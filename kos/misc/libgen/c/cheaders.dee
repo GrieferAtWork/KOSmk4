@@ -324,9 +324,11 @@ class FunctionPrototype {
 			fp: CWriter, escapeMode: int, decl: string,
 			exposedName: string, assemblyName: string) {
 		local isLcl = isLibcLinkage(decl, cc, assemblyName);
+		local isSameAsname = exposedName == assemblyName && fp.externLinkage in ["", "C"];
 		if (isLcl) {
-			cprintDeclarationCDECLARE(fp, escapeMode, decl, exposedName, assemblyName);
-			return;
+			if (isSameAsname)
+				return cprintDeclarationCDECLARE(fp, escapeMode, decl, exposedName);
+			return cprintRedirectDeclaration(fp, escapeMode, decl, exposedName, assemblyName);
 		}
 		/* Same symbol name -> declare normally (or with `__ASMNAME()' suffix) */
 		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName);
@@ -340,10 +342,10 @@ class FunctionPrototype {
 				suffix       = "_KOS";
 				assemblyName = assemblyName[4:];
 			}
-			if (exposedName == assemblyName)
+			if (isSameAsname)
 				fp << "_SAME";
 			fp << suffix << "(" << repr(assemblyName) << ")";
-		} else if (exposedName != assemblyName) {
+		} else if (!isSameAsname) {
 			fp << " __ASMNAME(" << repr(assemblyName) << ")";
 		}
 		fp << ";\n";
@@ -353,12 +355,7 @@ class FunctionPrototype {
 	@@> __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,wcslen,(__WCHAR_TYPE__ const *__restrict __str),(__str))
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintDeclarationCDECLARE(
-			fp: CWriter, escapeMode: int, decl: string,
-			exposedName: string, assemblyName: string) {
-		if (exposedName != assemblyName) {
-			return cprintRedirectDeclaration(
-				fp, escapeMode, decl, exposedName, assemblyName);
-		}
+			fp: CWriter, escapeMode: int, decl: string, exposedName: string) {
 		/* Special case: Make use of __CDECLARE */
 		local isVoidReturn = returnType.isVoid;
 		fp << "__CDECLARE";
@@ -512,7 +509,7 @@ class FunctionPrototype {
 	public function cprintRedirectionBinding(
 			fp: CWriter, escapeMode: int, decl: string,
 			exposedName: string, assemblyName: string) {
-		if (exposedName != assemblyName) {
+		if (exposedName != assemblyName || fp.externLinkage !in ["", "C"]) {
 			cprintRedirectDeclaration(
 				fp, escapeMode, decl, exposedName, assemblyName);
 			return;
@@ -612,6 +609,9 @@ class FunctionImplementation {
 		fp.forceStartOfLine();
 		local oldNs = fp.namespace;
 		fp.namespace = namespace;
+		local oldExternLinkage = fp.externLinkage;
+		if (oldExternLinkage !in ["", "C"])
+			fp.externLinkage = "";
 		/* Bind dependent functions. */
 		local deps = dependencyFunctions;
 		for (local depName, depFun: deps) {
@@ -665,6 +665,7 @@ class FunctionImplementation {
 			forceKeyEscape: true
 		);
 		fp << "\n";
+		fp.externLinkage = oldExternLinkage;
 		fp.namespace = oldNs;
 	}
 }
@@ -783,11 +784,15 @@ class LocalFunction {
 		local usedPrototype = functionPrototype;
 		local oldNs = fp.namespace;
 		fp.namespace = GLOBAL_NAMESPACE;
+		local oldExternLinkage = fp.externLinkage;
+		if (oldExternLinkage !in ["", "C"])
+			fp.externLinkage = "";
 		/* Include the local-header for this function */
 		fp.ppInclude("<local/{}/{}.h>".format({ originalSystemHeaderName, name }));
 		/* Remember that we'll be needing the local implementation of this function */
 		neededLocalFunction.insert(this);
 		fp.namespace = oldNs;
+		fp.externLinkage = oldExternLinkage;
 		local callToLocalName = LOCAL_NAMESPACE.keyCSymbolName(name);
 		if (oldNs === GLOBAL_NAMESPACE) {
 			if (LOCAL_NAMESPACE.prefix)
@@ -864,8 +869,12 @@ class InlineFunction {
 		if (impl.implPrefix) {
 			local oldNs = fp.namespace;
 			fp.namespace = GLOBAL_NAMESPACE;
+			local oldExternLinkage = fp.externLinkage;
+			if (oldExternLinkage !in ["", "C"])
+				fp.externLinkage = "";
 			for (local x: impl.implPrefix)
 				escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
+			fp.externLinkage = oldExternLinkage;
 			fp.namespace = oldNs;
 		}
 		/* Bind dependent functions. */
@@ -892,6 +901,9 @@ class InlineFunction {
 			};
 			local oldNs = fp.namespace;
 			fp.namespace = dependenciesNamespace;
+			local oldExternLinkage = fp.externLinkage;
+			if (oldExternLinkage !in ["", "C"])
+				fp.externLinkage = "";
 			for (local depName, depFun: deps) {
 				depName = keyDependency(depName);
 				depFun.cprintHeaderDeclaration(fp, escapeMode, dependencyDecl,
@@ -900,6 +912,7 @@ class InlineFunction {
 					preferBindingMacros:      true,
 					printDeclarationPrefixes: true);
 			}
+			fp.externLinkage = oldExternLinkage;
 			fp.namespace = oldNs;
 		} else {
 			depKey = [](keyword: string): string {
@@ -1369,6 +1382,7 @@ normal_guardName_binding:
 				continue;
 			local usedPpCond = expandPreprocessorConditionString(bind.ppCond);
 			local oldNs: Namespace | none = none;
+			local oldExternLinkage;
 			for (local x: bind.ppCondPrefix) {
 				local newText = escapeText(x, escapeMode);
 				if (fp.wasPrefixPrinted(newText))
@@ -1379,12 +1393,16 @@ normal_guardName_binding:
 						numNeededEndif.last = false;
 					}
 					/* Include the preprocessor-condition prefix texts. */
-					fp.namespace = GLOBAL_NAMESPACE;
 					oldNs = fp.namespace;
+					fp.namespace = GLOBAL_NAMESPACE;
+					oldExternLinkage = fp.externLinkage;
+					if (oldExternLinkage !in ["", "C"])
+						fp.externLinkage = "";
 				}
 				fp.forceStartOfLine() << newText;
 			}
 			if (oldNs !is none) {
+				fp.externLinkage = oldExternLinkage;
 				fp.namespace = oldNs;
 				fp.ppIf(usedPpCond);
 				numNeededEndif.pushback(true);
@@ -1443,18 +1461,25 @@ class ExposedFunction {
 	@@An override for the active namespace during function declaration
 	public member namespaceOverride: Namespace | UserString | string | none = none;
 
+	@@An override for the active `extern "<externLinkage>"` during function declaration
+	public member externLinkageOverride: string | none = none;
+
 	@@Print this function's normal declaration, as might be found in `<string.h>`
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintHeaderDeclaration(fp: CWriter, escapeMode: int) {
 		local oldNs = fp.namespace;
 		if (namespaceOverride !is none)
 			fp.namespace = namespaceOverride;
+		local oldExternLinkage = fp.externLinkage;
+		if (externLinkageOverride !is none)
+			fp.externLinkage = externLinkageOverride;
 		if (func is Callable)
 			func = func();
 		func.cprintHeaderDeclaration(
 			fp, escapeMode, decl, exposedName,
 			guardName, preferBindingMacros,
 			printDeclarationPrefixes);
+		fp.externLinkage = oldExternLinkage;
 		fp.namespace = oldNs;
 	}
 

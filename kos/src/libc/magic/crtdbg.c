@@ -282,7 +282,7 @@ _CrtDbgReportW:(int report_type, __WCHAR16_TYPE__ const *filename, int line, __W
 _CrtSetBreakAlloc:(__LONG32_TYPE__ break_alloc) -> __LONG32_TYPE__;
 
 [ATTR_MALLOC][ATTR_ALLOC_SIZE((1))]
-[guard][ATTR_WUNUSED][userimpl][requires($has_function(malloc))]
+[guard][ATTR_WUNUSED][userimpl][requires_function("malloc")]
 _malloc_dbg:($size_t num_bytes, int block_type,
              char const *filename, int line) -> void * {
 	(void)block_type;

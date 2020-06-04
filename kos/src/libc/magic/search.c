@@ -290,7 +290,7 @@ struct hsearch_data {
 }
 
 @@Reentrant versions which can handle multiple hashing tables at the same time
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 hsearch_r:(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab) -> int {
 	typedef struct {
 		unsigned int used;
@@ -353,7 +353,7 @@ hsearch_r:(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab)
 [doc_alias(hsearch_r)]
 [requires($has_function(calloc))][same_impl]
 [dependency_include(<hybrid/limitcore.h>)]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 hcreate_r:(size_t nel, struct hsearch_data *htab) -> int {
 	typedef struct {
 		unsigned int used;
@@ -388,7 +388,7 @@ hcreate_r:(size_t nel, struct hsearch_data *htab) -> int {
 }
 [doc_alias(hsearch_r)]
 [requires($has_function(free))][same_impl]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 hdestroy_r:(struct hsearch_data *htab) {
 	if (htab == NULL) {
 #ifdef EINVAL
@@ -473,7 +473,7 @@ maybe_split_for_insert:(void **rootp, void **parentp, void **gparentp, int p_r, 
 
 @@Search for an entry matching the given KEY in the tree
 @@pointed to by *ROOTP and insert a new element if not found
-[requires($has_function(malloc))][same_impl][export_alias(__tsearch)]
+[requires_function("malloc")][same_impl][export_alias(__tsearch)]
 tsearch:(void const *key, void **vrootp, __compar_fn_t compar) -> void * {
 	typedef struct node_struct {
 		void const         *key;

@@ -57,7 +57,7 @@ Memdup:([[nonnull]] void const *__restrict ptr, size_t num_bytes) -> [nonnull, m
 
 @@@throws: E_BADALLOC: ...
 [throws(E_BADALLOC)][requires($has_function(Memdup))][section(.text.crt.except.heap.rare_helpers)]
-Memcdup:([[nonnull]] void const *__restrict ptr, int needle, size_t num_bytes) -> [nonnull, malloc(?)] void * {
+Memcdup:([[nonnull]] void const *__restrict ptr, int needle, size_t num_bytes) -> [nonnull, malloc] void * {
 	if likely(num_bytes) {
 		void const *endaddr;
 		endaddr = memchr(ptr, needle, num_bytes - 1);

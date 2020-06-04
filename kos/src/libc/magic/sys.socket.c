@@ -209,7 +209,7 @@ send:($fd_t sockfd, [inp(bufsize)] void const *buf,
 @@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [cp][ATTR_WUNUSED][export_alias(__recv)]
-recv:($fd_t sockfd, [outp(bufsize)] void *buf, size_t bufsize,
+recv:($fd_t sockfd, [[outp(bufsize)]] void *buf, size_t bufsize,
       __STDC_INT_AS_UINT_T msg_flags) -> ssize_t;
 
 @@Send BUFSIZE bytes of BUF on socket FD to peer at address ADDR
@@ -227,7 +227,7 @@ sendto:($fd_t sockfd, [inp(bufsize)] void const *buf, size_t bufsize, __STDC_INT
 @@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [cp][ATTR_WUNUSED]
-recvfrom:($fd_t sockfd, [outp(bufsize)] void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
+recvfrom:($fd_t sockfd, [[outp(bufsize)]] void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
           [outp_opt(*addr_len)] __SOCKADDR_ARG addr, [[nullable]] socklen_t *__restrict addr_len) -> ssize_t;
 
 @@Send a message described MESSAGE on socket FD.

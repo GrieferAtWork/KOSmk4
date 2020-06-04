@@ -1416,7 +1416,7 @@ pthread_spin_lock:([[nonnull]] pthread_spinlock_t *lock) -> int {
 %
 @@Try to lock spinlock LOCK
 [dependency_include(<hybrid/__atomic.h>)]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 pthread_spin_trylock:([[nonnull]] pthread_spinlock_t *lock) -> int {
 	if (__hybrid_atomic_xch(*lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
@@ -1561,7 +1561,7 @@ pthread_num_processors_np:() -> __STDC_INT_AS_SIZE_T {
 }
 
 [dependency_include(<bits/sched.h>)]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [userimpl][requires($has_function(sched_setaffinity))]
 pthread_set_num_processors_np:(int n) -> int {
 	int i, result;

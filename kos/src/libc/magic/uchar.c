@@ -87,7 +87,7 @@ typedef __CHAR32_TYPE__ char32_t;
 
 
 [std]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [impl_prefix(
 @__LOCAL_LIBC_DATA@(mbrtoc16_mbs) __mbstate_t mbrtoc16_mbs = __MBSTATE_INIT;
 )]
@@ -115,7 +115,7 @@ mbrtoc16:(char16_t *__restrict pc16,
 
 
 [std]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [dependency_include(<bits/mbstate.h>)]
 [impl_prefix(
 @__LOCAL_LIBC_DATA@(mbrtoc32_mbs) __mbstate_t mbrtoc32_mbs = __MBSTATE_INIT;
@@ -143,7 +143,7 @@ mbrtoc32:(char32_t *__restrict pc32,
 }
 
 [std]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [dependency_include(<bits/mbstate.h>)]
 [impl_prefix(
 @__LOCAL_LIBC_DATA@(c16rtomb_mbs) __mbstate_t c16rtomb_mbs = __MBSTATE_INIT;
@@ -188,7 +188,7 @@ error_ilseq:
 }
 
 [std]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [dependency_include(<bits/mbstate.h>)]
 c32rtomb:(char *__restrict s, char32_t c32, __mbstate_t *__restrict mbs) -> size_t {
 	if (!s) {

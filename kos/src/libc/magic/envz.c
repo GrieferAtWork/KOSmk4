@@ -97,7 +97,7 @@ envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[non
 @@because when merging with another envz, the null entry can override an
 @@entry in the other one. Such entries can be removed with `envz_strip()'
 [requires($has_function(realloc) && $has_function(argz_add))]
-[dependency_include(<parts/errno.h>)][userimpl]
+[impl_include("<parts/errno.h>")][userimpl]
 envz_add:([[nonnull]] char **__restrict penvz, [[nonnull]] size_t *__restrict penvz_len,
           [[nonnull]] char const *__restrict name, [[nullable]] char const *value) -> error_t {
 	char *new_envz;

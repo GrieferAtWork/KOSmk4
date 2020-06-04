@@ -24,7 +24,7 @@
 %[define_replacement(dev_t = __dev_t)]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
-%[define_replacement(time_t = __TM_TYPE(time))]
+%[define_replacement(time_t = "__TM_TYPE(time)")]
 %[define_replacement(time32_t = __time32_t)]
 %[define_replacement(time64_t = __time64_t)]
 
@@ -97,11 +97,11 @@ FStatAt64:($fd_t dirfd, [[nonnull]] char const *__restrict filename,
 %[default_impl_section(.text.crt.except.fs.modify)]
 
 %
-[throws][cp][noexport][doc_alias(mkdir)]
+[[throws, cp, doc_alias(mkdir)]]
 Mkdir:([[nonnull]] char const *pathname, $mode_t mode);
 
 %
-[throws][cp][doc_alias(chmod)]
+[[throws, cp, doc_alias(chmod)]]
 Chmod:([[nonnull]] char const *filename, $mode_t mode);
 
 
@@ -147,11 +147,11 @@ Mkfifo:([[nonnull]] char const *fifoname, $mode_t mode);
 %#endif /* __USE_ATFILE */
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
-%[default_impl_section(.text.crt.except.fs.modify_time)]
+%[default_impl_section(.text.crt.except.fs.modify_time)];
 
-[throws][doc_alias(utimensat32)][cp][ignore]
-UTimensAt32:($fd_t dirfd, [[nonnull]] char const *filename,
-             [[nullable]] struct timespec const times[2 /*or:3*/], $atflag_t flags) = UTimensAt?;
+[[throws, doc_alias(utimensat32), cp, ignore, nocrt, alias(UTimensAt)]]
+void UTimensAt32($fd_t dirfd, [[nonnull]] char const *filename,
+                 [[nullable]] struct timespec const times[2 /*or:3*/], $atflag_t flags);
 
 %
 %#ifdef __USE_ATFILE
@@ -159,8 +159,8 @@ UTimensAt32:($fd_t dirfd, [[nonnull]] char const *filename,
 [[if(defined(__USE_TIME_BITS64)), preferred_alias(UTimensAt64)]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias(UTimensAt)]]
 [[userimpl, requires(defined(__CRT_HAVE_UTimensAt) || defined(__CRT_HAVE_UTimensAt64))]]
-UTimensAt:($fd_t dirfd, [[nonnull]] char const *filename,
-           [[nullable]] struct timespec const times[2 /*or:3*/], $atflag_t flags) {
+void UTimensAt($fd_t dirfd, [[nonnull]] char const *filename,
+               [[nullable]] struct timespec const times[2 /*or:3*/], $atflag_t flags) {
 #ifdef __CRT_HAVE_UTimensAt64
 #if defined(__KOS__) && __KOS_VERSION__ >= 300
 	struct timespec64 tms[3];

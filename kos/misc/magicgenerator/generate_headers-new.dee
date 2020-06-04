@@ -30,6 +30,9 @@ import Function from ..libgen.c.cheaders;
 import fs;
 
 #if 1
+@@Set of known user libc exports (populated by %[declare_user_export(...)])
+global final knownUserExports: {string...} = HashSet();
+
 @@Set of known kernel exports (populated by %[declare_kernel_export(...)])
 global final knownKernelExports: {string...} = HashSet();
 
@@ -41,18 +44,22 @@ function customDirectivesParser(context: LoaderContext): bool {
 	local tok = self.tok;
 	switch (tok) {
 
-	case "declare_kernel_export":
+	case "declare_user_export":
+	case "declare_kernel_export": {
+		local s = tok == "declare_kernel_export"
+			? knownKernelExports
+			: knownUserExports;
 		self.next();
 		tok = self.skip("(");
 		while (tok !in ["", ")"]) {
 			local name = parseCStringOrFunctionLikeExpression(self);
-			knownKernelExports.insert(name);
+			s.insert(name);
 			if (self.tok != ",")
 				break;
 			tok = self.next();
 		}
 		self.skip(")");
-		break;
+	}	break;
 
 	default:
 		return false;
@@ -120,15 +127,22 @@ size_t strlen(char const *__restrict str) {
 	return (size_t)(end - str);
 }
 
+[[crtbuiltin]]
+size_t strnlen(char const *__restrict str, size_t maxlen) {
+}
+
+
 %
 %
-%
-%
+%#ifdef __cplusplus
+%[insert:function(strlen = strnlen, externLinkageOverride: 'C++', guardName: '__cxx_strlen_defined')]
+%#endif /* __cplusplus */
+
 
 /* FIXME: This breaks due to how [[crtbuiltin]] is implemented... */
 //[[crtbuiltin]] wcslen(*) %{generate(str2wcs)}
 /* ... Note that this works, however: */
-[[crtbuiltin]] size_t wcslen(wchar_t const *__restrict str) %{generate(str2wcs)}
+//[[crtbuiltin]] size_t wcslen(wchar_t const *__restrict str) %{generate(str2wcs)}
 
 
 //

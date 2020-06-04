@@ -67,6 +67,10 @@ class Namespace {
 	@@Returns the macro name for the default guard for the given symbol
 	@@e.g. @([](name) -> "__fast_{}_defined".format({ name }))
 	public member keyDefaultGuard: Callable with string;
+
+	public operator hash(): int -> Object.id(this);
+	public operator == (other: Namespace): bool -> this === other;
+	public operator != (other: Namespace): bool -> this !== other;
 }
 
 local function _globalNamespaceUsing(fp: File, name: string, ...) {

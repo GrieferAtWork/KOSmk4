@@ -238,26 +238,26 @@ spawnve:(int mode, [[nonnull]] char const *__restrict path, [[nonnull]] @__TARGV
 [cp][guard][argument_names(mode, file, ___argv, ___envp)][alias(_spawnvpe)]
 spawnvpe:(int mode, [[nonnull]] char const *__restrict file, [[nonnull]] @__TARGV@, [[nonnull]] @__TENVP@) -> $pid_t;
 
-[cp][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(spawnv)][ATTR_SENTINEL][alias(_spawnl)][allow_macros]
+[cp][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(spawnv)][ATTR_SENTINEL][alias(_spawnl)][allow_macros]
 spawnl:(int mode, [[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) -> $pid_t {
 	__REDIRECT_SPAWNL(char, spawnv, mode, path, args)
 }
 
-[cp][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(spawnvp)][ATTR_SENTINEL][alias(_spawnlp)][allow_macros]
+[cp][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(spawnvp)][ATTR_SENTINEL][alias(_spawnlp)][allow_macros]
 spawnlp:(int mode, [[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) -> $pid_t {
 	__REDIRECT_SPAWNLP(char, spawnvp, mode, file, args)
 }
 
-[cp][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(spawnve)][ATTR_SENTINEL_O(1)][alias(_spawnle)][allow_macros]
+[cp][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(spawnve)][ATTR_SENTINEL_O(1)][alias(_spawnle)][allow_macros]
 spawnle:(int mode, [[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL, char **environ*/) -> $pid_t {
 	__REDIRECT_SPAWNLE(char, spawnve, mode, path, args)
 }
 
-[cp][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(spawnvpe)][ATTR_SENTINEL_O(1)][alias(_spawnlpe)][allow_macros]
+[cp][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(spawnvpe)][ATTR_SENTINEL_O(1)][alias(_spawnlpe)][allow_macros]
 spawnlpe:(int mode, [[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, char **environ*/) -> $pid_t {
 	__REDIRECT_SPAWNLPE(char, spawnvpe, mode, file, args)
 }

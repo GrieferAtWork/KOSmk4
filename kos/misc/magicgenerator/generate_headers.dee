@@ -2072,15 +2072,15 @@ got_section_prefix:
 					if (nosys_errno === default_nosys_errno)
 						nosys_errno = directive;
 					default_nosys_errno = directive;
-				} else if (directive.startswith("crt_feature")) {
-					directive = directive[#"crt_feature":].lstrip();
+				} else if (directive.startswith("declare_user_export")) {
+					directive = directive[#"declare_user_export":].lstrip();
 					if (!directive.startswith("("))
-						err(directive_begin, "Expected `(' after `%[crt_feature' in " + repr directive);
+						err(directive_begin, "Expected `(' after `%[declare_user_export' in " + repr directive);
 					local defend = directive.findmatch("(", ")", 1);
 					if (defend < 0)
-						err(directive_begin, "Missing `)' after `%[crt_feature" + repr directive + "'");
+						err(directive_begin, "Missing `)' after `%[declare_user_export" + repr directive + "'");
 					if (directive[defend + 1:].strip() != "")
-						err(directive_begin, "Trailing text after `%[crt_feature(...)': " + repr directive[defend:].strip());
+						err(directive_begin, "Trailing text after `%[declare_user_export(...)': " + repr directive[defend:].strip());
 					directive = directive[1:defend].strip();
 					for (local x: directive.split(",")) {
 						x = x.strip();
@@ -3182,7 +3182,7 @@ again_enum_name:
 					libc_impl = get_tag_operand();
 					user_impl = libc_impl;
 					break;
-				case "requires_dependency":
+				case "requires_dependent_function":
 					for (local d: get_tag_operand().split(",")) {
 						d = d.strip();
 						forced_dependencies.append(d);

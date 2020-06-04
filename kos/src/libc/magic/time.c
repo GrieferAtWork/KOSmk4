@@ -537,7 +537,7 @@ DEFINE_GMTIME_BUFFER
 @@the provided locale and not the global locale
 [dependency_prefix(DEFINE_STRUCT_TM)]
 [ignore][alias(_strftime_l)][export_alias(__strftime_l)]
-crt_strftime_l:([outp(bufsize)] char *__restrict buf, $size_t bufsize,
+crt_strftime_l:([[outp(bufsize)]] char *__restrict buf, $size_t bufsize,
                 [[nonnull]] char const *__restrict format,
                 [[nonnull]] __STRUCT_TM const *__restrict tp,
                 $locale_t locale) -> $size_t = strftime_l?;
@@ -554,7 +554,7 @@ crt_strftime_l:([outp(bufsize)] char *__restrict buf, $size_t bufsize,
 	COMPILER_IMPURE();
 	return 0;
 })]
-strftime:([outp(bufsize)] char *__restrict buf, size_t bufsize,
+strftime:([[outp(bufsize)]] char *__restrict buf, size_t bufsize,
           [[nonnull]] char const *__restrict format,
           [[nonnull]] __STRUCT_TM const *__restrict tp) -> size_t {
 @@if_has_function(crt_strftime_l)@@
@@ -1403,7 +1403,7 @@ getdate_r:([[nonnull]] const char *__restrict string,
 @@Similar to `strftime' but take the information from
 @@the provided locale and not the global locale
 [dependency_prefix(DEFINE_STRUCT_TM)][alias(_strftime_l)][export_alias(__strftime_l)]
-strftime_l:([outp(bufsize)] char *__restrict buf, $size_t bufsize,
+strftime_l:([[outp(bufsize)]] char *__restrict buf, $size_t bufsize,
             [[nonnull]] char const *__restrict format,
             [[nonnull]] __STRUCT_TM const *__restrict tp, $locale_t locale) -> $size_t {
 	(void)locale;

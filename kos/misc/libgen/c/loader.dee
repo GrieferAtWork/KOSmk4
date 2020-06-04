@@ -601,23 +601,103 @@ again_parse_annotations:
 					goto again_parse_annotations;
 
 				case "malloc": {
+					if (result.attributes === defaultAttributes)
+						result.attributes = List(defaultAttributes);
+					result.attributes.append("ATTR_WUNUSED");
+					result.attributes.append("ATTR_MALLOC");
+					result.attributes.append("ATTR_MALL_DEFAULT_ALIGNED");
+					if (self.next() == "(") {
+						self.next();
+						local argumentIndices = [];
+						while (self.tok !in ["", ")"]) {
+							local argumentNameStart = self.tokStart;
+							local argumentName = parseCStringOrKeyword(self);
+							try {
+								argumentIndices.append(
+									result.argv.index(result.argsByName[argumentName]) + 1);
+							} catch (Error as e) {
+								self.errAt(argumentNameStart, e.message);
+							}
+							if (self.tok !in [",", "*"])
+								break;
+							self.next();
+						}
+						result.attributes.append("ATTR_ALLOC_SIZE(({}))"
+							.format({ ", ".join(argumentIndices) }));
+						self.skip(")");
+					}
+				}	break;
+
+				case "realloc": {
 					self.next();
 					self.skip("(");
-					local argumentIndex;
-					local argumentNameStart = self.tokStart;
-					local argumentName = parseCStringOrKeyword(self);
-					try {
-						argumentIndex = result.argv.index(result.argsByName[argumentName]);
-					} catch (Error as e) {
-						print repr result.argsByName;
-						self.errAt(argumentNameStart, e.message);
+					parseCStringOrKeyword(self);
+					self.skip(",");
+					local argumentIndices = [];
+					while (self.tok !in ["", ")"]) {
+						local argumentNameStart = self.tokStart;
+						local argumentName = parseCStringOrKeyword(self);
+						try {
+							argumentIndices.append(
+								result.argv.index(result.argsByName[argumentName]) + 1);
+						} catch (Error as e) {
+							self.errAt(argumentNameStart, e.message);
+						}
+						if (self.tok !in [",", "*"])
+							break;
+						self.next();
 					}
 					if (result.attributes === defaultAttributes)
 						result.attributes = List(defaultAttributes);
+					result.attributes.append("ATTR_WUNUSED");
 					result.attributes.append("ATTR_MALLOC");
 					result.attributes.append("ATTR_MALL_DEFAULT_ALIGNED");
 					result.attributes.append("ATTR_ALLOC_SIZE(({}))"
-						.format({ argumentIndex + 1 }));
+						.format({ ", ".join(argumentIndices) }));
+					self.skip(")");
+				}	break;
+
+				case "memalign": {
+					self.next();
+					self.skip("(");
+					local minAlignmentAttrib;
+					if (self.tok == "getpagesize") {
+						self.next();
+						self.skip("(");
+						self.skip(")");
+						minAlignmentAttrib = "__ATTR_MALL_PAGEALIGNED";
+					} else {
+						local minAlignmentArgumentNameStart = self.tokStart;
+						local minAlignmentArgumentName = parseCStringOrKeyword(self);
+						try {
+							minAlignmentAttrib = "ATTR_ALLOC_ALIGN({})"
+							.format({ result.argv.index(result.argsByName[minAlignmentArgumentName]) + 1 });
+						} catch (Error as e) {
+							self.errAt(minAlignmentArgumentNameStart, e.message);
+						}
+					}
+					self.skip(",");
+					local argumentIndices = [];
+					while (self.tok !in ["", ")"]) {
+						local argumentNameStart = self.tokStart;
+						local argumentName = parseCStringOrKeyword(self);
+						try {
+							argumentIndices.append(
+								result.argv.index(result.argsByName[argumentName]) + 1);
+						} catch (Error as e) {
+							self.errAt(argumentNameStart, e.message);
+						}
+						if (self.tok !in [",", "*"])
+							break;
+						self.next();
+					}
+					if (result.attributes === defaultAttributes)
+						result.attributes = List(defaultAttributes);
+					result.attributes.append("ATTR_WUNUSED");
+					result.attributes.append("ATTR_MALLOC");
+					result.attributes.append(minAlignmentAttrib);
+					result.attributes.append("ATTR_ALLOC_SIZE(({}))"
+						.format({ ", ".join(argumentIndices) }));
 					self.skip(")");
 				}	break;
 
@@ -912,6 +992,26 @@ class FunctionFeatures {
 			self.skip("(");
 			while (self.tok !in ["", ")"]) {
 				local addend = "$has_function({})".format({ parseCStringOrKeyword(self) });
+				if (requires is UserString || requires != "1")
+					addend = "({}) && ({})".format({ requires, addend });
+				requires = addend;
+				if (self.tok != ",")
+					break;
+				self.next();
+			}
+			self.skip(")");
+		}	break;
+
+		case "requires_dependent_function": {
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			forcedDependencies = HashSet(forcedDependencies);
+			while (self.tok !in ["", ")"]) {
+				local functionName = parseCStringOrKeyword(self);
+				forcedDependencies.insert(functionName);
+				local addend = "$has_function({})".format({ functionName });
 				if (requires is UserString || requires != "1")
 					addend = "({}) && ({})".format({ requires, addend });
 				requires = addend;
@@ -1383,6 +1483,9 @@ class LoaderContext {
 	@@The associated C-parser
 	public member self: CParser;
 
+	@@Name of the header being loaded
+	public member headerName: string;
+
 	@@The system header that is being generated
 	public member result: SystemHeader;
 
@@ -1646,7 +1749,123 @@ again_parse_default_annotation:
 			.format({ tok }));
 	}
 
+	public function parseInsertDirective_std_function() {
+		parseInsertDirective_function(std: true);
+	}
+
+	@@>> %[insert:function(foo)]
+	@@>> %[insert:function(foo, ATTRIB)]
+	@@>> %[insert:function(foo = bar)]
+	@@>> %[insert:function(foo = bar, ATTRIB)]
+	@@>> %[insert:std_function(foo)]
+	@@>> %[insert:std_function(foo, ATTRIB)]
+	@@>> %[insert:std_function(foo = bar)]
+	@@>> %[insert:std_function(foo = bar, ATTRIB)]
+	@@
+	@@Where ATTRIB is:
+	@@    ',' ~~ (ATTR_NAME ':' ATTR_VALEXPR)...
+	@@
+	@@Where ATTR_NAME is the name of one of the members of @ExposedFunction
+	@@Where ATTR_VALEXPR is a deemon expression, as executable by @(exec from deemon)
+	public function parseInsertDirective_function(std: bool = false) {
+		local self = this.self;
+		self.next();
+		self.skip("(");
+		local exposedFunction = ExposedFunction();
+		local insertedFunctionNameStart = self.tokStart;
+		local insertedFunctionName = parseCStringOrKeyword(self);
+		if (self.tok == "=") {
+			exposedFunction.exposedName = insertedFunctionName;
+			self.next();
+			insertedFunctionNameStart = self.tokStart;
+			insertedFunctionName = parseCStringOrKeyword(self);
+		}
+		exposedFunction.func = []{
+			try {
+				return findFunctionByName(insertedFunctionName);
+			} catch (Error as e) {
+				self.errAt(insertedFunctionNameStart, e.message);
+			}
+		};
+		if (self.tok == ",") {
+			self.next();
+			while (self.tok !in ["", ")"]) {
+				local propStart = self.tokStart;
+				local prop = parseCStringOrKeyword(self);
+				self.skip(":");
+				local valExprStart = self.tokStart;
+				local valExpr = parseAllUntilRParenAsString(self);
+				try {
+					valExpr = exec(valExpr);
+				} catch (Error as e) {
+					self.errAt(valExprStart, "{} (while executing {!r})"
+						.format({ e.message, valExpr }));
+				}
+				try {
+					exposedFunction.operator . (prop) = valExpr;
+				} catch (Error as e) {
+					self.errAt(propStart, e.message);
+				}
+				if (self.tok != ",")
+					break;
+				self.next();
+			}
+		}
+		if (std) {
+			if (result_order_headerStd is none) {
+				self.err("%[insert:std_function(...)] used, but "
+				         "'%[insert:std]' hasn't been encountered, yet");
+			}
+			result_order_headerStd.append(exposedFunction);
+			local gblGuard = false;
+			local nsStd = NAMESPACES["std"];
+			local importCondition = "$has_function({})".format({ insertedFunctionName });
+			exposedFunction.namespaceOverride = NAMESPACES["std"];
+			local exposedName = exposedFunction.exposedName;
+			if (exposedFunction.guardName !== false) {
+				local stdGuard = exposedFunction.guardName;
+				if (stdGuard === true)
+					stdGuard = nsStd.keyDefaultGuard(exposedName);
+				gblGuard = GLOBAL_NAMESPACE.keyDefaultGuard(exposedName);
+				importCondition = "defined({})".format({ stdGuard });
+			}
+			local importFunction = Function(
+				name:                     exposedName,
+				originalSystemHeaderName: headerName,
+				bindings: []{
+					yield FunctionBinding(
+						ppCond:     importCondition,
+						prototypes: exposedFunction.func().functionBindings.first.prototypes,
+						binding:    nsStd);
+				});
+			if (gblGuard !== false) {
+				local gblExposure = copy exposedFunction;
+				gblExposure.func              = importFunction;
+				gblExposure.guardName         = gblGuard;
+				gblExposure.namespaceOverride = GLOBAL_NAMESPACE;
+				importFunction = gblExposure;
+			}
+			if (!result_order_header_in_CXX_SYSTEM_HEADER) {
+				result.order_header.append(CXX_SYSTEM_HEADER_START);
+				result_order_header_in_CXX_SYSTEM_HEADER = true;
+			}
+			result.order_header.append(importFunction);
+			if (result_ccompatHeaderName !is none)
+				result_order_headerCCompat.append(importFunction);
+		} else {
+			if (result_order_header_in_CXX_SYSTEM_HEADER) {
+				result.order_header.append(CXX_SYSTEM_HEADER_END);
+				result_order_header_in_CXX_SYSTEM_HEADER = true;
+			}
+			result.order_header.append(exposedFunction);
+		}
+		self.skip(")");
+	}
+
 	public function parseInsertDirective_extern() {
+		/* >> %[insert:extern(foo)]
+		 * Alias for:
+		 * >> %[insert:function(foo, guardName: true)] */
 		local self = this.self;
 		self.next();
 		self.skip("(");
@@ -1665,10 +1884,8 @@ again_parse_default_annotation:
 					self.errAt(functionNameStart, e.message);
 				}
 			},
-			exposedName:       functionName,
-			guardName:         true,
-			namespaceOverride: GLOBAL_NAMESPACE,
-			));
+			exposedName: functionName,
+			guardName:   true));
 		self.skip(")");
 	}
 
@@ -1892,7 +2109,8 @@ function loadSystemHeaderDefinitions(
 	if (!allSystemHeaders.setnew(headerName, result))
 		throw Error("Duplicate system header: {!r}".format({ headerName }));
 	final local context: LoaderContext = LoaderContext(
-		self: self, result: result, customDirectivesParser: customDirectivesParser);
+		self: self, headerName: headerName, result: result,
+		customDirectivesParser: customDirectivesParser);
 	local tok = self.tok;
 	if (!tok)
 		tok = self.next();
@@ -3722,8 +3940,7 @@ done_function:
 						stdGuard = nsStd.keyDefaultGuard(exposedName);
 					if (gblGuard is none)
 						gblGuard = GLOBAL_NAMESPACE.keyDefaultGuard(exposedName);
-					importCondition = "defined({}) || {}"
-						.format({ stdGuard, importCondition });
+					importCondition = "defined({})".format({ stdGuard });
 				}
 				local importFunction = Function(
 					name: exposedName,

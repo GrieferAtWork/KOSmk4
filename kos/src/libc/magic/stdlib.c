@@ -767,8 +767,8 @@ malloc:(size_t num_bytes) -> void * {
 }
 
 [std_guard][std][libc]
-[requires($has_function(malloc))]
-[dependency_include(<hybrid/__overflow.h>)]
+[requires_function("malloc")]
+[impl_include("<hybrid/__overflow.h>")]
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
 [ATTR_ALLOC_SIZE((1, 2))][crtbuiltin]
 calloc:(size_t count, size_t num_bytes) -> void * {
@@ -1829,7 +1829,7 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(__SIZE_TYPE__ __num_bytes) { return (call
 
 %
 %#ifdef __USE_BSD
-[section(.text.crt.heap.rare_helpers)][userimpl]
+[section(".text.crt.heap.rare_helpers")][userimpl]
 [requires($has_function(realloc) && $has_function(free))]
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((2))]
 reallocf:(void *mallptr, $size_t num_bytes) -> void * {
@@ -1843,7 +1843,7 @@ reallocf:(void *mallptr, $size_t num_bytes) -> void * {
 @@Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
 @@when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
 @@is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block
-[section(.text.crt.heap.rare_helpers)][userimpl]
+[section(".text.crt.heap.rare_helpers")][userimpl]
 [requires($has_function(recallocv) && $has_function(calloc) && $has_function(malloc_usable_size))]
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((3, 4))]
 recallocarray:(void *mallptr, $size_t old_elem_count, $size_t new_elem_count, $size_t elem_size) -> void * {
@@ -1878,7 +1878,7 @@ recallocarray:(void *mallptr, $size_t old_elem_count, $size_t new_elem_count, $s
 @@described by `mallptr...+=size' is explicitly freed to zero, or
 @@immediately returned to the OS, rather than being left in cache
 @@while still containing its previous contents.
-[section(.text.crt.heap.rare_helpers)]
+[section(".text.crt.heap.rare_helpers")]
 [requires($has_function(free))][userimpl]
 freezero:(void *mallptr, $size_t size) {
 	if likely(mallptr) {
@@ -2392,7 +2392,7 @@ _dupenv_s:([[nonnull]] char **__restrict pbuf,
 [alias(itoa_s)]
 [if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(_ltoa_s)]
 [if(__SIZEOF_INT__ == 8), alias(_i64toa_s)]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _itoa_s:(int val, [[nonnull]] char *buf, $size_t buflen, int radix) -> errno_t {
 	char *p;
 	int temp;
@@ -2433,7 +2433,7 @@ _itoa_s:(int val, [[nonnull]] char *buf, $size_t buflen, int radix) -> errno_t {
 [alias(ltoa_s)]
 [alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, _itoa_s)]
 [if(__SIZEOF_LONG__ == 8), alias(_i64toa_s)]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _ltoa_s:(long val, [[nonnull]] char *buf, $size_t buflen, int radix) -> errno_t {
 	char *p;
 	long temp;
@@ -2473,7 +2473,7 @@ _ltoa_s:(long val, [[nonnull]] char *buf, $size_t buflen, int radix) -> errno_t 
 
 [alias(ultoa_s)]
 [if(__SIZEOF_LONG__ == 8), alias(_ui64toa_s)]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _ultoa_s:(unsigned long val, [[nonnull]] char *buf, $size_t buflen, int radix) -> errno_t {
 	char *p;
 	unsigned long temp;
@@ -2522,7 +2522,7 @@ _ui64toa:($u64 val, [[nonnull]] char *buf, int radix) -> char * {
 
 [alt_variant_of(__SIZEOF_LONG__ == 8, _ltoa_s)]
 [alt_variant_of(__SIZEOF_INT__ == 8, _itoa_s)]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _i64toa_s:($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) -> errno_t {
 	char *p;
 	s64 temp;
@@ -2561,7 +2561,7 @@ _i64toa_s:($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) -> errno_
 }
 
 [alt_variant_of(__SIZEOF_LONG__ == 8, _ultoa_s)]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _ui64toa_s:($u64 val, [[nonnull]] char *buf, $size_t buflen, int radix) -> errno_t {
 	char *p;
 	u64 temp;
@@ -2664,7 +2664,7 @@ _mbstowcs_l:(wchar_t *dst, char const *src,
 }
 
 
-[wchar][dependency_include(<parts/errno.h>)]
+[wchar][impl_include("<parts/errno.h>")]
 _mbstowcs_s:($size_t *presult,
              wchar_t *dst, $size_t dstsize,
              char const *src, $size_t dstlen) -> errno_t {
@@ -2706,7 +2706,7 @@ _mbstowcs_s_l:($size_t *presult,
 }
 
 %[default_impl_section(.text.crt.dos.random)]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [user][same_impl][dos_variant]
 rand_s:([[nonnull]] unsigned int *__restrict randval) -> errno_t{
 	if (!randval) {
@@ -2750,7 +2750,7 @@ _wctomb_l:(char *buf, wchar_t wc, $locale_t locale) -> int {
 
 %
 %#ifdef __USE_DOS_SLIB
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 wctomb_s:([[nonnull]] int *presult, [[nonnull]] char *buf,
           rsize_t buflen, wchar_t wc) -> errno_t {
 	if (!presult || !buf) {
@@ -2772,14 +2772,14 @@ wctomb_s:([[nonnull]] int *presult, [[nonnull]] char *buf,
 }
 %#endif /* __USE_DOS_SLIB */
 
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _wctomb_s_l:([[nonnull]] int *presult, [[nonnull]] char *buf,
              $size_t buflen, wchar_t wc, $locale_t locale) -> errno_t {
 	(void)locale;
 	return wctomb_s(presult, buf, buflen, wc);
 }
 
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _wcstombs_s_l:([[nonnull]] $size_t *presult, [[nonnull]] char *buf,
                $size_t buflen, [[nonnull]] wchar_t const *src,
                $size_t maxlen, $locale_t locale) -> errno_t {
@@ -2793,7 +2793,7 @@ _wcstombs_l:([[nonnull]] char *dst, [[nonnull]] wchar_t const *src,
 	return wcstombs(dst, src, maxlen);
 }
 
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 wcstombs_s:([[nonnull]] $size_t *presult,
             [[nonnull]] char *buf, $size_t buflen,
             [[nonnull]] wchar_t const *src, $size_t maxlen) -> errno_t {
@@ -2821,7 +2821,7 @@ wcstombs_s:([[nonnull]] $size_t *presult,
 
 [attribute(*)] _recalloc:(*) = recallocv;
 
-[requires($has_function(malloc))][same_impl]
+[requires_function("malloc")][same_impl]
 _aligned_malloc:($size_t num_bytes, $size_t min_alignment)
 	-> [memalign(min_alignment, num_bytes)] void *
 {
@@ -2835,7 +2835,7 @@ _aligned_malloc:($size_t num_bytes, $size_t min_alignment)
 	return result;
 }
 
-[requires($has_function(malloc))][same_impl]
+[requires_function("malloc")][same_impl]
 _aligned_offset_malloc:($size_t num_bytes, $size_t min_alignment, $size_t offset)
 	-> [malloc_unaligned(num_bytes)] void *
 {
@@ -2946,7 +2946,7 @@ _aligned_free:(void *aligned_mallptr) {
 %[default_impl_section(.text.crt.unicode.static.convert)]
 
 %#ifndef __NO_FPU
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _ecvt_s:([[nonnull]] char *buf, $size_t buflen, double val, int ndigit,
          [[nonnull]] int *__restrict decptr,
          [[nonnull]] int *__restrict sign) -> errno_t {
@@ -2956,7 +2956,7 @@ _ecvt_s:([[nonnull]] char *buf, $size_t buflen, double val, int ndigit,
 	return 0;
 }
 
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _fcvt_s:([[nonnull]] char *buf, $size_t buflen, double val, int ndigit,
          [[nonnull]] int *__restrict decptr,
          [[nonnull]] int *__restrict sign) -> errno_t {
@@ -2966,7 +2966,7 @@ _fcvt_s:([[nonnull]] char *buf, $size_t buflen, double val, int ndigit,
 	return 0;
 }
 
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _gcvt_s:([[nonnull]] char *buf, $size_t buflen, double val, int ndigit) -> errno_t {
 	int a, b;
 	if (!buf)
@@ -3097,7 +3097,7 @@ _lrotr:(unsigned long val, int shift) -> unsigned long {
 
 %[default_impl_section(.text.crt.dos.fs.environ)]
 [requires(defined(__CRT_HAVE_setenv))][same_impl]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _putenv_s:(char const *varname, char const *val) -> errno_t {
 	return setenv(varname, val, 1) ? __libc_geterrno_or(__EINVAL) : 0;
 }
@@ -3133,7 +3133,7 @@ _splitpath:([[nonnull]] char const *__restrict abspath,
 	             ext, ext ? 256 : 0);
 }
 
-[dependency_include(<parts/errno.h>)][same_impl]
+[impl_include("<parts/errno.h>")][same_impl]
 _makepath_s:([[nonnull]] char *buf, $size_t buflen,
              char const *drive, char const *dir,
              char const *file, char const *ext) -> errno_t {
@@ -3181,7 +3181,7 @@ err_buflen:
 #undef path_putc
 }
 
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _splitpath_s:([[nonnull]] char const *__restrict abspath,
               [outp_opt(drivelen)] char *drive, $size_t drivelen,
               [outp_opt(dirlen)] char *dir, $size_t dirlen,

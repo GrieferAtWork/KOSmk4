@@ -341,7 +341,7 @@ err:
 
 @@Format a network number NET into presentation format and place
 @@result in buffer starting at BUF with length of LEN bytes
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 inet_neta:($uint32_t net, [outp(len)] char *buf, $size_t len) -> char * {
 	size_t reqlen;
 	if (net <= 0xff) {

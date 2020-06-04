@@ -512,7 +512,7 @@ putchar:(int ch) -> int {
 @@Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred.
 [std][cp_stdio][ATTR_WUNUSED][alias(fgets_unlocked)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fgets_unlocked)]
-[dependency_include(<parts/errno.h>)][same_impl]
+[impl_include("<parts/errno.h>")][same_impl]
 [requires($has_function(fgetc) && $has_function(ungetc) && $has_function(ferror))]
 fgets:([outp(min(strlen(return),bufsize))] char *__restrict buf,
        __STDC_INT_AS_SIZE_T bufsize,
@@ -819,7 +819,7 @@ fsetpos:([[nonnull]] FILE *__restrict stream, [[nonnull]] fpos_t const *__restri
 [std][cp_stdio][ATTR_LIBC_PRINTF(2, 0)]
 [section(.text.crt.FILE.locked.write.printf)][crtbuiltin]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(vfprintf_unlocked)]
-[same_impl][requires_dependency(file_printer)][alias(vfprintf_s)]
+[same_impl][requires_dependent_function(file_printer)][alias(vfprintf_s)]
 [export_alias(_IO_vfprintf)][alias(vfprintf_unlocked)]
 vfprintf:([[nonnull]] FILE *__restrict stream,
           [[nonnull]] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
@@ -1453,7 +1453,7 @@ fopencookie:(void *__restrict magic_cookie,
 
 %[default_impl_section(.text.crt.FILE.unlocked.read.read)]
 @@Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG'
-[cp_stdio][alias(fgets)][ATTR_WUNUSED][dependency_include(<parts/errno.h>)][same_impl]
+[cp_stdio][alias(fgets)][ATTR_WUNUSED][impl_include("<parts/errno.h>")][same_impl]
 [requires($has_function(fgetc_unlocked) && $has_function(ungetc_unlocked) && $has_function(ferror_unlocked))]
 fgets_unlocked:([outp(min(strlen(return),bufsize))] char *__restrict buf,
                 __STDC_INT_AS_SIZE_T bufsize,
@@ -2062,7 +2062,7 @@ fftruncate64_unlocked:([[nonnull]] $FILE *__restrict stream, __PIO_OFFSET64 leng
 
 %[default_impl_section(.text.crt.FILE.unlocked.write.printf)]
 [cp_stdio][ATTR_LIBC_PRINTF(2, 0)][same_impl]
-[requires_dependency(file_printer_unlocked)]
+[requires_dependent_function(file_printer_unlocked)]
 [alias(vfprintf, vfprintf_s, _IO_vfprintf)][user]
 vfprintf_unlocked:([[nonnull]] $FILE *__restrict stream,
                    [[nonnull]] char const *__restrict format,
@@ -2644,10 +2644,10 @@ freopen_s:([[nonnull]] $FILE **pstream,
            [[nonnull]] $FILE *oldstream) -> errno_t;
 
 [section(.text.crt.dos.fs.utility)]
-tmpnam_s:([outp(bufsize)] char *__restrict buf, rsize_t bufsize) -> errno_t;
+tmpnam_s:([[outp(bufsize)]] char *__restrict buf, rsize_t bufsize) -> errno_t;
 
 %
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [same_impl][requires($has_function(clearerr))]
 [section(.text.crt.dos.FILE.locked.utility)]
 clearerr_s:([[nonnull]] $FILE *__restrict stream) -> errno_t {
@@ -2657,7 +2657,7 @@ clearerr_s:([[nonnull]] $FILE *__restrict stream) -> errno_t {
 	return 0;
 }
 
-[cp][dependency_include(<parts/errno.h>)]
+[cp][impl_include("<parts/errno.h>")]
 [same_impl][requires($has_function(tmpfile))]
 [section(.text.crt.dos.FILE.locked.access)]
 tmpfile_s:([[nonnull]] $FILE **pstream) -> errno_t {
@@ -2681,7 +2681,7 @@ tmpfile_s:([[nonnull]] $FILE **pstream) -> errno_t {
 
 [cp][ATTR_WUNUSED]
 [same_impl][requires($has_function(fread))]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [section(.text.crt.dos.FILE.locked.read.read)]
 fread_s:([outp(min(return*elemsize,elemcount*elemsize,bufsize))] void *__restrict buf, $size_t bufsize,
          $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream) -> $size_t {

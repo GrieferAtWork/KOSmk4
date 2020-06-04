@@ -78,8 +78,8 @@ typedef __errno_t error_t;
 @@Make a '\0' separated arg vector from a unix argv vector, returning it in
 @@`PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
 @@`ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()'
-[export_alias(__argz_create)][userimpl][requires($has_function(malloc))]
-[dependency_include(<parts/errno.h>)]
+[export_alias(__argz_create)][userimpl][requires_function("malloc")]
+[impl_include("<parts/errno.h>")]
 [dependency_include(<hybrid/__assert.h>)]
 argz_create:([[nonnull]] char *const argv[],
              [[nonnull]] char **__restrict pargz,
@@ -119,7 +119,7 @@ __argz_create:(*) = argz_create;
 @@The result can be destroyed using `free()'
 [export_alias(__argz_create_sep)][userimpl]
 [requires($has_function(malloc) && $has_function(free))]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 argz_create_sep:(char const *__restrict string,
                  int sep, char **__restrict pargz,
                  size_t *__restrict pargz_len) -> error_t {
@@ -243,7 +243,7 @@ __argz_stringify:(*) = argz_stringify;
 @@Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN'
 [export_alias(__argz_create_sep)][userimpl]
 [requires($has_function(realloc))]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 argz_append:([[nonnull]] char **__restrict pargz, [[nonnull]] size_t *__restrict pargz_len,
              [inp_opt(buf_len)] char const *__restrict buf, size_t buf_len) -> error_t {
 	size_t oldlen = *pargz_len;
@@ -276,7 +276,7 @@ __argz_add:(*) = argz_add;
 @@Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN'
 [export_alias(__argz_add_sep)][userimpl]
 [requires($has_function(realloc))]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 argz_add_sep:([[nonnull]] char **__restrict pargz, [[nonnull]] size_t *__restrict pargz_len,
               [[nonnull]] char const *__restrict string, int sep) -> error_t {
 	char *result_string, *dst;
@@ -379,7 +379,7 @@ __argz_delete:(*) = argz_delete;
 @@will insert `ENTRY' at the beginning of `ARGZ'. If `BEFORE' is not in `ARGZ', `EINVAL'
 @@is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
 @@On success, `0' is returned
-[export_alias(__argz_insert)][userimpl][dependency_include(<parts/errno.h>)]
+[export_alias(__argz_insert)][userimpl][impl_include("<parts/errno.h>")]
 [requires($has_function(realloc) && $has_function(argz_add))]
 argz_insert:([[nonnull]] char **__restrict pargz, [[nonnull]] size_t *__restrict pargz_len,
              [[nullable]] char *before, [[nonnull]] char const *__restrict entry) -> error_t {
@@ -444,7 +444,7 @@ __argz_insert:(*) = argz_insert;
 @@Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
 @@`PARGZ' as necessary. If `PREPLACE_COUNT' is non-NULL, `*PREPLACE_COUNT' will be
 @@incremented by number of replacements performed
-[export_alias(__argz_replace)][userimpl][dependency_include(<parts/errno.h>)]
+[export_alias(__argz_replace)][userimpl][impl_include("<parts/errno.h>")]
 [requires($has_function(realloc) && $has_function(free))]
 argz_replace:([[nonnull]] char **__restrict pargz,
               [[nonnull]] size_t *__restrict pargz_len,

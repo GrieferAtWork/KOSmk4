@@ -164,25 +164,24 @@ __NAMESPACE_INT_END
 	(__NAMESPACE_INT_SYM __LFutexExprOffset(offset))
 #endif /* __cplusplus */
 
-}
+};
 
 
-[cp][doc_alias(lfutexexpr)][ignore]
-[decl_include("<bits/timespec.h>")]
-[decl_include(<kos/bits/futex-expr.h>)]
-lfutexexpr32:(void *base, $size_t exprc,
-              [[nonnull]] struct lfutexexpr const *exprv,
-              struct timespec64 const *timeout,
-              unsigned int timeout_flags) -> int = lfutexexpr?;
+[[decl_include("<bits/timespec.h>", "<kos/bits/futex-expr.h>")]]
+[[cp, doc_alias(lfutexexpr), ignore, nocrt, alias(lfutexexpr)]]
+int lfutexexpr32(void *base, $size_t exprc,
+                 [[nonnull]] struct lfutexexpr const *exprv,
+                 struct timespec64 const *timeout,
+                 unsigned int timeout_flags);
 
-[cp][doc_alias(lfutexlockexpr)][ignore]
-[decl_include("<bits/types.h>")]
-[decl_include("<bits/timespec.h>")]
-[decl_include(<kos/bits/futex-expr.h>)]
-lfutexlockexpr32:([[nonnull]] lfutex_t *ulockaddr, void *base,
-                  $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
-                  struct timespec64 const *timeout,
-                  unsigned int timeout_flags) -> int = lfutexlockexpr?;
+
+
+[[decl_include("<bits/types.h>"), decl_include("<bits/timespec.h>"), decl_include("<kos/bits/futex-expr.h>")]]
+[[cp, doc_alias(lfutexlockexpr), ignore, nocrt, alias(lfutexlockexpr)]]
+int lfutexlockexpr32([[nonnull]] lfutex_t *ulockaddr, void *base,
+                     $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
+                     struct timespec64 const *timeout,
+                     unsigned int timeout_flags);
 
 
 @@>> lfutexexpr(2)
@@ -292,7 +291,7 @@ lfutexlockexpr:([[nonnull]] lfutex_t *ulockaddr, void *base,
 [cp][time64_variant_of(lfutexexpr)]
 [requires($has_function(lfutexexpr32))]
 [decl_include("<bits/timespec.h>")]
-[decl_include(<kos/bits/futex-expr.h>)]
+[decl_include("<kos/bits/futex-expr.h>")]
 lfutexexpr64:(void *base, $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
               struct timespec64 const *timeout, unsigned int timeout_flags) -> int {
 	struct timespec32 tms32;
@@ -308,7 +307,7 @@ lfutexexpr64:(void *base, $size_t exprc, [[nonnull]] struct lfutexexpr const *ex
 [section(.text.crt.sched.futexlockexpr)]
 [decl_include("<bits/types.h>")]
 [decl_include("<bits/timespec.h>")]
-[decl_include(<kos/bits/futex-expr.h>)]
+[decl_include("<kos/bits/futex-expr.h>")]
 lfutexlockexpr64:([[nonnull]] lfutex_t *ulockaddr, void *base,
                   $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
                   struct timespec64 const *timeout, unsigned int timeout_flags) -> int {

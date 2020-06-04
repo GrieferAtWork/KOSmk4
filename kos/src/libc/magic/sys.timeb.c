@@ -133,7 +133,7 @@ _ftime64:([[nonnull]] struct __timeb64 *timebuf) {
 [requires($has_function(crt_ftime32) || $has_function(crt_ftime64_s) ||
           $has_function(crt_ftime64) || $has_function(crt_dos_ftime32) ||
           $has_function(crt_dos_ftime64))]
-[dependency_include(<parts/errno.h>)][dos_variant]
+[impl_include("<parts/errno.h>")][dos_variant]
 _ftime32_s:([[nonnull]] struct __timeb32 *timebuf) -> errno_t {
 #if @@has_function(crt_ftime32)@@
 	return crt_ftime32(timebuf) ? 0 : __libc_geterrno_or(@EPERM@);
@@ -170,7 +170,7 @@ _ftime32_s:([[nonnull]] struct __timeb32 *timebuf) -> errno_t {
 [requires($has_function(crt_ftime64) || $has_function(crt_ftime32_s) ||
           $has_function(crt_ftime32) || $has_function(crt_dos_ftime64) ||
           $has_function(crt_dos_ftime32))]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _ftime64_s:([[nonnull]] struct __timeb64 *timebuf) -> errno_t {
 #if @@has_function(crt_ftime64)@@
 	return crt_ftime64(timebuf) ? 0 : __libc_geterrno_or(@EPERM@);
@@ -216,7 +216,7 @@ _ftime64_s:([[nonnull]] struct __timeb64 *timebuf) -> errno_t {
 [requires($has_function(crt_ftime32_s) || $has_function(crt_ftime64_s) ||
           $has_function(crt_dos_ftime32) || $has_function(crt_dos_ftime64) ||
           $has_function(crt_ftime32) || $has_function(crt_ftime64))]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 ftime:([[nonnull]] struct timeb *timebuf) -> int {
 #if (@@has_function(crt_ftime32_s)@@) && !defined(__USE_TIME_BITS64)
 	errno_t error = crt_ftime32_s(timebuf);
@@ -308,7 +308,7 @@ ftime:([[nonnull]] struct timeb *timebuf) -> int {
 [requires($has_function(crt_ftime64_s) || $has_function(crt_dos_ftime64) ||
           $has_function(crt_ftime32) || $has_function(crt_ftime32_s) ||
           $has_function(crt_dos_ftime32))]
-[time64_variant_of(ftime)][dependency_include(<parts/errno.h>)]
+[time64_variant_of(ftime)][impl_include("<parts/errno.h>")]
 ftime64:([[nonnull]] struct timeb64 *timebuf) -> int {
 #if @@has_function(crt_ftime64_s)@@
 	errno_t error = crt_ftime64_s(timebuf);

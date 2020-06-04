@@ -79,23 +79,23 @@ wexecvp:([[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV) -> in
 [cp][wchar][guard][argument_names(path, ___argv, ___envp)][dosname(_wexecvpe)]
 wexecvpe:([[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP) -> int;
 
-[cp][wchar][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(wexecv)][ATTR_SENTINEL][dosname(_wexecl)][allow_macros]
+[cp][wchar][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(wexecv)][ATTR_SENTINEL][dosname(_wexecl)][allow_macros]
 wexecl:([[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) -> int {
 	__REDIRECT_EXECL(wchar_t, wexecv, path, args)
 }
-[cp][wchar][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(wexecvp)][ATTR_SENTINEL][dosname(_wexeclp)][allow_macros]
+[cp][wchar][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(wexecvp)][ATTR_SENTINEL][dosname(_wexeclp)][allow_macros]
 wexeclp:([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL*/) -> int {
 	__REDIRECT_EXECL(wchar_t, wexecvp, file, args)
 }
-[cp][wchar][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(wexecve)][ATTR_SENTINEL_O(1)][dosname(_wexecle)][allow_macros]
+[cp][wchar][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(wexecve)][ATTR_SENTINEL_O(1)][dosname(_wexecle)][allow_macros]
 wexecle:([[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) -> int {
 	__REDIRECT_EXECLE(wchar_t, wexecve, path, args)
 }
-[cp][wchar][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(wexecvpe)][ATTR_SENTINEL_O(1)][dosname(_wexecle)][allow_macros]
+[cp][wchar][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(wexecvpe)][ATTR_SENTINEL_O(1)][dosname(_wexecle)][allow_macros]
 wexeclpe:([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) -> int {
 	__REDIRECT_EXECLE(wchar_t, wexecvpe, file, args)
 }
@@ -111,26 +111,26 @@ wspawnvp:(int mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TW
 [cp][wchar][guard][argument_names(mode, file, ___argv, ___envp)][dosname(_wspawnvpe)]
 wspawnvpe:(int mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP) -> $pid_t;
 
-[cp][wchar][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(wspawnv)][ATTR_SENTINEL][dosname(_wspawnl)][allow_macros]
+[cp][wchar][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(wspawnv)][ATTR_SENTINEL][dosname(_wspawnl)][allow_macros]
 wspawnl:(int mode, [[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) -> $pid_t {
 	__REDIRECT_SPAWNL(wchar_t, wspawnv, mode, path, args)
 }
 
-[cp][wchar][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(wspawnvp)][ATTR_SENTINEL][dosname(_wspawnlp)][allow_macros]
+[cp][wchar][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(wspawnvp)][ATTR_SENTINEL][dosname(_wspawnlp)][allow_macros]
 wspawnlp:(int mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL*/) -> $pid_t {
 	__REDIRECT_SPAWNLP(wchar_t, wspawnvp, mode, file, args)
 }
 
-[cp][wchar][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(wspawnve)][ATTR_SENTINEL_O(1)][dosname(_wspawnle)][allow_macros]
+[cp][wchar][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(wspawnve)][ATTR_SENTINEL_O(1)][dosname(_wspawnle)][allow_macros]
 wspawnle:(int mode, [[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) -> $pid_t {
 	__REDIRECT_SPAWNLE(wchar_t, wspawnve, mode, path, args)
 }
 
-[cp][wchar][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(wspawnvpe)][ATTR_SENTINEL_O(1)][dosname(_wspawnle)][allow_macros]
+[cp][wchar][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(wspawnvpe)][ATTR_SENTINEL_O(1)][dosname(_wspawnle)][allow_macros]
 wspawnlpe:(int mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) -> $pid_t {
 	__REDIRECT_SPAWNLPE(wchar_t, wspawnvpe, mode, file, args)
 }

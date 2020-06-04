@@ -43,11 +43,11 @@ typedef __uintptr_t lfutex_t;
 
 }
 
-[cp][doc_alias(lfutexlock)][ignore]
-[vartypes($uintptr_t, $uintptr_t)][decl_include("<bits/types.h>")]
+[[vartypes($uintptr_t, $uintptr_t), decl_include("<bits/types.h>")]]
+[[cp, doc_alias(lfutexlock), ignore, nocrt, alias(lfutexlock)]]
 lfutexlock32:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
               $syscall_ulong_t futex_op, lfutex_t val,
-              /*struct timespec const *timeout, lfutex_t val2*/...) -> $ssize_t = lfutexlock?;
+              /*struct timespec const *timeout, lfutex_t val2*/...) -> $ssize_t;
 
 @@>> lfutexlock(3)
 @@Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
@@ -178,17 +178,8 @@ futexlock_waituntil:([[nonnull]] lfutex_t *ulockaddr,
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_UNTIL@, not_equal_to_value, (struct timespec64 const *)NULL);
 }
 
-[cp][nocrt][nouser][noexport]
-[decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
-futexlock_waitwhile_equal:([[nonnull]] lfutex_t *ulockaddr,
-                           [[nonnull]] lfutex_t *uaddr, lfutex_t equal_to_value)
-		-> int = futexlock_waitwhile;
-
-[cp][nocrt][nouser][noexport]
-[decl_include("<bits/types.h>")][dependency_include("<bits/timespec.h>")]
-futexlock_waitwhile_notequal:([[nonnull]] lfutex_t *ulockaddr,
-                              [[nonnull]] lfutex_t *uaddr, lfutex_t not_equal_to_value)
-		-> int = futexlock_waituntil;
+futexlock_waitwhile_equal(*) = futexlock_waitwhile;
+futexlock_waitwhile_notequal(*) = futexlock_waituntil;
 
 [cp][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile_above)]
 [impl_include("<kos/bits/futex.h>")]
@@ -438,7 +429,7 @@ futexlock_timedwaitwhile_allbits:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] l
 %#ifdef __USE_TIME64
 [cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile)]
 [impl_include("<kos/bits/futex.h>")]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
+[decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
                             lfutex_t equal_to_value, struct timespec64 const *rel_timeout) -> int {
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE@, equal_to_value, rel_timeout);
@@ -446,27 +437,18 @@ futexlock_timedwaitwhile64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_
 
 [cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaituntil)]
 [impl_include("<kos/bits/futex.h>")]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
+[decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaituntil64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
                             lfutex_t not_equal_to_value, struct timespec64 const *rel_timeout) -> int {
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_UNTIL@, not_equal_to_value, rel_timeout);
 }
 
-[cp][nocrt][nouser][noexport][time64_variant_of(futexlock_timedwaitwhile_equal)]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
-futexlock_timedwaitwhile_equal64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
-                                  lfutex_t equal_to_value, struct timespec64 const *rel_timeout)
-		-> int = futexlock_timedwaitwhile64;
-
-[cp][nocrt][nouser][noexport][time64_variant_of(futexlock_timedwaitwhile_notequal)]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
-futexlock_timedwaitwhile_notequal64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
-                                     lfutex_t not_equal_to_value, struct timespec64 const *rel_timeout)
-		-> int = futexlock_timedwaituntil64;
+futexlock_timedwaitwhile_equal64(*) = futexlock_timedwaitwhile64;
+futexlock_timedwaitwhile_notequal64(*) = futexlock_timedwaituntil64;
 
 [cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_above)]
 [impl_include("<kos/bits/futex.h>")]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
+[decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_above64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
                                   lfutex_t above_value, struct timespec64 const *rel_timeout) -> int {
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_ABOVE@, above_value, rel_timeout);
@@ -474,7 +456,7 @@ futexlock_timedwaitwhile_above64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] l
 
 [cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_below)]
 [impl_include("<kos/bits/futex.h>")]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
+[decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_below64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
                                   lfutex_t below_value, struct timespec64 const *rel_timeout) -> int {
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_BELOW@, below_value, rel_timeout);
@@ -482,7 +464,7 @@ futexlock_timedwaitwhile_below64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] l
 
 [cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_aboveequal)]
 [impl_include("<kos/bits/futex.h>")]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
+[decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_aboveequal64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
                                        lfutex_t above_equal_value, struct timespec64 const *rel_timeout) -> int {
 	if unlikely(!above_equal_value)
@@ -492,7 +474,7 @@ futexlock_timedwaitwhile_aboveequal64:([[nonnull]] lfutex_t *ulockaddr, [[nonnul
 
 [cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_belowequal)]
 [impl_include("<kos/bits/futex.h>")]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
+[decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_belowequal64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
                                        lfutex_t below_equal_value, struct timespec64 const *rel_timeout) -> int {
 	if unlikely(below_equal_value == (lfutex_t)-1)
@@ -502,7 +484,7 @@ futexlock_timedwaitwhile_belowequal64:([[nonnull]] lfutex_t *ulockaddr, [[nonnul
 
 [cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_cmpxch)]
 [impl_include("<kos/bits/futex.h>")]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
+[decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_cmpxch64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
                                    lfutex_t old_value, lfutex_t new_value,
                                    struct timespec64 const *rel_timeout) -> int {
@@ -511,7 +493,7 @@ futexlock_timedwaitwhile_cmpxch64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] 
 
 [cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaituntil_cmpxch)]
 [impl_include("<kos/bits/futex.h>")]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
+[decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaituntil_cmpxch64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
                                    lfutex_t old_value, lfutex_t new_value,
                                    struct timespec64 const *rel_timeout) -> int {
@@ -520,7 +502,7 @@ futexlock_timedwaituntil_cmpxch64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] 
 
 [cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitlock)]
 [impl_include("<kos/bits/futex.h>")]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
+[decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitlock64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
                            struct timespec64 const *rel_timeout) -> int {
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_LOCK@, 0, rel_timeout);
@@ -528,7 +510,7 @@ futexlock_timedwaitlock64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t
 
 [cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_exactbits)]
 [impl_include("<kos/bits/futex.h>")]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
+[decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_exactbits64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
                                       lfutex_t bitmask, lfutex_t setmask,
                                       struct timespec64 const *rel_timeout) -> int {
@@ -537,7 +519,7 @@ futexlock_timedwaitwhile_exactbits64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull
 
 [cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaituntil_exactbits)]
 [impl_include("<kos/bits/futex.h>")]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
+[decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaituntil_exactbits64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
                                       lfutex_t bitmask, lfutex_t setmask,
                                       struct timespec64 const *rel_timeout) -> int {
@@ -546,7 +528,7 @@ futexlock_timedwaituntil_exactbits64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull
 
 [cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_anybit)]
 [impl_include("<kos/bits/futex.h>")]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
+[decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_anybit64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
                                    lfutex_t bitmask, struct timespec64 const *rel_timeout) -> int {
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, rel_timeout, 0);
@@ -554,7 +536,7 @@ futexlock_timedwaitwhile_anybit64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] 
 
 [cp][requires($has_function(lfutexlock64))][time64_variant_of(futexlock_timedwaitwhile_allbits)]
 [impl_include("<kos/bits/futex.h>")]
-[decl_include("<bits/types.h>")][decl_include("<bits/timespec.h>")]
+[decl_include("<bits/types.h>", "<bits/timespec.h>")]
 futexlock_timedwaitwhile_allbits64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr,
                                     lfutex_t bitmask, struct timespec64 const *rel_timeout) -> int {
 	return lfutexlock64(ulockaddr, uaddr, @LFUTEX_WAIT_WHILE_BITMASK@, bitmask, rel_timeout, bitmask);
@@ -573,38 +555,38 @@ futexlock_timedwaitwhile_allbits64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]]
 }
 %extern "C++" {
 
-[overload_alias] futexlock_waitwhile:(*) = futexlock_timedwaitwhile;
-[overload_alias] futexlock_waituntil:(*) = futexlock_timedwaituntil;
-[overload_alias] futexlock_waitwhile_equal:(*) = futexlock_timedwaitwhile;
-[overload_alias] futexlock_waitwhile_notequal:(*) = futexlock_timedwaituntil;
-[overload_alias] futexlock_waitwhile_above:(*) = futexlock_timedwaitwhile_above;
-[overload_alias] futexlock_waitwhile_below:(*) = futexlock_timedwaitwhile_below;
-[overload_alias] futexlock_waitwhile_aboveequal:(*) = futexlock_timedwaitwhile_aboveequal;
-[overload_alias] futexlock_waitwhile_belowequal:(*) = futexlock_timedwaitwhile_belowequal;
-[overload_alias] futexlock_waitwhile_cmpxch:(*) = futexlock_timedwaitwhile_cmpxch;
-[overload_alias] futexlock_waituntil_cmpxch:(*) = futexlock_timedwaituntil_cmpxch;
-[overload_alias] futexlock_waitlock:(*) = futexlock_timedwaitlock;
-[overload_alias] futexlock_waitwhile_exactbits:(*) = futexlock_timedwaitwhile_exactbits;
-[overload_alias] futexlock_waituntil_exactbits:(*) = futexlock_timedwaituntil_exactbits;
-[overload_alias] futexlock_waitwhile_anybit:(*) = futexlock_timedwaitwhile_anybit;
-[overload_alias] futexlock_waitwhile_allbits:(*) = futexlock_timedwaitwhile_allbits;
+%[insert:function(futexlock_waitwhile = futexlock_timedwaitwhile, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waituntil = futexlock_timedwaituntil, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_equal = futexlock_timedwaitwhile, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_notequal = futexlock_timedwaituntil, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_above = futexlock_timedwaitwhile_above, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_below = futexlock_timedwaitwhile_below, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_aboveequal = futexlock_timedwaitwhile_aboveequal, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_belowequal = futexlock_timedwaitwhile_belowequal, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_cmpxch = futexlock_timedwaitwhile_cmpxch, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waituntil_cmpxch = futexlock_timedwaituntil_cmpxch, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitlock = futexlock_timedwaitlock, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_exactbits = futexlock_timedwaitwhile_exactbits, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waituntil_exactbits = futexlock_timedwaituntil_exactbits, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_anybit = futexlock_timedwaitwhile_anybit, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_allbits = futexlock_timedwaitwhile_allbits, externLinkageOverride: "C++")]
 
 %#if defined(__USE_TIME64) && !((defined(__USE_TIME_BITS64) || defined(_TIMESPEC_MATCHES_TIMESPEC64)) && defined(__USE_STRUCT64_MACRO))
-[overload_alias] futexlock_waitwhile:(*) = futexlock_timedwaitwhile64;
-[overload_alias] futexlock_waituntil:(*) = futexlock_timedwaituntil64;
-[overload_alias] futexlock_waitwhile_equal:(*) = futexlock_timedwaitwhile64;
-[overload_alias] futexlock_waitwhile_notequal:(*) = futexlock_timedwaituntil64;
-[overload_alias] futexlock_waitwhile_above:(*) = futexlock_timedwaitwhile_above64;
-[overload_alias] futexlock_waitwhile_below:(*) = futexlock_timedwaitwhile_below64;
-[overload_alias] futexlock_waitwhile_aboveequal:(*) = futexlock_timedwaitwhile_aboveequal64;
-[overload_alias] futexlock_waitwhile_belowequal:(*) = futexlock_timedwaitwhile_belowequal64;
-[overload_alias] futexlock_waitwhile_cmpxch:(*) = futexlock_timedwaitwhile_cmpxch64;
-[overload_alias] futexlock_waituntil_cmpxch:(*) = futexlock_timedwaituntil_cmpxch64;
-[overload_alias] futexlock_waitlock:(*) = futexlock_timedwaitlock64;
-[overload_alias] futexlock_waitwhile_exactbits:(*) = futexlock_timedwaitwhile_exactbits64;
-[overload_alias] futexlock_waituntil_exactbits:(*) = futexlock_timedwaituntil_exactbits64;
-[overload_alias] futexlock_waitwhile_anybit:(*) = futexlock_timedwaitwhile_anybit64;
-[overload_alias] futexlock_waitwhile_allbits:(*) = futexlock_timedwaitwhile_allbits64;
+%[insert:function(futexlock_waitwhile = futexlock_timedwaitwhile64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waituntil = futexlock_timedwaituntil64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_equal = futexlock_timedwaitwhile64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_notequal = futexlock_timedwaituntil64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_above = futexlock_timedwaitwhile_above64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_below = futexlock_timedwaitwhile_below64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_aboveequal = futexlock_timedwaitwhile_aboveequal64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_belowequal = futexlock_timedwaitwhile_belowequal64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_cmpxch = futexlock_timedwaitwhile_cmpxch64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waituntil_cmpxch = futexlock_timedwaituntil_cmpxch64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitlock = futexlock_timedwaitlock64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_exactbits = futexlock_timedwaitwhile_exactbits64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waituntil_exactbits = futexlock_timedwaituntil_exactbits64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_anybit = futexlock_timedwaitwhile_anybit64, externLinkageOverride: "C++")]
+%[insert:function(futexlock_waitwhile_allbits = futexlock_timedwaitwhile_allbits64, externLinkageOverride: "C++")]
 %#endif /* __USE_TIME64 && !((__USE_TIME_BITS64 || _TIMESPEC_MATCHES_TIMESPEC64) && __USE_STRUCT64_MACRO) */
 
 %} /* extern "C++" */

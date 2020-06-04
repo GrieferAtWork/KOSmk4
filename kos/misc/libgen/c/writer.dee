@@ -28,19 +28,22 @@ import functools;
 global CWriter;
 
 /* CGenerator part IDs */
-global final CGP_STRING  = 0; /* +string | +File.Writer */
-global final CGP_IF      = 1; /* +string */
-global final CGP_ELIF    = 2; /* +string */
-global final CGP_ELSE    = 3; /* +string */
-global final CGP_ENDIF   = 4; /* +string */
-global final CGP_NSENTER = 5; /* +Namespace */
-global final CGP_NSLEAVE = 6; /* +Namespace */
-global final CGP_FORCENL = 7; /* +none */
+global final CGP_STRING      = 0; /* +string | +File.Writer */
+global final CGP_IF          = 1; /* +string */
+global final CGP_ELIF        = 2; /* +string */
+global final CGP_ELSE        = 3; /* +string */
+global final CGP_ENDIF       = 4; /* +string */
+global final CGP_NSENTER     = 5; /* +Namespace */
+global final CGP_NSLEAVE     = 6; /* +Namespace */
+global final CGP_FORCENL     = 7; /* +none */
+global final CGP_EXTERNENTER = 8; /* +string */
+global final CGP_EXTERNLEAVE = 9; /* +string */
 
 @@All generator part ids that always end with a new-line
 global final CGPS_FORCENL: {int...} = {
 	CGP_IF, CGP_ELIF, CGP_ELSE, CGP_ENDIF,
-	CGP_NSENTER, CGP_NSLEAVE, CGP_FORCENL
+	CGP_NSENTER, CGP_NSLEAVE, CGP_FORCENL,
+	CGP_EXTERNENTER, CGP_EXTERNLEAVE
 };
 
 @@C Code generator
@@ -112,8 +115,15 @@ class CGenerator {
 		}
 	}
 
+	@@Delete a possible trailing CGP_FORCENL
+	private function deleteTrailingForceNl() {
+		if (pendingParts && pendingParts.last[0] == CGP_FORCENL)
+			pendingParts.popback();
+	}
+
 	/* Helper functions for appending certain components */
 	public function addPpIf(cond: string): CGenerator {
+		deleteTrailingForceNl();
 		optimizeTrailingStrings();
 		if (#pendingParts >= 2) {
 			local i = none;
@@ -167,24 +177,28 @@ done:
 	}
 
 	public function addPpElif(cond: string): CGenerator {
+		deleteTrailingForceNl();
 		optimizeTrailingStrings();
 		pendingParts.append((CGP_ELIF, cond));
 		return this;
 	}
 
 	public function addPpElse(comment: string): CGenerator {
+		deleteTrailingForceNl();
 		optimizeTrailingStrings();
 		pendingParts.append((CGP_ELSE, comment));
 		return this;
 	}
 
 	public function addPpEndif(comment: string): CGenerator {
+		deleteTrailingForceNl();
 		optimizeTrailingStrings();
 		pendingParts.append((CGP_ENDIF, comment));
 		return this;
 	}
 
 	public function addNsEnter(ns: Namespace): CGenerator {
+		deleteTrailingForceNl();
 		optimizeTrailingStrings();
 		if (ns === GLOBAL_NAMESPACE)
 			goto done;
@@ -201,6 +215,7 @@ done:
 	}
 
 	public function addNsLeave(ns: Namespace): CGenerator {
+		deleteTrailingForceNl();
 		optimizeTrailingStrings();
 		if (ns === GLOBAL_NAMESPACE)
 			goto done;
@@ -212,6 +227,30 @@ done:
 			}
 		}
 		pendingParts.append((CGP_NSLEAVE, ns));
+done:
+		return this;
+	}
+
+	public function addExternEnter(kind: string): CGenerator {
+		deleteTrailingForceNl();
+		optimizeTrailingStrings();
+		if (pendingParts && pendingParts.last == (CGP_EXTERNLEAVE, kind)) {
+			pendingParts.popback();
+			goto done;
+		}
+		pendingParts.append((CGP_EXTERNENTER, kind));
+done:
+		return this;
+	}
+
+	public function addExternLeave(kind: string): CGenerator {
+		deleteTrailingForceNl();
+		optimizeTrailingStrings();
+		if (pendingParts && pendingParts.last == (CGP_EXTERNENTER, kind)) {
+			pendingParts.popback();
+			goto done;
+		}
+		pendingParts.append((CGP_EXTERNLEAVE, kind));
 done:
 		return this;
 	}
@@ -323,6 +362,30 @@ nope:
 				if (!fpAfterNewline) {
 					fp << "\n";
 					fpAfterNewline = true;
+				}
+				break;
+
+			case CGP_EXTERNENTER:
+				if (!fpAfterNewline) {
+					fp << "\n";
+					fpAfterNewline = true;
+				}
+				if (arg == "C") {
+					fp << "__DECL_BEGIN\n";
+				} else {
+					fp << "extern " << repr(arg) << " {\n";
+				}
+				break;
+
+			case CGP_EXTERNLEAVE:
+				if (!fpAfterNewline) {
+					fp << "\n";
+					fpAfterNewline = true;
+				}
+				if (arg == "C") {
+					fp << "__DECL_END\n";
+				} else {
+					fp << "} /* extern " << repr(arg) << " */\n";
 				}
 				break;
 
@@ -702,6 +765,24 @@ done:
 			generator.addNsLeave(m_CurrentNamespace);
 			generator.addNsEnter(namespace);
 			m_CurrentNamespace = namespace;
+		}
+	}
+
+	private member m_CurrentExternLinkage: string = "";
+
+	@@Get/Set the current namespace
+	public property externLinkage: string = {
+		get(): string {
+			return m_CurrentExternLinkage;
+		}
+		set(linkage: string | none) {
+			if (m_CurrentExternLinkage === linkage)
+				return;
+			if (m_CurrentExternLinkage)
+				generator.addExternLeave(m_CurrentExternLinkage);
+			if (linkage)
+				generator.addExternEnter(linkage);
+			m_CurrentExternLinkage = linkage;
 		}
 	}
 }

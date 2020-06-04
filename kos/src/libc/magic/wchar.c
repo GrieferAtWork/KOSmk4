@@ -216,7 +216,7 @@ wctob:(wint_t ch) -> int {
 @__LOCAL_LIBC_DATA@(mbrtowc_ps) mbstate_t mbrtowc_ps = @__MBSTATE_INIT@;
 #endif /* !____local_mbrtowc_ps_defined */
 )][std][wchar][export_alias(__mbrtowc)]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 mbrtowc:([[nullable]] wchar_t *pwc,
          [inp_opt(maxlen)] char const *__restrict str, size_t maxlen,
          [[nullable]] mbstate_t *mbs) -> size_t {
@@ -242,7 +242,7 @@ mbrtowc:([[nullable]] wchar_t *pwc,
 }
 
 [std][wchar]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 wcrtomb:(char *__restrict str, wchar_t wc,
          [[nullable]] mbstate_t *mbs) -> size_t {
 	char *endptr;
@@ -513,9 +513,9 @@ putwc:(wchar_t wc, [[nonnull]] FILE *stream) -> wint_t = fputwc;
 [cp_stdio][std][std_guard][wchar][ATTR_WUNUSED][alias(fgetws_unlocked, _fgetws_nolock)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fgetws_unlocked, _fgetws_nolock)]
 [requires($has_function(fgetwc) && $has_function(ungetwc) && $has_function(ferror))][same_impl]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [dependency_include(<asm/stdio.h>)][same_impl]
-fgetws:([outp(bufsize)] wchar_t *__restrict buf,
+fgetws:([[outp(bufsize)]] wchar_t *__restrict buf,
         __STDC_INT_AS_SIZE_T bufsize,
         [[nonnull]] FILE *__restrict stream) -> wchar_t * {
 	size_t n;
@@ -662,7 +662,7 @@ fwide:([[nonnull]] FILE *fp, int mode) -> int {
 fwprintf:([[nonnull]] FILE *__restrict stream, [[nonnull]] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vfwprintf))}
 
-[cp_stdio][std][std_guard][ATTR_LIBC_WPRINTF(2, 0)][wchar][requires_dependency(file_wprinter)]
+[cp_stdio][std][std_guard][ATTR_LIBC_WPRINTF(2, 0)][wchar][requires_dependent_function(file_wprinter)]
 [section({.text.crt.wchar.FILE.locked.write.printf|.text.crt.dos.wchar.FILE.locked.write.printf})][same_impl]
 vfwprintf:([[nonnull]] FILE *__restrict stream, [[nonnull]] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return (__STDC_INT_AS_SSIZE_T)format_vwprintf(&file_wprinter, stream, format, args);
@@ -890,7 +890,7 @@ open_wmemstream:(wchar_t **bufloc, $size_t *sizeloc) -> $FILE *;
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
 wcsnlen:([[nonnull]] wchar_t const *__restrict string, $size_t maxlen) -> $size_t %{generate(str2wcs)}
 
-[requires($has_function(malloc))][ATTR_WUNUSED][dosname(_wcsdup)]
+[requires_function("malloc")][ATTR_WUNUSED][dosname(_wcsdup)]
 [ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC][wchar][guard]
 [section({.text.crt.wchar.heap.strdup|.text.crt.dos.wchar.heap.strdup})][same_impl]
 wcsdup:([[nonnull]] wchar_t const *__restrict string) -> wchar_t * %{generate(str2wcs)}
@@ -1072,8 +1072,8 @@ fputwc_unlocked:(wchar_t wc, [[nonnull]] $FILE *__restrict stream) -> $wint_t;
 [cp_stdio][alias(fgetws)][wchar][dosname(_fgetws_nolock)][same_impl]
 [section({.text.crt.wchar.FILE.unlocked.read.read|.text.crt.dos.wchar.FILE.unlocked.read.read})]
 [requires($has_function(fgetwc_unlocked) && $has_function(ungetwc_unlocked) && $has_function(ferror_unlocked))][same_impl]
-[dependency_include(<asm/stdio.h>)][dependency_include(<parts/errno.h>)]
-fgetws_unlocked:([outp(bufsize)] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, [[nonnull]] $FILE *__restrict stream) -> wchar_t * {
+[dependency_include(<asm/stdio.h>)][impl_include("<parts/errno.h>")]
+fgetws_unlocked:([[outp(bufsize)]] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, [[nonnull]] $FILE *__restrict stream) -> wchar_t * {
 	$size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
@@ -1179,7 +1179,7 @@ file_wprinter_unlocked:([[nonnull]] void *arg,
 [wchar][user][section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
 ungetwc_unlocked:($wint_t ch, [[nonnull]] $FILE *__restrict stream) -> $wint_t;
 
-[cp_stdio][ATTR_LIBC_WPRINTF(2, 0)][wchar][requires_dependency(file_wprinter_unlocked)]
+[cp_stdio][ATTR_LIBC_WPRINTF(2, 0)][wchar][requires_dependent_function(file_wprinter_unlocked)]
 [section({.text.crt.wchar.FILE.unlocked.write.printf|.text.crt.dos.wchar.FILE.unlocked.write.printf})][same_impl]
 vfwprintf_unlocked:([[nonnull]] $FILE *__restrict stream,
                     [[nonnull]] wchar_t const *__restrict format,
@@ -1420,7 +1420,7 @@ wcssep:([[nonnull]] wchar_t **__restrict stringp,
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
 wcsfry:([[nonnull]] wchar_t *__restrict string) -> wchar_t * %{generate(str2wcs)}
 
-[requires($has_function(malloc))][ATTR_WUNUSED]
+[requires_function("malloc")][ATTR_WUNUSED]
 [ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC][wchar]
 [section({.text.crt.wchar.heap.strdup|.text.crt.dos.wchar.heap.strdup})][same_impl]
 wcsndup:([inp(max_chars)] wchar_t const *__restrict string, $size_t max_chars) -> wchar_t * %{generate(str2wcs)}
@@ -1649,12 +1649,12 @@ wildwcscasecmp_l:([[nonnull]] wchar_t const *pattern, [[nonnull]] wchar_t const 
 
 %
 %#ifdef __USE_DOS_SLIB
-[ATTR_NONNULL((1, 3))][dependency_include(<parts/errno.h>)][wchar]
+[ATTR_NONNULL((1, 3))][impl_include("<parts/errno.h>")][wchar]
 [section(.text.crt.dos.wchar.string.memory)][guard]
 wcscat_s:(wchar_t *dst, $size_t dstsize, wchar_t const *src) -> $errno_t
 	%{generate(str2wcs)}
 
-[dependency_include(<parts/errno.h>)][wchar]
+[impl_include("<parts/errno.h>")][wchar]
 [section(.text.crt.dos.wchar.string.memory)][guard]
 wcscpy_s:(wchar_t *dst, $rsize_t dstsize, wchar_t const *src) -> $errno_t
 	%{generate(str2wcs)}
@@ -1879,11 +1879,11 @@ _scwprintf_p_l:([[nonnull]] wchar_t const *format,
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 [guard][wchar]
-_vswprintf_c:([outp(bufsize)] wchar_t *buf, $size_t bufsize,
+_vswprintf_c:([[outp(bufsize)]] wchar_t *buf, $size_t bufsize,
               [[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vswprintf;
 
 [guard][wchar]
-_swprintf_c:([outp(bufsize)] wchar_t *buf, $size_t bufsize,
+_swprintf_c:([[outp(bufsize)]] wchar_t *buf, $size_t bufsize,
              [[nonnull]] wchar_t const *format, ...) = swprintf;
 
 [guard][wchar]
@@ -1927,7 +1927,7 @@ _wprintf_p:([[nonnull]] wchar_t const *format, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 [guard][wchar]
-_vswprintf_p:([outp(bufsize)] wchar_t *buf, $size_t bufsize,
+_vswprintf_p:([[outp(bufsize)]] wchar_t *buf, $size_t bufsize,
               [[nonnull]] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	/* TODO */
 	(void)buf;
@@ -1939,7 +1939,7 @@ _vswprintf_p:([outp(bufsize)] wchar_t *buf, $size_t bufsize,
 }
 
 [guard][wchar]
-_swprintf_p:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+_swprintf_p:([[outp(bufsize)]] wchar_t *dst, $size_t bufsize,
              [[nonnull]] wchar_t const *format, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
@@ -2023,7 +2023,7 @@ _fwprintf_s_l:([[nonnull]] $FILE *stream,
 
 
 [guard][wchar]
-_vswprintf_c_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+_vswprintf_c_l:([[outp(bufsize)]] wchar_t *dst, $size_t bufsize,
                 [[nonnull]] wchar_t const *format,
                 [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
@@ -2031,14 +2031,14 @@ _vswprintf_c_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
 }
 
 [guard][wchar]
-_swprintf_c_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+_swprintf_c_l:([[outp(bufsize)]] wchar_t *dst, $size_t bufsize,
                [[nonnull]] wchar_t const *format,
                [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 
 
 [guard][wchar]
-_vswprintf_p_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+_vswprintf_p_l:([[outp(bufsize)]] wchar_t *dst, $size_t bufsize,
                 [[nonnull]] wchar_t const *format,
                 [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
@@ -2046,7 +2046,7 @@ _vswprintf_p_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
 }
 
 [guard][wchar]
-_swprintf_p_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+_swprintf_p_l:([[outp(bufsize)]] wchar_t *dst, $size_t bufsize,
                [[nonnull]] wchar_t const *format,
                [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
@@ -2067,7 +2067,7 @@ _swprintf_s_l:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count,
 
 
 [guard][wchar]
-_vsnwprintf_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+_vsnwprintf_l:([[outp(bufsize)]] wchar_t *dst, $size_t bufsize,
                [[nonnull]] wchar_t const *format,
                [[nullable]] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	(void)locale;
@@ -2075,7 +2075,7 @@ _vsnwprintf_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
 }
 
 [guard][wchar]
-_snwprintf_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+_snwprintf_l:([[outp(bufsize)]] wchar_t *dst, $size_t bufsize,
               [[nonnull]] wchar_t const *format, [[nullable]] $locale_t locale, ...)
 		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
 

@@ -520,7 +520,7 @@ strerror_l:(int errnum, $locale_t locale) -> char * {
 }
 [ATTR_WUNUSED] strsignal:(int signo) -> char *;
 
-[requires($has_function(malloc))]
+[requires_function("malloc")]
 [section(.text.crt.heap.strdup)][crtbuiltin][export_alias(__strndup)]
 strndup:([[nonnull]] char const *__restrict string, $size_t max_chars)
 	-> [malloc((strnlen(string, max_chars) + 1) * sizeof(char))] char *
@@ -542,7 +542,7 @@ strndup:([[nonnull]] char const *__restrict string, $size_t max_chars)
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 }
-[requires($has_function(malloc))][alias(_strdup)]
+[requires_function("malloc")][alias(_strdup)]
 [section(.text.crt.heap.strdup)][same_impl][crtbuiltin][export_alias(__strdup)]
 strdup:([[nonnull]] char const *__restrict string)
 	-> [malloc((strlen(string) + 1) * sizeof(char))] char *
@@ -3455,7 +3455,7 @@ strerror_s:(int errnum) -> char const * {
 }
 
 [ATTR_WUNUSED][ATTR_CONST][nothrow][section(.text.crt.errno)]
-[dependency_include(<parts/errno.h>)][user][noexport]
+[impl_include("<parts/errno.h>")][user][noexport]
 strerrorname_s:(int errnum) -> char const * {
 	char const *result;
 	switch (errnum) {
@@ -4917,7 +4917,7 @@ strrev:([[nonnull]] char *__restrict str) -> [== str] char * {
 [attribute(*)][alias(*)] _memicmp_l:(*) = memcasecmp_l;
 [attribute(*)][alias(*)] memicmp:(*) = memcasecmp;
 
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [section(.text.crt.dos.string.memory)]
 _strset_s:([[nonnull]] char *dst, $size_t dstsize, int ch) -> $errno_t {
 @@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
@@ -4940,7 +4940,7 @@ _strset_s:([[nonnull]] char *dst, $size_t dstsize, int ch) -> $errno_t {
 
 %
 %#ifdef __USE_DOS_SLIB
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [section(.text.crt.dos.string.memory)]
 memcpy_s:([[nonnull]] void *dst, rsize_t dstlength,
           [[nonnull]] void const *src, rsize_t srclength) -> $errno_t {
@@ -4962,7 +4962,7 @@ memcpy_s:([[nonnull]] void *dst, rsize_t dstlength,
 	return 0;
 }
 
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [section(.text.crt.dos.string.memory)]
 memmove_s:([[nonnull]] void *dst, rsize_t dstlength,
            [[nonnull]] void const *src, rsize_t srclength) -> $errno_t {
@@ -4978,7 +4978,7 @@ memmove_s:([[nonnull]] void *dst, rsize_t dstlength,
 }
 
 
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [section(.text.crt.dos.string.memory)]
 strcpy_s:(char *dst, $size_t dstsize, char const *src) -> $errno_t {
 @@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
@@ -4999,7 +4999,7 @@ strcpy_s:(char *dst, $size_t dstsize, char const *src) -> $errno_t {
 	return 0;
 }
 
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [section(.text.crt.dos.string.memory)]
 strcat_s:(char *dst, $size_t dstsize, char const *src) -> $errno_t {
 	if (!dst || !src)
@@ -5024,7 +5024,7 @@ __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL strnlen_s)(char const *__str, __SIZE_TYPE
 }
 }
 
-[dependency_include(<parts/errno.h>)][section(.text.crt.dos.string.memory)]
+[impl_include("<parts/errno.h>")][section(.text.crt.dos.string.memory)]
 strncat_s:(char *dst, rsize_t dstsize, const char *src, rsize_t maxlen) -> $errno_t {
 @@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
 @@exec MULTIPLY = $wchar_function ? none : " * sizeof(char)"@@
@@ -5063,7 +5063,7 @@ strncat_s:(char *dst, rsize_t dstsize, const char *src, rsize_t maxlen) -> $errn
 	return 0;
 }
 
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [section(.text.crt.dos.string.memory)]
 strncpy_s:(char *dst, $size_t dstsize, char const *src, $size_t maxlen) -> $errno_t {
 @@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
@@ -5124,7 +5124,7 @@ _strerror:(char const *message) -> char *;
 [section(.text.crt.dos.errno)][cp][dos_variant]
 _strerror_s:([[nonnull]] char *__restrict buf, $size_t buflen, char const *message) -> $errno_t;
 
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [section(.text.crt.dos.unicode.static.memory)][ATTR_LEAF]
 _strlwr_s:(char *buf, $size_t buflen) -> $errno_t {
 	char *iter, ch;
@@ -5176,7 +5176,7 @@ _strupr_s_l:(char *buf, $size_t buflen, $locale_t locale) -> $errno_t {
 [alias(*)][attribute(*)] _strnicmp:(*) = strncasecmp;
 [alias(*)][attribute(*)] _strnicmp_l:(*) = strncasecmp_l;
 
-[dependency_include(<parts/errno.h>)][section(.text.crt.dos.string.memory)][ATTR_LEAF]
+[impl_include("<parts/errno.h>")][section(.text.crt.dos.string.memory)][ATTR_LEAF]
 _strnset_s:(char *__restrict buf, $size_t buflen, int ch, $size_t maxlen) -> $errno_t {
 @@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
 @@exec MULTIPLY = $wchar_function ? none : " * sizeof(char)"@@

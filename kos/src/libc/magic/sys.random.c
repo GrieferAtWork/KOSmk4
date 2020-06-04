@@ -81,7 +81,7 @@ getrandom:([outp(num_bytes)] void *buf,
 @@@return:  0: Success
 @@@return: -1: Error (see `errno')
 [ATTR_WUNUSED][requires_include(<asm/random.h>)]
-[dependency_include(<parts/errno.h>)][userimpl][guard]
+[impl_include("<parts/errno.h>")][userimpl][guard]
 [requires(defined(__GRND_RANDOM) && $has_function(getrandom))]
 getentropy:([outp(num_bytes)] void *buf, size_t num_bytes) -> int {
 	size_t result = 0;

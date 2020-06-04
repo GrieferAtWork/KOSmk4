@@ -24,9 +24,9 @@
 %[default_impl_section(.text.crt.unicode.UTF)]
 %[define_wchar_replacement(__SIZEOF_WCHAR_T__ = 2, 4)]
 
-%[crt_feature(__unicode_asciiflags)]
-%[crt_feature(__unicode_descriptor)]
-%[crt_feature(unicode_fold)]
+%[declare_user_export(__unicode_asciiflags)]
+%[declare_user_export(__unicode_descriptor)]
+%[declare_user_export(unicode_fold)]
 
 %{
 #include <features.h>

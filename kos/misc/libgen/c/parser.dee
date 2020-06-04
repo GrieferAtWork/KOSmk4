@@ -419,13 +419,29 @@ function parseCStringOrFunctionLikeExpression(self: CParser): UserString | strin
 		.format({ tok }));
 }
 
-@@Parse a C-String, or everything else until a trailing @")", @"]" or @"}"
-function parseCStringOrAllUntilRParen(self: CParser): UserString | string {
+@@Parse everything until a trailing @")", @"]", @"}" or @","
+function parseAllUntilRParenAsString(self: CParser): UserString | string {
 	local tok = self.tok;
-	if (isCString(tok)) {
-		self.next();
-		return tok.decode("c-escape");
+	local resultStart = self.tokStart;
+	local resultEnd = self.tokEnd;
+	for (;;) {
+		if (tok in "([{") {
+			self.skipPair();
+			resultEnd = self.tokEnd;
+			tok = self.next();
+			continue;
+		}
+		if (tok in ")]},")
+			break;
+		resultEnd = self.tokEnd;
+		tok = self.next();
 	}
+	return self.text[resultStart:resultEnd];
+}
+
+@@Parse everything until a trailing @")", @"]", @"}" or @","
+function parseAllUntilRParen(self: CParser): UserString | string {
+	local tok = self.tok;
 	local resultStart = self.tokStart;
 	local resultEnd = self.tokEnd;
 	for (;;) {
@@ -442,6 +458,17 @@ function parseCStringOrAllUntilRParen(self: CParser): UserString | string {
 	}
 	return self.getUserString(resultStart, resultEnd);
 }
+
+@@Parse a C-String, or everything else until a trailing @")", @"]", @"}" or @","
+function parseCStringOrAllUntilRParen(self: CParser): UserString | string {
+	local tok = self.tok;
+	if (isCString(tok)) {
+		self.next();
+		return tok.decode("c-escape");
+	}
+	return parseAllUntilRParen(self);
+}
+
 
 
 @@Same as @parseCStringOrFunctionLikeExpression, but parse

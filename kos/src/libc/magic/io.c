@@ -157,7 +157,7 @@ _findnext64i32:(intptr_t findfd, [[nonnull]] struct _finddata64i32_t *__restrict
 %
 [cp][alias(_sopen_s_nolock)]
 [decl_include("<bits/types.h>")][requires($has_function(sopen))]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 _sopen_s:([[nonnull]] $fd_t *fd,
           [[nonnull]] char const *filename,
           $oflag_t oflags, int sflags, $mode_t mode) -> errno_t {
@@ -225,7 +225,7 @@ $int64_t _telli64($fd_t fd) {
 
 %[default_impl_section(.text.crt.dos.fs.basic_property)]
 
-[[dependency_include(<parts/errno.h>)]]
+[[impl_include("<parts/errno.h>")]]
 [[decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(umask))]]
 umask_s:($mode_t newmode, $mode_t *oldmode) -> errno_t {

@@ -143,7 +143,7 @@ typedef __cnd_t cnd_t;
 @@are passed through ARG. If successful, THR is set to new thread identifier
 [same_impl][requires($has_function(pthread_create))]
 [dependency_include(<asm/threads.h>)]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [decl_include(<bits/threads.h>)]
 thrd_create:(thrd_t *thr, thrd_start_t func, void *arg) -> int {
 	int error;
@@ -181,7 +181,7 @@ thrd_current:() -> thrd_t = pthread_self;
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(thrd_sleep)]
 [requires($has_function(thrd_sleep32) || $has_function(crt_thrd_sleep64) || $has_function(nanosleep))]
 [dependency_include(<asm/threads.h>)]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [decl_include("<bits/timespec.h>")][cp]
 thrd_sleep:([[nonnull]] struct timespec const *time_point,
             [[nullable]] struct timespec *remaining) -> int {

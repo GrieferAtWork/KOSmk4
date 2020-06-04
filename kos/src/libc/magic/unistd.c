@@ -270,16 +270,16 @@ execvp:([[nonnull]] char const *__restrict file, [[nonnull]] @__TARGV@) -> int;
 @@>> execl(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list
-[cp][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(execv)][ATTR_SENTINEL][alias(_execl)][allow_macros][crtbuiltin]
+[cp][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(execv)][ATTR_SENTINEL][alias(_execl)][allow_macros][crtbuiltin]
 execl:([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) -> int {
 	__REDIRECT_EXECL(char, execv, path, args)
 }
 @@>> execle(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel
-[cp][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(execve)][ATTR_SENTINEL_O(1)][alias(_execle)][allow_macros][crtbuiltin]
+[cp][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(execve)][ATTR_SENTINEL_O(1)][alias(_execle)][allow_macros][crtbuiltin]
 execle:([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) -> int {
 	__REDIRECT_EXECLE(char, execve, path, args)
 }
@@ -287,8 +287,8 @@ execle:([[nonnull]] char const *__restrict path, char const *args, ... /*, (char
 @@>> execlp(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list
-[cp][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(execvp)][ATTR_SENTINEL][alias(_execlp)][allow_macros][crtbuiltin]
+[cp][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(execvp)][ATTR_SENTINEL][alias(_execlp)][allow_macros][crtbuiltin]
 execlp:([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) -> int {
 	__REDIRECT_EXECL(char, execvp, file, args)
 }
@@ -305,8 +305,8 @@ execvpe:([[nonnull]] char const *__restrict file, [[nonnull]] @__TARGV@, [[nonnu
 @@>> execlpe(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel
-[cp][guard][dependency_include(<parts/redirect-exec.h>)]
-[requires_dependency(execvpe)][ATTR_SENTINEL_O(1)][alias(_execlpe)][allow_macros]
+[cp][guard][dependency_include("<parts/redirect-exec.h>")]
+[requires_dependent_function(execvpe)][ATTR_SENTINEL_O(1)][alias(_execlpe)][allow_macros]
 execlpe:([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) -> int {
 	__REDIRECT_EXECLE(char, execvp, file, args)
 }
@@ -554,7 +554,7 @@ link:([[nonnull]] char const *from, [[nonnull]] char const *to) -> int {
 @@Read data from a given file descriptor `FD' and return the number of bytes read.
 @@A return value of ZERO(0) is indicative of EOF
 [[cp, guard, export_alias(_read, __read), section(.text.crt.io.read)]]
-ssize_t read($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize);
+ssize_t read($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize);
 
 %
 @@>> write(2)
@@ -573,8 +573,8 @@ ssize_t write($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize);
 @@during this phase are silently ignored and don't cause `errno' to change
 [cp][guard][section(.text.crt.io.read)]
 [requires($has_function(read) && $has_function(lseek))]
-[dependency_include(<parts/errno.h>)]
-readall:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize) -> ssize_t {
+[impl_include("<parts/errno.h>")]
+readall:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) -> ssize_t {
 	ssize_t result, temp;
 	result = read(fd, buf, bufsize);
 	if (result > 0 && (size_t)result < bufsize) {
@@ -609,7 +609,7 @@ readall:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize) -> ssize_t {
 @@written (in which case `bufsize' is returned).
 [cp][guard][section(.text.crt.io.write)]
 [requires($has_function(write) && $has_function(lseek))]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 writeall:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize) -> ssize_t {
 	ssize_t result, temp;
 	result = write(fd, buf, bufsize);
@@ -869,7 +869,7 @@ lseek64:($fd_t fd, $off64_t offset, int whence) -> $off64_t {
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(pread)]
 [requires(defined(__CRT_HAVE_pread64) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))))]
 [section(.text.crt.io.read)]
-pread:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, __PIO_OFFSET offset) -> ssize_t {
+pread:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET offset) -> ssize_t {
 #ifdef __CRT_HAVE_pread64
 	return pread64(fd, buf, bufsize, (@__PIO_OFFSET64@)offset);
 #else
@@ -941,9 +941,9 @@ pwrite:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, __PIO_OFFSET o
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(preadall64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(preadall)]
 [requires($has_function(preadall64))]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [cp][section(.text.crt.io.read)]
-preadall:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, __PIO_OFFSET offset) -> ssize_t {
+preadall:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET offset) -> ssize_t {
 	return preadall64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
 }
 
@@ -953,7 +953,7 @@ preadall:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, __PIO_OFFSET offs
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(pwriteall64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(pwriteall)]
 [requires($has_function(pwriteall64))]
-[dependency_include(<parts/errno.h>)]
+[impl_include("<parts/errno.h>")]
 [cp][section(.text.crt.io.write)]
 pwriteall:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, __PIO_OFFSET offset) -> ssize_t {
 	return pwriteall64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
@@ -966,7 +966,7 @@ pwriteall:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, __PIO_OFFSE
 %#ifdef __USE_LARGEFILE64
 
 [section(.text.crt.io.read)][cp][ignore]
-pread32:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, $pos32_t offset) -> ssize_t = pread?;
+pread32:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, $pos32_t offset) -> ssize_t = pread?;
 [section(.text.crt.io.write)][cp][ignore]
 pwrite32:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, $pos32_t offset) -> ssize_t = pwrite?;
 
@@ -974,7 +974,7 @@ pwrite32:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, $pos32_t off
 @@Read data from a file at a specific offset
 [off64_variant_of(pread)][cp][noexport][section(.text.crt.io.large.read)][export_alias(__pread64)]
 [requires(defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))))]
-pread64:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, __PIO_OFFSET64 offset) -> ssize_t {
+pread64:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET64 offset) -> ssize_t {
 #if defined(__CRT_HAVE_pread) && ((!defined(__CRT_HAVE__lseeki64) && !defined(__CRT_HAVE_lseek64)) || (!defined(__CRT_HAVE_read) && !defined(__CRT_HAVE__read)))
 	return pread32(fd, buf, bufsize, (pos32_t)offset);
 #elif defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek64)
@@ -1693,8 +1693,8 @@ ftruncate64:($fd_t fd, __PIO_OFFSET64 length) -> int {
 @@>> brk(2), sbrk(2)
 @@Change the program break, allowing for a rudimentary implementation of a heap.
 @@It is recommended to use the much more advanced functions found in <sys/mman.h> instead
-[section(.text.crt.heap.utility)] brk:(void *addr) -> int;
-[section(.text.crt.heap.utility)][export_alias(__sbrk)] sbrk:(intptr_t delta) -> void *;
+[section(".text.crt.heap.utility")] brk:(void *addr) -> int;
+[section(".text.crt.heap.utility")][export_alias(__sbrk)] sbrk:(intptr_t delta) -> void *;
 %#endif
 
 %

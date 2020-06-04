@@ -91,16 +91,16 @@ enum {
 @@Get the attribute NAME of the file pointed to by PATH to VALUE
 @@(which is SIZE bytes long). Return 0 on success, -1 for errors
 [cp] getxattr:([[nonnull]] char const *path, [[nonnull]] char const *name,
-			   [outp(bufsize)] void *buf, size_t bufsize) -> ssize_t;
+			   [[outp(bufsize)]] void *buf, size_t bufsize) -> ssize_t;
 
 @@Get the attribute NAME of the file pointed to by PATH to VALUE (which is
 @@SIZE bytes long), not following symlinks for the last pathname component.
 @@Return 0 on success, -1 for errors
-[cp] lgetxattr:([[nonnull]] char const *path, [[nonnull]] char const *name, [outp(bufsize)] void *buf, size_t bufsize) -> ssize_t;
+[cp] lgetxattr:([[nonnull]] char const *path, [[nonnull]] char const *name, [[outp(bufsize)]] void *buf, size_t bufsize) -> ssize_t;
 
 @@Get the attribute NAME of the file descriptor FD to VALUE
 @@(which is SIZE bytes long). Return 0 on success, -1 for errors
-[cp] fgetxattr:($fd_t fd, [[nonnull]] char const *name, [outp(bufsize)] void *buf, size_t bufsize) -> ssize_t;
+[cp] fgetxattr:($fd_t fd, [[nonnull]] char const *name, [[outp(bufsize)]] void *buf, size_t bufsize) -> ssize_t;
 
 @@List attributes of the file pointed to by PATH into the
 @@user-supplied buffer LIST (which is SIZE bytes big).
