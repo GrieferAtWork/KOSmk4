@@ -600,12 +600,43 @@ again_parse_annotations:
 					++numRBracket;
 					goto again_parse_annotations;
 
-				case "malloc": {
+				case "==": {
+					tok = self.next();
+					if (!tok.issymbol()) {
+						self.err("Expected argumet name in [== ...], but got {!r}"
+							.format({ tok }));
+					}
+					local baseArg: Argument;
+					try {
+						baseArg = result.argsByName[tok];
+					} catch (Error as e) {
+						self.err(e.message);
+					}
+					tok = self.next();
+					if (tok == "+") {
+						self.next();
+						parseAllUntilRParenAsString(self);
+					}
+					for (local a: result.attributes) {
+						a = str a;
+						if (a.startswith("ATTR_NONNULL((") && a.endswith("))")) {
+							local nonNullArgs = a[14:-2].split(",").each.strip();
+							if (str(result.argv.index(baseArg) + 1) in nonNullArgs) {
+								result.attributes.append("ATTR_RETNONNULL");
+								break;
+							}
+						}
+					}
+				}	break;
+
+				case "malloc":
+				case "malloc_unaligned": {
 					if (result.attributes === defaultAttributes)
 						result.attributes = List(defaultAttributes);
 					result.attributes.append("ATTR_WUNUSED");
 					result.attributes.append("ATTR_MALLOC");
-					result.attributes.append("ATTR_MALL_DEFAULT_ALIGNED");
+					if (tok != "malloc_unaligned")
+						result.attributes.append("ATTR_MALL_DEFAULT_ALIGNED");
 					if (self.next() == "(") {
 						self.next();
 						local argumentIndices = [];
@@ -628,7 +659,8 @@ again_parse_annotations:
 					}
 				}	break;
 
-				case "realloc": {
+				case "realloc":
+				case "realloc_unaligned": {
 					self.next();
 					self.skip("(");
 					parseCStringOrKeyword(self);
@@ -650,16 +682,21 @@ again_parse_annotations:
 					if (result.attributes === defaultAttributes)
 						result.attributes = List(defaultAttributes);
 					result.attributes.append("ATTR_WUNUSED");
-					result.attributes.append("ATTR_MALLOC");
-					result.attributes.append("ATTR_MALL_DEFAULT_ALIGNED");
+					if (tok != "realloc_unaligned")
+						result.attributes.append("ATTR_MALL_DEFAULT_ALIGNED");
 					result.attributes.append("ATTR_ALLOC_SIZE(({}))"
 						.format({ ", ".join(argumentIndices) }));
 					self.skip(")");
 				}	break;
 
+				case "realign":
 				case "memalign": {
 					self.next();
 					self.skip("(");
+					if (tok == "realign") {
+						parseCStringOrKeyword(self); /* mallptr */
+						self.skip(",");
+					}
 					local minAlignmentAttrib;
 					if (self.tok == "getpagesize") {
 						self.next();
@@ -694,7 +731,8 @@ again_parse_annotations:
 					if (result.attributes === defaultAttributes)
 						result.attributes = List(defaultAttributes);
 					result.attributes.append("ATTR_WUNUSED");
-					result.attributes.append("ATTR_MALLOC");
+					if (tok != "realign")
+						result.attributes.append("ATTR_MALLOC");
 					result.attributes.append(minAlignmentAttrib);
 					result.attributes.append("ATTR_ALLOC_SIZE(({}))"
 						.format({ ", ".join(argumentIndices) }));
@@ -1185,7 +1223,7 @@ class FunctionFeatures {
 			this.operator . (myField) = field;
 			self.next();
 			self.skip("(");
-			for (;;) {
+			while (tok !in ["", ")"]) {
 				if (isCString(tok))
 					tok = tok.decode("c-escape");
 				else if (!tok.issymbol()) {
@@ -1200,7 +1238,7 @@ class FunctionFeatures {
 				tok = self.next();
 				if (tok != ",")
 					break;
-				self.next();
+				tok = self.next();
 			}
 			self.skip(")");
 		}	break;
@@ -1216,7 +1254,7 @@ class FunctionFeatures {
 			this.operator . (myField) = field;
 			self.next();
 			self.skip("(");
-			for (;;) {
+			while (tok !in ["", ")"]) {
 				if (isCString(tok))
 					tok = tok.decode("c-escape");
 				else if (!tok.issymbol()) {
@@ -1227,7 +1265,7 @@ class FunctionFeatures {
 				tok = self.next();
 				if (tok != ",")
 					break;
-				self.next();
+				tok = self.next();
 			}
 			self.skip(")");
 		}	break;
@@ -1319,6 +1357,21 @@ err_unexpected_if:
 			self.err("Annotation [{}] cannot be used with aliasing function {!r}"
 				.format({ altered, functionName }));
 		}
+	}
+
+	@@Assert that no annotations are given that wouldn't make sense for
+	@@symbolic aliasing functions, such that %{uchar} or '= other' aliases
+	public function assertAllGeneratedFunctionBody(
+			self: CParser, functionName: string) {
+		if (requires != "1")
+			self.err("Function {!r} has a generated implementation, but uses [requires({!r})]"
+				.format({ functionName, requires }));
+		if (requiresPrefix)
+			self.err("Function {!r} has a generated implementation, but uses [requires_prefix({!r})]"
+				.format({ functionName, requiresPrefix }));
+		if (implPrefix)
+			self.err("Function {!r} has a generated implementation, but uses [impl_prefix({!r})]"
+				.format({ functionName, implPrefix }));
 	}
 
 }
@@ -2934,7 +2987,7 @@ again_skip_annotation_rbracket:
 					self.getUserString(returnTypeStart, returnTypeEnd));
 			}
 		}
-		//print("Function: ", headerName, "::", currentName);
+		print("Function: ", headerName, "::", currentName);
 
 		/* Bind the function against its own symbol */
 		if (!currentFeatures.crt_noSelfImport) {
@@ -3221,22 +3274,218 @@ handle_percent_after_prototype:
 				tok = self.next();
 				switch (tok) {
 
-				case "copy": /* Deprecated alias */
+				case "chk": {
+					currentFeatures.assertAllGeneratedFunctionBody(self, currentName);
+					if (currentPrototype is none || currentPrototypes is none)
+						self.err("Cannot use %{{chk}} on function {!r} with inherited prototype"
+							.format({ currentName }));
+					local chkBaseFunctionName: string | none = none;
+					local chkExpr: string | none = none;
+					tok = self.next();
+					if (tok == "(") {
+						tok = self.next();
+						if (tok == "*") {
+							self.next();
+						} else if (tok == "%") {
+							self.next();
+							self.skip("auto");
+						} else {
+							chkBaseFunctionName = parseCStringOrKeyword(self);
+						}
+						if (self.tok == ",") {
+							tok = self.next();
+							if (tok == "*") {
+								self.next();
+							} else if (tok == "%") {
+								self.next();
+								self.skip("auto");
+							} else {
+								chkExpr = parseCStringOrAllUntilRParen(self);
+							}
+						}
+						self.skip(")");
+					}
+					if (chkBaseFunctionName is none) {
+						if (!currentName.endswith("_chk")) {
+							self.errAt(currentNameTokStart, "Unable to determine chk base-function for {!r}"
+								.format({ currentName }));
+						}
+						chkBaseFunctionName = currentName.lstrip("_")[:-4];
+					}
+					if (chkExpr is none) {
+						@@Pairs of builtin @(requiredArgumentNames, chkExprTemplate)
+						local final CHK_EXPR_VARIANTS: {({string...}, string)...} = {
+							({ "dst", "n_bytes", "dst_objsize" },
+								"__ssp_chk_dstbuf({base!r}, dst, n_bytes, dst_objsize)"),
+							({ "dst", "n_words", "dst_objsize" },
+								"__ssp_chk_dstbuf({base!r}, dst, n_words * 2, dst_objsize)"),
+							({ "dst", "n_dwords", "dst_objsize" },
+								"__ssp_chk_dstbuf({base!r}, dst, n_dwords * 4, dst_objsize)"),
+							({ "dst", "n_qwords", "dst_objsize" },
+								"__ssp_chk_dstbuf({base!r}, dst, n_qwords * 8, dst_objsize)"),
+							({ "dst", "elem_count", "elem_size", "dst_objsize" },
+								"__ssp_chk_dstbuf({base!r}, dst, elem_count * elem_size, dst_objsize)"),
+						};
+						local argsByName = currentPrototype.argsByName;
+						for (local requiredArgumentNames, chkExprTemplate: CHK_EXPR_VARIANTS) {
+							for (local requiredArgumentName: requiredArgumentNames) {
+								if (requiredArgumentName !in argsByName)
+									goto next_CHK_EXPR_VARIANTS_template;
+							}
+							/* Got it! */
+							chkExpr = chkExprTemplate.format({
+								"base" : chkBaseFunctionName
+							});
+							goto got_chkExpr;
+next_CHK_EXPR_VARIANTS_template:
+							;
+						}
+						self.errAt(currentNameTokStart,
+							"Unable to determine automatic check expression for {!r}"
+							.format({ currentName }));
+					}
+got_chkExpr:
+					loaderImpl = LoaderFunctionImplementation(
+						impl: FunctionImplementation(
+							body: "{{\n"
+								"\t{};\n"
+								"\treturn {}({})\n"
+								"}}".format({
+									chkExpr,
+									chkBaseFunctionName,
+									", ".join(currentPrototype.argv[:-1].each.name)
+								}),
+							name:         currentName,
+							implPrefix:   { "#include <ssp/chk.h>" },
+							dependencies: { [] -> findFunctionByName(chkBaseFunctionName) }),
+						ppCond: "$has_function({})".format({ chkBaseFunctionName }));
+				}	break;
+
+				case "printf": {
+					/* Syntax:
+					 * >> fprintf(*) %{printf}
+					 * >> fprintf(*) %{printf(*)}
+					 * >> fprintf(*) %{printf(%auto)}
+					 * >> fprintf(*) %{printf(vfprintf)} */
+					currentFeatures.assertAllGeneratedFunctionBody(self, currentName);
+					local vprintfFunctionName: string | none = none;
+					tok = self.next();
+					if (tok == "(") {
+						tok = self.next();
+						if (tok == "*") {
+							self.next();
+						} else if (tok == "%") {
+							self.next();
+							self.skip("auto");
+						} else {
+							vprintfFunctionName = parseCStringOrKeyword(self);
+						}
+						self.skip(")");
+					}
+					if (vprintfFunctionName is none) {
+						local n = 0;
+						while (n < #currentName && currentName[n] == "_")
+							++n;
+						vprintfFunctionName = "{}v{}".format({
+							currentName[:n], currentName[n:] });
+					}
+					if (currentPrototype is none) {
+						local replacedPrototypeCell: Cell with FunctionPrototype = Cell();
+						currentPrototype = []{
+							if (!replacedPrototypeCell) {
+								local origProto: FunctionPrototype;
+								try {
+									origProto = findLocalFunctionByName(
+										vprintfFunctionName).functionPrototype;
+								} catch (Error as e) {
+									self.errAt(currentNameTokStart, e.message);
+								}
+								local result = FunctionPrototype(
+									/* XXX: Replace 'ATTR_LIBC_PRINTF(N, 0)'
+									 *         with 'ATTR_LIBC_PRINTF(N, N+1)' */
+									attributes: origProto.attributes,
+									nothrow:    origProto.nothrow,
+									cc:         origProto.cc,
+									returnType: origProto.returnType,
+									argv:       { origProto.argv[:-1]..., Argument("", "", CType("...")) },
+									declPrefix: origProto.declPrefix);
+								replacedPrototypeCell.value = result;
+								return result;
+							}
+							return replacedPrototypeCell.value;
+						};
+					}
+					if (currentPrototypes is none) {
+						currentPrototypes = [] -> {
+							("1", {
+								currentPrototype is Callable
+									? currentPrototype()
+									: currentPrototype
+							}),
+						};
+						for (local binding: current.bindings) {
+							if (binding is Callable)
+								continue;
+							if (binding.prototypes is none)
+								binding.prototypes = currentPrototypes;
+						}
+					}
+					function getLoaderFunctionImplementation(): LoaderFunctionImplementation {
+						local myPrototype: FunctionPrototype = currentPrototype;
+						if (myPrototype is Callable)
+							myPrototype = myPrototype();
+						local bodyPattern: string =
+						"{{\n"
+						"	{returnType0} result{returnType1};\n"
+						"	va_list args;\n"
+						"	va_start(args, {lastArg});\n"
+						"	result = {vprintf}({positionalArgs}, args);\n"
+						"	va_end(args);\n"
+						"	return result;\n"
+						"}}";
+						/* Select different patterns based on prototype features */
+						if (myPrototype.isNoreturn) {
+							bodyPattern =
+							"{{\n"
+							"	va_list args;\n"
+							"	va_start(args, {lastArg});\n"
+							"	{vprintf}({positionalArgs}, args);\n"
+							"}}";
+						} else if (myPrototype.returnType.isVoid) {
+							bodyPattern =
+							"{{\n"
+							"	va_list args;\n"
+							"	va_start(args, {lastArg});\n"
+							"	{vprintf}({positionalArgs}, args);\n"
+							"	va_end(args);\n"
+							"}}";
+						}
+						return LoaderFunctionImplementation(
+							impl: FunctionImplementation(
+								body: bodyPattern.format({
+									"returnType0"    : myPrototype.returnType.beforeName,
+									"returnType1"    : myPrototype.returnType.afterName,
+									"lastArg"        : myPrototype.argv.last.name,
+									"positionalArgs" : ", ".join(myPrototype.argv[:-1].each.name),
+									"vprintf"        : vprintfFunctionName,
+								}),
+								name: currentName,
+								dependencies: { [] -> findFunctionByName(vprintfFunctionName) }),
+							ppCond: "$has_function({})".format({ vprintfFunctionName }));
+					}
+					loaderImpl = getLoaderFunctionImplementation;
+					if (currentPrototype !is Callable)
+						loaderImpl = loaderImpl();
+				}	break;
+
+
 				case "generate": {
 					/* Syntax:
 					 * >> wcslen(*) %{generate(str2wcs)}
 					 * >> wcslen(*) %{generate(str2wcs(*))}
 					 * >> wcslen(*) %{generate(str2wcs(%auto))}
 					 * >> wcslen(*) %{generate(str2wcs(strlen))} */
-					if (currentFeatures.requires != "1")
-						self.err("Function {!r} has a generated implementation, but uses [requires({!r})]"
-							.format({ currentName, currentFeatures.requires }));
-					if (currentFeatures.requiresPrefix)
-						self.err("Function {!r} has a generated implementation, but uses [requires_prefix({!r})]"
-							.format({ currentName, currentFeatures.requiresPrefix }));
-					if (currentFeatures.implPrefix)
-						self.err("Function {!r} has a generated implementation, but uses [impl_prefix({!r})]"
-							.format({ currentName, currentFeatures.implPrefix }));
+					currentFeatures.assertAllGeneratedFunctionBody(self, currentName);
 					self.next();
 					tok = self.skip("(");
 					if (!tok.issymbol()) {

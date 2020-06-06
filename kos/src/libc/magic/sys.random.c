@@ -65,7 +65,7 @@ typedef __SSIZE_TYPE__ ssize_t;
 @@               calling thread being interrupted, EINTR is only set
 @@               if no random data had already been retrieved from
 @@               the kernel's random data sink.
-[ATTR_WUNUSED]
+[[ATTR_WUNUSED]]
 getrandom:([outp(num_bytes)] void *buf,
            size_t num_bytes, unsigned int flags) -> ssize_t;
 
@@ -80,7 +80,7 @@ getrandom:([outp(num_bytes)] void *buf,
 @@Also note that any other than `EFAULT' and `ENOSYS' are translated into `EIO'
 @@@return:  0: Success
 @@@return: -1: Error (see `errno')
-[ATTR_WUNUSED][requires_include(<asm/random.h>)]
+[[ATTR_WUNUSED]][requires_include(<asm/random.h>)]
 [impl_include("<parts/errno.h>")][userimpl][guard]
 [requires(defined(__GRND_RANDOM) && $has_function(getrandom))]
 getentropy:([outp(num_bytes)] void *buf, size_t num_bytes) -> int {

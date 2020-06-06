@@ -306,11 +306,11 @@ struct ifconf {
 }
 
 @@Convert an interface name to an index, and vice versa
-[cp_kos] if_nametoindex:(char const *ifname) -> unsigned int;
-[cp_kos][doc_alias(if_nametoindex)] if_indextoname:(unsigned int ifindex, char *ifname) -> char *;
+[[cp_kos]] if_nametoindex:(char const *ifname) -> unsigned int;
+[[cp_kos]][doc_alias(if_nametoindex)] if_indextoname:(unsigned int ifindex, char *ifname) -> char *;
 
 @@Return a list of all interfaces and their indices
-[cp_kos] if_nameindex:() -> struct if_nameindex *;
+[[cp_kos]] if_nameindex:() -> struct if_nameindex *;
 @@Free the data returned from if_nameindex
 if_freenameindex:(struct if_nameindex *ptr);
 

@@ -120,7 +120,7 @@ OpenAt:($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) -> 
 	return result;
 }
 %#ifdef __USE_LARGEFILE64
-[[cp]][guard][noexport][vartypes($mode_t)][ATTR_WUNUSED]
+[[cp, guard]][noexport][vartypes($mode_t)][[ATTR_WUNUSED]]
 [largefile64_variant_of(OpenAt)][throws]
 [requires($has_function(OpenAt32))]
 [decl_include("<bits/types.h>")]

@@ -65,14 +65,14 @@ sem_init:([[nonnull]] sem_t *sem, int pshared, unsigned int value) -> int;
 sem_destroy:([[nonnull]] sem_t *sem) -> int;
 
 @@Open a named semaphore NAME with open flags OFLAGS
-[cp_kos][vartypes($mode_t, unsigned int)]
+[[cp_kos]][vartypes($mode_t, unsigned int)]
 sem_open:([[nonnull]] char const *name, $oflag_t oflags, ...) -> sem_t *;
 
 @@Close descriptor for named semaphore SEM
 sem_close:([[nonnull]] sem_t *sem) -> int;
 
 @@Remove named semaphore NAME
-[cp_kos] sem_unlink:([[nonnull]] const char *name) -> int;
+[[cp_kos]] sem_unlink:([[nonnull]] const char *name) -> int;
 
 @@Wait for SEM being posted
 [[cp]] sem_wait:([[nonnull]] sem_t *sem) -> int;

@@ -75,7 +75,9 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-}%[push_macro @undef { alias_name alias_members_len alias_members alias_local }]%{
+}
+%[push_macro @undef { alias_name alias_members_len alias_members alias_local }]
+%{
 /* Structure to represent one entry of the alias data base. */
 struct aliasent {
 	char          *alias_name;
@@ -83,35 +85,40 @@ struct aliasent {
 	char         **alias_members;
 	__INT32_TYPE__ alias_local;
 };
-}%[pop_macro]%{
+}
+%[pop_macro]
+%{
 
 }
 
 
 @@Open alias data base files
-[cp_kos] setaliasent:();
+[[cp_kos]]
+void setaliasent();
 
 @@Close alias data base files
-endaliasent:();
+void endaliasent();
 
 @@Get the next entry from the alias data base
-[cp_kos] getaliasent:() -> struct aliasent *;
+[[cp_kos]]
+struct aliasent *getaliasent();
 
 @@Get the next entry from the alias data base and put it in RESULT_BUF
-[cp_kos] getaliasent_r:(
-	[[nonnull]] struct aliasent *__restrict result_buf,
-	[[nonnull]] char *__restrict buffer, size_t buflen,
-	[[nonnull]] struct aliasent **__restrict result) -> int;
+[[cp_kos]]
+int getaliasent_r([[nonnull]] struct aliasent *__restrict result_buf,
+                  [[nonnull]] char *__restrict buffer, size_t buflen,
+                  [[nonnull]] struct aliasent **__restrict result);
 
 @@Get alias entry corresponding to NAME
-[cp_kos] getaliasbyname:([[nonnull]] char const *name) -> struct aliasent *;
+[[cp_kos]]
+struct aliasent *getaliasbyname([[nonnull]] char const *name);
 
 @@Get alias entry corresponding to NAME and put it in RESULT_BUF
-[cp_kos] getaliasbyname_r:(
-	[[nonnull]] char const *__restrict name,
-	[[nonnull]] struct aliasent *__restrict result_buf,
-	[[nonnull]] char *__restrict buffer, size_t buflen,
-	[[nonnull]] struct aliasent **__restrict result) -> int;
+[[cp_kos]]
+int getaliasbyname_r([[nonnull]] char const *__restrict name,
+                     [[nonnull]] struct aliasent *__restrict result_buf,
+                     [[nonnull]] char *__restrict buffer, size_t buflen,
+                     [[nonnull]] struct aliasent **__restrict result);
 
 
 

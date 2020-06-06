@@ -121,21 +121,21 @@ _isatty(*) = isatty;
 %[default_impl_section(.text.crt.dos.fs.dir)]
 _findclose:(intptr_t findfd) -> int;
 
-[[cp]][ATTR_WUNUSED][export_alias(_findfirst)]
+[[cp]][[ATTR_WUNUSED]][export_alias(_findfirst)]
 _findfirst32:([[nonnull]] char const *__restrict filename,
               [[nonnull]] struct _finddata32_t *__restrict finddata)
 		-> intptr_t;
 
-[[cp]][ATTR_WUNUSED][export_alias(_findfirsti64)]
+[[cp]][[ATTR_WUNUSED]][export_alias(_findfirsti64)]
 _findfirst32i64:([[nonnull]] char const *__restrict filename,
                  [[nonnull]] struct _finddata32i64_t *__restrict finddata)
 		-> intptr_t;
 
-[[cp]][ATTR_WUNUSED]
+[[cp]][[ATTR_WUNUSED]]
 _findfirst64:([[nonnull]] char const *__restrict filename,
               [[nonnull]] struct __finddata64_t *__restrict finddata)
 		-> intptr_t;
-[[cp]][ATTR_WUNUSED]
+[[cp]][[ATTR_WUNUSED]]
 _findfirst64i32:([[nonnull]] char const *__restrict filename,
                  [[nonnull]] struct _finddata64i32_t *__restrict finddata)
 		-> intptr_t = _findfirst64;
@@ -183,7 +183,7 @@ _sopen_s:([[nonnull]] $fd_t *fd,
 
 _sopen_s_nolock(*) = _sopen_s;
 
-[section(.text.crt.dos.fs.utility)]
+[section(".text.crt.dos.fs.utility")]
 _mktemp_s:([[nonnull]] char *template_, size_t size) -> errno_t;
 
 _sopen(*) = sopen;
@@ -195,7 +195,7 @@ int _pipe([[nonnull]] $fd_t pipedes[2], $uint32_t pipesize, $oflag_t textmode) {
 	return pipe2(pipedes, textmode);
 }
 
-%[default_impl_section(.text.crt.dos.fs.utility)]
+%[default_impl_section(".text.crt.dos.fs.utility")]
 _eof(*) = eof;
 _filelength(*) = filelength;
 _tell(*) = tell;
@@ -240,7 +240,7 @@ umask_s:($mode_t newmode, $mode_t *oldmode) -> errno_t {
 	return 0;
 }
 
-%[default_impl_section(.text.crt.dos.fs.utility)];
+%[default_impl_section(".text.crt.dos.fs.utility")];
 
 [[cp, decl_include("<bits/types.h>")]]
 int __lock_fhandle($fd_t fd);
@@ -302,7 +302,7 @@ $fd_t sopen([[nonnull]] char const *filename, $oflag_t oflags, int sflags, ...) 
 	return result;
 }
 
-%[default_impl_section(.text.crt.dos.fs.utility)]
+%[default_impl_section(".text.crt.dos.fs.utility")]
 
 [[decl_include("<bits/types.h>")]]
 [[ATTR_WUNUSED, export_alias(_filelength)]]

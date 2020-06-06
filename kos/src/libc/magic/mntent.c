@@ -116,7 +116,7 @@ endmntent:([[nonnull]] $FILE *stream) -> int;
 
 @@Search MNT->mnt_opts for an option matching OPT.
 @@Returns the address of the substring, or null if none found
-[ATTR_WUNUSED][ATTR_PURE]
+[[ATTR_WUNUSED, ATTR_PURE]]
 hasmntopt:([[nullable]] struct mntent const *mnt, [[nullable]] char const *opt) -> char * {
 	char *str;
 	if likely(mnt && opt && (str = mnt->@mnt_opts@) != NULL) {

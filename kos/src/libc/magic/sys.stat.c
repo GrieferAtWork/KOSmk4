@@ -486,12 +486,12 @@ fstatat64:($fd_t dirfd, [[nonnull]] char const *__restrict filename,
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_ATFILE */
 
-%[default_impl_section(.text.crt.fs.modify)]
+%[default_impl_section(".text.crt.fs.modify")]
 
 [[cp]][ignore] dos_mkdir:([[nonnull]] char const *pathname) -> int = _mkdir?;
 
 %
-[[cp]][guard][noexport]
+[[cp, guard]][noexport]
 [requires(defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))]
 mkdir:([[nonnull]] char const *pathname, $mode_t mode) -> int {
 	(void)mode;
@@ -499,13 +499,13 @@ mkdir:([[nonnull]] char const *pathname, $mode_t mode) -> int {
 }
 
 %
-[[cp]][guard][alias(_chmod)]
+[[cp, guard]][alias(_chmod)]
 chmod:([[nonnull]] char const *filename, $mode_t mode) -> int;
 
 
 %
 %#ifdef __USE_MISC
-[[cp]][guard]
+[[cp, guard]]
 [if(defined(__CRT_DOS_PRIMARY)), alias(_chmod, chmod)]
 lchmod:([[nonnull]] char const *filename, $mode_t mode) -> int;
 %#endif /* __USE_MISC */
@@ -528,7 +528,7 @@ getumask:() -> $mode_t {
 }
 %#endif /* __USE_GNU */
 
-%[default_impl_section(.text.crt.fs.modify)]
+%[default_impl_section(".text.crt.fs.modify")]
 
 %
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)

@@ -141,7 +141,7 @@ struct acct_v3 {
 }
 
 @@Switch process accounting on and off
-[cp_kos] acct:(const char *filename) -> int;
+[[cp_kos]] acct:(const char *filename) -> int;
 
 %{
 

@@ -531,7 +531,7 @@ unicode_readutf16_n:([[nonnull]] /*utf-16*/ $char16_t const **__restrict ptext, 
 
 %
 @@Same as `unicode_readutf16()', but read in reverse endian as that of the host CPU
-[kernel][dependency_include(<hybrid/__byteswap.h>)]
+[kernel][impl_include("<hybrid/__byteswap.h>")]
 unicode_readutf16_swap:([[nonnull]] /*utf-16-swap*/ $char16_t const **__restrict ptext) -> $char32_t
 	[([[nonnull]] /*utf-16-swap*/ $char16_t const **__restrict ptext) -> $char32_t]
 	[([[nonnull]] /*utf-16-swap*/ $char16_t **__restrict ptext) -> $char32_t]
@@ -554,7 +554,7 @@ unicode_readutf16_swap:([[nonnull]] /*utf-16-swap*/ $char16_t const **__restrict
 
 %
 @@Same as `unicode_readutf16_n()', but read in reverse endian as that of the host CPU
-[kernel][dependency_include(<hybrid/__byteswap.h>)]
+[kernel][impl_include("<hybrid/__byteswap.h>")]
 unicode_readutf16_swap_n:([[nonnull]] /*utf-16-swap*/ $char16_t const **__restrict ptext, [[nonnull]] $char16_t const *text_end) -> $char32_t
 	[([[nonnull]] /*utf-16-swap*/ $char16_t const **__restrict ptext, [[nonnull]] $char16_t const *text_end) -> $char32_t]
 	[([[nonnull]] /*utf-16-swap*/ $char16_t **__restrict ptext, [[nonnull]] $char16_t const *text_end) -> $char32_t]
@@ -743,7 +743,7 @@ unicode_writeutf16:([[nonnull]] /*utf-16*/ $char16_t *__restrict dst, $char32_t 
 
 %
 @@Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false
-[ATTR_WUNUSED]
+[[ATTR_WUNUSED]]
 unicode_writeutf16_chk:([[nonnull]] /*utf-16*/ $char16_t *__restrict dst, $char32_t ch) -> $char16_t * {
 	if unlikely(ch > 0x10ffff)
 		return NULL;
@@ -989,7 +989,7 @@ unicode_8to16:([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst,
 @@@param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
 @@@return: * : A pointer after the last written UTF-16 character.
 @@@return: NULL: Attempted to write an invalid character
-[ATTR_WUNUSED]
+[[ATTR_WUNUSED]]
 unicode_8to16_chk:([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst,
                    [inp(utf8_characters)] /*utf-8*/ char const *__restrict utf8_text,
                    $size_t utf8_characters) -> $char16_t * {
@@ -1103,7 +1103,7 @@ unicode_32to16:([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst,
 @@@return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
 @@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
 @@@return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated)
-[dependency_include(<bits/mbstate.h>)]
+[dependency_include("<bits/mbstate.h>")]
 unicode_c8toc16:([[nonnull]] $char16_t *__restrict pc16,
                  [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
                  [[nonnull]] __mbstate_t *__restrict mbs) -> $size_t {
@@ -1237,7 +1237,7 @@ done:
 @@@return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
 @@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
 @@@return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated)
-[dependency_include(<bits/mbstate.h>)]
+[dependency_include("<bits/mbstate.h>")]
 unicode_c8toc32:([[nonnull]] $char32_t *__restrict pc32,
                  [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
                  [[nonnull]] __mbstate_t *__restrict mbs) -> $size_t {
@@ -1367,7 +1367,7 @@ struct format_8to16_data {
 
 @@Format printer (compatible with `__pformatprinter') for
 @@converting UTF-8 unicode input data into a UTF-16 output
-[dependency_include(<bits/mbstate.h>)]
+[dependency_include("<bits/mbstate.h>")]
 [dependency_include(<bits/format-printer.h>)]
 [dependency_include(<bits/uformat-printer.h>)]
 format_8to16:(/*struct format_8to16_data **/ void *arg,
@@ -1419,7 +1419,7 @@ struct format_8to32_data {
 
 @@Format printer (compatible with `__pformatprinter') for
 @@converting UTF-8 unicode input data into a UTF-32 output
-[dependency_include(<bits/mbstate.h>)]
+[dependency_include("<bits/mbstate.h>")]
 [dependency_include(<bits/format-printer.h>)]
 [dependency_include(<bits/uformat-printer.h>)]
 format_8to32:(/*struct format_8to32_data **/ void *arg,

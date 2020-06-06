@@ -553,7 +553,7 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(mmap)]
 [alias_args(mmap64:(void *addr, size_t len, int prot, int flags, $fd_t fd, $off64_t offset) -> void *)]
 [alias_args(mmap:(void *addr, size_t len, int prot, int flags, $fd_t fd, $off32_t offset) -> void *)]
-[noexport][ATTR_WUNUSED][requires(defined(__CRT_HAVE_mmap) || defined(__CRT_HAVE_mmap64))]
+[noexport][[ATTR_WUNUSED]][requires(defined(__CRT_HAVE_mmap) || defined(__CRT_HAVE_mmap64))]
 mmap:(void *addr, size_t len, int prot, int flags, $fd_t fd, $off_t offset) -> void * {
 #ifdef __CRT_HAVE_mmap64
 	return mmap64(addr, len, prot, flags, fd, (__off32_t)offset);
@@ -604,7 +604,7 @@ mincore:([[nonnull]] void *start, size_t len, unsigned char *vec) -> int;
 %
 %#ifdef __USE_LARGEFILE64
 [section(.text.crt.heap.mman)][off64_variant_of(mmap)]
-[doc_alias(mmap)][noexport][ATTR_WUNUSED][requires(defined(__CRT_HAVE_mmap))]
+[doc_alias(mmap)][noexport][[ATTR_WUNUSED]][requires(defined(__CRT_HAVE_mmap))]
 mmap64:(void *addr, size_t len, int prot, int flags, $fd_t fd, $off64_t offset) -> void * {
 	return mmap32(addr, len, prot, flags, fd, (off32_t)offset);
 }

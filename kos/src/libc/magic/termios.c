@@ -20,7 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(pid_t = __pid_t)]
-%[default_impl_section(.text.crt.io.tty)]
+%[default_impl_section(".text.crt.io.tty")]
 
 %{
 #include <features.h>
@@ -48,13 +48,13 @@ typedef __pid_t pid_t;
 
 }
 
-[ATTR_WUNUSED][ATTR_PURE]
+[[ATTR_WUNUSED, ATTR_PURE]]
 [decl_include(<bits/termios.h>)]
 cfgetospeed:([[nonnull]] struct termios const *__restrict termios_p) -> speed_t {
 	return termios_p->@c_ospeed@;
 }
 
-[ATTR_WUNUSED][ATTR_PURE]
+[[ATTR_WUNUSED, ATTR_PURE]]
 [decl_include(<bits/termios.h>)]
 cfgetispeed:([[nonnull]] struct termios const *__restrict termios_p) -> speed_t {
 	return termios_p->@c_ispeed@;

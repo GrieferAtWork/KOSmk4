@@ -157,7 +157,7 @@ typedef union { __SOCKADDR_ALLTYPES } __CONST_SOCKADDR_ARG __ATTR_TRANSPARENT_UN
 @@                  `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
 @@                  >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 @@                  Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
-[ATTR_WUNUSED][export_alias(__socket)]
+[[ATTR_WUNUSED]][export_alias(__socket)]
 socket:(__STDC_INT_AS_UINT_T family, __STDC_INT_AS_UINT_T type,
         __STDC_INT_AS_UINT_T protocol) -> $fd_t;
 
@@ -208,7 +208,7 @@ send:($fd_t sockfd, [inp(bufsize)] void const *buf,
 @@Returns the number read or -1 for errors
 @@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
-[[cp]][ATTR_WUNUSED][export_alias(__recv)]
+[[cp]][[ATTR_WUNUSED]][export_alias(__recv)]
 recv:($fd_t sockfd, [[outp(bufsize)]] void *buf, size_t bufsize,
       __STDC_INT_AS_UINT_T msg_flags) -> ssize_t;
 
@@ -226,7 +226,7 @@ sendto:($fd_t sockfd, [inp(bufsize)] void const *buf, size_t bufsize, __STDC_INT
 @@Returns the number of bytes read or -1 for errors
 @@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
-[[cp]][ATTR_WUNUSED]
+[[cp]][[ATTR_WUNUSED]]
 recvfrom:($fd_t sockfd, [[outp(bufsize)]] void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
           [outp_opt(*addr_len)] __SOCKADDR_ARG addr, [[nullable]] socklen_t *__restrict addr_len) -> ssize_t;
 
@@ -243,7 +243,7 @@ sendmsg:($fd_t sockfd, [[nonnull]] struct msghdr const *message,
 @@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
 @@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
-[[cp]][ATTR_WUNUSED]
+[[cp]][[ATTR_WUNUSED]]
 recvmsg:($fd_t sockfd, [[nonnull]] struct msghdr *message,
          __STDC_INT_AS_UINT_T msg_flags) -> ssize_t;
 
@@ -358,7 +358,7 @@ recvmmsg64:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 @@@return: > 0 : The read-pointer is pointing at out-of-band data
 @@@return: == 0: The read-pointer is not pointing at out-of-band data
 @@@return: < 0 : Error (s.a. `errno')
-[ATTR_WUNUSED] sockatmark:($fd_t sockfd) -> int;
+[[ATTR_WUNUSED]] sockatmark:($fd_t sockfd) -> int;
 %#endif /* __USE_XOPEN2K */
 
 %
@@ -367,7 +367,7 @@ recvmmsg64:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 @@returns 1 if FD is open on an object of the indicated
 @@type, 0 if not, or -1 for errors (setting errno)
 @@@param: fdtype: One of `S_IF*' from `<sys/stat.h>'
-[ATTR_WUNUSED] isfdtype:($fd_t fd, __STDC_INT_AS_UINT_T fdtype) -> int;
+[[ATTR_WUNUSED]] isfdtype:($fd_t fd, __STDC_INT_AS_UINT_T fdtype) -> int;
 %#endif /* __USE_MISC */
 
 %{

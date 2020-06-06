@@ -31,10 +31,10 @@ __SYSDECL_BEGIN
 }
 
 [[cp]] sysinfo:([[nonnull]] struct sysinfo *info) -> int;
-[[cp]][ATTR_WUNUSED] get_nprocs_conf:() -> int;
-[[cp]][ATTR_WUNUSED] get_nprocs:() -> int;
-[[cp]][ATTR_WUNUSED] get_phys_pages:() -> __INTPTR_TYPE__;
-[[cp]][ATTR_WUNUSED] get_avphys_pages:() -> __INTPTR_TYPE__;
+[[cp]][[ATTR_WUNUSED]] get_nprocs_conf:() -> int;
+[[cp]][[ATTR_WUNUSED]] get_nprocs:() -> int;
+[[cp]][[ATTR_WUNUSED]] get_phys_pages:() -> __INTPTR_TYPE__;
+[[cp]][[ATTR_WUNUSED]] get_avphys_pages:() -> __INTPTR_TYPE__;
 
 %{
 #endif /* __CC__ */

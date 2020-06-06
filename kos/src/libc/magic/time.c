@@ -18,10 +18,10 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_ccompat_header(ctime)]
-%[default_impl_section(.text.crt.time)]
+%[define_ccompat_header("ctime")]
+%[default_impl_section(".text.crt.time")]
 
-%[define_replacement(time_t   = __TM_TYPE(time))]
+%[define_replacement(time_t   = "__TM_TYPE(time)")]
 %[define_replacement(time32_t = __time32_t)]
 %[define_replacement(time64_t = __time64_t)]
 %[define_replacement(clock_t  = __typedef_clock_t)]
@@ -339,15 +339,17 @@ dos_ctime64_s:([[nonnull]] char buf[26], $size_t bufsize, [[nonnull]] $time64_t 
 [alias(_time32)][ignore][doc_alias(time)]
 time32:([[nullable]] $time32_t *timer) -> $time32_t = time?;
 
-[ATTR_WUNUSED][ATTR_CONST][alias(_difftime32)][ATTR_NOTHROW][doc_alias(difftime)]
+[[ATTR_WUNUSED, ATTR_CONST]][alias(_difftime32)][ATTR_NOTHROW][doc_alias(difftime)]
 [ignore] difftime32:($time32_t time1, $time32_t time0) -> double = difftime?;
 
 [dependency_prefix(DEFINE_STRUCT_TM)]
-[ATTR_WUNUSED][ATTR_RETNONNULL][alias(_localtime32)][doc_alias(localtime)]
+[[ATTR_WUNUSED]][ATTR_RETNONNULL][alias(_localtime32)][doc_alias(localtime)]
 [ignore] localtime32:([[nonnull]] $time64_t const *timer) -> __STRUCT_TM * = localtime?;
 
+%[define_c_language_keyword(__KOS_FIXED_CONST)]
+
 [dependency_prefix(DEFINE_STRUCT_TM)]
-[ATTR_PURE][ATTR_WUNUSED][alias(_mktime32, timelocal)][doc_alias(mktime)]
+[ATTR_PURE][[ATTR_WUNUSED]][alias(_mktime32, timelocal)][doc_alias(mktime)]
 [ignore] mktime32:([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) -> $time32_t = mktime?;
 
 
@@ -360,7 +362,7 @@ time32:([[nullable]] $time32_t *timer) -> $time32_t = time?;
 
 @@Time used by the program so far (user time + system time)
 @@The result / CLOCKS_PER_SECOND is program time in seconds
-[std][ATTR_WUNUSED] clock:() -> clock_t;
+[std][[ATTR_WUNUSED]] clock:() -> clock_t;
 
 @@Return the current time and put it in *TIMER if TIMER is not NULL
 [no_crt_self_import]
@@ -384,7 +386,7 @@ time32:([[nullable]] $time32_t *timer) -> $time32_t = time?;
 
 %(std)#ifndef __NO_FPU
 @@Return the difference between TIME1 and TIME0
-[ATTR_WUNUSED][ATTR_CONST][std][guard][std_guard, no_crt_self_import]
+[[ATTR_WUNUSED, ATTR_CONST]][std][guard][std_guard, no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(difftime64, _difftime64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(difftime, _difftime32)]
 [libc_impl({
@@ -407,7 +409,7 @@ time32:([[nullable]] $time32_t *timer) -> $time32_t = time?;
 [impl_prefix(DEFINE_YEARSTODAYS), no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(mktime64, _mktime64, timelocal64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(mktime, _mktime32, timelocal)]
-[ATTR_WUNUSED][ATTR_PURE][std][libc_impl({
+[[ATTR_WUNUSED, ATTR_PURE]][std][libc_impl({
 	__TM_TYPE(@time@) result;
 	result = @__yearstodays@(tp->@tm_year@) - @__yearstodays@(1970); /* LINUX_TIME_START_YEAR */
 	result += tp->@tm_yday@;
@@ -436,11 +438,11 @@ mktime:([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) -> time_t {
 
 
 
-[ATTR_WUNUSED][ATTR_RETNONNULL][alias(_ctime32)][doc_alias(ctime)]
+[[ATTR_WUNUSED]][ATTR_RETNONNULL][alias(_ctime32)][doc_alias(ctime)]
 [ignore] ctime32:([[nonnull]] $time32_t const *timer) -> char * = ctime?;
 
 [dependency_prefix(DEFINE_STRUCT_TM)]
-[ATTR_WUNUSED][ATTR_RETNONNULL][alias(_gmtime32)][doc_alias(gmtime)]
+[[ATTR_WUNUSED]][ATTR_RETNONNULL][alias(_gmtime32)][doc_alias(gmtime)]
 [ignore] gmtime32:([[nonnull]] $time32_t const *timer) -> __STRUCT_TM * = gmtime?;
 
 
@@ -449,7 +451,7 @@ mktime:([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) -> time_t {
 @@if_has_function(ctime32, ctime64)@@
 DEFINE_CTIME_BUFFER
 @@endif_has_function(ctime32, ctime64)@@
-)][ATTR_WUNUSED][ATTR_RETNONNULL, no_crt_self_import]
+)][[ATTR_WUNUSED]][ATTR_RETNONNULL, no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(ctime64, _ctime64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(ctime, _ctime32)]
 [std][libc_prefix(DEFINE_CTIME_BUFFER)][libc_impl({
@@ -491,7 +493,7 @@ __NAMESPACE_LOCAL_END
 @@if_not_has_function(gmtime32, gmtime64)@@
 DEFINE_GMTIME_BUFFER
 @@endif_not_has_function(gmtime32, gmtime64)@@
-)][ATTR_WUNUSED][ATTR_RETNONNULL, no_crt_self_import]
+)][[ATTR_WUNUSED]][ATTR_RETNONNULL, no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(gmtime64, _gmtime64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(gmtime, _gmtime32)]
 [std][libc_impl({
@@ -515,7 +517,7 @@ DEFINE_GMTIME_BUFFER
 @@if_not_has_function(localtime32, localtime64)@@
 DEFINE_GMTIME_BUFFER
 @@endif_not_has_function(localtime32, localtime64)@@
-)][ATTR_WUNUSED][ATTR_RETNONNULL, no_crt_self_import]
+)][[ATTR_WUNUSED]][ATTR_RETNONNULL, no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(localtime64, _localtime64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(localtime, _localtime32)]
 [std][libc_impl({
@@ -588,7 +590,7 @@ __NAMESPACE_LOCAL_END
 @@Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
 @@that is the representation of TP in this format
 [dependency_prefix(DEFINE_CTIME_BUFFER)]
-[ATTR_WUNUSED][ATTR_RETNONNULL]
+[[ATTR_WUNUSED]][ATTR_RETNONNULL]
 [std] asctime:([[nonnull]] struct tm const *tp) -> char * {
 	return asctime_r(tp, @__NAMESPACE_LOCAL_SYM@ @__ctime_buf@);
 }
@@ -621,7 +623,7 @@ asctime_s:([[outp(buflen)]] char *__restrict buf, size_t buflen,
 
 %#ifndef __NO_FPU
 [time64_variant_of(difftime)][guard][export_alias(__difftime64)]
-[ATTR_WUNUSED][ATTR_CONST][alias(_difftime64)][libc_impl({
+[[ATTR_WUNUSED, ATTR_CONST]][alias(_difftime64)][libc_impl({
 	return time1 > time0 ? time1 - time0 : time0 - time1;
 })] difftime64:($time64_t time1, $time64_t time0) -> double {
 @@if_has_function(difftime32)@@
@@ -640,7 +642,7 @@ asctime_s:([[outp(buflen)]] char *__restrict buf, size_t buflen,
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 )][alias(_mktime64, timelocal64)]
-[ATTR_WUNUSED][ATTR_PURE][libc_impl({
+[[ATTR_WUNUSED, ATTR_PURE]][libc_impl({
 	time64_t result;
 	result = @__yearstodays@(tp->@tm_year@) - @__yearstodays@(1970); /* LINUX_TIME_START_YEAR */
 	result += tp->@tm_yday@;
@@ -670,7 +672,7 @@ mktime64:([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) -> $time64_t {
 @@if_not_has_function(ctime32)@@
 DEFINE_CTIME_BUFFER
 @@endif_not_has_function(ctime32)@@
-)][ATTR_WUNUSED][ATTR_RETNONNULL][alias(_ctime64)][libc_impl({
+)][[ATTR_WUNUSED]][ATTR_RETNONNULL][alias(_ctime64)][libc_impl({
 	return ctime64_r(timer, @__NAMESPACE_LOCAL_SYM@ @__ctime_buf@);
 })]
 ctime64:([[nonnull]] $time64_t const *timer) -> char * {
@@ -688,7 +690,7 @@ ctime64:([[nonnull]] $time64_t const *timer) -> char * {
 @@if_not_has_function(gmtime32)@@
 DEFINE_GMTIME_BUFFER
 @@endif_not_has_function(gmtime32)@@
-)][ATTR_WUNUSED][ATTR_RETNONNULL][alias(_gmtime64)][libc_impl({
+)][[ATTR_WUNUSED]][ATTR_RETNONNULL][alias(_gmtime64)][libc_impl({
 	return gmtime64_r(timer, &@__NAMESPACE_LOCAL_SYM@ @__gmtime_buf@);
 })]
 gmtime64:([[nonnull]] $time64_t const *timer) -> __STRUCT_TM * {
@@ -707,7 +709,7 @@ gmtime64:([[nonnull]] $time64_t const *timer) -> __STRUCT_TM * {
 @@if_not_has_function(localtime32)@@
 DEFINE_GMTIME_BUFFER
 @@endif_not_has_function(localtime32)@@
-)][ATTR_WUNUSED][ATTR_RETNONNULL][alias(_localtime64)][libc_impl({
+)][[ATTR_WUNUSED]][ATTR_RETNONNULL][alias(_localtime64)][libc_impl({
 	return localtime64_r(timer, &@__NAMESPACE_LOCAL_SYM@ @__gmtime_buf@);
 })]
 localtime64:([[nonnull]] $time64_t const *timer) -> __STRUCT_TM * {
@@ -873,7 +875,7 @@ stime:([[nonnull]] $time_t const *when) -> int {
 [no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(timegm64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(timegm)]
-[ATTR_WUNUSED][ATTR_PURE][dependency_prefix(DEFINE_STRUCT_TM)][libc_impl({
+[[ATTR_WUNUSED, ATTR_PURE]][dependency_prefix(DEFINE_STRUCT_TM)][libc_impl({
 	/* TODO: Timezones */
 	return mktime(tp);
 })]
@@ -890,7 +892,7 @@ timegm:([[nonnull]] __STRUCT_TM *tp) -> $time_t {
 [no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(mktime64, _mktime64, timelocal64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(mktime, _mktime32, timelocal)]
-[ATTR_WUNUSED][ATTR_PURE][dependency_prefix(DEFINE_STRUCT_TM)]
+[[ATTR_WUNUSED, ATTR_PURE]][dependency_prefix(DEFINE_STRUCT_TM)]
 timelocal:([[nonnull]] __STRUCT_TM *tp) -> $time_t = mktime;
 
 %[define(DEFINE_ISLEAP =
@@ -914,7 +916,7 @@ timelocal:([[nonnull]] __STRUCT_TM *tp) -> $time_t = mktime;
 
 
 @@Return the number of days in YEAR
-[ATTR_CONST][ATTR_WUNUSED][impl_prefix(DEFINE_ISLEAP)]
+[ATTR_CONST][[ATTR_WUNUSED]][impl_prefix(DEFINE_ISLEAP)]
 dysize:(int year) -> int {
 	return __isleap(year) ? 366 : 365;
 }
@@ -928,11 +930,11 @@ stime64:([[nonnull]] $time64_t const *when) -> int {
 }
 
 [dependency_prefix(DEFINE_STRUCT_TM)]
-[ATTR_WUNUSED][ATTR_PURE][ignore][doc_alias(timegm)]
+[[ATTR_WUNUSED, ATTR_PURE]][ignore][doc_alias(timegm)]
 timegm32:([[nonnull]] __STRUCT_TM *tp) -> $time32_t = timegm?;
 
 [dependency_prefix(DEFINE_STRUCT_TM)]
-[ATTR_WUNUSED][ATTR_PURE][time64_variant_of(timegm)][libc_impl({
+[[ATTR_WUNUSED, ATTR_PURE]][time64_variant_of(timegm)][libc_impl({
 	/* TODO: Timezones */
 	return mktime64(tp);
 })]
@@ -946,7 +948,7 @@ timegm64:([[nonnull]] __STRUCT_TM *tp) -> $time64_t {
 }
 
 @@Another name for `mktime64'
-[alias(_mktime64)][ATTR_WUNUSED][ATTR_PURE]
+[alias(_mktime64)][[ATTR_WUNUSED, ATTR_PURE]]
 [dependency_prefix(DEFINE_STRUCT_TM)]
 timelocal64:([[nonnull]] __STRUCT_TM *tp) -> $time64_t = mktime64;
 %#endif /* __USE_TIME64 */

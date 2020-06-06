@@ -144,7 +144,7 @@ fgetspent_r:([[nonnull]] $FILE *__restrict stream,
 %
 
 @@Protect password file against multi writers
-[cp_kos] lckpwdf:() -> int;
+[[cp_kos]] lckpwdf:() -> int;
 
 @@Unlock password file
 ulckpwdf:() -> int;

@@ -235,38 +235,38 @@ struct group_filter {
 }
 
 %[default_impl_section(.text.crt.net.convert)]
-[dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
+[impl_include("<hybrid/__byteswap.h>")][ATTR_CONST]
 [if(defined(__HYBRID_HTOBE_IS_BETOH)), alias(ntohs)]
 htons:($uint16_t hostword) -> $uint16_t {
 	return (uint16_t)__hybrid_htobe32(hostword);
 }
 
-[dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
+[impl_include("<hybrid/__byteswap.h>")][ATTR_CONST]
 [alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htons)]
 ntohs:($uint16_t netshort) -> $uint16_t {
 	return (uint16_t)__hybrid_betoh16(netshort);
 }
 
-[dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
+[impl_include("<hybrid/__byteswap.h>")][ATTR_CONST]
 [if(defined(__HYBRID_HTOBE_IS_BETOH)), alias(ntohl)]
 htonl:($uint32_t hostlong) -> $uint32_t {
 	return (uint32_t)__hybrid_htobe32(hostlong);
 }
 
-[dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
+[impl_include("<hybrid/__byteswap.h>")][ATTR_CONST]
 [alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonl)]
 ntohl:($uint32_t netlong) -> $uint32_t {
 	return (uint32_t)__hybrid_betoh32(netlong);
 }
 
 %#if defined(__USE_KOS) && defined(__UINT64_TYPE__)
-[dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
+[impl_include("<hybrid/__byteswap.h>")][ATTR_CONST]
 [if(defined(__HYBRID_HTOBE_IS_BETOH)), alias(ntohq)]
 htonq:($uint64_t hostlong) -> $uint64_t {
 	return (uint64_t)__hybrid_htobe64(hostlong);
 }
 
-[dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
+[impl_include("<hybrid/__byteswap.h>")][ATTR_CONST]
 [alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonq)]
 ntohq:($uint64_t netlong) -> $uint64_t {
 	return (uint64_t)__hybrid_betoh64(netlong);
@@ -364,54 +364,54 @@ struct ip6_mtuinfo {
 
 %[default_impl_section(.text.crt.net.inet.6.RFC_2292)]
 @@Obsolete hop-by-hop and Destination Options Processing (RFC 2292)
-[cp_kos][ATTR_DEPRECATED_] inet6_option_space:(int nbytes) -> int;
-[cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_init:(void *bp, struct cmsghdr **cmsgp, int type) -> int;
-[cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_append:(struct cmsghdr *cmsg, $uint8_t const *typep, int multx, int plusy) -> int;
-[cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_alloc:(struct cmsghdr *cmsg, int datalen, int multx, int plusy) -> $uint8_t *;
-[cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_next:(struct cmsghdr const *cmsg, $uint8_t **tptrp) -> int;
-[cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_find:(struct cmsghdr const *cmsg, $uint8_t **tptrp, int type) -> int;
+[[cp_kos]][ATTR_DEPRECATED_] inet6_option_space:(int nbytes) -> int;
+[[cp_kos]][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_init:(void *bp, struct cmsghdr **cmsgp, int type) -> int;
+[[cp_kos]][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_append:(struct cmsghdr *cmsg, $uint8_t const *typep, int multx, int plusy) -> int;
+[[cp_kos]][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_alloc:(struct cmsghdr *cmsg, int datalen, int multx, int plusy) -> $uint8_t *;
+[[cp_kos]][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_next:(struct cmsghdr const *cmsg, $uint8_t **tptrp) -> int;
+[[cp_kos]][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_find:(struct cmsghdr const *cmsg, $uint8_t **tptrp, int type) -> int;
 
 %[default_impl_section(.text.crt.net.inet.6.RFC_3542)]
 @@Hop-by-Hop and Destination Options Processing (RFC 3542)
-[cp_kos] inet6_opt_init:(void *extbuf, socklen_t extlen) -> int;
-[cp_kos][doc_alias(inet6_opt_init)] inet6_opt_append:(void *extbuf, socklen_t extlen, int offset, $uint8_t type, socklen_t len, $uint8_t align, void **databufp) -> int;
-[cp_kos][doc_alias(inet6_opt_init)] inet6_opt_finish:(void *extbuf, socklen_t extlen, int offset) -> int;
-[cp_kos][doc_alias(inet6_opt_init)] inet6_opt_set_val:(void *databuf, int offset, void *val, socklen_t vallen) -> int;
-[cp_kos][doc_alias(inet6_opt_init)] inet6_opt_next:(void *extbuf, socklen_t extlen, int offset, $uint8_t *typep, socklen_t *lenp, void **databufp) -> int;
-[cp_kos][doc_alias(inet6_opt_init)] inet6_opt_find:(void *extbuf, socklen_t extlen, int offset, $uint8_t type, socklen_t *lenp, void **databufp) -> int;
-[cp_kos][doc_alias(inet6_opt_init)] inet6_opt_get_val:(void *databuf, int offset, void *val, socklen_t vallen) -> int;
+[[cp_kos]] inet6_opt_init:(void *extbuf, socklen_t extlen) -> int;
+[[cp_kos]][doc_alias(inet6_opt_init)] inet6_opt_append:(void *extbuf, socklen_t extlen, int offset, $uint8_t type, socklen_t len, $uint8_t align, void **databufp) -> int;
+[[cp_kos]][doc_alias(inet6_opt_init)] inet6_opt_finish:(void *extbuf, socklen_t extlen, int offset) -> int;
+[[cp_kos]][doc_alias(inet6_opt_init)] inet6_opt_set_val:(void *databuf, int offset, void *val, socklen_t vallen) -> int;
+[[cp_kos]][doc_alias(inet6_opt_init)] inet6_opt_next:(void *extbuf, socklen_t extlen, int offset, $uint8_t *typep, socklen_t *lenp, void **databufp) -> int;
+[[cp_kos]][doc_alias(inet6_opt_init)] inet6_opt_find:(void *extbuf, socklen_t extlen, int offset, $uint8_t type, socklen_t *lenp, void **databufp) -> int;
+[[cp_kos]][doc_alias(inet6_opt_init)] inet6_opt_get_val:(void *databuf, int offset, void *val, socklen_t vallen) -> int;
 
 %[default_impl_section(.text.crt.net.inet.6.RFC_3542)]
 @@Routing Header Option (RFC 3542)
-[cp_kos] inet6_rth_space:(int type, int segments) -> socklen_t;
-[cp_kos][doc_alias(inet6_rth_space)] inet6_rth_init:(void *bp, socklen_t bp_len, int type, int segments) -> void *;
-[cp_kos][doc_alias(inet6_rth_space)] inet6_rth_add:(void *bp, struct in6_addr const *addr) -> int;
-[cp_kos][doc_alias(inet6_rth_space)] inet6_rth_reverse:(void const *in, void *out) -> int;
-[cp_kos][doc_alias(inet6_rth_space)] inet6_rth_segments:(void const *bp) -> int;
-[cp_kos][doc_alias(inet6_rth_space)] inet6_rth_getaddr:(void const *bp, int index) -> struct in6_addr *;
+[[cp_kos]] inet6_rth_space:(int type, int segments) -> socklen_t;
+[[cp_kos]][doc_alias(inet6_rth_space)] inet6_rth_init:(void *bp, socklen_t bp_len, int type, int segments) -> void *;
+[[cp_kos]][doc_alias(inet6_rth_space)] inet6_rth_add:(void *bp, struct in6_addr const *addr) -> int;
+[[cp_kos]][doc_alias(inet6_rth_space)] inet6_rth_reverse:(void const *in, void *out) -> int;
+[[cp_kos]][doc_alias(inet6_rth_space)] inet6_rth_segments:(void const *bp) -> int;
+[[cp_kos]][doc_alias(inet6_rth_space)] inet6_rth_getaddr:(void const *bp, int index) -> struct in6_addr *;
 
 %[default_impl_section(.text.crt.net.inet.6.ipv4_source_filter)]
 @@Get IPv4 source filter
-[cp_kos]
+[[cp_kos]]
 getipv4sourcefilter:($fd_t sockfd, struct in_addr interface_addr,
                      struct in_addr group, $uint32_t *fmode,
                      $uint32_t *numsrc, struct in_addr *slist) -> int;
 
 @@Set IPv4 source filter
-[cp_kos]
+[[cp_kos]]
 setipv4sourcefilter:($fd_t sockfd, struct in_addr interface_addr,
                      struct in_addr group, $uint32_t fmode,
                      $uint32_t numsrc, struct in_addr const *slist) -> int;
 
 %[default_impl_section(.text.crt.net.inet.6.source_filter)]
 @@Get source filter
-[cp_kos]
+[[cp_kos]]
 getsourcefilter:($fd_t sockfd, $uint32_t interface_addr,
                  struct sockaddr const *group, socklen_t grouplen,
                  $uint32_t *fmode, $uint32_t *numsrc,
                  struct sockaddr_storage *slist) -> int;
 @@Set source filter
-[cp_kos]
+[[cp_kos]]
 setsourcefilter:($fd_t sockfd, $uint32_t interface_addr,
                  struct sockaddr const *group, socklen_t grouplen,
                  $uint32_t fmode, $uint32_t numsrc,

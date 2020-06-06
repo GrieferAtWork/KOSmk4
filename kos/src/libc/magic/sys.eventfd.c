@@ -59,7 +59,7 @@ typedef uint64_t eventfd_t;
 }
 
 @@Return file descriptor for generic event channel. Set initial value to COUNT
-[ATTR_WUNUSED] eventfd:(unsigned int count, int flags) -> $fd_t;
+[[ATTR_WUNUSED]] eventfd:(unsigned int count, int flags) -> $fd_t;
 
 @@Read event counter and possibly wait for events
 [[cp]][requires($has_function(read))]

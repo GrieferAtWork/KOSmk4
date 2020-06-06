@@ -57,7 +57,7 @@ Directives are used to tell the magic generator special information that does no
 | `%[declare_user_export(name[,...])]` | Define additional CRT features that should appear in `/include/crt-features/all.h` as `#define __CRT_HAVE_<name> 1` |
 | `%[define_wchar_replacement(c = w16, w32)]` | Define the replacement for `c` in code blocks for 16-bit (dos) and 32-bit (unix) `wchar_t` mode.<br>Examples for this are:<br>`%[define_wchar_replacement(wchar_t = char16_t, char32_t)]`<br>`%[define_wchar_replacement(__SIZEOF_WCHAR_T__ = 2, 4)]`<br>Note that these definitions are persistent across all magic source files, and are only applied once all files have been parsed |
 | `%[define_replacement(a = b)]` | Define the replacement for `a` to-be applied in `/include/libc/string.h`, `/include/libc/core/string.h`, `/include/local/string/memcpy.h`, as well as `/include/string.h` (though here the replacement only applies to `$a` (the symbol prefixed by a `$`)) |
-| `%[define_str2wcs_replacement(a = b)]` | Define a replacement for `a` when it appears as a word in a piece of code that is used by the `%{copy(foo,str2wcs)}` code generator |
+| `%[define_str2wcs_replacement(a = b)]` | Define a replacement for `a` when it appears as a word in a piece of code that is used by the `%{copy(str2wcs(foo))}` code generator |
 | `%[push_macro [@opt [@...]] { name [...] }]`<br>`%[push_macro([@opt [@...]] { name [...] })]` | Output code to the `c` location to make use of `#pragma push_macro()` in order to preserve the definitions of every given `name`.<br>This directive should then be followed by another directive `%[pop_macro]` to restore those definitions.<br>When `@undef` is given as an `@opt`, then also ensure that the definitions of all given macros are `#undef`-ed (irregardlessly of the even host-compiler actually supporting `#pragma push_macro(...)`) |
 | `%[pop_macro]` | s.a. `%[push_macro ...]` |
 | `%[enum [@opt [@...]] [name] { defs... }]`<br>`%[enum([@opt [@...]] { defs... })]` | Declare a C `enum`-type such that it may also be used if the header is included by an assembler.<br>When `name` is given, it will be used as `enum <name> { FOO, BAR, ... }`.<br>The following values are defined for `@opt`:<br>- `@typedef(name)` Declare the enum as `typedef enum { ... } <name>;`<br>- `@undef` Delete macro definitions for enum values beforehand<br>- `@macro` Always provide enum values as macros for testing purposes `enum{ FOO }; #define FOO FOO`.<br>- `@guard` Surround the enum's definitions with a guard `#ifndef __<name>_defined`, where name is the `@typedef` name first, and the `enum <name>` second. |
@@ -132,15 +132,15 @@ strchr:(char const *s, int c) -> char *
   foo:() %{...}
   ```
 	- For this purpose, the following generators are defined:
-		- `foo:() %{copy(name)}`, `foo:() %{copy(name, direct)}`  
+		- `foo:() %{copy(`(name), `foo:() %{copy(direct(name))}`  
 		  Copy the implementation of another function `name`
-		- `foo:() %{copy(name, str2wcs)}`  
+		- `foo:() %{copy(str2wcs(name))}`  
 		  Copy from `name`, but convert `char` to `wchar_t` (s.a. `%[define_wchar_replacement(...)]`).  
 		  When `name` is `%auto`, replace a leading `wcs` with `str` (`wcslen()` derives from `strlen()`)
-		- `foo:() %{copy(name, double2float)}`  
+		- `foo:() %{copy(double2float(name))}`  
 		  Copy from `name`, but convert `double` to `float` (used for functions from `<math.h>`).  
 		  When `name` is `%auto`, strip a trailing `f` from the function name (`powf` derives from `pow`)
-		- `foo:() %{copy(name, double2ldouble)}`  
+		- `foo:() %{copy(double2ldouble(name))}`  
 		  Copy from `name`, but convert `double` to `__LONGDOUBLE` (used for functions from `<math.h>`).  
 		  When `name` is `%auto`, strip a trailing `l` from the function name (`powl` derives from `pow`)
 		- `foo:() %{uchar}`, `foo:() %{uchar16}`, `foo:() %{uchar32}`, `foo:() %{uchar(base)}`, `foo:() %{uchar16(base)}`, `foo:() %{uchar32(base)}`  

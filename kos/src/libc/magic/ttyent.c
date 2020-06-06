@@ -80,10 +80,10 @@ struct ttyent {
 
 }
 
-[cp_kos] getttyent:() -> struct ttyent *;
-[cp_kos] getttynam:([[nonnull]] char const *tty) -> struct ttyent *;
-[cp_kos] setttyent:() -> int;
-[cp_kos] endttyent:() -> int;
+[[cp_kos]] getttyent:() -> struct ttyent *;
+[[cp_kos]] getttynam:([[nonnull]] char const *tty) -> struct ttyent *;
+[[cp_kos]] setttyent:() -> int;
+[[cp_kos]] endttyent:() -> int;
 
 
 %{

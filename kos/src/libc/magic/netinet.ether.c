@@ -72,7 +72,7 @@ ether_aton:([[nonnull]] char const *__restrict asc) -> [[nonnull]] struct ether_
 	return ether_aton_r(asc, &addr);
 }
 
-[doc_alias(ether_aton)][ATTR_WUNUSED]
+[doc_alias(ether_aton)][[ATTR_WUNUSED]]
 [dependency_include(<net/ethernet.h>)]
 ether_aton_r:([[nonnull]] char const *__restrict asc,
               [[nonnull]] struct ether_addr *__restrict addr) -> struct ether_addr * {
@@ -80,7 +80,7 @@ ether_aton_r:([[nonnull]] char const *__restrict asc,
 }
 
 %#ifdef __USE_KOS
-[doc_alias(ether_aton)][ATTR_WUNUSED]
+[doc_alias(ether_aton)][[ATTR_WUNUSED]]
 [dependency_include(<net/ethernet.h>)]
 ether_paton_r:([[nonnull]] char const **__restrict pasc,
                [[nonnull]] struct ether_addr *__restrict addr) -> struct ether_addr * {
@@ -151,10 +151,10 @@ ether_line:([[nonnull]] char const *line,
 }
 
 @@Map 48 bit Ethernet number ADDR to HOSTNAME
-[cp_kos] ether_ntohost:(char *hostname, struct ether_addr const *addr) -> int;
+[[cp_kos]] ether_ntohost:(char *hostname, struct ether_addr const *addr) -> int;
 
 @@Map HOSTNAME to 48 bit Ethernet address
-[cp_kos] ether_hostton:(char const *hostname, struct ether_addr *addr) -> int;
+[[cp_kos]] ether_hostton:(char const *hostname, struct ether_addr *addr) -> int;
 
 
 %{

@@ -1143,7 +1143,7 @@ struct format_aprintf_data {
 @@                 (e.g. `format_aprintf_printer(&my_printer, "\0", 1)')
 [impl_include("<hybrid/__assert.h>")]
 [dependency_include(<hybrid/typecore.h>)][userimpl]
-[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
+[[ATTR_WUNUSED]][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
 [dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]
 format_aprintf_pack:([[nonnull]] struct format_aprintf_data *__restrict self,
                      [[nullable]] $size_t *pstrlen) -> char * {
@@ -1235,7 +1235,7 @@ format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
 
 @@Print data to a dynamically allocated heap buffer. On error, -1 is returned
 @@This function is intended to be used as a pformatprinter-compatibile printer sink
-[userimpl, requires_function(format_aprintf_alloc)][ATTR_WUNUSED]
+[userimpl, requires_function(format_aprintf_alloc)][[ATTR_WUNUSED]]
 format_aprintf_printer:([[nonnull]] /*struct format_aprintf_data **/ void *arg,
                         [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	char *buf;

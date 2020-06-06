@@ -75,38 +75,47 @@ enum {
 }
 
 @@Return the size of the buffer of FP in bytes currently in use by the given stream
-[ATTR_WUNUSED][ATTR_PURE] __fbufsize:([[nonnull]] $FILE *fp) -> $size_t;
+[[ATTR_WUNUSED, ATTR_PURE]]
+$size_t __fbufsize([[nonnull]] $FILE *fp);
 
 @@Return non-zero value iff the stream FP is opened readonly,
 @@or if the last operation on the stream was a read operation
-[ATTR_WUNUSED][ATTR_PURE] __freading:([[nonnull]] $FILE *fp) -> int;
+[[ATTR_WUNUSED, ATTR_PURE]]
+int __freading([[nonnull]] $FILE *fp);
 
 @@Return non-zero value iff the stream FP is opened write-only or
 @@append-only, or if the last operation on the stream was a write
 @@operation
-[ATTR_WUNUSED][ATTR_PURE] __fwriting:([[nonnull]] $FILE *fp) -> int;
+[[ATTR_WUNUSED, ATTR_PURE]]
+int __fwriting([[nonnull]] $FILE *fp);
 
 @@Return non-zero value iff stream FP is not opened write-only or append-only
-[ATTR_WUNUSED][ATTR_PURE] __freadable:([[nonnull]] $FILE *fp) -> int;
+[[ATTR_WUNUSED, ATTR_PURE]]
+int __freadable([[nonnull]] $FILE *fp);
 
 @@Return non-zero value iff stream FP is not opened read-only
-[ATTR_WUNUSED][ATTR_PURE] __fwritable:([[nonnull]] $FILE *fp) -> int;
+[[ATTR_WUNUSED, ATTR_PURE]]
+int __fwritable([[nonnull]] $FILE *fp);
 
 @@Return non-zero value iff the stream FP is line-buffered
-[ATTR_WUNUSED][ATTR_PURE] __flbf:([[nonnull]] $FILE *fp) -> int;
+[[ATTR_WUNUSED, ATTR_PURE]]
+int __flbf([[nonnull]] $FILE *fp);
 
 @@Discard all pending buffered I/O on the stream FP
-__fpurge:([[nonnull]] $FILE *fp);
+void __fpurge([[nonnull]] $FILE *fp);
 
 @@Return amount of output in bytes pending on a stream FP
-[ATTR_WUNUSED][ATTR_PURE] __fpending:([[nonnull]] $FILE *fp) -> size_t;
+[[ATTR_WUNUSED, ATTR_PURE]]
+size_t __fpending([[nonnull]] $FILE *fp);
 
 @@Flush all line-buffered files
-[export_alias(_IO_flush_all_linebuffere)]
-_flushlbf:();
+/* NOTE: I feel like this is a typo, but that's
+ *       the symbol that also exists in GLibC! */
+[[export_alias("_IO_flush_all_linebuffere")]]
+void _flushlbf();
 
 @@Set locking status of stream FP to TYPE
-__fsetlocking:([[nonnull]] $FILE *fp, int type) -> int;
+int __fsetlocking([[nonnull]] $FILE *fp, int type);
 
 %{
 #endif /* __CC__ */

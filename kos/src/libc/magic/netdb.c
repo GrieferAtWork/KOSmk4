@@ -251,7 +251,7 @@ struct gaicb {
 %#define h_errno   (*__h_errno_location())
 
 @@Function to get address of global `h_errno' variable
-[ATTR_CONST][ATTR_WUNUSED] __h_errno_location:() -> int *;
+[ATTR_CONST][[ATTR_WUNUSED]] __h_errno_location:() -> int *;
 %#endif /* __USE_MISC || !__USE_XOPEN2K8 */
 
 %
@@ -261,7 +261,7 @@ struct gaicb {
 [[cp]] herror:(char const *str);
 
 @@Return string associated with error ERR_NUM
-[ATTR_CONST][ATTR_WUNUSED] hstrerror:(int err_num) -> char const *;
+[ATTR_CONST][[ATTR_WUNUSED]] hstrerror:(int err_num) -> char const *;
 %#endif /* __USE_MISC */
 
 
@@ -499,7 +499,7 @@ struct gaicb {
 freeaddrinfo:(struct addrinfo *ai);
 
 @@Convert error return from getaddrinfo() to a string
-[ATTR_CONST][ATTR_WUNUSED] gai_strerror:(int ecode) -> char const *;
+[ATTR_CONST][[ATTR_WUNUSED]] gai_strerror:(int ecode) -> char const *;
 
 @@Translate a socket address to a location and service name
 [[cp]] getnameinfo:(struct sockaddr const *__restrict sa, socklen_t salen, char *__restrict host, socklen_t hostlen, char *__restrict serv, socklen_t servlen, int flags) -> int;

@@ -91,8 +91,8 @@ __LIBC int error_one_per_line;
 @@If `STATUS' is non-zero, follow up with a call to `exit(status)'
 [[ATTR_LIBC_PRINTF(3, 4), fast, libc, userimpl, throws]]
 [decl_include("<bits/types.h>")]
-[dependency_include(<local/stdstreams.h>)]
-[requires_include(<__crt.h>)]
+[impl_include("<local/stdstreams.h>")]
+[requires_include("<__crt.h>")]
 [requires_include(<local/program_invocation_name.h>)]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
           $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
@@ -133,8 +133,8 @@ error:(int status, $errno_t errnum, const char *format, ...) {
 @@pass the same values for `filename' and `line' will not produce the error message.
 [ATTR_LIBC_PRINTF(5, 6)][fast][libc][userimpl][throws]
 [decl_include("<bits/types.h>")]
-[dependency_include(<local/stdstreams.h>)]
-[requires_include(<__crt.h>)]
+[impl_include("<local/stdstreams.h>")]
+[requires_include("<__crt.h>")]
 [requires_include(<local/program_invocation_name.h>)]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
           $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&

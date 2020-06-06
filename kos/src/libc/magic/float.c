@@ -18,9 +18,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_ccompat_header(cfloat)]
+%[define_ccompat_header("cfloat")]
 %[define_replacement(errno_t = __errno_t)]
-%[default_impl_section(.text.crt.math.float)]
+%[default_impl_section(".text.crt.math.float")]
 
 %(c, ccompat)#ifndef __NO_FPU
 %{
@@ -232,7 +232,7 @@ __fpecode:() -> int *;
 
 _copysign:(*) = copysign;
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow]
+[[ATTR_WUNUSED, ATTR_CONST]][nothrow]
 double _chgsign(double x) {
 	return -x;
 }
@@ -242,7 +242,7 @@ _logb:(*) = logb;
 _nextafter:(*) = nextafter;
 _finite:(*) = finite;
 _isnan:(*) = isnan;
-[ATTR_WUNUSED][ATTR_CONST][nothrow] int _fpclass(double x);
+[[ATTR_WUNUSED, ATTR_CONST]][nothrow] int _fpclass(double x);
 %#if defined(__x86_64__) || defined(__i386__)
 _scalbf:(*) = scalbf;
 %#endif /* __x86_64__ || __i386__ */

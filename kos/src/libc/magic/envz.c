@@ -56,7 +56,7 @@ __SYSDECL_BEGIN
 @@Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
 @@Note that if `name' contains a `=' character, only characters leading up to this
 @@position are actually compared!
-[ATTR_PURE][ATTR_WUNUSED] char *
+[ATTR_PURE][[ATTR_WUNUSED]] char *
 envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
 	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
 	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]
@@ -75,7 +75,7 @@ envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[n
 
 @@Returns a pointer to the value portion of the entry
 @@in `ENVZ' for `NAME', or `NULL' if there is none.
-[ATTR_PURE][ATTR_WUNUSED] char *
+[ATTR_PURE][[ATTR_WUNUSED]] char *
 envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
 	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
 	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]

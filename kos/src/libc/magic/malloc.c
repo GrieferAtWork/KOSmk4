@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default_impl_section(.text.crt.heap.malloc)]
+%[default_impl_section(".text.crt.heap.malloc")]
 
 %(libc_fast){
 #include "stdlib.h"
@@ -79,7 +79,9 @@ int crt_posix_memalign([[nonnull]] void **__restrict pp, size_t alignment, size_
 %
 
 [[ATTR_WUNUSED, ATTR_ALLOC_ALIGN(1), ATTR_ALLOC_SIZE((2))]]
-[[ATTR_MALLOC, alias(aligned_alloc)]]
+[[ATTR_MALLOC, export_alias("aligned_alloc")]]
+[[if(__has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline("aligned_alloc", { return __builtin_aligned_alloc(alignment, n_bytes); })]]
 [[userimpl, requires_function(crt_posix_memalign)]]
 void *memalign(size_t alignment, size_t n_bytes) {
 	void *result;

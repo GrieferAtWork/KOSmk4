@@ -246,7 +246,7 @@ struct format_waprintf_data {
 @@                 (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)')
 [requires_function("realloc")][userimpl]
 [impl_include("<hybrid/__assert.h>")][wchar]
-[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
+[[ATTR_WUNUSED]][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
 [dependency_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]
 format_waprintf_pack:([[nonnull]] struct format_waprintf_data *__restrict self,
                       [[nullable]] $size_t *pstrlen) -> wchar_t * {
@@ -297,7 +297,7 @@ format_waprintf_pack:([[nonnull]] struct format_waprintf_data *__restrict self,
 @@to append additional data to the end of `self'
 @@@return: NULL: Failed to allocate additional memory
 [requires_function("realloc")][userimpl][wchar]
-[impl_include("<hybrid/__assert.h>")][ATTR_WUNUSED]
+[impl_include("<hybrid/__assert.h>")][[ATTR_WUNUSED]]
 [dependency_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]
 format_waprintf_alloc:([[nonnull]] struct format_waprintf_data *__restrict self,
                        $size_t num_wchars) -> [malloc /*(num_wchars * sizeof(wchar_t))*/] wchar_t * {
@@ -328,7 +328,7 @@ format_waprintf_alloc:([[nonnull]] struct format_waprintf_data *__restrict self,
 }
 
 @@Print data to a dynamically allocated heap buffer. On error, -1 is returned
-[requires_function("format_waprintf_alloc")][userimpl][wchar][ATTR_WUNUSED]
+[requires_function("format_waprintf_alloc")][userimpl][wchar][[ATTR_WUNUSED]]
 format_waprintf_printer:([[nonnull]] /*struct format_waprintf_data **/ void *arg,
                          [[nonnull]] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t {
 	wchar_t *buf;

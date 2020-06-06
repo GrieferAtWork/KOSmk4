@@ -46,13 +46,13 @@ bzero:([[nonnull]] void *__restrict dst, $size_t num_bytes) {
 	memset(dst, 0, num_bytes);
 }
 
-[guard][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
+[guard][[ATTR_WUNUSED, ATTR_PURE]][crtbuiltin]
 bcmp:([[nonnull]] void const *s1,
       [[nonnull]] void const *s2,
       $size_t num_bytes) -> int = memcmp;
 
 
-[guard][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
+[guard][[ATTR_WUNUSED, ATTR_PURE]][crtbuiltin]
 index:([[nonnull]] char const *__restrict haystack, int needle) -> char *
 	[([[nonnull]] char *__restrict haystack, int needle) -> char *]
 	[([[nonnull]] char const *__restrict haystack, int needle) -> char const *]
@@ -66,7 +66,7 @@ index:([[nonnull]] char const *__restrict haystack, int needle) -> char *
 	return NULL;
 }
 
-[guard][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
+[guard][[ATTR_WUNUSED, ATTR_PURE]][crtbuiltin]
 rindex:([[nonnull]] char const *__restrict haystack, int needle) -> char *
 	[([[nonnull]] char *__restrict haystack, int needle) -> char *]
 	[([[nonnull]] char const *__restrict haystack, int needle) -> char const *]

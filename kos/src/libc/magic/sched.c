@@ -94,7 +94,7 @@ int sched_setscheduler($pid_t pid, int policy, struct sched_param const *param);
 int sched_getscheduler($pid_t pid);
 
 %
-%[default_impl_section(.text.crt.sched.thread)];
+%[default_impl_section(".text.crt.sched.thread")];
 
 @@@return: 1: Another thread was executed prior to the function returning
 @@            The thread may not necessarily be apart of the calling process

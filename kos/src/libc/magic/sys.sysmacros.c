@@ -33,17 +33,17 @@ __SYSDECL_BEGIN
 
 }
 
-[ATTR_CONST][ATTR_NOTHROW][ATTR_WUNUSED]
+[ATTR_CONST][ATTR_NOTHROW][[ATTR_WUNUSED]]
 gnu_dev_major:($dev_t dev) -> $major_t {
 	return (major_t)((uintptr_t)dev >> 20);
 }
 
-[ATTR_CONST][ATTR_NOTHROW][ATTR_WUNUSED]
+[ATTR_CONST][ATTR_NOTHROW][[ATTR_WUNUSED]]
 gnu_dev_minor:($dev_t dev) -> $minor_t {
 	return (minor_t)((uintptr_t)dev & ((1 << 20) - 1));
 }
 
-[ATTR_CONST][ATTR_NOTHROW][ATTR_WUNUSED]
+[ATTR_CONST][ATTR_NOTHROW][[ATTR_WUNUSED]]
 gnu_dev_makedev:($major_t major, $minor_t minor) -> $dev_t {
 	return (dev_t)major << 20 | (dev_t)minor;
 }

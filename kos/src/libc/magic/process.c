@@ -109,12 +109,12 @@ void _endthreadex($u32 exitcode);
 _exit(*) = _Exit;
 %#endif /* !_CRT_TERMINATE_DEFINED */
 
-%[default_impl_section(.text.crt.dos.sched.process)]
+%[default_impl_section(".text.crt.dos.sched.process")]
 [throws] _cexit:();
 [throws] _c_exit:() {
 }
 
-[guard][ATTR_WUNUSED] _getpid:() -> $pid_t = getpid;
+[guard][[ATTR_WUNUSED]] _getpid:() -> $pid_t = getpid;
 
 %[default_impl_section(.text.crt.dos.fs.exec.exec)]
 _execv(*) = execv;
@@ -143,6 +143,7 @@ _cwait(*) = cwait;
 %
 %
 %
+%[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 %[default_impl_section(.text.crt.dos.fs.dlfcn)]
 [throws] _loaddll:(char __KOS_FIXED_CONST *file) -> intptr_t;

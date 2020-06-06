@@ -36,6 +36,9 @@ global final knownUserExports: {string...} = HashSet();
 @@Set of known kernel exports (populated by %[declare_kernel_export(...)])
 global final knownKernelExports: {string...} = HashSet();
 
+@@Set of known libc section names
+global final knownLibcSections: {string...} = HashSet();
+
 @@Parse custom directives that are so obscure that
 @@they shouldn't be part of the standard loader
 @@@return: * : Indicative of the directive having been recognized.
@@ -44,11 +47,69 @@ function customDirectivesParser(context: LoaderContext): bool {
 	local tok = self.tok;
 	switch (tok) {
 
+	case "define_ssp":
+	case "define_ssp_builtin":
+	case "define_ssp_undef":
+	case "define_ssp_builtin_undef":
+	case "define_ssp_crt":
+	case "define_ssp_builtin_crt":
+	case "define_ssp_undef_crt":
+	case "define_ssp_builtin_undef_crt": {
+		local define_builtin = "builtin" in tok;
+		local undef_existing = "undef" in tok;
+		local check_crt      = "crt" in tok;
+		self.next();
+		self.skip("(");
+		local a = str parseCStringOrFunctionLikeExpression(self);
+		self.skip("=");
+		local b = str parseCStringOrFunctionLikeExpression(self);
+		self.skip(")");
+		local aName = a.partition("(")[0].strip();
+		local baseFunctionName = b.lstrip("_").partition("_chk")[0];
+		File.Writer fp;
+		if (define_builtin) {
+			fp << "#if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_" << baseFunctionName << ") && \\\n";
+			fp << "     defined(__CRT_HAVE___" << baseFunctionName << "_chk) && __has_builtin(__builtin___" << baseFunctionName << "_chk))\n";
+			if (undef_existing)
+				fp << "#undef " << aName << "\n";
+			local bos_start = b.index("__ssp_bos");
+			local bos = b[bos_start:b.indexmatch("(", ")", b.index("(", bos_start) + 1) + 1].strip();
+			fp << "#define " << a << (" " * ((#b + #bos + 31) - #a)) << " \\\n";
+			fp << "\t(" << bos << " != (__SIZE_TYPE__)-1 ? __builtin_" << b << " \\\n";
+			fp << "\t" << (" " * (#bos + 23)) << ": " << b << ")\n";
+			if (check_crt)
+				fp << "#elif defined(__CRT_HAVE___" << baseFunctionName << "_chk)\n";
+			else {
+				fp << "#else /* ... */\n";
+			}
+		} else {
+			if (check_crt)
+				fp << "#ifdef __CRT_HAVE___" << baseFunctionName << "_chk\n";
+		}
+		if (undef_existing)
+			fp << "#undef " << aName << "\n";
+		fp << "#define " << a << " " << b << "\n";
+		if (define_builtin) {
+			if (check_crt) {
+				fp << "#endif /* ... */\n";
+			} else {
+				fp << "#endif /* !... */\n";
+			}
+		} else if (check_crt) {
+			fp << "#endif /* __CRT_HAVE___" << baseFunctionName << "_chk */\n";
+		}
+		context.insertText_c(fp.string);
+	}	break;
+
+
 	case "declare_user_export":
-	case "declare_kernel_export": {
-		local s = tok == "declare_kernel_export"
+	case "declare_kernel_export":
+	case "declare_known_section": {
+		local s = tok == "declare_user_export"
+			? knownUserExports
+			: tok == "declare_kernel_export"
 			? knownKernelExports
-			: knownUserExports;
+			: knownLibcSections;
 		self.next();
 		tok = self.skip("(");
 		while (tok !in ["", ")"]) {
@@ -82,6 +143,8 @@ fs.chdir(fs.headof(__FILE__) + "/../../src/libc/magic");
 
 try {
 	for (local filename: fs.query("*.c")) {
+		if (filename < "stdlib.c")
+			continue;
 		local fullPath = fs.abspath(filename);
 		/* XXX: There are only a couple of ways by which different definition
 		 *      files actually interact with each other:

@@ -113,7 +113,7 @@ typedef void *__restrict __timezone_ptr_t;
 
 }
 
-[ignore][section(.text.crt.time)][doc_alias(gettimeofday)][alias(__gettimeofday)]
+[ignore][section(".text.crt.time")][doc_alias(gettimeofday)][alias(__gettimeofday)]
 gettimeofday32:([[nonnull]] struct __timeval32 *__restrict tv,
                 [[nullable]] __timezone_ptr_t tz) -> int = gettimeofday?;
 
@@ -150,7 +150,7 @@ futimes32:($fd_t fd, [[nullable]] struct __timeval32 const tvp[2]) -> int = futi
 @@Returns 0 on success, -1 on errors.
 @@NOTE: This form of timezone information is obsolete.
 @@Use the functions and variables declared in <time.h> instead
-[section(.text.crt.time)][alternate_name(__gettimeofday), no_crt_self_import]
+[section(".text.crt.time")][alternate_name(__gettimeofday), no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(gettimeofday64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(gettimeofday, __gettimeofday)]
 [requires(defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE_gettimeofday64))]
@@ -183,7 +183,7 @@ gettimeofday:([[nonnull]] struct timeval *__restrict tv, [[nullable]] __timezone
 
 @@Set *VALUE to the current setting of timer WHICH.
 @@Return 0 on success, -1 on errors
-[section(.text.crt.time), no_crt_self_import]
+[section(".text.crt.time"), no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(getitimer64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(getitimer)]
 [requires(defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE_getitimer64))]
@@ -215,7 +215,7 @@ getitimer:(__itimer_which_t which, [[nonnull]] struct itimerval *curr_value) -> 
 
 @@Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
 @@Returns 0 on success, -1 on errors
-[section(.text.crt.time), no_crt_self_import]
+[section(".text.crt.time"), no_crt_self_import]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(setitimer64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(setitimer)]
 [requires(defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE_setitimer64))]
@@ -438,7 +438,7 @@ futimes:($fd_t fd, [[nullable]] struct timeval const tvp[2]) -> int {
 
 %
 %#ifdef __USE_TIME64
-[time64_variant_of(gettimeofday)][section(.text.crt.time)]
+[time64_variant_of(gettimeofday)][section(".text.crt.time")]
 [requires($has_function(gettimeofday32))]
 gettimeofday64:([[nonnull]] struct timeval64 *__restrict tv, [[nullable]] __timezone_ptr_t tz) -> int {
 	int result;
@@ -453,7 +453,7 @@ gettimeofday64:([[nonnull]] struct timeval64 *__restrict tv, [[nullable]] __time
 	return result;
 }
 
-[time64_variant_of(getitimer)][section(.text.crt.time)]
+[time64_variant_of(getitimer)][section(".text.crt.time")]
 [requires($has_function(getitimer32))]
 getitimer64:(__itimer_which_t which, [[nonnull]] struct itimerval64 *curr_value) -> int {
 	int result;
@@ -468,7 +468,7 @@ getitimer64:(__itimer_which_t which, [[nonnull]] struct itimerval64 *curr_value)
 	return result;
 }
 
-[time64_variant_of(setitimer)][section(.text.crt.time)]
+[time64_variant_of(setitimer)][section(".text.crt.time")]
 [requires($has_function(setitimer32))]
 setitimer64:(__itimer_which_t which,
              [[nonnull]] struct itimerval64 const *newval,

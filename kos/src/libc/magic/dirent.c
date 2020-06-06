@@ -181,7 +181,7 @@ closedir:([[nonnull]] DIR *dirp) -> int;
 %
 %#ifdef __USE_BSD
 @@Same as `closedir()', but instead of closing the underlying file descriptor, return it
-[ATTR_WUNUSED][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
+[[ATTR_WUNUSED]][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 fdclosedir:([[nonnull]] DIR *dirp) -> $fd_t;
 %#endif /* __USE_BSD */
 
@@ -202,7 +202,7 @@ rewinddir:([[nonnull]] DIR *__restrict dirp);
 %
 %#ifdef __USE_XOPEN2K8
 @@Create a new directory stream by inheriting the given `FD' as stream handle
-[ATTR_WUNUSED][decl_prefix(DEFINE_STRUCT_DIRSTREAM)] fdopendir:($fd_t fd) -> DIR *;
+[[ATTR_WUNUSED]][decl_prefix(DEFINE_STRUCT_DIRSTREAM)] fdopendir:($fd_t fd) -> DIR *;
 %#endif /* __USE_XOPEN2K8 */
 
 %

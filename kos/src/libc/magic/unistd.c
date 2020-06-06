@@ -19,8 +19,8 @@
  */
 
 %[define_replacement(fd_t       = __fd_t)]
-%[define_replacement(off_t      = __FS_TYPE(off))]
-%[define_replacement(pos_t      = __FS_TYPE(pos))]
+%[define_replacement(off_t      = "__FS_TYPE(off)")]
+%[define_replacement(pos_t      = "__FS_TYPE(pos)")]
 %[define_replacement(uid_t      = __uid_t)]
 %[define_replacement(gid_t      = __gid_t)]
 %[define_replacement(pid_t      = __pid_t)]
@@ -238,58 +238,54 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 
 %(user){
 INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_environ)(void);
-}
+};
 
-%[default_impl_section(.text.crt.fs.exec.exec)]
+%[default_impl_section(.text.crt.fs.exec.exec)];
 
 @@>> execv(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
-[[cp]][guard][alias(_execv)][argument_names(path, ___argv)]
-[nobuiltin][if(__has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execv)),
-preferred_impl({ return @__builtin_execv@(path, (char *const *)___argv); })]
-execv:([[nonnull]] char const *__restrict path, [[nonnull]] @__TARGV@) -> int;
+[[cp, guard, export_alias("_execv"), argument_names(path, ___argv), crtbuiltin]]
+int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV);
 
 @@>> execve(2)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
-[[cp]][guard][alias(_execve)][argument_names(path, ___argv, ___envp)]
-[nobuiltin][if(__has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execve)),
-preferred_impl({ return @__builtin_execve@(path, (char *const *)___argv, (char *const *)___envp); })]
-execve:([[nonnull]] char const *__restrict path, [[nonnull]] @__TARGV@, [[nonnull]] @__TENVP@) -> int;
+[[cp, guard, export_alias("_execve"), argument_names(path, ___argv, ___envp), crtbuiltin]]
+int execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
 @@>> execvp(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
-[[cp]][guard][alias(_execvp)][argument_names(file, ___argv)]
-[nobuiltin][if(__has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execvp)),
-preferred_impl({ return @__builtin_execvp@(file, (char *const *)___argv); })]
-execvp:([[nonnull]] char const *__restrict file, [[nonnull]] @__TARGV@) -> int;
+[[cp, guard, export_alias("_execvp"), argument_names(file, ___argv), crtbuiltin]]
+int execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV);
 
 
 @@>> execl(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list
-[[cp]][guard][dependency_include("<parts/redirect-exec.h>")]
-[requires_dependent_function(execv)][ATTR_SENTINEL][alias(_execl)][allow_macros][crtbuiltin]
-execl:([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) -> int {
+[[cp, guard, ATTR_SENTINEL, export_alias("_execl"), impl_include("<parts/redirect-exec.h>")]]
+[[userimpl, requires_dependent_function(execv), allow_macros, crtbuiltin]]
+int execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_EXECL(char, execv, path, args)
 }
+
 @@>> execle(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
-@@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel
-[[cp]][guard][dependency_include("<parts/redirect-exec.h>")]
-[requires_dependent_function(execve)][ATTR_SENTINEL_O(1)][alias(_execle)][allow_macros][crtbuiltin]
-execle:([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) -> int {
+@@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+@@and setting `environ' to a `char **' passed after the NULL sentinel
+[[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execle"), crtbuiltin]]
+[[userimpl, requires_dependent_function(execve), ATTR_SENTINEL_O(1), allow_macros]]
+int execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_EXECLE(char, execve, path, args)
 }
 
 @@>> execlp(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list
-[[cp]][guard][dependency_include("<parts/redirect-exec.h>")]
-[requires_dependent_function(execvp)][ATTR_SENTINEL][alias(_execlp)][allow_macros][crtbuiltin]
-execlp:([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) -> int {
+[[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execlp")]]
+[[userimpl, requires_dependent_function(execvp), ATTR_SENTINEL, allow_macros, crtbuiltin]]
+int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_EXECL(char, execvp, file, args)
 }
 
@@ -297,17 +293,17 @@ execlp:([[nonnull]] char const *__restrict file, char const *args, ... /*, (char
 @@>> execvpe(3)
 @@Replace the calling process with the application image referred to by `FILE'
 @@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
-[[cp]][guard][alias(_execvpe)][argument_names(file, ___argv, ___envp)]
-execvpe:([[nonnull]] char const *__restrict file, [[nonnull]] @__TARGV@, [[nonnull]] @__TENVP@) -> int;
+[[cp, guard, export_alias("_execvpe"), argument_names(file, ___argv, ___envp)]]
+int execvpe([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 %#endif /* __USE_KOS || __USE_DOS || __USE_GNU */
 
 %#if defined(__USE_KOS) || defined(__USE_DOS)
 @@>> execlpe(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel
-[[cp]][guard][dependency_include("<parts/redirect-exec.h>")]
-[requires_dependent_function(execvpe)][ATTR_SENTINEL_O(1)][alias(_execlpe)][allow_macros]
-execlpe:([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) -> int {
+[[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execlpe")]]
+[[userimpl, requires_dependent_function(execvpe), ATTR_SENTINEL_O(1), allow_macros]]
+int execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_EXECLE(char, execvp, file, args)
 }
 %#endif /* __USE_KOS || __USE_DOS */
@@ -318,39 +314,39 @@ execlpe:([[nonnull]] char const *__restrict file, char const *args, ... /*, (cha
 @@>> getpid(2)
 @@Return the PID of the calling process (that is the TID of the calling thread group's leader)
 @@THIS_THREAD->LEADER->PID
-[guard][ATTR_WUNUSED][alias(_getpid)][export_alias(__getpid)]
-getpid:() -> $pid_t;
+[[guard, ATTR_WUNUSED, export_alias("_getpid", "__getpid")]]
+$pid_t getpid();
 
 %
 %#ifdef __USE_KOS
 @@>> gettid(2)
 @@Return the TID of the calling thread
 @@THIS_THREAD->PID
-[section(.text.crt.sched.thread)]
-[guard][ATTR_WUNUSED] gettid:() -> $pid_t;
+[[guard, ATTR_WUNUSED, section(".text.crt.sched.thread")]]
+gettid:() -> $pid_t;
 %#endif /* __USE_KOS */
 
-[section(.text.crt.dos.io.access)]
-[ignore] dos_pipe:([[nonnull]] $fd_t pipedes[2], $uint32_t pipesize, $oflag_t textmode) -> int = _pipe?;
+[[ignore, section(".text.crt.dos.io.access")]]
+dos_pipe:([[nonnull]] $fd_t pipedes[2], $uint32_t pipesize, $oflag_t textmode) -> int = _pipe?;
 
 %
 @@>> pipe(2)
 @@Create a new pair of connected pipes ([0] = reader, [1] = writer)
-[section(.text.crt.io.access)][noexport]
-[requires($has_function(dos_pipe))][export_alias(__pipe)]
-pipe:([[nonnull]] $fd_t pipedes[2]) -> int {
+[[section(".text.crt.io.access")]]
+[[userimpl, requires_function(dos_pipe), export_alias("__pipe")]]
+int pipe([[nonnull]] $fd_t pipedes[2]) {
 	return dos_pipe(pipedes, 4096, 0x8000); /* O_BINARY */
 }
 
 @@Sleep for up to `DURATION' seconds
-[section(.text.crt.dos.system.utility)]
-[[cp]][ignore] dos_sleep:($uint32_t duration) = _sleep?;
+[[cp, ignore, nocrt, alias("_sleep")]]
+dos_sleep:($uint32_t duration);
 
 %
 @@>> sleep(3)
 @@Sleep for up to `SECONDS' seconds
 [section(.text.crt.system.utility)]
-[[cp]][guard][noexport][requires($has_function(dos_sleep))]
+[[cp, guard]][noexport][requires($has_function(dos_sleep))]
 sleep:(unsigned int seconds) -> unsigned int {
 	dos_sleep((uint32_t)seconds);
 	return 0;
@@ -373,7 +369,7 @@ fsync:($fd_t fd) -> int {
 @@Return the PID of the calling process's parent.
 @@(That is the TID of the leader of the parent of the calling thread's leader)
 @@THIS_THREAD->LEADER->PARENT->LEADER->PID
-[ATTR_WUNUSED] getppid:() -> $pid_t;
+[[ATTR_WUNUSED]] getppid:() -> $pid_t;
 
 
 %
@@ -381,10 +377,10 @@ fsync:($fd_t fd) -> int {
 @@Return the ID of the calling process's process group.
 @@(That is the TID of the leader of the process group of the calling thread's leader)
 @@THIS_THREAD->LEADER->GROUP_LEADER->PID
-[ATTR_WUNUSED] getpgrp:() -> $pid_t;
+[[ATTR_WUNUSED]] getpgrp:() -> $pid_t;
 
 %
-[doc_alias(getpgid)][ATTR_WUNUSED][preferred_alias(getpgid)][alias(__getpgid)]
+[doc_alias(getpgid)][[ATTR_WUNUSED]][preferred_alias(getpgid)][alias(__getpgid)]
 __getpgid:($pid_t pid) -> $pid_t = getpgid?;
 
 %
@@ -412,22 +408,22 @@ setsid:() -> $pid_t;
 %
 @@>> getuid(2)
 @@Return the real user ID of the calling process
-[ATTR_WUNUSED] getuid:() -> $uid_t;
+[[ATTR_WUNUSED]] getuid:() -> $uid_t;
 
 %
 @@>> geteuid(2)
 @@Return the effective user ID of the calling process
-[ATTR_WUNUSED] geteuid:() -> $uid_t;
+[[ATTR_WUNUSED]] geteuid:() -> $uid_t;
 
 %
 @@>> getgid(2)
 @@Return the real group ID of the calling process
-[ATTR_WUNUSED] getgid:() -> $gid_t;
+[[ATTR_WUNUSED]] getgid:() -> $gid_t;
 
 %
 @@>> getegid(2)
 @@Return the effective group ID of the calling process
-[ATTR_WUNUSED] getegid:() -> $gid_t;
+[[ATTR_WUNUSED]] getegid:() -> $gid_t;
 
 %
 %/* ... */
@@ -460,7 +456,7 @@ setgid:($gid_t gid) -> int;
 @@application image with that of another program that the original
 @@parent can then `wait(2)' for
 [section(.text.crt.sched.access)][crtbuiltin]
-[ATTR_WUNUSED][export_alias(__fork)]
+[[ATTR_WUNUSED]][export_alias(__fork)]
 fork:() -> $pid_t;
 
 
@@ -487,14 +483,14 @@ alarm:(unsigned int seconds) -> unsigned int;
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
 [section(.text.crt.fs.property)]
-[[cp]][ATTR_WUNUSED] fpathconf:($fd_t fd, int name) -> long int;
+[[cp]][[ATTR_WUNUSED]] fpathconf:($fd_t fd, int name) -> long int;
 
-%[default_impl_section(.text.crt.io.tty)]
+%[default_impl_section(".text.crt.io.tty")]
 
 %
 @@>> ttyname(3)
 @@Return the name of a TTY given its file descriptor
-[[cp]][ATTR_WUNUSED] ttyname:($fd_t fd) -> char *;
+[[cp]][[ATTR_WUNUSED]] ttyname:($fd_t fd) -> char *;
 
 @@>> ttyname_r(3)
 @@Return the name of a TTY given its file descriptor
@@ -503,7 +499,7 @@ alarm:(unsigned int seconds) -> unsigned int;
 %
 @@>> tcgetpgrp(2)
 @@Return the foreground process group of a given TTY file descriptor
-[ATTR_WUNUSED] tcgetpgrp:($fd_t fd) -> $pid_t;
+[[ATTR_WUNUSED]] tcgetpgrp:($fd_t fd) -> $pid_t;
 
 %
 @@>> tcsetpgrp(2)
@@ -512,9 +508,9 @@ tcsetpgrp:($fd_t fd, $pid_t pgrp_id) -> int;
 
 %
 %/* ... */
-[ATTR_WUNUSED] getlogin:() -> char *;
+[[ATTR_WUNUSED]] getlogin:() -> char *;
 
-%[default_impl_section(.text.crt.fs.modify)]
+%[default_impl_section(".text.crt.fs.modify")]
 
 %
 @@>> chown(2)
@@ -547,7 +543,7 @@ link:([[nonnull]] char const *from, [[nonnull]] char const *to) -> int {
 
 %[default_impl_section(.text.crt.sched.access)]
 %[insert:extern(exit)]
-%[default_impl_section(.text.crt.fs.modify)]
+%[default_impl_section(".text.crt.fs.modify")]
 
 %
 @@>> read(2)
@@ -571,7 +567,7 @@ ssize_t write($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize);
 @@If an error occurrs before all data could be read, try to use SEEK_CUR to rewind
 @@the file descriptor by the amount of data that had already been loaded. - Errors
 @@during this phase are silently ignored and don't cause `errno' to change
-[[cp]][guard][section(.text.crt.io.read)]
+[[cp, guard]][section(.text.crt.io.read)]
 [requires($has_function(read) && $has_function(lseek))]
 [impl_include("<parts/errno.h>")]
 readall:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) -> ssize_t {
@@ -607,7 +603,7 @@ readall:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) -> ssize_t {
 @@Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
 @@`writeall()' to immediately return `0') or the entirety of the given buffer has been
 @@written (in which case `bufsize' is returned).
-[[cp]][guard][section(.text.crt.io.write)]
+[[cp, guard]][section(.text.crt.io.write)]
 [requires($has_function(write) && $has_function(lseek))]
 [impl_include("<parts/errno.h>")]
 writeall:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize) -> ssize_t {
@@ -663,7 +659,7 @@ lseek:($fd_t fd, $off_t offset, int whence) -> $off_t {
 @@@return: 0: Not a tty
 @@Check if the given file handle `FD' refers to a TTY
 [[decl_include("<bits/types.h>")]]
-[[section(.text.crt.io.tty), guard, ATTR_WUNUSED, export_alias(_isatty)]]
+[[section(".text.crt.io.tty"), guard, ATTR_WUNUSED, export_alias(_isatty)]]
 int isatty($fd_t fd);
 
 %
@@ -671,7 +667,7 @@ int isatty($fd_t fd);
 @@@return: NEWFD: Returns the new handle upon success.
 @@Duplicate a file referred to by `OLDFD' into `NEWFD'
 [[decl_include("<bits/types.h>")]]
-[[section(.text.crt.io.access), guard, export_alias(_dup2, __dup2)]]
+[[section(".text.crt.io.access"), guard, export_alias(_dup2, __dup2)]]
 $fd_t dup2($fd_t oldfd, $fd_t newfd);
 
 %
@@ -679,14 +675,14 @@ $fd_t dup2($fd_t oldfd, $fd_t newfd);
 @@@return: * : Returns the new handle upon success.
 @@Duplicate a file referred to by `FD' and return its duplicated handle number
 [[export_alias(_dup), decl_include("<bits/types.h>")]]
-[[section(.text.crt.io.access), guard, ATTR_WUNUSED]]
+[[section(".text.crt.io.access"), guard, ATTR_WUNUSED]]
 $fd_t dup($fd_t fd);
 
 %
 @@>> close(2)
 @@Close a file handle
 [[export_alias(_close, __close), decl_include("<bits/types.h>")]]
-[[section(.text.crt.io.access), guard]]
+[[section(".text.crt.io.access"), guard]]
 int close($fd_t fd);
 
 %
@@ -710,16 +706,16 @@ int chdir([[nonnull]] char const *path);
 %
 @@>> getcwd(2)
 @@Return the path of the current working directory, relative to the filesystem root set by `chdir(2)'
-[[cp]][guard][alias(_getcwd)]
+[[cp, guard]][alias(_getcwd)]
 [section(.text.crt.fs.basic_property)]
 getcwd:([outp_opt(bufsize)] char *buf, size_t bufsize) -> char *;
 
-%[default_impl_section(.text.crt.fs.modify)]
+%[default_impl_section(".text.crt.fs.modify")]
 
 %
 @@>> unlink(2)
 @@Remove a file, symbolic link, device or FIFO referred to by `FILE'
-[[cp]][guard][alias(_unlink)][noexport]
+[[cp, guard]][alias(_unlink)][noexport]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(unlinkat))]
 unlink:([[nonnull]] char const *file) -> int {
 	return unlinkat(__CRT_AT_FDCWD, file, 0);
@@ -728,7 +724,7 @@ unlink:([[nonnull]] char const *file) -> int {
 %
 @@>> rmdir(2)
 @@Remove a directory referred to by `PATH'
-[[cp]][guard][alias(_rmdir)][noexport]
+[[cp, guard]][alias(_rmdir)][noexport]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(unlinkat))]
 rmdir:([[nonnull]] char const *path) -> int {
 	return unlinkat(__CRT_AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
@@ -741,7 +737,7 @@ rmdir:([[nonnull]] char const *path) -> int {
 @@>> euidaccess(2)
 @@@param: TYPE: Set of `X_OK|W_OK|R_OK'
 @@Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids
-[[cp]][alias(eaccess)][noexport][ATTR_WUNUSED]
+[[cp]][alias(eaccess)][noexport][[ATTR_WUNUSED]]
 [if(defined(__CRT_DOS)), alias(_access)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(faccessat))]
 euidaccess:([[nonnull]] char const *file, int type) -> int {
@@ -752,7 +748,7 @@ euidaccess:([[nonnull]] char const *file, int type) -> int {
 @@>> eaccess(2)
 @@@param: TYPE: Set of `X_OK|W_OK|R_OK'
 @@Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids
-[[cp]][noexport][ATTR_WUNUSED]
+[[cp]][noexport][[ATTR_WUNUSED]]
 eaccess:([[nonnull]] char const *file, int type) -> int = euidaccess;
 
 %#endif /* __USE_GNU */
@@ -764,7 +760,7 @@ eaccess:([[nonnull]] char const *file, int type) -> int = euidaccess;
 @@Test for access to the specified file `DFD:FILE', testing for `TYPE'
 [[cp]] faccessat:($fd_t dfd, [[nonnull]] char const *file, int type, $atflag_t flags) -> int;
 
-%[default_impl_section(.text.crt.fs.modify)]
+%[default_impl_section(".text.crt.fs.modify")]
 
 %
 @@>> fchownat(2)
@@ -806,7 +802,7 @@ eaccess:([[nonnull]] char const *file, int type) -> int = euidaccess;
                   [[outp(buflen)]] char *__restrict buf, size_t buflen, $atflag_t flags) -> ssize_t;
 %#endif /* __USE_KOS */
 
-%[default_impl_section(.text.crt.fs.modify)]
+%[default_impl_section(".text.crt.fs.modify")]
 
 %
 @@>> unlinkat(2)
@@ -1129,7 +1125,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 
 [noexport]
 [requires($has_function(pipe))]
-[section(.text.crt.io.access)]
+[section(".text.crt.io.access")]
 pipe2:([[nonnull]] $fd_t pipedes[2], $oflag_t flags) -> int {
 	(void)flags;
 	return pipe(pipedes);
@@ -1137,19 +1133,19 @@ pipe2:([[nonnull]] $fd_t pipedes[2], $oflag_t flags) -> int {
 
 [noexport]
 [requires($has_function(dup2))]
-[section(.text.crt.io.access)]
+[section(".text.crt.io.access")]
 dup3:($fd_t oldfd, $fd_t newfd, $oflag_t flags) -> $fd_t {
 	return newfd != oldfd ? dup2(oldfd, newfd) : -1;
 }
 
-[[cp]][ATTR_WUNUSED][ATTR_MALLOC][noexport]
+[[cp]][[ATTR_WUNUSED]][ATTR_MALLOC][noexport]
 [requires($has_function(getcwd))]
 [section(.text.crt.fs.basic_property)]
 get_current_dir_name:() -> char * {
 	return getcwd(NULL, 0);
 }
 
-[[cp]][user][noexport][section(.text.crt.fs.modify)]
+[[cp]][user][noexport][section(".text.crt.fs.modify")]
 syncfs:($fd_t fd) -> int {
 	(void)fd;
 	/* NO-OP */
@@ -1196,13 +1192,13 @@ ualarm:($useconds_t value, $useconds_t interval) -> $useconds_t;
 @@Same as `fork(2)', but possibly suspend the calling process until the
 @@child process either calls `exit(2)' or one of the many `exec(2)' functions
 [section(.text.crt.sched.access)][export_alias(__vfork)][guard]
-[ATTR_RETURNS_TWICE][ATTR_WUNUSED] vfork:() -> $pid_t;
+[ATTR_RETURNS_TWICE][[ATTR_WUNUSED]] vfork:() -> $pid_t;
 %#endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) || __USE_MISC */
 
 %
 @@>> fchown(2)
 @@Change the ownership of a given `FD' to `GROUP:OWNER'
-[section(.text.crt.fs.modify)]
+[section(".text.crt.fs.modify")]
 [[cp]] fchown:($fd_t fd, $uid_t owner, $gid_t group) -> int;
 
 %
@@ -1218,14 +1214,14 @@ ualarm:($useconds_t value, $useconds_t interval) -> $useconds_t;
 @@THREAD[PID]->LEADER->GROUP_LEADER->PID
 @@When `PID' is ZERO(0), use `gettid()' for it instead
 [section(.text.crt.sched.user)][export_alias(__getpgid)]
-[ATTR_WUNUSED] getpgid:($pid_t pid) -> $pid_t;
+[[ATTR_WUNUSED]] getpgid:($pid_t pid) -> $pid_t;
 
 %
 @@>> getsid(2)
 @@Return the ID of the session which a process `PID' is apart of.
 @@return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID;
 [section(.text.crt.sched.process)]
-[ATTR_WUNUSED] getsid:($pid_t pid) -> $pid_t;
+[[ATTR_WUNUSED]] getsid:($pid_t pid) -> $pid_t;
 
 %
 @@>> lchown(2)
@@ -1233,7 +1229,7 @@ ualarm:($useconds_t value, $useconds_t interval) -> $useconds_t;
 @@but don't reference it if that file is a symbolic link
 [[cp]][noexport]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(fchownat))]
-[section(.text.crt.fs.modify)]
+[section(".text.crt.fs.modify")]
 lchown:([[nonnull]] char const *file, $uid_t owner, $gid_t group) -> int {
 	return fchownat(__CRT_AT_FDCWD, file, owner, group, 0x0100); /* AT_SYMLINK_NOFOLLOW */
 }
@@ -1269,7 +1265,7 @@ lchown:([[nonnull]] char const *file, $uid_t owner, $gid_t group) -> int {
 )][noexport, no_crt_self_import]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(truncate64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(truncate)]
-[section(.text.crt.fs.modify)]
+[section(".text.crt.fs.modify")]
 [requires(defined(__CRT_HAVE_truncate64) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE__open)) && (defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64))))]
 truncate:([[nonnull]] char const *file, __PIO_OFFSET length) -> int {
 #if defined(__CRT_HAVE_truncate64)
@@ -1290,7 +1286,7 @@ truncate:([[nonnull]] char const *file, __PIO_OFFSET length) -> int {
 #endif
 }
 
-[doc_alias(truncate)][section(.text.crt.fs.modify)]
+[doc_alias(truncate)][section(".text.crt.fs.modify")]
 [ignore] truncate32:([[nonnull]] char const *file, $pos32_t length) -> int = truncate?;
 
 %
@@ -1308,7 +1304,7 @@ truncate:([[nonnull]] char const *file, __PIO_OFFSET length) -> int {
 #endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 )][noexport]
-[section(.text.crt.fs.modify)]
+[section(".text.crt.fs.modify")]
 [requires(defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE__open)) && (defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64))))]
 truncate64:([[nonnull]] char const *file, __PIO_OFFSET64 length) -> int {
 #if defined(__CRT_HAVE_truncate) && (!defined(__CRT_HAVE_open) || !defined(__CRT_HAVE_open64) || !defined(__CRT_HAVE__open) || (!defined(__CRT_HAVE__chsize_s) && !defined(__CRT_HAVE_ftruncate64)))
@@ -1339,7 +1335,7 @@ truncate64:([[nonnull]] char const *file, __PIO_OFFSET64 length) -> int {
 @@>> fexecve(2)
 @@Replace the calling process with the application image referred to by `FD' and
 @@execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
-[[cp]][guard][argument_names(fd, ___argv, ___envp)][section(.text.crt.fs.exec.exec)]
+[[cp, guard]][argument_names(fd, ___argv, ___envp)][section(.text.crt.fs.exec.exec)]
 fexecve:($fd_t fd, [[nonnull]] @__TARGV@, [[nonnull]] @__TENVP@) -> int;
 
 %#endif /* __USE_XOPEN2K8 */
@@ -1396,7 +1392,7 @@ __LIBC int optopt;
 %
 
 
-[guard][ATTR_WUNUSED][section(.text.crt.application.options)][noexport][nouser]
+[guard][[ATTR_WUNUSED]][section(.text.crt.application.options)][noexport][nouser]
 [if(defined(__USE_POSIX2) && !defined(__USE_POSIX_IMPLICITLY) && !defined(__USE_GNU)), preferred_alias(__posix_getopt)]
 getopt:(int argc, char *const argv[], char const *shortopts) -> int;
 
@@ -1410,7 +1406,7 @@ getopt:(int argc, char *const argv[], char const *shortopts) -> int;
 @@Synchronize all disk operations of all mounted file systems and flush
 @@unwritten buffers down to the hardware layer, ensuring that modifications
 @@made become visible on the underlying, persistent media
-[section(.text.crt.fs.modify)]
+[section(".text.crt.fs.modify")]
 [[cp]][user][noexport] sync:() {
 	/* NO-OP */
 }
@@ -1435,13 +1431,13 @@ setregid:($gid_t rgid, $gid_t egid) -> int;
 %
 %/* ... */
 [section(.text.crt.system.configuration)]
-[ATTR_WUNUSED] gethostid:() -> long int;
+[[ATTR_WUNUSED]] gethostid:() -> long int;
 
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K)
 @@>> getpagesize(3)
 @@Return the size of a PAGE (in bytes)
 [section(.text.crt.system.configuration)]
-[ATTR_CONST][ATTR_WUNUSED][export_alias(__getpagesize)]
+[ATTR_CONST][[ATTR_WUNUSED]][export_alias(__getpagesize)]
 [requires_include(<asm/pagesize.h>)]
 [requires(defined(__ARCH_PAGESIZE))]
 getpagesize:() -> int {
@@ -1451,7 +1447,7 @@ getpagesize:() -> int {
 %
 %/* ... */
 [section(.text.crt.system.configuration)]
-[ATTR_CONST][ATTR_WUNUSED] getdtablesize:() -> int {
+[ATTR_CONST][[ATTR_WUNUSED]] getdtablesize:() -> int {
 #if defined(__KOS__)
 	return 0x7fffffff; /* INT_MAX */
 #elif defined(__linux__) || defined(__linux) || defined(linux)
@@ -1491,8 +1487,8 @@ setegid:($gid_t egid) -> int;
 %   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_UNIX98))
 
 %/* ... */
-[section(.text.crt.io.tty)]
-[ATTR_WUNUSED] ttyslot:() -> int;
+[section(".text.crt.io.tty")]
+[[ATTR_WUNUSED]] ttyslot:() -> int;
 
 %#endif
 
@@ -1503,7 +1499,7 @@ setegid:($gid_t egid) -> int;
 @@Create a new symbolic link loaded with `LINK_TEXT' as link
 @@text, at the filesystem location referred to by `TARGET_PATH'.
 @@Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)'
-[[cp]][noexport][section(.text.crt.fs.modify)]
+[[cp]][noexport][section(".text.crt.fs.modify")]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(symlinkat))]
 symlink:([[nonnull]] char const *link_text, [[nonnull]] char const *target_path) -> int {
 	/* TODO: Header-implementation for `symlink()' on DOS (using the windows API) */
@@ -1532,7 +1528,7 @@ readlink:([[nonnull]] char const *__restrict path,
 
 %
 %#if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
-[[cp]][section(.text.crt.io.tty)]
+[[cp]][section(".text.crt.io.tty")]
 getlogin_r:([outp(name_len)] char *name, size_t name_len) -> int;
 %#endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
@@ -1547,7 +1543,7 @@ gethostname:([[outp(buflen)]] char *name, size_t buflen) -> int;
 %
 %#ifdef __USE_MISC
 %/* ... */
-[section(.text.crt.io.tty)]
+[section(".text.crt.io.tty")]
 setlogin:([[nonnull]] char const *name) -> int;
 %
 @@>> sethostname(2)
@@ -1574,7 +1570,7 @@ setdomainname:([inp(len)] char const *name, size_t len) -> int;
 
 %
 %/* ... */
-[section(.text.crt.io.tty)]
+[section(".text.crt.io.tty")]
 vhangup:() -> int;
 
 %
@@ -1586,7 +1582,7 @@ profil:([[nonnull]] unsigned short int *sample_buffer,
 %
 %/* ... */
 [section(.text.crt.database.shell)]
-[[cp]][ATTR_WUNUSED] getusershell:() -> char *;
+[[cp]][[ATTR_WUNUSED]] getusershell:() -> char *;
 
 %
 %/* ... */
@@ -1605,12 +1601,12 @@ endusershell:();
 
 %
 %/* ... */
-[section(.text.crt.fs.modify)]
+[section(".text.crt.fs.modify")]
 [[cp]] revoke:([[nonnull]] char const *file) -> int;
 
 %
 %/* ... */
-[section(.text.crt.fs.modify)]
+[section(".text.crt.fs.modify")]
 [[cp]] acct:([[nullable]] char const *name) -> int;
 
 [[cp]][section(.text.crt.system.utility)]
@@ -1632,12 +1628,12 @@ syscall64:(__syscall_ulong_t sysno, ...) -> __LONG64_TYPE__;
 @@>> chroot(2)
 @@Change the root directory of the calling `CLONE_FS' group of threads
 @@(usually the process) to a path that was previously address by `PATH'
-[section(.text.crt.fs.utility)]
+[section(".text.crt.fs.utility")]
 [[cp]] chroot:([[nonnull]] char const *__restrict path) -> int;
 
 %
 %/* ... */
-[[cp]][ATTR_WUNUSED][section(.text.crt.io.tty)]
+[[cp]][[ATTR_WUNUSED]][section(".text.crt.io.tty")]
 getpass:([[nonnull]] char const *__restrict prompt) -> char *;
 %#endif /* ... */
 
@@ -1714,9 +1710,9 @@ ftruncate64:($fd_t fd, __PIO_OFFSET64 length) -> int {
 @@Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
 @@exchanging the order of even and odd bytes ("123456" --> "214365")
 @@When `n_bytes <= 1', don't do anything and return immediately
-[alias(_swab)][guard][section(.text.crt.string.memory)]
-swab:([[nonnull]] void const *__restrict from,
-      [[nonnull]] void *__restrict to, __STDC_INT_AS_SSIZE_T n_bytes) {
+[[guard, export_alias("_swab"), section(".text.crt.string.memory")]]
+void swab([[nonnull]] void const *__restrict from,
+          [[nonnull]] void *__restrict to, __STDC_INT_AS_SSIZE_T n_bytes) {
 	n_bytes &= ~1;
 	while (n_bytes >= 2) {
 		byte_t a, b;
@@ -1734,7 +1730,7 @@ swab:([[nonnull]] void const *__restrict from,
 %#if (defined(_EVERY_SOURCE) || \
 %     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 %/* ... */
-[section(.text.crt.io.tty)]
+[section(".text.crt.io.tty")]
 [guard] ctermid:(char *s) -> char *;
 %[insert:extern(cuserid)]
 %#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
@@ -1757,7 +1753,7 @@ swab:([[nonnull]] void const *__restrict from,
 %
 %#ifdef __USE_REENTRANT
 @@Same as `ctermid', but return `NULL' when `S' is `NULL'
-[section(.text.crt.io.tty)][guard]
+[section(".text.crt.io.tty")][guard]
 [requires($has_function(ctermid))][noexport][user][same_impl]
 ctermid_r:([[nullable]] char *s) -> char * {
 	return s ? ctermid(s) : NULL;
@@ -1775,7 +1771,7 @@ ctermid_r:([[nullable]] char *s) -> char * {
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
 [[cp]][section(.text.crt.fs.property)]
 [section(.text.crt.system.configuration)]
-[ATTR_WUNUSED][export_alias(_sysconf,__sysconf)]
+[[ATTR_WUNUSED]][export_alias(_sysconf,__sysconf)]
 sysconf:(int name) -> long int;
 
 

@@ -114,13 +114,13 @@ SetUid:($uid_t uid);
 SetGid:($gid_t gid);
 
 %
-[doc_alias(fork)][ATTR_WUNUSED][throws]
+[doc_alias(fork)][[ATTR_WUNUSED]][throws]
 [section(.text.crt.except.sched.access)]
 Fork:() -> $pid_t;
 
 %
 [section(.text.crt.except.fs.property)]
-[throws][ATTR_WUNUSED][doc_alias(fpathconf)]
+[throws][[ATTR_WUNUSED]][doc_alias(fpathconf)]
 FPathConf:($fd_t fd, int name) -> long int;
 
 
@@ -218,7 +218,7 @@ Dup2:($fd_t oldfd, $fd_t newfd) -> $fd_t;
 
 %
 [section(.text.crt.except.io.access)][doc_alias(dup)]
-[ATTR_WUNUSED] Dup:($fd_t fd) -> $fd_t;
+[[ATTR_WUNUSED]] Dup:($fd_t fd) -> $fd_t;
 
 %
 [throws][[cp]][doc_alias(chdir)]
@@ -230,7 +230,7 @@ Chdir:([[nonnull]] char const *path);
 [section(.text.crt.except.fs.basic_property)]
 GetCwd:([outp_opt(bufsize)] char *buf, size_t bufsize) -> char *;
 
-%[default_impl_section(.text.crt.fs.modify)]
+%[default_impl_section(".text.crt.fs.modify")]
 
 %
 [throws][[cp]][doc_alias(unlink)][userimpl]
@@ -446,11 +446,11 @@ FChdir:($fd_t fd);
 
 %
 [throws][section(".text.crt.except.sched.user")][doc_alias(getpgid)]
-[ATTR_WUNUSED] GetPGid:($pid_t pid) -> $pid_t;
+[[ATTR_WUNUSED]] GetPGid:($pid_t pid) -> $pid_t;
 
 %
 [throws][section(".text.crt.except.sched.process")][doc_alias(getsid)]
-[ATTR_WUNUSED] GetSid:($pid_t pid) -> $pid_t;
+[[ATTR_WUNUSED]] GetSid:($pid_t pid) -> $pid_t;
 
 %
 [throws][[cp]][userimpl][doc_alias(lchown)]

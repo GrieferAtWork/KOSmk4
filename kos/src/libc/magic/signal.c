@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_ccompat_header(csignal)]
+%[define_ccompat_header("csignal")]
 %[define_replacement(longptr_t    = __LONGPTR_TYPE__)]
 %[define_replacement(ulongptr_t   = __ULONGPTR_TYPE__)]
 %[define_replacement(sighandler_t = __sighandler_t)]
@@ -26,7 +26,7 @@
 %[define_replacement(pid_t        = __pid_t)]
 %[define_replacement(timespec32   = __timespec32)]
 %[define_replacement(timespec64   = __timespec64)]
-%[default_impl_section({.text.crt.sched.signal|.text.crt.dos.sched.signal})]
+%[default_impl_section("{.text.crt.sched.signal|.text.crt.dos.sched.signal}")]
 
 %(user){
 DECL_END

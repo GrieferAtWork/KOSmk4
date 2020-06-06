@@ -54,7 +54,7 @@ _rmdir(*) = rmdir;
 %
 %#ifndef _GETDISKFREE_DEFINED
 %#define _GETDISKFREE_DEFINED 1
-[[cp]][guard] _getdiskfree:(unsigned int drive, struct _diskfree_t *diskfree) -> unsigned int;
+[[cp, guard]] _getdiskfree:(unsigned int drive, struct _diskfree_t *diskfree) -> unsigned int;
 %#endif /* !_GETDISKFREE_DEFINED */
 
 /* A small hand full of functions defined in '<direct.h>' */

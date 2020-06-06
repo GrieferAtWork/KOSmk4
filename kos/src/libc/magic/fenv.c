@@ -18,9 +18,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_ccompat_header(cfenv)]
+%[define_ccompat_header("cfenv")]
 %[define_replacement(errno_t = __errno_t)]
-%[default_impl_section(.text.crt.math.fenv)]
+%[default_impl_section(".text.crt.math.fenv")]
 
 %(c, ccompat)#ifndef __NO_FPU
 %{
@@ -123,7 +123,7 @@ fesetexceptflag:([[nonnull]] fexcept_t const *flagp, int excepts) -> int {
 
 @@Determine which of subset of the exceptions
 @@specified by EXCEPTS are currently set
-[std][nothrow][ATTR_PURE][ATTR_WUNUSED]
+[std][nothrow][ATTR_PURE][[ATTR_WUNUSED]]
 [fast][dependency_include(<bits/fenv-inline.h>)]
 fetestexcept:(int excepts) -> int {
 	return @__inline_fetestexcept@(excepts);
@@ -135,7 +135,7 @@ fetestexcept:(int excepts) -> int {
 @@            ... `FE_DOWNWARD':   floor()
 @@            ... `FE_UPWARD':     ceil()
 @@            ... `FE_TOWARDZERO': trunc()
-[std][nothrow][ATTR_PURE][ATTR_WUNUSED][libc]
+[std][nothrow][ATTR_PURE][[ATTR_WUNUSED]][libc]
 [fast][dependency_include(<bits/fenv-inline.h>)]
 fegetround:() -> int {
 	return @__inline_fegetround@();
@@ -204,7 +204,7 @@ fedisableexcept:(int excepts) -> int {
 }
 
 @@Return enabled exceptions
-[nothrow][ATTR_WUNUSED][ATTR_PURE]
+[nothrow][[ATTR_WUNUSED, ATTR_PURE]]
 [fast][dependency_include(<bits/fenv-inline.h>)]
 fegetexcept:() -> int {
 	return @__inline_fegetexcept@();

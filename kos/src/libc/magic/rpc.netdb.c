@@ -61,17 +61,17 @@ struct rpcent {
 
 }
 
-[cp_kos] setrpcent:(int stayopen);
+[[cp_kos]] setrpcent:(int stayopen);
 endrpcent:();
-[cp_kos] getrpcbyname:(char const *name) -> struct rpcent *;
-[cp_kos] getrpcbynumber:(int number) -> struct rpcent *;
-[cp_kos] getrpcent:() -> struct rpcent *;
+[[cp_kos]] getrpcbyname:(char const *name) -> struct rpcent *;
+[[cp_kos]] getrpcbynumber:(int number) -> struct rpcent *;
+[[cp_kos]] getrpcent:() -> struct rpcent *;
 
 %
 %#ifdef __USE_MISC
-[cp_kos] getrpcbyname_r:(char const *name, struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result) -> int;
-[cp_kos] getrpcbynumber_r:(int number, struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result) -> int;
-[cp_kos] getrpcent_r:(struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result) -> int;
+[[cp_kos]] getrpcbyname_r:(char const *name, struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result) -> int;
+[[cp_kos]] getrpcbynumber_r:(int number, struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result) -> int;
+[[cp_kos]] getrpcent_r:(struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result) -> int;
 %#endif /* __USE_MISC */
 
 

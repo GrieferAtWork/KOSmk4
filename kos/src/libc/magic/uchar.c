@@ -18,15 +18,15 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_ccompat_header(cuchar)]
+%[define_ccompat_header("cuchar")]
 %[define_replacement(locale_t = __locale_t)]
 %[define_replacement(wint_t = __WINT_TYPE__)]
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
-%[default_impl_section(.text.crt.unicode.mbr)]
+%[default_impl_section(".text.crt.unicode.mbr")]
 
-%[declare_known_section(.text.crt.wchar.unicode.convert)]
-%[declare_known_section(.text.crt.dos.wchar.unicode.convert)]
+%[declare_known_section(".text.crt.wchar.unicode.convert")]
+%[declare_known_section(".text.crt.dos.wchar.unicode.convert")]
 
 
 %{
@@ -116,7 +116,7 @@ mbrtoc16:(char16_t *__restrict pc16,
 
 [std]
 [impl_include("<parts/errno.h>")]
-[dependency_include(<bits/mbstate.h>)]
+[dependency_include("<bits/mbstate.h>")]
 [impl_prefix(
 @__LOCAL_LIBC_DATA@(mbrtoc32_mbs) __mbstate_t mbrtoc32_mbs = __MBSTATE_INIT;
 )]
@@ -144,7 +144,7 @@ mbrtoc32:(char32_t *__restrict pc32,
 
 [std]
 [impl_include("<parts/errno.h>")]
-[dependency_include(<bits/mbstate.h>)]
+[dependency_include("<bits/mbstate.h>")]
 [impl_prefix(
 @__LOCAL_LIBC_DATA@(c16rtomb_mbs) __mbstate_t c16rtomb_mbs = __MBSTATE_INIT;
 )]
@@ -189,7 +189,7 @@ error_ilseq:
 
 [std]
 [impl_include("<parts/errno.h>")]
-[dependency_include(<bits/mbstate.h>)]
+[dependency_include("<bits/mbstate.h>")]
 c32rtomb:(char *__restrict s, char32_t c32, __mbstate_t *__restrict mbs) -> size_t {
 	if (!s) {
 		if (mbs)

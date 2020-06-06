@@ -158,12 +158,12 @@ struct __EPOLL_PACKED epoll_event {
 @@The "size" parameter is a hint specifying the number of file
 @@descriptors to be associated with the new instance. The fd
 @@returned by epoll_create() should be closed with close()
-[ATTR_WUNUSED] epoll_create:(int size) -> $fd_t;
+[[ATTR_WUNUSED]] epoll_create:(int size) -> $fd_t;
 
 @@Same as epoll_create but with an FLAGS parameter.
 @@The unused SIZE parameter has been dropped
 @@@param: flags: Set of `EPOLL_*'
-[ATTR_WUNUSED] epoll_create1:(int flags) -> $fd_t;
+[[ATTR_WUNUSED]] epoll_create1:(int flags) -> $fd_t;
 
 
 @@Manipulate an epoll instance "epfd". Returns 0 in case of success,

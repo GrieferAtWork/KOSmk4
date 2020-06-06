@@ -225,7 +225,7 @@ fallocate64:($fd_t fd, int mode, $off64_t offset, $off64_t length) -> int {
 [[vartypes(void *), guard, decl_include("<bits/types.h>"), export_alias(__fcntl)]]
 fcntl:($fd_t fd, int cmd, ...) -> __STDC_INT_AS_SSIZE_T;
 
-%[default_impl_section(.text.crt.io.access)]
+%[default_impl_section(".text.crt.io.access")]
 
 [[ignore, vartypes($mode_t), decl_include("<bits/types.h>")]]
 [[nocrt, alias(open, _open, __open)]][[cp, ATTR_WUNUSED]]

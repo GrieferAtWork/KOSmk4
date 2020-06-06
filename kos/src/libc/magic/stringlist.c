@@ -53,7 +53,7 @@ typedef struct @_stringlist@ {
 
 
 @@Allocates and returns a new StringList object. Upon error, `NULL' is returned
-[ATTR_WUNUSED][decl_prefix(DEFINE_STRINGLIST)][userimpl]
+[[ATTR_WUNUSED]][decl_prefix(DEFINE_STRINGLIST)][userimpl]
 [requires($has_function(malloc) && $has_function(free))]
 sl_init:() -> struct _stringlist * {
 	struct _stringlist *result;
@@ -107,6 +107,8 @@ sl_free:([[nullable]] struct _stringlist *sl, int all) {
 	}
 	free(sl);
 }
+
+%[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 @@Search for `NAME' within the given StringList. Upon success,
 @@return a pointer to the equivalent string within `SL' (i.e. the

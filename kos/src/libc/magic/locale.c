@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_ccompat_header(clocale)]
+%[define_ccompat_header("clocale")]
 %[define_replacement(locale_t = __locale_t)]
 
 %{
