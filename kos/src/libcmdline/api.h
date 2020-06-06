@@ -24,6 +24,6 @@
 
 #include <libcmdline/api.h>
 
-#define CC    LIBCMDLINE_CC
+#define CC LIBCMDLINE_CC
 
 #endif /* !GUARD_LIBCMDLINE_API_H */

@@ -74,8 +74,8 @@ cmdline_decode_argv(char *cmdline, __size_t *pargc _os_heap_gfparg(gfp __DFL(0))
  *             do not mark separate arguments. Additionally, the leading and trailing
  *             "-characters are removed from the generated arguments
  *   - >'a b'< Same as "a b", but with this, you can do >"How's it going"< or
- *             >'I said "Hello"'< instead of having to use >How\'s it going<
- *             and >I said \"Hello\"<
+ *             >'I said "Hello"'< instead of having to use >'How\'s it going'<
+ *             and >"I said \"Hello\""<
  *   - >""<    Special case: When >""< or >''< is encountered, but is surrounded
  *             by whitespace, or the start/end of the commandline, an empty argument
  *             will be emit (see examples below)

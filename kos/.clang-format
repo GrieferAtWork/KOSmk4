@@ -1,21 +1,29 @@
 
 # Find stuff that this format defines incorrectly:
-#  REPLACE:  "\n[ \t]+(?=(?!default|public|private|protected)[a-zA-Z0-9_]+:[ \t]*\n)"  --> "\n"
-#             - Lables that aren't aligned to the left-most column
+#  REPLACE:  "(?<=(|un)likely) \(", "("
+#             - Spaces after [un]likely (caused by 'SpaceBeforeParens: ControlStatements'),
+#               though with LLVM9, the produced formatting was waaay worse than this :)
 #  REPLACE:  "}[ \t]*\n[ \t]+(?=\bEXCEPT\b)" --> "} "
 #             - EXCEPT on a new line
-#  REPLACE:  "}\n[ \t]*else" --> "} else"
-#             - Else on a new line (happens after `if (un)likely')
-#  FIND:     "\n\t*((__|)(un)likely(_untraced|))"
-#             - if-(un)likely pairs that were split onto multiple lines
 #  FIND:     "\t/\*[^\n]*\n [ ]+\*"
 #             - Block-comments that need to be re-aligned
+#
+# Really though: there needs to be a simple directive to perform
+# finalizing regex-based text replacement on otherwise already
+# formatted source code:
+# >> RegexReplacements:
+# >>   - Regex:       '(?<=(|un)likely) \('
+# >>     Replacement: '('
+# >>   - Regex:       '}[ \t]*\n[ \t]+(?=\bEXCEPT\b)'
+# >>     Replacement: '} '
 
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: true
+# AlignConsecutiveBitFields: true
 AlignConsecutiveDeclarations: false
-AlignEscapedNewlines: false
+AlignConsecutiveMacros: true
+AlignEscapedNewlines: Left
 AlignOperands: true
 AlignTrailingComments: true
 AllowAllArgumentsOnNextLine: false
@@ -23,6 +31,7 @@ AllowAllConstructorInitializersOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: true
+# AllowShortEnumsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: All
@@ -33,7 +42,6 @@ AlwaysBreakTemplateDeclarations: No
 BinPackArguments: true
 BinPackParameters: true
 ExperimentalAutoDetectBinPacking: true
-BreakBeforeBraces: Custom
 BraceWrapping:
   AfterCaseLabel: false
   AfterClass: false
@@ -47,12 +55,15 @@ BraceWrapping:
   AfterExternBlock: false
   BeforeCatch: false
   BeforeElse: false
+  # BeforeLambdaBody: false
+  # BeforeWhile: false
   IndentBraces: false
   SplitEmptyFunction: false
   SplitEmptyRecord: false
   SplitEmptyNamespace: false
 BreakAfterJavaFieldAnnotations: true
 BreakBeforeBinaryOperators: None
+BreakBeforeBraces: Custom
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeComma
 BreakInheritanceList: BeforeComma
@@ -64,6 +75,7 @@ ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 0
 Cpp11BracedListStyle: false
+DeriveLineEnding: true
 DerivePointerAlignment: false
 DisableFormat: false
 ExperimentalAutoDetectBinPacking: false
@@ -90,6 +102,7 @@ IncludeCategories:
     Priority:        8
 IncludeIsMainRegex: '$'
 IndentCaseLabels: false
+IndentGotoLabels: false
 IndentPPDirectives: None
 IndentWidth: 4
 IndentWrappedFunctionNames: false
@@ -123,22 +136,17 @@ SpaceBeforeCtorInitializerColon: false
 SpaceBeforeInheritanceColon: false
 SpaceBeforeParens: ControlStatements
 SpaceBeforeRangeBasedForLoopColon: false
+SpaceInEmptyBlock: true
 SpaceInEmptyParentheses: false
 SpacesBeforeTrailingComments: 1
 SpacesInAngles: false
 SpacesInCStyleCastParentheses: false
+SpacesInConditionalStatement: false
 SpacesInContainerLiterals: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
-StatementMacros:
-  - likely
-  - unlikely
-  - likely_untraced
-  - unlikely_untraced
-  - __likely
-  - __unlikely
-  - __likely_untraced
-  - __unlikely_untraced
 Standard: Cpp03
 TabWidth: 4
+TypenameMacros: ['ATREE_HEAD', 'ATREE_NODE', 'ATREE_NODE_SINGLE', 'ATREE_XNODE', 'ATREE_SEMI_T', 'SLIST', 'SLIST_NODE', 'LLIST', 'LLIST_NODE', 'DLIST', 'DLIST_NODE']
+UseCRLF: false
 UseTab: ForIndentation

@@ -42,16 +42,16 @@
  * locked away behind various feature macros (us being libc,
  * we obviously want access to anything we intend on defining,
  * so we make our job simple by unlocking everything) */
-#define _KOS_SOURCE 1
-#define _KOS_KERNEL_SOURCE 1
+#define _KOS_SOURCE         1
+#define _KOS_KERNEL_SOURCE  1
 #define _STRING_BWLQ_SOURCE 1
 #define _STRING_XCHR_SOURCE 1
 #define _CTYPE_MACRO_SOURCE 1
-#define _DOS_SOURCE 1
-#define _BSD_SOURCE 1
-#define _SVID_SOURCE 1
-#define _GNU_SOURCE 1
-#define _LARGEFILE_SOURCE 1
+#define _DOS_SOURCE         1
+#define _BSD_SOURCE         1
+#define _SVID_SOURCE        1
+#define _GNU_SOURCE         1
+#define _LARGEFILE_SOURCE   1
 
 /* Must load headers in 32-bit time/file-offset mode, so-as to prevent
  * any symbol re-directions from happening, which might otherwise screw
@@ -90,13 +90,13 @@
 #define __CRT_HAVE_unicode_utf8seqlen 1
 
 /* Indicate that we have support for all of the different assert functions. */
-#define __CRT_HAVE___afail 1
-#define __CRT_HAVE___afailf 1
-#define __CRT_HAVE___assert 1
+#define __CRT_HAVE___afail       1
+#define __CRT_HAVE___afailf      1
+#define __CRT_HAVE___assert      1
 #define __CRT_HAVE___assert_fail 1
 #define __CRT_HAVE___assert_func 1
-#define __CRT_HAVE___assertfail 1
-#define __CRT_HAVE__assert 1
+#define __CRT_HAVE___assertfail  1
+#define __CRT_HAVE__assert       1
 
 /* Do some quick probing if crt linkage was configured correctly */
 #ifndef __CRT_HAVE_memmove
@@ -165,18 +165,20 @@
 
 #include <errno.h>
 #include <parts/errno.h>
-#define libc_seterrno_syserr(e)       (likely(!E_ISERR(e)) ? (e) : libc_seterrno((errno_t)-(syscall_slong_t)(syscall_ulong_t)(e)))
-#define libc_seterrno_syserr2(e, ERR) (likely(!E_ISERR(e)) ? (e) : (libc_seterrno((errno_t) - (syscall_slong_t)(syscall_ulong_t)(e)), (ERR)))
+#define libc_seterrno_syserr(e) \
+	(likely(!E_ISERR(e)) ? (e) : libc_seterrno((errno_t) - (syscall_slong_t)(syscall_ulong_t)(e)))
+#define libc_seterrno_syserr2(e, ERR) \
+	(likely(!E_ISERR(e)) ? (e) : (libc_seterrno((errno_t) - (syscall_slong_t)(syscall_ulong_t)(e)), (ERR)))
 #define ISSEP(x)           ((x) == '/') /* TODO: In DOS-mode, `\\' must also be accepted */
 #define GET_PATHLIST_SEP() ':'          /* TODO: In DOS-mode, `;' must be used */
 
 
-#define ATTR_MALL_DEFAULT_ALIGNED   __ATTR_MALL_DEFAULT_ALIGNED
-#define ATTR_MALL_PAGEALIGNED       __ATTR_MALL_PAGEALIGNED
+#define ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALL_DEFAULT_ALIGNED
+#define ATTR_MALL_PAGEALIGNED     __ATTR_MALL_PAGEALIGNED
 
 /* Attribute for global data that is mostly read from */
 #ifndef ATTR_READMOSTLY
-#define ATTR_READMOSTLY   ATTR_SECTION(".data.read_mostly")
+#define ATTR_READMOSTLY ATTR_SECTION(".data.read_mostly")
 #endif /* !ATTR_READMOSTLY */
 
 
@@ -234,7 +236,7 @@ INTDEF void LIBCCALL libc_unimplemented(char const *__restrict name);
 #undef __libc_seterrno
 #undef __errno_location
 #define __libc_geterrno_or(alt) alt
-#define __libc_seterrno(v) (void)0
+#define __libc_seterrno(v)      (void)0
 #endif /* __KERNEL__ */
 
 
