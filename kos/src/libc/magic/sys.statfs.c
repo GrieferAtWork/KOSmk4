@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.fs.statfs.statfs)]
+%[default_impl_section(".text.crt.fs.statfs.statfs")]
 
 %{
 #include <features.h>
@@ -53,25 +53,25 @@ __SYSDECL_BEGIN
 }
 
 @@Return information about the filesystem on which FILE resides
-[alternate_name(__statfs), no_crt_self_import]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(statfs, __statfs)]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(statfs64)]
-statfs:([[nonnull]] char const *file, [[nonnull]] struct statfs *buf) -> int;
+[[export_as("__statfs"), no_crt_self_import]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("statfs", "__statfs")]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("statfs64")]]
+int statfs([[nonnull]] char const *file, [[nonnull]] struct statfs *buf);
 
 @@Return information about the filesystem containing the file FILDES refers to
-[no_crt_self_import]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fstatfs)]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(fstatfs64)]
-fstatfs:($fd_t filedes, [[nonnull]] struct statfs *buf) -> int;
+[[no_crt_self_import]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fstatfs")]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fstatfs64")]]
+int fstatfs($fd_t filedes, [[nonnull]] struct statfs *buf);
 
 %
 %#ifdef __USE_LARGEFILE64
 %#ifndef statfs64
-[statfs64_variant_of(statfs)]
-statfs64:([[nonnull]] const char *file, [[nonnull]] struct statfs64 *buf) -> int;
+[[statfs64_variant_of(statfs)]]
+int statfs64([[nonnull]] const char *file, [[nonnull]] struct statfs64 *buf);
 %#endif /* !statfs64 */
-[statfs64_variant_of(fstatfs)]
-fstatfs64:($fd_t filedes, [[nonnull]] struct statfs64 *buf) -> int;
+[[statfs64_variant_of(fstatfs)]]
+int fstatfs64($fd_t filedes, [[nonnull]] struct statfs64 *buf);
 %#endif /* __USE_LARGEFILE64 */
 
 

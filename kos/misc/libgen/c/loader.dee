@@ -41,7 +41,7 @@ import Function from .cheaders;
  * >> } */
 
 
-/* How [wchar] and associated %{uchar} functions are handled:
+/* How [[wchar]] and associated %{uchar} functions are handled:
  * >> [[wchar, ATTR_WUNUSED]]
  * >> size_t wcslen([[nonnull]] wchar_t const *__restrict str) {
  * >> 	size_t result = 0;
@@ -64,8 +64,8 @@ import Function from .cheaders;
  * >> }
  * >>
  * >>
- * >> [[if(__SIZEOF_WCHAR_T__ == 2), alias(wcslen)]][[alias(DOS$wcslen)]]
- * >> [[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(wcslen)]][[nocrt]][[ATTR_WUNUSED]]
+ * >> [[if(__SIZEOF_WCHAR_T__ == 2), alias(wcslen), alias(DOS$wcslen)]]
+ * >> [[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(wcslen), nocrt, ATTR_WUNUSED]]
  * >> size_t c16len([[nonnull]] char16_t const *__restrict str) {
  * >> 	size_t result = 0;
  * >> 	while (str[result])
@@ -73,8 +73,8 @@ import Function from .cheaders;
  * >> 	return result;
  * >> }
  * >>
- * >> [[if(__SIZEOF_WCHAR_T__ == 4), alias(wcslen)]][[alias(KOS$wcslen)]]
- * >> [[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(wcslen)]][[nocrt]][[ATTR_WUNUSED]]
+ * >> [[if(__SIZEOF_WCHAR_T__ == 4), alias(wcslen), alias(KOS$wcslen)]]
+ * >> [[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(wcslen), nocrt, ATTR_WUNUSED]]
  * >> size_t c32len([[nonnull]] char32_t const *__restrict str) {
  * >> 	size_t result = 0;
  * >> 	while (str[result])
@@ -818,7 +818,7 @@ class FunctionFeatures {
 
 	/* Declaration features */
 	public member decl: UserString | string = "__LIBC";              /* [decl(...)]             Declaration prefix */
-	public member std: bool = false;                                 /* [std]                   Expose as part of the std:: namespace */
+	public member std: bool = false;                                 /* [[std]]                   Expose as part of the std:: namespace */
 	public member namespaces: {string...} = ("",);                   /* [[no_]ignore]           Namespaces from which to import the function */
 	public member libc: bool = false;                                /* [[no_]libc]             Export in <libc/string.h> */
 	public member inline: UserString | string | none = none;         /* [[no_]inline]           Use the associated body for inline implementations, rather than including <local/...> headers */
@@ -2100,7 +2100,7 @@ again_parse_default_annotation:
 		local b = parseCStringOrAllUntilRParen(self);
 		local ok, oldDecl = keywordMacros.setnew_ex(a, b)...;
 		if (!ok) {
-			if (oldDecl !is string) {
+			if (oldDecl !is string && oldDecl !is UserString) {
 				self.err("macro re-definition: {!r} defined as {!r} (was: <Custom Function>)"
 					.format({ a, b }));
 			} else if (oldDecl != b) {
@@ -2355,7 +2355,7 @@ function loadSystemHeaderDefinitions(
 		local currentFeatures = copy context.defaultFeatures;
 		local current = Function(originalSystemHeaderName: headerName);
 		local currentPrototype = FunctionPrototype(cc: DEFAULT_CC, nothrow: DEFAULT_NOTHROW);
-		local currentPrototypes = { ("1", { currentPrototype }) };
+		local currentPrototypes = [("1", { currentPrototype })];
 		local currentLibraryFunction = LibraryFunction(originalSystemHeaderName: headerName);
 		local currentDosLibraryFunction: LibraryFunction = none;
 		/* # of leading entires in @current.bindings that should appear before the self-binding */
@@ -2987,7 +2987,7 @@ again_skip_annotation_rbracket:
 					self.getUserString(returnTypeStart, returnTypeEnd));
 			}
 		}
-		print("Function: ", headerName, "::", currentName);
+//		print("Function: ", headerName, "::", currentName);
 
 		/* Bind the function against its own symbol */
 		if (!currentFeatures.crt_noSelfImport) {
@@ -3119,7 +3119,7 @@ again_skip_annotation_rbracket:
 			}
 		} else { /* currentFeatures.wchar */
 			if (currentFeatures.crt_dosname !== context.defaultFeatures.crt_dosname) {
-				self.err("Function {!r} has a [dosname()] annotation, but no [wchar]"
+				self.err("Function {!r} has a [dosname()] annotation, but no [[wchar]]"
 					.format({ currentName }));
 			}
 		} /* !currentFeatures.wchar */
@@ -3236,19 +3236,9 @@ again_skip_annotation_rbracket:
 				if (tok != "[")
 					break;
 			}
-			local newCurrentPrototypes = {
+			currentPrototypes.insert(0,
 				("defined(__cplusplus) && defined(__CORRECT_ISO_CPP_{}_H_PROTO)"
-					.format({ headerName.upper() }), cxxPrototypes),
-				("1", { currentPrototype })
-			};
-			/* When updating `currentPrototypes', must also update
-			 * all `current.bindings' that were already using those
-			 * the current set of prototypes  */
-			for (local binding: current.bindings) {
-				if (binding.prototypes === currentPrototypes)
-					binding.prototypes = newCurrentPrototypes;
-			}
-			currentPrototypes = newCurrentPrototypes;
+					.format({ headerName.upper() }), cxxPrototypes));
 		}
 
 		/* Right now, @tok points at the first token after the prototype
@@ -3595,7 +3585,7 @@ got_chkExpr:
 				case "uchar32": {
 					local mode = tok;
 					if (currentFeatures.wchar) {
-						self.err("uchar function {!r} cannot have the [wchar] annotation"
+						self.err("uchar function {!r} cannot have the [[wchar]] annotation"
 							.format({ currentName }));
 					}
 					local wcsFunctionName = none;
@@ -3673,11 +3663,11 @@ got_chkExpr:
 						 * This is important for dynamic implementation transformations. */
 						if (wcharFunction.wc_header_uchar[mode] !is none) {
 							self.errAt(currentNameTokStart,
-								"Duplicate declaration of %{{uchar{}}} variant of [wchar] function {!r}"
+								"Duplicate declaration of %{{uchar{}}} variant of [[wchar]] function {!r}"
 								.format({ WCHAR_REPLACEMENT_WIDTH[mode], wcsFunctionName }));
 						}
 						wcharFunction.wc_header_uchar[mode] = current;
-						@@The referenced [wchar]-Function
+						@@The referenced [[wchar]]-Function
 						local wc: Function = wcharFunction.wc_func;
 						@@The Xchar-function implementation
 						local xc: XcharImplementation = wcharFunction.getXCharImplementation(currentName, mode);
@@ -3688,7 +3678,7 @@ got_chkExpr:
 							usedPrototype = xc.prototype;
 						if (usedPrototypes is none)
 							usedPrototypes = xc.prototypes;
-						/* Enumerate bindings of the underlying [wchar] Function to construct
+						/* Enumerate bindings of the underlying [[wchar]] Function to construct
 						 * new, transformed bindings for our new the Xchar function. */
 						local basicBindings = [];
 						for (local wc_bind/*:FunctionBinding*/ : wc.functionBindings) {
@@ -3962,7 +3952,7 @@ with_primaryImplementation:
 					wc_prototype:  currentPrototype,
 					wc_prototypes: currentPrototypes);
 				if (currentName in allWcharFunctionsByName)
-					self.errAt(currentNameTokStart, "Duplicate [wchar] function {!r}"
+					self.errAt(currentNameTokStart, "Duplicate [[wchar]] function {!r}"
 						.format({ currentName }));
 				allWcharFunctionsByName[currentName] = wcsCurrent;
 			}
@@ -4080,7 +4070,7 @@ done_currentLibraryFunction:
 		case "=": {
 handle_eq_after_prototype:
 			if (currentFeatures.wchar)
-				self.err("[wchar] cannot be used with alias bindings");
+				self.err("[[wchar]] cannot be used with alias bindings");
 			currentFeatures.assertAllDefaultAttributesWithoutImplementation(
 				self, context.defaultFeatures, currentName);
 			currentFeatures.assertAllSymbolicAliasOnly(
@@ -4217,7 +4207,7 @@ done_function:
 			if (currentFeatures.std) {
 				if (context.result_order_headerStd is none) {
 					self.errAt(currentNameTokStart,
-						"Function {!r} was marked as `[std]', but "
+						"Function {!r} was marked as `[[std]]', but "
 						"'%[insert:std]' hasn't been encountered, yet"
 						.format({ currentName }));
 				}

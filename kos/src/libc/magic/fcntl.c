@@ -228,7 +228,7 @@ fcntl:($fd_t fd, int cmd, ...) -> __STDC_INT_AS_SSIZE_T;
 %[default_impl_section(".text.crt.io.access")]
 
 [[ignore, vartypes($mode_t), decl_include("<bits/types.h>")]]
-[[nocrt, alias(open, _open, __open)]][[cp, ATTR_WUNUSED]]
+[[nocrt, alias(open, _open, __open), cp, ATTR_WUNUSED]]
 open32:([[nonnull]] char const *filename, $oflag_t oflags, ...) -> $fd_t;
 
 
@@ -252,7 +252,7 @@ open:([[nonnull]] char const *filename, $oflag_t oflags, ...) -> $fd_t {
 
 [[cp, guard, ATTR_WUNUSED, no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias(creat64)]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(creat)]][[alias(_creat)]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(creat), alias(_creat)]]
 [[userimpl, requires_function(creat64, open)]]
 [[impl_include(<bits/fcntl.h>), decl_include("<bits/types.h>")]]
 creat:([[nonnull]] char const *filename, $mode_t mode) -> $fd_t {

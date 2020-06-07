@@ -211,7 +211,7 @@ globfree([[nonnull]] glob_t *pglob) {
 
 %
 %#ifdef __USE_LARGEFILE64
-[doc_alias(glob)][decl_prefix(struct __glob64_struct;)][userimpl]
+[doc_alias(glob)][decl_prefix(struct __glob64_struct;)][[userimpl]]
 glob64:([[nonnull]] const char *__restrict pattern, int flags,
         [[nullable]] __glob_errfunc_t errfunc,
         [[nonnull]] struct __glob64_struct *__restrict pglob) -> int {

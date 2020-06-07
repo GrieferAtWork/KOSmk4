@@ -92,7 +92,7 @@ __LIBC int error_one_per_line;
 [[ATTR_LIBC_PRINTF(3, 4), fast, libc, userimpl, throws]]
 [decl_include("<bits/types.h>")]
 [impl_include("<local/stdstreams.h>")]
-[requires_include("<__crt.h>")]
+[[requires_include("<__crt.h>")]]
 [requires_include(<local/program_invocation_name.h>)]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
           $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
@@ -131,10 +131,10 @@ error:(int status, $errno_t errnum, const char *format, ...) {
 @@The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
 @@Additionally, when `error_one_per_line' is non-zero, consecutive calls to this function that
 @@pass the same values for `filename' and `line' will not produce the error message.
-[ATTR_LIBC_PRINTF(5, 6)][fast][libc][userimpl][throws]
+[ATTR_LIBC_PRINTF(5, 6)][[fast, libc, userimpl]][throws]
 [decl_include("<bits/types.h>")]
 [impl_include("<local/stdstreams.h>")]
-[requires_include("<__crt.h>")]
+[[requires_include("<__crt.h>")]]
 [requires_include(<local/program_invocation_name.h>)]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
           $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&

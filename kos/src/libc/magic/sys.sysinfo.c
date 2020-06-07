@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.system.info)]
+%[default_impl_section(".text.crt.system.info")]
 
 %{
 #include <features.h>
@@ -30,11 +30,11 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 }
 
-[[cp]] sysinfo:([[nonnull]] struct sysinfo *info) -> int;
-[[cp]][[ATTR_WUNUSED]] get_nprocs_conf:() -> int;
-[[cp]][[ATTR_WUNUSED]] get_nprocs:() -> int;
-[[cp]][[ATTR_WUNUSED]] get_phys_pages:() -> __INTPTR_TYPE__;
-[[cp]][[ATTR_WUNUSED]] get_avphys_pages:() -> __INTPTR_TYPE__;
+[[cp]] int sysinfo([[nonnull]] struct sysinfo *info);
+[[cp, ATTR_WUNUSED]] int get_nprocs_conf();
+[[cp, ATTR_WUNUSED]] int get_nprocs();
+[[cp, ATTR_WUNUSED]] __INTPTR_TYPE__ get_phys_pages();
+[[cp, ATTR_WUNUSED]] __INTPTR_TYPE__ get_avphys_pages();
 
 %{
 #endif /* __CC__ */

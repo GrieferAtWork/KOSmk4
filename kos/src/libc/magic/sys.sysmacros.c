@@ -21,7 +21,7 @@
 %[define_replacement(major_t = __major_t)]
 %[define_replacement(minor_t = __minor_t)]
 %[define_replacement(dev_t = __dev_t)]
-%[default_impl_section(.text.crt.system.utility)]
+%[default_impl_section(".text.crt.system.utility")]
 
 %{
 #include <features.h>
@@ -33,18 +33,18 @@ __SYSDECL_BEGIN
 
 }
 
-[ATTR_CONST][ATTR_NOTHROW][[ATTR_WUNUSED]]
-gnu_dev_major:($dev_t dev) -> $major_t {
+[[ATTR_CONST, ATTR_WUNUSED, nothrow]]
+$major_t gnu_dev_major($dev_t dev) {
 	return (major_t)((uintptr_t)dev >> 20);
 }
 
-[ATTR_CONST][ATTR_NOTHROW][[ATTR_WUNUSED]]
-gnu_dev_minor:($dev_t dev) -> $minor_t {
+[[ATTR_CONST, ATTR_WUNUSED, nothrow]]
+$minor_t gnu_dev_minor($dev_t dev) {
 	return (minor_t)((uintptr_t)dev & ((1 << 20) - 1));
 }
 
-[ATTR_CONST][ATTR_NOTHROW][[ATTR_WUNUSED]]
-gnu_dev_makedev:($major_t major, $minor_t minor) -> $dev_t {
+[[ATTR_CONST, ATTR_WUNUSED, nothrow]]
+$dev_t gnu_dev_makedev($major_t major, $minor_t minor) {
 	return (dev_t)major << 20 | (dev_t)minor;
 }
 

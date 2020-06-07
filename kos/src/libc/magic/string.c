@@ -171,10 +171,10 @@ typedef size_t rsize_t;
 
 @@Copy memory between non-overlapping memory blocks.
 @@@return: * : Always re-returns `dst'
-[fast][libc][kernel][std][ATTR_LEAF]
-memcpy:([[nonnull]] void *__restrict dst,
-        [[nonnull]] void const *__restrict src,
-        size_t n_bytes) -> [[[== dst]]] void * {
+[[fast, libc, kernel, std, ATTR_LEAF]]
+[[nonnull]] void *memcpy([[nonnull]] void *__restrict dst,
+                         [[nonnull]] void const *__restrict src,
+                         size_t n_bytes) {
 	byte_t *pdst = (byte_t *)dst;
 	byte_t *psrc = (byte_t *)src;
 	while (n_bytes--)
@@ -185,10 +185,10 @@ memcpy:([[nonnull]] void *__restrict dst,
 
 @@Move memory between potentially overlapping memory blocks.
 @@@return: * : Always re-returns `dst'
-[fast][libc][kernel][std][ATTR_LEAF]
-memmove:([[nonnull]] void *dst,
-         [[nonnull]] void const *src,
-         size_t n_bytes) -> [[[== dst]]] void * {
+[[fast, libc, kernel, std, ATTR_LEAF]]
+[[nonnull]] void *memmove([[nonnull]] void *dst,
+                          [[nonnull]] void const *src,
+                          size_t n_bytes) {
 	byte_t *pdst, *psrc;
 	if (dst <= src) {
 		pdst = (byte_t *)dst;
@@ -206,9 +206,9 @@ memmove:([[nonnull]] void *dst,
 
 @@Fill memory with a given byte
 @@@return: * : Always re-returns `dst'
-[fast][libc][kernel][std][ATTR_LEAF]
-memset:([[nonnull]] void *__restrict dst,
-        int byte, size_t n_bytes) -> [[[== dst]]] void * {
+[[fast, libc, kernel, std, ATTR_LEAF]]
+[[nonnull]] void *memset([[nonnull]] void *__restrict dst,
+                         int byte, size_t n_bytes) {
 	byte_t *pdst = (byte_t *)dst;
 	while (n_bytes--)
 		*pdst++ = (byte_t)byte;
@@ -219,9 +219,10 @@ memset:([[nonnull]] void *__restrict dst,
 @@@return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
 @@@return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
 @@@return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes'
-[fast][libc][kernel][alias(bcmp)][std][[ATTR_WUNUSED, ATTR_PURE]]
-memcmp:([[nonnull]] void const *s1,
-        [[nonnull]] void const *s2, size_t n_bytes) -> int {
+[[std, libc, fast, kernel, ATTR_WUNUSED, ATTR_PURE, alias("bcmp")]]
+[[if(!defined(__KERNEL__)), export_as("bcmp")]]
+int memcmp([[nonnull]] void const *s1,
+           [[nonnull]] void const *s2, size_t n_bytes) {
 	byte_t *p1 = (byte_t *)s1;
 	byte_t *p2 = (byte_t *)s2;
 	byte_t v1, v2;
@@ -232,7 +233,7 @@ memcmp:([[nonnull]] void const *s1,
 }
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][std][[ATTR_WUNUSED, ATTR_PURE]]
+[[fast, libc, kernel, std, ATTR_WUNUSED, ATTR_PURE]]
 void *memchr([[nonnull]] void const *__restrict haystack, int needle, size_t n_bytes)
 	[([[nonnull]] void *__restrict haystack, int needle, size_t n_bytes): void *]
 	[([[nonnull]] void const *__restrict haystack, int needle, size_t n_bytes): void const *]
@@ -251,14 +252,14 @@ void *memchr([[nonnull]] void const *__restrict haystack, int needle, size_t n_b
 %(libc_fast)#define __libc_strlen(string) (__builtin_constant_p(string) ? __builtin_strlen(string) : __libc_core_strlen(string))
 %(libc_fast)#else /* __LIBC_BIND_OPTIMIZATIONS && !__NO_builtin_constant_p && __builtin_strlen && __CRT_HAVE_strlen */
 @@Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')')
-[libc][kernel][std][[ATTR_WUNUSED, ATTR_PURE]]
-strlen:([[nonnull]] char const *__restrict string) -> size_t {
+[[libc, kernel, std, ATTR_WUNUSED, ATTR_PURE]]
+size_t strlen([[nonnull]] char const *__restrict string) {
 	return (size_t)(strend(string) - string);
 }
 %(libc_fast)#endif /* !__LIBC_BIND_OPTIMIZATIONS || __NO_builtin_constant_p || !__builtin_strlen || !__CRT_HAVE_strlen */
 
 @@Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found.
-[libc][kernel][std][[ATTR_WUNUSED, ATTR_PURE]][crtbuiltin]
+[[libc, kernel, std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
 char *strchr([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): char *]
 	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
@@ -271,7 +272,7 @@ char *strchr([[nonnull]] char const *__restrict haystack, int needle)
 }
 
 @@Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found.
-[std][[ATTR_WUNUSED, ATTR_PURE]][crtbuiltin]
+[[std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
 char *strrchr([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): char *]
 	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
@@ -285,7 +286,7 @@ char *strrchr([[nonnull]] char const *__restrict haystack, int needle)
 }
 
 @@Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical
-[libc][kernel][std][[ATTR_WUNUSED, ATTR_PURE]][crtbuiltin]
+[[libc, kernel, std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
 int strcmp([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 	char c1, c2;
 	do {
@@ -296,9 +297,9 @@ int strcmp([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 }
 
 @@Same as `strcmp', but compare at most `MAXLEN' characters from either string
-[std][[ATTR_WUNUSED, ATTR_PURE]][crtbuiltin]
-strncmp:([[nonnull]] char const *s1,
-         [[nonnull]] char const *s2, size_t maxlen) -> int {
+[[std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+int strncmp([[nonnull]] char const *s1,
+            [[nonnull]] char const *s2, size_t maxlen) {
 	char c1, c2;
 	do {
 		if (!maxlen--)
@@ -311,10 +312,10 @@ strncmp:([[nonnull]] char const *s1,
 
 @@Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
 @@If no such needle exists, return `NULL'
-[std][[ATTR_WUNUSED, ATTR_PURE]][crtbuiltin]
-strstr:([[nonnull]] char const *haystack, [[nonnull]] char const *needle) -> char *
-	[([[nonnull]] char *haystack, [[nonnull]] char *needle) -> char *]
-	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle) -> char const *]
+[[std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+char *strstr([[nonnull]] char const *haystack, [[nonnull]] char const *needle)
+	[([[nonnull]] char *haystack, [[nonnull]] char *needle): char *]
+	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle): char const *]
 {
 	char ch, needle_start = *needle++;
 	while ((ch = *haystack++) != '\0') {
@@ -335,32 +336,32 @@ miss:
 }
 
 
-[std][crtbuiltin][ATTR_LEAF]
-strcpy:([[nonnull]] char *__restrict buf,
-        [[nonnull]] char const *__restrict src) -> [== buf] char * {
+[[std, crtbuiltin, ATTR_LEAF]]
+[[nonnull]] char *strcpy([[nonnull]] char *__restrict buf,
+                         [[nonnull]] char const *__restrict src) {
 	return (char *)memcpy(buf, src, (strlen(src) + 1) * sizeof(char));
 }
 
-[std][crtbuiltin][ATTR_LEAF]
-strncpy:([[nonnull]] char *__restrict buf,
-         [[nonnull]] char const *__restrict src, size_t buflen) -> [== buf] char * {
+[[std, crtbuiltin, ATTR_LEAF]]
+[[nonnull]] char *strncpy([[nonnull]] char *__restrict buf,
+                          [[nonnull]] char const *__restrict src, size_t buflen) {
 	size_t srclen = strnlen(src, buflen);
 	memcpy(buf, src, srclen * sizeof(char));
 	memset(buf + srclen, '\0', (buflen - srclen) * sizeof(char));
 	return buf;
 }
 
-[std][crtbuiltin][ATTR_LEAF]
-strcat:([[nonnull]] char *__restrict buf,
-        [[nonnull]] char const *__restrict src) -> [== buf] char * {
+[[std, crtbuiltin, ATTR_LEAF]]
+[[nonnull]] char *strcat([[nonnull]] char *__restrict buf,
+                         [[nonnull]] char const *__restrict src) {
 	memcpy(strend(buf), src, (strlen(src) + 1) * sizeof(char));
 	return buf;
 }
 
-[std][crtbuiltin][ATTR_LEAF]
-strncat:([[nonnull]] char *__restrict buf,
-         [[nonnull]] char const *__restrict src,
-         size_t buflen) -> [== buf] char * {
+[[std, crtbuiltin, ATTR_LEAF]]
+[[nonnull]] char *strncat([[nonnull]] char *__restrict buf,
+                          [[nonnull]] char const *__restrict src,
+                          size_t buflen) {
 	size_t srclen = strnlen(src, buflen);
 	char *dst = strend(buf);
 	memcpy(dst, src, srclen * sizeof(char));
@@ -368,28 +369,28 @@ strncat:([[nonnull]] char *__restrict buf,
 	return buf;
 }
 
-[std][[ATTR_WUNUSED, ATTR_PURE]][crtbuiltin]
-strcspn:([[nonnull]] char const *haystack,
-         [[nonnull]] char const *reject) -> size_t {
+[[std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+size_t strcspn([[nonnull]] char const *haystack,
+               [[nonnull]] char const *reject) {
 	char const *iter = haystack;
 	while (*iter && !strchr(reject, *iter))
 		++iter;
 	return (size_t)(iter - haystack);
 }
 
-[std][[ATTR_WUNUSED, ATTR_PURE]][crtbuiltin]
-strspn:([[nonnull]] char const *haystack,
-        [[nonnull]] char const *accept) -> size_t {
+[[std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+size_t strspn([[nonnull]] char const *haystack,
+              [[nonnull]] char const *accept) {
 	char const *iter = haystack;
 	while (strchr(accept, *iter))
 		++iter;
 	return (size_t)(iter - haystack);
 }
 
-[std][[ATTR_WUNUSED, ATTR_PURE]][crtbuiltin]
-strpbrk:([[nonnull]] char const *haystack, [[nonnull]] char const *accept) -> char *
-	[([[nonnull]] char *haystack, [[nonnull]] char const *accept) -> char *]
-	[([[nonnull]] char const *haystack, [[nonnull]] char const *accept) -> char const *]
+[[std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+char *strpbrk([[nonnull]] char const *haystack, [[nonnull]] char const *accept)
+	[([[nonnull]] char *haystack, [[nonnull]] char const *accept): char *]
+	[([[nonnull]] char const *haystack, [[nonnull]] char const *accept): char const *]
 {
 	char haych, ch;
 	while ((haych = *haystack++) != '\0') {
@@ -404,31 +405,32 @@ strpbrk:([[nonnull]] char const *haystack, [[nonnull]] char const *accept) -> ch
 }
 
 
-[impl_prefix(
+[[std, impl_prefix(
 @__LOCAL_LIBC_DATA@(save_ptr) char *save_ptr = NULL;
-)][std]
-strtok:(char *string, [[nonnull]] char const *delim) -> char * {
+)]]
+char *strtok(char *string, [[nonnull]] char const *delim) {
 	return strtok_r(string, delim, &save_ptr);
 }
 
-[std][[ATTR_WUNUSED, ATTR_PURE]]
-[section(.text.crt.unicode.static.memory)]
-strcoll:([[nonnull]] char const *s1, [[nonnull]] char const *s2) -> int {
+[[std, ATTR_WUNUSED, ATTR_PURE]]
+[[section(".text.crt.unicode.static.memory")]]
+int strcoll([[nonnull]] char const *s1,
+            [[nonnull]] char const *s2) {
 	return strcmp(s1, s2);
 }
 
-[std][section(.text.crt.unicode.static.memory)]
-strxfrm:(char *dst, [[nonnull]] char const *__restrict src, size_t maxlen) -> size_t {
+[[std, section(".text.crt.unicode.static.memory")]]
+size_t strxfrm(char *dst, [[nonnull]] char const *__restrict src, size_t maxlen) {
 	/* XXX: Implement me */
 	size_t n = strnlen(src, maxlen);
 	memcpy(dst, src, n * sizeof(char));
 	return n;
 }
 
-[std][[ATTR_WUNUSED]][ATTR_COLD][impl_prefix(
+[[std, ATTR_WUNUSED, ATTR_COLD, impl_prefix(
 @__LOCAL_LIBC_DATA@(strerror_buf) char strerror_buf[64] = { 0 };
-)][section(.text.crt.errno)][noexport][user]
-strerror:(int errnum) -> [[nonnull]] char * {
+), section(".text.crt.errno"), userimpl]]
+[[nonnull]] char *strerror(int errnum) {
 	char *result = strerror_buf;
 	char const *string;
 	string = strerror_s(errnum);
@@ -462,8 +464,8 @@ __NAMESPACE_STD_END
 
 %#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 @@Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´)
-[libc][kernel][[ATTR_WUNUSED, ATTR_PURE]][crtbuiltin]
-strnlen:([[nonnull]] char const *__restrict string, $size_t maxlen) -> $size_t {
+[[libc, kernel, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+$size_t strnlen([[nonnull]] char const *__restrict string, $size_t maxlen) {
 	return (size_t)(strnend(string, maxlen) - string);
 }
 %#endif /* __USE_XOPEN2K8 || __USE_DOS */
@@ -471,19 +473,19 @@ strnlen:([[nonnull]] char const *__restrict string, $size_t maxlen) -> $size_t {
 %#ifdef __USE_XOPEN2K8
 
 @@Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´
-[crtbuiltin][alias(__stpcpy)][ATTR_LEAF]
+[[crtbuiltin, ATTR_LEAF, export_alias("__stpcpy")]]
 stpcpy:([[nonnull]] char *__restrict buf,
         [[nonnull]] char const *__restrict src)
-	-> [== buf + strlen(src)] char *
+	-> [[== buf + strlen(src)]] char *
 {
 	return (char *)mempcpy(buf, src, (strlen(src) + 1) * sizeof(char)) - 1;
 }
 
-[crtbuiltin][alias(__stpncpy)][ATTR_LEAF]
+[[crtbuiltin, ATTR_LEAF, export_alias("__stpncpy")]]
 stpncpy:([[nonnull]] char *__restrict buf,
          [[nonnull]] char const *__restrict src,
          $size_t buflen)
-	-> [== buf + strnlen(src, buflen)] char *
+	-> [[== buf + strnlen(src, buflen)]] char *
 {
 	size_t srclen = strnlen(src, buflen);
 	memcpy(buf, src, srclen * sizeof(char));
@@ -491,47 +493,46 @@ stpncpy:([[nonnull]] char *__restrict buf,
 	return buf + srclen;
 }
 
-[alias(*)][attribute(*)] __stpcpy:(*) = stpcpy;
-[alias(*)][attribute(*)] __stpncpy:(*) = stpncpy;
+__stpcpy(*) = stpcpy;
+__stpncpy(*) = stpncpy;
 
-[alias(_strcoll_l)][[ATTR_WUNUSED, ATTR_PURE]]
-[section(.text.crt.unicode.locale.memory)][export_alias(__strcoll_l)]
-strcoll_l:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $locale_t locale) -> int {
+[[ATTR_WUNUSED, ATTR_PURE, export_alias("_strcoll_l", "__strcoll_l")]]
+[[section(".text.crt.unicode.locale.memory")]]
+int strcoll_l([[nonnull]] char const *s1,
+              [[nonnull]] char const *s2,
+              $locale_t locale) {
 	(void)locale;
 	return strcoll(s1, s2);
 }
 
-[alias(_strxfrm_l)][requires($has_function(strxfrm))]
-[section(.text.crt.unicode.locale.memory)][export_alias(__strxfrm_l)]
-strxfrm_l:(char *dst, [[nonnull]] char const *__restrict src,
-           $size_t maxlen, $locale_t locale) -> $size_t {
+[[export_alias("_strxfrm_l", "__strxfrm_l")]]
+[[section(".text.crt.unicode.locale.memory")]]
+$size_t strxfrm_l(char *dst, [[nonnull]] char const *__restrict src,
+                  $size_t maxlen, $locale_t locale) {
 	(void)locale;
 	return strxfrm(dst, src, maxlen);
 }
 
-[requires($has_function(strerror))][noexport][user]
-[ATTR_COLD][[ATTR_WUNUSED]][section(.text.crt.errno)][same_impl]
-strerror_l:(int errnum, $locale_t locale) -> char * {
+[[ATTR_COLD, ATTR_WUNUSED, section(".text.crt.errno")]]
+[[userimpl, requires_function(strerror)]]
+char *strerror_l(int errnum, $locale_t locale) {
 	(void)locale;
 	return strerror(errnum);
 }
-[[ATTR_WUNUSED]] strsignal:(int signo) -> char *;
+[[ATTR_WUNUSED]] char *strsignal(int signo);
 
-[requires_function("malloc")]
-[section(.text.crt.heap.strdup)][crtbuiltin][export_alias(__strndup)]
+[[crtbuiltin, export_alias("__strndup")]]
+[[userimpl, requires_function(malloc), section(".text.crt.heap.strdup")]]
 strndup:([[nonnull]] char const *__restrict string, $size_t max_chars)
-	-> [malloc((strnlen(string, max_chars) + 1) * sizeof(char))] char *
-%{auto_block(any({
-	size_t resultlen = strnlen(string, max_chars);
-	char *result = (char *)malloc((resultlen + 1) * sizeof(char));
-	if likely(result)
-@@if $wchar_function@@
-		*wmempcpy(result, string, resultlen) = '\0';
-@@else@@
-		*(char *)mempcpy(result, string, resultlen * sizeof(char)) = '\0';
-@@endif@@
+	-> [[malloc/*((strnlen(string, max_chars) + 1) * sizeof(char))*/]] char *
+{
+	size_t resultsize = strnlen(string, max_chars) * sizeof(char);
+	char *result = (char *)malloc(resultsize + sizeof(char));
+	if likely(result) {
+		*(char *)mempcpy(result, string, resultsize) = '\0';
+	}
 	return result;
-}))}
+}
 
 
 %{
@@ -539,27 +540,28 @@ strndup:([[nonnull]] char const *__restrict string, $size_t max_chars)
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 }
-[requires_function("malloc")][alias(_strdup)]
-[section(.text.crt.heap.strdup)][same_impl][crtbuiltin][export_alias(__strdup)]
+[[crtbuiltin, export_alias("_strdup", "__strdup")]]
+[[section(".text.crt.heap.strdup")]]
+[[userimpl, requires_function(malloc)]]
 strdup:([[nonnull]] char const *__restrict string)
-	-> [malloc((strlen(string) + 1) * sizeof(char))] char *
-%{auto_block(any({
+	-> [[malloc/*((strlen(string) + 1) * sizeof(char))*/]] char *
+{
 	size_t resultsize = (strlen(string) + 1) * sizeof(char);
 	char *result = (char *)malloc(resultsize);
 	if likely(result)
 		memcpy(result, string, resultsize);
 	return result;
-}))}
+}
 %{
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 || __USE_DOS */
 
 #ifdef __USE_POSIX
 }
 
-[ATTR_LEAF][alias(strtok_s, __strtok_r)][ATTR_LEAF]
-strtok_r:(char *string,
-          [[nonnull]] char const *delim,
-          [[nonnull]] char **__restrict save_ptr) -> char * {
+[[ATTR_LEAF, export_alias("strtok_s", "__strtok_r")]]
+char *strtok_r([[nullable]] char *string,
+               [[nonnull]] char const *delim,
+               [[nonnull]] char **__restrict save_ptr) {
 	char *end;
 	if (!string)
 		string = *save_ptr;
@@ -588,10 +590,10 @@ strtok_r:(char *string,
 }
 
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found.
-[libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memrchr:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> void *
-	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes) -> void *]
-	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> void const *]
+[[libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+void *memrchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes): void *]
+	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes): void const *]
 {
 	byte_t *iter = (byte_t *)haystack + n_bytes;
 	while (n_bytes--) {
@@ -603,10 +605,11 @@ memrchr:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_byte
 
 
 @@Same as `memchr' with a search limit of `(size_t)-1'
-[kernel][[ATTR_WUNUSED, ATTR_PURE]][nokern_export_alias(__rawmemchr)]
-rawmemchr:([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnull]] void *
-	[([[nonnull]] void *__restrict haystack, int needle) -> [[nonnull]] void *]
-	[([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnull]] void const *]
+[[kernel, ATTR_WUNUSED, ATTR_PURE, alias("__rawmemchr")]]
+[[if(!defined(__KERNEL__)), export_as("__rawmemchr")]]
+[[nonnull]] void *rawmemchr([[nonnull]] void const *__restrict haystack, int needle)
+	[([[nonnull]] void *__restrict haystack, int needle): [[nonnull]] void *]
+	[([[nonnull]] void const *__restrict haystack, int needle): [[nonnull]] void const *]
 {
 	byte_t *iter = (byte_t *)haystack;
 	for (;; ++iter) {
@@ -618,9 +621,9 @@ rawmemchr:([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnull
 
 @@Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found.
 [[ATTR_WUNUSED, ATTR_PURE]]
-strchrnul:([[nonnull]] char const *__restrict haystack, int needle) -> [[nonnull]] char *
-	[([[nonnull]] char *__restrict haystack, int needle) -> [[nonnull]] char *]
-	[([[nonnull]] char const *__restrict haystack, int needle) -> [[nonnull]] char const *]
+[[nonnull]] char *strchrnul([[nonnull]] char const *__restrict haystack, int needle)
+	[([[nonnull]] char *__restrict haystack, int needle): [[nonnull]] char *]
+	[([[nonnull]] char const *__restrict haystack, int needle): [[nonnull]] char const *]
 {
 	for (; *haystack; ++haystack) {
 		if (*haystack == (char)needle)
@@ -629,10 +632,10 @@ strchrnul:([[nonnull]] char const *__restrict haystack, int needle) -> [[nonnull
 	return (char *)haystack;
 }
 
-[guard][[ATTR_WUNUSED, ATTR_PURE]]
-basename:([[nullable]] char const *filename) -> char *
-	[([[nullable]] char *filename) -> char *]
-	[([[nullable]] char const *filename) -> char const *]
+[[guard, ATTR_WUNUSED, ATTR_PURE]]
+char *basename([[nullable]] char const *filename)
+	[([[nullable]] char *filename): char *]
+	[([[nullable]] char const *filename): char const *]
 {
 	char ch, *iter = (char *)filename, *result = NULL;
 	if (!filename || !*filename)
@@ -674,10 +677,11 @@ basename:([[nullable]] char const *filename) -> char *
 
 
 @@Same as `strstr', but ignore casing
-[[ATTR_WUNUSED]][section(.text.crt.unicode.static.memory)][export_alias(__strcasestr)][ATTR_PURE]
-strcasestr:([[nonnull]] char const *haystack, [[nonnull]] char const *needle) -> char *
-	[([[nonnull]] char *haystack, [[nonnull]] char const *needle) -> char *]
-	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle) -> char const *]
+[[ATTR_WUNUSED, ATTR_PURE, export_alias("__strcasestr")]]
+[[section(".text.crt.unicode.static.memory")]]
+[[nullable]] char *strcasestr([[nonnull]] char const *haystack, [[nonnull]] char const *needle)
+	[([[nonnull]] char *haystack, [[nonnull]] char const *needle): [[nullable]] char *]
+	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle): [[nullable]] char const *]
 {
 	for (; *haystack; ++haystack) {
 		if (strcasecmp(haystack, needle) == 0)
@@ -693,12 +697,13 @@ strcasestr:([[nonnull]] char const *haystack, [[nonnull]] char const *needle) ->
 @@#else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 @@When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
 @@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-[libc][[ATTR_WUNUSED, ATTR_PURE]][impl_include(<features.h>), no_crt_self_import]
-[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memmem0)]
-[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memmem)]
-memmem:([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen) -> void *
-	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen) -> void *]
-	[([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen) -> void const *]
+[[libc, ATTR_WUNUSED, ATTR_PURE, no_crt_self_import]]
+[[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memmem0")]]
+[[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memmem")]]
+[[impl_include("<features.h>")]]
+[[nullable]] void *memmem([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen)
+	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): [[nullable]] void *]
+	[([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): [[nullable]] void const *]
 {
 	byte_t *candidate, marker;
 #if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
@@ -722,8 +727,9 @@ memmem:([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void 
 	return NULL;
 }
 
-[[ATTR_WUNUSED, ATTR_PURE]][export_alias(__strverscmp)]
-strverscmp:([[nonnull]] char const *s1, [[nonnull]] char const *s2) -> int {
+[[ATTR_WUNUSED, ATTR_PURE, export_alias("__strverscmp")]]
+int strverscmp([[nonnull]] char const *s1,
+               [[nonnull]] char const *s2) {
 	char const *s1_start = s1;
 	char c1, c2;
 	do {
@@ -769,13 +775,14 @@ strverscmp:([[nonnull]] char const *s1, [[nonnull]] char const *s2) -> int {
 }
 
 
-[alias(*)][attribute(*)] __mempcpy:(*) = mempcpy;
+__mempcpy(*) = mempcpy;
 
 @@Same as `memcpy', but return `DST + N_BYTES', rather than `DST'
-[libc][kernel][fast][alias(__mempcpy)][ATTR_LEAF]
+[[libc, kernel, fast, ATTR_LEAF, alias("__mempcpy")]]
+[[if(!defined(__KERNEL__)), export_as("__mempcpy")]]
 mempcpy:([[nonnull]] void *__restrict dst,
          [[nonnull]] void const *__restrict src,
-         $size_t n_bytes) -> [== dst + n_bytes] void * {
+         $size_t n_bytes) -> [[== dst + n_bytes]] void * {
 	byte_t *pdst = (byte_t *)dst;
 	byte_t *psrc = (byte_t *)src;
 	while (n_bytes--)
@@ -788,8 +795,8 @@ mempcpy:([[nonnull]] void *__restrict dst,
 %#endif /* __cplusplus && __USE_STRING_OVERLOADS */
 
 
-[ATTR_LEAF]
-strfry:([[nonnull]] char *__restrict string) -> [== string] char * {
+[[ATTR_LEAF]]
+strfry:([[nonnull]] char *__restrict string) -> [[== string]] char * {
 	size_t i, count = strlen(string);
 	for (i = 0; i < count; ++i) {
 		char temp;
@@ -803,24 +810,28 @@ strfry:([[nonnull]] char *__restrict string) -> [== string] char * {
 	return string;
 }
 
-[ATTR_LEAF]
-memfrob:([[nonnull]] void *buf, $size_t num_bytes) -> [== buf] void * {
+[[ATTR_LEAF]]
+memfrob:([[nonnull]] void *buf, $size_t num_bytes) -> [[== buf]] void * {
 	byte_t *iter = (byte_t *)buf;
 	while (num_bytes--)
 		*iter++ ^= 42; /* -_-   yeah... */
 	return buf;
 }
 
-[guard][alias(_stricmp_l)][[ATTR_WUNUSED]]
-[section(.text.crt.unicode.locale.memory)][export_alias(__strcasecmp_l)][ATTR_PURE]
+[[guard, ATTR_PURE, ATTR_WUNUSED]]
+[[export_alias("_stricmp_l", "__strcasecmp_l")]]
+[[section(".text.crt.unicode.locale.memory")]]
 strcasecmp_l:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $locale_t locale) -> int {
 	(void)locale;
 	return strcasecmp(s1, s2);
 }
 
-[guard][alias(_strnicmp_l, _strncmpi_l)][[ATTR_WUNUSED]]
-[section(.text.crt.unicode.locale.memory)][export_alias(__strncasecmp_l)][ATTR_PURE]
-strncasecmp_l:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t maxlen, $locale_t locale) -> int {
+[[guard, ATTR_WUNUSED, ATTR_PURE]]
+[[export_alias("_strnicmp_l", "_strncmpi_l", "__strncasecmp_l")]]
+[[section(".text.crt.unicode.locale.memory")]]
+int strncasecmp_l([[nonnull]] char const *s1,
+                  [[nonnull]] char const *s2,
+                  $size_t maxlen, $locale_t locale) {
 	(void)locale;
 	return strncasecmp(s1, s2, maxlen);
 }
@@ -829,19 +840,20 @@ strncasecmp_l:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t m
 %
 %#ifdef __USE_XOPEN2K
 %#ifdef __USE_GNU
-[section(.text.crt.errno)][export_alias(__strerror_r)][ATTR_COLD]
-strerror_r:(int errnum, [[nonnull]] char *buf, $size_t buflen) -> [[nonnull]] char *;
+[[ATTR_COLD, export_alias("__strerror_r"), section(".text.crt.errno")]]
+[[nonnull]] char *strerror_r(int errnum, [[nonnull]] char *buf, $size_t buflen);
+
 %#else /* __USE_GNU */
-[section(.text.crt.errno)][ATTR_COLD]
-strerror_r:(int errnum, [[nonnull]] char *buf, $size_t buflen) -> $errno_t = __xpg_strerror_r?;
+[[ATTR_COLD, exposed_name("strerror_r"), section(".text.crt.errno")]]
+$errno_t __xpg_strerror_r(int errnum, [[nonnull]] char *buf, $size_t buflen);
 %#endif /* !__USE_GNU */
 %#endif /* __USE_XOPEN2K */
 %
 %#ifdef __USE_MISC
 
-[ATTR_LEAF]
-strsep:([[nonnull]] char **__restrict stringp,
-        [[nonnull]] char const *__restrict delim) -> char * {
+[[ATTR_LEAF]]
+char *strsep([[nonnull]] char **__restrict stringp,
+             [[nonnull]] char const *__restrict delim) {
 	char *result, *iter;
 	if (!stringp || (result = *stringp) == NULL || !*result)
 		return NULL;
@@ -859,9 +871,9 @@ strsep:([[nonnull]] char **__restrict stringp,
 %[insert:extern(index)]
 %[insert:extern(rindex)]
 
-[guard][alias(_stricmp, _strcmpi, stricmp, strcmpi)][export_alias(__strcasecmp)]
-[[ATTR_WUNUSED]][section(.text.crt.unicode.static.memory)][crtbuiltin][ATTR_PURE]
-strcasecmp:([[nonnull]] char const *s1, [[nonnull]] char const *s2) -> int {
+[[guard, export_alias("_stricmp", "_strcmpi", "stricmp", "strcmpi", "__strcasecmp")]]
+[[ATTR_WUNUSED, ATTR_PURE, section(".text.crt.unicode.static.memory"), crtbuiltin]]
+int strcasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 	char c1, c2;
 	do {
 		if ((c1 = *s1++) != (c2 = *s2++) && ((c1 = tolower(c1)) != (c2 = tolower(c2))))
@@ -869,9 +881,9 @@ strcasecmp:([[nonnull]] char const *s1, [[nonnull]] char const *s2) -> int {
 	} while (c1);
 	return 0;
 }
-[guard][alias(_strnicmp, strnicmp, _strncmpi, strncmpi)]
-[[ATTR_WUNUSED]][section(.text.crt.unicode.static.memory)][crtbuiltin][ATTR_PURE]
-strncasecmp:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t maxlen) -> int {
+[[guard, export_alias("_strnicmp", "strnicmp", "_strncmpi", "strncmpi")]]
+[[ATTR_WUNUSED, ATTR_PURE, section(".text.crt.unicode.static.memory"), crtbuiltin]]
+int strncasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t maxlen) {
 	char c1, c2;
 	do {
 		if (!maxlen--)
@@ -883,11 +895,9 @@ strncasecmp:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t max
 }
 
 
-[[ATTR_WUNUSED, ATTR_CONST]][nothrow]
-[dependency_prefix(
-#include <hybrid/__bit.h>
-)][crtbuiltin][export_alias(__ffs)]
-ffs:(int i) -> __STDC_INT_AS_SIZE_T {
+[[ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[impl_include("<hybrid/__bit.h>"), export_alias("__ffs")]]
+__STDC_INT_AS_SIZE_T ffs(int i) {
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned int)i);
 }
 
@@ -905,27 +915,23 @@ ffs:(int i) -> __STDC_INT_AS_SIZE_T {
 }
 
 %#ifdef __USE_GNU
-[[ATTR_WUNUSED, ATTR_CONST]][nothrow]
-[dependency_prefix(
-#include <hybrid/__bit.h>
-)][crtbuiltin]
-ffsl:(long i) -> __STDC_INT_AS_SIZE_T {
+[[ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[impl_include("<hybrid/__bit.h>")]]
+__STDC_INT_AS_SIZE_T ffsl(long i) {
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned long)i);
 }
 
-[[ATTR_WUNUSED, ATTR_CONST]][nothrow]
-[dependency_prefix(
-#include <hybrid/__bit.h>
-)][crtbuiltin]
-ffsll:(__LONGLONG i) -> __STDC_INT_AS_SIZE_T {
+[[ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[impl_include("<hybrid/__bit.h>")]]
+__STDC_INT_AS_SIZE_T ffsll(__LONGLONG i) {
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((__ULONGLONG)i);
 }
 %#endif /* __USE_GNU */
 
-[ATTR_LEAF]
-strlcat:([[nonnull]] char *__restrict dst,
-         [[nonnull]] char const *__restrict src,
-         $size_t bufsize) -> $size_t {
+[[ATTR_LEAF]]
+$size_t strlcat([[nonnull]] char *__restrict dst,
+                [[nonnull]] char const *__restrict src,
+                $size_t bufsize) {
 	size_t result = strlen(src);
 	char *new_dst = dst + strnlen(dst, bufsize);
 	size_t copy_size;
@@ -936,10 +942,10 @@ strlcat:([[nonnull]] char *__restrict dst,
 	return result + (new_dst - dst);
 }
 
-[ATTR_LEAF]
-strlcpy:([[nonnull]] char *__restrict dst,
-         [[nonnull]] char const *__restrict src,
-         $size_t bufsize) -> $size_t {
+[[ATTR_LEAF]]
+$size_t strlcpy([[nonnull]] char *__restrict dst,
+                [[nonnull]] char const *__restrict src,
+                $size_t bufsize) {
 	size_t result = strlen(src);
 	size_t copy_size = result < bufsize ? result : bufsize - 1;
 	memcpy(dst, src, copy_size*sizeof(char));
@@ -953,10 +959,10 @@ strlcpy:([[nonnull]] char *__restrict dst,
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 }
 
-[alias(_memccpy)][ATTR_LEAF]
-memccpy:([[nonnull]] void *__restrict dst,
-         [[nonnull]] void const *__restrict src,
-         int needle, $size_t num_bytes) -> void * {
+[[ATTR_LEAF, export_alias("_memccpy")]]
+void *memccpy([[nonnull]] void *__restrict dst,
+              [[nonnull]] void const *__restrict src,
+              int needle, $size_t num_bytes) {
 	byte_t *pdst = (byte_t *)dst;
 	byte_t const *psrc = (byte_t const *)src;
 	while (num_bytes--) {
@@ -971,31 +977,32 @@ memccpy:([[nonnull]] void *__restrict dst,
 
 }
 
-[attribute(*)][alias(*)] __bzero:(*) = bzero;
-[attribute(*)][alias(*)] __strtok_r:(*) = strtok_r;
+__bzero(*) = bzero;
+__strtok_r(*) = strtok_r;
 
-%{
-
-#ifdef __USE_STRING_BWLQ
-}
+%
+%#ifdef __USE_STRING_BWLQ
 
 @@Copy memory between non-overlapping memory blocks.
-[nocrt][noexport][ATTR_LEAF]
+[[ATTR_LEAF]]
 memcpyb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
          [[nonnull]] /*aligned(1)*/ void const *__restrict src,
-         $size_t n_bytes) -> [[[== dst]]] $uint8_t * = memcpy;
+         $size_t n_bytes) -> [[== dst]] $uint8_t * = memcpy;
 
 @@Same as `memcpyb', but return `DST + N_BYTES', rather than `DST'
-[nocrt][noexport][ATTR_LEAF]
+[[ATTR_LEAF]]
 mempcpyb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
           [[nonnull]] /*aligned(1)*/ void const *__restrict src,
-          $size_t n_bytes) -> [== dst + n_bytes] $uint8_t * = mempcpy;
+          $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t * = mempcpy;
 
 @@Copy memory between non-overlapping memory blocks.
-[fast][libc][kernel][if(__SIZEOF_WCHAR_T__ == 2), alias(wmemcpy)][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemcpy")]]
+[[alias("DOS$wmemcpy")]]
+[[if(!defined(__KERNEL__)), export_as("DOS$wmemcpy")]]
 memcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
          [[nonnull]] /*aligned(2)*/ void const *__restrict src,
-         $size_t n_words) -> [[[== dst]]] $uint16_t * {
+         $size_t n_words) -> [[== dst]] $uint16_t * {
 	u16 *pdst = (u16 *)dst;
 	u16 *psrc = (u16 *)src;
 	while (n_words--)
@@ -1004,7 +1011,10 @@ memcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 }
 
 @@Same as `memcpyw', but return `DST + N_WORDS', rather than `DST'
-[fast][libc][kernel][if(__SIZEOF_WCHAR_T__ == 2), alias(wmempcpy)][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempcpy")]]
+[[alias("DOS$wmempcpy")]]
+[[if(!defined(__KERNEL__)), export_as("DOS$wmempcpy")]]
 mempcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
           [[nonnull]] /*aligned(2)*/ void const *__restrict src,
           $size_t n_words) -> [== dst + n_words * 2] $uint16_t * {
@@ -1012,10 +1022,13 @@ mempcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 }
 
 @@Copy memory between non-overlapping memory blocks.
-[fast][libc][kernel][if(__SIZEOF_WCHAR_T__ == 4), alias(wmemcpy)][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemcpy")]]
+[[if(defined(__PE__)), alias("KOS$wmemcpy")]]
+[[if(!defined(__KERNEL__)), export_as("wmemcpy")]]
 memcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
          [[nonnull]] /*aligned(4)*/ void const *__restrict src,
-         $size_t n_dwords) -> [[[== dst]]] $uint32_t * {
+         $size_t n_dwords) -> [[== dst]] $uint32_t * {
 	u32 *pdst = (u32 *)dst;
 	u32 *psrc = (u32 *)src;
 	while (n_dwords--)
@@ -1024,7 +1037,10 @@ memcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
 }
 
 @@Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST'
-[fast][libc][kernel][if(__SIZEOF_WCHAR_T__ == 4), alias(wmempcpy)][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempcpy")]]
+[[if(defined(__PE__)), alias("KOS$wmempcpy")]]
+[[if(!defined(__KERNEL__)), export_as("wmempcpy")]]
 mempcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
           [[nonnull]] /*aligned(4)*/ void const *__restrict src,
           $size_t n_dwords) -> [== dst + n_dwords * 4] $uint32_t * {
@@ -1033,22 +1049,25 @@ mempcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
 
 
 @@Move memory between potentially overlapping memory blocks.
-[nocrt][noexport][ATTR_LEAF]
+[[ATTR_LEAF]]
 memmoveb:([[nonnull]] /*aligned(1)*/ void *dst,
           [[nonnull]] /*aligned(1)*/ void const *src,
-          $size_t n_bytes) -> [[[== dst]]] $uint8_t * = memmove;
+          $size_t n_bytes) -> [[== dst]] $uint8_t * = memmove;
 
 @@Same as `memmoveb', but return `DST + N_BYTES', rather than `DST'
-[nocrt][noexport][ATTR_LEAF]
+[[ATTR_LEAF]]
 mempmoveb:([[nonnull]] /*aligned(1)*/ void *dst,
            [[nonnull]] /*aligned(1)*/ void const *src,
-           $size_t n_bytes) -> [== dst + n_bytes] $uint8_t * = mempmove;
+           $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t * = mempmove;
 
 @@Move memory between potentially overlapping memory blocks.
-[fast][libc][kernel][if(__SIZEOF_WCHAR_T__ == 2), alias(wmemmove)][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
+[[alias("DOS$wmemmove")]]
+[[if(!defined(__KERNEL__)), export_as("DOS$wmemmove")]]
 memmovew:([[nonnull]] /*aligned(2)*/ void *dst,
           [[nonnull]] /*aligned(2)*/ void const *src,
-          $size_t n_words) -> [[[== dst]]] $uint16_t * {
+          $size_t n_words) -> [[== dst]] $uint16_t * {
 	u16 *pdst, *psrc;
 	if (dst <= src) {
 		pdst = (u16 *)dst;
@@ -1065,7 +1084,7 @@ memmovew:([[nonnull]] /*aligned(2)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST'
-[fast][libc][kernel][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
 mempmovew:([[nonnull]] /*aligned(2)*/ void *dst,
            [[nonnull]] /*aligned(2)*/ void const *src,
            $size_t n_words) -> [== dst + n_words * 2] $uint16_t * {
@@ -1073,10 +1092,13 @@ mempmovew:([[nonnull]] /*aligned(2)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks.
-[fast][libc][kernel][if(__SIZEOF_WCHAR_T__ == 4), alias(wmemmove)][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
+[[if(defined(__PE__)), alias("KOS$wmemmove")]]
+[[if(!defined(__KERNEL__)), export_as("wmemmove")]]
 memmovel:([[nonnull]] /*aligned(4)*/ void *dst,
           [[nonnull]] /*aligned(4)*/ void const *src,
-          $size_t n_dwords) -> [[[== dst]]] $uint32_t * {
+          $size_t n_dwords) -> [[== dst]] $uint32_t * {
 	u32 *pdst, *psrc;
 	if (dst <= src) {
 		pdst = (u32 *)dst;
@@ -1093,7 +1115,10 @@ memmovel:([[nonnull]] /*aligned(4)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST'
-[fast][libc][kernel][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
+[[if(defined(__PE__)), alias("KOS$wmempmove")]]
+[[if(!defined(__KERNEL__)), export_as("wmempmove")]]
 mempmovel:([[nonnull]] /*aligned(4)*/ void *dst,
            [[nonnull]] /*aligned(4)*/ void const *src,
            $size_t n_dwords) -> [== dst + n_dwords * 4] $uint32_t * {
@@ -1102,35 +1127,37 @@ mempmovel:([[nonnull]] /*aligned(4)*/ void *dst,
 
 %#ifdef __USE_KOS
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_BYTES')
-[nocrt][noexport][ATTR_LEAF][alias(*)]
+[[ATTR_LEAF]]
 memmoveupb:([[nonnull]] /*aligned(1)*/ void *dst,
             [[nonnull]] /*aligned(1)*/ void const *src,
-            $size_t n_bytes) -> [[[== dst]]] $uint8_t * = memmoveup;
+            $size_t n_bytes) -> [[== dst]] $uint8_t * = memmoveup;
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_BYTES')
-[nocrt][noexport][ATTR_LEAF][alias(*)]
+[[ATTR_LEAF]]
 memmovedownb:([[nonnull]] /*aligned(1)*/ void *dst,
               [[nonnull]] /*aligned(1)*/ void const *src,
-              $size_t n_bytes) -> [[[== dst]]] $uint8_t * = memmovedown;
+              $size_t n_bytes) -> [[== dst]] $uint8_t * = memmovedown;
 
 @@Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES')
-[nocrt][noexport][ATTR_LEAF][alias(*)]
+[[ATTR_LEAF]]
 mempmoveupb:([[nonnull]] /*aligned(1)*/ void *dst,
              [[nonnull]] /*aligned(1)*/ void const *src,
-             $size_t n_bytes) -> [== dst + n_bytes] $uint8_t * = mempmoveup;
+             $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t * = mempmoveup;
 
 @@Same as `memmoveb', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES')
-[nocrt][noexport][ATTR_LEAF][alias(*)]
+[[ATTR_LEAF]]
 mempmovedownb:([[nonnull]] /*aligned(1)*/ void *dst,
                [[nonnull]] /*aligned(1)*/ void const *src,
-               $size_t n_bytes) -> [== dst + n_bytes] $uint8_t * = mempmovedown;
+               $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t * = mempmovedown;
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS')
-[fast][libc][kernel][ATTR_LEAF][alias(memmovew)][if(__SIZEOF_WCHAR_T__ == 2), alias(wmemmove)]
-[impl_include("<hybrid/__assert.h>")]
+[[fast, libc, kernel, ATTR_LEAF, alias("memmovew")]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
+[[alias("DOS$wmemmove")]]
+[[impl_include("<hybrid/__assert.h>")]]
 memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
             [[nonnull]] /*aligned(2)*/ void const *src,
-            $size_t n_words) -> [[[== dst]]] $uint16_t * {
+            $size_t n_words) -> [[== dst]] $uint16_t * {
 	u16 *pdst, *psrc;
 	pdst = (u16 *)dst + n_words;
 	psrc = (u16 *)src + n_words;
@@ -1141,11 +1168,13 @@ memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS')
-[fast][libc][kernel][ATTR_LEAF][alias(memmovew)][if(__SIZEOF_WCHAR_T__ == 2), alias(wmemmove)]
-[impl_include("<hybrid/__assert.h>")]
+[[fast, libc, kernel, ATTR_LEAF, alias("memmovew")]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
+[[alias("DOS$wmemmove")]]
+[[impl_include("<hybrid/__assert.h>")]]
 memmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
               [[nonnull]] /*aligned(2)*/ void const *src,
-              $size_t n_words) -> [[[== dst]]] $uint16_t * {
+              $size_t n_words) -> [[== dst]] $uint16_t * {
 	u16 *pdst, *psrc;
 	pdst = (u16 *)dst;
 	psrc = (u16 *)src;
@@ -1156,7 +1185,7 @@ memmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS')
-[fast][libc][kernel][ATTR_LEAF][alias(mempmovew)]
+[[fast, libc, kernel, ATTR_LEAF, alias("mempmovew")]]
 mempmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
              [[nonnull]] /*aligned(2)*/ void const *src,
              $size_t n_words) -> [== dst + n_words * 2] $uint16_t * {
@@ -1164,7 +1193,7 @@ mempmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS')
-[fast][libc][kernel][ATTR_LEAF][alias(mempmovew)]
+[[fast, libc, kernel, ATTR_LEAF, alias("mempmovew")]]
 mempmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
                [[nonnull]] /*aligned(2)*/ void const *src,
                $size_t n_words) -> [== dst + n_words * 2] $uint16_t * {
@@ -1172,11 +1201,13 @@ mempmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS')
-[fast][libc][kernel][if(__SIZEOF_WCHAR_T__ == 4), alias(wmemmove)][alias(memmovel)][ATTR_LEAF]
-[impl_include("<hybrid/__assert.h>")]
+[[fast, libc, kernel, alias("memmovel"), ATTR_LEAF]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
+[[if(defined(__PE__)), alias("KOS$wmemmove")]]
+[[impl_include("<hybrid/__assert.h>")]]
 memmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
             [[nonnull]] /*aligned(4)*/ void const *src,
-            $size_t n_dwords) -> [[[== dst]]] $uint32_t * {
+            $size_t n_dwords) -> [[== dst]] $uint32_t * {
 	u32 *pdst, *psrc;
 	pdst = (u32 *)dst + n_dwords;
 	psrc = (u32 *)src + n_dwords;
@@ -1187,10 +1218,13 @@ memmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_DWORDS')
-[fast][libc][kernel][if(__SIZEOF_WCHAR_T__ == 4), alias(wmemmove)][alias(memmovel)][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF, alias("memmovel")]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
+[[if(defined(__PE__)), alias("KOS$wmemmove")]]
+[[impl_include("<hybrid/__assert.h>")]]
 memmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
               [[nonnull]] /*aligned(4)*/ void const *src,
-              $size_t n_dwords) -> [[[== dst]]] $uint32_t * {
+              $size_t n_dwords) -> [[== dst]] $uint32_t * {
 	u32 *pdst, *psrc;
 	pdst = (u32 *)dst;
 	psrc = (u32 *)src;
@@ -1201,7 +1235,7 @@ memmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS')
-[fast][libc][kernel][ATTR_LEAF][alias(mempmovel)]
+[[fast, libc, kernel, ATTR_LEAF, alias("mempmovel")]]
 mempmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
              [[nonnull]] /*aligned(4)*/ void const *src,
              $size_t n_dwords) -> [== dst + n_dwords * 4] $uint32_t * {
@@ -1209,7 +1243,7 @@ mempmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS')
-[fast][libc][kernel][ATTR_LEAF][alias(mempmovel)]
+[[fast, libc, kernel, ATTR_LEAF, alias("mempmovel")]]
 mempmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
                [[nonnull]] /*aligned(4)*/ void const *src,
                $size_t n_dwords) -> [== dst + n_dwords * 4] $uint32_t * {
@@ -1220,19 +1254,22 @@ mempmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
 
 
 @@Fill memory with a given byte
-[nocrt][noexport][ATTR_LEAF]
+[[ATTR_LEAF]]
 memsetb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
-         int byte, $size_t n_bytes) -> [[[== dst]]] $uint8_t * = memset;
+         int byte, $size_t n_bytes) -> [[== dst]] $uint8_t * = memset;
 
 @@Same as `memsetb', but return `DST + N_BYTES', rather than `DST'
-[nocrt][noexport][ATTR_LEAF]
+[[ATTR_LEAF]]
 mempsetb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
-          int byte, $size_t n_bytes) -> [== dst + n_bytes] $uint8_t * = mempset;
+          int byte, $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t * = mempset;
 
 @@Fill memory with a given word
-[fast][libc][kernel][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemset")]]
+[[alias("DOS$wmemset")]]
+[[if(!defined(__KERNEL__)), export_as("DOS$wmemset")]]
 memsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
-         $uint16_t word, $size_t n_words) -> [[[== dst]]] $uint16_t * {
+         $uint16_t word, $size_t n_words) -> [[== dst]] $uint16_t * {
 	u16 *pdst = (u16 *)dst;
 	while (n_words--)
 		*pdst++ = word;
@@ -1240,16 +1277,19 @@ memsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 }
 
 @@Same as `memsetw', but return `DST + N_WORDS', rather than `DST'
-[fast][libc][kernel][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempset")]]
+[[alias("DOS$wmempset")]]
+[[if(!defined(__KERNEL__)), export_as("DOS$wmempset")]]
 mempsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
           $uint16_t word, $size_t n_words) -> [== dst + n_words * 2] $uint16_t * {
 	return (u16 *)memsetw(dst, word, n_words) + n_words;
 }
 
 @@Fill memory with a given dword
-[fast][libc][kernel][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
 memsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
-         $uint32_t dword, $size_t n_dwords) -> [[[== dst]]] $uint32_t * {
+         $uint32_t dword, $size_t n_dwords) -> [[== dst]] $uint32_t * {
 	u32 *pdst = (u32 *)dst;
 	while (n_dwords--)
 		*pdst++ = dword;
@@ -1257,7 +1297,7 @@ memsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
 }
 
 @@Same as `memsetl', but return `DST + N_DWORDS', rather than `DST'
-[fast][libc][kernel][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
 mempsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
           $uint32_t dword, $size_t n_dwords) -> [== dst + n_dwords * 4] $uint32_t * {
 	return (u32 *)memsetl(dst, dword, n_dwords) + n_dwords;
@@ -1265,13 +1305,16 @@ mempsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
 
 
 @@Compare memory buffers and return the difference of the first non-matching byte
-[nocrt][noexport][alias(bcmp)][[ATTR_WUNUSED, ATTR_PURE]]
-memcmpb:([[nonnull]] /*aligned(1)*/ void const *s1,
-         [[nonnull]] /*aligned(1)*/ void const *s2, $size_t n_bytes) -> int = memcmp;
+[[ATTR_WUNUSED, ATTR_PURE]]
+int memcmpb([[nonnull]] /*aligned(1)*/ void const *s1,
+            [[nonnull]] /*aligned(1)*/ void const *s2,
+            $size_t n_bytes) = memcmp;
 
 @@Compare memory buffers and return the difference of the first non-matching word
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-[if(__SIZEOF_WCHAR_T__ == 2), alias(wmemcmp)]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemcmp")]]
+[[alias("DOS$wmemcmp")]]
+[[if(!defined(__KERNEL__)), export_as("DOS$wmemcmp")]]
 memcmpw:([[nonnull]] /*aligned(2)*/ void const *s1,
          [[nonnull]] /*aligned(2)*/ void const *s2, $size_t n_words) -> $int16_t {
 	s16 *p1 = (s16 *)s1;
@@ -1283,8 +1326,10 @@ memcmpw:([[nonnull]] /*aligned(2)*/ void const *s1,
 }
 
 @@Compare memory buffers and return the difference of the first non-matching dword
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-[if(__SIZEOF_WCHAR_T__ == 4), alias(wmemcmp)]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemcmp")]]
+[[if(defined(__PE__)), alias("KOS$wmemcmp")]]
+[[if(!defined(__KERNEL__)), export_as("wmemcmp")]]
 memcmpl:([[nonnull]] /*aligned(4)*/ void const *s1,
          [[nonnull]] /*aligned(4)*/ void const *s2, $size_t n_dwords) -> $int32_t {
 	s32 *p1 = (s32 *)s1;
@@ -1296,17 +1341,20 @@ memcmpl:([[nonnull]] /*aligned(4)*/ void const *s1,
 }
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-memchrb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t *
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t const *]
+[[ATTR_WUNUSED, ATTR_PURE]]
+$uint8_t *memchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): $uint8_t const *]
 	= memchr;
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]][if(__SIZEOF_WCHAR_T__ == 2), alias(wmemchr)]
-memchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t *
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemchr")]]
+[[alias("DOS$wmemchr")]]
+[[if(!defined(__KERNEL__)), export_as("DOS$wmemchr")]]
+$uint16_t *memchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t const *]
 {
 	u16 *hay_iter = (u16 *)haystack;
 	for (; n_words--; ++hay_iter) {
@@ -1317,10 +1365,13 @@ memchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t w
 }
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]][if(__SIZEOF_WCHAR_T__ == 4), alias(wmemchr)]
-memchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t *
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemchr")]]
+[[if(defined(__PE__)), alias("KOS$wmemchr")]]
+[[if(!defined(__KERNEL__)), export_as("wmemchr")]]
+$uint32_t *memchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t const *]
 {
 	u32 *hay_iter = (u32 *)haystack;
 	for (; n_dwords--; ++hay_iter) {
@@ -1331,17 +1382,17 @@ memchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t d
 }
 
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-memrchrb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t *
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t const *]
+[[ATTR_WUNUSED, ATTR_PURE]]
+$uint8_t *memrchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): $uint8_t const *]
 	= memrchr;
 
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_WORDS * 2'. - Return `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memrchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t *
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+$uint16_t *memrchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t const *]
 {
 	u16 *iter = (u16 *)haystack + n_words;
 	while (n_words--) {
@@ -1352,10 +1403,10 @@ memrchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t 
 }
 
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK + N_DWORDS * 4'. - Return `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memrchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t *
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+$uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t const *]
 {
 	u32 *iter = (u32 *)haystack + n_dwords;
 	while (n_dwords--) {
@@ -1366,17 +1417,17 @@ memrchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t 
 }
 
 @@Same as `memchrb' with a search limit of `(size_t)-1'
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemchrb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte) -> [[nonnull]] $uint8_t *
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte) -> [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte) -> [[nonnull]] $uint8_t const *]
+[[ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint8_t *rawmemchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte): [[nonnull]] $uint8_t const *]
 	= rawmemchr;
 
 @@Same as `memchrw' with a search limit of `(size_t)-1 / 2'
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) -> [[nonnull]] $uint16_t *
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word) -> [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) -> [[nonnull]] $uint16_t const *]
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint16_t *rawmemchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t const *]
 {
 	u16 *iter = (u16 *)haystack;
 	for (;; ++iter) {
@@ -1387,10 +1438,10 @@ rawmemchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_
 }
 
 @@Same as `memchrl' with a search limit of `(size_t)-1 / 4'
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) -> [[nonnull]] $uint32_t *
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword) -> [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) -> [[nonnull]] $uint32_t const *]
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint32_t *rawmemchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t const *]
 {
 	u32 *iter = (u32 *)haystack;
 	for (;; ++iter) {
@@ -1402,17 +1453,17 @@ rawmemchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_
 
 
 @@Same as `memrchrb' without a search limit, starting at `HAYSTACK - 1'
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrchrb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte) -> [[nonnull]] $uint8_t *
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte) -> [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte) -> [[nonnull]] $uint8_t const *]
+[[ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint8_t *rawmemrchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte): [[nonnull]] $uint8_t const *]
 	= rawmemrchr;
 
 @@Same as `memrchrw' without a search limit, starting at `(byte_t *)HAYSTACK - 2'
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) -> [[nonnull]] $uint16_t *
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word) -> [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) -> [[nonnull]] $uint16_t const *]
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint16_t *rawmemrchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t const *]
 {
 	u16 *iter = (u16 *)haystack;
 	for (;;) {
@@ -1423,10 +1474,10 @@ rawmemrchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16
 }
 
 @@Same as `memrchrl' without a search limit, starting at `(byte_t *)HAYSTACK - 4'
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) -> [[nonnull]] $uint32_t *
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword) -> [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) -> [[nonnull]] $uint32_t const *]
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint32_t *rawmemrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t const *]
 {
 	u32 *iter = (u32 *)haystack;
 	for (;;) {
@@ -1438,17 +1489,17 @@ rawmemrchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32
 
 
 @@Same as `memchrb', but return `HAYSTACK + N_BYTES', rather than `NULL' if `NEEDLE' wasn't found.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-memendb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> [[nonnull]] $uint8_t *
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes) -> [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> [[nonnull]] $uint8_t const *]
+[[ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint8_t *memendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t const *]
 	= memend;
 
 @@Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memendw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes) -> [[nonnull]] $uint16_t *
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_bytes) -> [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes) -> [[nonnull]] $uint16_t const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint16_t *memendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_bytes): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes): [[nonnull]] $uint16_t const *]
 {
 	u16 *result = (u16 *)haystack;
 	for (; n_bytes--; ++result) {
@@ -1459,10 +1510,10 @@ memendw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t w
 }
 
 @@Same as `memchrl', but return `HAYSTACK + N_DWORDS * 4', rather than `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memendl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes) -> [[nonnull]] $uint32_t *
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_bytes) -> [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes) -> [[nonnull]] $uint32_t const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint32_t *memendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_bytes): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes): [[nonnull]] $uint32_t const *]
 {
 	u32 *result = (u32 *)haystack;
 	for (; n_bytes--; ++result) {
@@ -1473,17 +1524,17 @@ memendl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t d
 }
 
 @@Same as `memrchrb', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-memrendb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> [[nonnull]] $uint8_t *
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes) -> [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> [[nonnull]] $uint8_t const *]
+[[ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint8_t *memrendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t const *]
 	= memrend;
 
 @@Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memrendw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> [[nonnull]] $uint16_t *
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words) -> [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> [[nonnull]] $uint16_t const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint16_t *memrendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words): [[nonnull]] $uint16_t const *]
 {
 	u16 *result = (u16 *)haystack + n_words;
 	for (;;) {
@@ -1498,10 +1549,10 @@ memrendw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t 
 }
 
 @@Same as `memrchrl', but return `HAYSTACK - 4', rather than `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memrendl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> [[nonnull]] $uint32_t *
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> [[nonnull]] $uint32_t const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint32_t *memrendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords): [[nonnull]] $uint32_t const *]
 {
 	u32 *result = (u32 *)haystack + n_dwords;
 	for (;;) {
@@ -1519,74 +1570,82 @@ memrendl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t 
 
 @@Same as `memendb', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `HAYSTACK + N_DWORDS' if the given `NEEDLE' wasn't found
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-memlenb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $size_t = memlen;
+[[ATTR_WUNUSED, ATTR_PURE]]
+memlenb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
+         int byte, $size_t n_bytes) -> $size_t = memlen;
 
 @@Same as `memendw', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `HAYSTACK + N_DWORDS * 2' if the given `NEEDLE' wasn't found
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memlenw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $size_t {
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t memlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack,
+                $uint16_t word, $size_t n_words) {
 	return (size_t)(memendw(haystack, word, n_words) - (u16 *)haystack);
 }
 
 @@Same as `memendl', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `HAYSTACK + N_DWORDS * 4' if the given `NEEDLE' wasn't found
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memlenl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $size_t {
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t memlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
+                $uint32_t dword, $size_t n_dwords) {
 	return (size_t)(memendl(haystack, dword, n_dwords) - (u32 *)haystack);
 }
 
 @@Same as `memrendb', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `(size_t)-1' if the given `NEEDLE' wasn't found
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-memrlenb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $size_t = memrlen;
+[[ATTR_WUNUSED, ATTR_PURE]]
+$size_t memrlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
+                 int byte, $size_t n_bytes) = memrlen;
 
 @@Same as `memrendw', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `(size_t)-1 / 2' if the given `NEEDLE' wasn't found
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memrlenw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $size_t {
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t memrlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack,
+                 $uint16_t word, $size_t n_words) {
 	return (size_t)(memrendw(haystack, word, n_words) - (u16 *)haystack);
 }
 
 @@Same as `memrendl', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `(size_t)-1 / 4' if the given `NEEDLE' wasn't found
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memrlenl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $size_t {
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t memrlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
+                 $uint32_t dword, $size_t n_dwords) {
 	return (size_t)(memrendl(haystack, dword, n_dwords) - (u32 *)haystack);
 }
 
 
 
 @@Same as `rawmemchrb', but return the offset from `HAYSTACK', rather than the actual address.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemlenb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle) -> $size_t = rawmemlen;
+[[ATTR_WUNUSED, ATTR_PURE]]
+$size_t rawmemlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
+                   int needle) = rawmemlen;
 
 @@Same as `rawmemchrw', but return the offset from `HAYSTACK', rather than the actual address.
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemlenw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) -> $size_t {
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t rawmemlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) {
 	return (size_t)(rawmemchrw(haystack, word) - (u16 *)haystack);
 }
 
 @@Same as `rawmemchrl', but return the offset from `HAYSTACK', rather than the actual address.
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemlenl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) -> $size_t {
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t rawmemlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) {
 	return (size_t)(rawmemchrl(haystack, dword) - (u32 *)haystack);
 }
 
 
 @@Same as `rawmemrchrb', but return the offset from `HAYSTACK', rather than the actual address.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrlenb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle) -> $size_t = rawmemrlen;
+[[ATTR_WUNUSED, ATTR_PURE]]
+$size_t rawmemrlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
+                    int needle) = rawmemrlen;
 
 @@Same as `rawmemrchrw', but return the offset from `HAYSTACK', rather than the actual address.
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrlenw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) -> $size_t {
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t rawmemrlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) {
 	return (size_t)(rawmemrchrw(haystack, word) - (u16 *)haystack);
 }
 
 @@Same as `rawmemrchrl', but return the offset from `HAYSTACK', rather than the actual address.
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrlenl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) -> $size_t {
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t rawmemrlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) {
 	return (size_t)(rawmemrchrl(haystack, dword) - (u32 *)haystack);
 }
 
@@ -1594,10 +1653,10 @@ rawmemrlenl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32
 
 %#ifdef __UINT64_TYPE__
 @@Copy memory between non-overlapping memory blocks.
-[fast][libc][kernel][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
 memcpyq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
          [[nonnull]] /*aligned(8)*/ void const *__restrict src,
-         $size_t n_qwords) -> [[[== dst]]] $uint64_t * {
+         $size_t n_qwords) -> [[== dst]] $uint64_t * {
 #if __SIZEOF_POINTER__ >= 8
 	u64 *pdst = (u64 *)dst;
 	u64 *psrc = (u64 *)src;
@@ -1615,7 +1674,7 @@ memcpyq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 }
 
 @@Same as `memcpyq', but return `DST + N_QWORDS', rather than `DST'
-[fast][libc][kernel][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
 mempcpyq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
           [[nonnull]] /*aligned(8)*/ void const *__restrict src,
           $size_t n_qwords) -> [== dst + n_qwords * 8] $uint64_t * {
@@ -1623,10 +1682,10 @@ mempcpyq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 }
 
 @@Move memory between potentially overlapping memory blocks.
-[fast][libc][kernel][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
 memmoveq:([[nonnull]] /*aligned(8)*/ void *dst,
           [[nonnull]] /*aligned(8)*/ void const *src,
-          $size_t n_qwords) -> [[[== dst]]] $uint64_t * {
+          $size_t n_qwords) -> [[== dst]] $uint64_t * {
 #if __SIZEOF_POINTER__ >= 8
 	u64 *pdst, *psrc;
 	if (dst <= src) {
@@ -1662,7 +1721,7 @@ memmoveq:([[nonnull]] /*aligned(8)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_QWORDS', rather than `DST'
-[fast][libc][kernel][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
 mempmoveq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
            [[nonnull]] /*aligned(8)*/ void const *__restrict src,
            $size_t n_qwords) -> [== dst + n_qwords * 8] $uint64_t * {
@@ -1672,11 +1731,11 @@ mempmoveq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 %#ifdef __USE_KOS
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS')
-[fast][libc][kernel][ATTR_LEAF][alias(memmoveq)]
-[impl_include("<hybrid/__assert.h>")]
+[[fast, libc, kernel, ATTR_LEAF, alias("memmoveq")]]
+[[impl_include("<hybrid/__assert.h>")]]
 memmoveupq:([[nonnull]] /*aligned(8)*/ void *dst,
             [[nonnull]] /*aligned(8)*/ void const *src,
-            $size_t n_qwords) -> [[[== dst]]] $uint64_t * {
+            $size_t n_qwords) -> [[== dst]] $uint64_t * {
 #if __SIZEOF_POINTER__ >= 8
 	u64 *pdst, *psrc;
 	pdst = (u64 *)dst + n_qwords;
@@ -1698,11 +1757,11 @@ memmoveupq:([[nonnull]] /*aligned(8)*/ void *dst,
 }
 
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS')
-[fast][libc][kernel][ATTR_LEAF][alias(memmoveq)]
-[impl_include("<hybrid/__assert.h>")]
+[[fast, libc, kernel, ATTR_LEAF, alias("memmoveq")]]
+[[impl_include("<hybrid/__assert.h>")]]
 memmovedownq:([[nonnull]] /*aligned(8)*/ void *dst,
               [[nonnull]] /*aligned(8)*/ void const *src,
-              $size_t n_qwords) -> [[[== dst]]] $uint64_t * {
+              $size_t n_qwords) -> [[== dst]] $uint64_t * {
 #if __SIZEOF_POINTER__ >= 8
 	u64 *pdst, *psrc;
 	pdst = (u64 *)dst;
@@ -1724,7 +1783,7 @@ memmovedownq:([[nonnull]] /*aligned(8)*/ void *dst,
 }
 
 @@Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS')
-[fast][libc][kernel][ATTR_LEAF][alias(mempmoveq)]
+[[fast, libc, kernel, ATTR_LEAF, alias("mempmoveq")]]
 mempmoveupq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
              [[nonnull]] /*aligned(8)*/ void const *__restrict src,
              $size_t n_qwords) -> [== dst + n_qwords * 8] $uint64_t * {
@@ -1732,7 +1791,7 @@ mempmoveupq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 }
 
 @@Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS')
-[fast][libc][kernel][ATTR_LEAF][alias(mempmoveq)]
+[[fast, libc, kernel, ATTR_LEAF, alias("mempmoveq")]]
 mempmovedownq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
                [[nonnull]] /*aligned(8)*/ void const *__restrict src,
                $size_t n_qwords) -> [== dst + n_qwords * 8] $uint64_t * {
@@ -1743,9 +1802,9 @@ mempmovedownq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 
 
 @@Fill memory with a given qword
-[fast][libc][kernel][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
 memsetq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
-         $uint64_t qword, $size_t n_qwords) -> [[[== dst]]] $uint64_t * {
+         $uint64_t qword, $size_t n_qwords) -> [[== dst]] $uint64_t * {
 	u64 *pdst = (u64 *)dst;
 	while (n_qwords--)
 		*pdst++ = qword;
@@ -1753,14 +1812,14 @@ memsetq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 }
 
 @@Same as `memsetq', but return `DST + N_QWORDS', rather than `DST'
-[fast][libc][kernel][ATTR_LEAF]
+[[fast, libc, kernel, ATTR_LEAF]]
 mempsetq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
           $uint64_t qword, $size_t n_qwords) -> [== dst + n_qwords * 8] $uint64_t * {
 	return (u64 *)memsetq(dst, qword, n_qwords) + n_qwords;
 }
 
 @@Compare memory buffers and return the difference of the first non-matching qword
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
 memcmpq:([[nonnull]] /*aligned(8)*/ void const *s1,
          [[nonnull]] /*aligned(8)*/ void const *s2, $size_t n_dwords) -> $int64_t {
 	s64 *p1 = (s64 *)s1;
@@ -1772,10 +1831,10 @@ memcmpq:([[nonnull]] /*aligned(8)*/ void const *s1,
 }
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $uint64_t *
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $uint64_t const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+$uint64_t *memchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t const *]
 {
 	u64 *hay_iter = (u64 *)haystack;
 	for (; n_qwords--; ++hay_iter) {
@@ -1786,10 +1845,10 @@ memchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t q
 }
 
 @@Descendingly search for `NEEDLE', starting at `HAYSTACK+N_QWORDS'. - Return `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memrchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $uint64_t *
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $uint64_t const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+$uint64_t *memrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t const *]
 {
 	u64 *iter = (u64 *)haystack + n_qwords;
 	while (n_qwords--) {
@@ -1800,10 +1859,10 @@ memrchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t 
 }
 
 @@Same as `memchrq' with a search limit of `(size_t)-1 / 8'
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) -> [[nonnull]] $uint64_t *
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword) -> [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) -> [[nonnull]] $uint64_t const *]
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint64_t *rawmemchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t const *]
 {
 	u64 *iter = (u64 *)haystack;
 	for (;; ++iter) {
@@ -1814,10 +1873,10 @@ rawmemchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_
 }
 
 @@Same as `memrchrq' without a search limit, starting at `(byte_t *)HAYSTACK - 8'
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) -> [[nonnull]] $uint64_t *
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword) -> [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) -> [[nonnull]] $uint64_t const *]
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint64_t *rawmemrchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t const *]
 {
 	u64 *iter = (u64 *)haystack;
 	for (;;) {
@@ -1828,10 +1887,10 @@ rawmemrchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64
 }
 
 @@Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memendq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_bytes) -> [[nonnull]] $uint64_t *
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_bytes) -> [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_bytes) -> [[nonnull]] $uint64_t const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint64_t *memendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_bytes)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_bytes): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_bytes): [[nonnull]] $uint64_t const *]
 {
 	u64 *result = (u64 *)haystack;
 	for (; n_bytes--; ++result) {
@@ -1842,10 +1901,10 @@ memendq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t q
 }
 
 @@Same as `memrchrq', but return `HAYSTACK - 8', rather than `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memrendq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> [[nonnull]] $uint64_t *
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> [[nonnull]] $uint64_t const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint64_t *memrendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords): [[nonnull]] $uint64_t const *]
 {
 	u64 *result = (u64 *)haystack + n_qwords;
 	for (;;) {
@@ -1861,44 +1920,45 @@ memrendq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t 
 
 @@Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `N_QWORDS' if the given `NEEDLE' wasn't found
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memlenq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $size_t {
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t memlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
+                $uint64_t qword, $size_t n_qwords) {
 	return (size_t)(memendq(haystack, qword, n_qwords) - (u64 *)haystack);
 }
 
 @@Same as `memrendq', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `(size_t)-1 / 8' if the given `NEEDLE' wasn't found
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memrlenq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $size_t {
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t memrlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
+                 $uint64_t qword, $size_t n_qwords) {
 	return (size_t)(memrendq(haystack, qword, n_qwords) - (u64 *)haystack);
 }
 
 @@Same as `rawmemchrq', but return the offset from `HAYSTACK', rather than the actual address.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemlenq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) -> $size_t {
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t rawmemlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) {
 	return (size_t)(rawmemchrq(haystack, qword) - (u64 *)haystack);
 }
 
 @@Same as `rawmemrchrq', but return the offset from `HAYSTACK', rather than the actual address.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrlenq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) -> $size_t {
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t rawmemrlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) {
 	return (size_t)(rawmemrchrq(haystack, qword) - (u64 *)haystack);
 }
 
 
-%{
-#endif /* __UINT64_TYPE__ */
-#endif /* __USE_STRING_BWLQ */
+%#endif /* __UINT64_TYPE__ */
+%#endif /* __USE_STRING_BWLQ */
+%
+%
+%#ifdef __USE_STRING_XCHR
 
-
-#ifdef __USE_STRING_XCHR
-}
 
 @@Same as `memchr', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memxchr:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> void *
-	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes) -> void *]
-	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> void const *]
+void *memxchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes): void *]
+	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes): void const *]
 {
 	byte_t *hay_iter = (byte_t *)haystack;
 	for (; n_bytes--; ++hay_iter) {
@@ -1910,9 +1970,9 @@ memxchr:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_byte
 
 @@Same as `memrchr', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memrxchr:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> void *
-	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes) -> void *]
-	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> void const *]
+void *memrxchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes): void *]
+	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes): void const *]
 {
 	byte_t *iter = (byte_t *)haystack + n_bytes;
 	while (n_bytes--) {
@@ -1925,9 +1985,9 @@ memrxchr:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_byt
 
 @@Same as `rawmemchr', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemxchr:([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnull]] void *
-	[([[nonnull]] void *__restrict haystack, int needle) -> [[nonnull]] void *]
-	[([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnull]] void const *]
+[[nonnull]] void *rawmemxchr([[nonnull]] void const *__restrict haystack, int needle)
+	[([[nonnull]] void *__restrict haystack, int needle): [[nonnull]] void *]
+	[([[nonnull]] void const *__restrict haystack, int needle): [[nonnull]] void const *]
 {
 	byte_t *iter = (byte_t *)haystack;
 	for (;; ++iter) {
@@ -1939,9 +1999,9 @@ rawmemxchr:([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnul
 
 @@Same as `rawmemrchr', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrxchr:([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnull]] void *
-	[([[nonnull]] void *__restrict haystack, int needle) -> [[nonnull]] void *]
-	[([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnull]] void const *]
+[[nonnull]] void *rawmemrxchr([[nonnull]] void const *__restrict haystack, int needle)
+	[([[nonnull]] void *__restrict haystack, int needle): [[nonnull]] void *]
+	[([[nonnull]] void const *__restrict haystack, int needle): [[nonnull]] void const *]
 {
 	byte_t *iter = (byte_t *)haystack;
 	for (;;) {
@@ -1953,9 +2013,9 @@ rawmemrxchr:([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnu
 
 @@Same as `memend', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memxend:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> [[nonnull]] void *
-	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes) -> [[nonnull]] void *]
-	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> [[nonnull]] void const *]
+[[nonnull]] void *memxend([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] void *]
+	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] void const *]
 {
 	byte_t *result = (byte_t *)haystack;
 	for (; n_bytes--; ++result) {
@@ -1967,9 +2027,9 @@ memxend:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_byte
 
 @@Same as `memrend', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memrxend:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> [[nonnull]] void *
-	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes) -> [[nonnull]] void *]
-	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> [[nonnull]] void const *]
+[[nonnull]] void *memrxend([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] void *]
+	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] void const *]
 {
 	byte_t *result = (byte_t *)haystack + n_bytes;
 	while (n_bytes--) {
@@ -1981,25 +2041,25 @@ memrxend:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_byt
 
 @@Same as `memlen', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memxlen:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> $size_t {
+$size_t memxlen([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) {
 	return (size_t)((byte_t *)memxend(haystack, needle, n_bytes) - (byte_t *)haystack);
 }
 
 @@Same as `memrlen', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memrxlen:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> $size_t {
+$size_t memrxlen([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) {
 	return (size_t)((byte_t *)memrxend(haystack, needle, n_bytes) - (byte_t *)haystack);
 }
 
 @@Same as `rawmemlen', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemxlen:([[nonnull]] void const *__restrict haystack, int needle) -> $size_t {
+$size_t rawmemxlen([[nonnull]] void const *__restrict haystack, int needle) {
 	return (size_t)((byte_t *)rawmemxchr(haystack, needle) - (byte_t *)haystack);
 }
 
 @@Same as `rawmemrlen', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrxlen:([[nonnull]] void const *__restrict haystack, int needle) -> $size_t {
+$size_t rawmemrxlen([[nonnull]] void const *__restrict haystack, int needle) {
 	return (size_t)((byte_t *)rawmemrxchr(haystack, needle) - (byte_t *)haystack);
 }
 
@@ -2008,17 +2068,17 @@ rawmemrxlen:([[nonnull]] void const *__restrict haystack, int needle) -> $size_t
 %#ifdef __USE_STRING_BWLQ
 
 @@Same as `memchrb', but search for non-matching locations.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-memxchrb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t *
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t const *]
+[[ATTR_WUNUSED, ATTR_PURE]]
+$uint8_t *memxchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): $uint8_t const *]
 	= memxchr;
 
 @@Same as `memchrw', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memxchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t *
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t const *]
+$uint16_t *memxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t const *]
 {
 	u16 *hay_iter = (u16 *)haystack;
 	for (; n_words--; ++hay_iter) {
@@ -2030,9 +2090,9 @@ memxchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t 
 
 @@Same as `memchrl', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memxchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t *
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t const *]
+$uint32_t *memxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t const *]
 {
 	u32 *hay_iter = (u32 *)haystack;
 	for (; n_dwords--; ++hay_iter) {
@@ -2043,17 +2103,17 @@ memxchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t 
 }
 
 @@Same as `memrchrb', but search for non-matching locations.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-memrxchrb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t *
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $uint8_t const *]
+[[ATTR_WUNUSED, ATTR_PURE]]
+$uint8_t *memrxchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): $uint8_t const *]
 	= memrxchr;
 
 @@Same as `memrchrw', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memrxchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t *
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $uint16_t const *]
+$uint16_t *memrxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t const *]
 {
 	u16 *iter = (u16 *)haystack + n_words;
 	while (n_words--) {
@@ -2065,9 +2125,9 @@ memrxchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t
 
 @@Same as `memrchrl', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memrxchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t *
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $uint32_t const *]
+$uint32_t *memrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords): $uint32_t const *]
 {
 	u32 *iter = (u32 *)haystack + n_dwords;
 	while (n_dwords--) {
@@ -2078,17 +2138,17 @@ memrxchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t
 }
 
 @@Same as `rawmemchrb', but search for non-matching locations.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemxchrb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte) -> [[nonnull]] $uint8_t *
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte) -> [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte) -> [[nonnull]] $uint8_t const *]
+[[ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint8_t *rawmemxchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte): [[nonnull]] $uint8_t const *]
 	= rawmemxchr;
 
 @@Same as `rawmemchrw', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemxchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) -> [[nonnull]] $uint16_t *
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word) -> [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) -> [[nonnull]] $uint16_t const *]
+[[nonnull]] $uint16_t *rawmemxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t const *]
 {
 	u16 *iter = (u16 *)haystack;
 	for (;; ++iter) {
@@ -2100,9 +2160,9 @@ rawmemxchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16
 
 @@Same as `rawmemchrl', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemxchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) -> [[nonnull]] $uint32_t *
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword) -> [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) -> [[nonnull]] $uint32_t const *]
+[[nonnull]] $uint32_t *rawmemxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t const *]
 {
 	u32 *iter = (u32 *)haystack;
 	for (;; ++iter) {
@@ -2114,17 +2174,17 @@ rawmemxchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32
 
 
 @@Same as `rawmemrchrb', but search for non-matching locations.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrxchrb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte) -> [[nonnull]] $uint8_t *
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte) -> [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte) -> [[nonnull]] $uint8_t const *]
+[[ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint8_t *rawmemrxchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte): [[nonnull]] $uint8_t const *]
 	= rawmemrxchr;
 
 @@Same as `rawmemrchrw', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrxchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) -> [[nonnull]] $uint16_t *
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word) -> [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) -> [[nonnull]] $uint16_t const *]
+[[nonnull]] $uint16_t *rawmemrxchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word): [[nonnull]] $uint16_t const *]
 {
 	u16 *iter = (u16 *)haystack;
 	for (;;) {
@@ -2136,9 +2196,9 @@ rawmemrxchrw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint1
 
 @@Same as `rawmemrchrl', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrxchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) -> [[nonnull]] $uint32_t *
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword) -> [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) -> [[nonnull]] $uint32_t const *]
+[[nonnull]] $uint32_t *rawmemrxchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword): [[nonnull]] $uint32_t const *]
 {
 	u32 *iter = (u32 *)haystack;
 	for (;;) {
@@ -2150,17 +2210,17 @@ rawmemrxchrl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint3
 
 
 @@Same as `memendb', but search for non-matching locations.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-memxendb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> [[nonnull]] $uint8_t *
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes) -> [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> [[nonnull]] $uint8_t const *]
+[[ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint8_t *memxendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t const *]
 	= memxend;
 
 @@Same as `memendw', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memxendw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes) -> [[nonnull]] $uint16_t *
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_bytes) -> [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes) -> [[nonnull]] $uint16_t const *]
+[[nonnull]] $uint16_t *memxendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_bytes): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_bytes): [[nonnull]] $uint16_t const *]
 {
 	u16 *result = (u16 *)haystack;
 	for (; n_bytes--; ++result) {
@@ -2172,9 +2232,9 @@ memxendw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t 
 
 @@Same as `memendl', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memxendl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes) -> [[nonnull]] $uint32_t *
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_bytes) -> [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes) -> [[nonnull]] $uint32_t const *]
+[[nonnull]] $uint32_t *memxendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_bytes): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_bytes): [[nonnull]] $uint32_t const *]
 {
 	u32 *result = (u32 *)haystack;
 	for (; n_bytes--; ++result) {
@@ -2186,17 +2246,17 @@ memxendl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t 
 
 
 @@Same as `memrendb', but search for non-matching locations.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-memrxendb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> [[nonnull]] $uint8_t *
-	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes) -> [[nonnull]] $uint8_t *]
-	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> [[nonnull]] $uint8_t const *]
+[[ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] $uint8_t *memrxendb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes)
+	[([[nonnull]] /*aligned(1)*/ void *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t *]
+	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): [[nonnull]] $uint8_t const *]
 	= memrxend;
 
 @@Same as `memrendw', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memrxendw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> [[nonnull]] $uint16_t *
-	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words) -> [[nonnull]] $uint16_t *]
-	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> [[nonnull]] $uint16_t const *]
+[[nonnull]] $uint16_t *memrxendw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
+	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): [[nonnull]] $uint16_t *]
+	[([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words): [[nonnull]] $uint16_t const *]
 {
 	u16 *result = (u16 *)haystack + n_words;
 	while (n_words--) {
@@ -2208,9 +2268,9 @@ memrxendw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t
 
 @@Same as `memrendl', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memrxendl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> [[nonnull]] $uint32_t *
-	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> [[nonnull]] $uint32_t *]
-	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> [[nonnull]] $uint32_t const *]
+[[nonnull]] $uint32_t *memrxendl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)
+	[([[nonnull]] /*aligned(4)*/ void *__restrict haystack, $uint32_t dword, $size_t n_dwords): [[nonnull]] $uint32_t *]
+	[([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords): [[nonnull]] $uint32_t const *]
 {
 	u32 *result = (u32 *)haystack + n_dwords;
 	while (n_dwords--) {
@@ -2223,69 +2283,69 @@ memrxendl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t
 
 
 @@Same as `memlenb', but search for non-matching locations.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-memxlenb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $size_t = memxlen;
+[[ATTR_WUNUSED, ATTR_PURE]]
+$size_t memxlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) = memxlen;
 
 @@Same as `memlenw', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memxlenw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $size_t {
+$size_t memxlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) {
 	return (size_t)(memxendw(haystack, word, n_words) - (u16 *)haystack);
 }
 
 @@Same as `memlenl', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memxlenl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $size_t {
+$size_t memxlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) {
 	return (size_t)(memxendl(haystack, dword, n_dwords) - (u32 *)haystack);
 }
 
 @@Same as `memrlenb', but search for non-matching locations.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-memrxlenb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) -> $size_t = memrxlen;
+[[ATTR_WUNUSED, ATTR_PURE]]
+$size_t memrxlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes) = memrxlen;
 
 @@Same as `memrlenw', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memrxlenw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) -> $size_t {
+$size_t memrxlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words) {
 	return (size_t)(memrxendw(haystack, word, n_words) - (u16 *)haystack);
 }
 
 @@Same as `memrlenl', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memrxlenl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) -> $size_t {
+$size_t memrxlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords) {
 	return (size_t)(memrxendl(haystack, dword, n_dwords) - (u32 *)haystack);
 }
 
 
 
 @@Same as `rawmemlenb', but search for non-matching locations.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemxlenb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle) -> $size_t = rawmemxlen;
+[[ATTR_WUNUSED, ATTR_PURE]]
+$size_t rawmemxlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle) = rawmemxlen;
 
 @@Same as `rawmemlenw', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemxlenw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) -> $size_t {
+$size_t rawmemxlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) {
 	return (size_t)(rawmemxchrw(haystack, word) - (u16 *)haystack);
 }
 
 @@Same as `rawmemlenl', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemxlenl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) -> $size_t {
+$size_t rawmemxlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) {
 	return (size_t)(rawmemxchrl(haystack, dword) - (u32 *)haystack);
 }
 
 
 @@Same as `rawmemrlenb', but search for non-matching locations.
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrxlenb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle) -> $size_t = rawmemrxlen;
+[[ATTR_WUNUSED, ATTR_PURE]]
+$size_t rawmemrxlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int needle) = rawmemrxlen;
 
 @@Same as `rawmemrlenw', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrxlenw:([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) -> $size_t {
+$size_t rawmemrxlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word) {
 	return (size_t)(rawmemrxchrw(haystack, word) - (u16 *)haystack);
 }
 
 @@Same as `rawmemrlenl', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrxlenl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) -> $size_t {
+$size_t rawmemrxlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword) {
 	return (size_t)(rawmemrxchrl(haystack, dword) - (u32 *)haystack);
 }
 
@@ -2295,9 +2355,9 @@ rawmemrxlenl:([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint3
 
 @@Same as `memchrq', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memxchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $uint64_t *
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $uint64_t const *]
+$uint64_t *memxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t const *]
 {
 	u64 *hay_iter = (u64 *)haystack;
 	for (; n_qwords--; ++hay_iter) {
@@ -2309,9 +2369,9 @@ memxchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t 
 
 @@Same as `memrchrq', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memrxchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $uint64_t *
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $uint64_t const *]
+$uint64_t *memrxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords): $uint64_t const *]
 {
 	u64 *iter = (u64 *)haystack + n_qwords;
 	while (n_qwords--) {
@@ -2323,9 +2383,9 @@ memrxchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t
 
 @@Same as `rawmemchrq', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemxchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) -> [[nonnull]] $uint64_t *
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword) -> [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) -> [[nonnull]] $uint64_t const *]
+[[nonnull]] $uint64_t *rawmemxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t const *]
 {
 	u64 *iter = (u64 *)haystack;
 	for (;; ++iter) {
@@ -2337,9 +2397,9 @@ rawmemxchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64
 
 @@Same as `rawmemrchrq', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrxchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) -> [[nonnull]] $uint64_t *
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword) -> [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) -> [[nonnull]] $uint64_t const *]
+[[nonnull]] $uint64_t *rawmemrxchrq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword): [[nonnull]] $uint64_t const *]
 {
 	u64 *iter = (u64 *)haystack;
 	for (;;) {
@@ -2351,9 +2411,9 @@ rawmemrxchrq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint6
 
 @@Same as `memendq', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memxendq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_bytes) -> [[nonnull]] $uint64_t *
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_bytes) -> [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_bytes) -> [[nonnull]] $uint64_t const *]
+[[nonnull]] $uint64_t *memxendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_bytes)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_bytes): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_bytes): [[nonnull]] $uint64_t const *]
 {
 	u64 *result = (u64 *)haystack;
 	for (; n_bytes--; ++result) {
@@ -2365,9 +2425,9 @@ memxendq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t 
 
 @@Same as `memrendq', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memrxendq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> [[nonnull]] $uint64_t *
-	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> [[nonnull]] $uint64_t *]
-	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> [[nonnull]] $uint64_t const *]
+[[nonnull]] $uint64_t *memrxendq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords)
+	[([[nonnull]] /*aligned(8)*/ void *__restrict haystack, $uint64_t qword, $size_t n_qwords): [[nonnull]] $uint64_t *]
+	[([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords): [[nonnull]] $uint64_t const *]
 {
 	u64 *result = (u64 *)haystack + n_qwords;
 	while (n_qwords--) {
@@ -2379,45 +2439,45 @@ memrxendq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t
 
 @@Same as `memlenq', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memxlenq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $size_t {
+$size_t memxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) {
 	return (size_t)(memxendq(haystack, qword, n_qwords) - (u64 *)haystack);
 }
 
 @@Same as `memrlenq', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-memrxlenq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) -> $size_t {
+$size_t memrxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword, $size_t n_qwords) {
 	return (size_t)(memrxendq(haystack, qword, n_qwords) - (u64 *)haystack);
 }
 
 @@Same as `rawmemlenq', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemxlenq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) -> $size_t {
+$size_t rawmemxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) {
 	return (size_t)(rawmemxchrq(haystack, qword) - (u64 *)haystack);
 }
 
 @@Same as `rawmemrlenq', but search for non-matching locations.
 [[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrxlenq:([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) -> $size_t {
+$size_t rawmemrxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack, $uint64_t qword) {
 	return (size_t)(rawmemrxchrq(haystack, qword) - (u64 *)haystack);
 }
 
-%{
-#endif /* __UINT64_TYPE__ */
-#endif /* __USE_STRING_BWLQ */
-#endif /* __USE_STRING_XCHR */
-
-
-
-
-
-#ifdef __USE_KOS
-}
+%#endif /* __UINT64_TYPE__ */
+%#endif /* __USE_STRING_BWLQ */
+%#endif /* __USE_STRING_XCHR */
+%
+%
+%
+%
+%
+%#ifdef __USE_KOS
 
 @@Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
 @@@return: * : Always re-returns `dst'
-[fast][libc][kernel][ATTR_LEAF]
-[impl_include("<hybrid/__assert.h>")]
-memmoveup:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) -> [[[== dst]]] void * {
+[[fast, libc, kernel, ATTR_LEAF]]
+[[impl_include("<hybrid/__assert.h>")]]
+memmoveup:([[nonnull]] void *dst,
+           [[nonnull]] void const *src,
+           $size_t n_bytes) -> [[== dst]] void * {
 	byte_t *pdst, *psrc;
 	pdst = (byte_t *)dst + n_bytes;
 	psrc = (byte_t *)src + n_bytes;
@@ -2429,9 +2489,11 @@ memmoveup:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) 
 
 @@Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
 @@@return: * : Always re-returns `dst'
-[fast][libc][kernel][ATTR_LEAF]
-[impl_include("<hybrid/__assert.h>")]
-memmovedown:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) -> [[[== dst]]] void * {
+[[fast, libc, kernel, ATTR_LEAF]]
+[[impl_include("<hybrid/__assert.h>")]]
+memmovedown:([[nonnull]] void *dst,
+             [[nonnull]] void const *src,
+             $size_t n_bytes) -> [[== dst]] void * {
 	byte_t *pdst, *psrc;
 	pdst = (byte_t *)dst;
 	psrc = (byte_t *)src;
@@ -2446,81 +2508,257 @@ memmovedown:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes
 
 @@Copy memory between non-overlapping memory blocks.
 @@@return: * : Always re-returns `dst'
-[fast][libc][ATTR_LEAF]
+[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 memcpyc:([[nonnull]] void *__restrict dst,
          [[nonnull]] void const *__restrict src,
          $size_t elem_count, $size_t elem_size)
-	-> [[[== dst]]] void *
-	%{auto_block(memcpyc(%auto))}
+	-> [[== dst]] void * {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	switch (elem_size) {
+
+	case 1:
+		return memcpy(dst, src, elem_count);
+
+	case 2:
+		return memcpyw(dst, src, elem_count);
+
+	case 4:
+		return memcpyl(dst, src, elem_count);
+
+#ifdef __UINT64_TYPE__
+	case 8:
+		return memcpyq(dst, src, elem_count);
+#endif /* __UINT64_TYPE__ */
+
+	default:
+		break;
+	}
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	return memcpy(dst, src, elem_count * elem_size);
+}
 
 @@Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST'
-[fast][libc][ATTR_LEAF]
+[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 mempcpyc:([[nonnull]] void *__restrict dst,
           [[nonnull]] void const *__restrict src,
           $size_t elem_count, $size_t elem_size)
-	-> [== dst + (elem_count * elem_size)] void *
-	%{auto_block(memcpyc(%auto))}
+	-> [== dst + (elem_count * elem_size)] void * {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	switch (elem_size) {
+
+	case 1:
+		return mempcpy(dst, src, elem_count);
+
+	case 2:
+		return mempcpyw(dst, src, elem_count);
+
+	case 4:
+		return mempcpyl(dst, src, elem_count);
+
+#ifdef __UINT64_TYPE__
+	case 8:
+		return mempcpyq(dst, src, elem_count);
+#endif /* __UINT64_TYPE__ */
+
+	default:
+		break;
+	}
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	return mempcpy(dst, src, elem_count * elem_size);
+}
 
 @@Move memory between potentially overlapping memory blocks
 @@@return: * : Always re-returns `dst'
-[fast][libc][ATTR_LEAF]
+[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 memmovec:([[nonnull]] void *dst,
           [[nonnull]] void const *src,
           $size_t elem_count, $size_t elem_size)
-	-> [[[== dst]]] void *
-	%{auto_block(memcpyc(%auto))}
+	-> [[== dst]] void * {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	switch (elem_size) {
+
+	case 1:
+		return memmove(dst, src, elem_count);
+
+	case 2:
+		return memmovew(dst, src, elem_count);
+
+	case 4:
+		return memmovel(dst, src, elem_count);
+
+#ifdef __UINT64_TYPE__
+	case 8:
+		return memmoveq(dst, src, elem_count);
+#endif /* __UINT64_TYPE__ */
+
+	default:
+		break;
+	}
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	return memmove(dst, src, elem_count * elem_size);
+}
 
 @@Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST'
-[fast][libc][ATTR_LEAF]
+[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 mempmovec:([[nonnull]] void *dst,
            [[nonnull]] void const *src,
            $size_t elem_count, $size_t elem_size)
-	-> [== dst + (elem_count * elem_size)] void *
-	%{auto_block(memcpyc(%auto))}
+	-> [== dst + (elem_count * elem_size)] void * {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	switch (elem_size) {
+
+	case 1:
+		return mempmove(dst, src, elem_count);
+
+	case 2:
+		return mempmovew(dst, src, elem_count);
+
+	case 4:
+		return mempmovel(dst, src, elem_count);
+
+#ifdef __UINT64_TYPE__
+	case 8:
+		return mempmoveq(dst, src, elem_count);
+#endif /* __UINT64_TYPE__ */
+
+	default:
+		break;
+	}
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	return mempmove(dst, src, elem_count * elem_size);
+}
 
 @@Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
 @@@return: * : Always re-returns `dst'
-[fast][libc][ATTR_LEAF]
+[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 memmoveupc:([[nonnull]] void *dst,
             [[nonnull]] void const *src,
             $size_t elem_count, $size_t elem_size)
-	-> [[[== dst]]] void *
-	%{auto_block(memcpyc(%auto))}
+	-> [[== dst]] void * {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	switch (elem_size) {
+
+	case 1:
+		return memmoveup(dst, src, elem_count);
+
+	case 2:
+		return memmoveupw(dst, src, elem_count);
+
+	case 4:
+		return memmoveupl(dst, src, elem_count);
+
+#ifdef __UINT64_TYPE__
+	case 8:
+		return memmoveupq(dst, src, elem_count);
+#endif /* __UINT64_TYPE__ */
+
+	default:
+		break;
+	}
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	return memmoveup(dst, src, elem_count * elem_size);
+}
 
 @@Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
-[fast][libc][ATTR_LEAF][dependency_include(<hybrid/host.h>)]
+[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 mempmoveupc:([[nonnull]] void *dst,
              [[nonnull]] void const *src,
              $size_t elem_count, $size_t elem_size)
-	-> [== dst + (elem_count * elem_size)] void *
-	%{auto_block(memcpyc(%auto))}
+	-> [== dst + (elem_count * elem_size)] void * {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	switch (elem_size) {
+
+	case 1:
+		return mempmoveup(dst, src, elem_count);
+
+	case 2:
+		return mempmoveupw(dst, src, elem_count);
+
+	case 4:
+		return mempmoveupl(dst, src, elem_count);
+
+#ifdef __UINT64_TYPE__
+	case 8:
+		return mempmoveupq(dst, src, elem_count);
+#endif /* __UINT64_TYPE__ */
+
+	default:
+		break;
+	}
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	return mempmoveup(dst, src, elem_count * elem_size);
+}
 
 @@Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
 @@@return: * : Always re-returns `dst'
-[fast][libc][ATTR_LEAF]
+[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 memmovedownc:([[nonnull]] void *dst,
               [[nonnull]] void const *src,
               $size_t elem_count, $size_t elem_size)
-	-> [[[== dst]]] void *
-	%{auto_block(memcpyc(%auto))}
+	-> [[== dst]] void * {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	switch (elem_size) {
+
+	case 1:
+		return memmovedown(dst, src, elem_count);
+
+	case 2:
+		return memmovedownw(dst, src, elem_count);
+
+	case 4:
+		return memmovedownl(dst, src, elem_count);
+
+#ifdef __UINT64_TYPE__
+	case 8:
+		return memmovedownq(dst, src, elem_count);
+#endif /* __UINT64_TYPE__ */
+
+	default:
+		break;
+	}
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	return memmovedown(dst, src, elem_count * elem_size);
+}
 
 @@Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
-[fast][libc][ATTR_LEAF]
+[[fast, libc, ATTR_LEAF, impl_include("<hybrid/host.h>")]]
 mempmovedownc:([[nonnull]] void *dst,
                [[nonnull]] void const *src,
                $size_t elem_count, $size_t elem_size)
-	-> [== dst + (elem_count * elem_size)] void *
-	%{auto_block(memcpyc(%auto))}
+	-> [== dst + (elem_count * elem_size)] void * {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	switch (elem_size) {
+
+	case 1:
+		return mempmovedown(dst, src, elem_count);
+
+	case 2:
+		return mempmovedownw(dst, src, elem_count);
+
+	case 4:
+		return mempmovedownl(dst, src, elem_count);
+
+#ifdef __UINT64_TYPE__
+	case 8:
+		return mempmovedownq(dst, src, elem_count);
+#endif /* __UINT64_TYPE__ */
+
+	default:
+		break;
+	}
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	return mempmovedown(dst, src, elem_count * elem_size);
+}
 
 
 
 
 /* KOS String extension functions. */
 @@Same as `STR + strlen(STR)'
-[libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-strend:([[nonnull]] char const *__restrict string) -> [[nonnull]] char *
-	[([[nonnull]] char *__restrict string) -> [[nonnull]] char *]
-	[([[nonnull]] char const *__restrict string) -> [[nonnull]] char const *]
+[[libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] char *strend([[nonnull]] char const *__restrict string)
+	[([[nonnull]] char *__restrict string): [[nonnull]] char *]
+	[([[nonnull]] char const *__restrict string): [[nonnull]] char const *]
 {
 	while (*string)
 		++string;
@@ -2528,10 +2766,10 @@ strend:([[nonnull]] char const *__restrict string) -> [[nonnull]] char *
 }
 
 @@Same as `STR + strnlen(STR, MAX_CHARS)'
-[libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-strnend:([[nonnull]] char const *__restrict string, $size_t maxlen) -> [[nonnull]] char *
-	[([[nonnull]] char *__restrict string, $size_t maxlen) -> [[nonnull]] char *]
-	[([[nonnull]] char const *__restrict string, $size_t maxlen) -> [[nonnull]] char const *]
+[[libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] char *strnend([[nonnull]] char const *__restrict string, $size_t maxlen)
+	[([[nonnull]] char *__restrict string, $size_t maxlen): [[nonnull]] char *]
+	[([[nonnull]] char const *__restrict string, $size_t maxlen): [[nonnull]] char const *]
 {
 	for (; maxlen && *string; ++string, --maxlen)
 		;
@@ -2540,9 +2778,9 @@ strnend:([[nonnull]] char const *__restrict string, $size_t maxlen) -> [[nonnull
 
 @@Same as `strchr', but don't exceed `MAX_CHARS' characters.
 [[ATTR_WUNUSED, ATTR_PURE]]
-strnchr:([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen) -> char *
-	[([[nonnull]] char *__restrict haystack, int needle, $size_t maxlen) -> char *]
-	[([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen) -> char const *]
+char *strnchr([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen)
+	[([[nonnull]] char *__restrict haystack, int needle, $size_t maxlen): char *]
+	[([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen): char const *]
 {
 	for (; maxlen-- && *haystack; ++haystack) {
 		if unlikely((unsigned char)*haystack == (unsigned char)needle)
@@ -2553,9 +2791,9 @@ strnchr:([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen
 
 @@Same as `strrchr', but don't exceed `MAX_CHARS' characters.
 [[ATTR_WUNUSED, ATTR_PURE]]
-strnrchr:([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen) -> char *
-	[([[nonnull]] char *__restrict haystack, int needle, $size_t maxlen) -> char *]
-	[([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen) -> char const *]
+char *strnrchr([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen)
+	[([[nonnull]] char *__restrict haystack, int needle, $size_t maxlen): char *]
+	[([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen): char const *]
 {
 	char const *result = NULL;
 	for (; maxlen-- && *haystack; ++haystack) {
@@ -2567,9 +2805,9 @@ strnrchr:([[nonnull]] char const *__restrict haystack, int needle, $size_t maxle
 
 @@Same as `strrchr', but return `STR - 1', rather than `NULL' if `NEEDLE' wasn't found.
 [[ATTR_WUNUSED, ATTR_PURE]]
-strrchrnul:([[nonnull]] char const *__restrict haystack, int needle) -> [[nonnull]] char *
-	[([[nonnull]] char *__restrict haystack, int needle) -> [[nonnull]] char *]
-	[([[nonnull]] char const *__restrict haystack, int needle) -> [[nonnull]] char const *]
+[[nonnull]] char *strrchrnul([[nonnull]] char const *__restrict haystack, int needle)
+	[([[nonnull]] char *__restrict haystack, int needle): [[nonnull]] char *]
+	[([[nonnull]] char const *__restrict haystack, int needle): [[nonnull]] char const *]
 {
 	char const *result = haystack - 1;
 	do {
@@ -2581,9 +2819,9 @@ strrchrnul:([[nonnull]] char const *__restrict haystack, int needle) -> [[nonnul
 
 @@Same as `strnchr', but return `strnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found.
 [[ATTR_WUNUSED, ATTR_PURE]]
-strnchrnul:([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen) -> [[nonnull]] char *
-	[([[nonnull]] char *__restrict haystack, int needle, $size_t maxlen) -> [[nonnull]] char *]
-	[([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen) -> [[nonnull]] char const *]
+[[nonnull]] char *strnchrnul([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen)
+	[([[nonnull]] char *__restrict haystack, int needle, $size_t maxlen): [[nonnull]] char *]
+	[([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen): [[nonnull]] char const *]
 {
 	for (; maxlen-- && *haystack && (unsigned char)*haystack != (unsigned char)needle; ++haystack)
 		;
@@ -2592,9 +2830,9 @@ strnchrnul:([[nonnull]] char const *__restrict haystack, int needle, $size_t max
 
 @@Same as `strnrchr', but return `STR - 1', rather than `NULL' if `NEEDLE' wasn't found.
 [[ATTR_WUNUSED, ATTR_PURE]]
-strnrchrnul:([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen) -> [[nonnull]] char *
-	[([[nonnull]] char *__restrict haystack, int needle, $size_t maxlen) -> [[nonnull]] char *]
-	[([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen) -> [[nonnull]] char const *]
+[[nonnull]] char *strnrchrnul([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen)
+	[([[nonnull]] char *__restrict haystack, int needle, $size_t maxlen): [[nonnull]] char *]
+	[([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen): [[nonnull]] char const *]
 {
 	char const *result = haystack - 1;
 	for (; maxlen-- && *haystack; ++haystack) {
@@ -2606,50 +2844,50 @@ strnrchrnul:([[nonnull]] char const *__restrict haystack, int needle, $size_t ma
 
 @@Same as `strchrnul', but return the offset from `STR', rather than the actual address
 [[ATTR_WUNUSED, ATTR_PURE]]
-stroff:([[nonnull]] char const *__restrict haystack, int needle) -> $size_t {
+$size_t stroff([[nonnull]] char const *__restrict haystack, int needle) {
 	return (size_t)(strchrnul(haystack, needle) - haystack);
 }
 
 @@Same as `strrchrnul', but return the offset from `STR', rather than the actual address
 [[ATTR_WUNUSED, ATTR_PURE]]
-strroff:([[nonnull]] char const *__restrict haystack, int needle) -> $size_t {
+$size_t strroff([[nonnull]] char const *__restrict haystack, int needle) {
 	return (size_t)(strrchrnul(haystack, needle) - haystack);
 }
 
 @@Same as `strnchrnul', but return the offset from `STR', rather than the actual address
 [[ATTR_WUNUSED, ATTR_PURE]]
-strnoff:([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen) -> $size_t {
+$size_t strnoff([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen) {
 	return (size_t)(strnchrnul(haystack, needle, maxlen) - haystack);
 }
 
 @@Same as `strnrchrnul', but return the offset from `STR', rather than the actual address
 [[ATTR_WUNUSED, ATTR_PURE]]
-strnroff:([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen) -> $size_t {
+$size_t strnroff([[nonnull]] char const *__restrict haystack, int needle, $size_t maxlen) {
 	return (size_t)(strnrchrnul(haystack, needle, maxlen) - haystack);
 }
 
 
 @@Same as `memset', but return `DST + N_BYTES', rather than `DST'
-[fast][libc][kernel][ATTR_LEAF]
-mempset:([[nonnull]] void *__restrict dst, int byte, $size_t n_bytes) -> [== dst + n_bytes] void * {
+[[fast, libc, kernel, ATTR_LEAF]]
+mempset:([[nonnull]] void *__restrict dst, int byte, $size_t n_bytes) -> [[== dst + n_bytes]] void * {
 	return (void *)((byte_t *)memset(dst, byte, n_bytes) + n_bytes);
 }
 
 @@Same as `memmove', but return `DST + N_BYTES', rather than `DST'
-[fast][libc][kernel][ATTR_LEAF]
-mempmove:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) -> [[nonnull]] void * {
+[[fast, libc, kernel, ATTR_LEAF]]
+[[nonnull]] void *mempmove:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) {
 	return (void *)((byte_t *)memmove(dst, src, n_bytes) + n_bytes);
 }
 
 @@Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES')
-[fast][libc][kernel][ATTR_LEAF]
-mempmoveup:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) -> [[nonnull]] void * {
+[[fast, libc, kernel, ATTR_LEAF]]
+[[nonnull]] void *mempmoveup:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) {
 	return (void *)((byte_t *)memmoveup(dst, src, n_bytes) + n_bytes);
 }
 
 @@Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES')
-[fast][libc][kernel][ATTR_LEAF]
-mempmovedown:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) -> [[nonnull]] void * {
+[[fast, libc, kernel, ATTR_LEAF]]
+[[nonnull]] void *mempmovedown:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_bytes) {
 	return (void *)((byte_t *)memmovedown(dst, src, n_bytes) + n_bytes);
 }
 
@@ -2663,10 +2901,10 @@ mempmovedown:([[nonnull]] void *dst, [[nonnull]] void const *src, $size_t n_byte
 
 
 @@Same as `memrchr' without a search limit, starting at `HAYSTACK - 1'
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrchr:([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnull]] void *
-	[([[nonnull]] void *__restrict haystack, int needle) -> [[nonnull]] void *]
-	[([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnull]] void const *]
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] void *rawmemrchr([[nonnull]] void const *__restrict haystack, int needle)
+	[([[nonnull]] void *__restrict haystack, int needle): [[nonnull]] void *]
+	[([[nonnull]] void const *__restrict haystack, int needle): [[nonnull]] void const *]
 {
 	byte_t *iter = (byte_t *)haystack;
 	for (;;) {
@@ -2678,7 +2916,7 @@ rawmemrchr:([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnul
 
 
 /* This could be an idea. - But it may also turn out like memxch(), and never be used... */
-//[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
+//[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
 //memdiff:([[nonnull]] void const *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void *
 //	[([[nonnull]] void *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void *]
 //	[([[nonnull]] void const *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void const *]
@@ -2691,7 +2929,7 @@ rawmemrchr:([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnul
 //	}
 //	return NULL;
 //}
-//[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
+//[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
 //memrdiff:([[nonnull]] void const *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void *
 //	[([[nonnull]] void *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void *]
 //	[([[nonnull]] void const *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void const *]
@@ -2706,10 +2944,10 @@ rawmemrchr:([[nonnull]] void const *__restrict haystack, int needle) -> [[nonnul
 //}
 
 @@Same as `memchr', but return `HAYSTACK + N_BYTES', rather than `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memend:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> [[nonnull]] void *
-	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes) -> [[nonnull]] void *]
-	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> [[nonnull]] void const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] void *memend([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] void *]
+	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] void const *]
 {
 	byte_t *result = (byte_t *)haystack;
 	for (; n_bytes--; ++result) {
@@ -2720,10 +2958,10 @@ memend:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes
 }
 
 @@Same as `memrchr', but return `HAYSTACK - 1', rather than `NULL' if `NEEDLE' wasn't found.
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memrend:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> [[nonnull]] void *
-	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes) -> [[nonnull]] void *]
-	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> [[nonnull]] void const *]
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+[[nonnull]] void *memrend([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes)
+	[([[nonnull]] void *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] void *]
+	[([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes): [[nonnull]] void const *]
 {
 	byte_t *result = (byte_t *)haystack + n_bytes;
 	for (;;) {
@@ -2739,27 +2977,27 @@ memrend:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_byte
 
 @@Same as `memend', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `n_bytes' if the given `NEEDLE' wasn't found
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memlen:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> $size_t {
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t memlen([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) {
 	return (size_t)((byte_t *)memend(haystack, needle, n_bytes) - (byte_t *)haystack);
 }
 
 @@Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `(size_t)-1' if the given `NEEDLE' wasn't found
-[fast][libc][kernel][[ATTR_WUNUSED, ATTR_PURE]]
-memrlen:([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) -> $size_t {
+[[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t memrlen([[nonnull]] void const *__restrict haystack, int needle, $size_t n_bytes) {
 	return (size_t)((byte_t *)memrend(haystack, needle, n_bytes) - (byte_t *)haystack);
 }
 
 @@Same as `rawmemchr', but return the offset from `HAYSTACK', rather than the actual address.
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemlen:([[nonnull]] void const *__restrict haystack, int needle) -> $size_t {
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t rawmemlen([[nonnull]] void const *__restrict haystack, int needle) {
 	return (size_t)((byte_t *)rawmemchr(haystack, needle) - (byte_t *)haystack);
 }
 
 @@Same as `rawmemrchr', but return the offset from `HAYSTACK', rather than the actual address.
-[kernel][[ATTR_WUNUSED, ATTR_PURE]]
-rawmemrlen:([[nonnull]] void const *__restrict haystack, int needle) -> $size_t {
+[[kernel, ATTR_WUNUSED, ATTR_PURE]]
+$size_t rawmemrlen([[nonnull]] void const *__restrict haystack, int needle) {
 	return (size_t)((byte_t *)rawmemrchr(haystack, needle) - (byte_t *)haystack);
 }
 
@@ -2771,12 +3009,12 @@ rawmemrlen:([[nonnull]] void const *__restrict haystack, int needle) -> $size_t 
 @@#else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 @@When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
 @@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-[libc][[ATTR_WUNUSED, ATTR_PURE]][impl_include(<features.h>), no_crt_self_import]
-[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memrmem0)]
-[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memrmem)]
-memrmem:([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen) -> void *
-	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen) -> void *]
-	[([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen) -> void const *]
+[[libc, ATTR_WUNUSED, ATTR_PURE]][impl_include("<features.h>"), no_crt_self_import]
+[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memrmem0")]
+[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memrmem")]
+void *memrmem([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen)
+	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): void *]
+	[([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): void const *]
 {
 	byte_t *candidate, marker;
 #if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
@@ -2800,14 +3038,14 @@ memrmem:([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void
 
 
 @@Same as `memsetb', but repeat a 1-byte pattern on aligned addresses.
-[nocrt][noexport]
+[[ATTR_LEAF]]
 mempatb:([[nonnull]] void *__restrict dst,
-         int pattern, $size_t n_bytes) -> [[[== dst]]] void * = memset;
+         int pattern, $size_t n_bytes) -> [[== dst]] void * = memset;
 
 @@Same as `memsetw', but repeat a 2-byte pattern on aligned addresses.
-[fast][libc][kernel][dependency_include(<hybrid/__wordbits.h>)]
+[[fast, libc, kernel, ATTR_LEAF, impl_include("<hybrid/__wordbits.h>")]]
 mempatw:([[nonnull]] void *__restrict dst,
-         $uint16_t pattern, $size_t n_bytes) -> [[[== dst]]] void * {
+         $uint16_t pattern, $size_t n_bytes) -> [[== dst]] void * {
 	byte_t *iter = (byte_t *)dst;
 	if (n_bytes && (uintptr_t)iter & 1) {
 		*iter = __INT16_BYTE(pattern, 1);
@@ -2821,9 +3059,9 @@ mempatw:([[nonnull]] void *__restrict dst,
 }
 
 @@Same as `memsetl', but repeat a 4-byte pattern on aligned addresses.
-[fast][libc][kernel][dependency_include(<hybrid/__wordbits.h>)]
+[[fast, libc, kernel, ATTR_LEAF, impl_include("<hybrid/__wordbits.h>")]]
 mempatl:([[nonnull]] void *__restrict dst,
-         $uint32_t pattern, $size_t n_bytes) -> [[[== dst]]] void * {
+         $uint32_t pattern, $size_t n_bytes) -> [[== dst]] void * {
 	byte_t *iter = (byte_t *)dst;
 	for (; n_bytes && (uintptr_t)iter & 3; ++iter, --n_bytes)
 		*iter = __INT32_BYTE(pattern, (uintptr_t)iter & 3);
@@ -2835,9 +3073,9 @@ mempatl:([[nonnull]] void *__restrict dst,
 
 %#ifdef __UINT64_TYPE__
 @@Same as `memsetq', but repeat an 8-byte pattern on aligned addresses.
-[fast][libc][kernel][dependency_include(<hybrid/__wordbits.h>)]
+[[fast, libc, kernel, ATTR_LEAF, impl_include("<hybrid/__wordbits.h>")]]
 mempatq:([[nonnull]] void *__restrict dst,
-         $uint64_t pattern, $size_t n_bytes) -> [[[== dst]]] void * {
+         $uint64_t pattern, $size_t n_bytes) -> [[== dst]] void * {
 	byte_t *iter = (byte_t *)dst;
 	for (; n_bytes && (uintptr_t)iter & 7; ++iter, --n_bytes)
 		*iter = __INT64_BYTE(pattern, (uintptr_t)iter & 7);
@@ -2848,10 +3086,10 @@ mempatq:([[nonnull]] void *__restrict dst,
 }
 %#endif /* __UINT64_TYPE__ */
 
-[alias(memicmp, _memicmp)][[ATTR_WUNUSED]]
-[section(.text.crt.unicode.static.memory)][ATTR_PURE]
-memcasecmp:([[nonnull]] void const *s1,
-            [[nonnull]] void const *s2, $size_t n_bytes) -> int {
+[[ATTR_WUNUSED, ATTR_PURE, export_alias("memicmp", "_memicmp")]]
+[[section(".text.crt.unicode.static.memory")]]
+int memcasecmp([[nonnull]] void const *s1,
+               [[nonnull]] void const *s2, $size_t n_bytes) {
 	byte_t *p1 = (byte_t *)s1;
 	byte_t *p2 = (byte_t *)s2;
 	byte_t v1, v2;
@@ -2871,13 +3109,13 @@ memcasecmp:([[nonnull]] void const *s1,
 @@#else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 @@When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
 @@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-[[ATTR_WUNUSED, ATTR_PURE]][impl_include(<features.h>), no_crt_self_import]
-[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memcasemem0)]
-[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memcasemem)]
-[section(.text.crt.unicode.static.memory)]
-memcasemem:([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen) -> void *
-	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen) -> void *]
-	[([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen) -> void const *]
+[[ATTR_WUNUSED, ATTR_PURE, impl_include("<features.h>"), no_crt_self_import]]
+[[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memcasemem0")]]
+[[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memcasemem")]]
+[[section(".text.crt.unicode.static.memory")]]
+void *memcasemem([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen)
+	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): void *]
+	[([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): void const *]
 {
 	byte_t *candidate, marker;
 	byte_t *hayend;
@@ -2911,11 +3149,11 @@ got_candidate:
 }
 
 %#ifdef __USE_XOPEN2K8
-[alias(_memicmp_l)][[ATTR_WUNUSED, ATTR_PURE]]
-[section(.text.crt.unicode.locale.memory)]
-memcasecmp_l:([[nonnull]] void const *s1,
-              [[nonnull]] void const *s2,
-              $size_t n_bytes, $locale_t locale) -> int {
+[[ATTR_WUNUSED, ATTR_PURE, export_alias("_memicmp_l")]]
+[[section(".text.crt.unicode.locale.memory")]]
+int memcasecmp_l([[nonnull]] void const *s1,
+                 [[nonnull]] void const *s2,
+                 $size_t n_bytes, $locale_t locale) {
 	(void)locale;
 	return memcasecmp(s1, s2, n_bytes);
 }
@@ -2929,13 +3167,13 @@ memcasecmp_l:([[nonnull]] void const *s1,
 @@#else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 @@When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
 @@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-[[ATTR_WUNUSED, ATTR_PURE]][impl_include(<features.h>), no_crt_self_import]
-[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memcasemem0_l)]
-[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memcasemem_l)]
-[section(.text.crt.unicode.locale.memory)][ATTR_PURE]
-memcasemem_l:([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen, $locale_t locale) -> void *
-	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen, $locale_t locale) -> void *]
-	[([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen, $locale_t locale) -> void const *]
+[[ATTR_WUNUSED, ATTR_PURE, impl_include("<features.h>"), no_crt_self_import]]
+[[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memcasemem0_l")]]
+[[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memcasemem_l")]]
+[[section(".text.crt.unicode.locale.memory")]]
+void *memcasemem_l([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen, $locale_t locale)
+	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen, $locale_t locale): void *]
+	[([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen, $locale_t locale): void const *]
 {
 	byte_t *candidate, marker;
 	byte_t *hayend;
@@ -2968,10 +3206,10 @@ got_candidate:
 	return NULL;
 }
 
-[[ATTR_WUNUSED]][section(.text.crt.unicode.locale.memory)][ATTR_PURE]
-strcasestr_l:([[nonnull]] char const *haystack, [[nonnull]] char const *needle, $locale_t locale) -> char *
-	[([[nonnull]] char *haystack, [[nonnull]] char const *needle, $locale_t locale) -> char *]
-	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle, $locale_t locale) -> char const *]
+[[ATTR_WUNUSED, ATTR_PURE, section(".text.crt.unicode.locale.memory")]]
+char *strcasestr_l([[nonnull]] char const *haystack, [[nonnull]] char const *needle, $locale_t locale)
+	[([[nonnull]] char *haystack, [[nonnull]] char const *needle, $locale_t locale): char *]
+	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle, $locale_t locale): char const *]
 {
 	for (; *haystack; ++haystack) {
 		if (strcasecmp_l(haystack, needle, locale) == 0)
@@ -2979,16 +3217,15 @@ strcasestr_l:([[nonnull]] char const *haystack, [[nonnull]] char const *needle, 
 	}
 	return NULL;
 }
-%{
-#endif /* __USE_XOPEN2K8 */
+
+%#endif /* __USE_XOPEN2K8 */
+%
+%
+%
 
 
-
-}
-
-
-[nothrow][user][noexport]
-[impl_prefix(
+[[ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[userimpl, impl_prefix(
 #ifndef ___local_sys_errlist_defined
 #define ___local_sys_errlist_defined 1
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
@@ -2997,12 +3234,11 @@ __LIBC int _sys_nerr;
 #elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)
 __LIBC __ATTR_WUNUSED __ATTR_CONST char const *const *(__LIBCCALL __sys_errlist)(void);
 __LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL __sys_nerr)(void);
-#else
+#else /* ... */
 #undef ___local_sys_errlist_defined
-#endif
+#endif /* !... */
 #endif /* !___local_sys_errlist_defined */
-)]
-[[ATTR_WUNUSED, ATTR_CONST]][nothrow][section(.text.crt.errno)][ATTR_PURE]
+), section(".text.crt.errno")]]
 strerror_s:(int errnum) -> char const * {
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
 	return (unsigned int)errnum < (unsigned int)@_sys_nerr@ ? @_sys_errlist@[errnum] : NULL;
@@ -3447,9 +3683,9 @@ strerror_s:(int errnum) -> char const * {
 #endif
 }
 
-[[ATTR_WUNUSED, ATTR_CONST]][nothrow][section(.text.crt.errno)]
-[impl_include("<parts/errno.h>")][user][noexport]
-strerrorname_s:(int errnum) -> char const * {
+[[ATTR_WUNUSED, ATTR_CONST, nothrow, section(".text.crt.errno")]]
+[[userimpl, impl_include("<parts/errno.h>")]]
+char const *strerrorname_s(int errnum) {
 	char const *result;
 	switch (errnum) {
 
@@ -3887,9 +4123,8 @@ strerrorname_s:(int errnum) -> char const * {
 	return result;
 }
 
-[[ATTR_WUNUSED, ATTR_CONST]][nothrow][section(.text.crt.errno)]
-[dependency_include(<bits/signum.h>)][user][noexport]
-[impl_prefix(
+[[ATTR_WUNUSED, ATTR_CONST, nothrow, section(".text.crt.errno")]]
+[[userimpl, impl_include("<bits/signum.h>"), impl_prefix(
 #ifndef ___local_sys_siglist_defined
 #define ___local_sys_siglist_defined 1
 #undef sys_siglist
@@ -3917,8 +4152,8 @@ __LIBC char const *const sys_siglist[_NSIG] __ASMNAME("_sys_siglist");
 __LIBC char const *const _sys_siglist[_NSIG];
 #endif /* sys_siglist... */
 #endif /* !___local_sys_siglist_defined */
-)][dependency_include(<bits/signum-values.h>)]
-strsignal_s:(int signum) -> char const * {
+), impl_include("<bits/signum-values.h>")]]
+char const *strsignal_s(int signum) {
 #if defined(__CRT_HAVE___p_sys_siglist) || defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist)
 	return (unsigned int)errnum < _NSIG ? @_sys_siglist@[signum] : NULL;
 #else /* __CRT_HAVE___p_sys_siglist || __CRT_HAVE_sys_siglist || __CRT_HAVE__sys_siglist */
@@ -4050,23 +4285,20 @@ strsignal_s:(int signum) -> char const * {
 
 
 
-[doc_alias(strdupf)]
-[same_impl][requires($has_function(vasprintf))][[ATTR_WUNUSED]]
-[ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC][ATTR_LIBC_PRINTF(1, 0)]
-[section(.text.crt.heap.strdup)]
-vstrdupf:(char const *__restrict format, $va_list args) -> char * {
+[[ATTR_WUNUSED, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_LIBC_PRINTF(1, 0)]]
+[[doc_alias("strdupf"), section(".text.crt.heap.strdup")]]
+[[userimpl, requires_function(vasprintf)]]
+char *vstrdupf(char const *__restrict format, $va_list args) {
 	char *result;
 	return vasprintf(&result, format, args) >= 0 ? result : 0;
 }
 
 @@Print the given `FORMAT' into a newly allocated, heap-allocated string
-[[ATTR_WUNUSED]][ATTR_MALL_DEFAULT_ALIGNED]
-[ATTR_MALLOC][ATTR_LIBC_PRINTF(1, 0)]
-[section(.text.crt.heap.strdup)]
-strdupf:(char const *__restrict format, ...) -> char *
-%{
-	auto_block(printf(vstrdupf))
-}
+[[ATTR_WUNUSED, ATTR_MALL_DEFAULT_ALIGNED]]
+[[ATTR_MALLOC, ATTR_LIBC_PRINTF(1, 0)]]
+[[section(".text.crt.heap.strdup")]]
+char *strdupf(char const *__restrict format, ...)
+	%{printf(vstrdupf)}
 
 %{
 /* mstrdupa() & friends. */
@@ -4158,8 +4390,8 @@ __NOTHROW_NCX(__LIBCCALL __mstrndupa_init)(void *__buf, char const *__restrict _
 
 
 [[ATTR_WUNUSED, ATTR_PURE]]
-wildstrcmp:([[nonnull]] char const *pattern,
-            [[nonnull]] char const *string) -> int {
+int wildstrcmp([[nonnull]] char const *pattern,
+               [[nonnull]] char const *string) {
 	char card_post;
 	for (;;) {
 		if (!*string) {
@@ -4201,9 +4433,9 @@ next:
 	return (int)((unsigned char)*string - (unsigned char)*pattern);
 }
 
-[[ATTR_WUNUSED]][section(.text.crt.unicode.static.memory)][ATTR_PURE]
-wildstrcasecmp:([[nonnull]] char const *pattern,
-                [[nonnull]] char const *string) -> int {
+[[ATTR_WUNUSED, ATTR_PURE, section(".text.crt.unicode.static.memory")]]
+int wildstrcasecmp([[nonnull]] char const *pattern,
+                   [[nonnull]] char const *string) {
 	char card_post, pattern_ch, string_ch;
 	for (;;) {
 		if (!*string) {
@@ -4250,38 +4482,34 @@ next:
 	return (int)((unsigned char)string_ch - (unsigned char)pattern_ch);
 }
 
-[[ATTR_WUNUSED]][impl_include("<parts/malloca.h>")]
-[same_impl][requires($has_function(fuzzy_memcmp))][export][ATTR_PURE]
-fuzzy_strcmp:([[nonnull]] char const *s1, [[nonnull]] char const *s2) -> $size_t {
+[[ATTR_WUNUSED, ATTR_PURE, requires($has_function(fuzzy_memcmp))]]
+$size_t fuzzy_strcmp([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 	return fuzzy_memcmp(s1, strlen(s1), s2, strlen(s2));
 }
 
-[[ATTR_WUNUSED]][impl_include("<parts/malloca.h>")]
-[same_impl][requires($has_function(fuzzy_memcmp))][export][ATTR_PURE]
-fuzzy_strncmp:([[nonnull]] char const *s1, $size_t s1_maxlen,
-               [[nonnull]] char const *s2, $size_t s2_maxlen) -> $size_t {
+[[ATTR_WUNUSED, ATTR_PURE, requires($has_function(fuzzy_memcmp))]]
+$size_t fuzzy_strncmp([[nonnull]] char const *s1, $size_t s1_maxlen,
+                      [[nonnull]] char const *s2, $size_t s2_maxlen) {
 	return fuzzy_memcmp(s1, strnlen(s1, s1_maxlen), s2, strnlen(s2, s2_maxlen));
 }
 
-[impl_include("<parts/malloca.h>")][[ATTR_WUNUSED]]
-[same_impl][requires($has_function(fuzzy_memcasecmp))][export]
-[section(.text.crt.unicode.static.memory)][ATTR_PURE]
-fuzzy_strcasecmp:([[nonnull]] char const *s1, [[nonnull]] char const *s2) -> $size_t {
+[[section(".text.crt.unicode.static.memory")]]
+[[ATTR_WUNUSED, ATTR_PURE, requires($has_function(fuzzy_memcasecmp))]]
+$size_t fuzzy_strcasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 	return fuzzy_memcasecmp(s1, strlen(s1), s2, strlen(s2));
 }
 
-[impl_include("<parts/malloca.h>")][[ATTR_WUNUSED]]
-[same_impl][requires($has_function(fuzzy_memcasecmp))][export]
-[section(.text.crt.unicode.static.memory)][ATTR_PURE]
-fuzzy_strncasecmp:([[nonnull]] char const *s1, $size_t s1_maxlen,
-                   [[nonnull]] char const *s2, $size_t s2_maxlen) -> $size_t {
+[[section(".text.crt.unicode.static.memory")]]
+[[ATTR_WUNUSED, ATTR_PURE, requires($has_function(fuzzy_memcasecmp))]]
+$size_t fuzzy_strncasecmp([[nonnull]] char const *s1, $size_t s1_maxlen,
+                          [[nonnull]] char const *s2, $size_t s2_maxlen) {
 	return fuzzy_memcasecmp(s1, strnlen(s1, s1_maxlen), s2, strnlen(s2, s2_maxlen));
 }
 
-[impl_include("<parts/malloca.h>")][[ATTR_WUNUSED]]
-[same_impl][requires(!defined(__NO_MALLOCA))][export][ATTR_PURE]
-fuzzy_memcmp:([[nonnull]] void const *s1, $size_t s1_bytes,
-              [[nonnull]] void const *s2, $size_t s2_bytes) -> $size_t {
+[[ATTR_WUNUSED, ATTR_PURE, requires_include("<parts/malloca.h>")]]
+[[userimpl, requires(!defined(__NO_MALLOCA))]]
+$size_t fuzzy_memcmp([[nonnull]] void const *s1, $size_t s1_bytes,
+                     [[nonnull]] void const *s2, $size_t s2_bytes) {
 	size_t *v0, *v1, i, j, cost, temp;
 	if unlikely(!s1_bytes)
 		return s2_bytes;
@@ -4336,11 +4564,11 @@ fuzzy_memcmp:([[nonnull]] void const *s1, $size_t s1_bytes,
 	return temp;
 }
 
-[impl_include("<parts/malloca.h>")][[ATTR_WUNUSED]]
-[same_impl][requires(!defined(__NO_MALLOCA))][export]
-[section(.text.crt.unicode.static.memory)][ATTR_PURE]
-fuzzy_memcasecmp:([[nonnull]] void const *s1, $size_t s1_bytes,
-                  [[nonnull]] void const *s2, $size_t s2_bytes) -> $size_t {
+[[ATTR_WUNUSED, ATTR_PURE, requires_include("<parts/malloca.h>")]]
+[[userimpl, requires(!defined(__NO_MALLOCA))]]
+[[section(".text.crt.unicode.static.memory")]]
+$size_t fuzzy_memcasecmp([[nonnull]] void const *s1, $size_t s1_bytes,
+                         [[nonnull]] void const *s2, $size_t s2_bytes) {
 	size_t *v0, *v1, i, j, cost, temp;
 	if unlikely(!s1_bytes)
 		return s2_bytes;
@@ -4398,22 +4626,22 @@ fuzzy_memcasecmp:([[nonnull]] void const *s1, $size_t s1_bytes,
 }
 
 %#ifdef __USE_XOPEN2K8
-[[ATTR_WUNUSED]][impl_include("<parts/malloca.h>")][ATTR_PURE]
-[same_impl][requires(!defined(__NO_MALLOCA))][export][section(.text.crt.unicode.locale.memory)]
-fuzzy_strcasecmp_l:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $locale_t locale) -> $size_t {
+[[ATTR_WUNUSED, ATTR_PURE, requires_function(fuzzy_memcasecmp_l)]]
+[[section(".text.crt.unicode.locale.memory")]]
+$size_t fuzzy_strcasecmp_l([[nonnull]] char const *s1, [[nonnull]] char const *s2, $locale_t locale) {
 	return fuzzy_memcasecmp_l(s1, strlen(s1), s2, strlen(s2), locale);
 }
 
-[[ATTR_WUNUSED]][impl_include("<parts/malloca.h>")][ATTR_PURE]
-[same_impl][requires(!defined(__NO_MALLOCA))][export][section(.text.crt.unicode.locale.memory)]
-fuzzy_strncasecmp_l:([[nonnull]] char const *s1, $size_t s1_maxlen,
-                     [[nonnull]] char const *s2, $size_t s2_maxlen, $locale_t locale) -> $size_t {
+[[ATTR_WUNUSED, ATTR_PURE, requires_function(fuzzy_memcasecmp_l)]]
+[[section(".text.crt.unicode.locale.memory")]]
+$size_t fuzzy_strncasecmp_l([[nonnull]] char const *s1, $size_t s1_maxlen,
+                            [[nonnull]] char const *s2, $size_t s2_maxlen, $locale_t locale) {
 	return fuzzy_memcasecmp_l(s1, strnlen(s1, s1_maxlen), s2, strnlen(s2, s2_maxlen), locale);
 }
 
-[[ATTR_WUNUSED]][section(.text.crt.unicode.locale.memory)][ATTR_PURE]
-wildstrcasecmp_l:([[nonnull]] char const *pattern,
-                  [[nonnull]] char const *string, $locale_t locale) -> int {
+[[ATTR_WUNUSED, ATTR_PURE, section(".text.crt.unicode.locale.memory")]]
+int wildstrcasecmp_l([[nonnull]] char const *pattern,
+                     [[nonnull]] char const *string, $locale_t locale) {
 	char card_post, pattern_ch, string_ch;
 	for (;;) {
 		if (!*string) {
@@ -4460,10 +4688,11 @@ next:
 	return (int)((unsigned char)string_ch - (unsigned char)pattern_ch);
 }
 
-[impl_include("<parts/malloca.h>")][[ATTR_WUNUSED, ATTR_PURE]]
-[same_impl][requires(!defined(__NO_MALLOCA))][export][section(.text.crt.unicode.locale.memory)]
-fuzzy_memcasecmp_l:([[nonnull]] void const *s1, $size_t s1_bytes,
-                    [[nonnull]] void const *s2, $size_t s2_bytes, $locale_t locale) -> $size_t {
+[[ATTR_WUNUSED, ATTR_PURE, requires_include("<parts/malloca.h>")]]
+[[requires(!defined(__NO_MALLOCA)), section(".text.crt.unicode.locale.memory")]]
+$size_t fuzzy_memcasecmp_l([[nonnull]] void const *s1, $size_t s1_bytes,
+                           [[nonnull]] void const *s2, $size_t s2_bytes,
+                           $locale_t locale) {
 	size_t *v0, *v1, i, j, cost, temp;
 	if unlikely(!s1_bytes)
 		return s2_bytes;
@@ -4526,14 +4755,14 @@ fuzzy_memcasecmp_l:([[nonnull]] void const *s1, $size_t s1_bytes,
 #ifdef __USE_STRING_BWLQ
 }
 
-[nocrt][noexport][[ATTR_WUNUSED, ATTR_PURE]]
-fuzzy_memcmpb:([[nonnull]] void const *s1, $size_t s1_bytes,
-               [[nonnull]] void const *s2, $size_t s2_bytes) -> $size_t = fuzzy_memcmp;
+[[ATTR_WUNUSED, ATTR_PURE]]
+$size_t fuzzy_memcmpb([[nonnull]] void const *s1, $size_t s1_bytes,
+                      [[nonnull]] void const *s2, $size_t s2_bytes) = fuzzy_memcmp;
 
-[impl_include("<parts/malloca.h>")][[ATTR_WUNUSED]]
-[same_impl][requires(!defined(__NO_MALLOCA))][export][ATTR_PURE]
-fuzzy_memcmpw:([[nonnull]] void const *s1, $size_t s1_words,
-               [[nonnull]] void const *s2, $size_t s2_words) -> $size_t {
+[[ATTR_WUNUSED, ATTR_PURE, requires_include("<parts/malloca.h>")]]
+[[requires(!defined(__NO_MALLOCA))]]
+$size_t fuzzy_memcmpw([[nonnull]] void const *s1, $size_t s1_words,
+                      [[nonnull]] void const *s2, $size_t s2_words) {
 	size_t *v0, *v1, i, j, cost, temp;
 	if unlikely(!s1_words)
 		return s2_words;
@@ -4588,10 +4817,10 @@ fuzzy_memcmpw:([[nonnull]] void const *s1, $size_t s1_words,
 	return temp;
 }
 
-[impl_include("<parts/malloca.h>")][[ATTR_WUNUSED]]
-[same_impl][requires(!defined(__NO_MALLOCA))][export][ATTR_PURE]
-fuzzy_memcmpl:([[nonnull]] void const *s1, $size_t s1_dwords,
-               [[nonnull]] void const *s2, $size_t s2_dwords) -> $size_t {
+[[ATTR_WUNUSED, ATTR_PURE, requires_include("<parts/malloca.h>")]]
+[[requires(!defined(__NO_MALLOCA))]]
+$size_t fuzzy_memcmpl([[nonnull]] void const *s1, $size_t s1_dwords,
+                      [[nonnull]] void const *s2, $size_t s2_dwords) {
 	size_t *v0, *v1, i, j, cost, temp;
 	if unlikely(!s1_dwords)
 		return s2_dwords;
@@ -4646,10 +4875,10 @@ fuzzy_memcmpl:([[nonnull]] void const *s1, $size_t s1_dwords,
 }
 
 %#ifdef __UINT64_TYPE__
-[impl_include("<parts/malloca.h>")][[ATTR_WUNUSED]]
-[same_impl][requires(!defined(__NO_MALLOCA))][export][ATTR_PURE]
-fuzzy_memcmpq:([[nonnull]] void const *s1, $size_t s1_qwords,
-               [[nonnull]] void const *s2, $size_t s2_qwords) -> $size_t {
+[[ATTR_WUNUSED, ATTR_PURE, requires_include("<parts/malloca.h>")]]
+[[requires(!defined(__NO_MALLOCA))]]
+$size_t fuzzy_memcmpq([[nonnull]] void const *s1, $size_t s1_qwords,
+                      [[nonnull]] void const *s2, $size_t s2_qwords) {
 	size_t *v0, *v1, i, j, cost, temp;
 	if unlikely(!s1_qwords)
 		return s2_qwords;
@@ -4703,35 +4932,34 @@ fuzzy_memcmpq:([[nonnull]] void const *s1, $size_t s1_qwords,
 	return temp;
 }
 
-%{
-#endif /* __UINT64_TYPE__ */
-#endif /* __USE_STRING_BWLQ */
-}
+%#endif /* __UINT64_TYPE__ */
+%#endif /* __USE_STRING_BWLQ */
 
 
-[alias(_strncoll)][[ATTR_WUNUSED, ATTR_PURE]][section(.text.crt.unicode.static.memory)]
-strncoll:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t maxlen) -> int {
+[[ATTR_WUNUSED, ATTR_PURE, export_alias("_strncoll")]]
+[[section(".text.crt.unicode.static.memory")]]
+int strncoll([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t maxlen) {
 	return strncmp(s1, s2, maxlen);
 }
 
-[alias(_stricoll, strcasecmp, _stricmp, stricmp, _strcmpi, strcmpi)]
-[[ATTR_WUNUSED, ATTR_PURE]][section(.text.crt.unicode.static.memory)]
-strcasecoll:([[nonnull]] char const *s1, [[nonnull]] char const *s2) -> int {
+[[export_alias("_stricoll"), alias("strcasecmp", "_stricmp", "stricmp", "_strcmpi", "strcmpi")]]
+[[ATTR_WUNUSED, ATTR_PURE, section(".text.crt.unicode.static.memory")]]
+int strcasecoll([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 	return strcasecmp(s1, s2);
 }
 
-[alias(_strnicoll, strncasecmp)]
-[[ATTR_WUNUSED, ATTR_PURE]][section(.text.crt.unicode.static.memory)]
+[[export_alias("_strnicoll"), alias("strncasecmp")]]
+[[ATTR_WUNUSED, ATTR_PURE, section(".text.crt.unicode.static.memory")]]
 strncasecoll:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t maxlen) -> int {
 	return strncasecmp(s1, s2, maxlen);
 }
 
-[ATTR_LEAF]
+[[ATTR_LEAF]]
 strnrev:([[nonnull]] char *__restrict str, $size_t maxlen) -> [== str] char * {
 	return (char *)memrev(str, strnlen(str, maxlen));
 }
 
-[ATTR_LEAF][section(.text.crt.unicode.static.memory)]
+[[ATTR_LEAF, section(".text.crt.unicode.static.memory")]]
 strnlwr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [== str] char * {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
@@ -4739,7 +4967,7 @@ strnlwr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [== str] char * {
 	return str;
 }
 
-[ATTR_LEAF][section(.text.crt.unicode.static.memory)]
+[[ATTR_LEAF, section(".text.crt.unicode.static.memory")]]
 strnupr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [== str] char * {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
@@ -4749,27 +4977,33 @@ strnupr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [== str] char * {
 
 
 %#ifdef __USE_XOPEN2K8
-[alias(_strncoll_l)][[ATTR_WUNUSED]]
-[section(.text.crt.unicode.locale.memory)][ATTR_PURE]
-strncoll_l:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t maxlen, $locale_t locale) -> int {
+[[ATTR_WUNUSED, ATTR_PURE, export_alias("_strncoll_l")]]
+[[section(".text.crt.unicode.locale.memory")]]
+int strncoll_l([[nonnull]] char const *s1,
+               [[nonnull]] char const *s2,
+               $size_t maxlen, $locale_t locale) {
 	(void)locale;
 	return strncoll(s1, s2, maxlen);
 }
 
-[alias(_stricoll_l)][[ATTR_WUNUSED]]
-[section(.text.crt.unicode.locale.memory)][ATTR_PURE]
-strcasecoll_l:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $locale_t locale) -> int {
+[[ATTR_WUNUSED, ATTR_PURE, export_alias("_stricoll_l")]]
+[[section(".text.crt.unicode.locale.memory")]]
+int strcasecoll_l([[nonnull]] char const *s1, [[nonnull]] char const *s2, $locale_t locale) {
 	return strcasecmp_l(s1, s2, locale);
 }
 
-[alias(_strnicoll_l, strncasecmp_l, _strnicmp_l, _strncmpi_l)]
-[[ATTR_WUNUSED]][section(.text.crt.unicode.locale.memory)][ATTR_PURE]
-strncasecoll_l:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t maxlen, $locale_t locale) -> int {
+[[ATTR_WUNUSED, ATTR_PURE, export_alias("_strnicoll_l")]]
+[[alias("strncasecmp_l", "_strnicmp_l", "_strncmpi_l")]]
+[[section(".text.crt.unicode.locale.memory")]]
+int strncasecoll_l([[nonnull]] char const *s1,
+                   [[nonnull]] char const *s2,
+                   $size_t maxlen, $locale_t locale) {
 	(void)locale;
 	return strncasecoll(s1, s2, maxlen);
 }
 
-[export_alias(_strlwr_l)][section(.text.crt.unicode.locale.memory)][ATTR_LEAF]
+[[ATTR_LEAF, export_alias("_strlwr_l")]]
+[[section(".text.crt.unicode.locale.memory")]]
 strlwr_l:([[nonnull]] char *__restrict str, $locale_t locale) -> [== str] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
@@ -4777,7 +5011,8 @@ strlwr_l:([[nonnull]] char *__restrict str, $locale_t locale) -> [== str] char *
 	return str;
 }
 
-[export_alias(_strupr_l)][section(.text.crt.unicode.locale.memory)][ATTR_LEAF]
+[[ATTR_LEAF, export_alias("_strupr_l")]]
+[[section(".text.crt.unicode.locale.memory")]]
 strupr_l:([[nonnull]] char *__restrict str, $locale_t locale) -> [== str] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
@@ -4785,7 +5020,7 @@ strupr_l:([[nonnull]] char *__restrict str, $locale_t locale) -> [== str] char *
 	return str;
 }
 
-[section(.text.crt.unicode.locale.memory)][ATTR_LEAF]
+[[ATTR_LEAF, section(".text.crt.unicode.locale.memory")]]
 strnlwr_l:([[nonnull]] char *__restrict str, $size_t maxlen, $locale_t locale) -> [== str] char * {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
@@ -4793,7 +5028,7 @@ strnlwr_l:([[nonnull]] char *__restrict str, $size_t maxlen, $locale_t locale) -
 	return str;
 }
 
-[section(.text.crt.unicode.locale.memory)][ATTR_LEAF]
+[[ATTR_LEAF, section(".text.crt.unicode.locale.memory")]]
 strnupr_l:([[nonnull]] char *__restrict str, $size_t maxlen, $locale_t locale) -> [== str] char * {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
@@ -4801,7 +5036,7 @@ strnupr_l:([[nonnull]] char *__restrict str, $size_t maxlen, $locale_t locale) -
 	return str;
 }
 
-[ATTR_LEAF]
+[[ATTR_LEAF]]
 memrev:([[nonnull]] void *__restrict base, $size_t n_bytes) -> [== base] void * {
 	byte_t *iter, *end;
 	end = (iter = (byte_t *)base) + n_bytes;
@@ -4815,10 +5050,10 @@ memrev:([[nonnull]] void *__restrict base, $size_t n_bytes) -> [== base] void * 
 %#endif /* __USE_XOPEN2K8 */
 
 %#ifdef __USE_STRING_BWLQ
-[nocrt][noexport][attribute(*)][alias(*)]
+[[ATTR_LEAF]]
 memrevb:([[nonnull]] void *__restrict base, $size_t n_bytes) -> [== base] $uint8_t * = memrev;
 
-[ATTR_LEAF]
+[[ATTR_LEAF]]
 memrevw:([[nonnull]] void *__restrict base, $size_t n_words) -> [== base] $uint16_t * {
 	u16 *iter, *end;
 	end = (iter = (u16 *)base) + n_words;
@@ -4830,7 +5065,7 @@ memrevw:([[nonnull]] void *__restrict base, $size_t n_words) -> [== base] $uint1
 	return (u16 *)base;
 }
 
-[ATTR_LEAF]
+[[ATTR_LEAF]]
 memrevl:([[nonnull]] void *__restrict base, $size_t n_dwords) -> [== base] $uint32_t * {
 	u32 *iter, *end;
 	end = (iter = (u32 *)base) + n_dwords;
@@ -4843,7 +5078,7 @@ memrevl:([[nonnull]] void *__restrict base, $size_t n_dwords) -> [== base] $uint
 }
 
 %#ifdef __UINT64_TYPE__
-[ATTR_LEAF]
+[[ATTR_LEAF]]
 memrevq:([[nonnull]] void *__restrict base, $size_t n_qwords) -> [== base] $uint64_t * {
 	u64 *iter, *end;
 	end = (iter = (u64 *)base) + n_qwords;
@@ -4857,20 +5092,20 @@ memrevq:([[nonnull]] void *__restrict base, $size_t n_qwords) -> [== base] $uint
 %#endif /* __UINT64_TYPE__ */
 %#endif /* __USE_STRING_BWLQ */
 
-%{
-#endif /* __USE_KOS */
+%#endif /* __USE_KOS */
+%
+%
+%#if defined(__USE_KOS) || defined(__USE_DOS)
 
-
-#if defined(__USE_KOS) || defined(__USE_DOS)
-}
-[export_alias(_strlwr)][section(.text.crt.unicode.static.memory)]
+[[export_alias("_strlwr"), section(".text.crt.unicode.static.memory")]]
 strlwr:([[nonnull]] char *__restrict str) -> [== str] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
 		*iter = tolower(ch);
 	return str;
 }
-[export_alias(_strupr)][section(.text.crt.unicode.static.memory)]
+
+[[export_alias("_strupr"), section(".text.crt.unicode.static.memory")]]
 strupr:([[nonnull]] char *__restrict str) -> [== str] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
@@ -4878,7 +5113,7 @@ strupr:([[nonnull]] char *__restrict str) -> [== str] char * {
 	return str;
 }
 
-[export_alias(_strset)][ATTR_LEAF]
+[[export_alias("_strset"), ATTR_LEAF]]
 strset:([[nonnull]] char *__restrict str, int ch) -> [== str] char * {
 	char *iter;
 	for (iter = str; *iter; ++iter)
@@ -4886,7 +5121,7 @@ strset:([[nonnull]] char *__restrict str, int ch) -> [== str] char * {
 	return str;
 }
 
-[export_alias(_strnset)][ATTR_LEAF]
+[[export_alias("_strnset"), ATTR_LEAF]]
 strnset:([[nonnull]] char *__restrict str, int ch, $size_t maxlen) -> [== str] char * {
 	char *iter;
 	for (iter = str; maxlen-- && *iter; ++iter)
@@ -4894,7 +5129,7 @@ strnset:([[nonnull]] char *__restrict str, int ch, $size_t maxlen) -> [== str] c
 	return str;
 }
 
-[alias(_strrev)][ATTR_LEAF]
+[[alias("_strrev"), ATTR_LEAF]]
 strrev:([[nonnull]] char *__restrict str) -> [== str] char * {
 	return (char *)memrev(str, strlen(str));
 }
@@ -4905,14 +5140,14 @@ strrev:([[nonnull]] char *__restrict str) -> [== str] char * {
 #ifdef __USE_DOS
 }
 
-[attribute(*)][alias(*)] _memccpy:(*) = memccpy;
-[attribute(*)][alias(*)] _memicmp:(*) = memcasecmp;
-[attribute(*)][alias(*)] _memicmp_l:(*) = memcasecmp_l;
-[attribute(*)][alias(*)] memicmp:(*) = memcasecmp;
+_memccpy:(*) = memccpy;
+_memicmp:(*) = memcasecmp;
+_memicmp_l:(*) = memcasecmp_l;
+memicmp:(*) = memcasecmp;
 
-[impl_include("<parts/errno.h>")]
-[section(.text.crt.dos.string.memory)]
-_strset_s:([[nonnull]] char *dst, $size_t dstsize, int ch) -> $errno_t {
+[[impl_include("<parts/errno.h>")]]
+[[section(".text.crt.dos.string.memory")]]
+$errno_t _strset_s([[nonnull]] char *dst, $size_t dstsize, int ch) {
 @@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
 @@exec MULTIPLY = $wchar_function ? none : " * sizeof(char)"@@
 	char *p;
@@ -4933,10 +5168,10 @@ _strset_s:([[nonnull]] char *dst, $size_t dstsize, int ch) -> $errno_t {
 
 %
 %#ifdef __USE_DOS_SLIB
-[impl_include("<parts/errno.h>")]
-[section(.text.crt.dos.string.memory)]
-memcpy_s:([[nonnull]] void *dst, rsize_t dstlength,
-          [[nonnull]] void const *src, rsize_t srclength) -> $errno_t {
+[[impl_include("<parts/errno.h>")]]
+[[section(".text.crt.dos.string.memory")]]
+$errno_t memcpy_s([[nonnull]] void *dst, rsize_t dstlength,
+                  [[nonnull]] void const *src, rsize_t srclength) {
 @@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
 @@exec MEMCPY = $wchar_function ? "wmemcpy" : "memcpy"@@
 	if (!srclength)
@@ -4956,9 +5191,9 @@ memcpy_s:([[nonnull]] void *dst, rsize_t dstlength,
 }
 
 [impl_include("<parts/errno.h>")]
-[section(.text.crt.dos.string.memory)]
-memmove_s:([[nonnull]] void *dst, rsize_t dstlength,
-           [[nonnull]] void const *src, rsize_t srclength) -> $errno_t {
+[section(".text.crt.dos.string.memory")]
+$errno_t memmove_s([[nonnull]] void *dst, rsize_t dstlength,
+                   [[nonnull]] void const *src, rsize_t srclength) {
 @@exec MEMMOVE = $wchar_function ? "wmemmove" : "memmove"@@
 	if (!srclength)
 		return 0;
@@ -4971,9 +5206,9 @@ memmove_s:([[nonnull]] void *dst, rsize_t dstlength,
 }
 
 
-[impl_include("<parts/errno.h>")]
-[section(.text.crt.dos.string.memory)]
-strcpy_s:(char *dst, $size_t dstsize, char const *src) -> $errno_t {
+[[impl_include("<parts/errno.h>")]]
+[[section(".text.crt.dos.string.memory")]]
+$errno_t strcpy_s(char *dst, $size_t dstsize, char const *src) {
 @@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
 @@exec MULTIPLY = $wchar_function ? none : " * sizeof(char)"@@
 	char *iter;
@@ -4992,9 +5227,9 @@ strcpy_s:(char *dst, $size_t dstsize, char const *src) -> $errno_t {
 	return 0;
 }
 
-[impl_include("<parts/errno.h>")]
-[section(.text.crt.dos.string.memory)]
-strcat_s:(char *dst, $size_t dstsize, char const *src) -> $errno_t {
+[[impl_include("<parts/errno.h>")]]
+[[section(".text.crt.dos.string.memory")]]
+$errno_t strcat_s(char *dst, $size_t dstsize, char const *src) {
 	if (!dst || !src)
 		return __EINVAL;
 	while (dstsize && *dst) {
@@ -5017,8 +5252,9 @@ __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL strnlen_s)(char const *__str, __SIZE_TYPE
 }
 }
 
-[impl_include("<parts/errno.h>")][section(.text.crt.dos.string.memory)]
-strncat_s:(char *dst, rsize_t dstsize, const char *src, rsize_t maxlen) -> $errno_t {
+[[impl_include("<parts/errno.h>")]]
+[[section(".text.crt.dos.string.memory")]]
+$errno_t strncat_s(char *dst, rsize_t dstsize, const char *src, rsize_t maxlen) {
 @@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
 @@exec MULTIPLY = $wchar_function ? none : " * sizeof(char)"@@
 	char *iter;
@@ -5056,9 +5292,9 @@ strncat_s:(char *dst, rsize_t dstsize, const char *src, rsize_t maxlen) -> $errn
 	return 0;
 }
 
-[impl_include("<parts/errno.h>")]
-[section(.text.crt.dos.string.memory)]
-strncpy_s:(char *dst, $size_t dstsize, char const *src, $size_t maxlen) -> $errno_t {
+[[impl_include("<parts/errno.h>")]]
+[[section(".text.crt.dos.string.memory")]]
+$errno_t strncpy_s(char *dst, $size_t dstsize, char const *src, $size_t maxlen) {
 @@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
 @@exec MULTIPLY = $wchar_function ? none : " * sizeof(char)"@@
 	char *iter;
@@ -5096,30 +5332,30 @@ strncpy_s:(char *dst, $size_t dstsize, char const *src, $size_t maxlen) -> $errn
 	return 0;
 }
 
-[alias(*)][attribute(*)] strtok_s:(*) = strtok_r;
+strtok_s:(*) = strtok_r;
 %#endif /* __USE_DOS_SLIB */
 
-[alias(*)][attribute(*)] _strdup:(*) = strdup;
-[alias(*)][attribute(*)] _stricmp:(*) = strcasecmp;
-[alias(*)][attribute(*)] _strcmpi:(*) = strcasecmp;
-[alias(*)][attribute(*)] _stricmp_l:(*) = strcasecmp_l;
-[alias(*)][attribute(*)] _strcoll_l:(*) = strcoll_l;
-[alias(*)][attribute(*)] _stricoll:(*) = strcasecoll;
-[alias(*)][attribute(*)] _stricoll_l:(*) = strcasecoll_l;
-[alias(*)][attribute(*)] _strncoll:(*) = strncoll;
-[alias(*)][attribute(*)] _strncoll_l:(*) = strncoll_l;
-[alias(*)][attribute(*)] _strnicoll:(*) = strncasecoll;
-[alias(*)][attribute(*)] _strnicoll_l:(*) = strncasecoll_l;
+_strdup:(*) = strdup;
+_stricmp:(*) = strcasecmp;
+_strcmpi:(*) = strcasecmp;
+_stricmp_l:(*) = strcasecmp_l;
+_strcoll_l:(*) = strcoll_l;
+_stricoll:(*) = strcasecoll;
+_stricoll_l:(*) = strcasecoll_l;
+_strncoll:(*) = strncoll;
+_strncoll_l:(*) = strncoll_l;
+_strnicoll:(*) = strncasecoll;
+_strnicoll_l:(*) = strncasecoll_l;
 
-[section(".text.crt.dos.errno")][[cp]][[ATTR_WUNUSED]]
-_strerror:(char const *message) -> char *;
+[[cp, ATTR_WUNUSED, section(".text.crt.dos.errno")]]
+char *_strerror(char const *message);
 
-[section(".text.crt.dos.errno")][[cp]][dos_variant]
-_strerror_s:([[nonnull]] char *__restrict buf, $size_t buflen, char const *message) -> $errno_t;
+[[cp, wchar, section(".text.crt.dos.errno")]]
+$errno_t _strerror_s([[nonnull]] char *__restrict buf, $size_t buflen, char const *message);
 
-[impl_include("<parts/errno.h>")]
-[section(.text.crt.dos.unicode.static.memory)][ATTR_LEAF]
-_strlwr_s:(char *buf, $size_t buflen) -> $errno_t {
+[[ATTR_LEAF, impl_include("<parts/errno.h>")]]
+[[section(".text.crt.dos.unicode.static.memory")]]
+$errno_t _strlwr_s(char *buf, $size_t buflen) {
 	char *iter, ch;
 	if (buf == NULL)
 		return __EINVAL;
@@ -5130,8 +5366,8 @@ _strlwr_s:(char *buf, $size_t buflen) -> $errno_t {
 	return 0;
 }
 
-[section(.text.crt.dos.unicode.static.memory)][ATTR_LEAF]
-_strupr_s:(char *buf, $size_t buflen) -> $errno_t {
+[[ATTR_LEAF, section(".text.crt.dos.unicode.static.memory")]]
+$errno_t _strupr_s(char *buf, $size_t buflen) {
 	char *iter, ch;
 	if (buf == NULL)
 		return __EINVAL;
@@ -5142,8 +5378,8 @@ _strupr_s:(char *buf, $size_t buflen) -> $errno_t {
 	return 0;
 }
 
-[section(.text.crt.dos.unicode.locale.memory)][ATTR_LEAF]
-_strlwr_s_l:(char *buf, $size_t buflen, $locale_t locale) -> $errno_t {
+[[ATTR_LEAF, section(".text.crt.dos.unicode.locale.memory")]]
+$errno_t _strlwr_s_l(char *buf, $size_t buflen, $locale_t locale) {
 	char *iter, ch;
 	if (buf == NULL)
 		return __EINVAL;
@@ -5154,8 +5390,8 @@ _strlwr_s_l:(char *buf, $size_t buflen, $locale_t locale) -> $errno_t {
 	return 0;
 }
 
-[section(.text.crt.dos.unicode.locale.memory)][ATTR_LEAF]
-_strupr_s_l:(char *buf, $size_t buflen, $locale_t locale) -> $errno_t {
+[[ATTR_LEAF, section(".text.crt.dos.unicode.locale.memory")]]
+$errno_t _strupr_s_l(char *buf, $size_t buflen, $locale_t locale) {
 	char *iter, ch;
 	if (buf == NULL)
 		return __EINVAL;
@@ -5166,11 +5402,11 @@ _strupr_s_l:(char *buf, $size_t buflen, $locale_t locale) -> $errno_t {
 	return 0;
 }
 
-[alias(*)][attribute(*)] _strnicmp:(*) = strncasecmp;
-[alias(*)][attribute(*)] _strnicmp_l:(*) = strncasecmp_l;
+_strnicmp:(*) = strncasecmp;
+_strnicmp_l:(*) = strncasecmp_l;
 
-[impl_include("<parts/errno.h>")][section(.text.crt.dos.string.memory)][ATTR_LEAF]
-_strnset_s:(char *__restrict buf, $size_t buflen, int ch, $size_t maxlen) -> $errno_t {
+[[ATTR_LEAF, impl_include("<parts/errno.h>"), section(".text.crt.dos.string.memory")]]
+$errno_t _strnset_s(char *__restrict buf, $size_t buflen, int ch, $size_t maxlen) {
 @@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
 @@exec MULTIPLY = $wchar_function ? none : " * sizeof(char)"@@
 	char *iter;
@@ -5199,16 +5435,16 @@ _strnset_s:(char *__restrict buf, $size_t buflen, int ch, $size_t maxlen) -> $er
 	return 0;
 }
 
-[alias(*)][attribute(*)] _strrev:(*) = strrev;
-[alias(*)][attribute(*)] _strxfrm_l:(*) = strxfrm_l;
-[alias(*)][attribute(*)] stricmp:(*) = strcasecmp;
-[alias(*)][attribute(*)] strcmpi:(*) = strcasecmp;
-[alias(*)][attribute(*)] strnicmp:(*) = strncasecmp;
+_strrev:(*) = strrev;
+_strxfrm_l:(*) = strxfrm_l;
+stricmp:(*) = strcasecmp;
+strcmpi:(*) = strcasecmp;
+strnicmp:(*) = strncasecmp;
 
 /* The following aren't actually defined by DOS, but one might assume that they were */
-[alias(*)][attribute(*)] _strncmpi:(*) = strncasecmp;
-[alias(*)][attribute(*)] _strncmpi_l:(*) = strncasecmp_l;
-[alias(*)][attribute(*)] strncmpi:(*) = strncasecmp;
+_strncmpi:(*) = strncasecmp;
+_strncmpi_l:(*) = strncasecmp_l;
+strncmpi:(*) = strncasecmp;
 
 %
 %#ifndef _WSTRING_DEFINED
@@ -5416,9 +5652,9 @@ __SYSDECL_BEGIN
 @@If found, return a pointer to its location within `str', else return `NULL'
 @@This function originates from BSD, but is also provided as a KOS extension
 [[ATTR_WUNUSED, ATTR_PURE]]
-strnstr:([[nonnull]] char const *haystack, [[nonnull]] char const *needle, $size_t haystack_maxlen) -> char *
-	[([[nonnull]] char *haystack, [[nonnull]] char *needle, $size_t haystack_maxlen) -> char *]
-	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle, $size_t haystack_maxlen) -> char const *]
+char *strnstr([[nonnull]] char const *haystack, [[nonnull]] char const *needle, $size_t haystack_maxlen)
+	[([[nonnull]] char *haystack, [[nonnull]] char *needle, $size_t haystack_maxlen): char *]
+	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle, $size_t haystack_maxlen): char const *]
 {
 	char ch, needle_start = *needle++;
 	while (haystack_maxlen-- && (ch = *haystack++) != '\0') {
@@ -5469,9 +5705,9 @@ miss:
 @@   p[10] = ' '; // '+', if "alternate or additional access control
 @@                //          methods associated with the inode"
 @@   p[11] = '\0';
-[dependency_include(<asm/stat.h>)]
-[section(.text.crt.bsd.strstat)]
-strmode:($mode_t mode, [[nonnull]] char p[12]) {
+[[impl_include("<asm/stat.h>")]]
+[[section(".text.crt.bsd.strstat")]]
+void strmode($mode_t mode, [[nonnull]] char p[12]) {
 	char ch;
 	/* First character: File type */
 	ch = '?';

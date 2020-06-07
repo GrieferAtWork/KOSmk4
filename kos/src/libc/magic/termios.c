@@ -48,58 +48,56 @@ typedef __pid_t pid_t;
 
 }
 
-[[ATTR_WUNUSED, ATTR_PURE]]
-[decl_include(<bits/termios.h>)]
-cfgetospeed:([[nonnull]] struct termios const *__restrict termios_p) -> speed_t {
+[[ATTR_WUNUSED, ATTR_PURE, decl_include("<bits/termios.h>")]]
+speed_t cfgetospeed([[nonnull]] struct termios const *__restrict termios_p) {
 	return termios_p->@c_ospeed@;
 }
 
-[[ATTR_WUNUSED, ATTR_PURE]]
-[decl_include(<bits/termios.h>)]
-cfgetispeed:([[nonnull]] struct termios const *__restrict termios_p) -> speed_t {
+[[ATTR_WUNUSED, ATTR_PURE, decl_include("<bits/termios.h>")]]
+speed_t cfgetispeed([[nonnull]] struct termios const *__restrict termios_p) {
 	return termios_p->@c_ispeed@;
 }
 
-[decl_include(<bits/termios.h>)]
-cfsetospeed:([[nonnull]] struct termios *__restrict termios_p, speed_t speed) -> int {
+[[decl_include("<bits/termios.h>")]]
+int cfsetospeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed) {
 	termios_p->@c_ospeed@ = speed;
 	return 0;
 }
 
-[decl_include(<bits/termios.h>)]
-cfsetispeed:([[nonnull]] struct termios *__restrict termios_p, speed_t speed) -> int {
+[[decl_include("<bits/termios.h>")]]
+int cfsetispeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed) {
 	termios_p->@c_ispeed@ = speed;
 	return 0;
 }
 
 @@Get terminal attributes
-[decl_include(<bits/termios.h>)]
-tcgetattr:($fd_t fd, [[nonnull]] struct termios *__restrict termios_p) -> int;
+[[decl_include("<bits/termios.h>")]]
+int tcgetattr($fd_t fd, [[nonnull]] struct termios *__restrict termios_p);
 
 @@Set terminal attributes
 @@@param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH'
-[decl_include(<bits/termios.h>)]
-tcsetattr:($fd_t fd, int optional_actions, [[nonnull]] struct termios const *__restrict termios_p) -> int;
+[[decl_include("<bits/termios.h>")]]
+int tcsetattr($fd_t fd, int optional_actions, [[nonnull]] struct termios const *__restrict termios_p);
 
-tcsendbreak:($fd_t fd, int duration) -> int;
-[[cp]] tcdrain:($fd_t fd) -> int;
-tcflush:($fd_t fd, int queue_selector) -> int;
-tcflow:($fd_t fd, int action) -> int;
+int tcsendbreak($fd_t fd, int duration);
+[[cp]] int tcdrain($fd_t fd);
+int tcflush($fd_t fd, int queue_selector);
+int tcflow($fd_t fd, int action);
 
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
-tcgetsid:($fd_t fd) -> $pid_t;
+$pid_t tcgetsid($fd_t fd);
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
 %
 %#if defined(__USE_BSD)
-tcsetsid:($fd_t fd, $pid_t pid) -> int;
+int tcsetsid($fd_t fd, $pid_t pid);
 %#endif /* __USE_BSD */
 
 %
 %#ifdef __USE_MISC
-[decl_include(<bits/termios.h>)]
-cfsetspeed:([[nonnull]] struct termios *__restrict termios_p, speed_t speed) -> int {
+[[decl_include("<bits/termios.h>")]]
+int cfsetspeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed) {
 	termios_p->@c_ospeed@ = speed;
 	termios_p->@c_ispeed@ = speed;
 	return 0;
@@ -108,8 +106,8 @@ cfsetspeed:([[nonnull]] struct termios *__restrict termios_p, speed_t speed) -> 
 @@Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
 @@This entails the CANON and all control characters being disabled, as well as
 @@any sort of input/output text processing no longer taking place.
-[decl_include(<bits/termios.h>)]
-cfmakeraw:([[nonnull]] struct termios *__restrict termios_p) {
+[[decl_include("<bits/termios.h>")]]
+void cfmakeraw([[nonnull]] struct termios *__restrict termios_p) {
 	/* As documented here: http://man7.org/linux/man-pages/man3/termios.3.html
 	 * Note that the following additions were made:
 	 *  - Clear `IXOFF' (ensuring that TTY output can be streamed)
@@ -129,9 +127,9 @@ cfmakeraw:([[nonnull]] struct termios *__restrict termios_p) {
 %#if defined(__USE_KOS) || defined(__USE_BSD)
 @@Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
 @@Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h>
-[decl_include(<bits/termios.h>)]
-[dependency_include(<sys/ttydefaults.h>)][kernel]
-cfmakesane:([[nonnull]] struct termios *__restrict termios_p) {
+[[kernel, decl_include("<bits/termios.h>")]]
+[[impl_include("<sys/ttydefaults.h>")]]
+void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
 	/* Set sane values. */
 	memset(termios_p, 0, sizeof(*termios_p));
 #ifdef @TTYDEF_CFLAG@

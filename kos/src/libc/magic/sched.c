@@ -82,7 +82,7 @@ typedef __cpu_set_t cpu_set_t;
 %#ifdef __CC__
 
 
-%[default_impl_section(.text.crt.sched.param)];
+%[default_impl_section(".text.crt.sched.param")];
 
 int sched_setparam($pid_t pid, struct sched_param const *param);
 
@@ -102,7 +102,7 @@ int sched_getscheduler($pid_t pid);
 [[export_alias("thrd_yield", "pthread_yield", "__sched_yield")]]
 int sched_yield();
 
-%[default_impl_section(.text.crt.sched.param)];
+%[default_impl_section(".text.crt.sched.param")];
 
 [[export_alias("__sched_get_priority_max")]]
 int sched_get_priority_max(int algorithm);

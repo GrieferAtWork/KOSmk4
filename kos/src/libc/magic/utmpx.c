@@ -69,40 +69,50 @@ typedef __pid_t pid_t;
 }
 
 @@Open user accounting database
-[[cp]] void setutxent();
+[[cp]]
+void setutxent();
 
 @@Close user accounting database
-[cp_nokos] void endutxent();
+[[cp_nokos]]
+void endutxent();
 
 @@Get the next entry from the user accounting database
-[[cp]] struct utmpx *getutxent();
+[[cp]]
+struct utmpx *getutxent();
 
 @@Get the user accounting database entry corresponding to ID
-[[cp]] struct utmpx *getutxid(struct utmpx const *id);
+[[cp]]
+struct utmpx *getutxid(struct utmpx const *id);
 
 @@Get the user accounting database entry corresponding to LINE
-[[cp]] struct utmpx *getutxline(struct utmpx const *line);
+[[cp]]
+struct utmpx *getutxline(struct utmpx const *line);
 
 @@Write the entry UTMPX into the user accounting database
-[[cp]] struct utmpx *pututxline(struct utmpx const *utmpx);
+[[cp]]
+struct utmpx *pututxline(struct utmpx const *utmpx);
 
 %
 %#ifdef __USE_GNU
 @@Change name of the utmpx file to be examined.
 @@This function is not part of POSIX and therefore no official cancellation point
-[[cp]] int utmpxname(char const *file);
+[[cp]]
+int utmpxname(char const *file);
 
 @@Append entry UTMP to the wtmpx-like file WTMPX_FILE.
 @@This function is not part of POSIX and therefore no official cancellation point
-[[cp]] void updwtmpx(char const *wtmpx_file, struct utmpx const *utmpx);
+[[cp]]
+void updwtmpx(char const *wtmpx_file, struct utmpx const *utmpx);
 
 @@Copy the information in UTMPX to UTMP.
 @@This function is not part of POSIX and therefore no official cancellation point
-[[cp]] void getutmp(struct utmpx const *utmpx, struct utmp *utmp);
+[[cp]]
+void getutmp(struct utmpx const *utmpx, struct utmp *utmp);
 
 @@Copy the information in UTMP to UTMPX.
 @@This function is not part of POSIX and therefore no official cancellation point
-[[cp]] void getutmpx(struct utmp const *utmp, struct utmpx *utmpx);
+[[cp]]
+void getutmpx(struct utmp const *utmp, struct utmpx *utmpx);
 %#endif /* __USE_GNU */
 
 

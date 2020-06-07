@@ -437,7 +437,7 @@ fgetc:([[nonnull]] FILE *__restrict stream) -> int {
 }
 
 @@Alias for `fgetc()'
-[std] getc:(*) = fgetc;
+[[std]] getc:(*) = fgetc;
 
 @@Alias for `fgetc(stdin)'
 [[std, cp_stdio, requires_include("<__crt.h>")]]
@@ -466,7 +466,7 @@ int fputc(int ch, [[nonnull]] FILE *__restrict stream) {
 }
 
 @@Alias for `fputc()'
-[std] putc(*) = fputc;
+[[std]] putc(*) = fputc;
 
 @@Alias for `fputc(CH, stdout)'
 [[std, cp_stdio, crtbuiltin]]
@@ -544,11 +544,11 @@ __STDC_INT_AS_SSIZE_T fputs([[nonnull]] char const *__restrict str,
 }
 
 @@Print a given string `STR', followed by a line-feed to `STDOUT'
-[std][cp_stdio][userimpl]
+[[std, cp_stdio, userimpl]]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(puts_unlocked)]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(fputs) && $has_function(fputc))]
-[requires_include("<__crt.h>")][export_alias(_IO_puts)]
-[impl_include("<local/stdstreams.h>")][crtbuiltin]
+[[requires_include("<__crt.h>")]][export_alias(_IO_puts)]
+[impl_include("<local/stdstreams.h>")][[crtbuiltin]]
 puts:([[nonnull]] char const *__restrict string) -> __STDC_INT_AS_SSIZE_T {
 	__STDC_INT_AS_SSIZE_T result, temp;
 	result = fputs(string, stdout);
@@ -563,13 +563,13 @@ puts:([[nonnull]] char const *__restrict string) -> __STDC_INT_AS_SSIZE_T {
 }
 
 @@Unget a single character byte of data previously returned by `getc()'
-[std][section(".text.crt.FILE.locked.read.getc")]
+[[std]][section(".text.crt.FILE.locked.read.getc")]
 [export_alias("_IO_ungetc")][alias("ungetc_unlocked", "_ungetc_nolock")]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("ungetc_unlocked", "_ungetc_nolock")]
 ungetc:(int ch, [[nonnull]] FILE *__restrict stream) -> int;
 
 @@Read up to `ELEMSIZE * ELEMCOUNT' bytes of data from `STREAM' into `BUF'
-[std][cp_stdio][[ATTR_WUNUSED]][section(".text.crt.FILE.locked.read.read")]
+[[std, cp_stdio, ATTR_WUNUSED]][section(".text.crt.FILE.locked.read.read")]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fread_unlocked, _fread_nolock, _IO_fread)]
 [alias(fread_unlocked, _fread_nolock, _IO_fread)][requires($has_function(fgetc))]
 fread:([[inp(min(elemsize * return, elemsize * elemcount))]] void *__restrict buf,
@@ -592,9 +592,9 @@ done:
 
 
 @@Write up to `ELEMSIZE * ELEMCOUNT' bytes of data from `BUF' into `STREAM'
-[std][cp_stdio][section(".text.crt.FILE.locked.write.write")]
+[[std, cp_stdio]][section(".text.crt.FILE.locked.write.write")]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fwrite_unlocked, _fwrite_nolock, _IO_fwrite)]
-[alias(fwrite_s)][requires($has_function(fputc))][crtbuiltin]
+[alias(fwrite_s)][requires($has_function(fputc))][[crtbuiltin]]
 fwrite:([[inp(min(elemsize * return, elemsize * elemcount))]] void const *__restrict buf,
         size_t elemsize, size_t elemcount,
         [[nonnull]] FILE *__restrict stream) -> size_t {
@@ -614,7 +614,7 @@ done:
 
 %[default_impl_section(".text.crt.FILE.locked.seek.seek")]
 @@Change the current in-file position of `STREAM' as a byte-offet from the start of the file
-[stdio_throws][std][alias(fseek_unlocked, _fseek_nolock)]
+[stdio_throws][[std]][alias(fseek_unlocked, _fseek_nolock)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fseek_unlocked, _fseek_nolock)]
 [if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__), preferred_alias(fseeko_unlocked)]
 [if(defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__), preferred_alias(fseeko64_unlocked, _fseeki64_nolock)]
@@ -632,7 +632,7 @@ fseek:([[nonnull]] FILE *__restrict stream, long int off, int whence) -> int {
 }
 
 @@Return the current in-file position of `STREAM' as a byte-offet from the start of the file
-[stdio_throws][std][[ATTR_WUNUSED]][export_alias(_IO_ftell)]
+[stdio_throws][[std, ATTR_WUNUSED]][export_alias(_IO_ftell)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(ftell_unlocked, _ftell_nolock)]
 [if(__SIZEOF_LONG__ == __SIZEOF_OFF32_T__ && defined(__USE_STDIO_UNLOCKED)), preferred_alias(ftello_unlocked)]
 [if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__ && defined(__USE_STDIO_UNLOCKED)), preferred_alias(ftello64_unlocked, _ftelli64_nolock)]
@@ -675,7 +675,7 @@ void rewind([[nonnull]] FILE *__restrict stream);
 
 %[default_impl_section(".text.crt.FILE.locked.access")]
 @@Clear the error state of `STREAM', returning the stream to normal operations mode
-[std][alias(clearerr_unlocked)]
+[[std]][alias(clearerr_unlocked)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(clearerr_unlocked)]
 clearerr:([[nonnull]] FILE *__restrict stream);
 
@@ -683,7 +683,7 @@ clearerr:([[nonnull]] FILE *__restrict stream);
 
 %[default_impl_section(.text.crt.FILE.locked.read.utility)]
 @@Check if end-of-file has been reached in `STREAM'
-[std][[ATTR_WUNUSED]][alias(feof_unlocked)][export_alias(_IO_feof)][ATTR_PURE]
+[[std, ATTR_WUNUSED]][alias(feof_unlocked)][export_alias(_IO_feof)][[ATTR_PURE]]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(feof_unlocked)]
 feof:([[nonnull]] FILE __KOS_FIXED_CONST *__restrict stream) -> int;
 
@@ -713,13 +713,13 @@ perror([[nullable]] char const *message);
 FILE *tmpfile();
 
 @@Create and return a new file-stream for accessing `FILENAME'
-[[cp]][std][[ATTR_WUNUSED]][export_alias(_IO_fopen)][alias(fopen64)]
+[[cp, std, ATTR_WUNUSED]][export_alias(_IO_fopen)][alias(fopen64)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(fopen64)]
 fopen:([[nonnull]] char const *__restrict filename,
        [[nonnull]] char const *__restrict modes) -> FILE *;
 
 @@Re-open the given `STREAM' as a file-stream for accessing `FILENAME'
-[[cp]][std]
+[[cp, std]]
 [if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias(freopen64_unlocked)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(freopen_unlocked)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(freopen64)]
@@ -739,7 +739,7 @@ freopen:([[nonnull]] char const *__restrict filename,
 [requires($has_function(crt_ftello64) || $has_function(crt_fgetpos) ||
           $has_function(crt_fgetpos64) || $has_function(crt_ftello64) ||
           $has_function(crt_ftello) || $has_function(crt_ftell))]
-[stdio_throws][std][export_alias(_IO_fgetpos)]
+[stdio_throws][[std]][export_alias(_IO_fgetpos)]
 fgetpos:([[nonnull]] FILE *__restrict stream, [[nonnull]] fpos_t *__restrict pos) -> int {
 #if defined(__USE_FILE_OFFSET64) && (@@has_function(crt_ftello64)@@)
 	return (int32_t)(*pos = (fpos_t)crt_ftello64(stream)) < 0 ? -1 : 0;
@@ -772,7 +772,7 @@ fgetpos:([[nonnull]] FILE *__restrict stream, [[nonnull]] fpos_t *__restrict pos
 [requires($has_function(crt_fseeko64) || $has_function(crt_fsetpos) ||
           $has_function(crt_fsetpos64) || $has_function(crt_fseeko) ||
           $has_function(crt_fseek))]
-[stdio_throws][std][export_alias(_IO_fsetpos), no_crt_self_import]
+[stdio_throws][[std]][export_alias(_IO_fsetpos), no_crt_self_import]
 fsetpos:([[nonnull]] FILE *__restrict stream, [[nonnull]] fpos_t const *__restrict pos) -> int {
 #if defined(__USE_FILE_OFFSET64) && (@@has_function(crt_fseeko64)@@)
 	return crt_fseeko64(stream, (off64_t)*pos, SEEK_SET);
@@ -818,12 +818,12 @@ __STDC_INT_AS_SSIZE_T fprintf([[nonnull]] FILE *__restrict stream,
 
 @@Print data to `stdout', following `FORMAT'
 @@Return the number of successfully printed bytes
-[std][cp_stdio][ATTR_LIBC_PRINTF(1, 0)]
+[[std, cp_stdio]][ATTR_LIBC_PRINTF(1, 0)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(vprintf_unlocked)]
-[userimpl][alias(vprintf_s, vprintf_unlocked)]
-[requires_include("<__crt.h>")][impl_include("<local/stdstreams.h>")]
+[[userimpl]][alias(vprintf_s, vprintf_unlocked)]
+[[requires_include("<__crt.h>")]][impl_include("<local/stdstreams.h>")]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(vfprintf))]
-[section(".text.crt.FILE.locked.write.printf")][crtbuiltin]
+[section(".text.crt.FILE.locked.write.printf")][[crtbuiltin]]
 vprintf:([[nonnull]] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	return vfprintf(stdout, format, args);
 }
@@ -843,28 +843,28 @@ printf:([[nonnull]] char const *__restrict format, ...) -> __STDC_INT_AS_SSIZE_T
 
 @@Scan data from `STREAM', following `FORMAT'
 @@Return the number of successfully scanned data items
-[std][cp_stdio][guard][ATTR_LIBC_SCANF(2, 0)][[ATTR_WUNUSED]]
+[[std, cp_stdio, guard]][ATTR_LIBC_SCANF(2, 0)][[ATTR_WUNUSED]]
 [alias(_vfscanf, _vfscanf_s)][export_alias(_IO_vfscanf)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(vfscanf_unlocked)]
-[userimpl][requires($has_function(fgetc) && $has_function(ungetc))]
+[[userimpl]][requires($has_function(fgetc) && $has_function(ungetc))]
 [section(.text.crt.FILE.locked.read.scanf)][alias(vfscanf_unlocked)]
 [impl_prefix(
 __LOCAL_LIBC(@vfscanf_ungetc@) __SSIZE_TYPE__ (__LIBCCALL __vfscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __ch) {
 	return ungetc((int)(unsigned int)__ch, (FILE *)__arg);
 }
-)][crtbuiltin][export_alias(__vfscanf)]
+)][[crtbuiltin]][export_alias(__vfscanf)]
 vfscanf:([[nonnull]] FILE *__restrict stream, [[nonnull]] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return format_vscanf((pformatgetc)&@fgetc@, &@__vfscanf_ungetc@, (void *)stream, format, args);
 }
 
 @@Scan data from `stdin', following `FORMAT'
 @@Return the number of successfully scanned data items
-[std][cp_stdio][guard][ATTR_LIBC_SCANF(1, 0)][[ATTR_WUNUSED]]
-[requires_include("<__crt.h>")][alias(_vscanf, vscanf_unlocked)]
+[[std, cp_stdio, guard]][ATTR_LIBC_SCANF(1, 0)][[ATTR_WUNUSED]]
+[[requires_include("<__crt.h>")]][alias(_vscanf, vscanf_unlocked)]
 [impl_include("<local/stdstreams.h>")]
-[userimpl][requires(!defined(__NO_STDSTREAMS) && $has_function(vfscanf))]
+[[userimpl]][requires(!defined(__NO_STDSTREAMS) && $has_function(vfscanf))]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(vscanf_unlocked)]
-[section(.text.crt.FILE.locked.read.scanf)][crtbuiltin]
+[section(.text.crt.FILE.locked.read.scanf)][[crtbuiltin]]
 vscanf:([[nonnull]] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return vfscanf(stdin, format, args);
 }
@@ -874,17 +874,17 @@ vscanf:([[nonnull]] char const *__restrict format, $va_list args) -> __STDC_INT_
 
 @@Scan data from `STREAM', following `FORMAT'
 @@Return the number of successfully scanned data items
-[std][cp_stdio][ATTR_LIBC_SCANF(2, 3)][[ATTR_WUNUSED]]
+[[std, cp_stdio]][ATTR_LIBC_SCANF(2, 3)][[ATTR_WUNUSED]]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fscanf_unlocked)]
-[section(.text.crt.FILE.locked.read.scanf)][crtbuiltin][alias(fscanf_unlocked)]
+[section(.text.crt.FILE.locked.read.scanf)][[crtbuiltin]][alias(fscanf_unlocked)]
 fscanf:([[nonnull]] FILE *__restrict stream, [[nonnull]] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{printf("vfscanf")}
 
 @@Scan data from `stdin', following `FORMAT'
 @@Return the number of successfully scanned data items
-[std][cp_stdio][ATTR_LIBC_SCANF(1, 2)][[ATTR_WUNUSED]]
+[[std, cp_stdio]][ATTR_LIBC_SCANF(1, 2)][[ATTR_WUNUSED]]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(scanf_unlocked)]
-[section(.text.crt.FILE.locked.read.scanf)][crtbuiltin][alias(scanf_unlocked)]
+[section(.text.crt.FILE.locked.read.scanf)][[crtbuiltin]][alias(scanf_unlocked)]
 scanf:([[nonnull]] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{printf("vscanf")}
 
@@ -893,9 +893,9 @@ scanf:([[nonnull]] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 
 %(std)
 %(std)#if !defined(__USE_ISOC11) || (defined(__cplusplus) && __cplusplus <= 201103L)
-[std][cp_stdio][guard][export_alias(_IO_gets)]
-[userimpl][requires(!defined(__NO_STDSTREAMS) && $has_function(fgets))]
-[requires_include("<__crt.h>")][[ATTR_WUNUSED]]
+[[std, cp_stdio, guard]][export_alias(_IO_gets)]
+[[userimpl]][requires(!defined(__NO_STDSTREAMS) && $has_function(fgets))]
+[[requires_include("<__crt.h>"), ATTR_WUNUSED]]
 [impl_include("<local/stdstreams.h>")]
 [dependency_include(<hybrid/typecore.h>)]
 [ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)")]
@@ -910,7 +910,7 @@ gets:([[nonnull]] char *__restrict buf) -> char * {
 
 @@Scan data from a given `INPUT' string, following `FORMAT'
 @@Return the number of successfully scanned data items
-[guard][std][guard]
+[[guard, std, guard]]
 [impl_include("<asm/stdio.h>")]
 [dependency(unicode_readutf8)]
 [dependency(unicode_readutf8_rev)]
@@ -924,7 +924,7 @@ __LOCAL_LIBC(@vsscanf_ungetc@) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_ungetc)(void
 	unicode_readutf8_rev((char const **)__arg);
 	return 0;
 }
-)][ATTR_LIBC_SCANF(2, 0)][[ATTR_WUNUSED]][alias(_vsscanf, _vsscanf_s)][crtbuiltin]
+)][ATTR_LIBC_SCANF(2, 0)][[ATTR_WUNUSED]][alias(_vsscanf, _vsscanf_s)][[crtbuiltin]]
 [section(".text.crt.unicode.static.format.scanf")][export_alias(__vsscanf)]
 vsscanf:([[nonnull]] char const *__restrict input,
          [[nonnull]] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
@@ -1004,7 +1004,7 @@ __STDC_INT_AS_SIZE_T vsnprintf([[outp_opt(min(return, buflen))]] char *__restric
 
 @@Print a formatted string to a given in-member string buffer `BUF'
 @@Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF'
-[ATTR_LIBC_PRINTF(3, 4)][kernel][crtbuiltin][std][guard]
+[ATTR_LIBC_PRINTF(3, 4)][[kernel, crtbuiltin, std, guard]]
 [section(".text.crt.unicode.static.format.printf")]
 snprintf:([[outp_opt(min(return, buflen))]] char *__restrict buf, size_t buflen,
           [[nonnull]] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
@@ -1014,8 +1014,8 @@ snprintf:([[outp_opt(min(return, buflen))]] char *__restrict buf, size_t buflen,
 
 %
 %#ifdef __USE_XOPEN2K8
-[section(.text.crt.io.write)]
-[[cp]][userimpl][requires($has_function(write))][dependency(write)][impl_prefix(
+[section(".text.crt.io.write")]
+[[cp, userimpl]][requires($has_function(write))][dependency(write)][impl_prefix(
 __LOCAL_LIBC(@vdprintf_printer@) __ssize_t (__LIBCCALL __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
 	return (__ssize_t)write((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
 }
@@ -1028,14 +1028,14 @@ vdprintf:($fd_t fd, [[nonnull]] char const *__restrict format, $va_list args) ->
 }
 
 [[cp]][ATTR_LIBC_PRINTF(2, 3)]
-[section(.text.crt.io.write)]
+[section(".text.crt.io.write")]
 dprintf:($fd_t fd, [[nonnull]] char const *__restrict format, ...) -> __STDC_INT_AS_SSIZE_T
 	%{printf("vdprintf")}
 %#endif /* __USE_XOPEN2K8 */
 
 %
 %#ifdef __USE_ATFILE
-[[cp]][userimpl][requires($has_function(frenameat))]
+[[cp, userimpl]][requires($has_function(frenameat))]
 [section(".text.crt.fs.modify")]
 renameat:($fd_t oldfd, [[nonnull]] char const *oldname,
           $fd_t newfd, [[nonnull]] char const *newname_or_path) -> int {
@@ -1065,7 +1065,7 @@ tmpnam_r:([[nonnull]] char *buf) -> char * {
 }
 
 @@Specify the location and size for the buffer to-be used by `STREAM'
-[requires($has_function(setvbuf))][userimpl][export_alias(_IO_setbuffer)]
+[requires($has_function(setvbuf))][[userimpl]][export_alias(_IO_setbuffer)]
 [section(.text.crt.FILE.locked.read.utility)]
 setbuffer:([[nonnull]] $FILE *__restrict stream, [[nullable]] char *buf, $size_t bufsize) {
 	setvbuf(stream,
@@ -1075,7 +1075,7 @@ setbuffer:([[nonnull]] $FILE *__restrict stream, [[nullable]] char *buf, $size_t
 }
 
 @@Change the given `STREAM' to become line-buffered
-[requires($has_function(setvbuf))][userimpl]
+[requires($has_function(setvbuf))][[userimpl]]
 [section(.text.crt.FILE.locked.read.utility)]
 setlinebuf:([[nonnull]] $FILE *__restrict stream) {
 	setvbuf(stream, NULL, _IOLBF, 0);
@@ -1083,7 +1083,7 @@ setlinebuf:([[nonnull]] $FILE *__restrict stream) {
 
 @@Same as `fflush()', but performs I/O without acquiring a lock to `STREAM'
 [section(".text.crt.FILE.unlocked.write.utility")]
-[cp_stdio][userimpl][alias(_fflush_nolock, fflush, _IO_fflush)]
+[[cp_stdio, userimpl]][alias(_fflush_nolock, fflush, _IO_fflush)]
 fflush_unlocked:([[nullable]] $FILE *stream) -> int {
 	/* NO-OP (When not implemented by the CRT, assume no
 	 * buffering being done, meaning this function isn't needed) */
@@ -1096,7 +1096,7 @@ fflush_unlocked:([[nullable]] $FILE *stream) -> int {
 }
 
 @@Same as `fread()', but performs I/O without acquiring a lock to `STREAM'
-[cp_stdio][[ATTR_WUNUSED]][alias(_fread_nolock)][export_alias(_IO_fread)]
+[[cp_stdio, ATTR_WUNUSED]][alias(_fread_nolock)][export_alias(_IO_fread)]
 [alias(fread)][requires($has_function(fgetc_unlocked))]
 [section(".text.crt.FILE.unlocked.read.read")]
 fread_unlocked:([outp(min(return*elemsize,elemcount*elemsize))] void *__restrict buf,
@@ -1118,8 +1118,8 @@ done:
 }
 
 @@Same as `fwrite()', but performs I/O without acquiring a lock to `STREAM'
-[cp_stdio][alias(_fwrite_nolock)][export_alias(_IO_fwrite)][alias(fwrite, fwrite_s)]
-[requires($has_function(fputc_unlocked))][crtbuiltin]
+[[cp_stdio]][alias(_fwrite_nolock)][export_alias(_IO_fwrite)][alias(fwrite, fwrite_s)]
+[requires($has_function(fputc_unlocked))][[crtbuiltin]]
 [section(".text.crt.FILE.unlocked.write.printf")]
 fwrite_unlocked:([inp(min(return*elemsize,elemcount*elemsize))] void const *__restrict buf,
                  $size_t elemsize, $size_t elemcount,
@@ -1156,7 +1156,7 @@ fileno_unlocked(*) = fileno;
 
 %[default_impl_section(".text.crt.FILE.unlocked.read.getc")]
 @@Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM'
-[cp_stdio][alias(getc_unlocked)]
+[[cp_stdio]][alias(getc_unlocked)]
 [if(!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)), alias(getc, fgetc, _IO_getc)]
 [requires((defined(__CRT_DOS) && $has_function(_filbuf)) || $has_function(crt_fread_unlocked))]
 fgetc_unlocked:([[nonnull]] $FILE *__restrict stream) -> int {
@@ -1173,8 +1173,8 @@ fgetc_unlocked:([[nonnull]] $FILE *__restrict stream) -> int {
 %[default_impl_section(".text.crt.FILE.unlocked.write.putc")]
 
 @@Same as `fputc()', but performs I/O without acquiring a lock to `STREAM'
-[cp_stdio][alias(putc_unlocked)]
-[if(!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf)), alias(putc, fputc, _IO_putc)][crtbuiltin]
+[[cp_stdio]][alias(putc_unlocked)]
+[if(!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf)), alias(putc, fputc, _IO_putc)][[crtbuiltin]]
 [requires((defined(__CRT_DOS) && $has_function(_flsbuf)) || $has_function(crt_fwrite_unlocked))]
 fputc_unlocked:(int ch, [[nonnull]] $FILE *__restrict stream) -> int {
 #if defined(__CRT_DOS) && (@@has_function(_flsbuf)@@)
@@ -1331,7 +1331,7 @@ int ftrylockfile([[nonnull]] $FILE *__restrict stream);
 %#ifdef __USE_XOPEN
 @@Return the name of the current user (`getpwuid(geteuid())'), storing
 @@that name in `S'. When `S' is NULL, a static buffer is used instead
-[guard] char *cuserid(char *s);
+[[guard]] char *cuserid(char *s);
 %#endif /* Use X/Open, but not issue 6.  */
 
 
@@ -1406,7 +1406,7 @@ $FILE *fopencookie(void *__restrict magic_cookie,
 
 %[default_impl_section(".text.crt.FILE.unlocked.read.read")]
 @@Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG'
-[cp_stdio][alias(fgets)][[ATTR_WUNUSED]][impl_include("<parts/errno.h>")][userimpl]
+[[cp_stdio]][alias(fgets)][[ATTR_WUNUSED]][impl_include("<parts/errno.h>")][[userimpl]]
 [requires($has_function(fgetc_unlocked) && $has_function(ungetc_unlocked) && $has_function(ferror_unlocked))]
 fgets_unlocked:([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
                 __STDC_INT_AS_SIZE_T bufsize,
@@ -1450,7 +1450,7 @@ fgets_unlocked:([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
 
 %[default_impl_section(".text.crt.FILE.unlocked.write.write")]
 @@Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG'
-[cp_stdio][alias(fputs)][crtbuiltin][userimpl][requires($has_function(fwrite_unlocked))]
+[[cp_stdio]][alias(fputs)][[crtbuiltin, userimpl]][requires($has_function(fwrite_unlocked))]
 fputs_unlocked:([[nonnull]] char const *__restrict string,
                 [[nonnull]] $FILE *__restrict stream) -> __STDC_INT_AS_SIZE_T {
 	__STDC_INT_AS_SIZE_T result;
@@ -1470,7 +1470,7 @@ obstack_vprintf:([[nonnull]] struct obstack *__restrict obstack_,
                  [[nonnull]] char const *__restrict format, $va_list args) -> int;
 
 [ATTR_LIBC_PRINTF(2, 3)]
-[userimpl][requires($has_function(obstack_vprintf))]
+[[userimpl]][requires($has_function(obstack_vprintf))]
 obstack_printf:([[nonnull]] struct obstack *__restrict obstack_,
                 [[nonnull]] char const *__restrict format, ...) -> int {
 	int result;
@@ -1666,18 +1666,18 @@ fsetpos64:([[nonnull]] $FILE *__restrict stream, [[nonnull]] fpos64_t const *__r
 %#ifdef __USE_KOS
 %[default_impl_section(".text.crt.FILE.locked.write.write")]
 @@For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument
-[cp_stdio]
+[[cp_stdio]]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(file_printer_unlocked)]
-[alias(file_printer_unlocked)][userimpl][requires($has_function(fwrite))]
-file_printer:([[nonnull]] void *arg, [inp(datalen)] char const *__restrict data, $size_t datalen) -> $ssize_t {
+[alias(file_printer_unlocked)][[userimpl]][requires($has_function(fwrite))]
+file_printer:([[nonnull]] void *arg, [[inp(datalen)]] char const *__restrict data, $size_t datalen) -> $ssize_t {
 	return (ssize_t)fwrite(data, sizeof(char), datalen, ($FILE *)arg);
 }
 
 %[default_impl_section(".text.crt.FILE.unlocked.write.write")]
 @@Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG'
-[cp_stdio][alias(file_printer)]
-[userimpl][requires($has_function(fwrite_unlocked))]
-file_printer_unlocked:([[nonnull]] void *arg, [inp(datalen)] char const *__restrict data, $size_t datalen) -> $ssize_t {
+[[cp_stdio]][alias(file_printer)]
+[[userimpl]][requires($has_function(fwrite_unlocked))]
+file_printer_unlocked:([[nonnull]] void *arg, [[inp(datalen)]] char const *__restrict data, $size_t datalen) -> $ssize_t {
 	return (ssize_t)fwrite_unlocked(data, sizeof(char), datalen, ($FILE *)arg);
 }
 %#endif /* __USE_KOS */
@@ -1690,7 +1690,7 @@ file_printer_unlocked:([[nonnull]] void *arg, [inp(datalen)] char const *__restr
 %#ifdef __USE_GNU
 %[default_impl_section(.text.crt.heap.strdup)]
 @@Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR'
-[ATTR_LIBC_PRINTF(2, 3)][[ATTR_WUNUSED]][userimpl][impl_include("<hybrid/__assert.h>")]
+[ATTR_LIBC_PRINTF(2, 3)][[ATTR_WUNUSED, userimpl, impl_include("<hybrid/__assert.h>")]]
 [requires($has_function(format_aprintf_pack) && $has_function(format_aprintf_printer) && $has_function(free))]
 [dependency_prefix(
 #ifndef __format_aprintf_data_defined
@@ -2213,7 +2213,7 @@ __NAMESPACE_STD_USING(FILE)
 %#define _CRT_DIRECTORY_DEFINED 1
 %[default_impl_section(.text.crt.dos.fs.modify)]
 %[insert:extern(unlink)]
-[guard] _unlink:([[nonnull]] char const *filename) -> int = unlink;
+[[guard]] _unlink:([[nonnull]] char const *filename) -> int = unlink;
 %#endif /* !_CRT_DIRECTORY_DEFINED */
 
 

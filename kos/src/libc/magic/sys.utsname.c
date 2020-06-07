@@ -101,7 +101,7 @@ struct utsname {
 }
 
 @@Put information about the system in NAME
-uname:([[nonnull]] struct utsname *name) -> int;
+int uname([[nonnull]] struct utsname *name);
 
 %{
 

@@ -18,15 +18,15 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_replacement(nfds_t = __UINTPTR_TYPE__)]
-%[define_replacement(sigset_t = "struct __sigset_struct")]
-%[define_replacement(fd_t = __fd_t)]
-%[define_replacement(time_t   = __TM_TYPE(time))]
-%[define_replacement(time32_t = __time32_t)]
-%[define_replacement(time64_t = __time64_t)]
+%[define_replacement(nfds_t     = __UINTPTR_TYPE__)]
+%[define_replacement(sigset_t   = "struct __sigset_struct")]
+%[define_replacement(fd_t       = __fd_t)]
+%[define_replacement(time_t     = "__TM_TYPE(time)")]
+%[define_replacement(time32_t   = __time32_t)]
+%[define_replacement(time64_t   = __time64_t)]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
-%[default_impl_section(.text.crt.io.poll)]
+%[default_impl_section(".text.crt.io.poll")]
 
 
 %{
@@ -73,47 +73,47 @@ typedef __sigset_t sigset_t;
 }
 
 @@@param timeout: Timeout in milliseconds (or negative for infinity)
-[export_alias(__poll)][[cp]]
-poll:([inp(nfds)] struct pollfd *fds, nfds_t nfds, int timeout) -> int;
+[[cp, export_alias("__poll")]]
+int poll([[inp(nfds)]] struct pollfd *fds, nfds_t nfds, int timeout);
 
 %#ifdef __USE_GNU
 
-[[cp]][ignore]
-ppoll32:([inp(nfds)] struct pollfd *fds, nfds_t nfds,
-         [[nullable]] struct $timespec32 const *timeout,
-         [[nullable]] $sigset_t const *ss) -> int = ppoll?;
+[[cp, ignore, nocrt, alias("ppoll")]]
+int ppoll32([[inp(nfds)]] struct pollfd *fds, nfds_t nfds,
+            [[nullable]] struct $timespec32 const *timeout,
+            [[nullable]] $sigset_t const *ss);
 
-[[cp]][noexport, no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(ppoll)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(ppoll64)]
-[requires($has_function(ppoll32) || $has_function(ppoll64))]
-ppoll:([inp(nfds)] struct pollfd *fds, nfds_t nfds,
-       [[nullable]] struct timespec const *timeout,
-       [[nullable]] $sigset_t const *ss) -> int {
-@@if_has_function(ppoll32)@@
+[[cp, no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("ppoll")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("ppoll64")]]
+[[userimpl, requires($has_function(ppoll32) || $has_function(ppoll64))]]
+int ppoll([[inp(nfds)]] struct pollfd *fds, nfds_t nfds,
+          [[nullable]] struct timespec const *timeout,
+          [[nullable]] $sigset_t const *ss) {
+@@pp_if $has_function(ppoll32)@@
 	struct timespec32 tmo32;
 	if (!timeout)
 		return ppoll32(fds, nfds, NULL, ss);
 	tmo32.tv_sec  = (time32_t)timeout->tv_sec;
 	tmo32.tv_nsec = timeout->tv_nsec;
 	return ppoll32(fds, nfds, &tmo32, ss);
-@@else_has_function(ppoll32)@@
+@@pp_else@@
 	struct timespec64 tmo64;
 	if (!timeout)
 		return ppoll64(fds, nfds, NULL, ss);
 	tmo64.tv_sec  = (time64_t)timeout->tv_sec;
 	tmo64.tv_nsec = timeout->tv_nsec;
 	return ppoll64(fds, nfds, &tmo64, ss);
-@@endif_has_function(ppoll32)@@
+@@pp_endif@@
 }
 
 %
 %#ifdef __USE_TIME64
-[time64_variant_of(ppoll)]
-[[cp]][noexport][requires($has_function(ppoll32))]
-ppoll64:([inp(nfds)] struct pollfd *fds, nfds_t nfds,
-         [[nullable]] struct timespec64 const *timeout,
-         [[nullable]] $sigset_t const *ss) -> int {
+[[time64_variant_of(ppoll)]]
+[[cp, userimpl, requires_function(ppoll32)]]
+int ppoll64([[inp(nfds)]] struct pollfd *fds, nfds_t nfds,
+            [[nullable]] struct timespec64 const *timeout,
+            [[nullable]] $sigset_t const *ss) {
 	struct timespec32 tmo32;
 	if (!timeout)
 		return ppoll32(fds, nfds, NULL, ss);

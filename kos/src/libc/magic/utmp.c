@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.database.utmp)]
+%[default_impl_section(".text.crt.database.utmp")]
 
 %{
 #include <features.h>
@@ -62,10 +62,12 @@ __SYSDECL_BEGIN
 int login_tty($fd_t fd);
 
 @@Write the given entry into utmp and wtmp
-[[cp_kos]] void login([[nonnull]] struct utmp const *entry);
+[[cp_kos]]
+void login([[nonnull]] struct utmp const *entry);
 
 @@Write the utmp entry to say the user on UT_LINE has logged out
-[[cp_kos]] int logout([[nonnull]] char const *ut_line);
+[[cp_kos]]
+int logout([[nonnull]] char const *ut_line);
 
 @@Append to wtmp an entry for the current time and the given info
 [[cp_kos]]
@@ -83,27 +85,29 @@ void updwtmp([[nonnull]] char const *wtmp_file,
 int utmpname([[nonnull]] char const *file);
 
 @@Read next entry from a utmp-like file
-[[cp_kos]] struct utmp *getutent();
+[[cp_kos]]
+struct utmp *getutent();
 
 @@Reset the input stream to the beginning of the file
-[[cp_kos]] void setutent();
+[[cp_kos]]
+void setutent();
 
 @@Close the current open file
 void endutent();
 
 @@Search forward from the current point in the utmp file
 @@until the next entry with a ut_type matching ID->ut_type
-[[cp_kos]] struct utmp *
-getutid([[nonnull]] struct utmp const *id);
+[[cp_kos]]
+struct utmp *getutid([[nonnull]] struct utmp const *id);
 
 @@Search forward from the current point in the utmp file
 @@until the next entry with a ut_line matching LINE->ut_line
-[[cp_kos]] struct utmp *
-getutline([[nonnull]] struct utmp const *line);
+[[cp_kos]]
+struct utmp *getutline([[nonnull]] struct utmp const *line);
 
 @@Write out entry pointed to by UTMP_PTR into the utmp file
-[[cp_kos]] struct utmp *
-pututline([[nonnull]] struct utmp const *utmp_ptr);
+[[cp_kos]]
+struct utmp *pututline([[nonnull]] struct utmp const *utmp_ptr);
 
 %
 %#ifdef __USE_MISC

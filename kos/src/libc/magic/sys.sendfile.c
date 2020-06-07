@@ -19,10 +19,10 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[define_replacement(off_t = __FS_TYPE(off))]
+%[define_replacement(off_t = "__FS_TYPE(off)")]
 %[define_replacement(off32_t = __off32_t)]
 %[define_replacement(off64_t = __off64_t)]
-%[default_impl_section(.text.crt.fs.statfs.statfs)]
+%[default_impl_section(".text.crt.fs.statfs.statfs")]
 
 %{
 #include <features.h>
@@ -51,22 +51,22 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-}
+};
 
-[ignore][doc_alias(sendfile)]
-sendfile32:($fd_t out_fd, $fd_t in_fd, [[nullable]] $off32_t *offset, size_t count) -> ssize_t = sendfile?;
+[[doc_alias("sendfile"), ignore, nocrt, alias("sendfile")]]
+ssize_t sendfile32($fd_t out_fd, $fd_t in_fd, [[nullable]] $off32_t *offset, size_t count);
 
 
 @@Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
 @@to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
 @@read bytes. If OFFSET is a null pointer, use the normal file position instead.
 @@Return the number of written bytes, or -1 in case of error
-[no_crt_self_import]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(sendfile64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(sendfile)]
-[requires(defined(__CRT_HAVE_sendfile) || defined(__CRT_HAVE_sendfile64))]
-sendfile:($fd_t out_fd, $fd_t in_fd, [[nullable]] off_t *offset, size_t count) -> ssize_t {
-#ifdef __CRT_HAVE_sendfile64
+[[no_crt_self_import]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile")]]
+[[userimpl, requires($has_function(sendfile32) || $has_function(sendfile64))]]
+ssize_t sendfile($fd_t out_fd, $fd_t in_fd, [[nullable]] off_t *offset, size_t count) {
+@@pp_if $has_function(sendfile64)@@
 	ssize_t result;
 	if (offset) {
 		off64_t temp = *offset;
@@ -76,7 +76,7 @@ sendfile:($fd_t out_fd, $fd_t in_fd, [[nullable]] off_t *offset, size_t count) -
 		result = sendfile64(out_fd, in_fd, NULL, count);
 	}
 	return result;
-#else /* __CRT_HAVE_mmap64 */
+@@pp_else@@
 	ssize_t result;
 	if (offset) {
 		off32_t temp = (off32_t)*offset;
@@ -86,12 +86,13 @@ sendfile:($fd_t out_fd, $fd_t in_fd, [[nullable]] off_t *offset, size_t count) -
 		result = sendfile32(out_fd, in_fd, NULL, count);
 	}
 	return result;
-#endif /* !__CRT_HAVE_mmap64 */
+@@pp_endif@@
 }
 
 %#ifdef __USE_LARGEFILE64
-[off64_variant_of(sendfile)][doc_alias(sendfile)][requires(defined(__CRT_HAVE_sendfile))]
-sendfile64:($fd_t out_fd, $fd_t in_fd, [[nullable]] $off64_t *offset, size_t count) -> ssize_t {
+[[doc_alias("sendfile"), off64_variant_of(sendfile)]]
+[[userimpl, requires_function(sendfile32)]]
+ssize_t sendfile64($fd_t out_fd, $fd_t in_fd, [[nullable]] $off64_t *offset, size_t count) {
 	ssize_t result;
 	if (offset) {
 		off32_t temp = (off32_t)*offset;

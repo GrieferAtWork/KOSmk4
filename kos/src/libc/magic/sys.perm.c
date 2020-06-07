@@ -20,7 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
-%[default_impl_section(.text.crt.system.ioperm)]
+%[default_impl_section(".text.crt.system.ioperm")]
 
 %{
 #include <hybrid/typecore.h>
@@ -31,10 +31,10 @@ __SYSDECL_BEGIN
 }
 
 @@Change I/O port permissions for a specific I/O port range
-ioperm:($ulongptr_t from, $ulongptr_t num, int turn_on) -> int;
+int ioperm($ulongptr_t from, $ulongptr_t num, int turn_on);
 
 @@Change I/O port permissions for all I/O ports
-iopl:(int level) -> int;
+int iopl(int level);
 
 %{
 #endif /* __CC__ */

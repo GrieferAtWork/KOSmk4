@@ -49,23 +49,23 @@ __SYSDECL_BEGIN
 }
 
 %[default_impl_section(.text.crt.unicode.static.ctype)]
-[ignore][ATTR_CONST][[ATTR_WUNUSED]][nothrow] __locale_ctype_ptr:() -> char const *;
+[[ignore, ATTR_CONST, ATTR_WUNUSED, nothrow]] __locale_ctype_ptr:() -> char const *;
 %[default_impl_section(.text.crt.unicode.locale.ctype)]
-[ignore][ATTR_PURE][[ATTR_WUNUSED]] __locale_ctype_ptr_l:($locale_t locale) -> char const *;
+[[ignore, ATTR_PURE, ATTR_WUNUSED]] __locale_ctype_ptr_l:($locale_t locale) -> char const *;
 %[default_impl_section(.text.crt.unicode.static.ctype)]
-[ignore][ATTR_PURE][[ATTR_WUNUSED]][nothrow] __ctype_b_loc:() -> $uint16_t const **;
-[ignore][ATTR_PURE][[ATTR_WUNUSED]][nothrow] __ctype_tolower_loc:() -> $int32_t const **;
-[ignore][ATTR_PURE][[ATTR_WUNUSED]][nothrow] __ctype_toupper_loc:() -> $int32_t const **;
-[ignore][ATTR_CONST][[ATTR_WUNUSED]][nothrow] _isctype:(int ch, int mask) -> int;
+[[ignore, ATTR_PURE, ATTR_WUNUSED, nothrow]] __ctype_b_loc:() -> $uint16_t const **;
+[[ignore, ATTR_PURE, ATTR_WUNUSED, nothrow]] __ctype_tolower_loc:() -> $int32_t const **;
+[[ignore, ATTR_PURE, ATTR_WUNUSED, nothrow]] __ctype_toupper_loc:() -> $int32_t const **;
+[[ignore, ATTR_CONST, ATTR_WUNUSED, nothrow]] _isctype:(int ch, int mask) -> int;
 %[default_impl_section(.text.crt.unicode.locale.ctype)]
-[ignore][ATTR_PURE][[ATTR_WUNUSED]] _isctype_l:(int ch, int mask, $locale_t locale) -> int;
+[[ignore, ATTR_PURE, ATTR_WUNUSED]] _isctype_l:(int ch, int mask, $locale_t locale) -> int;
 %[default_impl_section(.text.crt.unicode.static.ctype)]
 
 %[insert:std]
 
 
-[ATTR_CONST][[ATTR_WUNUSED]][libc][nothrow]
-[crtbuiltin][std][kernel] iscntrl:(int ch) -> int {
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[crtbuiltin, std, kernel]] iscntrl:(int ch) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch <= 0x1f || (u8)ch == 0x7f;
 @@pp_else@@
@@ -87,8 +87,8 @@ __SYSDECL_BEGIN
 }
 
 
-[ATTR_CONST][[ATTR_WUNUSED]][libc][nothrow]
-[crtbuiltin][std][kernel] isspace:(int ch) -> int {
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[crtbuiltin, std, kernel]] isspace:(int ch) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	return ((u8)ch >= 0x09 && (u8)ch <= 0x0d) || (u8)ch == 0x20;
 @@pp_else@@
@@ -109,8 +109,8 @@ __SYSDECL_BEGIN
 @@pp_endif@@
 }
 
-[ATTR_CONST][[ATTR_WUNUSED]][libc][nothrow]
-[crtbuiltin][std][kernel] isupper:(int ch) -> int {
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[crtbuiltin, std, kernel]] isupper:(int ch) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x41 && (u8)ch <= 0x5a;
 @@pp_else@@
@@ -132,8 +132,8 @@ __SYSDECL_BEGIN
 }
 
 
-[ATTR_CONST][[ATTR_WUNUSED]][libc][nothrow]
-[crtbuiltin][std][kernel] islower:(int ch) -> int {
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[crtbuiltin, std, kernel]] islower:(int ch) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x61 && (u8)ch <= 0x7a;
 @@pp_else@@
@@ -154,8 +154,8 @@ __SYSDECL_BEGIN
 @@pp_endif@@
 }
 
-[ATTR_CONST][[ATTR_WUNUSED]][libc][nothrow]
-[crtbuiltin][std][kernel] isalpha:(int ch) -> int {
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[crtbuiltin, std, kernel]] isalpha:(int ch) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	return libc_isupper(ch) || libc_islower(ch);
 @@pp_else@@
@@ -176,8 +176,8 @@ __SYSDECL_BEGIN
 @@pp_endif@@
 }
 
-[ATTR_CONST][[ATTR_WUNUSED]][libc][nothrow]
-[crtbuiltin][std][kernel] isdigit:(int ch) -> int {
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[crtbuiltin, std, kernel]] isdigit:(int ch) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x30 && (u8)ch <= 0x39;
 @@pp_else@@
@@ -198,8 +198,8 @@ __SYSDECL_BEGIN
 @@pp_endif@@
 }
 
-[ATTR_CONST][[ATTR_WUNUSED]][libc][nothrow]
-[crtbuiltin][std][kernel] isxdigit:(int ch) -> int {
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[crtbuiltin, std, kernel]] isxdigit:(int ch) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	return isdigit(ch) ||
 	       ((u8)ch >= 0x41 && (u8)ch <= 0x46) ||
@@ -224,8 +224,8 @@ __SYSDECL_BEGIN
 @@pp_endif@@
 }
 
-[ATTR_CONST][[ATTR_WUNUSED]][libc][nothrow]
-[crtbuiltin][std][kernel] isalnum:(int ch) -> int {
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[crtbuiltin, std, kernel]] isalnum:(int ch) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	return isupper(ch) || islower(ch) || isdigit(ch);
 @@pp_else@@
@@ -246,8 +246,8 @@ __SYSDECL_BEGIN
 @@pp_endif@@
 }
 
-[ATTR_CONST][[ATTR_WUNUSED]][libc][nothrow]
-[crtbuiltin][std][kernel] ispunct:(int ch)  -> int {
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[crtbuiltin, std, kernel]] ispunct:(int ch)  -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	return ((u8)ch >= 0x21 && (u8)ch <= 0x2f) ||
 	       ((u8)ch >= 0x3a && (u8)ch <= 0x40) ||
@@ -274,8 +274,8 @@ __SYSDECL_BEGIN
 @@pp_endif@@
 }
 
-[ATTR_CONST][[ATTR_WUNUSED]][libc][nothrow]
-[crtbuiltin][std][kernel] isgraph:(int ch) -> int {
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[crtbuiltin, std, kernel]] isgraph:(int ch) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x21 && (u8)ch <= 0x7e;
 @@pp_else@@
@@ -296,8 +296,8 @@ __SYSDECL_BEGIN
 @@pp_endif@@
 }
 
-[ATTR_CONST][[ATTR_WUNUSED]][libc][nothrow]
-[crtbuiltin][std][kernel] isprint:(int ch) -> int {
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[crtbuiltin, std, kernel]] isprint:(int ch) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x20 && (u8)ch <= 0x7e;
 @@pp_else@@
@@ -348,8 +348,8 @@ toupper:(int ch) -> int {
 
 
 %#ifdef __USE_ISOC99
-[ATTR_CONST][[ATTR_WUNUSED]][libc][nothrow]
-[crtbuiltin][std][kernel] isblank:(int ch) -> int {
+[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[crtbuiltin, std, kernel]] isblank:(int ch) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch == 0x09 || (u8)ch == 0x20;
 @@pp_else@@
@@ -375,7 +375,7 @@ toupper:(int ch) -> int {
 
 %[default_impl_section(.text.crt.unicode.locale.ctype)]
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(__iscntrl_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(__iscntrl_l)]
 iscntrl_l:(int ch, __locale_t locale) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -402,7 +402,7 @@ iscntrl_l:(int ch, __locale_t locale) -> int {
 }
 
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(__isspace_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(__isspace_l)]
 isspace_l:(int ch, __locale_t locale) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -428,7 +428,7 @@ isspace_l:(int ch, __locale_t locale) -> int {
 @@pp_endif@@
 }
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(__isupper_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(__isupper_l)]
 isupper_l:(int ch, __locale_t locale) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -454,7 +454,7 @@ isupper_l:(int ch, __locale_t locale) -> int {
 @@pp_endif@@
 }
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(__islower_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(__islower_l)]
 islower_l:(int ch, __locale_t locale) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -480,7 +480,7 @@ islower_l:(int ch, __locale_t locale) -> int {
 @@pp_endif@@
 }
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(__isalpha_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(__isalpha_l)]
 isalpha_l:(int ch, __locale_t locale) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -506,7 +506,7 @@ isalpha_l:(int ch, __locale_t locale) -> int {
 @@pp_endif@@
 }
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(__isdigit_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(__isdigit_l)]
 isdigit_l:(int ch, __locale_t locale) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -532,7 +532,7 @@ isdigit_l:(int ch, __locale_t locale) -> int {
 @@pp_endif@@
 }
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(__isxdigit_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(__isxdigit_l)]
 isxdigit_l:(int ch, __locale_t locale) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -558,7 +558,7 @@ isxdigit_l:(int ch, __locale_t locale) -> int {
 @@pp_endif@@
 }
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(__isalnum_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(__isalnum_l)]
 isalnum_l:(int ch, __locale_t locale) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -584,7 +584,7 @@ isalnum_l:(int ch, __locale_t locale) -> int {
 @@pp_endif@@
 }
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(__ispunct_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(__ispunct_l)]
 ispunct_l:(int ch, __locale_t locale) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -610,7 +610,7 @@ ispunct_l:(int ch, __locale_t locale) -> int {
 @@pp_endif@@
 }
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(__isgraph_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(__isgraph_l)]
 isgraph_l:(int ch, __locale_t locale) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -636,7 +636,7 @@ isgraph_l:(int ch, __locale_t locale) -> int {
 @@pp_endif@@
 }
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(__isprint_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(__isprint_l)]
 isprint_l:(int ch, __locale_t locale) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -662,7 +662,7 @@ isprint_l:(int ch, __locale_t locale) -> int {
 @@pp_endif@@
 }
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(__isblank_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(__isblank_l)]
 isblank_l:(int ch, __locale_t locale) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -687,7 +687,7 @@ isblank_l:(int ch, __locale_t locale) -> int {
 }
 
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(_tolower_l, __tolower_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(_tolower_l, __tolower_l)]
 tolower_l:(int ch, __locale_t locale) -> int {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;
@@ -695,7 +695,7 @@ tolower_l:(int ch, __locale_t locale) -> int {
 	return tolower(ch);
 }
 
-[ATTR_PURE][[ATTR_WUNUSED]][export_alias(_toupper_l, __toupper_l)]
+[[ATTR_PURE, ATTR_WUNUSED]][export_alias(_toupper_l, __toupper_l)]
 toupper_l:(int ch, __locale_t locale) -> int {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;

@@ -128,7 +128,7 @@ FPathConf:($fd_t fd, int name) -> long int;
 
 
 %
-[throws][[cp]][userimpl][doc_alias(chown)]
+[throws][[cp, userimpl]][doc_alias(chown)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(FChownAt))]
 Chown:([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	FChownAt(__CRT_AT_FDCWD, file, owner, group, 0);
@@ -140,7 +140,7 @@ Chown:([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 PathConf:([[nonnull]] char const *path, int name) -> long int;
 
 %
-[throws][[cp]][userimpl][doc_alias(link)]
+[throws][[cp, userimpl]][doc_alias(link)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(LinkAt))]
 Link:([[nonnull]] char const *from, [[nonnull]] char const *to) {
 	LinkAt(__CRT_AT_FDCWD, from, __CRT_AT_FDCWD, to, 0);
@@ -152,7 +152,7 @@ Read:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) -> size_t;
 
 %
 [throws][doc_alias(write)][[cp]][section(".text.crt.except.io.write")]
-Write:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize) -> size_t;
+Write:($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) -> size_t;
 
 %
 %#ifdef __USE_KOS
@@ -233,14 +233,14 @@ GetCwd:([outp_opt(bufsize)] char *buf, size_t bufsize) -> char *;
 %[default_impl_section(".text.crt.fs.modify")]
 
 %
-[throws][[cp]][doc_alias(unlink)][userimpl]
+[throws][[cp]][doc_alias(unlink)][[userimpl]]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(UnlinkAt))]
 Unlink:([[nonnull]] char const *file) {
 	UnlinkAt(__CRT_AT_FDCWD, file, 0);
 }
 
 %
-[throws][[cp]][doc_alias(rmdir)][userimpl]
+[throws][[cp]][doc_alias(rmdir)][[userimpl]]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(UnlinkAt))]
 Rmdir:([[nonnull]] char const *path) {
 	UnlinkAt(__CRT_AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
@@ -288,7 +288,7 @@ UnlinkAt:($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 %
 %#ifdef __USE_LARGEFILE64
 [throws][doc_alias(lseek64)]
-[off64_variant_of(LSeek)][userimpl][requires($has_function(LSeek32))]
+[off64_variant_of(LSeek)][[userimpl]][requires($has_function(LSeek32))]
 [section(.text.crt.except.io.large.seek)]
 LSeek64:($fd_t fd, $off64_t offset, int whence) -> $pos64_t {
 	return LSeek32(fd, (__off32_t)offset, whence);
@@ -319,7 +319,7 @@ PRead:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos_t offset) -> s
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(PWrite)]]
 [[userimpl, requires($has_function(PWrite32) || $has_function(PWrite64))]]
 [[section(".text.crt.except.io.write")]]
-PWrite:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, pos_t offset) -> size_t {
+PWrite:($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, pos_t offset) -> size_t {
 @@if_has_function(PWrite32)@@
 	return PWrite32(fd, buf, bufsize, (pos32_t)offset);
 @@else_has_function(PWrite32)@@
@@ -350,7 +350,7 @@ PReadAll:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos_t offset) -
 [[throws, cp, ignore, nocrt, alias(PRead)]]
 size_t PRead32($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, $pos32_t offset);
 [[throws, cp, ignore, nocrt, alias(PWrite)]]
-size_t PWrite32($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, $pos32_t offset);
+size_t PWrite32($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, $pos32_t offset);
 
 [[cp, throws, doc_alias(pread64), off64_variant_of(PRead)]]
 [[userimpl, requires($has_function(PRead32)), section(.text.crt.except.io.large.read)]]
@@ -371,7 +371,7 @@ size_t PReadAll32($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, $pos32_
 
 [[cp, throws, doc_alias(preadall64), off64_variant_of(PReadAll)]]
 [[userimpl, requires($has_function(PRead64)), section(.text.crt.except.io.large.read)]]
-size_t PReadAll64($fd_t fd, [inp(bufsize)] void *buf, size_t bufsize, pos64_t offset) {
+size_t PReadAll64($fd_t fd, [[inp(bufsize)]] void *buf, size_t bufsize, pos64_t offset) {
 	size_t result, temp;
 	result = PRead64(fd, buf, bufsize, offset);
 	if (result != 0 && (size_t)result < bufsize) {
@@ -430,7 +430,7 @@ void SetResGid($gid_t rgid, $gid_t egid, $gid_t sgid);
 
 %#if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || \
 %     defined(__USE_MISC)
-[[throws, doc_alias(vfork), section(.text.crt.sched.access)]]
+[[throws, doc_alias(vfork), section(".text.crt.sched.access")]]
 [[ATTR_RETURNS_TWICE, ATTR_WUNUSED]]
 $pid_t VFork();
 %#endif
@@ -453,7 +453,7 @@ FChdir:($fd_t fd);
 [[ATTR_WUNUSED]] GetSid:($pid_t pid) -> $pid_t;
 
 %
-[throws][[cp]][userimpl][doc_alias(lchown)]
+[throws][[cp, userimpl]][doc_alias(lchown)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(FChownAt))]
 [section(".text.crt.except.fs.modify")]
 LChown:([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
@@ -539,7 +539,7 @@ Symlink:([[nonnull]] char const *link_text, [[nonnull]] char const *target_path)
 }
 
 %
-[throws][[cp]][userimpl][doc_alias(readlink)]
+[throws][[cp, userimpl]][doc_alias(readlink)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(ReadlinkAt))]
 [section(.text.crt.except.fs.property)]
 Readlink:([[nonnull]] char const *__restrict path,
@@ -560,7 +560,7 @@ GetHostName:([[outp(buflen)]] char *name, size_t buflen);
 %#ifdef __USE_MISC
 %
 [throws][doc_alias(sethostname)][section(.text.crt.except.system.configuration)]
-SetHostName:([inp(len)] char const *name, size_t len);
+SetHostName:([[inp(len)]] char const *name, size_t len);
 
 %
 [throws][doc_alias(getdomainname)][section(.text.crt.except.system.configuration)]
@@ -568,7 +568,7 @@ GetDomainName:([[outp(buflen)]] char *name, size_t buflen);
 
 %
 [[throws, doc_alias(setdomainname), section(.text.crt.except.system.configuration)]]
-SetDomainName:([inp(len)] char const *name, size_t len);
+SetDomainName:([[inp(len)]] char const *name, size_t len);
 
 [[throws, section(.text.crt.except.system.utility), cp]]
 Syscall:(__syscall_ulong_t sysno, ...) -> __syscall_slong_t;

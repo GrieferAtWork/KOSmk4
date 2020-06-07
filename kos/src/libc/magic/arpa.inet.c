@@ -119,7 +119,7 @@ inet_makeaddr:($uint32_t net, $uint32_t host) -> struct in_addr {
 @@    123      (decimal)
 @@    0x123    (hex)
 @@    0123     (oct)
-[ATTR_PURE][impl_include("<netinet/in.h>")]
+[[ATTR_PURE]][impl_include("<netinet/in.h>")]
 inet_addr:([[nonnull]] char const *__restrict cp) -> in_addr_t {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 0) || *cp)
@@ -153,7 +153,7 @@ inet_addr:([[nonnull]] char const *__restrict cp) -> in_addr_t {
 
 @@This function is the same as `inet_addr()', except that
 @@the return value is in host-endian, rather than net-endian
-[ATTR_PURE][impl_include("<netinet/in.h>")]
+[[ATTR_PURE]][impl_include("<netinet/in.h>")]
 [impl_include("<hybrid/__byteswap.h>")]
 inet_network:([[nonnull]] char const *__restrict cp) -> $uint32_t {
 	struct @in_addr@ addr;

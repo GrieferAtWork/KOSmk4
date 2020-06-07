@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.fs.swap)]
+%[default_impl_section(".text.crt.fs.swap")]
 
 %{
 
@@ -37,9 +37,9 @@ __SYSDECL_BEGIN
 }
 
 @@@param swapflags: Set of `SWAP_FLAG_*'
-[[cp]] swapon:([[nonnull]] char const *path, int swapflags) -> int;
+[[cp]] int swapon([[nonnull]] char const *path, int swapflags);
 
-[[cp]] swapoff:([[nonnull]] char const *path) -> int;
+[[cp]] int swapoff([[nonnull]] char const *path);
 
 %{
 

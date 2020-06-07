@@ -114,7 +114,7 @@ typedef __pformatungetc pformatungetc;
 @@else@@
 #include @<bits/format-printer.h>@
 @@endif@@
-)][kernel][throws]
+)][[kernel]][throws]
 format_repeat:([[nonnull]] pformatprinter printer, void *arg, char ch, $size_t num_repetitions) -> $ssize_t {
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
@@ -205,7 +205,7 @@ err:
 @@with the `FORMAT_ESCAPE_FFORCE*' flags
 @@@param: PRINTER: A function called for all quoted portions of the text
 @@@param: TEXTLEN: The total number of bytes to escape, starting at `text'
-[kernel][throws][export_alias(format_quote)][decl_prefix(
+[[kernel]][throws][export_alias(format_quote)][decl_prefix(
 @@if $wchar_function@@
 #include @<bits/wformat-printer.h>@
 #include @<bits/uformat-printer.h>@
@@ -536,7 +536,7 @@ err:
 @@else@@
 #include @<bits/format-printer.h>@
 @@endif@@
-)][kernel][throws]
+)][[kernel]][throws]
 format_hexdump:([[nonnull]] pformatprinter printer, void *arg,
                 void const *__restrict data, $size_t size,
                 $size_t linesize, unsigned int flags) -> $ssize_t {
@@ -848,7 +848,7 @@ err:
 @@else@@
 #include @<bits/format-printer.h>@
 @@endif@@
-)][ATTR_LIBC_PRINTF(3, 0)][throws][kernel]
+)][ATTR_LIBC_PRINTF(3, 0)][throws][[kernel]]
 format_vprintf:([[nonnull]] pformatprinter printer, void *arg,
                 [[nonnull]] char const *__restrict format, __builtin_va_list args) -> $ssize_t {
 #ifndef __INTELLISENSE__
@@ -901,7 +901,7 @@ format_vprintf:([[nonnull]] pformatprinter printer, void *arg,
 @@else@@
 #include @<bits/format-printer.h>@
 @@endif@@
-)][doc_alias(format_vprintf)][kernel]
+)][doc_alias(format_vprintf)][[kernel]]
 format_printf:([[nonnull]] pformatprinter printer, void *arg,
                [[nonnull]] char const *__restrict format, ...) -> $ssize_t {
 	ssize_t result;
@@ -939,7 +939,7 @@ format_printf:([[nonnull]] pformatprinter printer, void *arg,
 @@@return: 0 :  No data could be scanned.
 @@@return: * :  The total number of successfully scanned arguments.
 @@@return: EOF: `PGETC' returned EOF the first time an attempt at reading was made
-[dependency_include(<libc/unicode.h>)]
+[impl_include("<libc/unicode.h>")]
 [dependency_include(<libc/string.h>)]
 [decl_prefix(
 @@if $wchar_function@@
@@ -948,7 +948,7 @@ format_printf:([[nonnull]] pformatprinter printer, void *arg,
 @@else@@
 #include @<bits/format-printer.h>@
 @@endif@@
-)][ATTR_LIBC_SCANF(4, 0)][throws][kernel]
+)][ATTR_LIBC_SCANF(4, 0)][throws][[kernel]]
 format_vscanf:([[nonnull]] pformatgetc pgetc,
                [[nonnull]] pformatungetc pungetc, void *arg,
                [[nonnull]] char const *__restrict format, $va_list args) -> $ssize_t {
@@ -970,7 +970,7 @@ format_vscanf:([[nonnull]] pformatgetc pgetc,
 @@else@@
 #include @<bits/format-printer.h>@
 @@endif@@
-)][doc_alias(format_vscanf)][kernel]
+)][doc_alias(format_vscanf)][[kernel]]
 format_scanf:([[nonnull]] pformatgetc pgetc,
               [[nonnull]] pformatungetc pungetc, void *arg,
               [[nonnull]] char const *__restrict format, ...) -> $ssize_t {
@@ -988,7 +988,7 @@ format_scanf:([[nonnull]] pformatgetc pgetc,
 %
 @@Format-printer implementation for printing to a string buffer like `sprintf' would
 @@WARNING: No trailing NUL-character is implicitly appended
-[kernel]
+[[kernel]]
 format_sprintf_printer:([[nonnull]] /*char ***/ void *arg,
                         [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 @@if $wchar_function@@
@@ -1020,7 +1020,7 @@ struct format_snprintf_data {
 @@WARNING: No trailing NUL-character is implicitly appended
 @@NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
 @@NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()'
-[dependency_include(<hybrid/typecore.h>)][kernel]
+[dependency_include(<hybrid/typecore.h>)][[kernel]]
 format_snprintf_printer:([[nonnull]] /*struct format_snprintf_data**/ void *arg,
                          [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	struct format_snprintf_data_ {
@@ -1044,7 +1044,7 @@ format_snprintf_printer:([[nonnull]] /*struct format_snprintf_data**/ void *arg,
 
 
 @@Returns the width (number of characters; not bytes) of the given unicode string
-[dependency_include(<local/unicode_utf8seqlen.h>)][kernel][ATTR_PURE]
+[[impl_include("<local/unicode_utf8seqlen.h>"), kernel, ATTR_PURE]]
 format_width:(void *arg, [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	size_t result = 0;
 	char const *iter, *end;
@@ -1062,7 +1062,7 @@ format_width:(void *arg, [[nonnull]] /*utf-8*/ char const *__restrict data, $siz
 }
 
 @@Always re-return `datalen' and ignore all other arguments
-[alternate_names(format_wwidth)][ATTR_CONST]
+[alternate_names(format_wwidth)][[ATTR_CONST]]
 format_length:(void *arg, /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	(void)arg;
 	(void)data;
@@ -1141,9 +1141,9 @@ struct format_aprintf_data {
 @@                 but may differ from `strlen(return)' when NUL characters were
 @@                 printed to the aprintf-printer at one point.
 @@                 (e.g. `format_aprintf_printer(&my_printer, "\0", 1)')
-[impl_include("<hybrid/__assert.h>")]
-[dependency_include(<hybrid/typecore.h>)][userimpl]
-[[ATTR_WUNUSED]][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
+[[impl_include("<hybrid/__assert.h>")]]
+[dependency_include(<hybrid/typecore.h>)][[userimpl]]
+[[ATTR_WUNUSED, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]
 format_aprintf_pack:([[nonnull]] struct format_aprintf_data *__restrict self,
                      [[nullable]] $size_t *pstrlen) -> char * {

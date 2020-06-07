@@ -245,7 +245,7 @@ typedef __except_handler_t except_handler_t;
 @@@param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
 @@@return: 0 :        Success.
 @@@return: -1:EINVAL: The given MODE is invalid
-[nothrow]
+[[nothrow]]
 set_exception_handler:(int mode, except_handler_t handler, void *handler_sp) -> int;
 
 @@Get the current exception handler mode for the calling thread.

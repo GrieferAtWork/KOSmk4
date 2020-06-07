@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[define_replacement(time_t   = __TM_TYPE(time))]
+%[define_replacement(time_t   = "__TM_TYPE(time)")]
 %[define_replacement(time32_t = __time32_t)]
 %[define_replacement(time64_t = __time64_t)]
 %[define_replacement(timespec32 = __timespec32)]
@@ -74,17 +74,17 @@ __SYSDECL_BEGIN
 #if __TM_SIZEOF(TIME) <= 4
 #define __ntptimeval64   __ntptimeval_alt
 #define __ntptimeval32   ntptimeval
-#else
+#else /* __TM_SIZEOF(TIME) <= 4 */
 #define __ntptimeval64   ntptimeval
 #define __ntptimeval32   __ntptimeval_alt
-#endif
+#endif /* __TM_SIZEOF(TIME) > 4 */
 
 #ifdef __USE_TIME64
 #if __TM_SIZEOF(TIME) <= 4
 #define __ntptimeval_alt ntptimeval64
-#else
+#else /* __TM_SIZEOF(TIME) <= 4 */
 #define ntptimeval64     ntptimeval
-#endif
+#endif /* __TM_SIZEOF(TIME) > 4 */
 #endif /* __USE_TIME64 */
 
 }%[push_macro @undef { time maxerror esterror tai }]%{
@@ -112,20 +112,23 @@ struct __ntptimeval_alt {
 
 }
 
-[ignore][alias(__adjtimex)] adjtimex32:([[nonnull]] struct __timex32 *__restrict __ntx) -> int = adjtimex?;
-[ignore] ntp_gettime32:([[nonnull]] struct __ntptimeval32 *__restrict ntv) -> int = ntp_gettimex?;
-[ignore] ntp_adjtime32:([[nonnull]] struct __timex32 *__restrict tntx) -> int = ntp_adjtime?;
+[[ignore, nocrt, alias("adjtimex", "__adjtimex")]]
+int adjtimex32([[nonnull]] struct __timex32 *__restrict __ntx);
+[[ignore, nocrt, alias("ntp_gettimex")]]
+int ntp_gettime32([[nonnull]] struct __ntptimeval32 *__restrict ntv);
+[[ignore, nocrt, alias("ntp_adjtime")]]
+int ntp_adjtime32([[nonnull]] struct __timex32 *__restrict tntx);
 
 
-[attribute(*)][alias(*)] __adjtimex:(*) = adjtimex;
+__adjtimex(*) = adjtimex;
 
-[no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(adjtimex64, __adjtimex64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(adjtimex, __adjtimex)]
-[requires(defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64))]
-adjtimex:([[nonnull]] struct timex *__restrict ntx) -> int {
+[[export_as("__adjtimex"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("adjtimex64", "__adjtimex64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("adjtimex", "__adjtimex")]]
+[[userimpl, requires($has_function(adjtimex32) || $has_function(adjtimex64))]]
+int adjtimex([[nonnull]] struct timex *__restrict ntx) {
 	int result;
-#if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
+@@pp_if $has_function(adjtimex32)@@
 	struct __timex32 nxtalt;
 	nxtalt.@time@.tv_sec  = (time32_t)ntx->@time@.tv_sec;
 	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
@@ -146,7 +149,7 @@ adjtimex:([[nonnull]] struct timex *__restrict ntx) -> int {
 /*	nxtalt.@errcnt@    = (time32_t)ntx->@errcnt@; */
 /*	nxtalt.@stbcnt@    = (time32_t)ntx->@stbcnt@; */
 /*	nxtalt.@tai@       = (time32_t)ntx->@tai@; */
-#else /* __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex */
+@@pp_else@@
 	struct __timex64 nxtalt;
 	nxtalt.@time@.tv_sec  = (time64_t)ntx->@time@.tv_sec;
 	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
@@ -167,16 +170,16 @@ adjtimex:([[nonnull]] struct timex *__restrict ntx) -> int {
 /*	nxtalt.@errcnt@    = (time64_t)ntx->@errcnt@; */
 /*	nxtalt.@stbcnt@    = (time64_t)ntx->@stbcnt@; */
 /*	nxtalt.@tai@       = (time64_t)ntx->@tai@; */
-#endif /* !__CRT_HAVE_adjtimex && !__CRT_HAVE___adjtimex */
+@@pp_endif@@
 	nxtalt.@modes@     = ntx->@modes@;
 	nxtalt.@status@    = ntx->@status@;
-#if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
+@@pp_if $has_function(adjtimex32)@@
 	result = adjtimex32(&nxtalt);
-#else /* __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex */
+@@pp_else@@
 	result = adjtimex64(&nxtalt);
-#endif /* !__CRT_HAVE_adjtimex && !__CRT_HAVE___adjtimex */
+@@pp_endif@@
 	if likely(result == 0) {
-#if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
+@@pp_if $has_function(adjtimex32)@@
 		ntx->@time@.tv_sec  = (time64_t)nxtalt.@time@.tv_sec;
 		ntx->@time@.tv_nsec = nxtalt.@time@.tv_nsec;
 		ntx->@offset@    = (time64_t)nxtalt.@offset@;
@@ -196,7 +199,7 @@ adjtimex:([[nonnull]] struct timex *__restrict ntx) -> int {
 		ntx->@errcnt@    = (time64_t)nxtalt.@errcnt@;
 		ntx->@stbcnt@    = (time64_t)nxtalt.@stbcnt@;
 		ntx->@tai@       = (time64_t)nxtalt.@tai@;
-#else /* __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex */
+@@pp_else@@
 		ntx->@time@.tv_sec  = (time32_t)nxtalt.@time@.tv_sec;
 		ntx->@time@.tv_nsec = nxtalt.@time@.tv_nsec;
 		ntx->@offset@    = (time32_t)nxtalt.@offset@;
@@ -216,7 +219,7 @@ adjtimex:([[nonnull]] struct timex *__restrict ntx) -> int {
 		ntx->@errcnt@    = (time32_t)nxtalt.@errcnt@;
 		ntx->@stbcnt@    = (time32_t)nxtalt.@stbcnt@;
 		ntx->@tai@       = (time32_t)nxtalt.@tai@;
-#endif /* !__CRT_HAVE_adjtimex && !__CRT_HAVE___adjtimex */
+@@pp_endif@@
 		ntx->@modes@     = nxtalt.@modes@;
 		ntx->@status@    = nxtalt.@status@;
 	}
@@ -224,12 +227,12 @@ adjtimex:([[nonnull]] struct timex *__restrict ntx) -> int {
 }
 
 
-[user][nocrt][alternate_names(ntp_gettimex), no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(ntp_gettimex64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(ntp_gettimex)]
-[requires(defined(__CRT_HAVE_ntp_gettimex) || defined(__CRT_HAVE_ntp_gettimex64))]
-ntp_gettime:([[nonnull]] struct ntptimeval *__restrict ntv) -> int {
-#ifdef __CRT_HAVE_ntp_gettimex
+[crt_name("ntp_gettimex"), no_crt_self_import]
+[if(defined(__USE_TIME_BITS64)), preferred_alias("ntp_gettimex64")]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias("ntp_gettimex")]
+[userimpl, requires($has_fucntion(ntp_gettime32) || $has_fucntion(ntp_gettime64))]
+int ntp_gettime([[nonnull]] struct ntptimeval *__restrict ntv) {
+@@pp_if $has_function(ntp_gettime32)@@
 	struct __ntptimeval32 ntv32;
 	int result = ntp_gettime32(&ntv32);
 	if likely(result == 0) {
@@ -244,7 +247,7 @@ ntp_gettime:([[nonnull]] struct ntptimeval *__restrict ntv) -> int {
 		ntv->__glibc_reserved4 = ntv32.__glibc_reserved4;
 	}
 	return result;
-#else /* __CRT_HAVE_ntp_gettimex */
+@@pp_else@@
 	struct __ntptimeval64 ntv64;
 	int result = ntp_gettime64(&ntv64);
 	if likely(result == 0) {
@@ -262,13 +265,13 @@ ntp_gettime:([[nonnull]] struct ntptimeval *__restrict ntv) -> int {
 #endif /* !__CRT_HAVE_ntp_gettimex */
 }
 
-[no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(ntp_adjtime64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(ntp_adjtime)]
-[requires(defined(__CRT_HAVE_ntp_adjtime) || defined(__CRT_HAVE_ntp_adjtime64))]
-ntp_adjtime:([[nonnull]] struct timex *__restrict tntx) -> int {
+[[no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("ntp_adjtime64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("ntp_adjtime")]]
+[[userimpl, requires($has_function(ntp_adjtime32) || $has_function(ntp_adjtime64))]]
+int ntp_adjtime([[nonnull]] struct timex *__restrict tntx) {
 	int result;
-#ifdef __CRT_HAVE_ntp_adjtime
+@@pp_if $has_function(ntp_adjtime32)@@
 	struct __timex32 nxtalt;
 	nxtalt.@time@.tv_sec  = (time32_t)ntx->@time@.tv_sec;
 	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
@@ -289,7 +292,7 @@ ntp_adjtime:([[nonnull]] struct timex *__restrict tntx) -> int {
 /*	nxtalt.@errcnt@    = (time32_t)ntx->@errcnt@; */
 /*	nxtalt.@stbcnt@    = (time32_t)ntx->@stbcnt@; */
 /*	nxtalt.@tai@       = (time32_t)ntx->@tai@; */
-#else /* __CRT_HAVE_ntp_adjtime */
+@@pp_else@@
 	struct __timex64 nxtalt;
 	nxtalt.@time@.tv_sec  = (time64_t)ntx->@time@.tv_sec;
 	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
@@ -310,16 +313,16 @@ ntp_adjtime:([[nonnull]] struct timex *__restrict tntx) -> int {
 /*	nxtalt.@errcnt@    = (time64_t)ntx->@errcnt@; */
 /*	nxtalt.@stbcnt@    = (time64_t)ntx->@stbcnt@; */
 /*	nxtalt.@tai@       = (time64_t)ntx->@tai@; */
-#endif /* !__CRT_HAVE_ntp_adjtime */
+@@pp_endif@@
 	nxtalt.@modes@     = ntx->@modes@;
 	nxtalt.@status@    = ntx->@status@;
-#ifdef __CRT_HAVE_ntp_adjtime
+@@pp_if $has_function(ntp_adjtime32)@@
 	result = ntp_adjtime32(&nxtalt);
-#else /* __CRT_HAVE_ntp_adjtime */
+@@pp_else@@
 	result = ntp_adjtime64(&nxtalt);
-#endif /* !__CRT_HAVE_ntp_adjtime */
+@@pp_endif@@
 	if likely(result == 0) {
-#ifdef __CRT_HAVE_ntp_adjtime
+@@pp_if $has_function(ntp_adjtime32)@@
 		ntx->@time@.tv_sec  = (time64_t)nxtalt.@time@.tv_sec;
 		ntx->@time@.tv_nsec = nxtalt.@time@.tv_nsec;
 		ntx->@offset@    = (time64_t)nxtalt.@offset@;
@@ -339,7 +342,7 @@ ntp_adjtime:([[nonnull]] struct timex *__restrict tntx) -> int {
 		ntx->@errcnt@    = (time64_t)nxtalt.@errcnt@;
 		ntx->@stbcnt@    = (time64_t)nxtalt.@stbcnt@;
 		ntx->@tai@       = (time64_t)nxtalt.@tai@;
-#else /* __CRT_HAVE_ntp_adjtime */
+@@pp_else@@
 		ntx->@time@.tv_sec  = (time32_t)nxtalt.@time@.tv_sec;
 		ntx->@time@.tv_nsec = nxtalt.@time@.tv_nsec;
 		ntx->@offset@    = (time32_t)nxtalt.@offset@;
@@ -359,7 +362,7 @@ ntp_adjtime:([[nonnull]] struct timex *__restrict tntx) -> int {
 		ntx->@errcnt@    = (time32_t)nxtalt.@errcnt@;
 		ntx->@stbcnt@    = (time32_t)nxtalt.@stbcnt@;
 		ntx->@tai@       = (time32_t)nxtalt.@tai@;
-#endif /* !__CRT_HAVE_ntp_adjtime */
+@@pp_endif@@
 		ntx->@modes@     = nxtalt.@modes@;
 		ntx->@status@    = nxtalt.@status@;
 	}
@@ -368,9 +371,9 @@ ntp_adjtime:([[nonnull]] struct timex *__restrict tntx) -> int {
 
 %
 %#ifdef __USE_TIME64
-[alias(__adjtimex64)][time64_variant_of(adjtimex)]
-[requires(defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex))]
-adjtimex64:([[nonnull]] struct timex64 *__restrict ntx) -> int {
+[[export_alias("__adjtimex64"), time64_variant_of(adjtimex)]]
+[[userimpl, requires_function(adjtimex32)]]
+int adjtimex64([[nonnull]] struct timex64 *__restrict ntx) {
 	int result;
 	struct __timex32 nxtalt;
 	nxtalt.@time@.tv_sec  = (time32_t)ntx->@time@.tv_sec;
@@ -421,9 +424,9 @@ adjtimex64:([[nonnull]] struct timex64 *__restrict ntx) -> int {
 	return result;
 }
 
-[time64_variant_of(ntp_adjtime)]
-[requires(defined(__CRT_HAVE_ntp_adjtime))]
-ntp_adjtime64:([[nonnull]] struct timex64 *__restrict tntx) -> int {
+[[time64_variant_of(ntp_adjtime)]]
+[[userimpl, requires_function(ntp_adjtime32)]]
+int ntp_adjtime64([[nonnull]] struct timex64 *__restrict tntx) {
 	int result;
 	struct __timex32 nxtalt;
 	nxtalt.@time@.tv_sec  = (time32_t)tntx->@time@.tv_sec;
@@ -475,10 +478,9 @@ ntp_adjtime64:([[nonnull]] struct timex64 *__restrict tntx) -> int {
 }
 
 
-[user][nocrt][time64_variant_of(ntp_gettime)]
-[export_alias(ntp_gettimex64)]
-[requires(defined(__CRT_HAVE_ntp_gettimex))]
-ntp_gettime64:([[nonnull]] struct ntptimeval64 *__restrict ntv) -> int {
+[[crt_name("ntp_gettimex64"), time64_variant_of(ntp_gettime)]]
+[[userimpl, requires_function(ntp_gettime32)]]
+int ntp_gettime64([[nonnull]] struct ntptimeval64 *__restrict ntv) {
 	struct __ntptimeval32 ntv32;
 	int result = ntp_gettime32(&ntv32);
 	if likely(result == 0) {

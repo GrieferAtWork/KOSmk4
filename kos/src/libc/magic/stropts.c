@@ -67,7 +67,7 @@ typedef __t_uscalar_t t_uscalar_t;
 }
 
 @@Test whether FILDES is associated with a STREAM-based file
-[nothrow] isastream:($fd_t fildes) -> int;
+[[nothrow]] isastream:($fd_t fildes) -> int;
 
 @@Receive next message from a STREAMS file
 [[cp]] getmsg:($fd_t fildes, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, int *__restrict flagsp) -> int;

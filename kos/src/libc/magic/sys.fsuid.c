@@ -20,7 +20,7 @@
 
 %[define_replacement(uid_t = __uid_t)]
 %[define_replacement(gid_t = __gid_t)]
-%[default_impl_section(.text.crt.sched.user)]
+%[default_impl_section(".text.crt.sched.user")]
 
 %{
 #include <features.h>

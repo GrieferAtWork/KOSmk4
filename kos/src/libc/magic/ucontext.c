@@ -50,17 +50,17 @@ __SYSDECL_BEGIN
 
 %
 @@Get user context and store it in variable pointed to by UCP
-getcontext:([[nonnull]] ucontext_t *__restrict ucp) -> int;
+int getcontext([[nonnull]] ucontext_t *__restrict ucp);
 
 %
 @@Set user context from information of variable pointed to by UCP
-setcontext:([[nonnull]] ucontext_t const *__restrict ucp) -> int;
+int setcontext([[nonnull]] ucontext_t const *__restrict ucp);
 
 %
 @@Save current context in context variable pointed to by OUCP and set
 @@context from variable pointed to by UCP
-swapcontext:([[nonnull]] ucontext_t *__restrict oucp,
-             [[nonnull]] ucontext_t const *__restrict ucp) -> int;
+int swapcontext([[nonnull]] ucontext_t *__restrict oucp,
+                [[nonnull]] ucontext_t const *__restrict ucp);
 
 %
 %typedef void (*__makecontext_func_t)(void);
@@ -71,8 +71,9 @@ swapcontext:([[nonnull]] ucontext_t *__restrict oucp,
 @@the next time in `setcontext' or `swapcontext'.
 @@We cannot say anything about the parameters FUNC takes; `void'
 @@is as good as any other choice
-makecontext:([[nonnull]] ucontext_t *ucp,
-             [[nonnull]] __makecontext_func_t func, int argc, ...);
+void makecontext([[nonnull]] ucontext_t *ucp,
+                 [[nonnull]] __makecontext_func_t func,
+                 int argc, ...);
 
 %{
 

@@ -215,7 +215,7 @@ struct @hsearch_data@ {
 #define __local_htab_defined 1
 @__LOCAL_LIBC_DATA@(htab) struct @hsearch_data@ htab = {NULL, 0, 0};
 #endif /* !__local_htab_defined */
-)][requires($has_function(hsearch_r))][userimpl]
+)][requires($has_function(hsearch_r))][[userimpl]]
 hsearch:(ENTRY item, ACTION action) -> ENTRY * {
 	@ENTRY@ *result;
 	hsearch_r(item, action, &result, &htab);
@@ -238,7 +238,7 @@ struct @hsearch_data@ {
 #define __local_htab_defined 1
 @__LOCAL_LIBC_DATA@(htab) struct @hsearch_data@ htab = {NULL, 0, 0};
 #endif /* !__local_htab_defined */
-)][requires($has_function(hcreate_r))][userimpl]
+)][requires($has_function(hcreate_r))][[userimpl]]
 hcreate:(size_t nel) -> int {
 	return hcreate_r(nel, &htab);
 }
@@ -259,7 +259,7 @@ struct @hsearch_data@ {
 #define __local_htab_defined 1
 @__LOCAL_LIBC_DATA@(htab) struct @hsearch_data@ htab = {NULL, 0, 0};
 #endif /* !__local_htab_defined */
-)][requires($has_function(hdestroy_r))][userimpl]
+)][requires($has_function(hdestroy_r))][[userimpl]]
 hdestroy:() {
 	hdestroy_r(&htab);
 }
@@ -282,7 +282,7 @@ struct hsearch_data {
 @@algorithm is adequate because
 @@a)  the code is (most probably) called a few times per program run and
 @@b)  the number is small because the table must fit in the core
-[ignore][ATTR_CONST] isprime:(unsigned int number) -> int {
+[[ignore, ATTR_CONST]] isprime:(unsigned int number) -> int {
 	/* no even number will be passed */
 	for (unsigned int div = 3; div <= number / div; div += 2) {
 		if (number % div == 0)
@@ -473,7 +473,7 @@ maybe_split_for_insert:(void **rootp, void **parentp, void **gparentp, int p_r, 
 
 @@Search for an entry matching the given KEY in the tree
 @@pointed to by *ROOTP and insert a new element if not found
-[[userimpl, requires_function("malloc"), export_alias("__tsearch")]]
+[[userimpl, requires_function(malloc), export_alias("__tsearch")]]
 void *tsearch(void const *key, void **vrootp, __compar_fn_t compar) {
 	typedef struct node_struct {
 		void const         *key;
@@ -739,7 +739,7 @@ typedef void (__LIBCCALL *__action_fn_t)(void const *nodep, VISIT value, int lev
 @@Walk the nodes of a tree.
 @@ROOT is the root of the tree to be walked, ACTION the function to be
 @@called at each node. LEVEL is the level of ROOT in the whole tree
-[ignore]
+[[ignore]]
 trecurse:(void const *root, __action_fn_t action, int level) {
 	void *l, *r;
 	l = ((void **)root)[1];
@@ -772,7 +772,7 @@ typedef void (*__free_fn_t) (void *__nodep);
 }
 
 @@Destroy the whole tree, call FREEFCT for each node or leaf
-[requires($has_function(free))][userimpl]
+[requires($has_function(free))][[userimpl]]
 tdestroy:(void *root, __free_fn_t freefct) {
 again:
 	if (root) {

@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.application.options)]
+%[default_impl_section(".text.crt.application.options")]
 
 %{
 #include <features.h>
@@ -143,7 +143,7 @@ struct option {
 @@- If OPTS begins with `--', then non-option arguments are treated as
 @@  arguments to the option '\0'.  This behavior is specific to the GNU
 @@  `getopt'
-[guard][[ATTR_WUNUSED]]
+[[guard, ATTR_WUNUSED]]
 getopt:(int argc, char *const argv[], char const *shortopts) -> int;
 
 [[ATTR_WUNUSED]][doc_alias(getopt)]

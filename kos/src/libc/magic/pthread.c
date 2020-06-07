@@ -451,10 +451,10 @@ pthread_detach:(pthread_t pthread) -> int;
 
 %
 @@Obtain the identifier of the current thread
-[export_alias(thrd_current)][ATTR_CONST] pthread_self:() -> pthread_t;
+[export_alias(thrd_current)][[ATTR_CONST]] pthread_self:() -> pthread_t;
 
 @@Compare two thread identifiers
-[ATTR_CONST] pthread_equal:(pthread_t pthread1, pthread_t pthread2) -> int {
+[[ATTR_CONST]] pthread_equal:(pthread_t pthread1, pthread_t pthread2) -> int {
 	return pthread1 == pthread2;
 }
 
@@ -615,14 +615,14 @@ pthread_setname_np:(pthread_t target_thread, [[nonnull]] const char *name) -> in
 %#ifdef __USE_KOS
 @@Return the TID of the given `target_thread'
 @@If the given `target_thread' has already terminated, 0 is returned
-[guard][[ATTR_WUNUSED, ATTR_CONST]]
+[[guard, ATTR_WUNUSED, ATTR_CONST]]
 pthread_gettid_np:(pthread_t target_thread) -> $pid_t;
 %#endif /* __USE_KOS */
 
 
 %#ifdef __USE_UNIX98
 @@Determine level of concurrency
-[ATTR_PURE] pthread_getconcurrency:() -> int;
+[[ATTR_PURE]] pthread_getconcurrency:() -> int;
 
 %
 @@Set new concurrency level to LEVEL
@@ -676,7 +676,7 @@ pthread_setcancelstate:(int state, [[nullable]] int *oldstate) -> int;
 %
 @@Set cancellation state of current thread to TYPE, returning the old
 @@type in *OLDTYPE if OLDTYPE is not NULL
-[guard] pthread_setcanceltype:(int type, [[nullable]] int *oldtype) -> int;
+[[guard]] pthread_setcanceltype:(int type, [[nullable]] int *oldtype) -> int;
 
 %
 @@Cancel THREAD immediately or at the next possibility
@@ -1434,7 +1434,7 @@ pthread_spin_unlock:([[nonnull]] pthread_spinlock_t *lock) -> int {
 @@Initialize BARRIER with the attributes in ATTR.
 @@The barrier is opened when COUNT waiters arrived
 pthread_barrier_init:([[nonnull]] pthread_barrier_t *__restrict barrier,
-                      [inp(count)] pthread_barrierattr_t const *__restrict attr,
+                      [[inp(count)]] pthread_barrierattr_t const *__restrict attr,
                       unsigned int count) -> int;
 
 %
@@ -1528,7 +1528,7 @@ pthread_getcpuclockid:(pthread_t pthread_id, [[nonnull]] $clockid_t *clock_id) -
 @@handlers are called in LIFO order (last added with PTHREAD_ATFORK,
 @@first called before FORK), and the PARENT and CHILD handlers are called
 @@in FIFO (first added, first called)
-[guard]
+[[guard]]
 pthread_atfork:([[nullable]] __pthread_atfork_func_t prepare,
                 [[nullable]] __pthread_atfork_func_t parent,
                 [[nullable]] __pthread_atfork_func_t child) -> int;
@@ -1539,7 +1539,7 @@ pthread_atfork:([[nullable]] __pthread_atfork_func_t prepare,
 %
 %/* Some more functions from winpthread. */
 [dependency_include(<bits/sched.h>)]
-[userimpl][requires($has_function(sched_getaffinity))]
+[[userimpl]][requires($has_function(sched_getaffinity))]
 pthread_num_processors_np:() -> __STDC_INT_AS_SIZE_T {
 	cpu_set_t cset;
 	if unlikely(sched_getaffinity(0, sizeof(cset), &cset) != 0)
@@ -1549,7 +1549,7 @@ pthread_num_processors_np:() -> __STDC_INT_AS_SIZE_T {
 
 [dependency_include(<bits/sched.h>)]
 [impl_include("<parts/errno.h>")]
-[userimpl][requires($has_function(sched_setaffinity))]
+[[userimpl]][requires($has_function(sched_setaffinity))]
 pthread_set_num_processors_np:(int n) -> int {
 	int i, result;
 	cpu_set_t cset;

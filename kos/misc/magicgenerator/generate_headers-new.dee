@@ -143,8 +143,6 @@ fs.chdir(fs.headof(__FILE__) + "/../../src/libc/magic");
 
 try {
 	for (local filename: fs.query("*.c")) {
-		if (filename < "stdlib.c")
-			continue;
 		local fullPath = fs.abspath(filename);
 		/* XXX: There are only a couple of ways by which different definition
 		 *      files actually interact with each other:
@@ -235,7 +233,7 @@ size_t strnlen(char const *__restrict str, size_t maxlen) {
 
 
 //%
-//[[if(__SIZEOF_WCHAR_T__ == 2), alias(wmemcpy)]][[alias(DOS$wmemcpy)]]
+//[[if(__SIZEOF_WCHAR_T__ == 2), alias(wmemcpy), alias(DOS$wmemcpy)]]
 //[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(wmemcpy)]]
 //[[nocrt, cc(LIBDCALL), nonnull]] char16_t *
 //c16memcpy([[nonnull]] char16_t *__restrict dst,

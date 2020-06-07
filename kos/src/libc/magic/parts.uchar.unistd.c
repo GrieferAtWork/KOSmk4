@@ -110,8 +110,8 @@ c32lchown:(*) %{uchar(wlchown)}
 c16truncate:(*) %{uchar(wtruncate)}
 c32truncate:(*) %{uchar(wtruncate)}
 
-[ignore] c16truncate32:(*) %{uchar16(wtruncate32)}
-[ignore] c32truncate32:(*) %{uchar32(wtruncate32)}
+[[ignore]] c16truncate32:(*) %{uchar16(wtruncate32)}
+[[ignore]] c32truncate32:(*) %{uchar32(wtruncate32)}
 
 %#ifdef __USE_LARGEFILE64
 c16truncate64:(*) %{uchar(wtruncate64)}

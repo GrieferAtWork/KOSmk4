@@ -53,7 +53,7 @@ typedef struct @_stringlist@ {
 
 
 @@Allocates and returns a new StringList object. Upon error, `NULL' is returned
-[[ATTR_WUNUSED]][decl_prefix(DEFINE_STRINGLIST)][userimpl]
+[[ATTR_WUNUSED]][decl_prefix(DEFINE_STRINGLIST)][[userimpl]]
 [requires($has_function(malloc) && $has_function(free))]
 sl_init:() -> struct _stringlist * {
 	struct _stringlist *result;
@@ -73,7 +73,7 @@ sl_init:() -> struct _stringlist * {
 
 @@Append a given `NAME' to `SL'. `NAME' is considered
 @@inherited if the StringList is destroyed with `1'
-[requires_function("realloc")][decl_prefix(DEFINE_STRINGLIST)][userimpl]
+[requires_function("realloc")][decl_prefix(DEFINE_STRINGLIST)][[userimpl]]
 sl_add:([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) -> int {
 	if unlikely(sl->@sl_cur@ >= sl->@sl_max@) {
 		char **new_vector;
@@ -93,7 +93,7 @@ sl_add:([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) -> int {
 @@Free a given string list. When `ALL' is non-zero, all contained
 @@string pointers (as previously added with `sl_add()') will also
 @@be `free(3)'ed.
-[requires($has_function(free))][decl_prefix(DEFINE_STRINGLIST)][userimpl]
+[requires($has_function(free))][decl_prefix(DEFINE_STRINGLIST)][[userimpl]]
 sl_free:([[nullable]] struct _stringlist *sl, int all) {
 	if unlikely(!sl)
 		return;
@@ -114,7 +114,7 @@ sl_free:([[nullable]] struct _stringlist *sl, int all) {
 @@return a pointer to the equivalent string within `SL' (i.e. the
 @@pointer originally passed to `sl_add()' to insert that string).
 @@If `SL' doesn't contain an equivalent string, return `NULL' instead.
-[decl_prefix(DEFINE_STRINGLIST)][userimpl][ATTR_PURE]
+[decl_prefix(DEFINE_STRINGLIST)][[userimpl, ATTR_PURE]]
 sl_find:([[nonnull]] struct _stringlist __KOS_FIXED_CONST *sl,
          [[nonnull]] char const *name) -> [[nullable]] char * {
 	size_t i;

@@ -78,9 +78,9 @@ typedef __errno_t error_t;
 @@Make a '\0' separated arg vector from a unix argv vector, returning it in
 @@`PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
 @@`ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()'
-[export_alias(__argz_create)][userimpl][requires_function("malloc")]
+[export_alias(__argz_create)][[userimpl, requires_function(malloc)]]
 [impl_include("<parts/errno.h>")]
-[impl_include("<hybrid/__assert.h>")]
+[[impl_include("<hybrid/__assert.h>")]]
 argz_create:([[nonnull]] char *const argv[],
              [[nonnull]] char **__restrict pargz,
              [[nonnull]] size_t *__restrict pargz_len) -> error_t {
@@ -117,7 +117,7 @@ __argz_create:(*) = argz_create;
 @@`STRING', returning it in `PARGZ', and the total length in `PLEN'.
 @@If a memory allocation error occurs, `ENOMEM' is returned, otherwise `0'.
 @@The result can be destroyed using `free()'
-[export_alias(__argz_create_sep)][userimpl]
+[export_alias(__argz_create_sep)][[userimpl]]
 [requires($has_function(malloc) && $has_function(free))]
 [impl_include("<parts/errno.h>")]
 argz_create_sep:(char const *__restrict string,
@@ -177,7 +177,7 @@ __argz_create_sep:(*) = argz_create_sep;
 
 @@Returns the number of strings in `ARGZ'
 @@Simply count the number of`NUL-characters within `argz...+=argz_len'
-[export_alias(__argz_count)][ATTR_PURE]
+[export_alias(__argz_count)][[ATTR_PURE]]
 argz_count:([inp_opt(argz_len)] char const *argz, size_t argz_len) -> size_t {
 	size_t result = 0;
 	if likely(argz_len) {
@@ -241,7 +241,7 @@ __argz_stringify:(*) = argz_stringify;
 
 
 @@Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN'
-[export_alias(__argz_create_sep)][userimpl]
+[export_alias(__argz_create_sep)][[userimpl]]
 [requires_function("realloc")]
 [impl_include("<parts/errno.h>")]
 argz_append:([[nonnull]] char **__restrict pargz, [[nonnull]] size_t *__restrict pargz_len,
@@ -265,7 +265,7 @@ argz_append:([[nonnull]] char **__restrict pargz, [[nonnull]] size_t *__restrict
 __argz_append:(*) = argz_append;
 
 @@Append `STR' to the argz vector in `PARGZ & PARGZ_LEN'
-[export_alias(__argz_add)][userimpl][requires($has_function(argz_append))]
+[export_alias(__argz_add)][[userimpl]][requires($has_function(argz_append))]
 argz_add:([[nonnull]] char **__restrict pargz, [[nonnull]] size_t *__restrict pargz_len,
           [[nonnull]] char const *__restrict str) -> error_t {
 	return argz_append(pargz, pargz_len, str, strlen(str) + 1);
@@ -274,7 +274,7 @@ argz_add:([[nonnull]] char **__restrict pargz, [[nonnull]] size_t *__restrict pa
 __argz_add:(*) = argz_add;
 
 @@Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN'
-[export_alias(__argz_add_sep)][userimpl]
+[export_alias(__argz_add_sep)][[userimpl]]
 [requires_function("realloc")]
 [impl_include("<parts/errno.h>")]
 argz_add_sep:([[nonnull]] char **__restrict pargz, [[nonnull]] size_t *__restrict pargz_len,
@@ -349,7 +349,7 @@ __argz_add_sep:(*) = argz_add_sep;
 @@Note that `ENTRY' must be the actual pointer to one of the elements
 @@of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
 @@of the elements... (took me a while to realize this one)
-[export_alias(__argz_add_sep)][userimpl]
+[export_alias(__argz_add_sep)][[userimpl]]
 argz_delete:([[nonnull]] char **__restrict pargz,
              [[nonnull]] size_t *__restrict pargz_len,
              [[nullable]] char *entry) {
@@ -379,7 +379,7 @@ __argz_delete:(*) = argz_delete;
 @@will insert `ENTRY' at the beginning of `ARGZ'. If `BEFORE' is not in `ARGZ', `EINVAL'
 @@is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
 @@On success, `0' is returned
-[export_alias(__argz_insert)][userimpl][impl_include("<parts/errno.h>")]
+[export_alias(__argz_insert)][[userimpl]][impl_include("<parts/errno.h>")]
 [requires($has_function(realloc) && $has_function(argz_add))]
 argz_insert:([[nonnull]] char **__restrict pargz, [[nonnull]] size_t *__restrict pargz_len,
              [[nullable]] char *before, [[nonnull]] char const *__restrict entry) -> error_t {
@@ -444,7 +444,7 @@ __argz_insert:(*) = argz_insert;
 @@Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
 @@`PARGZ' as necessary. If `PREPLACE_COUNT' is non-NULL, `*PREPLACE_COUNT' will be
 @@incremented by number of replacements performed
-[export_alias(__argz_replace)][userimpl][impl_include("<parts/errno.h>")]
+[export_alias(__argz_replace)][[userimpl]][impl_include("<parts/errno.h>")]
 [requires($has_function(realloc) && $has_function(free))]
 argz_replace:([[nonnull]] char **__restrict pargz,
               [[nonnull]] size_t *__restrict pargz_len,

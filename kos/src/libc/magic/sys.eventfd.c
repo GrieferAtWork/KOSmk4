@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.sched.eventfd)]
+%[default_impl_section(".text.crt.sched.eventfd")]
 
 %{
 #include <features.h>
@@ -62,9 +62,8 @@ typedef uint64_t eventfd_t;
 [[ATTR_WUNUSED]] eventfd:(unsigned int count, int flags) -> $fd_t;
 
 @@Read event counter and possibly wait for events
-[[cp]][requires($has_function(read))]
-[impl_include("<parts/errno.h>")]
-eventfd_read:($fd_t fd, eventfd_t *value) -> int %{auto_block(any({
+[[cp, userimpl, requires_function(read), impl_include("<parts/errno.h>")]]
+eventfd_read:($fd_t fd, eventfd_t *value) -> int {
 	ssize_t error;
 	error = read(fd, value, sizeof(eventfd_t));
 	if (error == sizeof(eventfd_t))
@@ -74,12 +73,11 @@ eventfd_read:($fd_t fd, eventfd_t *value) -> int %{auto_block(any({
 		__libc_seterrno(EINVAL);
 #endif /* EINVAL */
 	return -1;
-}))}
+}
 
 @@Increment event counter
-[[cp]][requires($has_function(write))]
-[impl_include("<parts/errno.h>")]
-eventfd_write:($fd_t fd, eventfd_t value) -> int %{auto_block(any({
+[[cp, requires_function(write), impl_include("<parts/errno.h>")]]
+eventfd_write:($fd_t fd, eventfd_t value) -> int {
 	ssize_t error;
 	error = write(fd, &value, sizeof(eventfd_t));
 	if (error == sizeof(eventfd_t))
@@ -89,7 +87,7 @@ eventfd_write:($fd_t fd, eventfd_t value) -> int %{auto_block(any({
 		__libc_seterrno(EINVAL);
 #endif /* EINVAL */
 	return -1;
-}))}
+}
 
 %{
 #endif /* __CC__ */

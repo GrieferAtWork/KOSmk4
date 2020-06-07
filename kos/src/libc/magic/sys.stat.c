@@ -24,7 +24,7 @@
 %[define_replacement(dev_t      = __dev_t)]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
-%[define_replacement(time_t     = __TM_TYPE(time))]
+%[define_replacement(time_t     = "__TM_TYPE(time)")]
 %[define_replacement(time32_t   = __time32_t)]
 %[define_replacement(time64_t   = __time64_t)]
 
@@ -55,8 +55,8 @@
 %[define_replacement(UTIME_NOW   = __UTIME_NOW)]
 %[define_replacement(UTIME_OMIT  = __UTIME_OMIT)]
 
-%[declare_known_section(.text.crt.fs.stat)]
-%[declare_known_section(.text.crt.fs.stat_glc)]
+%[declare_known_section(".text.crt.fs.stat")]
+%[declare_known_section(".text.crt.fs.stat_glc")]
 
 %{
 #include <features.h>
@@ -353,82 +353,94 @@ typedef __blksize_t blksize_t;
  * Otherwise, `struct stat' uses a totally generic layout.
  */
 
-%[default_impl_section(.text.crt.fs.stat)]
+%[default_impl_section(".text.crt.fs.stat")];
 
 /* Name format: `<N_TIME_BITS>i<N_FILE_BITS>' */
-[ignore][alias(_stat32)]     dos_stat32i32:([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat32 *__restrict buf) -> int = _stat?;
-[ignore][alias(_stat32i64)]  dos_stat32i64:([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat32i64 *__restrict buf) -> int = _stati64?;
-[ignore][alias(_stat64i32)]  dos_stat64i32:([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat64i32 *__restrict buf) -> int = _stat64?;
-[ignore][alias(_stat64i32)]  dos_stat64i64:([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat64 *__restrict buf) -> int = _stat64?;
-[ignore][alias(_fstat32)]    dos_fstat32i32:($fd_t fd, [[nonnull]] struct __dos_stat32 *__restrict buf) -> int = _fstat?;
-[ignore][alias(_fstat32i64)] dos_fstat32i64:($fd_t fd, [[nonnull]] struct __dos_stat32i64 *__restrict buf) -> int = _fstati64?;
-[ignore][alias(_fstat64i32)] dos_fstat64i32:($fd_t fd, [[nonnull]] struct __dos_stat64i32 *__restrict buf) -> int = _fstat64?;
-[ignore][alias(_fstat64i32)] dos_fstat64i64:($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf) -> int = _fstat64?;
+[[ignore, nocrt, alias("_stat", "_stat32")]]         int dos_stat32i32([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat32 *__restrict buf);
+[[ignore, nocrt, alias("_stati64", "_stat32i64")]]   int dos_stat32i64([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat32i64 *__restrict buf);
+[[ignore, nocrt, alias("_stat64", "_stat64i32")]]    int dos_stat64i32([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat64i32 *__restrict buf);
+[[ignore, nocrt, alias("_stat64", "_stat64i32")]]    int dos_stat64i64([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat64 *__restrict buf);
+[[ignore, nocrt, alias("_fstat", "_fstat32")]]       int dos_fstat32i32($fd_t fd, [[nonnull]] struct __dos_stat32 *__restrict buf);
+[[ignore, nocrt, alias("_fstati64", "_fstat32i64")]] int dos_fstat32i64($fd_t fd, [[nonnull]] struct __dos_stat32i64 *__restrict buf);
+[[ignore, nocrt, alias("_fstat64", "_fstat64i32")]]  int dos_fstat64i32($fd_t fd, [[nonnull]] struct __dos_stat64i32 *__restrict buf);
+[[ignore, nocrt, alias("_fstat64", "_fstat64i32")]]  int dos_fstat64i64($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf);
 
-//[ignore] glibc_stat:([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat *__restrict buf) -> int = stat?;
-//[ignore] glibc_stat64:([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat64 *__restrict buf) -> int = stat64?;
-//[ignore] glibc_lstat:([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat *__restrict buf) -> int = lstat?;
-//[ignore] glibc_lstat64:([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat64 *__restrict buf) -> int = lstat64?;
-//[ignore] glibc_fstat:($fd_t fd, [[nonnull]] struct __glc_stat *__restrict buf) -> int = fstat?;
-//[ignore] glibc_fstat64:($fd_t fd, [[nonnull]] struct __glc_stat64 *__restrict buf) -> int = fstat64?;
+//[[ignore, nocrt, alias("stat")]]    int glibc_stat([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat *__restrict buf);
+//[[ignore, nocrt, alias("stat64")]]  int glibc_stat64([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat64 *__restrict buf);
+//[[ignore, nocrt, alias("lstat")]]   int glibc_lstat([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat *__restrict buf);
+//[[ignore, nocrt, alias("lstat64")]] int glibc_lstat64([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat64 *__restrict buf);
+//[[ignore, nocrt, alias("fstat")]]   int glibc_fstat($fd_t fd, [[nonnull]] struct __glc_stat *__restrict buf);
+//[[ignore, nocrt, alias("fstat64")]] int glibc_fstat64($fd_t fd, [[nonnull]] struct __glc_stat64 *__restrict buf);
 
 
-[no_crt_impl, no_crt_self_import]
-[if(defined(__CRT_KOS_PRIMARY)), preferred_alias(kstat, kstat64)]
-[if(defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)), preferred_alias(_stat64, _stat64i32)]
-[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)), preferred_alias(_stati64, _stat32i64)]
-[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), preferred_alias(_stat, _stat32)]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(stat64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(stat)]
-[noexport] stat:([[nonnull]] char const *__restrict filename, [[nonnull]] struct stat *__restrict buf) -> int;
+[[no_crt_impl, no_crt_self_import]]
+[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kstat", "kstat64")]]
+[[if(defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)), preferred_alias("_stat64", "_stat64i32")]]
+[[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)), preferred_alias("_stati64", "_stat32i64")]]
+[[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), preferred_alias("_stat", "_stat32")]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("stat64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("stat")]]
+int stat([[nonnull]] char const *__restrict filename,
+         [[nonnull]] struct stat *__restrict buf);
 /* TODO: Emulate stat() for __USE_TIME_BITS64 compatibility! */
 
 
 %
-[no_crt_impl, no_crt_self_import]
-[if(defined(__CRT_KOS_PRIMARY)), preferred_alias(kfstat, kfstat64)]
-[if(defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)), preferred_alias(_fstat64, _fstat64i32)]
-[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)), preferred_alias(_fstati64, _fstat32i64)]
-[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), preferred_alias(_fstat, _fstat32)]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(fstat64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fstat)]
-fstat:($fd_t fd, [[nonnull]] struct stat *__restrict buf) -> int;
+;
+[[no_crt_impl, no_crt_self_import]]
+[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kfstat", "kfstat64")]]
+[[if(defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)), preferred_alias("_fstat64", "_fstat64i32")]]
+[[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)), preferred_alias("_fstati64", "_fstat32i64")]]
+[[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), preferred_alias("_fstat", "_fstat32")]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fstat64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fstat")]]
+int fstat($fd_t fd, [[nonnull]] struct stat *__restrict buf);
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
-[no_crt_impl, no_crt_self_import]
-[if(defined(__CRT_KOS_PRIMARY)), preferred_alias(klstat, klstat64)]
-[if(defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)), preferred_alias(_stat64, _stat64i32)]
-[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)), preferred_alias(_stati64, _stat32i64)]
-[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), preferred_alias(_stat, _stat32)]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(lstat64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(lstat)]
-lstat:([[nonnull]] char const *__restrict filename, [[nonnull]] struct stat *__restrict buf) -> int;
+;
+
+[[no_crt_impl, no_crt_self_import]]
+[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("klstat", "klstat64")]]
+[[if(defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)), preferred_alias("_stat64", "_stat64i32")]]
+[[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)), preferred_alias("_stati64", "_stat32i64")]]
+[[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), preferred_alias("_stat", "_stat32")]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("lstat64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("lstat")]]
+int lstat([[nonnull]] char const *__restrict filename,
+          [[nonnull]] struct stat *__restrict buf);
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 %
 %#ifdef __USE_LARGEFILE64
-[no_crt_impl, no_crt_self_import]
-[if(defined(__CRT_KOS_PRIMARY)), preferred_alias(kstat, kstat64)]
-[if(defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)), preferred_alias(_stat64, _stat64i32)]
-[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), preferred_alias(_stati64, _stat32i64)]
-[preferred_alias(stat64)]
-stat64:([[nonnull]] char const *__restrict filename, [[nonnull]] struct stat64 *__restrict buf) -> int;
+;
+
+[[no_crt_impl, no_crt_self_import]]
+[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kstat", "kstat64")]]
+[[if(defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)), preferred_alias("_stat64", "_stat64i32")]]
+[[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), preferred_alias("_stati64", "_stat32i64")]]
+[[preferred_alias("stat64")]]
+int stat64([[nonnull]] char const *__restrict filename,
+           [[nonnull]] struct stat64 *__restrict buf);
 
 %
-[if(defined(__CRT_KOS_PRIMARY)), preferred_alias(kfstat, kfstat64)]
-[if(defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)), preferred_alias(_fstat64, _fstat64i32)]
-[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), preferred_alias(_fstati64, _fstat32i64)]
-[preferred_alias(fstat64)][no_crt_impl, no_crt_self_import]
-fstat64:($fd_t fd, [[nonnull]] struct stat64 *__restrict buf) -> int;
+;
+[[no_crt_impl, no_crt_self_import]]
+[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kfstat", "kfstat64")]]
+[[if(defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)), preferred_alias("_fstat64", "_fstat64i32")]]
+[[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), preferred_alias("_fstati64", "_fstat32i64")]]
+[[preferred_alias("fstat64")]]
+int fstat64($fd_t fd, [[nonnull]] struct stat64 *__restrict buf);
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
-[if(defined(__CRT_KOS_PRIMARY)), preferred_alias(klstat, klstat64)]
-[if(defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)), preferred_alias(_stat64, _stat64i32)]
-[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), preferred_alias(_stati64, _stat32i64)]
-[preferred_alias(lstat64)][no_crt_impl, no_crt_self_import]
-lstat64:([[nonnull]] char const *__restrict filename, [[nonnull]] struct stat64 *__restrict buf) -> int;
+[[no_crt_impl, no_crt_self_import]]
+[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("klstat", "klstat64")]]
+[[if(defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)), preferred_alias("_stat64", "_stat64i32")]]
+[[if(defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), preferred_alias("_stati64", "_stat32i64")]]
+[[preferred_alias("lstat64")]]
+int lstat64([[nonnull]] char const *__restrict filename,
+            [[nonnull]] struct stat64 *__restrict buf);
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 %#endif /* __USE_LARGEFILE64 */
 
@@ -470,57 +482,68 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_dos_stat64)(char const *__r
 %#ifdef __USE_ATFILE
 
 @@@param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
-[if(defined(__CRT_KOS_PRIMARY)), preferred_alias(kfstatat, kfstatat64)]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(fstatat64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fstatat)]
-[no_crt_impl, no_crt_self_import]
-fstatat:($fd_t dirfd, [[nonnull]] char const *__restrict filename,
-         [[nonnull]] struct stat *__restrict buf, $atflag_t flags) -> int;
+[[no_crt_impl, no_crt_self_import]]
+[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kfstatat", "kfstatat64")]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fstatat64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fstatat")]]
+int fstatat($fd_t dirfd, [[nonnull]] char const *__restrict filename,
+            [[nonnull]] struct stat *__restrict buf, $atflag_t flags);
 
 %#ifdef __USE_LARGEFILE64
 @@@param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
-[if(defined(__CRT_KOS_PRIMARY)), preferred_alias(kfstatat, kfstatat64)]
-[no_crt_impl, no_crt_self_import]
-fstatat64:($fd_t dirfd, [[nonnull]] char const *__restrict filename,
-           [[nonnull]] struct stat *__restrict buf, $atflag_t flags) -> int;
+[[no_crt_impl, no_crt_self_import]]
+[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kfstatat", "kfstatat64")]]
+int fstatat64($fd_t dirfd, [[nonnull]] char const *__restrict filename,
+              [[nonnull]] struct stat *__restrict buf, $atflag_t flags);
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_ATFILE */
 
-%[default_impl_section(".text.crt.fs.modify")]
+%[default_impl_section(".text.crt.fs.modify")];
 
-[[cp]][ignore] dos_mkdir:([[nonnull]] char const *pathname) -> int = _mkdir?;
+[[cp, ignore, nocrt, alias("_mkdir")]]
+int dos_mkdir([[nonnull]] char const *pathname);
 
 %
-[[cp, guard]][noexport]
-[requires(defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))]
-mkdir:([[nonnull]] char const *pathname, $mode_t mode) -> int {
+;
+
+[[cp, guard, userimpl]]
+[[requires(defined(__CRT_DOS_PRIMARY) && $has_function(dos_mkdir))]]
+int mkdir([[nonnull]] char const *pathname, $mode_t mode) {
 	(void)mode;
 	return dos_mkdir(pathname);
 }
 
 %
-[[cp, guard]][alias(_chmod)]
-chmod:([[nonnull]] char const *filename, $mode_t mode) -> int;
+;
+
+[[cp, guard, export_alias("_chmod")]]
+int chmod([[nonnull]] char const *filename, $mode_t mode);
 
 
 %
 %#ifdef __USE_MISC
+;
+
 [[cp, guard]]
-[if(defined(__CRT_DOS_PRIMARY)), alias(_chmod, chmod)]
-lchmod:([[nonnull]] char const *filename, $mode_t mode) -> int;
+[[if(defined(__CRT_DOS_PRIMARY)), alias("_chmod", "chmod")]]
+int lchmod([[nonnull]] char const *filename, $mode_t mode);
 %#endif /* __USE_MISC */
 
-%[default_impl_section(.text.crt.fs.basic_property)]
+%[default_impl_section(".text.crt.fs.basic_property")];
 
 %
-[guard][alias(_umask)] umask:($mode_t mode) -> $mode_t;
+;
+
+[[guard, export_alias("_umask")]]
+$mode_t umask($mode_t mode);
+
 
 %
 %#ifdef __USE_GNU
 @@Return the current umask.
 @@WARNING: This function isn't thread-safe
-[requires(defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask))]
-getumask:() -> $mode_t {
+[[userimpl, requires_function(umask)]]
+$mode_t getumask() {
 	$mode_t result;
 	result = umask(0);
 	umask(result);
@@ -528,59 +551,71 @@ getumask:() -> $mode_t {
 }
 %#endif /* __USE_GNU */
 
-%[default_impl_section(".text.crt.fs.modify")]
+%[default_impl_section(".text.crt.fs.modify")];
 
 %
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
 @@@param flags: Set of `0|AT_DOSPATH'
-[[cp]] fmkdirat:($fd_t dirfd, [[nonnull]] char const *pathname, $mode_t mode, $atflag_t flags) -> int;
+[[cp]]
+int fmkdirat($fd_t dirfd,
+             [[nonnull]] char const *pathname,
+             $mode_t mode, $atflag_t flags);
 
 @@@param flags: Set of `0|AT_DOSPATH'
-[[cp]] fmknodat:($fd_t dirfd, [[nonnull]] char const *nodename, $mode_t mode, $dev_t dev, $atflag_t flags) -> int;
+[[cp]]
+int fmknodat($fd_t dirfd, [[nonnull]] char const *nodename,
+             $mode_t mode, $dev_t dev, $atflag_t flags);
 %#endif
 
 
 %
-[[cp]] mkfifo:([[nonnull]] char const *fifoname, $mode_t mode) -> int;
+;
+
+[[cp]]
+int mkfifo([[nonnull]] char const *fifoname, $mode_t mode);
 
 %
 %#ifdef __USE_ATFILE
 @@@param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
-[[cp]] fchmodat:($fd_t dirfd, [[nonnull]] char const *filename, $mode_t mode, $atflag_t flags) -> int;
-[[cp]] mkdirat:($fd_t dirfd, [[nonnull]] char const *pathname, $mode_t mode) -> int;
-[[cp]] mkfifoat:($fd_t dirfd, [[nonnull]] char const *fifoname, $mode_t mode) -> int;
+[[cp]] int fchmodat($fd_t dirfd, [[nonnull]] char const *filename, $mode_t mode, $atflag_t flags);
+[[cp]] int mkdirat($fd_t dirfd, [[nonnull]] char const *pathname, $mode_t mode);
+[[cp]] int mkfifoat($fd_t dirfd, [[nonnull]] char const *fifoname, $mode_t mode);
 %#endif /* __USE_ATFILE */
 
 %
 %#ifdef __USE_POSIX
-[[cp]] fchmod:($fd_t fd, $mode_t mode) -> int;
+[[cp]] int fchmod($fd_t fd, $mode_t mode);
 %#endif /* __USE_POSIX */
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-[[cp]] mknod:([[nonnull]] char const *nodename, $mode_t mode, $dev_t dev) -> int;
+[[cp]] int mknod([[nonnull]] char const *nodename, $mode_t mode, $dev_t dev);
 %#ifdef __USE_ATFILE
-[[cp]] mknodat:($fd_t dirfd, [[nonnull]] char const *nodename, $mode_t mode, $dev_t dev) -> int;
+[[cp]] int mknodat($fd_t dirfd, [[nonnull]] char const *nodename, $mode_t mode, $dev_t dev);
 %#endif /* __USE_ATFILE */
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
-%[default_impl_section(.text.crt.fs.modify_time)]
-@@@param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH'
-[[cp]][ignore]
-utimensat32:($fd_t dirfd, [[nonnull]] char const *filename,
-             [[nullable]] struct timespec const times[2 /*or:3*/], $atflag_t flags) -> int = utimensat?;
+%[default_impl_section(".text.crt.fs.modify_time")];
+
+[[cp, ignore, doc_alias("utimensat"), nocrt, alias("utimensat")]]
+int utimensat32($fd_t dirfd, [[nonnull]] char const *filename,
+                [[nullable]] struct timespec const times[2 /*or:3*/],
+                $atflag_t flags);
+
 
 %
 %#ifdef __USE_ATFILE
 @@@param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH'
-[cp, no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(utimensat64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(utimensat)]
-[userimpl, requires(defined(__CRT_HAVE_utimensat) || defined(__CRT_HAVE_utimensat64))]
-utimensat:($fd_t dirfd, [[nonnull]] char const *filename,
-           [[nullable]] struct timespec const times[2 /*or:3*/], $atflag_t flags) -> int {
-#ifdef __CRT_HAVE_utimensat64
-#if defined(__KOS__) && __KOS_VERSION__ >= 300
+[[cp, no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("utimensat64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("utimensat")]]
+[[userimpl, requires($has_function(utimensat32) || $has_function(utimensat64))]]
+[[impl_include("<asm/fcntl.h>")]]
+int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
+              [[nullable]] struct timespec const times[2 /*or:3*/],
+              $atflag_t flags) {
+@@pp_if $has_function(utimensat64)@@
+#ifdef __AT_CHANGE_CTIME
 	struct timespec64 tms[3];
 	if (!times)
 		return utimensat64(dirfd, filename, NULL, flags);
@@ -588,12 +623,12 @@ utimensat:($fd_t dirfd, [[nonnull]] char const *filename,
 	tms[0].tv_nsec = times[0].tv_nsec;
 	tms[1].tv_sec  = (__time64_t)times[1].tv_sec;
 	tms[1].tv_nsec = times[1].tv_nsec;
-	if (flags & 0x0200) /* AT_CHANGE_CTIME */ {
+	if (flags & __AT_CHANGE_CTIME) {
 		tms[2].tv_sec  = (__time64_t)times[2].tv_sec;
 		tms[2].tv_nsec = times[2].tv_nsec;
 	}
 	return utimensat64(dirfd, filename, tms, flags);
-#else
+#else /* __AT_CHANGE_CTIME */
 	struct timespec64 tms[2];
 	if (!times)
 		return utimensat64(dirfd, filename, NULL, flags);
@@ -602,9 +637,9 @@ utimensat:($fd_t dirfd, [[nonnull]] char const *filename,
 	tms[1].tv_sec  = (__time64_t)times[1].tv_sec;
 	tms[1].tv_nsec = times[1].tv_nsec;
 	return utimensat64(dirfd, filename, tms, flags);
-#endif
-#else /* __CRT_HAVE_utimensat64 */
-#if defined(__KOS__) && __KOS_VERSION__ >= 300
+#endif /* !__AT_CHANGE_CTIME */
+@@pp_else@@
+#ifdef __AT_CHANGE_CTIME
 	struct @__timespec32@ tms[3];
 	if (!times)
 		return utimensat32(dirfd, filename, NULL, flags);
@@ -612,12 +647,12 @@ utimensat:($fd_t dirfd, [[nonnull]] char const *filename,
 	tms[0].tv_nsec = times[0].tv_nsec;
 	tms[1].tv_sec  = (__time32_t)times[1].tv_sec;
 	tms[1].tv_nsec = times[1].tv_nsec;
-	if (flags & 0x0200) /* AT_CHANGE_CTIME */ {
+	if (flags & __AT_CHANGE_CTIME) {
 		tms[2].tv_sec  = (__time32_t)times[2].tv_sec;
 		tms[2].tv_nsec = times[2].tv_nsec;
 	}
 	return utimensat32(dirfd, filename, tms, flags);
-#else
+#else /* __AT_CHANGE_CTIME */
 	struct @__timespec32@ tms[2];
 	if (!times)
 		return utimensat32(dirfd, filename, NULL, flags);
@@ -626,16 +661,17 @@ utimensat:($fd_t dirfd, [[nonnull]] char const *filename,
 	tms[1].tv_sec  = (__time32_t)times[1].tv_sec;
 	tms[1].tv_nsec = times[1].tv_nsec;
 	return utimensat32(dirfd, filename, tms, flags);
-#endif
-#endif /* !__CRT_HAVE_utimensat64 */
+#endif /* !__AT_CHANGE_CTIME */
+@@pp_endif@@
 }
 
 %#ifdef __USE_TIME64
-[time64_variant_of(utimensat)]
-[[cp]][noexport][requires(defined(__CRT_HAVE_utimensat))]
-utimensat64:($fd_t dirfd, [[nonnull]] char const *filename,
-             [[nullable]] struct timespec64 const times[2 /*or:3*/], $atflag_t flags) -> int {
-#if defined(__KOS__) && __KOS_VERSION__ >= 300
+[[cp, time64_variant_of(utimensat)]]
+[[userimpl, requires_function(utimensat32)]]
+[[impl_include("<asm/fcntl.h>")]]
+int utimensat64($fd_t dirfd, [[nonnull]] char const *filename,
+                [[nullable]] struct timespec64 const times[2 /*or:3*/], $atflag_t flags) {
+#ifdef __AT_CHANGE_CTIME
 	struct timespec32 tms[3];
 	if (!times)
 		return utimensat32(dirfd, filename, NULL, flags);
@@ -648,7 +684,7 @@ utimensat64:($fd_t dirfd, [[nonnull]] char const *filename,
 		tms[2].tv_nsec = times[2].tv_nsec;
 	}
 	return utimensat32(dirfd, filename, tms, flags);
-#else
+#else /* __AT_CHANGE_CTIME */
 	struct timespec32 tms[2];
 	if (!times)
 		return utimensat32(dirfd, filename, NULL, flags);
@@ -657,21 +693,22 @@ utimensat64:($fd_t dirfd, [[nonnull]] char const *filename,
 	tms[1].tv_sec  = (__time32_t)times[1].tv_sec;
 	tms[1].tv_nsec = times[1].tv_nsec;
 	return utimensat32(dirfd, filename, tms, flags);
-#endif
+#endif /* !__AT_CHANGE_CTIME */
 }
 %#endif /* __USE_TIME64 */
 %#endif /* __USE_ATFILE */
 
-[[cp]][ignore] futimens32:($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) -> int = futimens?;
+[[cp, ignore, nocrt, alias("futimens")]]
+int futimens32($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]);
 
 %
 %#ifdef __USE_XOPEN2K8
-[cp, no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(futimens64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(futimens)]
-[userimpl, requires(defined(__CRT_HAVE_futimens) || defined(__CRT_HAVE_futimens64))]
-futimens:($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) -> int {
-#ifdef __CRT_HAVE_utimensat64
+[[cp, no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias(futimens64)]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias(futimens)]]
+[[userimpl, requires($has_function(futimens32) || $has_function(futimens64))]]
+int futimens($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) {
+@@pp_if $has_function(futimens64)@@
 	struct timespec64 tms[2];
 	if (!times)
 		return futimens64(fd, NULL);
@@ -680,7 +717,7 @@ futimens:($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) -> int
 	tms[1].tv_sec  = (__time64_t)times[1].tv_sec;
 	tms[1].tv_nsec = times[1].tv_nsec;
 	return futimens64(fd, tms);
-#else /* __CRT_HAVE_utimensat64 */
+@@pp_else@@
 	struct timespec32 tms[2];
 	if (!times)
 		return futimens32(fd, NULL);
@@ -689,13 +726,13 @@ futimens:($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) -> int
 	tms[1].tv_sec  = (__time32_t)times[1].tv_sec;
 	tms[1].tv_nsec = times[1].tv_nsec;
 	return futimens32(fd, tms);
-#endif /* !__CRT_HAVE_utimensat64 */
+@@pp_endif@@
 }
 
 %#ifdef __USE_TIME64
-[time64_variant_of(futimens)]
-[[cp]][noexport][requires(defined(__CRT_HAVE_futimens))]
-futimens64:($fd_t fd, [[nullable]] struct timespec64 const times[2 /*or:3*/]) -> int {
+[[cp, time64_variant_of(futimens)]]
+[[userimpl, requires_function(futimens32)]]
+int futimens64($fd_t fd, [[nullable]] struct timespec64 const times[2 /*or:3*/]) {
 	struct timespec32 tms[2];
 	if (!times)
 		return futimens32(fd, NULL);
@@ -713,21 +750,21 @@ futimens64:($fd_t fd, [[nullable]] struct timespec64 const times[2 /*or:3*/]) ->
 %/* Define DOS's redundant stat() functions. */
 %#ifdef __USE_DOS
 
-%[default_impl_section(.text.crt.dos.wchar.fs.stat)]
+%[default_impl_section(".text.crt.dos.wchar.fs.stat")];
 
 /* TODO: Emulate these functions when not running under DOS-CRT */
-[alias(_stat32)]     _stat32:([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat32 *__restrict buf) -> int = _stat?;
-[alias(_stat32i64)]  _stat32i64:([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat32i64 *__restrict buf) -> int = _stati64?;
-[alias(_stat64i32)]  _stat64i32:([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat64i32 *__restrict buf) -> int = _stat64?;
-[alias(_stat64i32)]  _stat64:([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat64 *__restrict buf) -> int = _stat64?;
-[alias(_fstat32)]    _fstat32:($fd_t fd, [[nonnull]] struct __dos_stat32 *__restrict buf) -> int = _fstat?;
-[alias(_fstat32i64)] _fstat32i64:($fd_t fd, [[nonnull]] struct __dos_stat32i64 *__restrict buf) -> int = _fstati64?;
-[alias(_fstat64i32)] _fstat64i32:($fd_t fd, [[nonnull]] struct __dos_stat64i32 *__restrict buf) -> int = _fstat64?;
-[alias(_fstat64i32)] _fstat64:($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf) -> int = _fstat64?;
-[wchar]             _wstat32:([[nonnull]] $wchar_t const *filename, [[nonnull]] struct __dos_stat32 *buf) -> int;
-[wchar]             _wstat64:([[nonnull]] $wchar_t const *filename, [[nonnull]] struct __dos_stat64 *buf) -> int;
-[wchar]             _wstat32i64:([[nonnull]] $wchar_t const *filename, [[nonnull]] struct __dos_stat32i64 *buf) -> int;
-[wchar]             _wstat64i32:([[nonnull]] $wchar_t const *filename, [[nonnull]] struct __dos_stat64i32 *buf) -> int;
+[[nocrt, alias("_stat", "_stat32")]]         int _stat32([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat32 *__restrict buf);
+[[nocrt, alias("_stati64", "_stat32i64")]]   int _stat32i64([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat32i64 *__restrict buf);
+[[nocrt, alias("_stat64", "_stat64i32")]]    int _stat64i32([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat64i32 *__restrict buf);
+[[nocrt, alias("_stat64", "_stat64i32")]]    int _stat64([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat64 *__restrict buf);
+[[nocrt, alias("_fstat", "_fstat32")]]       int _fstat32($fd_t fd, [[nonnull]] struct __dos_stat32 *__restrict buf);
+[[nocrt, alias("_fstati64", "_fstat32i64")]] int _fstat32i64($fd_t fd, [[nonnull]] struct __dos_stat32i64 *__restrict buf);
+[[nocrt, alias("_fstat64", "_fstat64i32")]]  int _fstat64i32($fd_t fd, [[nonnull]] struct __dos_stat64i32 *__restrict buf);
+[[nocrt, alias("_fstat64", "_fstat64i32")]]  int _fstat64($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf);
+[[wchar]] int _wstat32([[nonnull]] $wchar_t const *filename, [[nonnull]] struct __dos_stat32 *buf);
+[[wchar]] int _wstat64([[nonnull]] $wchar_t const *filename, [[nonnull]] struct __dos_stat64 *buf);
+[[wchar]] int _wstat32i64([[nonnull]] $wchar_t const *filename, [[nonnull]] struct __dos_stat32i64 *buf);
+[[wchar]] int _wstat64i32([[nonnull]] $wchar_t const *filename, [[nonnull]] struct __dos_stat64i32 *buf);
 
 %#endif /* __USE_DOS */
 

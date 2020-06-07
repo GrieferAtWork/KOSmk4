@@ -86,14 +86,12 @@ typedef __CHAR32_TYPE__ char32_t;
 %[insert:std]
 
 
-[std]
-[impl_include("<parts/errno.h>")]
-[impl_prefix(
+[[std, impl_include("<parts/errno.h>"), impl_prefix(
 @__LOCAL_LIBC_DATA@(mbrtoc16_mbs) __mbstate_t mbrtoc16_mbs = __MBSTATE_INIT;
-)]
-mbrtoc16:(char16_t *__restrict pc16,
-          char const *__restrict s, size_t n,
-          __mbstate_t *__restrict mbs) -> size_t {
+)]]
+size_t mbrtoc16(char16_t *__restrict pc16,
+                char const *__restrict s, size_t n,
+                __mbstate_t *__restrict mbs) {
 	char16_t c16;
 	size_t result;
 	if (!s) {
@@ -114,15 +112,13 @@ mbrtoc16:(char16_t *__restrict pc16,
 }
 
 
-[std]
-[impl_include("<parts/errno.h>")]
-[dependency_include("<bits/mbstate.h>")]
-[impl_prefix(
+[[std, impl_include("<parts/errno.h>")]]
+[[decl_include("<bits/mbstate.h>"), impl_prefix(
 @__LOCAL_LIBC_DATA@(mbrtoc32_mbs) __mbstate_t mbrtoc32_mbs = __MBSTATE_INIT;
-)]
-mbrtoc32:(char32_t *__restrict pc32,
-          char const *__restrict s, size_t n,
-          __mbstate_t *__restrict mbs) -> size_t {
+)]]
+size_t mbrtoc32(char32_t *__restrict pc32,
+                char const *__restrict s, size_t n,
+                __mbstate_t *__restrict mbs) {
 	char32_t c32;
 	size_t result;
 	if (!s) {
@@ -142,13 +138,11 @@ mbrtoc32:(char32_t *__restrict pc32,
 	return result;
 }
 
-[std]
-[impl_include("<parts/errno.h>")]
-[dependency_include("<bits/mbstate.h>")]
-[impl_prefix(
+[[std, impl_include("<parts/errno.h>")]]
+[[decl_include("<bits/mbstate.h>"), impl_prefix(
 @__LOCAL_LIBC_DATA@(c16rtomb_mbs) __mbstate_t c16rtomb_mbs = __MBSTATE_INIT;
-)]
-c16rtomb:(char *__restrict s, char16_t c16, __mbstate_t *__restrict mbs) -> size_t {
+)]]
+size_t c16rtomb(char *__restrict s, char16_t c16, __mbstate_t *__restrict mbs) {
 	char32_t ch32;
 	if (!s) {
 		if (mbs)
@@ -187,10 +181,8 @@ error_ilseq:
 	return (size_t)(unicode_writeutf8(s, ch32) - s);
 }
 
-[std]
-[impl_include("<parts/errno.h>")]
-[dependency_include("<bits/mbstate.h>")]
-c32rtomb:(char *__restrict s, char32_t c32, __mbstate_t *__restrict mbs) -> size_t {
+[[std, decl_include("<bits/mbstate.h>"), impl_include("<parts/errno.h>")]]
+size_t c32rtomb(char *__restrict s, char32_t c32, __mbstate_t *__restrict mbs) {
 	if (!s) {
 		if (mbs)
 			mbs->__word = __MBSTATE_TYPE_EMPTY;
@@ -218,55 +210,55 @@ __SYSDECL_END
 
 #if defined(_STRING_H) && !defined(_PARTS_UCHAR_STRING_H)
 #include <parts/uchar/string.h>
-#endif
+#endif /* _STRING_H && !_PARTS_UCHAR_STRING_H */
 
 #if defined(_PROCESS_H) && !defined(_PARTS_UCHAR_PROCESS_H)
 #include <parts/uchar/process.h>
-#endif
+#endif /* _PROCESS_H && !_PARTS_UCHAR_PROCESS_H */
 
 #if defined(_STDLIB_H) && !defined(_PARTS_UCHAR_STDLIB_H)
 #include <parts/uchar/stdlib.h>
-#endif
+#endif /* _STDLIB_H && !_PARTS_UCHAR_STDLIB_H */
 
 #if defined(_FCNTL_H) && !defined(_PARTS_UCHAR_FCNTL_H)
 #include <parts/uchar/fcntl.h>
-#endif
+#endif /* _FCNTL_H && !_PARTS_UCHAR_FCNTL_H */
 
 #if defined(_UNISTD_H) && !defined(_PARTS_UCHAR_UNISTD_H)
 #include <parts/uchar/unistd.h>
-#endif
+#endif /* _UNISTD_H && !_PARTS_UCHAR_UNISTD_H */
 
 #if defined(_UTIME_H) && !defined(_PARTS_UCHAR_UTIME_H)
 #include <parts/uchar/utime.h>
-#endif
+#endif /* _UTIME_H && !_PARTS_UCHAR_UTIME_H */
 
 #if defined(_FORMAT_PRINTER_H) && !defined(_PARTS_UCHAR_FORMATPRINTER_H)
 #include <parts/uchar/format-printer.h>
-#endif
+#endif /* _FORMAT_PRINTER_H && !_PARTS_UCHAR_FORMATPRINTER_H */
 
 #if defined(_IO_H) && !defined(_PARTS_UCHAR_IO_H)
 #include <parts/uchar/io.h>
-#endif
+#endif /* _IO_H && !_PARTS_UCHAR_IO_H */
 
 #if defined(_STDIO_H) && !defined(_PARTS_UCHAR_STDIO_H)
 #include <parts/uchar/stdio.h>
-#endif
+#endif /* _STDIO_H && !_PARTS_UCHAR_STDIO_H */
 
 #if defined(_TIME_H) && !defined(_PARTS_UCHAR_TIME_H)
 #include <parts/uchar/time.h>
-#endif
+#endif /* _TIME_H && !_PARTS_UCHAR_TIME_H */
 
 #if defined(_SYS_STAT_H) && !defined(_PARTS_UCHAR_SYS_STAT_H)
 #include <parts/uchar/sys/stat.h>
-#endif
+#endif /* _SYS_STAT_H && !_PARTS_UCHAR_SYS_STAT_H */
 
 #if defined(_SYS_MMAN_H) && !defined(_PARTS_UCHAR_SYS_MMAN_H)
 #include <parts/uchar/sys/mman.h>
-#endif
+#endif /* _SYS_MMAN_H && !_PARTS_UCHAR_SYS_MMAN_H */
 
 #if defined(_INTTYPES_H) && !defined(_PARTS_UCHAR_INTTYPES_H)
 #include <parts/uchar/inttypes.h>
-#endif
+#endif /* _INTTYPES_H && !_PARTS_UCHAR_INTTYPES_H */
 
 #endif /* __USE_UTF */
 

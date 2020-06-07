@@ -63,17 +63,17 @@ function replaceWcharTextKeyword(keyword: string, mode: int): string {
 	local repl = wcharReplacementEscapes.get(keyword);
 	if (repl !is none)
 		return repl[mode];
-	/* Check for references to other [wchar]-functions */
+	/* Check for references to other [[wchar]]-functions */
 	repl = allWcharFunctionsByName.get(keyword);
 	if (repl !is none) {
-		/* Yes, this is a [wchar]-function! */
+		/* Yes, this is a [[wchar]]-function! */
 		repl = repl.wc_header_uchar[mode];
 		if (repl !is none)
 			return repl.name;
 		repl = allWcharFunctionsByName[keyword];
-		/* Complain if referencing a [wchar] function function some uchar
+		/* Complain if referencing a [[wchar]] function function some uchar
 		 * variant, but no uchar variant exists for that referenced function. */
-		throw Error("Missing %{{uchar{}}}-variant of [wchar] Function {!r}"
+		throw Error("Missing %{{uchar{}}}-variant of [[wchar]] Function {!r}"
 			.format({ WCHAR_REPLACEMENT_WIDTH[mode], repl.wc_name }));
 	}
 	if (keyword.startswith("$")) {
@@ -258,7 +258,7 @@ function replaceWcharFunctionImplementation(
 			if (wcs !is none) {
 				func = wcs.wc_header_uchar[mode];
 				if (func is none) {
-					throw Error("Missing %{{uchar{}}}-variant of [wchar] Function {!r}"
+					throw Error("Missing %{{uchar{}}}-variant of [[wchar]] Function {!r}"
 						.format({ WCHAR_REPLACEMENT_WIDTH[mode], func.name }));
 				}
 			}

@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.io.poll)]
+%[default_impl_section(".text.crt.io.poll")]
 
 %{
 #include <features.h>
@@ -66,17 +66,19 @@ struct sembuf {
 }
 
 @@Semaphore control operation.  
-semctl:(int semid, int semnum, int cmd, ...) -> int;
+int semctl(int semid, int semnum, int cmd, ...);
 
 @@Get semaphore
-semget:(key_t key, int nsems, int semflg) -> int;
+int semget(key_t key, int nsems, int semflg);
 
 @@Operate on semaphore
-semop:(int semid, struct sembuf *sops, size_t nsops) -> int;
+int semop(int semid, struct sembuf *sops, size_t nsops);
 
 %#ifdef __USE_GNU
 @@Operate on semaphore with timeout
-semtimedop:(int semid, struct sembuf *sops, size_t nsops, struct timespec const *timeout) -> int;
+int semtimedop(int semid,
+               struct sembuf *sops, size_t nsops,
+               struct timespec const *timeout);
 %#endif /* __USE_GNU */
 
 %{

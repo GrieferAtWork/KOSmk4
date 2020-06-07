@@ -77,7 +77,7 @@ wutime:([[nonnull]] wchar_t const *filename, [[nullable]] struct utimbuf const *
 
 %
 %#ifdef __USE_TIME64
-[[cp]][alias(_wutime64)][wchar][time64_variant_of(wutime)]
+[[cp]][alias(_wutime64)][[wchar]][time64_variant_of(wutime)]
 [requires(defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32))]
 wutime64:([[nonnull]] $wchar_t const *filename, [[nullable]] struct utimbuf64 const *file_times) -> int {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO

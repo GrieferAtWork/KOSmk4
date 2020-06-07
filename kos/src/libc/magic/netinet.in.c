@@ -235,38 +235,38 @@ struct group_filter {
 }
 
 %[default_impl_section(.text.crt.net.convert)]
-[impl_include("<hybrid/__byteswap.h>")][ATTR_CONST]
+[impl_include("<hybrid/__byteswap.h>")][[ATTR_CONST]]
 [if(defined(__HYBRID_HTOBE_IS_BETOH)), alias(ntohs)]
 htons:($uint16_t hostword) -> $uint16_t {
 	return (uint16_t)__hybrid_htobe32(hostword);
 }
 
-[impl_include("<hybrid/__byteswap.h>")][ATTR_CONST]
+[impl_include("<hybrid/__byteswap.h>")][[ATTR_CONST]]
 [alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htons)]
 ntohs:($uint16_t netshort) -> $uint16_t {
 	return (uint16_t)__hybrid_betoh16(netshort);
 }
 
-[impl_include("<hybrid/__byteswap.h>")][ATTR_CONST]
+[impl_include("<hybrid/__byteswap.h>")][[ATTR_CONST]]
 [if(defined(__HYBRID_HTOBE_IS_BETOH)), alias(ntohl)]
 htonl:($uint32_t hostlong) -> $uint32_t {
 	return (uint32_t)__hybrid_htobe32(hostlong);
 }
 
-[impl_include("<hybrid/__byteswap.h>")][ATTR_CONST]
+[impl_include("<hybrid/__byteswap.h>")][[ATTR_CONST]]
 [alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonl)]
 ntohl:($uint32_t netlong) -> $uint32_t {
 	return (uint32_t)__hybrid_betoh32(netlong);
 }
 
 %#if defined(__USE_KOS) && defined(__UINT64_TYPE__)
-[impl_include("<hybrid/__byteswap.h>")][ATTR_CONST]
+[impl_include("<hybrid/__byteswap.h>")][[ATTR_CONST]]
 [if(defined(__HYBRID_HTOBE_IS_BETOH)), alias(ntohq)]
 htonq:($uint64_t hostlong) -> $uint64_t {
 	return (uint64_t)__hybrid_htobe64(hostlong);
 }
 
-[impl_include("<hybrid/__byteswap.h>")][ATTR_CONST]
+[impl_include("<hybrid/__byteswap.h>")][[ATTR_CONST]]
 [alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonq)]
 ntohq:($uint64_t netlong) -> $uint64_t {
 	return (uint64_t)__hybrid_betoh64(netlong);

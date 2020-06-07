@@ -81,14 +81,14 @@ __NAMESPACE_STD_USING(fexcept_t)
 
 
 @@Clear the supported exceptions represented by EXCEPTS
-[std][nothrow][fast][dependency_include(<bits/fenv-inline.h>)]
+[[std, nothrow, fast]][dependency_include(<bits/fenv-inline.h>)]
 feclearexcept:(int excepts) -> int {
 	@__inline_feclearexcept@(excepts);
 	return 0;
 }
 
 @@Raise the supported exceptions represented by EXCEPTS
-[std][throws][fast][dependency_include(<bits/fenv-inline.h>)][libc]
+[[std]][throws][[fast]][dependency_include(<bits/fenv-inline.h>)][[libc]]
 feraiseexcept:(int excepts) -> int {
 	@__inline_feraiseexcept@(excepts);
 	return 0;
@@ -96,7 +96,7 @@ feraiseexcept:(int excepts) -> int {
 
 @@Store implementation-defined representation of the exception
 @@flags indicated by EXCEPTS in the object pointed to by FLAGP
-[std][fast][dependency_include(<bits/fenv-inline.h>)]
+[[std, fast]][dependency_include(<bits/fenv-inline.h>)]
 fegetexceptflag:([[nonnull]] fexcept_t *flagp, int excepts) -> int {
 #ifdef @__inline_fegetexceptflag@
 	@__inline_fegetexceptflag@(flagp, excepts);
@@ -109,7 +109,7 @@ fegetexceptflag:([[nonnull]] fexcept_t *flagp, int excepts) -> int {
 
 @@Set complete status for exceptions indicated by EXCEPTS according
 @@to the representation in the object pointed to by FLAGP
-[std][fast][dependency_include(<bits/fenv-inline.h>)]
+[[std, fast]][dependency_include(<bits/fenv-inline.h>)]
 fesetexceptflag:([[nonnull]] fexcept_t const *flagp, int excepts) -> int {
 #ifdef @__inline_fesetexceptflag@
 	@__inline_fesetexceptflag@(flagp, excepts);
@@ -123,8 +123,8 @@ fesetexceptflag:([[nonnull]] fexcept_t const *flagp, int excepts) -> int {
 
 @@Determine which of subset of the exceptions
 @@specified by EXCEPTS are currently set
-[std][nothrow][ATTR_PURE][[ATTR_WUNUSED]]
-[fast][dependency_include(<bits/fenv-inline.h>)]
+[[std, nothrow, ATTR_PURE, ATTR_WUNUSED]]
+[[fast]][dependency_include(<bits/fenv-inline.h>)]
 fetestexcept:(int excepts) -> int {
 	return @__inline_fetestexcept@(excepts);
 }
@@ -135,8 +135,8 @@ fetestexcept:(int excepts) -> int {
 @@            ... `FE_DOWNWARD':   floor()
 @@            ... `FE_UPWARD':     ceil()
 @@            ... `FE_TOWARDZERO': trunc()
-[std][nothrow][ATTR_PURE][[ATTR_WUNUSED]][libc]
-[fast][dependency_include(<bits/fenv-inline.h>)]
+[[std, nothrow, ATTR_PURE, ATTR_WUNUSED, libc]]
+[[fast]][dependency_include(<bits/fenv-inline.h>)]
 fegetround:() -> int {
 	return @__inline_fegetround@();
 }
@@ -147,14 +147,14 @@ fegetround:() -> int {
 @@            ... `FE_DOWNWARD':   floor()
 @@            ... `FE_UPWARD':     ceil()
 @@            ... `FE_TOWARDZERO': trunc()
-[std][nothrow][libc]
-[fast][dependency_include(<bits/fenv-inline.h>)]
+[[std, nothrow, libc]]
+[[fast]][dependency_include(<bits/fenv-inline.h>)]
 fesetround:(int rounding_direction) -> int {
 	return @__inline_fesetround@(rounding_direction);
 }
 
 @@Store the current floating-point environment in the object pointed to by ENVP
-[std][fast][dependency_include(<bits/fenv-inline.h>)]
+[[std, fast]][dependency_include(<bits/fenv-inline.h>)]
 fegetenv:([[nonnull]] fenv_t *envp) -> int {
 	@__inline_fegetenv@(envp);
 	return 0;
@@ -162,14 +162,14 @@ fegetenv:([[nonnull]] fenv_t *envp) -> int {
 
 @@Save the current environment in the object pointed to by ENVP, clear
 @@exception flags and install a non-stop mode (if available) for all exceptions
-[std][fast][dependency_include(<bits/fenv-inline.h>)]
+[[std, fast]][dependency_include(<bits/fenv-inline.h>)]
 feholdexcept:([[nonnull]] fenv_t *envp) -> int {
 	@__inline_feholdexcept@(envp);
 	return 0;
 }
 
 @@Establish the floating-point environment represented by the object pointed to by ENVP
-[std][fast][dependency_include(<bits/fenv-inline.h>)]
+[[std, fast]][dependency_include(<bits/fenv-inline.h>)]
 fesetenv:([[nonnull]] fenv_t const *envp) -> int {
 	@__inline_fesetenv@(envp);
 	return 0;
@@ -178,7 +178,7 @@ fesetenv:([[nonnull]] fenv_t const *envp) -> int {
 @@Save current exceptions in temporary storage, install environment
 @@represented by object pointed to by ENVP and raise exceptions
 @@according to saved exceptions
-[std][fast][dependency_include(<bits/fenv-inline.h>)]
+[[std, fast]][dependency_include(<bits/fenv-inline.h>)]
 feupdateenv:([[nonnull]] fenv_t const *envp) -> int {
 	@__inline_feupdateenv@(envp);
 	return 0;
@@ -190,7 +190,7 @@ feupdateenv:([[nonnull]] fenv_t const *envp) -> int {
 @@Enable individual exceptions.  Will not enable more exceptions than
 @@EXCEPTS specifies.  Returns the previous enabled exceptions if all
 @@exceptions are successfully set, otherwise returns -1
-[nothrow][fast][dependency_include(<bits/fenv-inline.h>)]
+[[nothrow, fast]][dependency_include(<bits/fenv-inline.h>)]
 feenableexcept:(int excepts) -> int {
 	return @__inline_feenableexcept@(excepts);
 }
@@ -198,14 +198,14 @@ feenableexcept:(int excepts) -> int {
 @@Disable individual exceptions.  Will not disable more exceptions than
 @@EXCEPTS specifies.  Returns the previous enabled exceptions if all
 @@exceptions are successfully disabled, otherwise returns -1
-[nothrow][fast][dependency_include(<bits/fenv-inline.h>)]
+[[nothrow, fast]][dependency_include(<bits/fenv-inline.h>)]
 fedisableexcept:(int excepts) -> int {
 	return @__inline_fedisableexcept@(excepts);
 }
 
 @@Return enabled exceptions
-[nothrow][[ATTR_WUNUSED, ATTR_PURE]]
-[fast][dependency_include(<bits/fenv-inline.h>)]
+[[ATTR_WUNUSED, nothrow, ATTR_PURE]]
+[[fast]][dependency_include(<bits/fenv-inline.h>)]
 fegetexcept:() -> int {
 	return @__inline_fegetexcept@();
 }

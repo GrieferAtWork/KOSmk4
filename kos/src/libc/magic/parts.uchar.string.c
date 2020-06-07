@@ -50,18 +50,18 @@ c32mempmove:(*) %{uchar(wmempmove)}
 c16mempset:(*) %{uchar(wmempset)}
 c32mempset:(*) %{uchar(wmempset)}
 
-[libc] c16end:(*) %{uchar(wcsend)}
-[libc] c32end:(*) %{uchar(wcsend)}
-[libc] c16nend:(*) %{uchar(wcsnend)}
-[libc] c32nend:(*) %{uchar(wcsnend)}
-[libc] c16len:(*) %{uchar(wcslen)}
-[libc] c32len:(*) %{uchar(wcslen)}
-[libc] c16nlen:(*) %{uchar(wcsnlen)}
-[libc] c32nlen:(*) %{uchar(wcsnlen)}
-[libc] c16cmp:(*) %{uchar(wcscmp)}
-[libc] c32cmp:(*) %{uchar(wcscmp)}
-[libc] c16ncmp:(*) %{uchar(wcsncmp)}
-[libc] c32ncmp:(*) %{uchar(wcsncmp)}
+[[libc]] c16end:(*) %{uchar(wcsend)}
+[[libc]] c32end:(*) %{uchar(wcsend)}
+[[libc]] c16nend:(*) %{uchar(wcsnend)}
+[[libc]] c32nend:(*) %{uchar(wcsnend)}
+[[libc]] c16len:(*) %{uchar(wcslen)}
+[[libc]] c32len:(*) %{uchar(wcslen)}
+[[libc]] c16nlen:(*) %{uchar(wcsnlen)}
+[[libc]] c32nlen:(*) %{uchar(wcsnlen)}
+[[libc]] c16cmp:(*) %{uchar(wcscmp)}
+[[libc]] c32cmp:(*) %{uchar(wcscmp)}
+[[libc]] c16ncmp:(*) %{uchar(wcsncmp)}
+[[libc]] c32ncmp:(*) %{uchar(wcsncmp)}
 
 c16chr:(*) %{uchar(wcschr)}
 c32chr:(*) %{uchar(wcschr)}
@@ -117,8 +117,8 @@ c32cspn:(*) %{uchar(wcscspn)}
 c16pbrk:(*) %{uchar(wcspbrk)}
 c32pbrk:(*) %{uchar(wcspbrk)}
 
-[guard] c16tok:(*) %{uchar(wcstok)}
-[guard] c32tok:(*) %{uchar(wcstok)}
+[[guard]] c16tok:(*) %{uchar(wcstok)}
+[[guard]] c32tok:(*) %{uchar(wcstok)}
 
 c16sep:(*) %{uchar(wcssep)}
 c32sep:(*) %{uchar(wcssep)}

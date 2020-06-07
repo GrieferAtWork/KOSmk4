@@ -175,7 +175,7 @@ __memcdup(*) = memcdup;
 %#ifdef __USE_KOS
 [[export_alias(__memdup)]]
 [[ATTR_WUNUSED, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
-[[section(".text.crt.heap.rare_helpers"), userimpl, requires_function("malloc")]]
+[[section(".text.crt.heap.rare_helpers"), userimpl, requires_function(malloc)]]
 void *memdup([[nonnull]] void const *__restrict ptr, size_t n_bytes) {
 	void *result;
 	result = malloc(n_bytes);

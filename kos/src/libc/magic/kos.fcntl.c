@@ -29,7 +29,7 @@ __SYSDECL_BEGIN
 
 }
 
-[vartypes(void *)][guard][decl_include("<bits/types.h>")][throws]
+[vartypes(void *)][[guard]][decl_include("<bits/types.h>")][throws]
 Fcntl:($fd_t fd, int cmd, ...) -> __STDC_INT_AS_SSIZE_T;
 
 %[default_impl_section(.text.crt.except.io.access)]

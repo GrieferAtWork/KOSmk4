@@ -99,7 +99,7 @@ void _endthread() {
 
 void _endthreadex($u32 exitcode);
 
-%[default_impl_section(.text.crt.sched.process)]
+%[default_impl_section(".text.crt.sched.process")]
 
 %
 %#ifndef _CRT_TERMINATE_DEFINED
@@ -114,7 +114,7 @@ _exit(*) = _Exit;
 [throws] _c_exit:() {
 }
 
-[guard][[ATTR_WUNUSED]] _getpid:() -> $pid_t = getpid;
+[[guard, ATTR_WUNUSED]] _getpid:() -> $pid_t = getpid;
 
 %[default_impl_section(.text.crt.dos.fs.exec.exec)]
 _execv(*) = execv;
@@ -206,7 +206,7 @@ _wexeclpe(*) = wexeclpe;
 %
 %#ifndef _CRT_WSYSTEM_DEFINED
 %#define _CRT_WSYSTEM_DEFINED 1
-[guard] _wsystem(*) = wsystem;
+[[guard]] _wsystem(*) = wsystem;
 %#endif /* !_CRT_WSYSTEM_DEFINED */
 
 

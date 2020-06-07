@@ -56,7 +56,7 @@ __SYSDECL_BEGIN
 @@Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
 @@Note that if `name' contains a `=' character, only characters leading up to this
 @@position are actually compared!
-[ATTR_PURE][[ATTR_WUNUSED]] char *
+[[ATTR_PURE, ATTR_WUNUSED]] char *
 envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
 	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
 	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]
@@ -75,7 +75,7 @@ envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[n
 
 @@Returns a pointer to the value portion of the entry
 @@in `ENVZ' for `NAME', or `NULL' if there is none.
-[ATTR_PURE][[ATTR_WUNUSED]] char *
+[[ATTR_PURE, ATTR_WUNUSED]] char *
 envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
 	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
 	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]
@@ -97,7 +97,7 @@ envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[non
 @@because when merging with another envz, the null entry can override an
 @@entry in the other one. Such entries can be removed with `envz_strip()'
 [requires($has_function(realloc) && $has_function(argz_add))]
-[impl_include("<parts/errno.h>")][userimpl]
+[impl_include("<parts/errno.h>")][[userimpl]]
 envz_add:([[nonnull]] char **__restrict penvz, [[nonnull]] size_t *__restrict penvz_len,
           [[nonnull]] char const *__restrict name, [[nullable]] char const *value) -> error_t {
 	char *new_envz;
@@ -130,7 +130,7 @@ envz_add:([[nonnull]] char **__restrict penvz, [[nonnull]] size_t *__restrict pe
 @@Adds each entry in `ENVZ2' to `ENVZ & ENVZ_LEN', as if with `envz_add()'.
 @@If `OVERRIDE' is true, then values in `ENVZ2' will supersede those
 @@with the same name in `ENV', otherwise they don't
-[requires($has_function(argz_append))][userimpl]
+[requires($has_function(argz_append))][[userimpl]]
 envz_merge:([[nonnull]] char **__restrict penvz, [[nonnull]] size_t *__restrict penvz_len,
             [[nonnull]] char const *__restrict envz2, size_t envz2_len, int override_) -> error_t {
 	error_t result = 0;
@@ -150,7 +150,7 @@ envz_merge:([[nonnull]] char **__restrict penvz, [[nonnull]] size_t *__restrict 
 }
 
 @@Remove the entry for `NAME' from `ENVZ & ENVZ_LEN', if any
-[userimpl]
+[[userimpl]]
 envz_remove:([[nonnull]] char **__restrict penvz,
              [[nonnull]] size_t *__restrict penvz_len,
              [[nonnull]] char const *__restrict name) {
@@ -162,7 +162,7 @@ envz_remove:([[nonnull]] char **__restrict penvz,
 
 
 @@Remove entries that have no value attached
-[userimpl]
+[[userimpl]]
 envz_strip:([[nonnull]] char **__restrict penvz,
             [[nonnull]] size_t *__restrict penvz_len) {
 	char *start, *ptr, *end;

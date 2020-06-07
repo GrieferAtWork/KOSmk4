@@ -38,7 +38,7 @@ warn:(char const *format, ...) {
 	va_end(args);
 }
 
-[doc_alias(warn)][ATTR_LIBC_PRINTF(1, 0)][userimpl][cp_stdio]
+[doc_alias(warn)][ATTR_LIBC_PRINTF(1, 0)][[userimpl, cp_stdio]]
 [impl_include(<local/stdstreams.h>, <parts/errno.h>)]
 [requires_include(<__crt.h>, <local/program_invocation_name.h>)]
 [requires(!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) &&
@@ -72,8 +72,8 @@ warnx:(char const *format, ...)  {
 	va_end(args);
 }
 
-[doc_alias(warnx)][ATTR_LIBC_PRINTF(1, 0)][userimpl][cp_stdio]
-[userimpl][impl_include(<local/stdstreams.h>)]
+[doc_alias(warnx)][ATTR_LIBC_PRINTF(1, 0)][[userimpl, cp_stdio]]
+[[userimpl]][impl_include(<local/stdstreams.h>)]
 [requires_include(<__crt.h>, <local/program_invocation_name.h>)]
 [requires(!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) &&
           $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc))]

@@ -102,7 +102,7 @@ setmntent:([[nonnull]] char const *file, [[nonnull]] char const *mode) -> $FILE 
 [[cp]][export_alias(__getmntent_r)]
 getmntent_r:([[nonnull]] $FILE *__restrict stream,
              [[nonnull]] struct mntent *__restrict result,
-             [inp(bufsize)] char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize) -> struct mntent *;
+             [[inp(bufsize)]] char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize) -> struct mntent *;
 %#endif /* __USE_MISC */
 
 %

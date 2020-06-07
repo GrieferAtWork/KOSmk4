@@ -83,24 +83,24 @@ __strncpy_chk([[nonnull]] char *__restrict dst,
 
 %
 %#ifdef __USE_GNU
-[ATTR_LEAF][libc][fast]
+[[ATTR_LEAF, libc, fast]]
 __mempcpy_chk([[nonnull]] void *__restrict dst,
               [[nonnull]] void const *__restrict src,
               $size_t n_bytes, $size_t dst_objsize)
-		-> [== dst + n_bytes] void *
+		-> [[== dst + n_bytes]] void *
 	%{chk}
 %#endif /* __USE_GNU */
 
 %
 %#ifdef __USE_XOPEN2K8
-[ATTR_LEAF][libc][fast]
+[[ATTR_LEAF, libc, fast]]
 __stpcpy_chk:([[nonnull]] char *__restrict dst,
               [[nonnull]] char const *__restrict src,
               $size_t dst_objsize)
 		-> [== dst + strlen(src)] char *
 	%{chk(%auto, "(void)dst_objsize; /* TODO */")}
 
-[ATTR_LEAF][libc][fast]
+[[ATTR_LEAF, libc, fast]]
 __stpncpy_chk:([[nonnull]] char *__restrict dst,
                [[nonnull]] char const *__restrict src,
                $size_t buflen, $size_t dst_objsize)
@@ -113,13 +113,13 @@ __stpncpy_chk:([[nonnull]] char *__restrict dst,
 [[ATTR_LEAF, libc, fast]]
 __mempmove_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                $size_t n_bytes, $size_t dst_objsize)
-		-> [== dst + n_bytes] void *
+		-> [[== dst + n_bytes]] void *
 	%{chk}
 
 [[ATTR_LEAF, libc, fast]]
 __mempset_chk([[nonnull]] void *__restrict dst, int byte,
               $size_t n_bytes, $size_t dst_objsize)
-		-> [== dst + n_bytes] void *
+		-> [[== dst + n_bytes]] void *
 	%{chk}
 
 [[ATTR_LEAF, libc, fast]]
@@ -137,13 +137,13 @@ __memmovedown_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
 [[ATTR_LEAF, libc, fast]]
 __mempmoveup_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                  $size_t n_bytes, $size_t dst_objsize)
-		-> [== dst + n_bytes] void *
+		-> [[== dst + n_bytes]] void *
 	%{chk}
 
 [[ATTR_LEAF, libc, fast]]
 __mempmovedown_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                    $size_t n_bytes, $size_t dst_objsize)
-		-> [== dst + n_bytes] void *
+		-> [[== dst + n_bytes]] void *
 	%{chk}
 
 [[ATTR_LEAF, libc, fast]]

@@ -75,7 +75,8 @@ enum {
 }
 
 @@Control process limits according to CMD
-[vartypes(long)] ulimit:(int cmd, ...) -> long int;
+[[vartypes(long)]]
+long int ulimit(int cmd, ...);
 
 %{
 #endif /* __CC__ */

@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[define_replacement(time_t   = __TM_TYPE(time))]
+%[define_replacement(time_t   = "__TM_TYPE(time)")]
 %[define_replacement(time32_t = __time32_t)]
 %[define_replacement(time64_t = __time64_t)]
 %[define_replacement(timespec32 = __timespec32)]
@@ -113,35 +113,35 @@ typedef void *__restrict __timezone_ptr_t;
 
 }
 
-[ignore][section(".text.crt.time")][doc_alias(gettimeofday)][alias(__gettimeofday)]
-gettimeofday32:([[nonnull]] struct __timeval32 *__restrict tv,
-                [[nullable]] __timezone_ptr_t tz) -> int = gettimeofday?;
+[[doc_alias("gettimeofday"), ignore, nocrt, alias("gettimeofday", "__gettimeofday")]]
+int gettimeofday32([[nonnull]] struct __timeval32 *__restrict tv,
+                   [[nullable]] __timezone_ptr_t tz);
 
-[ignore][section(.text.crt.timer)][doc_alias(getitimer)]
-getitimer32:(__itimer_which_t which, [[nonnull]] struct __itimerval32 *curr_value) -> int = getitimer?;
+[[doc_alias("getitimer"), ignore, nocrt, alias("getitimer")]]
+int getitimer32(__itimer_which_t which, [[nonnull]] struct __itimerval32 *curr_value);
 
-[ignore][section(.text.crt.timer)][doc_alias(setitimer)]
-setitimer32:(__itimer_which_t which,
-             [[nonnull]] struct __itimerval32 const *__restrict newval,
-             [[nullable]] struct __itimerval32 *__restrict oldval) -> int = setitimer?;
+[[doc_alias("setitimer"), ignore, nocrt, alias("setitimer")]]
+int setitimer32(__itimer_which_t which,
+                [[nonnull]] struct __itimerval32 const *__restrict newval,
+                [[nullable]] struct __itimerval32 *__restrict oldval);
 
-[ignore][section(.text.crt.fs.modify_time)][doc_alias(utimes)]
-utimes32:([[nonnull]] char const *file, [[nonnull]] struct __timeval32 const tvp[2]) -> int = utimes?;
+[[doc_alias("utimes"), ignore, nocrt, alias("utimes")]]
+int utimes32([[nonnull]] char const *file, [[nonnull]] struct __timeval32 const tvp[2]);
 
-[ignore][section(.text.crt.fs.modify_time)][doc_alias(futimesat)]
-futimesat32:($fd_t fd, [[nonnull]] char const *file, [[nonnull]] struct __timeval32 const tvp[2]) -> int = futimesat?;
+[[doc_alias("futimesat"), ignore, nocrt, alias("futimesat")]]
+int futimesat32($fd_t fd, [[nonnull]] char const *file, [[nonnull]] struct __timeval32 const tvp[2]);
 
-[ignore][section(.text.crt.system.adjtime)][doc_alias(settimeofday)]
-settimeofday32:([[nullable]] struct __timeval32 const *tv, [[nullable]] struct timezone const *tz) -> int = settimeofday?;
+[[doc_alias("settimeofday"), ignore, nocrt, alias("settimeofday")]]
+int settimeofday32([[nullable]] struct __timeval32 const *tv, [[nullable]] struct timezone const *tz);
 
-[ignore][section(.text.crt.system.adjtime)][doc_alias(adjtime)]
-adjtime32:([[nullable]] struct __timeval32 const *delta, [[nullable]] struct __timeval32 *olddelta) -> int = adjtime?;
+[[doc_alias("adjtime"), ignore, nocrt, alias("adjtime")]]
+int adjtime32([[nullable]] struct __timeval32 const *delta, [[nullable]] struct __timeval32 *olddelta);
 
-[ignore][section(.text.crt.fs.modify_time)][doc_alias(lutimes)]
-lutimes32:([[nonnull]] char const *file, [[nullable]] struct __timeval32 const tvp[2]) -> int = lutimes?;
+[[doc_alias("lutimes"), ignore, nocrt, alias("lutimes")]]
+int lutimes32([[nonnull]] char const *file, [[nullable]] struct __timeval32 const tvp[2]);
 
-[ignore][section(.text.crt.fs.modify_time)][doc_alias(lutimes)]
-futimes32:($fd_t fd, [[nullable]] struct __timeval32 const tvp[2]) -> int = futimes?;
+[[doc_alias("lutimes"), ignore, nocrt, alias("futimes")]]
+int futimes32($fd_t fd, [[nullable]] struct __timeval32 const tvp[2]);
 
 
 
@@ -150,12 +150,12 @@ futimes32:($fd_t fd, [[nullable]] struct __timeval32 const tvp[2]) -> int = futi
 @@Returns 0 on success, -1 on errors.
 @@NOTE: This form of timezone information is obsolete.
 @@Use the functions and variables declared in <time.h> instead
-[section(".text.crt.time")][alternate_name(__gettimeofday), no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(gettimeofday64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(gettimeofday, __gettimeofday)]
-[requires(defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE_gettimeofday64))]
-gettimeofday:([[nonnull]] struct timeval *__restrict tv, [[nullable]] __timezone_ptr_t tz) -> int {
-#ifdef __CRT_HAVE_gettimeofday
+[[section(".text.crt.time"), export_as("__gettimeofday"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("gettimeofday64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("gettimeofday", "__gettimeofday")]]
+[[userimpl, requires($has_function(gettimeofday32) || $has_function(gettimeofday64))]]
+int gettimeofday([[nonnull]] struct timeval *__restrict tv, [[nullable]] __timezone_ptr_t tz) {
+@@pp_if $has_function(gettimeofday32)@@
 	int result;
 	struct __timeval32 tv32;
 	if (!tv)
@@ -166,7 +166,7 @@ gettimeofday:([[nonnull]] struct timeval *__restrict tv, [[nullable]] __timezone
 		tv->tv_usec = tv32.tv_usec;
 	}
 	return result;
-#else /* __CRT_HAVE_gettimeofday */
+@@pp_else@@
 	int result;
 	struct __timeval64 tv64;
 	if (!tv)
@@ -177,18 +177,18 @@ gettimeofday:([[nonnull]] struct timeval *__restrict tv, [[nullable]] __timezone
 		tv->tv_usec = tv64.tv_usec;
 	}
 	return result;
-#endif /* !__CRT_HAVE_gettimeofday */
+@@pp_endif@@
 }
 
 
 @@Set *VALUE to the current setting of timer WHICH.
 @@Return 0 on success, -1 on errors
-[section(".text.crt.time"), no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(getitimer64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(getitimer)]
-[requires(defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE_getitimer64))]
-getitimer:(__itimer_which_t which, [[nonnull]] struct itimerval *curr_value) -> int {
-#ifdef __CRT_HAVE_getitimer
+[[section(".text.crt.time"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("getitimer64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("getitimer")]]
+[[userimpl, requires($has_function(getitimer32) || $has_function(getitimer64))]]
+int getitimer(__itimer_which_t which, [[nonnull]] struct itimerval *curr_value) {
+@@pp_if $has_function(getitimer32)@@
 	int result;
 	struct __itimerval32 tv32;
 	result = getitimer32(which, &tv32);
@@ -199,7 +199,7 @@ getitimer:(__itimer_which_t which, [[nonnull]] struct itimerval *curr_value) -> 
 		curr_value->@it_value@.tv_usec    = tv32.@it_value@.tv_usec;
 	}
 	return result;
-#else /* __CRT_HAVE_getitimer */
+@@pp_else@@
 	int result;
 	struct __timeval64 tv64;
 	result = getitimer64(which, &tv64);
@@ -210,19 +210,19 @@ getitimer:(__itimer_which_t which, [[nonnull]] struct itimerval *curr_value) -> 
 		curr_value->@it_value@.tv_usec    = tv64.@it_value@.tv_usec;
 	}
 	return result;
-#endif /* !__CRT_HAVE_getitimer */
+@@pp_endif@@
 }
 
 @@Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
 @@Returns 0 on success, -1 on errors
-[section(".text.crt.time"), no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(setitimer64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(setitimer)]
-[requires(defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE_setitimer64))]
-setitimer:(__itimer_which_t which,
-           [[nonnull]] struct itimerval const *newval,
-           [[nullable]] struct itimerval *oldval) -> int {
-#ifdef __CRT_HAVE_setitimer
+[[section(".text.crt.time"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("setitimer64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("setitimer")]]
+[[userimpl, requires($has_function(setitimer32) || $has_function(setitimer64))]]
+int setitimer(__itimer_which_t which,
+              [[nonnull]] struct itimerval const *newval,
+              [[nullable]] struct itimerval *oldval) {
+@@pp_if $has_function(setitimer32)@@
 	int result;
 	struct __itimerval32 new32, old32;
 	new32.@it_interval@.tv_sec  = (time32_t)newval->@it_interval@.tv_sec;
@@ -237,7 +237,7 @@ setitimer:(__itimer_which_t which,
 		oldval->@it_value@.tv_usec    = old32.@it_value@.tv_usec;
 	}
 	return result;
-#else /* __CRT_HAVE_setitimer */
+@@pp_else@@
 	int result;
 	struct __itimerval64 new64, old64;
 	new64.@it_interval@.tv_sec  = (time64_t)newval->@it_interval@.tv_sec;
@@ -252,19 +252,19 @@ setitimer:(__itimer_which_t which,
 		oldval->@it_value@.tv_usec    = old64.@it_value@.tv_usec;
 	}
 	return result;
-#endif /* !__CRT_HAVE_setitimer */
+@@pp_endif@@
 }
 
 
 @@Change the access time of FILE to TVP[0] and the modification time of
 @@FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
 @@Returns 0 on success, -1 on errors
-[section(.text.crt.fs.modify_time), no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(utimes64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(utimes)]
-[requires(defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE_utimes64))]
-utimes:([[nonnull]] char const *file, [[nullable]] struct timeval const tvp[2]) -> int {
-#ifdef __CRT_HAVE_utimes
+[[section(".text.crt.fs.modify_time"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("utimes64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("utimes")]]
+[[userimpl, requires($has_function(utimes32) || $has_function(utimes64))]]
+int utimes([[nonnull]] char const *file, [[nullable]] struct timeval const tvp[2]) {
+@@pp_if $has_function(utimes32)@@
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return utimes32(file, NULL);
@@ -273,7 +273,7 @@ utimes:([[nonnull]] char const *file, [[nullable]] struct timeval const tvp[2]) 
 	tv32[1].tv_sec  = (time32_t)tvp[1].tv_sec;
 	tv32[1].tv_usec = tvp[1].tv_usec;
 	return utimes32(file, tv32);
-#else /* __CRT_HAVE_utimes */
+@@pp_else@@
 	struct __timeval64 tv64[2];
 	if (!tvp)
 		return utimes64(file, NULL);
@@ -282,18 +282,18 @@ utimes:([[nonnull]] char const *file, [[nullable]] struct timeval const tvp[2]) 
 	tv64[1].tv_sec  = (time64_t)tvp[1].tv_sec;
 	tv64[1].tv_usec = tvp[1].tv_usec;
 	return utimes64(file, tv64);
-#endif /* !__CRT_HAVE_utimes */
+@@pp_endif@@
 }
 
 %
 %#ifdef __USE_GNU
 @@Same as `utimes', but takes an open file descriptor instead of a name
-[section(.text.crt.fs.modify_time), no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(futimesat64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(futimesat)]
-[requires(defined(__CRT_HAVE_futimesat) || defined(__CRT_HAVE_futimesat64))]
-futimesat:($fd_t fd, [[nonnull]] char const *file, [[nullable]] struct timeval const tvp[2]) -> int {
-#ifdef __CRT_HAVE_utimes
+[[section(".text.crt.fs.modify_time"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futimesat64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futimesat")]]
+[[userimpl, requires($has_function(futimesat32) || $has_function(futimesat64))]]
+int futimesat($fd_t fd, [[nonnull]] char const *file, [[nullable]] struct timeval const tvp[2]) {
+@@pp_if $has_function(utimes32)@@
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return futimesat32(fd, file, NULL);
@@ -302,7 +302,7 @@ futimesat:($fd_t fd, [[nonnull]] char const *file, [[nullable]] struct timeval c
 	tv32[1].tv_sec  = (time32_t)tvp[1].tv_sec;
 	tv32[1].tv_usec = tvp[1].tv_usec;
 	return futimesat32(fd, file, tv32);
-#else /* __CRT_HAVE_utimes */
+@@pp_else@@
 	struct __timeval64 tv64[2];
 	if (!tvp)
 		return futimesat64(fd, file, NULL);
@@ -311,7 +311,7 @@ futimesat:($fd_t fd, [[nonnull]] char const *file, [[nullable]] struct timeval c
 	tv64[1].tv_sec  = (time64_t)tvp[1].tv_sec;
 	tv64[1].tv_usec = tvp[1].tv_usec;
 	return futimesat64(fd, file, tv64);
-#endif /* !__CRT_HAVE_utimes */
+@@pp_endif@@
 }
 %#endif /* __USE_GNU */
 
@@ -319,38 +319,38 @@ futimesat:($fd_t fd, [[nonnull]] char const *file, [[nullable]] struct timeval c
 %#ifdef __USE_MISC
 @@Set the current time of day and timezone information.
 @@This call is restricted to the super-user
-[section(.text.crt.system.adjtime), no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(settimeofday64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(settimeofday)]
-[requires(defined(__CRT_HAVE_settimeofday) || defined(__CRT_HAVE_settimeofday64))]
-settimeofday:([[nullable]] struct timeval const *tv, [[nullable]] struct timezone const *tz) -> int {
-#ifdef __CRT_HAVE_settimeofday
+[[section(".text.crt.system.adjtime"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("settimeofday64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("settimeofday")]]
+[[userimpl, requires($has_function(settimeofday32) || $has_function(settimeofday64))]]
+int settimeofday([[nullable]] struct timeval const *tv, [[nullable]] struct timezone const *tz) {
+@@pp_if $has_function(settimeofday32)@@
 	struct __timeval32 tv32;
 	if (!tv)
 		return settimeofday32(NULL, tz);
 	tv32.tv_sec  = (time32_t)tv->tv_sec;
 	tv32.tv_usec = tv->tv_usec;
 	return settimeofday32(&tv32, tz);
-#else /* __CRT_HAVE_settimeofday */
+@@pp_else@@
 	struct __timeval64 tv64;
 	if (!tv)
 		return settimeofday64(NULL, tz);
 	tv64.tv_sec  = (time64_t)tv->tv_sec;
 	tv64.tv_usec = tv->tv_usec;
 	return settimeofday64(&tv64, tz);
-#endif /* !__CRT_HAVE_settimeofday */
+@@pp_endif@@
 }
 
 @@Adjust the current time of day by the amount in DELTA.
 @@If OLDDELTA is not NULL, it is filled in with the amount of time
 @@adjustment remaining to be done from the last `adjtime' call.
 @@This call is restricted to the super-user
-[section(.text.crt.system.adjtime), no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(adjtime64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(adjtime)]
-[requires(defined(__CRT_HAVE_adjtime) || defined(__CRT_HAVE_adjtime64))]
-adjtime:([[nullable]] struct timeval const *delta, [[nullable]] struct timeval *olddelta) -> int {
-#ifdef __CRT_HAVE_adjtime
+[[section(".text.crt.system.adjtime"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("adjtime64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("adjtime")]]
+[[userimpl, requires($has_function(adjtime32) || $has_function(adjtime64))]]
+int adjtime([[nullable]] struct timeval const *delta, [[nullable]] struct timeval *olddelta) {
+@@pp_if $has_function(adjtime32)@@
 	int result;
 	struct __timeval32 delta32, olddelta32;
 	if (delta) {
@@ -363,7 +363,7 @@ adjtime:([[nullable]] struct timeval const *delta, [[nullable]] struct timeval *
 		olddelta->tv_usec = olddelta32.tv_usec;
 	}
 	return result;
-#else /* __CRT_HAVE_adjtime */
+@@pp_else@@
 	int result;
 	struct __timeval64 delta64, olddelta64;
 	if (delta) {
@@ -376,16 +376,16 @@ adjtime:([[nullable]] struct timeval const *delta, [[nullable]] struct timeval *
 		olddelta->tv_usec = olddelta64.tv_usec;
 	}
 	return result;
-#endif /* !__CRT_HAVE_adjtime */
+@@pp_endif@@
 }
 
 @@Same as `utimes', but does not follow symbolic links
-[section(.text.crt.fs.modify_time), no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(lutimes64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(lutimes)]
-[requires(defined(__CRT_HAVE_lutimes) || defined(__CRT_HAVE_lutimes64))]
-lutimes:([[nonnull]] char const *file, [[nullable]] struct timeval const tvp[2]) -> int {
-#ifdef __CRT_HAVE_utimes
+[[section(".text.crt.fs.modify_time"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("lutimes64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("lutimes")]]
+[[userimpl, requires($has_function(lutimes32) || $has_function(lutimes64))]]
+int lutimes([[nonnull]] char const *file, [[nullable]] struct timeval const tvp[2]) {
+@@pp_if $has_function(utimes32)@@
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return lutimes32(file, NULL);
@@ -394,7 +394,7 @@ lutimes:([[nonnull]] char const *file, [[nullable]] struct timeval const tvp[2])
 	tv32[1].tv_sec  = (time32_t)tvp[1].tv_sec;
 	tv32[1].tv_usec = tvp[1].tv_usec;
 	return lutimes32(file, tv32);
-#else /* __CRT_HAVE_utimes */
+@@pp_else@@
 	struct __timeval64 tv64[2];
 	if (!tvp)
 		return lutimes64(file, NULL);
@@ -403,17 +403,17 @@ lutimes:([[nonnull]] char const *file, [[nullable]] struct timeval const tvp[2])
 	tv64[1].tv_sec  = (time64_t)tvp[1].tv_sec;
 	tv64[1].tv_usec = tvp[1].tv_usec;
 	return lutimes64(file, tv64);
-#endif /* !__CRT_HAVE_utimes */
+@@pp_endif@@
 }
 
 
 @@Same as `utimes', but takes an open file descriptor instead of a name
-[section(.text.crt.fs.modify_time), no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(futimes64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(futimes)]
-[requires(defined(__CRT_HAVE_futimes) || defined(__CRT_HAVE_futimes64))]
-futimes:($fd_t fd, [[nullable]] struct timeval const tvp[2]) -> int {
-#ifdef __CRT_HAVE_utimes
+[[section(".text.crt.fs.modify_time"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("futimes64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futimes")]]
+[[userimpl, requires($has_function(futimes32) || $has_function(futimes64))]]
+int futimes($fd_t fd, [[nullable]] struct timeval const tvp[2]) {
+@@pp_if $has_function(futimes32)@@
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return futimes32(fd, NULL);
@@ -422,7 +422,7 @@ futimes:($fd_t fd, [[nullable]] struct timeval const tvp[2]) -> int {
 	tv32[1].tv_sec  = (time32_t)tvp[1].tv_sec;
 	tv32[1].tv_usec = tvp[1].tv_usec;
 	return futimes32(fd, tv32);
-#else /* __CRT_HAVE_utimes */
+@@pp_else@@
 	struct __timeval64 tv64[2];
 	if (!tvp)
 		return futimes64(fd, NULL);
@@ -431,16 +431,17 @@ futimes:($fd_t fd, [[nullable]] struct timeval const tvp[2]) -> int {
 	tv64[1].tv_sec  = (time64_t)tvp[1].tv_sec;
 	tv64[1].tv_usec = tvp[1].tv_usec;
 	return futimes64(fd, tv64);
-#endif /* !__CRT_HAVE_utimes */
+@@pp_endif@@
 }
 
 %#endif /* __USE_MISC */
 
 %
 %#ifdef __USE_TIME64
-[time64_variant_of(gettimeofday)][section(".text.crt.time")]
-[requires($has_function(gettimeofday32))]
-gettimeofday64:([[nonnull]] struct timeval64 *__restrict tv, [[nullable]] __timezone_ptr_t tz) -> int {
+[[time64_variant_of(gettimeofday), section(".text.crt.time")]]
+[[userimpl, requires_function(gettimeofday32)]]
+int gettimeofday64([[nonnull]] struct timeval64 *__restrict tv,
+                   [[nullable]] __timezone_ptr_t tz) {
 	int result;
 	struct __timeval32 tv32;
 	if (!tv)
@@ -453,9 +454,9 @@ gettimeofday64:([[nonnull]] struct timeval64 *__restrict tv, [[nullable]] __time
 	return result;
 }
 
-[time64_variant_of(getitimer)][section(".text.crt.time")]
-[requires($has_function(getitimer32))]
-getitimer64:(__itimer_which_t which, [[nonnull]] struct itimerval64 *curr_value) -> int {
+[[time64_variant_of(getitimer), section(".text.crt.time")]]
+[[userimpl, requires_function(getitimer32)]]
+int getitimer64(__itimer_which_t which, [[nonnull]] struct itimerval64 *curr_value) {
 	int result;
 	struct __itimerval32 tv32;
 	result = getitimer32(which, &tv32);
@@ -468,11 +469,11 @@ getitimer64:(__itimer_which_t which, [[nonnull]] struct itimerval64 *curr_value)
 	return result;
 }
 
-[time64_variant_of(setitimer)][section(".text.crt.time")]
-[requires($has_function(setitimer32))]
-setitimer64:(__itimer_which_t which,
-             [[nonnull]] struct itimerval64 const *newval,
-             [[nullable]] struct itimerval64 *oldval) -> int {
+[[time64_variant_of(setitimer), section(".text.crt.time")]]
+[[userimpl, requires_function(setitimer32)]]
+int setitimer64(__itimer_which_t which,
+                [[nonnull]] struct itimerval64 const *newval,
+                [[nullable]] struct itimerval64 *oldval) {
 	int result;
 	struct __itimerval32 new32, old32;
 	new32.@it_interval@.tv_sec  = (time32_t)newval->@it_interval@.tv_sec;
@@ -490,10 +491,10 @@ setitimer64:(__itimer_which_t which,
 }
 
 
-[section(.text.crt.fs.modify_time)]
-[time64_variant_of(utimes)][requires(defined(__CRT_HAVE_utimes))]
-utimes64:([[nonnull]] char const *file,
-          [[nullable]] struct timeval64 const tvp[2]) -> int {
+[[time64_variant_of(utimes), section(".text.crt.fs.modify_time")]]
+[[userimpl, requires_function(utimes32)]]
+int utimes64([[nonnull]] char const *file,
+             [[nullable]] struct timeval64 const tvp[2]) {
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return utimes32(file, NULL);
@@ -506,9 +507,9 @@ utimes64:([[nonnull]] char const *file,
 
 %
 %#ifdef __USE_MISC
-[time64_variant_of(settimeofday)][section(.text.crt.system.adjtime)]
-[requires(defined(__CRT_HAVE_settimeofday))]
-settimeofday64:([[nullable]] struct timeval64 const *tv, [[nullable]] struct timezone const *tz) -> int {
+[[time64_variant_of(settimeofday), section(".text.crt.system.adjtime")]]
+[[userimpl, requires_function(settimeofday32)]]
+int settimeofday64([[nullable]] struct timeval64 const *tv, [[nullable]] struct timezone const *tz) {
 	struct __timeval32 tv32;
 	if (!tv)
 		return settimeofday32(NULL, tz);
@@ -517,9 +518,9 @@ settimeofday64:([[nullable]] struct timeval64 const *tv, [[nullable]] struct tim
 	return settimeofday32(&tv32, tz);
 }
 
-[section(.text.crt.system.adjtime)][time64_variant_of(adjtime)]
-[requires(defined(__CRT_HAVE_adjtime))]
-adjtime64:([[nullable]] struct timeval64 const *delta, [[nullable]] struct timeval64 *olddelta) -> int {
+[[time64_variant_of(adjtime), section(".text.crt.system.adjtime")]]
+[[userimpl, requires_function(adjtime32)]]
+int adjtime64([[nullable]] struct timeval64 const *delta, [[nullable]] struct timeval64 *olddelta) {
 	int result;
 	struct __timeval32 delta32, olddelta32;
 	if (delta) {
@@ -534,9 +535,9 @@ adjtime64:([[nullable]] struct timeval64 const *delta, [[nullable]] struct timev
 	return result;
 }
 
-[section(.text.crt.fs.modify_time)]
-[time64_variant_of(lutimes)][requires(defined(__CRT_HAVE_lutimes))]
-lutimes64:([[nonnull]] char const *file, [[nullable]] struct timeval64 const tvp[2]) -> int {
+[[time64_variant_of(lutimes), section(".text.crt.fs.modify_time")]]
+[[userimpl, requires_function(lutimes32)]]
+int lutimes64([[nonnull]] char const *file, [[nullable]] struct timeval64 const tvp[2]) {
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return lutimes32(file, NULL);
@@ -548,9 +549,9 @@ lutimes64:([[nonnull]] char const *file, [[nullable]] struct timeval64 const tvp
 }
 
 
-[section(.text.crt.fs.modify_time)]
-[time64_variant_of(lutimes)][requires(defined(__CRT_HAVE_futimes))]
-futimes64:($fd_t fd, [[nullable]] struct timeval64 const tvp[2]) -> int {
+[[time64_variant_of(lutimes), section(".text.crt.fs.modify_time")]]
+[[userimpl, requires_function(futimes32)]]
+int futimes64($fd_t fd, [[nullable]] struct timeval64 const tvp[2]) {
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return futimes32(fd, NULL);
@@ -565,9 +566,9 @@ futimes64:($fd_t fd, [[nullable]] struct timeval64 const tvp[2]) -> int {
 
 %
 %#ifdef __USE_GNU
-[section(.text.crt.fs.modify_time)]
-[time64_variant_of(futimesat)][requires(defined(__CRT_HAVE_futimesat))]
-futimesat64:($fd_t fd, [[nonnull]] char const *file, [[nullable]] struct timeval64 const tvp[2]) -> int {
+[[time64_variant_of(futimesat), section(".text.crt.fs.modify_time")]]
+[[userimpl, requires_function(futimesat32)]]
+int futimesat64($fd_t fd, [[nonnull]] char const *file, [[nullable]] struct timeval64 const tvp[2]) {
 	struct __timeval32 tv32[2];
 	if (!tvp)
 		return futimesat32(fd, file, NULL);
@@ -589,11 +590,11 @@ futimesat64:($fd_t fd, [[nonnull]] char const *file, [[nullable]] struct timeval
 #undef timercmp
 #define timerisset(tvp) ((tvp)->tv_sec || (tvp)->tv_usec)
 #define timerclear(tvp) ((tvp)->tv_sec = (tvp)->tv_usec = 0)
-#define timercmp(a, b, CMP) \
+#define timercmp(a, b, CMP)           \
 	(((a)->tv_sec == (b)->tv_sec)     \
 	 ? ((a)->tv_usec CMP(b)->tv_usec) \
 	 : ((a)->tv_sec CMP(b)->tv_sec))
-#define timeradd(a, b, result) \
+#define timeradd(a, b, result)                           \
 	do {                                                 \
 		(result)->tv_sec  = (a)->tv_sec + (b)->tv_sec;   \
 		(result)->tv_usec = (a)->tv_usec + (b)->tv_usec; \
@@ -602,7 +603,7 @@ futimesat64:($fd_t fd, [[nonnull]] char const *file, [[nullable]] struct timeval
 			(result)->tv_usec -= 1000000;                \
 		}                                                \
 	} __WHILE0
-#define timersub(a, b, result) \
+#define timersub(a, b, result)                           \
 	do {                                                 \
 		(result)->tv_sec  = (a)->tv_sec - (b)->tv_sec;   \
 		(result)->tv_usec = (a)->tv_usec - (b)->tv_usec; \

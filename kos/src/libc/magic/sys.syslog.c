@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.system.syslog)]
+%[default_impl_section(".text.crt.system.syslog")]
 
 %{
 #include <features.h>
@@ -76,7 +76,7 @@ __SYSDECL_BEGIN
 #define LOG_WARN    LOG_WARNING
 #define LOG_CONFIRM LOG_NOTICE
 #define LOG_MESSAGE LOG_INFO
-#endif
+#endif /* __USE_KOS */
 
 /* facility codes */
 #define LOG_KERN     (0<<3)  /* kernel messages. */
@@ -112,9 +112,9 @@ __SYSDECL_BEGIN
 #define LOG_BOOT        (30<<3)
 #define LOG_IO          (31<<3)
 #define LOG_NFACILITIES  32     /* current number of facilities */
-#else
+#else /* __KERNEL__ */
 #define LOG_NFACILITIES  24     /* current number of facilities */
-#endif
+#endif /* !__KERNEL__ */
 #define LOG_FACMASK      0x03f8 /* mask to extract facility part */
 #define LOG_FAC(p)   (((p) & LOG_FACMASK) >> 3) /* facility of pri */
 
@@ -133,15 +133,16 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 }
 
-closelog:();
+void closelog();
 
-[[cp]] openlog:(char const *ident, int option, int facility);
+[[cp]]
+void openlog(char const *ident, int option, int facility);
 
-setlogmask:(int mask) -> int;
+int setlogmask(int mask);
 
-[ATTR_LIBC_PRINTF(2,3)]
-[[cp]][requires($has_function(vsyslog))]
-syslog:(int level, [[nonnull]] char const *format, ...) {
+[[cp, ATTR_LIBC_PRINTF(2, 3)]]
+[[userimpl, requires_function(vsyslog)]]
+void syslog(int level, [[nonnull]] char const *format, ...) {
 	va_list args;
 	va_start(args,format);
 	vsyslog(level,format,args);
@@ -150,10 +151,11 @@ syslog:(int level, [[nonnull]] char const *format, ...) {
 
 %
 %#ifdef __USE_MISC
-[[cp]][ATTR_LIBC_PRINTF(2,0)][requires_dependent_function(syslog_printer)]
-vsyslog:(int level, [[nonnull]] char const *format, $va_list args) {
+[[cp, ATTR_LIBC_PRINTF(2, 0)]]
+[[userimpl, requires_dependent_function(syslog_printer)]]
+void vsyslog(int level, [[nonnull]] char const *format, $va_list args) {
 	format_vprintf(&syslog_printer,
-	              (void *)(uintptr_t)(unsigned int)level,
+	               (void *)(uintptr_t)(unsigned int)level,
 	               format,
 	               args);
 }
@@ -162,7 +164,11 @@ vsyslog:(int level, [[nonnull]] char const *format, $va_list args) {
 %
 %#ifdef __USE_KOS
 @@Helper functions for printing to the system log
-[[cp]] syslog_printer:(void *arg, [[nonnull]] char const *__restrict data, $size_t datalen) -> $ssize_t;
+[[cp]]
+$ssize_t syslog_printer(void *arg,
+                        [[nonnull]] char const *__restrict data,
+                        $size_t datalen);
+
 %#define SYSLOG_PRINTER_CLOSURE(level) ((void *)(__uintptr_t)(int)(level))
 %#endif /* __USE_KOS */
 

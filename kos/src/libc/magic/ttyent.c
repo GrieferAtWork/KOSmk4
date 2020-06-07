@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.database.utmpx)]
+%[default_impl_section(".text.crt.database.utmpx")]
 
 %{
 #include <features.h>
@@ -78,12 +78,12 @@ struct ttyent {
 	char           *ty_comment; /* comment field */
 };
 
-}
+};
 
-[[cp_kos]] getttyent:() -> struct ttyent *;
-[[cp_kos]] getttynam:([[nonnull]] char const *tty) -> struct ttyent *;
-[[cp_kos]] setttyent:() -> int;
-[[cp_kos]] endttyent:() -> int;
+[[cp_kos]] struct ttyent *getttyent();
+[[cp_kos]] struct ttyent *getttynam([[nonnull]] char const *tty);
+[[cp_kos]] int setttyent();
+[[cp_kos]] int endttyent();
 
 
 %{

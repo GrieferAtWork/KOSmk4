@@ -254,7 +254,7 @@ telldir:([[nonnull]] DIR *__restrict dirp) -> long int;
 %
 %#ifdef __USE_XOPEN2K8
 @@Return the underlying file descriptor of the given directory stream
-[ATTR_PURE][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
+[[ATTR_PURE]][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 dirfd:([[nonnull]] DIR __KOS_FIXED_CONST *__restrict dirp) -> $fd_t;
 
 
@@ -274,13 +274,13 @@ scandir:([[nonnull]] char const *__restrict dir,
 
 %
 @@Sort the 2 given directory entries `E1' and `E2' the same way `strcmp(3)' would
-[ATTR_PURE][if(defined(_DIRENT_MATCHES_DIRENT64)), alias(alphasort64)]
+[[ATTR_PURE]][if(defined(_DIRENT_MATCHES_DIRENT64)), alias(alphasort64)]
 alphasort:([[nonnull]] struct dirent const **e1, [[nonnull]] struct dirent const **e2) -> int {
 	return strcoll((*e1)->@d_name@, (*e2)->@d_name@);
 }
 %#ifdef __USE_LARGEFILE64
 @@64-bit variant of `alphasort()'
-[ATTR_PURE][dirent64_variant_of(alphasort)]
+[[ATTR_PURE]][dirent64_variant_of(alphasort)]
 alphasort64:([[nonnull]] struct dirent64 const **e1, [[nonnull]] struct dirent64 const **e2) -> int {
 	return strcoll((*e1)->@d_name@, (*e2)->@d_name@);
 }
@@ -342,13 +342,13 @@ getdirentries64($fd_t fd, [[nonnull]] char *__restrict buf, size_t nbytes,
 %
 %#ifdef __USE_GNU
 @@Sort the 2 given directory entries `E1' and `E2' the same way `strvercmp(3)' would.
-[ATTR_PURE][if(defined(_DIRENT_MATCHES_DIRENT64)), alias(versionsort64)]
+[[ATTR_PURE]][if(defined(_DIRENT_MATCHES_DIRENT64)), alias(versionsort64)]
 versionsort:([[nonnull]] struct dirent const **e1, [[nonnull]] struct dirent const **e2) -> int {
 	return strverscmp((*e1)->@d_name@, (*e2)->@d_name@);
 }
 %#ifdef __USE_LARGEFILE64
 @@64-bit variant of `versionsort()'
-[ATTR_PURE][dirent64_variant_of(versionsort)]
+[[ATTR_PURE]][dirent64_variant_of(versionsort)]
 versionsort64:([[nonnull]] struct dirent64 const **e1, [[nonnull]] struct dirent64 const **e2) -> int {
 	return strverscmp((*e1)->@d_name@, (*e2)->@d_name@);
 }

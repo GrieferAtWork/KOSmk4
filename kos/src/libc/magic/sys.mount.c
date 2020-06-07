@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%[default_impl_section(.text.crt.fs.mount)]
+%[default_impl_section(".text.crt.fs.mount")]
 
 %{
 #include <features.h>
@@ -212,15 +212,18 @@ __SYSDECL_BEGIN
 
 /* Mount a filesystem. */
 [[cp]]
-mount:([[nullable]] char const *special_file, [[nullable]] char const *dir,
-       [[nullable]] char const *fstype, unsigned long int mountflags,
-       [[nullable]] void const *data) -> int;
+int mount([[nullable]] char const *special_file, [[nullable]] char const *dir,
+          [[nullable]] char const *fstype, unsigned long int mountflags,
+          [[nullable]] void const *data);
 
-[[cp]][noexport][crt_requires(umount2)]
-umount:([[nullable]] char const *special_file) -> int {
+[[cp, userimpl, requires_function(umount2)]]
+int umount([[nullable]] char const *special_file) {
 	return umount2(special_file, 0);
 }
-[[cp]] umount2:([[nullable]] char const *special_file, int flags) -> int;
+
+[[cp]]
+int umount2([[nullable]] char const *special_file, int flags);
+
 
 %{
 #endif /* __CC__ */

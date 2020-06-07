@@ -36,10 +36,10 @@ __SYSDECL_BEGIN
 
 }
 
-[ignore] crt_c16utime32:(*) %{uchar16(crt_wutime32)}
-[ignore] crt_c16utime64:(*) %{uchar16(crt_wutime64)}
-[ignore] crt_c32utime32:(*) %{uchar32(crt_wutime32)}
-[ignore] crt_c32utime64:(*) %{uchar32(crt_wutime64)}
+[[ignore]] crt_c16utime32:(*) %{uchar16(crt_wutime32)}
+[[ignore]] crt_c16utime64:(*) %{uchar16(crt_wutime64)}
+[[ignore]] crt_c32utime32:(*) %{uchar32(crt_wutime32)}
+[[ignore]] crt_c32utime64:(*) %{uchar32(crt_wutime64)}
 
 
 c16utime:(*) %{uchar(wutime)}

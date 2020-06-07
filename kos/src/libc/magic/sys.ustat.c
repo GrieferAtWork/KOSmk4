@@ -31,8 +31,8 @@ __SYSDECL_BEGIN
 
 }
 
-[decl_include(<bits/ustat.h>)]
-ustat:($dev_t dev, [[nonnull]] struct ustat *ubuf) -> int;
+[[decl_include("<bits/ustat.h>")]]
+int ustat($dev_t dev, [[nonnull]] struct ustat *ubuf);
 
 %{
 #endif /* __CC__ */

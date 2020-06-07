@@ -56,10 +56,10 @@ __SYSDECL_BEGIN
 setkey:([[nonnull]] char const *key);
 
 @@Encrypt at most 8 characters from KEY using salt to perturb DES
-[guard] crypt:([[nonnull]] char const *key, [[nonnull]] char const *salt) -> char *;
+[[guard]] crypt:([[nonnull]] char const *key, [[nonnull]] char const *salt) -> char *;
 
 @@Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place
-[guard] encrypt:([[nonnull]] char *glibc_block, int edflag);
+[[guard]] encrypt:([[nonnull]] char *glibc_block, int edflag);
 
 %
 %#ifdef __USE_GNU

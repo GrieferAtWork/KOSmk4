@@ -198,10 +198,10 @@ __NAMESPACE_STD_USING(lconv)
 
 
 @@Set and/or return the current locale
-[std] setlocale:(int category, char const *locale) -> char *;
+[[std]] setlocale:(int category, char const *locale) -> char *;
 
 @@Return the numeric/monetary information for the current locale
-[std] localeconv:() -> struct lconv *;
+[[std]] localeconv:() -> struct lconv *;
 
 %
 %#ifdef __USE_XOPEN2K8

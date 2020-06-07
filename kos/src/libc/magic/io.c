@@ -121,21 +121,21 @@ _isatty(*) = isatty;
 %[default_impl_section(.text.crt.dos.fs.dir)]
 _findclose:(intptr_t findfd) -> int;
 
-[[cp]][[ATTR_WUNUSED]][export_alias(_findfirst)]
+[[cp, ATTR_WUNUSED]][export_alias(_findfirst)]
 _findfirst32:([[nonnull]] char const *__restrict filename,
               [[nonnull]] struct _finddata32_t *__restrict finddata)
 		-> intptr_t;
 
-[[cp]][[ATTR_WUNUSED]][export_alias(_findfirsti64)]
+[[cp, ATTR_WUNUSED]][export_alias(_findfirsti64)]
 _findfirst32i64:([[nonnull]] char const *__restrict filename,
                  [[nonnull]] struct _finddata32i64_t *__restrict finddata)
 		-> intptr_t;
 
-[[cp]][[ATTR_WUNUSED]]
+[[cp, ATTR_WUNUSED]]
 _findfirst64:([[nonnull]] char const *__restrict filename,
               [[nonnull]] struct __finddata64_t *__restrict finddata)
 		-> intptr_t;
-[[cp]][[ATTR_WUNUSED]]
+[[cp, ATTR_WUNUSED]]
 _findfirst64i32:([[nonnull]] char const *__restrict filename,
                  [[nonnull]] struct _finddata64i32_t *__restrict finddata)
 		-> intptr_t = _findfirst64;
