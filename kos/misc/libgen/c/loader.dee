@@ -3410,14 +3410,24 @@ got_chkExpr:
 							if (!replacedPrototypeCell) {
 								local origProto: FunctionPrototype;
 								try {
-									origProto = findLocalFunctionByName(
-										vprintfFunctionName).functionPrototype;
+									try {
+										origProto = findLocalFunctionByName(
+											vprintfFunctionName).functionPrototype;
+									} catch (...) {
+										/* No such local function.
+										 * -> Try to search for a normal function */
+										origProto = findFunctionByName(vprintfFunctionName).onlyPrototype;
+										if (origProto is none) {
+											throw Error("Function {!r} has multiple prototypes"
+												.format({ vprintfFunctionName }));
+										}
+									}
 								} catch (Error as e) {
 									self.errAt(currentNameTokStart, e.message);
 								}
 								local result = FunctionPrototype(
-									/* XXX: Replace 'ATTR_LIBC_PRINTF(N, 0)'
-									 *         with 'ATTR_LIBC_PRINTF(N, N+1)' */
+									/* TODO: Replace 'ATTR_LIBC_PRINTF(N, 0)'
+									 *          with 'ATTR_LIBC_PRINTF(N, #ARGV-1)' */
 									attributes: origProto.attributes,
 									nothrow:    origProto.nothrow,
 									cc:         origProto.cc,
@@ -3541,15 +3551,11 @@ got_chkExpr:
 					}
 					/* Hint at the generator about the replacement. */
 					gen.registerFunctionPairing(currentName, baseFunctionName);
-					local baseLocalFunctionCell: Cell with LocalFunction = Cell();
-					function getBaseLocalFunction(): LocalFunction {
+					local baseLocalFunctionCell: Cell with (LocalFunction | none) = Cell();
+					function getBaseLocalFunction(): LocalFunction | none {
 						if (!baseLocalFunctionCell) {
-							local result: LocalFunction;
-							try {
-								result = findLocalFunctionByName(baseFunctionName);
-							} catch (Error as e) {
-								self.errAt(currentNameTokStart, e.message);
-							}
+							local result: LocalFunction | none;
+							result = try findLocalFunctionByName(baseFunctionName) catch (...) none;
 							baseLocalFunctionCell.value = result;
 							return result;
 						}
@@ -3559,8 +3565,22 @@ got_chkExpr:
 						local replacedPrototypeCell: Cell with FunctionPrototype = Cell();
 						currentPrototype = []{
 							if (!replacedPrototypeCell) {
-								local result = gen.replaceFunctionPrototype(
-									getBaseLocalFunction().functionPrototype);
+								local primaryPrototype: FunctionPrototype =
+									getBaseLocalFunction().functionPrototype;
+								if (primaryPrototype is none) {
+									/* No such local function.
+									 * -> Try to search for a normal function */
+									try {
+										primaryPrototype = findFunctionByName(baseFunctionName).onlyPrototype;
+										if (primaryPrototype is none) {
+											throw Error("Function {!r} has multiple prototypes"
+												.format({ baseFunctionName }));
+										}
+									} catch (Error as e) {
+										self.errAt(currentNameTokStart, e.message);
+									}
+								}
+								local result = gen.replaceFunctionPrototype(primaryPrototype);
 								replacedPrototypeCell.value = result;
 								return result;
 							}
@@ -3583,8 +3603,10 @@ got_chkExpr:
 						}
 					}
 					/* Define the generator for the converted function implementations */
-					loaderImpl = [](): LoaderFunctionImplementation {
-						local baseLocalFunction: LocalFunction = getBaseLocalFunction();
+					loaderImpl = [](): LoaderFunctionImplementation | none {
+						local baseLocalFunction: LocalFunction | none = getBaseLocalFunction();
+						if (baseLocalFunction is none)
+							return none;
 						return LoaderFunctionImplementation(
 							ppCond:       gen.replaceText(baseLocalFunction.ppCond),
 							ppCondPrefix: gen.replaceTextArray(baseLocalFunction.ppCondPrefix),
@@ -3678,24 +3700,31 @@ got_chkExpr:
 							self.errAt(currentNameTokStart, "Duplicate local function: {!r}"
 								.format({ xcLocalFunction.name }));
 					}
+					@@The wchar function descriptor
+					local strWcsFunctionName: string = str(wcsFunctionName);
+					local wcharFunction: WcharFunction;
+					for (;;) {
+						wcharFunction = allWcharFunctionsByName.get(strWcsFunctionName);
+						if (wcharFunction !is none)
+							break;
+						wcharFunction = WcharFunction();
+						if (allWcharFunctionsByName.setnew(strWcsFunctionName, wcharFunction))
+							break;
+					}
+					/* Remember the used uchar16/uchar32 system header names
+					 * This is important for dynamic implementation transformations. */
+					if (wcharFunction.wc_header_uchar.xch(mode, current) !is none) {
+						self.errAt(currentNameTokStart,
+							"Duplicate declaration of %{{uchar{}}} variant of [[wchar]] function {!r}"
+							.format({ WCHAR_REPLACEMENT_WIDTH[mode], wcsFunctionName }));
+					}
 					/* Lazily construct function bindings upon first access */
 					current.bindings = [](): {FunctionBinding...} {
-						@@The wchar function descriptor
-						local wcharFunction: WcharFunction =
-							getWcharFunctionByNameWithParserAndErrorAt(
-								wcsFunctionName, self, currentNameTokStart);
-						/* Remember the used uchar16/uchar32 system header names
-						 * This is important for dynamic implementation transformations. */
-						if (wcharFunction.wc_header_uchar[mode] !is none) {
-							self.errAt(currentNameTokStart,
-								"Duplicate declaration of %{{uchar{}}} variant of [[wchar]] function {!r}"
-								.format({ WCHAR_REPLACEMENT_WIDTH[mode], wcsFunctionName }));
-						}
-						wcharFunction.wc_header_uchar[mode] = current;
 						@@The referenced [[wchar]]-Function
 						local wc: Function = wcharFunction.wc_func;
 						@@The Xchar-function implementation
-						local xc: XcharImplementation = wcharFunction.getXCharImplementation(currentName, mode);
+						local xc: XcharImplementation = wcharFunction
+							.getXCharImplementation(currentName, mode);
 						/* Figure out which prototypes should be used */
 						local usedPrototype: FunctionPrototype = currentPrototype;
 						local usedPrototypes: {(string, {FunctionPrototype...})...} = currentPrototypes;
@@ -3857,6 +3886,10 @@ with_primaryImplementation:
 							usedImpl = usedImpl();
 						if (usedExistingBindings is Callable)
 							usedExistingBindings = usedExistingBindings();
+						if (usedImpl is none) {
+							yield usedExistingBindings...;
+							return;
+						}
 						local funImpl: FunctionImplementation = usedImpl.impl;
 						local implBinding = FunctionBinding(
 							ppCond:       usedImpl.ppCond,
@@ -3971,15 +4004,20 @@ with_primaryImplementation:
 			}
 			local wcsCurrent;
 			if (currentFeatures.wchar) {
-				wcsCurrent = WcharFunction(
-					wc_func:       current,
-					wc_loaderImpl: loaderImpl,
-					wc_prototype:  currentPrototype,
-					wc_prototypes: currentPrototypes);
-				if (currentName in allWcharFunctionsByName)
+again_lookup_wcsCurrent:
+				wcsCurrent = allWcharFunctionsByName.get(currentName);
+				if (wcsCurrent is none) {
+					wcsCurrent = WcharFunction();
+					if (!allWcharFunctionsByName.setnew(currentName, wcsCurrent))
+						goto again_lookup_wcsCurrent;
+				}
+				if (wcsCurrent.wc_func is bound)
 					self.errAt(currentNameTokStart, "Duplicate [[wchar]] function {!r}"
 						.format({ currentName }));
-				allWcharFunctionsByName[currentName] = wcsCurrent;
+				wcsCurrent.wc_func       = current;
+				wcsCurrent.wc_loaderImpl = loaderImpl;
+				wcsCurrent.wc_prototype  = currentPrototype;
+				wcsCurrent.wc_prototypes = currentPrototypes;
 			}
 			if (!currentFeatures.crt_noImpl) {
 				local crtName = currentFeatures.crt_name;

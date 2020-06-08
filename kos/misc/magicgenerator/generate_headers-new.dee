@@ -266,7 +266,7 @@ function compileSystemHeaderSourceFile(filename: string, headerName: string) {
 global final HEADER_PRINT_WHITELIST: {string...} = {
 	"aliases", "argz", "arpa.inet", "bits.resource",
 	"bits.sched", "bits.sigthread", "bits.statvfs",
-//	"crtdbg",
+	"crtdbg",
 //	"crypt",
 //	"ctype",
 //	"direct",
@@ -408,12 +408,10 @@ global final HEADER_PRINT_WHITELIST: {string...} = {
 //	"wctype",
 };
 global final HEADER_TEST_WHITELIST: {string...} = {
-	"aliases", "argz", "arpa.inet", "bits.resource",
-	"bits.sched", "bits.sigthread", "bits.statvfs",
 //	"crtdbg",
 //	"crypt",
 //	"ctype",
-//	"direct",
+	"direct",
 //	"dirent",
 //	"dos",
 //	"envz",
@@ -460,18 +458,18 @@ global final HEADER_TEST_WHITELIST: {string...} = {
 //	"parts.uchar.process",
 //	"parts.uchar.stdio",
 //	"parts.uchar.stdlib",
-//	"parts.uchar.string",
+	"parts.uchar.string",
 //	"parts.uchar.sys.mman",
 //	"parts.uchar.sys.stat",
 //	"parts.uchar.time",
-//	"parts.uchar.unistd",
+	"parts.uchar.unistd",
 //	"parts.uchar.utime",
 //	"parts.wchar.format-printer",
 //	"parts.wchar.process",
 //	"parts.wchar.stdio",
 //	"parts.wchar.stdlib",
 //	"parts.wchar.sys.stat",
-//	"parts.wchar.unistd",
+	"parts.wchar.unistd",
 //	"parts.wchar.utime",
 //	"process",
 //	"pthread",
@@ -487,10 +485,10 @@ global final HEADER_TEST_WHITELIST: {string...} = {
 //	"signal",
 //	"spawn",
 //	"ssp.string",
-//	"stdio",
+	"stdio",
 //	"stdio_ext",
 	"stdlib",
-//	"string",
+	"string",
 //	"stringlist",
 //	"strings",
 //	"stropts",
@@ -543,12 +541,12 @@ global final HEADER_TEST_WHITELIST: {string...} = {
 //	"ucontext",
 //	"ulimit",
 //	"unicode",
-//	"unistd",
+	"unistd",
 //	"utime",
 //	"utmp",
 //	"utmpx",
 //	"vfork",
-//	"wchar",
+	"wchar",
 //	"wctype",
 };
 #endif
@@ -558,10 +556,14 @@ try {
 	/* Load all the definitions files */
 	local LIBC_PATH = "src/libc/magic";
 	for (local filename: fs.query(LIBC_PATH + "/*.c")) {
-#ifdef HEADER_TEST_WHITELIST
+#if defined(HEADER_PRINT_WHITELIST) && defined(HEADER_TEST_WHITELIST)
+		if (filename[:-2] !in HEADER_TEST_WHITELIST &&
+		    filename[:-2] !in HEADER_PRINT_WHITELIST)
+			continue;
+#elif defined(HEADER_TEST_WHITELIST)
 		if (filename[:-2] !in HEADER_TEST_WHITELIST)
 			continue;
-#endif /* HEADER_TEST_WHITELIST */
+#endif /* ... */
 		local fullPath = fs.abspath(LIBC_PATH + "/" + filename);
 		/* XXX: There are only a couple of ways by which different definition
 		 *      files actually interact with each other:
@@ -581,10 +583,6 @@ try {
 
 	/* Generate the actual system headers (i.e. <string.h>) */
 	for (local name /*: string*/, header /*: SystemHeader*/: allSystemHeaders) {
-#ifdef HEADER_TEST_WHITELIST
-		if (name !in HEADER_TEST_WHITELIST)
-			continue;
-#endif /* HEADER_TEST_WHITELIST */
 #ifdef HEADER_PRINT_WHITELIST
 		if (name !in HEADER_PRINT_WHITELIST)
 			continue;

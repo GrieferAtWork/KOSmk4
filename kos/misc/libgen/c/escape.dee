@@ -333,6 +333,8 @@ function keyCrtHave(symbolName: string | UserString): string {
 	 *               however CRT feature files are written from the perspective
 	 *               of an ELF program. */
 	local usedSymbolName = str symbolName;
+	if (usedSymbolName.startswith("?")) /* Encode NT special symbol characters */
+		usedSymbolName = usedSymbolName.replace("?", "$Q").replace("@", "$A");
 	if (usedSymbolName.startswith("KOS$")) {
 		/* Technically, this should be:
 		 * >> (defined(__KOS__) && defined(__PE__) && defined(__CRT_HAVE_{usedSymbolName[4:]})) */

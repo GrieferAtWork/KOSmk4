@@ -483,42 +483,46 @@ alarm:(unsigned int seconds) -> unsigned int;
 @@return: * : The configuration limit associated with `NAME' for `FD'
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
-[section(".text.crt.fs.property")]
-[[cp, ATTR_WUNUSED]] fpathconf:($fd_t fd, int name) -> long int;
+[[section(".text.crt.fs.property")]]
+[[cp, ATTR_WUNUSED]]
+long int fpathconf($fd_t fd, int name);
 
 %[default_impl_section(".text.crt.io.tty")]
 
 %
 @@>> ttyname(3)
 @@Return the name of a TTY given its file descriptor
-[[cp, ATTR_WUNUSED]] ttyname:($fd_t fd) -> char *;
+[[cp, ATTR_WUNUSED]]
+char *ttyname($fd_t fd);
 
 @@>> ttyname_r(3)
 @@Return the name of a TTY given its file descriptor
-[[cp]] ttyname_r:($fd_t fd, [[outp(buflen)]] char *buf, size_t buflen) -> int;
+[[cp]]
+int ttyname_r($fd_t fd, [[outp(buflen)]] char *buf, size_t buflen);
 
 %
 @@>> tcgetpgrp(2)
 @@Return the foreground process group of a given TTY file descriptor
-[[ATTR_WUNUSED]] tcgetpgrp:($fd_t fd) -> $pid_t;
+[[ATTR_WUNUSED]]
+$pid_t tcgetpgrp($fd_t fd);
 
 %
 @@>> tcsetpgrp(2)
 @@Set the foreground process group of a given TTY file descriptor
-tcsetpgrp:($fd_t fd, $pid_t pgrp_id) -> int;
+int tcsetpgrp($fd_t fd, $pid_t pgrp_id);
 
 %
 %/* ... */
-[[ATTR_WUNUSED]] getlogin:() -> char *;
+[[ATTR_WUNUSED]]
+char *getlogin();
 
 %[default_impl_section(".text.crt.fs.modify")]
 
 %
 @@>> chown(2)
 @@Change the ownership of a given `FILE' to `GROUP:OWNER'
-[[cp]][noexport]
-[requires(defined(__CRT_AT_FDCWD) && $has_function(fchownat))]
-chown:([[nonnull]] char const *file, $uid_t owner, $gid_t group) -> int {
+[[cp, userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(fchownat))]]
+int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	return fchownat(__CRT_AT_FDCWD, file, owner, group, 0);
 }
 

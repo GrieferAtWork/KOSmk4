@@ -356,35 +356,6 @@ got_result_prototypes:
 
 
 
-@@Return a wchar function, given its name
-function getWcharFunctionByName(name: string | UserString): WcharFunction {
-	try {
-		return allWcharFunctionsByName[str(name)];
-	} catch (Error as e) {
-		if (name is UserString)
-			name.err(e.message);
-		throw;
-	}
-}
-
-@@Same as @getWcharFunctionByName, but print errors at the given offset
-function getWcharFunctionByNameWithParserAndErrorAt(
-		name: string | UserString, parser: CParser, errorAt: int): WcharFunction {
-	try {
-		return allWcharFunctionsByName[str(name)];
-	} catch (Error as e) {
-		if (name is UserString)
-			name.err(e.message);
-		else {
-			parser.errAt(errorAt, e.message);
-		}
-		throw;
-	}
-}
-
-
-
-
 
 
 

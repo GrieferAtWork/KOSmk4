@@ -602,7 +602,9 @@ class FunctionPrototype {
 			callToName: string, callToPrototype: FunctionPrototype,
 			explicitCastAllTypes: bool = false) {
 		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName);
-		fp << " { return ";
+		fp << " { ";
+		if (!returnType.isVoid)
+			fp << "return ";
 		if (explicitCastAllTypes || !callToPrototype.returnType.implicitlyConvertibleTo(returnType))
 			returnType.cprintCCastPrefix(fp, escapeMode);
 		fp << callToName << "(";
@@ -1652,6 +1654,28 @@ class Function {
 			local result = documentation;
 			if (result is Callable)
 				documentation = result = result();
+			return result;
+		}
+	}
+
+	@@Return the only prototype in use (if only one, common prototype is
+	@@defined across all @functionBinding), or @none if multiple prototypes,
+	@@or no prototypes at all have been defined
+	public property onlyPrototype: FunctionPrototype | none = {
+		get(): FunctionPrototype | none {
+			local result = none;
+			for (local binding /*: FunctionBinding*/ : functionBindings) {
+				for (local none, protos /*: {FunctionPrototype...}*/ : binding.functionPrototypes) {
+					for (local proto /*: FunctionPrototype*/: protos) {
+						if (result is none)
+							result = proto;
+						else if (!result.compatibleWith(proto)) {
+							/* Incompatible prototypes! */
+							return none;
+						}
+					}
+				}
+			}
 			return result;
 		}
 	}
