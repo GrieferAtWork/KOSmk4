@@ -388,19 +388,18 @@ _iswxdigit_l(*) = iswxdigit_l;
 _iswblank_l(*) = iswblank_l;
 _towupper_l(*) = towupper_l;
 _towlower_l(*) = towlower_l;
-
 _iswctype_l(*) = iswctype_l;
 is_wctype(*) = iswctype;
 
 %
-%[default_impl_section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")];
 [[ATTR_WUNUSED, ATTR_CONST]]
+[[section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]]
 int isleadbyte(int wc) {
 	return wc >= 192 && wc <= 255;
 }
 
-%[default_impl_section("{.text.crt.wchar.unicode.locale.mbs|.text.crt.dos.wchar.unicode.locale.mbs}")];
 [[ATTR_WUNUSED, ATTR_PURE]]
+[[section("{.text.crt.wchar.unicode.locale.mbs|.text.crt.dos.wchar.unicode.locale.mbs}")]]
 int _isleadbyte_l(int wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();

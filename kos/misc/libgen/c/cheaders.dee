@@ -908,7 +908,7 @@ class FunctionImplementation {
 	@@Truncate @body for use in a truncated inline function binding
 	public function truncateBodyForInline(): FunctionImplementation {
 		local result = copy this;
-		local newBody = result.body;
+		local newBody = str(result.body);
 		/* Simple: Unescape escaped line-feeds */
 		newBody = newBody.replace("\\\n", "");
 		/* TODO:

@@ -171,7 +171,7 @@ typedef size_t rsize_t;
 
 @@Copy memory between non-overlapping memory blocks.
 @@@return: * : Always re-returns `dst'
-[[fast, libc, kernel, std, ATTR_LEAF]]
+[[fast, libc, std, kernel, ATTR_LEAF]]
 [[nonnull]] void *memcpy([[nonnull]] void *__restrict dst,
                          [[nonnull]] void const *__restrict src,
                          size_t n_bytes) {
@@ -185,7 +185,7 @@ typedef size_t rsize_t;
 
 @@Move memory between potentially overlapping memory blocks.
 @@@return: * : Always re-returns `dst'
-[[fast, libc, kernel, std, ATTR_LEAF]]
+[[fast, libc, std, kernel, ATTR_LEAF]]
 [[nonnull]] void *memmove([[nonnull]] void *dst,
                           [[nonnull]] void const *src,
                           size_t n_bytes) {
@@ -206,7 +206,7 @@ typedef size_t rsize_t;
 
 @@Fill memory with a given byte
 @@@return: * : Always re-returns `dst'
-[[fast, libc, kernel, std, ATTR_LEAF]]
+[[fast, libc, std, kernel, ATTR_LEAF]]
 [[nonnull]] void *memset([[nonnull]] void *__restrict dst,
                          int byte, size_t n_bytes) {
 	byte_t *pdst = (byte_t *)dst;
@@ -233,7 +233,7 @@ int memcmp([[nonnull]] void const *s1,
 }
 
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
-[[fast, libc, kernel, std, ATTR_WUNUSED, ATTR_PURE]]
+[[fast, libc, std, kernel, ATTR_WUNUSED, ATTR_PURE]]
 void *memchr([[nonnull]] void const *__restrict haystack, int needle, size_t n_bytes)
 	[([[nonnull]] void *__restrict haystack, int needle, size_t n_bytes): void *]
 	[([[nonnull]] void const *__restrict haystack, int needle, size_t n_bytes): void const *]
@@ -252,14 +252,14 @@ void *memchr([[nonnull]] void const *__restrict haystack, int needle, size_t n_b
 %(libc_fast)#define __libc_strlen(string) (__builtin_constant_p(string) ? __builtin_strlen(string) : __libc_core_strlen(string))
 %(libc_fast)#else /* __LIBC_BIND_OPTIMIZATIONS && !__NO_builtin_constant_p && __builtin_strlen && __CRT_HAVE_strlen */
 @@Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')')
-[[libc, kernel, std, ATTR_WUNUSED, ATTR_PURE]]
+[[libc, std, kernel, ATTR_WUNUSED, ATTR_PURE]]
 size_t strlen([[nonnull]] char const *__restrict string) {
 	return (size_t)(strend(string) - string);
 }
 %(libc_fast)#endif /* !__LIBC_BIND_OPTIMIZATIONS || __NO_builtin_constant_p || !__builtin_strlen || !__CRT_HAVE_strlen */
 
 @@Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found.
-[[libc, kernel, std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+[[libc, std, kernel, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
 char *strchr([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): char *]
 	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
@@ -272,7 +272,7 @@ char *strchr([[nonnull]] char const *__restrict haystack, int needle)
 }
 
 @@Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found.
-[[std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+[[std, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
 char *strrchr([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): char *]
 	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
@@ -286,7 +286,7 @@ char *strrchr([[nonnull]] char const *__restrict haystack, int needle)
 }
 
 @@Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical
-[[libc, kernel, std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+[[libc, std, kernel, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
 int strcmp([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 	char c1, c2;
 	do {
@@ -297,7 +297,7 @@ int strcmp([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 }
 
 @@Same as `strcmp', but compare at most `MAXLEN' characters from either string
-[[std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+[[std, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
 int strncmp([[nonnull]] char const *s1,
             [[nonnull]] char const *s2, size_t maxlen) {
 	char c1, c2;
@@ -312,7 +312,7 @@ int strncmp([[nonnull]] char const *s1,
 
 @@Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
 @@If no such needle exists, return `NULL'
-[[std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+[[std, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
 char *strstr([[nonnull]] char const *haystack, [[nonnull]] char const *needle)
 	[([[nonnull]] char *haystack, [[nonnull]] char *needle): char *]
 	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle): char const *]
@@ -369,7 +369,7 @@ miss:
 	return buf;
 }
 
-[[std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+[[std, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
 size_t strcspn([[nonnull]] char const *haystack,
                [[nonnull]] char const *reject) {
 	char const *iter = haystack;
@@ -378,7 +378,7 @@ size_t strcspn([[nonnull]] char const *haystack,
 	return (size_t)(iter - haystack);
 }
 
-[[std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+[[std, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
 size_t strspn([[nonnull]] char const *haystack,
               [[nonnull]] char const *accept) {
 	char const *iter = haystack;
@@ -387,7 +387,7 @@ size_t strspn([[nonnull]] char const *haystack,
 	return (size_t)(iter - haystack);
 }
 
-[[std, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+[[std, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
 char *strpbrk([[nonnull]] char const *haystack, [[nonnull]] char const *accept)
 	[([[nonnull]] char *haystack, [[nonnull]] char const *accept): char *]
 	[([[nonnull]] char const *haystack, [[nonnull]] char const *accept): char const *]
@@ -464,7 +464,7 @@ __NAMESPACE_STD_END
 
 %#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 @@Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´)
-[[libc, kernel, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+[[libc, kernel, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
 $size_t strnlen([[nonnull]] char const *__restrict string, $size_t maxlen) {
 	return (size_t)(strnend(string, maxlen) - string);
 }
@@ -519,6 +519,7 @@ char *strerror_l(int errnum, $locale_t locale) {
 	(void)locale;
 	return strerror(errnum);
 }
+
 [[ATTR_WUNUSED]] char *strsignal(int signo);
 
 [[crtbuiltin, export_alias("__strndup")]]
@@ -642,36 +643,36 @@ char *basename([[nullable]] char const *filename)
 		return (char *)filename;
 	do {
 		ch = *iter++;
-#ifdef _WIN32
+@@pp_ifdef _WIN32@@
 		if (ch == '/' || ch == '\\')
 			result = iter;
-#else /* _WIN32 */
+@@pp_else@@
 		if (ch == '/')
 			result = iter;
-#endif /* !_WIN32 */
+@@pp_endif@@
 	} while (ch);
 	if unlikely(!result)
 		return (char *)filename; /* Path doesn't contain '/'. */
 	if (*result)
 		return result; /* Last character isn't a '/'. */
 	iter = result;
-#ifdef _WIN32
+@@pp_ifdef _WIN32@@
 	while (iter != filename && (iter[-1] == '/' || iter[-1] == '\\'))
 		--iter;
-#else /* _WIN32 */
+@@pp_else@@
 	while (iter != filename && iter[-1] == '/')
 		--iter;
-#endif /* !_WIN32 */
+@@pp_endif@@
 	if (iter == filename)
 		return result-1; /* Only `'/'"-characters. */
 	//*iter = '\0'; /* Trim all ending `'/'"-characters. */
-#ifdef _WIN32
+@@pp_ifdef _WIN32@@
 	while (iter != filename && (iter[-1] != '/' || iter[-1] != '\\'))
 		--iter; /* Scan until the previous '/'. */
-#else /* _WIN32 */
+@@pp_else@@
 	while (iter != filename && iter[-1] != '/')
 		--iter; /* Scan until the previous '/'. */
-#endif /* !_WIN32 */
+@@pp_endif@@
 	return iter; /* Returns string after previous '/'. */
 }
 
@@ -778,7 +779,7 @@ int strverscmp([[nonnull]] char const *s1,
 __mempcpy(*) = mempcpy;
 
 @@Same as `memcpy', but return `DST + N_BYTES', rather than `DST'
-[[libc, kernel, fast, ATTR_LEAF, alias("__mempcpy")]]
+[[guard, libc, kernel, fast, ATTR_LEAF, alias("__mempcpy")]]
 [[if(!defined(__KERNEL__)), export_as("__mempcpy")]]
 mempcpy:([[nonnull]] void *__restrict dst,
          [[nonnull]] void const *__restrict src,
@@ -1315,8 +1316,8 @@ int memcmpb([[nonnull]] /*aligned(1)*/ void const *s1,
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemcmp")]]
 [[alias("DOS$wmemcmp")]]
 [[if(!defined(__KERNEL__)), export_as("DOS$wmemcmp")]]
-memcmpw:([[nonnull]] /*aligned(2)*/ void const *s1,
-         [[nonnull]] /*aligned(2)*/ void const *s2, $size_t n_words) -> $int16_t {
+$int16_t memcmpw([[nonnull]] /*aligned(2)*/ void const *s1,
+                 [[nonnull]] /*aligned(2)*/ void const *s2, $size_t n_words) {
 	s16 *p1 = (s16 *)s1;
 	s16 *p2 = (s16 *)s2;
 	s16 v1, v2;
@@ -1330,8 +1331,9 @@ memcmpw:([[nonnull]] /*aligned(2)*/ void const *s1,
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemcmp")]]
 [[if(defined(__PE__)), alias("KOS$wmemcmp")]]
 [[if(!defined(__KERNEL__)), export_as("wmemcmp")]]
-memcmpl:([[nonnull]] /*aligned(4)*/ void const *s1,
-         [[nonnull]] /*aligned(4)*/ void const *s2, $size_t n_dwords) -> $int32_t {
+$int32_t memcmpl([[nonnull]] /*aligned(4)*/ void const *s1,
+                 [[nonnull]] /*aligned(4)*/ void const *s2,
+                 $size_t n_dwords) {
 	s32 *p1 = (s32 *)s1;
 	s32 *p2 = (s32 *)s2;
 	s32 v1, v2;
@@ -1571,8 +1573,8 @@ $uint32_t *memrchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, 
 @@Same as `memendb', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `HAYSTACK + N_DWORDS' if the given `NEEDLE' wasn't found
 [[ATTR_WUNUSED, ATTR_PURE]]
-memlenb:([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
-         int byte, $size_t n_bytes) -> $size_t = memlen;
+$size_t memlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
+                int byte, $size_t n_bytes) = memlen;
 
 @@Same as `memendw', but return the offset from `HAYSTACK', rather than the actual address.
 @@Returns `HAYSTACK + N_DWORDS * 2' if the given `NEEDLE' wasn't found
@@ -1677,7 +1679,7 @@ memcpyq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 [[fast, libc, kernel, ATTR_LEAF]]
 mempcpyq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
           [[nonnull]] /*aligned(8)*/ void const *__restrict src,
-          $size_t n_qwords) -> [== dst + n_qwords * 8] $uint64_t * {
+          $size_t n_qwords) -> [[== dst + n_qwords * 8]] $uint64_t * {
 	return (u64 *)memcpyq(dst, src, n_qwords) + n_qwords;
 }
 
@@ -1724,7 +1726,7 @@ memmoveq:([[nonnull]] /*aligned(8)*/ void *dst,
 [[fast, libc, kernel, ATTR_LEAF]]
 mempmoveq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
            [[nonnull]] /*aligned(8)*/ void const *__restrict src,
-           $size_t n_qwords) -> [== dst + n_qwords * 8] $uint64_t * {
+           $size_t n_qwords) -> [[== dst + n_qwords * 8]] $uint64_t * {
 	return (u64 *)memmoveq(dst, src, n_qwords) + n_qwords;
 }
 
@@ -1786,7 +1788,7 @@ memmovedownq:([[nonnull]] /*aligned(8)*/ void *dst,
 [[fast, libc, kernel, ATTR_LEAF, alias("mempmoveq")]]
 mempmoveupq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
              [[nonnull]] /*aligned(8)*/ void const *__restrict src,
-             $size_t n_qwords) -> [== dst + n_qwords * 8] $uint64_t * {
+             $size_t n_qwords) -> [[== dst + n_qwords * 8]] $uint64_t * {
 	return (u64 *)memmoveupq(dst, src, n_qwords) + n_qwords;
 }
 
@@ -1794,7 +1796,7 @@ mempmoveupq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 [[fast, libc, kernel, ATTR_LEAF, alias("mempmoveq")]]
 mempmovedownq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
                [[nonnull]] /*aligned(8)*/ void const *__restrict src,
-               $size_t n_qwords) -> [== dst + n_qwords * 8] $uint64_t * {
+               $size_t n_qwords) -> [[== dst + n_qwords * 8]] $uint64_t * {
 	return (u64 *)memmovedownq(dst, src, n_qwords) + n_qwords;
 }
 
@@ -1814,14 +1816,14 @@ memsetq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 @@Same as `memsetq', but return `DST + N_QWORDS', rather than `DST'
 [[fast, libc, kernel, ATTR_LEAF]]
 mempsetq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
-          $uint64_t qword, $size_t n_qwords) -> [== dst + n_qwords * 8] $uint64_t * {
+          $uint64_t qword, $size_t n_qwords) -> [[== dst + n_qwords * 8]] $uint64_t * {
 	return (u64 *)memsetq(dst, qword, n_qwords) + n_qwords;
 }
 
 @@Compare memory buffers and return the difference of the first non-matching qword
 [[fast, libc, kernel, ATTR_WUNUSED, ATTR_PURE]]
-memcmpq:([[nonnull]] /*aligned(8)*/ void const *s1,
-         [[nonnull]] /*aligned(8)*/ void const *s2, $size_t n_dwords) -> $int64_t {
+$int64_t memcmpq([[nonnull]] /*aligned(8)*/ void const *s1,
+                 [[nonnull]] /*aligned(8)*/ void const *s2, $size_t n_dwords) {
 	s64 *p1 = (s64 *)s1;
 	s64 *p2 = (s64 *)s2;
 	s64 v1, v2;
@@ -2542,7 +2544,7 @@ memcpyc:([[nonnull]] void *__restrict dst,
 mempcpyc:([[nonnull]] void *__restrict dst,
           [[nonnull]] void const *__restrict src,
           $size_t elem_count, $size_t elem_size)
-	-> [== dst + (elem_count * elem_size)] void * {
+	-> [[== dst + (elem_count * elem_size)]] void * {
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 	switch (elem_size) {
 
@@ -2603,7 +2605,7 @@ memmovec:([[nonnull]] void *dst,
 mempmovec:([[nonnull]] void *dst,
            [[nonnull]] void const *src,
            $size_t elem_count, $size_t elem_size)
-	-> [== dst + (elem_count * elem_size)] void * {
+	-> [[== dst + (elem_count * elem_size)]] void * {
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 	switch (elem_size) {
 
@@ -2664,7 +2666,7 @@ memmoveupc:([[nonnull]] void *dst,
 mempmoveupc:([[nonnull]] void *dst,
              [[nonnull]] void const *src,
              $size_t elem_count, $size_t elem_size)
-	-> [== dst + (elem_count * elem_size)] void * {
+	-> [[== dst + (elem_count * elem_size)]] void * {
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 	switch (elem_size) {
 
@@ -2725,7 +2727,7 @@ memmovedownc:([[nonnull]] void *dst,
 mempmovedownc:([[nonnull]] void *dst,
                [[nonnull]] void const *src,
                $size_t elem_count, $size_t elem_size)
-	-> [== dst + (elem_count * elem_size)] void * {
+	-> [[== dst + (elem_count * elem_size)]] void * {
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 	switch (elem_size) {
 
@@ -3239,7 +3241,7 @@ __LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL __sys_nerr)(void);
 #endif /* !... */
 #endif /* !___local_sys_errlist_defined */
 ), section(".text.crt.errno")]]
-strerror_s:(int errnum) -> char const * {
+char const *strerror_s(int errnum) {
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
 	return (unsigned int)errnum < (unsigned int)@_sys_nerr@ ? @_sys_errlist@[errnum] : NULL;
 #elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)
@@ -4576,10 +4578,10 @@ $size_t fuzzy_memcasecmp([[nonnull]] void const *s1, $size_t s1_bytes,
 		return s1_bytes;
 	if (s2_bytes > s1_bytes) {
 		{
-			@@yield $wchar_function ? "wchar_t" : "void"@@ const *temp;
-			temp = s1;
+			void const *temp;
+			temp = (void const *)s1;
 			s1   = s2;
-			s2   = temp;
+			*(void const **)&s2 = temp;
 		}
 		{
 			size_t temp;
@@ -4700,10 +4702,10 @@ $size_t fuzzy_memcasecmp_l([[nonnull]] void const *s1, $size_t s1_bytes,
 		return s1_bytes;
 	if (s2_bytes > s1_bytes) {
 		{
-			@@yield $wchar_function ? "wchar_t" : "void"@@ const *temp;
-			temp = s1;
+			void const *temp;
+			temp = (void const *)s1;
 			s1   = s2;
-			s2   = temp;
+			*(void const **)&s2 = temp;
 		}
 		{
 			size_t temp;
@@ -4760,6 +4762,8 @@ $size_t fuzzy_memcmpb([[nonnull]] void const *s1, $size_t s1_bytes,
                       [[nonnull]] void const *s2, $size_t s2_bytes) = fuzzy_memcmp;
 
 [[ATTR_WUNUSED, ATTR_PURE, requires_include("<parts/malloca.h>")]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("fuzzy_wmemcmp")]]
+[[export_alias("DOS$fuzzy_wmemcmp")]]
 [[requires(!defined(__NO_MALLOCA))]]
 $size_t fuzzy_memcmpw([[nonnull]] void const *s1, $size_t s1_words,
                       [[nonnull]] void const *s2, $size_t s2_words) {
@@ -4818,7 +4822,9 @@ $size_t fuzzy_memcmpw([[nonnull]] void const *s1, $size_t s1_words,
 }
 
 [[ATTR_WUNUSED, ATTR_PURE, requires_include("<parts/malloca.h>")]]
-[[requires(!defined(__NO_MALLOCA))]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("fuzzy_wmemcmp")]]
+[[alias("KOS$fuzzy_wmemcmp")]]
+[[export_as("fuzzy_wmemcmp"), requires(!defined(__NO_MALLOCA))]]
 $size_t fuzzy_memcmpl([[nonnull]] void const *s1, $size_t s1_dwords,
                       [[nonnull]] void const *s2, $size_t s2_dwords) {
 	size_t *v0, *v1, i, j, cost, temp;
@@ -4950,17 +4956,17 @@ int strcasecoll([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 
 [[export_alias("_strnicoll"), alias("strncasecmp")]]
 [[ATTR_WUNUSED, ATTR_PURE, section(".text.crt.unicode.static.memory")]]
-strncasecoll:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t maxlen) -> int {
+int strncasecoll([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t maxlen) {
 	return strncasecmp(s1, s2, maxlen);
 }
 
 [[ATTR_LEAF]]
-strnrev:([[nonnull]] char *__restrict str, $size_t maxlen) -> [== str] char * {
+strnrev:([[nonnull]] char *__restrict str, $size_t maxlen) -> [[== str]] char * {
 	return (char *)memrev(str, strnlen(str, maxlen));
 }
 
 [[ATTR_LEAF, section(".text.crt.unicode.static.memory")]]
-strnlwr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [== str] char * {
+strnlwr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
 		*iter = tolower(ch);
@@ -4968,7 +4974,7 @@ strnlwr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [== str] char * {
 }
 
 [[ATTR_LEAF, section(".text.crt.unicode.static.memory")]]
-strnupr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [== str] char * {
+strnupr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
 		*iter = toupper(ch);
@@ -5004,7 +5010,7 @@ int strncasecoll_l([[nonnull]] char const *s1,
 
 [[ATTR_LEAF, export_alias("_strlwr_l")]]
 [[section(".text.crt.unicode.locale.memory")]]
-strlwr_l:([[nonnull]] char *__restrict str, $locale_t locale) -> [== str] char * {
+strlwr_l:([[nonnull]] char *__restrict str, $locale_t locale) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
 		*iter = tolower_l(ch, locale);
@@ -5013,7 +5019,7 @@ strlwr_l:([[nonnull]] char *__restrict str, $locale_t locale) -> [== str] char *
 
 [[ATTR_LEAF, export_alias("_strupr_l")]]
 [[section(".text.crt.unicode.locale.memory")]]
-strupr_l:([[nonnull]] char *__restrict str, $locale_t locale) -> [== str] char * {
+strupr_l:([[nonnull]] char *__restrict str, $locale_t locale) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
 		*iter = toupper_l(ch, locale);
@@ -5021,7 +5027,7 @@ strupr_l:([[nonnull]] char *__restrict str, $locale_t locale) -> [== str] char *
 }
 
 [[ATTR_LEAF, section(".text.crt.unicode.locale.memory")]]
-strnlwr_l:([[nonnull]] char *__restrict str, $size_t maxlen, $locale_t locale) -> [== str] char * {
+strnlwr_l:([[nonnull]] char *__restrict str, $size_t maxlen, $locale_t locale) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
 		*iter = tolower_l(ch, locale);
@@ -5029,7 +5035,7 @@ strnlwr_l:([[nonnull]] char *__restrict str, $size_t maxlen, $locale_t locale) -
 }
 
 [[ATTR_LEAF, section(".text.crt.unicode.locale.memory")]]
-strnupr_l:([[nonnull]] char *__restrict str, $size_t maxlen, $locale_t locale) -> [== str] char * {
+strnupr_l:([[nonnull]] char *__restrict str, $size_t maxlen, $locale_t locale) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
 		*iter = toupper_l(ch, locale);
@@ -5037,7 +5043,7 @@ strnupr_l:([[nonnull]] char *__restrict str, $size_t maxlen, $locale_t locale) -
 }
 
 [[ATTR_LEAF]]
-memrev:([[nonnull]] void *__restrict base, $size_t n_bytes) -> [== base] void * {
+memrev:([[nonnull]] void *__restrict base, $size_t n_bytes) -> [[== base]] void * {
 	byte_t *iter, *end;
 	end = (iter = (byte_t *)base) + n_bytes;
 	while (iter < end) {
@@ -5051,10 +5057,10 @@ memrev:([[nonnull]] void *__restrict base, $size_t n_bytes) -> [== base] void * 
 
 %#ifdef __USE_STRING_BWLQ
 [[ATTR_LEAF]]
-memrevb:([[nonnull]] void *__restrict base, $size_t n_bytes) -> [== base] $uint8_t * = memrev;
+memrevb:([[nonnull]] void *__restrict base, $size_t n_bytes) -> [[== base]] $uint8_t * = memrev;
 
 [[ATTR_LEAF]]
-memrevw:([[nonnull]] void *__restrict base, $size_t n_words) -> [== base] $uint16_t * {
+memrevw:([[nonnull]] void *__restrict base, $size_t n_words) -> [[== base]] $uint16_t * {
 	u16 *iter, *end;
 	end = (iter = (u16 *)base) + n_words;
 	while (iter < end) {
@@ -5066,7 +5072,7 @@ memrevw:([[nonnull]] void *__restrict base, $size_t n_words) -> [== base] $uint1
 }
 
 [[ATTR_LEAF]]
-memrevl:([[nonnull]] void *__restrict base, $size_t n_dwords) -> [== base] $uint32_t * {
+memrevl:([[nonnull]] void *__restrict base, $size_t n_dwords) -> [[== base]] $uint32_t * {
 	u32 *iter, *end;
 	end = (iter = (u32 *)base) + n_dwords;
 	while (iter < end) {
@@ -5079,7 +5085,7 @@ memrevl:([[nonnull]] void *__restrict base, $size_t n_dwords) -> [== base] $uint
 
 %#ifdef __UINT64_TYPE__
 [[ATTR_LEAF]]
-memrevq:([[nonnull]] void *__restrict base, $size_t n_qwords) -> [== base] $uint64_t * {
+memrevq:([[nonnull]] void *__restrict base, $size_t n_qwords) -> [[== base]] $uint64_t * {
 	u64 *iter, *end;
 	end = (iter = (u64 *)base) + n_qwords;
 	while (iter < end) {
@@ -5098,7 +5104,7 @@ memrevq:([[nonnull]] void *__restrict base, $size_t n_qwords) -> [== base] $uint
 %#if defined(__USE_KOS) || defined(__USE_DOS)
 
 [[export_alias("_strlwr"), section(".text.crt.unicode.static.memory")]]
-strlwr:([[nonnull]] char *__restrict str) -> [== str] char * {
+strlwr:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
 		*iter = tolower(ch);
@@ -5106,7 +5112,7 @@ strlwr:([[nonnull]] char *__restrict str) -> [== str] char * {
 }
 
 [[export_alias("_strupr"), section(".text.crt.unicode.static.memory")]]
-strupr:([[nonnull]] char *__restrict str) -> [== str] char * {
+strupr:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
 		*iter = toupper(ch);
@@ -5114,7 +5120,7 @@ strupr:([[nonnull]] char *__restrict str) -> [== str] char * {
 }
 
 [[export_alias("_strset"), ATTR_LEAF]]
-strset:([[nonnull]] char *__restrict str, int ch) -> [== str] char * {
+strset:([[nonnull]] char *__restrict str, int ch) -> [[== str]] char * {
 	char *iter;
 	for (iter = str; *iter; ++iter)
 		*iter = (char)ch;
@@ -5122,7 +5128,7 @@ strset:([[nonnull]] char *__restrict str, int ch) -> [== str] char * {
 }
 
 [[export_alias("_strnset"), ATTR_LEAF]]
-strnset:([[nonnull]] char *__restrict str, int ch, $size_t maxlen) -> [== str] char * {
+strnset:([[nonnull]] char *__restrict str, int ch, $size_t maxlen) -> [[== str]] char * {
 	char *iter;
 	for (iter = str; maxlen-- && *iter; ++iter)
 		*iter = (char)ch;
@@ -5130,7 +5136,7 @@ strnset:([[nonnull]] char *__restrict str, int ch, $size_t maxlen) -> [== str] c
 }
 
 [[alias("_strrev"), ATTR_LEAF]]
-strrev:([[nonnull]] char *__restrict str) -> [== str] char * {
+strrev:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 	return (char *)memrev(str, strlen(str));
 }
 %{
@@ -5145,11 +5151,9 @@ _memicmp:(*) = memcasecmp;
 _memicmp_l:(*) = memcasecmp_l;
 memicmp:(*) = memcasecmp;
 
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
 $errno_t _strset_s([[nonnull]] char *dst, $size_t dstsize, int ch) {
-@@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
-@@exec MULTIPLY = $wchar_function ? none : " * sizeof(char)"@@
 	char *p;
 	size_t remaining;
 	if (!dst && dstsize != 0)
@@ -5159,58 +5163,53 @@ $errno_t _strset_s([[nonnull]] char *dst, $size_t dstsize, int ch) {
 	while (*p && --remaining != 0)
 		*p++ = (char)ch;
 	if (remaining == 0) {
-		@@yield MEMSET@@(dst, 1, dstsize@@yield MULTIPLY@@);
+		__libc_memsetc(dst, 0, dstsize, __SIZEOF_CHAR__);
 		return __EINVAL;
 	}
-	@@yield MEMSET@@(p, 0, remaining@@yield MULTIPLY@@);
+	__libc_memsetc(p, 0, remaining, __SIZEOF_CHAR__);
 	return 0;
 }
 
 %
 %#ifdef __USE_DOS_SLIB
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
 $errno_t memcpy_s([[nonnull]] void *dst, rsize_t dstlength,
                   [[nonnull]] void const *src, rsize_t srclength) {
-@@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
-@@exec MEMCPY = $wchar_function ? "wmemcpy" : "memcpy"@@
 	if (!srclength)
 		return 0;
 	if (dst == NULL)
 		return __EINVAL;
 	if (!src || dstlength < srclength) {
-		@@yield MEMSET@@(dst, 0, dstlength);
+		__libc_memsetc(dst, 0, dstlength, __SIZEOF_CHAR__);
 		if (!src)
 			return __EINVAL;
 		if (dstlength < srclength)
 			return __ERANGE;
 		return __EINVAL;
 	}
-	@@yield MEMCPY@@(dst, src, srclength);
+	__libc_memcpyc(dst, src, srclength, __SIZEOF_CHAR__);
 	return 0;
 }
 
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 [section(".text.crt.dos.string.memory")]
 $errno_t memmove_s([[nonnull]] void *dst, rsize_t dstlength,
                    [[nonnull]] void const *src, rsize_t srclength) {
-@@exec MEMMOVE = $wchar_function ? "wmemmove" : "memmove"@@
 	if (!srclength)
 		return 0;
 	if (!dst || !src)
 		return __EINVAL;
 	if (dstlength < srclength)
 		return __ERANGE;
-	@@yield MEMMOVE@@(dst, src, srclength);
+	__libc_memmovec(dst, src, srclength, __SIZEOF_CHAR__);
 	return 0;
 }
 
 
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
 $errno_t strcpy_s(char *dst, $size_t dstsize, char const *src) {
-@@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
-@@exec MULTIPLY = $wchar_function ? none : " * sizeof(char)"@@
 	char *iter;
 	size_t remaining;
 	if ((!dst && dstsize) || !src)
@@ -5220,10 +5219,10 @@ $errno_t strcpy_s(char *dst, $size_t dstsize, char const *src) {
 	while ((*iter++ = *src++) != 0 && --remaining)
 		;
 	if (!remaining) {
-		@@yield MEMSET@@(dst, 0, dstsize@@yield MULTIPLY@@);
+		__libc_memsetc(dst, 0, dstsize, __SIZEOF_CHAR__);
 		return __ERANGE;
 	}
-	@@yield MEMSET@@(iter, 0, remaining@@yield MULTIPLY@@);
+	__libc_memsetc(iter, 0, remaining, __SIZEOF_CHAR__);
 	return 0;
 }
 
@@ -5245,18 +5244,14 @@ $errno_t strcat_s(char *dst, $size_t dstsize, char const *src) {
 	return 0;
 }
 
-%{
-__LOCAL __ATTR_WUNUSED __ATTR_PURE
-__SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL strnlen_s)(char const *__str, __SIZE_TYPE__ __maxlen) {
-	return __str ? strnlen(__str, __maxlen) : 0;
-}
+[[guard, inline, nocrt, ATTR_WUNUSED, ATTR_PURE]]
+$size_t strnlen_s([[nullable]] char const *str, $size_t maxlen) {
+	return str ? strnlen(str, maxlen) : 0;
 }
 
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
 $errno_t strncat_s(char *dst, rsize_t dstsize, const char *src, rsize_t maxlen) {
-@@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
-@@exec MULTIPLY = $wchar_function ? none : " * sizeof(char)"@@
 	char *iter;
 	size_t remaining;
 	if (!maxlen && !dst && !dstsize)
@@ -5266,7 +5261,7 @@ $errno_t strncat_s(char *dst, rsize_t dstsize, const char *src, rsize_t maxlen) 
 	for (iter = dst, remaining = dstsize; remaining && *iter; ++iter, --remaining)
 		;
 	if (!remaining) {
-		@@yield MEMSET@@(dst, 0, dstsize@@yield MULTIPLY@@);
+		__libc_memsetc(dst, 0, dstsize, __SIZEOF_CHAR__);
 		return __EINVAL;
 	}
 	if (maxlen == (size_t)-1) {
@@ -5285,18 +5280,16 @@ $errno_t strncat_s(char *dst, rsize_t dstsize, const char *src, rsize_t maxlen) 
 			dst[dstsize - 1] = 0;
 			return __STRUNCATE;
 		}
-		@@yield MEMSET@@(dst, 0, dstsize@@yield MULTIPLY@@);
+		__libc_memsetc(dst, 0, dstsize, __SIZEOF_CHAR__);
 		return __ERANGE;
 	}
-	@@yield MEMSET@@(iter, 0, remaining@@yield MULTIPLY@@);
+	__libc_memsetc(iter, 0, remaining, __SIZEOF_CHAR__);
 	return 0;
 }
 
-[[impl_include("<parts/errno.h>")]]
+[[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
 $errno_t strncpy_s(char *dst, $size_t dstsize, char const *src, $size_t maxlen) {
-@@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
-@@exec MULTIPLY = $wchar_function ? none : " * sizeof(char)"@@
 	char *iter;
 	size_t remaining;
 	if (maxlen == 0 && dst == NULL && dstsize == 0)
@@ -5304,7 +5297,7 @@ $errno_t strncpy_s(char *dst, $size_t dstsize, char const *src, $size_t maxlen) 
 	if ((!dst && dstsize) || (!src && maxlen))
 		return __EINVAL;
 	if (!maxlen) {
-		@@yield MEMSET@@(dst, 0, dstsize@@yield MULTIPLY@@);
+		__libc_memsetc(dst, 0, dstsize, __SIZEOF_CHAR__);
 		return 0;
 	}
 	iter = dst;
@@ -5325,10 +5318,10 @@ $errno_t strncpy_s(char *dst, $size_t dstsize, char const *src, $size_t maxlen) 
 			dst[dstsize - 1] = 0;
 			return __STRUNCATE;
 		}
-		@@yield MEMSET@@(dst, 0, dstsize@@yield MULTIPLY@@);
+		__libc_memsetc(dst, 0, dstsize, __SIZEOF_CHAR__);
 		return __ERANGE;
 	}
-	@@yield MEMSET@@(iter, 0, remaining@@yield MULTIPLY@@);
+	__libc_memsetc(iter, 0, remaining, __SIZEOF_CHAR__);
 	return 0;
 }
 
@@ -5351,7 +5344,8 @@ _strnicoll_l:(*) = strncasecoll_l;
 char *_strerror(char const *message);
 
 [[cp, wchar, section(".text.crt.dos.errno")]]
-$errno_t _strerror_s([[nonnull]] char *__restrict buf, $size_t buflen, char const *message);
+$errno_t _strerror_s([[nonnull]] char *__restrict buf,
+                     $size_t buflen, char const *message);
 
 [[ATTR_LEAF, impl_include("<parts/errno.h>")]]
 [[section(".text.crt.dos.unicode.static.memory")]]
@@ -5402,13 +5396,12 @@ $errno_t _strupr_s_l(char *buf, $size_t buflen, $locale_t locale) {
 	return 0;
 }
 
-_strnicmp:(*) = strncasecmp;
-_strnicmp_l:(*) = strncasecmp_l;
+_strnicmp(*) = strncasecmp;
+_strnicmp_l(*) = strncasecmp_l;
 
-[[ATTR_LEAF, impl_include("<parts/errno.h>"), section(".text.crt.dos.string.memory")]]
+[[section(".text.crt.dos.string.memory")]]
+[[ATTR_LEAF, impl_include("<parts/errno.h>", "<libc/string.h>")]]
 $errno_t _strnset_s(char *__restrict buf, $size_t buflen, int ch, $size_t maxlen) {
-@@exec MEMSET = $wchar_function ? "wmemset" : "memset"@@
-@@exec MULTIPLY = $wchar_function ? none : " * sizeof(char)"@@
 	char *iter;
 	size_t remaining;
 	if (maxlen == 0 && buf == NULL && buflen == 0)
@@ -5428,23 +5421,23 @@ $errno_t _strnset_s(char *__restrict buf, $size_t buflen, int ch, $size_t maxlen
 			++iter;
 	}
 	if (!remaining) {
-		@@yield MEMSET@@(buf, 0, buflen@@yield MULTIPLY@@);
+		__libc_memsetc(buf, 0, buflen, __SIZEOF_CHAR__);
 		return __EINVAL;
 	}
-	@@yield MEMSET@@(iter, 0, remaining@@yield MULTIPLY@@);
+	__libc_memsetc(iter, 0, remaining, __SIZEOF_CHAR__);
 	return 0;
 }
 
-_strrev:(*) = strrev;
-_strxfrm_l:(*) = strxfrm_l;
-stricmp:(*) = strcasecmp;
-strcmpi:(*) = strcasecmp;
-strnicmp:(*) = strncasecmp;
+_strrev(*) = strrev;
+_strxfrm_l(*) = strxfrm_l;
+stricmp(*) = strcasecmp;
+strcmpi(*) = strcasecmp;
+strnicmp(*) = strncasecmp;
 
 /* The following aren't actually defined by DOS, but one might assume that they were */
-_strncmpi:(*) = strncasecmp;
-_strncmpi_l:(*) = strncasecmp_l;
-strncmpi:(*) = strncasecmp;
+_strncmpi(*) = strncasecmp;
+_strncmpi_l(*) = strncasecmp_l;
+strncmpi(*) = strncasecmp;
 
 %
 %#ifndef _WSTRING_DEFINED
@@ -5512,15 +5505,7 @@ strncmpi:(*) = strncasecmp;
 %[insert:extern(wcsncat_s)]
 %[insert:extern(wcsncpy_s)]
 %[insert:extern(wcstok_s)]
-%{
-#ifndef __wcsnlen_s_defined
-#define __wcsnlen_s_defined 1
-__LOCAL __ATTR_WUNUSED __ATTR_PURE
-__SIZE_TYPE__ __NOTHROW_NCX((__LIBCCALL wcsnlen_s)(wchar_t const *__str, __SIZE_TYPE__ __maxlen)) {
-	return __str ? wcsnlen(__str, __maxlen) : 0;
-}
-#endif /* !__wcsnlen_s_defined */
-}
+%[insert:extern(wcsnlen_s)]
 %#endif  /* __USE_DOS_SLIB */
 %#endif /* !_WSTRING_DEFINED */
 

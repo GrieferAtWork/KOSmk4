@@ -141,7 +141,8 @@ struct acct_v3 {
 }
 
 @@Switch process accounting on and off
-[[cp_kos]] acct:(const char *filename) -> int;
+[[cp, section(".text.crt.fs.modify")]]
+int acct(const char *filename);
 
 %{
 

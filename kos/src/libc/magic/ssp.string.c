@@ -165,14 +165,14 @@ __mempcpyc_chk([[nonnull]] void *__restrict dst,
                [[nonnull]] void const *__restrict src,
                $size_t elem_count, $size_t elem_size,
                $size_t dst_objsize)
-		-> [== dst + (elem_count * elem_size)] void *
+		-> [[== dst + (elem_count * elem_size)]] void *
 	%{chk}
 
 [[ATTR_LEAF, libc, fast]]
 __mempmovec_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                 $size_t elem_count, $size_t elem_size,
                 $size_t dst_objsize)
-		-> [== dst + (elem_count * elem_size)] void *
+		-> [[== dst + (elem_count * elem_size)]] void *
 	%{chk}
 
 [[ATTR_LEAF, libc, fast]]
@@ -193,14 +193,14 @@ __memmovedownc_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
 __mempmoveupc_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                   $size_t elem_count, $size_t elem_size,
                   $size_t dst_objsize)
-		-> [== dst + (elem_count * elem_size)] void *
+		-> [[== dst + (elem_count * elem_size)]] void *
 	%{chk}
 
 [[ATTR_LEAF, libc, fast]]
 __mempmovedownc_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
                     $size_t elem_count, $size_t elem_size,
                     $size_t dst_objsize)
-		-> [== dst + (elem_count * elem_size)] void *
+		-> [[== dst + (elem_count * elem_size)]] void *
 	%{chk}
 
 %#endif /* __USE_KOS */
@@ -231,16 +231,16 @@ __mempmovedownc_chk([[nonnull]] void *dst, [[nonnull]] void const *src,
 %#endif /* __USE_KOS */
 %#ifdef __UINT64_TYPE__
 [[fast, libc, ATTR_LEAF]] __memcpyq_chk:([[nonnull]] /*aligned(8)*/ void *__restrict dst, [[nonnull]] /*aligned(8)*/ void const *__restrict src, $size_t n_qwords, $size_t dst_objsize) -> [[== dst]] $uint64_t * %{chk}
-[[fast, libc, ATTR_LEAF]] __mempcpyq_chk:([[nonnull]] /*aligned(8)*/ void *__restrict dst, [[nonnull]] /*aligned(8)*/ void const *__restrict src, $size_t n_qwords, $size_t dst_objsize) -> [== dst + n_qwords * 8] $uint64_t * %{chk}
+[[fast, libc, ATTR_LEAF]] __mempcpyq_chk:([[nonnull]] /*aligned(8)*/ void *__restrict dst, [[nonnull]] /*aligned(8)*/ void const *__restrict src, $size_t n_qwords, $size_t dst_objsize) -> [[== dst + n_qwords * 8]] $uint64_t * %{chk}
 [[fast, libc, ATTR_LEAF]] __memmoveq_chk:([[nonnull]] /*aligned(8)*/ void *dst, [[nonnull]] /*aligned(8)*/ void const *src, $size_t n_qwords, $size_t dst_objsize) -> [[== dst]] $uint64_t * %{chk}
-[[fast, libc, ATTR_LEAF]] __mempmoveq_chk:([[nonnull]] /*aligned(8)*/ void *__restrict dst, [[nonnull]] /*aligned(8)*/ void const *__restrict src, $size_t n_qwords, $size_t dst_objsize) -> [== dst + n_qwords * 8] $uint64_t * %{chk}
+[[fast, libc, ATTR_LEAF]] __mempmoveq_chk:([[nonnull]] /*aligned(8)*/ void *__restrict dst, [[nonnull]] /*aligned(8)*/ void const *__restrict src, $size_t n_qwords, $size_t dst_objsize) -> [[== dst + n_qwords * 8]] $uint64_t * %{chk}
 [[fast, libc, ATTR_LEAF]] __memsetq_chk:([[nonnull]] /*aligned(8)*/ void *__restrict dst, $uint64_t qword, $size_t n_qwords, $size_t dst_objsize) -> [[== dst]] $uint64_t * %{chk}
-[[fast, libc, ATTR_LEAF]] __mempsetq_chk:([[nonnull]] /*aligned(8)*/ void *__restrict dst, $uint64_t qword, $size_t n_qwords, $size_t dst_objsize) -> [== dst + n_qwords * 8] $uint64_t * %{chk}
+[[fast, libc, ATTR_LEAF]] __mempsetq_chk:([[nonnull]] /*aligned(8)*/ void *__restrict dst, $uint64_t qword, $size_t n_qwords, $size_t dst_objsize) -> [[== dst + n_qwords * 8]] $uint64_t * %{chk}
 %#ifdef __USE_KOS
 [[fast, libc, ATTR_LEAF, alias("__memmoveq_chk")]] __memmoveupq_chk([[nonnull]] /*aligned(8)*/ void *dst, [[nonnull]] /*aligned(8)*/ void const *src, $size_t n_qwords, $size_t dst_objsize) -> [[== dst]] $uint64_t * %{chk}
 [[fast, libc, ATTR_LEAF, alias("__memmoveq_chk")]] __memmovedownq_chk([[nonnull]] /*aligned(8)*/ void *dst, [[nonnull]] /*aligned(8)*/ void const *src, $size_t n_qwords, $size_t dst_objsize) -> [[== dst]] $uint64_t * %{chk}
-[[fast, libc, ATTR_LEAF, alias("__mempmoveq_chk")]] __mempmoveupq_chk([[nonnull]] /*aligned(8)*/ void *__restrict dst, [[nonnull]] /*aligned(8)*/ void const *__restrict src, $size_t n_qwords, $size_t dst_objsize) -> [== dst + n_qwords * 8] $uint64_t * %{chk}
-[[fast, libc, ATTR_LEAF, alias("__mempmoveq_chk")]] __mempmovedownq_chk([[nonnull]] /*aligned(8)*/ void *__restrict dst, [[nonnull]] /*aligned(8)*/ void const *__restrict src, $size_t n_qwords, $size_t dst_objsize) -> [== dst + n_qwords * 8] $uint64_t * %{chk}
+[[fast, libc, ATTR_LEAF, alias("__mempmoveq_chk")]] __mempmoveupq_chk([[nonnull]] /*aligned(8)*/ void *__restrict dst, [[nonnull]] /*aligned(8)*/ void const *__restrict src, $size_t n_qwords, $size_t dst_objsize) -> [[== dst + n_qwords * 8]] $uint64_t * %{chk}
+[[fast, libc, ATTR_LEAF, alias("__mempmoveq_chk")]] __mempmovedownq_chk([[nonnull]] /*aligned(8)*/ void *__restrict dst, [[nonnull]] /*aligned(8)*/ void const *__restrict src, $size_t n_qwords, $size_t dst_objsize) -> [[== dst + n_qwords * 8]] $uint64_t * %{chk}
 %#endif /* __USE_KOS */
 %#endif /* __UINT64_TYPE__ */
 %#endif /* __USE_STRING_BWLQ */

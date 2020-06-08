@@ -77,7 +77,7 @@ int _isctype_l(int ch, int mask, $locale_t locale);
 %[insert:std]
 
 
-[[crtbuiltin, std, kernel]]
+[[std, crtbuiltin, kernel]]
 [[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
 int iscntrl(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -102,7 +102,7 @@ int iscntrl(int ch) {
 
 
 [[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
-[[crtbuiltin, std, kernel]]
+[[std, crtbuiltin, kernel]]
 int isspace(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return ((u8)ch >= 0x09 && (u8)ch <= 0x0d) || (u8)ch == 0x20;
@@ -125,7 +125,7 @@ int isspace(int ch) {
 }
 
 [[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
-[[crtbuiltin, std, kernel]] 
+[[std, crtbuiltin, kernel]] 
 int isupper(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x41 && (u8)ch <= 0x5a;
@@ -149,7 +149,7 @@ int isupper(int ch) {
 
 
 [[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
-[[crtbuiltin, std, kernel]] 
+[[std, crtbuiltin, kernel]] 
 int islower(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x61 && (u8)ch <= 0x7a;
@@ -172,7 +172,7 @@ int islower(int ch) {
 }
 
 [[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
-[[crtbuiltin, std, kernel]] 
+[[std, crtbuiltin, kernel]] 
 int isalpha(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return libc_isupper(ch) || libc_islower(ch);
@@ -195,7 +195,7 @@ int isalpha(int ch) {
 }
 
 [[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
-[[crtbuiltin, std, kernel]] 
+[[std, crtbuiltin, kernel]] 
 int isdigit(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x30 && (u8)ch <= 0x39;
@@ -218,7 +218,7 @@ int isdigit(int ch) {
 }
 
 [[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
-[[crtbuiltin, std, kernel]] 
+[[std, crtbuiltin, kernel]] 
 int isxdigit(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return isdigit(ch) ||
@@ -245,7 +245,7 @@ int isxdigit(int ch) {
 }
 
 [[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
-[[crtbuiltin, std, kernel]] 
+[[std, crtbuiltin, kernel]] 
 int isalnum(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return isupper(ch) || islower(ch) || isdigit(ch);
@@ -268,7 +268,7 @@ int isalnum(int ch) {
 }
 
 [[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
-[[crtbuiltin, std, kernel]] 
+[[std, crtbuiltin, kernel]] 
 int ispunct(int ch)  {
 @@pp_ifdef __BUILDING_LIBC@@
 	return ((u8)ch >= 0x21 && (u8)ch <= 0x2f) ||
@@ -297,7 +297,7 @@ int ispunct(int ch)  {
 }
 
 [[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
-[[crtbuiltin, std, kernel]] 
+[[std, crtbuiltin, kernel]] 
 int isgraph(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x21 && (u8)ch <= 0x7e;
@@ -320,7 +320,7 @@ int isgraph(int ch) {
 }
 
 [[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
-[[crtbuiltin, std, kernel]] 
+[[std, crtbuiltin, kernel]] 
 int isprint(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch >= 0x20 && (u8)ch <= 0x7e;

@@ -142,7 +142,7 @@ lfutexlock64:([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uaddr, $sys
 @@on some given futex-lock. - This method of waking is faster, since it doesn't invoke a
 @@system call when no thread is waiting on the given lock
 [requires($has_function(futex_wakemask))]
-[dependency_include(<hybrid/__atomic.h>)]
+[impl_include("<hybrid/__atomic.h>")]
 [impl_include("<kos/bits/futex.h>")][decl_include("<bits/types.h>")]
 futexlock_wake:([[nonnull]] lfutex_t *ulockaddr, $size_t max_wake) -> $ssize_t {
 	if (!(__hybrid_atomic_load(*ulockaddr, __ATOMIC_ACQUIRE) & LFUTEX_WAIT_LOCK_WAITERS))
@@ -152,7 +152,7 @@ futexlock_wake:([[nonnull]] lfutex_t *ulockaddr, $size_t max_wake) -> $ssize_t {
 
 [doc_alias(futexlock_wake)]
 [requires($has_function(futex_wakeall))]
-[dependency_include(<hybrid/__atomic.h>)]
+[impl_include("<hybrid/__atomic.h>")]
 [impl_include("<kos/bits/futex.h>")][decl_include("<bits/types.h>")]
 futexlock_wakeall:([[nonnull]] lfutex_t *ulockaddr) -> $ssize_t {
 	if (!(__hybrid_atomic_load(*ulockaddr, __ATOMIC_ACQUIRE) & LFUTEX_WAIT_LOCK_WAITERS))

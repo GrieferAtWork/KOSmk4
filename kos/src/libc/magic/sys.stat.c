@@ -555,13 +555,13 @@ $mode_t getumask() {
 
 %
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
-@@@param flags: Set of `0|AT_DOSPATH'
+@@@param flags: Set of `0 | AT_DOSPATH'
 [[cp]]
 int fmkdirat($fd_t dirfd,
              [[nonnull]] char const *pathname,
              $mode_t mode, $atflag_t flags);
 
-@@@param flags: Set of `0|AT_DOSPATH'
+@@@param flags: Set of `0 | AT_DOSPATH'
 [[cp]]
 int fmknodat($fd_t dirfd, [[nonnull]] char const *nodename,
              $mode_t mode, $dev_t dev, $atflag_t flags);

@@ -1564,9 +1564,7 @@ int daemon(int nochdir, int noclose);
 int revoke([[nonnull]] char const *file);
 
 %
-%/* ... */
-[[cp, section(".text.crt.fs.modify")]]
-int acct([[nullable]] char const *name);
+%[insert:extern(acct)]
 
 [[cp, section(".text.crt.system.utility")]]
 long int syscall(long int sysno, ...);

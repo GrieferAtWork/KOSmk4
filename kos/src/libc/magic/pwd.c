@@ -99,9 +99,6 @@ __NAMESPACE_STD_USING(FILE)
 
 }
 
-[[cp]] getpwuid:($uid_t uid) -> struct passwd *;
-[[cp]] getpwnam:([[nonnull]] char const *name) -> struct passwd *;
-
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 @@Rewind the password-file stream
 [[cp]] setpwent:();

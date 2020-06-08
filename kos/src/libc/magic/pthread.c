@@ -362,33 +362,34 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
 @@Create a new thread, starting with execution of START-ROUTINE
 @@getting passed ARG. Creation attributed come from ATTR. The new
 @@handle is stored in *NEWTHREAD
-[decl_include("<bits/pthreadtypes.h>")]
-[decl_prefix(
+[[decl_include("<bits/pthreadtypes.h>")]]
+[[decl_prefix(
 #ifndef ____pthread_start_routine_t_defined
 #define ____pthread_start_routine_t_defined 1
 typedef void *(*__pthread_start_routine_t)(void *);
 #endif /* !____pthread_start_routine_t_defined */
-)]
-pthread_create:([[nonnull]] pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr,
-                [[nonnull]] __pthread_start_routine_t start_routine, void *__restrict arg) -> int;
+)]]
+int pthread_create([[nonnull]] pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr,
+                   [[nonnull]] __pthread_start_routine_t start_routine, void *__restrict arg);
 
 %
 @@Terminate calling thread.
 @@The registered cleanup handlers are called via exception handling
-[throws()][ATTR_NORETURN] pthread_exit:(void *retval);
+[[throws, ATTR_NORETURN]]
+void pthread_exit(void *retval);
 
 %
 @@Make calling thread wait for termination of the thread THREAD. The
 @@exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
 @@is not NULL
-[decl_include("<bits/pthreadtypes.h>")]
-[[cp]] pthread_join:(pthread_t pthread, void **thread_return) -> int;
+[[cp, decl_include("<bits/pthreadtypes.h>")]]
+int pthread_join(pthread_t pthread, void **thread_return);
 
 %#ifdef __USE_GNU
 @@Check whether thread THREAD has terminated. If yes return the status of
 @@the thread in *THREAD_RETURN, if THREAD_RETURN is not NULL
-[decl_include("<bits/pthreadtypes.h>")]
-pthread_tryjoin_np:(pthread_t pthread, void **thread_return) -> int;
+[[decl_include("<bits/pthreadtypes.h>")]]
+int pthread_tryjoin_np(pthread_t pthread, void **thread_return);
 
 %
 %struct timespec;
@@ -396,32 +397,31 @@ pthread_tryjoin_np:(pthread_t pthread, void **thread_return) -> int;
 @@Make calling thread wait for termination of the thread THREAD, but only
 @@until TIMEOUT. The exit status of the thread is stored in
 @@*THREAD_RETURN, if THREAD_RETURN is not NULL.
-[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_timedjoin64_np)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_timedjoin_np)][[cp]]
-[decl_include("<bits/pthreadtypes.h>"), no_crt_self_import]
-[decl_include("<bits/timespec.h>")]
-[requires(defined(__CRT_HAVE_pthread_timedjoin_np) || defined(__CRT_HAVE_pthread_timedjoin64_np))]
-pthread_timedjoin_np:(pthread_t pthread, void **thread_return,
-                      struct timespec const *abstime) -> int {
-#ifdef __CRT_HAVE_pthread_timedjoin_np
+[[cp, decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("pthread_timedjoin64_np")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("pthread_timedjoin_np")]]
+[[userimpl, requires($has_function(pthread_timedjoin32_np) || $has_function(pthread_timedjoin64_np))]]
+int pthread_timedjoin_np(pthread_t pthread, void **thread_return,
+                         struct timespec const *abstime) {
+@@pp_if $has_function(pthread_timedjoin32_np)@@
 	int result;
 	struct timespec32 abstime32;
 	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
 	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_timedjoin32_np(pthread, thread_return, &abstime32);
 	return result;
-#else /* __CRT_HAVE_pthread_timedjoin_np */
+@@pp_else@@
 	int result;
 	struct timespec64 abstime64;
 	abstime64.tv_sec  = (time64_t)abstime->tv_sec;
 	abstime64.tv_nsec = abstime->tv_nsec;
 	result = pthread_timedjoin64_np(pthread, thread_return, &abstime32);
 	return result;
-#endif /* !__CRT_HAVE_pthread_timedjoin_np */
+@@pp_endif@@
 }
 
 %#ifdef __USE_TIME64
-[[cp, ignore, doc_alias(pthread_timedjoin_np), nocrt, alias(pthread_timedjoin_np)]]
+[[cp, ignore, doc_alias(pthread_timedjoin_np), nocrt, alias("pthread_timedjoin_np")]]
 [[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
 int pthread_timedjoin32_np(pthread_t pthread, void **thread_return,
                            struct timespec32 const *abstime);
@@ -430,8 +430,8 @@ int pthread_timedjoin32_np(pthread_t pthread, void **thread_return,
 [[cp, time64_variant_of(pthread_timedjoin_np)]]
 [[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
 [[userimpl, requires_function(pthread_timedjoin32_np)]]
-pthread_timedjoin64_np:(pthread_t pthread, void **thread_return,
-                        struct timespec64 const *abstime) -> int {
+int pthread_timedjoin64_np(pthread_t pthread, void **thread_return,
+                           struct timespec64 const *abstime) {
 	int result;
 	struct timespec32 abstime32;
 	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
@@ -447,14 +447,16 @@ pthread_timedjoin64_np:(pthread_t pthread, void **thread_return,
 @@Indicate that the thread THREAD is never to be joined with PTHREAD_JOIN.
 @@The resources of THREAD will therefore be freed immediately when it
 @@terminates, instead of waiting for another thread to perform PTHREAD_JOIN on it
-pthread_detach:(pthread_t pthread) -> int;
+int pthread_detach(pthread_t pthread);
 
 %
 @@Obtain the identifier of the current thread
-[export_alias(thrd_current)][[ATTR_CONST]] pthread_self:() -> pthread_t;
+[[ATTR_CONST, export_alias("thrd_current")]]
+pthread_t pthread_self();
 
 @@Compare two thread identifiers
-[[ATTR_CONST]] pthread_equal:(pthread_t pthread1, pthread_t pthread2) -> int {
+[[inline, ATTR_CONST]]
+int pthread_equal(pthread_t pthread1, pthread_t pthread2) {
 	return pthread1 == pthread2;
 }
 
@@ -463,70 +465,70 @@ pthread_detach:(pthread_t pthread) -> int;
 %
 @@Initialize thread attribute *ATTR with default attributes
 @@(detachstate is PTHREAD_JOINABLE, scheduling policy is SCHED_OTHER, no user-provided stack)
-pthread_attr_init:([[nonnull]] pthread_attr_t *attr) -> int;
+int pthread_attr_init([[nonnull]] pthread_attr_t *attr);
 
 %
 @@Destroy thread attribute *ATTR
-pthread_attr_destroy:([[nonnull]] pthread_attr_t *attr) -> int;
+int pthread_attr_destroy([[nonnull]] pthread_attr_t *attr);
 
 %
 @@Get detach state attribute
-pthread_attr_getdetachstate:([[nonnull]] pthread_attr_t const *attr, [[nonnull]] int *detachstate) -> int;
+int pthread_attr_getdetachstate([[nonnull]] pthread_attr_t const *attr, [[nonnull]] int *detachstate);
 
 %
 @@Set detach state attribute
-pthread_attr_setdetachstate:([[nonnull]] pthread_attr_t *attr, int detachstate) -> int;
+int pthread_attr_setdetachstate([[nonnull]] pthread_attr_t *attr, int detachstate);
 
 %
 @@Get the size of the guard area created for stack overflow protection
-pthread_attr_getguardsize:([[nonnull]] pthread_attr_t const *attr, [[nonnull]] size_t *guardsize) -> int;
+int pthread_attr_getguardsize([[nonnull]] pthread_attr_t const *attr, [[nonnull]] size_t *guardsize);
 
 %
 @@Set the size of the guard area created for stack overflow protection
-pthread_attr_setguardsize:([[nonnull]] pthread_attr_t *attr, size_t guardsize) -> int;
+int pthread_attr_setguardsize([[nonnull]] pthread_attr_t *attr, size_t guardsize);
 
 %
 @@Return in *PARAM the scheduling parameters of *ATTR
-pthread_attr_getschedparam:([[nonnull]] pthread_attr_t const *__restrict attr,
-                            [[nonnull]] struct sched_param *__restrict param) -> int;
+int pthread_attr_getschedparam([[nonnull]] pthread_attr_t const *__restrict attr,
+                               [[nonnull]] struct sched_param *__restrict param);
 
 %
 @@Set scheduling parameters (priority, etc) in *ATTR according to PARAM
-pthread_attr_setschedparam:([[nonnull]] pthread_attr_t *__restrict attr,
-                            [[nonnull]] struct sched_param const *__restrict param) -> int;
+int pthread_attr_setschedparam([[nonnull]] pthread_attr_t *__restrict attr,
+                               [[nonnull]] struct sched_param const *__restrict param);
 
 %
 @@Return in *POLICY the scheduling policy of *ATTR
-pthread_attr_getschedpolicy:([[nonnull]] pthread_attr_t const *__restrict attr,
-                             [[nonnull]] int *__restrict policy) -> int;
+int pthread_attr_getschedpolicy([[nonnull]] pthread_attr_t const *__restrict attr,
+                                [[nonnull]] int *__restrict policy);
 
 %
 @@Set scheduling policy in *ATTR according to POLICY
-pthread_attr_setschedpolicy:([[nonnull]] pthread_attr_t *attr, int policy) -> int;
+int pthread_attr_setschedpolicy([[nonnull]] pthread_attr_t *attr, int policy);
 
 %
 @@Return in *INHERIT the scheduling inheritance mode of *ATTR
-pthread_attr_getinheritsched:([[nonnull]] pthread_attr_t const *__restrict attr,
-                              [[nonnull]] int *__restrict inherit) -> int;
+int pthread_attr_getinheritsched([[nonnull]] pthread_attr_t const *__restrict attr,
+                                 [[nonnull]] int *__restrict inherit);
 
 %
 @@Set scheduling inheritance mode in *ATTR according to INHERIT
-pthread_attr_setinheritsched:([[nonnull]] pthread_attr_t *attr, int inherit) -> int;
+int pthread_attr_setinheritsched([[nonnull]] pthread_attr_t *attr, int inherit);
 
 %
 @@Return in *SCOPE the scheduling contention scope of *ATTR
-pthread_attr_getscope:([[nonnull]] pthread_attr_t const *__restrict attr,
-                       [[nonnull]] int *__restrict scope) -> int;
+int pthread_attr_getscope([[nonnull]] pthread_attr_t const *__restrict attr,
+                          [[nonnull]] int *__restrict scope);
 
 %
 @@Set scheduling contention scope in *ATTR according to SCOPE
-pthread_attr_setscope:([[nonnull]] pthread_attr_t *attr, int scope) -> int;
+int pthread_attr_setscope([[nonnull]] pthread_attr_t *attr, int scope);
 
 %
 @@Return the previously set address for the stack
-[ATTR_DEPRECATED_]
-pthread_attr_getstackaddr:([[nonnull]] pthread_attr_t const *__restrict attr,
-                           [[nonnull]] void **__restrict stackaddr) -> int;
+[[ATTR_DEPRECATED_]]
+int pthread_attr_getstackaddr([[nonnull]] pthread_attr_t const *__restrict attr,
+                              [[nonnull]] void **__restrict stackaddr);
 
 
 %
@@ -534,81 +536,84 @@ pthread_attr_getstackaddr:([[nonnull]] pthread_attr_t const *__restrict attr,
 @@Depending on whether the stack grows up or down the value must either
 @@be higher or lower than all the address in the memory block. The
 @@minimal size of the block must be PTHREAD_STACK_MIN
-[ATTR_DEPRECATED_]
-pthread_attr_setstackaddr:([[nonnull]] pthread_attr_t *attr, void *stackaddr) -> int;
+[[ATTR_DEPRECATED_]]
+int pthread_attr_setstackaddr([[nonnull]] pthread_attr_t *attr, void *stackaddr);
 
 %
 @@Return the currently used minimal stack size
-pthread_attr_getstacksize:([[nonnull]] pthread_attr_t const *__restrict attr,
-                           [[nonnull]] size_t *__restrict stacksize) -> int;
+int pthread_attr_getstacksize([[nonnull]] pthread_attr_t const *__restrict attr,
+                              [[nonnull]] size_t *__restrict stacksize);
 
 %
 @@Add information about the minimum stack size needed for the thread
 @@to be started. This size must never be less than PTHREAD_STACK_MIN
 @@and must also not exceed the system limits
-pthread_attr_setstacksize:([[nonnull]] pthread_attr_t *attr, size_t stacksize) -> int;
+int pthread_attr_setstacksize([[nonnull]] pthread_attr_t *attr, size_t stacksize);
 
 %#ifdef __USE_XOPEN2K
 @@Return the previously set address for the stack
-pthread_attr_getstack:([[nonnull]] pthread_attr_t const *__restrict attr,
-                       [[nonnull]] void **__restrict stackaddr,
-                       [[nonnull]] size_t *__restrict stacksize) -> int;
+int pthread_attr_getstack([[nonnull]] pthread_attr_t const *__restrict attr,
+                          [[nonnull]] void **__restrict stackaddr,
+                          [[nonnull]] size_t *__restrict stacksize);
 
 %
 @@The following two interfaces are intended to replace the last two. They
 @@require setting the address as well as the size since only setting the
 @@address will make the implementation on some architectures impossible
-pthread_attr_setstack:([[nonnull]] pthread_attr_t *attr, void *stackaddr, size_t stacksize) -> int;
+int pthread_attr_setstack([[nonnull]] pthread_attr_t *attr, void *stackaddr, size_t stacksize);
 %#endif /* __USE_XOPEN2K */
 
 %#ifdef __USE_GNU
 @@Thread created with attribute ATTR will be limited to run only on
 @@the processors represented in CPUSET
-pthread_attr_setaffinity_np:([[nonnull]] pthread_attr_t *attr, size_t cpusetsize,
-                             [[nonnull]] cpu_set_t const *cpuset) -> int;
+int pthread_attr_setaffinity_np([[nonnull]] pthread_attr_t *attr, size_t cpusetsize,
+                                [[nonnull]] cpu_set_t const *cpuset);
 
 %
 @@Get bit set in CPUSET representing the processors threads created with ATTR can run on
-pthread_attr_getaffinity_np:([[nonnull]] pthread_attr_t const *attr, size_t cpusetsize,
-                             [[nonnull]] cpu_set_t *cpuset) -> int;
+int pthread_attr_getaffinity_np([[nonnull]] pthread_attr_t const *attr, size_t cpusetsize,
+                                [[nonnull]] cpu_set_t *cpuset);
 
 %
 @@Get the default attributes used by pthread_create in this process
-pthread_getattr_default_np:([[nonnull]] pthread_attr_t *attr) -> int;
+int pthread_getattr_default_np([[nonnull]] pthread_attr_t *attr);
 
 %
 @@Set the default attributes to be used by pthread_create in this process
-pthread_setattr_default_np:([[nonnull]] pthread_attr_t const *attr) -> int;
+int pthread_setattr_default_np([[nonnull]] pthread_attr_t const *attr);
 
 %
 @@Initialize thread attribute *ATTR with attributes corresponding to the
 @@already running thread THREAD. It shall be called on uninitialized ATTR
 @@and destroyed with pthread_attr_destroy when no longer needed
-pthread_getattr_np:(pthread_t pthread, [[nonnull]] pthread_attr_t *attr) -> int;
+int pthread_getattr_np(pthread_t pthread, [[nonnull]] pthread_attr_t *attr);
 %#endif /* __USE_GNU */
 
 %
 %/* Functions for scheduling control. */
 %
 @@Set the scheduling parameters for TARGET_THREAD according to POLICY and *PARAM
-pthread_setschedparam:(pthread_t target_thread, int policy, [[nonnull]] struct sched_param const *param) -> int;
+int pthread_setschedparam(pthread_t target_thread, int policy,
+                          [[nonnull]] struct sched_param const *param);
 
 %
 @@Return in *POLICY and *PARAM the scheduling parameters for TARGET_THREAD
-pthread_getschedparam:(pthread_t target_thread, [[nonnull]] int *__restrict policy, [[nonnull]] struct sched_param *__restrict param) -> int;
+int pthread_getschedparam(pthread_t target_thread,
+                          [[nonnull]] int *__restrict policy,
+                          [[nonnull]] struct sched_param *__restrict param);
 
 %
 @@Set the scheduling priority for TARGET_THREAD
-pthread_setschedprio:(pthread_t target_thread, int prio) -> int;
+int pthread_setschedprio(pthread_t target_thread, int prio);
 
 
 %#ifdef __USE_GNU
 @@Get thread name visible in the kernel and its interfaces
-pthread_getname_np:(pthread_t target_thread, [[outp(buflen)]] char *buf, size_t buflen) -> int;
+int pthread_getname_np(pthread_t target_thread, [[outp(buflen)]] char *buf, size_t buflen);
 
 %
 @@Set thread name visible in the kernel and its interfaces
-pthread_setname_np:(pthread_t target_thread, [[nonnull]] const char *name) -> int;
+int pthread_setname_np(pthread_t target_thread, [[nonnull]] const char *name);
 %#endif /* __USE_GNU */
 
 
@@ -616,17 +621,18 @@ pthread_setname_np:(pthread_t target_thread, [[nonnull]] const char *name) -> in
 @@Return the TID of the given `target_thread'
 @@If the given `target_thread' has already terminated, 0 is returned
 [[guard, ATTR_WUNUSED, ATTR_CONST]]
-pthread_gettid_np:(pthread_t target_thread) -> $pid_t;
+$pid_t pthread_gettid_np(pthread_t target_thread);
 %#endif /* __USE_KOS */
 
 
 %#ifdef __USE_UNIX98
 @@Determine level of concurrency
-[[ATTR_PURE]] pthread_getconcurrency:() -> int;
+[[ATTR_PURE]]
+int pthread_getconcurrency();
 
 %
 @@Set new concurrency level to LEVEL
-pthread_setconcurrency:(int level) -> int;
+int pthread_setconcurrency(int level);
 %#endif /* __USE_UNIX98 */
 
 %#ifdef __USE_GNU
@@ -634,15 +640,17 @@ pthread_setconcurrency:(int level) -> int;
 @@This function is similar to the POSIX `sched_yield' function but
 @@might be differently implemented in the case of a m-on-n thread
 @@implementation
-[alias(sched_yield, thrd_yield)] pthread_yield:() -> int;
+pthread_yield(*) = sched_yield;
 
 %
 @@Limit specified thread THREAD to run only on the processors represented in CPUSET
-pthread_setaffinity_np:(pthread_t pthread, size_t cpusetsize, [[nonnull]] cpu_set_t const *cpuset) -> int;
+int pthread_setaffinity_np(pthread_t pthread, size_t cpusetsize,
+                           [[nonnull]] cpu_set_t const *cpuset);
 
 %
 @@Get bit set in CPUSET representing the processors THREAD can run on
-pthread_getaffinity_np:(pthread_t pthread, size_t cpusetsize, [[nonnull]] cpu_set_t *cpuset) -> int;
+int pthread_getaffinity_np(pthread_t pthread, size_t cpusetsize,
+                           [[nonnull]] cpu_set_t *cpuset);
 %#endif /* __USE_GNU */
 
 
@@ -657,9 +665,9 @@ pthread_getaffinity_np:(pthread_t pthread, size_t cpusetsize, [[nonnull]] cpu_se
 @@only once, even if pthread_once is executed several times with the
 @@same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
 @@extern variable initialized to PTHREAD_ONCE_INIT.
-[[throws]][export_alias(call_once)]
-pthread_once:([[nonnull]] pthread_once_t *once_control,
-              [[nonnull]] __pthread_once_routine_t init_routine) -> int;
+[[throws, export_alias("call_once")]]
+int pthread_once([[nonnull]] pthread_once_t *once_control,
+                 [[nonnull]] __pthread_once_routine_t init_routine);
 
 %
 %/* Functions for handling cancellation.
@@ -671,21 +679,22 @@ pthread_once:([[nonnull]] pthread_once_t *once_control,
 %
 @@Set cancelability state of current thread to STATE,
 @@returning old state in *OLDSTATE if OLDSTATE is not NULL
-pthread_setcancelstate:(int state, [[nullable]] int *oldstate) -> int;
+int pthread_setcancelstate(int state, [[nullable]] int *oldstate);
 
 %
 @@Set cancellation state of current thread to TYPE, returning the old
 @@type in *OLDTYPE if OLDTYPE is not NULL
-[[guard]] pthread_setcanceltype:(int type, [[nullable]] int *oldtype) -> int;
+[[guard]]
+int pthread_setcanceltype(int type, [[nullable]] int *oldtype);
 
 %
 @@Cancel THREAD immediately or at the next possibility
-pthread_cancel:(pthread_t pthread) -> int;
+int pthread_cancel(pthread_t pthread);
 
 %
 @@Test for pending cancellation for the current thread and terminate
 @@the thread as per pthread_exit(PTHREAD_CANCELED) if it has been canceled
-[[cp]] pthread_testcancel:();
+[[cp]] void pthread_testcancel();
 
 %
 %/* Cancellation handling with integration into exception handling. */
@@ -779,9 +788,9 @@ public:
 @@Function called to call the cleanup handler. As an extern inline
 @@function the compiler is free to decide inlining the change when
 @@needed or fall back on the copy which must exist somewhere else
-__pthread_cleanup_routine:([[nonnull]] struct __pthread_cleanup_frame *frame) {
-	if (frame->@__do_it@)
-		(*frame->@__cancel_routine)@(frame->@__cancel_arg@);
+void __pthread_cleanup_routine([[nonnull]] struct __pthread_cleanup_frame *frame) {
+	if (frame->__do_it)
+		(*frame->__cancel_routine@(frame->__cancel_arg);
 }
 
 %{
@@ -869,8 +878,8 @@ __pthread_register_cancel:(__pthread_unwind_buf_t *buf);
 %			(*__cancel_routine)(__cancel_arg);                                 \
 %	} __WHILE0
 
-[attribute(@__cleanup_fct_attribute@)]
-__pthread_unregister_cancel:([[nonnull]] __pthread_unwind_buf_t *buf);
+[[attribute(@__cleanup_fct_attribute@)]]
+void __pthread_unregister_cancel([[nonnull]] __pthread_unwind_buf_t *buf);
 
 %#ifdef __USE_GNU
 %/* Install a cleanup handler as pthread_cleanup_push does, but also
@@ -890,8 +899,8 @@ __pthread_unregister_cancel:([[nonnull]] __pthread_unwind_buf_t *buf);
 %		__pthread_register_cancel_defer(&__cancel_buf);                                                       \
 %		do {
 
-[attribute(@__cleanup_fct_attribute@)]
-__pthread_register_cancel_defer:([[nonnull]] __pthread_unwind_buf_t *buf);
+[[attribute(@__cleanup_fct_attribute@)]]
+void __pthread_register_cancel_defer([[nonnull]] __pthread_unwind_buf_t *buf);
 
 %/* Remove a cleanup handler as pthread_cleanup_pop does, but also
 % * restores the cancellation type that was in effect when the matching
@@ -905,14 +914,14 @@ __pthread_register_cancel_defer:([[nonnull]] __pthread_unwind_buf_t *buf);
 %			(*__cancel_routine)(__cancel_arg);                                 \
 %	} __WHILE0
 
-[attribute(@__cleanup_fct_attribute@)]
-__pthread_unregister_cancel_restore:([[nonnull]] __pthread_unwind_buf_t *buf);
+[[attribute(@__cleanup_fct_attribute@)]]
+void __pthread_unregister_cancel_restore([[nonnull]] __pthread_unwind_buf_t *buf);
 %#endif /* __USE_GNU */
 
 @@Internal interface to initiate cleanup
-[ATTR_WEAK] /* XXX:[if(!defined(SHARED)), ATTR_WEAK] */
-[attribute(@__cleanup_fct_attribute@)][ATTR_NORETURN]
-__pthread_unwind_next:([[nonnull]] __pthread_unwind_buf_t *buf);
+[[ATTR_WEAK]] /* XXX:[if(!defined(SHARED)), ATTR_WEAK] */
+[[attribute(@__cleanup_fct_attribute@), ATTR_NORETURN]]
+void __pthread_unwind_next([[nonnull]] __pthread_unwind_buf_t *buf);
 
 %#endif /* !__GNUC__ || !__EXCEPTIONS */
 
@@ -931,42 +940,41 @@ int pthread_mutex_init([[nonnull]] pthread_mutex_t *mutex,
 
 %
 @@Destroy a mutex
-[export_alias(mtx_destroy)]
-pthread_mutex_destroy:([[nonnull]] pthread_mutex_t *mutex) -> int;
+[[export_alias("mtx_destroy")]]
+int pthread_mutex_destroy([[nonnull]] pthread_mutex_t *mutex);
 
 %
 @@Try locking a mutex
-pthread_mutex_trylock:([[nonnull]] pthread_mutex_t *mutex) -> int;
+int pthread_mutex_trylock([[nonnull]] pthread_mutex_t *mutex);
 
 %
 @@Lock a mutex
-pthread_mutex_lock:([[nonnull]] pthread_mutex_t *mutex) -> int;
+int pthread_mutex_lock([[nonnull]] pthread_mutex_t *mutex);
 
 %
 %#ifdef __USE_XOPEN2K
 @@Wait until lock becomes available, or specified time passes
-[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_mutex_timedlock64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_mutex_timedlock)][[cp]]
-[decl_include("<bits/pthreadtypes.h>"), no_crt_self_import]
-[decl_include("<bits/timespec.h>")]
-[requires(defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64))]
-pthread_mutex_timedlock:([[nonnull]] pthread_mutex_t *__restrict mutex,
-                         [[nonnull]] struct timespec const *__restrict abstime) -> int {
-#ifdef __CRT_HAVE_pthread_mutex_timedlock
+[[cp, decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_mutex_timedlock64)]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_mutex_timedlock)]]
+[[userimpl, requires($has_function(pthread_mutex_timedlock32) || $has_function(pthread_mutex_timedlock64))]]
+int pthread_mutex_timedlock([[nonnull]] pthread_mutex_t *__restrict mutex,
+                            [[nonnull]] struct timespec const *__restrict abstime) {
+@@pp_if $has_function(pthread_mutex_timedlock32)@@
 	int result;
 	struct timespec32 abstime32;
 	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
 	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_mutex_timedlock32(mutex, &abstime32);
 	return result;
-#else /* __CRT_HAVE_pthread_mutex_timedlock */
+@@pp_else@@
 	int result;
 	struct timespec64 abstime64;
 	abstime64.tv_sec  = (time64_t)abstime->tv_sec;
 	abstime64.tv_nsec = abstime->tv_nsec;
 	result = pthread_mutex_timedlock64(mutex, &abstime64);
 	return result;
-#endif /* !__CRT_HAVE_pthread_mutex_timedlock */
+@@pp_endif@@
 }
 
 %#ifdef __USE_TIME64
@@ -993,25 +1001,25 @@ int pthread_mutex_timedlock64([[nonnull]] pthread_mutex_t *__restrict mutex,
 
 %
 @@Unlock a mutex
-pthread_mutex_unlock:([[nonnull]] pthread_mutex_t *mutex) -> int;
+int pthread_mutex_unlock([[nonnull]] pthread_mutex_t *mutex);
 
 %
 @@Get the priority ceiling of MUTEX
-pthread_mutex_getprioceiling:([[nonnull]] pthread_mutex_t const *__restrict mutex,
-                              [[nonnull]] int *__restrict prioceiling) -> int;
+int pthread_mutex_getprioceiling([[nonnull]] pthread_mutex_t const *__restrict mutex,
+                                 [[nonnull]] int *__restrict prioceiling);
 
 %
 @@Set the priority ceiling of MUTEX to PRIOCEILING, return old
 @@priority ceiling value in *OLD_CEILING
-pthread_mutex_setprioceiling:([[nonnull]] pthread_mutex_t *__restrict mutex, int prioceiling,
-                              [[nonnull]] int *__restrict old_ceiling) -> int;
+int pthread_mutex_setprioceiling([[nonnull]] pthread_mutex_t *__restrict mutex, int prioceiling,
+                                 [[nonnull]] int *__restrict old_ceiling);
 
 %
 %#ifdef __USE_XOPEN2K8
 @@Declare the state protected by MUTEX as consistent
-pthread_mutex_consistent:([[nonnull]] pthread_mutex_t *mutex) -> int;
+int pthread_mutex_consistent([[nonnull]] pthread_mutex_t *mutex);
 %#ifdef __USE_GNU
-pthread_mutex_consistent_np:([[nonnull]] pthread_mutex_t *mutex) -> int;
+int pthread_mutex_consistent_np([[nonnull]] pthread_mutex_t *mutex);
 %#endif /* __USE_GNU */
 %#endif /* __USE_XOPEN2K8 */
 
@@ -1021,69 +1029,69 @@ pthread_mutex_consistent_np:([[nonnull]] pthread_mutex_t *mutex) -> int;
 
 %
 @@Initialize mutex attribute object ATTR with default attributes (kind is PTHREAD_MUTEX_TIMED_NP)
-pthread_mutexattr_init:([[nonnull]] pthread_mutexattr_t *attr) -> int;
+int pthread_mutexattr_init([[nonnull]] pthread_mutexattr_t *attr);
 
 
 %
 @@Destroy mutex attribute object ATTR
-pthread_mutexattr_destroy:([[nonnull]] pthread_mutexattr_t *attr) -> int;
+int pthread_mutexattr_destroy([[nonnull]] pthread_mutexattr_t *attr);
 
 %
 @@Get the process-shared flag of the mutex attribute ATTR
-pthread_mutexattr_getpshared:([[nonnull]] pthread_mutexattr_t const *__restrict attr,
-                              [[nonnull]] int *__restrict pshared) -> int;
+int pthread_mutexattr_getpshared([[nonnull]] pthread_mutexattr_t const *__restrict attr,
+                                 [[nonnull]] int *__restrict pshared);
 
 %
 @@Set the process-shared flag of the mutex attribute ATTR
-pthread_mutexattr_setpshared:([[nonnull]] pthread_mutexattr_t *attr, int pshared) -> int;
+int pthread_mutexattr_setpshared([[nonnull]] pthread_mutexattr_t *attr, int pshared);
 
 
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 @@Return in *KIND the mutex kind attribute in *ATTR
-pthread_mutexattr_gettype:([[nonnull]] pthread_mutexattr_t const *__restrict attr,
-                           [[nonnull]] int *__restrict kind) -> int;
+int pthread_mutexattr_gettype([[nonnull]] pthread_mutexattr_t const *__restrict attr,
+                              [[nonnull]] int *__restrict kind);
 
 %
 @@Set the mutex kind attribute in *ATTR to KIND (either PTHREAD_MUTEX_NORMAL,
 @@PTHREAD_MUTEX_RECURSIVE, PTHREAD_MUTEX_ERRORCHECK, or PTHREAD_MUTEX_DEFAULT)
-pthread_mutexattr_settype:([[nonnull]] pthread_mutexattr_t *attr, int kind) -> int;
+int pthread_mutexattr_settype([[nonnull]] pthread_mutexattr_t *attr, int kind);
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
 %
 @@Return in *PROTOCOL the mutex protocol attribute in *ATTR
-pthread_mutexattr_getprotocol:([[nonnull]] pthread_mutexattr_t const *__restrict attr,
-                               [[nonnull]] int *__restrict protocol) -> int;
+int pthread_mutexattr_getprotocol([[nonnull]] pthread_mutexattr_t const *__restrict attr,
+                                  [[nonnull]] int *__restrict protocol);
 
 %
 @@Set the mutex protocol attribute in *ATTR to PROTOCOL (either
 @@PTHREAD_PRIO_NONE, PTHREAD_PRIO_INHERIT, or PTHREAD_PRIO_PROTECT)
-pthread_mutexattr_setprotocol:([[nonnull]] pthread_mutexattr_t *attr, int protocol) -> int;
+int pthread_mutexattr_setprotocol([[nonnull]] pthread_mutexattr_t *attr, int protocol);
 
 %
 @@Return in *PRIOCEILING the mutex prioceiling attribute in *ATTR
-pthread_mutexattr_getprioceiling:([[nonnull]] pthread_mutexattr_t const *__restrict attr,
-                                  [[nonnull]] int *__restrict prioceiling) -> int;
+int pthread_mutexattr_getprioceiling([[nonnull]] pthread_mutexattr_t const *__restrict attr,
+                                     [[nonnull]] int *__restrict prioceiling);
 
 %
 @@Set the mutex prioceiling attribute in *ATTR to PRIOCEILING
-pthread_mutexattr_setprioceiling:([[nonnull]] pthread_mutexattr_t *attr, int prioceiling) -> int;
+int pthread_mutexattr_setprioceiling([[nonnull]] pthread_mutexattr_t *attr, int prioceiling);
 
 %
 %#ifdef __USE_XOPEN2K
 @@Get the robustness flag of the mutex attribute ATTR
-pthread_mutexattr_getrobust:([[nonnull]] pthread_mutexattr_t const *attr,
-                             [[nonnull]] int *robustness) -> int;
+int pthread_mutexattr_getrobust([[nonnull]] pthread_mutexattr_t const *attr,
+                                [[nonnull]] int *robustness);
 
 %
 @@Set the robustness flag of the mutex attribute ATTR
-pthread_mutexattr_setrobust:([[nonnull]] pthread_mutexattr_t *attr, int robustness) -> int;
+int pthread_mutexattr_setrobust([[nonnull]] pthread_mutexattr_t *attr, int robustness);
 
 %
 %#ifdef __USE_GNU
-pthread_mutexattr_getrobust_np:([[nonnull]] pthread_mutexattr_t const *attr,
-                                [[nonnull]] int *robustness) -> int;
-pthread_mutexattr_setrobust_np:([[nonnull]] pthread_mutexattr_t *attr, int robustness) -> int;
+int pthread_mutexattr_getrobust_np([[nonnull]] pthread_mutexattr_t const *attr,
+                                   [[nonnull]] int *robustness);
+int pthread_mutexattr_setrobust_np([[nonnull]] pthread_mutexattr_t *attr, int robustness);
 %#endif /* __USE_GNU */
 %#endif /* __USE_XOPEN2K */
 
@@ -1095,58 +1103,60 @@ pthread_mutexattr_setrobust_np:([[nonnull]] pthread_mutexattr_t *attr, int robus
 %
 @@Initialize read-write lock RWLOCK using attributes ATTR,
 @@or use the default values if later is NULL
-pthread_rwlock_init:([[nonnull]] pthread_rwlock_t *__restrict rwlock, pthread_rwlockattr_t const *__restrict attr) -> int;
+int pthread_rwlock_init([[nonnull]] pthread_rwlock_t *__restrict rwlock,
+                        pthread_rwlockattr_t const *__restrict attr);
 
 %
 @@Destroy read-write lock RWLOCK
-pthread_rwlock_destroy:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
+int pthread_rwlock_destroy([[nonnull]] pthread_rwlock_t *rwlock);
 
 %
 @@Acquire read lock for RWLOCK
-[[cp]] pthread_rwlock_rdlock:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
+[[cp]]
+int pthread_rwlock_rdlock([[nonnull]] pthread_rwlock_t *rwlock);
 
 %
 @@Try to acquire read lock for RWLOCK
-pthread_rwlock_tryrdlock:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
+int pthread_rwlock_tryrdlock([[nonnull]] pthread_rwlock_t *rwlock);
 
 %
 %#ifdef __USE_XOPEN2K
 
 @@Try to acquire read lock for RWLOCK or return after specfied time
-[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_rwlock_timedrdlock64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_rwlock_timedrdlock)]
-[decl_include("<bits/pthreadtypes.h>"), no_crt_self_import]
-[decl_include("<bits/timespec.h>")][[cp]]
-[requires(defined(__CRT_HAVE_pthread_rwlock_timedrdlock) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock64))]
+[[cp, no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_timedrdlock64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_timedrdlock")]]
+[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[userimpl, requires($has_function(pthread_rwlock_timedrdlock32) || $has_function(pthread_rwlock_timedrdlock64))]]
 pthread_rwlock_timedrdlock:([[nonnull]] pthread_rwlock_t *__restrict rwlock,
                             [[nonnull]] struct timespec const *__restrict abstime) -> int {
-#ifdef __CRT_HAVE_pthread_rwlock_timedrdlock
+@@pp_if $has_function(pthread_rwlock_timedrdlock32)@@
 	int result;
 	struct timespec32 abstime32;
 	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
 	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_rwlock_timedrdlock32(rwlock, &abstime32);
 	return result;
-#else /* __CRT_HAVE_pthread_rwlock_timedrdlock */
+@@pp_else@@
 	int result;
 	struct timespec64 abstime64;
 	abstime64.tv_sec  = (time64_t)abstime->tv_sec;
 	abstime64.tv_nsec = abstime->tv_nsec;
 	result = pthread_rwlock_timedrdlock64(rwlock, &abstime32);
 	return result;
-#endif /* !__CRT_HAVE_pthread_rwlock_timedrdlock */
+@@pp_endif@@
 }
 
 %#ifdef __USE_TIME64
 
-[[cp, doc_alias(pthread_rwlock_timedrdlock), ignore, nocrt, alias(pthread_rwlock_timedrdlock)]]
+[[cp, doc_alias("pthread_rwlock_timedrdlock"), ignore, nocrt, alias("pthread_rwlock_timedrdlock")]]
 [[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
 int pthread_rwlock_timedrdlock32([[nonnull]] pthread_rwlock_t *__restrict rwlock,
                                  [[nonnull]] struct timespec32 const *__restrict abstime);
 
-[[cp, doc_alias(pthread_rwlock_timedrdlock), time64_variant_of(pthread_rwlock_timedrdlock)]]
+[[cp, doc_alias("pthread_rwlock_timedrdlock"), time64_variant_of(pthread_rwlock_timedrdlock)]]
 [[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
-[[userimpl, requires($has_function(pthread_rwlock_timedrdlock32))]]
+[[userimpl, requires_function(pthread_rwlock_timedrdlock32)]]
 int pthread_rwlock_timedrdlock64([[nonnull]] pthread_rwlock_t *__restrict rwlock,
                                  [[nonnull]] struct timespec64 const *__restrict abstime) {
 	int result;
@@ -1163,38 +1173,39 @@ int pthread_rwlock_timedrdlock64([[nonnull]] pthread_rwlock_t *__restrict rwlock
 
 %
 @@Acquire write lock for RWLOCK
-[[cp]] pthread_rwlock_wrlock:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
+[[cp]]
+int pthread_rwlock_wrlock([[nonnull]] pthread_rwlock_t *rwlock);
 
 %
 @@Try to acquire write lock for RWLOCK
-pthread_rwlock_trywrlock:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
+int pthread_rwlock_trywrlock([[nonnull]] pthread_rwlock_t *rwlock);
 
 %
 %#ifdef __USE_XOPEN2K
 
 @@Try to acquire write lock for RWLOCK or return after specfied time
-[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_rwlock_timedwrlock64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_rwlock_timedwrlock)]
-[decl_include("<bits/pthreadtypes.h>"), no_crt_self_import]
-[decl_include("<bits/timespec.h>")][[cp]]
-[requires(defined(__CRT_HAVE_pthread_rwlock_timedwrlock) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock64))]
-pthread_rwlock_timedwrlock:([[nonnull]] pthread_rwlock_t *__restrict rwlock,
-                            [[nonnull]] struct timespec const *__restrict abstime) -> int {
-#ifdef __CRT_HAVE_pthread_rwlock_timedwrlock
+[[cp, no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_timedwrlock64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_timedwrlock")]]
+[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[userimpl, requires($has_function(pthread_rwlock_timedwrlock32) || $has_function(pthread_rwlock_timedwrlock64))]]
+int pthread_rwlock_timedwrlock([[nonnull]] pthread_rwlock_t *__restrict rwlock,
+                               [[nonnull]] struct timespec const *__restrict abstime) {
+@@pp_if $has_function(pthread_rwlock_timedwrlock32)@@
 	int result;
 	struct timespec32 abstime32;
 	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
 	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_rwlock_timedwrlock32(rwlock, &abstime32);
 	return result;
-#else /* __CRT_HAVE_pthread_rwlock_timedwrlock */
+@@pp_else@@
 	int result;
 	struct timespec64 abstime64;
 	abstime64.tv_sec  = (time64_t)abstime->tv_sec;
 	abstime64.tv_nsec = abstime->tv_nsec;
 	result = pthread_rwlock_timedwrlock64(rwlock, &abstime32);
 	return result;
-#endif /* !__CRT_HAVE_pthread_rwlock_timedwrlock */
+@@pp_endif@@
 }
 
 %#ifdef __USE_TIME64
@@ -1229,29 +1240,29 @@ pthread_rwlock_unlock:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
 
 %
 @@Initialize attribute object ATTR with default values
-pthread_rwlockattr_init:([[nonnull]] pthread_rwlockattr_t *attr) -> int;
+int pthread_rwlockattr_init([[nonnull]] pthread_rwlockattr_t *attr);
 
 %
 @@Destroy attribute object ATTR
-pthread_rwlockattr_destroy:([[nonnull]] pthread_rwlockattr_t *attr) -> int;
+int pthread_rwlockattr_destroy([[nonnull]] pthread_rwlockattr_t *attr);
 
 %
 @@Return current setting of process-shared attribute of ATTR in PSHARED
-pthread_rwlockattr_getpshared:([[nonnull]] pthread_rwlockattr_t const *__restrict attr,
-                               [[nonnull]] int *__restrict pshared) -> int;
+int pthread_rwlockattr_getpshared([[nonnull]] pthread_rwlockattr_t const *__restrict attr,
+                                  [[nonnull]] int *__restrict pshared);
 
 %
 @@Set process-shared attribute of ATTR to PSHARED
-pthread_rwlockattr_setpshared:([[nonnull]] pthread_rwlockattr_t *attr, int pshared) -> int;
+int pthread_rwlockattr_setpshared([[nonnull]] pthread_rwlockattr_t *attr, int pshared);
 
 %
 @@Return current setting of reader/writer preference
-pthread_rwlockattr_getkind_np:([[nonnull]] pthread_rwlockattr_t const *__restrict attr,
-                               [[nonnull]] int *__restrict pref) -> int;
+int pthread_rwlockattr_getkind_np([[nonnull]] pthread_rwlockattr_t const *__restrict attr,
+                                  [[nonnull]] int *__restrict pref);
 
 %
 @@Set reader/write preference
-pthread_rwlockattr_setkind_np:([[nonnull]] pthread_rwlockattr_t *attr, int pref) -> int;
+int pthread_rwlockattr_setkind_np([[nonnull]] pthread_rwlockattr_t *attr, int pref);
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 %
@@ -1260,68 +1271,69 @@ pthread_rwlockattr_setkind_np:([[nonnull]] pthread_rwlockattr_t *attr, int pref)
 %
 @@Initialize condition variable COND using attributes ATTR, or use
 @@the default values if later is NULL
-pthread_cond_init:([[nonnull]] pthread_cond_t *__restrict cond,
-                   [[nullable]] pthread_condattr_t const *__restrict cond_attr) -> int;
+int pthread_cond_init([[nonnull]] pthread_cond_t *__restrict cond,
+                      [[nullable]] pthread_condattr_t const *__restrict cond_attr);
 
 %
 @@Destroy condition variable COND
 [export_alias(cnd_destroy)]
-pthread_cond_destroy:([[nonnull]] pthread_cond_t *cond) -> int;
+int pthread_cond_destroy([[nonnull]] pthread_cond_t *cond);
 
 %
 @@Wake up one thread waiting for condition variable COND
-pthread_cond_signal:([[nonnull]] pthread_cond_t *cond) -> int;
+int pthread_cond_signal([[nonnull]] pthread_cond_t *cond);
 
 %
 @@Wake up all threads waiting for condition variables COND
-pthread_cond_broadcast:([[nonnull]] pthread_cond_t *cond) -> int;
+int pthread_cond_broadcast([[nonnull]] pthread_cond_t *cond);
 
 %
 @@Wait for condition variable COND to be signaled or broadcast.
 @@MUTEX is assumed to be locked before.
-[[cp]] pthread_cond_wait:([[nonnull]] pthread_cond_t *__restrict cond,
-                        [[nonnull]] pthread_mutex_t *__restrict mutex) -> int;
+[[cp]]
+int pthread_cond_wait([[nonnull]] pthread_cond_t *__restrict cond,
+                      [[nonnull]] pthread_mutex_t *__restrict mutex);
 
 %
 @@Wait for condition variable COND to be signaled or broadcast until
 @@ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
 @@absolute time specification; zero is the beginning of the epoch
 @@(00:00:00 GMT, January 1, 1970).
-[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_cond_timedwait64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_cond_timedwait)][[cp]]
-[decl_include("<bits/pthreadtypes.h>"), no_crt_self_import]
-[decl_include("<bits/timespec.h>")]
-[requires(defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64))]
-pthread_cond_timedwait:([[nonnull]] pthread_cond_t *__restrict cond,
-                        [[nonnull]] pthread_mutex_t *__restrict mutex,
-                        [[nonnull]] struct timespec const *__restrict abstime) -> int {
-#ifdef __CRT_HAVE_pthread_cond_timedwait
+[[cp, no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_cond_timedwait64)]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_cond_timedwait)]]
+[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[userimpl, requires($has_function(pthread_cond_timedwait32) || $has_function(pthread_cond_timedwait64))]]
+int pthread_cond_timedwait([[nonnull]] pthread_cond_t *__restrict cond,
+                           [[nonnull]] pthread_mutex_t *__restrict mutex,
+                           [[nonnull]] struct timespec const *__restrict abstime) {
+@@pp_if $has_function(pthread_cond_timedwait32)@@
 	int result;
 	struct timespec32 abstime32;
 	abstime32.tv_sec  = (time32_t)abstime->tv_sec;
 	abstime32.tv_nsec = abstime->tv_nsec;
 	result = pthread_cond_timedwait32(cond, mutex, &abstime32);
 	return result;
-#else /* __CRT_HAVE_pthread_cond_timedwait */
+@@pp_else@@
 	int result;
 	struct timespec64 abstime64;
 	abstime64.tv_sec  = (time64_t)abstime->tv_sec;
 	abstime64.tv_nsec = abstime->tv_nsec;
 	result = pthread_cond_timedwait64(cond, mutex, &abstime64);
 	return result;
-#endif /* !__CRT_HAVE_pthread_cond_timedwait */
+@@pp_endif@@
 }
 
 %#ifdef __USE_TIME64
 [[cp, ignore, nocrt, alias("pthread_cond_timedwait")]]
 [[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
 int pthread_cond_timedwait32([[nonnull]] pthread_cond_t *__restrict cond,
-                              [[nonnull]] pthread_mutex_t *__restrict mutex,
-                              [[nonnull]] struct timespec32 const *__restrict abstime);
+                             [[nonnull]] pthread_mutex_t *__restrict mutex,
+                             [[nonnull]] struct timespec32 const *__restrict abstime);
 
 [[cp, doc_alias("pthread_cond_timedwait"), time64_variant_of(pthread_cond_timedwait)]]
 [[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
-[[userimpl, requires($has_function(pthread_cond_timedwait32))]]
+[[userimpl, requires_function(pthread_cond_timedwait32)]]
 int pthread_cond_timedwait64([[nonnull]] pthread_cond_t *__restrict cond,
                              [[nonnull]] pthread_mutex_t *__restrict mutex,
                              [[nonnull]] struct timespec64 const *__restrict abstime) {
@@ -1341,30 +1353,30 @@ int pthread_cond_timedwait64([[nonnull]] pthread_cond_t *__restrict cond,
 
 %
 @@Initialize condition variable attribute ATTR
-pthread_condattr_init:([[nonnull]] pthread_condattr_t *attr) -> int;
+int pthread_condattr_init([[nonnull]] pthread_condattr_t *attr);
 
 %
 @@Destroy condition variable attribute ATTR
-pthread_condattr_destroy:([[nonnull]] pthread_condattr_t *attr) -> int;
+int pthread_condattr_destroy([[nonnull]] pthread_condattr_t *attr);
 
 %
 @@Get the process-shared flag of the condition variable attribute ATTR
-pthread_condattr_getpshared:([[nonnull]] pthread_condattr_t const *__restrict attr,
-                             [[nonnull]] int *__restrict pshared) -> int;
+int pthread_condattr_getpshared([[nonnull]] pthread_condattr_t const *__restrict attr,
+                                [[nonnull]] int *__restrict pshared);
 
 %
 @@Set the process-shared flag of the condition variable attribute ATTR
-pthread_condattr_setpshared:([[nonnull]] pthread_condattr_t *attr, int pshared) -> int;
+int pthread_condattr_setpshared([[nonnull]] pthread_condattr_t *attr, int pshared);
 
 %
 %#ifdef __USE_XOPEN2K
 
 @@Get the clock selected for the condition variable attribute ATTR
-pthread_condattr_getclock:([[nonnull]] pthread_condattr_t const *__restrict attr,
-                           [[nonnull]] $clockid_t *__restrict clock_id) -> int;
+int pthread_condattr_getclock([[nonnull]] pthread_condattr_t const *__restrict attr,
+                              [[nonnull]] $clockid_t *__restrict clock_id);
 
 @@Set the clock selected for the condition variable attribute ATTR
-pthread_condattr_setclock:([[nonnull]] pthread_condattr_t *attr, $clockid_t clock_id) -> int;
+int pthread_condattr_setclock([[nonnull]] pthread_condattr_t *attr, $clockid_t clock_id);
 %#endif /* __USE_XOPEN2K */
 
 %
@@ -1375,8 +1387,8 @@ pthread_condattr_setclock:([[nonnull]] pthread_condattr_t *attr, $clockid_t cloc
 %
 @@Initialize the spinlock LOCK. If PSHARED is nonzero the
 @@spinlock can be shared between different processes
-[dependency_include(<hybrid/__atomic.h>)]
-pthread_spin_init:([[nonnull]] pthread_spinlock_t *lock, int pshared) -> int {
+[[impl_include("<hybrid/__atomic.h>")]]
+int pthread_spin_init([[nonnull]] pthread_spinlock_t *lock, int pshared) {
 	(void)pshared;
 	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELAXED);
 	return 0;
@@ -1384,7 +1396,7 @@ pthread_spin_init:([[nonnull]] pthread_spinlock_t *lock, int pshared) -> int {
 
 %
 @@Destroy the spinlock LOCK
-pthread_spin_destroy:([[nonnull]] pthread_spinlock_t *lock) -> int {
+int pthread_spin_destroy([[nonnull]] pthread_spinlock_t *lock) {
 	COMPILER_IMPURE();
 	(void)lock; /* no-op */
 	return 0;
@@ -1392,9 +1404,8 @@ pthread_spin_destroy:([[nonnull]] pthread_spinlock_t *lock) -> int {
 
 %
 @@Wait until spinlock LOCK is retrieved
-[dependency_include(<hybrid/__atomic.h>)]
-[dependency_include(<hybrid/sched/__yield.h>)]
-pthread_spin_lock:([[nonnull]] pthread_spinlock_t *lock) -> int {
+[[impl_include("<hybrid/__atomic.h>", "<hybrid/sched/__yield.h>")]]
+int pthread_spin_lock([[nonnull]] pthread_spinlock_t *lock) {
 	while (pthread_spin_trylock(lock) != 0)
 		__hybrid_yield();
 	return 0;
@@ -1402,26 +1413,25 @@ pthread_spin_lock:([[nonnull]] pthread_spinlock_t *lock) -> int {
 
 %
 @@Try to lock spinlock LOCK
-[dependency_include(<hybrid/__atomic.h>)]
-[[impl_include("<parts/errno.h>")]]
-pthread_spin_trylock:([[nonnull]] pthread_spinlock_t *lock) -> int {
+[[impl_include("<hybrid/__atomic.h>", "<parts/errno.h>")]]
+int pthread_spin_trylock([[nonnull]] pthread_spinlock_t *lock) {
 	if (__hybrid_atomic_xch(*lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
-#ifdef EBUSY
+@@pp_ifdef EBUSY@@
 	return EBUSY;
-#elif defined(EWOULDBLOCK)
+@@pp_elif defined(EWOULDBLOCK)@@
 	return EWOULDBLOCK;
-#elif defined(EAGAIN)
+@@pp_elif defined(EAGAIN)@@
 	return EAGAIN;
-#else /* ... */
+@@pp_else@@
 	return 1;
-#endif /* !... */
+@@pp_endif@@
 }
 
 %
 @@Release spinlock LOCK
-[dependency_include(<hybrid/__atomic.h>)]
-pthread_spin_unlock:([[nonnull]] pthread_spinlock_t *lock) -> int {
+[[impl_include("<hybrid/__atomic.h>")]]
+int pthread_spin_unlock([[nonnull]] pthread_spinlock_t *lock) {
 	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELEASE);
 	return 0;
 }
@@ -1433,34 +1443,35 @@ pthread_spin_unlock:([[nonnull]] pthread_spinlock_t *lock) -> int {
 %
 @@Initialize BARRIER with the attributes in ATTR.
 @@The barrier is opened when COUNT waiters arrived
-pthread_barrier_init:([[nonnull]] pthread_barrier_t *__restrict barrier,
-                      [[inp(count)]] pthread_barrierattr_t const *__restrict attr,
-                      unsigned int count) -> int;
+int pthread_barrier_init([[nonnull]] pthread_barrier_t *__restrict barrier,
+                         [[inp(count)]] pthread_barrierattr_t const *__restrict attr,
+                         unsigned int count);
 
 %
 @@Destroy a previously dynamically initialized barrier BARRIER
-pthread_barrier_destroy:([[nonnull]] pthread_barrier_t *barrier) -> int;
+int pthread_barrier_destroy([[nonnull]] pthread_barrier_t *barrier);
 
 %
 @@Wait on barrier BARRIER
-[[cp]] pthread_barrier_wait:([[nonnull]] pthread_barrier_t *barrier) -> int;
+[[cp]]
+int pthread_barrier_wait([[nonnull]] pthread_barrier_t *barrier);
 
 %
 @@Initialize barrier attribute ATTR
-pthread_barrierattr_init:([[nonnull]] pthread_barrierattr_t *attr) -> int;
+int pthread_barrierattr_init([[nonnull]] pthread_barrierattr_t *attr);
 
 %
 @@Destroy previously dynamically initialized barrier attribute ATTR
-pthread_barrierattr_destroy:([[nonnull]] pthread_barrierattr_t *attr) -> int;
+int pthread_barrierattr_destroy([[nonnull]] pthread_barrierattr_t *attr);
 
 %
 @@Get the process-shared flag of the barrier attribute ATTR
-pthread_barrierattr_getpshared:([[nonnull]] pthread_barrierattr_t const *__restrict attr,
-                                [[nonnull]] int *__restrict pshared) -> int;
+int pthread_barrierattr_getpshared([[nonnull]] pthread_barrierattr_t const *__restrict attr,
+                                   [[nonnull]] int *__restrict pshared);
 
 %
 @@Set the process-shared flag of the barrier attribute ATTR
-pthread_barrierattr_setpshared:([[nonnull]] pthread_barrierattr_t *attr, int pshared) -> int;
+int pthread_barrierattr_setpshared([[nonnull]] pthread_barrierattr_t *attr, int pshared);
 
 %#endif /* __USE_XOPEN2K */
 
@@ -1483,32 +1494,33 @@ typedef void (__LIBCCALL *__pthread_destr_function_t)(void *);
 @@associated to that key when the key is destroyed.
 @@DESTR_FUNCTION is not called if the value associated is NULL when
 @@the key is destroyed
-[decl_prefix(
+[[decl_prefix(
 #ifndef ____pthread_destr_function_t_defined
 #define ____pthread_destr_function_t_defined 1
 typedef void (__LIBCCALL *__pthread_destr_function_t)(void *);
 #endif /* !____pthread_destr_function_t_defined */
-)]
-pthread_key_create:([[nonnull]] pthread_key_t *key,
-                    [[nullable]] __pthread_destr_function_t destr_function) -> int;
+)]]
+int pthread_key_create([[nonnull]] pthread_key_t *key,
+                       [[nullable]] __pthread_destr_function_t destr_function);
 
 %
 @@Destroy KEY
-[export_alias(tss_delete)]
-pthread_key_delete:(pthread_key_t key) -> int;
+[[export_alias("tss_delete")]]
+int pthread_key_delete(pthread_key_t key);
 
 %
 @@Return current value of the thread-specific data slot identified by KEY
-[export_alias(tss_get)] pthread_getspecific:(pthread_key_t key) -> void *;
+[[export_alias("tss_get")]]
+void *pthread_getspecific(pthread_key_t key);
 
 %
 @@Store POINTER in the thread-specific data slot identified by KEY
-pthread_setspecific:(pthread_key_t key, void const *pointer) -> int;
+int pthread_setspecific(pthread_key_t key, void const *pointer);
 
 %
 %#ifdef __USE_XOPEN2K
 @@Get ID of CPU-time clock for thread THREAD_ID
-pthread_getcpuclockid:(pthread_t pthread_id, [[nonnull]] $clockid_t *clock_id) -> int;
+int pthread_getcpuclockid(pthread_t pthread_id, [[nonnull]] $clockid_t *clock_id);
 %#endif /* __USE_XOPEN2K */
 
 %
@@ -1529,36 +1541,35 @@ pthread_getcpuclockid:(pthread_t pthread_id, [[nonnull]] $clockid_t *clock_id) -
 @@first called before FORK), and the PARENT and CHILD handlers are called
 @@in FIFO (first added, first called)
 [[guard]]
-pthread_atfork:([[nullable]] __pthread_atfork_func_t prepare,
-                [[nullable]] __pthread_atfork_func_t parent,
-                [[nullable]] __pthread_atfork_func_t child) -> int;
+int pthread_atfork([[nullable]] __pthread_atfork_func_t prepare,
+                   [[nullable]] __pthread_atfork_func_t parent,
+                   [[nullable]] __pthread_atfork_func_t child);
 
-%[default_impl_section(.text.crt.sched.pthread_ext)]
+%[default_impl_section(".text.crt.sched.pthread_ext")]
 
 %
 %
 %/* Some more functions from winpthread. */
-[dependency_include(<bits/sched.h>)]
-[[userimpl]][requires($has_function(sched_getaffinity))]
-pthread_num_processors_np:() -> __STDC_INT_AS_SIZE_T {
+[[impl_include("<bits/sched.h>")]]
+[[userimpl, requires_function(sched_getaffinity)]]
+__STDC_INT_AS_SIZE_T pthread_num_processors_np() {
 	cpu_set_t cset;
 	if unlikely(sched_getaffinity(0, sizeof(cset), &cset) != 0)
 		return 1;
 	return (__STDC_INT_AS_SIZE_T)__CPU_COUNT_S(sizeof(cset), &cset);
 }
 
-[dependency_include(<bits/sched.h>)]
-[[impl_include("<parts/errno.h>")]]
-[[userimpl]][requires($has_function(sched_setaffinity))]
-pthread_set_num_processors_np:(int n) -> int {
+[[impl_include("<bits/sched.h>", "<parts/errno.h>")]]
+[[userimpl, requires_function(sched_setaffinity)]]
+int pthread_set_num_processors_np(int n) {
 	int i, result;
 	cpu_set_t cset;
 	if (n < 1) {
-#ifdef EINVAL
+@@pp_ifdef EINVAL@@
 		return EINVAL;
-#else /* EINVAL */
+@@pp_else@@
 		return 1;
-#endif /* !EINVAL */
+@@pp_endif@@
 	}
 	__CPU_ZERO_S(sizeof(cset), &cset);
 	for (i = 0; i < n; ++i) {

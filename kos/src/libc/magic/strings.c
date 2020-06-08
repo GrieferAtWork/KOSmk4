@@ -36,19 +36,19 @@ typedef __SIZE_TYPE__ size_t;
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K8)
 
 [[guard, crtbuiltin]]
-bcopy:([[nonnull]] void const *src,
-       [[nonnull]] void *dst, $size_t num_bytes) {
+void bcopy([[nonnull]] void const *src,
+           [[nonnull]] void *dst, $size_t num_bytes) {
 	memmove(dst, src, num_bytes);
 }
 
 [[guard, crtbuiltin, export_alias("__bzero", "explicit_bzero")]]
-bzero:([[nonnull]] void *__restrict dst, $size_t num_bytes) {
+void bzero([[nonnull]] void *__restrict dst, $size_t num_bytes) {
 	memset(dst, 0, num_bytes);
 }
 
 [[guard]] bcmp(*) = memcmp;
 
-[[guard, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+[[guard, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
 char *index([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): char *]
 	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
@@ -62,7 +62,7 @@ char *index([[nonnull]] char const *__restrict haystack, int needle)
 	return NULL;
 }
 
-[[guard, ATTR_WUNUSED, ATTR_PURE, crtbuiltin]]
+[[guard, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
 char *rindex([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): char *]
 	[([[nonnull]] char const *__restrict haystack, int needle): char const *]

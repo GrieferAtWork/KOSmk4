@@ -531,7 +531,7 @@ $char32_t unicode_readutf16_n([[nonnull]] /*utf-16*/ $char16_t const **__restric
 
 %
 @@Same as `unicode_readutf16()', but read in reverse endian as that of the host CPU
-[[kernel]][impl_include("<hybrid/__byteswap.h>")]
+[[kernel, impl_include("<hybrid/__byteswap.h>")]]
 $char32_t unicode_readutf16_swap([[nonnull]] /*utf-16-swap*/ $char16_t const **__restrict ptext)
 	[([[nonnull]] /*utf-16-swap*/ $char16_t const **__restrict ptext): $char32_t]
 	[([[nonnull]] /*utf-16-swap*/ $char16_t **__restrict ptext): $char32_t]
@@ -554,7 +554,7 @@ $char32_t unicode_readutf16_swap([[nonnull]] /*utf-16-swap*/ $char16_t const **_
 
 %
 @@Same as `unicode_readutf16_n()', but read in reverse endian as that of the host CPU
-[[kernel]][impl_include("<hybrid/__byteswap.h>")]
+[[kernel, impl_include("<hybrid/__byteswap.h>")]]
 $char32_t unicode_readutf16_swap_n([[nonnull]] /*utf-16-swap*/ $char16_t const **__restrict ptext, [[nonnull]] $char16_t const *text_end)
 	[([[nonnull]] /*utf-16-swap*/ $char16_t const **__restrict ptext, [[nonnull]] $char16_t const *text_end): $char32_t]
 	[([[nonnull]] /*utf-16-swap*/ $char16_t **__restrict ptext, [[nonnull]] $char16_t const *text_end): $char32_t]

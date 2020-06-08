@@ -244,7 +244,7 @@ struct format_waprintf_data {
 @@                 but may differ from `wcslen(return)' when NUL characters were
 @@                 printed to the waprintf-printer at one point.
 @@                 (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)')
-[requires_function("realloc")][[userimpl]]
+[requires_function(realloc)][[userimpl]]
 [[impl_include("<hybrid/__assert.h>"), wchar]]
 [[ATTR_WUNUSED, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [dependency_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]
@@ -296,7 +296,7 @@ format_waprintf_pack:([[nonnull]] struct format_waprintf_data *__restrict self,
 @@the format_aprintf buffer `self' is finalized, or some other function is used
 @@to append additional data to the end of `self'
 @@@return: NULL: Failed to allocate additional memory
-[requires_function("realloc")][[userimpl, wchar]]
+[requires_function(realloc)][[userimpl, wchar]]
 [[impl_include("<hybrid/__assert.h>"), ATTR_WUNUSED]]
 [dependency_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]
 format_waprintf_alloc:([[nonnull]] struct format_waprintf_data *__restrict self,

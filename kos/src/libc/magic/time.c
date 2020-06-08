@@ -1388,14 +1388,7 @@ __STRUCT_TM *getdate([[nonnull]] const char *string);
 
 %
 %#ifdef __USE_GNU
-@@Since `getdate' is not reentrant because of the use of `getdate_err'
-@@and the static buffer to return the result in, we provide a thread-safe
-@@variant.  The functionality is the same.  The result is returned in
-@@the buffer pointed to by RESBUFP and in case of an error the return
-@@value is != 0 with the same values as given above for `getdate_err'.
-[[decl_prefix(DEFINE_STRUCT_TM)]]
-int getdate_r([[nonnull]] const char *__restrict string,
-              [[nonnull]] __STRUCT_TM *__restrict resbufp);
+%[insert:extern(getdate_r)]
 %#endif /* __USE_GNU */
 
 
@@ -1473,6 +1466,11 @@ char *strptime_l([[nonnull]] char const *__restrict s,
 	return strptime(s, format, tp);
 }
 
+@@Since `getdate' is not reentrant because of the use of `getdate_err'
+@@and the static buffer to return the result in, we provide a thread-safe
+@@variant.  The functionality is the same.  The result is returned in
+@@the buffer pointed to by RESBUFP and in case of an error the return
+@@value is != 0 with the same values as given above for `getdate_err'.
 [[decl_prefix(DEFINE_STRUCT_TM)]]
 int getdate_r([[nonnull]] char const *__restrict string,
               [[nonnull]] __STRUCT_TM *__restrict resbufp) {
