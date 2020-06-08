@@ -1,5 +1,4 @@
-global COPYRIGHT =
-"/* Copyright (c) 2019-2020 Griefer@Work                                       *
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -17,9 +16,10 @@ global COPYRIGHT =
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
- */";
+ */
 
 import * from deemon;
+import * from errors;
 import * from ..libgen.c.cheaders;
 import * from ..libgen.c.escape;
 import * from ..libgen.c.parser;
@@ -27,9 +27,129 @@ import * from ..libgen.c.writer;
 import * from ..libgen.c.loader;
 import * from ..libgen.c.globals;
 import Function from ..libgen.c.cheaders;
+import hash from hashlib;
 import fs;
 
-#if 1
+fs.chdir(fs.headof(__FILE__) + "/../../");
+
+final global HASH_FUNCTION = "CRC-32";
+
+@@The max # of tasks that may be run in parallel
+final global MAX_RUNNING_TASKS = (cpu_count from posix)();
+
+@@List of all tasks that are currently being run
+global runningTasks: {Thread...} = [];
+
+@@Start a new task that'll execute @cb with @args
+function startTask(cb: Callable, args: {Object...} = ()) {
+	for (;;) {
+		local n = #runningTasks;
+		if (n < MAX_RUNNING_TASKS)
+			break;
+		for (local i = 0; i < n;) {
+			if (runningTasks[i].tryjoin()[0]) {
+				runningTasks.erase(i);
+				--n;
+				continue;
+			}
+			++i;
+		}
+		if (n < MAX_RUNNING_TASKS)
+			break;
+		Thread.sleep((milliseconds from time)(100));
+	}
+	local t = Thread(cb, args);
+	t.start();
+	runningTasks.append(t);
+}
+
+@@Wait for all running tasks to finish
+function waitTasks() {
+	while (runningTasks)
+		runningTasks.popback().join();
+}
+
+@@Update the contents of @filename, using a file-printer callback @cb
+function updateHashedFile(filename: string, cb: Callable with File) {
+	local fp: File = File.Writer();
+	print "Printing:", repr filename;
+	local result = cb(fp);
+	local newText: Bytes = fp.string.encode("utf-8");
+	local newTextHash: int = hash(HASH_FUNCTION, newText);
+again:
+	try {
+		fp = File.open(filename, "rb+");
+	} catch (FileNotFound) {
+		try {
+			fp = File.open(filename, "wronly,creat,excl");
+		} catch (FileExists) {
+			goto again;
+		}
+		/* Create a previously non-existant file */
+		print "Creating:", repr filename;
+		try {
+			with (fp) {
+				fp << "/* HASH " << HASH_FUNCTION << ":" << newTextHash.hex() << " */\n";
+				fp.write(newText);
+			}
+		} catch (...) {
+			try {
+				fs.unlink(filename);
+			} catch (...) {
+			}
+			throw;
+		}
+		goto done;
+	}
+	/* File already exists.
+	 * -> Read in the existing file, and check if its contents match its hash.
+	 *    If they don't, then throw an Error.
+	 * -> If the contents match the new contents for the file, then don't do anything.
+	 * -> If the contents did change, then re-write the new contents to the file */
+	local oldText: Bytes;
+	local oldTextHashFunction: string;
+	local oldTextHash: int, oldTextRealHash: int;
+	try {
+		local oldTextWhole: Bytes = fp.readall();
+		oldTextHashFunction, oldTextHash = oldTextWhole
+			.scanf(" /* HASH %[^:]:%[0-9xXa-fA-F] */")...;
+		oldText = oldTextWhole[oldTextWhole.index("\n") + 1:];
+		oldTextHashFunction = oldTextHashFunction.strip().decode("utf-8");
+		oldTextHash         = int(oldTextHash.strip());
+		oldTextRealHash     = hash(oldTextHashFunction, oldText);
+	} catch (...) {
+		throw Error("File {!r} is lacking, or has a broken hash header"
+			.format({ filename }));
+	}
+	if (oldTextHash != oldTextRealHash) {
+		throw Error("File {!r} has been modified (hash miss-match: expected {!r}, but got {!r})"
+			.format({ oldTextRealHash.hex(), oldTextHash.hex() }));
+	}
+	if (oldTextHash == newTextHash) {
+		if (oldText == newText)
+			goto done;
+	}
+	try {
+		print "Updating:", repr filename;
+		fp.rewind();
+		with (fp) {
+			fp << "/* HASH " << HASH_FUNCTION << ":" << newTextHash.hex() << " */\n";
+			fp.write(newText);
+			fp.trunc();
+		}
+	} catch (...) {
+		try {
+			fs.unlink(filename);
+		} catch (...) {
+		}
+		throw;
+	}
+done:
+	return result;
+}
+
+
+
 @@Set of known user libc exports (populated by %[declare_user_export(...)])
 global final knownUserExports: {string...} = HashSet();
 
@@ -128,22 +248,30 @@ function customDirectivesParser(context: LoaderContext): bool {
 	return true;
 }
 
+@@Compile a given system header source file @filename
 function compileSystemHeaderSourceFile(filename: string, headerName: string) {
-	print "Compiling:", filename;
+	print "Compiling:", filename, "(begin)";
 	local parser = CParser(File.open(filename), filename: filename);
 	loadSystemHeaderDefinitions(
 		self:                   parser,
 		headerName:             headerName,
 		customDirectivesParser: customDirectivesParser);
-
+	print "Compiling:", filename, "(end)";
 }
 
-/* Load all the definitions files */
-fs.chdir(fs.headof(__FILE__) + "/../../src/libc/magic");
+
+#define SINGLE_HEADER_TEST "aliases"
 
 try {
-	for (local filename: fs.query("*.c")) {
-		local fullPath = fs.abspath(filename);
+	local runningTasks = [];
+	/* Load all the definitions files */
+	local LIBC_PATH = "src/libc/magic";
+	for (local filename: fs.query(LIBC_PATH + "/*.c")) {
+#ifdef SINGLE_HEADER_TEST
+		if (filename != SINGLE_HEADER_TEST ".c")
+			continue;
+#endif /* SINGLE_HEADER_TEST */
+		local fullPath = fs.abspath(LIBC_PATH + "/" + filename);
 		/* XXX: There are only a couple of ways by which different definition
 		 *      files actually interact with each other:
 		 *  - %[define_replacement(...)]
@@ -154,139 +282,37 @@ try {
 		 * We could create some sort of database that contains information about
 		 * which source files define some feature/function, which might allow us
 		 * to not have to re-compile everything anything something changes!
-		 *
-		 * XXX: Use multi-threading to load multiple source files at the same time!
 		 */
-		compileSystemHeaderSourceFile(fullPath, fs.fileof(filename));
+		startTask(compileSystemHeaderSourceFile,
+			(fullPath, fs.fileof(filename)));
 	}
+	waitTasks();
+
+	/* Generate the actual system headers (i.e. <string.h>) */
+	for (local name /*: string*/, header /*: SystemHeader*/: allSystemHeaders) {
+#ifdef SINGLE_HEADER_TEST
+		if (name != SINGLE_HEADER_TEST)
+			continue;
+#endif /* SINGLE_HEADER_TEST */
+		startTask(updateHashedFile,
+			("include/{}.h".format({ name.replace(".", "/") }),
+			[](fp: File) {
+				fp << COPYRIGHT << "\n";
+				local cWriter = CWriter(fp);
+				header.cprintHeader(cWriter, ESCAPE_MODE_PART);
+				cWriter.flush();
+			})
+		);
+	}
+	waitTasks();
+
 } catch (e...) {
 	print repr e;
 	print repr Traceback.current;
 	Error.AppExit.exit(1);
 }
-Error.AppExit.exit(0);
-#else
-/**************************************************************************/
-/**************************************************************************/
-/**************************************************************************/
-/**************************************************************************/
-local startLine = __LINE__;
-local headerDef = loadSystemHeaderDefinitions(CParser(r"
-
-%{
-__SYSDECL_BEGIN
-}
-//%[define_ccompat_header(cwchar)]
-//%[insert:std]
-
-
-[[crtbuiltin]]
-size_t strlen(char const *__restrict str) {
-	char const *end = str;
-	while (*end)
-		++end;
-	return (size_t)(end - str);
-}
-
-[[crtbuiltin]]
-size_t strnlen(char const *__restrict str, size_t maxlen) {
-}
-
-
-%
-%
-%#ifdef __cplusplus
-%[insert:function(strlen = strnlen, externLinkageOverride: 'C++', guardName: '__cxx_strlen_defined')]
-%#endif /* __cplusplus */
-
-
-/* FIXME: This breaks due to how [[crtbuiltin]] is implemented... */
-//[[crtbuiltin]] wcslen(*) %{generate(str2wcs)}
-/* ... Note that this works, however: */
-//[[crtbuiltin]] size_t wcslen(wchar_t const *__restrict str) %{generate(str2wcs)}
-
-
-//
-//@@Bla bla bla
-//[[crtbuiltin]]
-//[[if(__SIZEOF_WCHAR_T__ == 2), alias(memcpyw)]]
-//[[if(__SIZEOF_WCHAR_T__ == 4), alias(memcpyl)]]
-//[[wchar, nonnull, fast]] $wchar_t *
-//wmemcpy([[nonnull]] $wchar_t *__restrict dst,
-//        [[nonnull]] $wchar_t const *__restrict src,
-//        size_t num_chars) {
-//	size_t i;
-//	for (i = 0; i < num_chars; ++i)
-//		dst[i] = src[i];
-//	return dst;
-//}
-//
-//%
-//%
-//c16memcpy(*) %{uchar(wmemcpy)}
-//c32memcpy(*) %{uchar(wmemcpy)}
-//
-//
-//%
-//%
-//c32memcpy_alias(*) = wmemcpy;
-
-
-//%
-//[[if(__SIZEOF_WCHAR_T__ == 2), alias(wmemcpy), alias(DOS$wmemcpy)]]
-//[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(wmemcpy)]]
-//[[nocrt, cc(LIBDCALL), nonnull]] char16_t *
-//c16memcpy([[nonnull]] char16_t *__restrict dst,
-//          [[nonnull]] char16_t const *__restrict src,
-//          size_t num_chars) {
-//	size_t i;
-//	for (i = 0; i < num_chars; ++i)
-//		dst[i] = src[i];
-//	return dst;
-//}
-
-%{
-
-__SYSDECL_END
-}
-
-".unifylines(), firstLineOffset: startLine), headerName: "wchar");
-
-local fp = CWriter(File.stdout);
-
-print "HEADER:";
-headerDef.cprintHeader(fp, ESCAPE_MODE_PART);
-fp.flush();
-
-//print "AUTO:";
-//headerDef.cprintLibraryAutoHeader(fp, ESCAPE_MODE_NONE);
-//headerDef.cprintLibraryAutoSourceImplementations(fp, ESCAPE_MODE_NONE);
-//headerDef.cprintLibraryAutoSourceExports(fp, ESCAPE_MODE_NONE);
-//fp.flush();
-//
-//print "USER:";
-//headerDef.cprintLibraryUserHeader(fp, ESCAPE_MODE_NONE);
-//headerDef.cprintLibraryUserSourceImplementations(fp, ESCAPE_MODE_NONE);
-//headerDef.cprintLibraryUserSourceExports(fp, ESCAPE_MODE_NONE);
-//fp.flush();
-//
-//
-//print "LOCAL:wcslen:";
-//allLocalFunctionsByName["wcslen"].cprintLocalFunctionHeader(
-//	fp, ESCAPE_MODE_FULL, "__LIBC", printCopyright: false);
-//
-////fp.namespace = "";
-////for (local x: neededLocalFunction.sorted([](x) -> x.name)) {
-////	x.cprintLocalFunctionHeader(
-////		fp, ESCAPE_MODE_FULL, "__LIBC", false);
-////}
-
-
-fp.flush();
 print "DONE";
 Error.AppExit.exit(0);
 
-//localWcslen.implementations[0].dependencies["__localdep_wcslen"] = wcslen;
-//localWcslen.cprintLocalFunctionHeader(writer, dependencyDecl: "__LIBC");
-//print repr allSystemHeaders;
-#endif
+
+

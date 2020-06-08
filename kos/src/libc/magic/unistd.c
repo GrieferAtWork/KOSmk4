@@ -570,7 +570,7 @@ ssize_t write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
 @@during this phase are silently ignored and don't cause `errno' to change
 [[cp, guard]][section(".text.crt.io.read")]
 [requires($has_function(read) && $has_function(lseek))]
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 readall:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) -> ssize_t {
 	ssize_t result, temp;
 	result = read(fd, buf, bufsize);
@@ -606,7 +606,7 @@ readall:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) -> ssize_t {
 @@written (in which case `bufsize' is returned).
 [[cp, guard]][section(".text.crt.io.write")]
 [requires($has_function(write) && $has_function(lseek))]
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 writeall:($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) -> ssize_t {
 	ssize_t result, temp;
 	result = write(fd, buf, bufsize);
@@ -703,7 +703,7 @@ int chdir([[nonnull]] char const *path);
 @@>> getcwd(2)
 @@Return the path of the current working directory, relative to the filesystem root set by `chdir(2)'
 [[cp, guard, export_alias("_getcwd"), section(".text.crt.fs.basic_property")]]
-char *getcwd([outp_opt(bufsize)] char *buf, size_t bufsize);
+char *getcwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 
 %[default_impl_section(".text.crt.fs.modify")]
 

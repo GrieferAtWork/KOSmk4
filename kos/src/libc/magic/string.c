@@ -5190,7 +5190,7 @@ $errno_t memcpy_s([[nonnull]] void *dst, rsize_t dstlength,
 	return 0;
 }
 
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 [section(".text.crt.dos.string.memory")]
 $errno_t memmove_s([[nonnull]] void *dst, rsize_t dstlength,
                    [[nonnull]] void const *src, rsize_t srclength) {
@@ -5834,6 +5834,17 @@ void strmode($mode_t mode, [[nonnull]] char p[12]) {
 }
 
 %#endif /* __USE_BSD */
+
+%(libc_fast){
+#define __libc_PRIVATE_memset1 __libc_memset
+#define __libc_PRIVATE_memset2 __libc_memsetw
+#define __libc_PRIVATE_memset4 __libc_memsetl
+#define __libc_PRIVATE_memset8 __libc_memsetq
+#define __libc_PRIVATE_memset(dst, word, elem_count, elem_size) \
+	__libc_PRIVATE_memset##elem_size(dst, word, elem_count)
+#define __libc_memsetc(dst, word, elem_count, elem_size) \
+	__libc_PRIVATE_memset(dst, word, elem_count, elem_size)
+}
 
 
 %{

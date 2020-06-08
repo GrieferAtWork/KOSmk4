@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(errno_t = __errno_t)]
-%[default_impl_section(.text.crt.error)]
+%[default_impl_section(".text.crt.error")]
 
 %{
 #include <bits/types.h>
@@ -89,18 +89,17 @@ __LIBC int error_one_per_line;
 @@The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
 @@Also note that `stdout' is flushed before the message is printed.
 @@If `STATUS' is non-zero, follow up with a call to `exit(status)'
-[[ATTR_LIBC_PRINTF(3, 4), fast, libc, userimpl, throws]]
-[decl_include("<bits/types.h>")]
-[impl_include("<local/stdstreams.h>")]
-[[requires_include("<__crt.h>")]]
-[requires_include(<local/program_invocation_name.h>)]
-[requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
-          $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
-          defined(__LOCAL_program_invocation_short_name) &&
-          $has_function(strerror))]
-[impl_prefix(DEFINE_LOCAL_error_print_progname)]
-[impl_prefix(DEFINE_LOCAL_error_message_count)]
-error:(int status, $errno_t errnum, const char *format, ...) {
+[[ATTR_LIBC_PRINTF(3, 4), fast, libc, throws]]
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<local/stdstreams.h>")]]
+[[impl_prefix(DEFINE_LOCAL_error_print_progname)]]
+[[impl_prefix(DEFINE_LOCAL_error_message_count)]]
+[[requires_include("<__crt.h>", "<local/program_invocation_name.h>")]]
+[[userimpl, requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
+                     $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
+                     defined(__LOCAL_program_invocation_short_name) &&
+                     $has_function(strerror))]]
+void error(int status, $errno_t errnum, const char *format, ...) {
 #ifdef @__LOCAL_error_print_progname@
 	if (__LOCAL_error_print_progname) {
 		(*__LOCAL_error_print_progname)();
@@ -131,20 +130,19 @@ error:(int status, $errno_t errnum, const char *format, ...) {
 @@The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
 @@Additionally, when `error_one_per_line' is non-zero, consecutive calls to this function that
 @@pass the same values for `filename' and `line' will not produce the error message.
-[ATTR_LIBC_PRINTF(5, 6)][[fast, libc, userimpl]][throws]
-[decl_include("<bits/types.h>")]
-[impl_include("<local/stdstreams.h>")]
-[[requires_include("<__crt.h>")]]
-[requires_include(<local/program_invocation_name.h>)]
-[requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
-          $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
-          defined(__LOCAL_program_invocation_short_name) &&
-          $has_function(strerror))]
-[impl_prefix(DEFINE_LOCAL_error_print_progname)]
-[impl_prefix(DEFINE_LOCAL_error_one_per_line)]
-[impl_prefix(DEFINE_LOCAL_error_message_count)]
-error_at_line:(int status, $errno_t errnum, char const *filename,
-               unsigned int line, char const *format, ...) {
+[[fast, libc, throws, ATTR_LIBC_PRINTF(5, 6)]]
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<local/stdstreams.h>")]]
+[[requires_include("<__crt.h>", "<local/program_invocation_name.h>")]]
+[[userimpl, requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
+                     $has_function(fprintf) && $has_function(vfprintf) &&
+                     $has_function(fputc) && defined(__LOCAL_program_invocation_short_name) &&
+                     $has_function(strerror))]]
+[[impl_prefix(DEFINE_LOCAL_error_print_progname)]]
+[[impl_prefix(DEFINE_LOCAL_error_one_per_line)]]
+[[impl_prefix(DEFINE_LOCAL_error_message_count)]]
+void error_at_line(int status, $errno_t errnum, char const *filename,
+                   unsigned int line, char const *format, ...) {
 #ifdef @__LOCAL_error_one_per_line@
 	static char const *last_filename = NULL;
 	static unsigned int last_line = 0;

@@ -222,7 +222,7 @@ typedef void (*__LIBCCALL __atexit_func_t)(void);
 #define __compar_d_fn_t_defined 1
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
-)][throws]
+)][[throws]]
 qsort_r:([[nonnull]] void *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg) {
 	/* DISCALIMER: The qsort() implementation below has been taken directly
 	 *             from glibc (`/stdlib/qsort.c'), before being retuned and
@@ -434,7 +434,7 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 	return (*(__compar_fn_t)__arg)(__a, __b);
 }
 #endif /* !____invoke_compare_helper_defined */
-)][throws][[std]]
+)][[throws, std]]
 qsort:([[nonnull]] void *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp) {
 	qsort_r(pbase, item_count, item_size, &@__invoke_compare_helper@, (void *)cmp);
 }
@@ -742,7 +742,7 @@ typedef void (*__LIBCCALL __atexit_func_t)(void);
 [decl_prefix(DEFINE_ATEXIT_FUNC_T)]
 [[std]][alias(at_quick_exit)] atexit:([[nonnull]] __atexit_func_t func) -> int;
 %(std, c, ccompat)#if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
-[[std]][alias(exit)][alias(_exit)][alias(_Exit)][ATTR_NORETURN][throws] quick_exit:(int status);
+[[std]][alias(exit)][alias(_exit)][alias(_Exit)][ATTR_NORETURN][[throws]] quick_exit:(int status);
 [decl_prefix(DEFINE_ATEXIT_FUNC_T)]
 [[std]][alias(atexit)] at_quick_exit:([[nonnull]] __atexit_func_t func) -> int;
 %(std, c, ccompat)#endif /* __USE_ISOC11 || __USE_ISOCXX11 */
@@ -1897,7 +1897,7 @@ recallocarray:(void *mallptr, $size_t old_elem_count, $size_t new_elem_count, $s
 @@immediately returned to the OS, rather than being left in cache
 @@while still containing its previous contents.
 [section(".text.crt.heap.rare_helpers")]
-[requires($has_function(free))][[userimpl]]
+[requires_function(free)][[userimpl]]
 freezero:(void *mallptr, $size_t size) {
 	if likely(mallptr) {
 		explicit_bzero(mallptr, size);
@@ -1971,7 +1971,7 @@ typedef int (__LIBCCALL *_onexit_t)(void);
 %#define _CRT_ERRNO_DEFINED 1
 /* NOTE: Cygwin calls it `__errno()' and DOS calls it `_errno()' */
 %#ifndef errno
-%[default_impl_section(.text.crt.errno_access)]
+%[default_impl_section(".text.crt.errno_access")]
 [[guard, ATTR_WUNUSED, ATTR_CONST]][alias(_errno, __errno)]
 __errno_location:() -> errno_t *;
 %#ifdef ____errno_location_defined
@@ -2536,7 +2536,7 @@ char *_ui64toa($u64 val, [[nonnull]] char *buf, int radix) {
 
 [alt_variant_of(__SIZEOF_LONG__ == 8, _ltoa_s)]
 [alt_variant_of(__SIZEOF_INT__ == 8, _itoa_s)]
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 _i64toa_s:($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) -> errno_t {
 	char *p;
 	s64 temp;
@@ -2575,7 +2575,7 @@ _i64toa_s:($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) -> errno_
 }
 
 [alt_variant_of(__SIZEOF_LONG__ == 8, _ultoa_s)]
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 _ui64toa_s:($u64 val, [[nonnull]] char *buf, $size_t buflen, int radix) -> errno_t {
 	char *p;
 	u64 temp;
@@ -2678,7 +2678,7 @@ _mbstowcs_l:(wchar_t *dst, char const *src,
 }
 
 
-[[wchar]][impl_include("<parts/errno.h>")]
+[[wchar, impl_include("<parts/errno.h>")]]
 _mbstowcs_s:($size_t *presult,
              wchar_t *dst, $size_t dstsize,
              char const *src, $size_t dstlen) -> errno_t {
@@ -2763,7 +2763,7 @@ _wctomb_l:(char *buf, wchar_t wc, $locale_t locale) -> int {
 
 %
 %#ifdef __USE_DOS_SLIB
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 wctomb_s:([[nonnull]] int *presult, [[nonnull]] char *buf,
           rsize_t buflen, wchar_t wc) -> errno_t {
 	if (!presult || !buf) {
@@ -2785,14 +2785,14 @@ wctomb_s:([[nonnull]] int *presult, [[nonnull]] char *buf,
 }
 %#endif /* __USE_DOS_SLIB */
 
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 _wctomb_s_l:([[nonnull]] int *presult, [[nonnull]] char *buf,
              $size_t buflen, wchar_t wc, $locale_t locale) -> errno_t {
 	(void)locale;
 	return wctomb_s(presult, buf, buflen, wc);
 }
 
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 _wcstombs_s_l:([[nonnull]] $size_t *presult, [[nonnull]] char *buf,
                $size_t buflen, [[nonnull]] wchar_t const *src,
                $size_t maxlen, $locale_t locale) -> errno_t {
@@ -2806,7 +2806,7 @@ _wcstombs_l:([[nonnull]] char *dst, [[nonnull]] wchar_t const *src,
 	return wcstombs(dst, src, maxlen);
 }
 
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 wcstombs_s:([[nonnull]] $size_t *presult,
             [[nonnull]] char *buf, $size_t buflen,
             [[nonnull]] wchar_t const *src, $size_t maxlen) -> errno_t {
@@ -2945,7 +2945,7 @@ _aligned_msize:(void *aligned_mallptr, $size_t min_alignment, $size_t offset) ->
 	return ($size_t)(uintptr_t)((void **)aligned_mallptr)[-2];
 }
 
-[requires($has_function(free))][[userimpl]]
+[requires_function(free)][[userimpl]]
 _aligned_free:(void *aligned_mallptr) {
 	if (aligned_mallptr)
 		free(((void **)aligned_mallptr)[-1]);
@@ -2959,7 +2959,7 @@ _aligned_free:(void *aligned_mallptr) {
 %[default_impl_section(".text.crt.unicode.static.convert")]
 
 %#ifndef __NO_FPU
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 _ecvt_s:([[nonnull]] char *buf, $size_t buflen, double val, int ndigit,
          [[nonnull]] int *__restrict decptr,
          [[nonnull]] int *__restrict sign) -> errno_t {
@@ -2969,7 +2969,7 @@ _ecvt_s:([[nonnull]] char *buf, $size_t buflen, double val, int ndigit,
 	return 0;
 }
 
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 _fcvt_s:([[nonnull]] char *buf, $size_t buflen, double val, int ndigit,
          [[nonnull]] int *__restrict decptr,
          [[nonnull]] int *__restrict sign) -> errno_t {
@@ -2979,7 +2979,7 @@ _fcvt_s:([[nonnull]] char *buf, $size_t buflen, double val, int ndigit,
 	return 0;
 }
 
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 _gcvt_s:([[nonnull]] char *buf, $size_t buflen, double val, int ndigit) -> errno_t {
 	int a, b;
 	if (!buf)
@@ -3393,7 +3393,7 @@ onexit_t onexit(onexit_t func);
 
 %[default_impl_section(".text.crt.dos.wchar.fs.environ")]
 [[guard, wchar, ATTR_WUNUSED]] _wgetenv:([[nonnull]] wchar_t const *varname) -> wchar_t *;
-[[guard, wchar]] _wgetenv_s:([[nonnull]] $size_t *return_size, [outp_opt(buflen)] wchar_t *buf, $size_t buflen, [[nonnull]] wchar_t const *varname) -> errno_t;
+[[guard, wchar]] _wgetenv_s:([[nonnull]] $size_t *return_size, [[outp_opt(buflen)]] wchar_t *buf, $size_t buflen, [[nonnull]] wchar_t const *varname) -> errno_t;
 [[guard, wchar]] _wdupenv_s:([[nonnull]] wchar_t **pbuf, [[nonnull]] $size_t *pbuflen, [[nonnull]] wchar_t const *varname) -> errno_t;
 
 %[insert:extern(_wsystem)]
@@ -3433,11 +3433,11 @@ _wtof_l:([[nonnull]] wchar_t const *nptr, [[nullable]] $locale_t locale) -> doub
 [[guard, wchar]] _ultow:(unsigned long val, [[nonnull]] wchar_t *buf, int radix) -> wchar_t * %{generate(str2wcs("ultoa"))}
 [[guard, wchar]] _i64tow:($int64_t val, [[nonnull]] wchar_t *buf, int radix) -> wchar_t * %{generate(str2wcs("_i64toa"))}
 [[guard, wchar]] _ui64tow:($uint64_t val, [[nonnull]] wchar_t *buf, int radix) -> wchar_t * %{generate(str2wcs("_ui64toa"))}
-[[guard, wchar]] _itow_s:(int val, [outp_opt(buflen)] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{generate(str2wcs("_itoa_s"))}
-[[guard, wchar]] _ltow_s:(long val, [outp_opt(buflen)] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{generate(str2wcs("_ltoa_s"))}
-[[guard, wchar]] _ultow_s:(unsigned long val, [outp_opt(buflen)] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{generate(str2wcs("_ultoa_s"))}
-[[guard, wchar]] _i64tow_s:($int64_t val, [outp_opt(buflen)] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{generate(str2wcs("_i64toa_s"))}
-[[guard, wchar]] _ui64tow_s:($uint64_t val, [outp_opt(buflen)] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{generate(str2wcs("_ui64toa_s"))}
+[[guard, wchar]] _itow_s:(int val, [[outp_opt(buflen)]] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{generate(str2wcs("_itoa_s"))}
+[[guard, wchar]] _ltow_s:(long val, [[outp_opt(buflen)]] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{generate(str2wcs("_ltoa_s"))}
+[[guard, wchar]] _ultow_s:(unsigned long val, [[outp_opt(buflen)]] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{generate(str2wcs("_ultoa_s"))}
+[[guard, wchar]] _i64tow_s:($int64_t val, [[outp_opt(buflen)]] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{generate(str2wcs("_i64toa_s"))}
+[[guard, wchar]] _ui64tow_s:($uint64_t val, [[outp_opt(buflen)]] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{generate(str2wcs("_ui64toa_s"))}
 
 %[default_impl_section(".text.crt.dos.wchar.unicode.static.convert")]
 [[guard]] _wtoi(*) = wtoi;

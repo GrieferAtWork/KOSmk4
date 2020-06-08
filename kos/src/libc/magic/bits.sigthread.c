@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(sigset_t = "struct __sigset_struct")]
-%[default_impl_section(.text.crt.sched.pthread)]
+%[default_impl_section(".text.crt.sched.pthread")]
 
 
 %(user){
@@ -48,11 +48,19 @@ struct __sigset_struct;
 
 }
 
-[[guard]] pthread_sigmask:(int how, $sigset_t const *__restrict newmask, $sigset_t *__restrict oldmask) -> int;
-[[guard]] pthread_kill:($pthread_t threadid, int signo) -> int;
+[[guard]]
+int pthread_sigmask(int how,
+                    [[nullable]] $sigset_t const *newmask,
+                    [[nullable]] $sigset_t *oldmask);
+
+[[guard]]
+int pthread_kill($pthread_t threadid, int signo);
 
 %#ifdef __USE_GNU
-[[guard]] pthread_sigqueue:($pthread_t threadid, int signo, union sigval const value) -> int;
+[[guard]]
+int pthread_sigqueue($pthread_t threadid,
+                     int signo,
+                     union sigval const value);
 %#endif /* __USE_GNU */
 
 %{

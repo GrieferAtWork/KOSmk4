@@ -292,7 +292,7 @@ struct hsearch_data {
 }
 
 @@Reentrant versions which can handle multiple hashing tables at the same time
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 hsearch_r:(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab) -> int {
 	typedef struct {
 		unsigned int used;
@@ -388,7 +388,7 @@ int hcreate_r(size_t nel, struct hsearch_data *htab) {
 }
 
 [[doc_alias(hsearch_r), impl_include("<parts/errno.h>")]]
-[[userimpl, requires($has_function(free))]]
+[[userimpl, requires_function(free)]]
 hdestroy_r:(struct hsearch_data *htab) {
 	if (htab == NULL) {
 #ifdef EINVAL
@@ -772,7 +772,7 @@ typedef void (*__free_fn_t) (void *__nodep);
 }
 
 @@Destroy the whole tree, call FREEFCT for each node or leaf
-[requires($has_function(free))][[userimpl]]
+[requires_function(free)][[userimpl]]
 tdestroy:(void *root, __free_fn_t freefct) {
 again:
 	if (root) {

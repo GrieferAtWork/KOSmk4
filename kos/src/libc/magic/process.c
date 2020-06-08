@@ -110,8 +110,8 @@ _exit(*) = _Exit;
 %#endif /* !_CRT_TERMINATE_DEFINED */
 
 %[default_impl_section(".text.crt.dos.sched.process")]
-[throws] _cexit:();
-[throws] _c_exit:() {
+[[throws]] _cexit:();
+[[throws]] _c_exit:() {
 }
 
 [[guard, ATTR_WUNUSED]] _getpid:() -> $pid_t = getpid;
@@ -146,13 +146,13 @@ _cwait(*) = cwait;
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 %[default_impl_section(.text.crt.dos.fs.dlfcn)]
-[throws] _loaddll:(char __KOS_FIXED_CONST *file) -> intptr_t;
+[[throws]] _loaddll:(char __KOS_FIXED_CONST *file) -> intptr_t;
 
-[throws] _unloaddll:(intptr_t hnd) -> int;
+[[throws]] _unloaddll:(intptr_t hnd) -> int;
 
 %
 %typedef int (__LIBCCALL *__procfun)(void);
-[throws] _getdllprocaddr:(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) -> __procfun;
+[[throws]] _getdllprocaddr:(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) -> __procfun;
 
 
 %{

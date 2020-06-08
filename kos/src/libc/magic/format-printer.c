@@ -22,7 +22,7 @@
 %[define_replacement(pformatgetc    = __pformatgetc)]
 %[define_replacement(pformatungetc  = __pformatungetc)]
 
-%[default_impl_section(.text.crt.string.format)]
+%[default_impl_section(".text.crt.string.format")]
 
 %[define_str2wcs_replacement(pformatprinter = pwformatprinter)]
 %[define_str2wcs_replacement(__pformatprinter = __pwformatprinter)]
@@ -106,60 +106,46 @@ typedef __pformatungetc pformatungetc;
 @@Repeat `CH' a number of `NUM_REPETITIONS' times
 @@The usual format-printer rules apply, and this function
 @@is allowed to call `PRINTER' as often as it chooses
-[dependency_include(<hybrid/__alloca.h>)]
-[decl_prefix(
-@@if $wchar_function@@
-#include @<bits/wformat-printer.h>@
-#include @<bits/uformat-printer.h>@
-@@else@@
-#include @<bits/format-printer.h>@
-@@endif@@
-)][[kernel]][throws]
-format_repeat:([[nonnull]] pformatprinter printer, void *arg, char ch, $size_t num_repetitions) -> $ssize_t {
+[[kernel, throws, decl_include("<bits/format-printer.h>")]]
+[[impl_include("<hybrid/__alloca.h>", "<libc/string.h>")]]
+$ssize_t format_repeat([[nonnull]] pformatprinter printer, void *arg,
+                       char ch, $size_t num_repetitions) {
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
 	ssize_t result, temp;
 #ifdef __hybrid_alloca
 	char *buffer;
-	if __likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
+	if likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
 		buffer = (char *)__hybrid_alloca(num_repetitions);
-@@if $wchar_function@@
-		wmemset(buffer, ch, num_repetitions);
-@@else@@
-		memset(buffer, ch, num_repetitions * sizeof(char));
-@@endif@@
+		__libc_memsetc(buffer, ch, num_repetitions, __SIZEOF_CHAR__);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
 	buffer = (char *)__hybrid_alloca(FORMAT_REPEAT_BUFSIZE);
 	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
 #else /* __hybrid_alloca */
 	char buffer[FORMAT_REPEAT_BUFSIZE];
-	if __likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
-@@if $wchar_function@@
-		wmemset(buffer, ch, num_repetitions);
-@@else@@
-		memset(buffer, ch, num_repetitions * sizeof(char));
-@@endif@@
+	if likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
+		__libc_memsetc(buffer, ch, num_repetitions, __SIZEOF_CHAR__);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
 	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
 #endif /* !__hybrid_alloca */
 	result = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
-	if __unlikely(result < 0)
+	if unlikely(result < 0)
 		goto done;
 	for (;;) {
 		num_repetitions -= FORMAT_REPEAT_BUFSIZE;
 		if (num_repetitions < FORMAT_REPEAT_BUFSIZE)
 			break;
 		temp = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
-		if __unlikely(temp < 0)
+		if unlikely(temp < 0)
 			goto done;
 		result += temp;
 	}
 	if (num_repetitions) {
 		temp = (*printer)(arg, buffer, num_repetitions);
-		if __unlikely(temp < 0)
+		if unlikely(temp < 0)
 			goto err;
 		result += temp;
 	}
@@ -205,17 +191,12 @@ err:
 @@with the `FORMAT_ESCAPE_FFORCE*' flags
 @@@param: PRINTER: A function called for all quoted portions of the text
 @@@param: TEXTLEN: The total number of bytes to escape, starting at `text'
-[[kernel]][throws][export_alias(format_quote)][decl_prefix(
-@@if $wchar_function@@
-#include @<bits/wformat-printer.h>@
-#include @<bits/uformat-printer.h>@
-@@else@@
-#include @<bits/format-printer.h>@
-@@endif@@
-)]
-format_escape:([[nonnull]] pformatprinter printer, void *arg,
-               /*utf-8*/ char const *__restrict text,
-               $size_t textlen, unsigned int flags) -> $ssize_t {
+[[kernel, throws, alias("format_quote")]]
+[[if(!defined(__KERNEL__)), export_as("format_quote")]]
+[[decl_include("<bits/format-printer.h>")]]
+$ssize_t format_escape([[nonnull]] pformatprinter printer, void *arg,
+                       /*utf-8*/ char const *__restrict text,
+                       $size_t textlen, unsigned int flags) {
 #define escape_tooct(c) ('0' + (char)(unsigned char)(c))
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
@@ -232,31 +213,30 @@ format_escape:([[nonnull]] pformatprinter printer, void *arg,
 	char const *flush_start = text;
 	c_hex = DECIMALS_SELECTOR[!(flags & FORMAT_ESCAPE_FUPPERHEX)];
 	encoded_text[0] = '\\';
-	if __likely(!(flags & FORMAT_ESCAPE_FPRINTRAW)) {
+	if likely(!(flags & FORMAT_ESCAPE_FPRINTRAW)) {
 		temp = (*printer)(arg, quote, 1);
-		if __unlikely(temp < 0)
+		if unlikely(temp < 0)
 			goto err;
 		result += temp;
 	}
 	while (text < textend) {
 		char const *old_text = text;
-@@if $wchar_function@@
-#if __SIZEOF_WCHAR_T__ == 2
-		uint32_t ch = unicode_readutf16_n((char16_t const **)&text,
-		                                  (char16_t const *)textend);
-#else /* __SIZEOF_WCHAR_T__ == 2 */
-		uint32_t ch = (uint32_t)*text++;
-#endif /* __SIZEOF_WCHAR_T__ != 2 */
-@@else@@
-		uint32_t ch = unicode_readutf8_n((char const **)&text, textend);
-@@endif@@
-		if __unlikely(ch < 32 || ch >= 127  || ch == '\'' ||
+		uint32_t ch;
+@@pp_if __SIZEOF_CHAR__ == 1@@
+		ch = unicode_readutf8_n((char const **)&text, textend);
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+		ch = unicode_readutf16_n((char16_t const **)&text,
+		                         (char16_t const *)textend);
+@@pp_else@@
+		ch = (uint32_t)*text++;
+@@pp_endif@@
+		if unlikely(ch < 32 || ch >= 127  || ch == '\'' ||
 		              ch == '\"' || ch == '\\' ||
 		             (flags & FORMAT_ESCAPE_FNOASCII)) {
 			/* Flush unwritten direct-copy text. */
 			if (flush_start < old_text) {
 				temp = (*printer)(arg, flush_start, (size_t)(old_text - flush_start));
-				if __unlikely(temp < 0)
+				if unlikely(temp < 0)
 					goto err;
 				result += temp;
 			}
@@ -270,16 +250,15 @@ default_ctrl:
 encode_oct:
 					if (text < textend) {
 						char const *new_text = text;
-@@if $wchar_function@@
-#if __SIZEOF_WCHAR_T__ == 2
-						uint32_t next_ch = unicode_readutf16_n((char16_t const **)&new_text,
-						                                       (char16_t const *)textend);
-#else
-						uint32_t next_ch = (uint32_t)*new_text++;
-#endif
-@@else@@
-						uint32_t next_ch = unicode_readutf8_n((char const **)&new_text, textend);
-@@endif@@
+						uint32_t next_ch;
+@@pp_if __SIZEOF_CHAR__ == 1@@
+						next_ch = unicode_readutf8_n((char const **)&new_text, textend);
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+						next_ch = unicode_readutf16_n((char16_t const **)&new_text,
+						                              (char16_t const *)textend);
+@@pp_else@@
+						next_ch = (uint32_t)*new_text++;
+@@pp_endif@@
 						if (next_ch >= '0' && next_ch <= '7')
 							goto encode_hex;
 					}
@@ -408,16 +387,15 @@ special_control:
 encode_hex:
 				if (text < textend) {
 					char const *new_text = text;
-@@if $wchar_function@@
-#if __SIZEOF_WCHAR_T__ == 2
-					uint32_t next_ch = unicode_readutf16_n((char16_t const **)&new_text,
-					                                       (char16_t const *)textend);
-#else /* __SIZEOF_WCHAR_T__ == 2 */
-					uint32_t next_ch = (uint32_t)*new_text++;
-#endif /* __SIZEOF_WCHAR_T__ != 2 */
-@@else@@
-					uint32_t next_ch = unicode_readutf8_n((char const **)&new_text, textend);
-@@endif@@
+					uint32_t next_ch;
+@@pp_if __SIZEOF_CHAR__ == 1@@
+					next_ch = unicode_readutf8_n((char const **)&new_text, textend);
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+					next_ch = unicode_readutf16_n((char16_t const **)&new_text,
+					                              (char16_t const *)textend);
+@@pp_else@@
+					next_ch = (uint32_t)*new_text++;
+@@pp_endif@@
 					if ((next_ch >= 'a' && next_ch <= 'f') ||
 					    (next_ch >= 'A' && next_ch <= 'F') ||
 					    (next_ch >= '0' && next_ch <= '9'))
@@ -456,7 +434,7 @@ encode_uni:
 				}
 print_encoded:
 				temp = (*printer)(arg, encoded_text, encoded_text_size);
-				if __unlikely(temp < 0)
+				if unlikely(temp < 0)
 					goto err;
 				result += temp;
 			}
@@ -466,13 +444,13 @@ print_encoded:
 /*done:*/
 	if (flush_start < text) {
 		temp = (*printer)(arg, flush_start, (size_t)(text - flush_start));
-		if __unlikely(temp < 0)
+		if unlikely(temp < 0)
 			goto err;
 		result += temp;
 	}
-	if __likely(!(flags & FORMAT_ESCAPE_FPRINTRAW)) {
+	if likely(!(flags & FORMAT_ESCAPE_FPRINTRAW)) {
 		temp = (*printer)(arg, quote, 1);
-		if __unlikely(temp < 0)
+		if unlikely(temp < 0)
 			goto err;
 		result += temp;
 	}
@@ -526,20 +504,11 @@ err:
 @@@param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
 @@@return: 0: The given data was successfully hex-dumped
 @@@return: *: The first non-ZERO(0) return value of PRINTER
-[dependency_include(<hybrid/__alloca.h>)]
-[dependency_include(<hybrid/__unaligned.h>)]
-[dependency_include(<hybrid/byteorder.h>)]
-[decl_prefix(
-@@if $wchar_function@@
-#include @<bits/wformat-printer.h>@
-#include @<bits/uformat-printer.h>@
-@@else@@
-#include @<bits/format-printer.h>@
-@@endif@@
-)][[kernel]][throws]
-format_hexdump:([[nonnull]] pformatprinter printer, void *arg,
-                void const *__restrict data, $size_t size,
-                $size_t linesize, unsigned int flags) -> $ssize_t {
+[[kernel, throws, decl_include("<bits/format-printer.h>")]]
+[[impl_include("<hybrid/__alloca.h>", "<hybrid/__unaligned.h>", "<hybrid/byteorder.h>")]]
+$ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
+                        void const *__restrict data, $size_t size,
+                        $size_t linesize, unsigned int flags) {
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals
@@ -579,7 +548,7 @@ format_hexdump:([[nonnull]] pformatprinter printer, void *arg,
 				value >>= 4;
 			}
 			temp = (*printer)(arg, buffer, (sizeof(void *) * 2) + 1);
-			if __unlikely(temp < 0)
+			if unlikely(temp < 0)
 				goto err;
 			result += temp;
 		}
@@ -593,7 +562,7 @@ format_hexdump:([[nonnull]] pformatprinter printer, void *arg,
 			}
 			buffer[0] = '+';
 			temp = (*printer)(arg, buffer, (size_t)2 + offset_digits);
-			if __unlikely(temp < 0)
+			if unlikely(temp < 0)
 				goto err;
 			result += temp;
 		}
@@ -617,7 +586,7 @@ format_hexdump:([[nonnull]] pformatprinter printer, void *arg,
 						w >>= 4;
 					}
 					temp = (*printer)(arg, buffer, 5);
-					if __unlikely(temp < 0)
+					if unlikely(temp < 0)
 						goto err;
 					result += temp;
 					tailspace_count -= 5;
@@ -635,7 +604,7 @@ format_hexdump:([[nonnull]] pformatprinter printer, void *arg,
 						l >>= 4;
 					}
 					temp = (*printer)(arg, buffer, 9);
-					if __unlikely(temp < 0)
+					if unlikely(temp < 0)
 						goto err;
 					result += temp;
 					tailspace_count -= 9;
@@ -646,21 +615,22 @@ format_hexdump:([[nonnull]] pformatprinter printer, void *arg,
 				tailspace_count = (linesize / 8) * 17 + (linesize % 8) * 3;
 				buffer[16] = ' ';
 				for (; i + 8 <= line_len; i += 8) {
-#if __SIZEOF_POINTER__ >= 8
+@@pp_if __SIZEOF_POINTER__ >= 8@@
 					u64 q = __hybrid_unaligned_get64((u64 *)(line_data + i));
 					dst = buffer + 16;
 					while (dst > buffer) {
 						*--dst = dec[q & 0xf];
 						q >>= 4;
 					}
-#else
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-					u32 b = __hybrid_unaligned_get32((u32 *)(line_data + i));
-					u32 a = __hybrid_unaligned_get32((u32 *)(line_data + i + 4));
-#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-					u32 a = __hybrid_unaligned_get32((u32 *)(line_data + i));
-					u32 b = __hybrid_unaligned_get32((u32 *)(line_data + i + 4));
-#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+@@pp_else@@
+					u32 a, b;
+@@pp_if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__@@
+					a = __hybrid_unaligned_get32((u32 *)(line_data + i + 4));
+					b = __hybrid_unaligned_get32((u32 *)(line_data + i));
+@@pp_else@@
+					a = __hybrid_unaligned_get32((u32 *)(line_data + i));
+					b = __hybrid_unaligned_get32((u32 *)(line_data + i + 4));
+@@pp_endif@@
 					dst = buffer + 16;
 					while (dst > buffer + 8) {
 						*--dst = dec[b & 0xf];
@@ -670,9 +640,9 @@ format_hexdump:([[nonnull]] pformatprinter printer, void *arg,
 						*--dst = dec[a & 0xf];
 						a >>= 4;
 					}
-#endif
+@@pp_endif@@
 					temp = (*printer)(arg, buffer, 17);
-					if __unlikely(temp < 0)
+					if unlikely(temp < 0)
 						goto err;
 					result += temp;
 					tailspace_count -= 17;
@@ -685,14 +655,14 @@ format_hexdump:([[nonnull]] pformatprinter printer, void *arg,
 				buffer[0] = dec[b >> 4];
 				buffer[1] = dec[b & 0xf];
 				temp = (*printer)(arg, buffer, 3);
-				if __unlikely(temp < 0)
+				if unlikely(temp < 0)
 					goto err;
 				result += temp;
 				tailspace_count -= 3;
 			}
 			if (tailspace_count) {
 				temp = format_repeat(printer, arg, ' ', tailspace_count);
-				if __unlikely(temp < 0)
+				if unlikely(temp < 0)
 					goto err;
 				result += temp;
 			}
@@ -703,7 +673,7 @@ format_hexdump:([[nonnull]] pformatprinter printer, void *arg,
 				if (!isprint(b))
 					b = '.';
 				temp = (*printer)(arg, (char const *)&b, 1);
-				if __unlikely(temp < 0)
+				if unlikely(temp < 0)
 					goto err;
 				result += temp;
 			}
@@ -713,7 +683,7 @@ format_hexdump:([[nonnull]] pformatprinter printer, void *arg,
 		line_data += line_len;
 		size      -= line_len;
 		temp = (*printer)(arg, lf, 1);
-		if __unlikely(temp < 0)
+		if unlikely(temp < 0)
 			goto err;
 		result += temp;
 	}
@@ -822,88 +792,78 @@ err:
 @@                     increasing the buffer when it gets filled completely.
 @@ - syslog:           Unbuffered system-log output.
 @@ - ...               There are a _lot_ more...
-[dependency_include(<parts/printf-config.h>)][dependency_prefix(
-#include @<bits/uformat-printer.h>@
-#include @<libc/parts.uchar.string.h>@
-#include @<libc/string.h>@
-#include @<hybrid/__assert.h>@
+[[kernel, throws, ATTR_LIBC_PRINTF(3, 0)]]
+[[decl_include("<bits/format-printer.h>")]]
+[[impl_include("<bits/uformat-printer.h>")]]
+[[impl_include("<parts/printf-config.h>")]]
+[[impl_include("<libc/parts.uchar.string.h>")]]
+[[impl_include("<libc/string.h>")]]
+[[impl_include("<hybrid/__assert.h>")]]
+[[impl_prefix(
 #ifndef __NO_PRINTF_DISASM
 #if !defined(__KERNEL__) || !defined(__KOS__)
-#include @<dlfcn.h>@
+#include <dlfcn.h>
 #endif /* !__KERNEL__ || !__KOS__ */
-#include @<libdisasm/disassembler.h>@
+#include <libdisasm/disassembler.h>
 #endif /* !__NO_PRINTF_DISASM */
 #ifndef __NO_PRINTF_VINFO
 #if !defined(__KERNEL__) || !defined(__KOS__)
-#include @<dlfcn.h>@
-#include @<libdebuginfo/addr2line.h>@
+#include <dlfcn.h>
+#include <libdebuginfo/addr2line.h>
 #else /* !__KERNEL__ || !__KOS__ */
-#include @<kernel/addr2line.h>@
+#include <kernel/addr2line.h>
 #endif /* __KERNEL__ && __KOS__ */
 #endif /* !__NO_PRINTF_VINFO */
-)][decl_prefix(
-@@if $wchar_function@@
-#include @<bits/wformat-printer.h>@
-#include @<bits/uformat-printer.h>@
-@@else@@
-#include @<bits/format-printer.h>@
-@@endif@@
-)][ATTR_LIBC_PRINTF(3, 0)][throws][[kernel]]
-format_vprintf:([[nonnull]] pformatprinter printer, void *arg,
-                [[nonnull]] char const *__restrict format, __builtin_va_list args) -> $ssize_t {
+)]]
+$ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
+                        [[nonnull]] char const *__restrict format, __builtin_va_list args) {
 #ifndef __INTELLISENSE__
-#define @__CHAR_TYPE@                 char
-#define @__CHAR_SIZE@                 __SIZEOF_CHAR__
-#define @__FORMAT_REPEAT@             format_repeat
-#define @__FORMAT_HEXDUMP@            format_hexdump
-@@if $wchar_function@@
-#define @__FORMAT_WIDTH@              format_wwidth
-#define @__FORMAT_ESCAPE@             format_wescape
-#define @__FORMAT_WIDTH8@             @@noreplace_on_copy format_width@@
-#define @__FORMAT_ESCAPE8@            @@noreplace_on_copy format_escape@@
-#if __SIZEOF_WCHAR_T__ == 2
-#define @__FORMAT_WIDTH32@            format_c32width
-#define @__FORMAT_ESCAPE32@           format_c32escape
-#define @__FORMAT_UNICODE_WRITECHAR@  unicode_writeutf16
-#define @__FORMAT_UNICODE_FORMAT8@    format_8to16
-#define @__FORMAT_UNICODE_FORMAT32@   format_32to16
-#else /* __SIZEOF_WCHAR_T__ == 2 */
-#define @__FORMAT_WIDTH16@            format_c16width
-#define @__FORMAT_ESCAPE16@           format_c16escape
-#define @__FORMAT_UNICODE_WRITECHAR@(dst, ch) ((dst)[0] = (ch), (dst) + 1)
-#define @__FORMAT_UNICODE_FORMAT8@    format_8to32
-#define @__FORMAT_UNICODE_FORMAT16@   format_16to32
-#endif /* __SIZEOF_WCHAR_T__ != 2 */
-@@else@@
-#define @__FORMAT_WIDTH@              format_width
-#define @__FORMAT_WIDTH16@            format_c16width
-#define @__FORMAT_WIDTH32@            format_c32width
-#define @__FORMAT_ESCAPE@             format_escape
-#define @__FORMAT_ESCAPE16@           format_c16escape
-#define @__FORMAT_ESCAPE32@           format_c32escape
-#define @__FORMAT_UNICODE_WRITECHAR@  unicode_writeutf8
-#define @__FORMAT_UNICODE_FORMAT16@   format_16to8
-#define @__FORMAT_UNICODE_FORMAT32@   format_32to8
-@@endif@@
-#define @__FORMAT_PRINTER@            printer
-#define @__FORMAT_ARG@                arg
-#define @__FORMAT_FORMAT@             format
-#define @__FORMAT_ARGS@               args
-#include @<local/format-printf.h>@
+#define __FORMAT_PRINTER            printer
+#define __FORMAT_ARG                arg
+#define __FORMAT_FORMAT             format
+#define __FORMAT_ARGS               args
+#define __CHAR_TYPE                 char
+#define __CHAR_SIZE                 __SIZEOF_CHAR__
+#define __FORMAT_REPEAT             format_repeat
+#define __FORMAT_HEXDUMP            format_hexdump
+@@pp_if __SIZEOF_CHAR__ == 1@@
+#define __FORMAT_WIDTH16            format_c16width
+#define __FORMAT_WIDTH32            format_c32width
+#define __FORMAT_ESCAPE             format_escape
+#define __FORMAT_ESCAPE16           format_c16escape
+#define __FORMAT_ESCAPE32           format_c32escape
+#define __FORMAT_UNICODE_WRITECHAR  unicode_writeutf8
+#define __FORMAT_UNICODE_FORMAT16   format_16to8
+#define __FORMAT_UNICODE_FORMAT32   format_32to8
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+#define __FORMAT_WIDTH              format_wwidth
+#define __FORMAT_ESCAPE             format_wescape
+#define __FORMAT_WIDTH8             format_width
+#define __FORMAT_ESCAPE8            format_escape
+#define __FORMAT_WIDTH32            format_c32width
+#define __FORMAT_ESCAPE32           format_c32escape
+#define __FORMAT_UNICODE_WRITECHAR  unicode_writeutf16
+#define __FORMAT_UNICODE_FORMAT8    format_8to16
+#define __FORMAT_UNICODE_FORMAT32   format_32to16
+@@pp_else@@
+#define __FORMAT_WIDTH              format_wwidth
+#define __FORMAT_ESCAPE             format_wescape
+#define __FORMAT_WIDTH8             format_width
+#define __FORMAT_ESCAPE8            format_escape
+#define __FORMAT_WIDTH16            format_c16width
+#define __FORMAT_ESCAPE16           format_c16escape
+#define __FORMAT_UNICODE_WRITECHAR(dst, ch) ((dst)[0] = (ch), (dst) + 1)
+#define __FORMAT_UNICODE_FORMAT8    format_8to32
+#define __FORMAT_UNICODE_FORMAT16   format_16to32
+@@pp_endif@@
+#include <local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }
 
-[ATTR_LIBC_PRINTF(3, 4)][throws][allow_macros]
-[decl_prefix(
-@@if $wchar_function@@
-#include @<bits/wformat-printer.h>@
-#include @<bits/uformat-printer.h>@
-@@else@@
-#include @<bits/format-printer.h>@
-@@endif@@
-)][doc_alias(format_vprintf)][[kernel]]
-format_printf:([[nonnull]] pformatprinter printer, void *arg,
-               [[nonnull]] char const *__restrict format, ...) -> $ssize_t {
+[[kernel, ATTR_LIBC_PRINTF(3, 4), throws, allow_macros]]
+[[decl_include("<bits/format-printer.h>"), doc_alias("format_vprintf")]]
+$ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
+                       [[nonnull]] char const *__restrict format, ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -939,41 +899,28 @@ format_printf:([[nonnull]] pformatprinter printer, void *arg,
 @@@return: 0 :  No data could be scanned.
 @@@return: * :  The total number of successfully scanned arguments.
 @@@return: EOF: `PGETC' returned EOF the first time an attempt at reading was made
-[impl_include("<libc/unicode.h>")]
-[dependency_include(<libc/string.h>)]
-[decl_prefix(
-@@if $wchar_function@@
-#include @<bits/wformat-printer.h>@
-#include @<bits/uformat-printer.h>@
-@@else@@
-#include @<bits/format-printer.h>@
-@@endif@@
-)][ATTR_LIBC_SCANF(4, 0)][throws][[kernel]]
-format_vscanf:([[nonnull]] pformatgetc pgetc,
-               [[nonnull]] pformatungetc pungetc, void *arg,
-               [[nonnull]] char const *__restrict format, $va_list args) -> $ssize_t {
-#define @__CHAR_TYPE@      char
-#define @__CHAR_SIZE@      __SIZEOF_CHAR__
-#define @__FORMAT_PGETC@   pgetc
-#define @__FORMAT_PUNGETC@ pungetc
-#define @__FORMAT_ARG@     arg
-#define @__FORMAT_FORMAT@  format
-#define @__FORMAT_ARGS@    args
-#include @<local/format-scanf.h>@
+[[throws, kernel, ATTR_LIBC_SCANF(4, 0)]]
+[[decl_include("<bits/format-printer.h>")]]
+[[impl_include("<libc/string.h>", "<libc/unicode.h>")]]
+$ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
+                       [[nonnull]] pformatungetc pungetc, void *arg,
+                       [[nonnull]] char const *__restrict format, $va_list args) {
+#define __CHAR_TYPE      char
+#define __CHAR_SIZE      __SIZEOF_CHAR__
+#define __FORMAT_PGETC   pgetc
+#define __FORMAT_PUNGETC pungetc
+#define __FORMAT_ARG     arg
+#define __FORMAT_FORMAT  format
+#define __FORMAT_ARGS    args
+#include <local/format-scanf.h>
 }
 
-[ATTR_LIBC_SCANF(4, 5)][throws][allow_macros]
-[decl_prefix(
-@@if $wchar_function@@
-#include @<bits/wformat-printer.h>@
-#include @<bits/uformat-printer.h>@
-@@else@@
-#include @<bits/format-printer.h>@
-@@endif@@
-)][doc_alias(format_vscanf)][[kernel]]
-format_scanf:([[nonnull]] pformatgetc pgetc,
-              [[nonnull]] pformatungetc pungetc, void *arg,
-              [[nonnull]] char const *__restrict format, ...) -> $ssize_t {
+[[throws, allow_macros, ATTR_LIBC_SCANF(4, 5)]]
+[[decl_include("<bits/format-printer.h>")]]
+[[doc_alias("format_vscanf"), kernel]]
+$ssize_t format_scanf([[nonnull]] pformatgetc pgetc,
+                      [[nonnull]] pformatungetc pungetc, void *arg,
+                      [[nonnull]] char const *__restrict format, ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -989,13 +936,10 @@ format_scanf:([[nonnull]] pformatgetc pgetc,
 @@Format-printer implementation for printing to a string buffer like `sprintf' would
 @@WARNING: No trailing NUL-character is implicitly appended
 [[kernel]]
-format_sprintf_printer:([[nonnull]] /*char ***/ void *arg,
-                        [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
-@@if $wchar_function@@
-	*(wchar_t **)arg = (wchar_t *)wmempcpy(*(wchar_t **)arg, data, datalen);
-@@else@@
+$ssize_t format_sprintf_printer([[nonnull]] /*char ***/ void *arg,
+                                [[nonnull]] /*utf-8*/ char const *__restrict data,
+                                $size_t datalen) {
 	*(char **)arg = (char *)mempcpyc(*(char **)arg, data, datalen, sizeof(char));
-@@endif@@
 	return (ssize_t)datalen;
 }
 
@@ -1019,24 +963,21 @@ struct format_snprintf_data {
 @@Format-printer implementation for printing to a string buffer like `snprintf' would
 @@WARNING: No trailing NUL-character is implicitly appended
 @@NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
-@@NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()'
-[dependency_include(<hybrid/typecore.h>)][[kernel]]
-format_snprintf_printer:([[nonnull]] /*struct format_snprintf_data**/ void *arg,
-                         [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
+@@NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
+@@      the sum of return values of all calls to `format_snprintf_printer()'
+[[kernel]]
+$ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ void *arg,
+                                 [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	struct format_snprintf_data_ {
-		char         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
-		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
+		char   *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
+		size_t  sd_bufsiz; /* Remaining buffer size. */
 	};
 	struct format_snprintf_data_ *ctrl;
 	size_t result = datalen;
 	ctrl = (struct format_snprintf_data_ *)arg;
 	if (result > ctrl->sd_bufsiz)
 		result = ctrl->sd_bufsiz;
-@@if $wchar_function@@
-	wmemcpy(ctrl->sd_buffer, data, result);
-@@else@@
 	memcpyc(ctrl->sd_buffer, data, result, sizeof(char));
-@@endif@@
 	ctrl->sd_buffer += datalen;
 	ctrl->sd_bufsiz -= result;
 	return (ssize_t)datalen;
@@ -1044,8 +985,8 @@ format_snprintf_printer:([[nonnull]] /*struct format_snprintf_data**/ void *arg,
 
 
 @@Returns the width (number of characters; not bytes) of the given unicode string
-[[impl_include("<local/unicode_utf8seqlen.h>"), kernel, ATTR_PURE]]
-format_width:(void *arg, [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
+[[kernel, ATTR_PURE, impl_include("<local/unicode_utf8seqlen.h>")]]
+$ssize_t format_width(void *arg, [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	size_t result = 0;
 	char const *iter, *end;
 	(void)arg;
@@ -1062,8 +1003,8 @@ format_width:(void *arg, [[nonnull]] /*utf-8*/ char const *__restrict data, $siz
 }
 
 @@Always re-return `datalen' and ignore all other arguments
-[alternate_names(format_wwidth)][[ATTR_CONST]]
-format_length:(void *arg, /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
+[[ATTR_CONST, export_alias("format_wwidth")]]
+$ssize_t format_length(void *arg, /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	(void)arg;
 	(void)data;
 	return (ssize_t)datalen;
@@ -1141,16 +1082,14 @@ struct format_aprintf_data {
 @@                 but may differ from `strlen(return)' when NUL characters were
 @@                 printed to the aprintf-printer at one point.
 @@                 (e.g. `format_aprintf_printer(&my_printer, "\0", 1)')
-[[impl_include("<hybrid/__assert.h>")]]
-[dependency_include(<hybrid/typecore.h>)][[userimpl]]
-[[ATTR_WUNUSED, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
-[dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]
-format_aprintf_pack:([[nonnull]] struct format_aprintf_data *__restrict self,
-                     [[nullable]] $size_t *pstrlen) -> char * {
+[[ATTR_WUNUSED, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, userimpl]]
+[[impl_include("<hybrid/__assert.h>"), impl_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
+char *format_aprintf_pack([[nonnull]] struct format_aprintf_data *__restrict self,
+                          [[nullable]] $size_t *pstrlen) {
 	/* Free unused buffer memory. */
 	char *result;
 	if (self->@ap_avail@ != 0) {
-@@pp_if_has_function(realloc)@@
+@@pp_if $has_function(realloc)@@
 		char *newbuf;
 		newbuf = (char *)realloc(self->@ap_base@,
 		                         (self->@ap_used@ + 1) *
@@ -1201,9 +1140,9 @@ format_aprintf_pack:([[nonnull]] struct format_aprintf_data *__restrict self,
 @@the format_aprintf buffer `self' is finalized, or some other function is used
 @@to append additional data to the end of `self'
 @@@return: NULL: Failed to allocate additional memory
-[[userimpl, requires_function(realloc)]]
 [[impl_include("<hybrid/__assert.h>"), ATTR_WUNUSED]]
 [[dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
+[[userimpl, requires_function(realloc)]]
 format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
                       $size_t num_chars) -> [[malloc(num_chars)]] char * {
 	char *result;
@@ -1235,9 +1174,9 @@ format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
 
 @@Print data to a dynamically allocated heap buffer. On error, -1 is returned
 @@This function is intended to be used as a pformatprinter-compatibile printer sink
-[userimpl, requires_function(format_aprintf_alloc)][[ATTR_WUNUSED]]
-format_aprintf_printer:([[nonnull]] /*struct format_aprintf_data **/ void *arg,
-                        [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
+[[ATTR_WUNUSED, userimpl, requires_function(format_aprintf_alloc)]]
+$ssize_t format_aprintf_printer([[nonnull]] /*struct format_aprintf_data **/ void *arg,
+                                [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	char *buf;
 	buf = format_aprintf_alloc((struct @format_aprintf_data@ *)arg,
 	                           datalen);

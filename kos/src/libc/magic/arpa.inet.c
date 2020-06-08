@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default_impl_section(.text.crt.net.inet)]
+%[default_impl_section(".text.crt.net.inet")]
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(pid_t = __pid_t)]
 
@@ -59,9 +59,8 @@ typedef __socklen_t socklen_t;
 
 @@Return network number part of the Internet address IN
 [[ATTR_WUNUSED, ATTR_CONST]]
-[impl_include("<netinet/in.h>")]
-[impl_include("<hybrid/__byteswap.h>")]
-inet_netof:(struct in_addr inaddr) -> $uint32_t {
+[[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
+$uint32_t inet_netof(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
 	if (@IN_CLASSA@(addr)) {
 		return (addr & @IN_CLASSA_NET@) >> @IN_CLASSA_NSHIFT@;
@@ -74,9 +73,8 @@ inet_netof:(struct in_addr inaddr) -> $uint32_t {
 
 @@Return the local host address part of the Internet address in IN
 [[ATTR_WUNUSED, ATTR_CONST]]
-[impl_include("<netinet/in.h>")]
-[impl_include("<hybrid/__byteswap.h>")]
-inet_lnaof:(struct in_addr inaddr) -> $uint32_t {
+[[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
+$uint32_t inet_lnaof(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
 	if (@IN_CLASSA@(addr)) {
 		return addr & @IN_CLASSA_HOST@;
@@ -90,9 +88,8 @@ inet_lnaof:(struct in_addr inaddr) -> $uint32_t {
 @@Make Internet host address in network byte order by
 @@combining the network number NET with the local address HOST
 [[ATTR_WUNUSED, ATTR_CONST]]
-[impl_include("<netinet/in.h>")]
-[impl_include("<hybrid/__byteswap.h>")]
-inet_makeaddr:($uint32_t net, $uint32_t host) -> struct in_addr {
+[[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
+struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {
 	struct @in_addr@ result;
 	uint32_t result_addr;
 	if (net < @IN_CLASSA_MAX@)
@@ -119,8 +116,8 @@ inet_makeaddr:($uint32_t net, $uint32_t host) -> struct in_addr {
 @@    123      (decimal)
 @@    0x123    (hex)
 @@    0123     (oct)
-[[ATTR_PURE]][impl_include("<netinet/in.h>")]
-inet_addr:([[nonnull]] char const *__restrict cp) -> in_addr_t {
+[[ATTR_PURE, impl_include("<netinet/in.h>")]]
+in_addr_t inet_addr([[nonnull]] char const *__restrict cp) {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 0) || *cp)
 		return @INADDR_NONE@;
@@ -138,8 +135,7 @@ inet_addr:([[nonnull]] char const *__restrict cp) -> in_addr_t {
 %#ifdef __USE_KOS
 %#define INET_NTOA_R_MAXLEN 16 /* Max # of characters written by `inet_ntoa_r' (e.g. `111.111.111.111\0') */
 @@Re-entrant version of `inet_ntoa()'
-[impl_include("<netinet/in.h>")]
-[impl_include("<hybrid/__byteswap.h>")]
+[[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 [[nonnull]] char *inet_ntoa_r(struct in_addr inaddr, [[nonnull]] char buf[16]) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
 	sprintf(buf, "%u.%u.%u.%u",
@@ -153,9 +149,8 @@ inet_addr:([[nonnull]] char const *__restrict cp) -> in_addr_t {
 
 @@This function is the same as `inet_addr()', except that
 @@the return value is in host-endian, rather than net-endian
-[[ATTR_PURE]][impl_include("<netinet/in.h>")]
-[impl_include("<hybrid/__byteswap.h>")]
-inet_network:([[nonnull]] char const *__restrict cp) -> $uint32_t {
+[[ATTR_PURE, impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
+$uint32_t inet_network([[nonnull]] char const *__restrict cp) {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 1) || *cp)
 		return @INADDR_NONE@;
@@ -179,8 +174,8 @@ inet_network:([[nonnull]] char const *__restrict cp) -> $uint32_t {
 @@    0123     (oct)
 @@@return: 0: Bad input format
 @@@return: 1: Success
-inet_aton:([[nonnull]] char const *__restrict cp,
-           [[nonnull]] struct in_addr *__restrict inp) -> int {
+int inet_aton([[nonnull]] char const *__restrict cp,
+              [[nonnull]] struct in_addr *__restrict inp) {
 	return inet_paton((char const **)&cp, inp, 0) && !*cp;
 }
 
@@ -198,10 +193,10 @@ inet_aton:([[nonnull]] char const *__restrict cp,
 @@@param: network_addr: When non-zero, `*pcp' is a network address
 @@@return: 0: Bad input format
 @@@return: 1: Success
-[[ATTR_WUNUSED]][impl_include("<hybrid/__byteswap.h>")]
-inet_paton:([[nonnull]] char const **__restrict pcp,
-            [[nonnull]] struct in_addr *__restrict inp,
-            int network_addr) -> int {
+[[ATTR_WUNUSED, impl_include("<hybrid/__byteswap.h>")]]
+int inet_paton([[nonnull]] char const **__restrict pcp,
+               [[nonnull]] struct in_addr *__restrict inp,
+               int network_addr) {
 	uint32_t result;
 	uint32_t parts[4];
 	char const *cp = *pcp;
@@ -286,6 +281,7 @@ inet_paton:([[nonnull]] char const **__restrict pcp,
 		++cp;
 	}
 	switch (__builtin_expect(i, 4)) {
+
 	case 4:
 		if unlikely(parts[3] > 0xff)
 			goto err;
@@ -294,6 +290,7 @@ inet_paton:([[nonnull]] char const **__restrict pcp,
 		         parts[2] << 8 |
 		         parts[3];
 		break;
+
 	case 3:
 		if (network_addr) {
 			if unlikely(parts[2] > 0xff)
@@ -309,6 +306,7 @@ inet_paton:([[nonnull]] char const **__restrict pcp,
 			         parts[2];
 		}
 		break;
+
 	case 2:
 		if (network_addr) {
 			if unlikely(parts[1] > 0xff)
@@ -322,6 +320,7 @@ inet_paton:([[nonnull]] char const **__restrict pcp,
 			         parts[1];
 		}
 		break;
+
 	case 1:
 		if (network_addr) {
 			if unlikely(parts[0] > 0xff)
@@ -329,6 +328,7 @@ inet_paton:([[nonnull]] char const **__restrict pcp,
 		}
 		result = parts[0];
 		break;
+
 	default: __builtin_unreachable();
 	}
 	inp->@s_addr@ = __hybrid_htobe32(result);
@@ -341,8 +341,8 @@ err:
 
 @@Format a network number NET into presentation format and place
 @@result in buffer starting at BUF with length of LEN bytes
-[impl_include("<parts/errno.h>")]
-inet_neta:($uint32_t net, [outp(len)] char *buf, $size_t len) -> char * {
+[[impl_include("<parts/errno.h>")]]
+char *inet_neta($uint32_t net, [[outp(len)]] char *buf, $size_t len) {
 	size_t reqlen;
 	if (net <= 0xff) {
 		if (!net) {
@@ -384,31 +384,38 @@ too_small:
 
 @@Convert network number for interface type AF in buffer starting at CP
 @@to presentation format. The result will specify BITS bits of the number
-[[cp_kos]] inet_net_ntop:(int af, void const *cp, int bits, char *buf, $size_t len) -> char *;
+[[cp_kos]]
+char *inet_net_ntop(int af, void const *cp, int bits, char *buf, $size_t len);
 
 @@Convert network number for interface type AF from presentation in buffer starting
 @@at CP to network format and store result int buffer starting at BUF of size LEN
-[[cp_kos]] inet_net_pton:(int af, char const *cp, void *buf, $size_t len) -> int;
+[[cp_kos]]
+intinet_net_pton(int af, char const *cp, void *buf, $size_t len);
 
 @@Convert ASCII representation in hexadecimal form of the Internet address
 @@to binary form and place result in buffer of length LEN starting at BUF
-[[cp_kos]] inet_nsap_addr:(char const *cp, unsigned char *buf, int len) -> unsigned int;
+[[cp_kos]]
+unsigned intinet_nsap_addr(char const *cp, unsigned char *buf, int len);
 
 @@Convert internet address in binary form in LEN bytes
 @@starting at CP a presentation form and place result in BUF
-[[cp_kos]] inet_nsap_ntoa:(int len, unsigned char const *cp, char *buf) -> char *;
+[[cp_kos]]
+char *inet_nsap_ntoa(int len, unsigned char const *cp, char *buf);
 
 %#endif /* __USE_MISC */
 
 @@Convert from presentation format of an Internet number in buffer
 @@starting at CP to the binary network format and store result for
 @@interface type AF in buffer starting at BUF
-[[cp_kos]] inet_pton:(int af, char const *__restrict cp, void *__restrict buf) -> int;
+[[cp_kos]]
+int inet_pton(int af, char const *__restrict cp, void *__restrict buf);
 
 @@Convert a Internet address in binary network format for interface
 @@type AF in buffer starting at CP to presentation form and place
 @@result in buffer of length LEN starting at BUF
-[[cp_kos]] inet_ntop:(int af, void const *__restrict cp, char *__restrict buf, socklen_t len) -> char const *;
+[[cp_kos]]
+char const *inet_ntop(int af, void const *__restrict cp,
+                      char *__restrict buf, socklen_t len);
 
 
 %{

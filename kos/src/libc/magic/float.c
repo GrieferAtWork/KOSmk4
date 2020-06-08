@@ -200,12 +200,14 @@ _statusfp2($uint32_t *x86_stat, $uint32_t *sse2_stat);
 #ifdef __CC__
 }
 
-_control87:($uint32_t newval, $uint32_t mask) -> $uint32_t;
+$uint32_t _control87($uint32_t newval, $uint32_t mask);
 %#if defined(__x86_64__) || defined(__i386__)
-__control87_2:($uint32_t newval, $uint32_t mask, $uint32_t *x86_control_word, $uint32_t *sse2_control_word) -> int;
+int __control87_2($uint32_t newval, $uint32_t mask,
+                  $uint32_t *x86_control_word,
+                  $uint32_t *sse2_control_word);
 %#endif /* X64... */
-__fpecode:() -> int *;
-%#define _fpecode      (*__fpecode())
+int *__fpecode();
+%#define _fpecode (*__fpecode())
 %{
 #endif /* __CC__ */
 
@@ -230,21 +232,24 @@ __fpecode:() -> int *;
 #ifdef __CC__
 }
 
-_copysign:(*) = copysign;
+_copysign(*) = copysign;
 
 [[ATTR_WUNUSED, ATTR_CONST, nothrow]]
 double _chgsign(double x) {
 	return -x;
 }
 
-_scalb:(*) = scalb;
-_logb:(*) = logb;
-_nextafter:(*) = nextafter;
-_finite:(*) = finite;
-_isnan:(*) = isnan;
-[[ATTR_WUNUSED, ATTR_CONST, nothrow]] int _fpclass(double x);
+_scalb(*) = scalb;
+_logb(*) = logb;
+_nextafter(*) = nextafter;
+_finite(*) = finite;
+_isnan(*) = isnan;
+
+[[ATTR_WUNUSED, ATTR_CONST, nothrow]]
+int _fpclass(double x);
+
 %#if defined(__x86_64__) || defined(__i386__)
-_scalbf:(*) = scalbf;
+_scalbf(*) = scalbf;
 %#endif /* __x86_64__ || __i386__ */
 
 %{
@@ -264,7 +269,8 @@ _scalbf:(*) = scalbf;
 #ifdef __CC__
 }
 
-[alias(_fpreset)] fpreset();
+[export_alias("_fpreset")]
+void fpreset();
 
 %{
 

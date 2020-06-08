@@ -657,7 +657,7 @@ pthread_getaffinity_np:(pthread_t pthread, size_t cpusetsize, [[nonnull]] cpu_se
 @@only once, even if pthread_once is executed several times with the
 @@same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
 @@extern variable initialized to PTHREAD_ONCE_INIT.
-[throws][export_alias(call_once)]
+[[throws]][export_alias(call_once)]
 pthread_once:([[nonnull]] pthread_once_t *once_control,
               [[nonnull]] __pthread_once_routine_t init_routine) -> int;
 
@@ -1403,7 +1403,7 @@ pthread_spin_lock:([[nonnull]] pthread_spinlock_t *lock) -> int {
 %
 @@Try to lock spinlock LOCK
 [dependency_include(<hybrid/__atomic.h>)]
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 pthread_spin_trylock:([[nonnull]] pthread_spinlock_t *lock) -> int {
 	if (__hybrid_atomic_xch(*lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
@@ -1548,7 +1548,7 @@ pthread_num_processors_np:() -> __STDC_INT_AS_SIZE_T {
 }
 
 [dependency_include(<bits/sched.h>)]
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 [[userimpl]][requires($has_function(sched_setaffinity))]
 pthread_set_num_processors_np:(int n) -> int {
 	int i, result;

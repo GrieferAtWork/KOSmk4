@@ -516,7 +516,7 @@ fputwc:(wchar_t wc, [[nonnull]] FILE *stream) -> wint_t;
 [[cp_stdio, std, guard, wchar, ATTR_WUNUSED]][alias(fgetws_unlocked, _fgetws_nolock)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fgetws_unlocked, _fgetws_nolock)]
 [requires($has_function(fgetwc) && $has_function(ungetwc) && $has_function(ferror))][[userimpl]]
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 [impl_include("<asm/stdio.h>")][[userimpl]]
 fgetws:([[outp(bufsize)]] wchar_t *__restrict buf,
         __STDC_INT_AS_SIZE_T bufsize,

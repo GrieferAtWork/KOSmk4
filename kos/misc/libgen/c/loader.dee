@@ -227,16 +227,15 @@ function parseCTypeAndName(self: CParser): (CType, UserString | string) {
 		varname = "";
 		self.next();
 	} else {
-		final local TWO_WORD_TYPENAME_INDICATORS = ["struct", "union", "class", "enum"];
 		if (!tok.issymbol())
 			self.err("Expected keyword or string for typename, but got {!r}".format({ tok }));
 		local typenameStart = self.tokStart;
 		local typenameEnd = self.tokEnd;
-		if (tok in TWO_WORD_TYPENAME_INDICATORS)
+		if (tok in cLanguageTwoWordTypenameKeywords)
 			goto continue_typename_expression_twoword;
 		tok = self.next();
 		for (;;) {
-			if (tok in TWO_WORD_TYPENAME_INDICATORS) {
+			if (tok in cLanguageTwoWordTypenameKeywords) {
 continue_typename_expression_twoword:
 				self.next();
 continue_typename_expression:
@@ -1708,7 +1707,7 @@ do_push_macroList:
 			tempfp << "#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */\n";
 			if (doUndefMacros) {
 				for (local mac: macroList)
-					tempfp << "#undef " << repr(mac) << "\n";
+					tempfp << "#undef " << mac << "\n";
 			}
 			if (pushedMacros is none)
 				pushedMacros = [];
@@ -4301,7 +4300,6 @@ done_function:
 			.format({ guard_CXX_STDONLY }));
 		result.order_header.insertall(1, context.result_order_headerCCompat);
 		result.order_header.append(
-			"\n"
 			"#ifdef __CXX_SYSTEM_HEADER\n"
 			"#define {1} 1\n"
 			"#undef {0}\n"
@@ -4318,7 +4316,6 @@ done_function:
 			"#define {0} 1\n"
 			"\n".format({ context.result_headerGuardName }));
 		result.order_header.append(
-			"\n"
 			"#endif /* !{} */\n"
 			.format({ context.result_headerGuardName }));
 	}

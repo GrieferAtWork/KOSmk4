@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf3d6761 */
+/* HASH CRC-32:0xfd6a245b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,27 +80,27 @@ struct aliasent {
 #ifdef __CRT_HAVE_setaliasent
 /* Open alias data base files */
 __CDECLARE_VOID(,__NOTHROW_RPC_KOS,setaliasent,(void),())
-#endif /* setaliasent... */
+#endif /* __CRT_HAVE_setaliasent */
 #ifdef __CRT_HAVE_endaliasent
 /* Close alias data base files */
 __CDECLARE_VOID(,__NOTHROW_NCX,endaliasent,(void),())
-#endif /* endaliasent... */
+#endif /* __CRT_HAVE_endaliasent */
 #ifdef __CRT_HAVE_getaliasent
 /* Get the next entry from the alias data base */
 __CDECLARE(,struct aliasent *,__NOTHROW_RPC_KOS,getaliasent,(void),())
-#endif /* getaliasent... */
+#endif /* __CRT_HAVE_getaliasent */
 #ifdef __CRT_HAVE_getaliasent_r
 /* Get the next entry from the alias data base and put it in RESULT_BUF */
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),int,__NOTHROW_RPC_KOS,getaliasent_r,(struct aliasent *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct aliasent **__restrict __result),(__result_buf,__buffer,__buflen,__result))
-#endif /* getaliasent_r... */
+#endif /* __CRT_HAVE_getaliasent_r */
 #ifdef __CRT_HAVE_getaliasbyname
 /* Get alias entry corresponding to NAME */
 __CDECLARE(__ATTR_NONNULL((1)),struct aliasent *,__NOTHROW_RPC_KOS,getaliasbyname,(char const *__name),(__name))
-#endif /* getaliasbyname... */
+#endif /* __CRT_HAVE_getaliasbyname */
 #ifdef __CRT_HAVE_getaliasbyname_r
 /* Get alias entry corresponding to NAME and put it in RESULT_BUF */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC_KOS,getaliasbyname_r,(char const *__restrict __name, struct aliasent *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct aliasent **__restrict __result),(__name,__result_buf,__buffer,__buflen,__result))
-#endif /* getaliasbyname_r... */
+#endif /* __CRT_HAVE_getaliasbyname_r */
 #endif /* __CC__ */
 
 __SYSDECL_END

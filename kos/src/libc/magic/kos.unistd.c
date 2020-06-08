@@ -97,30 +97,30 @@ void FSync($fd_t fd) {
 %[default_impl_section(.text.crt.except.sched.process)]
 
 %
-[doc_alias(setpgid)][throws]
+[doc_alias(setpgid)][[throws]]
 void SetPGid($pid_t pid, $pid_t pgid);
 
 
 %
-[doc_alias(setsid)][throws]
+[doc_alias(setsid)][[throws]]
 SetSid:() -> $pid_t;
 
 %
-[doc_alias(setuid)][throws]
+[doc_alias(setuid)][[throws]]
 SetUid:($uid_t uid);
 
 %
-[doc_alias(setgid)][throws]
+[doc_alias(setgid)][[throws]]
 SetGid:($gid_t gid);
 
 %
-[doc_alias(fork)][[ATTR_WUNUSED]][throws]
+[doc_alias(fork)][[ATTR_WUNUSED, throws]]
 [section(.text.crt.except.sched.access)]
 Fork:() -> $pid_t;
 
 %
 [section(.text.crt.except.fs.property)]
-[throws][[ATTR_WUNUSED]][doc_alias(fpathconf)]
+[[throws, ATTR_WUNUSED]][doc_alias(fpathconf)]
 FPathConf:($fd_t fd, int name) -> long int;
 
 
@@ -128,35 +128,35 @@ FPathConf:($fd_t fd, int name) -> long int;
 
 
 %
-[throws][[cp, userimpl]][doc_alias(chown)]
+[[throws, cp, userimpl]][doc_alias(chown)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(FChownAt))]
 Chown:([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	FChownAt(__CRT_AT_FDCWD, file, owner, group, 0);
 }
 
 %
-[throws][[cp]][doc_alias(pathconf)]
+[[throws, cp]][doc_alias(pathconf)]
 [section(.text.crt.except.fs.property)]
 PathConf:([[nonnull]] char const *path, int name) -> long int;
 
 %
-[throws][[cp, userimpl]][doc_alias(link)]
+[[throws, cp, userimpl]][doc_alias(link)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(LinkAt))]
 Link:([[nonnull]] char const *from, [[nonnull]] char const *to) {
 	LinkAt(__CRT_AT_FDCWD, from, __CRT_AT_FDCWD, to, 0);
 }
 
 %
-[throws][doc_alias(read)][[cp]][section(.text.crt.except.io.read)]
+[[throws]][doc_alias(read)][[cp]][section(.text.crt.except.io.read)]
 Read:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) -> size_t;
 
 %
-[throws][doc_alias(write)][[cp]][section(".text.crt.except.io.write")]
+[[throws]][doc_alias(write)][[cp]][section(".text.crt.except.io.write")]
 Write:($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) -> size_t;
 
 %
 %#ifdef __USE_KOS
-[throws][doc_alias(readall)][[cp]][section(.text.crt.except.io.read)]
+[[throws]][doc_alias(readall)][[cp]][section(.text.crt.except.io.read)]
 [requires($has_function(Read) && $has_function(lseek))]
 [impl_include(<parts/errno.h>)]
 [impl_include(<kos/except.h>)]
@@ -213,7 +213,7 @@ $pos_t LSeek($fd_t fd, $off_t offset, int whence) {
 }
 
 %
-[throws][section(.text.crt.except.io.access)][doc_alias(dup2)]
+[[throws]][section(.text.crt.except.io.access)][doc_alias(dup2)]
 Dup2:($fd_t oldfd, $fd_t newfd) -> $fd_t;
 
 %
@@ -221,26 +221,26 @@ Dup2:($fd_t oldfd, $fd_t newfd) -> $fd_t;
 [[ATTR_WUNUSED]] Dup:($fd_t fd) -> $fd_t;
 
 %
-[throws][[cp]][doc_alias(chdir)]
+[[throws, cp]][doc_alias(chdir)]
 [section(.text.crt.except.fs.basic_property)]
 Chdir:([[nonnull]] char const *path);
 
 %
-[throws][[cp]][doc_alias(getcwd)]
+[[throws, cp]][doc_alias(getcwd)]
 [section(.text.crt.except.fs.basic_property)]
-GetCwd:([outp_opt(bufsize)] char *buf, size_t bufsize) -> char *;
+GetCwd:([[outp_opt(bufsize)]] char *buf, size_t bufsize) -> char *;
 
 %[default_impl_section(".text.crt.fs.modify")]
 
 %
-[throws][[cp]][doc_alias(unlink)][[userimpl]]
+[[throws, cp]][doc_alias(unlink)][[userimpl]]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(UnlinkAt))]
 Unlink:([[nonnull]] char const *file) {
 	UnlinkAt(__CRT_AT_FDCWD, file, 0);
 }
 
 %
-[throws][[cp]][doc_alias(rmdir)][[userimpl]]
+[[throws, cp]][doc_alias(rmdir)][[userimpl]]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(UnlinkAt))]
 Rmdir:([[nonnull]] char const *path) {
 	UnlinkAt(__CRT_AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
@@ -251,27 +251,27 @@ Rmdir:([[nonnull]] char const *path) {
 %[default_impl_section(.text.crt.except.fs.modify)]
 
 %
-[throws][[cp]][doc_alias(fchownat)]
+[[throws, cp]][doc_alias(fchownat)]
 FChownAt:($fd_t dfd, [[nonnull]] char const *file, $uid_t owner, $gid_t group, $atflag_t flags);
 
 %
-[throws][[cp]][doc_alias(linkat)]
+[[throws, cp]][doc_alias(linkat)]
 LinkAt:($fd_t fromfd, [[nonnull]] char const *from, $fd_t tofd, [[nonnull]] char const *to, $atflag_t flags);
 
 %
-[throws][[cp]][doc_alias(symlinkat)]
+[[throws, cp]][doc_alias(symlinkat)]
 SymlinkAt:([[nonnull]] char const *link_text, $fd_t tofd, [[nonnull]] char const *target_path);
 
 %[default_impl_section(.text.crt.except.fs.property)]
 
 %
-[throws][[cp]][doc_alias(readlinkat)]
+[[throws, cp]][doc_alias(readlinkat)]
 ReadlinkAt:($fd_t dfd, [[nonnull]] char const *__restrict path,
             [[outp(buflen)]] char *__restrict buf, size_t buflen) -> size_t;
 
 %
 %#ifdef __USE_KOS
-[throws][[cp]][doc_alias(freadlinkat)]
+[[throws, cp]][doc_alias(freadlinkat)]
 FReadlinkAt:($fd_t dfd, [[nonnull]] char const *__restrict path,
              [[outp(buflen)]] char *__restrict buf, size_t buflen, $atflag_t flags) -> size_t;
 %#endif /* __USE_KOS */
@@ -279,7 +279,7 @@ FReadlinkAt:($fd_t dfd, [[nonnull]] char const *__restrict path,
 %[default_impl_section(.text.crt.except.fs.modify)]
 
 %
-[throws][[cp]][doc_alias(unlinkat)]
+[[throws, cp]][doc_alias(unlinkat)]
 UnlinkAt:($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 %#endif /* __USE_ATFILE */
 
@@ -287,7 +287,7 @@ UnlinkAt:($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 %
 %
 %#ifdef __USE_LARGEFILE64
-[throws][doc_alias(lseek64)]
+[[throws]][doc_alias(lseek64)]
 [off64_variant_of(LSeek)][[userimpl]][requires($has_function(LSeek32))]
 [section(.text.crt.except.io.large.seek)]
 LSeek64:($fd_t fd, $off64_t offset, int whence) -> $pos64_t {
@@ -441,19 +441,19 @@ $pid_t VFork();
 void FChown($fd_t fd, $uid_t owner, $gid_t group);
 
 %
-[throws][[cp]][section(.text.crt.except.fs.basic_property)][doc_alias(fchdir)]
+[[throws, cp]][section(.text.crt.except.fs.basic_property)][doc_alias(fchdir)]
 FChdir:($fd_t fd);
 
 %
-[throws][section(".text.crt.except.sched.user")][doc_alias(getpgid)]
+[[throws]][section(".text.crt.except.sched.user")][doc_alias(getpgid)]
 [[ATTR_WUNUSED]] GetPGid:($pid_t pid) -> $pid_t;
 
 %
-[throws][section(".text.crt.except.sched.process")][doc_alias(getsid)]
+[[throws]][section(".text.crt.except.sched.process")][doc_alias(getsid)]
 [[ATTR_WUNUSED]] GetSid:($pid_t pid) -> $pid_t;
 
 %
-[throws][[cp, userimpl]][doc_alias(lchown)]
+[[throws, cp, userimpl]][doc_alias(lchown)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(FChownAt))]
 [section(".text.crt.except.fs.modify")]
 LChown:([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
@@ -539,7 +539,7 @@ Symlink:([[nonnull]] char const *link_text, [[nonnull]] char const *target_path)
 }
 
 %
-[throws][[cp, userimpl]][doc_alias(readlink)]
+[[throws, cp, userimpl]][doc_alias(readlink)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(ReadlinkAt))]
 [section(.text.crt.except.fs.property)]
 Readlink:([[nonnull]] char const *__restrict path,
@@ -551,7 +551,7 @@ Readlink:([[nonnull]] char const *__restrict path,
 
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
-[throws][doc_alias(gethostname)][section(.text.crt.except.system.configuration)]
+[[throws]][doc_alias(gethostname)][section(.text.crt.except.system.configuration)]
 GetHostName:([[outp(buflen)]] char *name, size_t buflen);
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
@@ -559,11 +559,11 @@ GetHostName:([[outp(buflen)]] char *name, size_t buflen);
 %
 %#ifdef __USE_MISC
 %
-[throws][doc_alias(sethostname)][section(.text.crt.except.system.configuration)]
+[[throws]][doc_alias(sethostname)][section(.text.crt.except.system.configuration)]
 SetHostName:([[inp(len)]] char const *name, size_t len);
 
 %
-[throws][doc_alias(getdomainname)][section(.text.crt.except.system.configuration)]
+[[throws]][doc_alias(getdomainname)][section(.text.crt.except.system.configuration)]
 GetDomainName:([[outp(buflen)]] char *name, size_t buflen);
 
 %
@@ -583,7 +583,7 @@ Syscall64:(__syscall_ulong_t sysno, ...) -> __LONG64_TYPE__;
 %
 %#if defined(__USE_MISC) || \
 %   (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
-[throws][[cp]][doc_alias(chroot)][section(.text.crt.except.fs.utility)]
+[[throws, cp]][doc_alias(chroot)][section(.text.crt.except.fs.utility)]
 ChRoot:([[nonnull]] char const *__restrict path);
 %#endif /* ... */
 

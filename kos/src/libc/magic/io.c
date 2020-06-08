@@ -93,7 +93,7 @@ _access(*) = access;
 _creat(*) = creat;
 _chmod(*) = chmod;
 
-[[cp, section(.text.crt.dos.fs.property)]]
+[[cp, section(".text.crt.dos.fs.property")]]
 errno_t _access_s([[nonnull]] char const *filename, int type);
 
 _chsize(*) = chsize;
@@ -157,7 +157,7 @@ _findnext64i32:(intptr_t findfd, [[nonnull]] struct _finddata64i32_t *__restrict
 %
 [[cp]][alias(_sopen_s_nolock)]
 [decl_include("<bits/types.h>")][requires($has_function(sopen))]
-[impl_include("<parts/errno.h>")]
+[[impl_include("<parts/errno.h>")]]
 _sopen_s:([[nonnull]] $fd_t *fd,
           [[nonnull]] char const *filename,
           $oflag_t oflags, int sflags, $mode_t mode) -> errno_t {

@@ -1406,7 +1406,7 @@ $FILE *fopencookie(void *__restrict magic_cookie,
 
 %[default_impl_section(".text.crt.FILE.unlocked.read.read")]
 @@Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG'
-[[cp_stdio]][alias(fgets)][[ATTR_WUNUSED]][impl_include("<parts/errno.h>")][[userimpl]]
+[[cp_stdio]][alias(fgets)][[ATTR_WUNUSED, impl_include("<parts/errno.h>"), userimpl]]
 [requires($has_function(fgetc_unlocked) && $has_function(ungetc_unlocked) && $has_function(ferror_unlocked))]
 fgets_unlocked:([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
                 __STDC_INT_AS_SIZE_T bufsize,
@@ -2211,7 +2211,7 @@ __NAMESPACE_STD_USING(FILE)
 %
 %#ifndef _CRT_DIRECTORY_DEFINED
 %#define _CRT_DIRECTORY_DEFINED 1
-%[default_impl_section(.text.crt.dos.fs.modify)]
+%[default_impl_section(".text.crt.dos.fs.modify")]
 %[insert:extern(unlink)]
 [[guard]] _unlink:([[nonnull]] char const *filename) -> int = unlink;
 %#endif /* !_CRT_DIRECTORY_DEFINED */

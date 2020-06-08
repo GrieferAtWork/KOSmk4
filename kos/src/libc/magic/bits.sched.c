@@ -514,15 +514,15 @@ struct sched_param {
 
 }
 
-%[default_impl_section(.text.crt.sched.utility)]
+%[default_impl_section(".text.crt.sched.utility")];
 
 %#if defined(__USE_GNU) || defined(__USE_KOS)
 %typedef int (__LIBCCALL *__clone_func_t)(void *__arg);
 
-[section(".text.crt.sched.access")]
-[vartypes($pid_t,void *,$pid_t)][export_alias(__clone)]
-clone:([[nonnull]] __clone_func_t fn, void *child_stack, int flags,
-       void *arg, ... /* pid_t *ptid, void *newtls, pid_t *ctid */) -> $pid_t;
+[[section(".text.crt.sched.access")]]
+[[vartypes($pid_t, void *, $pid_t), export_alias("__clone")]]
+$pid_t clone([[nonnull]] __clone_func_t fn, void *child_stack, int flags,
+             void *arg, ... /* pid_t *ptid, void *newtls, pid_t *ctid */);
 
 @@>> unshare(2)
 @@Unshare certain components of the calling thread that may be shared with other
@@ -548,7 +548,7 @@ clone:([[nonnull]] __clone_func_t fn, void *child_stack, int flags,
 @@                - CLONE_SYSVSEM:   ...
 @@                - CLONE_VM:        Unshare the current VM (KOS extension)
 @@                - CLONE_SIGHAND:   Unshare signal handlers (KOS extension)
-unshare:(int flags) -> int;
+int unshare(int flags);
 
 @@>> sched_getcpu(3)
 @@Returns the number of the CPU for the calling thread.
@@ -556,7 +556,7 @@ unshare:(int flags) -> int;
 @@moment, even before this function returns, or before the caller was able to
 @@act on its return value. For that reason, this function must only be taken
 @@as a hint
-sched_getcpu:() -> int;
+int sched_getcpu();
 
 @@>> setns(2)
 @@With `FD' referring to a namespace, reassociate the calling thread with that namespace.
@@ -565,7 +565,7 @@ sched_getcpu:() -> int;
 @@                type of namespace, or one of `CLONE_NEWCGROUP', `CLONE_NEWIPC',
 @@               `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',
 @@               `CLONE_NEWUTS')
-setns:($fd_t fd, int nstype) -> int;
+int setns($fd_t fd, int nstype);
 
 %
 %#ifdef __USE_KOS
@@ -574,8 +574,8 @@ setns:($fd_t fd, int nstype) -> int;
 @@Assuming that the calling thread was constructed by `clone()',
 @@calling this function has the same effect as returning `EXIT_CODE'
 @@from `clone()'s `FN' callback
-[section(".text.crt.sched.access")]
-[ATTR_NORETURN] exit_thread:(int exit_code);
+[[ATTR_NORETURN, section(".text.crt.sched.access")]]
+void exit_thread(int exit_code);
 %#endif /* __USE_KOS */
 %#endif /* __USE_GNU || __USE_KOS */
 

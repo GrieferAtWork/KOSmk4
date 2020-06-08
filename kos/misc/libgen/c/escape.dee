@@ -66,6 +66,10 @@ global cLanguageKeywords: {string...} = HashSet({
 	"inline", "__inline", "__inline__", "__extension__",
 });
 
+global cLanguageTwoWordTypenameKeywords: {string...} = HashSet({
+	"struct", "union", "class", "enum"
+});
+
 @@Special replacements for certain keywords during escaping.
 @@By default, all keywords are escaped by either:
 @@  - Inserting 2 leading "__"
@@ -776,6 +780,8 @@ handle_numLines_after_pp_directive:
 							if (escapedTok !is none)
 								goto got_escapedTok;
 						}
+						if (tok in cLanguageTwoWordTypenameKeywords)
+							goto do_handle_cLanguageTwoWordTypenameKeyword;
 						if (tok in keywordEscapes || tok in cLanguageKeywords)
 							escapedTok = tok;
 						else {
@@ -795,6 +801,32 @@ do_escape_keyword_dollar:
 					}
 					escapedTok = keywordEscapes.get(tok);
 					if (escapedTok is none) {
+						if (tok in cLanguageTwoWordTypenameKeywords) {
+do_handle_cLanguageTwoWordTypenameKeyword:
+							tok = self.next();
+							if (!tok.issymbol())
+								goto again_handle_tok;
+							if (forceKeyEscape) {
+								escapedTok = keyEscape(tok);
+								if (escapedTok !is none)
+									goto got_escapedTok;
+							}
+							if (tok.startswith("$"))
+								tok = tok[1:];
+							if (!forceKeyEscape) {
+								escapedTok = keyEscape(tok);
+								if (escapedTok !is none)
+									goto got_escapedTok;
+							}
+							/* Don't escape keywords after "struct", "union", etc. by default.
+							 * Only escape them if an explicit replacement rule exists! */
+							escapedTok = keywordEscapes.get(tok);
+							if (escapedTok !is none)
+								goto got_escapedTok;
+							if (tok in cLanguageTwoWordTypenameKeywords)
+								goto do_handle_cLanguageTwoWordTypenameKeyword;
+							continue;
+						}
 						if (tok in cLanguageKeywords)
 							continue;
 						escapedTok = escapeKeywordIfNotAlreadyEscaped(tok);

@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default_impl_section(.text.crt.string.encrypt)]
+%[default_impl_section(".text.crt.string.encrypt")]
 
 %{
 #include <features.h>
@@ -53,13 +53,15 @@ __SYSDECL_BEGIN
 }
 
 @@Setup DES tables according KEY
-setkey:([[nonnull]] char const *key);
+void setkey([[nonnull]] char const *key);
 
 @@Encrypt at most 8 characters from KEY using salt to perturb DES
-[[guard]] crypt:([[nonnull]] char const *key, [[nonnull]] char const *salt) -> char *;
+[[guard]]
+char *crypt([[nonnull]] char const *key, [[nonnull]] char const *salt);
 
 @@Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place
-[[guard]] encrypt:([[nonnull]] char *glibc_block, int edflag);
+[[guard]]
+void encrypt([[nonnull]] char *glibc_block, int edflag);
 
 %
 %#ifdef __USE_GNU
@@ -82,12 +84,19 @@ struct crypt_data {
 }%[pop_macro]
 %
 
-[doc_alias(crypt)]
-crypt_r:([[nonnull]] char const *key, [[nonnull]] char const *salt, [[nonnull]] struct crypt_data *__restrict data) -> char *;
-[doc_alias(setkey)]
-setkey_r:([[nonnull]] char const *key, [[nonnull]] struct crypt_data *__restrict data);
-[doc_alias(encrypt)]
-encrypt_r:([[nonnull]] char *glibc_block, int edflag, [[nonnull]] struct crypt_data *__restrict data);
+[[doc_alias("crypt")]]
+char *crypt_r([[nonnull]] char const *key,
+              [[nonnull]] char const *salt,
+              [[nonnull]] struct crypt_data *__restrict data);
+
+[[doc_alias("setkey")]]
+void setkey_r([[nonnull]] char const *key,
+              [[nonnull]] struct crypt_data *__restrict data);
+
+[[doc_alias("encrypt")]]
+void encrypt_r([[nonnull]] char *glibc_block, int edflag,
+               [[nonnull]] struct crypt_data *__restrict data);
+
 %#endif /* __USE_GNU */
 
 %{

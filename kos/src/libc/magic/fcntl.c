@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%[default_impl_section(.text.crt.io.utility)]
+%[default_impl_section(".text.crt.io.utility")]
 
 %[define_replacement(fd_t    = __fd_t)]
 %[define_replacement(off_t   = "__FS_TYPE(off)")]
@@ -153,7 +153,7 @@ readahead:($fd_t fd, $off64_t offset, $size_t count) -> $ssize_t {
 	return count;
 }
 [[userimpl, decl_include("<bits/types.h>")]]
-sync_file_range:($fd_t fd, $off64_t offset, $off64_t count, unsigned int flags) -> int {
+int sync_file_range($fd_t fd, $off64_t offset, $off64_t count, unsigned int flags) {
 	(void)fd;
 	(void)offset;
 	(void)count;
@@ -179,7 +179,7 @@ int fallocate32($fd_t fd, int mode, $off64_t offset, $off64_t length);
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias(fallocate64)]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fallocate)]]
 [[userimpl, decl_include("<bits/types.h>"), no_crt_self_import]]
-fallocate:($fd_t fd, int mode, $off_t offset, $off_t length) -> int {
+int fallocate($fd_t fd, int mode, $off_t offset, $off_t length) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)fd;
 	(void)mode;
@@ -201,7 +201,7 @@ fallocate:($fd_t fd, int mode, $off_t offset, $off_t length) -> int {
 
 %#ifdef __USE_LARGEFILE64
 [[userimpl, off64_variant_of(fallocate), decl_include("<bits/types.h>")]]
-fallocate64:($fd_t fd, int mode, $off64_t offset, $off64_t length) -> int {
+int fallocate64($fd_t fd, int mode, $off64_t offset, $off64_t length) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)fd;
 	(void)mode;
@@ -222,22 +222,22 @@ fallocate64:($fd_t fd, int mode, $off64_t offset, $off64_t length) -> int {
 %#endif /* __USE_GNU */
 
 
-[[vartypes(void *), guard, decl_include("<bits/types.h>"), export_alias(__fcntl)]]
-fcntl:($fd_t fd, int cmd, ...) -> __STDC_INT_AS_SSIZE_T;
+[[vartypes(void *), guard, decl_include("<bits/types.h>"), export_alias("__fcntl")]]
+__STDC_INT_AS_SSIZE_T fcntl($fd_t fd, int cmd, ...);
 
 %[default_impl_section(".text.crt.io.access")]
 
 [[ignore, vartypes($mode_t), decl_include("<bits/types.h>")]]
 [[nocrt, alias(open, _open, __open), cp, ATTR_WUNUSED]]
-open32:([[nonnull]] char const *filename, $oflag_t oflags, ...) -> $fd_t;
+$fd_t open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 
 
 [[cp, guard, ATTR_WUNUSED, vartypes($mode_t), no_crt_self_import]]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(open64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(open, _open, __open)]
-[[decl_include("<bits/types.h>"), export_as(__open)]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("open64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("open", "_open", "__open")]]
+[[decl_include("<bits/types.h>"), export_as("__open")]]
 [[userimpl, requires($has_function(open64) || (defined(__CRT_AT_FDCWD) && $has_function(openat)))]]
-open:([[nonnull]] char const *filename, $oflag_t oflags, ...) -> $fd_t {
+$fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
 	va_start(args, oflags);
@@ -250,13 +250,13 @@ open:([[nonnull]] char const *filename, $oflag_t oflags, ...) -> $fd_t {
 	return result;
 }
 
-[[cp, guard, ATTR_WUNUSED, no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(creat64)]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(creat), alias(_creat)]]
+[[cp, guard, ATTR_WUNUSED, no_crt_self_import, alias("_creat")]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("creat64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("creat")]]
 [[userimpl, requires_function(creat64, open)]]
-[[impl_include(<bits/fcntl.h>), decl_include("<bits/types.h>")]]
-creat:([[nonnull]] char const *filename, $mode_t mode) -> $fd_t {
-@@pp_if_has_function(creat64)@@
+[[impl_include("<bits/fcntl.h>"), decl_include("<bits/types.h>")]]
+$fd_t creat([[nonnull]] char const *filename, $mode_t mode) {
+@@pp_if $has_function(creat64)@@
 	return creat64(filename, mode);
 @@pp_else@
 	return open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode);
@@ -265,11 +265,11 @@ creat:([[nonnull]] char const *filename, $mode_t mode) -> $fd_t {
 
 %
 %#ifdef __USE_LARGEFILE64
-[[vartypes($mode_t), export_alias(__open64), largefile64_variant_of(open)]]
-[[decl_include("<bits/types.h>"), impl_include(<bits/fcntl.h>)]]
-[[if(!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias(_open)]]
+[[vartypes($mode_t), export_alias("__open64"), largefile64_variant_of(open)]]
+[[decl_include("<bits/types.h>"), impl_include("<bits/fcntl.h>")]]
+[[if(!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("open", "_open")]]
 [[cp, ATTR_WUNUSED, userimpl, requires_function(open32)]]
-open64:([[nonnull]] char const *filename, $oflag_t oflags, ...) -> $fd_t {
+$fd_t open64([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
 	mode_t mode;
@@ -285,26 +285,26 @@ open64:([[nonnull]] char const *filename, $oflag_t oflags, ...) -> $fd_t {
 }
 
 [[guard, largefile64_variant_of(creat)]]
-[[decl_include("<bits/types.h>"), impl_include(<bits/fcntl.h>)]]
-[[if(!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias(_creat)]]
+[[decl_include("<bits/types.h>"), impl_include("<bits/fcntl.h>")]]
+[[if(!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("creat", "_creat")]]
 [[cp, ATTR_WUNUSED, userimpl, requires_function(open64)]]
-creat64:([[nonnull]] char const *filename, $mode_t mode) -> $fd_t {
+$fd_t creat64([[nonnull]] char const *filename, $mode_t mode) {
 	return open64(filename, O_CREAT | O_WRONLY | O_TRUNC, mode);
 }
 %#endif /* __USE_LARGEFILE64 */
 %
 %#ifdef __USE_ATFILE
 
-[[cp, ignore, nocrt, alias(openat)]]
+[[cp, ignore, nocrt, alias("openat")]]
 [[ATTR_WUNUSED, vartypes($mode_t), decl_include("<bits/types.h>")]]
 $fd_t openat32($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...);
 
 [[cp, ATTR_WUNUSED, guard, vartypes($mode_t), no_crt_self_import]]
-[[decl_include("<bits/types.h>"), impl_include(<bits/fcntl.h>)]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(openat64)]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(openat)]]
+[[decl_include("<bits/types.h>"), impl_include("<bits/fcntl.h>")]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("openat64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("openat")]]
 [[userimpl, requires_function(openat64)]]
-openat:($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) -> $fd_t {
+$fd_t openat($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
 	va_start(args, oflags);
@@ -317,7 +317,7 @@ openat:($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) -> 
 [[cp, ATTR_WUNUSED, guard, vartypes($mode_t)]]
 [[decl_include("<bits/types.h>"), largefile64_variant_of(openat)]]
 [[userimpl, requires_function(openat32)]]
-openat64:($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) -> $fd_t {
+$fd_t openat64($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	fd_t result;
 	va_list args;
 	mode_t mode;
@@ -336,14 +336,14 @@ openat64:($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) -
 %
 %#ifdef __USE_XOPEN2K
 
-[[decl_include("<bits/types.h>"), ignore, nocrt, alias(posix_fadvise)]]
+[[decl_include("<bits/types.h>"), ignore, nocrt, alias("posix_fadvise")]]
 int posix_fadvise32($fd_t fd, $off32_t offset, $off32_t length, int advise);
 
 
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(posix_fadvise64)]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(posix_fadvise)]]
 [[decl_include("<bits/types.h>"), no_crt_self_import]]
-[[userimpl, section(.text.crt.io.utility)]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fadvise64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fadvise")]]
+[[userimpl, section(".text.crt.io.utility")]]
 posix_fadvise:($fd_t fd, $off_t offset, $off_t length, int advise) -> int {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)fd;
@@ -364,14 +364,14 @@ posix_fadvise:($fd_t fd, $off_t offset, $off_t length, int advise) -> int {
 @@pp_endif@@
 }
 
-[[decl_include("<bits/types.h>"), ignore, nocrt, alias(posix_fallocate)]]
+[[decl_include("<bits/types.h>"), ignore, nocrt, alias("posix_fallocate")]]
 int posix_fallocate32($fd_t fd, $off32_t offset, $off32_t length);
 
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(posix_fallocate64)]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(posix_fallocate)]]
 [[decl_include("<bits/types.h>"), no_crt_self_import]]
-[[userimpl, section(.text.crt.io.utility)]]
-posix_fallocate:($fd_t fd, $off_t offset, $off_t length) -> int {
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fallocate64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fallocate")]]
+[[userimpl, section(".text.crt.io.utility")]]
+int posix_fallocate($fd_t fd, $off_t offset, $off_t length) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)fd;
 	(void)offset;
@@ -391,7 +391,7 @@ posix_fallocate:($fd_t fd, $off_t offset, $off_t length) -> int {
 
 %#ifdef __USE_LARGEFILE64
 [[off64_variant_of(posix_fadvise), decl_include("<bits/types.h>")]]
-[[userimpl, section(.text.crt.io.large.utility)]]
+[[userimpl, section(".text.crt.io.large.utility")]]
 int posix_fadvise64($fd_t fd, $off64_t offset, $off64_t length, int advise) {
 @@pp_if_has_function(posix_fadvise32)@@
 	return posix_fadvise32(fd, ($off32_t)offset, ($off32_t)length, advise);
@@ -405,8 +405,8 @@ int posix_fadvise64($fd_t fd, $off64_t offset, $off64_t length, int advise) {
 }
 
 [[off64_variant_of(posix_fallocate), decl_include("<bits/types.h>")]]
-[[userimpl, section(.text.crt.io.large.utility)]]
-posix_fallocate64:($fd_t fd, $off64_t offset, $off64_t length) -> int {
+[[userimpl, section(".text.crt.io.large.utility")]]
+int posix_fallocate64($fd_t fd, $off64_t offset, $off64_t length) {
 @@pp_if_has_function(posix_fallocate32)@@
 	return posix_fallocate32(fd, ($off32_t)offset, ($off32_t)length);
 @@pp_else@@
@@ -428,16 +428,16 @@ posix_fallocate64:($fd_t fd, $off64_t offset, $off64_t length) -> int {
 %#define F_TEST  3 /* Test a region for other processes locks. */
 %#endif /* !F_LOCK */
 
-[[cp, decl_include("<bits/types.h>"), ignore, nocrt, alias(locking, _locking)]]
+[[cp, decl_include("<bits/types.h>"), ignore, nocrt, alias("locking", "_locking")]]
 int crt_locking($fd_t fd, int cmd, $off32_t length);
 
-[[cp, decl_include("<bits/types.h>"), ignore, nocrt, alias(lockf)]]
+[[cp, decl_include("<bits/types.h>"), ignore, nocrt, alias("lockf")]]
 int lockf32($fd_t fd, int cmd, $off32_t length);
 
-[[cp, guard, export_as(_locking, locking), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(lockf64)]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(lockf, _locking, locking)]]
-[[decl_include("<bits/types.h>"), section(.text.crt.io.lock)]]
+[[cp, guard, export_as("_locking", "locking"), no_crt_self_import]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("lockf64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("lockf", "_locking", "locking")]]
+[[decl_include("<bits/types.h>"), section(".text.crt.io.lock")]]
 [[userimpl, requires($has_function(lockf64) || $has_function(lockf32) || $has_function(crt_locking))]]
 int lockf($fd_t fd, int cmd, $off_t length) {
 @@if_has_function(lockf64)@@
@@ -451,7 +451,7 @@ int lockf($fd_t fd, int cmd, $off_t length) {
 
 %#ifdef __USE_LARGEFILE64
 [[cp, guard, off64_variant_of(lockf)]]
-[[decl_include("<bits/types.h>"), section(.text.crt.io.large.lock)]]
+[[decl_include("<bits/types.h>"), section(".text.crt.io.large.lock")]]
 [[userimpl, requires($has_function(lockf32) || $has_function(crt_locking))]]
 int lockf64($fd_t fd, int cmd, $off64_t length) {
 @@pp_if_has_function(lockf32)@@
@@ -473,7 +473,7 @@ __SYSDECL_END
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_FCNTL_H)
 #include <parts/uchar/fcntl.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_FCNTL_H */
 #endif /* __USE_UTF */
 
 }

@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(pid_t = __pid_t)]
-%[default_impl_section(.text.crt.sched.resource)]
+%[default_impl_section(".text.crt.sched.resource")]
 
 %{
 #include <features.h>
@@ -252,10 +252,16 @@ struct rlimit64 {
 %typedef int __rlimit_resource_t;
 %#endif /* !__COMPILER_PREFERR_ENUMS */
 %
-prlimit:($pid_t pid, __rlimit_resource_t resource, struct rlimit const *new_limit, struct rlimit *old_limit) -> int;
+
+int prlimit($pid_t pid, __rlimit_resource_t resource,
+            [[nullable]] struct rlimit const *new_limit,
+            [[nullable]] struct rlimit *old_limit);
+
 %#ifdef __USE_LARGEFILE64
-[rlim64_variant_of(prlimit)]
-prlimit64:($pid_t pid, __rlimit_resource_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) -> int;
+[[rlim64_variant_of(prlimit)]]
+int prlimit64($pid_t pid, __rlimit_resource_t resource,
+              [[nullable]] struct rlimit64 const *new_limit,
+              [[nullable]] struct rlimit64 *old_limit);
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_GNU */
 

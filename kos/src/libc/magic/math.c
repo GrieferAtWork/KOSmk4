@@ -341,7 +341,7 @@ frexp:(double x, [[nonnull]] int *pexponent) -> double {
 
 @@X times (two to the EXP power)
 [[std, ATTR_WUNUSED]][ATTR_MCONST][export_alias(__ldexp)][[nothrow, crtbuiltin]]
-[impl_include("<parts/errno.h>")][impl_include(<libm/finite.h>)]
+[[impl_include("<parts/errno.h>")]][impl_include(<libm/finite.h>)]
 [requires_include("<ieee754.h>")][impl_include(<libm/ldexp.h>)]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -1662,7 +1662,7 @@ lgammal_r:(__LONGDOUBLE x, int *signgamp) -> __LONGDOUBLE /*TODO:%{generate(doub
 [[ATTR_WUNUSED]][ATTR_MCONST][[nothrow]][export_alias(__scalb, _scalb)][[crtbuiltin]]
 [impl_include("<libm/isnan.h>")]
 [impl_include(<libm/finite.h>)][impl_include("<libm/isinf.h>")]
-[impl_include("<libm/matherr.h>")][impl_include("<parts/errno.h>")]
+[impl_include("<libm/matherr.h>")][[impl_include("<parts/errno.h>")]]
 [requires_include("<ieee754.h>")][impl_include(<libm/scalb.h>)]
 [requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
