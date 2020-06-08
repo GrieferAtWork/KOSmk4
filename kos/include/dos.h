@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f107dac */
+/* HASH CRC-32:0xbb436ff7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,9 +75,9 @@ struct _diskfree_t {
 #define ___getdiskfree_defined 1
 #ifdef __CRT_HAVE__getdiskfree
 __CDECLARE(,unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),(__drive,__diskfree))
-#else /* LIBC: _getdiskfree */
+#else /* __CRT_HAVE__getdiskfree */
 #undef ___getdiskfree_defined
-#endif /* _getdiskfree... */
+#endif /* !__CRT_HAVE__getdiskfree */
 #endif /* !___getdiskfree_defined */
 #endif /* !_GETDISKFREE_DEFINED */
 
@@ -93,21 +93,25 @@ __CDECLARE_VOID(,__NOTHROW_RPC,delay,(unsigned int __mill),(__mill))
 #elif defined(__CRT_HAVE___crtSleep)
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
 __CREDIRECT_VOID(,__NOTHROW_RPC,delay,(unsigned int __mill),__crtSleep,(__mill))
-#else /* LIBC: delay */
+#else /* ... */
 #include <local/dos/delay.h>
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(delay, __FORCELOCAL void __NOTHROW_RPC(__LIBCCALL delay)(unsigned int __mill) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(delay))(__mill); })
-#endif /* delay... */
+#endif /* !... */
 #ifdef __CRT_HAVE__getdiskfree
-__CREDIRECT(,unsigned int,__NOTHROW_RPC,_dos_getdiskfree,(int __drive, struct diskfree_t *__diskfree),_getdiskfree,(__drive,__diskfree))
-#endif /* _dos_getdiskfree... */
+__CREDIRECT(,unsigned int,__NOTHROW_RPC,_dos_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),_getdiskfree,(__drive,__diskfree))
+#endif /* __CRT_HAVE__getdiskfree */
 #ifndef __sleep_defined
 #define __sleep_defined 1
-#ifdef __CRT_HAVE_sleep
-__CDECLARE_VOID(,__NOTHROW_RPC,sleep,(unsigned int __seconds),(__seconds))
-#else /* LIBC: _sleep */
+#ifdef __CRT_HAVE__sleep
+/* Sleep for up to `duration' seconds */
+__CREDIRECT_VOID(,__NOTHROW_RPC,sleep,(unsigned int __duration),_sleep,(__duration))
+#elif defined(__CRT_HAVE_sleep)
+/* Sleep for up to `duration' seconds */
+__CDECLARE_VOID(,__NOTHROW_RPC,sleep,(unsigned int __duration),(__duration))
+#else /* ... */
 #undef __sleep_defined
-#endif /* sleep... */
+#endif /* !... */
 #endif /* !__sleep_defined */
 #ifndef __unlink_defined
 #define __unlink_defined 1
@@ -124,9 +128,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),_u
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); })
-#else /* CUSTOM: unlink */
+#else /* ... */
 #undef __unlink_defined
-#endif /* unlink... */
+#endif /* !... */
 #endif /* !__unlink_defined */
 
 #if defined(__i386__) || defined(__x86_64__)

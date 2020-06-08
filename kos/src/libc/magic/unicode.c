@@ -685,7 +685,7 @@ $char32_t unicode_readutf16_swap_rev_n([[nonnull]] /*utf-16*/ $char16_t const **
 %
 @@Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
 @@This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst'
-[[ATTR_RETNONNULL, kernel, libc]]
+[[kernel, libc, nonnull]]
 char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, $char32_t ch) {
 	if likely(ch <= UTF8_1BYTE_MAX) {
 		*dst++ = (char)(u8)ch;
@@ -729,7 +729,7 @@ char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, $char32_t ch
 %
 @@Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
 @@This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst'
-[[ATTR_RETNONNULL, kernel, libc]]
+[[kernel, libc, nonnull]]
 $char16_t *unicode_writeutf16([[nonnull]] /*utf-16*/ $char16_t *__restrict dst, $char32_t ch) {
 	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
 		*dst++ = (char16_t)ch;
@@ -968,7 +968,7 @@ __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 @@@param: utf8_text: The input UTF-8 string to convert
 @@@param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
 @@@return: * : A pointer after the last written UTF-16 character
-[[ATTR_RETNONNULL, kernel]]
+[[kernel, nonnull]]
 $char16_t *unicode_8to16([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst,
                          [[inp(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
                          $size_t utf8_characters) {
@@ -1010,7 +1010,7 @@ $char16_t *unicode_8to16_chk([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_
 @@@param: utf8_text: The input UTF-8 string to convert
 @@@param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
 @@@return: * : A pointer after the last written UTF-32 character.
-[[ATTR_RETNONNULL, kernel]]
+[[kernel, nonnull]]
 $char32_t *unicode_8to32([[nonnull]] /*utf-32*/ $char32_t *__restrict utf32_dst,
                          [[inp(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
                          $size_t utf8_characters) {
@@ -1027,7 +1027,7 @@ $char32_t *unicode_8to32([[nonnull]] /*utf-32*/ $char32_t *__restrict utf32_dst,
 @@@param: utf16_text: The input UTF-16 string to convert
 @@@param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
 @@@return: * : A pointer after the last written UTF-8 character
-[[ATTR_RETNONNULL, kernel]]
+[[kernel, nonnull]]
 char *unicode_16to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
                     [[inp(utf16_characters)]] /*utf-16*/ $char16_t const *__restrict utf16_text,
                     $size_t utf16_characters) {
@@ -1055,7 +1055,7 @@ char *unicode_16to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
 @@@param: utf16_text: The input UTF-16 string to convert
 @@@param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
 @@@return: * : A pointer after the last written UTF-32 character
-[[ATTR_RETNONNULL, kernel]]
+[[kernel, nonnull]]
 $char32_t *unicode_16to32([[nonnull]] /*utf-32*/ $char32_t *__restrict utf32_dst,
                           [[inp(utf16_characters)]] /*utf-16*/ $char16_t const *__restrict utf16_text,
                           $size_t utf16_characters) {
@@ -1071,7 +1071,7 @@ $char32_t *unicode_16to32([[nonnull]] /*utf-32*/ $char32_t *__restrict utf32_dst
 @@@param: utf32_text: The input UTF-32 string to convert
 @@@param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
 @@@return: * : A pointer after the last written UTF-8 character
-[[ATTR_RETNONNULL, kernel]]
+[[kernel, nonnull]]
 char *unicode_32to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
                     [[inp(utf32_characters)]] /*utf-32*/ $char32_t const *__restrict utf32_text,
                     $size_t utf32_characters) {
@@ -1087,7 +1087,7 @@ char *unicode_32to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
 @@@param: utf32_text: The input UTF-32 string to convert
 @@@param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
 @@@return: * : A pointer after the last written UTF-16 character
-[[ATTR_RETNONNULL, kernel]]
+[[kernel, nonnull]]
 $char16_t *unicode_32to16([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst,
                           [[inp(utf32_characters)]] /*utf-32*/ $char32_t const *__restrict utf32_text,
                           $size_t utf32_characters) {

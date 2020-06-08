@@ -355,10 +355,9 @@ $time32_t time32([[nullable]] $time32_t *timer);
 [[ignore, nocrt, alias("difftime", "_difftime32")]]
 double difftime32($time32_t time1, $time32_t time0);
 
-[[ATTR_WUNUSED, ATTR_RETNONNULL]]
-[[decl_prefix(DEFINE_STRUCT_TM), doc_alias("localtime")]]
+[[ATTR_WUNUSED, decl_prefix(DEFINE_STRUCT_TM), doc_alias("localtime")]]
 [[ignore, nocrt, alias("localtime", "_localtime32")]]
-__STRUCT_TM *localtime32([[nonnull]] $time64_t const *timer);
+[[nonnull]] __STRUCT_TM *localtime32([[nonnull]] $time64_t const *timer);
 
 %[define_c_language_keyword(__KOS_FIXED_CONST)];
 
@@ -452,14 +451,13 @@ time_t mktime([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) {
 
 
 
-[[ATTR_WUNUSED, ATTR_RETNONNULL, doc_alias("ctime")]]
+[[ATTR_WUNUSED, doc_alias("ctime")]]
 [[ignore, nocrt, alias("ctime", "_ctime32")]]
-char *ctime32([[nonnull]] $time32_t const *timer);
+[[nonnull]] char *ctime32([[nonnull]] $time32_t const *timer);
 
-[[decl_prefix(DEFINE_STRUCT_TM)]]
-[[ATTR_WUNUSED, ATTR_RETNONNULL, doc_alias("gmtime")]]
+[[ATTR_WUNUSED, doc_alias("gmtime"), decl_prefix(DEFINE_STRUCT_TM)]]
 [[ignore, nocrt, alias("gmtime", "_gmtime32")]]
-__STRUCT_TM *gmtime32([[nonnull]] $time32_t const *timer);
+[[nonnull]] __STRUCT_TM *gmtime32([[nonnull]] $time32_t const *timer);
 
 
 @@Equivalent to `asctime(localtime(timer))'
@@ -467,10 +465,10 @@ __STRUCT_TM *gmtime32([[nonnull]] $time32_t const *timer);
 @@pp_if defined(__BUILDING_LIBC) || (!$has_function(ctime32) && !$has_function(ctime32))@@
 DEFINE_CTIME_BUFFER
 @@pp_endif@@
-), ATTR_WUNUSED, ATTR_RETNONNULL, no_crt_self_import]]
+), ATTR_WUNUSED, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("ctime64", "_ctime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("ctime", "_ctime32")]]
-char *ctime([[nonnull]] time_t const *timer) {
+[[nonnull]] char *ctime([[nonnull]] time_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return ctime_r(timer, @__ctime_buf@);
 @@pp_elif $has_function(ctime64)@@
@@ -508,10 +506,10 @@ __NAMESPACE_LOCAL_END
 @@pp_if defined(__BUILDING_LIBC) || (!$has_function(gmtime32) && !$has_function(gmtime64))@@
 DEFINE_GMTIME_BUFFER
 @@pp_endif@@
-), ATTR_WUNUSED, ATTR_RETNONNULL, no_crt_self_import]]
+), ATTR_WUNUSED, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("gmtime64", "_gmtime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("gmtime", "_gmtime32")]]
-struct tm *gmtime([[nonnull]] time_t const *timer) {
+[[nonnull]] struct tm *gmtime([[nonnull]] time_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return gmtime_r(timer, &@__gmtime_buf@);
 @@pp_elif $has_function(gmtime64)@@
@@ -532,10 +530,10 @@ struct tm *gmtime([[nonnull]] time_t const *timer) {
 @@pp_if defined(__BUILDING_LIBC) || (!$has_function(localtime32) && !$has_function(localtime64))@@
 DEFINE_GMTIME_BUFFER
 @@pp_endif@@
-), ATTR_WUNUSED, ATTR_RETNONNULL, no_crt_self_import]]
+), ATTR_WUNUSED, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("localtime64", "_localtime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("localtime", "_localtime32")]]
-struct tm *localtime([[nonnull]] time_t const *timer) {
+[[nonnull]] struct tm *localtime([[nonnull]] time_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return localtime_r(timer, &@__gmtime_buf@);
 @@pp_elif $has_function(localtime64)@@
@@ -685,8 +683,8 @@ $time64_t mktime64([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) {
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(ctime32)@@
 DEFINE_CTIME_BUFFER
 @@pp_endif@@
-), ATTR_WUNUSED, ATTR_RETNONNULL, export_alias("_ctime64")]]
-char *ctime64([[nonnull]] $time64_t const *timer) {
+), ATTR_WUNUSED, export_alias("_ctime64")]]
+[[nonnull]] char *ctime64([[nonnull]] $time64_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return ctime64_r(timer, @__ctime_buf@);
 @@pp_elif $has_function(ctime32)@@
@@ -703,8 +701,8 @@ char *ctime64([[nonnull]] $time64_t const *timer) {
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(gmtime32)@@
 DEFINE_GMTIME_BUFFER
 @@pp_endif@@
-), ATTR_WUNUSED, ATTR_RETNONNULL, export_alias("_gmtime64")]]
-__STRUCT_TM *gmtime64([[nonnull]] $time64_t const *timer) {
+), ATTR_WUNUSED, export_alias("_gmtime64")]]
+[[nonnull]] __STRUCT_TM *gmtime64([[nonnull]] $time64_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return gmtime64_r(timer, &@__gmtime_buf@);
 @@pp_elif $has_function(gmtime32)@@
@@ -722,8 +720,8 @@ __STRUCT_TM *gmtime64([[nonnull]] $time64_t const *timer) {
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(localtime32)@@
 DEFINE_GMTIME_BUFFER
 @@pp_endif@@
-), ATTR_WUNUSED, ATTR_RETNONNULL, export_alias("_localtime64")]]
-__STRUCT_TM *localtime64([[nonnull]] $time64_t const *timer) {
+), ATTR_WUNUSED, export_alias("_localtime64")]]
+[[nonnull]] __STRUCT_TM *localtime64([[nonnull]] $time64_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return localtime64_r(timer, &@__gmtime_buf@);
 @@pp_elif $has_function(localtime32)@@

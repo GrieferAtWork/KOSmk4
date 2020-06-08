@@ -384,7 +384,7 @@ int wmemcmp:([[inp(num_chars)]] wchar_t const *s1,
 @@pp_endif@@
 };
 
-[[std, ATTR_RETNONNULL, wchar]]
+[[std, wchar, nonnull]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("memcpyw")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("memcpyl")]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
@@ -400,7 +400,7 @@ wchar_t *wmemcpy([[outp(num_chars)]] wchar_t *__restrict dst,
 @@pp_endif@@
 };
 
-[[std, ATTR_RETNONNULL, wchar]]
+[[std, wchar, nonnull]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("memmovew")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("memmovel")]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
@@ -416,11 +416,11 @@ wchar_t *wmemmove([[outp(num_chars)]] wchar_t *dst,
 @@pp_endif@@
 };
 
-[[std, ATTR_RETNONNULL, wchar]]
+[[std, wchar]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("memsetw")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("memsetl")]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
-wmemset:([[outp(num_chars)]] wchar_t *dst, wchar_t filler, size_t num_chars) -> wchar_t * {
+[[nonnull]] wchar_t *wmemset([[outp(num_chars)]] wchar_t *dst, wchar_t filler, size_t num_chars) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	return (wchar_t *)memsetw(dst, (u16)filler, num_chars);
 @@pp_elif __SIZEOF_WCHAR_T__ == 4@@
@@ -430,24 +430,26 @@ wmemset:([[outp(num_chars)]] wchar_t *dst, wchar_t filler, size_t num_chars) -> 
 @@pp_endif@@
 };
 
-[[std, guard, ATTR_RETNONNULL, wchar]]
+[[std, guard, wchar]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
-wchar_t *wcscpy([[nonnull]] wchar_t *__restrict buf, [[nonnull]] wchar_t const *__restrict src) {
+[[nonnull]] wchar_t *wcscpy([[nonnull]] wchar_t *__restrict buf,
+                            [[nonnull]] wchar_t const *__restrict src) {
 	return wmemcpy(buf, src, wcslen(src) + 1);
 }
 
-[[std, guard, ATTR_RETNONNULL, wchar]]
+[[std, guard, wchar]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
-wchar_t *wcscat([[nonnull]] wchar_t *__restrict buf, [[nonnull]] wchar_t const *__restrict src) {
+[[nonnull]] wchar_t *wcscat([[nonnull]] wchar_t *__restrict buf,
+                            [[nonnull]] wchar_t const *__restrict src) {
 	wmemcpy(wcsend(buf), src, wcslen(src) + 1);
 	return buf;
 }
 
-[[std, guard, ATTR_RETNONNULL, wchar]]
+[[std, guard, wchar]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
-wchar_t *wcsncat([[nonnull]] wchar_t *__restrict buf,
-                 [[inp(wcsnlen(src, buflen))]] wchar_t const *__restrict src,
-                 $size_t buflen) {
+[[nonnull]] wchar_t *wcsncat([[nonnull]] wchar_t *__restrict buf,
+                             [[inp(wcsnlen(src, buflen))]] wchar_t const *__restrict src,
+                             $size_t buflen) {
 	size_t srclen = wcsnlen(src, buflen);
 	wchar_t *dst = wcsend(buf);
 	wmemcpy(dst, src, srclen);
@@ -455,11 +457,11 @@ wchar_t *wcsncat([[nonnull]] wchar_t *__restrict buf,
 	return buf;
 }
 
-[[std, guard, ATTR_RETNONNULL, wchar]]
+[[std, guard, wchar]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
-wchar_t *wcsncpy([[nonnull]] wchar_t *__restrict buf,
-                [[inp(wcsnlen(src, buflen))]] wchar_t const *__restrict src,
-                $size_t buflen) {
+[[nonnull]] wchar_t *wcsncpy([[nonnull]] wchar_t *__restrict buf,
+                             [[inp(wcsnlen(src, buflen))]] wchar_t const *__restrict src,
+                             $size_t buflen) {
 	size_t srclen = wcsnlen(src, buflen);
 	wmemcpy(buf, src, srclen);
 	wmemset(buf+srclen, '\0', buflen - srclen);
@@ -834,40 +836,52 @@ __mbrlen(*) = mbrlen;
 
 %
 %#ifdef __USE_XOPEN2K8
-[alias(_wcsicmp, wcsicmp)][[ATTR_WUNUSED, ATTR_PURE, wchar]]
+[[ATTR_WUNUSED, ATTR_PURE, wchar, export_alias("_wcsicmp", "wcsicmp")]]
 [[section("{.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory}")]]
-wcscasecmp:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2) -> int %{generate(str2wcs)}
+int wcscasecmp([[nonnull]] wchar_t const *s1,
+               [[nonnull]] wchar_t const *s2)
+	%{generate(str2wcs)}
 
-[alias(_wcsnicmp, wcsnicmp)][[ATTR_WUNUSED, ATTR_PURE, wchar]]
+[[ATTR_WUNUSED, ATTR_PURE, wchar, export_alias("_wcsnicmp", "wcsnicmp")]]
 [[section("{.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory}")]]
-wcsncasecmp:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2, $size_t maxlen) -> int %{generate(str2wcs)}
+int wcsncasecmp([[nonnull]] wchar_t const *s1,
+                [[nonnull]] wchar_t const *s2, $size_t maxlen)
+	%{generate(str2wcs)}
 
-[alias(_wcsicmp_l, wcsicmp_l)][[ATTR_WUNUSED, ATTR_PURE, wchar]][export_alias(__wcscasecmp_l)]
+[[ATTR_WUNUSED, ATTR_PURE, wchar, export_alias("_wcsicmp_l", "wcsicmp_l", "__wcscasecmp_l")]]
 [[section("{.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory}")]]
 wcscasecmp_l:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2, $locale_t locale) -> int %{generate(str2wcs)}
 
-[alias(_wcsnicmp_l, wcsnicmp_l)][[ATTR_WUNUSED, ATTR_PURE, wchar]][export_alias(__wcsncasecmp_l)]
+[[ATTR_WUNUSED, ATTR_PURE, wchar, export_alias("_wcsnicmp_l", "wcsnicmp_l", "__wcsncasecmp_l")]]
 [[section("{.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory}")]]
-wcsncasecmp_l:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2, $size_t maxlen, $locale_t locale) -> int %{generate(str2wcs)}
+int wcsncasecmp_l([[nonnull]] wchar_t const *s1,
+                  [[nonnull]] wchar_t const *s2,
+                  $size_t maxlen, $locale_t locale)
+	%{generate(str2wcs)}
 
 [alias(_wcscoll_l)][[ATTR_WUNUSED, ATTR_PURE, wchar]][export_alias(__wcscoll_l)]
 [[section("{.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory}")]]
-wcscoll_l:([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2, $locale_t locale) -> int %{generate(str2wcs)}
+int wcscoll_l([[nonnull]] wchar_t const *s1,
+              [[nonnull]] wchar_t const *s2,
+              $locale_t locale)
+	%{generate(str2wcs)}
 
 [alias(_wcsxfrm_l)][[wchar, userimpl]][export_alias("__wcsxfrm_l")]
 [[section("{.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory}")]]
-wcsxfrm_l:(wchar_t *dst, [[nonnull]] wchar_t const *__restrict src, $size_t maxlen, $locale_t locale) -> $size_t
+$size_t wcsxfrm_l(wchar_t *dst, [[nonnull]] wchar_t const *__restrict src, $size_t maxlen, $locale_t locale)
 	%{generate(str2wcs)}
 
-[[ATTR_RETNONNULL, wchar]]
-[[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
-wcpcpy:([[nonnull]] wchar_t *__restrict dst, [[nonnull]] wchar_t const *__restrict src) -> wchar_t * {
+[[wchar, section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
+[[nonnull]] wchar_t *wcpcpy([[nonnull]] wchar_t *__restrict dst,
+                            [[nonnull]] wchar_t const *__restrict src) {
 	return wmempcpy(dst, src, wcslen(src) + 1);
 }
 
-[[ATTR_RETNONNULL, wchar]]
+[[wchar]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
-wcpncpy:([[nonnull]] wchar_t *__restrict buf, [[nonnull]] wchar_t const *__restrict src, $size_t buflen) -> wchar_t * {
+[[nonnull]] wchar_t *wcpncpy([[nonnull]] wchar_t *__restrict buf,
+                             [[nonnull]] wchar_t const *__restrict src,
+                             $size_t buflen) {
 	$size_t srclen = wcsnlen(src, buflen);
 	wmemcpy(buf, src, srclen);
 	wmemset(buf + srclen, '\0', ($size_t)(buflen - srclen));
@@ -875,17 +889,17 @@ wcpncpy:([[nonnull]] wchar_t *__restrict buf, [[nonnull]] wchar_t const *__restr
 }
 
 [[wchar, section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]]
-mbsnrtowcs:([[nullable]] wchar_t *dst,
-            [[nonnull]] char const **__restrict psrc, $size_t nmc, $size_t len,
-            [[nullable]] $mbstate_t *mbs) -> $size_t;
+$size_t mbsnrtowcs([[nullable]] wchar_t *dst,
+                   [[nonnull]] char const **__restrict psrc, $size_t nmc, $size_t len,
+                   [[nullable]] $mbstate_t *mbs);
 
 [[wchar, section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]]
-wcsnrtombs:([[nullable]] char *dst,
-            [[nonnull]] wchar_t const **__restrict psrc, $size_t nwc, $size_t len,
-            [[nullable]] $mbstate_t *mbs) -> $size_t;
+$size_t wcsnrtombs([[nullable]] char *dst,
+                   [[nonnull]] wchar_t const **__restrict psrc, $size_t nwc, $size_t len,
+                   [[nullable]] $mbstate_t *mbs);
 
-[[wchar]][section({.text.crt.wchar.FILE.locked.access|.text.crt.dos.wchar.FILE.locked.access})]
-open_wmemstream:(wchar_t **bufloc, $size_t *sizeloc) -> $FILE *;
+[[wchar, section("{.text.crt.wchar.FILE.locked.access|.text.crt.dos.wchar.FILE.locked.access}")]]
+$FILE *open_wmemstream(wchar_t **bufloc, $size_t *sizeloc);
 %#endif /* __USE_XOPEN2K8 */
 
 %
@@ -893,20 +907,22 @@ open_wmemstream:(wchar_t **bufloc, $size_t *sizeloc) -> $FILE *;
 
 [[guard, ATTR_WUNUSED, ATTR_PURE, wchar]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
-wcsnlen:([[nonnull]] wchar_t const *__restrict string, $size_t maxlen) -> $size_t %{generate(str2wcs)}
+$size_t wcsnlen([[nonnull]] wchar_t const *__restrict string, $size_t maxlen)
+	%{generate(str2wcs)}
 
 [[ATTR_WUNUSED, crt_dosname("_wcsdup")]]
 [[ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, wchar, guard, userimpl]]
 [[section("{.text.crt.wchar.heap.strdup|.text.crt.dos.wchar.heap.strdup}")]]
-wcsdup:([[nonnull]] wchar_t const *__restrict string) -> wchar_t * %{generate(str2wcs)}
+wchar_t *wcsdup([[nonnull]] wchar_t const *__restrict string)
+	%{generate(str2wcs)}
 
 %#endif /* __USE_XOPEN2K8 || __USE_DOS */
 
 %
 %#ifdef __USE_XOPEN
 [[section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]]
-[[impl_include("<libc/unicode.h>"), userimpl, ATTR_CONST]]
-[[ATTR_WUNUSED, wchar]] wcwidth:(wchar_t ch) -> int {
+[[impl_include("<libc/unicode.h>"), userimpl, ATTR_CONST, ATTR_WUNUSED, wchar]]
+int wcwidth(wchar_t ch) {
 #if __SIZEOF_WCHAR_T__ == 2
 	if (ch >= UTF16_HIGH_SURROGATE_MIN &&
 	    ch <= UTF16_LOW_SURROGATE_MAX)
@@ -919,9 +935,9 @@ wcsdup:([[nonnull]] wchar_t const *__restrict string) -> wchar_t * %{generate(st
 	return -1;
 }
 
-[[ATTR_WUNUSED, wchar, userimpl]][noexport][[ATTR_PURE]]
+[[ATTR_WUNUSED, wchar, userimpl, ATTR_PURE]]
 [[section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]]
-wcswidth:([[inp(num_chars)]] wchar_t const *__restrict string, $size_t num_chars) -> int {
+int wcswidth([[inp(num_chars)]] wchar_t const *__restrict string, $size_t num_chars) {
 	int temp, result = 0;
 	for (; num_chars; --num_chars, ++string) {
 		wchar_t ch = *string;
@@ -954,11 +970,12 @@ wchar_t *wcschrnul([[nonnull]] wchar_t const *haystack, wchar_t needle)
 
 
 [[ATTR_RETNONNULL, wchar]]
-[if(__SIZEOF_WCHAR_T__ == 2), alias(mempcpyw)]
-[if(__SIZEOF_WCHAR_T__ == 4), alias(mempcpyl)]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("mempcpyw")]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("mempcpyl")]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
 wchar_t *wmempcpy([[outp(num_chars)]] wchar_t *__restrict dst,
-                  [[inp(num_chars)]] wchar_t const *__restrict src, $size_t num_chars) {
+                  [[inp(num_chars)]] wchar_t const *__restrict src,
+                  $size_t num_chars) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	return (wchar_t *)mempcpyw(dst, src, num_chars);
 @@pp_elif __SIZEOF_WCHAR_T__ == 4@@
@@ -973,7 +990,8 @@ wchar_t *wmempcpy([[outp(num_chars)]] wchar_t *__restrict dst,
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("mempmovel")]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
 wmempmove:([[outp(num_chars)]] wchar_t *dst,
-           [[inp(num_chars)]] wchar_t const *src, $size_t num_chars) -> wchar_t * {
+           [[inp(num_chars)]] wchar_t const *src,
+           $size_t num_chars) -> wchar_t * {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	return (wchar_t *)mempmovew(dst, src, num_chars);
 @@pp_elif __SIZEOF_WCHAR_T__ == 4@@
@@ -985,41 +1003,58 @@ wmempmove:([[outp(num_chars)]] wchar_t *dst,
 
 [[ATTR_PURE, ATTR_WUNUSED, wchar, export_alias("_wcstol_l", "__wcstol_l")]]
 [[section("{.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert}")]]
-wcstol_l:([[nonnull]] wchar_t const *__restrict nptr, wchar_t **__restrict endptr, int base, $locale_t locale) -> long %{generate(str2wcs)}
+long wcstol_l([[nonnull]] wchar_t const *__restrict nptr,
+              wchar_t **endptr, int base, $locale_t locale)
+	%{generate(str2wcs)}
+
 [[ATTR_PURE, ATTR_WUNUSED, wchar, export_alias("_wcstoul_l", "__wcstoul_l")]]
 [[section("{.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert}")]]
-wcstoul_l:([[nonnull]] wchar_t const *__restrict nptr, wchar_t **__restrict endptr, int base, $locale_t locale) -> unsigned long %{generate(str2wcs)}
+unsigned long wcstoul_l([[nonnull]] wchar_t const *__restrict nptr,
+                        wchar_t **endptr, int base, $locale_t locale)
+	%{generate(str2wcs)}
 
 wcstoq(*) = wcstoll;
 wcstouq(*) = wcstoull;
 
-[[wchar]][export_alias(_wcstoll_l, __wcstoll_l)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(wcstol_l, _wcstol_l, __wcstol_l)]
-[if(__SIZEOF_LONG_LONG__ == 8), alias(_wcstoi64_l)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoimax_l, _wcstoimax_l, __wcstoimax_l)]
+[[wchar, export_as("_wcstoll_l", "__wcstoll_l")]]
+[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("wcstol_l", "_wcstol_l", "__wcstol_l")]]
+[[if(__SIZEOF_LONG_LONG__ == 8), alias("_wcstoi64_l")]]
+[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoimax_l", "_wcstoimax_l", "__wcstoimax_l")]]
 [[section("{.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert}")]]
-wcstoll_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base, $locale_t locale) -> __LONGLONG %{generate(str2wcs)}
+__LONGLONG wcstoll_l([[nonnull]] wchar_t const *__restrict nptr,
+                     [[nullable]] wchar_t **endptr, int base,
+                     $locale_t locale)
+	%{generate(str2wcs)}
 
-[[wchar]][export_alias(__wcstoull_l)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(wcstoul_l, _wcstoul_l, __wcstoul_l)]
-[if(__SIZEOF_LONG_LONG__ == 8), alias(_wcstoui64_l)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoumax_l, _wcstoumax_l, __wcstoumax_l)]
+[[wchar, export_alias("__wcstoull_l")]]
+[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("wcstoul_l", "_wcstoul_l", "__wcstoul_l")]]
+[[if(__SIZEOF_LONG_LONG__ == 8), alias("_wcstoui64_l")]]
+[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoumax_l", "_wcstoumax_l", "__wcstoumax_l")]]
 [[section("{.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert}")]]
-wcstoull_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, int base, $locale_t locale) -> __ULONGLONG %{generate(str2wcs)}
+__ULONGLONG wcstoull_l([[nonnull]] wchar_t const *__restrict nptr,
+                       [[nullable]] wchar_t **endptr, int base,
+                       $locale_t locale)
+	%{generate(str2wcs)}
 
 %#ifndef __NO_FPU
-[alias(_wcstof_l)][[ATTR_PURE, ATTR_WUNUSED, wchar]][export_alias(_wcstof_l, __wcstof_l)]
+[[ATTR_PURE, ATTR_WUNUSED, wchar, export_alias("_wcstof_l", "__wcstof_l")]]
 [[section("{.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert}")]]
-wcstof_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, $locale_t locale) -> float %{generate(str2wcs)}
+float wcstof_l([[nonnull]] wchar_t const *__restrict nptr,
+               [[nullable]] wchar_t **endptr, $locale_t locale)
+	%{generate(str2wcs)}
 
-[alias(_wcstod_l)][[ATTR_PURE, ATTR_WUNUSED, wchar]][export_alias(_wcstod_l, __wcstod_l)]
+[[ATTR_PURE, ATTR_WUNUSED, wchar, export_alias("_wcstod_l", "__wcstod_l")]]
 [[section("{.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert}")]]
-wcstod_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, $locale_t locale) -> double %{generate(str2wcs)}
+double wcstod_l([[nonnull]] wchar_t const *__restrict nptr,
+                [[nullable]] wchar_t **endptr, $locale_t locale)
+	%{generate(str2wcs)}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[alias(_wcstold_l)][[ATTR_PURE, ATTR_WUNUSED, wchar]][export_alias(_wcstold_l, __wcstold_l)]
+[[ATTR_PURE, ATTR_WUNUSED, wchar, export_alias("_wcstold_l", "__wcstold_l")]]
 [[section("{.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert}")]]
-wcstold_l:([[nonnull]] wchar_t const *__restrict nptr, [[nullable]] wchar_t **endptr, $locale_t locale) -> __LONGDOUBLE %{generate(str2wcs)}
+__LONGDOUBLE wcstold_l([[nonnull]] wchar_t const *__restrict nptr,
+                       [[nullable]] wchar_t **endptr, $locale_t locale)
+	%{generate(str2wcs)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 

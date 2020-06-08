@@ -696,6 +696,7 @@ typedef __errno_t errno_t;
 [[ATTR_CONST, section(".text.crt.errno_access")]]
 [[nonnull]] $errno_t *__errno_location();
 
+
 %{
 #ifdef ____errno_location_defined
 #define errno     (*__errno_location())

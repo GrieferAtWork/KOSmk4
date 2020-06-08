@@ -339,10 +339,6 @@ int pipe([[nonnull]] $fd_t pipedes[2]) {
 	return dos_pipe(pipedes, 4096, 0x8000); /* O_BINARY */
 }
 
-@@Sleep for up to `DURATION' seconds
-[[cp, ignore, nocrt, alias("_sleep")]]
-void dos_sleep($uint32_t duration);
-
 %
 @@>> sleep(3)
 @@Sleep for up to `SECONDS' seconds

@@ -1983,15 +1983,14 @@ typedef int (__LIBCCALL *_onexit_t)(void);
 %#define _CRT_ERRNO_DEFINED 1
 /* NOTE: Cygwin calls it `__errno()' and DOS calls it `_errno()' */
 %#ifndef errno
-%[default_impl_section(".text.crt.errno_access")]
-[[guard, ATTR_WUNUSED, ATTR_CONST]][alias(_errno, __errno)]
-__errno_location:() -> errno_t *;
+%[insert:extern(__errno_location)]
 %#ifdef ____errno_location_defined
 %#define errno     (*__errno_location())
 %#endif /* ____errno_location_defined */
 %#endif /* !errno */
-_get_errno:(errno_t *perr) -> errno_t;
-_set_errno:(errno_t err) -> errno_t;
+%[default_impl_section(".text.crt.errno_access")]
+errno_t _get_errno(errno_t *perr);
+errno_t _set_errno(errno_t err);
 %#endif /* !_CRT_ERRNO_DEFINED */
 
 
@@ -2061,8 +2060,8 @@ __LIBC int __argc;
 #define __argc __argc
 #else /* .... */
 }
-[[guard, ATTR_WUNUSED, ATTR_CONST, ATTR_RETNONNULL]]
-__p___argc:() -> [[nonnull]] int *;
+[[guard, ATTR_WUNUSED, ATTR_CONST]]
+[[nonnull]] int *__p___argc();
 %{
 #ifdef ____p___argc_defined
 #define __argc (*__p___argc())
@@ -2075,8 +2074,8 @@ __p___argc:() -> [[nonnull]] int *;
 __LIBC char **__argv;
 #else /* .... */
 }
-[[guard, ATTR_WUNUSED, ATTR_CONST, ATTR_RETNONNULL]]
-__p___argv:() -> [[nonnull]] char ***;
+[[guard, ATTR_WUNUSED, ATTR_CONST]]
+[[nonnull]] char ***__p___argv();
 %{
 #ifdef ____p___argv_defined
 #define __argv (*__p___argv())
@@ -2090,8 +2089,8 @@ __LIBC wchar_t **__wargv;
 #define __wargv __wargv
 #else /* .... */
 }
-[[guard, ATTR_WUNUSED, ATTR_CONST, wchar, ATTR_RETNONNULL]]
-__p___wargv:() -> [[nonnull]] wchar_t ***;
+[[guard, ATTR_WUNUSED, ATTR_CONST, wchar]]
+[[nonnull]] wchar_t ***__p___wargv();
 %{
 #ifdef ____p___wargv_defined
 #define __wargv (*__p___wargv())
@@ -2105,8 +2104,8 @@ __LIBC wchar_t **_wenviron;
 #define _wenviron _wenviron
 #else /* .... */
 }
-[[guard, ATTR_WUNUSED, ATTR_CONST, wchar, ATTR_RETNONNULL]]
-__p__wenviron:() -> [[nonnull]] wchar_t ***;
+[[guard, ATTR_WUNUSED, ATTR_CONST, wchar]]
+[[nonnull]] wchar_t ***__p__wenviron();
 %{
 #ifdef ____p__wenviron_defined
 #define _wenviron (*__p__wenviron())
@@ -2120,8 +2119,8 @@ __LIBC wchar_t *_wpgmptr;
 #define _wpgmptr _wpgmptr
 #else /* .... */
 }
-[[guard, ATTR_WUNUSED, ATTR_CONST, wchar, ATTR_RETNONNULL]]
-__p__wpgmptr:() -> [[nonnull]] wchar_t **;
+[[guard, ATTR_WUNUSED, ATTR_CONST, wchar]]
+[[nonnull]] wchar_t **__p__wpgmptr();
 %{
 #ifdef ____p__wpgmptr_defined
 #define _wpgmptr (*__p__wpgmptr())
@@ -2160,9 +2159,9 @@ __LIBC char *__progname_full;
 #else /* ... */
 }
 @@Alias for argv[0], as passed to main()
-[[guard, ATTR_WUNUSED, ATTR_CONST, ATTR_RETNONNULL]]
+[[guard, ATTR_WUNUSED, ATTR_CONST]]
 [export_alias(__p_program_invocation_name)]
-__p__pgmptr:() -> [[nonnull]] char **;
+[[nonnull]] char **__p__pgmptr();
 %{
 #ifdef ____p__pgmptr_defined
 #define _pgmptr   (*__p__pgmptr())
@@ -2238,7 +2237,8 @@ _get_pgmptr:(char **pvalue) -> errno_t {
 %#ifdef __CRT_HAVE__fmode
 %__LIBC int _fmode;
 %#else /* ... */
-[[guard, ATTR_WUNUSED, ATTR_CONST, ATTR_RETNONNULL]] __p__fmode:() -> int *;
+[[guard, ATTR_WUNUSED, ATTR_CONST]]
+[[nonnull]] int *__p__fmode();
 %#ifdef ____p__fmode_defined
 %#define _fmode (*__p__fmode())
 %#endif /* ____p__fmode_defined */

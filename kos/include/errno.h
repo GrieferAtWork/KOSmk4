@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdba83967 */
+/* HASH CRC-32:0x8a4a22b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,6 @@
 #ifndef _ERRNO_H
 #define _ERRNO_H 1
 
-#ifdef _CXX_STDONLY_CERRNO
-#ifdef __CXX_SYSTEM_HEADER
-#undef _ERRNO_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
-#else /* __CXX_SYSTEM_HEADER */
-/* Import all symbols into the global namespace when re-including "errno.h" after "cerrno" */
-#undef _CXX_STDONLY_CERRNO
-#endif /* !__CXX_SYSTEM_HEADER */
-#else /* _CXX_STDONLY_CERRNO */
 #include "__stdinc.h"
 #include "__crt.h"
 
@@ -568,9 +560,9 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_N
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),_errno,())
 #elif defined(__CRT_HAVE___errno)
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),__errno,())
-#else /* LIBC: __errno_location */
+#else /* ... */
 #undef ____errno_location_defined
-#endif /* __errno_location... */
+#endif /* !... */
 #endif /* !____errno_location_defined */
 #ifdef ____errno_location_defined
 #define errno     (*__errno_location())
@@ -580,7 +572,7 @@ __LIBC __ATTR_THREAD __errno_t errno;
 #elif defined(__CRT_HAVE_errno)
 __LIBC __errno_t errno;
 #define errno  errno
-#endif
+#endif /* ... */
 #endif /* !__errno */
 #endif /* !errno */
 
@@ -622,9 +614,9 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,_
 #elif defined(__CRT_HAVE___p_program_invocation_name)
 /* Alias for argv[0], as passed to main() */
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),__p_program_invocation_name,())
-#else /* LIBC: __p__pgmptr */
+#else /* ... */
 #undef ____p__pgmptr_defined
-#endif /* __p__pgmptr... */
+#endif /* !... */
 #endif /* !____p__pgmptr_defined */
 #ifdef ____p__pgmptr_defined
 #define program_invocation_name (*__p__pgmptr())
@@ -654,9 +646,9 @@ __LIBC char *__progname;
 #ifdef __CRT_HAVE___p_program_invocation_short_name
 /* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p_program_invocation_short_name,(void),())
-#else /* LIBC: __p_program_invocation_short_name */
+#else /* __CRT_HAVE___p_program_invocation_short_name */
 #undef ____p_program_invocation_short_name_defined
-#endif /* __p_program_invocation_short_name... */
+#endif /* !__CRT_HAVE___p_program_invocation_short_name */
 #endif /* !____p_program_invocation_short_name_defined */
 #ifdef ____p__pgmptr_defined
 #define program_invocation_name (*__p__pgmptr())
@@ -675,9 +667,4 @@ __SYSDECL_END
 
 #endif /* __CC__ */
 
-#ifdef __CXX_SYSTEM_HEADER
-#define _CXX_STDONLY_CERRNO 1
-#undef _ERRNO_H
-#endif /* __CXX_SYSTEM_HEADER */
-#endif /* !_CXX_STDONLY_CERRNO */
 #endif /* !_ERRNO_H */

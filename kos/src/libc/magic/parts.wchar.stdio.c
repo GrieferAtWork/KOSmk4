@@ -42,15 +42,15 @@ __SYSDECL_BEGIN
 int wremove([[nonnull]] wchar_t const *filename);
 
 [[wchar, ATTR_WUNUSED, crt_dosname("_wfopen")]]
-[[section({.text.crt.wchar.FILE.locked.access|.text.crt.dos.wchar.FILE.locked.access})]]
+[[section("{.text.crt.wchar.FILE.locked.access|.text.crt.dos.wchar.FILE.locked.access}")]]
 $FILE *wfopen([[nonnull]] wchar_t const *filename, [[nonnull]] wchar_t const *mode);
 
 [[wchar, ATTR_WUNUSED, crt_dosname("_wfreopen")]]
-[[section({.text.crt.wchar.FILE.locked.access|.text.crt.dos.wchar.FILE.locked.access})]]
+[[section("{.text.crt.wchar.FILE.locked.access|.text.crt.dos.wchar.FILE.locked.access}")]]
 $FILE *wfreopen([[nonnull]] wchar_t const *filename, [[nonnull]] wchar_t const *mode, $FILE *stream);
 
 [[guard, wchar, ATTR_WUNUSED, crt_dosname("_wpopen")]]
-[[section({.text.crt.wchar.FILE.locked.access|.text.crt.dos.wchar.FILE.locked.access})]]
+[[section("{.text.crt.wchar.FILE.locked.access|.text.crt.dos.wchar.FILE.locked.access}")]]
 $FILE *wpopen([[nonnull]] wchar_t const *command, [[nonnull]] wchar_t const *mode);
 
 

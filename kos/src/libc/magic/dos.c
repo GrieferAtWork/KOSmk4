@@ -89,8 +89,9 @@ void delay(unsigned int mill) {
 %[default_impl_section(".text.crt.dos.fs.property")]
 _dos_getdiskfree(*) = _getdiskfree;
 
+@@Sleep for up to `duration' seconds
 [[cp, guard, nocrt, alias("_sleep", "sleep"), exposed_name("sleep")]]
-void dos_sleep(unsigned int seconds);
+void dos_sleep(unsigned int duration);
 
 %[default_impl_section(".text.crt.fs.modify")]
 %[insert:extern(unlink)]
