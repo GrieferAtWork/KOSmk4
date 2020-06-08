@@ -562,6 +562,24 @@ again_handle_tok:
 		case "":
 			goto done;
 
+		case "#":
+			tok = self.next();
+			switch (tok) {
+
+			case "include":
+			case "include_next": {
+				/* Don't escape anything within this line! */
+				local eol = self.text.find("\n", self.tokEnd);
+				if (eol < 0)
+					eol = self.end;
+				self.tokEnd = eol;
+			}	break;
+
+			default:
+				break;
+			}
+			continue;
+
 		case "@": {
 			/* Escaped text sequence */
 			if (flushStart < self.tokStart)

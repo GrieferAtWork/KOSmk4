@@ -23,6 +23,7 @@
 
 %{
 #include <bits/types.h>
+#include <kos/anno.h>
 
 #ifdef __CC__
 

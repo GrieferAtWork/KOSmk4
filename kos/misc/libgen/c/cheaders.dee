@@ -526,8 +526,10 @@ class FunctionPrototype {
 			fp << " ";
 		fp << exposedName << ")";
 		cprintArgumentListWithTypes(fp, escapeMode);
-		if (isNothrowThrowing)
+		if (isNothrowThrowing) {
+			fp << " ";
 			escapeTextIntoFile(fp, nothrow, escapeMode);
+		}
 	}
 
 	@@Print a declaration akin to:

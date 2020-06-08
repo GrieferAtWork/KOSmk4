@@ -22,6 +22,7 @@
 %[default_impl_section(".text.crt.error")]
 
 %{
+#include <kos/anno.h>
 
 }
 %#ifdef __CC__

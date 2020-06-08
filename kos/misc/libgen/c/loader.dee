@@ -131,6 +131,7 @@ global final CXX_SYSTEM_HEADER_END   = "#endif /* !__CXX_SYSTEM_HEADER */\n";
 global final DEFAULT_CC              = "LIBCCALL";
 global final DEFAULT_VCC             = "VLIBCCALL";
 global final DEFAULT_NOTHROW         = "NOTHROW_NCX";
+global final INCLUDE_KOS_ANNO        = "#include <kos/anno.h>";
 
 @@Simple return type annotations which (when used) will be converted into attributes
 global final SIMPLE_RETURN_TYPE_ATTRIBUTE_ANNOTATIONS: {string: string} = {
@@ -402,6 +403,10 @@ again_parse_annotations:
 					} else {
 						result.nothrow = "THROWS(...)";
 					}
+					if (result.declPrefix !is List)
+						result.declPrefix = List(result.declPrefix);
+					if (INCLUDE_KOS_ANNO !in result.declPrefix)
+						result.declPrefix.append(INCLUDE_KOS_ANNO);
 					break;
 
 				case "nothrow":
@@ -463,6 +468,12 @@ again_parse_annotations:
 						} else {
 							anno = SIMPLE_NOTHROW_ANNOTATIONS.get(tok);
 							if (anno !is none) {
+								if (anno.startswith("THROWS")) {
+									if (result.declPrefix !is List)
+										result.declPrefix = List(result.declPrefix);
+									if (INCLUDE_KOS_ANNO !in result.declPrefix)
+										result.declPrefix.append(INCLUDE_KOS_ANNO);
+								}
 								result.nothrow = anno;
 								self.next();
 							} else if (tok.startswith("ATTR_")) {
@@ -4230,44 +4241,46 @@ done_function:
 			if (exposedName is none)
 				exposedName = currentName;
 			local gblGuard = false;
-			if (currentFeatures.guard) {
-				/* Add namespace import bindings for all defined namespaces. */
-				local moreBindings = [];
-				for (local ns: currentFeatures.namespaces) {
-					if (ns !is Namespace)
-						ns = getNamespaceByName(ns);
-					local nsGuard = currentFeatures.guardNames.get(ns.name);
-					if (nsGuard is none)
-						nsGuard = ns.keyDefaultGuard(exposedName);
-					if (ns === GLOBAL_NAMESPACE)
-						gblGuard = nsGuard;
-					moreBindings.append(FunctionBinding(
-						ppCond:     "defined({})".format({ nsGuard }),
-						prototypes: currentPrototypes,
-						binding:    NamespaceBinding(
-							namespace:  ns,
-							importName: exposedName,
-							prototypes: currentPrototypes),
-					));
+			/* Add namespace import bindings for all defined namespaces. */
+			local moreBindings = [];
+			for (local ns: currentFeatures.namespaces) {
+				if (ns !is Namespace)
+					ns = getNamespaceByName(ns);
+				if (!currentFeatures.guard) {
+					if (ns === GLOBAL_NAMESPACE || ns === NAMESPACES["std"])
+						continue;
 				}
-				if (moreBindings) {
-					local oldBindings = current.bindings;
-					if (oldBindings is Callable) {
-						current.bindings = []{
-							yield moreBindings...;
-							yield oldBindings()...;
-						};
-					} else {
-						if (oldBindings !is List) {
-							oldBindings = List(oldBindings);
-							current.bindings = oldBindings;
-						}
-						oldBindings.insertall(0, moreBindings);
-					}
-				}
-				if (gblGuard === false)
-					gblGuard = GLOBAL_NAMESPACE.keyDefaultGuard(exposedName);
+				local nsGuard = currentFeatures.guardNames.get(ns.name);
+				if (nsGuard is none)
+					nsGuard = ns.keyDefaultGuard(exposedName);
+				if (ns === GLOBAL_NAMESPACE)
+					gblGuard = nsGuard;
+				moreBindings.append(FunctionBinding(
+					ppCond:     "defined({})".format({ nsGuard }),
+					prototypes: currentPrototypes,
+					binding:    NamespaceBinding(
+						namespace:  ns,
+						importName: exposedName,
+						prototypes: currentPrototypes),
+				));
 			}
+			if (moreBindings) {
+				local oldBindings = current.bindings;
+				if (oldBindings is Callable) {
+					current.bindings = []{
+						yield moreBindings...;
+						yield oldBindings()...;
+					};
+				} else {
+					if (oldBindings !is List) {
+						oldBindings = List(oldBindings);
+						current.bindings = oldBindings;
+					}
+					oldBindings.insertall(0, moreBindings);
+				}
+			}
+			if (gblGuard === false && currentFeatures.guard)
+				gblGuard = GLOBAL_NAMESPACE.keyDefaultGuard(exposedName);
 			local func = current;
 			if (currentFeatures.decl != "__LIBC" || exposedName != func.name ||
 			    gblGuard !== false || currentFeatures.macroBinding) {
