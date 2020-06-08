@@ -644,29 +644,39 @@ done:
 
 	@@Check if a given @prefix was already printed
 	public function wasPrefixPrinted(prefix: string): bool {
+		if (m_IfdefDead)
+			goto done;
 		for (local ste: m_IfdefStack) {
-			if (prefix in ste.printedPrefixes)
+			if (prefix in ste.printedPrefixes) {
+done:
 				return true;
+			}
 		}
 		return prefix in m_GlobalPrintedPrefixes;
 	}
 
 	@@Check if all of the given prefixes were already printed
 	public function wereAllPrefixesAlreadyPrinted(prefixes: {string...}): bool {
+		if (m_IfdefDead)
+			goto done;
 		for (local p: prefixes) {
 			if (!wasPrefixPrinted(p))
 				return false;
 		}
+done:
 		return true;
 	}
 
 	@@Check if all of the given prefixes were already printed
 	public function printPrefix(prefix: string): CWriter {
+		if (m_IfdefDead)
+			goto done;
 		if (!wasPrefixPrinted(prefix)) {
-			f_RememberPrefixAlreadyPrinted(prefix);
+			rememberPrefixAlreadyPrinted(prefix);
 			generator.addForceNl();
 			generator.addPrinter << prefix;
 		}
+done:
 		return this;
 	}
 
@@ -674,22 +684,8 @@ done:
 		return printPrefix("#include {}\n".format({ header }));
 	}
 
-	@@Check if a given @header was already included
-	public function wasHeaderAlreadyIncluded(header: string): bool {
-		return wasPrefixPrinted("#include {}\n".format({ header }));
-	}
-
-	@@Check if all of the given headers were already included
-	public function wereAllHeadersAlreadyIncluded(headers: {string...}): bool {
-		for (local h: headers) {
-			if (!wasHeaderAlreadyIncluded(h))
-				return false;
-		}
-		return true;
-	}
-
 	@@Remember the inclusion of a given @header
-	private function f_RememberPrefixAlreadyPrinted(prefix: string) {
+	private function rememberPrefixAlreadyPrinted(prefix: string) {
 		local set = m_IfdefStack
 			? m_IfdefStack.last.printedPrefixes
 			: m_GlobalPrintedPrefixes;

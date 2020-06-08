@@ -21,6 +21,7 @@
 %[default_impl_section(".text.crt.net.inet")]
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(pid_t = __pid_t)]
+%[define_replacement(in_addr_t = __u_net32_t)]
 
 %{
 #include <features.h>

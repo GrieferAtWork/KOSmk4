@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa33cc852 */
+/* HASH CRC-32:0xf52ba418 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,backtrace,(void **__array, int 
 /* Store up to SIZE return address of the current program state
  * in ARRAY and return the exact number of values stored */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,backtrace,(void **__array, int __size),__backtrace,(__array,__size))
-#endif /* backtrace... */
+#endif /* ... */
 #ifdef __CRT_HAVE_backtrace_symbols
 /* Return names of functions from the backtrace list
  * in ARRAY in a newly malloc()ed memory block */
@@ -70,7 +70,7 @@ __CDECLARE(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *co
 /* Return names of functions from the backtrace list
  * in ARRAY in a newly malloc()ed memory block */
 __CREDIRECT(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, int __size),__backtrace_symbols,(__array,__size))
-#endif /* backtrace_symbols... */
+#endif /* ... */
 #ifdef __CRT_HAVE_backtrace_symbols_fd
 /* This function is similar to backtrace_symbols()
  * but it writes the result immediately to a file */
@@ -79,7 +79,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,backtrace_symbols_fd,(void *co
 /* This function is similar to backtrace_symbols()
  * but it writes the result immediately to a file */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, int __size, __fd_t __fd),__backtrace_symbols_fd,(__array,__size,__fd))
-#endif /* backtrace_symbols_fd... */
+#endif /* ... */
 #endif /* __CC__ */
 
 __SYSDECL_END

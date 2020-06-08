@@ -343,7 +343,7 @@ class WcharFunction {
 			}
 			result.prototypes = replaceWcharPrototypes(wcPrototypes, mode);
 got_result_prototypes:
-			result.loaderImpl = LoaderFunctionImplementation(
+			result.loaderImpl = wcLoaderImpl is none ? none : LoaderFunctionImplementation(
 				impl:         replaceWcharFunctionImplementation(wcLoaderImpl.impl, mode, functionName),
 				ppCond:       replaceWcharText(wcLoaderImpl.ppCond, mode),
 				ppCondPrefix: replaceWcharTextArray(wcLoaderImpl.ppCondPrefix, mode));;

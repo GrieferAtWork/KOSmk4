@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda35377 */
+/* HASH CRC-32:0xa487ec5c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,7 +98,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_makeaddr, __FORCELOCAL __ATTR_CONST __ATTR_
  *     123      (decimal)
  *     0x123    (hex)
  *     0123     (oct) */
-__CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),__in_addr_t,__NOTHROW_NCX,inet_addr,(char const *__restrict __cp),(__cp))
+__CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),in_addr_t,__NOTHROW_NCX,inet_addr,(char const *__restrict __cp),(__cp))
 #else /* __CRT_HAVE_inet_addr */
 #include <local/arpa.inet/inet_addr.h>
 /* Convert Internet host address from numbers-and-dots
@@ -112,7 +112,7 @@ __CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),__in_addr_t,__NOTHROW_NCX,inet_addr,(
  *     123      (decimal)
  *     0x123    (hex)
  *     0123     (oct) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_addr, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1)) __in_addr_t __NOTHROW_NCX(__LIBCCALL inet_addr)(char const *__restrict __cp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_addr))(__cp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_addr, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1)) in_addr_t __NOTHROW_NCX(__LIBCCALL inet_addr)(char const *__restrict __cp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_addr))(__cp); })
 #endif /* !__CRT_HAVE_inet_addr */
 #ifdef __CRT_HAVE_inet_ntoa
 /* Convert Internet number in IN to ASCII representation. The return

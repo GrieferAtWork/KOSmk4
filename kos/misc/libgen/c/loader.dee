@@ -3951,6 +3951,8 @@ with_primaryImplementation:
 								name:                     currentName,
 								originalSystemHeaderName: headerName,
 								prototype:                currentPrototype,
+								ppCond:                   usedImpl.ppCond,
+								ppCondPrefix:             usedImpl.ppCondPrefix,
 								impl:                     funImpl,
 								documentation:            current.documentation);
 							defineFunctionInMapping(allLocalFunctionsByName, localFunc);
@@ -4011,6 +4013,8 @@ with_primaryImplementation:
 							name:                     currentName,
 							originalSystemHeaderName: headerName,
 							prototype:                currentPrototype,
+							ppCond:                   loaderImpl.ppCond,
+							ppCondPrefix:             loaderImpl.ppCondPrefix,
 							impl:                     funImpl,
 							documentation:            current.documentation);
 						defineFunctionInMapping(allLocalFunctionsByName, localFunc);
