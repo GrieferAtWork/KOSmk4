@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d43d48e */
+/* HASH CRC-32:0x5f3fb665 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -513,10 +513,10 @@ struct sched_param {
 #if defined(__USE_GNU) || defined(__USE_KOS)
 typedef int (__LIBCCALL *__clone_func_t)(void *__arg);
 #ifdef __CRT_HAVE_clone
-__LIBC __ATTR_NONNULL((1)) __pid_t __NOTHROW_NCX(__VLIBCCALL clone)(__clone_func_t __fn, void *__child_stack, int __flags, void *__arg, ... /* pid_t *ptid, void *newtls, pid_t *ctid */) __CASMNAME_SAME("clone");
+__LIBC __ATTR_NONNULL((1)) __pid_t __NOTHROW_NCX(__VLIBCCALL clone)(__clone_func_t __fn, void *__child_stack, int __flags, void *__arg, ...) __CASMNAME_SAME("clone");
 #elif defined(__CRT_HAVE___clone)
 __CVREDIRECT(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,clone,(__clone_func_t __fn, void *__child_stack, int __flags, void *__arg),__clone,(__fn,__child_stack,__flags,__arg),__arg,3,(__pid_t,void *,__pid_t))
-#endif /* clone... */
+#endif /* ... */
 #ifdef __CRT_HAVE_unshare
 /* >> unshare(2)
  * Unshare certain components of the calling thread that may be shared with other
@@ -543,7 +543,7 @@ __CVREDIRECT(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,clone,(__clone_func_t __f
  *                 - CLONE_VM:        Unshare the current VM (KOS extension)
  *                 - CLONE_SIGHAND:   Unshare signal handlers (KOS extension) */
 __CDECLARE(,int,__NOTHROW_NCX,unshare,(int __flags),(__flags))
-#endif /* unshare... */
+#endif /* __CRT_HAVE_unshare */
 #ifdef __CRT_HAVE_sched_getcpu
 /* >> sched_getcpu(3)
  * Returns the number of the CPU for the calling thread.
@@ -552,7 +552,7 @@ __CDECLARE(,int,__NOTHROW_NCX,unshare,(int __flags),(__flags))
  * act on its return value. For that reason, this function must only be taken
  * as a hint */
 __CDECLARE(,int,__NOTHROW_NCX,sched_getcpu,(void),())
-#endif /* sched_getcpu... */
+#endif /* __CRT_HAVE_sched_getcpu */
 #ifdef __CRT_HAVE_setns
 /* >> setns(2)
  * With `FD' referring to a namespace, reassociate the calling thread with that namespace.
@@ -562,7 +562,7 @@ __CDECLARE(,int,__NOTHROW_NCX,sched_getcpu,(void),())
  *                `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',
  *                `CLONE_NEWUTS') */
 __CDECLARE(,int,__NOTHROW_NCX,setns,(__fd_t __fd, int __nstype),(__fd,__nstype))
-#endif /* setns... */
+#endif /* __CRT_HAVE_setns */
 
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_exit_thread
@@ -572,7 +572,7 @@ __CDECLARE(,int,__NOTHROW_NCX,setns,(__fd_t __fd, int __nstype),(__fd,__nstype))
  * calling this function has the same effect as returning `EXIT_CODE'
  * from `clone()'s `FN' callback */
 __CDECLARE_VOID(__ATTR_NORETURN,__NOTHROW_NCX,exit_thread,(int __exit_code),(__exit_code))
-#endif /* exit_thread... */
+#endif /* __CRT_HAVE_exit_thread */
 #endif /* __USE_KOS */
 #endif /* __USE_GNU || __USE_KOS */
 #endif /* __CC__ */

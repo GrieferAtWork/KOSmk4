@@ -122,6 +122,7 @@ import Function from .cheaders;
 global final CXX_SYSTEM_HEADER_START = "#ifndef __CXX_SYSTEM_HEADER\n";
 global final CXX_SYSTEM_HEADER_END   = "#endif /* !__CXX_SYSTEM_HEADER */\n";
 global final DEFAULT_CC              = "LIBCCALL";
+global final DEFAULT_VCC             = "VLIBCCALL";
 global final DEFAULT_NOTHROW         = "NOTHROW_NCX";
 
 @@Simple return type annotations which (when used) will be converted into attributes
@@ -567,7 +568,7 @@ again_skip_arg_annotation_rbracket:
 	}
 	self.skip(")");
 	if (nonNullArguments) {
-		local attrib = "ATTR_NONNULL(({}))"
+		local attrib = "NONNULL(({}))"
 			.format({ ", ".join(nonNullArguments.sorted()) });
 		if (result.attributes === defaultAttributes)
 			result.attributes = List(defaultAttributes);
@@ -618,12 +619,18 @@ again_parse_annotations:
 					}
 					for (local a: result.attributes) {
 						a = str a;
-						if (a.startswith("ATTR_NONNULL((") && a.endswith("))")) {
-							local nonNullArgs = a[14:-2].split(",").each.strip();
-							if (str(result.argv.index(baseArg) + 1) in nonNullArgs) {
-								result.attributes.append("ATTR_RETNONNULL");
-								break;
-							}
+						local nonNullArgs;
+						if (a.startswith("NONNULL((") && a.endswith("))")) {
+							nonNullArgs = a[9:-2];
+						} else if (a.startswith("__ATTR_NONNULL((") && a.endswith("))")) {
+							nonNullArgs = a[16:-2];
+						} else {
+							continue;
+						}
+						nonNullArgs = nonNullArgs.split(",").each.strip();
+						if (str(result.argv.index(baseArg) + 1) in nonNullArgs) {
+							result.attributes.append("ATTR_RETNONNULL");
+							break;
 						}
 					}
 				}	break;
@@ -800,6 +807,8 @@ function parseWholeFunctionPrototype(
 	parseArgumentListAndOptionalTrailingReturnType(
 		self, result, defaultAttributes,
 		functionArgumentNamesOverride);
+	if (result.returnType !is bound)
+		result.returnType = CType("void");
 }
 
 
@@ -2030,6 +2039,20 @@ again_parse_default_annotation:
 		self.skip(")");
 	}
 
+	public function parseDirective_define_partial_replacement() {
+		self.next();
+		self.skip("(");
+		local a = parseCStringOrKeyword(self);
+		self.skip("=");
+		local b = parseCStringOrKeyword(self);
+		local ok, oldRepl = partialKeywordEscapes.setnew_ex(a, b)...;
+		if (!ok && oldRepl != b) {
+			self.err("Replacement re-definition: {!r} defined as {!r} (was: {!r})"
+				.format({ a, b, oldRepl }));
+		}
+		self.skip(")");
+	}
+
 	public function parseDirective_define_str2wcs_replacement() {
 		self.next();
 		self.skip("(");
@@ -2353,7 +2376,7 @@ function loadSystemHeaderDefinitions(
 		}
 		local currentFeatures = copy context.defaultFeatures;
 		local current = Function(originalSystemHeaderName: headerName);
-		local currentPrototype = FunctionPrototype(cc: DEFAULT_CC, nothrow: DEFAULT_NOTHROW);
+		local currentPrototype = FunctionPrototype(nothrow: DEFAULT_NOTHROW);
 		local currentPrototypes = [("1", { currentPrototype })];
 		local currentLibraryFunction = LibraryFunction(originalSystemHeaderName: headerName);
 		local currentDosLibraryFunction: LibraryFunction = none;
@@ -3159,7 +3182,8 @@ again_skip_annotation_rbracket:
 						"Function {!r} has an automatic prototype, but return type was set to {!r}"
 							.format({ currentName, currentPrototype.returnType }));
 				}
-				if (currentPrototype.cc != DEFAULT_CC) {
+				if (currentPrototype.cc is bound &&
+				    currentPrototype.cc != (currentPrototype.hasEllipsis ? DEFAULT_VCC : DEFAULT_CC)) {
 					self.errAt(currentNameTokStart,
 						"Function {!r} has an automatic prototype, but explicit CC {!r}"
 							.format({ currentName, currentPrototype.cc }));
@@ -3215,6 +3239,8 @@ again_skip_annotation_rbracket:
 		/* Default to having a void returnType */
 		if (currentPrototype.returnType !is bound)
 			currentPrototype.returnType = CType("void");
+		if (currentPrototype.cc !is bound)
+			currentPrototype.cc = currentPrototype.hasEllipsis ? DEFAULT_VCC : DEFAULT_CC;
 		if (tok == "[") {
 			/* C++ overloads */
 			local cxxPrototypes: {FunctionPrototype...} = [];
@@ -3226,7 +3252,7 @@ again_skip_annotation_rbracket:
 					tok = self.next();
 				}
 				local cxxProto = FunctionPrototype(
-					cc: currentPrototype.cc,
+					cc:      currentPrototype.cc,
 					nothrow: currentPrototype.nothrow);
 				parseWholeFunctionPrototype(self, cxxProto, defaultAttributes);
 				cxxPrototypes.append(cxxProto);
@@ -3683,7 +3709,7 @@ got_chkExpr:
 						for (local wc_bind/*:FunctionBinding*/ : wc.functionBindings) {
 							local wc_bind_binding = wc_bind.functionBinding;
 							/* Ignore namespace bindings (though we could theoretically bind these as well...) */
-							if (wc_bind_binding is Namespace)
+							if (wc_bind_binding is NamespaceBinding)
 								continue;
 							/* At this point, @wc_bind_binding is one of:
 							 *  - LocalFunction       : Local function implementation
@@ -4171,7 +4197,10 @@ done_function:
 					moreBindings.append(FunctionBinding(
 						ppCond:     "defined({})".format({ nsGuard }),
 						prototypes: currentPrototypes,
-						binding:    ns,
+						binding:    NamespaceBinding(
+							namespace:  ns,
+							importName: exposedName,
+							prototypes: currentPrototypes),
 					));
 				}
 				if (moreBindings) {
@@ -4179,7 +4208,7 @@ done_function:
 					if (oldBindings is Callable) {
 						current.bindings = []{
 							yield moreBindings...;
-							yield oldBindings...;
+							yield oldBindings()...;
 						};
 					} else {
 						if (oldBindings !is List) {

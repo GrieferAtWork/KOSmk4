@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb28020ca */
+/* HASH CRC-32:0x4ea88666 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,27 +56,7 @@ __SYSDECL_BEGIN
 
 
 /* Kinds of resource limit. */
-#ifndef ____rlimit_resource_defined
-#define ____rlimit_resource_defined 1
-#undef RLIMIT_CPU
-#undef RLIMIT_FSIZE
-#undef RLIMIT_DATA
-#undef RLIMIT_STACK
-#undef RLIMIT_CORE
-#undef RLIMIT_RSS
-#undef RLIMIT_NPROC
-#undef RLIMIT_NOFILE
-#undef RLIMIT_OFILE
-#undef RLIMIT_MEMLOCK
-#undef RLIMIT_AS
-#undef RLIMIT_LOCKS
-#undef RLIMIT_SIGPENDING
-#undef RLIMIT_MSGQUEUE
-#undef RLIMIT_NICE
-#undef RLIMIT_RTPRIO
-#undef RLIMIT_RTTIME
-#undef RLIMIT_NLIMITS
-#undef RLIM_NLIMITS
+/*[[[enum]]]*/
 #ifdef __CC__
 enum __rlimit_resource {
 	RLIMIT_CPU        = 0,  /* Per-process CPU limit, in seconds. */
@@ -106,6 +86,7 @@ enum __rlimit_resource {
 	RLIM_NLIMITS      = 16
 };
 #endif /* __CC__ */
+/*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define RLIMIT_CPU        RLIMIT_CPU        /* Per-process CPU limit, in seconds. */
 #define RLIMIT_FSIZE      RLIMIT_FSIZE      /* Largest file that can be created, in bytes. */
@@ -159,13 +140,13 @@ enum __rlimit_resource {
 #define RLIMIT_NLIMITS    16
 #define RLIM_NLIMITS      16
 #endif /* !__COMPILER_PREFERR_ENUMS */
-#endif /* !____rlimit_resource_defined */
+/*[[[end]]]*/
 
 /* Value to indicate that there is no limit. */
 #define RLIM_INFINITY     (__CCAST(__FS_TYPE(rlim))-1)
 #ifdef __USE_LARGEFILE64
 #define RLIM64_INFINITY   (__CCAST(__rlim64_t)-1)
-#endif
+#endif /* __USE_LARGEFILE64 */
 
 /* We can represent all limits. */
 #ifndef RLIM_SAVED_MAX
@@ -178,18 +159,15 @@ enum __rlimit_resource {
 
 /* The type of the WHICH argument to `getpriority' and `setpriority',
  * indicating what flavor of entity the WHO argument specifies. */
-#ifndef ____priority_which_defined
-#define ____priority_which_defined 1
-#undef PRIO_PROCESS
-#undef PRIO_PGRP
-#undef PRIO_USER
+/*[[[enum]]]*/
 #ifdef __CC__
 enum __priority_which {
 	PRIO_PROCESS = 0, /* WHO is a process ID. */
 	PRIO_PGRP    = 1, /* WHO is a process group ID. */
-	PRIO_USER    = 2 /* WHO is a user ID. */
+	PRIO_USER    = 2  /* WHO is a user ID. */
 };
 #endif /* __CC__ */
+/*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define PRIO_PROCESS PRIO_PROCESS /* WHO is a process ID. */
 #define PRIO_PGRP    PRIO_PGRP    /* WHO is a process group ID. */
@@ -199,26 +177,21 @@ enum __priority_which {
 #define PRIO_PGRP    1 /* WHO is a process group ID. */
 #define PRIO_USER    2 /* WHO is a user ID. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
-#endif /* !____priority_which_defined */
+/*[[[end]]]*/
 
 
 /* Whose usage statistics do you want?  */
-#ifndef ____rusage_who_defined
-#define ____rusage_who_defined 1
-#undef RUSAGE_SELF
-#undef RUSAGE_CHILDREN
-#ifdef __USE_GNU
-#undef RUSAGE_THREAD
-#endif /* __USE_GNU */
+/*[[[enum]]]*/
 #ifdef __CC__
 enum __rusage_who {
-	RUSAGE_SELF     = 0,  /* The calling process. */
-	RUSAGE_CHILDREN = -1, /* All of its terminated child processes. */
+	RUSAGE_SELF     =  0,   /* The calling process. */
+	RUSAGE_CHILDREN = (-1), /* All of its terminated child processes. */
 #ifdef __USE_GNU
-	RUSAGE_THREAD   = 1  /* The calling thread. */
+	RUSAGE_THREAD   =  1    /* The calling thread. */
 #endif /* __USE_GNU */
 };
 #endif /* __CC__ */
+/*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define RUSAGE_SELF     RUSAGE_SELF     /* The calling process. */
 #define RUSAGE_CHILDREN RUSAGE_CHILDREN /* All of its terminated child processes. */
@@ -232,7 +205,7 @@ enum __rusage_who {
 #define RUSAGE_THREAD   1    /* The calling thread. */
 #endif /* __USE_GNU */
 #endif /* !__COMPILER_PREFERR_ENUMS */
-#endif /* !____rusage_who_defined */
+/*[[[end]]]*/
 
 /* Priority limits. */
 #ifndef PRIO_MIN
@@ -285,13 +258,13 @@ typedef int __rlimit_resource_t;
 
 #ifdef __CRT_HAVE_prlimit
 __CDECLARE(,int,__NOTHROW_NCX,prlimit,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit const *__new_limit, struct rlimit *__old_limit),(__pid,__resource,__new_limit,__old_limit))
-#endif /* prlimit... */
+#endif /* __CRT_HAVE_prlimit */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_prlimit64
 __CDECLARE(,int,__NOTHROW_NCX,prlimit64,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #elif defined(__CRT_HAVE_prlimit) && (__SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)
 __CREDIRECT(,int,__NOTHROW_NCX,prlimit64,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),prlimit,(__pid,__resource,__new_limit,__old_limit))
-#endif /* prlimit64... */
+#endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_GNU */
 

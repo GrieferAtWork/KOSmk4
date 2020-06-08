@@ -19,6 +19,8 @@
  */
 
 %[default_impl_section(".text.crt.string.argz")]
+%[define_partial_replacement(argc = ___argc)]
+%[define_partial_replacement(argv = ___argv)]
 
 %{
 #include <features.h>
@@ -380,7 +382,7 @@ __argz_delete(*) = argz_delete;
 @@will insert `ENTRY' at the beginning of `ARGZ'. If `BEFORE' is not in `ARGZ', `EINVAL'
 @@is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
 @@On success, `0' is returned
-[[export_alias(__argz_insert), impl_include("<parts/errno.h>")]]
+[[export_alias("__argz_insert"), impl_include("<parts/errno.h>")]]
 [[userimpl, requires($has_function(realloc) && $has_function(argz_add))]]
 error_t argz_insert([[nonnull]] char **__restrict pargz,
                     [[nonnull]] size_t *__restrict pargz_len,

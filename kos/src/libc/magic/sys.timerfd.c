@@ -151,7 +151,7 @@ int timerfd_gettime($fd_t ufd, [[nonnull]] struct itimerspec *__restrict otmr) {
 
 %#ifdef __USE_TIME64
 
-[[time64_variant_of(timerfd_settime)]]
+[[doc_alias("timerfd_settime"), time64_variant_of(timerfd_settime)]]
 [[userimpl, requires_function(timerfd_settime32)]]
 int timerfd_settime64($fd_t ufd, int flags,
                       [[nonnull]] struct itimerspec64 const *utmr,
@@ -172,7 +172,7 @@ int timerfd_settime64($fd_t ufd, int flags,
 	return result;
 }
 
-[[time64_variant_of(timerfd_gettime)]]
+[[doc_alias("timerfd_gettime"), time64_variant_of(timerfd_gettime)]]
 [[userimpl, requires_function(timerfd_gettime32)]]
 int timerfd_gettime64($fd_t ufd, [[nonnull]] struct itimerspec64 *__restrict otmr) {
 	int result;

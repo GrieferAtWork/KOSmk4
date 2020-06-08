@@ -19,6 +19,9 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
+%[define_partial_replacement(argc = ___argc)]
+%[define_partial_replacement(argv = ___argv)]
+%[define_partial_replacement(envp = ___envp)]
 %[default_impl_section(".text.crt.application.options")]
 
 %{
@@ -144,13 +147,19 @@ struct option {
 @@  arguments to the option '\0'.  This behavior is specific to the GNU
 @@  `getopt'
 [[guard, ATTR_WUNUSED]]
-getopt:(int argc, char *const argv[], char const *shortopts) -> int;
+int getopt(int argc, char *const argv[], char const *shortopts);
 
-[[ATTR_WUNUSED]][doc_alias(getopt)]
-getopt_long:(int argc, char *const argv[], char const *shortopts, struct option const *longopts, int *longind) -> int;
+[[ATTR_WUNUSED, doc_alias("getopt")]]
+int getopt_long(int argc, char *const argv[],
+                char const *shortopts,
+                struct option const *longopts,
+                int *longind);
 
-[[ATTR_WUNUSED]][doc_alias(getopt)]
-getopt_long_only:(int argc, char *const argv[], char const *shortopts, struct option const *longopts, int *longind) -> int;
+[[ATTR_WUNUSED, doc_alias("getopt")]]
+int getopt_long_only(int argc, char *const argv[],
+                     char const *shortopts,
+                     struct option const *longopts,
+                     int *longind);
 
 
 %

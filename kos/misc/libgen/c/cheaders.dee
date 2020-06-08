@@ -32,6 +32,7 @@ import * from .escape;
 import * from .globals;
 import * from .namespace;
 import * from .namespace;
+import util;
 
 global Function;
 global SystemHeader;
@@ -46,23 +47,42 @@ global final function keyLocalDep(symbolName: string): string {
 
 function isLibcLinkage(
 		decl: string | UserString, cc: string | UserString,
-		asmname: string | UserString): bool {
+		asmname: string | UserString, hasEllipsis: bool): bool {
 	if (decl !in LIBC_LINKAGE_DECLS)
 		return false;
 	switch (cc) {
 
 	case "LIBCCALL":
 	case "__LIBCCALL":
-		return !asmname.startswith("DOS$") &&
+		return !hasEllipsis &&
+		       !asmname.startswith("DOS$") &&
 		       !asmname.startswith("KOS$");
 
 	case "LIBKCALL":
 	case "__LIBKCALL":
-		return asmname.startswith("KOS$");
+		return !hasEllipsis &&
+		       asmname.startswith("KOS$");
 
 	case "LIBDCALL":
 	case "__LIBDCALL":
-		return asmname.startswith("DOS$");
+		return !hasEllipsis &&
+		       asmname.startswith("DOS$");
+
+	case "VLIBCCALL":
+	case "__VLIBCCALL":
+		return hasEllipsis &&
+		       !asmname.startswith("DOS$") &&
+		       !asmname.startswith("KOS$");
+
+	case "VLIBKCALL":
+	case "__VLIBKCALL":
+		return hasEllipsis &&
+		       asmname.startswith("KOS$");
+
+	case "VLIBDCALL":
+	case "__VLIBDCALL":
+		return hasEllipsis &&
+		       asmname.startswith("DOS$");
 
 	default:
 		break;
@@ -81,11 +101,50 @@ class CType {
 	@@NOTE: This string will have already been stripped of leading/trailing spaces
 	public member afterName: string | UserString = "";
 
+	public function equals(other: CType): bool {
+		if (this === other)
+			return true;
+		if (beforeName != other.beforeName)
+			return false;
+		if (afterName != other.afterName)
+			return false;
+		return false;
+	}
+
 	@@Returns @true if @this @CType is implicitly convertible to @other
-	function implicitlyConvertibleTo(other: CType): bool {
-		/* TODO: This can be done better! */
-		return beforeName == other.beforeName &&
-		       afterName == other.afterName;
+	public function implicitlyConvertibleTo(other: CType): bool {
+		if (equals(other))
+			return true;
+		local typename = str(beforeName).strip();
+		if (typename.endswith("__restrict"))
+			typename = typename[:-10].rstrip();
+		local an = str(afterName);
+		if (an.startswith("[") && an.endswith("]"))
+			an = "*";
+		typename = typename + an;
+		local otTypename = str(other.beforeName).strip();
+		if (otTypename.endswith("__restrict"))
+			otTypename = otTypename[:-10].rstrip();
+		local an = str(other.afterName);
+		if (an.startswith("[") && an.endswith("]"))
+			an = "*";
+		otTypename = otTypename + an;
+again_compare_typenames:
+		if (typename == otTypename)
+			return true;
+		typename = typename.replace("\t", " ");
+		otTypename = otTypename.replace("\t", " ");
+		while ("  " in typename)
+			typename = typename.replace("  ", " ");
+		while ("  " in otTypename)
+			otTypename = otTypename.replace("  ", " ");
+		if (typename == otTypename)
+			return true;
+		if ("const" in otTypename) {
+			otTypename = otTypename.replace("const", "");
+			goto again_compare_typenames;
+		}
+		return false;
 	}
 
 	@@Returns @true if @this @CType is @"void"
@@ -107,9 +166,13 @@ class CType {
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintCCastPrefix(fp: CWriter, escapeMode: int) {
 		fp << "(";
-		/* TODO: This doesn't work for array types! */
-		/* TODO: This doesn't work for things like __restrict */
-		cprint(fp, escapeMode);
+		local typename = str(beforeName).strip();
+		if (typename.endswith("__restrict"))
+			typename = typename[:-10].rstrip();
+		local an = str(afterName);
+		fp << typename;
+		if (an.startswith("[") && an.endswith("]"))
+			fp << " *";
 		fp << ")";
 	}
 
@@ -127,7 +190,7 @@ class CType {
 			escapeTextIntoFile(fp, name, escapeMode);
 		}
 		if (afterNameStr) {
-			if (!afterNameStr.startswith(")"))
+			if (afterNameStr.first !in ")[")
 				fp << " ";
 			escapeTextIntoFile(fp, afterName, escapeMode);
 		}
@@ -192,7 +255,7 @@ class FunctionPrototype {
 
 	@@Calling convention of this function prototype (e.g. @"ATTR_CDECL")
 	@@Set to an empty string to use the default calling convention.
-	public member cc: string | UserString = "";
+	public member cc: string | UserString;
 
 	@@The type that is returned by this function prototype
 	public member returnType: CType;
@@ -208,6 +271,34 @@ class FunctionPrototype {
 	@@NOTE: These prefixes are only printed in local function implementations, as well as
 	@@      their dependencies, as well as the dependencies of inline functions
 	public member declPrefix: {(string | UserString)...} = ();
+
+	@@Wrapper around @attributes that will automatically sort and unwind attributes
+	public property prototypeAttributes: {(string | UserString)...} = {
+		get(): {(string | UserString)...} {
+			local result = attributes;
+			if (!m_attributesSorted) {
+				local wip = []; /* WIthParen */
+				local wop = []; /* WithOutParen */
+				for (local a: result) {
+					a = str(a);
+					if ("(" in a) {
+						wip.append(a);
+					} else {
+						wop.append(a);
+					}
+				}
+				wip.sort();
+				wop.sort();
+				wop.extend(wip);
+				result = wop;
+				attributes = result;
+				m_attributesSorted = true;
+			}
+			return result;
+		}
+	}
+	private member m_attributesSorted: bool = false;
+
 
 	@@Returns @true if this prototype contains a @"ATTR_NORETURN" attribute
 	public property isNoreturn: bool = {
@@ -271,12 +362,49 @@ class FunctionPrototype {
 		}
 	}
 
+	@@Check if @this FunctionPrototype is compatible with @other
+	@@i.e.: uses identical items, attributes, and calling convention.
+	@@Note however that argument names are not checked here!
+	public function compatibleWith(other: FunctionPrototype): bool {
+		if (this === other)
+			return true;
+		if (!returnType.equals(other.returnType))
+			return false;
+		local n = #argv;
+		if (n != #other.argv)
+			return false;
+		for (local i = 0; i < n; ++i) {
+			local my = argv[i];
+			local ot = other.argv[i];
+			if (!my.ctype.equals(ot.ctype))
+				return false;
+		}
+		if (nothrow != other.nothrow)
+			return false;
+		if (cc != other.cc)
+			return false;
+		if (ellipsisArgumentTypes is none) {
+			if (other.ellipsisArgumentTypes !is none)
+				return false;
+		} else {
+			if (other.ellipsisArgumentTypes is none)
+				return false;
+			if (ellipsisArgumentTypes != other.ellipsisArgumentTypes)
+				return false;
+		}
+		if (declPrefix != other.declPrefix)
+			return false;
+		if (prototypeAttributes != other.prototypeAttributes)
+			return false;
+		return true;
+	}
+
 	@@Print the attribute list (returns @false if
 	@@nothing was printed, and @true otherwise)
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintAttributeList(fp: CWriter, escapeMode: int): bool {
 		local isFirst = true;
-		for (local attr: attributes) {
+		for (local attr: prototypeAttributes) {
 			if (!isFirst)
 				fp << " ";
 			escapeTextIntoFile(fp, attr, escapeMode);
@@ -322,14 +450,8 @@ class FunctionPrototype {
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintDeclarationWithOptionalAsmname(
 			fp: CWriter, escapeMode: int, decl: string,
-			exposedName: string, assemblyName: string) {
-		local isLcl = isLibcLinkage(decl, cc, assemblyName);
-		local isSameAsname = exposedName == assemblyName && fp.externLinkage in ["", "C"];
-		if (isLcl) {
-			if (isSameAsname)
-				return cprintDeclarationCDECLARE(fp, escapeMode, decl, exposedName);
-			return cprintRedirectDeclaration(fp, escapeMode, decl, exposedName, assemblyName);
-		}
+			exposedName: string, assemblyName: string,
+			isLcl: bool, isSameAsname: bool) {
 		/* Same symbol name -> declare normally (or with `__ASMNAME()' suffix) */
 		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName);
 		if (isLcl) {
@@ -354,10 +476,10 @@ class FunctionPrototype {
 	@@Print a declaration akin to:
 	@@> __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,wcslen,(__WCHAR_TYPE__ const *__restrict __str),(__str))
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
-	public function cprintDeclarationCDECLARE(
+	public function cprintCDECLARE(
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string) {
 		/* Special case: Make use of __CDECLARE */
-		local isVoidReturn = returnType.isVoid;
+		local isVoidReturn = this.returnType.isVoid;
 		fp << "__CDECLARE";
 		if (isVoidReturn)
 			fp << "_VOID";
@@ -409,6 +531,61 @@ class FunctionPrototype {
 	}
 
 	@@Print a declaration akin to:
+	@@> #define wcslen(string) (size_t)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((wchar_t const *)__string)
+	@@If the types from @callToPrototype different from those in @this prototype,
+	@@insert casts where- and as necessary.
+	@@NOTE: This function will not print a trailing line-feed after the declaration!
+	@@@param: escapeMode:      One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	@@@param: exposedName:     In the above example: @"wcslen"
+	@@@param: callToName:      In the above example: @"(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))"
+	@@@param: callToPrototype: In the above example: @(allLocalFunctionsByName["wcslen"].prototype)
+	public function cprintCallToMacro(
+			fp: CWriter, escapeMode: int, exposedName: string,
+			callToName: string, callToPrototype: FunctionPrototype,
+			explicitCastAllTypes: bool = false) {
+		fp << "#define " << exposedName;
+		if (!this.compatibleWith(callToPrototype)) {
+			/* Need to cast arguments if prototypes don't match up */
+			local isFirst = true;
+			fp << "(";
+			for (local a: this.argv) {
+				if (!isFirst)
+					fp << ", ";
+				isFirst = false;
+				fp << a.name;
+			}
+			fp << ") ";
+			if (!callToPrototype.returnType.implicitlyConvertibleTo(this.returnType))
+				this.returnType.cprintCCastPrefix(fp, escapeMode);
+			fp << callToName << "(";
+			local isFirst = true;
+			local usedPrototypeArgc = #callToPrototype.argv;
+			local i, a;
+			for (i, a: util.enumerate(this.argv)) {
+				if (i >= usedPrototypeArgc)
+					break;
+				if (!isFirst)
+					fp << ", ";
+				local srcArg = this.argv[i];
+				local dstArg = callToPrototype.argv[i];
+				isFirst = false;
+				if (!srcArg.ctype.implicitlyConvertibleTo(dstArg.ctype))
+					dstArg.ctype.cprintCCastPrefix(fp, escapeMode);
+				fp << a.name;
+			}
+			for (; i < usedPrototypeArgc; ++i) {
+				if (!isFirst)
+					fp << ", ";
+				isFirst = false;
+				fp << "0";
+			}
+			fp << ")";
+			return;
+		}
+		fp << " " << callToName;
+	}
+
+	@@Print a declaration akin to:
 	@@> FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 	@@> __NOTHROW_NCX(__LIBCCALL wcslen)(wchar_t const *__restrict __string) {
 	@@> return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))(__string); }
@@ -420,12 +597,13 @@ class FunctionPrototype {
 	@@@param: exposedName:     In the above example: @"wcslen"
 	@@@param: callToName:      In the above example: @"(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))"
 	@@@param: callToPrototype: In the above example: @(allLocalFunctionsByName["wcslen"].prototype)
-	public function cprintCallToAliasDeclaration(
+	public function cprintCallToFunction(
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
-			callToName: string, callToPrototype: FunctionPrototype) {
+			callToName: string, callToPrototype: FunctionPrototype,
+			explicitCastAllTypes: bool = false) {
 		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName);
 		fp << " { return ";
-		if (!callToPrototype.returnType.implicitlyConvertibleTo(returnType))
+		if (explicitCastAllTypes || !callToPrototype.returnType.implicitlyConvertibleTo(returnType))
 			returnType.cprintCCastPrefix(fp, escapeMode);
 		fp << callToName << "(";
 		local argc = #callToPrototype.argv;
@@ -442,7 +620,7 @@ class FunctionPrototype {
 				continue;
 			}
 			local myArg = this.argv[argi];
-			if (!myArg.ctype.implicitlyConvertibleTo(arg.ctype))
+			if (explicitCastAllTypes || !myArg.ctype.implicitlyConvertibleTo(arg.ctype))
 				arg.ctype.cprintCCastPrefix(fp, escapeMode);
 			escapeTextIntoFile(fp, myArg.name, escapeMode);
 		}
@@ -453,11 +631,11 @@ class FunctionPrototype {
 	@@> __REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,
 	@@>            __LIBCCALL,strlen,(char const *__str),strlen_alias,(__str))
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
-	public function cprintRedirectDeclaration(
+	public function cprintREDIRECT(
 			fp: CWriter, escapeMode: int, decl: string,
-			exposedName: string, assemblyName: string) {
-		local isLcl = isLibcLinkage(decl, cc, assemblyName);
-		fp << (isLcl ? "__CREDIRECT" : "__REDIRECT");
+			exposedName: string, assemblyName: string,
+			isLcl: bool) {
+		fp << (isLcl ? "__CREDIRECT" : "__COMPILER_REDIRECT");
 		local isVoidReturn = returnType.isVoid;
 		if (isVoidReturn)
 			fp << "_VOID";
@@ -503,19 +681,173 @@ class FunctionPrototype {
 		fp << ")\n";
 	}
 
+	@@Print a declaration akin to:
+	@@> __CVREDIRECT(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,clone,
+	@@>              (__clone_func_t __fn, void *__child_stack, int __flags, void *__arg),
+	@@>              __clone,(__fn,__child_stack,__flags,__arg),
+	@@>              __arg,3,(__pid_t,void *,__pid_t))
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintVREDIRECT(
+			fp: CWriter, escapeMode: int, decl: string,
+			exposedName: string, assemblyName: string,
+			isLcl: bool) {
+		fp << (isLcl ? "__CVREDIRECT" : "__COMPILER_VREDIRECT");
+		local isVoidReturn = returnType.isVoid;
+		if (isVoidReturn)
+			fp << "_VOID";
+		if (isLcl) {
+			if (assemblyName.startswith("DOS$")) {
+				fp << "_DOS";
+				assemblyName = assemblyName[4:];
+			} else if (assemblyName.startswith("KOS$")) {
+				fp << "_KOS";
+				assemblyName = assemblyName[4:];
+			}
+		}
+		fp << "(";
+		/* Linkage */
+		if (!isLcl)
+			fp << decl << ",";
+		/* Attributes */
+		cprintAttributeList(fp, escapeMode);
+		/* Return type */
+		fp << ",";
+		if (!isVoidReturn) {
+			returnType.cprint(fp, escapeMode);
+			fp << ",";
+		}
+		/* NOTHROW behavior */
+		escapeTextIntoFile(fp, isNothrowThrowing
+			? nothrowThrowingSpec
+			: nothrow, escapeMode);
+		fp << ",";
+		/* Calling convention */
+		if (!isLcl) {
+			escapeTextIntoFile(fp, cc, escapeMode);
+			fp << ",";
+		}
+		/* Exposed symbol name */
+		fp << exposedName << ",";
+		/* Argument list */
+		local isFirst = true;
+		fp << "(";
+		for (local arg: argv[:-1]) {
+			if (!isFirst)
+				fp << ", ";
+			arg.cprint(fp, escapeMode);
+			isFirst = false;
+		}
+		fp << ")";
+		/* Assembly import symbol name */
+		fp << "," << assemblyName << ",";
+		/* Argument names */
+		local isFirst = true;
+		fp << "(";
+		for (local arg: argv[:-1]) {
+			if (!isFirst)
+				fp << ",";
+			escapeTextIntoFile(fp, arg.protoTypeName, escapeMode);
+			isFirst = false;
+		}
+		fp << "),";
+		/* Next up: print the name of the last argument before ellipsis starts */
+		escapeTextIntoFile(fp, argv[#argv - 2].name, escapeMode);
+		/* Then print the # of known ellipsis argument types */
+		fp << "," << #ellipsisArgumentTypes << ",(";
+		/* And finally, print the actual list of ellipsis argument types */
+		local isFirst = true;
+		for (local typ: ellipsisArgumentTypes) {
+			if (!isFirst)
+				fp << ",";
+			typ.cprint(fp, escapeMode);
+			isFirst = false;
+		}
+		fp << "))\n";
+	}
+
 	@@Print a redirection- or declaration-binding, based on
 	@@the exposed- and assembly name being the same
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintRedirectionBinding(
 			fp: CWriter, escapeMode: int, decl: string,
 			exposedName: string, assemblyName: string) {
-		if (exposedName != assemblyName || fp.externLinkage !in ["", "C"]) {
-			cprintRedirectDeclaration(
-				fp, escapeMode, decl, exposedName, assemblyName);
-			return;
+		local hasEllipsis = this.hasEllipsis;
+		local isLcl = isLibcLinkage(decl, cc, assemblyName, hasEllipsis);
+		local isSameAsname = exposedName == assemblyName && fp.externLinkage in ["", "C"];
+		if (hasEllipsis) {
+			if (!isSameAsname) {
+				if (ellipsisArgumentTypes !is none) {
+					return cprintVREDIRECT(
+						fp, escapeMode, decl, exposedName, assemblyName, isLcl);
+				}
+				/* XXX: This is the one corner-case, where there's no real way
+				 *      of implementing redirections portably... So for now,
+				 *      simply fall through to use the non-portable ASMNAME()
+				 *      notation... */
+			}
+			return cprintDeclarationWithOptionalAsmname(
+				fp, escapeMode, decl, exposedName,
+				assemblyName, isLcl, isSameAsname);
 		}
-		cprintDeclarationWithOptionalAsmname(
-			fp, escapeMode, decl, exposedName, assemblyName);
+		if (isLcl) {
+			if (!isSameAsname)
+				return cprintREDIRECT(fp, escapeMode, decl, exposedName, assemblyName, isLcl);
+			return cprintCDECLARE(fp, escapeMode, decl, exposedName);
+		}
+		if (!isSameAsname) {
+			return cprintREDIRECT(
+				fp, escapeMode, decl, exposedName, assemblyName, isLcl);
+		}
+		return cprintDeclarationWithOptionalAsmname(
+			fp, escapeMode, decl, exposedName,
+			assemblyName, isLcl, isSameAsname);
+	}
+
+	@@Print the start of an EXTERN-INLINE redirection- or declaration-binding,
+	@@based on the exposed- and assembly name being the same
+	@@Upon return, the caller should proceed to print the inline implementation body,
+	@@followed by a single @')'-terminator that will then complete the macro started
+	@@by this function.
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintExternInlineBindingStart(
+			fp: CWriter, escapeMode: int, decl: string,
+			exposedName: string, assemblyName: string) {
+		local hasEllipsis = this.hasEllipsis;
+		local isLcl = isLibcLinkage(decl, cc, assemblyName, hasEllipsis);
+		local isRedirect = exposedName != assemblyName;
+		fp << (isLcl
+		       ? isRedirect ? "__CEIREDIRECT" : "__CEIDECLARE"
+		       : isRedirect ? "__COMPILER_EIREDIRECT" : "__COMPILER_EIDECLARE");
+		if (isRedirect && isLcl) {
+			if (assemblyName.startswith("DOS$")) {
+				fp << "_DOS";
+				assemblyName = assemblyName[4:];
+			} else if (assemblyName.startswith("KOS$")) {
+				fp << "_KOS";
+				assemblyName = assemblyName[4:];
+			}
+		}
+		fp << "(";
+		if (!isLcl)
+			fp << decl << ","; /* Declaration linkage */
+		/* Attribute list */
+		cprintAttributeList(fp, escapeMode);
+		fp << ",";
+		/* Return type */
+		returnType.cprint(fp, escapeMode);
+		fp << ",";
+		/* NOTHROW behavior */
+		escapeTextIntoFile(fp, isNothrowThrowing
+			? nothrowThrowingSpec
+			: nothrow, escapeMode);
+		if (!isLcl)
+			fp << cc << ","; /* Calling convention */
+		/* Exposed name */
+		fp << "," << exposedName << ",";
+		cprintArgumentListWithTypes(fp, escapeMode);
+		fp << ",";
+		if (isRedirect)
+			fp << assemblyName << ",";
 	}
 
 }
@@ -800,24 +1132,30 @@ class LocalFunction {
 			callToLocalName = "({})".format({ callToLocalName });
 		}
 		if (preferBindingMacros) {
-			/* TODO: Need to cast arguments if prototypes don't match up */
 			if (doc)
 				fp.printComment(doc);
-			fp << "#define " << exposedName << " " << callToLocalName;
+			if (#prototypes == 1) {
+				prototypes.first.cprintCallToMacro(
+					fp, escapeMode, exposedName,
+					callToLocalName, usedPrototype);
+			} else {
+				fp << "#define " << exposedName << " " << callToLocalName;
+			}
 			return;
 		}
 		for (local ptype: prototypes) {
 			if (doc)
 				fp.printComment(doc);
-			if (exposedName == name) {
-				/* TODO: Can only be done if the prototypes match up! */
+			if (exposedName == name && #prototypes == 1 &&
+			    ptype.compatibleWith(usedPrototype)) {
+				/* Can only be done if the prototypes match up! */
 				LOCAL_NAMESPACE.keyUsingOrImpl(fp, exposedName, []{
-					ptype.cprintCallToAliasDeclaration(
+					ptype.cprintCallToFunction(
 						fp, escapeMode, NAMESPACE_IMPORT_DECL,
 						exposedName, callToLocalName, usedPrototype);
 				});
 			} else {
-				ptype.cprintCallToAliasDeclaration(
+				ptype.cprintCallToFunction(
 					fp, escapeMode, NAMESPACE_IMPORT_DECL,
 					exposedName, callToLocalName, usedPrototype);
 				fp << "\n";
@@ -925,42 +1263,9 @@ class InlineFunction {
 			if (doc)
 				fp.printComment(doc);
 			if (mode == "__EXTERNINLINE") {
-				local assemblyName = str externInlineAsmname;
-				local isLcl = isLibcLinkage(decl, prototype.cc, assemblyName);
-				local isRedirect = exposedName != assemblyName;
-				fp << (isLcl
-					   ? isRedirect ? "__CEIREDIRECT" : "__CEIDECLARE"
-					   : isRedirect ? "__EIREDIRECT" : "__EIDECLARE");
-				if (isRedirect && isLcl) {
-					if (assemblyName.startswith("DOS$")) {
-						fp << "_DOS";
-						assemblyName = assemblyName[4:];
-					} else if (assemblyName.startswith("KOS$")) {
-						fp << "_KOS";
-						assemblyName = assemblyName[4:];
-					}
-				}
-				fp << "(";
-				if (!isLcl)
-					fp << decl << ","; /* Declaration linkage */
-				/* Attribute list */
-				prototype.cprintAttributeList(fp, escapeMode);
-				fp << ",";
-				/* Return type */
-				prototype.returnType.cprint(fp, escapeMode);
-				fp << ",";
-				/* NOTHROW behavior */
-				escapeTextIntoFile(fp, prototype.isNothrowThrowing
-					? prototype.nothrowThrowingSpec
-					: prototype.nothrow, escapeMode);
-				if (!isLcl)
-					fp << prototype.cc << ","; /* Calling convention */
-				/* Exposed name */
-				fp << "," << exposedName << ",";
-				prototype.cprintArgumentListWithTypes(fp, escapeMode);
-				fp << ",";
-				if (isRedirect)
-					fp << assemblyName << ",";
+				prototype.cprintExternInlineBindingStart(
+					fp, escapeMode, decl, exposedName,
+					str externInlineAsmname);
 				/* Inline implementation */
 				escapeTextIntoFile(
 					fp, impl.body, escapeMode,
@@ -983,6 +1288,86 @@ class InlineFunction {
 }
 
 
+class NamespaceBinding {
+	this = default;
+
+	@@The namespace from which to import the function
+	public member namespace: Namespace;
+
+	@@Name of the function within @namespace
+	public member importName: string | UserString;
+
+	@@Prototype selectors (usually simply @({ "1", { <primaryPrototype> } }))
+	@@These are the prototypes of @importName within its associated @namespace
+	public member prototypes: {(string | UserString, {FunctionPrototype...})...} | Callable = ();
+
+	public property functionPrototypes: {(string | UserString, {FunctionPrototype...})...} = {
+		get(): {(string | UserString, {FunctionPrototype...})...} {
+			local result = prototypes;
+			if (result is Callable)
+				result = prototypes = result();
+			return result;
+		}
+	}
+
+	@@Print a binding for this namespace import
+	@@@param: preferBindingMacros: Prefer function bindings to be done with macros, rather than
+	@@                             through use of inline functions.
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintFunctionBinding(
+			fp: CWriter, escapeMode: int, decl/*unused*/: string, exposedName: string,
+			prototypes: {FunctionPrototype...}, doc: string, preferBindingMacros: bool) {
+		/* Bind a function declaration from @namespace, inside of which it was
+		 * declared under the name @importName, and @this.prototypes to a new
+		 * function or macro by the name of @exposedName, using @prototypes */
+		local callToPrototypes = this.functionPrototypes;
+		local explicitCastAllTypes =
+			(#callToPrototypes != 1) ||
+			(#callToPrototypes.first[1] != 1);
+		local callToName = "({} {})".format({
+			this.namespace.prefix,
+			this.namespace.keyCSymbolName(this.importName)
+		});
+		for (local ptype: prototypes) {
+			local isFirst = true;
+			for (local callToPrototypePpCond, callToProtos: callToPrototypes) {
+				callToPrototypePpCond = expandPreprocessorConditionString(callToPrototypePpCond);
+				if (isFirst)
+					fp.ppIf(callToPrototypePpCond);
+				else {
+					fp.ppElif(callToPrototypePpCond);
+				}
+				isFirst = false;
+				for (local callToProto: callToProtos) {
+					if (doc)
+						fp.printComment(doc);
+					if (exposedName == this.importName && #prototypes == 1 &&
+					    ptype.compatibleWith(callToProto)) {
+						/* Can only be done if the prototypes match up! */
+						this.namespace.keyUsingOrImpl(fp, exposedName, []{
+							ptype.cprintCallToFunction(
+								fp, escapeMode, NAMESPACE_IMPORT_DECL,
+								exposedName, callToName, callToProto,
+								explicitCastAllTypes: explicitCastAllTypes);
+						});
+					} else if (preferBindingMacros) {
+						ptype.cprintCallToMacro(
+							fp, escapeMode, exposedName, callToName, callToProto,
+							explicitCastAllTypes: explicitCastAllTypes);
+					} else {
+						ptype.cprintCallToFunction(
+							fp, escapeMode, NAMESPACE_IMPORT_DECL,
+							exposedName, callToName, callToProto,
+							explicitCastAllTypes: explicitCastAllTypes);
+						fp << "\n";
+					}
+				}
+			}
+			if (!isFirst)
+				fp.ppEndif();
+		}
+	}
+}
 
 
 class FunctionBinding {
@@ -1007,16 +1392,16 @@ class FunctionBinding {
 	public member prototypes: {(string | UserString, {FunctionPrototype...})...} | Callable = ();
 
 	@@The actual binding provided by this function:
-	@@  - @LocalFunction:  Provide a local function implementation, via inclusion of
-	@@                     <local/@(binding.originalSystemHeaderName)/@(binding.name).h>
-	@@  - @InlineFunction: Provide an in-line function implementation, possibly alongside
-	@@                     support for @"__EXTERNINLINE"
-	@@  - @string:         External assembly symbol (bind the function against
-	@@                     an assembly symbol by the name of @binding)
-	@@  - @UserString:     Same as @string
-	@@  - @Namespace:      Import an existing declaration from some other namespace
-	@@  - @Callable:       A callback that takes no arguments, and returns one of the above
-	public member binding: LocalFunction | InlineFunction | string | UserString | Namespace | Callable;
+	@@  - @LocalFunction:    Provide a local function implementation, via inclusion of
+	@@                       <local/@(binding.originalSystemHeaderName)/@(binding.name).h>
+	@@  - @InlineFunction:   Provide an in-line function implementation, possibly alongside
+	@@                       support for @"__EXTERNINLINE"
+	@@  - @string:           External assembly symbol (bind the function against
+	@@                       an assembly symbol by the name of @binding)
+	@@  - @UserString:       Same as @string
+	@@  - @NamespaceBinding: Import an existing declaration from some other namespace
+	@@  - @Callable:         A callback that takes no arguments, and returns one of the above
+	public member binding: LocalFunction | InlineFunction | string | UserString | NamespaceBinding | Callable;
 
 	public property functionPrototypes: {(string | UserString, {FunctionPrototype...})...} = {
 		get(): {(string | UserString, {FunctionPrototype...})...} {
@@ -1028,8 +1413,8 @@ class FunctionBinding {
 	}
 
 	@@Return @binding, but unwind @Callable wrappers
-	public property functionBinding: LocalFunction | InlineFunction | string | UserString | Namespace = {
-		get(): LocalFunction | InlineFunction | string | UserString | Namespace {
+	public property functionBinding: LocalFunction | InlineFunction | string | UserString | NamespaceBinding = {
+		get(): LocalFunction | InlineFunction | string | UserString | NamespaceBinding {
 			local result = binding;
 			if (result is Callable)
 				result = binding = result();
@@ -1124,27 +1509,75 @@ class FunctionBinding {
 			preferBindingMacros: bool = false,
 			printDeclarationPrefixes: bool = false) {
 		local usedBinding = functionBinding;
-		if (usedBinding is Namespace) {
-			assert usedBinding !== fp.namespace, "The caller must check this!";
-			local nsCName = usedBinding.keyCSymbolName(exposedName);
-			if (nsCName == exposedName) {
-				/* Simple case: C doesn't perform any name mangling.
-				 * This is the case for functions imported from  */
-				usedBinding.keyUsing(fp, nsCName);
-			} else {
-				usedBinding.keyUsingOrImpl(fp, nsCName, []{
-					fp << "/* TODO: IMPORT-MANGLED-C-FUNCTION-FROM-NAMESPACE */";
-				});
+		local usedPrototypes = functionPrototypes;
+		if (usedBinding is NamespaceBinding) {
+			local usedNs = usedBinding.namespace;
+			assert usedNs !== fp.namespace, "The caller must check this!";
+			local nsCImportName = usedNs.keyCSymbolName(usedBinding.importName);
+			if (nsCImportName == exposedName) {
+				if (prototypes === usedBinding.prototypes) {
+bind_with_ns_using:
+					/* Simple case: C doesn't perform any name mangling,
+					 * and the prototypes of the existing declaration match
+					 * those from the new declaration.
+					 * This is the case for functions imported from  */
+					usedNs.keyUsing(fp, nsCImportName);
+					return;
+				}
+				local nsPrototypes = usedBinding.functionPrototypes;
+				local prototypeVariantCount = #nsPrototypes;
+				if (prototypeVariantCount == #usedPrototypes) {
+					for (local i = 0; i < prototypeVariantCount; ++i) {
+						local myProtoOpt = usedPrototypes[i];
+						local otProtoOpt = nsPrototypes[i];
+						/* Check the prototype's preprocessor conditions */
+						if (str(myProtoOpt[0]) != otProtoOpt[0])
+							goto bind_normally;
+						myProtoOpt = myProtoOpt[1];
+						otProtoOpt = otProtoOpt[1];
+						local n = #myProtoOpt;
+						if (n != #otProtoOpt)
+							goto bind_normally;
+						/* Check the actual prototypes */
+						for (local j = 0; j < n; ++j) {
+							if (!myProtoOpt[j].compatibleWith(otProtoOpt[j]))
+								goto bind_normally;
+						}
+					}
+				}
+				goto bind_with_ns_using;
 			}
-			return;
+		}
+bind_normally:
+		if (#usedPrototypes >= 2) {
+			for (local ppCond, none: usedPrototypes) {
+				if (ppCond != "1")
+					continue;
+				if (usedBinding is LocalFunction) {
+					/* Include the local-implementation beforehard! */
+					local oldNs = fp.namespace;
+					local oldExternLinkage = fp.externLinkage;
+					fp.namespace = GLOBAL_NAMESPACE;
+					if (oldExternLinkage !in ["", "C"])
+						fp.externLinkage = "";
+					/* Include the local-header for this function */
+					fp.ppInclude("<local/{}/{}.h>".format({
+						usedBinding.originalSystemHeaderName,
+						usedBinding.name
+					}));
+					fp.externLinkage = oldExternLinkage;
+					fp.namespace = oldNs;
+				}
+				if (printDeclarationPrefixes) {
+					/* TODO: Print declaration prefixes common to all of @usedPrototypes,
+					 *       so-long as at least one of @usedPrototypes has a ppCond that
+					 *       always evaluates to true */
+				}
+				break;
+			}
 		}
 		local isFirst = true;
-		if (printDeclarationPrefixes) {
-			/* TODO: Print declaration prefixes common to all of @functionPrototypes,
-			 *       so-long as at least one of @functionPrototypes has a ppCond that
-			 *       always evaluates to true */
-		}
-		for (local ppCond, associatedPrototypes: functionPrototypes) {
+		for (local ppCond, associatedPrototypes: usedPrototypes) {
 			ppCond = expandPreprocessorConditionString(ppCond);
 			if (isFirst)
 				fp.ppIf(ppCond);
@@ -1159,11 +1592,10 @@ class FunctionBinding {
 						escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
 				}
 			}
-			if (usedBinding !is string && usedBinding !is UserString) {
-				usedBinding.cprintFunctionBinding(
-					fp, escapeMode, decl, exposedName, associatedPrototypes,
-					doc, preferBindingMacros);
-			} else {
+			local oldExternLinkage = fp.externLinkage;
+			if (#associatedPrototypes >= 2)
+				fp.externLinkage = "C++";
+			if (usedBinding is string || usedBinding is UserString) {
 				usedBinding = str usedBinding;
 				for (local ptype: associatedPrototypes) {
 					if (doc)
@@ -1172,7 +1604,12 @@ class FunctionBinding {
 						fp, escapeMode, decl,
 						exposedName, usedBinding);
 				}
+			} else {
+				usedBinding.cprintFunctionBinding(
+					fp, escapeMode, decl, exposedName, associatedPrototypes,
+					doc, preferBindingMacros);
 			}
+			fp.externLinkage = oldExternLinkage;
 		}
 		if (guardName !is none) {
 			if (!isFirst)
@@ -1247,13 +1684,6 @@ class Function {
 	}
 	private member m_functionBindings: {FunctionBinding...};
 
-//TODO:	@@Find identical bindings, and merge them into a single one
-//TODO:	public function resolveDuplicateBindings() {
-//TODO:		if (#functionBindings <= 1)
-//TODO:			return;
-//TODO:		//public member binding: LocalFunction | InlineFunction | string | UserString | Namespace | Callable;
-//TODO:	}
-
 	@@Print requires-conditions for this function (has used by @"$has_function(...)")
 	public function cprintRequires(fp: CWriter | File) {
 		local usedBindings = functionBindings;
@@ -1265,6 +1695,8 @@ no_usable_bindings:
 		local hasUsableBindings = 0;
 		local hasUnusableBindings = false;
 		for (local bind: usedBindings) {
+			if (bind.functionBinding is NamespaceBinding)
+				continue;
 			local c = bind.getRequiresConstant();
 			if (c === true) {
 				fp << "1";
@@ -1280,6 +1712,8 @@ no_usable_bindings:
 		if (hasUsableBindings == 1) {
 			local bind;
 			for (bind: usedBindings) {
+				if (bind.functionBinding is NamespaceBinding)
+					continue;
 				if (bind.getRequiresConstant() is none)
 					break;
 			}
@@ -1288,6 +1722,8 @@ no_usable_bindings:
 			fp << "(";
 			local isFirst = true;
 			for (local bind: usedBindings) {
+				if (bind.functionBinding is NamespaceBinding)
+					continue;
 				if (hasUnusableBindings) {
 					if (bind.getRequiresConstant() === false)
 						continue;
@@ -1315,119 +1751,127 @@ no_usable_bindings:
 			exposedName: string = none, guardName: string | bool = none,
 			preferBindingMacros: bool = false,
 			printDeclarationPrefixes: bool = false) {
-		local usedBindings = functionBindings;
-		if (!usedBindings)
-			return; /* No bindings -> Noop */
-		if (exposedName is none)
-			exposedName = this.name;
-		if (guardName is bool) {
-			guardName = guardName
-				? fp.namespace.keyDefaultGuard(exposedName)
-				: none;
-		}
-		if (printDeclarationPrefixes) {
-			/* TODO: Print declaration prefixes common to all bindings,
-			 *       when at least one one binding exists that can get
-			 *       bound unconditionally. */
-		}
-		if (guardName !is none) {
-			if (#usedBindings == 1) {
-				/* Try to optimize special case: Only 1 binding
-				 * Instead of writing something like this:
-				 * >> #ifndef __wcslen_defined
-				 * >> #define __wcslen_defined 1
-				 * >> #if $has_function(wcslen) || defined(__std_wcslen_defined)
-				 * >> __NAMESPACE_STD_USING(wcslen)
-				 * >> #else // <$has_function(wcslen)> || __std_wcslen_defined
-				 * >> #undef __wcslen_defined
-				 * >> #endif // !<$has_function(wcslen)> && !__std_wcslen_defined
-				 * >> #endif // !__wcslen_defined
-				 *
-				 * Write the following instead:
-				 * >> #if !defined(__wcslen_defined) && (defined(__std_wcslen_defined) || $has_function(wcslen))
-				 * >> #define __wcslen_defined 1
-				 * >> __NAMESPACE_STD_USING(wcslen)
-				 * >> #endif // !__wcslen_defined && (__std_wcslen_defined || $has_function(wcslen)) */
-				local bind = usedBindings.first;
-				/* Special case: Can't bind against a declaration from the current namespace! */
-				if (bind.binding is Callable)
-					bind.binding = bind.binding();
-				if (bind.binding is Namespace && bind.binding === fp.namespace)
+		try {
+			local usedBindings = functionBindings;
+			if (!usedBindings)
+				return; /* No bindings -> Noop */
+			if (exposedName is none)
+				exposedName = this.name;
+			if (guardName is bool) {
+				guardName = guardName
+					? fp.namespace.keyDefaultGuard(exposedName)
+					: none;
+			}
+			if (printDeclarationPrefixes) {
+				/* TODO: Print declaration prefixes common to all bindings,
+				 *       when at least one one binding exists that can get
+				 *       bound unconditionally. */
+			}
+			if (guardName !is none) {
+				if (#usedBindings == 1) {
+					/* Try to optimize special case: Only 1 binding
+					 * Instead of writing something like this:
+					 * >> #ifndef __wcslen_defined
+					 * >> #define __wcslen_defined 1
+					 * >> #if $has_function(wcslen) || defined(__std_wcslen_defined)
+					 * >> __NAMESPACE_STD_USING(wcslen)
+					 * >> #else // <$has_function(wcslen)> || __std_wcslen_defined
+					 * >> #undef __wcslen_defined
+					 * >> #endif // !<$has_function(wcslen)> && !__std_wcslen_defined
+					 * >> #endif // !__wcslen_defined
+					 *
+					 * Write the following instead:
+					 * >> #if !defined(__wcslen_defined) && (defined(__std_wcslen_defined) || $has_function(wcslen))
+					 * >> #define __wcslen_defined 1
+					 * >> __NAMESPACE_STD_USING(wcslen)
+					 * >> #endif // !__wcslen_defined && (__std_wcslen_defined || $has_function(wcslen)) */
+					local bind = usedBindings.first;
+					/* Special case: Can't bind against a declaration from the current namespace! */
+					if (bind.binding is Callable)
+						bind.binding = bind.binding();
+					if (bind.binding is NamespaceBinding &&
+					    bind.binding.namespace === fp.namespace)
+						return;
+					for (local x: bind.ppCondPrefix) {
+						if (!fp.wasPrefixPrinted(escapeText(x, escapeMode)))
+							goto normal_guardName_binding;
+					}
+					fp.ppIf("!defined({}) && ({})".format({
+						guardName,
+						expandPreprocessorConditionString(bind.ppCond)
+					}));
+					fp.ppDefine(guardName, "1");
+					bind.cprintBindFunction(
+						fp, escapeMode, decl, exposedName, guardName,
+						documentationString, preferBindingMacros,
+						printDeclarationPrefixes);
+					fp.ppEndif();
 					return;
-				for (local x: bind.ppCondPrefix) {
-					if (!fp.wasPrefixPrinted(escapeText(x, escapeMode)))
-						goto normal_guardName_binding;
 				}
-				fp.ppIf("!defined({}) && ({})".format({
-					guardName,
-					expandPreprocessorConditionString(bind.ppCond)
-				}));
+normal_guardName_binding:
+				fp.ppIfndef(guardName);
 				fp.ppDefine(guardName, "1");
+			}
+			local isFirst = true;
+			local numNeededEndif = [];
+			for (local bind: usedBindings) {
+				/* Special case: Can't bind against a declaration from the current namespace! */
+				if (bind.binding is NamespaceBinding &&
+				    bind.binding.namespace === fp.namespace)
+					continue;
+				local usedPpCond = expandPreprocessorConditionString(bind.ppCond);
+				local oldNs: Namespace | none = none;
+				local oldExternLinkage;
+				for (local x: bind.ppCondPrefix) {
+					local newText = escapeText(x, escapeMode);
+					if (fp.wasPrefixPrinted(newText))
+						continue;
+					if (oldNs is none) {
+						if (!isFirst) {
+							fp.ppElse();
+							numNeededEndif.last = false;
+						}
+						/* Include the preprocessor-condition prefix texts. */
+						oldNs = fp.namespace;
+						fp.namespace = GLOBAL_NAMESPACE;
+						oldExternLinkage = fp.externLinkage;
+						if (oldExternLinkage !in ["", "C"])
+							fp.externLinkage = "";
+					}
+					fp.forceStartOfLine() << newText;
+				}
+				if (oldNs !is none) {
+					fp.externLinkage = oldExternLinkage;
+					fp.namespace = oldNs;
+					fp.ppIf(usedPpCond);
+					numNeededEndif.pushback(true);
+				} else if (isFirst) {
+					fp.ppIf(usedPpCond);
+					numNeededEndif.pushback(true);
+				} else {
+					fp.ppElif(usedPpCond);
+				}
 				bind.cprintBindFunction(
 					fp, escapeMode, decl, exposedName, guardName,
 					documentationString, preferBindingMacros,
 					printDeclarationPrefixes);
-				fp.ppEndif();
-				return;
+				isFirst = false;
 			}
-normal_guardName_binding:
-			fp.ppIfndef(guardName);
-			fp.ppDefine(guardName, "1");
-		}
-		local isFirst = true;
-		local numNeededEndif = [];
-		for (local bind: usedBindings) {
-			/* Special case: Can't bind against a declaration from the current namespace! */
-			if (bind.binding is Namespace && bind.binding === fp.namespace)
-				continue;
-			local usedPpCond = expandPreprocessorConditionString(bind.ppCond);
-			local oldNs: Namespace | none = none;
-			local oldExternLinkage;
-			for (local x: bind.ppCondPrefix) {
-				local newText = escapeText(x, escapeMode);
-				if (fp.wasPrefixPrinted(newText))
-					continue;
-				if (oldNs is none) {
-					if (!isFirst) {
-						fp.ppElse();
-						numNeededEndif.last = false;
-					}
-					/* Include the preprocessor-condition prefix texts. */
-					oldNs = fp.namespace;
-					fp.namespace = GLOBAL_NAMESPACE;
-					oldExternLinkage = fp.externLinkage;
-					if (oldExternLinkage !in ["", "C"])
-						fp.externLinkage = "";
+			while (numNeededEndif) {
+				local l = numNeededEndif.popback();
+				if (l && guardName !is none) {
+					fp.ppElse();
+					fp.ppUndef(guardName);
 				}
-				fp.forceStartOfLine() << newText;
+				fp.ppEndif();
 			}
-			if (oldNs !is none) {
-				fp.externLinkage = oldExternLinkage;
-				fp.namespace = oldNs;
-				fp.ppIf(usedPpCond);
-				numNeededEndif.pushback(true);
-			} else if (isFirst) {
-				fp.ppIf(usedPpCond);
-				numNeededEndif.pushback(true);
-			} else {
-				fp.ppElif(usedPpCond);
-			}
-			bind.cprintBindFunction(
-				fp, escapeMode, decl, exposedName, guardName,
-				documentationString, preferBindingMacros,
-				printDeclarationPrefixes);
-			isFirst = false;
+			if (guardName !is none)
+				fp.ppEndif();
+		} catch (...) {
+			print "... while printing header declaration for",
+				repr(name), "as", repr(exposedName);
+			throw;
 		}
-		while (numNeededEndif) {
-			local l = numNeededEndif.popback();
-			if (l && guardName !is none) {
-				fp.ppElse();
-				fp.ppUndef(guardName);
-			}
-			fp.ppEndif();
-		}
-		if (guardName !is none)
-			fp.ppEndif();
 	}
 
 }

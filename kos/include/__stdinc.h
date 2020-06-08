@@ -404,7 +404,8 @@
 #define __COMPILER_VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    decl attr void nothrow(cc name) paramf;
 #define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      decl attr Treturn nothrow(cc name) param;
 #define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         decl attr void nothrow(cc name) param;
-#define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...)                                           extern attr Treturn nothrow(cc name)param;
+#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)                                                    extern attr Treturn nothrow(cc name) param;
+#define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...)                                           extern attr Treturn nothrow(cc name) param;
 #elif !defined(__CC__)
 #define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       /* nothing */
 #define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          /* nothing */
@@ -414,6 +415,7 @@
 #define __COMPILER_VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    /* nothing */
 #define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      /* nothing */
 #define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         /* nothing */
+#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)                                                    /* nothing */
 #define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...)                                           /* nothing */
 #elif !defined(__NO_ASMNAME)
 /* Use GCC family's assembly name extension. */
@@ -426,8 +428,10 @@
 #define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      decl attr Treturn nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
 #define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         decl attr void nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
 #ifdef __NO_EXTERNINLINE
+#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__
 #define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__
 #else /* __NO_EXTERNINLINE */
+#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __EXTERNINLINE attr Treturn nothrow(cc name) param __VA_ARGS__
 #define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) extern attr Treturn nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname)); __EXTERNINLINE attr Treturn nothrow(cc name) param __VA_ARGS__
 #endif /* !__NO_EXTERNINLINE */
 #elif defined(__PRAGMA_REDEFINE_EXTNAME)
@@ -441,13 +445,21 @@
 #define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      __pragma(redefine_extname name asmname) decl attr Treturn nothrow(cc name) param;
 #define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         __pragma(redefine_extname name asmname) decl attr void nothrow(cc name) param;
 #ifdef __NO_EXTERNINLINE
+#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__
 #define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__
 #else /* __NO_EXTERNINLINE */
+#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __EXTERNINLINE attr Treturn nothrow(cc name) param __VA_ARGS__
 #define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) __pragma(redefine_extname name asmname) __EXTERNINLINE attr Treturn nothrow(cc name) param __VA_ARGS__
 #endif /* !__NO_EXTERNINLINE */
 #else
 
+#ifdef __NO_EXTERNINLINE
+#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__
+#else /* __NO_EXTERNINLINE */
+#define __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __EXTERNINLINE attr Treturn nothrow(cc name) param __VA_ARGS__
+#endif /* !__NO_EXTERNINLINE */
 #define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__
+
 #define __VREDIRECT_VARUNIQUE(prefix)      __PP_CAT2(prefix,__LINE__)
 #define __VREDIRECT_INIT_TYPES1(a)                                          a __VREDIRECT_VARUNIQUE(__vu0_) = __builtin_va_arg(____va_args,a);
 #define __VREDIRECT_INIT_TYPES2(a,b)       __VREDIRECT_INIT_TYPES1(a)       b __VREDIRECT_VARUNIQUE(__vu1_) = __builtin_va_arg(____va_args,b);
@@ -598,6 +610,7 @@
 #define __VFREDIRECT_VOID __COMPILER_VFREDIRECT_VOID
 #define __XREDIRECT       __COMPILER_XREDIRECT
 #define __XREDIRECT_VOID  __COMPILER_XREDIRECT_VOID
+#define __EIDECLARE       __COMPILER_EIDECLARE
 #define __EIREDIRECT      __COMPILER_EIREDIRECT
 #endif /* __KOS_SYSTEM_HEADERS__ */
 

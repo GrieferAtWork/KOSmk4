@@ -129,7 +129,7 @@ int posix_memalign([[nonnull]] void **__restrict pp,
 	return 0;
 }
 
-cfree(*) = free;
+[[guard]] cfree(*) = free;
 
 %
 [[ignore, nocrt, alias(_heapmin)]]

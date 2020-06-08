@@ -190,17 +190,137 @@ global keywordEscapes: {string: string} = Dict({
 	"u16" : "__UINT16_TYPE__",
 	"u32" : "__UINT32_TYPE__",
 	"u64" : "__UINT64_TYPE__",
+});
+
+@@Special replacements for keywords in @ESCAPE_MODE_PART contexts
+global partialKeywordEscapes: {string: string} = Dict({
 	"va_list" : "__builtin_va_list",
 	"va_start" : "__builtin_va_start",
 	"va_copy" : "__builtin_va_copy",
 	"va_end" : "__builtin_va_end",
 	"va_arg" : "__builtin_va_arg",
+	"offsetof" : "__builtin_offsetof",
 	"bool" : "__BOOL",
 	"true" : "1",
 	"false" : "0",
 	"NULL" : "__NULLPTR",
-	"WUNUSED" : "__ATTR_WUNUSED",
+	"ATTR_NOINLINE" : "__ATTR_NOINLINE",
+	"ATTR_NORETURN" : "__ATTR_NORETURN",
+	"ATTR_FASTCALL" : "__ATTR_FASTCALL",
+	"ATTR_STDCALL" : "__ATTR_STDCALL",
+	"ATTR_CDECL" : "__ATTR_CDECL",
+	"ATTR_SYSVABI" : "__ATTR_SYSVABI",
+	"ATTR_MSABI" : "__ATTR_MSABI",
+	"ATTR_PURE" : "__ATTR_PURE",
+	"ATTR_PURE_P" : "__ATTR_PURE_P",
+	"ATTR_CONST" : "__ATTR_CONST",
+	"ATTR_CONST_P" : "__ATTR_CONST_P",
+	"ATTR_LEAF" : "__ATTR_LEAF",
+	"ATTR_LEAF_P" : "__ATTR_LEAF_P",
+	"ATTR_FLATTEN" : "__ATTR_FLATTEN",
+	"ATTR_MALLOC" : "__ATTR_MALLOC",
+	"ATTR_HOT" : "__ATTR_HOT",
+	"ATTR_COLD" : "__ATTR_COLD",
+	"ATTR_WEAK" : "__ATTR_WEAK",
+	"ATTR_ALLOC_SIZE" : "__ATTR_ALLOC_SIZE",
+	"ATTR_ASSUME_ALIGNED" : "__ATTR_ASSUME_ALIGNED",
+	"ATTR_ALLOC_ALIGN" : "__ATTR_ALLOC_ALIGN",
+	"ATTR_NOTHROW" : "__ATTR_NOTHROW",
+	"ATTR_DLLIMPORT" : "__ATTR_DLLIMPORT",
+	"ATTR_DLLEXPORT" : "__ATTR_DLLEXPORT",
+	"ATTR_NOCLONE" : "__ATTR_NOCLONE",
+	"ATTR_USED" : "__ATTR_USED",
+	"ATTR_UNUSED" : "__ATTR_UNUSED",
+	"ATTR_SENTINEL" : "__ATTR_SENTINEL",
+	"ATTR_SENTINEL_O" : "__ATTR_SENTINEL_O",
+	"ATTR_THREAD" : "__ATTR_THREAD",
+	"ATTR_DEPRECATED" : "__ATTR_DEPRECATED",
+	"ATTR_DEPRECATED_" : "__ATTR_DEPRECATED_",
+	"ATTR_WARNING" : "__ATTR_WARNING",
+	"ATTR_ERROR" : "__ATTR_ERROR",
+	"ATTR_SECTION" : "__ATTR_SECTION",
+	"ATTR_RETNONNULL" : "__ATTR_RETNONNULL",
+	"ATTR_ALIGNED" : "__ATTR_ALIGNED",
+	"ATTR_ALIAS" : "__ATTR_ALIAS",
+	"ATTR_INLINE" : "__ATTR_INLINE",
+	"ATTR_FORCEINLINE" : "__ATTR_FORCEINLINE",
+	"ATTR_FALLTHROUGH" : "__ATTR_FALLTHROUGH",
+	"ATTR_PACKED" : "__ATTR_PACKED",
+	"ATTR_RETURNS_TWICE" : "__ATTR_RETURNS_TWICE",
+	"ATTR_EXTERNALLY_VISIBLE" : "__ATTR_EXTERNALLY_VISIBLE",
+	"COMPILER_LENOF" : "__COMPILER_LENOF",
+	"COMPILER_ENDOF" : "__COMPILER_ENDOF",
+	"COMPILER_STRLEN" : "__COMPILER_STRLEN",
+	"COMPILER_STREND" : "__COMPILER_STREND",
+	"COMPILER_UNUSED" : "__COMPILER_UNUSED",
+	"COMPILER_UNIPOINTER" : "__COMPILER_UNIPOINTER",
+	"COMPILER_ALIGNOF" : "__COMPILER_ALIGNOF",
+	"COMPILER_OFFSETOF" : "__COMPILER_OFFSETOF",
+	"COMPILER_OFFSETAFTER" : "__COMPILER_OFFSETAFTER",
+	"COMPILER_CONTAINER_OF" : "__COMPILER_CONTAINER_OF",
+	"COMPILER_BARRIER" : "__COMPILER_BARRIER",
+	"COMPILER_READ_BARRIER" : "__COMPILER_READ_BARRIER",
+	"COMPILER_WRITE_BARRIER" : "__COMPILER_WRITE_BARRIER",
+	"COMPILER_IGNORE_UNINITIALIZED" : "__COMPILER_IGNORE_UNINITIALIZED",
+	"COMPILER_FLEXIBLE_ARRAY" : "__COMPILER_FLEXIBLE_ARRAY",
+	"COMPILER_IMPURE" : "__COMPILER_IMPURE",
+	"DEFINE_PRIVATE_ALIAS" : "__DEFINE_PRIVATE_ALIAS",
+	"DEFINE_PUBLIC_ALIAS" : "__DEFINE_PUBLIC_ALIAS",
+	"DEFINE_INTERN_ALIAS" : "__DEFINE_INTERN_ALIAS",
+	"DEFINE_PRIVATE_WEAK_ALIAS" : "__DEFINE_PRIVATE_WEAK_ALIAS",
+	"DEFINE_PUBLIC_WEAK_ALIAS" : "__DEFINE_PUBLIC_WEAK_ALIAS",
+	"DEFINE_INTERN_WEAK_ALIAS" : "__DEFINE_INTERN_WEAK_ALIAS",
+	"likely" : "__likely",
+	"unlikely" : "__unlikely",
+	"DECL_BEGIN" : "__DECL_BEGIN",
+	"DECL_END" : "__DECL_END",
+	"ASMNAME" : "__ASMNAME",
+	"XBLOCK" : "__XBLOCK",
+	"XRETURN" : "__XRETURN",
+	"NOTHROW" : "__NOTHROW",
+	"NOTHROW_NCX" : "__NOTHROW_NCX",
+	"NOTHROW_RPC" : "__NOTHROW_RPC",
+	"NOTHROW_RPC_KOS" : "__NOTHROW_RPC_KOS",
+	"NOTHROW_RPC_NOKOS" : "__NOTHROW_RPC_NOKOS",
+	"NOTHROW_RPC_PURE" : "__NOTHROW_RPC_PURE",
+	"REDIRECT" : "__COMPILER_REDIRECT",
+	"REDIRECT_VOID" : "__COMPILER_REDIRECT_VOID",
+	"VREDIRECT" : "__COMPILER_VREDIRECT",
+	"VREDIRECT_VOID" : "__COMPILER_VREDIRECT_VOID",
+	"VFREDIRECT" : "__COMPILER_VFREDIRECT",
+	"VFREDIRECT_VOID" : "__COMPILER_VFREDIRECT_VOID",
+	"XREDIRECT" : "__COMPILER_XREDIRECT",
+	"XREDIRECT_VOID" : "__COMPILER_XREDIRECT_VOID",
+	"PP_PRIVATE_STR" : "__PP_PRIVATE_STR",
+	"PP_STR" : "__PP_STR",
+	"PP_PRIVATE_CAT2" : "__PP_PRIVATE_CAT2",
+	"PP_PRIVATE_CAT3" : "__PP_PRIVATE_CAT3",
+	"PP_PRIVATE_CAT4" : "__PP_PRIVATE_CAT4",
+	"PP_CAT2" : "__PP_CAT2",
+	"PP_CAT3" : "__PP_CAT3",
+	"PP_CAT4" : "__PP_CAT4",
+	"PP_PRIVATE_MUL8" : "__PP_PRIVATE_MUL8",
+	"PP_MUL8" : "__PP_MUL8",
+	"STATIC_ASSERT" : "__STATIC_ASSERT",
+	"STATIC_ASSERT_MSG" : "__STATIC_ASSERT_MSG",
 	"NONNULL" : "__ATTR_NONNULL",
+	"NONNULL_CXX" : "__ATTR_NONNULL_CXX",
+	"WUNUSED" : "__WUNUSED",
+	"UNUSED" : "__UNUSED",
+	"IMPDAT" : "__IMPDAT",
+	"IMPDEF" : "__IMPDEF",
+	"EXPDEF" : "__EXPDEF",
+	"FUNDEF" : "__FUNDEF",
+	"DATDEF" : "__DATDEF",
+	"PUBLIC" : "__PUBLIC",
+	"INTERN" : "__INTERN",
+	"PUBLIC_CONST" : "__PUBLIC_CONST",
+	"INTERN_CONST" : "__INTERN_CONST",
+	"INTDEF" : "__INTDEF",
+	"PRIVATE" : "__PRIVATE",
+	"FORCELOCAL" : "__FORCELOCAL",
+	"LOCAL" : "__LOCAL",
+	"DFL" : "__DFL",
 });
 
 
@@ -387,10 +507,13 @@ single_dont_escape:
 								if (escapedTok !is none)
 									goto got_escapedTok;
 							}
-							if (usedText in keywordEscapes || usedText in cLanguageKeywords)
-								escapedTok = usedText;
-							else {
-								escapedTok = escapeKeywordIfNotAlreadyEscaped(usedText);
+							escapedTok = partialKeywordEscapes.get(usedText);
+							if (escapedTok is none) {
+								if (usedText in keywordEscapes || usedText in cLanguageKeywords)
+									escapedTok = usedText;
+								else {
+									escapedTok = escapeKeywordIfNotAlreadyEscaped(usedText);
+								}
 							}
 						}
 					} else {
@@ -404,6 +527,8 @@ single_do_escape_keyword:
 								goto got_escapedTok;
 						}
 						escapedTok = keywordEscapes.get(usedText);
+						if (escapedTok is none)
+							escapedTok = partialKeywordEscapes.get(usedText);
 						if (escapedTok is none) {
 							if (usedText in cLanguageKeywords)
 								goto single_dont_escape;
@@ -751,15 +876,6 @@ handle_numLines_after_pp_directive:
 					}
 					goto again_handle_tok;
 				}
-				if (tok.startswith("$")) {
-					switch (tok) {
-
-					/* TODO: $crt_has_function(...) */
-
-					default:
-						break;
-					}
-				}
 				if (forceKeyEscape) {
 					escapedTok = keyEscape(tok);
 					if (escapedTok !is none)
@@ -782,12 +898,17 @@ handle_numLines_after_pp_directive:
 						}
 						if (tok in cLanguageTwoWordTypenameKeywords)
 							goto do_handle_cLanguageTwoWordTypenameKeyword;
-						if (tok in keywordEscapes || tok in cLanguageKeywords)
-							escapedTok = tok;
-						else {
-							escapedTok = escapeKeywordIfNotAlreadyEscaped(tok);
+						escapedTok = partialKeywordEscapes.get(tok);
+						if (escapedTok is none) {
+							if (tok in keywordEscapes || tok in cLanguageKeywords)
+								escapedTok = tok;
+							else {
+								escapedTok = escapeKeywordIfNotAlreadyEscaped(tok);
+							}
 						}
 					}
+					if (escapedTok == tok)
+						continue;
 				} else {
 					if (tok.startswith("$")) {
 do_escape_keyword_dollar:
@@ -800,6 +921,8 @@ do_escape_keyword_dollar:
 							goto got_escapedTok;
 					}
 					escapedTok = keywordEscapes.get(tok);
+					if (escapedTok is none)
+						escapedTok = partialKeywordEscapes.get(tok);
 					if (escapedTok is none) {
 						if (tok in cLanguageTwoWordTypenameKeywords) {
 do_handle_cLanguageTwoWordTypenameKeyword:

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ee4225a */
+/* HASH CRC-32:0xe914021c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,27 +41,27 @@ struct __sigset_struct;
 #ifndef __pthread_sigmask_defined
 #define __pthread_sigmask_defined 1
 #ifdef __CRT_HAVE_pthread_sigmask
-__CDECLARE(,int,__NOTHROW_NCX,pthread_sigmask,(int __how, struct __sigset_struct const *__restrict __newmask, struct __sigset_struct *__restrict __oldmask),(__how,__newmask,__oldmask))
-#else /* LIBC: pthread_sigmask */
+__CDECLARE(,int,__NOTHROW_NCX,pthread_sigmask,(int __how, struct __sigset_struct const *__newmask, struct __sigset_struct *__oldmask),(__how,__newmask,__oldmask))
+#else /* __CRT_HAVE_pthread_sigmask */
 #undef __pthread_sigmask_defined
-#endif /* pthread_sigmask... */
+#endif /* !__CRT_HAVE_pthread_sigmask */
 #endif /* !__pthread_sigmask_defined */
 #ifndef __pthread_kill_defined
 #define __pthread_kill_defined 1
 #ifdef __CRT_HAVE_pthread_kill
 __CDECLARE(,int,__NOTHROW_NCX,pthread_kill,(__pthread_t __threadid, int __signo),(__threadid,__signo))
-#else /* LIBC: pthread_kill */
+#else /* __CRT_HAVE_pthread_kill */
 #undef __pthread_kill_defined
-#endif /* pthread_kill... */
+#endif /* !__CRT_HAVE_pthread_kill */
 #endif /* !__pthread_kill_defined */
 #ifdef __USE_GNU
 #ifndef __pthread_sigqueue_defined
 #define __pthread_sigqueue_defined 1
 #ifdef __CRT_HAVE_pthread_sigqueue
 __CDECLARE(,int,__NOTHROW_NCX,pthread_sigqueue,(__pthread_t __threadid, int __signo, union sigval const __value),(__threadid,__signo,__value))
-#else /* LIBC: pthread_sigqueue */
+#else /* __CRT_HAVE_pthread_sigqueue */
 #undef __pthread_sigqueue_defined
-#endif /* pthread_sigqueue... */
+#endif /* !__CRT_HAVE_pthread_sigqueue */
 #endif /* !__pthread_sigqueue_defined */
 #endif /* __USE_GNU */
 #endif /* __CC__ */

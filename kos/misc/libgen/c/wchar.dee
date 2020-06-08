@@ -34,7 +34,9 @@ global final wcharReplacementEscapes: {string: (string, string)} = Dict({
 	"__WCHAR_TYPE__"     : ("__CHAR16_TYPE__", "__CHAR32_TYPE__"),
 	"__SIZEOF_WCHAR_T__" : ("2", "4"),
 	"LIBCCALL"           : ("LIBDCALL", "LIBKCALL"),
+	"VLIBCCALL"          : ("VLIBDCALL", "VLIBKCALL"),
 	"__LIBCCALL"         : ("__LIBDCALL", "__LIBKCALL"),
+	"__VLIBCCALL"        : ("__VLIBDCALL", "__VLIBKCALL"),
 });
 
 @@Replacements for wchar-related headers
@@ -74,7 +76,7 @@ function replaceWcharTextKeyword(keyword: string, mode: int): string {
 		/* Complain if referencing a [[wchar]] function function some uchar
 		 * variant, but no uchar variant exists for that referenced function. */
 		throw Error("Missing %{{uchar{}}}-variant of [[wchar]] Function {!r}"
-			.format({ WCHAR_REPLACEMENT_WIDTH[mode], repl.wc_name }));
+			.format({ WCHAR_REPLACEMENT_WIDTH[mode], repl.wc_func.name }));
 	}
 	if (keyword.startswith("$")) {
 		if (#keyword >= 2 && keyword[1] != "$") {
