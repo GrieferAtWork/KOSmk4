@@ -29,6 +29,13 @@ import * from .wchar;
 import * from .generator;
 import Function from .cheaders;
 
+/* TODO: Add checks & errors for duplicate Function.bindings
+ *       - Duplicate [[alias(...)]] Annotations
+ *       - An [[alias(...)]] annotation that overlaps with [[crt_name()]] without [[no_crt_self_import]]
+ *       - A [[wchar]] function that binds against assembly names already designated by other bindings
+ *       - ...
+ */
+
 /* How auto vs. user implementation is selected:
  * >> if (HAS_MAGIC_IMPLEMENTION_BODY) {
  * >>     if (HAS_ANNOTATION("crt_userimpl")) {
@@ -1409,8 +1416,10 @@ function defineFunctionInMapping(
 	for (;;) {
 		if (mapping.setnew(func.name, func))
 			break;
-		if (mapping.setold(func.name, DuplicateFunctionMarker))
+		if (mapping.setold(func.name, DuplicateFunctionMarker)) {
+			print "Duplicate function:", func.name;
 			break;
+		}
 	}
 }
 
@@ -2428,10 +2437,10 @@ again_parse_annotations:
 						self.err("[doc_alias(...)] used when a custom doc string was already set");
 					self.next();
 					self.skip("(");
-					local funcNameStart = self.tokStart;
-					local funcName = parseCStringOrKeyword(self);
+					local funcNameStart: int = self.tokStart;
+					local funcName: string = parseCStringOrKeyword(self);
 					self.skip(")");
-					current.documentation = []{
+					current.documentation = [](): string {
 						local func: Function;
 						try {
 							func = findFunctionByName(funcName);
@@ -4296,13 +4305,19 @@ done_function:
 					importCondition = "defined({})".format({ stdGuard });
 				}
 				local importFunction = Function(
-					name: exposedName,
+					name:                     exposedName,
 					originalSystemHeaderName: headerName,
-					bindings: { FunctionBinding(
-						ppCond:     importCondition,
-						prototypes: currentPrototypes,
-						binding:    nsStd, /* Bind against the std:: namespace export */
-					) });
+					bindings: {
+						FunctionBinding(
+							ppCond:     importCondition,
+							prototypes: currentPrototypes,
+							/* Bind against the std:: namespace export */
+							binding: NamespaceBinding(
+								namespace:  nsStd,
+								importName: exposedName,
+								prototypes: currentPrototypes),
+						),
+					});
 				if (gblGuard !== false) {
 					importFunction = ExposedFunction(
 						func: importFunction,

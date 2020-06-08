@@ -1653,127 +1653,131 @@ int mkstemp64([[nonnull]] char *template_) {
 %
 %#ifdef __USE_XOPEN2K8
 [alias(_mktemp)][[ATTR_WUNUSED, guard]]
-mkdtemp:([[nonnull]] char *template_) -> char *;
+char *mkdtemp([[nonnull]] char *template_);
 %#endif /* __USE_XOPEN2K8 */
 
 %
 %#ifdef __USE_XOPEN
 %[default_impl_section(".text.crt.io.tty")]
-setkey:([[nonnull]] char const *key);
-grantpt:($fd_t fd) -> int;
-unlockpt:($fd_t fd) -> int;
-[[ATTR_WUNUSED]] ptsname:($fd_t fd) -> char *; /* TODO: Implement using `ptsname_r()' */
+%[insert:extern(setkey)]
+int grantpt($fd_t fd);
+int unlockpt($fd_t fd);
+
+[[ATTR_WUNUSED]]
+char *ptsname($fd_t fd); /* TODO: Implement using `ptsname_r()' */
 %#endif /* __USE_XOPEN */
 
 %
 %#ifdef __USE_XOPEN2KXSI
-[[cp, ATTR_WUNUSED]] posix_openpt:($oflag_t oflags) -> int;
+[[cp, ATTR_WUNUSED]]
+int posix_openpt($oflag_t oflags);
 %#endif /* __USE_XOPEN2KXSI */
 
 
 %#ifdef __USE_GNU
 %[default_impl_section(".text.crt.unicode.static.convert")]
-[export_alias(_strtol_l, __strtol_l)]
-[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(strtoll_l, _strtoll_l, __strtoll_l)]
-[alt_variant_of(__SIZEOF_LONG__ == 4, strto32_l)]
-[alt_variant_of(__SIZEOF_LONG__ == 8, strto64_l)]
-strtol_l:([[nonnull]] char const *__restrict nptr,
-          char **endptr, int base, $locale_t locale) -> long {
+[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("strtoll_l", "_strtoll_l", "__strtoll_l")]]
+[[alt_variant_of(__SIZEOF_LONG__ == 4, "strto32_l")]]
+[[alt_variant_of(__SIZEOF_LONG__ == 8, "strto64_l")]]
+[[export_as("_strtol_l", "__strtol_l")]]
+long strtol_l([[nonnull]] char const *__restrict nptr,
+              char **endptr, int base, $locale_t locale) {
 	(void)locale;
 	return strtol(nptr, endptr, base);
 }
 
-[export_alias(_strtoul_l, __strtoul_l)]
-[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(strtoull_l, _strtoll_l, __strtoll_l)]
-[alt_variant_of(__SIZEOF_LONG__ == 4, strtou32_l)]
-[alt_variant_of(__SIZEOF_LONG__ == 8, strtou64_l)]
-strtoul_l:([[nonnull]] char const *__restrict nptr,
-           char **endptr, int base, $locale_t locale) -> unsigned long {
+[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("strtoull_l", "_strtoll_l", "__strtoll_l")]]
+[[alt_variant_of(__SIZEOF_LONG__ == 4, "strtou32_l")]]
+[[alt_variant_of(__SIZEOF_LONG__ == 8, "strtou64_l")]]
+[[export_alias("_strtoul_l", "__strtoul_l")]]
+unsigned long strtoul_l([[nonnull]] char const *__restrict nptr,
+                        char **endptr, int base, $locale_t locale) {
 	(void)locale;
 	return strtoul(nptr, endptr, base);
 }
 
 %#ifdef __LONGLONG
-[export_alias(_strtoll_l, __strtoll_l)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(strtol_l, _strtol_l, __strtol_l)]
-[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, strto64_l)]
-[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, strto32_l)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(strtoimax_l, _strtoimax_l, __strtoimax_l)]
-strtoll_l:([[nonnull]] char const *__restrict nptr,
-           char **endptr, int base, $locale_t locale) -> __LONGLONG {
+[[export_as("_strtoll_l", "__strtoll_l")]]
+[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("strtol_l", "_strtol_l", "__strtol_l")]]
+[[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, "strto64_l")]]
+[[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, "strto32_l")]]
+[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoimax_l", "_strtoimax_l", "__strtoimax_l")]]
+__LONGLONG strtoll_l([[nonnull]] char const *__restrict nptr,
+                     char **endptr, int base, $locale_t locale) {
 	(void)locale;
 	return strtoll(nptr, endptr, base);
 }
 
-[export_alias(_strtoull_l, __strtoull_l)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(strtoul_l, _strtoul_l)]
-[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, strtou64_l)]
-[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, strtou32_l)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(strtoumax_l, _strtoumax_l, __strtoumax_l)]
-strtoull_l:([[nonnull]] char const *__restrict nptr,
-            char **endptr, int base, $locale_t locale) -> __ULONGLONG {
+[[export_as("_strtoull_l", "__strtoull_l")]]
+[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("strtoul_l", "_strtoul_l")]]
+[[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, "strtou64_l")]]
+[[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, "strtou32_l")]]
+[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoumax_l", "_strtoumax_l", "__strtoumax_l")]]
+__ULONGLONG strtoull_l([[nonnull]] char const *__restrict nptr,
+                       char **endptr, int base, $locale_t locale) {
 	(void)locale;
 	return strtoull(nptr, endptr, base);
 }
 %#endif /* __LONGLONG */
 
 %#ifndef __NO_FPU
-[alias(_strtod_l)][export_alias(__strtod_l)]
-[if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(strtold_l, _strtold_l)]
-strtod_l:([[nonnull]] char const *__restrict nptr,
-          char **endptr, $locale_t locale) -> double {
+[[export_alias("_strtod_l", "__strtod_l")]]
+[[if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("strtold_l", "_strtold_l", "__strtold_l")]]
+double strtod_l([[nonnull]] char const *__restrict nptr,
+                char **endptr, $locale_t locale) {
 	(void)locale;
 	return strtod(nptr, endptr);
 }
 
-[alias(_strtof_l)][export_alias(__strtof_l)]
-strtof_l:([[nonnull]] char const *__restrict nptr,
-          char **endptr, $locale_t locale) -> float {
+[[export_alias("_strtof_l", "__strtof_l")]]
+float strtof_l([[nonnull]] char const *__restrict nptr,
+               char **endptr, $locale_t locale) {
 	(void)locale;
 	return strtof(nptr, endptr);
 }
+
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[alias(_strtold_l)][export_alias(__strtold_l)]
-[alt_variant_of(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, strtod_l)]
-[if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(_strtod_l)]
-strtold_l:([[nonnull]] char const *__restrict nptr,
-           char **endptr, $locale_t locale) -> __LONGDOUBLE {
+[[export_alias("_strtold_l", "__strtold_l")]]
+[[alt_variant_of(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, strtod_l)]]
+[[if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("_strtod_l", "__strtod_l")]]
+__LONGDOUBLE strtold_l([[nonnull]] char const *__restrict nptr,
+                       char **endptr, $locale_t locale) {
 	(void)locale;
 	return strtold(nptr, endptr);
 }
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 
-%[default_impl_section(".text.crt.fs.environ")]
-[alias(getenv)][[ATTR_WUNUSED]][export_alias(__secure_getenv)]
-secure_getenv:([[nonnull]] char const *varname) -> char *;
+[[section(".text.crt.fs.environ")]]
+[[ATTR_WUNUSED, export_alias("__secure_getenv"), alias("getenv")]]
+char *secure_getenv([[nonnull]] char const *varname);
 
-%[default_impl_section(".text.crt.io.tty")]
-ptsname_r:($fd_t fd, [[nonnull]] char *buf, $size_t buflen) -> int;
+[[section(".text.crt.io.tty")]]
+int ptsname_r($fd_t fd, [[nonnull]] char *buf, $size_t buflen);
 
-[[cp]] getpt:() -> int;
+[[cp]]
+int getpt();
 
-%[default_impl_section(".text.crt.fs.property")]
 @@Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
 @@Upon error, `NULL' is returned instead
-[[cp, ATTR_MALLOC, ATTR_WUNUSED]]
-canonicalize_file_name:([[nonnull]] char const *filename) -> char *;
+[[cp, ATTR_MALLOC, ATTR_WUNUSED, section(".text.crt.fs.property")]]
+char *canonicalize_file_name([[nonnull]] char const *filename);
 
 %[default_impl_section(".text.crt.fs.utility")]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(mkostemp64)]
-[[cp, ATTR_WUNUSED]][alias(mkostemp64)]
-mkostemp:([[nonnull]] char *template_, int flags) -> int;
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemp64")]]
+[[cp, ATTR_WUNUSED, alias("mkostemp64")]]
+int mkostemp([[nonnull]] char *template_, int flags);
 
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(mkostemps64)]
-[[cp, ATTR_WUNUSED]][alias(mkostemps64)]
-mkostemps:([[nonnull]] char *template_, int suffixlen, int flags) -> int;
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemps64")]]
+[[cp, ATTR_WUNUSED, alias("mkostemps64")]]
+int mkostemps([[nonnull]] char *template_, int suffixlen, int flags);
 
 %#ifdef __USE_LARGEFILE64
-[[cp, ATTR_WUNUSED]][largefile64_variant_of(mkostemp)]
-mkostemp64:([[nonnull]] char *template_, int flags) -> int;
+[[cp, ATTR_WUNUSED, largefile64_variant_of(mkostemp)]]
+int mkostemp64([[nonnull]] char *template_, int flags);
 
-[[cp, ATTR_WUNUSED]][largefile64_variant_of(mkostemps)]
-mkostemps64:([[nonnull]] char *template_, int suffixlen, int flags) -> int;
+[[cp, ATTR_WUNUSED, largefile64_variant_of(mkostemps)]]
+int mkostemps64([[nonnull]] char *template_, int suffixlen, int flags);
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_GNU */
 

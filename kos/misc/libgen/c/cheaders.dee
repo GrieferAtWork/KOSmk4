@@ -1128,7 +1128,7 @@ class LocalFunction {
 		fp.namespace = oldNs;
 		fp.externLinkage = oldExternLinkage;
 		local callToLocalName = LOCAL_NAMESPACE.keyCSymbolName(name);
-		if (oldNs === GLOBAL_NAMESPACE) {
+		if (oldNs !== LOCAL_NAMESPACE) {
 			if (LOCAL_NAMESPACE.prefix)
 				callToLocalName = "{} {}".format({ LOCAL_NAMESPACE.prefix, callToLocalName });
 			callToLocalName = "({})".format({ callToLocalName });

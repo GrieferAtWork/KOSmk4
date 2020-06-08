@@ -50,9 +50,7 @@ global neededLocalFunction: {LocalFunction...} = HashSet();
 
 @@Lookup a function, given its name
 function findFunctionByName(name: string | UserString): Function {
-	local usedName = name;
-	if (usedName !is string)
-		usedName = usedName.text;
+	local usedName = str name;
 	local result: Function;
 	try {
 		if ("." in usedName) {
@@ -63,7 +61,7 @@ function findFunctionByName(name: string | UserString): Function {
 		} else {
 			result = allFunctionsByName[usedName];
 		}
-		if (result == DuplicateFunctionMarker)
+		if (result === DuplicateFunctionMarker)
 			throw Error("Ambiguous Function: {!r}".format({ name }));
 	} catch (Error as e) {
 		if (hasattr(name, "err"))
@@ -75,9 +73,7 @@ function findFunctionByName(name: string | UserString): Function {
 
 @@Lookup a local function, given its name
 function findLocalFunctionByName(name: string | UserString): LocalFunction {
-	local usedName = name;
-	if (usedName !is string)
-		usedName = usedName.text;
+	local usedName = str name;
 	local result: LocalFunction;
 	try {
 		if ("." in usedName) {
@@ -88,7 +84,7 @@ function findLocalFunctionByName(name: string | UserString): LocalFunction {
 		} else {
 			result = allLocalFunctionsByName[usedName];
 		}
-		if (result == DuplicateFunctionMarker)
+		if (result === DuplicateFunctionMarker)
 			throw Error("Ambiguous local function: {!r}".format({ name }));
 	} catch (e...) {
 		if (hasattr(name, "err"))

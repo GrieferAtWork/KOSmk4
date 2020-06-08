@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d89b1a9 */
+/* HASH CRC-32:0xde2bbccc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,24 +60,24 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_setkey
 /* Setup DES tables according KEY */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setkey,(char const *__key),(__key))
-#endif /* setkey... */
+#endif /* __CRT_HAVE_setkey */
 #ifndef __crypt_defined
 #define __crypt_defined 1
 #ifdef __CRT_HAVE_crypt
 /* Encrypt at most 8 characters from KEY using salt to perturb DES */
 __CDECLARE(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,crypt,(char const *__key, char const *__salt),(__key,__salt))
-#else /* LIBC: crypt */
+#else /* __CRT_HAVE_crypt */
 #undef __crypt_defined
-#endif /* crypt... */
+#endif /* !__CRT_HAVE_crypt */
 #endif /* !__crypt_defined */
 #ifndef __encrypt_defined
 #define __encrypt_defined 1
 #ifdef __CRT_HAVE_encrypt
 /* Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,encrypt,(char *__glibc_block, int __edflag),(__glibc_block,__edflag))
-#else /* LIBC: encrypt */
+#else /* __CRT_HAVE_encrypt */
 #undef __encrypt_defined
-#endif /* encrypt... */
+#endif /* !__CRT_HAVE_encrypt */
 #endif /* !__encrypt_defined */
 
 #ifdef __USE_GNU
@@ -134,14 +134,15 @@ struct crypt_data {
 #ifdef __CRT_HAVE_crypt_r
 /* Encrypt at most 8 characters from KEY using salt to perturb DES */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),char *,__NOTHROW_NCX,crypt_r,(char const *__key, char const *__salt, struct crypt_data *__restrict __data),(__key,__salt,__data))
-#endif /* crypt_r... */
+#endif /* __CRT_HAVE_crypt_r */
 #ifdef __CRT_HAVE_setkey_r
+/* Setup DES tables according KEY */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,setkey_r,(char const *__key, struct crypt_data *__restrict __data),(__key,__data))
-#endif /* setkey_r... */
+#endif /* __CRT_HAVE_setkey_r */
 #ifdef __CRT_HAVE_encrypt_r
 /* Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,encrypt_r,(char *__glibc_block, int __edflag, struct crypt_data *__restrict __data),(__glibc_block,__edflag,__data))
-#endif /* encrypt_r... */
+#endif /* __CRT_HAVE_encrypt_r */
 #endif /* __USE_GNU */
 
 #endif /* __CC__ */
