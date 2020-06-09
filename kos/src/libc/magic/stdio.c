@@ -90,6 +90,7 @@
 #include <asm/stdio.h>
 #include <bits/stdio_lim.h>
 #include <bits/types.h>
+#include <kos/anno.h>
 
 #include <libio.h>
 
@@ -3003,12 +3004,12 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 #if defined(__USE_XOPEN) && !defined(__USE_XOPEN2K) && !defined(__USE_GNU)
 #include <getopt.h>
-#endif
+#endif /* __USE_XOPEN && !__USE_XOPEN2K && !__USE_GNU */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_STDIO_H)
 #include <parts/uchar/stdio.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_STDIO_H */
 #endif /* __USE_UTF */
 
 }

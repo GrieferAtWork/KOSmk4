@@ -23,6 +23,7 @@
 
 %{
 #include <stdio.h>
+#include <kos/anno.h>
 
 __SYSDECL_BEGIN
 
@@ -111,7 +112,7 @@ size_t __fpending([[nonnull]] $FILE *fp);
 @@Flush all line-buffered files
 /* NOTE: I feel like this is a typo, but that's
  *       the symbol that also exists in GLibC! */
-[[export_alias("_IO_flush_all_linebuffere")]]
+[[cp_stdio, export_alias("_IO_flush_all_linebuffere")]]
 void _flushlbf();
 
 @@Set locking status of stream FP to TYPE

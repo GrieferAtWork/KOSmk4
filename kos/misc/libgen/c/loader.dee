@@ -2700,17 +2700,6 @@ again_parse_annotations:
 						local asmname: string = asmnameOverride;
 						if (asmname is none)
 							asmname = current.name;
-						local builtinName: string = "__builtin_" + asmname;
-						local bindingCond: string =
-							"__has_builtin({})&&"
-							"defined(__LIBC_BIND_CRTBUILTINS)&&"
-							"{}".format({ builtinName, keyCrtHave(asmname) });
-						if (currentConditions !is none)
-							bindingCond = "({})&&{}".format({ currentConditions, bindingCond });
-						File.Writer bodyFp;
-						bodyFp << "{ return " << builtinName << "(";
-						/* Print argument names */
-						local isFirst: bool = true;
 						local usedCurrentPrototype: FunctionPrototype = currentPrototype;
 						local usedCurrentPrototypes: {(string | UserString, {FunctionPrototype...})...} = currentPrototypes;
 						if (!usedCurrentPrototypes) {
@@ -2751,12 +2740,27 @@ again_parse_annotations:
 							 *      arguments... */
 							usedCurrentPrototype = usedCurrentPrototypes.first.last.first;
 						}
+						local builtinName: string = "__builtin_" + asmname;
+						local bindingCond: string =
+							"__has_builtin({})&&"
+							"defined(__LIBC_BIND_CRTBUILTINS)&&"
+							"{}".format({ builtinName, keyCrtHave(asmname) });
+						if (usedCurrentPrototype.hasEllipsis)
+							bindingCond += "&&__has_builtin(__builtin_va_arg_pack)";
+						if (currentConditions !is none)
+							bindingCond = "({})&&{}".format({ currentConditions, bindingCond });
+						File.Writer bodyFp;
+						bodyFp << "{ return " << builtinName << "(";
+						/* Print argument names */
+						local isFirst: bool = true;
 						for (local a: usedCurrentPrototype.argv) {
 							if (!isFirst)
 								bodyFp << ", ";
 							isFirst = false;
 							bodyFp << a.name;
 						}
+						if (usedCurrentPrototype.hasEllipsis)
+							bodyFp << "__builtin_va_arg_pack()";
 						bodyFp << "); }";
 						return FunctionBinding(
 							ppCond:     bindingCond,

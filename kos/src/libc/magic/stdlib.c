@@ -41,6 +41,7 @@
 #include <features.h>
 #include <bits/types.h>
 #include <hybrid/typecore.h>
+#include <kos/anno.h>
 #ifdef __USE_MISC
 #include <alloca.h>
 #endif /* __USE_MISC */
@@ -2022,8 +2023,10 @@ typedef int errno_t;
 #ifndef _ONEXIT_T_DEFINED
 #define _ONEXIT_T_DEFINED 1
 typedef int (__LIBCCALL *_onexit_t)(void);
-#define onexit_t         _onexit_t
 #endif  /* _ONEXIT_T_DEFINED */
+#ifndef onexit_t
+#define onexit_t _onexit_t
+#endif /* !onexit_t */
 }
 
 %
@@ -2262,15 +2265,51 @@ __LIBC wchar_t **__winitenv;
 
 %
 %[default_impl_section(".text.crt.dos.errno")]
-%typedef void (__LIBCCALL *_purecall_handler)(void);
+%{
+#ifndef ___purecall_handler_defined
+#define ___purecall_handler_defined 1
+typedef void (__LIBCCALL *_purecall_handler)(void);
+#endif /* !___purecall_handler_defined */
+}
+
+%[define(DEFINE_PURECALL_HANDLER =
+#ifndef ___purecall_handler_defined
+#define ___purecall_handler_defined 1
+typedef void (__LIBCCALL *_purecall_handler)(void);
+#endif /* !___purecall_handler_defined */
+)]
+%[define_replacement(_purecall_handler = _purecall_handler)]
+
+
+[[decl_prefix(DEFINE_PURECALL_HANDLER)]]
 _purecall_handler _set_purecall_handler(_purecall_handler __handler);
+
+[[decl_prefix(DEFINE_PURECALL_HANDLER)]]
 _purecall_handler _get_purecall_handler();
 
 %
 %[default_impl_section(".text.crt.dos.errno")]
-%typedef void (__LIBCCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
+%{
+#ifndef ___invalid_parameter_handler_defined
+#define ___invalid_parameter_handler_defined 1
+typedef void (__LIBCCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
+#endif /* !___invalid_parameter_handler_defined */
+}
+
+%[define(DEFINE_INVALID_PARAMETER_HANDLER =
+#ifndef ___invalid_parameter_handler_defined
+#define ___invalid_parameter_handler_defined 1
+typedef void (__LIBCCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
+#endif /* !___invalid_parameter_handler_defined */
+)]
+%[define_replacement(_invalid_parameter_handler = _invalid_parameter_handler)]
+
+[[decl_prefix(DEFINE_INVALID_PARAMETER_HANDLER)]]
 _invalid_parameter_handler _set_invalid_parameter_handler(_invalid_parameter_handler __handler);
+
+[[decl_prefix(DEFINE_INVALID_PARAMETER_HANDLER)]]
 _invalid_parameter_handler _get_invalid_parameter_handler();
+
 
 %
 [[section(".text.crt.dos.application.init")]]
@@ -3437,7 +3476,16 @@ char *ultoa(unsigned long val, [[nonnull]] char *buf, int radix) {
 %[default_impl_section(".text.crt.dos.sched.process")]
 _onexit(*) = onexit;
 
-[[export_alias("_onexit")]]
+%[define_replacement(onexit_t = _onexit_t)]
+%[define_replacement(_onexit_t = _onexit_t)]
+%[define(DEFINE_ONEXIT_T =
+#ifndef _ONEXIT_T_DEFINED
+#define _ONEXIT_T_DEFINED 1
+typedef int (__LIBCCALL *_onexit_t)(void);
+#endif  /* _ONEXIT_T_DEFINED */
+)]
+
+[[export_alias("_onexit"), decl_prefix(DEFINE_ONEXIT_T)]]
 onexit_t onexit(onexit_t func);
 
 

@@ -96,6 +96,8 @@
 #define __NOTHROW_RPC_NOKOS(x) x
 #define NOTHROW_RPC_PURE(x) x
 #define __NOTHROW_RPC_PURE(x) x
+#define THROWING(x) x
+#define __THROWING(x) x
 
 #define DECL_BEGIN
 #define __DECL_BEGIN
