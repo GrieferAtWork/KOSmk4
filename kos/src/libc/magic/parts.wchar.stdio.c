@@ -38,7 +38,7 @@ __SYSDECL_BEGIN
 }
 
 [[guard, wchar, crt_dosname("_wremove")]]
-[[section({.text.crt.wchar.fs.modify|.text.crt.dos.wchar.fs.modify})]]
+[[section("{.text.crt.wchar.fs.modify|.text.crt.dos.wchar.fs.modify}")]]
 int wremove([[nonnull]] wchar_t const *filename);
 
 [[wchar, ATTR_WUNUSED, crt_dosname("_wfopen")]]

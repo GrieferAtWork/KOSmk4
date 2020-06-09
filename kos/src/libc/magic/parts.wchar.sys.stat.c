@@ -20,7 +20,7 @@
 
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
-%[default_impl_section({.text.crt.wchar.fs.stat|.text.crt.dos.wchar.fs.stat})]
+%[default_impl_section("{.text.crt.wchar.fs.stat|.text.crt.dos.wchar.fs.stat}")]
 
 %{
 #include <features.h>

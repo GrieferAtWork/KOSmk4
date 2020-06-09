@@ -59,11 +59,18 @@ struct winsize;
 @@Create pseudo tty master slave pair with NAME and set terminal
 @@attributes according to TERMP and WINP and return handles for
 @@both ends in AMASTER and ASLAVE
-openpty:($fd_t *amaster, $fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) -> int;
+int openpty([[nonnull]] $fd_t *amaster,
+            [[nonnull]] $fd_t *aslave,
+            [[nullable]] char *name,
+            [[nullable]] struct termios const *termp,
+            [[nullable]] struct winsize const *winp);
 
 @@Create child process and establish the slave pseudo
 @@terminal as the child's controlling terminal
-forkpty:($fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp) -> $pid_t;
+$pid_t forkpty([[nonnull]] $fd_t *amaster,
+               [[nonnull]] char *name,
+               [[nullable]] struct termios const *termp,
+               [[nullable]] struct winsize const *winp);
 
 %{
 

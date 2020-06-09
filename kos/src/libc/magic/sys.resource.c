@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(id_t = __id_t)]
-%[default_impl_section(.text.crt.sched.resource)]
+%[default_impl_section(".text.crt.sched.resource")]
 
 %{
 #include <features.h>
@@ -68,22 +68,25 @@ typedef int __priority_which_t;
 
 @@Put the soft and hard limits for RESOURCE in *RLIMITS.
 @@Returns 0 if successful, -1 if not (and sets errno)
-[no_crt_self_import]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(getrlimit64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(getrlimit, __getrlimit)]
-getrlimit:(__rlimit_resource_t resource, [[nonnull]] struct rlimit *rlimits) -> int;
+[[no_crt_self_import]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("getrlimit64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("getrlimit", "__getrlimit")]]
+int getrlimit(__rlimit_resource_t resource,
+              [[nonnull]] struct rlimit *rlimits);
 
 @@Set the soft and hard limits for RESOURCE to *RLIMITS.
 @@Only the super-user can increase hard limits.
 @@Return 0 if successful, -1 if not (and sets errno)
-[no_crt_self_import]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(setrlimit64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(setrlimit)]
-setrlimit:(__rlimit_resource_t resource, [[nonnull]] struct rlimit const *rlimits) -> int;
+[[no_crt_self_import]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("setrlimit64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("setrlimit")]]
+int setrlimit(__rlimit_resource_t resource,
+              [[nonnull]] struct rlimit const *rlimits);
 
 @@Return resource usage information on process indicated by WHO
 @@and put it in *USAGE. Returns 0 for success, -1 for failure
-getrusage:(__rusage_who_t who, [[nonnull]] struct rusage *usage) -> int;
+int getrusage(__rusage_who_t who,
+              [[nonnull]] struct rusage *usage);
 
 %/* TODO: getrusage64() (__USE_TIME64 & __USE_TIME_BITS64 integration) */
 
@@ -91,18 +94,21 @@ getrusage:(__rusage_who_t who, [[nonnull]] struct rusage *usage) -> int;
 @@WHO (see above); if WHO is zero, the current process, process group,
 @@or user (as specified by WHO) is used.  A lower priority number means
 @@higher priority. Priorities range from PRIO_MIN to PRIO_MAX (above)
-getpriority:(__priority_which_t which, id_t who) -> int;
+int getpriority(__priority_which_t which, id_t who);
 
 @@Set the priority of all processes specified by WHICH and WHO (see above) to PRIO.
 @@Returns 0 on success, -1 on errors
-setpriority:(__priority_which_t which, id_t who, int prio) -> int;
+int setpriority(__priority_which_t which, id_t who, int prio);
 
 %
 %#ifdef __USE_LARGEFILE64
-[off64_variant_of(getrlimit)]
-getrlimit64:(__rlimit_resource_t resource, [[nonnull]] struct rlimit64 *rlimits) -> int;
-[off64_variant_of(setrlimit)]
-setrlimit64:(__rlimit_resource_t resource, [[nonnull]] struct rlimit64 const *rlimits) -> int;
+[[off64_variant_of(getrlimit)]]
+int getrlimit64(__rlimit_resource_t resource,
+                [[nonnull]] struct rlimit64 *rlimits);
+
+[[off64_variant_of(setrlimit)]]
+int setrlimit64(__rlimit_resource_t resource,
+                [[nonnull]] struct rlimit64 const *rlimits);
 %#endif /* __USE_LARGEFILE64 */
 
 

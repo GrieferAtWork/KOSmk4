@@ -39,60 +39,60 @@ __SYSDECL_BEGIN
 %{
 #ifndef __T16ARGV
 #ifdef __USE_DOS
-#   define __T16ARGV char16_t const *const *__restrict ___argv
-#   define __T16ENVP char16_t const *const *__restrict ___envp
+#define __T16ARGV char16_t const *const *__restrict ___argv
+#define __T16ENVP char16_t const *const *__restrict ___envp
 #else /* __USE_DOS */
-#   define __T16ARGV char16_t *const ___argv[__restrict_arr]
-#   define __T16ENVP char16_t *const ___envp[__restrict_arr]
+#define __T16ARGV char16_t *const ___argv[__restrict_arr]
+#define __T16ENVP char16_t *const ___envp[__restrict_arr]
 #endif /* !__USE_DOS */
 #endif /* !__T16ARGV */
 #ifndef __T32ARGV
 #ifdef __USE_DOS
-#   define __T32ARGV char32_t const *const *__restrict ___argv
-#   define __T32ENVP char32_t const *const *__restrict ___envp
+#define __T32ARGV char32_t const *const *__restrict ___argv
+#define __T32ENVP char32_t const *const *__restrict ___envp
 #else /* __USE_DOS */
-#   define __T32ARGV char32_t *const ___argv[__restrict_arr]
-#   define __T32ENVP char32_t *const ___envp[__restrict_arr]
+#define __T32ARGV char32_t *const ___argv[__restrict_arr]
+#define __T32ENVP char32_t *const ___envp[__restrict_arr]
 #endif /* !__USE_DOS */
 #endif /* !__T32ARGV */
 }
 
-c16execv:(*) %{uchar(wexecv)}
-c32execv:(*) %{uchar(wexecv)}
-c16execve:(*) %{uchar(wexecve)}
-c32execve:(*) %{uchar(wexecve)}
-c16execvp:(*) %{uchar(wexecvp)}
-c32execvp:(*) %{uchar(wexecvp)}
-c16execvpe:(*) %{uchar(wexecvpe)}
-c32execvpe:(*) %{uchar(wexecvpe)}
-c16execl:(*) %{uchar(wexecl)}
-c32execl:(*) %{uchar(wexecl)}
-c16execlp:(*) %{uchar(wexeclp)}
-c32execlp:(*) %{uchar(wexeclp)}
-c16execle:(*) %{uchar(wexecle)}
-c32execle:(*) %{uchar(wexecle)}
-c16execlpe:(*) %{uchar(wexeclpe)}
-c32execlpe:(*) %{uchar(wexeclpe)}
+c16execv(*) %{uchar("wexecv")}
+c32execv(*) %{uchar("wexecv")}
+c16execve(*) %{uchar("wexecve")}
+c32execve(*) %{uchar("wexecve")}
+c16execvp(*) %{uchar("wexecvp")}
+c32execvp(*) %{uchar("wexecvp")}
+c16execvpe(*) %{uchar("wexecvpe")}
+c32execvpe(*) %{uchar("wexecvpe")}
+c16execl(*) %{uchar("wexecl")}
+c32execl(*) %{uchar("wexecl")}
+c16execlp(*) %{uchar("wexeclp")}
+c32execlp(*) %{uchar("wexeclp")}
+c16execle(*) %{uchar("wexecle")}
+c32execle(*) %{uchar("wexecle")}
+c16execlpe(*) %{uchar("wexeclpe")}
+c32execlpe(*) %{uchar("wexeclpe")}
 
-c16spawnv:(*) %{uchar(wspawnv)}
-c32spawnv:(*) %{uchar(wspawnv)}
-c16spawnve:(*) %{uchar(wspawnve)}
-c32spawnve:(*) %{uchar(wspawnve)}
-c16spawnvp:(*) %{uchar(wspawnvp)}
-c32spawnvp:(*) %{uchar(wspawnvp)}
-c16spawnvpe:(*) %{uchar(wspawnvpe)}
-c32spawnvpe:(*) %{uchar(wspawnvpe)}
-c16spawnl:(*) %{uchar(wspawnl)}
-c32spawnl:(*) %{uchar(wspawnl)}
-c16spawnlp:(*) %{uchar(wspawnlp)}
-c32spawnlp:(*) %{uchar(wspawnlp)}
-c16spawnle:(*) %{uchar(wspawnle)}
-c32spawnle:(*) %{uchar(wspawnle)}
-c16spawnlpe:(*) %{uchar(wspawnlpe)}
-c32spawnlpe:(*) %{uchar(wspawnlpe)}
+c16spawnv(*) %{uchar("wspawnv")}
+c32spawnv(*) %{uchar("wspawnv")}
+c16spawnve(*) %{uchar("wspawnve")}
+c32spawnve(*) %{uchar("wspawnve")}
+c16spawnvp(*) %{uchar("wspawnvp")}
+c32spawnvp(*) %{uchar("wspawnvp")}
+c16spawnvpe(*) %{uchar("wspawnvpe")}
+c32spawnvpe(*) %{uchar("wspawnvpe")}
+c16spawnl(*) %{uchar("wspawnl")}
+c32spawnl(*) %{uchar("wspawnl")}
+c16spawnlp(*) %{uchar("wspawnlp")}
+c32spawnlp(*) %{uchar("wspawnlp")}
+c16spawnle(*) %{uchar("wspawnle")}
+c32spawnle(*) %{uchar("wspawnle")}
+c16spawnlpe(*) %{uchar("wspawnlpe")}
+c32spawnlpe(*) %{uchar("wspawnlpe")}
 
-c16system:(*) %{uchar(wsystem)}
-c32system:(*) %{uchar(wsystem)}
+c16system(*) %{uchar("wsystem")}
+c32system(*) %{uchar("wsystem")}
 
 %{
 

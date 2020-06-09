@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
-%[default_impl_section(.text.crt.system.auxv)]
+%[default_impl_section(".text.crt.system.auxv")]
 
 %{
 #include <elf.h>
@@ -35,8 +35,8 @@ __SYSDECL_BEGIN
 @@Return the value associated with an Elf*_auxv_t type from the auxv list
 @@passed to the program on startup.  If TYPE was not present in the auxv
 @@list, returns zero and sets errno to ENOENT
-[export_alias(__getauxval)]
-getauxval:($ulongptr_t type) -> $ulongptr_t;
+[[export_alias("__getauxval")]]
+$ulongptr_t getauxval($ulongptr_t type);
 
 %{
 

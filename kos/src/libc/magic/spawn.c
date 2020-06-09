@@ -216,29 +216,29 @@ int posix_spawnattr_setschedparam([[nonnull]] posix_spawnattr_t *__restrict attr
 
 %
 @@Initialize data structure for file attribute for `spawn' call
-posix_spawn_file_actions_init:([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions) -> int;
+int posix_spawn_file_actions_init([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions);
 
 %
 @@Free resources associated with FILE-ACTIONS
-posix_spawn_file_actions_destroy:([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions) -> int;
+int posix_spawn_file_actions_destroy([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions);
 
 %
 @@Add an action to FILE-ACTIONS which tells the implementation
 @@to call `open' for the given file during the `spawn' call
-posix_spawn_file_actions_addopen:([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
-                                  $fd_t fd, [[nonnull]] char const *__restrict path,
-                                  $oflag_t oflags, mode_t mode) -> int;
+int posix_spawn_file_actions_addopen([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
+                                     $fd_t fd, [[nonnull]] char const *__restrict path,
+                                     $oflag_t oflags, mode_t mode);
 
 %
 @@Add an action to FILE-ACTIONS which tells the implementation to
 @@call `close' for the given file descriptor during the `spawn' call
-posix_spawn_file_actions_addclose:([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions, $fd_t fd) -> int;
+int posix_spawn_file_actions_addclose([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions, $fd_t fd);
 
 %
 @@Add an action to FILE-ACTIONS which tells the implementation to
 @@call `dup2' for the given file descriptors during the `spawn' call
-posix_spawn_file_actions_adddup2:([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
-                                  $fd_t fd, $fd_t newfd) -> int;
+int posix_spawn_file_actions_adddup2([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
+                                     $fd_t fd, $fd_t newfd);
 
 
 %{

@@ -66,9 +66,9 @@ __SYSDECL_BEGIN
 #define RAND_MAX 0x7fff /* TODO: Check what this really is */
 #elif defined(__CRT_CYG_PRIMARY)
 #define RAND_MAX 0x7fff /* TODO: Check what this really is */
-#else
+#else /* ... */
 #define RAND_MAX 0x7fff
-#endif
+#endif /* !... */
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
@@ -565,6 +565,7 @@ $lldiv_t lldiv(__LONGLONG numer, __LONGLONG denom) {
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
 
 %(std)#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
+/* TODO: Use %[insert:std_function_nousing(...)] for these! */
 %(std){
 extern "C++" {
 #ifdef __CRT_HAVE_abs
@@ -668,6 +669,7 @@ struct __div_struct div(int numer, int denom) {
 %(std)#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STDLIB_H_PROTO */
 
 %(std)#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_MATH_H_PROTO) && !defined(__NO_FPU)
+/* TODO: Use %[insert:std_function_nousing(...)] for these! */
 %(std){
 extern "C++" {
 /* Also provide abs() for floating point types. */
@@ -852,8 +854,8 @@ long atol([[nonnull]] char const *__restrict nptr) {
 
 %#if defined(__LONGLONG) && defined(__USE_ISOC99)
 [[std, ATTR_PURE, ATTR_WUNUSED]]
-[[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, "atoi")]]
-[[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, "atol")]]
+[[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, atoi)]]
+[[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, atol)]]
 __LONGLONG atoll([[nonnull]] char const *__restrict nptr) {
 @@pp_if __SIZEOF_LONG_LONG__@@
 	return (__LONGLONG)strto32(nptr, NULL, 10);
@@ -865,8 +867,8 @@ __LONGLONG atoll([[nonnull]] char const *__restrict nptr) {
 
 
 [[std, ATTR_LEAF]]
-[[alt_variant_of(__SIZEOF_LONG__ == 4, "strtou32")]]
-[[alt_variant_of(__SIZEOF_LONG__ == 8, "strtou64")]]
+[[alt_variant_of(__SIZEOF_LONG__ == 4, strtou32)]]
+[[alt_variant_of(__SIZEOF_LONG__ == 8, strtou64)]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("strtoull", "strtouq")]]
 [[if(__SIZEOF_LONG__ == 8), alias("_strtoui64")]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoumax")]]
@@ -880,8 +882,8 @@ unsigned long strtoul([[nonnull]] char const *__restrict nptr,
 }
 
 [[std, ATTR_LEAF]]
-[[alt_variant_of(__SIZEOF_LONG__ == 4, "strto32")]]
-[[alt_variant_of(__SIZEOF_LONG__ == 8, "strto64")]]
+[[alt_variant_of(__SIZEOF_LONG__ == 4, strto32)]]
+[[alt_variant_of(__SIZEOF_LONG__ == 8, strto64)]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("strtoll", "strtoq")]]
 [[if(__SIZEOF_LONG__ == 8), alias("_strtoi64")]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoimax")]]
@@ -897,8 +899,8 @@ long strtol([[nonnull]] char const *__restrict nptr,
 %(std)#ifdef __ULONGLONG
 %(std)#ifdef __USE_ISOC99
 [[std, guard, ATTR_LEAF, export_alias("strtouq")]]
-[[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, "strtou64")]]
-[[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, "strtou32")]]
+[[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, strtou64)]]
+[[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, strtou32)]]
 [[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("strtoul")]]
 [[if(__SIZEOF_LONG_LONG__ == 8), alias("_strtoui64")]]
 [[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoumax")]]
@@ -912,8 +914,8 @@ __ULONGLONG strtoull([[nonnull]] char const *__restrict nptr,
 }
 
 [[std, guard, ATTR_LEAF, export_alias("strtoq")]]
-[[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, "strto64")]]
-[[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, "strto32")]]
+[[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, strto64)]]
+[[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, strto32)]]
 [[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("strtol")]]
 [[if(__SIZEOF_LONG_LONG__ == 8), alias("_strtoi64")]]
 [[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("strtoimax")]]
@@ -958,7 +960,7 @@ float strtof([[nonnull]] char const *__restrict nptr,
 
 %(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[guard, std, ATTR_LEAF]]
-[[alt_variant_of(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, "strtod")]]
+[[alt_variant_of(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, strtod)]]
 __LONGDOUBLE strtold([[nonnull]] char const *__restrict nptr,
                      [[nullable]] char **endptr) {
 	/* TODO */
@@ -2324,7 +2326,7 @@ errno_t _get_pgmptr(char **pvalue) {
 errno_t _get_wpgmptr(wchar_t **pvalue); /* TODO: Implement using `_wpgmptr' */
 
 %
-%[default_impl_section(.text.crt.dos.FILE.utility)]
+%[default_impl_section(".text.crt.dos.FILE.utility")]
 %#ifdef __CRT_HAVE__fmode
 %__LIBC int _fmode;
 %#else /* ... */
@@ -2819,7 +2821,8 @@ errno_t _mbstowcs_s_l($size_t *presult,
 	return 0;
 }
 
-%[default_impl_section(.text.crt.dos.random)];
+%[default_impl_section(".text.crt.dos.random")]
+
 [[impl_include("<parts/errno.h>"), userimpl]]
 errno_t rand_s([[nonnull]] unsigned int *__restrict randval) {
 	if (!randval) {

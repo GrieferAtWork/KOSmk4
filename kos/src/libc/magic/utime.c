@@ -145,21 +145,21 @@ int futime($fd_t fd, [[nullable]] struct utimbuf const *file_times) {
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #undef @actime@
 #undef @modtime@
-@@if_has_function(crt_futime32)@@
+@@pp_if $has_function(crt_futime32)@@
 	struct __utimbuf32 buf32;
 	if (!file_times)
 		return crt_futime32(fd, NULL);
 	buf32.@actime@  = (time32_t)file_times->@actime@;
 	buf32.@modtime@ = (time32_t)file_times->@modtime@;
 	return crt_futime32(fd, &buf32);
-@@else_has_function(crt_futime32)@@
+@@pp_else@@
 	struct __utimbuf64 buf64;
 	if (!file_times)
 		return crt_futime64(fd, NULL);
 	buf64.@actime@  = (time64_t)file_times->@actime@;
 	buf64.@modtime@ = (time64_t)file_times->@modtime@;
 	return crt_futime64(fd, &buf64);
-@@endif_has_function(crt_futime32)@@
+@@pp_endif@@
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @pop_macro@("modtime")
 #pragma @pop_macro@("actime")

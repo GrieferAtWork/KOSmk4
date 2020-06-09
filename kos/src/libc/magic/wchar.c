@@ -1188,7 +1188,7 @@ $size_t wcsftime_l([[outp(maxsize)]] wchar_t *__restrict buf, $size_t maxsize,
 %/* KOS FILE extension functions. */
 %
 
-%[default_impl_section(.text.crt.wchar.FILE.locked.write.write)]
+%[default_impl_section(".text.crt.wchar.FILE.locked.write.write")]
 @@For use with `format_printf()' and friends: Prints to a `FILE *' closure argument
 [[cp_stdio, wchar, impl_include("<asm/stdio.h>")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("file_wprinter_unlocked")]]
@@ -1205,10 +1205,10 @@ $ssize_t file_wprinter([[nonnull]] void *arg,
 	return (ssize_t)i;
 }
 
-%[default_impl_section(.text.crt.wchar.FILE.unlocked.write.write)]
+%[default_impl_section(".text.crt.wchar.FILE.unlocked.write.write")]
 @@Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG'
 [[cp_stdio, wchar, impl_include("<asm/stdio.h>"), alias("file_wprinter")]]
-[[userimpl, requires($has_function(fputwc_unlocked))]]
+[[userimpl, requires_function(fputwc_unlocked)]]
 $ssize_t file_wprinter_unlocked([[nonnull]] void *arg,
                                 [[inp(datalen)]] wchar_t const *__restrict data,
                                 $size_t datalen) {

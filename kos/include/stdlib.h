@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedbe7deb */
+/* HASH CRC-32:0x1a161820 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -177,9 +177,9 @@ __SYSDECL_BEGIN
 #define RAND_MAX 0x7fff /* TODO: Check what this really is */
 #elif defined(__CRT_CYG_PRIMARY)
 #define RAND_MAX 0x7fff /* TODO: Check what this really is */
-#else
+#else /* ... */
 #define RAND_MAX 0x7fff
-#endif
+#endif /* !... */
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1

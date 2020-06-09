@@ -20,7 +20,7 @@
 
 %[define_replacement(GRND_RANDOM = __GRND_RANDOM)]
 %[define_replacement(GRND_NONBLOCK = __GRND_NONBLOCK)]
-%[default_impl_section(.text.crt.system.random)]
+%[default_impl_section(".text.crt.system.random")]
 
 %{
 #include <features.h>
@@ -66,8 +66,8 @@ typedef __SSIZE_TYPE__ ssize_t;
 @@               if no random data had already been retrieved from
 @@               the kernel's random data sink.
 [[ATTR_WUNUSED]]
-getrandom:([outp(num_bytes)] void *buf,
-           size_t num_bytes, unsigned int flags) -> ssize_t;
+ssize_t getrandom([[outp(num_bytes)]] void *buf,
+                  size_t num_bytes, unsigned int flags);
 
 
 @@Similar to `getrandom(BUF, NUM_BYTES, GRND_RANDOM)', however
@@ -80,10 +80,10 @@ getrandom:([outp(num_bytes)] void *buf,
 @@Also note that any other than `EFAULT' and `ENOSYS' are translated into `EIO'
 @@@return:  0: Success
 @@@return: -1: Error (see `errno')
-[[ATTR_WUNUSED]][requires_include(<asm/random.h>)]
-[[impl_include("<parts/errno.h>"), userimpl, guard]]
-[requires(defined(__GRND_RANDOM) && $has_function(getrandom))]
-getentropy:([outp(num_bytes)] void *buf, size_t num_bytes) -> int {
+[[guard, ATTR_WUNUSED, impl_include("<parts/errno.h>")]]
+[[requires_include("<asm/random.h>")]]
+[[userimpl, requires(defined(__GRND_RANDOM) && $has_function(getrandom))]]
+int getentropy([[outp(num_bytes)]] void *buf, size_t num_bytes) {
 	size_t result = 0;
 	ssize_t temp;
 	while (result < num_bytes) {
@@ -91,10 +91,10 @@ getentropy:([outp(num_bytes)] void *buf, size_t num_bytes) -> int {
 		                 num_bytes - result,
 		                 GRND_RANDOM);
 		if (temp < 0) {
-#if defined(__libc_geterrno) && defined(EINTR)
+@@pp_if defined(__libc_geterrno) && defined(EINTR)@@
 			if (__libc_geterrno() == EINTR)
 				continue;
-#endif /* __libc_geterrno && EINTR */
+@@pp_endif@@
 			goto err;
 		}
 		result += (size_t)temp;

@@ -363,9 +363,9 @@ void argz_delete([[nonnull]] char **__restrict pargz,
 	newlen    = *pargz_len - entrylen;
 	*pargz_len = newlen;
 	if unlikely(newlen == 0) {
-@@if_has_function(free)@@
+@@pp_if $has_function(free)@@
 		free(*pargz);
-@@endif_has_function(free)@@
+@@pp_endif@@
 		*pargz = NULL;
 		return;
 	}

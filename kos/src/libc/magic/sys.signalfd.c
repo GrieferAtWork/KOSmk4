@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.sched.signalfd)]
+%[default_impl_section(".text.crt.sched.signalfd")]
 
 %{
 #include <features.h>
@@ -80,7 +80,7 @@ struct signalfd_siginfo {
 
 
 @@Request notification for delivery of signals in MASK to be performed using descriptor FD
-signalfd:($fd_t fd, [[nonnull]] sigset_t const *mask, int flags) -> $fd_t;
+$fd_t signalfd($fd_t fd, [[nonnull]] sigset_t const *mask, int flags);
 
 
 %{

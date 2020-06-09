@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb9ced61 */
+/* HASH CRC-32:0xdb1d8e8a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -311,7 +311,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sigismember, __FORCELOCAL __ATTR_PURE __ATTR_WUN
 #endif /* !... */
 #ifdef __CRT_HAVE_sigprocmask
 /* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
-__CDECLARE(,int,__NOTHROW_NCX,sigprocmask,(int __how, sigset_t const *__restrict __set, sigset_t *__restrict __oset),(__how,__set,__oset))
+__CDECLARE(,int,__NOTHROW_NCX,sigprocmask,(int __how, sigset_t const *__set, sigset_t *__oset),(__how,__set,__oset))
 #endif /* __CRT_HAVE_sigprocmask */
 #ifdef __CRT_HAVE_sigsuspend
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigsuspend,(sigset_t const *__set),(__set))
@@ -320,13 +320,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigsuspend,(sigset_t const *__
 #endif /* ... */
 #ifdef __CRT_HAVE_sigaction
 /* @param signo: One of `SIG*' */
-__CDECLARE(,int,__NOTHROW_NCX,sigaction,(int __signo, struct sigaction const *__restrict __act, struct sigaction *__restrict __oact),(__signo,__act,__oact))
+__CDECLARE(,int,__NOTHROW_NCX,sigaction,(int __signo, struct sigaction const *__act, struct sigaction *__oact),(__signo,__act,__oact))
 #elif defined(__CRT_HAVE___sigaction)
 /* @param signo: One of `SIG*' */
-__CREDIRECT(,int,__NOTHROW_NCX,sigaction,(int __signo, struct sigaction const *__restrict __act, struct sigaction *__restrict __oact),__sigaction,(__signo,__act,__oact))
+__CREDIRECT(,int,__NOTHROW_NCX,sigaction,(int __signo, struct sigaction const *__act, struct sigaction *__oact),__sigaction,(__signo,__act,__oact))
 #endif /* ... */
 #ifdef __CRT_HAVE_sigpending
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigpending,(sigset_t *__set),(__set))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigpending,(sigset_t *__restrict __set),(__set))
 #endif /* __CRT_HAVE_sigpending */
 #ifdef __CRT_HAVE_sigwait
 /* @param signo: One of `SIG*' */
@@ -334,10 +334,10 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sigwait,(sigset_t const *__r
 #endif /* __CRT_HAVE_sigwait */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_sigisemptyset
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigisemptyset,(sigset_t const *__set),(__set))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigisemptyset,(sigset_t const *__restrict __set),(__set))
 #else /* __CRT_HAVE_sigisemptyset */
 #include <local/signal/sigisemptyset.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigisemptyset, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigisemptyset)(sigset_t const *__set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigisemptyset))(__set); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigisemptyset, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigisemptyset)(sigset_t const *__restrict __set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigisemptyset))(__set); })
 #endif /* !__CRT_HAVE_sigisemptyset */
 #ifdef __CRT_HAVE_sigandset
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,sigandset,(sigset_t *__set, sigset_t const *__left, sigset_t const *__right),(__set,__left,__right))
@@ -384,11 +384,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sigtimedwait64, __FORCELOCAL __ATTR_NONNULL((1))
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_sigqueueinfo
 /* @param signo: One of `SIG*' */
-__CDECLARE(,int,__NOTHROW_NCX,sigqueueinfo,(__pid_t __tgid, int __signo, siginfo_t const *__uinfo),(__tgid,__signo,__uinfo))
+__CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,sigqueueinfo,(__pid_t __tgid, int __signo, siginfo_t const *__uinfo),(__tgid,__signo,__uinfo))
 #endif /* __CRT_HAVE_sigqueueinfo */
 #ifdef __CRT_HAVE_tgsigqueueinfo
 /* @param signo: One of `SIG*' */
-__CDECLARE(,int,__NOTHROW_NCX,tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, int __signo, siginfo_t const *__uinfo),(__tgid,__tid,__signo,__uinfo))
+__CDECLARE(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, int __signo, siginfo_t const *__uinfo),(__tgid,__tid,__signo,__uinfo))
 #endif /* __CRT_HAVE_tgsigqueueinfo */
 #endif /* __USE_KOS */
 
@@ -405,7 +405,7 @@ __CDECLARE(,int,__NOTHROW_NCX,killpg,(__pid_t __pgrp, int __signo),(__pgrp,__sig
 __CDECLARE_VOID(,__NOTHROW_NCX,psignal,(int __signo, char const *__s),(__signo,__s))
 #endif /* __CRT_HAVE_psignal */
 #ifdef __CRT_HAVE_psiginfo
-__CDECLARE_VOID(,__NOTHROW_NCX,psiginfo,(siginfo_t const *__pinfo, char const *__s),(__pinfo,__s))
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,psiginfo,(siginfo_t const *__pinfo, char const *__s),(__pinfo,__s))
 #endif /* __CRT_HAVE_psiginfo */
 #endif /* __USE_XOPEN2K8 */
 
@@ -418,7 +418,7 @@ __CDECLARE(,int,__NOTHROW_NCX,siginterrupt,(int __signo, int __interrupt),(__sig
 __CDECLARE(,int,__NOTHROW_NCX,sigstack,(struct sigstack *__ss, struct sigstack *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_sigstack */
 #ifdef __CRT_HAVE_sigaltstack
-__CDECLARE(,int,__NOTHROW_NCX,sigaltstack,(struct sigaltstack const *__restrict __ss, struct sigaltstack *__restrict __oss),(__ss,__oss))
+__CDECLARE(,int,__NOTHROW_NCX,sigaltstack,(struct sigaltstack const *__ss, struct sigaltstack *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_sigaltstack */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
@@ -442,10 +442,10 @@ __CDECLARE(,__sighandler_t,__NOTHROW_NCX,sigset,(int __signo, __sighandler_t __d
 #endif /* __USE_XOPEN_EXTENDED */
 
 #ifdef __CRT_HAVE___libc_current_sigrtmin
-__CDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,__libc_current_sigrtmin,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__libc_current_sigrtmin,(void),())
 #endif /* __CRT_HAVE___libc_current_sigrtmin */
 #ifdef __CRT_HAVE___libc_current_sigrtmax
-__CDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,__libc_current_sigrtmax,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__libc_current_sigrtmax,(void),())
 #endif /* __CRT_HAVE___libc_current_sigrtmax */
 
 #endif /* __CC__ */

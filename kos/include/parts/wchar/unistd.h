@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc41a40ad */
+/* HASH CRC-32:0x129223a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -424,12 +424,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wlchown, __FORCELOCAL __ATTR_NONNULL((1)) int __
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS
-#define __PIO_OFFSET     __FS_TYPE(pos)
-#define __PIO_OFFSET64   __pos64_t
-#else
-#define __PIO_OFFSET     __FS_TYPE(off)
-#define __PIO_OFFSET64   __off64_t
-#endif
+#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS */
+#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 #if defined(__CRT_HAVE_wtruncate64) && defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
@@ -455,7 +455,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBCCALL,wtru
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBCCALL,wtruncate,(wchar_t const *__file, __PIO_OFFSET __length),DOS$wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_truncate64) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || defined(__CRT_HAVE_wtruncate) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)))
+#elif defined(__CRT_HAVE_truncate64) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)))
 #include <local/parts.wchar.unistd/wtruncate.h>
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -486,7 +486,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBCCALL,wtru
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBCCALL,wtruncate64,(wchar_t const *__file, __PIO_OFFSET64 __length),DOS$wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_wtruncate) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
+#elif defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
 #include <local/parts.wchar.unistd/wtruncate64.h>
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -645,8 +645,8 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBCCALL,wset
 #endif /* ... */
 #endif /* __USE_MISC */
 
-#if defined(__USE_MISC) || \
-   (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
+#if (defined(__USE_MISC) || \
+     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 #ifdef __CRT_HAVE_wchroot
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads

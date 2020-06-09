@@ -629,6 +629,8 @@ again_handle_tok:
 				}
 			}	break;
 
+			/* TODO: @@yield {expr}@@ */
+
 			case "if":
 			case "elif": {
 				self.next();
@@ -709,13 +711,13 @@ parse_if_or_elif_condition:
 
 			{
 				local numLines;
-				local cond;
 			case "pp_if":
 			case "pp_ifdef":
 			case "pp_ifndef":
 			case "pp_elif":
 			case "pp_elifdef":
 			case "pp_elifndef": {
+				local cond;
 				self.next();
 				local exprStart = self.tokStart;
 				local exprEnd = exprStart;
@@ -729,7 +731,6 @@ parse_if_or_elif_condition:
 				} else if (tok.endswith("def")) {
 					cond = "defined({})".format({ cond });
 				}
-handle_pp_if__pp_elif_cond:
 				cond = expandPreprocessorConditionString(cond);
 				if (tok.startswith("pp_if")) {
 					if (oldKeepNewLinesFromDeadCode is none) {
@@ -792,79 +793,7 @@ handle_numLines_after_pp_directive:
 				numLines = fp.ppEndif();
 				self.next();
 				goto handle_numLines_after_pp_directive;
-
-			/* Deprecated preprocessor functions */
-			case "pp_if_has_function":           /* alias for @@pp_if $has_function({name})@@ */
-			case "pp_elif_has_function":         /* alias for @@pp_elif $has_function({name})@@ */
-			case "if_has_function":              /* (Deprecated alias for @@pp_if   $has_function({name})@@) */
-			case "if_crt_has_function":          /* (Deprecated alias for @@pp_if   $crt_has_function({name})@@) */
-			case "if_not_has_function":          /* (Deprecated alias for @@pp_if   !$has_function({name})@@) */
-			case "if_not_crt_has_function":      /* (Deprecated alias for @@pp_if   !$crt_has_function({name})@@) */
-			case "elif_has_function":            /* (Deprecated alias for @@pp_elif $has_function({name})@@) */
-			case "elif_crt_has_function":        /* (Deprecated alias for @@pp_elif $crt_has_function({name})@@) */
-			case "elif_not_has_function":        /* (Deprecated alias for @@pp_elif !$has_function({name})@@) */
-			case "elif_not_crt_has_function":    /* (Deprecated alias for @@pp_elif !$crt_has_function({name})@@) */
-			case "else_has_function":            /* (Deprecated alias for @@pp_else@@) */
-			case "else_crt_has_function":        /* (Deprecated alias for @@pp_else@@) */
-			case "else_not_has_function":        /* (Deprecated alias for @@pp_else@@) */
-			case "else_not_crt_has_function":    /* (Deprecated alias for @@pp_else@@) */
-			case "endif_has_function":           /* (Deprecated alias for @@pp_endif@@) */
-			case "endif_crt_has_function":       /* (Deprecated alias for @@pp_endif@@) */
-			case "endif_not_has_function":       /* (Deprecated alias for @@pp_endif@@) */
-			case "endif_not_crt_has_function": { /* (Deprecated alias for @@pp_endif@@) */
-				local functionName;
-				self.next();
-				self.skip("(");
-				functionName = self.tok;
-				if (isCString(functionName))
-					functionName = functionName.decode("c-escape");
-				else if (!functionName.issymbol()) {
-					self.err("Expected keyword or string in '@@{}(...)@@', but got {!r}"
-						.format({ tok, functionName }));
-				}
-				self.next();
-				self.skip(")");
-				if (tok in ["else_has_function", "else_crt_has_function",
-				            "else_not_has_function", "else_not_crt_has_function"]) {
-					if (oldKeepNewLinesFromDeadCode is none) {
-						self.err("@@{}@@ without @@pp_if@@"
-							.format({ tok }));
-					}
-					numLines = fp.ppElse();
-					goto handle_numLines_after_pp_directive;
-				}
-				if (tok in ["endif_has_function", "endif_crt_has_function",
-				            "endif_not_has_function", "endif_not_crt_has_function"]) {
-					if (oldKeepNewLinesFromDeadCode is none) {
-						self.err("@@{}@@ without @@pp_if@@"
-							.format({ tok }));
-					}
-					numLines = fp.ppEndif();
-					goto handle_numLines_after_pp_directive;
-				}
-				/* construct the condition string, and if vs. elif */
-				tok, cond = {
-					"pp_if_has_function"        : ("pp_if",   "$has_function({})"),
-					"if_has_function"           : ("pp_if",   "$has_function({})"),
-					"if_crt_has_function"       : ("pp_if",   "$crt_has_function({})"),
-					"if_not_has_function"       : ("pp_if",   "!$has_function({})"),
-					"if_not_crt_has_function"   : ("pp_if",   "!$crt_has_function({})"),
-					"pp_elif_has_function"      : ("pp_elif", "$has_function({})"),
-					"elif_has_function"         : ("pp_elif", "$has_function({})"),
-					"elif_crt_has_function"     : ("pp_elif", "$crt_has_function({})"),
-					"elif_not_has_function"     : ("pp_elif", "!$has_function({})"),
-					"elif_not_crt_has_function" : ("pp_elif", "!$crt_has_function({})"),
-				}[tok]...;
-				cond = cond.format({ functionName });
-				goto handle_pp_if__pp_elif_cond;
-			}	break;
-
 			}
-
-			/* TODO: @@insert copy({basefunc}, {copymode})@@ */
-			/* TODO: @@yield {expr}@@ */
-			/* TODO: @@has_function({name})@@ */
-			/* TODO: @@crt_has_function({name})@@ */
 
 			default:
 				self.err("Unknown directive: {!r}"

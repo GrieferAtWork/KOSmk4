@@ -22,6 +22,7 @@
 %[define_replacement(except_handler_t = __except_handler_t)]
 
 %{
+#include <kos/anno.h>
 #include <kos/except.h>
 #include <kos/bits/except-handler.h>
 
@@ -247,7 +248,7 @@ typedef __except_handler_t except_handler_t;
 @@@return: 0 :        Success.
 @@@return: -1:EINVAL: The given MODE is invalid
 [[nothrow]]
-set_exception_handler:(int mode, except_handler_t handler, void *handler_sp) -> int;
+int set_exception_handler(int mode, except_handler_t handler, void *handler_sp);
 
 @@Get the current exception handler mode for the calling thread.
 @@@param: PMODE:       When non-NULL, store the current mode, which is encoded as:
@@ -262,19 +263,22 @@ set_exception_handler:(int mode, except_handler_t handler, void *handler_sp) -> 
 @@                     then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
 @@@return: 0 :         Success.
 @@@return: -1:EFAULT:  One of the given pointers is non-NULL and faulty
-get_exception_handler:(int *pmode, except_handler_t *phandler, void **phandler_sp) -> int;
+int get_exception_handler([[nullable]] int *pmode,
+                          [[nullable]] except_handler_t *phandler,
+                          [[nullable]] void **phandler_sp);
 
 
-%{
-#ifdef __CRT_HAVE_except_handler3
-/* Mode #2 / #3 exception handler (see description above) */
-__LIBC __ATTR_NORETURN void (__EXCEPT_HANDLER_CC except_handler3)(error_register_state_t *__restrict __state, struct exception_data *__restrict __error) __CASMNAME_SAME("except_handler3");
-#endif /* __CRT_HAVE_except_handler3 */
-#ifdef __CRT_HAVE_except_handler4
-/* Mode #4 exception handler (see description above) */
-__LIBC __ATTR_NORETURN void (__EXCEPT_HANDLER_CC except_handler4)(error_register_state_t *__restrict __state, struct exception_data *__restrict __error) __CASMNAME_SAME("except_handler4");
-#endif /* __CRT_HAVE_except_handler4 */
-}
+%[define_replacement(error_register_state_t = __ERROR_REGISTER_STATE_TYPE)]
+
+@@Mode #2 / #3 exception handler (see description above)
+[[throws, ATTR_NORETURN, cc("__EXCEPT_HANDLER_CC")]]
+void except_handler3(error_register_state_t *__restrict state,
+                     struct exception_data *__restrict error);
+
+@@Mode #4 exception handler (see description above)
+[[throws, ATTR_NORETURN, cc("__EXCEPT_HANDLER_CC")]]
+void except_handler4(error_register_state_t *__restrict state,
+                     struct exception_data *__restrict error);
 
 
 %{

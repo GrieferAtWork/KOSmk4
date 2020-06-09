@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8454eaa8 */
+/* HASH CRC-32:0x86497983 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,7 +133,7 @@ __CDECLARE(__ATTR_NONNULL((1)),struct passwd *,__NOTHROW_RPC,fgetpwent,(__FILE *
 #endif /* __CRT_HAVE_fgetpwent */
 #ifdef __CRT_HAVE_putpwent
 /* Write the given entry onto the given stream */
-__CDECLARE(,int,__NOTHROW_RPC,putpwent,(struct passwd const *__restrict __p, __FILE *__restrict __f),(__p,__f))
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,putpwent,(struct passwd const *__restrict __p, __FILE *__restrict __f),(__p,__f))
 #endif /* __CRT_HAVE_putpwent */
 #endif /* __USE_MISC */
 

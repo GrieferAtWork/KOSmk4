@@ -88,8 +88,10 @@ int sched_setparam($pid_t pid, struct sched_param const *param);
 
 [[export_alias("__sched_getparam")]]
 int sched_getparam($pid_t pid, struct sched_param *param);
+
 [[export_alias("__sched_setscheduler")]]
 int sched_setscheduler($pid_t pid, int policy, struct sched_param const *param);
+
 [[export_alias("__sched_getscheduler")]]
 int sched_getscheduler($pid_t pid);
 
@@ -116,8 +118,8 @@ int sched_getaffinity($pid_t pid, $size_t cpusetsize, cpu_set_t *cpuset);
 int sched_rr_get_interval32($pid_t pid, struct $timespec32 *tms);
 
 [[no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(sched_rr_get_interval64)]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(sched_rr_get_interval)]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("sched_rr_get_interval64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("sched_rr_get_interval")]]
 [[userimpl, requires($has_function(sched_rr_get_interval32) || $has_function(sched_rr_get_interval64))]]
 int sched_rr_get_interval($pid_t pid, struct timespec *tms) {
 @@pp_if $has_function(sched_rr_get_interval32)@@
@@ -140,7 +142,7 @@ int sched_rr_get_interval($pid_t pid, struct timespec *tms) {
 %#ifdef __USE_TIME64
 [[time64_variant_of(sched_rr_get_interval)]]
 [[userimpl, requires_function(sched_rr_get_interval32)]]
-sched_rr_get_interval64:($pid_t pid, struct $timespec64 *tms) -> int {
+int sched_rr_get_interval64($pid_t pid, struct $timespec64 *tms) {
 	struct timespec32 tms32;
 	if (!tms)
 		return sched_rr_get_interval32(pid, NULL);

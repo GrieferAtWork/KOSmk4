@@ -122,7 +122,8 @@ int endmntent([[nonnull]] $FILE *stream);
 @@Search MNT->mnt_opts for an option matching OPT.
 @@Returns the address of the substring, or null if none found
 [[ATTR_WUNUSED, ATTR_PURE]]
-char *hasmntopt([[nullable]] struct mntent const *mnt, [[nullable]] char const *opt) {
+char *hasmntopt([[nullable]] struct mntent const *mnt,
+                [[nullable]] char const *opt) {
 	char *str;
 	if likely(mnt && opt && (str = mnt->@mnt_opts@) != NULL) {
 		size_t optlen = strlen(opt);

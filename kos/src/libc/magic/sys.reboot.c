@@ -19,7 +19,7 @@
  */
 
 
-%[default_impl_section(.text.crt.system.reboot)]
+%[default_impl_section(".text.crt.system.reboot")]
 
 %{
 
@@ -40,7 +40,7 @@ __SYSDECL_BEGIN
 
 @@Reboot or halt the system
 @@@param: howto: One of the `RB_*' constants above
-reboot:(int howto) -> int;
+int reboot(int howto);
 
 %{
 

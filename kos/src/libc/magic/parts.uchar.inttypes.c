@@ -37,16 +37,16 @@ __SYSDECL_BEGIN
 
 }
 
-c16toimax:(*) %{uchar(wcstoimax)}
-c32toimax:(*) %{uchar(wcstoimax)}
-c16toumax:(*) %{uchar(wcstoumax)}
-c32toumax:(*) %{uchar(wcstoumax)}
+c16toimax:(*) %{uchar("wcstoimax")}
+c32toimax:(*) %{uchar("wcstoimax")}
+c16toumax:(*) %{uchar("wcstoumax")}
+c32toumax:(*) %{uchar("wcstoumax")}
 
 %#ifdef __USE_XOPEN2K8
-c16toimax_l:(*) %{uchar(wcstoimax_l)}
-c32toimax_l:(*) %{uchar(wcstoimax_l)}
-c16toumax_l:(*) %{uchar(wcstoumax_l)}
-c32toumax_l:(*) %{uchar(wcstoumax_l)}
+c16toimax_l:(*) %{uchar("wcstoimax_l")}
+c32toimax_l:(*) %{uchar("wcstoimax_l")}
+c16toumax_l:(*) %{uchar("wcstoumax_l")}
+c32toumax_l:(*) %{uchar("wcstoumax_l")}
 %#endif /* __USE_XOPEN2K8 */
 
 %{

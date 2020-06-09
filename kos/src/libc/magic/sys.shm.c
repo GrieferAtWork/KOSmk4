@@ -20,7 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(pid_t = __pid_t)]
-%[default_impl_section(.text.crt.utility.shm)]
+%[default_impl_section(".text.crt.utility.shm")]
 
 %{
 #include <features.h>
@@ -53,12 +53,12 @@ typedef __key_t key_t;
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
 
-}
+};
 
-shmctl:(int shmid, int cmd, struct shmid_ds *buf) -> int;
-shmget:(key_t key, size_t size, int shmflg) -> int;
-shmat:(int shmid, void const *shmaddr, int shmflg) -> void *;
-shmdt:(void const *shmaddr) -> int;
+int shmctl(int shmid, int cmd, struct shmid_ds *buf);
+int shmget(key_t key, size_t size, int shmflg);
+void *shmat(int shmid, void const *shmaddr, int shmflg);
+int shmdt(void const *shmaddr);
 
 %{
 

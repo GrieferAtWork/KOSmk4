@@ -34,6 +34,13 @@ import * from .namespace;
 import * from .namespace;
 import util;
 
+/* TODO: The effective escapeMode for 'ppCond' of LocalFunction bindings
+ *       must be changed to ESCAPE_MODE_FULL when the surrounding declaration
+ *       is printed in ESCAPE_MODE_PART.
+ *       Reason being that the condition in local function implementation
+ *       headers is always printed in ESCAPE_MODE_FULL, so in bindings, the
+ *       condition must also be encoded that same way! */
+
 global Function;
 global SystemHeader;
 
@@ -45,44 +52,34 @@ global final function keyLocalDep(symbolName: string): string {
 	return "__localdep_" + symbolName;
 }
 
+@@Check if `__C[EI](DECLARE|REDIRECT)` can be used for some given declaration
 function isLibcLinkage(
 		decl: string | UserString, cc: string | UserString,
 		asmname: string | UserString, hasEllipsis: bool): bool {
 	if (decl !in LIBC_LINKAGE_DECLS)
 		return false;
+	if (hasEllipsis != (cc.startswith("V") || cc.startswith("__V")))
+		return false;
 	switch (cc) {
 
 	case "LIBCCALL":
+	case "VLIBCCALL":
 	case "__LIBCCALL":
-		return !hasEllipsis &&
-		       !asmname.startswith("DOS$") &&
+	case "__VLIBCCALL":
+		return !asmname.startswith("DOS$") &&
 		       !asmname.startswith("KOS$");
 
 	case "LIBKCALL":
+	case "VLIBKCALL":
 	case "__LIBKCALL":
-		return !hasEllipsis &&
-		       asmname.startswith("KOS$");
+	case "__VLIBKCALL":
+		return asmname.startswith("KOS$");
 
 	case "LIBDCALL":
-	case "__LIBDCALL":
-		return !hasEllipsis &&
-		       asmname.startswith("DOS$");
-
-	case "VLIBCCALL":
-	case "__VLIBCCALL":
-		return hasEllipsis &&
-		       !asmname.startswith("DOS$") &&
-		       !asmname.startswith("KOS$");
-
-	case "VLIBKCALL":
-	case "__VLIBKCALL":
-		return hasEllipsis &&
-		       asmname.startswith("KOS$");
-
 	case "VLIBDCALL":
+	case "__LIBDCALL":
 	case "__VLIBDCALL":
-		return hasEllipsis &&
-		       asmname.startswith("DOS$");
+		return asmname.startswith("DOS$");
 
 	default:
 		break;
@@ -467,10 +464,13 @@ class FunctionPrototype {
 	public function cprintDeclarationWithOptionalAsmname(
 			fp: CWriter, escapeMode: int, decl: string,
 			exposedName: string, assemblyName: string,
-			isLcl: bool, isSameAsname: bool) {
+			isSameAsname: bool) {
 		/* Same symbol name -> declare normally (or with `__ASMNAME()' suffix) */
 		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName);
-		if (isLcl) {
+		if (decl in LIBC_LINKAGE_DECLS) {
+			/* Always use __CASMNAME for anything declared in the context of libc.
+			 * This is required to ensure proper assembly linkage, as well as
+			 * symbol visibility when libc.so is including its own headers. */
 			fp << " __CASMNAME";
 			local suffix = "";
 			if (assemblyName.startswith("DOS$")) {
@@ -811,7 +811,7 @@ class FunctionPrototype {
 			}
 			return cprintDeclarationWithOptionalAsmname(
 				fp, escapeMode, decl, exposedName,
-				assemblyName, isLcl, isSameAsname);
+				assemblyName, isSameAsname);
 		}
 		if (isLcl) {
 			if (!isSameAsname)
@@ -824,7 +824,7 @@ class FunctionPrototype {
 		}
 		return cprintDeclarationWithOptionalAsmname(
 			fp, escapeMode, decl, exposedName,
-			assemblyName, isLcl, isSameAsname);
+			assemblyName, isSameAsname);
 	}
 
 	@@Print the start of an EXTERN-INLINE redirection- or declaration-binding,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2531182c */
+/* HASH CRC-32:0xeca919b7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+#include <kos/anno.h>
 #include <kos/except.h>
 #include <kos/bits/except-handler.h>
 
@@ -270,11 +271,11 @@ __CDECLARE(,int,__NOTHROW_NCX,get_exception_handler,(int *__pmode, except_handle
 #endif /* __CRT_HAVE_get_exception_handler */
 #ifdef __CRT_HAVE_except_handler3
 /* Mode #2 / #3 exception handler (see description above) */
-__LIBC __ATTR_NORETURN void (__EXCEPT_HANDLER_CC except_handler3)(error_register_state_t *__restrict __state, struct exception_data *__restrict __error) __CASMNAME_SAME("except_handler3");
+__LIBC __ATTR_NORETURN void (__EXCEPT_HANDLER_CC except_handler3)(error_register_state_t *__restrict __state, struct exception_data *__restrict __error) __THROWS(...) __CASMNAME_SAME("except_handler3");
 #endif /* __CRT_HAVE_except_handler3 */
 #ifdef __CRT_HAVE_except_handler4
 /* Mode #4 exception handler (see description above) */
-__LIBC __ATTR_NORETURN void (__EXCEPT_HANDLER_CC except_handler4)(error_register_state_t *__restrict __state, struct exception_data *__restrict __error) __CASMNAME_SAME("except_handler4");
+__LIBC __ATTR_NORETURN void (__EXCEPT_HANDLER_CC except_handler4)(error_register_state_t *__restrict __state, struct exception_data *__restrict __error) __THROWS(...) __CASMNAME_SAME("except_handler4");
 #endif /* __CRT_HAVE_except_handler4 */
 
 #endif /* __CC__ */

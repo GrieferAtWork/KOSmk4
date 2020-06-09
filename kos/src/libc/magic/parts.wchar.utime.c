@@ -20,7 +20,7 @@
 
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
-%[default_impl_section({.text.crt.wchar.fs.modify_time|.text.crt.dos.wchar.fs.modify_time})]
+%[default_impl_section("{.text.crt.wchar.fs.modify_time|.text.crt.dos.wchar.fs.modify_time}")]
 
 %{
 #include <features.h>
@@ -38,37 +38,41 @@ __SYSDECL_BEGIN
 
 }
 
-[[cp, wchar, ignore, nocrt, alias(wutime, _wutime32)]]
-int crt_wutime32([[nonnull]] $wchar_t const *filename, [[nullable]] struct __utimbuf32 const *file_times);
-[[cp, wchar, ignore, nocrt, alias(wutime64, _wutime64)]]
-int crt_wutime64([[nonnull]] $wchar_t const *filename, [[nullable]] struct __utimbuf64 const *file_times);
+[[cp, wchar, ignore, nocrt, alias("wutime", "_wutime32")]]
+int crt_wutime32([[nonnull]] $wchar_t const *filename,
+                 [[nullable]] struct __utimbuf32 const *file_times);
 
-[[cp]][alternate_names(_wutime32)][wchar, no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias(wutime64, _wutime64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(wutime, _wutime32)]
-[requires(defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64))]
-wutime:([[nonnull]] wchar_t const *filename, [[nullable]] struct utimbuf const *file_times) -> int {
+[[cp, wchar, ignore, nocrt, alias("wutime64", "_wutime64")]]
+int crt_wutime64([[nonnull]] $wchar_t const *filename,
+                 [[nullable]] struct __utimbuf64 const *file_times);
+
+[[cp, wchar, crt_dosname("_wutime32"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("wutime64", "_wutime64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("wutime", "_wutime32")]]
+[[userimpl, requires($has_function(crt_wutime32) || $has_function(crt_wutime64))]]
+int wutime([[nonnull]] wchar_t const *filename,
+           [[nullable]] struct utimbuf const *file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @push_macro@("actime")
 #pragma @push_macro@("modtime")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #undef @actime@
 #undef @modtime@
-#if defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32)
+@@pp_if $has_function(crt_wutime32)@@
 	struct __utimbuf32 buf32;
 	if (!file_times)
 		return crt_wutime32(filename, NULL);
 	buf32.@actime@  = (time32_t)file_times->@actime@;
 	buf32.@modtime@ = (time32_t)file_times->@modtime@;
 	return crt_wutime32(filename, &buf32);
-#else
+@@pp_else@@
 	struct __utimbuf64 buf64;
 	if (!file_times)
 		return wutime64(filename, NULL);
 	buf64.@actime@  = (time64_t)file_times->@actime@;
 	buf64.@modtime@ = (time64_t)file_times->@modtime@;
 	return wutime64(filename, &buf64);
-#endif
+@@pp_endif@@
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @pop_macro@("modtime")
 #pragma @pop_macro@("actime")
@@ -77,9 +81,10 @@ wutime:([[nonnull]] wchar_t const *filename, [[nullable]] struct utimbuf const *
 
 %
 %#ifdef __USE_TIME64
-[[cp]][alias(_wutime64)][[wchar]][time64_variant_of(wutime)]
-[requires(defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32))]
-wutime64:([[nonnull]] $wchar_t const *filename, [[nullable]] struct utimbuf64 const *file_times) -> int {
+[[cp, wchar, crt_dosname("_wutime64"), time64_variant_of(wutime)]]
+[[userimpl, requires_function(crt_wutime32)]]
+int wutime64([[nonnull]] $wchar_t const *filename,
+             [[nullable]] struct utimbuf64 const *file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @push_macro@("actime")
 #pragma @push_macro@("modtime")

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b346de3 */
+/* HASH CRC-32:0xfe4e6a3d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -186,6 +186,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32toumax, __FORCELOCAL __ATTR_LEAF __ATTR_NONNU
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__LIBDCALL,c16toimax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstoimax_l)
 __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),wcstoimax_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE__wcstoimax_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__LIBDCALL,c16toimax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoimax_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE_DOS$_wcstoimax_l)
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstol_l) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__LIBDCALL,c16toimax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),wcstol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstol_l) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__)
@@ -222,10 +226,6 @@ __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c1
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__LIBDCALL,c16toimax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),wcsto32_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcsto32_l) && (__SIZEOF_INTMAX_T__ == 4)
 __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),wcsto32_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE__wcstoimax_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__LIBDCALL,c16toimax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoimax_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE_DOS$_wcstoimax_l)
-__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c16toimax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/inttypes/wcstoimax_l.h>
 __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBDCALL c16toimax_l)(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoimax_l))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base, __locale); }
@@ -237,6 +237,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16toimax_l, __FORCELOCAL __ATTR_LEAF __ATTR_NON
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__LIBKCALL,c32toimax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstoimax_l)
 __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),wcstoimax_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE__wcstoimax_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__LIBKCALL,c32toimax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoimax_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE_DOS$_wcstoimax_l)
+__CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstol_l) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__LIBKCALL,c32toimax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),wcstol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstol_l) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__)
@@ -273,10 +277,6 @@ __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c3
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__LIBKCALL,c32toimax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),wcsto32_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcsto32_l) && (__SIZEOF_INTMAX_T__ == 4)
 __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),wcsto32_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE__wcstoimax_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__LIBKCALL,c32toimax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoimax_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE_DOS$_wcstoimax_l)
-__CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,c32toimax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/inttypes/wcstoimax_l.h>
 __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBKCALL c32toimax_l)(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoimax_l))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base, __locale); }
@@ -288,6 +288,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32toimax_l, __FORCELOCAL __ATTR_LEAF __ATTR_NON
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__LIBDCALL,c16toumax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstoumax_l)
 __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),wcstoumax_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE__wcstoumax_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__LIBDCALL,c16toumax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoumax_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE_DOS$_wcstoumax_l)
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstoul_l) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__LIBDCALL,c16toumax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),wcstoul_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstoul_l) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__)
@@ -324,10 +328,6 @@ __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__LIBDCALL,c16toumax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),wcstou32_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstou32_l) && (__SIZEOF_INTMAX_T__ == 4)
 __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),wcstou32_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE__wcstoumax_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__LIBDCALL,c16toumax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoumax_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE_DOS$_wcstoumax_l)
-__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c16toumax_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/inttypes/wcstoumax_l.h>
 __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBDCALL c16toumax_l)(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoumax_l))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base, __locale); }
@@ -339,6 +339,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16toumax_l, __FORCELOCAL __ATTR_LEAF __ATTR_NON
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__LIBKCALL,c32toumax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstoumax_l)
 __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),wcstoumax_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE__wcstoumax_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__LIBKCALL,c32toumax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoumax_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE_DOS$_wcstoumax_l)
+__CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstoul_l) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__LIBKCALL,c32toumax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),wcstoul_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstoul_l) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__)
@@ -375,10 +379,6 @@ __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__LIBKCALL,c32toumax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),wcstou32_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstou32_l) && (__SIZEOF_INTMAX_T__ == 4)
 __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),wcstou32_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE__wcstoumax_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__LIBKCALL,c32toumax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoumax_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE_DOS$_wcstoumax_l)
-__CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,c32toumax_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale),_wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/inttypes/wcstoumax_l.h>
 __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBKCALL c32toumax_l)(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoumax_l))((__WCHAR_TYPE__ const *)__nptr, (__WCHAR_TYPE__ **)__endptr, __base, __locale); }

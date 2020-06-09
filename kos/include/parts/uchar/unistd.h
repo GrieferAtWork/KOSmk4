@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29bcb08a */
+/* HASH CRC-32:0x5159c20b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -890,11 +890,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32lchown, __FORCELOCAL __ATTR_NONNULL((1)) int 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS
-#define __PIO_OFFSET     __FS_TYPE(pos)
-#define __PIO_OFFSET64   __pos64_t
+#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS */
-#define __PIO_OFFSET     __FS_TYPE(off)
-#define __PIO_OFFSET64   __off64_t
+#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 #if defined(__CRT_HAVE_wtruncate64) && defined(__USE_FILE_OFFSET64) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
@@ -921,12 +921,12 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate,(char16_t cons
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate,(char16_t const *__file, __PIO_OFFSET __length),DOS$wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_truncate64) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || defined(__CRT_HAVE_wtruncate) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)) && (__SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_HAVE_truncate64) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)) && (__SIZEOF_WCHAR_T__ == 2))
 #include <local/parts.wchar.unistd/wtruncate.h>
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBDCALL c16truncate)(char16_t const *__file, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtruncate))((__WCHAR_TYPE__ const *)__file, __length); }
-#elif defined(__CRT_HAVE_truncate64) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || (defined(__CRT_HAVE_wtruncate) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wtruncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)))
+#elif defined(__CRT_HAVE_truncate64) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)))
 #include <local/parts.wchar.unistd/c16truncate.h>
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -956,12 +956,12 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32truncate,(char32_t cons
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32truncate,(char32_t const *__file, __PIO_OFFSET __length),KOS$wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_truncate64) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || defined(__CRT_HAVE_wtruncate) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)) && (__SIZEOF_WCHAR_T__ == 4))
+#elif defined(__CRT_HAVE_truncate64) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)) && (__SIZEOF_WCHAR_T__ == 4))
 #include <local/parts.wchar.unistd/wtruncate.h>
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBKCALL c32truncate)(char32_t const *__file, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtruncate))((__WCHAR_TYPE__ const *)__file, __length); }
-#elif defined(__CRT_HAVE_truncate64) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || (defined(__CRT_HAVE_wtruncate) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wtruncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)))
+#elif defined(__CRT_HAVE_truncate64) || defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)))
 #include <local/parts.wchar.unistd/c32truncate.h>
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -992,12 +992,12 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate64,(char16_t co
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate64,(char16_t const *__file, __PIO_OFFSET64 __length),DOS$wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_wtruncate) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)) && (__SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)) && (__SIZEOF_WCHAR_T__ == 2))
 #include <local/parts.wchar.unistd/wtruncate64.h>
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBDCALL c16truncate64)(char16_t const *__file, __PIO_OFFSET64 __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtruncate64))((__WCHAR_TYPE__ const *)__file, __length); }
-#elif (defined(__CRT_HAVE_wtruncate) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wtruncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
+#elif defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
 #include <local/parts.wchar.unistd/c16truncate64.h>
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -1027,12 +1027,12 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32truncate64,(char32_t co
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32truncate64,(char32_t const *__file, __PIO_OFFSET64 __length),KOS$wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_wtruncate) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)) && (__SIZEOF_WCHAR_T__ == 4))
+#elif defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)) && (__SIZEOF_WCHAR_T__ == 4))
 #include <local/parts.wchar.unistd/wtruncate64.h>
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBKCALL c32truncate64)(char32_t const *__file, __PIO_OFFSET64 __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtruncate64))((__WCHAR_TYPE__ const *)__file, __length); }
-#elif (defined(__CRT_HAVE_wtruncate) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wtruncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
+#elif defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
 #include <local/parts.wchar.unistd/c32truncate64.h>
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */

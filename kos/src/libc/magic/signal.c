@@ -26,6 +26,8 @@
 %[define_replacement(sigset_t     = "struct __sigset_struct")]
 %[define_replacement(pid_t        = __pid_t)]
 %[define_replacement(timespec32   = __timespec32)]
+%[define_replacement(sig_atomic_t = __sig_atomic_t)]
+%[define_replacement(sig_t        = __sighandler_t)]
 %[define_replacement(timespec64   = __timespec64)]
 %[default_impl_section("{.text.crt.sched.signal|.text.crt.dos.sched.signal}")]
 
@@ -160,14 +162,15 @@ __NAMESPACE_STD_USING(size_t)
 %[insert:std]
 
 @@@param signo: One of `SIG*'
-[[std /*, dos_variant*/]] raise:(int signo) -> int;
+[[std /*, dos_variant*/]]
+int raise(int signo);
 
 __sysv_signal(*) = sysv_signal;
 
 %#ifdef __USE_GNU
 @@@param signo: One of `SIG*'
-[[export_alias(__sysv_signal)]]
-sysv_signal:(int signo, $sighandler_t handler) -> $sighandler_t;
+[[export_alias("__sysv_signal")]]
+$sighandler_t sysv_signal(int signo, $sighandler_t handler);
 %#endif /* __USE_GNU */
 
 
@@ -227,7 +230,8 @@ void sigreturn(struct sigcontext const *scp);
 $sighandler_t bsd_signal(int signo, $sighandler_t handler);
 
 @@@param signo: One of `SIG*'
-[[crt_name("__xpg_sigpause")]] int sigpause(int signo);
+[[crt_name("__xpg_sigpause")]]
+int sigpause(int signo);
 
 %#endif /* __USE_XOPEN */
 %
@@ -250,7 +254,7 @@ int sigfillset([[nonnull]] sigset_t *set) {
 	size_t cnt;
 	cnt = sizeof(__sigset_t) / sizeof(ulongptr_t);
 	while (cnt--)
-		set->@__val@[cnt] = ~(__ULONGPTR_TYPE__)0;
+		set->@__val@[cnt] = ~(ulongptr_t)0;
 	return 0;
 }
 
@@ -282,29 +286,32 @@ sigismember:([[nonnull]] sigset_t const *set, int signo) -> int {
 }
 
 @@@param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
-int sigprocmask(int how, sigset_t const *__restrict set, sigset_t *__restrict oset);
+int sigprocmask(int how, sigset_t const *set, sigset_t *oset);
 
 [[cp, export_alias("__sigsuspend")]]
 int sigsuspend([[nonnull]] sigset_t const *set);
 
 @@@param signo: One of `SIG*'
 [[export_alias("__sigaction"), decl_prefix(struct sigaction;)]]
-int sigaction(int signo, struct sigaction const *__restrict act, struct sigaction *__restrict oact);
+int sigaction(int signo, struct sigaction const *act, struct sigaction *oact);
 
-int sigpending([[nonnull]] sigset_t *set);
+int sigpending([[nonnull]] sigset_t *__restrict set);
 
 @@@param signo: One of `SIG*'
-[[cp]] int sigwait([[nonnull]] sigset_t const *__restrict set, [[nonnull]] int *__restrict signo);
+[[cp]]
+int sigwait([[nonnull]] sigset_t const *__restrict set,
+            [[nonnull]] int *__restrict signo);
 
 %#ifdef __USE_GNU
 [[ATTR_WUNUSED, ATTR_PURE, decl_include("<bits/sigset.h>")]]
-int sigisemptyset([[nonnull]] sigset_t const *set) {
+int sigisemptyset([[nonnull]] sigset_t const *__restrict set) {
 	size_t i;
 	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
 		if (set->@__val@[i])
 			return 0;
 	return 1;
 }
+
 [[decl_include("<bits/sigset.h>")]]
 int sigandset([[nonnull]] sigset_t *set,
               [[nonnull]] sigset_t const *left,
@@ -331,7 +338,7 @@ int sigorset([[nonnull]] sigset_t *set,
 int sigwaitinfo([[nonnull]] sigset_t const *__restrict set,
                 [[nullable]] siginfo_t *__restrict info);
 
-[[cp, ignore, nocrt, alias("sigtimedwait")]]
+[[cp, ignore, nocrt, alias("sigtimedwait"), doc_alias("sigtimedwait")]]
 int sigtimedwait32([[nonnull]] sigset_t const *__restrict set,
                    [[nullable]] siginfo_t *__restrict info,
                    [[nullable]] struct $timespec32 const *timeout);
@@ -339,25 +346,25 @@ int sigtimedwait32([[nonnull]] sigset_t const *__restrict set,
 [[cp, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("sigtimedwait64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("sigtimedwait")]]
-[[userimpl, requires(defined(__CRT_HAVE_sigtimedwait) || defined(__CRT_HAVE_sigtimedwait64))]]
+[[userimpl, requires($has_function(sigtimedwait32) || $has_function(sigtimedwait64))]]
 int sigtimedwait([[nonnull]] sigset_t const *__restrict set,
                  [[nullable]] siginfo_t *__restrict info,
                  [[nullable]] struct timespec const *timeout) {
-#ifdef __CRT_HAVE_sigtimedwait64
+@@pp_if $has_function(sigtimedwait64)@@
 	struct timespec64 tmv;
 	if (!timeout)
 		return sigtimedwait64(set, info, NULL);
 	tmv.tv_sec  = (__time64_t)timeout->tv_sec;
 	tmv.tv_nsec = timeout->tv_nsec;
 	return sigtimedwait64(set, info, NULL);
-#else /* __CRT_HAVE_sigtimedwait64 */
+@@pp_else@@
 	struct timespec32 tmv;
 	if (!timeout)
 		return sigtimedwait32(set, info, NULL);
 	tmv.tv_sec  = (__time32_t)timeout->tv_sec;
 	tmv.tv_nsec = timeout->tv_nsec;
 	return sigtimedwait32(set, info, NULL);
-#endif /* !__CRT_HAVE_sigtimedwait64 */
+@@pp_endif@@
 }
 
 @@@param signo: One of `SIG*'
@@ -365,11 +372,11 @@ int sigqueue($pid_t pid, int signo, union sigval const val);
 
 %#ifdef __USE_TIME64
 
-[time64_variant_of(sigtimedwait)]
-[[cp, userimpl, requires(defined(__CRT_HAVE_sigtimedwait))]]
-sigtimedwait64:([[nonnull]] sigset_t const *__restrict set,
-                [[nullable]] siginfo_t *__restrict info,
-                [[nullable]] struct $timespec64 const *timeout) -> int {
+[[time64_variant_of(sigtimedwait), doc_alias("sigtimedwait")]]
+[[cp, userimpl, requires_function(sigtimedwait32)]]
+int sigtimedwait64([[nonnull]] sigset_t const *__restrict set,
+                   [[nullable]] siginfo_t *__restrict info,
+                   [[nullable]] struct $timespec64 const *timeout) {
 	struct timespec32 tmv;
 	if (!timeout)
 		return sigtimedwait32(set, info, NULL);
@@ -385,10 +392,12 @@ sigtimedwait64:([[nonnull]] sigset_t const *__restrict set,
 %
 %#ifdef __USE_KOS
 @@@param signo: One of `SIG*'
-int sigqueueinfo($pid_t tgid, int signo, siginfo_t const *uinfo);
+int sigqueueinfo($pid_t tgid, int signo,
+                 [[nonnull]] siginfo_t const *uinfo);
 
 @@@param signo: One of `SIG*'
-int tgsigqueueinfo($pid_t tgid, $pid_t tid, int signo, siginfo_t const *uinfo);
+int tgsigqueueinfo($pid_t tgid, $pid_t tid, int signo,
+                   [[nonnull]] siginfo_t const *uinfo);
 %#endif /* __USE_KOS */
 
 %
@@ -400,9 +409,10 @@ int killpg($pid_t pgrp, int signo);
 %
 %#ifdef __USE_XOPEN2K8
 @@@param signo: One of `SIG*'
-void psignal(int signo, char const *s);
+void psignal(int signo, [[nullable]] char const *s);
 
-void psiginfo(siginfo_t const *pinfo, char const *s);
+void psiginfo([[nonnull]] siginfo_t const *pinfo,
+              [[nullable]] char const *s);
 %#endif /* __USE_XOPEN2K8 */
 
 %
@@ -410,8 +420,11 @@ void psiginfo(siginfo_t const *pinfo, char const *s);
 @@@param signo: One of `SIG*'
 int siginterrupt(int signo, int interrupt);
 
-int sigstack(struct sigstack *ss, struct sigstack *oss);
-int sigaltstack(struct sigaltstack const *__restrict ss, struct sigaltstack *__restrict oss);
+int sigstack([[nullable]] struct sigstack *ss,
+             [[nullable]] struct sigstack *oss);
+
+int sigaltstack([[nullable]] struct sigaltstack const *ss,
+                [[nullable]] struct sigaltstack *oss);
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 %
@@ -431,8 +444,23 @@ $sighandler_t sigset(int signo, $sighandler_t disp);
 %#endif /* __USE_XOPEN_EXTENDED */
 %
 
-[[ATTR_CONST]] int __libc_current_sigrtmin();
-[[ATTR_CONST]] int __libc_current_sigrtmax();
+[[ATTR_CONST, ATTR_WUNUSED]] int __libc_current_sigrtmin();
+[[ATTR_CONST, ATTR_WUNUSED]] int __libc_current_sigrtmax();
+
+/* TODO: Enable once the new magic is able to generate <local/...> headers. */
+//TODO:[[ATTR_CONST, ATTR_WUNUSED]]
+//TODO:[[requires(defined(__SIGRTMIN))]]
+//TODO:[[requires_include("<bits/signum-values.h>")]]
+//TODO:int __libc_current_sigrtmin() {
+//TODO:	return __SIGRTMIN;
+//TODO:}
+//TODO:
+//TODO:[[ATTR_CONST, ATTR_WUNUSED]]
+//TODO:[[requires(defined(__SIGRTMIN))]]
+//TODO:[[requires_include("<bits/signum-values.h>")]]
+//TODO:int __libc_current_sigrtmax() {
+//TODO:	return __SIGRTMAX;
+//TODO:}
 
 
 

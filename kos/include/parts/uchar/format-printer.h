@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d173e21 */
+/* HASH CRC-32:0x483dc925 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1366,7 +1366,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_vc32printf, __FORCELOCAL __ATTR_LIBC_PRIN
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBDCALL format_c16printf)(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __format, ...) __THROWS(...) __ASMNAME("format_wprintf");
+__LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBDCALL format_c16printf)(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __format, ...) __THROWS(...) __CASMNAME("format_wprintf");
 #elif defined(__CRT_HAVE_DOS$format_wprintf) && defined(__VLIBCCALL_IS_VLIBDCALL)
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
@@ -1729,7 +1729,7 @@ __NAMESPACE_LOCAL_USING(format_c16printf)
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBKCALL format_c32printf)(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __format, ...) __THROWS(...) __ASMNAME("format_wprintf");
+__LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBKCALL format_c32printf)(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __format, ...) __THROWS(...) __CASMNAME("format_wprintf");
 #elif defined(__CRT_HAVE_DOS$format_wprintf) && defined(__VLIBCCALL_IS_VLIBKCALL)
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these

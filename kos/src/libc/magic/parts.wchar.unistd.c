@@ -47,10 +47,10 @@ __SYSDECL_BEGIN
 [[wchar]] wlink(*) %{generate(str2wcs("link"))}
 [[wchar]] waccess(*) %{generate(str2wcs("access"))}
 
-[[wchar, crt_dosname("_wchdir")]] wchdir(*) %{generate(str2wcs("chdir"))}
+[[wchar, crt_dosname("_wchdir")]]  wchdir(*) %{generate(str2wcs("chdir"))}
 [[wchar, crt_dosname("_wgetcwd")]] wgetcwd(*) %{generate(str2wcs("getcwd"))}
 [[wchar, crt_dosname("_wunlink")]] wunlink(*) %{generate(str2wcs("unlink"))}
-[[wchar, crt_dosname("_wrmdir")]] wrmdir(*) %{generate(str2wcs("rmdir"))}
+[[wchar, crt_dosname("_wrmdir")]]  wrmdir(*) %{generate(str2wcs("rmdir"))}
 
 
 
@@ -61,83 +61,80 @@ weaccess(*) = weuidaccess;
 %#endif /* __USE_GNU */
 
 %#ifdef __USE_ATFILE
-[[wchar]] wfaccessat:(*) %{generate(str2wcs("faccessat"))}
-[[wchar]] wfchownat:(*) %{generate(str2wcs("fchownat"))}
-[[wchar]] wlinkat:(*) %{generate(str2wcs("linkat"))}
-[[wchar]] wsymlinkat:(*) %{generate(str2wcs("symlinkat"))}
-[[wchar]] wreadlinkat:(*) %{generate(str2wcs("readlinkat"))}
+[[wchar]] wfaccessat(*) %{generate(str2wcs("faccessat"))}
+[[wchar]] wfchownat(*) %{generate(str2wcs("fchownat"))}
+[[wchar]] wlinkat(*) %{generate(str2wcs("linkat"))}
+[[wchar]] wsymlinkat(*) %{generate(str2wcs("symlinkat"))}
+[[wchar]] wreadlinkat(*) %{generate(str2wcs("readlinkat"))}
 %#ifdef __USE_KOS
-[[wchar]] wfreadlinkat:(*) %{generate(str2wcs("freadlinkat"))}
+[[wchar]] wfreadlinkat(*) %{generate(str2wcs("freadlinkat"))}
 %#endif /* __USE_KOS */
-[[wchar]] wunlinkat:(*) %{generate(str2wcs("unlinkat"))}
+[[wchar]] wunlinkat(*) %{generate(str2wcs("unlinkat"))}
 %#endif /* __USE_ATFILE */
 
-[[wchar]] wlchown:(*) %{generate(str2wcs("lchown"))}
+[[wchar]] wlchown(*) %{generate(str2wcs("lchown"))}
 
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 %{
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS
-#define __PIO_OFFSET     __FS_TYPE(pos)
-#define __PIO_OFFSET64   __pos64_t
-#else
-#define __PIO_OFFSET     __FS_TYPE(off)
-#define __PIO_OFFSET64   __off64_t
-#endif
+#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS */
+#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 }
 
 [[wchar, no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(wtruncate64)]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(wtruncate)]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("wtruncate64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("wtruncate")]]
 wtruncate(*) %{generate(str2wcs("truncate"))}
 
-[[doc_alias(truncate), wchar, ignore, nocrt, alias(wtruncate)]]
-int wtruncate32($wchar_t const *file, $pos32_t length);
-
-%[define_str2wcs_replacement(truncate32 = wtruncate32)]
-
+[[wchar, ignore, nocrt, alias("wtruncate")]]
+wtruncate32(*) %{generate(str2wcs("truncate32"))}
 
 %#ifdef __USE_LARGEFILE64
 [[wchar, off64_variant_of(wtruncate)]]
-wtruncate64(*) %{generate(str2wcs(truncate64))}
+wtruncate64(*) %{generate(str2wcs("truncate64"))}
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
-[[wchar]] wsymlink:(*) %{generate(str2wcs("symlink"))}
-[[wchar]] wreadlink:(*) %{generate(str2wcs("readlink"))}
+[[wchar]] wsymlink(*) %{generate(str2wcs("symlink"))}
+[[wchar]] wreadlink(*) %{generate(str2wcs("readlink"))}
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 %
 %#if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
-[[wchar]] wgetlogin_r:(*) %{generate(str2wcs("getlogin_r"))}
+[[wchar]] wgetlogin_r(*) %{generate(str2wcs("getlogin_r"))}
 %#endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
-[[wchar]] wgethostname:(*) %{generate(str2wcs("gethostname"))}
+[[wchar]] wgethostname(*) %{generate(str2wcs("gethostname"))}
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 %
 %#ifdef __USE_MISC
-[[wchar]] wsetlogin:(*) %{generate(str2wcs("setlogin"))}
-[[wchar]] wsethostname:(*) %{generate(str2wcs("sethostname"))}
-[[wchar]] wgetdomainname:(*) %{generate(str2wcs("getdomainname"))}
-[[wchar]] wsetdomainname:(*) %{generate(str2wcs("setdomainname"))}
+[[wchar]] wsetlogin(*) %{generate(str2wcs("setlogin"))}
+[[wchar]] wsethostname(*) %{generate(str2wcs("sethostname"))}
+[[wchar]] wgetdomainname(*) %{generate(str2wcs("getdomainname"))}
+[[wchar]] wsetdomainname(*) %{generate(str2wcs("setdomainname"))}
 %#endif /* __USE_MISC */
 
 %
-%#if defined(__USE_MISC) || \
-%   (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
-[[wchar]] wchroot:(*) %{generate(str2wcs("chroot"))}
+%#if (defined(__USE_MISC) || \
+%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
+[[wchar]] wchroot(*) %{generate(str2wcs("chroot"))}
 %#endif /* ... */
 
 %
 %#if (defined(_EVERY_SOURCE) || \
 %     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
-[[wchar]] wctermid:(*) %{generate(str2wcs("ctermid"))}
+[[wchar]] wctermid(*) %{generate(str2wcs("ctermid"))}
 %#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 

@@ -623,13 +623,13 @@ done:
 [[if(__SIZEOF_LONG__ == __SIZEOF_OFF64_T__), alias("fseeko64", "_fseeki64")]]
 [[requires($has_function(crt_fseeko) || $has_function(crt_fseeko64))]]
 int fseek([[nonnull]] FILE *__restrict stream, long int off, int whence) {
-#if __SIZEOF_OFF64_T__ == __SIZEOF_LONG__ && (@@has_function(crt_fseeko64)@@)
+@@pp_if __SIZEOF_OFF64_T__ == __SIZEOF_LONG__ && $has_function(crt_fseeko64)@@
 	return crt_fseeko64(stream, (off64_t)off, whence);
-#elif (@@has_function(crt_fseeko)@@)
+@@pp_elif $has_function(crt_fseeko)@@
 	return crt_fseeko(stream, (off32_t)off, whence);
-#else
+@@pp_else@@
 	return crt_fseeko64(stream, (off64_t)off, whence);
-#endif
+@@pp_endif@@
 }
 
 @@Return the current in-file position of `STREAM' as a byte-offet from the start of the file
@@ -1142,7 +1142,7 @@ done:
 }
 
 
-%[default_impl_section(.text.crt.FILE.unlocked.read.utility)]
+%[default_impl_section(".text.crt.FILE.unlocked.read.utility")]
 @@Same as `feof()', but performs I/O without acquiring a lock to `STREAM'
 [[ATTR_WUNUSED]]
 int feof_unlocked([[nonnull]] $FILE *__restrict stream) = feof;
@@ -1398,7 +1398,7 @@ int putw(int w, [[nonnull]] $FILE *__restrict stream) {
 
 %
 %#if defined(__USE_GNU) || defined(__USE_DOS)
-%[default_impl_section(.text.crt.dos.FILE.utility)]
+%[default_impl_section(".text.crt.dos.FILE.utility")]
 @@Alias for `_fcloseall()'
 [[stdio_throws, export_alias("_fcloseall")]]
 int fcloseall();
@@ -1506,13 +1506,13 @@ int obstack_printf([[nonnull]] struct obstack *__restrict obstack_,
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fseeko_unlocked")]]
 [[userimpl, requires($has_function(crt_fseeko64) || $has_function(crt_fseeko) || $has_function(crt_fseek))]]
 int fseeko([[nonnull]] $FILE *__restrict stream, $off_t off, int whence) {
-@@if_has_function(crt_fseeko64)@@
+@@pp_if $has_function(crt_fseeko64)@@
 	return crt_fseeko64(stream, (off64_t)off, whence);
-@@elif_has_function(crt_fseeko)@@
+@@pp_elif $has_function(crt_fseeko)@@
 	return crt_fseeko(stream, (off32_t)off, whence);
-@@else_has_function@@
+@@pp_else@@
 	return crt_fseek(stream, (long int)off, whence);
-@@endif_has_function@@
+@@pp_endif@@
 }
 
 @@Return the current in-file position of `STREAM'
@@ -1594,12 +1594,12 @@ $off64_t ftello64([[nonnull]] $FILE *__restrict stream) {
 	if (crt_fgetpos64(stream, &pos))
 		return -1;
 	return (off64_t)pos;
-@@pp_elif_has_function(crt_fgetpos)@@
+@@pp_elif $has_function(crt_fgetpos)@@
 	pos32_t pos;
 	if (crt_fgetpos(stream, &pos))
 		return -1;
 	return (off64_t)(off32_t)pos;
-@@pp_elif_has_function(crt_ftello)@@
+@@pp_elif $has_function(crt_ftello)@@
 	return (off64_t)crt_ftello(stream);
 @@pp_else@@
 	return (off64_t)crt_ftell(stream);
@@ -1638,13 +1638,13 @@ $FILE *freopen64([[nonnull]] char const *__restrict filename,
 int fgetpos64([[nonnull]] $FILE *__restrict stream, [[nonnull]] fpos64_t *__restrict pos) {
 @@pp_if $has_function(crt_ftello64)@@
 	return (int64_t)(*pos = (fpos64_t)crt_ftello64(stream)) < 0 ? -1 : 0;
-@@pp_elif_has_function(crt_fgetpos)@@
+@@pp_elif $has_function(crt_fgetpos)@@
 	pos32_t pos32;
 	int result = crt_fgetpos(stream, &pos32);
 	if (!result)
 		*pos = (fpos64_t)pos32;
 	return result;
-@@pp_elif_has_function(crt_ftello)@@
+@@pp_elif $has_function(crt_ftello)@@
 	return (int64_t)(*pos = (fpos64_t)crt_ftello(stream)) < 0 ? -1 : 0;
 @@pp_else@@
 	return (int64_t)(*pos = (fpos64_t)crt_ftell(stream)) < 0 ? -1 : 0;
@@ -1705,7 +1705,8 @@ $ssize_t file_printer_unlocked([[nonnull]] /*FILE*/ void *arg,
 
 %
 %#ifdef __USE_GNU
-%[default_impl_section(.text.crt.heap.strdup)]
+%[default_impl_section(".text.crt.heap.strdup")]
+
 @@Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR'
 [[ATTR_LIBC_PRINTF(2, 3), ATTR_WUNUSED, impl_include("<hybrid/__assert.h>")]]
 [[userimpl, requires_function(format_aprintf_pack, format_aprintf_printer, free)]]
@@ -2105,57 +2106,51 @@ int fftruncate64_unlocked([[nonnull]] $FILE *__restrict stream, __PIO_OFFSET64 l
 %[default_impl_section(".text.crt.FILE.unlocked.write.printf")]
 [[cp_stdio, ATTR_LIBC_PRINTF(2, 0), alias("vfprintf", "vfprintf_s", "_IO_vfprintf")]]
 [[userimpl, requires_dependent_function(file_printer_unlocked)]]
-vfprintf_unlocked:([[nonnull]] $FILE *__restrict stream,
-                   [[nonnull]] char const *__restrict format,
-                   $va_list args) -> __STDC_INT_AS_SSIZE_T {
+__STDC_INT_AS_SSIZE_T vfprintf_unlocked([[nonnull]] $FILE *__restrict stream,
+                                        [[nonnull]] char const *__restrict format,
+                                        $va_list args) {
 	return (__STDC_INT_AS_SSIZE_T)format_vprintf(&file_printer_unlocked, stream, format, args);
 }
 
 [[cp_stdio, crtbuiltin, ATTR_LIBC_PRINTF(2, 3), alias("fprintf_s"), userimpl]]
-fprintf_unlocked:([[nonnull]] $FILE *__restrict stream,
-                  [[nonnull]] char const *__restrict format, ...)
-		-> __STDC_INT_AS_SSIZE_T
+__STDC_INT_AS_SSIZE_T fprintf_unlocked([[nonnull]] $FILE *__restrict stream,
+                                       [[nonnull]] char const *__restrict format, ...)
 	%{printf("vfprintf_unlocked")}
 
 [[cp_stdio, ATTR_LIBC_PRINTF(1, 0), alias("vprintf_s")]]
 [[userimpl, requires_function(vprintf)]]
-vprintf_unlocked:([[nonnull]] char const *__restrict format,
-                  $va_list args)
-		-> __STDC_INT_AS_SSIZE_T {
+__STDC_INT_AS_SSIZE_T vprintf_unlocked([[nonnull]] char const *__restrict format,
+                                       $va_list args) {
 	return vprintf(format, args);
 }
 
 [[cp_stdio, crtbuiltin, ATTR_LIBC_PRINTF(1, 2), alias("printf_s"), userimpl]]
-printf_unlocked:([[nonnull]] char const *__restrict format, ...)
-		-> __STDC_INT_AS_SSIZE_T 
+__STDC_INT_AS_SSIZE_T printf_unlocked([[nonnull]] char const *__restrict format, ...)
 	%{printf("vprintf_unlocked")}
 
-%[default_impl_section(.text.crt.FILE.unlocked.read.scanf)]
+%[default_impl_section(".text.crt.FILE.unlocked.read.scanf")]
+
 [[cp_stdio, ATTR_LIBC_SCANF(2, 0), ATTR_WUNUSED]]
 [[alias("_vfscanf", "_vfscanf_s", "_IO_vfscanf")]]
 [[userimpl, requires_function(vfscanf)]]
-vfscanf_unlocked:([[nonnull]] $FILE *__restrict stream,
-                  [[nonnull]] char const *__restrict format, $va_list args)
-		-> __STDC_INT_AS_SIZE_T {
+__STDC_INT_AS_SIZE_T vfscanf_unlocked([[nonnull]] $FILE *__restrict stream,
+                                      [[nonnull]] char const *__restrict format, $va_list args) {
 	return vfscanf(stream, format, args);
 }
 
 [[cp_stdio, ATTR_LIBC_SCANF(1, 0), ATTR_WUNUSED, alias("_vscanf")]]
 [[userimpl, requires_function(vscanf)]]
-vscanf_unlocked:([[nonnull]] char const *__restrict format, $va_list args)
-		-> __STDC_INT_AS_SIZE_T {
+__STDC_INT_AS_SIZE_T vscanf_unlocked([[nonnull]] char const *__restrict format, $va_list args) {
 	return vscanf(format, args);
 }
 
 [[cp_stdio, ATTR_LIBC_SCANF(2, 3), ATTR_WUNUSED, userimpl]]
-fscanf_unlocked:([[nonnull]] $FILE *__restrict stream,
-                 [[nonnull]] char const *__restrict format, ...)
-		-> __STDC_INT_AS_SIZE_T
+__STDC_INT_AS_SIZE_T fscanf_unlocked([[nonnull]] $FILE *__restrict stream,
+                                     [[nonnull]] char const *__restrict format, ...)
 	%{printf("vfscanf_unlocked")}
 
 [[cp_stdio, ATTR_LIBC_SCANF(1, 2), ATTR_WUNUSED, userimpl]]
-scanf_unlocked:([[nonnull]] char const *__restrict format, ...)
-		-> __STDC_INT_AS_SIZE_T
+__STDC_INT_AS_SIZE_T scanf_unlocked([[nonnull]] char const *__restrict format, ...)
 	%{printf("vscanf_unlocked")}
 
 %{
@@ -2236,7 +2231,9 @@ __NAMESPACE_STD_USING(FILE)
 %#define _CRT_DIRECTORY_DEFINED 1
 %[default_impl_section(".text.crt.dos.fs.modify")]
 %[insert:extern(unlink)]
-[[guard]] _unlink:([[nonnull]] char const *filename) -> int = unlink;
+
+[[guard]]
+int _unlink([[nonnull]] char const *filename) = unlink;
 %#endif /* !_CRT_DIRECTORY_DEFINED */
 
 
@@ -2249,8 +2246,8 @@ _pclose(*) = pclose;
 
 [[cp, ATTR_WUNUSED, section(".text.crt.dos.FILE.locked.access")]]
 [[userimpl, requires_function(fopen)]]
-_fsopen:([[nonnull]] char const *filename,
-         [[nonnull]] char const *modes, int sflag) -> $FILE * {
+$FILE *_fsopen([[nonnull]] char const *filename,
+               [[nonnull]] char const *modes, int sflag) {
 	(void)sflag;
 	return fopen(filename, modes);
 }
@@ -2276,7 +2273,7 @@ _fseeki64(*) = fseeko64;
 _ftelli64(*) = ftello64;
 
 %
-%[default_impl_section(.text.crt.dos.FILE.utility)];
+%[default_impl_section(".text.crt.dos.FILE.utility")];
 
 [[cp]] int _rmtmp();
 
@@ -2288,7 +2285,7 @@ int _filbuf([[nonnull]] $FILE *__restrict stream);
 int _flsbuf(int ch, [[nonnull]] $FILE *__restrict stream);
 
 %
-%[default_impl_section(.text.crt.dos.FILE.utility)];
+%[default_impl_section(".text.crt.dos.FILE.utility")];
 
 [[ATTR_WUNUSED]]
 int _getmaxstdio();
@@ -2311,26 +2308,26 @@ _vscanf(*) = vscanf;
 
 [[cp_stdio, ignore, ATTR_LIBC_SCANF(1, 3), ATTR_WUNUSED, export_alias("_vscanf_s_l")]]
 [[userimpl, requires_function(vscanf)]]
-_vscanf_l:([[nonnull]] char const *__restrict format,
-           $locale_t locale, $va_list args) -> __STDC_INT_AS_SIZE_T {
+__STDC_INT_AS_SIZE_T _vscanf_l([[nonnull]] char const *__restrict format,
+                               $locale_t locale, $va_list args) {
 	(void)locale;
 	return vscanf(format, args);
 }
 
 [[cp_stdio, ignore, ATTR_LIBC_SCANF(2, 4), ATTR_WUNUSED, export_alias("_vfscanf_s_l")]]
 [[userimpl, requires_function(vfscanf)]]
-_vfscanf_l:([[nonnull]] $FILE *__restrict stream,
-            [[nonnull]] char const *__restrict format,
-            $locale_t locale, $va_list args) -> __STDC_INT_AS_SIZE_T {
+__STDC_INT_AS_SIZE_T _vfscanf_l([[nonnull]] $FILE *__restrict stream,
+                                [[nonnull]] char const *__restrict format,
+                                $locale_t locale, $va_list args) {
 	(void)locale;
 	return vfscanf(stream, format, args);
 }
 
 [[ignore, ATTR_LIBC_SCANF(2, 4), ATTR_WUNUSED, export_alias("_vsscanf_s_l")]]
 [[requires_function(vsscanf), section(".text.crt.dos.unicode.locale.format.scanf")]]
-_vsscanf_l:([[nonnull]] char const *__restrict input,
-            [[nonnull]] char const *__restrict format,
-            $locale_t locale, $va_list args) -> __STDC_INT_AS_SIZE_T {
+__STDC_INT_AS_SIZE_T _vsscanf_l([[nonnull]] char const *__restrict input,
+                                [[nonnull]] char const *__restrict format,
+                                $locale_t locale, $va_list args) {
 	(void)locale;
 	return vsscanf(input, format, args);
 }
@@ -2349,8 +2346,8 @@ _vsscanf_l:([[nonnull]] char const *__restrict input,
 [[section(".text.crt.dos.unicode.static.format.scanf")]]
 [[dependency(unicode_readutf8_n, unicode_readutf8_rev)]]
 [[impl_include("<asm/stdio.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(
-#include <hybrid/typecore.h>
 struct __vsnscanf_data {
 	char const *__ptr;
 	char const *__end;
@@ -2369,8 +2366,8 @@ __LOCAL_LIBC(@vsnscanf_ungetc@) __SSIZE_TYPE__
 	return 0;
 }
 ), ATTR_WUNUSED, ATTR_LIBC_SCANF(3, 4)]]
-_vsnscanf:([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
-           [[nonnull]] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
+__STDC_INT_AS_SIZE_T _vsnscanf([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
+                               [[nonnull]] char const *__restrict format, $va_list args) {
 	struct @__vsnscanf_data@ data;
 	data.@__ptr@ = input;
 	data.@__end@ = input + inputlen;
@@ -2382,8 +2379,8 @@ _vsnscanf:([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
 [[ignore, ATTR_LIBC_SCANF(3, 5), export_alias("_vsnscanf_s_l")]]
 [[section(".text.crt.dos.unicode.locale.format.scanf")]]
 [[userimpl, requires_function(_vsnscanf)]]
-_vsnscanf_l:([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
-             [[nonnull]] char const *__restrict format, $locale_t locale, $va_list args) -> __STDC_INT_AS_SIZE_T {
+__STDC_INT_AS_SIZE_T _vsnscanf_l([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
+                                 [[nonnull]] char const *__restrict format, $locale_t locale, $va_list args) {
 	(void)locale;
 	return _vsnscanf(input, inputlen, format, args);
 }
@@ -2393,61 +2390,62 @@ _vsnscanf_l:([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
 %
 [[cp_stdio, ATTR_LIBC_SCANF(1, 3), export_alias("_scanf_s_l")]]
 [[userimpl, section(".text.crt.dos.FILE.locked.read.scanf")]]
-__STDC_INT_AS_SIZE_T
-_scanf_l([[nonnull]] char const *__restrict format, $locale_t locale, ...)
+__STDC_INT_AS_SIZE_T _scanf_l([[nonnull]] char const *__restrict format,
+                              $locale_t locale, ...)
 	%{printf("_vscanf_l")}
 
 [[cp_stdio, ATTR_LIBC_SCANF(2, 4), export_alias("_fscanf_s_l")]]
 [[userimpl, section(".text.crt.dos.FILE.locked.read.scanf")]]
-__STDC_INT_AS_SIZE_T
-_fscanf_l([[nonnull]] $FILE *__restrict stream,
-          [[nonnull]] char const *__restrict format, $locale_t locale, ...)
+__STDC_INT_AS_SIZE_T _fscanf_l([[nonnull]] $FILE *__restrict stream,
+                               [[nonnull]] char const *__restrict format, $locale_t locale, ...)
 	%{printf("_vfscanf_l")}
 
 
 [[section(".text.crt.dos.unicode.static.format.scanf")]]
 [[ATTR_LIBC_SCANF(3, 4), export_alias(_snscanf_s)]]
-__STDC_INT_AS_SIZE_T
-_snscanf([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
-         [[nonnull]] char const *__restrict format, ...)
+__STDC_INT_AS_SIZE_T _snscanf([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
+                              [[nonnull]] char const *__restrict format, ...)
 	%{printf("_vsnscanf")}
 
 [[section(".text.crt.dos.unicode.locale.format.scanf")]]
 [[ATTR_LIBC_SCANF(3, 5), export_alias("_snscanf_s_l"), userimpl]]
-__STDC_INT_AS_SIZE_T
-_snscanf_l([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
-           [[nonnull]] char const *__restrict format, $locale_t locale, ...)
+__STDC_INT_AS_SIZE_T _snscanf_l([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
+                                [[nonnull]] char const *__restrict format, $locale_t locale, ...)
 	%{printf("_vsnscanf_l")}
 
 [[cp_stdio, ATTR_LIBC_SCANF(1, 3), no_crt_impl]]
-__STDC_INT_AS_SIZE_T
-_scanf_s_l([[nonnull]] char const *__restrict format, $locale_t locale, ...)
+__STDC_INT_AS_SIZE_T _scanf_s_l([[nonnull]] char const *__restrict format,
+                                $locale_t locale, ...)
 	%{printf("_vscanf_s_l")}
 
 [[cp_stdio, ATTR_LIBC_SCANF(2, 4), no_crt_impl]]
-_sscanf_s_l:([[nonnull]] char const *__restrict input, [[nonnull]] char const *__restrict format, $locale_t locale, ...) -> __STDC_INT_AS_SIZE_T 
+__STDC_INT_AS_SIZE_T  _sscanf_s_l([[nonnull]] char const *__restrict input,
+                                  [[nonnull]] char const *__restrict format,
+                                  $locale_t locale, ...)
 	%{printf("_vsscanf_s_l")}
 
 [[cp_stdio, ATTR_LIBC_SCANF(2, 4), no_crt_impl]]
-_fscanf_s_l:([[nonnull]] $FILE *__restrict stream, [[nonnull]] char const *__restrict format, $locale_t locale, ...) -> __STDC_INT_AS_SIZE_T
+__STDC_INT_AS_SIZE_T _fscanf_s_l([[nonnull]] $FILE *__restrict stream,
+                                 [[nonnull]] char const *__restrict format,
+                                 $locale_t locale, ...)
 	%{printf("_vfscanf_s_l")}
 
 [[ATTR_LIBC_SCANF(3, 4), no_crt_impl]]
-_snscanf_s:([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
-            [[nonnull]] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+__STDC_INT_AS_SIZE_T _snscanf_s([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
+                                [[nonnull]] char const *__restrict format, ...)
 	%{printf("_vsnscanf_s")}
 
 [[ATTR_LIBC_SCANF(3, 5), no_crt_impl]]
-_snscanf_s_l:([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
-              [[nonnull]] char const *__restrict format, $locale_t locale, ...) -> __STDC_INT_AS_SIZE_T
+__STDC_INT_AS_SIZE_T _snscanf_s_l([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
+                                  [[nonnull]] char const *__restrict format, $locale_t locale, ...)
 	%{printf("_vsnscanf_s_l")}
 
 %
 [[ATTR_LIBC_PRINTF(2, 0)]]
 [[section(".text.crt.dos.unicode.locale.format.printf")]]
-_vsprintf_l:([[outp(return)]] char *__restrict buf,
-             [[nonnull]] char const *__restrict format,
-             $locale_t locale, $va_list args) -> __STDC_INT_AS_SIZE_T {
+__STDC_INT_AS_SIZE_T _vsprintf_l([[outp(return)]] char *__restrict buf,
+                                 [[nonnull]] char const *__restrict format,
+                                 $locale_t locale, $va_list args) {
 	(void)locale;
 	return vsprintf(buf, format, args);
 }
@@ -2456,8 +2454,8 @@ _vsprintf_s_l(*) = _vsnprintf_l;
 
 [[ATTR_LIBC_PRINTF_P(3, 0)]]
 [[section(".text.crt.dos.unicode.static.format.printf")]]
-_vsprintf_p:([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
-             [[nonnull]] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
+__STDC_INT_AS_SIZE_T _vsprintf_p([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
+                                 [[nonnull]] char const *__restrict format, $va_list args) {
 	(void)buf;
 	(void)bufsize;
 	(void)format;
@@ -2469,8 +2467,8 @@ _vsprintf_p:([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bu
 
 [[ATTR_LIBC_PRINTF_P(3, 0)]]
 [[section(".text.crt.dos.unicode.locale.format.printf")]]
-_vsprintf_p_l:([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
-               [[nonnull]] char const *__restrict format, $locale_t locale, $va_list args) -> __STDC_INT_AS_SIZE_T {
+__STDC_INT_AS_SIZE_T _vsprintf_p_l([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
+                                   [[nonnull]] char const *__restrict format, $locale_t locale, $va_list args) {
 	(void)locale;
 	return _vsprintf_p(buf, bufsize, format, args);
 }
@@ -2478,24 +2476,24 @@ _vsprintf_p_l:([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t 
 %
 %[default_impl_section(".text.crt.dos.unicode.locale.format.printf")]
 [[ATTR_LIBC_PRINTF(2, 4)]]
-_sprintf_l:([[outp(return)]] char *__restrict buf,
-            [[nonnull]] char const *__restrict format,
-            $locale_t locale, ...) -> __STDC_INT_AS_SIZE_T
+__STDC_INT_AS_SIZE_T _sprintf_l([[outp(return)]] char *__restrict buf,
+                                [[nonnull]] char const *__restrict format,
+                                $locale_t locale, ...)
 	%{printf("_vsprintf_l")}
 
 [[ATTR_LIBC_PRINTF(3, 5)]]
-_sprintf_s_l:([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
-              [[nonnull]] char const *__restrict format, $locale_t locale, ...) -> __STDC_INT_AS_SIZE_T
+__STDC_INT_AS_SIZE_T _sprintf_s_l([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
+                                  [[nonnull]] char const *__restrict format, $locale_t locale, ...)
 	%{printf("_vsprintf_s_l")}
 
 [[ATTR_LIBC_PRINTF_P(3, 4)]]
-_sprintf_p:([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
-            [[nonnull]] char const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+__STDC_INT_AS_SIZE_T _sprintf_p([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
+                                [[nonnull]] char const *__restrict format, ...)
 	%{printf("_vsprintf_p")}
 
 [[ATTR_LIBC_PRINTF_P(3, 5)]]
-_sprintf_p_l:([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
-              [[nonnull]] char const *__restrict format, $locale_t locale, ...) -> __STDC_INT_AS_SIZE_T
+__STDC_INT_AS_SIZE_T _sprintf_p_l([[outp_opt(min(return, bufsize))]] char *__restrict buf, $size_t bufsize,
+                                  [[nonnull]] char const *__restrict format, $locale_t locale, ...)
 	%{printf("_vsprintf_p_l")}
 
 %
@@ -2532,14 +2530,16 @@ __STDC_INT_AS_SIZE_T _vscprintf_p([[nonnull]] char const *__restrict format, $va
 
 [[ATTR_WUNUSED, ATTR_LIBC_PRINTF_P(1, 0)]]
 [[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _vscprintf_p_l([[nonnull]] char const *__restrict format, $locale_t locale, $va_list args) {
+__STDC_INT_AS_SIZE_T _vscprintf_p_l([[nonnull]] char const *__restrict format,
+                                    $locale_t locale, $va_list args) {
 	(void)locale;
 	return _vscprintf_p(format, args);
 }
 
 [[ATTR_WUNUSED, ATTR_LIBC_PRINTF(1, 3)]]
 [[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _scprintf_l([[nonnull]] char const *__restrict format, $locale_t locale, ...)
+__STDC_INT_AS_SIZE_T _scprintf_l([[nonnull]] char const *__restrict format,
+                                 $locale_t locale, ...)
 	%{printf("_vscprintf_l")}
 
 [[ATTR_WUNUSED, ATTR_LIBC_PRINTF_P(1, 2)]]
@@ -2549,7 +2549,8 @@ __STDC_INT_AS_SIZE_T _scprintf_p([[nonnull]] char const *__restrict format, ...)
 
 [[ATTR_WUNUSED, ATTR_LIBC_PRINTF_P(1, 3)]]
 [[section(".text.crt.dos.unicode.locale.format.printf")]]
-__STDC_INT_AS_SIZE_T _scprintf_p_l([[nonnull]] char const *__restrict format, $locale_t locale, ...)
+__STDC_INT_AS_SIZE_T _scprintf_p_l([[nonnull]] char const *__restrict format,
+                                   $locale_t locale, ...)
 	%{printf("_vscprintf_p_l")}
 
 %
@@ -2694,7 +2695,8 @@ __STDC_INT_AS_SIZE_T _vfprintf_p([[nonnull]] $FILE *__restrict stream,
 [[section(".text.crt.dos.unicode.locale.format.printf")]]
 [[cp_stdio, ATTR_LIBC_PRINTF_P(2, 0), userimpl, requires_function(_vfprintf_p)]]
 __STDC_INT_AS_SIZE_T _vfprintf_p_l([[nonnull]] $FILE *__restrict stream,
-                                   [[nonnull]] char const *__restrict format, $locale_t locale, $va_list args) {
+                                   [[nonnull]] char const *__restrict format,
+                                   $locale_t locale, $va_list args) {
 	(void)locale;
 	return _vfprintf_p(stream, format, args);
 }
@@ -2758,19 +2760,19 @@ errno_t clearerr_s([[nonnull]] $FILE *__restrict stream) {
 [[section(".text.crt.dos.FILE.locked.access")]]
 errno_t tmpfile_s([[nonnull]] $FILE **pstream) {
 	if (!pstream) {
-#ifdef EINVAL
+@@pp_ifdef EINVAL@@
 		return EINVAL;
-#else /* EINVAL */
+@@pp_else@@
 		return 1;
-#endif /* !EINVAL */
+@@pp_endif@@
 	}
 	*pstream = tmpfile();
 	if (!*pstream) {
-#ifdef ENOMEM
+@@pp_ifdef ENOMEM@@
 		return __libc_geterrno_or(ENOMEM);
-#else /* ENOMEM */
+@@pp_else@@
 		return __libc_geterrno_or(1);
-#endif /* !ENOMEM */
+@@pp_endif@@
 	}
 	return 0;
 }
@@ -2830,7 +2832,8 @@ void _wperror($wchar_t const *__restrict message);
 /*[nocrt]*/ _getchar_nolock(*) = getchar_unlocked;
 /*[nocrt]*/ _putchar_nolock(*) = putchar_unlocked;
 
-%[default_impl_section(".text.crt.dos.FILE.locked.utility")];
+%[default_impl_section(".text.crt.dos.FILE.locked.utility")]
+
 _lock_file(*) = flockfile;
 _unlock_file(*) = funlockfile;
 
@@ -2839,7 +2842,8 @@ _fflush_nolock:(*) = fflush_unlocked;
 _fread_nolock:(*) = fread_unlocked;
 _fwrite_nolock:(*) = fwrite_unlocked;
 
-%[default_impl_section(.text.crt.dos.FILE.unlocked.read.read)];
+%[default_impl_section(".text.crt.dos.FILE.unlocked.read.read")]
+
 [[cp_stdio, ATTR_WUNUSED, userimpl, requires_function(fread_unlocked)]]
 $size_t _fread_nolock_s([[outp(min(return * elemsize, elemcount * elemsize, bufsize))]] void *__restrict buf,
                         $size_t bufsize, $size_t elemsize, $size_t elemcount, [[nonnull]] $FILE *__restrict stream) {

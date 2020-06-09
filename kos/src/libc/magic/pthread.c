@@ -1233,7 +1233,7 @@ int pthread_rwlock_timedwrlock64([[nonnull]] pthread_rwlock_t *__restrict rwlock
 
 %
 @@Unlock RWLOCK
-pthread_rwlock_unlock:([[nonnull]] pthread_rwlock_t *rwlock) -> int;
+int pthread_rwlock_unlock([[nonnull]] pthread_rwlock_t *rwlock);
 
 %
 %/* Functions for handling read-write lock attributes. */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5e697a2 */
+/* HASH CRC-32:0xc15df674 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -730,7 +730,7 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCA
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __ASMNAME("KOS$format_wprintf");
+__LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_KOS("format_wprintf");
 #elif defined(__CRT_HAVE_DOS$format_wprintf) && __SIZEOF_WCHAR_T__ == 2
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
@@ -819,7 +819,7 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCA
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __ASMNAME("DOS$format_wprintf");
+__LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_DOS("format_wprintf");
 #else /* ... */
 #include <local/parts.wchar.format-printer/format_wprintf.h>
 /* Generic printf implementation

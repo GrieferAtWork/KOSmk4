@@ -1781,7 +1781,8 @@ DEFINE_TIME_ABBR_WDAY_NAMES
 DEFINE_TIME_ABBR_MONTH_NAMES
 @@pp_endif@@
 )]]
-asctime_r:([[nonnull]] __STRUCT_TM const *__restrict tp, [[nonnull]] char buf[26]) -> char * {
+char *asctime_r([[nonnull]] __STRUCT_TM const *__restrict tp,
+                [[nonnull]] char buf[26]) {
 @@pp_ifdef __BUILDING_LIBC@@
 	sprintf(buf,
 	        "%.3s %.3s%3u %.2u:%.2u:%.2u %u\n",
@@ -1795,7 +1796,7 @@ asctime_r:([[nonnull]] __STRUCT_TM const *__restrict tp, [[nonnull]] char buf[26
 	       (unsigned int)tp->@tm_sec@,
 	       (unsigned int)tp->@tm_year@ + 1900);
 	return buf;
-@@pp_elif_has_function(crt_asctime_s)@@
+@@pp_elif $has_function(crt_asctime_s)@@
 	return crt_asctime_s(buf, 26, tp) ? NULL : buf;
 @@pp_else@@
 	sprintf(buf,

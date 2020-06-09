@@ -241,7 +241,7 @@ $fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
 	va_start(args, oflags);
-@@pp_if_has_function(open64)@@
+@@pp_if $has_function(open64)@@
 	result = open64(filename, oflags, va_arg(args, mode_t));
 @@pp_else@@
 	result = openat(__CRT_AT_FDCWD, filename, oflags, va_arg(args, mode_t));
@@ -393,7 +393,7 @@ int posix_fallocate($fd_t fd, $off_t offset, $off_t length) {
 [[off64_variant_of(posix_fadvise), decl_include("<bits/types.h>")]]
 [[userimpl, section(".text.crt.io.large.utility")]]
 int posix_fadvise64($fd_t fd, $off64_t offset, $off64_t length, int advise) {
-@@pp_if_has_function(posix_fadvise32)@@
+@@pp_if $has_function(posix_fadvise32)@@
 	return posix_fadvise32(fd, ($off32_t)offset, ($off32_t)length, advise);
 @@pp_else@@
 	(void)fd;
@@ -407,7 +407,7 @@ int posix_fadvise64($fd_t fd, $off64_t offset, $off64_t length, int advise) {
 [[off64_variant_of(posix_fallocate), decl_include("<bits/types.h>")]]
 [[userimpl, section(".text.crt.io.large.utility")]]
 int posix_fallocate64($fd_t fd, $off64_t offset, $off64_t length) {
-@@pp_if_has_function(posix_fallocate32)@@
+@@pp_if $has_function(posix_fallocate32)@@
 	return posix_fallocate32(fd, ($off32_t)offset, ($off32_t)length);
 @@pp_else@@
 	(void)fd;
@@ -440,13 +440,13 @@ int lockf32($fd_t fd, int cmd, $off32_t length);
 [[decl_include("<bits/types.h>"), section(".text.crt.io.lock")]]
 [[userimpl, requires($has_function(lockf64) || $has_function(lockf32) || $has_function(crt_locking))]]
 int lockf($fd_t fd, int cmd, $off_t length) {
-@@if_has_function(lockf64)@@
+@@pp_if $has_function(lockf64)@@
 	return lockf64(fd, cmd, (off64_t)length);
-@@elif_has_function(lockf32)@@
+@@pp_elif $has_function(lockf32)@@
 	return lockf32(fd, cmd, (off32_t)length);
-@@elif_has_function(crt_locking)@@
+@@pp_elif $has_function(crt_locking)@@
 	return crt_locking(fd, cmd, (off32_t)length);
-@@endif_has_function(crt_locking)@@
+@@pp_endif@@
 }
 
 %#ifdef __USE_LARGEFILE64
@@ -454,7 +454,7 @@ int lockf($fd_t fd, int cmd, $off_t length) {
 [[decl_include("<bits/types.h>"), section(".text.crt.io.large.lock")]]
 [[userimpl, requires($has_function(lockf32) || $has_function(crt_locking))]]
 int lockf64($fd_t fd, int cmd, $off64_t length) {
-@@pp_if_has_function(lockf32)@@
+@@pp_if $has_function(lockf32)@@
 	return lockf32(fd, cmd, (off64_t)length);
 @@pp_else@@
 	return crt_locking(fd, cmd, (off32_t)length);

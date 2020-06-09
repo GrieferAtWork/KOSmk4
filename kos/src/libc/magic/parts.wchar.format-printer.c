@@ -177,7 +177,8 @@ $ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $s
 
 
 [[ATTR_CONST]]
-$ssize_t format_wlength(void *arg, wchar_t const *__restrict data, $size_t datalen) = format_length;
+$ssize_t format_wlength(void *arg, wchar_t const *__restrict data,
+                        $size_t datalen) = format_length;
 
 
 

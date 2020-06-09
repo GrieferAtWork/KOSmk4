@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(uid_t = __uid_t)]
-%[default_impl_section(.text.crt.io.stropts)]
+%[default_impl_section(".text.crt.io.stropts")]
 
 %{
 #include <features.h>

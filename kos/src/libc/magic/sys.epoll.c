@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.io.poll)]
+%[default_impl_section(".text.crt.io.poll")]
 
 %{
 #include <features.h>
@@ -158,12 +158,14 @@ struct __EPOLL_PACKED epoll_event {
 @@The "size" parameter is a hint specifying the number of file
 @@descriptors to be associated with the new instance. The fd
 @@returned by epoll_create() should be closed with close()
-[[ATTR_WUNUSED]] epoll_create:(int size) -> $fd_t;
+[[ATTR_WUNUSED]]
+$fd_t epoll_create(int size);
 
 @@Same as epoll_create but with an FLAGS parameter.
 @@The unused SIZE parameter has been dropped
 @@@param: flags: Set of `EPOLL_*'
-[[ATTR_WUNUSED]] epoll_create1:(int flags) -> $fd_t;
+[[ATTR_WUNUSED]]
+$fd_t epoll_create1(int flags);
 
 
 @@Manipulate an epoll instance "epfd". Returns 0 in case of success,
@@ -172,7 +174,8 @@ struct __EPOLL_PACKED epoll_event {
 @@constants defined above. The "fd" parameter is the target of the
 @@operation. The "event" parameter describes which events the caller
 @@is interested in and any associated user data
-epoll_ctl:($fd_t epfd, enum __epoll_ctl op, $fd_t fd, struct epoll_event *event) -> int;
+int epoll_ctl($fd_t epfd, enum __epoll_ctl op,
+              $fd_t fd, struct epoll_event *event);
 
 
 @@Wait for events on an epoll instance "epfd". Returns the number of
@@ -182,11 +185,15 @@ epoll_ctl:($fd_t epfd, enum __epoll_ctl op, $fd_t fd, struct epoll_event *event)
 @@events. The "maxevents" is the maximum number of events to be
 @@returned (usually size of "events"). The "timeout" parameter
 @@specifies the maximum wait time in milliseconds (-1 == infinite).
-[[cp]] epoll_wait:($fd_t epfd, struct epoll_event *events, int maxevents, int timeout) -> int;
+[[cp]]
+int epoll_wait($fd_t epfd, struct epoll_event *events,
+               int maxevents, int timeout);
 
 @@Same as epoll_wait, but the thread's signal mask is temporarily
 @@and atomically replaced with the one provided as parameter
-[[cp]] epoll_pwait:($fd_t epfd, struct epoll_event *events, int maxevents, int timeout, sigset_t const *ss) -> int;
+[[cp]]
+int epoll_pwait($fd_t epfd, struct epoll_event *events,
+                int maxevents, int timeout, sigset_t const *ss);
 
 
 

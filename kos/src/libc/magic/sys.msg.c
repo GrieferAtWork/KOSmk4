@@ -20,7 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(longptr_t = __LONGPTR_TYPE__)]
-%[default_impl_section(.text.crt.sched.msg)]
+%[default_impl_section(".text.crt.sched.msg")]
 
 %{
 
@@ -90,16 +90,20 @@ struct msgbuf {
 }
 
 @@Message queue control operation
-msgctl:(int msqid, int cmd, struct msqid_ds *buf) -> int;
+int msgctl(int msqid, int cmd, struct msqid_ds *buf);
 
 @@Get messages queue
-msgget:(key_t key, int msgflg) -> int;
+int msgget(key_t key, int msgflg);
 
 @@Receive message from message queue
-[[cp]] msgrcv:(int msqid, void *msgp, size_t msgsz, $longptr_t msgtyp, int msgflg) -> ssize_t;
+[[cp]]
+ssize_t msgrcv(int msqid, void *msgp, size_t msgsz,
+               $longptr_t msgtyp, int msgflg);
 
 @@Send message to message queue
-[[cp]] msgsnd:(int msqid, const void *msgp, size_t msgsz, int msgflg) -> int;
+[[cp]]
+int msgsnd(int msqid, const void *msgp,
+           size_t msgsz, int msgflg);
 
 %{
 

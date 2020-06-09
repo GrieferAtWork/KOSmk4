@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default_impl_section(.text.crt.utility.klog)]
+%[default_impl_section(".text.crt.utility.klog")]
 
 %{
 #include <features.h>
@@ -47,11 +47,10 @@ __SYSDECL_BEGIN
 
 }
 
-@@Control the kernel's logging facility.  This corresponds exactly to
-@@the kernel's syslog system call, but that name is easily confused
-@@with the user-level syslog facility, which is something completely
-@@different
-klogctl:(int type, char *bufp, int len) -> int;
+@@Control the kernel's logging facility.  This corresponds exactly to the
+@@kernel's syslog system call, but that name is easily confused with the
+@@user-level syslog facility, which is something completely different
+int klogctl(int type, char *bufp, int len);
 
 %{
 

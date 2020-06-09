@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.net.rpc)]
+%[default_impl_section(".text.crt.net.rpc")]
 
 %{
 #include <bits/types.h>
@@ -61,17 +61,35 @@ struct rpcent {
 
 }
 
-[[cp_kos]] setrpcent:(int stayopen);
-endrpcent:();
-[[cp_kos]] getrpcbyname:(char const *name) -> struct rpcent *;
-[[cp_kos]] getrpcbynumber:(int number) -> struct rpcent *;
-[[cp_kos]] getrpcent:() -> struct rpcent *;
+[[cp_kos]]
+void setrpcent(int stayopen);
+
+void endrpcent();
+
+[[cp_kos]]
+struct rpcent *getrpcbyname(char const *name);
+
+[[cp_kos]]
+struct rpcent *getrpcbynumber(int number);
+
+[[cp_kos]]
+struct rpcent *getrpcent();
+
 
 %
 %#ifdef __USE_MISC
-[[cp_kos]] getrpcbyname_r:(char const *name, struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result) -> int;
-[[cp_kos]] getrpcbynumber_r:(int number, struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result) -> int;
-[[cp_kos]] getrpcent_r:(struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result) -> int;
+[[cp_kos]]
+int getrpcbyname_r(char const *name, struct rpcent *result_buf,
+                   char *buffer, size_t buflen,
+                   struct rpcent **result);
+[[cp_kos]]
+int getrpcbynumber_r(int number, struct rpcent *result_buf,
+                     char *buffer, size_t buflen,
+                     struct rpcent **result);
+[[cp_kos]]
+int getrpcent_r(struct rpcent *result_buf,
+                char *buffer, size_t buflen,
+                struct rpcent **result);
 %#endif /* __USE_MISC */
 
 

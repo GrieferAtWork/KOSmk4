@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.database.utmpx)]
+%[default_impl_section(".text.crt.database.utmpx")]
 
 %{
 #include <features.h>
@@ -52,10 +52,10 @@ struct sgttyb;
 }
 
 @@Fill in *PARAMS with terminal parameters associated with FD
-gtty:($fd_t fd, [[nonnull]] struct sgttyb *params) -> int;
+int gtty($fd_t fd, [[nonnull]] struct sgttyb *params);
 
 @@Set the terminal parameters associated with FD to *PARAMS
-stty:($fd_t fd, [[nonnull]] struct sgttyb const *params)  -> int;
+int stty($fd_t fd, [[nonnull]] struct sgttyb const *params);
 
 %{
 #endif /* __CC__ */
