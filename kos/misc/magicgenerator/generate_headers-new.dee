@@ -261,6 +261,18 @@ function compileSystemHeaderSourceFile(filename: string, headerName: string) {
 }
 
 
+REMOVEME_localPathRedirections.update({
+	"parts.uchar.string"         : "wchar",
+	"parts.uchar.format-printer" : "parts.wchar.format-printer",
+	"parts.uchar.process"        : "parts.wchar.process",
+	"parts.uchar.stdio"          : "stdio",
+	"parts.uchar.stdlib"         : "parts.wchar.stdlib",
+	"parts.uchar.sys.stat"       : "sys.stat",
+	"parts.uchar.unistd"         : "parts.wchar.unistd",
+	"parts.uchar.utime"          : "parts.wchar.utime",
+});
+
+
 #if 1
 #define HEADER_TEST_WHITELIST HEADER_TEST_WHITELIST
 #define HEADER_PRINT_WHITELIST HEADER_PRINT_WHITELIST
@@ -276,26 +288,13 @@ global final HEADER_PRINT_WHITELIST: {string...} = {
 	"kos.sys.ioctl", "kos.sys.stat", "kos.unistd", "libgen",
 	"libio", "locale", "malloc", "math", "mntent", "monetary",
 	"net.if", "netdb", "netinet.ether", "netinet.in",
-//	"parts.uchar.fcntl",
-//	"parts.uchar.format-printer",
-//	"parts.uchar.inttypes",
-//	"parts.uchar.io",
-//	"parts.uchar.process",
-//	"parts.uchar.stdio",
-//	"parts.uchar.stdlib",
-//	"parts.uchar.string",
-//	"parts.uchar.sys.mman",
-//	"parts.uchar.sys.stat",
-//	"parts.uchar.time",
-//	"parts.uchar.unistd",
-//	"parts.uchar.utime",
-//	"parts.wchar.format-printer",
-//	"parts.wchar.process",
-//	"parts.wchar.stdio",
-//	"parts.wchar.stdlib",
-//	"parts.wchar.sys.stat",
-//	"parts.wchar.unistd",
-//	"parts.wchar.utime",
+	"parts.uchar.fcntl", "parts.uchar.format-printer",
+	"parts.uchar.inttypes", "parts.uchar.io", "parts.uchar.process",
+	"parts.uchar.stdio", "parts.uchar.stdlib", "parts.uchar.string",
+	"parts.uchar.sys.mman", "parts.uchar.sys.stat", "parts.uchar.time",
+	"parts.uchar.unistd", "parts.uchar.utime", "parts.wchar.format-printer",
+	"parts.wchar.process", "parts.wchar.stdio", "parts.wchar.stdlib",
+	"parts.wchar.sys.stat", "parts.wchar.unistd", "parts.wchar.utime",
 //	"process",
 //	"pthread",
 //	"pty",
@@ -362,7 +361,7 @@ global final HEADER_PRINT_WHITELIST: {string...} = {
 //	"threads",
 //	"time",
 //	"ttyent",
-//	"uchar",
+	"uchar",
 //	"ucontext",
 //	"ulimit",
 //	"unicode",
@@ -371,7 +370,7 @@ global final HEADER_PRINT_WHITELIST: {string...} = {
 //	"utmp",
 //	"utmpx",
 //	"vfork",
-//	"wchar",
+	"wchar",
 //	"wctype",
 };
 
@@ -439,7 +438,7 @@ global final HEADER_TEST_WHITELIST: {string...} = {
 //	"parts.wchar.sys.stat",
 	"parts.wchar.unistd",
 //	"parts.wchar.utime",
-//	"process",
+	"process",
 //	"pthread",
 //	"pty",
 //	"pwd",

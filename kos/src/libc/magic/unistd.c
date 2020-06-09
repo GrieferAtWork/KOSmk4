@@ -529,15 +529,15 @@ int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 @@return: * : The configuration limit associated with `NAME' for `PATH'
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
-[[cp]][section(".text.crt.fs.property")]
-pathconf:([[nonnull]] char const *path, int name) -> long int;
+[[cp, section(".text.crt.fs.property")]]
+long int pathconf([[nonnull]] char const *path, int name);
 
 %
 @@>> link(2)
 @@Create a hard link from `FROM', leading to `TO'
-[[cp]][noexport]
-[requires(defined(__CRT_AT_FDCWD) && $has_function(linkat))]
-link:([[nonnull]] char const *from, [[nonnull]] char const *to) -> int {
+[[cp]]
+[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(linkat))]]
+int link([[nonnull]] char const *from, [[nonnull]] char const *to) {
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */
 	return linkat(__CRT_AT_FDCWD, from, __CRT_AT_FDCWD, to, 0);
 }

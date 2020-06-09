@@ -20,7 +20,7 @@
 
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
-%[default_impl_section({.text.crt.wchar.string.format|.text.crt.dos.wchar.string.format})]
+%[default_impl_section("{.text.crt.wchar.string.format|.text.crt.dos.wchar.string.format}")]
 
 %{
 #include <features.h>
@@ -31,6 +31,7 @@
 #include <uchar.h>
 #endif /* !_UCHAR_H */
 #include <bits/uformat-printer.h>
+#include <kos/anno.h>
 
 __SYSDECL_BEGIN
 
@@ -57,29 +58,29 @@ typedef __pc32formatprinter pc32formatprinter;
 
 }
 
-format_c16repeat:(*) %{uchar(format_wrepeat)}
-format_c32repeat:(*) %{uchar(format_wrepeat)}
-format_c16escape:(*) %{uchar(format_wescape)}
-format_c32escape:(*) %{uchar(format_wescape)}
-format_c16hexdump:(*) %{uchar(format_whexdump)}
-format_c32hexdump:(*) %{uchar(format_whexdump)}
+format_c16repeat(*) %{uchar("format_wrepeat")}
+format_c32repeat(*) %{uchar("format_wrepeat")}
+format_c16escape(*) %{uchar("format_wescape")}
+format_c32escape(*) %{uchar("format_wescape")}
+format_c16hexdump(*) %{uchar("format_whexdump")}
+format_c32hexdump(*) %{uchar("format_whexdump")}
 
 %
 %
 %
 
-format_vc16printf:(*) %{uchar(format_vwprintf)}
-format_vc32printf:(*) %{uchar(format_vwprintf)}
-format_c16printf:(*) %{uchar(format_wprintf)}
-format_c32printf:(*) %{uchar(format_wprintf)}
+format_vc16printf(*) %{uchar("format_vwprintf")}
+format_vc32printf(*) %{uchar("format_vwprintf")}
+format_c16printf(*) %{uchar("format_wprintf")}
+format_c32printf(*) %{uchar("format_wprintf")}
 
 %
 %
 %
-format_c16sprintf_printer:(/*char16_t ***/ void *arg, char16_t const *__restrict data, $size_t datalen) -> $ssize_t
-	%{uchar(format_wsprintf_printer)}
-format_c32sprintf_printer:(/*char32_t ***/ void *arg, char32_t const *__restrict data, $size_t datalen) -> $ssize_t
-	%{uchar(format_wsprintf_printer)}
+$ssize_t format_c16sprintf_printer(/*char16_t ***/ void *arg, char16_t const *__restrict data, $size_t datalen)
+	%{uchar("format_wsprintf_printer")}
+$ssize_t format_c32sprintf_printer(/*char32_t ***/ void *arg, char32_t const *__restrict data, $size_t datalen)
+	%{uchar("format_wsprintf_printer")}
 
 
 %{
@@ -106,11 +107,11 @@ struct format_c32snprintf_data {
 
 }
 
-format_c16snprintf_printer:(*) %{uchar(format_wsnprintf_printer)}
-format_c32snprintf_printer:(*) %{uchar(format_wsnprintf_printer)}
+format_c16snprintf_printer(*) %{uchar("format_wsnprintf_printer")}
+format_c32snprintf_printer(*) %{uchar("format_wsnprintf_printer")}
 
-format_c16width(*) %{uchar(format_wwidth)}
-format_c32width(*) %{uchar(format_wwidth)}
+format_c16width(*) %{uchar("format_wwidth")}
+format_c32width(*) %{uchar("format_wwidth")}
 
 $ssize_t format_c16length(void *arg, char16_t const *__restrict data, $size_t datalen) = format_length;
 $ssize_t format_c32length(void *arg, char32_t const *__restrict data, $size_t datalen) = format_length;
@@ -190,12 +191,12 @@ struct format_c32aprintf_data {
 }
 
 
-format_c16aprintf_pack:(*) %{uchar(format_waprintf_pack)}
-format_c32aprintf_pack:(*) %{uchar(format_waprintf_pack)}
-format_c16aprintf_alloc:(*) %{uchar(format_waprintf_alloc)}
-format_c32aprintf_alloc:(*) %{uchar(format_waprintf_alloc)}
-format_c16aprintf_printer:(*) %{uchar(format_waprintf_printer)}
-format_c32aprintf_printer:(*) %{uchar(format_waprintf_printer)}
+format_c16aprintf_pack(*) %{uchar("format_waprintf_pack")}
+format_c32aprintf_pack(*) %{uchar("format_waprintf_pack")}
+format_c16aprintf_alloc(*) %{uchar("format_waprintf_alloc")}
+format_c32aprintf_alloc(*) %{uchar("format_waprintf_alloc")}
+format_c16aprintf_printer(*) %{uchar("format_waprintf_printer")}
+format_c32aprintf_printer(*) %{uchar("format_waprintf_printer")}
 
 
 

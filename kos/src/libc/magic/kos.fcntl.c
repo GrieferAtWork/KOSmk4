@@ -108,7 +108,7 @@ $fd_t OpenAt32($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, .
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(OpenAt)]]
 [[userimpl, requires($has_function(OpenAt32) || $has_function(OpenAt64)), throws]]
 [[impl_include("<bits/fcntl.h>")]]
-OpenAt:($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) -> $fd_t {
+$fd_t OpenAt($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
 	va_start(args, oflags);
@@ -120,12 +120,13 @@ OpenAt:($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) -> 
 	va_end(args);
 	return result;
 }
+
 %#ifdef __USE_LARGEFILE64
-[[cp, guard]][noexport][vartypes($mode_t)][[ATTR_WUNUSED]]
-[largefile64_variant_of(OpenAt)][[throws]]
-[requires($has_function(OpenAt32))]
-[decl_include("<bits/types.h>")]
-OpenAt64:($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) -> $fd_t {
+[[cp, throws, guard, ATTR_WUNUSED, vartypes($mode_t)]]
+[[largefile64_variant_of(OpenAt), doc_alias("OpenAt")]]
+[[decl_include("<bits/types.h>")]]
+[[userimpl, requires($has_function(OpenAt32))]]
+$fd_t OpenAt64($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
 	va_start(args, oflags);

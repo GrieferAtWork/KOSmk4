@@ -29,7 +29,7 @@
 __SYSDECL_BEGIN
 
 typedef __SSIZE_TYPE__ (__LIBDCALL *__pc16formatprinter)(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen);
-typedef __SSIZE_TYPE__ (__LIBCCALL *__pc32formatprinter)(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen);
+typedef __SSIZE_TYPE__ (__LIBKCALL *__pc32formatprinter)(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen);
 
 __SYSDECL_END
 #endif /* __CC__ */

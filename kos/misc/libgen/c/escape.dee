@@ -1087,7 +1087,7 @@ function scanForNamesOfDependentFunctions(
 			usedPrototype = usedPrototype();
 		/* Always include forced dependencies */
 		for (local dep: forcedDependencies)
-			yield dep;
+			yield (str(dep), dep);
 		/* Check if we're supposed to do automatic dependency scanning? */
 		if (noAutoDependencyScanning)
 			return;

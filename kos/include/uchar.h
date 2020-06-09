@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e586dc0 */
+/* HASH CRC-32:0xbdf911ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,36 +98,36 @@ typedef __CHAR32_TYPE__ char32_t;
 __NAMESPACE_STD_BEGIN
 #ifdef __CRT_HAVE_mbrtoc16
 __CDECLARE(,size_t,__NOTHROW_NCX,mbrtoc16,(char16_t *__restrict __pc16, char const *__restrict __s, size_t __n, __mbstate_t *__restrict __mbs),(__pc16,__s,__n,__mbs))
-#else /* LIBC: mbrtoc16 */
+#else /* __CRT_HAVE_mbrtoc16 */
 __NAMESPACE_STD_END
 #include <local/uchar/mbrtoc16.h>
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(mbrtoc16, __FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc16)(char16_t *__restrict __pc16, char const *__restrict __s, size_t __n, __mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtoc16))(__pc16, __s, __n, __mbs); })
-#endif /* mbrtoc16... */
+#endif /* !__CRT_HAVE_mbrtoc16 */
 #ifdef __CRT_HAVE_mbrtoc32
 __CDECLARE(,size_t,__NOTHROW_NCX,mbrtoc32,(char32_t *__restrict __pc32, char const *__restrict __s, size_t __n, __mbstate_t *__restrict __mbs),(__pc32,__s,__n,__mbs))
-#else /* LIBC: mbrtoc32 */
+#else /* __CRT_HAVE_mbrtoc32 */
 __NAMESPACE_STD_END
 #include <local/uchar/mbrtoc32.h>
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(mbrtoc32, __FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc32)(char32_t *__restrict __pc32, char const *__restrict __s, size_t __n, __mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtoc32))(__pc32, __s, __n, __mbs); })
-#endif /* mbrtoc32... */
+#endif /* !__CRT_HAVE_mbrtoc32 */
 #ifdef __CRT_HAVE_c16rtomb
 __CDECLARE(,size_t,__NOTHROW_NCX,c16rtomb,(char *__restrict __s, char16_t __c16, __mbstate_t *__restrict __mbs),(__s,__c16,__mbs))
-#else /* LIBC: c16rtomb */
+#else /* __CRT_HAVE_c16rtomb */
 __NAMESPACE_STD_END
 #include <local/uchar/c16rtomb.h>
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16rtomb, __FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL c16rtomb)(char *__restrict __s, char16_t __c16, __mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16rtomb))(__s, __c16, __mbs); })
-#endif /* c16rtomb... */
+#endif /* !__CRT_HAVE_c16rtomb */
 #ifdef __CRT_HAVE_c32rtomb
 __CDECLARE(,size_t,__NOTHROW_NCX,c32rtomb,(char *__restrict __s, char32_t __c32, __mbstate_t *__restrict __mbs),(__s,__c32,__mbs))
-#else /* LIBC: c32rtomb */
+#else /* __CRT_HAVE_c32rtomb */
 __NAMESPACE_STD_END
 #include <local/uchar/c32rtomb.h>
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32rtomb, __FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL c32rtomb)(char *__restrict __s, char32_t __c32, __mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32rtomb))(__s, __c32, __mbs); })
-#endif /* c32rtomb... */
+#endif /* !__CRT_HAVE_c32rtomb */
 __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 __NAMESPACE_STD_USING(mbrtoc16)
@@ -144,55 +144,55 @@ __SYSDECL_END
 
 #if defined(_STRING_H) && !defined(_PARTS_UCHAR_STRING_H)
 #include <parts/uchar/string.h>
-#endif
+#endif /* _STRING_H && !_PARTS_UCHAR_STRING_H */
 
 #if defined(_PROCESS_H) && !defined(_PARTS_UCHAR_PROCESS_H)
 #include <parts/uchar/process.h>
-#endif
+#endif /* _PROCESS_H && !_PARTS_UCHAR_PROCESS_H */
 
 #if defined(_STDLIB_H) && !defined(_PARTS_UCHAR_STDLIB_H)
 #include <parts/uchar/stdlib.h>
-#endif
+#endif /* _STDLIB_H && !_PARTS_UCHAR_STDLIB_H */
 
 #if defined(_FCNTL_H) && !defined(_PARTS_UCHAR_FCNTL_H)
 #include <parts/uchar/fcntl.h>
-#endif
+#endif /* _FCNTL_H && !_PARTS_UCHAR_FCNTL_H */
 
 #if defined(_UNISTD_H) && !defined(_PARTS_UCHAR_UNISTD_H)
 #include <parts/uchar/unistd.h>
-#endif
+#endif /* _UNISTD_H && !_PARTS_UCHAR_UNISTD_H */
 
 #if defined(_UTIME_H) && !defined(_PARTS_UCHAR_UTIME_H)
 #include <parts/uchar/utime.h>
-#endif
+#endif /* _UTIME_H && !_PARTS_UCHAR_UTIME_H */
 
 #if defined(_FORMAT_PRINTER_H) && !defined(_PARTS_UCHAR_FORMATPRINTER_H)
 #include <parts/uchar/format-printer.h>
-#endif
+#endif /* _FORMAT_PRINTER_H && !_PARTS_UCHAR_FORMATPRINTER_H */
 
 #if defined(_IO_H) && !defined(_PARTS_UCHAR_IO_H)
 #include <parts/uchar/io.h>
-#endif
+#endif /* _IO_H && !_PARTS_UCHAR_IO_H */
 
 #if defined(_STDIO_H) && !defined(_PARTS_UCHAR_STDIO_H)
 #include <parts/uchar/stdio.h>
-#endif
+#endif /* _STDIO_H && !_PARTS_UCHAR_STDIO_H */
 
 #if defined(_TIME_H) && !defined(_PARTS_UCHAR_TIME_H)
 #include <parts/uchar/time.h>
-#endif
+#endif /* _TIME_H && !_PARTS_UCHAR_TIME_H */
 
 #if defined(_SYS_STAT_H) && !defined(_PARTS_UCHAR_SYS_STAT_H)
 #include <parts/uchar/sys/stat.h>
-#endif
+#endif /* _SYS_STAT_H && !_PARTS_UCHAR_SYS_STAT_H */
 
 #if defined(_SYS_MMAN_H) && !defined(_PARTS_UCHAR_SYS_MMAN_H)
 #include <parts/uchar/sys/mman.h>
-#endif
+#endif /* _SYS_MMAN_H && !_PARTS_UCHAR_SYS_MMAN_H */
 
 #if defined(_INTTYPES_H) && !defined(_PARTS_UCHAR_INTTYPES_H)
 #include <parts/uchar/inttypes.h>
-#endif
+#endif /* _INTTYPES_H && !_PARTS_UCHAR_INTTYPES_H */
 
 #endif /* __USE_UTF */
 

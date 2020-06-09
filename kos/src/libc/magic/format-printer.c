@@ -115,7 +115,7 @@ $ssize_t format_repeat([[nonnull]] pformatprinter printer, void *arg,
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
 	ssize_t result, temp;
-#ifdef __hybrid_alloca
+@@pp_ifdef __hybrid_alloca@@
 	char *buffer;
 	if likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
 		buffer = (char *)__hybrid_alloca(num_repetitions);
@@ -124,14 +124,14 @@ $ssize_t format_repeat([[nonnull]] pformatprinter printer, void *arg,
 	}
 	buffer = (char *)__hybrid_alloca(FORMAT_REPEAT_BUFSIZE);
 	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
-#else /* __hybrid_alloca */
+@@pp_else@@
 	char buffer[FORMAT_REPEAT_BUFSIZE];
 	if likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
 		__libc_memsetc(buffer, ch, num_repetitions, __SIZEOF_CHAR__);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
 	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
-#endif /* !__hybrid_alloca */
+@@pp_endif@@
 	result = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
 	if unlikely(result < 0)
 		goto done;
@@ -517,7 +517,7 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' },
 		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' },
 	};
-#endif
+#endif /* !DECIMALS_SELECTOR */
 	__PRIVATE char const lf[1] = { '\n' };
 	@char@ const *dec;
 	byte_t const *line_data;

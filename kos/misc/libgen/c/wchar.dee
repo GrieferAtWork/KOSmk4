@@ -28,7 +28,7 @@ import Function from .cheaders;
 global WcharFunction;
 
 @@Replacements for wchar-related keywords
-global final wcharReplacementEscapes: {string: (string, string)} = Dict({
+global wcharReplacementEscapes: {string: (string, string)} = Dict({
 	"wchar_t"            : ("char16_t", "char32_t"),
 	"__wchar_t"          : ("__char16_t", "__char32_t"),
 	"__WCHAR_TYPE__"     : ("__CHAR16_TYPE__", "__CHAR32_TYPE__"),
@@ -40,7 +40,7 @@ global final wcharReplacementEscapes: {string: (string, string)} = Dict({
 });
 
 @@Replacements for wchar-related headers
-global final wcharReplacementHeaders: {string: (string, string)} = Dict({
+global wcharReplacementHeaders: {string: (string, string)} = Dict({
 	"<bits/wformat-printer.h>"       : ("<bits/uformat-printer.h>",       "<bits/uformat-printer.h>"),
 	"<parts/wchar/format-printer.h>" : ("<parts/uchar/format-printer.h>", "<parts/uchar/format-printer.h>"),
 	"<parts/wchar/process.h>"        : ("<parts/uchar/process.h>",        "<parts/uchar/process.h>"),

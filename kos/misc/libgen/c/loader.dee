@@ -19,6 +19,7 @@
  */
 
 import * from deemon;
+import * from errors;
 import * from .cheaders;
 import * from .parser;
 import * from .escape;
@@ -843,7 +844,7 @@ class FunctionFeatures {
 	this = default;
 
 	/* Declaration features */
-	public member decl: UserString | string = "__LIBC";              /* [decl(...)]             Declaration prefix */
+	public member decl: UserString | string = DEFAULT_DECL;          /* [decl(...)]             Declaration prefix */
 	public member std: bool = false;                                 /* [[std]]                   Expose as part of the std:: namespace */
 	public member namespaces: {string...} = ("",);                   /* [[no_]ignore]           Namespaces from which to import the function */
 	public member libc: bool = false;                                /* [[no_]libc]             Export in <libc/string.h> */
@@ -925,8 +926,8 @@ class FunctionFeatures {
 		@@Simple annotations that only entail setting the value of some field.
 		@@This is a mapping of: @(tagName: (fieldName, toBeAssignedValue))
 		final local SIMPLE_SETFIELD_ANNOTATIONS: {string: (string, Object)} = {
-			"nodecl"                      : ("decl", "__LIBC"),
-			"no_decl"                     : ("decl", "__LIBC"),
+			"nodecl"                      : ("decl", "__LIBC" /*DEFAULT_DECL*/),
+			"no_decl"                     : ("decl", "__LIBC" /*DEFAULT_DECL*/),
 			"ignore"                      : ("namespaces", ()),
 			"no_ignore"                   : ("namespaces", ("",)),
 			"libc"                        : ("libc", true),
@@ -969,8 +970,6 @@ class FunctionFeatures {
 			"no_crt_self_import"          : ("crt_noSelfImport", true),
 			"crt_self_export"             : ("crt_noSelfExport", false),
 			"no_crt_self_export"          : ("crt_noSelfExport", true),
-			"noexport"                    : ("crt_userimpl", true), /* TODO: Deprecated */
-			"export"                      : ("crt_userimpl", false), /* TODO: Deprecated */
 			"userimpl"                    : ("crt_userimpl", true),
 			"no_userimpl"                 : ("crt_userimpl", false),
 			"kernel"                      : ("crt_kernel", true),
@@ -1207,8 +1206,6 @@ class FunctionFeatures {
 				self.skip(")");
 			}
 			break;
-
-//	TODO: guardNames
 
 		case "exposed_name":
 			if (ppCond !is none)
@@ -3457,7 +3454,7 @@ got_chkExpr:
 									"vprintf"        : vprintfFunctionName,
 								}),
 								name: currentName,
-								dependencies: { [] -> findFunctionByName(vprintfFunctionName) }),
+								dependencies: { vprintfFunctionName : vprintfFunctionName }),
 							ppCond: "$has_function({})".format({ vprintfFunctionName }));
 					}
 					loaderImpl = getLoaderFunctionImplementation;
@@ -3738,10 +3735,25 @@ got_chkExpr:
 							"Duplicate declaration of %{{uchar{}}} variant of [[wchar]] function {!r}"
 							.format({ WCHAR_REPLACEMENT_WIDTH[mode], wcsFunctionName }));
 					}
+					function getWcharFunction(): Function {
+						try {
+							return wcharFunction.wc_func;
+						} catch (UnboundAttribute) {
+							self.errAt(currentNameTokStart,
+								"%{{uchar{}}}-function {!r} uses missing [[wchar]] function {!r}"
+								.format({ WCHAR_REPLACEMENT_WIDTH[mode], currentName, wcsFunctionName }));
+						}
+					}
+					if (current.documentation is string && !current.documentation) {
+						/* Automatically inherit the documentation from @wcharFunction */
+						current.documentation = [](): string {
+							return getWcharFunction().documentationString;
+						};
+					}
 					/* Lazily construct function bindings upon first access */
 					current.bindings = [](): {FunctionBinding...} {
 						@@The referenced [[wchar]]-Function
-						local wc: Function = wcharFunction.wc_func;
+						local wc: Function = getWcharFunction();
 						@@The Xchar-function implementation
 						local xc: XcharImplementation = wcharFunction
 							.getXCharImplementation(currentName, mode);
@@ -3755,6 +3767,7 @@ got_chkExpr:
 						/* Enumerate bindings of the underlying [[wchar]] Function to construct
 						 * new, transformed bindings for our new the Xchar function. */
 						local basicBindings = [];
+						local mySize = WCHAR_REPLACEMENT_SIZE[mode];
 						for (local wc_bind/*:FunctionBinding*/ : wc.functionBindings) {
 							local wc_bind_binding = wc_bind.functionBinding;
 							/* Ignore namespace bindings (though we could theoretically bind these as well...) */
@@ -3780,7 +3793,178 @@ got_chkExpr:
 							 * >> }
 							 * >> basicBindings.append(FunctionBinding(myCond, TRANSFORM(wc_bind_binding), ...));
 							 */
-							/* TODO */
+							local wc_bindCond = str(wc_bind.ppCond);
+							local myCond: string;
+							local myCondRequiresMySize: bool;
+							if ("__SIZEOF_WCHAR_T__" !in wc_bindCond) {
+								/* Binding makes no mention of WCHAR-size -> Append our requirement */
+								myCond = "{} && (__SIZEOF_WCHAR_T__ == {})"
+									.format({ wc_bindCond, mySize });
+								myCondRequiresMySize = true;
+							} else {
+								/* Scan the different usage cases of __SIZEOF_WCHAR_T__
+								 * XXX: This is imperfect! (See the above comment for
+								 *      what should ~actually~ be happening here!) */
+								local len = #wc_bindCond;
+								local flushStart = 0;
+								local i = 0;
+								myCond = File.Writer();
+								for (;;) {
+									i = wc_bindCond.find("__SIZEOF_WCHAR_T__", i);
+									if (i < 0)
+										break;
+									local e = i + 18;
+									while (i > flushStart && wc_bindCond.isspace(i - 1))
+										--i;
+									while (e < len && wc_bindCond.isspace(e))
+										++e;
+									local how = wc_bindCond.substr(e, e + 2);
+									local what;
+									if (how in ["==", "!="]) {
+										e += 2;
+										while (e < len && wc_bindCond.isspace(e))
+											++e;
+										local whatStart = e;
+										while (e < len && wc_bindCond.isalnum(e))
+											++e;
+										what = wc_bindCond[whatStart:e];
+									} else {
+										if (i < 2)
+											goto wc_bind_continue_scan_bindings;
+										how = wc_bindCond.substr(i - 2, i);
+										if (how !in ["==", "!="])
+											goto wc_bind_continue_scan_bindings;
+										i -= 2;
+										while (i > flushStart && wc_bindCond.isspace(i - 1))
+											--i;
+										local whatEnd = i;
+										while (i > flushStart && wc_bindCond.isalnum(i - 1))
+											--i;
+										what = wc_bindCond[i:whatEnd];
+									}
+									try {
+										what = int(what);
+									} catch (...) {
+										goto wc_bind_continue_scan_bindings;
+									}
+									if (how == "==") {
+										if (what != mySize)
+											goto wc_bind_continue_scan_bindings;
+									} else {
+										if (what == mySize)
+											goto wc_bind_continue_scan_bindings;
+									}
+									for (;;) {
+										while (i > flushStart && e < len &&
+										       wc_bindCond[i - 1] == "(" &&
+										       wc_bindCond[e] == ")") {
+											--i;
+											++e;
+										}
+										if (i > flushStart && wc_bindCond.isspace(i - 1)) {
+											--i;
+											continue;
+										}
+										if (e < len && wc_bindCond.isspace(e)) {
+											++e;
+											continue;
+										}
+										break;
+									}
+									/* Replace "__SIZEOF_WCHAR_T__ == <mySize>" with "1" */
+									myCond << wc_bindCond[flushStart:i] << "1";
+									flushStart = e;
+									i = e;
+								}
+								myCond = (myCond << wc_bindCond[flushStart:]).string;
+								myCondRequiresMySize = false;
+							}
+							myCond = myCond.replace("&&1", "").replace("1&&", "");
+							local wcBinding = wc_bind.functionBinding;
+							local replacedPrototypes = replaceWcharPrototypes(wc_bind.functionPrototypes, mode);
+							if (wcBinding is string || wcBinding is UserString) {
+								local origCC = getCommonCCFromPrototypes(wc_bind.functionPrototypes);
+								if (origCC is none)
+									goto wc_bind_continue_scan_bindings;
+								local replCC = getCommonCCFromPrototypes(replacedPrototypes);
+								if (replCC is none)
+									goto wc_bind_continue_scan_bindings;
+								origCC = origCC.lstrip("_");
+								replCC = replCC.lstrip("_");
+								if (origCC != replCC) {
+									/* Bind against an external symbol name.
+									 * -> Must also assert (in `myCond') that `origCC' and `replCC'
+									 *    are the same calling conventions at compile-time. */
+									local cc1 = replCC, cc2 = origCC;
+									if (cc1 < cc2) {
+										local temp = cc2;
+										cc2 = cc1;
+										cc1 = temp;
+									}
+									/* assert cc1 > cc2; */
+									basicBindings.append(FunctionBinding(
+										ppCond:       "{} && defined(__{}_IS_{})".format({ myCond, cc2, cc1 }),
+										ppCondPrefix: replaceWcharTextArray(wc_bind.ppCondPrefix, mode),
+										prototypes:   replacedPrototypes,
+										binding:      wcBinding));
+									/* Note a couple of special cases where we can still bind:
+									 * >> ...
+									 * >> #elif defined(__CRT_HAVE_memcpyw) && defined(__LIBCCALL_IS_LIBDCALL)
+									 * >> __COMPILER_REDIRECT(__LIBC,...,LIBDCALL,c16memcpy,...,memcpyw,...)
+									 * >> #elif defined(__CRT_HAVE_DOS$memcpyw)
+									 * >> __COMPILER_REDIRECT(__LIBC,...,LIBDCALL,c16memcpy,...,DOS$memcpyw,...)
+									 * >> ...
+									 * Note the second variant that can be used when:
+									 *   - replCC == "LIBDCALL"
+									 *     >> #if keyCrtHave("DOS$" + name)
+									 *     >> BIND_AGAINST("DOS$" + name)
+									 *     >> #endif
+									 *   - replCC == "LIBKCALL"
+									 *     >> #if keyCrtHave("KOS$" + name)
+									 *     >> BIND_AGAINST("KOS$" + name)
+									 *     >> #endif
+									 * Also note that we only do this when the basic @myCond doesn't impose
+									 * any requirements on @mySize, since if it does, then the wchar-size
+									 * attribute of the assembly symbol is dependent on DOS-vs-KOS linkage,
+									 * in which case we'd end up with a redundant binding:
+									 * >> ...
+									 * >> #elif defined(__CRT_HAVE_DOS$wmemcpy) && (__SIZEOF_WCHAR_T__ == 2)
+									 * >> __CREDIRECT_DOS(...,c16memcpy,...,wmemcpy,...)
+									 * >> #elif defined(__CRT_HAVE_DOS$wmemcpy)
+									 * >> __CREDIRECT_DOS(...,c16memcpy,...,wmemcpy,...)
+									 * >> ...
+									 */
+									if (!myCondRequiresMySize) {
+										wcBinding = str(wcBinding);
+										local wcBindingCrtHaveKey = keyCrtHave(wcBinding);
+										if (wcBindingCrtHaveKey in myCond) {
+											local ccSpecificPrefix = {
+												"LIBKCALL"   : "KOS$",
+												"LIBDCALL"   : "DOS$",
+												"__LIBKCALL" : "KOS$",
+												"__LIBDCALL" : "DOS$",
+											}.get(replCC);
+											if (ccSpecificPrefix is none)
+												goto wc_bind_continue_scan_bindings;
+											wcBinding = ccSpecificPrefix + wcBinding;
+											basicBindings.append(FunctionBinding(
+												ppCond:       myCond.replace(wcBindingCrtHaveKey, keyCrtHave(wcBinding)),
+												ppCondPrefix: replaceWcharTextArray(wc_bind.ppCondPrefix, mode),
+												prototypes:   replacedPrototypes,
+												binding:      wcBinding));
+										}
+									}
+									goto wc_bind_continue_scan_bindings;
+								}
+							}
+							/* Append the transformed binding. */
+							basicBindings.append(FunctionBinding(
+								ppCond:       myCond,
+								ppCondPrefix: replaceWcharTextArray(wc_bind.ppCondPrefix, mode),
+								prototypes:   replacedPrototypes,
+								binding:      wcBinding));
+wc_bind_continue_scan_bindings:
+							;
 						}
 						/* Last cast: Directly implement the Xchar function */
 						local xcImpl: none | Callable | LoaderFunctionImplementation = xc.loaderImpl;
@@ -4253,21 +4437,24 @@ done_function:
 			local exposedName = currentFeatures.exposedName;
 			if (exposedName is none)
 				exposedName = currentName;
-			local gblGuard = false;
+			local dflGuard = false;
+			local dflNamespace = GLOBAL_NAMESPACE;
+			if (currentFeatures.std)
+				dflNamespace = NAMESPACES["std"];
 			/* Add namespace import bindings for all defined namespaces. */
 			local moreBindings = [];
 			for (local ns: currentFeatures.namespaces) {
 				if (ns !is Namespace)
 					ns = getNamespaceByName(ns);
 				if (!currentFeatures.guard) {
-					if (ns === GLOBAL_NAMESPACE || ns === NAMESPACES["std"])
+					if (ns === GLOBAL_NAMESPACE || ns === dflNamespace)
 						continue;
 				}
 				local nsGuard = currentFeatures.guardNames.get(ns.name);
 				if (nsGuard is none)
 					nsGuard = ns.keyDefaultGuard(exposedName);
-				if (ns === GLOBAL_NAMESPACE)
-					gblGuard = nsGuard;
+				if (ns === dflNamespace)
+					dflGuard = nsGuard;
 				moreBindings.append(FunctionBinding(
 					ppCond:     "defined({})".format({ nsGuard }),
 					prototypes: currentPrototypes,
@@ -4292,17 +4479,17 @@ done_function:
 					oldBindings.insertall(0, moreBindings);
 				}
 			}
-			if (gblGuard === false && currentFeatures.guard)
-				gblGuard = GLOBAL_NAMESPACE.keyDefaultGuard(exposedName);
+			if (dflGuard === false && currentFeatures.guard)
+				dflGuard = dflNamespace.keyDefaultGuard(exposedName);
 			local func = current;
-			if (currentFeatures.decl != "__LIBC" || exposedName != func.name ||
-			    gblGuard !== false || currentFeatures.macroBinding) {
+			if (currentFeatures.decl != DEFAULT_DECL || exposedName != func.name ||
+			    dflGuard !== false || currentFeatures.macroBinding) {
 				/* Need a custom @ExposedFunction */
 				func = ExposedFunction(
 					func:                func,
 					decl:                currentFeatures.decl,
 					exposedName:         exposedName,
-					guardName:           gblGuard,
+					guardName:           dflGuard,
 					preferBindingMacros: currentFeatures.macroBinding);
 			}
 			if (currentFeatures.std) {

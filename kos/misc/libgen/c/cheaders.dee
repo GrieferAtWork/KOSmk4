@@ -592,6 +592,8 @@ class FunctionPrototype {
 				if (!isFirst)
 					fp << ", ";
 				isFirst = false;
+				callToPrototype.argv[i].ctype
+					.cprintCCastPrefix(fp, escapeMode);
 				fp << "0";
 			}
 			fp << ")";
@@ -615,13 +617,15 @@ class FunctionPrototype {
 	public function cprintCallToFunction(
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
 			callToName: string, callToPrototype: FunctionPrototype,
-			explicitCastAllTypes: bool = false) {
+			explicitCastAllTypes: bool = false, callToEscapeMode: int = none) {
+		if (callToEscapeMode is none)
+			callToEscapeMode = escapeMode;
 		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName);
 		fp << " { ";
 		if (!returnType.isVoid)
 			fp << "return ";
 		if (explicitCastAllTypes || !callToPrototype.returnType.implicitlyConvertibleTo(returnType))
-			returnType.cprintCCastPrefix(fp, escapeMode);
+			returnType.cprintCCastPrefix(fp, callToEscapeMode);
 		fp << callToName << "(";
 		local argc = #callToPrototype.argv;
 		local isFirst = true;
@@ -632,13 +636,13 @@ class FunctionPrototype {
 			local arg = callToPrototype.argv[argi];
 			if (argi >= #argv) {
 				/* Shouldn't happen... */
-				arg.ctype.cprintCCastPrefix(fp, escapeMode);
+				arg.ctype.cprintCCastPrefix(fp, callToEscapeMode);
 				fp << "0";
 				continue;
 			}
 			local myArg = this.argv[argi];
 			if (explicitCastAllTypes || !myArg.ctype.implicitlyConvertibleTo(arg.ctype))
-				arg.ctype.cprintCCastPrefix(fp, escapeMode);
+				arg.ctype.cprintCCastPrefix(fp, callToEscapeMode);
 			escapeTextIntoFile(fp, myArg.name, escapeMode);
 		}
 		fp << "); }";
@@ -904,12 +908,13 @@ class FunctionImplementation {
 				local usedDeps = dependencies;
 				if (usedDeps is Callable)
 					usedDeps = usedDeps();
+				if (usedDeps && #usedDeps.first != 2)
+					print "HERE:", type usedDeps.first, repr usedDeps.first;
 				for (local name, elem: usedDeps) {
-					if (elem !is Function) {
-						if (elem is Callable)
-							elem = elem();
+					if (elem is Callable)
+						elem = elem();
+					if (elem !is Function)
 						elem = findFunctionByName(elem);
-					}
 					m_dependencyFunctions[name] = elem;
 				}
 			}
@@ -1137,7 +1142,9 @@ class LocalFunction {
 		if (oldExternLinkage !in ["", "C"])
 			fp.externLinkage = "";
 		/* Include the local-header for this function */
-		fp.ppInclude("<local/{}/{}.h>".format({ originalSystemHeaderName, name }));
+		fp.ppInclude("<local/{}/{}.h>".format({
+			REMOVEME_localPathRedirections.get(originalSystemHeaderName, originalSystemHeaderName),
+			name }));
 		/* Remember that we'll be needing the local implementation of this function */
 		neededLocalFunction.insert(this);
 		fp.namespace = oldNs;
@@ -1148,12 +1155,21 @@ class LocalFunction {
 				callToLocalName = "{} {}".format({ LOCAL_NAMESPACE.prefix, callToLocalName });
 			callToLocalName = "({})".format({ callToLocalName });
 		}
+		/* When only doing partial escaping of declaration, we must still
+		 * do full escaping within call-to-local expressions, since local
+		 * functions may use types in their declarations (which we in turn
+		 * have to cast our prototypes to), that aren't declared in the
+		 * current header (meaning that their representation must be fully
+		 * escaped) */
+		local callToEscapeMode = escapeMode;
+		if (callToEscapeMode == ESCAPE_MODE_PART)
+			callToEscapeMode = ESCAPE_MODE_FULL;
 		if (preferBindingMacros) {
 			if (doc)
 				fp.printComment(doc);
 			if (#prototypes == 1) {
 				prototypes.first.cprintCallToMacro(
-					fp, escapeMode, exposedName,
+					fp, callToEscapeMode, exposedName,
 					callToLocalName, usedPrototype);
 			} else {
 				fp << "#define " << exposedName << " " << callToLocalName;
@@ -1164,11 +1180,15 @@ class LocalFunction {
 			/* _Must_ (try to) use keyUsing for c++, or a macro for C */
 			if (doc)
 				fp.printComment(doc);
-			fp.ppIfdef("__cplusplus");
-			LOCAL_NAMESPACE.keyUsing(fp, exposedName);
-			fp.ppElse();
-			fp << "#define " << exposedName << " " << callToLocalName;
-			fp.ppEndif();
+			if (exposedName == name) {
+				fp.ppIfdef("__cplusplus");
+				LOCAL_NAMESPACE.keyUsing(fp, exposedName);
+				fp.ppElse();
+				fp << "#define " << exposedName << " " << callToLocalName << "\n";
+				fp.ppEndif();
+			} else {
+				fp << "#define " << exposedName << " " << callToLocalName << "\n";
+			}
 			return;
 		}
 		for (local ptype: prototypes) {
@@ -1181,12 +1201,14 @@ class LocalFunction {
 				LOCAL_NAMESPACE.keyUsingOrImpl(fp, exposedName, []{
 					ptype.cprintCallToFunction(
 						fp, escapeMode, NAMESPACE_IMPORT_DECL,
-						exposedName, callToLocalName, usedPrototype);
+						exposedName, callToLocalName, usedPrototype,
+						callToEscapeMode: callToEscapeMode);
 				});
 			} else {
 				ptype.cprintCallToFunction(
 					fp, escapeMode, NAMESPACE_IMPORT_DECL,
-					exposedName, callToLocalName, usedPrototype);
+					exposedName, callToLocalName, usedPrototype,
+					callToEscapeMode: callToEscapeMode);
 				fp << "\n";
 			}
 		}
@@ -1316,6 +1338,24 @@ class InlineFunction {
 	}
 }
 
+
+@@Return the @FunctionPrototype.cc that is common to all of the
+@@given @prototypes. If different CCs are used, return @none instead.
+function getCommonCCFromPrototypes(
+		prototypes: {(string | UserString, {FunctionPrototype...})...}): string | none {
+	local result = none;
+	for (local none, protos: prototypes) {
+		for (local proto: protos) {
+			local pcc = str(proto.cc);
+			if (result is none)
+				result = pcc;
+			else if (result != pcc) {
+				return none;
+			}
+		}
+	}
+	return result;
+}
 
 @@Check if the given 2 lists of function prototypes
 @@and conditions are compatible with each other
@@ -1631,7 +1671,9 @@ class FunctionBinding {
 						fp.externLinkage = "";
 					/* Include the local-header for this function */
 					fp.ppInclude("<local/{}/{}.h>".format({
-						usedBinding.originalSystemHeaderName,
+						REMOVEME_localPathRedirections.get(
+							usedBinding.originalSystemHeaderName,
+							usedBinding.originalSystemHeaderName),
 						usedBinding.name
 					}));
 					fp.externLinkage = oldExternLinkage;

@@ -26,10 +26,11 @@
 %[define_replacement(pc32formatprinter = __pc32formatprinter)]
 
 %[define_wchar_replacement(pwformatprinter = pc16formatprinter, pc32formatprinter)]
+%[define_wchar_replacement(pwformatprinter = pc16formatprinter, pc32formatprinter)]
 %[define_wchar_replacement(__pwformatprinter = __pc16formatprinter, __pc32formatprinter)]
 %[define_wchar_replacement(format_wsnprintf_data = format_c16snprintf_data, format_c32snprintf_data)]
 %[define_wchar_replacement(__format_waprintf_data_defined = __format_c16aprintf_data_defined, __format_c32aprintf_data_defined)]
-%[default_impl_section({.text.crt.wchar.string.format|.text.crt.dos.wchar.string.format})]
+%[default_impl_section("{.text.crt.wchar.string.format|.text.crt.dos.wchar.string.format}")]
 
 
 %(auto_header)#include <parts/uchar/format-printer.h>
@@ -61,6 +62,7 @@
 #include <bits/wformat-printer.h>
 #include <libc/malloc.h>
 #include <hybrid/__assert.h>
+#include <kos/anno.h>
 
 __SYSDECL_BEGIN
 
@@ -85,17 +87,22 @@ typedef __pwformatprinter pwformatprinter;
 
 }
 
-[[wchar]] format_wrepeat:(*) %{generate(str2wcs("format_repeat"))}
-[[wchar]] format_wescape:(*) %{generate(str2wcs("format_escape"))}
-[[wchar]] format_whexdump:(*) %{generate(str2wcs("format_hexdump"))}
+[[wchar]]
+[[throws, decl_include("<bits/wformat-printer.h>")]]
+$ssize_t format_wrepeat([[nonnull]] pwformatprinter printer, void *arg,
+                        char ch, $size_t num_repetitions)
+	%{generate(str2wcs("format_repeat"))}
+
+[[wchar]] format_wescape(*) %{generate(str2wcs("format_escape"))}
+[[wchar]] format_whexdump(*) %{generate(str2wcs("format_hexdump"))}
 
 %
 %
 %
 %
 
-[[wchar]] format_vwprintf:(*) %{generate(str2wcs("format_vprintf"))}
-[[wchar]] format_wprintf:(*) %{generate(str2wcs("format_printf"))}
+[[wchar]] format_vwprintf(*) %{generate(str2wcs("format_vprintf"))}
+[[wchar]] format_wprintf(*) %{generate(str2wcs("format_printf"))}
 
 
 %
@@ -104,8 +111,9 @@ typedef __pwformatprinter pwformatprinter;
 @@Format-printer implementation for printing to a string buffer like `wsprintf' would
 @@WARNING: No trailing NUL-character is implicitly appended
 [[wchar]]
-format_wsprintf_printer:([[nonnull]] /*wchar_t ***/ void *arg,
-                         [[nonnull]] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t
+$ssize_t format_wsprintf_printer([[nonnull]] /*wchar_t ***/ void *arg,
+                                 [[nonnull]] wchar_t const *__restrict data,
+                                 $size_t datalen)
 	%{generate(str2wcs("format_sprintf_printer"))}
 
 %{
@@ -130,15 +138,16 @@ struct format_wsnprintf_data {
 @@NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
 @@NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()'
 [[wchar]]
-format_wsnprintf_printer:([[nonnull]] /*struct format_wsnprintf_data**/ void *arg,
-                          [[nonnull]] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t
+$ssize_t format_wsnprintf_printer([[nonnull]] /*struct format_wsnprintf_data**/ void *arg,
+                                  [[nonnull]] wchar_t const *__restrict data,
+                                  $size_t datalen)
 	%{generate(str2wcs("format_snprintf_printer"))}
 
 
-[doc_alias(format_width)][[ATTR_PURE]]
-[if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(format_length)][[wchar]]
-format_wwidth:(void *arg, [[nonnull]] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t {
-#if __SIZEOF_WCHAR_T__ == 2
+[[wchar, doc_alias("format_width"), ATTR_PURE]]
+[[if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(format_length)]]
+$ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $size_t datalen) {
+@@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	size_t result = 0;
 	wchar_t const *iter, *end;
 	(void)arg;
@@ -154,7 +163,7 @@ format_wwidth:(void *arg, [[nonnull]] wchar_t const *__restrict data, $size_t da
 		++result;
 	}
 	return (ssize_t)result;
-#else
+@@pp_else@@
 	(void)arg;
 	(void)data;
 	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
@@ -163,7 +172,7 @@ format_wwidth:(void *arg, [[nonnull]] wchar_t const *__restrict data, $size_t da
 	 *      [if(__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
 	COMPILER_IMPURE();
 	return (ssize_t)datalen;
-#endif
+@@pp_endif@@
 }
 
 
@@ -216,9 +225,9 @@ struct format_waprintf_data {
 #ifndef __format_waprintf_data_defined
 #define __format_waprintf_data_defined 1
 struct format_waprintf_data {
-	wchar_t      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+	wchar_t      *@ap_base@;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ @ap_avail@; /* Unused buffer size */
+	__SIZE_TYPE__ @ap_used@;  /* Used buffer size */
 };
 #endif /* !__format_waprintf_data_defined */
 )]
@@ -244,12 +253,12 @@ struct format_waprintf_data {
 @@                 but may differ from `wcslen(return)' when NUL characters were
 @@                 printed to the waprintf-printer at one point.
 @@                 (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)')
-[requires_function(realloc)][[userimpl]]
-[[impl_include("<hybrid/__assert.h>"), wchar]]
+[[wchar, impl_include("<hybrid/__assert.h>")]]
 [[ATTR_WUNUSED, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
-[dependency_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]
-format_waprintf_pack:([[nonnull]] struct format_waprintf_data *__restrict self,
-                      [[nullable]] $size_t *pstrlen) -> wchar_t * {
+[[decl_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]]
+[[userimpl, requires_function(realloc)]]
+wchar_t *format_waprintf_pack([[nonnull]] struct format_waprintf_data *__restrict self,
+                              [[nullable]] $size_t *pstrlen) {
 	/* Free unused buffer memory. */
 	wchar_t *result;
 	if (self->@ap_avail@ != 0) {
@@ -262,11 +271,11 @@ format_waprintf_pack:([[nonnull]] struct format_waprintf_data *__restrict self,
 		if unlikely(!self->@ap_used@) {
 			/* Special case: Nothing was printed. */
 			__hybrid_assert(!self->@ap_base@);
-#ifdef __CRT_HAVE_malloc
+@@pp_if $has_function(malloc)@@
 			self->@ap_base@ = (wchar_t *)malloc(1 * sizeof(wchar_t));
-#else /* __CRT_HAVE_malloc */
+@@pp_else@@
 			self->@ap_base@ = (wchar_t *)realloc(NULL, 1 * sizeof(wchar_t));
-#endif /* !__CRT_HAVE_malloc */
+@@pp_endif@@
 			if unlikely(!self->@ap_base@)
 				return NULL;
 		}
@@ -276,17 +285,17 @@ format_waprintf_pack:([[nonnull]] struct format_waprintf_data *__restrict self,
 	result[self->@ap_used@] = '\0'; /* NUL-terminate */
 	if (pstrlen)
 		*pstrlen = self->@ap_used@;
-#ifndef NDEBUG
-#if __SIZEOF_POINTER__ == 4
+@@pp_ifndef NDEBUG@@
+@@pp_if __SIZEOF_POINTER__ == 4@@
 	self->@ap_base@  = (wchar_t *)__UINT32_C(0xcccccccc);
 	self->@ap_avail@ = __UINT32_C(0xcccccccc);
 	self->@ap_used@  = __UINT32_C(0xcccccccc);
-#elif __SIZEOF_POINTER__ == 8
+@@pp_elif __SIZEOF_POINTER__ == 8@@
 	self->@ap_base@  = (wchar_t *)__UINT64_C(0xcccccccccccccccc);
 	self->@ap_avail@ = __UINT64_C(0xcccccccccccccccc);
 	self->@ap_used@  = __UINT64_C(0xcccccccccccccccc);
-#endif /* __SIZEOF_POINTER__ == ... */
-#endif /* !NDEBUG */
+@@pp_endif@@
+@@pp_endif@@
 	return result;
 }
 
@@ -296,11 +305,11 @@ format_waprintf_pack:([[nonnull]] struct format_waprintf_data *__restrict self,
 @@the format_aprintf buffer `self' is finalized, or some other function is used
 @@to append additional data to the end of `self'
 @@@return: NULL: Failed to allocate additional memory
-[requires_function(realloc)][[userimpl, wchar]]
-[[impl_include("<hybrid/__assert.h>"), ATTR_WUNUSED]]
-[dependency_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]
+[[wchar, ATTR_WUNUSED, impl_include("<hybrid/__assert.h>")]]
+[[decl_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]]
+[[userimpl, requires_function(realloc)]]
 format_waprintf_alloc:([[nonnull]] struct format_waprintf_data *__restrict self,
-                       $size_t num_wchars) -> [malloc /*(num_wchars * sizeof(wchar_t))*/] wchar_t * {
+                       $size_t num_wchars) -> [[malloc /*(num_wchars * sizeof(wchar_t))*/]] wchar_t * {
 	wchar_t *result;
 	if (self->@ap_avail@ < num_wchars) {
 		wchar_t *newbuf;

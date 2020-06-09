@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bb28072 */
+/* HASH CRC-32:0xf0d3c0dd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,59 +43,125 @@ __SYSDECL_BEGIN
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_wtoi
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),(__nptr))
-#elif defined(__CRT_HAVE__wtoi)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),_wtoi,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtoi) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(char32_t const *__nptr),wtoi,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoi) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(char16_t const *__nptr),_wtoi,(__nptr))
 #elif defined(__CRT_HAVE_wtol) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),wtol,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtol) && (__SIZEOF_INT__ == __SIZEOF_LONG__) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(char32_t const *__nptr),wtol,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtol) && (__SIZEOF_INT__ == __SIZEOF_LONG__) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(char16_t const *__nptr),wtol,(__nptr))
 #elif defined(__CRT_HAVE__wtol) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),_wtol,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtol) && (__SIZEOF_INT__ == __SIZEOF_LONG__) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(char32_t const *__nptr),_wtol,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtol) && (__SIZEOF_INT__ == __SIZEOF_LONG__) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(char16_t const *__nptr),_wtol,(__nptr))
 #elif defined(__CRT_HAVE_wtoll) && (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),wtoll,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtoll) && (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(char32_t const *__nptr),wtoll,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtoll) && (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(char16_t const *__nptr),wtoll,(__nptr))
 #elif defined(__CRT_HAVE__wtoll) && (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),_wtoll,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoll) && (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(char32_t const *__nptr),_wtoll,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoll) && (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(char16_t const *__nptr),_wtoll,(__nptr))
 #elif defined(__CRT_HAVE__wtoi64) && (__SIZEOF_INT__ == 8)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),_wtoi64,(__nptr))
-#else /* LIBC: wtoi */
+#elif defined(__CRT_HAVE_DOS$_wtoi64) && (__SIZEOF_INT__ == 8) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(char32_t const *__nptr),_wtoi64,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoi64) && (__SIZEOF_INT__ == 8) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(char16_t const *__nptr),_wtoi64,(__nptr))
+#else /* ... */
 #include <local/parts.wchar.stdlib/wtoi.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(wtoi, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL wtoi)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoi))(__nptr); })
-#endif /* wtoi... */
+#endif /* !... */
 #ifdef __CRT_HAVE_wtol
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),(__nptr))
-#elif defined(__CRT_HAVE__wtol)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),_wtol,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtol) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(char32_t const *__nptr),wtol,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtol) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(char16_t const *__nptr),_wtol,(__nptr))
 #elif defined(__CRT_HAVE_wtoi) && (__SIZEOF_LONG__ == __SIZEOF_INT__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),wtoi,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtoi) && (__SIZEOF_LONG__ == __SIZEOF_INT__) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(char32_t const *__nptr),wtoi,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtoi) && (__SIZEOF_LONG__ == __SIZEOF_INT__) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(char16_t const *__nptr),wtoi,(__nptr))
 #elif defined(__CRT_HAVE__wtoi) && (__SIZEOF_LONG__ == __SIZEOF_INT__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),_wtoi,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoi) && (__SIZEOF_LONG__ == __SIZEOF_INT__) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(char32_t const *__nptr),_wtoi,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoi) && (__SIZEOF_LONG__ == __SIZEOF_INT__) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(char16_t const *__nptr),_wtoi,(__nptr))
 #elif defined(__CRT_HAVE_wtoll) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),wtoll,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtoll) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(char32_t const *__nptr),wtoll,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtoll) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(char16_t const *__nptr),wtoll,(__nptr))
 #elif defined(__CRT_HAVE__wtoll) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),_wtoll,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoll) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(char32_t const *__nptr),_wtoll,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoll) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(char16_t const *__nptr),_wtoll,(__nptr))
 #elif defined(__CRT_HAVE__wtoi64) && (__SIZEOF_LONG__ == 8)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),_wtoi64,(__nptr))
-#else /* LIBC: wtol */
+#elif defined(__CRT_HAVE_DOS$_wtoi64) && (__SIZEOF_LONG__ == 8) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(char32_t const *__nptr),_wtoi64,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoi64) && (__SIZEOF_LONG__ == 8) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(char16_t const *__nptr),_wtoi64,(__nptr))
+#else /* ... */
 #include <local/parts.wchar.stdlib/wtol.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(wtol, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL wtol)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtol))(__nptr); })
-#endif /* wtol... */
+#endif /* !... */
 #ifdef __LONGLONG
 #ifdef __CRT_HAVE_wtoll
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),(__nptr))
-#elif defined(__CRT_HAVE__wtoll)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),_wtoll,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtoll) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(char32_t const *__nptr),wtoll,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoll) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(char16_t const *__nptr),_wtoll,(__nptr))
 #elif defined(__CRT_HAVE_wtoi) && (__SIZEOF_LONG_LONG__ == __SIZEOF_INT__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),wtoi,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtoi) && (__SIZEOF_LONG_LONG__ == __SIZEOF_INT__) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(char32_t const *__nptr),wtoi,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtoi) && (__SIZEOF_LONG_LONG__ == __SIZEOF_INT__) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(char16_t const *__nptr),wtoi,(__nptr))
 #elif defined(__CRT_HAVE__wtoi) && (__SIZEOF_LONG_LONG__ == __SIZEOF_INT__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),_wtoi,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoi) && (__SIZEOF_LONG_LONG__ == __SIZEOF_INT__) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(char32_t const *__nptr),_wtoi,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoi) && (__SIZEOF_LONG_LONG__ == __SIZEOF_INT__) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(char16_t const *__nptr),_wtoi,(__nptr))
 #elif defined(__CRT_HAVE_wtol) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),wtol,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtol) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(char32_t const *__nptr),wtol,(__nptr))
+#elif defined(__CRT_HAVE_DOS$wtol) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(char16_t const *__nptr),wtol,(__nptr))
 #elif defined(__CRT_HAVE__wtol) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),_wtol,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtol) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(char32_t const *__nptr),_wtol,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtol) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(char16_t const *__nptr),_wtol,(__nptr))
 #elif defined(__CRT_HAVE__wtoi64) && (__SIZEOF_LONG_LONG__ == 8)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),_wtoi64,(__nptr))
-#else /* LIBC: wtoll */
+#elif defined(__CRT_HAVE_DOS$_wtoi64) && (__SIZEOF_LONG_LONG__ == 8) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(char32_t const *__nptr),_wtoi64,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoi64) && (__SIZEOF_LONG_LONG__ == 8) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(char16_t const *__nptr),_wtoi64,(__nptr))
+#else /* ... */
 #include <local/parts.wchar.stdlib/wtoll.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(wtoll, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL wtoll)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoll))(__nptr); })
-#endif /* wtoll... */
+#endif /* !... */
 #endif /* __LONGLONG */
 #endif /* __USE_KOS */
 
