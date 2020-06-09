@@ -155,7 +155,7 @@ class Generator {
 		return FunctionImplementation(
 			body:         replaceText(self.body),
 			name:         newFunctionName,
-			implPrefix:   replaceText(self.implPrefix),
+			implPrefix:   replaceTextArray(self.implPrefix),
 			dependencies: none /* TODO */);
 	}
 

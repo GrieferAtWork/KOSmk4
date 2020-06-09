@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5b95d44 */
+/* HASH CRC-32:0xfc787d85 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,7 +131,7 @@ typedef struct __dirstream DIR;
 #ifdef __CRT_HAVE_opendir
 /* Open and return a new directory stream for reading, referring to `name' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),DIR *,__NOTHROW_RPC,opendir,(char const *__name),(__name))
-#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && ((defined(__CRT_HAVE_openat64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
+#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 #include <local/dirent/opendir.h>
 /* Open and return a new directory stream for reading, referring to `name' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(opendir, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) DIR *__NOTHROW_RPC(__LIBCCALL opendir)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendir))(__name); })
@@ -141,7 +141,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(opendir, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONN
 #ifdef __CRT_HAVE_fopendirat
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),DIR *,__NOTHROW_RPC,fopendirat,(__fd_t __dirfd, char const *__name, __oflag_t __oflags),(__dirfd,__name,__oflags))
-#elif defined(__CRT_HAVE_fdopendir) && ((defined(__CRT_HAVE_openat64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))
+#elif defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))
 #include <local/dirent/fopendirat.h>
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fopendirat, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) DIR *__NOTHROW_RPC(__LIBCCALL fopendirat)(__fd_t __dirfd, char const *__name, __oflag_t __oflags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fopendirat))(__dirfd, __name, __oflags); })
@@ -149,7 +149,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fopendirat, __FORCELOCAL __ATTR_WUNUSED __ATTR_N
 #ifdef __CRT_HAVE_opendirat
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),DIR *,__NOTHROW_RPC,opendirat,(__fd_t __dirfd, char const *__name),(__dirfd,__name))
-#elif defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && ((defined(__CRT_HAVE_openat64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#elif defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <local/dirent/opendirat.h>
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(opendirat, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) DIR *__NOTHROW_RPC(__LIBCCALL opendirat)(__fd_t __dirfd, char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendirat))(__dirfd, __name); })

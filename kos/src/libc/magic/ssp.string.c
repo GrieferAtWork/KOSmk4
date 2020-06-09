@@ -26,6 +26,9 @@
 #include <hybrid/typecore.h>
 
 #include <ssp/ssp.h>
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <optimized/ssp.string.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
 
 __SYSDECL_BEGIN
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc5248b1 */
+/* HASH CRC-32:0x65de9679 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,9 +53,7 @@
 __SYSDECL_BEGIN
 
 /* Names for the values of the `has_arg' field of `struct option'. */
-#undef no_argument
-#undef required_argument
-#undef optional_argument
+/*[[[enum]]]*/
 #ifdef __CC__
 enum {
 	no_argument       = 0,
@@ -63,6 +61,7 @@ enum {
 	optional_argument = 2
 };
 #endif /* __CC__ */
+/*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define no_argument       no_argument
 #define required_argument required_argument
@@ -72,6 +71,7 @@ enum {
 #define required_argument 1
 #define optional_argument 2
 #endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 #ifdef __CC__
 
@@ -170,16 +170,46 @@ struct option {
  *   arguments to the option '\0'.  This behavior is specific to the GNU
  *   `getopt' */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt,(int ___argc, char *const ___argv[], char const *__shortopts),(___argc,___argv,__shortopts))
-#else /* LIBC: getopt */
+#else /* __CRT_HAVE_getopt */
 #undef __getopt_defined
-#endif /* getopt... */
+#endif /* !__CRT_HAVE_getopt */
 #endif /* !__getopt_defined */
 #ifdef __CRT_HAVE_getopt_long
+/* Return the option character from OPTS just read.  Return -1 when
+ * there are no more options.  For unrecognized options, or options
+ * missing arguments, `optopt' is set to the option letter, and '?' is
+ * returned.
+ * - The OPTS string is a list of characters which are recognized option
+ *   letters, optionally followed by colons, specifying that that letter
+ *   takes an argument, to be placed in `optarg'.
+ * - If a letter in OPTS is followed by two colons, its argument is
+ *   optional.  This behavior is specific to the GNU `getopt'.
+ * - The argument `--' causes premature termination of argument
+ *   scanning, explicitly telling `getopt' that there are no more
+ *   options.
+ * - If OPTS begins with `--', then non-option arguments are treated as
+ *   arguments to the option '\0'.  This behavior is specific to the GNU
+ *   `getopt' */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt_long,(int ___argc, char *const ___argv[], char const *__shortopts, struct option const *__longopts, int *__longind),(___argc,___argv,__shortopts,__longopts,__longind))
-#endif /* getopt_long... */
+#endif /* __CRT_HAVE_getopt_long */
 #ifdef __CRT_HAVE_getopt_long_only
+/* Return the option character from OPTS just read.  Return -1 when
+ * there are no more options.  For unrecognized options, or options
+ * missing arguments, `optopt' is set to the option letter, and '?' is
+ * returned.
+ * - The OPTS string is a list of characters which are recognized option
+ *   letters, optionally followed by colons, specifying that that letter
+ *   takes an argument, to be placed in `optarg'.
+ * - If a letter in OPTS is followed by two colons, its argument is
+ *   optional.  This behavior is specific to the GNU `getopt'.
+ * - The argument `--' causes premature termination of argument
+ *   scanning, explicitly telling `getopt' that there are no more
+ *   options.
+ * - If OPTS begins with `--', then non-option arguments are treated as
+ *   arguments to the option '\0'.  This behavior is specific to the GNU
+ *   `getopt' */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt_long_only,(int ___argc, char *const ___argv[], char const *__shortopts, struct option const *__longopts, int *__longind),(___argc,___argv,__shortopts,__longopts,__longind))
-#endif /* getopt_long_only... */
+#endif /* __CRT_HAVE_getopt_long_only */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("val")

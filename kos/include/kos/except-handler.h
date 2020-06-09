@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x818fde1c */
+/* HASH CRC-32:0x2531182c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -251,7 +251,7 @@ typedef __except_handler_t except_handler_t;
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
 __CDECLARE(,int,__NOTHROW,set_exception_handler,(int __mode, except_handler_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
-#endif /* set_exception_handler... */
+#endif /* __CRT_HAVE_set_exception_handler */
 #ifdef __CRT_HAVE_get_exception_handler
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
@@ -267,7 +267,7 @@ __CDECLARE(,int,__NOTHROW,set_exception_handler,(int __mode, except_handler_t __
  * @return: 0 :         Success.
  * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
 __CDECLARE(,int,__NOTHROW_NCX,get_exception_handler,(int *__pmode, except_handler_t *__phandler, void **__phandler_sp),(__pmode,__phandler,__phandler_sp))
-#endif /* get_exception_handler... */
+#endif /* __CRT_HAVE_get_exception_handler */
 #ifdef __CRT_HAVE_except_handler3
 /* Mode #2 / #3 exception handler (see description above) */
 __LIBC __ATTR_NORETURN void (__EXCEPT_HANDLER_CC except_handler3)(error_register_state_t *__restrict __state, struct exception_data *__restrict __error) __CASMNAME_SAME("except_handler3");

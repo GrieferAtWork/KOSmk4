@@ -1781,13 +1781,6 @@ do_push_macroList:
 		self.skip(")");
 	}
 
-	public function parseDirective_define_system_header_guard() {
-		self.next();
-		self.skip("(");
-		result_headerGuardName = parseCStringOrFunctionLikeExpression(self);
-		self.skip(")");
-	}
-
 	public function parseDirective_pushdefault() {
 		return parseDirective_push_default();
 	}
@@ -4365,8 +4358,12 @@ done_function:
 		context.result_order_header_in_CXX_SYSTEM_HEADER = false;
 	}
 	if (context.result_headerGuardName is none) {
-		context.result_headerGuardName = "_{}_H"
-			.format({ headerName.replace(".", "_").upper() });
+		context.result_headerGuardName = "_{}_H".format({
+			headerName
+				.replace(".", "_")
+				.replace("-", "_")
+				.upper()
+		});
 	}
 	if (context.result_ccompatHeaderName !is none) {
 		if (context.result_order_headerCCompat is none) {

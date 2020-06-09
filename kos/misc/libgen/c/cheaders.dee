@@ -1147,11 +1147,23 @@ class LocalFunction {
 			}
 			return;
 		}
+		if (prototypes.each.hasEllipsis || ...) {
+			/* _Must_ (try to) use keyUsing for c++, or a macro for C */
+			if (doc)
+				fp.printComment(doc);
+			fp.ppIfdef("__cplusplus");
+			LOCAL_NAMESPACE.keyUsing(fp, exposedName);
+			fp.ppElse();
+			fp << "#define " << exposedName << " " << callToLocalName;
+			fp.ppEndif();
+			return;
+		}
 		for (local ptype: prototypes) {
 			if (doc)
 				fp.printComment(doc);
-			if (exposedName == name && #prototypes == 1 &&
-			    ptype.compatibleWith(usedPrototype)) {
+			local allowUsing = exposedName == name && #prototypes == 1 &&
+			                   ptype.compatibleWith(usedPrototype);
+			if (allowUsing) {
 				/* Can only be done if the prototypes match up! */
 				LOCAL_NAMESPACE.keyUsingOrImpl(fp, exposedName, []{
 					ptype.cprintCallToFunction(
@@ -1332,6 +1344,17 @@ class NamespaceBinding {
 			this.namespace.prefix,
 			this.namespace.keyCSymbolName(this.importName)
 		});
+		if (prototypes.each.hasEllipsis || ...) {
+			/* _Must_ (try to) use keyUsing for c++, or a macro for C */
+			if (doc)
+				fp.printComment(doc);
+			fp.ppIfdef("__cplusplus");
+			this.namespace.keyUsing(fp, exposedName);
+			fp.ppElse();
+			fp << "#define " << exposedName << " " << callToName;
+			fp.ppEndif();
+			return;
+		}
 		for (local ptype: prototypes) {
 			local isFirst = true;
 			for (local callToPrototypePpCond, callToProtos: callToPrototypes) {
@@ -1465,7 +1488,9 @@ class FunctionBinding {
 			}
 		}
 		if (hasUniversalPrototype) {
+			fp << "(";
 			printPreprocessorConditionString(fp, ppCond);
+			fp << ")";
 			return;
 		}
 		if (ppCond != "1") {
@@ -1525,7 +1550,7 @@ bind_with_ns_using:
 					 * and the prototypes of the existing declaration match
 					 * those from the new declaration.
 					 * This is the case for functions imported from  */
-					usedNs.keyUsing(fp, nsCImportName);
+					usedNs.keyUsing(fp, exposedName);
 					return;
 				}
 				local nsPrototypes = usedBinding.functionPrototypes;

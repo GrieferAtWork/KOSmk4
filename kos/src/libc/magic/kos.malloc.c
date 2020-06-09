@@ -21,6 +21,7 @@
 %{
 #include <features.h>
 #include <malloc.h>
+#include <kos/anno.h>
 
 __SYSDECL_BEGIN
 

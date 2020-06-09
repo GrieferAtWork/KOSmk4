@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa603bb77 */
+/* HASH CRC-32:0xfeceaf7f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,12 +69,12 @@ __SYSDECL_BEGIN
 /* Match NAME against the filename pattern PATTERN,
  * returning zero if it matches, FNM_NOMATCH if not */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,fnmatch,(char const *__pattern, char const *__name, int __match_flags),(__pattern,__name,__match_flags))
-#else /* LIBC: fnmatch */
+#else /* __CRT_HAVE_fnmatch */
 #include <local/fnmatch/fnmatch.h>
 /* Match NAME against the filename pattern PATTERN,
  * returning zero if it matches, FNM_NOMATCH if not */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fnmatch, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL fnmatch)(char const *__pattern, char const *__name, int __match_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fnmatch))(__pattern, __name, __match_flags); })
-#endif /* fnmatch... */
+#endif /* !__CRT_HAVE_fnmatch */
 
 __SYSDECL_END
 #endif /* __CC__ */

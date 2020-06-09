@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f260e13 */
+/* HASH CRC-32:0x9f0c396b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,11 +100,11 @@ struct ifaddrs {
  * The storage returned in *IFAP is allocated dynamically and can
  * only be properly freed by passing it to `freeifaddrs' */
 __CDECLARE(,int,__NOTHROW_NCX,getifaddrs,(struct ifaddrs **__ifap),(__ifap))
-#endif /* getifaddrs... */
+#endif /* __CRT_HAVE_getifaddrs */
 #ifdef __CRT_HAVE_freeifaddrs
 /* Reclaim the storage allocated by a previous `getifaddrs' call */
 __CDECLARE_VOID(,__NOTHROW_NCX,freeifaddrs,(struct ifaddrs *__ifa),(__ifa))
-#endif /* freeifaddrs... */
+#endif /* __CRT_HAVE_freeifaddrs */
 
 #endif /* __CC__ */
 

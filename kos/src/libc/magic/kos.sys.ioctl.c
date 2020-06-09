@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.except.io.utility)]
+%[default_impl_section(".text.crt.except.io.utility")]
 
 %{
 #include <sys/ioctl.h>
@@ -29,7 +29,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 }
 
-[[throws, cp]][doc_alias(ioctl)][[guard]][vartypes(void *)]
+[[cp, throws]][doc_alias(ioctl)][[guard]][vartypes(void *)]
 Ioctl:($fd_t fd, unsigned long int request, ...) -> $ssize_t;
 
 %{

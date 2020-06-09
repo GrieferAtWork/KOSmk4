@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8851fc3 */
+/* HASH CRC-32:0x6b67bbf1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,56 +97,56 @@ __NAMESPACE_STD_USING(FILE)
 #ifdef __CRT_HAVE_getgrgid
 /* Search for an entry with a matching group ID */
 __CDECLARE(,struct group *,__NOTHROW_RPC,getgrgid,(__gid_t __gid),(__gid))
-#endif /* getgrgid... */
+#endif /* __CRT_HAVE_getgrgid */
 #ifdef __CRT_HAVE_getgrnam
 /* Search for an entry with a matching group name */
 __CDECLARE(__ATTR_NONNULL((1)),struct group *,__NOTHROW_RPC,getgrnam,(char const *__restrict __name),(__name))
-#endif /* getgrnam... */
+#endif /* __CRT_HAVE_getgrnam */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 #ifdef __CRT_HAVE_setgrent
 /* Rewind the group-file stream */
 __CDECLARE_VOID(,__NOTHROW_RPC,setgrent,(void),())
-#endif /* setgrent... */
+#endif /* __CRT_HAVE_setgrent */
 #ifdef __CRT_HAVE_endgrent
 /* Close the group-file stream */
 __CDECLARE_VOID(,__NOTHROW_RPC_NOKOS,endgrent,(void),())
-#endif /* endgrent... */
+#endif /* __CRT_HAVE_endgrent */
 #ifdef __CRT_HAVE_getgrent
 /* Read an entry from the group-file stream, opening it if necessary */
 __CDECLARE(,struct group *,__NOTHROW_RPC,getgrent,(void),())
-#endif /* getgrent... */
+#endif /* __CRT_HAVE_getgrent */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_putgrent
 /* Write the given entry onto the given stream */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,putgrent,(struct group const *__restrict __entry, __FILE *__restrict __stream),(__entry,__stream))
-#endif /* putgrent... */
+#endif /* __CRT_HAVE_putgrent */
 #endif /* __USE_GNU */
 
 #ifdef __USE_POSIX
 #ifdef __CRT_HAVE_getgrgid_r
 /* Search for an entry with a matching group ID */
 __CDECLARE(__ATTR_NONNULL((2, 3, 5)),int,__NOTHROW_RPC,getgrgid_r,(__gid_t __gid, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__gid,__resultbuf,__buffer,__buflen,__result))
-#endif /* getgrgid_r... */
+#endif /* __CRT_HAVE_getgrgid_r */
 #ifdef __CRT_HAVE_getgrnam_r
 /* Search for an entry with a matching group name */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,getgrnam_r,(char const *__restrict __name, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__name,__resultbuf,__buffer,__buflen,__result))
-#endif /* getgrnam_r... */
+#endif /* __CRT_HAVE_getgrnam_r */
 
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_getgrent_r
 /* Read an entry from the group-file stream, opening it if necessary */
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),int,__NOTHROW_RPC,getgrent_r,(struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__resultbuf,__buffer,__buflen,__result))
-#endif /* getgrent_r... */
+#endif /* __CRT_HAVE_getgrent_r */
 #endif /* __USE_GNU */
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_fgetgrent_r
 /* Read a group entry from STREAM */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,fgetgrent_r,(__FILE *__restrict __stream, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__stream,__resultbuf,__buffer,__buflen,__result))
-#endif /* fgetgrent_r... */
+#endif /* __CRT_HAVE_fgetgrent_r */
 #endif /* __USE_MISC */
 #endif /* __USE_POSIX */
 
@@ -154,23 +154,23 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,fgetgrent_r,(__FILE *_
 #ifdef __CRT_HAVE_fgetgrent
 /* Read a group entry from STREAM */
 __CDECLARE(__ATTR_NONNULL((1)),struct group *,__NOTHROW_RPC,fgetgrent,(__FILE *__restrict __stream),(__stream))
-#endif /* fgetgrent... */
+#endif /* __CRT_HAVE_fgetgrent */
 #ifdef __CRT_HAVE_setgroups
 /* Set the group set for the current user to GROUPS (N of them) */
 __CDECLARE(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),(__count,__groups))
-#endif /* setgroups... */
+#endif /* __CRT_HAVE_setgroups */
 #ifdef __CRT_HAVE_getgrouplist
 /* Store at most *NGROUPS members of the group set for USER into
  * *GROUPS. Also include GROUP. The actual number of groups found is
  * returned in *NGROUPS.  Return -1 if the if *NGROUPS is too small */
 __CDECLARE(__ATTR_NONNULL((1, 3, 4)),int,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, int *__ngroups),(__user,__group,__groups,__ngroups))
-#endif /* getgrouplist... */
+#endif /* __CRT_HAVE_getgrouplist */
 #ifdef __CRT_HAVE_initgroups
 /* Initialize the group set for the current user
  * by reading the group database and using all groups
  * of which USER is a member. Also include GROUP. */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,initgroups,(char const *__user, __gid_t __group),(__user,__group))
-#endif /* initgroups... */
+#endif /* __CRT_HAVE_initgroups */
 #endif /* __USE_MISC */
 #endif /* __CC__ */
 

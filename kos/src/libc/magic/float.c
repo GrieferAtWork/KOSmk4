@@ -206,8 +206,13 @@ int __control87_2($uint32_t newval, $uint32_t mask,
                   $uint32_t *x86_control_word,
                   $uint32_t *sse2_control_word);
 %#endif /* X64... */
-int *__fpecode();
-%#define _fpecode (*__fpecode())
+[[guard]] int *__fpecode();
+%{
+#ifdef ____fpecode_defined
+#define _fpecode (*__fpecode())
+#endif /* ____fpecode_defined */
+}
+
 %{
 #endif /* __CC__ */
 

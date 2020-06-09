@@ -17,11 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%[default_impl_section(.text.crt.except.io.utility)]
+%[default_impl_section(".text.crt.except.io.utility")]
 
 %{
 #include <features.h>
 #include <fcntl.h>
+#include <kos/anno.h>
 
 __SYSDECL_BEGIN
 
@@ -58,7 +59,7 @@ Open:([[nonnull]] char const *filename, $oflag_t oflags, ...) -> $fd_t {
 }
 
 [[decl_include("<bits/types.h>")]]
-[[cp, guard, ATTR_WUNUSED, throws, no_crt_self_import]]
+[[cp, guard, throws, ATTR_WUNUSED, no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias(Creat64)]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(Creat)]]
 [[impl_include(<asm/oflags.h>), userimpl, requires($has_function(Open))]]

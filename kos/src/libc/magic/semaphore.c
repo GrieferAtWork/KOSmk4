@@ -107,7 +107,7 @@ sem_timedwait:([[nonnull]] sem_t *__restrict sem,
 %
 %#ifdef __USE_TIME64
 [[cp, time64_variant_of(sem_timedwait)]]
-[[userimpl, requires_function("sem_timedwait32")]]
+[[userimpl, requires_function(sem_timedwait32)]]
 sem_timedwait64:([[nonnull]] sem_t *__restrict sem,
                  [[nonnull]] struct timespec64 const *__restrict abstime) -> int {
 	struct timespec32 ts32;

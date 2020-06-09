@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8719855b */
+/* HASH CRC-32:0x270a960f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ typedef __size_t size_t;
 #define GLOB_NOESCAPE (1 << 6) /* Backslashes don't quote metacharacters.  */
 #define GLOB_PERIOD   (1 << 7) /* Leading `.' can be matched by metachars.  */
 
-#if !defined __USE_POSIX2 || defined __USE_MISC
+#if !defined(__USE_POSIX2) || defined(__USE_MISC)
 #define GLOB_MAGCHAR      (1 << 8)  /* Set in gl_flags if any metachars seen.  */
 #define GLOB_ALTDIRFUNC   (1 << 9)  /* Use gl_opendir et al functions.  */
 #define GLOB_BRACE        (1 << 10) /* Expand "{a,b}" to "a" "b".  */
@@ -82,12 +82,12 @@ typedef __size_t size_t;
 	 GLOB_NOESCAPE | GLOB_NOCHECK | GLOB_APPEND |       \
 	 GLOB_PERIOD | GLOB_ALTDIRFUNC | GLOB_BRACE |       \
 	 GLOB_NOMAGIC | GLOB_TILDE | GLOB_ONLYDIR | GLOB_TILDE_CHECK)
-#else
+#else /* !__USE_POSIX2 || __USE_MISC */
 #define __GLOB_FLAGS                                    \
 	(GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS | \
 	 GLOB_NOESCAPE | GLOB_NOCHECK | GLOB_APPEND |       \
 	 GLOB_PERIOD)
-#endif
+#endif /* __USE_POSIX2 && !__USE_MISC */
 
 /* Error returns from `glob'. */
 #define GLOB_NOSPACE 1 /* Ran out of memory.  */
@@ -180,7 +180,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob,(char const *__restric
  * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
  * Otherwise, `glob' returns zero */
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob,(char const *__restrict __pattern, int __flags, __glob_errfunc_t __errfunc, glob_t *__restrict __pglob),(__pattern,__flags,__errfunc,__pglob))
-#else /* LIBC: glob */
+#else /* ... */
 #include <local/glob/glob.h>
 /* Do glob searching for PATTERN, placing results in PGLOB.
  * The bits defined above may be set in FLAGS.
@@ -191,18 +191,18 @@ __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob,(char const *__restrict
  * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
  * Otherwise, `glob' returns zero */
 __NAMESPACE_LOCAL_USING_OR_IMPL(glob, __FORCELOCAL __ATTR_NONNULL((1, 4)) int __NOTHROW_NCX(__LIBCCALL glob)(char const *__restrict __pattern, int __flags, __glob_errfunc_t __errfunc, glob_t *__restrict __pglob) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(glob))(__pattern, __flags, __errfunc, __pglob); })
-#endif /* glob... */
+#endif /* !... */
 #if defined(__CRT_HAVE_globfree64) && defined(__USE_FILE_OFFSET64)
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree,(glob_t *__pglob),globfree64,(__pglob))
 #elif defined(__CRT_HAVE_globfree) && !defined(__USE_FILE_OFFSET64)
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree,(glob_t *__pglob),(__pglob))
-#else /* LIBC: globfree */
+#else /* ... */
 #include <local/glob/globfree.h>
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __NAMESPACE_LOCAL_USING_OR_IMPL(globfree, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL globfree)(glob_t *__pglob) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(globfree))(__pglob); })
-#endif /* globfree... */
+#endif /* !... */
 
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_glob64
@@ -215,7 +215,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(globfree, __FORCELOCAL __ATTR_NONNULL((1)) void 
  * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
  * Otherwise, `glob' returns zero */
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob64,(const char *__restrict __pattern, int __flags, __glob_errfunc_t __errfunc, struct __glob64_struct *__restrict __pglob),(__pattern,__flags,__errfunc,__pglob))
-#else /* LIBC: glob64 */
+#else /* __CRT_HAVE_glob64 */
 #include <local/glob/glob64.h>
 /* Do glob searching for PATTERN, placing results in PGLOB.
  * The bits defined above may be set in FLAGS.
@@ -226,15 +226,15 @@ __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob64,(const char *__restri
  * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
  * Otherwise, `glob' returns zero */
 __NAMESPACE_LOCAL_USING_OR_IMPL(glob64, __FORCELOCAL __ATTR_NONNULL((1, 4)) int __NOTHROW_NCX(__LIBCCALL glob64)(const char *__restrict __pattern, int __flags, __glob_errfunc_t __errfunc, struct __glob64_struct *__restrict __pglob) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(glob64))(__pattern, __flags, __errfunc, __pglob); })
-#endif /* glob64... */
+#endif /* !__CRT_HAVE_glob64 */
 #ifdef __CRT_HAVE_globfree64
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree64,(struct __glob64_struct *__pglob),(__pglob))
-#else /* LIBC: globfree64 */
+#else /* __CRT_HAVE_globfree64 */
 #include <local/glob/globfree64.h>
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __NAMESPACE_LOCAL_USING_OR_IMPL(globfree64, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL globfree64)(struct __glob64_struct *__pglob) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(globfree64))(__pglob); })
-#endif /* globfree64... */
+#endif /* !__CRT_HAVE_globfree64 */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __CC__ */
 

@@ -186,7 +186,7 @@ void *memdup([[nonnull]] void const *__restrict ptr, size_t n_bytes) {
 
 [[export_alias(__memcdup)]]
 [[ATTR_WUNUSED, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
-[[section(".text.crt.heap.rare_helpers"), userimpl, requires_function("memdup")]]
+[[section(".text.crt.heap.rare_helpers"), userimpl, requires_function(memdup)]]
 void *memcdup([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes) {
 	if likely(n_bytes) {
 		void const *endaddr;

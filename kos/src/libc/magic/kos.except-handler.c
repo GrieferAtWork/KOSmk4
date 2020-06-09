@@ -19,6 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
+%[define_replacement(except_handler_t = __except_handler_t)]
 
 %{
 #include <kos/except.h>

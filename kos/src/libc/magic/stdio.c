@@ -2380,7 +2380,7 @@ _vsnscanf:([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
 
 [[ignore, ATTR_LIBC_SCANF(3, 5), export_alias("_vsnscanf_s_l")]]
 [[section(".text.crt.dos.unicode.locale.format.scanf")]]
-[[userimpl, requires_function("_vsnscanf")]]
+[[userimpl, requires_function(_vsnscanf)]]
 _vsnscanf_l:([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
              [[nonnull]] char const *__restrict format, $locale_t locale, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	(void)locale;

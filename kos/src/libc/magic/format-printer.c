@@ -72,6 +72,7 @@
 #include <bits/types.h>
 
 #include <libc/malloc.h>
+#include <kos/anno.h>
 
 
 #ifdef __CC__
@@ -860,7 +861,7 @@ $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
 #endif /* !__INTELLISENSE__ */
 }
 
-[[kernel, ATTR_LIBC_PRINTF(3, 4), throws, allow_macros]]
+[[kernel, ATTR_LIBC_PRINTF(3, 4), throws]]
 [[decl_include("<bits/format-printer.h>"), doc_alias("format_vprintf")]]
 $ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
                        [[nonnull]] char const *__restrict format, ...) {
@@ -915,7 +916,7 @@ $ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
 #include <local/format-scanf.h>
 }
 
-[[throws, allow_macros, ATTR_LIBC_SCANF(4, 5)]]
+[[throws, ATTR_LIBC_SCANF(4, 5)]]
 [[decl_include("<bits/format-printer.h>")]]
 [[doc_alias("format_vscanf"), kernel]]
 $ssize_t format_scanf([[nonnull]] pformatgetc pgetc,

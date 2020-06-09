@@ -335,6 +335,7 @@ class PPBranchAnd: PPBranch {
 			}
 			++i;
 		}
+again_conditions_i_start:
 		local i = 0;
 again_conditions_i:
 		while (i < #conditions) {
@@ -343,7 +344,7 @@ again_conditions_i:
 			if (b is PPBranchAnd) {
 				conditions.erase(i);
 				conditions.insertall(i, b.conditions);
-				continue;
+				goto again_conditions_i_start;
 			}
 			/* Remove implied branches:
 			 * (a || b || c) && b --> b */
@@ -405,6 +406,7 @@ class PPBranchOr: PPBranch {
 			}
 			++i;
 		}
+again_conditions_i_start:
 		local i = 0;
 again_conditions_i:
 		while (i < #conditions) {
@@ -413,7 +415,7 @@ again_conditions_i:
 			if (b is PPBranchOr) {
 				conditions.erase(i);
 				conditions.insertall(i, b.conditions);
-				continue;
+				goto again_conditions_i_start;
 			}
 			/* Remove implied branches:
 			 * (a && b && c) || b --> b */
@@ -701,3 +703,24 @@ assert optimizePreprocessorExpression(
 "((_POSIX_C_SOURCE - 0) >= 200809L || (_XOPEN_SOURCE - 0) >= 700 || defined(_NETBSD_SOURCE)) && "
 "defined(QUEUEDEBUG) && defined(_KERNEL) && defined(_XOPEN_SOURCE)"
 ) == "0";
+
+assert optimizePreprocessorExpression(
+"(defined(__CRT_HAVE_lfutexlock64) && defined(__USE_TIME_BITS64)) || "
+"defined(__CRT_HAVE_lfutexlock)||defined(__CRT_HAVE_lfutexlock64)"
+) == "defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64)";
+assert optimizePreprocessorExpression(
+"("
+	"(defined(__CRT_HAVE_lfutexlock64) && defined(__USE_TIME_BITS64)) || "
+	"(defined(__CRT_HAVE_lfutexlock) && !defined(__USE_TIME_BITS64)) || "
+	"("
+		"defined(__CRT_HAVE_lfutexlock) || ("
+			"defined(__CRT_HAVE_lfutexlock64) || "
+			"(defined(__CRT_HAVE_lfutexlock) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) ||"
+			"defined(__CRT_HAVE_lfutexlock)"
+		")"
+	")"
+")"
+) == "defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64)";
+
+
+

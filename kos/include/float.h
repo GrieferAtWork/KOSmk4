@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1994c4d */
+/* HASH CRC-32:0x48b23d83 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,31 +152,30 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 
 
 #ifdef __USE_DOS
-
 #ifdef __CC__
 #ifdef __CRT_HAVE__clearfp
 __CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_clearfp,(void),())
-#endif /* _clearfp... */
+#endif /* __CRT_HAVE__clearfp */
 #ifdef __CRT_HAVE__controlfp
 __CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_controlfp,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
-#endif /* _controlfp... */
+#endif /* __CRT_HAVE__controlfp */
 #ifdef __CRT_HAVE__set_controlfp
 __CDECLARE_VOID(,__NOTHROW_NCX,_set_controlfp,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
-#endif /* _set_controlfp... */
+#endif /* __CRT_HAVE__set_controlfp */
 #ifdef __CRT_HAVE__controlfp_s
 __CDECLARE(,__errno_t,__NOTHROW_NCX,_controlfp_s,(__UINT32_TYPE__ *__pcurrent, __UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__pcurrent,__newval,__mask))
-#endif /* _controlfp_s... */
+#endif /* __CRT_HAVE__controlfp_s */
 #ifdef __CRT_HAVE__statusfp
 __CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_statusfp,(void),())
-#endif /* _statusfp... */
-#ifdef __CRT_HAVE__fpreset
-__CDECLARE_VOID(,__NOTHROW_NCX,_fpreset,(void),())
-#elif defined(__CRT_HAVE_fpreset)
+#endif /* __CRT_HAVE__statusfp */
+#ifdef __CRT_HAVE_fpreset
 __CREDIRECT_VOID(,__NOTHROW_NCX,_fpreset,(void),fpreset,())
-#endif /* _fpreset... */
+#elif defined(__CRT_HAVE__fpreset)
+__CDECLARE_VOID(,__NOTHROW_NCX,_fpreset,(void),())
+#endif /* ... */
 #ifdef __CRT_HAVE__statusfp2
 __CDECLARE_VOID(,__NOTHROW_NCX,_statusfp2,(__UINT32_TYPE__ *__x86_stat, __UINT32_TYPE__ *__sse2_stat),(__x86_stat,__sse2_stat))
-#endif /* _statusfp2... */
+#endif /* __CRT_HAVE__statusfp2 */
 #endif /* __CC__ */
 #define _clear87        _clearfp
 #define _status87       _statusfp
@@ -228,16 +227,23 @@ __CDECLARE_VOID(,__NOTHROW_NCX,_statusfp2,(__UINT32_TYPE__ *__x86_stat, __UINT32
 #ifdef __CC__
 #ifdef __CRT_HAVE__control87
 __CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_control87,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
-#endif /* _control87... */
+#endif /* __CRT_HAVE__control87 */
 #if defined(__x86_64__) || defined(__i386__)
 #ifdef __CRT_HAVE___control87_2
 __CDECLARE(,int,__NOTHROW_NCX,__control87_2,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask, __UINT32_TYPE__ *__x86_control_word, __UINT32_TYPE__ *__sse2_control_word),(__newval,__mask,__x86_control_word,__sse2_control_word))
-#endif /* __control87_2... */
+#endif /* __CRT_HAVE___control87_2 */
 #endif /* X64... */
+#ifndef ____fpecode_defined
+#define ____fpecode_defined 1
 #ifdef __CRT_HAVE___fpecode
 __CDECLARE(,int *,__NOTHROW_NCX,__fpecode,(void),())
-#endif /* __fpecode... */
-#define _fpecode      (*__fpecode())
+#else /* __CRT_HAVE___fpecode */
+#undef ____fpecode_defined
+#endif /* !__CRT_HAVE___fpecode */
+#endif /* !____fpecode_defined */
+#ifdef ____fpecode_defined
+#define _fpecode (*__fpecode())
+#endif /* ____fpecode_defined */
 #endif /* __CC__ */
 
 #define _SW_UNEMULATED          0x0040
@@ -271,17 +277,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_copysign,(double __num
 #elif defined(__CRT_HAVE__copysign)
 /* Return X with its signed changed to Y's */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_copysign,(double __num, double __sign),(__num,__sign))
-#else /* LIBC: copysign */
+#else /* ... */
 #include <local/math/copysign.h>
 /* Return X with its signed changed to Y's */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _copysign)(double __num, double __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysign))(__num, __sign); }
-#endif /* _copysign... */
+#endif /* !... */
 #ifdef __CRT_HAVE__chgsign
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_chgsign,(double __x),(__x))
-#else /* LIBC: _chgsign */
+#else /* __CRT_HAVE__chgsign */
 #include <local/float/_chgsign.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_chgsign, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _chgsign)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_chgsign))(__x); })
-#endif /* _chgsign... */
+#endif /* !__CRT_HAVE__chgsign */
 #if __has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)
 /* Return X times (2 to the Nth power) */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __fn),scalb,{ return __builtin_scalb(__x, __fn); })
@@ -294,44 +300,56 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __fn),__s
 #elif defined(__CRT_HAVE__scalb)
 /* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __fn),(__x,__fn))
-#else /* LIBC: scalb */
+#else /* ... */
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/scalb.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _scalb)(double __x, double __fn) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalb))(__x, __fn); }
-#endif /* _scalb... */
-#endif /* _scalb... */
-#ifdef __CRT_HAVE___logb
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !... */
+#if __has_builtin(__builtin_logb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logb)
+/* Return the base 2 signed integral exponent of X */
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_logb,(double __x),logb,{ return __builtin_logb(__x); })
+#elif defined(__CRT_HAVE_logb)
+/* Return the base 2 signed integral exponent of X */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_logb,(double __x),logb,(__x))
+#elif defined(__CRT_HAVE___logb)
 /* Return the base 2 signed integral exponent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_logb,(double __x),__logb,(__x))
 #elif defined(__CRT_HAVE__logb)
 /* Return the base 2 signed integral exponent of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,_logb,(double __x),(__x))
-#elif defined(__CRT_HAVE_logb)
-/* Return the base 2 signed integral exponent of X */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_logb,(double __x),logb,(__x))
-#endif /* _logb... */
+#endif /* ... */
 #if __has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, double __y),nextafter,{ return __builtin_nextafter(__x, __y); })
+#elif __has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, double __y),nexttoward,{ return __builtin_nexttoward(__x); })
 #elif defined(__CRT_HAVE_nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, double __y),nextafter,(__x,__y))
+#elif defined(__CRT_HAVE_nexttoward)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, double __y),nexttoward,(__x,__y))
 #elif defined(__CRT_HAVE___nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, double __y),__nextafter,(__x,__y))
 #elif defined(__CRT_HAVE__nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, double __y),(__x,__y))
-#else /* LIBC: nextafter */
+#elif defined(__CRT_HAVE___nexttoward)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, double __y),__nexttoward,(__x,__y))
+#else /* ... */
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/nextafter.h>
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _nextafter)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafter))(__x, __y); }
-#endif /* _nextafter... */
-#endif /* _nextafter... */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !... */
 #if __has_builtin(__builtin_finite) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_finite,(double __x),finite,{ return __builtin_finite(__x); })
@@ -344,14 +362,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_finite,(double __x),__fin
 #elif defined(__CRT_HAVE__finite)
 /* Return nonzero if VALUE is finite and not NaN */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_finite,(double __x),(__x))
-#else /* LIBC: finite */
+#else /* ... */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || ((defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf)) && (defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE___isnan) || defined(__CRT_HAVE__isnan)))
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || ((defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) && (defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE___isnan) || defined(__CRT_HAVE__isnan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))
 #include <local/math/finite.h>
 /* Return nonzero if VALUE is finite and not NaN */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _finite)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))(__x); }
-#endif /* _finite... */
-#endif /* _finite... */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || ((__CRT_HAVE_isinf || __CRT_HAVE___isinf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) && (__CRT_HAVE_isnan || __CRT_HAVE___isnan || __CRT_HAVE__isnan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) */
+#endif /* !... */
 #if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __x),isnan,{ return __builtin_isnan(__x); })
@@ -364,39 +382,34 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __x),__isna
 #elif defined(__CRT_HAVE__isnan)
 /* Return nonzero if VALUE is not a number */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __x),(__x))
-#else /* LIBC: isnan */
+#else /* ... */
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/isnan.h>
 /* Return nonzero if VALUE is not a number */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _isnan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__x); }
-#endif /* _isnan... */
-#endif /* _isnan... */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !... */
 #ifdef __CRT_HAVE__fpclass
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_fpclass,(double __x),(__x))
-#endif /* _fpclass... */
+#endif /* __CRT_HAVE__fpclass */
 #if defined(__x86_64__) || defined(__i386__)
 #if __has_builtin(__builtin_scalbf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbf)
-/* Return X times (2 to the Nth power) */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __fn),scalbf,{ return __builtin_scalbf(__x, __fn); })
 #elif defined(__CRT_HAVE_scalbf)
-/* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __fn),scalbf,(__x,__fn))
 #elif defined(__CRT_HAVE___scalbf)
-/* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __fn),__scalbf,(__x,__fn))
 #elif defined(__CRT_HAVE__scalbf)
-/* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __fn),(__x,__fn))
-#else /* LIBC: scalbf */
+#else /* ... */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/scalbf.h>
-/* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _scalbf)(float __x, float __fn) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbf))(__x, __fn); }
-#endif /* _scalbf... */
-#endif /* _scalbf... */
-#endif
+#endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
+#endif /* !... */
+#endif /* __x86_64__ || __i386__ */
 #endif /* __CC__ */
 
 #define _FPCLASS_SNAN   0x0001 /* signaling NaN. */
@@ -415,7 +428,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _scalbf)(float __x, float
 __CDECLARE_VOID(,__NOTHROW_NCX,fpreset,(void),())
 #elif defined(__CRT_HAVE__fpreset)
 __CREDIRECT_VOID(,__NOTHROW_NCX,fpreset,(void),_fpreset,())
-#endif /* fpreset... */
+#endif /* ... */
 
 #define clear87   _clear87
 #define status87  _status87

@@ -18,7 +18,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default_impl_section(.text.crt.utility.glob)]
+%[default_impl_section(".text.crt.utility.glob")]
+%[define_replacement(glob_t = "struct __glob_struct")]
+%[define_replacement(glob64_t = "struct __glob64_struct")]
 
 
 %{
@@ -63,7 +65,7 @@ typedef __size_t size_t;
 #define GLOB_NOESCAPE (1 << 6) /* Backslashes don't quote metacharacters.  */
 #define GLOB_PERIOD   (1 << 7) /* Leading `.' can be matched by metachars.  */
 
-#if !defined __USE_POSIX2 || defined __USE_MISC
+#if !defined(__USE_POSIX2) || defined(__USE_MISC)
 #define GLOB_MAGCHAR      (1 << 8)  /* Set in gl_flags if any metachars seen.  */
 #define GLOB_ALTDIRFUNC   (1 << 9)  /* Use gl_opendir et al functions.  */
 #define GLOB_BRACE        (1 << 10) /* Expand "{a,b}" to "a" "b".  */
@@ -76,12 +78,12 @@ typedef __size_t size_t;
 	 GLOB_NOESCAPE | GLOB_NOCHECK | GLOB_APPEND |       \
 	 GLOB_PERIOD | GLOB_ALTDIRFUNC | GLOB_BRACE |       \
 	 GLOB_NOMAGIC | GLOB_TILDE | GLOB_ONLYDIR | GLOB_TILDE_CHECK)
-#else
+#else /* !__USE_POSIX2 || __USE_MISC */
 #define __GLOB_FLAGS                                    \
 	(GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS | \
 	 GLOB_NOESCAPE | GLOB_NOCHECK | GLOB_APPEND |       \
 	 GLOB_PERIOD)
-#endif
+#endif /* __USE_POSIX2 && !__USE_MISC */
 
 /* Error returns from `glob'. */
 #define GLOB_NOSPACE 1 /* Ran out of memory.  */
@@ -156,10 +158,11 @@ typedef int (__LIBCCALL *__glob_errfunc_t)(char const *__path, int __flags);
 
 };
 
-[[ignore, nocrt, doc_alias(glob), alias(glob)]]
-int glob32([[nonnull]] char const *__restrict pattern, int flags, __glob_errfunc_t errfunc,
+[[ignore, nocrt, doc_alias("glob"), alias("glob")]]
+int glob32([[nonnull]] char const *__restrict pattern,
+           int flags, __glob_errfunc_t errfunc,
            [[nonnull]] void *__restrict pglob);
-[[ignore, nocrt, doc_alias(globfree), alias(globfree)]]
+[[ignore, nocrt, doc_alias("globfree"), alias("globfree")]]
 void globfree32(void *pglob);
 
 
@@ -171,12 +174,12 @@ void globfree32(void *pglob);
 @@`glob' returns GLOB_ABEND; if it returns zero, the error is ignored.
 @@If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
 @@Otherwise, `glob' returns zero
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(glob64)]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(glob)]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("glob64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("glob")]]
 [[userimpl, no_crt_self_import]]
-glob:([[nonnull]] char const *__restrict pattern, int flags,
-      [[nullable]] __glob_errfunc_t errfunc,
-      [[nonnull]] glob_t *__restrict pglob) -> int {
+int glob([[nonnull]] char const *__restrict pattern, int flags,
+         [[nullable]] __glob_errfunc_t errfunc,
+         [[nonnull]] glob_t *__restrict pglob) {
 @@pp_if $has_function(glob32)@@
 	return glob32(pattern, flags, errfunc, pglob);
 @@pp_elif $has_function(glob64)@@
@@ -195,10 +198,10 @@ glob:([[nonnull]] char const *__restrict pattern, int flags,
 
 
 @@Free storage allocated in PGLOB by a previous `glob' call
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias(globfree64)]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(globfree)]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("globfree64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("globfree")]]
 [[userimpl, no_crt_self_import]]
-globfree([[nonnull]] glob_t *pglob) {
+void globfree([[nonnull]] glob_t *pglob) {
 @@pp_if $has_function(globfree32)@@
 	globfree32(pglob);
 @@pp_elif $has_function(globfree64)@@
@@ -211,11 +214,11 @@ globfree([[nonnull]] glob_t *pglob) {
 
 %
 %#ifdef __USE_LARGEFILE64
-[doc_alias(glob)][decl_prefix(struct __glob64_struct;)][[userimpl]]
-glob64:([[nonnull]] const char *__restrict pattern, int flags,
-        [[nullable]] __glob_errfunc_t errfunc,
-        [[nonnull]] struct __glob64_struct *__restrict pglob) -> int {
-@@pp_if_has_function(glob32)@@
+[[doc_alias("glob"), decl_prefix(struct __glob64_struct;), userimpl]]
+int glob64([[nonnull]] const char *__restrict pattern, int flags,
+           [[nullable]] __glob_errfunc_t errfunc,
+           [[nonnull]] struct __glob64_struct *__restrict pglob) {
+@@pp_if $has_function(glob32)@@
 	return glob32(pattern, flags, errfunc, pglob);
 @@pp_else@@
 	(void)pattern;
@@ -227,9 +230,9 @@ glob64:([[nonnull]] const char *__restrict pattern, int flags,
 @@pp_endif@@
 }
 
-[[doc_alias(globfree), decl_prefix(struct __glob64_struct;), userimpl]]
+[[doc_alias("globfree"), decl_prefix(struct __glob64_struct;), userimpl]]
 void globfree64([[nonnull]] struct __glob64_struct *pglob) {
-@@pp_if_has_function(globfree32)@@
+@@pp_if $has_function(globfree32)@@
 	globfree32(pglob);
 @@pp_else@@
 	COMPILER_IMPURE();

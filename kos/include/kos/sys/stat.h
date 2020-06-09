@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11e9338b */
+/* HASH CRC-32:0xbe1ec370 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 
 #include <__stdinc.h>
 #include <__crt.h>
-#include <kos/anno.h>
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
 #pragma GCC system_header
@@ -31,6 +30,7 @@
 
 #include <features.h>
 #include <sys/stat.h>
+#include <kos/anno.h>
 
 __SYSDECL_BEGIN
 
@@ -40,34 +40,34 @@ __SYSDECL_BEGIN
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Stat,(char const *__restrict __filename, struct stat *__restrict __buf),KStat,(__filename,__buf))
 #elif defined(__CRT_HAVE_KStat64) && !defined(__USE_FILE_OFFSET64)
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Stat,(char const *__restrict __filename, struct stat *__restrict __buf),KStat64,(__filename,__buf))
-#endif /* Stat... */
+#endif /* ... */
 
 #if defined(__CRT_HAVE_KFStat) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,FStat,(__fd_t __fd, struct stat *__restrict __buf),KFStat,(__fd,__buf))
 #elif defined(__CRT_HAVE_KFStat64) && !defined(__USE_FILE_OFFSET64)
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,FStat,(__fd_t __fd, struct stat *__restrict __buf),KFStat64,(__fd,__buf))
-#endif /* FStat... */
+#endif /* ... */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #if defined(__CRT_HAVE_KLStat) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,LStat,(char const *__restrict __filename, struct stat *__restrict __buf),KLStat,(__filename,__buf))
 #elif defined(__CRT_HAVE_KLStat64) && !defined(__USE_FILE_OFFSET64)
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,LStat,(char const *__restrict __filename, struct stat *__restrict __buf),KLStat64,(__filename,__buf))
-#endif /* LStat... */
+#endif /* ... */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_KStat64
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Stat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),KStat64,(__filename,__buf))
-#endif /* Stat64... */
+#endif /* __CRT_HAVE_KStat64 */
 #ifdef __CRT_HAVE_KFStat64
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,FStat64,(__fd_t __fd, struct stat64 *__restrict __buf),KFStat64,(__fd,__buf))
-#endif /* FStat64... */
+#endif /* __CRT_HAVE_KFStat64 */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #ifdef __CRT_HAVE_KLStat64
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,LStat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),KLStat64,(__filename,__buf))
-#endif /* LStat64... */
+#endif /* __CRT_HAVE_KLStat64 */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 #endif /* __USE_LARGEFILE64 */
 
@@ -80,71 +80,71 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2, 3)),__THROWING,FStatAt,(__fd_t __dirfd, char
 #elif defined(__CRT_HAVE_KFStatAt64) && !defined(__USE_FILE_OFFSET64)
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2, 3)),__THROWING,FStatAt,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),KFStatAt64,(__dirfd,__filename,__buf,__flags))
-#endif /* FStatAt... */
+#endif /* ... */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_KFStatAt64
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2, 3)),__THROWING,FStatAt64,(__fd_t __dirfd, char const *__restrict __filename, struct stat64 *__restrict __buf, __atflag_t __flags),KFStatAt64,(__dirfd,__filename,__buf,__flags))
-#endif /* FStatAt64... */
+#endif /* __CRT_HAVE_KFStatAt64 */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_ATFILE */
 
 #ifdef __CRT_HAVE_Mkdir
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))
-#endif /* Mkdir... */
+#endif /* __CRT_HAVE_Mkdir */
 
 #ifdef __CRT_HAVE_Chmod
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Chmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
-#endif /* Chmod... */
+#endif /* __CRT_HAVE_Chmod */
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_LChmod
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,LChmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
-#endif /* LChmod... */
+#endif /* __CRT_HAVE_LChmod */
 #endif /* __USE_MISC */
 
 #if defined(__USE_KOS) && defined(__USE_ATFILE)
 #ifdef __CRT_HAVE_FMkdirAt
-/* @param flags: Set of `0|AT_DOSPATH' */
+/* @param flags: Set of `0 | AT_DOSPATH' */
 __CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,FMkdirAt,(__fd_t __dirfd, char const *__pathname, __mode_t __mode, __atflag_t __flags),(__dirfd,__pathname,__mode,__flags))
-#endif /* FMkdirAt... */
+#endif /* __CRT_HAVE_FMkdirAt */
 #ifdef __CRT_HAVE_FMknodAt
-/* @param flags: Set of `0|AT_DOSPATH' */
+/* @param flags: Set of `0 | AT_DOSPATH' */
 __CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,FMknodAt,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),(__dirfd,__nodename,__mode,__dev,__flags))
-#endif /* FMknodAt... */
+#endif /* __CRT_HAVE_FMknodAt */
 #endif /* __USE_KOS && __USE_ATFILE */
 
 #ifdef __CRT_HAVE_Mkfifo
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Mkfifo,(char const *__fifoname, __mode_t __mode),(__fifoname,__mode))
-#endif /* Mkfifo... */
+#endif /* __CRT_HAVE_Mkfifo */
 
 #ifdef __USE_ATFILE
 #ifdef __CRT_HAVE_FChmodAt
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 __CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,FChmodAt,(__fd_t __dirfd, char const *__filename, __mode_t __mode, __atflag_t __flags),(__dirfd,__filename,__mode,__flags))
-#endif /* FChmodAt... */
+#endif /* __CRT_HAVE_FChmodAt */
 #ifdef __CRT_HAVE_MkdirAt
 __CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,MkdirAt,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),(__dirfd,__pathname,__mode))
-#endif /* MkdirAt... */
+#endif /* __CRT_HAVE_MkdirAt */
 #ifdef __CRT_HAVE_MkfifoAt
 __CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,MkfifoAt,(__fd_t __dirfd, char const *__fifoname, __mode_t __mode),(__dirfd,__fifoname,__mode))
-#endif /* MkfifoAt... */
+#endif /* __CRT_HAVE_MkfifoAt */
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_POSIX
 #ifdef __CRT_HAVE_FChmod
 __CDECLARE_VOID(,__THROWING,FChmod,(__fd_t __fd, __mode_t __mode),(__fd,__mode))
-#endif /* FChmod... */
+#endif /* __CRT_HAVE_FChmod */
 #endif /* __USE_POSIX */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 #ifdef __CRT_HAVE_Mknod
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Mknod,(char const *__nodename, __mode_t __mode, __dev_t __dev),(__nodename,__mode,__dev))
-#endif /* Mknod... */
+#endif /* __CRT_HAVE_Mknod */
 #ifdef __USE_ATFILE
 #ifdef __CRT_HAVE_MknodAt
 __CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,MknodAt,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev),(__dirfd,__nodename,__mode,__dev))
-#endif /* MknodAt... */
+#endif /* __CRT_HAVE_MknodAt */
 #endif /* __USE_ATFILE */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
@@ -159,7 +159,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,UTimensAt,(__fd_t __dirfd, char c
 #include <local/kos.sys.stat/UTimensAt.h>
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(UTimensAt, __FORCELOCAL __ATTR_NONNULL((2)) void (__LIBCCALL UTimensAt)(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(UTimensAt))(__dirfd, __filename, __times, __flags); })
-#endif /* UTimensAt... */
+#endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_UTimensAt64
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
@@ -171,7 +171,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,UTimensAt64,(__fd_t __dirfd, cha
 #include <local/kos.sys.stat/UTimensAt64.h>
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(UTimensAt64, __FORCELOCAL __ATTR_NONNULL((2)) void (__LIBCCALL UTimensAt64)(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(UTimensAt64))(__dirfd, __filename, __times, __flags); })
-#endif /* UTimensAt64... */
+#endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_ATFILE */
 
@@ -183,7 +183,7 @@ __CDECLARE_VOID(,__THROWING,FUtimens,(__fd_t __fd, struct timespec const __times
 #elif defined(__CRT_HAVE_FUtimens) || defined(__CRT_HAVE_FUtimens64)
 #include <local/kos.sys.stat/FUtimens.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(FUtimens, __FORCELOCAL void (__LIBCCALL FUtimens)(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUtimens))(__fd, __times); })
-#endif /* FUtimens... */
+#endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_FUtimens64
 __CDECLARE_VOID(,__THROWING,FUtimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),(__fd,__times))
@@ -192,7 +192,7 @@ __CREDIRECT_VOID(,__THROWING,FUtimens64,(__fd_t __fd, struct timespec64 const __
 #elif defined(__CRT_HAVE_FUtimens)
 #include <local/kos.sys.stat/FUtimens64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(FUtimens64, __FORCELOCAL void (__LIBCCALL FUtimens64)(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUtimens64))(__fd, __times); })
-#endif /* FUtimens64... */
+#endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K8 */
 

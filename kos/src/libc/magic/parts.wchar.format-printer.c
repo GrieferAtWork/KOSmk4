@@ -328,9 +328,9 @@ format_waprintf_alloc:([[nonnull]] struct format_waprintf_data *__restrict self,
 }
 
 @@Print data to a dynamically allocated heap buffer. On error, -1 is returned
-[requires_function("format_waprintf_alloc")][[userimpl, wchar, ATTR_WUNUSED]]
-format_waprintf_printer:([[nonnull]] /*struct format_waprintf_data **/ void *arg,
-                         [[nonnull]] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t {
+[[wchar, ATTR_WUNUSED, userimpl, requires_function(format_waprintf_alloc)]]
+$ssize_t format_waprintf_printer([[nonnull]] /*struct format_waprintf_data **/ void *arg,
+                                 [[nonnull]] wchar_t const *__restrict data, $size_t datalen) {
 	wchar_t *buf;
 	buf = format_waprintf_alloc((struct $format_waprintf_data *)arg, datalen);
 	if unlikely(!buf)

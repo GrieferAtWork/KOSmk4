@@ -20,6 +20,9 @@
 
 %[define_ccompat_header("cfenv")]
 %[define_replacement(errno_t = __errno_t)]
+%[define_replacement(fexcept_t = __fexcept_t)]
+%[define_replacement(fenv_t = "struct __fenv_struct")]
+%[define_partial_replacement(envp = ___envp)]
 %[default_impl_section(".text.crt.math.fenv")]
 
 %(c, ccompat)#ifndef __NO_FPU
@@ -27,6 +30,10 @@
 #include <features.h>
 
 #include <bits/fenv.h>
+#include <kos/anno.h>
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <optimized/fenv.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
 
 /* Documentation comments are taken from glibc /usr/include/fenv.h */
 /* Copyright (C) 1997-2016 Free Software Foundation, Inc.
@@ -98,12 +105,12 @@ int feraiseexcept:(int excepts) {
 @@flags indicated by EXCEPTS in the object pointed to by FLAGP
 [[std, fast, impl_include("<bits/fenv-inline.h>")]]
 int fegetexceptflag([[nonnull]] fexcept_t *flagp, int excepts) {
-#ifdef @__inline_fegetexceptflag@
-	@__inline_fegetexceptflag@(flagp, excepts);
-#else /* __inline_fegetexceptflag */
+@@pp_ifdef __inline_fegetexceptflag@@
+	__inline_fegetexceptflag(flagp, excepts);
+@@pp_else@@
 	*flagp = 0;
 	(void)excepts;
-#endif /* !__inline_fegetexceptflag */
+@@pp_endif@@
 	return 0;
 }
 
@@ -111,13 +118,13 @@ int fegetexceptflag([[nonnull]] fexcept_t *flagp, int excepts) {
 @@to the representation in the object pointed to by FLAGP
 [[std, fast, impl_include("<bits/fenv-inline.h>")]]
 int fesetexceptflag([[nonnull]] fexcept_t const *flagp, int excepts) {
-#ifdef @__inline_fesetexceptflag@
-	@__inline_fesetexceptflag@(flagp, excepts);
-#else /* __inline_fesetexceptflag */
+@@pp_ifdef __inline_fesetexceptflag@@
+	__inline_fesetexceptflag(flagp, excepts);
+@@pp_else@@
 	(void)flagp;
 	(void)excepts;
 	COMPILER_IMPURE();
-#endif /* !__inline_fesetexceptflag */
+@@pp_endif@@
 	return 0;
 }
 
@@ -126,7 +133,7 @@ int fesetexceptflag([[nonnull]] fexcept_t const *flagp, int excepts) {
 [[std, nothrow, ATTR_PURE, ATTR_WUNUSED]]
 [[fast, impl_include("<bits/fenv-inline.h>")]]
 int fetestexcept(int excepts) {
-	return @__inline_fetestexcept@(excepts);
+	return __inline_fetestexcept(excepts);
 }
 
 @@Get current rounding direction
@@ -138,7 +145,7 @@ int fetestexcept(int excepts) {
 [[std, nothrow, ATTR_PURE, ATTR_WUNUSED, libc]]
 [[fast, impl_include("<bits/fenv-inline.h>")]]
 int fegetround() {
-	return @__inline_fegetround@();
+	return __inline_fegetround();
 }
 
 @@Establish the rounding direction represented by `rounding_direction'
@@ -150,13 +157,13 @@ int fegetround() {
 [[std, nothrow, libc]]
 [[fast, impl_include("<bits/fenv-inline.h>")]]
 int fesetround(int rounding_direction) {
-	return @__inline_fesetround@(rounding_direction);
+	return __inline_fesetround(rounding_direction);
 }
 
 @@Store the current floating-point environment in the object pointed to by ENVP
 [[std, fast, impl_include("<bits/fenv-inline.h>")]]
 int fegetenv([[nonnull]] fenv_t *envp) {
-	@__inline_fegetenv@(envp);
+	__inline_fegetenv(envp);
 	return 0;
 }
 
@@ -164,14 +171,14 @@ int fegetenv([[nonnull]] fenv_t *envp) {
 @@exception flags and install a non-stop mode (if available) for all exceptions
 [[std, fast, impl_include("<bits/fenv-inline.h>")]]
 int feholdexcept([[nonnull]] fenv_t *envp) {
-	@__inline_feholdexcept@(envp);
+	__inline_feholdexcept(envp);
 	return 0;
 }
 
 @@Establish the floating-point environment represented by the object pointed to by ENVP
 [[std, fast, impl_include("<bits/fenv-inline.h>")]]
 int fesetenv([[nonnull]] fenv_t const *envp) {
-	@__inline_fesetenv@(envp);
+	__inline_fesetenv(envp);
 	return 0;
 }
 
@@ -180,7 +187,7 @@ int fesetenv([[nonnull]] fenv_t const *envp) {
 @@according to saved exceptions
 [[std, fast, impl_include("<bits/fenv-inline.h>")]]
 int feupdateenv([[nonnull]] fenv_t const *envp) {
-	@__inline_feupdateenv@(envp);
+	__inline_feupdateenv(envp);
 	return 0;
 }
 
@@ -192,7 +199,7 @@ int feupdateenv([[nonnull]] fenv_t const *envp) {
 @@exceptions are successfully set, otherwise returns -1
 [[nothrow, fast, impl_include("<bits/fenv-inline.h>")]]
 int feenableexcept(int excepts) {
-	return @__inline_feenableexcept@(excepts);
+	return __inline_feenableexcept(excepts);
 }
 
 @@Disable individual exceptions.  Will not disable more exceptions than
@@ -200,14 +207,14 @@ int feenableexcept(int excepts) {
 @@exceptions are successfully disabled, otherwise returns -1
 [[nothrow, fast, impl_include("<bits/fenv-inline.h>")]]
 int fedisableexcept(int excepts) {
-	return @__inline_fedisableexcept@(excepts);
+	return __inline_fedisableexcept(excepts);
 }
 
 @@Return enabled exceptions
 [[ATTR_WUNUSED, nothrow, ATTR_PURE]]
 [[fast, impl_include("<bits/fenv-inline.h>")]]
 int fegetexcept() {
-	return @__inline_fegetexcept@();
+	return __inline_fegetexcept();
 }
 
 %#endif /* __USE_GNU */

@@ -916,8 +916,25 @@ handle_numLines_after_pp_directive:
 							if (escapedTok !is none)
 								goto got_escapedTok;
 						}
-						if (tok in cLanguageTwoWordTypenameKeywords)
-							goto do_handle_cLanguageTwoWordTypenameKeyword;
+						if (tok in cLanguageTwoWordTypenameKeywords) {
+							tok = self.next();
+							if (!tok.issymbol())
+								goto again_handle_tok;
+							if (forceKeyEscape) {
+								escapedTok = keyEscape(tok);
+								if (escapedTok !is none)
+									goto got_escapedTok;
+							}
+							if (tok.startswith("$"))
+								goto do_handle_cLanguageTwoWordTypenameKeyword_dollar;
+							if (!forceKeyEscape) {
+								escapedTok = keyEscape(tok);
+								if (escapedTok !is none)
+									goto got_escapedTok;
+							}
+							/* Don't escape struct/union/etc. names in PART-mode */
+							continue;
+						}
 						escapedTok = partialKeywordEscapes.get(tok);
 						if (escapedTok is none) {
 							if (tok in keywordEscapes || tok in cLanguageKeywords)
@@ -954,8 +971,10 @@ do_handle_cLanguageTwoWordTypenameKeyword:
 								if (escapedTok !is none)
 									goto got_escapedTok;
 							}
-							if (tok.startswith("$"))
+							if (tok.startswith("$")) {
+do_handle_cLanguageTwoWordTypenameKeyword_dollar:
 								tok = tok[1:];
+							}
 							if (!forceKeyEscape) {
 								escapedTok = keyEscape(tok);
 								if (escapedTok !is none)

@@ -45,6 +45,9 @@
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/pp/__va_nargs.h>
 #endif /* !__cplusplus && __USE_STRING_OVERLOADS */
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <optimized/string.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
 
 __SYSDECL_BEGIN
 

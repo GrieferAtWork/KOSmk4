@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x784ba808 */
+/* HASH CRC-32:0xdb3093c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 
 #include <__stdinc.h>
 #include <__crt.h>
-#include <kos/anno.h>
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
 #pragma GCC system_header
@@ -41,9 +40,9 @@ __SYSDECL_BEGIN
  * One argument may follow; its presence and type depend on REQUEST.
  * Return value depends on REQUEST. Usually -1 indicates error */
 __LIBC __SSIZE_TYPE__ (__VLIBCCALL Ioctl)(__fd_t __fd, unsigned long int __request, ...) __THROWS(...) __CASMNAME_SAME("Ioctl");
-#else /* LIBC: Ioctl */
+#else /* __CRT_HAVE_Ioctl */
 #undef __Ioctl_defined
-#endif /* Ioctl... */
+#endif /* !__CRT_HAVE_Ioctl */
 #endif /* !__Ioctl_defined */
 #endif /* __CC__ */
 

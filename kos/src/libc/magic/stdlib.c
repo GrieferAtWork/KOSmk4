@@ -375,7 +375,7 @@ typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 #define __compar_d_fn_t_defined 1
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
-), ATTR_WUNUSED, throws]]
+), throws, ATTR_WUNUSED]]
 void *bsearch_r([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg)
 	[([[nonnull]] void const *pkey, [[nonnull]] void *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg): void *]
 	[([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg): void const *]
@@ -2415,7 +2415,7 @@ __LOCAL_LIBC(__invoke_compare_helper_s) int
 	return (*((struct __invoke_compare_helper_s_data *)__arg)->__fun)(((struct __invoke_compare_helper_s_data *)__arg)->__arg, __a, __b);
 }
 #endif /* !____invoke_compare_helper_defined */
-), ATTR_WUNUSED, throws]]
+), throws, ATTR_WUNUSED]]
 void *bsearch_s([[nonnull]] void const *key, [[nonnull]] void const *base,
                 $size_t nmemb, $size_t size,
                 [[nonnull]] __dos_compar_d_fn_t compar, void *arg) {

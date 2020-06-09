@@ -24,6 +24,9 @@
 %{
 #include <bits/types.h>
 #include <kos/anno.h>
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <optimized/error.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
 
 #ifdef __CC__
 
