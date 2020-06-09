@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51b1a42 */
+/* HASH CRC-32:0xf7f78872 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,27 +62,27 @@ __SYSDECL_BEGIN
 /* Initialize semaphore object SEM to VALUE.
  * If PSHARED then share it with other processes */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_init,(sem_t *__sem, int __pshared, unsigned int __value),(__sem,__pshared,__value))
-#endif /* sem_init... */
+#endif /* __CRT_HAVE_sem_init */
 #ifdef __CRT_HAVE_sem_destroy
 /* Free resources associated with semaphore object SEM */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_destroy,(sem_t *__sem),(__sem))
-#endif /* sem_destroy... */
+#endif /* __CRT_HAVE_sem_destroy */
 #ifdef __CRT_HAVE_sem_open
 /* Open a named semaphore NAME with open flags OFLAGS */
 __LIBC __ATTR_NONNULL((1)) sem_t *__NOTHROW_RPC_KOS(__VLIBCCALL sem_open)(char const *__name, __oflag_t __oflags, ...) __CASMNAME_SAME("sem_open");
-#endif /* sem_open... */
+#endif /* __CRT_HAVE_sem_open */
 #ifdef __CRT_HAVE_sem_close
 /* Close descriptor for named semaphore SEM */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_close,(sem_t *__sem),(__sem))
-#endif /* sem_close... */
+#endif /* __CRT_HAVE_sem_close */
 #ifdef __CRT_HAVE_sem_unlink
 /* Remove named semaphore NAME */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,sem_unlink,(const char *__name),(__name))
-#endif /* sem_unlink... */
+#endif /* __CRT_HAVE_sem_unlink */
 #ifdef __CRT_HAVE_sem_wait
 /* Wait for SEM being posted */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sem_wait,(sem_t *__sem),(__sem))
-#endif /* sem_wait... */
+#endif /* __CRT_HAVE_sem_wait */
 
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_sem_timedwait) && !defined(__USE_TIME_BITS64)
@@ -95,34 +95,31 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sem_timedwait,(sem_t *__res
 #include <local/semaphore/sem_timedwait.h>
 /* Similar to `sem_wait' but wait only until ABSTIME */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sem_timedwait, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL sem_timedwait)(sem_t *__restrict __sem, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sem_timedwait))(__sem, __abstime); })
-#endif /* sem_timedwait... */
+#endif /* ... */
 
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_sem_timedwait64
-/* Similar to `sem_wait' but wait only until ABSTIME */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sem_timedwait64,(sem_t *__restrict __sem, struct timespec64 const *__restrict __abstime),(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* Similar to `sem_wait' but wait only until ABSTIME */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sem_timedwait64,(sem_t *__restrict __sem, struct timespec64 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait)
 #include <local/semaphore/sem_timedwait64.h>
-/* Similar to `sem_wait' but wait only until ABSTIME */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sem_timedwait64, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL sem_timedwait64)(sem_t *__restrict __sem, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sem_timedwait64))(__sem, __abstime); })
-#endif /* sem_timedwait64... */
+#endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
 #ifdef __CRT_HAVE_sem_trywait
 /* Test whether SEM is posted */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_trywait,(sem_t *__sem),(__sem))
-#endif /* sem_trywait... */
+#endif /* __CRT_HAVE_sem_trywait */
 #ifdef __CRT_HAVE_sem_post
 /* Post SEM */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_post,(sem_t *__sem),(__sem))
-#endif /* sem_post... */
+#endif /* __CRT_HAVE_sem_post */
 #ifdef __CRT_HAVE_sem_getvalue
 /* Get current value of SEM and store it in *SVAL */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sem_getvalue,(sem_t *__restrict __sem, int *__restrict __sval),(__sem,__sval))
-#endif /* sem_getvalue... */
+#endif /* __CRT_HAVE_sem_getvalue */
 #endif /* __CC__ */
 
 __SYSDECL_END

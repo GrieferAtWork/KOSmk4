@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8899461e */
+/* HASH CRC-32:0x8454eaa8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,64 +103,58 @@ __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
-#ifdef __CRT_HAVE_getpwuid
-__CDECLARE(,struct passwd *,__NOTHROW_RPC,getpwuid,(__uid_t __uid),(__uid))
-#endif /* getpwuid... */
-#ifdef __CRT_HAVE_getpwnam
-__CDECLARE(__ATTR_NONNULL((1)),struct passwd *,__NOTHROW_RPC,getpwnam,(char const *__name),(__name))
-#endif /* getpwnam... */
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 #ifdef __CRT_HAVE_setpwent
 /* Rewind the password-file stream */
 __CDECLARE_VOID(,__NOTHROW_RPC,setpwent,(void),())
-#endif /* setpwent... */
+#endif /* __CRT_HAVE_setpwent */
 #ifdef __CRT_HAVE_endpwent
 /* Close the password-file stream */
 __CDECLARE_VOID(,__NOTHROW_RPC_NOKOS,endpwent,(void),())
-#endif /* endpwent... */
+#endif /* __CRT_HAVE_endpwent */
 #ifdef __CRT_HAVE_getpwent
 /* Read an entry from the password-file stream, opening it if necessary */
 __CDECLARE(,struct passwd *,__NOTHROW_RPC,getpwent,(void),())
-#endif /* getpwent... */
+#endif /* __CRT_HAVE_getpwent */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 #ifdef __CRT_HAVE_getpwuid
 /* Search for an entry with a matching user ID */
 __CDECLARE(,struct passwd *,__NOTHROW_RPC,getpwuid,(__uid_t __uid),(__uid))
-#endif /* getpwuid... */
+#endif /* __CRT_HAVE_getpwuid */
 #ifdef __CRT_HAVE_getpwnam
 /* Search for an entry with a matching username */
 __CDECLARE(__ATTR_NONNULL((1)),struct passwd *,__NOTHROW_RPC,getpwnam,(const char *__name),(__name))
-#endif /* getpwnam... */
+#endif /* __CRT_HAVE_getpwnam */
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_fgetpwent
 /* Read an entry from STREAM */
 __CDECLARE(__ATTR_NONNULL((1)),struct passwd *,__NOTHROW_RPC,fgetpwent,(__FILE *__restrict __stream),(__stream))
-#endif /* fgetpwent... */
+#endif /* __CRT_HAVE_fgetpwent */
 #ifdef __CRT_HAVE_putpwent
 /* Write the given entry onto the given stream */
 __CDECLARE(,int,__NOTHROW_RPC,putpwent,(struct passwd const *__restrict __p, __FILE *__restrict __f),(__p,__f))
-#endif /* putpwent... */
+#endif /* __CRT_HAVE_putpwent */
 #endif /* __USE_MISC */
 
 #ifdef __USE_POSIX
 #ifdef __CRT_HAVE_getpwuid_r
 /* Search for an entry with a matching user ID */
-__CDECLARE(__ATTR_NONNULL((2, 3, 5)),int,__NOTHROW_RPC,getpwuid_r,(__uid_t ____uid, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(____uid,__resultbuf,__buffer,__buflen,__result))
-#endif /* getpwuid_r... */
+__CDECLARE(__ATTR_NONNULL((2, 3, 5)),int,__NOTHROW_RPC,getpwuid_r,(__uid_t __uid, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__uid,__resultbuf,__buffer,__buflen,__result))
+#endif /* __CRT_HAVE_getpwuid_r */
 #ifdef __CRT_HAVE_getpwnam_r
 /* Search for an entry with a matching username */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,getpwnam_r,(const char *__restrict __name, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__name,__resultbuf,__buffer,__buflen,__result))
-#endif /* getpwnam_r... */
+#endif /* __CRT_HAVE_getpwnam_r */
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_getpwent_r
 /* Read an entry from the password-file stream, opening it if necessary */
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),int,__NOTHROW_RPC,getpwent_r,(struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__resultbuf,__buffer,__buflen,__result))
-#endif /* getpwent_r... */
+#endif /* __CRT_HAVE_getpwent_r */
 #ifdef __CRT_HAVE_fgetpwent_r
-/* Read an entry from STREAM */
+/* Read an entry from STREAM. This function is not standardized and probably never will */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,fgetpwent_r,(__FILE *__restrict __stream, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__stream,__resultbuf,__buffer,__buflen,__result))
-#endif /* fgetpwent_r... */
+#endif /* __CRT_HAVE_fgetpwent_r */
 #endif /* __USE_MISC */
 #endif	/* __USE_POSIX */
 #ifdef __USE_GNU
@@ -169,7 +163,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,fgetpwent_r,(__FILE *_
  * given buffer. This knows the format that the caller will
  * expect, but this need not be the format of the password file */
 __CDECLARE(,int,__NOTHROW_RPC,getpw,(__uid_t __uid, char *__buffer),(__uid,__buffer))
-#endif /* getpw... */
+#endif /* __CRT_HAVE_getpw */
 #endif /* __USE_GNU */
 #endif /* __CC__ */
 

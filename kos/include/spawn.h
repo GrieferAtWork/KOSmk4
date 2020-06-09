@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e5e8e23 */
+/* HASH CRC-32:0x16f2ff2e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,12 +116,12 @@ typedef struct {
 
 #ifndef __TARGV
 #ifdef __USE_DOS
-#   define __TARGV  char const *const *___argv
-#   define __TENVP  char const *const *___envp
-#else
-#   define __TARGV  char *const ___argv[__restrict_arr]
-#   define __TENVP  char *const ___envp[__restrict_arr]
-#endif
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* ! */
 #endif /* !__TARGV */
 
 
@@ -130,111 +130,111 @@ typedef struct {
  * Before running the process perform the actions described in FILE-ACTIONS.
  * This function is a possible cancellation point and therefore not marked with __THROW */
 __CDECLARE(__ATTR_NONNULL((1, 2, 5, 6)),int,__NOTHROW_RPC,posix_spawn,(pid_t *__restrict __pid, char const *__restrict __path, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__path,__file_actions,__attrp,,))
-#endif /* posix_spawn... */
+#endif /* __CRT_HAVE_posix_spawn */
 
 #ifdef __CRT_HAVE_posix_spawnp
 /* Similar to `posix_spawn' but search for FILE in the PATH.
  * This function is a possible cancellation point and therefore not marked with __THROW */
 __CDECLARE(__ATTR_NONNULL((1, 2, 5, 6)),int,__NOTHROW_RPC,posix_spawnp,(pid_t *__restrict __pid, const char *__restrict __file, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__file,__file_actions,__attrp,,))
-#endif /* posix_spawnp... */
+#endif /* __CRT_HAVE_posix_spawnp */
 
 #ifdef __CRT_HAVE_posix_spawnattr_init
 /* Initialize data structure with attributes for `spawn' to default values */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawnattr_init,(posix_spawnattr_t *__restrict __attr),(__attr))
-#endif /* posix_spawnattr_init... */
+#endif /* __CRT_HAVE_posix_spawnattr_init */
 
 #ifdef __CRT_HAVE_posix_spawnattr_destroy
 /* Free resources associated with ATTR */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawnattr_destroy,(posix_spawnattr_t *__restrict __attr),(__attr))
-#endif /* posix_spawnattr_destroy... */
+#endif /* __CRT_HAVE_posix_spawnattr_destroy */
 
 #ifdef __CRT_HAVE_posix_spawnattr_getsigdefault
 /* Store signal mask for signals with default handling from ATTR in SIGDEFAULT */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getsigdefault,(posix_spawnattr_t const *__restrict __attr, sigset_t *__restrict __sigdefault),(__attr,__sigdefault))
-#endif /* posix_spawnattr_getsigdefault... */
+#endif /* __CRT_HAVE_posix_spawnattr_getsigdefault */
 
 #ifdef __CRT_HAVE_posix_spawnattr_setsigdefault
 /* Set signal mask for signals with default handling in ATTR to SIGDEFAULT */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_setsigdefault,(posix_spawnattr_t *__restrict __attr, sigset_t const *__restrict __sigdefault),(__attr,__sigdefault))
-#endif /* posix_spawnattr_setsigdefault... */
+#endif /* __CRT_HAVE_posix_spawnattr_setsigdefault */
 
 #ifdef __CRT_HAVE_posix_spawnattr_getsigmask
 /* Store signal mask for the new process from ATTR in SIGMASK */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getsigmask,(posix_spawnattr_t const *__restrict __attr, sigset_t *__restrict __sigmask),(__attr,__sigmask))
-#endif /* posix_spawnattr_getsigmask... */
+#endif /* __CRT_HAVE_posix_spawnattr_getsigmask */
 
 #ifdef __CRT_HAVE_posix_spawnattr_setsigmask
 /* Set signal mask for the new process in ATTR to SIGMASK */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_setsigmask,(posix_spawnattr_t *__restrict __attr, sigset_t const *__restrict __sigmask),(__attr,__sigmask))
-#endif /* posix_spawnattr_setsigmask... */
+#endif /* __CRT_HAVE_posix_spawnattr_setsigmask */
 
 #ifdef __CRT_HAVE_posix_spawnattr_getflags
 /* Get flag word from the attribute structure */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getflags,(posix_spawnattr_t const *__restrict __attr, __INT16_TYPE__ *__restrict __flags),(__attr,__flags))
-#endif /* posix_spawnattr_getflags... */
+#endif /* __CRT_HAVE_posix_spawnattr_getflags */
 
 #ifdef __CRT_HAVE_posix_spawnattr_setflags
 /* Store flags in the attribute structure */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawnattr_setflags,(posix_spawnattr_t *__restrict __attr, short int __flags),(__attr,__flags))
-#endif /* posix_spawnattr_setflags... */
+#endif /* __CRT_HAVE_posix_spawnattr_setflags */
 
 #ifdef __CRT_HAVE_posix_spawnattr_getpgroup
 /* Get process group ID from the attribute structure */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getpgroup,(posix_spawnattr_t const *__restrict __attr, pid_t *__restrict __pgroup),(__attr,__pgroup))
-#endif /* posix_spawnattr_getpgroup... */
+#endif /* __CRT_HAVE_posix_spawnattr_getpgroup */
 
 #ifdef __CRT_HAVE_posix_spawnattr_setpgroup
-/* Store process group ID in the attribute structure */
+/* Store rocess group ID in the attribute structure */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawnattr_setpgroup,(posix_spawnattr_t *__restrict __attr, pid_t __pgroup),(__attr,__pgroup))
-#endif /* posix_spawnattr_setpgroup... */
+#endif /* __CRT_HAVE_posix_spawnattr_setpgroup */
 
 #ifdef __CRT_HAVE_posix_spawnattr_getschedpolicy
 /* Get scheduling policy from the attribute structure */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getschedpolicy,(posix_spawnattr_t const *__restrict __attr, int *__restrict __schedpolicy),(__attr,__schedpolicy))
-#endif /* posix_spawnattr_getschedpolicy... */
+#endif /* __CRT_HAVE_posix_spawnattr_getschedpolicy */
 
 #ifdef __CRT_HAVE_posix_spawnattr_setschedpolicy
 /* Store scheduling policy in the attribute structure */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawnattr_setschedpolicy,(posix_spawnattr_t *__restrict __attr, int __schedpolicy),(__attr,__schedpolicy))
-#endif /* posix_spawnattr_setschedpolicy... */
+#endif /* __CRT_HAVE_posix_spawnattr_setschedpolicy */
 
 #ifdef __CRT_HAVE_posix_spawnattr_getschedparam
 /* Get scheduling parameters from the attribute structure */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getschedparam,(posix_spawnattr_t const *__restrict __attr, struct sched_param *__restrict __schedparam),(__attr,__schedparam))
-#endif /* posix_spawnattr_getschedparam... */
+#endif /* __CRT_HAVE_posix_spawnattr_getschedparam */
 
 #ifdef __CRT_HAVE_posix_spawnattr_setschedparam
 /* Store scheduling parameters in the attribute structure */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_setschedparam,(posix_spawnattr_t *__restrict __attr, struct sched_param const *__restrict __schedparam),(__attr,__schedparam))
-#endif /* posix_spawnattr_setschedparam... */
+#endif /* __CRT_HAVE_posix_spawnattr_setschedparam */
 
 #ifdef __CRT_HAVE_posix_spawn_file_actions_init
 /* Initialize data structure for file attribute for `spawn' call */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawn_file_actions_init,(posix_spawn_file_actions_t *__restrict __file_actions),(__file_actions))
-#endif /* posix_spawn_file_actions_init... */
+#endif /* __CRT_HAVE_posix_spawn_file_actions_init */
 
 #ifdef __CRT_HAVE_posix_spawn_file_actions_destroy
 /* Free resources associated with FILE-ACTIONS */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawn_file_actions_destroy,(posix_spawn_file_actions_t *__restrict __file_actions),(__file_actions))
-#endif /* posix_spawn_file_actions_destroy... */
+#endif /* __CRT_HAVE_posix_spawn_file_actions_destroy */
 
 #ifdef __CRT_HAVE_posix_spawn_file_actions_addopen
 /* Add an action to FILE-ACTIONS which tells the implementation
  * to call `open' for the given file during the `spawn' call */
 __CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,posix_spawn_file_actions_addopen,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd, char const *__restrict __path, __oflag_t __oflags, mode_t __mode),(__file_actions,__fd,__path,__oflags,__mode))
-#endif /* posix_spawn_file_actions_addopen... */
+#endif /* __CRT_HAVE_posix_spawn_file_actions_addopen */
 
 #ifdef __CRT_HAVE_posix_spawn_file_actions_addclose
 /* Add an action to FILE-ACTIONS which tells the implementation to
  * call `close' for the given file descriptor during the `spawn' call */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawn_file_actions_addclose,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd),(__file_actions,__fd))
-#endif /* posix_spawn_file_actions_addclose... */
+#endif /* __CRT_HAVE_posix_spawn_file_actions_addclose */
 
 #ifdef __CRT_HAVE_posix_spawn_file_actions_adddup2
 /* Add an action to FILE-ACTIONS which tells the implementation to
  * call `dup2' for the given file descriptors during the `spawn' call */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawn_file_actions_adddup2,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd, __fd_t __newfd),(__file_actions,__fd,__newfd))
-#endif /* posix_spawn_file_actions_adddup2... */
+#endif /* __CRT_HAVE_posix_spawn_file_actions_adddup2 */
 
 #endif /* __CC__ */
 

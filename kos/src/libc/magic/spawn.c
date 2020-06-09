@@ -20,7 +20,10 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]
+%[define_replacement(posix_spawnattr_t = posix_spawnattr_t)]
+%[define_replacement(posix_spawn_file_actions_t = posix_spawn_file_actions_t)]
 %[default_impl_section(".text.crt.fs.exec.posix_spawn")]
+
 
 %{
 #include <features.h>
@@ -111,12 +114,12 @@ typedef struct {
 
 #ifndef __TARGV
 #ifdef __USE_DOS
-#   define __TARGV  char const *const *___argv
-#   define __TENVP  char const *const *___envp
-#else
-#   define __TARGV  char *const ___argv[__restrict_arr]
-#   define __TENVP  char *const ___envp[__restrict_arr]
-#endif
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* ! */
 #endif /* !__TARGV */
 
 }

@@ -19,7 +19,14 @@
  */
 
 %[define_replacement(errno_t = __errno_t)]
-%[default_impl_section(.text.crt.utility.regex)]
+%[define_replacement(s_reg_t = __LONGPTR_TYPE__)]
+%[define_replacement(active_reg_t = __ULONGPTR_TYPE__)]
+%[define_replacement(reg_syntax_t = __ULONGPTR_TYPE__)]
+%[define_replacement(regmatch_t = regmatch_t)]
+%[define_replacement(regex_t = "struct re_pattern_buffer")]
+%[define_replacement(regoff_t = __INT32_TYPE__)]
+
+%[default_impl_section(".text.crt.utility.regex")]
 
 %{
 #include <features.h>
@@ -320,7 +327,7 @@ typedef struct {
 
 @@Sets the current default syntax to SYNTAX, and return the old syntax.
 @@You can also simply assign to the `re_syntax_options' variable
-re_set_syntax:(reg_syntax_t syntax) -> reg_syntax_t;
+reg_syntax_t re_set_syntax(reg_syntax_t syntax);
 
 @@Compile the regular expression PATTERN, with length LENGTH
 @@and syntax given by the global `re_syntax_options', into the buffer
@@ -328,35 +335,36 @@ re_set_syntax:(reg_syntax_t syntax) -> reg_syntax_t;
 @@To free the allocated storage, you must call `regfree' on BUFFER.
 @@Note that the translate table must either have been initialized by
 @@`regcomp', with a malloc'd value, or set to NULL before calling `regfree'
-re_compile_pattern:(char const *pattern, size_t length, struct re_pattern_buffer *buffer) -> char const *;
+char const *re_compile_pattern(char const *pattern, size_t length,
+                               struct re_pattern_buffer *buffer);
 
 @@Compile a fastmap for the compiled pattern in BUFFER; used to
 @@accelerate searches. Return 0 if successful and -2 if was an internal error
-re_compile_fastmap:(struct re_pattern_buffer *buffer) -> int;
+int re_compile_fastmap(struct re_pattern_buffer *buffer);
 
 @@Search in the string STRING (with length LENGTH) for the pattern
 @@compiled into BUFFER. Start searching at position START, for RANGE
 @@characters. Return the starting position of the match, -1 for no
 @@match, or -2 for an internal error. Also return register
 @@information in REGS (if REGS and BUFFER->no_sub are nonzero)
-re_search:(struct re_pattern_buffer *buffer, char const *string,
-           int length, int start, int range, struct re_registers *regs) -> int;
+int re_search(struct re_pattern_buffer *buffer, char const *string,
+              int length, int start, int range, struct re_registers *regs);
 
 @@Like `re_search', but search in the concatenation of STRING1
 @@and STRING2. Also, stop searching at index START + STOP
-re_search_2:(struct re_pattern_buffer *buffer, char const *string1, int length1,
-             char const *string2, int length2, int start, int range,
-             struct re_registers *regs, int stop) -> int;
+int re_search_2(struct re_pattern_buffer *buffer, char const *string1, int length1,
+                char const *string2, int length2, int start, int range,
+                struct re_registers *regs, int stop);
 
 @@Like `re_search', but return how many characters in STRING
 @@the regexp in BUFFER matched, starting at position START
-re_match:(struct re_pattern_buffer *buffer, char const *string,
-          int length, int start, struct re_registers *regs) -> int;
+int re_match(struct re_pattern_buffer *buffer, char const *string,
+             int length, int start, struct re_registers *regs);
 
 @@Relates to `re_match' as `re_search_2' relates to `re_search'
-re_match_2:(struct re_pattern_buffer *buffer, char const *string1,
-            int length1, char const *string2, int length2, int start,
-            struct re_registers *regs, int stop) -> int;
+int re_match_2(struct re_pattern_buffer *buffer, char const *string1,
+               int length1, char const *string2, int length2, int start,
+               struct re_registers *regs, int stop);
 
 @@Set REGS to hold NUM_REGS registers, storing them in STARTS and
 @@ENDS. Subsequent matches using BUFFER and REGS will use this memory
@@ -365,18 +373,20 @@ re_match_2:(struct re_pattern_buffer *buffer, char const *string1,
 @@If NUM_REGS == 0, then subsequent matches should allocate their own register data.
 @@Unless this function is called, the first search or match using
 @@PATTERN_BUFFER will allocate its own register data, without freeing the old data
-re_set_registers:(struct re_pattern_buffer *buffer, struct re_registers *regs,
-                  unsigned int num_regs, regoff_t *starts, regoff_t *ends);
+void re_set_registers(struct re_pattern_buffer *buffer, struct re_registers *regs,
+                      unsigned int num_regs, regoff_t *starts, regoff_t *ends);
 %#endif /* __USE_GNU */
 
+%
+%
+%/* POSIX compatibility.  */
 
-/* POSIX compatibility.  */
-regcomp:(regex_t *__restrict preg, char const *__restrict pattern, int cflags) -> int;
-regexec:(regex_t const *__restrict preg, char const *__restrict string,
-         size_t nmatch, regmatch_t pmatch[__restrict_arr], int eflags) -> int;
-regerror:(int errcode, regex_t const *__restrict preg,
-          char *__restrict errbuf, size_t errbuf_size) -> size_t;
-regfree:(regex_t *preg);
+int regcomp(regex_t *__restrict preg, char const *__restrict pattern, int cflags);
+int regexec(regex_t const *__restrict preg, char const *__restrict string,
+            size_t nmatch, regmatch_t pmatch[__restrict_arr], int eflags);
+size_t regerror(int errcode, regex_t const *__restrict preg,
+                char *__restrict errbuf, size_t errbuf_size);
+void regfree(regex_t *preg);
 
 %{
 

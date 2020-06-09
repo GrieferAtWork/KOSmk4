@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91303fa5 */
+/* HASH CRC-32:0xdc72c9c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,6 +155,7 @@ __LIBC reg_syntax_t re_syntax_options;
 
 /* If any error codes are removed, changed, or added, update the
    `re_error_msg' table in regex.c. */
+/*[[[enum]]]*/
 #ifdef __CC__
 typedef enum {
 #if defined(_XOPEN_SOURCE) || defined(__USE_XOPEN2K)
@@ -162,6 +163,7 @@ typedef enum {
 #endif /* _XOPEN_SOURCE || __USE_XOPEN2K */
 	REG_NOERROR  = 0,  /* Success. */
 	REG_NOMATCH  = 1,  /* Didn't find a match (for regexec). */
+
 	/* POSIX */
 	REG_BADPAT   = 2,  /* Invalid pattern. */
 	REG_ECOLLATE = 3,  /* Inalid collating element. */
@@ -175,36 +177,62 @@ typedef enum {
 	REG_ERANGE   = 11, /* Invalid range end. */
 	REG_ESPACE   = 12, /* Ran out of memory. */
 	REG_BADRPT   = 13, /* No preceding re for repetition op. */
+
 	/* GNU-specific errors */
 	REG_EEND     = 14, /* Premature end. */
 	REG_ESIZE    = 15, /* Compiled pattern bigger than 2^16 bytes. */
-	REG_ERPAREN  = 16 /* Unmatched ) or \); not returned from regcomp. */
+	REG_ERPAREN  = 16  /* Unmatched ) or \); not returned from regcomp. */
 } reg_errcode_t;
 #endif /* __CC__ */
-#ifndef __COMPILER_PREFERR_ENUMS
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
 #if defined(_XOPEN_SOURCE) || defined(__USE_XOPEN2K)
-#define REG_ENOSYS   (-1) /* Returned when libc.so fails to load `libregex.so' for some reason */
+#define REG_ENOSYS   REG_ENOSYS   /* Returned when libc.so fails to load `libregex.so' for some reason */
 #endif /* _XOPEN_SOURCE || __USE_XOPEN2K */
-#define REG_NOERROR  0    /* Success. */
-#define REG_NOMATCH  1    /* Didn't find a match (for regexec). */
+#define REG_NOERROR  REG_NOERROR  /* Success. */
+#define REG_NOMATCH  REG_NOMATCH  /* Didn't find a match (for regexec). */
 	/* POSIX */
-#define REG_BADPAT   2    /* Invalid pattern. */
-#define REG_ECOLLATE 3    /* Inalid collating element. */
-#define REG_ECTYPE   4    /* Invalid character class name. */
-#define REG_EESCAPE  5    /* Trailing backslash. */
-#define REG_ESUBREG  6    /* Invalid back reference. */
-#define REG_EBRACK   7    /* Unmatched left bracket. */
-#define REG_EPAREN   8    /* Parenthesis imbalance. */
-#define REG_EBRACE   9    /* Unmatched \{. */
-#define REG_BADBR    10   /* Invalid contents of \{\}. */
-#define REG_ERANGE   11   /* Invalid range end. */
-#define REG_ESPACE   12   /* Ran out of memory. */
-#define REG_BADRPT   13   /* No preceding re for repetition op. */
+#define REG_BADPAT   REG_BADPAT   /* Invalid pattern. */
+#define REG_ECOLLATE REG_ECOLLATE /* Inalid collating element. */
+#define REG_ECTYPE   REG_ECTYPE   /* Invalid character class name. */
+#define REG_EESCAPE  REG_EESCAPE  /* Trailing backslash. */
+#define REG_ESUBREG  REG_ESUBREG  /* Invalid back reference. */
+#define REG_EBRACK   REG_EBRACK   /* Unmatched left bracket. */
+#define REG_EPAREN   REG_EPAREN   /* Parenthesis imbalance. */
+#define REG_EBRACE   REG_EBRACE   /* Unmatched \{. */
+#define REG_BADBR    REG_BADBR    /* Invalid contents of \{\}. */
+#define REG_ERANGE   REG_ERANGE   /* Invalid range end. */
+#define REG_ESPACE   REG_ESPACE   /* Ran out of memory. */
+#define REG_BADRPT   REG_BADRPT   /* No preceding re for repetition op. */
 	/* GNU-specific errors */
-#define REG_EEND     14   /* Premature end. */
-#define REG_ESIZE    15   /* Compiled pattern bigger than 2^16 bytes. */
-#define REG_ERPAREN  16   /* Unmatched ) or \); not returned from regcomp. */
+#define REG_EEND     REG_EEND     /* Premature end. */
+#define REG_ESIZE    REG_ESIZE    /* Compiled pattern bigger than 2^16 bytes. */
+#define REG_ERPAREN  REG_ERPAREN  /* Unmatched ) or \); not returned from regcomp. */
+#else /* __COMPILER_PREFERR_ENUMS */
+#if defined(_XOPEN_SOURCE) || defined(__USE_XOPEN2K)
+#define REG_ENOSYS   -1 /* Returned when libc.so fails to load `libregex.so' for some reason */
+#endif /* _XOPEN_SOURCE || __USE_XOPEN2K */
+#define REG_NOERROR  0  /* Success. */
+#define REG_NOMATCH  1  /* Didn't find a match (for regexec). */
+	/* POSIX */
+#define REG_BADPAT   2  /* Invalid pattern. */
+#define REG_ECOLLATE 3  /* Inalid collating element. */
+#define REG_ECTYPE   4  /* Invalid character class name. */
+#define REG_EESCAPE  5  /* Trailing backslash. */
+#define REG_ESUBREG  6  /* Invalid back reference. */
+#define REG_EBRACK   7  /* Unmatched left bracket. */
+#define REG_EPAREN   8  /* Parenthesis imbalance. */
+#define REG_EBRACE   9  /* Unmatched \{. */
+#define REG_BADBR    10 /* Invalid contents of \{\}. */
+#define REG_ERANGE   11 /* Invalid range end. */
+#define REG_ESPACE   12 /* Ran out of memory. */
+#define REG_BADRPT   13 /* No preceding re for repetition op. */
+	/* GNU-specific errors */
+#define REG_EEND     14 /* Premature end. */
+#define REG_ESIZE    15 /* Compiled pattern bigger than 2^16 bytes. */
+#define REG_ERPAREN  16 /* Unmatched ) or \); not returned from regcomp. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 
 #ifndef __RE_TRANSLATE_TYPE
@@ -295,7 +323,7 @@ typedef struct {
 /* Sets the current default syntax to SYNTAX, and return the old syntax.
  * You can also simply assign to the `re_syntax_options' variable */
 __CDECLARE(,reg_syntax_t,__NOTHROW_NCX,re_set_syntax,(reg_syntax_t __syntax),(__syntax))
-#endif /* re_set_syntax... */
+#endif /* __CRT_HAVE_re_set_syntax */
 #ifdef __CRT_HAVE_re_compile_pattern
 /* Compile the regular expression PATTERN, with length LENGTH
  * and syntax given by the global `re_syntax_options', into the buffer
@@ -304,12 +332,12 @@ __CDECLARE(,reg_syntax_t,__NOTHROW_NCX,re_set_syntax,(reg_syntax_t __syntax),(__
  * Note that the translate table must either have been initialized by
  * `regcomp', with a malloc'd value, or set to NULL before calling `regfree' */
 __CDECLARE(,char const *,__NOTHROW_NCX,re_compile_pattern,(char const *__pattern, size_t __length, struct re_pattern_buffer *__buffer),(__pattern,__length,__buffer))
-#endif /* re_compile_pattern... */
+#endif /* __CRT_HAVE_re_compile_pattern */
 #ifdef __CRT_HAVE_re_compile_fastmap
 /* Compile a fastmap for the compiled pattern in BUFFER; used to
  * accelerate searches. Return 0 if successful and -2 if was an internal error */
 __CDECLARE(,int,__NOTHROW_NCX,re_compile_fastmap,(struct re_pattern_buffer *__buffer),(__buffer))
-#endif /* re_compile_fastmap... */
+#endif /* __CRT_HAVE_re_compile_fastmap */
 #ifdef __CRT_HAVE_re_search
 /* Search in the string STRING (with length LENGTH) for the pattern
  * compiled into BUFFER. Start searching at position START, for RANGE
@@ -317,21 +345,21 @@ __CDECLARE(,int,__NOTHROW_NCX,re_compile_fastmap,(struct re_pattern_buffer *__bu
  * match, or -2 for an internal error. Also return register
  * information in REGS (if REGS and BUFFER->no_sub are nonzero) */
 __CDECLARE(,int,__NOTHROW_NCX,re_search,(struct re_pattern_buffer *__buffer, char const *__string, int __length, int __start, int __range, struct re_registers *__regs),(__buffer,__string,__length,__start,__range,__regs))
-#endif /* re_search... */
+#endif /* __CRT_HAVE_re_search */
 #ifdef __CRT_HAVE_re_search_2
 /* Like `re_search', but search in the concatenation of STRING1
  * and STRING2. Also, stop searching at index START + STOP */
 __CDECLARE(,int,__NOTHROW_NCX,re_search_2,(struct re_pattern_buffer *__buffer, char const *__string1, int __length1, char const *__string2, int __length2, int __start, int __range, struct re_registers *__regs, int __stop),(__buffer,__string1,__length1,__string2,__length2,__start,__range,__regs,__stop))
-#endif /* re_search_2... */
+#endif /* __CRT_HAVE_re_search_2 */
 #ifdef __CRT_HAVE_re_match
 /* Like `re_search', but return how many characters in STRING
  * the regexp in BUFFER matched, starting at position START */
 __CDECLARE(,int,__NOTHROW_NCX,re_match,(struct re_pattern_buffer *__buffer, char const *__string, int __length, int __start, struct re_registers *__regs),(__buffer,__string,__length,__start,__regs))
-#endif /* re_match... */
+#endif /* __CRT_HAVE_re_match */
 #ifdef __CRT_HAVE_re_match_2
 /* Relates to `re_match' as `re_search_2' relates to `re_search' */
 __CDECLARE(,int,__NOTHROW_NCX,re_match_2,(struct re_pattern_buffer *__buffer, char const *__string1, int __length1, char const *__string2, int __length2, int __start, struct re_registers *__regs, int __stop),(__buffer,__string1,__length1,__string2,__length2,__start,__regs,__stop))
-#endif /* re_match_2... */
+#endif /* __CRT_HAVE_re_match_2 */
 #ifdef __CRT_HAVE_re_set_registers
 /* Set REGS to hold NUM_REGS registers, storing them in STARTS and
  * ENDS. Subsequent matches using BUFFER and REGS will use this memory
@@ -341,20 +369,23 @@ __CDECLARE(,int,__NOTHROW_NCX,re_match_2,(struct re_pattern_buffer *__buffer, ch
  * Unless this function is called, the first search or match using
  * PATTERN_BUFFER will allocate its own register data, without freeing the old data */
 __CDECLARE_VOID(,__NOTHROW_NCX,re_set_registers,(struct re_pattern_buffer *__buffer, struct re_registers *__regs, unsigned int __num_regs, regoff_t *__starts, regoff_t *__ends),(__buffer,__regs,__num_regs,__starts,__ends))
-#endif /* re_set_registers... */
+#endif /* __CRT_HAVE_re_set_registers */
 #endif /* __USE_GNU */
+
+
+/* POSIX compatibility.  */
 #ifdef __CRT_HAVE_regcomp
 __CDECLARE(,int,__NOTHROW_NCX,regcomp,(regex_t *__restrict __preg, char const *__restrict __pattern, int __cflags),(__preg,__pattern,__cflags))
-#endif /* regcomp... */
+#endif /* __CRT_HAVE_regcomp */
 #ifdef __CRT_HAVE_regexec
 __CDECLARE(,int,__NOTHROW_NCX,regexec,(regex_t const *__restrict __preg, char const *__restrict __string, size_t __nmatch, regmatch_t __pmatch[__restrict_arr], int __eflags),(__preg,__string,__nmatch,__pmatch,__eflags))
-#endif /* regexec... */
+#endif /* __CRT_HAVE_regexec */
 #ifdef __CRT_HAVE_regerror
 __CDECLARE(,size_t,__NOTHROW_NCX,regerror,(int __errcode, regex_t const *__restrict __preg, char *__restrict __errbuf, size_t __errbuf_size),(__errcode,__preg,__errbuf,__errbuf_size))
-#endif /* regerror... */
+#endif /* __CRT_HAVE_regerror */
 #ifdef __CRT_HAVE_regfree
 __CDECLARE_VOID(,__NOTHROW_NCX,regfree,(regex_t *__preg),(__preg))
-#endif /* regfree... */
+#endif /* __CRT_HAVE_regfree */
 
 #endif /* __CC__ */
 

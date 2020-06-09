@@ -22,6 +22,7 @@
 %[define_replacement(longptr_t    = __LONGPTR_TYPE__)]
 %[define_replacement(ulongptr_t   = __ULONGPTR_TYPE__)]
 %[define_replacement(sighandler_t = __sighandler_t)]
+%[define_replacement(siginfo_t    = "struct __siginfo_struct")]
 %[define_replacement(sigset_t     = "struct __sigset_struct")]
 %[define_replacement(pid_t        = __pid_t)]
 %[define_replacement(timespec32   = __timespec32)]
@@ -159,7 +160,7 @@ __NAMESPACE_STD_USING(size_t)
 %[insert:std]
 
 @@@param signo: One of `SIG*'
-[[std, wchar /*dos_variant*/]] raise:(int signo) -> int;
+[[std /*, dos_variant*/]] raise:(int signo) -> int;
 
 __sysv_signal(*) = sysv_signal;
 
@@ -171,7 +172,7 @@ sysv_signal:(int signo, $sighandler_t handler) -> $sighandler_t;
 
 
 @@@param signo: One of `SIG*'
-[[std, preferred_export_alias(sysv_signal), export_alias(_signal), wchar /*dos_variant*/]]
+[[std, preferred_export_alias(sysv_signal), export_alias(_signal) /*, dos_variant*/]]
 $sighandler_t signal(int signo, $sighandler_t handler);
 
 %#ifdef __USE_MISC

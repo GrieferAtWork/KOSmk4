@@ -101,6 +101,9 @@ class CType {
 	@@NOTE: This string will have already been stripped of leading/trailing spaces
 	public member afterName: string | UserString = "";
 
+	/* TODO: public member commentBefore: string; */
+	/* TODO: public member commentAfter: string; */
+
 	public function equals(other: CType): bool {
 		if (this === other)
 			return true;

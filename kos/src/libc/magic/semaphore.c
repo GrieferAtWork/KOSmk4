@@ -22,7 +22,8 @@
 %[define_replacement(oflag_t = __oflag_t)]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
-%[default_impl_section(.text.crt.sched.semaphore)]
+%[define_replacement(sem_t = sem_t)]
+%[default_impl_section(".text.crt.sched.semaphore")]
 
 %{
 #include <features.h>
@@ -59,23 +60,25 @@ __SYSDECL_BEGIN
 
 @@Initialize semaphore object SEM to VALUE.
 @@If PSHARED then share it with other processes
-sem_init:([[nonnull]] sem_t *sem, int pshared, unsigned int value) -> int;
+int sem_init([[nonnull]] sem_t *sem, int pshared, unsigned int value);
 
 @@Free resources associated with semaphore object SEM
-sem_destroy:([[nonnull]] sem_t *sem) -> int;
+int sem_destroy([[nonnull]] sem_t *sem);
 
 @@Open a named semaphore NAME with open flags OFLAGS
 [[cp_kos]][vartypes($mode_t, unsigned int)]
-sem_open:([[nonnull]] char const *name, $oflag_t oflags, ...) -> sem_t *;
+sem_t *sem_open([[nonnull]] char const *name, $oflag_t oflags, ...);
 
 @@Close descriptor for named semaphore SEM
-sem_close:([[nonnull]] sem_t *sem) -> int;
+int sem_close([[nonnull]] sem_t *sem);
 
 @@Remove named semaphore NAME
-[[cp_kos]] sem_unlink:([[nonnull]] const char *name) -> int;
+[[cp_kos]]
+int sem_unlink([[nonnull]] const char *name);
 
 @@Wait for SEM being posted
-[[cp]] sem_wait:([[nonnull]] sem_t *sem) -> int;
+[[cp]]
+int sem_wait([[nonnull]] sem_t *sem);
 
 [[cp, doc_alias(sem_timedwait), ignore, nocrt, alias(sem_timedwait)]]
 int sem_timedwait32([[nonnull]] sem_t *__restrict sem,
@@ -89,8 +92,8 @@ int sem_timedwait32([[nonnull]] sem_t *__restrict sem,
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias(sem_timedwait)]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias(sem_timedwait64)]]
 [[userimpl, requires($has_function(sem_timedwait32) || $has_function(sem_timedwait64))]]
-sem_timedwait:([[nonnull]] sem_t *__restrict sem,
-               [[nonnull]] struct timespec const *__restrict abstime) -> int {
+int sem_timedwait([[nonnull]] sem_t *__restrict sem,
+                  [[nonnull]] struct timespec const *__restrict abstime) {
 @@pp_if $has_function(sem_timedwait32)@@
 	struct timespec32 ts32;
 	ts32.tv_sec = (time32_t)abstime->tv_sec;
@@ -108,8 +111,8 @@ sem_timedwait:([[nonnull]] sem_t *__restrict sem,
 %#ifdef __USE_TIME64
 [[cp, time64_variant_of(sem_timedwait)]]
 [[userimpl, requires_function(sem_timedwait32)]]
-sem_timedwait64:([[nonnull]] sem_t *__restrict sem,
-                 [[nonnull]] struct timespec64 const *__restrict abstime) -> int {
+int sem_timedwait64([[nonnull]] sem_t *__restrict sem,
+                    [[nonnull]] struct timespec64 const *__restrict abstime) {
 	struct timespec32 ts32;
 	ts32.tv_sec  = (time32_t)abstime->tv_sec;
 	ts32.tv_nsec = abstime->tv_nsec;
@@ -119,14 +122,14 @@ sem_timedwait64:([[nonnull]] sem_t *__restrict sem,
 %#endif /* __USE_XOPEN2K */
 
 @@Test whether SEM is posted
-sem_trywait:([[nonnull]] sem_t *sem) -> int;
+int sem_trywait([[nonnull]] sem_t *sem);
 
 @@Post SEM
-sem_post:([[nonnull]] sem_t *sem) -> int;
+int sem_post([[nonnull]] sem_t *sem);
 
 @@Get current value of SEM and store it in *SVAL
-sem_getvalue:([[nonnull]] sem_t *__restrict sem,
-              [[nonnull]] int *__restrict sval) -> int;
+int sem_getvalue([[nonnull]] sem_t *__restrict sem,
+                 [[nonnull]] int *__restrict sval);
 
 
 %{
