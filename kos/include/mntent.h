@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c13ff06 */
+/* HASH CRC-32:0xb509da3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,12 +98,12 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *
 /* Prepare to begin reading and/or writing mount table
  * entries from the beginning of FILE.  MODE is as for `fopen' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *__file, char const *__mode),__setmntent,(__file,__mode))
-#endif /* setmntent... */
+#endif /* ... */
 #ifdef __CRT_HAVE_getmntent
 /* Read one mount table entry from STREAM.  Returns a pointer to storage
  * reused on the next call, or null for EOF or error (use feof/ferror to check) */
 __CDECLARE(__ATTR_NONNULL((1)),struct mntent *,__NOTHROW_RPC,getmntent,(__FILE *__stream),(__stream))
-#endif /* getmntent... */
+#endif /* __CRT_HAVE_getmntent */
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_getmntent_r
@@ -112,14 +112,14 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),struct mntent *,__NOTHROW_RPC,getmntent_r,(
 #elif defined(__CRT_HAVE___getmntent_r)
 /* Reentrant version of the above function */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),struct mntent *,__NOTHROW_RPC,getmntent_r,(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize),__getmntent_r,(__stream,__result,__buffer,__bufsize))
-#endif /* getmntent_r... */
+#endif /* ... */
 #endif /* __USE_MISC */
 
 #ifdef __CRT_HAVE_addmntent
 /* Write the mount table entry described by MNT to STREAM.
  * Return zero on success, nonzero on failure */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,addmntent,(__FILE *__restrict __stream, struct mntent const *__restrict __mnt),(__stream,__mnt))
-#endif /* addmntent... */
+#endif /* __CRT_HAVE_addmntent */
 #ifdef __CRT_HAVE_endmntent
 /* Close a stream opened with `setmntent' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),(__stream))
@@ -129,17 +129,17 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__str
 #elif defined(__CRT_HAVE___endmntent)
 /* Close a stream opened with `setmntent' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),__endmntent,(__stream))
-#endif /* endmntent... */
+#endif /* ... */
 #ifdef __CRT_HAVE_hasmntopt
 /* Search MNT->mnt_opts for an option matching OPT.
  * Returns the address of the substring, or null if none found */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,hasmntopt,(struct mntent const *__mnt, char const *__opt),(__mnt,__opt))
-#else /* LIBC: hasmntopt */
+#else /* __CRT_HAVE_hasmntopt */
 #include <local/mntent/hasmntopt.h>
 /* Search MNT->mnt_opts for an option matching OPT.
  * Returns the address of the substring, or null if none found */
 __NAMESPACE_LOCAL_USING_OR_IMPL(hasmntopt, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL hasmntopt)(struct mntent const *__mnt, char const *__opt) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hasmntopt))(__mnt, __opt); })
-#endif /* hasmntopt... */
+#endif /* !__CRT_HAVE_hasmntopt */
 
 #endif /* __CC__ */
 

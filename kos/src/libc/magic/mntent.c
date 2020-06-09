@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(.text.crt.database.mntent)]
+%[default_impl_section(".text.crt.database.mntent")]
 
 %{
 #include <features.h>
@@ -89,35 +89,40 @@ struct mntent {
 
 @@Prepare to begin reading and/or writing mount table
 @@entries from the beginning of FILE.  MODE is as for `fopen'
-[[cp]][export_alias(__setmntent)]
-setmntent:([[nonnull]] char const *file, [[nonnull]] char const *mode) -> $FILE *;
+[[cp, export_alias("__setmntent")]]
+$FILE *setmntent([[nonnull]] char const *file,
+                 [[nonnull]] char const *mode);
 
 @@Read one mount table entry from STREAM.  Returns a pointer to storage
 @@reused on the next call, or null for EOF or error (use feof/ferror to check)
-[[cp]] getmntent:([[nonnull]] $FILE *stream) -> struct mntent *;
+[[cp]]
+struct mntent *getmntent([[nonnull]] $FILE *stream);
 
 %
 %#ifdef __USE_MISC
 @@Reentrant version of the above function
-[[cp]][export_alias(__getmntent_r)]
-getmntent_r:([[nonnull]] $FILE *__restrict stream,
-             [[nonnull]] struct mntent *__restrict result,
-             [[inp(bufsize)]] char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize) -> struct mntent *;
+[[cp, export_alias("__getmntent_r")]]
+struct mntent *getmntent_r([[nonnull]] $FILE *__restrict stream,
+                           [[nonnull]] struct mntent *__restrict result,
+                           [[inp(bufsize)]] char *__restrict buffer,
+                           __STDC_INT_AS_SIZE_T bufsize);
 %#endif /* __USE_MISC */
 
 %
 @@Write the mount table entry described by MNT to STREAM.
 @@Return zero on success, nonzero on failure
-[[cp]] addmntent:([[nonnull]] $FILE *__restrict stream, [[nonnull]] struct mntent const *__restrict mnt) -> int;
+[[cp]]
+int addmntent([[nonnull]] $FILE *__restrict stream,
+              [[nonnull]] struct mntent const *__restrict mnt);
 
 @@Close a stream opened with `setmntent'
-[cp_nokos][alias(fclose)][export_alias(__endmntent)]
-endmntent:([[nonnull]] $FILE *stream) -> int;
+[[cp_nokos, alias(fclose), export_alias("__endmntent")]]
+int endmntent([[nonnull]] $FILE *stream);
 
 @@Search MNT->mnt_opts for an option matching OPT.
 @@Returns the address of the substring, or null if none found
 [[ATTR_WUNUSED, ATTR_PURE]]
-hasmntopt:([[nullable]] struct mntent const *mnt, [[nullable]] char const *opt) -> char * {
+char *hasmntopt([[nullable]] struct mntent const *mnt, [[nullable]] char const *opt) {
 	char *str;
 	if likely(mnt && opt && (str = mnt->@mnt_opts@) != NULL) {
 		size_t optlen = strlen(opt);

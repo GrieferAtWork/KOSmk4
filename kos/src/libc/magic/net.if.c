@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%[default_impl_section(.text.crt.net.interface)]
+%[default_impl_section(".text.crt.net.interface")]
 
 %{
 #include <features.h>
@@ -306,13 +306,18 @@ struct ifconf {
 }
 
 @@Convert an interface name to an index, and vice versa
-[[cp_kos]] if_nametoindex:(char const *ifname) -> unsigned int;
-[[cp_kos]][doc_alias(if_nametoindex)] if_indextoname:(unsigned int ifindex, char *ifname) -> char *;
+[[cp_kos]]
+unsigned int if_nametoindex(char const *ifname);
+
+[[cp_kos, doc_alias("if_nametoindex")]]
+char *if_indextoname(unsigned int ifindex, char *ifname);
 
 @@Return a list of all interfaces and their indices
-[[cp_kos]] if_nameindex:() -> struct if_nameindex *;
+[[cp_kos]]
+struct if_nameindex *if_nameindex();
+
 @@Free the data returned from if_nameindex
-if_freenameindex:(struct if_nameindex *ptr);
+void if_freenameindex(struct if_nameindex *ptr);
 
 %{
 

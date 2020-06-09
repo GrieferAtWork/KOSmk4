@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%[default_impl_section(.text.crt.net.ether)]
+%[default_impl_section(".text.crt.net.ether")]
 
 %{
 #include <features.h>
@@ -49,15 +49,15 @@ __SYSDECL_BEGIN
 }
 
 @@Convert 48 bit Ethernet ADDRess to ASCII
-[dependency_include(<net/ethernet.h>)]
-ether_ntoa:([[nonnull]] struct ether_addr const *__restrict addr) -> [[nonnull]] char * {
+[[impl_include("<net/ethernet.h>")]]
+[[nonnull]] char *ether_ntoa([[nonnull]] struct ether_addr const *__restrict addr) {
 	static char buf[21];
 	return ether_ntoa_r(addr, buf);
 }
 
-[doc_alias(ether_ntoa)][dependency_include(<net/ethernet.h>)]
-ether_ntoa_r:([[nonnull]] struct ether_addr const *__restrict addr,
-              [[nonnull]] char *__restrict buf) -> [[nonnull]] char * {
+[[doc_alias("ether_ntoa"), impl_include("<net/ethernet.h>")]]
+[[nonnull]] char *ether_ntoa_r([[nonnull]] struct ether_addr const *__restrict addr,
+                               [[nonnull]] char *__restrict buf) {
 	sprintf(buf, "%x:%x:%x:%x:%x:%x",
 	        addr->@ether_addr_octet@[0], addr->@ether_addr_octet@[1],
 	        addr->@ether_addr_octet@[2], addr->@ether_addr_octet@[3],
@@ -66,24 +66,22 @@ ether_ntoa_r:([[nonnull]] struct ether_addr const *__restrict addr,
 }
 
 @@Convert ASCII string S to 48 bit Ethernet address
-[dependency_include(<net/ethernet.h>)]
-ether_aton:([[nonnull]] char const *__restrict asc) -> [[nonnull]] struct ether_addr * {
+[[impl_include("<net/ethernet.h>")]]
+[[nonnull]] struct ether_addr *ether_aton([[nonnull]] char const *__restrict asc) {
 	static struct @ether_addr@ addr;
 	return ether_aton_r(asc, &addr);
 }
 
-[doc_alias(ether_aton)][[ATTR_WUNUSED]]
-[dependency_include(<net/ethernet.h>)]
-ether_aton_r:([[nonnull]] char const *__restrict asc,
-              [[nonnull]] struct ether_addr *__restrict addr) -> struct ether_addr * {
+[[doc_alias("ether_aton"), ATTR_WUNUSED, impl_include("<net/ethernet.h>")]]
+struct ether_addr *ether_aton_r([[nonnull]] char const *__restrict asc,
+                                [[nonnull]] struct ether_addr *__restrict addr) {
 	return ether_paton_r((char const **)&asc, addr);
 }
 
 %#ifdef __USE_KOS
-[doc_alias(ether_aton)][[ATTR_WUNUSED]]
-[dependency_include(<net/ethernet.h>)]
-ether_paton_r:([[nonnull]] char const **__restrict pasc,
-               [[nonnull]] struct ether_addr *__restrict addr) -> struct ether_addr * {
+[[doc_alias("ether_aton"), ATTR_WUNUSED, impl_include("<net/ethernet.h>")]]
+struct ether_addr *ether_paton_r([[nonnull]] char const **__restrict pasc,
+                                 [[nonnull]] struct ether_addr *__restrict addr) {
 	unsigned int i;
 	char const *asc = *pasc;
 	for (i = 0; i < 6; ++i) {
@@ -128,9 +126,9 @@ ether_paton_r:([[nonnull]] char const **__restrict pasc,
 %#endif /* __USE_KOS */
 
 @@Scan LINE and set ADDR and HOSTNAME
-ether_line:([[nonnull]] char const *line,
-            [[nonnull]] struct ether_addr *addr,
-            [[nonnull]] char *hostname) -> int {
+int ether_line([[nonnull]] char const *line,
+               [[nonnull]] struct ether_addr *addr,
+               [[nonnull]] char *hostname) {
 	size_t hnlen;
 	while (isspace(*line) && *line != '\r' && *line != '\n')
 		++line;
@@ -151,10 +149,12 @@ ether_line:([[nonnull]] char const *line,
 }
 
 @@Map 48 bit Ethernet number ADDR to HOSTNAME
-[[cp_kos]] ether_ntohost:(char *hostname, struct ether_addr const *addr) -> int;
+[[cp_kos]]
+int ether_ntohost(char *hostname, struct ether_addr const *addr);
 
 @@Map HOSTNAME to 48 bit Ethernet address
-[[cp_kos]] ether_hostton:(char const *hostname, struct ether_addr *addr) -> int;
+[[cp_kos]]
+int ether_hostton(char const *hostname, struct ether_addr *addr);
 
 
 %{

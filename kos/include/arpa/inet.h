@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa487ec5c */
+/* HASH CRC-32:0xbf1cefc3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -255,7 +255,7 @@ __CDECLARE(,int,__NOTHROW_RPC_KOS,inet_pton,(int __af, char const *__restrict __
 /* Convert a Internet address in binary network format for interface
  * type AF in buffer starting at CP to presentation form and place
  * result in buffer of length LEN starting at BUF */
-__CDECLARE(,char const *,__NOTHROW_RPC_KOS,inet_ntop,(int __af, void const *__restrict __cp, char *__restrict __buf, __socklen_t __len),(__af,__cp,__buf,__len))
+__CDECLARE(,char const *,__NOTHROW_RPC_KOS,inet_ntop,(int __af, void const *__restrict __cp, char *__restrict __buf, socklen_t __len),(__af,__cp,__buf,__len))
 #endif /* __CRT_HAVE_inet_ntop */
 
 #endif /* __CC__ */

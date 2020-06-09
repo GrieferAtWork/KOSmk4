@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x260c398d */
+/* HASH CRC-32:0x17554cc9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -243,51 +243,51 @@ struct group_filter {
 __CDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),(__hostword))
 #elif defined(__CRT_HAVE_ntohs) && defined(__HYBRID_HTOBE_IS_BETOH)
 __CREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),ntohs,(__hostword))
-#else /* LIBC: htons */
+#else /* ... */
 #include <local/netinet.in/htons.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(htons, __FORCELOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL htons)(__UINT16_TYPE__ __hostword) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htons))(__hostword); })
-#endif /* htons... */
+#endif /* !... */
 #ifdef __CRT_HAVE_ntohs
 __CDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),(__netshort))
 #elif defined(__CRT_HAVE_htons) && defined(__HYBRID_HTOBE_IS_BETOH)
 __CREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),htons,(__netshort))
-#else /* LIBC: ntohs */
+#else /* ... */
 #include <local/netinet.in/ntohs.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(ntohs, __FORCELOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohs)(__UINT16_TYPE__ __netshort) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohs))(__netshort); })
-#endif /* ntohs... */
+#endif /* !... */
 #ifdef __CRT_HAVE_htonl
 __CDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),(__hostlong))
 #elif defined(__CRT_HAVE_ntohl) && defined(__HYBRID_HTOBE_IS_BETOH)
 __CREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),ntohl,(__hostlong))
-#else /* LIBC: htonl */
+#else /* ... */
 #include <local/netinet.in/htonl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(htonl, __FORCELOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL htonl)(__UINT32_TYPE__ __hostlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htonl))(__hostlong); })
-#endif /* htonl... */
+#endif /* !... */
 #ifdef __CRT_HAVE_ntohl
 __CDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),(__netlong))
 #elif defined(__CRT_HAVE_htonl) && defined(__HYBRID_HTOBE_IS_BETOH)
 __CREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),htonl,(__netlong))
-#else /* LIBC: ntohl */
+#else /* ... */
 #include <local/netinet.in/ntohl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(ntohl, __FORCELOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohl)(__UINT32_TYPE__ __netlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohl))(__netlong); })
-#endif /* ntohl... */
+#endif /* !... */
 #if defined(__USE_KOS) && defined(__UINT64_TYPE__)
 #ifdef __CRT_HAVE_htonq
-__CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,htonq,(__UINT64_TYPE__ __hostlong),(__hostlong))
+__CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,htonq,(__UINT64_TYPE__ __hostquad),(__hostquad))
 #elif defined(__CRT_HAVE_ntohq) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,htonq,(__UINT64_TYPE__ __hostlong),ntohq,(__hostlong))
-#else /* LIBC: htonq */
+__CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,htonq,(__UINT64_TYPE__ __hostquad),ntohq,(__hostquad))
+#else /* ... */
 #include <local/netinet.in/htonq.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(htonq, __FORCELOCAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL htonq)(__UINT64_TYPE__ __hostlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htonq))(__hostlong); })
-#endif /* htonq... */
+__NAMESPACE_LOCAL_USING_OR_IMPL(htonq, __FORCELOCAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL htonq)(__UINT64_TYPE__ __hostquad) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htonq))(__hostquad); })
+#endif /* !... */
 #ifdef __CRT_HAVE_ntohq
-__CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,ntohq,(__UINT64_TYPE__ __netlong),(__netlong))
+__CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,ntohq,(__UINT64_TYPE__ __netquad),(__netquad))
 #elif defined(__CRT_HAVE_htonq) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,ntohq,(__UINT64_TYPE__ __netlong),htonq,(__netlong))
-#else /* LIBC: ntohq */
+__CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,ntohq,(__UINT64_TYPE__ __netquad),htonq,(__netquad))
+#else /* ... */
 #include <local/netinet.in/ntohq.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ntohq, __FORCELOCAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohq)(__UINT64_TYPE__ __netlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohq))(__netlong); })
-#endif /* ntohq... */
+__NAMESPACE_LOCAL_USING_OR_IMPL(ntohq, __FORCELOCAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohq)(__UINT64_TYPE__ __netquad) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohq))(__netquad); })
+#endif /* !... */
 #endif /* __USE_KOS && __UINT64_TYPE__ */
 
 
@@ -342,11 +342,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ntohq, __FORCELOCAL __ATTR_CONST __UINT64_TYPE__
 #ifdef __CRT_HAVE_bindresvport
 /* Bind socket to a privileged IP port */
 __CDECLARE(,int,__NOTHROW_RPC,bindresvport,(__fd_t __sockfd, struct sockaddr_in *__sock_in),(__sockfd,__sock_in))
-#endif /* bindresvport... */
+#endif /* __CRT_HAVE_bindresvport */
 #ifdef __CRT_HAVE_bindresvport6
 /* The IPv6 version of this function */
 __CDECLARE(,int,__NOTHROW_RPC,bindresvport6,(__fd_t __sockfd, struct sockaddr_in6 *__sock_in),(__sockfd,__sock_in))
-#endif /* bindresvport6... */
+#endif /* __CRT_HAVE_bindresvport6 */
 #endif /* __USE_MISC */
 
 #define IN6_IS_ADDR_MC_NODELOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x1)))
@@ -373,95 +373,95 @@ struct ip6_mtuinfo {
 #ifdef __CRT_HAVE_inet6_option_space
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 __CDECLARE(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_space,(int __nbytes),(__nbytes))
-#endif /* inet6_option_space... */
+#endif /* __CRT_HAVE_inet6_option_space */
 #ifdef __CRT_HAVE_inet6_option_init
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 __CDECLARE(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_init,(void *__bp, struct cmsghdr **__cmsgp, int __type),(__bp,__cmsgp,__type))
-#endif /* inet6_option_init... */
+#endif /* __CRT_HAVE_inet6_option_init */
 #ifdef __CRT_HAVE_inet6_option_append
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 __CDECLARE(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_append,(struct cmsghdr *__cmsg, __UINT8_TYPE__ const *__typep, int __multx, int __plusy),(__cmsg,__typep,__multx,__plusy))
-#endif /* inet6_option_append... */
+#endif /* __CRT_HAVE_inet6_option_append */
 #ifdef __CRT_HAVE_inet6_option_alloc
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 __CDECLARE(__ATTR_DEPRECATED_,__UINT8_TYPE__ *,__NOTHROW_RPC_KOS,inet6_option_alloc,(struct cmsghdr *__cmsg, int __datalen, int __multx, int __plusy),(__cmsg,__datalen,__multx,__plusy))
-#endif /* inet6_option_alloc... */
+#endif /* __CRT_HAVE_inet6_option_alloc */
 #ifdef __CRT_HAVE_inet6_option_next
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 __CDECLARE(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_next,(struct cmsghdr const *__cmsg, __UINT8_TYPE__ **__tptrp),(__cmsg,__tptrp))
-#endif /* inet6_option_next... */
+#endif /* __CRT_HAVE_inet6_option_next */
 #ifdef __CRT_HAVE_inet6_option_find
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 __CDECLARE(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_find,(struct cmsghdr const *__cmsg, __UINT8_TYPE__ **__tptrp, int __type),(__cmsg,__tptrp,__type))
-#endif /* inet6_option_find... */
+#endif /* __CRT_HAVE_inet6_option_find */
 #ifdef __CRT_HAVE_inet6_opt_init
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_init,(void *__extbuf, socklen_t __extlen),(__extbuf,__extlen))
-#endif /* inet6_opt_init... */
+#endif /* __CRT_HAVE_inet6_opt_init */
 #ifdef __CRT_HAVE_inet6_opt_append
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_append,(void *__extbuf, socklen_t __extlen, int __offset, __UINT8_TYPE__ __type, socklen_t __len, __UINT8_TYPE__ __align, void **__databufp),(__extbuf,__extlen,__offset,__type,__len,__align,__databufp))
-#endif /* inet6_opt_append... */
+#endif /* __CRT_HAVE_inet6_opt_append */
 #ifdef __CRT_HAVE_inet6_opt_finish
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_finish,(void *__extbuf, socklen_t __extlen, int __offset),(__extbuf,__extlen,__offset))
-#endif /* inet6_opt_finish... */
+#endif /* __CRT_HAVE_inet6_opt_finish */
 #ifdef __CRT_HAVE_inet6_opt_set_val
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_set_val,(void *__databuf, int __offset, void *__val, socklen_t __vallen),(__databuf,__offset,__val,__vallen))
-#endif /* inet6_opt_set_val... */
+#endif /* __CRT_HAVE_inet6_opt_set_val */
 #ifdef __CRT_HAVE_inet6_opt_next
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_next,(void *__extbuf, socklen_t __extlen, int __offset, __UINT8_TYPE__ *__typep, socklen_t *__lenp, void **__databufp),(__extbuf,__extlen,__offset,__typep,__lenp,__databufp))
-#endif /* inet6_opt_next... */
+#endif /* __CRT_HAVE_inet6_opt_next */
 #ifdef __CRT_HAVE_inet6_opt_find
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_find,(void *__extbuf, socklen_t __extlen, int __offset, __UINT8_TYPE__ __type, socklen_t *__lenp, void **__databufp),(__extbuf,__extlen,__offset,__type,__lenp,__databufp))
-#endif /* inet6_opt_find... */
+#endif /* __CRT_HAVE_inet6_opt_find */
 #ifdef __CRT_HAVE_inet6_opt_get_val
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_get_val,(void *__databuf, int __offset, void *__val, socklen_t __vallen),(__databuf,__offset,__val,__vallen))
-#endif /* inet6_opt_get_val... */
+#endif /* __CRT_HAVE_inet6_opt_get_val */
 #ifdef __CRT_HAVE_inet6_rth_space
 /* Routing Header Option (RFC 3542) */
 __CDECLARE(,socklen_t,__NOTHROW_RPC_KOS,inet6_rth_space,(int __type, int __segments),(__type,__segments))
-#endif /* inet6_rth_space... */
+#endif /* __CRT_HAVE_inet6_rth_space */
 #ifdef __CRT_HAVE_inet6_rth_init
 /* Routing Header Option (RFC 3542) */
 __CDECLARE(,void *,__NOTHROW_RPC_KOS,inet6_rth_init,(void *__bp, socklen_t __bp_len, int __type, int __segments),(__bp,__bp_len,__type,__segments))
-#endif /* inet6_rth_init... */
+#endif /* __CRT_HAVE_inet6_rth_init */
 #ifdef __CRT_HAVE_inet6_rth_add
 /* Routing Header Option (RFC 3542) */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_rth_add,(void *__bp, struct in6_addr const *__addr),(__bp,__addr))
-#endif /* inet6_rth_add... */
+#endif /* __CRT_HAVE_inet6_rth_add */
 #ifdef __CRT_HAVE_inet6_rth_reverse
 /* Routing Header Option (RFC 3542) */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_rth_reverse,(void const *__in, void *__out),(__in,__out))
-#endif /* inet6_rth_reverse... */
+#endif /* __CRT_HAVE_inet6_rth_reverse */
 #ifdef __CRT_HAVE_inet6_rth_segments
 /* Routing Header Option (RFC 3542) */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_rth_segments,(void const *__bp),(__bp))
-#endif /* inet6_rth_segments... */
+#endif /* __CRT_HAVE_inet6_rth_segments */
 #ifdef __CRT_HAVE_inet6_rth_getaddr
 /* Routing Header Option (RFC 3542) */
 __CDECLARE(,struct in6_addr *,__NOTHROW_RPC_KOS,inet6_rth_getaddr,(void const *__bp, int __index),(__bp,__index))
-#endif /* inet6_rth_getaddr... */
+#endif /* __CRT_HAVE_inet6_rth_getaddr */
 #ifdef __CRT_HAVE_getipv4sourcefilter
 /* Get IPv4 source filter */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,getipv4sourcefilter,(__fd_t __sockfd, struct in_addr __interface_addr, struct in_addr __group, __UINT32_TYPE__ *__fmode, __UINT32_TYPE__ *__numsrc, struct in_addr *__slist),(__sockfd,__interface_addr,__group,__fmode,__numsrc,__slist))
-#endif /* getipv4sourcefilter... */
+#endif /* __CRT_HAVE_getipv4sourcefilter */
 #ifdef __CRT_HAVE_setipv4sourcefilter
 /* Set IPv4 source filter */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,setipv4sourcefilter,(__fd_t __sockfd, struct in_addr __interface_addr, struct in_addr __group, __UINT32_TYPE__ __fmode, __UINT32_TYPE__ __numsrc, struct in_addr const *__slist),(__sockfd,__interface_addr,__group,__fmode,__numsrc,__slist))
-#endif /* setipv4sourcefilter... */
+#endif /* __CRT_HAVE_setipv4sourcefilter */
 #ifdef __CRT_HAVE_getsourcefilter
 /* Get source filter */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,getsourcefilter,(__fd_t __sockfd, __UINT32_TYPE__ __interface_addr, struct sockaddr const *__group, socklen_t __grouplen, __UINT32_TYPE__ *__fmode, __UINT32_TYPE__ *__numsrc, struct sockaddr_storage *__slist),(__sockfd,__interface_addr,__group,__grouplen,__fmode,__numsrc,__slist))
-#endif /* getsourcefilter... */
+#endif /* __CRT_HAVE_getsourcefilter */
 #ifdef __CRT_HAVE_setsourcefilter
 /* Set source filter */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,setsourcefilter,(__fd_t __sockfd, __UINT32_TYPE__ __interface_addr, struct sockaddr const *__group, socklen_t __grouplen, __UINT32_TYPE__ __fmode, __UINT32_TYPE__ __numsrc, struct sockaddr_storage const *__slist),(__sockfd,__interface_addr,__group,__grouplen,__fmode,__numsrc,__slist))
-#endif /* setsourcefilter... */
+#endif /* __CRT_HAVE_setsourcefilter */
 #endif /* __USE_GNU */
 
 #endif /* __CC__ */
