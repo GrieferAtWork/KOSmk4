@@ -448,8 +448,8 @@ size_t strxfrm(char *dst, [[nonnull]] char const *__restrict src, size_t maxlen)
 }
 
 %(std)#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
-%[insert:std_function(memcpy = memcpyc, externLinkageOverride: "C++")]
-%[insert:std_function(memmove = memmovec, externLinkageOverride: "C++")]
+%[insert:std_function_nousing(memcpy = memcpyc, externLinkageOverride: "C++")]
+%[insert:std_function_nousing(memmove = memmovec, externLinkageOverride: "C++")]
 %(std)#endif /* __cplusplus && __USE_STRING_OVERLOADS */
 
 

@@ -1736,7 +1736,11 @@ again_parse_default_annotation:
 	}
 
 	public function parseInsertDirective_std_function() {
-		parseInsertDirective_function(std: true);
+		parseInsertDirective_function(std: true, using: true);
+	}
+
+	public function parseInsertDirective_std_function_nousing() {
+		parseInsertDirective_function(std: true, using: false);
 	}
 
 	@@>> %[insert:function(foo)]
@@ -1747,13 +1751,17 @@ again_parse_default_annotation:
 	@@>> %[insert:std_function(foo, ATTRIB)]
 	@@>> %[insert:std_function(foo = bar)]
 	@@>> %[insert:std_function(foo = bar, ATTRIB)]
+	@@>> %[insert:std_function_nousing(foo)]
+	@@>> %[insert:std_function_nousing(foo, ATTRIB)]
+	@@>> %[insert:std_function_nousing(foo = bar)]
+	@@>> %[insert:std_function_nousing(foo = bar, ATTRIB)]
 	@@
 	@@Where ATTRIB is:
 	@@    ',' ~~ (ATTR_NAME ':' ATTR_VALEXPR)...
 	@@
 	@@Where ATTR_NAME is the name of one of the members of @ExposedFunction
 	@@Where ATTR_VALEXPR is a deemon expression, as executable by @(exec from deemon)
-	public function parseInsertDirective_function(std: bool = false) {
+	public function parseInsertDirective_function(std: bool = false, using: bool = false) {
 		local self = this.self;
 		self.next();
 		self.skip("(");
@@ -1802,47 +1810,49 @@ again_parse_default_annotation:
 				self.err("%[insert:std_function(...)] used, but "
 				         "'%[insert:std]' hasn't been encountered, yet");
 			}
-			result_order_headerStd.append(exposedFunction);
-			local gblGuard = false;
 			local nsStd = NAMESPACES["std"];
-			local importCondition = "$has_function({})".format({ insertedFunctionName });
-			exposedFunction.namespaceOverride = NAMESPACES["std"];
-			local exposedName = exposedFunction.exposedName;
-			if (exposedFunction.guardName !== false) {
-				local stdGuard = exposedFunction.guardName;
-				if (stdGuard === true)
-					stdGuard = nsStd.keyDefaultGuard(exposedName);
-				gblGuard = GLOBAL_NAMESPACE.keyDefaultGuard(exposedName);
-				importCondition = "defined({})".format({ stdGuard });
+			exposedFunction.namespaceOverride = nsStd;
+			result_order_headerStd.append(exposedFunction);
+			if (using) {
+				local gblGuard = false;
+				local importCondition = "$has_function({})".format({ insertedFunctionName });
+				local exposedName = exposedFunction.exposedName;
+				if (exposedFunction.guardName !== false) {
+					local stdGuard = exposedFunction.guardName;
+					if (stdGuard === true)
+						stdGuard = nsStd.keyDefaultGuard(exposedName);
+					gblGuard = GLOBAL_NAMESPACE.keyDefaultGuard(exposedName);
+					importCondition = "defined({})".format({ stdGuard });
+				}
+				local importFunction = Function(
+					name:                     exposedName,
+					originalSystemHeaderName: headerName,
+					bindings: []{
+						local protos = exposedFunction.func()
+							.functionBindings.first.prototypes;
+						yield FunctionBinding(
+							ppCond:     importCondition,
+							prototypes: protos,
+							binding:    NamespaceBinding(
+								namespace:  nsStd,
+								importName: exposedName,
+								prototypes: protos));
+					});
+				if (gblGuard !== false) {
+					local gblExposure = copy exposedFunction;
+					gblExposure.func              = importFunction;
+					gblExposure.guardName         = gblGuard;
+					gblExposure.namespaceOverride = GLOBAL_NAMESPACE;
+					importFunction = gblExposure;
+				}
+				if (!result_order_header_in_CXX_SYSTEM_HEADER) {
+					result.order_header.append(CXX_SYSTEM_HEADER_START);
+					result_order_header_in_CXX_SYSTEM_HEADER = true;
+				}
+				result.order_header.append(importFunction);
+				if (result_ccompatHeaderName !is none)
+					result_order_headerCCompat.append(importFunction);
 			}
-			local importFunction = Function(
-				name:                     exposedName,
-				originalSystemHeaderName: headerName,
-				bindings: []{
-					local protos = exposedFunction.func()
-						.functionBindings.first.prototypes;
-					yield FunctionBinding(
-						ppCond:     importCondition,
-						prototypes: protos,
-						binding:    NamespaceBinding(
-							namespace:  nsStd,
-							importName: exposedName,
-							prototypes: protos));
-				});
-			if (gblGuard !== false) {
-				local gblExposure = copy exposedFunction;
-				gblExposure.func              = importFunction;
-				gblExposure.guardName         = gblGuard;
-				gblExposure.namespaceOverride = GLOBAL_NAMESPACE;
-				importFunction = gblExposure;
-			}
-			if (!result_order_header_in_CXX_SYSTEM_HEADER) {
-				result.order_header.append(CXX_SYSTEM_HEADER_START);
-				result_order_header_in_CXX_SYSTEM_HEADER = true;
-			}
-			result.order_header.append(importFunction);
-			if (result_ccompatHeaderName !is none)
-				result_order_headerCCompat.append(importFunction);
 		} else {
 			if (result_order_header_in_CXX_SYSTEM_HEADER) {
 				result.order_header.append(CXX_SYSTEM_HEADER_END);

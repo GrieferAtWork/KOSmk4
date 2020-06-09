@@ -1383,58 +1383,78 @@ class NamespaceBinding {
 		local explicitCastAllTypes =
 			(#callToPrototypes != 1) ||
 			(#callToPrototypes.first[1] != 1);
-		local callToName = "({} {})".format({
-			this.namespace.prefix,
-			this.namespace.keyCSymbolName(this.importName)
-		});
+		local callToSymbolName = this.namespace.keyCSymbolName(this.importName);
+		local callToName = callToSymbolName;
+		if (this.namespace.prefix)
+			callToName = "({} {})".format({ this.namespace.prefix, callToName });
 		if (prototypes.each.hasEllipsis || ...) {
 			/* _Must_ (try to) use keyUsing for c++, or a macro for C */
 			if (doc)
 				fp.printComment(doc);
 			fp.ppIfdef("__cplusplus");
-			this.namespace.keyUsing(fp, exposedName);
+			this.namespace.keyUsing(fp, this.importName);
 			fp.ppElse();
-			fp << "#define " << exposedName << " " << callToName;
+			fp << "#define " << exposedName << " " << callToName << "\n";
 			fp.ppEndif();
 			return;
 		}
+		local usedCallToProto = none;
+		for (local callToPrototypePpCond, callToProtos: callToPrototypes) {
+			if (callToPrototypePpCond != "1")
+				continue;
+			usedCallToProto = callToProtos;
+			break;
+		}
+		if (usedCallToProto is none) {
+			usedCallToProto = callToPrototypes
+				? callToPrototypes.first.last
+				: prototypes;
+		}
+		usedCallToProto = usedCallToProto.first;
 		for (local ptype: prototypes) {
-			local isFirst = true;
-			for (local callToPrototypePpCond, callToProtos: callToPrototypes) {
-				callToPrototypePpCond = expandPreprocessorConditionString(callToPrototypePpCond);
-				if (isFirst)
-					fp.ppIf(callToPrototypePpCond);
-				else {
-					fp.ppElif(callToPrototypePpCond);
-				}
-				isFirst = false;
-				for (local callToProto: callToProtos) {
-					if (doc)
-						fp.printComment(doc);
-					if (exposedName == this.importName && #prototypes == 1 &&
-					    ptype.compatibleWith(callToProto)) {
-						/* Can only be done if the prototypes match up! */
-						this.namespace.keyUsingOrImpl(fp, exposedName, []{
-							ptype.cprintCallToFunction(
-								fp, escapeMode, NAMESPACE_IMPORT_DECL,
-								exposedName, callToName, callToProto,
-								explicitCastAllTypes: explicitCastAllTypes);
-						});
-					} else if (preferBindingMacros) {
-						ptype.cprintCallToMacro(
-							fp, escapeMode, exposedName, callToName, callToProto,
-							explicitCastAllTypes: explicitCastAllTypes);
+			if (doc)
+				fp.printComment(doc);
+			if (exposedName == this.importName && #prototypes == 1 &&
+			    ptype.compatibleWith(usedCallToProto)) {
+				/* Can only be done if the prototypes match up! */
+				this.namespace.keyUsingOrImpl(fp, exposedName, []{
+					ptype.cprintCallToFunction(
+						fp, escapeMode, NAMESPACE_IMPORT_DECL,
+						exposedName, callToName, usedCallToProto,
+						explicitCastAllTypes: explicitCastAllTypes);
+				});
+			} else if (preferBindingMacros) {
+				if (fp.namespace !== GLOBAL_NAMESPACE) {
+					if (#prototypes == 1 && ptype.compatibleWith(usedCallToProto)) {
+						/* Compatible prototypes -> Do this:
+						 * >> __NAMESPACE_STD_BEGIN
+						 * >> void foo(void);
+						 * >> __NAMESPACE_STD_END
+						 * >>
+						 * >> ...
+						 * >>
+						 * >> __NAMESPACE_LOCAL_BEGIN
+						 * >> __NAMESPACE_STD_USING(foo);
+						 * >> #define __MY_BINDING_NAME_FOR_FOO foo
+						 * >> __NAMESPACE_LOCAL_END */
+						this.namespace.keyUsing(fp, this.importName);
+						fp << "#define " << exposedName << " " << callToSymbolName << "\n";
 					} else {
-						ptype.cprintCallToFunction(
-							fp, escapeMode, NAMESPACE_IMPORT_DECL,
-							exposedName, callToName, callToProto,
-							explicitCastAllTypes: explicitCastAllTypes);
-						fp << "\n";
+						goto do_bind_by_call;
 					}
+				} else {
+					ptype.cprintCallToMacro(
+						fp, escapeMode, exposedName, callToName, usedCallToProto,
+						explicitCastAllTypes: explicitCastAllTypes);
 				}
+			} else {
+do_bind_by_call:
+				ptype.cprintCallToFunction(
+					fp, escapeMode, NAMESPACE_IMPORT_DECL,
+					exposedName, callToName, usedCallToProto,
+					explicitCastAllTypes: explicitCastAllTypes);
+				fp << "\n";
 			}
-			if (!isFirst)
-				fp.ppEndif();
 		}
 	}
 }

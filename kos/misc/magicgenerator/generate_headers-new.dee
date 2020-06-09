@@ -309,13 +309,13 @@ global final HEADER_PRINT_WHITELIST: {string...} = {
 //	"shadow",
 //	"signal",
 //	"spawn",
-//	"ssp.string",
+	"ssp.string",
 //	"stdio",
 //	"stdio_ext",
 //	"stdlib",
-//	"string",
-//	"stringlist",
-//	"strings",
+	"string",
+	"stringlist",
+	"strings",
 //	"stropts",
 //	"sys.acct",
 //	"sys.auxv",
@@ -374,6 +374,7 @@ global final HEADER_PRINT_WHITELIST: {string...} = {
 //	"wchar",
 //	"wctype",
 };
+
 global final HEADER_TEST_WHITELIST: {string...} = {
 //	"crtdbg",
 //	"crypt",
@@ -547,6 +548,14 @@ try {
 			(fullPath, fs.fileof(filename)));
 	}
 	waitTasks();
+
+#if 0
+	local fp = CWriter(File.stdout);
+	allFunctionsByName["wcsnlen_s"]
+		.cprintHeaderDeclaration(fp, ESCAPE_MODE_PART);
+	fp.flush();
+	Error.AppExit.exit(0);
+#endif
 
 	/* Generate the actual system headers (i.e. <string.h>) */
 	for (local name /*: string*/, header /*: SystemHeader*/: allSystemHeaders) {

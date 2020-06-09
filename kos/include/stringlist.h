@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6a27473 */
+/* HASH CRC-32:0x7486ad96 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,11 +47,11 @@ typedef struct _stringlist {
 #ifdef __CRT_HAVE_sl_init
 /* Allocates and returns a new StringList object. Upon error, `NULL' is returned */
 __CDECLARE(__ATTR_WUNUSED,struct _stringlist *,__NOTHROW_NCX,sl_init,(void),())
-#elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <local/stringlist/sl_init.h>
 /* Allocates and returns a new StringList object. Upon error, `NULL' is returned */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sl_init, __FORCELOCAL __ATTR_WUNUSED struct _stringlist *__NOTHROW_NCX(__LIBCCALL sl_init)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_init))(); })
-#endif /* sl_init... */
+#endif /* ... */
 #ifdef __CRT_HAVE_sl_add
 /* Append a given `NAME' to `SL'. `NAME' is considered
  * inherited if the StringList is destroyed with `1' */
@@ -61,7 +61,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sl_add,(struct _stringlist *
 /* Append a given `NAME' to `SL'. `NAME' is considered
  * inherited if the StringList is destroyed with `1' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sl_add, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL sl_add)(struct _stringlist *__sl, char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_add))(__sl, __name); })
-#endif /* sl_add... */
+#endif /* ... */
 #ifdef __CRT_HAVE_sl_free
 /* Free a given string list. When `ALL' is non-zero, all contained
  * string pointers (as previously added with `sl_add()') will also
@@ -73,21 +73,21 @@ __CDECLARE_VOID(,__NOTHROW_NCX,sl_free,(struct _stringlist *__sl, int __all),(__
  * string pointers (as previously added with `sl_add()') will also
  * be `free(3)'ed. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sl_free, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL sl_free)(struct _stringlist *__sl, int __all) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_free))(__sl, __all); })
-#endif /* sl_free... */
+#endif /* ... */
 #ifdef __CRT_HAVE_sl_find
 /* Search for `NAME' within the given StringList. Upon success,
  * return a pointer to the equivalent string within `SL' (i.e. the
  * pointer originally passed to `sl_add()' to insert that string).
  * If `SL' doesn't contain an equivalent string, return `NULL' instead. */
 __CDECLARE(__ATTR_PURE __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,sl_find,(struct _stringlist __KOS_FIXED_CONST *__sl, char const *__name),(__sl,__name))
-#else /* LIBC: sl_find */
+#else /* __CRT_HAVE_sl_find */
 #include <local/stringlist/sl_find.h>
 /* Search for `NAME' within the given StringList. Upon success,
  * return a pointer to the equivalent string within `SL' (i.e. the
  * pointer originally passed to `sl_add()' to insert that string).
  * If `SL' doesn't contain an equivalent string, return `NULL' instead. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sl_find, __FORCELOCAL __ATTR_PURE __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL sl_find)(struct _stringlist __KOS_FIXED_CONST *__sl, char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_find))(__sl, __name); })
-#endif /* sl_find... */
+#endif /* !__CRT_HAVE_sl_find */
 #endif /* __CC__ */
 
 __SYSDECL_END
