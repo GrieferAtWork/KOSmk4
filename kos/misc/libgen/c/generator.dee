@@ -20,6 +20,7 @@
 
 import * from deemon;
 import * from .cheaders;
+import * from .escape;
 import * from .parser;
 import * from .globals;
 import * from .namespace;
@@ -52,6 +53,41 @@ class Generator {
 	@@Same as @replaceText, but is optional and used to convert documentation strings
 	@@> function replaceDocumentation(text: string | CParser | UserString): string | UserString;
 	public member replaceDocumentation: Callable with (string | CParser | UserString) = none;
+
+	@@An optional callback to provide a @LoaderFunctionImplementation
+	@@for the given base-funciton. Not providing this callback is the
+	@@same as implementing it as follows:
+	@@>>function generateLoaderFunctionImplementation(
+	@@>>		baseFunction:             Function,
+	@@>>		newFunctionName:          string,
+	@@>>		prototype:                FunctionPrototype | Callable,
+	@@>>		baseLocalFunction:        LocalFunction | none,
+	@@>>		forcedDependencies:       {string...},
+	@@>>		unforcedDependencies:     {string...},
+	@@>>		noAutoDependencyScanning: bool)
+	@@>>	: LoaderFunctionImplementation | none
+	@@>>{
+	@@>>	if (baseLocalFunction is none)
+	@@>>		return none;
+	@@>>	return LoaderFunctionImplementation(
+	@@>>		ppCond:       this.replaceText(baseLocalFunction.ppCond),
+	@@>>		ppCondPrefix: this.replaceTextArray(baseLocalFunction.ppCondPrefix),
+	@@>>		impl:         this.replaceFunctionImplementation(
+	@@>>			baseLocalFunction.functionImpl, newFunctionName, prototype,
+	@@>>			forcedDependencies:       forcedDependencies,
+	@@>>			unforcedDependencies:     unforcedDependencies,
+	@@>>			noAutoDependencyScanning: noAutoDependencyScanning));
+	@@>>}
+	public member generateLoaderFunctionImplementation: Callable with (
+			/* baseFunction:             */ Function,
+			/* newFunctionName:          */ string,
+			/* prototype:                */ FunctionPrototype | Callable,
+			/* baseLocalFunction:        */ LocalFunction | none,
+			/* forcedDependencies:       */ {string...},
+			/* unforcedDependencies:     */ {string...},
+			/* noAutoDependencyScanning: */ bool)
+		/* : LoaderFunctionImplementation | none */
+		= none;
 
 	public function replaceTextArray(strings: {string...}): {string...} {
 		if (!strings)
@@ -137,7 +173,7 @@ class Generator {
 		    newCc === self.cc && newReturnType === self.returnType &&
 		    newArgv === self.argv &&
 		    newEllipsisArgumentTypes === self.ellipsisArgumentTypes &&
-		    newDeclPrefix === self.newDeclPrefix)
+		    newDeclPrefix === self.declPrefix)
 			return self;
 		return FunctionPrototype(
 			attributes:            newAttributes,
@@ -150,13 +186,22 @@ class Generator {
 	}
 
 	public function replaceFunctionImplementation(
-			self: FunctionImplementation,
-			newFunctionName: string): FunctionImplementation {
-		return FunctionImplementation(
+			self: FunctionImplementation, newFunctionName: string,
+			prototype: FunctionPrototype | Callable,
+			forcedDependencies: {string...} = none,
+			unforcedDependencies: {string...} = none,
+			noAutoDependencyScanning: bool = false): FunctionImplementation {
+		local result = FunctionImplementation(
 			body:         replaceText(self.body),
 			name:         newFunctionName,
-			implPrefix:   replaceTextArray(self.implPrefix),
-			dependencies: none /* TODO */);
+			implPrefix:   replaceTextArray(self.implPrefix));
+		/* Scan for dependencies */
+		result.dependencies = scanForNamesOfDependentFunctions(
+			result.body, prototype,
+			forcedDependencies:       forcedDependencies,
+			unforcedDependencies:     unforcedDependencies,
+			noAutoDependencyScanning: noAutoDependencyScanning);
+		return result;
 	}
 
 }
@@ -308,7 +353,7 @@ function math_replaceText(
 				return text; /* Special case: Empty string */
 			/* Simple case: replace-single-keyword */
 			if (usedText.issymbol())
-				return str2wcs_replaceWord(text);
+				return math_replaceWord(text, mode);
 			/* Optimization for things such as "0", "1", etc...
 			 * (very likely in case of preprocessor conditions) */
 			if (usedText.isnumeric())
@@ -361,7 +406,7 @@ function double2float_replaceText(
 
 function double2ldouble_replaceText(
 		text: string | CParser | UserString): string | UserString {
-	return math_replaceText(text, MATH_REPLACEMENT_MODE_FLOAT);
+	return math_replaceText(text, MATH_REPLACEMENT_MODE_LDBL);
 }
 
 @@@param: mode: Either @MATH_REPLACEMENT_MODE_FLOAT, or @MATH_REPLACEMENT_MODE_LDBL
@@ -419,22 +464,229 @@ function double2ldouble_getDefaultBaseFunctionName(name: string): string {
 	return none;
 }
 
+global MATH_GENERATORS: (Generator, Generator);
+
+function math_constructCallToBaseExpression(
+		mode: int, prototype: FunctionPrototype,
+		basePrototype: FunctionPrototype,
+		baseFunctionName: string): string {
+	File.Writer fp;
+	if (!prototype.returnType.isVoid) {
+		fp << "return ";
+		if (!basePrototype.returnType.implicitlyConvertibleTo(prototype.returnType))
+			prototype.returnType.cprintCCastPrefixForGenerator(fp);
+	}
+	fp << baseFunctionName << "(";
+	local bsArgc = #basePrototype.argv;
+	local myArgc = #prototype.argv;
+	local isFirst = true;
+	for (local i: [:bsArgc]) {
+		if (!isFirst)
+			fp << ", ";
+		isFirst = false;
+		if (i > myArgc) {
+			fp << "0";
+			continue;
+		}
+		local bsArg = basePrototype.argv[i];
+		local myArg = prototype.argv[i];
+		if (!myArg.ctype.implicitlyConvertibleTo(bsArg.ctype))
+			bsArg.ctype.cprintCCastPrefixForGenerator(fp);
+		fp << myArg.name;
+	}
+	fp << ")";
+	return fp.string;
+}
 
 
+@@@param: mode: Either @MATH_REPLACEMENT_MODE_FLOAT, or @MATH_REPLACEMENT_MODE_LDBL
+function math_generateLoaderFunctionImplementation(
+		mode:                     int,
+		baseFunction:             Function,
+		newFunctionName:          string,
+		prototype:                FunctionPrototype | Callable,
+		baseLocalFunction:        LocalFunction | none,
+		forcedDependencies:       {string...},
+		unforcedDependencies:     {string...},
+		noAutoDependencyScanning: bool)
+	: LoaderFunctionImplementation | none
+{
+	/* Math function generators are somewhat special, in that they can ~magically~
+	 * create implementations where previously there were none. Though in actuality,
+	 * there's really nothing special about it:
+	 * >> acosl(*) %{generate(double2ldouble("acos"))}
+	 * Same as:
+	 *
+	 * if (baseLocalFunction !is none) {
+	 *     if (<CONVERTED_REQUIRES_OF:acos> == "1") {
+	 *         >> __LONGDOUBLE acosl(__LONGDOUBLE x) {
+	 *         >> <CONVERTED_BODY_OF:acos>
+	 *         >> }
+	 *     } else {
+	 *         >> [[dependency(acos)]]
+	 *         >> [[requires(<CONVERTED_REQUIRES_OF:acos> || $has_function(acos))]]
+	 *         >> __LONGDOUBLE acosl(__LONGDOUBLE x) {
+	 *         >> @@pp_if <CONVERTED_REQUIRES_OF:acos>@@
+	 *         >> <CONVERTED_BODY_OF:acos>
+	 *         >> @@pp_else@@
+	 *         >>      return (__LONGDOUBLE)acos((double)x);
+	 *         >> @@pp_endif@@
+	 *         >> }
+	 *     }
+	 * } else {
+	 *     >> [[dependency(acos)]]
+	 *     >> [[requires($has_function(acos))]]
+	 *     >> __LONGDOUBLE acosl(__LONGDOUBLE x) {
+	 *     >>      return (__LONGDOUBLE)acos((double)x);
+	 *     >> }
+	 * }
+	 */
+	local gen = MATH_GENERATORS[mode];
+	if (baseLocalFunction !is none) {
+		local baseLocalFunctionImplementation: FunctionImplementation = baseLocalFunction.functionImpl;
+		local convertedPpCond = str(math_replaceText(baseLocalFunction.ppCond, mode));
+		if (convertedPpCond == "1") {
+			/* Simply copy the base function 1-on-1 */
+			local impl = gen.replaceFunctionImplementation(
+				baseLocalFunctionImplementation, newFunctionName, prototype,
+				forcedDependencies:       forcedDependencies,
+				unforcedDependencies:     unforcedDependencies,
+				noAutoDependencyScanning: noAutoDependencyScanning);
+			return LoaderFunctionImplementation(impl: impl);
+		}
+		/* Wrap the underlying function's implementation */
+		local convertedBody = str(math_replaceText(
+			baseLocalFunctionImplementation.body, mode));
+		for (;;) {
+			convertedBody = convertedBody.strip();
+			if (convertedBody.startswith("{") && convertedBody.endswith("}") &&
+			    convertedBody.findmatch("{", "}", 1) == #convertedBody-1) {
+				convertedBody = convertedBody[1:-1];
+				continue;
+			}
+			break;
+		}
+		if (prototype is Callable)
+			prototype = prototype();
+		local result = FunctionImplementation(
+			body: "{{\n"
+				"@@pp_if {convertedPpCond}@@\n"
+				"	{convertedBody}\n"
+				"@@pp_else@@\n"
+				"	{callBase};\n"
+				"@@pp_endif@@\n"
+				"}}".format({
+					"convertedPpCond" : convertedPpCond,
+					"convertedBody"   : convertedBody,
+					"callBase"        : math_constructCallToBaseExpression(
+						mode, prototype, baseLocalFunction.functionPrototype,
+						baseLocalFunction.name),
+				}),
+			name:       newFunctionName,
+			implPrefix: gen.replaceTextArray(baseLocalFunctionImplementation.implPrefix));
+		/* Scan for dependencies within @convertedBody */
+		local resultDependencies: {string: Function};
+		resultDependencies = Dict(scanForNamesOfDependentFunctions(
+			convertedBody, prototype,
+			forcedDependencies:       forcedDependencies,
+			unforcedDependencies:     unforcedDependencies,
+			noAutoDependencyScanning: noAutoDependencyScanning)());
+		/* Also force a dependency on the actual base function (since
+		 * that one's getting invoked from the `callBase` part!) */
+		resultDependencies[baseLocalFunction.name] = baseFunction;
+		result.dependencies = resultDependencies;
+		return LoaderFunctionImplementation(
+			impl:         result,
+			/* Include mention of the call-to-base variant in implementation's requires */
+			ppCond:       "{} || $has_function({})".format({ convertedPpCond, baseFunction.name }),
+			ppCondPrefix: gen.replaceTextArray(baseLocalFunction.ppCondPrefix));
+	} else {
+		/* Simply generate a call to the base-function:
+		 * >> [[dependency(acos)]]
+		 * >> [[requires($has_function(acos))]]
+		 * >> __LONGDOUBLE acosl(__LONGDOUBLE x) {
+		 * >>      return (__LONGDOUBLE)acos((double)x);
+		 * >> } */
+		local baseName: string = baseFunction.name;
+		local basePrototype: FunctionPrototype = baseFunction.onlyPrototype;
+		if (basePrototype is none) {
+			throw Error("Cannot generate math implementation for {!r}: Base function {!r} "
+			            "has no local variant, and is exposed through multiple prototypes"
+				.format({ newFunctionName, baseName }));
+		}
+		if (prototype is Callable)
+			prototype = prototype();
+		return LoaderFunctionImplementation(
+			impl:   FunctionImplementation(
+				body: "{{\n"
+					"	{};\n"
+					"}}".format({
+						math_constructCallToBaseExpression(
+							mode, prototype, basePrototype, baseName),
+					}),
+				name:         newFunctionName,
+				dependencies: { baseName : baseFunction }),
+			ppCond: "$has_function({})".format({ baseFunction.name }));
+	}
+}
+
+function double2float_generateLoaderFunctionImplementation(
+		baseFunction:             Function,
+		newFunctionName:          string,
+		prototype:                FunctionPrototype | Callable,
+		baseLocalFunction:        LocalFunction | none,
+		forcedDependencies:       {string...},
+		unforcedDependencies:     {string...},
+		noAutoDependencyScanning: bool)
+	: LoaderFunctionImplementation | none
+{
+	return math_generateLoaderFunctionImplementation(
+		MATH_REPLACEMENT_MODE_FLOAT, baseFunction,
+		newFunctionName, prototype, baseLocalFunction,
+		forcedDependencies, unforcedDependencies,
+		noAutoDependencyScanning);
+}
+
+function double2ldouble_generateLoaderFunctionImplementation(
+		baseFunction:             Function,
+		newFunctionName:          string,
+		prototype:                FunctionPrototype | Callable,
+		baseLocalFunction:        LocalFunction | none,
+		forcedDependencies:       {string...},
+		unforcedDependencies:     {string...},
+		noAutoDependencyScanning: bool)
+	: LoaderFunctionImplementation | none
+{
+	return math_generateLoaderFunctionImplementation(
+		MATH_REPLACEMENT_MODE_LDBL, baseFunction,
+		newFunctionName, prototype, baseLocalFunction,
+		forcedDependencies, unforcedDependencies,
+		noAutoDependencyScanning);
+}
+
+
+
+
+MATH_GENERATORS = (
+	Generator(
+		getDefaultBaseFunctionName:           double2float_getDefaultBaseFunctionName,
+		registerFunctionPairing:              double2float_defineReplacement,
+		replaceText:                          double2float_replaceText,
+		generateLoaderFunctionImplementation: double2float_generateLoaderFunctionImplementation),
+	Generator(
+		getDefaultBaseFunctionName:           double2ldouble_getDefaultBaseFunctionName,
+		registerFunctionPairing:              double2ldouble_defineReplacement,
+		replaceText:                          double2ldouble_replaceText,
+		generateLoaderFunctionImplementation: double2ldouble_generateLoaderFunctionImplementation),
+);
 
 global generators: {string: Generator} = Dict({
 	"str2wcs" : Generator(
 		getDefaultBaseFunctionName: str2wcs_getDefaultBaseFunctionName,
 		registerFunctionPairing:    str2wcs_registerFunctionPairing,
 		replaceText:                str2wcs_replaceText),
-	"double2float" : Generator(
-		getDefaultBaseFunctionName: double2float_getDefaultBaseFunctionName,
-		registerFunctionPairing:    double2float_defineReplacement,
-		replaceText:                double2float_replaceText),
-	"double2ldouble" : Generator(
-		getDefaultBaseFunctionName: double2ldouble_getDefaultBaseFunctionName,
-		registerFunctionPairing:    double2ldouble_defineReplacement,
-		replaceText:                double2ldouble_replaceText),
+	"double2float"   : MATH_GENERATORS[0],
+	"double2ldouble" : MATH_GENERATORS[1],
 });
 
 

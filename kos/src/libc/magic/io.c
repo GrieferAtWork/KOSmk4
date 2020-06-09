@@ -69,6 +69,16 @@ struct __finddata64_t; /* I guess something else already using the more obvious 
 struct _finddata32i64_t;
 struct _finddata64i32_t;
 
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS
+#define __PIO_OFFSET     __FS_TYPE(pos)
+#define __PIO_OFFSET64   __pos64_t
+#else /* __USE_KOS */
+#define __PIO_OFFSET     __FS_TYPE(off)
+#define __PIO_OFFSET64   __off64_t
+#endif /* !__USE_KOS */
+#endif /* !__PIO_OFFSET */
+
 }
 
 %[insert:std]

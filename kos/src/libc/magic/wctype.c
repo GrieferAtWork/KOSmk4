@@ -113,57 +113,57 @@ __NAMESPACE_STD_USING(wctrans_t)
 %[insert:std]
 %[default_impl_section("{.text.crt.wchar.unicode.static.ctype|.text.crt.dos.wchar.unicode.static.ctype}")];
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
 int iswalnum(wint_t wc) {
 	return isalnum((int)wc);
 }
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
 int iswalpha(wint_t wc) {
 	return isalpha((int)wc);
 }
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
 int iswcntrl(wint_t wc) {
 	return iscntrl((int)wc);
 }
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
 int iswdigit(wint_t wc) {
 	return isdigit((int)wc);
 }
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
 int iswgraph(wint_t wc) {
 	return isgraph((int)wc);
 }
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
 int iswlower(wint_t wc) {
 	return islower((int)wc);
 }
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
 int iswprint(wint_t wc) {
 	return isprint((int)wc);
 }
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
 int iswpunct(wint_t wc) {
 	return ispunct((int)wc);
 }
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
 int iswspace(wint_t wc) {
 	return isspace((int)wc);
 }
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
 int iswupper(wint_t wc) {
 	return isupper((int)wc);
 }
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
 int iswxdigit(wint_t wc) {
 	return isdigit((int)wc);
 }

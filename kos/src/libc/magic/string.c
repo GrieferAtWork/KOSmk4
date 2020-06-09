@@ -262,7 +262,7 @@ size_t strlen([[nonnull]] char const *__restrict string) {
 %(libc_fast)#endif /* !__LIBC_BIND_OPTIMIZATIONS || __NO_builtin_constant_p || !__builtin_strlen || !__CRT_HAVE_strlen */
 
 @@Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found.
-[[libc, std, kernel, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
+[[libc, std, kernel, ATTR_WUNUSED, crtbuiltin, ATTR_PURE]]
 char *strchr([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): char *]
 	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
@@ -275,7 +275,7 @@ char *strchr([[nonnull]] char const *__restrict haystack, int needle)
 }
 
 @@Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found.
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
+[[std, ATTR_WUNUSED, crtbuiltin, ATTR_PURE]]
 char *strrchr([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): char *]
 	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
@@ -289,7 +289,7 @@ char *strrchr([[nonnull]] char const *__restrict haystack, int needle)
 }
 
 @@Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical
-[[libc, std, kernel, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
+[[libc, std, kernel, ATTR_WUNUSED, crtbuiltin, ATTR_PURE]]
 int strcmp([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 	char c1, c2;
 	do {
@@ -300,7 +300,7 @@ int strcmp([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 }
 
 @@Same as `strcmp', but compare at most `MAXLEN' characters from either string
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
+[[std, ATTR_WUNUSED, crtbuiltin, ATTR_PURE]]
 int strncmp([[nonnull]] char const *s1,
             [[nonnull]] char const *s2, size_t maxlen) {
 	char c1, c2;
@@ -315,7 +315,7 @@ int strncmp([[nonnull]] char const *s1,
 
 @@Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
 @@If no such needle exists, return `NULL'
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
+[[std, ATTR_WUNUSED, crtbuiltin, ATTR_PURE]]
 char *strstr([[nonnull]] char const *haystack, [[nonnull]] char const *needle)
 	[([[nonnull]] char *haystack, [[nonnull]] char *needle): char *]
 	[([[nonnull]] char const *haystack, [[nonnull]] char const *needle): char const *]
@@ -372,7 +372,7 @@ miss:
 	return buf;
 }
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
+[[std, ATTR_WUNUSED, crtbuiltin, ATTR_PURE]]
 size_t strcspn([[nonnull]] char const *haystack,
                [[nonnull]] char const *reject) {
 	char const *iter = haystack;
@@ -381,7 +381,7 @@ size_t strcspn([[nonnull]] char const *haystack,
 	return (size_t)(iter - haystack);
 }
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
+[[std, ATTR_WUNUSED, crtbuiltin, ATTR_PURE]]
 size_t strspn([[nonnull]] char const *haystack,
               [[nonnull]] char const *accept) {
 	char const *iter = haystack;
@@ -390,7 +390,7 @@ size_t strspn([[nonnull]] char const *haystack,
 	return (size_t)(iter - haystack);
 }
 
-[[std, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
+[[std, ATTR_WUNUSED, crtbuiltin, ATTR_PURE]]
 char *strpbrk([[nonnull]] char const *haystack, [[nonnull]] char const *accept)
 	[([[nonnull]] char *haystack, [[nonnull]] char const *accept): char *]
 	[([[nonnull]] char const *haystack, [[nonnull]] char const *accept): char const *]
@@ -467,7 +467,7 @@ __NAMESPACE_STD_END
 
 %#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 @@Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´)
-[[libc, kernel, crtbuiltin, ATTR_WUNUSED, ATTR_PURE]]
+[[libc, kernel, ATTR_WUNUSED, crtbuiltin, ATTR_PURE]]
 $size_t strnlen([[nonnull]] char const *__restrict string, $size_t maxlen) {
 	return (size_t)(strnend(string, maxlen) - string);
 }

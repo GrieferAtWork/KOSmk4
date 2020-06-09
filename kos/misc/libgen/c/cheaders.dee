@@ -104,9 +104,9 @@ class CType {
 	public function equals(other: CType): bool {
 		if (this === other)
 			return true;
-		if (beforeName != other.beforeName)
+		if (beforeName != str(other.beforeName))
 			return false;
-		if (afterName != other.afterName)
+		if (afterName != str(other.afterName))
 			return false;
 		return false;
 	}
@@ -165,6 +165,19 @@ again_compare_typenames:
 	@@Prints the c-cast prefix (e.g. @"(int)") for @this
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintCCastPrefix(fp: CWriter, escapeMode: int) {
+		fp << "(";
+		local typename = str(beforeName).strip();
+		if (typename.endswith("__restrict"))
+			typename = typename[:-10].rstrip();
+		local an = str(afterName);
+		escapeTextIntoFile(fp, typename, escapeMode);
+		if (an.startswith("[") && an.endswith("]"))
+			fp << " *";
+		fp << ")";
+	}
+
+	@@Same @cprintCCastPrefix, but meant to be used by generators
+	public function cprintCCastPrefixForGenerator(fp: CWriter | File) {
 		fp << "(";
 		local typename = str(beforeName).strip();
 		if (typename.endswith("__restrict"))
@@ -1304,6 +1317,36 @@ class InlineFunction {
 }
 
 
+@@Check if the given 2 lists of function prototypes
+@@and conditions are compatible with each other
+function areFunctionPrototypesCompatible(
+		a: {(string | UserString, {FunctionPrototype...})...},
+		b: {(string | UserString, {FunctionPrototype...})...}): bool {
+	if (a === b)
+		return true;
+	local an = #a;
+	if (an != #b)
+		return false;
+	for (local i = 0; i < an; ++i) {
+		local ea = a[i];
+		local eb = b[i];
+		if (ea[0] != str(eb[0]))
+			return false;
+		ea = ea[1];
+		eb = eb[1];
+		local apn = #ea;
+		if (apn != #eb)
+			return false;
+		for (local j = 0; j < apn; ++j) {
+			if (!ea[j].compatibleWith(eb[j]))
+				return false;
+		}
+	}
+	return true;
+}
+
+
+
 class NamespaceBinding {
 	this = default;
 
@@ -1544,8 +1587,8 @@ class FunctionBinding {
 			assert usedNs !== fp.namespace, "The caller must check this!";
 			local nsCImportName = usedNs.keyCSymbolName(usedBinding.importName);
 			if (nsCImportName == exposedName) {
-				if (prototypes === usedBinding.prototypes) {
-bind_with_ns_using:
+				if (prototypes === usedBinding.prototypes ||
+				    areFunctionPrototypesCompatible(functionPrototypes, usedBinding.functionPrototypes)) {
 					/* Simple case: C doesn't perform any name mangling,
 					 * and the prototypes of the existing declaration match
 					 * those from the new declaration.
@@ -1553,31 +1596,8 @@ bind_with_ns_using:
 					usedNs.keyUsing(fp, exposedName);
 					return;
 				}
-				local nsPrototypes = usedBinding.functionPrototypes;
-				local prototypeVariantCount = #nsPrototypes;
-				if (prototypeVariantCount == #usedPrototypes) {
-					for (local i = 0; i < prototypeVariantCount; ++i) {
-						local myProtoOpt = usedPrototypes[i];
-						local otProtoOpt = nsPrototypes[i];
-						/* Check the prototype's preprocessor conditions */
-						if (str(myProtoOpt[0]) != otProtoOpt[0])
-							goto bind_normally;
-						myProtoOpt = myProtoOpt[1];
-						otProtoOpt = otProtoOpt[1];
-						local n = #myProtoOpt;
-						if (n != #otProtoOpt)
-							goto bind_normally;
-						/* Check the actual prototypes */
-						for (local j = 0; j < n; ++j) {
-							if (!myProtoOpt[j].compatibleWith(otProtoOpt[j]))
-								goto bind_normally;
-						}
-					}
-				}
-				goto bind_with_ns_using;
 			}
 		}
-bind_normally:
 		if (#usedPrototypes >= 2) {
 			for (local ppCond, none: usedPrototypes) {
 				if (ppCond != "1")
@@ -1652,7 +1672,6 @@ bind_normally:
 
 
 
-
 class Function {
 	this = default;
 
@@ -1702,6 +1721,25 @@ class Function {
 						}
 					}
 				}
+			}
+			return result;
+		}
+	}
+
+	@@Similar to @onlyPrototype, but return the set of prototypes+conditions
+	@@common to all bindings, or @none if no such set exists.
+	public property onlyPrototypes: {(string | UserString, {FunctionPrototype...})...} | none = {
+		get(): {(string | UserString, {FunctionPrototype...})...} | none {
+			local result = none;
+			for (local binding /*: FunctionBinding*/ : functionBindings) {
+				local conditionalProtos = binding.functionPrototypes;
+				if (result is none) {
+					result = conditionalProtos;
+					continue;
+				}
+				if (areFunctionPrototypesCompatible(result, conditionalProtos))
+					continue;
+				return none;
 			}
 			return result;
 		}
@@ -1920,7 +1958,7 @@ normal_guardName_binding:
 				fp.ppEndif();
 		} catch (...) {
 			print "... while printing header declaration for",
-				repr(name), "as", repr(exposedName);
+				repr(this.name), "as", repr(exposedName);
 			throw;
 		}
 	}

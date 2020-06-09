@@ -1469,103 +1469,6 @@ function getDefaultLibraryImplementationForPrototype(
 	return fp.string;
 }
 
-@@Scan for references to dependent functions within the given @text
-@@@param: prototype: The primary function prototype.
-@@                   Used to detect references to arguments, and prevent those
-@@                   from ever being considered references to dependencies.
-@@@param: features:  Extended function features to take into consideration
-function scanForNamesOfDependentFunctions(
-		text: string | UserString | Callable,
-		prototype: FunctionPrototype | Callable,
-		features: FunctionFeatures): Callable {
-	local forcedDependencies = features.forcedDependencies;
-	local unforcedDependencies = features.unforcedDependencies;
-	local noAutoDependencyScanning = features.noAutoDependencyScanning;
-	return []{
-		local usedPrototype = prototype;
-		if (usedPrototype is Callable)
-			usedPrototype = usedPrototype();
-		/* Always include forced dependencies */
-		for (local dep: features.forcedDependencies)
-			yield dep;
-		/* Check if we're supposed to do automatic dependency scanning? */
-		if (noAutoDependencyScanning)
-			return;
-		local parser = CParser(text is Callable ? text() : text);
-		local knownNonDependencies: {string...} = none;
-		local prevToken;
-		local tok = none;
-		for (;;) {
-next_token:
-			prevToken = tok;
-			tok = parser.next();
-with_next_token:
-			if (!tok)
-				break;
-			if (!tok.issymbol())
-				continue; /* Dependent functions must always have keyword names */
-			if (tok.startswith("$"))
-				continue; /* Functions cannot start with a '$', since that would interfere with escape rules */
-			if (tok in cLanguageKeywords)
-				continue; /* C language keywords can never be dependencies */
-			if (tok in unforcedDependencies)
-				continue; /* Explicitly not a dependencies of this function */
-			if (tok in keywordEscapes)
-				continue; /* Keywords that can be escaped further cannot refer to dependable functions */
-			if (tok in features.forcedDependencies)
-				continue; /* Already a dependency */
-			if (tok in usedPrototype.argsByName)
-				continue; /* Argument name -> Not a dependency */
-			if (tok in knownNonDependencies)
-				continue; /* Already a known non-dependency */
-			/* Check if there is a function by this name. */
-			local func = allFunctionsByName.get(tok);
-			if (func is none)
-				continue;
-			if (knownNonDependencies is none)
-				knownNonDependencies = HashSet();
-			if (func === DuplicateFunctionMarker) {
-				/* Check for header-specific, explicit dependencies */
-				for (local dep: forcedDependencies) {
-					if ("." !in dep)
-						continue;
-					if (tok == dep.rpartition(".")[2]) {
-						knownNonDependencies.insert(tok);
-						prevToken = tok;
-						goto next_token;
-					}
-				}
-				/* Error, unless the function was explicitly annotated as _NOT_ being a dependency! */
-				parser.err("Ambiguous dependency {0!r} (consider clarifying with "
-					"[dependency({0!r})] or [not_dependency({0!r})])"
-					.format({ tok }));
-				continue;
-			}
-			/* don't assume a dependency based on the next word:
-			 * int error;                  // Not a dependency on error()
-			 * int error = 5;              // Not a dependency on error()
-			 * printf("%d, %d", error, 5); // Not a dependency on error()
-			 * printf("%d", error);        // Not a dependency on error()
-			 * printf("%d", &error);       // Is a dependency on error() (unless 'error' was already used in a different context)
-			 */
-			if (prevToken == "&") {
-				knownNonDependencies.insert(tok);
-				yield (tok, func);
-				goto next_token;
-			}
-			prevToken = tok;
-			tok = parser.next();
-			if (tok in [")", ";", ",", "="]) {
-				knownNonDependencies.insert(prevToken);
-				goto with_next_token;
-			}
-			/* Yield items in pairs of @(dependencyName, dependencyFunc) */
-			yield (prevToken, func);
-			goto with_next_token;
-		}
-	};
-}
-
 
 class LoaderContext {
 	this = default;
@@ -1916,10 +1819,15 @@ again_parse_default_annotation:
 				name:                     exposedName,
 				originalSystemHeaderName: headerName,
 				bindings: []{
+					local protos = exposedFunction.func()
+						.functionBindings.first.prototypes;
 					yield FunctionBinding(
 						ppCond:     importCondition,
-						prototypes: exposedFunction.func().functionBindings.first.prototypes,
-						binding:    nsStd);
+						prototypes: protos,
+						binding:    NamespaceBinding(
+							namespace:  nsStd,
+							importName: exposedName,
+							prototypes: protos));
 				});
 			if (gblGuard !== false) {
 				local gblExposure = copy exposedFunction;
@@ -2775,17 +2683,18 @@ again_parse_annotations:
 					 * >> __CDECLARE(,size_t,__NOTHROW_NCX,strlen,(char const *__restrict __str),(__str))
 					 * >> #endif // ...
 					 */
-					local asmnameOverride = none;
+					local builtinStart: int = self.tokStart;
+					local asmnameOverride: string | none = none;
 					if (self.next() == "(") {
 						asmnameOverride = parseCStringOrKeyword(self);
 						self.skip(")");
 					}
-					current.bindings.insert(numPreferredBindings, []{
-						local asmname = asmnameOverride;
+					function crtbuiltinBindingGenerator(): FunctionBinding {
+						local asmname: string = asmnameOverride;
 						if (asmname is none)
 							asmname = current.name;
-						local builtinName = "__builtin_" + asmname;
-						local bindingCond =
+						local builtinName: string = "__builtin_" + asmname;
+						local bindingCond: string =
 							"__has_builtin({})&&"
 							"defined(__LIBC_BIND_CRTBUILTINS)&&"
 							"{}".format({ builtinName, keyCrtHave(asmname) });
@@ -2794,11 +2703,48 @@ again_parse_annotations:
 						File.Writer bodyFp;
 						bodyFp << "{ return " << builtinName << "(";
 						/* Print argument names */
-						local isFirst = true;
-						/* TODO: currentPrototype can't be used if the function ends up
-						 *       inheriting some other function's prototypes:
-						 * >> [[crtbuiltin]] wcslen(*) %{generate(str2wcs)} */
-						for (local a: currentPrototype.argv) {
+						local isFirst: bool = true;
+						local usedCurrentPrototype: FunctionPrototype = currentPrototype;
+						local usedCurrentPrototypes: {(string | UserString, {FunctionPrototype...})...} = currentPrototypes;
+						if (!usedCurrentPrototypes) {
+							usedCurrentPrototypes = none;
+							local usedBindings = current.bindings;
+							if (usedBindings is Callable)
+								usedBindings = usedBindings();
+							for (local binding /*: FunctionBinding*/ : usedBindings) {
+								/* Make sure to ignore our own binding here,
+								 *so-as to  prevent an infinite recursion! */
+								if (binding === crtbuiltinBindingGenerator)
+									continue;
+								local conditionalProtos = binding.prototypes;
+								if (usedCurrentPrototypes is none) {
+									usedCurrentPrototypes = conditionalProtos;
+									continue;
+								}
+								if (usedCurrentPrototypes === conditionalProtos)
+									continue;
+								if (usedCurrentPrototypes is Callable)
+									usedCurrentPrototypes = usedCurrentPrototypes();
+								if (conditionalProtos is Callable)
+									conditionalProtos = binding.prototypes = conditionalProtos();
+								if (areFunctionPrototypesCompatible(
+										usedCurrentPrototypes, conditionalProtos))
+									continue;
+								usedCurrentPrototypes = none;
+								break;
+							}
+							if (usedCurrentPrototypes is Callable)
+								usedCurrentPrototypes = usedCurrentPrototypes();
+							if (usedCurrentPrototypes is none)
+								self.errAt(builtinStart, "Unable to determine prototype list");
+						}
+						if (usedCurrentPrototype.returnType !is bound) {
+							/* XXX: Must assert that all prototypes have the same
+							 *      number of arguments, and the same names for
+							 *      arguments... */
+							usedCurrentPrototype = usedCurrentPrototypes.first.last.first;
+						}
+						for (local a: usedCurrentPrototype.argv) {
 							if (!isFirst)
 								bodyFp << ", ";
 							isFirst = false;
@@ -2807,23 +2753,15 @@ again_parse_annotations:
 						bodyFp << "); }";
 						return FunctionBinding(
 							ppCond:     bindingCond,
-							/* TODO: currentPrototypes can't be used if the function ends up
-							 *       inheriting some other function's prototypes:
-							 * >> [[crtbuiltin]] wcslen(*) %{generate(str2wcs)}
-							 * HINT: Completeness could can be detected by:
-							 *    >> (for (local none, ps: currentPrototypes)
-							 *    >>     for (local p: ps)
-							 *    >>         p.returnType is bound
-							 *    >> ) && ...;
-							 */
-							prototypes: currentPrototypes,
+							prototypes: usedCurrentPrototypes,
 							binding:    InlineFunction(
 								mode: "__EXTERNINLINE",
 								impl: FunctionImplementation(
 									body: bodyFp.string,
 									name: current.name),
 								externInlineAsmname: asmname));
-					});
+					}
+					current.bindings.insert(numPreferredBindings, crtbuiltinBindingGenerator);
 					++numPreferredBindings;
 				}	break;
 
@@ -3226,6 +3164,7 @@ again_skip_annotation_rbracket:
 						"Function {!r} has an automatic prototype, but explicit argument names {!r}"
 							.format({ currentName, functionArgumentNamesOverride }));
 				}
+				currentPrototypes.clear();
 				currentPrototype  = none;
 				currentPrototypes = none;
 				for (local binding: current.bindings) {
@@ -3578,14 +3517,14 @@ got_chkExpr:
 						local replacedPrototypeCell: Cell with FunctionPrototype = Cell();
 						currentPrototype = []{
 							if (!replacedPrototypeCell) {
-								local primaryPrototype: FunctionPrototype =
+								local result: FunctionPrototype =
 									getBaseLocalFunction().functionPrototype;
-								if (primaryPrototype is none) {
+								if (result is none) {
 									/* No such local function.
 									 * -> Try to search for a normal function */
 									try {
-										primaryPrototype = findFunctionByName(baseFunctionName).onlyPrototype;
-										if (primaryPrototype is none) {
+										result = findFunctionByName(baseFunctionName).onlyPrototype;
+										if (result is none) {
 											throw Error("Function {!r} has multiple prototypes"
 												.format({ baseFunctionName }));
 										}
@@ -3593,7 +3532,7 @@ got_chkExpr:
 										self.errAt(currentNameTokStart, e.message);
 									}
 								}
-								local result = gen.replaceFunctionPrototype(primaryPrototype);
+								result = gen.replaceFunctionPrototype(result);
 								replacedPrototypeCell.value = result;
 								return result;
 							}
@@ -3615,16 +3554,74 @@ got_chkExpr:
 								binding.prototypes = currentPrototypes;
 						}
 					}
+					if (current.documentation is string && !current.documentation) {
+						local baseDocumentationTextCell: Cell with string = Cell();
+						current.documentation = []{
+							if (!baseDocumentationTextCell) {
+								local result: Function;
+								try {
+									result = findFunctionByName(baseFunctionName);
+								} catch (Error as e) {
+									self.errAt(currentNameTokStart, e.message);
+								}
+								result = result.documentationString;
+								if (gen.replaceDocumentation !is none)
+									result = gen.replaceDocumentation(result);
+								baseDocumentationTextCell.value = result;
+								return result;
+							}
+							return baseDocumentationTextCell.value;
+						};
+					}
 					/* Define the generator for the converted function implementations */
+					local feat_noAutoDependencyScanning = currentFeatures.noAutoDependencyScanning;
+					local feat_forcedDependencies       = currentFeatures.forcedDependencies;
+					local feat_unforcedDependencies     = currentFeatures.unforcedDependencies;
+					local generatedLoaderImplCell: Cell with (LoaderFunctionImplementation | none) = Cell();
 					loaderImpl = [](): LoaderFunctionImplementation | none {
-						local baseLocalFunction: LocalFunction | none = getBaseLocalFunction();
-						if (baseLocalFunction is none)
-							return none;
-						return LoaderFunctionImplementation(
-							ppCond:       gen.replaceText(baseLocalFunction.ppCond),
-							ppCondPrefix: gen.replaceTextArray(baseLocalFunction.ppCondPrefix),
-							impl:         gen.replaceFunctionImplementation(
-								baseLocalFunction.functionImpl, currentName));
+						if (!generatedLoaderImplCell) {
+							local baseLocalFunction: LocalFunction | none = getBaseLocalFunction();
+							local result: LoaderFunctionImplementation | none;
+							/* Allow the generator to provide a custom callback for
+							 * generating LoaderFunctionImplementation objects for
+							 * some given function.
+							 * If the generator doesn't provide such a callback, fall
+							 * back to simply converting the base function's body, and,
+							 * if the base function doesn't have a Local variant, simply
+							 * don't provide a local implementation ourselves. */
+							if (gen.generateLoaderFunctionImplementation !is none) {
+								local baseFunction: Function;
+								try {
+									baseFunction = findFunctionByName(baseFunctionName);
+								} catch (Error as e) {
+									self.errAt(currentNameTokStart, e.message);
+								}
+								result = gen.generateLoaderFunctionImplementation(
+									baseFunction:             baseFunction,
+									newFunctionName:          currentName,
+									prototype:                currentPrototype,
+									baseLocalFunction:        getBaseLocalFunction(),
+									forcedDependencies:       feat_forcedDependencies,
+									unforcedDependencies:     feat_unforcedDependencies,
+									noAutoDependencyScanning: feat_noAutoDependencyScanning);
+							} else {
+								if (baseLocalFunction is none)
+									result = none;
+								else {
+									result = LoaderFunctionImplementation(
+										ppCond:       gen.replaceText(baseLocalFunction.ppCond),
+										ppCondPrefix: gen.replaceTextArray(baseLocalFunction.ppCondPrefix),
+										impl:         gen.replaceFunctionImplementation(
+											baseLocalFunction.functionImpl, currentName, currentPrototype,
+											forcedDependencies:       feat_forcedDependencies,
+											unforcedDependencies:     feat_unforcedDependencies,
+											noAutoDependencyScanning: feat_noAutoDependencyScanning));
+								}
+							}
+							generatedLoaderImplCell.value = result;
+							return result;
+						}
+						return generatedLoaderImplCell.value;
 					};
 					self.skip(")");
 				}	break;
@@ -3878,7 +3875,11 @@ got_chkExpr:
 						name:         currentName,
 						implPrefix:   currentFeatures.implPrefix,
 						dependencies: scanForNamesOfDependentFunctions(
-							body, currentPrototype, currentFeatures))
+							body, currentPrototype,
+							forcedDependencies:       currentFeatures.forcedDependencies,
+							unforcedDependencies:     currentFeatures.unforcedDependencies,
+							noAutoDependencyScanning: currentFeatures.noAutoDependencyScanning)
+					)
 				);
 			}
 with_primaryImplementation:
@@ -3892,6 +3893,19 @@ with_primaryImplementation:
 					local feat_inline = currentFeatures.inline;
 					local feat_noExternInline   = currentFeatures.noExternInline;
 					local feat_noInlineTruncate = currentFeatures.noInlineTruncate;
+					local localFunc: LocalFunction = none;
+					if (feat_inline is none) {
+						localFunc = LocalFunction(
+							name:                     currentName,
+							originalSystemHeaderName: headerName,
+							prototype:                currentPrototype,
+							documentation:            current.documentation);
+						defineFunctionInMapping(allLocalFunctionsByName, localFunc);
+						if (!result.localFunctionsByName.setnew(localFunc.name, localFunc)) {
+							self.errAt(currentNameTokStart, "Duplicate local function: {!r}"
+								.format({ localFunc.name }));
+						}
+					}
 					current.bindings = []{
 						local usedImpl: LoaderFunctionImplementation = loaderImpl;
 						local usedExistingBindings = existingBindings;
@@ -3940,18 +3954,10 @@ with_primaryImplementation:
 						} else {
 							yield usedExistingBindings...;
 							/* Construct a local function object */
-							local localFunc = LocalFunction(
-								name:                     currentName,
-								originalSystemHeaderName: headerName,
-								prototype:                currentPrototype,
-								ppCond:                   usedImpl.ppCond,
-								ppCondPrefix:             usedImpl.ppCondPrefix,
-								impl:                     funImpl,
-								documentation:            current.documentation);
-							defineFunctionInMapping(allLocalFunctionsByName, localFunc);
-							if (!result.localFunctionsByName.setnew(localFunc.name, localFunc))
-								self.errAt(currentNameTokStart, "Duplicate local function: {!r}"
-									.format({ localFunc.name }));
+							assert localFunc !is none;
+							localFunc.ppCond       = usedImpl.ppCond;
+							localFunc.ppCondPrefix = usedImpl.ppCondPrefix;
+							localFunc.impl         = funImpl;
 							implBinding.binding = localFunc;
 						}
 						yield implBinding;
@@ -4303,7 +4309,7 @@ done_function:
 					context.result_order_header_in_CXX_SYSTEM_HEADER = true;
 				}
 				local gblGuard = false;
-				local importCondition = "$has_function({})".format({ currentName });
+				local importCondition;
 				local nsStd = NAMESPACES["std"];
 				if (currentFeatures.guard) {
 					local stdGuard = currentFeatures.guardNames.get("std");
@@ -4313,6 +4319,8 @@ done_function:
 					if (gblGuard is none)
 						gblGuard = GLOBAL_NAMESPACE.keyDefaultGuard(exposedName);
 					importCondition = "defined({})".format({ stdGuard });
+				} else {
+					importCondition = "$has_function({})".format({ currentName });
 				}
 				local importFunction = Function(
 					name:                     exposedName,
@@ -4330,10 +4338,10 @@ done_function:
 					});
 				if (gblGuard !== false) {
 					importFunction = ExposedFunction(
-						func: importFunction,
-						decl: currentFeatures.decl, /* This one should go unused... */
+						func:        importFunction,
+						decl:        currentFeatures.decl, /* This one should go unused... */
 						exposedName: exposedName,
-						guardName: gblGuard);
+						guardName:   gblGuard);
 				}
 				result.order_header.append(importFunction);
 				if (context.result_ccompatHeaderName !is none)

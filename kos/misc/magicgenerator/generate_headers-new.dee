@@ -72,8 +72,9 @@ function waitTasks() {
 @@Update the contents of @filename, using a file-printer callback @cb
 function updateHashedFile(filename: string, cb: Callable with File) {
 	local fp: File = File.Writer();
-	print "Printing:", repr filename;
+	print "Printing:", repr filename, "(begin)";
 	local result = cb(fp);
+	print "Printing:", repr filename, "(end)";
 	local newText: Bytes = fp.string.encode("utf-8");
 	local newTextHash: int = hash(HASH_FUNCTION, newText);
 again:
@@ -272,12 +273,9 @@ global final HEADER_PRINT_WHITELIST: {string...} = {
 	"format-reader", "getopt", "glob", "grp", "ifaddrs",
 	"inttypes", "io", "kos.except-handler", "kos.fcntl",
 	"kos.futex", "kos.futexexpr", "kos.futexlock", "kos.malloc",
-	"kos.sys.ioctl", "kos.sys.stat", "kos.unistd",
-//	"libgen",
-//	"libio",
-//	"locale",
-	"malloc",
-//	"math",
+	"kos.sys.ioctl", "kos.sys.stat", "kos.unistd", "libgen",
+	"libio", "locale", "malloc",
+	"math",
 //	"mntent",
 //	"monetary",
 //	"net.if",

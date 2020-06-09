@@ -198,10 +198,12 @@ __NAMESPACE_STD_USING(lconv)
 
 
 @@Set and/or return the current locale
-[[std]] setlocale:(int category, char const *locale) -> char *;
+[[std]]
+char *setlocale(int category, char const *locale);
 
 @@Return the numeric/monetary information for the current locale
-[[std]] localeconv:() -> struct lconv *;
+[[std]]
+struct lconv *localeconv();
 
 %
 %#ifdef __USE_XOPEN2K8
@@ -220,26 +222,26 @@ __NAMESPACE_STD_USING(lconv)
 @@datasets. Unlike for the CATEGORY parameter for `setlocale' the
 @@CATEGORY_MASK parameter here uses a single bit for each category,
 @@made by OR'ing together LC_*_MASK bits above
-[export_alias(__newlocale)]
-newlocale:(int category_mask, char const *locale, $locale_t base) -> $locale_t;
+[[export_alias("__newlocale")]]
+$locale_t newlocale(int category_mask, char const *locale, $locale_t base);
 
 @@Return a duplicate of the set of locale in DATASET.
 @@All usage counters are increased if necessary
-[export_alias(__duplocale)]
-duplocale:($locale_t dataset) -> $locale_t;
+[[export_alias("__duplocale")]]
+$locale_t duplocale($locale_t dataset);
 
 @@Free the data associated with a locale dataset
 @@previously returned by a call to `setlocale_r'
-[export_alias(__freelocale)]
-freelocale:($locale_t dataset);
+[[export_alias("__freelocale")]]
+void freelocale($locale_t dataset);
 
 @@Switch the current thread's locale to DATASET.
 @@If DATASET is null, instead just return the current setting.
 @@The special value LC_GLOBAL_LOCALE is the initial setting
 @@for all threads and can also be installed any time, meaning
 @@the thread uses the global settings controlled by `setlocale'
-[export_alias(__uselocale)]
-uselocale:($locale_t dataset) -> $locale_t;
+[[export_alias("__uselocale")]]
+$locale_t uselocale($locale_t dataset);
 
 %#endif /* __USE_XOPEN2K8 */
 

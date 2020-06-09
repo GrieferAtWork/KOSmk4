@@ -24,9 +24,10 @@ import * from .globals;
 import * from .writer;
 import * from ..optiexpr;
 
-#define Function         Object /* Function from .cheaders */
-#define LocalFunction    Object /* LocalFunction from .cheaders */
-#define SystemHeader     Object /* SystemHeader from .cheaders */
+#define Function          Object /* Function from .cheaders */
+#define LocalFunction     Object /* LocalFunction from .cheaders */
+#define SystemHeader      Object /* SystemHeader from .cheaders */
+#define FunctionPrototype Object /* FunctionPrototype from .cheaders */
 
 global expandPreprocessorConditionString;
 
@@ -1062,3 +1063,98 @@ function expandPreprocessorConditionString(
 	return resultFp.string;
 }
 
+
+@@Scan for references to dependent functions within the given @text
+@@@param: prototype: The primary function prototype.
+@@                   Used to detect references to arguments, and prevent those
+@@                   from ever being considered references to dependencies.
+function scanForNamesOfDependentFunctions(
+		text: string | UserString | Callable,
+		prototype: FunctionPrototype | Callable,
+		forcedDependencies: {string...} = none,
+		unforcedDependencies: {string...} = none,
+		noAutoDependencyScanning: bool = false): Callable {
+	return []{
+		local usedPrototype = prototype;
+		if (usedPrototype is Callable)
+			usedPrototype = usedPrototype();
+		/* Always include forced dependencies */
+		for (local dep: forcedDependencies)
+			yield dep;
+		/* Check if we're supposed to do automatic dependency scanning? */
+		if (noAutoDependencyScanning)
+			return;
+		local parser = CParser(text is Callable ? text() : text);
+		local knownNonDependencies: {string...} = none;
+		local prevToken;
+		local tok = none;
+		for (;;) {
+next_token:
+			prevToken = tok;
+			tok = parser.next();
+with_next_token:
+			if (!tok)
+				break;
+			if (!tok.issymbol())
+				continue; /* Dependent functions must always have keyword names */
+			if (tok.startswith("$"))
+				continue; /* Functions cannot start with a '$', since that would interfere with escape rules */
+			if (tok in cLanguageKeywords)
+				continue; /* C language keywords can never be dependencies */
+			if (tok in unforcedDependencies)
+				continue; /* Explicitly not a dependencies of this function */
+			if (tok in keywordEscapes)
+				continue; /* Keywords that can be escaped further cannot refer to dependable functions */
+			if (tok in forcedDependencies)
+				continue; /* Already a dependency */
+			if (tok in usedPrototype.argsByName)
+				continue; /* Argument name -> Not a dependency */
+			if (tok in knownNonDependencies)
+				continue; /* Already a known non-dependency */
+			/* Check if there is a function by this name. */
+			local func = allFunctionsByName.get(tok);
+			if (func is none)
+				continue;
+			if (knownNonDependencies is none)
+				knownNonDependencies = HashSet();
+			if (func === DuplicateFunctionMarker) {
+				/* Check for header-specific, explicit dependencies */
+				for (local dep: forcedDependencies) {
+					if ("." !in dep)
+						continue;
+					if (tok == dep.rpartition(".")[2]) {
+						knownNonDependencies.insert(tok);
+						prevToken = tok;
+						goto next_token;
+					}
+				}
+				/* Error, unless the function was explicitly annotated as _NOT_ being a dependency! */
+				parser.err("Ambiguous dependency {0!r} (consider clarifying with "
+					"[dependency({0!r})] or [not_dependency({0!r})])"
+					.format({ tok }));
+				continue;
+			}
+			/* don't assume a dependency based on the next word:
+			 * int error;                  // Not a dependency on error()
+			 * int error = 5;              // Not a dependency on error()
+			 * printf("%d, %d", error, 5); // Not a dependency on error()
+			 * printf("%d", error);        // Not a dependency on error()
+			 * printf("%d", &error);       // Is a dependency on error() (unless 'error' was already used in a different context)
+			 */
+			if (prevToken == "&") {
+				knownNonDependencies.insert(tok);
+				yield (tok, func);
+				goto next_token;
+			}
+			prevToken = tok;
+			tok = parser.next();
+			if (tok in [")", ";", ",", "="]) {
+				knownNonDependencies.insert(prevToken);
+				goto with_next_token;
+			}
+			/* Yield items in pairs of @(dependencyName, dependencyFunc) */
+			yield (prevToken, func);
+			goto with_next_token;
+		}
+	};
+}
