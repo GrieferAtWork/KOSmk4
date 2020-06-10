@@ -20,6 +20,7 @@
 
 import * from deemon;
 import * from errors;
+import * from threading;
 import * from ..libgen.c.cheaders;
 import * from ..libgen.c.escape;
 import * from ..libgen.c.parser;
@@ -35,39 +36,71 @@ fs.chdir(fs.headof(__FILE__) + "/../../");
 final global HASH_FUNCTION = "CRC-32";
 
 @@The max # of tasks that may be run in parallel
-final global MAX_RUNNING_TASKS = (cpu_count from posix)();
+final global MAX_RUNNING_TASKS = (cpu_count from posix)() * 2;
 
-@@List of all tasks that are currently being run
-global runningTasks: {Thread...} = [];
+global numTotalTasks: int = 0;
+global numCompletedTasks: Cell with int = Cell(0);
+global pendingTasks: {(Callable, Tuple)...} = [];
+global pendingTasksSem: Semaphore = Semaphore(0);
+global completeAllTasksSem: Semaphore = Semaphore(0);
+
+function incCompletedTasks(): int {
+	local oldval;
+	do {
+		oldval = numCompletedTasks.value;
+	} while (!numCompletedTasks.cmpxch(oldval, oldval + 1));
+	return oldval;
+}
+
+@@Thread-Main function for task service threads
+function servicePendingTasks() {
+	try {
+		for (;;) {
+			/* Wait for more tasks */
+			pendingTasksSem.wait();
+			/* Execute pending tasks */
+			while (pendingTasks) {
+				local task: (Callable, Tuple);
+				/* Take one task and start executing it */
+				try {
+					task = pendingTasks.popfront();
+				} catch (IndexError) {
+					break;
+				}
+				/* Execute the task */
+				task[0](task[1]...);
+				if (incCompletedTasks() == numTotalTasks)
+					completeAllTasksSem.post();
+			}
+		}
+	} catch (e...) {
+		pendingTasks = none;
+		print repr e;
+		print repr Traceback.current;
+		Error.AppExit.exit(1);
+	}
+}
+
 
 @@Start a new task that'll execute @cb with @args
 function startTask(cb: Callable, args: {Object...} = ()) {
-	for (;;) {
-		local n = #runningTasks;
-		if (n < MAX_RUNNING_TASKS)
-			break;
-		for (local i = 0; i < n;) {
-			if (runningTasks[i].tryjoin()[0]) {
-				runningTasks.erase(i);
-				--n;
-				continue;
-			}
-			++i;
-		}
-		if (n < MAX_RUNNING_TASKS)
-			break;
-		Thread.sleep((milliseconds from time)(100));
-	}
-	local t = Thread(cb, args);
-	t.start();
-	runningTasks.append(t);
+	pendingTasks.append((cb, args));
+	pendingTasksSem.post();
+	++numTotalTasks;
 }
 
 @@Wait for all running tasks to finish
 function waitTasks() {
-	while (runningTasks)
-		runningTasks.popback().join();
+	while (numCompletedTasks.value < numTotalTasks)
+		completeAllTasksSem.wait();
+	numCompletedTasks.value = 0;
+	numTotalTasks           = 0;
 }
+
+/* Launch worker threads */
+for (none: [:MAX_RUNNING_TASKS])
+	Thread(servicePendingTasks).start();
+
 
 @@Update the contents of @filename, using a file-printer callback @cb
 function updateHashedFile(filename: string, cb: Callable with File) {
@@ -297,6 +330,23 @@ try {
 	}
 	waitTasks();
 
+	/* Generate the actual system headers (i.e. <string.h>) */
+	for (local name /*: string*/, header /*: SystemHeader*/: allSystemHeaders) {
+		startTask(updateHashedFile,
+			("include/{}.h".format({ name.replace(".", "/") }),
+			[](fp: File) {
+				fp << COPYRIGHT << "\n";
+				local cWriter = CWriter(fp);
+				header.cprintHeader(cWriter, ESCAPE_MODE_PART);
+				cWriter.flush();
+			})
+		);
+	}
+	waitTasks();
+
+	/* Generate all of the needed <local/...> headers */
+	/* TODO */
+
 #if 0
 	local fp = CWriter(File.stdout);
 	allLocalFunctionsByName["mkstemp64"]
@@ -313,19 +363,6 @@ try {
 	Error.AppExit.exit(0);
 #endif
 
-	/* Generate the actual system headers (i.e. <string.h>) */
-	for (local name /*: string*/, header /*: SystemHeader*/: allSystemHeaders) {
-		startTask(updateHashedFile,
-			("include/{}.h".format({ name.replace(".", "/") }),
-			[](fp: File) {
-				fp << COPYRIGHT << "\n";
-				local cWriter = CWriter(fp);
-				header.cprintHeader(cWriter, ESCAPE_MODE_PART);
-				cWriter.flush();
-			})
-		);
-	}
-	waitTasks();
 
 } catch (e...) {
 	print repr e;
