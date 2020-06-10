@@ -73,14 +73,14 @@
 #define __F_RDLCK 0 /* Read lock. */
 #define __F_WRLCK 1 /* Write lock. */
 #define __F_UNLCK 2 /* Remove lock. */
-#define __F_EXLCK 4
-#define __F_SHLCK 8
+#define __F_EXLCK 4 /* TODO: DOC */
+#define __F_SHLCK 8 /* TODO: DOC */
 
-#define __LOCK_SH     1  /* Shared lock. */
-#define __LOCK_EX     2  /* Exclusive lock. */
-#define __LOCK_NB     4  /* Or'd with one of the above to prevent blocking. */
-#define __LOCK_UN     8  /* Remove lock. */
-#define __LOCK_ATOMIC 16 /* Atomic update.  */
+#define __LOCK_SH     1   /* Shared lock. */
+#define __LOCK_EX     2   /* Exclusive lock. */
+#define __LOCK_NB     4   /* Or'd with one of the above to prevent blocking. */
+#define __LOCK_UN     8   /* Remove lock. */
+#define __LOCK_ATOMIC 16  /* Atomic update.  */
 #define __LOCK_MAND   32  /* This is a mandatory flock: */
 #define __LOCK_READ   64  /* ... which allows concurrent read operations. */
 #define __LOCK_WRITE  128 /* ... which allows concurrent write operations. */

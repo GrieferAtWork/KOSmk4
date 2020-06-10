@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bf833c3 */
+/* HASH CRC-32:0xf4629f03 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+#include <features.h>
 
 __SYSDECL_BEGIN
 
@@ -45,8 +46,8 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_reboot
 /* Reboot or halt the system
  * @param: howto: One of the `RB_*' constants above */
-__CDECLARE(,int,__NOTHROW_NCX,reboot,(int __howto),(__howto))
-#endif /* reboot... */
+__CDECLARE(,int,__NOTHROW_NCX,reboot,(__STDC_INT_AS_UINT_T __howto),(__howto))
+#endif /* __CRT_HAVE_reboot */
 
 #endif /* __CC__ */
 

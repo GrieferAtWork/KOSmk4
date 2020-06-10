@@ -66,10 +66,14 @@ struct sembuf {
 }
 
 @@Semaphore control operation.  
-int semctl(int semid, int semnum, int cmd, ...);
+int semctl(int semid,
+           __STDC_INT_AS_UINT_T semnum,
+           __STDC_INT_AS_UINT_T cmd, ...);
 
 @@Get semaphore
-int semget(key_t key, int nsems, int semflg);
+int semget(key_t key,
+           __STDC_INT_AS_UINT_T nsems,
+           __STDC_INT_AS_UINT_T semflg);
 
 @@Operate on semaphore
 int semop(int semid, struct sembuf *sops, size_t nsops);
@@ -79,6 +83,7 @@ int semop(int semid, struct sembuf *sops, size_t nsops);
 int semtimedop(int semid,
                struct sembuf *sops, size_t nsops,
                struct timespec const *timeout);
+/* TODO: semtimedop64(..., struct timespec64 const *timeout) */
 %#endif /* __USE_GNU */
 
 %{

@@ -21,18 +21,29 @@
 %[define_replacement(fd_t = __fd_t)]
 
 %{
+#include <features.h>
+
+#include <asm/fcntl.h>  /* __LOCK_* */
+#include <asm/stdio.h>  /* __SEEK_* */
+#include <bits/types.h> /* fd_t */
+
+#ifdef __USE_GLIBC
 #include <fcntl.h>
-#include <bits/types.h>
+#endif /* __USE_GLIBC */
 
 #ifndef SEEK_SET
-#   define SEEK_SET  0 /* Seek from beginning of file.  */
-#   define SEEK_CUR  1 /* Seek from current position.  */
-#   define SEEK_END  2 /* Seek from end of file.  */
-#if defined(__USE_GNU) && (defined(__CRT_KOS) || defined(__CRT_GLC))
-#   define SEEK_DATA 3 /* Seek to next data.  */
-#   define SEEK_HOLE 4 /* Seek to next hole.  */
-#endif /* __USE_GNU && (__CRT_KOS || __CRT_GLC) */
-#endif
+#define SEEK_SET __SEEK_SET /* Seek from beginning of file. */
+#define SEEK_CUR __SEEK_CUR /* Seek from current position. */
+#define SEEK_END __SEEK_END /* Seek from end of file. */
+#ifdef __USE_GNU
+#ifdef __SEEK_DATA
+#define SEEK_DATA __SEEK_DATA /* Seek to next data. */
+#endif /* __SEEK_DATA */
+#ifdef __SEEK_HOLE
+#define SEEK_HOLE __SEEK_HOLE /* Seek to next hole. */
+#endif /* __SEEK_HOLE */
+#endif /* __USE_GNU */
+#endif /* !SEEK_SET */
 
 #ifndef L_SET
 #define L_SET  SEEK_SET /* Seek from beginning of file. */
@@ -41,21 +52,35 @@
 #define L_XTND SEEK_END /* Seek from end of file. */
 #endif /* !L_SET */
 
-#ifndef LOCK_SH
-#define LOCK_SH        1 /* Shared lock. */
-#define LOCK_EX        2 /* Exclusive lock. */
-#define LOCK_NB        4 /* Or'd with one of the above to prevent blocking. */
-#define LOCK_UN        8 /* Remove lock. */
-#define __LOCK_ATOMIC 16 /* Atomic update.  */
-#endif /* !LOCK_SH */
+/* Shared lock. */
+#ifdef __LOCK_SH
+#define LOCK_SH __LOCK_SH
+#endif /* __LOCK_SH */
+
+/* Exclusive lock. */
+#ifdef __LOCK_EX
+#define LOCK_EX __LOCK_EX
+#endif /* __LOCK_EX */
+
+/* Or'd with one of the above to prevent blocking. */
+#ifdef __LOCK_NB
+#define LOCK_NB __LOCK_NB
+#endif /* __LOCK_NB */
+
+/* Remove lock. */
+#ifdef __LOCK_UN
+#define LOCK_UN __LOCK_UN
+#endif /* __LOCK_UN */
+
 
 #ifdef __CC__
 __SYSDECL_BEGIN
 
 }
 
-%/* Apply or remove an advisory lock, according to OPERATION, on the file FD refers to.  */
-[[cp]] flock:($fd_t fd, int operation) -> int;
+@@Apply or remove an advisory lock, according to OPERATION, on the file FD refers to
+[[cp]]
+int flock($fd_t fd, __STDC_INT_AS_UINT_T operation);
 
 %{
 

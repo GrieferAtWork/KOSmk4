@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18a10ec */
+/* HASH CRC-32:0x4619a13d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,11 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#include <bits/types.h>
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
+#endif /* __USE_GLIBC */
 
 /* Documentation taken from Glibc /usr/include/i386-linux-gnu/sys/fsuid.c */
 /* Copyright (C) 1997-2016 Free Software Foundation, Inc.
@@ -57,11 +61,11 @@ __SYSDECL_BEGIN
 /* Change uid used for file access control to UID, without affecting
  * other privileges (such as who can send signals at the process) */
 __CDECLARE(,int,__NOTHROW_NCX,setfsuid,(__uid_t __uid),(__uid))
-#endif /* setfsuid... */
+#endif /* __CRT_HAVE_setfsuid */
 #ifdef __CRT_HAVE_setfsgid
 /* Ditto for group id */
 __CDECLARE(,int,__NOTHROW_NCX,setfsgid,(__gid_t __gid),(__gid))
-#endif /* setfsgid... */
+#endif /* __CRT_HAVE_setfsgid */
 
 #endif /* __CC__ */
 

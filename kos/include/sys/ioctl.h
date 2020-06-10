@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d8840de */
+/* HASH CRC-32:0x3b412b58 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,10 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+
+#include <bits/ioctl-types.h>
 #include <bits/ioctls.h>
 #include <bits/types.h>
-#include <bits/ioctl-types.h>
 #include <sys/ttydefaults.h>
 
 __SYSDECL_BEGIN
@@ -43,10 +44,10 @@ __SYSDECL_BEGIN
 /* Perform the I/O control operation specified by REQUEST on FD.
  * One argument may follow; its presence and type depend on REQUEST.
  * Return value depends on REQUEST. Usually -1 indicates error */
-__LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, unsigned long int __request, ...) __CASMNAME_SAME("ioctl");
-#else /* LIBC: ioctl */
+__LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, __ULONGPTR_TYPE__ __request, ...) __CASMNAME_SAME("ioctl");
+#else /* __CRT_HAVE_ioctl */
 #undef __ioctl_defined
-#endif /* ioctl... */
+#endif /* !__CRT_HAVE_ioctl */
 #endif /* !__ioctl_defined */
 #endif /* __CC__ */
 

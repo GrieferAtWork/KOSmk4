@@ -136,13 +136,16 @@ __SYSDECL_BEGIN
 void closelog();
 
 [[cp]]
-void openlog(char const *ident, int option, int facility);
+void openlog(char const *ident,
+             __STDC_INT_AS_UINT_T option,
+             __STDC_INT_AS_UINT_T facility);
 
-int setlogmask(int mask);
+int setlogmask(__STDC_INT_AS_UINT_T mask);
 
 [[cp, ATTR_LIBC_PRINTF(2, 3)]]
 [[userimpl, requires_function(vsyslog)]]
-void syslog(int level, [[nonnull]] char const *format, ...) {
+void syslog(__STDC_INT_AS_UINT_T level,
+            [[nonnull]] char const *format, ...) {
 	va_list args;
 	va_start(args,format);
 	vsyslog(level,format,args);
@@ -153,7 +156,9 @@ void syslog(int level, [[nonnull]] char const *format, ...) {
 %#ifdef __USE_MISC
 [[cp, ATTR_LIBC_PRINTF(2, 0)]]
 [[userimpl, requires_dependent_function(syslog_printer)]]
-void vsyslog(int level, [[nonnull]] char const *format, $va_list args) {
+void vsyslog(__STDC_INT_AS_UINT_T level,
+             [[nonnull]] char const *format,
+             $va_list args) {
 	format_vprintf(&syslog_printer,
 	               (void *)(uintptr_t)(unsigned int)level,
 	               format,
@@ -169,7 +174,7 @@ $ssize_t syslog_printer(void *arg,
                         [[nonnull]] char const *__restrict data,
                         $size_t datalen);
 
-%#define SYSLOG_PRINTER_CLOSURE(level) ((void *)(__uintptr_t)(int)(level))
+%#define SYSLOG_PRINTER_CLOSURE(level) ((void *)(__uintptr_t)(__STDC_INT_AS_UINT_T)(level))
 %#endif /* __USE_KOS */
 
 

@@ -159,13 +159,13 @@ struct __EPOLL_PACKED epoll_event {
 @@descriptors to be associated with the new instance. The fd
 @@returned by epoll_create() should be closed with close()
 [[ATTR_WUNUSED]]
-$fd_t epoll_create(int size);
+$fd_t epoll_create(__STDC_INT_AS_SIZE_T size);
 
 @@Same as epoll_create but with an FLAGS parameter.
 @@The unused SIZE parameter has been dropped
 @@@param: flags: Set of `EPOLL_*'
 [[ATTR_WUNUSED]]
-$fd_t epoll_create1(int flags);
+$fd_t epoll_create1(__STDC_INT_AS_UINT_T flags);
 
 
 @@Manipulate an epoll instance "epfd". Returns 0 in case of success,
@@ -187,13 +187,14 @@ int epoll_ctl($fd_t epfd, enum __epoll_ctl op,
 @@specifies the maximum wait time in milliseconds (-1 == infinite).
 [[cp]]
 int epoll_wait($fd_t epfd, struct epoll_event *events,
-               int maxevents, int timeout);
+               __STDC_INT_AS_SIZE_T maxevents, int timeout);
 
 @@Same as epoll_wait, but the thread's signal mask is temporarily
 @@and atomically replaced with the one provided as parameter
 [[cp]]
 int epoll_pwait($fd_t epfd, struct epoll_event *events,
-                int maxevents, int timeout, sigset_t const *ss);
+                __STDC_INT_AS_SIZE_T maxevents, int timeout,
+                sigset_t const *ss);
 
 
 

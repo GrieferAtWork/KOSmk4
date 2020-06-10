@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9f4b657 */
+/* HASH CRC-32:0x62278d15 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_ftime32,(struct __timeb32 *__
 #include <local/sys.timeb/_ftime32.h>
 /* Fill in TIMEBUF with information about the current time */
 __NAMESPACE_LOCAL_USING_OR_IMPL(_ftime32, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _ftime32)(struct __timeb32 *__timebuf) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ftime32))(__timebuf); })
-#endif /* _ftime32... */
+#endif /* ... */
 #ifdef __CRT_HAVE__ftime64
 /* Fill in TIMEBUF with information about the current time */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_ftime64,(struct __timeb64 *__timebuf),(__timebuf))
@@ -65,7 +65,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_ftime64,(struct __timeb64 *_
 #include <local/sys.timeb/_ftime64.h>
 /* Fill in TIMEBUF with information about the current time */
 __NAMESPACE_LOCAL_USING_OR_IMPL(_ftime64, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _ftime64)(struct __timeb64 *__timebuf) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ftime64))(__timebuf); })
-#endif /* _ftime64... */
+#endif /* ... */
 #ifdef __CRT_HAVE__ftime32_s
 /* Fill in TIMEBUF with information about the current time */
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_ftime32_s,(struct __timeb32 *__timebuf),(__timebuf))
@@ -73,7 +73,7 @@ __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_ftime32_s,(struct __timeb3
 #include <local/sys.timeb/_ftime32_s.h>
 /* Fill in TIMEBUF with information about the current time */
 __NAMESPACE_LOCAL_USING_OR_IMPL(_ftime32_s, __FORCELOCAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _ftime32_s)(struct __timeb32 *__timebuf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ftime32_s))(__timebuf); })
-#endif /* _ftime32_s... */
+#endif /* ... */
 #ifdef __CRT_HAVE__ftime64_s
 /* Fill in TIMEBUF with information about the current time */
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_ftime64_s,(struct __timeb64 *__timebuf),(__timebuf))
@@ -84,7 +84,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_ftime64_s,(struct __timeb
 #include <local/sys.timeb/_ftime64_s.h>
 /* Fill in TIMEBUF with information about the current time */
 __NAMESPACE_LOCAL_USING_OR_IMPL(_ftime64_s, __FORCELOCAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _ftime64_s)(struct __timeb64 *__timebuf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ftime64_s))(__timebuf); })
-#endif /* _ftime64_s... */
+#endif /* ... */
 #endif /* __USE_DOS */
 
 
@@ -99,7 +99,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftime,(struct timeb *__timebuf)
 #include <local/sys.timeb/ftime.h>
 /* Fill in TIMEBUF with information about the current time */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ftime, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL ftime)(struct timeb *__timebuf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftime))(__timebuf); })
-#endif /* ftime... */
+#endif /* ... */
 
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_ftime64
@@ -112,7 +112,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftime64,(struct timeb64 *__tim
 #include <local/sys.timeb/ftime64.h>
 /* Fill in TIMEBUF with information about the current time */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ftime64, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL ftime64)(struct timeb64 *__timebuf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftime64))(__timebuf); })
-#endif /* ftime64... */
+#endif /* ... */
 #endif /* __USE_TIME64 */
 
 #endif /* __CC__ */

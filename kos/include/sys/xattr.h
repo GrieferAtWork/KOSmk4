@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5418abc6 */
+/* HASH CRC-32:0x735dea83 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,12 +53,14 @@
 __SYSDECL_BEGIN
 
 #ifndef __USE_KERNEL_XATTR_DEFS
+/*[[[enum]]]*/
 #ifdef __CC__
 enum {
 	XATTR_CREATE  = 1, /* set value, fail if attr already exists. */
-	XATTR_REPLACE = 2 /* set value, fail if attr does not exist. */
+	XATTR_REPLACE = 2  /* set value, fail if attr does not exist. */
 };
 #endif /* __CC__ */
+/*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define XATTR_CREATE  XATTR_CREATE  /* set value, fail if attr already exists. */
 #define XATTR_REPLACE XATTR_REPLACE /* set value, fail if attr does not exist. */
@@ -66,6 +68,7 @@ enum {
 #define XATTR_CREATE  1 /* set value, fail if attr already exists. */
 #define XATTR_REPLACE 2 /* set value, fail if attr does not exist. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 #endif /* !__USE_KERNEL_XATTR_DEFS */
 
 #ifdef __CC__
@@ -74,70 +77,70 @@ enum {
 /* Set the attribute NAME of the file pointed to by PATH to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,setxattr,(char const *__path, char const *__name, void const *__buf, size_t __bufsize, int __flags),(__path,__name,__buf,__bufsize,__flags))
-#endif /* setxattr... */
+__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,setxattr,(char const *__path, char const *__name, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags),(__path,__name,__buf,__bufsize,__flags))
+#endif /* __CRT_HAVE_setxattr */
 #ifdef __CRT_HAVE_lsetxattr
 /* Set the attribute NAME of the file pointed to by PATH to VALUE (which is
  * SIZE bytes long), not following symlinks for the last pathname component.
  * Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,lsetxattr,(char const *__path, char const *__name, void const *__buf, size_t __bufsize, int __flags),(__path,__name,__buf,__bufsize,__flags))
-#endif /* lsetxattr... */
+__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,lsetxattr,(char const *__path, char const *__name, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags),(__path,__name,__buf,__bufsize,__flags))
+#endif /* __CRT_HAVE_lsetxattr */
 #ifdef __CRT_HAVE_fsetxattr
 /* Set the attribute NAME of the file descriptor FD to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
-__CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,fsetxattr,(__fd_t __fd, char const *__name, void const *__buf, size_t __bufsize, int __flags),(__fd,__name,__buf,__bufsize,__flags))
-#endif /* fsetxattr... */
+__CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,fsetxattr,(__fd_t __fd, char const *__name, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags),(__fd,__name,__buf,__bufsize,__flags))
+#endif /* __CRT_HAVE_fsetxattr */
 #ifdef __CRT_HAVE_getxattr
 /* Get the attribute NAME of the file pointed to by PATH to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),ssize_t,__NOTHROW_RPC,getxattr,(char const *__path, char const *__name, void *__buf, size_t __bufsize),(__path,__name,__buf,__bufsize))
-#endif /* getxattr... */
+#endif /* __CRT_HAVE_getxattr */
 #ifdef __CRT_HAVE_lgetxattr
 /* Get the attribute NAME of the file pointed to by PATH to VALUE (which is
  * SIZE bytes long), not following symlinks for the last pathname component.
  * Return 0 on success, -1 for errors */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),ssize_t,__NOTHROW_RPC,lgetxattr,(char const *__path, char const *__name, void *__buf, size_t __bufsize),(__path,__name,__buf,__bufsize))
-#endif /* lgetxattr... */
+#endif /* __CRT_HAVE_lgetxattr */
 #ifdef __CRT_HAVE_fgetxattr
 /* Get the attribute NAME of the file descriptor FD to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors */
 __CDECLARE(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,fgetxattr,(__fd_t __fd, char const *__name, void *__buf, size_t __bufsize),(__fd,__name,__buf,__bufsize))
-#endif /* fgetxattr... */
+#endif /* __CRT_HAVE_fgetxattr */
 #ifdef __CRT_HAVE_listxattr
 /* List attributes of the file pointed to by PATH into the
  * user-supplied buffer LIST (which is SIZE bytes big).
  * Return 0 on success, -1 for errors */
 __CDECLARE(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,listxattr,(char const *__path, char *__listbuf, size_t __listbufsize),(__path,__listbuf,__listbufsize))
-#endif /* listxattr... */
+#endif /* __CRT_HAVE_listxattr */
 #ifdef __CRT_HAVE_llistxattr
 /* List attributes of the file pointed to by PATH into the user-supplied
  * buffer LIST (which is SIZE bytes big), not following symlinks for the
  * last pathname component. Return 0 on success, -1 for errors */
 __CDECLARE(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,llistxattr,(char const *__path, char *__listbuf, size_t __listbufsize),(__path,__listbuf,__listbufsize))
-#endif /* llistxattr... */
+#endif /* __CRT_HAVE_llistxattr */
 #ifdef __CRT_HAVE_flistxattr
 /* List attributes of the file descriptor FD into the user-supplied buffer
  * LIST (which is SIZE bytes big). Return 0 on success, -1 for errors */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,flistxattr,(__fd_t __fd, char *__listbuf, size_t __listbufsize),(__fd,__listbuf,__listbufsize))
-#endif /* flistxattr... */
+#endif /* __CRT_HAVE_flistxattr */
 #ifdef __CRT_HAVE_removexattr
 /* Remove the attribute NAME from the file pointed to by PATH.
  * Return 0 on success, -1 for errors */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,removexattr,(char const *__path, char const *__name),(__path,__name))
-#endif /* removexattr... */
+#endif /* __CRT_HAVE_removexattr */
 #ifdef __CRT_HAVE_lremovexattr
 /* Remove the attribute NAME from the file pointed to by PATH, not
  * following symlinks for the last pathname component.
  * Return 0 on success, -1 for errors */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,lremovexattr,(char const *__path, char const *__name),(__path,__name))
-#endif /* lremovexattr... */
+#endif /* __CRT_HAVE_lremovexattr */
 #ifdef __CRT_HAVE_fremovexattr
 /* Remove the attribute NAME from the file descriptor FD.
  * Return 0 on success, -1 for errors */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fremovexattr,(__fd_t __fd, char const *__name),(__fd,__name))
-#endif /* fremovexattr... */
+#endif /* __CRT_HAVE_fremovexattr */
 
 #endif /* __CC__ */
 

@@ -18,14 +18,15 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_replacement(fd_t    = __fd_t)]
-%[define_replacement(pid_t   = __pid_t)]
-%[define_replacement(off_t   = "__FS_TYPE(off)")]
-%[define_replacement(pos_t   = "__FS_TYPE(pos)")]
-%[define_replacement(off32_t = __off32_t)]
-%[define_replacement(off64_t = __off64_t)]
-%[define_replacement(pos32_t = __pos32_t)]
-%[define_replacement(pos64_t = __pos64_t)]
+%[define_replacement(fd_t       = __fd_t)]
+%[define_replacement(pid_t      = __pid_t)]
+%[define_replacement(off_t      = "__FS_TYPE(off)")]
+%[define_replacement(pos_t      = "__FS_TYPE(pos)")]
+%[define_replacement(off32_t    = __off32_t)]
+%[define_replacement(off64_t    = __off64_t)]
+%[define_replacement(pos32_t    = __pos32_t)]
+%[define_replacement(pos64_t    = __pos64_t)]
+%[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
 
 %{
 #include <features.h>
@@ -43,15 +44,15 @@ __SYSDECL_BEGIN
 %#ifdef __USE_GNU
 [[cp, ATTR_WUNUSED, decl_include("<bits/uio.h>")]]
 ssize_t process_vm_readv($pid_t pid,
-                         [[inp_opt(liovcnt)]] struct iovec const *local_iov, unsigned long int liovcnt,
-                         [[inp_opt(riovcnt)]] struct iovec const *remote_iov, unsigned long int riovcnt,
-                         unsigned long int flags);
+                         [[inp_opt(liovcnt)]] struct iovec const *local_iov, $ulongptr_t liovcnt,
+                         [[inp_opt(riovcnt)]] struct iovec const *remote_iov, $ulongptr_t riovcnt,
+                         $ulongptr_t flags);
 
 [[cp, decl_include("<bits/uio.h>")]]
 process_vm_writev:($pid_t pid,
-                   [[inp_opt(liovcnt)]] struct iovec const *local_iov, unsigned long int liovcnt,
-                   [[inp_opt(riovcnt)]] struct iovec const *remote_iov, unsigned long int riovcnt,
-                   unsigned long int flags) -> ssize_t;
+                   [[inp_opt(liovcnt)]] struct iovec const *local_iov, $ulongptr_t liovcnt,
+                   [[inp_opt(riovcnt)]] struct iovec const *remote_iov, $ulongptr_t riovcnt,
+                   $ulongptr_t flags) -> ssize_t;
 %#endif /* __USE_GNU */
 
 %

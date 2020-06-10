@@ -77,12 +77,19 @@ int tcgetattr($fd_t fd, [[nonnull]] struct termios *__restrict termios_p);
 @@Set terminal attributes
 @@@param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH'
 [[decl_include("<bits/termios.h>")]]
-int tcsetattr($fd_t fd, int optional_actions, [[nonnull]] struct termios const *__restrict termios_p);
+int tcsetattr($fd_t fd, __STDC_INT_AS_UINT_T optional_actions,
+              [[nonnull]] struct termios const *__restrict termios_p);
 
 int tcsendbreak($fd_t fd, int duration);
-[[cp]] int tcdrain($fd_t fd);
-int tcflush($fd_t fd, int queue_selector);
-int tcflow($fd_t fd, int action);
+
+[[cp]]
+int tcdrain($fd_t fd);
+
+@@@param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH'
+int tcflush($fd_t fd, __STDC_INT_AS_UINT_T queue_selector);
+
+@@@param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION'
+int tcflow($fd_t fd, __STDC_INT_AS_UINT_T action);
 
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)

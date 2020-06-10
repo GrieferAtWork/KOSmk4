@@ -22,6 +22,7 @@
 %[default_impl_section(".text.crt.system.reboot")]
 
 %{
+#include <features.h>
 
 __SYSDECL_BEGIN
 
@@ -40,7 +41,7 @@ __SYSDECL_BEGIN
 
 @@Reboot or halt the system
 @@@param: howto: One of the `RB_*' constants above
-int reboot(int howto);
+int reboot(__STDC_INT_AS_UINT_T howto);
 
 %{
 

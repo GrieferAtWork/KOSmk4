@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5365dc18 */
+/* HASH CRC-32:0x518f7368 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,7 +111,7 @@ __CDECLARE(,__pid_t,__NOTHROW_RPC,wait,(__WAIT_STATUS __stat_loc),(__stat_loc))
 #elif defined(__CRT_HAVE___wait)
 /* Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,wait,(__WAIT_STATUS __stat_loc),__wait,(__stat_loc))
-#endif /* wait... */
+#endif /* ... */
 #ifdef __CRT_HAVE_waitpid
 /* Wait for a child process:
  *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
@@ -119,7 +119,7 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,wait,(__WAIT_STATUS __stat_loc),__wait,(__sta
  *  - `pid == 0':  Wait for any child process whose process group ID is that of the caller
  *  - `pid > 0':   Wait for the child whose process ID is equal to `PID'
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CDECLARE(,__pid_t,__NOTHROW_RPC,waitpid,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options),(__pid,__stat_loc,__options))
+__CDECLARE(,__pid_t,__NOTHROW_RPC,waitpid,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options),(__pid,__stat_loc,__options))
 #elif defined(__CRT_HAVE___waitpid)
 /* Wait for a child process:
  *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
@@ -127,8 +127,8 @@ __CDECLARE(,__pid_t,__NOTHROW_RPC,waitpid,(__pid_t __pid, __WAIT_STATUS __stat_l
  *  - `pid == 0':  Wait for any child process whose process group ID is that of the caller
  *  - `pid > 0':   Wait for the child whose process ID is equal to `PID'
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CREDIRECT(,__pid_t,__NOTHROW_RPC,waitpid,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options),__waitpid,(__pid,__stat_loc,__options))
-#endif /* waitpid... */
+__CREDIRECT(,__pid_t,__NOTHROW_RPC,waitpid,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options),__waitpid,(__pid,__stat_loc,__options))
+#endif /* ... */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #ifndef __id_t_defined
@@ -136,43 +136,44 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,waitpid,(__pid_t __pid, __WAIT_STATUS __stat_
 typedef __id_t id_t;
 #endif /* !__id_t_defined */
 #ifdef __CRT_HAVE_waitid
-/* @param options: At least one of `WEXITED|WSTOPPED|WCONTINUED', optionally or'd with `WNOHANG|WNOWAIT' */
-__CDECLARE(,int,__NOTHROW_RPC,waitid,(idtype_t __idtype, id_t __id, siginfo_t *__infop, int __options),(__idtype,__id,__infop,__options))
-#endif /* waitid... */
+/* @param options: At least one of `WEXITED | WSTOPPED | WCONTINUED',
+ *                 optionally or'd with `WNOHANG | WNOWAIT' */
+__CDECLARE(,int,__NOTHROW_RPC,waitid,(idtype_t __idtype, id_t __id, siginfo_t *__infop, __STDC_INT_AS_UINT_T __options),(__idtype,__id,__infop,__options))
+#endif /* __CRT_HAVE_waitid */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 struct rusage;
 #if defined(__CRT_HAVE_wait3_64) && defined(__USE_TIME_BITS64)
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CREDIRECT(,__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),wait3_64,(__stat_loc,__options,__usage))
+ * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(,__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage *__usage),wait3_64,(__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait3) && !defined(__USE_TIME_BITS64)
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CDECLARE(,__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),(__stat_loc,__options,__usage))
+ * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CDECLARE(,__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage *__usage),(__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait3) || defined(__CRT_HAVE_wait3_64)
 #include <local/sys.wait/wait3.h>
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(wait3, __FORCELOCAL __pid_t __NOTHROW_RPC(__LIBCCALL wait3)(__WAIT_STATUS __stat_loc, int __options, struct rusage *__usage) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wait3))(__stat_loc, __options, __usage); })
-#endif /* wait3... */
+ * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wait3, __FORCELOCAL __pid_t __NOTHROW_RPC(__LIBCCALL wait3)(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage *__usage) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wait3))(__stat_loc, __options, __usage); })
+#endif /* ... */
 #ifdef __USE_TIME64
 struct rusage64;
 #ifdef __CRT_HAVE_wait3_64
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CDECLARE(,__pid_t,__NOTHROW_NCX,wait3_64,(__WAIT_STATUS __stat_loc, int __options, struct rusage64 *__usage),(__stat_loc,__options,__usage))
+ * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CDECLARE(,__pid_t,__NOTHROW_NCX,wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage64 *__usage),(__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait3) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CREDIRECT(,__pid_t,__NOTHROW_NCX,wait3_64,(__WAIT_STATUS __stat_loc, int __options, struct rusage64 *__usage),wait3,(__stat_loc,__options,__usage))
+ * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(,__pid_t,__NOTHROW_NCX,wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage64 *__usage),wait3,(__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait3)
 #include <local/sys.wait/wait3_64.h>
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(wait3_64, __FORCELOCAL __pid_t __NOTHROW_NCX(__LIBCCALL wait3_64)(__WAIT_STATUS __stat_loc, int __options, struct rusage64 *__usage) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wait3_64))(__stat_loc, __options, __usage); })
-#endif /* wait3_64... */
+ * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wait3_64, __FORCELOCAL __pid_t __NOTHROW_NCX(__LIBCCALL wait3_64)(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage64 *__usage) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wait3_64))(__stat_loc, __options, __usage); })
+#endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
@@ -180,33 +181,37 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wait3_64, __FORCELOCAL __pid_t __NOTHROW_NCX(__L
 #if defined(__CRT_HAVE_wait4_64) && defined(__USE_TIME_BITS64)
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CREDIRECT(,__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),wait4_64,(__pid,__stat_loc,__options,__usage))
+__CREDIRECT(,__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage *__usage),wait4_64,(__pid,__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait4) && !defined(__USE_TIME_BITS64)
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CDECLARE(,__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
+__CDECLARE(,__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait4)
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CDECLARE(,__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait4) || defined(__CRT_HAVE_wait4_64)
 #include <local/sys.wait/wait4.h>
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(wait4, __FORCELOCAL __pid_t __NOTHROW_RPC(__LIBCCALL wait4)(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct rusage *__usage) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wait4))(__pid, __stat_loc, __options, __usage); })
-#endif /* wait4... */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wait4, __FORCELOCAL __pid_t __NOTHROW_RPC(__LIBCCALL wait4)(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage *__usage) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wait4))(__pid, __stat_loc, __options, __usage); })
+#endif /* ... */
 #ifdef __USE_TIME64
 struct rusage64;
 #ifdef __CRT_HAVE_wait4_64
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CDECLARE(,__pid_t,__NOTHROW_NCX,wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct rusage64 *__usage),(__pid,__stat_loc,__options,__usage))
+__CDECLARE(,__pid_t,__NOTHROW_NCX,wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage64 *__usage),(__pid,__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait4) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CREDIRECT(,__pid_t,__NOTHROW_NCX,wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct rusage64 *__usage),wait4,(__pid,__stat_loc,__options,__usage))
+__CREDIRECT(,__pid_t,__NOTHROW_NCX,wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage64 *__usage),wait4,(__pid,__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait4)
 #include <local/sys.wait/wait4_64.h>
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(wait4_64, __FORCELOCAL __pid_t __NOTHROW_NCX(__LIBCCALL wait4_64)(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct rusage64 *__usage) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wait4_64))(__pid, __stat_loc, __options, __usage); })
-#endif /* wait4_64... */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wait4_64, __FORCELOCAL __pid_t __NOTHROW_NCX(__LIBCCALL wait4_64)(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage64 *__usage) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wait4_64))(__pid, __stat_loc, __options, __usage); })
+#endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_MISC */
 
@@ -301,7 +306,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wait4_64, __FORCELOCAL __pid_t __NOTHROW_NCX(__L
  *                              and exited, or that the `PID' is just invalid (which
  *                              would also be the case if it was valid at some point) */
 __CDECLARE(,int,__NOTHROW_NCX,detach,(__pid_t __pid),(__pid))
-#endif /* detach... */
+#endif /* __CRT_HAVE_detach */
 #endif /* __USE_KOS */
 
 #endif /* __CC__ */

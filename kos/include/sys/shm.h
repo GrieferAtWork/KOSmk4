@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8d8d02b */
+/* HASH CRC-32:0xbedac068 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,17 +59,17 @@ typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
 
 #ifdef __CRT_HAVE_shmctl
-__CDECLARE(,int,__NOTHROW_NCX,shmctl,(int __shmid, int __cmd, struct shmid_ds *__buf),(__shmid,__cmd,__buf))
-#endif /* shmctl... */
+__CDECLARE(,int,__NOTHROW_NCX,shmctl,(int __shmid, __STDC_INT_AS_UINT_T __cmd, struct shmid_ds *__buf),(__shmid,__cmd,__buf))
+#endif /* __CRT_HAVE_shmctl */
 #ifdef __CRT_HAVE_shmget
-__CDECLARE(,int,__NOTHROW_NCX,shmget,(key_t __key, size_t __size, int __shmflg),(__key,__size,__shmflg))
-#endif /* shmget... */
+__CDECLARE(,int,__NOTHROW_NCX,shmget,(key_t __key, size_t __size, __STDC_INT_AS_UINT_T __shmflg),(__key,__size,__shmflg))
+#endif /* __CRT_HAVE_shmget */
 #ifdef __CRT_HAVE_shmat
-__CDECLARE(,void *,__NOTHROW_NCX,shmat,(int __shmid, void const *__shmaddr, int __shmflg),(__shmid,__shmaddr,__shmflg))
-#endif /* shmat... */
+__CDECLARE(,void *,__NOTHROW_NCX,shmat,(int __shmid, void const *__shmaddr, __STDC_INT_AS_UINT_T __shmflg),(__shmid,__shmaddr,__shmflg))
+#endif /* __CRT_HAVE_shmat */
 #ifdef __CRT_HAVE_shmdt
 __CDECLARE(,int,__NOTHROW_NCX,shmdt,(void const *__shmaddr),(__shmaddr))
-#endif /* shmdt... */
+#endif /* __CRT_HAVE_shmdt */
 
 #endif /* __CC__ */
 

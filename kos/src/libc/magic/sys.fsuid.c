@@ -24,7 +24,11 @@
 
 %{
 #include <features.h>
+#include <bits/types.h>
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
+#endif /* __USE_GLIBC */
 
 /* Documentation taken from Glibc /usr/include/i386-linux-gnu/sys/fsuid.c */
 /* Copyright (C) 1997-2016 Free Software Foundation, Inc.
@@ -52,10 +56,10 @@ __SYSDECL_BEGIN
 
 @@Change uid used for file access control to UID, without affecting
 @@other privileges (such as who can send signals at the process)
-setfsuid:($uid_t uid) -> int;
+int setfsuid($uid_t uid);
 
 @@Ditto for group id
-setfsgid:($gid_t gid) -> int;
+int setfsgid($gid_t gid);
 
 %{
 

@@ -19,6 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
+%[define_replacement(eventfd_t = __UINT64_TYPE__)]
 %[default_impl_section(".text.crt.sched.eventfd")]
 
 %{
@@ -63,29 +64,29 @@ typedef uint64_t eventfd_t;
 
 @@Read event counter and possibly wait for events
 [[cp, userimpl, requires_function(read), impl_include("<parts/errno.h>")]]
-eventfd_read:($fd_t fd, eventfd_t *value) -> int {
+int eventfd_read($fd_t fd, eventfd_t *value) {
 	ssize_t error;
 	error = read(fd, value, sizeof(eventfd_t));
 	if (error == sizeof(eventfd_t))
 		return 0;
-#ifdef EINVAL
+@@pp_ifdef EINVAL@@
 	if (error >= 0)
 		__libc_seterrno(EINVAL);
-#endif /* EINVAL */
+@@pp_endif@@
 	return -1;
 }
 
 @@Increment event counter
 [[cp, requires_function(write), impl_include("<parts/errno.h>")]]
-eventfd_write:($fd_t fd, eventfd_t value) -> int {
+int eventfd_write($fd_t fd, eventfd_t value) {
 	ssize_t error;
 	error = write(fd, &value, sizeof(eventfd_t));
 	if (error == sizeof(eventfd_t))
 		return 0;
-#ifdef EINVAL
+@@pp_ifdef EINVAL@@
 	if (error >= 0)
 		__libc_seterrno(EINVAL);
-#endif /* EINVAL */
+@@pp_endif@@
 	return -1;
 }
 

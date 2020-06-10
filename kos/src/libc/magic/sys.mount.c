@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %[default_impl_section(".text.crt.fs.mount")]
+%[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
 
 %{
 #include <features.h>
@@ -42,6 +43,10 @@ __SYSDECL_BEGIN
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
+
+
+/* TODO: Move all of these constants into `<asm/mount.h>', where
+ *       they should appear in escaped form (e.g. `__BLOCK_SIZE')! */
 
 #ifndef BLOCK_SIZE
 #define BLOCK_SIZE      1024
@@ -132,7 +137,7 @@ __SYSDECL_BEGIN
 
 /* Flags that can be altered by MS_REMOUNT  */
 #ifndef MS_RMT_MASK
-#define MS_RMT_MASK   (MS_RDONLY|MS_SYNCHRONOUS|MS_MANDLOCK|MS_I_VERSION|MS_LAZYTIME)
+#define MS_RMT_MASK   (MS_RDONLY | MS_SYNCHRONOUS | MS_MANDLOCK | MS_I_VERSION | MS_LAZYTIME)
 #endif /* !MS_RMT_MASK */
 
 /* Magic mount flag number. Has to be or-ed to the flag values. */
@@ -213,7 +218,7 @@ __SYSDECL_BEGIN
 /* Mount a filesystem. */
 [[cp]]
 int mount([[nullable]] char const *special_file, [[nullable]] char const *dir,
-          [[nullable]] char const *fstype, unsigned long int mountflags,
+          [[nullable]] char const *fstype, $ulongptr_t mountflags,
           [[nullable]] void const *data);
 
 [[cp, userimpl, requires_function(umount2)]]
@@ -222,7 +227,8 @@ int umount([[nullable]] char const *special_file) {
 }
 
 [[cp]]
-int umount2([[nullable]] char const *special_file, int flags);
+int umount2([[nullable]] char const *special_file,
+            __STDC_INT_AS_UINT_T flags);
 
 
 %{

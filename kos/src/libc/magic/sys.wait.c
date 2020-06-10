@@ -21,6 +21,7 @@
 %[define_replacement(pid_t = __pid_t)]
 %[define_replacement(rusage32 = __rusage32)]
 %[define_replacement(rusage64 = __rusage64)]
+%[define_replacement(idtype_t = int)]
 %[default_impl_section(".text.crt.sched.wait")]
 
 %{
@@ -114,7 +115,8 @@ $pid_t wait([[nullable]] __WAIT_STATUS stat_loc);
 @@ - `pid > 0':   Wait for the child whose process ID is equal to `PID'
 @@@param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [[cp, export_alias("__waitpid")]]
-$pid_t waitpid($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc, int options);
+$pid_t waitpid($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
+               __STDC_INT_AS_UINT_T options);
 
 %
 %#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
@@ -125,7 +127,9 @@ $pid_t waitpid($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc, int options);
 @@@param options: At least one of `WEXITED | WSTOPPED | WCONTINUED',
 @@                optionally or'd with `WNOHANG | WNOWAIT'
 [[cp]]
-int waitid(idtype_t idtype, id_t id, [[nullable]] siginfo_t *infop, int options);
+int waitid(idtype_t idtype, id_t id,
+           [[nullable]] siginfo_t *infop,
+           __STDC_INT_AS_UINT_T options);
 %#endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 %
@@ -133,7 +137,9 @@ int waitid(idtype_t idtype, id_t id, [[nullable]] siginfo_t *infop, int options)
 %struct rusage;
 
 [[decl_include("<bits/rusage-struct.h>"), cp, doc_alias("wait3"), ignore, nocrt, alias("wait3")]]
-$pid_t wait3_32([[nullable]] __WAIT_STATUS stat_loc, int options, [[nullable]] struct $rusage32 *usage);
+$pid_t wait3_32([[nullable]] __WAIT_STATUS stat_loc,
+                __STDC_INT_AS_UINT_T options,
+                [[nullable]] struct $rusage32 *usage);
 
 @@Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
@@ -143,7 +149,9 @@ $pid_t wait3_32([[nullable]] __WAIT_STATUS stat_loc, int options, [[nullable]] s
 [[userimpl, requires($has_function(wait3_32) || $has_function(wait3_64))]]
 [[decl_prefix(struct rusage;)]]
 [[impl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>")]]
-$pid_t wait3([[nullable]] __WAIT_STATUS stat_loc, int options, [[nullable]] struct rusage *usage) {
+$pid_t wait3([[nullable]] __WAIT_STATUS stat_loc,
+             __STDC_INT_AS_UINT_T options,
+             [[nullable]] struct rusage *usage) {
 	pid_t result;
 @@pp_if $has_function(wait3_32)@@
 	struct rusage32 ru32;
@@ -162,8 +170,11 @@ $pid_t wait3([[nullable]] __WAIT_STATUS stat_loc, int options, [[nullable]] stru
 %#ifdef __USE_TIME64
 %struct rusage64;
 [[decl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>")]]
-[[time64_variant_of(wait3), userimpl, requires_function(wait3_32)]]
-$pid_t wait3_64([[nullable]] __WAIT_STATUS stat_loc, int options, [[nullable]] struct rusage64 *usage) {
+[[doc_alias("wait3"), time64_variant_of(wait3)]]
+[[userimpl, requires_function(wait3_32)]]
+$pid_t wait3_64([[nullable]] __WAIT_STATUS stat_loc,
+                __STDC_INT_AS_UINT_T options,
+                [[nullable]] struct rusage64 *usage) {
 	pid_t result;
 	struct rusage32 ru32;
 	result = wait3_32(stat_loc, options, usage ? &ru32 : NULL);
@@ -178,7 +189,9 @@ $pid_t wait3_64([[nullable]] __WAIT_STATUS stat_loc, int options, [[nullable]] s
 %#ifdef __USE_MISC
 
 [[cp, doc_alias("wait4"), decl_include("<bits/rusage-struct.h>"), ignore, nocrt, alias("wait4")]]
-$pid_t wait4_32($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc, int options, [[nullable]] struct $rusage32 *usage);
+$pid_t wait4_32($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
+                __STDC_INT_AS_UINT_T options,
+                [[nullable]] struct $rusage32 *usage);
 
 @@Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
@@ -188,7 +201,8 @@ $pid_t wait4_32($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc, int options, [[
 [[impl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>")]]
 [[userimpl, requires($has_function(wait4_32) || $has_function(wait4_64))]]
 $pid_t wait4($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
-             int options, [[nullable]] struct rusage *usage) {
+             __STDC_INT_AS_UINT_T options,
+             [[nullable]] struct rusage *usage) {
 	pid_t result;
 @@pp_if $has_function(wait4_32)@@
 	struct rusage32 ru32;
@@ -206,11 +220,12 @@ $pid_t wait4($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
 
 %#ifdef __USE_TIME64
 %struct rusage64;
-[[time64_variant_of(wait4), decl_prefix(struct rusage64;)]]
+[[doc_alias("wait4"), time64_variant_of(wait4), decl_prefix(struct rusage64;)]]
 [[impl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>")]]
 [[userimpl, requires_function(wait4_32)]]
 $pid_t wait4_64($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
-                int options, [[nullable]] struct rusage64 *usage) {
+                __STDC_INT_AS_UINT_T options,
+                [[nullable]] struct rusage64 *usage) {
 	pid_t result;
 	struct rusage32 ru32;
 	result = wait4_32(pid, stat_loc, options, usage ? &ru32 : NULL);

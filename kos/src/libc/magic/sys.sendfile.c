@@ -54,7 +54,9 @@ __SYSDECL_BEGIN
 };
 
 [[doc_alias("sendfile"), ignore, nocrt, alias("sendfile")]]
-ssize_t sendfile32($fd_t out_fd, $fd_t in_fd, [[nullable]] $off32_t *offset, size_t count);
+ssize_t sendfile32($fd_t out_fd, $fd_t in_fd,
+                   [[nullable]] $off32_t *offset,
+                   size_t count);
 
 
 @@Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
@@ -65,7 +67,8 @@ ssize_t sendfile32($fd_t out_fd, $fd_t in_fd, [[nullable]] $off32_t *offset, siz
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile")]]
 [[userimpl, requires($has_function(sendfile32) || $has_function(sendfile64))]]
-ssize_t sendfile($fd_t out_fd, $fd_t in_fd, [[nullable]] off_t *offset, size_t count) {
+ssize_t sendfile($fd_t out_fd, $fd_t in_fd,
+                 [[nullable]] off_t *offset, size_t count) {
 @@pp_if $has_function(sendfile64)@@
 	ssize_t result;
 	if (offset) {
@@ -92,7 +95,8 @@ ssize_t sendfile($fd_t out_fd, $fd_t in_fd, [[nullable]] off_t *offset, size_t c
 %#ifdef __USE_LARGEFILE64
 [[doc_alias("sendfile"), off64_variant_of(sendfile)]]
 [[userimpl, requires_function(sendfile32)]]
-ssize_t sendfile64($fd_t out_fd, $fd_t in_fd, [[nullable]] $off64_t *offset, size_t count) {
+ssize_t sendfile64($fd_t out_fd, $fd_t in_fd,
+                   [[nullable]] $off64_t *offset, size_t count) {
 	ssize_t result;
 	if (offset) {
 		off32_t temp = (off32_t)*offset;

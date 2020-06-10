@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3ebce53 */
+/* HASH CRC-32:0xa4bd886c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ typedef __SSIZE_TYPE__ ssize_t;
  *                if no random data had already been retrieved from
  *                the kernel's random data sink. */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),ssize_t,__NOTHROW_NCX,getrandom,(void *__buf, size_t __num_bytes, unsigned int __flags),(__buf,__num_bytes,__flags))
-#endif /* getrandom... */
+#endif /* __CRT_HAVE_getrandom */
 #ifndef __getentropy_defined
 #define __getentropy_defined 1
 #ifdef __CRT_HAVE_getentropy
@@ -85,7 +85,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),ssize_t,__NOTHROW_NCX,getrandom,(v
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,getentropy,(void *__buf, size_t __num_bytes),(__buf,__num_bytes))
-#else /* LIBC: getentropy */
+#else /* __CRT_HAVE_getentropy */
 #include <asm/random.h>
 #if defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
 #include <local/sys.random/getentropy.h>
@@ -100,10 +100,10 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,getentropy,(void
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL getentropy)(void *__buf, size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getentropy))(__buf, __num_bytes); })
-#else /* CUSTOM: getentropy */
+#else /* __GRND_RANDOM && __CRT_HAVE_getrandom */
 #undef __getentropy_defined
-#endif /* getentropy... */
-#endif /* getentropy... */
+#endif /* !__GRND_RANDOM || !__CRT_HAVE_getrandom */
+#endif /* !__CRT_HAVE_getentropy */
 #endif /* !__getentropy_defined */
 
 #endif /* __CC__ */

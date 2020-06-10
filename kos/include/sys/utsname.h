@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd702689 */
+/* HASH CRC-32:0x51ef8c92 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,7 +130,7 @@ struct utsname {
 #ifdef __CRT_HAVE_uname
 /* Put information about the system in NAME */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,uname,(struct utsname *__name),(__name))
-#endif /* uname... */
+#endif /* __CRT_HAVE_uname */
 
 #endif /* __CC__ */
 

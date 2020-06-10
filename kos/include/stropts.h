@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb42d38fe */
+/* HASH CRC-32:0xf8142059 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,42 +73,42 @@ typedef __t_uscalar_t t_uscalar_t;
 #ifdef __CRT_HAVE_isastream
 /* Test whether FILDES is associated with a STREAM-based file */
 __CDECLARE(,int,__NOTHROW,isastream,(__fd_t __fildes),(__fildes))
-#endif /* isastream... */
+#endif /* __CRT_HAVE_isastream */
 #ifdef __CRT_HAVE_getmsg
 /* Receive next message from a STREAMS file */
 __CDECLARE(,int,__NOTHROW_RPC,getmsg,(__fd_t __fildes, struct strbuf *__restrict __ctlptr, struct strbuf *__restrict __dataptr, int *__restrict __flagsp),(__fildes,__ctlptr,__dataptr,__flagsp))
-#endif /* getmsg... */
+#endif /* __CRT_HAVE_getmsg */
 #ifdef __CRT_HAVE_getpmsg
 /* Receive next message from a STREAMS file, with *FLAGSP allowing to control which message. */
 __CDECLARE(,int,__NOTHROW_RPC,getpmsg,(__fd_t __fildes, struct strbuf *__restrict __ctlptr, struct strbuf *__restrict __dataptr, int *__restrict __bandp, int *__restrict __flagsp),(__fildes,__ctlptr,__dataptr,__bandp,__flagsp))
-#endif /* getpmsg... */
+#endif /* __CRT_HAVE_getpmsg */
 #ifndef __ioctl_defined
 #define __ioctl_defined 1
 #ifdef __CRT_HAVE_ioctl
 /* Perform the I/O control operation specified by REQUEST on FD.
  * One argument may follow; its presence and type depend on REQUEST.
  * Return value depends on REQUEST. Usually -1 indicates error */
-__LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, unsigned long int __request, ...) __CASMNAME_SAME("ioctl");
-#else /* LIBC: ioctl */
+__LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, __ULONGPTR_TYPE__ __request, ...) __CASMNAME_SAME("ioctl");
+#else /* __CRT_HAVE_ioctl */
 #undef __ioctl_defined
-#endif /* ioctl... */
+#endif /* !__CRT_HAVE_ioctl */
 #endif /* !__ioctl_defined */
 #ifdef __CRT_HAVE_putmsg
 /* Send a message on a STREAM */
 __CDECLARE(,int,__NOTHROW_RPC,putmsg,(__fd_t __fildes, struct strbuf const *__ctlptr, struct strbuf const *__dataptr, int __flags),(__fildes,__ctlptr,__dataptr,__flags))
-#endif /* putmsg... */
+#endif /* __CRT_HAVE_putmsg */
 #ifdef __CRT_HAVE_putpmsg
 /* Send a message on a STREAM to the BAND */
 __CDECLARE(,int,__NOTHROW_RPC,putpmsg,(__fd_t __fildes, struct strbuf const *__ctlptr, struct strbuf const *__dataptr, int __band, int __flags),(__fildes,__ctlptr,__dataptr,__band,__flags))
-#endif /* putpmsg... */
+#endif /* __CRT_HAVE_putpmsg */
 #ifdef __CRT_HAVE_fattach
 /* Attach a STREAMS-based file descriptor FILDES to a file PATH in the file system name space */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fildes, char const *__restrict __path),(__fildes,__path))
-#endif /* fattach... */
+#endif /* __CRT_HAVE_fattach */
 #ifdef __CRT_HAVE_fdetach
 /* Detach a name PATH from a STREAMS-based file descriptor */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __path),(__path))
-#endif /* fdetach... */
+#endif /* __CRT_HAVE_fdetach */
 #endif /* __CC__ */
 
 __SYSDECL_END

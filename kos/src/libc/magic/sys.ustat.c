@@ -35,6 +35,7 @@ __SYSDECL_BEGIN
 int ustat($dev_t dev, [[nonnull]] struct ustat *ubuf);
 
 %{
+
 #endif /* __CC__ */
 
 __SYSDECL_END

@@ -53,7 +53,7 @@ __SYSDECL_BEGIN
 }
 
 @@Return information about the filesystem on which FILE resides
-[[export_as("__statfs"), no_crt_self_import]]
+[[no_crt_self_import, export_as("__statfs")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("statfs", "__statfs")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("statfs64")]]
 int statfs([[nonnull]] char const *file, [[nonnull]] struct statfs *buf);
@@ -66,11 +66,13 @@ int fstatfs($fd_t filedes, [[nonnull]] struct statfs *buf);
 
 %
 %#ifdef __USE_LARGEFILE64
+
 %#ifndef statfs64
-[[statfs64_variant_of(statfs)]]
+[[doc_alias("statfs"), statfs64_variant_of(statfs)]]
 int statfs64([[nonnull]] const char *file, [[nonnull]] struct statfs64 *buf);
 %#endif /* !statfs64 */
-[[statfs64_variant_of(fstatfs)]]
+
+[[doc_alias("fstatfs"), statfs64_variant_of(fstatfs)]]
 int fstatfs64($fd_t filedes, [[nonnull]] struct statfs64 *buf);
 %#endif /* __USE_LARGEFILE64 */
 

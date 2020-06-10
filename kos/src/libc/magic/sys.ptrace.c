@@ -19,6 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
+%[define_replacement(longptr_t = __LONGPTR_TYPE__)]
 %[default_impl_section(".text.crt.system.ptrace")]
 
 %{
@@ -369,7 +370,7 @@ struct __ptrace_peeksiginfo_args {
 @@appear (those that are used for the particular request) as:
 @@    pid_t PID, void *ADDR, int DATA, void *ADDR2
 @@after REQUEST
-long int ptrace(__ptrace_request_t request, ...);
+$longptr_t ptrace(__ptrace_request_t request, ...);
 
 %{
 #endif /* __CC__ */

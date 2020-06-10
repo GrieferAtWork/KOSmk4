@@ -22,6 +22,7 @@
 %[default_impl_section(".text.crt.fs.swap")]
 
 %{
+#include <features.h>
 
 __SYSDECL_BEGIN
 
@@ -37,9 +38,12 @@ __SYSDECL_BEGIN
 }
 
 @@@param swapflags: Set of `SWAP_FLAG_*'
-[[cp]] int swapon([[nonnull]] char const *path, int swapflags);
+[[cp]]
+int swapon([[nonnull]] char const *path,
+           __STDC_INT_AS_UINT_T swapflags);
 
-[[cp]] int swapoff([[nonnull]] char const *path);
+[[cp]]
+int swapoff([[nonnull]] char const *path);
 
 %{
 

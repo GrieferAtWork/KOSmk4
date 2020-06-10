@@ -19,13 +19,15 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
+%[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
 %[default_impl_section(".text.crt.io.utility")]
 
 %{
 #include <features.h>
+
+#include <bits/ioctl-types.h>
 #include <bits/ioctls.h>
 #include <bits/types.h>
-#include <bits/ioctl-types.h>
 #include <sys/ttydefaults.h>
 
 __SYSDECL_BEGIN
@@ -36,8 +38,8 @@ __SYSDECL_BEGIN
 @@Perform the I/O control operation specified by REQUEST on FD.
 @@One argument may follow; its presence and type depend on REQUEST.
 @@Return value depends on REQUEST. Usually -1 indicates error
-[[cp, guard]][vartypes(void *)]
-ioctl:($fd_t fd, unsigned long int request, ...) -> __STDC_INT_AS_SSIZE_T;
+[[cp, guard, vartypes(void *)]]
+__STDC_INT_AS_SSIZE_T ioctl($fd_t fd, $ulongptr_t request, ...);
 
 %{
 #endif /* __CC__ */

@@ -18,14 +18,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_replacement(fd_t = __fd_t)]
-%[define_replacement(time_t   = "__TM_TYPE(time)")]
-%[define_replacement(time32_t = __time32_t)]
-%[define_replacement(time64_t = __time64_t)]
-%[define_replacement(timespec32 = __timespec32)]
-%[define_replacement(timespec64 = __timespec64)]
-%[define_replacement(timeval32  = __timeval32)]
-%[define_replacement(timeval64  = __timeval64)]
+%[define_replacement(fd_t         = __fd_t)]
+%[define_replacement(time_t       = "__TM_TYPE(time)")]
+%[define_replacement(time32_t     = __time32_t)]
+%[define_replacement(time64_t     = __time64_t)]
+%[define_replacement(timespec32   = __timespec32)]
+%[define_replacement(timespec64   = __timespec64)]
+%[define_replacement(timeval32    = __timeval32)]
+%[define_replacement(timeval64    = __timeval64)]
+%[define_replacement(ntptimeval32 = __ntptimeval32)]
+%[define_replacement(ntptimeval64 = __ntptimeval64)]
+%[define_replacement(timex32      = __timex32)]
+%[define_replacement(timex64      = __timex64)]
 
 
 %{
@@ -87,6 +91,14 @@ __SYSDECL_BEGIN
 #endif /* __TM_SIZEOF(TIME) > 4 */
 #endif /* __USE_TIME64 */
 
+#ifdef __USE_KOS
+#if __TM_SIZEOF(TIME) <= 4
+#define ntptimeval32 ntptimeval
+#else /* __TM_SIZEOF(TIME) <= 4 */
+#define ntptimeval32 __ntptimeval_alt
+#endif /* __TM_SIZEOF(TIME) > 4 */
+#endif /* __USE_KOS */
+
 }%[push_macro @undef { time maxerror esterror tai }]%{
 struct ntptimeval {
 	struct timeval       time;            /* current time (ro) */
@@ -113,11 +125,14 @@ struct __ntptimeval_alt {
 }
 
 [[ignore, nocrt, alias("adjtimex", "__adjtimex")]]
-int adjtimex32([[nonnull]] struct __timex32 *__restrict __ntx);
+int adjtimex32([[nonnull]] struct $timex32 *__restrict __ntx);
+
 [[ignore, nocrt, alias("ntp_gettimex")]]
-int ntp_gettime32([[nonnull]] struct __ntptimeval32 *__restrict ntv);
+int ntp_gettime32([[nonnull]] struct $ntptimeval32 *__restrict ntv);
+
 [[ignore, nocrt, alias("ntp_adjtime")]]
-int ntp_adjtime32([[nonnull]] struct __timex32 *__restrict tntx);
+int ntp_adjtime32([[nonnull]] struct $timex32 *__restrict tntx);
+
 
 
 __adjtimex(*) = adjtimex;
@@ -129,7 +144,7 @@ __adjtimex(*) = adjtimex;
 int adjtimex([[nonnull]] struct timex *__restrict ntx) {
 	int result;
 @@pp_if $has_function(adjtimex32)@@
-	struct __timex32 nxtalt;
+	struct $timex32 nxtalt;
 	nxtalt.@time@.tv_sec  = (time32_t)ntx->@time@.tv_sec;
 	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
 	nxtalt.@offset@    = (time32_t)ntx->@offset@;
@@ -150,7 +165,7 @@ int adjtimex([[nonnull]] struct timex *__restrict ntx) {
 /*	nxtalt.@stbcnt@    = (time32_t)ntx->@stbcnt@; */
 /*	nxtalt.@tai@       = (time32_t)ntx->@tai@; */
 @@pp_else@@
-	struct __timex64 nxtalt;
+	struct $timex64 nxtalt;
 	nxtalt.@time@.tv_sec  = (time64_t)ntx->@time@.tv_sec;
 	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
 	nxtalt.@offset@    = (time64_t)ntx->@offset@;
@@ -227,13 +242,13 @@ int adjtimex([[nonnull]] struct timex *__restrict ntx) {
 }
 
 
-[crt_name("ntp_gettimex"), no_crt_self_import]
-[if(defined(__USE_TIME_BITS64)), preferred_alias("ntp_gettimex64")]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias("ntp_gettimex")]
-[userimpl, requires($has_fucntion(ntp_gettime32) || $has_fucntion(ntp_gettime64))]
+[[crt_name("ntp_gettimex"), no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("ntp_gettimex64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("ntp_gettimex")]]
+[[userimpl, requires($has_fucntion(ntp_gettime32) || $has_fucntion(ntp_gettime64))]]
 int ntp_gettime([[nonnull]] struct ntptimeval *__restrict ntv) {
 @@pp_if $has_function(ntp_gettime32)@@
-	struct __ntptimeval32 ntv32;
+	struct $ntptimeval32 ntv32;
 	int result = ntp_gettime32(&ntv32);
 	if likely(result == 0) {
 		ntv->@time@.tv_sec   = (time64_t)ntv32.@time@.tv_sec;
@@ -248,7 +263,7 @@ int ntp_gettime([[nonnull]] struct ntptimeval *__restrict ntv) {
 	}
 	return result;
 @@pp_else@@
-	struct __ntptimeval64 ntv64;
+	struct $ntptimeval64 ntv64;
 	int result = ntp_gettime64(&ntv64);
 	if likely(result == 0) {
 		ntv->@time@.tv_sec   = (time32_t)ntv64.@time@.tv_sec;
@@ -272,7 +287,7 @@ int ntp_gettime([[nonnull]] struct ntptimeval *__restrict ntv) {
 int ntp_adjtime([[nonnull]] struct timex *__restrict tntx) {
 	int result;
 @@pp_if $has_function(ntp_adjtime32)@@
-	struct __timex32 nxtalt;
+	struct $timex32 nxtalt;
 	nxtalt.@time@.tv_sec  = (time32_t)ntx->@time@.tv_sec;
 	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
 	nxtalt.@offset@    = (time32_t)ntx->@offset@;
@@ -293,7 +308,7 @@ int ntp_adjtime([[nonnull]] struct timex *__restrict tntx) {
 /*	nxtalt.@stbcnt@    = (time32_t)ntx->@stbcnt@; */
 /*	nxtalt.@tai@       = (time32_t)ntx->@tai@; */
 @@pp_else@@
-	struct __timex64 nxtalt;
+	struct $timex64 nxtalt;
 	nxtalt.@time@.tv_sec  = (time64_t)ntx->@time@.tv_sec;
 	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
 	nxtalt.@offset@    = (time64_t)ntx->@offset@;
@@ -375,7 +390,7 @@ int ntp_adjtime([[nonnull]] struct timex *__restrict tntx) {
 [[userimpl, requires_function(adjtimex32)]]
 int adjtimex64([[nonnull]] struct timex64 *__restrict ntx) {
 	int result;
-	struct __timex32 nxtalt;
+	struct $timex32 nxtalt;
 	nxtalt.@time@.tv_sec  = (time32_t)ntx->@time@.tv_sec;
 	nxtalt.@time@.tv_nsec = ntx->@time@.tv_nsec;
 	nxtalt.@modes@     = ntx->@modes@;
@@ -428,7 +443,7 @@ int adjtimex64([[nonnull]] struct timex64 *__restrict ntx) {
 [[userimpl, requires_function(ntp_adjtime32)]]
 int ntp_adjtime64([[nonnull]] struct timex64 *__restrict tntx) {
 	int result;
-	struct __timex32 nxtalt;
+	struct $timex32 nxtalt;
 	nxtalt.@time@.tv_sec  = (time32_t)tntx->@time@.tv_sec;
 	nxtalt.@time@.tv_nsec = tntx->@time@.tv_nsec;
 	nxtalt.@modes@     = tntx->@modes@;
@@ -481,7 +496,7 @@ int ntp_adjtime64([[nonnull]] struct timex64 *__restrict tntx) {
 [[crt_name("ntp_gettimex64"), time64_variant_of(ntp_gettime)]]
 [[userimpl, requires_function(ntp_gettime32)]]
 int ntp_gettime64([[nonnull]] struct ntptimeval64 *__restrict ntv) {
-	struct __ntptimeval32 ntv32;
+	struct $ntptimeval32 ntv32;
 	int result = ntp_gettime32(&ntv32);
 	if likely(result == 0) {
 		ntv->@time@.tv_sec   = (time64_t)ntv32.@time@.tv_sec;

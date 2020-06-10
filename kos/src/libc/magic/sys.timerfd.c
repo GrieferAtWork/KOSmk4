@@ -19,9 +19,12 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
+%[define_replacement(itimerspec32 = __itimerspec32)]
+%[define_replacement(itimerspec64 = __itimerspec64)]
 %[default_impl_section(".text.crt.timer")]
 
 %{
+#include <features.h>
 #include <time.h>
 #include <bits/timerfd.h>
 #include <bits/types.h>
@@ -63,17 +66,17 @@ enum {
 
 
 [[doc_alias("timerfd_settime"), ignore, nocrt, alias("timerfd_settime")]]
-int timerfd_settime32($fd_t ufd, int flags,
-                      [[nonnull]] struct __itimerspec32 const *utmr,
-                      [[nullable]] struct __itimerspec32 *otmr);
+int timerfd_settime32($fd_t ufd, __STDC_INT_AS_UINT_T flags,
+                      [[nonnull]] struct $itimerspec32 const *utmr,
+                      [[nullable]] struct $itimerspec32 *otmr);
 
 [[doc_alias("timerfd_gettime"), ignore, nocrt, alias("timerfd_gettime")]]
-int timerfd_gettime32($fd_t ufd, [[nonnull]] struct __itimerspec32 *__restrict otmr);
+int timerfd_gettime32($fd_t ufd, [[nonnull]] struct $itimerspec32 *__restrict otmr);
 
 
 @@Return file descriptor for new interval timer source
 [[nothrow]]
-$fd_t timerfd_create(clockid_t clock_id, int flags);
+$fd_t timerfd_create(clockid_t clock_id, __STDC_INT_AS_UINT_T flags);
 
 @@Set next expiration time of interval timer source UFD to UTMR.
 @@If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
@@ -82,12 +85,12 @@ $fd_t timerfd_create(clockid_t clock_id, int flags);
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("timerfd_settime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("timerfd_settime")]]
 [[userimpl, requires($has_function(timerfd_settime32) || $has_function(timerfd_settime64))]]
-int timerfd_settime($fd_t ufd, int flags,
+int timerfd_settime($fd_t ufd, __STDC_INT_AS_UINT_T flags,
                      [[nonnull]] struct itimerspec const *utmr,
                      [[nullable]] struct itimerspec *otmr) {
 @@pp_if $has_function(timerfd_settime32)@@
 	int result;
-	struct __itimerspec32 utmr32, otmr32;
+	struct $itimerspec32 utmr32, otmr32;
 	utmr32.it_interval.tv_sec  = (__time32_t)utmr->it_interval.tv_sec;
 	utmr32.it_interval.tv_nsec = utmr->it_interval.tv_nsec;
 	utmr32.it_value.tv_sec     = (__time32_t)utmr->it_value.tv_sec;
@@ -102,7 +105,7 @@ int timerfd_settime($fd_t ufd, int flags,
 	return result;
 @@pp_else@@
 	int result;
-	struct __itimerspec64 utmr64, otmr64;
+	struct $itimerspec64 utmr64, otmr64;
 	utmr64.it_interval.tv_sec  = (__time64_t)utmr->it_interval.tv_sec;
 	utmr64.it_interval.tv_nsec = utmr->it_interval.tv_nsec;
 	utmr64.it_value.tv_sec     = (__time64_t)utmr->it_value.tv_sec;
@@ -126,7 +129,7 @@ int timerfd_settime($fd_t ufd, int flags,
 int timerfd_gettime($fd_t ufd, [[nonnull]] struct itimerspec *__restrict otmr) {
 @@pp_if $has_function(timerfd_gettime32)@@
 	int result;
-	struct __itimerspec32 otmr32;
+	struct $itimerspec32 otmr32;
 	result = timerfd_gettime32(timerid, &otmr32);
 	if (!result) {
 		otmr->it_interval.tv_sec  = (__time64_t)otmr32.it_interval.tv_sec;
@@ -137,7 +140,7 @@ int timerfd_gettime($fd_t ufd, [[nonnull]] struct itimerspec *__restrict otmr) {
 	return result;
 @@pp_else@@
 	int result;
-	struct __itimerspec64 otmr64;
+	struct $itimerspec64 otmr64;
 	result = timerfd_gettime64(timerid, &otmr64);
 	if (!result) {
 		otmr->it_interval.tv_sec  = (__time32_t)otmr64.it_interval.tv_sec;
@@ -153,11 +156,11 @@ int timerfd_gettime($fd_t ufd, [[nonnull]] struct itimerspec *__restrict otmr) {
 
 [[doc_alias("timerfd_settime"), time64_variant_of(timerfd_settime)]]
 [[userimpl, requires_function(timerfd_settime32)]]
-int timerfd_settime64($fd_t ufd, int flags,
+int timerfd_settime64($fd_t ufd, __STDC_INT_AS_UINT_T flags,
                       [[nonnull]] struct itimerspec64 const *utmr,
                       [[nullable]] struct itimerspec64 *otmr) {
 	int result;
-	struct __itimerspec32 utmr32, otmr32;
+	struct $itimerspec32 utmr32, otmr32;
 	utmr32.it_interval.tv_sec  = (__time32_t)utmr->it_interval.tv_sec;
 	utmr32.it_interval.tv_nsec = utmr->it_interval.tv_nsec;
 	utmr32.it_value.tv_sec     = (__time32_t)utmr->it_value.tv_sec;
@@ -176,7 +179,7 @@ int timerfd_settime64($fd_t ufd, int flags,
 [[userimpl, requires_function(timerfd_gettime32)]]
 int timerfd_gettime64($fd_t ufd, [[nonnull]] struct itimerspec64 *__restrict otmr) {
 	int result;
-	struct __itimerspec32 otmr32;
+	struct $itimerspec32 otmr32;
 	result = timerfd_gettime32(timerid, &otmr32);
 	if (!result) {
 		otmr->it_interval.tv_sec  = (__time64_t)otmr32.it_interval.tv_sec;

@@ -68,7 +68,7 @@ typedef int __priority_which_t;
 
 @@Put the soft and hard limits for RESOURCE in *RLIMITS.
 @@Returns 0 if successful, -1 if not (and sets errno)
-[[no_crt_self_import]]
+[[no_crt_self_import, export_as("__getrlimit")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("getrlimit64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("getrlimit", "__getrlimit")]]
 int getrlimit(__rlimit_resource_t resource,
@@ -102,11 +102,11 @@ int setpriority(__priority_which_t which, id_t who, int prio);
 
 %
 %#ifdef __USE_LARGEFILE64
-[[off64_variant_of(getrlimit)]]
+[[doc_alias("getrlimit"), off64_variant_of(getrlimit)]]
 int getrlimit64(__rlimit_resource_t resource,
                 [[nonnull]] struct rlimit64 *rlimits);
 
-[[off64_variant_of(setrlimit)]]
+[[doc_alias("setrlimit"), off64_variant_of(setrlimit)]]
 int setrlimit64(__rlimit_resource_t resource,
                 [[nonnull]] struct rlimit64 const *rlimits);
 %#endif /* __USE_LARGEFILE64 */

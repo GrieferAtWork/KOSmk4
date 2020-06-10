@@ -90,20 +90,20 @@ struct msgbuf {
 }
 
 @@Message queue control operation
-int msgctl(int msqid, int cmd, struct msqid_ds *buf);
+int msgctl(int msqid, __STDC_INT_AS_UINT_T cmd, struct msqid_ds *buf);
 
 @@Get messages queue
-int msgget(key_t key, int msgflg);
+int msgget(key_t key, __STDC_INT_AS_UINT_T msgflg);
 
 @@Receive message from message queue
 [[cp]]
 ssize_t msgrcv(int msqid, void *msgp, size_t msgsz,
-               $longptr_t msgtyp, int msgflg);
+               $longptr_t msgtyp, __STDC_INT_AS_UINT_T msgflg);
 
 @@Send message to message queue
 [[cp]]
 int msgsnd(int msqid, const void *msgp,
-           size_t msgsz, int msgflg);
+           size_t msgsz, __STDC_INT_AS_UINT_T msgflg);
 
 %{
 

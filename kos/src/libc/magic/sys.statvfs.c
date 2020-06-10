@@ -75,10 +75,10 @@ int fstatvfs($fd_t filedes, [[nonnull]] struct statvfs *buf);
 
 %
 %#ifdef __USE_LARGEFILE64
-[[off64_variant_of(statvfs)]]
+[[doc_alias("statvfs"), off64_variant_of(statvfs)]]
 int statvfs64([[nonnull]] const char *file, [[nonnull]] struct statvfs64 *buf);
 
-[[off64_variant_of(fstatvfs)]]
+[[doc_alias("fstatvfs"), off64_variant_of(fstatvfs)]]
 int fstatvfs64($fd_t filedes, [[nonnull]] struct statvfs64 *buf);
 %#endif /* __USE_LARGEFILE64 */
 

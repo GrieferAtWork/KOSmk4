@@ -78,7 +78,7 @@ int poll([[inp(nfds)]] struct pollfd *fds, nfds_t nfds, int timeout);
 
 %#ifdef __USE_GNU
 
-[[cp, ignore, nocrt, alias("ppoll")]]
+[[cp, doc_alias("ppoll"), ignore, nocrt, alias("ppoll")]]
 int ppoll32([[inp(nfds)]] struct pollfd *fds, nfds_t nfds,
             [[nullable]] struct $timespec32 const *timeout,
             [[nullable]] $sigset_t const *ss);
@@ -109,7 +109,7 @@ int ppoll([[inp(nfds)]] struct pollfd *fds, nfds_t nfds,
 
 %
 %#ifdef __USE_TIME64
-[[time64_variant_of(ppoll)]]
+[[doc_alias("ppoll"), time64_variant_of(ppoll)]]
 [[cp, userimpl, requires_function(ppoll32)]]
 int ppoll64([[inp(nfds)]] struct pollfd *fds, nfds_t nfds,
             [[nullable]] struct timespec64 const *timeout,

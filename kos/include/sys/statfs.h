@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x598a26bb */
+/* HASH CRC-32:0x7a955335 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,14 +65,14 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statfs,(char const *__file,
 #elif defined(__CRT_HAVE_statfs64) && defined(__USE_FILE_OFFSET64)
 /* Return information about the filesystem on which FILE resides */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statfs,(char const *__file, struct statfs *__buf),statfs64,(__file,__buf))
-#endif /* statfs... */
+#endif /* ... */
 #if defined(__CRT_HAVE_fstatfs) && !defined(__USE_FILE_OFFSET64)
 /* Return information about the filesystem containing the file FILDES refers to */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstatfs,(__fd_t __filedes, struct statfs *__buf),(__filedes,__buf))
 #elif defined(__CRT_HAVE_fstatfs64) && defined(__USE_FILE_OFFSET64)
 /* Return information about the filesystem containing the file FILDES refers to */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstatfs,(__fd_t __filedes, struct statfs *__buf),fstatfs64,(__filedes,__buf))
-#endif /* fstatfs... */
+#endif /* ... */
 
 #ifdef __USE_LARGEFILE64
 #ifndef statfs64
@@ -82,7 +82,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statfs64,(const char *__file
 #elif defined(__CRT_HAVE_statfs) && defined(_STATFS_MATCHES_STATFS64)
 /* Return information about the filesystem on which FILE resides */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statfs64,(const char *__file, struct statfs64 *__buf),statfs,(__file,__buf))
-#endif /* statfs64... */
+#endif /* ... */
 #endif /* !statfs64 */
 #ifdef __CRT_HAVE_fstatfs64
 /* Return information about the filesystem containing the file FILDES refers to */
@@ -90,7 +90,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, st
 #elif defined(__CRT_HAVE_fstatfs) && defined(_STATFS_MATCHES_STATFS64)
 /* Return information about the filesystem containing the file FILDES refers to */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, struct statfs64 *__buf),fstatfs,(__filedes,__buf))
-#endif /* fstatfs64... */
+#endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __CC__ */
 

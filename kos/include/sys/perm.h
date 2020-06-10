@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xecf33f64 */
+/* HASH CRC-32:0xbbd5b6c2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+#include <features.h>
 #include <hybrid/typecore.h>
 
 __SYSDECL_BEGIN
@@ -35,12 +36,12 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 #ifdef __CRT_HAVE_ioperm
 /* Change I/O port permissions for a specific I/O port range */
-__CDECLARE(,int,__NOTHROW_NCX,ioperm,(__ULONGPTR_TYPE__ __from, __ULONGPTR_TYPE__ __num, int __turn_on),(__from,__num,__turn_on))
-#endif /* ioperm... */
+__CDECLARE(,int,__NOTHROW_NCX,ioperm,(__ULONGPTR_TYPE__ __from, __ULONGPTR_TYPE__ __num, __STDC_INT_AS_UINT_T __turn_on),(__from,__num,__turn_on))
+#endif /* __CRT_HAVE_ioperm */
 #ifdef __CRT_HAVE_iopl
 /* Change I/O port permissions for all I/O ports */
-__CDECLARE(,int,__NOTHROW_NCX,iopl,(int __level),(__level))
-#endif /* iopl... */
+__CDECLARE(,int,__NOTHROW_NCX,iopl,(__STDC_INT_AS_UINT_T __level),(__level))
+#endif /* __CRT_HAVE_iopl */
 #endif /* __CC__ */
 
 __SYSDECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9eced6e */
+/* HASH CRC-32:0x880822c9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+
 #include <bits/types.h>
 #include <bits/ipctypes.h>
 #include <bits/ipc.h>
@@ -59,8 +60,8 @@ typedef __key_t key_t;
 
 #ifdef __CRT_HAVE_ftok
 /* Generates key for System V style IPC */
-__CDECLARE(__ATTR_NONNULL((1)),key_t,__NOTHROW_RPC,ftok,(char const *__pathname, int __proj_id),(__pathname,__proj_id))
-#endif /* ftok... */
+__CDECLARE(__ATTR_NONNULL((1)),key_t,__NOTHROW_RPC,ftok,(char const *__pathname, __STDC_INT_AS_UINT_T __proj_id),(__pathname,__proj_id))
+#endif /* __CRT_HAVE_ftok */
 
 #endif /* __CC__ */
 

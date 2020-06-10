@@ -125,10 +125,10 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_MISC
 #ifndef L_SET
-#define L_SET  SEEK_SET
-#define L_CURR SEEK_CUR
-#define L_INCR SEEK_CUR
-#define L_XTND SEEK_END
+#define L_SET  SEEK_SET /* Seek from beginning of file. */
+#define L_CURR SEEK_CUR /* Seek from current position. */
+#define L_INCR SEEK_CUR /* Seek from current position. */
+#define L_XTND SEEK_END /* Seek from end of file. */
 #endif /* !L_SET */
 #endif /* __USE_MISC */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf65bbee */
+/* HASH CRC-32:0xaa9692b7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __CDECLARE(,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type)
  * passed to the program on startup.  If TYPE was not present in the auxv
  * list, returns zero and sets errno to ENOENT */
 __CREDIRECT(,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),__getauxval,(__type))
-#endif /* getauxval... */
+#endif /* ... */
 
 #endif /* __CC__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd32b2a0d */
+/* HASH CRC-32:0x99f626c5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,6 +50,10 @@ __SYSDECL_BEGIN
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
+
+
+/* TODO: Move all of these constants into `<asm/mount.h>', where
+ *       they should appear in escaped form (e.g. `__BLOCK_SIZE')! */
 
 #ifndef BLOCK_SIZE
 #define BLOCK_SIZE      1024
@@ -140,7 +144,7 @@ __SYSDECL_BEGIN
 
 /* Flags that can be altered by MS_REMOUNT  */
 #ifndef MS_RMT_MASK
-#define MS_RMT_MASK   (MS_RDONLY|MS_SYNCHRONOUS|MS_MANDLOCK|MS_I_VERSION|MS_LAZYTIME)
+#define MS_RMT_MASK   (MS_RDONLY | MS_SYNCHRONOUS | MS_MANDLOCK | MS_I_VERSION | MS_LAZYTIME)
 #endif /* !MS_RMT_MASK */
 
 /* Magic mount flag number. Has to be or-ed to the flag values. */
@@ -216,17 +220,17 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 #ifdef __CRT_HAVE_mount
-__CDECLARE(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, unsigned long int __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
-#endif /* mount... */
+__CDECLARE(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
+#endif /* __CRT_HAVE_mount */
 #ifdef __CRT_HAVE_umount
 __CDECLARE(,int,__NOTHROW_RPC,umount,(char const *__special_file),(__special_file))
 #elif defined(__CRT_HAVE_umount2)
 #include <local/sys.mount/umount.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(umount, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL umount)(char const *__special_file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(umount))(__special_file); })
-#endif /* umount... */
+#endif /* ... */
 #ifdef __CRT_HAVE_umount2
-__CDECLARE(,int,__NOTHROW_RPC,umount2,(char const *__special_file, int __flags),(__special_file,__flags))
-#endif /* umount2... */
+__CDECLARE(,int,__NOTHROW_RPC,umount2,(char const *__special_file, __STDC_INT_AS_UINT_T __flags),(__special_file,__flags))
+#endif /* __CRT_HAVE_umount2 */
 #endif /* __CC__ */
 
 __SYSDECL_END

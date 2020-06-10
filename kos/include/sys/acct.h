@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb876f57a */
+/* HASH CRC-32:0x7b9133da */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,20 +65,28 @@ __SYSDECL_BEGIN
 #endif
 
 
+/*[[[enum]]]*/
 #ifdef __CC__
 enum {
 	AFORK = 0x01, /* Has executed fork, but no exec. */
 	ASU   = 0x02, /* Used super-user privileges. */
 	ACORE = 0x08, /* Dumped core. */
-	AXSIG = 0x10 /* Killed by a signal. */
+	AXSIG = 0x10  /* Killed by a signal. */
 };
 #endif /* __CC__ */
-#ifndef __COMPILER_PREFERR_ENUMS
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define AFORK AFORK /* Has executed fork, but no exec. */
+#define ASU   ASU   /* Used super-user privileges. */
+#define ACORE ACORE /* Dumped core. */
+#define AXSIG AXSIG /* Killed by a signal. */
+#else /* __COMPILER_PREFERR_ENUMS */
 #define AFORK 0x01 /* Has executed fork, but no exec. */
 #define ASU   0x02 /* Used super-user privileges. */
 #define ACORE 0x08 /* Dumped core. */
 #define AXSIG 0x10 /* Killed by a signal. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 #ifdef __CC__
 
@@ -139,8 +147,8 @@ struct acct_v3 {
 
 #ifdef __CRT_HAVE_acct
 /* Switch process accounting on and off */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,acct,(const char *__filename),(__filename))
-#endif /* acct... */
+__CDECLARE(,int,__NOTHROW_RPC,acct,(const char *__filename),(__filename))
+#endif /* __CRT_HAVE_acct */
 
 #endif /* __CC__ */
 

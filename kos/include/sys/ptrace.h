@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6281575d */
+/* HASH CRC-32:0xff4df01c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,95 +56,39 @@ __SYSDECL_BEGIN
 
 
 /* Type of the REQUEST argument to `ptrace.' */
-#ifndef ____ptrace_request_t_defined
-#define ____ptrace_request_t_defined 1
-#undef PTRACE_TRACEME
-#undef PTRACE_PEEKTEXT
-#undef PTRACE_PEEKDATA
-#undef PTRACE_PEEKUSER
-#undef PTRACE_POKETEXT
-#undef PTRACE_POKEDATA
-#undef PTRACE_POKEUSER
-#undef PTRACE_CONT
-#undef PTRACE_KILL
-#undef PTRACE_SINGLESTEP
-#undef PTRACE_GETREGS
-#undef PTRACE_SETREGS
-#undef PTRACE_GETFPREGS
-#undef PTRACE_SETFPREGS
-#undef PTRACE_ATTACH
-#undef PTRACE_DETACH
-#undef PTRACE_GETFPXREGS
-#undef PTRACE_SETFPXREGS
-#undef PTRACE_SYSCALL
-#undef PTRACE_SETOPTIONS
-#undef PTRACE_GETEVENTMSG
-#undef PTRACE_GETSIGINFO
-#undef PTRACE_SETSIGINFO
-#undef PTRACE_GETREGSET
-#undef PTRACE_SETREGSET
-#undef PTRACE_SEIZE
-#undef PTRACE_INTERRUPT
-#undef PTRACE_LISTEN
-#undef PTRACE_PEEKSIGINFO
-#undef PTRACE_GETSIGMASK
-#undef PTRACE_SETSIGMASK
-#undef PTRACE_SECCOMP_GET_FILTER
-#undef PT_TRACE_ME
-#undef PT_READ_I
-#undef PT_READ_D
-#undef PT_READ_U
-#undef PT_WRITE_I
-#undef PT_WRITE_D
-#undef PT_WRITE_U
-#undef PT_CONTINUE
-#undef PT_KILL
-#undef PT_STEP
-#undef PT_GETREGS
-#undef PT_SETREGS
-#undef PT_GETFPREGS
-#undef PT_SETFPREGS
-#undef PT_ATTACH
-#undef PT_DETACH
-#undef PT_GETFPXREGS
-#undef PT_SETFPXREGS
-#undef PT_SYSCALL
-#undef PT_SETOPTIONS
-#undef PT_GETEVENTMSG
-#undef PT_GETSIGINFO
-#undef PT_SETSIGINFO
+/*[[[enum]]]*/
 #ifdef __CC__
 typedef enum __ptrace_request {
-	PTRACE_TRACEME            = 0,                  /* Indicate that the process making this request should be traced.
-	                                                 * All signals received by this process can be intercepted by its
-	                                                 * parent, and its parent can use the other `ptrace' requests. */
-	PTRACE_PEEKTEXT           = 1,                  /* Return the word in the process's text space at address ADDR. */
-	PTRACE_PEEKDATA           = 2,                  /* Return the word in the process's data space at address ADDR. */
-	PTRACE_PEEKUSER           = 3,                  /* Return the word in the process's user area at offset ADDR. */
-	PTRACE_POKETEXT           = 4,                  /* Write the word DATA into the process's text space at address ADDR. */
-	PTRACE_POKEDATA           = 5,                  /* Write the word DATA into the process's data space at address ADDR. */
-	PTRACE_POKEUSER           = 6,                  /* Write the word DATA into the process's user area at offset ADDR. */
-	PTRACE_CONT               = 7,                  /* Continue the process. */
-	PTRACE_KILL               = 8,                  /* Kill the process. */
-	PTRACE_SINGLESTEP         = 9,                  /* Single step the process. This is not supported on all machines. */
-	PTRACE_GETREGS            = 12,                 /* Get all general purpose registers used by a processes. This is not supported on all machines. */
-	PTRACE_SETREGS            = 13,                 /* Set all general purpose registers used by a processes. This is not supported on all machines. */
-	PTRACE_GETFPREGS          = 14,                 /* Get all floating point registers used by a processes. This is not supported on all machines. */
-	PTRACE_SETFPREGS          = 15,                 /* Set all floating point registers used by a processes. This is not supported on all machines. */
-	PTRACE_ATTACH             = 16,                 /* Attach to a process that is already running. */
-	PTRACE_DETACH             = 17,                 /* Detach from a process attached to with PTRACE_ATTACH. */
-	PTRACE_GETFPXREGS         = 18,                 /* Get all extended floating point registers used by a processes. This is not supported on all machines. */
-	PTRACE_SETFPXREGS         = 19,                 /* Set all extended floating point registers used by a processes. This is not supported on all machines. */
-	PTRACE_SYSCALL            = 24,                 /* Continue and stop at the next (return from) syscall. */
-	PTRACE_SETOPTIONS         = 0x4200,             /* Set ptrace filter options. */
-	PTRACE_GETEVENTMSG        = 0x4201,             /* Get last ptrace message. */
-	PTRACE_GETSIGINFO         = 0x4202,             /* Get siginfo for process. */
-	PTRACE_SETSIGINFO         = 0x4203,             /* Set new siginfo for process. */
-	PTRACE_GETREGSET          = 0x4204,             /* Get register content. */
-	PTRACE_SETREGSET          = 0x4205,             /* Set register content. */
-	PTRACE_SEIZE              = 0x4206,             /* Like PTRACE_ATTACH, but do not force tracee to trap and do not affect signal or group stop state. */
-	PTRACE_INTERRUPT          = 0x4207,             /* Trap seized tracee. */
-	PTRACE_LISTEN             = 0x4208,             /* Wait for next group event. */
+	PTRACE_TRACEME            = 0,      /* Indicate that the process making this request should be traced.
+	                                     * All signals received by this process can be intercepted by its
+	                                     * parent, and its parent can use the other `ptrace' requests. */
+	PTRACE_PEEKTEXT           = 1,      /* Return the word in the process's text space at address ADDR.  */
+	PTRACE_PEEKDATA           = 2,      /* Return the word in the process's data space at address ADDR.  */
+	PTRACE_PEEKUSER           = 3,      /* Return the word in the process's user area at offset ADDR.  */
+	PTRACE_POKETEXT           = 4,      /* Write the word DATA into the process's text space at address ADDR.  */
+	PTRACE_POKEDATA           = 5,      /* Write the word DATA into the process's data space at address ADDR.  */
+	PTRACE_POKEUSER           = 6,      /* Write the word DATA into the process's user area at offset ADDR.  */
+	PTRACE_CONT               = 7,      /* Continue the process.  */
+	PTRACE_KILL               = 8,      /* Kill the process.  */
+	PTRACE_SINGLESTEP         = 9,      /* Single step the process. This is not supported on all machines.  */
+	PTRACE_GETREGS            = 12,     /* Get all general purpose registers used by a processes. This is not supported on all machines.  */
+	PTRACE_SETREGS            = 13,     /* Set all general purpose registers used by a processes. This is not supported on all machines.  */
+	PTRACE_GETFPREGS          = 14,     /* Get all floating point registers used by a processes. This is not supported on all machines.  */
+	PTRACE_SETFPREGS          = 15,     /* Set all floating point registers used by a processes. This is not supported on all machines.  */
+	PTRACE_ATTACH             = 16,     /* Attach to a process that is already running. */
+	PTRACE_DETACH             = 17,     /* Detach from a process attached to with PTRACE_ATTACH.  */
+	PTRACE_GETFPXREGS         = 18,     /* Get all extended floating point registers used by a processes. This is not supported on all machines.  */
+	PTRACE_SETFPXREGS         = 19,     /* Set all extended floating point registers used by a processes. This is not supported on all machines.  */
+	PTRACE_SYSCALL            = 24,     /* Continue and stop at the next (return from) syscall.  */
+	PTRACE_SETOPTIONS         = 0x4200, /* Set ptrace filter options.  */
+	PTRACE_GETEVENTMSG        = 0x4201, /* Get last ptrace message.  */
+	PTRACE_GETSIGINFO         = 0x4202, /* Get siginfo for process.  */
+	PTRACE_SETSIGINFO         = 0x4203, /* Set new siginfo for process.  */
+	PTRACE_GETREGSET          = 0x4204, /* Get register content.  */
+	PTRACE_SETREGSET          = 0x4205, /* Set register content.  */
+	PTRACE_SEIZE              = 0x4206, /* Like PTRACE_ATTACH, but do not force tracee to trap and do not affect signal or group stop state.  */
+	PTRACE_INTERRUPT          = 0x4207, /* Trap seized tracee.  */
+	PTRACE_LISTEN             = 0x4208, /* Wait for next group event.  */
 	PTRACE_PEEKSIGINFO        = 0x4209,
 	PTRACE_GETSIGMASK         = 0x420a,
 	PTRACE_SETSIGMASK         = 0x420b,
@@ -152,61 +96,62 @@ typedef enum __ptrace_request {
 	PT_TRACE_ME               = PTRACE_TRACEME,     /* Indicate that the process making this request should be traced.
 	                                                 * All signals received by this process can be intercepted by its
 	                                                 * parent, and its parent can use the other `ptrace' requests. */
-	PT_READ_I                 = PTRACE_PEEKTEXT,    /* Return the word in the process's text space at address ADDR. */
-	PT_READ_D                 = PTRACE_PEEKDATA,    /* Return the word in the process's data space at address ADDR. */
-	PT_READ_U                 = PTRACE_PEEKUSER,    /* Return the word in the process's user area at offset ADDR. */
-	PT_WRITE_I                = PTRACE_POKETEXT,    /* Write the word DATA into the process's text space at address ADDR. */
-	PT_WRITE_D                = PTRACE_POKEDATA,    /* Write the word DATA into the process's data space at address ADDR. */
-	PT_WRITE_U                = PTRACE_POKEUSER,    /* Write the word DATA into the process's user area at offset ADDR. */
-	PT_CONTINUE               = PTRACE_CONT,        /* Continue the process. */
-	PT_KILL                   = PTRACE_KILL,        /* Kill the process. */
-	PT_STEP                   = PTRACE_SINGLESTEP,  /* Single step the process. This is not supported on all machines. */
-	PT_GETREGS                = PTRACE_GETREGS,     /* Get all general purpose registers used by a processes. This is not supported on all machines. */
-	PT_SETREGS                = PTRACE_SETREGS,     /* Set all general purpose registers used by a processes. This is not supported on all machines. */
-	PT_GETFPREGS              = PTRACE_GETFPREGS,   /* Get all floating point registers used by a processes. This is not supported on all machines. */
-	PT_SETFPREGS              = PTRACE_SETFPREGS,   /* Set all floating point registers used by a processes. This is not supported on all machines. */
+	PT_READ_I                 = PTRACE_PEEKTEXT,    /* Return the word in the process's text space at address ADDR.  */
+	PT_READ_D                 = PTRACE_PEEKDATA,    /* Return the word in the process's data space at address ADDR.  */
+	PT_READ_U                 = PTRACE_PEEKUSER,    /* Return the word in the process's user area at offset ADDR.  */
+	PT_WRITE_I                = PTRACE_POKETEXT,    /* Write the word DATA into the process's text space at address ADDR.  */
+	PT_WRITE_D                = PTRACE_POKEDATA,    /* Write the word DATA into the process's data space at address ADDR.  */
+	PT_WRITE_U                = PTRACE_POKEUSER,    /* Write the word DATA into the process's user area at offset ADDR.  */
+	PT_CONTINUE               = PTRACE_CONT,        /* Continue the process.  */
+	PT_KILL                   = PTRACE_KILL,        /* Kill the process.  */
+	PT_STEP                   = PTRACE_SINGLESTEP,  /* Single step the process. This is not supported on all machines.  */
+	PT_GETREGS                = PTRACE_GETREGS,     /* Get all general purpose registers used by a processes. This is not supported on all machines.  */
+	PT_SETREGS                = PTRACE_SETREGS,     /* Set all general purpose registers used by a processes. This is not supported on all machines.  */
+	PT_GETFPREGS              = PTRACE_GETFPREGS,   /* Get all floating point registers used by a processes. This is not supported on all machines.  */
+	PT_SETFPREGS              = PTRACE_SETFPREGS,   /* Set all floating point registers used by a processes. This is not supported on all machines.  */
 	PT_ATTACH                 = PTRACE_ATTACH,      /* Attach to a process that is already running. */
-	PT_DETACH                 = PTRACE_DETACH,      /* Detach from a process attached to with PTRACE_ATTACH. */
-	PT_GETFPXREGS             = PTRACE_GETFPXREGS,  /* Get all extended floating point registers used by a processes. This is not supported on all machines. */
-	PT_SETFPXREGS             = PTRACE_SETFPXREGS,  /* Set all extended floating point registers used by a processes. This is not supported on all machines. */
-	PT_SYSCALL                = PTRACE_SYSCALL,     /* Continue and stop at the next (return from) syscall. */
-	PT_SETOPTIONS             = PTRACE_SETOPTIONS,  /* Set ptrace filter options. */
-	PT_GETEVENTMSG            = PTRACE_GETEVENTMSG, /* Get last ptrace message. */
-	PT_GETSIGINFO             = PTRACE_GETSIGINFO,  /* Get siginfo for process. */
-	PT_SETSIGINFO             = PTRACE_SETSIGINFO  /* Set new siginfo for process. */
+	PT_DETACH                 = PTRACE_DETACH,      /* Detach from a process attached to with PTRACE_ATTACH.  */
+	PT_GETFPXREGS             = PTRACE_GETFPXREGS,  /* Get all extended floating point registers used by a processes. This is not supported on all machines.  */
+	PT_SETFPXREGS             = PTRACE_SETFPXREGS,  /* Set all extended floating point registers used by a processes. This is not supported on all machines.  */
+	PT_SYSCALL                = PTRACE_SYSCALL,     /* Continue and stop at the next (return from) syscall.  */
+	PT_SETOPTIONS             = PTRACE_SETOPTIONS,  /* Set ptrace filter options.  */
+	PT_GETEVENTMSG            = PTRACE_GETEVENTMSG, /* Get last ptrace message.  */
+	PT_GETSIGINFO             = PTRACE_GETSIGINFO,  /* Get siginfo for process.  */
+	PT_SETSIGINFO             = PTRACE_SETSIGINFO,  /* Set new siginfo for process.  */
 } __ptrace_request_t;
 #endif /* __CC__ */
+/*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define PTRACE_TRACEME            PTRACE_TRACEME            /* Indicate that the process making this request should be traced.
                                                              * All signals received by this process can be intercepted by its
                                                              * parent, and its parent can use the other `ptrace' requests. */
-#define PTRACE_PEEKTEXT           PTRACE_PEEKTEXT           /* Return the word in the process's text space at address ADDR. */
-#define PTRACE_PEEKDATA           PTRACE_PEEKDATA           /* Return the word in the process's data space at address ADDR. */
-#define PTRACE_PEEKUSER           PTRACE_PEEKUSER           /* Return the word in the process's user area at offset ADDR. */
-#define PTRACE_POKETEXT           PTRACE_POKETEXT           /* Write the word DATA into the process's text space at address ADDR. */
-#define PTRACE_POKEDATA           PTRACE_POKEDATA           /* Write the word DATA into the process's data space at address ADDR. */
-#define PTRACE_POKEUSER           PTRACE_POKEUSER           /* Write the word DATA into the process's user area at offset ADDR. */
-#define PTRACE_CONT               PTRACE_CONT               /* Continue the process. */
-#define PTRACE_KILL               PTRACE_KILL               /* Kill the process. */
-#define PTRACE_SINGLESTEP         PTRACE_SINGLESTEP         /* Single step the process. This is not supported on all machines. */
-#define PTRACE_GETREGS            PTRACE_GETREGS            /* Get all general purpose registers used by a processes. This is not supported on all machines. */
-#define PTRACE_SETREGS            PTRACE_SETREGS            /* Set all general purpose registers used by a processes. This is not supported on all machines. */
-#define PTRACE_GETFPREGS          PTRACE_GETFPREGS          /* Get all floating point registers used by a processes. This is not supported on all machines. */
-#define PTRACE_SETFPREGS          PTRACE_SETFPREGS          /* Set all floating point registers used by a processes. This is not supported on all machines. */
+#define PTRACE_PEEKTEXT           PTRACE_PEEKTEXT           /* Return the word in the process's text space at address ADDR.  */
+#define PTRACE_PEEKDATA           PTRACE_PEEKDATA           /* Return the word in the process's data space at address ADDR.  */
+#define PTRACE_PEEKUSER           PTRACE_PEEKUSER           /* Return the word in the process's user area at offset ADDR.  */
+#define PTRACE_POKETEXT           PTRACE_POKETEXT           /* Write the word DATA into the process's text space at address ADDR.  */
+#define PTRACE_POKEDATA           PTRACE_POKEDATA           /* Write the word DATA into the process's data space at address ADDR.  */
+#define PTRACE_POKEUSER           PTRACE_POKEUSER           /* Write the word DATA into the process's user area at offset ADDR.  */
+#define PTRACE_CONT               PTRACE_CONT               /* Continue the process.  */
+#define PTRACE_KILL               PTRACE_KILL               /* Kill the process.  */
+#define PTRACE_SINGLESTEP         PTRACE_SINGLESTEP         /* Single step the process. This is not supported on all machines.  */
+#define PTRACE_GETREGS            PTRACE_GETREGS            /* Get all general purpose registers used by a processes. This is not supported on all machines.  */
+#define PTRACE_SETREGS            PTRACE_SETREGS            /* Set all general purpose registers used by a processes. This is not supported on all machines.  */
+#define PTRACE_GETFPREGS          PTRACE_GETFPREGS          /* Get all floating point registers used by a processes. This is not supported on all machines.  */
+#define PTRACE_SETFPREGS          PTRACE_SETFPREGS          /* Set all floating point registers used by a processes. This is not supported on all machines.  */
 #define PTRACE_ATTACH             PTRACE_ATTACH             /* Attach to a process that is already running. */
-#define PTRACE_DETACH             PTRACE_DETACH             /* Detach from a process attached to with PTRACE_ATTACH. */
-#define PTRACE_GETFPXREGS         PTRACE_GETFPXREGS         /* Get all extended floating point registers used by a processes. This is not supported on all machines. */
-#define PTRACE_SETFPXREGS         PTRACE_SETFPXREGS         /* Set all extended floating point registers used by a processes. This is not supported on all machines. */
-#define PTRACE_SYSCALL            PTRACE_SYSCALL            /* Continue and stop at the next (return from) syscall. */
-#define PTRACE_SETOPTIONS         PTRACE_SETOPTIONS         /* Set ptrace filter options. */
-#define PTRACE_GETEVENTMSG        PTRACE_GETEVENTMSG        /* Get last ptrace message. */
-#define PTRACE_GETSIGINFO         PTRACE_GETSIGINFO         /* Get siginfo for process. */
-#define PTRACE_SETSIGINFO         PTRACE_SETSIGINFO         /* Set new siginfo for process. */
-#define PTRACE_GETREGSET          PTRACE_GETREGSET          /* Get register content. */
-#define PTRACE_SETREGSET          PTRACE_SETREGSET          /* Set register content. */
-#define PTRACE_SEIZE              PTRACE_SEIZE              /* Like PTRACE_ATTACH, but do not force tracee to trap and do not affect signal or group stop state. */
-#define PTRACE_INTERRUPT          PTRACE_INTERRUPT          /* Trap seized tracee. */
-#define PTRACE_LISTEN             PTRACE_LISTEN             /* Wait for next group event. */
+#define PTRACE_DETACH             PTRACE_DETACH             /* Detach from a process attached to with PTRACE_ATTACH.  */
+#define PTRACE_GETFPXREGS         PTRACE_GETFPXREGS         /* Get all extended floating point registers used by a processes. This is not supported on all machines.  */
+#define PTRACE_SETFPXREGS         PTRACE_SETFPXREGS         /* Set all extended floating point registers used by a processes. This is not supported on all machines.  */
+#define PTRACE_SYSCALL            PTRACE_SYSCALL            /* Continue and stop at the next (return from) syscall.  */
+#define PTRACE_SETOPTIONS         PTRACE_SETOPTIONS         /* Set ptrace filter options.  */
+#define PTRACE_GETEVENTMSG        PTRACE_GETEVENTMSG        /* Get last ptrace message.  */
+#define PTRACE_GETSIGINFO         PTRACE_GETSIGINFO         /* Get siginfo for process.  */
+#define PTRACE_SETSIGINFO         PTRACE_SETSIGINFO         /* Set new siginfo for process.  */
+#define PTRACE_GETREGSET          PTRACE_GETREGSET          /* Get register content.  */
+#define PTRACE_SETREGSET          PTRACE_SETREGSET          /* Set register content.  */
+#define PTRACE_SEIZE              PTRACE_SEIZE              /* Like PTRACE_ATTACH, but do not force tracee to trap and do not affect signal or group stop state.  */
+#define PTRACE_INTERRUPT          PTRACE_INTERRUPT          /* Trap seized tracee.  */
+#define PTRACE_LISTEN             PTRACE_LISTEN             /* Wait for next group event.  */
 #define PTRACE_PEEKSIGINFO        PTRACE_PEEKSIGINFO
 #define PTRACE_GETSIGMASK         PTRACE_GETSIGMASK
 #define PTRACE_SETSIGMASK         PTRACE_SETSIGMASK
@@ -214,117 +159,109 @@ typedef enum __ptrace_request {
 #define PT_TRACE_ME               PT_TRACE_ME               /* Indicate that the process making this request should be traced.
                                                              * All signals received by this process can be intercepted by its
                                                              * parent, and its parent can use the other `ptrace' requests. */
-#define PT_READ_I                 PT_READ_I                 /* Return the word in the process's text space at address ADDR. */
-#define PT_READ_D                 PT_READ_D                 /* Return the word in the process's data space at address ADDR. */
-#define PT_READ_U                 PT_READ_U                 /* Return the word in the process's user area at offset ADDR. */
-#define PT_WRITE_I                PT_WRITE_I                /* Write the word DATA into the process's text space at address ADDR. */
-#define PT_WRITE_D                PT_WRITE_D                /* Write the word DATA into the process's data space at address ADDR. */
-#define PT_WRITE_U                PT_WRITE_U                /* Write the word DATA into the process's user area at offset ADDR. */
-#define PT_CONTINUE               PT_CONTINUE               /* Continue the process. */
-#define PT_KILL                   PT_KILL                   /* Kill the process. */
-#define PT_STEP                   PT_STEP                   /* Single step the process. This is not supported on all machines. */
-#define PT_GETREGS                PT_GETREGS                /* Get all general purpose registers used by a processes. This is not supported on all machines. */
-#define PT_SETREGS                PT_SETREGS                /* Set all general purpose registers used by a processes. This is not supported on all machines. */
-#define PT_GETFPREGS              PT_GETFPREGS              /* Get all floating point registers used by a processes. This is not supported on all machines. */
-#define PT_SETFPREGS              PT_SETFPREGS              /* Set all floating point registers used by a processes. This is not supported on all machines. */
+#define PT_READ_I                 PT_READ_I                 /* Return the word in the process's text space at address ADDR.  */
+#define PT_READ_D                 PT_READ_D                 /* Return the word in the process's data space at address ADDR.  */
+#define PT_READ_U                 PT_READ_U                 /* Return the word in the process's user area at offset ADDR.  */
+#define PT_WRITE_I                PT_WRITE_I                /* Write the word DATA into the process's text space at address ADDR.  */
+#define PT_WRITE_D                PT_WRITE_D                /* Write the word DATA into the process's data space at address ADDR.  */
+#define PT_WRITE_U                PT_WRITE_U                /* Write the word DATA into the process's user area at offset ADDR.  */
+#define PT_CONTINUE               PT_CONTINUE               /* Continue the process.  */
+#define PT_KILL                   PT_KILL                   /* Kill the process.  */
+#define PT_STEP                   PT_STEP                   /* Single step the process. This is not supported on all machines.  */
+#define PT_GETREGS                PT_GETREGS                /* Get all general purpose registers used by a processes. This is not supported on all machines.  */
+#define PT_SETREGS                PT_SETREGS                /* Set all general purpose registers used by a processes. This is not supported on all machines.  */
+#define PT_GETFPREGS              PT_GETFPREGS              /* Get all floating point registers used by a processes. This is not supported on all machines.  */
+#define PT_SETFPREGS              PT_SETFPREGS              /* Set all floating point registers used by a processes. This is not supported on all machines.  */
 #define PT_ATTACH                 PT_ATTACH                 /* Attach to a process that is already running. */
-#define PT_DETACH                 PT_DETACH                 /* Detach from a process attached to with PTRACE_ATTACH. */
-#define PT_GETFPXREGS             PT_GETFPXREGS             /* Get all extended floating point registers used by a processes. This is not supported on all machines. */
-#define PT_SETFPXREGS             PT_SETFPXREGS             /* Set all extended floating point registers used by a processes. This is not supported on all machines. */
-#define PT_SYSCALL                PT_SYSCALL                /* Continue and stop at the next (return from) syscall. */
-#define PT_SETOPTIONS             PT_SETOPTIONS             /* Set ptrace filter options. */
-#define PT_GETEVENTMSG            PT_GETEVENTMSG            /* Get last ptrace message. */
-#define PT_GETSIGINFO             PT_GETSIGINFO             /* Get siginfo for process. */
-#define PT_SETSIGINFO             PT_SETSIGINFO             /* Set new siginfo for process. */
+#define PT_DETACH                 PT_DETACH                 /* Detach from a process attached to with PTRACE_ATTACH.  */
+#define PT_GETFPXREGS             PT_GETFPXREGS             /* Get all extended floating point registers used by a processes. This is not supported on all machines.  */
+#define PT_SETFPXREGS             PT_SETFPXREGS             /* Set all extended floating point registers used by a processes. This is not supported on all machines.  */
+#define PT_SYSCALL                PT_SYSCALL                /* Continue and stop at the next (return from) syscall.  */
+#define PT_SETOPTIONS             PT_SETOPTIONS             /* Set ptrace filter options.  */
+#define PT_GETEVENTMSG            PT_GETEVENTMSG            /* Get last ptrace message.  */
+#define PT_GETSIGINFO             PT_GETSIGINFO             /* Get siginfo for process.  */
+#define PT_SETSIGINFO             PT_SETSIGINFO             /* Set new siginfo for process.  */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define PTRACE_TRACEME            0                  /* Indicate that the process making this request should be traced.
-                                                      * All signals received by this process can be intercepted by its
-                                                      * parent, and its parent can use the other `ptrace' requests. */
-#define PTRACE_PEEKTEXT           1                  /* Return the word in the process's text space at address ADDR. */
-#define PTRACE_PEEKDATA           2                  /* Return the word in the process's data space at address ADDR. */
-#define PTRACE_PEEKUSER           3                  /* Return the word in the process's user area at offset ADDR. */
-#define PTRACE_POKETEXT           4                  /* Write the word DATA into the process's text space at address ADDR. */
-#define PTRACE_POKEDATA           5                  /* Write the word DATA into the process's data space at address ADDR. */
-#define PTRACE_POKEUSER           6                  /* Write the word DATA into the process's user area at offset ADDR. */
-#define PTRACE_CONT               7                  /* Continue the process. */
-#define PTRACE_KILL               8                  /* Kill the process. */
-#define PTRACE_SINGLESTEP         9                  /* Single step the process. This is not supported on all machines. */
-#define PTRACE_GETREGS            12                 /* Get all general purpose registers used by a processes. This is not supported on all machines. */
-#define PTRACE_SETREGS            13                 /* Set all general purpose registers used by a processes. This is not supported on all machines. */
-#define PTRACE_GETFPREGS          14                 /* Get all floating point registers used by a processes. This is not supported on all machines. */
-#define PTRACE_SETFPREGS          15                 /* Set all floating point registers used by a processes. This is not supported on all machines. */
-#define PTRACE_ATTACH             16                 /* Attach to a process that is already running. */
-#define PTRACE_DETACH             17                 /* Detach from a process attached to with PTRACE_ATTACH. */
-#define PTRACE_GETFPXREGS         18                 /* Get all extended floating point registers used by a processes. This is not supported on all machines. */
-#define PTRACE_SETFPXREGS         19                 /* Set all extended floating point registers used by a processes. This is not supported on all machines. */
-#define PTRACE_SYSCALL            24                 /* Continue and stop at the next (return from) syscall. */
-#define PTRACE_SETOPTIONS         0x4200             /* Set ptrace filter options. */
-#define PTRACE_GETEVENTMSG        0x4201             /* Get last ptrace message. */
-#define PTRACE_GETSIGINFO         0x4202             /* Get siginfo for process. */
-#define PTRACE_SETSIGINFO         0x4203             /* Set new siginfo for process. */
-#define PTRACE_GETREGSET          0x4204             /* Get register content. */
-#define PTRACE_SETREGSET          0x4205             /* Set register content. */
-#define PTRACE_SEIZE              0x4206             /* Like PTRACE_ATTACH, but do not force tracee to trap and do not affect signal or group stop state. */
-#define PTRACE_INTERRUPT          0x4207             /* Trap seized tracee. */
-#define PTRACE_LISTEN             0x4208             /* Wait for next group event. */
+#define PTRACE_TRACEME            0      /* Indicate that the process making this request should be traced.
+                                          * All signals received by this process can be intercepted by its
+                                          * parent, and its parent can use the other `ptrace' requests. */
+#define PTRACE_PEEKTEXT           1      /* Return the word in the process's text space at address ADDR.  */
+#define PTRACE_PEEKDATA           2      /* Return the word in the process's data space at address ADDR.  */
+#define PTRACE_PEEKUSER           3      /* Return the word in the process's user area at offset ADDR.  */
+#define PTRACE_POKETEXT           4      /* Write the word DATA into the process's text space at address ADDR.  */
+#define PTRACE_POKEDATA           5      /* Write the word DATA into the process's data space at address ADDR.  */
+#define PTRACE_POKEUSER           6      /* Write the word DATA into the process's user area at offset ADDR.  */
+#define PTRACE_CONT               7      /* Continue the process.  */
+#define PTRACE_KILL               8      /* Kill the process.  */
+#define PTRACE_SINGLESTEP         9      /* Single step the process. This is not supported on all machines.  */
+#define PTRACE_GETREGS            12     /* Get all general purpose registers used by a processes. This is not supported on all machines.  */
+#define PTRACE_SETREGS            13     /* Set all general purpose registers used by a processes. This is not supported on all machines.  */
+#define PTRACE_GETFPREGS          14     /* Get all floating point registers used by a processes. This is not supported on all machines.  */
+#define PTRACE_SETFPREGS          15     /* Set all floating point registers used by a processes. This is not supported on all machines.  */
+#define PTRACE_ATTACH             16     /* Attach to a process that is already running. */
+#define PTRACE_DETACH             17     /* Detach from a process attached to with PTRACE_ATTACH.  */
+#define PTRACE_GETFPXREGS         18     /* Get all extended floating point registers used by a processes. This is not supported on all machines.  */
+#define PTRACE_SETFPXREGS         19     /* Set all extended floating point registers used by a processes. This is not supported on all machines.  */
+#define PTRACE_SYSCALL            24     /* Continue and stop at the next (return from) syscall.  */
+#define PTRACE_SETOPTIONS         0x4200 /* Set ptrace filter options.  */
+#define PTRACE_GETEVENTMSG        0x4201 /* Get last ptrace message.  */
+#define PTRACE_GETSIGINFO         0x4202 /* Get siginfo for process.  */
+#define PTRACE_SETSIGINFO         0x4203 /* Set new siginfo for process.  */
+#define PTRACE_GETREGSET          0x4204 /* Get register content.  */
+#define PTRACE_SETREGSET          0x4205 /* Set register content.  */
+#define PTRACE_SEIZE              0x4206 /* Like PTRACE_ATTACH, but do not force tracee to trap and do not affect signal or group stop state.  */
+#define PTRACE_INTERRUPT          0x4207 /* Trap seized tracee.  */
+#define PTRACE_LISTEN             0x4208 /* Wait for next group event.  */
 #define PTRACE_PEEKSIGINFO        0x4209
 #define PTRACE_GETSIGMASK         0x420a
 #define PTRACE_SETSIGMASK         0x420b
 #define PTRACE_SECCOMP_GET_FILTER 0x420c
-#define PT_TRACE_ME               PTRACE_TRACEME     /* Indicate that the process making this request should be traced.
-                                                      * All signals received by this process can be intercepted by its
-                                                      * parent, and its parent can use the other `ptrace' requests. */
-#define PT_READ_I                 PTRACE_PEEKTEXT    /* Return the word in the process's text space at address ADDR. */
-#define PT_READ_D                 PTRACE_PEEKDATA    /* Return the word in the process's data space at address ADDR. */
-#define PT_READ_U                 PTRACE_PEEKUSER    /* Return the word in the process's user area at offset ADDR. */
-#define PT_WRITE_I                PTRACE_POKETEXT    /* Write the word DATA into the process's text space at address ADDR. */
-#define PT_WRITE_D                PTRACE_POKEDATA    /* Write the word DATA into the process's data space at address ADDR. */
-#define PT_WRITE_U                PTRACE_POKEUSER    /* Write the word DATA into the process's user area at offset ADDR. */
-#define PT_CONTINUE               PTRACE_CONT        /* Continue the process. */
-#define PT_KILL                   PTRACE_KILL        /* Kill the process. */
-#define PT_STEP                   PTRACE_SINGLESTEP  /* Single step the process. This is not supported on all machines. */
-#define PT_GETREGS                PTRACE_GETREGS     /* Get all general purpose registers used by a processes. This is not supported on all machines. */
-#define PT_SETREGS                PTRACE_SETREGS     /* Set all general purpose registers used by a processes. This is not supported on all machines. */
-#define PT_GETFPREGS              PTRACE_GETFPREGS   /* Get all floating point registers used by a processes. This is not supported on all machines. */
-#define PT_SETFPREGS              PTRACE_SETFPREGS   /* Set all floating point registers used by a processes. This is not supported on all machines. */
-#define PT_ATTACH                 PTRACE_ATTACH      /* Attach to a process that is already running. */
-#define PT_DETACH                 PTRACE_DETACH      /* Detach from a process attached to with PTRACE_ATTACH. */
-#define PT_GETFPXREGS             PTRACE_GETFPXREGS  /* Get all extended floating point registers used by a processes. This is not supported on all machines. */
-#define PT_SETFPXREGS             PTRACE_SETFPXREGS  /* Set all extended floating point registers used by a processes. This is not supported on all machines. */
-#define PT_SYSCALL                PTRACE_SYSCALL     /* Continue and stop at the next (return from) syscall. */
-#define PT_SETOPTIONS             PTRACE_SETOPTIONS  /* Set ptrace filter options. */
-#define PT_GETEVENTMSG            PTRACE_GETEVENTMSG /* Get last ptrace message. */
-#define PT_GETSIGINFO             PTRACE_GETSIGINFO  /* Get siginfo for process. */
-#define PT_SETSIGINFO             PTRACE_SETSIGINFO  /* Set new siginfo for process. */
+#define PT_TRACE_ME               0      /* Indicate that the process making this request should be traced.
+                                          * All signals received by this process can be intercepted by its
+                                          * parent, and its parent can use the other `ptrace' requests. */
+#define PT_READ_I                 1      /* Return the word in the process's text space at address ADDR.  */
+#define PT_READ_D                 2      /* Return the word in the process's data space at address ADDR.  */
+#define PT_READ_U                 3      /* Return the word in the process's user area at offset ADDR.  */
+#define PT_WRITE_I                4      /* Write the word DATA into the process's text space at address ADDR.  */
+#define PT_WRITE_D                5      /* Write the word DATA into the process's data space at address ADDR.  */
+#define PT_WRITE_U                6      /* Write the word DATA into the process's user area at offset ADDR.  */
+#define PT_CONTINUE               7      /* Continue the process.  */
+#define PT_KILL                   8      /* Kill the process.  */
+#define PT_STEP                   9      /* Single step the process. This is not supported on all machines.  */
+#define PT_GETREGS                12     /* Get all general purpose registers used by a processes. This is not supported on all machines.  */
+#define PT_SETREGS                13     /* Set all general purpose registers used by a processes. This is not supported on all machines.  */
+#define PT_GETFPREGS              14     /* Get all floating point registers used by a processes. This is not supported on all machines.  */
+#define PT_SETFPREGS              15     /* Set all floating point registers used by a processes. This is not supported on all machines.  */
+#define PT_ATTACH                 16     /* Attach to a process that is already running. */
+#define PT_DETACH                 17     /* Detach from a process attached to with PTRACE_ATTACH.  */
+#define PT_GETFPXREGS             18     /* Get all extended floating point registers used by a processes. This is not supported on all machines.  */
+#define PT_SETFPXREGS             19     /* Set all extended floating point registers used by a processes. This is not supported on all machines.  */
+#define PT_SYSCALL                24     /* Continue and stop at the next (return from) syscall.  */
+#define PT_SETOPTIONS             0x4200 /* Set ptrace filter options.  */
+#define PT_GETEVENTMSG            0x4201 /* Get last ptrace message.  */
+#define PT_GETSIGINFO             0x4202 /* Get siginfo for process.  */
+#define PT_SETSIGINFO             0x4203 /* Set new siginfo for process.  */
 #endif /* !__COMPILER_PREFERR_ENUMS */
-#endif /* !____ptrace_request_t_defined */
+/*[[[end]]]*/
 
 
 /* Flag for PTRACE_LISTEN. */
-#undef PTRACE_SEIZE_DEVEL
+/*[[[enum]]]*/
 #ifdef __CC__
 enum __ptrace_flags {
 	PTRACE_SEIZE_DEVEL = 0x80000000
 };
 #endif /* __CC__ */
+/*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define PTRACE_SEIZE_DEVEL PTRACE_SEIZE_DEVEL
 #else /* __COMPILER_PREFERR_ENUMS */
 #define PTRACE_SEIZE_DEVEL 0x80000000
 #endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 /* Options set using PTRACE_SETOPTIONS. */
-#undef PTRACE_O_TRACESYSGOOD
-#undef PTRACE_O_TRACEFORK
-#undef PTRACE_O_TRACEVFORK
-#undef PTRACE_O_TRACECLONE
-#undef PTRACE_O_TRACEEXEC
-#undef PTRACE_O_TRACEVFORKDONE
-#undef PTRACE_O_TRACEEXIT
-#undef PTRACE_O_TRACESECCOMP
-#undef PTRACE_O_EXITKILL
-#undef PTRACE_O_SUSPEND_SECCOMP
-#undef PTRACE_O_MASK
+/*[[[enum]]]*/
 #ifdef __CC__
 enum __ptrace_setoptions {
 	PTRACE_O_TRACESYSGOOD    = 0x00000001,
@@ -340,6 +277,7 @@ enum __ptrace_setoptions {
 	PTRACE_O_MASK            = 0x003000ff
 };
 #endif /* __CC__ */
+/*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define PTRACE_O_TRACESYSGOOD    PTRACE_O_TRACESYSGOOD
 #define PTRACE_O_TRACEFORK       PTRACE_O_TRACEFORK
@@ -365,16 +303,11 @@ enum __ptrace_setoptions {
 #define PTRACE_O_SUSPEND_SECCOMP 0x00200000
 #define PTRACE_O_MASK            0x003000ff
 #endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 
 /* Wait extended result codes for the above trace options. */
-#undef PTRACE_EVENT_FORK
-#undef PTRACE_EVENT_VFORK
-#undef PTRACE_EVENT_CLONE
-#undef PTRACE_EVENT_EXEC
-#undef PTRACE_EVENT_VFORK_DONE
-#undef PTRACE_EVENT_EXIT
-#undef PTRACE_EVENT_SECCOMP
+/*[[[enum]]]*/
 #ifdef __CC__
 enum __ptrace_eventcodes {
 	PTRACE_EVENT_FORK       = 1,
@@ -386,6 +319,7 @@ enum __ptrace_eventcodes {
 	PTRACE_EVENT_SECCOMP    = 7
 };
 #endif /* __CC__ */
+/*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define PTRACE_EVENT_FORK       PTRACE_EVENT_FORK
 #define PTRACE_EVENT_VFORK      PTRACE_EVENT_VFORK
@@ -403,19 +337,22 @@ enum __ptrace_eventcodes {
 #define PTRACE_EVENT_EXIT       6
 #define PTRACE_EVENT_SECCOMP    7
 #endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 
-#undef PTRACE_PEEKSIGINFO_SHARED
+/*[[[enum]]]*/
 #ifdef __CC__
 enum __ptrace_peeksiginfo_flags {
-	PTRACE_PEEKSIGINFO_SHARED = (1 << 0)  /* Read signals from a shared (process wide) queue. */
+	PTRACE_PEEKSIGINFO_SHARED = 0x0001 /* Read signals from a shared (process wide) queue. */
 };
 #endif /* __CC__ */
+/*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define PTRACE_PEEKSIGINFO_SHARED PTRACE_PEEKSIGINFO_SHARED /* Read signals from a shared (process wide) queue. */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define PTRACE_PEEKSIGINFO_SHARED (1 << 0) /* Read signals from a shared (process wide) queue. */
+#define PTRACE_PEEKSIGINFO_SHARED 0x0001 /* Read signals from a shared (process wide) queue. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 
 #ifdef __CC__
@@ -448,8 +385,8 @@ struct __ptrace_peeksiginfo_args {
  * appear (those that are used for the particular request) as:
  *     pid_t PID, void *ADDR, int DATA, void *ADDR2
  * after REQUEST */
-__LIBC long int __NOTHROW_NCX(__VLIBCCALL ptrace)(__ptrace_request_t __request, ...) __CASMNAME_SAME("ptrace");
-#endif /* ptrace... */
+__LIBC __LONGPTR_TYPE__ __NOTHROW_NCX(__VLIBCCALL ptrace)(__ptrace_request_t __request, ...) __CASMNAME_SAME("ptrace");
+#endif /* __CRT_HAVE_ptrace */
 #endif /* __CC__ */
 
 __SYSDECL_END

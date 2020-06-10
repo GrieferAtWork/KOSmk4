@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x768f63db */
+/* HASH CRC-32:0x9fd1ef7d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,21 +71,21 @@ struct sembuf {
 
 #ifdef __CRT_HAVE_semctl
 /* Semaphore control operation. */
-__LIBC int __NOTHROW_NCX(__VLIBCCALL semctl)(int __semid, int __semnum, int __cmd, ...) __CASMNAME_SAME("semctl");
-#endif /* semctl... */
+__LIBC int __NOTHROW_NCX(__VLIBCCALL semctl)(int __semid, __STDC_INT_AS_UINT_T __semnum, __STDC_INT_AS_UINT_T __cmd, ...) __CASMNAME_SAME("semctl");
+#endif /* __CRT_HAVE_semctl */
 #ifdef __CRT_HAVE_semget
 /* Get semaphore */
-__CDECLARE(,int,__NOTHROW_NCX,semget,(key_t __key, int __nsems, int __semflg),(__key,__nsems,__semflg))
-#endif /* semget... */
+__CDECLARE(,int,__NOTHROW_NCX,semget,(key_t __key, __STDC_INT_AS_UINT_T __nsems, __STDC_INT_AS_UINT_T __semflg),(__key,__nsems,__semflg))
+#endif /* __CRT_HAVE_semget */
 #ifdef __CRT_HAVE_semop
 /* Operate on semaphore */
 __CDECLARE(,int,__NOTHROW_NCX,semop,(int __semid, struct sembuf *__sops, size_t __nsops),(__semid,__sops,__nsops))
-#endif /* semop... */
+#endif /* __CRT_HAVE_semop */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_semtimedop
 /* Operate on semaphore with timeout */
 __CDECLARE(,int,__NOTHROW_NCX,semtimedop,(int __semid, struct sembuf *__sops, size_t __nsops, struct timespec const *__timeout),(__semid,__sops,__nsops,__timeout))
-#endif /* semtimedop... */
+#endif /* __CRT_HAVE_semtimedop */
 #endif /* __USE_GNU */
 #endif /* __CC__ */
 

@@ -1018,12 +1018,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(__mempmovedownq_chk))(/*aligned(8)*/ v
 #endif /* __UINT64_TYPE__ */
 //[[[end]]]
 
-//TODO: [[ATTR_LEAF, libc, fast]] __strcat_chk:([[nonnull]] char *__restrict dst, [[nonnull]] char const *__restrict src, __SIZE_TYPE__ dst_objsize) -> [[== buf]] char * %{auto_block(chk(%auto, (void)dst_objsize; /* TODO */))}
-//TODO: [[ATTR_LEAF, libc, fast]] __strcpy_chk:([[nonnull]] char *__restrict dst, [[nonnull]] char const *__restrict src, __SIZE_TYPE__ dst_objsize) -> [[== buf]] char * %{auto_block(chk(%auto, (void)dst_objsize; /* TODO */))}
-//TODO: [[ATTR_LEAF, libc, fast]] __strncat_chk:([[nonnull]] char *__restrict dst, [[nonnull]] char const *__restrict src, __SIZE_TYPE__ buflen, __SIZE_TYPE__ dst_objsize) -> [[== buf]] char * %{auto_block(chk(%auto, (void)dst_objsize; /* TODO */))}
-//TODO: [[ATTR_LEAF, libc, fast]] __strncpy_chk:([[nonnull]] char *__restrict dst, [[nonnull]] char const *__restrict src, __SIZE_TYPE__ buflen, __SIZE_TYPE__ dst_objsize) -> [[== buf]] char * %{auto_block(chk(%auto, (void)dst_objsize; /* TODO */))}
-//TODO: [[ATTR_LEAF, libc, fast]] __stpcpy_chk:([[nonnull]] char *__restrict dst, [[nonnull]] char const *__restrict src, __SIZE_TYPE__ dst_objsize) -> [[== buf + strlen(src)]] char * %{auto_block(chk(%auto, (void)dst_objsize; /* TODO */))}
-//TODO: [[ATTR_LEAF, libc, fast]] __stpncpy_chk:([[nonnull]] char *__restrict dst, [[nonnull]] char const *__restrict src, __SIZE_TYPE__ buflen, __SIZE_TYPE__ dst_objsize) -> [[== buf + strlen(src)]] char * %{auto_block(chk(%auto, (void)dst_objsize; /* TODO */))}
+//TODO: [[libc, fast, ATTR_LEAF]] __strcat_chk:([[nonnull]] char *__restrict dst, [[nonnull]] char const *__restrict src, __SIZE_TYPE__ dst_objsize) -> [[== buf]] char * %{auto_block(chk(%auto, (void)dst_objsize; /* TODO */))}
+//TODO: [[libc, fast, ATTR_LEAF]] __strcpy_chk:([[nonnull]] char *__restrict dst, [[nonnull]] char const *__restrict src, __SIZE_TYPE__ dst_objsize) -> [[== buf]] char * %{auto_block(chk(%auto, (void)dst_objsize; /* TODO */))}
+//TODO: [[libc, fast, ATTR_LEAF]] __strncat_chk:([[nonnull]] char *__restrict dst, [[nonnull]] char const *__restrict src, __SIZE_TYPE__ buflen, __SIZE_TYPE__ dst_objsize) -> [[== buf]] char * %{auto_block(chk(%auto, (void)dst_objsize; /* TODO */))}
+//TODO: [[libc, fast, ATTR_LEAF]] __strncpy_chk:([[nonnull]] char *__restrict dst, [[nonnull]] char const *__restrict src, __SIZE_TYPE__ buflen, __SIZE_TYPE__ dst_objsize) -> [[== buf]] char * %{auto_block(chk(%auto, (void)dst_objsize; /* TODO */))}
+//TODO: [[libc, fast, ATTR_LEAF]] __stpcpy_chk:([[nonnull]] char *__restrict dst, [[nonnull]] char const *__restrict src, __SIZE_TYPE__ dst_objsize) -> [[== buf + strlen(src)]] char * %{auto_block(chk(%auto, (void)dst_objsize; /* TODO */))}
+//TODO: [[libc, fast, ATTR_LEAF]] __stpncpy_chk:([[nonnull]] char *__restrict dst, [[nonnull]] char const *__restrict src, __SIZE_TYPE__ buflen, __SIZE_TYPE__ dst_objsize) -> [[== buf + strlen(src)]] char * %{auto_block(chk(%auto, (void)dst_objsize; /* TODO */))}
 
 __NAMESPACE_FAST_END
 __SYSDECL_END

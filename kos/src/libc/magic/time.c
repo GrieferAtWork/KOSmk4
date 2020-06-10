@@ -188,11 +188,11 @@ struct tm {
 	int         tm_isdst;    /* daylight savings flag. */
 #ifdef __CRT_GLC
 #ifdef __USE_MISC
-	long int    tm_gmtoff;   /* Seconds east of UTC. */
-	char const *tm_zone;     /* Timezone abbreviation. */
+	__LONGPTR_TYPE__ tm_gmtoff;   /* Seconds east of UTC. */
+	char const      *tm_zone;     /* Timezone abbreviation. */
 #else /* __USE_MISC */
-	long int    __tm_gmtoff; /* Seconds east of UTC. */
-	char const *__tm_zone;   /* Timezone abbreviation. */
+	__LONGPTR_TYPE__ __tm_gmtoff; /* Seconds east of UTC. */
+	char const      *__tm_zone;   /* Timezone abbreviation. */
 #endif /* !__USE_MISC */
 #endif /* __CRT_GLC */
 };
@@ -246,11 +246,11 @@ struct tm {
 	int         tm_isdst;    /* daylight savings flag. */
 #ifdef __CRT_GLC
 #ifdef __USE_MISC
-	long int    tm_gmtoff;   /* Seconds east of UTC. */
-	char const *tm_zone;     /* Timezone abbreviation. */
+	__LONGPTR_TYPE__ tm_gmtoff;   /* Seconds east of UTC. */
+	char const      *tm_zone;     /* Timezone abbreviation. */
 #else /* __USE_MISC */
-	long int    __tm_gmtoff; /* Seconds east of UTC. */
-	char const *__tm_zone;   /* Timezone abbreviation. */
+	__LONGPTR_TYPE__ __tm_gmtoff; /* Seconds east of UTC. */
+	char const      *__tm_zone;   /* Timezone abbreviation. */
 #endif /* !__USE_MISC */
 #endif /* __CRT_GLC */
 };
@@ -924,7 +924,7 @@ timelocal(*) = mktime;
 
 @@Return the number of days in YEAR
 [[ATTR_CONST, ATTR_WUNUSED, impl_prefix(DEFINE_ISLEAP)]]
-int dysize(int year) {
+int dysize(__STDC_INT_AS_UINT_T year) {
 	return __isleap(year) ? 366 : 365;
 }
 
@@ -1101,7 +1101,7 @@ int timer_delete(timer_t timerid);
 
 @@Set timer TIMERID to VALUE, returning old value in OVALUE
 [[decl_include("<bits/itimerspec.h>"), ignore, nocrt, alias("timer_settime")]]
-int timer_settime32(timer_t timerid, int flags,
+int timer_settime32(timer_t timerid, __STDC_INT_AS_UINT_T flags,
                     [[nonnull]] struct __itimerspec32 const *__restrict value,
                     [[nullable]] struct __itimerspec32 *ovalue);
 
@@ -1111,7 +1111,7 @@ int timer_settime32(timer_t timerid, int flags,
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("timer_settime")]]
 [[userimpl, requires($has_function(timer_settime32) || $has_function(timer_settime64))]]
 [[section(".text.crt.timer"), decl_include("<bits/itimerspec.h>")]]
-int timer_settime(timer_t timerid, int flags,
+int timer_settime(timer_t timerid, __STDC_INT_AS_UINT_T flags,
                   [[nonnull]] struct itimerspec const *__restrict value,
                   [[nullable]] struct itimerspec *__restrict ovalue) {
 @@pp_if $has_function(timer_settime32)@@
@@ -1189,7 +1189,7 @@ int timer_getoverrun(timer_t timerid);
 %
 %#ifdef __USE_XOPEN2K
 [[cp, doc_alias("clock_nanosleep"), ignore, nocrt, alias("clock_nanosleep", "__clock_nanosleep")]]
-int clock_nanosleep32(clockid_t clock_id, int flags,
+int clock_nanosleep32(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
                       [[nonnull]] struct $timespec32 const *__restrict requested_time,
                       [[nullable]] struct $timespec32 *remaining);
 
@@ -1198,7 +1198,7 @@ int clock_nanosleep32(clockid_t clock_id, int flags,
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("clock_nanosleep64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("clock_nanosleep", "__clock_nanosleep")]]
 [[userimpl, requires($has_function(clock_nanosleep32) || $has_function(clock_nanosleep64))]]
-int clock_nanosleep(clockid_t clock_id, int flags,
+int clock_nanosleep(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
                     [[nonnull]] struct timespec const *__restrict requested_time,
                     [[nullable]] struct timespec *remaining) {
 @@pp_if $has_function(clock_nanosleep32)@@
@@ -1287,7 +1287,7 @@ int clock_settime64(clockid_t clock_id, [[nonnull]] struct $timespec64 const *tp
 [[decl_include("<bits/itimerspec.h>")]]
 [[time64_variant_of(timer_settime), section(".text.crt.timer")]]
 [[userimpl, requires_function(timer_settime32)]]
-int timer_settime64(timer_t timerid, int flags,
+int timer_settime64(timer_t timerid, __STDC_INT_AS_UINT_T flags,
                     [[nonnull]] struct $itimerspec64 const *__restrict value,
                     [[nullable]] struct $itimerspec64 *__restrict ovalue) {
 	int result;
@@ -1326,7 +1326,7 @@ int timer_gettime64(timer_t timerid, [[nonnull]] struct $itimerspec64 *value) {
 %#ifdef __USE_XOPEN2K
 [[cp, time64_variant_of(clock_nanosleep)]]
 [[userimpl, requires_function(clock_nanosleep32)]]
-int clock_nanosleep64(clockid_t clock_id, int flags,
+int clock_nanosleep64(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
                       [[nonnull]] struct $timespec64 const *requested_time,
                       [[nullable]] struct $timespec64 *remaining) {
 	int result;
@@ -1349,7 +1349,8 @@ int clock_nanosleep64(clockid_t clock_id, int flags,
 %(c,std)#ifdef __USE_ISOCXX17
 @@Set TS to calendar time based in time base BASE
 [[std, guard]]
-int timespec_get([[nonnull]] struct timespec *ts, int base);
+int timespec_get([[nonnull]] struct timespec *ts,
+                 __STDC_INT_AS_UINT_T base);
 %(c,std)#endif /* __USE_ISOCXX17 */
 
 %

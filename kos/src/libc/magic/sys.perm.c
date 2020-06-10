@@ -23,6 +23,7 @@
 %[default_impl_section(".text.crt.system.ioperm")]
 
 %{
+#include <features.h>
 #include <hybrid/typecore.h>
 
 __SYSDECL_BEGIN
@@ -31,10 +32,10 @@ __SYSDECL_BEGIN
 }
 
 @@Change I/O port permissions for a specific I/O port range
-int ioperm($ulongptr_t from, $ulongptr_t num, int turn_on);
+int ioperm($ulongptr_t from, $ulongptr_t num, __STDC_INT_AS_UINT_T turn_on);
 
 @@Change I/O port permissions for all I/O ports
-int iopl(int level);
+int iopl(__STDC_INT_AS_UINT_T level);
 
 %{
 #endif /* __CC__ */

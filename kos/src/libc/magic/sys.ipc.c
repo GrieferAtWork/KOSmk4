@@ -18,8 +18,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+%[define_replacement(uid_t = __uid_t)]
+%[define_replacement(gid_t = __gid_t)]
+%[define_replacement(mode_t = __mode_t)]
+%[define_replacement(key_t = __key_t)]
+
 %{
 #include <features.h>
+
 #include <bits/types.h>
 #include <bits/ipctypes.h>
 #include <bits/ipc.h>
@@ -51,7 +57,9 @@ typedef __key_t key_t;
 }
 
 @@Generates key for System V style IPC
-[[cp]] ftok:([[nonnull]] char const *pathname, int proj_id) -> key_t;
+[[cp]]
+key_t ftok([[nonnull]] char const *pathname,
+           __STDC_INT_AS_UINT_T proj_id);
 
 %{
 

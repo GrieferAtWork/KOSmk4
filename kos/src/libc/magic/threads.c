@@ -152,10 +152,10 @@ int thrd_create(thrd_t *thr, thrd_start_t func, void *arg) {
 	                       arg);
 	if likely(!error)
 		return thrd_success;
-#ifdef ENOMEM
+@@pp_ifdef ENOMEM@@
 	if (error == ENOMEM)
 		return thrd_nomem;
-#endif /* ENOMEM */
+@@pp_endif@@
 	return thrd_error;
 }
 
@@ -209,10 +209,10 @@ int thrd_sleep([[nonnull]] struct timespec const *time_point,
 	error = nanosleep(time_point, remaining);
 	if likely(error == 0)
 		return 0;
-#if defined(__libc_geterrno) && defined(EINTR)
+@@pp_if defined(__libc_geterrno) && defined(EINTR)@@
 	if (__libc_geterrno() == EINTR)
 		return -1;
-#endif /* __libc_geterrno && EINTR */
+@@pp_endif@@
 	return -2;
 @@pp_endif@@
 }
@@ -238,10 +238,10 @@ int thrd_sleep64([[nonnull]] struct timespec64 const *time_point,
 	error = nanosleep64(time_point, remaining);
 	if likely(error == 0)
 		return 0;
-#if defined(__libc_geterrno) && defined(EINTR)
+@@pp_if defined(__libc_geterrno) && defined(EINTR)@@
 	if (__libc_geterrno() == EINTR)
 		return -1;
-#endif /* __libc_geterrno && EINTR */
+@@pp_endif@@
 	return -2;
 @@pp_else@@
 	int result;
@@ -290,7 +290,7 @@ int thrd_detach(thrd_t thr) {
 [[userimpl, requires_function(pthread_join)]]
 int thrd_join(thrd_t thr, int *res) {
 	int error;
-#if __SIZEOF_POINTER__ != __SIZEOF_INT__
+@@pp_if __SIZEOF_POINTER__ != __SIZEOF_INT__@@
 	void *resptr;
 	error = pthread_join((pthread_t)thr, res ? &resptr : NULL);
 	if likely(!error) {
@@ -298,11 +298,11 @@ int thrd_join(thrd_t thr, int *res) {
 			*res = (int)(unsigned int)(uintptr_t)resptr;
 		return thrd_success;
 	}
-#else /* __SIZEOF_POINTER__ != __SIZEOF_INT__ */
+@@pp_else@@
 	error = pthread_join((pthread_t)thr, (void **)res);
 	if likely(!error)
 		return thrd_success;
-#endif /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
+@@pp_endif@@
 	return thrd_error;
 }
 
@@ -325,7 +325,7 @@ thrd_yield(*) = pthread_yield;
 [[decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadvalues.h>", "<bits/pthreadtypes.h>")]]
 [[userimpl, requires_function(pthread_mutex_init)]]
-int mtx_init([[nonnull]] mtx_t *__restrict mutex, int type) {
+int mtx_init([[nonnull]] mtx_t *__restrict mutex, __STDC_INT_AS_UINT_T type) {
 	int error;
 	if (type == mtx_plain) {
 		error = pthread_mutex_init((pthread_mutex_t *)mutex, NULL);

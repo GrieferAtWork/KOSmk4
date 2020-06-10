@@ -318,9 +318,9 @@ int recvmmsg32($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("recvmmsg64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("recvmmsg")]]
 [[userimpl, requires($has_function(recvmmsg32) || $has_function(recvmmsg64))]]
-recvmmsg:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
-          __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
-          [[nullable]] struct timespec *tmo) -> int {
+int recvmmsg($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
+             __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
+             [[nullable]] struct timespec *tmo) {
 @@pp_if $has_function(recvmmsg64)@@
 	struct timespec64 tmo64;
 	if (!tmo)
@@ -339,7 +339,7 @@ recvmmsg:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 }
 
 %#ifdef __USE_TIME64
-[[cp, time64_variant_of(recvmmsg)]]
+[[cp, doc_alias("recvmmsg"), time64_variant_of(recvmmsg)]]
 [[userimpl, requires_function(recvmmsg32)]]
 int recvmmsg64($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
                __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
@@ -360,7 +360,8 @@ int recvmmsg64($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 @@@return: > 0 : The read-pointer is pointing at out-of-band data
 @@@return: == 0: The read-pointer is not pointing at out-of-band data
 @@@return: < 0 : Error (s.a. `errno')
-[[ATTR_WUNUSED]] int sockatmark($fd_t sockfd);
+[[ATTR_WUNUSED]]
+int sockatmark($fd_t sockfd);
 %#endif /* __USE_XOPEN2K */
 
 %

@@ -74,7 +74,8 @@ enum {
 @@@param: flags: 0, or a one of `XATTR_*'
 [[cp]]
 int setxattr([[nonnull]] char const *path, [[nonnull]] char const *name,
-             [[inp(bufsize)]] void const *buf, size_t bufsize, int flags);
+             [[inp(bufsize)]] void const *buf, size_t bufsize,
+             __STDC_INT_AS_UINT_T flags);
 
 @@Set the attribute NAME of the file pointed to by PATH to VALUE (which is
 @@SIZE bytes long), not following symlinks for the last pathname component.
@@ -82,14 +83,16 @@ int setxattr([[nonnull]] char const *path, [[nonnull]] char const *name,
 @@@param: flags: 0, or a one of `XATTR_*'
 [[cp]]
 int lsetxattr([[nonnull]] char const *path, [[nonnull]] char const *name,
-              [[inp(bufsize)]] void const *buf, size_t bufsize, int flags);
+              [[inp(bufsize)]] void const *buf, size_t bufsize,
+              __STDC_INT_AS_UINT_T flags);
 
 @@Set the attribute NAME of the file descriptor FD to VALUE
 @@(which is SIZE bytes long). Return 0 on success, -1 for errors
 @@@param: flags: 0, or a one of `XATTR_*'
 [[cp]]
 int fsetxattr($fd_t fd, [[nonnull]] char const *name,
-              [[inp(bufsize)]] void const *buf, size_t bufsize, int flags);
+              [[inp(bufsize)]] void const *buf, size_t bufsize,
+              __STDC_INT_AS_UINT_T flags);
 
 @@Get the attribute NAME of the file pointed to by PATH to VALUE
 @@(which is SIZE bytes long). Return 0 on success, -1 for errors

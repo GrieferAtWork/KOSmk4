@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f674001 */
+/* HASH CRC-32:0x9bd37ca4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,7 @@ __SYSDECL_BEGIN
 #define LOG_WARN    LOG_WARNING
 #define LOG_CONFIRM LOG_NOTICE
 #define LOG_MESSAGE LOG_INFO
-#endif
+#endif /* __USE_KOS */
 
 /* facility codes */
 #define LOG_KERN     (0<<3)  /* kernel messages. */
@@ -118,9 +118,9 @@ __SYSDECL_BEGIN
 #define LOG_BOOT        (30<<3)
 #define LOG_IO          (31<<3)
 #define LOG_NFACILITIES  32     /* current number of facilities */
-#else
+#else /* __KERNEL__ */
 #define LOG_NFACILITIES  24     /* current number of facilities */
-#endif
+#endif /* !__KERNEL__ */
 #define LOG_FACMASK      0x03f8 /* mask to extract facility part */
 #define LOG_FAC(p)   (((p) & LOG_FACMASK) >> 3) /* facility of pri */
 
@@ -139,39 +139,39 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 #ifdef __CRT_HAVE_closelog
 __CDECLARE_VOID(,__NOTHROW_NCX,closelog,(void),())
-#endif /* closelog... */
+#endif /* __CRT_HAVE_closelog */
 #ifdef __CRT_HAVE_openlog
-__CDECLARE_VOID(,__NOTHROW_RPC,openlog,(char const *__ident, int __option, int __facility),(__ident,__option,__facility))
-#endif /* openlog... */
+__CDECLARE_VOID(,__NOTHROW_RPC,openlog,(char const *__ident, __STDC_INT_AS_UINT_T __option, __STDC_INT_AS_UINT_T __facility),(__ident,__option,__facility))
+#endif /* __CRT_HAVE_openlog */
 #ifdef __CRT_HAVE_setlogmask
-__CDECLARE(,int,__NOTHROW_NCX,setlogmask,(int __mask),(__mask))
-#endif /* setlogmask... */
+__CDECLARE(,int,__NOTHROW_NCX,setlogmask,(__STDC_INT_AS_UINT_T __mask),(__mask))
+#endif /* __CRT_HAVE_setlogmask */
 #ifdef __CRT_HAVE_syslog
-__LIBC __ATTR_LIBC_PRINTF(2,3) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__VLIBCCALL syslog)(int __level, char const *__format, ...) __CASMNAME_SAME("syslog");
-#elif defined(__CRT_HAVE_syslog_printer) || defined(__CRT_HAVE_vsyslog)
+__LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__VLIBCCALL syslog)(__STDC_INT_AS_UINT_T __level, char const *__format, ...) __CASMNAME_SAME("syslog");
+#elif defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer)
 #include <local/sys.syslog/syslog.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(syslog)
 #else /* __cplusplus */
 #define syslog (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(syslog))
 #endif /* !__cplusplus */
-#endif /* syslog... */
+#endif /* ... */
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_vsyslog
-__CDECLARE_VOID(__ATTR_LIBC_PRINTF(2,0) __ATTR_NONNULL((2)),__NOTHROW_RPC,vsyslog,(int __level, char const *__format, __builtin_va_list __args),(__level,__format,__args))
+__CDECLARE_VOID(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)),__NOTHROW_RPC,vsyslog,(__STDC_INT_AS_UINT_T __level, char const *__format, __builtin_va_list __args),(__level,__format,__args))
 #elif defined(__CRT_HAVE_syslog_printer)
 #include <local/sys.syslog/vsyslog.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(vsyslog, __FORCELOCAL __ATTR_LIBC_PRINTF(2,0) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__LIBCCALL vsyslog)(int __level, char const *__format, __builtin_va_list __args) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsyslog))(__level, __format, __args); })
-#endif /* vsyslog... */
+__NAMESPACE_LOCAL_USING_OR_IMPL(vsyslog, __FORCELOCAL __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__LIBCCALL vsyslog)(__STDC_INT_AS_UINT_T __level, char const *__format, __builtin_va_list __args) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsyslog))(__level, __format, __args); })
+#endif /* ... */
 #endif /* __USE_MISC */
 
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_syslog_printer
 /* Helper functions for printing to the system log */
 __CDECLARE(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,syslog_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
-#endif /* syslog_printer... */
-#define SYSLOG_PRINTER_CLOSURE(level) ((void *)(__uintptr_t)(int)(level))
+#endif /* __CRT_HAVE_syslog_printer */
+#define SYSLOG_PRINTER_CLOSURE(level) ((void *)(__uintptr_t)(__STDC_INT_AS_UINT_T)(level))
 #endif /* __USE_KOS */
 
 #ifdef SYSLOG_NAMES

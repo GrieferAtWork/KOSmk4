@@ -30,11 +30,21 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 }
 
-[[cp]] int sysinfo([[nonnull]] struct sysinfo *info);
-[[cp, ATTR_WUNUSED]] int get_nprocs_conf();
-[[cp, ATTR_WUNUSED]] int get_nprocs();
-[[cp, ATTR_WUNUSED]] __INTPTR_TYPE__ get_phys_pages();
-[[cp, ATTR_WUNUSED]] __INTPTR_TYPE__ get_avphys_pages();
+[[cp]]
+int sysinfo([[nonnull]] struct sysinfo *info);
+
+[[cp, ATTR_WUNUSED]]
+int get_nprocs_conf();
+
+[[cp, ATTR_WUNUSED]]
+int get_nprocs();
+
+[[cp, ATTR_WUNUSED]]
+__INTPTR_TYPE__ get_phys_pages();
+
+[[cp, ATTR_WUNUSED]]
+__INTPTR_TYPE__ get_avphys_pages();
+
 
 %{
 #endif /* __CC__ */

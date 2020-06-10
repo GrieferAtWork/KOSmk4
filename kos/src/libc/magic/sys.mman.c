@@ -540,8 +540,9 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 #ifdef __CC__
 }
 
-[[doc_alias("mmap"), ignore, nocrt, alias(mmap)]]
-mmap32:(void *addr, size_t len, int prot, int flags, $fd_t fd, $off32_t offset) -> void *;
+[[doc_alias("mmap"), ignore, nocrt, alias("mmap")]]
+void *mmap32(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
+             __STDC_INT_AS_UINT_T flags, $fd_t fd, $off32_t offset);
 
 @@@param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
 @@@param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
@@ -552,9 +553,10 @@ mmap32:(void *addr, size_t len, int prot, int flags, $fd_t fd, $off32_t offset) 
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mmap64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("mmap")]]
 [[userimpl, requires($has_function(mmap32) || $has_function(mmap64))]]
-void *mmap(void *addr, size_t len, int prot, int flags, $fd_t fd, $off_t offset) {
+void *mmap(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
+           __STDC_INT_AS_UINT_T flags, $fd_t fd, $off_t offset) {
 @@pp_if $has_function(mmap64)@@
-	return mmap64(addr, len, prot, flags, fd, (__off32_t)offset);
+	return mmap64(addr, len, prot, flags, fd, (__off64_t)offset);
 @@pp_else@@
 	return mmap32(addr, len, prot, flags, fd, (__off32_t)offset);
 @@pp_endif@@
@@ -568,31 +570,38 @@ int munmap([[nonnull]] void *addr, size_t len);
 @@             PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED |
 @@             PROT_GROWSUP | PROT_GROWSDOWN'
 [[section(".text.crt.system.mman")]]
-int mprotect([[nonnull]] void *addr, size_t len, int prot);
+int mprotect([[nonnull]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot);
 
 @@@param flags: Set of `MS_ASYNC|MS_INVALIDATE|MS_SYNC'
-[[cp]] int msync([[nonnull]] void *addr, size_t len, int flags);
+[[cp]] int msync([[nonnull]] void *addr, size_t len, __STDC_INT_AS_UINT_T flags);
 int mlock([[nonnull]] void const *addr, size_t len);
 int munlock([[nonnull]] void const *addr, size_t len);
 
 @@@param flags: Set of `MCL_CURRENT|MCL_FUTURE|MCL_ONFAULT'
-int mlockall(int flags);
+int mlockall(__STDC_INT_AS_UINT_T flags);
 
 int munlockall();
-[[cp]] int shm_open:([[nonnull]] char const *name, $oflag_t oflags, mode_t mode);
-[[cp]] int shm_unlink:([[nonnull]] char const *name);
+
+[[cp]]
+int shm_open([[nonnull]] char const *name,
+             $oflag_t oflags, mode_t mode);
+
+[[cp]]
+int shm_unlink([[nonnull]] char const *name);
 
 %
 %#ifdef __USE_MISC
 
 [[userimpl, export_alias("__madvise")]]
-int madvise([[nonnull]] void *addr, size_t len, int advice) {
+int madvise([[nonnull]] void *addr, size_t len,
+            __STDC_INT_AS_UINT_T advice) {
 	/* Implement as a no-op, since this function is merely meant as a hint */
 	(void)addr;
 	(void)len;
 	(void)advice;
 	return 0;
 }
+
 int mincore([[nonnull]] void *start, size_t len, unsigned char *vec);
 
 %#endif /* __USE_MISC */
@@ -602,7 +611,8 @@ int mincore([[nonnull]] void *start, size_t len, unsigned char *vec);
 %#ifdef __USE_LARGEFILE64
 [[ATTR_WUNUSED, section(".text.crt.heap.mman"), off64_variant_of(mmap)]]
 [[doc_alias("mmap"), userimpl, requires_function(mmap32)]]
-void *mmap64(void *addr, size_t len, int prot, int flags, $fd_t fd, $off64_t offset) {
+void *mmap64(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
+             __STDC_INT_AS_UINT_T flags, $fd_t fd, $off64_t offset) {
 	return mmap32(addr, len, prot, flags, fd, (off32_t)offset);
 }
 %#endif /* __USE_LARGEFILE64 */
@@ -612,7 +622,8 @@ void *mmap64(void *addr, size_t len, int prot, int flags, $fd_t fd, $off64_t off
 %#ifdef __USE_XOPEN2K
 
 [[userimpl]]
-int posix_madvise([[nonnull]] void *addr, size_t len, int advice) {
+int posix_madvise([[nonnull]] void *addr, size_t len,
+                  __STDC_INT_AS_UINT_T advice) {
 	/* Implement as a no-op, since this function is merely meant as a hint */
 	(void)addr;
 	(void)len;
@@ -627,16 +638,20 @@ int posix_madvise([[nonnull]] void *addr, size_t len, int advice) {
 
 @@@param flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED'
 [[section(".text.crt.heap.mman"), vartypes(void *)]]
-void *mremap(void *addr, size_t old_len, size_t new_len, int flags, ... /* void *new_address */);
+void *mremap(void *addr, size_t old_len, size_t new_len,
+             __STDC_INT_AS_UINT_T flags, ... /* void *new_address */);
 
-int remap_file_pages(void *start, size_t size, int prot, size_t pgoff, int flags);
+int remap_file_pages(void *start, size_t size,
+                     __STDC_INT_AS_UINT_T prot, size_t pgoff,
+                     __STDC_INT_AS_UINT_T flags);
 $fd_t memfd_create(char const *name, unsigned int flags);
 int mlock2(void const *addr, size_t length, unsigned int flags);
+
 int pkey_alloc(unsigned int flags, unsigned int access_rights);
 int pkey_set(int key, unsigned int access_rights);
 int pkey_get(int key);
 int pkey_free(int key);
-int pkey_mprotect(void *addr, size_t len, int prot, int pkey);
+int pkey_mprotect(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
 
 
 %#endif /* __USE_GNU */
@@ -650,7 +665,7 @@ __SYSDECL_END
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_SYS_MMAN_H)
 #include <parts/uchar/sys/mman.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_SYS_MMAN_H */
 #endif /* __USE_UTF */
 
 }

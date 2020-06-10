@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4e071d6 */
+/* HASH CRC-32:0x742d3e4a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,8 @@ __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_ustat
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
-#endif /* ustat... */
+#endif /* __CRT_HAVE_ustat */
+
 #endif /* __CC__ */
 
 __SYSDECL_END
