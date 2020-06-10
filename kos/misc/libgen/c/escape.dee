@@ -65,6 +65,10 @@ global cLanguageKeywords: {string...} = HashSet({
 	"__restrict", "attribute", "__attribute", "__attribute__",
 	"_declspec", "__declspec", "char16_t", "char32_t", "wchar_t",
 	"inline", "__inline", "__inline__", "__extension__",
+
+	/* Preprocessor-only keywords */
+	"defined", "ifdef", "ifndef", "elif", "endif", "define",
+	"include", "undef", "pragma",
 });
 
 global cLanguageTwoWordTypenameKeywords: {string...} = HashSet({
@@ -515,7 +519,7 @@ single_dont_escape:
 							if (!forceKeyEscape) {
 								escapedTok = keyEscape(usedText);
 								if (escapedTok !is none)
-									goto got_escapedTok;
+									goto single_got_escapedTok;
 							}
 							escapedTok = partialKeywordEscapes.get(usedText);
 							if (escapedTok is none) {
@@ -534,7 +538,7 @@ single_do_escape_keyword:
 						if (!forceKeyEscape) {
 							escapedTok = keyEscape(usedText);
 							if (escapedTok !is none)
-								goto got_escapedTok;
+								goto single_got_escapedTok;
 						}
 						escapedTok = keywordEscapes.get(usedText);
 						if (escapedTok is none)
@@ -828,7 +832,7 @@ handle_numLines_after_pp_directive:
 						escapeTextIntoFile(
 							fp, escapedTok, mode, keyEscape,
 							evalEnviron, forceKeyEscape);
-						flushStart = self.tokStart;
+						flushStart = self.tokEnd;
 						tok = self.next();
 					}
 					goto again_handle_tok;
@@ -1006,6 +1010,7 @@ function expandPreprocessorConditionString(
 @@                   from ever being considered references to dependencies.
 function scanForNamesOfDependentFunctions(
 		text: string | UserString | Callable,
+		selfFunctionName: string | UserString,
 		prototype: FunctionPrototype | Callable,
 		forcedDependencies: {string...} = none,
 		unforcedDependencies: {string...} = none,
@@ -1031,8 +1036,29 @@ next_token:
 with_next_token:
 			if (!tok)
 				break;
-			if (!tok.issymbol())
-				continue; /* Dependent functions must always have keyword names */
+			if (!tok.issymbol()) {
+				/* Dependent functions must always have keyword names */
+				switch (tok) {
+
+				case "@":
+					/* Deal with escaped keywords */
+					do {
+						tok = parser.next();
+					} while (tok !in ["", "@"]);
+					break;
+
+				case "@@":
+					/* Deal with directives (which can't contain dependent function name) */
+					do {
+						tok = parser.next();
+					} while (tok !in ["", "@@"]);
+					break;
+
+				default:
+					break;
+				}
+				continue;
+			}
 			if (tok.startswith("$"))
 				continue; /* Functions cannot start with a '$', since that would interfere with escape rules */
 			if (tok in cLanguageKeywords)
@@ -1047,6 +1073,8 @@ with_next_token:
 				continue; /* Argument name -> Not a dependency */
 			if (tok in knownNonDependencies)
 				continue; /* Already a known non-dependency */
+			if (selfFunctionName == tok)
+				continue; /* No function can be its own dependency (that would cause an infinite loop!) */
 			/* Check if there is a function by this name. */
 			local func = allFunctionsByName.get(tok);
 			if (func is none)

@@ -38,6 +38,52 @@ final global HASH_FUNCTION = "CRC-32";
 @@The max # of tasks that may be run in parallel
 final global MAX_RUNNING_TASKS = (cpu_count from posix)() * 2;
 
+class CriticalSection {
+
+	@@The # of threads inside the critical section
+	public member counter: Cell with int = Cell(0);
+
+	@@Enter the critical section
+	public operator enter() {
+		local oldval;
+		do {
+			for (;;) {
+				oldval = counter.value;
+				if (oldval != -1)
+					break;
+				Thread.operator . ("yield")();
+			}
+		} while (counter.cmpxch(oldval, oldval + 1) !== oldval);
+	}
+
+	@@Leave the critical section
+	public operator leave() {
+		local oldval;
+		do {
+			oldval = counter.value;
+			assert oldval > 0;
+		} while (counter.cmpxch(oldval, oldval - 1) !== oldval);
+	}
+
+	@@Exit the application, but wait for all threads
+	@@to have exited @this critical section first, as
+	@@well as prevent any threads from ever entering
+	@@the section again
+	function exitApplication(status: int) {
+		local oldval;
+		do {
+			for (;;) {
+				oldval = counter.value;
+				if (oldval == 0)
+					break;
+				Thread.operator . ("yield")();
+			}
+		} while (counter.cmpxch(oldval, -1) !== oldval);
+		Error.AppExit.exit(status);
+	}
+}
+
+global final criticalSection = CriticalSection();
 global numTotalTasks: int = 0;
 global numCompletedTasks: Cell with int = Cell(0);
 global pendingTasks: {(Callable, Tuple)...} = [];
@@ -48,7 +94,7 @@ function incCompletedTasks(): int {
 	local oldval;
 	do {
 		oldval = numCompletedTasks.value;
-	} while (!numCompletedTasks.cmpxch(oldval, oldval + 1));
+	} while (numCompletedTasks.cmpxch(oldval, oldval + 1) !== oldval);
 	return oldval;
 }
 
@@ -69,7 +115,7 @@ function servicePendingTasks() {
 				}
 				/* Execute the task */
 				task[0](task[1]...);
-				if (incCompletedTasks() == numTotalTasks)
+				if (incCompletedTasks() + 1 >= numTotalTasks)
 					completeAllTasksSem.post();
 			}
 		}
@@ -77,7 +123,7 @@ function servicePendingTasks() {
 		pendingTasks = none;
 		print repr e;
 		print repr Traceback.current;
-		Error.AppExit.exit(1);
+		criticalSection.exitApplication(1);
 	}
 }
 
@@ -101,6 +147,20 @@ function waitTasks() {
 for (none: [:MAX_RUNNING_TASKS])
 	Thread(servicePendingTasks).start();
 
+function tryCreateDirectoryTree(path: string): bool {
+	path = path.replace("\\", "/").rstrip("/");
+again:
+	try {
+		fs.mkdir(path);
+	} catch (FileExists) {
+		return false;
+	} catch (FileNotFound) {
+		if (tryCreateDirectoryTree(fs.headof(path)))
+			goto again;
+		throw;
+	}
+	return true;
+}
 
 @@Update the contents of @filename, using a file-printer callback @cb
 function updateHashedFile(filename: string, cb: Callable with File) {
@@ -114,24 +174,31 @@ again:
 	try {
 		fp = File.open(filename, "rb+");
 	} catch (FileNotFound) {
+again_create_new:
 		try {
-			fp = File.open(filename, "wronly,creat,excl");
+			fp = File.open(filename, "wbx");
 		} catch (FileExists) {
 			goto again;
+		} catch (FileNotFound) {
+			if (tryCreateDirectoryTree(fs.headof(filename)))
+				goto again_create_new;
+			throw;
 		}
 		/* Create a previously non-existant file */
 		print "Creating:", repr filename;
-		try {
-			with (fp) {
-				fp << "/* HASH " << HASH_FUNCTION << ":" << newTextHash.hex() << " */\n";
-				fp.write(newText);
-			}
-		} catch (...) {
+		with (criticalSection) {
 			try {
-				fs.unlink(filename);
+				with (fp) {
+					fp << "/* HASH " << HASH_FUNCTION << ":" << newTextHash.hex() << " */\n";
+					fp.write(newText);
+				}
 			} catch (...) {
+				try {
+					fs.unlink(filename);
+				} catch (...) {
+				}
+				throw;
 			}
-			throw;
 		}
 		goto done;
 	}
@@ -145,6 +212,8 @@ again:
 	local oldTextHash: int, oldTextRealHash: int;
 	try {
 		local oldTextWhole: Bytes = fp.readall();
+		if (!oldTextWhole)
+			goto do_update_file; /* Empty file (always override) */
 		oldTextHashFunction, oldTextHash = oldTextWhole
 			.scanf(" /* HASH %[^:]:%[0-9xXa-fA-F] */")...;
 		oldText = oldTextWhole[oldTextWhole.index("\n") + 1:];
@@ -163,13 +232,16 @@ again:
 		if (oldText == newText)
 			goto done;
 	}
+do_update_file:
 	try {
 		print "Updating:", repr filename;
 		fp.rewind();
-		with (fp) {
-			fp << "/* HASH " << HASH_FUNCTION << ":" << newTextHash.hex() << " */\n";
-			fp.write(newText);
-			fp.trunc();
+		with (criticalSection) {
+			with (fp) {
+				fp << "/* HASH " << HASH_FUNCTION << ":" << newTextHash.hex() << " */\n";
+				fp.write(newText);
+				fp.trunc();
+			}
 		}
 	} catch (...) {
 		try {
@@ -307,6 +379,8 @@ REMOVEME_localPathRedirections.update({
 	"parts.uchar.utime"          : "parts.wchar.utime",
 });
 
+//#define QUICK_SKIP_SYSTEM_HAEDERS
+
 
 try {
 	local runningTasks = [];
@@ -330,6 +404,7 @@ try {
 	}
 	waitTasks();
 
+#ifndef QUICK_SKIP_SYSTEM_HAEDERS
 	/* Generate the actual system headers (i.e. <string.h>) */
 	for (local name /*: string*/, header /*: SystemHeader*/: allSystemHeaders) {
 		startTask(updateHashedFile,
@@ -343,34 +418,70 @@ try {
 		);
 	}
 	waitTasks();
+#else /* QUICK_SKIP_SYSTEM_HAEDERS */
+	print "Fast-Preload... (begin)";
+	for (local none, header /*: SystemHeader*/: allSystemHeaders)
+		startTask(header.preload);
+	waitTasks();
+	for (local none, header /*: SystemHeader*/: allSystemHeaders) {
+		for (local none, lfun: header.localFunctionsByName) {
+			if (lfun.impl is bound)
+				neededLocalFunction.insert(lfun);
+		}
+	}
+	print "Fast-Preload... (end)";
+#endif /* QUICK_SKIP_SYSTEM_HAEDERS */
 
+
+#if 0 /* TODO: Some local functions need <libc/...> headers, which we must
+       *       generate correctly before we can start generating these headers! */
 	/* Generate all of the needed <local/...> headers */
-	/* TODO */
-
-#if 0
-	local fp = CWriter(File.stdout);
-	allLocalFunctionsByName["mkstemp64"]
-		.cprintLocalFunctionHeader(
-			fp, ESCAPE_MODE_FULL, "__LIBC",
-			printCopyright: true);
-	fp.flush();
-	Error.AppExit.exit(0);
-#elif 0
-	local fp = CWriter(File.stdout);
-	allFunctionsByName["wcsnlen_s"]
-		.cprintHeaderDeclaration(fp, ESCAPE_MODE_PART);
-	fp.flush();
-	Error.AppExit.exit(0);
+	local printedLocalFunctions: HashSet with LocalFunction = HashSet();
+	for (;;) {
+		for (local lfun /*: LocalFunction*/: neededLocalFunction) {
+			if (lfun in printedLocalFunctions)
+				continue;
+			printedLocalFunctions.insert(lfun);
+			startTask(updateHashedFile,
+				("include/local/{}/{}.h".format({
+					lfun.originalSystemHeaderName,
+					lfun.name,
+				}),
+				[](fp: File) {
+					local cWriter = CWriter(fp);
+					lfun.cprintLocalFunctionHeader(
+						cWriter, ESCAPE_MODE_FULL,
+						/* XXX: This shouldn't be here!
+						 *      The declaration of a function should be a member of cheaders.Function,
+						 *      rather than be an exposure override configurable via ExposedFunction! */
+						dependencyDecl: "__LIBC",
+						printCopyright: true);
+					cWriter.flush();
+				}));
+		}
+		waitTasks();
+		/* Keep on printing until everything from @neededLocalFunction is apart of @printedLocalFunctions
+		 * Note that this check if fairly simple, because we already know that at any
+		 * point in time, @printedLocalFunctions is a sub-set of @neededLocalFunction!
+		 * Technically, this should be a "==" compare, but ">=" is used to emphasize
+		 * that @printedLocalFunctions grows faster than @neededLocalFunction, and that
+		 * @neededLocalFunction eventually stops growing alltogether */
+		if (#printedLocalFunctions >= #neededLocalFunction)
+			break;
+	}
 #endif
 
 
+
+
+	waitTasks(); /* Should be a no-op! */
 } catch (e...) {
 	print repr e;
 	print repr Traceback.current;
-	Error.AppExit.exit(1);
+	criticalSection.exitApplication(1);
 }
 print "DONE";
-Error.AppExit.exit(0);
+criticalSection.exitApplication(0);
 
 
 

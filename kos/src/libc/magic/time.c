@@ -1576,7 +1576,7 @@ __STRUCT_TM *localtime_r([[nonnull]] $time_t const *__restrict timer,
 }
 
 @@Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)'
-[decl_prefix(DEFINE_STRUCT_TM)]
+[[decl_prefix(DEFINE_STRUCT_TM)]]
 char *ctime_r([[nonnull]] $time_t const *__restrict timer,
               [[nonnull]] char buf[26]) {
 @@pp_ifdef __BUILDING_LIBC@@

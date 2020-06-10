@@ -646,6 +646,19 @@ done:
 	public function wasPrefixPrinted(prefix: string): bool {
 		if (m_IfdefDead)
 			goto done;
+		prefix = prefix.rstrip().lstrip("\n");
+		for (local ste: m_IfdefStack) {
+			if (prefix in ste.printedPrefixes) {
+done:
+				return true;
+			}
+		}
+		return prefix in m_GlobalPrintedPrefixes;
+	}
+
+	private function _wasPrefixPrinted(prefix: string): bool {
+		if (m_IfdefDead)
+			goto done;
 		for (local ste: m_IfdefStack) {
 			if (prefix in ste.printedPrefixes) {
 done:
@@ -671,17 +684,18 @@ done:
 	public function printPrefix(prefix: string): CWriter {
 		if (m_IfdefDead)
 			goto done;
-		if (!wasPrefixPrinted(prefix)) {
+		prefix = prefix.rstrip().lstrip("\n");
+		if (!_wasPrefixPrinted(prefix)) {
 			rememberPrefixAlreadyPrinted(prefix);
 			generator.addForceNl();
-			generator.addPrinter << prefix;
+			generator.addPrinter << prefix << "\n";
 		}
 done:
 		return this;
 	}
 
 	public function ppInclude(header: string): CWriter {
-		return printPrefix("#include {}\n".format({ header }));
+		return printPrefix("#include {}".format({ header }));
 	}
 
 	@@Remember the inclusion of a given @header

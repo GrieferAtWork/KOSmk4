@@ -214,17 +214,9 @@ double sinh(double x); /* TODO */
 [[std, ATTR_WUNUSED, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__tanh")]]
 double tanh(double x); /* TODO */
 
-
-[[std, ATTR_WUNUSED, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__coshf")]]
-float coshf(float x); /* TODO */
-
-[[std, ATTR_WUNUSED, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__sinhf")]]
-float sinhf(float x); /* TODO */
-
-[[std, ATTR_WUNUSED, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__tanhf")]]
-float tanhf(float x); /* TODO */
-
-
+[[std, crtbuiltin, export_alias("__coshf")]] coshf(*) %{generate(double2float("cosh"))}
+[[std, crtbuiltin, export_alias("__sinhf")]] sinhf(*) %{generate(double2float("sinh"))}
+[[std, crtbuiltin, export_alias("__tanhf")]] tanhf(*) %{generate(double2float("tanh"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[std, crtbuiltin, export_alias("__coshl")]] coshl(*) %{generate(double2ldouble("cosh"))}
 [[std, crtbuiltin, export_alias("__sinhl")]] sinhl(*) %{generate(double2ldouble("sinh"))}

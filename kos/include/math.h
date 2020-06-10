@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cae10d5 */
+/* HASH CRC-32:0x99364dc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,15 +101,15 @@ __NAMESPACE_STD_USING(sinh)
 #if defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 __NAMESPACE_STD_USING(tanh)
 #endif /* __CRT_HAVE_tanh || __CRT_HAVE___tanh */
-#if defined(__CRT_HAVE_coshf) || defined(__CRT_HAVE___coshf)
+#if defined(__CRT_HAVE_coshf) || defined(__CRT_HAVE___coshf) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
 __NAMESPACE_STD_USING(coshf)
-#endif /* __CRT_HAVE_coshf || __CRT_HAVE___coshf */
-#if defined(__CRT_HAVE_sinhf) || defined(__CRT_HAVE___sinhf)
+#endif /* __CRT_HAVE_coshf || __CRT_HAVE___coshf || __CRT_HAVE_cosh || __CRT_HAVE___cosh */
+#if defined(__CRT_HAVE_sinhf) || defined(__CRT_HAVE___sinhf) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 __NAMESPACE_STD_USING(sinhf)
-#endif /* __CRT_HAVE_sinhf || __CRT_HAVE___sinhf */
-#if defined(__CRT_HAVE_tanhf) || defined(__CRT_HAVE___tanhf)
+#endif /* __CRT_HAVE_sinhf || __CRT_HAVE___sinhf || __CRT_HAVE_sinh || __CRT_HAVE___sinh */
+#if defined(__CRT_HAVE_tanhf) || defined(__CRT_HAVE___tanhf) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 __NAMESPACE_STD_USING(tanhf)
-#endif /* __CRT_HAVE_tanhf || __CRT_HAVE___tanhf */
+#endif /* __CRT_HAVE_tanhf || __CRT_HAVE___tanhf || __CRT_HAVE_tanh || __CRT_HAVE___tanh */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if defined(__CRT_HAVE_coshl) || defined(__CRT_HAVE___coshl) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
 __NAMESPACE_STD_USING(coshl)
@@ -998,25 +998,52 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,tanh,(double __x),(__x))
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,tanh,(double __x),__tanh,(__x))
 #endif /* ... */
 #if __has_builtin(__builtin_coshf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_coshf)
+/* Hyperbolic cosine of X */
 __CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,coshf,(float __x),{ return __builtin_coshf(__x); })
 #elif defined(__CRT_HAVE_coshf)
+/* Hyperbolic cosine of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,coshf,(float __x),(__x))
 #elif defined(__CRT_HAVE___coshf)
+/* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,coshf,(float __x),__coshf,(__x))
+#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+__NAMESPACE_STD_END
+#include <local/math/coshf.h>
+__NAMESPACE_STD_BEGIN
+/* Hyperbolic cosine of X */
+__NAMESPACE_LOCAL_USING_OR_IMPL(coshf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL coshf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshf))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_sinhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinhf)
+/* Hyperbolic sine of X */
 __CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,sinhf,(float __x),{ return __builtin_sinhf(__x); })
 #elif defined(__CRT_HAVE_sinhf)
+/* Hyperbolic sine of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,sinhf,(float __x),(__x))
 #elif defined(__CRT_HAVE___sinhf)
+/* Hyperbolic sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sinhf,(float __x),__sinhf,(__x))
+#elif defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
+__NAMESPACE_STD_END
+#include <local/math/sinhf.h>
+__NAMESPACE_STD_BEGIN
+/* Hyperbolic sine of X */
+__NAMESPACE_LOCAL_USING_OR_IMPL(sinhf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL sinhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sinhf))(__x); })
 #endif /* ... */
 #if __has_builtin(__builtin_tanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhf)
+/* Hyperbolic tangent of X */
 __CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),{ return __builtin_tanhf(__x); })
 #elif defined(__CRT_HAVE_tanhf)
+/* Hyperbolic tangent of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),(__x))
 #elif defined(__CRT_HAVE___tanhf)
+/* Hyperbolic tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),__tanhf,(__x))
+#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+__NAMESPACE_STD_END
+#include <local/math/tanhf.h>
+__NAMESPACE_STD_BEGIN
+/* Hyperbolic tangent of X */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tanhf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tanhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); })
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_coshl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_coshl)
@@ -3828,25 +3855,58 @@ extern "C++" {
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tan)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_coshf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_coshf)
+/* Hyperbolic cosine of X */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cosh,(float __x),coshf,{ return __builtin_coshf(__x); })
 #elif defined(__CRT_HAVE_coshf)
+/* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cosh,(float __x),coshf,(__x))
 #elif defined(__CRT_HAVE___coshf)
+/* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cosh,(float __x),__coshf,(__x))
+#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+__NAMESPACE_STD_END
+} /* extern "C++" */
+#include <local/math/coshf.h>
+__NAMESPACE_STD_BEGIN
+extern "C++" {
+/* Hyperbolic cosine of X */
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL cosh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_sinhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinhf)
+/* Hyperbolic sine of X */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sinh,(float __x),sinhf,{ return __builtin_sinhf(__x); })
 #elif defined(__CRT_HAVE_sinhf)
+/* Hyperbolic sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sinh,(float __x),sinhf,(__x))
 #elif defined(__CRT_HAVE___sinhf)
+/* Hyperbolic sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sinh,(float __x),__sinhf,(__x))
+#elif defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
+__NAMESPACE_STD_END
+} /* extern "C++" */
+#include <local/math/sinhf.h>
+__NAMESPACE_STD_BEGIN
+extern "C++" {
+/* Hyperbolic sine of X */
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL sinh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sinhf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_tanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhf)
+/* Hyperbolic tangent of X */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),tanhf,{ return __builtin_tanhf(__x); })
 #elif defined(__CRT_HAVE_tanhf)
+/* Hyperbolic tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),tanhf,(__x))
 #elif defined(__CRT_HAVE___tanhf)
+/* Hyperbolic tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),__tanhf,(__x))
+#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+__NAMESPACE_STD_END
+} /* extern "C++" */
+#include <local/math/tanhf.h>
+__NAMESPACE_STD_BEGIN
+extern "C++" {
+/* Hyperbolic tangent of X */
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tanh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_expf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expf)
 /* Exponential function of X */
@@ -6217,15 +6277,15 @@ __NAMESPACE_STD_USING(sinh)
 #if defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 __NAMESPACE_STD_USING(tanh)
 #endif /* __CRT_HAVE_tanh || __CRT_HAVE___tanh */
-#if defined(__CRT_HAVE_coshf) || defined(__CRT_HAVE___coshf)
+#if defined(__CRT_HAVE_coshf) || defined(__CRT_HAVE___coshf) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
 __NAMESPACE_STD_USING(coshf)
-#endif /* __CRT_HAVE_coshf || __CRT_HAVE___coshf */
-#if defined(__CRT_HAVE_sinhf) || defined(__CRT_HAVE___sinhf)
+#endif /* __CRT_HAVE_coshf || __CRT_HAVE___coshf || __CRT_HAVE_cosh || __CRT_HAVE___cosh */
+#if defined(__CRT_HAVE_sinhf) || defined(__CRT_HAVE___sinhf) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 __NAMESPACE_STD_USING(sinhf)
-#endif /* __CRT_HAVE_sinhf || __CRT_HAVE___sinhf */
-#if defined(__CRT_HAVE_tanhf) || defined(__CRT_HAVE___tanhf)
+#endif /* __CRT_HAVE_sinhf || __CRT_HAVE___sinhf || __CRT_HAVE_sinh || __CRT_HAVE___sinh */
+#if defined(__CRT_HAVE_tanhf) || defined(__CRT_HAVE___tanhf) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 __NAMESPACE_STD_USING(tanhf)
-#endif /* __CRT_HAVE_tanhf || __CRT_HAVE___tanhf */
+#endif /* __CRT_HAVE_tanhf || __CRT_HAVE___tanhf || __CRT_HAVE_tanh || __CRT_HAVE___tanh */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
@@ -7827,25 +7887,46 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__tanf,(float __x),(__x))
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __tanf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_coshf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_coshf)
+/* Hyperbolic cosine of X */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__coshf,(float __x),coshf,{ return __builtin_coshf(__x); })
 #elif defined(__CRT_HAVE_coshf)
+/* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__coshf,(float __x),coshf,(__x))
 #elif defined(__CRT_HAVE___coshf)
+/* Hyperbolic cosine of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__coshf,(float __x),(__x))
+#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#include <local/math/coshf.h>
+/* Hyperbolic cosine of X */
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __coshf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_sinhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinhf)
+/* Hyperbolic sine of X */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__sinhf,(float __x),sinhf,{ return __builtin_sinhf(__x); })
 #elif defined(__CRT_HAVE_sinhf)
+/* Hyperbolic sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__sinhf,(float __x),sinhf,(__x))
 #elif defined(__CRT_HAVE___sinhf)
+/* Hyperbolic sine of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__sinhf,(float __x),(__x))
+#elif defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
+#include <local/math/sinhf.h>
+/* Hyperbolic sine of X */
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __sinhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sinhf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_tanhf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanhf)
+/* Hyperbolic tangent of X */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),tanhf,{ return __builtin_tanhf(__x); })
 #elif defined(__CRT_HAVE_tanhf)
+/* Hyperbolic tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),tanhf,(__x))
 #elif defined(__CRT_HAVE___tanhf)
+/* Hyperbolic tangent of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),(__x))
+#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+#include <local/math/tanhf.h>
+/* Hyperbolic tangent of X */
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __tanhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); }
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_acosl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosl)

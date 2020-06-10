@@ -35,7 +35,11 @@ import Function from .cheaders;
  *       - An [[alias(...)]] annotation that overlaps with [[crt_name()]] without [[no_crt_self_import]]
  *       - A [[wchar]] function that binds against assembly names already designated by other bindings
  *       - ...
+ * TODO: Assert that `FunctionPrototype.nothrow === DEFAULT_NOTHROW' whenever
+ *       re-assigning a different nothrow, thus ensuring that any function has
+ *       at most a single nothrow-related annotation!
  */
+
 
 /* How auto vs. user implementation is selected:
  * >> if (HAS_MAGIC_IMPLEMENTION_BODY) {
@@ -1245,7 +1249,7 @@ class FunctionFeatures {
 			local field = HashSet(this.operator . (myField));
 			this.operator . (myField) = field;
 			self.next();
-			self.skip("(");
+			tok = self.skip("(");
 			while (tok !in ["", ")"]) {
 				if (isCString(tok))
 					tok = tok.decode("c-escape");
@@ -1276,7 +1280,7 @@ class FunctionFeatures {
 			local field = HashSet(this.operator . (myField));
 			this.operator . (myField) = field;
 			self.next();
-			self.skip("(");
+			tok = self.skip("(");
 			while (tok !in ["", ")"]) {
 				if (isCString(tok))
 					tok = tok.decode("c-escape");
@@ -1953,46 +1957,39 @@ again_parse_default_annotation:
 		self.skip(")");
 	}
 
-	public function parseDirective_define_replacement() {
+	public function parseDirective_define_replacement(map: {string: string} = none) {
+		if (map is none)
+			map = keywordEscapes;
+		local self = this.self;
+		local mode = self.tok;
 		self.next();
 		self.skip("(");
 		local a = parseCStringOrKeyword(self);
 		self.skip("=");
-		local b = parseCStringOrKeyword(self);
-		local ok, oldRepl = keywordEscapes.setnew_ex(a, b)...;
-		if (!ok && oldRepl != b) {
-			self.err("Replacement re-definition: {!r} defined as {!r} (was: {!r})"
-				.format({ a, b, oldRepl }));
+		local b = parseCStringOrAllUntilRParenAsString(self);
+		local ok, oldRepl = map.setnew_ex(a, b)...;
+		if (!ok && ((oldRepl !is string && oldRepl !is UserString) || oldRepl != b)) {
+			if (oldRepl !is string && oldRepl !is UserString) {
+				self.err("Replacement re-definition: %[{}({!r} = {!r})] (previously defined as <Custom {}>)"
+					.format({ mode, a, b, type(oldRepl) }));
+			} else {
+				self.err("Replacement re-definition: %[{}({!r} = {!r})] (previously defined as {!r})"
+					.format({ mode, a, b, oldRepl }));
+			}
 		}
 		self.skip(")");
 	}
 
 	public function parseDirective_define_partial_replacement() {
-		self.next();
-		self.skip("(");
-		local a = parseCStringOrKeyword(self);
-		self.skip("=");
-		local b = parseCStringOrKeyword(self);
-		local ok, oldRepl = partialKeywordEscapes.setnew_ex(a, b)...;
-		if (!ok && oldRepl != b) {
-			self.err("Replacement re-definition: {!r} defined as {!r} (was: {!r})"
-				.format({ a, b, oldRepl }));
-		}
-		self.skip(")");
+		parseDirective_define_replacement(partialKeywordEscapes);
 	}
 
 	public function parseDirective_define_str2wcs_replacement() {
-		self.next();
-		self.skip("(");
-		local a = parseCStringOrKeyword(self);
-		self.skip("=");
-		local b = parseCStringOrKeyword(self);
-		local ok, oldRepl = str2wcsReplacementEscapes.setnew_ex(a, b)...;
-		if (!ok && oldRepl != b) {
-			self.err("str2wcs replacement re-definition: {!r} defined as {!r} (was: {!r})"
-				.format({ a, b, oldRepl }));
-		}
-		self.skip(")");
+		parseDirective_define_replacement(str2wcsReplacementEscapes);
+	}
+
+	public function parseDirective_define_str2wcs_header_replacement() {
+		parseDirective_define_replacement(str2wcsHeaderReplacementEscapes);
 	}
 
 	public function parseDirective_define_double_replacement() {
@@ -2043,22 +2040,7 @@ again_parse_default_annotation:
 	@@Note that macros defined using this directive are expanded at the same
 	@@time as special builtin macros such as @"$has_function"
 	public function parseDirective_define() {
-		self.next();
-		self.skip("(");
-		local a = parseCStringOrKeyword(self);
-		self.skip("=");
-		local b = parseCStringOrAllUntilRParen(self);
-		local ok, oldDecl = keywordMacros.setnew_ex(a, b)...;
-		if (!ok) {
-			if (oldDecl !is string && oldDecl !is UserString) {
-				self.err("macro re-definition: {!r} defined as {!r} (was: <Custom Function>)"
-					.format({ a, b }));
-			} else if (oldDecl != b) {
-				self.err("macro re-definition: {!r} defined as {!r} (was: {!r})"
-					.format({ a, b, oldDecl }));
-			}
-		}
-		self.skip(")");
+		parseDirective_define_replacement(keywordMacros);
 	}
 
 
@@ -2405,6 +2387,9 @@ again_parse_annotations:
 					} else {
 						currentPrototype.nothrow = "THROWS(...)";
 					}
+					if (currentPrototype.declPrefix !is List)
+						currentPrototype.declPrefix = List(currentPrototype.declPrefix);
+					currentPrototype.declPrefix.append(INCLUDE_KOS_ANNO);
 					break;
 
 				case "nothrow":
@@ -3338,7 +3323,7 @@ got_chkExpr:
 								}),
 							name:         currentName,
 							implPrefix:   { "#include <ssp/chk.h>" },
-							dependencies: { [] -> findFunctionByName(chkBaseFunctionName) }),
+							dependencies: { chkBaseFunctionName : chkBaseFunctionName }),
 						ppCond: "$has_function({})".format({ chkBaseFunctionName }));
 				}	break;
 
@@ -4076,7 +4061,7 @@ wc_bind_continue_scan_bindings:
 						name:         currentName,
 						implPrefix:   currentFeatures.implPrefix,
 						dependencies: scanForNamesOfDependentFunctions(
-							body, currentPrototype,
+							body, currentName, currentPrototype,
 							forcedDependencies:       currentFeatures.forcedDependencies,
 							unforcedDependencies:     currentFeatures.unforcedDependencies,
 							noAutoDependencyScanning: currentFeatures.noAutoDependencyScanning)

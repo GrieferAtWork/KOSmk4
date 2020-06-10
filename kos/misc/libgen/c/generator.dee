@@ -186,7 +186,8 @@ class Generator {
 	}
 
 	public function replaceFunctionImplementation(
-			self: FunctionImplementation, newFunctionName: string,
+			self: FunctionImplementation,
+			newFunctionName: string,
 			prototype: FunctionPrototype | Callable,
 			forcedDependencies: {string...} = none,
 			unforcedDependencies: {string...} = none,
@@ -197,7 +198,7 @@ class Generator {
 			implPrefix:   replaceTextArray(self.implPrefix));
 		/* Scan for dependencies */
 		result.dependencies = scanForNamesOfDependentFunctions(
-			result.body, prototype,
+			result.body, newFunctionName, prototype,
 			forcedDependencies:       forcedDependencies,
 			unforcedDependencies:     unforcedDependencies,
 			noAutoDependencyScanning: noAutoDependencyScanning);
@@ -212,6 +213,9 @@ global str2wcsReplacementEscapes: {string: string} = Dict({
 	"char"            : "wchar_t",
 	"__SIZEOF_CHAR__" : "__SIZEOF_WCHAR_T__",
 });
+
+@@Replacement-headers in str2wcs functions
+global str2wcsHeaderReplacementEscapes: {string: string} = Dict();
 
 @@str2wcs will convert all keywords starting with @"str" with @"wcs"
 @@This is a list of keywords that aren't replaced like that.
@@ -275,16 +279,68 @@ function str2wcs_replaceText(
 	local flushStart = self.tokEnd;
 	for (;;) {
 		local tok = self.next();
-		if (!tok)
-			break;
-		if (!tok.issymbol()) {
-			if (tok == "@") {
-				do {
-					tok = self.next();
-				} while (tok !in ["", "@"]);
+		switch (tok) {
+
+		case "":
+			goto done;
+
+		case "#":
+			/* Check for header replacements */
+			tok = self.next();
+			if (tok in ["include", "include_next"]) {
+				local headerStart = self.tokEnd;
+				local headerEnd = self.text.find("\n", headerStart, self.end);
+				if (headerEnd < 0)
+					headerEnd = self.end;
+				while (headerStart < headerEnd && self.text.isspace(headerStart))
+					++headerStart;
+				while (headerEnd > headerStart && self.text.isspace(headerEnd - 1))
+					--headerEnd;
+				self.tokEnd = headerEnd;
+				local newHeaderName = str2wcsHeaderReplacementEscapes.get(
+					self.text[headerStart:headerEnd].strip());
+				if (newHeaderName is none)
+					continue;
+				if (flushStart < headerStart)
+					fp << self.text[flushStart:headerStart];
+				fp << newHeaderName;
+				flushStart = headerEnd;
 			}
 			continue;
+
+		case "__has_include":
+		case "__has_include_next":
+			tok = self.next();
+			if (tok == "(") {
+				self.next();
+				local headerStart = self.tokStart;
+				self.skipPair("(", ")");
+				local headerEnd = self.tokStart;
+				while (headerEnd > headerStart && self.text.isspace(headerEnd - 1))
+					--headerEnd;
+				local newHeaderName =
+					str2wcsHeaderReplacementEscapes.get(
+						self.text[headerStart:headerEnd]);
+				if (newHeaderName is none)
+					continue;
+				if (flushStart < headerStart)
+					fp << self.text[flushStart:headerStart];
+				fp << newHeaderName;
+				flushStart = headerEnd;
+			}
+			continue;
+
+		case "@":
+			do {
+				tok = self.next();
+			} while (tok !in ["", "@"]);
+			continue;
+
+		default:
+			break;
 		}
+		if (!tok.issymbol())
+			continue;
 		if (tok in ["signed", "unsigned"]) {
 			/* Special case: Must not replace "char" after "signed" or "unsigned"
 			 * -> Handle this by simply treaking these keywords as escape prefixes
@@ -301,6 +357,7 @@ function str2wcs_replaceText(
 		fp << repl;
 		flushStart = self.tokEnd;
 	}
+done:
 	if (flushStart < self.end) {
 		if (flushStart == 0)
 			return text;
@@ -587,7 +644,7 @@ function math_generateLoaderFunctionImplementation(
 		/* Scan for dependencies within @convertedBody */
 		local resultDependencies: {string: Function};
 		resultDependencies = Dict(scanForNamesOfDependentFunctions(
-			convertedBody, prototype,
+			convertedBody, newFunctionName, prototype,
 			forcedDependencies:       forcedDependencies,
 			unforcedDependencies:     unforcedDependencies,
 			noAutoDependencyScanning: noAutoDependencyScanning)());

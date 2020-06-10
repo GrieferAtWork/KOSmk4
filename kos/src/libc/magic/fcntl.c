@@ -258,7 +258,7 @@ $fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 $fd_t creat([[nonnull]] char const *filename, $mode_t mode) {
 @@pp_if $has_function(creat64)@@
 	return creat64(filename, mode);
-@@pp_else@
+@@pp_else@@
 	return open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode);
 @@pp_endif@@
 }

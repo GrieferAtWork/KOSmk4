@@ -791,7 +791,7 @@ public:
 @@needed or fall back on the copy which must exist somewhere else
 void __pthread_cleanup_routine([[nonnull]] struct __pthread_cleanup_frame *frame) {
 	if (frame->__do_it)
-		(*frame->__cancel_routine@(frame->__cancel_arg);
+		(*frame->__cancel_routine(frame->__cancel_arg);
 }
 
 %{

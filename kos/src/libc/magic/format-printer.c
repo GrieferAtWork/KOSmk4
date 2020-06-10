@@ -34,6 +34,7 @@
 %[define_str2wcs_replacement(format_sprintf_printer = format_wsprintf_printer)]
 %[define_str2wcs_replacement(format_snprintf_data = format_wsnprintf_data)]
 %[define_str2wcs_replacement(format_snprintf_printer = format_wsnprintf_printer)]
+%[define_str2wcs_header_replacement("<bits/format-printer.h>" = "<bits/wformat-printer.h>")]
 
 %(auto_source){
 #include <hybrid/__assert.h>

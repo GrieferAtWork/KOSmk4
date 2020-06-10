@@ -277,7 +277,7 @@ int ntp_gettime([[nonnull]] struct ntptimeval *__restrict ntv) {
 		ntv->__glibc_reserved4 = ntv64.__glibc_reserved4;
 	}
 	return result;
-#endif /* !__CRT_HAVE_ntp_gettimex */
+@@pp_endif@@
 }
 
 [[no_crt_self_import]]

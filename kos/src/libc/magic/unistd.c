@@ -1285,7 +1285,7 @@ int truncate64([[nonnull]] char const *file, __PIO_OFFSET64 length) {
 	if __unlikely(fd < 0)
 		return -1;
 	result = ftruncate64(fd, length);
-@@pp_ $has_function(close)@@
+@@pp_if $has_function(close)@@
 	close(fd);
 @@pp_endif@@
 	return result;

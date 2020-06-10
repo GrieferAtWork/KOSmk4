@@ -951,8 +951,6 @@ class FunctionImplementation {
 				local usedDeps = dependencies;
 				if (usedDeps is Callable)
 					usedDeps = usedDeps();
-				if (usedDeps && #usedDeps.first != 2)
-					print "HERE:", type usedDeps.first, repr usedDeps.first;
 				for (local name, elem: usedDeps) {
 					if (elem is Callable)
 						elem = elem();
@@ -965,6 +963,10 @@ class FunctionImplementation {
 		}
 	}
 	private member m_dependencyFunctions: {string: Function};
+
+	public function preload() {
+		dependencyFunctions;
+	}
 
 	@@Truncate @body for use in a truncated inline function binding
 	public function truncateBodyForInline(): FunctionImplementation {
@@ -1074,6 +1076,9 @@ class LoaderFunctionImplementation {
 	public member impl: FunctionImplementation;
 	public member ppCond: string | UserString = "1";
 	public member ppCondPrefix: {(string | UserString)...} = ();
+	public function preload() {
+		impl.preload();
+	}
 }
 
 
@@ -1138,37 +1143,51 @@ class LocalFunction {
 		}
 	}
 
+	public function preload() {
+		if (prototype is bound)
+			functionPrototype;
+		if (impl is bound)
+			functionImpl.preload();
+		documentationString;
+	}
+
 	@@@param: dependencyDecl: Declaration prefix for dependencies (usually @"__LIBC")
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintLocalFunctionHeader(
 			fp: CWriter, escapeMode: int, dependencyDecl: string,
 			keyDependency: Callable with string = none, printCopyright: bool = true) {
-		if (keyDependency is none)
-			keyDependency = keyLocalDep;
-		if (printCopyright)
-			fp << COPYRIGHT << "\n";
-		local usedPrototype = functionPrototype;
-		local localGuardName = LOCAL_NAMESPACE.keyDefaultGuard(name);
-		fp.ppIfndef(localGuardName);
-		fp.ppDefine(localGuardName, "1");
-		fp.ppInclude("<__crt.h>");
-		/* Include the preprocessor-condition prefix texts. */
-		for (local x: ppCondPrefix)
-			escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
-		fp.ppIf(expandPreprocessorConditionString(ppCond));
-		/* Print out the declaration prefix. */
-		for (local x: usedPrototype.declPrefix)
-			escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
-		fp.forceStartOfLine();
-		/* Print the binding */
-		functionImpl.cprintLocalFunctionImplementation(
-			fp, escapeMode, name, usedPrototype,
-			dependencyDecl, documentationString,
-			LOCAL_NAMESPACE, keyDependency);
-		fp.ppElse();
-		fp.ppUndef(localGuardName);
-		fp.ppEndif();
-		fp.ppEndif();
+		try {
+			if (keyDependency is none)
+				keyDependency = keyLocalDep;
+			if (printCopyright)
+				fp << COPYRIGHT << "\n";
+			local usedPrototype = functionPrototype;
+			local localGuardName = LOCAL_NAMESPACE.keyDefaultGuard(name);
+			fp.ppIfndef(localGuardName);
+			fp.ppDefine(localGuardName, "1");
+			fp.ppInclude("<__crt.h>");
+			/* Include the preprocessor-condition prefix texts. */
+			for (local x: ppCondPrefix)
+				escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
+			fp.ppIf(expandPreprocessorConditionString(ppCond));
+			/* Print out the declaration prefix. */
+			for (local x: usedPrototype.declPrefix)
+				escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
+			fp.forceStartOfLine();
+			/* Print the binding */
+			functionImpl.cprintLocalFunctionImplementation(
+				fp, escapeMode, name, usedPrototype,
+				dependencyDecl, documentationString,
+				LOCAL_NAMESPACE, keyDependency);
+			fp.ppElse();
+			fp.ppUndef(localGuardName);
+			fp.ppEndif();
+			fp.ppEndif();
+		} catch (...) {
+			print("... while printing local-header <local/",
+				originalSystemHeaderName, "/", name, ".h>");
+			throw;
+		}
 	}
 
 	@@Print a binding for this function
@@ -1285,6 +1304,10 @@ class InlineFunction {
 				result = impl = result();
 			return result;
 		}
+	}
+
+	public function preload() {
+		functionImpl.preload();
 	}
 
 	@@Bind the inline function's body.
@@ -1452,6 +1475,10 @@ class NamespaceBinding {
 		}
 	}
 
+	public function preload() {
+		functionPrototypes;
+	}
+
 	@@Print a binding for this namespace import
 	@@@param: preferBindingMacros: Prefer function bindings to be done with macros, rather than
 	@@                             through use of inline functions.
@@ -1593,6 +1620,13 @@ class FunctionBinding {
 				result = binding = result();
 			return result;
 		}
+	}
+
+	public function preload() {
+		functionPrototypes;
+		local bind = functionBinding;
+		if (hasattr(bind, "preload"))
+			bind.preload();
 	}
 
 	@@Simple helper to peek if the ppCond part of @this binding is known already
@@ -1871,12 +1905,24 @@ class Function {
 					}
 				}
 				m_functionBindings = newBindings;
+				bindings           = newBindings;
 				return newBindings;
 			}
 			return m_functionBindings;
 		}
 	}
 	private member m_functionBindings: {FunctionBinding...};
+
+	public function preload() {
+		try {
+			documentationString;
+			for (local b: functionBindings)
+				b.preload();
+		} catch (...) {
+			print "... while preloading Function", repr(name);
+			throw;
+		}
+	}
 
 	@@Print requires-conditions for this function (has used by @"$has_function(...)")
 	public function cprintRequires(fp: CWriter | File) {
@@ -2102,6 +2148,18 @@ class ExposedFunction {
 	@@An override for the active `extern "<externLinkage>"` during function declaration
 	public member externLinkageOverride: string | none = none;
 
+	public function preload() {
+		try {
+			if (func is Callable)
+				func = func();
+			func.preload();
+		} catch (...) {
+			print "... while preloading ExposedFunction",
+				repr(func.name), "as", repr(exposedName);
+			throw;
+		}
+	}
+
 	@@Print this function's normal declaration, as might be found in `<string.h>`
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintHeaderDeclaration(fp: CWriter, escapeMode: int) {
@@ -2153,6 +2211,11 @@ class LibraryFunctionBinding {
 			return result;
 		}
 	}
+
+	public function preload() {
+		functionBinding.preload();
+	}
+
 }
 
 class LibraryFunction {
@@ -2223,12 +2286,20 @@ class LibraryFunction {
 					}
 				}
 				m_functionBindings = newBindings;
+				bindings           = newBindings;
 				return newBindings;
 			}
 			return m_functionBindings;
 		}
 	}
 	private member m_functionBindings: {LibraryFunctionBinding...};
+
+	public function preload() {
+		documentationString;
+		functionPrototype;
+		for (local b: functionBindings)
+			b.preload();
+	}
 
 	@@Print the in-library declaration of this function
 	public function cprintInLibraryDeclaration(
@@ -2365,6 +2436,16 @@ class SystemHeader {
 	@@Same as @functionsByName, but for local functions
 	@@Duplicate entires aren't allowed
 	public member localFunctionsByName: {string: LocalFunction} = Dict();
+
+	public function preload() {
+		for (local none, f: functionsByName) {
+			if (f === DuplicateFunctionMarker)
+				continue;
+			f.preload();
+		}
+		for (local none, f: localFunctionsByName)
+			f.preload();
+	}
 
 	@@Output order of <string.h> (when empty, don't generate that header)
 	@@This is one of:
