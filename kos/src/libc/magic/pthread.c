@@ -47,6 +47,7 @@
 #include <bits/pthreadinit.h>
 #include <bits/setjmp.h>
 #include <bits/wordsize.h>
+#include <kos/anno.h>
 
 __SYSDECL_BEGIN
 
@@ -455,9 +456,9 @@ int pthread_detach(pthread_t pthread);
 pthread_t pthread_self();
 
 @@Compare two thread identifiers
-[[inline, ATTR_CONST]]
-int pthread_equal(pthread_t pthread1, pthread_t pthread2) {
-	return pthread1 == pthread2;
+[[inline, ATTR_CONST, export_alias("thrd_equal")]]
+int pthread_equal(pthread_t thr1, pthread_t thr2) {
+	return thr1 == thr2;
 }
 
 %

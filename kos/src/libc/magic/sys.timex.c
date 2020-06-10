@@ -245,7 +245,7 @@ int adjtimex([[nonnull]] struct timex *__restrict ntx) {
 [[crt_name("ntp_gettimex"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("ntp_gettimex64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("ntp_gettimex")]]
-[[userimpl, requires($has_fucntion(ntp_gettime32) || $has_fucntion(ntp_gettime64))]]
+[[userimpl, requires($has_function(ntp_gettime32) || $has_function(ntp_gettime64))]]
 int ntp_gettime([[nonnull]] struct ntptimeval *__restrict ntv) {
 @@pp_if $has_function(ntp_gettime32)@@
 	struct $ntptimeval32 ntv32;

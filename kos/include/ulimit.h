@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb9f0b54 */
+/* HASH CRC-32:0xa4bc0610 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,18 +55,16 @@ __SYSDECL_BEGIN
 
 /* Constants used as the first parameter for `ulimit'.
  * They denote limits which can be set or retrieved using this function. */
-#undef UL_GETFSIZE
-#undef UL_SETFSIZE
-#undef __UL_GETMAXBRK
-#undef __UL_GETOPENMAX
+/*[[[enum]]]*/
 #ifdef __CC__
 enum {
 	UL_GETFSIZE     = 1, /* Return limit on the size of a file, in units of 512 bytes. */
 	UL_SETFSIZE     = 2, /* Set limit on the size of a file to second argument. */
 	__UL_GETMAXBRK  = 3, /* Return the maximum possible address of the data segment. */
-	__UL_GETOPENMAX = 4 /* Return the maximum number of files that the calling process can open. */
+	__UL_GETOPENMAX = 4  /* Return the maximum number of files that the calling process can open. */
 };
 #endif /* __CC__ */
+/*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define UL_GETFSIZE     UL_GETFSIZE     /* Return limit on the size of a file, in units of 512 bytes. */
 #define UL_SETFSIZE     UL_SETFSIZE     /* Set limit on the size of a file to second argument. */
@@ -78,12 +76,13 @@ enum {
 #define __UL_GETMAXBRK  3 /* Return the maximum possible address of the data segment. */
 #define __UL_GETOPENMAX 4 /* Return the maximum number of files that the calling process can open. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 
 #ifdef __CC__
 #ifdef __CRT_HAVE_ulimit
 /* Control process limits according to CMD */
 __LIBC long int __NOTHROW_NCX(__VLIBCCALL ulimit)(int __cmd, ...) __CASMNAME_SAME("ulimit");
-#endif /* ulimit... */
+#endif /* __CRT_HAVE_ulimit */
 #endif /* __CC__ */
 
 __SYSDECL_END

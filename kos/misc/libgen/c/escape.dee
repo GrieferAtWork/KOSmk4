@@ -311,7 +311,7 @@ global partialKeywordEscapes: {string: string} = Dict({
 	"IMPDAT" : "__IMPDAT",
 	"IMPDEF" : "__IMPDEF",
 	"EXPDEF" : "__EXPDEF",
-	"FUNDEF" : "__FUNDEF",
+	"FUNDEF" : "__PUBDEF",
 	"DATDEF" : "__DATDEF",
 	"PUBLIC" : "__PUBLIC",
 	"INTERN" : "__INTERN",

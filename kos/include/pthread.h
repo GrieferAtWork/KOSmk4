@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcee05a6 */
+/* HASH CRC-32:0xc079fb09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,7 @@
 #include <bits/pthreadinit.h>
 #include <bits/setjmp.h>
 #include <bits/wordsize.h>
+#include <kos/anno.h>
 
 __SYSDECL_BEGIN
 
@@ -419,11 +420,14 @@ __CREDIRECT(__ATTR_CONST,pthread_t,__NOTHROW_NCX,pthread_self,(void),thrd_curren
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_equal
 /* Compare two thread identifiers */
-__CEIDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,pthread_equal,(pthread_t __pthread1, pthread_t __pthread2),{ return __pthread1 == __pthread2; })
-#else /* __CRT_HAVE_pthread_equal */
+__CEIDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,pthread_equal,(pthread_t __thr1, pthread_t __thr2),{ return __thr1 == __thr2; })
+#elif defined(__CRT_HAVE_thrd_equal)
 /* Compare two thread identifiers */
-__LOCAL __ATTR_CONST int __NOTHROW_NCX(__LIBCCALL pthread_equal)(pthread_t __pthread1, pthread_t __pthread2) { return __pthread1 == __pthread2; }
-#endif /* !__CRT_HAVE_pthread_equal */
+__CEIREDIRECT(__ATTR_CONST,int,__NOTHROW_NCX,pthread_equal,(pthread_t __thr1, pthread_t __thr2),thrd_equal,{ return __thr1 == __thr2; })
+#else /* ... */
+/* Compare two thread identifiers */
+__LOCAL __ATTR_CONST int __NOTHROW_NCX(__LIBCCALL pthread_equal)(pthread_t __thr1, pthread_t __thr2) { return __thr1 == __thr2; }
+#endif /* !... */
 
 /* Thread attribute handling. */
 

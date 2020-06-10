@@ -765,7 +765,11 @@ int at_quick_exit([[nonnull]] __atexit_func_t func);
 %(std, c, ccompat)#endif /* __USE_ISOC11 || __USE_ISOCXX11 */
 
 %(std, c, ccompat)#ifdef __USE_ISOC99
-[[std, crtbuiltin, alias("_exit", "quick_exit", "exit")]]
+[[std, crtbuiltin]]
+[[if(__has_builtin(__builtin__exit) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(_exit, { __builtin__exit(status); })]]
+[[export_alias("_exit")]]
+[[alias("quick_exit", "exit")]]
 [[ATTR_NORETURN, throws, section(".text.crt.application.exit")]]
 void _Exit(int status);
 %(std, c, ccompat)#endif /* __USE_ISOC99 */

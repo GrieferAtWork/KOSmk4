@@ -18,8 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_replacement(fd_t = __fd_t)]
-%[define_replacement(pid_t = __pid_t)]
+%[define_replacement(fd_t     = __fd_t)]
+%[define_replacement(pid_t    = __pid_t)]
+%[define_replacement(cc_t     = __UINT8_TYPE__)]
+%[define_replacement(speed_t  = __UINT32_TYPE__)]
+%[define_replacement(tcflag_t = __UINT32_TYPE__)]
+
 %[default_impl_section(".text.crt.io.tty")]
 
 %{

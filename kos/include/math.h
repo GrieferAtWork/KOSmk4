@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e76e14d */
+/* HASH CRC-32:0x2cae10d5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6856,19 +6856,19 @@ __CREDIRECT_VOID(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),__NOTHROW,sincosf,(f
 __NAMESPACE_LOCAL_USING_OR_IMPL(sincosf, __FORCELOCAL __DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCALL sincosf)(float __x, float *__psinx, float *__pcosx) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sincosf))(__x, __psinx, __pcosx); })
 #endif /* ... */
 #if __has_builtin(__builtin_exp10f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10f)
-/* Multiply-add function computed as a ternary operation */
-__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,exp10f,(float __x, float __y, float __z),{ return __builtin_exp10f(__x, __y, __z); })
+/* A function missing in all standards: compute exponent to base ten */
+__CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,exp10f,(float __x),{ return __builtin_exp10f(__x); })
 #elif defined(__CRT_HAVE_exp10f)
-/* Multiply-add function computed as a ternary operation */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,exp10f,(float __x, float __y, float __z),(__x,__y,__z))
+/* A function missing in all standards: compute exponent to base ten */
+__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,exp10f,(float __x),(__x))
 #elif defined(__CRT_HAVE___exp10f)
-/* Multiply-add function computed as a ternary operation */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,exp10f,(float __x, float __y, float __z),__exp10f,(__x,__y,__z))
-#else /* ... */
+/* A function missing in all standards: compute exponent to base ten */
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,exp10f,(float __x),__exp10f,(__x))
+#elif defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
 #include <local/math/exp10f.h>
-/* Multiply-add function computed as a ternary operation */
-__NAMESPACE_LOCAL_USING_OR_IMPL(exp10f, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL exp10f)(float __x, float __y, float __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10f))(__x, __y, __z); })
-#endif /* !... */
+/* A function missing in all standards: compute exponent to base ten */
+__NAMESPACE_LOCAL_USING_OR_IMPL(exp10f, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL exp10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10f))(__x); })
+#endif /* ... */
 #if __has_builtin(__builtin_pow10f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10f)
 /* Another name occasionally used */
 __CEIDECLARE(__ATTR_WUNUSED,float,__NOTHROW,pow10f,(float __x),{ return __builtin_pow10f(__x); })
@@ -6905,19 +6905,19 @@ __CREDIRECT_VOID(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),__NOTHROW,sincosl,(_
 __NAMESPACE_LOCAL_USING_OR_IMPL(sincosl, __FORCELOCAL __DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCALL sincosl)(__LONGDOUBLE __x, __LONGDOUBLE *__psinx, __LONGDOUBLE *__pcosx) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sincosl))(__x, __psinx, __pcosx); })
 #endif /* ... */
 #if __has_builtin(__builtin_exp10l) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10l)
-/* Multiply-add function computed as a ternary operation */
-__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp10l,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),{ return __builtin_exp10l(__x, __y, __z); })
+/* A function missing in all standards: compute exponent to base ten */
+__CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp10l,(__LONGDOUBLE __x),{ return __builtin_exp10l(__x); })
 #elif defined(__CRT_HAVE_exp10l)
-/* Multiply-add function computed as a ternary operation */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp10l,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),(__x,__y,__z))
+/* A function missing in all standards: compute exponent to base ten */
+__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp10l,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___exp10l)
-/* Multiply-add function computed as a ternary operation */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp10l,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),__exp10l,(__x,__y,__z))
-#else /* ... */
+/* A function missing in all standards: compute exponent to base ten */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp10l,(__LONGDOUBLE __x),__exp10l,(__x))
+#elif defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
 #include <local/math/exp10l.h>
-/* Multiply-add function computed as a ternary operation */
-__NAMESPACE_LOCAL_USING_OR_IMPL(exp10l, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL exp10l)(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10l))(__x, __y, __z); })
-#endif /* !... */
+/* A function missing in all standards: compute exponent to base ten */
+__NAMESPACE_LOCAL_USING_OR_IMPL(exp10l, __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL exp10l)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10l))(__x); })
+#endif /* ... */
 #if __has_builtin(__builtin_pow10l) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10l)
 /* Another name occasionally used */
 __CEIDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,pow10l,(__LONGDOUBLE __x),{ return __builtin_pow10l(__x); })
@@ -8470,19 +8470,19 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__pow10,(double __x),(__x))
 __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __pow10)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_exp10f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10f)
-/* Multiply-add function computed as a ternary operation */
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__exp10f,(float __x, float __y, float __z),exp10f,{ return __builtin_exp10f(__x, __y, __z); })
+/* A function missing in all standards: compute exponent to base ten */
+__CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__exp10f,(float __x),exp10f,{ return __builtin_exp10f(__x); })
 #elif defined(__CRT_HAVE_exp10f)
-/* Multiply-add function computed as a ternary operation */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__exp10f,(float __x, float __y, float __z),exp10f,(__x,__y,__z))
+/* A function missing in all standards: compute exponent to base ten */
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__exp10f,(float __x),exp10f,(__x))
 #elif defined(__CRT_HAVE___exp10f)
-/* Multiply-add function computed as a ternary operation */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__exp10f,(float __x, float __y, float __z),(__x,__y,__z))
-#else /* ... */
+/* A function missing in all standards: compute exponent to base ten */
+__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__exp10f,(float __x),(__x))
+#elif defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
 #include <local/math/exp10f.h>
-/* Multiply-add function computed as a ternary operation */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __exp10f)(float __x, float __y, float __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10f))(__x, __y, __z); }
-#endif /* !... */
+/* A function missing in all standards: compute exponent to base ten */
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __exp10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10f))(__x); }
+#endif /* ... */
 #if __has_builtin(__builtin_pow10f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10f)
 /* Another name occasionally used */
 __CEIREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__pow10f,(float __x),pow10f,{ return __builtin_pow10f(__x); })
@@ -8499,19 +8499,19 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __pow10f)(float __x) { re
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_exp10l) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10l)
-/* Multiply-add function computed as a ternary operation */
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__exp10l,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),exp10l,{ return __builtin_exp10l(__x, __y, __z); })
+/* A function missing in all standards: compute exponent to base ten */
+__CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__exp10l,(__LONGDOUBLE __x),exp10l,{ return __builtin_exp10l(__x); })
 #elif defined(__CRT_HAVE_exp10l)
-/* Multiply-add function computed as a ternary operation */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__exp10l,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),exp10l,(__x,__y,__z))
+/* A function missing in all standards: compute exponent to base ten */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__exp10l,(__LONGDOUBLE __x),exp10l,(__x))
 #elif defined(__CRT_HAVE___exp10l)
-/* Multiply-add function computed as a ternary operation */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__exp10l,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),(__x,__y,__z))
-#else /* ... */
+/* A function missing in all standards: compute exponent to base ten */
+__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__exp10l,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
 #include <local/math/exp10l.h>
-/* Multiply-add function computed as a ternary operation */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __exp10l)(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10l))(__x, __y, __z); }
-#endif /* !... */
+/* A function missing in all standards: compute exponent to base ten */
+__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __exp10l)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10l))(__x); }
+#endif /* ... */
 #if __has_builtin(__builtin_pow10l) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10l)
 /* Another name occasionally used */
 __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__pow10l,(__LONGDOUBLE __x),pow10l,{ return __builtin_pow10l(__x); })

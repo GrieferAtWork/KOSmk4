@@ -3197,7 +3197,8 @@ again_skip_annotation_rbracket:
 		/* Right now, `tok == "("', pointing at the '('-character
 		 * before the argument list. So parse that argument list */
 		parseArgumentListAndOptionalTrailingReturnType(
-			self, currentPrototype, defaultAttributes);
+			self, currentPrototype, defaultAttributes,
+			functionArgumentNamesOverride);
 		tok = self.tok;
 		/* Default to having a void returnType */
 		if (currentPrototype.returnType !is bound)
@@ -3217,7 +3218,9 @@ again_skip_annotation_rbracket:
 				local cxxProto = FunctionPrototype(
 					cc:      currentPrototype.cc,
 					nothrow: currentPrototype.nothrow);
-				parseWholeFunctionPrototype(self, cxxProto, defaultAttributes);
+				parseWholeFunctionPrototype(
+					self, cxxProto, defaultAttributes,
+					functionArgumentNamesOverride);
 				cxxPrototypes.append(cxxProto);
 				while (numBrackets--)
 					tok = self.skip("]");

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76ff20a5 */
+/* HASH CRC-32:0x4991b54e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,18 +57,18 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_getcontext
 /* Get user context and store it in variable pointed to by UCP */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getcontext,(ucontext_t *__restrict __ucp),(__ucp))
-#endif /* getcontext... */
+#endif /* __CRT_HAVE_getcontext */
 
 #ifdef __CRT_HAVE_setcontext
 /* Set user context from information of variable pointed to by UCP */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setcontext,(ucontext_t const *__restrict __ucp),(__ucp))
-#endif /* setcontext... */
+#endif /* __CRT_HAVE_setcontext */
 
 #ifdef __CRT_HAVE_swapcontext
 /* Save current context in context variable pointed to by OUCP and set
  * context from variable pointed to by UCP */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,swapcontext,(ucontext_t *__restrict __oucp, ucontext_t const *__restrict __ucp),(__oucp,__ucp))
-#endif /* swapcontext... */
+#endif /* __CRT_HAVE_swapcontext */
 
 typedef void (*__makecontext_func_t)(void);
 
@@ -79,7 +79,7 @@ typedef void (*__makecontext_func_t)(void);
  * We cannot say anything about the parameters FUNC takes; `void'
  * is as good as any other choice */
 __LIBC __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__VLIBCCALL makecontext)(ucontext_t *__ucp, __makecontext_func_t __func, int ___argc, ...) __CASMNAME_SAME("makecontext");
-#endif /* makecontext... */
+#endif /* __CRT_HAVE_makecontext */
 
 #endif /* __CC__ */
 

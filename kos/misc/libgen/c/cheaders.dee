@@ -34,6 +34,28 @@ import * from .namespace;
 import * from .namespace;
 import util;
 
+
+/*TODO:REMOVE_ME:BEGIN*/
+#define GET_LOCAL_PATH_NAME(name, func) \
+	_GET_LOCAL_PATH_NAME(str(name), str(func))
+function _GET_LOCAL_PATH_NAME(name: string, func: string) {
+	local result = REMOVEME_localPathRedirections.get(name, name);
+	if (result !is string) {
+		/* Search for a match */
+		import fs;
+		for (local candy: result) {
+			if (fs.stat.exists("include/local/{}/{}.h".format({ candy, func })))
+				return candy;
+		}
+		throw Error("Unable to find proper folder for '<local/{}/{}.h>'"
+			.format({ name, func }));
+	}
+	return result;
+}
+
+/*TODO:REMOVE_ME:END*/
+
+
 /* TODO: The effective escapeMode for 'ppCond' of LocalFunction bindings
  *       must be changed to ESCAPE_MODE_FULL when the surrounding declaration
  *       is printed in ESCAPE_MODE_PART.
@@ -141,8 +163,26 @@ again_compare_typenames:
 		if (typename == otTypename)
 			return true;
 		if ("const" in otTypename) {
-			otTypename = otTypename.replace("const", "");
-			goto again_compare_typenames;
+			if ((otTypename.count("*") + otTypename.count("&")) < 2) {
+				otTypename = otTypename.replace("const", "");
+				goto again_compare_typenames;
+			}
+			/* Only replace "const" up until the second-to-last "*" or "&":
+			 *  - "char const *"          -> "char *"
+			 *  - "char *const *"         -> "char **"
+			 *  - "char const *const *"   -> "char const **" */
+			local replStart = #otTypename;
+			while (otTypename[replStart - 1] !in "*&")
+				--replStart;
+			--replStart;
+			while (otTypename[replStart - 1] !in "*&")
+				--replStart;
+			/* `replStart` now points after the second-to-last "*" or "&" */
+			local after = otTypename[replStart:];
+			if ("const" in after) {
+				otTypename = otTypename[:replStart] + after.replace("const", "");
+				goto again_compare_typenames;
+			}
 		}
 		return false;
 	}
@@ -452,7 +492,7 @@ class FunctionPrototype {
 		for (local arg: argv) {
 			if (!isFirst)
 				fp << ",";
-			escapeTextIntoFile(fp, arg.protoTypeName, escapeMode);
+			escapeTextIntoFile(fp, arg.name, escapeMode);
 			isFirst = false;
 		}
 		fp << ")";
@@ -1146,7 +1186,7 @@ class LocalFunction {
 			fp.externLinkage = "";
 		/* Include the local-header for this function */
 		fp.ppInclude("<local/{}/{}.h>".format({
-			REMOVEME_localPathRedirections.get(originalSystemHeaderName, originalSystemHeaderName),
+			GET_LOCAL_PATH_NAME(originalSystemHeaderName, name),
 			name }));
 		/* Remember that we'll be needing the local implementation of this function */
 		neededLocalFunction.insert(this);
@@ -1674,9 +1714,9 @@ class FunctionBinding {
 						fp.externLinkage = "";
 					/* Include the local-header for this function */
 					fp.ppInclude("<local/{}/{}.h>".format({
-						REMOVEME_localPathRedirections.get(
+						GET_LOCAL_PATH_NAME(
 							usedBinding.originalSystemHeaderName,
-							usedBinding.originalSystemHeaderName),
+							usedBinding.name),
 						usedBinding.name
 					}));
 					fp.externLinkage = oldExternLinkage;

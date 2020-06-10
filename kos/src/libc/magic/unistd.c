@@ -245,19 +245,25 @@ INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_enviro
 @@>> execv(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
-[[cp, guard, export_alias("_execv"), argument_names(path, ___argv), crtbuiltin]]
+[[cp, guard, export_alias("_execv"), argument_names(path, ___argv)]]
+[[if(__has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(execv, { return __builtin_execv(path, (char *const *)___argv); })]]
 int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV);
 
 @@>> execve(2)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
-[[cp, guard, export_alias("_execve"), argument_names(path, ___argv, ___envp), crtbuiltin]]
+[[cp, guard, export_alias("_execve"), argument_names(path, ___argv, ___envp)]]
+[[if(__has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(execve, { return __builtin_execve(path, (char *const *)___argv, (char *const *)___envp); })]]
 int execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
 @@>> execvp(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
-[[cp, guard, export_alias("_execvp"), argument_names(file, ___argv), crtbuiltin]]
+[[cp, guard, export_alias("_execvp"), argument_names(file, ___argv)]]
+[[if(__has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS)),
+  preferred_extern_inline(execvp, { return __builtin_execvp(file, (char *const *)___argv); })]]
 int execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV);
 
 
@@ -452,9 +458,9 @@ setgid:($gid_t gid) -> int;
 @@The child then usually proceeds by calling `exec(2)' to replace its
 @@application image with that of another program that the original
 @@parent can then `wait(2)' for
-[section(".text.crt.sched.access")][[crtbuiltin]]
-[[ATTR_WUNUSED]][export_alias(__fork)]
-fork:() -> $pid_t;
+[[crtbuiltin, ATTR_WUNUSED, export_alias("__fork")]]
+[[section(".text.crt.sched.access")]]
+$pid_t fork();
 
 
 %[default_impl_section(".text.crt.system.utility")]

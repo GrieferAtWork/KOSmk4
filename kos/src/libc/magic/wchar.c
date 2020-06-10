@@ -1650,13 +1650,30 @@ wcslwr_l(*) %{generate(str2wcs)}
 [[wchar, crt_dosname("_wcsupr_l")]]
 wcsupr_l(*) %{generate(str2wcs)}
 
-[[wchar]] wcsnlwr_l(*) %{generate(str2wcs("strnlwr_l"))}
-[[wchar]] wcsnupr_l(*) %{generate(str2wcs("strnupr_l"))}
-[[wchar]] wcscasestr_l(*) %{generate(str2wcs("strcasestr_l"))}
-[[wchar]] fuzzy_wmemcasecmp_l(*) %{generate(str2wcs("fuzzy_memcasecmp_l"))}
-[[wchar]] fuzzy_wcscasecmp_l(*) %{generate(str2wcs("fuzzy_strcasecmp_l"))}
-[[wchar]] fuzzy_wcsncasecmp_l(*) %{generate(str2wcs("fuzzy_strncasecmp_l"))}
-[[wchar]] wildwcscasecmp_l(*) %{generate(str2wcs("wildstrcasecmp_l"))}
+[[wchar]]
+wcsnlwr_l(*) %{generate(str2wcs("strnlwr_l"))}
+
+[[wchar]]
+wcsnupr_l(*) %{generate(str2wcs("strnupr_l"))}
+
+[[wchar]]
+wcscasestr_l(*) %{generate(str2wcs("strcasestr_l"))}
+
+[[wchar]]
+$size_t fuzzy_wmemcasecmp_l(wchar_t const *s1, $size_t s1_bytes,
+                            wchar_t const *s2, $size_t s2_bytes,
+                            $locale_t locale)
+	%{generate(str2wcs("fuzzy_memcasecmp_l"))}
+
+[[wchar]]
+fuzzy_wcscasecmp_l(*) %{generate(str2wcs("fuzzy_strcasecmp_l"))}
+
+[[wchar]]
+fuzzy_wcsncasecmp_l(*) %{generate(str2wcs("fuzzy_strncasecmp_l"))}
+
+[[wchar]]
+wildwcscasecmp_l(*) %{generate(str2wcs("wildstrcasecmp_l"))}
+
 
 %#endif /* __USE_XOPEN2K8 */
 

@@ -49,6 +49,7 @@
 #include <asm/threads.h>
 #include <bits/threads.h>
 #include <bits/timespec.h>
+#include <kos/anno.h>
 
 __SYSDECL_BEGIN
 
@@ -159,10 +160,8 @@ int thrd_create(thrd_t *thr, thrd_start_t func, void *arg) {
 	return thrd_error;
 }
 
-@@Check if __LHS and __RHS point to the same thread
-@@s.a. `pthread_equal()'
 [[decl_include("<bits/threads.h>")]]
-int thrd_equal(thrd_t lhs, thrd_t rhs) = pthread_equal;
+int thrd_equal(thrd_t thr1, thrd_t thr2) = pthread_equal;
 
 @@Return current thread identifier
 @@s.a. `pthread_self()'
@@ -218,17 +217,17 @@ int thrd_sleep([[nonnull]] struct timespec const *time_point,
 }
 
 %#ifdef __USE_TIME64
-[[cp, doc_alias(thrd_sleep), ignore, nocrt, alias("thrd_sleep")]]
+[[cp, doc_alias("thrd_sleep"), ignore, nocrt, alias("thrd_sleep")]]
 [[decl_include("<bits/timespec.h>")]]
 int thrd_sleep32([[nonnull]] struct $timespec32 const *time_point,
                  [[nullable]] struct $timespec32 *remaining);
 
-[[cp, doc_alias(thrd_sleep), ignore, nocrt, alias("thrd_sleep64")]]
+[[cp, doc_alias("thrd_sleep"), ignore, nocrt, alias("thrd_sleep64")]]
 [[decl_include("<bits/timespec.h>")]]
 int crt_thrd_sleep64([[nonnull]] struct timespec64 const *time_point,
                      [[nullable]] struct timespec64 *remaining);
 
-[[cp, doc_alias(thrd_sleep)]]
+[[cp, doc_alias("thrd_sleep")]]
 [[decl_include("<bits/timespec.h>"), time64_variant_of(thrd_sleep)]]
 [[userimpl, requires($has_function(thrd_sleep32) || $has_function(nanosleep64))]]
 int thrd_sleep64([[nonnull]] struct timespec64 const *time_point,
@@ -310,7 +309,7 @@ int thrd_join(thrd_t thr, int *res) {
 @@thread should execute next. The current thread may be selected by the
 @@scheduler to keep running
 @@s.a. `pthread_yield()'
-thrd_yield(*) = pthread_yield;
+void thrd_yield() = pthread_yield;
 
 
 
@@ -380,7 +379,7 @@ int mtx_timedlock([[nonnull]] mtx_t *__restrict mutex,
 }
 
 %#ifdef __USE_TIME64
-[[cp, time64_variant_of(mtx_timedlock)]]
+[[cp, doc_alias("mtx_timedlock"), time64_variant_of(mtx_timedlock)]]
 [[decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
 [[userimpl]][requires($has_function(pthread_mutex_timedlock64))]
@@ -521,7 +520,7 @@ int cnd_timedwait([[nonnull]] cnd_t *__restrict cond,
 }
 
 %#ifdef __USE_TIME64
-[[cp, time64_variant_of(cnd_timedwait)]]
+[[cp, doc_alias("cnd_timedwait"), time64_variant_of(cnd_timedwait)]]
 [[decl_include("<bits/threads.h>", "<bits/timespec.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
 [[userimpl, requires($has_function(pthread_cond_timedwait))]]

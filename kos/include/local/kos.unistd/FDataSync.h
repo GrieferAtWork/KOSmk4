@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2510835b */
+/* HASH REMOVE_ME:0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,40 +18,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _VFORK_H
-#define _VFORK_H 1
-
-#include "__stdinc.h"
-#include "__crt.h"
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
-#include <features.h>
-#include <bits/types.h>
-
-__SYSDECL_BEGIN
-
-#ifdef __CC__
-#ifndef __vfork_defined
-#define __vfork_defined 1
-#ifdef __CRT_HAVE_vfork
-/* >> vfork(2)
- * Same as `fork(2)', but possibly suspend the calling process until the
- * child process either calls `exit(2)' or one of the many `exec(2)' functions */
-__CDECLARE(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),())
-#elif defined(__CRT_HAVE___vfork)
-/* >> vfork(2)
- * Same as `fork(2)', but possibly suspend the calling process until the
- * child process either calls `exit(2)' or one of the many `exec(2)' functions */
-__CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),__vfork,())
-#else /* ... */
-#undef __vfork_defined
-#endif /* !... */
-#endif /* !__vfork_defined */
-#endif /* __CC__ */
-
-__SYSDECL_END
-
-#endif /* !_VFORK_H */
+#ifndef __local_FDataSync_defined
+#define __local_FDataSync_defined 1
+#include <__crt.h>
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> fsync(2)
+ * DataSynchronize a file (including its descriptor which contains timestamps, and its size),
+ * meaning that changes to its data and/or descriptor are written to disk */
+__LOCAL_LIBC(FDataSync) void
+(__LIBCCALL __LIBC_LOCAL_NAME(FDataSync))(__fd_t __fd) __THROWS(...) {
+	(void)__fd;
+	/* No-Op */
+}
+__NAMESPACE_LOCAL_END
+#endif /* !__local_FDataSync_defined */

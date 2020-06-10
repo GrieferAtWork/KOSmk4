@@ -1254,7 +1254,7 @@ void sincosf(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx) {
 	*pcosx = (float)cosx;
 }
 
-[[crtbuiltin, export_alias("__exp10f")]] exp10f(*) %{generate(double2float("fma"))}
+[[crtbuiltin, export_alias("__exp10f")]] exp10f(*) %{generate(double2float("exp10"))}
 [[crtbuiltin, export_alias("__pow10f")]] pow10f(*) %{generate(double2float("pow10"))}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -1269,7 +1269,7 @@ void sincosl(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *psinx, [[nonnull]] __LONG
 	*pcosx = (__LONGDOUBLE)cosx;
 }
 
-[[crtbuiltin, export_alias("__exp10l")]] exp10l(*) %{generate(double2ldouble("fma"))}
+[[crtbuiltin, export_alias("__exp10l")]] exp10l(*) %{generate(double2ldouble("exp10"))}
 [[crtbuiltin, export_alias("__pow10l")]] pow10l(*) %{generate(double2ldouble("pow10"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */

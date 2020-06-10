@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f422725 */
+/* HASH CRC-32:0xe24104fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,44 +56,44 @@ __SYSDECL_BEGIN
 #endif /* !__USE_DOS */
 #endif /* !__T32ARGV */
 #if defined(__CRT_HAVE_wexecv) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBDCALL,c16execv,(char16_t const *__restrict __path, __T16ARGV),wexecv,(__path,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBDCALL,c16execv,(char16_t const *__restrict __path, __T16ARGV),wexecv,(__path,___argv))
 #elif defined(__CRT_HAVE_DOS$_wexecv)
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16execv,(char16_t const *__restrict __path, __T16ARGV),_wexecv,(__path,))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16execv,(char16_t const *__restrict __path, __T16ARGV),_wexecv,(__path,___argv))
 #endif /* ... */
 #if defined(__CRT_HAVE_wexecv) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBKCALL,c32execv,(char32_t const *__restrict __path, __T32ARGV),wexecv,(__path,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBKCALL,c32execv,(char32_t const *__restrict __path, __T32ARGV),wexecv,(__path,___argv))
 #elif defined(__CRT_HAVE_DOS$wexecv)
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c32execv,(char32_t const *__restrict __path, __T32ARGV),wexecv,(__path,))
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c32execv,(char32_t const *__restrict __path, __T32ARGV),wexecv,(__path,___argv))
 #endif /* ... */
 #if defined(__CRT_HAVE_wexecve) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__LIBDCALL,c16execve,(char16_t const *__restrict __path, __T16ARGV, __T16ENVP),wexecve,(__path,,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__LIBDCALL,c16execve,(char16_t const *__restrict __path, __T16ARGV, __T16ENVP),wexecve,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$_wexecve)
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,c16execve,(char16_t const *__restrict __path, __T16ARGV, __T16ENVP),_wexecve,(__path,,))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,c16execve,(char16_t const *__restrict __path, __T16ARGV, __T16ENVP),_wexecve,(__path,___argv,___envp))
 #endif /* ... */
 #if defined(__CRT_HAVE_wexecve) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__LIBKCALL,c32execve,(char32_t const *__restrict __path, __T32ARGV, __T32ENVP),wexecve,(__path,,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__LIBKCALL,c32execve,(char32_t const *__restrict __path, __T32ARGV, __T32ENVP),wexecve,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$wexecve)
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,c32execve,(char32_t const *__restrict __path, __T32ARGV, __T32ENVP),wexecve,(__path,,))
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,c32execve,(char32_t const *__restrict __path, __T32ARGV, __T32ENVP),wexecve,(__path,___argv,___envp))
 #endif /* ... */
 #if defined(__CRT_HAVE_wexecvp) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBDCALL,c16execvp,(char16_t const *__restrict __file, __T16ARGV),wexecvp,(__file,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBDCALL,c16execvp,(char16_t const *__restrict __file, __T16ARGV),wexecvp,(__path,___argv))
 #elif defined(__CRT_HAVE_DOS$_wexecvp)
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16execvp,(char16_t const *__restrict __file, __T16ARGV),_wexecvp,(__file,))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16execvp,(char16_t const *__restrict __file, __T16ARGV),_wexecvp,(__path,___argv))
 #endif /* ... */
 #if defined(__CRT_HAVE_wexecvp) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBKCALL,c32execvp,(char32_t const *__restrict __file, __T32ARGV),wexecvp,(__file,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBKCALL,c32execvp,(char32_t const *__restrict __file, __T32ARGV),wexecvp,(__path,___argv))
 #elif defined(__CRT_HAVE_DOS$wexecvp)
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c32execvp,(char32_t const *__restrict __file, __T32ARGV),wexecvp,(__file,))
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c32execvp,(char32_t const *__restrict __file, __T32ARGV),wexecvp,(__path,___argv))
 #endif /* ... */
 #if defined(__CRT_HAVE_wexecvpe) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__LIBDCALL,c16execvpe,(char16_t const *__restrict __file, __T16ARGV, __T16ENVP),wexecvpe,(__file,,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__LIBDCALL,c16execvpe,(char16_t const *__restrict __file, __T16ARGV, __T16ENVP),wexecvpe,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$_wexecvpe)
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,c16execvpe,(char16_t const *__restrict __file, __T16ARGV, __T16ENVP),_wexecvpe,(__file,,))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,c16execvpe,(char16_t const *__restrict __file, __T16ARGV, __T16ENVP),_wexecvpe,(__path,___argv,___envp))
 #endif /* ... */
 #if defined(__CRT_HAVE_wexecvpe) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__LIBKCALL,c32execvpe,(char32_t const *__restrict __file, __T32ARGV, __T32ENVP),wexecvpe,(__file,,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__LIBKCALL,c32execvpe,(char32_t const *__restrict __file, __T32ARGV, __T32ENVP),wexecvpe,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$wexecvpe)
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,c32execvpe,(char32_t const *__restrict __file, __T32ARGV, __T32ENVP),wexecvpe,(__file,,))
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,c32execvpe,(char32_t const *__restrict __file, __T32ARGV, __T32ENVP),wexecvpe,(__path,___argv,___envp))
 #endif /* ... */
 #if defined(__CRT_HAVE_wexecl) && (__SIZEOF_WCHAR_T__ == 2) && defined(__VLIBCCALL_IS_VLIBDCALL)
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBDCALL c16execl)(char16_t const *__restrict __path, char16_t const *__args, ...) __CASMNAME("wexecl");
@@ -216,44 +216,44 @@ __NAMESPACE_LOCAL_USING(c32execlpe)
 #endif /* !__cplusplus */
 #endif /* ... */
 #if defined(__CRT_HAVE_wspawnv) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__LIBDCALL,c16spawnv,(int __mode, char16_t const *__restrict __path, __T16ARGV),wspawnv,(__mode,__path,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__LIBDCALL,c16spawnv,(int __mode, char16_t const *__restrict __path, __T16ARGV),wspawnv,(__mode,__path,___argv))
 #elif defined(__CRT_HAVE_DOS$_wspawnv)
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,c16spawnv,(int __mode, char16_t const *__restrict __path, __T16ARGV),_wspawnv,(__mode,__path,))
+__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,c16spawnv,(int __mode, char16_t const *__restrict __path, __T16ARGV),_wspawnv,(__mode,__path,___argv))
 #endif /* ... */
 #if defined(__CRT_HAVE_wspawnv) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__LIBKCALL,c32spawnv,(int __mode, char32_t const *__restrict __path, __T32ARGV),wspawnv,(__mode,__path,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__LIBKCALL,c32spawnv,(int __mode, char32_t const *__restrict __path, __T32ARGV),wspawnv,(__mode,__path,___argv))
 #elif defined(__CRT_HAVE_DOS$wspawnv)
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,c32spawnv,(int __mode, char32_t const *__restrict __path, __T32ARGV),wspawnv,(__mode,__path,))
+__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,c32spawnv,(int __mode, char32_t const *__restrict __path, __T32ARGV),wspawnv,(__mode,__path,___argv))
 #endif /* ... */
 #if defined(__CRT_HAVE_wspawnve) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__LIBDCALL,c16spawnve,(int __mode, char16_t const *__restrict __path, __T16ARGV, __T16ENVP),wspawnve,(__mode,__path,,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__LIBDCALL,c16spawnve,(int __mode, char16_t const *__restrict __path, __T16ARGV, __T16ENVP),wspawnve,(__mode,__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$_wspawnve)
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,c16spawnve,(int __mode, char16_t const *__restrict __path, __T16ARGV, __T16ENVP),_wspawnve,(__mode,__path,,))
+__CREDIRECT_DOS(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,c16spawnve,(int __mode, char16_t const *__restrict __path, __T16ARGV, __T16ENVP),_wspawnve,(__mode,__path,___argv,___envp))
 #endif /* ... */
 #if defined(__CRT_HAVE_wspawnve) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__LIBKCALL,c32spawnve,(int __mode, char32_t const *__restrict __path, __T32ARGV, __T32ENVP),wspawnve,(__mode,__path,,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__LIBKCALL,c32spawnve,(int __mode, char32_t const *__restrict __path, __T32ARGV, __T32ENVP),wspawnve,(__mode,__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$wspawnve)
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,c32spawnve,(int __mode, char32_t const *__restrict __path, __T32ARGV, __T32ENVP),wspawnve,(__mode,__path,,))
+__CREDIRECT_KOS(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,c32spawnve,(int __mode, char32_t const *__restrict __path, __T32ARGV, __T32ENVP),wspawnve,(__mode,__path,___argv,___envp))
 #endif /* ... */
 #if defined(__CRT_HAVE_wspawnvp) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__LIBDCALL,c16spawnvp,(int __mode, char16_t const *__restrict __file, __T16ARGV),wspawnvp,(__mode,__file,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__LIBDCALL,c16spawnvp,(int __mode, char16_t const *__restrict __file, __T16ARGV),wspawnvp,(__mode,__file,___argv))
 #elif defined(__CRT_HAVE_DOS$_wspawnvp)
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,c16spawnvp,(int __mode, char16_t const *__restrict __file, __T16ARGV),_wspawnvp,(__mode,__file,))
+__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,c16spawnvp,(int __mode, char16_t const *__restrict __file, __T16ARGV),_wspawnvp,(__mode,__file,___argv))
 #endif /* ... */
 #if defined(__CRT_HAVE_wspawnvp) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__LIBKCALL,c32spawnvp,(int __mode, char32_t const *__restrict __file, __T32ARGV),wspawnvp,(__mode,__file,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__LIBKCALL,c32spawnvp,(int __mode, char32_t const *__restrict __file, __T32ARGV),wspawnvp,(__mode,__file,___argv))
 #elif defined(__CRT_HAVE_DOS$wspawnvp)
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,c32spawnvp,(int __mode, char32_t const *__restrict __file, __T32ARGV),wspawnvp,(__mode,__file,))
+__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,c32spawnvp,(int __mode, char32_t const *__restrict __file, __T32ARGV),wspawnvp,(__mode,__file,___argv))
 #endif /* ... */
 #if defined(__CRT_HAVE_wspawnvpe) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__LIBDCALL,c16spawnvpe,(int __mode, char16_t const *__restrict __file, __T16ARGV, __T16ENVP),wspawnvpe,(__mode,__file,,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__LIBDCALL,c16spawnvpe,(int __mode, char16_t const *__restrict __file, __T16ARGV, __T16ENVP),wspawnvpe,(__mode,__file,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$_wspawnvpe)
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,c16spawnvpe,(int __mode, char16_t const *__restrict __file, __T16ARGV, __T16ENVP),_wspawnvpe,(__mode,__file,,))
+__CREDIRECT_DOS(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,c16spawnvpe,(int __mode, char16_t const *__restrict __file, __T16ARGV, __T16ENVP),_wspawnvpe,(__mode,__file,___argv,___envp))
 #endif /* ... */
 #if defined(__CRT_HAVE_wspawnvpe) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__LIBKCALL,c32spawnvpe,(int __mode, char32_t const *__restrict __file, __T32ARGV, __T32ENVP),wspawnvpe,(__mode,__file,,))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__LIBKCALL,c32spawnvpe,(int __mode, char32_t const *__restrict __file, __T32ARGV, __T32ENVP),wspawnvpe,(__mode,__file,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$wspawnvpe)
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,c32spawnvpe,(int __mode, char32_t const *__restrict __file, __T32ARGV, __T32ENVP),wspawnvpe,(__mode,__file,,))
+__CREDIRECT_KOS(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,c32spawnvpe,(int __mode, char32_t const *__restrict __file, __T32ARGV, __T32ENVP),wspawnvpe,(__mode,__file,___argv,___envp))
 #endif /* ... */
 #if defined(__CRT_HAVE_wspawnl) && (__SIZEOF_WCHAR_T__ == 2) && defined(__VLIBCCALL_IS_VLIBDCALL)
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBDCALL c16spawnl)(int __mode, char16_t const *__restrict __path, char16_t const *__args, ...) __CASMNAME("wspawnl");

@@ -110,7 +110,7 @@ void _endthreadex($u32 exitcode);
 %#define _CRT_TERMINATE_DEFINED 1
 %[insert:extern(exit)]
 %[insert:extern(abort)]
-_exit(*) = _Exit;
+[[guard]] _exit(*) = _Exit;
 %#endif /* !_CRT_TERMINATE_DEFINED */
 
 %[default_impl_section(".text.crt.dos.sched.process")]

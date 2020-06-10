@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90f1d374 */
+/* HASH CRC-32:0x765aef3c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,81 +53,83 @@ typedef __pid_t pid_t;
 
 #ifdef __CRT_HAVE_cfgetospeed
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),speed_t,__NOTHROW_NCX,cfgetospeed,(struct termios const *__restrict __termios_p),(__termios_p))
-#else /* LIBC: cfgetospeed */
+#else /* __CRT_HAVE_cfgetospeed */
 #include <local/termios/cfgetospeed.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfgetospeed, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) speed_t __NOTHROW_NCX(__LIBCCALL cfgetospeed)(struct termios const *__restrict __termios_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfgetospeed))(__termios_p); })
-#endif /* cfgetospeed... */
+#endif /* !__CRT_HAVE_cfgetospeed */
 #ifdef __CRT_HAVE_cfgetispeed
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),speed_t,__NOTHROW_NCX,cfgetispeed,(struct termios const *__restrict __termios_p),(__termios_p))
-#else /* LIBC: cfgetispeed */
+#else /* __CRT_HAVE_cfgetispeed */
 #include <local/termios/cfgetispeed.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfgetispeed, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) speed_t __NOTHROW_NCX(__LIBCCALL cfgetispeed)(struct termios const *__restrict __termios_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfgetispeed))(__termios_p); })
-#endif /* cfgetispeed... */
+#endif /* !__CRT_HAVE_cfgetispeed */
 #ifdef __CRT_HAVE_cfsetospeed
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cfsetospeed,(struct termios *__restrict __termios_p, speed_t __speed),(__termios_p,__speed))
-#else /* LIBC: cfsetospeed */
+#else /* __CRT_HAVE_cfsetospeed */
 #include <local/termios/cfsetospeed.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfsetospeed, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cfsetospeed)(struct termios *__restrict __termios_p, speed_t __speed) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfsetospeed))(__termios_p, __speed); })
-#endif /* cfsetospeed... */
+#endif /* !__CRT_HAVE_cfsetospeed */
 #ifdef __CRT_HAVE_cfsetispeed
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cfsetispeed,(struct termios *__restrict __termios_p, speed_t __speed),(__termios_p,__speed))
-#else /* LIBC: cfsetispeed */
+#else /* __CRT_HAVE_cfsetispeed */
 #include <local/termios/cfsetispeed.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfsetispeed, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cfsetispeed)(struct termios *__restrict __termios_p, speed_t __speed) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfsetispeed))(__termios_p, __speed); })
-#endif /* cfsetispeed... */
+#endif /* !__CRT_HAVE_cfsetispeed */
 #ifdef __CRT_HAVE_tcgetattr
 /* Get terminal attributes */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,tcgetattr,(__fd_t __fd, struct termios *__restrict __termios_p),(__fd,__termios_p))
-#endif /* tcgetattr... */
+#endif /* __CRT_HAVE_tcgetattr */
 #ifdef __CRT_HAVE_tcsetattr
 /* Set terminal attributes
  * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
-__CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,tcsetattr,(__fd_t __fd, int __optional_actions, struct termios const *__restrict __termios_p),(__fd,__optional_actions,__termios_p))
-#endif /* tcsetattr... */
+__CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,tcsetattr,(__fd_t __fd, __STDC_INT_AS_UINT_T __optional_actions, struct termios const *__restrict __termios_p),(__fd,__optional_actions,__termios_p))
+#endif /* __CRT_HAVE_tcsetattr */
 #ifdef __CRT_HAVE_tcsendbreak
 __CDECLARE(,int,__NOTHROW_NCX,tcsendbreak,(__fd_t __fd, int __duration),(__fd,__duration))
-#endif /* tcsendbreak... */
+#endif /* __CRT_HAVE_tcsendbreak */
 #ifdef __CRT_HAVE_tcdrain
 __CDECLARE(,int,__NOTHROW_RPC,tcdrain,(__fd_t __fd),(__fd))
-#endif /* tcdrain... */
+#endif /* __CRT_HAVE_tcdrain */
 #ifdef __CRT_HAVE_tcflush
-__CDECLARE(,int,__NOTHROW_NCX,tcflush,(__fd_t __fd, int __queue_selector),(__fd,__queue_selector))
-#endif /* tcflush... */
+/* @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
+__CDECLARE(,int,__NOTHROW_NCX,tcflush,(__fd_t __fd, __STDC_INT_AS_UINT_T __queue_selector),(__fd,__queue_selector))
+#endif /* __CRT_HAVE_tcflush */
 #ifdef __CRT_HAVE_tcflow
-__CDECLARE(,int,__NOTHROW_NCX,tcflow,(__fd_t __fd, int __action),(__fd,__action))
-#endif /* tcflow... */
+/* @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
+__CDECLARE(,int,__NOTHROW_NCX,tcflow,(__fd_t __fd, __STDC_INT_AS_UINT_T __action),(__fd,__action))
+#endif /* __CRT_HAVE_tcflow */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 #ifdef __CRT_HAVE_tcgetsid
 __CDECLARE(,__pid_t,__NOTHROW_NCX,tcgetsid,(__fd_t __fd),(__fd))
-#endif /* tcgetsid... */
+#endif /* __CRT_HAVE_tcgetsid */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
 #if defined(__USE_BSD)
 #ifdef __CRT_HAVE_tcsetsid
 __CDECLARE(,int,__NOTHROW_NCX,tcsetsid,(__fd_t __fd, __pid_t __pid),(__fd,__pid))
-#endif /* tcsetsid... */
+#endif /* __CRT_HAVE_tcsetsid */
 #endif /* __USE_BSD */
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_cfsetspeed
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cfsetspeed,(struct termios *__restrict __termios_p, speed_t __speed),(__termios_p,__speed))
-#else /* LIBC: cfsetspeed */
+#else /* __CRT_HAVE_cfsetspeed */
 #include <local/termios/cfsetspeed.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfsetspeed, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cfsetspeed)(struct termios *__restrict __termios_p, speed_t __speed) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfsetspeed))(__termios_p, __speed); })
-#endif /* cfsetspeed... */
+#endif /* !__CRT_HAVE_cfsetspeed */
 #ifdef __CRT_HAVE_cfmakeraw
 /* Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
  * This entails the CANON and all control characters being disabled, as well as
  * any sort of input/output text processing no longer taking place. */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,cfmakeraw,(struct termios *__restrict __termios_p),(__termios_p))
-#else /* LIBC: cfmakeraw */
+#else /* __CRT_HAVE_cfmakeraw */
 #include <local/termios/cfmakeraw.h>
 /* Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
  * This entails the CANON and all control characters being disabled, as well as
  * any sort of input/output text processing no longer taking place. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfmakeraw, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL cfmakeraw)(struct termios *__restrict __termios_p) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfmakeraw))(__termios_p); })
-#endif /* cfmakeraw... */
+#endif /* !__CRT_HAVE_cfmakeraw */
 #endif /* __USE_MISC */
 
 #if defined(__USE_KOS) || defined(__USE_BSD)
@@ -135,12 +137,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cfmakeraw, __FORCELOCAL __ATTR_NONNULL((1)) void
 /* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
  * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,cfmakesane,(struct termios *__restrict __termios_p),(__termios_p))
-#else /* LIBC: cfmakesane */
+#else /* __CRT_HAVE_cfmakesane */
 #include <local/termios/cfmakesane.h>
 /* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
  * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfmakesane, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL cfmakesane)(struct termios *__restrict __termios_p) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfmakesane))(__termios_p); })
-#endif /* cfmakesane... */
+#endif /* !__CRT_HAVE_cfmakesane */
 #endif /* __USE_KOS || __USE_BSD */
 #endif /* __CC__ */
 

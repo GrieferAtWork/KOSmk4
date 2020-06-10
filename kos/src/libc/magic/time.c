@@ -21,15 +21,20 @@
 %[define_ccompat_header("ctime")]
 %[default_impl_section(".text.crt.time")]
 
-%[define_replacement(time_t   = "__TM_TYPE(time)")]
-%[define_replacement(time32_t = __time32_t)]
-%[define_replacement(time64_t = __time64_t)]
-%[define_replacement(clock_t  = __typedef_clock_t)]
+%[define_replacement(time_t    = "__TM_TYPE(time)")]
+%[define_replacement(time32_t  = __time32_t)]
+%[define_replacement(time64_t  = __time64_t)]
+%[define_replacement(clock_t   = __typedef_clock_t)]
+%[define_replacement(pid_t     = __pid_t)]
+%[define_replacement(clockid_t = __clockid_t)]
+%[define_replacement(timer_t   = __timer_t)]
 
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
 %[define_replacement(timeval32  = __timeval32)]
 %[define_replacement(timeval64  = __timeval64)]
+%[define_replacement(itimerspec32 = __itimerspec32)]
+%[define_replacement(itimerspec64 = __itimerspec64)]
 
 
 %{
@@ -623,7 +628,7 @@ $errno_t asctime_s([[outp(buflen)]] char *__restrict buf, size_t buflen,
 
 
 %#ifdef __USE_TIME64
-[[time64_variant_of(time), export_alias("_time64")]]
+[[doc_alias("time"), time64_variant_of(time), export_alias("_time64")]]
 [[userimpl, requires_function(time32)]]
 $time64_t time64($time64_t *timer) {
 	time32_t tm32 = time32(NULL);
@@ -633,7 +638,7 @@ $time64_t time64($time64_t *timer) {
 }
 
 %#ifndef __NO_FPU
-[[ATTR_WUNUSED, ATTR_CONST, guard, time64_variant_of(difftime)]]
+[[ATTR_WUNUSED, ATTR_CONST, guard, doc_alias("difftime"), time64_variant_of(difftime)]]
 [[export_alias("_difftime64", "__difftime64")]]
 double difftime64($time64_t time1, $time64_t time0) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -648,7 +653,7 @@ double difftime64($time64_t time1, $time64_t time0) {
 
 
 
-[[time64_variant_of(mktime)]]
+[[doc_alias("mktime"), time64_variant_of(mktime)]]
 [[decl_prefix(DEFINE_STRUCT_TM), impl_prefix(
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
@@ -679,7 +684,7 @@ $time64_t mktime64([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) {
 @@pp_endif@@
 }
 
-[[time64_variant_of(ctime), impl_prefix(
+[[doc_alias("ctime"), time64_variant_of(ctime), impl_prefix(
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(ctime32)@@
 DEFINE_CTIME_BUFFER
 @@pp_endif@@
@@ -695,7 +700,7 @@ DEFINE_CTIME_BUFFER
 @@pp_endif@@
 }
 
-[[time64_variant_of(gmtime)]]
+[[doc_alias("gmtime"), time64_variant_of(gmtime)]]
 [[decl_prefix(DEFINE_STRUCT_TM)]]
 [[impl_prefix(
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(gmtime32)@@
@@ -714,7 +719,7 @@ DEFINE_GMTIME_BUFFER
 }
 
 
-[[time64_variant_of(localtime)]]
+[[doc_alias("localtime"), time64_variant_of(localtime)]]
 [[decl_prefix(DEFINE_STRUCT_TM)]]
 [[impl_prefix(
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(localtime32)@@
@@ -900,7 +905,9 @@ $time_t timegm([[nonnull]] __STRUCT_TM *tp) {
 }
 
 @@Another name for `mktime'
-timelocal(*) = mktime;
+[[ATTR_WUNUSED, ATTR_PURE]]
+$time_t timelocal([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) = mktime;
+
 
 %[define(DEFINE_ISLEAP =
 #ifndef __isleap
@@ -930,7 +937,7 @@ int dysize(__STDC_INT_AS_UINT_T year) {
 
 %
 %#ifdef __USE_TIME64
-[[time64_variant_of(stime), userimpl, requires_function(stime32)]]
+[[doc_alias("stime"), time64_variant_of(stime), userimpl, requires_function(stime32)]]
 int stime64([[nonnull]] $time64_t const *when) {
 	time32_t tms = (time32_t)*when;
 	return stime32(&tms);
@@ -942,7 +949,7 @@ $time32_t timegm32([[nonnull]] __STRUCT_TM *tp);
 
 
 [[decl_prefix(DEFINE_STRUCT_TM)]]
-[[ATTR_WUNUSED, ATTR_PURE, time64_variant_of(timegm)]]
+[[ATTR_WUNUSED, ATTR_PURE, doc_alias("timegm"), time64_variant_of(timegm)]]
 $time64_t timegm64([[nonnull]] __STRUCT_TM *tp) {
 @@pp_ifdef __BUILDING_LIBC@@
 	/* TODO: Timezones */
@@ -980,7 +987,7 @@ int nanosleep([[nonnull]] struct timespec const *requested_time,
               [[nullable]] struct timespec *remaining) {
 @@pp_if $has_function(nanosleep32)@@
 	int result;
-	struct @__timespec32@ req32, rem32;
+	struct timespec32 req32, rem32;
 	req32.tv_sec  = (__time32_t)requested_time->tv_sec;
 	req32.tv_nsec = requested_time->tv_nsec;
 	result = nanosleep32(&req32, &rem32);
@@ -991,7 +998,7 @@ int nanosleep([[nonnull]] struct timespec const *requested_time,
 	return result;
 @@pp_else@@
 	int result;
-	struct @__timespec64@ req64, rem64;
+	struct timespec64 req64, rem64;
 	req64.tv_sec  = (__time64_t)requested_time->tv_sec;
 	req64.tv_nsec = requested_time->tv_nsec;
 	result = nanosleep64(&req64, &rem64);
@@ -1015,7 +1022,7 @@ int clock_getres32(clockid_t clock_id, [[nonnull]] struct $timespec32 *res);
 int clock_getres(clockid_t clock_id, [[nonnull]] struct timespec *res) {
 @@pp_if $has_function(clock_getres32)@@
 	int result;
-	struct @__timespec32@ res32;
+	struct timespec32 res32;
 	result = clock_getres32(clock_id, &res32);
 	if (!result) {
 		res->tv_sec  = (__time64_t)res32.tv_sec;
@@ -1024,7 +1031,7 @@ int clock_getres(clockid_t clock_id, [[nonnull]] struct timespec *res) {
 	return result;
 @@pp_else@@
 	int result;
-	struct @__timespec64@ res64;
+	struct timespec64 res64;
 	result = clock_getres64(clock_id, &res64);
 	if (!result) {
 		res->tv_sec  = (__time32_t)res64.tv_sec;
@@ -1045,7 +1052,7 @@ int clock_gettime32(clockid_t clock_id, [[nonnull]] struct $timespec32 *tp);
 int clock_gettime(clockid_t clock_id, [[nonnull]] struct timespec *tp) {
 @@pp_if $has_function(clock_gettime32)@@
 	int result;
-	struct @__timespec32@ res32;
+	struct timespec32 res32;
 	result = clock_gettime32(clock_id, &res32);
 	if (!result) {
 		tp->tv_sec  = (__time64_t)res32.tv_sec;
@@ -1054,7 +1061,7 @@ int clock_gettime(clockid_t clock_id, [[nonnull]] struct timespec *tp) {
 	return result;
 @@pp_else@@
 	int result;
-	struct @__timespec64@ res64;
+	struct timespec64 res64;
 	result = clock_gettime64(clock_id, &res64);
 	if (!result) {
 		tp->tv_sec  = (__time32_t)res64.tv_sec;
@@ -1076,12 +1083,12 @@ int clock_settime32(clockid_t clock_id, [[nonnull]] struct $timespec32 const *tp
 [[userimpl, requires($has_function(clock_settime32) || $has_function(clock_settime64))]]
 int clock_settime(clockid_t clock_id, [[nonnull]] struct timespec const *tp) {
 @@pp_if $has_function(clock_settime32)@@
-	struct @__timespec32@ tp32;
+	struct timespec32 tp32;
 	tp32.tv_sec  = (__time32_t)tp->tv_sec;
 	tp32.tv_nsec = tp->tv_nsec;
 	return clock_settime32(clock_id, &tp32);
 @@pp_else@@
-	struct @__timespec64@ tp64;
+	struct timespec64 tp64;
 	tp64.tv_sec  = (__time64_t)tp->tv_sec;
 	tp64.tv_nsec = tp->tv_nsec;
 	return clock_settime64(clock_id, &tp64);
@@ -1102,8 +1109,8 @@ int timer_delete(timer_t timerid);
 @@Set timer TIMERID to VALUE, returning old value in OVALUE
 [[decl_include("<bits/itimerspec.h>"), ignore, nocrt, alias("timer_settime")]]
 int timer_settime32(timer_t timerid, __STDC_INT_AS_UINT_T flags,
-                    [[nonnull]] struct __itimerspec32 const *__restrict value,
-                    [[nullable]] struct __itimerspec32 *ovalue);
+                    [[nonnull]] struct $itimerspec32 const *__restrict value,
+                    [[nullable]] struct $itimerspec32 *ovalue);
 
 @@Set timer TIMERID to VALUE, returning old value in OVALUE
 [[no_crt_self_import]]
@@ -1116,7 +1123,7 @@ int timer_settime(timer_t timerid, __STDC_INT_AS_UINT_T flags,
                   [[nullable]] struct itimerspec *__restrict ovalue) {
 @@pp_if $has_function(timer_settime32)@@
 	int result;
-	struct __itimerspec32 value32, ovalue32;
+	struct $itimerspec32 value32, ovalue32;
 	value32.it_interval.tv_sec  = (__time32_t)value->it_interval.tv_sec;
 	value32.it_interval.tv_nsec = value->it_interval.tv_nsec;
 	value32.it_value.tv_sec     = (__time32_t)value->it_value.tv_sec;
@@ -1131,7 +1138,7 @@ int timer_settime(timer_t timerid, __STDC_INT_AS_UINT_T flags,
 	return result;
 @@pp_else@@
 	int result;
-	struct __itimerspec64 value64, ovalue64;
+	struct $itimerspec64 value64, ovalue64;
 	value64.it_interval.tv_sec  = (__time64_t)value->it_interval.tv_sec;
 	value64.it_interval.tv_nsec = value->it_interval.tv_nsec;
 	value64.it_value.tv_sec     = (__time64_t)value->it_value.tv_sec;
@@ -1159,7 +1166,7 @@ int timer_gettime32(timer_t timerid, [[nonnull]] struct itimerspec *value);
 int timer_gettime(timer_t timerid, [[nonnull]] struct itimerspec *value) {
 @@pp_if $has_function(timer_gettime32)@@
 	int result;
-	struct __itimerspec32 value32;
+	struct $itimerspec32 value32;
 	result = timer_gettime32(timerid, &value32);
 	if (!result) {
 		value->it_interval.tv_sec  = (__time64_t)value32.it_interval.tv_sec;
@@ -1170,7 +1177,7 @@ int timer_gettime(timer_t timerid, [[nonnull]] struct itimerspec *value) {
 	return result;
 @@pp_else@@
 	int result;
-	struct __itimerspec64 value64;
+	struct $itimerspec64 value64;
 	result = timer_gettime64(timerid, &value64);
 	if (!result) {
 		value->it_interval.tv_sec  = (__time32_t)value64.it_interval.tv_sec;
@@ -1233,12 +1240,12 @@ int clock_getcpuclockid(pid_t pid, clockid_t *clock_id);
 
 %
 %#ifdef __USE_TIME64
-[[cp, time64_variant_of(nanosleep)]]
+[[cp, doc_alias("nanosleep"), time64_variant_of(nanosleep)]]
 [[userimpl, requires_function(nanosleep32)]]
-int nanosleep64([[nonnull]] struct $timespec64 const *__restrict requested_time,
-                [[nullable]] struct $timespec64 *remaining) {
+int nanosleep64([[nonnull]] struct timespec64 const *__restrict requested_time,
+                [[nullable]] struct timespec64 *remaining) {
 	int result;
-	struct @__timespec32@ req32, rem32;
+	struct timespec32 req32, rem32;
 	req32.tv_sec  = (__time32_t)requested_time->tv_sec;
 	req32.tv_nsec = requested_time->tv_nsec;
 	result = nanosleep32(&req32, &rem32);
@@ -1249,11 +1256,11 @@ int nanosleep64([[nonnull]] struct $timespec64 const *__restrict requested_time,
 	return result;
 }
 
-[[time64_variant_of(clock_getres)]]
+[[doc_alias("clock_getres"), time64_variant_of(clock_getres)]]
 [[userimpl, requires($has_function(clock_getres32))]]
-int clock_getres64(clockid_t clock_id, [[nonnull]] struct $timespec64 *res) {
+int clock_getres64(clockid_t clock_id, [[nonnull]] struct timespec64 *res) {
 	int result;
-	struct @__timespec32@ res32;
+	struct timespec32 res32;
 	result = clock_getres32(clock_id, &res32);
 	if (!result) {
 		res->tv_sec  = (__time64_t)res32.tv_sec;
@@ -1262,11 +1269,11 @@ int clock_getres64(clockid_t clock_id, [[nonnull]] struct $timespec64 *res) {
 	return result;
 }
 
-[[time64_variant_of(clock_gettime)]]
+[[doc_alias("clock_gettime"), time64_variant_of(clock_gettime)]]
 [[userimpl, requires_function(clock_gettime32)]]
-int clock_gettime64(clockid_t clock_id, [[nonnull]] struct $timespec64 *tp) {
+int clock_gettime64(clockid_t clock_id, [[nonnull]] struct timespec64 *tp) {
 	int result;
-	struct @__timespec32@ res32;
+	struct timespec32 res32;
 	result = clock_gettime32(clock_id, &res32);
 	if (!result) {
 		tp->tv_sec  = (__time64_t)res32.tv_sec;
@@ -1275,23 +1282,23 @@ int clock_gettime64(clockid_t clock_id, [[nonnull]] struct $timespec64 *tp) {
 	return result;
 }
 
-[[time64_variant_of(clock_settime)]]
+[[doc_alias("clock_settime"), time64_variant_of(clock_settime)]]
 [[userimpl, requires_function(clock_settime32)]]
-int clock_settime64(clockid_t clock_id, [[nonnull]] struct $timespec64 const *tp) {
-	struct @__timespec32@ tp32;
+int clock_settime64(clockid_t clock_id, [[nonnull]] struct timespec64 const *tp) {
+	struct timespec32 tp32;
 	tp32.tv_sec  = (__time32_t)tp->tv_sec;
 	tp32.tv_nsec = tp->tv_nsec;
 	return clock_settime32(clock_id, &tp32);
 }
 
 [[decl_include("<bits/itimerspec.h>")]]
-[[time64_variant_of(timer_settime), section(".text.crt.timer")]]
+[[doc_alias("timer_settime"), time64_variant_of(timer_settime), section(".text.crt.timer")]]
 [[userimpl, requires_function(timer_settime32)]]
 int timer_settime64(timer_t timerid, __STDC_INT_AS_UINT_T flags,
-                    [[nonnull]] struct $itimerspec64 const *__restrict value,
-                    [[nullable]] struct $itimerspec64 *__restrict ovalue) {
+                    [[nonnull]] struct itimerspec64 const *__restrict value,
+                    [[nullable]] struct itimerspec64 *__restrict ovalue) {
 	int result;
-	struct __itimerspec32 value32, ovalue32;
+	struct $itimerspec32 value32, ovalue32;
 	value32.it_interval.tv_sec  = (__time32_t)value->it_interval.tv_sec;
 	value32.it_interval.tv_nsec = value->it_interval.tv_nsec;
 	value32.it_value.tv_sec     = (__time32_t)value->it_value.tv_sec;
@@ -1307,11 +1314,11 @@ int timer_settime64(timer_t timerid, __STDC_INT_AS_UINT_T flags,
 }
 
 [[decl_include("<bits/itimerspec.h>")]]
-[[time64_variant_of(timer_gettime), section(".text.crt.timer")]]
+[[doc_alias("timer_gettime"), time64_variant_of(timer_gettime), section(".text.crt.timer")]]
 [[userimpl, requires_function(timer_gettime32)]]
-int timer_gettime64(timer_t timerid, [[nonnull]] struct $itimerspec64 *value) {
+int timer_gettime64(timer_t timerid, [[nonnull]] struct itimerspec64 *value) {
 	int result;
-	struct __itimerspec32 value32;
+	struct $itimerspec32 value32;
 	result = timer_gettime32(timerid, &value32);
 	if (!result) {
 		value->it_interval.tv_sec  = (__time64_t)value32.it_interval.tv_sec;
@@ -1324,13 +1331,13 @@ int timer_gettime64(timer_t timerid, [[nonnull]] struct $itimerspec64 *value) {
 
 %
 %#ifdef __USE_XOPEN2K
-[[cp, time64_variant_of(clock_nanosleep)]]
+[[cp, doc_alias("clock_nanosleep"), time64_variant_of(clock_nanosleep)]]
 [[userimpl, requires_function(clock_nanosleep32)]]
 int clock_nanosleep64(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
-                      [[nonnull]] struct $timespec64 const *requested_time,
-                      [[nullable]] struct $timespec64 *remaining) {
+                      [[nonnull]] struct timespec64 const *requested_time,
+                      [[nullable]] struct timespec64 *remaining) {
 	int result;
-	struct @__timespec32@ req32, rem32;
+	struct timespec32 req32, rem32;
 	req32.tv_sec  = (__time32_t)requested_time->tv_sec;
 	req32.tv_nsec = requested_time->tv_nsec;
 	result = clock_nanosleep32(clock_id, flags, &req32, &rem32);
@@ -1472,7 +1479,7 @@ char *strptime_l([[nonnull]] char const *__restrict s,
 @@variant.  The functionality is the same.  The result is returned in
 @@the buffer pointed to by RESBUFP and in case of an error the return
 @@value is != 0 with the same values as given above for `getdate_err'.
-[[decl_prefix(DEFINE_STRUCT_TM)]]
+[[guard, decl_prefix(DEFINE_STRUCT_TM)]]
 int getdate_r([[nonnull]] char const *__restrict string,
               [[nonnull]] __STRUCT_TM *__restrict resbufp) {
 	/* TODO */
@@ -1606,16 +1613,16 @@ __NAMESPACE_LOCAL_END
 )]
 
 
-[[time64_variant_of(gmtime_r)]]
+[[doc_alias("gmtime_r"), time64_variant_of(gmtime_r)]]
 [[decl_prefix(DEFINE_STRUCT_TM)]]
 [[impl_prefix(
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(dos_gmtime64_s)@@
 DEFINE_TIME_MONTHSTART_YDAY
 @@pp_endif@@
 )]]
-[impl_prefix(DEFINE_ISLEAP)]
-[impl_prefix(DEFINE_DAYSTOYEARS)]
-[impl_prefix(DEFINE_YEARSTODAYS)]
+[[impl_prefix(DEFINE_ISLEAP)]]
+[[impl_prefix(DEFINE_DAYSTOYEARS)]]
+[[impl_prefix(DEFINE_YEARSTODAYS)]]
 __STRUCT_TM *gmtime64_r([[nonnull]] $time64_t const *__restrict timer,
                         [[nonnull]] __STRUCT_TM *__restrict tp) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -1705,8 +1712,8 @@ __STRUCT_TM *gmtime64_r([[nonnull]] $time64_t const *__restrict timer,
 @@pp_endif@@
 }
 
-[decl_prefix(DEFINE_STRUCT_TM)]
-[time64_variant_of(localtime_r)]
+[[decl_prefix(DEFINE_STRUCT_TM)]]
+[[doc_alias("localtime_r"), time64_variant_of(localtime_r)]]
 __STRUCT_TM *localtime64_r([[nonnull]] $time64_t const *__restrict timer,
                            [[nonnull]] __STRUCT_TM *__restrict tp) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -1720,7 +1727,7 @@ __STRUCT_TM *localtime64_r([[nonnull]] $time64_t const *__restrict timer,
 @@pp_endif@@
 }
 
-[[time64_variant_of(ctime_r)]]
+[[doc_alias("ctime_r"), time64_variant_of(ctime_r)]]
 [[decl_prefix(DEFINE_STRUCT_TM)]]
 char *ctime64_r([[nonnull]] $time64_t const *__restrict timer,
                 [[nonnull]] char buf[26]) {
