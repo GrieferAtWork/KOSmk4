@@ -36,76 +36,87 @@ __SYSDECL_BEGIN
 
 }
 
-c16stol(*) %{uchar("wcstol")}
-c32stol(*) %{uchar("wcstol")}
-c16stoul(*) %{uchar("wcstoul")}
-c32stoul(*) %{uchar("wcstoul")}
-
-c16stoll(*) %{uchar("wcstoll")}
-c32stoll(*) %{uchar("wcstoll")}
-c16stoull(*) %{uchar("wcstoull")}
-c32stoull(*) %{uchar("wcstoull")}
-
-%#ifndef __NO_FPU
-c16stod(*) %{uchar("wcstod")}
-c32stod(*) %{uchar("wcstod")}
-%#ifdef __USE_ISOC99
-c16stof(*) %{uchar("wcstof")}
-c32stof(*) %{uchar("wcstof")}
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-c16stold(*) %{uchar("wcstold")}
-c32stold(*) %{uchar("wcstold")}
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* !__USE_ISOC99 */
-%#endif /* !__NO_FPU */
+mbtoc16(*) %{uchar16("mbtowc")}
+mbtoc32(*) %{uchar32("mbtowc")}
+c16tomb(*) %{uchar16("wctomb")}
+c32tomb(*) %{uchar32("wctomb")}
+mbstoc16s(*) %{uchar16("mbstowcs")}
+mbstoc32s(*) %{uchar32("mbstowcs")}
+c16stombs(*) %{uchar16("wcstombs")}
+c32stombs(*) %{uchar32("wcstombs")}
 
 
-%
-%#ifdef __USE_GNU
-%[insert:function(c16stoq = c16stoll)]
-%[insert:function(c32stoq = c32stoll)]
-%[insert:function(c16stouq = c16stoull)]
-%[insert:function(c32stouq = c32stoull)]
-c16stol_l(*) %{uchar("wcstol_l")}
-c32stol_l(*) %{uchar("wcstol_l")}
-c16stoul_l(*) %{uchar("wcstoul_l")}
-c32stoul_l(*) %{uchar("wcstoul_l")}
-c16stoll_l(*) %{uchar("wcstoll_l")}
-c32stoll_l(*) %{uchar("wcstoll_l")}
-c16stoull_l(*) %{uchar("wcstoull_l")}
-c32stoull_l(*) %{uchar("wcstoull_l")}
+[[ignore]] __p___c16argv(*) %{uchar16("__p___wargv")}
+[[ignore]] __p___c32argv(*) %{uchar32("__p___wargv")}
+[[ignore]] __p__c16environ(*) %{uchar16("__p__wenviron")}
+[[ignore]] __p__c32environ(*) %{uchar32("__p__wenviron")}
+[[ignore]] __p__c16pgmptr(*) %{uchar16("__p__wpgmptr")}
+[[ignore]] __p__c32pgmptr(*) %{uchar32("__p__wpgmptr")}
 
-%#ifndef __NO_FPU
-c16stof_l(*) %{uchar("wcstof_l")}
-c32stof_l(*) %{uchar("wcstof_l")}
-c16stod_l(*) %{uchar("wcstod_l")}
-c32stod_l(*) %{uchar("wcstod_l")}
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-c16stold_l(*) %{uchar("wcstold_l")}
-c32stold_l(*) %{uchar("wcstold_l")}
-%#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%#endif /* !__NO_FPU */
-%#endif /* __USE_GNU */
+[[ignore]] _get_c16pgmptr(*) %{uchar16("_get_wpgmptr")}
+[[ignore]] _get_c32pgmptr(*) %{uchar32("_get_wpgmptr")}
 
+[[ignore]] _mbtoc16_l(*) %{uchar16("_mbtowc_l")}
+[[ignore]] _mbtoc32_l(*) %{uchar32("_mbtowc_l")}
+[[ignore]] _mbstoc16s_l(*) %{uchar16("_mbstowcs_l")}
+[[ignore]] _mbstoc32s_l(*) %{uchar32("_mbstowcs_l")}
+[[ignore]] _mbstoc16s_s(*) %{uchar16("_mbstowcs_s")}
+[[ignore]] _mbstoc32s_s(*) %{uchar32("_mbstowcs_s")}
+[[ignore]] _mbstoc16s_s_l(*) %{uchar16("_mbstowcs_s_l")}
+[[ignore]] _mbstoc32s_s_l(*) %{uchar32("_mbstowcs_s_l")}
 
-%
-%#ifdef __USE_KOS
-c16sto32(*) %{uchar16("wcsto32")}
-c32sto32(*) %{uchar32("wcsto32")}
-c16stou32(*) %{uchar16("wcstou32")}
-c32stou32(*) %{uchar32("wcstou32")}
-c16sto64(*) %{uchar16("wcsto64")}
-c32sto64(*) %{uchar32("wcsto64")}
-c16stou64(*) %{uchar16("wcstou64")}
-c32stou64(*) %{uchar32("wcstou64")}
+[[ignore]] c16tomb_s(*) %{uchar16("wctomb_s")}
+[[ignore]] c32tomb_s(*) %{uchar32("wctomb_s")}
+[[ignore]] _c16tomb_s_l(*) %{uchar16("_wctomb_s_l")}
+[[ignore]] _c32tomb_s_l(*) %{uchar32("_wctomb_s_l")}
+[[ignore]] _c16stombs_s_l(*) %{uchar16("_wcstombs_s_l")}
+[[ignore]] _c32stombs_s_l(*) %{uchar32("_wcstombs_s_l")}
+[[ignore]] _c16stombs_l(*) %{uchar16("_wcstombs_l")}
+[[ignore]] _c32stombs_l(*) %{uchar32("_wcstombs_l")}
+[[ignore]] c16stombs_s(*) %{uchar16("wcstombs_s")}
+[[ignore]] c32stombs_s(*) %{uchar32("wcstombs_s")}
 
-c16toi(*) %{uchar16("wtoi")}
-c32toi(*) %{uchar32("wtoi")}
-c16tol(*) %{uchar16("wtol")}
-c32tol(*) %{uchar32("wtol")}
-c16toll(*) %{uchar16("wtoll")}
-c32toll(*) %{uchar32("wtoll")}
-%#endif /* __USE_KOS */
+[[ignore]] _c16getenv(*) %{uchar16("_wgetenv")}
+[[ignore]] _c32getenv(*) %{uchar32("_wgetenv")}
+[[ignore]] _c16getenv_s(*) %{uchar16("_wgetenv_s")}
+[[ignore]] _c32getenv_s(*) %{uchar32("_wgetenv_s")}
+[[ignore]] _c16dupenv_s(*) %{uchar16("_wdupenv_s")}
+[[ignore]] _c32dupenv_s(*) %{uchar32("_wdupenv_s")}
+[[ignore]] _c16tof(*) %{uchar16("_wtof")}
+[[ignore]] _c32tof(*) %{uchar32("_wtof")}
+[[ignore]] _c16tof_l(*) %{uchar16("_wtof_l")}
+[[ignore]] _c32tof_l(*) %{uchar32("_wtof_l")}
+
+[[ignore]] _itoc16(*) %{uchar16("_itow")}
+[[ignore]] _itoc32(*) %{uchar32("_itow")}
+[[ignore]] _ltoc16(*) %{uchar16("_ltow")}
+[[ignore]] _ltoc32(*) %{uchar32("_ltow")}
+[[ignore]] _ultoc16(*) %{uchar16("_ultow")}
+[[ignore]] _ultoc32(*) %{uchar32("_ultow")}
+[[ignore]] _i64toc16(*) %{uchar16("_i64tow")}
+[[ignore]] _i64toc32(*) %{uchar32("_i64tow")}
+[[ignore]] _ui64toc16(*) %{uchar16("_ui64tow")}
+[[ignore]] _ui64toc32(*) %{uchar32("_ui64tow")}
+[[ignore]] _itoc16_s(*) %{uchar16("_itow_s")}
+[[ignore]] _itoc32_s(*) %{uchar32("_itow_s")}
+[[ignore]] _ltoc16_s(*) %{uchar16("_ltow_s")}
+[[ignore]] _ltoc32_s(*) %{uchar32("_ltow_s")}
+[[ignore]] _ultoc16_s(*) %{uchar16("_ultow_s")}
+[[ignore]] _ultoc32_s(*) %{uchar32("_ultow_s")}
+[[ignore]] _i64toc16_s(*) %{uchar16("_i64tow_s")}
+[[ignore]] _i64toc32_s(*) %{uchar32("_i64tow_s")}
+[[ignore]] _ui64toc16_s(*) %{uchar16("_ui64tow_s")}
+[[ignore]] _ui64toc32_s(*) %{uchar32("_ui64tow_s")}
+[[ignore]] _c16toi64(*) %{uchar16("_wtoi64")}
+[[ignore]] _c32toi64(*) %{uchar32("_wtoi64")}
+[[ignore]] _c16toi_l(*) %{uchar16("_wtoi_l")}
+[[ignore]] _c32toi_l(*) %{uchar32("_wtoi_l")}
+[[ignore]] _c16tol_l(*) %{uchar16("_wtol_l")}
+[[ignore]] _c32tol_l(*) %{uchar32("_wtol_l")}
+[[ignore]] _c16toi64_l(*) %{uchar16("_wtoi64_l")}
+[[ignore]] _c32toi64_l(*) %{uchar32("_wtoi64_l")}
+[[ignore]] _c16toll_l(*) %{uchar16("_wtoll_l")}
+[[ignore]] _c32toll_l(*) %{uchar32("_wtoll_l")}
 
 
 

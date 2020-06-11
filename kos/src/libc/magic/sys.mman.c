@@ -551,7 +551,7 @@ void *mmap32(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 @@              MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
 @@              MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_DONT_OVERRIDE'
 [[decl_include("<features.h>")]]
-[[ATTR_WUNUSED, section(".text.crt.heap.mman"), no_crt_self_import]]
+[[wunused, section(".text.crt.heap.mman"), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mmap64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("mmap")]]
 [[userimpl, requires($has_function(mmap32) || $has_function(mmap64))]]
@@ -616,7 +616,7 @@ int mincore([[nonnull]] void *start, size_t len, unsigned char *vec);
 %
 %#ifdef __USE_LARGEFILE64
 [[decl_include("<features.h>")]]
-[[ATTR_WUNUSED, section(".text.crt.heap.mman")]]
+[[wunused, section(".text.crt.heap.mman")]]
 [[doc_alias("mmap"), off64_variant_of(mmap)]]
 [[userimpl, requires_function(mmap32)]]
 void *mmap64(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,

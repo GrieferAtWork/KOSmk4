@@ -277,7 +277,7 @@ sigdelset:([[nonnull]] sigset_t *set, int signo) -> int {
 }
 
 @@@param signo: One of `SIG*'
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 [[decl_include("<bits/sigset.h>"), export_alias("__sigismember")]]
 sigismember:([[nonnull]] sigset_t const *set, int signo) -> int {
 	ulongptr_t mask = @__sigmask@(signo);
@@ -303,7 +303,7 @@ int sigwait([[nonnull]] sigset_t const *__restrict set,
             [[nonnull]] int *__restrict signo);
 
 %#ifdef __USE_GNU
-[[ATTR_WUNUSED, ATTR_PURE, decl_include("<bits/sigset.h>")]]
+[[wunused, ATTR_PURE, decl_include("<bits/sigset.h>")]]
 int sigisemptyset([[nonnull]] sigset_t const *__restrict set) {
 	size_t i;
 	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
@@ -445,16 +445,16 @@ $sighandler_t sigset(int signo, $sighandler_t disp);
 %
 
 
-[[ATTR_CONST, ATTR_WUNUSED]]
-[[requires(defined(__SIGRTMIN))]]
+[[ATTR_CONST, wunused]]
 [[requires_include("<bits/signum-values.h>")]]
+[[requires(defined(__SIGRTMIN))]]
 int __libc_current_sigrtmin() {
 	return __SIGRTMIN;
 }
 
-[[ATTR_CONST, ATTR_WUNUSED]]
-[[requires(defined(__SIGRTMIN))]]
+[[ATTR_CONST, wunused]]
 [[requires_include("<bits/signum-values.h>")]]
+[[requires(defined(__SIGRTMAX))]]
 int __libc_current_sigrtmax() {
 	return __SIGRTMAX;
 }

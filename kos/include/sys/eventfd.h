@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76aa099f */
+/* HASH CRC-32:0x5e2548e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ typedef uint64_t eventfd_t;
 
 #ifdef __CRT_HAVE_eventfd
 /* Return file descriptor for generic event channel. Set initial value to COUNT */
-__CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,eventfd,(unsigned int __count, int __flags),(__count,__flags))
+__CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,eventfd,(__STDC_UINT_AS_SIZE_T __count, __STDC_INT_AS_UINT_T __flags),(__count,__flags))
 #endif /* __CRT_HAVE_eventfd */
 #ifdef __CRT_HAVE_eventfd_read
 /* Read event counter and possibly wait for events */

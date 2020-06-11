@@ -137,7 +137,7 @@ typedef struct __dirstream DIR;
 %[define(DEFINE_STRUCT_DIRSTREAM = struct __dirstream;)]
 
 @@Open and return a new directory stream for reading, referring to `name'
-[[cp, ATTR_WUNUSED, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(opendirat))]]
 DIR *opendir([[nonnull]] char const *name) {
 	/* TODO: Emulate using DOS's _find* functions */
@@ -149,7 +149,7 @@ DIR *opendir([[nonnull]] char const *name) {
 %
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
-[[cp, ATTR_WUNUSED, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[userimpl, requires($has_function(fdopendir) && $has_function(openat))]]
 DIR *fopendirat($fd_t dirfd, [[nonnull]] char const *name, $oflag_t oflags) {
 	DIR *result;
@@ -165,7 +165,7 @@ DIR *fopendirat($fd_t dirfd, [[nonnull]] char const *name, $oflag_t oflags) {
 }
 
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
-[[cp, ATTR_WUNUSED, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[userimpl, requires_function(fopendirat)]]
 DIR *opendirat($fd_t dirfd, [[nonnull]] char const *name) {
 	return fopendirat(dirfd, name, 0);
@@ -181,7 +181,7 @@ int closedir([[nonnull]] DIR *dirp);
 %
 %#ifdef __USE_BSD
 @@Same as `closedir()', but instead of closing the underlying file descriptor, return it
-[[ATTR_WUNUSED, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 $fd_t fdclosedir([[nonnull]] DIR *dirp);
 %#endif /* __USE_BSD */
 
@@ -202,7 +202,7 @@ void rewinddir([[nonnull]] DIR *__restrict dirp);
 %
 %#ifdef __USE_XOPEN2K8
 @@Create a new directory stream by inheriting the given `FD' as stream handle
-[[ATTR_WUNUSED, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 DIR *fdopendir($fd_t fd);
 %#endif /* __USE_XOPEN2K8 */
 
@@ -374,7 +374,7 @@ int versionsort64([[nonnull]] struct dirent64 const **e1,
 @@@return: 0 : The end of the directory has been reached.
 @@@return: -1: Failed to read a directory entry for some reason (s.a.: `errno')
 [[if(defined(_DIRENT_MATCHES_DIRENT64)), alias("kreaddir64")]]
-[[cp, ATTR_WUNUSED, userimpl, requires_function(kreaddirf)]]
+[[cp, wunused, userimpl, requires_function(kreaddirf)]]
 $ssize_t kreaddir($fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode) {
 	return kreaddirf(fd, buf, bufsize, mode, 0);
 }
@@ -387,7 +387,7 @@ $ssize_t kreaddir($fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mod
 @@                   stream will only be advanced when this value is >= 'BUFSIZE'
 @@@return: 0 : The end of the directory has been reached.
 @@@return: -1: Failed to read a directory entry for some reason (s.a.: `errno')
-[[cp, ATTR_WUNUSED, no_crt_self_import]]
+[[cp, wunused, no_crt_self_import]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("kreaddirf")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("kreaddirf64")]]
 $ssize_t kreaddirf($fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mode, $oflag_t flags);
@@ -395,7 +395,7 @@ $ssize_t kreaddirf($fd_t fd, struct dirent *buf, size_t bufsize, unsigned int mo
 %#ifdef __USE_LARGEFILE64
 
 @@64-bit variant of `kreaddir()'
-[[cp, ATTR_WUNUSED, dirent64_variant_of(kreaddir)]]
+[[cp, wunused, dirent64_variant_of(kreaddir)]]
 [[if(defined(_DIRENT_MATCHES_DIRENT64)), alias("kreaddir")]]
 [[userimpl, requires_function(kreaddirf64)]]
 $ssize_t kreaddir64($fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode) {
@@ -403,7 +403,7 @@ $ssize_t kreaddir64($fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int
 }
 
 @@64-bit variant of `kreaddirf()'
-[[cp, ATTR_WUNUSED, dirent64_variant_of(kreaddirf)]]
+[[cp, wunused, dirent64_variant_of(kreaddirf)]]
 $ssize_t kreaddirf64($fd_t fd, struct dirent64 *buf, size_t bufsize,
                      unsigned int mode, $oflag_t flags);
 

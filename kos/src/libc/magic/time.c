@@ -367,12 +367,12 @@ $errno_t dos_ctime64_s([[nonnull]] char buf[26], $size_t bufsize,
 $time32_t time32([[nullable]] $time32_t *timer);
 
 [[decl_include("<bits/types.h>")]]
-[[ATTR_WUNUSED, nothrow, ATTR_CONST, doc_alias("difftime")]]
+[[wunused, nothrow, ATTR_CONST, doc_alias("difftime")]]
 [[ignore, nocrt, alias("difftime", "_difftime32")]]
 double difftime32($time32_t time1, $time32_t time0);
 
 [[decl_include("<bits/types.h>")]]
-[[ATTR_WUNUSED, decl_prefix(DEFINE_STRUCT_TM), doc_alias("localtime")]]
+[[wunused, decl_prefix(DEFINE_STRUCT_TM), doc_alias("localtime")]]
 [[ignore, nocrt, alias("localtime", "_localtime32")]]
 [[nonnull]] __STRUCT_TM *localtime32([[nonnull]] $time64_t const *timer);
 
@@ -380,7 +380,7 @@ double difftime32($time32_t time1, $time32_t time0);
 
 [[decl_include("<features.h>")]]
 [[decl_prefix(DEFINE_STRUCT_TM)]]
-[[ATTR_PURE, ATTR_WUNUSED, doc_alias(mktime)]]
+[[ATTR_PURE, wunused, doc_alias(mktime)]]
 [[ignore, nocrt, alias("mktime", "_mktime32", "timelocal")]]
 $time32_t mktime32([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp);
 
@@ -394,7 +394,7 @@ $time32_t mktime32([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp);
 
 @@Time used by the program so far (user time + system time)
 @@The result / CLOCKS_PER_SECOND is program time in seconds
-[[std, ATTR_WUNUSED]] clock_t clock();
+[[std, wunused]] clock_t clock();
 
 @@Return the current time and put it in *TIMER if TIMER is not NULL
 [[decl_include("<bits/types.h>")]]
@@ -420,7 +420,7 @@ time_t time(time_t *timer) {
 %(std)#ifndef __NO_FPU
 @@Return the difference between TIME1 and TIME0
 [[decl_include("<bits/types.h>")]]
-[[ATTR_WUNUSED, ATTR_CONST, std, guard, no_crt_self_import]]
+[[wunused, ATTR_CONST, std, guard, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("difftime64", "_difftime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("difftime", "_difftime32")]]
 double difftime(time_t time1, time_t time0) {
@@ -440,7 +440,7 @@ double difftime(time_t time1, time_t time0) {
 
 @@Return the `time_t' representation of TP and normalize TP
 [[decl_include("<bits/types.h>", "<features.h>")]]
-[[ATTR_WUNUSED, ATTR_PURE, std]]
+[[wunused, ATTR_PURE, std]]
 [[decl_prefix(DEFINE_STRUCT_TM), impl_prefix(DEFINE_YEARSTODAYS), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("mktime64", "_mktime64", "timelocal64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("mktime", "_mktime32", "timelocal")]]
@@ -473,12 +473,12 @@ time_t mktime([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) {
 
 
 [[decl_include("<bits/types.h>")]]
-[[ATTR_WUNUSED, doc_alias("ctime")]]
+[[wunused, doc_alias("ctime")]]
 [[ignore, nocrt, alias("ctime", "_ctime32")]]
 [[nonnull]] char *ctime32([[nonnull]] $time32_t const *timer);
 
 [[decl_include("<bits/types.h>")]]
-[[ATTR_WUNUSED, doc_alias("gmtime"), decl_prefix(DEFINE_STRUCT_TM)]]
+[[wunused, doc_alias("gmtime"), decl_prefix(DEFINE_STRUCT_TM)]]
 [[ignore, nocrt, alias("gmtime", "_gmtime32")]]
 [[nonnull]] __STRUCT_TM *gmtime32([[nonnull]] $time32_t const *timer);
 
@@ -489,7 +489,7 @@ time_t mktime([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) {
 @@pp_if defined(__BUILDING_LIBC) || (!$has_function(ctime32) && !$has_function(ctime32))@@
 DEFINE_CTIME_BUFFER
 @@pp_endif@@
-), ATTR_WUNUSED, no_crt_self_import]]
+), wunused, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("ctime64", "_ctime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("ctime", "_ctime32")]]
 [[nonnull]] char *ctime([[nonnull]] time_t const *timer) {
@@ -525,7 +525,7 @@ __LOCAL_LIBC_DATA(__gmtime_buf) __STRUCT_TM __gmtime_buf = { 0 };
 @@pp_if defined(__BUILDING_LIBC) || (!$has_function(gmtime32) && !$has_function(gmtime64))@@
 DEFINE_GMTIME_BUFFER
 @@pp_endif@@
-), ATTR_WUNUSED, no_crt_self_import]]
+), wunused, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("gmtime64", "_gmtime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("gmtime", "_gmtime32")]]
 [[nonnull]] struct tm *gmtime([[nonnull]] time_t const *timer) {
@@ -550,7 +550,7 @@ DEFINE_GMTIME_BUFFER
 @@pp_if defined(__BUILDING_LIBC) || (!$has_function(localtime32) && !$has_function(localtime64))@@
 DEFINE_GMTIME_BUFFER
 @@pp_endif@@
-), ATTR_WUNUSED, no_crt_self_import]]
+), wunused, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("localtime64", "_localtime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("localtime", "_localtime32")]]
 [[nonnull]] struct tm *localtime([[nonnull]] time_t const *timer) {
@@ -617,7 +617,7 @@ __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 
 @@Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
 @@that is the representation of TP in this format
-[[std, ATTR_WUNUSED, impl_prefix(DEFINE_CTIME_BUFFER)]]
+[[std, wunused, impl_prefix(DEFINE_CTIME_BUFFER)]]
 [[nonnull]] char *asctime([[nonnull]] struct tm const *tp) {
 	return asctime_r(tp, @__ctime_buf@);
 }
@@ -649,7 +649,7 @@ $time64_t time64($time64_t *timer) {
 
 %#ifndef __NO_FPU
 [[decl_include("<bits/types.h>")]]
-[[ATTR_WUNUSED, ATTR_CONST, guard, doc_alias("difftime"), time64_variant_of(difftime)]]
+[[wunused, ATTR_CONST, guard, doc_alias("difftime"), time64_variant_of(difftime)]]
 [[export_alias("_difftime64", "__difftime64")]]
 double difftime64($time64_t time1, $time64_t time0) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -671,7 +671,7 @@ double difftime64($time64_t time1, $time64_t time0) {
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 ), export_alias("_mktime64", "timelocal64")]]
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 $time64_t mktime64([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) {
 @@pp_ifdef __BUILDING_LIBC@@
 	time64_t result;
@@ -701,7 +701,7 @@ $time64_t mktime64([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) {
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(ctime32)@@
 DEFINE_CTIME_BUFFER
 @@pp_endif@@
-), ATTR_WUNUSED, export_alias("_ctime64")]]
+), wunused, export_alias("_ctime64")]]
 [[nonnull]] char *ctime64([[nonnull]] $time64_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return ctime64_r(timer, @__ctime_buf@);
@@ -720,7 +720,7 @@ DEFINE_CTIME_BUFFER
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(gmtime32)@@
 DEFINE_GMTIME_BUFFER
 @@pp_endif@@
-), ATTR_WUNUSED, export_alias("_gmtime64")]]
+), wunused, export_alias("_gmtime64")]]
 [[nonnull]] __STRUCT_TM *gmtime64([[nonnull]] $time64_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return gmtime64_r(timer, &@__gmtime_buf@);
@@ -740,7 +740,7 @@ DEFINE_GMTIME_BUFFER
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(localtime32)@@
 DEFINE_GMTIME_BUFFER
 @@pp_endif@@
-), ATTR_WUNUSED, export_alias("_localtime64")]]
+), wunused, export_alias("_localtime64")]]
 [[nonnull]] __STRUCT_TM *localtime64([[nonnull]] $time64_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return localtime64_r(timer, &@__gmtime_buf@);
@@ -907,7 +907,7 @@ int stime([[nonnull]] $time_t const *when) {
 [[decl_include("<bits/types.h>"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("timegm64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("timegm")]]
-[[ATTR_WUNUSED, ATTR_PURE, decl_prefix(DEFINE_STRUCT_TM)]]
+[[wunused, ATTR_PURE, decl_prefix(DEFINE_STRUCT_TM)]]
 $time_t timegm([[nonnull]] __STRUCT_TM *tp) {
 @@pp_ifdef __BUILDING_LIBC@@
 	/* TODO: Timezones */
@@ -921,7 +921,7 @@ $time_t timegm([[nonnull]] __STRUCT_TM *tp) {
 }
 
 @@Another name for `mktime'
-[[ATTR_WUNUSED, ATTR_PURE, decl_include("<bits/types.h>", "<features.h>")]]
+[[wunused, ATTR_PURE, decl_include("<bits/types.h>", "<features.h>")]]
 $time_t timelocal([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) = mktime;
 
 
@@ -947,7 +947,7 @@ $time_t timelocal([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) = mktime;
 
 @@Return the number of days in YEAR
 [[decl_include("<features.h>")]]
-[[ATTR_CONST, ATTR_WUNUSED, impl_prefix(DEFINE_ISLEAP)]]
+[[ATTR_CONST, wunused, impl_prefix(DEFINE_ISLEAP)]]
 int dysize(__STDC_INT_AS_UINT_T year) {
 	return __isleap(year) ? 366 : 365;
 }
@@ -962,14 +962,14 @@ int stime64([[nonnull]] $time64_t const *when) {
 }
 
 [[decl_include("<bits/types.h>")]]
-[[ATTR_WUNUSED, ATTR_PURE, doc_alias("timegm"), decl_prefix(DEFINE_STRUCT_TM)]]
+[[wunused, ATTR_PURE, doc_alias("timegm"), decl_prefix(DEFINE_STRUCT_TM)]]
 [[ignore, nocrt, alias("timegm")]]
 $time32_t timegm32([[nonnull]] __STRUCT_TM *tp);
 
 
 [[decl_include("<bits/types.h>")]]
 [[decl_prefix(DEFINE_STRUCT_TM)]]
-[[ATTR_WUNUSED, ATTR_PURE, doc_alias("timegm"), time64_variant_of(timegm)]]
+[[wunused, ATTR_PURE, doc_alias("timegm"), time64_variant_of(timegm)]]
 $time64_t timegm64([[nonnull]] __STRUCT_TM *tp) {
 @@pp_ifdef __BUILDING_LIBC@@
 	/* TODO: Timezones */

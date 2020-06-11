@@ -988,7 +988,7 @@ __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_allbits)(lfutex_t *__uaddr, lfutex_t
 @@>> return lfutex(uaddr, LFUTEX_WAIT_WHILE, val, (struct timespec const *)NULL);
 @@Upon startup, `futex_getspin()' is pre-initialized to `4'.
 @@@return: * : The current (get) / old (set) spin value
-[[ATTR_WUNUSED, nothrow]]
+[[wunused, nothrow]]
 unsigned int futex_getspin();
 
 [[nothrow, doc_alias("futex_getspin")]]

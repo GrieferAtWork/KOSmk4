@@ -240,7 +240,7 @@ int __control87_2($uint32_t newval, $uint32_t mask,
 
 %[insert:function(_copysign = copysign)]
 
-[[ATTR_WUNUSED, nothrow, ATTR_CONST]]
+[[wunused, nothrow, ATTR_CONST]]
 double _chgsign(double x) {
 	return -x;
 }
@@ -251,7 +251,7 @@ double _chgsign(double x) {
 %[insert:function(_finite = finite)]
 %[insert:function(_isnan = isnan)]
 
-[[ATTR_WUNUSED, nothrow, ATTR_CONST]]
+[[wunused, nothrow, ATTR_CONST]]
 int _fpclass(double x);
 
 %#if defined(__x86_64__) || defined(__i386__)

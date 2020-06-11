@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x508785ed */
+/* HASH CRC-32:0xa6a94387 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local___libc_current_sigrtmax_defined 1
 #include <__crt.h>
 #include <bits/signum-values.h>
-#ifdef __SIGRTMIN
+#ifdef __SIGRTMAX
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__libc_current_sigrtmax) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(void) {
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep___libc_current_sigrtmax_defined 1
 #define __localdep___libc_current_sigrtmax __LIBC_LOCAL_NAME(__libc_current_sigrtmax)
 #endif /* !__local___localdep___libc_current_sigrtmax_defined */
-#else /* __SIGRTMIN */
+#else /* __SIGRTMAX */
 #undef __local___libc_current_sigrtmax_defined
-#endif /* !__SIGRTMIN */
+#endif /* !__SIGRTMAX */
 #endif /* !__local___libc_current_sigrtmax_defined */

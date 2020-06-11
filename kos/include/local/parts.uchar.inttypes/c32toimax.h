@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e8f271b */
+/* HASH CRC-32:0xca345192 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_c32toimax_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c32sto64 from parts.uchar.stdlib */
+/* Dependency: c32sto64 from parts.uchar.wchar */
 #ifndef __local___localdep_c32sto64_defined
 #define __local___localdep_c32sto64_defined 1
 #if defined(__CRT_HAVE_wcsto64) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
@@ -52,12 +52,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32sto64 (*(__INT64_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__ **, int))&__LIBC_LOCAL_NAME(wcsto64))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <local/parts.uchar.stdlib/c32sto64.h>
+#include <local/parts.uchar.wchar/c32sto64.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32sto64 __LIBC_LOCAL_NAME(c32sto64)
 #endif /* !... */
 #endif /* !__local___localdep_c32sto64_defined */
-/* Dependency: c32sto32 from parts.uchar.stdlib */
+/* Dependency: c32sto32 from parts.uchar.wchar */
 #ifndef __local___localdep_c32sto32_defined
 #define __local___localdep_c32sto32_defined 1
 #if defined(__CRT_HAVE_wcsto32) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
@@ -87,7 +87,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32sto32 (*(__INT32_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__ **, int))&__LIBC_LOCAL_NAME(wcsto32))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <local/parts.uchar.stdlib/c32sto32.h>
+#include <local/parts.uchar.wchar/c32sto32.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32sto32 __LIBC_LOCAL_NAME(c32sto32)
 #endif /* !... */

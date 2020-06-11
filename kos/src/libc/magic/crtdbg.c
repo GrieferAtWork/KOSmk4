@@ -293,7 +293,7 @@ void _CrtDbgBreak();
 __LONG32_TYPE__ _CrtSetBreakAlloc(__LONG32_TYPE__ break_alloc);
 
 [[ATTR_MALLOC, ATTR_ALLOC_SIZE((1))]]
-[[guard, ATTR_WUNUSED, userimpl, requires_function(malloc)]]
+[[guard, wunused, userimpl, requires_function(malloc)]]
 void *_malloc_dbg($size_t num_bytes, int block_type,
                   char const *filename, int line) {
 	(void)block_type;
@@ -302,7 +302,7 @@ void *_malloc_dbg($size_t num_bytes, int block_type,
 	return malloc(num_bytes);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
+[[guard, wunused, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
 [[userimpl, requires_function(calloc)]]
 void *_calloc_dbg($size_t count, $size_t num_bytes,
                   int block_type, char const *filename, int line) {
@@ -312,7 +312,7 @@ void *_calloc_dbg($size_t count, $size_t num_bytes,
 	return calloc(count, num_bytes);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_ALLOC_SIZE((2))]]
+[[guard, wunused, ATTR_ALLOC_SIZE((2))]]
 [[userimpl, requires_function(calloc)]]
 void *_realloc_dbg([[nullable]] void *ptr, $size_t num_bytes,
                    int block_type, char const *filename, int line) {
@@ -322,7 +322,7 @@ void *_realloc_dbg([[nullable]] void *ptr, $size_t num_bytes,
 	return realloc(ptr, num_bytes);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_ALLOC_SIZE((2, 3))]]
+[[guard, wunused, ATTR_ALLOC_SIZE((2, 3))]]
 [[userimpl, requires($has_function(recallocv))]]
 void *_recalloc_dbg([[nullable]] void *ptr, $size_t count, $size_t num_bytes,
                     int block_type, char const *filename, int line) {
@@ -332,7 +332,7 @@ void *_recalloc_dbg([[nullable]] void *ptr, $size_t count, $size_t num_bytes,
 	return recallocv(ptr, count, num_bytes);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_ALLOC_SIZE((2))]]
+[[guard, wunused, ATTR_ALLOC_SIZE((2))]]
 [[userimpl, requires_function(realloc_in_place)]]
 void *_expand_dbg([[nonnull]] void *ptr, $size_t num_bytes,
                   int block_type, char const *filename, int line) {
@@ -348,20 +348,20 @@ void _free_dbg([[nullable]] void *ptr, int block_type) {
 	free(ptr);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_PURE]]
+[[guard, wunused, ATTR_PURE]]
 [[userimpl, requires_function(_msize)]]
 $size_t _msize_dbg([[nonnull]] void *ptr, int block_type) {
 	(void)block_type;
 	return _msize(ptr);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_PURE]]
+[[guard, wunused, ATTR_PURE]]
 [[userimpl, requires_function(_aligned_msize)]]
 $size_t _aligned_msize_dbg([[nonnull]] void *ptr, $size_t min_alignment, $size_t offset) {
 	return _aligned_msize(ptr, min_alignment, offset);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1)), ATTR_ALLOC_ALIGN(2)]]
+[[guard, wunused, ATTR_MALLOC, ATTR_ALLOC_SIZE((1)), ATTR_ALLOC_ALIGN(2)]]
 [[userimpl, requires($has_function(_aligned_malloc))]]
 void *_aligned_malloc_dbg($size_t num_bytes, $size_t min_alignment,
                           char const *filename, int line) {
@@ -370,7 +370,7 @@ void *_aligned_malloc_dbg($size_t num_bytes, $size_t min_alignment,
 	return _aligned_malloc(num_bytes, min_alignment);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_ALLOC_SIZE((2)), ATTR_ALLOC_ALIGN(3)]]
+[[guard, wunused, ATTR_ALLOC_SIZE((2)), ATTR_ALLOC_ALIGN(3)]]
 [[userimpl, requires_function(_aligned_realloc)]]
 void *_aligned_realloc_dbg([[nullable]] void *ptr, $size_t num_bytes,
                            $size_t min_alignment, char const *filename, int line) {
@@ -379,7 +379,7 @@ void *_aligned_realloc_dbg([[nullable]] void *ptr, $size_t num_bytes,
 	return _aligned_realloc(ptr, num_bytes, min_alignment);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_ALLOC_SIZE((2, 3)), ATTR_ALLOC_ALIGN(4)]]
+[[guard, wunused, ATTR_ALLOC_SIZE((2, 3)), ATTR_ALLOC_ALIGN(4)]]
 [[userimpl, requires_function(_aligned_recalloc)]]
 void *_aligned_recalloc_dbg([[nullable]] void *ptr, $size_t count, $size_t num_bytes,
                             $size_t min_alignment, char const *filename, int line) {
@@ -388,7 +388,7 @@ void *_aligned_recalloc_dbg([[nullable]] void *ptr, $size_t count, $size_t num_b
 	return _aligned_recalloc(ptr, count, num_bytes, min_alignment);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1))]]
+[[guard, wunused, ATTR_MALLOC, ATTR_ALLOC_SIZE((1))]]
 [[userimpl, requires_function(_aligned_offset_malloc)]]
 void *_aligned_offset_malloc_dbg($size_t num_bytes, $size_t min_alignment, $size_t offset,
                                  char const *filename, int line) {
@@ -397,7 +397,7 @@ void *_aligned_offset_malloc_dbg($size_t num_bytes, $size_t min_alignment, $size
 	return _aligned_offset_malloc(num_bytes, min_alignment, offset);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_ALLOC_SIZE((2))]]
+[[guard, wunused, ATTR_ALLOC_SIZE((2))]]
 [[userimpl, requires_function(_aligned_offset_realloc)]]
 void *_aligned_offset_realloc_dbg([[nullable]] void *ptr, $size_t num_bytes,
                                   $size_t min_alignment, $size_t offset,
@@ -407,7 +407,7 @@ void *_aligned_offset_realloc_dbg([[nullable]] void *ptr, $size_t num_bytes,
 	return _aligned_offset_realloc(ptr, num_bytes, min_alignment, offset);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_ALLOC_SIZE((2, 3))]]
+[[guard, wunused, ATTR_ALLOC_SIZE((2, 3))]]
 [[userimpl, requires_function(_aligned_offset_recalloc)]]
 void *_aligned_offset_recalloc_dbg([[nullable]] void *ptr, $size_t count,
                                    $size_t num_bytes, $size_t min_alignment,
@@ -422,7 +422,7 @@ void _aligned_free_dbg([[nullable]] void *ptr) {
 	_aligned_free(ptr);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_MALLOC]]
+[[guard, wunused, ATTR_MALLOC]]
 [[userimpl, requires_function(strdup)]]
 char *_strdup_dbg(char const *string, int block_type, char const *filename, int line) {
 	(void)block_type;
@@ -431,7 +431,7 @@ char *_strdup_dbg(char const *string, int block_type, char const *filename, int 
 	return strdup(string);
 }
 
-[[guard, ATTR_MALLOC, ATTR_WUNUSED]]
+[[guard, ATTR_MALLOC, wunused]]
 [[userimpl, requires_function(c16dup)]]
 __WCHAR16_TYPE__ *_wcsdup_dbg(__WCHAR16_TYPE__ const *string,
                               int block_type, char const *filename, int line) {
@@ -441,7 +441,7 @@ __WCHAR16_TYPE__ *_wcsdup_dbg(__WCHAR16_TYPE__ const *string,
 	return (__WCHAR16_TYPE__ *)c16dup((char16_t const *)string);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_MALLOC]]
+[[guard, wunused, ATTR_MALLOC]]
 [[userimpl, requires_function(tempnam)]]
 char *_tempnam_dbg(char const *dir_name, char const *file_prefix,
                    int block_type, char const *filename, int line) {
@@ -451,7 +451,7 @@ char *_tempnam_dbg(char const *dir_name, char const *file_prefix,
 	return tempnam(dir_name, file_prefix);
 }
 
-[[guard, ATTR_WUNUSED, userimpl]]
+[[guard, wunused, userimpl]]
 __WCHAR16_TYPE__ *_wtempnam_dbg(__WCHAR16_TYPE__ const *dir_name,
                                 __WCHAR16_TYPE__ const *file_prefix,
                                 int block_type, char const *filename, int line) {
@@ -465,7 +465,7 @@ __WCHAR16_TYPE__ *_wtempnam_dbg(__WCHAR16_TYPE__ const *dir_name,
 	return NULL;
 }
 
-[[guard, ATTR_WUNUSED, userimpl, requires_function(_fullpath)]]
+[[guard, wunused, userimpl, requires_function(_fullpath)]]
 char *_fullpath_dbg([[outp_opt(bufsize)]] char *full_path,
                     [[nonnull]] char const *path, $size_t bufsize,
                     int block_type, char const *filename, int line) {
@@ -475,7 +475,7 @@ char *_fullpath_dbg([[outp_opt(bufsize)]] char *full_path,
 	return _fullpath(full_path, path, bufsize);
 }
 
-[[guard, ATTR_WUNUSED, userimpl]]
+[[guard, wunused, userimpl]]
 __WCHAR16_TYPE__ *_wfullpath_dbg([[outp_opt(buflen)]] __WCHAR16_TYPE__ *full_path,
                                  [[nonnull]] __WCHAR16_TYPE__ const *path, $size_t buflen,
                                  int block_type, char const *filename, int line) {
@@ -491,7 +491,7 @@ __WCHAR16_TYPE__ *_wfullpath_dbg([[outp_opt(buflen)]] __WCHAR16_TYPE__ *full_pat
 }
 
 [[decl_include("<features.h>")]]
-[[guard, ATTR_WUNUSED, userimpl, requires_function(getcwd)]]
+[[guard, wunused, userimpl, requires_function(getcwd)]]
 char *_getcwd_dbg([[outp_opt(bufsize)]] char *buf, __STDC_INT_AS_SIZE_T bufsize,
                   int block_type, char const *filename, int line) {
 	(void)block_type;
@@ -501,7 +501,7 @@ char *_getcwd_dbg([[outp_opt(bufsize)]] char *buf, __STDC_INT_AS_SIZE_T bufsize,
 }
 
 [[decl_include("<features.h>")]]
-[[guard, ATTR_WUNUSED, userimpl, requires_function(c16getcwd)]]
+[[guard, wunused, userimpl, requires_function(c16getcwd)]]
 __WCHAR16_TYPE__ *_wgetcwd_dbg([[outp_opt(buflen)]] __WCHAR16_TYPE__ *buf,
                                __STDC_INT_AS_SIZE_T buflen,
                                int block_type, char const *filename, int line) {
@@ -513,7 +513,7 @@ __WCHAR16_TYPE__ *_wgetcwd_dbg([[outp_opt(buflen)]] __WCHAR16_TYPE__ *buf,
 
 
 [[decl_include("<features.h>")]]
-[[guard, ATTR_WUNUSED, userimpl, requires_function(_getdcwd)]]
+[[guard, wunused, userimpl, requires_function(_getdcwd)]]
 char *_getdcwd_dbg(int driveno, [[outp_opt(bufsize)]] char *buf,
                    __STDC_INT_AS_SIZE_T bufsize,
                    int block_type, char const *filename, int line) {
@@ -524,7 +524,7 @@ char *_getdcwd_dbg(int driveno, [[outp_opt(bufsize)]] char *buf,
 }
 
 [[decl_include("<features.h>")]]
-[[guard, ATTR_WUNUSED, userimpl]]
+[[guard, wunused, userimpl]]
 __WCHAR16_TYPE__ *_wgetdcwd_dbg(int driveno, [[outp_opt(buflen)]] __WCHAR16_TYPE__ *buf,
                                 __STDC_INT_AS_SIZE_T buflen, int block_type,
                                 char const *filename, int line) {
@@ -581,7 +581,7 @@ void _CrtDoForAllClientObjects([[nonnull]] _PFNCRTDOFORALLCLIENTOBJECTS pfn, voi
 	(void)context;
 }
 
-[[ATTR_WUNUSED, userimpl, ATTR_PURE]]
+[[wunused, userimpl, ATTR_PURE]]
 int _CrtIsValidPointer(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes, int writable) {
 	COMPILER_IMPURE();
 	(void)num_bytes;
@@ -589,7 +589,7 @@ int _CrtIsValidPointer(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes, int wri
 	return ptr != NULL;
 }
 
-[[ATTR_WUNUSED, userimpl, ATTR_PURE]]
+[[wunused, userimpl, ATTR_PURE]]
 int _CrtIsValidHeapPointer(void const *heap_ptr) {
 	COMPILER_IMPURE();
 	return heap_ptr != NULL;
@@ -611,7 +611,7 @@ int _CrtIsMemoryBlock(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes,
 	return 0;
 }
 
-[[ATTR_WUNUSED, userimpl, ATTR_PURE]]
+[[wunused, userimpl, ATTR_PURE]]
 int _CrtReportBlockType(void const *ptr) {
 	COMPILER_IMPURE();
 	return ptr ? 1 /*_NORMAL_BLOCK*/ : 0 /*_FREE_BLOCK*/;

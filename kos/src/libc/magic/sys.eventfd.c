@@ -60,10 +60,13 @@ typedef uint64_t eventfd_t;
 }
 
 @@Return file descriptor for generic event channel. Set initial value to COUNT
-[[ATTR_WUNUSED]] eventfd:(unsigned int count, int flags) -> $fd_t;
+[[wunused, decl_include("<features.h>", "<bits/types.h>")]]
+$fd_t eventfd(__STDC_UINT_AS_SIZE_T count,
+              __STDC_INT_AS_UINT_T flags);
 
 @@Read event counter and possibly wait for events
-[[cp, userimpl, requires_function(read), impl_include("<parts/errno.h>")]]
+[[cp, userimpl, requires_function(read)]]
+[[decl_include("<bits/types.h>"), impl_include("<parts/errno.h>")]]
 int eventfd_read($fd_t fd, eventfd_t *value) {
 	ssize_t error;
 	error = read(fd, value, sizeof(eventfd_t));
@@ -77,7 +80,8 @@ int eventfd_read($fd_t fd, eventfd_t *value) {
 }
 
 @@Increment event counter
-[[cp, requires_function(write), impl_include("<parts/errno.h>")]]
+[[cp, requires_function(write)]]
+[[decl_include("<bits/types.h>"), impl_include("<parts/errno.h>")]]
 int eventfd_write($fd_t fd, eventfd_t value) {
 	ssize_t error;
 	error = write(fd, &value, sizeof(eventfd_t));

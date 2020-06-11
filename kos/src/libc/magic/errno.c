@@ -692,7 +692,7 @@ typedef __errno_t errno_t;
 #else /* __errno */
 }
 
-[[guard, alias("_errno", "__errno"), ATTR_WUNUSED]]
+[[guard, alias("_errno", "__errno"), wunused]]
 [[ATTR_CONST, section(".text.crt.errno_access")]]
 [[nonnull]] $errno_t *__errno_location();
 
@@ -768,7 +768,7 @@ __LIBC char *__progname;
 #else /* ... */
 }
 @@Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main()
-[[guard, ATTR_WUNUSED, ATTR_CONST, nonnull]]
+[[guard, wunused, ATTR_CONST, nonnull]]
 char **__p_program_invocation_short_name();
 %{
 #ifdef ____p__pgmptr_defined

@@ -90,6 +90,23 @@ global pendingTasks: {(Callable, Tuple)...} = [];
 global pendingTasksSem: Semaphore = Semaphore(0);
 global completeAllTasksSem: Semaphore = Semaphore(0);
 
+@@A prefix printed before all messages printed by @printMessage
+global messagePrefix: string = "";
+
+@@Lock for @printMessage
+global messageLock: Mutex = Mutex();
+
+@@Print a status message, including a leading progress indicator
+function printMessage(msg: string) {
+	with (messageLock) {
+		local numCompl = numCompletedTasks.value;
+		local complPercent = try (numCompl * 100) / numTotalTasks catch (...) 99;
+		print("[", messagePrefix, "|", str(complPercent).zfill(2),
+			"% (", numCompl, " / ", numTotalTasks, ")] ", msg);
+	}
+}
+
+
 function incCompletedTasks(): int {
 	local oldval;
 	do {
@@ -165,9 +182,9 @@ again:
 @@Update the contents of @filename, using a file-printer callback @cb
 function updateHashedFile(filename: string, cb: Callable with File) {
 	local fp: File = File.Writer();
-	print "Printing:", repr filename, "(begin)";
+	printMessage("Printing: {!r} (begin)".format({ filename }));
 	local result = cb(fp);
-	print "Printing:", repr filename, "(end)";
+	printMessage("Printing: {!r} (end)".format({ filename }));
 	local newText: Bytes = fp.string.encode("utf-8");
 	local newTextHash: int = hash(HASH_FUNCTION, newText);
 again:
@@ -185,7 +202,7 @@ again_create_new:
 			throw;
 		}
 		/* Create a previously non-existant file */
-		print "Creating:", repr filename;
+		printMessage("Creating: {!r}".format({ filename }));
 		with (criticalSection) {
 			try {
 				with (fp) {
@@ -234,7 +251,7 @@ again_create_new:
 	}
 do_update_file:
 	try {
-		print "Updating:", repr filename;
+		printMessage("Updating: {!r}".format({ filename }));
 		fp.rewind();
 		with (criticalSection) {
 			with (fp) {
@@ -356,13 +373,13 @@ function customDirectivesParser(context: LoaderContext): bool {
 
 @@Compile a given system header source file @filename
 function compileSystemHeaderSourceFile(filename: string, headerName: string) {
-	print "Compiling:", filename, "(begin)";
+	printMessage("Compiling: {!r} (begin)".format({ filename }));
 	local parser = CParser(File.open(filename), filename: filename);
 	loadSystemHeaderDefinitions(
 		self:                   parser,
 		headerName:             headerName,
 		customDirectivesParser: customDirectivesParser);
-	print "Compiling:", filename, "(end)";
+	printMessage("Compiling: {!r} (end)".format({ filename }));
 }
 
 
@@ -373,6 +390,8 @@ try {
 	local runningTasks = [];
 	/* Load all the definitions files */
 	local LIBC_PATH = "src/libc/magic";
+
+	messagePrefix = "1/3";
 	for (local filename: fs.query(LIBC_PATH + "/*.c")) {
 		local fullPath = fs.abspath(LIBC_PATH + "/" + filename);
 		/* XXX: There are only a couple of ways by which different definition
@@ -390,6 +409,7 @@ try {
 			(fullPath, fs.fileof(filename)));
 	}
 	waitTasks();
+	messagePrefix = "2/3";
 
 #ifndef QUICK_SKIP_SYSTEM_HAEDERS
 	/* Generate the actual system headers (i.e. <string.h>) */
@@ -404,19 +424,6 @@ try {
 			})
 		);
 	}
-#else /* QUICK_SKIP_SYSTEM_HAEDERS */
-	print "Fast-Preload... (begin)";
-	for (local none, header /*: SystemHeader*/: allSystemHeaders)
-		startTask(header.preload);
-	waitTasks();
-	for (local none, header /*: SystemHeader*/: allSystemHeaders) {
-		for (local none, lfun: header.localFunctionsByName) {
-			if (lfun.impl is bound)
-				neededLocalFunction.insert(lfun);
-		}
-	}
-	print "Fast-Preload... (end)";
-#endif /* QUICK_SKIP_SYSTEM_HAEDERS */
 
 	/* Generate <libc/...> and <libc/core/...> headers */
 	for (local name, header /*: SystemHeader*/: allSystemHeaders) {
@@ -441,7 +448,25 @@ try {
 			})
 		);
 	}
+
+#else /* QUICK_SKIP_SYSTEM_HAEDERS */
+	print "Fast-Preload... (begin)";
+	for (local none, header /*: SystemHeader*/: allSystemHeaders)
+		startTask(header.preload);
+#endif /* QUICK_SKIP_SYSTEM_HAEDERS */
+
+
 	waitTasks();
+	messagePrefix = "3/3";
+
+#ifdef QUICK_SKIP_SYSTEM_HAEDERS
+	for (local none, header /*: SystemHeader*/: allSystemHeaders) {
+		for (local none, lfun: header.localFunctionsByName) {
+			if (lfun.impl is bound)
+				neededLocalFunction.insert(lfun);
+		}
+	}
+#endif /* QUICK_SKIP_SYSTEM_HAEDERS */
 
 	/* Generate all of the needed <local/...> headers */
 	local printedLocalFunctions: HashSet with LocalFunction = HashSet();

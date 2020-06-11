@@ -53,7 +53,7 @@ typedef struct @_stringlist@ {
 
 
 @@Allocates and returns a new StringList object. Upon error, `NULL' is returned
-[[ATTR_WUNUSED, decl_prefix(DEFINE_STRINGLIST)]]
+[[wunused, decl_prefix(DEFINE_STRINGLIST)]]
 [[userimpl, requires($has_function(malloc) && $has_function(free))]]
 struct _stringlist *sl_init() {
 	struct _stringlist *result;

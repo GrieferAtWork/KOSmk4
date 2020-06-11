@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6434beea */
+/* HASH CRC-32:0xd6f4430 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,6 @@
 #ifndef __local_c32rtomb_defined
 #define __local_c32rtomb_defined 1
 #include <__crt.h>
-#include <bits/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: unicode_writeutf8 from unicode */
 #ifndef __local___localdep_unicode_writeutf8_defined
@@ -43,21 +42,50 @@ __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32rtomb) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32rtomb))(char *__restrict __s, __CHAR32_TYPE__ __c32, __mbstate_t *__restrict __mbs) {
-	if (!__s) {
-		if (__mbs)
-			__mbs->__word = __MBSTATE_TYPE_EMPTY;
+__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32rtomb))(char *__restrict __str, __CHAR32_TYPE__ __wc, __mbstate_t *__mbs) {
+	char *__endptr;
+	__SIZE_TYPE__ __result;
+#if 4 == 2
+	/* unicode_c16toc8() */
+	if (!__mbs) {
+		static __mbstate_t __wcrtomb_ps = __MBSTATE_INIT;
+		__mbs = &__wcrtomb_ps;
+	}
+	if (!__str) {
+		__mbs->__word = 0;
 		return 1;
 	}
-	if __unlikely((__c32 > 0x10ffff) ||
-	            (__mbs && (__mbs->__word & __MBSTATE_TYPE_MASK) != __MBSTATE_TYPE_EMPTY)) {
+	if ((__mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
+		/* Complete surrogate */
+		__CHAR32_TYPE__ __ch32;
+		if __unlikely(!((__UINT16_TYPE__)__wc >= 0xdc00 &&
+		              (__UINT16_TYPE__)__wc <= 0xdfff)) {
+			/* Expected low surrogate */
 #ifdef EILSEQ
-		__libc_seterrno(__EILSEQ);
+			__libc_seterrno(__EILSEQ);
 #endif /* EILSEQ */
-		return (__SIZE_TYPE__)-1;
+			return (__SIZE_TYPE__)-1;
+		}
+		__ch32 = ((__mbs->__word & 0x000003ff) << 10) +
+		       0x10000 + ((__UINT16_TYPE__)__wc - 0xdc00);
+		__mbs->__word = 0;
+		__endptr = __localdep_unicode_writeutf8(__str, __ch32);
+	} else if ((__UINT16_TYPE__)__wc >= 0xd800 &&
+	           (__UINT16_TYPE__)__wc <= 0xdbff) {
+		__mbs->__word = __MBSTATE_TYPE_UTF16_LO | ((__UINT16_TYPE__)__wc - 0xd800);
+		return 0;
+	} else {
+		__endptr = __localdep_unicode_writeutf8(__str, (__CHAR32_TYPE__)(__UINT32_TYPE__)(__UINT16_TYPE__)__wc);
 	}
-	/* Write a utf-8 sequence */
-	return (__SIZE_TYPE__)(__localdep_unicode_writeutf8(__s, __c32) - __s);
+#else /* 4 == 2 */
+	/* unicode_c32toc8() */
+	(void)__mbs;
+	if (!__str)
+		return 1;
+	__endptr = __localdep_unicode_writeutf8(__str, (__CHAR32_TYPE__)__wc);
+#endif /* !(4 == 2) */
+	__result = (__SIZE_TYPE__)(__endptr - __str);
+	return __result;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32rtomb_defined

@@ -320,7 +320,7 @@ int execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (
 @@>> getpid(2)
 @@Return the PID of the calling process (that is the TID of the calling thread group's leader)
 @@THIS_THREAD->LEADER->PID
-[[guard, ATTR_WUNUSED, export_alias("_getpid", "__getpid")]]
+[[guard, wunused, export_alias("_getpid", "__getpid")]]
 $pid_t getpid();
 
 %
@@ -328,7 +328,7 @@ $pid_t getpid();
 @@>> gettid(2)
 @@Return the TID of the calling thread
 @@THIS_THREAD->PID
-[[guard, ATTR_WUNUSED, section(".text.crt.sched.thread")]]
+[[guard, wunused, section(".text.crt.sched.thread")]]
 $pid_t gettid();
 %#endif /* __USE_KOS */
 
@@ -373,7 +373,7 @@ int fsync($fd_t fd) {
 @@Return the PID of the calling process's parent.
 @@(That is the TID of the leader of the parent of the calling thread's leader)
 @@THIS_THREAD->LEADER->PARENT->LEADER->PID
-[[ATTR_WUNUSED]]
+[[wunused]]
 $pid_t getppid();
 
 
@@ -382,7 +382,7 @@ $pid_t getppid();
 @@Return the ID of the calling process's process group.
 @@(That is the TID of the leader of the process group of the calling thread's leader)
 @@THIS_THREAD->LEADER->GROUP_LEADER->PID
-[[ATTR_WUNUSED]]
+[[wunused]]
 $pid_t getpgrp();
 
 %
@@ -413,25 +413,25 @@ $pid_t setsid();
 %
 @@>> getuid(2)
 @@Return the real user ID of the calling process
-[[ATTR_WUNUSED]]
+[[wunused]]
 $uid_t getuid();
 
 %
 @@>> geteuid(2)
 @@Return the effective user ID of the calling process
-[[ATTR_WUNUSED]]
+[[wunused]]
 $uid_t geteuid();
 
 %
 @@>> getgid(2)
 @@Return the real group ID of the calling process
-[[ATTR_WUNUSED]]
+[[wunused]]
 $gid_t getgid();
 
 %
 @@>> getegid(2)
 @@Return the effective group ID of the calling process
-[[ATTR_WUNUSED]]
+[[wunused]]
 $gid_t getegid();
 
 %
@@ -464,7 +464,7 @@ int setgid($gid_t gid);
 @@The child then usually proceeds by calling `exec(2)' to replace its
 @@application image with that of another program that the original
 @@parent can then `wait(2)' for
-[[crtbuiltin, ATTR_WUNUSED, export_alias("__fork")]]
+[[crtbuiltin, wunused, export_alias("__fork")]]
 [[section(".text.crt.sched.access")]]
 $pid_t fork();
 
@@ -492,7 +492,7 @@ int pause();
 @@return: * : The configuration limit associated with `NAME' for `FD'
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
-[[cp, ATTR_WUNUSED, section(".text.crt.fs.property")]]
+[[cp, wunused, section(".text.crt.fs.property")]]
 long int fpathconf($fd_t fd, int name);
 
 %[default_impl_section(".text.crt.io.tty")]
@@ -500,7 +500,7 @@ long int fpathconf($fd_t fd, int name);
 %
 @@>> ttyname(3)
 @@Return the name of a TTY given its file descriptor
-[[cp, ATTR_WUNUSED]]
+[[cp, wunused]]
 char *ttyname($fd_t fd);
 
 @@>> ttyname_r(3)
@@ -511,7 +511,7 @@ int ttyname_r($fd_t fd, [[outp(buflen)]] char *buf, size_t buflen);
 %
 @@>> tcgetpgrp(2)
 @@Return the foreground process group of a given TTY file descriptor
-[[ATTR_WUNUSED]]
+[[wunused]]
 $pid_t tcgetpgrp($fd_t fd);
 
 %
@@ -521,7 +521,7 @@ int tcsetpgrp($fd_t fd, $pid_t pgrp_id);
 
 %
 %/* ... */
-[[ATTR_WUNUSED]]
+[[wunused]]
 char *getlogin();
 
 %[default_impl_section(".text.crt.fs.modify")]
@@ -664,7 +664,7 @@ $off_t lseek($fd_t fd, $off_t offset, int whence) {
 @@@return: 1: Is a tty
 @@@return: 0: Not a tty
 @@Check if the given file handle `FD' refers to a TTY
-[[guard, ATTR_WUNUSED, decl_include("<bits/types.h>")]]
+[[guard, wunused, decl_include("<bits/types.h>")]]
 [[section(".text.crt.io.tty"), export_alias("_isatty")]]
 int isatty($fd_t fd);
 
@@ -680,7 +680,7 @@ $fd_t dup2($fd_t oldfd, $fd_t newfd);
 @@>> dup(2)
 @@@return: * : Returns the new handle upon success.
 @@Duplicate a file referred to by `FD' and return its duplicated handle number
-[[guard, ATTR_WUNUSED, decl_include("<bits/types.h>")]]
+[[guard, wunused, decl_include("<bits/types.h>")]]
 [[section(".text.crt.io.access"), export_alias("_dup")]]
 $fd_t dup($fd_t fd);
 
@@ -695,7 +695,7 @@ int close($fd_t fd);
 @@>> access(2)
 @@@param: TYPE: Set of `X_OK|W_OK|R_OK'
 @@Test for access to the specified file `FILE', testing for `TYPE'
-[[cp, guard, ATTR_WUNUSED]]
+[[cp, guard, wunused]]
 [[export_alias("_access"), section(".text.crt.fs.property")]]
 [[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(faccessat))]]
 int access([[nonnull]] char const *file, int type) {
@@ -743,7 +743,7 @@ int rmdir([[nonnull]] char const *path) {
 @@@param: TYPE: Set of `X_OK | W_OK | R_OK'
 @@Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids
 [[decl_include("<features.h>")]]
-[[cp, ATTR_WUNUSED, export_alias("eaccess")]]
+[[cp, wunused, export_alias("eaccess")]]
 [[if(defined(__CRT_DOS)), alias("_access")]]
 [[requires_include("<asm/fcntl.h>")]]
 [[userimpl, requires(defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && $has_function(faccessat))]]
@@ -1133,7 +1133,7 @@ $fd_t dup3($fd_t oldfd, $fd_t newfd, $oflag_t flags) {
 	return newfd != oldfd ? dup2(oldfd, newfd) : -1;
 }
 
-[[cp, ATTR_WUNUSED, ATTR_MALLOC]]
+[[cp, wunused, ATTR_MALLOC]]
 [[section(".text.crt.fs.basic_property")]]
 [[userimpl, requires_function(getcwd)]]
 char *get_current_dir_name() {
@@ -1187,7 +1187,7 @@ $useconds_t ualarm($useconds_t value, $useconds_t interval);
 @@Same as `fork(2)', but possibly suspend the calling process until the
 @@child process either calls `exit(2)' or one of the many `exec(2)' functions
 [[guard, section(".text.crt.sched.access"), export_alias("__vfork")]]
-[[ATTR_RETURNS_TWICE, ATTR_WUNUSED]]
+[[ATTR_RETURNS_TWICE, wunused]]
 $pid_t vfork();
 %#endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) || __USE_MISC */
 
@@ -1209,14 +1209,14 @@ int fchdir($fd_t fd);
 @@(That is the TID of the leader of the process group of `PID's leader)
 @@THREAD[PID]->LEADER->GROUP_LEADER->PID
 @@When `PID' is ZERO(0), use `gettid()' for it instead
-[[ATTR_WUNUSED, section(".text.crt.sched.user"), export_alias("__getpgid")]]
+[[wunused, section(".text.crt.sched.user"), export_alias("__getpgid")]]
 $pid_t getpgid($pid_t pid);
 
 %
 @@>> getsid(2)
 @@Return the ID of the session which a process `PID' is apart of.
 @@return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID;
-[[ATTR_WUNUSED, section(".text.crt.sched.process")]]
+[[wunused, section(".text.crt.sched.process")]]
 $pid_t getsid($pid_t pid);
 
 %
@@ -1363,7 +1363,7 @@ __LIBC int optopt;
 %
 
 
-[[guard, ATTR_WUNUSED, section(".text.crt.application.options")]]
+[[guard, wunused, section(".text.crt.application.options")]]
 [[if(defined(__USE_POSIX2) && !defined(__USE_POSIX_IMPLICITLY) && !defined(__USE_GNU)), preferred_alias(__posix_getopt)]]
 [[crt_name("getopt"), exposed_name("getopt")]]
 int unistd_getopt(int argc, char *const argv[], char const *shortopts);
@@ -1402,12 +1402,12 @@ int setregid($gid_t rgid, $gid_t egid);
 %
 %/* ... */
 [[section(".text.crt.system.configuration")]]
-[[ATTR_WUNUSED]] long int gethostid();
+[[wunused]] long int gethostid();
 
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K)
 @@>> getpagesize(3)
 @@Return the size of a PAGE (in bytes)
-[[ATTR_CONST, ATTR_WUNUSED, export_alias("__getpagesize")]]
+[[ATTR_CONST, wunused, export_alias("__getpagesize")]]
 [[requires_include("<asm/pagesize.h>"), requires(defined(__ARCH_PAGESIZE))]]
 [[section(".text.crt.system.configuration")]]
 int getpagesize() {
@@ -1416,7 +1416,7 @@ int getpagesize() {
 
 %
 %/* ... */
-[[ATTR_CONST, ATTR_WUNUSED, section(".text.crt.system.configuration")]]
+[[ATTR_CONST, wunused, section(".text.crt.system.configuration")]]
 int getdtablesize() {
 #if defined(__KOS__)
 	return 0x7fffffff; /* INT_MAX */
@@ -1457,7 +1457,7 @@ int setegid($gid_t egid);
 %   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_UNIX98))
 
 %/* ... */
-[[ATTR_WUNUSED, section(".text.crt.io.tty")]]
+[[wunused, section(".text.crt.io.tty")]]
 int ttyslot();
 
 %#endif
@@ -1552,7 +1552,7 @@ int profil([[nonnull]] unsigned short int *sample_buffer,
 
 %
 %/* ... */
-[[cp, ATTR_WUNUSED, section(".text.crt.database.shell")]]
+[[cp, wunused, section(".text.crt.database.shell")]]
 char *getusershell();
 
 %
@@ -1602,7 +1602,7 @@ int chroot([[nonnull]] char const *__restrict path);
 
 %
 %/* ... */
-[[cp, ATTR_WUNUSED, section(".text.crt.io.tty")]]
+[[cp, wunused, section(".text.crt.io.tty")]]
 char *getpass([[nonnull]] char const *__restrict prompt);
 %#endif /* ... */
 
@@ -1736,7 +1736,7 @@ char *ctermid_r([[nullable]] char *s) {
 @@return: -1: [errno=<unchanged>] `NAME' referrs to a maximum or minimum
 @@                                limit, and that limit is indeterminate
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
-[[cp, ATTR_WUNUSED, section(".text.crt.system.configuration")]]
+[[cp, wunused, section(".text.crt.system.configuration")]]
 [[export_alias("_sysconf", "__sysconf")]]
 long int sysconf(int name);
 

@@ -130,7 +130,7 @@ int fesetexceptflag([[nonnull]] fexcept_t const *flagp, int excepts) {
 
 @@Determine which of subset of the exceptions
 @@specified by EXCEPTS are currently set
-[[std, nothrow, ATTR_PURE, ATTR_WUNUSED]]
+[[std, nothrow, ATTR_PURE, wunused]]
 [[fast, impl_include("<bits/fenv-inline.h>")]]
 int fetestexcept(int excepts) {
 	return __inline_fetestexcept(excepts);
@@ -142,7 +142,7 @@ int fetestexcept(int excepts) {
 @@            ... `FE_DOWNWARD':   floor()
 @@            ... `FE_UPWARD':     ceil()
 @@            ... `FE_TOWARDZERO': trunc()
-[[std, nothrow, ATTR_PURE, ATTR_WUNUSED, libc]]
+[[std, nothrow, ATTR_PURE, wunused, libc]]
 [[fast, impl_include("<bits/fenv-inline.h>")]]
 int fegetround() {
 	return __inline_fegetround();
@@ -211,7 +211,7 @@ int fedisableexcept(int excepts) {
 }
 
 @@Return enabled exceptions
-[[ATTR_WUNUSED, nothrow, ATTR_PURE]]
+[[wunused, nothrow, ATTR_PURE]]
 [[fast, impl_include("<bits/fenv-inline.h>")]]
 int fegetexcept() {
 	return __inline_fegetexcept();

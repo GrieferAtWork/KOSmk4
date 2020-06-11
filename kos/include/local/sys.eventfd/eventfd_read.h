@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36b3f7fe */
+/* HASH CRC-32:0x7f67d4b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_eventfd_read_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: read from unistd */
 #ifndef __local___localdep_read_defined

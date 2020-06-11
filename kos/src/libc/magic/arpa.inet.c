@@ -59,7 +59,7 @@ typedef __socklen_t socklen_t;
 }
 
 @@Return network number part of the Internet address IN
-[[ATTR_WUNUSED, ATTR_CONST]]
+[[wunused, ATTR_CONST]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 $uint32_t inet_netof(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
@@ -73,7 +73,7 @@ $uint32_t inet_netof(struct in_addr inaddr) {
 }
 
 @@Return the local host address part of the Internet address in IN
-[[ATTR_WUNUSED, ATTR_CONST]]
+[[wunused, ATTR_CONST]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 $uint32_t inet_lnaof(struct in_addr inaddr) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
@@ -88,7 +88,7 @@ $uint32_t inet_lnaof(struct in_addr inaddr) {
 
 @@Make Internet host address in network byte order by
 @@combining the network number NET with the local address HOST
-[[ATTR_WUNUSED, ATTR_CONST]]
+[[wunused, ATTR_CONST]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {
 	struct @in_addr@ result;
@@ -127,7 +127,7 @@ in_addr_t inet_addr([[nonnull]] char const *__restrict cp) {
 
 @@Convert Internet number in IN to ASCII representation. The return
 @@value is a pointer to an internal array containing the string
-[[ATTR_WUNUSED]]
+[[wunused]]
 [[nonnull]] char *inet_ntoa(struct in_addr inaddr) {
 	static char buf[16];
 	return inet_ntoa_r(inaddr, buf);
@@ -194,7 +194,7 @@ int inet_aton([[nonnull]] char const *__restrict cp,
 @@@param: network_addr: When non-zero, `*pcp' is a network address
 @@@return: 0: Bad input format
 @@@return: 1: Success
-[[ATTR_WUNUSED, impl_include("<hybrid/__byteswap.h>")]]
+[[wunused, impl_include("<hybrid/__byteswap.h>")]]
 int inet_paton([[nonnull]] char const **__restrict pcp,
                [[nonnull]] struct in_addr *__restrict inp,
                int network_addr) {

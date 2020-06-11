@@ -72,14 +72,14 @@ __SYSDECL_BEGIN
 	return ether_aton_r(asc, &addr);
 }
 
-[[doc_alias("ether_aton"), ATTR_WUNUSED, impl_include("<net/ethernet.h>")]]
+[[wunused, doc_alias("ether_aton"), impl_include("<net/ethernet.h>")]]
 struct ether_addr *ether_aton_r([[nonnull]] char const *__restrict asc,
                                 [[nonnull]] struct ether_addr *__restrict addr) {
 	return ether_paton_r((char const **)&asc, addr);
 }
 
 %#ifdef __USE_KOS
-[[doc_alias("ether_aton"), ATTR_WUNUSED, impl_include("<net/ethernet.h>")]]
+[[wunused, doc_alias("ether_aton"), impl_include("<net/ethernet.h>")]]
 struct ether_addr *ether_paton_r([[nonnull]] char const **__restrict pasc,
                                  [[nonnull]] struct ether_addr *__restrict addr) {
 	unsigned int i;

@@ -551,7 +551,7 @@ error_t argz_replace([[nonnull]] char **__restrict pargz,
 @@>> char *entry;
 @@>> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
 @@>>     ...;
-[[export_alias("__argz_next"), ATTR_PURE, ATTR_WUNUSED]]
+[[export_alias("__argz_next"), ATTR_PURE, wunused]]
 char *argz_next([[inp_opt(argz_len)]] char const *__restrict argz, size_t argz_len, [[nullable]] char const *__restrict entry)
 	[[([[inp_opt(argz_len)]] char *__restrict argz, size_t argz_len, [[nullable]] char *__restrict entry): char *]]
 	[[([[inp_opt(argz_len)]] char const *__restrict argz, size_t argz_len, [[nullable]] char const *__restrict entry): char const *]]

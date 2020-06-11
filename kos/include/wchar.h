@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69cbcc8 */
+/* HASH CRC-32:0x25818115 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7678,7 +7678,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtoll_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSE
 __SYSDECL_END
 
 #ifdef __USE_KOS
-
 #if defined(_FORMAT_PRINTER_H) && !defined(_PARTS_WCHAR_FORMAT_PRINTER_H)
 #include <parts/wchar/format-printer.h>
 #endif /* _FORMAT_PRINTER_H && !_PARTS_WCHAR_FORMAT_PRINTER_H */
@@ -7698,7 +7697,12 @@ __SYSDECL_END
 #if defined(_STDLIB_H) && !defined(_PARTS_WCHAR_STDLIB_H)
 #include <parts/wchar/stdlib.h>
 #endif /* _STDLIB_H && !_PARTS_WCHAR_STDLIB_H */
+#endif /* __USE_KOS */
 
+#ifdef __USE_UTF
+#if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_WCHAR_H)
+#include <parts/uchar/wchar.h>
+#endif /* _UCHAR_H && !_PARTS_UCHAR_WCHAR_H */
 #endif /* __USE_KOS */
 
 #ifdef __CXX_SYSTEM_HEADER

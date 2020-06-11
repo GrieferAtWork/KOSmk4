@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x796ba374 */
+/* HASH CRC-32:0x171ae8bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_eventfd_write_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: write from unistd */
 #ifndef __local___localdep_write_defined

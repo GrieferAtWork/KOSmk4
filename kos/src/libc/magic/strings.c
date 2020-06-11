@@ -51,7 +51,7 @@ void bzero([[nonnull]] void *__restrict dst, $size_t num_bytes) {
 
 %[insert:guarded_function(bcmp = memcmp)]
 
-[[guard, ATTR_WUNUSED, crtbuiltin, ATTR_PURE]]
+[[guard, wunused, crtbuiltin, ATTR_PURE]]
 char *index([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): char *]
 	[([[nonnull]] char const *__restrict haystack, int needle): char const *]
@@ -65,7 +65,7 @@ char *index([[nonnull]] char const *__restrict haystack, int needle)
 	return NULL;
 }
 
-[[guard, ATTR_WUNUSED, crtbuiltin, ATTR_PURE]]
+[[guard, wunused, crtbuiltin, ATTR_PURE]]
 char *rindex([[nonnull]] char const *__restrict haystack, int needle)
 	[([[nonnull]] char *__restrict haystack, int needle): char *]
 	[([[nonnull]] char const *__restrict haystack, int needle): char const *]

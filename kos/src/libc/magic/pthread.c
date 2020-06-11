@@ -621,7 +621,7 @@ int pthread_setname_np(pthread_t target_thread, [[nonnull]] const char *name);
 %#ifdef __USE_KOS
 @@Return the TID of the given `target_thread'
 @@If the given `target_thread' has already terminated, 0 is returned
-[[guard, ATTR_WUNUSED, ATTR_CONST]]
+[[guard, wunused, ATTR_CONST]]
 $pid_t pthread_gettid_np(pthread_t target_thread);
 %#endif /* __USE_KOS */
 

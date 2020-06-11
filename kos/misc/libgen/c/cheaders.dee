@@ -2500,7 +2500,7 @@ class LibraryFunction {
 			if (isFirst) {
 				fp.ppIf(bind.ppCond);
 			} else {
-				fp.ppElIf(bind.ppCond);
+				fp.ppElif(bind.ppCond);
 			}
 			if (doc)
 				fp.printComment(doc);
@@ -2529,7 +2529,7 @@ class LibraryFunction {
 				fp.ppIf(bind.ppCond);
 				isFirst = false;
 			} else {
-				fp.ppElIf(bind.ppCond);
+				fp.ppElif(bind.ppCond);
 			}
 			local impl: FunctionImplementation | string | UserString = bind.functionBinding;
 			if (impl is FunctionImplementation) {
@@ -2812,32 +2812,55 @@ class SystemHeader {
 			"#endif /* !" << guardName << " */\n";
 	}
 
-	@@Print the header /kos/src/libc/auto/string.h
-	public function cprintLibraryAutoHeader(
-			fp: CWriter, escapeMode: int, decl: string = "INTDEF") {
+	private function cprintInternalLibraryHeader(fp: CWriter, isAuto: bool) {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
 		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
 		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
 		 *       replaced by the export-condition */
-		for (local part: order_libcAutoHeader) {
+		local guardName = "GUARD_LIBC_{}_{}_H".format({
+			isAuto ? "AUTO" : "USER",
+			name.replace("-", "_").replace(".", "_").upper()
+		});
+		fp << "#ifndef " << guardName << "\n"
+			"#define " << guardName << " 1\n"
+			"\n"
+			"#include \"../api.h\"\n";
+		if (!isAuto)
+			fp << "#include \"../auto/" << name << ".h\"\n";
+		fp << "\n"
+			"#include <hybrid/typecore.h>\n"
+			"#include <kos/types.h>\n"
+			"#include <" << name.replace(".", "/") << ".h>\n"
+			"\n"
+			"DECL_BEGIN\n"
+			"\n";
+		for (local part: isAuto ? order_libcAutoHeader : order_libcUserHeader) {
 			if (part is LibraryFunction) {
-				part.cprintInLibraryDeclaration(fp, escapeMode, decl);
+				part.cprintInLibraryDeclaration(fp, ESCAPE_MODE_NONE, "INTDEF");
 			} else {
 				fp << part;
 			}
 		}
+		fp << "\n"
+			"DECL_END\n"
+			"\n"
+			"#endif /* !" << guardName << " */\n";
+	}
+
+	@@Print the header /kos/src/libc/auto/string.h
+	public function cprintLibraryAutoHeader(fp: CWriter) {
+		return cprintInternalLibraryHeader(fp, true);
 	}
 
 	@@Print the implementations from /kos/src/libc/auto/string.c
-	public function cprintLibraryAutoSourceImplementations(
-			fp: CWriter, escapeMode: int, decl: string = "INTERN") {
+	public function cprintLibraryAutoSourceImplementations(fp: CWriter) {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
 		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
 		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
 		 *       replaced by the export-condition */
 		for (local part: order_libcAutoSource) {
 			if (part is LibraryFunction) {
-				part.cprintInLibraryAutoImplementation(fp, escapeMode, decl);
+				part.cprintInLibraryAutoImplementation(fp, ESCAPE_MODE_NONE, "INTERN");
 			} else {
 				fp << part;
 			}
@@ -2845,15 +2868,14 @@ class SystemHeader {
 	}
 
 	@@Print the export table from /kos/src/libc/auto/string.c
-	public function cprintLibraryAutoSourceExports(
-			fp: CWriter, escapeMode: int) {
+	public function cprintLibraryAutoSourceExports(fp: CWriter) {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
 		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
 		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
 		 *       replaced by the export-condition */
 		for (local part: order_libcAutoSource) {
 			if (part is LibraryFunction) {
-				part.cprintInLibraryExports(fp, escapeMode);
+				part.cprintInLibraryExports(fp, ESCAPE_MODE_NONE);
 			} else {
 				fp << part;
 			}
@@ -2861,24 +2883,12 @@ class SystemHeader {
 	}
 
 	@@Print the header /kos/src/libc/user/string.h
-	public function cprintLibraryUserHeader(
-			fp: CWriter, escapeMode: int, decl: string = "INTDEF") {
-		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
-		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
-		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
-		 *       replaced by the export-condition */
-		for (local part: order_libcUserHeader) {
-			if (part is LibraryFunction) {
-				part.cprintInLibraryDeclaration(fp, escapeMode, decl);
-			} else {
-				fp << part;
-			}
-		}
+	public function cprintLibraryUserHeader(fp: CWriter) {
+		return cprintInternalLibraryHeader(fp, false);
 	}
 
 	@@Print the source /kos/src/libc/user/string.c
-	public function cprintLibraryUserSourceImplementations(
-			fp: CWriter, escapeMode: int, decl: string = "INTERN") {
+	public function cprintLibraryUserSourceImplementations(fp: CWriter) {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
 		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
 		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
@@ -2886,7 +2896,7 @@ class SystemHeader {
 		/* TODO: This needs special handling! */
 		for (local part: order_libcUserSource) {
 			if (part is LibraryFunction) {
-				part.cprintInLibraryAutoImplementation(fp, escapeMode, decl);
+				part.cprintInLibraryAutoImplementation(fp, ESCAPE_MODE_NONE, "INTERN");
 			} else {
 				fp << part;
 			}
@@ -2894,15 +2904,14 @@ class SystemHeader {
 	}
 
 	@@Print the export table from /kos/src/libc/user/string.c
-	public function cprintLibraryUserSourceExports(
-			fp: CWriter, escapeMode: int) {
+	public function cprintLibraryUserSourceExports(fp: CWriter) {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
 		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
 		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
 		 *       replaced by the export-condition */
 		for (local part: order_libcUserSource) {
 			if (part is LibraryFunction) {
-				part.cprintInLibraryExports(fp, escapeMode);
+				part.cprintInLibraryExports(fp, ESCAPE_MODE_NONE);
 			} else {
 				fp << part;
 			}

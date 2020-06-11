@@ -146,16 +146,16 @@ struct option {
 @@- If OPTS begins with `--', then non-option arguments are treated as
 @@  arguments to the option '\0'.  This behavior is specific to the GNU
 @@  `getopt'
-[[guard, ATTR_WUNUSED]]
+[[guard, wunused]]
 int getopt(int argc, char *const argv[], char const *shortopts);
 
-[[ATTR_WUNUSED, doc_alias("getopt")]]
+[[wunused, doc_alias("getopt")]]
 int getopt_long(int argc, char *const argv[],
                 char const *shortopts,
                 struct option const *longopts,
                 int *longind);
 
-[[ATTR_WUNUSED, doc_alias("getopt")]]
+[[wunused, doc_alias("getopt")]]
 int getopt_long_only(int argc, char *const argv[],
                      char const *shortopts,
                      struct option const *longopts,

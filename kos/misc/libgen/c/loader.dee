@@ -4286,7 +4286,7 @@ again_lookup_wcsCurrent:
 							return LibraryFunctionBinding(
 								binding: xcLoaderImpl is none
 									? getDefaultLibraryImplementationForPrototype(
-										wcsCurrent.prototype, crtName)
+										wcsCurrent.wc_prototype, crtName)
 									: xcLoaderImpl.impl,
 								implSection: implSection);
 						};
@@ -4328,8 +4328,7 @@ again_lookup_wcsCurrent:
 						libImpl = LibraryFunctionBinding(
 							binding: loaderImpl is Callable
 								? [] -> loaderImpl().impl
-								: loaderImpl.impl
-								,
+								: loaderImpl.impl,
 							implSection: currentFeatures.crt_kosSection);
 					}
 					currentLibraryFunction.bindings.append(libImpl);

@@ -1073,7 +1073,7 @@ struct format_aprintf_data {
 @@                 but may differ from `strlen(return)' when NUL characters were
 @@                 printed to the aprintf-printer at one point.
 @@                 (e.g. `format_aprintf_printer(&my_printer, "\0", 1)')
-[[ATTR_WUNUSED, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, userimpl]]
+[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, userimpl]]
 [[impl_include("<hybrid/__assert.h>"), impl_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
 char *format_aprintf_pack([[nonnull]] struct format_aprintf_data *__restrict self,
                           [[nullable]] $size_t *pstrlen) {
@@ -1131,7 +1131,7 @@ char *format_aprintf_pack([[nonnull]] struct format_aprintf_data *__restrict sel
 @@the format_aprintf buffer `self' is finalized, or some other function is used
 @@to append additional data to the end of `self'
 @@@return: NULL: Failed to allocate additional memory
-[[impl_include("<hybrid/__assert.h>"), ATTR_WUNUSED]]
+[[impl_include("<hybrid/__assert.h>"), wunused]]
 [[dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
 [[userimpl, requires_function(realloc)]]
 format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
@@ -1165,7 +1165,7 @@ format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
 
 @@Print data to a dynamically allocated heap buffer. On error, -1 is returned
 @@This function is intended to be used as a pformatprinter-compatibile printer sink
-[[ATTR_WUNUSED, userimpl, requires_function(format_aprintf_alloc)]]
+[[wunused, userimpl, requires_function(format_aprintf_alloc)]]
 $ssize_t format_aprintf_printer([[nonnull]] /*struct format_aprintf_data **/ void *arg,
                                 [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	char *buf;

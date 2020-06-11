@@ -122,7 +122,7 @@ int endmntent([[nonnull]] $FILE *stream);
 
 @@Search MNT->mnt_opts for an option matching OPT.
 @@Returns the address of the substring, or null if none found
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 char *hasmntopt([[nullable]] struct mntent const *mnt,
                 [[nullable]] char const *opt) {
 	char *str;

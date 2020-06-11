@@ -33,16 +33,16 @@ __SYSDECL_BEGIN
 [[cp]]
 int sysinfo([[nonnull]] struct sysinfo *info);
 
-[[cp, ATTR_WUNUSED]]
+[[cp, wunused]]
 int get_nprocs_conf();
 
-[[cp, ATTR_WUNUSED]]
+[[cp, wunused]]
 int get_nprocs();
 
-[[cp, ATTR_WUNUSED]]
+[[cp, wunused]]
 __INTPTR_TYPE__ get_phys_pages();
 
-[[cp, ATTR_WUNUSED]]
+[[cp, wunused]]
 __INTPTR_TYPE__ get_avphys_pages();
 
 

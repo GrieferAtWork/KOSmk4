@@ -229,11 +229,11 @@ __STDC_INT_AS_SSIZE_T fcntl($fd_t fd, int cmd, ...);
 %[default_impl_section(".text.crt.io.access")]
 
 [[ignore, vartypes($mode_t), decl_include("<bits/types.h>")]]
-[[nocrt, alias(open, _open, __open), cp, ATTR_WUNUSED]]
+[[nocrt, alias(open, _open, __open), cp, wunused]]
 $fd_t open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 
 
-[[cp, guard, ATTR_WUNUSED, vartypes($mode_t), no_crt_self_import]]
+[[cp, guard, wunused, vartypes($mode_t), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("open64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("open", "_open", "__open")]]
 [[decl_include("<bits/types.h>"), export_as("__open")]]
@@ -251,7 +251,7 @@ $fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	return result;
 }
 
-[[cp, guard, ATTR_WUNUSED, no_crt_self_import, alias("_creat")]]
+[[cp, guard, wunused, no_crt_self_import, alias("_creat")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("creat64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("creat")]]
 [[userimpl, requires_function(creat64, open)]]
@@ -269,7 +269,7 @@ $fd_t creat([[nonnull]] char const *filename, $mode_t mode) {
 [[vartypes($mode_t), export_alias("__open64"), largefile64_variant_of(open)]]
 [[decl_include("<bits/types.h>"), impl_include("<bits/fcntl.h>")]]
 [[if(!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("open", "_open")]]
-[[cp, ATTR_WUNUSED, userimpl, requires_function(open32)]]
+[[cp, wunused, userimpl, requires_function(open32)]]
 $fd_t open64([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
@@ -288,7 +288,7 @@ $fd_t open64([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 [[guard, largefile64_variant_of(creat)]]
 [[decl_include("<bits/types.h>"), impl_include("<bits/fcntl.h>")]]
 [[if(!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("creat", "_creat")]]
-[[cp, ATTR_WUNUSED, userimpl, requires_function(open64)]]
+[[cp, wunused, userimpl, requires_function(open64)]]
 $fd_t creat64([[nonnull]] char const *filename, $mode_t mode) {
 	return open64(filename, O_CREAT | O_WRONLY | O_TRUNC, mode);
 }
@@ -297,10 +297,10 @@ $fd_t creat64([[nonnull]] char const *filename, $mode_t mode) {
 %#ifdef __USE_ATFILE
 
 [[cp, ignore, nocrt, alias("openat")]]
-[[ATTR_WUNUSED, vartypes($mode_t), decl_include("<bits/types.h>")]]
+[[wunused, vartypes($mode_t), decl_include("<bits/types.h>")]]
 $fd_t openat32($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...);
 
-[[cp, ATTR_WUNUSED, guard, vartypes($mode_t), no_crt_self_import]]
+[[cp, wunused, guard, vartypes($mode_t), no_crt_self_import]]
 [[decl_include("<bits/types.h>"), impl_include("<bits/fcntl.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("openat64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("openat")]]
@@ -315,7 +315,7 @@ $fd_t openat($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...
 }
 
 %#ifdef __USE_LARGEFILE64
-[[cp, ATTR_WUNUSED, guard, vartypes($mode_t)]]
+[[cp, wunused, guard, vartypes($mode_t)]]
 [[decl_include("<bits/types.h>"), largefile64_variant_of(openat)]]
 [[userimpl, requires_function(openat32)]]
 $fd_t openat64($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) {

@@ -86,125 +86,10 @@ typedef __CHAR32_TYPE__ char32_t;
 
 %[insert:std]
 
-
-[[std, impl_include("<parts/errno.h>")]]
-size_t mbrtoc16(char16_t *__restrict pc16,
-                char const *__restrict s, size_t n,
-                mbstate_t *__restrict mbs) {
-	char16_t c16;
-	size_t result;
-	if (!s) {
-		if (mbs)
-			mbs->__word = 0;
-		return 0;
-	}
-	if (!mbs) {
-		static mbstate_t mbrtoc16_mbs = __MBSTATE_INIT;
-		mbs = &mbrtoc16_mbs;
-	}
-	if (!pc16)
-		pc16 = &c16;
-	result = unicode_c8toc16(pc16, s, n, mbs);
-@@pp_ifdef EILSEQ@@
-	if unlikely(result == (size_t)-1)
-		__libc_seterrno(EILSEQ);
-@@pp_endif@@
-	return result;
-}
-
-
-[[std, impl_include("<parts/errno.h>")]]
-[[decl_include("<bits/mbstate.h>")]]
-size_t mbrtoc32(char32_t *__restrict pc32,
-                char const *__restrict s, size_t n,
-                mbstate_t *__restrict mbs) {
-	char32_t c32;
-	size_t result;
-	if (!s) {
-		if (mbs)
-			mbs->__word = 0;
-		return 0;
-	}
-	if (!mbs) {
-		static mbstate_t mbrtoc32_mbs = __MBSTATE_INIT;
-		mbs = &mbrtoc32_mbs;
-	}
-	if (!pc32)
-		pc32 = &c32;
-	result = unicode_c8toc32(pc32, s, n, mbs);
-@@pp_ifdef EILSEQ@@
-	if unlikely(result == (size_t)-1)
-		__libc_seterrno(EILSEQ);
-@@pp_endif@@
-	return result;
-}
-
-
-[[std, impl_include("<parts/errno.h>")]]
-[[decl_include("<bits/mbstate.h>")]]
-size_t c16rtomb(char *__restrict s, char16_t c16,
-                mbstate_t *__restrict mbs) {
-	char32_t ch32;
-	if (!s) {
-		if (mbs)
-			mbs->__word = __MBSTATE_TYPE_EMPTY;
-		return 1;
-	}
-	if (!mbs) {
-		static mbstate_t c16rtomb_mbs = __MBSTATE_INIT;
-		mbs = &c16rtomb_mbs;
-	}
-	switch (mbs->__word & __MBSTATE_TYPE_MASK) {
-
-	case __MBSTATE_TYPE_EMPTY:
-		if (c16 >= 0xd800 && c16 <= 0xdbff) {
-			/* High surrogate (set the MBS to accept a low surrogate as the next character) */
-			mbs->__word = __MBSTATE_TYPE_UTF16_LO | ((c16 - 0xd800) & 0x3ff);
-			return 0;
-		}
-		ch32 = (char32_t)c16;
-		break;
-
-	case __MBSTATE_TYPE_UTF16_LO:
-		/* c16 should be a low surrogate */
-		if unlikely(!(c16 >= 0xdc00 && c16 <= 0xdfff))
-			goto error_ilseq;
-		ch32 = ((mbs->__word & 0x000003ff) << 10) + 0x10000 + (c16 - 0xdc00);
-		mbs->__word = __MBSTATE_TYPE_EMPTY;
-		break;
-
-	default:
-error_ilseq:
-@@pp_ifdef EILSEQ@@
-		__libc_seterrno(EILSEQ);
-@@pp_endif@@
-		return (size_t)-1;
-	}
-	/* Write a utf-8 sequence */
-	return (size_t)(unicode_writeutf8(s, ch32) - s);
-}
-
-
-[[std, decl_include("<bits/mbstate.h>")]]
-[[impl_include("<parts/errno.h>")]]
-size_t c32rtomb(char *__restrict s, char32_t c32,
-                mbstate_t *__restrict mbs) {
-	if (!s) {
-		if (mbs)
-			mbs->__word = __MBSTATE_TYPE_EMPTY;
-		return 1;
-	}
-	if unlikely((c32 > UNICODE_MAXCHAR) ||
-	            (mbs && (mbs->__word & __MBSTATE_TYPE_MASK) != __MBSTATE_TYPE_EMPTY)) {
-@@pp_ifdef EILSEQ@@
-		__libc_seterrno(EILSEQ);
-@@pp_endif@@
-		return (size_t)-1;
-	}
-	/* Write a utf-8 sequence */
-	return (size_t)(unicode_writeutf8(s, c32) - s);
-}
-
+[[std]] mbrtoc16(*) %{uchar("mbrtowc")}
+[[std]] mbrtoc32(*) %{uchar("mbrtowc")}
+[[std]] c16rtomb(*) %{uchar("wcrtomb")}
+[[std]] c32rtomb(*) %{uchar("wcrtomb")}
 
 %{
 
@@ -213,7 +98,6 @@ size_t c32rtomb(char *__restrict s, char32_t c32,
 __SYSDECL_END
 
 #ifdef __USE_UTF
-
 #if defined(_STRING_H) && !defined(_PARTS_UCHAR_STRING_H)
 #include <parts/uchar/string.h>
 #endif /* _STRING_H && !_PARTS_UCHAR_STRING_H */
@@ -266,6 +150,9 @@ __SYSDECL_END
 #include <parts/uchar/inttypes.h>
 #endif /* _INTTYPES_H && !_PARTS_UCHAR_INTTYPES_H */
 
+#if defined(_WCHAR_H) && !defined(_PARTS_UCHAR_WCHAR_H)
+#include <parts/uchar/wchar.h>
+#endif /* _WCHAR_H && !_PARTS_UCHAR_WCHAR_H */
 #endif /* __USE_UTF */
 
 }

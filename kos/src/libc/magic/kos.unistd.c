@@ -114,12 +114,12 @@ void SetUid($uid_t uid);
 void SetGid($gid_t gid);
 
 %
-[[throws, ATTR_WUNUSED, doc_alias("fork")]]
+[[throws, wunused, doc_alias("fork")]]
 [[section(".text.crt.except.sched.access")]]
 $pid_t Fork();
 
 %
-[[throws, ATTR_WUNUSED, doc_alias("fpathconf")]]
+[[throws, wunused, doc_alias("fpathconf")]]
 [[section(".text.crt.except.fs.property")]]
 long int FPathConf($fd_t fd, int name);
 
@@ -216,7 +216,7 @@ $pos_t LSeek($fd_t fd, $off_t offset, int whence) {
 $fd_t Dup2($fd_t oldfd, $fd_t newfd);
 
 %
-[[ATTR_WUNUSED, doc_alias("dup"), section(".text.crt.except.io.access")]]
+[[wunused, doc_alias("dup"), section(".text.crt.except.io.access")]]
 $fd_t Dup($fd_t fd);
 
 %
@@ -434,7 +434,7 @@ void SetResGid($gid_t rgid, $gid_t egid, $gid_t sgid);
 
 %#if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || \
 %     defined(__USE_MISC)
-[[ATTR_RETURNS_TWICE, ATTR_WUNUSED]]
+[[ATTR_RETURNS_TWICE, wunused]]
 [[throws, doc_alias("vfork"), section(".text.crt.sched.access")]]
 $pid_t VFork();
 %#endif
@@ -449,11 +449,11 @@ void FChown($fd_t fd, $uid_t owner, $gid_t group);
 void FChdir($fd_t fd);
 
 %
-[[throws, ATTR_WUNUSED, doc_alias("getpgid"), section(".text.crt.except.sched.user")]]
+[[throws, wunused, doc_alias("getpgid"), section(".text.crt.except.sched.user")]]
 $pid_t GetPGid($pid_t pid);
 
 %
-[[throws, ATTR_WUNUSED, doc_alias("getsid"), section(".text.crt.except.sched.process")]]
+[[throws, wunused, doc_alias("getsid"), section(".text.crt.except.sched.process")]]
 $pid_t GetSid($pid_t pid);
 
 %

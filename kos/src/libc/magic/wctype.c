@@ -113,57 +113,57 @@ __NAMESPACE_STD_USING(wctrans_t)
 %[insert:std]
 %[default_impl_section("{.text.crt.wchar.unicode.static.ctype|.text.crt.dos.wchar.unicode.static.ctype}")];
 
-[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswalnum(wint_t wc) {
 	return isalnum((int)wc);
 }
 
-[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswalpha(wint_t wc) {
 	return isalpha((int)wc);
 }
 
-[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswcntrl(wint_t wc) {
 	return iscntrl((int)wc);
 }
 
-[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswdigit(wint_t wc) {
 	return isdigit((int)wc);
 }
 
-[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswgraph(wint_t wc) {
 	return isgraph((int)wc);
 }
 
-[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswlower(wint_t wc) {
 	return islower((int)wc);
 }
 
-[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswprint(wint_t wc) {
 	return isprint((int)wc);
 }
 
-[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswpunct(wint_t wc) {
 	return ispunct((int)wc);
 }
 
-[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswspace(wint_t wc) {
 	return isspace((int)wc);
 }
 
-[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswupper(wint_t wc) {
 	return isupper((int)wc);
 }
 
-[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswxdigit(wint_t wc) {
 	return isdigit((int)wc);
 }
@@ -171,7 +171,7 @@ int iswxdigit(wint_t wc) {
 %(std)#ifdef __USE_ISOC99
 %[default_impl_section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")];
 
-[[std, guard, ATTR_WUNUSED, ATTR_PURE]]
+[[std, guard, wunused, ATTR_PURE]]
 wctrans_t wctrans([[nonnull]] char const *prop) {
 	/* TODO */
 	(void)prop;
@@ -179,7 +179,7 @@ wctrans_t wctrans([[nonnull]] char const *prop) {
 	return 0;
 }
 
-[[std, guard, ATTR_WUNUSED, export_alias("__towctrans"), ATTR_CONST]]
+[[std, guard, wunused, export_alias("__towctrans"), ATTR_CONST]]
 wint_t towctrans(wint_t wc, wctrans_t desc) {
 	/* TODO */
 	(void)wc;
@@ -188,7 +188,7 @@ wint_t towctrans(wint_t wc, wctrans_t desc) {
 }
 %(std)#endif /* __USE_ISOC99 */
 
-[[std, ATTR_WUNUSED, ATTR_PURE]]
+[[std, wunused, ATTR_PURE]]
 wctype_t wctype([[nonnull]] char const *prop) {
 	/* TODO */
 	(void)prop;
@@ -196,7 +196,7 @@ wctype_t wctype([[nonnull]] char const *prop) {
 	return 0;
 }
 
-[[std, ATTR_WUNUSED, ATTR_CONST, export_alias("is_wctype", "__iswctype")]]
+[[std, wunused, ATTR_CONST, export_alias("is_wctype", "__iswctype")]]
 int iswctype(wint_t wc, wctype_t desc) {
 	/* TODO */
 	(void)wc;
@@ -206,17 +206,17 @@ int iswctype(wint_t wc, wctype_t desc) {
 
 %[default_impl_section("{.text.crt.wchar.unicode.static.ctype|.text.crt.dos.wchar.unicode.static.ctype}")]
 %(std)#ifdef __USE_ISOC99
-[[std, guard, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, guard, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswblank(wint_t wc) {
 	return isblank((int)wc);
 }
 %(std)#endif /* __USE_ISOC99 */
 
-[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 wint_t towlower(wint_t wc) {
 	return (wint_t)tolower((int)wc);
 }
-[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
+[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 wint_t towupper(wint_t wc) {
 	return (wint_t)toupper((int)wc);
 }
@@ -224,7 +224,7 @@ wint_t towupper(wint_t wc) {
 
 %
 %#if defined(__USE_KOS) || defined(__USE_DOS)
-[[ATTR_WUNUSED, nothrow, ATTR_CONST]]
+[[wunused, nothrow, ATTR_CONST]]
 int iswascii($wint_t wc) {
 	return (unsigned int)wc <= 0x7f;
 }
@@ -235,105 +235,105 @@ int iswascii($wint_t wc) {
 %#ifdef __USE_XOPEN2K8
 
 %[default_impl_section("{.text.crt.wchar.unicode.locale.ctype|.text.crt.dos.wchar.unicode.locale.ctype}")];
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_iswalnum_l", "__iswalnum_l")]]
+[[wunused, ATTR_PURE, export_alias("_iswalnum_l", "__iswalnum_l")]]
 int iswalnum_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswalnum(wc);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_iswalpha_l", "__iswalpha_l")]]
+[[wunused, ATTR_PURE, export_alias("_iswalpha_l", "__iswalpha_l")]]
 int iswalpha_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswalpha(wc);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_iswcntrl_l", "__iswcntrl_l")]]
+[[wunused, ATTR_PURE, export_alias("_iswcntrl_l", "__iswcntrl_l")]]
 int iswcntrl_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswcntrl(wc);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_iswdigit_l", "__iswdigit_l")]]
+[[wunused, ATTR_PURE, export_alias("_iswdigit_l", "__iswdigit_l")]]
 int iswdigit_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswdigit(wc);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_iswgraph_l", "__iswgraph_l")]]
+[[wunused, ATTR_PURE, export_alias("_iswgraph_l", "__iswgraph_l")]]
 int iswgraph_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswgraph(wc);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_iswlower_l", "__iswlower_l")]]
+[[wunused, ATTR_PURE, export_alias("_iswlower_l", "__iswlower_l")]]
 int iswlower_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswlower(wc);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_iswprint_l", "__iswprint_l")]]
+[[wunused, ATTR_PURE, export_alias("_iswprint_l", "__iswprint_l")]]
 int iswprint_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswprint(wc);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_iswpunct_l", "__iswpunct_l")]]
+[[wunused, ATTR_PURE, export_alias("_iswpunct_l", "__iswpunct_l")]]
 int iswpunct_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswpunct(wc);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_iswspace_l", "__iswspace_l")]]
+[[wunused, ATTR_PURE, export_alias("_iswspace_l", "__iswspace_l")]]
 int iswspace_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswspace(wc);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_iswupper_l", "__iswupper_l")]]
+[[wunused, ATTR_PURE, export_alias("_iswupper_l", "__iswupper_l")]]
 int iswupper_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswupper(wc);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_iswxdigit_l", "__iswxdigit_l")]]
+[[wunused, ATTR_PURE, export_alias("_iswxdigit_l", "__iswxdigit_l")]]
 int iswxdigit_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswxdigit(wc);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_iswblank_l", "__iswblank_l")]]
+[[wunused, ATTR_PURE, export_alias("_iswblank_l", "__iswblank_l")]]
 int iswblank_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswblank(wc);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_iswctype_l", "__iswctype_l")]]
+[[wunused, ATTR_PURE, export_alias("_iswctype_l", "__iswctype_l")]]
 int iswctype_l($wint_t wc, $wctype_t type, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswctype(wc, type);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_towupper_l", "__towupper_l")]]
+[[wunused, ATTR_PURE, export_alias("_towupper_l", "__towupper_l")]]
 $wint_t towupper_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return towupper(wc);
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, export_alias("_towlower_l", "__towlower_l")]]
+[[wunused, ATTR_PURE, export_alias("_towlower_l", "__towlower_l")]]
 $wint_t towlower_l($wint_t wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
@@ -342,21 +342,21 @@ $wint_t towlower_l($wint_t wc, $locale_t locale) {
 
 %[default_impl_section("{.text.crt.wchar.unicode.locale.mbs|.text.crt.dos.wchar.unicode.locale.mbs}")];
 
-[[ATTR_WUNUSED, export_alias("__wctype_l")]]
+[[wunused, export_alias("__wctype_l")]]
 $wctype_t wctype_l([[nonnull]] char const *prop, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return wctype(prop);
 }
 
-[[ATTR_WUNUSED, export_alias("__wctrans_l")]]
+[[wunused, export_alias("__wctrans_l")]]
 $wctrans_t wctrans_l([[nonnull]] char const *prop, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return wctrans(prop);
 }
 
-[[ATTR_WUNUSED, export_alias("__towctrans_l")]]
+[[wunused, export_alias("__towctrans_l")]]
 $wint_t towctrans_l($wint_t wc, $wctrans_t desc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
@@ -392,13 +392,13 @@ $wint_t towctrans_l($wint_t wc, $wctrans_t desc, $locale_t locale) {
 %[insert:function(is_wctype = iswctype)]
 
 %
-[[ATTR_WUNUSED, ATTR_CONST]]
+[[wunused, ATTR_CONST]]
 [[section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]]
 int isleadbyte(int wc) {
 	return wc >= 192 && wc <= 255;
 }
 
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 [[section("{.text.crt.wchar.unicode.locale.mbs|.text.crt.dos.wchar.unicode.locale.mbs}")]]
 int _isleadbyte_l(int wc, $locale_t locale) {
 	(void)locale;
@@ -407,24 +407,24 @@ int _isleadbyte_l(int wc, $locale_t locale) {
 }
 
 %[default_impl_section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")];
-[[ATTR_WUNUSED, ATTR_CONST]]
+[[wunused, ATTR_CONST]]
 int __iswcsymf($wint_t wc) {
 	return iswalpha(wc) || wc == '_' || wc == '$';
 }
 
-[[ATTR_WUNUSED, ATTR_CONST]]
+[[wunused, ATTR_CONST]]
 int __iswcsym($wint_t wc) {
 	return iswalnum(wc) || wc == '_' || wc == '$';
 }
 
 %
 %[default_impl_section("{.text.crt.wchar.unicode.locale.mbs|.text.crt.dos.wchar.unicode.locale.mbs}")];
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 int _iswcsymf_l($wint_t wc, $locale_t locale) {
 	return iswalpha_l(wc, locale) || wc == '_' || wc == '$';
 }
 
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 int _iswcsym_l($wint_t wc, $locale_t locale) {
 	return iswalnum_l(wc, locale) || wc == '_' || wc == '$';
 }

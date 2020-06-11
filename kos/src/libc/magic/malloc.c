@@ -78,7 +78,7 @@ int crt_posix_memalign([[nonnull]] void **__restrict pp, size_t alignment, size_
 
 %
 
-[[ATTR_WUNUSED, ATTR_ALLOC_ALIGN(1), ATTR_ALLOC_SIZE((2))]]
+[[wunused, ATTR_ALLOC_ALIGN(1), ATTR_ALLOC_SIZE((2))]]
 [[ATTR_MALLOC, export_alias("aligned_alloc")]]
 [[if(__has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("aligned_alloc", { return __builtin_aligned_alloc(alignment, n_bytes); })]]
@@ -92,11 +92,11 @@ void *memalign(size_t alignment, size_t n_bytes) {
 
 
 %
-[[ATTR_WUNUSED, ATTR_MALL_PAGEALIGNED, ATTR_ALLOC_SIZE((1)), ATTR_MALLOC]]
+[[wunused, ATTR_MALL_PAGEALIGNED, ATTR_ALLOC_SIZE((1)), ATTR_MALLOC]]
 [[section(".text.crt.heap.rare_helpers")]]
 void *pvalloc(size_t n_bytes);
 
-[[guard, ATTR_WUNUSED, ATTR_MALL_PAGEALIGNED, ATTR_ALLOC_SIZE((1))]]
+[[guard, wunused, ATTR_MALL_PAGEALIGNED, ATTR_ALLOC_SIZE((1))]]
 [[section(".text.crt.heap.rare_helpers"), userimpl, requires($has_function(memalign))]]
 void *valloc($size_t n_bytes) {
 	return memalign(getpagesize(), n_bytes);
@@ -157,7 +157,7 @@ int malloc_trim(size_t pad) {
 }
 
 %
-[[ATTR_PURE, ATTR_WUNUSED, export_alias(_msize)]]
+[[ATTR_PURE, wunused, export_alias(_msize)]]
 [[section(".text.crt.heap.helpers")]]
 size_t malloc_usable_size(void *__restrict mallptr);
 
@@ -176,7 +176,7 @@ int mallopt(int parameter_number, int parameter_value) {
 %
 %#ifdef __USE_KOS
 [[export_alias(__memdup)]]
-[[ATTR_WUNUSED, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
+[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt.heap.rare_helpers"), userimpl, requires_function(malloc)]]
 void *memdup([[nonnull]] void const *__restrict ptr, size_t n_bytes) {
 	void *result;
@@ -187,7 +187,7 @@ void *memdup([[nonnull]] void const *__restrict ptr, size_t n_bytes) {
 }
 
 [[export_alias(__memcdup)]]
-[[ATTR_WUNUSED, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
+[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt.heap.rare_helpers"), userimpl, requires_function(memdup)]]
 void *memcdup([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes) {
 	if likely(n_bytes) {
@@ -199,7 +199,7 @@ void *memcdup([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes
 	return memdup(ptr, n_bytes);
 }
 
-[[guard, ATTR_WUNUSED, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
+[[guard, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt.heap.rare_helpers"), userimpl]]
 [[impl_include("<hybrid/__overflow.h>"), requires_function(realloc)]]
 reallocarray:(void *ptr, $size_t elem_count, $size_t elem_size)

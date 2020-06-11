@@ -52,12 +52,12 @@ typedef __pid_t pid_t;
 
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, decl_include("<bits/termios.h>")]]
+[[wunused, ATTR_PURE, decl_include("<bits/termios.h>")]]
 speed_t cfgetospeed([[nonnull]] struct termios const *__restrict termios_p) {
 	return termios_p->@c_ospeed@;
 }
 
-[[ATTR_WUNUSED, ATTR_PURE, decl_include("<bits/termios.h>")]]
+[[wunused, ATTR_PURE, decl_include("<bits/termios.h>")]]
 speed_t cfgetispeed([[nonnull]] struct termios const *__restrict termios_p) {
 	return termios_p->@c_ispeed@;
 }

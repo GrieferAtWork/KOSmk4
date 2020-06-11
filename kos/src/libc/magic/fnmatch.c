@@ -72,7 +72,7 @@ __SYSDECL_BEGIN
 
 @@Match NAME against the filename pattern PATTERN,
 @@returning zero if it matches, FNM_NOMATCH if not
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 int fnmatch([[nonnull]] char const *pattern,
             [[nonnull]] char const *name,
             int match_flags) {

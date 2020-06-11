@@ -311,7 +311,7 @@ global partialKeywordEscapes: {string: string} = Dict({
 	"STATIC_ASSERT_MSG" : "__STATIC_ASSERT_MSG",
 	"NONNULL" : "__ATTR_NONNULL",
 	"NONNULL_CXX" : "__ATTR_NONNULL_CXX",
-	"WUNUSED" : "__WUNUSED",
+	"WUNUSED" : "__ATTR_WUNUSED",
 	"UNUSED" : "__UNUSED",
 	"IMPDAT" : "__IMPDAT",
 	"IMPDEF" : "__IMPDEF",

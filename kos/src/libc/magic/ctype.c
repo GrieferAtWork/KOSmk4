@@ -50,26 +50,26 @@ __SYSDECL_BEGIN
 
 %[default_impl_section(".text.crt.unicode.static.ctype")];
 
-[[ignore, ATTR_CONST, ATTR_WUNUSED, nothrow]]
+[[ignore, ATTR_CONST, wunused, nothrow]]
 char const *__locale_ctype_ptr();
 
-[[ignore, ATTR_PURE, ATTR_WUNUSED]]
+[[ignore, ATTR_PURE, wunused]]
 [[section(".text.crt.unicode.locale.ctype")]]
 char const *__locale_ctype_ptr_l($locale_t locale);
 
-[[ignore, ATTR_PURE, ATTR_WUNUSED, nothrow]]
+[[ignore, ATTR_PURE, wunused, nothrow]]
 $uint16_t const **__ctype_b_loc();
 
-[[ignore, ATTR_PURE, ATTR_WUNUSED, nothrow]]
+[[ignore, ATTR_PURE, wunused, nothrow]]
 $int32_t const **__ctype_tolower_loc();
 
-[[ignore, ATTR_PURE, ATTR_WUNUSED, nothrow]]
+[[ignore, ATTR_PURE, wunused, nothrow]]
 $int32_t const **__ctype_toupper_loc();
 
-[[ignore, ATTR_CONST, ATTR_WUNUSED, nothrow]]
+[[ignore, ATTR_CONST, wunused, nothrow]]
 int _isctype(int ch, int mask);
 
-[[ignore, ATTR_PURE, ATTR_WUNUSED]]
+[[ignore, ATTR_PURE, wunused]]
 [[section(".text.crt.unicode.locale.ctype")]]
 int _isctype_l(int ch, int mask, $locale_t locale);
 
@@ -78,7 +78,7 @@ int _isctype_l(int ch, int mask, $locale_t locale);
 
 
 [[std, crtbuiltin, kernel]]
-[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[ATTR_CONST, wunused, libc, nothrow]]
 int iscntrl(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
 	return (u8)ch <= 0x1f || (u8)ch == 0x7f;
@@ -101,7 +101,7 @@ int iscntrl(int ch) {
 }
 
 
-[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[ATTR_CONST, wunused, libc, nothrow]]
 [[std, crtbuiltin, kernel]]
 int isspace(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -124,7 +124,7 @@ int isspace(int ch) {
 @@pp_endif@@
 }
 
-[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[ATTR_CONST, wunused, libc, nothrow]]
 [[std, crtbuiltin, kernel]] 
 int isupper(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -148,7 +148,7 @@ int isupper(int ch) {
 }
 
 
-[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[ATTR_CONST, wunused, libc, nothrow]]
 [[std, crtbuiltin, kernel]] 
 int islower(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -171,7 +171,7 @@ int islower(int ch) {
 @@pp_endif@@
 }
 
-[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[ATTR_CONST, wunused, libc, nothrow]]
 [[std, crtbuiltin, kernel]] 
 int isalpha(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -194,7 +194,7 @@ int isalpha(int ch) {
 @@pp_endif@@
 }
 
-[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[ATTR_CONST, wunused, libc, nothrow]]
 [[std, crtbuiltin, kernel]] 
 int isdigit(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -217,7 +217,7 @@ int isdigit(int ch) {
 @@pp_endif@@
 }
 
-[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[ATTR_CONST, wunused, libc, nothrow]]
 [[std, crtbuiltin, kernel]] 
 int isxdigit(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -244,7 +244,7 @@ int isxdigit(int ch) {
 @@pp_endif@@
 }
 
-[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[ATTR_CONST, wunused, libc, nothrow]]
 [[std, crtbuiltin, kernel]] 
 int isalnum(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -267,7 +267,7 @@ int isalnum(int ch) {
 @@pp_endif@@
 }
 
-[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[ATTR_CONST, wunused, libc, nothrow]]
 [[std, crtbuiltin, kernel]] 
 int ispunct(int ch)  {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -296,7 +296,7 @@ int ispunct(int ch)  {
 @@pp_endif@@
 }
 
-[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[ATTR_CONST, wunused, libc, nothrow]]
 [[std, crtbuiltin, kernel]] 
 int isgraph(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -319,7 +319,7 @@ int isgraph(int ch) {
 @@pp_endif@@
 }
 
-[[ATTR_CONST, ATTR_WUNUSED, libc, nothrow]]
+[[ATTR_CONST, wunused, libc, nothrow]]
 [[std, crtbuiltin, kernel]] 
 int isprint(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -342,7 +342,7 @@ int isprint(int ch) {
 @@pp_endif@@
 }
 
-[[ATTR_CONST, ATTR_WUNUSED, nothrow, crtbuiltin]]
+[[ATTR_CONST, wunused, nothrow, crtbuiltin]]
 [[libc, std, kernel, alias("_tolower")]]
 [[if(!defined(__KERNEL__)), export_as("_tolower")]]
 int tolower(int ch) {
@@ -357,7 +357,7 @@ int tolower(int ch) {
 @@pp_endif@@
 }
 
-[[ATTR_CONST, ATTR_WUNUSED, nothrow, crtbuiltin]]
+[[ATTR_CONST, wunused, nothrow, crtbuiltin]]
 [[libc, std, kernel, alias("_toupper")]]
 [[if(!defined(__KERNEL__)), export_as("_toupper")]]
 int toupper(int ch) {
@@ -374,7 +374,7 @@ int toupper(int ch) {
 
 
 %#ifdef __USE_ISOC99
-[[ATTR_CONST, ATTR_WUNUSED, nothrow]]
+[[ATTR_CONST, wunused, nothrow]]
 [[crtbuiltin, libc, std, kernel]]
 int isblank(int ch) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -402,7 +402,7 @@ int isblank(int ch) {
 
 %[default_impl_section(".text.crt.unicode.locale.ctype")]
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("__iscntrl_l")]]
+[[ATTR_PURE, wunused, export_alias("__iscntrl_l")]]
 int iscntrl_l(int ch, __locale_t locale) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -429,7 +429,7 @@ int iscntrl_l(int ch, __locale_t locale) {
 }
 
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("__isspace_l")]]
+[[ATTR_PURE, wunused, export_alias("__isspace_l")]]
 int isspace_l(int ch, __locale_t locale) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -455,7 +455,7 @@ int isspace_l(int ch, __locale_t locale) {
 @@pp_endif@@
 }
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("__isupper_l")]]
+[[ATTR_PURE, wunused, export_alias("__isupper_l")]]
 int isupper_l(int ch, __locale_t locale) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -481,7 +481,7 @@ int isupper_l(int ch, __locale_t locale) {
 @@pp_endif@@
 }
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("__islower_l")]]
+[[ATTR_PURE, wunused, export_alias("__islower_l")]]
 int islower_l(int ch, __locale_t locale) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -507,7 +507,7 @@ int islower_l(int ch, __locale_t locale) {
 @@pp_endif@@
 }
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("__isalpha_l")]]
+[[ATTR_PURE, wunused, export_alias("__isalpha_l")]]
 int isalpha_l(int ch, __locale_t locale) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -533,7 +533,7 @@ int isalpha_l(int ch, __locale_t locale) {
 @@pp_endif@@
 }
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("__isdigit_l")]]
+[[ATTR_PURE, wunused, export_alias("__isdigit_l")]]
 int isdigit_l(int ch, __locale_t locale) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -559,7 +559,7 @@ int isdigit_l(int ch, __locale_t locale) {
 @@pp_endif@@
 }
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("__isxdigit_l")]]
+[[ATTR_PURE, wunused, export_alias("__isxdigit_l")]]
 int isxdigit_l(int ch, __locale_t locale) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -585,7 +585,7 @@ int isxdigit_l(int ch, __locale_t locale) {
 @@pp_endif@@
 }
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("__isalnum_l")]]
+[[ATTR_PURE, wunused, export_alias("__isalnum_l")]]
 int isalnum_l(int ch, __locale_t locale) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -611,7 +611,7 @@ int isalnum_l(int ch, __locale_t locale) {
 @@pp_endif@@
 }
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("__ispunct_l")]]
+[[ATTR_PURE, wunused, export_alias("__ispunct_l")]]
 int ispunct_l(int ch, __locale_t locale) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -637,7 +637,7 @@ int ispunct_l(int ch, __locale_t locale) {
 @@pp_endif@@
 }
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("__isgraph_l")]]
+[[ATTR_PURE, wunused, export_alias("__isgraph_l")]]
 int isgraph_l(int ch, __locale_t locale) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -663,7 +663,7 @@ int isgraph_l(int ch, __locale_t locale) {
 @@pp_endif@@
 }
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("__isprint_l")]]
+[[ATTR_PURE, wunused, export_alias("__isprint_l")]]
 int isprint_l(int ch, __locale_t locale) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -689,7 +689,7 @@ int isprint_l(int ch, __locale_t locale) {
 @@pp_endif@@
 }
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("__isblank_l")]]
+[[ATTR_PURE, wunused, export_alias("__isblank_l")]]
 int isblank_l(int ch, __locale_t locale) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)locale;
@@ -714,7 +714,7 @@ int isblank_l(int ch, __locale_t locale) {
 }
 
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("_tolower_l", "__tolower_l")]]
+[[ATTR_PURE, wunused, export_alias("_tolower_l", "__tolower_l")]]
 int tolower_l(int ch, __locale_t locale) {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;
@@ -722,7 +722,7 @@ int tolower_l(int ch, __locale_t locale) {
 	return tolower(ch);
 }
 
-[[ATTR_PURE, ATTR_WUNUSED, export_alias("_toupper_l", "__toupper_l")]]
+[[ATTR_PURE, wunused, export_alias("_toupper_l", "__toupper_l")]]
 int toupper_l(int ch, __locale_t locale) {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;
