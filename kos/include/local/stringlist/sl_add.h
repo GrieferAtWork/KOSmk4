@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa91306dd */
+/* HASH CRC-32:0x4b22c0b7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,9 +19,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sl_add_defined
-#ifdef __CRT_HAVE_realloc
 #define __local_sl_add_defined 1
 #include <__crt.h>
+#ifdef __CRT_HAVE_realloc
 #ifndef ___stringlist_defined
 #define ___stringlist_defined 1
 typedef struct _stringlist {
@@ -29,28 +29,29 @@ typedef struct _stringlist {
 	__SIZE_TYPE__   sl_max;
 	__SIZE_TYPE__   sl_cur;
 } StringList;
-#endif /* !___stringlist_defined */
-/* Dependency: "realloc" */
-#ifndef ____localdep_realloc_defined
-#define ____localdep_realloc_defined 1
-#ifdef __std___localdep_realloc_defined
-__NAMESPACE_STD_USING(__localdep_realloc)
+#endif
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: realloc from stdlib */
+#ifndef __local___localdep_realloc_defined
+#define __local___localdep_realloc_defined 1
+#ifdef __realloc_defined
+__NAMESPACE_GLB_USING(realloc)
+#define __localdep_realloc realloc
+#elif defined(__std_realloc_defined)
+__NAMESPACE_STD_USING(realloc)
+#define __localdep_realloc realloc
 #elif __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
 __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
 #elif defined(__CRT_HAVE_realloc)
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
-#else /* LIBC: realloc */
-#undef ____localdep_realloc_defined
-#endif /* realloc... */
-#endif /* !____localdep_realloc_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_realloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_realloc_defined */
 /* Append a given `NAME' to `SL'. `NAME' is considered
  * inherited if the StringList is destroyed with `1' */
 __LOCAL_LIBC(sl_add) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_add))(struct _stringlist *__sl,
-                                                    char *__name) {
-#line 78 "kos/src/libc/magic/stringlist.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_add))(struct _stringlist *__sl, char *__name) {
 	if __unlikely(__sl->sl_cur >= __sl->sl_max) {
 		char **__new_vector;
 		__SIZE_TYPE__ __new_alloc;
@@ -66,5 +67,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_add))(struct _stringlist *__sl,
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_realloc */
+#ifndef __local___localdep_sl_add_defined
+#define __local___localdep_sl_add_defined 1
+#define __localdep_sl_add __LIBC_LOCAL_NAME(sl_add)
+#endif /* !__local___localdep_sl_add_defined */
+#else /* __CRT_HAVE_realloc */
+#undef __local_sl_add_defined
+#endif /* !__CRT_HAVE_realloc */
 #endif /* !__local_sl_add_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4e8203b */
+/* HASH CRC-32:0x100b4dfa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,37 +21,52 @@
 #ifndef __local_bsearch_defined
 #define __local_bsearch_defined 1
 #include <__crt.h>
+#ifndef ____compar_fn_t_defined
+#define ____compar_fn_t_defined 1
+typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
+#endif /* !____compar_fn_t_defined */
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: bsearch_r from stdlib */
+#ifndef __local___localdep_bsearch_r_defined
+#define __local___localdep_bsearch_r_defined 1
+#ifdef __CRT_HAVE_bsearch_r
+__NAMESPACE_LOCAL_END
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
-/* Dependency: "bsearch_r" from "stdlib" */
-#ifndef ____localdep_bsearch_r_defined
-#define ____localdep_bsearch_r_defined 1
-#ifdef __CRT_HAVE_bsearch_r
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__NOTHROW_NCX,__localdep_bsearch_r,(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),bsearch_r,(__pkey,__pbase,__item_count,__item_size,__cmp,__arg))
-#else /* LIBC: bsearch_r */
-#include <local/stdlib/bsearch_r.h>
-#define __localdep_bsearch_r (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))
-#endif /* bsearch_r... */
-#endif /* !____localdep_bsearch_r_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,__localdep_bsearch_r,(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),bsearch_r,(__pkey,__pbase,__item_count,__item_size,__cmp,__arg))
+#else /* __CRT_HAVE_bsearch_r */
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/bsearch_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_bsearch_r __LIBC_LOCAL_NAME(bsearch_r)
+#endif /* !__CRT_HAVE_bsearch_r */
+#endif /* !__local___localdep_bsearch_r_defined */
+__NAMESPACE_LOCAL_END
 #ifndef ____invoke_compare_helper_defined
+__NAMESPACE_LOCAL_BEGIN
+
 #define ____invoke_compare_helper_defined 1
 __LOCAL_LIBC(__invoke_compare_helper) int
 (__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
 	return (*(__compar_fn_t)__arg)(__a, __b);
 }
+__NAMESPACE_LOCAL_END
+
 #endif /* !____invoke_compare_helper_defined */
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(bsearch) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bsearch))(void const *__pkey,
-                                                     void const *__pbase,
-                                                     __SIZE_TYPE__ __item_count,
-                                                     __SIZE_TYPE__ __item_size,
-                                                     __compar_fn_t __cmp) {
-#line 454 "kos/src/libc/magic/stdlib.c"
-	return __localdep_bsearch_r(__pkey, __pbase, __item_count, __item_size, &__invoke_compare_helper, (void *)__cmp);
+(__LIBCCALL __LIBC_LOCAL_NAME(bsearch))(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) {
+	return __localdep_bsearch_r(__pkey, __pbase, __item_count, __item_size,
+	                 &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
+	                 (void *)__cmp);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_bsearch_defined
+#define __local___localdep_bsearch_defined 1
+#define __localdep_bsearch __LIBC_LOCAL_NAME(bsearch)
+#endif /* !__local___localdep_bsearch_defined */
 #endif /* !__local_bsearch_defined */

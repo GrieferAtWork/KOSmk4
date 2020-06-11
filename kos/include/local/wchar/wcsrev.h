@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50b233a6 */
+/* HASH CRC-32:0x543a81f6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,65 +21,84 @@
 #ifndef __local_wcsrev_defined
 #define __local_wcsrev_defined 1
 #include <__crt.h>
-/* Dependency: "memrevw" from "string" */
-#ifndef ____localdep_memrevw_defined
-#define ____localdep_memrevw_defined 1
-#ifdef __CRT_HAVE_memrevw
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memrevw,(void *__restrict __base, __SIZE_TYPE__ __n_words),memrevw,(__base,__n_words))
-#else /* LIBC: memrevw */
-#include <local/string/memrevw.h>
-#define __localdep_memrevw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrevw))
-#endif /* memrevw... */
-#endif /* !____localdep_memrevw_defined */
-
-/* Dependency: "wcslen" from "wchar" */
-#ifndef ____localdep_wcslen_defined
-#define ____localdep_wcslen_defined 1
-#ifdef __std___localdep_wcslen_defined
-__NAMESPACE_STD_USING(__localdep_wcslen)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memrevl from string */
+#ifndef __local___localdep_memrevl_defined
+#define __local___localdep_memrevl_defined 1
+#ifdef __CRT_HAVE_memrevl
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrevl,(void *__restrict __base, __SIZE_TYPE__ __n_dwords),memrevl,(__base,__n_dwords))
+#else /* __CRT_HAVE_memrevl */
+__NAMESPACE_LOCAL_END
+#include <local/string/memrevl.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_memrevl __LIBC_LOCAL_NAME(memrevl)
+#endif /* !__CRT_HAVE_memrevl */
+#endif /* !__local___localdep_memrevl_defined */
+/* Dependency: wcslen from wchar */
+#ifndef __local___localdep_wcslen_defined
+#define __local___localdep_wcslen_defined 1
+#ifdef __wcslen_defined
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__NAMESPACE_GLB_USING(wcslen)
+#define __localdep_wcslen wcslen
+#elif defined(__std_wcslen_defined)
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__NAMESPACE_STD_USING(wcslen)
+#define __localdep_wcslen wcslen
 #elif defined(__CRT_HAVE_wcslen)
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
-#else /* LIBC: wcslen */
-#include <local/wchar/wcslen.h>
+#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 4
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_wcslen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))
-#endif /* wcslen... */
-#endif /* !____localdep_wcslen_defined */
-
-/* Dependency: "memrevl" from "string" */
-#ifndef ____localdep_memrevl_defined
-#define ____localdep_memrevl_defined 1
-#ifdef __CRT_HAVE_memrevl
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrevl,(void *__restrict __base, __SIZE_TYPE__ __n_dwords),memrevl,(__base,__n_dwords))
-#else /* LIBC: memrevl */
-#include <local/string/memrevl.h>
-#define __localdep_memrevl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrevl))
-#endif /* memrevl... */
-#endif /* !____localdep_memrevl_defined */
-
-/* Dependency: "memrev" from "string" */
-#ifndef ____localdep_memrev_defined
-#define ____localdep_memrev_defined 1
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
+#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 2
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__CHAR16_TYPE__ const *__restrict __string),wcslen,(__string))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wcslen.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_wcslen __LIBC_LOCAL_NAME(wcslen)
+#endif /* !... */
+#endif /* !__local___localdep_wcslen_defined */
+/* Dependency: memrev from string */
+#ifndef __local___localdep_memrev_defined
+#define __local___localdep_memrev_defined 1
 #ifdef __CRT_HAVE_memrev
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
-#else /* LIBC: memrev */
+#else /* __CRT_HAVE_memrev */
+__NAMESPACE_LOCAL_END
 #include <local/string/memrev.h>
-#define __localdep_memrev (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrev))
-#endif /* memrev... */
-#endif /* !____localdep_memrev_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_memrev __LIBC_LOCAL_NAME(memrev)
+#endif /* !__CRT_HAVE_memrev */
+#endif /* !__local___localdep_memrev_defined */
+/* Dependency: memrevw from string */
+#ifndef __local___localdep_memrevw_defined
+#define __local___localdep_memrevw_defined 1
+#ifdef __CRT_HAVE_memrevw
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memrevw,(void *__restrict __base, __SIZE_TYPE__ __n_words),memrevw,(__base,__n_words))
+#else /* __CRT_HAVE_memrevw */
+__NAMESPACE_LOCAL_END
+#include <local/string/memrevw.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_memrevw __LIBC_LOCAL_NAME(memrevw)
+#endif /* !__CRT_HAVE_memrevw */
+#endif /* !__local___localdep_memrevw_defined */
 __LOCAL_LIBC(wcsrev) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsrev))(__WCHAR_TYPE__ *__restrict __str) {
-#line 1791 "kos/src/libc/magic/wchar.c"
 #if __SIZEOF_WCHAR_T__ == 2
 	return (__WCHAR_TYPE__ *)__localdep_memrevw(__str, __localdep_wcslen(__str));
 #elif __SIZEOF_WCHAR_T__ == 4
 	return (__WCHAR_TYPE__ *)__localdep_memrevl(__str, __localdep_wcslen(__str));
-#else
+#else /* ... */
 	return (__WCHAR_TYPE__ *)__localdep_memrev(__str, __localdep_wcslen(__str) * sizeof(__WCHAR_TYPE__));
-#endif
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsrev_defined
+#define __local___localdep_wcsrev_defined 1
+#define __localdep_wcsrev __LIBC_LOCAL_NAME(wcsrev)
+#endif /* !__local___localdep_wcsrev_defined */
 #endif /* !__local_wcsrev_defined */

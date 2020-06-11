@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x544404c9 */
+/* HASH CRC-32:0x63246f45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,29 @@
 #ifndef __local_rawmemxlen_defined
 #define __local_rawmemxlen_defined 1
 #include <__crt.h>
-/* Dependency: "rawmemxchr" from "string" */
-#ifndef ____localdep_rawmemxchr_defined
-#define ____localdep_rawmemxchr_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: rawmemxchr from string */
+#ifndef __local___localdep_rawmemxchr_defined
+#define __local___localdep_rawmemxchr_defined 1
 #ifdef __CRT_HAVE_rawmemxchr
 /* Same as `rawmemchr', but search for non-matching locations. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemxchr,(void const *__restrict __haystack, int __needle),rawmemxchr,(__haystack,__needle))
-#else /* LIBC: rawmemxchr */
+#else /* __CRT_HAVE_rawmemxchr */
+__NAMESPACE_LOCAL_END
 #include <local/string/rawmemxchr.h>
-/* Same as `rawmemchr', but search for non-matching locations. */
-#define __localdep_rawmemxchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemxchr))
-#endif /* rawmemxchr... */
-#endif /* !____localdep_rawmemxchr_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `rawmemchr', but search for non-matching locations. */
+#define __localdep_rawmemxchr __LIBC_LOCAL_NAME(rawmemxchr)
+#endif /* !__CRT_HAVE_rawmemxchr */
+#endif /* !__local___localdep_rawmemxchr_defined */
 /* Same as `rawmemlen', but search for non-matching locations. */
 __LOCAL_LIBC(rawmemxlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemxlen))(void const *__restrict __haystack,
-                                                        int __needle) {
-#line 2002 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemxlen))(void const *__restrict __haystack, int __needle) {
 	return (__SIZE_TYPE__)((__BYTE_TYPE__ *)__localdep_rawmemxchr(__haystack, __needle) - (__BYTE_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_rawmemxlen_defined
+#define __local___localdep_rawmemxlen_defined 1
+#define __localdep_rawmemxlen __LIBC_LOCAL_NAME(rawmemxlen)
+#endif /* !__local___localdep_rawmemxlen_defined */
 #endif /* !__local_rawmemxlen_defined */

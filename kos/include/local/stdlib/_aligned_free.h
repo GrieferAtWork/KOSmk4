@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50e6ae33 */
+/* HASH CRC-32:0xa6a93660 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,32 +19,40 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__aligned_free_defined
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #define __local__aligned_free_defined 1
 #include <__crt.h>
-/* Dependency: "free" */
-#ifndef ____localdep_free_defined
-#define ____localdep_free_defined 1
-#ifdef __std___localdep_free_defined
-__NAMESPACE_STD_USING(__localdep_free)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: free from stdlib */
+#ifndef __local___localdep_free_defined
+#define __local___localdep_free_defined 1
+#ifdef __free_defined
+__NAMESPACE_GLB_USING(free)
+#define __localdep_free free
+#elif defined(__std_free_defined)
+__NAMESPACE_STD_USING(free)
+#define __localdep_free free
 #elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
-#else /* LIBC: free */
-#undef ____localdep_free_defined
-#endif /* free... */
-#endif /* !____localdep_free_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_free_defined
+#endif /* !... */
+#endif /* !__local___localdep_free_defined */
 __LOCAL_LIBC(_aligned_free) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_free))(void *__aligned_mallptr) {
-#line 2937 "kos/src/libc/magic/stdlib.c"
 	if (__aligned_mallptr)
 		__localdep_free(((void **)__aligned_mallptr)[-1]);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#ifndef __local___localdep__aligned_free_defined
+#define __local___localdep__aligned_free_defined 1
+#define __localdep__aligned_free __LIBC_LOCAL_NAME(_aligned_free)
+#endif /* !__local___localdep__aligned_free_defined */
+#else /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#undef __local__aligned_free_defined
+#endif /* !__CRT_HAVE_free && !__CRT_HAVE_cfree */
 #endif /* !__local__aligned_free_defined */

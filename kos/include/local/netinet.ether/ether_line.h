@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x648827f0 */
+/* HASH CRC-32:0x6369b58a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,61 +21,63 @@
 #ifndef __local_ether_line_defined
 #define __local_ether_line_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "isspace" from "ctype" */
-#ifndef ____localdep_isspace_defined
-#define ____localdep_isspace_defined 1
-#if __has_builtin(__builtin_isspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isspace)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,{ return __builtin_isspace(__ch); })
-#elif defined(__CRT_HAVE_isspace)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,(__ch))
-#else /* LIBC: isspace */
-#include <local/ctype/isspace.h>
-#define __localdep_isspace (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isspace))
-#endif /* isspace... */
-#endif /* !____localdep_isspace_defined */
-
-/* Dependency: "ether_paton_r" from "netinet.ether" */
-#ifndef ____localdep_ether_paton_r_defined
-#define ____localdep_ether_paton_r_defined 1
-#ifdef __CRT_HAVE_ether_paton_r
-/* Convert ASCII string S to 48 bit Ethernet address */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),struct ether_addr *,__NOTHROW_NCX,__localdep_ether_paton_r,(char const **__restrict __pasc, struct ether_addr *__restrict __addr),ether_paton_r,(__pasc,__addr))
-#else /* LIBC: ether_paton_r */
-#include <local/netinet.ether/ether_paton_r.h>
-/* Convert ASCII string S to 48 bit Ethernet address */
-#define __localdep_ether_paton_r (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_paton_r))
-#endif /* ether_paton_r... */
-#endif /* !____localdep_ether_paton_r_defined */
-
-/* Dependency: "mempcpy" from "string" */
-#ifndef ____localdep_mempcpy_defined
-#define ____localdep_mempcpy_defined 1
-#ifdef __fast_mempcpy_defined
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempcpy from string */
+#ifndef __local___localdep_mempcpy_defined
+#define __local___localdep_mempcpy_defined 1
+#ifdef __mempcpy_defined
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))
+__NAMESPACE_GLB_USING(mempcpy)
+#define __localdep_mempcpy mempcpy
+#elif defined(__fast_mempcpy_defined)
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
+__NAMESPACE_FAST_USING(mempcpy)
+#define __localdep_mempcpy __LIBC_FAST_NAME(mempcpy)
 #elif defined(__CRT_HAVE_mempcpy)
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
-#else /* LIBC: mempcpy */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempcpy.h>
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))
-#endif /* mempcpy... */
-#endif /* !____localdep_mempcpy_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
+#define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
+#endif /* !... */
+#endif /* !__local___localdep_mempcpy_defined */
+/* Dependency: isspace from ctype */
+#ifndef __local___localdep_isspace_defined
+#define __local___localdep_isspace_defined 1
+#if __has_builtin(__builtin_isspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isspace)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,{ return __builtin_isspace(__ch); })
+#elif defined(__CRT_HAVE_isspace)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,(__ch))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/ctype/isspace.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_isspace __LIBC_LOCAL_NAME(isspace)
+#endif /* !... */
+#endif /* !__local___localdep_isspace_defined */
+/* Dependency: ether_paton_r from netinet.ether */
+#ifndef __local___localdep_ether_paton_r_defined
+#define __local___localdep_ether_paton_r_defined 1
+#ifdef __CRT_HAVE_ether_paton_r
+/* Convert ASCII string S to 48 bit Ethernet address */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),struct ether_addr *,__NOTHROW_NCX,__localdep_ether_paton_r,(char const **__restrict __pasc, struct ether_addr *__restrict __addr),ether_paton_r,(__pasc,__addr))
+#else /* __CRT_HAVE_ether_paton_r */
+__NAMESPACE_LOCAL_END
+#include <local/netinet.ether/ether_paton_r.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Convert ASCII string S to 48 bit Ethernet address */
+#define __localdep_ether_paton_r __LIBC_LOCAL_NAME(ether_paton_r)
+#endif /* !__CRT_HAVE_ether_paton_r */
+#endif /* !__local___localdep_ether_paton_r_defined */
 /* Scan LINE and set ADDR and HOSTNAME */
 __LOCAL_LIBC(ether_line) __ATTR_NONNULL((1, 2, 3)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_line))(char const *__line,
-                                                        struct ether_addr *__addr,
-                                                        char *__hostname) {
-#line 134 "kos/src/libc/magic/netinet.ether.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_line))(char const *__line, struct ether_addr *__addr, char *__hostname) {
 	__SIZE_TYPE__ __hnlen;
 	while (__localdep_isspace(*__line) && *__line != '\r' && *__line != '\n')
 		++__line;
@@ -95,4 +97,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_line))(char const *__line,
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_ether_line_defined
+#define __local___localdep_ether_line_defined 1
+#define __localdep_ether_line __LIBC_LOCAL_NAME(ether_line)
+#endif /* !__local___localdep_ether_line_defined */
 #endif /* !__local_ether_line_defined */

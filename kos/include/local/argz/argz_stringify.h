@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e2c10b6 */
+/* HASH CRC-32:0xd724803 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,25 @@
 #ifndef __local_argz_stringify_defined
 #define __local_argz_stringify_defined 1
 #include <__crt.h>
-/* Dependency: "strlen" from "string" */
-#ifndef ____localdep_strlen_defined
-#define ____localdep_strlen_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* LIBC: strlen */
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
 #include <local/string/strlen.h>
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
-#endif /* strlen... */
-#endif /* !____localdep_strlen_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
 /* Make '\0' separated arg vector `ARGZ' printable by converting
  * all the '\0's except the last into the character `SEP' */
 __LOCAL_LIBC(argz_stringify) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_stringify))(char *__argz,
-                                                            __SIZE_TYPE__ __len,
-                                                            int __sep) {
-#line 226 "kos/src/libc/magic/argz.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_stringify))(char *__argz, __SIZE_TYPE__ __len, int __sep) {
 	/* replace(base: argz, count: len - 1, old: '\0', new: sep); */
 	if __unlikely(!__len)
 		return;
@@ -56,4 +54,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_stringify))(char *__argz,
 	}
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_argz_stringify_defined
+#define __local___localdep_argz_stringify_defined 1
+#define __localdep_argz_stringify __LIBC_LOCAL_NAME(argz_stringify)
+#endif /* !__local___localdep_argz_stringify_defined */
 #endif /* !__local_argz_stringify_defined */

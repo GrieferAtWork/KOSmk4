@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4248aa1 */
+/* HASH CRC-32:0xefc2a195 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tanhf_defined
-#if defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 #define __local_tanhf_defined 1
 #include <__crt.h>
-/* Dependency: "tanh" */
-#ifndef ____localdep_tanh_defined
-#define ____localdep_tanh_defined 1
+#if defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: tanh from math */
+#ifndef __local___localdep_tanh_defined
+#define __local___localdep_tanh_defined 1
 #if __has_builtin(__builtin_tanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanh)
 /* Hyperbolic tangent of X */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tanh,(double __x),tanh,{ return __builtin_tanh(__x); })
@@ -34,18 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tanh,(double __x),tanh,(_
 #elif defined(__CRT_HAVE___tanh)
 /* Hyperbolic tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tanh,(double __x),__tanh,(__x))
-#else /* LIBC: tanh */
-#undef ____localdep_tanh_defined
-#endif /* tanh... */
-#endif /* !____localdep_tanh_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_tanh_defined
+#endif /* !... */
+#endif /* !__local___localdep_tanh_defined */
 /* Hyperbolic tangent of X */
 __LOCAL_LIBC(tanhf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tanhf))(float __x) {
-#line 253 "kos/src/libc/magic/math.c"
 	return (float)__localdep_tanh((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_tanh || __CRT_HAVE___tanh */
+#ifndef __local___localdep_tanhf_defined
+#define __local___localdep_tanhf_defined 1
+#define __localdep_tanhf __LIBC_LOCAL_NAME(tanhf)
+#endif /* !__local___localdep_tanhf_defined */
+#else /* __CRT_HAVE_tanh || __CRT_HAVE___tanh */
+#undef __local_tanhf_defined
+#endif /* !__CRT_HAVE_tanh && !__CRT_HAVE___tanh */
 #endif /* !__local_tanhf_defined */

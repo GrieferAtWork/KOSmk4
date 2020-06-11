@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b9973c3 */
+/* HASH CRC-32:0x91b70f39 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,13 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtSetCheckCount) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtSetCheckCount))(int __check_count) {
-#line 633 "kos/src/libc/magic/crtdbg.c"
 	(void)__check_count;
 	__COMPILER_IMPURE();
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__CrtSetCheckCount_defined
+#define __local___localdep__CrtSetCheckCount_defined 1
+#define __localdep__CrtSetCheckCount __LIBC_LOCAL_NAME(_CrtSetCheckCount)
+#endif /* !__local___localdep__CrtSetCheckCount_defined */
 #endif /* !__local__CrtSetCheckCount_defined */

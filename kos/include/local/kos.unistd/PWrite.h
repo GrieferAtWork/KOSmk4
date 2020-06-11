@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe00fbd24 */
+/* HASH CRC-32:0x87be0cbf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,23 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_PWrite_defined
-#if defined(__CRT_HAVE_PWrite) || defined(__CRT_HAVE_PWrite64)
 #define __local_PWrite_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_PWrite) || defined(__CRT_HAVE_PWrite64)
 #include <kos/anno.h>
-/* Dependency: "PWrite32" from "kos.unistd" */
-#ifndef ____localdep_PWrite32_defined
-#define ____localdep_PWrite32_defined 1
-#ifdef __CRT_HAVE_PWrite
-__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PWrite32,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
-#else /* LIBC: PWrite */
-#undef ____localdep_PWrite32_defined
-#endif /* PWrite32... */
-#endif /* !____localdep_PWrite32_defined */
-
-/* Dependency: "PWrite64" from "kos.unistd" */
-#ifndef ____localdep_PWrite64_defined
-#define ____localdep_PWrite64_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: PWrite64 from kos.unistd */
+#ifndef __local___localdep_PWrite64_defined
+#define __local___localdep_PWrite64_defined 1
 #ifdef __CRT_HAVE_PWrite64
 /* >> pwrite64(2)
  * Write data to a file at a specific offset */
@@ -45,24 +36,25 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PWrite64,(__
  * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PWrite64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PWrite)
+__NAMESPACE_LOCAL_END
 #include <local/kos.unistd/PWrite64.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> pwrite64(2)
  * Write data to a file at a specific offset */
-#define __localdep_PWrite64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWrite64))
-#else /* CUSTOM: PWrite64 */
-#undef ____localdep_PWrite64_defined
-#endif /* PWrite64... */
-#endif /* !____localdep_PWrite64_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_PWrite64 __LIBC_LOCAL_NAME(PWrite64)
+#else /* ... */
+#undef __local___localdep_PWrite64_defined
+#endif /* !... */
+#endif /* !__local___localdep_PWrite64_defined */
+/* Dependency: PWrite32 from kos.unistd */
+#if !defined(__local___localdep_PWrite32_defined) && defined(__CRT_HAVE_PWrite)
+#define __local___localdep_PWrite32_defined 1
+__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PWrite32,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
+#endif /* !__local___localdep_PWrite32_defined && __CRT_HAVE_PWrite */
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
 __LOCAL_LIBC(PWrite) __ATTR_NONNULL((2)) __SIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(PWrite))(__fd_t __fd,
-                                       void const *__buf,
-                                       __SIZE_TYPE__ __bufsize,
-                                       __FS_TYPE(pos) __offset) __THROWS(...) {
-#line 323 "kos/src/libc/magic/kos.unistd.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(PWrite))(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __FS_TYPE(pos) __offset) __THROWS(...) {
 #ifdef __CRT_HAVE_PWrite
 	return __localdep_PWrite32(__fd, __buf, __bufsize, (__pos32_t)__offset);
 #else /* __CRT_HAVE_PWrite */
@@ -70,5 +62,11 @@ __LOCAL_LIBC(PWrite) __ATTR_NONNULL((2)) __SIZE_TYPE__
 #endif /* !__CRT_HAVE_PWrite */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_PWrite || __CRT_HAVE_PWrite64 */
+#ifndef __local___localdep_PWrite_defined
+#define __local___localdep_PWrite_defined 1
+#define __localdep_PWrite __LIBC_LOCAL_NAME(PWrite)
+#endif /* !__local___localdep_PWrite_defined */
+#else /* __CRT_HAVE_PWrite || __CRT_HAVE_PWrite64 */
+#undef __local_PWrite_defined
+#endif /* !__CRT_HAVE_PWrite && !__CRT_HAVE_PWrite64 */
 #endif /* !__local_PWrite_defined */

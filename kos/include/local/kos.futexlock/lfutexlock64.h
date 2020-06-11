@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb29f0635 */
+/* HASH CRC-32:0x7b4f0127 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,16 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lfutexlock64_defined
-#ifdef __CRT_HAVE_lfutexlock
 #define __local_lfutexlock64_defined 1
 #include <__crt.h>
-#include <bits/types.h>
-#include <bits/types.h>
-#include <bits/timespec.h>
-/* Dependency: "lfutexlock32" from "kos.futexlock" */
-#ifndef ____localdep_lfutexlock32_defined
-#define ____localdep_lfutexlock32_defined 1
 #ifdef __CRT_HAVE_lfutexlock
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: lfutexlock32 from kos.futexlock */
+#if !defined(__local___localdep_lfutexlock32_defined) && defined(__CRT_HAVE_lfutexlock)
+#define __local___localdep_lfutexlock32_defined 1
 /* >> lfutexlock(3)
  * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
  * This function behaves identical to the lfutex() system call, except that it takes
@@ -55,12 +53,10 @@
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock32,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec const *timeout, lfutex_t val2*/...),lfutexlock,(__ulockaddr,__uaddr,__futex_op,__val,))
-#else /* LIBC: lfutexlock */
-#undef ____localdep_lfutexlock32_defined
-#endif /* lfutexlock32... */
-#endif /* !____localdep_lfutexlock32_defined */
-
+__CVREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock32,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutexlock,(__ulockaddr,__uaddr,__futex_op,__val),__val,2,(__UINTPTR_TYPE__,__UINTPTR_TYPE__))
+#endif /* !__local___localdep_lfutexlock32_defined && __CRT_HAVE_lfutexlock */
+__NAMESPACE_LOCAL_END
+#include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> lfutexlock(3)
  * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
@@ -89,12 +85,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __LOCAL_LIBC(lfutexlock64) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexlock64))(__uintptr_t *__ulockaddr,
-                                                          __uintptr_t *__uaddr,
-                                                          __syscall_ulong_t __futex_op,
-                                                          __uintptr_t __val,
-                                                          /*struct timespec64 const *timeout, lfutex_t val2*/...) {
-#line 124 "kos/src/libc/magic/kos.futexlock.c"
+__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(lfutexlock64))(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, ...) {
 	__builtin_va_list __args;
 	__uintptr_t __val2;
 	struct __timespec32 __tms32;
@@ -110,5 +101,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexlock64))(__uintptr_t *__ulockad
 	return __localdep_lfutexlock32(__ulockaddr, __uaddr, __futex_op, __val, &__tms32, __val2);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lfutexlock */
+#ifndef __local___localdep_lfutexlock64_defined
+#define __local___localdep_lfutexlock64_defined 1
+#define __localdep_lfutexlock64 __LIBC_LOCAL_NAME(lfutexlock64)
+#endif /* !__local___localdep_lfutexlock64_defined */
+#else /* __CRT_HAVE_lfutexlock */
+#undef __local_lfutexlock64_defined
+#endif /* !__CRT_HAVE_lfutexlock */
 #endif /* !__local_lfutexlock64_defined */

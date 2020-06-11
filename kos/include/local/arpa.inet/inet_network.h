@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd7a055a */
+/* HASH CRC-32:0xeeeaff90 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,10 @@
 #ifndef __local_inet_network_defined
 #define __local_inet_network_defined 1
 #include <__crt.h>
-#include <netinet/in.h>
-
-#include <hybrid/__byteswap.h>
-/* Dependency: "inet_paton" from "arpa.inet" */
-#ifndef ____localdep_inet_paton_defined
-#define ____localdep_inet_paton_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: inet_paton from arpa.inet */
+#ifndef __local___localdep_inet_paton_defined
+#define __local___localdep_inet_paton_defined 1
 #ifdef __CRT_HAVE_inet_paton
 /* Same as `inet_aton()', but update `*pcp' to point after the address
  * Accepted notations are:
@@ -42,8 +40,10 @@
  * @return: 0: Bad input format
  * @return: 1: Success */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_inet_paton,(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr),inet_paton,(__pcp,__inp,__network_addr))
-#else /* LIBC: inet_paton */
+#else /* __CRT_HAVE_inet_paton */
+__NAMESPACE_LOCAL_END
 #include <local/arpa.inet/inet_paton.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `inet_aton()', but update `*pcp' to point after the address
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)
@@ -57,20 +57,25 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_i
  * @param: network_addr: When non-zero, `*pcp' is a network address
  * @return: 0: Bad input format
  * @return: 1: Success */
-#define __localdep_inet_paton (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_paton))
-#endif /* inet_paton... */
-#endif /* !____localdep_inet_paton_defined */
-
+#define __localdep_inet_paton __LIBC_LOCAL_NAME(inet_paton)
+#endif /* !__CRT_HAVE_inet_paton */
+#endif /* !__local___localdep_inet_paton_defined */
+__NAMESPACE_LOCAL_END
+#include <netinet/in.h>
+#include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 /* This function is the same as `inet_addr()', except that
  * the return value is in host-endian, rather than net-endian */
 __LOCAL_LIBC(inet_network) __ATTR_PURE __ATTR_NONNULL((1)) __UINT32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_network))(char const *__restrict __cp) {
-#line 159 "kos/src/libc/magic/arpa.inet.c"
 	struct in_addr __addr;
 	if (!__localdep_inet_paton((char const **)&__cp, &__addr, 1) || *__cp)
 		return INADDR_NONE;
 	return __addr.s_addr;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_inet_network_defined
+#define __local___localdep_inet_network_defined 1
+#define __localdep_inet_network __LIBC_LOCAL_NAME(inet_network)
+#endif /* !__local___localdep_inet_network_defined */
 #endif /* !__local_inet_network_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb69ff17a */
+/* HASH CRC-32:0x92b7d865 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,49 +19,48 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_clock_nanosleep_defined
-#if defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep) || defined(__CRT_HAVE_clock_nanosleep64)
 #define __local_clock_nanosleep_defined 1
 #include <__crt.h>
-/* Dependency: "clock_nanosleep32" from "time" */
-#ifndef ____localdep_clock_nanosleep32_defined
-#define ____localdep_clock_nanosleep32_defined 1
+#if defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep) || defined(__CRT_HAVE_clock_nanosleep64)
+#include <features.h>
+#include <bits/timespec.h>
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: clock_nanosleep32 from time */
+#ifndef __local___localdep_clock_nanosleep32_defined
+#define __local___localdep_clock_nanosleep32_defined 1
 #ifdef __CRT_HAVE_clock_nanosleep
 /* High-resolution sleep with the specified clock */
-__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep32,(__clockid_t __clock_id, int __flags, struct __timespec32 const *__restrict __requested_time, struct __timespec32 *__remaining),clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
+__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep32,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec32 const *__restrict __requested_time, struct __timespec32 *__remaining),clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE___clock_nanosleep)
 /* High-resolution sleep with the specified clock */
-__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep32,(__clockid_t __clock_id, int __flags, struct __timespec32 const *__restrict __requested_time, struct __timespec32 *__remaining),__clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
-#else /* LIBC: clock_nanosleep */
-#undef ____localdep_clock_nanosleep32_defined
-#endif /* clock_nanosleep32... */
-#endif /* !____localdep_clock_nanosleep32_defined */
-
-/* Dependency: "clock_nanosleep64" from "time" */
-#ifndef ____localdep_clock_nanosleep64_defined
-#define ____localdep_clock_nanosleep64_defined 1
+__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep32,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec32 const *__restrict __requested_time, struct __timespec32 *__remaining),__clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
+#else /* ... */
+#undef __local___localdep_clock_nanosleep32_defined
+#endif /* !... */
+#endif /* !__local___localdep_clock_nanosleep32_defined */
+/* Dependency: clock_nanosleep64 from time */
+#ifndef __local___localdep_clock_nanosleep64_defined
+#define __local___localdep_clock_nanosleep64_defined 1
 #ifdef __CRT_HAVE_clock_nanosleep64
 /* High-resolution sleep with the specified clock */
-__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep64,(__clockid_t __clock_id, int __flags, struct __timespec64 const *__requested_time, struct __timespec64 *__remaining),clock_nanosleep64,(__clock_id,__flags,__requested_time,__remaining))
+__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep64,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec64 const *__requested_time, struct __timespec64 *__remaining),clock_nanosleep64,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* High-resolution sleep with the specified clock */
-__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep64,(__clockid_t __clock_id, int __flags, struct __timespec64 const *__requested_time, struct __timespec64 *__remaining),clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
+__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep64,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec64 const *__requested_time, struct __timespec64 *__remaining),clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
+__NAMESPACE_LOCAL_END
 #include <local/time/clock_nanosleep64.h>
-/* High-resolution sleep with the specified clock */
-#define __localdep_clock_nanosleep64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_nanosleep64))
-#else /* CUSTOM: clock_nanosleep64 */
-#undef ____localdep_clock_nanosleep64_defined
-#endif /* clock_nanosleep64... */
-#endif /* !____localdep_clock_nanosleep64_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* High-resolution sleep with the specified clock */
+#define __localdep_clock_nanosleep64 __LIBC_LOCAL_NAME(clock_nanosleep64)
+#else /* ... */
+#undef __local___localdep_clock_nanosleep64_defined
+#endif /* !... */
+#endif /* !__local___localdep_clock_nanosleep64_defined */
+/* High-resolution sleep with the specified clock */
 __LOCAL_LIBC(clock_nanosleep) __ATTR_NONNULL((3)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(clock_nanosleep))(__clockid_t __clock_id,
-                                                             int __flags,
-                                                             struct timespec const *__restrict __requested_time,
-                                                             struct timespec *__remaining) {
-#line 1187 "kos/src/libc/magic/time.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(clock_nanosleep))(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining) {
 #if defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
 	int __result;
 	struct __timespec32 __req32, __rem32;
@@ -87,5 +86,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(clock_nanosleep))(__clockid_t __clock
 #endif /* !__CRT_HAVE_clock_nanosleep && !__CRT_HAVE___clock_nanosleep */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_clock_nanosleep || __CRT_HAVE___clock_nanosleep || __CRT_HAVE_clock_nanosleep64 */
+#ifndef __local___localdep_clock_nanosleep_defined
+#define __local___localdep_clock_nanosleep_defined 1
+#define __localdep_clock_nanosleep __LIBC_LOCAL_NAME(clock_nanosleep)
+#endif /* !__local___localdep_clock_nanosleep_defined */
+#else /* __CRT_HAVE_clock_nanosleep || __CRT_HAVE___clock_nanosleep || __CRT_HAVE_clock_nanosleep64 */
+#undef __local_clock_nanosleep_defined
+#endif /* !__CRT_HAVE_clock_nanosleep && !__CRT_HAVE___clock_nanosleep && !__CRT_HAVE_clock_nanosleep64 */
 #endif /* !__local_clock_nanosleep_defined */

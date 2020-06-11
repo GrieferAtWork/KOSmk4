@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16679042 */
+/* HASH CRC-32:0x400c567d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_logbl_defined
-#if defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
 #define __local_logbl_defined 1
 #include <__crt.h>
-/* Dependency: "logb" */
-#ifndef ____localdep_logb_defined
-#define ____localdep_logb_defined 1
+#if defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: logb from math */
+#ifndef __local___localdep_logb_defined
+#define __local___localdep_logb_defined 1
 #if __has_builtin(__builtin_logb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logb)
 /* Return the base 2 signed integral exponent of X */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_logb,(double __x),logb,{ return __builtin_logb(__x); })
@@ -37,18 +38,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_logb,(double __x),__logb,
 #elif defined(__CRT_HAVE__logb)
 /* Return the base 2 signed integral exponent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_logb,(double __x),_logb,(__x))
-#else /* LIBC: logb */
-#undef ____localdep_logb_defined
-#endif /* logb... */
-#endif /* !____localdep_logb_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_logb_defined
+#endif /* !... */
+#endif /* !__local___localdep_logb_defined */
 /* Return the base 2 signed integral exponent of X */
 __LOCAL_LIBC(logbl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(logbl))(__LONGDOUBLE __x) {
-#line 490 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_logb((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb */
+#ifndef __local___localdep_logbl_defined
+#define __local___localdep_logbl_defined 1
+#define __localdep_logbl __LIBC_LOCAL_NAME(logbl)
+#endif /* !__local___localdep_logbl_defined */
+#else /* __CRT_HAVE_logb || __CRT_HAVE___logb || __CRT_HAVE__logb */
+#undef __local_logbl_defined
+#endif /* !__CRT_HAVE_logb && !__CRT_HAVE___logb && !__CRT_HAVE__logb */
 #endif /* !__local_logbl_defined */

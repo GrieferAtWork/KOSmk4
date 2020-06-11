@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcef1a39 */
+/* HASH CRC-32:0x42109ae7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,32 @@
 #ifndef __local_vsprintf_defined
 #define __local_vsprintf_defined 1
 #include <__crt.h>
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: format_sprintf_printer from format-printer */
+#ifndef __local___localdep_format_sprintf_printer_defined
+#define __local___localdep_format_sprintf_printer_defined 1
+#ifdef __CRT_HAVE_format_sprintf_printer
+/* Format-printer implementation for printing to a string buffer like `sprintf' would
+ * WARNING: No trailing NUL-character is implicitly appended */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_sprintf_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_sprintf_printer,(__arg,__data,__datalen))
+#else /* __CRT_HAVE_format_sprintf_printer */
+__NAMESPACE_LOCAL_END
+#include <local/format-printer/format_sprintf_printer.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Format-printer implementation for printing to a string buffer like `sprintf' would
+ * WARNING: No trailing NUL-character is implicitly appended */
+#define __localdep_format_sprintf_printer __LIBC_LOCAL_NAME(format_sprintf_printer)
+#endif /* !__CRT_HAVE_format_sprintf_printer */
+#endif /* !__local___localdep_format_sprintf_printer_defined */
+/* Dependency: format_vprintf from format-printer */
+#ifndef __local___localdep_format_vprintf_defined
+#define __local___localdep_format_vprintf_defined 1
+#ifdef __CRT_HAVE_format_vprintf
+__NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/format-printer.h>
-/* Dependency: "format_vprintf" from "format-printer" */
-#ifndef ____localdep_format_vprintf_defined
-#define ____localdep_format_vprintf_defined 1
-#ifdef __CRT_HAVE_format_vprintf
+__NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -115,8 +135,10 @@
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
-#else /* LIBC: format_vprintf */
+#else /* __CRT_HAVE_format_vprintf */
+__NAMESPACE_LOCAL_END
 #include <local/format-printer/format_vprintf.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -204,42 +226,25 @@ __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THR
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-#define __localdep_format_vprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vprintf))
-#endif /* format_vprintf... */
-#endif /* !____localdep_format_vprintf_defined */
-
-/* Dependency: "format_sprintf_printer" from "format-printer" */
-#ifndef ____localdep_format_sprintf_printer_defined
-#define ____localdep_format_sprintf_printer_defined 1
-#ifdef __CRT_HAVE_format_sprintf_printer
-/* Format-printer implementation for printing to a string buffer like `sprintf' would
- * WARNING: No trailing NUL-character is implicitly appended */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_sprintf_printer,(/*char ***/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_sprintf_printer,(__arg,__data,__datalen))
-#else /* LIBC: format_sprintf_printer */
-#include <local/format-printer/format_sprintf_printer.h>
-/* Format-printer implementation for printing to a string buffer like `sprintf' would
- * WARNING: No trailing NUL-character is implicitly appended */
-#define __localdep_format_sprintf_printer (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_sprintf_printer))
-#endif /* format_sprintf_printer... */
-#endif /* !____localdep_format_sprintf_printer_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_format_vprintf __LIBC_LOCAL_NAME(format_vprintf)
+#endif /* !__CRT_HAVE_format_vprintf */
+#endif /* !__local___localdep_format_vprintf_defined */
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LOCAL_LIBC(vsprintf) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsprintf))(char *__restrict __dest,
-                                                      char const *__restrict __format,
-                                                      __builtin_va_list __args) {
-#line 985 "kos/src/libc/magic/stdio.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsprintf))(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args) {
 	__STDC_INT_AS_SSIZE_T __result;
 	char *__dest_pointer = __dest;
 	__result = (__STDC_INT_AS_SSIZE_T)__localdep_format_vprintf(&__localdep_format_sprintf_printer,
-	                                                 (void *)&__dest_pointer,
-	                                                 __format,
-	                                                 __args);
+	                                               (void *)&__dest_pointer,
+	                                               __format, __args);
 	if (__result >= 0)
 		*__dest_pointer = '\0';
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_vsprintf_defined
+#define __local___localdep_vsprintf_defined 1
+#define __localdep_vsprintf __LIBC_LOCAL_NAME(vsprintf)
+#endif /* !__local___localdep_vsprintf_defined */
 #endif /* !__local_vsprintf_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e2d15e9 */
+/* HASH CRC-32:0x7c182bd6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,36 +21,42 @@
 #ifndef __local___mempsetw_chk_defined
 #define __local___mempsetw_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "mempsetw" from "string" */
-#ifndef ____localdep_mempsetw_defined
-#define ____localdep_mempsetw_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempsetw from string */
+#ifndef __local___localdep_mempsetw_defined
+#define __local___localdep_mempsetw_defined 1
 #ifdef __fast_mempsetw_defined
 /* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
-#define __localdep_mempsetw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetw))
+__NAMESPACE_FAST_USING(mempsetw)
+#define __localdep_mempsetw __LIBC_FAST_NAME(mempsetw)
 #elif defined(__CRT_HAVE_mempsetw)
 /* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),mempsetw,(__dst,__word,__n_words))
-#else /* LIBC: mempsetw */
-#include <local/string/mempsetw.h>
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),mempsetw,(__dst,__word,__n_words))
+#elif defined(__CRT_HAVE_wmempset) && (__SIZEOF_WCHAR_T__ == 2)
 /* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
-#define __localdep_mempsetw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetw))
-#endif /* mempsetw... */
-#endif /* !____localdep_mempsetw_defined */
-
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),wmempset,(__dst,__word,__n_words))
+#elif defined(__CRT_HAVE_DOS$wmempset)
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),DOS$wmempset,(__dst,__word,__n_words))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/mempsetw.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+#define __localdep_mempsetw __LIBC_LOCAL_NAME(mempsetw)
+#endif /* !... */
+#endif /* !__local___localdep_mempsetw_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__mempsetw_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempsetw_chk))(/*aligned(2)*/ void *__restrict __dst,
-                                                            __UINT16_TYPE__ __word,
-                                                            __SIZE_TYPE__ __n_words,
-                                                            __SIZE_TYPE__ __dst_objsize) {
-#line 85 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempsetw_chk))(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("mempsetw", __dst, __n_words * 2, __dst_objsize);
 	return __localdep_mempsetw(__dst, __word, __n_words);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___mempsetw_chk_defined
+#define __local___localdep___mempsetw_chk_defined 1
+#define __localdep___mempsetw_chk __LIBC_LOCAL_NAME(__mempsetw_chk)
+#endif /* !__local___localdep___mempsetw_chk_defined */
 #endif /* !__local___mempsetw_chk_defined */

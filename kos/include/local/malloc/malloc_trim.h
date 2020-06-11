@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x584c0ca1 */
+/* HASH CRC-32:0xd694da42 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,29 +21,32 @@
 #ifndef __local_malloc_trim_defined
 #define __local_malloc_trim_defined 1
 #include <__crt.h>
-/* Dependency: "_heapmin" from "malloc" */
-#ifndef ____localdep__heapmin_defined
-#define ____localdep__heapmin_defined 1
-#ifdef __CRT_HAVE__heapmin
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep__heapmin,(void),_heapmin,())
-#else /* LIBC: _heapmin */
-#undef ____localdep__heapmin_defined
-#endif /* _heapmin... */
-#endif /* !____localdep__heapmin_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _heapmin from malloc */
+#if !defined(__local___localdep__heapmin_defined) && defined(__CRT_HAVE__heapmin)
+#define __local___localdep__heapmin_defined 1
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep__heapmin,(void),_heapmin,())
+#endif /* !__local___localdep__heapmin_defined && __CRT_HAVE__heapmin */
 __LOCAL_LIBC(malloc_trim) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(malloc_trim))(__SIZE_TYPE__ __pad) {
-#line 147 "kos/src/libc/magic/malloc.c"
-#ifdef __CRT_HAVE__heapmin
-	(void)__pad;
-	return __localdep__heapmin() ? 1 : 0;
-#else /* __CRT_HAVE__heapmin */
+#ifdef __BUILDING_LIBC
 	/* NO-OP (indicate failure to release memory) */
 	__COMPILER_IMPURE();
 	(void)__pad;
 	return 0;
-#endif /* !__CRT_HAVE__heapmin */
+#elif defined(__CRT_HAVE__heapmin)
+	(void)__pad;
+	return __localdep__heapmin() ? 1 : 0;
+#else /* ... */
+	/* NO-OP (indicate failure to release memory) */
+	__COMPILER_IMPURE();
+	(void)__pad;
+	return 0;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_malloc_trim_defined
+#define __local___localdep_malloc_trim_defined 1
+#define __localdep_malloc_trim __LIBC_LOCAL_NAME(malloc_trim)
+#endif /* !__local___localdep_malloc_trim_defined */
 #endif /* !__local_malloc_trim_defined */

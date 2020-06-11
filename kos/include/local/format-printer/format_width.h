@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57d4d106 */
+/* HASH CRC-32:0xff698732 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __LOCAL_LIBC(format_width) __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_width))(void *__arg,
-                                                          /*utf-8*/ char const *__restrict __data,
-                                                          __SIZE_TYPE__ __datalen) {
-#line 1049 "kos/src/libc/magic/format-printer.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_width))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	__SIZE_TYPE__ __result = 0;
 	char const *__iter, *__end;
 	(void)__arg;
@@ -44,4 +41,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_width))(void *__arg,
 	return (__SSIZE_TYPE__)__result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_width_defined
+#define __local___localdep_format_width_defined 1
+#define __localdep_format_width __LIBC_LOCAL_NAME(format_width)
+#endif /* !__local___localdep_format_width_defined */
 #endif /* !__local_format_width_defined */

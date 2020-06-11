@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e1fa515 */
+/* HASH CRC-32:0xbb626a87 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,12 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtMemDumpAllObjectsSince) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtMemDumpAllObjectsSince))(_CrtMemState const *__state) {
-#line 615 "kos/src/libc/magic/crtdbg.c"
 	__COMPILER_IMPURE();
 	(void)__state;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__CrtMemDumpAllObjectsSince_defined
+#define __local___localdep__CrtMemDumpAllObjectsSince_defined 1
+#define __localdep__CrtMemDumpAllObjectsSince __LIBC_LOCAL_NAME(_CrtMemDumpAllObjectsSince)
+#endif /* !__local___localdep__CrtMemDumpAllObjectsSince_defined */
 #endif /* !__local__CrtMemDumpAllObjectsSince_defined */

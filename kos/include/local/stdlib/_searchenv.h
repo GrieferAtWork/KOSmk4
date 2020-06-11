@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99603da5 */
+/* HASH CRC-32:0xa9097621 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,27 +19,28 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__searchenv_defined
-#ifdef __CRT_HAVE__searchenv_s
 #define __local__searchenv_defined 1
 #include <__crt.h>
-/* Dependency: "_searchenv_s" */
-#ifndef ____localdep__searchenv_s_defined
-#define ____localdep__searchenv_s_defined 1
 #ifdef __CRT_HAVE__searchenv_s
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep__searchenv_s,(char const *__file, char const *__envvar, char *__restrict __resultpath, __SIZE_TYPE__ __buflen),_searchenv_s,(__file,__envvar,__resultpath,__buflen))
-#else /* LIBC: _searchenv_s */
-#undef ____localdep__searchenv_s_defined
-#endif /* _searchenv_s... */
-#endif /* !____localdep__searchenv_s_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _searchenv_s from stdlib */
+#if !defined(__local___localdep__searchenv_s_defined) && defined(__CRT_HAVE__searchenv_s)
+#define __local___localdep__searchenv_s_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep__searchenv_s,(char const *__file, char const *__envvar, char *__restrict __resultpath, __SIZE_TYPE__ __buflen),_searchenv_s,(__file,__envvar,__resultpath,__buflen))
+#endif /* !__local___localdep__searchenv_s_defined && __CRT_HAVE__searchenv_s */
 __LOCAL_LIBC(_searchenv) __ATTR_NONNULL((1, 2, 3)) void
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_searchenv))(char const *__file,
-                                                        char const *__envvar,
-                                                        char *__restrict __resultpath) {
-#line 3110 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_searchenv))(char const *__file, char const *__envvar, char *__restrict __resultpath) {
 	__localdep__searchenv_s(__file, __envvar, __resultpath, (__SIZE_TYPE__)-1);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE__searchenv_s */
+#ifndef __local___localdep__searchenv_defined
+#define __local___localdep__searchenv_defined 1
+#define __localdep__searchenv __LIBC_LOCAL_NAME(_searchenv)
+#endif /* !__local___localdep__searchenv_defined */
+#else /* __CRT_HAVE__searchenv_s */
+#undef __local__searchenv_defined
+#endif /* !__CRT_HAVE__searchenv_s */
 #endif /* !__local__searchenv_defined */

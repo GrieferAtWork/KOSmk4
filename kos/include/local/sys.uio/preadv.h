@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc39da993 */
+/* HASH CRC-32:0xa576643f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,49 +19,47 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_preadv_defined
-#if defined(__CRT_HAVE_preadv) || defined(__CRT_HAVE_preadv64)
 #define __local_preadv_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_preadv) || defined(__CRT_HAVE_preadv64)
+#include <features.h>
 #include <bits/uio.h>
-#include <bits/uio.h>
-/* Dependency: "preadv64" from "sys.uio" */
-#ifndef ____localdep_preadv64_defined
-#define ____localdep_preadv64_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: preadv32 from sys.uio */
+#if !defined(__local___localdep_preadv32_defined) && defined(__CRT_HAVE_preadv)
+#define __local___localdep_preadv32_defined 1
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),preadv,(__fd,__iov,__count,__offset))
+#endif /* !__local___localdep_preadv32_defined && __CRT_HAVE_preadv */
+/* Dependency: preadv64 from sys.uio */
+#ifndef __local___localdep_preadv64_defined
+#define __local___localdep_preadv64_defined 1
 #ifdef __CRT_HAVE_preadv64
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv64,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_preadv) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_preadv)
+__NAMESPACE_LOCAL_END
 #include <local/sys.uio/preadv64.h>
-#define __localdep_preadv64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadv64))
-#else /* CUSTOM: preadv64 */
-#undef ____localdep_preadv64_defined
-#endif /* preadv64... */
-#endif /* !____localdep_preadv64_defined */
-
-/* Dependency: "preadv32" from "sys.uio" */
-#ifndef ____localdep_preadv32_defined
-#define ____localdep_preadv32_defined 1
-#ifdef __CRT_HAVE_preadv
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),preadv,(__fd,__iov,__count,__offset))
-#else /* LIBC: preadv */
-#undef ____localdep_preadv32_defined
-#endif /* preadv32... */
-#endif /* !____localdep_preadv32_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_preadv64 __LIBC_LOCAL_NAME(preadv64)
+#else /* ... */
+#undef __local___localdep_preadv64_defined
+#endif /* !... */
+#endif /* !__local___localdep_preadv64_defined */
 __LOCAL_LIBC(preadv) __ATTR_WUNUSED __ATTR_NONNULL((2)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadv))(__fd_t __fd,
-                                                    struct iovec const *__iov,
-                                                    __STDC_INT_AS_SIZE_T __count,
-                                                    __FS_TYPE(off) __offset) {
-#line 80 "kos/src/libc/magic/sys.uio.c"
-#if defined(__CRT_HAVE_preadv) || defined(__CRT_HAVE_preadv64)
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadv))(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset) {
+#if defined(__CRT_HAVE_preadv64) || defined(__CRT_HAVE_preadv)
 	return __localdep_preadv64(__fd, __iov, __count, (__off64_t)__offset);
-#else /* __CRT_HAVE_preadv || __CRT_HAVE_preadv64 */
+#else /* __CRT_HAVE_preadv64 || __CRT_HAVE_preadv */
 	return __localdep_preadv32(__fd, __iov, __count, (__off32_t)__offset);
-#endif /* !__CRT_HAVE_preadv && !__CRT_HAVE_preadv64 */
+#endif /* !__CRT_HAVE_preadv64 && !__CRT_HAVE_preadv */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_preadv || __CRT_HAVE_preadv64 */
+#ifndef __local___localdep_preadv_defined
+#define __local___localdep_preadv_defined 1
+#define __localdep_preadv __LIBC_LOCAL_NAME(preadv)
+#endif /* !__local___localdep_preadv_defined */
+#else /* __CRT_HAVE_preadv || __CRT_HAVE_preadv64 */
+#undef __local_preadv_defined
+#endif /* !__CRT_HAVE_preadv && !__CRT_HAVE_preadv64 */
 #endif /* !__local_preadv_defined */

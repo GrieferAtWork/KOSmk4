@@ -791,7 +791,7 @@ public:
 @@needed or fall back on the copy which must exist somewhere else
 void __pthread_cleanup_routine([[nonnull]] struct __pthread_cleanup_frame *frame) {
 	if (frame->__do_it)
-		(*frame->__cancel_routine(frame->__cancel_arg);
+		(*frame->__cancel_routine)(frame->__cancel_arg);
 }
 
 %{
@@ -1564,6 +1564,7 @@ int pthread_atfork([[nullable]] __pthread_atfork_func_t prepare,
 %
 %/* Some more functions from winpthread. */
 [[impl_include("<bits/sched.h>")]]
+[[decl_include("<features.h>")]]
 [[userimpl, requires_function(sched_getaffinity)]]
 __STDC_INT_AS_SIZE_T pthread_num_processors_np() {
 	cpu_set_t cset;

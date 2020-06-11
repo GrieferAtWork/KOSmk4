@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fb6d944 */
+/* HASH CRC-32:0xf94550cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_hypotl_defined
-#if defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
 #define __local_hypotl_defined 1
 #include <__crt.h>
-/* Dependency: "hypot" */
-#ifndef ____localdep_hypot_defined
-#define ____localdep_hypot_defined 1
+#if defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: hypot from math */
+#ifndef __local___localdep_hypot_defined
+#define __local___localdep_hypot_defined 1
 #if __has_builtin(__builtin_hypot) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_hypot)
 /* Return `sqrt(X*X + Y*Y)' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_hypot,(double __x, double __y),hypot,{ return __builtin_hypot(__x, __y); })
@@ -34,19 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_hypot,(double __x, double
 #elif defined(__CRT_HAVE___hypot)
 /* Return `sqrt(X*X + Y*Y)' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_hypot,(double __x, double __y),__hypot,(__x,__y))
-#else /* LIBC: hypot */
-#undef ____localdep_hypot_defined
-#endif /* hypot... */
-#endif /* !____localdep_hypot_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_hypot_defined
+#endif /* !... */
+#endif /* !__local___localdep_hypot_defined */
 /* Return `sqrt(X*X + Y*Y)' */
 __LOCAL_LIBC(hypotl) __ATTR_WUNUSED __LONGDOUBLE
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(hypotl))(__LONGDOUBLE __x,
-                                                __LONGDOUBLE __y) {
-#line 627 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(hypotl))(__LONGDOUBLE __x, __LONGDOUBLE __y) {
 	return (__LONGDOUBLE)__localdep_hypot((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_hypot || __CRT_HAVE___hypot */
+#ifndef __local___localdep_hypotl_defined
+#define __local___localdep_hypotl_defined 1
+#define __localdep_hypotl __LIBC_LOCAL_NAME(hypotl)
+#endif /* !__local___localdep_hypotl_defined */
+#else /* __CRT_HAVE_hypot || __CRT_HAVE___hypot */
+#undef __local_hypotl_defined
+#endif /* !__CRT_HAVE_hypot && !__CRT_HAVE___hypot */
 #endif /* !__local_hypotl_defined */

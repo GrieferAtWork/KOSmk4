@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x382b9fca */
+/* HASH CRC-32:0xf47de60f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,10 +21,10 @@
 #ifndef __local_flushall_unlocked_defined
 #define __local_flushall_unlocked_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-/* Dependency: "fflush_unlocked" from "stdio" */
-#ifndef ____localdep_fflush_unlocked_defined
-#define ____localdep_fflush_unlocked_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fflush_unlocked from stdio */
+#ifndef __local___localdep_fflush_unlocked_defined
+#define __local___localdep_fflush_unlocked_defined 1
 #ifdef __CRT_HAVE_fflush_unlocked
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(,int,__THROWING,__localdep_fflush_unlocked,(__FILE *__stream),fflush_unlocked,(__stream))
@@ -37,18 +37,21 @@ __CREDIRECT(,int,__THROWING,__localdep_fflush_unlocked,(__FILE *__stream),fflush
 #elif defined(__CRT_HAVE__IO_fflush)
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(,int,__THROWING,__localdep_fflush_unlocked,(__FILE *__stream),_IO_fflush,(__stream))
-#else /* LIBC: fflush_unlocked */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdio/fflush_unlocked.h>
-/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
-#define __localdep_fflush_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fflush_unlocked))
-#endif /* fflush_unlocked... */
-#endif /* !____localdep_fflush_unlocked_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
+#define __localdep_fflush_unlocked __LIBC_LOCAL_NAME(fflush_unlocked)
+#endif /* !... */
+#endif /* !__local___localdep_fflush_unlocked_defined */
 __LOCAL_LIBC(flushall_unlocked) int
 (__LIBCCALL __LIBC_LOCAL_NAME(flushall_unlocked))(void) __THROWS(...) {
-#line 1837 "kos/src/libc/magic/stdio.c"
 	return __localdep_fflush_unlocked(__NULLPTR);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_flushall_unlocked_defined
+#define __local___localdep_flushall_unlocked_defined 1
+#define __localdep_flushall_unlocked __LIBC_LOCAL_NAME(flushall_unlocked)
+#endif /* !__local___localdep_flushall_unlocked_defined */
 #endif /* !__local_flushall_unlocked_defined */

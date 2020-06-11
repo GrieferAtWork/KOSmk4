@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96f1d105 */
+/* HASH CRC-32:0x6eff34b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,31 +21,45 @@
 #ifndef __local_envz_entry_defined
 #define __local_envz_entry_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "stroff" from "string" */
-#ifndef ____localdep_stroff_defined
-#define ____localdep_stroff_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: stroff from string */
+#ifndef __local___localdep_stroff_defined
+#define __local___localdep_stroff_defined 1
 #ifdef __CRT_HAVE_stroff
 /* Same as `strchrnul', but return the offset from `STR', rather than the actual address */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_stroff,(char const *__restrict __haystack, int __needle),stroff,(__haystack,__needle))
-#else /* LIBC: stroff */
+#else /* __CRT_HAVE_stroff */
+__NAMESPACE_LOCAL_END
 #include <local/string/stroff.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `strchrnul', but return the offset from `STR', rather than the actual address */
-#define __localdep_stroff (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stroff))
-#endif /* stroff... */
-#endif /* !____localdep_stroff_defined */
-
-/* Dependency: "memcmp" from "string" */
-#ifndef ____localdep_memcmp_defined
-#define ____localdep_memcmp_defined 1
+#define __localdep_stroff __LIBC_LOCAL_NAME(stroff)
+#endif /* !__CRT_HAVE_stroff */
+#endif /* !__local___localdep_stroff_defined */
+/* Dependency: strend from string */
+#ifndef __local___localdep_strend_defined
+#define __local___localdep_strend_defined 1
+#ifdef __CRT_HAVE_strend
+/* Same as `STR + strlen(STR)' */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
+#else /* __CRT_HAVE_strend */
+__NAMESPACE_LOCAL_END
+#include <local/string/strend.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `STR + strlen(STR)' */
+#define __localdep_strend __LIBC_LOCAL_NAME(strend)
+#endif /* !__CRT_HAVE_strend */
+#endif /* !__local___localdep_strend_defined */
+/* Dependency: memcmp from string */
+#ifndef __local___localdep_memcmp_defined
+#define __local___localdep_memcmp_defined 1
 #ifdef __fast_memcmp_defined
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-#define __localdep_memcmp (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))
+__NAMESPACE_FAST_USING(memcmp)
+#define __localdep_memcmp __LIBC_FAST_NAME(memcmp)
 #elif defined(__CRT_HAVE_memcmp)
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
@@ -58,38 +72,22 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
-#else /* LIBC: memcmp */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memcmp.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-#define __localdep_memcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp))
-#endif /* memcmp... */
-#endif /* !____localdep_memcmp_defined */
-
-/* Dependency: "strend" from "string" */
-#ifndef ____localdep_strend_defined
-#define ____localdep_strend_defined 1
-#ifdef __CRT_HAVE_strend
-/* Same as `STR + strlen(STR)' */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
-#else /* LIBC: strend */
-#include <local/string/strend.h>
-/* Same as `STR + strlen(STR)' */
-#define __localdep_strend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strend))
-#endif /* strend... */
-#endif /* !____localdep_strend_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
+#endif /* !... */
+#endif /* !__local___localdep_memcmp_defined */
 /* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
  * Note that if `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
 __LOCAL_LIBC(envz_entry) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_entry))(char const *__restrict __envz,
-                                                        __SIZE_TYPE__ __envz_len,
-                                                        char const *__restrict __name) {
-#line 64 "kos/src/libc/magic/envz.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_entry))(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name) {
 	__SIZE_TYPE__ __namelen;
 	char *__envz_end = (char *)(__envz + __envz_len);
 	__namelen = __localdep_stroff(__name, '=');
@@ -102,4 +100,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_entry))(char const *__restrict _
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_envz_entry_defined
+#define __local___localdep_envz_entry_defined 1
+#define __localdep_envz_entry __LIBC_LOCAL_NAME(envz_entry)
+#endif /* !__local___localdep_envz_entry_defined */
 #endif /* !__local_envz_entry_defined */

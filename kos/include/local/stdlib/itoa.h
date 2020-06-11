@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0e6d435 */
+/* HASH CRC-32:0xbd5c1f7b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,31 +21,40 @@
 #ifndef __local_itoa_defined
 #define __local_itoa_defined 1
 #include <__crt.h>
-/* Dependency: "_itoa_s" from "stdlib" */
-#ifndef ____localdep__itoa_s_defined
-#define ____localdep__itoa_s_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: _itoa_s from stdlib */
+#ifndef __local___localdep__itoa_s_defined
+#define __local___localdep__itoa_s_defined 1
 #ifdef __CRT_HAVE__itoa_s
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_itoa_s,(__val,__buf,__buflen,__radix))
-#elif defined(__CRT_HAVE_itoa_s)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),itoa_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE__ltoa_s) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ltoa_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE__i64toa_s) && (__SIZEOF_INT__ == 8)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64toa_s,(__val,__buf,__buflen,__radix))
-#else /* LIBC: _itoa_s */
-#include <local/stdlib/_itoa_s.h>
-#define __localdep__itoa_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_itoa_s))
-#endif /* _itoa_s... */
-#endif /* !____localdep__itoa_s_defined */
-
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64toa_s,(__val,__buf,__buflen,__radix))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/_itoa_s.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__itoa_s __LIBC_LOCAL_NAME(_itoa_s)
+#endif /* !... */
+#endif /* !__local___localdep__itoa_s_defined */
 __LOCAL_LIBC(itoa) __ATTR_NONNULL((2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(itoa))(int __val,
-                                                  char *__buf,
-                                                  int __radix) {
-#line 3350 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(itoa))(int __val, char *__buf, int __radix) {
 	__localdep__itoa_s(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_itoa_defined
+#define __local___localdep_itoa_defined 1
+#define __localdep_itoa __LIBC_LOCAL_NAME(itoa)
+#endif /* !__local___localdep_itoa_defined */
 #endif /* !__local_itoa_defined */

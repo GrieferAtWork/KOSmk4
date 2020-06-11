@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7890c28a */
+/* HASH CRC-32:0x9bf77a1e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,22 +21,21 @@
 #ifndef __local_strerror_s_defined
 #define __local_strerror_s_defined 1
 #include <__crt.h>
-__NAMESPACE_LOCAL_BEGIN
 #ifndef ___local_sys_errlist_defined
 #define ___local_sys_errlist_defined 1
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
-__LIBC char const *const _sys_errlist[];
-__LIBC int _sys_nerr;
+__LIBC char const *const ___sys_errlist[];
+__LIBC int ___sys_nerr;
 #elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)
 __LIBC __ATTR_WUNUSED __ATTR_CONST char const *const *(__LIBCCALL __sys_errlist)(void);
 __LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL __sys_nerr)(void);
-#else
+#else /* ... */
 #undef ___local_sys_errlist_defined
+#endif /* !... */
 #endif
-#endif /* !___local_sys_errlist_defined */
-__LOCAL_LIBC(strerror_s) __ATTR_CONST __ATTR_PURE __ATTR_WUNUSED char const *
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(strerror_s) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerror_s))(int __errnum) {
-#line 3014 "kos/src/libc/magic/string.c"
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
 	return (unsigned int)__errnum < (unsigned int)_sys_nerr ? _sys_errlist[__errnum] : __NULLPTR;
 #elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)
@@ -480,4 +479,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerror_s))(int __errnum) {
 #endif
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strerror_s_defined
+#define __local___localdep_strerror_s_defined 1
+#define __localdep_strerror_s __LIBC_LOCAL_NAME(strerror_s)
+#endif /* !__local___localdep_strerror_s_defined */
 #endif /* !__local_strerror_s_defined */

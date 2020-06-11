@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69fc9258 */
+/* HASH CRC-32:0xe15742c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__fsopen_defined
-#if defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64)
 #define __local__fsopen_defined 1
 #include <__crt.h>
-/* Dependency: "fopen" */
-#ifndef ____localdep_fopen_defined
-#define ____localdep_fopen_defined 1
+#if defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fopen from stdio */
+#ifndef __local___localdep_fopen_defined
+#define __local___localdep_fopen_defined 1
 #if defined(__CRT_HAVE_fopen64) && defined(__USE_FILE_OFFSET64)
 /* Create and return a new file-stream for accessing `FILENAME' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen64,(__filename,__modes))
@@ -37,20 +38,21 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__local
 #elif defined(__CRT_HAVE_fopen64)
 /* Create and return a new file-stream for accessing `FILENAME' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen64,(__filename,__modes))
-#else /* LIBC: fopen */
-#undef ____localdep_fopen_defined
-#endif /* fopen... */
-#endif /* !____localdep_fopen_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_fopen_defined
+#endif /* !... */
+#endif /* !__local___localdep_fopen_defined */
 __LOCAL_LIBC(_fsopen) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __FILE *
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_fsopen))(char const *__filename,
-                                                     char const *__modes,
-                                                     int __sflag) {
-#line 2199 "kos/src/libc/magic/stdio.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_fsopen))(char const *__filename, char const *__modes, int __sflag) {
 	(void)__sflag;
 	return __localdep_fopen(__filename, __modes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_fopen || __CRT_HAVE__IO_fopen || __CRT_HAVE_fopen64 */
+#ifndef __local___localdep__fsopen_defined
+#define __local___localdep__fsopen_defined 1
+#define __localdep__fsopen __LIBC_LOCAL_NAME(_fsopen)
+#endif /* !__local___localdep__fsopen_defined */
+#else /* __CRT_HAVE_fopen || __CRT_HAVE__IO_fopen || __CRT_HAVE_fopen64 */
+#undef __local__fsopen_defined
+#endif /* !__CRT_HAVE_fopen && !__CRT_HAVE__IO_fopen && !__CRT_HAVE_fopen64 */
 #endif /* !__local__fsopen_defined */

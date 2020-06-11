@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3991cc5e */
+/* HASH CRC-32:0xc1aade */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,28 @@
 #ifndef __local___iswcsym_defined
 #define __local___iswcsym_defined 1
 #include <__crt.h>
-/* Dependency: "iswalnum" from "wctype" */
-#ifndef ____localdep_iswalnum_defined
-#define ____localdep_iswalnum_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: iswalnum from wctype */
+#ifndef __local___localdep_iswalnum_defined
+#define __local___localdep_iswalnum_defined 1
 #if __has_builtin(__builtin_iswalnum) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswalnum)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswalnum,(__WINT_TYPE__ __wc),iswalnum,{ return __builtin_iswalnum(__wc); })
 #elif defined(__CRT_HAVE_iswalnum)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswalnum,(__WINT_TYPE__ __wc),iswalnum,(__wc))
-#else /* LIBC: iswalnum */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/iswalnum.h>
-#define __localdep_iswalnum (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswalnum))
-#endif /* iswalnum... */
-#endif /* !____localdep_iswalnum_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_iswalnum __LIBC_LOCAL_NAME(iswalnum)
+#endif /* !... */
+#endif /* !__local___localdep_iswalnum_defined */
 __LOCAL_LIBC(__iswcsym) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__iswcsym))(__WINT_TYPE__ __wc) {
-#line 404 "kos/src/libc/magic/wctype.c"
 	return __localdep_iswalnum(__wc) || __wc == '_' || __wc == '$';
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___iswcsym_defined
+#define __local___localdep___iswcsym_defined 1
+#define __localdep___iswcsym __LIBC_LOCAL_NAME(__iswcsym)
+#endif /* !__local___localdep___iswcsym_defined */
 #endif /* !__local___iswcsym_defined */

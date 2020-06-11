@@ -490,6 +490,7 @@ __WCHAR16_TYPE__ *_wfullpath_dbg([[outp_opt(buflen)]] __WCHAR16_TYPE__ *full_pat
 	return NULL;
 }
 
+[[decl_include("<features.h>")]]
 [[guard, ATTR_WUNUSED, userimpl, requires_function(getcwd)]]
 char *_getcwd_dbg([[outp_opt(bufsize)]] char *buf, __STDC_INT_AS_SIZE_T bufsize,
                   int block_type, char const *filename, int line) {
@@ -499,6 +500,7 @@ char *_getcwd_dbg([[outp_opt(bufsize)]] char *buf, __STDC_INT_AS_SIZE_T bufsize,
 	return getcwd(buf, (size_t)bufsize);
 }
 
+[[decl_include("<features.h>")]]
 [[guard, ATTR_WUNUSED, userimpl, requires_function(c16getcwd)]]
 __WCHAR16_TYPE__ *_wgetcwd_dbg([[outp_opt(buflen)]] __WCHAR16_TYPE__ *buf,
                                __STDC_INT_AS_SIZE_T buflen,
@@ -510,6 +512,7 @@ __WCHAR16_TYPE__ *_wgetcwd_dbg([[outp_opt(buflen)]] __WCHAR16_TYPE__ *buf,
 }
 
 
+[[decl_include("<features.h>")]]
 [[guard, ATTR_WUNUSED, userimpl, requires_function(_getdcwd)]]
 char *_getdcwd_dbg(int driveno, [[outp_opt(bufsize)]] char *buf,
                    __STDC_INT_AS_SIZE_T bufsize,
@@ -520,6 +523,7 @@ char *_getdcwd_dbg(int driveno, [[outp_opt(bufsize)]] char *buf,
 	return _getdcwd(driveno, buf, bufsize);
 }
 
+[[decl_include("<features.h>")]]
 [[guard, ATTR_WUNUSED, userimpl]]
 __WCHAR16_TYPE__ *_wgetdcwd_dbg(int driveno, [[outp_opt(buflen)]] __WCHAR16_TYPE__ *buf,
                                 __STDC_INT_AS_SIZE_T buflen, int block_type,
@@ -535,8 +539,8 @@ __WCHAR16_TYPE__ *_wgetdcwd_dbg(int driveno, [[outp_opt(buflen)]] __WCHAR16_TYPE
 	return NULL;
 }
 
-[[guard]] _getdcwd_lk_dbg(*) = _getdcwd_dbg;
-[[guard]] _wgetdcwd_lk_dbg(*) = _wgetdcwd_dbg;
+%[insert:guarded_function(_getdcwd_lk_dbg = _getdcwd_dbg)]
+%[insert:guarded_function(_wgetdcwd_lk_dbg = _wgetdcwd_dbg)]
 
 [[guard, attribute(@_Check_return_wat_@)]]
 [[userimpl, requires_function(_dupenv_s)]]

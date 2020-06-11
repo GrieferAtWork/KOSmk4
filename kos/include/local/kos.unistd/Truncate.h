@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6684e83c */
+/* HASH CRC-32:0x23be36d8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,21 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Truncate_defined
-#if defined(__CRT_HAVE_Truncate) || defined(__CRT_HAVE_Truncate64)
 #define __local_Truncate_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_Truncate) || defined(__CRT_HAVE_Truncate64)
 #include <kos/anno.h>
-/* Dependency: "Truncate64" from "kos.unistd" */
-#ifndef ____localdep_Truncate64_defined
-#define ____localdep_Truncate64_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: Truncate32 from kos.unistd */
+#if !defined(__local___localdep_Truncate32_defined) && defined(__CRT_HAVE_Truncate)
+#define __local___localdep_Truncate32_defined 1
+/* >> truncate(2)
+ * Truncate the given file `FILE' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),__vodi,__THROWING,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length))
+#endif /* !__local___localdep_Truncate32_defined && __CRT_HAVE_Truncate */
+/* Dependency: Truncate64 from kos.unistd */
+#ifndef __local___localdep_Truncate64_defined
+#define __local___localdep_Truncate64_defined 1
 #ifdef __CRT_HAVE_Truncate64
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -35,34 +43,20 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate64,(char cons
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate64,(char const *__file, __pos64_t __length),Truncate,(__file,__length))
 #elif defined(__CRT_HAVE_Truncate)
+__NAMESPACE_LOCAL_END
 #include <local/kos.unistd/Truncate64.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-#define __localdep_Truncate64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Truncate64))
-#else /* CUSTOM: Truncate64 */
-#undef ____localdep_Truncate64_defined
-#endif /* Truncate64... */
-#endif /* !____localdep_Truncate64_defined */
-
-/* Dependency: "Truncate32" from "kos.unistd" */
-#ifndef ____localdep_Truncate32_defined
-#define ____localdep_Truncate32_defined 1
-#ifdef __CRT_HAVE_Truncate
-/* >> truncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length))
-#else /* LIBC: Truncate */
-#undef ____localdep_Truncate32_defined
-#endif /* Truncate32... */
-#endif /* !____localdep_Truncate32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_Truncate64 __LIBC_LOCAL_NAME(Truncate64)
+#else /* ... */
+#undef __local___localdep_Truncate64_defined
+#endif /* !... */
+#endif /* !__local___localdep_Truncate64_defined */
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __LOCAL_LIBC(Truncate) __ATTR_NONNULL((1)) void
-(__LIBCCALL __LIBC_LOCAL_NAME(Truncate))(char const *__file,
-                                         __FS_TYPE(pos) __length) __THROWS(...) {
-#line 475 "kos/src/libc/magic/kos.unistd.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(Truncate))(char const *__file, __FS_TYPE(pos) __length) __THROWS(...) {
 #ifdef __CRT_HAVE_Truncate
 	__localdep_Truncate64(__file, (__pos64_t)__length);
 #else /* __CRT_HAVE_Truncate */
@@ -70,5 +64,11 @@ __LOCAL_LIBC(Truncate) __ATTR_NONNULL((1)) void
 #endif /* !__CRT_HAVE_Truncate */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_Truncate || __CRT_HAVE_Truncate64 */
+#ifndef __local___localdep_Truncate_defined
+#define __local___localdep_Truncate_defined 1
+#define __localdep_Truncate __LIBC_LOCAL_NAME(Truncate)
+#endif /* !__local___localdep_Truncate_defined */
+#else /* __CRT_HAVE_Truncate || __CRT_HAVE_Truncate64 */
+#undef __local_Truncate_defined
+#endif /* !__CRT_HAVE_Truncate && !__CRT_HAVE_Truncate64 */
 #endif /* !__local_Truncate_defined */

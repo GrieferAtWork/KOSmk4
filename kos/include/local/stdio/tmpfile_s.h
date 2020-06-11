@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66f67e50 */
+/* HASH CRC-32:0xadf9623 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tmpfile_s_defined
-#if defined(__CRT_HAVE_tmpfile) || defined(__CRT_HAVE_tmpfile64)
 #define __local_tmpfile_s_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-/* Dependency: "tmpfile" */
-#ifndef ____localdep_tmpfile_defined
-#define ____localdep_tmpfile_defined 1
+#if defined(__CRT_HAVE_tmpfile) || defined(__CRT_HAVE_tmpfile64)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: tmpfile from stdio */
+#ifndef __local___localdep_tmpfile_defined
+#define __local___localdep_tmpfile_defined 1
 #if defined(__CRT_HAVE_tmpfile64) && defined(__USE_FILE_OFFSET64)
 /* Create and return a new file-stream for accessing a temporary file for reading/writing */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,__localdep_tmpfile,(void),tmpfile64,())
@@ -35,17 +35,17 @@ __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,__localdep_tmpfile,(void),tmpf
 #elif defined(__CRT_HAVE_tmpfile64)
 /* Create and return a new file-stream for accessing a temporary file for reading/writing */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,__localdep_tmpfile,(void),tmpfile64,())
-#else /* LIBC: tmpfile */
-#undef ____localdep_tmpfile_defined
-#endif /* tmpfile... */
-#endif /* !____localdep_tmpfile_defined */
-
+#else /* ... */
+#undef __local___localdep_tmpfile_defined
+#endif /* !... */
+#endif /* !__local___localdep_tmpfile_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tmpfile_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(tmpfile_s))(__FILE **__pstream) {
-#line 2664 "kos/src/libc/magic/stdio.c"
 	if (!__pstream) {
-#ifdef __EINVAL
+#ifdef EINVAL
 		return __EINVAL;
 #else /* EINVAL */
 		return 1;
@@ -53,7 +53,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(tmpfile_s))(__FILE **__pstream) {
 	}
 	*__pstream = __localdep_tmpfile();
 	if (!*__pstream) {
-#ifdef __ENOMEM
+#ifdef ENOMEM
 		return __libc_geterrno_or(__ENOMEM);
 #else /* ENOMEM */
 		return __libc_geterrno_or(1);
@@ -62,5 +62,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(tmpfile_s))(__FILE **__pstream) {
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_tmpfile || __CRT_HAVE_tmpfile64 */
+#ifndef __local___localdep_tmpfile_s_defined
+#define __local___localdep_tmpfile_s_defined 1
+#define __localdep_tmpfile_s __LIBC_LOCAL_NAME(tmpfile_s)
+#endif /* !__local___localdep_tmpfile_s_defined */
+#else /* __CRT_HAVE_tmpfile || __CRT_HAVE_tmpfile64 */
+#undef __local_tmpfile_s_defined
+#endif /* !__CRT_HAVE_tmpfile && !__CRT_HAVE_tmpfile64 */
 #endif /* !__local_tmpfile_s_defined */

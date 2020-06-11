@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x624667ba */
+/* HASH CRC-32:0x24124a49 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,15 +25,10 @@
 #define __compar_d_fn_t_defined 1
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(bsearch_r) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bsearch_r))(void const *__pkey,
-                                                       void const *__pbase,
-                                                       __SIZE_TYPE__ __item_count,
-                                                       __SIZE_TYPE__ __item_size,
-                                                       __compar_d_fn_t __cmp,
-                                                       void *__arg) {
-#line 379 "kos/src/libc/magic/stdlib.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(bsearch_r))(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) {
 	/* Optimize this function with the (allowed) assumption that `pbase' is sorted according to:
 	 * >> qsort_r(pbase, item_count, item_size, cmp, arg); */
 	__SIZE_TYPE__ __lo, __hi;
@@ -70,4 +65,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bsearch_r))(void const *__pkey,
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_bsearch_r_defined
+#define __local___localdep_bsearch_r_defined 1
+#define __localdep_bsearch_r __LIBC_LOCAL_NAME(bsearch_r)
+#endif /* !__local___localdep_bsearch_r_defined */
 #endif /* !__local_bsearch_r_defined */

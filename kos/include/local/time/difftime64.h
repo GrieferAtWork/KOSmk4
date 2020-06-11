@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b4aa798 */
+/* HASH CRC-32:0xacb3055e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,31 +21,35 @@
 #ifndef __local_difftime64_defined
 #define __local_difftime64_defined 1
 #include <__crt.h>
-/* Dependency: "difftime32" from "time" */
-#ifndef ____localdep_difftime32_defined
-#define ____localdep_difftime32_defined 1
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: difftime32 from time */
+#ifndef __local___localdep_difftime32_defined
+#define __local___localdep_difftime32_defined 1
 #ifdef __CRT_HAVE_difftime
 /* Return the difference between TIME1 and TIME0 */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(__time32_t __time1, __time32_t __time0),difftime,(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime32)
 /* Return the difference between TIME1 and TIME0 */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(__time32_t __time1, __time32_t __time0),_difftime32,(__time1,__time0))
-#else /* LIBC: difftime */
-#undef ____localdep_difftime32_defined
-#endif /* difftime32... */
-#endif /* !____localdep_difftime32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_difftime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_difftime32_defined */
 /* Return the difference between TIME1 and TIME0 */
 __LOCAL_LIBC(difftime64) __ATTR_CONST __ATTR_WUNUSED double
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(difftime64))(__time64_t __time1,
-                                                        __time64_t __time0) {
-#line 624 "kos/src/libc/magic/time.c"
-#if defined(__CRT_HAVE_difftime) || defined(__CRT_HAVE__difftime32)
-	return __localdep_difftime32((__time32_t)__time1, (__time32_t)__time0);
-#else /* __CRT_HAVE_difftime || __CRT_HAVE__difftime32 */
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(difftime64))(__time64_t __time1, __time64_t __time0) {
+#ifdef __BUILDING_LIBC
 	return __time1 > __time0 ? __time1 - __time0 : __time0 - __time1;
-#endif /* !__CRT_HAVE_difftime && !__CRT_HAVE__difftime32 */
+#elif defined(__CRT_HAVE_difftime) || defined(__CRT_HAVE__difftime32)
+	return __localdep_difftime32((__time32_t)__time1, (__time32_t)__time0);
+#else /* ... */
+	return __time1 > __time0 ? __time1 - __time0 : __time0 - __time1;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_difftime64_defined
+#define __local___localdep_difftime64_defined 1
+#define __localdep_difftime64 __LIBC_LOCAL_NAME(difftime64)
+#endif /* !__local___localdep_difftime64_defined */
 #endif /* !__local_difftime64_defined */

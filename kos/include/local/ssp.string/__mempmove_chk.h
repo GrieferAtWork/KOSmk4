@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7b6594f */
+/* HASH CRC-32:0x50a3a240 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,36 +21,36 @@
 #ifndef __local___mempmove_chk_defined
 #define __local___mempmove_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "mempmove" from "string" */
-#ifndef ____localdep_mempmove_defined
-#define ____localdep_mempmove_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempmove from string */
+#ifndef __local___localdep_mempmove_defined
+#define __local___localdep_mempmove_defined 1
 #ifdef __fast_mempmove_defined
 /* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempmove (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmove))
+__NAMESPACE_FAST_USING(mempmove)
+#define __localdep_mempmove __LIBC_FAST_NAME(mempmove)
 #elif defined(__CRT_HAVE_mempmove)
 /* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
-#else /* LIBC: mempmove */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempmove.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempmove (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmove))
-#endif /* mempmove... */
-#endif /* !____localdep_mempmove_defined */
-
+#define __localdep_mempmove __LIBC_LOCAL_NAME(mempmove)
+#endif /* !... */
+#endif /* !__local___localdep_mempmove_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__mempmove_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempmove_chk))(void *__dst,
-                                                            void const *__src,
-                                                            __SIZE_TYPE__ __n_bytes,
-                                                            __SIZE_TYPE__ __dst_objsize) {
-#line 58 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempmove_chk))(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("mempmove", __dst, __n_bytes, __dst_objsize);
 	return __localdep_mempmove(__dst, __src, __n_bytes);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___mempmove_chk_defined
+#define __local___localdep___mempmove_chk_defined 1
+#define __localdep___mempmove_chk __LIBC_LOCAL_NAME(__mempmove_chk)
+#endif /* !__local___localdep___mempmove_chk_defined */
 #endif /* !__local___mempmove_chk_defined */

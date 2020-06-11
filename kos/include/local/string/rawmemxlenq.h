@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69ec2560 */
+/* HASH CRC-32:0x9c340b33 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,29 @@
 #ifndef __local_rawmemxlenq_defined
 #define __local_rawmemxlenq_defined 1
 #include <__crt.h>
-/* Dependency: "rawmemxchrq" from "string" */
-#ifndef ____localdep_rawmemxchrq_defined
-#define ____localdep_rawmemxchrq_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: rawmemxchrq from string */
+#ifndef __local___localdep_rawmemxchrq_defined
+#define __local___localdep_rawmemxchrq_defined 1
 #ifdef __CRT_HAVE_rawmemxchrq
 /* Same as `rawmemchrq', but search for non-matching locations. */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_rawmemxchrq,(/*aligned(8)*/ void const *__restrict __haystack, __UINT64_TYPE__ __qword),rawmemxchrq,(__haystack,__qword))
-#else /* LIBC: rawmemxchrq */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_rawmemxchrq,(void const *__restrict __haystack, __UINT64_TYPE__ __qword),rawmemxchrq,(__haystack,__qword))
+#else /* __CRT_HAVE_rawmemxchrq */
+__NAMESPACE_LOCAL_END
 #include <local/string/rawmemxchrq.h>
-/* Same as `rawmemchrq', but search for non-matching locations. */
-#define __localdep_rawmemxchrq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemxchrq))
-#endif /* rawmemxchrq... */
-#endif /* !____localdep_rawmemxchrq_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `rawmemchrq', but search for non-matching locations. */
+#define __localdep_rawmemxchrq __LIBC_LOCAL_NAME(rawmemxchrq)
+#endif /* !__CRT_HAVE_rawmemxchrq */
+#endif /* !__local___localdep_rawmemxchrq_defined */
 /* Same as `rawmemlenq', but search for non-matching locations. */
 __LOCAL_LIBC(rawmemxlenq) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemxlenq))(/*aligned(8)*/ void const *__restrict __haystack,
-                                                         __UINT64_TYPE__ __qword) {
-#line 2400 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemxlenq))(void const *__restrict __haystack, __UINT64_TYPE__ __qword) {
 	return (__SIZE_TYPE__)(__localdep_rawmemxchrq(__haystack, __qword) - (__UINT64_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_rawmemxlenq_defined
+#define __local___localdep_rawmemxlenq_defined 1
+#define __localdep_rawmemxlenq __LIBC_LOCAL_NAME(rawmemxlenq)
+#endif /* !__local___localdep_rawmemxlenq_defined */
 #endif /* !__local_rawmemxlenq_defined */

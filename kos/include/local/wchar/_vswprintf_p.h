@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa42a8cb8 */
+/* HASH CRC-32:0xc4ef753a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,10 @@
 #ifndef __local__vswprintf_p_defined
 #define __local__vswprintf_p_defined 1
 #include <__crt.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_vswprintf_p) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vswprintf_p))(__WCHAR_TYPE__ *__buf,
-                                                          __SIZE_TYPE__ __bufsize,
-                                                          __WCHAR_TYPE__ const *__format,
-                                                          __builtin_va_list __args) {
-#line 1937 "kos/src/libc/magic/wchar.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vswprintf_p))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, __builtin_va_list __args) {
 	/* TODO */
 	(void)__buf;
 	(void)__bufsize;
@@ -37,4 +34,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vswprintf_p))(__WCHAR_TYPE__ *__buf,
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__vswprintf_p_defined
+#define __local___localdep__vswprintf_p_defined 1
+#define __localdep__vswprintf_p __LIBC_LOCAL_NAME(_vswprintf_p)
+#endif /* !__local___localdep__vswprintf_p_defined */
 #endif /* !__local__vswprintf_p_defined */

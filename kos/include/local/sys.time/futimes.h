@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb45167c0 */
+/* HASH CRC-32:0x4e93fbce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,23 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futimes_defined
-#if defined(__CRT_HAVE_futimes) || defined(__CRT_HAVE_futimes64)
 #define __local_futimes_defined 1
 #include <__crt.h>
-/* Dependency: "futimes32" from "sys.time" */
-#ifndef ____localdep_futimes32_defined
-#define ____localdep_futimes32_defined 1
-#ifdef __CRT_HAVE_futimes
+#if defined(__CRT_HAVE_futimes) || defined(__CRT_HAVE_futimes64) || (defined(__CRT_HAVE_lutimes) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: futimes32 from sys.time */
+#if !defined(__local___localdep_futimes32_defined) && defined(__CRT_HAVE_futimes)
+#define __local___localdep_futimes32_defined 1
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes32,(__fd_t __fd, struct __timeval32 const __tvp[2]),futimes,(__fd,__tvp))
-#else /* LIBC: futimes */
-#undef ____localdep_futimes32_defined
-#endif /* futimes32... */
-#endif /* !____localdep_futimes32_defined */
-
-/* Dependency: "futimes64" from "sys.time" */
-#ifndef ____localdep_futimes64_defined
-#define ____localdep_futimes64_defined 1
+#endif /* !__local___localdep_futimes32_defined && __CRT_HAVE_futimes */
+/* Dependency: futimes64 from sys.time */
+#ifndef __local___localdep_futimes64_defined
+#define __local___localdep_futimes64_defined 1
 #ifdef __CRT_HAVE_futimes64
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),futimes64,(__fd,__tvp))
@@ -43,21 +39,19 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timev
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),lutimes,(__fd,__tvp))
 #elif defined(__CRT_HAVE_futimes)
+__NAMESPACE_LOCAL_END
 #include <local/sys.time/futimes64.h>
-/* Same as `utimes', but does not follow symbolic links */
-#define __localdep_futimes64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimes64))
-#else /* CUSTOM: futimes64 */
-#undef ____localdep_futimes64_defined
-#endif /* futimes64... */
-#endif /* !____localdep_futimes64_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `utimes', but does not follow symbolic links */
+#define __localdep_futimes64 __LIBC_LOCAL_NAME(futimes64)
+#else /* ... */
+#undef __local___localdep_futimes64_defined
+#endif /* !... */
+#endif /* !__local___localdep_futimes64_defined */
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __LOCAL_LIBC(futimes) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimes))(__fd_t __fd,
-                                                     struct timeval const __tvp[2]) {
-#line 402 "kos/src/libc/magic/sys.time.c"
-#ifdef __CRT_HAVE_utimes
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimes))(__fd_t __fd, struct timeval const __tvp[2]) {
+#ifdef __CRT_HAVE_futimes
 	struct __timeval32 __tv32[2];
 	if (!__tvp)
 		return __localdep_futimes32(__fd, __NULLPTR);
@@ -66,7 +60,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimes))(__fd_t __fd,
 	__tv32[1].tv_sec  = (__time32_t)__tvp[1].tv_sec;
 	__tv32[1].tv_usec = __tvp[1].tv_usec;
 	return __localdep_futimes32(__fd, __tv32);
-#else /* __CRT_HAVE_utimes */
+#else /* __CRT_HAVE_futimes */
 	struct __timeval64 __tv64[2];
 	if (!__tvp)
 		return __localdep_futimes64(__fd, __NULLPTR);
@@ -75,8 +69,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimes))(__fd_t __fd,
 	__tv64[1].tv_sec  = (__time64_t)__tvp[1].tv_sec;
 	__tv64[1].tv_usec = __tvp[1].tv_usec;
 	return __localdep_futimes64(__fd, __tv64);
-#endif /* !__CRT_HAVE_utimes */
+#endif /* !__CRT_HAVE_futimes */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_futimes || __CRT_HAVE_futimes64 */
+#ifndef __local___localdep_futimes_defined
+#define __local___localdep_futimes_defined 1
+#define __localdep_futimes __LIBC_LOCAL_NAME(futimes)
+#endif /* !__local___localdep_futimes_defined */
+#else /* __CRT_HAVE_futimes || __CRT_HAVE_futimes64 || (__CRT_HAVE_lutimes && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) */
+#undef __local_futimes_defined
+#endif /* !__CRT_HAVE_futimes && !__CRT_HAVE_futimes64 && (!__CRT_HAVE_lutimes || !(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) */
 #endif /* !__local_futimes_defined */

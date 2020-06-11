@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc263cc7 */
+/* HASH CRC-32:0x7316d336 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,28 +19,33 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_putwchar_unlocked_defined
-#if (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) && !defined(__NO_STDSTREAMS)
 #define __local_putwchar_unlocked_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-/* Dependency: "fputwc_unlocked" */
-#ifndef ____localdep_fputwc_unlocked_defined
-#define ____localdep_fputwc_unlocked_defined 1
+#if (defined(__CRT_HAVE_fputwc_unlocked) || (defined(__CRT_HAVE_DOS$fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_fputwc_nolock) && __SIZEOF_WCHAR_T__ == 2)) && !defined(__NO_STDSTREAMS)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fputwc_unlocked from wchar */
+#ifndef __local___localdep_fputwc_unlocked_defined
+#define __local___localdep_fputwc_unlocked_defined 1
 #ifdef __CRT_HAVE_fputwc_unlocked
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
-#elif defined(__CRT_HAVE__fputwc_nolock)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
-#else /* LIBC: fputwc_unlocked */
-#undef ____localdep_fputwc_unlocked_defined
-#endif /* fputwc_unlocked... */
-#endif /* !____localdep_fputwc_unlocked_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#elif defined(__CRT_HAVE_DOS$fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__CHAR32_TYPE__ __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$_fputwc_nolock) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__CHAR16_TYPE__ __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+#else /* ... */
+#undef __local___localdep_fputwc_unlocked_defined
+#endif /* !... */
+#endif /* !__local___localdep_fputwc_unlocked_defined */
 __LOCAL_LIBC(putwchar_unlocked) __WINT_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(putwchar_unlocked))(__WCHAR_TYPE__ __wc) __THROWS(...) {
-#line 1058 "kos/src/libc/magic/wchar.c"
 	return __localdep_fputwc_unlocked(__wc, __LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_fputwc_unlocked || __CRT_HAVE__fputwc_nolock) && !__NO_STDSTREAMS */
+#ifndef __local___localdep_putwchar_unlocked_defined
+#define __local___localdep_putwchar_unlocked_defined 1
+#define __localdep_putwchar_unlocked __LIBC_LOCAL_NAME(putwchar_unlocked)
+#endif /* !__local___localdep_putwchar_unlocked_defined */
+#else /* (__CRT_HAVE_fputwc_unlocked || (__CRT_HAVE_DOS$fputwc_unlocked && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$_fputwc_nolock && __SIZEOF_WCHAR_T__ == 2)) && !__NO_STDSTREAMS */
+#undef __local_putwchar_unlocked_defined
+#endif /* (!__CRT_HAVE_fputwc_unlocked && (!__CRT_HAVE_DOS$fputwc_unlocked || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$_fputwc_nolock || !__SIZEOF_WCHAR_T__ == 2)) || __NO_STDSTREAMS */
 #endif /* !__local_putwchar_unlocked_defined */

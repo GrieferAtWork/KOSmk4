@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34d0e144 */
+/* HASH CRC-32:0xd7925a9a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,33 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_posix_memalign_defined
-#if defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)
 #define __local_posix_memalign_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-/* Dependency: "memalign" from "malloc" */
-#ifndef ____localdep_memalign_defined
-#define ____localdep_memalign_defined 1
-#ifdef __CRT_HAVE_memalign
+#if defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memalign from malloc */
+#ifndef __local___localdep_memalign_defined
+#define __local___localdep_memalign_defined 1
+#if __has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_aligned_alloc)
+__CEIREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),aligned_alloc,{ return __builtin_aligned_alloc(__alignment, __n_bytes); })
+#elif defined(__CRT_HAVE_memalign)
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),memalign,(__alignment,__n_bytes))
 #elif defined(__CRT_HAVE_aligned_alloc)
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),aligned_alloc,(__alignment,__n_bytes))
 #elif defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_END
 #include <local/malloc/memalign.h>
-#define __localdep_memalign (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memalign))
-#else /* CUSTOM: memalign */
-#undef ____localdep_memalign_defined
-#endif /* memalign... */
-#endif /* !____localdep_memalign_defined */
-
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_memalign __LIBC_LOCAL_NAME(memalign)
+#else /* ... */
+#undef __local___localdep_memalign_defined
+#endif /* !... */
+#endif /* !__local___localdep_memalign_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(posix_memalign) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_memalign))(void **__restrict __pp,
-                                                            __SIZE_TYPE__ __alignment,
-                                                            __SIZE_TYPE__ __n_bytes) {
-#line 109 "kos/src/libc/magic/malloc.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_memalign))(void **__restrict __pp, __SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes) {
 	void *__result;
 	__SIZE_TYPE__ __d = __alignment / sizeof(void *);
 	__SIZE_TYPE__ __r = __alignment % sizeof(void *);
@@ -66,5 +68,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_memalign))(void **__restrict __
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_posix_memalign || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc */
+#ifndef __local___localdep_posix_memalign_defined
+#define __local___localdep_posix_memalign_defined 1
+#define __localdep_posix_memalign __LIBC_LOCAL_NAME(posix_memalign)
+#endif /* !__local___localdep_posix_memalign_defined */
+#else /* __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+#undef __local_posix_memalign_defined
+#endif /* !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
 #endif /* !__local_posix_memalign_defined */

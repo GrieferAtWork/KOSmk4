@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfca81708 */
+/* HASH CRC-32:0xd579996e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,28 +21,29 @@
 #ifndef __local_strncoll_l_defined
 #define __local_strncoll_l_defined 1
 #include <__crt.h>
-/* Dependency: "strncoll" from "string" */
-#ifndef ____localdep_strncoll_defined
-#define ____localdep_strncoll_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strncoll from string */
+#ifndef __local___localdep_strncoll_defined
+#define __local___localdep_strncoll_defined 1
 #ifdef __CRT_HAVE_strncoll
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncoll,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncoll,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__strncoll)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncoll,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),_strncoll,(__s1,__s2,__maxlen))
-#else /* LIBC: strncoll */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/strncoll.h>
-#define __localdep_strncoll (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncoll))
-#endif /* strncoll... */
-#endif /* !____localdep_strncoll_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strncoll __LIBC_LOCAL_NAME(strncoll)
+#endif /* !... */
+#endif /* !__local___localdep_strncoll_defined */
 __LOCAL_LIBC(strncoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strncoll_l))(char const *__s1,
-                                                        char const *__s2,
-                                                        __SIZE_TYPE__ __maxlen,
-                                                        __locale_t __locale) {
-#line 4762 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strncoll_l))(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_strncoll(__s1, __s2, __maxlen);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strncoll_l_defined
+#define __local___localdep_strncoll_l_defined 1
+#define __localdep_strncoll_l __LIBC_LOCAL_NAME(strncoll_l)
+#endif /* !__local___localdep_strncoll_l_defined */
 #endif /* !__local_strncoll_l_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f3c5448 */
+/* HASH CRC-32:0x747e15db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,34 +21,49 @@
 #ifndef __local_wcsncasecoll_l_defined
 #define __local_wcsncasecoll_l_defined 1
 #include <__crt.h>
-/* Dependency: "wcsncasecoll" from "wchar" */
-#ifndef ____localdep_wcsncasecoll_defined
-#define ____localdep_wcsncasecoll_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcsncasecoll from wchar */
+#ifndef __local___localdep_wcsncasecoll_defined
+#define __local___localdep_wcsncasecoll_defined 1
 #ifdef __CRT_HAVE_wcsncasecoll
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncasecoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncasecoll,(__s1,__s2,__maxlen))
-#elif defined(__CRT_HAVE__wcsnicoll)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncasecoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),_wcsnicoll,(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_DOS$wcsncasecoll) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncasecoll,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncasecoll,(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_DOS$_wcsnicoll) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncasecoll,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),_wcsnicoll,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_wcsncasecmp)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncasecoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncasecmp,(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_DOS$wcsncasecmp) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncasecoll,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncasecmp,(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_DOS$wcsncasecmp) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncasecoll,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncasecmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__wcsnicmp)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncasecoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),_wcsnicmp,(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_DOS$_wcsnicmp) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncasecoll,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),_wcsnicmp,(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_DOS$_wcsnicmp) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncasecoll,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),_wcsnicmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_wcsnicmp)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncasecoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsnicmp,(__s1,__s2,__maxlen))
-#else /* LIBC: wcsncasecoll */
+#elif defined(__CRT_HAVE_DOS$wcsnicmp) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncasecoll,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsnicmp,(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_DOS$wcsnicmp) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncasecoll,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsnicmp,(__s1,__s2,__maxlen))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/wcsncasecoll.h>
-#define __localdep_wcsncasecoll (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncasecoll))
-#endif /* wcsncasecoll... */
-#endif /* !____localdep_wcsncasecoll_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcsncasecoll __LIBC_LOCAL_NAME(wcsncasecoll)
+#endif /* !... */
+#endif /* !__local___localdep_wcsncasecoll_defined */
 __LOCAL_LIBC(wcsncasecoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncasecoll_l))(__WCHAR_TYPE__ const *__s1,
-                                                            __WCHAR_TYPE__ const *__s2,
-                                                            __SIZE_TYPE__ __maxlen,
-                                                            __locale_t __locale) {
-#line 4775 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncasecoll_l))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_wcsncasecoll(__s1, __s2, __maxlen);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsncasecoll_l_defined
+#define __local___localdep_wcsncasecoll_l_defined 1
+#define __localdep_wcsncasecoll_l __LIBC_LOCAL_NAME(wcsncasecoll_l)
+#endif /* !__local___localdep_wcsncasecoll_l_defined */
 #endif /* !__local_wcsncasecoll_l_defined */

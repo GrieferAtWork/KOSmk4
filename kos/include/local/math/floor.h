@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7edf5be */
+/* HASH CRC-32:0x940c513 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,11 @@
 #define __local_floor_defined 1
 #include <__crt.h>
 #include <hybrid/typecore.h>
-
 #include <libm/floor.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Largest integer not greater than X */
 __LOCAL_LIBC(floor) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(floor))(double __x) {
-#line 687 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUN
 	return __LIBM_MATHFUN(floor, __x);
 #else /* __LIBM_MATHFUN */
@@ -40,4 +38,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(floor))(double __x) {
 #endif /* !__LIBM_MATHFUN */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_floor_defined
+#define __local___localdep_floor_defined 1
+#define __localdep_floor __LIBC_LOCAL_NAME(floor)
+#endif /* !__local___localdep_floor_defined */
 #endif /* !__local_floor_defined */

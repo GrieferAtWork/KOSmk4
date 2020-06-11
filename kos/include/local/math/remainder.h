@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8a46520 */
+/* HASH CRC-32:0x7d82a3e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,23 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_remainder_defined
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_remainder_defined 1
 #include <__crt.h>
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/matherr.h>
-
 #include <libm/isnan.h>
-
 #include <libm/isinf.h>
-
 #include <libm/remainder.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the remainder of integer division X/P with infinite precision */
 __LOCAL_LIBC(remainder) __ATTR_WUNUSED double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainder))(double __x,
-                                                   double __p) {
-#line 866 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainder))(double __x, double __p) {
 	if (((__p == 0.0 && !__LIBM_MATHFUN(isnan, __x)) ||
 	     (__LIBM_MATHFUN(isinf, __x) && !__LIBM_MATHFUN(isnan, __p))) &&
 	    __LIBM_LIB_VERSION != __LIBM_IEEE)
@@ -43,5 +38,11 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainder))(double __x,
 	return __LIBM_MATHFUN2(remainder, __x, __p);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#ifndef __local___localdep_remainder_defined
+#define __local___localdep_remainder_defined 1
+#define __localdep_remainder __LIBC_LOCAL_NAME(remainder)
+#endif /* !__local___localdep_remainder_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_remainder_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_remainder_defined */

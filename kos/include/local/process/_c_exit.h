@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd0d8322 */
+/* HASH CRC-32:0x876bf5a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,10 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_c_exit) void
 (__LIBCCALL __LIBC_LOCAL_NAME(_c_exit))(void) __THROWS(...) {
-#line 112 "kos/src/libc/magic/process.c"
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__c_exit_defined
+#define __local___localdep__c_exit_defined 1
+#define __localdep__c_exit __LIBC_LOCAL_NAME(_c_exit)
+#endif /* !__local___localdep__c_exit_defined */
 #endif /* !__local__c_exit_defined */

@@ -255,6 +255,7 @@ long int telldir([[nonnull]] DIR *__restrict dirp);
 %
 %#ifdef __USE_XOPEN2K8
 @@Return the underlying file descriptor of the given directory stream
+[[decl_include("<features.h>")]]
 [[ATTR_PURE, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 $fd_t dirfd([[nonnull]] DIR __KOS_FIXED_CONST *__restrict dirp);
 

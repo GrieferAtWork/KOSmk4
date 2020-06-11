@@ -129,7 +129,9 @@ int posix_memalign([[nonnull]] void **__restrict pp,
 	return 0;
 }
 
-[[guard]] cfree(*) = free;
+[[guard]]
+cfree(*) = free;
+
 
 %
 [[ignore, nocrt, alias(_heapmin)]]
@@ -168,8 +170,8 @@ int mallopt(int parameter_number, int parameter_value) {
 	return 0;
 }
 
-__memdup(*) = memdup;
-__memcdup(*) = memcdup;
+%[insert:function(__memdup = memdup)]
+%[insert:function(__memcdup = memcdup)]
 
 %
 %#ifdef __USE_KOS

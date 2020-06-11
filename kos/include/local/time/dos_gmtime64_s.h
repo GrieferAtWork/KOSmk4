@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae0d889a */
+/* HASH CRC-32:0x4f77cf2d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_dos_gmtime64_s_defined
-#ifdef __CRT_HAVE__gmtime32_s
 #define __local_dos_gmtime64_s_defined 1
 #include <__crt.h>
+#ifdef __CRT_HAVE__gmtime32_s
+#include <bits/types.h>
 #ifndef __STRUCT_TM
 #ifdef __tm_defined
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
+#define __STRUCT_TM struct tm
 #else /* __tm_defined */
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM __NAMESPACE_STD_SYM tm
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
 #ifndef __std_tm_defined
 #define __std_tm_defined 1
 __NAMESPACE_STD_BEGIN
-struct __NAMESPACE_STD_SYM tm {
+struct tm {
 	int         tm_sec;      /* seconds [0, 61]. */
 	int         tm_min;      /* minutes [0, 59]. */
 	int         tm_hour;     /* hour [0, 23]. */
@@ -42,37 +43,36 @@ struct __NAMESPACE_STD_SYM tm {
 	int         tm_isdst;    /* daylight savings flag. */
 #ifdef __CRT_GLC
 #ifdef __USE_MISC
-	long int    tm_gmtoff;   /* Seconds east of UTC. */
-	char const *tm_zone;     /* Timezone abbreviation. */
+	__LONGPTR_TYPE__ tm_gmtoff;   /* Seconds east of UTC. */
+	char const      *tm_zone;     /* Timezone abbreviation. */
 #else /* __USE_MISC */
-	long int    __tm_gmtoff; /* Seconds east of UTC. */
-	char const *__tm_zone;   /* Timezone abbreviation. */
+	__LONGPTR_TYPE__ __tm_gmtoff; /* Seconds east of UTC. */
+	char const      *__tm_zone;   /* Timezone abbreviation. */
 #endif /* !__USE_MISC */
 #endif /* __CRT_GLC */
 };
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif /* !__STRUCT_TM */
-/* Dependency: "dos_gmtime32_s" from "time" */
-#ifndef ____localdep_dos_gmtime32_s_defined
-#define ____localdep_dos_gmtime32_s_defined 1
-#ifdef __CRT_HAVE__gmtime32_s
+#endif
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: dos_gmtime32_s from time */
+#if !defined(__local___localdep_dos_gmtime32_s_defined) && defined(__CRT_HAVE__gmtime32_s)
+#define __local___localdep_dos_gmtime32_s_defined 1
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_gmtime32_s,(__STRUCT_TM *__restrict __tp, __time32_t const *__restrict __timer),_gmtime32_s,(__tp,__timer))
-#else /* LIBC: _gmtime32_s */
-#undef ____localdep_dos_gmtime32_s_defined
-#endif /* dos_gmtime32_s... */
-#endif /* !____localdep_dos_gmtime32_s_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_dos_gmtime32_s_defined && __CRT_HAVE__gmtime32_s */
 __LOCAL_LIBC(dos_gmtime64_s) __ATTR_NONNULL((1, 2)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_gmtime64_s))(__STRUCT_TM *__restrict __tp,
-                                                            __time64_t const *__restrict __timer) {
-#line 318 "kos/src/libc/magic/time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_gmtime64_s))(__STRUCT_TM *__restrict __tp, __time64_t const *__restrict __timer) {
 	__time32_t __tm32 = *__timer;
 	return __localdep_dos_gmtime32_s(__tp, &__tm32);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE__gmtime32_s */
+#ifndef __local___localdep_dos_gmtime64_s_defined
+#define __local___localdep_dos_gmtime64_s_defined 1
+#define __localdep_dos_gmtime64_s __LIBC_LOCAL_NAME(dos_gmtime64_s)
+#endif /* !__local___localdep_dos_gmtime64_s_defined */
+#else /* __CRT_HAVE__gmtime32_s */
+#undef __local_dos_gmtime64_s_defined
+#endif /* !__CRT_HAVE__gmtime32_s */
 #endif /* !__local_dos_gmtime64_s_defined */

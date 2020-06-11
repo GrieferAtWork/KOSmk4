@@ -1741,34 +1741,48 @@ again_parse_default_annotation:
 	}
 
 	public function parseInsertDirective_std_function_nousing() {
-		parseInsertDirective_function(std: true, using: false);
+		parseInsertDirective_function(std: true);
+	}
+
+	public function parseInsertDirective_guarded_function() {
+		parseInsertDirective_function(guarded: true);
+	}
+
+	public function parseInsertDirective_guarded_std_function() {
+		parseInsertDirective_function(guarded: true, std: true, using: true);
+	}
+
+	public function parseInsertDirective_guarded_std_function_nousing() {
+		parseInsertDirective_function(guarded: true, std: true);
 	}
 
 	@@>> %[insert:function(foo)]
 	@@>> %[insert:function(foo, ATTRIB)]
 	@@>> %[insert:function(foo = bar)]
 	@@>> %[insert:function(foo = bar, ATTRIB)]
-	@@>> %[insert:std_function(foo)]
-	@@>> %[insert:std_function(foo, ATTRIB)]
-	@@>> %[insert:std_function(foo = bar)]
-	@@>> %[insert:std_function(foo = bar, ATTRIB)]
-	@@>> %[insert:std_function_nousing(foo)]
-	@@>> %[insert:std_function_nousing(foo, ATTRIB)]
-	@@>> %[insert:std_function_nousing(foo = bar)]
-	@@>> %[insert:std_function_nousing(foo = bar, ATTRIB)]
+	@@>> %[insert:std_function(<Same as above...>)]
+	@@>> %[insert:std_function_nousing(<Same as above...>)]
+	@@>> %[insert:guarded_function(<Same as above...>)]
+	@@>> %[insert:guarded_std_function(<Same as above...>)]
+	@@>> %[insert:guarded_std_function_nousing(<Same as above...>)]
 	@@
 	@@Where ATTRIB is:
 	@@    ',' ~~ (ATTR_NAME ':' ATTR_VALEXPR)...
 	@@
 	@@Where ATTR_NAME is the name of one of the members of @ExposedFunction
 	@@Where ATTR_VALEXPR is a deemon expression, as executable by @(exec from deemon)
-	public function parseInsertDirective_function(std: bool = false, using: bool = false) {
+	@@
+	@@HINT: %[insert:guarded_*_function(...)] is the same as %[insert:_function(guardName: true)]
+	public function parseInsertDirective_function(
+			guarded: bool = false, std: bool = false, using: bool = false) {
 		local self = this.self;
 		self.next();
 		self.skip("(");
 		local exposedFunction = ExposedFunction();
 		local insertedFunctionNameStart = self.tokStart;
 		local insertedFunctionName = parseCStringOrKeyword(self);
+		if (guarded)
+			exposedFunction.guardName = true;
 		if (self.tok == "=") {
 			exposedFunction.exposedName = insertedFunctionName;
 			self.next();
@@ -1857,7 +1871,7 @@ again_parse_default_annotation:
 		} else {
 			if (result_order_header_in_CXX_SYSTEM_HEADER) {
 				result.order_header.append(CXX_SYSTEM_HEADER_END);
-				result_order_header_in_CXX_SYSTEM_HEADER = true;
+				result_order_header_in_CXX_SYSTEM_HEADER = false;
 			}
 			result.order_header.append(exposedFunction);
 		}
@@ -3315,7 +3329,7 @@ got_chkExpr:
 						impl: FunctionImplementation(
 							body: "{{\n"
 								"\t{};\n"
-								"\treturn {}({})\n"
+								"\treturn {}({});\n"
 								"}}".format({
 									chkExpr,
 									chkBaseFunctionName,
@@ -3441,7 +3455,7 @@ got_chkExpr:
 								body: bodyPattern.format({
 									"returnType0"    : myPrototype.returnType.beforeName,
 									"returnType1"    : myPrototype.returnType.afterName,
-									"lastArg"        : myPrototype.argv.last.name,
+									"lastArg"        : myPrototype.argv[#myPrototype.argv-2].name,
 									"positionalArgs" : ", ".join(myPrototype.argv[:-1].each.name),
 									"vprintf"        : vprintfFunctionName,
 								}),
@@ -4386,6 +4400,28 @@ handle_eq_after_prototype:
 				 *              also simply inherit all bindings from the other
 				 *              function) */
 				current.bindings = [] -> getBoundFunction().functionBindings;
+				/* Need to bind @currentPrototypes properly, as it may
+				 * still be used for @(NamespaceBinding)s down below! */
+				if (currentFeatures.namespaces) {
+					currentPrototypes = []{
+						local bfun: Function = getBoundFunction();
+						local result = bfun.onlyPrototypes;
+						if (result !is none)
+							return result;
+						for (local x: bfun.functionBindings) {
+							print "BINDING:", x.functionBinding;
+							for (local none, protos: x.functionPrototypes) {
+								for (local p: protos)
+									print("\t", p);
+							}
+						}
+						self.errAt(boundFunctionNameStart,
+							"Bound function {!r} has ambiguous prototypes, and thus "
+							"cannot be used for namespace imports together with aliasing "
+							"function {!r} (consider using %[insert:function(...)] instead)"
+							.format({ bfun.name, currentName }));
+					};
+				}
 			} else {
 				/* Difficult case: We must inherit bindings, but override them
 				 *                 with our own, custom list of prototypes! */

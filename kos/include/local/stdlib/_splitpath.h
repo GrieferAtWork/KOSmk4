@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0ed2aed */
+/* HASH CRC-32:0xa992139d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,24 @@
 #ifndef __local__splitpath_defined
 #define __local__splitpath_defined 1
 #include <__crt.h>
-/* Dependency: "_splitpath_s" from "stdlib" */
-#ifndef ____localdep__splitpath_s_defined
-#define ____localdep__splitpath_s_defined 1
-#ifdef __CRT_HAVE__splitpath_s
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep__splitpath_s,(char const *__restrict __abspath, char *__drive, __SIZE_TYPE__ __drivelen, char *__dir, __SIZE_TYPE__ __dirlen, char *__file, __SIZE_TYPE__ __filelen, char *__ext, __SIZE_TYPE__ __extlen),_splitpath_s,(__abspath,__drive,__drivelen,__dir,__dirlen,__file,__filelen,__ext,__extlen))
-#else /* LIBC: _splitpath_s */
-#include <local/stdlib/_splitpath_s.h>
-#define __localdep__splitpath_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_splitpath_s))
-#endif /* _splitpath_s... */
-#endif /* !____localdep__splitpath_s_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _splitpath_s from stdlib */
+#ifndef __local___localdep__splitpath_s_defined
+#define __local___localdep__splitpath_s_defined 1
+#ifdef __CRT_HAVE__splitpath_s
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep__splitpath_s,(char const *__restrict __abspath, char *__drive, __SIZE_TYPE__ __drivelen, char *__dir, __SIZE_TYPE__ __dirlen, char *__file, __SIZE_TYPE__ __filelen, char *__ext, __SIZE_TYPE__ __extlen),_splitpath_s,(__abspath,__drive,__drivelen,__dir,__dirlen,__file,__filelen,__ext,__extlen))
+#else /* __CRT_HAVE__splitpath_s */
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/_splitpath_s.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__splitpath_s __LIBC_LOCAL_NAME(_splitpath_s)
+#endif /* !__CRT_HAVE__splitpath_s */
+#endif /* !__local___localdep__splitpath_s_defined */
 __LOCAL_LIBC(_splitpath) __ATTR_NONNULL((1)) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath))(char const *__restrict __abspath,
-                                                        char *__drive,
-                                                        char *__dir,
-                                                        char *__file,
-                                                        char *__ext) {
-#line 3129 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath))(char const *__restrict __abspath, char *__drive, char *__dir, char *__file, char *__ext) {
 	__localdep__splitpath_s(__abspath,
 	             __drive, __drive ? 3 : 0,
 	             __dir, __dir ? 256 : 0,
@@ -47,4 +46,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath))(char const *__restrict _
 	             __ext, __ext ? 256 : 0);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__splitpath_defined
+#define __local___localdep__splitpath_defined 1
+#define __localdep__splitpath __LIBC_LOCAL_NAME(_splitpath)
+#endif /* !__local___localdep__splitpath_defined */
 #endif /* !__local__splitpath_defined */

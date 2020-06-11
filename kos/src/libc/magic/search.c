@@ -172,16 +172,22 @@ void remque([[nonnull]] void *__restrict elem) {
 /* For use with hsearch(3).  */
 #ifndef __COMPAR_FN_T
 #define __COMPAR_FN_T 1
+#ifndef ____compar_fn_t_defined
+#define ____compar_fn_t_defined 1
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
+#endif /* !____compar_fn_t_defined */
 #ifdef __USE_GNU
 typedef __compar_fn_t comparison_fn_t;
 #endif /* __USE_GNU */
 #endif /* __COMPAR_FN_T */
 
+#ifndef __ENTRY_defined
+#define __ENTRY_defined 1
 typedef struct entry {
 	char *key;
 	void *data;
 } ENTRY;
+#endif /* !__ENTRY_defined */
 
 /* Opaque type for internal use. */
 struct _ENTRY;
@@ -196,70 +202,67 @@ struct _ENTRY;
 %[define_replacement(VISIT = int)]
 %[define_replacement(ACTION = int)]
 
+%[define(FIND      = 0)]
+%[define(ENTER     = 1)]
+%[define(preorder  = 0)]
+%[define(postorder = 1)]
+%[define(endorder  = 2)]
+%[define(leaf      = 3)]
+
+
+%[define(DEFINE_HSEARCH_DATA =
+@@pp_ifndef __hsearch_data_defined@@
+#define __hsearch_data_defined 1
+struct _ENTRY;
+struct hsearch_data {
+	struct _ENTRY  *@table@;
+	__UINT32_TYPE__ @size@;
+	__UINT32_TYPE__ @filled@;
+};
+@@pp_endif@@
+)]
+
+%[define(DEFINE_HSEARCH_HTAB =
+@@pp_ifndef __local_htab_defined@@
+#define __local_htab_defined 1
+@@push_namespace(local)@@
+__LOCAL_LIBC_DATA(htab) struct hsearch_data htab = {NULL, 0, 0};
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_SEARCH_ENTRY =
+@@pp_ifndef __ENTRY_defined@@
+#define __ENTRY_defined 1
+typedef struct entry {
+	char *@key@;
+	void *@data@;
+} @ENTRY@;
+@@pp_endif@@
+)]
+
 
 @@Search for entry matching ITEM.key in internal hash table.
 @@If ACTION is `FIND' return found entry or signal error by returning NULL.
 @@If ACTION is `ENTER' replace existing data (if any) with ITEM.data
-[[impl_prefix(
-#ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
-struct @_ENTRY@;
-struct @hsearch_data@ {
-	struct @_ENTRY@ *@table@;
-	unsigned int     @size@;
-	unsigned int     @filled@;
-};
-#endif /* !__hsearch_data_defined */
-), impl_prefix(
-#ifndef __local_htab_defined
-#define __local_htab_defined 1
-@__LOCAL_LIBC_DATA@(htab) struct @hsearch_data@ htab = {NULL, 0, 0};
-#endif /* !__local_htab_defined */
-), userimpl, requires_function(hsearch_r)]]
+[[impl_prefix(DEFINE_HSEARCH_DATA), impl_prefix(DEFINE_HSEARCH_HTAB)]]
+[[userimpl, requires_function(hsearch_r)]]
 ENTRY *hsearch(ENTRY item, ACTION action) {
-	@ENTRY@ *result;
+	ENTRY *result;
 	hsearch_r(item, action, &result, &htab);
 	return result;
 }
 
 @@Create a new hashing table which will at most contain NEL elements
-[[impl_prefix(
-#ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
-struct @_ENTRY@;
-struct @hsearch_data@ {
-	struct @_ENTRY@ *@table@;
-	unsigned int     @size@;
-	unsigned int     @filled@;
-};
-#endif /* !__hsearch_data_defined */
-), impl_prefix(
-#ifndef __local_htab_defined
-#define __local_htab_defined 1
-@__LOCAL_LIBC_DATA@(htab) struct @hsearch_data@ htab = {NULL, 0, 0};
-#endif /* !__local_htab_defined */
-), userimpl, requires_function(hcreate_r)]]
+[[impl_prefix(DEFINE_HSEARCH_DATA), impl_prefix(DEFINE_HSEARCH_HTAB)]]
+[[userimpl, requires_function(hcreate_r)]]
 int hcreate(size_t nel) {
 	return hcreate_r(nel, &htab);
 }
 
 @@Destroy current internal hashing table
-[[impl_prefix(
-#ifndef __hsearch_data_defined
-#define __hsearch_data_defined 1
-struct @_ENTRY@;
-struct @hsearch_data@ {
-	struct @_ENTRY@ *@table@;
-	unsigned int     @size@;
-	unsigned int     @filled@;
-};
-#endif /* !__hsearch_data_defined */
-), impl_prefix(
-#ifndef __local_htab_defined
-#define __local_htab_defined 1
-@__LOCAL_LIBC_DATA@(htab) struct @hsearch_data@ htab = {NULL, 0, 0};
-#endif /* !__local_htab_defined */
-), userimpl, requires_function(hdestroy_r)]]
+[[impl_prefix(DEFINE_HSEARCH_DATA), impl_prefix(DEFINE_HSEARCH_HTAB)]]
+[[userimpl, requires_function(hdestroy_r)]]
 void hdestroy() {
 	hdestroy_r(&htab);
 }
@@ -293,13 +296,16 @@ int isprime(unsigned int number) {
 }
 
 @@Reentrant versions which can handle multiple hashing tables at the same time
+[[decl_prefix(struct entry;)]]
 [[impl_include("<parts/errno.h>")]]
+[[impl_prefix(DEFINE_HSEARCH_DATA)]]
+[[impl_prefix(DEFINE_SEARCH_ENTRY)]]
 int hsearch_r(ENTRY item, ACTION action,
               [[nonnull]] ENTRY **retval,
               [[nonnull]] struct hsearch_data *htab) {
 	typedef struct {
 		unsigned int used;
-		@ENTRY@        entry;
+		ENTRY        entry;
 	} entry_type;
 	unsigned int hval, count, idx;
 	unsigned int len = strlen(item.@key@);
@@ -334,7 +340,7 @@ int hsearch_r(ENTRY item, ACTION action,
 			}
 		} while (((entry_type *)htab->@table@)[idx].used);
 	}
-	if (action == @ENTER@) {
+	if (action == ENTER) {
 		if (htab->@filled@ == htab->@size@) {
 @@pp_ifdef ENOMEM@@
 			__libc_seterrno(ENOMEM);
@@ -355,12 +361,14 @@ int hsearch_r(ENTRY item, ACTION action,
 	return 0;
 }
 
+[[impl_prefix(DEFINE_HSEARCH_DATA)]]
+[[impl_prefix(DEFINE_SEARCH_ENTRY)]]
 [[userimpl, requires_function(calloc), doc_alias("hsearch_r")]]
 [[impl_include("<hybrid/limitcore.h>", "<parts/errno.h>")]]
 int hcreate_r(size_t nel, struct hsearch_data *htab) {
 	typedef struct {
 		unsigned int used;
-		@ENTRY@        entry;
+		ENTRY        entry;
 	} entry_type;
 	if (htab == NULL) {
 @@pp_ifdef EINVAL@@
@@ -390,6 +398,7 @@ int hcreate_r(size_t nel, struct hsearch_data *htab) {
 	return 1;
 }
 
+[[impl_prefix(DEFINE_HSEARCH_DATA)]]
 [[doc_alias("hsearch_r"), impl_include("<parts/errno.h>")]]
 [[userimpl, requires_function(free)]]
 void hdestroy_r(struct hsearch_data *htab) {
@@ -422,11 +431,11 @@ void hdestroy_r(struct hsearch_data *htab) {
 void maybe_split_for_insert([[nonnull]] void **rootp, [[nullable]] void **parentp,
                             /*[[if(rootp != NULL), nonnull]]*/ void **gparentp,
                             int p_r, int gp_r, int mode) {
-	typedef struct node_struct {
-		void const         *key;
-		struct node_struct *left_node;
-		struct node_struct *right_node;
-		__UINTPTR_TYPE__    is_red;
+	typedef struct __node_struct {
+		void const           *key;
+		struct __node_struct *left_node;
+		struct __node_struct *right_node;
+		__UINTPTR_TYPE__      is_red;
 	} *node;
 	node root = *(node *)rootp;
 	node *rp, *lp;
@@ -476,17 +485,25 @@ void maybe_split_for_insert([[nonnull]] void **rootp, [[nullable]] void **parent
 	}
 }
 
+%[define(DEFINE_COMPAR_FN_T =
+@@pp_ifndef ____compar_fn_t_defined@@
+#define ____compar_fn_t_defined 1
+typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
+@@pp_endif@@
+)]
+
 @@Search for an entry matching the given KEY in the tree
 @@pointed to by *ROOTP and insert a new element if not found
+[[decl_prefix(DEFINE_COMPAR_FN_T)]]
 [[userimpl, requires_function(malloc), export_alias("__tsearch")]]
 void *tsearch(void const *key,
               [[nullable]] void **vrootp,
               [[nonnull]] __compar_fn_t compar) {
-	typedef struct node_struct {
-		void const         *key;
-		struct node_struct *left_node;
-		struct node_struct *right_node;
-		__UINTPTR_TYPE__    is_red;
+	typedef struct __node_struct {
+		void const           *key;
+		struct __node_struct *left_node;
+		struct __node_struct *right_node;
+		__UINTPTR_TYPE__      is_red;
 	} *node;
 	node q, root;
 	node *parentp = NULL, *gparentp = NULL;
@@ -518,7 +535,7 @@ void *tsearch(void const *key,
 		gp_r = p_r;
 		p_r = r;
 	}
-	q = (node)malloc(sizeof(struct node_struct));
+	q = (node)malloc(sizeof(struct __node_struct));
 	if (q != NULL) {
 		*nextp = q;
 		q->key = key;
@@ -537,15 +554,16 @@ void *tsearch(void const *key,
 
 @@Search for an entry matching the given KEY in the tree pointed
 @@to by *ROOTP. If no matching entry is available return NULL
+[[decl_prefix(DEFINE_COMPAR_FN_T)]]
 [[export_alias("__tfind")]]
 void *tfind(void const *key,
             [[nullable]] void *const *vrootp,
             [[nonnull]] __compar_fn_t compar) {
-	typedef struct node_struct {
-		void const         *key;
-		struct node_struct *left_node;
-		struct node_struct *right_node;
-		__UINTPTR_TYPE__    is_red;
+	typedef struct __node_struct {
+		void const           *key;
+		struct __node_struct *left_node;
+		struct __node_struct *right_node;
+		__UINTPTR_TYPE__      is_red;
 	} *node;
 	node root, *rootp = (node *)vrootp;
 	if (rootp == NULL)
@@ -561,17 +579,18 @@ void *tfind(void const *key,
 }
 
 @@Remove the element matching KEY from the tree pointed to by *ROOTP
+[[decl_prefix(DEFINE_COMPAR_FN_T)]]
 [[export_alias("__tdelete")]]
-[[dependency_include("<hybrid/typecore.h>", "<parts/malloca.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<parts/malloca.h>")]]
 [[userimpl, requires_function(free)]]
 void *tdelete(void const *__restrict key,
               [[nullable]] void **__restrict vrootp,
               [[nonnull]] __compar_fn_t compar) {
-	typedef struct node_struct {
-		void const         *key;
-		struct node_struct *left_node;
-		struct node_struct *right_node;
-		__UINTPTR_TYPE__    is_red;
+	typedef struct __node_struct {
+		void const           *key;
+		struct __node_struct *left_node;
+		struct __node_struct *right_node;
+		__UINTPTR_TYPE__      is_red;
 	} *node;
 	node p, q, r, retval;
 	node root, unchained;
@@ -813,6 +832,7 @@ again:
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 @@Perform linear search for KEY by comparing by COMPAR in an array [BASE, BASE+NMEMB*SIZE)
+[[decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<features.h>")]]
 void *lfind:(void const *key, [[nonnull]] void const *base, [[nonnull]] size_t __KOS_FIXED_CONST *nmemb, size_t size, [[nonnull]] __compar_fn_t compar)
 	[(void const *key, [[nonnull]] void *base, [[nonnull]] size_t __KOS_FIXED_CONST *nmemb, size_t size, [[nonnull]] __compar_fn_t compar): void *]
 	[(void const *key, [[nonnull]] void const *base, [[nonnull]] size_t __KOS_FIXED_CONST *nmemb, size_t size, [[nonnull]] __compar_fn_t compar): void const *]
@@ -830,7 +850,7 @@ void *lfind:(void const *key, [[nonnull]] void const *base, [[nonnull]] size_t _
 @@Perform linear search for KEY by comparing by COMPAR function
 @@in array [BASE, BASE+NMEMB*SIZE) and insert entry if not found
 void *lsearch(void const *key, [[nonnull]] void *base,
-              [[nonnull]] size_t __KOS_FIXED_CONST *nmemb,
+              [[nonnull]] size_t *nmemb,
               size_t size, [[nonnull]] __compar_fn_t compar) {
 	void *result;
 	result = lfind(key, base, nmemb, size, compar);

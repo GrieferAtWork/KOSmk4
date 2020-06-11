@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3ba17f */
+/* HASH CRC-32:0x36438fd6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,19 +23,17 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wildwcscmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscmp))(__WCHAR_TYPE__ const *__pattern,
-                                                        __WCHAR_TYPE__ const *__string) {
-#line 4170 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscmp))(__WCHAR_TYPE__ const *__pattern, __WCHAR_TYPE__ const *__string) {
 	__WCHAR_TYPE__ __card_post;
 	for (;;) {
 		if (!*__string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
 			while (*__pattern == '*')
 				++__pattern;
-			return -(int)(__WCHAR_TYPE__)*__pattern;
+			return -(int)(unsigned char)*__pattern;
 		}
 		if (!*__pattern)
-			return (int)(__WCHAR_TYPE__)*__string; /* Pattern end doesn't match */
+			return (int)(unsigned char)*__string; /* Pattern end doesn't match */
 		if (*__pattern == '*') {
 			/* Skip stars */
 			do {
@@ -52,7 +50,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscmp))(__WCHAR_TYPE__ const *__
 					if (!__LIBC_LOCAL_NAME(wildwcscmp)(__string, __pattern))
 						return 0;
 				} else if (!__ch) {
-					return -(int)(__WCHAR_TYPE__)__card_post; /* Wildcard suffix not found */
+					return -(int)(unsigned char)__card_post; /* Wildcard suffix not found */
 				}
 			}
 		}
@@ -64,7 +62,11 @@ __next:
 		}
 		break; /* mismatch */
 	}
-	return (int)((__WCHAR_TYPE__)*__string - (__WCHAR_TYPE__)*__pattern);
+	return (int)((unsigned char)*__string - (unsigned char)*__pattern);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wildwcscmp_defined
+#define __local___localdep_wildwcscmp_defined 1
+#define __localdep_wildwcscmp __LIBC_LOCAL_NAME(wildwcscmp)
+#endif /* !__local___localdep_wildwcscmp_defined */
 #endif /* !__local_wildwcscmp_defined */

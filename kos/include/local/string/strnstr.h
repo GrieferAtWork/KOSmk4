@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc41c12fd */
+/* HASH CRC-32:0x5620b20d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __LOCAL_LIBC(strnstr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnstr))(char const *__haystack,
-                                                     char const *__needle,
-                                                     __SIZE_TYPE__ __haystack_maxlen) {
-#line 5430 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnstr))(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) {
 	char __ch, __needle_start = *__needle++;
 	while (__haystack_maxlen-- && (__ch = *__haystack++) != '\0') {
 		if (__ch == __needle_start) {
@@ -50,4 +47,8 @@ __miss:
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strnstr_defined
+#define __local___localdep_strnstr_defined 1
+#define __localdep_strnstr __LIBC_LOCAL_NAME(strnstr)
+#endif /* !__local___localdep_strnstr_defined */
 #endif /* !__local_strnstr_defined */

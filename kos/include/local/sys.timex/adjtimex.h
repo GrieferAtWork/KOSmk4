@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x476d373f */
+/* HASH CRC-32:0xbad4c19e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,42 +19,41 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_adjtimex_defined
-#if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64)
 #define __local_adjtimex_defined 1
 #include <__crt.h>
-/* Dependency: "adjtimex32" from "sys.timex" */
-#ifndef ____localdep_adjtimex32_defined
-#define ____localdep_adjtimex32_defined 1
-#ifdef __CRT_HAVE_adjtimex
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict ____ntx),adjtimex,(____ntx))
-#elif defined(__CRT_HAVE___adjtimex)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict ____ntx),__adjtimex,(____ntx))
-#else /* LIBC: adjtimex */
-#undef ____localdep_adjtimex32_defined
-#endif /* adjtimex32... */
-#endif /* !____localdep_adjtimex32_defined */
-
-/* Dependency: "adjtimex64" from "sys.timex" */
-#ifndef ____localdep_adjtimex64_defined
-#define ____localdep_adjtimex64_defined 1
-#ifdef __CRT_HAVE_adjtimex64
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct timex64 *__restrict __ntx),adjtimex64,(__ntx))
-#elif defined(__CRT_HAVE___adjtimex64)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct timex64 *__restrict __ntx),__adjtimex64,(__ntx))
-#elif defined(__CRT_HAVE_adjtimex) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct timex64 *__restrict __ntx),adjtimex,(__ntx))
-#elif defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
-#include <local/sys.timex/adjtimex64.h>
-#define __localdep_adjtimex64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtimex64))
-#else /* CUSTOM: adjtimex64 */
-#undef ____localdep_adjtimex64_defined
-#endif /* adjtimex64... */
-#endif /* !____localdep_adjtimex64_defined */
-
+#if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: adjtimex64 from sys.timex */
+#ifndef __local___localdep_adjtimex64_defined
+#define __local___localdep_adjtimex64_defined 1
+#ifdef __CRT_HAVE_adjtimex64
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),adjtimex64,(__ntx))
+#elif defined(__CRT_HAVE___adjtimex64)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),__adjtimex64,(__ntx))
+#elif defined(__CRT_HAVE_adjtimex) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),adjtimex,(__ntx))
+#elif defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
+__NAMESPACE_LOCAL_END
+#include <local/sys.timex/adjtimex64.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_adjtimex64 __LIBC_LOCAL_NAME(adjtimex64)
+#else /* ... */
+#undef __local___localdep_adjtimex64_defined
+#endif /* !... */
+#endif /* !__local___localdep_adjtimex64_defined */
+/* Dependency: adjtimex32 from sys.timex */
+#ifndef __local___localdep_adjtimex32_defined
+#define __local___localdep_adjtimex32_defined 1
+#ifdef __CRT_HAVE_adjtimex
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict __ntx),adjtimex,(__ntx))
+#elif defined(__CRT_HAVE___adjtimex)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict __ntx),__adjtimex,(__ntx))
+#else /* ... */
+#undef __local___localdep_adjtimex32_defined
+#endif /* !... */
+#endif /* !__local___localdep_adjtimex32_defined */
 __LOCAL_LIBC(adjtimex) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtimex))(struct timex *__restrict __ntx) {
-#line 126 "kos/src/libc/magic/sys.timex.c"
 	int __result;
 #if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 	struct __timex32 __nxtalt;
@@ -154,5 +153,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtimex))(struct timex *__restrict _
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex || __CRT_HAVE_adjtimex64 || __CRT_HAVE___adjtimex64 */
+#ifndef __local___localdep_adjtimex_defined
+#define __local___localdep_adjtimex_defined 1
+#define __localdep_adjtimex __LIBC_LOCAL_NAME(adjtimex)
+#endif /* !__local___localdep_adjtimex_defined */
+#else /* __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex || __CRT_HAVE_adjtimex64 || __CRT_HAVE___adjtimex64 */
+#undef __local_adjtimex_defined
+#endif /* !__CRT_HAVE_adjtimex && !__CRT_HAVE___adjtimex && !__CRT_HAVE_adjtimex64 && !__CRT_HAVE___adjtimex64 */
 #endif /* !__local_adjtimex_defined */

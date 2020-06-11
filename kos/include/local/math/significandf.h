@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8aeed0bf */
+/* HASH CRC-32:0xced256a8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_significandf_defined
-#include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #define __local_significandf_defined 1
 #include <__crt.h>
-#include <libm/significand.h>
-/* Dependency: "significand" from "math" */
-#ifndef ____localdep_significand_defined
-#define ____localdep_significand_defined 1
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: significand from math */
+#ifndef __local___localdep_significand_defined
+#define __local___localdep_significand_defined 1
 #if __has_builtin(__builtin_significand) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significand)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_significand,(double __x),significand,{ return __builtin_significand(__x); })
@@ -36,29 +36,36 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_significand,
 #elif defined(__CRT_HAVE___significand)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_significand,(double __x),__significand,(__x))
-#else /* LIBC: significand */
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
 #include <local/math/significand.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-#define __localdep_significand (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significand))
-#else /* CUSTOM: significand */
-#undef ____localdep_significand_defined
-#endif /* significand... */
-#endif /* significand... */
-#endif /* !____localdep_significand_defined */
-
+#define __localdep_significand __LIBC_LOCAL_NAME(significand)
+#else /* ... */
+#undef __local___localdep_significand_defined
+#endif /* !... */
+#endif /* !__local___localdep_significand_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/significand.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the fractional part of X after dividing out `ilogb(X)' */
 __LOCAL_LIBC(significandf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(significandf))(float __x) {
-#line 1506 "kos/src/libc/magic/math.c"
-#ifdef __LIBM_MATHFUNF
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
 	return __LIBM_MATHFUNF(significand, __x);
-#else /* __LIBM_MATHFUNF */
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)__localdep_significand((double)__x);
-#endif /* !__LIBM_MATHFUNF */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_significand || __CRT_HAVE___significand */
+#ifndef __local___localdep_significandf_defined
+#define __local___localdep_significandf_defined 1
+#define __localdep_significandf __LIBC_LOCAL_NAME(significandf)
+#endif /* !__local___localdep_significandf_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_significand || __CRT_HAVE___significand || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_significandf_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_significand && !__CRT_HAVE___significand && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_significandf_defined */

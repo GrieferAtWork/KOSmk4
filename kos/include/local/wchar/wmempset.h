@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97bad4aa */
+/* HASH CRC-32:0x3ec9b813 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,71 +21,81 @@
 #ifndef __local_wmempset_defined
 #define __local_wmempset_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "mempsetw" from "string" */
-#ifndef ____localdep_mempsetw_defined
-#define ____localdep_mempsetw_defined 1
-#ifdef __fast_mempsetw_defined
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
-#define __localdep_mempsetw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetw))
-#elif defined(__CRT_HAVE_mempsetw)
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),mempsetw,(__dst,__word,__n_words))
-#else /* LIBC: mempsetw */
-#include <local/string/mempsetw.h>
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
-#define __localdep_mempsetw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetw))
-#endif /* mempsetw... */
-#endif /* !____localdep_mempsetw_defined */
-
-/* Dependency: "mempsetl" from "string" */
-#ifndef ____localdep_mempsetl_defined
-#define ____localdep_mempsetl_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempsetl from string */
+#ifndef __local___localdep_mempsetl_defined
+#define __local___localdep_mempsetl_defined 1
 #ifdef __fast_mempsetl_defined
 /* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
-#define __localdep_mempsetl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetl))
+__NAMESPACE_FAST_USING(mempsetl)
+#define __localdep_mempsetl __LIBC_FAST_NAME(mempsetl)
 #elif defined(__CRT_HAVE_mempsetl)
 /* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),mempsetl,(__dst,__dword,__n_dwords))
-#else /* LIBC: mempsetl */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),mempsetl,(__dst,__dword,__n_dwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempsetl.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
-#define __localdep_mempsetl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetl))
-#endif /* mempsetl... */
-#endif /* !____localdep_mempsetl_defined */
-
-/* Dependency: "mempset" from "string" */
-#ifndef ____localdep_mempset_defined
-#define ____localdep_mempset_defined 1
+#define __localdep_mempsetl __LIBC_LOCAL_NAME(mempsetl)
+#endif /* !... */
+#endif /* !__local___localdep_mempsetl_defined */
+/* Dependency: mempset from string */
+#ifndef __local___localdep_mempset_defined
+#define __local___localdep_mempset_defined 1
 #ifdef __fast_mempset_defined
 /* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempset))
+__NAMESPACE_FAST_USING(mempset)
+#define __localdep_mempset __LIBC_FAST_NAME(mempset)
 #elif defined(__CRT_HAVE_mempset)
 /* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_mempset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),mempset,(__dst,__byte,__n_bytes))
-#else /* LIBC: mempset */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempset.h>
-/* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempset))
-#endif /* mempset... */
-#endif /* !____localdep_mempset_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
+#define __localdep_mempset __LIBC_LOCAL_NAME(mempset)
+#endif /* !... */
+#endif /* !__local___localdep_mempset_defined */
+/* Dependency: mempsetw from string */
+#ifndef __local___localdep_mempsetw_defined
+#define __local___localdep_mempsetw_defined 1
+#ifdef __fast_mempsetw_defined
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+__NAMESPACE_FAST_USING(mempsetw)
+#define __localdep_mempsetw __LIBC_FAST_NAME(mempsetw)
+#elif defined(__CRT_HAVE_mempsetw)
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),mempsetw,(__dst,__word,__n_words))
+#elif defined(__CRT_HAVE_wmempset) && (__SIZEOF_WCHAR_T__ == 2)
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),wmempset,(__dst,__word,__n_words))
+#elif defined(__CRT_HAVE_DOS$wmempset)
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),DOS$wmempset,(__dst,__word,__n_words))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/mempsetw.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+#define __localdep_mempsetw __LIBC_LOCAL_NAME(mempsetw)
+#endif /* !... */
+#endif /* !__local___localdep_mempsetw_defined */
 /* Same as wmemset, but return a pointer after the last written character */
 __LOCAL_LIBC(wmempset) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmempset))(__WCHAR_TYPE__ *__dst,
-                                                      __WCHAR_TYPE__ __filler,
-                                                      __SIZE_TYPE__ __num_chars) {
-#line 1393 "kos/src/libc/magic/wchar.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmempset))(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars) {
 #if __SIZEOF_WCHAR_T__ == 2
 	return (__WCHAR_TYPE__ *)__localdep_mempsetw(__dst, (__UINT16_TYPE__)__filler, __num_chars);
 #elif __SIZEOF_WCHAR_T__ == 4
 	return (__WCHAR_TYPE__ *)__localdep_mempsetl(__dst, (__UINT32_TYPE__)__filler, __num_chars);
-#else
+#else /* ... */
 	return (__WCHAR_TYPE__ *)__localdep_mempset(__dst, (int)__filler, __num_chars * sizeof(__WCHAR_TYPE__));
-#endif
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wmempset_defined
+#define __local___localdep_wmempset_defined 1
+#define __localdep_wmempset __LIBC_LOCAL_NAME(wmempset)
+#endif /* !__local___localdep_wmempset_defined */
 #endif /* !__local_wmempset_defined */

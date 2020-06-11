@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20c25d5 */
+/* HASH CRC-32:0x2e5d825 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,10 +27,13 @@ __NAMESPACE_LOCAL_BEGIN
  * represented by object pointed to by ENVP and raise exceptions
  * according to saved exceptions */
 __LOCAL_LIBC(feupdateenv) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(feupdateenv))(fenv_t const *___envp) {
-#line 183 "kos/src/libc/magic/fenv.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(feupdateenv))(struct __fenv_struct const *___envp) {
 	__inline_feupdateenv(___envp);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_feupdateenv_defined
+#define __local___localdep_feupdateenv_defined 1
+#define __localdep_feupdateenv __LIBC_LOCAL_NAME(feupdateenv)
+#endif /* !__local___localdep_feupdateenv_defined */
 #endif /* !__local_feupdateenv_defined */

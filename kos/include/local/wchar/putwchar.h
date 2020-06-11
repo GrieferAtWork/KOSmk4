@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bd7c167 */
+/* HASH CRC-32:0xbe65f29c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,48 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_putwchar_defined
-#if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc))
 #define __local_putwchar_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-#include <local/stdstreams.h>
-/* Dependency: "fputwc" */
-#ifndef ____localdep_fputwc_defined
-#define ____localdep_fputwc_defined 1
-#ifdef __std___localdep_fputwc_defined
-__NAMESPACE_STD_USING(__localdep_fputwc)
+#if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputwc) || (defined(__CRT_HAVE_DOS$fputwc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$fputwc) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_putwc) || (defined(__CRT_HAVE_DOS$putwc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$putwc) && __SIZEOF_WCHAR_T__ == 2))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fputwc from wchar */
+#ifndef __local___localdep_fputwc_defined
+#define __local___localdep_fputwc_defined 1
+#ifdef __fputwc_defined
+__NAMESPACE_GLB_USING(fputwc)
+#define __localdep_fputwc fputwc
+#elif defined(__std_fputwc_defined)
+__NAMESPACE_STD_USING(fputwc)
+#define __localdep_fputwc fputwc
 #elif defined(__CRT_HAVE_fputwc)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$fputwc) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$fputwc) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
-#else /* LIBC: fputwc */
-#undef ____localdep_fputwc_defined
-#endif /* fputwc... */
-#endif /* !____localdep_fputwc_defined */
-
+#elif defined(__CRT_HAVE_DOS$putwc) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$putwc) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
+#else /* ... */
+#undef __local___localdep_fputwc_defined
+#endif /* !... */
+#endif /* !__local___localdep_fputwc_defined */
+__NAMESPACE_LOCAL_END
+#include <local/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(putwchar) __WINT_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(putwchar))(__WCHAR_TYPE__ __wc) __THROWS(...) {
-#line 504 "kos/src/libc/magic/wchar.c"
 	return __localdep_fputwc(__wc, __LOCAL_stdout);
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__NO_STDSTREAMS && (__CRT_HAVE_fputwc || __CRT_HAVE_putwc) */
+#ifndef __local___localdep_putwchar_defined
+#define __local___localdep_putwchar_defined 1
+#define __localdep_putwchar __LIBC_LOCAL_NAME(putwchar)
+#endif /* !__local___localdep_putwchar_defined */
+#else /* !__NO_STDSTREAMS && (__CRT_HAVE_fputwc || (__CRT_HAVE_DOS$fputwc && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$fputwc && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_putwc || (__CRT_HAVE_DOS$putwc && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$putwc && __SIZEOF_WCHAR_T__ == 2)) */
+#undef __local_putwchar_defined
+#endif /* __NO_STDSTREAMS || (!__CRT_HAVE_fputwc && (!__CRT_HAVE_DOS$fputwc || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$fputwc || !__SIZEOF_WCHAR_T__ == 2) && !__CRT_HAVE_putwc && (!__CRT_HAVE_DOS$putwc || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$putwc || !__SIZEOF_WCHAR_T__ == 2)) */
 #endif /* !__local_putwchar_defined */

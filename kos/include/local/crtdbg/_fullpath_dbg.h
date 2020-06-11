@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49d5a400 */
+/* HASH CRC-32:0x1165adf4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,33 +19,28 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__fullpath_dbg_defined
-#ifdef __CRT_HAVE__fullpath
 #define __local__fullpath_dbg_defined 1
 #include <__crt.h>
-/* Dependency: "_fullpath" */
-#ifndef ____localdep__fullpath_defined
-#define ____localdep__fullpath_defined 1
 #ifdef __CRT_HAVE__fullpath
-__CREDIRECT(,char *,__NOTHROW_RPC,__localdep__fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),_fullpath,(__buf,__path,__buflen))
-#else /* LIBC: _fullpath */
-#undef ____localdep__fullpath_defined
-#endif /* _fullpath... */
-#endif /* !____localdep__fullpath_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _fullpath from stdlib */
+#if !defined(__local___localdep__fullpath_defined) && defined(__CRT_HAVE__fullpath)
+#define __local___localdep__fullpath_defined 1
+__CREDIRECT(,char *,__NOTHROW_RPC,__localdep__fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),_fullpath,(__buf,__path,__buflen))
+#endif /* !__local___localdep__fullpath_defined && __CRT_HAVE__fullpath */
 __LOCAL_LIBC(_fullpath_dbg) __ATTR_WUNUSED __ATTR_NONNULL((2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fullpath_dbg))(char *__full_path,
-                                                           char const *__path,
-                                                           __SIZE_TYPE__ __bufsize,
-                                                           int __block_type,
-                                                           char const *__filename,
-                                                           int __line) {
-#line 458 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fullpath_dbg))(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
 	return __localdep__fullpath(__full_path, __path, __bufsize);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE__fullpath */
+#ifndef __local___localdep__fullpath_dbg_defined
+#define __local___localdep__fullpath_dbg_defined 1
+#define __localdep__fullpath_dbg __LIBC_LOCAL_NAME(_fullpath_dbg)
+#endif /* !__local___localdep__fullpath_dbg_defined */
+#else /* __CRT_HAVE__fullpath */
+#undef __local__fullpath_dbg_defined
+#endif /* !__CRT_HAVE__fullpath */
 #endif /* !__local__fullpath_dbg_defined */

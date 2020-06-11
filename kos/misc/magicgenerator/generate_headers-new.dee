@@ -366,19 +366,6 @@ function compileSystemHeaderSourceFile(filename: string, headerName: string) {
 }
 
 
-REMOVEME_localPathRedirections.update({
-	"parts.uchar.sys.stat"       : "sys.stat",
-	"parts.uchar.format-printer" : "parts.wchar.format-printer",
-	"parts.uchar.inttypes"       : "inttypes",
-	"parts.uchar.process"        : "parts.wchar.process",
-	"parts.uchar.stdio"          : ("stdio", "wchar", "parts.wchar.stdio"),
-	"parts.uchar.stdlib"         : ("stdlib", "wchar", "parts.wchar.stdlib"),
-	"parts.uchar.string"         : "wchar",
-	"parts.uchar.time"           : ("time", "wchar"),
-	"parts.uchar.unistd"         : "parts.wchar.unistd",
-	"parts.uchar.utime"          : "parts.wchar.utime",
-});
-
 //#define QUICK_SKIP_SYSTEM_HAEDERS
 
 
@@ -456,8 +443,6 @@ try {
 	}
 	waitTasks();
 
-#if 0 /* TODO: Some local functions need <libc/...> headers, which we must
-       *       generate correctly before we can start generating these headers! */
 	/* Generate all of the needed <local/...> headers */
 	local printedLocalFunctions: HashSet with LocalFunction = HashSet();
 	for (;;) {
@@ -492,7 +477,6 @@ try {
 		if (#printedLocalFunctions >= #neededLocalFunction)
 			break;
 	}
-#endif
 
 	/* TODO: When generating libc auto/user implementations, the keyword "static"
 	 *       should be escaped by being suffixed by
@@ -501,7 +485,7 @@ try {
 
 
 	waitTasks(); /* Should be a no-op! */
-} catch (e...) {
+} @[interrupt] catch (e...) {
 	print repr e;
 	print repr Traceback.current;
 	criticalSection.exitApplication(1);

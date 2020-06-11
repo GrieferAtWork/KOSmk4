@@ -38,7 +38,7 @@ __SYSDECL_BEGIN
 }
 
 @@@param swapflags: Set of `SWAP_FLAG_*'
-[[cp]]
+[[cp, decl_include("<features.h>")]]
 int swapon([[nonnull]] char const *path,
            __STDC_INT_AS_UINT_T swapflags);
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a566bdf */
+/* HASH CRC-32:0xc3dc5d29 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,11 +24,13 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Return minimum numeric value from X and Y */
 __LOCAL_LIBC(fminf) __ATTR_CONST __ATTR_WUNUSED float
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fminf))(float __x,
-                                               float __y) {
-#line 1063 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fminf))(float __x, float __y) {
 	/* TODO: ieee754-specific function */
 	return __x < __y ? __x : __y;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_fminf_defined
+#define __local___localdep_fminf_defined 1
+#define __localdep_fminf __LIBC_LOCAL_NAME(fminf)
+#endif /* !__local___localdep_fminf_defined */
 #endif /* !__local_fminf_defined */

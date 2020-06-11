@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1b77e80 */
+/* HASH CRC-32:0xfcac1c3d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,53 @@
 #define __local_format_vscanf_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
-
-
-
-
 #include <bits/format-printer.h>
-
-#include <libc/unicode.h>
-
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: scanf from stdio */
+#ifndef __local___localdep_scanf_defined
+#define __local___localdep_scanf_defined 1
+#if __has_builtin(__builtin_scanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scanf) && __has_builtin(__builtin_va_arg_pack)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_scanf,(char const *__restrict __format, ...),scanf,{ return __builtin_scanf(__format, __builtin_va_arg_pack()); })
+#elif defined(__CRT_HAVE_scanf_unlocked) && defined(__USE_STDIO_UNLOCKED)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__LIBC __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T (__VLIBCCALL __localdep_scanf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf_unlocked");
+#elif defined(__CRT_HAVE_scanf)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__LIBC __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T (__VLIBCCALL __localdep_scanf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf");
+#elif defined(__CRT_HAVE_scanf_unlocked)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+__LIBC __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T (__VLIBCCALL __localdep_scanf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf_unlocked");
+#elif defined(__CRT_HAVE_vscanf) || defined(__CRT_HAVE__vscanf) || defined(__CRT_HAVE_vscanf_unlocked) || (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)))))
+__NAMESPACE_LOCAL_END
+#include <local/stdio/scanf.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+#define __localdep_scanf __LIBC_LOCAL_NAME(scanf)
+#else /* ... */
+#undef __local___localdep_scanf_defined
+#endif /* !... */
+#endif /* !__local___localdep_scanf_defined */
+__NAMESPACE_LOCAL_END
 #include <libc/string.h>
+#include <libc/unicode.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
@@ -56,12 +94,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 __LOCAL_LIBC(format_vscanf) __ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(format_vscanf))(__pformatgetc __pgetc,
-                                              __pformatungetc __pungetc,
-                                              void *__arg,
-                                              char const *__restrict __format,
-                                              __builtin_va_list __args) __THROWS(...) {
-#line 955 "kos/src/libc/magic/format-printer.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(format_vscanf))(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 #define __CHAR_TYPE      char
 #define __CHAR_SIZE      __SIZEOF_CHAR__
 #define __FORMAT_PGETC   __pgetc
@@ -72,4 +105,8 @@ __LOCAL_LIBC(format_vscanf) __ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __
 #include <local/format-scanf.h>
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_vscanf_defined
+#define __local___localdep_format_vscanf_defined 1
+#define __localdep_format_vscanf __LIBC_LOCAL_NAME(format_vscanf)
+#endif /* !__local___localdep_format_vscanf_defined */
 #endif /* !__local_format_vscanf_defined */

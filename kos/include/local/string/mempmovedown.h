@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf411f6 */
+/* HASH CRC-32:0xc90484a3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,36 +21,36 @@
 #ifndef __local_mempmovedown_defined
 #define __local_mempmovedown_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "memmovedown" from "string" */
-#ifndef ____localdep_memmovedown_defined
-#define ____localdep_memmovedown_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memmovedown from string */
+#ifndef __local___localdep_memmovedown_defined
+#define __local___localdep_memmovedown_defined 1
 #ifdef __fast_memmovedown_defined
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
-#define __localdep_memmovedown (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedown))
+__NAMESPACE_FAST_USING(memmovedown)
+#define __localdep_memmovedown __LIBC_FAST_NAME(memmovedown)
 #elif defined(__CRT_HAVE_memmovedown)
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmovedown,(__dst,__src,__n_bytes))
-#else /* LIBC: memmovedown */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memmovedown.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
-#define __localdep_memmovedown (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedown))
-#endif /* memmovedown... */
-#endif /* !____localdep_memmovedown_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_memmovedown __LIBC_LOCAL_NAME(memmovedown)
+#endif /* !... */
+#endif /* !__local___localdep_memmovedown_defined */
 /* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
 __LOCAL_LIBC(mempmovedown) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmovedown))(void *__dst,
-                                                          void const *__src,
-                                                          __SIZE_TYPE__ __n_bytes) {
-#line 2658 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmovedown))(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) {
 	return (void *)((__BYTE_TYPE__ *)__localdep_memmovedown(__dst, __src, __n_bytes) + __n_bytes);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_mempmovedown_defined
+#define __local___localdep_mempmovedown_defined 1
+#define __localdep_mempmovedown __LIBC_LOCAL_NAME(mempmovedown)
+#endif /* !__local___localdep_mempmovedown_defined */
 #endif /* !__local_mempmovedown_defined */

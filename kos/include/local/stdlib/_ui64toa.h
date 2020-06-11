@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98468efe */
+/* HASH CRC-32:0x73460f2e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,35 @@
 #ifndef __local__ui64toa_defined
 #define __local__ui64toa_defined 1
 #include <__crt.h>
-/* Dependency: "_ui64toa_s" from "stdlib" */
-#ifndef ____localdep__ui64toa_s_defined
-#define ____localdep__ui64toa_s_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: _ui64toa_s from stdlib */
+#ifndef __local___localdep__ui64toa_s_defined
+#define __local___localdep__ui64toa_s_defined 1
 #ifdef __CRT_HAVE__ui64toa_s
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ui64toa_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE__ultoa_s) && (__SIZEOF_LONG__ == 8)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ultoa_s,(__val,__buf,__buflen,__radix))
-#else /* LIBC: _ui64toa_s */
-#include <local/stdlib/_ui64toa_s.h>
-#define __localdep__ui64toa_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ui64toa_s))
-#endif /* _ui64toa_s... */
-#endif /* !____localdep__ui64toa_s_defined */
-
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ultoa_s,(__val,__buf,__buflen,__radix))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/_ui64toa_s.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__ui64toa_s __LIBC_LOCAL_NAME(_ui64toa_s)
+#endif /* !... */
+#endif /* !__local___localdep__ui64toa_s_defined */
 __LOCAL_LIBC(_ui64toa) __ATTR_NONNULL((2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ui64toa))(__UINT64_TYPE__ __val,
-                                                      char *__buf,
-                                                      int __radix) {
-#line 2519 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ui64toa))(__UINT64_TYPE__ __val, char *__buf, int __radix) {
 	__localdep__ui64toa_s(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__ui64toa_defined
+#define __local___localdep__ui64toa_defined 1
+#define __localdep__ui64toa __LIBC_LOCAL_NAME(_ui64toa)
+#endif /* !__local___localdep__ui64toa_defined */
 #endif /* !__local__ui64toa_defined */

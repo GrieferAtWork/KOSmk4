@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c2ceab4 */
+/* HASH CRC-32:0x5fc4a2c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,26 @@
 #ifndef __local__aligned_msize_dbg_defined
 #define __local__aligned_msize_dbg_defined 1
 #include <__crt.h>
-/* Dependency: "_aligned_msize" from "stdlib" */
-#ifndef ____localdep__aligned_msize_defined
-#define ____localdep__aligned_msize_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: _aligned_msize from stdlib */
+#ifndef __local___localdep__aligned_msize_defined
+#define __local___localdep__aligned_msize_defined 1
 #ifdef __CRT_HAVE__aligned_msize
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__aligned_mallptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__aligned_mallptr,__min_alignment,__offset))
-#else /* LIBC: _aligned_msize */
+#else /* __CRT_HAVE__aligned_msize */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/_aligned_msize.h>
-#define __localdep__aligned_msize (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_msize))
-#endif /* _aligned_msize... */
-#endif /* !____localdep__aligned_msize_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep__aligned_msize __LIBC_LOCAL_NAME(_aligned_msize)
+#endif /* !__CRT_HAVE__aligned_msize */
+#endif /* !__local___localdep__aligned_msize_defined */
 __LOCAL_LIBC(_aligned_msize_dbg) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_msize_dbg))(void *__ptr,
-                                                                __SIZE_TYPE__ __min_alignment,
-                                                                __SIZE_TYPE__ __offset) {
-#line 348 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_msize_dbg))(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) {
 	return __localdep__aligned_msize(__ptr, __min_alignment, __offset);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__aligned_msize_dbg_defined
+#define __local___localdep__aligned_msize_dbg_defined 1
+#define __localdep__aligned_msize_dbg __LIBC_LOCAL_NAME(_aligned_msize_dbg)
+#endif /* !__local___localdep__aligned_msize_dbg_defined */
 #endif /* !__local__aligned_msize_dbg_defined */

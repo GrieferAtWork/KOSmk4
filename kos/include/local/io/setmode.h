@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3350669e */
+/* HASH CRC-32:0xc4964e61 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,38 +19,56 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setmode_defined
-#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__KOS__) || defined(__linux__))
 #define __local_setmode_defined 1
 #include <__crt.h>
+#include <asm/fcntl.h>
+#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
 #include <bits/types.h>
-#include <bits/types.h>
-/* Dependency: "fcntl" */
-#ifndef ____localdep_fcntl_defined
-#define ____localdep_fcntl_defined 1
-#ifdef __CRT_HAVE_fcntl
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fcntl from fcntl */
+#ifndef __local___localdep_fcntl_defined
+#define __local___localdep_fcntl_defined 1
+#ifdef __fcntl_defined
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifdef __cplusplus
+__NAMESPACE_GLB_USING(fcntl)
+#else /* __cplusplus */
+#define __localdep_fcntl fcntl
+#endif /* !__cplusplus */
+#elif defined(__CRT_HAVE_fcntl)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, int __cmd),fcntl,(__fd,__cmd),__cmd,1,(void *))
 #elif defined(__CRT_HAVE___fcntl)
-__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, int __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
-#else /* LIBC: fcntl */
-#undef ____localdep_fcntl_defined
-#endif /* fcntl... */
-#endif /* !____localdep_fcntl_defined */
-
+__NAMESPACE_LOCAL_END
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, int __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
+#else /* ... */
+#undef __local___localdep_fcntl_defined
+#endif /* !... */
+#endif /* !__local___localdep_fcntl_defined */
 __LOCAL_LIBC(setmode) __oflag_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setmode))(__fd_t __fd,
-                                                     __oflag_t __mode) {
-#line 350 "kos/src/libc/magic/io.c"
-#ifdef __KOS__
-	return __localdep_fcntl(__fd, 5163, __mode); /* F_SETFL_XCH */
-#else /* __KOS__ */
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setmode))(__fd_t __fd, __oflag_t __mode) {
+#ifdef __F_SETFL_XCH
+	return __localdep_fcntl(__fd, __F_SETFL_XCH, __mode);
+#else /* __F_SETFL_XCH */
 	__oflag_t __result;
-	__result = __localdep_fcntl(__fd, 3); /* F_GETFL */
+	__result = __localdep_fcntl(__fd, __F_GETFL);
 	if __unlikely(__result < 0)
 		return -1;
-	return __localdep_fcntl(__fd, 4, __mode); /* F_SETFL */
-#endif /* !__KOS__ */
+	return __localdep_fcntl(__fd, __F_SETFL, __mode);
+#endif /* !__F_SETFL_XCH */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && (__KOS__ || __linux__) */
+#ifndef __local___localdep_setmode_defined
+#define __local___localdep_setmode_defined 1
+#define __localdep_setmode __LIBC_LOCAL_NAME(setmode)
+#endif /* !__local___localdep_setmode_defined */
+#else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && (__F_SETFL_XCH || (__F_GETFL && __F_SETFL)) */
+#undef __local_setmode_defined
+#endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl) || (!__F_SETFL_XCH && (!__F_GETFL || !__F_SETFL)) */
 #endif /* !__local_setmode_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42b05aea */
+/* HASH CRC-32:0xf7334df6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,39 +21,42 @@
 #ifndef __local___mempcpyw_chk_defined
 #define __local___mempcpyw_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "mempcpyw" from "string" */
-#ifndef ____localdep_mempcpyw_defined
-#define ____localdep_mempcpyw_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempcpyw from string */
+#ifndef __local___localdep_mempcpyw_defined
+#define __local___localdep_mempcpyw_defined 1
 #ifdef __fast_mempcpyw_defined
 /* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
-#define __localdep_mempcpyw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyw))
+__NAMESPACE_FAST_USING(mempcpyw)
+#define __localdep_mempcpyw __LIBC_FAST_NAME(mempcpyw)
 #elif defined(__CRT_HAVE_mempcpyw)
 /* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyw,(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words),mempcpyw,(__dst,__src,__n_words))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),mempcpyw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_wmempcpy) && (__SIZEOF_WCHAR_T__ == 2)
 /* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyw,(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words),wmempcpy,(__dst,__src,__n_words))
-#else /* LIBC: mempcpyw */
-#include <local/string/mempcpyw.h>
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),wmempcpy,(__dst,__src,__n_words))
+#elif defined(__CRT_HAVE_DOS$wmempcpy)
 /* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
-#define __localdep_mempcpyw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyw))
-#endif /* mempcpyw... */
-#endif /* !____localdep_mempcpyw_defined */
-
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),DOS$wmempcpy,(__dst,__src,__n_words))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/mempcpyw.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
+#define __localdep_mempcpyw __LIBC_LOCAL_NAME(mempcpyw)
+#endif /* !... */
+#endif /* !__local___localdep_mempcpyw_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__mempcpyw_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempcpyw_chk))(/*aligned(2)*/ void *__restrict __dst,
-                                                            /*aligned(2)*/ void const *__restrict __src,
-                                                            __SIZE_TYPE__ __n_words,
-                                                            __SIZE_TYPE__ __dst_objsize) {
-#line 77 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempcpyw_chk))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("mempcpyw", __dst, __n_words * 2, __dst_objsize);
 	return __localdep_mempcpyw(__dst, __src, __n_words);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___mempcpyw_chk_defined
+#define __local___localdep___mempcpyw_chk_defined 1
+#define __localdep___mempcpyw_chk __LIBC_LOCAL_NAME(__mempcpyw_chk)
+#endif /* !__local___localdep___mempcpyw_chk_defined */
 #endif /* !__local___mempcpyw_chk_defined */

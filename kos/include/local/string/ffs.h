@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e8557a */
+/* HASH CRC-32:0x92d9a075 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,16 @@
 #ifndef __local_ffs_defined
 #define __local_ffs_defined 1
 #include <__crt.h>
+#include <features.h>
 #include <hybrid/__bit.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ffs) __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ffs))(int __i) {
-#line 896 "kos/src/libc/magic/string.c"
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned int)__i);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_ffs_defined
+#define __local___localdep_ffs_defined 1
+#define __localdep_ffs __LIBC_LOCAL_NAME(ffs)
+#endif /* !__local___localdep_ffs_defined */
 #endif /* !__local_ffs_defined */

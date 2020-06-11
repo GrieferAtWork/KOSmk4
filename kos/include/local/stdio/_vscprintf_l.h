@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x704c5c8c */
+/* HASH CRC-32:0x3d663117 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,28 @@
 #ifndef __local__vscprintf_l_defined
 #define __local__vscprintf_l_defined 1
 #include <__crt.h>
-/* Dependency: "_vscprintf" from "stdio" */
-#ifndef ____localdep__vscprintf_defined
-#define ____localdep__vscprintf_defined 1
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: _vscprintf from stdio */
+#ifndef __local___localdep__vscprintf_defined
+#define __local___localdep__vscprintf_defined 1
 #ifdef __CRT_HAVE__vscprintf
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vscprintf,(char const *__restrict __format, __builtin_va_list __args),_vscprintf,(__format,__args))
-#else /* LIBC: _vscprintf */
+#else /* __CRT_HAVE__vscprintf */
+__NAMESPACE_LOCAL_END
 #include <local/stdio/_vscprintf.h>
-#define __localdep__vscprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vscprintf))
-#endif /* _vscprintf... */
-#endif /* !____localdep__vscprintf_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep__vscprintf __LIBC_LOCAL_NAME(_vscprintf)
+#endif /* !__CRT_HAVE__vscprintf */
+#endif /* !__local___localdep__vscprintf_defined */
 __LOCAL_LIBC(_vscprintf_l) __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_l))(char const *__restrict __format,
-                                                          __locale_t __locale,
-                                                          __builtin_va_list __args) {
-#line 2443 "kos/src/libc/magic/stdio.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_l))(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) {
 	(void)__locale;
 	return __localdep__vscprintf(__format, __args);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__vscprintf_l_defined
+#define __local___localdep__vscprintf_l_defined 1
+#define __localdep__vscprintf_l __LIBC_LOCAL_NAME(_vscprintf_l)
+#endif /* !__local___localdep__vscprintf_l_defined */
 #endif /* !__local__vscprintf_l_defined */

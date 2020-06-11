@@ -39,9 +39,9 @@ struct _diskfree_t {
 
 }
 
-_getcwd(*) = getcwd;
-_chdir(*) = chdir;
-_rmdir(*) = rmdir;
+%[insert:function(_getcwd = getcwd)]
+%[insert:function(_chdir = chdir)]
+%[insert:function(_rmdir = rmdir)]
 
 %[default_impl_section(".text.crt.dos.fs.property")]
 %#define _getdcwd_nolock _getdcwd
@@ -69,8 +69,7 @@ int _mkdir([[nonnull]] char const *path) {
 	return mkdir(path, 0755);
 }
 
-[[guard, exposed_name("mkdir")]]
-nt_mkdir(*) = _mkdir;
+%[insert:guarded_function(mkdir = _mkdir)]
 
 
 %{

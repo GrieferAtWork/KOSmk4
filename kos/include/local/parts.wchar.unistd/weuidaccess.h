@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22740b7e */
+/* HASH CRC-32:0xfe106f1c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,32 +19,47 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_weuidaccess_defined
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wfaccessat)
 #define __local_weuidaccess_defined 1
 #include <__crt.h>
-/* Dependency: "wfaccessat" from "parts.wchar.unistd" */
-#ifndef ____localdep_wfaccessat_defined
-#define ____localdep_wfaccessat_defined 1
+#include <asm/fcntl.h>
+#if defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && (defined(__CRT_HAVE_wfaccessat) || (defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 2))
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wfaccessat from parts.wchar.unistd */
+#ifndef __local___localdep_wfaccessat_defined
+#define __local___localdep_wfaccessat_defined 1
 #ifdef __CRT_HAVE_wfaccessat
-/* >> wfaccessat(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
+/* >> faccessat(2)
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfaccessat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, int __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
-#else /* LIBC: wfaccessat */
-#undef ____localdep_wfaccessat_defined
-#endif /* wfaccessat... */
-#endif /* !____localdep_wfaccessat_defined */
-
-__NAMESPACE_LOCAL_BEGIN
-/* >> weuidaccess(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
+#elif defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 4
+/* >> faccessat(2)
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,__localdep_wfaccessat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, int __type, __atflag_t __flags),KOS$wfaccessat,(__dfd,__file,__type,__flags))
+#elif defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 2
+/* >> faccessat(2)
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,__localdep_wfaccessat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, int __type, __atflag_t __flags),DOS$wfaccessat,(__dfd,__file,__type,__flags))
+#else /* ... */
+#undef __local___localdep_wfaccessat_defined
+#endif /* !... */
+#endif /* !__local___localdep_wfaccessat_defined */
+/* >> euidaccess(2)
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
 __LOCAL_LIBC(weuidaccess) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(weuidaccess))(__WCHAR_TYPE__ const *__file,
-                                                         int __type) {
-#line 747 "kos/src/libc/magic/unistd.c"
-	return __localdep_wfaccessat(__CRT_AT_FDCWD, __file, __type, 0x0200); /* AT_EACCESS */
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(weuidaccess))(__WCHAR_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type) {
+	return __localdep_wfaccessat(__CRT_AT_FDCWD, __file, __type, __AT_EACCESS);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && __CRT_HAVE_wfaccessat */
+#ifndef __local___localdep_weuidaccess_defined
+#define __local___localdep_weuidaccess_defined 1
+#define __localdep_weuidaccess __LIBC_LOCAL_NAME(weuidaccess)
+#endif /* !__local___localdep_weuidaccess_defined */
+#else /* __CRT_AT_FDCWD && __AT_EACCESS && (__CRT_HAVE_wfaccessat || (__CRT_HAVE_DOS$wfaccessat && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$wfaccessat && __SIZEOF_WCHAR_T__ == 2)) */
+#undef __local_weuidaccess_defined
+#endif /* !__CRT_AT_FDCWD || !__AT_EACCESS || (!__CRT_HAVE_wfaccessat && (!__CRT_HAVE_DOS$wfaccessat || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$wfaccessat || !__SIZEOF_WCHAR_T__ == 2)) */
 #endif /* !__local_weuidaccess_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8f3457 */
+/* HASH CRC-32:0xd373c225 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,34 +19,34 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16execl_defined
-#if (defined(__CRT_HAVE_wexecv) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wexecv) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wexecv)
 #define __local_c16execl_defined 1
 #include <__crt.h>
+#if (defined(__CRT_HAVE_wexecv) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wexecv)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: c16execv from parts.uchar.process */
+#ifndef __local___localdep_c16execv_defined
+#define __local___localdep_c16execv_defined 1
+#if defined(__CRT_HAVE_wexecv) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBDCALL,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),wexecv,(__path,___argv))
+#elif defined(__CRT_HAVE_DOS$_wexecv)
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wexecv,(__path,___argv))
+#else /* ... */
+#undef __local___localdep_c16execv_defined
+#endif /* !... */
+#endif /* !__local___localdep_c16execv_defined */
+__NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
-/* Dependency: "c16execv" from "parts.uchar.process" */
-#ifndef ____localdep_c16execv_defined
-#define ____localdep_c16execv_defined 1
-#if defined(__CRT_HAVE_wexecv) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),wexecv,(__path,___argv))
-#elif defined(__CRT_HAVE__wexecv) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wexecv,(__path,___argv))
-#elif defined(__CRT_HAVE_DOS$_wexecv)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wexecv,(__path,___argv))
-#elif defined(__CRT_HAVE_DOS$_wexecv)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wexecv,(__path,___argv))
-#else /* LIBC: c16execv */
-#undef ____localdep_c16execv_defined
-#endif /* c16execv... */
-#endif /* !____localdep_c16execv_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16execl) __ATTR_SENTINEL __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(c16execl))(__CHAR16_TYPE__ const *__restrict __path,
-                                                       __CHAR16_TYPE__ const *__args,
-                                                       ... /*, (char16_t *)NULL*/) {
-#line 98 "kos/src/libc/magic/parts.uchar.process.c"
+__NOTHROW_RPC(__VLIBDCALL __LIBC_LOCAL_NAME(c16execl))(__CHAR16_TYPE__ const *__restrict __path, __CHAR16_TYPE__ const *__args, ...) {
 	__REDIRECT_EXECL(__CHAR16_TYPE__, __localdep_c16execv, __path, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_wexecv && __SIZEOF_WCHAR_T__ == 2) || (__CRT_HAVE__wexecv && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_DOS$_wexecv */
+#ifndef __local___localdep_c16execl_defined
+#define __local___localdep_c16execl_defined 1
+#define __localdep_c16execl __LIBC_LOCAL_NAME(c16execl)
+#endif /* !__local___localdep_c16execl_defined */
+#else /* (__CRT_HAVE_wexecv && (__SIZEOF_WCHAR_T__ == 2) && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wexecv */
+#undef __local_c16execl_defined
+#endif /* (!__CRT_HAVE_wexecv || !(__SIZEOF_WCHAR_T__ == 2) || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$_wexecv */
 #endif /* !__local_c16execl_defined */

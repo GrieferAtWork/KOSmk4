@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7471fde */
+/* HASH CRC-32:0x665e1799 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,34 +19,25 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sendfile64_defined
-#ifdef __CRT_HAVE_sendfile
 #define __local_sendfile64_defined 1
 #include <__crt.h>
-/* Dependency: "sendfile32" from "sys.sendfile" */
-#ifndef ____localdep_sendfile32_defined
-#define ____localdep_sendfile32_defined 1
 #ifdef __CRT_HAVE_sendfile
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: sendfile32 from sys.sendfile */
+#if !defined(__local___localdep_sendfile32_defined) && defined(__CRT_HAVE_sendfile)
+#define __local___localdep_sendfile32_defined 1
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
  * Return the number of written bytes, or -1 in case of error */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile32,(__fd_t __out_fd, __fd_t __in_fd, __off32_t *__offset, __SIZE_TYPE__ __count),sendfile,(__out_fd,__in_fd,__offset,__count))
-#else /* LIBC: sendfile */
-#undef ____localdep_sendfile32_defined
-#endif /* sendfile32... */
-#endif /* !____localdep_sendfile32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_sendfile32_defined && __CRT_HAVE_sendfile */
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
  * Return the number of written bytes, or -1 in case of error */
 __LOCAL_LIBC(sendfile64) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sendfile64))(__fd_t __out_fd,
-                                                        __fd_t __in_fd,
-                                                        __off64_t *__offset,
-                                                        __SIZE_TYPE__ __count) {
-#line 94 "kos/src/libc/magic/sys.sendfile.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sendfile64))(__fd_t __out_fd, __fd_t __in_fd, __off64_t *__offset, __SIZE_TYPE__ __count) {
 	__SSIZE_TYPE__ __result;
 	if (__offset) {
 		__off32_t __temp = (__off32_t)*__offset;
@@ -58,5 +49,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sendfile64))(__fd_t __out_fd,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_sendfile */
+#ifndef __local___localdep_sendfile64_defined
+#define __local___localdep_sendfile64_defined 1
+#define __localdep_sendfile64 __LIBC_LOCAL_NAME(sendfile64)
+#endif /* !__local___localdep_sendfile64_defined */
+#else /* __CRT_HAVE_sendfile */
+#undef __local_sendfile64_defined
+#endif /* !__CRT_HAVE_sendfile */
 #endif /* !__local_sendfile64_defined */

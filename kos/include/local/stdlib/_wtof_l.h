@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8155d34b */
+/* HASH CRC-32:0xd24f2442 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,29 +21,42 @@
 #ifndef __local__wtof_l_defined
 #define __local__wtof_l_defined 1
 #include <__crt.h>
-/* Dependency: "wcstod_l" from "wchar" */
-#ifndef ____localdep_wcstod_l_defined
-#define ____localdep_wcstod_l_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcstod_l from wchar */
+#ifndef __local___localdep_wcstod_l_defined
+#define __local___localdep_wcstod_l_defined 1
 #ifdef __CRT_HAVE_wcstod_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),wcstod_l,(__nptr,__endptr,__locale))
+#elif defined(__CRT_HAVE_DOS$wcstod_l) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, __locale_t __locale),wcstod_l,(__nptr,__endptr,__locale))
+#elif defined(__CRT_HAVE_DOS$wcstod_l) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __locale_t __locale),wcstod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__wcstod_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),_wcstod_l,(__nptr,__endptr,__locale))
-#elif defined(__CRT_HAVE__wcstod_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),_wcstod_l,(__nptr,__endptr,__locale))
+#elif defined(__CRT_HAVE_DOS$_wcstod_l) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, __locale_t __locale),_wcstod_l,(__nptr,__endptr,__locale))
+#elif defined(__CRT_HAVE_DOS$_wcstod_l) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __locale_t __locale),_wcstod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE___wcstod_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),__wcstod_l,(__nptr,__endptr,__locale))
-#else /* LIBC: wcstod_l */
+#elif defined(__CRT_HAVE_DOS$__wcstod_l) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, __locale_t __locale),__wcstod_l,(__nptr,__endptr,__locale))
+#elif defined(__CRT_HAVE_DOS$__wcstod_l) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __locale_t __locale),__wcstod_l,(__nptr,__endptr,__locale))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/wcstod_l.h>
-#define __localdep_wcstod_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstod_l))
-#endif /* wcstod_l... */
-#endif /* !____localdep_wcstod_l_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcstod_l __LIBC_LOCAL_NAME(wcstod_l)
+#endif /* !... */
+#endif /* !__local___localdep_wcstod_l_defined */
 __LOCAL_LIBC(_wtof_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) double
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wtof_l))(__WCHAR_TYPE__ const *__nptr,
-                                                     __locale_t __locale) {
-#line 3410 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wtof_l))(__WCHAR_TYPE__ const *__nptr, __locale_t __locale) {
 	return __localdep_wcstod_l(__nptr, __NULLPTR, __locale);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__wtof_l_defined
+#define __local___localdep__wtof_l_defined 1
+#define __localdep__wtof_l __LIBC_LOCAL_NAME(_wtof_l)
+#endif /* !__local___localdep__wtof_l_defined */
 #endif /* !__local__wtof_l_defined */

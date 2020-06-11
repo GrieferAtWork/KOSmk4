@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c12f64c */
+/* HASH CRC-32:0xd5d0f37c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memrendw', but search for non-matching locations. */
 __LOCAL_LIBC(memrxendw) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxendw))(/*aligned(2)*/ void const *__restrict __haystack,
-                                                       __UINT16_TYPE__ __word,
-                                                       __SIZE_TYPE__ __n_words) {
-#line 2206 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxendw))(void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) {
 	__UINT16_TYPE__ *__result = (__UINT16_TYPE__ *)__haystack + __n_words;
 	while (__n_words--) {
 		if __unlikely(*--__result != __word)
@@ -36,4 +33,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxendw))(/*aligned(2)*/ void const
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memrxendw_defined
+#define __local___localdep_memrxendw_defined 1
+#define __localdep_memrxendw __LIBC_LOCAL_NAME(memrxendw)
+#endif /* !__local___localdep_memrxendw_defined */
 #endif /* !__local_memrxendw_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x891c1c54 */
+/* HASH CRC-32:0xd5e2356b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,39 +21,39 @@
 #ifndef __local___mempmovedownw_chk_defined
 #define __local___mempmovedownw_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "mempmovedownw" from "string" */
-#ifndef ____localdep_mempmovedownw_defined
-#define ____localdep_mempmovedownw_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempmovedownw from string */
+#ifndef __local___localdep_mempmovedownw_defined
+#define __local___localdep_mempmovedownw_defined 1
 #ifdef __fast_mempmovedownw_defined
 /* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
-#define __localdep_mempmovedownw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownw))
+__NAMESPACE_FAST_USING(mempmovedownw)
+#define __localdep_mempmovedownw __LIBC_FAST_NAME(mempmovedownw)
 #elif defined(__CRT_HAVE_mempmovedownw)
 /* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownw,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words),mempmovedownw,(__dst,__src,__n_words))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),mempmovedownw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_mempmovew)
 /* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownw,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words),mempmovew,(__dst,__src,__n_words))
-#else /* LIBC: mempmovedownw */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),mempmovew,(__dst,__src,__n_words))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempmovedownw.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
-#define __localdep_mempmovedownw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownw))
-#endif /* mempmovedownw... */
-#endif /* !____localdep_mempmovedownw_defined */
-
+#define __localdep_mempmovedownw __LIBC_LOCAL_NAME(mempmovedownw)
+#endif /* !... */
+#endif /* !__local___localdep_mempmovedownw_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__mempmovedownw_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempmovedownw_chk))(/*aligned(2)*/ void *__dst,
-                                                                 /*aligned(2)*/ void const *__src,
-                                                                 __SIZE_TYPE__ __n_words,
-                                                                 __SIZE_TYPE__ __dst_objsize) {
-#line 94 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempmovedownw_chk))(void *__dst, void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("mempmovedownw", __dst, __n_words * 2, __dst_objsize);
 	return __localdep_mempmovedownw(__dst, __src, __n_words);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___mempmovedownw_chk_defined
+#define __local___localdep___mempmovedownw_chk_defined 1
+#define __localdep___mempmovedownw_chk __LIBC_LOCAL_NAME(__mempmovedownw_chk)
+#endif /* !__local___localdep___mempmovedownw_chk_defined */
 #endif /* !__local___mempmovedownw_chk_defined */

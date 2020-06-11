@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b8c1b0a */
+/* HASH CRC-32:0xe3454ff1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,33 +21,37 @@
 #ifndef __local_mempatw_defined
 #define __local_mempatw_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <hybrid/__wordbits.h>
-/* Dependency: "mempsetw" from "string" */
-#ifndef ____localdep_mempsetw_defined
-#define ____localdep_mempsetw_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempsetw from string */
+#ifndef __local___localdep_mempsetw_defined
+#define __local___localdep_mempsetw_defined 1
 #ifdef __fast_mempsetw_defined
 /* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
-#define __localdep_mempsetw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetw))
+__NAMESPACE_FAST_USING(mempsetw)
+#define __localdep_mempsetw __LIBC_FAST_NAME(mempsetw)
 #elif defined(__CRT_HAVE_mempsetw)
 /* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),mempsetw,(__dst,__word,__n_words))
-#else /* LIBC: mempsetw */
-#include <local/string/mempsetw.h>
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),mempsetw,(__dst,__word,__n_words))
+#elif defined(__CRT_HAVE_wmempset) && (__SIZEOF_WCHAR_T__ == 2)
 /* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
-#define __localdep_mempsetw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetw))
-#endif /* mempsetw... */
-#endif /* !____localdep_mempsetw_defined */
-
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),wmempset,(__dst,__word,__n_words))
+#elif defined(__CRT_HAVE_DOS$wmempset)
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),DOS$wmempset,(__dst,__word,__n_words))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/mempsetw.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
+#define __localdep_mempsetw __LIBC_LOCAL_NAME(mempsetw)
+#endif /* !... */
+#endif /* !__local___localdep_mempsetw_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__wordbits.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
-__LOCAL_LIBC(mempatw) __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempatw))(void *__restrict __dst,
-                                                     __UINT16_TYPE__ __pattern,
-                                                     __SIZE_TYPE__ __n_bytes) {
-#line 2818 "kos/src/libc/magic/string.c"
+__LOCAL_LIBC(mempatw) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempatw))(void *__restrict __dst, __UINT16_TYPE__ __pattern, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__iter = (__BYTE_TYPE__ *)__dst;
 	if (__n_bytes && (__UINTPTR_TYPE__)__iter & 1) {
 		*__iter = __INT16_BYTE(__pattern, 1);
@@ -60,4 +64,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempatw))(void *__restrict __dst,
 	return __dst;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_mempatw_defined
+#define __local___localdep_mempatw_defined 1
+#define __localdep_mempatw __LIBC_LOCAL_NAME(mempatw)
+#endif /* !__local___localdep_mempatw_defined */
 #endif /* !__local_mempatw_defined */

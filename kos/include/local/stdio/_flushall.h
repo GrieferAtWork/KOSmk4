@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1105d672 */
+/* HASH CRC-32:0x953869cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,10 +21,10 @@
 #ifndef __local__flushall_defined
 #define __local__flushall_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-/* Dependency: "fflush" from "stdio" */
-#ifndef ____localdep_fflush_defined
-#define ____localdep_fflush_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fflush from stdio */
+#ifndef __local___localdep_fflush_defined
+#define __local___localdep_fflush_defined 1
 #if defined(__CRT_HAVE_fflush_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),fflush_unlocked,(__stream))
@@ -43,18 +43,21 @@ __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),fflush_unlocked
 #elif defined(__CRT_HAVE__fflush_nolock)
 /* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),_fflush_nolock,(__stream))
-#else /* LIBC: fflush */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdio/fflush.h>
-/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
-#define __localdep_fflush (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fflush))
-#endif /* fflush... */
-#endif /* !____localdep_fflush_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Flush any unwritten data from `STREAM' to the underlying filesystem/TTY */
+#define __localdep_fflush __LIBC_LOCAL_NAME(fflush)
+#endif /* !... */
+#endif /* !__local___localdep_fflush_defined */
 __LOCAL_LIBC(_flushall) int
 (__LIBCCALL __LIBC_LOCAL_NAME(_flushall))(void) __THROWS(...) {
-#line 2207 "kos/src/libc/magic/stdio.c"
 	return __localdep_fflush(__NULLPTR);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__flushall_defined
+#define __local___localdep__flushall_defined 1
+#define __localdep__flushall __LIBC_LOCAL_NAME(_flushall)
+#endif /* !__local___localdep__flushall_defined */
 #endif /* !__local__flushall_defined */

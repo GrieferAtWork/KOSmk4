@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x900fdb2e */
+/* HASH CRC-32:0x7d0bf49a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __LOCAL_LIBC(strcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcmp))(char const *__s1,
-                                                    char const *__s2) {
-#line 291 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcmp))(char const *__s1, char const *__s2) {
 	char __c1, __c2;
 	do {
 		if __unlikely((__c1 = *__s1++) != (__c2 = *__s2++))
@@ -35,4 +33,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcmp))(char const *__s1,
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strcmp_defined
+#define __local___localdep_strcmp_defined 1
+#define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
+#endif /* !__local___localdep_strcmp_defined */
 #endif /* !__local_strcmp_defined */

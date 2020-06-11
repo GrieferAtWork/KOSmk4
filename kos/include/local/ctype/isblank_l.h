@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa394db6a */
+/* HASH CRC-32:0x2475fb18 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,36 +21,35 @@
 #ifndef __local_isblank_l_defined
 #define __local_isblank_l_defined 1
 #include <__crt.h>
-/* Dependency: "__locale_ctype_ptr_l" from "ctype" */
-#ifndef ____localdep___locale_ctype_ptr_l_defined
-#define ____localdep___locale_ctype_ptr_l_defined 1
-#ifdef __CRT_HAVE___locale_ctype_ptr_l
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: __locale_ctype_ptr_l from ctype */
+#if !defined(__local___localdep___locale_ctype_ptr_l_defined) && defined(__CRT_HAVE___locale_ctype_ptr_l)
+#define __local___localdep___locale_ctype_ptr_l_defined 1
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___locale_ctype_ptr_l,(__locale_t __locale),__locale_ctype_ptr_l,(__locale))
-#else /* LIBC: __locale_ctype_ptr_l */
-#undef ____localdep___locale_ctype_ptr_l_defined
-#endif /* __locale_ctype_ptr_l... */
-#endif /* !____localdep___locale_ctype_ptr_l_defined */
-
-/* Dependency: "isblank" from "ctype" */
-#ifndef ____localdep_isblank_defined
-#define ____localdep_isblank_defined 1
+#endif /* !__local___localdep___locale_ctype_ptr_l_defined && __CRT_HAVE___locale_ctype_ptr_l */
+/* Dependency: isblank from ctype */
+#ifndef __local___localdep_isblank_defined
+#define __local___localdep_isblank_defined 1
 #if __has_builtin(__builtin_isblank) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isblank)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isblank,(int __ch),isblank,{ return __builtin_isblank(__ch); })
 #elif defined(__CRT_HAVE_isblank)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isblank,(int __ch),isblank,(__ch))
-#else /* LIBC: isblank */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/isblank.h>
-#define __localdep_isblank (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isblank))
-#endif /* isblank... */
-#endif /* !____localdep_isblank_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_isblank __LIBC_LOCAL_NAME(isblank)
+#endif /* !... */
+#endif /* !__local___localdep_isblank_defined */
 __LOCAL_LIBC(isblank_l) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isblank_l))(int __ch,
-                                                       __locale_t __locale) {
-#line 604 "kos/src/libc/magic/ctype.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isblank_l))(int __ch, __locale_t __locale) {
+#ifdef __BUILDING_LIBC
+	(void)__locale;
+	__COMPILER_IMPURE();
+	return __localdep_isblank(__ch);
+#else /* __BUILDING_LIBC */
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
-#include <__hybrid/__byteorder.__h>
+#include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	return __locale->__ctype_b[__ch] & (1 << 8);
 #else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
@@ -63,6 +62,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isblank_l))(int __ch,
 	__COMPILER_IMPURE();
 	return __localdep_isblank(__ch);
 #endif
+#endif /* !__BUILDING_LIBC */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_isblank_l_defined
+#define __local___localdep_isblank_l_defined 1
+#define __localdep_isblank_l __LIBC_LOCAL_NAME(isblank_l)
+#endif /* !__local___localdep_isblank_l_defined */
 #endif /* !__local_isblank_l_defined */

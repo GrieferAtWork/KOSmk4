@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6583e9d */
+/* HASH CRC-32:0x89a6be8c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,12 @@
 #include <hybrid/__rotate.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_rotr64) __ATTR_CONST __UINT64_TYPE__
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_rotr64))(__UINT64_TYPE__ __val,
-                                                 int __shift) {
-#line 3066 "kos/src/libc/magic/stdlib.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_rotr64))(__UINT64_TYPE__ __val, int __shift) {
 	return __hybrid_ror64(__val, __shift);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__rotr64_defined
+#define __local___localdep__rotr64_defined 1
+#define __localdep__rotr64 __LIBC_LOCAL_NAME(_rotr64)
+#endif /* !__local___localdep__rotr64_defined */
 #endif /* !__local__rotr64_defined */

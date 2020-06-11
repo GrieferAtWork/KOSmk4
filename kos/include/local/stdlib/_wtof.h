@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd828d310 */
+/* HASH CRC-32:0x5769b0de */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,36 @@
 #ifndef __local__wtof_defined
 #define __local__wtof_defined 1
 #include <__crt.h>
-/* Dependency: "wcstod" from "wchar" */
-#ifndef ____localdep_wcstod_defined
-#define ____localdep_wcstod_defined 1
-#ifdef __std___localdep_wcstod_defined
-__NAMESPACE_STD_USING(__localdep_wcstod)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcstod from wchar */
+#ifndef __local___localdep_wcstod_defined
+#define __local___localdep_wcstod_defined 1
+#ifdef __wcstod_defined
+__NAMESPACE_GLB_USING(wcstod)
+#define __localdep_wcstod wcstod
+#elif defined(__std_wcstod_defined)
+__NAMESPACE_STD_USING(wcstod)
+#define __localdep_wcstod wcstod
 #elif defined(__CRT_HAVE_wcstod)
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstod,(__nptr,__endptr))
-#else /* LIBC: wcstod */
+#elif defined(__CRT_HAVE_DOS$wcstod) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr),wcstod,(__nptr,__endptr))
+#elif defined(__CRT_HAVE_DOS$wcstod) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr),wcstod,(__nptr,__endptr))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/wcstod.h>
-#define __localdep_wcstod (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstod))
-#endif /* wcstod... */
-#endif /* !____localdep_wcstod_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcstod __LIBC_LOCAL_NAME(wcstod)
+#endif /* !... */
+#endif /* !__local___localdep_wcstod_defined */
 __LOCAL_LIBC(_wtof) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wtof))(__WCHAR_TYPE__ const *__nptr) {
-#line 3405 "kos/src/libc/magic/stdlib.c"
 	return __localdep_wcstod(__nptr, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__wtof_defined
+#define __local___localdep__wtof_defined 1
+#define __localdep__wtof __LIBC_LOCAL_NAME(_wtof)
+#endif /* !__local___localdep__wtof_defined */
 #endif /* !__local__wtof_defined */

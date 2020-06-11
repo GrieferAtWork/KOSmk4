@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4e916d */
+/* HASH CRC-32:0xbfaa4eda */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,38 +19,33 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ntp_adjtime_defined
-#if defined(__CRT_HAVE_ntp_adjtime) || defined(__CRT_HAVE_ntp_adjtime64)
 #define __local_ntp_adjtime_defined 1
 #include <__crt.h>
-/* Dependency: "ntp_adjtime32" from "sys.timex" */
-#ifndef ____localdep_ntp_adjtime32_defined
-#define ____localdep_ntp_adjtime32_defined 1
-#ifdef __CRT_HAVE_ntp_adjtime
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime32,(struct __timex32 *__restrict __tntx),ntp_adjtime,(__tntx))
-#else /* LIBC: ntp_adjtime */
-#undef ____localdep_ntp_adjtime32_defined
-#endif /* ntp_adjtime32... */
-#endif /* !____localdep_ntp_adjtime32_defined */
-
-/* Dependency: "ntp_adjtime64" from "sys.timex" */
-#ifndef ____localdep_ntp_adjtime64_defined
-#define ____localdep_ntp_adjtime64_defined 1
-#ifdef __CRT_HAVE_ntp_adjtime64
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime64,(struct timex64 *__restrict __tntx),ntp_adjtime64,(__tntx))
-#elif defined(__CRT_HAVE_ntp_adjtime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime64,(struct timex64 *__restrict __tntx),ntp_adjtime,(__tntx))
-#elif defined(__CRT_HAVE_ntp_adjtime)
-#include <local/sys.timex/ntp_adjtime64.h>
-#define __localdep_ntp_adjtime64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntp_adjtime64))
-#else /* CUSTOM: ntp_adjtime64 */
-#undef ____localdep_ntp_adjtime64_defined
-#endif /* ntp_adjtime64... */
-#endif /* !____localdep_ntp_adjtime64_defined */
-
+#if defined(__CRT_HAVE_ntp_adjtime) || defined(__CRT_HAVE_ntp_adjtime64)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: ntp_adjtime64 from sys.timex */
+#ifndef __local___localdep_ntp_adjtime64_defined
+#define __local___localdep_ntp_adjtime64_defined 1
+#ifdef __CRT_HAVE_ntp_adjtime64
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime64,(struct __timex64 *__restrict __tntx),ntp_adjtime64,(__tntx))
+#elif defined(__CRT_HAVE_ntp_adjtime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime64,(struct __timex64 *__restrict __tntx),ntp_adjtime,(__tntx))
+#elif defined(__CRT_HAVE_ntp_adjtime)
+__NAMESPACE_LOCAL_END
+#include <local/sys.timex/ntp_adjtime64.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_ntp_adjtime64 __LIBC_LOCAL_NAME(ntp_adjtime64)
+#else /* ... */
+#undef __local___localdep_ntp_adjtime64_defined
+#endif /* !... */
+#endif /* !__local___localdep_ntp_adjtime64_defined */
+/* Dependency: ntp_adjtime32 from sys.timex */
+#if !defined(__local___localdep_ntp_adjtime32_defined) && defined(__CRT_HAVE_ntp_adjtime)
+#define __local___localdep_ntp_adjtime32_defined 1
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime32,(struct __timex32 *__restrict __tntx),ntp_adjtime,(__tntx))
+#endif /* !__local___localdep_ntp_adjtime32_defined && __CRT_HAVE_ntp_adjtime */
 __LOCAL_LIBC(ntp_adjtime) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_adjtime))(struct timex *__restrict __tntx) {
-#line 268 "kos/src/libc/magic/sys.timex.c"
 	int __result;
 #ifdef __CRT_HAVE_ntp_adjtime
 	struct __timex32 __nxtalt;
@@ -150,5 +145,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_adjtime))(struct timex *__restric
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_ntp_adjtime || __CRT_HAVE_ntp_adjtime64 */
+#ifndef __local___localdep_ntp_adjtime_defined
+#define __local___localdep_ntp_adjtime_defined 1
+#define __localdep_ntp_adjtime __LIBC_LOCAL_NAME(ntp_adjtime)
+#endif /* !__local___localdep_ntp_adjtime_defined */
+#else /* __CRT_HAVE_ntp_adjtime || __CRT_HAVE_ntp_adjtime64 */
+#undef __local_ntp_adjtime_defined
+#endif /* !__CRT_HAVE_ntp_adjtime && !__CRT_HAVE_ntp_adjtime64 */
 #endif /* !__local_ntp_adjtime_defined */

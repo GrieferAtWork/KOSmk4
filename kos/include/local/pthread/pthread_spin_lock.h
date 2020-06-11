@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaea136c6 */
+/* HASH CRC-32:0x10a93a37 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,30 +21,35 @@
 #ifndef __local_pthread_spin_lock_defined
 #define __local_pthread_spin_lock_defined 1
 #include <__crt.h>
-#include <hybrid/__atomic.h>
-
-#include <hybrid/sched/__yield.h>
-/* Dependency: "pthread_spin_trylock" from "pthread" */
-#ifndef ____localdep_pthread_spin_trylock_defined
-#define ____localdep_pthread_spin_trylock_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pthread_spin_trylock from pthread */
+#ifndef __local___localdep_pthread_spin_trylock_defined
+#define __local___localdep_pthread_spin_trylock_defined 1
 #ifdef __CRT_HAVE_pthread_spin_trylock
 /* Try to lock spinlock LOCK */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_spin_trylock,(__pthread_spinlock_t *__lock),pthread_spin_trylock,(__lock))
-#else /* LIBC: pthread_spin_trylock */
+#else /* __CRT_HAVE_pthread_spin_trylock */
+__NAMESPACE_LOCAL_END
 #include <local/pthread/pthread_spin_trylock.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Try to lock spinlock LOCK */
-#define __localdep_pthread_spin_trylock (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_trylock))
-#endif /* pthread_spin_trylock... */
-#endif /* !____localdep_pthread_spin_trylock_defined */
-
+#define __localdep_pthread_spin_trylock __LIBC_LOCAL_NAME(pthread_spin_trylock)
+#endif /* !__CRT_HAVE_pthread_spin_trylock */
+#endif /* !__local___localdep_pthread_spin_trylock_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__atomic.h>
+#include <hybrid/sched/__yield.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait until spinlock LOCK is retrieved */
 __LOCAL_LIBC(pthread_spin_lock) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_lock))(__pthread_spinlock_t *__lock) {
-#line 1271 "kos/src/libc/magic/pthread.c"
 	while (__localdep_pthread_spin_trylock(__lock) != 0)
 		__hybrid_yield();
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_pthread_spin_lock_defined
+#define __local___localdep_pthread_spin_lock_defined 1
+#define __localdep_pthread_spin_lock __LIBC_LOCAL_NAME(pthread_spin_lock)
+#endif /* !__local___localdep_pthread_spin_lock_defined */
 #endif /* !__local_pthread_spin_lock_defined */

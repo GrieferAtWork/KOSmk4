@@ -226,7 +226,7 @@ int umount([[nullable]] char const *special_file) {
 	return umount2(special_file, 0);
 }
 
-[[cp]]
+[[cp, decl_include("<features.h>")]]
 int umount2([[nullable]] char const *special_file,
             __STDC_INT_AS_UINT_T flags);
 

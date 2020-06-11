@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c33dd0e */
+/* HASH CRC-32:0x41423069 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,11 +23,8 @@
 #include <__crt.h>
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wcscat_s) __ATTR_NONNULL((1, 3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscat_s))(__WCHAR_TYPE__ *__dst,
-                                                      __SIZE_TYPE__ __dstsize,
-                                                      __WCHAR_TYPE__ const *__src) {
-#line 5005 "kos/src/libc/magic/string.c"
+__LOCAL_LIBC(wcscat_s) __errno_t
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscat_s))(__WCHAR_TYPE__ *__dst, __SIZE_TYPE__ __dstsize, __WCHAR_TYPE__ const *__src) {
 	if (!__dst || !__src)
 		return __EINVAL;
 	while (__dstsize && *__dst) {
@@ -43,4 +40,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscat_s))(__WCHAR_TYPE__ *__dst,
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcscat_s_defined
+#define __local___localdep_wcscat_s_defined 1
+#define __localdep_wcscat_s __LIBC_LOCAL_NAME(wcscat_s)
+#endif /* !__local___localdep_wcscat_s_defined */
 #endif /* !__local_wcscat_s_defined */

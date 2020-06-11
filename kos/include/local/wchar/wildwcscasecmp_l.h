@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4859487d */
+/* HASH CRC-32:0xa56c6d12 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,44 +21,59 @@
 #ifndef __local_wildwcscasecmp_l_defined
 #define __local_wildwcscasecmp_l_defined 1
 #include <__crt.h>
-/* Dependency: "towlower_l" from "wctype" */
-#ifndef ____localdep_towlower_l_defined
-#define ____localdep_towlower_l_defined 1
-#ifdef __CRT_HAVE_towlower_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),towlower_l,(__wc,__locale))
-#elif defined(__CRT_HAVE__towlower_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),_towlower_l,(__wc,__locale))
-#elif defined(__CRT_HAVE___towlower_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),__towlower_l,(__wc,__locale))
-#else /* LIBC: towlower_l */
-#include <local/wctype/towlower_l.h>
-#define __localdep_towlower_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towlower_l))
-#endif /* towlower_l... */
-#endif /* !____localdep_towlower_l_defined */
-
-/* Dependency: "wcscasecmp_l" from "wchar" */
-#ifndef ____localdep_wcscasecmp_l_defined
-#define ____localdep_wcscasecmp_l_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: tolower_l from ctype */
+#ifndef __local___localdep_tolower_l_defined
+#define __local___localdep_tolower_l_defined 1
+#ifdef __CRT_HAVE_tolower_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),tolower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__tolower_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),_tolower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE___tolower_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),__tolower_l,(__ch,__locale))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/ctype/tolower_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_tolower_l __LIBC_LOCAL_NAME(tolower_l)
+#endif /* !... */
+#endif /* !__local___localdep_tolower_l_defined */
+/* Dependency: wcscasecmp_l from wchar */
+#ifndef __local___localdep_wcscasecmp_l_defined
+#define __local___localdep_wcscasecmp_l_defined 1
 #ifdef __CRT_HAVE_wcscasecmp_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __locale_t __locale),wcscasecmp_l,(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE_DOS$wcscasecmp_l) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __locale_t __locale),wcscasecmp_l,(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE_DOS$wcscasecmp_l) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __locale_t __locale),wcscasecmp_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE__wcsicmp_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __locale_t __locale),_wcsicmp_l,(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE_DOS$_wcsicmp_l) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __locale_t __locale),_wcsicmp_l,(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE_DOS$_wcsicmp_l) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __locale_t __locale),_wcsicmp_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE_wcsicmp_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __locale_t __locale),wcsicmp_l,(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE_DOS$wcsicmp_l) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __locale_t __locale),wcsicmp_l,(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE_DOS$wcsicmp_l) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __locale_t __locale),wcsicmp_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE___wcscasecmp_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __locale_t __locale),__wcscasecmp_l,(__s1,__s2,__locale))
-#else /* LIBC: wcscasecmp_l */
+#elif defined(__CRT_HAVE_DOS$__wcscasecmp_l) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __locale_t __locale),__wcscasecmp_l,(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE_DOS$__wcscasecmp_l) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __locale_t __locale),__wcscasecmp_l,(__s1,__s2,__locale))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/wcscasecmp_l.h>
-#define __localdep_wcscasecmp_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscasecmp_l))
-#endif /* wcscasecmp_l... */
-#endif /* !____localdep_wcscasecmp_l_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcscasecmp_l __LIBC_LOCAL_NAME(wcscasecmp_l)
+#endif /* !... */
+#endif /* !__local___localdep_wcscasecmp_l_defined */
 __LOCAL_LIBC(wildwcscasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscasecmp_l))(__WCHAR_TYPE__ const *__pattern,
-                                                              __WCHAR_TYPE__ const *__string,
-                                                              __locale_t __locale) {
-#line 4424 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscasecmp_l))(__WCHAR_TYPE__ const *__pattern, __WCHAR_TYPE__ const *__string, __locale_t __locale) {
 	__WCHAR_TYPE__ __card_post, __pattern_ch, __wcsing_ch;
 	for (;;) {
 		if (!*__string) {
@@ -77,23 +92,23 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscasecmp_l))(__WCHAR_TYPE__ con
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (__card_post == '?')
 				goto __next; /* Match any --> already found */
-			__card_post = (__WCHAR_TYPE__)__localdep_towlower_l(__card_post, __locale);
+			__card_post = __localdep_tolower_l(__card_post, __locale);
 			for (;;) {
 				__WCHAR_TYPE__ __ch = *__string++;
-				if (__card_post == __ch || __card_post == (__WCHAR_TYPE__)__localdep_towlower_l(__ch, __locale)) {
+				if (__card_post == __ch || __card_post == __localdep_tolower_l(__ch, __locale)) {
 					/* Recursively check if the rest of the string and pattern match */
 					if (!__localdep_wcscasecmp_l(__string, __pattern, __locale))
 						return 0;
 				} else if (!__ch) {
-					return -(int)(__WCHAR_TYPE__)__card_post; /* Wildcard suffix not found */
+					return -(int)(unsigned char)__card_post; /* Wildcard suffix not found */
 				}
 			}
 		}
 		__pattern_ch = *__pattern;
 		__wcsing_ch = *__string;
 		if (__pattern_ch == __wcsing_ch || __pattern_ch == '?' ||
-		   (__pattern_ch = (__WCHAR_TYPE__)__localdep_towlower_l(__pattern_ch, __locale),
-		    __wcsing_ch = (__WCHAR_TYPE__)__localdep_towlower_l(__wcsing_ch, __locale),
+		   (__pattern_ch = __localdep_tolower_l(__pattern_ch, __locale),
+		    __wcsing_ch = __localdep_tolower_l(__wcsing_ch, __locale),
 		    __pattern_ch == __wcsing_ch)) {
 __next:
 			++__string;
@@ -102,7 +117,11 @@ __next:
 		}
 		break; /* mismatch */
 	}
-	return (int)((__WCHAR_TYPE__)__wcsing_ch - (__WCHAR_TYPE__)__pattern_ch);
+	return (int)((unsigned char)__wcsing_ch - (unsigned char)__pattern_ch);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wildwcscasecmp_l_defined
+#define __local___localdep_wildwcscasecmp_l_defined 1
+#define __localdep_wildwcscasecmp_l __LIBC_LOCAL_NAME(wildwcscasecmp_l)
+#endif /* !__local___localdep_wildwcscasecmp_l_defined */
 #endif /* !__local_wildwcscasecmp_l_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e766534 */
+/* HASH CRC-32:0x6288d6b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `wcschr', but return `wcsend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(wcschrnul) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcschrnul))(__WCHAR_TYPE__ const *__haystack,
-                                                       __WCHAR_TYPE__ __needle) {
-#line 628 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcschrnul))(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ __needle) {
 	for (; *__haystack; ++__haystack) {
 		if (*__haystack == (__WCHAR_TYPE__)__needle)
 			break;
@@ -34,4 +32,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcschrnul))(__WCHAR_TYPE__ const *__h
 	return (__WCHAR_TYPE__ *)__haystack;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcschrnul_defined
+#define __local___localdep_wcschrnul_defined 1
+#define __localdep_wcschrnul __LIBC_LOCAL_NAME(wcschrnul)
+#endif /* !__local___localdep_wcschrnul_defined */
 #endif /* !__local_wcschrnul_defined */

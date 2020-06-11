@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3ace74c */
+/* HASH CRC-32:0xaa9a16ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,68 +19,47 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mtx_init_defined
-#ifdef __CRT_HAVE_pthread_mutex_init
 #define __local_mtx_init_defined 1
 #include <__crt.h>
-#include <bits/threads.h>
-
-#include <bits/pthreadvalues.h>
-
-#include <bits/pthreadtypes.h>
-#include <asm/threads.h>
-/* Dependency: "pthread_mutex_init" */
-#ifndef ____localdep_pthread_mutex_init_defined
-#define ____localdep_pthread_mutex_init_defined 1
 #ifdef __CRT_HAVE_pthread_mutex_init
+#include <features.h>
+#include <bits/threads.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pthread_mutex_init from pthread */
+#if !defined(__local___localdep_pthread_mutex_init_defined) && defined(__CRT_HAVE_pthread_mutex_init)
+#define __local___localdep_pthread_mutex_init_defined 1
 /* Initialize a mutex */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutex_init,(__pthread_mutex_t *__mutex, __pthread_mutexattr_t const *__mutexattr),pthread_mutex_init,(__mutex,__mutexattr))
-#else /* LIBC: pthread_mutex_init */
-#undef ____localdep_pthread_mutex_init_defined
-#endif /* pthread_mutex_init... */
-#endif /* !____localdep_pthread_mutex_init_defined */
-
-/* Dependency: "pthread_mutexattr_init" */
-#ifndef ____localdep_pthread_mutexattr_init_defined
-#define ____localdep_pthread_mutexattr_init_defined 1
-#ifdef __CRT_HAVE_pthread_mutexattr_init
+#endif /* !__local___localdep_pthread_mutex_init_defined && __CRT_HAVE_pthread_mutex_init */
+/* Dependency: pthread_mutexattr_destroy from pthread */
+#if !defined(__local___localdep_pthread_mutexattr_destroy_defined) && defined(__CRT_HAVE_pthread_mutexattr_destroy)
+#define __local___localdep_pthread_mutexattr_destroy_defined 1
+/* Destroy mutex attribute object ATTR */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutexattr_destroy,(__pthread_mutexattr_t *__attr),pthread_mutexattr_destroy,(__attr))
+#endif /* !__local___localdep_pthread_mutexattr_destroy_defined && __CRT_HAVE_pthread_mutexattr_destroy */
+/* Dependency: pthread_mutexattr_init from pthread */
+#if !defined(__local___localdep_pthread_mutexattr_init_defined) && defined(__CRT_HAVE_pthread_mutexattr_init)
+#define __local___localdep_pthread_mutexattr_init_defined 1
 /* Initialize mutex attribute object ATTR with default attributes (kind is PTHREAD_MUTEX_TIMED_NP) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutexattr_init,(__pthread_mutexattr_t *__attr),pthread_mutexattr_init,(__attr))
-#else /* LIBC: pthread_mutexattr_init */
-#undef ____localdep_pthread_mutexattr_init_defined
-#endif /* pthread_mutexattr_init... */
-#endif /* !____localdep_pthread_mutexattr_init_defined */
-
-/* Dependency: "pthread_mutexattr_settype" */
-#ifndef ____localdep_pthread_mutexattr_settype_defined
-#define ____localdep_pthread_mutexattr_settype_defined 1
-#ifdef __CRT_HAVE_pthread_mutexattr_settype
+#endif /* !__local___localdep_pthread_mutexattr_init_defined && __CRT_HAVE_pthread_mutexattr_init */
+/* Dependency: pthread_mutexattr_settype from pthread */
+#if !defined(__local___localdep_pthread_mutexattr_settype_defined) && defined(__CRT_HAVE_pthread_mutexattr_settype)
+#define __local___localdep_pthread_mutexattr_settype_defined 1
 /* Set the mutex kind attribute in *ATTR to KIND (either PTHREAD_MUTEX_NORMAL,
  * PTHREAD_MUTEX_RECURSIVE, PTHREAD_MUTEX_ERRORCHECK, or PTHREAD_MUTEX_DEFAULT) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutexattr_settype,(__pthread_mutexattr_t *__attr, int __kind),pthread_mutexattr_settype,(__attr,__kind))
-#else /* LIBC: pthread_mutexattr_settype */
-#undef ____localdep_pthread_mutexattr_settype_defined
-#endif /* pthread_mutexattr_settype... */
-#endif /* !____localdep_pthread_mutexattr_settype_defined */
-
-/* Dependency: "pthread_mutexattr_destroy" */
-#ifndef ____localdep_pthread_mutexattr_destroy_defined
-#define ____localdep_pthread_mutexattr_destroy_defined 1
-#ifdef __CRT_HAVE_pthread_mutexattr_destroy
-/* Destroy mutex attribute object ATTR */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutexattr_destroy,(__pthread_mutexattr_t *__attr),pthread_mutexattr_destroy,(__attr))
-#else /* LIBC: pthread_mutexattr_destroy */
-#undef ____localdep_pthread_mutexattr_destroy_defined
-#endif /* pthread_mutexattr_destroy... */
-#endif /* !____localdep_pthread_mutexattr_destroy_defined */
-
+#endif /* !__local___localdep_pthread_mutexattr_settype_defined && __CRT_HAVE_pthread_mutexattr_settype */
+__NAMESPACE_LOCAL_END
+#include <asm/threads.h>
+#include <bits/pthreadvalues.h>
+#include <bits/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Creates a new mutex object with type TYPE.
  * If successful the new object is pointed by MUTEX
  * s.a. `pthread_mutex_init()' */
 __LOCAL_LIBC(mtx_init) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_init))(__mtx_t *__restrict __mutex,
-                                                      int __type) {
-#line 300 "kos/src/libc/magic/threads.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_init))(__mtx_t *__restrict __mutex, __STDC_INT_AS_UINT_T __type) {
 	int __error;
 	if (__type == __mtx_plain) {
 		__error = __localdep_pthread_mutex_init((__pthread_mutex_t *)__mutex, __NULLPTR);
@@ -101,5 +80,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_init))(__mtx_t *__restrict __mute
 	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_pthread_mutex_init */
+#ifndef __local___localdep_mtx_init_defined
+#define __local___localdep_mtx_init_defined 1
+#define __localdep_mtx_init __LIBC_LOCAL_NAME(mtx_init)
+#endif /* !__local___localdep_mtx_init_defined */
+#else /* __CRT_HAVE_pthread_mutex_init */
+#undef __local_mtx_init_defined
+#endif /* !__CRT_HAVE_pthread_mutex_init */
 #endif /* !__local_mtx_init_defined */

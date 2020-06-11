@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe95b2a6e */
+/* HASH CRC-32:0xa6da2ccb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,39 +21,42 @@
 #ifndef __local_mempmoveupl_defined
 #define __local_mempmoveupl_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "memmoveupl" from "string" */
-#ifndef ____localdep_memmoveupl_defined
-#define ____localdep_memmoveupl_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memmoveupl from string */
+#ifndef __local___localdep_memmoveupl_defined
+#define __local___localdep_memmoveupl_defined 1
 #ifdef __fast_memmoveupl_defined
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
-#define __localdep_memmoveupl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupl))
+__NAMESPACE_FAST_USING(memmoveupl)
+#define __localdep_memmoveupl __LIBC_FAST_NAME(memmoveupl)
 #elif defined(__CRT_HAVE_memmoveupl)
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupl,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),memmoveupl,(__dst,__src,__n_dwords))
-#elif defined(__CRT_HAVE_wmemmove) && (__SIZEOF_WCHAR_T__ == 4)
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupl,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),wmemmove,(__dst,__src,__n_dwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),memmoveupl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_memmovel)
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupl,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),memmovel,(__dst,__src,__n_dwords))
-#else /* LIBC: memmoveupl */
-#include <local/string/memmoveupl.h>
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),memmovel,(__dst,__src,__n_dwords))
+#elif defined(__CRT_HAVE_wmemmove) && (__SIZEOF_WCHAR_T__ == 4)
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
-#define __localdep_memmoveupl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupl))
-#endif /* memmoveupl... */
-#endif /* !____localdep_memmoveupl_defined */
-
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),wmemmove,(__dst,__src,__n_dwords))
+#elif defined(__CRT_HAVE_DOS$wmemmove) && defined(__PE__)
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memmoveupl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),KOS$wmemmove,(__dst,__src,__n_dwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/memmoveupl.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
+#define __localdep_memmoveupl __LIBC_LOCAL_NAME(memmoveupl)
+#endif /* !... */
+#endif /* !__local___localdep_memmoveupl_defined */
 /* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
 __LOCAL_LIBC(mempmoveupl) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveupl))(/*aligned(4)*/ void *__dst,
-                                                         /*aligned(4)*/ void const *__src,
-                                                         __SIZE_TYPE__ __n_dwords) {
-#line 1213 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveupl))(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords) {
 	return (__UINT32_TYPE__ *)__localdep_memmoveupl(__dst, __src, __n_dwords) + __n_dwords;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_mempmoveupl_defined
+#define __local___localdep_mempmoveupl_defined 1
+#define __localdep_mempmoveupl __LIBC_LOCAL_NAME(mempmoveupl)
+#endif /* !__local___localdep_mempmoveupl_defined */
 #endif /* !__local_mempmoveupl_defined */

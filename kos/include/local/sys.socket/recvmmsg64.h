@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4032fc03 */
+/* HASH CRC-32:0xf4eb7176 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,37 +19,28 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_recvmmsg64_defined
-#ifdef __CRT_HAVE_recvmmsg
 #define __local_recvmmsg64_defined 1
 #include <__crt.h>
-/* Dependency: "recvmmsg32" from "sys.socket" */
-#ifndef ____localdep_recvmmsg32_defined
-#define ____localdep_recvmmsg32_defined 1
 #ifdef __CRT_HAVE_recvmmsg
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: recvmmsg32 from sys.socket */
+#if !defined(__local___localdep_recvmmsg32_defined) && defined(__CRT_HAVE_recvmmsg)
+#define __local___localdep_recvmmsg32_defined 1
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-__CREDIRECT_VOID(__ATTR_NONNULL((2)),__NOTHROW_RPC,__localdep_recvmmsg32,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec32 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
-#else /* LIBC: recvmmsg */
-#undef ____localdep_recvmmsg32_defined
-#endif /* recvmmsg32... */
-#endif /* !____localdep_recvmmsg32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_recvmmsg32,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec32 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+#endif /* !__local___localdep_recvmmsg32_defined && __CRT_HAVE_recvmmsg */
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 __LOCAL_LIBC(recvmmsg64) __ATTR_NONNULL((2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(recvmmsg64))(__fd_t __sockfd,
-                                                        struct mmsghdr *__vmessages,
-                                                        __STDC_UINT_AS_SIZE_T __vlen,
-                                                        __STDC_INT_AS_UINT_T __msg_flags,
-                                                        struct __timespec64 *__tmo) {
-#line 330 "kos/src/libc/magic/sys.socket.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(recvmmsg64))(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo) {
 	struct __timespec32 __tmo32;
 	if (!__tmo)
 		return __localdep_recvmmsg32(__sockfd, __vmessages, __vlen, __msg_flags, __NULLPTR);
@@ -58,5 +49,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(recvmmsg64))(__fd_t __sockfd,
 	return __localdep_recvmmsg32(__sockfd, __vmessages, __vlen, __msg_flags, &__tmo32);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_recvmmsg */
+#ifndef __local___localdep_recvmmsg64_defined
+#define __local___localdep_recvmmsg64_defined 1
+#define __localdep_recvmmsg64 __LIBC_LOCAL_NAME(recvmmsg64)
+#endif /* !__local___localdep_recvmmsg64_defined */
+#else /* __CRT_HAVE_recvmmsg */
+#undef __local_recvmmsg64_defined
+#endif /* !__CRT_HAVE_recvmmsg */
 #endif /* !__local_recvmmsg64_defined */

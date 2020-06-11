@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x139c7ec3 */
+/* HASH CRC-32:0x4ff7183e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,25 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_FTruncate_defined
-#if defined(__CRT_HAVE_FTruncate) || defined(__CRT_HAVE_FTruncate64)
 #define __local_FTruncate_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_FTruncate) || defined(__CRT_HAVE_FTruncate64)
 #include <kos/anno.h>
-/* Dependency: "FTruncate32" from "kos.unistd" */
-#ifndef ____localdep_FTruncate32_defined
-#define ____localdep_FTruncate32_defined 1
-#ifdef __CRT_HAVE_FTruncate
-/* >> ftruncate(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
-__CREDIRECT(,int,__THROWING,__localdep_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length))
-#else /* LIBC: FTruncate */
-#undef ____localdep_FTruncate32_defined
-#endif /* FTruncate32... */
-#endif /* !____localdep_FTruncate32_defined */
-
-/* Dependency: "FTruncate64" from "kos.unistd" */
-#ifndef ____localdep_FTruncate64_defined
-#define ____localdep_FTruncate64_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: FTruncate64 from kos.unistd */
+#ifndef __local___localdep_FTruncate64_defined
+#define __local___localdep_FTruncate64_defined 1
 #ifdef __CRT_HAVE_FTruncate64
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
@@ -47,22 +36,27 @@ __CREDIRECT_VOID(,__THROWING,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __le
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT_VOID(,__THROWING,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate)
+__NAMESPACE_LOCAL_END
 #include <local/kos.unistd/FTruncate64.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
-#define __localdep_FTruncate64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FTruncate64))
-#else /* CUSTOM: FTruncate64 */
-#undef ____localdep_FTruncate64_defined
-#endif /* FTruncate64... */
-#endif /* !____localdep_FTruncate64_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_FTruncate64 __LIBC_LOCAL_NAME(FTruncate64)
+#else /* ... */
+#undef __local___localdep_FTruncate64_defined
+#endif /* !... */
+#endif /* !__local___localdep_FTruncate64_defined */
+/* Dependency: FTruncate32 from kos.unistd */
+#if !defined(__local___localdep_FTruncate32_defined) && defined(__CRT_HAVE_FTruncate)
+#define __local___localdep_FTruncate32_defined 1
+/* >> ftruncate(2)
+ * Truncate the given file `FD' to a length of `LENGTH' */
+__CREDIRECT(,int,__THROWING,__localdep_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length))
+#endif /* !__local___localdep_FTruncate32_defined && __CRT_HAVE_FTruncate */
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __LOCAL_LIBC(FTruncate) void
-(__LIBCCALL __LIBC_LOCAL_NAME(FTruncate))(__fd_t __fd,
-                                          __FS_TYPE(pos) __length) __THROWS(...) {
-#line 606 "kos/src/libc/magic/kos.unistd.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(FTruncate))(__fd_t __fd, __FS_TYPE(pos) __length) __THROWS(...) {
 #ifdef __CRT_HAVE_FTruncate
 	__localdep_FTruncate32(__fd, (__pos32_t)__length);
 #else /* __CRT_HAVE_FTruncate */
@@ -70,5 +64,11 @@ __LOCAL_LIBC(FTruncate) void
 #endif /* !__CRT_HAVE_FTruncate */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_FTruncate || __CRT_HAVE_FTruncate64 */
+#ifndef __local___localdep_FTruncate_defined
+#define __local___localdep_FTruncate_defined 1
+#define __localdep_FTruncate __LIBC_LOCAL_NAME(FTruncate)
+#endif /* !__local___localdep_FTruncate_defined */
+#else /* __CRT_HAVE_FTruncate || __CRT_HAVE_FTruncate64 */
+#undef __local_FTruncate_defined
+#endif /* !__CRT_HAVE_FTruncate && !__CRT_HAVE_FTruncate64 */
 #endif /* !__local_FTruncate_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44ef6d6a */
+/* HASH CRC-32:0x505f1243 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,34 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32spawnlpe_defined
-#if (defined(__CRT_HAVE_wspawnvpe) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE__wspawnvpe) && __SIZEOF_WCHAR_T__ == 4)
 #define __local_c32spawnlpe_defined 1
 #include <__crt.h>
-#include <parts/redirect-exec.h>
-/* Dependency: "c32spawnvpe" from "parts.uchar.process" */
-#ifndef ____localdep_c32spawnvpe_defined
-#define ____localdep_c32spawnvpe_defined 1
-#if defined(__CRT_HAVE_wspawnvpe) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2, 3, 4)) __ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnvpe,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV, __T32ENVP),wspawnvpe,(__mode,__path,___argv,___envp))
-#elif defined(__CRT_HAVE__wspawnvpe) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2, 3, 4)) __ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnvpe,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV, __T32ENVP),_wspawnvpe,(__mode,__path,___argv,___envp))
-#else /* LIBC: c32spawnvpe */
-#undef ____localdep_c32spawnvpe_defined
-#endif /* c32spawnvpe... */
-#endif /* !____localdep_c32spawnvpe_defined */
-
+#if (defined(__CRT_HAVE_wspawnvpe) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wspawnvpe)
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c32spawnlpe) __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) __pid_t
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(c32spawnlpe))(int __mode,
-                                                          __CHAR32_TYPE__ const *__restrict __file,
-                                                          __CHAR32_TYPE__ const *__args,
-                                                          ... /*, (char32_t *)NULL, char32_t **environ*/) {
-#line 260 "kos/src/libc/magic/parts.uchar.process.c"
-	__REDIRECT_SPAWNLE(__CHAR32_TYPE__, __localdep_c32spawnvpe, __mode, __file, __args)
+/* Dependency: c32spawnvpe from parts.uchar.process */
+#ifndef __local___localdep_c32spawnvpe_defined
+#define __local___localdep_c32spawnvpe_defined 1
+#if defined(__CRT_HAVE_wspawnvpe) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__LIBKCALL,__localdep_c32spawnvpe,(int __mode, __CHAR32_TYPE__ const *__restrict __file, __T32ARGV, __T32ENVP),wspawnvpe,(__mode,__file,___argv,___envp))
+#elif defined(__CRT_HAVE_DOS$wspawnvpe)
+__CREDIRECT_KOS(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnvpe,(int __mode, __CHAR32_TYPE__ const *__restrict __file, __T32ARGV, __T32ENVP),wspawnvpe,(__mode,__file,___argv,___envp))
+#else /* ... */
+#undef __local___localdep_c32spawnvpe_defined
+#endif /* !... */
+#endif /* !__local___localdep_c32spawnvpe_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/redirect-exec.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(c32spawnlpe) __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t
+__NOTHROW_RPC(__VLIBKCALL __LIBC_LOCAL_NAME(c32spawnlpe))(int __mode, __CHAR32_TYPE__ const *__restrict __file, __CHAR32_TYPE__ const *__args, ...) {
+	__REDIRECT_SPAWNLPE(__CHAR32_TYPE__, __localdep_c32spawnvpe, __mode, __file, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_wspawnvpe && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE__wspawnvpe && __SIZEOF_WCHAR_T__ == 4) */
+#ifndef __local___localdep_c32spawnlpe_defined
+#define __local___localdep_c32spawnlpe_defined 1
+#define __localdep_c32spawnlpe __LIBC_LOCAL_NAME(c32spawnlpe)
+#endif /* !__local___localdep_c32spawnlpe_defined */
+#else /* (__CRT_HAVE_wspawnvpe && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$wspawnvpe */
+#undef __local_c32spawnlpe_defined
+#endif /* (!__CRT_HAVE_wspawnvpe || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$wspawnvpe */
 #endif /* !__local_c32spawnlpe_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b783bf2 */
+/* HASH CRC-32:0x1b68464e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,28 +19,29 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_stime64_defined
-#ifdef __CRT_HAVE_stime
 #define __local_stime64_defined 1
 #include <__crt.h>
-/* Dependency: "stime32" from "time" */
-#ifndef ____localdep_stime32_defined
-#define ____localdep_stime32_defined 1
 #ifdef __CRT_HAVE_stime
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: stime32 from time */
+#if !defined(__local___localdep_stime32_defined) && defined(__CRT_HAVE_stime)
+#define __local___localdep_stime32_defined 1
 /* Set the system time to *WHEN. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime32,(__time32_t const *__when),stime,(__when))
-#else /* LIBC: stime */
-#undef ____localdep_stime32_defined
-#endif /* stime32... */
-#endif /* !____localdep_stime32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_stime32_defined && __CRT_HAVE_stime */
 /* Set the system time to *WHEN. This call is restricted to the superuser */
 __LOCAL_LIBC(stime64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stime64))(__time64_t const *__when) {
-#line 920 "kos/src/libc/magic/time.c"
 	__time32_t __tms = (__time32_t)*__when;
 	return __localdep_stime32(&__tms);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_stime */
+#ifndef __local___localdep_stime64_defined
+#define __local___localdep_stime64_defined 1
+#define __localdep_stime64 __LIBC_LOCAL_NAME(stime64)
+#endif /* !__local___localdep_stime64_defined */
+#else /* __CRT_HAVE_stime */
+#undef __local_stime64_defined
+#endif /* !__CRT_HAVE_stime */
 #endif /* !__local_stime64_defined */

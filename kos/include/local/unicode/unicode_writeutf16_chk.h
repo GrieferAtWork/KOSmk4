@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52c2e9b0 */
+/* HASH CRC-32:0x27b17f49 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false */
 __LOCAL_LIBC(unicode_writeutf16_chk) __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf16_chk))(/*utf-16*/ __CHAR16_TYPE__ *__restrict __dst,
-                                                                    __CHAR32_TYPE__ __ch) {
-#line 748 "kos/src/libc/magic/unicode.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf16_chk))(__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch) {
 	if __unlikely(__ch > 0x10ffff)
 		return __NULLPTR;
 	if __likely(__ch <= 0xffff && (__ch < 0xd800 || __ch > 0xdfff)) {
@@ -39,4 +37,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf16_chk))(/*utf-16*/ _
 	return __dst;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_unicode_writeutf16_chk_defined
+#define __local___localdep_unicode_writeutf16_chk_defined 1
+#define __localdep_unicode_writeutf16_chk __LIBC_LOCAL_NAME(unicode_writeutf16_chk)
+#endif /* !__local___localdep_unicode_writeutf16_chk_defined */
 #endif /* !__local_unicode_writeutf16_chk_defined */

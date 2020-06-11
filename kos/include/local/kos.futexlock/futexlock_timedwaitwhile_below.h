@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc56b6ee */
+/* HASH CRC-32:0x5bcf9ad0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,17 +19,15 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futexlock_timedwaitwhile_below_defined
-#if defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64)
 #define __local_futexlock_timedwaitwhile_below_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64)
 #include <bits/types.h>
-#include <bits/types.h>
-
 #include <bits/timespec.h>
-#include <kos/bits/futex.h>
-/* Dependency: "lfutexlock" from "kos.futexlock" */
-#ifndef ____localdep_lfutexlock_defined
-#define ____localdep_lfutexlock_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: lfutexlock from kos.futexlock */
+#ifndef __local___localdep_lfutexlock_defined
+#define __local___localdep_lfutexlock_defined 1
 #if defined(__CRT_HAVE_lfutexlock64) && defined(__USE_TIME_BITS64)
 /* >> lfutexlock(3)
  * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
@@ -57,7 +55,7 @@
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec const *timeout, lfutex_t val2*/...),lfutexlock64,(__ulockaddr,__uaddr,__futex_op,__val,))
+__CVREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutexlock64,(__ulockaddr,__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
 #elif defined(__CRT_HAVE_lfutexlock) && !defined(__USE_TIME_BITS64)
 /* >> lfutexlock(3)
  * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
@@ -85,9 +83,11 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfute
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec const *timeout, lfutex_t val2*/...),lfutexlock,(__ulockaddr,__uaddr,__futex_op,__val,))
+__CVREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutexlock,(__ulockaddr,__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
 #elif defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64)
+__NAMESPACE_LOCAL_END
 #include <local/kos.futexlock/lfutexlock.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> lfutexlock(3)
  * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
  * This function behaves identical to the lfutex() system call, except that it takes
@@ -114,12 +114,13 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfute
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define __localdep_lfutexlock (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexlock))
-#else /* CUSTOM: lfutexlock */
-#undef ____localdep_lfutexlock_defined
-#endif /* lfutexlock... */
-#endif /* !____localdep_lfutexlock_defined */
-
+#define __localdep_lfutexlock __LIBC_LOCAL_NAME(lfutexlock)
+#else /* ... */
+#undef __local___localdep_lfutexlock_defined
+#endif /* !... */
+#endif /* !__local___localdep_lfutexlock_defined */
+__NAMESPACE_LOCAL_END
+#include <kos/bits/futex.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait if `*uaddr < below_value'
  * @return: 0: Did wait
@@ -128,13 +129,15 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __LOCAL_LIBC(futexlock_timedwaitwhile_below) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_timedwaitwhile_below))(__uintptr_t *__ulockaddr,
-                                                                            __uintptr_t *__uaddr,
-                                                                            __uintptr_t __below_value,
-                                                                            struct timespec const *__rel_timeout) {
-#line 346 "kos/src/libc/magic/kos.futexlock.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_timedwaitwhile_below))(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __uintptr_t __below_value, struct timespec const *__rel_timeout) {
 	return __localdep_lfutexlock(__ulockaddr, __uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_value, __rel_timeout);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lfutexlock || __CRT_HAVE_lfutexlock64 */
+#ifndef __local___localdep_futexlock_timedwaitwhile_below_defined
+#define __local___localdep_futexlock_timedwaitwhile_below_defined 1
+#define __localdep_futexlock_timedwaitwhile_below __LIBC_LOCAL_NAME(futexlock_timedwaitwhile_below)
+#endif /* !__local___localdep_futexlock_timedwaitwhile_below_defined */
+#else /* __CRT_HAVE_lfutexlock || __CRT_HAVE_lfutexlock64 */
+#undef __local_futexlock_timedwaitwhile_below_defined
+#endif /* !__CRT_HAVE_lfutexlock && !__CRT_HAVE_lfutexlock64 */
 #endif /* !__local_futexlock_timedwaitwhile_below_defined */

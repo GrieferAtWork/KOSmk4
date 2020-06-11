@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4635bc08 */
+/* HASH CRC-32:0xfeb859fa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_modfl_defined
-#include <ieee754.h>
-#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 #define __local_modfl_defined 1
 #include <__crt.h>
-#include <libm/modf.h>
-/* Dependency: "modf" from "math" */
-#ifndef ____localdep_modf_defined
-#define ____localdep_modf_defined 1
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: modf from math */
+#ifndef __local___localdep_modf_defined
+#define __local___localdep_modf_defined 1
 #if __has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)
 /* Break VALUE into integral and fractional parts */
 __CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),modf,{ return __builtin_modf(__x, __iptr); })
@@ -36,36 +36,43 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_m
 #elif defined(__CRT_HAVE___modf)
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),__modf,(__x,__iptr))
-#else /* LIBC: modf */
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
 #include <local/math/modf.h>
-/* Break VALUE into integral and fractional parts */
-#define __localdep_modf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modf))
-#else /* CUSTOM: modf */
-#undef ____localdep_modf_defined
-#endif /* modf... */
-#endif /* modf... */
-#endif /* !____localdep_modf_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* Break VALUE into integral and fractional parts */
-__LOCAL_LIBC(modfl) __ATTR_NONNULL((2)) __LONGDOUBLE
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modfl))(__LONGDOUBLE __x,
-                                                   __LONGDOUBLE *__iptr) {
-#line 436 "kos/src/libc/magic/math.c"
-#ifdef __LIBM_MATHFUN2L
-	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
+#define __localdep_modf __LIBC_LOCAL_NAME(modf)
+#else /* ... */
+#undef __local___localdep_modf_defined
+#endif /* !... */
+#endif /* !__local___localdep_modf_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/modf.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Break VALUE into integral and fractional parts */
+__LOCAL_LIBC(modfl) __ATTR_WUNUSED __ATTR_NONNULL((2)) __LONGDOUBLE
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modfl))(__LONGDOUBLE __x, __LONGDOUBLE *__iptr) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	
+#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__ *)__iptr);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_modff((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__ *)__iptr);
 #else /* ... */
 	return (__LONGDOUBLE)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__ *)__iptr);
 #endif /* !... */
-#else /* __LIBM_MATHFUN2L */
-	return (__LONGDOUBLE)__localdep_modf((double)__x, __iptr);
-#endif /* !__LIBM_MATHFUN2L */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
+	return (__LONGDOUBLE)__localdep_modf((double)__x, (double *)__iptr);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_modf || __CRT_HAVE___modf */
+#ifndef __local___localdep_modfl_defined
+#define __local___localdep_modfl_defined 1
+#define __localdep_modfl __LIBC_LOCAL_NAME(modfl)
+#endif /* !__local___localdep_modfl_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_modf || __CRT_HAVE___modf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_modfl_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__CRT_HAVE_modf && !__CRT_HAVE___modf && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_modfl_defined */

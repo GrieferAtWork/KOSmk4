@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4498b0d7 */
+/* HASH CRC-32:0x61913b35 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,10 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: 0: Bad input format
  * @return: 1: Success */
 __LOCAL_LIBC(inet_paton) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_paton))(char const **__restrict __pcp,
-                                                        struct in_addr *__restrict __inp,
-                                                        int __network_addr) {
-#line 205 "kos/src/libc/magic/arpa.inet.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_paton))(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr) {
 	__UINT32_TYPE__ __result;
 	__UINT32_TYPE__ __parts[4];
 	char const *__cp = *__pcp;
@@ -125,6 +122,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_paton))(char const **__restrict 
 		++__cp;
 	}
 	switch (__builtin_expect(__i, 4)) {
+
 	case 4:
 		if __unlikely(__parts[3] > 0xff)
 			goto __err;
@@ -133,6 +131,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_paton))(char const **__restrict 
 		         __parts[2] << 8 |
 		         __parts[3];
 		break;
+
 	case 3:
 		if (__network_addr) {
 			if __unlikely(__parts[2] > 0xff)
@@ -148,6 +147,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_paton))(char const **__restrict 
 			         __parts[2];
 		}
 		break;
+
 	case 2:
 		if (__network_addr) {
 			if __unlikely(__parts[1] > 0xff)
@@ -161,6 +161,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_paton))(char const **__restrict 
 			         __parts[1];
 		}
 		break;
+
 	case 1:
 		if (__network_addr) {
 			if __unlikely(__parts[0] > 0xff)
@@ -168,6 +169,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_paton))(char const **__restrict 
 		}
 		__result = __parts[0];
 		break;
+
 	default: __builtin_unreachable();
 	}
 	__inp->s_addr = __hybrid_htobe32(__result);
@@ -177,4 +179,8 @@ __err:
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_inet_paton_defined
+#define __local___localdep_inet_paton_defined 1
+#define __localdep_inet_paton __LIBC_LOCAL_NAME(inet_paton)
+#endif /* !__local___localdep_inet_paton_defined */
 #endif /* !__local_inet_paton_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6af0106e */
+/* HASH CRC-32:0x3605b5a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,32 @@
 #ifndef __local_swprintf_defined
 #define __local_swprintf_defined 1
 #include <__crt.h>
-/* Dependency: "vswprintf" from "wchar" */
-#ifndef ____localdep_vswprintf_defined
-#define ____localdep_vswprintf_defined 1
-#ifdef __std___localdep_vswprintf_defined
-__NAMESPACE_STD_USING(__localdep_vswprintf)
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: vswprintf from wchar */
+#ifndef __local___localdep_vswprintf_defined
+#define __local___localdep_vswprintf_defined 1
+#ifdef __vswprintf_defined
+__NAMESPACE_GLB_USING(vswprintf)
+#define __localdep_vswprintf vswprintf
+#elif defined(__std_vswprintf_defined)
+__NAMESPACE_STD_USING(vswprintf)
+#define __localdep_vswprintf vswprintf
 #elif defined(__CRT_HAVE_vswprintf)
 __CREDIRECT(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vswprintf,(__WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
-#else /* LIBC: vswprintf */
+#elif defined(__CRT_HAVE_DOS$vswprintf) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vswprintf,(__CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
+#elif defined(__CRT_HAVE_DOS$vswprintf) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vswprintf,(__CHAR16_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/vswprintf.h>
-#define __localdep_vswprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswprintf))
-#endif /* vswprintf... */
-#endif /* !____localdep_vswprintf_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_vswprintf __LIBC_LOCAL_NAME(vswprintf)
+#endif /* !... */
+#endif /* !__local___localdep_vswprintf_defined */
 __LOCAL_LIBC(swprintf) __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(swprintf))(__WCHAR_TYPE__ *__restrict __buf,
-                                                       __SIZE_TYPE__ __buflen,
-                                                       __WCHAR_TYPE__ const *__restrict __format,
-                                                       ...) {
-#line 721 "kos/src/libc/magic/wchar.c"
+__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(swprintf))(__WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__restrict __format, ...) {
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
@@ -49,4 +55,8 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(swprintf))(__WCHAR_TYPE__ *__restric
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_swprintf_defined
+#define __local___localdep_swprintf_defined 1
+#define __localdep_swprintf __LIBC_LOCAL_NAME(swprintf)
+#endif /* !__local___localdep_swprintf_defined */
 #endif /* !__local_swprintf_defined */

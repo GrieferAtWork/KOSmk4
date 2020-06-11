@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd329ac6 */
+/* HASH CRC-32:0x192e0c69 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,37 +21,11 @@
 #ifndef __local__strset_s_defined
 #define __local__strset_s_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
 #include <parts/errno.h>
-/* Dependency: "memset" from "string" */
-#ifndef ____localdep_memset_defined
-#define ____localdep_memset_defined 1
-#ifdef __fast_memset_defined
-/* Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))
-#elif defined(__CRT_HAVE_memset)
-/* Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* LIBC: memset */
-#include <local/string/memset.h>
-/* Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))
-#endif /* memset... */
-#endif /* !____localdep_memset_defined */
-
+#include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_strset_s) __ATTR_NONNULL((1)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strset_s))(char *__dst,
-                                                       __SIZE_TYPE__ __dstsize,
-                                                       int __ch) {
-#line 4923 "kos/src/libc/magic/string.c"
-
-
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strset_s))(char *__dst, __SIZE_TYPE__ __dstsize, int __ch) {
 	char *__p;
 	__SIZE_TYPE__ __remaining;
 	if (!__dst && __dstsize != 0)
@@ -61,11 +35,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strset_s))(char *__dst,
 	while (*__p && --__remaining != 0)
 		*__p++ = (char)__ch;
 	if (__remaining == 0) {
-		__localdep_memset(__dst, 1, __dstsize * sizeof(char));
+		__libc_memsetc(__dst, 0, __dstsize, __SIZEOF_CHAR__);
 		return __EINVAL;
 	}
-	__localdep_memset(__p, 0, __remaining * sizeof(char));
+	__libc_memsetc(__p, 0, __remaining, __SIZEOF_CHAR__);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__strset_s_defined
+#define __local___localdep__strset_s_defined 1
+#define __localdep__strset_s __LIBC_LOCAL_NAME(_strset_s)
+#endif /* !__local___localdep__strset_s_defined */
 #endif /* !__local__strset_s_defined */

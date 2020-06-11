@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3490c55 */
+/* HASH CRC-32:0xdcf8be23 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,12 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wtempnam_dbg) __ATTR_WUNUSED __WCHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wtempnam_dbg))(__WCHAR16_TYPE__ const *__dir_name,
-                                                           __WCHAR16_TYPE__ const *__file_prefix,
-                                                           int __block_type,
-                                                           char const *__filename,
-                                                           int __line) {
-#line 444 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wtempnam_dbg))(__WCHAR16_TYPE__ const *__dir_name, __WCHAR16_TYPE__ const *__file_prefix, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
@@ -39,4 +34,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wtempnam_dbg))(__WCHAR16_TYPE__ cons
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__wtempnam_dbg_defined
+#define __local___localdep__wtempnam_dbg_defined 1
+#define __localdep__wtempnam_dbg __LIBC_LOCAL_NAME(_wtempnam_dbg)
+#endif /* !__local___localdep__wtempnam_dbg_defined */
 #endif /* !__local__wtempnam_dbg_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbebc25d1 */
+/* HASH CRC-32:0xcaf2018b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,14 @@
 __NAMESPACE_LOCAL_BEGIN
 /* @param signo: One of `SIG*' */
 __LOCAL_LIBC(sigismember) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigismember))(struct __sigset_struct const *__set,
-                                                         int __signo) {
-#line 282 "kos/src/libc/magic/signal.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigismember))(struct __sigset_struct const *__set, int __signo) {
 	__ULONGPTR_TYPE__ __mask = __sigmask(__signo);
 	__ULONGPTR_TYPE__ __word = __sigword(__signo);
 	return (__set->__val[__word] & __mask) != 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_sigismember_defined
+#define __local___localdep_sigismember_defined 1
+#define __localdep_sigismember __LIBC_LOCAL_NAME(sigismember)
+#endif /* !__local___localdep_sigismember_defined */
 #endif /* !__local_sigismember_defined */

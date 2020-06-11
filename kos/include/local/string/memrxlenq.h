@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2062dedd */
+/* HASH CRC-32:0xd919f584 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,29 @@
 #ifndef __local_memrxlenq_defined
 #define __local_memrxlenq_defined 1
 #include <__crt.h>
-/* Dependency: "memrxendq" from "string" */
-#ifndef ____localdep_memrxendq_defined
-#define ____localdep_memrxendq_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memrxendq from string */
+#ifndef __local___localdep_memrxendq_defined
+#define __local___localdep_memrxendq_defined 1
 #ifdef __CRT_HAVE_memrxendq
 /* Same as `memrendq', but search for non-matching locations. */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memrxendq,(/*aligned(8)*/ void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memrxendq,(__haystack,__qword,__n_qwords))
-#else /* LIBC: memrxendq */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memrxendq,(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memrxendq,(__haystack,__qword,__n_qwords))
+#else /* __CRT_HAVE_memrxendq */
+__NAMESPACE_LOCAL_END
 #include <local/string/memrxendq.h>
-/* Same as `memrendq', but search for non-matching locations. */
-#define __localdep_memrxendq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrxendq))
-#endif /* memrxendq... */
-#endif /* !____localdep_memrxendq_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `memrendq', but search for non-matching locations. */
+#define __localdep_memrxendq __LIBC_LOCAL_NAME(memrxendq)
+#endif /* !__CRT_HAVE_memrxendq */
+#endif /* !__local___localdep_memrxendq_defined */
 /* Same as `memrlenq', but search for non-matching locations. */
 __LOCAL_LIBC(memrxlenq) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxlenq))(/*aligned(8)*/ void const *__restrict __haystack,
-                                                       __UINT64_TYPE__ __qword,
-                                                       __SIZE_TYPE__ __n_qwords) {
-#line 2394 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxlenq))(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) {
 	return (__SIZE_TYPE__)(__localdep_memrxendq(__haystack, __qword, __n_qwords) - (__UINT64_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memrxlenq_defined
+#define __local___localdep_memrxlenq_defined 1
+#define __localdep_memrxlenq __LIBC_LOCAL_NAME(memrxlenq)
+#endif /* !__local___localdep_memrxlenq_defined */
 #endif /* !__local_memrxlenq_defined */

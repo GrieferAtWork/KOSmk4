@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a38403c */
+/* HASH CRC-32:0x16747776 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,60 +19,41 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_timedjoin_np_defined
-#if defined(__CRT_HAVE_pthread_timedjoin_np) || defined(__CRT_HAVE_pthread_timedjoin64_np)
 #define __local_pthread_timedjoin_np_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_pthread_timedjoin_np) || defined(__CRT_HAVE_pthread_timedjoin64_np)
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
-#include <bits/pthreadtypes.h>
-
-#include <bits/timespec.h>
-/* Dependency: "pthread_timedjoin32_np" from "pthread" */
-#ifndef ____localdep_pthread_timedjoin32_np_defined
-#define ____localdep_pthread_timedjoin32_np_defined 1
-#ifdef __CRT_HAVE_pthread_timedjoin_np
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pthread_timedjoin32_np from pthread */
+#if !defined(__local___localdep_pthread_timedjoin32_np_defined) && defined(__CRT_HAVE_pthread_timedjoin_np)
+#define __local___localdep_pthread_timedjoin32_np_defined 1
 /* Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_pthread_timedjoin32_np,(__pthread_t __pthread, void **__thread_return, struct __timespec32 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
-#else /* LIBC: pthread_timedjoin_np */
-#undef ____localdep_pthread_timedjoin32_np_defined
-#endif /* pthread_timedjoin32_np... */
-#endif /* !____localdep_pthread_timedjoin32_np_defined */
-
-/* Dependency: "pthread_timedjoin64_np" from "pthread" */
-#ifndef ____localdep_pthread_timedjoin64_np_defined
-#define ____localdep_pthread_timedjoin64_np_defined 1
+#endif /* !__local___localdep_pthread_timedjoin32_np_defined && __CRT_HAVE_pthread_timedjoin_np */
+/* Dependency: pthread_timedjoin64_np from pthread */
+#ifndef __local___localdep_pthread_timedjoin64_np_defined
+#define __local___localdep_pthread_timedjoin64_np_defined 1
 #ifdef __CRT_HAVE_pthread_timedjoin64_np
-/* Make calling thread wait for termination of the thread THREAD, but only
- * until TIMEOUT. The exit status of the thread is stored in
- * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_pthread_timedjoin64_np,(__pthread_t __pthread, void **__thread_return, struct __timespec64 const *__abstime),pthread_timedjoin64_np,(__pthread,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin_np) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* Make calling thread wait for termination of the thread THREAD, but only
- * until TIMEOUT. The exit status of the thread is stored in
- * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_pthread_timedjoin64_np,(__pthread_t __pthread, void **__thread_return, struct __timespec64 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin_np)
+__NAMESPACE_LOCAL_END
 #include <local/pthread/pthread_timedjoin64_np.h>
-/* Make calling thread wait for termination of the thread THREAD, but only
- * until TIMEOUT. The exit status of the thread is stored in
- * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
-#define __localdep_pthread_timedjoin64_np (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin64_np))
-#else /* CUSTOM: pthread_timedjoin64_np */
-#undef ____localdep_pthread_timedjoin64_np_defined
-#endif /* pthread_timedjoin64_np... */
-#endif /* !____localdep_pthread_timedjoin64_np_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_pthread_timedjoin64_np __LIBC_LOCAL_NAME(pthread_timedjoin64_np)
+#else /* ... */
+#undef __local___localdep_pthread_timedjoin64_np_defined
+#endif /* !... */
+#endif /* !__local___localdep_pthread_timedjoin64_np_defined */
 /* Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
 __LOCAL_LIBC(pthread_timedjoin_np) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_timedjoin_np))(__pthread_t __pthread,
-                                                                  void **__thread_return,
-                                                                  struct timespec const *__abstime) {
-#line 266 "kos/src/libc/magic/pthread.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_timedjoin_np))(__pthread_t __pthread, void **__thread_return, struct timespec const *__abstime) {
 #ifdef __CRT_HAVE_pthread_timedjoin_np
 	int __result;
 	struct __timespec32 __abstime32;
@@ -90,5 +71,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_timedjoin_np))(__pthread_t __
 #endif /* !__CRT_HAVE_pthread_timedjoin_np */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_pthread_timedjoin_np || __CRT_HAVE_pthread_timedjoin64_np */
+#ifndef __local___localdep_pthread_timedjoin_np_defined
+#define __local___localdep_pthread_timedjoin_np_defined 1
+#define __localdep_pthread_timedjoin_np __LIBC_LOCAL_NAME(pthread_timedjoin_np)
+#endif /* !__local___localdep_pthread_timedjoin_np_defined */
+#else /* __CRT_HAVE_pthread_timedjoin_np || __CRT_HAVE_pthread_timedjoin64_np */
+#undef __local_pthread_timedjoin_np_defined
+#endif /* !__CRT_HAVE_pthread_timedjoin_np && !__CRT_HAVE_pthread_timedjoin64_np */
 #endif /* !__local_pthread_timedjoin_np_defined */

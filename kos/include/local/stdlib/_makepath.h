@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9890ffa */
+/* HASH CRC-32:0xdb058b4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,29 @@
 #ifndef __local__makepath_defined
 #define __local__makepath_defined 1
 #include <__crt.h>
-/* Dependency: "_makepath_s" from "stdlib" */
-#ifndef ____localdep__makepath_s_defined
-#define ____localdep__makepath_s_defined 1
-#ifdef __CRT_HAVE__makepath_s
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep__makepath_s,(char *__buf, __SIZE_TYPE__ __buflen, char const *__drive, char const *__dir, char const *__file, char const *__ext),_makepath_s,(__buf,__buflen,__drive,__dir,__file,__ext))
-#else /* LIBC: _makepath_s */
-#include <local/stdlib/_makepath_s.h>
-#define __localdep__makepath_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_makepath_s))
-#endif /* _makepath_s... */
-#endif /* !____localdep__makepath_s_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _makepath_s from stdlib */
+#ifndef __local___localdep__makepath_s_defined
+#define __local___localdep__makepath_s_defined 1
+#ifdef __CRT_HAVE__makepath_s
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep__makepath_s,(char *__buf, __SIZE_TYPE__ __buflen, char const *__drive, char const *__dir, char const *__file, char const *__ext),_makepath_s,(__buf,__buflen,__drive,__dir,__file,__ext))
+#else /* __CRT_HAVE__makepath_s */
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/_makepath_s.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__makepath_s __LIBC_LOCAL_NAME(_makepath_s)
+#endif /* !__CRT_HAVE__makepath_s */
+#endif /* !__local___localdep__makepath_s_defined */
 __LOCAL_LIBC(_makepath) __ATTR_NONNULL((1)) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath))(char *__restrict __buf,
-                                                       char const *__drive,
-                                                       char const *__dir,
-                                                       char const *__file,
-                                                       char const *__ext) {
-#line 3123 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath))(char *__restrict __buf, char const *__drive, char const *__dir, char const *__file, char const *__ext) {
 	__localdep__makepath_s(__buf, (__SIZE_TYPE__)-1, __drive, __dir, __file, __ext);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__makepath_defined
+#define __local___localdep__makepath_defined 1
+#define __localdep__makepath __LIBC_LOCAL_NAME(_makepath)
+#endif /* !__local___localdep__makepath_defined */
 #endif /* !__local__makepath_defined */

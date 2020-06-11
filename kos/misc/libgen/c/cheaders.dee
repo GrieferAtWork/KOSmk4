@@ -35,27 +35,6 @@ import * from .namespace;
 import util;
 
 
-/*TODO:REMOVE_ME:BEGIN*/
-#define GET_LOCAL_PATH_NAME(name, func) \
-	_GET_LOCAL_PATH_NAME(str(name), str(func))
-function _GET_LOCAL_PATH_NAME(name: string, func: string) {
-	local result = REMOVEME_localPathRedirections.get(name, name);
-	if (result !is string) {
-		/* Search for a match */
-		import fs;
-		for (local candy: result) {
-			if (fs.stat.exists("include/local/{}/{}.h".format({ candy, func })))
-				return candy;
-		}
-		throw Error("Unable to find proper folder for '<local/{}/{}.h>'"
-			.format({ name, func }));
-	}
-	return result;
-}
-
-/*TODO:REMOVE_ME:END*/
-
-
 /* TODO: The effective escapeMode for 'ppCond' of LocalFunction bindings
  *       must be changed to ESCAPE_MODE_FULL when the surrounding declaration
  *       is printed in ESCAPE_MODE_PART.
@@ -227,6 +206,13 @@ again_compare_typenames:
 		if (an.startswith("[") && an.endswith("]"))
 			fp << " *";
 		fp << ")";
+	}
+
+	@@Print a stub-value for @this type (e.g. @"(char const *)0")
+	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	public function cprintStubValue(fp: CWriter, escapeMode: int) {
+		cprintCCastPrefix(fp, escapeMode);
+		fp << "0";
 	}
 
 	@@Output @this @CType to a @CWriter
@@ -415,6 +401,23 @@ class FunctionPrototype {
 		}
 	}
 
+	public operator str(): string {
+		File.Writer fp;
+		for (local a: prototypeAttributes)
+			fp << a << " ";
+		fp << returnType.beforeName << returnType.afterName
+			<< " " << cc << " ...(";
+		local isFirst = true;
+		for (local a: argv) {
+			if (!isFirst)
+				fp << ", ";
+			isFirst = false;
+			fp << a.ctype.beforeName << a.protoTypeName << a.ctype.afterName;
+		}
+		fp << ")";
+		return fp.string;
+	}
+
 	@@Check if @this FunctionPrototype is compatible with @other
 	@@i.e.: uses identical items, attributes, and calling convention.
 	@@Note however that argument names are not checked here!
@@ -589,7 +592,7 @@ class FunctionPrototype {
 	}
 
 	@@Print a declaration akin to:
-	@@> #define wcslen(string) (size_t)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((wchar_t const *)__string)
+	@@> #define wcslen (*(size_t(LIBCCALL*)(wchar_t const *__restrict))&__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))
 	@@If the types from @callToPrototype different from those in @this prototype,
 	@@insert casts where- and as necessary.
 	@@NOTE: This function will not print a trailing line-feed after the declaration!
@@ -602,47 +605,90 @@ class FunctionPrototype {
 			callToName: string, callToPrototype: FunctionPrototype,
 			explicitCastAllTypes: bool = false) {
 		fp << "#define " << exposedName;
-		if (!this.compatibleWith(callToPrototype)) {
-			/* Need to cast arguments if prototypes don't match up */
-			local isFirst = true;
+		/* Check if the prototypes are already compatible */
+		if (this.compatibleWith(callToPrototype)) {
+			fp << " " << callToName;
+			return;
+		}
+		local myArgc = #argv;
+		local otArgc = #callToPrototype.argv;
+		local myHaveEllipsis = hasEllipsis;
+		local otHaveEllipsis = callToPrototype.hasEllipsis;
+		if (myArgc != otArgc || myHaveEllipsis != otHaveEllipsis) {
+			/* Different # of arguments (shouldn't happen, but can only be dealt with
+			 * by generating a function-like macro, though obviously this macro cannot
+			 * be used in a situation where it's address would have to be taken) */
 			fp << "(";
-			for (local a: this.argv) {
-				if (!isFirst)
-					fp << ", ";
-				isFirst = false;
-				fp << a.name;
-			}
-			fp << ") ";
-			if (!callToPrototype.returnType.implicitlyConvertibleTo(this.returnType))
-				this.returnType.cprintCCastPrefix(fp, escapeMode);
-			fp << callToName << "(";
 			local isFirst = true;
-			local usedPrototypeArgc = #callToPrototype.argv;
-			local i, a;
-			for (i, a: util.enumerate(this.argv)) {
-				if (i >= usedPrototypeArgc)
-					break;
+			for (local a: argv) {
 				if (!isFirst)
 					fp << ", ";
-				local srcArg = this.argv[i];
-				local dstArg = callToPrototype.argv[i];
 				isFirst = false;
-				if (!srcArg.ctype.implicitlyConvertibleTo(dstArg.ctype))
-					dstArg.ctype.cprintCCastPrefix(fp, escapeMode);
 				fp << a.name;
 			}
-			for (++i; i < usedPrototypeArgc; ++i) {
+			if (myHaveEllipsis) {
 				if (!isFirst)
 					fp << ", ";
-				isFirst = false;
-				callToPrototype.argv[i].ctype
-					.cprintCCastPrefix(fp, escapeMode);
-				fp << "0";
+				fp << "...";
+			}
+			fp << ") " << callToName << "(";
+			if (otHaveEllipsis)
+				--otArgc;
+			if (myHaveEllipsis)
+				--myArgc;
+			local commonArgc = otArgc;
+			if (commonArgc > myArgc)
+				commonArgc = myArgc;
+			for (local i: [:commonArgc]) {
+				if (i)
+					fp << ", ";
+				local myArg = argv[i];
+				local otArg = callToPrototype.argv[i];
+				if (!myArg.implicitlyConvertibleTo(otArg))
+					otArg.cprintCCastPrefix(fp, escapeMode);
+				fp << myArg.name;
+			}
+			if (otArgc > commonArgc) {
+				if (commonArgc)
+					fp << ", ";
+				for (local i: [commonArgc:otArgc]) {
+					if (commonArgc != commonArgc)
+						fp << ", ";
+					callToPrototype.argv[i].cprintStubValue(fp, escapeMode);
+				}
+			}
+			if (myHaveEllipsis && otHaveEllipsis) {
+				if (otArgc)
+					fp << ", ";
+				fp << "__VA_ARGS__";
 			}
 			fp << ")";
 			return;
 		}
-		fp << " " << callToName;
+		/* Same # of arguments, and same ellipsis behavior.
+		 * Assume that a difference in CC is intentional and cast the
+		 * other function's pointer into the intended prototype's format. */
+		fp << " (*(";
+		returnType.cprint(fp, escapeMode);
+		fp << "(";
+		if (cc) {
+			escapeTextIntoFile(fp, cc, escapeMode);
+			fp << " ";
+		}
+		fp << "*)(";
+		local isFirst = true;
+		for (local a: argv) {
+			if (!isFirst)
+				fp << ", ";
+			isFirst = false;
+			a.ctype.cprint(fp, escapeMode);
+		}
+		if (myHaveEllipsis) {
+			if (!isFirst)
+				fp << ", ";
+			fp << "...";
+		}
+		fp << "))&" << callToName << ")";
 	}
 
 	@@Print a declaration akin to:
@@ -1012,7 +1058,7 @@ class FunctionImplementation {
 		if (oldExternLinkage !in ["", "C"])
 			fp.externLinkage = "";
 		/* Bind dependent functions. */
-		local deps = dependencyFunctions;
+		local deps: {string: Function} = dependencyFunctions;
 		for (local depName, depFun: deps) {
 			fp << "/* Dependency: "
 				<< depFun.name << " from "
@@ -1022,13 +1068,26 @@ class FunctionImplementation {
 				fp, escapeMode, dependencyDecl,
 				exposedName: depName,
 				guardName:   namespace.keyDefaultGuard(depName),
-				preferBindingMacros:      true,
-				printDeclarationPrefixes: true);
+				preferBindingMacros:       true,
+				printDeclarationPrefixes:  true,
+				onlyPrintPrimaryPrototype: true);
 		}
 		if (implPrefix) {
 			fp.namespace = GLOBAL_NAMESPACE;
-			for (local x: implPrefix)
-				escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
+			for (local x: implPrefix) {
+				escapeNonRepeatingTextIntoFile(
+					fp, x, escapeMode,
+					keyEscape: [](keyword: string): string {
+						if (keyword in deps) {
+							local res = keyDependency(keyword);
+							if (fp.namespace !== LOCAL_NAMESPACE)
+								res = "({} {})".format({ LOCAL_NAMESPACE.prefix, res });
+							return res;
+						}
+						return none;
+					},
+					forceKeyEscape: true);
+			}
 			fp.namespace = namespace;
 		}
 		if (doc)
@@ -1179,6 +1238,14 @@ class LocalFunction {
 				fp, escapeMode, name, usedPrototype,
 				dependencyDecl, documentationString,
 				LOCAL_NAMESPACE, keyDependency);
+			local myLocalDepName = keyLocalDep(name);
+			local myLocalDepGuard = LOCAL_NAMESPACE.keyDefaultGuard(myLocalDepName);
+			fp.forceStartOfLine();
+			/* Also bind ourself as a local dependency function */
+			fp << "#ifndef " << myLocalDepGuard << "\n"
+				"#define " << myLocalDepGuard << " 1\n"
+				"#define " << myLocalDepName << " " << LOCAL_NAMESPACE.keyCSymbolName(name) << "\n"
+				"#endif /* !" << myLocalDepGuard << " */\n";
 			fp.ppElse();
 			fp.ppUndef(localGuardName);
 			fp.ppEndif();
@@ -1205,8 +1272,7 @@ class LocalFunction {
 			fp.externLinkage = "";
 		/* Include the local-header for this function */
 		fp.ppInclude("<local/{}/{}.h>".format({
-			GET_LOCAL_PATH_NAME(originalSystemHeaderName, name),
-			name }));
+			originalSystemHeaderName, name }));
 		/* Remember that we'll be needing the local implementation of this function */
 		neededLocalFunction.insert(this);
 		fp.namespace = oldNs;
@@ -1321,19 +1387,8 @@ class InlineFunction {
 			dependenciesNamespace: Namespace = none, dependencyDecl: string = "__LIBC") {
 		local impl: FunctionImplementation = functionImpl;
 		local implName = impl.name;
-		if (impl.implPrefix) {
-			local oldNs = fp.namespace;
-			fp.namespace = GLOBAL_NAMESPACE;
-			local oldExternLinkage = fp.externLinkage;
-			if (oldExternLinkage !in ["", "C"])
-				fp.externLinkage = "";
-			for (local x: impl.implPrefix)
-				escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
-			fp.externLinkage = oldExternLinkage;
-			fp.namespace = oldNs;
-		}
 		/* Bind dependent functions. */
-		local deps = impl.dependencyFunctions;
+		local deps: {string: Function} = impl.dependencyFunctions;
 		local depKey = none;
 		if (deps) {
 			if (dependenciesNamespace is none)
@@ -1375,6 +1430,32 @@ class InlineFunction {
 					return exposedName;
 				return none;
 			};
+		}
+		if (impl.implPrefix) {
+			local oldNs = fp.namespace;
+			fp.namespace = GLOBAL_NAMESPACE;
+			local oldExternLinkage = fp.externLinkage;
+			if (oldExternLinkage !in ["", "C"])
+				fp.externLinkage = "";
+			for (local x: impl.implPrefix) {
+				escapeNonRepeatingTextIntoFile(
+					fp, x, escapeMode,
+					keyEscape: [](keyword: string): string {
+						if (keyword in deps) {
+							local res = keyDependency(keyword);
+							if (fp.namespace === dependenciesNamespace)
+								return res;
+							return "({} {})".format({
+								dependenciesNamespace.prefix,
+								res
+							});
+						}
+						return none;
+					},
+					forceKeyEscape: true);
+			}
+			fp.externLinkage = oldExternLinkage;
+			fp.namespace = oldNs;
 		}
 		for (local prototype: prototypes) {
 			if (doc)
@@ -1776,11 +1857,8 @@ class FunctionBinding {
 						fp.externLinkage = "";
 					/* Include the local-header for this function */
 					fp.ppInclude("<local/{}/{}.h>".format({
-						GET_LOCAL_PATH_NAME(
-							usedBinding.originalSystemHeaderName,
-							usedBinding.name),
-						usedBinding.name
-					}));
+						usedBinding.originalSystemHeaderName,
+						usedBinding.name }));
 					fp.externLinkage = oldExternLinkage;
 					fp.namespace = oldNs;
 				}
@@ -1802,10 +1880,32 @@ class FunctionBinding {
 			}
 			isFirst = false;
 			if (printDeclarationPrefixes) {
-				/* Print declaration prefixes */
-				for (local proto: associatedPrototypes) {
-					for (local x: proto.declPrefix)
-						escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
+				if (usedBinding is LocalFunction &&
+				    (#usedPrototypes == 1 && #associatedPrototypes == 1) &&
+				    associatedPrototypes.first.declPrefix ==
+				    usedBinding.functionPrototype.declPrefix) {
+					/* The same prefix will already be printed
+					 * inside of the local-function header. */
+				} else {
+					/* Print declaration prefixes */
+					local oldNs = none;
+					local oldExternLinkage;
+					for (local proto: associatedPrototypes) {
+						for (local x: proto.declPrefix) {
+							if (oldNs is none) {
+								oldNs = fp.namespace;
+								oldExternLinkage = fp.externLinkage;
+								fp.namespace = GLOBAL_NAMESPACE;
+								if (oldExternLinkage !in ["", "C"])
+									fp.externLinkage = "";
+							}
+							escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
+						}
+					}
+					if (oldNs !is none) {
+						fp.externLinkage = oldExternLinkage;
+						fp.namespace = oldNs;
+					}
 				}
 			}
 			local oldExternLinkage = fp.externLinkage;
@@ -1830,6 +1930,11 @@ class FunctionBinding {
 		if (guardName !is none) {
 			if (!isFirst)
 				fp.ppElse();
+			if (guardName == "__local___localdep__vswprintf_c_defined") {
+				fp << "// !!!!HERE!!!!\n";
+				fp << "// isFirst = " << repr(isFirst) << "\n";
+				fp << "// usedPrototypes = " << repr(usedPrototypes) << "\n";
+			}
 			fp.ppUndef(guardName);
 		}
 		if (!isFirst)
@@ -2428,8 +2533,17 @@ class LibraryFunction {
 			}
 			local impl: FunctionImplementation | string | UserString = bind.functionBinding;
 			if (impl is FunctionImplementation) {
-				for (local x: impl.implPrefix)
-					escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
+				local deps: {string: Function} = impl.dependencyFunctions;
+				for (local x: impl.implPrefix) {
+					escapeNonRepeatingTextIntoFile(fp, x, escapeMode,
+						keyEscape: [](keyword: string): string {
+							local depFun = deps.get(keyword);
+							if (depFun !is none)
+								return depFun.name;
+							return none;
+						},
+						forceKeyEscape: true);
+				}
 				/* TODO: Include @impl.implementationSection as @"ATTR_SECTION(...)"! */
 				if (doc)
 					fp.printComment(doc);
@@ -2439,7 +2553,7 @@ class LibraryFunction {
 					[](keyword: string): string {
 						if (keyword == impl.implementationName)
 							return this.name;
-						local depFun = impl.dependencyFunctions.get(keyword);
+						local depFun = deps.get(keyword);
 						if (depFun !is none)
 							return depFun.name;
 						return none;

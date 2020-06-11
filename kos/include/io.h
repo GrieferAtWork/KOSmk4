@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4645195 */
+/* HASH CRC-32:0x3b145c0d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -531,16 +531,16 @@ __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL _locking)(__fd_t __fd, int __cmd, __FS
 #ifdef __CRT_HAVE_unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_unlink,(char const *__filename),unlink,(__filename))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),unlink,(__file))
 #elif defined(__CRT_HAVE__unlink)
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_unlink,(char const *__filename),(__filename))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),(__file))
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <local/unistd/unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _unlink)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__filename); }
+__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); }
 #else /* ... */
 #undef ___unlink_defined
 #endif /* !... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21841d56 */
+/* HASH CRC-32:0xc7569c38 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,32 +19,26 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cnd_wait_defined
-#ifdef __CRT_HAVE_pthread_cond_wait
 #define __local_cnd_wait_defined 1
 #include <__crt.h>
-#include <bits/threads.h>
-
-#include <bits/pthreadtypes.h>
-#include <asm/threads.h>
-/* Dependency: "pthread_cond_wait" */
-#ifndef ____localdep_pthread_cond_wait_defined
-#define ____localdep_pthread_cond_wait_defined 1
 #ifdef __CRT_HAVE_pthread_cond_wait
+#include <bits/threads.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pthread_cond_wait from pthread */
+#if !defined(__local___localdep_pthread_cond_wait_defined) && defined(__CRT_HAVE_pthread_cond_wait)
+#define __local___localdep_pthread_cond_wait_defined 1
 /* Wait for condition variable COND to be signaled or broadcast.
  * MUTEX is assumed to be locked before. */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_cond_wait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex),pthread_cond_wait,(__cond,__mutex))
-#else /* LIBC: pthread_cond_wait */
-#undef ____localdep_pthread_cond_wait_defined
-#endif /* pthread_cond_wait... */
-#endif /* !____localdep_pthread_cond_wait_defined */
-
+#endif /* !__local___localdep_pthread_cond_wait_defined && __CRT_HAVE_pthread_cond_wait */
+__NAMESPACE_LOCAL_END
+#include <asm/threads.h>
+#include <bits/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Block current thread on the condition variable pointed by COND
  * s.a. `pthread_cond_wait()' */
 __LOCAL_LIBC(cnd_wait) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_wait))(__cnd_t *__restrict __cond,
-                                                      __mtx_t *__restrict __mutex) {
-#line 471 "kos/src/libc/magic/threads.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_wait))(__cnd_t *__restrict __cond, __mtx_t *__restrict __mutex) {
 	int __error;
 	__error = __localdep_pthread_cond_wait((__pthread_cond_t *)__cond,
 	                          (__pthread_mutex_t *)__mutex);
@@ -53,5 +47,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_wait))(__cnd_t *__restrict __cond
 	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_pthread_cond_wait */
+#ifndef __local___localdep_cnd_wait_defined
+#define __local___localdep_cnd_wait_defined 1
+#define __localdep_cnd_wait __LIBC_LOCAL_NAME(cnd_wait)
+#endif /* !__local___localdep_cnd_wait_defined */
+#else /* __CRT_HAVE_pthread_cond_wait */
+#undef __local_cnd_wait_defined
+#endif /* !__CRT_HAVE_pthread_cond_wait */
 #endif /* !__local_cnd_wait_defined */

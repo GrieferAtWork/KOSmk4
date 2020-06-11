@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc029181 */
+/* HASH CRC-32:0xc881aff2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,39 +19,41 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lseek64_defined
-#if defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #define __local_lseek64_defined 1
 #include <__crt.h>
-/* Dependency: "lseek32" from "unistd" */
-#ifndef ____localdep_lseek32_defined
-#define ____localdep_lseek32_defined 1
+#if defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: lseek32 from unistd */
+#ifndef __local___localdep_lseek32_defined
+#define __local___localdep_lseek32_defined 1
 #ifdef __CRT_HAVE_lseek
-/* >> lseek32(2)
+/* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, int __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseek)
-/* >> lseek32(2)
+/* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, int __whence),_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___lseek)
-/* >> lseek32(2)
+/* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, int __whence),__lseek,(__fd,__offset,__whence))
-#else /* LIBC: lseek */
-#undef ____localdep_lseek32_defined
-#endif /* lseek32... */
-#endif /* !____localdep_lseek32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_lseek32_defined
+#endif /* !... */
+#endif /* !__local___localdep_lseek32_defined */
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __LOCAL_LIBC(lseek64) __off64_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lseek64))(__fd_t __fd,
-                                                     __off64_t __offset,
-                                                     int __whence) {
-#line 825 "kos/src/libc/magic/unistd.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lseek64))(__fd_t __fd, __off64_t __offset, int __whence) {
 	return __localdep_lseek32(__fd, (__off32_t)__offset, __whence);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek */
+#ifndef __local___localdep_lseek64_defined
+#define __local___localdep_lseek64_defined 1
+#define __localdep_lseek64 __LIBC_LOCAL_NAME(lseek64)
+#endif /* !__local___localdep_lseek64_defined */
+#else /* __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek */
+#undef __local_lseek64_defined
+#endif /* !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek */
 #endif /* !__local_lseek64_defined */

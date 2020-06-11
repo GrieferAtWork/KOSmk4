@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7e48a42 */
+/* HASH CRC-32:0x26a47c12 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__strdup_dbg_defined
-#if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup)
 #define __local__strdup_dbg_defined 1
 #include <__crt.h>
-/* Dependency: "strdup" from "string" */
-#ifndef ____localdep_strdup_defined
-#define ____localdep_strdup_defined 1
+#if defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strdup from string */
+#ifndef __local___localdep_strdup_defined
+#define __local___localdep_strdup_defined 1
 #if __has_builtin(__builtin_strdup) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strdup)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strdup,(char const *__restrict __string),strdup,{ return __builtin_strdup(__string); })
 #elif defined(__CRT_HAVE_strdup)
@@ -33,26 +34,28 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strdup,(char const *__restrict __string),_strdup,(__string))
 #elif defined(__CRT_HAVE___strdup)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strdup,(char const *__restrict __string),__strdup,(__string))
-#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_END
 #include <local/string/strdup.h>
-#define __localdep_strdup (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strdup))
-#else /* CUSTOM: strdup */
-#undef ____localdep_strdup_defined
-#endif /* strdup... */
-#endif /* !____localdep_strdup_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strdup __LIBC_LOCAL_NAME(strdup)
+#else /* ... */
+#undef __local___localdep_strdup_defined
+#endif /* !... */
+#endif /* !__local___localdep_strdup_defined */
 __LOCAL_LIBC(_strdup_dbg) __ATTR_MALLOC __ATTR_WUNUSED char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strdup_dbg))(char const *__string,
-                                                         int __block_type,
-                                                         char const *__filename,
-                                                         int __line) {
-#line 415 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strdup_dbg))(char const *__string, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
 	return __localdep_strdup(__string);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_posix_memalign || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_malloc || __CRT_HAVE_strdup || __CRT_HAVE__strdup || __CRT_HAVE___strdup */
+#ifndef __local___localdep__strdup_dbg_defined
+#define __local___localdep__strdup_dbg_defined 1
+#define __localdep__strdup_dbg __LIBC_LOCAL_NAME(_strdup_dbg)
+#endif /* !__local___localdep__strdup_dbg_defined */
+#else /* __CRT_HAVE_strdup || __CRT_HAVE__strdup || __CRT_HAVE___strdup || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+#undef __local__strdup_dbg_defined
+#endif /* !__CRT_HAVE_strdup && !__CRT_HAVE__strdup && !__CRT_HAVE___strdup && !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
 #endif /* !__local__strdup_dbg_defined */

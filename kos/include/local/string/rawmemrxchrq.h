@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd87ae7c3 */
+/* HASH CRC-32:0x39bdd578 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `rawmemrchrq', but search for non-matching locations. */
 __LOCAL_LIBC(rawmemrxchrq) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrxchrq))(/*aligned(8)*/ void const *__restrict __haystack,
-                                                          __UINT64_TYPE__ __qword) {
-#line 2349 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrxchrq))(void const *__restrict __haystack, __UINT64_TYPE__ __qword) {
 	__UINT64_TYPE__ *__iter = (__UINT64_TYPE__ *)__haystack;
 	for (;;) {
 		if __unlikely(*--__iter != __qword)
@@ -35,4 +33,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrxchrq))(/*aligned(8)*/ void co
 	return __iter;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_rawmemrxchrq_defined
+#define __local___localdep_rawmemrxchrq_defined 1
+#define __localdep_rawmemrxchrq __LIBC_LOCAL_NAME(rawmemrxchrq)
+#endif /* !__local___localdep_rawmemrxchrq_defined */
 #endif /* !__local_rawmemrxchrq_defined */

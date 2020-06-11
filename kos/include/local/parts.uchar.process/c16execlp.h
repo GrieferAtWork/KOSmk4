@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ccf69c2 */
+/* HASH CRC-32:0x59188230 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,34 +19,34 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16execlp_defined
-#if (defined(__CRT_HAVE_wexecvp) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wexecvp) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wexecvp)
 #define __local_c16execlp_defined 1
 #include <__crt.h>
+#if (defined(__CRT_HAVE_wexecvp) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wexecvp)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: c16execvp from parts.uchar.process */
+#ifndef __local___localdep_c16execvp_defined
+#define __local___localdep_c16execvp_defined 1
+#if defined(__CRT_HAVE_wexecvp) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBDCALL,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV),wexecvp,(__path,___argv))
+#elif defined(__CRT_HAVE_DOS$_wexecvp)
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV),_wexecvp,(__path,___argv))
+#else /* ... */
+#undef __local___localdep_c16execvp_defined
+#endif /* !... */
+#endif /* !__local___localdep_c16execvp_defined */
+__NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
-/* Dependency: "c16execvp" from "parts.uchar.process" */
-#ifndef ____localdep_c16execvp_defined
-#define ____localdep_c16execvp_defined 1
-#if defined(__CRT_HAVE_wexecvp) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),wexecvp,(__path,___argv))
-#elif defined(__CRT_HAVE__wexecvp) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wexecvp,(__path,___argv))
-#elif defined(__CRT_HAVE_DOS$_wexecvp)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wexecvp,(__path,___argv))
-#elif defined(__CRT_HAVE_DOS$_wexecvp)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wexecvp,(__path,___argv))
-#else /* LIBC: c16execvp */
-#undef ____localdep_c16execvp_defined
-#endif /* c16execvp... */
-#endif /* !____localdep_c16execvp_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16execlp) __ATTR_SENTINEL __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(c16execlp))(__CHAR16_TYPE__ const *__restrict __file,
-                                                        __CHAR16_TYPE__ const *__args,
-                                                        ... /*, (char16_t *)NULL*/) {
-#line 114 "kos/src/libc/magic/parts.uchar.process.c"
+__NOTHROW_RPC(__VLIBDCALL __LIBC_LOCAL_NAME(c16execlp))(__CHAR16_TYPE__ const *__restrict __file, __CHAR16_TYPE__ const *__args, ...) {
 	__REDIRECT_EXECL(__CHAR16_TYPE__, __localdep_c16execvp, __file, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_wexecvp && __SIZEOF_WCHAR_T__ == 2) || (__CRT_HAVE__wexecvp && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_DOS$_wexecvp */
+#ifndef __local___localdep_c16execlp_defined
+#define __local___localdep_c16execlp_defined 1
+#define __localdep_c16execlp __LIBC_LOCAL_NAME(c16execlp)
+#endif /* !__local___localdep_c16execlp_defined */
+#else /* (__CRT_HAVE_wexecvp && (__SIZEOF_WCHAR_T__ == 2) && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wexecvp */
+#undef __local_c16execlp_defined
+#endif /* (!__CRT_HAVE_wexecvp || !(__SIZEOF_WCHAR_T__ == 2) || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$_wexecvp */
 #endif /* !__local_c16execlp_defined */

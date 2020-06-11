@@ -62,10 +62,10 @@ c32stold(*) %{uchar("wcstold")}
 
 %
 %#ifdef __USE_GNU
-c16stoq(*) = c16stoll;
-c32stoq(*) = c32stoll;
-c16stouq(*) = c16stoull;
-c32stouq(*) = c32stoull;
+%[insert:function(c16stoq = c16stoll)]
+%[insert:function(c32stoq = c32stoll)]
+%[insert:function(c16stouq = c16stoull)]
+%[insert:function(c32stouq = c32stoull)]
 c16stol_l(*) %{uchar("wcstol_l")}
 c32stol_l(*) %{uchar("wcstol_l")}
 c16stoul_l(*) %{uchar("wcstoul_l")}

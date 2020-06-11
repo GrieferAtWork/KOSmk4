@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb38f9682 */
+/* HASH CRC-32:0xba55fa71 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_exp2l_defined
-#if defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
 #define __local_exp2l_defined 1
 #include <__crt.h>
-/* Dependency: "exp2" */
-#ifndef ____localdep_exp2_defined
-#define ____localdep_exp2_defined 1
+#if defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: exp2 from math */
+#ifndef __local___localdep_exp2_defined
+#define __local___localdep_exp2_defined 1
 #if __has_builtin(__builtin_exp2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp2)
 /* Compute base-2 exponential of X */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp2,(double __x),exp2,{ return __builtin_exp2(__x); })
@@ -34,18 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp2,(double __x),exp2,(_
 #elif defined(__CRT_HAVE___exp2)
 /* Compute base-2 exponential of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp2,(double __x),__exp2,(__x))
-#else /* LIBC: exp2 */
-#undef ____localdep_exp2_defined
-#endif /* exp2... */
-#endif /* !____localdep_exp2_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_exp2_defined
+#endif /* !... */
+#endif /* !__local___localdep_exp2_defined */
 /* Compute base-2 exponential of X */
 __LOCAL_LIBC(exp2l) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp2l))(__LONGDOUBLE __x) {
-#line 514 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_exp2((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_exp2 || __CRT_HAVE___exp2 */
+#ifndef __local___localdep_exp2l_defined
+#define __local___localdep_exp2l_defined 1
+#define __localdep_exp2l __LIBC_LOCAL_NAME(exp2l)
+#endif /* !__local___localdep_exp2l_defined */
+#else /* __CRT_HAVE_exp2 || __CRT_HAVE___exp2 */
+#undef __local_exp2l_defined
+#endif /* !__CRT_HAVE_exp2 && !__CRT_HAVE___exp2 */
 #endif /* !__local_exp2l_defined */

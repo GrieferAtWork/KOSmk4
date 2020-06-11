@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70671f60 */
+/* HASH CRC-32:0x4062b26 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,17 +19,23 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__get_pgmptr_defined
-#include <local/program_invocation_name.h>
-#ifdef __LOCAL_program_invocation_name
 #define __local__get_pgmptr_defined 1
 #include <__crt.h>
+#include <local/program_invocation_name.h>
+#ifdef __LOCAL_program_invocation_name
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_get_pgmptr) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_pgmptr))(char **__pvalue) {
-#line 2199 "kos/src/libc/magic/stdlib.c"
 	*__pvalue = __LOCAL_program_invocation_name;
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __LOCAL_program_invocation_name */
+#ifndef __local___localdep__get_pgmptr_defined
+#define __local___localdep__get_pgmptr_defined 1
+#define __localdep__get_pgmptr __LIBC_LOCAL_NAME(_get_pgmptr)
+#endif /* !__local___localdep__get_pgmptr_defined */
+#else /* __LOCAL_program_invocation_name */
+#undef __local__get_pgmptr_defined
+#endif /* !__LOCAL_program_invocation_name */
 #endif /* !__local__get_pgmptr_defined */

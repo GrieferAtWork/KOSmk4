@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x746f380 */
+/* HASH CRC-32:0xc5eaa738 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,38 +21,38 @@
 #ifndef __local__CrtMemDifference_defined
 #define __local__CrtMemDifference_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "memset" from "string" */
-#ifndef ____localdep_memset_defined
-#define ____localdep_memset_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memset from string */
+#ifndef __local___localdep_memset_defined
+#define __local___localdep_memset_defined 1
 #ifdef __fast_memset_defined
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))
+__NAMESPACE_FAST_USING(memset)
+#define __localdep_memset __LIBC_FAST_NAME(memset)
 #elif defined(__CRT_HAVE_memset)
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* LIBC: memset */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memset.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))
-#endif /* memset... */
-#endif /* !____localdep_memset_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_memset __LIBC_LOCAL_NAME(memset)
+#endif /* !... */
+#endif /* !__local___localdep_memset_defined */
 __LOCAL_LIBC(_CrtMemDifference) __ATTR_NONNULL((1, 2, 3)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtMemDifference))(/*out*/ _CrtMemState *__state,
-                                                               _CrtMemState const *__old_state,
-                                                               _CrtMemState const *__new_state) {
-#line 607 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtMemDifference))(_CrtMemState *__state, _CrtMemState const *__old_state, _CrtMemState const *__new_state) {
 	(void)__old_state;
 	(void)__new_state;
 	__localdep_memset(__state, 0, sizeof(*__state));
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__CrtMemDifference_defined
+#define __local___localdep__CrtMemDifference_defined 1
+#define __localdep__CrtMemDifference __LIBC_LOCAL_NAME(_CrtMemDifference)
+#endif /* !__local___localdep__CrtMemDifference_defined */
 #endif /* !__local__CrtMemDifference_defined */

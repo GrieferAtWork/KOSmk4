@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30e8d18b */
+/* HASH CRC-32:0xd25add86 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,36 +21,36 @@
 #ifndef __local___mempmoveq_chk_defined
 #define __local___mempmoveq_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "mempmoveq" from "string" */
-#ifndef ____localdep_mempmoveq_defined
-#define ____localdep_mempmoveq_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempmoveq from string */
+#ifndef __local___localdep_mempmoveq_defined
+#define __local___localdep_mempmoveq_defined 1
 #ifdef __fast_mempmoveq_defined
 /* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
-#define __localdep_mempmoveq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveq))
+__NAMESPACE_FAST_USING(mempmoveq)
+#define __localdep_mempmoveq __LIBC_FAST_NAME(mempmoveq)
 #elif defined(__CRT_HAVE_mempmoveq)
 /* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveq,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveq,(__dst,__src,__n_qwords))
-#else /* LIBC: mempmoveq */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveq,(__dst,__src,__n_qwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempmoveq.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
-#define __localdep_mempmoveq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveq))
-#endif /* mempmoveq... */
-#endif /* !____localdep_mempmoveq_defined */
-
+#define __localdep_mempmoveq __LIBC_LOCAL_NAME(mempmoveq)
+#endif /* !... */
+#endif /* !__local___localdep_mempmoveq_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__mempmoveq_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempmoveq_chk))(/*aligned(8)*/ void *__restrict __dst,
-                                                             /*aligned(8)*/ void const *__restrict __src,
-                                                             __SIZE_TYPE__ __n_qwords,
-                                                             __SIZE_TYPE__ __dst_objsize) {
-#line 102 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempmoveq_chk))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("mempmoveq", __dst, __n_qwords * 8, __dst_objsize);
 	return __localdep_mempmoveq(__dst, __src, __n_qwords);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___mempmoveq_chk_defined
+#define __local___localdep___mempmoveq_chk_defined 1
+#define __localdep___mempmoveq_chk __LIBC_LOCAL_NAME(__mempmoveq_chk)
+#endif /* !__local___localdep___mempmoveq_chk_defined */
 #endif /* !__local___mempmoveq_chk_defined */

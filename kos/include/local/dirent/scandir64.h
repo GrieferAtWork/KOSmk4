@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd1bf892 */
+/* HASH CRC-32:0x813bac9e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,33 +19,34 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_scandir64_defined
-#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_scandirat64) || (defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)))
 #define __local_scandir64_defined 1
 #include <__crt.h>
-/* Dependency: "scandirat64" */
-#ifndef ____localdep_scandirat64_defined
-#define ____localdep_scandirat64_defined 1
+#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_scandirat64) || (defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: scandirat64 from dirent */
+#ifndef __local___localdep_scandirat64_defined
+#define __local___localdep_scandirat64_defined 1
 #ifdef __CRT_HAVE_scandirat64
 /* 64-bit variant of `scandirat()' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp),scandirat64,(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)
 /* 64-bit variant of `scandirat()' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp),scandirat,(__dirfd,__dir,__namelist,__selector,__cmp))
-#else /* LIBC: scandirat64 */
-#undef ____localdep_scandirat64_defined
-#endif /* scandirat64... */
-#endif /* !____localdep_scandirat64_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_scandirat64_defined
+#endif /* !... */
+#endif /* !__local___localdep_scandirat64_defined */
 /* 64-bit variant of `scandir()' */
 __LOCAL_LIBC(scandir64) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(scandir64))(char const *__restrict __dir,
-                                                       struct dirent64 ***__restrict __namelist,
-                                                       __scandir64_selector_t __selector,
-                                                       __scandir64_cmp_t __cmp) {
-#line 285 "kos/src/libc/magic/dirent.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(scandir64))(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp) {
 	return __localdep_scandirat64(__CRT_AT_FDCWD, __dir, __namelist, __selector, __cmp);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && (__CRT_HAVE_scandirat64 || (__CRT_HAVE_scandirat && _DIRENT_MATCHES_DIRENT64)) */
+#ifndef __local___localdep_scandir64_defined
+#define __local___localdep_scandir64_defined 1
+#define __localdep_scandir64 __LIBC_LOCAL_NAME(scandir64)
+#endif /* !__local___localdep_scandir64_defined */
+#else /* __CRT_AT_FDCWD && (__CRT_HAVE_scandirat64 || (__CRT_HAVE_scandirat && _DIRENT_MATCHES_DIRENT64)) */
+#undef __local_scandir64_defined
+#endif /* !__CRT_AT_FDCWD || (!__CRT_HAVE_scandirat64 && (!__CRT_HAVE_scandirat || !_DIRENT_MATCHES_DIRENT64)) */
 #endif /* !__local_scandir64_defined */

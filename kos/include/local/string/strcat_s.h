@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71210066 */
+/* HASH CRC-32:0xadeb07bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,7 @@
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strcat_s) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcat_s))(char *__dst,
-                                                      __SIZE_TYPE__ __dstsize,
-                                                      char const *__src) {
-#line 5005 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcat_s))(char *__dst, __SIZE_TYPE__ __dstsize, char const *__src) {
 	if (!__dst || !__src)
 		return __EINVAL;
 	while (__dstsize && *__dst) {
@@ -43,4 +40,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcat_s))(char *__dst,
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strcat_s_defined
+#define __local___localdep_strcat_s_defined 1
+#define __localdep_strcat_s __LIBC_LOCAL_NAME(strcat_s)
+#endif /* !__local___localdep_strcat_s_defined */
 #endif /* !__local_strcat_s_defined */

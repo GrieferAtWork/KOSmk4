@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd038bd82 */
+/* HASH CRC-32:0x1fe6b72a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcstou64) __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstou64))(__WCHAR_TYPE__ const *__restrict __nptr,
-                                                      __WCHAR_TYPE__ **__endptr,
-                                                      int __base) {
-#line 1027 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstou64))(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, int __base) {
 	__UINT64_TYPE__ __result, __temp;
 	if (!__base) {
 		if (*__nptr == '0') {
@@ -67,4 +64,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstou64))(__WCHAR_TYPE__ const *__re
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcstou64_defined
+#define __local___localdep_wcstou64_defined 1
+#define __localdep_wcstou64 __LIBC_LOCAL_NAME(wcstou64)
+#endif /* !__local___localdep_wcstou64_defined */
 #endif /* !__local_wcstou64_defined */

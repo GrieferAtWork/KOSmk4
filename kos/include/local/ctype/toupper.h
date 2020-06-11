@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1d07e8 */
+/* HASH CRC-32:0x680d709e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,38 +21,41 @@
 #ifndef __local_toupper_defined
 #define __local_toupper_defined 1
 #include <__crt.h>
-/* Dependency: "__ctype_toupper_loc" from "ctype" */
-#ifndef ____localdep___ctype_toupper_loc_defined
-#define ____localdep___ctype_toupper_loc_defined 1
-#ifdef __CRT_HAVE___ctype_toupper_loc
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: __ctype_toupper_loc from ctype */
+#if !defined(__local___localdep___ctype_toupper_loc_defined) && defined(__CRT_HAVE___ctype_toupper_loc)
+#define __local___localdep___ctype_toupper_loc_defined 1
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__INT32_TYPE__ const **,__NOTHROW,__localdep___ctype_toupper_loc,(void),__ctype_toupper_loc,())
-#else /* LIBC: __ctype_toupper_loc */
-#undef ____localdep___ctype_toupper_loc_defined
-#endif /* __ctype_toupper_loc... */
-#endif /* !____localdep___ctype_toupper_loc_defined */
-
-/* Dependency: "islower" from "ctype" */
-#ifndef ____localdep_islower_defined
-#define ____localdep_islower_defined 1
+#endif /* !__local___localdep___ctype_toupper_loc_defined && __CRT_HAVE___ctype_toupper_loc */
+/* Dependency: islower from ctype */
+#ifndef __local___localdep_islower_defined
+#define __local___localdep_islower_defined 1
 #if __has_builtin(__builtin_islower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_islower)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,{ return __builtin_islower(__ch); })
 #elif defined(__CRT_HAVE_islower)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,(__ch))
-#else /* LIBC: islower */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/islower.h>
-#define __localdep_islower (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(islower))
-#endif /* islower... */
-#endif /* !____localdep_islower_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_islower __LIBC_LOCAL_NAME(islower)
+#endif /* !... */
+#endif /* !__local___localdep_islower_defined */
 __LOCAL_LIBC(toupper) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(toupper))(int __ch) {
-#line 300 "kos/src/libc/magic/ctype.c"
-#if (defined(__CRT_HAVE___ctype_toupper_loc)) && defined(__CRT_CYG)
-	return __ch >= -128 && __ch < 256 ? (*__localdep___ctype_toupper_loc())[__ch] : __ch;
-#else
+#ifdef __BUILDING_LIBC
 	return __localdep_islower(__ch) ? ((__UINT8_TYPE__)__ch-0x20) : __ch;
-#endif
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_toupper_loc) && defined(__CRT_CYG)
+	return __ch >= -128 && __ch < 256 ? (*__localdep___ctype_toupper_loc())[__ch] : __ch;
+#else /* __CRT_HAVE___ctype_toupper_loc && __CRT_CYG */
+	return __localdep_islower(__ch) ? ((__UINT8_TYPE__)__ch-0x20) : __ch;
+#endif /* !__CRT_HAVE___ctype_toupper_loc || !__CRT_CYG */
+#endif /* !__BUILDING_LIBC */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_toupper_defined
+#define __local___localdep_toupper_defined 1
+#define __localdep_toupper __LIBC_LOCAL_NAME(toupper)
+#endif /* !__local___localdep_toupper_defined */
 #endif /* !__local_toupper_defined */

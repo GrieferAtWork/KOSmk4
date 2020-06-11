@@ -110,7 +110,7 @@ void _endthreadex($u32 exitcode);
 %#define _CRT_TERMINATE_DEFINED 1
 %[insert:extern(exit)]
 %[insert:extern(abort)]
-[[guard]] _exit(*) = _Exit;
+%[insert:guarded_function(_exit = _Exit)]
 %#endif /* !_CRT_TERMINATE_DEFINED */
 
 %[default_impl_section(".text.crt.dos.sched.process")]
@@ -122,17 +122,17 @@ void _endthreadex($u32 exitcode);
 $pid_t _getpid() = getpid;
 
 %[default_impl_section(".text.crt.dos.fs.exec.exec")]
-_execv(*) = execv;
-_execvp(*) = execvp;
-_execve(*) = execve;
-_execvpe(*) = execvpe;
-_execl(*) = execl;
-_execlp(*) = execlp;
-_execle(*) = execle;
-_execlpe(*) = execlpe;
+%[insert:function(_execv = execv)]
+%[insert:function(_execvp = execvp)]
+%[insert:function(_execve = execve)]
+%[insert:function(_execvpe = execvpe)]
+%[insert:function(_execl = execl)]
+%[insert:function(_execlp = execlp)]
+%[insert:function(_execle = execle)]
+%[insert:function(_execlpe = execlpe)]
 
 %[default_impl_section(".text.crt.dos.fs.exec.spawn")]
-_cwait(*) = cwait;
+%[insert:function(_cwait = cwait)]
 
 [[argument_names(mode, path, ___argv)]]
 intptr_t _spawnv(int mode, [[nonnull]] char const *__restrict path,
@@ -172,7 +172,7 @@ intptr_t _spawnlpe(int mode, [[nonnull]] char const *__restrict file,
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 %[default_impl_section(".text.crt.dos.fs.dlfcn")]
-[[throws]]
+[[throws, decl_include("<features.h>")]]
 intptr_t _loaddll(char __KOS_FIXED_CONST *file);
 
 [[throws]]
@@ -182,7 +182,7 @@ int _unloaddll(intptr_t hnd);
 %typedef int (__LIBCCALL *__procfun)(void);
 %[define_replacement(__procfun = __procfun)]
 
-[[throws]]
+[[throws, decl_include("<features.h>")]]
 __procfun _getdllprocaddr(intptr_t hnd,
                           char __KOS_FIXED_CONST *symname,
                           intptr_t ord);
@@ -216,14 +216,14 @@ typedef __intptr_t intptr_t;
 %#ifndef _WPROCESS_DEFINED
 %#define _WPROCESS_DEFINED 1
 %[default_impl_section("{.text.crt.wchar.fs.exec.exec|.text.crt.dos.wchar.fs.exec.exec}")]
-_wexecv(*) = wexecv;
-_wexecvp(*) = wexecvp;
-_wexecve(*) = wexecve;
-_wexecvpe(*) = wexecvpe;
-_wexecl(*) = wexecl;
-_wexeclp(*) = wexeclp;
-_wexecle(*) = wexecle;
-_wexeclpe(*) = wexeclpe;
+%[insert:function(_wexecv = wexecv)]
+%[insert:function(_wexecvp = wexecvp)]
+%[insert:function(_wexecve = wexecve)]
+%[insert:function(_wexecvpe = wexecvpe)]
+%[insert:function(_wexecl = wexecl)]
+%[insert:function(_wexeclp = wexeclp)]
+%[insert:function(_wexecle = wexecle)]
+%[insert:function(_wexeclpe = wexeclpe)]
 
 %[default_impl_section("{.text.crt.wchar.fs.exec.spawn|.text.crt.dos.wchar.fs.exec.spawn}")]
 [[argument_names(mode, path, ___argv)]]
@@ -260,10 +260,7 @@ intptr_t _wspawnlpe(int mode, [[nonnull]] wchar_t const *__restrict path,
 %#endif /* !_WPROCESS_DEFINED */
 
 %
-%#ifndef _CRT_WSYSTEM_DEFINED
-%#define _CRT_WSYSTEM_DEFINED 1
-[[guard]] _wsystem(*) = wsystem;
-%#endif /* !_CRT_WSYSTEM_DEFINED */
+%[insert:function(_wsystem = wsystem, guardName: "_CRT_WSYSTEM_DEFINED")]
 
 
 

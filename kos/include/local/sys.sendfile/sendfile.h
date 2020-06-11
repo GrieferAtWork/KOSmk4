@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e063837 */
+/* HASH CRC-32:0x3a34b91f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sendfile_defined
-#if defined(__CRT_HAVE_sendfile) || defined(__CRT_HAVE_sendfile64)
 #define __local_sendfile_defined 1
 #include <__crt.h>
-/* Dependency: "sendfile64" from "sys.sendfile" */
-#ifndef ____localdep_sendfile64_defined
-#define ____localdep_sendfile64_defined 1
+#if defined(__CRT_HAVE_sendfile) || defined(__CRT_HAVE_sendfile64)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: sendfile64 from sys.sendfile */
+#ifndef __local___localdep_sendfile64_defined
+#define __local___localdep_sendfile64_defined 1
 #ifdef __CRT_HAVE_sendfile64
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
@@ -38,43 +39,34 @@ __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile64,(__fd_t __out_fd
  * Return the number of written bytes, or -1 in case of error */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __off64_t *__offset, __SIZE_TYPE__ __count),sendfile,(__out_fd,__in_fd,__offset,__count))
 #elif defined(__CRT_HAVE_sendfile)
+__NAMESPACE_LOCAL_END
 #include <local/sys.sendfile/sendfile64.h>
-/* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
- * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
- * read bytes. If OFFSET is a null pointer, use the normal file position instead.
- * Return the number of written bytes, or -1 in case of error */
-#define __localdep_sendfile64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sendfile64))
-#else /* CUSTOM: sendfile64 */
-#undef ____localdep_sendfile64_defined
-#endif /* sendfile64... */
-#endif /* !____localdep_sendfile64_defined */
-
-/* Dependency: "sendfile32" from "sys.sendfile" */
-#ifndef ____localdep_sendfile32_defined
-#define ____localdep_sendfile32_defined 1
-#ifdef __CRT_HAVE_sendfile
-/* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
- * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
- * read bytes. If OFFSET is a null pointer, use the normal file position instead.
- * Return the number of written bytes, or -1 in case of error */
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile32,(__fd_t __out_fd, __fd_t __in_fd, __off32_t *__offset, __SIZE_TYPE__ __count),sendfile,(__out_fd,__in_fd,__offset,__count))
-#else /* LIBC: sendfile */
-#undef ____localdep_sendfile32_defined
-#endif /* sendfile32... */
-#endif /* !____localdep_sendfile32_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
  * Return the number of written bytes, or -1 in case of error */
+#define __localdep_sendfile64 __LIBC_LOCAL_NAME(sendfile64)
+#else /* ... */
+#undef __local___localdep_sendfile64_defined
+#endif /* !... */
+#endif /* !__local___localdep_sendfile64_defined */
+/* Dependency: sendfile32 from sys.sendfile */
+#if !defined(__local___localdep_sendfile32_defined) && defined(__CRT_HAVE_sendfile)
+#define __local___localdep_sendfile32_defined 1
+/* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
+ * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
+ * read bytes. If OFFSET is a null pointer, use the normal file position instead.
+ * Return the number of written bytes, or -1 in case of error */
+__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile32,(__fd_t __out_fd, __fd_t __in_fd, __off32_t *__offset, __SIZE_TYPE__ __count),sendfile,(__out_fd,__in_fd,__offset,__count))
+#endif /* !__local___localdep_sendfile32_defined && __CRT_HAVE_sendfile */
+/* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
+ * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
+ * read bytes. If OFFSET is a null pointer, use the normal file position instead.
+ * Return the number of written bytes, or -1 in case of error */
 __LOCAL_LIBC(sendfile) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sendfile))(__fd_t __out_fd,
-                                                      __fd_t __in_fd,
-                                                      __FS_TYPE(off) *__offset,
-                                                      __SIZE_TYPE__ __count) {
-#line 68 "kos/src/libc/magic/sys.sendfile.c"
-#ifdef __CRT_HAVE_sendfile64
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sendfile))(__fd_t __out_fd, __fd_t __in_fd, __FS_TYPE(off) *__offset, __SIZE_TYPE__ __count) {
+#if defined(__CRT_HAVE_sendfile64) || defined(__CRT_HAVE_sendfile)
 	__SSIZE_TYPE__ __result;
 	if (__offset) {
 		__off64_t __temp = *__offset;
@@ -84,7 +76,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sendfile))(__fd_t __out_fd,
 		__result = __localdep_sendfile64(__out_fd, __in_fd, __NULLPTR, __count);
 	}
 	return __result;
-#else /* __CRT_HAVE_mmap64 */
+#else /* __CRT_HAVE_sendfile64 || __CRT_HAVE_sendfile */
 	__SSIZE_TYPE__ __result;
 	if (__offset) {
 		__off32_t __temp = (__off32_t)*__offset;
@@ -94,8 +86,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sendfile))(__fd_t __out_fd,
 		__result = __localdep_sendfile32(__out_fd, __in_fd, __NULLPTR, __count);
 	}
 	return __result;
-#endif /* !__CRT_HAVE_mmap64 */
+#endif /* !__CRT_HAVE_sendfile64 && !__CRT_HAVE_sendfile */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_sendfile || __CRT_HAVE_sendfile64 */
+#ifndef __local___localdep_sendfile_defined
+#define __local___localdep_sendfile_defined 1
+#define __localdep_sendfile __LIBC_LOCAL_NAME(sendfile)
+#endif /* !__local___localdep_sendfile_defined */
+#else /* __CRT_HAVE_sendfile || __CRT_HAVE_sendfile64 */
+#undef __local_sendfile_defined
+#endif /* !__CRT_HAVE_sendfile && !__CRT_HAVE_sendfile64 */
 #endif /* !__local_sendfile_defined */

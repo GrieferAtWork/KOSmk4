@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff00b36f */
+/* HASH CRC-32:0x20ca92b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,28 @@
 #ifndef __local_wctype_l_defined
 #define __local_wctype_l_defined 1
 #include <__crt.h>
-/* Dependency: "wctype" from "wctype" */
-#ifndef ____localdep_wctype_defined
-#define ____localdep_wctype_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wctype from wctype */
+#ifndef __local___localdep_wctype_defined
+#define __local___localdep_wctype_defined 1
 #ifdef __CRT_HAVE_wctype
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCTYPE_TYPE__,__NOTHROW_NCX,__localdep_wctype,(char const *__prop),wctype,(__prop))
-#else /* LIBC: wctype */
+#else /* __CRT_HAVE_wctype */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/wctype.h>
-#define __localdep_wctype (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctype))
-#endif /* wctype... */
-#endif /* !____localdep_wctype_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_wctype __LIBC_LOCAL_NAME(wctype)
+#endif /* !__CRT_HAVE_wctype */
+#endif /* !__local___localdep_wctype_defined */
 __LOCAL_LIBC(wctype_l) __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCTYPE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctype_l))(char const *__prop,
-                                                      __locale_t __locale) {
-#line 335 "kos/src/libc/magic/wctype.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctype_l))(char const *__prop, __locale_t __locale) {
 	(void)__locale;
 	__COMPILER_IMPURE();
 	return __localdep_wctype(__prop);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wctype_l_defined
+#define __local___localdep_wctype_l_defined 1
+#define __localdep_wctype_l __LIBC_LOCAL_NAME(wctype_l)
+#endif /* !__local___localdep_wctype_l_defined */
 #endif /* !__local_wctype_l_defined */

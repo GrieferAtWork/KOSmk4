@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd997da0d */
+/* HASH CRC-32:0x600f0e6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,39 +19,67 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_filelength_defined
-#if defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #define __local_filelength_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64)
 #include <bits/types.h>
-#include <bits/types.h>
-/* Dependency: "_lseek" from "io" */
-#ifndef ____localdep__lseek_defined
-#define ____localdep__lseek_defined 1
-#ifdef __CRT_HAVE__lseek
-__CREDIRECT(,__LONG32_TYPE__,__NOTHROW_NCX,__localdep__lseek,(__fd_t __fd, __LONG32_TYPE__ __offset, int __whence),_lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek)
-__CREDIRECT(,__LONG32_TYPE__,__NOTHROW_NCX,__localdep__lseek,(__fd_t __fd, __LONG32_TYPE__ __offset, int __whence),lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
-#include <local/io/_lseek.h>
-#define __localdep__lseek (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lseek))
-#else /* CUSTOM: _lseek */
-#undef ____localdep__lseek_defined
-#endif /* _lseek... */
-#endif /* !____localdep__lseek_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: lseek from unistd */
+#ifndef __local___localdep_lseek_defined
+#define __local___localdep_lseek_defined 1
+#ifdef __lseek_defined
+/* >> lseek(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__NAMESPACE_GLB_USING(lseek)
+#define __localdep_lseek lseek
+#elif defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
+/* >> lseek(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),lseek64,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE__lseeki64) && defined(__USE_FILE_OFFSET64)
+/* >> lseek(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),_lseeki64,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE_lseek) && !defined(__USE_FILE_OFFSET64)
+/* >> lseek(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE__lseek) && !defined(__USE_FILE_OFFSET64)
+/* >> lseek(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),_lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE___lseek) && !defined(__USE_FILE_OFFSET64)
+/* >> lseek(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),__lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64)
+__NAMESPACE_LOCAL_END
+#include <local/unistd/lseek.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> lseek(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+#define __localdep_lseek __LIBC_LOCAL_NAME(lseek)
+#else /* ... */
+#undef __local___localdep_lseek_defined
+#endif /* !... */
+#endif /* !__local___localdep_lseek_defined */
 __LOCAL_LIBC(filelength) __ATTR_WUNUSED __LONG32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(filelength))(__fd_t __fd) {
-#line 395 "kos/src/libc/magic/io.c"
 	__LONG32_TYPE__ __oldpos, __result;
-	__oldpos = __localdep__lseek(__fd, 0, __SEEK_CUR);
+	__oldpos = __localdep_lseek(__fd, 0, __SEEK_CUR);
 	if __unlikely(__oldpos < 0)
 		return -1;
-	__result = __localdep__lseek(__fd, 0, __SEEK_END);
+	__result = __localdep_lseek(__fd, 0, __SEEK_END);
 	if __likely(__result >= 0)
-		__localdep__lseek(__fd, __oldpos, __SEEK_SET);
+		__localdep_lseek(__fd, __oldpos, __SEEK_SET);
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek */
+#ifndef __local___localdep_filelength_defined
+#define __local___localdep_filelength_defined 1
+#define __localdep_filelength __LIBC_LOCAL_NAME(filelength)
+#endif /* !__local___localdep_filelength_defined */
+#else /* __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 */
+#undef __local_filelength_defined
+#endif /* !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek && !__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 */
 #endif /* !__local_filelength_defined */

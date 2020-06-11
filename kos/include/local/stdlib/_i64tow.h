@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2233aa6f */
+/* HASH CRC-32:0x6d6db3d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,46 @@
 #ifndef __local__i64tow_defined
 #define __local__i64tow_defined 1
 #include <__crt.h>
-/* Dependency: "_i64tow_s" from "stdlib" */
-#ifndef ____localdep__i64tow_s_defined
-#define ____localdep__i64tow_s_defined 1
-#ifdef __CRT_HAVE__i64tow_s
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep__i64tow_s,(__INT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64tow_s,(__val,__buf,__buflen,__radix))
-#else /* LIBC: _i64tow_s */
-#include <local/stdlib/_i64tow_s.h>
-#define __localdep__i64tow_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_i64tow_s))
-#endif /* _i64tow_s... */
-#endif /* !____localdep__i64tow_s_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _i64tow_s from stdlib */
+#ifndef __local___localdep__i64tow_s_defined
+#define __local___localdep__i64tow_s_defined 1
+#ifdef ___i64tow_s_defined
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__NAMESPACE_GLB_USING(_i64tow_s)
+#define __localdep__i64tow_s _i64tow_s
+#elif defined(__CRT_HAVE__i64tow_s)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64tow_s,(__INT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64tow_s,(__val,__buf,__buflen,__radix))
+#elif defined(__CRT_HAVE_DOS$_i64tow_s) && __SIZEOF_WCHAR_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__LIBCCALL,__localdep__i64tow_s,(__INT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),KOS$_i64tow_s,(__val,__buf,__buflen,__radix))
+#elif defined(__CRT_HAVE_DOS$_i64tow_s) && __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__LIBCCALL,__localdep__i64tow_s,(__INT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),DOS$_i64tow_s,(__val,__buf,__buflen,__radix))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/_i64tow_s.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__i64tow_s __LIBC_LOCAL_NAME(_i64tow_s)
+#endif /* !... */
+#endif /* !__local___localdep__i64tow_s_defined */
 __LOCAL_LIBC(_i64tow) __ATTR_NONNULL((2)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_i64tow))(__INT64_TYPE__ __val,
-                                                     __WCHAR_TYPE__ *__buf,
-                                                     int __radix) {
-#line 2512 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_i64tow))(__INT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, int __radix) {
 	__localdep__i64tow_s(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__i64tow_defined
+#define __local___localdep__i64tow_defined 1
+#define __localdep__i64tow __LIBC_LOCAL_NAME(_i64tow)
+#endif /* !__local___localdep__i64tow_defined */
 #endif /* !__local__i64tow_defined */

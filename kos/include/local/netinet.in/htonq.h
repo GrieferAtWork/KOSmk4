@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc71bfa7e */
+/* HASH CRC-32:0x2c143c50 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,12 @@
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(htonq) __ATTR_CONST __UINT64_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(htonq))(__UINT64_TYPE__ __hostlong) {
-#line 266 "kos/src/libc/magic/netinet.in.c"
-	return (__UINT64_TYPE__)__hybrid_htobe64(__hostlong);
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(htonq))(__UINT64_TYPE__ __hostquad) {
+	return (__UINT64_TYPE__)__hybrid_htobe64(__hostquad);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_htonq_defined
+#define __local___localdep_htonq_defined 1
+#define __localdep_htonq __LIBC_LOCAL_NAME(htonq)
+#endif /* !__local___localdep_htonq_defined */
 #endif /* !__local_htonq_defined */

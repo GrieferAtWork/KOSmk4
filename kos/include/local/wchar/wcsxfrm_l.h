@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f32c377 */
+/* HASH CRC-32:0x14ed3dc0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,28 +21,37 @@
 #ifndef __local_wcsxfrm_l_defined
 #define __local_wcsxfrm_l_defined 1
 #include <__crt.h>
-/* Dependency: "wcsxfrm" from "wchar" */
-#ifndef ____localdep_wcsxfrm_defined
-#define ____localdep_wcsxfrm_defined 1
-#ifdef __std___localdep_wcsxfrm_defined
-__NAMESPACE_STD_USING(__localdep_wcsxfrm)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcsxfrm from wchar */
+#ifndef __local___localdep_wcsxfrm_defined
+#define __local___localdep_wcsxfrm_defined 1
+#ifdef __wcsxfrm_defined
+__NAMESPACE_GLB_USING(wcsxfrm)
+#define __localdep_wcsxfrm wcsxfrm
+#elif defined(__std_wcsxfrm_defined)
+__NAMESPACE_STD_USING(wcsxfrm)
+#define __localdep_wcsxfrm wcsxfrm
 #elif defined(__CRT_HAVE_wcsxfrm)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsxfrm,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __maxlen),wcsxfrm,(__dst,__src,__maxlen))
-#else /* LIBC: wcsxfrm */
+#elif defined(__CRT_HAVE_DOS$wcsxfrm) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsxfrm,(__CHAR32_TYPE__ *__dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __maxlen),wcsxfrm,(__dst,__src,__maxlen))
+#elif defined(__CRT_HAVE_DOS$wcsxfrm) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsxfrm,(__CHAR16_TYPE__ *__dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __maxlen),wcsxfrm,(__dst,__src,__maxlen))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/wcsxfrm.h>
-#define __localdep_wcsxfrm (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsxfrm))
-#endif /* wcsxfrm... */
-#endif /* !____localdep_wcsxfrm_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcsxfrm __LIBC_LOCAL_NAME(wcsxfrm)
+#endif /* !... */
+#endif /* !__local___localdep_wcsxfrm_defined */
 __LOCAL_LIBC(wcsxfrm_l) __ATTR_NONNULL((2)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsxfrm_l))(__WCHAR_TYPE__ *__dst,
-                                                       __WCHAR_TYPE__ const *__restrict __src,
-                                                       __SIZE_TYPE__ __maxlen,
-                                                       __locale_t __locale) {
-#line 511 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsxfrm_l))(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __maxlen, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_wcsxfrm(__dst, __src, __maxlen);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsxfrm_l_defined
+#define __local___localdep_wcsxfrm_l_defined 1
+#define __localdep_wcsxfrm_l __LIBC_LOCAL_NAME(wcsxfrm_l)
+#endif /* !__local___localdep_wcsxfrm_l_defined */
 #endif /* !__local_wcsxfrm_l_defined */

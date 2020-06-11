@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2ad7d7 */
+/* HASH CRC-32:0xf2cb3f8c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,43 +19,53 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_strcmp_defined
-#if !defined(__NO_MALLOCA) || defined(__CRT_HAVE_fuzzy_memcmp)
 #define __local_fuzzy_strcmp_defined 1
 #include <__crt.h>
-#include <parts/malloca.h>
-/* Dependency: "fuzzy_memcmp" from "string" */
-#ifndef ____localdep_fuzzy_memcmp_defined
-#define ____localdep_fuzzy_memcmp_defined 1
-#ifdef __CRT_HAVE_fuzzy_memcmp
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmp,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_memcmp,(__s1,__s1_bytes,__s2,__s2_bytes))
-#elif !defined(__NO_MALLOCA)
-#include <local/string/fuzzy_memcmp.h>
-#define __localdep_fuzzy_memcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_memcmp))
-#else /* CUSTOM: fuzzy_memcmp */
-#undef ____localdep_fuzzy_memcmp_defined
-#endif /* fuzzy_memcmp... */
-#endif /* !____localdep_fuzzy_memcmp_defined */
-
-/* Dependency: "strlen" from "string" */
-#ifndef ____localdep_strlen_defined
-#define ____localdep_strlen_defined 1
+#if defined(__CRT_HAVE_fuzzy_memcmp) || !defined(__NO_MALLOCA)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* LIBC: strlen */
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
 #include <local/string/strlen.h>
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
-#endif /* strlen... */
-#endif /* !____localdep_strlen_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
+/* Dependency: fuzzy_memcmp from string */
+#ifndef __local___localdep_fuzzy_memcmp_defined
+#define __local___localdep_fuzzy_memcmp_defined 1
+#ifdef __CRT_HAVE_fuzzy_memcmp
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmp,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_memcmp,(__s1,__s1_bytes,__s2,__s2_bytes))
+#else /* __CRT_HAVE_fuzzy_memcmp */
+__NAMESPACE_LOCAL_END
+#include <parts/malloca.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __NO_MALLOCA
+__NAMESPACE_LOCAL_END
+#include <local/string/fuzzy_memcmp.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_fuzzy_memcmp __LIBC_LOCAL_NAME(fuzzy_memcmp)
+#else /* !__NO_MALLOCA */
+#undef __local___localdep_fuzzy_memcmp_defined
+#endif /* __NO_MALLOCA */
+#endif /* !__CRT_HAVE_fuzzy_memcmp */
+#endif /* !__local___localdep_fuzzy_memcmp_defined */
 __LOCAL_LIBC(fuzzy_strcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_strcmp))(char const *__s1,
-                                                          char const *__s2) {
-#line 4263 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_strcmp))(char const *__s1, char const *__s2) {
 	return __localdep_fuzzy_memcmp(__s1, __localdep_strlen(__s1), __s2, __localdep_strlen(__s2));
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__NO_MALLOCA || __CRT_HAVE_fuzzy_memcmp */
+#ifndef __local___localdep_fuzzy_strcmp_defined
+#define __local___localdep_fuzzy_strcmp_defined 1
+#define __localdep_fuzzy_strcmp __LIBC_LOCAL_NAME(fuzzy_strcmp)
+#endif /* !__local___localdep_fuzzy_strcmp_defined */
+#else /* __CRT_HAVE_fuzzy_memcmp || !__NO_MALLOCA */
+#undef __local_fuzzy_strcmp_defined
+#endif /* !__CRT_HAVE_fuzzy_memcmp && __NO_MALLOCA */
 #endif /* !__local_fuzzy_strcmp_defined */

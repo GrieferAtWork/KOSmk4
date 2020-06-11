@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77697c64 */
+/* HASH CRC-32:0xd9bd1546 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,17 +19,15 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futex_timedwaitwhile_belowequal64_defined
-#if defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64)
 #define __local_futex_timedwaitwhile_belowequal64_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <bits/types.h>
-#include <bits/types.h>
-
 #include <bits/timespec.h>
-#include <kos/bits/futex.h>
-/* Dependency: "lfutex64" from "kos.futex" */
-#ifndef ____localdep_lfutex64_defined
-#define ____localdep_lfutex64_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: lfutex64 from kos.futex */
+#ifndef __local___localdep_lfutex64_defined
+#define __local___localdep_lfutex64_defined 1
 #ifdef __CRT_HAVE_lfutex64
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
@@ -53,7 +51,7 @@
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),lfutex64,(__uaddr,__futex_op,__val,))
+__CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutex64,(__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
 #elif defined(__CRT_HAVE_lfutex) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
@@ -77,9 +75,11 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),lfutex,(__uaddr,__futex_op,__val,))
+__CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutex,(__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
 #elif defined(__CRT_HAVE_lfutex)
+__NAMESPACE_LOCAL_END
 #include <local/kos.futex/lfutex64.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
@@ -102,12 +102,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define __localdep_lfutex64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutex64))
-#else /* CUSTOM: lfutex64 */
-#undef ____localdep_lfutex64_defined
-#endif /* lfutex64... */
-#endif /* !____localdep_lfutex64_defined */
-
+#define __localdep_lfutex64 __LIBC_LOCAL_NAME(lfutex64)
+#else /* ... */
+#undef __local___localdep_lfutex64_defined
+#endif /* !... */
+#endif /* !__local___localdep_lfutex64_defined */
+__NAMESPACE_LOCAL_END
+#include <kos/bits/futex.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait if `*uaddr <= below_equal_value'
  * @return: 0: Did wait
@@ -116,14 +117,17 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __LOCAL_LIBC(futex_timedwaitwhile_belowequal64) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal64))(__uintptr_t *__uaddr,
-                                                                               __uintptr_t __below_equal_value,
-                                                                               struct __timespec64 const *__rel_timeout) {
-#line 811 "kos/src/libc/magic/kos.futex.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal64))(__uintptr_t *__uaddr, __uintptr_t __below_equal_value, struct __timespec64 const *__rel_timeout) {
 	if __unlikely(__below_equal_value == (__uintptr_t)-1)
 		return __localdep_lfutex64(__uaddr, LFUTEX_WAIT, 0, __rel_timeout);
 	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_equal_value + 1, __rel_timeout);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lfutex || __CRT_HAVE_lfutex64 */
+#ifndef __local___localdep_futex_timedwaitwhile_belowequal64_defined
+#define __local___localdep_futex_timedwaitwhile_belowequal64_defined 1
+#define __localdep_futex_timedwaitwhile_belowequal64 __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal64)
+#endif /* !__local___localdep_futex_timedwaitwhile_belowequal64_defined */
+#else /* __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex */
+#undef __local_futex_timedwaitwhile_belowequal64_defined
+#endif /* !__CRT_HAVE_lfutex64 && !__CRT_HAVE_lfutex */
 #endif /* !__local_futex_timedwaitwhile_belowequal64_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x208841a */
+/* HASH CRC-32:0x6ba37523 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,15 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(iswctype) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswctype))(__WINT_TYPE__ __wc,
-                                                      __WCTYPE_TYPE__ __desc) {
-#line 190 "kos/src/libc/magic/wctype.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswctype))(__WINT_TYPE__ __wc, __WCTYPE_TYPE__ __desc) {
 	/* TODO */
 	(void)__wc;
 	(void)__desc;
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswctype_defined
+#define __local___localdep_iswctype_defined 1
+#define __localdep_iswctype __LIBC_LOCAL_NAME(iswctype)
+#endif /* !__local___localdep_iswctype_defined */
 #endif /* !__local_iswctype_defined */

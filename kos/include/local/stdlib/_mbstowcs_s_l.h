@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cf38a7f */
+/* HASH CRC-32:0xf94f61b2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,26 @@
 #ifndef __local__mbstowcs_s_l_defined
 #define __local__mbstowcs_s_l_defined 1
 #include <__crt.h>
-/* Dependency: "_mbstowcs_l" from "stdlib" */
-#ifndef ____localdep__mbstowcs_l_defined
-#define ____localdep__mbstowcs_l_defined 1
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: _mbstowcs_l from stdlib */
+#ifndef __local___localdep__mbstowcs_l_defined
+#define __local___localdep__mbstowcs_l_defined 1
 #ifdef __CRT_HAVE__mbstowcs_l
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstowcs_l,(__WCHAR_TYPE__ *__dst, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale),_mbstowcs_l,(__dst,__src,__dstlen,__locale))
-#else /* LIBC: _mbstowcs_l */
+#elif defined(__CRT_HAVE_DOS$_mbstowcs_l) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstowcs_l,(__CHAR32_TYPE__ *__dst, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale),_mbstowcs_l,(__dst,__src,__dstlen,__locale))
+#elif defined(__CRT_HAVE_DOS$_mbstowcs_l) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstowcs_l,(__CHAR16_TYPE__ *__dst, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale),_mbstowcs_l,(__dst,__src,__dstlen,__locale))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/_mbstowcs_l.h>
-#define __localdep__mbstowcs_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstowcs_l))
-#endif /* _mbstowcs_l... */
-#endif /* !____localdep__mbstowcs_l_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbstowcs_l __LIBC_LOCAL_NAME(_mbstowcs_l)
+#endif /* !... */
+#endif /* !__local___localdep__mbstowcs_l_defined */
 __LOCAL_LIBC(_mbstowcs_s_l) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstowcs_s_l))(__SIZE_TYPE__ *__presult,
-                                                           __WCHAR_TYPE__ *__dst,
-                                                           __SIZE_TYPE__ __dstsize,
-                                                           char const *__src,
-                                                           __SIZE_TYPE__ __dstlen,
-                                                           __locale_t __locale) {
-#line 2692 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstowcs_s_l))(__SIZE_TYPE__ *__presult, __WCHAR_TYPE__ *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale) {
 	__SIZE_TYPE__ __error;
 	if (__dstlen >= __dstsize) {
 		if (!__dstsize)
@@ -50,11 +50,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstowcs_s_l))(__SIZE_TYPE__ *__pres
 	__error = __localdep__mbstowcs_l(__dst, __src, __dstlen, __locale);
 	if (__presult)
 		*__presult = __error;
-#ifdef __EILSEQ
+#ifdef EILSEQ
 	if (__error == (__SIZE_TYPE__)-1)
 		return __EILSEQ;
 #endif /* EILSEQ */
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__mbstowcs_s_l_defined
+#define __local___localdep__mbstowcs_s_l_defined 1
+#define __localdep__mbstowcs_s_l __LIBC_LOCAL_NAME(_mbstowcs_s_l)
+#endif /* !__local___localdep__mbstowcs_s_l_defined */
 #endif /* !__local__mbstowcs_s_l_defined */

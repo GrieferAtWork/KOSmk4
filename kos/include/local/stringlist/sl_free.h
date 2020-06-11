@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d6e7e3f */
+/* HASH CRC-32:0x8cff9e1c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,9 +19,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sl_free_defined
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #define __local_sl_free_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #ifndef ___stringlist_defined
 #define ___stringlist_defined 1
 typedef struct _stringlist {
@@ -29,31 +29,32 @@ typedef struct _stringlist {
 	__SIZE_TYPE__   sl_max;
 	__SIZE_TYPE__   sl_cur;
 } StringList;
-#endif /* !___stringlist_defined */
-/* Dependency: "free" */
-#ifndef ____localdep_free_defined
-#define ____localdep_free_defined 1
-#ifdef __std___localdep_free_defined
-__NAMESPACE_STD_USING(__localdep_free)
+#endif
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: free from stdlib */
+#ifndef __local___localdep_free_defined
+#define __local___localdep_free_defined 1
+#ifdef __free_defined
+__NAMESPACE_GLB_USING(free)
+#define __localdep_free free
+#elif defined(__std_free_defined)
+__NAMESPACE_STD_USING(free)
+#define __localdep_free free
 #elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
-#else /* LIBC: free */
-#undef ____localdep_free_defined
-#endif /* free... */
-#endif /* !____localdep_free_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_free_defined
+#endif /* !... */
+#endif /* !__local___localdep_free_defined */
 /* Free a given string list. When `ALL' is non-zero, all contained
  * string pointers (as previously added with `sl_add()') will also
  * be `free(3)'ed. */
 __LOCAL_LIBC(sl_free) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_free))(struct _stringlist *__sl,
-                                                     int __all) {
-#line 98 "kos/src/libc/magic/stringlist.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_free))(struct _stringlist *__sl, int __all) {
 	if __unlikely(!__sl)
 		return;
 	if __likely(__sl->sl_str) {
@@ -67,5 +68,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_free))(struct _stringlist *__sl,
 	__localdep_free(__sl);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#ifndef __local___localdep_sl_free_defined
+#define __local___localdep_sl_free_defined 1
+#define __localdep_sl_free __LIBC_LOCAL_NAME(sl_free)
+#endif /* !__local___localdep_sl_free_defined */
+#else /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#undef __local_sl_free_defined
+#endif /* !__CRT_HAVE_free && !__CRT_HAVE_cfree */
 #endif /* !__local_sl_free_defined */

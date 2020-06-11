@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35a71a55 */
+/* HASH CRC-32:0x1bad07b0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,12 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtIsMemoryBlock) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtIsMemoryBlock))(void const *__ptr,
-                                                               __STDC_UINT_AS_SIZE_T __num_bytes,
-                                                               __LONG32_TYPE__ *__prequest_number,
-                                                               char **__filename,
-                                                               int *__line) {
-#line 581 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtIsMemoryBlock))(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, __LONG32_TYPE__ *__prequest_number, char **__filename, int *__line) {
 	(void)__ptr;
 	(void)__num_bytes;
 	if (__prequest_number)
@@ -40,4 +35,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtIsMemoryBlock))(void const *__ptr
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__CrtIsMemoryBlock_defined
+#define __local___localdep__CrtIsMemoryBlock_defined 1
+#define __localdep__CrtIsMemoryBlock __LIBC_LOCAL_NAME(_CrtIsMemoryBlock)
+#endif /* !__local___localdep__CrtIsMemoryBlock_defined */
 #endif /* !__local__CrtIsMemoryBlock_defined */

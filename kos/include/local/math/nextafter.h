@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x757a7c5 */
+/* HASH CRC-32:0x57cde09a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,19 +19,23 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_nextafter_defined
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_nextafter_defined 1
 #include <__crt.h>
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/nextafter.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __LOCAL_LIBC(nextafter) __ATTR_CONST __ATTR_WUNUSED double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextafter))(double __x,
-                                                   double __y) {
-#line 854 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextafter))(double __x, double __y) {
 	return __LIBM_MATHFUN2(nextafter, __x, __y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#ifndef __local___localdep_nextafter_defined
+#define __local___localdep_nextafter_defined 1
+#define __localdep_nextafter __LIBC_LOCAL_NAME(nextafter)
+#endif /* !__local___localdep_nextafter_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_nextafter_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_nextafter_defined */

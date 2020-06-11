@@ -86,8 +86,7 @@ void delay(unsigned int mill) {
 	usleep((__useconds_t)__mill * 1000);
 }
 
-%[default_impl_section(".text.crt.dos.fs.property")]
-_dos_getdiskfree(*) = _getdiskfree;
+%[insert:function(_dos_getdiskfree = _getdiskfree)]
 
 @@Sleep for up to `duration' seconds
 [[cp, guard, nocrt, alias("_sleep", "sleep"), exposed_name("sleep")]]

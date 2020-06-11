@@ -56,9 +56,15 @@ typedef __TM_TYPE(time) time_t;
 
 };
 
+[[decl_include("<features.h>")]]
 int shmctl(int shmid, __STDC_INT_AS_UINT_T cmd, struct shmid_ds *buf);
+
+[[decl_include("<features.h>")]]
 int shmget(key_t key, size_t size, __STDC_INT_AS_UINT_T shmflg);
+
+[[decl_include("<features.h>")]]
 void *shmat(int shmid, void const *shmaddr, __STDC_INT_AS_UINT_T shmflg);
+
 int shmdt(void const *shmaddr);
 
 %{

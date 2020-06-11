@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cfb497 */
+/* HASH CRC-32:0x9f85e42 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,33 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_y0l_defined
-#if defined(__CRT_HAVE_y0) || defined(__CRT_HAVE___y0)
 #define __local_y0l_defined 1
 #include <__crt.h>
-/* Dependency: "y0" */
-#ifndef ____localdep_y0_defined
-#define ____localdep_y0_defined 1
+#if defined(__CRT_HAVE_y0) || defined(__CRT_HAVE___y0)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: y0 from math */
+#ifndef __local___localdep_y0_defined
+#define __local___localdep_y0_defined 1
 #if __has_builtin(__builtin_y0) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_y0)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_y0,(double __x),y0,{ return __builtin_y0(__x); })
 #elif defined(__CRT_HAVE_y0)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_y0,(double __x),y0,(__x))
 #elif defined(__CRT_HAVE___y0)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_y0,(double __x),__y0,(__x))
-#else /* LIBC: y0 */
-#undef ____localdep_y0_defined
-#endif /* y0... */
-#endif /* !____localdep_y0_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_y0_defined
+#endif /* !... */
+#endif /* !__local___localdep_y0_defined */
 __LOCAL_LIBC(y0l) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(y0l))(__LONGDOUBLE __x) {
-#line 1597 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_y0((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_y0 || __CRT_HAVE___y0 */
+#ifndef __local___localdep_y0l_defined
+#define __local___localdep_y0l_defined 1
+#define __localdep_y0l __LIBC_LOCAL_NAME(y0l)
+#endif /* !__local___localdep_y0l_defined */
+#else /* __CRT_HAVE_y0 || __CRT_HAVE___y0 */
+#undef __local_y0l_defined
+#endif /* !__CRT_HAVE_y0 && !__CRT_HAVE___y0 */
 #endif /* !__local_y0l_defined */

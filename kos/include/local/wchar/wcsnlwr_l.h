@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb6f51ad */
+/* HASH CRC-32:0xb8ce5188 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,31 +21,33 @@
 #ifndef __local_wcsnlwr_l_defined
 #define __local_wcsnlwr_l_defined 1
 #include <__crt.h>
-/* Dependency: "towlower_l" from "wctype" */
-#ifndef ____localdep_towlower_l_defined
-#define ____localdep_towlower_l_defined 1
-#ifdef __CRT_HAVE_towlower_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),towlower_l,(__wc,__locale))
-#elif defined(__CRT_HAVE__towlower_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),_towlower_l,(__wc,__locale))
-#elif defined(__CRT_HAVE___towlower_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),__towlower_l,(__wc,__locale))
-#else /* LIBC: towlower_l */
-#include <local/wctype/towlower_l.h>
-#define __localdep_towlower_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towlower_l))
-#endif /* towlower_l... */
-#endif /* !____localdep_towlower_l_defined */
-
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wcsnlwr_l) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnlwr_l))(__WCHAR_TYPE__ *__restrict __str,
-                                                       __SIZE_TYPE__ __maxlen,
-                                                       __locale_t __locale) {
-#line 4797 "kos/src/libc/magic/string.c"
+/* Dependency: tolower_l from ctype */
+#ifndef __local___localdep_tolower_l_defined
+#define __local___localdep_tolower_l_defined 1
+#ifdef __CRT_HAVE_tolower_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),tolower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__tolower_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),_tolower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE___tolower_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),__tolower_l,(__ch,__locale))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/ctype/tolower_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_tolower_l __LIBC_LOCAL_NAME(tolower_l)
+#endif /* !... */
+#endif /* !__local___localdep_tolower_l_defined */
+__LOCAL_LIBC(wcsnlwr_l) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnlwr_l))(__WCHAR_TYPE__ *__restrict __str, __SIZE_TYPE__ __maxlen, __locale_t __locale) {
 	__WCHAR_TYPE__ *__iter, __ch;
 	for (__iter = __str; __maxlen-- && (__ch = *__iter) != '\0'; ++__iter)
-		*__iter = (__WCHAR_TYPE__)__localdep_towlower_l(__ch, __locale);
+		*__iter = __localdep_tolower_l(__ch, __locale);
 	return __str;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsnlwr_l_defined
+#define __local___localdep_wcsnlwr_l_defined 1
+#define __localdep_wcsnlwr_l __LIBC_LOCAL_NAME(wcsnlwr_l)
+#endif /* !__local___localdep_wcsnlwr_l_defined */
 #endif /* !__local_wcsnlwr_l_defined */

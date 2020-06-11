@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcca06c9d */
+/* HASH CRC-32:0x9bc3b930 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,49 +19,43 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getitimer_defined
-#if defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE_getitimer64)
 #define __local_getitimer_defined 1
 #include <__crt.h>
-/* Dependency: "getitimer32" from "sys.time" */
-#ifndef ____localdep_getitimer32_defined
-#define ____localdep_getitimer32_defined 1
-#ifdef __CRT_HAVE_getitimer
+#if defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE_getitimer64)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: getitimer32 from sys.time */
+#if !defined(__local___localdep_getitimer32_defined) && defined(__CRT_HAVE_getitimer)
+#define __local___localdep_getitimer32_defined 1
 /* Set *VALUE to the current setting of timer WHICH.
  * Return 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer32,(__itimer_which_t __which, struct __itimerval32 *__curr_value),getitimer,(__which,__curr_value))
-#else /* LIBC: getitimer */
-#undef ____localdep_getitimer32_defined
-#endif /* getitimer32... */
-#endif /* !____localdep_getitimer32_defined */
-
-/* Dependency: "getitimer64" from "sys.time" */
-#ifndef ____localdep_getitimer64_defined
-#define ____localdep_getitimer64_defined 1
+#endif /* !__local___localdep_getitimer32_defined && __CRT_HAVE_getitimer */
+/* Dependency: getitimer64 from sys.time */
+#ifndef __local___localdep_getitimer64_defined
+#define __local___localdep_getitimer64_defined 1
 #ifdef __CRT_HAVE_getitimer64
 /* Set *VALUE to the current setting of timer WHICH.
  * Return 0 on success, -1 on errors */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(__itimer_which_t __which, struct itimerval64 *__curr_value),getitimer64,(__which,__curr_value))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(__itimer_which_t __which, struct __itimerval64 *__curr_value),getitimer64,(__which,__curr_value))
 #elif defined(__CRT_HAVE_getitimer) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Set *VALUE to the current setting of timer WHICH.
  * Return 0 on success, -1 on errors */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(__itimer_which_t __which, struct itimerval64 *__curr_value),getitimer,(__which,__curr_value))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(__itimer_which_t __which, struct __itimerval64 *__curr_value),getitimer,(__which,__curr_value))
 #elif defined(__CRT_HAVE_getitimer)
+__NAMESPACE_LOCAL_END
 #include <local/sys.time/getitimer64.h>
-/* Set *VALUE to the current setting of timer WHICH.
- * Return 0 on success, -1 on errors */
-#define __localdep_getitimer64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getitimer64))
-#else /* CUSTOM: getitimer64 */
-#undef ____localdep_getitimer64_defined
-#endif /* getitimer64... */
-#endif /* !____localdep_getitimer64_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* Set *VALUE to the current setting of timer WHICH.
  * Return 0 on success, -1 on errors */
+#define __localdep_getitimer64 __LIBC_LOCAL_NAME(getitimer64)
+#else /* ... */
+#undef __local___localdep_getitimer64_defined
+#endif /* !... */
+#endif /* !__local___localdep_getitimer64_defined */
+/* Set *VALUE to the current setting of timer WHICH.
+ * Return 0 on success, -1 on errors */
 __LOCAL_LIBC(getitimer) __ATTR_NONNULL((2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getitimer))(__itimer_which_t __which,
-                                                       struct itimerval *__curr_value) {
-#line 177 "kos/src/libc/magic/sys.time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getitimer))(__itimer_which_t __which, struct itimerval *__curr_value) {
 #ifdef __CRT_HAVE_getitimer
 	int __result;
 	struct __itimerval32 __tv32;
@@ -87,5 +81,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getitimer))(__itimer_which_t __which,
 #endif /* !__CRT_HAVE_getitimer */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_getitimer || __CRT_HAVE_getitimer64 */
+#ifndef __local___localdep_getitimer_defined
+#define __local___localdep_getitimer_defined 1
+#define __localdep_getitimer __LIBC_LOCAL_NAME(getitimer)
+#endif /* !__local___localdep_getitimer_defined */
+#else /* __CRT_HAVE_getitimer || __CRT_HAVE_getitimer64 */
+#undef __local_getitimer_defined
+#endif /* !__CRT_HAVE_getitimer && !__CRT_HAVE_getitimer64 */
 #endif /* !__local_getitimer_defined */

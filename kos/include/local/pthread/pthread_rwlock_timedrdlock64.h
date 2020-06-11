@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9470f183 */
+/* HASH CRC-32:0x4d1b492b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,21 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_rwlock_timedrdlock64_defined
-#ifdef __CRT_HAVE_pthread_rwlock_timedrdlock
 #define __local_pthread_rwlock_timedrdlock64_defined 1
 #include <__crt.h>
-#include <bits/pthreadtypes.h>
-#include <bits/timespec.h>
-#include <bits/pthreadtypes.h>
-
-#include <bits/timespec.h>
-/* Dependency: "pthread_rwlock_timedrdlock32" from "pthread" */
-#ifndef ____localdep_pthread_rwlock_timedrdlock32_defined
-#define ____localdep_pthread_rwlock_timedrdlock32_defined 1
 #ifdef __CRT_HAVE_pthread_rwlock_timedrdlock
+#include <bits/pthreadtypes.h>
+#include <bits/timespec.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pthread_rwlock_timedrdlock32 from pthread */
+#if !defined(__local___localdep_pthread_rwlock_timedrdlock32_defined) && defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
+#define __local___localdep_pthread_rwlock_timedrdlock32_defined 1
 /* Try to acquire read lock for RWLOCK or return after specfied time */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_rwlock_timedrdlock32,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec32 const *__restrict __abstime),pthread_rwlock_timedrdlock,(__rwlock,__abstime))
-#else /* LIBC: pthread_rwlock_timedrdlock */
-#undef ____localdep_pthread_rwlock_timedrdlock32_defined
-#endif /* pthread_rwlock_timedrdlock32... */
-#endif /* !____localdep_pthread_rwlock_timedrdlock32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_pthread_rwlock_timedrdlock32_defined && __CRT_HAVE_pthread_rwlock_timedrdlock */
 /* Try to acquire read lock for RWLOCK or return after specfied time */
 __LOCAL_LIBC(pthread_rwlock_timedrdlock64) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64))(__pthread_rwlock_t *__restrict __rwlock,
-                                                                          struct __timespec64 const *__restrict __abstime) {
-#line 1019 "kos/src/libc/magic/pthread.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64))(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __abstime) {
 	int __result;
 	struct __timespec32 __abstime32;
 	__abstime32.tv_sec  = (__time32_t)__abstime->tv_sec;
@@ -52,5 +42,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64))(__pthr
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_pthread_rwlock_timedrdlock */
+#ifndef __local___localdep_pthread_rwlock_timedrdlock64_defined
+#define __local___localdep_pthread_rwlock_timedrdlock64_defined 1
+#define __localdep_pthread_rwlock_timedrdlock64 __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64)
+#endif /* !__local___localdep_pthread_rwlock_timedrdlock64_defined */
+#else /* __CRT_HAVE_pthread_rwlock_timedrdlock */
+#undef __local_pthread_rwlock_timedrdlock64_defined
+#endif /* !__CRT_HAVE_pthread_rwlock_timedrdlock */
 #endif /* !__local_pthread_rwlock_timedrdlock64_defined */

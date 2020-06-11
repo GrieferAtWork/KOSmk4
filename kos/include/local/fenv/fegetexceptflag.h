@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4e373df */
+/* HASH CRC-32:0xc0006944 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Store implementation-defined representation of the exception
  * flags indicated by EXCEPTS in the object pointed to by FLAGP */
 __LOCAL_LIBC(fegetexceptflag) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fegetexceptflag))(fexcept_t *__flagp,
-                                                             int __excepts) {
-#line 101 "kos/src/libc/magic/fenv.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fegetexceptflag))(__fexcept_t *__flagp, int __excepts) {
 #ifdef __inline_fegetexceptflag
 	__inline_fegetexceptflag(__flagp, __excepts);
 #else /* __inline_fegetexceptflag */
@@ -38,4 +36,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fegetexceptflag))(fexcept_t *__flagp,
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_fegetexceptflag_defined
+#define __local___localdep_fegetexceptflag_defined 1
+#define __localdep_fegetexceptflag __LIBC_LOCAL_NAME(fegetexceptflag)
+#endif /* !__local___localdep_fegetexceptflag_defined */
 #endif /* !__local_fegetexceptflag_defined */

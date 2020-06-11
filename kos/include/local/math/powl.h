@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3cc5701e */
+/* HASH CRC-32:0x48f938e9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,50 +19,46 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_powl_defined
-#include <ieee754.h>
-#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 #define __local_powl_defined 1
 #include <__crt.h>
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <bits/math-vector.h>
-#include <bits/math-vector.h>
-#include <libm/finite.h>
-
-#include <libm/isnan.h>
-
-#include <libm/matherr.h>
-
-#include <libm/pow.h>
-/* Dependency: "pow" from "math" */
-#ifndef ____localdep_pow_defined
-#define ____localdep_pow_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pow from math */
+#ifndef __local___localdep_pow_defined
+#define __local___localdep_pow_defined 1
 #if __has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)
 /* Return X to the Y power */
-__CEIREDIRECT(__DECL_SIMD_pow __ATTR_WUNUSED,double,__NOTHROW,__localdep_pow,(double __x, double __y),pow,{ return __builtin_pow(__x, __y); })
+__CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_pow,double,__NOTHROW,__localdep_pow,(double __x, double __y),pow,{ return __builtin_pow(__x, __y); })
 #elif defined(__CRT_HAVE_pow)
 /* Return X to the Y power */
-__CREDIRECT(__DECL_SIMD_pow __ATTR_WUNUSED,double,__NOTHROW,__localdep_pow,(double __x, double __y),pow,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_pow,double,__NOTHROW,__localdep_pow,(double __x, double __y),pow,(__x,__y))
 #elif defined(__CRT_HAVE___pow)
 /* Return X to the Y power */
-__CREDIRECT(__DECL_SIMD_pow __ATTR_WUNUSED,double,__NOTHROW,__localdep_pow,(double __x, double __y),__pow,(__x,__y))
-#else /* LIBC: pow */
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_pow,double,__NOTHROW,__localdep_pow,(double __x, double __y),__pow,(__x,__y))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
 #include <local/math/pow.h>
-/* Return X to the Y power */
-#define __localdep_pow (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow))
-#else /* CUSTOM: pow */
-#undef ____localdep_pow_defined
-#endif /* pow... */
-#endif /* pow... */
-#endif /* !____localdep_pow_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* Return X to the Y power */
-__LOCAL_LIBC(powl) __DECL_SIMD_powl __ATTR_WUNUSED __LONGDOUBLE
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(powl))(__LONGDOUBLE __x,
-                                              __LONGDOUBLE __y) {
-#line 609 "kos/src/libc/magic/math.c"
-#ifdef __LIBM_MATHFUN2L
+#define __localdep_pow __LIBC_LOCAL_NAME(pow)
+#else /* ... */
+#undef __local___localdep_pow_defined
+#endif /* !... */
+#endif /* !__local___localdep_pow_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/finite.h>
+#include <libm/isnan.h>
+#include <libm/matherr.h>
+#include <libm/pow.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return X to the Y power */
+__LOCAL_LIBC(powl) __ATTR_WUNUSED __DECL_SIMD_powl __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(powl))(__LONGDOUBLE __x, __LONGDOUBLE __y) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
 	__LONGDOUBLE __result;
 	__result = __LIBM_MATHFUN2L(pow, __x, __y);
 	/*
@@ -111,10 +107,16 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(powl))(__LONGDOUBLE __x,
 		}
 	}
 	return __result;
-#else /* __LIBM_MATHFUN2L */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)__localdep_pow((double)__x, (double)__y);
-#endif /* !__LIBM_MATHFUN2L */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_pow || __CRT_HAVE___pow */
+#ifndef __local___localdep_powl_defined
+#define __local___localdep_powl_defined 1
+#define __localdep_powl __LIBC_LOCAL_NAME(powl)
+#endif /* !__local___localdep_powl_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_pow || __CRT_HAVE___pow || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_powl_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__CRT_HAVE_pow && !__CRT_HAVE___pow && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_powl_defined */

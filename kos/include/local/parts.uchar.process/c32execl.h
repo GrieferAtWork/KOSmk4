@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5b9709c */
+/* HASH CRC-32:0xfa357793 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,30 +19,34 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32execl_defined
-#if (defined(__CRT_HAVE_wexecv) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE__wexecv) && __SIZEOF_WCHAR_T__ == 4)
 #define __local_c32execl_defined 1
 #include <__crt.h>
+#if (defined(__CRT_HAVE_wexecv) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wexecv)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: c32execv from parts.uchar.process */
+#ifndef __local___localdep_c32execv_defined
+#define __local___localdep_c32execv_defined 1
+#if defined(__CRT_HAVE_wexecv) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBKCALL,__localdep_c32execv,(__CHAR32_TYPE__ const *__restrict __path, __T32ARGV),wexecv,(__path,___argv))
+#elif defined(__CRT_HAVE_DOS$wexecv)
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c32execv,(__CHAR32_TYPE__ const *__restrict __path, __T32ARGV),wexecv,(__path,___argv))
+#else /* ... */
+#undef __local___localdep_c32execv_defined
+#endif /* !... */
+#endif /* !__local___localdep_c32execv_defined */
+__NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
-/* Dependency: "c32execv" from "parts.uchar.process" */
-#ifndef ____localdep_c32execv_defined
-#define ____localdep_c32execv_defined 1
-#if defined(__CRT_HAVE_wexecv) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c32execv,(__CHAR32_TYPE__ const *__restrict __path, __T32ARGV),wexecv,(__path,___argv))
-#elif defined(__CRT_HAVE__wexecv) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c32execv,(__CHAR32_TYPE__ const *__restrict __path, __T32ARGV),_wexecv,(__path,___argv))
-#else /* LIBC: c32execv */
-#undef ____localdep_c32execv_defined
-#endif /* c32execv... */
-#endif /* !____localdep_c32execv_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32execl) __ATTR_SENTINEL __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(c32execl))(__CHAR32_TYPE__ const *__restrict __path,
-                                                       __CHAR32_TYPE__ const *__args,
-                                                       ... /*, (char32_t *)NULL*/) {
-#line 106 "kos/src/libc/magic/parts.uchar.process.c"
+__NOTHROW_RPC(__VLIBKCALL __LIBC_LOCAL_NAME(c32execl))(__CHAR32_TYPE__ const *__restrict __path, __CHAR32_TYPE__ const *__args, ...) {
 	__REDIRECT_EXECL(__CHAR32_TYPE__, __localdep_c32execv, __path, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_wexecv && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE__wexecv && __SIZEOF_WCHAR_T__ == 4) */
+#ifndef __local___localdep_c32execl_defined
+#define __local___localdep_c32execl_defined 1
+#define __localdep_c32execl __LIBC_LOCAL_NAME(c32execl)
+#endif /* !__local___localdep_c32execl_defined */
+#else /* (__CRT_HAVE_wexecv && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$wexecv */
+#undef __local_c32execl_defined
+#endif /* (!__CRT_HAVE_wexecv || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$wexecv */
 #endif /* !__local_c32execl_defined */

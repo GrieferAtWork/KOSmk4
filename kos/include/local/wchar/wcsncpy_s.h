@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1e7eef0 */
+/* HASH CRC-32:0xd76f34e7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,30 +22,10 @@
 #define __local_wcsncpy_s_defined 1
 #include <__crt.h>
 #include <parts/errno.h>
-/* Dependency: "wmemset" from "wchar" */
-#ifndef ____localdep_wmemset_defined
-#define ____localdep_wmemset_defined 1
-#ifdef __CRT_HAVE_wmemset
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmemset,(__dst,__filler,__num_chars))
-#elif defined(__CRT_HAVE_memsetw) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),memsetw,(__dst,__filler,__num_chars))
-#elif defined(__CRT_HAVE_memsetl) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),memsetl,(__dst,__filler,__num_chars))
-#else /* LIBC: wmemset */
-#include <local/wchar/wmemset.h>
-#define __localdep_wmemset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemset))
-#endif /* wmemset... */
-#endif /* !____localdep_wmemset_defined */
-
+#include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsncpy_s) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncpy_s))(__WCHAR_TYPE__ *__dst,
-                                                       __SIZE_TYPE__ __dstsize,
-                                                       __WCHAR_TYPE__ const *__src,
-                                                       __SIZE_TYPE__ __maxlen) {
-#line 5069 "kos/src/libc/magic/string.c"
-
-
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncpy_s))(__WCHAR_TYPE__ *__dst, __SIZE_TYPE__ __dstsize, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __maxlen) {
 	__WCHAR_TYPE__ *__iter;
 	__SIZE_TYPE__ __remaining;
 	if (__maxlen == 0 && __dst == __NULLPTR && __dstsize == 0)
@@ -53,7 +33,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncpy_s))(__WCHAR_TYPE__ *__dst,
 	if ((!__dst && __dstsize) || (!__src && __maxlen))
 		return __EINVAL;
 	if (!__maxlen) {
-		__localdep_wmemset(__dst, 0, __dstsize);
+		__libc_memsetc(__dst, 0, __dstsize, __SIZEOF_WCHAR_T__);
 		return 0;
 	}
 	__iter = __dst;
@@ -74,11 +54,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncpy_s))(__WCHAR_TYPE__ *__dst,
 			__dst[__dstsize - 1] = 0;
 			return __STRUNCATE;
 		}
-		__localdep_wmemset(__dst, 0, __dstsize);
+		__libc_memsetc(__dst, 0, __dstsize, __SIZEOF_WCHAR_T__);
 		return __ERANGE;
 	}
-	__localdep_wmemset(__iter, 0, __remaining);
+	__libc_memsetc(__iter, 0, __remaining, __SIZEOF_WCHAR_T__);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsncpy_s_defined
+#define __local___localdep_wcsncpy_s_defined 1
+#define __localdep_wcsncpy_s __LIBC_LOCAL_NAME(wcsncpy_s)
+#endif /* !__local___localdep_wcsncpy_s_defined */
 #endif /* !__local_wcsncpy_s_defined */

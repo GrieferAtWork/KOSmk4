@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bfbfd1d */
+/* HASH CRC-32:0x3fab86e5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,39 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wspawnl_defined
-#if defined(__CRT_HAVE_wspawnv) || defined(__CRT_HAVE__wspawnv)
 #define __local_wspawnl_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_wspawnv) || (defined(__CRT_HAVE_DOS$wspawnv) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wspawnv) && __SIZEOF_WCHAR_T__ == 2)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wspawnv from parts.wchar.process */
+#ifndef __local___localdep_wspawnv_defined
+#define __local___localdep_wspawnv_defined 1
+#ifdef __wspawnv_defined
+__NAMESPACE_GLB_USING(wspawnv)
+#define __localdep_wspawnv wspawnv
+#elif defined(__CRT_HAVE_wspawnv)
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnv,(int __mode, __WCHAR_TYPE__ const *__restrict __path, __TWARGV),wspawnv,(__mode,__path,___argv))
+#elif defined(__CRT_HAVE_DOS$wspawnv) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnv,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV),wspawnv,(__mode,__path,___argv))
+#elif defined(__CRT_HAVE_DOS$_wspawnv) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnv,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wspawnv,(__mode,__path,___argv))
+#else /* ... */
+#undef __local___localdep_wspawnv_defined
+#endif /* !... */
+#endif /* !__local___localdep_wspawnv_defined */
+__NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
-/* Dependency: "wspawnv" */
-#ifndef ____localdep_wspawnv_defined
-#define ____localdep_wspawnv_defined 1
-#ifdef __CRT_HAVE_wspawnv
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnv,(int __mode, __WCHAR_TYPE__ const *__restrict __path, __TWARGV),wspawnv,(__mode,__path,____TWARGV))
-#elif defined(__CRT_HAVE__wspawnv)
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnv,(int __mode, __WCHAR_TYPE__ const *__restrict __path, __TWARGV),_wspawnv,(__mode,__path,____TWARGV))
-#else /* LIBC: wspawnv */
-#undef ____localdep_wspawnv_defined
-#endif /* wspawnv... */
-#endif /* !____localdep_wspawnv_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wspawnl) __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(wspawnl))(int __mode,
-                                                      __WCHAR_TYPE__ const *__restrict __path,
-                                                      __WCHAR_TYPE__ const *__args,
-                                                      ... /*, (wchar_t *)NULL*/) {
-#line 117 "kos/src/libc/magic/parts.wchar.process.c"
+__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(wspawnl))(int __mode, __WCHAR_TYPE__ const *__restrict __path, __WCHAR_TYPE__ const *__args, ...) {
 	__REDIRECT_SPAWNL(__WCHAR_TYPE__, __localdep_wspawnv, __mode, __path, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_wspawnv || __CRT_HAVE__wspawnv */
+#ifndef __local___localdep_wspawnl_defined
+#define __local___localdep_wspawnl_defined 1
+#define __localdep_wspawnl __LIBC_LOCAL_NAME(wspawnl)
+#endif /* !__local___localdep_wspawnl_defined */
+#else /* __CRT_HAVE_wspawnv || (__CRT_HAVE_DOS$wspawnv && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$_wspawnv && __SIZEOF_WCHAR_T__ == 2) */
+#undef __local_wspawnl_defined
+#endif /* !__CRT_HAVE_wspawnv && (!__CRT_HAVE_DOS$wspawnv || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$_wspawnv || !__SIZEOF_WCHAR_T__ == 2) */
 #endif /* !__local_wspawnl_defined */

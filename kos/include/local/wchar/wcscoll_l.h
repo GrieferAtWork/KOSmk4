@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4655a8d */
+/* HASH CRC-32:0x3f843161 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,37 @@
 #ifndef __local_wcscoll_l_defined
 #define __local_wcscoll_l_defined 1
 #include <__crt.h>
-/* Dependency: "wcscoll" from "wchar" */
-#ifndef ____localdep_wcscoll_defined
-#define ____localdep_wcscoll_defined 1
-#ifdef __std___localdep_wcscoll_defined
-__NAMESPACE_STD_USING(__localdep_wcscoll)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcscoll from wchar */
+#ifndef __local___localdep_wcscoll_defined
+#define __local___localdep_wcscoll_defined 1
+#ifdef __wcscoll_defined
+__NAMESPACE_GLB_USING(wcscoll)
+#define __localdep_wcscoll wcscoll
+#elif defined(__std_wcscoll_defined)
+__NAMESPACE_STD_USING(wcscoll)
+#define __localdep_wcscoll wcscoll
 #elif defined(__CRT_HAVE_wcscoll)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscoll,(__s1,__s2))
-#else /* LIBC: wcscoll */
+#elif defined(__CRT_HAVE_DOS$wcscoll) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscoll,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2),wcscoll,(__s1,__s2))
+#elif defined(__CRT_HAVE_DOS$wcscoll) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscoll,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2),wcscoll,(__s1,__s2))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/wcscoll.h>
-#define __localdep_wcscoll (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscoll))
-#endif /* wcscoll... */
-#endif /* !____localdep_wcscoll_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcscoll __LIBC_LOCAL_NAME(wcscoll)
+#endif /* !... */
+#endif /* !__local___localdep_wcscoll_defined */
 __LOCAL_LIBC(wcscoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscoll_l))(__WCHAR_TYPE__ const *__s1,
-                                                       __WCHAR_TYPE__ const *__s2,
-                                                       __locale_t __locale) {
-#line 503 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscoll_l))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_wcscoll(__s1, __s2);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcscoll_l_defined
+#define __local___localdep_wcscoll_l_defined 1
+#define __localdep_wcscoll_l __LIBC_LOCAL_NAME(wcscoll_l)
+#endif /* !__local___localdep_wcscoll_l_defined */
 #endif /* !__local_wcscoll_l_defined */

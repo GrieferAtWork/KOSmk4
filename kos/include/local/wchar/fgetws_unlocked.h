@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6386815 */
+/* HASH CRC-32:0x68b5575d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,63 +19,72 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgetws_unlocked_defined
-#if (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && (defined(__CRT_HAVE_ungetwc_unlocked) || defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE__ungetwc_nolock)) && (defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE_ferror))
 #define __local_fgetws_unlocked_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-#include <asm/stdio.h>
-
-#include <parts/errno.h>
-/* Dependency: "fgetwc_unlocked" */
-#ifndef ____localdep_fgetwc_unlocked_defined
-#define ____localdep_fgetwc_unlocked_defined 1
-#ifdef __CRT_HAVE_fgetwc_unlocked
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
-#elif defined(__CRT_HAVE__fgetwc_nolock)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
-#else /* LIBC: fgetwc_unlocked */
-#undef ____localdep_fgetwc_unlocked_defined
-#endif /* fgetwc_unlocked... */
-#endif /* !____localdep_fgetwc_unlocked_defined */
-
-/* Dependency: "ferror_unlocked" from "stdio" */
-#ifndef ____localdep_ferror_unlocked_defined
-#define ____localdep_ferror_unlocked_defined 1
-#ifdef __CRT_HAVE_ferror_unlocked
+#if (defined(__CRT_HAVE_fgetwc_unlocked) || (defined(__CRT_HAVE_DOS$fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 2)) && (defined(__CRT_HAVE_ungetwc_unlocked) || (defined(__CRT_HAVE_DOS$ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_ungetwc_nolock) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_ungetwc) || (defined(__CRT_HAVE_DOS$ungetwc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$ungetwc) && __SIZEOF_WCHAR_T__ == 2)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: ungetwc_unlocked from wchar */
+#ifndef __local___localdep_ungetwc_unlocked_defined
+#define __local___localdep_ungetwc_unlocked_defined 1
+#ifdef __CRT_HAVE_ungetwc_unlocked
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE_DOS$ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE_DOS$_ungetwc_nolock) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),_ungetwc_nolock,(__ch,__stream))
+#elif defined(__CRT_HAVE_ungetwc)
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
+#elif defined(__CRT_HAVE_DOS$ungetwc) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
+#elif defined(__CRT_HAVE_DOS$ungetwc) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
+#else /* ... */
+#undef __local___localdep_ungetwc_unlocked_defined
+#endif /* !... */
+#endif /* !__local___localdep_ungetwc_unlocked_defined */
+/* Dependency: ferror_unlocked from stdio */
+#ifndef __local___localdep_ferror_unlocked_defined
+#define __local___localdep_ferror_unlocked_defined 1
+#if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
 /* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE *__restrict __stream),ferror,(__stream))
-#else /* LIBC: ferror_unlocked */
-#undef ____localdep_ferror_unlocked_defined
-#endif /* ferror_unlocked... */
-#endif /* !____localdep_ferror_unlocked_defined */
-
-/* Dependency: "ungetwc_unlocked" */
-#ifndef ____localdep_ungetwc_unlocked_defined
-#define ____localdep_ungetwc_unlocked_defined 1
-#ifdef __CRT_HAVE_ungetwc_unlocked
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
-#elif defined(__CRT_HAVE_ungetwc)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
-#elif defined(__CRT_HAVE__ungetwc_nolock)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),_ungetwc_nolock,(__ch,__stream))
-#else /* LIBC: ungetwc_unlocked */
-#undef ____localdep_ungetwc_unlocked_defined
-#endif /* ungetwc_unlocked... */
-#endif /* !____localdep_ungetwc_unlocked_defined */
-
+#elif defined(__CRT_HAVE__IO_ferror)
+/* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE *__restrict __stream),_IO_ferror,(__stream))
+#elif defined(__CRT_HAVE_ferror_unlocked)
+/* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE *__restrict __stream),ferror_unlocked,(__stream))
+#else /* ... */
+#undef __local___localdep_ferror_unlocked_defined
+#endif /* !... */
+#endif /* !__local___localdep_ferror_unlocked_defined */
+/* Dependency: fgetwc_unlocked from wchar */
+#ifndef __local___localdep_fgetwc_unlocked_defined
+#define __local___localdep_fgetwc_unlocked_defined 1
+#ifdef __CRT_HAVE_fgetwc_unlocked
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_DOS$fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_DOS$_fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+#else /* ... */
+#undef __local___localdep_fgetwc_unlocked_defined
+#endif /* !... */
+#endif /* !__local___localdep_fgetwc_unlocked_defined */
+__NAMESPACE_LOCAL_END
+#include <asm/stdio.h>
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetws_unlocked) __ATTR_NONNULL((1, 3)) __WCHAR_TYPE__ *
-(__LIBCCALL __LIBC_LOCAL_NAME(fgetws_unlocked))(__WCHAR_TYPE__ *__restrict __buf,
-                                                __STDC_INT_AS_SIZE_T __bufsize,
-                                                __FILE *__restrict __stream) __THROWS(...) {
-#line 1082 "kos/src/libc/magic/wchar.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(fgetws_unlocked))(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream) __THROWS(...) {
 	__SIZE_TYPE__ __n;
 	if __unlikely(!__buf || !__bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef __ERANGE
+#ifdef ERANGE
 		__libc_seterrno(__ERANGE);
 #endif /* ERANGE */
 		return __NULLPTR;
@@ -109,5 +118,11 @@ __LOCAL_LIBC(fgetws_unlocked) __ATTR_NONNULL((1, 3)) __WCHAR_TYPE__ *
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_fgetwc_unlocked || __CRT_HAVE__fgetwc_nolock) && (__CRT_HAVE_ungetwc_unlocked || __CRT_HAVE_ungetwc || __CRT_HAVE__ungetwc_nolock) && (__CRT_HAVE_ferror_unlocked || __CRT_HAVE_ferror) */
+#ifndef __local___localdep_fgetws_unlocked_defined
+#define __local___localdep_fgetws_unlocked_defined 1
+#define __localdep_fgetws_unlocked __LIBC_LOCAL_NAME(fgetws_unlocked)
+#endif /* !__local___localdep_fgetws_unlocked_defined */
+#else /* (__CRT_HAVE_fgetwc_unlocked || (__CRT_HAVE_DOS$fgetwc_unlocked && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$_fgetwc_nolock && __SIZEOF_WCHAR_T__ == 2)) && (__CRT_HAVE_ungetwc_unlocked || (__CRT_HAVE_DOS$ungetwc_unlocked && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$_ungetwc_nolock && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_ungetwc || (__CRT_HAVE_DOS$ungetwc && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$ungetwc && __SIZEOF_WCHAR_T__ == 2)) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked) */
+#undef __local_fgetws_unlocked_defined
+#endif /* (!__CRT_HAVE_fgetwc_unlocked && (!__CRT_HAVE_DOS$fgetwc_unlocked || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$_fgetwc_nolock || !__SIZEOF_WCHAR_T__ == 2)) || (!__CRT_HAVE_ungetwc_unlocked && (!__CRT_HAVE_DOS$ungetwc_unlocked || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$_ungetwc_nolock || !__SIZEOF_WCHAR_T__ == 2) && !__CRT_HAVE_ungetwc && (!__CRT_HAVE_DOS$ungetwc || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$ungetwc || !__SIZEOF_WCHAR_T__ == 2)) || (!__CRT_HAVE_ferror && !__CRT_HAVE__IO_ferror && !__CRT_HAVE_ferror_unlocked) */
 #endif /* !__local_fgetws_unlocked_defined */

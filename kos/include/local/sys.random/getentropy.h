@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf80d74d4 */
+/* HASH CRC-32:0xba792cc3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,15 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getentropy_defined
-#include <asm/random.h>
-#if defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
 #define __local_getentropy_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-/* Dependency: "getrandom" */
-#ifndef ____localdep_getrandom_defined
-#define ____localdep_getrandom_defined 1
-#ifdef __CRT_HAVE_getrandom
+#include <asm/random.h>
+#if defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: getrandom from sys.random */
+#if !defined(__local___localdep_getrandom_defined) && defined(__CRT_HAVE_getrandom)
+#define __local___localdep_getrandom_defined 1
 /* Ask the kernel for up to `NUM_BYTES' bytes of random data, which
  * should then be written to `BUFFER'.
  * @param: FLAGS: Set of `GRND_NONBLOCK | GRND_RANDOM'
@@ -39,11 +38,9 @@
  *                if no random data had already been retrieved from
  *                the kernel's random data sink. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_getrandom,(void *__buf, __SIZE_TYPE__ __num_bytes, unsigned int __flags),getrandom,(__buf,__num_bytes,__flags))
-#else /* LIBC: getrandom */
-#undef ____localdep_getrandom_defined
-#endif /* getrandom... */
-#endif /* !____localdep_getrandom_defined */
-
+#endif /* !__local___localdep_getrandom_defined && __CRT_HAVE_getrandom */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Similar to `getrandom(BUF, NUM_BYTES, GRND_RANDOM)', however
  * the case where the calling thread is interrupted, causing an
@@ -56,9 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
 __LOCAL_LIBC(getentropy) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getentropy))(void *__buf,
-                                                        __SIZE_TYPE__ __num_bytes) {
-#line 87 "kos/src/libc/magic/sys.random.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getentropy))(void *__buf, __SIZE_TYPE__ __num_bytes) {
 	__SIZE_TYPE__ __result = 0;
 	__SSIZE_TYPE__ __temp;
 	while (__result < __num_bytes) {
@@ -66,7 +61,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getentropy))(void *__buf,
 		                 __num_bytes - __result,
 		                 __GRND_RANDOM);
 		if (__temp < 0) {
-#if defined(__libc_geterrno) && defined(__EINTR)
+#if defined(__libc_geterrno) && defined(EINTR)
 			if (__libc_geterrno() == __EINTR)
 				continue;
 #endif /* __libc_geterrno && EINTR */
@@ -79,5 +74,11 @@ __err:
 	return -1;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __GRND_RANDOM && __CRT_HAVE_getrandom */
+#ifndef __local___localdep_getentropy_defined
+#define __local___localdep_getentropy_defined 1
+#define __localdep_getentropy __LIBC_LOCAL_NAME(getentropy)
+#endif /* !__local___localdep_getentropy_defined */
+#else /* __GRND_RANDOM && __CRT_HAVE_getrandom */
+#undef __local_getentropy_defined
+#endif /* !__GRND_RANDOM || !__CRT_HAVE_getrandom */
 #endif /* !__local_getentropy_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f33f6c0 */
+/* HASH CRC-32:0x9f772e20 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,53 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgets_unlocked_defined
-#if ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)))) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc)) && (defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE_ferror))
 #define __local_fgets_unlocked_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-#include <parts/errno.h>
-/* Dependency: "fgetc_unlocked" from "stdio" */
-#ifndef ____localdep_fgetc_unlocked_defined
-#define ____localdep_fgetc_unlocked_defined 1
+#if (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock) || defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: ungetc_unlocked from stdio */
+#ifndef __local___localdep_ungetc_unlocked_defined
+#define __local___localdep_ungetc_unlocked_defined 1
+#ifdef __CRT_HAVE_ungetc_unlocked
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetc_nolock)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
+#elif defined(__CRT_HAVE_ungetc)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
+#elif defined(__CRT_HAVE__IO_ungetc)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
+#elif defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)
+__NAMESPACE_LOCAL_END
+#include <local/stdio/ungetc_unlocked.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_ungetc_unlocked __LIBC_LOCAL_NAME(ungetc_unlocked)
+#else /* ... */
+#undef __local___localdep_ungetc_unlocked_defined
+#endif /* !... */
+#endif /* !__local___localdep_ungetc_unlocked_defined */
+/* Dependency: ferror_unlocked from stdio */
+#ifndef __local___localdep_ferror_unlocked_defined
+#define __local___localdep_ferror_unlocked_defined 1
+#if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
+/* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE *__restrict __stream),ferror_unlocked,(__stream))
+#elif defined(__CRT_HAVE_ferror)
+/* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE *__restrict __stream),ferror,(__stream))
+#elif defined(__CRT_HAVE__IO_ferror)
+/* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE *__restrict __stream),_IO_ferror,(__stream))
+#elif defined(__CRT_HAVE_ferror_unlocked)
+/* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE *__restrict __stream),ferror_unlocked,(__stream))
+#else /* ... */
+#undef __local___localdep_ferror_unlocked_defined
+#endif /* !... */
+#endif /* !__local___localdep_ferror_unlocked_defined */
+/* Dependency: fgetc_unlocked from stdio */
+#ifndef __local___localdep_fgetc_unlocked_defined
+#define __local___localdep_fgetc_unlocked_defined 1
 #ifdef __CRT_HAVE_fgetc_unlocked
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
@@ -43,59 +82,25 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),_IO_getc,(__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)
+__NAMESPACE_LOCAL_END
 #include <local/stdio/fgetc_unlocked.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
-#define __localdep_fgetc_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc_unlocked))
-#else /* CUSTOM: fgetc_unlocked */
-#undef ____localdep_fgetc_unlocked_defined
-#endif /* fgetc_unlocked... */
-#endif /* !____localdep_fgetc_unlocked_defined */
-
-/* Dependency: "ferror_unlocked" from "stdio" */
-#ifndef ____localdep_ferror_unlocked_defined
-#define ____localdep_ferror_unlocked_defined 1
-#ifdef __CRT_HAVE_ferror_unlocked
-/* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE *__restrict __stream),ferror_unlocked,(__stream))
-#elif defined(__CRT_HAVE_ferror)
-/* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE *__restrict __stream),ferror,(__stream))
-#else /* LIBC: ferror_unlocked */
-#undef ____localdep_ferror_unlocked_defined
-#endif /* ferror_unlocked... */
-#endif /* !____localdep_ferror_unlocked_defined */
-
-/* Dependency: "ungetc_unlocked" from "stdio" */
-#ifndef ____localdep_ungetc_unlocked_defined
-#define ____localdep_ungetc_unlocked_defined 1
-#ifdef __CRT_HAVE_ungetc_unlocked
-/* Unget a single character byte of data previously returned by `getc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
-#elif defined(__CRT_HAVE__ungetc_nolock)
-/* Unget a single character byte of data previously returned by `getc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
-#elif defined(__CRT_HAVE__IO_ungetc)
-/* Unget a single character byte of data previously returned by `getc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
-#elif defined(__CRT_HAVE_ungetc)
-/* Unget a single character byte of data previously returned by `getc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
-#else /* LIBC: ungetc_unlocked */
-#undef ____localdep_ungetc_unlocked_defined
-#endif /* ungetc_unlocked... */
-#endif /* !____localdep_ungetc_unlocked_defined */
-
+#define __localdep_fgetc_unlocked __LIBC_LOCAL_NAME(fgetc_unlocked)
+#else /* ... */
+#undef __local___localdep_fgetc_unlocked_defined
+#endif /* !... */
+#endif /* !__local___localdep_fgetc_unlocked_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __LOCAL_LIBC(fgets_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *
-(__LIBCCALL __LIBC_LOCAL_NAME(fgets_unlocked))(char *__restrict __buf,
-                                               __STDC_INT_AS_SIZE_T __bufsize,
-                                               __FILE *__restrict __stream) __THROWS(...) {
-#line 1461 "kos/src/libc/magic/stdio.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(fgets_unlocked))(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream) __THROWS(...) {
 	__SIZE_TYPE__ __n;
 	if __unlikely(!__buf || !__bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef __ERANGE
+#ifdef ERANGE
 		__libc_seterrno(__ERANGE);
 #endif /* ERANGE */
 		return __NULLPTR;
@@ -129,5 +134,11 @@ __LOCAL_LIBC(fgets_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock || __CRT_HAVE__IO_fread || __CRT_HAVE_fread || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_HAVE_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE_fgetc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE__IO_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf))) && (__CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc) && (__CRT_HAVE_ferror_unlocked || __CRT_HAVE_ferror) */
+#ifndef __local___localdep_fgets_unlocked_defined
+#define __local___localdep_fgets_unlocked_defined 1
+#define __localdep_fgets_unlocked __LIBC_LOCAL_NAME(fgets_unlocked)
+#endif /* !__local___localdep_fgets_unlocked_defined */
+#else /* (__CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_HAVE_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE_fgetc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE__IO_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock || __CRT_HAVE__IO_fread || __CRT_HAVE_fread) && (__CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock || __CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked) */
+#undef __local_fgets_unlocked_defined
+#endif /* (!__CRT_HAVE_fgetc_unlocked && !__CRT_HAVE_getc_unlocked && (!__CRT_HAVE_getc || (__CRT_DOS && __CRT_HAVE__filbuf)) && (!__CRT_HAVE_fgetc || (__CRT_DOS && __CRT_HAVE__filbuf)) && (!__CRT_HAVE__IO_getc || (__CRT_DOS && __CRT_HAVE__filbuf)) && (!__CRT_DOS || !__CRT_HAVE__filbuf) && !__CRT_HAVE_fread_unlocked && !__CRT_HAVE__fread_nolock && !__CRT_HAVE__IO_fread && !__CRT_HAVE_fread) || (!__CRT_HAVE_ungetc_unlocked && !__CRT_HAVE__ungetc_nolock && !__CRT_HAVE_ungetc && !__CRT_HAVE__IO_ungetc) || (!__CRT_HAVE_ferror && !__CRT_HAVE__IO_ferror && !__CRT_HAVE_ferror_unlocked) */
 #endif /* !__local_fgets_unlocked_defined */

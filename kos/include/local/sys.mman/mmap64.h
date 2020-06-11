@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe553957c */
+/* HASH CRC-32:0x7f31b850 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,40 +19,36 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mmap64_defined
-#ifdef __CRT_HAVE_mmap
 #define __local_mmap64_defined 1
 #include <__crt.h>
-/* Dependency: "mmap32" from "sys.mman" */
-#ifndef ____localdep_mmap32_defined
-#define ____localdep_mmap32_defined 1
 #ifdef __CRT_HAVE_mmap
-/* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
- * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
- *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
-__CREDIRECT(,void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, int __prot, int __flags, __fd_t __fd, __off32_t __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
-#else /* LIBC: mmap */
-#undef ____localdep_mmap32_defined
-#endif /* mmap32... */
-#endif /* !____localdep_mmap32_defined */
-
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+/* Dependency: mmap32 from sys.mman */
+#if !defined(__local___localdep_mmap32_defined) && defined(__CRT_HAVE_mmap)
+#define __local___localdep_mmap32_defined 1
+/* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
- *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
+ *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
+ *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_DONT_OVERRIDE' */
+__CREDIRECT(,void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off32_t __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
+#endif /* !__local___localdep_mmap32_defined && __CRT_HAVE_mmap */
+/* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+ * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+ *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
+ *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_DONT_OVERRIDE' */
 __LOCAL_LIBC(mmap64) __ATTR_WUNUSED void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mmap64))(void *__addr,
-                                                    __SIZE_TYPE__ __len,
-                                                    int __prot,
-                                                    int __flags,
-                                                    __fd_t __fd,
-                                                    __off64_t __offset) {
-#line 609 "kos/src/libc/magic/sys.mman.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mmap64))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off64_t __offset) {
 	return __localdep_mmap32(__addr, __len, __prot, __flags, __fd, (__off32_t)__offset);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_mmap */
+#ifndef __local___localdep_mmap64_defined
+#define __local___localdep_mmap64_defined 1
+#define __localdep_mmap64 __LIBC_LOCAL_NAME(mmap64)
+#endif /* !__local___localdep_mmap64_defined */
+#else /* __CRT_HAVE_mmap */
+#undef __local_mmap64_defined
+#endif /* !__CRT_HAVE_mmap */
 #endif /* !__local_mmap64_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1b563fc */
+/* HASH CRC-32:0x4df208c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,8 +24,11 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(imaxabs) __ATTR_CONST __INTMAX_TYPE__
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(imaxabs))(__INTMAX_TYPE__ __x) {
-#line 540 "kos/src/libc/magic/inttypes.c"
 	return __x < 0 ? -__x : __x;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_imaxabs_defined
+#define __local___localdep_imaxabs_defined 1
+#define __localdep_imaxabs __LIBC_LOCAL_NAME(imaxabs)
+#endif /* !__local___localdep_imaxabs_defined */
 #endif /* !__local_imaxabs_defined */

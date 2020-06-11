@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67eb0174 */
+/* HASH CRC-32:0x2e667495 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,32 +19,39 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getumask_defined
-#if defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask)
 #define __local_getumask_defined 1
 #include <__crt.h>
-/* Dependency: "umask" */
-#ifndef ____localdep_umask_defined
-#define ____localdep_umask_defined 1
-#ifdef __CRT_HAVE_umask
+#if defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: umask from sys.stat */
+#ifndef __local___localdep_umask_defined
+#define __local___localdep_umask_defined 1
+#ifdef __umask_defined
+__NAMESPACE_GLB_USING(umask)
+#define __localdep_umask umask
+#elif defined(__CRT_HAVE_umask)
 __CREDIRECT(,__mode_t,__NOTHROW_NCX,__localdep_umask,(__mode_t __mode),umask,(__mode))
 #elif defined(__CRT_HAVE__umask)
 __CREDIRECT(,__mode_t,__NOTHROW_NCX,__localdep_umask,(__mode_t __mode),_umask,(__mode))
-#else /* LIBC: umask */
-#undef ____localdep_umask_defined
-#endif /* umask... */
-#endif /* !____localdep_umask_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_umask_defined
+#endif /* !... */
+#endif /* !__local___localdep_umask_defined */
 /* Return the current umask.
  * WARNING: This function isn't thread-safe */
 __LOCAL_LIBC(getumask) __mode_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getumask))(void) {
-#line 523 "kos/src/libc/magic/sys.stat.c"
 	__mode_t __result;
 	__result = __localdep_umask(0);
 	__localdep_umask(__result);
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_umask || __CRT_HAVE__umask */
+#ifndef __local___localdep_getumask_defined
+#define __local___localdep_getumask_defined 1
+#define __localdep_getumask __LIBC_LOCAL_NAME(getumask)
+#endif /* !__local___localdep_getumask_defined */
+#else /* __CRT_HAVE_umask || __CRT_HAVE__umask */
+#undef __local_getumask_defined
+#endif /* !__CRT_HAVE_umask && !__CRT_HAVE__umask */
 #endif /* !__local_getumask_defined */

@@ -40,15 +40,15 @@ getchar16(*) %{uchar("getwchar")}
 getchar32(*) %{uchar("getwchar")}
 fgetc16(*) %{uchar("fgetwc")}
 fgetc32(*) %{uchar("fgetwc")}
-getc16(*) = fgetc16;
-getc32(*) = fgetc32;
+%[insert:function(getc16 = fgetc16)]
+%[insert:function(getc32 = fgetc32)]
 
 putchar16(*) %{uchar("putwchar")}
 putchar32(*) %{uchar("putwchar")}
 fputc16(*) %{uchar("fputwc")}
 fputc32(*) %{uchar("fputwc")}
-putc16(*) = fputc16;
-putc32(*) = fputc32;
+%[insert:function(putc16 = fputc16)]
+%[insert:function(putc32 = fputc32)]
 
 fgetc16s(*) %{uchar("fgetws")}
 fgetc32s(*) %{uchar("fgetws")}
@@ -104,10 +104,10 @@ fgetc32_unlocked(*) %{uchar("fgetwc_unlocked")}
 fputc16_unlocked(*) %{uchar("fputwc_unlocked")}
 fputc32_unlocked(*) %{uchar("fputwc_unlocked")}
 
-getc16_unlocked(*) = fgetc16_unlocked;
-getc32_unlocked(*) = fgetc32_unlocked;
-putc16_unlocked(*) = fputc16_unlocked;
-putc32_unlocked(*) = fputc32_unlocked;
+%[insert:function(getc16_unlocked = fgetc16_unlocked)]
+%[insert:function(getc32_unlocked = fgetc32_unlocked)]
+%[insert:function(putc16_unlocked = fputc16_unlocked)]
+%[insert:function(putc32_unlocked = fputc32_unlocked)]
 
 fgetc16s_unlocked(*) %{uchar("fgetws_unlocked")}
 fgetc32s_unlocked(*) %{uchar("fgetws_unlocked")}

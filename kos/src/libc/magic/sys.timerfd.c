@@ -65,6 +65,7 @@ enum {
 }
 
 
+[[decl_include("<features.h>")]]
 [[doc_alias("timerfd_settime"), ignore, nocrt, alias("timerfd_settime")]]
 int timerfd_settime32($fd_t ufd, __STDC_INT_AS_UINT_T flags,
                       [[nonnull]] struct $itimerspec32 const *utmr,
@@ -75,13 +76,13 @@ int timerfd_gettime32($fd_t ufd, [[nonnull]] struct $itimerspec32 *__restrict ot
 
 
 @@Return file descriptor for new interval timer source
-[[nothrow]]
+[[nothrow, decl_include("<features.h>")]]
 $fd_t timerfd_create(clockid_t clock_id, __STDC_INT_AS_UINT_T flags);
 
 @@Set next expiration time of interval timer source UFD to UTMR.
 @@If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
 @@is absolute. Optionally return the old expiration time in OTMR
-[[no_crt_self_import]]
+[[no_crt_self_import, decl_include("<features.h>")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("timerfd_settime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("timerfd_settime")]]
 [[userimpl, requires($has_function(timerfd_settime32) || $has_function(timerfd_settime64))]]
@@ -154,6 +155,7 @@ int timerfd_gettime($fd_t ufd, [[nonnull]] struct itimerspec *__restrict otmr) {
 
 %#ifdef __USE_TIME64
 
+[[decl_include("<features.h>")]]
 [[doc_alias("timerfd_settime"), time64_variant_of(timerfd_settime)]]
 [[userimpl, requires_function(timerfd_settime32)]]
 int timerfd_settime64($fd_t ufd, __STDC_INT_AS_UINT_T flags,

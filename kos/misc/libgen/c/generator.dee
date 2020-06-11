@@ -232,8 +232,7 @@ function str2wcs_getDefaultBaseFunctionName(name: string): string | none {
 
 function str2wcs_registerFunctionPairing(
 		generatedFunctionName: string, baseFunctionName: string) {
-	if (generatedFunctionName !in str2wcsReplacementEscapes)
-		str2wcsReplacementEscapes[generatedFunctionName] = baseFunctionName;
+	str2wcsReplacementEscapes.setnew(baseFunctionName, generatedFunctionName);
 }
 
 function str2wcs_replaceWord(
@@ -423,20 +422,39 @@ function math_replaceText(
 	for (;;) {
 		local repl;
 		local tok = self.next();
-		if (!tok)
-			break;
-		if (!tok.issymbol()) {
-			if (tok == "@") {
-				do {
-					tok = self.next();
-				} while (tok !in ["", "@"]);
-			} else if ("." in tok && tok.isnumeric(0)) {
-				if (!tok.endswith("f") && !tok.endswith("L")) {
-					repl = tok + MATH_REPLACEMENT_SUFFIX[mode];
-					goto do_insert_repl;
-				}
+		switch (tok) {
+
+		case "":
+			goto done;
+
+		case "@":
+			do {
+				tok = self.next();
+			} while (tok !in ["", "@"]);
+			continue;
+
+		case "#":
+			tok = self.next();
+			if (tok in ["include", "include_next"]) {
+				/* Don't replace text within #include directives! */
+				local headerEnd = self.text.find("\n", self.tokEnd, self.end);
+				if (headerEnd < 0)
+					headerEnd = self.end;
+				self.tokEnd = headerEnd;
 			}
 			continue;
+
+		default:
+			if (!tok.issymbol()) {
+				if ("." in tok && tok.isnumeric(0)) {
+					if (!tok.endswith("f") && !tok.endswith("L")) {
+						repl = tok + MATH_REPLACEMENT_SUFFIX[mode];
+						goto do_insert_repl;
+					}
+				}
+				continue;
+			}
+			break;
 		}
 		repl = math_replaceWord(tok, mode);
 		if (repl === tok)
@@ -448,6 +466,7 @@ do_insert_repl:
 		fp << repl;
 		flushStart = self.tokEnd;
 	}
+done:
 	if (flushStart < self.end) {
 		if (flushStart == 0)
 			return text;
@@ -504,10 +523,10 @@ err_redef:
 	}
 }
 
-function double2float_defineReplacement(keyword: string, repl: string) {
+function double2float_defineReplacement(repl: string, keyword: string) {
 	return math_defineReplacement(keyword, repl, MATH_REPLACEMENT_MODE_FLOAT);
 }
-function double2ldouble_defineReplacement(keyword: string, repl: string) {
+function double2ldouble_defineReplacement(repl: string, keyword: string) {
 	return math_defineReplacement(keyword, repl, MATH_REPLACEMENT_MODE_LDBL);
 }
 function double2float_getDefaultBaseFunctionName(name: string): string {

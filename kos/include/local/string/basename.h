@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa17fc176 */
+/* HASH CRC-32:0x286c946c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,13 +24,12 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(basename) __ATTR_PURE __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(basename))(char const *__filename) {
-#line 640 "kos/src/libc/magic/string.c"
 	char __ch, *__iter = (char *)__filename, *__result = __NULLPTR;
 	if (!__filename || !*__filename)
 		return (char *)__filename;
 	do {
 		__ch = *__iter++;
-#ifdef ___WIN32
+#ifdef _WIN32
 		if (__ch == '/' || __ch == '\\')
 			__result = __iter;
 #else /* _WIN32 */
@@ -43,7 +42,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(basename))(char const *__filename) {
 	if (*__result)
 		return __result; /* Last character isn't a '/'. */
 	__iter = __result;
-#ifdef ___WIN32
+#ifdef _WIN32
 	while (__iter != __filename && (__iter[-1] == '/' || __iter[-1] == '\\'))
 		--__iter;
 #else /* _WIN32 */
@@ -53,7 +52,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(basename))(char const *__filename) {
 	if (__iter == __filename)
 		return __result-1; /* Only `'/'"-characters. */
 	//*iter = '\0'; /* Trim all ending `'/'"-characters. */
-#ifdef ___WIN32
+#ifdef _WIN32
 	while (__iter != __filename && (__iter[-1] != '/' || __iter[-1] != '\\'))
 		--__iter; /* Scan until the previous '/'. */
 #else /* _WIN32 */
@@ -63,4 +62,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(basename))(char const *__filename) {
 	return __iter; /* Returns string after previous '/'. */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_basename_defined
+#define __local___localdep_basename_defined 1
+#define __localdep_basename __LIBC_LOCAL_NAME(basename)
+#endif /* !__local___localdep_basename_defined */
 #endif /* !__local_basename_defined */

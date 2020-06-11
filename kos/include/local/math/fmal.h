@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56b3afa6 */
+/* HASH CRC-32:0x8a305cb5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,12 +24,13 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Multiply-add function computed as a ternary operation */
 __LOCAL_LIBC(fmal) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmal))(__LONGDOUBLE __x,
-                                              __LONGDOUBLE __y,
-                                              __LONGDOUBLE __z) {
-#line 1070 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmal))(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z) {
 	/* TODO: ieee754-specific function */
 	return (__x * __y) + __z;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_fmal_defined
+#define __local___localdep_fmal_defined 1
+#define __localdep_fmal __LIBC_LOCAL_NAME(fmal)
+#endif /* !__local___localdep_fmal_defined */
 #endif /* !__local_fmal_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbba126 */
+/* HASH CRC-32:0xf54d4be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,73 +19,96 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgetws_defined
-#if (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE__IO_ferror))
 #define __local_fgetws_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-#include <parts/errno.h>
-
-#include <asm/stdio.h>
-/* Dependency: "fgetwc" */
-#ifndef ____localdep_fgetwc_defined
-#define ____localdep_fgetwc_defined 1
-#ifdef __std___localdep_fgetwc_defined
-__NAMESPACE_STD_USING(__localdep_fgetwc)
+#if (defined(__CRT_HAVE_fgetwc) || (defined(__CRT_HAVE_DOS$fgetwc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$fgetwc) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_getwc) || (defined(__CRT_HAVE_DOS$getwc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$getwc) && __SIZEOF_WCHAR_T__ == 2)) && ((defined(__CRT_HAVE_DOS$ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_ungetwc) || (defined(__CRT_HAVE_DOS$ungetwc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$ungetwc) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_ungetwc_unlocked) || (defined(__CRT_HAVE_DOS$ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fgetwc from wchar */
+#ifndef __local___localdep_fgetwc_defined
+#define __local___localdep_fgetwc_defined 1
+#ifdef __fgetwc_defined
+__NAMESPACE_GLB_USING(fgetwc)
+#define __localdep_fgetwc fgetwc
+#elif defined(__std_fgetwc_defined)
+__NAMESPACE_STD_USING(fgetwc)
+#define __localdep_fgetwc fgetwc
 #elif defined(__CRT_HAVE_fgetwc)
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc,(__stream))
+#elif defined(__CRT_HAVE_DOS$fgetwc) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc,(__stream))
+#elif defined(__CRT_HAVE_DOS$fgetwc) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc)
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),getwc,(__stream))
-#else /* LIBC: fgetwc */
-#undef ____localdep_fgetwc_defined
-#endif /* fgetwc... */
-#endif /* !____localdep_fgetwc_defined */
-
-/* Dependency: "ferror" */
-#ifndef ____localdep_ferror_defined
-#define ____localdep_ferror_defined 1
+#elif defined(__CRT_HAVE_DOS$getwc) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),getwc,(__stream))
+#elif defined(__CRT_HAVE_DOS$getwc) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),getwc,(__stream))
+#else /* ... */
+#undef __local___localdep_fgetwc_defined
+#endif /* !... */
+#endif /* !__local___localdep_fgetwc_defined */
+/* Dependency: ungetwc from wchar */
+#ifndef __local___localdep_ungetwc_defined
+#define __local___localdep_ungetwc_defined 1
+#ifdef __ungetwc_defined
+__NAMESPACE_GLB_USING(ungetwc)
+#define __localdep_ungetwc ungetwc
+#elif defined(__std_ungetwc_defined)
+__NAMESPACE_STD_USING(ungetwc)
+#define __localdep_ungetwc ungetwc
+#elif defined(__CRT_HAVE_ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+#elif defined(__CRT_HAVE_ungetwc)
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$ungetwc) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$ungetwc) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc,(__wc,__stream))
+#elif defined(__CRT_HAVE_ungetwc_unlocked)
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+#else /* ... */
+#undef __local___localdep_ungetwc_defined
+#endif /* !... */
+#endif /* !__local___localdep_ungetwc_defined */
+/* Dependency: ferror from stdio */
+#ifndef __local___localdep_ferror_defined
+#define __local___localdep_ferror_defined 1
 #if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Check if an I/O error occurred in `STREAM' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
 /* Check if an I/O error occurred in `STREAM' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
-#elif defined(__CRT_HAVE_ferror_unlocked)
-/* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE__IO_ferror)
 /* Check if an I/O error occurred in `STREAM' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
-#else /* LIBC: ferror */
-#undef ____localdep_ferror_defined
-#endif /* ferror... */
-#endif /* !____localdep_ferror_defined */
-
-/* Dependency: "ungetwc" */
-#ifndef ____localdep_ungetwc_defined
-#define ____localdep_ungetwc_defined 1
-#ifdef __std___localdep_ungetwc_defined
-__NAMESPACE_STD_USING(__localdep_ungetwc)
-#elif defined(__CRT_HAVE_ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
-#elif defined(__CRT_HAVE_ungetwc)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc,(__wc,__stream))
-#elif defined(__CRT_HAVE_ungetwc_unlocked)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
-#else /* LIBC: ungetwc */
-#undef ____localdep_ungetwc_defined
-#endif /* ungetwc... */
-#endif /* !____localdep_ungetwc_defined */
-
+#elif defined(__CRT_HAVE_ferror_unlocked)
+/* Check if an I/O error occurred in `STREAM' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
+#else /* ... */
+#undef __local___localdep_ferror_defined
+#endif /* !... */
+#endif /* !__local___localdep_ferror_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
+#include <asm/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetws) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __WCHAR_TYPE__ *
-(__LIBCCALL __LIBC_LOCAL_NAME(fgetws))(__WCHAR_TYPE__ *__restrict __buf,
-                                       __STDC_INT_AS_SIZE_T __bufsize,
-                                       __FILE *__restrict __stream) __THROWS(...) {
-#line 526 "kos/src/libc/magic/wchar.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(fgetws))(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream) __THROWS(...) {
 	__SIZE_TYPE__ __n;
 	if __unlikely(!__buf || !__bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef __ERANGE
+#ifdef ERANGE
 		__libc_seterrno(__ERANGE);
 #endif /* ERANGE */
 		return __NULLPTR;
@@ -119,5 +142,11 @@ __LOCAL_LIBC(fgetws) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __WCHAR_TYPE__ *
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_fgetwc || __CRT_HAVE_getwc) && (__CRT_HAVE_ungetwc || __CRT_HAVE_ungetwc_unlocked) && (__CRT_HAVE_ferror || __CRT_HAVE_ferror_unlocked || __CRT_HAVE__IO_ferror) */
+#ifndef __local___localdep_fgetws_defined
+#define __local___localdep_fgetws_defined 1
+#define __localdep_fgetws __LIBC_LOCAL_NAME(fgetws)
+#endif /* !__local___localdep_fgetws_defined */
+#else /* (__CRT_HAVE_fgetwc || (__CRT_HAVE_DOS$fgetwc && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$fgetwc && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_getwc || (__CRT_HAVE_DOS$getwc && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$getwc && __SIZEOF_WCHAR_T__ == 2)) && ((__CRT_HAVE_DOS$ungetwc_unlocked && __USE_STDIO_UNLOCKED && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$ungetwc_unlocked && __USE_STDIO_UNLOCKED && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_ungetwc || (__CRT_HAVE_DOS$ungetwc && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$ungetwc && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_ungetwc_unlocked || (__CRT_HAVE_DOS$ungetwc_unlocked && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$ungetwc_unlocked && __SIZEOF_WCHAR_T__ == 2)) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked) */
+#undef __local_fgetws_defined
+#endif /* (!__CRT_HAVE_fgetwc && (!__CRT_HAVE_DOS$fgetwc || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$fgetwc || !__SIZEOF_WCHAR_T__ == 2) && !__CRT_HAVE_getwc && (!__CRT_HAVE_DOS$getwc || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$getwc || !__SIZEOF_WCHAR_T__ == 2)) || ((!__CRT_HAVE_DOS$ungetwc_unlocked || !__USE_STDIO_UNLOCKED || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$ungetwc_unlocked || !__USE_STDIO_UNLOCKED || !__SIZEOF_WCHAR_T__ == 2) && !__CRT_HAVE_ungetwc && (!__CRT_HAVE_DOS$ungetwc || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$ungetwc || !__SIZEOF_WCHAR_T__ == 2) && !__CRT_HAVE_ungetwc_unlocked && (!__CRT_HAVE_DOS$ungetwc_unlocked || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$ungetwc_unlocked || !__SIZEOF_WCHAR_T__ == 2)) || (!__CRT_HAVE_ferror && !__CRT_HAVE__IO_ferror && !__CRT_HAVE_ferror_unlocked) */
 #endif /* !__local_fgetws_defined */

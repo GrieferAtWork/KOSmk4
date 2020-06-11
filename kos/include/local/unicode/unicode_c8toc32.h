@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36819ef */
+/* HASH CRC-32:0xc1b3c7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,11 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
 __LOCAL_LIBC(unicode_c8toc32) __ATTR_NONNULL((1, 2, 4)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_c8toc32))(__CHAR32_TYPE__ *__restrict __pc32,
-                                                             /*utf-8*/ char const *__restrict __s,
-                                                             __SIZE_TYPE__ __n,
-                                                             __mbstate_t *__restrict __mbs) {
-#line 1244 "kos/src/libc/magic/unicode.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_c8toc32))(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, __mbstate_t *__restrict __mbs) {
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __n; ++__i) {
 		__UINT32_TYPE__ __state;
@@ -141,4 +137,8 @@ __done:
 	return __i + 1;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_unicode_c8toc32_defined
+#define __local___localdep_unicode_c8toc32_defined 1
+#define __localdep_unicode_c8toc32 __LIBC_LOCAL_NAME(unicode_c8toc32)
+#endif /* !__local___localdep_unicode_c8toc32_defined */
 #endif /* !__local_unicode_c8toc32_defined */

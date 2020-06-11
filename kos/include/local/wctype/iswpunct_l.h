@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa79476d */
+/* HASH CRC-32:0xabd7191a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,30 @@
 #ifndef __local_iswpunct_l_defined
 #define __local_iswpunct_l_defined 1
 #include <__crt.h>
-/* Dependency: "iswpunct" from "wctype" */
-#ifndef ____localdep_iswpunct_defined
-#define ____localdep_iswpunct_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: iswpunct from wctype */
+#ifndef __local___localdep_iswpunct_defined
+#define __local___localdep_iswpunct_defined 1
 #if __has_builtin(__builtin_iswpunct) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswpunct)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswpunct,(__WINT_TYPE__ __wc),iswpunct,{ return __builtin_iswpunct(__wc); })
 #elif defined(__CRT_HAVE_iswpunct)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswpunct,(__WINT_TYPE__ __wc),iswpunct,(__wc))
-#else /* LIBC: iswpunct */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/iswpunct.h>
-#define __localdep_iswpunct (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswpunct))
-#endif /* iswpunct... */
-#endif /* !____localdep_iswpunct_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_iswpunct __LIBC_LOCAL_NAME(iswpunct)
+#endif /* !... */
+#endif /* !__local___localdep_iswpunct_defined */
 __LOCAL_LIBC(iswpunct_l) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswpunct_l))(__WINT_TYPE__ __wc,
-                                                        __locale_t __locale) {
-#line 278 "kos/src/libc/magic/wctype.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswpunct_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
 	(void)__locale;
 	__COMPILER_IMPURE();
 	return __localdep_iswpunct(__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswpunct_l_defined
+#define __local___localdep_iswpunct_l_defined 1
+#define __localdep_iswpunct_l __LIBC_LOCAL_NAME(iswpunct_l)
+#endif /* !__local___localdep_iswpunct_l_defined */
 #endif /* !__local_iswpunct_l_defined */

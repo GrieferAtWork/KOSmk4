@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa17e048a */
+/* HASH CRC-32:0x4fdf661c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,27 @@
 #ifndef __local_strcoll_l_defined
 #define __local_strcoll_l_defined 1
 #include <__crt.h>
-/* Dependency: "strcoll" from "string" */
-#ifndef ____localdep_strcoll_defined
-#define ____localdep_strcoll_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strcoll from string */
+#ifndef __local___localdep_strcoll_defined
+#define __local___localdep_strcoll_defined 1
 #ifdef __CRT_HAVE_strcoll
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcoll,(char const *__s1, char const *__s2),strcoll,(__s1,__s2))
-#else /* LIBC: strcoll */
+#else /* __CRT_HAVE_strcoll */
+__NAMESPACE_LOCAL_END
 #include <local/string/strcoll.h>
-#define __localdep_strcoll (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcoll))
-#endif /* strcoll... */
-#endif /* !____localdep_strcoll_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strcoll __LIBC_LOCAL_NAME(strcoll)
+#endif /* !__CRT_HAVE_strcoll */
+#endif /* !__local___localdep_strcoll_defined */
 __LOCAL_LIBC(strcoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcoll_l))(char const *__s1,
-                                                       char const *__s2,
-                                                       __locale_t __locale) {
-#line 503 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcoll_l))(char const *__s1, char const *__s2, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_strcoll(__s1, __s2);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strcoll_l_defined
+#define __local___localdep_strcoll_l_defined 1
+#define __localdep_strcoll_l __LIBC_LOCAL_NAME(strcoll_l)
+#endif /* !__local___localdep_strcoll_l_defined */
 #endif /* !__local_strcoll_l_defined */

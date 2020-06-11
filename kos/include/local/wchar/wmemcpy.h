@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f78cad6 */
+/* HASH CRC-32:0x25f006d6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,79 +21,89 @@
 #ifndef __local_wmemcpy_defined
 #define __local_wmemcpy_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "memcpyw" from "string" */
-#ifndef ____localdep_memcpyw_defined
-#define ____localdep_memcpyw_defined 1
-#ifdef __fast_memcpyw_defined
-/* Copy memory between non-overlapping memory blocks. */
-#define __localdep_memcpyw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyw))
-#elif defined(__CRT_HAVE_memcpyw)
-/* Copy memory between non-overlapping memory blocks. */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words),memcpyw,(__dst,__src,__n_words))
-#elif defined(__CRT_HAVE_wmemcpy) && (__SIZEOF_WCHAR_T__ == 2)
-/* Copy memory between non-overlapping memory blocks. */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words),wmemcpy,(__dst,__src,__n_words))
-#else /* LIBC: memcpyw */
-#include <local/string/memcpyw.h>
-/* Copy memory between non-overlapping memory blocks. */
-#define __localdep_memcpyw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyw))
-#endif /* memcpyw... */
-#endif /* !____localdep_memcpyw_defined */
-
-/* Dependency: "memcpyl" from "string" */
-#ifndef ____localdep_memcpyl_defined
-#define ____localdep_memcpyl_defined 1
-#ifdef __fast_memcpyl_defined
-/* Copy memory between non-overlapping memory blocks. */
-#define __localdep_memcpyl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyl))
-#elif defined(__CRT_HAVE_memcpyl)
-/* Copy memory between non-overlapping memory blocks. */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords),memcpyl,(__dst,__src,__n_dwords))
-#elif defined(__CRT_HAVE_wmemcpy) && (__SIZEOF_WCHAR_T__ == 4)
-/* Copy memory between non-overlapping memory blocks. */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords),wmemcpy,(__dst,__src,__n_dwords))
-#else /* LIBC: memcpyl */
-#include <local/string/memcpyl.h>
-/* Copy memory between non-overlapping memory blocks. */
-#define __localdep_memcpyl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyl))
-#endif /* memcpyl... */
-#endif /* !____localdep_memcpyl_defined */
-
-/* Dependency: "memcpyc" from "string" */
-#ifndef ____localdep_memcpyc_defined
-#define ____localdep_memcpyc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcpyc from string */
+#ifndef __local___localdep_memcpyc_defined
+#define __local___localdep_memcpyc_defined 1
 #ifdef __fast_memcpyc_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))
+__NAMESPACE_FAST_USING(memcpyc)
+#define __localdep_memcpyc __LIBC_FAST_NAME(memcpyc)
 #elif defined(__CRT_HAVE_memcpyc)
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
-#else /* LIBC: memcpyc */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))
-#endif /* memcpyc... */
-#endif /* !____localdep_memcpyc_defined */
-
+#define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
+#endif /* !... */
+#endif /* !__local___localdep_memcpyc_defined */
+/* Dependency: memcpyl from string */
+#ifndef __local___localdep_memcpyl_defined
+#define __local___localdep_memcpyl_defined 1
+#ifdef __fast_memcpyl_defined
+/* Copy memory between non-overlapping memory blocks. */
+__NAMESPACE_FAST_USING(memcpyl)
+#define __localdep_memcpyl __LIBC_FAST_NAME(memcpyl)
+#elif defined(__CRT_HAVE_memcpyl)
+/* Copy memory between non-overlapping memory blocks. */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),memcpyl,(__dst,__src,__n_dwords))
+#elif defined(__CRT_HAVE_wmemcpy) && (__SIZEOF_WCHAR_T__ == 4)
+/* Copy memory between non-overlapping memory blocks. */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),wmemcpy,(__dst,__src,__n_dwords))
+#elif defined(__CRT_HAVE_DOS$wmemcpy) && defined(__PE__)
+/* Copy memory between non-overlapping memory blocks. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),KOS$wmemcpy,(__dst,__src,__n_dwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpyl.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Copy memory between non-overlapping memory blocks. */
+#define __localdep_memcpyl __LIBC_LOCAL_NAME(memcpyl)
+#endif /* !... */
+#endif /* !__local___localdep_memcpyl_defined */
+/* Dependency: memcpyw from string */
+#ifndef __local___localdep_memcpyw_defined
+#define __local___localdep_memcpyw_defined 1
+#ifdef __fast_memcpyw_defined
+/* Copy memory between non-overlapping memory blocks. */
+__NAMESPACE_FAST_USING(memcpyw)
+#define __localdep_memcpyw __LIBC_FAST_NAME(memcpyw)
+#elif defined(__CRT_HAVE_memcpyw)
+/* Copy memory between non-overlapping memory blocks. */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),memcpyw,(__dst,__src,__n_words))
+#elif defined(__CRT_HAVE_wmemcpy) && (__SIZEOF_WCHAR_T__ == 2)
+/* Copy memory between non-overlapping memory blocks. */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),wmemcpy,(__dst,__src,__n_words))
+#elif defined(__CRT_HAVE_DOS$wmemcpy)
+/* Copy memory between non-overlapping memory blocks. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),DOS$wmemcpy,(__dst,__src,__n_words))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpyw.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Copy memory between non-overlapping memory blocks. */
+#define __localdep_memcpyw __LIBC_LOCAL_NAME(memcpyw)
+#endif /* !... */
+#endif /* !__local___localdep_memcpyw_defined */
 __LOCAL_LIBC(wmemcpy) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmemcpy))(__WCHAR_TYPE__ *__restrict __dst,
-                                                     __WCHAR_TYPE__ const *__restrict __src,
-                                                     __SIZE_TYPE__ __num_chars) {
-#line 396 "kos/src/libc/magic/wchar.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmemcpy))(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars) {
 #if __SIZEOF_WCHAR_T__ == 2
 	return (__WCHAR_TYPE__ *)__localdep_memcpyw(__dst, __src, __num_chars);
 #elif __SIZEOF_WCHAR_T__ == 4
 	return (__WCHAR_TYPE__ *)__localdep_memcpyl(__dst, __src, __num_chars);
-#else
+#else /* ... */
 	return (__WCHAR_TYPE__ *)__localdep_memcpyc(__dst, __src, __num_chars, sizeof(__WCHAR_TYPE__));
-#endif
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wmemcpy_defined
+#define __local___localdep_wmemcpy_defined 1
+#define __localdep_wmemcpy __LIBC_LOCAL_NAME(wmemcpy)
+#endif /* !__local___localdep_wmemcpy_defined */
 #endif /* !__local_wmemcpy_defined */

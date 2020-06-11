@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48614150 */
+/* HASH CRC-32:0xb470721 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,14 +25,15 @@ __NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 __LOCAL_LIBC(memset) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memset))(void *__restrict __dst,
-                                                    int __byte,
-                                                    __SIZE_TYPE__ __n_bytes) {
-#line 212 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memset))(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__pdst = (__BYTE_TYPE__ *)__dst;
 	while (__n_bytes--)
 		*__pdst++ = (__BYTE_TYPE__)__byte;
 	return __dst;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memset_defined
+#define __local___localdep_memset_defined 1
+#define __localdep_memset __LIBC_LOCAL_NAME(memset)
+#endif /* !__local___localdep_memset_defined */
 #endif /* !__local_memset_defined */

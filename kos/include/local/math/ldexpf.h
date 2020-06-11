@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf69248d7 */
+/* HASH CRC-32:0x6526c1f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ldexpf_defined
-#include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 #define __local_ldexpf_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-
-#include <libm/finite.h>
-
-#include <libm/ldexp.h>
-/* Dependency: "ldexp" from "math" */
-#ifndef ____localdep_ldexp_defined
-#define ____localdep_ldexp_defined 1
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: ldexp from math */
+#ifndef __local___localdep_ldexp_defined
+#define __local___localdep_ldexp_defined 1
 #if __has_builtin(__builtin_ldexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexp)
 /* X times (two to the EXP power) */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_ldexp,(double __x, int __exponent),ldexp,{ return __builtin_ldexp(__x, __exponent); })
@@ -40,25 +36,27 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_ldexp,(double __x, int __
 #elif defined(__CRT_HAVE___ldexp)
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_ldexp,(double __x, int __exponent),__ldexp,(__x,__exponent))
-#else /* LIBC: ldexp */
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
 #include <local/math/ldexp.h>
+__NAMESPACE_LOCAL_BEGIN
 /* X times (two to the EXP power) */
-#define __localdep_ldexp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldexp))
-#else /* CUSTOM: ldexp */
-#undef ____localdep_ldexp_defined
-#endif /* ldexp... */
-#endif /* ldexp... */
-#endif /* !____localdep_ldexp_defined */
-
+#define __localdep_ldexp __LIBC_LOCAL_NAME(ldexp)
+#else /* ... */
+#undef __local___localdep_ldexp_defined
+#endif /* !... */
+#endif /* !__local___localdep_ldexp_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
+#include <libm/finite.h>
+#include <libm/ldexp.h>
 __NAMESPACE_LOCAL_BEGIN
 /* X times (two to the EXP power) */
 __LOCAL_LIBC(ldexpf) __ATTR_WUNUSED float
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexpf))(float __x,
-                                                int __exponent) {
-#line 404 "kos/src/libc/magic/math.c"
-#ifdef __LIBM_MATHFUN2F
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexpf))(float __x, int __exponent) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
 	float __result;
 #ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
 	__result = (float)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)__x, __exponent);
@@ -67,15 +65,21 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexpf))(float __x,
 #else /* ... */
 	__result = (float)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __exponent);
 #endif /* !... */
-#ifdef __ERANGE
+#ifdef ERANGE
 	if __unlikely(!__LIBM_MATHFUNF(finite, __result) || __result == 0.0f)
 		__libc_seterrno(__ERANGE);
 #endif /* ERANGE */
 	return __result;
-#else /* __LIBM_MATHFUN2F */
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)__localdep_ldexp((double)__x, __exponent);
-#endif /* !__LIBM_MATHFUN2F */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_ldexp || __CRT_HAVE___ldexp */
+#ifndef __local___localdep_ldexpf_defined
+#define __local___localdep_ldexpf_defined 1
+#define __localdep_ldexpf __LIBC_LOCAL_NAME(ldexpf)
+#endif /* !__local___localdep_ldexpf_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_ldexp || __CRT_HAVE___ldexp || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_ldexpf_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_ldexp && !__CRT_HAVE___ldexp && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_ldexpf_defined */

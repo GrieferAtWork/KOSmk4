@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8093d31 */
+/* HASH CRC-32:0x11856517 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,11 @@
 #ifndef __local__ltow_s_defined
 #define __local__ltow_s_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_ltow_s) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ltow_s))(long __val,
-                                                     __WCHAR_TYPE__ *__buf,
-                                                     __SIZE_TYPE__ __buflen,
-                                                     int __radix) {
-#line 2438 "kos/src/libc/magic/stdlib.c"
+__LOCAL_LIBC(_ltow_s) __ATTR_NONNULL((2)) __errno_t
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ltow_s))(long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix) {
 	__WCHAR_TYPE__ *__p;
 	long __temp;
 	if (__radix < 2)
@@ -36,7 +33,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ltow_s))(long __val,
 	__p = __buf;
 	if (__val < 0) {
 		if (!__buflen--) {
-#ifdef __ERANGE
+#ifdef ERANGE
 			return __ERANGE;
 #else /* ERANGE */
 			return 1;
@@ -49,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ltow_s))(long __val,
 	do ++__p;
 	while ((__temp /= (unsigned int)__radix) != 0);
 	if (__buflen <= (__SIZE_TYPE__)(__p - __buf)) {
-#ifdef __ERANGE
+#ifdef ERANGE
 		return __ERANGE;
 #else /* ERANGE */
 		return 1;
@@ -58,11 +55,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ltow_s))(long __val,
 	__temp = __val;
 	*__p = '\0';
 	do {
-		__WCHAR_TYPE__ __digit;
+		unsigned char __digit;
 		__digit = __temp % (unsigned int)__radix;
 		*--__p = __digit < 10 ? (__WCHAR_TYPE__)('0' + __digit) : (__WCHAR_TYPE__)('A' + (__digit - 10));
 	} while ((__temp /= (unsigned int)__radix) != 0);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__ltow_s_defined
+#define __local___localdep__ltow_s_defined 1
+#define __localdep__ltow_s __LIBC_LOCAL_NAME(_ltow_s)
+#endif /* !__local___localdep__ltow_s_defined */
 #endif /* !__local__ltow_s_defined */

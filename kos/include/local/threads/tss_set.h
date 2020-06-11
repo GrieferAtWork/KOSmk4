@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1dcd26ce */
+/* HASH CRC-32:0xb7d682f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,32 +19,26 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tss_set_defined
-#ifdef __CRT_HAVE_pthread_setspecific
 #define __local_tss_set_defined 1
 #include <__crt.h>
-#include <bits/threads.h>
-
-#include <bits/pthreadtypes.h>
-#include <asm/threads.h>
-/* Dependency: "pthread_setspecific" */
-#ifndef ____localdep_pthread_setspecific_defined
-#define ____localdep_pthread_setspecific_defined 1
 #ifdef __CRT_HAVE_pthread_setspecific
+#include <bits/threads.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pthread_setspecific from pthread */
+#if !defined(__local___localdep_pthread_setspecific_defined) && defined(__CRT_HAVE_pthread_setspecific)
+#define __local___localdep_pthread_setspecific_defined 1
 /* Store POINTER in the thread-specific data slot identified by KEY */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),pthread_setspecific,(__key,__pointer))
-#else /* LIBC: pthread_setspecific */
-#undef ____localdep_pthread_setspecific_defined
-#endif /* pthread_setspecific... */
-#endif /* !____localdep_pthread_setspecific_defined */
-
+#endif /* !__local___localdep_pthread_setspecific_defined && __CRT_HAVE_pthread_setspecific */
+__NAMESPACE_LOCAL_END
+#include <asm/threads.h>
+#include <bits/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Sets the value of the thread-specific storage
  * identified by TSS_ID for the current thread to VAL
  * s.a. `pthread_setspecific()' */
 __LOCAL_LIBC(tss_set) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_set))(__tss_t __tss_id,
-                                                     void *__val) {
-#line 563 "kos/src/libc/magic/threads.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_set))(__tss_t __tss_id, void *__val) {
 	int __error;
 	__error = __localdep_pthread_setspecific((__pthread_key_t)__tss_id, __val);
 	if __likely(!__error)
@@ -52,5 +46,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_set))(__tss_t __tss_id,
 	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_pthread_setspecific */
+#ifndef __local___localdep_tss_set_defined
+#define __local___localdep_tss_set_defined 1
+#define __localdep_tss_set __LIBC_LOCAL_NAME(tss_set)
+#endif /* !__local___localdep_tss_set_defined */
+#else /* __CRT_HAVE_pthread_setspecific */
+#undef __local_tss_set_defined
+#endif /* !__CRT_HAVE_pthread_setspecific */
 #endif /* !__local_tss_set_defined */

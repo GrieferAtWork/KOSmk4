@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x479592d1 */
+/* HASH CRC-32:0x9d65b4fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sincosl_defined
-#if defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
 #define __local_sincosl_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
 #include <bits/math-vector.h>
-#include <bits/math-vector.h>
-/* Dependency: "sincos" */
-#ifndef ____localdep_sincos_defined
-#define ____localdep_sincos_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: sincos from math */
+#ifndef __local___localdep_sincos_defined
+#define __local___localdep_sincos_defined 1
 #if __has_builtin(__builtin_sincos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincos)
 /* Cosine and sine of X */
 __CEIREDIRECT(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),void,__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),sincos,{ return __builtin_sincos(__x, __psinx, __pcosx); })
@@ -36,23 +36,24 @@ __CREDIRECT_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,__localdep_
 #elif defined(__CRT_HAVE___sincos)
 /* Cosine and sine of X */
 __CREDIRECT_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),__sincos,(__x,__psinx,__pcosx))
-#else /* LIBC: sincos */
-#undef ____localdep_sincos_defined
-#endif /* sincos... */
-#endif /* !____localdep_sincos_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_sincos_defined
+#endif /* !... */
+#endif /* !__local___localdep_sincos_defined */
 /* Cosine and sine of X */
 __LOCAL_LIBC(sincosl) __DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)) void
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sincosl))(__LONGDOUBLE __x,
-                                                 __LONGDOUBLE *__psinx,
-                                                 __LONGDOUBLE *__pcosx) {
-#line 1429 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sincosl))(__LONGDOUBLE __x, __LONGDOUBLE *__psinx, __LONGDOUBLE *__pcosx) {
 	double __sinx, __cosx;
 	__localdep_sincos((double)__x, &__sinx, &__cosx);
 	*__psinx = (__LONGDOUBLE)__sinx;
 	*__pcosx = (__LONGDOUBLE)__cosx;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_sincos || __CRT_HAVE___sincos */
+#ifndef __local___localdep_sincosl_defined
+#define __local___localdep_sincosl_defined 1
+#define __localdep_sincosl __LIBC_LOCAL_NAME(sincosl)
+#endif /* !__local___localdep_sincosl_defined */
+#else /* __CRT_HAVE_sincos || __CRT_HAVE___sincos */
+#undef __local_sincosl_defined
+#endif /* !__CRT_HAVE_sincos && !__CRT_HAVE___sincos */
 #endif /* !__local_sincosl_defined */

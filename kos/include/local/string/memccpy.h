@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47181739 */
+/* HASH CRC-32:0x53a4021f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,11 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(memccpy) __ATTR_LEAF __ATTR_NONNULL((1, 2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memccpy))(void *__restrict __dst,
-                                                     void const *__restrict __src,
-                                                     int __needle,
-                                                     __SIZE_TYPE__ __num_bytes) {
-#line 965 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memccpy))(void *__restrict __dst, void const *__restrict __src, int __needle, __SIZE_TYPE__ __num_bytes) {
 	__BYTE_TYPE__ *__pdst = (__BYTE_TYPE__ *)__dst;
 	__BYTE_TYPE__ const *__psrc = (__BYTE_TYPE__ const *)__src;
 	while (__num_bytes--) {
@@ -37,4 +33,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memccpy))(void *__restrict __dst,
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memccpy_defined
+#define __local___localdep_memccpy_defined 1
+#define __localdep_memccpy __LIBC_LOCAL_NAME(memccpy)
+#endif /* !__local___localdep_memccpy_defined */
 #endif /* !__local_memccpy_defined */

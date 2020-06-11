@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17cfa05b */
+/* HASH CRC-32:0x2ff274c9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,9 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
  *                 //          methods associated with the inode"
  *    p[11] = '\0'; */
 __LOCAL_LIBC(strmode) __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode,
-                                                     char __p[12]) {
-#line 5482 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode, char __p[12]) {
 	char __ch;
 	/* First character: File type */
 	__ch = '?';
@@ -174,4 +172,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode,
 	*__p = '\0';
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strmode_defined
+#define __local___localdep_strmode_defined 1
+#define __localdep_strmode __LIBC_LOCAL_NAME(strmode)
+#endif /* !__local___localdep_strmode_defined */
 #endif /* !__local_strmode_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdeadef5e */
+/* HASH CRC-32:0x894f1b71 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,33 +21,31 @@
 #ifndef __local_mempatq_defined
 #define __local_mempatq_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <hybrid/__wordbits.h>
-/* Dependency: "mempsetq" from "string" */
-#ifndef ____localdep_mempsetq_defined
-#define ____localdep_mempsetq_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempsetq from string */
+#ifndef __local___localdep_mempsetq_defined
+#define __local___localdep_mempsetq_defined 1
 #ifdef __fast_mempsetq_defined
 /* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
-#define __localdep_mempsetq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetq))
+__NAMESPACE_FAST_USING(mempsetq)
+#define __localdep_mempsetq __LIBC_FAST_NAME(mempsetq)
 #elif defined(__CRT_HAVE_mempsetq)
 /* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetq,(/*aligned(8)*/ void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),mempsetq,(__dst,__qword,__n_qwords))
-#else /* LIBC: mempsetq */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetq,(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),mempsetq,(__dst,__qword,__n_qwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempsetq.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
-#define __localdep_mempsetq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetq))
-#endif /* mempsetq... */
-#endif /* !____localdep_mempsetq_defined */
-
+#define __localdep_mempsetq __LIBC_LOCAL_NAME(mempsetq)
+#endif /* !... */
+#endif /* !__local___localdep_mempsetq_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__wordbits.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
-__LOCAL_LIBC(mempatq) __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempatq))(void *__restrict __dst,
-                                                     __UINT64_TYPE__ __pattern,
-                                                     __SIZE_TYPE__ __n_bytes) {
-#line 2848 "kos/src/libc/magic/string.c"
+__LOCAL_LIBC(mempatq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempatq))(void *__restrict __dst, __UINT64_TYPE__ __pattern, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__iter = (__BYTE_TYPE__ *)__dst;
 	for (; __n_bytes && (__UINTPTR_TYPE__)__iter & 7; ++__iter, --__n_bytes)
 		*__iter = __INT64_BYTE(__pattern, (__UINTPTR_TYPE__)__iter & 7);
@@ -57,4 +55,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempatq))(void *__restrict __dst,
 	return __dst;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_mempatq_defined
+#define __local___localdep_mempatq_defined 1
+#define __localdep_mempatq __LIBC_LOCAL_NAME(mempatq)
+#endif /* !__local___localdep_mempatq_defined */
 #endif /* !__local_mempatq_defined */

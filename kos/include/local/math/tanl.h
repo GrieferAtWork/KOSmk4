@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e09b775 */
+/* HASH CRC-32:0x5eb8eb5f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tanl_defined
-#if defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 #define __local_tanl_defined 1
 #include <__crt.h>
-/* Dependency: "tan" */
-#ifndef ____localdep_tan_defined
-#define ____localdep_tan_defined 1
+#if defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: tan from math */
+#ifndef __local___localdep_tan_defined
+#define __local___localdep_tan_defined 1
 #if __has_builtin(__builtin_tan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tan)
 /* Tangent of X */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tan,(double __x),tan,{ return __builtin_tan(__x); })
@@ -34,18 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tan,(double __x),tan,(__x
 #elif defined(__CRT_HAVE___tan)
 /* Tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tan,(double __x),__tan,(__x))
-#else /* LIBC: tan */
-#undef ____localdep_tan_defined
-#endif /* tan... */
-#endif /* !____localdep_tan_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_tan_defined
+#endif /* !... */
+#endif /* !__local___localdep_tan_defined */
 /* Tangent of X */
 __LOCAL_LIBC(tanl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tanl))(__LONGDOUBLE __x) {
-#line 227 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_tan((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_tan || __CRT_HAVE___tan */
+#ifndef __local___localdep_tanl_defined
+#define __local___localdep_tanl_defined 1
+#define __localdep_tanl __LIBC_LOCAL_NAME(tanl)
+#endif /* !__local___localdep_tanl_defined */
+#else /* __CRT_HAVE_tan || __CRT_HAVE___tan */
+#undef __local_tanl_defined
+#endif /* !__CRT_HAVE_tan && !__CRT_HAVE___tan */
 #endif /* !__local_tanl_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3616c856 */
+/* HASH CRC-32:0x29738621 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,28 +21,28 @@
 #ifndef __local_remque_defined
 #define __local_remque_defined 1
 #include <__crt.h>
-/* Dependency: "link" from "unistd" */
-#ifndef ____localdep_link_defined
-#define ____localdep_link_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: link from unistd */
+#ifndef __local___localdep_link_defined
+#define __local___localdep_link_defined 1
 #ifdef __CRT_HAVE_link
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),link,(__from,__to))
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_linkat)
+__NAMESPACE_LOCAL_END
 #include <local/unistd/link.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
-#define __localdep_link (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(link))
-#else /* CUSTOM: link */
-#undef ____localdep_link_defined
-#endif /* link... */
-#endif /* !____localdep_link_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_link __LIBC_LOCAL_NAME(link)
+#else /* ... */
+#undef __local___localdep_link_defined
+#endif /* !... */
+#endif /* !__local___localdep_link_defined */
 /* Unlink ELEM from the doubly-linked list that it is in */
 __LOCAL_LIBC(remque) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(remque))(void *__restrict __elem) {
-#line 129 "kos/src/libc/magic/search.c"
 	struct __localdep_link {
 		struct __localdep_link *__l_forw; /* [0..1] Forward link */
 		struct __localdep_link *__l_back; /* [0..1] Backward link */
@@ -56,4 +56,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(remque))(void *__restrict __elem) {
 		__next->__l_back = __prev;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_remque_defined
+#define __local___localdep_remque_defined 1
+#define __localdep_remque __LIBC_LOCAL_NAME(remque)
+#endif /* !__local___localdep_remque_defined */
 #endif /* !__local_remque_defined */

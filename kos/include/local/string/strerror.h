@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cab7fd4 */
+/* HASH CRC-32:0xb3fa3262 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,58 +21,71 @@
 #ifndef __local_strerror_defined
 #define __local_strerror_defined 1
 #include <__crt.h>
-/* Dependency: "strerror_s" from "string" */
-#ifndef ____localdep_strerror_s_defined
-#define ____localdep_strerror_s_defined 1
-#ifdef __CRT_HAVE_strerror_s
-__CREDIRECT(__ATTR_CONST __ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerror_s,(int __errnum),strerror_s,(__errnum))
-#else /* LIBC: strerror_s */
-#include <local/string/strerror_s.h>
-#define __localdep_strerror_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror_s))
-#endif /* strerror_s... */
-#endif /* !____localdep_strerror_s_defined */
-
-/* Dependency: "strncpy" from "string" */
-#ifndef ____localdep_strncpy_defined
-#define ____localdep_strncpy_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strncpy from string */
+#ifndef __local___localdep_strncpy_defined
+#define __local___localdep_strncpy_defined 1
 #if __has_builtin(__builtin_strncpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncpy)
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncpy,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen),strncpy,{ return __builtin_strncpy(__buf, __src, __buflen); })
 #elif defined(__CRT_HAVE_strncpy)
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncpy,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen),strncpy,(__buf,__src,__buflen))
-#else /* LIBC: strncpy */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/strncpy.h>
-#define __localdep_strncpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncpy))
-#endif /* strncpy... */
-#endif /* !____localdep_strncpy_defined */
-
-/* Dependency: "sprintf" from "stdio" */
-#ifndef ____localdep_sprintf_defined
-#define ____localdep_sprintf_defined 1
-#if __has_builtin(__builtin_sprintf) && __has_builtin(__builtin_va_arg_pack) && !defined(__NO_EXTERNINLINE) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf)
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strncpy __LIBC_LOCAL_NAME(strncpy)
+#endif /* !... */
+#endif /* !__local___localdep_strncpy_defined */
+/* Dependency: strerror_s from string */
+#ifndef __local___localdep_strerror_s_defined
+#define __local___localdep_strerror_s_defined 1
+#ifdef __CRT_HAVE_strerror_s
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerror_s,(int __errnum),strerror_s,(__errnum))
+#else /* __CRT_HAVE_strerror_s */
+__NAMESPACE_LOCAL_END
+#include <local/string/strerror_s.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strerror_s __LIBC_LOCAL_NAME(strerror_s)
+#endif /* !__CRT_HAVE_strerror_s */
+#endif /* !__local___localdep_strerror_s_defined */
+/* Dependency: sprintf from stdio */
+#ifndef __local___localdep_sprintf_defined
+#define __local___localdep_sprintf_defined 1
+#if __has_builtin(__builtin_sprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf) && __has_builtin(__builtin_va_arg_pack)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_sprintf,(char *__restrict __buf, char const *__restrict __format, ...),sprintf,{ return __builtin_sprintf(__buf, __format, __builtin_va_arg_pack()); })
-#elif defined(__CRT_HAVE_sprintf) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_sprintf)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("sprintf");
-#elif defined(__CRT_HAVE__IO_sprintf) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__IO_sprintf)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("_IO_sprintf");
-#else /* LIBC: sprintf */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdio/sprintf.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-#define __localdep_sprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sprintf))
-#endif /* sprintf... */
-#endif /* !____localdep_sprintf_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_sprintf __LIBC_LOCAL_NAME(sprintf)
+#endif /* !... */
+#endif /* !__local___localdep_sprintf_defined */
+__NAMESPACE_LOCAL_END
 __LOCAL_LIBC_DATA(__strerror_buf) char __strerror_buf[64] = { 0 };
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerror) __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(int __errnum) {
-#line 433 "kos/src/libc/magic/string.c"
 	char *__result = __strerror_buf;
 	char const *__string;
 	__string = __localdep_strerror_s(__errnum);
@@ -86,4 +99,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(int __errnum) {
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strerror_defined
+#define __local___localdep_strerror_defined 1
+#define __localdep_strerror __LIBC_LOCAL_NAME(strerror)
+#endif /* !__local___localdep_strerror_defined */
 #endif /* !__local_strerror_defined */

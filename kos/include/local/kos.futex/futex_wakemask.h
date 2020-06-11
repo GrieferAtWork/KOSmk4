@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x208524e0 */
+/* HASH CRC-32:0xf2c635ba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,15 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futex_wakemask_defined
-#if defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64)
 #define __local_futex_wakemask_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <bits/types.h>
-#include <bits/types.h>
-#include <kos/bits/futex.h>
-/* Dependency: "lfutex64" from "kos.futex" */
-#ifndef ____localdep_lfutex64_defined
-#define ____localdep_lfutex64_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: lfutex64 from kos.futex */
+#ifndef __local___localdep_lfutex64_defined
+#define __local___localdep_lfutex64_defined 1
 #ifdef __CRT_HAVE_lfutex64
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
@@ -51,7 +50,7 @@
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),lfutex64,(__uaddr,__futex_op,__val,))
+__CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutex64,(__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
 #elif defined(__CRT_HAVE_lfutex) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
@@ -75,9 +74,11 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),lfutex,(__uaddr,__futex_op,__val,))
+__CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutex,(__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
 #elif defined(__CRT_HAVE_lfutex)
+__NAMESPACE_LOCAL_END
 #include <local/kos.futex/lfutex64.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
@@ -100,25 +101,28 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define __localdep_lfutex64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutex64))
-#else /* CUSTOM: lfutex64 */
-#undef ____localdep_lfutex64_defined
-#endif /* lfutex64... */
-#endif /* !____localdep_lfutex64_defined */
-
+#define __localdep_lfutex64 __LIBC_LOCAL_NAME(lfutex64)
+#else /* ... */
+#undef __local___localdep_lfutex64_defined
+#endif /* !... */
+#endif /* !__local___localdep_lfutex64_defined */
+__NAMESPACE_LOCAL_END
+#include <kos/bits/futex.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Similar to `futex_wake()', however once there are no more threads that
  * can be awoken, perform the following operation: `*uaddr = (*uaddr & mask_and) | mask_or'
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */
 __LOCAL_LIBC(futex_wakemask) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futex_wakemask))(__uintptr_t *__uaddr,
-                                                            __SIZE_TYPE__ __max_wake,
-                                                            __uintptr_t __mask_and,
-                                                            __uintptr_t __mask_or) {
-#line 355 "kos/src/libc/magic/kos.futex.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futex_wakemask))(__uintptr_t *__uaddr, __SIZE_TYPE__ __max_wake, __uintptr_t __mask_and, __uintptr_t __mask_or) {
 	return __localdep_lfutex64(__uaddr, LFUTEX_WAKEMASK, __max_wake, __mask_and, __mask_or);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lfutex || __CRT_HAVE_lfutex64 */
+#ifndef __local___localdep_futex_wakemask_defined
+#define __local___localdep_futex_wakemask_defined 1
+#define __localdep_futex_wakemask __LIBC_LOCAL_NAME(futex_wakemask)
+#endif /* !__local___localdep_futex_wakemask_defined */
+#else /* __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex */
+#undef __local_futex_wakemask_defined
+#endif /* !__CRT_HAVE_lfutex64 && !__CRT_HAVE_lfutex */
 #endif /* !__local_futex_wakemask_defined */

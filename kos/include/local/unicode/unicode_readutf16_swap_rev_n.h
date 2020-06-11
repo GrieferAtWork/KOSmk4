@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f180ef2 */
+/* HASH CRC-32:0x66d5419 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
 __LOCAL_LIBC(unicode_readutf16_swap_rev_n) __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf16_swap_rev_n))(/*utf-16*/ __CHAR16_TYPE__ const **__restrict __ptext,
-                                                                          __CHAR16_TYPE__ const *__text_start) {
-#line 657 "kos/src/libc/magic/unicode.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf16_swap_rev_n))(__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_start) {
 	__CHAR32_TYPE__ __result;
 	__CHAR16_TYPE__ const *__text = *__ptext;
 	if (__text <= __text_start)
@@ -45,4 +43,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf16_swap_rev_n))(/*utf-
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_unicode_readutf16_swap_rev_n_defined
+#define __local___localdep_unicode_readutf16_swap_rev_n_defined 1
+#define __localdep_unicode_readutf16_swap_rev_n __LIBC_LOCAL_NAME(unicode_readutf16_swap_rev_n)
+#endif /* !__local___localdep_unicode_readutf16_swap_rev_n_defined */
 #endif /* !__local_unicode_readutf16_swap_rev_n_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1dfd780 */
+/* HASH CRC-32:0x56b5e5fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(index) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(index))(char const *__restrict __haystack,
-                                                   int __needle) {
-#line 60 "kos/src/libc/magic/strings.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(index))(char const *__restrict __haystack, int __needle) {
 	for (; *__haystack; ++__haystack) {
 		if (*__haystack == __needle)
 			return (char *)__haystack;
@@ -35,4 +33,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(index))(char const *__restrict __hays
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_index_defined
+#define __local___localdep_index_defined 1
+#define __localdep_index __LIBC_LOCAL_NAME(index)
+#endif /* !__local___localdep_index_defined */
 #endif /* !__local_index_defined */

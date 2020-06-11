@@ -157,6 +157,7 @@ typedef union { __SOCKADDR_ALLTYPES } __CONST_SOCKADDR_ARG __ATTR_TRANSPARENT_UN
 @@                  `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
 @@                  >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 @@                  Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+[[decl_include("<features.h>")]]
 [[ATTR_WUNUSED, export_alias("__socket")]]
 $fd_t socket(__STDC_INT_AS_UINT_T family, __STDC_INT_AS_UINT_T type,
              __STDC_INT_AS_UINT_T protocol);
@@ -173,6 +174,7 @@ $fd_t socket(__STDC_INT_AS_UINT_T family, __STDC_INT_AS_UINT_T type,
 @@                  `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
 @@                  >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 @@                  Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+[[decl_include("<features.h>")]]
 int socketpair(__STDC_INT_AS_UINT_T family, __STDC_INT_AS_UINT_T type,
                __STDC_INT_AS_UINT_T protocol, [[nonnull]] $fd_t fds[2]);
 
@@ -201,6 +203,7 @@ int getpeername($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 [[cp, export_alias("__send")]]
+[[decl_include("<features.h>")]]
 ssize_t send($fd_t sockfd, [[inp(bufsize)]] void const *buf,
              size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
 
@@ -209,6 +212,7 @@ ssize_t send($fd_t sockfd, [[inp(bufsize)]] void const *buf,
 @@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [[cp, ATTR_WUNUSED, export_alias("__recv")]]
+[[decl_include("<features.h>")]]
 ssize_t recv($fd_t sockfd, [[outp(bufsize)]] void *buf, size_t bufsize,
              __STDC_INT_AS_UINT_T msg_flags);
 
@@ -216,7 +220,7 @@ ssize_t recv($fd_t sockfd, [[outp(bufsize)]] void *buf, size_t bufsize,
 @@(which is ADDR_LEN bytes long). Returns the number sent, or -1 for errors.
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
-[[cp]]
+[[cp, decl_include("<features.h>")]]
 ssize_t sendto($fd_t sockfd, [[inp(bufsize)]] void const *buf,
                size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
                [[inp_opt(addr_len)]] __CONST_SOCKADDR_ARG addr,
@@ -228,7 +232,7 @@ ssize_t sendto($fd_t sockfd, [[inp(bufsize)]] void const *buf,
 @@Returns the number of bytes read or -1 for errors
 @@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
-[[cp, ATTR_WUNUSED]]
+[[cp, ATTR_WUNUSED, decl_include("<features.h>")]]
 ssize_t recvfrom($fd_t sockfd, [[outp(bufsize)]] void *__restrict buf,
                  size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
                  [[outp_opt(*addr_len)]] __SOCKADDR_ARG addr,
@@ -238,7 +242,7 @@ ssize_t recvfrom($fd_t sockfd, [[outp(bufsize)]] void *__restrict buf,
 @@Returns the number of bytes sent, or -1 for errors
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
-[[cp]]
+[[cp, decl_include("<features.h>")]]
 ssize_t sendmsg($fd_t sockfd, [[nonnull]] struct msghdr const *message,
                 __STDC_INT_AS_UINT_T msg_flags);
 
@@ -247,7 +251,7 @@ ssize_t sendmsg($fd_t sockfd, [[nonnull]] struct msghdr const *message,
 @@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
 @@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
-[[cp, ATTR_WUNUSED]]
+[[cp, ATTR_WUNUSED, decl_include("<features.h>")]]
 ssize_t recvmsg($fd_t sockfd, [[nonnull]] struct msghdr *message,
                 __STDC_INT_AS_UINT_T msg_flags);
 
@@ -256,6 +260,7 @@ ssize_t recvmsg($fd_t sockfd, [[nonnull]] struct msghdr *message,
 @@actual length.  Returns 0 on success, -1 for errors
 @@@param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
 @@@param: optname: Dependent on `level'
+[[decl_include("<features.h>")]]
 int getsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
                [[outp(*optlen)]] void *__restrict optval, socklen_t *__restrict optlen);
 
@@ -263,12 +268,14 @@ int getsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T op
 @@(which is OPTLEN bytes long). Returns 0 on success, -1 for errors
 @@@param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
 @@@param: optname: Dependent on `level'
+[[decl_include("<features.h>")]]
 int setsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
                [[inp(optlen)]] void const *optval, socklen_t optlen);
 
 @@Prepare to accept connections on socket FD.
 @@`MAX_BACKLOG' connection requests will be queued before further
 @@requests are refused. Returns 0 on success, -1 for errors
+[[decl_include("<features.h>")]]
 int listen($fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 
 @@Await a connection on socket FD.
@@ -286,13 +293,14 @@ $fd_t accept($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
 @@    - SHUT_WR   = No more transmissions;
 @@    - SHUT_RDWR = No more receptions or transmissions.
 @@Returns 0 on success, -1 for errors
+[[decl_include("<features.h>")]]
 int shutdown($fd_t sockfd, __STDC_INT_AS_UINT_T how);
 
 %
 %#ifdef __USE_GNU
 @@Similar to 'accept(2)' but takes an additional parameter to specify socket flags.
 @@@param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
-[[cp]]
+[[cp, decl_include("<features.h>")]]
 $fd_t accept4($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
               socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags);
 
@@ -300,10 +308,11 @@ $fd_t accept4($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
 @@Returns the number of datagrams successfully written or -1 for errors
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
-[[cp, export_alias("__sendmmsg")]]
+[[cp, export_alias("__sendmmsg"), decl_include("<features.h>")]]
 int sendmmsg($fd_t sockfd, [[nonnull]] struct mmsghdr *vmessages,
              __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags);
 
+[[decl_include("<features.h>")]]
 [[cp, doc_alias("recvmmsg"), ignore, nocrt, alias("recvmmsg")]]
 int recvmmsg32($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
                __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
@@ -314,7 +323,7 @@ int recvmmsg32($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 @@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
 @@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
-[[cp, no_crt_self_import]]
+[[cp, no_crt_self_import, decl_include("<features.h>")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("recvmmsg64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("recvmmsg")]]
 [[userimpl, requires($has_function(recvmmsg32) || $has_function(recvmmsg64))]]
@@ -339,6 +348,7 @@ int recvmmsg($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 }
 
 %#ifdef __USE_TIME64
+[[decl_include("<features.h>")]]
 [[cp, doc_alias("recvmmsg"), time64_variant_of(recvmmsg)]]
 [[userimpl, requires_function(recvmmsg32)]]
 int recvmmsg64($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
@@ -370,7 +380,7 @@ int sockatmark($fd_t sockfd);
 @@returns 1 if FD is open on an object of the indicated
 @@type, 0 if not, or -1 for errors (setting errno)
 @@@param: fdtype: One of `S_IF*' from `<sys/stat.h>'
-[[ATTR_WUNUSED]]
+[[ATTR_WUNUSED, decl_include("<features.h>")]]
 int isfdtype($fd_t fd, __STDC_INT_AS_UINT_T fdtype);
 %#endif /* __USE_MISC */
 

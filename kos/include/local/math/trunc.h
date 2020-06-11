@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad98db3b */
+/* HASH CRC-32:0x58375914 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,12 @@
 #define __local_trunc_defined 1
 #include <__crt.h>
 #include <hybrid/typecore.h>
-
 #include <libm/trunc.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
 __LOCAL_LIBC(trunc) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(trunc))(double __x) {
-#line 1007 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUN
 	return __LIBM_MATHFUN(trunc, __x);
 #else /* __LIBM_MATHFUN */
@@ -37,4 +35,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(trunc))(double __x) {
 #endif /* !__LIBM_MATHFUN */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_trunc_defined
+#define __local___localdep_trunc_defined 1
+#define __localdep_trunc __LIBC_LOCAL_NAME(trunc)
+#endif /* !__local___localdep_trunc_defined */
 #endif /* !__local_trunc_defined */

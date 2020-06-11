@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbdffb77 */
+/* HASH CRC-32:0xc0f26e45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,33 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_j0f_defined
-#if defined(__CRT_HAVE_j0) || defined(__CRT_HAVE___j0)
 #define __local_j0f_defined 1
 #include <__crt.h>
-/* Dependency: "j0" */
-#ifndef ____localdep_j0_defined
-#define ____localdep_j0_defined 1
+#if defined(__CRT_HAVE_j0) || defined(__CRT_HAVE___j0)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: j0 from math */
+#ifndef __local___localdep_j0_defined
+#define __local___localdep_j0_defined 1
 #if __has_builtin(__builtin_j0) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_j0)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_j0,(double __x),j0,{ return __builtin_j0(__x); })
 #elif defined(__CRT_HAVE_j0)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_j0,(double __x),j0,(__x))
 #elif defined(__CRT_HAVE___j0)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_j0,(double __x),__j0,(__x))
-#else /* LIBC: j0 */
-#undef ____localdep_j0_defined
-#endif /* j0... */
-#endif /* !____localdep_j0_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_j0_defined
+#endif /* !... */
+#endif /* !__local___localdep_j0_defined */
 __LOCAL_LIBC(j0f) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(j0f))(float __x) {
-#line 1568 "kos/src/libc/magic/math.c"
 	return (float)__localdep_j0((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_j0 || __CRT_HAVE___j0 */
+#ifndef __local___localdep_j0f_defined
+#define __local___localdep_j0f_defined 1
+#define __localdep_j0f __LIBC_LOCAL_NAME(j0f)
+#endif /* !__local___localdep_j0f_defined */
+#else /* __CRT_HAVE_j0 || __CRT_HAVE___j0 */
+#undef __local_j0f_defined
+#endif /* !__CRT_HAVE_j0 && !__CRT_HAVE___j0 */
 #endif /* !__local_j0f_defined */

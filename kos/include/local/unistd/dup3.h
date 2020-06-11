@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c941d0 */
+/* HASH CRC-32:0x436751db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,40 +19,61 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_dup3_defined
-#if defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)
 #define __local_dup3_defined 1
 #include <__crt.h>
-/* Dependency: "dup2" */
-#ifndef ____localdep_dup2_defined
-#define ____localdep_dup2_defined 1
-#ifdef __CRT_HAVE_dup2
+#if defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: dup2 from unistd */
+#ifndef __local___localdep_dup2_defined
+#define __local___localdep_dup2_defined 1
+#ifdef __dup2_defined
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> dup2(2)
+ * @return: NEWFD: Returns the new handle upon success.
+ * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+__NAMESPACE_GLB_USING(dup2)
+#define __localdep_dup2 dup2
+#elif defined(__CRT_HAVE_dup2)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> dup2(2)
  * @return: NEWFD: Returns the new handle upon success.
  * Duplicate a file referred to by `OLDFD' into `NEWFD' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),dup2,(__oldfd,__newfd))
 #elif defined(__CRT_HAVE__dup2)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> dup2(2)
  * @return: NEWFD: Returns the new handle upon success.
  * Duplicate a file referred to by `OLDFD' into `NEWFD' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),_dup2,(__oldfd,__newfd))
 #elif defined(__CRT_HAVE___dup2)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> dup2(2)
  * @return: NEWFD: Returns the new handle upon success.
  * Duplicate a file referred to by `OLDFD' into `NEWFD' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(__oldfd,__newfd))
-#else /* LIBC: dup2 */
-#undef ____localdep_dup2_defined
-#endif /* dup2... */
-#endif /* !____localdep_dup2_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_dup2_defined
+#endif /* !... */
+#endif /* !__local___localdep_dup2_defined */
 __LOCAL_LIBC(dup3) __fd_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dup3))(__fd_t __oldfd,
-                                                  __fd_t __newfd,
-                                                  __oflag_t __flags) {
-#line 1139 "kos/src/libc/magic/unistd.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dup3))(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags) {
+	(void)__flags;
 	return __newfd != __oldfd ? __localdep_dup2(__oldfd, __newfd) : -1;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2 */
+#ifndef __local___localdep_dup3_defined
+#define __local___localdep_dup3_defined 1
+#define __localdep_dup3 __LIBC_LOCAL_NAME(dup3)
+#endif /* !__local___localdep_dup3_defined */
+#else /* __CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2 */
+#undef __local_dup3_defined
+#endif /* !__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2 */
 #endif /* !__local_dup3_defined */

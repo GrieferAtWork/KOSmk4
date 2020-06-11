@@ -135,13 +135,15 @@ __SYSDECL_BEGIN
 
 void closelog();
 
-[[cp]]
+[[cp, decl_include("<features.h>")]]
 void openlog(char const *ident,
              __STDC_INT_AS_UINT_T option,
              __STDC_INT_AS_UINT_T facility);
 
+[[decl_include("<features.h>")]]
 int setlogmask(__STDC_INT_AS_UINT_T mask);
 
+[[decl_include("<features.h>")]]
 [[cp, ATTR_LIBC_PRINTF(2, 3)]]
 [[userimpl, requires_function(vsyslog)]]
 void syslog(__STDC_INT_AS_UINT_T level,
@@ -154,6 +156,7 @@ void syslog(__STDC_INT_AS_UINT_T level,
 
 %
 %#ifdef __USE_MISC
+[[decl_include("<features.h>")]]
 [[cp, ATTR_LIBC_PRINTF(2, 0)]]
 [[userimpl, requires_dependent_function(syslog_printer)]]
 void vsyslog(__STDC_INT_AS_UINT_T level,

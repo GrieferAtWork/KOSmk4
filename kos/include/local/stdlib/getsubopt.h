@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4addb5ed */
+/* HASH CRC-32:0xef3c26c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,47 +21,31 @@
 #ifndef __local_getsubopt_defined
 #define __local_getsubopt_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "strchr" from "string" */
-#ifndef ____localdep_strchr_defined
-#define ____localdep_strchr_defined 1
-#if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
-/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
-#elif defined(__CRT_HAVE_strchr)
-/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,(__haystack,__needle))
-#else /* LIBC: strchr */
-#include <local/string/strchr.h>
-/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_strchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strchr))
-#endif /* strchr... */
-#endif /* !____localdep_strchr_defined */
-
-/* Dependency: "strlen" from "string" */
-#ifndef ____localdep_strlen_defined
-#define ____localdep_strlen_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* LIBC: strlen */
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
 #include <local/string/strlen.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
-#endif /* strlen... */
-#endif /* !____localdep_strlen_defined */
-
-/* Dependency: "memcmp" from "string" */
-#ifndef ____localdep_memcmp_defined
-#define ____localdep_memcmp_defined 1
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
+/* Dependency: memcmp from string */
+#ifndef __local___localdep_memcmp_defined
+#define __local___localdep_memcmp_defined 1
 #ifdef __fast_memcmp_defined
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-#define __localdep_memcmp (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))
+__NAMESPACE_FAST_USING(memcmp)
+#define __localdep_memcmp __LIBC_FAST_NAME(memcmp)
 #elif defined(__CRT_HAVE_memcmp)
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
@@ -74,22 +58,36 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
-#else /* LIBC: memcmp */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memcmp.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-#define __localdep_memcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp))
-#endif /* memcmp... */
-#endif /* !____localdep_memcmp_defined */
-
+#define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
+#endif /* !... */
+#endif /* !__local___localdep_memcmp_defined */
+/* Dependency: strchr from string */
+#ifndef __local___localdep_strchr_defined
+#define __local___localdep_strchr_defined 1
+#if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
+/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
+#elif defined(__CRT_HAVE_strchr)
+/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,(__haystack,__needle))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/strchr.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+#define __localdep_strchr __LIBC_LOCAL_NAME(strchr)
+#endif /* !... */
+#endif /* !__local___localdep_strchr_defined */
 __LOCAL_LIBC(getsubopt) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optionp,
-                                                       char *const *__restrict __tokens,
-                                                       char **__restrict __valuep) {
-#line 1579 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep) {
 	unsigned int __i;
 	char *__option, *__nextopt;
 	__SIZE_TYPE__ __option_len;
@@ -125,4 +123,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optio
 	return -1;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_getsubopt_defined
+#define __local___localdep_getsubopt_defined 1
+#define __localdep_getsubopt __LIBC_LOCAL_NAME(getsubopt)
+#endif /* !__local___localdep_getsubopt_defined */
 #endif /* !__local_getsubopt_defined */

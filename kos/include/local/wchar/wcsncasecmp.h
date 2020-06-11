@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c60a578 */
+/* HASH CRC-32:0xb17f4768 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,33 +21,35 @@
 #ifndef __local_wcsncasecmp_defined
 #define __local_wcsncasecmp_defined 1
 #include <__crt.h>
-/* Dependency: "towlower" from "wctype" */
-#ifndef ____localdep_towlower_defined
-#define ____localdep_towlower_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: towlower from wctype */
+#ifndef __local___localdep_towlower_defined
+#define __local___localdep_towlower_defined 1
 #if __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,{ return __builtin_towlower(__wc); })
 #elif defined(__CRT_HAVE_towlower)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,(__wc))
-#else /* LIBC: towlower */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/towlower.h>
-#define __localdep_towlower (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towlower))
-#endif /* towlower... */
-#endif /* !____localdep_towlower_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_towlower __LIBC_LOCAL_NAME(towlower)
+#endif /* !... */
+#endif /* !__local___localdep_towlower_defined */
 __LOCAL_LIBC(wcsncasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncasecmp))(__WCHAR_TYPE__ const *__s1,
-                                                         __WCHAR_TYPE__ const *__s2,
-                                                         __SIZE_TYPE__ __maxlen) {
-#line 880 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncasecmp))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen) {
 	__WCHAR_TYPE__ __c1, __c2;
 	do {
 		if (!__maxlen--)
 			break;
 		if ((__c1 = *__s1++) != (__c2 = *__s2++) && ((__c1 = (__WCHAR_TYPE__)__localdep_towlower(__c1)) != (__c2 = (__WCHAR_TYPE__)__localdep_towlower(__c2))))
-			return (int)((__WCHAR_TYPE__)__c1 - (__WCHAR_TYPE__)__c2);
+			return (int)((unsigned char)__c1 - (unsigned char)__c2);
 	} while (__c1);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsncasecmp_defined
+#define __local___localdep_wcsncasecmp_defined 1
+#define __localdep_wcsncasecmp __LIBC_LOCAL_NAME(wcsncasecmp)
+#endif /* !__local___localdep_wcsncasecmp_defined */
 #endif /* !__local_wcsncasecmp_defined */

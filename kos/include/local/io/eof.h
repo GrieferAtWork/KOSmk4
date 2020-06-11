@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ff93ded */
+/* HASH CRC-32:0x8624d497 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_eof_defined
-#if defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #define __local_eof_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #include <bits/types.h>
-/* Dependency: "lseek64" from "unistd" */
-#ifndef ____localdep_lseek64_defined
-#define ____localdep_lseek64_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: lseek64 from unistd */
+#ifndef __local___localdep_lseek64_defined
+#define __local___localdep_lseek64_defined 1
 #ifdef __CRT_HAVE_lseek64
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
@@ -39,19 +40,21 @@ __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t 
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, int __whence),_lseeki64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+__NAMESPACE_LOCAL_END
 #include <local/unistd/lseek64.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
-#define __localdep_lseek64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lseek64))
-#else /* CUSTOM: lseek64 */
-#undef ____localdep_lseek64_defined
-#endif /* lseek64... */
-#endif /* !____localdep_lseek64_defined */
-
+#define __localdep_lseek64 __LIBC_LOCAL_NAME(lseek64)
+#else /* ... */
+#undef __local___localdep_lseek64_defined
+#endif /* !... */
+#endif /* !__local___localdep_lseek64_defined */
+__NAMESPACE_LOCAL_END
+#include <asm/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(eof) __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(eof))(__fd_t __fd) {
-#line 418 "kos/src/libc/magic/io.c"
 	__INT64_TYPE__ __oldpos, __endpos;
 	__oldpos = __localdep_lseek64(__fd, 0, __SEEK_CUR);
 	if __unlikely(__oldpos < 0)
@@ -65,5 +68,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(eof))(__fd_t __fd) {
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek */
+#ifndef __local___localdep_eof_defined
+#define __local___localdep_eof_defined 1
+#define __localdep_eof __LIBC_LOCAL_NAME(eof)
+#endif /* !__local___localdep_eof_defined */
+#else /* __CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek */
+#undef __local_eof_defined
+#endif /* !__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 && !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek */
 #endif /* !__local_eof_defined */

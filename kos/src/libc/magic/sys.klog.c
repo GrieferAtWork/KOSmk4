@@ -50,6 +50,7 @@ __SYSDECL_BEGIN
 @@Control the kernel's logging facility.  This corresponds exactly to the
 @@kernel's syslog system call, but that name is easily confused with the
 @@user-level syslog facility, which is something completely different
+[[decl_include("<features.h>")]]
 int klogctl(__STDC_INT_AS_UINT_T type, char *bufp, __STDC_INT_AS_SIZE_T len);
 
 %{

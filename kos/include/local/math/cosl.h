@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d9f2207 */
+/* HASH CRC-32:0x62338412 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,34 +19,38 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cosl_defined
-#if defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
 #define __local_cosl_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
 #include <bits/math-vector.h>
-/* Dependency: "cos" */
-#ifndef ____localdep_cos_defined
-#define ____localdep_cos_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: cos from math */
+#ifndef __local___localdep_cos_defined
+#define __local___localdep_cos_defined 1
 #if __has_builtin(__builtin_cos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cos)
 /* Cosine of X */
-__CEIREDIRECT(__DECL_SIMD_cos __ATTR_WUNUSED,double,__NOTHROW,__localdep_cos,(double __x),cos,{ return __builtin_cos(__x); })
+__CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,__localdep_cos,(double __x),cos,{ return __builtin_cos(__x); })
 #elif defined(__CRT_HAVE_cos)
 /* Cosine of X */
-__CREDIRECT(__DECL_SIMD_cos __ATTR_WUNUSED,double,__NOTHROW,__localdep_cos,(double __x),cos,(__x))
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,__localdep_cos,(double __x),cos,(__x))
 #elif defined(__CRT_HAVE___cos)
 /* Cosine of X */
-__CREDIRECT(__DECL_SIMD_cos __ATTR_WUNUSED,double,__NOTHROW,__localdep_cos,(double __x),__cos,(__x))
-#else /* LIBC: cos */
-#undef ____localdep_cos_defined
-#endif /* cos... */
-#endif /* !____localdep_cos_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cos,double,__NOTHROW,__localdep_cos,(double __x),__cos,(__x))
+#else /* ... */
+#undef __local___localdep_cos_defined
+#endif /* !... */
+#endif /* !__local___localdep_cos_defined */
 /* Cosine of X */
-__LOCAL_LIBC(cosl) __ATTR_WUNUSED __LONGDOUBLE
+__LOCAL_LIBC(cosl) __ATTR_WUNUSED __DECL_SIMD_cosl __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cosl))(__LONGDOUBLE __x) {
-#line 221 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_cos((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_cos || __CRT_HAVE___cos */
+#ifndef __local___localdep_cosl_defined
+#define __local___localdep_cosl_defined 1
+#define __localdep_cosl __LIBC_LOCAL_NAME(cosl)
+#endif /* !__local___localdep_cosl_defined */
+#else /* __CRT_HAVE_cos || __CRT_HAVE___cos */
+#undef __local_cosl_defined
+#endif /* !__CRT_HAVE_cos && !__CRT_HAVE___cos */
 #endif /* !__local_cosl_defined */

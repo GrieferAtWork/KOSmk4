@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91102e5b */
+/* HASH CRC-32:0xdcca8a21 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,30 +19,39 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wexeclpe_defined
-#if defined(__CRT_HAVE_wexecvpe) || defined(__CRT_HAVE__wexecvpe)
 #define __local_wexeclpe_defined 1
 #include <__crt.h>
-#include <parts/redirect-exec.h>
-/* Dependency: "wexecvpe" */
-#ifndef ____localdep_wexecvpe_defined
-#define ____localdep_wexecvpe_defined 1
-#ifdef __CRT_HAVE_wexecvpe
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecvpe,(__WCHAR_TYPE__ const *__restrict __file, __TWARGV, __TWENVP),wexecvpe,(__file,____TWARGV,____TWENVP))
-#elif defined(__CRT_HAVE__wexecvpe)
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecvpe,(__WCHAR_TYPE__ const *__restrict __file, __TWARGV, __TWENVP),_wexecvpe,(__file,____TWARGV,____TWENVP))
-#else /* LIBC: wexecvpe */
-#undef ____localdep_wexecvpe_defined
-#endif /* wexecvpe... */
-#endif /* !____localdep_wexecvpe_defined */
-
+#if defined(__CRT_HAVE_wexecvpe) || (defined(__CRT_HAVE_DOS$wexecvpe) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wexecvpe) && __SIZEOF_WCHAR_T__ == 2)
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wexeclpe) __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) int
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(wexeclpe))(__WCHAR_TYPE__ const *__restrict __file,
-                                                       __WCHAR_TYPE__ const *__args,
-                                                       ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
-#line 100 "kos/src/libc/magic/parts.wchar.process.c"
+/* Dependency: wexecvpe from parts.wchar.process */
+#ifndef __local___localdep_wexecvpe_defined
+#define __local___localdep_wexecvpe_defined 1
+#ifdef __wexecvpe_defined
+__NAMESPACE_GLB_USING(wexecvpe)
+#define __localdep_wexecvpe wexecvpe
+#elif defined(__CRT_HAVE_wexecvpe)
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecvpe,(__WCHAR_TYPE__ const *__restrict __file, __TWARGV, __TWENVP),wexecvpe,(__path,___argv,___envp))
+#elif defined(__CRT_HAVE_DOS$wexecvpe) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecvpe,(__CHAR32_TYPE__ const *__restrict __file, __T32ARGV, __T32ENVP),wexecvpe,(__path,___argv,___envp))
+#elif defined(__CRT_HAVE_DOS$_wexecvpe) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecvpe,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV, __T16ENVP),_wexecvpe,(__path,___argv,___envp))
+#else /* ... */
+#undef __local___localdep_wexecvpe_defined
+#endif /* !... */
+#endif /* !__local___localdep_wexecvpe_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/redirect-exec.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(wexeclpe) __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int
+__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(wexeclpe))(__WCHAR_TYPE__ const *__restrict __file, __WCHAR_TYPE__ const *__args, ...) {
 	__REDIRECT_EXECLE(__WCHAR_TYPE__, __localdep_wexecvpe, __file, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_wexecvpe || __CRT_HAVE__wexecvpe */
+#ifndef __local___localdep_wexeclpe_defined
+#define __local___localdep_wexeclpe_defined 1
+#define __localdep_wexeclpe __LIBC_LOCAL_NAME(wexeclpe)
+#endif /* !__local___localdep_wexeclpe_defined */
+#else /* __CRT_HAVE_wexecvpe || (__CRT_HAVE_DOS$wexecvpe && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$_wexecvpe && __SIZEOF_WCHAR_T__ == 2) */
+#undef __local_wexeclpe_defined
+#endif /* !__CRT_HAVE_wexecvpe && (!__CRT_HAVE_DOS$wexecvpe || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$_wexecvpe || !__SIZEOF_WCHAR_T__ == 2) */
 #endif /* !__local_wexeclpe_defined */

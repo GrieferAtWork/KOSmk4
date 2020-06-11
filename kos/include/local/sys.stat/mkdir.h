@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x965cf5b3 */
+/* HASH CRC-32:0x684d2700 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,27 +19,26 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mkdir_defined
-#if defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
 #define __local_mkdir_defined 1
 #include <__crt.h>
-/* Dependency: "dos_mkdir" from "sys.stat" */
-#ifndef ____localdep_dos_mkdir_defined
-#define ____localdep_dos_mkdir_defined 1
-#ifdef __CRT_HAVE__mkdir
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_dos_mkdir,(char const *__pathname),_mkdir,(__pathname))
-#else /* LIBC: _mkdir */
-#undef ____localdep_dos_mkdir_defined
-#endif /* dos_mkdir... */
-#endif /* !____localdep_dos_mkdir_defined */
-
+#if defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: dos_mkdir from sys.stat */
+#if !defined(__local___localdep_dos_mkdir_defined) && defined(__CRT_HAVE__mkdir)
+#define __local___localdep_dos_mkdir_defined 1
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_dos_mkdir,(char const *__pathname),_mkdir,(__pathname))
+#endif /* !__local___localdep_dos_mkdir_defined && __CRT_HAVE__mkdir */
 __LOCAL_LIBC(mkdir) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mkdir))(char const *__pathname,
-                                                   __mode_t __mode) {
-#line 496 "kos/src/libc/magic/sys.stat.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mkdir))(char const *__pathname, __mode_t __mode) {
 	(void)__mode;
 	return __localdep_dos_mkdir(__pathname);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_DOS_PRIMARY && __CRT_HAVE__mkdir */
+#ifndef __local___localdep_mkdir_defined
+#define __local___localdep_mkdir_defined 1
+#define __localdep_mkdir __LIBC_LOCAL_NAME(mkdir)
+#endif /* !__local___localdep_mkdir_defined */
+#else /* __CRT_DOS_PRIMARY && __CRT_HAVE__mkdir */
+#undef __local_mkdir_defined
+#endif /* !__CRT_DOS_PRIMARY || !__CRT_HAVE__mkdir */
 #endif /* !__local_mkdir_defined */

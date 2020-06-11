@@ -135,18 +135,77 @@ function replaceWcharText(
 	local flushStart = self.tokEnd;
 	for (;;) {
 		local tok = self.next();
-		if (!tok)
-			break;
-		if (!tok.issymbol()) {
-			if (tok.startswith('L"') || tok.startswith("L'")) {
-				/* Wide-character string/char constant
-				 * -> Convert to unicode character constant */
-				if (flushStart < self.tokStart)
-					fp << self.text[flushStart:self.tokStart];
-				fp << WCHAR_REPLACEMENT_STR[mode];
-				flushStart = self.tokStart + 1;
+		switch (tok) {
+		
+		case "":
+			goto done;
+
+		case "@":
+			/* Deal with escaped keywords */
+			do {
+				tok = self.next();
+			} while (tok !in ["", "@"]);
+			continue;
+
+		case "#":
+			/* Check for header replacements */
+			tok = self.next();
+			if (tok in ["include", "include_next"]) {
+				local headerStart = self.tokEnd;
+				local headerEnd = self.text.find("\n", headerStart, self.end);
+				if (headerEnd < 0)
+					headerEnd = self.end;
+				while (headerStart < headerEnd && self.text.isspace(headerStart))
+					++headerStart;
+				while (headerEnd > headerStart && self.text.isspace(headerEnd - 1))
+					--headerEnd;
+				self.tokEnd = headerEnd;
+				local newHeaderName = wcharReplacementHeaders.get(
+					self.text[headerStart:headerEnd].strip())[mode];
+				if (newHeaderName is none)
+					continue;
+				if (flushStart < headerStart)
+					fp << self.text[flushStart:headerStart];
+				fp << newHeaderName;
+				flushStart = headerEnd;
 			}
 			continue;
+
+		case "__has_include":
+		case "__has_include_next":
+			tok = self.next();
+			if (tok == "(") {
+				self.next();
+				local headerStart = self.tokStart;
+				self.skipPair("(", ")");
+				local headerEnd = self.tokStart;
+				while (headerEnd > headerStart && self.text.isspace(headerEnd - 1))
+					--headerEnd;
+				local newHeaderName =
+					wcharReplacementHeaders.get(
+						self.text[headerStart:headerEnd])[mode];
+				if (newHeaderName is none)
+					continue;
+				if (flushStart < headerStart)
+					fp << self.text[flushStart:headerStart];
+				fp << newHeaderName;
+				flushStart = headerEnd;
+			}
+			continue;
+
+		default:
+			if (!tok.issymbol()) {
+				if (tok.startswith('L"') || tok.startswith("L'")) {
+					/* Wide-character string/char constant
+					 * -> Convert to unicode character constant */
+					if (flushStart < self.tokStart)
+						fp << self.text[flushStart:self.tokStart];
+					fp << WCHAR_REPLACEMENT_STR[mode];
+					flushStart = self.tokStart + 1;
+				}
+				continue;
+			}
+			break;
 		}
 		local repl;
 		try {
@@ -166,6 +225,7 @@ function replaceWcharText(
 		fp << repl;
 		flushStart = self.tokEnd;
 	}
+done:
 	if (flushStart < self.end)
 		fp << self.text[flushStart:self.end];
 	return fp.string;
@@ -243,6 +303,33 @@ function replaceWcharPrototypes(
 	return newPrototypes;
 }
 
+@@Similar to @replaceWcharPrototype, but only do a shallow replacement,
+@@such that the resulting prototype is only correct under the assumption
+@@that `sizeof(wchar_t) == WCHAR_REPLACEMENT_SIZE[mode]`
+@@In practice, this means that only calling conventions are replaced
+function replaceWcharPrototypeShallow(self: FunctionPrototype, mode: int): FunctionPrototype {
+	local result = copy self;
+	result.cc = replaceWcharText(result.cc, mode);
+	return result;
+}
+
+@@Similar to @replaceWcharPrototypes, but only do a shallow replacement,
+@@such that the resulting prototypes are only correct under the assumption
+@@that `sizeof(wchar_t) == WCHAR_REPLACEMENT_SIZE[mode]`
+@@In practice, this means that only calling conventions are replaced
+function replaceWcharPrototypesShallow(
+		self: {(string | UserString, {FunctionPrototype...})...},
+		mode: int): {(string | UserString, {FunctionPrototype...})...} {
+	local newPrototypes = [];
+	for (local ppCond, protos: self) {
+		local newProtos = [];
+		for (local proto: protos)
+			newProtos.append(replaceWcharPrototypeShallow(proto, mode));
+		newPrototypes.append((ppCond, newProtos));
+	}
+	return newPrototypes;
+}
+
 function replaceWcharFunctionImplementation(
 		self: FunctionImplementation, mode: int,
 		functionName: string | UserString): FunctionImplementation {
@@ -263,6 +350,7 @@ function replaceWcharFunctionImplementation(
 					throw Error("Missing %{{uchar{}}}-variant of [[wchar]] Function {!r}"
 						.format({ WCHAR_REPLACEMENT_WIDTH[mode], func.name }));
 				}
+				name = func.name;
 			}
 			newDeps.append((name, func));
 		}

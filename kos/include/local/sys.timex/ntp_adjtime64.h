@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x399eed26 */
+/* HASH CRC-32:0x8a66f2e7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,23 +19,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ntp_adjtime64_defined
-#ifdef __CRT_HAVE_ntp_adjtime
 #define __local_ntp_adjtime64_defined 1
 #include <__crt.h>
-/* Dependency: "ntp_adjtime32" from "sys.timex" */
-#ifndef ____localdep_ntp_adjtime32_defined
-#define ____localdep_ntp_adjtime32_defined 1
 #ifdef __CRT_HAVE_ntp_adjtime
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime32,(struct __timex32 *__restrict __tntx),ntp_adjtime,(__tntx))
-#else /* LIBC: ntp_adjtime */
-#undef ____localdep_ntp_adjtime32_defined
-#endif /* ntp_adjtime32... */
-#endif /* !____localdep_ntp_adjtime32_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: ntp_adjtime32 from sys.timex */
+#if !defined(__local___localdep_ntp_adjtime32_defined) && defined(__CRT_HAVE_ntp_adjtime)
+#define __local___localdep_ntp_adjtime32_defined 1
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime32,(struct __timex32 *__restrict __tntx),ntp_adjtime,(__tntx))
+#endif /* !__local___localdep_ntp_adjtime32_defined && __CRT_HAVE_ntp_adjtime */
 __LOCAL_LIBC(ntp_adjtime64) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_adjtime64))(struct timex64 *__restrict __tntx) {
-#line 425 "kos/src/libc/magic/sys.timex.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_adjtime64))(struct __timex64 *__restrict __tntx) {
 	int __result;
 	struct __timex32 __nxtalt;
 	__nxtalt.time.tv_sec  = (__time32_t)__tntx->time.tv_sec;
@@ -86,5 +80,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_adjtime64))(struct timex64 *__res
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_ntp_adjtime */
+#ifndef __local___localdep_ntp_adjtime64_defined
+#define __local___localdep_ntp_adjtime64_defined 1
+#define __localdep_ntp_adjtime64 __LIBC_LOCAL_NAME(ntp_adjtime64)
+#endif /* !__local___localdep_ntp_adjtime64_defined */
+#else /* __CRT_HAVE_ntp_adjtime */
+#undef __local_ntp_adjtime64_defined
+#endif /* !__CRT_HAVE_ntp_adjtime */
 #endif /* !__local_ntp_adjtime64_defined */

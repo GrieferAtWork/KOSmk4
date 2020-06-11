@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb74dc820 */
+/* HASH CRC-32:0x1f435066 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mallopt) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mallopt))(int __parameter_number,
-                                                     int __parameter_value) {
-#line 165 "kos/src/libc/magic/malloc.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mallopt))(int __parameter_number, int __parameter_value) {
 	/* NO-OP */
 	__COMPILER_IMPURE();
 	(void)__parameter_number;
@@ -33,4 +31,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mallopt))(int __parameter_number,
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_mallopt_defined
+#define __local___localdep_mallopt_defined 1
+#define __localdep_mallopt __LIBC_LOCAL_NAME(mallopt)
+#endif /* !__local___localdep_mallopt_defined */
 #endif /* !__local_mallopt_defined */

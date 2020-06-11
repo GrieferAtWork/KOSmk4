@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa20799ea */
+/* HASH CRC-32:0x7ac04abe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,21 +19,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ldexp_defined
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_ldexp_defined 1
 #include <__crt.h>
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <parts/errno.h>
-
 #include <libm/finite.h>
-
 #include <libm/ldexp.h>
 __NAMESPACE_LOCAL_BEGIN
 /* X times (two to the EXP power) */
 __LOCAL_LIBC(ldexp) __ATTR_WUNUSED double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexp))(double __x,
-                                               int __exponent) {
-#line 354 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexp))(double __x, int __exponent) {
 	double __result;
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	__result = (double)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)__x, __exponent);
@@ -42,12 +38,18 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexp))(double __x,
 #else /* ... */
 	__result = (double)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __exponent);
 #endif /* !... */
-#ifdef __ERANGE
+#ifdef ERANGE
 	if __unlikely(!__LIBM_MATHFUN(finite, __result) || __result == 0.0)
 		__libc_seterrno(__ERANGE);
 #endif /* ERANGE */
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#ifndef __local___localdep_ldexp_defined
+#define __local___localdep_ldexp_defined 1
+#define __localdep_ldexp __LIBC_LOCAL_NAME(ldexp)
+#endif /* !__local___localdep_ldexp_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_ldexp_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_ldexp_defined */

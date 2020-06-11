@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f7105a3 */
+/* HASH CRC-32:0xb06b47e4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,24 +22,26 @@
 #define __local_pthread_spin_trylock_defined 1
 #include <__crt.h>
 #include <hybrid/__atomic.h>
-
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Try to lock spinlock LOCK */
 __LOCAL_LIBC(pthread_spin_trylock) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_trylock))(__pthread_spinlock_t *__lock) {
-#line 1281 "kos/src/libc/magic/pthread.c"
 	if (__hybrid_atomic_xch(*__lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
-#ifdef __EBUSY
+#ifdef EBUSY
 	return __EBUSY;
-#elif defined(__EWOULDBLOCK)
+#elif defined(EWOULDBLOCK)
 	return __EWOULDBLOCK;
-#elif defined(__EAGAIN)
+#elif defined(EAGAIN)
 	return __EAGAIN;
 #else /* ... */
 	return 1;
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_pthread_spin_trylock_defined
+#define __local___localdep_pthread_spin_trylock_defined 1
+#define __localdep_pthread_spin_trylock __LIBC_LOCAL_NAME(pthread_spin_trylock)
+#endif /* !__local___localdep_pthread_spin_trylock_defined */
 #endif /* !__local_pthread_spin_trylock_defined */

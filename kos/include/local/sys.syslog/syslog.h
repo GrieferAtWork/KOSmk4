@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb440c6d */
+/* HASH CRC-32:0x4f3c2adb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,33 +19,38 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_syslog_defined
-#if defined(__CRT_HAVE_syslog_printer) || defined(__CRT_HAVE_vsyslog)
 #define __local_syslog_defined 1
 #include <__crt.h>
-/* Dependency: "vsyslog" from "sys.syslog" */
-#ifndef ____localdep_vsyslog_defined
-#define ____localdep_vsyslog_defined 1
-#ifdef __CRT_HAVE_vsyslog
-__CREDIRECT_VOID(__ATTR_LIBC_PRINTF(2,0) __ATTR_NONNULL((2)),__NOTHROW_RPC,__localdep_vsyslog,(int __level, char const *__format, __builtin_va_list __args),vsyslog,(__level,__format,__args))
-#elif defined(__CRT_HAVE_syslog_printer)
-#include <local/sys.syslog/vsyslog.h>
-#define __localdep_vsyslog (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsyslog))
-#else /* CUSTOM: vsyslog */
-#undef ____localdep_vsyslog_defined
-#endif /* vsyslog... */
-#endif /* !____localdep_vsyslog_defined */
-
+#if defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer)
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(syslog) __ATTR_LIBC_PRINTF(2,3) __ATTR_NONNULL((2)) void
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(syslog))(int __level,
-                                                     char const *__format,
-                                                     ...) {
-#line 145 "kos/src/libc/magic/sys.syslog.c"
+/* Dependency: vsyslog from sys.syslog */
+#ifndef __local___localdep_vsyslog_defined
+#define __local___localdep_vsyslog_defined 1
+#ifdef __CRT_HAVE_vsyslog
+__CREDIRECT_VOID(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)),__NOTHROW_RPC,__localdep_vsyslog,(__STDC_INT_AS_UINT_T __level, char const *__format, __builtin_va_list __args),vsyslog,(__level,__format,__args))
+#elif defined(__CRT_HAVE_syslog_printer)
+__NAMESPACE_LOCAL_END
+#include <local/sys.syslog/vsyslog.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_vsyslog __LIBC_LOCAL_NAME(vsyslog)
+#else /* ... */
+#undef __local___localdep_vsyslog_defined
+#endif /* !... */
+#endif /* !__local___localdep_vsyslog_defined */
+__LOCAL_LIBC(syslog) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) void
+__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(syslog))(__STDC_INT_AS_UINT_T __level, char const *__format, ...) {
 	__builtin_va_list __args;
 	__builtin_va_start(__args,__format);
 	__localdep_vsyslog(__level,__format,__args);
 	__builtin_va_end(__args);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_syslog_printer || __CRT_HAVE_vsyslog */
+#ifndef __local___localdep_syslog_defined
+#define __local___localdep_syslog_defined 1
+#define __localdep_syslog __LIBC_LOCAL_NAME(syslog)
+#endif /* !__local___localdep_syslog_defined */
+#else /* __CRT_HAVE_vsyslog || __CRT_HAVE_syslog_printer */
+#undef __local_syslog_defined
+#endif /* !__CRT_HAVE_vsyslog && !__CRT_HAVE_syslog_printer */
 #endif /* !__local_syslog_defined */

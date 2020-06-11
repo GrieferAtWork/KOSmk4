@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x202f938f */
+/* HASH CRC-32:0x91b7e89b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(strchrnul) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strchrnul))(char const *__restrict __haystack,
-                                                       int __needle) {
-#line 628 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strchrnul))(char const *__restrict __haystack, int __needle) {
 	for (; *__haystack; ++__haystack) {
 		if (*__haystack == (char)__needle)
 			break;
@@ -34,4 +32,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strchrnul))(char const *__restrict __
 	return (char *)__haystack;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strchrnul_defined
+#define __local___localdep_strchrnul_defined 1
+#define __localdep_strchrnul __LIBC_LOCAL_NAME(strchrnul)
+#endif /* !__local___localdep_strchrnul_defined */
 #endif /* !__local_strchrnul_defined */

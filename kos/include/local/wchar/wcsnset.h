@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30ce9873 */
+/* HASH CRC-32:0xb82df024 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,14 +23,15 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsnset) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnset))(__WCHAR_TYPE__ *__restrict __str,
-                                                     __WCHAR_TYPE__ __ch,
-                                                     __SIZE_TYPE__ __maxlen) {
-#line 4898 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnset))(__WCHAR_TYPE__ *__restrict __str, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __maxlen) {
 	__WCHAR_TYPE__ *__iter;
 	for (__iter = __str; __maxlen-- && *__iter; ++__iter)
 		*__iter = (__WCHAR_TYPE__)__ch;
 	return __str;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsnset_defined
+#define __local___localdep_wcsnset_defined 1
+#define __localdep_wcsnset __LIBC_LOCAL_NAME(wcsnset)
+#endif /* !__local___localdep_wcsnset_defined */
 #endif /* !__local_wcsnset_defined */

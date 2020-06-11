@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28c25969 */
+/* HASH CRC-32:0xb0e24044 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcwidth) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcwidth))(__WCHAR_TYPE__ __ch) {
-#line 910 "kos/src/libc/magic/wchar.c"
 #if __SIZEOF_WCHAR_T__ == 2
 	if (__ch >= 0xd800 &&
 	    __ch <= 0xdfff)
@@ -38,4 +37,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcwidth))(__WCHAR_TYPE__ __ch) {
 	return -1;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcwidth_defined
+#define __local___localdep_wcwidth_defined 1
+#define __localdep_wcwidth __LIBC_LOCAL_NAME(wcwidth)
+#endif /* !__local___localdep_wcwidth_defined */
 #endif /* !__local_wcwidth_defined */

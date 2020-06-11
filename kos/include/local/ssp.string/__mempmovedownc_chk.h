@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x421ee9a4 */
+/* HASH CRC-32:0x8bb75e65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,37 +21,36 @@
 #ifndef __local___mempmovedownc_chk_defined
 #define __local___mempmovedownc_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "mempmovedownc" from "string" */
-#ifndef ____localdep_mempmovedownc_defined
-#define ____localdep_mempmovedownc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempmovedownc from string */
+#ifndef __local___localdep_mempmovedownc_defined
+#define __local___localdep_mempmovedownc_defined 1
 #ifdef __fast_mempmovedownc_defined
 /* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
-#define __localdep_mempmovedownc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownc))
+__NAMESPACE_FAST_USING(mempmovedownc)
+#define __localdep_mempmovedownc __LIBC_FAST_NAME(mempmovedownc)
 #elif defined(__CRT_HAVE_mempmovedownc)
 /* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempmovedownc,(__dst,__src,__elem_count,__elem_size))
-#else /* LIBC: mempmovedownc */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempmovedownc.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
-#define __localdep_mempmovedownc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownc))
-#endif /* mempmovedownc... */
-#endif /* !____localdep_mempmovedownc_defined */
-
+#define __localdep_mempmovedownc __LIBC_LOCAL_NAME(mempmovedownc)
+#endif /* !... */
+#endif /* !__local___localdep_mempmovedownc_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__mempmovedownc_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempmovedownc_chk))(void *__dst,
-                                                                 void const *__src,
-                                                                 __SIZE_TYPE__ __elem_count,
-                                                                 __SIZE_TYPE__ __elem_size,
-                                                                 __SIZE_TYPE__ __dst_objsize) {
-#line 71 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempmovedownc_chk))(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("mempmovedownc", __dst, __elem_count * __elem_size, __dst_objsize);
 	return __localdep_mempmovedownc(__dst, __src, __elem_count, __elem_size);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___mempmovedownc_chk_defined
+#define __local___localdep___mempmovedownc_chk_defined 1
+#define __localdep___mempmovedownc_chk __LIBC_LOCAL_NAME(__mempmovedownc_chk)
+#endif /* !__local___localdep___mempmovedownc_chk_defined */
 #endif /* !__local___mempmovedownc_chk_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37c91c4 */
+/* HASH CRC-32:0xd83201f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,31 +21,31 @@
 #ifndef __local_memrmem_defined
 #define __local_memrmem_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "memrchr" from "string" */
-#ifndef ____localdep_memrchr_defined
-#define ____localdep_memrchr_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memrchr from string */
+#ifndef __local___localdep_memrchr_defined
+#define __local___localdep_memrchr_defined 1
 #ifdef __CRT_HAVE_memrchr
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrchr,(__haystack,__needle,__n_bytes))
-#else /* LIBC: memrchr */
+#else /* __CRT_HAVE_memrchr */
+__NAMESPACE_LOCAL_END
 #include <local/string/memrchr.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_memrchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchr))
-#endif /* memrchr... */
-#endif /* !____localdep_memrchr_defined */
-
-/* Dependency: "memcmp" from "string" */
-#ifndef ____localdep_memcmp_defined
-#define ____localdep_memcmp_defined 1
+#define __localdep_memrchr __LIBC_LOCAL_NAME(memrchr)
+#endif /* !__CRT_HAVE_memrchr */
+#endif /* !__local___localdep_memrchr_defined */
+/* Dependency: memcmp from string */
+#ifndef __local___localdep_memcmp_defined
+#define __local___localdep_memcmp_defined 1
 #ifdef __fast_memcmp_defined
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-#define __localdep_memcmp (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))
+__NAMESPACE_FAST_USING(memcmp)
+#define __localdep_memcmp __LIBC_FAST_NAME(memcmp)
 #elif defined(__CRT_HAVE_memcmp)
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
@@ -58,18 +58,20 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
-#else /* LIBC: memcmp */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memcmp.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-#define __localdep_memcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp))
-#endif /* memcmp... */
-#endif /* !____localdep_memcmp_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
+#endif /* !... */
+#endif /* !__local___localdep_memcmp_defined */
+__NAMESPACE_LOCAL_END
 #include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
@@ -78,11 +80,7 @@ __NAMESPACE_LOCAL_BEGIN
  * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __LOCAL_LIBC(memrmem) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrmem))(void const *__haystack,
-                                                     __SIZE_TYPE__ __haystacklen,
-                                                     void const *__needle,
-                                                     __SIZE_TYPE__ __needlelen) {
-#line 2788 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrmem))(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen) {
 	__BYTE_TYPE__ *__candidate, __marker;
 #if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
 	if __unlikely(!__needlelen || __needlelen > __haystacklen)
@@ -103,4 +101,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrmem))(void const *__haystack,
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memrmem_defined
+#define __local___localdep_memrmem_defined 1
+#define __localdep_memrmem __LIBC_LOCAL_NAME(memrmem)
+#endif /* !__local___localdep_memrmem_defined */
 #endif /* !__local_memrmem_defined */

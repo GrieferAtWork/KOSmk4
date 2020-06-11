@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9002da4 */
+/* HASH CRC-32:0x720ce87c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,32 +19,30 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wait3_64_defined
-#ifdef __CRT_HAVE_wait3
 #define __local_wait3_64_defined 1
 #include <__crt.h>
-#include <bits/rusage-struct.h>
-#include <bits/rusage-struct.h>
-/* Dependency: "wait3_32" from "sys.wait" */
-#ifndef ____localdep_wait3_32_defined
-#define ____localdep_wait3_32_defined 1
 #ifdef __CRT_HAVE_wait3
-/* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait3_32,(__WAIT_STATUS __stat_loc, int __options, struct __rusage32 *__usage),wait3,(__stat_loc,__options,__usage))
-#else /* LIBC: wait3 */
-#undef ____localdep_wait3_32_defined
-#endif /* wait3_32... */
-#endif /* !____localdep_wait3_32_defined */
-
+#include <features.h>
+struct __rusage64;
 __NAMESPACE_LOCAL_BEGIN
-#include <bits/rusage-convert.h>
+/* Dependency: wait3_32 from sys.wait */
+#if !defined(__local___localdep_wait3_32_defined) && defined(__CRT_HAVE_wait3)
+#define __local___localdep_wait3_32_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/rusage-struct.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+ * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait3_32,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),wait3,(__stat_loc,__options,__usage))
+#endif /* !__local___localdep_wait3_32_defined && __CRT_HAVE_wait3 */
+__NAMESPACE_LOCAL_END
+#include <bits/rusage-struct.h>
+#include <bits/rusage-convert.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __LOCAL_LIBC(wait3_64) __pid_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wait3_64))(__WAIT_STATUS __stat_loc,
-                                                      int __options,
-                                                      struct __rusage64 *__usage) {
-#line 167 "kos/src/libc/magic/sys.wait.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wait3_64))(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage) {
 	__pid_t __result;
 	struct __rusage32 __ru32;
 	__result = __localdep_wait3_32(__stat_loc, __options, __usage ? &__ru32 : __NULLPTR);
@@ -53,5 +51,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wait3_64))(__WAIT_STATUS __stat_loc,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_wait3 */
+#ifndef __local___localdep_wait3_64_defined
+#define __local___localdep_wait3_64_defined 1
+#define __localdep_wait3_64 __LIBC_LOCAL_NAME(wait3_64)
+#endif /* !__local___localdep_wait3_64_defined */
+#else /* __CRT_HAVE_wait3 */
+#undef __local_wait3_64_defined
+#endif /* !__CRT_HAVE_wait3 */
 #endif /* !__local_wait3_64_defined */

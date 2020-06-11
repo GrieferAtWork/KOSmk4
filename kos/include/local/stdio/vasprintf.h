@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc90a0b57 */
+/* HASH CRC-32:0x365dafe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,25 +19,71 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vasprintf_defined
-#if (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #define __local_vasprintf_defined 1
 #include <__crt.h>
+#if (defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: format_aprintf_pack from format-printer */
+#ifndef __local___localdep_format_aprintf_pack_defined
+#define __local___localdep_format_aprintf_pack_defined 1
+#ifdef __CRT_HAVE_format_aprintf_pack
+/* Pack and finalize a given aprintf format printer
+ * Together with `format_aprintf_printer()', the aprintf
+ * format printer sub-system should be used as follows:
+ * >> char *result; ssize_t error;
+ * >> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
+ * >> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
+ * >> if unlikely(error < 0) {
+ * >>     format_aprintf_data_fini(&p);
+ * >>     return NULL;
+ * >> }
+ * >> result = format_aprintf_pack(&p, NULL);
+ * >> return result;
+ * WARNING: Note that `format_aprintf_pack()' is able to return `NULL' as well,
+ *          but will finalize the given aprintf printer an all cases.
+ * NOTE:    The caller must destroy the returned string by passing it to `free()'
+ * @param: pstrlen: When non-NULL, store the length of the constructed string here
+ *                  Note that this is the actual length if the constructed string,
+ *                  but may differ from `strlen(return)' when NUL characters were
+ *                  printed to the aprintf-printer at one point.
+ *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_format_aprintf_pack,(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),format_aprintf_pack,(__self,__pstrlen))
+#else /* __CRT_HAVE_format_aprintf_pack */
+__NAMESPACE_LOCAL_END
+#include <local/format-printer/format_aprintf_pack.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Pack and finalize a given aprintf format printer
+ * Together with `format_aprintf_printer()', the aprintf
+ * format printer sub-system should be used as follows:
+ * >> char *result; ssize_t error;
+ * >> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
+ * >> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
+ * >> if unlikely(error < 0) {
+ * >>     format_aprintf_data_fini(&p);
+ * >>     return NULL;
+ * >> }
+ * >> result = format_aprintf_pack(&p, NULL);
+ * >> return result;
+ * WARNING: Note that `format_aprintf_pack()' is able to return `NULL' as well,
+ *          but will finalize the given aprintf printer an all cases.
+ * NOTE:    The caller must destroy the returned string by passing it to `free()'
+ * @param: pstrlen: When non-NULL, store the length of the constructed string here
+ *                  Note that this is the actual length if the constructed string,
+ *                  but may differ from `strlen(return)' when NUL characters were
+ *                  printed to the aprintf-printer at one point.
+ *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
+#define __localdep_format_aprintf_pack __LIBC_LOCAL_NAME(format_aprintf_pack)
+#endif /* !__CRT_HAVE_format_aprintf_pack */
+#endif /* !__local___localdep_format_aprintf_pack_defined */
+/* Dependency: format_vprintf from format-printer */
+#ifndef __local___localdep_format_vprintf_defined
+#define __local___localdep_format_vprintf_defined 1
+#ifdef __CRT_HAVE_format_vprintf
+__NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/format-printer.h>
-#include <hybrid/__assert.h>
-
-#ifndef __format_aprintf_data_defined
-#define __format_aprintf_data_defined 1
-struct format_aprintf_data {
-	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owend] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
-};
-#endif /* !__format_aprintf_data_defined */
-/* Dependency: "format_vprintf" from "format-printer" */
-#ifndef ____localdep_format_vprintf_defined
-#define ____localdep_format_vprintf_defined 1
-#ifdef __CRT_HAVE_format_vprintf
+__NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -126,8 +172,10 @@ struct format_aprintf_data {
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
-#else /* LIBC: format_vprintf */
+#else /* __CRT_HAVE_format_vprintf */
+__NAMESPACE_LOCAL_END
 #include <local/format-printer/format_vprintf.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -215,101 +263,60 @@ __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THR
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-#define __localdep_format_vprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vprintf))
-#endif /* format_vprintf... */
-#endif /* !____localdep_format_vprintf_defined */
-
-/* Dependency: "free" */
-#ifndef ____localdep_free_defined
-#define ____localdep_free_defined 1
-#ifdef __std___localdep_free_defined
-__NAMESPACE_STD_USING(__localdep_free)
+#define __localdep_format_vprintf __LIBC_LOCAL_NAME(format_vprintf)
+#endif /* !__CRT_HAVE_format_vprintf */
+#endif /* !__local___localdep_format_vprintf_defined */
+/* Dependency: format_aprintf_printer from format-printer */
+#ifndef __local___localdep_format_aprintf_printer_defined
+#define __local___localdep_format_aprintf_printer_defined 1
+#ifdef __CRT_HAVE_format_aprintf_printer
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
+ * This function is intended to be used as a pformatprinter-compatibile printer sink */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_aprintf_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_aprintf_printer,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)
+__NAMESPACE_LOCAL_END
+#include <local/format-printer/format_aprintf_printer.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
+ * This function is intended to be used as a pformatprinter-compatibile printer sink */
+#define __localdep_format_aprintf_printer __LIBC_LOCAL_NAME(format_aprintf_printer)
+#else /* ... */
+#undef __local___localdep_format_aprintf_printer_defined
+#endif /* !... */
+#endif /* !__local___localdep_format_aprintf_printer_defined */
+/* Dependency: free from stdlib */
+#ifndef __local___localdep_free_defined
+#define __local___localdep_free_defined 1
+#ifdef __free_defined
+__NAMESPACE_GLB_USING(free)
+#define __localdep_free free
+#elif defined(__std_free_defined)
+__NAMESPACE_STD_USING(free)
+#define __localdep_free free
 #elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
-#else /* LIBC: free */
-#undef ____localdep_free_defined
-#endif /* free... */
-#endif /* !____localdep_free_defined */
-
-/* Dependency: "format_aprintf_pack" from "format-printer" */
-#ifndef ____localdep_format_aprintf_pack_defined
-#define ____localdep_format_aprintf_pack_defined 1
-#ifdef __CRT_HAVE_format_aprintf_pack
-/* Pack and finalize a given aprintf format printer
- * Together with `format_aprintf_printer()', the aprintf
- * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
- * >> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
- * >> if unlikely(error < 0) {
- * >>     format_aprintf_data_fini(&p);
- * >>     return NULL;
- * >> }
- * >> result = format_aprintf_pack(&p, NULL);
- * >> return result;
- * WARNING: Note that `format_aprintf_pack()' is able to return `NULL' as well,
- *          but will finalize the given aprintf printer an all cases.
- * NOTE:    The caller must destroy the returned string by passing it to `free()'
- * @param: pstrlen: When non-NULL, store the length of the constructed string here
- *                  Note that this is the actual length if the constructed string,
- *                  but may differ from `strlen(return)' when NUL characters were
- *                  printed to the aprintf-printer at one point.
- *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_format_aprintf_pack,(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),format_aprintf_pack,(__self,__pstrlen))
-#else /* LIBC: format_aprintf_pack */
-#include <local/format-printer/format_aprintf_pack.h>
-/* Pack and finalize a given aprintf format printer
- * Together with `format_aprintf_printer()', the aprintf
- * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
- * >> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
- * >> if unlikely(error < 0) {
- * >>     format_aprintf_data_fini(&p);
- * >>     return NULL;
- * >> }
- * >> result = format_aprintf_pack(&p, NULL);
- * >> return result;
- * WARNING: Note that `format_aprintf_pack()' is able to return `NULL' as well,
- *          but will finalize the given aprintf printer an all cases.
- * NOTE:    The caller must destroy the returned string by passing it to `free()'
- * @param: pstrlen: When non-NULL, store the length of the constructed string here
- *                  Note that this is the actual length if the constructed string,
- *                  but may differ from `strlen(return)' when NUL characters were
- *                  printed to the aprintf-printer at one point.
- *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
-#define __localdep_format_aprintf_pack (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_pack))
-#endif /* format_aprintf_pack... */
-#endif /* !____localdep_format_aprintf_pack_defined */
-
-/* Dependency: "format_aprintf_printer" from "format-printer" */
-#ifndef ____localdep_format_aprintf_printer_defined
-#define ____localdep_format_aprintf_printer_defined 1
-#ifdef __CRT_HAVE_format_aprintf_printer
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
- * This function is intended to be used as a pformatprinter-compatibile printer sink */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_aprintf_printer,(/*struct format_aprintf_data **/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_aprintf_printer,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc)
-#include <local/format-printer/format_aprintf_printer.h>
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
- * This function is intended to be used as a pformatprinter-compatibile printer sink */
-#define __localdep_format_aprintf_printer (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_printer))
-#else /* CUSTOM: format_aprintf_printer */
-#undef ____localdep_format_aprintf_printer_defined
-#endif /* format_aprintf_printer... */
-#endif /* !____localdep_format_aprintf_printer_defined */
-
+#else /* ... */
+#undef __local___localdep_free_defined
+#endif /* !... */
+#endif /* !__local___localdep_free_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__assert.h>
+#ifndef __format_aprintf_data_defined
+#define __format_aprintf_data_defined 1
+struct format_aprintf_data {
+	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owend] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+};
+#endif
 __NAMESPACE_LOCAL_BEGIN
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 __LOCAL_LIBC(vasprintf) __ATTR_WUNUSED __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr,
-                                                       char const *__restrict __format,
-                                                       __builtin_va_list __args) {
-#line 1747 "kos/src/libc/magic/stdio.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr, char const *__restrict __format, __builtin_va_list __args) {
 	char *__result;
 	__SSIZE_TYPE__ __error;
 	struct format_aprintf_data __data;
@@ -329,5 +336,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr,
 	return (__STDC_INT_AS_SSIZE_T)__error;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_realloc || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_format_aprintf_printer) && (__CRT_HAVE_free || __CRT_HAVE_cfree) */
+#ifndef __local___localdep_vasprintf_defined
+#define __local___localdep_vasprintf_defined 1
+#define __localdep_vasprintf __LIBC_LOCAL_NAME(vasprintf)
+#endif /* !__local___localdep_vasprintf_defined */
+#else /* (__CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc) && (__CRT_HAVE_free || __CRT_HAVE_cfree) */
+#undef __local_vasprintf_defined
+#endif /* (!__CRT_HAVE_format_aprintf_printer && !__CRT_HAVE_format_aprintf_alloc && !__CRT_HAVE_realloc) || (!__CRT_HAVE_free && !__CRT_HAVE_cfree) */
 #endif /* !__local_vasprintf_defined */

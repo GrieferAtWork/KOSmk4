@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83d96812 */
+/* HASH CRC-32:0x43aea8a5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,23 +21,30 @@
 #ifndef __local_wctomb_defined
 #define __local_wctomb_defined 1
 #include <__crt.h>
-/* Dependency: "wcrtomb" from "wchar" */
-#ifndef ____localdep_wcrtomb_defined
-#define ____localdep_wcrtomb_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcrtomb from wchar */
+#ifndef __local___localdep_wcrtomb_defined
+#define __local___localdep_wcrtomb_defined 1
 #ifdef __CRT_HAVE_wcrtomb
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
-#else /* LIBC: wcrtomb */
+#elif defined(__CRT_HAVE_DOS$wcrtomb) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __CHAR32_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
+#elif defined(__CRT_HAVE_DOS$wcrtomb) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/wcrtomb.h>
-#define __localdep_wcrtomb (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcrtomb))
-#endif /* wcrtomb... */
-#endif /* !____localdep_wcrtomb_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcrtomb __LIBC_LOCAL_NAME(wcrtomb)
+#endif /* !... */
+#endif /* !__local___localdep_wcrtomb_defined */
 __LOCAL_LIBC(wctomb) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctomb))(char *__str,
-                                                    __WCHAR_TYPE__ __wc) {
-#line 708 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctomb))(char *__str, __WCHAR_TYPE__ __wc) {
 	return __localdep_wcrtomb(__str, __wc, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wctomb_defined
+#define __local___localdep_wctomb_defined 1
+#define __localdep_wctomb __LIBC_LOCAL_NAME(wctomb)
+#endif /* !__local___localdep_wctomb_defined */
 #endif /* !__local_wctomb_defined */

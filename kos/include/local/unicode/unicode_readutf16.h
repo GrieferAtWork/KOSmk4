@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ff3840a */
+/* HASH CRC-32:0xb2a41467 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,8 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Read a single Unicode character from a given UTF-16 string */
 __LOCAL_LIBC(unicode_readutf16) __ATTR_NONNULL((1)) __CHAR32_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf16))(/*utf-16*/ __CHAR16_TYPE__ const **__restrict __ptext) {
-#line 493 "kos/src/libc/magic/unicode.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf16))(__CHAR16_TYPE__ const **__restrict __ptext) {
 	__CHAR32_TYPE__ __result;
 	__CHAR16_TYPE__ const *__text = *__ptext;
 	__result = (__CHAR32_TYPE__)(__UINT16_TYPE__)*__text++;
@@ -40,4 +39,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf16))(/*utf-16*/ __CHAR
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_unicode_readutf16_defined
+#define __local___localdep_unicode_readutf16_defined 1
+#define __localdep_unicode_readutf16 __LIBC_LOCAL_NAME(unicode_readutf16)
+#endif /* !__local___localdep_unicode_readutf16_defined */
 #endif /* !__local_unicode_readutf16_defined */

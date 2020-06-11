@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14ce7e0f */
+/* HASH CRC-32:0x480371b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pipe2_defined
-#if defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe)
 #define __local_pipe2_defined 1
 #include <__crt.h>
-/* Dependency: "pipe" from "unistd" */
-#ifndef ____localdep_pipe_defined
-#define ____localdep_pipe_defined 1
+#if defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pipe from unistd */
+#ifndef __local___localdep_pipe_defined
+#define __local___localdep_pipe_defined 1
 #ifdef __CRT_HAVE_pipe
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
@@ -34,23 +35,27 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pipe,(__fd_t __pipe
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pipe,(__fd_t __pipedes[2]),__pipe,(__pipedes))
 #elif defined(__CRT_HAVE__pipe)
+__NAMESPACE_LOCAL_END
 #include <local/unistd/pipe.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
-#define __localdep_pipe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pipe))
-#else /* CUSTOM: pipe */
-#undef ____localdep_pipe_defined
-#endif /* pipe... */
-#endif /* !____localdep_pipe_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_pipe __LIBC_LOCAL_NAME(pipe)
+#else /* ... */
+#undef __local___localdep_pipe_defined
+#endif /* !... */
+#endif /* !__local___localdep_pipe_defined */
 __LOCAL_LIBC(pipe2) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pipe2))(__fd_t __pipedes[2],
-                                                   __oflag_t __flags) {
-#line 1131 "kos/src/libc/magic/unistd.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pipe2))(__fd_t __pipedes[2], __oflag_t __flags) {
 	(void)__flags;
 	return __localdep_pipe(__pipedes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE__pipe || __CRT_HAVE_pipe || __CRT_HAVE___pipe */
+#ifndef __local___localdep_pipe2_defined
+#define __local___localdep_pipe2_defined 1
+#define __localdep_pipe2 __LIBC_LOCAL_NAME(pipe2)
+#endif /* !__local___localdep_pipe2_defined */
+#else /* __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe */
+#undef __local_pipe2_defined
+#endif /* !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE__pipe */
 #endif /* !__local_pipe2_defined */

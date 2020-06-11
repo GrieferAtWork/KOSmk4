@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc7eb71b */
+/* HASH CRC-32:0xaa129dad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__fread_nolock_s_defined
-#if (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)))
 #define __local__fread_nolock_s_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-/* Dependency: "fread_unlocked" from "stdio" */
-#ifndef ____localdep_fread_unlocked_defined
-#define ____localdep_fread_unlocked_defined 1
+#if defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fread_unlocked from stdio */
+#ifndef __local___localdep_fread_unlocked_defined
+#define __local___localdep_fread_unlocked_defined 1
 #ifdef __CRT_HAVE_fread_unlocked
 /* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream))
@@ -38,26 +38,31 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__loc
 #elif defined(__CRT_HAVE_fread)
 /* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread,(__buf,__elemsize,__elemcount,__stream))
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)))
+#elif defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)
+__NAMESPACE_LOCAL_END
 #include <local/stdio/fread_unlocked.h>
-/* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
-#define __localdep_fread_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fread_unlocked))
-#else /* CUSTOM: fread_unlocked */
-#undef ____localdep_fread_unlocked_defined
-#endif /* fread_unlocked... */
-#endif /* !____localdep_fread_unlocked_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
+#define __localdep_fread_unlocked __LIBC_LOCAL_NAME(fread_unlocked)
+#else /* ... */
+#undef __local___localdep_fread_unlocked_defined
+#endif /* !... */
+#endif /* !__local___localdep_fread_unlocked_defined */
 __LOCAL_LIBC(_fread_nolock_s) __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __SIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(_fread_nolock_s))(void *__restrict __buf,
-                                                __SIZE_TYPE__ __bufsize,
-                                                __SIZE_TYPE__ __elemsize,
-                                                __SIZE_TYPE__ __elemcount,
-                                                __FILE *__restrict __stream) __THROWS(...) {
-#line 2759 "kos/src/libc/magic/stdio.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(_fread_nolock_s))(void *__restrict __buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) __THROWS(...) {
 	__bufsize = __elemsize ? __bufsize / __elemsize : 0;
-	return __localdep_fread_unlocked(__buf, __elemsize, __bufsize < __elemcount ? __bufsize : __elemcount, __stream);
+	return __localdep_fread_unlocked(__buf, __elemsize,
+	                      __bufsize < __elemcount
+	                      ? __bufsize
+	                      : __elemcount,
+	                      __stream);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock || __CRT_HAVE__IO_fread || __CRT_HAVE_fread || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_HAVE_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE_fgetc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE__IO_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) */
+#ifndef __local___localdep__fread_nolock_s_defined
+#define __local___localdep__fread_nolock_s_defined 1
+#define __localdep__fread_nolock_s __LIBC_LOCAL_NAME(_fread_nolock_s)
+#endif /* !__local___localdep__fread_nolock_s_defined */
+#else /* __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock || __CRT_HAVE__IO_fread || __CRT_HAVE_fread || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_HAVE_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE_fgetc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE__IO_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_DOS && __CRT_HAVE__filbuf) */
+#undef __local__fread_nolock_s_defined
+#endif /* !__CRT_HAVE_fread_unlocked && !__CRT_HAVE__fread_nolock && !__CRT_HAVE__IO_fread && !__CRT_HAVE_fread && !__CRT_HAVE_fgetc_unlocked && !__CRT_HAVE_getc_unlocked && (!__CRT_HAVE_getc || (__CRT_DOS && __CRT_HAVE__filbuf)) && (!__CRT_HAVE_fgetc || (__CRT_DOS && __CRT_HAVE__filbuf)) && (!__CRT_HAVE__IO_getc || (__CRT_DOS && __CRT_HAVE__filbuf)) && (!__CRT_DOS || !__CRT_HAVE__filbuf) */
 #endif /* !__local__fread_nolock_s_defined */

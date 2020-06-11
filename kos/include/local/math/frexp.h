@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb467f24 */
+/* HASH CRC-32:0x4b38257 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,17 +19,15 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_frexp_defined
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_frexp_defined 1
 #include <__crt.h>
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/frexp.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __LOCAL_LIBC(frexp) __ATTR_WUNUSED __ATTR_NONNULL((2)) double
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexp))(double __x,
-                                                   int *__pexponent) {
-#line 337 "kos/src/libc/magic/math.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexp))(double __x, int *__pexponent) {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)__x, __pexponent);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
@@ -39,5 +37,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexp))(double __x,
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#ifndef __local___localdep_frexp_defined
+#define __local___localdep_frexp_defined 1
+#define __localdep_frexp __LIBC_LOCAL_NAME(frexp)
+#endif /* !__local___localdep_frexp_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_frexp_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_frexp_defined */

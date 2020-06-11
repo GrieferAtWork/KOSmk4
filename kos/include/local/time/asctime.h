@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e97806c */
+/* HASH CRC-32:0x26eb9d39 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,40 +21,76 @@
 #ifndef __local_asctime_defined
 #define __local_asctime_defined 1
 #include <__crt.h>
-#ifndef __LIBC_CTIME_BUFFER_DEFINED
-#define __LIBC_CTIME_BUFFER_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __NO_ATTR_WEAK
-__INTERN __ATTR_UNUSED __ATTR_WEAK char __ctime_buf[26] = {0};
-#elif !defined(__NO_ATTR_SELECTANY)
-__INTERN __ATTR_UNUSED __ATTR_SELECTANY char __ctime_buf[26] = {0};
-#else
-__PRIVATE __ATTR_UNUSED char __ctime_buf[26] = {0};
-#endif
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBC_CTIME_BUFFER_DEFINED */
-/* Dependency: "asctime_r" from "time" */
-#ifndef ____localdep_asctime_r_defined
-#define ____localdep_asctime_r_defined 1
+/* Dependency: asctime_r from time */
+#ifndef __local___localdep_asctime_r_defined
+#define __local___localdep_asctime_r_defined 1
 #ifdef __CRT_HAVE_asctime_r
+__NAMESPACE_LOCAL_END
+#ifndef __STRUCT_TM
+#ifdef __tm_defined
+#define __STRUCT_TM struct tm
+#else /* __tm_defined */
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
+#ifndef __std_tm_defined
+#define __std_tm_defined 1
+__NAMESPACE_STD_BEGIN
+struct tm {
+	int         tm_sec;      /* seconds [0, 61]. */
+	int         tm_min;      /* minutes [0, 59]. */
+	int         tm_hour;     /* hour [0, 23]. */
+	int         tm_mday;     /* day of month [1, 31]. */
+	int         tm_mon;      /* month of year [0, 11]. */
+	int         tm_year;     /* years since 1900. */
+	int         tm_wday;     /* day of week [0, 6] (Sunday = 0). */
+	int         tm_yday;     /* day of year [0, 365]. */
+	int         tm_isdst;    /* daylight savings flag. */
+#ifdef __CRT_GLC
+#ifdef __USE_MISC
+	__LONGPTR_TYPE__ tm_gmtoff;   /* Seconds east of UTC. */
+	char const      *tm_zone;     /* Timezone abbreviation. */
+#else /* __USE_MISC */
+	__LONGPTR_TYPE__ __tm_gmtoff; /* Seconds east of UTC. */
+	char const      *__tm_zone;   /* Timezone abbreviation. */
+#endif /* !__USE_MISC */
+#endif /* __CRT_GLC */
+};
+__NAMESPACE_STD_END
+#endif /* !__std_tm_defined */
+#endif /* !__tm_defined */
+#endif
+__NAMESPACE_LOCAL_BEGIN
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(__STRUCT_TM const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
-#else /* LIBC: asctime_r */
+#else /* __CRT_HAVE_asctime_r */
+__NAMESPACE_LOCAL_END
 #include <local/time/asctime_r.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
-#define __localdep_asctime_r (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asctime_r))
-#endif /* asctime_r... */
-#endif /* !____localdep_asctime_r_defined */
+#define __localdep_asctime_r __LIBC_LOCAL_NAME(asctime_r)
+#endif /* !__CRT_HAVE_asctime_r */
+#endif /* !__local___localdep_asctime_r_defined */
+__NAMESPACE_LOCAL_END
+#ifndef __LIBC_CTIME_BUFFER_DEFINED
+#define __LIBC_CTIME_BUFFER_DEFINED 1
+__NAMESPACE_LOCAL_BEGIN
 
+__LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
+__NAMESPACE_LOCAL_END
+
+#endif
 __NAMESPACE_LOCAL_BEGIN
 /* Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
 __LOCAL_LIBC(asctime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime))(struct __NAMESPACE_STD_SYM tm const *__tp) {
-#line 590 "kos/src/libc/magic/time.c"
-	return __localdep_asctime_r(__tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
+	return __localdep_asctime_r(__tp, __ctime_buf);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_asctime_defined
+#define __local___localdep_asctime_defined 1
+#define __localdep_asctime __LIBC_LOCAL_NAME(asctime)
+#endif /* !__local___localdep_asctime_defined */
 #endif /* !__local_asctime_defined */

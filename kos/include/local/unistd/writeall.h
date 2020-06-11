@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65fc9b93 */
+/* HASH CRC-32:0x43fe69e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_writeall_defined
-#if (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))
 #define __local_writeall_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-/* Dependency: "write" */
-#ifndef ____localdep_write_defined
-#define ____localdep_write_defined 1
-#ifdef __CRT_HAVE_write
+#if (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: write from unistd */
+#ifndef __local___localdep_write_defined
+#define __local___localdep_write_defined 1
+#ifdef __write_defined
+/* >> write(2)
+ * Write data to a given file descriptor `FD' and return the number of bytes written */
+__NAMESPACE_GLB_USING(write)
+#define __localdep_write write
+#elif defined(__CRT_HAVE_write)
 /* >> write(2)
  * Write data to a given file descriptor `FD' and return the number of bytes written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),write,(__fd,__buf,__bufsize))
@@ -38,21 +43,19 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(_
 /* >> write(2)
  * Write data to a given file descriptor `FD' and return the number of bytes written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),__write,(__fd,__buf,__bufsize))
-#else /* LIBC: write */
-#undef ____localdep_write_defined
-#endif /* write... */
-#endif /* !____localdep_write_defined */
-
+#else /* ... */
+#undef __local___localdep_write_defined
+#endif /* !... */
+#endif /* !__local___localdep_write_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> writeall(3)
  * Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
 __LOCAL_LIBC(writeall) __ATTR_NONNULL((2)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(writeall))(__fd_t __fd,
-                                                      void const *__buf,
-                                                      __SIZE_TYPE__ __bufsize) {
-#line 614 "kos/src/libc/magic/unistd.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(writeall))(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize) {
 	__SSIZE_TYPE__ __result, __temp;
 	__result = __localdep_write(__fd, __buf, __bufsize);
 	if (__result > 0 && (__SIZE_TYPE__)__result < __bufsize) {
@@ -73,5 +76,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(writeall))(__fd_t __fd,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_lseek || __CRT_HAVE_lseek64 || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE__lseeki64) */
+#ifndef __local___localdep_writeall_defined
+#define __local___localdep_writeall_defined 1
+#define __localdep_writeall __LIBC_LOCAL_NAME(writeall)
+#endif /* !__local___localdep_writeall_defined */
+#else /* (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64) */
+#undef __local_writeall_defined
+#endif /* (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write) || (!__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek && !__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64) */
 #endif /* !__local_writeall_defined */

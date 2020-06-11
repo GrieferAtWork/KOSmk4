@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58ad54ad */
+/* HASH CRC-32:0x7eb9b31c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,73 +21,76 @@
 #ifndef __local_stpncpy_defined
 #define __local_stpncpy_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "strnlen" from "string" */
-#ifndef ____localdep_strnlen_defined
-#define ____localdep_strnlen_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcpy from string */
+#ifndef __local___localdep_memcpy_defined
+#define __local___localdep_memcpy_defined 1
+#ifdef __fast_memcpy_defined
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__NAMESPACE_FAST_USING(memcpy)
+#define __localdep_memcpy __LIBC_FAST_NAME(memcpy)
+#elif defined(__CRT_HAVE_memcpy)
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpy.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
+#endif /* !... */
+#endif /* !__local___localdep_memcpy_defined */
+/* Dependency: memset from string */
+#ifndef __local___localdep_memset_defined
+#define __local___localdep_memset_defined 1
+#ifdef __fast_memset_defined
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
+__NAMESPACE_FAST_USING(memset)
+#define __localdep_memset __LIBC_FAST_NAME(memset)
+#elif defined(__CRT_HAVE_memset)
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/memset.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memset __LIBC_LOCAL_NAME(memset)
+#endif /* !... */
+#endif /* !__local___localdep_memset_defined */
+/* Dependency: strnlen from string */
+#ifndef __local___localdep_strnlen_defined
+#define __local___localdep_strnlen_defined 1
 #if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __string, __SIZE_TYPE__ __maxlen),strnlen,{ return __builtin_strnlen(__string, __maxlen); })
 #elif defined(__CRT_HAVE_strnlen)
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __string, __SIZE_TYPE__ __maxlen),strnlen,(__string,__maxlen))
-#else /* LIBC: strnlen */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/strnlen.h>
-/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
-#define __localdep_strnlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnlen))
-#endif /* strnlen... */
-#endif /* !____localdep_strnlen_defined */
-
-/* Dependency: "memcpy" from "string" */
-#ifndef ____localdep_memcpy_defined
-#define ____localdep_memcpy_defined 1
-#ifdef __fast_memcpy_defined
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-#define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))
-#elif defined(__CRT_HAVE_memcpy)
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
-#else /* LIBC: memcpy */
-#include <local/string/memcpy.h>
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-#define __localdep_memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))
-#endif /* memcpy... */
-#endif /* !____localdep_memcpy_defined */
-
-/* Dependency: "memset" from "string" */
-#ifndef ____localdep_memset_defined
-#define ____localdep_memset_defined 1
-#ifdef __fast_memset_defined
-/* Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))
-#elif defined(__CRT_HAVE_memset)
-/* Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* LIBC: memset */
-#include <local/string/memset.h>
-/* Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))
-#endif /* memset... */
-#endif /* !____localdep_memset_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+#define __localdep_strnlen __LIBC_LOCAL_NAME(strnlen)
+#endif /* !... */
+#endif /* !__local___localdep_strnlen_defined */
 __LOCAL_LIBC(stpncpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stpncpy))(char *__restrict __buf,
-                                                     char const *__restrict __src,
-                                                     __SIZE_TYPE__ __buflen) {
-#line 491 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stpncpy))(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen) {
 	__SIZE_TYPE__ __srclen = __localdep_strnlen(__src, __buflen);
 	__localdep_memcpy(__buf, __src, __srclen * sizeof(char));
 	__localdep_memset(__buf + __srclen, '\0', (__SIZE_TYPE__)(__buflen - __srclen) * sizeof(char));
 	return __buf + __srclen;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_stpncpy_defined
+#define __local___localdep_stpncpy_defined 1
+#define __localdep_stpncpy __LIBC_LOCAL_NAME(stpncpy)
+#endif /* !__local___localdep_stpncpy_defined */
 #endif /* !__local_stpncpy_defined */

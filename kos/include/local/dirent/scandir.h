@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0321cc8 */
+/* HASH CRC-32:0x834c5d30 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,33 +19,34 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_scandir_defined
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_scandirat) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandirat64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))))
 #define __local_scandir_defined 1
 #include <__crt.h>
-/* Dependency: "scandirat" */
-#ifndef ____localdep_scandirat_defined
-#define ____localdep_scandirat_defined 1
+#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_scandirat) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandirat64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: scandirat from dirent */
+#ifndef __local___localdep_scandirat_defined
+#define __local___localdep_scandirat_defined 1
 #if defined(__CRT_HAVE_scandirat) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* Scan a directory `DIRFD:DIR' for all contained directory entries */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_scandirat,(__fd_t __dirfd, char const *__restrict __dir, struct dirent ***__restrict __namelist, __scandir_selector_t __selector, __scandir_cmp_t __cmp),scandirat,(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandirat64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* Scan a directory `DIRFD:DIR' for all contained directory entries */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_scandirat,(__fd_t __dirfd, char const *__restrict __dir, struct dirent ***__restrict __namelist, __scandir_selector_t __selector, __scandir_cmp_t __cmp),scandirat64,(__dirfd,__dir,__namelist,__selector,__cmp))
-#else /* LIBC: scandirat */
-#undef ____localdep_scandirat_defined
-#endif /* scandirat... */
-#endif /* !____localdep_scandirat_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_scandirat_defined
+#endif /* !... */
+#endif /* !__local___localdep_scandirat_defined */
 /* Scan a directory `DIR' for all contained directory entries */
 __LOCAL_LIBC(scandir) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(scandir))(char const *__restrict __dir,
-                                                     struct dirent ***__restrict __namelist,
-                                                     __scandir_selector_t __selector,
-                                                     __scandir_cmp_t __cmp) {
-#line 246 "kos/src/libc/magic/dirent.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(scandir))(char const *__restrict __dir, struct dirent ***__restrict __namelist, __scandir_selector_t __selector, __scandir_cmp_t __cmp) {
 	return __localdep_scandirat(__CRT_AT_FDCWD, __dir, __namelist, __selector, __cmp);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && ((__CRT_HAVE_scandirat && (!__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE_scandirat64 && (__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64))) */
+#ifndef __local___localdep_scandir_defined
+#define __local___localdep_scandir_defined 1
+#define __localdep_scandir __LIBC_LOCAL_NAME(scandir)
+#endif /* !__local___localdep_scandir_defined */
+#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_scandirat && (!__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE_scandirat64 && (__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64))) */
+#undef __local_scandir_defined
+#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_scandirat || (__USE_FILE_OFFSET64 && !_DIRENT_MATCHES_DIRENT64)) && (!__CRT_HAVE_scandirat64 || (!__USE_FILE_OFFSET64 && !_DIRENT_MATCHES_DIRENT64))) */
 #endif /* !__local_scandir_defined */

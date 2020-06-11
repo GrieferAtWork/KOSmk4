@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x151f2490 */
+/* HASH CRC-32:0xf197ad52 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,14 +24,15 @@
 #include <bits/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sigandset) __ATTR_NONNULL((1, 2, 3)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigandset))(struct __sigset_struct *__set,
-                                                       struct __sigset_struct const *__left,
-                                                       struct __sigset_struct const *__right) {
-#line 315 "kos/src/libc/magic/signal.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigandset))(struct __sigset_struct *__set, struct __sigset_struct const *__left, struct __sigset_struct const *__right) {
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < sizeof(__sigset_t) / sizeof(__ULONGPTR_TYPE__); ++__i)
 		__set->__val[__i] = __left->__val[__i] & __right->__val[__i];
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_sigandset_defined
+#define __local___localdep_sigandset_defined 1
+#define __localdep_sigandset __LIBC_LOCAL_NAME(sigandset)
+#endif /* !__local___localdep_sigandset_defined */
 #endif /* !__local_sigandset_defined */

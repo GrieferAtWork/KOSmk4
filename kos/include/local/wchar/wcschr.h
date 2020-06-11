@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7da01fb */
+/* HASH CRC-32:0x682366a4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(wcschr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcschr))(__WCHAR_TYPE__ const *__restrict __haystack,
-                                                    __WCHAR_TYPE__ __needle) {
-#line 266 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcschr))(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle) {
 	for (; *__haystack; ++__haystack) {
 		if __unlikely(*__haystack == (__WCHAR_TYPE__)__needle)
 			return (__WCHAR_TYPE__ *)__haystack;
@@ -34,4 +32,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcschr))(__WCHAR_TYPE__ const *__rest
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcschr_defined
+#define __local___localdep_wcschr_defined 1
+#define __localdep_wcschr __LIBC_LOCAL_NAME(wcschr)
+#endif /* !__local___localdep_wcschr_defined */
 #endif /* !__local_wcschr_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1609307 */
+/* HASH CRC-32:0x957a9b68 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,15 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vsyslog_defined
-#ifdef __CRT_HAVE_syslog_printer
 #define __local_vsyslog_defined 1
 #include <__crt.h>
+#ifdef __CRT_HAVE_syslog_printer
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: format_vprintf from format-printer */
+#ifndef __local___localdep_format_vprintf_defined
+#define __local___localdep_format_vprintf_defined 1
+#ifdef __CRT_HAVE_format_vprintf
+__NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/format-printer.h>
-/* Dependency: "format_vprintf" from "format-printer" */
-#ifndef ____localdep_format_vprintf_defined
-#define ____localdep_format_vprintf_defined 1
-#ifdef __CRT_HAVE_format_vprintf
+__NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -116,8 +120,10 @@
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
-#else /* LIBC: format_vprintf */
+#else /* __CRT_HAVE_format_vprintf */
+__NAMESPACE_LOCAL_END
 #include <local/format-printer/format_vprintf.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -205,32 +211,28 @@ __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THR
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-#define __localdep_format_vprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vprintf))
-#endif /* format_vprintf... */
-#endif /* !____localdep_format_vprintf_defined */
-
-/* Dependency: "syslog_printer" */
-#ifndef ____localdep_syslog_printer_defined
-#define ____localdep_syslog_printer_defined 1
-#ifdef __CRT_HAVE_syslog_printer
+#define __localdep_format_vprintf __LIBC_LOCAL_NAME(format_vprintf)
+#endif /* !__CRT_HAVE_format_vprintf */
+#endif /* !__local___localdep_format_vprintf_defined */
+/* Dependency: syslog_printer from sys.syslog */
+#if !defined(__local___localdep_syslog_printer_defined) && defined(__CRT_HAVE_syslog_printer)
+#define __local___localdep_syslog_printer_defined 1
 /* Helper functions for printing to the system log */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_syslog_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),syslog_printer,(__arg,__data,__datalen))
-#else /* LIBC: syslog_printer */
-#undef ____localdep_syslog_printer_defined
-#endif /* syslog_printer... */
-#endif /* !____localdep_syslog_printer_defined */
-
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsyslog) __ATTR_LIBC_PRINTF(2,0) __ATTR_NONNULL((2)) void
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(vsyslog))(int __level,
-                                                     char const *__format,
-                                                     __builtin_va_list __args) {
-#line 155 "kos/src/libc/magic/sys.syslog.c"
+#endif /* !__local___localdep_syslog_printer_defined && __CRT_HAVE_syslog_printer */
+__LOCAL_LIBC(vsyslog) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)) void
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(vsyslog))(__STDC_INT_AS_UINT_T __level, char const *__format, __builtin_va_list __args) {
 	__localdep_format_vprintf(&__localdep_syslog_printer,
-	              (void *)(__UINTPTR_TYPE__)(unsigned int)__level,
+	               (void *)(__UINTPTR_TYPE__)(unsigned int)__level,
 	               __format,
 	               __args);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_syslog_printer */
+#ifndef __local___localdep_vsyslog_defined
+#define __local___localdep_vsyslog_defined 1
+#define __localdep_vsyslog __LIBC_LOCAL_NAME(vsyslog)
+#endif /* !__local___localdep_vsyslog_defined */
+#else /* __CRT_HAVE_syslog_printer */
+#undef __local_vsyslog_defined
+#endif /* !__CRT_HAVE_syslog_printer */
 #endif /* !__local_vsyslog_defined */

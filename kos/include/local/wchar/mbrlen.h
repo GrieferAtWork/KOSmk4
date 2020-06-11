@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0244027 */
+/* HASH CRC-32:0xea600971 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,55 @@
 #ifndef __local_mbrlen_defined
 #define __local_mbrlen_defined 1
 #include <__crt.h>
-/* Dependency: "mbrtowc" from "wchar" */
-#ifndef ____localdep_mbrtowc_defined
-#define ____localdep_mbrtowc_defined 1
-#ifdef __CRT_HAVE_mbrtowc
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtowc,(__pwc,__str,__maxlen,__mbs))
-#elif defined(__CRT_HAVE___mbrtowc)
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
-#else /* LIBC: mbrtowc */
-#include <local/wchar/mbrtowc.h>
-#define __localdep_mbrtowc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtowc))
-#endif /* mbrtowc... */
-#endif /* !____localdep_mbrtowc_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: mbrtowc from wchar */
+#ifndef __local___localdep_mbrtowc_defined
+#define __local___localdep_mbrtowc_defined 1
+#ifdef __CRT_HAVE_mbrtowc
+__NAMESPACE_LOCAL_END
+#include <bits/mbstate.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtowc,(__pwc,__str,__maxlen,__mbs))
+#elif defined(__CRT_HAVE_DOS$mbrtowc) && __SIZEOF_WCHAR_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <bits/mbstate.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__CHAR32_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtowc,(__pwc,__str,__maxlen,__mbs))
+#elif defined(__CRT_HAVE_DOS$mbrtowc) && __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <bits/mbstate.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtowc,(__pwc,__str,__maxlen,__mbs))
+#elif defined(__CRT_HAVE___mbrtowc)
+__NAMESPACE_LOCAL_END
+#include <bits/mbstate.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
+#elif defined(__CRT_HAVE_DOS$__mbrtowc) && __SIZEOF_WCHAR_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <bits/mbstate.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__CHAR32_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
+#elif defined(__CRT_HAVE_DOS$__mbrtowc) && __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <bits/mbstate.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/mbrtowc.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_mbrtowc __LIBC_LOCAL_NAME(mbrtowc)
+#endif /* !... */
+#endif /* !__local___localdep_mbrtowc_defined */
 __LOCAL_LIBC(mbrlen) __ATTR_WUNUSED __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbrlen))(char const *__restrict __str,
-                                                    __SIZE_TYPE__ __maxlen,
-                                                    __mbstate_t *__mbs) {
-#line 301 "kos/src/libc/magic/wchar.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbrlen))(char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs) {
 	__WCHAR_TYPE__ __wc;
 	return __localdep_mbrtowc(&__wc, __str, __maxlen, __mbs);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_mbrlen_defined
+#define __local___localdep_mbrlen_defined 1
+#define __localdep_mbrlen __LIBC_LOCAL_NAME(mbrlen)
+#endif /* !__local___localdep_mbrlen_defined */
 #endif /* !__local_mbrlen_defined */

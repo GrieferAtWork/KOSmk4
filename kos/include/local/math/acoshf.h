@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ca943fd */
+/* HASH CRC-32:0x5c8d05c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_acoshf_defined
-#if defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
 #define __local_acoshf_defined 1
 #include <__crt.h>
-/* Dependency: "acosh" */
-#ifndef ____localdep_acosh_defined
-#define ____localdep_acosh_defined 1
+#if defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: acosh from math */
+#ifndef __local___localdep_acosh_defined
+#define __local___localdep_acosh_defined 1
 #if __has_builtin(__builtin_acosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosh)
 /* Hyperbolic arc cosine of X */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acosh,(double __x),acosh,{ return __builtin_acosh(__x); })
@@ -34,18 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acosh,(double __x),acosh,
 #elif defined(__CRT_HAVE___acosh)
 /* Hyperbolic arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acosh,(double __x),__acosh,(__x))
-#else /* LIBC: acosh */
-#undef ____localdep_acosh_defined
-#endif /* acosh... */
-#endif /* !____localdep_acosh_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_acosh_defined
+#endif /* !... */
+#endif /* !__local___localdep_acosh_defined */
 /* Hyperbolic arc cosine of X */
 __LOCAL_LIBC(acoshf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(acoshf))(float __x) {
-#line 284 "kos/src/libc/magic/math.c"
 	return (float)__localdep_acosh((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_acosh || __CRT_HAVE___acosh */
+#ifndef __local___localdep_acoshf_defined
+#define __local___localdep_acoshf_defined 1
+#define __localdep_acoshf __LIBC_LOCAL_NAME(acoshf)
+#endif /* !__local___localdep_acoshf_defined */
+#else /* __CRT_HAVE_acosh || __CRT_HAVE___acosh */
+#undef __local_acoshf_defined
+#endif /* !__CRT_HAVE_acosh && !__CRT_HAVE___acosh */
 #endif /* !__local_acoshf_defined */

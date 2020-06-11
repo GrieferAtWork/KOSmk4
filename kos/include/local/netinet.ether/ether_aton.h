@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25f49f69 */
+/* HASH CRC-32:0x722231bd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,33 @@
 #ifndef __local_ether_aton_defined
 #define __local_ether_aton_defined 1
 #include <__crt.h>
-#include <net/ethernet.h>
-/* Dependency: "ether_aton_r" from "netinet.ether" */
-#ifndef ____localdep_ether_aton_r_defined
-#define ____localdep_ether_aton_r_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: ether_aton_r from netinet.ether */
+#ifndef __local___localdep_ether_aton_r_defined
+#define __local___localdep_ether_aton_r_defined 1
 #ifdef __CRT_HAVE_ether_aton_r
 /* Convert ASCII string S to 48 bit Ethernet address */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),struct ether_addr *,__NOTHROW_NCX,__localdep_ether_aton_r,(char const *__restrict __asc, struct ether_addr *__restrict __addr),ether_aton_r,(__asc,__addr))
-#else /* LIBC: ether_aton_r */
+#else /* __CRT_HAVE_ether_aton_r */
+__NAMESPACE_LOCAL_END
 #include <local/netinet.ether/ether_aton_r.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Convert ASCII string S to 48 bit Ethernet address */
-#define __localdep_ether_aton_r (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_aton_r))
-#endif /* ether_aton_r... */
-#endif /* !____localdep_ether_aton_r_defined */
-
+#define __localdep_ether_aton_r __LIBC_LOCAL_NAME(ether_aton_r)
+#endif /* !__CRT_HAVE_ether_aton_r */
+#endif /* !__local___localdep_ether_aton_r_defined */
+__NAMESPACE_LOCAL_END
+#include <net/ethernet.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Convert ASCII string S to 48 bit Ethernet address */
 __LOCAL_LIBC(ether_aton) __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct ether_addr *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_aton))(char const *__restrict __asc) {
-#line 71 "kos/src/libc/magic/netinet.ether.c"
 	static struct ether_addr __addr;
 	return __localdep_ether_aton_r(__asc, &__addr);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_ether_aton_defined
+#define __local___localdep_ether_aton_defined 1
+#define __localdep_ether_aton __LIBC_LOCAL_NAME(ether_aton)
+#endif /* !__local___localdep_ether_aton_defined */
 #endif /* !__local_ether_aton_defined */

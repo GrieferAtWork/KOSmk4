@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4288957b */
+/* HASH CRC-32:0x31e4cd33 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,32 +21,31 @@
 #ifndef __local_format_32to16_defined
 #define __local_format_32to16_defined 1
 #include <__crt.h>
-#include <bits/format-printer.h>
-
-#include <bits/uformat-printer.h>
-/* Dependency: "unicode_writeutf16" from "unicode" */
-#ifndef ____localdep_unicode_writeutf16_defined
-#define ____localdep_unicode_writeutf16_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: unicode_writeutf16 from unicode */
+#ifndef __local___localdep_unicode_writeutf16_defined
+#define __local___localdep_unicode_writeutf16_defined 1
 #ifdef __CRT_HAVE_unicode_writeutf16
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_unicode_writeutf16,(/*utf-16*/ __CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))
-#else /* LIBC: unicode_writeutf16 */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_unicode_writeutf16,(__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))
+#else /* __CRT_HAVE_unicode_writeutf16 */
+__NAMESPACE_LOCAL_END
 #include <local/unicode/unicode_writeutf16.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
-#define __localdep_unicode_writeutf16 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf16))
-#endif /* unicode_writeutf16... */
-#endif /* !____localdep_unicode_writeutf16_defined */
-
+#define __localdep_unicode_writeutf16 __LIBC_LOCAL_NAME(unicode_writeutf16)
+#endif /* !__CRT_HAVE_unicode_writeutf16 */
+#endif /* !__local___localdep_unicode_writeutf16_defined */
+__NAMESPACE_LOCAL_END
+#include <bits/format-printer.h>
+#include <bits/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Format printer (compatible with `__pwformatprinter') for
  * converting wide-character unicode input data into a UTF-16 output */
 __LOCAL_LIBC(format_32to16) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_32to16))(/*struct format_wto16_data **/ void *__arg,
-                                                           __CHAR32_TYPE__ const *__data,
-                                                           __SIZE_TYPE__ __datalen) {
-#line 1690 "kos/src/libc/magic/unicode.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_32to16))(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
 #if 4 == 4
 	struct __local_format_32to16_data {
 		__pc16formatprinter __fd_printer; /* [1..1] Inner printer */
@@ -70,7 +69,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_32to16))(/*struct format_wto16
 	return __result;
 __err:
 	return __temp;
-#else /* __SIZEOF_WCHAR_T__ == 4 */
+#else /* 4 == 4 */
 	struct __local_format_16to16_data {
 		__pc16formatprinter __fd_printer;   /* [1..1] Inner printer */
 		void               *__fd_arg;       /* Argument for `fd_printer' */
@@ -78,7 +77,11 @@ __err:
 	struct __local_format_16to16_data *__closure;
 	__closure = (struct __local_format_16to16_data *)__arg;
 	return (*__closure->__fd_printer)(__closure->__fd_arg, (__CHAR16_TYPE__ const *)__data, __datalen);
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
+#endif /* !(4 == 4) */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_32to16_defined
+#define __local___localdep_format_32to16_defined 1
+#define __localdep_format_32to16 __LIBC_LOCAL_NAME(format_32to16)
+#endif /* !__local___localdep_format_32to16_defined */
 #endif /* !__local_format_32to16_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x900f83c6 */
+/* HASH CRC-32:0xc0daff98 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,35 +19,30 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_thrd_join_defined
-#ifdef __CRT_HAVE_pthread_join
 #define __local_thrd_join_defined 1
 #include <__crt.h>
-#include <bits/pthreadtypes.h>
-#include <hybrid/typecore.h>
-
-#include <bits/threads.h>
-#include <asm/threads.h>
-/* Dependency: "pthread_join" */
-#ifndef ____localdep_pthread_join_defined
-#define ____localdep_pthread_join_defined 1
 #ifdef __CRT_HAVE_pthread_join
+#include <bits/threads.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pthread_join from pthread */
+#if !defined(__local___localdep_pthread_join_defined) && defined(__CRT_HAVE_pthread_join)
+#define __local___localdep_pthread_join_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Make calling thread wait for termination of the thread THREAD. The
  * exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
  * is not NULL */
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_pthread_join,(__pthread_t __pthread, void **__thread_return),pthread_join,(__pthread,__thread_return))
-#else /* LIBC: pthread_join */
-#undef ____localdep_pthread_join_defined
-#endif /* pthread_join... */
-#endif /* !____localdep_pthread_join_defined */
-
+#endif /* !__local___localdep_pthread_join_defined && __CRT_HAVE_pthread_join */
+__NAMESPACE_LOCAL_END
+#include <asm/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Block current thread until execution of THR is complete.
  * In case that RES is not NULL, will store the return value of THR when exiting
  * s.a. `pthread_join()' */
 __LOCAL_LIBC(thrd_join) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr,
-                                                       int *__res) {
-#line 261 "kos/src/libc/magic/threads.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr, int *__res) {
 	int __error;
 #if __SIZEOF_POINTER__ != __SIZEOF_INT__
 	void *__resptr;
@@ -61,9 +56,15 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr,
 	__error = __localdep_pthread_join((__pthread_t)__thr, (void **)__res);
 	if __likely(!__error)
 		return __thrd_success;
-#endif /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
+#endif /* !(__SIZEOF_POINTER__ != __SIZEOF_INT__) */
 	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_pthread_join */
+#ifndef __local___localdep_thrd_join_defined
+#define __local___localdep_thrd_join_defined 1
+#define __localdep_thrd_join __LIBC_LOCAL_NAME(thrd_join)
+#endif /* !__local___localdep_thrd_join_defined */
+#else /* __CRT_HAVE_pthread_join */
+#undef __local_thrd_join_defined
+#endif /* !__CRT_HAVE_pthread_join */
 #endif /* !__local_thrd_join_defined */

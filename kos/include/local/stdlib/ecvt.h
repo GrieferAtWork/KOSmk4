@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b760b81 */
+/* HASH CRC-32:0xb1c10c09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,34 +21,40 @@
 #ifndef __local_ecvt_defined
 #define __local_ecvt_defined 1
 #include <__crt.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: ecvt_r from stdlib */
+#ifndef __local___localdep_ecvt_r_defined
+#define __local___localdep_ecvt_r_defined 1
+#ifdef __CRT_HAVE_ecvt_r
+__CREDIRECT(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,__localdep_ecvt_r,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),ecvt_r,(__val,__ndigit,__decptr,__sign,__buf,__len))
+#else /* __CRT_HAVE_ecvt_r */
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/ecvt_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_ecvt_r __LIBC_LOCAL_NAME(ecvt_r)
+#endif /* !__CRT_HAVE_ecvt_r */
+#endif /* !__local___localdep_ecvt_r_defined */
+__NAMESPACE_LOCAL_END
 #ifndef __CRT_QCVT_BUFFER_DEFINED
 #define __CRT_QCVT_BUFFER_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = {0};
-__NAMESPACE_LOCAL_END
-#endif /* !__CRT_QCVT_BUFFER_DEFINED */
-/* Dependency: "ecvt_r" from "stdlib" */
-#ifndef ____localdep_ecvt_r_defined
-#define ____localdep_ecvt_r_defined 1
-#ifdef __CRT_HAVE_ecvt_r
-__CREDIRECT(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,__localdep_ecvt_r,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),ecvt_r,(__val,__ndigit,__decptr,__sign,__buf,__len))
-#else /* LIBC: ecvt_r */
-#include <local/stdlib/ecvt_r.h>
-#define __localdep_ecvt_r (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ecvt_r))
-#endif /* ecvt_r... */
-#endif /* !____localdep_ecvt_r_defined */
 
+__LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
+__NAMESPACE_LOCAL_END
+
+#endif
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ecvt) __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ecvt))(double __val,
-                                                  int __ndigit,
-                                                  int *__restrict __decptr,
-                                                  int *__restrict __sign) {
-#line 1552 "kos/src/libc/magic/stdlib.c"
-	if (__localdep_ecvt_r(__val, __ndigit, __decptr, __sign, __NAMESPACE_LOCAL_SYM __qcvt_buffer,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ecvt))(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) {
+	if (__localdep_ecvt_r(__val, __ndigit, __decptr, __sign,
+	           __NAMESPACE_LOCAL_SYM __qcvt_buffer,
 	           sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
 		return __NULLPTR;
 	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_ecvt_defined
+#define __local___localdep_ecvt_defined 1
+#define __localdep_ecvt __LIBC_LOCAL_NAME(ecvt)
+#endif /* !__local___localdep_ecvt_defined */
 #endif /* !__local_ecvt_defined */

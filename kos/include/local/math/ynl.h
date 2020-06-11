@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x717b05d8 */
+/* HASH CRC-32:0xee4610a7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,30 +19,33 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ynl_defined
-#if defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
 #define __local_ynl_defined 1
 #include <__crt.h>
-/* Dependency: "yn" */
-#ifndef ____localdep_yn_defined
-#define ____localdep_yn_defined 1
+#if defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: yn from math */
+#ifndef __local___localdep_yn_defined
+#define __local___localdep_yn_defined 1
 #if __has_builtin(__builtin_yn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_yn)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_yn,(int __n, double __x),yn,{ return __builtin_yn(__n, __x); })
 #elif defined(__CRT_HAVE_yn)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_yn,(int __n, double __x),yn,(__n,__x))
 #elif defined(__CRT_HAVE___yn)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_yn,(int __n, double __x),__yn,(__n,__x))
-#else /* LIBC: yn */
-#undef ____localdep_yn_defined
-#endif /* yn... */
-#endif /* !____localdep_yn_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_yn_defined
+#endif /* !... */
+#endif /* !__local___localdep_yn_defined */
 __LOCAL_LIBC(ynl) __ATTR_WUNUSED __LONGDOUBLE
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ynl))(int __n,
-                                             __LONGDOUBLE __x) {
-#line 1603 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ynl))(int __n, __LONGDOUBLE __x) {
 	return (__LONGDOUBLE)__localdep_yn(__n, (double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_yn || __CRT_HAVE___yn */
+#ifndef __local___localdep_ynl_defined
+#define __local___localdep_ynl_defined 1
+#define __localdep_ynl __LIBC_LOCAL_NAME(ynl)
+#endif /* !__local___localdep_ynl_defined */
+#else /* __CRT_HAVE_yn || __CRT_HAVE___yn */
+#undef __local_ynl_defined
+#endif /* !__CRT_HAVE_yn && !__CRT_HAVE___yn */
 #endif /* !__local_ynl_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52b51e49 */
+/* HASH CRC-32:0x12a2904a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,27 +19,27 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pipe_defined
-#ifdef __CRT_HAVE__pipe
 #define __local_pipe_defined 1
 #include <__crt.h>
-/* Dependency: "dos_pipe" from "unistd" */
-#ifndef ____localdep_dos_pipe_defined
-#define ____localdep_dos_pipe_defined 1
 #ifdef __CRT_HAVE__pipe
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_dos_pipe,(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode),_pipe,(__pipedes,__pipesize,__textmode))
-#else /* LIBC: _pipe */
-#undef ____localdep_dos_pipe_defined
-#endif /* dos_pipe... */
-#endif /* !____localdep_dos_pipe_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: dos_pipe from unistd */
+#if !defined(__local___localdep_dos_pipe_defined) && defined(__CRT_HAVE__pipe)
+#define __local___localdep_dos_pipe_defined 1
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_dos_pipe,(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode),_pipe,(__pipedes,__pipesize,__textmode))
+#endif /* !__local___localdep_dos_pipe_defined && __CRT_HAVE__pipe */
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 __LOCAL_LIBC(pipe) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pipe))(__fd_t __pipedes[2]) {
-#line 342 "kos/src/libc/magic/unistd.c"
 	return __localdep_dos_pipe(__pipedes, 4096, 0x8000); /* O_BINARY */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE__pipe */
+#ifndef __local___localdep_pipe_defined
+#define __local___localdep_pipe_defined 1
+#define __localdep_pipe __LIBC_LOCAL_NAME(pipe)
+#endif /* !__local___localdep_pipe_defined */
+#else /* __CRT_HAVE__pipe */
+#undef __local_pipe_defined
+#endif /* !__CRT_HAVE__pipe */
 #endif /* !__local_pipe_defined */

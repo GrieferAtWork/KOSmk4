@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36dec125 */
+/* HASH CRC-32:0x5f7803ab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,15 +21,12 @@
 #ifndef __local__atoll_l_defined
 #define __local__atoll_l_defined 1
 #include <__crt.h>
-/* Dependency: "strtoll_l" from "stdlib" */
-#ifndef ____localdep_strtoll_l_defined
-#define ____localdep_strtoll_l_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strtoll_l from stdlib */
+#ifndef __local___localdep_strtoll_l_defined
+#define __local___localdep_strtoll_l_defined 1
 #ifdef __CRT_HAVE_strtoll_l
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),strtoll_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE__strtoll_l)
-__CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),_strtoll_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE___strtoll_l)
-__CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),__strtoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_strtol_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),strtol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__strtol_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
@@ -46,18 +43,20 @@ __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(c
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),_strtoimax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___strtoimax_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__)
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),__strtoimax_l,(__nptr,__endptr,__base,__locale))
-#else /* LIBC: strtoll_l */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/strtoll_l.h>
-#define __localdep_strtoll_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoll_l))
-#endif /* strtoll_l... */
-#endif /* !____localdep_strtoll_l_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strtoll_l __LIBC_LOCAL_NAME(strtoll_l)
+#endif /* !... */
+#endif /* !__local___localdep_strtoll_l_defined */
 __LOCAL_LIBC(_atoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atoll_l))(char const *__restrict __nptr,
-                                                      __locale_t __locale) {
-#line 2266 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atoll_l))(char const *__restrict __nptr, __locale_t __locale) {
 	return __localdep_strtoll_l(__nptr, __NULLPTR, 10, __locale);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__atoll_l_defined
+#define __local___localdep__atoll_l_defined 1
+#define __localdep__atoll_l __LIBC_LOCAL_NAME(_atoll_l)
+#endif /* !__local___localdep__atoll_l_defined */
 #endif /* !__local__atoll_l_defined */

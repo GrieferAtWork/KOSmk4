@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9af22533 */
+/* HASH CRC-32:0x27a5ac0a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,47 +21,56 @@
 #ifndef __local_qgcvt_defined
 #define __local_qgcvt_defined 1
 #include <__crt.h>
-/* Dependency: "sprintf" from "stdio" */
-#ifndef ____localdep_sprintf_defined
-#define ____localdep_sprintf_defined 1
-#if __has_builtin(__builtin_sprintf) && __has_builtin(__builtin_va_arg_pack) && !defined(__NO_EXTERNINLINE) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: sprintf from stdio */
+#ifndef __local___localdep_sprintf_defined
+#define __local___localdep_sprintf_defined 1
+#if __has_builtin(__builtin_sprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf) && __has_builtin(__builtin_va_arg_pack)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_sprintf,(char *__restrict __buf, char const *__restrict __format, ...),sprintf,{ return __builtin_sprintf(__buf, __format, __builtin_va_arg_pack()); })
-#elif defined(__CRT_HAVE_sprintf) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_sprintf)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("sprintf");
-#elif defined(__CRT_HAVE__IO_sprintf) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__IO_sprintf)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("_IO_sprintf");
-#else /* LIBC: sprintf */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdio/sprintf.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-#define __localdep_sprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sprintf))
-#endif /* sprintf... */
-#endif /* !____localdep_sprintf_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_sprintf __LIBC_LOCAL_NAME(sprintf)
+#endif /* !... */
+#endif /* !__local___localdep_sprintf_defined */
+__NAMESPACE_LOCAL_END
 #include <hybrid/floatcore.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qgcvt) __ATTR_NONNULL((3)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qgcvt))(__LONGDOUBLE __val,
-                                                   int __ndigit,
-                                                   char *__buf) {
-#line 1198 "kos/src/libc/magic/stdlib.c"
-#ifndef __LDBG_NDIGIT_MAX
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qgcvt))(__LONGDOUBLE __val, int __ndigit, char *__buf) {
+#ifndef LDBG_NDIGIT_MAX
 #if __LDBL_MANT_DIG__ == 53
 #define __LDBG_NDIGIT_MAX 17
 #elif __LDBL_MANT_DIG__ == 24
 #define __LDBG_NDIGIT_MAX 9
 #elif __LDBL_MANT_DIG__ == 56
 #define __LDBG_NDIGIT_MAX 18
-#else
+#else /* ... */
 	/* ceil (M_LN2 / M_LN10 * DBL_MANT_DIG + 1.0) */
 #define __LDBG_NDIGIT_MAX (__LDBL_MANT_DIG__ / 4)
-#endif
+#endif /* !... */
 #endif /* !LDBG_NDIGIT_MAX */
 	if (__ndigit > __LDBG_NDIGIT_MAX)
 		__ndigit = __LDBG_NDIGIT_MAX;
@@ -69,4 +78,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qgcvt))(__LONGDOUBLE __val,
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_qgcvt_defined
+#define __local___localdep_qgcvt_defined 1
+#define __localdep_qgcvt __LIBC_LOCAL_NAME(qgcvt)
+#endif /* !__local___localdep_qgcvt_defined */
 #endif /* !__local_qgcvt_defined */

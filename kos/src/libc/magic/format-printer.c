@@ -34,6 +34,16 @@
 %[define_str2wcs_replacement(format_sprintf_printer = format_wsprintf_printer)]
 %[define_str2wcs_replacement(format_snprintf_data = format_wsnprintf_data)]
 %[define_str2wcs_replacement(format_snprintf_printer = format_wsnprintf_printer)]
+
+%[define_str2wcs_replacement(ATTR_LIBC_PRINTF = ATTR_LIBC_WPRINTF)]
+%[define_str2wcs_replacement(ATTR_LIBC_PRINTF_P = ATTR_LIBC_WPRINTF_P)]
+%[define_str2wcs_replacement(ATTR_LIBC_SCANF = ATTR_LIBC_WSCANF)]
+
+%[define_str2wcs_replacement(__ATTR_LIBC_PRINTF = __ATTR_LIBC_WPRINTF)]
+%[define_str2wcs_replacement(__ATTR_LIBC_PRINTF_P = __ATTR_LIBC_WPRINTF_P)]
+%[define_str2wcs_replacement(__ATTR_LIBC_SCANF = __ATTR_LIBC_WSCANF)]
+
+%[define_str2wcs_header_replacement("<format-printer.h>" = "<parts/wchar/format-printer.h>")]
 %[define_str2wcs_header_replacement("<bits/format-printer.h>" = "<bits/wformat-printer.h>")]
 
 %(auto_source){
@@ -796,7 +806,6 @@ err:
 @@ - ...               There are a _lot_ more...
 [[kernel, throws, ATTR_LIBC_PRINTF(3, 0)]]
 [[decl_include("<bits/format-printer.h>")]]
-[[impl_include("<bits/uformat-printer.h>")]]
 [[impl_include("<parts/printf-config.h>")]]
 [[impl_include("<libc/parts.uchar.string.h>")]]
 [[impl_include("<libc/string.h>")]]
@@ -818,7 +827,8 @@ err:
 #endif /* !__NO_PRINTF_VINFO */
 )]]
 $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
-                        [[nonnull]] char const *__restrict format, __builtin_va_list args) {
+                        [[nonnull]] char const *__restrict format,
+                        $va_list args) {
 #ifndef __INTELLISENSE__
 #define __FORMAT_PRINTER            printer
 #define __FORMAT_ARG                arg
@@ -828,36 +838,15 @@ $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
 #define __CHAR_SIZE                 __SIZEOF_CHAR__
 #define __FORMAT_REPEAT             format_repeat
 #define __FORMAT_HEXDUMP            format_hexdump
-@@pp_if __SIZEOF_CHAR__ == 1@@
+#define __FORMAT_WIDTH              format_width
+#define __FORMAT_ESCAPE             format_escape
 #define __FORMAT_WIDTH16            format_c16width
 #define __FORMAT_WIDTH32            format_c32width
-#define __FORMAT_ESCAPE             format_escape
 #define __FORMAT_ESCAPE16           format_c16escape
 #define __FORMAT_ESCAPE32           format_c32escape
 #define __FORMAT_UNICODE_WRITECHAR  unicode_writeutf8
 #define __FORMAT_UNICODE_FORMAT16   format_16to8
 #define __FORMAT_UNICODE_FORMAT32   format_32to8
-@@pp_elif __SIZEOF_CHAR__ == 2@@
-#define __FORMAT_WIDTH              format_wwidth
-#define __FORMAT_ESCAPE             format_wescape
-#define __FORMAT_WIDTH8             format_width
-#define __FORMAT_ESCAPE8            format_escape
-#define __FORMAT_WIDTH32            format_c32width
-#define __FORMAT_ESCAPE32           format_c32escape
-#define __FORMAT_UNICODE_WRITECHAR  unicode_writeutf16
-#define __FORMAT_UNICODE_FORMAT8    format_8to16
-#define __FORMAT_UNICODE_FORMAT32   format_32to16
-@@pp_else@@
-#define __FORMAT_WIDTH              format_wwidth
-#define __FORMAT_ESCAPE             format_wescape
-#define __FORMAT_WIDTH8             format_width
-#define __FORMAT_ESCAPE8            format_escape
-#define __FORMAT_WIDTH16            format_c16width
-#define __FORMAT_ESCAPE16           format_c16escape
-#define __FORMAT_UNICODE_WRITECHAR(dst, ch) ((dst)[0] = (ch), (dst) + 1)
-#define __FORMAT_UNICODE_FORMAT8    format_8to32
-#define __FORMAT_UNICODE_FORMAT16   format_16to32
-@@pp_endif@@
 #include <local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }

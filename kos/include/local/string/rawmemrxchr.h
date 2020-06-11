@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb577a68 */
+/* HASH CRC-32:0x35aaf646 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `rawmemrchr', but search for non-matching locations. */
 __LOCAL_LIBC(rawmemrxchr) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrxchr))(void const *__restrict __haystack,
-                                                         int __needle) {
-#line 1951 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrxchr))(void const *__restrict __haystack, int __needle) {
 	__BYTE_TYPE__ *__iter = (__BYTE_TYPE__ *)__haystack;
 	for (;;) {
 		if __unlikely(*--__iter != (__BYTE_TYPE__)__needle)
@@ -35,4 +33,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrxchr))(void const *__restrict 
 	return __iter;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_rawmemrxchr_defined
+#define __local___localdep_rawmemrxchr_defined 1
+#define __localdep_rawmemrxchr __LIBC_LOCAL_NAME(rawmemrxchr)
+#endif /* !__local___localdep_rawmemrxchr_defined */
 #endif /* !__local_rawmemrxchr_defined */

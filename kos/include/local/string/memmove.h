@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9683d */
+/* HASH CRC-32:0x31641188 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __LOCAL_LIBC(memmove) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmove))(void *__dst,
-                                                     void const *__src,
-                                                     __SIZE_TYPE__ __n_bytes) {
-#line 192 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmove))(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__pdst, *__psrc;
 	if (__dst <= __src) {
 		__pdst = (__BYTE_TYPE__ *)__dst;
@@ -44,4 +41,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmove))(void *__dst,
 	return __dst;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memmove_defined
+#define __local___localdep_memmove_defined 1
+#define __localdep_memmove __LIBC_LOCAL_NAME(memmove)
+#endif /* !__local___localdep_memmove_defined */
 #endif /* !__local_memmove_defined */

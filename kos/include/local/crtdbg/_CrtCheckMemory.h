@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1ec7c00 */
+/* HASH CRC-32:0x95774f63 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,12 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtCheckMemory) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtCheckMemory))(void) {
-#line 551 "kos/src/libc/magic/crtdbg.c"
 	__COMPILER_IMPURE();
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__CrtCheckMemory_defined
+#define __local___localdep__CrtCheckMemory_defined 1
+#define __localdep__CrtCheckMemory __LIBC_LOCAL_NAME(_CrtCheckMemory)
+#endif /* !__local___localdep__CrtCheckMemory_defined */
 #endif /* !__local__CrtCheckMemory_defined */

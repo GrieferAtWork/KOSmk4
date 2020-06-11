@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde829389 */
+/* HASH CRC-32:0xa6cfae0b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,27 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futimesat64_defined
-#ifdef __CRT_HAVE_futimesat
 #define __local_futimesat64_defined 1
 #include <__crt.h>
-/* Dependency: "futimesat32" from "sys.time" */
-#ifndef ____localdep_futimesat32_defined
-#define ____localdep_futimesat32_defined 1
 #ifdef __CRT_HAVE_futimesat
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: futimesat32 from sys.time */
+#if !defined(__local___localdep_futimesat32_defined) && defined(__CRT_HAVE_futimesat)
+#define __local___localdep_futimesat32_defined 1
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,__localdep_futimesat32,(__fd_t __fd, char const *__file, struct __timeval32 const __tvp[2]),futimesat,(__fd,__file,__tvp))
-#else /* LIBC: futimesat */
-#undef ____localdep_futimesat32_defined
-#endif /* futimesat32... */
-#endif /* !____localdep_futimesat32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_futimesat32_defined && __CRT_HAVE_futimesat */
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __LOCAL_LIBC(futimesat64) __ATTR_NONNULL((2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimesat64))(__fd_t __fd,
-                                                         char const *__file,
-                                                         struct __timeval64 const __tvp[2]) {
-#line 557 "kos/src/libc/magic/sys.time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimesat64))(__fd_t __fd, char const *__file, struct __timeval64 const __tvp[2]) {
 	struct __timeval32 __tv32[2];
 	if (!__tvp)
 		return __localdep_futimesat32(__fd, __file, __NULLPTR);
@@ -50,5 +42,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimesat64))(__fd_t __fd,
 	return __localdep_futimesat32(__fd, __file, __tv32);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_futimesat */
+#ifndef __local___localdep_futimesat64_defined
+#define __local___localdep_futimesat64_defined 1
+#define __localdep_futimesat64 __LIBC_LOCAL_NAME(futimesat64)
+#endif /* !__local___localdep_futimesat64_defined */
+#else /* __CRT_HAVE_futimesat */
+#undef __local_futimesat64_defined
+#endif /* !__CRT_HAVE_futimesat */
 #endif /* !__local_futimesat64_defined */

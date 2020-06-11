@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x305791df */
+/* HASH CRC-32:0xb1571f3f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,27 @@
 #ifndef __local_strerror_l_defined
 #define __local_strerror_l_defined 1
 #include <__crt.h>
-/* Dependency: "strerror" from "string" */
-#ifndef ____localdep_strerror_defined
-#define ____localdep_strerror_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strerror from string */
+#ifndef __local___localdep_strerror_defined
+#define __local___localdep_strerror_defined 1
 #ifdef __CRT_HAVE_strerror
 __CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_strerror,(int __errnum),strerror,(__errnum))
-#else /* LIBC: strerror */
+#else /* __CRT_HAVE_strerror */
+__NAMESPACE_LOCAL_END
 #include <local/string/strerror.h>
-#define __localdep_strerror (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror))
-#endif /* strerror... */
-#endif /* !____localdep_strerror_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strerror __LIBC_LOCAL_NAME(strerror)
+#endif /* !__CRT_HAVE_strerror */
+#endif /* !__local___localdep_strerror_defined */
 __LOCAL_LIBC(strerror_l) __ATTR_COLD __ATTR_WUNUSED char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror_l))(int __errnum,
-                                                        __locale_t __locale) {
-#line 518 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror_l))(int __errnum, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_strerror(__errnum);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strerror_l_defined
+#define __local___localdep_strerror_l_defined 1
+#define __localdep_strerror_l __LIBC_LOCAL_NAME(strerror_l)
+#endif /* !__local___localdep_strerror_l_defined */
 #endif /* !__local_strerror_l_defined */

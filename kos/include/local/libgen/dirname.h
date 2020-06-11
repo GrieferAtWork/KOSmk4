@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x541cd97b */
+/* HASH CRC-32:0x41b807ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,40 +21,41 @@
 #ifndef __local_dirname_defined
 #define __local_dirname_defined 1
 #include <__crt.h>
-/* Dependency: "strrchr" from "string" */
-#ifndef ____localdep_strrchr_defined
-#define ____localdep_strrchr_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strrchr from string */
+#ifndef __local___localdep_strrchr_defined
+#define __local___localdep_strrchr_defined 1
 #if __has_builtin(__builtin_strrchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strrchr)
 /* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strrchr,(char const *__restrict __haystack, int __needle),strrchr,{ return __builtin_strrchr(__haystack, __needle); })
 #elif defined(__CRT_HAVE_strrchr)
 /* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strrchr,(char const *__restrict __haystack, int __needle),strrchr,(__haystack,__needle))
-#else /* LIBC: strrchr */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/strrchr.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_strrchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strrchr))
-#endif /* strrchr... */
-#endif /* !____localdep_strrchr_defined */
-
-/* Dependency: "memrchr" from "string" */
-#ifndef ____localdep_memrchr_defined
-#define ____localdep_memrchr_defined 1
+#define __localdep_strrchr __LIBC_LOCAL_NAME(strrchr)
+#endif /* !... */
+#endif /* !__local___localdep_strrchr_defined */
+/* Dependency: memrchr from string */
+#ifndef __local___localdep_memrchr_defined
+#define __local___localdep_memrchr_defined 1
 #ifdef __CRT_HAVE_memrchr
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrchr,(__haystack,__needle,__n_bytes))
-#else /* LIBC: memrchr */
+#else /* __CRT_HAVE_memrchr */
+__NAMESPACE_LOCAL_END
 #include <local/string/memrchr.h>
-/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_memrchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchr))
-#endif /* memrchr... */
-#endif /* !____localdep_memrchr_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
+#define __localdep_memrchr __LIBC_LOCAL_NAME(memrchr)
+#endif /* !__CRT_HAVE_memrchr */
+#endif /* !__local___localdep_memrchr_defined */
 /* Return directory part of PATH or "." if none is available */
 __LOCAL_LIBC(dirname) __ATTR_RETNONNULL char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dirname))(char *__path) {
-#line 34 "kos/src/libc/magic/libgen.c"
 	/* NOTE: This implementation is taken from GLibc */
 	/* dirname - return directory part of PATH.
 	   Copyright (C) 1996-2017 Free Software Foundation, Inc.
@@ -107,4 +108,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dirname))(char *__path) {
 	return __path;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_dirname_defined
+#define __local___localdep_dirname_defined 1
+#define __localdep_dirname __LIBC_LOCAL_NAME(dirname)
+#endif /* !__local___localdep_dirname_defined */
 #endif /* !__local_dirname_defined */

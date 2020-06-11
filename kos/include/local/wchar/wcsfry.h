@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x184373ff */
+/* HASH CRC-32:0x6e0e1ae8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,38 +21,51 @@
 #ifndef __local_wcsfry_defined
 #define __local_wcsfry_defined 1
 #include <__crt.h>
-/* Dependency: "wcslen" from "wchar" */
-#ifndef ____localdep_wcslen_defined
-#define ____localdep_wcslen_defined 1
-#ifdef __std___localdep_wcslen_defined
-__NAMESPACE_STD_USING(__localdep_wcslen)
-#elif defined(__CRT_HAVE_wcslen)
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
-#else /* LIBC: wcslen */
-#include <local/wchar/wcslen.h>
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_wcslen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))
-#endif /* wcslen... */
-#endif /* !____localdep_wcslen_defined */
-
-/* Dependency: "rand" from "stdlib" */
-#ifndef ____localdep_rand_defined
-#define ____localdep_rand_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: rand from stdlib */
+#ifndef __local___localdep_rand_defined
+#define __local___localdep_rand_defined 1
 #ifdef __CRT_HAVE_rand
 __CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),rand,())
 #elif defined(__CRT_HAVE_random) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 __CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),random,())
-#else /* LIBC: rand */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/rand.h>
-#define __localdep_rand (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rand))
-#endif /* rand... */
-#endif /* !____localdep_rand_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_rand __LIBC_LOCAL_NAME(rand)
+#endif /* !... */
+#endif /* !__local___localdep_rand_defined */
+/* Dependency: wcslen from wchar */
+#ifndef __local___localdep_wcslen_defined
+#define __local___localdep_wcslen_defined 1
+#ifdef __wcslen_defined
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__NAMESPACE_GLB_USING(wcslen)
+#define __localdep_wcslen wcslen
+#elif defined(__std_wcslen_defined)
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__NAMESPACE_STD_USING(wcslen)
+#define __localdep_wcslen wcslen
+#elif defined(__CRT_HAVE_wcslen)
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
+#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 4
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
+#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 2
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__CHAR16_TYPE__ const *__restrict __string),wcslen,(__string))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wcslen.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_wcslen __LIBC_LOCAL_NAME(wcslen)
+#endif /* !... */
+#endif /* !__local___localdep_wcslen_defined */
 __LOCAL_LIBC(wcsfry) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsfry))(__WCHAR_TYPE__ *__restrict __string) {
-#line 798 "kos/src/libc/magic/string.c"
 	__SIZE_TYPE__ __i, __count = __localdep_wcslen(__string);
 	for (__i = 0; __i < __count; ++__i) {
 		__WCHAR_TYPE__ __temp;
@@ -66,4 +79,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsfry))(__WCHAR_TYPE__ *__restrict _
 	return __string;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsfry_defined
+#define __local___localdep_wcsfry_defined 1
+#define __localdep_wcsfry __LIBC_LOCAL_NAME(wcsfry)
+#endif /* !__local___localdep_wcsfry_defined */
 #endif /* !__local_wcsfry_defined */

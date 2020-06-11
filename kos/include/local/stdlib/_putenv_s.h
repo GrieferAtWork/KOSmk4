@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e01b975 */
+/* HASH CRC-32:0xeffaa09c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,30 +19,38 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__putenv_s_defined
-#ifdef __CRT_HAVE_setenv
 #define __local__putenv_s_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-/* Dependency: "setenv" from "stdlib" */
-#ifndef ____localdep_setenv_defined
-#define ____localdep_setenv_defined 1
+#if defined(__CRT_HAVE_setenv) || (defined(__CRT_HAVE_getenv) && defined(__CRT_HAVE__putenv_s))
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: setenv from stdlib */
+#ifndef __local___localdep_setenv_defined
+#define __local___localdep_setenv_defined 1
 #ifdef __CRT_HAVE_setenv
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setenv,(char const *__varname, char const *__val, int __replace),setenv,(__varname,__val,__replace))
-#elif defined(__CRT_HAVE__putenv_s)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_setenv,(char const *__varname, char const *__val, int __replace),setenv,(__varname,__val,__replace))
+#elif defined(__CRT_HAVE_getenv) && defined(__CRT_HAVE__putenv_s)
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/setenv.h>
-#define __localdep_setenv (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setenv))
-#else /* CUSTOM: setenv */
-#undef ____localdep_setenv_defined
-#endif /* setenv... */
-#endif /* !____localdep_setenv_defined */
-
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_setenv __LIBC_LOCAL_NAME(setenv)
+#else /* ... */
+#undef __local___localdep_setenv_defined
+#endif /* !... */
+#endif /* !__local___localdep_setenv_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_putenv_s) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_putenv_s))(char const *__varname,
-                                                       char const *__val) {
-#line 3102 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_putenv_s))(char const *__varname, char const *__val) {
 	return __localdep_setenv(__varname, __val, 1) ? __libc_geterrno_or(__EINVAL) : 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_setenv */
+#ifndef __local___localdep__putenv_s_defined
+#define __local___localdep__putenv_s_defined 1
+#define __localdep__putenv_s __LIBC_LOCAL_NAME(_putenv_s)
+#endif /* !__local___localdep__putenv_s_defined */
+#else /* __CRT_HAVE_setenv || (__CRT_HAVE_getenv && __CRT_HAVE__putenv_s) */
+#undef __local__putenv_s_defined
+#endif /* !__CRT_HAVE_setenv && (!__CRT_HAVE_getenv || !__CRT_HAVE__putenv_s) */
 #endif /* !__local__putenv_s_defined */

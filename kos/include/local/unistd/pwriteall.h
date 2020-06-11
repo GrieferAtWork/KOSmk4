@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6553452f */
+/* HASH CRC-32:0xf7531411 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,22 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pwriteall_defined
-#if defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))) || defined(__CRT_HAVE_pwrite64) || (defined(__CRT_HAVE_pwrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE___pwrite64) || defined(__CRT_HAVE_pwriteall64) || (defined(__CRT_HAVE_pwriteall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 #define __local_pwriteall_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-/* Dependency: "pwriteall64" from "unistd" */
-#ifndef ____localdep_pwriteall64_defined
-#define ____localdep_pwriteall64_defined 1
+#if defined(__CRT_HAVE_pwriteall64) || (defined(__CRT_HAVE_pwriteall) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || defined(__CRT_HAVE_pwrite64) || defined(__CRT_HAVE___pwrite64) || defined(__CRT_HAVE_pwrite) || ((defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS
+#define __PIO_OFFSET     __FS_TYPE(__pos)
+#define __PIO_OFFSET64   __pos64_t
+#else /* __USE_KOS */
+#define __PIO_OFFSET     __FS_TYPE(__off)
+#define __PIO_OFFSET64   __off64_t
+#endif /* !__USE_KOS */
+#endif
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pwriteall64 from unistd */
+#ifndef __local___localdep_pwriteall64_defined
+#define __local___localdep_pwriteall64_defined 1
 #ifdef __CRT_HAVE_pwriteall64
 /* >> pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
@@ -34,27 +43,32 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwriteal
 /* >> pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwriteall64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),pwriteall,(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))) || defined(__CRT_HAVE_pwrite64) || (defined(__CRT_HAVE_pwrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE___pwrite64)
+#elif defined(__CRT_HAVE_pwrite64) || defined(__CRT_HAVE___pwrite64) || defined(__CRT_HAVE_pwrite) || ((defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
+__NAMESPACE_LOCAL_END
 #include <local/unistd/pwriteall64.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
-#define __localdep_pwriteall64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwriteall64))
-#else /* CUSTOM: pwriteall64 */
-#undef ____localdep_pwriteall64_defined
-#endif /* pwriteall64... */
-#endif /* !____localdep_pwriteall64_defined */
-
+#define __localdep_pwriteall64 __LIBC_LOCAL_NAME(pwriteall64)
+#else /* ... */
+#undef __local___localdep_pwriteall64_defined
+#endif /* !... */
+#endif /* !__local___localdep_pwriteall64_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> pwriteall(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 __LOCAL_LIBC(pwriteall) __ATTR_NONNULL((2)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwriteall))(__fd_t __fd,
-                                                       void const *__buf,
-                                                       __SIZE_TYPE__ __bufsize,
-                                                       __PIO_OFFSET __offset) {
-#line 956 "kos/src/libc/magic/unistd.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwriteall))(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET __offset) {
 	return __localdep_pwriteall64(__fd, __buf, __bufsize, (__PIO_OFFSET64)__offset);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_pread || ((__CRT_HAVE_write || __CRT_HAVE__write) && (__CRT_HAVE_lseek || __CRT_HAVE_lseek64 || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE__lseeki64)) || __CRT_HAVE_pwrite64 || (__CRT_HAVE_pwrite && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || __CRT_HAVE___pwrite64 || __CRT_HAVE_pwriteall64 || (__CRT_HAVE_pwriteall && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) */
+#ifndef __local___localdep_pwriteall_defined
+#define __local___localdep_pwriteall_defined 1
+#define __localdep_pwriteall __LIBC_LOCAL_NAME(pwriteall)
+#endif /* !__local___localdep_pwriteall_defined */
+#else /* __CRT_HAVE_pwriteall64 || (__CRT_HAVE_pwriteall && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || __CRT_HAVE_pwrite64 || __CRT_HAVE___pwrite64 || __CRT_HAVE_pwrite || ((__CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && __SEEK_CUR && __SEEK_SET) */
+#undef __local_pwriteall_defined
+#endif /* !__CRT_HAVE_pwriteall64 && (!__CRT_HAVE_pwriteall || !(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) && !__CRT_HAVE_pwrite64 && !__CRT_HAVE___pwrite64 && !__CRT_HAVE_pwrite && ((!__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek && !__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write) || !__SEEK_CUR || !__SEEK_SET) */
 #endif /* !__local_pwriteall_defined */

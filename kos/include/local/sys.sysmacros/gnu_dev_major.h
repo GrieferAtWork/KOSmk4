@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9877e5ca */
+/* HASH CRC-32:0x3017f183 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,8 +24,11 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gnu_dev_major) __ATTR_CONST __ATTR_WUNUSED __major_t
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(gnu_dev_major))(__dev_t __dev) {
-#line 38 "kos/src/libc/magic/sys.sysmacros.c"
 	return (__major_t)((__UINTPTR_TYPE__)__dev >> 20);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_gnu_dev_major_defined
+#define __local___localdep_gnu_dev_major_defined 1
+#define __localdep_gnu_dev_major __LIBC_LOCAL_NAME(gnu_dev_major)
+#endif /* !__local___localdep_gnu_dev_major_defined */
 #endif /* !__local_gnu_dev_major_defined */

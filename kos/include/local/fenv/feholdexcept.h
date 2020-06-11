@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93f771f5 */
+/* HASH CRC-32:0x265e1ae2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,13 @@ __NAMESPACE_LOCAL_BEGIN
 /* Save the current environment in the object pointed to by ENVP, clear
  * exception flags and install a non-stop mode (if available) for all exceptions */
 __LOCAL_LIBC(feholdexcept) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(feholdexcept))(fenv_t *___envp) {
-#line 167 "kos/src/libc/magic/fenv.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(feholdexcept))(struct __fenv_struct *___envp) {
 	__inline_feholdexcept(___envp);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_feholdexcept_defined
+#define __local___localdep_feholdexcept_defined 1
+#define __localdep_feholdexcept __LIBC_LOCAL_NAME(feholdexcept)
+#endif /* !__local___localdep_feholdexcept_defined */
 #endif /* !__local_feholdexcept_defined */

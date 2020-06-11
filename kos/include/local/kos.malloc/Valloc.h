@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70e33e2d */
+/* HASH CRC-32:0x7542c5a8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,24 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Valloc_defined
-#ifdef __CRT_HAVE_Memalign
 #define __local_Valloc_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-/* Dependency: "Memalign" */
-#ifndef ____localdep_Memalign_defined
-#define ____localdep_Memalign_defined 1
 #ifdef __CRT_HAVE_Memalign
-/* @throws: E_BADALLOC: ... */
-__CREDIRECT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__THROWING,__localdep_Memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),Memalign,(__alignment,__num_bytes))
-#else /* LIBC: Memalign */
-#undef ____localdep_Memalign_defined
-#endif /* Memalign... */
-#endif /* !____localdep_Memalign_defined */
-
-/* Dependency: "getpagesize" from "unistd" */
-#ifndef ____localdep_getpagesize_defined
-#define ____localdep_getpagesize_defined 1
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: getpagesize from unistd */
+#ifndef __local___localdep_getpagesize_defined
+#define __local___localdep_getpagesize_defined 1
 #ifdef __CRT_HAVE_getpagesize
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
@@ -45,26 +35,37 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_getpagesize
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_getpagesize,(void),__getpagesize,())
-#else /* LIBC: getpagesize */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <asm/pagesize.h>
+__NAMESPACE_LOCAL_BEGIN
 #ifdef __ARCH_PAGESIZE
+__NAMESPACE_LOCAL_END
 #include <local/unistd/getpagesize.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-#define __localdep_getpagesize (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpagesize))
-#else /* CUSTOM: getpagesize */
-#undef ____localdep_getpagesize_defined
-#endif /* getpagesize... */
-#endif /* getpagesize... */
-#endif /* !____localdep_getpagesize_defined */
-
-__NAMESPACE_LOCAL_BEGIN
-/* @throws: E_BADALLOC: ... */
-__LOCAL_LIBC(Valloc) __ATTR_MALLOC __ATTR_MALL_PAGEALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *
-(__LIBCCALL __LIBC_LOCAL_NAME(Valloc))(__SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC) {
-#line 44 "kos/src/libc/magic/kos.malloc.c"
+#define __localdep_getpagesize __LIBC_LOCAL_NAME(getpagesize)
+#else /* __ARCH_PAGESIZE */
+#undef __local___localdep_getpagesize_defined
+#endif /* !__ARCH_PAGESIZE */
+#endif /* !... */
+#endif /* !__local___localdep_getpagesize_defined */
+/* Dependency: Memalign from kos.malloc */
+#if !defined(__local___localdep_Memalign_defined) && defined(__CRT_HAVE_Memalign)
+#define __local___localdep_Memalign_defined 1
+__CREDIRECT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__THROWING,__localdep_Memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),Memalign,(__alignment,__num_bytes))
+#endif /* !__local___localdep_Memalign_defined && __CRT_HAVE_Memalign */
+__LOCAL_LIBC(Valloc) __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)) void *
+(__LIBCCALL __LIBC_LOCAL_NAME(Valloc))(__SIZE_TYPE__ __num_bytes) __THROWS(__E_BADALLOC) {
 	return __localdep_Memalign(__localdep_getpagesize(), __num_bytes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_Memalign */
+#ifndef __local___localdep_Valloc_defined
+#define __local___localdep_Valloc_defined 1
+#define __localdep_Valloc __LIBC_LOCAL_NAME(Valloc)
+#endif /* !__local___localdep_Valloc_defined */
+#else /* __CRT_HAVE_Memalign */
+#undef __local_Valloc_defined
+#endif /* !__CRT_HAVE_Memalign */
 #endif /* !__local_Valloc_defined */

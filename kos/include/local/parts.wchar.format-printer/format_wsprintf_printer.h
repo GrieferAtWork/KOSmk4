@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9afdc954 */
+/* HASH CRC-32:0xd701e646 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,35 +21,35 @@
 #ifndef __local_format_wsprintf_printer_defined
 #define __local_format_wsprintf_printer_defined 1
 #include <__crt.h>
-/* Dependency: "wmempcpy" from "wchar" */
-#ifndef ____localdep_wmempcpy_defined
-#define ____localdep_wmempcpy_defined 1
-#ifdef __CRT_HAVE_wmempcpy
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmempcpy,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_mempcpyw) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),mempcpyw,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_mempcpyl) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),mempcpyl,(__dst,__src,__num_chars))
-#else /* LIBC: wmempcpy */
-#include <local/wchar/wmempcpy.h>
-#define __localdep_wmempcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmempcpy))
-#endif /* wmempcpy... */
-#endif /* !____localdep_wmempcpy_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempcpyc from string */
+#ifndef __local___localdep_mempcpyc_defined
+#define __local___localdep_mempcpyc_defined 1
+#ifdef __fast_mempcpyc_defined
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__NAMESPACE_FAST_USING(mempcpyc)
+#define __localdep_mempcpyc __LIBC_FAST_NAME(mempcpyc)
+#elif defined(__CRT_HAVE_mempcpyc)
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/mempcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+#define __localdep_mempcpyc __LIBC_LOCAL_NAME(mempcpyc)
+#endif /* !... */
+#endif /* !__local___localdep_mempcpyc_defined */
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 __LOCAL_LIBC(format_wsprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wsprintf_printer))(/*wchar_t ***/ void *__arg,
-                                                                     __WCHAR_TYPE__ const *__restrict __data,
-                                                                     __SIZE_TYPE__ __datalen) {
-#line 994 "kos/src/libc/magic/format-printer.c"
-
-	*(__WCHAR_TYPE__ **)__arg = (__WCHAR_TYPE__ *)__localdep_wmempcpy(*(__WCHAR_TYPE__ **)__arg, __data, __datalen);
-
-
-
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wsprintf_printer))(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
+	*(__WCHAR_TYPE__ **)__arg = (__WCHAR_TYPE__ *)__localdep_mempcpyc(*(__WCHAR_TYPE__ **)__arg, __data, __datalen, sizeof(__WCHAR_TYPE__));
 	return (__SSIZE_TYPE__)__datalen;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_wsprintf_printer_defined
+#define __local___localdep_format_wsprintf_printer_defined 1
+#define __localdep_format_wsprintf_printer __LIBC_LOCAL_NAME(format_wsprintf_printer)
+#endif /* !__local___localdep_format_wsprintf_printer_defined */
 #endif /* !__local_format_wsprintf_printer_defined */

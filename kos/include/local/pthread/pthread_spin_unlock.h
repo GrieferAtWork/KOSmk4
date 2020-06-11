@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc67c2b92 */
+/* HASH CRC-32:0x5499fe33 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,12 @@ __NAMESPACE_LOCAL_BEGIN
 /* Release spinlock LOCK */
 __LOCAL_LIBC(pthread_spin_unlock) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_unlock))(__pthread_spinlock_t *__lock) {
-#line 1298 "kos/src/libc/magic/pthread.c"
 	__hybrid_atomic_store(*__lock, 0, __ATOMIC_RELEASE);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_pthread_spin_unlock_defined
+#define __local___localdep_pthread_spin_unlock_defined 1
+#define __localdep_pthread_spin_unlock __LIBC_LOCAL_NAME(pthread_spin_unlock)
+#endif /* !__local___localdep_pthread_spin_unlock_defined */
 #endif /* !__local_pthread_spin_unlock_defined */

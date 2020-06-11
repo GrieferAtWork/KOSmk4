@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e68b7ea */
+/* HASH CRC-32:0x5a8468c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_scalblnl_defined
-#include <ieee754.h>
-#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__)
 #define __local_scalblnl_defined 1
 #include <__crt.h>
-#include <libm/scalbn.h>
-/* Dependency: "scalbln" from "math" */
-#ifndef ____localdep_scalbln_defined
-#define ____localdep_scalbln_defined 1
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || (defined(__CRT_HAVE___scalbn) && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: scalbln from math */
+#ifndef __local___localdep_scalbln_defined
+#define __local___localdep_scalbln_defined 1
 #if __has_builtin(__builtin_scalbln) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbln)
 /* Return X times (2 to the Nth power) */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_scalbln,(double __x, long int __n),scalbln,{ return __builtin_scalbln(__x, __n); })
@@ -42,36 +42,43 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_scalbln,(dou
 #elif defined(__CRT_HAVE___scalbn) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_scalbln,(double __x, long int __n),__scalbn,(__x,__n))
-#else /* LIBC: scalbln */
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
 #include <local/math/scalbln.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return X times (2 to the Nth power) */
-#define __localdep_scalbln (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbln))
-#else /* CUSTOM: scalbln */
-#undef ____localdep_scalbln_defined
-#endif /* scalbln... */
-#endif /* scalbln... */
-#endif /* !____localdep_scalbln_defined */
-
+#define __localdep_scalbln __LIBC_LOCAL_NAME(scalbln)
+#else /* ... */
+#undef __local___localdep_scalbln_defined
+#endif /* !... */
+#endif /* !__local___localdep_scalbln_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/scalbn.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X times (2 to the Nth power) */
 __LOCAL_LIBC(scalblnl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalblnl))(__LONGDOUBLE __x,
-                                                  long int __n) {
-#line 1186 "kos/src/libc/magic/math.c"
-#ifdef __LIBM_MATHFUN2L
-	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalblnl))(__LONGDOUBLE __x, long int __n) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	
+#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee754_scalbln((__IEEE754_DOUBLE_TYPE__)__x, __n);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)__x, __n);
 #else /* ... */
 	return (__LONGDOUBLE)__ieee854_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __n);
 #endif /* !... */
-#else /* __LIBM_MATHFUN2L */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)__localdep_scalbln((double)__x, __n);
-#endif /* !__LIBM_MATHFUN2L */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_scalbln || __CRT_HAVE___scalbln || (__CRT_HAVE_scalbn && __SIZEOF_INT__ == __SIZEOF_LONG__) || (__CRT_HAVE___scalbn && __SIZEOF_INT__ == __SIZEOF_LONG__) */
+#ifndef __local___localdep_scalblnl_defined
+#define __local___localdep_scalblnl_defined 1
+#define __localdep_scalblnl __LIBC_LOCAL_NAME(scalblnl)
+#endif /* !__local___localdep_scalblnl_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_scalbln || __CRT_HAVE___scalbln || (__CRT_HAVE_scalbn && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || (__CRT_HAVE___scalbn && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_scalblnl_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__CRT_HAVE_scalbln && !__CRT_HAVE___scalbln && (!__CRT_HAVE_scalbn || !(__SIZEOF_INT__ == __SIZEOF_LONG__)) && (!__CRT_HAVE___scalbn || !(__SIZEOF_INT__ == __SIZEOF_LONG__)) && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_scalblnl_defined */

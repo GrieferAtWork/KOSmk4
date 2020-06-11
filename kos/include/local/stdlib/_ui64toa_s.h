@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaefc4146 */
+/* HASH CRC-32:0x2684d45a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,11 @@
 #ifndef __local__ui64toa_s_defined
 #define __local__ui64toa_s_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_ui64toa_s) __ATTR_NONNULL((2)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ui64toa_s))(__UINT64_TYPE__ __val,
-                                                        char *__buf,
-                                                        __SIZE_TYPE__ __buflen,
-                                                        int __radix) {
-#line 2566 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ui64toa_s))(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) {
 	char *__p;
 	__UINT64_TYPE__ __temp;
 	if (__radix < 2)
@@ -38,7 +35,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ui64toa_s))(__UINT64_TYPE__ __val,
 	do ++__p;
 	while ((__temp /= (unsigned int)__radix) != 0);
 	if (__buflen <= (__SIZE_TYPE__)(__p - __buf)) {
-#ifdef __ERANGE
+#ifdef ERANGE
 		return __ERANGE;
 #else /* ERANGE */
 		return 1;
@@ -54,4 +51,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ui64toa_s))(__UINT64_TYPE__ __val,
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__ui64toa_s_defined
+#define __local___localdep__ui64toa_s_defined 1
+#define __localdep__ui64toa_s __LIBC_LOCAL_NAME(_ui64toa_s)
+#endif /* !__local___localdep__ui64toa_s_defined */
 #endif /* !__local__ui64toa_s_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7ac84d0 */
+/* HASH CRC-32:0x36797dc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,24 +19,20 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_settimeofday_defined
-#if defined(__CRT_HAVE_settimeofday) || defined(__CRT_HAVE_settimeofday64)
 #define __local_settimeofday_defined 1
 #include <__crt.h>
-/* Dependency: "settimeofday32" from "sys.time" */
-#ifndef ____localdep_settimeofday32_defined
-#define ____localdep_settimeofday32_defined 1
-#ifdef __CRT_HAVE_settimeofday
+#if defined(__CRT_HAVE_settimeofday) || defined(__CRT_HAVE_settimeofday64)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: settimeofday32 from sys.time */
+#if !defined(__local___localdep_settimeofday32_defined) && defined(__CRT_HAVE_settimeofday)
+#define __local___localdep_settimeofday32_defined 1
 /* Set the current time of day and timezone information.
  * This call is restricted to the super-user */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
-#else /* LIBC: settimeofday */
-#undef ____localdep_settimeofday32_defined
-#endif /* settimeofday32... */
-#endif /* !____localdep_settimeofday32_defined */
-
-/* Dependency: "settimeofday64" from "sys.time" */
-#ifndef ____localdep_settimeofday64_defined
-#define ____localdep_settimeofday64_defined 1
+#endif /* !__local___localdep_settimeofday32_defined && __CRT_HAVE_settimeofday */
+/* Dependency: settimeofday64 from sys.time */
+#ifndef __local___localdep_settimeofday64_defined
+#define __local___localdep_settimeofday64_defined 1
 #ifdef __CRT_HAVE_settimeofday64
 /* Set the current time of day and timezone information.
  * This call is restricted to the super-user */
@@ -46,22 +42,20 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 con
  * This call is restricted to the super-user */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE_settimeofday)
+__NAMESPACE_LOCAL_END
 #include <local/sys.time/settimeofday64.h>
-/* Set the current time of day and timezone information.
- * This call is restricted to the super-user */
-#define __localdep_settimeofday64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(settimeofday64))
-#else /* CUSTOM: settimeofday64 */
-#undef ____localdep_settimeofday64_defined
-#endif /* settimeofday64... */
-#endif /* !____localdep_settimeofday64_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* Set the current time of day and timezone information.
  * This call is restricted to the super-user */
+#define __localdep_settimeofday64 __LIBC_LOCAL_NAME(settimeofday64)
+#else /* ... */
+#undef __local___localdep_settimeofday64_defined
+#endif /* !... */
+#endif /* !__local___localdep_settimeofday64_defined */
+/* Set the current time of day and timezone information.
+ * This call is restricted to the super-user */
 __LOCAL_LIBC(settimeofday) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(settimeofday))(struct timeval const *__tv,
-                                                          struct timezone const *__tz) {
-#line 313 "kos/src/libc/magic/sys.time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(settimeofday))(struct timeval const *__tv, struct timezone const *__tz) {
 #ifdef __CRT_HAVE_settimeofday
 	struct __timeval32 __tv32;
 	if (!__tv)
@@ -79,5 +73,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(settimeofday))(struct timeval const *
 #endif /* !__CRT_HAVE_settimeofday */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_settimeofday || __CRT_HAVE_settimeofday64 */
+#ifndef __local___localdep_settimeofday_defined
+#define __local___localdep_settimeofday_defined 1
+#define __localdep_settimeofday __LIBC_LOCAL_NAME(settimeofday)
+#endif /* !__local___localdep_settimeofday_defined */
+#else /* __CRT_HAVE_settimeofday || __CRT_HAVE_settimeofday64 */
+#undef __local_settimeofday_defined
+#endif /* !__CRT_HAVE_settimeofday && !__CRT_HAVE_settimeofday64 */
 #endif /* !__local_settimeofday_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x470fbf52 */
+/* HASH CRC-32:0x406f32f5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,28 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_memalign_defined
-#ifdef __CRT_HAVE_posix_memalign
 #define __local_memalign_defined 1
 #include <__crt.h>
-/* Dependency: "crt_posix_memalign" from "malloc" */
-#ifndef ____localdep_crt_posix_memalign_defined
-#define ____localdep_crt_posix_memalign_defined 1
 #ifdef __CRT_HAVE_posix_memalign
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_crt_posix_memalign,(void **__restrict __pp, __SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),posix_memalign,(__pp,__alignment,__n_bytes))
-#else /* LIBC: posix_memalign */
-#undef ____localdep_crt_posix_memalign_defined
-#endif /* crt_posix_memalign... */
-#endif /* !____localdep_crt_posix_memalign_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: crt_posix_memalign from malloc */
+#if !defined(__local___localdep_crt_posix_memalign_defined) && defined(__CRT_HAVE_posix_memalign)
+#define __local___localdep_crt_posix_memalign_defined 1
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_crt_posix_memalign,(void **__restrict __pp, __SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),posix_memalign,(__pp,__alignment,__n_bytes))
+#endif /* !__local___localdep_crt_posix_memalign_defined && __CRT_HAVE_posix_memalign */
 __LOCAL_LIBC(memalign) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memalign))(__SIZE_TYPE__ __alignment,
-                                                      __SIZE_TYPE__ __n_bytes) {
-#line 85 "kos/src/libc/magic/malloc.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memalign))(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes) {
 	void *__result;
 	if (__localdep_crt_posix_memalign(&__result, __alignment, __n_bytes))
 		return __NULLPTR;
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_posix_memalign */
+#ifndef __local___localdep_memalign_defined
+#define __local___localdep_memalign_defined 1
+#define __localdep_memalign __LIBC_LOCAL_NAME(memalign)
+#endif /* !__local___localdep_memalign_defined */
+#else /* __CRT_HAVE_posix_memalign */
+#undef __local_memalign_defined
+#endif /* !__CRT_HAVE_posix_memalign */
 #endif /* !__local_memalign_defined */

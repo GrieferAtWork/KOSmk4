@@ -1,4 +1,4 @@
-/* HASH REMOVE_ME:0 */
+/* HASH CRC-32:0xac3a8238 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,17 @@
 #include <__crt.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fsync(2)
- * DataSynchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
+/* >> fdatasync(2)
+ * Synchronize only the data of a file (not its descriptor which contains
+ * timestamps, and its size), meaning that changes are written to disk */
 __LOCAL_LIBC(FDataSync) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FDataSync))(__fd_t __fd) __THROWS(...) {
 	(void)__fd;
 	/* No-Op */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_FDataSync_defined
+#define __local___localdep_FDataSync_defined 1
+#define __localdep_FDataSync __LIBC_LOCAL_NAME(FDataSync)
+#endif /* !__local___localdep_FDataSync_defined */
 #endif /* !__local_FDataSync_defined */

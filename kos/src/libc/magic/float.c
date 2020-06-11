@@ -145,7 +145,8 @@ $uint32_t _controlfp($uint32_t newval, $uint32_t mask);
 _set_controlfp($uint32_t newval, $uint32_t mask);
 $errno_t _controlfp_s($uint32_t *pcurrent, $uint32_t newval, $uint32_t mask);
 $uint32_t _statusfp();
-_fpreset(*) = fpreset;
+
+%[insert:function(_fpreset = fpreset)]
 _statusfp2($uint32_t *x86_stat, $uint32_t *sse2_stat);
 
 %#endif /* __CC__ */
@@ -237,24 +238,24 @@ int __control87_2($uint32_t newval, $uint32_t mask,
 #ifdef __CC__
 }
 
-_copysign(*) = copysign;
+%[insert:function(_copysign = copysign)]
 
 [[ATTR_WUNUSED, nothrow, ATTR_CONST]]
 double _chgsign(double x) {
 	return -x;
 }
 
-_scalb(*) = scalb;
-_logb(*) = logb;
-_nextafter(*) = nextafter;
-_finite(*) = finite;
-_isnan(*) = isnan;
+%[insert:function(_scalb = scalb)]
+%[insert:function(_logb = logb)]
+%[insert:function(_nextafter = nextafter)]
+%[insert:function(_finite = finite)]
+%[insert:function(_isnan = isnan)]
 
 [[ATTR_WUNUSED, nothrow, ATTR_CONST]]
 int _fpclass(double x);
 
 %#if defined(__x86_64__) || defined(__i386__)
-_scalbf(*) = scalbf;
+%[insert:function(_scalbf = scalbf)]
 %#endif /* __x86_64__ || __i386__ */
 
 %{

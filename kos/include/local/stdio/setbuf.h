@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51b00ee6 */
+/* HASH CRC-32:0x6124a2b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setbuf_defined
-#if defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
 #define __local_setbuf_defined 1
 #include <__crt.h>
-#include <asm/stdio.h>
-/* Dependency: "setvbuf" */
-#ifndef ____localdep_setvbuf_defined
-#define ____localdep_setvbuf_defined 1
+#if defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: setvbuf from stdio */
+#ifndef __local___localdep_setvbuf_defined
+#define __local___localdep_setvbuf_defined 1
 #if defined(__CRT_HAVE_setvbuf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Set the buffer and buffer-mode to-be used by the given `STREAM'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
@@ -42,21 +42,26 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__
 /* Set the buffer and buffer-mode to-be used by the given `STREAM'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, int __modes, __SIZE_TYPE__ __bufsize),setvbuf_unlocked,(__stream,__buf,__modes,__bufsize))
-#else /* LIBC: setvbuf */
-#undef ____localdep_setvbuf_defined
-#endif /* setvbuf... */
-#endif /* !____localdep_setvbuf_defined */
-
+#else /* ... */
+#undef __local___localdep_setvbuf_defined
+#endif /* !... */
+#endif /* !__local___localdep_setvbuf_defined */
+__NAMESPACE_LOCAL_END
+#include <asm/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Alias for `setvbuf(STREAM, buf, _IOFBF, BUFSIZ)' */
 __LOCAL_LIBC(setbuf) __ATTR_NONNULL((1)) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setbuf))(__FILE *__restrict __stream,
-                                                    char *__restrict __buf) {
-#line 431 "kos/src/libc/magic/stdio.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setbuf))(__FILE *__restrict __stream, char *__buf) {
 	__localdep_setvbuf(__stream, __buf,
 	        __buf ? ___IOFBF : ___IONBF,
 	        __buf ? __BUFSIZ : 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked */
+#ifndef __local___localdep_setbuf_defined
+#define __local___localdep_setbuf_defined 1
+#define __localdep_setbuf __LIBC_LOCAL_NAME(setbuf)
+#endif /* !__local___localdep_setbuf_defined */
+#else /* __CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked */
+#undef __local_setbuf_defined
+#endif /* !__CRT_HAVE_setvbuf && !__CRT_HAVE__IO_setvbuf && !__CRT_HAVE_setvbuf_unlocked */
 #endif /* !__local_setbuf_defined */

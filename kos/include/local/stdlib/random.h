@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x454079d0 */
+/* HASH CRC-32:0xc0f8d7a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,28 @@
 #ifndef __local_random_defined
 #define __local_random_defined 1
 #include <__crt.h>
-/* Dependency: "rand" from "stdlib" */
-#ifndef ____localdep_rand_defined
-#define ____localdep_rand_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: rand from stdlib */
+#ifndef __local___localdep_rand_defined
+#define __local___localdep_rand_defined 1
 #ifdef __CRT_HAVE_rand
 __CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),rand,())
 #elif defined(__CRT_HAVE_random) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 __CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),random,())
-#else /* LIBC: rand */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/rand.h>
-#define __localdep_rand (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rand))
-#endif /* rand... */
-#endif /* !____localdep_rand_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_rand __LIBC_LOCAL_NAME(rand)
+#endif /* !... */
+#endif /* !__local___localdep_rand_defined */
 __LOCAL_LIBC(random) long
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(random))(void) {
-#line 1435 "kos/src/libc/magic/stdlib.c"
 	return (long)__localdep_rand();
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_random_defined
+#define __local___localdep_random_defined 1
+#define __localdep_random __LIBC_LOCAL_NAME(random)
+#endif /* !__local___localdep_random_defined */
 #endif /* !__local_random_defined */

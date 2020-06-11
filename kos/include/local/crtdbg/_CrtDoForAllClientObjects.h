@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3be72153 */
+/* HASH CRC-32:0x79b923ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,12 +23,14 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtDoForAllClientObjects) __ATTR_NONNULL((1)) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtDoForAllClientObjects))(_PFNCRTDOFORALLCLIENTOBJECTS __pfn,
-                                                                       void *__context) {
-#line 557 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtDoForAllClientObjects))(_PFNCRTDOFORALLCLIENTOBJECTS __pfn, void *__context) {
 	__COMPILER_IMPURE();
 	(void)__pfn;
 	(void)__context;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__CrtDoForAllClientObjects_defined
+#define __local___localdep__CrtDoForAllClientObjects_defined 1
+#define __localdep__CrtDoForAllClientObjects __LIBC_LOCAL_NAME(_CrtDoForAllClientObjects)
+#endif /* !__local___localdep__CrtDoForAllClientObjects_defined */
 #endif /* !__local__CrtDoForAllClientObjects_defined */

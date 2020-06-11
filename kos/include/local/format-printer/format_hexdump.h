@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7b1335e */
+/* HASH CRC-32:0x10e69277 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,47 +23,43 @@
 #include <__crt.h>
 #include <kos/anno.h>
 #include <bits/format-printer.h>
-
-
-
-
-#include <bits/format-printer.h>
-
-#include <hybrid/__alloca.h>
-
-#include <hybrid/__unaligned.h>
-
-#include <hybrid/byteorder.h>
-/* Dependency: "format_repeat" from "format-printer" */
-#ifndef ____localdep_format_repeat_defined
-#define ____localdep_format_repeat_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: format_repeat from format-printer */
+#ifndef __local___localdep_format_repeat_defined
+#define __local___localdep_format_repeat_defined 1
 #ifdef __CRT_HAVE_format_repeat
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_repeat,(__pformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_repeat,(__printer,__arg,__ch,__num_repetitions))
-#else /* LIBC: format_repeat */
+#else /* __CRT_HAVE_format_repeat */
+__NAMESPACE_LOCAL_END
 #include <local/format-printer/format_repeat.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
-#define __localdep_format_repeat (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_repeat))
-#endif /* format_repeat... */
-#endif /* !____localdep_format_repeat_defined */
-
-/* Dependency: "isprint" from "ctype" */
-#ifndef ____localdep_isprint_defined
-#define ____localdep_isprint_defined 1
+#define __localdep_format_repeat __LIBC_LOCAL_NAME(format_repeat)
+#endif /* !__CRT_HAVE_format_repeat */
+#endif /* !__local___localdep_format_repeat_defined */
+/* Dependency: isprint from ctype */
+#ifndef __local___localdep_isprint_defined
+#define __local___localdep_isprint_defined 1
 #if __has_builtin(__builtin_isprint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isprint)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint,(int __ch),isprint,{ return __builtin_isprint(__ch); })
 #elif defined(__CRT_HAVE_isprint)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint,(int __ch),isprint,(__ch))
-#else /* LIBC: isprint */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/isprint.h>
-#define __localdep_isprint (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isprint))
-#endif /* isprint... */
-#endif /* !____localdep_isprint_defined */
-
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_isprint __LIBC_LOCAL_NAME(isprint)
+#endif /* !... */
+#endif /* !__local___localdep_isprint_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__alloca.h>
+#include <hybrid/__unaligned.h>
+#include <hybrid/byteorder.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Print a hex dump of the given data using the provided format printer
  * @param: PRINTER:  A function called for all quoted portions of the text
@@ -75,13 +71,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
 __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(format_hexdump))(__pformatprinter __printer,
-                                               void *__arg,
-                                               void const *__restrict __data,
-                                               __SIZE_TYPE__ __size,
-                                               __SIZE_TYPE__ __linesize,
-                                               unsigned int __flags) __THROWS(...) {
-#line 543 "kos/src/libc/magic/format-printer.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(format_hexdump))(__pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) {
 #ifndef __DECIMALS_SELECTOR
 #define __LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define __DECIMALS_SELECTOR  __decimals
@@ -89,7 +79,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' },
 		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' },
 	};
-#endif
+#endif /* !DECIMALS_SELECTOR */
 	__PRIVATE char const __lf[1] = { '\n' };
 	char const *__dec;
 	__BYTE_TYPE__ const *__line_data;
@@ -195,14 +185,15 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 						*--__dst = __dec[__q & 0xf];
 						__q >>= 4;
 					}
-#else
+#else /* __SIZEOF_POINTER__ >= 8 */
+					__UINT32_TYPE__ __a, __b;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-					__UINT32_TYPE__ __b = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
-					__UINT32_TYPE__ __a = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i + 4));
+					__a = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i + 4));
+					__b = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-					__UINT32_TYPE__ __a = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
-					__UINT32_TYPE__ __b = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i + 4));
-#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+					__a = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
+					__b = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i + 4));
+#endif /* !(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) */
 					__dst = __buffer + 16;
 					while (__dst > __buffer + 8) {
 						*--__dst = __dec[__b & 0xf];
@@ -212,7 +203,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 						*--__dst = __dec[__a & 0xf];
 						__a >>= 4;
 					}
-#endif
+#endif /* !(__SIZEOF_POINTER__ >= 8) */
 					__temp = (*__printer)(__arg, __buffer, 17);
 					if __unlikely(__temp < 0)
 						goto __err;
@@ -269,4 +260,8 @@ __err:
 #endif /* LOCAL_DECIMALS_SELECTOR_DEFINED */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_hexdump_defined
+#define __local___localdep_format_hexdump_defined 1
+#define __localdep_format_hexdump __LIBC_LOCAL_NAME(format_hexdump)
+#endif /* !__local___localdep_format_hexdump_defined */
 #endif /* !__local_format_hexdump_defined */

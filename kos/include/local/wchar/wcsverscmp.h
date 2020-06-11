@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cf97f23 */
+/* HASH CRC-32:0xbe02bf7f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsverscmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsverscmp))(__WCHAR_TYPE__ const *__s1,
-                                                        __WCHAR_TYPE__ const *__s2) {
-#line 730 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsverscmp))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2) {
 	__WCHAR_TYPE__ const *__s1_start = __s1;
 	__WCHAR_TYPE__ __c1, __c2;
 	do {
@@ -40,7 +38,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsverscmp))(__WCHAR_TYPE__ const *__
 			/* Check if both strings have digit sequences in the same places. */
 			if ((__c1 < '0' || __c1 > '9') &&
 			    (__c2 < '0' || __c2 > '9'))
-				return (int)((__WCHAR_TYPE__)__c1 - (__WCHAR_TYPE__)__c2);
+				return (int)((unsigned char)__c1 - (unsigned char)__c2);
 			/* Deal with leading zeros. */
 			if (__c1 == '0')
 				return -1;
@@ -70,4 +68,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsverscmp))(__WCHAR_TYPE__ const *__
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsverscmp_defined
+#define __local___localdep_wcsverscmp_defined 1
+#define __localdep_wcsverscmp __LIBC_LOCAL_NAME(wcsverscmp)
+#endif /* !__local___localdep_wcsverscmp_defined */
 #endif /* !__local_wcsverscmp_defined */

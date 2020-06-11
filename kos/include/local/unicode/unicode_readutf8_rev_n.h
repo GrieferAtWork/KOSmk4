@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f87a11 */
+/* HASH CRC-32:0xd2fce084 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
 __LOCAL_LIBC(unicode_readutf8_rev_n) __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev_n))(/*utf-8*/ char const **__restrict __ptext,
-                                                                    char const *__text_start) {
-#line 402 "kos/src/libc/magic/unicode.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev_n))(char const **__restrict __ptext, char const *__text_start) {
 	__CHAR32_TYPE__ __result;
 	char const *__iter = *__ptext;
 	__UINT8_TYPE__ __seqlen = 1;
@@ -111,4 +109,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev_n))(/*utf-8*/ ch
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_unicode_readutf8_rev_n_defined
+#define __local___localdep_unicode_readutf8_rev_n_defined 1
+#define __localdep_unicode_readutf8_rev_n __LIBC_LOCAL_NAME(unicode_readutf8_rev_n)
+#endif /* !__local___localdep_unicode_readutf8_rev_n_defined */
 #endif /* !__local_unicode_readutf8_rev_n_defined */

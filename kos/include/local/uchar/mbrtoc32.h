@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cf22bcb */
+/* HASH CRC-32:0x9e8120 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,34 +21,31 @@
 #ifndef __local_mbrtoc32_defined
 #define __local_mbrtoc32_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-
 #include <bits/mbstate.h>
-/* Dependency: "unicode_c8toc32" from "unicode" */
-#ifndef ____localdep_unicode_c8toc32_defined
-#define ____localdep_unicode_c8toc32_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: unicode_c8toc32 from unicode */
+#ifndef __local___localdep_unicode_c8toc32_defined
+#define __local___localdep_unicode_c8toc32_defined 1
 #ifdef __CRT_HAVE_unicode_c8toc32
 /* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc32,(__CHAR32_TYPE__ *__restrict __pc32, /*utf-8*/ char const *__restrict __s, __SIZE_TYPE__ __n, __mbstate_t *__restrict __mbs),unicode_c8toc32,(__pc32,__s,__n,__mbs))
-#else /* LIBC: unicode_c8toc32 */
+__CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc32,(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, __mbstate_t *__restrict __mbs),unicode_c8toc32,(__pc32,__s,__n,__mbs))
+#else /* __CRT_HAVE_unicode_c8toc32 */
+__NAMESPACE_LOCAL_END
 #include <local/unicode/unicode_c8toc32.h>
+__NAMESPACE_LOCAL_BEGIN
 /* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
-#define __localdep_unicode_c8toc32 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_c8toc32))
-#endif /* unicode_c8toc32... */
-#endif /* !____localdep_unicode_c8toc32_defined */
-
+#define __localdep_unicode_c8toc32 __LIBC_LOCAL_NAME(unicode_c8toc32)
+#endif /* !__CRT_HAVE_unicode_c8toc32 */
+#endif /* !__local___localdep_unicode_c8toc32_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__mbrtoc32_mbs) __mbstate_t __mbrtoc32_mbs = __MBSTATE_INIT;
 __LOCAL_LIBC(mbrtoc32) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbrtoc32))(__CHAR32_TYPE__ *__restrict __pc32,
-                                                      char const *__restrict __s,
-                                                      __SIZE_TYPE__ __n,
-                                                      __mbstate_t *__restrict __mbs) {
-#line 126 "kos/src/libc/magic/uchar.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbrtoc32))(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, __mbstate_t *__restrict __mbs) {
 	__CHAR32_TYPE__ __c32;
 	__SIZE_TYPE__ __result;
 	if (!__s) {
@@ -56,16 +53,22 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbrtoc32))(__CHAR32_TYPE__ *__restric
 			__mbs->__word = 0;
 		return 0;
 	}
-	if (!__mbs)
+	if (!__mbs) {
+		static __mbstate_t __mbrtoc32_mbs = __MBSTATE_INIT;
 		__mbs = &__mbrtoc32_mbs;
+	}
 	if (!__pc32)
 		__pc32 = &__c32;
 	__result = __localdep_unicode_c8toc32(__pc32, __s, __n, __mbs);
-#ifdef __EILSEQ
+#ifdef EILSEQ
 	if __unlikely(__result == (__SIZE_TYPE__)-1)
 		__libc_seterrno(__EILSEQ);
 #endif /* EILSEQ */
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_mbrtoc32_defined
+#define __local___localdep_mbrtoc32_defined 1
+#define __localdep_mbrtoc32 __LIBC_LOCAL_NAME(mbrtoc32)
+#endif /* !__local___localdep_mbrtoc32_defined */
 #endif /* !__local_mbrtoc32_defined */

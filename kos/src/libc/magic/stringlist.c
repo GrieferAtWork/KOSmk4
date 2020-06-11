@@ -116,6 +116,7 @@ void sl_free([[nullable]] struct _stringlist *sl, int all) {
 @@return a pointer to the equivalent string within `SL' (i.e. the
 @@pointer originally passed to `sl_add()' to insert that string).
 @@If `SL' doesn't contain an equivalent string, return `NULL' instead.
+[[decl_include("<features.h>")]]
 [[ATTR_PURE, decl_prefix(DEFINE_STRINGLIST)]]
 [[nullable]] char *sl_find([[nonnull]] struct _stringlist __KOS_FIXED_CONST *sl,
                            [[nonnull]] char const *name) {

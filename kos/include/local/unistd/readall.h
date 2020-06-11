@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a33b6b4 */
+/* HASH CRC-32:0xf9d0a7a5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,20 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_readall_defined
-#if (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))
 #define __local_readall_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-/* Dependency: "read" */
-#ifndef ____localdep_read_defined
-#define ____localdep_read_defined 1
-#ifdef __CRT_HAVE_read
+#if (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: read from unistd */
+#ifndef __local___localdep_read_defined
+#define __local___localdep_read_defined 1
+#ifdef __read_defined
+/* >> read(2)
+ * Read data from a given file descriptor `FD' and return the number of bytes read.
+ * A return value of ZERO(0) is indicative of EOF */
+__NAMESPACE_GLB_USING(read)
+#define __localdep_read read
+#elif defined(__CRT_HAVE_read)
 /* >> read(2)
  * Read data from a given file descriptor `FD' and return the number of bytes read.
  * A return value of ZERO(0) is indicative of EOF */
@@ -41,44 +47,51 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
  * Read data from a given file descriptor `FD' and return the number of bytes read.
  * A return value of ZERO(0) is indicative of EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),__read,(__fd,__buf,__bufsize))
-#else /* LIBC: read */
-#undef ____localdep_read_defined
-#endif /* read... */
-#endif /* !____localdep_read_defined */
-
-/* Dependency: "lseek" from "unistd" */
-#ifndef ____localdep_lseek_defined
-#define ____localdep_lseek_defined 1
-#if defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
+#else /* ... */
+#undef __local___localdep_read_defined
+#endif /* !... */
+#endif /* !__local___localdep_read_defined */
+/* Dependency: lseek from unistd */
+#ifndef __local___localdep_lseek_defined
+#define __local___localdep_lseek_defined 1
+#ifdef __lseek_defined
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
-__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off64_t __offset, int __whence),lseek64,(__fd,__offset,__whence))
+__NAMESPACE_GLB_USING(lseek)
+#define __localdep_lseek lseek
+#elif defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
+/* >> lseek(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),lseek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseeki64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
-__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off64_t __offset, int __whence),_lseeki64,(__fd,__offset,__whence))
+__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),_lseeki64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off32_t __offset, int __whence),lseek,(__fd,__offset,__whence))
+__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off32_t __offset, int __whence),_lseek,(__fd,__offset,__whence))
+__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off32_t __offset, int __whence),__lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),__lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64)
+__NAMESPACE_LOCAL_END
 #include <local/unistd/lseek.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
-#define __localdep_lseek (*(__FS_TYPE(off)(__LIBCCALL*)(__fd_t, __off32_t, int))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lseek)))
-#else /* CUSTOM: lseek */
-#undef ____localdep_lseek_defined
-#endif /* lseek... */
-#endif /* !____localdep_lseek_defined */
-
+#define __localdep_lseek __LIBC_LOCAL_NAME(lseek)
+#else /* ... */
+#undef __local___localdep_lseek_defined
+#endif /* !... */
+#endif /* !__local___localdep_lseek_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> readall(3)
  * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
@@ -88,10 +101,7 @@ __NAMESPACE_LOCAL_BEGIN
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 __LOCAL_LIBC(readall) __ATTR_NONNULL((2)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readall))(__fd_t __fd,
-                                                     void *__buf,
-                                                     __SIZE_TYPE__ __bufsize) {
-#line 578 "kos/src/libc/magic/unistd.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readall))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize) {
 	__SSIZE_TYPE__ __result, __temp;
 	__result = __localdep_read(__fd, __buf, __bufsize);
 	if (__result > 0 && (__SIZE_TYPE__)__result < __bufsize) {
@@ -101,14 +111,14 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readall))(__fd_t __fd,
 			            (__BYTE_TYPE__ *)__buf + (__SIZE_TYPE__)__result,
 			            __bufsize - (__SIZE_TYPE__)__result);
 			if (__temp <= 0) {
-#ifdef __errno
-				int __old_error = __errno;
-#endif /* __errno */
+#ifdef __libc_geterrno
+				int __old_error = __libc_geterrno();
+#endif /* __libc_geterrno */
 				/* Try to un-read data that had already been loaded. */
 				__localdep_lseek(__fd, -(__FS_TYPE(off))(__FS_TYPE(pos))__result, __SEEK_CUR);
-#ifdef __errno
-				__errno = __old_error;
-#endif /* __errno */
+#ifdef __libc_geterrno
+				__libc_seterrno(__old_error);
+#endif /* __libc_geterrno */
 				__result = __temp;
 				break;
 			}
@@ -120,5 +130,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readall))(__fd_t __fd,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_lseek || __CRT_HAVE_lseek64 || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE__lseeki64) */
+#ifndef __local___localdep_readall_defined
+#define __local___localdep_readall_defined 1
+#define __localdep_readall __LIBC_LOCAL_NAME(readall)
+#endif /* !__local___localdep_readall_defined */
+#else /* (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64) */
+#undef __local_readall_defined
+#endif /* (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read) || (!__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek && !__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64) */
 #endif /* !__local_readall_defined */

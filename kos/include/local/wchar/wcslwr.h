@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3936377f */
+/* HASH CRC-32:0x30029f3f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,31 @@
 #ifndef __local_wcslwr_defined
 #define __local_wcslwr_defined 1
 #include <__crt.h>
-/* Dependency: "towlower" from "wctype" */
-#ifndef ____localdep_towlower_defined
-#define ____localdep_towlower_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: towlower from wctype */
+#ifndef __local___localdep_towlower_defined
+#define __local___localdep_towlower_defined 1
 #if __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,{ return __builtin_towlower(__wc); })
 #elif defined(__CRT_HAVE_towlower)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,(__wc))
-#else /* LIBC: towlower */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/towlower.h>
-#define __localdep_towlower (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towlower))
-#endif /* towlower... */
-#endif /* !____localdep_towlower_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_towlower __LIBC_LOCAL_NAME(towlower)
+#endif /* !... */
+#endif /* !__local___localdep_towlower_defined */
 __LOCAL_LIBC(wcslwr) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcslwr))(__WCHAR_TYPE__ *__restrict __str) {
-#line 4875 "kos/src/libc/magic/string.c"
 	__WCHAR_TYPE__ *__iter, __ch;
 	for (__iter = __str; (__ch = *__iter) != '\0'; ++__iter)
 		*__iter = (__WCHAR_TYPE__)__localdep_towlower(__ch);
 	return __str;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcslwr_defined
+#define __local___localdep_wcslwr_defined 1
+#define __localdep_wcslwr __LIBC_LOCAL_NAME(wcslwr)
+#endif /* !__local___localdep_wcslwr_defined */
 #endif /* !__local_wcslwr_defined */

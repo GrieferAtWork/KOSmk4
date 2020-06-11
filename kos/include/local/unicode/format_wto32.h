@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10b2d10b */
+/* HASH CRC-32:0xa0b99a06 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-32 output */
 __LOCAL_LIBC(format_wto32) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wto32))(/*struct format_wto32_data **/ void *__arg,
-                                                          __WCHAR_TYPE__ const *__data,
-                                                          __SIZE_TYPE__ __datalen) {
-#line 1600 "kos/src/libc/magic/unicode.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wto32))(void *__arg, __WCHAR_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
 #if __SIZEOF_WCHAR_T__ == 2
 	struct __local_format_16to32_data {
 		__pc32formatprinter __fd_printer;   /* [1..1] Inner printer */
@@ -88,7 +85,11 @@ __err:
 	struct __local_format_32to32_data *__closure;
 	__closure = (struct __local_format_32to32_data *)__arg;
 	return (*__closure->__fd_printer)(__closure->__fd_arg, (__CHAR32_TYPE__ const *)__data, __datalen);
-#endif /* __SIZEOF_WCHAR_T__ != 2 */
+#endif /* !(__SIZEOF_WCHAR_T__ == 2) */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_wto32_defined
+#define __local___localdep_format_wto32_defined 1
+#define __localdep_format_wto32 __LIBC_LOCAL_NAME(format_wto32)
+#endif /* !__local___localdep_format_wto32_defined */
 #endif /* !__local_format_wto32_defined */

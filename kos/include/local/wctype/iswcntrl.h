@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffe9a1b3 */
+/* HASH CRC-32:0xebea0d89 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,28 @@
 #ifndef __local_iswcntrl_defined
 #define __local_iswcntrl_defined 1
 #include <__crt.h>
-/* Dependency: "iscntrl" from "ctype" */
-#ifndef ____localdep_iscntrl_defined
-#define ____localdep_iscntrl_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: iscntrl from ctype */
+#ifndef __local___localdep_iscntrl_defined
+#define __local___localdep_iscntrl_defined 1
 #if __has_builtin(__builtin_iscntrl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iscntrl)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iscntrl,(int __ch),iscntrl,{ return __builtin_iscntrl(__ch); })
 #elif defined(__CRT_HAVE_iscntrl)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iscntrl,(int __ch),iscntrl,(__ch))
-#else /* LIBC: iscntrl */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/iscntrl.h>
-#define __localdep_iscntrl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iscntrl))
-#endif /* iscntrl... */
-#endif /* !____localdep_iscntrl_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_iscntrl __LIBC_LOCAL_NAME(iscntrl)
+#endif /* !... */
+#endif /* !__local___localdep_iscntrl_defined */
 __LOCAL_LIBC(iswcntrl) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswcntrl))(__WINT_TYPE__ __wc) {
-#line 126 "kos/src/libc/magic/wctype.c"
 	return __localdep_iscntrl((int)__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswcntrl_defined
+#define __local___localdep_iswcntrl_defined 1
+#define __localdep_iswcntrl __LIBC_LOCAL_NAME(iswcntrl)
+#endif /* !__local___localdep_iswcntrl_defined */
 #endif /* !__local_iswcntrl_defined */

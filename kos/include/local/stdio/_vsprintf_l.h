@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54066c10 */
+/* HASH CRC-32:0x331ba27a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,11 @@
 #ifndef __local__vsprintf_l_defined
 #define __local__vsprintf_l_defined 1
 #include <__crt.h>
-/* Dependency: "vsprintf" from "stdio" */
-#ifndef ____localdep_vsprintf_defined
-#define ____localdep_vsprintf_defined 1
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: vsprintf from stdio */
+#ifndef __local___localdep_vsprintf_defined
+#define __local___localdep_vsprintf_defined 1
 #if __has_builtin(__builtin_vsprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsprintf)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
@@ -36,23 +38,23 @@ __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),_IO_vsprintf,(__dest,__format,__args))
-#else /* LIBC: vsprintf */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdio/vsprintf.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-#define __localdep_vsprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsprintf))
-#endif /* vsprintf... */
-#endif /* !____localdep_vsprintf_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_vsprintf __LIBC_LOCAL_NAME(vsprintf)
+#endif /* !... */
+#endif /* !__local___localdep_vsprintf_defined */
 __LOCAL_LIBC(_vsprintf_l) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsprintf_l))(char *__restrict __buf,
-                                                         char const *__restrict __format,
-                                                         __locale_t __locale,
-                                                         __builtin_va_list __args) {
-#line 2388 "kos/src/libc/magic/stdio.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsprintf_l))(char *__restrict __buf, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) {
 	(void)__locale;
 	return __localdep_vsprintf(__buf, __format, __args);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__vsprintf_l_defined
+#define __local___localdep__vsprintf_l_defined 1
+#define __localdep__vsprintf_l __LIBC_LOCAL_NAME(_vsprintf_l)
+#endif /* !__local___localdep__vsprintf_l_defined */
 #endif /* !__local__vsprintf_l_defined */

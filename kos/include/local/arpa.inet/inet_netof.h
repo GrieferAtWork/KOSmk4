@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1dbfa467 */
+/* HASH CRC-32:0xafba796b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,11 @@
 #define __local_inet_netof_defined 1
 #include <__crt.h>
 #include <netinet/in.h>
-
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return network number part of the Internet address IN */
 __LOCAL_LIBC(inet_netof) __ATTR_CONST __ATTR_WUNUSED __UINT32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_netof))(struct in_addr __inaddr) {
-#line 65 "kos/src/libc/magic/arpa.inet.c"
 	__UINT32_TYPE__ __addr = __hybrid_betoh32(__inaddr.s_addr);
 	if (IN_CLASSA(__addr)) {
 		return (__addr & IN_CLASSA_NET) >> IN_CLASSA_NSHIFT;
@@ -39,4 +37,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_netof))(struct in_addr __inaddr)
 	}
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_inet_netof_defined
+#define __local___localdep_inet_netof_defined 1
+#define __localdep_inet_netof __LIBC_LOCAL_NAME(inet_netof)
+#endif /* !__local___localdep_inet_netof_defined */
 #endif /* !__local_inet_netof_defined */

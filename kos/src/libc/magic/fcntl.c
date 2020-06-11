@@ -222,7 +222,8 @@ int fallocate64($fd_t fd, int mode, $off64_t offset, $off64_t length) {
 %#endif /* __USE_GNU */
 
 
-[[vartypes(void *), guard, decl_include("<bits/types.h>"), export_alias("__fcntl")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
+[[vartypes(void *), guard, export_alias("__fcntl")]]
 __STDC_INT_AS_SSIZE_T fcntl($fd_t fd, int cmd, ...);
 
 %[default_impl_section(".text.crt.io.access")]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8368b386 */
+/* HASH CRC-32:0x8876f865 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,28 +21,33 @@
 #ifndef __local_strtok_defined
 #define __local_strtok_defined 1
 #include <__crt.h>
-/* Dependency: "strtok_r" from "string" */
-#ifndef ____localdep_strtok_r_defined
-#define ____localdep_strtok_r_defined 1
-#ifdef __CRT_HAVE_strtok_r
-__CREDIRECT(__ATTR_LEAF __ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),strtok_r,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_strtok_s)
-__CREDIRECT(__ATTR_LEAF __ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),strtok_s,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE___strtok_r)
-__CREDIRECT(__ATTR_LEAF __ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),__strtok_r,(__string,__delim,__save_ptr))
-#else /* LIBC: strtok_r */
-#include <local/string/strtok_r.h>
-#define __localdep_strtok_r (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtok_r))
-#endif /* strtok_r... */
-#endif /* !____localdep_strtok_r_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: strtok_r from string */
+#ifndef __local___localdep_strtok_r_defined
+#define __local___localdep_strtok_r_defined 1
+#ifdef __CRT_HAVE_strtok_r
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),strtok_r,(__string,__delim,__save_ptr))
+#elif defined(__CRT_HAVE_strtok_s)
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),strtok_s,(__string,__delim,__save_ptr))
+#elif defined(__CRT_HAVE___strtok_r)
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),__strtok_r,(__string,__delim,__save_ptr))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/strtok_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strtok_r __LIBC_LOCAL_NAME(strtok_r)
+#endif /* !... */
+#endif /* !__local___localdep_strtok_r_defined */
+__NAMESPACE_LOCAL_END
 __LOCAL_LIBC_DATA(__save_ptr) char *__save_ptr = __NULLPTR;
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtok) __ATTR_NONNULL((2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtok))(char *__string,
-                                                    char const *__delim) {
-#line 412 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtok))(char *__string, char const *__delim) {
 	return __localdep_strtok_r(__string, __delim, &__save_ptr);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strtok_defined
+#define __local___localdep_strtok_defined 1
+#define __localdep_strtok __LIBC_LOCAL_NAME(strtok)
+#endif /* !__local___localdep_strtok_defined */
 #endif /* !__local_strtok_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f75434e */
+/* HASH CRC-32:0x5f0d8789 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,24 +22,14 @@
 #define __local_posix_fadvise64_defined 1
 #include <__crt.h>
 #include <bits/types.h>
-#include <bits/types.h>
-/* Dependency: "posix_fadvise32" from "fcntl" */
-#ifndef ____localdep_posix_fadvise32_defined
-#define ____localdep_posix_fadvise32_defined 1
-#ifdef __CRT_HAVE_posix_fadvise
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise32,(__fd_t __fd, __off32_t __offset, __off32_t __length, int __advise),posix_fadvise,(__fd,__offset,__length,__advise))
-#else /* LIBC: posix_fadvise */
-#undef ____localdep_posix_fadvise32_defined
-#endif /* posix_fadvise32... */
-#endif /* !____localdep_posix_fadvise32_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: posix_fadvise32 from fcntl */
+#if !defined(__local___localdep_posix_fadvise32_defined) && defined(__CRT_HAVE_posix_fadvise)
+#define __local___localdep_posix_fadvise32_defined 1
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise32,(__fd_t __fd, __off32_t __offset, __off32_t __length, int __advise),posix_fadvise,(__fd,__offset,__length,__advise))
+#endif /* !__local___localdep_posix_fadvise32_defined && __CRT_HAVE_posix_fadvise */
 __LOCAL_LIBC(posix_fadvise64) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fadvise64))(__fd_t __fd,
-                                                             __off64_t __offset,
-                                                             __off64_t __length,
-                                                             int __advise) {
-#line 380 "kos/src/libc/magic/fcntl.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fadvise64))(__fd_t __fd, __off64_t __offset, __off64_t __length, int __advise) {
 #ifdef __CRT_HAVE_posix_fadvise
 	return __localdep_posix_fadvise32(__fd, (__off32_t)__offset, (__off32_t)__length, __advise);
 #else /* __CRT_HAVE_posix_fadvise */
@@ -51,4 +41,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fadvise64))(__fd_t __fd,
 #endif /* !__CRT_HAVE_posix_fadvise */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_posix_fadvise64_defined
+#define __local___localdep_posix_fadvise64_defined 1
+#define __localdep_posix_fadvise64 __LIBC_LOCAL_NAME(posix_fadvise64)
+#endif /* !__local___localdep_posix_fadvise64_defined */
 #endif /* !__local_posix_fadvise64_defined */

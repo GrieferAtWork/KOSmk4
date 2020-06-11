@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd13f389 */
+/* HASH CRC-32:0x36f6f8c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,13 +24,14 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(readahead) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(readahead))(__fd_t __fd,
-                                                       __off64_t __offset,
-                                                       __SIZE_TYPE__ __count) {
-#line 152 "kos/src/libc/magic/fcntl.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(readahead))(__fd_t __fd, __off64_t __offset, __SIZE_TYPE__ __count) {
 	(void)__fd;
 	(void)__offset;
 	return __count;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_readahead_defined
+#define __local___localdep_readahead_defined 1
+#define __localdep_readahead __LIBC_LOCAL_NAME(readahead)
+#endif /* !__local___localdep_readahead_defined */
 #endif /* !__local_readahead_defined */

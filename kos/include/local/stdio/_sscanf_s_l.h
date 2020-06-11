@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b0bd2d8 */
+/* HASH CRC-32:0x1c3c9939 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,24 @@
 #ifndef __local__sscanf_s_l_defined
 #define __local__sscanf_s_l_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-/* Dependency: "_vsscanf_s_l" from "stdio" */
-#ifndef ____localdep__vsscanf_s_l_defined
-#define ____localdep__vsscanf_s_l_defined 1
-#ifdef __CRT_HAVE__vsscanf_s_l
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 4) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsscanf_s_l,(char const *__restrict __input, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vsscanf_s_l,(__input,__format,__locale,__args))
-#elif defined(__CRT_HAVE__vsscanf_l)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 4) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsscanf_s_l,(char const *__restrict __input, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vsscanf_l,(__input,__format,__locale,__args))
-#else /* LIBC: _vsscanf_l */
-#include <local/stdio/_vsscanf_l.h>
-#define __localdep__vsscanf_s_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vsscanf_l))
-#endif /* _vsscanf_s_l... */
-#endif /* !____localdep__vsscanf_s_l_defined */
-
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _vsscanf_s_l from stdio */
+#ifndef __local___localdep__vsscanf_s_l_defined
+#define __local___localdep__vsscanf_s_l_defined 1
+#ifdef __CRT_HAVE__vsscanf_l
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 4) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsscanf_s_l,(char const *__restrict __input, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vsscanf_l,(__input,__format,__locale,__args))
+#elif defined(__CRT_HAVE__vsscanf_s_l)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 4) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsscanf_s_l,(char const *__restrict __input, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vsscanf_s_l,(__input,__format,__locale,__args))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/stdio/_vsscanf_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__vsscanf_s_l __LIBC_LOCAL_NAME(_vsscanf_l)
+#endif /* !... */
+#endif /* !__local___localdep__vsscanf_s_l_defined */
 __LOCAL_LIBC(_sscanf_s_l) __ATTR_LIBC_SCANF(2, 4) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-(__VLIBCCALL __LIBC_LOCAL_NAME(_sscanf_s_l))(char const *__restrict __input,
-                                             char const *__restrict __format,
-                                             __locale_t __locale,
-                                             ...) __THROWS(...) {
-#line 2368 "kos/src/libc/magic/stdio.c"
+(__VLIBCCALL __LIBC_LOCAL_NAME(_sscanf_s_l))(char const *__restrict __input, char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) {
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __locale);
@@ -50,4 +47,8 @@ __LOCAL_LIBC(_sscanf_s_l) __ATTR_LIBC_SCANF(2, 4) __ATTR_NONNULL((1, 2)) __STDC_
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__sscanf_s_l_defined
+#define __local___localdep__sscanf_s_l_defined 1
+#define __localdep__sscanf_s_l __LIBC_LOCAL_NAME(_sscanf_s_l)
+#endif /* !__local___localdep__sscanf_s_l_defined */
 #endif /* !__local__sscanf_s_l_defined */

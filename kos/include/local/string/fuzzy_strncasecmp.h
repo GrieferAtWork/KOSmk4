@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13db9acf */
+/* HASH CRC-32:0x2e1c7e2e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,48 +19,56 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_strncasecmp_defined
-#if !defined(__NO_MALLOCA) || defined(__CRT_HAVE_fuzzy_memcasecmp)
 #define __local_fuzzy_strncasecmp_defined 1
 #include <__crt.h>
-#include <parts/malloca.h>
-/* Dependency: "fuzzy_memcasecmp" from "string" */
-#ifndef ____localdep_fuzzy_memcasecmp_defined
-#define ____localdep_fuzzy_memcasecmp_defined 1
+#if defined(__CRT_HAVE_fuzzy_memcasecmp) || !defined(__NO_MALLOCA)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fuzzy_memcasecmp from string */
+#ifndef __local___localdep_fuzzy_memcasecmp_defined
+#define __local___localdep_fuzzy_memcasecmp_defined 1
 #ifdef __CRT_HAVE_fuzzy_memcasecmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcasecmp,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_memcasecmp,(__s1,__s1_bytes,__s2,__s2_bytes))
-#elif !defined(__NO_MALLOCA)
+#else /* __CRT_HAVE_fuzzy_memcasecmp */
+__NAMESPACE_LOCAL_END
+#include <parts/malloca.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __NO_MALLOCA
+__NAMESPACE_LOCAL_END
 #include <local/string/fuzzy_memcasecmp.h>
-#define __localdep_fuzzy_memcasecmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_memcasecmp))
-#else /* CUSTOM: fuzzy_memcasecmp */
-#undef ____localdep_fuzzy_memcasecmp_defined
-#endif /* fuzzy_memcasecmp... */
-#endif /* !____localdep_fuzzy_memcasecmp_defined */
-
-/* Dependency: "strnlen" from "string" */
-#ifndef ____localdep_strnlen_defined
-#define ____localdep_strnlen_defined 1
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_fuzzy_memcasecmp __LIBC_LOCAL_NAME(fuzzy_memcasecmp)
+#else /* !__NO_MALLOCA */
+#undef __local___localdep_fuzzy_memcasecmp_defined
+#endif /* __NO_MALLOCA */
+#endif /* !__CRT_HAVE_fuzzy_memcasecmp */
+#endif /* !__local___localdep_fuzzy_memcasecmp_defined */
+/* Dependency: strnlen from string */
+#ifndef __local___localdep_strnlen_defined
+#define __local___localdep_strnlen_defined 1
 #if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __string, __SIZE_TYPE__ __maxlen),strnlen,{ return __builtin_strnlen(__string, __maxlen); })
 #elif defined(__CRT_HAVE_strnlen)
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __string, __SIZE_TYPE__ __maxlen),strnlen,(__string,__maxlen))
-#else /* LIBC: strnlen */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/strnlen.h>
-/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
-#define __localdep_strnlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnlen))
-#endif /* strnlen... */
-#endif /* !____localdep_strnlen_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+#define __localdep_strnlen __LIBC_LOCAL_NAME(strnlen)
+#endif /* !... */
+#endif /* !__local___localdep_strnlen_defined */
 __LOCAL_LIBC(fuzzy_strncasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_strncasecmp))(char const *__s1,
-                                                               __SIZE_TYPE__ __s1_maxlen,
-                                                               char const *__s2,
-                                                               __SIZE_TYPE__ __s2_maxlen) {
-#line 4285 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_strncasecmp))(char const *__s1, __SIZE_TYPE__ __s1_maxlen, char const *__s2, __SIZE_TYPE__ __s2_maxlen) {
 	return __localdep_fuzzy_memcasecmp(__s1, __localdep_strnlen(__s1, __s1_maxlen), __s2, __localdep_strnlen(__s2, __s2_maxlen));
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__NO_MALLOCA || __CRT_HAVE_fuzzy_memcasecmp */
+#ifndef __local___localdep_fuzzy_strncasecmp_defined
+#define __local___localdep_fuzzy_strncasecmp_defined 1
+#define __localdep_fuzzy_strncasecmp __LIBC_LOCAL_NAME(fuzzy_strncasecmp)
+#endif /* !__local___localdep_fuzzy_strncasecmp_defined */
+#else /* __CRT_HAVE_fuzzy_memcasecmp || !__NO_MALLOCA */
+#undef __local_fuzzy_strncasecmp_defined
+#endif /* !__CRT_HAVE_fuzzy_memcasecmp && __NO_MALLOCA */
 #endif /* !__local_fuzzy_strncasecmp_defined */

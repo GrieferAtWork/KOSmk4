@@ -666,10 +666,10 @@ $uintmax_t wcstoumax_l([[nonnull]] $wchar_t const *__restrict nptr,
 %
 %
 %#ifdef __USE_DOS
-_strtoimax_l(*) = strtoimax_l;
-_strtoumax_l(*) = strtoumax_l;
-_wcstoimax_l(*) = wcstoimax_l;
-_wcstoumax_l(*) = wcstoumax_l;
+%[insert:function(_strtoimax_l = strtoimax_l)]
+%[insert:function(_strtoumax_l = strtoumax_l)]
+%[insert:function(_wcstoimax_l = wcstoimax_l)]
+%[insert:function(_wcstoumax_l = wcstoumax_l)]
 %#endif /* __USE_DOS */
 
 %{

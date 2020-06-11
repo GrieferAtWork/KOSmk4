@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d8be18f */
+/* HASH CRC-32:0xe3a875d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,15 +21,10 @@
 #ifndef __local__wgetdcwd_dbg_defined
 #define __local__wgetdcwd_dbg_defined 1
 #include <__crt.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wgetdcwd_dbg) __ATTR_WUNUSED __WCHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wgetdcwd_dbg))(int __driveno,
-                                                           __WCHAR16_TYPE__ *__buf,
-                                                           __STDC_INT_AS_SIZE_T __buflen,
-                                                           int __block_type,
-                                                           char const *__filename,
-                                                           int __line) {
-#line 511 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wgetdcwd_dbg))(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
@@ -41,4 +36,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wgetdcwd_dbg))(int __driveno,
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__wgetdcwd_dbg_defined
+#define __local___localdep__wgetdcwd_dbg_defined 1
+#define __localdep__wgetdcwd_dbg __LIBC_LOCAL_NAME(_wgetdcwd_dbg)
+#endif /* !__local___localdep__wgetdcwd_dbg_defined */
 #endif /* !__local__wgetdcwd_dbg_defined */

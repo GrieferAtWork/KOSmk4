@@ -374,22 +374,22 @@ $wint_t towctrans_l($wint_t wc, $wctrans_t desc, $locale_t locale) {
 %#ifndef _WCTYPE_DEFINED
 %#define _WCTYPE_DEFINED 1
 
-_iswalnum_l(*) = iswalnum_l;
-_iswalpha_l(*) = iswalpha_l;
-_iswcntrl_l(*) = iswcntrl_l;
-_iswdigit_l(*) = iswdigit_l;
-_iswgraph_l(*) = iswgraph_l;
-_iswlower_l(*) = iswlower_l;
-_iswprint_l(*) = iswprint_l;
-_iswpunct_l(*) = iswpunct_l;
-_iswspace_l(*) = iswspace_l;
-_iswupper_l(*) = iswupper_l;
-_iswxdigit_l(*) = iswxdigit_l;
-_iswblank_l(*) = iswblank_l;
-_towupper_l(*) = towupper_l;
-_towlower_l(*) = towlower_l;
-_iswctype_l(*) = iswctype_l;
-is_wctype(*) = iswctype;
+%[insert:function(_iswalnum_l = iswalnum_l)]
+%[insert:function(_iswalpha_l = iswalpha_l)]
+%[insert:function(_iswcntrl_l = iswcntrl_l)]
+%[insert:function(_iswdigit_l = iswdigit_l)]
+%[insert:function(_iswgraph_l = iswgraph_l)]
+%[insert:function(_iswlower_l = iswlower_l)]
+%[insert:function(_iswprint_l = iswprint_l)]
+%[insert:function(_iswpunct_l = iswpunct_l)]
+%[insert:function(_iswspace_l = iswspace_l)]
+%[insert:function(_iswupper_l = iswupper_l)]
+%[insert:function(_iswxdigit_l = iswxdigit_l)]
+%[insert:function(_iswblank_l = iswblank_l)]
+%[insert:function(_towupper_l = towupper_l)]
+%[insert:function(_towlower_l = towlower_l)]
+%[insert:function(_iswctype_l = iswctype_l)]
+%[insert:function(is_wctype = iswctype)]
 
 %
 [[ATTR_WUNUSED, ATTR_CONST]]

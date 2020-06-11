@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9749d663 */
+/* HASH CRC-32:0x9cf93aa5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,44 +19,66 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wreadlink_defined
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wreadlinkat)
 #define __local_wreadlink_defined 1
 #include <__crt.h>
-/* Dependency: "wreadlinkat" from "parts.wchar.unistd" */
-#ifndef ____localdep_wreadlinkat_defined
-#define ____localdep_wreadlinkat_defined 1
+#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wreadlinkat) || (defined(__CRT_HAVE_DOS$wreadlinkat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wreadlinkat) && __SIZEOF_WCHAR_T__ == 2))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wreadlinkat from parts.wchar.unistd */
+#ifndef __local___localdep_wreadlinkat_defined
+#define __local___localdep_wreadlinkat_defined 1
 #ifdef __CRT_HAVE_wreadlinkat
-/* >> wreadlinkat(2)
+/* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `wfreadlinkat(2)' with `AT_READLINK_REQSIZE'. */
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_wreadlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__restrict __path, __WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
-#else /* LIBC: wreadlinkat */
-#undef ____localdep_wreadlinkat_defined
-#endif /* wreadlinkat... */
-#endif /* !____localdep_wreadlinkat_defined */
-
-__NAMESPACE_LOCAL_BEGIN
-/* >> wreadlink(3)
- * Read the text of a symbolic link under `PATH' into the provided buffer.
- * Same as `wreadlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
+#elif defined(__CRT_HAVE_DOS$wreadlinkat) && __SIZEOF_WCHAR_T__ == 4
+/* >> readlinkat(2)
+ * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `wfreadlinkat(2)' with `AT_READLINK_REQSIZE' */
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__LIBCCALL,__localdep_wreadlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__restrict __path, __WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen),KOS$wreadlinkat,(__dfd,__path,__buf,__buflen))
+#elif defined(__CRT_HAVE_DOS$wreadlinkat) && __SIZEOF_WCHAR_T__ == 2
+/* >> readlinkat(2)
+ * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
+ * WARNING: This function is badly designed and will neither append a trailing
+ *          NUL-character to the buffer, nor will it return the required buffer
+ *          size. Instead, it will return the written size, and the caller must
+ *          keep on over allocating until the function indicates that it didn't
+ *          make use of the buffer in its entirety.
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__LIBCCALL,__localdep_wreadlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__restrict __path, __WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen),DOS$wreadlinkat,(__dfd,__path,__buf,__buflen))
+#else /* ... */
+#undef __local___localdep_wreadlinkat_defined
+#endif /* !... */
+#endif /* !__local___localdep_wreadlinkat_defined */
+/* >> readlink(3)
+ * Read the text of a symbolic link under `PATH' into the provided buffer.
+ * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
+ * WARNING: This function is badly designed and will neither append a trailing
+ *          NUL-character to the buffer, nor will it return the required buffer
+ *          size. Instead, it will return the written size, and the caller must
+ *          keep on over allocating until the function indicates that it didn't
+ *          make use of the buffer in its entirety.
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __LOCAL_LIBC(wreadlink) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wreadlink))(__WCHAR_TYPE__ const *__restrict __path,
-                                                       __WCHAR_TYPE__ *__restrict __buf,
-                                                       __SIZE_TYPE__ __buflen) {
-#line 1525 "kos/src/libc/magic/unistd.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wreadlink))(__WCHAR_TYPE__ const *__restrict __path, __WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen) {
 	return __localdep_wreadlinkat(__CRT_AT_FDCWD, __path, __buf, __buflen);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && __CRT_HAVE_wreadlinkat */
+#ifndef __local___localdep_wreadlink_defined
+#define __local___localdep_wreadlink_defined 1
+#define __localdep_wreadlink __LIBC_LOCAL_NAME(wreadlink)
+#endif /* !__local___localdep_wreadlink_defined */
+#else /* __CRT_AT_FDCWD && (__CRT_HAVE_wreadlinkat || (__CRT_HAVE_DOS$wreadlinkat && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$wreadlinkat && __SIZEOF_WCHAR_T__ == 2)) */
+#undef __local_wreadlink_defined
+#endif /* !__CRT_AT_FDCWD || (!__CRT_HAVE_wreadlinkat && (!__CRT_HAVE_DOS$wreadlinkat || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$wreadlinkat || !__SIZEOF_WCHAR_T__ == 2)) */
 #endif /* !__local_wreadlink_defined */

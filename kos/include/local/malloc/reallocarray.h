@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c365326 */
+/* HASH CRC-32:0x96bdea3f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,35 +19,43 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_reallocarray_defined
-#ifdef __CRT_HAVE_realloc
 #define __local_reallocarray_defined 1
 #include <__crt.h>
-#include <hybrid/__overflow.h>
-/* Dependency: "realloc" */
-#ifndef ____localdep_realloc_defined
-#define ____localdep_realloc_defined 1
-#ifdef __std___localdep_realloc_defined
-__NAMESPACE_STD_USING(__localdep_realloc)
+#ifdef __CRT_HAVE_realloc
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: realloc from stdlib */
+#ifndef __local___localdep_realloc_defined
+#define __local___localdep_realloc_defined 1
+#ifdef __realloc_defined
+__NAMESPACE_GLB_USING(realloc)
+#define __localdep_realloc realloc
+#elif defined(__std_realloc_defined)
+__NAMESPACE_STD_USING(realloc)
+#define __localdep_realloc realloc
 #elif __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
 __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
 #elif defined(__CRT_HAVE_realloc)
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
-#else /* LIBC: realloc */
-#undef ____localdep_realloc_defined
-#endif /* realloc... */
-#endif /* !____localdep_realloc_defined */
-
+#else /* ... */
+#undef __local___localdep_realloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_realloc_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__overflow.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(reallocarray) __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(reallocarray))(void *__ptr,
-                                                          __SIZE_TYPE__ __elem_count,
-                                                          __SIZE_TYPE__ __elem_size) {
-#line 212 "kos/src/libc/magic/malloc.c"
+__LOCAL_LIBC(reallocarray) __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(reallocarray))(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) {
 	__SIZE_TYPE__ __total_bytes;
 	if (__hybrid_overflow_umul(__elem_count, __elem_size, &__total_bytes))
 		__total_bytes = (__SIZE_TYPE__)-1; /* Force down-stream failure */
 	return __localdep_realloc(__ptr, __total_bytes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_realloc */
+#ifndef __local___localdep_reallocarray_defined
+#define __local___localdep_reallocarray_defined 1
+#define __localdep_reallocarray __LIBC_LOCAL_NAME(reallocarray)
+#endif /* !__local___localdep_reallocarray_defined */
+#else /* __CRT_HAVE_realloc */
+#undef __local_reallocarray_defined
+#endif /* !__CRT_HAVE_realloc */
 #endif /* !__local_reallocarray_defined */

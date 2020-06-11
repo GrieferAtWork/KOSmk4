@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0827932 */
+/* HASH CRC-32:0x14095014 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,23 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fmod_defined
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_fmod_defined 1
 #include <__crt.h>
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/isinf.h>
-
 #include <libm/fcomp.h>
-
 #include <libm/matherr.h>
-
 #include <libm/fmod.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Floating-point modulo remainder of X/Y */
 __LOCAL_LIBC(fmod) __ATTR_WUNUSED double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmod))(double __x,
-                                              double __y) {
-#line 708 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmod))(double __x, double __y) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    (__LIBM_MATHFUN(isinf, __x) || __y == 0.0) &&
 	    !__LIBM_MATHFUN2(isunordered, __x, __y))
@@ -43,5 +38,11 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmod))(double __x,
 	return __LIBM_MATHFUN2(fmod, __x, __y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#ifndef __local___localdep_fmod_defined
+#define __local___localdep_fmod_defined 1
+#define __localdep_fmod __LIBC_LOCAL_NAME(fmod)
+#endif /* !__local___localdep_fmod_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_fmod_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_fmod_defined */

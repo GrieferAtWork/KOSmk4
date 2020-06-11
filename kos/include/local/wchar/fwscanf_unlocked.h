@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3af3317 */
+/* HASH CRC-32:0xcf5bb884 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,28 +19,32 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fwscanf_unlocked_defined
-#if defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)
 #define __local_fwscanf_unlocked_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-/* Dependency: "vfwscanf_unlocked" */
-#ifndef ____localdep_vfwscanf_unlocked_defined
-#define ____localdep_vfwscanf_unlocked_defined 1
+#if defined(__CRT_HAVE_vfwscanf_unlocked) || (defined(__CRT_HAVE_DOS$vfwscanf_unlocked) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$vfwscanf_unlocked) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_vfwscanf) || (defined(__CRT_HAVE_DOS$vfwscanf) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$vfwscanf) && __SIZEOF_WCHAR_T__ == 2)
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: vfwscanf_unlocked from wchar */
+#ifndef __local___localdep_vfwscanf_unlocked_defined
+#define __local___localdep_vfwscanf_unlocked_defined 1
 #ifdef __CRT_HAVE_vfwscanf_unlocked
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
+#elif defined(__CRT_HAVE_DOS$vfwscanf_unlocked) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
+#elif defined(__CRT_HAVE_DOS$vfwscanf_unlocked) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_vfwscanf)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
-#else /* LIBC: vfwscanf_unlocked */
-#undef ____localdep_vfwscanf_unlocked_defined
-#endif /* vfwscanf_unlocked... */
-#endif /* !____localdep_vfwscanf_unlocked_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#elif defined(__CRT_HAVE_DOS$vfwscanf) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
+#elif defined(__CRT_HAVE_DOS$vfwscanf) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
+#else /* ... */
+#undef __local___localdep_vfwscanf_unlocked_defined
+#endif /* !... */
+#endif /* !__local___localdep_vfwscanf_unlocked_defined */
 __LOCAL_LIBC(fwscanf_unlocked) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-(__VLIBCCALL __LIBC_LOCAL_NAME(fwscanf_unlocked))(__FILE *__restrict __stream,
-                                                  __WCHAR_TYPE__ const *__restrict __format,
-                                                  ...) __THROWS(...) {
-#line 1232 "kos/src/libc/magic/wchar.c"
+(__VLIBCCALL __LIBC_LOCAL_NAME(fwscanf_unlocked))(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, ...) __THROWS(...) {
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
@@ -49,5 +53,11 @@ __LOCAL_LIBC(fwscanf_unlocked) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 3) __ATTR_NON
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_vfwscanf_unlocked || __CRT_HAVE_vfwscanf */
+#ifndef __local___localdep_fwscanf_unlocked_defined
+#define __local___localdep_fwscanf_unlocked_defined 1
+#define __localdep_fwscanf_unlocked __LIBC_LOCAL_NAME(fwscanf_unlocked)
+#endif /* !__local___localdep_fwscanf_unlocked_defined */
+#else /* __CRT_HAVE_vfwscanf_unlocked || (__CRT_HAVE_DOS$vfwscanf_unlocked && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$vfwscanf_unlocked && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_vfwscanf || (__CRT_HAVE_DOS$vfwscanf && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$vfwscanf && __SIZEOF_WCHAR_T__ == 2) */
+#undef __local_fwscanf_unlocked_defined
+#endif /* !__CRT_HAVE_vfwscanf_unlocked && (!__CRT_HAVE_DOS$vfwscanf_unlocked || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$vfwscanf_unlocked || !__SIZEOF_WCHAR_T__ == 2) && !__CRT_HAVE_vfwscanf && (!__CRT_HAVE_DOS$vfwscanf || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$vfwscanf || !__SIZEOF_WCHAR_T__ == 2) */
 #endif /* !__local_fwscanf_unlocked_defined */

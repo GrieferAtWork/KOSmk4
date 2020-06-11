@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x719e3ba2 */
+/* HASH CRC-32:0x3c12ac4c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,23 @@
 #ifndef __local_wildwcscasecmp_defined
 #define __local_wildwcscasecmp_defined 1
 #include <__crt.h>
-/* Dependency: "towlower" from "wctype" */
-#ifndef ____localdep_towlower_defined
-#define ____localdep_towlower_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: towlower from wctype */
+#ifndef __local___localdep_towlower_defined
+#define __local___localdep_towlower_defined 1
 #if __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,{ return __builtin_towlower(__wc); })
 #elif defined(__CRT_HAVE_towlower)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,(__wc))
-#else /* LIBC: towlower */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/towlower.h>
-#define __localdep_towlower (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towlower))
-#endif /* towlower... */
-#endif /* !____localdep_towlower_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_towlower __LIBC_LOCAL_NAME(towlower)
+#endif /* !... */
+#endif /* !__local___localdep_towlower_defined */
 __LOCAL_LIBC(wildwcscasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscasecmp))(__WCHAR_TYPE__ const *__pattern,
-                                                            __WCHAR_TYPE__ const *__string) {
-#line 4214 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscasecmp))(__WCHAR_TYPE__ const *__pattern, __WCHAR_TYPE__ const *__string) {
 	__WCHAR_TYPE__ __card_post, __pattern_ch, __wcsing_ch;
 	for (;;) {
 		if (!*__string) {
@@ -65,7 +64,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscasecmp))(__WCHAR_TYPE__ const
 					if (!__LIBC_LOCAL_NAME(wildwcscasecmp)(__string, __pattern))
 						return 0;
 				} else if (!__ch) {
-					return -(int)(__WCHAR_TYPE__)__card_post; /* Wildcard suffix not found */
+					return -(int)(unsigned char)__card_post; /* Wildcard suffix not found */
 				}
 			}
 		}
@@ -82,7 +81,11 @@ __next:
 		}
 		break; /* mismatch */
 	}
-	return (int)((__WCHAR_TYPE__)__wcsing_ch - (__WCHAR_TYPE__)__pattern_ch);
+	return (int)((unsigned char)__wcsing_ch - (unsigned char)__pattern_ch);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wildwcscasecmp_defined
+#define __local___localdep_wildwcscasecmp_defined 1
+#define __localdep_wildwcscasecmp __LIBC_LOCAL_NAME(wildwcscasecmp)
+#endif /* !__local___localdep_wildwcscasecmp_defined */
 #endif /* !__local_wildwcscasecmp_defined */

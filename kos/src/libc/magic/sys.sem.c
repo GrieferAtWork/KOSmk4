@@ -66,11 +66,13 @@ struct sembuf {
 }
 
 @@Semaphore control operation.  
+[[decl_include("<features.h>")]]
 int semctl(int semid,
            __STDC_INT_AS_UINT_T semnum,
            __STDC_INT_AS_UINT_T cmd, ...);
 
 @@Get semaphore
+[[decl_include("<features.h>")]]
 int semget(key_t key,
            __STDC_INT_AS_UINT_T nsems,
            __STDC_INT_AS_UINT_T semflg);

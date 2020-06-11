@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7042fbb */
+/* HASH CRC-32:0x186b55f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,30 @@
 #ifndef __local_towupper_defined
 #define __local_towupper_defined 1
 #include <__crt.h>
-/* Dependency: "toupper" from "ctype" */
-#ifndef ____localdep_toupper_defined
-#define ____localdep_toupper_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: toupper from ctype */
+#ifndef __local___localdep_toupper_defined
+#define __local___localdep_toupper_defined 1
 #if __has_builtin(__builtin_toupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_toupper)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),toupper,{ return __builtin_toupper(__ch); })
 #elif defined(__CRT_HAVE_toupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),toupper,(__ch))
 #elif defined(__CRT_HAVE__toupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),_toupper,(__ch))
-#else /* LIBC: toupper */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/toupper.h>
-#define __localdep_toupper (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toupper))
-#endif /* toupper... */
-#endif /* !____localdep_toupper_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_toupper __LIBC_LOCAL_NAME(toupper)
+#endif /* !... */
+#endif /* !__local___localdep_toupper_defined */
 __LOCAL_LIBC(towupper) __ATTR_CONST __ATTR_WUNUSED __WINT_TYPE__
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(towupper))(__WINT_TYPE__ __wc) {
-#line 210 "kos/src/libc/magic/wctype.c"
 	return (__WINT_TYPE__)__localdep_toupper((int)__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_towupper_defined
+#define __local___localdep_towupper_defined 1
+#define __localdep_towupper __LIBC_LOCAL_NAME(towupper)
+#endif /* !__local___localdep_towupper_defined */
 #endif /* !__local_towupper_defined */

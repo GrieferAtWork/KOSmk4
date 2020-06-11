@@ -49,7 +49,7 @@ void bzero([[nonnull]] void *__restrict dst, $size_t num_bytes) {
 	memset(dst, 0, num_bytes);
 }
 
-[[guard]] bcmp(*) = memcmp;
+%[insert:guarded_function(bcmp = memcmp)]
 
 [[guard, ATTR_WUNUSED, crtbuiltin, ATTR_PURE]]
 char *index([[nonnull]] char const *__restrict haystack, int needle)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc0866a0 */
+/* HASH CRC-32:0x575a95ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,25 +19,25 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__endthread_defined
-#ifdef __CRT_HAVE__endthreadex
 #define __local__endthread_defined 1
 #include <__crt.h>
-/* Dependency: "_endthreadex" */
-#ifndef ____localdep__endthreadex_defined
-#define ____localdep__endthreadex_defined 1
 #ifdef __CRT_HAVE__endthreadex
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__endthreadex,(__UINT32_TYPE__ __exitcode),_endthreadex,(__exitcode))
-#else /* LIBC: _endthreadex */
-#undef ____localdep__endthreadex_defined
-#endif /* _endthreadex... */
-#endif /* !____localdep__endthreadex_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _endthreadex from process */
+#if !defined(__local___localdep__endthreadex_defined) && defined(__CRT_HAVE__endthreadex)
+#define __local___localdep__endthreadex_defined 1
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__endthreadex,(__UINT32_TYPE__ __exitcode),_endthreadex,(__exitcode))
+#endif /* !__local___localdep__endthreadex_defined && __CRT_HAVE__endthreadex */
 __LOCAL_LIBC(_endthread) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_endthread))(void) {
-#line 94 "kos/src/libc/magic/process.c"
 	__localdep__endthreadex(0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE__endthreadex */
+#ifndef __local___localdep__endthread_defined
+#define __local___localdep__endthread_defined 1
+#define __localdep__endthread __LIBC_LOCAL_NAME(_endthread)
+#endif /* !__local___localdep__endthread_defined */
+#else /* __CRT_HAVE__endthreadex */
+#undef __local__endthread_defined
+#endif /* !__CRT_HAVE__endthreadex */
 #endif /* !__local__endthread_defined */

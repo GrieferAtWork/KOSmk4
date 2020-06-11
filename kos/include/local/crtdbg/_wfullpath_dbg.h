@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa84d9e93 */
+/* HASH CRC-32:0x80cd2a97 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wfullpath_dbg) __ATTR_WUNUSED __ATTR_NONNULL((2)) __WCHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wfullpath_dbg))(__WCHAR16_TYPE__ *__full_path,
-                                                            __WCHAR16_TYPE__ const *__path,
-                                                            __SIZE_TYPE__ __buflen,
-                                                            int __block_type,
-                                                            char const *__filename,
-                                                            int __line) {
-#line 468 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wfullpath_dbg))(__WCHAR16_TYPE__ *__full_path, __WCHAR16_TYPE__ const *__path, __SIZE_TYPE__ __buflen, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
@@ -41,4 +35,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wfullpath_dbg))(__WCHAR16_TYPE__ *__
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__wfullpath_dbg_defined
+#define __local___localdep__wfullpath_dbg_defined 1
+#define __localdep__wfullpath_dbg __LIBC_LOCAL_NAME(_wfullpath_dbg)
+#endif /* !__local___localdep__wfullpath_dbg_defined */
 #endif /* !__local__wfullpath_dbg_defined */

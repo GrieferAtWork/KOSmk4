@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec8efc7e */
+/* HASH CRC-32:0x4c922e42 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,29 +21,36 @@
 #ifndef __local_iswblank_l_defined
 #define __local_iswblank_l_defined 1
 #include <__crt.h>
-/* Dependency: "iswblank" from "wctype" */
-#ifndef ____localdep_iswblank_defined
-#define ____localdep_iswblank_defined 1
-#ifdef __std___localdep_iswblank_defined
-__NAMESPACE_STD_USING(__localdep_iswblank)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: iswblank from wctype */
+#ifndef __local___localdep_iswblank_defined
+#define __local___localdep_iswblank_defined 1
+#ifdef __iswblank_defined
+__NAMESPACE_GLB_USING(iswblank)
+#define __localdep_iswblank iswblank
+#elif defined(__std_iswblank_defined)
+__NAMESPACE_STD_USING(iswblank)
+#define __localdep_iswblank iswblank
 #elif __has_builtin(__builtin_iswblank) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswblank)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswblank,(__WINT_TYPE__ __wc),iswblank,{ return __builtin_iswblank(__wc); })
 #elif defined(__CRT_HAVE_iswblank)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswblank,(__WINT_TYPE__ __wc),iswblank,(__wc))
-#else /* LIBC: iswblank */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/iswblank.h>
-#define __localdep_iswblank (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswblank))
-#endif /* iswblank... */
-#endif /* !____localdep_iswblank_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_iswblank __LIBC_LOCAL_NAME(iswblank)
+#endif /* !... */
+#endif /* !__local___localdep_iswblank_defined */
 __LOCAL_LIBC(iswblank_l) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswblank_l))(__WINT_TYPE__ __wc,
-                                                        __locale_t __locale) {
-#line 306 "kos/src/libc/magic/wctype.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswblank_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
 	(void)__locale;
 	__COMPILER_IMPURE();
 	return __localdep_iswblank(__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswblank_l_defined
+#define __local___localdep_iswblank_l_defined 1
+#define __localdep_iswblank_l __LIBC_LOCAL_NAME(iswblank_l)
+#endif /* !__local___localdep_iswblank_l_defined */
 #endif /* !__local_iswblank_l_defined */

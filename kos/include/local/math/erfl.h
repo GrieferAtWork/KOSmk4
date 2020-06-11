@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8eb66aac */
+/* HASH CRC-32:0x73561386 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,33 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_erfl_defined
-#if defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 #define __local_erfl_defined 1
 #include <__crt.h>
-/* Dependency: "erf" */
-#ifndef ____localdep_erf_defined
-#define ____localdep_erf_defined 1
+#if defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: erf from math */
+#ifndef __local___localdep_erf_defined
+#define __local___localdep_erf_defined 1
 #if __has_builtin(__builtin_erf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erf)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_erf,(double __x),erf,{ return __builtin_erf(__x); })
 #elif defined(__CRT_HAVE_erf)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_erf,(double __x),erf,(__x))
 #elif defined(__CRT_HAVE___erf)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_erf,(double __x),__erf,(__x))
-#else /* LIBC: erf */
-#undef ____localdep_erf_defined
-#endif /* erf... */
-#endif /* !____localdep_erf_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_erf_defined
+#endif /* !... */
+#endif /* !__local___localdep_erf_defined */
 __LOCAL_LIBC(erfl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(erfl))(__LONGDOUBLE __x) {
-#line 810 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_erf((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_erf || __CRT_HAVE___erf */
+#ifndef __local___localdep_erfl_defined
+#define __local___localdep_erfl_defined 1
+#define __localdep_erfl __LIBC_LOCAL_NAME(erfl)
+#endif /* !__local___localdep_erfl_defined */
+#else /* __CRT_HAVE_erf || __CRT_HAVE___erf */
+#undef __local_erfl_defined
+#endif /* !__CRT_HAVE_erf && !__CRT_HAVE___erf */
 #endif /* !__local_erfl_defined */

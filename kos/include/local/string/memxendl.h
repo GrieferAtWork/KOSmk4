@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcb50ade */
+/* HASH CRC-32:0x755b388 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memendl', but search for non-matching locations. */
 __LOCAL_LIBC(memxendl) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxendl))(/*aligned(4)*/ void const *__restrict __haystack,
-                                                      __UINT32_TYPE__ __dword,
-                                                      __SIZE_TYPE__ __n_bytes) {
-#line 2184 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxendl))(void const *__restrict __haystack, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_bytes) {
 	__UINT32_TYPE__ *__result = (__UINT32_TYPE__ *)__haystack;
 	for (; __n_bytes--; ++__result) {
 		if __unlikely(*__result != __dword)
@@ -36,4 +33,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxendl))(/*aligned(4)*/ void const 
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memxendl_defined
+#define __local___localdep_memxendl_defined 1
+#define __localdep_memxendl __LIBC_LOCAL_NAME(memxendl)
+#endif /* !__local___localdep_memxendl_defined */
 #endif /* !__local_memxendl_defined */

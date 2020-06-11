@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70e985cf */
+/* HASH CRC-32:0x2f4008ab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,19 +21,16 @@
 #ifndef __local_vsnprintf_defined
 #define __local_vsnprintf_defined 1
 #include <__crt.h>
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: format_vprintf from format-printer */
+#ifndef __local___localdep_format_vprintf_defined
+#define __local___localdep_format_vprintf_defined 1
+#ifdef __CRT_HAVE_format_vprintf
+__NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/format-printer.h>
-#ifndef ____format_snprintf_data_defined
-#define ____format_snprintf_data_defined 1
-struct __format_snprintf_data {
-	char         *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
-	__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
-};
-#endif /* !____format_snprintf_data_defined */
-/* Dependency: "format_vprintf" from "format-printer" */
-#ifndef ____localdep_format_vprintf_defined
-#define ____localdep_format_vprintf_defined 1
-#ifdef __CRT_HAVE_format_vprintf
+__NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -122,8 +119,10 @@ struct __format_snprintf_data {
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
-#else /* LIBC: format_vprintf */
+#else /* __CRT_HAVE_format_vprintf */
+__NAMESPACE_LOCAL_END
 #include <local/format-printer/format_vprintf.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -211,49 +210,57 @@ __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THR
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-#define __localdep_format_vprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vprintf))
-#endif /* format_vprintf... */
-#endif /* !____localdep_format_vprintf_defined */
-
-/* Dependency: "format_snprintf_printer" from "format-printer" */
-#ifndef ____localdep_format_snprintf_printer_defined
-#define ____localdep_format_snprintf_printer_defined 1
+#define __localdep_format_vprintf __LIBC_LOCAL_NAME(format_vprintf)
+#endif /* !__CRT_HAVE_format_vprintf */
+#endif /* !__local___localdep_format_vprintf_defined */
+/* Dependency: format_snprintf_printer from format-printer */
+#ifndef __local___localdep_format_snprintf_printer_defined
+#define __local___localdep_format_snprintf_printer_defined 1
 #ifdef __CRT_HAVE_format_snprintf_printer
 /* Format-printer implementation for printing to a string buffer like `snprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
- * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_snprintf_printer,(/*struct format_snprintf_data**/ void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_snprintf_printer,(__arg,__data,__datalen))
-#else /* LIBC: format_snprintf_printer */
+ * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
+ *       the sum of return values of all calls to `format_snprintf_printer()' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_snprintf_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_snprintf_printer,(__arg,__data,__datalen))
+#else /* __CRT_HAVE_format_snprintf_printer */
+__NAMESPACE_LOCAL_END
 #include <local/format-printer/format_snprintf_printer.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Format-printer implementation for printing to a string buffer like `snprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
- * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
-#define __localdep_format_snprintf_printer (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_snprintf_printer))
-#endif /* format_snprintf_printer... */
-#endif /* !____localdep_format_snprintf_printer_defined */
-
+ * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
+ *       the sum of return values of all calls to `format_snprintf_printer()' */
+#define __localdep_format_snprintf_printer __LIBC_LOCAL_NAME(format_snprintf_printer)
+#endif /* !__CRT_HAVE_format_snprintf_printer */
+#endif /* !__local___localdep_format_snprintf_printer_defined */
+__NAMESPACE_LOCAL_END
+#ifndef ____format_snprintf_data_defined
+#define ____format_snprintf_data_defined 1
+struct __format_snprintf_data {
+	char         *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
+	__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
+};
+#endif
 __NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
 __LOCAL_LIBC(vsnprintf) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsnprintf))(char *__restrict __buf,
-                                                       __SIZE_TYPE__ __buflen,
-                                                       char const *__restrict __format,
-                                                       __builtin_va_list __args) {
-#line 1026 "kos/src/libc/magic/stdio.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsnprintf))(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args) {
 	struct __format_snprintf_data __data;
 	__STDC_INT_AS_SSIZE_T __result;
 	__data.__sd_buffer = __buf;
 	__data.__sd_bufsiz = __buflen;
 	__result = (__STDC_INT_AS_SSIZE_T)__localdep_format_vprintf(&__localdep_format_snprintf_printer,
-	                                                (void *)&__data,
-	                                                 __format,
-	                                                 __args);
+	                                               (void *)&__data, __format, __args);
 	if (__result >= 0 && __data.__sd_bufsiz != 0)
 		*__data.__sd_buffer = '\0';
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_vsnprintf_defined
+#define __local___localdep_vsnprintf_defined 1
+#define __localdep_vsnprintf __LIBC_LOCAL_NAME(vsnprintf)
+#endif /* !__local___localdep_vsnprintf_defined */
 #endif /* !__local_vsnprintf_defined */

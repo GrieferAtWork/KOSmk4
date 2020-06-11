@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf023e6a3 */
+/* HASH CRC-32:0x25fd16ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,33 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_erfcl_defined
-#if defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 #define __local_erfcl_defined 1
 #include <__crt.h>
-/* Dependency: "erfc" */
-#ifndef ____localdep_erfc_defined
-#define ____localdep_erfc_defined 1
+#if defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: erfc from math */
+#ifndef __local___localdep_erfc_defined
+#define __local___localdep_erfc_defined 1
 #if __has_builtin(__builtin_erfc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfc)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_erfc,(double __x),erfc,{ return __builtin_erfc(__x); })
 #elif defined(__CRT_HAVE_erfc)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_erfc,(double __x),erfc,(__x))
 #elif defined(__CRT_HAVE___erfc)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_erfc,(double __x),__erfc,(__x))
-#else /* LIBC: erfc */
-#undef ____localdep_erfc_defined
-#endif /* erfc... */
-#endif /* !____localdep_erfc_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_erfc_defined
+#endif /* !... */
+#endif /* !__local___localdep_erfc_defined */
 __LOCAL_LIBC(erfcl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(erfcl))(__LONGDOUBLE __x) {
-#line 813 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_erfc((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_erfc || __CRT_HAVE___erfc */
+#ifndef __local___localdep_erfcl_defined
+#define __local___localdep_erfcl_defined 1
+#define __localdep_erfcl __LIBC_LOCAL_NAME(erfcl)
+#endif /* !__local___localdep_erfcl_defined */
+#else /* __CRT_HAVE_erfc || __CRT_HAVE___erfc */
+#undef __local_erfcl_defined
+#endif /* !__CRT_HAVE_erfc && !__CRT_HAVE___erfc */
 #endif /* !__local_erfcl_defined */

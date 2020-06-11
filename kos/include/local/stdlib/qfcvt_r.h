@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6b3cd5f */
+/* HASH CRC-32:0x3099b729 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,17 @@
 #ifndef __local_qfcvt_r_defined
 #define __local_qfcvt_r_defined 1
 #include <__crt.h>
-/* Dependency: "dos_fcvt_s" from "stdlib" */
-#ifndef ____localdep_dos_fcvt_s_defined
-#define ____localdep_dos_fcvt_s_defined 1
-#ifdef __CRT_HAVE__fcvt_s
-__CREDIRECT(__ATTR_NONNULL((1, 5, 6)),__errno_t,__NOTHROW_NCX,__localdep_dos_fcvt_s,(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),_fcvt_s,(__buf,__buflen,__val,__ndigit,__decptr,__sign))
-#else /* LIBC: _fcvt_s */
-#undef ____localdep_dos_fcvt_s_defined
-#endif /* dos_fcvt_s... */
-#endif /* !____localdep_dos_fcvt_s_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: dos_fcvt_s from stdlib */
+#if !defined(__local___localdep_dos_fcvt_s_defined) && defined(__CRT_HAVE__fcvt_s)
+#define __local___localdep_dos_fcvt_s_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 5, 6)),__errno_t,__NOTHROW_NCX,__localdep_dos_fcvt_s,(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),_fcvt_s,(__buf,__buflen,__val,__ndigit,__decptr,__sign))
+#endif /* !__local___localdep_dos_fcvt_s_defined && __CRT_HAVE__fcvt_s */
 __LOCAL_LIBC(qfcvt_r) __ATTR_NONNULL((3, 4, 5)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qfcvt_r))(__LONGDOUBLE __val,
-                                                     int __ndigit,
-                                                     int *__restrict __decptr,
-                                                     int *__restrict __sign,
-                                                     char *__restrict __buf,
-                                                     __SIZE_TYPE__ __len) {
-#line 1239 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qfcvt_r))(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len) {
 #if defined(__CRT_HAVE__fcvt_s) && !defined(__BUILDING_LIBC)
 	return __localdep_dos_fcvt_s(__buf, __len, (double)__val, __ndigit, __decptr, __sign) ? -1 : 0;
 #else
@@ -55,4 +47,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qfcvt_r))(__LONGDOUBLE __val,
 #endif
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_qfcvt_r_defined
+#define __local___localdep_qfcvt_r_defined 1
+#define __localdep_qfcvt_r __LIBC_LOCAL_NAME(qfcvt_r)
+#endif /* !__local___localdep_qfcvt_r_defined */
 #endif /* !__local_qfcvt_r_defined */

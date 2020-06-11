@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95850392 */
+/* HASH CRC-32:0x66f3606e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,30 @@
 #ifndef __local_iswgraph_l_defined
 #define __local_iswgraph_l_defined 1
 #include <__crt.h>
-/* Dependency: "iswgraph" from "wctype" */
-#ifndef ____localdep_iswgraph_defined
-#define ____localdep_iswgraph_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: iswgraph from wctype */
+#ifndef __local___localdep_iswgraph_defined
+#define __local___localdep_iswgraph_defined 1
 #if __has_builtin(__builtin_iswgraph) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswgraph)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswgraph,(__WINT_TYPE__ __wc),iswgraph,{ return __builtin_iswgraph(__wc); })
 #elif defined(__CRT_HAVE_iswgraph)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswgraph,(__WINT_TYPE__ __wc),iswgraph,(__wc))
-#else /* LIBC: iswgraph */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/iswgraph.h>
-#define __localdep_iswgraph (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswgraph))
-#endif /* iswgraph... */
-#endif /* !____localdep_iswgraph_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_iswgraph __LIBC_LOCAL_NAME(iswgraph)
+#endif /* !... */
+#endif /* !__local___localdep_iswgraph_defined */
 __LOCAL_LIBC(iswgraph_l) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswgraph_l))(__WINT_TYPE__ __wc,
-                                                        __locale_t __locale) {
-#line 257 "kos/src/libc/magic/wctype.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswgraph_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
 	(void)__locale;
 	__COMPILER_IMPURE();
 	return __localdep_iswgraph(__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswgraph_l_defined
+#define __local___localdep_iswgraph_l_defined 1
+#define __localdep_iswgraph_l __LIBC_LOCAL_NAME(iswgraph_l)
+#endif /* !__local___localdep_iswgraph_l_defined */
 #endif /* !__local_iswgraph_l_defined */

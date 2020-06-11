@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52c63a56 */
+/* HASH CRC-32:0xe0d03fff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wdupenv_s_dbg) _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wdupenv_s_dbg))(__WCHAR16_TYPE__ **__pbuf,
-                                                            __SIZE_TYPE__ *__pbuflen,
-                                                            __WCHAR16_TYPE__ const *__varname,
-                                                            int __block_type,
-                                                            char const *__filename,
-                                                            int __line) {
-#line 539 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wdupenv_s_dbg))(__WCHAR16_TYPE__ **__pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR16_TYPE__ const *__varname, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
@@ -41,4 +35,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wdupenv_s_dbg))(__WCHAR16_TYPE__ **_
 	return 1;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__wdupenv_s_dbg_defined
+#define __local___localdep__wdupenv_s_dbg_defined 1
+#define __localdep__wdupenv_s_dbg __LIBC_LOCAL_NAME(_wdupenv_s_dbg)
+#endif /* !__local___localdep__wdupenv_s_dbg_defined */
 #endif /* !__local__wdupenv_s_dbg_defined */

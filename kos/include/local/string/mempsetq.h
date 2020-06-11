@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3a5df3b */
+/* HASH CRC-32:0x3b40b9dc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,33 +21,33 @@
 #ifndef __local_mempsetq_defined
 #define __local_mempsetq_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "memsetq" from "string" */
-#ifndef ____localdep_memsetq_defined
-#define ____localdep_memsetq_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memsetq from string */
+#ifndef __local___localdep_memsetq_defined
+#define __local___localdep_memsetq_defined 1
 #ifdef __fast_memsetq_defined
 /* Fill memory with a given qword */
-#define __localdep_memsetq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetq))
+__NAMESPACE_FAST_USING(memsetq)
+#define __localdep_memsetq __LIBC_FAST_NAME(memsetq)
 #elif defined(__CRT_HAVE_memsetq)
 /* Fill memory with a given qword */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memsetq,(/*aligned(8)*/ void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memsetq,(__dst,__qword,__n_qwords))
-#else /* LIBC: memsetq */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memsetq,(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memsetq,(__dst,__qword,__n_qwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memsetq.h>
-/* Fill memory with a given qword */
-#define __localdep_memsetq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memsetq))
-#endif /* memsetq... */
-#endif /* !____localdep_memsetq_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Fill memory with a given qword */
+#define __localdep_memsetq __LIBC_LOCAL_NAME(memsetq)
+#endif /* !... */
+#endif /* !__local___localdep_memsetq_defined */
 /* Same as `memsetq', but return `DST + N_QWORDS', rather than `DST' */
 __LOCAL_LIBC(mempsetq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempsetq))(/*aligned(8)*/ void *__restrict __dst,
-                                                      __UINT64_TYPE__ __qword,
-                                                      __SIZE_TYPE__ __n_qwords) {
-#line 1764 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempsetq))(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) {
 	return (__UINT64_TYPE__ *)__localdep_memsetq(__dst, __qword, __n_qwords) + __n_qwords;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_mempsetq_defined
+#define __local___localdep_mempsetq_defined 1
+#define __localdep_mempsetq __LIBC_LOCAL_NAME(mempsetq)
+#endif /* !__local___localdep_mempsetq_defined */
 #endif /* !__local_mempsetq_defined */

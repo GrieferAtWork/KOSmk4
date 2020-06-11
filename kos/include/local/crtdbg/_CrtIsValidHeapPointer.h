@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bdbcc7b */
+/* HASH CRC-32:0x1d0a8634 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,12 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtIsValidHeapPointer) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtIsValidHeapPointer))(void const *__heap_ptr) {
-#line 572 "kos/src/libc/magic/crtdbg.c"
 	__COMPILER_IMPURE();
 	return __heap_ptr != __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__CrtIsValidHeapPointer_defined
+#define __local___localdep__CrtIsValidHeapPointer_defined 1
+#define __localdep__CrtIsValidHeapPointer __LIBC_LOCAL_NAME(_CrtIsValidHeapPointer)
+#endif /* !__local___localdep__CrtIsValidHeapPointer_defined */
 #endif /* !__local__CrtIsValidHeapPointer_defined */

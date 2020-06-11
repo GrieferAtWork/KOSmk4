@@ -165,7 +165,7 @@ __NAMESPACE_STD_USING(size_t)
 [[std /*, dos_variant*/]]
 int raise(int signo);
 
-__sysv_signal(*) = sysv_signal;
+%[insert:function(__sysv_signal = sysv_signal)]
 
 %#ifdef __USE_GNU
 @@@param signo: One of `SIG*'
@@ -444,23 +444,20 @@ $sighandler_t sigset(int signo, $sighandler_t disp);
 %#endif /* __USE_XOPEN_EXTENDED */
 %
 
-[[ATTR_CONST, ATTR_WUNUSED]] int __libc_current_sigrtmin();
-[[ATTR_CONST, ATTR_WUNUSED]] int __libc_current_sigrtmax();
 
-/* TODO: Enable once the new magic is able to generate <local/...> headers. */
-//TODO:[[ATTR_CONST, ATTR_WUNUSED]]
-//TODO:[[requires(defined(__SIGRTMIN))]]
-//TODO:[[requires_include("<bits/signum-values.h>")]]
-//TODO:int __libc_current_sigrtmin() {
-//TODO:	return __SIGRTMIN;
-//TODO:}
-//TODO:
-//TODO:[[ATTR_CONST, ATTR_WUNUSED]]
-//TODO:[[requires(defined(__SIGRTMIN))]]
-//TODO:[[requires_include("<bits/signum-values.h>")]]
-//TODO:int __libc_current_sigrtmax() {
-//TODO:	return __SIGRTMAX;
-//TODO:}
+[[ATTR_CONST, ATTR_WUNUSED]]
+[[requires(defined(__SIGRTMIN))]]
+[[requires_include("<bits/signum-values.h>")]]
+int __libc_current_sigrtmin() {
+	return __SIGRTMIN;
+}
+
+[[ATTR_CONST, ATTR_WUNUSED]]
+[[requires(defined(__SIGRTMIN))]]
+[[requires_include("<bits/signum-values.h>")]]
+int __libc_current_sigrtmax() {
+	return __SIGRTMAX;
+}
 
 
 

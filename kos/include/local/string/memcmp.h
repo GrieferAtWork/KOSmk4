@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x673e1a9 */
+/* HASH CRC-32:0xb635ef06 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,10 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __LOCAL_LIBC(memcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmp))(void const *__s1,
-                                                    void const *__s2,
-                                                    __SIZE_TYPE__ __n_bytes) {
-#line 225 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmp))(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__p1 = (__BYTE_TYPE__ *)__s1;
 	__BYTE_TYPE__ *__p2 = (__BYTE_TYPE__ *)__s2;
 	__BYTE_TYPE__ __v1, __v2;
@@ -40,4 +37,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmp))(void const *__s1,
 	return (int)__v1 - (int)__v2;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memcmp_defined
+#define __local___localdep_memcmp_defined 1
+#define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
+#endif /* !__local___localdep_memcmp_defined */
 #endif /* !__local_memcmp_defined */

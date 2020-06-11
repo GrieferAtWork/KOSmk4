@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc846d0bf */
+/* HASH CRC-32:0x57ecab9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,61 +19,66 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_argz_add_sep_defined
-#ifdef __CRT_HAVE_realloc
 #define __local_argz_add_sep_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-/* Dependency: "strlen" from "string" */
-#ifndef ____localdep_strlen_defined
-#define ____localdep_strlen_defined 1
+#ifdef __CRT_HAVE_realloc
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* LIBC: strlen */
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
 #include <local/string/strlen.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
-#endif /* strlen... */
-#endif /* !____localdep_strlen_defined */
-
-/* Dependency: "realloc" */
-#ifndef ____localdep_realloc_defined
-#define ____localdep_realloc_defined 1
-#ifdef __std___localdep_realloc_defined
-__NAMESPACE_STD_USING(__localdep_realloc)
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
+/* Dependency: realloc from stdlib */
+#ifndef __local___localdep_realloc_defined
+#define __local___localdep_realloc_defined 1
+#ifdef __realloc_defined
+__NAMESPACE_GLB_USING(realloc)
+#define __localdep_realloc realloc
+#elif defined(__std_realloc_defined)
+__NAMESPACE_STD_USING(realloc)
+#define __localdep_realloc realloc
 #elif __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
 __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
 #elif defined(__CRT_HAVE_realloc)
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
-#else /* LIBC: realloc */
-#undef ____localdep_realloc_defined
-#endif /* realloc... */
-#endif /* !____localdep_realloc_defined */
-
-/* Dependency: "free" */
-#ifndef ____localdep_free_defined
-#define ____localdep_free_defined 1
-#ifdef __std___localdep_free_defined
-__NAMESPACE_STD_USING(__localdep_free)
+#else /* ... */
+#undef __local___localdep_realloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_realloc_defined */
+/* Dependency: free from stdlib */
+#ifndef __local___localdep_free_defined
+#define __local___localdep_free_defined 1
+#ifdef __free_defined
+__NAMESPACE_GLB_USING(free)
+#define __localdep_free free
+#elif defined(__std_free_defined)
+__NAMESPACE_STD_USING(free)
+#define __localdep_free free
 #elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
-#else /* LIBC: free */
-#undef ____localdep_free_defined
-#endif /* free... */
-#endif /* !____localdep_free_defined */
-
+#else /* ... */
+#undef __local___localdep_free_defined
+#endif /* !... */
+#endif /* !__local___localdep_free_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
 __LOCAL_LIBC(argz_add_sep) __ATTR_NONNULL((1, 2, 3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add_sep))(char **__restrict __pargz,
-                                                          __SIZE_TYPE__ *__restrict __pargz_len,
-                                                          char const *__restrict __string,
-                                                          int __sep) {
-#line 282 "kos/src/libc/magic/argz.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add_sep))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __string, int __sep) {
 	char *__result_string, *__dst;
 	__SIZE_TYPE__ __oldlen;
 	__SIZE_TYPE__ __slen = __localdep_strlen(__string);
@@ -138,5 +143,11 @@ __again_check_ch:
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_realloc */
+#ifndef __local___localdep_argz_add_sep_defined
+#define __local___localdep_argz_add_sep_defined 1
+#define __localdep_argz_add_sep __LIBC_LOCAL_NAME(argz_add_sep)
+#endif /* !__local___localdep_argz_add_sep_defined */
+#else /* __CRT_HAVE_realloc */
+#undef __local_argz_add_sep_defined
+#endif /* !__CRT_HAVE_realloc */
 #endif /* !__local_argz_add_sep_defined */

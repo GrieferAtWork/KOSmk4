@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89087850 */
+/* HASH CRC-32:0x604d435 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,36 +21,36 @@
 #ifndef __local___memcpyq_chk_defined
 #define __local___memcpyq_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "memcpyq" from "string" */
-#ifndef ____localdep_memcpyq_defined
-#define ____localdep_memcpyq_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcpyq from string */
+#ifndef __local___localdep_memcpyq_defined
+#define __local___localdep_memcpyq_defined 1
 #ifdef __fast_memcpyq_defined
 /* Copy memory between non-overlapping memory blocks. */
-#define __localdep_memcpyq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyq))
+__NAMESPACE_FAST_USING(memcpyq)
+#define __localdep_memcpyq __LIBC_FAST_NAME(memcpyq)
 #elif defined(__CRT_HAVE_memcpyq)
 /* Copy memory between non-overlapping memory blocks. */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyq,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords),memcpyq,(__dst,__src,__n_qwords))
-#else /* LIBC: memcpyq */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),memcpyq,(__dst,__src,__n_qwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memcpyq.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks. */
-#define __localdep_memcpyq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyq))
-#endif /* memcpyq... */
-#endif /* !____localdep_memcpyq_defined */
-
+#define __localdep_memcpyq __LIBC_LOCAL_NAME(memcpyq)
+#endif /* !... */
+#endif /* !__local___localdep_memcpyq_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__memcpyq_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memcpyq_chk))(/*aligned(8)*/ void *__restrict __dst,
-                                                           /*aligned(8)*/ void const *__restrict __src,
-                                                           __SIZE_TYPE__ __n_qwords,
-                                                           __SIZE_TYPE__ __dst_objsize) {
-#line 99 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memcpyq_chk))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("memcpyq", __dst, __n_qwords * 8, __dst_objsize);
 	return __localdep_memcpyq(__dst, __src, __n_qwords);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___memcpyq_chk_defined
+#define __local___localdep___memcpyq_chk_defined 1
+#define __localdep___memcpyq_chk __LIBC_LOCAL_NAME(__memcpyq_chk)
+#endif /* !__local___localdep___memcpyq_chk_defined */
 #endif /* !__local___memcpyq_chk_defined */

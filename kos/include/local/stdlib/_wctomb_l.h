@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84e00ce9 */
+/* HASH CRC-32:0x1cb61780 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,31 @@
 #ifndef __local__wctomb_l_defined
 #define __local__wctomb_l_defined 1
 #include <__crt.h>
-/* Dependency: "wctomb" from "stdlib" */
-#ifndef ____localdep_wctomb_defined
-#define ____localdep_wctomb_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wctomb from stdlib */
+#ifndef __local___localdep_wctomb_defined
+#define __local___localdep_wctomb_defined 1
 #ifdef __CRT_HAVE_wctomb
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __WCHAR_TYPE__ __wc),wctomb,(__str,__wc))
-#else /* LIBC: wctomb */
+#elif defined(__CRT_HAVE_DOS$wctomb) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(,int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __CHAR32_TYPE__ __wc),wctomb,(__str,__wc))
+#elif defined(__CRT_HAVE_DOS$wctomb) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(,int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __CHAR16_TYPE__ __wc),wctomb,(__str,__wc))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/wctomb.h>
-#define __localdep_wctomb (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctomb))
-#endif /* wctomb... */
-#endif /* !____localdep_wctomb_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_wctomb __LIBC_LOCAL_NAME(wctomb)
+#endif /* !... */
+#endif /* !__local___localdep_wctomb_defined */
 __LOCAL_LIBC(_wctomb_l) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wctomb_l))(char *__buf,
-                                                       __WCHAR_TYPE__ __wc,
-                                                       __locale_t __locale) {
-#line 2747 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wctomb_l))(char *__buf, __WCHAR_TYPE__ __wc, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_wctomb(__buf, __wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__wctomb_l_defined
+#define __local___localdep__wctomb_l_defined 1
+#define __localdep__wctomb_l __LIBC_LOCAL_NAME(_wctomb_l)
+#endif /* !__local___localdep__wctomb_l_defined */
 #endif /* !__local__wctomb_l_defined */

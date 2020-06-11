@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f190459 */
+/* HASH CRC-32:0xf9ede226 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,10 @@
 #ifndef __local_inet_aton_defined
 #define __local_inet_aton_defined 1
 #include <__crt.h>
-/* Dependency: "inet_paton" from "arpa.inet" */
-#ifndef ____localdep_inet_paton_defined
-#define ____localdep_inet_paton_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: inet_paton from arpa.inet */
+#ifndef __local___localdep_inet_paton_defined
+#define __local___localdep_inet_paton_defined 1
 #ifdef __CRT_HAVE_inet_paton
 /* Same as `inet_aton()', but update `*pcp' to point after the address
  * Accepted notations are:
@@ -39,8 +40,10 @@
  * @return: 0: Bad input format
  * @return: 1: Success */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_inet_paton,(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr),inet_paton,(__pcp,__inp,__network_addr))
-#else /* LIBC: inet_paton */
+#else /* __CRT_HAVE_inet_paton */
+__NAMESPACE_LOCAL_END
 #include <local/arpa.inet/inet_paton.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `inet_aton()', but update `*pcp' to point after the address
  * Accepted notations are:
  *     a.b.c.d  (1.2.3.4)
@@ -54,11 +57,9 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_i
  * @param: network_addr: When non-zero, `*pcp' is a network address
  * @return: 0: Bad input format
  * @return: 1: Success */
-#define __localdep_inet_paton (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_paton))
-#endif /* inet_paton... */
-#endif /* !____localdep_inet_paton_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_inet_paton __LIBC_LOCAL_NAME(inet_paton)
+#endif /* !__CRT_HAVE_inet_paton */
+#endif /* !__local___localdep_inet_paton_defined */
 /* Convert Internet host address from numbers-and-dots notation in
  * CP into binary data and store the result in the structure INP
  * Accepted notations are:
@@ -73,10 +74,12 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: 0: Bad input format
  * @return: 1: Success */
 __LOCAL_LIBC(inet_aton) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_aton))(char const *__restrict __cp,
-                                                       struct in_addr *__restrict __inp) {
-#line 184 "kos/src/libc/magic/arpa.inet.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_aton))(char const *__restrict __cp, struct in_addr *__restrict __inp) {
 	return __localdep_inet_paton((char const **)&__cp, __inp, 0) && !*__cp;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_inet_aton_defined
+#define __local___localdep_inet_aton_defined 1
+#define __localdep_inet_aton __LIBC_LOCAL_NAME(inet_aton)
+#endif /* !__local___localdep_inet_aton_defined */
 #endif /* !__local_inet_aton_defined */

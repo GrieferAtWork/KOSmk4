@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35caffd7 */
+/* HASH CRC-32:0x914bc02d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,30 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_FTruncate64_defined
-#ifdef __CRT_HAVE_FTruncate
 #define __local_FTruncate64_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-/* Dependency: "FTruncate32" from "kos.unistd" */
-#ifndef ____localdep_FTruncate32_defined
-#define ____localdep_FTruncate32_defined 1
 #ifdef __CRT_HAVE_FTruncate
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: FTruncate32 from kos.unistd */
+#if !defined(__local___localdep_FTruncate32_defined) && defined(__CRT_HAVE_FTruncate)
+#define __local___localdep_FTruncate32_defined 1
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__THROWING,__localdep_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length))
-#else /* LIBC: FTruncate */
-#undef ____localdep_FTruncate32_defined
-#endif /* FTruncate32... */
-#endif /* !____localdep_FTruncate32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_FTruncate32_defined && __CRT_HAVE_FTruncate */
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __LOCAL_LIBC(FTruncate64) void
-(__LIBCCALL __LIBC_LOCAL_NAME(FTruncate64))(__fd_t __fd,
-                                            __pos64_t __length) __THROWS(...) {
-#line 620 "kos/src/libc/magic/kos.unistd.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(FTruncate64))(__fd_t __fd, __pos64_t __length) __THROWS(...) {
 	__localdep_FTruncate32(__fd, (__pos32_t)__length);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_FTruncate */
+#ifndef __local___localdep_FTruncate64_defined
+#define __local___localdep_FTruncate64_defined 1
+#define __localdep_FTruncate64 __LIBC_LOCAL_NAME(FTruncate64)
+#endif /* !__local___localdep_FTruncate64_defined */
+#else /* __CRT_HAVE_FTruncate */
+#undef __local_FTruncate64_defined
+#endif /* !__CRT_HAVE_FTruncate */
 #endif /* !__local_FTruncate64_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4df0e9fd */
+/* HASH CRC-32:0xf60f84df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,24 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_atan_defined
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_atan_defined 1
 #include <__crt.h>
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/fcomp.h>
-
 #include <libm/fabs.h>
-
 #include <libm/matherr.h>
-
 #include <libm/inf.h>
-
 #include <libm/atan.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Arc tangent of X */
 __LOCAL_LIBC(atan) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan))(double __x) {
-#line 144 "kos/src/libc/magic/math.c"
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2(isgreaterequal, __LIBM_MATHFUN(fabs, __x), 1.0)) {
 		return __kernel_standard(__x, __x, __LIBM_MATHFUN0(inf),
@@ -47,5 +42,11 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan))(double __x) {
 	return __LIBM_MATHFUN(atan, __x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#ifndef __local___localdep_atan_defined
+#define __local___localdep_atan_defined 1
+#define __localdep_atan __LIBC_LOCAL_NAME(atan)
+#endif /* !__local___localdep_atan_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_atan_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_atan_defined */

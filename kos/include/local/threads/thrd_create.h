@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x350e2591 */
+/* HASH CRC-32:0xfe58693e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,39 +19,34 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_thrd_create_defined
-#ifdef __CRT_HAVE_pthread_create
 #define __local_thrd_create_defined 1
 #include <__crt.h>
+#ifdef __CRT_HAVE_pthread_create
+#include <bits/threads.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pthread_create from pthread */
+#if !defined(__local___localdep_pthread_create_defined) && defined(__CRT_HAVE_pthread_create)
+#define __local___localdep_pthread_create_defined 1
+__NAMESPACE_LOCAL_END
 #include <bits/pthreadtypes.h>
 #ifndef ____pthread_start_routine_t_defined
 #define ____pthread_start_routine_t_defined 1
 typedef void *(*__pthread_start_routine_t)(void *);
-#endif /* !____pthread_start_routine_t_defined */
-#include <bits/threads.h>
-#include <asm/threads.h>
-
-#include <parts/errno.h>
-/* Dependency: "pthread_create" */
-#ifndef ____localdep_pthread_create_defined
-#define ____localdep_pthread_create_defined 1
-#ifdef __CRT_HAVE_pthread_create
+#endif
+__NAMESPACE_LOCAL_BEGIN
 /* Create a new thread, starting with execution of START-ROUTINE
  * getting passed ARG. Creation attributed come from ATTR. The new
  * handle is stored in *NEWTHREAD */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,__localdep_pthread_create,(__pthread_t *__restrict __newthread, __pthread_attr_t const *__restrict __attr, __pthread_start_routine_t __start_routine, void *__restrict __arg),pthread_create,(__newthread,__attr,__start_routine,__arg))
-#else /* LIBC: pthread_create */
-#undef ____localdep_pthread_create_defined
-#endif /* pthread_create... */
-#endif /* !____localdep_pthread_create_defined */
-
+#endif /* !__local___localdep_pthread_create_defined && __CRT_HAVE_pthread_create */
+__NAMESPACE_LOCAL_END
+#include <asm/threads.h>
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Create a new thread executing the function FUNC.  Arguments for FUNC
  * are passed through ARG. If successful, THR is set to new thread identifier */
 __LOCAL_LIBC(thrd_create) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr,
-                                                         __thrd_start_t __func,
-                                                         void *__arg) {
-#line 117 "kos/src/libc/magic/threads.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr, __thrd_start_t __func, void *__arg) {
 	int __error;
 	__STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 	__error = __localdep_pthread_create((__pthread_t *)__thr, __NULLPTR,
@@ -59,12 +54,18 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr,
 	                       __arg);
 	if __likely(!__error)
 		return __thrd_success;
-#ifdef __ENOMEM
+#ifdef ENOMEM
 	if (__error == __ENOMEM)
 		return __thrd_nomem;
 #endif /* ENOMEM */
 	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_pthread_create */
+#ifndef __local___localdep_thrd_create_defined
+#define __local___localdep_thrd_create_defined 1
+#define __localdep_thrd_create __LIBC_LOCAL_NAME(thrd_create)
+#endif /* !__local___localdep_thrd_create_defined */
+#else /* __CRT_HAVE_pthread_create */
+#undef __local_thrd_create_defined
+#endif /* !__CRT_HAVE_pthread_create */
 #endif /* !__local_thrd_create_defined */

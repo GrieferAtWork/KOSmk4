@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66171d40 */
+/* HASH CRC-32:0x7d9abbee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,10 @@
 #ifndef __local_fdim_defined
 #define __local_fdim_defined 1
 #include <__crt.h>
-/* Dependency: "fabs" from "math" */
-#ifndef ____localdep_fabs_defined
-#define ____localdep_fabs_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fabs from math */
+#ifndef __local___localdep_fabs_defined
+#define __local___localdep_fabs_defined 1
 #if __has_builtin(__builtin_fabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabs)
 /* Absolute value of X */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double __x),fabs,{ return __builtin_fabs(__x); })
@@ -33,21 +34,23 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double
 #elif defined(__CRT_HAVE___fabs)
 /* Absolute value of X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double __x),__fabs,(__x))
-#else /* LIBC: fabs */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/math/fabs.h>
-/* Absolute value of X */
-#define __localdep_fabs (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabs))
-#endif /* fabs... */
-#endif /* !____localdep_fabs_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Absolute value of X */
+#define __localdep_fabs __LIBC_LOCAL_NAME(fabs)
+#endif /* !... */
+#endif /* !__local___localdep_fabs_defined */
 /* Return positive difference between X and Y */
 __LOCAL_LIBC(fdim) __ATTR_CONST __ATTR_WUNUSED double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fdim))(double __x,
-                                              double __y) {
-#line 1049 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fdim))(double __x, double __y) {
 	/* TODO: ieee754-specific function */
 	return __localdep_fabs(__y - __x);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_fdim_defined
+#define __local___localdep_fdim_defined 1
+#define __localdep_fdim __LIBC_LOCAL_NAME(fdim)
+#endif /* !__local___localdep_fdim_defined */
 #endif /* !__local_fdim_defined */

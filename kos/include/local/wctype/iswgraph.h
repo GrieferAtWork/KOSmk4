@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3dac0324 */
+/* HASH CRC-32:0x7a36ef88 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,28 @@
 #ifndef __local_iswgraph_defined
 #define __local_iswgraph_defined 1
 #include <__crt.h>
-/* Dependency: "isgraph" from "ctype" */
-#ifndef ____localdep_isgraph_defined
-#define ____localdep_isgraph_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: isgraph from ctype */
+#ifndef __local___localdep_isgraph_defined
+#define __local___localdep_isgraph_defined 1
 #if __has_builtin(__builtin_isgraph) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isgraph)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isgraph,(int __ch),isgraph,{ return __builtin_isgraph(__ch); })
 #elif defined(__CRT_HAVE_isgraph)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isgraph,(int __ch),isgraph,(__ch))
-#else /* LIBC: isgraph */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/isgraph.h>
-#define __localdep_isgraph (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isgraph))
-#endif /* isgraph... */
-#endif /* !____localdep_isgraph_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_isgraph __LIBC_LOCAL_NAME(isgraph)
+#endif /* !... */
+#endif /* !__local___localdep_isgraph_defined */
 __LOCAL_LIBC(iswgraph) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswgraph))(__WINT_TYPE__ __wc) {
-#line 134 "kos/src/libc/magic/wctype.c"
 	return __localdep_isgraph((int)__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswgraph_defined
+#define __local___localdep_iswgraph_defined 1
+#define __localdep_iswgraph __LIBC_LOCAL_NAME(iswgraph)
+#endif /* !__local___localdep_iswgraph_defined */
 #endif /* !__local_iswgraph_defined */

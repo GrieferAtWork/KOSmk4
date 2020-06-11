@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48924975 */
+/* HASH CRC-32:0xee229687 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,32 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_freezero_defined
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #define __local_freezero_defined 1
 #include <__crt.h>
-/* Dependency: "explicit_bzero" from "strings" */
-#ifndef ____localdep_explicit_bzero_defined
-#define ____localdep_explicit_bzero_defined 1
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: free from stdlib */
+#ifndef __local___localdep_free_defined
+#define __local___localdep_free_defined 1
+#ifdef __free_defined
+__NAMESPACE_GLB_USING(free)
+#define __localdep_free free
+#elif defined(__std_free_defined)
+__NAMESPACE_STD_USING(free)
+#define __localdep_free free
+#elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
+__CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
+#elif defined(__CRT_HAVE_free)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
+#elif defined(__CRT_HAVE_cfree)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
+#else /* ... */
+#undef __local___localdep_free_defined
+#endif /* !... */
+#endif /* !__local___localdep_free_defined */
+/* Dependency: explicit_bzero from strings */
+#ifndef __local___localdep_explicit_bzero_defined
+#define __local___localdep_explicit_bzero_defined 1
 #ifdef __CRT_HAVE_bzero
 /* Same as `bzero(buf, len)', however compilers will not optimize away
  * uses of this function when they (think) that clearing the memory
@@ -43,46 +63,34 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__buf, __SIZE_T
  * wouldn't have any visible side-effects (though those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__buf, __SIZE_TYPE__ __len),__bzero,(__buf,__len))
-#else /* LIBC: explicit_bzero */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/strings/explicit_bzero.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `bzero(buf, len)', however compilers will not optimize away
  * uses of this function when they (think) that clearing the memory
  * wouldn't have any visible side-effects (though those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
-#define __localdep_explicit_bzero (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(explicit_bzero))
-#endif /* explicit_bzero... */
-#endif /* !____localdep_explicit_bzero_defined */
-
-/* Dependency: "free" */
-#ifndef ____localdep_free_defined
-#define ____localdep_free_defined 1
-#ifdef __std___localdep_free_defined
-__NAMESPACE_STD_USING(__localdep_free)
-#elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
-__CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
-#elif defined(__CRT_HAVE_free)
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
-#elif defined(__CRT_HAVE_cfree)
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
-#else /* LIBC: free */
-#undef ____localdep_free_defined
-#endif /* free... */
-#endif /* !____localdep_free_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_explicit_bzero __LIBC_LOCAL_NAME(explicit_bzero)
+#endif /* !... */
+#endif /* !__local___localdep_explicit_bzero_defined */
 /* Same as `free(mallptr)', but also ensure that the memory region
  * described by `mallptr...+=size' is explicitly freed to zero, or
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */
 __LOCAL_LIBC(freezero) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(freezero))(void *__mallptr,
-                                                      __SIZE_TYPE__ __size) {
-#line 1884 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(freezero))(void *__mallptr, __SIZE_TYPE__ __size) {
 	if __likely(__mallptr) {
 		__localdep_explicit_bzero(__mallptr, __size);
 		__localdep_free(__mallptr);
 	}
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#ifndef __local___localdep_freezero_defined
+#define __local___localdep_freezero_defined 1
+#define __localdep_freezero __LIBC_LOCAL_NAME(freezero)
+#endif /* !__local___localdep_freezero_defined */
+#else /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#undef __local_freezero_defined
+#endif /* !__CRT_HAVE_free && !__CRT_HAVE_cfree */
 #endif /* !__local_freezero_defined */

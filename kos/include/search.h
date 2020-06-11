@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34103b0c */
+/* HASH CRC-32:0x671c43f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -166,16 +166,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(remque, __FORCELOCAL __ATTR_NONNULL((1)) void __
 /* For use with hsearch(3).  */
 #ifndef __COMPAR_FN_T
 #define __COMPAR_FN_T 1
+#ifndef ____compar_fn_t_defined
+#define ____compar_fn_t_defined 1
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
+#endif /* !____compar_fn_t_defined */
 #ifdef __USE_GNU
 typedef __compar_fn_t comparison_fn_t;
 #endif /* __USE_GNU */
 #endif /* __COMPAR_FN_T */
 
+#ifndef __ENTRY_defined
+#define __ENTRY_defined 1
 typedef struct entry {
 	char *key;
 	void *data;
 } ENTRY;
+#endif /* !__ENTRY_defined */
 
 /* Opaque type for internal use. */
 struct _ENTRY;
@@ -347,12 +353,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfind, __FORCELOCAL __ATTR_NONNULL((2, 3, 5)) vo
 #ifdef __CRT_HAVE_lsearch
 /* Perform linear search for KEY by comparing by COMPAR function
  * in array [BASE, BASE+NMEMB*SIZE) and insert entry if not found */
-__CDECLARE(__ATTR_NONNULL((2, 3, 5)),void *,__NOTHROW_NCX,lsearch,(void const *__key, void *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar),(__key,__base,__nmemb,__size,__compar))
+__CDECLARE(__ATTR_NONNULL((2, 3, 5)),void *,__NOTHROW_NCX,lsearch,(void const *__key, void *__base, size_t *__nmemb, size_t __size, __compar_fn_t __compar),(__key,__base,__nmemb,__size,__compar))
 #else /* __CRT_HAVE_lsearch */
 #include <local/search/lsearch.h>
 /* Perform linear search for KEY by comparing by COMPAR function
  * in array [BASE, BASE+NMEMB*SIZE) and insert entry if not found */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lsearch, __FORCELOCAL __ATTR_NONNULL((2, 3, 5)) void *__NOTHROW_NCX(__LIBCCALL lsearch)(void const *__key, void *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lsearch))(__key, __base, __nmemb, __size, __compar); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lsearch, __FORCELOCAL __ATTR_NONNULL((2, 3, 5)) void *__NOTHROW_NCX(__LIBCCALL lsearch)(void const *__key, void *__base, size_t *__nmemb, size_t __size, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lsearch))(__key, __base, __nmemb, __size, __compar); })
 #endif /* !__CRT_HAVE_lsearch */
 
 #endif /* __CC__ */

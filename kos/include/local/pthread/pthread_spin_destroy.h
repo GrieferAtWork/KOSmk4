@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb811e2d */
+/* HASH CRC-32:0x1acfdef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,13 @@ __NAMESPACE_LOCAL_BEGIN
 /* Destroy the spinlock LOCK */
 __LOCAL_LIBC(pthread_spin_destroy) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_destroy))(__pthread_spinlock_t *__lock) {
-#line 1261 "kos/src/libc/magic/pthread.c"
 	__COMPILER_IMPURE();
 	(void)__lock; /* no-op */
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_pthread_spin_destroy_defined
+#define __local___localdep_pthread_spin_destroy_defined 1
+#define __localdep_pthread_spin_destroy __LIBC_LOCAL_NAME(pthread_spin_destroy)
+#endif /* !__local___localdep_pthread_spin_destroy_defined */
 #endif /* !__local_pthread_spin_destroy_defined */

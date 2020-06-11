@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8f45bf5 */
+/* HASH CRC-32:0xfc9536ae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,29 @@
 #ifndef __local_rawmemrlen_defined
 #define __local_rawmemrlen_defined 1
 #include <__crt.h>
-/* Dependency: "rawmemrchr" from "string" */
-#ifndef ____localdep_rawmemrchr_defined
-#define ____localdep_rawmemrchr_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: rawmemrchr from string */
+#ifndef __local___localdep_rawmemrchr_defined
+#define __local___localdep_rawmemrchr_defined 1
 #ifdef __CRT_HAVE_rawmemrchr
 /* Same as `memrchr' without a search limit, starting at `HAYSTACK - 1' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemrchr,(void const *__restrict __haystack, int __needle),rawmemrchr,(__haystack,__needle))
-#else /* LIBC: rawmemrchr */
+#else /* __CRT_HAVE_rawmemrchr */
+__NAMESPACE_LOCAL_END
 #include <local/string/rawmemrchr.h>
-/* Same as `memrchr' without a search limit, starting at `HAYSTACK - 1' */
-#define __localdep_rawmemrchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemrchr))
-#endif /* rawmemrchr... */
-#endif /* !____localdep_rawmemrchr_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `memrchr' without a search limit, starting at `HAYSTACK - 1' */
+#define __localdep_rawmemrchr __LIBC_LOCAL_NAME(rawmemrchr)
+#endif /* !__CRT_HAVE_rawmemrchr */
+#endif /* !__local___localdep_rawmemrchr_defined */
 /* Same as `rawmemrchr', but return the offset from `HAYSTACK', rather than the actual address. */
 __LOCAL_LIBC(rawmemrlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrlen))(void const *__restrict __haystack,
-                                                        int __needle) {
-#line 2770 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrlen))(void const *__restrict __haystack, int __needle) {
 	return (__SIZE_TYPE__)((__BYTE_TYPE__ *)__localdep_rawmemrchr(__haystack, __needle) - (__BYTE_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_rawmemrlen_defined
+#define __local___localdep_rawmemrlen_defined 1
+#define __localdep_rawmemrlen __LIBC_LOCAL_NAME(rawmemrlen)
+#endif /* !__local___localdep_rawmemrlen_defined */
 #endif /* !__local_rawmemrlen_defined */

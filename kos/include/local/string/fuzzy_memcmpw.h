@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3dbf69c9 */
+/* HASH CRC-32:0x74ffca28 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,39 +19,34 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_memcmpw_defined
-#ifndef __NO_MALLOCA
 #define __local_fuzzy_memcmpw_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
 #include <parts/malloca.h>
-/* Dependency: "memcpyc" from "string" */
-#ifndef ____localdep_memcpyc_defined
-#define ____localdep_memcpyc_defined 1
+#ifndef __NO_MALLOCA
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcpyc from string */
+#ifndef __local___localdep_memcpyc_defined
+#define __local___localdep_memcpyc_defined 1
 #ifdef __fast_memcpyc_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))
+__NAMESPACE_FAST_USING(memcpyc)
+#define __localdep_memcpyc __LIBC_FAST_NAME(memcpyc)
 #elif defined(__CRT_HAVE_memcpyc)
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
-#else /* LIBC: memcpyc */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))
-#endif /* memcpyc... */
-#endif /* !____localdep_memcpyc_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
+#endif /* !... */
+#endif /* !__local___localdep_memcpyc_defined */
 __LOCAL_LIBC(fuzzy_memcmpw) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_memcmpw))(void const *__s1,
-                                                           __SIZE_TYPE__ __s1_words,
-                                                           void const *__s2,
-                                                           __SIZE_TYPE__ __s2_words) {
-#line 4544 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_memcmpw))(void const *__s1, __SIZE_TYPE__ __s1_words, void const *__s2, __SIZE_TYPE__ __s2_words) {
 	__SIZE_TYPE__ *__v0, *__v1, __i, __j, __cost, __temp;
 	if __unlikely(!__s1_words)
 		return __s2_words;
@@ -106,5 +101,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_memcmpw))(void const *__s1,
 	return __temp;
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__NO_MALLOCA */
+#ifndef __local___localdep_fuzzy_memcmpw_defined
+#define __local___localdep_fuzzy_memcmpw_defined 1
+#define __localdep_fuzzy_memcmpw __LIBC_LOCAL_NAME(fuzzy_memcmpw)
+#endif /* !__local___localdep_fuzzy_memcmpw_defined */
+#else /* !__NO_MALLOCA */
+#undef __local_fuzzy_memcmpw_defined
+#endif /* __NO_MALLOCA */
 #endif /* !__local_fuzzy_memcmpw_defined */

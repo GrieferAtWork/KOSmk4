@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4bf1c3a */
+/* HASH CRC-32:0x12d21ed2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,33 +19,31 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__dupenv_s_dbg_defined
-#ifdef __CRT_HAVE__dupenv_s
 #define __local__dupenv_s_dbg_defined 1
 #include <__crt.h>
-/* Dependency: "_dupenv_s" */
-#ifndef ____localdep__dupenv_s_defined
-#define ____localdep__dupenv_s_defined 1
 #ifdef __CRT_HAVE__dupenv_s
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep__dupenv_s,(char **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, char const *__varname),_dupenv_s,(__pbuf,__pbuflen,__varname))
-#else /* LIBC: _dupenv_s */
-#undef ____localdep__dupenv_s_defined
-#endif /* _dupenv_s... */
-#endif /* !____localdep__dupenv_s_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _dupenv_s from stdlib */
+#if !defined(__local___localdep__dupenv_s_defined) && defined(__CRT_HAVE__dupenv_s)
+#define __local___localdep__dupenv_s_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep__dupenv_s,(char **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, char const *__varname),_dupenv_s,(__pbuf,__pbuflen,__varname))
+#endif /* !__local___localdep__dupenv_s_defined && __CRT_HAVE__dupenv_s */
 __LOCAL_LIBC(_dupenv_s_dbg) _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_dupenv_s_dbg))(char **__pbuf,
-                                                           __SIZE_TYPE__ *__pbufsize,
-                                                           char const *__varname,
-                                                           int __block_type,
-                                                           char const *__filename,
-                                                           int __line) {
-#line 529 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_dupenv_s_dbg))(char **__pbuf, __SIZE_TYPE__ *__pbufsize, char const *__varname, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
 	return __localdep__dupenv_s(__pbuf, __pbufsize, __varname);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE__dupenv_s */
+#ifndef __local___localdep__dupenv_s_dbg_defined
+#define __local___localdep__dupenv_s_dbg_defined 1
+#define __localdep__dupenv_s_dbg __LIBC_LOCAL_NAME(_dupenv_s_dbg)
+#endif /* !__local___localdep__dupenv_s_dbg_defined */
+#else /* __CRT_HAVE__dupenv_s */
+#undef __local__dupenv_s_dbg_defined
+#endif /* !__CRT_HAVE__dupenv_s */
 #endif /* !__local__dupenv_s_dbg_defined */

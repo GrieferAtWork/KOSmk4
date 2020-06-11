@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x207fe30b */
+/* HASH CRC-32:0x1d3cfefd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __LOCAL_LIBC(format_wwidth) __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wwidth))(void *__arg,
-                                                           __WCHAR_TYPE__ const *__restrict __data,
-                                                           __SIZE_TYPE__ __datalen) {
-#line 141 "kos/src/libc/magic/parts.wchar.format-printer.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wwidth))(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
 #if __SIZEOF_WCHAR_T__ == 2
 	__SIZE_TYPE__ __result = 0;
 	__WCHAR_TYPE__ const *__iter, *__end;
@@ -44,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wwidth))(void *__arg,
 		++__result;
 	}
 	return (__SSIZE_TYPE__)__result;
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 	(void)__arg;
 	(void)__data;
 	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
@@ -53,7 +50,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wwidth))(void *__arg,
 	 *      [if(__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
 	__COMPILER_IMPURE();
 	return (__SSIZE_TYPE__)__datalen;
-#endif
+#endif /* !(__SIZEOF_WCHAR_T__ == 2) */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_wwidth_defined
+#define __local___localdep_format_wwidth_defined 1
+#define __localdep_format_wwidth __LIBC_LOCAL_NAME(format_wwidth)
+#endif /* !__local___localdep_format_wwidth_defined */
 #endif /* !__local_format_wwidth_defined */

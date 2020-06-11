@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcba160dc */
+/* HASH CRC-32:0xf525dfde */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,45 +19,27 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_argz_create_defined
-#if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #define __local_argz_create_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-
-#include <hybrid/__assert.h>
-/* Dependency: "strlen" from "string" */
-#ifndef ____localdep_strlen_defined
-#define ____localdep_strlen_defined 1
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* LIBC: strlen */
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
 #include <local/string/strlen.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
-#endif /* strlen... */
-#endif /* !____localdep_strlen_defined */
-
-/* Dependency: "malloc" from "stdlib" */
-#ifndef ____localdep_malloc_defined
-#define ____localdep_malloc_defined 1
-#ifdef __std___localdep_malloc_defined
-__NAMESPACE_STD_USING(__localdep_malloc)
-#elif __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
-__CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,{ return __builtin_malloc(__num_bytes); })
-#elif defined(__CRT_HAVE_malloc)
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,(__num_bytes))
-#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)
-#include <local/stdlib/malloc.h>
-#define __localdep_malloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(malloc))
-#else /* CUSTOM: malloc */
-#undef ____localdep_malloc_defined
-#endif /* malloc... */
-#endif /* !____localdep_malloc_defined */
-
-/* Dependency: "stpcpy" from "string" */
-#ifndef ____localdep_stpcpy_defined
-#define ____localdep_stpcpy_defined 1
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
+/* Dependency: stpcpy from string */
+#ifndef __local___localdep_stpcpy_defined
+#define __local___localdep_stpcpy_defined 1
 #if __has_builtin(__builtin_stpcpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_stpcpy)
 /* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_stpcpy,(char *__restrict __buf, char const *__restrict __src),stpcpy,{ return __builtin_stpcpy(__buf, __src); })
@@ -67,22 +49,45 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHRO
 #elif defined(__CRT_HAVE___stpcpy)
 /* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_stpcpy,(char *__restrict __buf, char const *__restrict __src),__stpcpy,(__buf,__src))
-#else /* LIBC: stpcpy */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/stpcpy.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
-#define __localdep_stpcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stpcpy))
-#endif /* stpcpy... */
-#endif /* !____localdep_stpcpy_defined */
-
+#define __localdep_stpcpy __LIBC_LOCAL_NAME(stpcpy)
+#endif /* !... */
+#endif /* !__local___localdep_stpcpy_defined */
+/* Dependency: malloc from stdlib */
+#ifndef __local___localdep_malloc_defined
+#define __local___localdep_malloc_defined 1
+#ifdef __malloc_defined
+__NAMESPACE_GLB_USING(malloc)
+#define __localdep_malloc malloc
+#elif defined(__std_malloc_defined)
+__NAMESPACE_STD_USING(malloc)
+#define __localdep_malloc malloc
+#elif __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
+__CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,{ return __builtin_malloc(__num_bytes); })
+#elif defined(__CRT_HAVE_malloc)
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,(__num_bytes))
+#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/malloc.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_malloc __LIBC_LOCAL_NAME(malloc)
+#else /* ... */
+#undef __local___localdep_malloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_malloc_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
+#include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Make a '\0' separated arg vector from a unix argv vector, returning it in
  * `PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
  * `ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()' */
 __LOCAL_LIBC(argz_create) __ATTR_NONNULL((1, 2, 3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_create))(char *const ___argv[],
-                                                         char **__restrict __pargz,
-                                                         __SIZE_TYPE__ *__restrict __pargz_len) {
-#line 87 "kos/src/libc/magic/argz.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_create))(char *const ___argv[], char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len) {
 	__SIZE_TYPE__ __i, ___argc, __total_len = 0;
 	for (___argc = 0; ___argv[___argc] != __NULLPTR; ++___argc)
 		__total_len += __localdep_strlen(___argv[___argc]) + 1;
@@ -110,5 +115,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_create))(char *const ___argv[],
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_posix_memalign || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_malloc */
+#ifndef __local___localdep_argz_create_defined
+#define __local___localdep_argz_create_defined 1
+#define __localdep_argz_create __LIBC_LOCAL_NAME(argz_create)
+#endif /* !__local___localdep_argz_create_defined */
+#else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+#undef __local_argz_create_defined
+#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
 #endif /* !__local_argz_create_defined */

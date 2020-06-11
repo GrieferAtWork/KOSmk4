@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5def9fd0 */
+/* HASH CRC-32:0x18654a92 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,36 @@
 #ifndef __local_mblen_defined
 #define __local_mblen_defined 1
 #include <__crt.h>
-/* Dependency: "mbrlen" from "wchar" */
-#ifndef ____localdep_mbrlen_defined
-#define ____localdep_mbrlen_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mbrlen from wchar */
+#ifndef __local___localdep_mbrlen_defined
+#define __local___localdep_mbrlen_defined 1
 #ifdef __CRT_HAVE_mbrlen
 __CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrlen,(__str,__maxlen,__mbs))
+#elif defined(__CRT_HAVE_DOS$mbrlen) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrlen,(__str,__maxlen,__mbs))
+#elif defined(__CRT_HAVE_DOS$mbrlen) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrlen,(__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE___mbrlen)
 __CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrlen,(__str,__maxlen,__mbs))
-#else /* LIBC: mbrlen */
+#elif defined(__CRT_HAVE_DOS$__mbrlen) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrlen,(__str,__maxlen,__mbs))
+#elif defined(__CRT_HAVE_DOS$__mbrlen) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrlen,(__str,__maxlen,__mbs))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/mbrlen.h>
-#define __localdep_mbrlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrlen))
-#endif /* mbrlen... */
-#endif /* !____localdep_mbrlen_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_mbrlen __LIBC_LOCAL_NAME(mbrlen)
+#endif /* !... */
+#endif /* !__local___localdep_mbrlen_defined */
 __LOCAL_LIBC(mblen) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mblen))(char const *__str,
-                                                   __SIZE_TYPE__ __maxlen) {
-#line 697 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mblen))(char const *__str, __SIZE_TYPE__ __maxlen) {
 	return __localdep_mbrlen(__str, __maxlen, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_mblen_defined
+#define __local___localdep_mblen_defined 1
+#define __localdep_mblen __LIBC_LOCAL_NAME(mblen)
+#endif /* !__local___localdep_mblen_defined */
 #endif /* !__local_mblen_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0dd7a53 */
+/* HASH CRC-32:0xd01e83e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,31 +21,33 @@
 #ifndef __local__fcvt_s_defined
 #define __local__fcvt_s_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-/* Dependency: "fcvt_r" from "stdlib" */
-#ifndef ____localdep_fcvt_r_defined
-#define ____localdep_fcvt_r_defined 1
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fcvt_r from stdlib */
+#ifndef __local___localdep_fcvt_r_defined
+#define __local___localdep_fcvt_r_defined 1
 #ifdef __CRT_HAVE_fcvt_r
 __CREDIRECT(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,__localdep_fcvt_r,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),fcvt_r,(__val,__ndigit,__decptr,__sign,__buf,__len))
-#else /* LIBC: fcvt_r */
+#else /* __CRT_HAVE_fcvt_r */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/fcvt_r.h>
-#define __localdep_fcvt_r (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fcvt_r))
-#endif /* fcvt_r... */
-#endif /* !____localdep_fcvt_r_defined */
-
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_fcvt_r __LIBC_LOCAL_NAME(fcvt_r)
+#endif /* !__CRT_HAVE_fcvt_r */
+#endif /* !__local___localdep_fcvt_r_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_fcvt_s) __ATTR_NONNULL((1, 5, 6)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fcvt_s))(char *__buf,
-                                                     __SIZE_TYPE__ __buflen,
-                                                     double __val,
-                                                     int __ndigit,
-                                                     int *__restrict __decptr,
-                                                     int *__restrict __sign) {
-#line 2963 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fcvt_s))(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) {
 	if (!__buf || !__decptr || !__sign)
 		return __EINVAL;
 	__localdep_fcvt_r(__val, __ndigit, __decptr, __sign, __buf, __buflen);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__fcvt_s_defined
+#define __local___localdep__fcvt_s_defined 1
+#define __localdep__fcvt_s __LIBC_LOCAL_NAME(_fcvt_s)
+#endif /* !__local___localdep__fcvt_s_defined */
 #endif /* !__local__fcvt_s_defined */

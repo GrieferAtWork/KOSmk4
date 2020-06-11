@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7973915 */
+/* HASH CRC-32:0xd446a81a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_atanhf_defined
-#if defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 #define __local_atanhf_defined 1
 #include <__crt.h>
-/* Dependency: "atanh" */
-#ifndef ____localdep_atanh_defined
-#define ____localdep_atanh_defined 1
+#if defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: atanh from math */
+#ifndef __local___localdep_atanh_defined
+#define __local___localdep_atanh_defined 1
 #if __has_builtin(__builtin_atanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanh)
 /* Hyperbolic arc tangent of X */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atanh,(double __x),atanh,{ return __builtin_atanh(__x); })
@@ -34,18 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atanh,(double __x),atanh,
 #elif defined(__CRT_HAVE___atanh)
 /* Hyperbolic arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atanh,(double __x),__atanh,(__x))
-#else /* LIBC: atanh */
-#undef ____localdep_atanh_defined
-#endif /* atanh... */
-#endif /* !____localdep_atanh_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_atanh_defined
+#endif /* !... */
+#endif /* !__local___localdep_atanh_defined */
 /* Hyperbolic arc tangent of X */
 __LOCAL_LIBC(atanhf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atanhf))(float __x) {
-#line 290 "kos/src/libc/magic/math.c"
 	return (float)__localdep_atanh((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_atanh || __CRT_HAVE___atanh */
+#ifndef __local___localdep_atanhf_defined
+#define __local___localdep_atanhf_defined 1
+#define __localdep_atanhf __LIBC_LOCAL_NAME(atanhf)
+#endif /* !__local___localdep_atanhf_defined */
+#else /* __CRT_HAVE_atanh || __CRT_HAVE___atanh */
+#undef __local_atanhf_defined
+#endif /* !__CRT_HAVE_atanh && !__CRT_HAVE___atanh */
 #endif /* !__local_atanhf_defined */

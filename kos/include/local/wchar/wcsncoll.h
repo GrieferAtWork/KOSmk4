@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52080b47 */
+/* HASH CRC-32:0xa4cbd47d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,28 +21,42 @@
 #ifndef __local_wcsncoll_defined
 #define __local_wcsncoll_defined 1
 #include <__crt.h>
-/* Dependency: "wcsncmp" from "wchar" */
-#ifndef ____localdep_wcsncmp_defined
-#define ____localdep_wcsncmp_defined 1
-#ifdef __std___localdep_wcsncmp_defined
-__NAMESPACE_STD_USING(__localdep_wcsncmp)
-#elif defined(__CRT_HAVE_wcsncmp)
-/* Same as `wcscmp', but compare at most `MAXLEN' characters from either string */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
-#else /* LIBC: wcsncmp */
-#include <local/wchar/wcsncmp.h>
-/* Same as `wcscmp', but compare at most `MAXLEN' characters from either string */
-#define __localdep_wcsncmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncmp))
-#endif /* wcsncmp... */
-#endif /* !____localdep_wcsncmp_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcsncmp from wchar */
+#ifndef __local___localdep_wcsncmp_defined
+#define __local___localdep_wcsncmp_defined 1
+#ifdef __wcsncmp_defined
+/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
+__NAMESPACE_GLB_USING(wcsncmp)
+#define __localdep_wcsncmp wcsncmp
+#elif defined(__std_wcsncmp_defined)
+/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
+__NAMESPACE_STD_USING(wcsncmp)
+#define __localdep_wcsncmp wcsncmp
+#elif defined(__CRT_HAVE_wcsncmp)
+/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_DOS$wcsncmp) && __SIZEOF_WCHAR_T__ == 4
+/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
+#elif defined(__CRT_HAVE_DOS$wcsncmp) && __SIZEOF_WCHAR_T__ == 2
+/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wcsncmp.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
+#define __localdep_wcsncmp __LIBC_LOCAL_NAME(wcsncmp)
+#endif /* !... */
+#endif /* !__local___localdep_wcsncmp_defined */
 __LOCAL_LIBC(wcsncoll) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncoll))(__WCHAR_TYPE__ const *__s1,
-                                                      __WCHAR_TYPE__ const *__s2,
-                                                      __SIZE_TYPE__ __maxlen) {
-#line 4721 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncoll))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen) {
 	return __localdep_wcsncmp(__s1, __s2, __maxlen);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsncoll_defined
+#define __local___localdep_wcsncoll_defined 1
+#define __localdep_wcsncoll __LIBC_LOCAL_NAME(wcsncoll)
+#endif /* !__local___localdep_wcsncoll_defined */
 #endif /* !__local_wcsncoll_defined */

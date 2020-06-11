@@ -101,8 +101,67 @@ $ssize_t format_wrepeat([[nonnull]] pwformatprinter printer, void *arg,
 %
 %
 
-[[wchar]] format_vwprintf(*) %{generate(str2wcs("format_vprintf"))}
-[[wchar]] format_wprintf(*) %{generate(str2wcs("format_printf"))}
+[[throws, ATTR_LIBC_WPRINTF(3, 0)]]
+[[wchar, doc_alias("format_vprintf")]]
+[[decl_include("<bits/wformat-printer.h>")]]
+[[impl_include("<parts/printf-config.h>")]]
+[[impl_include("<libc/parts.uchar.string.h>")]]
+[[impl_include("<libc/string.h>")]]
+[[impl_include("<hybrid/__assert.h>")]]
+[[impl_prefix(
+#ifndef __NO_PRINTF_DISASM
+#if !defined(__KERNEL__) || !defined(__KOS__)
+#include <dlfcn.h>
+#endif /* !__KERNEL__ || !__KOS__ */
+#include <libdisasm/disassembler.h>
+#endif /* !__NO_PRINTF_DISASM */
+#ifndef __NO_PRINTF_VINFO
+#if !defined(__KERNEL__) || !defined(__KOS__)
+#include <dlfcn.h>
+#include <libdebuginfo/addr2line.h>
+#else /* !__KERNEL__ || !__KOS__ */
+#include <kernel/addr2line.h>
+#endif /* __KERNEL__ && __KOS__ */
+#endif /* !__NO_PRINTF_VINFO */
+)]]
+$ssize_t format_vwprintf([[nonnull]] pwformatprinter printer, void *arg,
+                         [[nonnull]] wchar_t const *__restrict format,
+                         $va_list args) {
+#ifndef __INTELLISENSE__
+#define __FORMAT_PRINTER            printer
+#define __FORMAT_ARG                arg
+#define __FORMAT_FORMAT             format
+#define __FORMAT_ARGS               args
+#define __CHAR_TYPE                 wchar_t
+#define __CHAR_SIZE                 __SIZEOF_WCHAR_T__
+#define __FORMAT_REPEAT             format_wrepeat
+#define __FORMAT_HEXDUMP            format_whexdump
+#define __FORMAT_WIDTH              format_wwidth
+#define __FORMAT_ESCAPE             format_wescape
+@@pp_if __SIZEOF_WCHAR_T__ == 2@@
+#define __FORMAT_WIDTH8             format_width
+#define __FORMAT_ESCAPE8            format_escape
+#define __FORMAT_WIDTH32            format_c32width
+#define __FORMAT_ESCAPE32           format_c32escape
+#define __FORMAT_UNICODE_WRITECHAR  unicode_writeutf16
+#define __FORMAT_UNICODE_FORMAT8    format_8to16
+#define __FORMAT_UNICODE_FORMAT32   format_32to16
+@@pp_else@@
+#define __FORMAT_WIDTH8             format_width
+#define __FORMAT_ESCAPE8            format_escape
+#define __FORMAT_WIDTH16            format_c16width
+#define __FORMAT_ESCAPE16           format_c16escape
+#define __FORMAT_UNICODE_WRITECHAR(dst, ch) ((dst)[0] = (ch), (dst) + 1)
+#define __FORMAT_UNICODE_FORMAT8    format_8to32
+#define __FORMAT_UNICODE_FORMAT16   format_16to32
+@@pp_endif@@
+#include <local/format-printf.h>
+#endif /* !__INTELLISENSE__ */
+}
+
+
+[[wchar, doc_alias("format_vwprintf")]]
+format_wprintf(*) %{printf("format_vwprintf")}
 
 
 %

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6fc6b74 */
+/* HASH CRC-32:0x15db081c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,35 @@
 #ifndef __local_wcsnoff_defined
 #define __local_wcsnoff_defined 1
 #include <__crt.h>
-/* Dependency: "wcsnchrnul" from "wchar" */
-#ifndef ____localdep_wcsnchrnul_defined
-#define ____localdep_wcsnchrnul_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcsnchrnul from wchar */
+#ifndef __local___localdep_wcsnchrnul_defined
+#define __local___localdep_wcsnchrnul_defined 1
 #ifdef __CRT_HAVE_wcsnchrnul
 /* Same as `wcsnchr', but return `wcsnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsnchrnul,(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle, __SIZE_TYPE__ __maxlen),wcsnchrnul,(__haystack,__needle,__maxlen))
-#else /* LIBC: wcsnchrnul */
-#include <local/wchar/wcsnchrnul.h>
+#elif defined(__CRT_HAVE_DOS$wcsnchrnul) && __SIZEOF_WCHAR_T__ == 4
 /* Same as `wcsnchr', but return `wcsnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_wcsnchrnul (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnchrnul))
-#endif /* wcsnchrnul... */
-#endif /* !____localdep_wcsnchrnul_defined */
-
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_wcsnchrnul,(__CHAR32_TYPE__ const *__restrict __haystack, __CHAR32_TYPE__ __needle, __SIZE_TYPE__ __maxlen),wcsnchrnul,(__haystack,__needle,__maxlen))
+#elif defined(__CRT_HAVE_DOS$wcsnchrnul) && __SIZEOF_WCHAR_T__ == 2
+/* Same as `wcsnchr', but return `wcsnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_wcsnchrnul,(__CHAR16_TYPE__ const *__restrict __haystack, __CHAR16_TYPE__ __needle, __SIZE_TYPE__ __maxlen),wcsnchrnul,(__haystack,__needle,__maxlen))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wcsnchrnul.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `wcsnchr', but return `wcsnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
+#define __localdep_wcsnchrnul __LIBC_LOCAL_NAME(wcsnchrnul)
+#endif /* !... */
+#endif /* !__local___localdep_wcsnchrnul_defined */
 /* Same as `wcsnchrnul', but return the offset from `STR', rather than the actual address */
 __LOCAL_LIBC(wcsnoff) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnoff))(__WCHAR_TYPE__ const *__restrict __haystack,
-                                                     __WCHAR_TYPE__ __needle,
-                                                     __SIZE_TYPE__ __maxlen) {
-#line 2627 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnoff))(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle, __SIZE_TYPE__ __maxlen) {
 	return (__SIZE_TYPE__)(__localdep_wcsnchrnul(__haystack, __needle, __maxlen) - __haystack);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsnoff_defined
+#define __local___localdep_wcsnoff_defined 1
+#define __localdep_wcsnoff __LIBC_LOCAL_NAME(wcsnoff)
+#endif /* !__local___localdep_wcsnoff_defined */
 #endif /* !__local_wcsnoff_defined */

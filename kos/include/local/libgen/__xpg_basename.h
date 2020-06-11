@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdf2011f */
+/* HASH CRC-32:0x3b2b995e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,23 +21,24 @@
 #ifndef __local___xpg_basename_defined
 #define __local___xpg_basename_defined 1
 #include <__crt.h>
-/* Dependency: "strrchr" from "string" */
-#ifndef ____localdep_strrchr_defined
-#define ____localdep_strrchr_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strrchr from string */
+#ifndef __local___localdep_strrchr_defined
+#define __local___localdep_strrchr_defined 1
 #if __has_builtin(__builtin_strrchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strrchr)
 /* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strrchr,(char const *__restrict __haystack, int __needle),strrchr,{ return __builtin_strrchr(__haystack, __needle); })
 #elif defined(__CRT_HAVE_strrchr)
 /* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strrchr,(char const *__restrict __haystack, int __needle),strrchr,(__haystack,__needle))
-#else /* LIBC: strrchr */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/strrchr.h>
-/* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_strrchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strrchr))
-#endif /* strrchr... */
-#endif /* !____localdep_strrchr_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+#define __localdep_strrchr __LIBC_LOCAL_NAME(strrchr)
+#endif /* !... */
+#endif /* !__local___localdep_strrchr_defined */
 /* Return final component of PATH.
  * This is the weird XPG version of this function. It sometimes will
  * modify its argument. Therefore we normally use the GNU version (in
@@ -45,7 +46,6 @@ __NAMESPACE_LOCAL_BEGIN
  * version available under the real name */
 __LOCAL_LIBC(__xpg_basename) __ATTR_RETNONNULL char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_basename))(char *__filename) {
-#line 92 "kos/src/libc/magic/libgen.c"
 	/* NOTE: This implementation is taken from GLibc */
 	/* Return basename of given pathname according to the weird XPG specification.
 	   Copyright (C) 1997-2017 Free Software Foundation, Inc.
@@ -90,4 +90,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_basename))(char *__filename) {
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___xpg_basename_defined
+#define __local___localdep___xpg_basename_defined 1
+#define __localdep___xpg_basename __LIBC_LOCAL_NAME(__xpg_basename)
+#endif /* !__local___localdep___xpg_basename_defined */
 #endif /* !__local___xpg_basename_defined */

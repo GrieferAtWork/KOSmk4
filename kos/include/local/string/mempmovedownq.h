@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9edd302 */
+/* HASH CRC-32:0xd40a6dcc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,36 +21,36 @@
 #ifndef __local_mempmovedownq_defined
 #define __local_mempmovedownq_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "memmovedownq" from "string" */
-#ifndef ____localdep_memmovedownq_defined
-#define ____localdep_memmovedownq_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memmovedownq from string */
+#ifndef __local___localdep_memmovedownq_defined
+#define __local___localdep_memmovedownq_defined 1
 #ifdef __fast_memmovedownq_defined
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
-#define __localdep_memmovedownq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownq))
+__NAMESPACE_FAST_USING(memmovedownq)
+#define __localdep_memmovedownq __LIBC_FAST_NAME(memmovedownq)
 #elif defined(__CRT_HAVE_memmovedownq)
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmovedownq,(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords),memmovedownq,(__dst,__src,__n_qwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmovedownq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmovedownq,(__dst,__src,__n_qwords))
 #elif defined(__CRT_HAVE_memmoveq)
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmovedownq,(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
-#else /* LIBC: memmovedownq */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmovedownq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memmovedownq.h>
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
-#define __localdep_memmovedownq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownq))
-#endif /* memmovedownq... */
-#endif /* !____localdep_memmovedownq_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
+#define __localdep_memmovedownq __LIBC_LOCAL_NAME(memmovedownq)
+#endif /* !... */
+#endif /* !__local___localdep_memmovedownq_defined */
 /* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
 __LOCAL_LIBC(mempmovedownq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmovedownq))(/*aligned(8)*/ void *__restrict __dst,
-                                                           /*aligned(8)*/ void const *__restrict __src,
-                                                           __SIZE_TYPE__ __n_qwords) {
-#line 1744 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmovedownq))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords) {
 	return (__UINT64_TYPE__ *)__localdep_memmovedownq(__dst, __src, __n_qwords) + __n_qwords;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_mempmovedownq_defined
+#define __local___localdep_mempmovedownq_defined 1
+#define __localdep_mempmovedownq __LIBC_LOCAL_NAME(mempmovedownq)
+#endif /* !__local___localdep_mempmovedownq_defined */
 #endif /* !__local_mempmovedownq_defined */

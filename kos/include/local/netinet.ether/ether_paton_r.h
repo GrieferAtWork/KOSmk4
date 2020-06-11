@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3d9878 */
+/* HASH CRC-32:0x89016464 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,27 @@
 #ifndef __local_ether_paton_r_defined
 #define __local_ether_paton_r_defined 1
 #include <__crt.h>
-#include <net/ethernet.h>
-/* Dependency: "isspace" from "ctype" */
-#ifndef ____localdep_isspace_defined
-#define ____localdep_isspace_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: isspace from ctype */
+#ifndef __local___localdep_isspace_defined
+#define __local___localdep_isspace_defined 1
 #if __has_builtin(__builtin_isspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isspace)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,{ return __builtin_isspace(__ch); })
 #elif defined(__CRT_HAVE_isspace)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,(__ch))
-#else /* LIBC: isspace */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/isspace.h>
-#define __localdep_isspace (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isspace))
-#endif /* isspace... */
-#endif /* !____localdep_isspace_defined */
-
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_isspace __LIBC_LOCAL_NAME(isspace)
+#endif /* !... */
+#endif /* !__local___localdep_isspace_defined */
+__NAMESPACE_LOCAL_END
+#include <net/ethernet.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Convert ASCII string S to 48 bit Ethernet address */
 __LOCAL_LIBC(ether_paton_r) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct ether_addr *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_paton_r))(char const **__restrict __pasc,
-                                                           struct ether_addr *__restrict __addr) {
-#line 87 "kos/src/libc/magic/netinet.ether.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_paton_r))(char const **__restrict __pasc, struct ether_addr *__restrict __addr) {
 	unsigned int __i;
 	char const *__asc = *__pasc;
 	for (__i = 0; __i < 6; ++__i) {
@@ -83,4 +84,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_paton_r))(char const **__restri
 	return __addr;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_ether_paton_r_defined
+#define __local___localdep_ether_paton_r_defined 1
+#define __localdep_ether_paton_r __LIBC_LOCAL_NAME(ether_paton_r)
+#endif /* !__local___localdep_ether_paton_r_defined */
 #endif /* !__local_ether_paton_r_defined */

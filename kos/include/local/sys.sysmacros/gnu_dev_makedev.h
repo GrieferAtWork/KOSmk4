@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe62824b4 */
+/* HASH CRC-32:0xb77456db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,12 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gnu_dev_makedev) __ATTR_CONST __ATTR_WUNUSED __dev_t
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(gnu_dev_makedev))(__major_t __major,
-                                                         __minor_t __minor) {
-#line 48 "kos/src/libc/magic/sys.sysmacros.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(gnu_dev_makedev))(__major_t __major, __minor_t __minor) {
 	return (__dev_t)__major << 20 | (__dev_t)__minor;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_gnu_dev_makedev_defined
+#define __local___localdep_gnu_dev_makedev_defined 1
+#define __localdep_gnu_dev_makedev __LIBC_LOCAL_NAME(gnu_dev_makedev)
+#endif /* !__local___localdep_gnu_dev_makedev_defined */
 #endif /* !__local_gnu_dev_makedev_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71796b4e */
+/* HASH CRC-32:0xf1b6f9fa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,21 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setitimer64_defined
-#ifdef __CRT_HAVE_setitimer
 #define __local_setitimer64_defined 1
 #include <__crt.h>
-/* Dependency: "setitimer32" from "sys.time" */
-#ifndef ____localdep_setitimer32_defined
-#define ____localdep_setitimer32_defined 1
 #ifdef __CRT_HAVE_setitimer
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: setitimer32 from sys.time */
+#if !defined(__local___localdep_setitimer32_defined) && defined(__CRT_HAVE_setitimer)
+#define __local___localdep_setitimer32_defined 1
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(__itimer_which_t __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),setitimer,(__which,__newval,__oldval))
-#else /* LIBC: setitimer */
-#undef ____localdep_setitimer32_defined
-#endif /* setitimer32... */
-#endif /* !____localdep_setitimer32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_setitimer32_defined && __CRT_HAVE_setitimer */
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
 __LOCAL_LIBC(setitimer64) __ATTR_NONNULL((2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setitimer64))(__itimer_which_t __which,
-                                                         struct itimerval64 const *__newval,
-                                                         struct itimerval64 *__oldval) {
-#line 462 "kos/src/libc/magic/sys.time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setitimer64))(__itimer_which_t __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval) {
 	int __result;
 	struct __itimerval32 __new32, __old32;
 	__new32.it_interval.tv_sec  = (__time32_t)__newval->it_interval.tv_sec;
@@ -58,5 +50,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setitimer64))(__itimer_which_t __whic
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_setitimer */
+#ifndef __local___localdep_setitimer64_defined
+#define __local___localdep_setitimer64_defined 1
+#define __localdep_setitimer64 __LIBC_LOCAL_NAME(setitimer64)
+#endif /* !__local___localdep_setitimer64_defined */
+#else /* __CRT_HAVE_setitimer */
+#undef __local_setitimer64_defined
+#endif /* !__CRT_HAVE_setitimer */
 #endif /* !__local_setitimer64_defined */

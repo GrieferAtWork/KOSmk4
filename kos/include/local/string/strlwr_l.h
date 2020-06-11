@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91d1e81d */
+/* HASH CRC-32:0x8849f42e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,30 +21,33 @@
 #ifndef __local_strlwr_l_defined
 #define __local_strlwr_l_defined 1
 #include <__crt.h>
-/* Dependency: "tolower_l" from "ctype" */
-#ifndef ____localdep_tolower_l_defined
-#define ____localdep_tolower_l_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: tolower_l from ctype */
+#ifndef __local___localdep_tolower_l_defined
+#define __local___localdep_tolower_l_defined 1
 #ifdef __CRT_HAVE_tolower_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),tolower_l,(__ch,__locale))
 #elif defined(__CRT_HAVE__tolower_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),_tolower_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___tolower_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),__tolower_l,(__ch,__locale))
-#else /* LIBC: tolower_l */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/tolower_l.h>
-#define __localdep_tolower_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tolower_l))
-#endif /* tolower_l... */
-#endif /* !____localdep_tolower_l_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_tolower_l __LIBC_LOCAL_NAME(tolower_l)
+#endif /* !... */
+#endif /* !__local___localdep_tolower_l_defined */
 __LOCAL_LIBC(strlwr_l) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strlwr_l))(char *__restrict __str,
-                                                      __locale_t __locale) {
-#line 4781 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strlwr_l))(char *__restrict __str, __locale_t __locale) {
 	char *__iter, __ch;
 	for (__iter = __str; (__ch = *__iter) != '\0'; ++__iter)
 		*__iter = __localdep_tolower_l(__ch, __locale);
 	return __str;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strlwr_l_defined
+#define __local___localdep_strlwr_l_defined 1
+#define __localdep_strlwr_l __LIBC_LOCAL_NAME(strlwr_l)
+#endif /* !__local___localdep_strlwr_l_defined */
 #endif /* !__local_strlwr_l_defined */

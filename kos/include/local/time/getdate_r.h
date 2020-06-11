@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e4364cc */
+/* HASH CRC-32:0xab645e91 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,13 @@
 #include <__crt.h>
 #ifndef __STRUCT_TM
 #ifdef __tm_defined
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
+#define __STRUCT_TM struct tm
 #else /* __tm_defined */
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM __NAMESPACE_STD_SYM tm
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
 #ifndef __std_tm_defined
 #define __std_tm_defined 1
 __NAMESPACE_STD_BEGIN
-struct __NAMESPACE_STD_SYM tm {
+struct tm {
 	int         tm_sec;      /* seconds [0, 61]. */
 	int         tm_min;      /* minutes [0, 59]. */
 	int         tm_hour;     /* hour [0, 23]. */
@@ -41,23 +41,26 @@ struct __NAMESPACE_STD_SYM tm {
 	int         tm_isdst;    /* daylight savings flag. */
 #ifdef __CRT_GLC
 #ifdef __USE_MISC
-	long int    tm_gmtoff;   /* Seconds east of UTC. */
-	char const *tm_zone;     /* Timezone abbreviation. */
+	__LONGPTR_TYPE__ tm_gmtoff;   /* Seconds east of UTC. */
+	char const      *tm_zone;     /* Timezone abbreviation. */
 #else /* __USE_MISC */
-	long int    __tm_gmtoff; /* Seconds east of UTC. */
-	char const *__tm_zone;   /* Timezone abbreviation. */
+	__LONGPTR_TYPE__ __tm_gmtoff; /* Seconds east of UTC. */
+	char const      *__tm_zone;   /* Timezone abbreviation. */
 #endif /* !__USE_MISC */
 #endif /* __CRT_GLC */
 };
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif /* !__STRUCT_TM */
+#endif
 __NAMESPACE_LOCAL_BEGIN
+/* Since `getdate' is not reentrant because of the use of `getdate_err'
+ * and the static buffer to return the result in, we provide a thread-safe
+ * variant.  The functionality is the same.  The result is returned in
+ * the buffer pointed to by RESBUFP and in case of an error the return
+ * value is != 0 with the same values as given above for `getdate_err'. */
 __LOCAL_LIBC(getdate_r) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getdate_r))(char const *__restrict __string,
-                                                       __STRUCT_TM *__restrict __resbufp) {
-#line 1452 "kos/src/libc/magic/time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getdate_r))(char const *__restrict __string, __STRUCT_TM *__restrict __resbufp) {
 	/* TODO */
 	(void)__string;
 	(void)__resbufp;
@@ -65,4 +68,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getdate_r))(char const *__restrict __
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_getdate_r_defined
+#define __local___localdep_getdate_r_defined 1
+#define __localdep_getdate_r __LIBC_LOCAL_NAME(getdate_r)
+#endif /* !__local___localdep_getdate_r_defined */
 #endif /* !__local_getdate_r_defined */

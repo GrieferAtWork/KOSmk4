@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x978abeb6 */
+/* HASH CRC-32:0x8cb8729c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,41 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wchown_defined
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wfchownat)
 #define __local_wchown_defined 1
 #include <__crt.h>
-/* Dependency: "wfchownat" from "parts.wchar.unistd" */
-#ifndef ____localdep_wfchownat_defined
-#define ____localdep_wfchownat_defined 1
+#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wfchownat) || (defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 2))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wfchownat from parts.wchar.unistd */
+#ifndef __local___localdep_wfchownat_defined
+#define __local___localdep_wfchownat_defined 1
 #ifdef __CRT_HAVE_wfchownat
-/* >> wfchownat(2)
+/* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfchownat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
-#else /* LIBC: wfchownat */
-#undef ____localdep_wfchownat_defined
-#endif /* wfchownat... */
-#endif /* !____localdep_wfchownat_defined */
-
-__NAMESPACE_LOCAL_BEGIN
-/* >> wchown(2)
+#elif defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 4
+/* >> fchownat(2)
+ * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,__localdep_wfchownat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),KOS$wfchownat,(__dfd,__file,__owner,__group,__flags))
+#elif defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 2
+/* >> fchownat(2)
+ * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,__localdep_wfchownat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),DOS$wfchownat,(__dfd,__file,__owner,__group,__flags))
+#else /* ... */
+#undef __local___localdep_wfchownat_defined
+#endif /* !... */
+#endif /* !__local___localdep_wfchownat_defined */
+/* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __LOCAL_LIBC(wchown) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wchown))(__WCHAR_TYPE__ const *__file,
-                                                    __uid_t __owner,
-                                                    __gid_t __group) {
-#line 525 "kos/src/libc/magic/unistd.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wchown))(__WCHAR_TYPE__ const *__file, __uid_t __owner, __gid_t __group) {
 	return __localdep_wfchownat(__CRT_AT_FDCWD, __file, __owner, __group, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && __CRT_HAVE_wfchownat */
+#ifndef __local___localdep_wchown_defined
+#define __local___localdep_wchown_defined 1
+#define __localdep_wchown __LIBC_LOCAL_NAME(wchown)
+#endif /* !__local___localdep_wchown_defined */
+#else /* __CRT_AT_FDCWD && (__CRT_HAVE_wfchownat || (__CRT_HAVE_DOS$wfchownat && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$wfchownat && __SIZEOF_WCHAR_T__ == 2)) */
+#undef __local_wchown_defined
+#endif /* !__CRT_AT_FDCWD || (!__CRT_HAVE_wfchownat && (!__CRT_HAVE_DOS$wfchownat || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$wfchownat || !__SIZEOF_WCHAR_T__ == 2)) */
 #endif /* !__local_wchown_defined */

@@ -38,7 +38,7 @@ __SYSDECL_BEGIN
 @@Perform the I/O control operation specified by REQUEST on FD.
 @@One argument may follow; its presence and type depend on REQUEST.
 @@Return value depends on REQUEST. Usually -1 indicates error
-[[cp, guard, vartypes(void *)]]
+[[cp, guard, vartypes(void *), decl_include("<features.h>")]]
 __STDC_INT_AS_SSIZE_T ioctl($fd_t fd, $ulongptr_t request, ...);
 
 %{

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e02eead */
+/* HASH CRC-32:0xdfbaa3a3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,24 +19,22 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ftruncate_defined
-#if defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)
 #define __local_ftruncate_defined 1
 #include <__crt.h>
-/* Dependency: "ftruncate32" from "unistd" */
-#ifndef ____localdep_ftruncate32_defined
-#define ____localdep_ftruncate32_defined 1
-#ifdef __CRT_HAVE_ftruncate
-/* >> ftruncate(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),ftruncate,(__fd,__length))
-#else /* LIBC: ftruncate */
-#undef ____localdep_ftruncate32_defined
-#endif /* ftruncate32... */
-#endif /* !____localdep_ftruncate32_defined */
-
-/* Dependency: "ftruncate64" from "unistd" */
-#ifndef ____localdep_ftruncate64_defined
-#define ____localdep_ftruncate64_defined 1
+#if defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS
+#define __PIO_OFFSET     __FS_TYPE(__pos)
+#define __PIO_OFFSET64   __pos64_t
+#else /* __USE_KOS */
+#define __PIO_OFFSET     __FS_TYPE(__off)
+#define __PIO_OFFSET64   __off64_t
+#endif /* !__USE_KOS */
+#endif
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: ftruncate64 from unistd */
+#ifndef __local___localdep_ftruncate64_defined
+#define __local___localdep_ftruncate64_defined 1
 #ifdef __CRT_HAVE_ftruncate64
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
@@ -49,29 +47,40 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),_chsize_s,(__fd,__length))
-#elif defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize)
+#elif defined(__CRT_HAVE_ftruncate)
+__NAMESPACE_LOCAL_END
 #include <local/unistd/ftruncate64.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
-#define __localdep_ftruncate64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftruncate64))
-#else /* CUSTOM: ftruncate64 */
-#undef ____localdep_ftruncate64_defined
-#endif /* ftruncate64... */
-#endif /* !____localdep_ftruncate64_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_ftruncate64 __LIBC_LOCAL_NAME(ftruncate64)
+#else /* ... */
+#undef __local___localdep_ftruncate64_defined
+#endif /* !... */
+#endif /* !__local___localdep_ftruncate64_defined */
+/* Dependency: ftruncate32 from unistd */
+#if !defined(__local___localdep_ftruncate32_defined) && defined(__CRT_HAVE_ftruncate)
+#define __local___localdep_ftruncate32_defined 1
+/* >> ftruncate(2)
+ * Truncate the given file `FD' to a length of `LENGTH' */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),ftruncate,(__fd,__length))
+#endif /* !__local___localdep_ftruncate32_defined && __CRT_HAVE_ftruncate */
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __LOCAL_LIBC(ftruncate) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftruncate))(__fd_t __fd,
-                                                       __PIO_OFFSET __length) {
-#line 1657 "kos/src/libc/magic/unistd.c"
-#if defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize)
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftruncate))(__fd_t __fd, __PIO_OFFSET __length) {
+#ifdef __CRT_HAVE_ftruncate
 	return __localdep_ftruncate32(__fd, (__pos32_t)__length);
-#else
+#else /* __CRT_HAVE_ftruncate */
 	return __localdep_ftruncate64(__fd, (__pos64_t)__length);
-#endif
+#endif /* !__CRT_HAVE_ftruncate */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_ftruncate || __CRT_HAVE__chsize || __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s */
+#ifndef __local___localdep_ftruncate_defined
+#define __local___localdep_ftruncate_defined 1
+#define __localdep_ftruncate __LIBC_LOCAL_NAME(ftruncate)
+#endif /* !__local___localdep_ftruncate_defined */
+#else /* __CRT_HAVE_ftruncate || __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s */
+#undef __local_ftruncate_defined
+#endif /* !__CRT_HAVE_ftruncate && !__CRT_HAVE_ftruncate64 && !__CRT_HAVE__chsize_s */
 #endif /* !__local_ftruncate_defined */

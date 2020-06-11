@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7746c05e */
+/* HASH CRC-32:0x5d3ab202 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,29 +21,31 @@
 #ifndef __local_strncoll_defined
 #define __local_strncoll_defined 1
 #include <__crt.h>
-/* Dependency: "strncmp" from "string" */
-#ifndef ____localdep_strncmp_defined
-#define ____localdep_strncmp_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strncmp from string */
+#ifndef __local___localdep_strncmp_defined
+#define __local___localdep_strncmp_defined 1
 #if __has_builtin(__builtin_strncmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncmp)
 /* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncmp,{ return __builtin_strncmp(__s1, __s2, __maxlen); })
 #elif defined(__CRT_HAVE_strncmp)
 /* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncmp,(__s1,__s2,__maxlen))
-#else /* LIBC: strncmp */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/strncmp.h>
-/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
-#define __localdep_strncmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncmp))
-#endif /* strncmp... */
-#endif /* !____localdep_strncmp_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
+#define __localdep_strncmp __LIBC_LOCAL_NAME(strncmp)
+#endif /* !... */
+#endif /* !__local___localdep_strncmp_defined */
 __LOCAL_LIBC(strncoll) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strncoll))(char const *__s1,
-                                                      char const *__s2,
-                                                      __SIZE_TYPE__ __maxlen) {
-#line 4721 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strncoll))(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen) {
 	return __localdep_strncmp(__s1, __s2, __maxlen);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strncoll_defined
+#define __local___localdep_strncoll_defined 1
+#define __localdep_strncoll __LIBC_LOCAL_NAME(strncoll)
+#endif /* !__local___localdep_strncoll_defined */
 #endif /* !__local_strncoll_defined */

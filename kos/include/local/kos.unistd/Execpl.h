@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4640f55e */
+/* HASH CRC-32:0x2d60acab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,35 +19,35 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Execpl_defined
-#ifdef __CRT_HAVE_Execvp
 #define __local_Execpl_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-#include <parts/redirect-exec.h>
-/* Dependency: "Execvp" */
-#ifndef ____localdep_Execvp_defined
-#define ____localdep_Execvp_defined 1
 #ifdef __CRT_HAVE_Execvp
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: Execvp from kos.unistd */
+#if !defined(__local___localdep_Execvp_defined) && defined(__CRT_HAVE_Execvp)
+#define __local___localdep_Execvp_defined 1
 /* >> execvp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),__THROWING,__localdep_Execvp,(char const *__restrict __file, __TARGV),Execvp,(__file,))
-#else /* LIBC: Execvp */
-#undef ____localdep_Execvp_defined
-#endif /* Execvp... */
-#endif /* !____localdep_Execvp_defined */
-
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),__THROWING,__localdep_Execvp,(char const *__restrict __file, __TARGV),Execvp,(__file,___argv))
+#endif /* !__local___localdep_Execvp_defined && __CRT_HAVE_Execvp */
+__NAMESPACE_LOCAL_END
+#include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 __LOCAL_LIBC(Execpl) __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void
-(__VLIBCCALL __LIBC_LOCAL_NAME(Execpl))(char const *__restrict __file,
-                                        char const *__args,
-                                        ... /*, (char *)NULL*/) __THROWS(...) {
-#line 70 "kos/src/libc/magic/kos.unistd.c"
+(__VLIBCCALL __LIBC_LOCAL_NAME(Execpl))(char const *__restrict __file, char const *__args, ...) __THROWS(...) {
 	__REDIRECT_XEXECL(char, __localdep_Execvp, __file, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_Execvp */
+#ifndef __local___localdep_Execpl_defined
+#define __local___localdep_Execpl_defined 1
+#define __localdep_Execpl __LIBC_LOCAL_NAME(Execpl)
+#endif /* !__local___localdep_Execpl_defined */
+#else /* __CRT_HAVE_Execvp */
+#undef __local_Execpl_defined
+#endif /* !__CRT_HAVE_Execvp */
 #endif /* !__local_Execpl_defined */

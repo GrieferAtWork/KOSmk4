@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea741825 */
+/* HASH CRC-32:0x91c10435 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,31 +21,33 @@
 #ifndef __local__ecvt_s_defined
 #define __local__ecvt_s_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-/* Dependency: "ecvt_r" from "stdlib" */
-#ifndef ____localdep_ecvt_r_defined
-#define ____localdep_ecvt_r_defined 1
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: ecvt_r from stdlib */
+#ifndef __local___localdep_ecvt_r_defined
+#define __local___localdep_ecvt_r_defined 1
 #ifdef __CRT_HAVE_ecvt_r
 __CREDIRECT(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,__localdep_ecvt_r,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),ecvt_r,(__val,__ndigit,__decptr,__sign,__buf,__len))
-#else /* LIBC: ecvt_r */
+#else /* __CRT_HAVE_ecvt_r */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/ecvt_r.h>
-#define __localdep_ecvt_r (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ecvt_r))
-#endif /* ecvt_r... */
-#endif /* !____localdep_ecvt_r_defined */
-
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_ecvt_r __LIBC_LOCAL_NAME(ecvt_r)
+#endif /* !__CRT_HAVE_ecvt_r */
+#endif /* !__local___localdep_ecvt_r_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_ecvt_s) __ATTR_NONNULL((1, 5, 6)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ecvt_s))(char *__buf,
-                                                     __SIZE_TYPE__ __buflen,
-                                                     double __val,
-                                                     int __ndigit,
-                                                     int *__restrict __decptr,
-                                                     int *__restrict __sign) {
-#line 2953 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ecvt_s))(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) {
 	if (!__buf || !__decptr || !__sign)
 		return __EINVAL;
 	__localdep_ecvt_r(__val, __ndigit, __decptr, __sign, __buf, __buflen);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__ecvt_s_defined
+#define __local___localdep__ecvt_s_defined 1
+#define __localdep__ecvt_s __LIBC_LOCAL_NAME(_ecvt_s)
+#endif /* !__local___localdep__ecvt_s_defined */
 #endif /* !__local__ecvt_s_defined */

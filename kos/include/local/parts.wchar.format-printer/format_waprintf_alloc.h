@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadd3e70f */
+/* HASH CRC-32:0x2761f7df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_waprintf_alloc_defined
-#ifdef __CRT_HAVE_realloc
 #define __local_format_waprintf_alloc_defined 1
 #include <__crt.h>
-#include <hybrid/__assert.h>
-
+#ifdef __CRT_HAVE_realloc
 #ifndef __format_waprintf_data_defined
 #define __format_waprintf_data_defined 1
 struct format_waprintf_data {
@@ -31,31 +29,35 @@ struct format_waprintf_data {
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
 	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
-#endif /* !__format_waprintf_data_defined */
-/* Dependency: "realloc" */
-#ifndef ____localdep_realloc_defined
-#define ____localdep_realloc_defined 1
-#ifdef __std___localdep_realloc_defined
-__NAMESPACE_STD_USING(__localdep_realloc)
+#endif
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: realloc from stdlib */
+#ifndef __local___localdep_realloc_defined
+#define __local___localdep_realloc_defined 1
+#ifdef __realloc_defined
+__NAMESPACE_GLB_USING(realloc)
+#define __localdep_realloc realloc
+#elif defined(__std_realloc_defined)
+__NAMESPACE_STD_USING(realloc)
+#define __localdep_realloc realloc
 #elif __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
 __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
 #elif defined(__CRT_HAVE_realloc)
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
-#else /* LIBC: realloc */
-#undef ____localdep_realloc_defined
-#endif /* realloc... */
-#endif /* !____localdep_realloc_defined */
-
+#else /* ... */
+#undef __local___localdep_realloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_realloc_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
-__LOCAL_LIBC(format_waprintf_alloc) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_waprintf_alloc))(struct format_waprintf_data *__restrict __self,
-                                                                   __SIZE_TYPE__ __num_wchars) {
-#line 304 "kos/src/libc/magic/parts.wchar.format-printer.c"
+__LOCAL_LIBC(format_waprintf_alloc) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_waprintf_alloc))(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars) {
 	__WCHAR_TYPE__ *__result;
 	if (__self->ap_avail < __num_wchars) {
 		__WCHAR_TYPE__ *__newbuf;
@@ -82,5 +84,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_waprintf_alloc))(struct format
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_realloc */
+#ifndef __local___localdep_format_waprintf_alloc_defined
+#define __local___localdep_format_waprintf_alloc_defined 1
+#define __localdep_format_waprintf_alloc __LIBC_LOCAL_NAME(format_waprintf_alloc)
+#endif /* !__local___localdep_format_waprintf_alloc_defined */
+#else /* __CRT_HAVE_realloc */
+#undef __local_format_waprintf_alloc_defined
+#endif /* !__CRT_HAVE_realloc */
 #endif /* !__local_format_waprintf_alloc_defined */

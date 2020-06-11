@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a20e5fa */
+/* HASH CRC-32:0x4b0ca298 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,32 +19,34 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__aligned_offset_malloc_defined
-#if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #define __local__aligned_offset_malloc_defined 1
 #include <__crt.h>
-/* Dependency: "malloc" from "stdlib" */
-#ifndef ____localdep_malloc_defined
-#define ____localdep_malloc_defined 1
-#ifdef __std___localdep_malloc_defined
-__NAMESPACE_STD_USING(__localdep_malloc)
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: malloc from stdlib */
+#ifndef __local___localdep_malloc_defined
+#define __local___localdep_malloc_defined 1
+#ifdef __malloc_defined
+__NAMESPACE_GLB_USING(malloc)
+#define __localdep_malloc malloc
+#elif defined(__std_malloc_defined)
+__NAMESPACE_STD_USING(malloc)
+#define __localdep_malloc malloc
 #elif __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,{ return __builtin_malloc(__num_bytes); })
 #elif defined(__CRT_HAVE_malloc)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,(__num_bytes))
-#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)
+#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/malloc.h>
-#define __localdep_malloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(malloc))
-#else /* CUSTOM: malloc */
-#undef ____localdep_malloc_defined
-#endif /* malloc... */
-#endif /* !____localdep_malloc_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_malloc __LIBC_LOCAL_NAME(malloc)
+#else /* ... */
+#undef __local___localdep_malloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_malloc_defined */
 __LOCAL_LIBC(_aligned_offset_malloc) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_malloc))(__SIZE_TYPE__ __num_bytes,
-                                                                    __SIZE_TYPE__ __min_alignment,
-                                                                    __SIZE_TYPE__ __offset) {
-#line 2842 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_malloc))(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) {
 	void *__result;
 	__offset &= (__min_alignment - 1);
 	__result = __localdep_malloc(__num_bytes + 2 * sizeof(void *) + __min_alignment - 1 + (__min_alignment - __offset));
@@ -57,5 +59,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_malloc))(__SIZE_TYPE_
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_posix_memalign || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_malloc */
+#ifndef __local___localdep__aligned_offset_malloc_defined
+#define __local___localdep__aligned_offset_malloc_defined 1
+#define __localdep__aligned_offset_malloc __LIBC_LOCAL_NAME(_aligned_offset_malloc)
+#endif /* !__local___localdep__aligned_offset_malloc_defined */
+#else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+#undef __local__aligned_offset_malloc_defined
+#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
 #endif /* !__local__aligned_offset_malloc_defined */

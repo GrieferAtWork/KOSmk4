@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1e54dd3 */
+/* HASH CRC-32:0x3d563f19 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,45 +19,44 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wcsdup_dbg_defined
-#if (defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_c16dup) || (defined(__CRT_HAVE__wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #define __local__wcsdup_dbg_defined 1
 #include <__crt.h>
-/* Dependency: "c16dup" from "parts.uchar.string" */
-#ifndef ____localdep_c16dup_defined
-#define ____localdep_c16dup_defined 1
-#if defined(__CRT_HAVE_wcsdup) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16dup,(__CHAR16_TYPE__ const *__restrict __string),wcsdup,(__string))
-#elif defined(__CRT_HAVE__wcsdup) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16dup,(__CHAR16_TYPE__ const *__restrict __string),_wcsdup,(__string))
-#elif defined(__CRT_HAVE_DOS$_wcsdup)
-__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16dup,(__CHAR16_TYPE__ const *__restrict __string),_wcsdup,(__string))
-#elif defined(__CRT_HAVE_DOS$_wcsdup)
-__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16dup,(__CHAR16_TYPE__ const *__restrict __string),_wcsdup,(__string))
-#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
-#if __SIZEOF_WCHAR_T__ == 2
-#include <local/wchar/wcsdup.h>
-#define __localdep_c16dup (*(__CHAR16_TYPE__ *(__LIBCCALL*)(__CHAR16_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsdup)))
-#else /* LIBC: c16dup */
-#include <local/wchar/c16dup.h>
-#define __localdep_c16dup (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16dup))
-#endif /* LIBC: c16dup */
-#else /* CUSTOM: wcsdup */
-#undef ____localdep_c16dup_defined
-#endif /* c16dup... */
-#endif /* !____localdep_c16dup_defined */
-
+#if (defined(__CRT_HAVE_wcsdup) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: c16dup from parts.uchar.string */
+#ifndef __local___localdep_c16dup_defined
+#define __local___localdep_c16dup_defined 1
+#if defined(__CRT_HAVE_wcsdup) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+__COMPILER_REDIRECT(__LIBC,__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__LIBDCALL,__localdep_c16dup,(__CHAR16_TYPE__ const *__restrict __string),wcsdup,(__string))
+#elif defined(__CRT_HAVE_DOS$_wcsdup)
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16dup,(__CHAR16_TYPE__ const *__restrict __string),_wcsdup,(__string))
+#elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (__SIZEOF_WCHAR_T__ == 2)
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wcsdup.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_c16dup (*(__CHAR16_TYPE__ *(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcsdup))
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_END
+#include <local/parts.uchar.string/c16dup.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_c16dup __LIBC_LOCAL_NAME(c16dup)
+#else /* ... */
+#undef __local___localdep_c16dup_defined
+#endif /* !... */
+#endif /* !__local___localdep_c16dup_defined */
 __LOCAL_LIBC(_wcsdup_dbg) __ATTR_MALLOC __ATTR_WUNUSED __WCHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcsdup_dbg))(__WCHAR16_TYPE__ const *__string,
-                                                         int __block_type,
-                                                         char const *__filename,
-                                                         int __line) {
-#line 424 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcsdup_dbg))(__WCHAR16_TYPE__ const *__string, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
 	return (__WCHAR16_TYPE__ *)__localdep_c16dup((__CHAR16_TYPE__ const *)__string);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_wcsdup && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_c16dup || (__CRT_HAVE__wcsdup && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_DOS$_wcsdup || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_posix_memalign || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_malloc */
+#ifndef __local___localdep__wcsdup_dbg_defined
+#define __local___localdep__wcsdup_dbg_defined 1
+#define __localdep__wcsdup_dbg __LIBC_LOCAL_NAME(_wcsdup_dbg)
+#endif /* !__local___localdep__wcsdup_dbg_defined */
+#else /* (__CRT_HAVE_wcsdup && (__SIZEOF_WCHAR_T__ == 2) && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wcsdup || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+#undef __local__wcsdup_dbg_defined
+#endif /* (!__CRT_HAVE_wcsdup || !(__SIZEOF_WCHAR_T__ == 2) || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$_wcsdup && !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
 #endif /* !__local__wcsdup_dbg_defined */

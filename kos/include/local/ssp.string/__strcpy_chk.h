@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabcd5a01 */
+/* HASH CRC-32:0xdc02bcaa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,29 +21,32 @@
 #ifndef __local___strcpy_chk_defined
 #define __local___strcpy_chk_defined 1
 #include <__crt.h>
-#include <ssp/chk.h>
-/* Dependency: "strcpy" from "string" */
-#ifndef ____localdep_strcpy_defined
-#define ____localdep_strcpy_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strcpy from string */
+#ifndef __local___localdep_strcpy_defined
+#define __local___localdep_strcpy_defined 1
 #if __has_builtin(__builtin_strcpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcpy)
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcpy,(char *__restrict __buf, char const *__restrict __src),strcpy,{ return __builtin_strcpy(__buf, __src); })
 #elif defined(__CRT_HAVE_strcpy)
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcpy,(char *__restrict __buf, char const *__restrict __src),strcpy,(__buf,__src))
-#else /* LIBC: strcpy */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/strcpy.h>
-#define __localdep_strcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcpy))
-#endif /* strcpy... */
-#endif /* !____localdep_strcpy_defined */
-
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__strcpy_chk) __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__strcpy_chk))(char *__restrict __dst,
-                                                          char const *__restrict __src,
-                                                          __SIZE_TYPE__ __dst_objsize) {
-#line 41 "kos/src/libc/magic/ssp.string.c"
+#define __localdep_strcpy __LIBC_LOCAL_NAME(strcpy)
+#endif /* !... */
+#endif /* !__local___localdep_strcpy_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(__strcpy_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__strcpy_chk))(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dst_objsize) {
 	(void)__dst_objsize; /* TODO */;
 	return __localdep_strcpy(__dst, __src);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___strcpy_chk_defined
+#define __local___localdep___strcpy_chk_defined 1
+#define __localdep___strcpy_chk __LIBC_LOCAL_NAME(__strcpy_chk)
+#endif /* !__local___localdep___strcpy_chk_defined */
 #endif /* !__local___strcpy_chk_defined */

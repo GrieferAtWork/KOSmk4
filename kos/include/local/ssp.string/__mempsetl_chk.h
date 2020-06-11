@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf5c6ae6 */
+/* HASH CRC-32:0x64edd9b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,36 +21,36 @@
 #ifndef __local___mempsetl_chk_defined
 #define __local___mempsetl_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "mempsetl" from "string" */
-#ifndef ____localdep_mempsetl_defined
-#define ____localdep_mempsetl_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempsetl from string */
+#ifndef __local___localdep_mempsetl_defined
+#define __local___localdep_mempsetl_defined 1
 #ifdef __fast_mempsetl_defined
 /* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
-#define __localdep_mempsetl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetl))
+__NAMESPACE_FAST_USING(mempsetl)
+#define __localdep_mempsetl __LIBC_FAST_NAME(mempsetl)
 #elif defined(__CRT_HAVE_mempsetl)
 /* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),mempsetl,(__dst,__dword,__n_dwords))
-#else /* LIBC: mempsetl */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),mempsetl,(__dst,__dword,__n_dwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempsetl.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
-#define __localdep_mempsetl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetl))
-#endif /* mempsetl... */
-#endif /* !____localdep_mempsetl_defined */
-
+#define __localdep_mempsetl __LIBC_LOCAL_NAME(mempsetl)
+#endif /* !... */
+#endif /* !__local___localdep_mempsetl_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__mempsetl_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempsetl_chk))(/*aligned(4)*/ void *__restrict __dst,
-                                                            __UINT32_TYPE__ __dword,
-                                                            __SIZE_TYPE__ __n_dwords,
-                                                            __SIZE_TYPE__ __dst_objsize) {
-#line 87 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempsetl_chk))(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("mempsetl", __dst, __n_dwords * 4, __dst_objsize);
 	return __localdep_mempsetl(__dst, __dword, __n_dwords);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___mempsetl_chk_defined
+#define __local___localdep___mempsetl_chk_defined 1
+#define __localdep___mempsetl_chk __LIBC_LOCAL_NAME(__mempsetl_chk)
+#endif /* !__local___localdep___mempsetl_chk_defined */
 #endif /* !__local___mempsetl_chk_defined */

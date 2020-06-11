@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe10cee7a */
+/* HASH CRC-32:0xfe8f39a3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,41 +22,39 @@
 #define __local_strsignal_s_defined 1
 #include <__crt.h>
 #include <bits/signum.h>
-
-#include <bits/signum-values.h>
-__NAMESPACE_LOCAL_BEGIN
 #ifndef ___local_sys_siglist_defined
 #define ___local_sys_siglist_defined 1
-#undef sys_siglist
-#undef _sys_siglist
+#undef __sys_siglist
+#undef ___sys_siglist
 #if defined(__CRT_HAVE___p_sys_siglist)
 #ifndef ____p_sys_siglist_defined
 #define ____p_sys_siglist_defined 1
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__NOTHROW_NCX,__p_sys_siglist,(void),())
 #endif /* !____p_sys_siglist_defined */
-#define _sys_siglist  __p_sys_siglist()
-#define sys_siglist   __p_sys_siglist()
+#define ___sys_siglist  __p_sys_siglist()
+#define __sys_siglist   __p_sys_siglist()
 #elif defined(__CRT_HAVE_sys_siglist)
 #if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_ASMNAME)
-__LIBC char const *const _sys_siglist[___NSIG] __ASMNAME("sys_siglist");
+__LIBC char const *const ___sys_siglist[_NSIG] __ASMNAME("sys_siglist");
 #else /* __CRT_HAVE__sys_siglist || !__NO_ASMNAME */
-#define _sys_siglist  sys_siglist
+#define ___sys_siglist  __sys_siglist
 #endif /* !__CRT_HAVE__sys_siglist && __NO_ASMNAME */
-__LIBC char const *const sys_siglist[___NSIG];
+__LIBC char const *const __sys_siglist[_NSIG];
 #elif defined(__CRT_HAVE__sys_siglist)
 #ifndef __NO_ASMNAME
-__LIBC char const *const sys_siglist[___NSIG] __ASMNAME("_sys_siglist");
+__LIBC char const *const __sys_siglist[_NSIG] __ASMNAME("_sys_siglist");
 #else /* !__NO_ASMNAME */
-#define sys_siglist     _sys_siglist
+#define __sys_siglist     ___sys_siglist
 #endif /* __NO_ASMNAME */
-__LIBC char const *const _sys_siglist[___NSIG];
+__LIBC char const *const ___sys_siglist[_NSIG];
 #endif /* sys_siglist... */
-#endif /* !___local_sys_siglist_defined */
+#endif
+#include <bits/signum-values.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strsignal_s) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strsignal_s))(int __signum) {
-#line 3929 "kos/src/libc/magic/string.c"
 #if defined(__CRT_HAVE___p_sys_siglist) || defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist)
-	return (unsigned int)__errnum < ___NSIG ? _sys_siglist[__signum] : __NULLPTR;
+	return (unsigned int)__errnum < _NSIG ? _sys_siglist[__signum] : __NULLPTR;
 #else /* __CRT_HAVE___p_sys_siglist || __CRT_HAVE_sys_siglist || __CRT_HAVE__sys_siglist */
 	char const *__result;
 	switch (__signum) {
@@ -184,4 +182,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strsignal_s))(int __signum) {
 #endif /* !__CRT_HAVE___p_sys_siglist && !__CRT_HAVE_sys_siglist && !__CRT_HAVE__sys_siglist */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strsignal_s_defined
+#define __local___localdep_strsignal_s_defined 1
+#define __localdep_strsignal_s __LIBC_LOCAL_NAME(strsignal_s)
+#endif /* !__local___localdep_strsignal_s_defined */
 #endif /* !__local_strsignal_s_defined */

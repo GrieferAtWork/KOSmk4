@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12735a69 */
+/* HASH CRC-32:0x4bd27320 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,42 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wlink_defined
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wlinkat)
 #define __local_wlink_defined 1
 #include <__crt.h>
-/* Dependency: "wlinkat" from "parts.wchar.unistd" */
-#ifndef ____localdep_wlinkat_defined
-#define ____localdep_wlinkat_defined 1
+#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wlinkat) || (defined(__CRT_HAVE_DOS$wlinkat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wlinkat) && __SIZEOF_WCHAR_T__ == 2))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wlinkat from parts.wchar.unistd */
+#ifndef __local___localdep_wlinkat_defined
+#define __local___localdep_wlinkat_defined 1
 #ifdef __CRT_HAVE_wlinkat
-/* >> wlinkat(2)
+/* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_wlinkat,(__fd_t __fromfd, __WCHAR_TYPE__ const *__from, __fd_t __tofd, __WCHAR_TYPE__ const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
-#else /* LIBC: wlinkat */
-#undef ____localdep_wlinkat_defined
-#endif /* wlinkat... */
-#endif /* !____localdep_wlinkat_defined */
-
-__NAMESPACE_LOCAL_BEGIN
-/* >> wlink(2)
+#elif defined(__CRT_HAVE_DOS$wlinkat) && __SIZEOF_WCHAR_T__ == 4
+/* >> linkat(2)
+ * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__LIBCCALL,__localdep_wlinkat,(__fd_t __fromfd, __WCHAR_TYPE__ const *__from, __fd_t __tofd, __WCHAR_TYPE__ const *__to, __atflag_t __flags),KOS$wlinkat,(__fromfd,__from,__tofd,__to,__flags))
+#elif defined(__CRT_HAVE_DOS$wlinkat) && __SIZEOF_WCHAR_T__ == 2
+/* >> linkat(2)
+ * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__LIBCCALL,__localdep_wlinkat,(__fd_t __fromfd, __WCHAR_TYPE__ const *__from, __fd_t __tofd, __WCHAR_TYPE__ const *__to, __atflag_t __flags),DOS$wlinkat,(__fromfd,__from,__tofd,__to,__flags))
+#else /* ... */
+#undef __local___localdep_wlinkat_defined
+#endif /* !... */
+#endif /* !__local___localdep_wlinkat_defined */
+/* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __LOCAL_LIBC(wlink) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wlink))(__WCHAR_TYPE__ const *__from,
-                                                   __WCHAR_TYPE__ const *__to) {
-#line 544 "kos/src/libc/magic/unistd.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wlink))(__WCHAR_TYPE__ const *__from, __WCHAR_TYPE__ const *__to) {
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */
 	return __localdep_wlinkat(__CRT_AT_FDCWD, __from, __CRT_AT_FDCWD, __to, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && __CRT_HAVE_wlinkat */
+#ifndef __local___localdep_wlink_defined
+#define __local___localdep_wlink_defined 1
+#define __localdep_wlink __LIBC_LOCAL_NAME(wlink)
+#endif /* !__local___localdep_wlink_defined */
+#else /* __CRT_AT_FDCWD && (__CRT_HAVE_wlinkat || (__CRT_HAVE_DOS$wlinkat && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$wlinkat && __SIZEOF_WCHAR_T__ == 2)) */
+#undef __local_wlink_defined
+#endif /* !__CRT_AT_FDCWD || (!__CRT_HAVE_wlinkat && (!__CRT_HAVE_DOS$wlinkat || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$wlinkat || !__SIZEOF_WCHAR_T__ == 2)) */
 #endif /* !__local_wlink_defined */

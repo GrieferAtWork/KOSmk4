@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf54c7f5d */
+/* HASH CRC-32:0x7ca0c19c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,13 @@
 #include <__crt.h>
 #ifndef __STRUCT_TM
 #ifdef __tm_defined
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
+#define __STRUCT_TM struct tm
 #else /* __tm_defined */
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM __NAMESPACE_STD_SYM tm
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
 #ifndef __std_tm_defined
 #define __std_tm_defined 1
 __NAMESPACE_STD_BEGIN
-struct __NAMESPACE_STD_SYM tm {
+struct tm {
 	int         tm_sec;      /* seconds [0, 61]. */
 	int         tm_min;      /* minutes [0, 59]. */
 	int         tm_hour;     /* hour [0, 23]. */
@@ -41,21 +41,22 @@ struct __NAMESPACE_STD_SYM tm {
 	int         tm_isdst;    /* daylight savings flag. */
 #ifdef __CRT_GLC
 #ifdef __USE_MISC
-	long int    tm_gmtoff;   /* Seconds east of UTC. */
-	char const *tm_zone;     /* Timezone abbreviation. */
+	__LONGPTR_TYPE__ tm_gmtoff;   /* Seconds east of UTC. */
+	char const      *tm_zone;     /* Timezone abbreviation. */
 #else /* __USE_MISC */
-	long int    __tm_gmtoff; /* Seconds east of UTC. */
-	char const *__tm_zone;   /* Timezone abbreviation. */
+	__LONGPTR_TYPE__ __tm_gmtoff; /* Seconds east of UTC. */
+	char const      *__tm_zone;   /* Timezone abbreviation. */
 #endif /* !__USE_MISC */
 #endif /* __CRT_GLC */
 };
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif /* !__STRUCT_TM */
-/* Dependency: "crt_strftime_l" from "time" */
-#ifndef ____localdep_crt_strftime_l_defined
-#define ____localdep_crt_strftime_l_defined 1
+#endif
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: crt_strftime_l from time */
+#ifndef __local___localdep_crt_strftime_l_defined
+#define __local___localdep_crt_strftime_l_defined 1
 #ifdef __CRT_HAVE_strftime_l
 /* Similar to `strftime' but take the information from
  * the provided locale and not the global locale */
@@ -68,24 +69,16 @@ __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt
 /* Similar to `strftime' but take the information from
  * the provided locale and not the global locale */
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),__strftime_l,(__buf,__bufsize,__format,__tp,__locale))
-#else /* LIBC: strftime_l */
-#undef ____localdep_crt_strftime_l_defined
-#endif /* crt_strftime_l... */
-#endif /* !____localdep_crt_strftime_l_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_crt_strftime_l_defined
+#endif /* !... */
+#endif /* !__local___localdep_crt_strftime_l_defined */
 /* Format TP into S according to FORMAT.
  * Write no more than MAXSIZE characters and return the number
  * of characters written, or 0 if it would exceed MAXSIZE */
 __LOCAL_LIBC(strftime) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf,
-                                                      __SIZE_TYPE__ __bufsize,
-                                                      char const *__restrict __format,
-                                                      __STRUCT_TM const *__restrict __tp) {
-#line 557 "kos/src/libc/magic/time.c"
-#if defined(__CRT_HAVE_strftime_l) || defined(__CRT_HAVE__strftime_l) || defined(__CRT_HAVE___strftime_l)
-	return __localdep_crt_strftime_l(__buf, __bufsize, __format, __tp, __NULLPTR);
-#else /* __CRT_HAVE_strftime_l || __CRT_HAVE__strftime_l || __CRT_HAVE___strftime_l */
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp) {
+#ifdef __BUILDING_LIBC
 	/* TODO */
 	(void)__buf;
 	(void)__bufsize;
@@ -93,7 +86,21 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf,
 	(void)__tp;
 	__COMPILER_IMPURE();
 	return 0;
-#endif /* !__CRT_HAVE_strftime_l && !__CRT_HAVE__strftime_l && !__CRT_HAVE___strftime_l */
+#elif defined(__CRT_HAVE_strftime_l) || defined(__CRT_HAVE__strftime_l) || defined(__CRT_HAVE___strftime_l)
+	return __localdep_crt_strftime_l(__buf, __bufsize, __format, __tp, __NULLPTR);
+#else /* ... */
+	/* TODO */
+	(void)__buf;
+	(void)__bufsize;
+	(void)__format;
+	(void)__tp;
+	__COMPILER_IMPURE();
+	return 0;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strftime_defined
+#define __local___localdep_strftime_defined 1
+#define __localdep_strftime __LIBC_LOCAL_NAME(strftime)
+#endif /* !__local___localdep_strftime_defined */
 #endif /* !__local_strftime_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57f9e4b4 */
+/* HASH CRC-32:0x17a9f672 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,22 @@
 #ifndef __local__sprintf_l_defined
 #define __local__sprintf_l_defined 1
 #include <__crt.h>
-/* Dependency: "_vsprintf_l" from "stdio" */
-#ifndef ____localdep__vsprintf_l_defined
-#define ____localdep__vsprintf_l_defined 1
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: _vsprintf_l from stdio */
+#ifndef __local___localdep__vsprintf_l_defined
+#define __local___localdep__vsprintf_l_defined 1
 #ifdef __CRT_HAVE__vsprintf_l
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsprintf_l,(char *__restrict __buf, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vsprintf_l,(__buf,__format,__locale,__args))
-#else /* LIBC: _vsprintf_l */
+#else /* __CRT_HAVE__vsprintf_l */
+__NAMESPACE_LOCAL_END
 #include <local/stdio/_vsprintf_l.h>
-#define __localdep__vsprintf_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vsprintf_l))
-#endif /* _vsprintf_l... */
-#endif /* !____localdep__vsprintf_l_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep__vsprintf_l __LIBC_LOCAL_NAME(_vsprintf_l)
+#endif /* !__CRT_HAVE__vsprintf_l */
+#endif /* !__local___localdep__vsprintf_l_defined */
 __LOCAL_LIBC(_sprintf_l) __ATTR_LIBC_PRINTF(2, 4) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_sprintf_l))(char *__restrict __buf,
-                                                         char const *__restrict __format,
-                                                         __locale_t __locale,
-                                                         ...) {
-#line 2421 "kos/src/libc/magic/stdio.c"
+__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_sprintf_l))(char *__restrict __buf, char const *__restrict __format, __locale_t __locale, ...) {
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __locale);
@@ -47,4 +45,8 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_sprintf_l))(char *__restrict __buf,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__sprintf_l_defined
+#define __local___localdep__sprintf_l_defined 1
+#define __localdep__sprintf_l __LIBC_LOCAL_NAME(_sprintf_l)
+#endif /* !__local___localdep__sprintf_l_defined */
 #endif /* !__local__sprintf_l_defined */

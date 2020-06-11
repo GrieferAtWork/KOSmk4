@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x758c57e8 */
+/* HASH CRC-32:0xa2189d48 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,50 +19,65 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_nextafterf_defined
-#include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 #define __local_nextafterf_defined 1
 #include <__crt.h>
-#include <libm/nextafter.h>
-/* Dependency: "nextafter" from "math" */
-#ifndef ____localdep_nextafter_defined
-#define ____localdep_nextafter_defined 1
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: nextafter from math */
+#ifndef __local___localdep_nextafter_defined
+#define __local___localdep_nextafter_defined 1
 #if __has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),nextafter,{ return __builtin_nextafter(__x, __y); })
+#elif __has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),nexttoward,{ return __builtin_nexttoward(__x); })
 #elif defined(__CRT_HAVE_nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),nextafter,(__x,__y))
+#elif defined(__CRT_HAVE_nexttoward)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),nexttoward,(__x,__y))
 #elif defined(__CRT_HAVE___nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),__nextafter,(__x,__y))
 #elif defined(__CRT_HAVE__nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),_nextafter,(__x,__y))
-#else /* LIBC: nextafter */
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#include <local/math/nextafter.h>
+#elif defined(__CRT_HAVE___nexttoward)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-#define __localdep_nextafter (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafter))
-#else /* CUSTOM: nextafter */
-#undef ____localdep_nextafter_defined
-#endif /* nextafter... */
-#endif /* nextafter... */
-#endif /* !____localdep_nextafter_defined */
-
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),__nexttoward,(__x,__y))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <local/math/nextafter.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+#define __localdep_nextafter __LIBC_LOCAL_NAME(nextafter)
+#else /* ... */
+#undef __local___localdep_nextafter_defined
+#endif /* !... */
+#endif /* !__local___localdep_nextafter_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/nextafter.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __LOCAL_LIBC(nextafterf) __ATTR_CONST __ATTR_WUNUSED float
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextafterf))(float __x,
-                                                    float __y) {
-#line 893 "kos/src/libc/magic/math.c"
-#ifdef __LIBM_MATHFUN2F
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextafterf))(float __x, float __y) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
 	return __LIBM_MATHFUN2F(nextafter, __x, __y);
-#else /* __LIBM_MATHFUN2F */
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)__localdep_nextafter((double)__x, (double)__y);
-#endif /* !__LIBM_MATHFUN2F */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_nextafter || __CRT_HAVE___nextafter || __CRT_HAVE__nextafter */
+#ifndef __local___localdep_nextafterf_defined
+#define __local___localdep_nextafterf_defined 1
+#define __localdep_nextafterf __LIBC_LOCAL_NAME(nextafterf)
+#endif /* !__local___localdep_nextafterf_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_nextafter || __CRT_HAVE_nexttoward || __CRT_HAVE___nextafter || __CRT_HAVE__nextafter || __CRT_HAVE___nexttoward || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_nextafterf_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_nextafter && !__CRT_HAVE_nexttoward && !__CRT_HAVE___nextafter && !__CRT_HAVE__nextafter && !__CRT_HAVE___nexttoward && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_nextafterf_defined */

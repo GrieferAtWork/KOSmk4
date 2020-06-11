@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc15df674 */
+/* HASH CRC-32:0x62efe0d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -283,7 +283,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_whexdump, __FORCELOCAL __ATTR_NONNULL((1)
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__CDECLARE(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,format_vwprintf,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args),(__printer,__arg,__format,__args))
+__CDECLARE(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,format_vwprintf,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args),(__printer,__arg,__format,__args))
 #elif defined(__CRT_HAVE_DOS$format_vwprintf) && __SIZEOF_WCHAR_T__ == 4
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
@@ -372,7 +372,7 @@ __CDECLARE(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THRO
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__COMPILER_REDIRECT(__LIBC,__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__LIBCCALL,format_vwprintf,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args),KOS$format_vwprintf,(__printer,__arg,__format,__args))
+__CREDIRECT_KOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,format_vwprintf,(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
 #elif defined(__CRT_HAVE_DOS$format_vwprintf) && __SIZEOF_WCHAR_T__ == 2
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
@@ -461,7 +461,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSI
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__COMPILER_REDIRECT(__LIBC,__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__LIBCCALL,format_vwprintf,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args),DOS$format_vwprintf,(__printer,__arg,__format,__args))
+__CREDIRECT_DOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,format_vwprintf,(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
 #else /* ... */
 #include <local/parts.wchar.format-printer/format_vwprintf.h>
 /* Generic printf implementation
@@ -551,7 +551,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSI
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_vwprintf, __FORCELOCAL __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_vwprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwprintf))(__printer, __arg, __format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_vwprintf, __FORCELOCAL __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_vwprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwprintf))(__printer, __arg, __format, __args); })
 #endif /* !... */
 #ifdef __CRT_HAVE_format_wprintf
 /* Generic printf implementation
@@ -641,7 +641,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_vwprintf, __FORCELOCAL __ATTR_LIBC_PRINTF
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("format_wprintf");
+__LIBC __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("format_wprintf");
 #elif defined(__CRT_HAVE_DOS$format_wprintf) && __SIZEOF_WCHAR_T__ == 4
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
@@ -730,7 +730,7 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCA
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_KOS("format_wprintf");
+__LIBC __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_KOS("format_wprintf");
 #elif defined(__CRT_HAVE_DOS$format_wprintf) && __SIZEOF_WCHAR_T__ == 2
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
@@ -819,7 +819,7 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCA
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_DOS("format_wprintf");
+__LIBC __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_DOS("format_wprintf");
 #else /* ... */
 #include <local/parts.wchar.format-printer/format_wprintf.h>
 /* Generic printf implementation

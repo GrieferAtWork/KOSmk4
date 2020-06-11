@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd794c172 */
+/* HASH CRC-32:0x7de1ac91 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,30 @@
 #ifndef __local_iswdigit_l_defined
 #define __local_iswdigit_l_defined 1
 #include <__crt.h>
-/* Dependency: "iswdigit" from "wctype" */
-#ifndef ____localdep_iswdigit_defined
-#define ____localdep_iswdigit_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: iswdigit from wctype */
+#ifndef __local___localdep_iswdigit_defined
+#define __local___localdep_iswdigit_defined 1
 #if __has_builtin(__builtin_iswdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswdigit)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswdigit,(__WINT_TYPE__ __wc),iswdigit,{ return __builtin_iswdigit(__wc); })
 #elif defined(__CRT_HAVE_iswdigit)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswdigit,(__WINT_TYPE__ __wc),iswdigit,(__wc))
-#else /* LIBC: iswdigit */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/iswdigit.h>
-#define __localdep_iswdigit (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswdigit))
-#endif /* iswdigit... */
-#endif /* !____localdep_iswdigit_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_iswdigit __LIBC_LOCAL_NAME(iswdigit)
+#endif /* !... */
+#endif /* !__local___localdep_iswdigit_defined */
 __LOCAL_LIBC(iswdigit_l) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswdigit_l))(__WINT_TYPE__ __wc,
-                                                        __locale_t __locale) {
-#line 250 "kos/src/libc/magic/wctype.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswdigit_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
 	(void)__locale;
 	__COMPILER_IMPURE();
 	return __localdep_iswdigit(__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswdigit_l_defined
+#define __local___localdep_iswdigit_l_defined 1
+#define __localdep_iswdigit_l __LIBC_LOCAL_NAME(iswdigit_l)
+#endif /* !__local___localdep_iswdigit_l_defined */
 #endif /* !__local_iswdigit_l_defined */

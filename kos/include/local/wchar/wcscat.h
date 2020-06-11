@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2f0b9d0 */
+/* HASH CRC-32:0x105e99ab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,56 +21,83 @@
 #ifndef __local_wcscat_defined
 #define __local_wcscat_defined 1
 #include <__crt.h>
-/* Dependency: "wmemcpy" from "wchar" */
-#ifndef ____localdep_wmemcpy_defined
-#define ____localdep_wmemcpy_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcsend from wchar */
+#ifndef __local___localdep_wcsend_defined
+#define __local___localdep_wcsend_defined 1
+#ifdef __CRT_HAVE_wcsend
+/* Same as `STR+wcslen(STR)' */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsend,(__WCHAR_TYPE__ const *__restrict __string),wcsend,(__string))
+#elif defined(__CRT_HAVE_DOS$wcsend) && __SIZEOF_WCHAR_T__ == 4
+/* Same as `STR+wcslen(STR)' */
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_wcsend,(__CHAR32_TYPE__ const *__restrict __string),wcsend,(__string))
+#elif defined(__CRT_HAVE_DOS$wcsend) && __SIZEOF_WCHAR_T__ == 2
+/* Same as `STR+wcslen(STR)' */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_wcsend,(__CHAR16_TYPE__ const *__restrict __string),wcsend,(__string))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wcsend.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `STR+wcslen(STR)' */
+#define __localdep_wcsend __LIBC_LOCAL_NAME(wcsend)
+#endif /* !... */
+#endif /* !__local___localdep_wcsend_defined */
+/* Dependency: wcslen from wchar */
+#ifndef __local___localdep_wcslen_defined
+#define __local___localdep_wcslen_defined 1
+#ifdef __wcslen_defined
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__NAMESPACE_GLB_USING(wcslen)
+#define __localdep_wcslen wcslen
+#elif defined(__std_wcslen_defined)
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__NAMESPACE_STD_USING(wcslen)
+#define __localdep_wcslen wcslen
+#elif defined(__CRT_HAVE_wcslen)
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
+#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 4
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
+#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 2
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__CHAR16_TYPE__ const *__restrict __string),wcslen,(__string))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wcslen.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_wcslen __LIBC_LOCAL_NAME(wcslen)
+#endif /* !... */
+#endif /* !__local___localdep_wcslen_defined */
+/* Dependency: wmemcpy from wchar */
+#ifndef __local___localdep_wmemcpy_defined
+#define __local___localdep_wmemcpy_defined 1
 #ifdef __CRT_HAVE_wmemcpy
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
+#elif defined(__CRT_HAVE_DOS$wmemcpy) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
+#elif defined(__CRT_HAVE_DOS$wmemcpy) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__CHAR16_TYPE__ *__restrict __dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
 #elif defined(__CRT_HAVE_memcpyw) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyw,(__dst,__src,__num_chars))
 #elif defined(__CRT_HAVE_memcpyl) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyl,(__dst,__src,__num_chars))
-#else /* LIBC: wmemcpy */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/wmemcpy.h>
-#define __localdep_wmemcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcpy))
-#endif /* wmemcpy... */
-#endif /* !____localdep_wmemcpy_defined */
-
-/* Dependency: "wcsend" from "wchar" */
-#ifndef ____localdep_wcsend_defined
-#define ____localdep_wcsend_defined 1
-#ifdef __CRT_HAVE_wcsend
-/* Same as `STR+wcslen(STR)' */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsend,(__WCHAR_TYPE__ const *__restrict __string),wcsend,(__string))
-#else /* LIBC: wcsend */
-#include <local/wchar/wcsend.h>
-/* Same as `STR+wcslen(STR)' */
-#define __localdep_wcsend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsend))
-#endif /* wcsend... */
-#endif /* !____localdep_wcsend_defined */
-
-/* Dependency: "wcslen" from "wchar" */
-#ifndef ____localdep_wcslen_defined
-#define ____localdep_wcslen_defined 1
-#ifdef __std___localdep_wcslen_defined
-__NAMESPACE_STD_USING(__localdep_wcslen)
-#elif defined(__CRT_HAVE_wcslen)
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
-#else /* LIBC: wcslen */
-#include <local/wchar/wcslen.h>
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_wcslen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))
-#endif /* wcslen... */
-#endif /* !____localdep_wcslen_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_wmemcpy __LIBC_LOCAL_NAME(wmemcpy)
+#endif /* !... */
+#endif /* !__local___localdep_wmemcpy_defined */
 __LOCAL_LIBC(wcscat) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscat))(__WCHAR_TYPE__ *__restrict __buf,
-                                                    __WCHAR_TYPE__ const *__restrict __src) {
-#line 444 "kos/src/libc/magic/wchar.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscat))(__WCHAR_TYPE__ *__restrict __buf, __WCHAR_TYPE__ const *__restrict __src) {
 	__localdep_wmemcpy(__localdep_wcsend(__buf), __src, __localdep_wcslen(__src) + 1);
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcscat_defined
+#define __local___localdep_wcscat_defined 1
+#define __localdep_wcscat __LIBC_LOCAL_NAME(wcscat)
+#endif /* !__local___localdep_wcscat_defined */
 #endif /* !__local_wcscat_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa999efb3 */
+/* HASH CRC-32:0x6c522d15 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,39 +21,43 @@
 #ifndef __local___mempcpy_chk_defined
 #define __local___mempcpy_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "mempcpy" from "string" */
-#ifndef ____localdep_mempcpy_defined
-#define ____localdep_mempcpy_defined 1
-#ifdef __fast_mempcpy_defined
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempcpy from string */
+#ifndef __local___localdep_mempcpy_defined
+#define __local___localdep_mempcpy_defined 1
+#ifdef __mempcpy_defined
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))
+__NAMESPACE_GLB_USING(mempcpy)
+#define __localdep_mempcpy mempcpy
+#elif defined(__fast_mempcpy_defined)
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
+__NAMESPACE_FAST_USING(mempcpy)
+#define __localdep_mempcpy __LIBC_FAST_NAME(mempcpy)
 #elif defined(__CRT_HAVE_mempcpy)
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
-#else /* LIBC: mempcpy */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempcpy.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))
-#endif /* mempcpy... */
-#endif /* !____localdep_mempcpy_defined */
-
+#define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
+#endif /* !... */
+#endif /* !__local___localdep_mempcpy_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__mempcpy_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempcpy_chk))(void *__restrict __dst,
-                                                           void const *__restrict __src,
-                                                           __SIZE_TYPE__ __n_bytes,
-                                                           __SIZE_TYPE__ __dst_objsize) {
-#line 47 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempcpy_chk))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("mempcpy", __dst, __n_bytes, __dst_objsize);
 	return __localdep_mempcpy(__dst, __src, __n_bytes);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___mempcpy_chk_defined
+#define __local___localdep___mempcpy_chk_defined 1
+#define __localdep___mempcpy_chk __LIBC_LOCAL_NAME(__mempcpy_chk)
+#endif /* !__local___localdep___mempcpy_chk_defined */
 #endif /* !__local___mempcpy_chk_defined */

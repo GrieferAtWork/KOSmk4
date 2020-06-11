@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e0d1c01 */
+/* HASH CRC-32:0x66cc5418 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,11 @@ __NAMESPACE_LOCAL_BEGIN
  *             ... `FE_TOWARDZERO': trunc() */
 __LOCAL_LIBC(fegetround) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fegetround))(void) {
-#line 141 "kos/src/libc/magic/fenv.c"
 	return __inline_fegetround();
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_fegetround_defined
+#define __local___localdep_fegetround_defined 1
+#define __localdep_fegetround __LIBC_LOCAL_NAME(fegetround)
+#endif /* !__local___localdep_fegetround_defined */
 #endif /* !__local_fegetround_defined */

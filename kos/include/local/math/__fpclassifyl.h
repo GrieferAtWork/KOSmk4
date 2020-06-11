@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f2d361f */
+/* HASH CRC-32:0x146aa7dd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,47 +19,55 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local___fpclassifyl_defined
-#include <ieee754.h>
-#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass) || defined(__CRT_HAVE_fpclassify)
 #define __local___fpclassifyl_defined 1
 #include <__crt.h>
-#include <libm/fpclassify.h>
-/* Dependency: "__fpclassify" from "math" */
-#ifndef ____localdep___fpclassify_defined
-#define ____localdep___fpclassify_defined 1
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass) || defined(__CRT_HAVE_fpclassify) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: __fpclassify from math */
+#ifndef __local___localdep___fpclassify_defined
+#define __local___localdep___fpclassify_defined 1
 #ifdef __CRT_HAVE___fpclassify
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __x),__fpclassify,(__x))
 #elif defined(__CRT_HAVE__dclass)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __x),_dclass,(__x))
 #elif defined(__CRT_HAVE_fpclassify)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __x),fpclassify,(__x))
-#else /* LIBC: __fpclassify */
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
 #include <local/math/__fpclassify.h>
-#define __localdep___fpclassify (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassify))
-#else /* CUSTOM: __fpclassify */
-#undef ____localdep___fpclassify_defined
-#endif /* __fpclassify... */
-#endif /* __fpclassify... */
-#endif /* !____localdep___fpclassify_defined */
-
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep___fpclassify __LIBC_LOCAL_NAME(__fpclassify)
+#else /* ... */
+#undef __local___localdep___fpclassify_defined
+#endif /* !... */
+#endif /* !__local___localdep___fpclassify_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/fpclassify.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__fpclassifyl) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassifyl))(__LONGDOUBLE __x) {
-#line 2112 "kos/src/libc/magic/math.c"
-#ifdef __LIBM_MATHFUNL
-	#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+
+
+	
+#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)__x);
 #else /* ... */
 	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
 #endif /* !... */
-#else /* __LIBM_MATHFUNL */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return __localdep___fpclassify((double)__x);
-#endif /* !__LIBM_MATHFUNL */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE___fpclassify || __CRT_HAVE__dclass || __CRT_HAVE_fpclassify */
+#ifndef __local___localdep___fpclassifyl_defined
+#define __local___localdep___fpclassifyl_defined 1
+#define __localdep___fpclassifyl __LIBC_LOCAL_NAME(__fpclassifyl)
+#endif /* !__local___localdep___fpclassifyl_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE___fpclassify || __CRT_HAVE__dclass || __CRT_HAVE_fpclassify || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local___fpclassifyl_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__CRT_HAVE___fpclassify && !__CRT_HAVE__dclass && !__CRT_HAVE_fpclassify && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local___fpclassifyl_defined */

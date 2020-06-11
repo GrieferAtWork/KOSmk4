@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5955bb4a */
+/* HASH CRC-32:0x895869a9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,14 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getchar_defined
-#if !defined(__NO_STDSTREAMS) && ((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked))
 #define __local_getchar_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-#include <local/stdstreams.h>
-/* Dependency: "fgetc" from "stdio" */
-#ifndef ____localdep_fgetc_defined
-#define ____localdep_fgetc_defined 1
+#if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fgetc from stdio */
+#ifndef __local___localdep_fgetc_defined
+#define __local___localdep_fgetc_defined 1
 #if defined(__CRT_HAVE_fgetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Read and return a single character from `STREAM'
  * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
@@ -63,23 +62,31 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restr
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)
+__NAMESPACE_LOCAL_END
 #include <local/stdio/fgetc.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Read and return a single character from `STREAM'
  * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
-#define __localdep_fgetc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc))
-#else /* CUSTOM: fgetc */
-#undef ____localdep_fgetc_defined
-#endif /* fgetc... */
-#endif /* !____localdep_fgetc_defined */
-
+#define __localdep_fgetc __LIBC_LOCAL_NAME(fgetc)
+#else /* ... */
+#undef __local___localdep_fgetc_defined
+#endif /* !... */
+#endif /* !__local___localdep_fgetc_defined */
+__NAMESPACE_LOCAL_END
+#include <local/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Alias for `fgetc(stdin)' */
 __LOCAL_LIBC(getchar) int
 (__LIBCCALL __LIBC_LOCAL_NAME(getchar))(void) __THROWS(...) {
-#line 475 "kos/src/libc/magic/stdio.c"
 	return __localdep_fgetc(__LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__NO_STDSTREAMS && ((__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock || __CRT_HAVE__IO_fread || __CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked) */
+#ifndef __local___localdep_getchar_defined
+#define __local___localdep_getchar_defined 1
+#define __localdep_getchar __LIBC_LOCAL_NAME(getchar)
+#endif /* !__local___localdep_getchar_defined */
+#else /* !__NO_STDSTREAMS && (__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock || __CRT_HAVE__IO_fread) */
+#undef __local_getchar_defined
+#endif /* __NO_STDSTREAMS || (!__CRT_HAVE_fgetc && !__CRT_HAVE_getc && !__CRT_HAVE__IO_getc && !__CRT_HAVE_fgetc_unlocked && !__CRT_HAVE_getc_unlocked && (!__CRT_DOS || !__CRT_HAVE__filbuf) && !__CRT_HAVE_fread && !__CRT_HAVE_fread_unlocked && !__CRT_HAVE__fread_nolock && !__CRT_HAVE__IO_fread) */
 #endif /* !__local_getchar_defined */

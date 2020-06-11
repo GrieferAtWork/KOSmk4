@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36d183ee */
+/* HASH CRC-32:0xfe680646 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,41 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wunlink_defined
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 #define __local_wunlink_defined 1
 #include <__crt.h>
-/* Dependency: "wunlinkat" from "parts.wchar.unistd" */
-#ifndef ____localdep_wunlinkat_defined
-#define ____localdep_wunlinkat_defined 1
+#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wunlinkat) || (defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 2))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wunlinkat from parts.wchar.unistd */
+#ifndef __local___localdep_wunlinkat_defined
+#define __local___localdep_wunlinkat_defined 1
 #ifdef __CRT_HAVE_wunlinkat
-/* >> wunlinkat(2)
+/* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
-#else /* LIBC: wunlinkat */
-#undef ____localdep_wunlinkat_defined
-#endif /* wunlinkat... */
-#endif /* !____localdep_wunlinkat_defined */
-
-__NAMESPACE_LOCAL_BEGIN
-/* >> wunlink(2)
+#elif defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 4
+/* >> unlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__name, __atflag_t __flags),KOS$wunlinkat,(__dfd,__name,__flags))
+#elif defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 2
+/* >> unlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__name, __atflag_t __flags),DOS$wunlinkat,(__dfd,__name,__flags))
+#else /* ... */
+#undef __local___localdep_wunlinkat_defined
+#endif /* !... */
+#endif /* !__local___localdep_wunlinkat_defined */
+/* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __LOCAL_LIBC(wunlink) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wunlink))(__WCHAR_TYPE__ const *__file) {
-#line 724 "kos/src/libc/magic/unistd.c"
 	return __localdep_wunlinkat(__CRT_AT_FDCWD, __file, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && __CRT_HAVE_wunlinkat */
+#ifndef __local___localdep_wunlink_defined
+#define __local___localdep_wunlink_defined 1
+#define __localdep_wunlink __LIBC_LOCAL_NAME(wunlink)
+#endif /* !__local___localdep_wunlink_defined */
+#else /* __CRT_AT_FDCWD && (__CRT_HAVE_wunlinkat || (__CRT_HAVE_DOS$wunlinkat && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$wunlinkat && __SIZEOF_WCHAR_T__ == 2)) */
+#undef __local_wunlink_defined
+#endif /* !__CRT_AT_FDCWD || (!__CRT_HAVE_wunlinkat && (!__CRT_HAVE_DOS$wunlinkat || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$wunlinkat || !__SIZEOF_WCHAR_T__ == 2)) */
 #endif /* !__local_wunlink_defined */

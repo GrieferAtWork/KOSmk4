@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf686816 */
+/* HASH CRC-32:0x534fa3a7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,40 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sleep_defined
-#ifdef __CRT_HAVE__sleep
 #define __local_sleep_defined 1
 #include <__crt.h>
-/* Dependency: "dos_sleep" from "unistd" */
-#ifndef ____localdep_dos_sleep_defined
-#define ____localdep_dos_sleep_defined 1
-#ifdef __CRT_HAVE__sleep
-/* Sleep for up to `DURATION' seconds */
-__CREDIRECT_VOID(,__NOTHROW_RPC,__localdep_dos_sleep,(__UINT32_TYPE__ __duration),_sleep,(__duration))
-#else /* LIBC: _sleep */
-#undef ____localdep_dos_sleep_defined
-#endif /* dos_sleep... */
-#endif /* !____localdep_dos_sleep_defined */
-
+#if defined(__CRT_HAVE__sleep) || defined(__CRT_HAVE_sleep)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: dos_sleep from dos */
+#ifndef __local___localdep_dos_sleep_defined
+#define __local___localdep_dos_sleep_defined 1
+#ifdef __sleep_defined
+/* Sleep for up to `duration' seconds */
+__NAMESPACE_GLB_USING(sleep)
+#define __localdep_dos_sleep sleep
+#elif defined(__CRT_HAVE__sleep)
+/* Sleep for up to `duration' seconds */
+__CREDIRECT_VOID(,__NOTHROW_RPC,__localdep_dos_sleep,(unsigned int __duration),_sleep,(__duration))
+#elif defined(__CRT_HAVE_sleep)
+/* Sleep for up to `duration' seconds */
+__CREDIRECT_VOID(,__NOTHROW_RPC,__localdep_dos_sleep,(unsigned int __duration),sleep,(__duration))
+#else /* ... */
+#undef __local___localdep_dos_sleep_defined
+#endif /* !... */
+#endif /* !__local___localdep_dos_sleep_defined */
 /* >> sleep(3)
  * Sleep for up to `SECONDS' seconds */
 __LOCAL_LIBC(sleep) unsigned int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sleep))(unsigned int __seconds) {
-#line 355 "kos/src/libc/magic/unistd.c"
 	__localdep_dos_sleep((__UINT32_TYPE__)__seconds);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE__sleep */
+#ifndef __local___localdep_sleep_defined
+#define __local___localdep_sleep_defined 1
+#define __localdep_sleep __LIBC_LOCAL_NAME(sleep)
+#endif /* !__local___localdep_sleep_defined */
+#else /* __CRT_HAVE__sleep || __CRT_HAVE_sleep */
+#undef __local_sleep_defined
+#endif /* !__CRT_HAVE__sleep && !__CRT_HAVE_sleep */
 #endif /* !__local_sleep_defined */

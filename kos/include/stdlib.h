@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8868a081 */
+/* HASH CRC-32:0x2f3a83f1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -309,7 +309,10 @@ __NAMESPACE_STD_USING(lldiv_t)
 
 #ifndef __COMPAR_FN_T
 #define __COMPAR_FN_T 1
+#ifndef ____compar_fn_t_defined
+#define ____compar_fn_t_defined 1
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
+#endif /* !____compar_fn_t_defined */
 #ifdef __USE_GNU
 typedef __compar_fn_t comparison_fn_t;
 #endif /* __USE_GNU */
@@ -3520,8 +3523,6 @@ __CDECLARE_VOID(,__NOTHROW_NCX,_beep,(unsigned int __freq, unsigned int __durati
 
 #ifndef _CRT_WPERROR_DEFINED
 #define _CRT_WPERROR_DEFINED 1
-#ifndef ___wperror_defined
-#define ___wperror_defined 1
 #ifdef __CRT_HAVE__wperror
 __CDECLARE_VOID(__ATTR_COLD,__THROWING,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message))
 #elif defined(__CRT_HAVE_DOS$_wperror) && __SIZEOF_WCHAR_T__ == 4
@@ -3529,9 +3530,8 @@ __CREDIRECT_VOID_KOS(__ATTR_COLD,__THROWING,_wperror,(__CHAR32_TYPE__ const *__r
 #elif defined(__CRT_HAVE_DOS$_wperror) && __SIZEOF_WCHAR_T__ == 2
 __CREDIRECT_VOID_DOS(__ATTR_COLD,__THROWING,_wperror,(__CHAR16_TYPE__ const *__restrict __message),_wperror,(__message))
 #else /* ... */
-#undef ___wperror_defined
+#undef _CRT_WPERROR_DEFINED
 #endif /* !... */
-#endif /* !___wperror_defined */
 #endif /* !_CRT_WPERROR_DEFINED */
 #ifdef __CRT_HAVE_sleep
 /* >> sleep(3)
@@ -3688,8 +3688,8 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_NCX,_wdupenv_s,(char
 #undef ___wdupenv_s_defined
 #endif /* !... */
 #endif /* !___wdupenv_s_defined */
-#ifndef ___wsystem_defined
-#define ___wsystem_defined 1
+#ifndef _CRT_WSYSTEM_DEFINED
+#define _CRT_WSYSTEM_DEFINED 1
 #ifdef __CRT_HAVE_wsystem
 __CREDIRECT(,int,__NOTHROW_RPC,_wsystem,(wchar_t const *__cmd),wsystem,(__cmd))
 #elif defined(__CRT_HAVE_DOS$wsystem) && __SIZEOF_WCHAR_T__ == 4
@@ -3697,9 +3697,9 @@ __CREDIRECT_KOS(,int,__NOTHROW_RPC,_wsystem,(char32_t const *__cmd),wsystem,(__c
 #elif defined(__CRT_HAVE_DOS$_wsystem) && __SIZEOF_WCHAR_T__ == 2
 __CREDIRECT_DOS(,int,__NOTHROW_RPC,_wsystem,(char16_t const *__cmd),_wsystem,(__cmd))
 #else /* ... */
-#undef ___wsystem_defined
+#undef _CRT_WSYSTEM_DEFINED
 #endif /* !... */
-#endif /* !___wsystem_defined */
+#endif /* !_CRT_WSYSTEM_DEFINED */
 #ifndef __wcstol_defined
 #define __wcstol_defined 1
 #ifdef __std_wcstol_defined

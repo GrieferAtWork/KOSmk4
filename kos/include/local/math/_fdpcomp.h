@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x570132fa */
+/* HASH CRC-32:0xefd76fd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,26 +19,25 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__fdpcomp_defined
-#ifdef __CRT_HAVE__dpcomp
 #define __local__fdpcomp_defined 1
 #include <__crt.h>
-/* Dependency: "_dpcomp" from "math" */
-#ifndef ____localdep__dpcomp_defined
-#define ____localdep__dpcomp_defined 1
 #ifdef __CRT_HAVE__dpcomp
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__dpcomp,(double __x, double __y),_dpcomp,(__x,__y))
-#else /* LIBC: _dpcomp */
-#undef ____localdep__dpcomp_defined
-#endif /* _dpcomp... */
-#endif /* !____localdep__dpcomp_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _dpcomp from math */
+#if !defined(__local___localdep__dpcomp_defined) && defined(__CRT_HAVE__dpcomp)
+#define __local___localdep__dpcomp_defined 1
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__dpcomp,(double __x, double __y),_dpcomp,(__x,__y))
+#endif /* !__local___localdep__dpcomp_defined && __CRT_HAVE__dpcomp */
 __LOCAL_LIBC(_fdpcomp) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fdpcomp))(float __x,
-                                                      float __y) {
-#line 2151 "kos/src/libc/magic/math.c"
-	return (int)__localdep__dpcomp((double)__x, (double)__y);
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fdpcomp))(float __x, float __y) {
+	return __localdep__dpcomp((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE__dpcomp */
+#ifndef __local___localdep__fdpcomp_defined
+#define __local___localdep__fdpcomp_defined 1
+#define __localdep__fdpcomp __LIBC_LOCAL_NAME(_fdpcomp)
+#endif /* !__local___localdep__fdpcomp_defined */
+#else /* __CRT_HAVE__dpcomp */
+#undef __local__fdpcomp_defined
+#endif /* !__CRT_HAVE__dpcomp */
 #endif /* !__local__fdpcomp_defined */

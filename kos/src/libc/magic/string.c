@@ -496,8 +496,8 @@ stpncpy:([[nonnull]] char *__restrict buf,
 	return buf + srclen;
 }
 
-__stpcpy(*) = stpcpy;
-__stpncpy(*) = stpncpy;
+%[insert:function(__stpcpy = stpcpy)]
+%[insert:function(__stpncpy = stpncpy)]
 
 [[ATTR_WUNUSED, ATTR_PURE, export_alias("_strcoll_l", "__strcoll_l")]]
 [[section(".text.crt.unicode.locale.memory")]]
@@ -779,7 +779,7 @@ int strverscmp([[nonnull]] char const *s1,
 }
 
 
-__mempcpy(*) = mempcpy;
+%[insert:function(__mempcpy = mempcpy)]
 
 @@Same as `memcpy', but return `DST + N_BYTES', rather than `DST'
 [[guard, libc, kernel, fast, ATTR_LEAF, alias("__mempcpy")]]
@@ -871,7 +871,7 @@ char *strsep([[nonnull]] char **__restrict stringp,
 
 %[insert:extern(bcopy)]
 %[insert:extern(bzero)]
-%[insert:extern(bcmp)]
+%[insert:guarded_function(bcmp = memcmp)]
 %[insert:extern(index)]
 %[insert:extern(rindex)]
 
@@ -899,6 +899,7 @@ int strncasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t 
 }
 
 
+[[decl_include("<features.h>")]]
 [[ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 [[impl_include("<hybrid/__bit.h>"), export_alias("__ffs")]]
 __STDC_INT_AS_SIZE_T ffs(int i) {
@@ -919,12 +920,14 @@ __STDC_INT_AS_SIZE_T ffs(int i) {
 }
 
 %#ifdef __USE_GNU
+[[decl_include("<features.h>")]]
 [[ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 [[impl_include("<hybrid/__bit.h>")]]
 __STDC_INT_AS_SIZE_T ffsl(long i) {
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned long)i);
 }
 
+[[decl_include("<features.h>")]]
 [[ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 [[impl_include("<hybrid/__bit.h>")]]
 __STDC_INT_AS_SIZE_T ffsll(__LONGLONG i) {
@@ -981,8 +984,8 @@ void *memccpy([[nonnull]] void *__restrict dst,
 
 }
 
-__bzero(*) = bzero;
-__strtok_r(*) = strtok_r;
+%[insert:function(__bzero = bzero)]
+%[insert:function(__strtok_r = strtok_r)]
 
 %
 %#ifdef __USE_STRING_BWLQ
@@ -5149,10 +5152,10 @@ strrev:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 #ifdef __USE_DOS
 }
 
-_memccpy:(*) = memccpy;
-_memicmp:(*) = memcasecmp;
-_memicmp_l:(*) = memcasecmp_l;
-memicmp:(*) = memcasecmp;
+%[insert:function(_memccpy = memccpy)]
+%[insert:function(_memicmp = memcasecmp)]
+%[insert:function(_memicmp_l = memcasecmp_l)]
+%[insert:function(memicmp = memcasecmp)]
 
 [[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
@@ -5328,20 +5331,20 @@ $errno_t strncpy_s(char *dst, $size_t dstsize, char const *src, $size_t maxlen) 
 	return 0;
 }
 
-strtok_s:(*) = strtok_r;
+%[insert:function(strtok_s = strtok_r)]
 %#endif /* __USE_DOS_SLIB */
 
-_strdup:(*) = strdup;
-_stricmp:(*) = strcasecmp;
-_strcmpi:(*) = strcasecmp;
-_stricmp_l:(*) = strcasecmp_l;
-_strcoll_l:(*) = strcoll_l;
-_stricoll:(*) = strcasecoll;
-_stricoll_l:(*) = strcasecoll_l;
-_strncoll:(*) = strncoll;
-_strncoll_l:(*) = strncoll_l;
-_strnicoll:(*) = strncasecoll;
-_strnicoll_l:(*) = strncasecoll_l;
+%[insert:function(_strdup = strdup)]
+%[insert:function(_stricmp = strcasecmp)]
+%[insert:function(_strcmpi = strcasecmp)]
+%[insert:function(_stricmp_l = strcasecmp_l)]
+%[insert:function(_strcoll_l = strcoll_l)]
+%[insert:function(_stricoll = strcasecoll)]
+%[insert:function(_stricoll_l = strcasecoll_l)]
+%[insert:function(_strncoll = strncoll)]
+%[insert:function(_strncoll_l = strncoll_l)]
+%[insert:function(_strnicoll = strncasecoll)]
+%[insert:function(_strnicoll_l = strncasecoll_l)]
 
 [[cp, ATTR_WUNUSED, section(".text.crt.dos.errno")]]
 char *_strerror(char const *message);
@@ -5399,8 +5402,8 @@ $errno_t _strupr_s_l(char *buf, $size_t buflen, $locale_t locale) {
 	return 0;
 }
 
-_strnicmp(*) = strncasecmp;
-_strnicmp_l(*) = strncasecmp_l;
+%[insert:function(_strnicmp = strncasecmp)]
+%[insert:function(_strnicmp_l = strncasecmp_l)]
 
 [[section(".text.crt.dos.string.memory")]]
 [[ATTR_LEAF, impl_include("<parts/errno.h>", "<libc/string.h>")]]
@@ -5431,21 +5434,21 @@ $errno_t _strnset_s(char *__restrict buf, $size_t buflen, int ch, $size_t maxlen
 	return 0;
 }
 
-_strrev(*) = strrev;
-_strxfrm_l(*) = strxfrm_l;
-stricmp(*) = strcasecmp;
-strcmpi(*) = strcasecmp;
-strnicmp(*) = strncasecmp;
+%[insert:function(_strrev = strrev)]
+%[insert:function(_strxfrm_l = strxfrm_l)]
+%[insert:function(stricmp = strcasecmp)]
+%[insert:function(strcmpi = strcasecmp)]
+%[insert:function(strnicmp = strncasecmp)]
 
 /* The following aren't actually defined by DOS, but one might assume that they were */
-_strncmpi(*) = strncasecmp;
-_strncmpi_l(*) = strncasecmp_l;
-strncmpi(*) = strncasecmp;
+%[insert:function(_strncmpi = strncasecmp)]
+%[insert:function(_strncmpi_l = strncasecmp_l)]
+%[insert:function(strncmpi = strncasecmp)]
 
 %
 %#ifndef _WSTRING_DEFINED
 %#define _WSTRING_DEFINED 1
-%[insert:extern(_wcsdup)]
+%[insert:guarded_function(_wcsdup = wcsdup)]
 %[insert:extern(wcscat)]
 %[insert:extern(wcschr)]
 %[insert:extern(wcscmp)]
@@ -5465,49 +5468,49 @@ strncmpi(*) = strncasecmp;
 %[insert:extern(_wcserror_s)]
 %[insert:extern(__wcserror)]
 %[insert:extern(__wcserror_s)]
-%[insert:extern(_wcsicmp)]
-%[insert:extern(_wcsicmp_l)]
-%[insert:extern(_wcsnicmp)]
-%[insert:extern(_wcsnicmp_l)]
+%[insert:guarded_function(_wcsicmp = wcscasecmp)]
+%[insert:guarded_function(_wcsicmp_l = wcscasecmp_l)]
+%[insert:guarded_function(_wcsnicmp = wcsncasecmp)]
+%[insert:guarded_function(_wcsnicmp_l = wcsncasecmp_l)]
 %[insert:extern(_wcsnset_s)]
-%[insert:extern(_wcsnset)]
-%[insert:extern(_wcsrev)]
+%[insert:guarded_function(_wcsnset = wcsnset)]
+%[insert:guarded_function(_wcsrev = wcsrev)]
 %[insert:extern(_wcsset_s)]
-%[insert:extern(_wcsset)]
+%[insert:guarded_function(_wcsset = wcsset)]
 %[insert:extern(_wcslwr_s)]
-%[insert:extern(_wcslwr)]
+%[insert:guarded_function(_wcslwr = wcslwr)]
 %[insert:extern(_wcslwr_s_l)]
-%[insert:extern(_wcslwr_l)]
+%[insert:guarded_function(_wcslwr_l = wcslwr_l)]
 %[insert:extern(_wcsupr_s)]
-%[insert:extern(_wcsupr)]
+%[insert:guarded_function(_wcsupr = wcsupr)]
 %[insert:extern(_wcsupr_s_l)]
-%[insert:extern(_wcsupr_l)]
+%[insert:guarded_function(_wcsupr_l = wcsupr_l)]
 %[insert:extern(wcsxfrm)]
-%[insert:extern(_wcsxfrm_l)]
+%[insert:guarded_function(_wcsxfrm_l = wcsxfrm_l)]
 %[insert:extern(wcscoll)]
-%[insert:extern(_wcscoll_l)]
-%[insert:extern(_wcsicoll)]
-%[insert:extern(_wcsicoll_l)]
-%[insert:extern(_wcsncoll)]
-%[insert:extern(_wcsncoll_l)]
-%[insert:extern(_wcsnicoll)]
-%[insert:extern(_wcsnicoll_l)]
+%[insert:guarded_function(_wcscoll_l = wcscoll_l)]
+%[insert:guarded_function(_wcsicoll = wcscasecoll)]
+%[insert:guarded_function(_wcsicoll_l = wcscasecoll_l)]
+%[insert:guarded_function(_wcsncoll = wcsncasecoll)]
+%[insert:guarded_function(_wcsncoll_l = wcsncoll_l)]
+%[insert:guarded_function(_wcsnicoll = wcsncasecoll)]
+%[insert:guarded_function(_wcsnicoll_l = wcsncasecoll_l)]
 %[insert:extern(wcsdup)]
-%[insert:extern(wcswcs)]
-%[insert:extern(wcsicmp)]
-%[insert:extern(wcsnicmp)]
+%[insert:guarded_function(wcswcs = wcsstr)]
+%[insert:guarded_function(wcsicmp = wcscasecmp)]
+%[insert:guarded_function(wcsnicmp = wcsncasecmp)]
 %[insert:extern(wcsnset)]
 %[insert:extern(wcsrev)]
 %[insert:extern(wcsset)]
 %[insert:extern(wcslwr)]
 %[insert:extern(wcsupr)]
-%[insert:extern(wcsicoll)]
+%[insert:guarded_function(wcsicoll = wcscasecoll)]
 %#ifdef __USE_DOS_SLIB
 %[insert:extern(wcscat_s)]
 %[insert:extern(wcscpy_s)]
 %[insert:extern(wcsncat_s)]
 %[insert:extern(wcsncpy_s)]
-%[insert:extern(wcstok_s)]
+%[insert:guarded_function(wcstok_s = wcstok)]
 %[insert:extern(wcsnlen_s)]
 %#endif  /* __USE_DOS_SLIB */
 %#endif /* !_WSTRING_DEFINED */

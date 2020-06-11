@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9892ccea */
+/* HASH CRC-32:0x6fd2e2ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,61 +19,61 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_unsetenv_defined
-#if defined(__CRT_HAVE_putenv) || defined(__CRT_HAVE__putenv)
 #define __local_unsetenv_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <parts/malloca.h>
-/* Dependency: "strlen" from "string" */
-#ifndef ____localdep_strlen_defined
-#define ____localdep_strlen_defined 1
+#if defined(__CRT_HAVE_putenv) || defined(__CRT_HAVE__putenv)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* LIBC: strlen */
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
 #include <local/string/strlen.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
-#endif /* strlen... */
-#endif /* !____localdep_strlen_defined */
-
-/* Dependency: "memcpyc" from "string" */
-#ifndef ____localdep_memcpyc_defined
-#define ____localdep_memcpyc_defined 1
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
+/* Dependency: memcpyc from string */
+#ifndef __local___localdep_memcpyc_defined
+#define __local___localdep_memcpyc_defined 1
 #ifdef __fast_memcpyc_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))
+__NAMESPACE_FAST_USING(memcpyc)
+#define __localdep_memcpyc __LIBC_FAST_NAME(memcpyc)
 #elif defined(__CRT_HAVE_memcpyc)
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
-#else /* LIBC: memcpyc */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))
-#endif /* memcpyc... */
-#endif /* !____localdep_memcpyc_defined */
-
-/* Dependency: "putenv" */
-#ifndef ____localdep_putenv_defined
-#define ____localdep_putenv_defined 1
+#define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
+#endif /* !... */
+#endif /* !__local___localdep_memcpyc_defined */
+/* Dependency: putenv from stdlib */
+#ifndef __local___localdep_putenv_defined
+#define __local___localdep_putenv_defined 1
 #ifdef __CRT_HAVE_putenv
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_putenv,(char *__string),putenv,(__string))
 #elif defined(__CRT_HAVE__putenv)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_putenv,(char *__string),_putenv,(__string))
-#else /* LIBC: putenv */
-#undef ____localdep_putenv_defined
-#endif /* putenv... */
-#endif /* !____localdep_putenv_defined */
-
+#else /* ... */
+#undef __local___localdep_putenv_defined
+#endif /* !... */
+#endif /* !__local___localdep_putenv_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(unsetenv) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unsetenv))(char const *__varname) {
-#line 1513 "kos/src/libc/magic/stdlib.c"
 	int __result;
 	char *__copy;
 	__SIZE_TYPE__ __namelen;
@@ -91,5 +91,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unsetenv))(char const *__varname) {
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_putenv || __CRT_HAVE__putenv */
+#ifndef __local___localdep_unsetenv_defined
+#define __local___localdep_unsetenv_defined 1
+#define __localdep_unsetenv __LIBC_LOCAL_NAME(unsetenv)
+#endif /* !__local___localdep_unsetenv_defined */
+#else /* __CRT_HAVE_putenv || __CRT_HAVE__putenv */
+#undef __local_unsetenv_defined
+#endif /* !__CRT_HAVE_putenv && !__CRT_HAVE__putenv */
 #endif /* !__local_unsetenv_defined */

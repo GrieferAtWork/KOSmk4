@@ -135,7 +135,7 @@ int ntp_adjtime32([[nonnull]] struct $timex32 *__restrict tntx);
 
 
 
-__adjtimex(*) = adjtimex;
+%[insert:function(__adjtimex = adjtimex)]
 
 [[export_as("__adjtimex"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("adjtimex64", "__adjtimex64")]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa884a1e8 */
+/* HASH CRC-32:0xe049fc45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,39 +21,35 @@
 #ifndef __local_format_sprintf_printer_defined
 #define __local_format_sprintf_printer_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "mempcpyc" from "string" */
-#ifndef ____localdep_mempcpyc_defined
-#define ____localdep_mempcpyc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempcpyc from string */
+#ifndef __local___localdep_mempcpyc_defined
+#define __local___localdep_mempcpyc_defined 1
 #ifdef __fast_mempcpyc_defined
 /* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
-#define __localdep_mempcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyc))
+__NAMESPACE_FAST_USING(mempcpyc)
+#define __localdep_mempcpyc __LIBC_FAST_NAME(mempcpyc)
 #elif defined(__CRT_HAVE_mempcpyc)
 /* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
-#else /* LIBC: mempcpyc */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempcpyc.h>
-/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
-#define __localdep_mempcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyc))
-#endif /* mempcpyc... */
-#endif /* !____localdep_mempcpyc_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+#define __localdep_mempcpyc __LIBC_LOCAL_NAME(mempcpyc)
+#endif /* !... */
+#endif /* !__local___localdep_mempcpyc_defined */
 /* Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 __LOCAL_LIBC(format_sprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_sprintf_printer))(/*char ***/ void *__arg,
-                                                                    /*utf-8*/ char const *__restrict __data,
-                                                                    __SIZE_TYPE__ __datalen) {
-#line 994 "kos/src/libc/magic/format-printer.c"
-
-
-
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_sprintf_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	*(char **)__arg = (char *)__localdep_mempcpyc(*(char **)__arg, __data, __datalen, sizeof(char));
-
 	return (__SSIZE_TYPE__)__datalen;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_sprintf_printer_defined
+#define __local___localdep_format_sprintf_printer_defined 1
+#define __localdep_format_sprintf_printer __LIBC_LOCAL_NAME(format_sprintf_printer)
+#endif /* !__local___localdep_format_sprintf_printer_defined */
 #endif /* !__local_format_sprintf_printer_defined */

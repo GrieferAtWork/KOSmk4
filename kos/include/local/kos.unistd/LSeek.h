@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70b5b3fa */
+/* HASH CRC-32:0x65691880 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,25 +19,21 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_LSeek_defined
-#if defined(__CRT_HAVE_LSeek) || defined(__CRT_HAVE_LSeek64)
 #define __local_LSeek_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_LSeek) || defined(__CRT_HAVE_LSeek64)
 #include <kos/anno.h>
-/* Dependency: "LSeek32" from "kos.unistd" */
-#ifndef ____localdep_LSeek32_defined
-#define ____localdep_LSeek32_defined 1
-#ifdef __CRT_HAVE_LSeek
-/* >> lseek32(2)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: LSeek32 from kos.unistd */
+#if !defined(__local___localdep_LSeek32_defined) && defined(__CRT_HAVE_LSeek)
+#define __local___localdep_LSeek32_defined 1
+/* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__pos32_t,__THROWING,__localdep_LSeek32,(__fd_t __fd, __off32_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
-#else /* LIBC: LSeek */
-#undef ____localdep_LSeek32_defined
-#endif /* LSeek32... */
-#endif /* !____localdep_LSeek32_defined */
-
-/* Dependency: "LSeek64" from "kos.unistd" */
-#ifndef ____localdep_LSeek64_defined
-#define ____localdep_LSeek64_defined 1
+#endif /* !__local___localdep_LSeek32_defined && __CRT_HAVE_LSeek */
+/* Dependency: LSeek64 from kos.unistd */
+#ifndef __local___localdep_LSeek64_defined
+#define __local___localdep_LSeek64_defined 1
 #ifdef __CRT_HAVE_LSeek64
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
@@ -47,23 +43,20 @@ __CREDIRECT(,__pos64_t,__THROWING,__localdep_LSeek64,(__fd_t __fd, __off64_t __o
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__pos64_t,__THROWING,__localdep_LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek)
+__NAMESPACE_LOCAL_END
 #include <local/kos.unistd/LSeek64.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
-#define __localdep_LSeek64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LSeek64))
-#else /* CUSTOM: LSeek64 */
-#undef ____localdep_LSeek64_defined
-#endif /* LSeek64... */
-#endif /* !____localdep_LSeek64_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_LSeek64 __LIBC_LOCAL_NAME(LSeek64)
+#else /* ... */
+#undef __local___localdep_LSeek64_defined
+#endif /* !... */
+#endif /* !__local___localdep_LSeek64_defined */
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __LOCAL_LIBC(LSeek) __FS_TYPE(pos)
-(__LIBCCALL __LIBC_LOCAL_NAME(LSeek))(__fd_t __fd,
-                                      __FS_TYPE(off) __offset,
-                                      int __whence) __THROWS(...) {
-#line 208 "kos/src/libc/magic/kos.unistd.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(LSeek))(__fd_t __fd, __FS_TYPE(off) __offset, int __whence) __THROWS(...) {
 #ifdef __CRT_HAVE_LSeek
 	return __localdep_LSeek32(__fd, (__off32_t)__offset, __whence);
 #else /* __CRT_HAVE_LSeek */
@@ -71,5 +64,11 @@ __LOCAL_LIBC(LSeek) __FS_TYPE(pos)
 #endif /* !__CRT_HAVE_LSeek */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_LSeek || __CRT_HAVE_LSeek64 */
+#ifndef __local___localdep_LSeek_defined
+#define __local___localdep_LSeek_defined 1
+#define __localdep_LSeek __LIBC_LOCAL_NAME(LSeek)
+#endif /* !__local___localdep_LSeek_defined */
+#else /* __CRT_HAVE_LSeek || __CRT_HAVE_LSeek64 */
+#undef __local_LSeek_defined
+#endif /* !__CRT_HAVE_LSeek && !__CRT_HAVE_LSeek64 */
 #endif /* !__local_LSeek_defined */

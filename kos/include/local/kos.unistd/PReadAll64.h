@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaebfe0ce */
+/* HASH CRC-32:0xf6529874 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_PReadAll64_defined
-#if defined(__CRT_HAVE_PRead) || defined(__CRT_HAVE_PRead64)
 #define __local_PReadAll64_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 #include <kos/anno.h>
-/* Dependency: "PRead64" from "kos.unistd" */
-#ifndef ____localdep_PRead64_defined
-#define ____localdep_PRead64_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: PRead64 from kos.unistd */
+#ifndef __local___localdep_PRead64_defined
+#define __local___localdep_PRead64_defined 1
 #ifdef __CRT_HAVE_PRead64
 /* >> pread64(2)
  * Read data from a file at a specific offset */
@@ -35,24 +36,20 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PRead64,(__f
  * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead)
+__NAMESPACE_LOCAL_END
 #include <local/kos.unistd/PRead64.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> pread64(2)
  * Read data from a file at a specific offset */
-#define __localdep_PRead64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PRead64))
-#else /* CUSTOM: PRead64 */
-#undef ____localdep_PRead64_defined
-#endif /* PRead64... */
-#endif /* !____localdep_PRead64_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_PRead64 __LIBC_LOCAL_NAME(PRead64)
+#else /* ... */
+#undef __local___localdep_PRead64_defined
+#endif /* !... */
+#endif /* !__local___localdep_PRead64_defined */
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __LOCAL_LIBC(PReadAll64) __ATTR_NONNULL((2)) __SIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(PReadAll64))(__fd_t __fd,
-                                           void *__buf,
-                                           __SIZE_TYPE__ __bufsize,
-                                           __pos64_t __offset) __THROWS(...) {
-#line 377 "kos/src/libc/magic/kos.unistd.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(PReadAll64))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset) __THROWS(...) {
 	__SIZE_TYPE__ __result, __temp;
 	__result = __localdep_PRead64(__fd, __buf, __bufsize, __offset);
 	if (__result != 0 && (__SIZE_TYPE__)__result < __bufsize) {
@@ -74,5 +71,11 @@ __LOCAL_LIBC(PReadAll64) __ATTR_NONNULL((2)) __SIZE_TYPE__
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_PRead || __CRT_HAVE_PRead64 */
+#ifndef __local___localdep_PReadAll64_defined
+#define __local___localdep_PReadAll64_defined 1
+#define __localdep_PReadAll64 __LIBC_LOCAL_NAME(PReadAll64)
+#endif /* !__local___localdep_PReadAll64_defined */
+#else /* __CRT_HAVE_PRead64 || __CRT_HAVE_PRead */
+#undef __local_PReadAll64_defined
+#endif /* !__CRT_HAVE_PRead64 && !__CRT_HAVE_PRead */
 #endif /* !__local_PReadAll64_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8585694 */
+/* HASH CRC-32:0x3184ddfd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,33 +19,46 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_hdestroy_r_defined
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #define __local_hdestroy_r_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-/* Dependency: "free" */
-#ifndef ____localdep_free_defined
-#define ____localdep_free_defined 1
-#ifdef __std___localdep_free_defined
-__NAMESPACE_STD_USING(__localdep_free)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: free from stdlib */
+#ifndef __local___localdep_free_defined
+#define __local___localdep_free_defined 1
+#ifdef __free_defined
+__NAMESPACE_GLB_USING(free)
+#define __localdep_free free
+#elif defined(__std_free_defined)
+__NAMESPACE_STD_USING(free)
+#define __localdep_free free
 #elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
-#else /* LIBC: free */
-#undef ____localdep_free_defined
-#endif /* free... */
-#endif /* !____localdep_free_defined */
-
+#else /* ... */
+#undef __local___localdep_free_defined
+#endif /* !... */
+#endif /* !__local___localdep_free_defined */
+__NAMESPACE_LOCAL_END
+#ifndef __hsearch_data_defined
+#define __hsearch_data_defined 1
+struct _ENTRY;
+struct hsearch_data {
+	struct _ENTRY  *table;
+	__UINT32_TYPE__ size;
+	__UINT32_TYPE__ filled;
+};
+#endif /* !__hsearch_data_defined */
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __LOCAL_LIBC(hdestroy_r) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hdestroy_r))(struct hsearch_data *__htab) {
-#line 365 "kos/src/libc/magic/search.c"
 	if (__htab == __NULLPTR) {
-#ifdef __EINVAL
+#ifdef EINVAL
 		__libc_seterrno(__EINVAL);
 #endif /* EINVAL */
 		return;
@@ -54,5 +67,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hdestroy_r))(struct hsearch_data *__h
 	__htab->table = __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#ifndef __local___localdep_hdestroy_r_defined
+#define __local___localdep_hdestroy_r_defined 1
+#define __localdep_hdestroy_r __LIBC_LOCAL_NAME(hdestroy_r)
+#endif /* !__local___localdep_hdestroy_r_defined */
+#else /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#undef __local_hdestroy_r_defined
+#endif /* !__CRT_HAVE_free && !__CRT_HAVE_cfree */
 #endif /* !__local_hdestroy_r_defined */

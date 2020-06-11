@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf493006a */
+/* HASH CRC-32:0x189cd810 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,28 @@
 #ifndef __local_iswupper_defined
 #define __local_iswupper_defined 1
 #include <__crt.h>
-/* Dependency: "isupper" from "ctype" */
-#ifndef ____localdep_isupper_defined
-#define ____localdep_isupper_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: isupper from ctype */
+#ifndef __local___localdep_isupper_defined
+#define __local___localdep_isupper_defined 1
 #if __has_builtin(__builtin_isupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isupper)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isupper,(int __ch),isupper,{ return __builtin_isupper(__ch); })
 #elif defined(__CRT_HAVE_isupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isupper,(int __ch),isupper,(__ch))
-#else /* LIBC: isupper */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/isupper.h>
-#define __localdep_isupper (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isupper))
-#endif /* isupper... */
-#endif /* !____localdep_isupper_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_isupper __LIBC_LOCAL_NAME(isupper)
+#endif /* !... */
+#endif /* !__local___localdep_isupper_defined */
 __LOCAL_LIBC(iswupper) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswupper))(__WINT_TYPE__ __wc) {
-#line 154 "kos/src/libc/magic/wctype.c"
 	return __localdep_isupper((int)__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswupper_defined
+#define __local___localdep_iswupper_defined 1
+#define __localdep_iswupper __LIBC_LOCAL_NAME(iswupper)
+#endif /* !__local___localdep_iswupper_defined */
 #endif /* !__local_iswupper_defined */

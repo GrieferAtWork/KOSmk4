@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93d8b095 */
+/* HASH CRC-32:0xb119f58e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,30 +19,33 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_jnl_defined
-#if defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn)
 #define __local_jnl_defined 1
 #include <__crt.h>
-/* Dependency: "jn" */
-#ifndef ____localdep_jn_defined
-#define ____localdep_jn_defined 1
+#if defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: jn from math */
+#ifndef __local___localdep_jn_defined
+#define __local___localdep_jn_defined 1
 #if __has_builtin(__builtin_jn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_jn)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_jn,(int __n, double __x),jn,{ return __builtin_jn(__n, __x); })
 #elif defined(__CRT_HAVE_jn)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_jn,(int __n, double __x),jn,(__n,__x))
 #elif defined(__CRT_HAVE___jn)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_jn,(int __n, double __x),__jn,(__n,__x))
-#else /* LIBC: jn */
-#undef ____localdep_jn_defined
-#endif /* jn... */
-#endif /* !____localdep_jn_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_jn_defined
+#endif /* !... */
+#endif /* !__local___localdep_jn_defined */
 __LOCAL_LIBC(jnl) __ATTR_WUNUSED __LONGDOUBLE
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(jnl))(int __n,
-                                             __LONGDOUBLE __x) {
-#line 1594 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(jnl))(int __n, __LONGDOUBLE __x) {
 	return (__LONGDOUBLE)__localdep_jn(__n, (double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_jn || __CRT_HAVE___jn */
+#ifndef __local___localdep_jnl_defined
+#define __local___localdep_jnl_defined 1
+#define __localdep_jnl __LIBC_LOCAL_NAME(jnl)
+#endif /* !__local___localdep_jnl_defined */
+#else /* __CRT_HAVE_jn || __CRT_HAVE___jn */
+#undef __local_jnl_defined
+#endif /* !__CRT_HAVE_jn && !__CRT_HAVE___jn */
 #endif /* !__local_jnl_defined */

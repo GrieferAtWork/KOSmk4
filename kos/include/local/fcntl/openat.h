@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39e52f34 */
+/* HASH CRC-32:0x2ba878e1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,34 +19,38 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_openat_defined
-#if defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64)
 #define __local_openat_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)
 #include <bits/types.h>
-#include <bits/types.h>
-#include <bits/fcntl.h>
-/* Dependency: "openat64" from "fcntl" */
-#ifndef ____localdep_openat64_defined
-#define ____localdep_openat64_defined 1
-#ifdef __CRT_HAVE_openat64
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: openat64 from fcntl */
+#ifndef __local___localdep_openat64_defined
+#define __local___localdep_openat64_defined 1
+#ifdef __openat64_defined
+#ifdef __cplusplus
+__NAMESPACE_GLB_USING(openat64)
+#else /* __cplusplus */
+#define __localdep_openat64 openat64
+#endif /* !__cplusplus */
+#elif defined(__CRT_HAVE_openat64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_openat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_openat)
+__NAMESPACE_LOCAL_END
 #include <local/fcntl/openat64.h>
-#define __localdep_openat64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(openat64))
-#else /* CUSTOM: openat64 */
-#undef ____localdep_openat64_defined
-#endif /* openat64... */
-#endif /* !____localdep_openat64_defined */
-
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_openat64 __LIBC_LOCAL_NAME(openat64)
+#else /* ... */
+#undef __local___localdep_openat64_defined
+#endif /* !... */
+#endif /* !__local___localdep_openat64_defined */
+__NAMESPACE_LOCAL_END
+#include <bits/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(openat) __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(openat))(__fd_t __dirfd,
-                                                     char const *__filename,
-                                                     __oflag_t __oflags,
-                                                     ...) {
-#line 300 "kos/src/libc/magic/fcntl.c"
+__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(openat))(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) {
 	__fd_t __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __oflags);
@@ -55,5 +59,11 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(openat))(__fd_t __dirfd,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_openat || __CRT_HAVE_openat64 */
+#ifndef __local___localdep_openat_defined
+#define __local___localdep_openat_defined 1
+#define __localdep_openat __LIBC_LOCAL_NAME(openat)
+#endif /* !__local___localdep_openat_defined */
+#else /* __CRT_HAVE_openat64 || __CRT_HAVE_openat */
+#undef __local_openat_defined
+#endif /* !__CRT_HAVE_openat64 && !__CRT_HAVE_openat */
 #endif /* !__local_openat_defined */

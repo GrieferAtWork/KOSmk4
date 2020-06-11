@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74f27aee */
+/* HASH CRC-32:0xa1286126 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,15 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vfprintf_unlocked_defined
-#if (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_file_printer)
 #define __local_vfprintf_unlocked_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: format_vprintf from format-printer */
+#ifndef __local___localdep_format_vprintf_defined
+#define __local___localdep_format_vprintf_defined 1
+#ifdef __CRT_HAVE_format_vprintf
+__NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/format-printer.h>
-/* Dependency: "format_vprintf" from "format-printer" */
-#ifndef ____localdep_format_vprintf_defined
-#define ____localdep_format_vprintf_defined 1
-#ifdef __CRT_HAVE_format_vprintf
+__NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -116,8 +120,10 @@
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
-#else /* LIBC: format_vprintf */
+#else /* __CRT_HAVE_format_vprintf */
+__NAMESPACE_LOCAL_END
 #include <local/format-printer/format_vprintf.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -205,36 +211,38 @@ __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THR
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-#define __localdep_format_vprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vprintf))
-#endif /* format_vprintf... */
-#endif /* !____localdep_format_vprintf_defined */
-
-/* Dependency: "file_printer_unlocked" from "stdio" */
-#ifndef ____localdep_file_printer_unlocked_defined
-#define ____localdep_file_printer_unlocked_defined 1
+#define __localdep_format_vprintf __LIBC_LOCAL_NAME(format_vprintf)
+#endif /* !__CRT_HAVE_format_vprintf */
+#endif /* !__local___localdep_format_vprintf_defined */
+/* Dependency: file_printer_unlocked from stdio */
+#ifndef __local___localdep_file_printer_unlocked_defined
+#define __local___localdep_file_printer_unlocked_defined 1
 #ifdef __CRT_HAVE_file_printer_unlocked
 /* Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_printer_unlocked,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),file_printer_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_printer)
 /* Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_printer_unlocked,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),file_printer,(__arg,__data,__datalen))
-#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_HAVE_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE_fputc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf))) || (defined(__CRT_HAVE__IO_putc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf)))
+#elif defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)
+__NAMESPACE_LOCAL_END
 #include <local/stdio/file_printer_unlocked.h>
-/* Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-#define __localdep_file_printer_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_printer_unlocked))
-#else /* CUSTOM: file_printer_unlocked */
-#undef ____localdep_file_printer_unlocked_defined
-#endif /* file_printer_unlocked... */
-#endif /* !____localdep_file_printer_unlocked_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+#define __localdep_file_printer_unlocked __LIBC_LOCAL_NAME(file_printer_unlocked)
+#else /* ... */
+#undef __local___localdep_file_printer_unlocked_defined
+#endif /* !... */
+#endif /* !__local___localdep_file_printer_unlocked_defined */
 __LOCAL_LIBC(vfprintf_unlocked) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
-(__LIBCCALL __LIBC_LOCAL_NAME(vfprintf_unlocked))(__FILE *__restrict __stream,
-                                                  char const *__restrict __format,
-                                                  __builtin_va_list __args) __THROWS(...) {
-#line 2070 "kos/src/libc/magic/stdio.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(vfprintf_unlocked))(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 	return (__STDC_INT_AS_SSIZE_T)__localdep_format_vprintf(&__localdep_file_printer_unlocked, __stream, __format, __args);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_HAVE_putc && (!__CRT_DOS || !__CRT_HAVE__flsbuf)) || (__CRT_HAVE_fputc && (!__CRT_DOS || !__CRT_HAVE__flsbuf)) || (__CRT_HAVE__IO_putc && (!__CRT_DOS || !__CRT_HAVE__flsbuf)) || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_file_printer */
+#ifndef __local___localdep_vfprintf_unlocked_defined
+#define __local___localdep_vfprintf_unlocked_defined 1
+#define __localdep_vfprintf_unlocked __LIBC_LOCAL_NAME(vfprintf_unlocked)
+#endif /* !__local___localdep_vfprintf_unlocked_defined */
+#else /* __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_HAVE_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE_fgetc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE__IO_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock || __CRT_HAVE__IO_fread || __CRT_HAVE_fread */
+#undef __local_vfprintf_unlocked_defined
+#endif /* !__CRT_HAVE_file_printer_unlocked && !__CRT_HAVE_file_printer && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock && !__CRT_HAVE__IO_fwrite && !__CRT_HAVE_fwrite && !__CRT_HAVE_fgetc_unlocked && !__CRT_HAVE_getc_unlocked && (!__CRT_HAVE_getc || (__CRT_DOS && __CRT_HAVE__filbuf)) && (!__CRT_HAVE_fgetc || (__CRT_DOS && __CRT_HAVE__filbuf)) && (!__CRT_HAVE__IO_getc || (__CRT_DOS && __CRT_HAVE__filbuf)) && (!__CRT_DOS || !__CRT_HAVE__filbuf) && !__CRT_HAVE_fread_unlocked && !__CRT_HAVE__fread_nolock && !__CRT_HAVE__IO_fread && !__CRT_HAVE_fread */
 #endif /* !__local_vfprintf_unlocked_defined */

@@ -46,17 +46,6 @@ global allSystemHeaders: {string: SystemHeader} = Dict();
 global neededLocalFunction: {LocalFunction...} = HashSet();
 
 
-@@REMOVE ME: (Only here to aid in the incremental transition to the new magic generator)
-@@Used to map local header names to their old variants:
-@@  - The new magic defines local variants of UCHAR-functions where they belong,
-@@    that is within the local-folder of the declaring header file.
-@@  - The old magic used to define them alongside their underlying wchar-variants.
-@@This mapping translates from the new UCHAR-paths to the old WCHAR-paths, and should
-@@be removed once the new uchar-specific local files are being generated automatically!
-global REMOVEME_localPathRedirections: {string: string} = Dict();
-
-
-
 
 
 @@Lookup a function, given its name

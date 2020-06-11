@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1df2e450 */
+/* HASH CRC-32:0xde021c82 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,36 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mkstemp_defined
-#if defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp)
 #define __local_mkstemp_defined 1
 #include <__crt.h>
-/* Dependency: "mktemp" */
-#ifndef ____localdep_mktemp_defined
-#define ____localdep_mktemp_defined 1
-#ifdef __CRT_HAVE_mktemp
+#if defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mktemp from stdlib */
+#ifndef __local___localdep_mktemp_defined
+#define __local___localdep_mktemp_defined 1
+#ifdef __mktemp_defined
+__NAMESPACE_GLB_USING(mktemp)
+#define __localdep_mktemp mktemp
+#elif defined(__CRT_HAVE_mktemp)
 __CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_mktemp,(char *__template_),mktemp,(__template_))
 #elif defined(__CRT_HAVE__mktemp)
 __CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_mktemp,(char *__template_),_mktemp,(__template_))
 #elif defined(__CRT_HAVE___mktemp)
 __CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_mktemp,(char *__template_),__mktemp,(__template_))
-#else /* LIBC: mktemp */
-#undef ____localdep_mktemp_defined
-#endif /* mktemp... */
-#endif /* !____localdep_mktemp_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_mktemp_defined
+#endif /* !... */
+#endif /* !__local___localdep_mktemp_defined */
 __LOCAL_LIBC(mkstemp) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mkstemp))(char *__template_) {
-#line 1618 "kos/src/libc/magic/stdlib.c"
 	return __localdep_mktemp(__template_) ? 0 : -1;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_mktemp || __CRT_HAVE__mktemp || __CRT_HAVE___mktemp */
+#ifndef __local___localdep_mkstemp_defined
+#define __local___localdep_mkstemp_defined 1
+#define __localdep_mkstemp __LIBC_LOCAL_NAME(mkstemp)
+#endif /* !__local___localdep_mkstemp_defined */
+#else /* __CRT_HAVE_mktemp || __CRT_HAVE__mktemp || __CRT_HAVE___mktemp */
+#undef __local_mkstemp_defined
+#endif /* !__CRT_HAVE_mktemp && !__CRT_HAVE__mktemp && !__CRT_HAVE___mktemp */
 #endif /* !__local_mkstemp_defined */

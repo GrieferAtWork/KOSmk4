@@ -90,18 +90,20 @@ struct msgbuf {
 }
 
 @@Message queue control operation
+[[decl_include("<features.h>")]]
 int msgctl(int msqid, __STDC_INT_AS_UINT_T cmd, struct msqid_ds *buf);
 
 @@Get messages queue
+[[decl_include("<features.h>")]]
 int msgget(key_t key, __STDC_INT_AS_UINT_T msgflg);
 
 @@Receive message from message queue
-[[cp]]
+[[cp, decl_include("<features.h>")]]
 ssize_t msgrcv(int msqid, void *msgp, size_t msgsz,
                $longptr_t msgtyp, __STDC_INT_AS_UINT_T msgflg);
 
 @@Send message to message queue
-[[cp]]
+[[cp, decl_include("<features.h>")]]
 int msgsnd(int msqid, const void *msgp,
            size_t msgsz, __STDC_INT_AS_UINT_T msgflg);
 

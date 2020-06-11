@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f303a2 */
+/* HASH CRC-32:0x52e81d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(memrevl) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrevl))(void *__restrict __base,
-                                                     __SIZE_TYPE__ __n_dwords) {
-#line 4842 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrevl))(void *__restrict __base, __SIZE_TYPE__ __n_dwords) {
 	__UINT32_TYPE__ *__iter, *__end;
 	__end = (__iter = (__UINT32_TYPE__ *)__base) + __n_dwords;
 	while (__iter < __end) {
@@ -36,4 +34,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrevl))(void *__restrict __base,
 	return (__UINT32_TYPE__ *)__base;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memrevl_defined
+#define __local___localdep_memrevl_defined 1
+#define __localdep_memrevl __LIBC_LOCAL_NAME(memrevl)
+#endif /* !__local___localdep_memrevl_defined */
 #endif /* !__local_memrevl_defined */

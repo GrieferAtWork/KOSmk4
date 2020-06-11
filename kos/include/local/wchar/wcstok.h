@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80f5cf6b */
+/* HASH CRC-32:0xc6a95df7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,38 +21,53 @@
 #ifndef __local_wcstok_defined
 #define __local_wcstok_defined 1
 #include <__crt.h>
-/* Dependency: "wcsspn" from "wchar" */
-#ifndef ____localdep_wcsspn_defined
-#define ____localdep_wcsspn_defined 1
-#ifdef __std___localdep_wcsspn_defined
-__NAMESPACE_STD_USING(__localdep_wcsspn)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcsspn from wchar */
+#ifndef __local___localdep_wcsspn_defined
+#define __local___localdep_wcsspn_defined 1
+#ifdef __wcsspn_defined
+__NAMESPACE_GLB_USING(wcsspn)
+#define __localdep_wcsspn wcsspn
+#elif defined(__std_wcsspn_defined)
+__NAMESPACE_STD_USING(wcsspn)
+#define __localdep_wcsspn wcsspn
 #elif defined(__CRT_HAVE_wcsspn)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
-#else /* LIBC: wcsspn */
+#elif defined(__CRT_HAVE_DOS$wcsspn) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
+#elif defined(__CRT_HAVE_DOS$wcsspn) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/wcsspn.h>
-#define __localdep_wcsspn (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsspn))
-#endif /* wcsspn... */
-#endif /* !____localdep_wcsspn_defined */
-
-/* Dependency: "wcscspn" from "wchar" */
-#ifndef ____localdep_wcscspn_defined
-#define ____localdep_wcscspn_defined 1
-#ifdef __std___localdep_wcscspn_defined
-__NAMESPACE_STD_USING(__localdep_wcscspn)
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcsspn __LIBC_LOCAL_NAME(wcsspn)
+#endif /* !... */
+#endif /* !__local___localdep_wcsspn_defined */
+/* Dependency: wcscspn from wchar */
+#ifndef __local___localdep_wcscspn_defined
+#define __local___localdep_wcscspn_defined 1
+#ifdef __wcscspn_defined
+__NAMESPACE_GLB_USING(wcscspn)
+#define __localdep_wcscspn wcscspn
+#elif defined(__std_wcscspn_defined)
+__NAMESPACE_STD_USING(wcscspn)
+#define __localdep_wcscspn wcscspn
 #elif defined(__CRT_HAVE_wcscspn)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
-#else /* LIBC: wcscspn */
+#elif defined(__CRT_HAVE_DOS$wcscspn) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
+#elif defined(__CRT_HAVE_DOS$wcscspn) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/wcscspn.h>
-#define __localdep_wcscspn (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscspn))
-#endif /* wcscspn... */
-#endif /* !____localdep_wcscspn_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcscspn __LIBC_LOCAL_NAME(wcscspn)
+#endif /* !... */
+#endif /* !__local___localdep_wcscspn_defined */
 __LOCAL_LIBC(wcstok) __ATTR_NONNULL((2, 3)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstok))(__WCHAR_TYPE__ *__string,
-                                                    __WCHAR_TYPE__ const *__restrict __delim,
-                                                    __WCHAR_TYPE__ **__restrict __save_ptr) {
-#line 566 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstok))(__WCHAR_TYPE__ *__string, __WCHAR_TYPE__ const *__restrict __delim, __WCHAR_TYPE__ **__restrict __save_ptr) {
 	__WCHAR_TYPE__ *__end;
 	if (!__string)
 		__string = *__save_ptr;
@@ -75,4 +90,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstok))(__WCHAR_TYPE__ *__string,
 	return __string;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcstok_defined
+#define __local___localdep_wcstok_defined 1
+#define __localdep_wcstok __LIBC_LOCAL_NAME(wcstok)
+#endif /* !__local___localdep_wcstok_defined */
 #endif /* !__local_wcstok_defined */

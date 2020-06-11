@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x831d267a */
+/* HASH CRC-32:0xaae6a0f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,24 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pow_defined
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_pow_defined 1
 #include <__crt.h>
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <bits/math-vector.h>
 #include <libm/finite.h>
-
 #include <libm/isnan.h>
-
 #include <libm/matherr.h>
-
 #include <libm/pow.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X to the Y power */
-__LOCAL_LIBC(pow) __DECL_SIMD_pow __ATTR_WUNUSED double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pow))(double __x,
-                                             double __y) {
-#line 533 "kos/src/libc/magic/math.c"
+__LOCAL_LIBC(pow) __ATTR_WUNUSED __DECL_SIMD_pow double
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pow))(double __x, double __y) {
 	double __result;
 	__result = __LIBM_MATHFUN2(pow, __x, __y);
 	/*
@@ -87,5 +82,11 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pow))(double __x,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#ifndef __local___localdep_pow_defined
+#define __local___localdep_pow_defined 1
+#define __localdep_pow __LIBC_LOCAL_NAME(pow)
+#endif /* !__local___localdep_pow_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_pow_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_pow_defined */

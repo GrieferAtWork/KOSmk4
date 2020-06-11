@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfae75291 */
+/* HASH CRC-32:0x64651a36 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,10 +21,14 @@
 #ifndef __local_strncasecoll_defined
 #define __local_strncasecoll_defined 1
 #include <__crt.h>
-/* Dependency: "strncasecmp" from "string" */
-#ifndef ____localdep_strncasecmp_defined
-#define ____localdep_strncasecmp_defined 1
-#if __has_builtin(__builtin_strncasecmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncasecmp)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strncasecmp from string */
+#ifndef __local___localdep_strncasecmp_defined
+#define __local___localdep_strncasecmp_defined 1
+#ifdef __strncasecmp_defined
+__NAMESPACE_GLB_USING(strncasecmp)
+#define __localdep_strncasecmp strncasecmp
+#elif __has_builtin(__builtin_strncasecmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncasecmp)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncasecmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncasecmp,{ return __builtin_strncasecmp(__s1, __s2, __maxlen); })
 #elif defined(__CRT_HAVE_strncasecmp)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncasecmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncasecmp,(__s1,__s2,__maxlen))
@@ -36,19 +40,20 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncasecmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),_strncmpi,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_strncmpi)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncasecmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncmpi,(__s1,__s2,__maxlen))
-#else /* LIBC: strncasecmp */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/strncasecmp.h>
-#define __localdep_strncasecmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncasecmp))
-#endif /* strncasecmp... */
-#endif /* !____localdep_strncasecmp_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strncasecmp __LIBC_LOCAL_NAME(strncasecmp)
+#endif /* !... */
+#endif /* !__local___localdep_strncasecmp_defined */
 __LOCAL_LIBC(strncasecoll) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strncasecoll))(char const *__s1,
-                                                          char const *__s2,
-                                                          __SIZE_TYPE__ __maxlen) {
-#line 4733 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strncasecoll))(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen) {
 	return __localdep_strncasecmp(__s1, __s2, __maxlen);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strncasecoll_defined
+#define __local___localdep_strncasecoll_defined 1
+#define __localdep_strncasecoll __LIBC_LOCAL_NAME(strncasecoll)
+#endif /* !__local___localdep_strncasecoll_defined */
 #endif /* !__local_strncasecoll_defined */

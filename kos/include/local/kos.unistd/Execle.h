@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5903f4cd */
+/* HASH CRC-32:0xe347adb5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,35 +19,36 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Execle_defined
-#ifdef __CRT_HAVE_Execve
 #define __local_Execle_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-#include <parts/redirect-exec.h>
-/* Dependency: "Execve" */
-#ifndef ____localdep_Execve_defined
-#define ____localdep_Execve_defined 1
 #ifdef __CRT_HAVE_Execve
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: Execve from kos.unistd */
+#if !defined(__local___localdep_Execve_defined) && defined(__CRT_HAVE_Execve)
+#define __local___localdep_Execve_defined 1
 /* >> execve(2)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,__localdep_Execve,(char const *__restrict __path, __TARGV, __TENVP),Execve,(__path,,))
-#else /* LIBC: Execve */
-#undef ____localdep_Execve_defined
-#endif /* Execve... */
-#endif /* !____localdep_Execve_defined */
-
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,__localdep_Execve,(char const *__restrict __path, __TARGV, __TENVP),Execve,(__path,___argv,___envp))
+#endif /* !__local___localdep_Execve_defined && __CRT_HAVE_Execve */
+__NAMESPACE_LOCAL_END
+#include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__LOCAL_LIBC(Execle) __ATTR_NORETURN __ATTR_NONNULL((1)) __ATTR_SENTINEL_O(1) void
-(__VLIBCCALL __LIBC_LOCAL_NAME(Execle))(char const *__restrict __path,
-                                        char const *__args,
-                                        ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) {
-#line 64 "kos/src/libc/magic/kos.unistd.c"
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * and setting `environ' to a `char **' passed after the NULL sentinel */
+__LOCAL_LIBC(Execle) __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void
+(__VLIBCCALL __LIBC_LOCAL_NAME(Execle))(char const *__restrict __path, char const *__args, ...) __THROWS(...) {
 	__REDIRECT_XEXECLE(char, __localdep_Execve, __path, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_Execve */
+#ifndef __local___localdep_Execle_defined
+#define __local___localdep_Execle_defined 1
+#define __localdep_Execle __LIBC_LOCAL_NAME(Execle)
+#endif /* !__local___localdep_Execle_defined */
+#else /* __CRT_HAVE_Execve */
+#undef __local_Execle_defined
+#endif /* !__CRT_HAVE_Execve */
 #endif /* !__local_Execle_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41fccdcc */
+/* HASH CRC-32:0x28b7e4f8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_acosf_defined
-#if defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
 #define __local_acosf_defined 1
 #include <__crt.h>
-/* Dependency: "acos" */
-#ifndef ____localdep_acos_defined
-#define ____localdep_acos_defined 1
+#if defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: acos from math */
+#ifndef __local___localdep_acos_defined
+#define __local___localdep_acos_defined 1
 #if __has_builtin(__builtin_acos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acos)
 /* Arc cosine of X */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acos,(double __x),acos,{ return __builtin_acos(__x); })
@@ -34,18 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acos,(double __x),acos,(_
 #elif defined(__CRT_HAVE___acos)
 /* Arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acos,(double __x),__acos,(__x))
-#else /* LIBC: acos */
-#undef ____localdep_acos_defined
-#endif /* acos... */
-#endif /* !____localdep_acos_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_acos_defined
+#endif /* !... */
+#endif /* !__local___localdep_acos_defined */
 /* Arc cosine of X */
 __LOCAL_LIBC(acosf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(acosf))(float __x) {
-#line 185 "kos/src/libc/magic/math.c"
 	return (float)__localdep_acos((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_acos || __CRT_HAVE___acos */
+#ifndef __local___localdep_acosf_defined
+#define __local___localdep_acosf_defined 1
+#define __localdep_acosf __LIBC_LOCAL_NAME(acosf)
+#endif /* !__local___localdep_acosf_defined */
+#else /* __CRT_HAVE_acos || __CRT_HAVE___acos */
+#undef __local_acosf_defined
+#endif /* !__CRT_HAVE_acos && !__CRT_HAVE___acos */
 #endif /* !__local_acosf_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69d061b1 */
+/* HASH CRC-32:0xb55dc07d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,28 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_nanosleep64_defined
-#if defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
 #define __local_nanosleep64_defined 1
 #include <__crt.h>
-/* Dependency: "nanosleep32" from "time" */
-#ifndef ____localdep_nanosleep32_defined
-#define ____localdep_nanosleep32_defined 1
+#if defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
+#include <bits/types.h>
+#include <bits/timespec.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: nanosleep32 from time */
+#ifndef __local___localdep_nanosleep32_defined
+#define __local___localdep_nanosleep32_defined 1
 #ifdef __CRT_HAVE_nanosleep
 /* Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct timespec const *__requested_time, struct __timespec32 *__remaining),nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___nanosleep)
 /* Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct timespec const *__requested_time, struct __timespec32 *__remaining),__nanosleep,(__requested_time,__remaining))
-#else /* LIBC: nanosleep */
-#undef ____localdep_nanosleep32_defined
-#endif /* nanosleep32... */
-#endif /* !____localdep_nanosleep32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_nanosleep32_defined
+#endif /* !... */
+#endif /* !__local___localdep_nanosleep32_defined */
 /* Pause execution for a number of nanoseconds */
 __LOCAL_LIBC(nanosleep64) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep64))(struct __timespec64 const *__restrict __requested_time,
-                                                         struct __timespec64 *__remaining) {
-#line 1222 "kos/src/libc/magic/time.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep64))(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining) {
 	int __result;
 	struct __timespec32 __req32, __rem32;
 	__req32.tv_sec  = (__time32_t)__requested_time->tv_sec;
@@ -54,5 +53,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep64))(struct __timespec64 con
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep */
+#ifndef __local___localdep_nanosleep64_defined
+#define __local___localdep_nanosleep64_defined 1
+#define __localdep_nanosleep64 __LIBC_LOCAL_NAME(nanosleep64)
+#endif /* !__local___localdep_nanosleep64_defined */
+#else /* __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep */
+#undef __local_nanosleep64_defined
+#endif /* !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep */
 #endif /* !__local_nanosleep64_defined */

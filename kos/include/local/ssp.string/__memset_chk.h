@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78137a2c */
+/* HASH CRC-32:0x794df61a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,39 +21,39 @@
 #ifndef __local___memset_chk_defined
 #define __local___memset_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "memset" from "string" */
-#ifndef ____localdep_memset_defined
-#define ____localdep_memset_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memset from string */
+#ifndef __local___localdep_memset_defined
+#define __local___localdep_memset_defined 1
 #ifdef __fast_memset_defined
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))
+__NAMESPACE_FAST_USING(memset)
+#define __localdep_memset __LIBC_FAST_NAME(memset)
 #elif defined(__CRT_HAVE_memset)
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* LIBC: memset */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memset.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))
-#endif /* memset... */
-#endif /* !____localdep_memset_defined */
-
+#define __localdep_memset __LIBC_LOCAL_NAME(memset)
+#endif /* !... */
+#endif /* !__local___localdep_memset_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__memset_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memset_chk))(void *__restrict __dst,
-                                                          int __byte,
-                                                          __SIZE_TYPE__ __n_bytes,
-                                                          __SIZE_TYPE__ __dst_objsize) {
-#line 39 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memset_chk))(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("memset", __dst, __n_bytes, __dst_objsize);
 	return __localdep_memset(__dst, __byte, __n_bytes);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___memset_chk_defined
+#define __local___localdep___memset_chk_defined 1
+#define __localdep___memset_chk __LIBC_LOCAL_NAME(__memset_chk)
+#endif /* !__local___localdep___memset_chk_defined */
 #endif /* !__local___memset_chk_defined */

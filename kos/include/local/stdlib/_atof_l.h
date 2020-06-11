@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f023d25 */
+/* HASH CRC-32:0x3931526f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,10 @@
 #ifndef __local__atof_l_defined
 #define __local__atof_l_defined 1
 #include <__crt.h>
-/* Dependency: "strtod_l" from "stdlib" */
-#ifndef ____localdep_strtod_l_defined
-#define ____localdep_strtod_l_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strtod_l from stdlib */
+#ifndef __local___localdep_strtod_l_defined
+#define __local___localdep_strtod_l_defined 1
 #ifdef __CRT_HAVE_strtod_l
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__strtod_l)
@@ -34,18 +35,22 @@ __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_strtod_l,(char c
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtold_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__strtold_l) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtold_l,(__nptr,__endptr,__locale))
-#else /* LIBC: strtod_l */
+#elif defined(__CRT_HAVE___strtold_l) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
+__CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtold_l,(__nptr,__endptr,__locale))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/strtod_l.h>
-#define __localdep_strtod_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtod_l))
-#endif /* strtod_l... */
-#endif /* !____localdep_strtod_l_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strtod_l __LIBC_LOCAL_NAME(strtod_l)
+#endif /* !... */
+#endif /* !__local___localdep_strtod_l_defined */
 __LOCAL_LIBC(_atof_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) double
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atof_l))(char const *__restrict __nptr,
-                                                     __locale_t __locale) {
-#line 2245 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atof_l))(char const *__restrict __nptr, __locale_t __locale) {
 	return __localdep_strtod_l(__nptr, __NULLPTR, __locale);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__atof_l_defined
+#define __local___localdep__atof_l_defined 1
+#define __localdep__atof_l __LIBC_LOCAL_NAME(_atof_l)
+#endif /* !__local___localdep__atof_l_defined */
 #endif /* !__local__atof_l_defined */

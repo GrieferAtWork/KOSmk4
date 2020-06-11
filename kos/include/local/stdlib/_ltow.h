@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99aa90af */
+/* HASH CRC-32:0x7f1e653f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,46 @@
 #ifndef __local__ltow_defined
 #define __local__ltow_defined 1
 #include <__crt.h>
-/* Dependency: "_ltow_s" from "stdlib" */
-#ifndef ____localdep__ltow_s_defined
-#define ____localdep__ltow_s_defined 1
-#ifdef __CRT_HAVE__ltow_s
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep__ltow_s,(long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_ltow_s,(__val,__buf,__buflen,__radix))
-#else /* LIBC: _ltow_s */
-#include <local/stdlib/_ltow_s.h>
-#define __localdep__ltow_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ltow_s))
-#endif /* _ltow_s... */
-#endif /* !____localdep__ltow_s_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _ltow_s from stdlib */
+#ifndef __local___localdep__ltow_s_defined
+#define __local___localdep__ltow_s_defined 1
+#ifdef ___ltow_s_defined
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__NAMESPACE_GLB_USING(_ltow_s)
+#define __localdep__ltow_s _ltow_s
+#elif defined(__CRT_HAVE__ltow_s)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltow_s,(long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_ltow_s,(__val,__buf,__buflen,__radix))
+#elif defined(__CRT_HAVE_DOS$_ltow_s) && __SIZEOF_WCHAR_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__LIBCCALL,__localdep__ltow_s,(long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),KOS$_ltow_s,(__val,__buf,__buflen,__radix))
+#elif defined(__CRT_HAVE_DOS$_ltow_s) && __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__LIBCCALL,__localdep__ltow_s,(long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),DOS$_ltow_s,(__val,__buf,__buflen,__radix))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/_ltow_s.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__ltow_s __LIBC_LOCAL_NAME(_ltow_s)
+#endif /* !... */
+#endif /* !__local___localdep__ltow_s_defined */
 __LOCAL_LIBC(_ltow) __ATTR_NONNULL((2)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ltow))(long __val,
-                                                   __WCHAR_TYPE__ *__buf,
-                                                   int __radix) {
-#line 3359 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ltow))(long __val, __WCHAR_TYPE__ *__buf, int __radix) {
 	__localdep__ltow_s(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__ltow_defined
+#define __local___localdep__ltow_defined 1
+#define __localdep__ltow __LIBC_LOCAL_NAME(_ltow)
+#endif /* !__local___localdep__ltow_defined */
 #endif /* !__local__ltow_defined */

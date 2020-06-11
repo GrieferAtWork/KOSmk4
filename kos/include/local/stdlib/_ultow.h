@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa28cb86 */
+/* HASH CRC-32:0x4f2b0952 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,46 @@
 #ifndef __local__ultow_defined
 #define __local__ultow_defined 1
 #include <__crt.h>
-/* Dependency: "_ultow_s" from "stdlib" */
-#ifndef ____localdep__ultow_s_defined
-#define ____localdep__ultow_s_defined 1
-#ifdef __CRT_HAVE__ultow_s
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep__ultow_s,(unsigned long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_ultow_s,(__val,__buf,__buflen,__radix))
-#else /* LIBC: _ultow_s */
-#include <local/stdlib/_ultow_s.h>
-#define __localdep__ultow_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ultow_s))
-#endif /* _ultow_s... */
-#endif /* !____localdep__ultow_s_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _ultow_s from stdlib */
+#ifndef __local___localdep__ultow_s_defined
+#define __local___localdep__ultow_s_defined 1
+#ifdef ___ultow_s_defined
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__NAMESPACE_GLB_USING(_ultow_s)
+#define __localdep__ultow_s _ultow_s
+#elif defined(__CRT_HAVE__ultow_s)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultow_s,(unsigned long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_ultow_s,(__val,__buf,__buflen,__radix))
+#elif defined(__CRT_HAVE_DOS$_ultow_s) && __SIZEOF_WCHAR_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__LIBCCALL,__localdep__ultow_s,(unsigned long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),KOS$_ultow_s,(__val,__buf,__buflen,__radix))
+#elif defined(__CRT_HAVE_DOS$_ultow_s) && __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__LIBCCALL,__localdep__ultow_s,(unsigned long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),DOS$_ultow_s,(__val,__buf,__buflen,__radix))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/_ultow_s.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__ultow_s __LIBC_LOCAL_NAME(_ultow_s)
+#endif /* !... */
+#endif /* !__local___localdep__ultow_s_defined */
 __LOCAL_LIBC(_ultow) __ATTR_NONNULL((2)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ultow))(unsigned long __val,
-                                                    __WCHAR_TYPE__ *__buf,
-                                                    int __radix) {
-#line 3366 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ultow))(unsigned long __val, __WCHAR_TYPE__ *__buf, int __radix) {
 	__localdep__ultow_s(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__ultow_defined
+#define __local___localdep__ultow_defined 1
+#define __localdep__ultow __LIBC_LOCAL_NAME(_ultow)
+#endif /* !__local___localdep__ultow_defined */
 #endif /* !__local__ultow_defined */

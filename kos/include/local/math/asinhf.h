@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3eb07a4 */
+/* HASH CRC-32:0x3b9fd91b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_asinhf_defined
-#if defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
 #define __local_asinhf_defined 1
 #include <__crt.h>
-/* Dependency: "asinh" */
-#ifndef ____localdep_asinh_defined
-#define ____localdep_asinh_defined 1
+#if defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: asinh from math */
+#ifndef __local___localdep_asinh_defined
+#define __local___localdep_asinh_defined 1
 #if __has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)
 /* Hyperbolic arc sine of X */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asinh,(double __x),asinh,{ return __builtin_asinh(__x); })
@@ -34,18 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asinh,(double __x),asinh,
 #elif defined(__CRT_HAVE___asinh)
 /* Hyperbolic arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asinh,(double __x),__asinh,(__x))
-#else /* LIBC: asinh */
-#undef ____localdep_asinh_defined
-#endif /* asinh... */
-#endif /* !____localdep_asinh_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_asinh_defined
+#endif /* !... */
+#endif /* !__local___localdep_asinh_defined */
 /* Hyperbolic arc sine of X */
 __LOCAL_LIBC(asinhf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(asinhf))(float __x) {
-#line 287 "kos/src/libc/magic/math.c"
 	return (float)__localdep_asinh((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_asinh || __CRT_HAVE___asinh */
+#ifndef __local___localdep_asinhf_defined
+#define __local___localdep_asinhf_defined 1
+#define __localdep_asinhf __LIBC_LOCAL_NAME(asinhf)
+#endif /* !__local___localdep_asinhf_defined */
+#else /* __CRT_HAVE_asinh || __CRT_HAVE___asinh */
+#undef __local_asinhf_defined
+#endif /* !__CRT_HAVE_asinh && !__CRT_HAVE___asinh */
 #endif /* !__local_asinhf_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefcd3d0d */
+/* HASH CRC-32:0x7d08e3c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,40 +19,40 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futexlock_wakeall_defined
-#if defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_futex_wakeall)
 #define __local_futexlock_wakeall_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_futex_wakeall) || defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <bits/types.h>
-#include <bits/types.h>
-#include <hybrid/__atomic.h>
-
-#include <kos/bits/futex.h>
-/* Dependency: "futex_wakeall" from "kos.futex" */
-#ifndef ____localdep_futex_wakeall_defined
-#define ____localdep_futex_wakeall_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: futex_wakeall from kos.futex */
+#ifndef __local___localdep_futex_wakeall_defined
+#define __local___localdep_futex_wakeall_defined 1
 #ifdef __CRT_HAVE_futex_wakeall
 /* Wake all threads waiting for `*UADDR' (same as `futex_wake(uaddr, (size_t)-1)')
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_futex_wakeall,(__uintptr_t *__uaddr),futex_wakeall,(__uaddr))
-#elif defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_futex_wake)
+#elif defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
+__NAMESPACE_LOCAL_END
 #include <local/kos.futex/futex_wakeall.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Wake all threads waiting for `*UADDR' (same as `futex_wake(uaddr, (size_t)-1)')
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */
-#define __localdep_futex_wakeall (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_wakeall))
-#else /* CUSTOM: futex_wakeall */
-#undef ____localdep_futex_wakeall_defined
-#endif /* futex_wakeall... */
-#endif /* !____localdep_futex_wakeall_defined */
-
+#define __localdep_futex_wakeall __LIBC_LOCAL_NAME(futex_wakeall)
+#else /* ... */
+#undef __local___localdep_futex_wakeall_defined
+#endif /* !... */
+#endif /* !__local___localdep_futex_wakeall_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__atomic.h>
+#include <kos/bits/futex.h>
 __NAMESPACE_LOCAL_BEGIN
 /* A more efficient variant of `futex_wake()' that can be used to wake up threads waiting
  * on some given futex-lock. - This method of waking is faster, since it doesn't invoke a
  * system call when no thread is waiting on the given lock */
 __LOCAL_LIBC(futexlock_wakeall) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_wakeall))(__uintptr_t *__ulockaddr) {
-#line 159 "kos/src/libc/magic/kos.futexlock.c"
 	if (!(__hybrid_atomic_load(*__ulockaddr, __ATOMIC_ACQUIRE) & __LFUTEX_WAIT_LOCK_WAITERS))
 		return 0; /* No waiting threads. */
 	if (!(__hybrid_atomic_fetchand(*__ulockaddr, ~__LFUTEX_WAIT_LOCK_WAITERS, __ATOMIC_SEQ_CST) & __LFUTEX_WAIT_LOCK_WAITERS))
@@ -60,5 +60,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_wakeall))(__uintptr_t *__ul
 	return __localdep_futex_wakeall(__ulockaddr);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lfutex || __CRT_HAVE_lfutex64 || __CRT_HAVE_futex_wake || __CRT_HAVE_futex_wakeall */
+#ifndef __local___localdep_futexlock_wakeall_defined
+#define __local___localdep_futexlock_wakeall_defined 1
+#define __localdep_futexlock_wakeall __LIBC_LOCAL_NAME(futexlock_wakeall)
+#endif /* !__local___localdep_futexlock_wakeall_defined */
+#else /* __CRT_HAVE_futex_wakeall || __CRT_HAVE_futex_wake || __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex */
+#undef __local_futexlock_wakeall_defined
+#endif /* !__CRT_HAVE_futex_wakeall && !__CRT_HAVE_futex_wake && !__CRT_HAVE_lfutex64 && !__CRT_HAVE_lfutex */
 #endif /* !__local_futexlock_wakeall_defined */

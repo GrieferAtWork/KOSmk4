@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dd53dd8 */
+/* HASH CRC-32:0xee007a40 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,94 +19,94 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__aligned_recalloc_defined
-#if (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE__aligned_malloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE__aligned_free))
 #define __local__aligned_recalloc_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "_aligned_malloc" from "stdlib" */
-#ifndef ____localdep__aligned_malloc_defined
-#define ____localdep__aligned_malloc_defined 1
-#ifdef __CRT_HAVE__aligned_malloc
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep__aligned_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),_aligned_malloc,(__num_bytes,__min_alignment))
-#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
-#include <local/stdlib/_aligned_malloc.h>
-#define __localdep__aligned_malloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_malloc))
-#else /* CUSTOM: _aligned_malloc */
-#undef ____localdep__aligned_malloc_defined
-#endif /* _aligned_malloc... */
-#endif /* !____localdep__aligned_malloc_defined */
-
-/* Dependency: "_aligned_msize" from "stdlib" */
-#ifndef ____localdep__aligned_msize_defined
-#define ____localdep__aligned_msize_defined 1
+#if (defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: _aligned_msize from stdlib */
+#ifndef __local___localdep__aligned_msize_defined
+#define __local___localdep__aligned_msize_defined 1
 #ifdef __CRT_HAVE__aligned_msize
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__aligned_mallptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__aligned_mallptr,__min_alignment,__offset))
-#else /* LIBC: _aligned_msize */
+#else /* __CRT_HAVE__aligned_msize */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/_aligned_msize.h>
-#define __localdep__aligned_msize (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_msize))
-#endif /* _aligned_msize... */
-#endif /* !____localdep__aligned_msize_defined */
-
-/* Dependency: "memcpy" from "string" */
-#ifndef ____localdep_memcpy_defined
-#define ____localdep_memcpy_defined 1
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__aligned_msize __LIBC_LOCAL_NAME(_aligned_msize)
+#endif /* !__CRT_HAVE__aligned_msize */
+#endif /* !__local___localdep__aligned_msize_defined */
+/* Dependency: memcpy from string */
+#ifndef __local___localdep_memcpy_defined
+#define __local___localdep_memcpy_defined 1
 #ifdef __fast_memcpy_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))
+__NAMESPACE_FAST_USING(memcpy)
+#define __localdep_memcpy __LIBC_FAST_NAME(memcpy)
 #elif defined(__CRT_HAVE_memcpy)
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
-#else /* LIBC: memcpy */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memcpy.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))
-#endif /* memcpy... */
-#endif /* !____localdep_memcpy_defined */
-
-/* Dependency: "memset" from "string" */
-#ifndef ____localdep_memset_defined
-#define ____localdep_memset_defined 1
+#define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
+#endif /* !... */
+#endif /* !__local___localdep_memcpy_defined */
+/* Dependency: memset from string */
+#ifndef __local___localdep_memset_defined
+#define __local___localdep_memset_defined 1
 #ifdef __fast_memset_defined
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))
+__NAMESPACE_FAST_USING(memset)
+#define __localdep_memset __LIBC_FAST_NAME(memset)
 #elif defined(__CRT_HAVE_memset)
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* LIBC: memset */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memset.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))
-#endif /* memset... */
-#endif /* !____localdep_memset_defined */
-
-/* Dependency: "_aligned_free" from "stdlib" */
-#ifndef ____localdep__aligned_free_defined
-#define ____localdep__aligned_free_defined 1
+#define __localdep_memset __LIBC_LOCAL_NAME(memset)
+#endif /* !... */
+#endif /* !__local___localdep_memset_defined */
+/* Dependency: _aligned_free from stdlib */
+#ifndef __local___localdep__aligned_free_defined
+#define __local___localdep__aligned_free_defined 1
 #ifdef __CRT_HAVE__aligned_free
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__aligned_free,(void *__aligned_mallptr),_aligned_free,(__aligned_mallptr))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/_aligned_free.h>
-#define __localdep__aligned_free (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_free))
-#else /* CUSTOM: _aligned_free */
-#undef ____localdep__aligned_free_defined
-#endif /* _aligned_free... */
-#endif /* !____localdep__aligned_free_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep__aligned_free __LIBC_LOCAL_NAME(_aligned_free)
+#else /* ... */
+#undef __local___localdep__aligned_free_defined
+#endif /* !... */
+#endif /* !__local___localdep__aligned_free_defined */
+/* Dependency: _aligned_malloc from stdlib */
+#ifndef __local___localdep__aligned_malloc_defined
+#define __local___localdep__aligned_malloc_defined 1
+#ifdef __CRT_HAVE__aligned_malloc
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep__aligned_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),_aligned_malloc,(__num_bytes,__min_alignment))
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/_aligned_malloc.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__aligned_malloc __LIBC_LOCAL_NAME(_aligned_malloc)
+#else /* ... */
+#undef __local___localdep__aligned_malloc_defined
+#endif /* !... */
+#endif /* !__local___localdep__aligned_malloc_defined */
 __LOCAL_LIBC(_aligned_recalloc) __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_recalloc))(void *__aligned_mallptr,
-                                                               __SIZE_TYPE__ __count,
-                                                               __SIZE_TYPE__ __num_bytes,
-                                                               __SIZE_TYPE__ __min_alignment) {
-#line 2876 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_recalloc))(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment) {
 	void *__result;
 	__num_bytes *= __count;
 	__result = __localdep__aligned_malloc(__num_bytes, __min_alignment);
@@ -121,5 +121,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_recalloc))(void *__aligned_m
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_posix_memalign || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_malloc || __CRT_HAVE__aligned_malloc) && (__CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE__aligned_free) */
+#ifndef __local___localdep__aligned_recalloc_defined
+#define __local___localdep__aligned_recalloc_defined 1
+#define __localdep__aligned_recalloc __LIBC_LOCAL_NAME(_aligned_recalloc)
+#endif /* !__local___localdep__aligned_recalloc_defined */
+#else /* (__CRT_HAVE__aligned_malloc || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) && (__CRT_HAVE__aligned_free || __CRT_HAVE_free || __CRT_HAVE_cfree) */
+#undef __local__aligned_recalloc_defined
+#endif /* (!__CRT_HAVE__aligned_malloc && !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign) || (!__CRT_HAVE__aligned_free && !__CRT_HAVE_free && !__CRT_HAVE_cfree) */
 #endif /* !__local__aligned_recalloc_defined */

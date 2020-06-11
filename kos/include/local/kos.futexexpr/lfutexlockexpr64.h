@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55e7e6fc */
+/* HASH CRC-32:0xac5736f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,21 +19,16 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lfutexlockexpr64_defined
-#ifdef __CRT_HAVE_lfutexlockexpr
 #define __local_lfutexlockexpr64_defined 1
 #include <__crt.h>
-#include <bits/types.h>
-#include <bits/timespec.h>
-#include <kos/bits/futex-expr.h>
-#include <bits/types.h>
-
-#include <bits/timespec.h>
-
-#include <kos/bits/futex-expr.h>
-/* Dependency: "lfutexlockexpr32" from "kos.futexexpr" */
-#ifndef ____localdep_lfutexlockexpr32_defined
-#define ____localdep_lfutexlockexpr32_defined 1
 #ifdef __CRT_HAVE_lfutexlockexpr
+#include <bits/types.h>
+#include <bits/timespec.h>
+#include <kos/bits/futex-expr.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: lfutexlockexpr32 from kos.futexexpr */
+#if !defined(__local___localdep_lfutexlockexpr32_defined) && defined(__CRT_HAVE_lfutexlockexpr)
+#define __local___localdep_lfutexlockexpr32_defined 1
 /* >> lfutexlockexpr(2)
  * A function that is similar to `lfutexexpr()', but allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex
@@ -62,12 +57,7 @@
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,__localdep_lfutexlockexpr32,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexlockexpr,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
-#else /* LIBC: lfutexlockexpr */
-#undef ____localdep_lfutexlockexpr32_defined
-#endif /* lfutexlockexpr32... */
-#endif /* !____localdep_lfutexlockexpr32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_lfutexlockexpr32_defined && __CRT_HAVE_lfutexlockexpr */
 /* >> lfutexlockexpr(2)
  * A function that is similar to `lfutexexpr()', but allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex
@@ -96,13 +86,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __LOCAL_LIBC(lfutexlockexpr64) __ATTR_NONNULL((1, 4)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexlockexpr64))(__uintptr_t *__ulockaddr,
-                                                              void *__base,
-                                                              __SIZE_TYPE__ __exprc,
-                                                              struct lfutexexpr const *__exprv,
-                                                              struct __timespec64 const *__timeout,
-                                                              unsigned int __timeout_flags) {
-#line 319 "kos/src/libc/magic/kos.futexexpr.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexlockexpr64))(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags) {
 	struct __timespec32 __tms32;
 	if (!__timeout)
 		return __localdep_lfutexlockexpr32(__ulockaddr, __base, __exprc, __exprv, __NULLPTR, 0);
@@ -111,5 +95,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexlockexpr64))(__uintptr_t *__ulo
 	return __localdep_lfutexlockexpr32(__ulockaddr, __base, __exprc, __exprv, &__tms32, __timeout_flags);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lfutexlockexpr */
+#ifndef __local___localdep_lfutexlockexpr64_defined
+#define __local___localdep_lfutexlockexpr64_defined 1
+#define __localdep_lfutexlockexpr64 __LIBC_LOCAL_NAME(lfutexlockexpr64)
+#endif /* !__local___localdep_lfutexlockexpr64_defined */
+#else /* __CRT_HAVE_lfutexlockexpr */
+#undef __local_lfutexlockexpr64_defined
+#endif /* !__CRT_HAVE_lfutexlockexpr */
 #endif /* !__local_lfutexlockexpr64_defined */

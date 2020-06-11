@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabdb092d */
+/* HASH CRC-32:0x6c9799ab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,23 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futimesat_defined
-#if defined(__CRT_HAVE_futimesat) || defined(__CRT_HAVE_futimesat64)
 #define __local_futimesat_defined 1
 #include <__crt.h>
-/* Dependency: "futimesat32" from "sys.time" */
-#ifndef ____localdep_futimesat32_defined
-#define ____localdep_futimesat32_defined 1
-#ifdef __CRT_HAVE_futimesat
+#if defined(__CRT_HAVE_futimesat) || defined(__CRT_HAVE_futimesat64)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: futimesat32 from sys.time */
+#if !defined(__local___localdep_futimesat32_defined) && defined(__CRT_HAVE_futimesat)
+#define __local___localdep_futimesat32_defined 1
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,__localdep_futimesat32,(__fd_t __fd, char const *__file, struct __timeval32 const __tvp[2]),futimesat,(__fd,__file,__tvp))
-#else /* LIBC: futimesat */
-#undef ____localdep_futimesat32_defined
-#endif /* futimesat32... */
-#endif /* !____localdep_futimesat32_defined */
-
-/* Dependency: "futimesat64" from "sys.time" */
-#ifndef ____localdep_futimesat64_defined
-#define ____localdep_futimesat64_defined 1
+#endif /* !__local___localdep_futimesat32_defined && __CRT_HAVE_futimesat */
+/* Dependency: futimesat64 from sys.time */
+#ifndef __local___localdep_futimesat64_defined
+#define __local___localdep_futimesat64_defined 1
 #ifdef __CRT_HAVE_futimesat64
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_futimesat64,(__fd_t __fd, char const *__file, struct __timeval64 const __tvp[2]),futimesat64,(__fd,__file,__tvp))
@@ -43,21 +39,18 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_futimesat64,(__fd_t
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_futimesat64,(__fd_t __fd, char const *__file, struct __timeval64 const __tvp[2]),futimesat,(__fd,__file,__tvp))
 #elif defined(__CRT_HAVE_futimesat)
+__NAMESPACE_LOCAL_END
 #include <local/sys.time/futimesat64.h>
-/* Same as `utimes', but takes an open file descriptor instead of a name */
-#define __localdep_futimesat64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimesat64))
-#else /* CUSTOM: futimesat64 */
-#undef ____localdep_futimesat64_defined
-#endif /* futimesat64... */
-#endif /* !____localdep_futimesat64_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `utimes', but takes an open file descriptor instead of a name */
+#define __localdep_futimesat64 __LIBC_LOCAL_NAME(futimesat64)
+#else /* ... */
+#undef __local___localdep_futimesat64_defined
+#endif /* !... */
+#endif /* !__local___localdep_futimesat64_defined */
+/* Same as `utimes', but takes an open file descriptor instead of a name */
 __LOCAL_LIBC(futimesat) __ATTR_NONNULL((2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimesat))(__fd_t __fd,
-                                                       char const *__file,
-                                                       struct timeval const __tvp[2]) {
-#line 282 "kos/src/libc/magic/sys.time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimesat))(__fd_t __fd, char const *__file, struct timeval const __tvp[2]) {
 #ifdef __CRT_HAVE_utimes
 	struct __timeval32 __tv32[2];
 	if (!__tvp)
@@ -79,5 +72,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimesat))(__fd_t __fd,
 #endif /* !__CRT_HAVE_utimes */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_futimesat || __CRT_HAVE_futimesat64 */
+#ifndef __local___localdep_futimesat_defined
+#define __local___localdep_futimesat_defined 1
+#define __localdep_futimesat __LIBC_LOCAL_NAME(futimesat)
+#endif /* !__local___localdep_futimesat_defined */
+#else /* __CRT_HAVE_futimesat || __CRT_HAVE_futimesat64 */
+#undef __local_futimesat_defined
+#endif /* !__CRT_HAVE_futimesat && !__CRT_HAVE_futimesat64 */
 #endif /* !__local_futimesat_defined */

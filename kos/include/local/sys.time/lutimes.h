@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5220dbff */
+/* HASH CRC-32:0xa31d6134 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,23 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lutimes_defined
-#if defined(__CRT_HAVE_lutimes) || defined(__CRT_HAVE_lutimes64)
 #define __local_lutimes_defined 1
 #include <__crt.h>
-/* Dependency: "lutimes32" from "sys.time" */
-#ifndef ____localdep_lutimes32_defined
-#define ____localdep_lutimes32_defined 1
-#ifdef __CRT_HAVE_lutimes
+#if defined(__CRT_HAVE_lutimes) || defined(__CRT_HAVE_lutimes64)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: lutimes32 from sys.time */
+#if !defined(__local___localdep_lutimes32_defined) && defined(__CRT_HAVE_lutimes)
+#define __local___localdep_lutimes32_defined 1
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes32,(char const *__file, struct __timeval32 const __tvp[2]),lutimes,(__file,__tvp))
-#else /* LIBC: lutimes */
-#undef ____localdep_lutimes32_defined
-#endif /* lutimes32... */
-#endif /* !____localdep_lutimes32_defined */
-
-/* Dependency: "lutimes64" from "sys.time" */
-#ifndef ____localdep_lutimes64_defined
-#define ____localdep_lutimes64_defined 1
+#endif /* !__local___localdep_lutimes32_defined && __CRT_HAVE_lutimes */
+/* Dependency: lutimes64 from sys.time */
+#ifndef __local___localdep_lutimes64_defined
+#define __local___localdep_lutimes64_defined 1
 #ifdef __CRT_HAVE_lutimes64
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes64,(char const *__file, struct __timeval64 const __tvp[2]),lutimes64,(__file,__tvp))
@@ -43,20 +39,18 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes64,(char con
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes64,(char const *__file, struct __timeval64 const __tvp[2]),lutimes,(__file,__tvp))
 #elif defined(__CRT_HAVE_lutimes)
+__NAMESPACE_LOCAL_END
 #include <local/sys.time/lutimes64.h>
-/* Same as `utimes', but does not follow symbolic links */
-#define __localdep_lutimes64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lutimes64))
-#else /* CUSTOM: lutimes64 */
-#undef ____localdep_lutimes64_defined
-#endif /* lutimes64... */
-#endif /* !____localdep_lutimes64_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `utimes', but does not follow symbolic links */
+#define __localdep_lutimes64 __LIBC_LOCAL_NAME(lutimes64)
+#else /* ... */
+#undef __local___localdep_lutimes64_defined
+#endif /* !... */
+#endif /* !__local___localdep_lutimes64_defined */
+/* Same as `utimes', but does not follow symbolic links */
 __LOCAL_LIBC(lutimes) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lutimes))(char const *__file,
-                                                     struct timeval const __tvp[2]) {
-#line 374 "kos/src/libc/magic/sys.time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lutimes))(char const *__file, struct timeval const __tvp[2]) {
 #ifdef __CRT_HAVE_utimes
 	struct __timeval32 __tv32[2];
 	if (!__tvp)
@@ -78,5 +72,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lutimes))(char const *__file,
 #endif /* !__CRT_HAVE_utimes */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lutimes || __CRT_HAVE_lutimes64 */
+#ifndef __local___localdep_lutimes_defined
+#define __local___localdep_lutimes_defined 1
+#define __localdep_lutimes __LIBC_LOCAL_NAME(lutimes)
+#endif /* !__local___localdep_lutimes_defined */
+#else /* __CRT_HAVE_lutimes || __CRT_HAVE_lutimes64 */
+#undef __local_lutimes_defined
+#endif /* !__CRT_HAVE_lutimes && !__CRT_HAVE_lutimes64 */
 #endif /* !__local_lutimes_defined */

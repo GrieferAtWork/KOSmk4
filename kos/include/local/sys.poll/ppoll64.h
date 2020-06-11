@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4d92ec0 */
+/* HASH CRC-32:0x3b62d61 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,26 +19,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ppoll64_defined
-#ifdef __CRT_HAVE_ppoll
 #define __local_ppoll64_defined 1
 #include <__crt.h>
-/* Dependency: "ppoll32" from "sys.poll" */
-#ifndef ____localdep_ppoll32_defined
-#define ____localdep_ppoll32_defined 1
 #ifdef __CRT_HAVE_ppoll
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll32,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec32 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
-#else /* LIBC: ppoll */
-#undef ____localdep_ppoll32_defined
-#endif /* ppoll32... */
-#endif /* !____localdep_ppoll32_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: ppoll32 from sys.poll */
+#if !defined(__local___localdep_ppoll32_defined) && defined(__CRT_HAVE_ppoll)
+#define __local___localdep_ppoll32_defined 1
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll32,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec32 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
+#endif /* !__local___localdep_ppoll32_defined && __CRT_HAVE_ppoll */
 __LOCAL_LIBC(ppoll64) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ppoll64))(struct pollfd *__fds,
-                                                     __UINTPTR_TYPE__ __nfds,
-                                                     struct __timespec64 const *__timeout,
-                                                     struct __sigset_struct const *__ss) {
-#line 117 "kos/src/libc/magic/sys.poll.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ppoll64))(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss) {
 	struct __timespec32 __tmo32;
 	if (!__timeout)
 		return __localdep_ppoll32(__fds, __nfds, __NULLPTR, __ss);
@@ -47,5 +38,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ppoll64))(struct pollfd *__fds,
 	return __localdep_ppoll32(__fds, __nfds, &__tmo32, __ss);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_ppoll */
+#ifndef __local___localdep_ppoll64_defined
+#define __local___localdep_ppoll64_defined 1
+#define __localdep_ppoll64 __LIBC_LOCAL_NAME(ppoll64)
+#endif /* !__local___localdep_ppoll64_defined */
+#else /* __CRT_HAVE_ppoll */
+#undef __local_ppoll64_defined
+#endif /* !__CRT_HAVE_ppoll */
 #endif /* !__local_ppoll64_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9ac2ee4 */
+/* HASH CRC-32:0x42418ec7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,27 +19,27 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_remove_defined
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_removeat)
 #define __local_remove_defined 1
 #include <__crt.h>
-/* Dependency: "removeat" */
-#ifndef ____localdep_removeat_defined
-#define ____localdep_removeat_defined 1
-#ifdef __CRT_HAVE_removeat
+#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_removeat)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: removeat from stdio */
+#if !defined(__local___localdep_removeat_defined) && defined(__CRT_HAVE_removeat)
+#define __local___localdep_removeat_defined 1
 /* Remove a file or directory `FILENAME' relative to a given base directory `DIRFD' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_removeat,(__fd_t __dirfd, char const *__filename),removeat,(__dirfd,__filename))
-#else /* LIBC: removeat */
-#undef ____localdep_removeat_defined
-#endif /* removeat... */
-#endif /* !____localdep_removeat_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_removeat_defined && __CRT_HAVE_removeat */
 /* Remove a file or directory `FILENAME' */
 __LOCAL_LIBC(remove) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(remove))(char const *__filename) {
-#line 387 "kos/src/libc/magic/stdio.c"
 	return __localdep_removeat(__CRT_AT_FDCWD, __filename);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && __CRT_HAVE_removeat */
+#ifndef __local___localdep_remove_defined
+#define __local___localdep_remove_defined 1
+#define __localdep_remove __LIBC_LOCAL_NAME(remove)
+#endif /* !__local___localdep_remove_defined */
+#else /* __CRT_AT_FDCWD && __CRT_HAVE_removeat */
+#undef __local_remove_defined
+#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_removeat */
 #endif /* !__local_remove_defined */

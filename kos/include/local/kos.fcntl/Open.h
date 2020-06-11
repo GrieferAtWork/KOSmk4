@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8e82009 */
+/* HASH CRC-32:0x23cd6be9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,59 +19,69 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Open_defined
-#if (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))) || defined(__CRT_HAVE_Open) || defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64) || (defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64))))
 #define __local_Open_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open) || (defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64)))
+#include <bits/types.h>
 #include <kos/anno.h>
-#include <bits/types.h>
-#include <bits/types.h>
-/* Dependency: "Open64" from "kos.fcntl" */
-#ifndef ____localdep_Open64_defined
-#define ____localdep_Open64_defined 1
-#ifdef __CRT_HAVE_Open64
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_Open) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))) || defined(__CRT_HAVE_Open)
-#include <local/kos.fcntl/Open64.h>
-#define __localdep_Open64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Open64))
-#else /* CUSTOM: Open64 */
-#undef ____localdep_Open64_defined
-#endif /* Open64... */
-#endif /* !____localdep_Open64_defined */
-
-/* Dependency: "OpenAt" from "kos.fcntl" */
-#ifndef ____localdep_OpenAt_defined
-#define ____localdep_OpenAt_defined 1
-#if defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: OpenAt from kos.fcntl */
+#ifndef __local___localdep_OpenAt_defined
+#define __local___localdep_OpenAt_defined 1
+#ifdef __OpenAt_defined
+#ifdef __cplusplus
+__NAMESPACE_GLB_USING(OpenAt)
+#else /* __cplusplus */
+#define __localdep_OpenAt OpenAt
+#endif /* !__cplusplus */
+#elif defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__THROWING,__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),Openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_OpenAt) && !defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__THROWING,__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64)
+__NAMESPACE_LOCAL_END
 #include <local/kos.fcntl/OpenAt.h>
-#define __localdep_OpenAt (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(OpenAt))
-#else /* CUSTOM: OpenAt */
-#undef ____localdep_OpenAt_defined
-#endif /* OpenAt... */
-#endif /* !____localdep_OpenAt_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_OpenAt __LIBC_LOCAL_NAME(OpenAt)
+#else /* ... */
+#undef __local___localdep_OpenAt_defined
+#endif /* !... */
+#endif /* !__local___localdep_OpenAt_defined */
+/* Dependency: Open64 from kos.fcntl */
+#ifndef __local___localdep_Open64_defined
+#define __local___localdep_Open64_defined 1
+#ifdef __CRT_HAVE_Open64
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE_Open) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
+__NAMESPACE_LOCAL_END
+#include <local/kos.fcntl/Open64.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_Open64 __LIBC_LOCAL_NAME(Open64)
+#else /* ... */
+#undef __local___localdep_Open64_defined
+#endif /* !... */
+#endif /* !__local___localdep_Open64_defined */
 __LOCAL_LIBC(Open) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
-(__VLIBCCALL __LIBC_LOCAL_NAME(Open))(char const *__filename,
-                                      __oflag_t __oflags,
-                                      ...) __THROWS(...) {
-#line 45 "kos/src/libc/magic/kos.fcntl.c"
+(__VLIBCCALL __LIBC_LOCAL_NAME(Open))(char const *__filename, __oflag_t __oflags, ...) __THROWS(...) {
 	__fd_t __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __oflags);
-#if (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))) || defined(__CRT_HAVE_Open) || defined(__CRT_HAVE_Open64)
+#if defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
 	__result = __localdep_Open64(__filename, __oflags, __builtin_va_arg(__args, __mode_t));
-#else /* (__CRT_AT_FDCWD && (__CRT_HAVE_OpenAt || __CRT_HAVE_OpenAt64)) || __CRT_HAVE_Open || __CRT_HAVE_Open64 */
+#else /* __CRT_HAVE_Open64 || (__CRT_AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open */
 	__result = __localdep_OpenAt(__CRT_AT_FDCWD, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
-#endif /* (!__CRT_AT_FDCWD || (!__CRT_HAVE_OpenAt && !__CRT_HAVE_OpenAt64)) && !__CRT_HAVE_Open && !__CRT_HAVE_Open64 */
+#endif /* !__CRT_HAVE_Open64 && (!__CRT_AT_FDCWD || (!__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt)) && !__CRT_HAVE_Open */
 	__builtin_va_end(__args);
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_AT_FDCWD && (__CRT_HAVE_OpenAt || __CRT_HAVE_OpenAt64)) || __CRT_HAVE_Open || __CRT_HAVE_Open64 || (__CRT_AT_FDCWD && (__CRT_HAVE_OpenAt || __CRT_HAVE_OpenAt64 || (__CRT_HAVE_Openat64 && __USE_FILE_OFFSET64))) */
+#ifndef __local___localdep_Open_defined
+#define __local___localdep_Open_defined 1
+#define __localdep_Open __LIBC_LOCAL_NAME(Open)
+#endif /* !__local___localdep_Open_defined */
+#else /* __CRT_HAVE_Open64 || (__CRT_AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open || (__CRT_AT_FDCWD && ((__CRT_HAVE_Openat64 && __USE_FILE_OFFSET64) || __CRT_HAVE_OpenAt || __CRT_HAVE_OpenAt64)) */
+#undef __local_Open_defined
+#endif /* !__CRT_HAVE_Open64 && (!__CRT_AT_FDCWD || (!__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt)) && !__CRT_HAVE_Open && (!__CRT_AT_FDCWD || ((!__CRT_HAVE_Openat64 || !__USE_FILE_OFFSET64) && !__CRT_HAVE_OpenAt && !__CRT_HAVE_OpenAt64)) */
 #endif /* !__local_Open_defined */

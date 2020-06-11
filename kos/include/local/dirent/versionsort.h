@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d25833b */
+/* HASH CRC-32:0x9c643e38 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,32 @@
 #ifndef __local_versionsort_defined
 #define __local_versionsort_defined 1
 #include <__crt.h>
-/* Dependency: "strverscmp" from "string" */
-#ifndef ____localdep_strverscmp_defined
-#define ____localdep_strverscmp_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strverscmp from string */
+#ifndef __local___localdep_strverscmp_defined
+#define __local___localdep_strverscmp_defined 1
 #ifdef __CRT_HAVE_strverscmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strverscmp,(char const *__s1, char const *__s2),strverscmp,(__s1,__s2))
 #elif defined(__CRT_HAVE___strverscmp)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strverscmp,(char const *__s1, char const *__s2),__strverscmp,(__s1,__s2))
-#else /* LIBC: strverscmp */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/strverscmp.h>
-#define __localdep_strverscmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strverscmp))
-#endif /* strverscmp... */
-#endif /* !____localdep_strverscmp_defined */
-
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strverscmp __LIBC_LOCAL_NAME(strverscmp)
+#endif /* !... */
+#endif /* !__local___localdep_strverscmp_defined */
+__NAMESPACE_LOCAL_END
+#include <bits/dirent.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Sort the 2 given directory entries `E1' and `E2' the same way `strvercmp(3)' would. */
 __LOCAL_LIBC(versionsort) __ATTR_PURE __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(versionsort))(struct dirent const **__e1,
-                                                         struct dirent const **__e2) {
-#line 320 "kos/src/libc/magic/dirent.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(versionsort))(struct dirent const **__e1, struct dirent const **__e2) {
 	return __localdep_strverscmp((*__e1)->d_name, (*__e2)->d_name);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_versionsort_defined
+#define __local___localdep_versionsort_defined 1
+#define __localdep_versionsort __LIBC_LOCAL_NAME(versionsort)
+#endif /* !__local___localdep_versionsort_defined */
 #endif /* !__local_versionsort_defined */

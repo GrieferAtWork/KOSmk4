@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3726db19 */
+/* HASH CRC-32:0xe2da019b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,42 +21,44 @@
 #ifndef __local_wildstrcasecmp_l_defined
 #define __local_wildstrcasecmp_l_defined 1
 #include <__crt.h>
-/* Dependency: "tolower_l" from "ctype" */
-#ifndef ____localdep_tolower_l_defined
-#define ____localdep_tolower_l_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strcasecmp_l from string */
+#ifndef __local___localdep_strcasecmp_l_defined
+#define __local___localdep_strcasecmp_l_defined 1
+#ifdef __strcasecmp_l_defined
+__NAMESPACE_GLB_USING(strcasecmp_l)
+#define __localdep_strcasecmp_l strcasecmp_l
+#elif defined(__CRT_HAVE_strcasecmp_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),strcasecmp_l,(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE__stricmp_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),_stricmp_l,(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE___strcasecmp_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),__strcasecmp_l,(__s1,__s2,__locale))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/strcasecmp_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strcasecmp_l __LIBC_LOCAL_NAME(strcasecmp_l)
+#endif /* !... */
+#endif /* !__local___localdep_strcasecmp_l_defined */
+/* Dependency: tolower_l from ctype */
+#ifndef __local___localdep_tolower_l_defined
+#define __local___localdep_tolower_l_defined 1
 #ifdef __CRT_HAVE_tolower_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),tolower_l,(__ch,__locale))
 #elif defined(__CRT_HAVE__tolower_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),_tolower_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___tolower_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),__tolower_l,(__ch,__locale))
-#else /* LIBC: tolower_l */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/tolower_l.h>
-#define __localdep_tolower_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tolower_l))
-#endif /* tolower_l... */
-#endif /* !____localdep_tolower_l_defined */
-
-/* Dependency: "strcasecmp_l" from "string" */
-#ifndef ____localdep_strcasecmp_l_defined
-#define ____localdep_strcasecmp_l_defined 1
-#ifdef __CRT_HAVE_strcasecmp_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),strcasecmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE__stricmp_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),_stricmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE___strcasecmp_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),__strcasecmp_l,(__s1,__s2,__locale))
-#else /* LIBC: strcasecmp_l */
-#include <local/string/strcasecmp_l.h>
-#define __localdep_strcasecmp_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcasecmp_l))
-#endif /* strcasecmp_l... */
-#endif /* !____localdep_strcasecmp_l_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_tolower_l __LIBC_LOCAL_NAME(tolower_l)
+#endif /* !... */
+#endif /* !__local___localdep_tolower_l_defined */
 __LOCAL_LIBC(wildstrcasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildstrcasecmp_l))(char const *__pattern,
-                                                              char const *__string,
-                                                              __locale_t __locale) {
-#line 4424 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildstrcasecmp_l))(char const *__pattern, char const *__string, __locale_t __locale) {
 	char __card_post, __pattern_ch, __string_ch;
 	for (;;) {
 		if (!*__string) {
@@ -103,4 +105,8 @@ __next:
 	return (int)((unsigned char)__string_ch - (unsigned char)__pattern_ch);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wildstrcasecmp_l_defined
+#define __local___localdep_wildstrcasecmp_l_defined 1
+#define __localdep_wildstrcasecmp_l __LIBC_LOCAL_NAME(wildstrcasecmp_l)
+#endif /* !__local___localdep_wildstrcasecmp_l_defined */
 #endif /* !__local_wildstrcasecmp_l_defined */

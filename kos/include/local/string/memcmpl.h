@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb83b2e6 */
+/* HASH CRC-32:0x538be961 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Compare memory buffers and return the difference of the first non-matching dword */
 __LOCAL_LIBC(memcmpl) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __INT32_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmpl))(/*aligned(4)*/ void const *__s1,
-                                                     /*aligned(4)*/ void const *__s2,
-                                                     __SIZE_TYPE__ __n_dwords) {
-#line 1295 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmpl))(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords) {
 	__INT32_TYPE__ *__p1 = (__INT32_TYPE__ *)__s1;
 	__INT32_TYPE__ *__p2 = (__INT32_TYPE__ *)__s2;
 	__INT32_TYPE__ __v1, __v2;
@@ -36,4 +33,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmpl))(/*aligned(4)*/ void const *
 	return __v1 - __v2;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memcmpl_defined
+#define __local___localdep_memcmpl_defined 1
+#define __localdep_memcmpl __LIBC_LOCAL_NAME(memcmpl)
+#endif /* !__local___localdep_memcmpl_defined */
 #endif /* !__local_memcmpl_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb94eec99 */
+/* HASH CRC-32:0x5b977db6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_asinf_defined
-#if defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 #define __local_asinf_defined 1
 #include <__crt.h>
-/* Dependency: "asin" */
-#ifndef ____localdep_asin_defined
-#define ____localdep_asin_defined 1
+#if defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: asin from math */
+#ifndef __local___localdep_asin_defined
+#define __local___localdep_asin_defined 1
 #if __has_builtin(__builtin_asin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asin)
 /* Arc sine of X */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asin,(double __x),asin,{ return __builtin_asin(__x); })
@@ -34,18 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asin,(double __x),asin,(_
 #elif defined(__CRT_HAVE___asin)
 /* Arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asin,(double __x),__asin,(__x))
-#else /* LIBC: asin */
-#undef ____localdep_asin_defined
-#endif /* asin... */
-#endif /* !____localdep_asin_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_asin_defined
+#endif /* !... */
+#endif /* !__local___localdep_asin_defined */
 /* Arc sine of X */
 __LOCAL_LIBC(asinf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(asinf))(float __x) {
-#line 188 "kos/src/libc/magic/math.c"
 	return (float)__localdep_asin((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_asin || __CRT_HAVE___asin */
+#ifndef __local___localdep_asinf_defined
+#define __local___localdep_asinf_defined 1
+#define __localdep_asinf __LIBC_LOCAL_NAME(asinf)
+#endif /* !__local___localdep_asinf_defined */
+#else /* __CRT_HAVE_asin || __CRT_HAVE___asin */
+#undef __local_asinf_defined
+#endif /* !__CRT_HAVE_asin && !__CRT_HAVE___asin */
 #endif /* !__local_asinf_defined */

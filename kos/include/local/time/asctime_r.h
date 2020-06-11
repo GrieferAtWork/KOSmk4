@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdf35204 */
+/* HASH CRC-32:0xfd614bcb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,13 @@
 #include <__crt.h>
 #ifndef __STRUCT_TM
 #ifdef __tm_defined
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
+#define __STRUCT_TM struct tm
 #else /* __tm_defined */
-#define __STRUCT_TM struct __NAMESPACE_STD_SYM __NAMESPACE_STD_SYM tm
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
 #ifndef __std_tm_defined
 #define __std_tm_defined 1
 __NAMESPACE_STD_BEGIN
-struct __NAMESPACE_STD_SYM tm {
+struct tm {
 	int         tm_sec;      /* seconds [0, 61]. */
 	int         tm_min;      /* minutes [0, 59]. */
 	int         tm_hour;     /* hour [0, 23]. */
@@ -41,105 +41,118 @@ struct __NAMESPACE_STD_SYM tm {
 	int         tm_isdst;    /* daylight savings flag. */
 #ifdef __CRT_GLC
 #ifdef __USE_MISC
-	long int    tm_gmtoff;   /* Seconds east of UTC. */
-	char const *tm_zone;     /* Timezone abbreviation. */
+	__LONGPTR_TYPE__ tm_gmtoff;   /* Seconds east of UTC. */
+	char const      *tm_zone;     /* Timezone abbreviation. */
 #else /* __USE_MISC */
-	long int    __tm_gmtoff; /* Seconds east of UTC. */
-	char const *__tm_zone;   /* Timezone abbreviation. */
+	__LONGPTR_TYPE__ __tm_gmtoff; /* Seconds east of UTC. */
+	char const      *__tm_zone;   /* Timezone abbreviation. */
 #endif /* !__USE_MISC */
 #endif /* __CRT_GLC */
 };
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-#endif /* !__STRUCT_TM */
-
-#if !(defined(__CRT_HAVE_asctime_s))
-#ifndef __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED
-#define __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __NO_ATTR_WEAK
-__INTERN_CONST __ATTR_UNUSED __ATTR_WEAK char const __abbr_wday_names[7][4] =
-#elif !defined(__NO_ATTR_SELECTANY)
-__INTERN_CONST __ATTR_UNUSED __ATTR_SELECTANY char const __abbr_wday_names[7][4] =
-#else
-__PRIVATE __ATTR_UNUSED char const __abbr_wday_names[7][4] =
 #endif
-	{ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBC_TIME_ABBR_WDAY_NAMES_DEFINED */
-#ifndef __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED
-#define __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __NO_ATTR_WEAK
-__INTERN_CONST __ATTR_UNUSED __ATTR_WEAK char const __abbr_month_names[12][4] =
-#elif !defined(__NO_ATTR_SELECTANY)
-__INTERN_CONST __ATTR_UNUSED __ATTR_SELECTANY char const __abbr_month_names[12][4] =
-#else
-__PRIVATE __ATTR_UNUSED char const __abbr_month_names[12][4] =
-#endif
-	{ "Jan", "Feb", "Mar", "Apr", "May", "Jun",  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBC_TIME_ABBR_MONTH_NAMES_DEFINED */
-#endif /* !__CRT_HAVE_asctime_s */
-/* Dependency: "crt_asctime_s" from "time" */
-#ifndef ____localdep_crt_asctime_s_defined
-#define ____localdep_crt_asctime_s_defined 1
-#ifdef __CRT_HAVE_asctime_s
+/* Dependency: crt_asctime_s from time */
+#if !defined(__local___localdep_crt_asctime_s_defined) && defined(__CRT_HAVE_asctime_s)
+#define __local___localdep_crt_asctime_s_defined 1
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_crt_asctime_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, __STRUCT_TM const *__restrict __tp),asctime_s,(__buf,__buflen,__tp))
-#else /* LIBC: asctime_s */
-#undef ____localdep_crt_asctime_s_defined
-#endif /* crt_asctime_s... */
-#endif /* !____localdep_crt_asctime_s_defined */
-
-/* Dependency: "sprintf" from "stdio" */
-#ifndef ____localdep_sprintf_defined
-#define ____localdep_sprintf_defined 1
-#if __has_builtin(__builtin_sprintf) && __has_builtin(__builtin_va_arg_pack) && !defined(__NO_EXTERNINLINE) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf)
+#endif /* !__local___localdep_crt_asctime_s_defined && __CRT_HAVE_asctime_s */
+/* Dependency: sprintf from stdio */
+#ifndef __local___localdep_sprintf_defined
+#define __local___localdep_sprintf_defined 1
+#if __has_builtin(__builtin_sprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf) && __has_builtin(__builtin_va_arg_pack)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_sprintf,(char *__restrict __buf, char const *__restrict __format, ...),sprintf,{ return __builtin_sprintf(__buf, __format, __builtin_va_arg_pack()); })
-#elif defined(__CRT_HAVE_sprintf) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_sprintf)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("sprintf");
-#elif defined(__CRT_HAVE__IO_sprintf) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__IO_sprintf)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("_IO_sprintf");
-#else /* LIBC: sprintf */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdio/sprintf.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-#define __localdep_sprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sprintf))
-#endif /* sprintf... */
-#endif /* !____localdep_sprintf_defined */
+#define __localdep_sprintf __LIBC_LOCAL_NAME(sprintf)
+#endif /* !... */
+#endif /* !__local___localdep_sprintf_defined */
+__NAMESPACE_LOCAL_END
+#if defined(__BUILDING_LIBC) || !defined(__CRT_HAVE_asctime_s)
+#ifndef __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED
+#define __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED 1
+__NAMESPACE_LOCAL_BEGIN
 
+__LOCAL_LIBC_CONST_DATA(__abbr_wday_names) char const __abbr_wday_names[7][4] =
+	{ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+__NAMESPACE_LOCAL_END
+
+#endif
+#ifndef __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED
+#define __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED 1
+__NAMESPACE_LOCAL_BEGIN
+
+__LOCAL_LIBC_CONST_DATA(__abbr_month_names) char const __abbr_month_names[12][4] =
+	{ "Jan", "Feb", "Mar", "Apr", "May", "Jun",  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+__NAMESPACE_LOCAL_END
+
+#endif
+#endif /* __BUILDING_LIBC || !__CRT_HAVE_asctime_s */
 __NAMESPACE_LOCAL_BEGIN
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
 __LOCAL_LIBC(asctime_r) __ATTR_NONNULL((1, 2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_r))(__STRUCT_TM const *__restrict __tp,
-                                                       char __buf[26]) {
-#line 1773 "kos/src/libc/magic/time.c"
-#ifdef __CRT_HAVE_asctime_s
-	return __localdep_crt_asctime_s(__buf, 26, __tp) ? __NULLPTR : __buf;
-#else /* __CRT_HAVE_asctime_s */
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_r))(__STRUCT_TM const *__restrict __tp, char __buf[26]) {
+#ifdef __BUILDING_LIBC
 	__localdep_sprintf(__buf,
 	        "%.3s %.3s%3u %.2u:%.2u:%.2u %u\n",
 	       (unsigned int)__tp->tm_wday >= 7 ? "??" "?" :
-	        __NAMESPACE_LOCAL_SYM __abbr_wday_names[__tp->tm_wday],
+	        __abbr_wday_names[__tp->tm_wday],
 	       (unsigned int)__tp->tm_mon >= 12 ? "??" "?" :
-	        __NAMESPACE_LOCAL_SYM __abbr_month_names[__tp->tm_mon],
+	        __abbr_month_names[__tp->tm_mon],
 	       (unsigned int)__tp->tm_mday,
 	       (unsigned int)__tp->tm_hour,
 	       (unsigned int)__tp->tm_min,
 	       (unsigned int)__tp->tm_sec,
 	       (unsigned int)__tp->tm_year + 1900);
 	return __buf;
-#endif /* !__CRT_HAVE_asctime_s */
+#elif defined(__CRT_HAVE_asctime_s)
+	return __localdep_crt_asctime_s(__buf, 26, __tp) ? __NULLPTR : __buf;
+#else /* ... */
+	__localdep_sprintf(__buf,
+	        "%.3s %.3s%3u %.2u:%.2u:%.2u %u\n",
+	       (unsigned int)__tp->tm_wday >= 7 ? "??" "?" :
+	        __abbr_wday_names[__tp->tm_wday],
+	       (unsigned int)__tp->tm_mon >= 12 ? "??" "?" :
+	        __abbr_month_names[__tp->tm_mon],
+	       (unsigned int)__tp->tm_mday,
+	       (unsigned int)__tp->tm_hour,
+	       (unsigned int)__tp->tm_min,
+	       (unsigned int)__tp->tm_sec,
+	       (unsigned int)__tp->tm_year + 1900);
+	return __buf;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_asctime_r_defined
+#define __local___localdep_asctime_r_defined 1
+#define __localdep_asctime_r __LIBC_LOCAL_NAME(asctime_r)
+#endif /* !__local___localdep_asctime_r_defined */
 #endif /* !__local_asctime_r_defined */

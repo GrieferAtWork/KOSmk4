@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60cd8155 */
+/* HASH CRC-32:0xe8db5599 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,27 @@
 #ifndef __local__mbstrnlen_l_defined
 #define __local__mbstrnlen_l_defined 1
 #include <__crt.h>
-/* Dependency: "_mbstrnlen" from "stdlib" */
-#ifndef ____localdep__mbstrnlen_defined
-#define ____localdep__mbstrnlen_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: _mbstrnlen from stdlib */
+#ifndef __local___localdep__mbstrnlen_defined
+#define __local___localdep__mbstrnlen_defined 1
 #ifdef __CRT_HAVE__mbstrnlen
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstrnlen,(char const *__str, __SIZE_TYPE__ __maxlen),_mbstrnlen,(__str,__maxlen))
-#else /* LIBC: _mbstrnlen */
+#else /* __CRT_HAVE__mbstrnlen */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/_mbstrnlen.h>
-#define __localdep__mbstrnlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstrnlen))
-#endif /* _mbstrnlen... */
-#endif /* !____localdep__mbstrnlen_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbstrnlen __LIBC_LOCAL_NAME(_mbstrnlen)
+#endif /* !__CRT_HAVE__mbstrnlen */
+#endif /* !__local___localdep__mbstrnlen_defined */
 __LOCAL_LIBC(_mbstrnlen_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstrnlen_l))(char const *__str,
-                                                          __SIZE_TYPE__ __maxlen,
-                                                          __locale_t __locale) {
-#line 2642 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstrnlen_l))(char const *__str, __SIZE_TYPE__ __maxlen, __locale_t __locale) {
 	(void)__locale;
 	return __localdep__mbstrnlen(__str, __maxlen);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__mbstrnlen_l_defined
+#define __local___localdep__mbstrnlen_l_defined 1
+#define __localdep__mbstrnlen_l __LIBC_LOCAL_NAME(_mbstrnlen_l)
+#endif /* !__local___localdep__mbstrnlen_l_defined */
 #endif /* !__local__mbstrnlen_l_defined */

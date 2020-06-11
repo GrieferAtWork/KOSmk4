@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7a922db */
+/* HASH CRC-32:0x792a20d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,21 @@
 #ifndef __local_fflush_unlocked_defined
 #define __local_fflush_unlocked_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-/* Dependency: "crt_flushall" from "stdio" */
-#ifndef ____localdep_crt_flushall_defined
-#define ____localdep_crt_flushall_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: crt_flushall from stdio */
+#ifndef __local___localdep_crt_flushall_defined
+#define __local___localdep_crt_flushall_defined 1
 #ifdef __CRT_HAVE__flushall
 __CREDIRECT(,int,__THROWING,__localdep_crt_flushall,(void),_flushall,())
 #elif defined(__CRT_HAVE__IO_flush_all)
 __CREDIRECT(,int,__THROWING,__localdep_crt_flushall,(void),_IO_flush_all,())
-#else /* LIBC: _flushall */
-#undef ____localdep_crt_flushall_defined
-#endif /* crt_flushall... */
-#endif /* !____localdep_crt_flushall_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_crt_flushall_defined
+#endif /* !... */
+#endif /* !__local___localdep_crt_flushall_defined */
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
 __LOCAL_LIBC(fflush_unlocked) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fflush_unlocked))(__FILE *__stream) __THROWS(...) {
-#line 1126 "kos/src/libc/magic/stdio.c"
 	/* NO-OP (When not implemented by the CRT, assume no
 	 * buffering being done, meaning this function isn't needed) */
 #if defined(__CRT_HAVE__flushall) || defined(__CRT_HAVE__IO_flush_all)
@@ -49,4 +46,8 @@ __LOCAL_LIBC(fflush_unlocked) int
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_fflush_unlocked_defined
+#define __local___localdep_fflush_unlocked_defined 1
+#define __localdep_fflush_unlocked __LIBC_LOCAL_NAME(fflush_unlocked)
+#endif /* !__local___localdep_fflush_unlocked_defined */
 #endif /* !__local_fflush_unlocked_defined */

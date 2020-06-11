@@ -321,7 +321,7 @@ void thrd_yield() = pthread_yield;
 @@Creates a new mutex object with type TYPE.
 @@If successful the new object is pointed by MUTEX
 @@s.a. `pthread_mutex_init()'
-[[decl_include("<bits/threads.h>")]]
+[[decl_include("<features.h>", "<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadvalues.h>", "<bits/pthreadtypes.h>")]]
 [[userimpl, requires_function(pthread_mutex_init)]]
 int mtx_init([[nonnull]] mtx_t *__restrict mutex, __STDC_INT_AS_UINT_T type) {

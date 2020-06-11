@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4d91d5b */
+/* HASH CRC-32:0x58e7de1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,65 +19,87 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fopendirat_defined
-#if defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64))
 #define __local_fopendirat_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))
+struct __dirstream;
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: close from unistd */
+#ifndef __local___localdep_close_defined
+#define __local___localdep_close_defined 1
+#ifdef __close_defined
+__NAMESPACE_LOCAL_END
 #include <bits/types.h>
-struct __dirstream;
-struct __dirstream;
-/* Dependency: "openat" from "fcntl" */
-#ifndef ____localdep_openat_defined
-#define ____localdep_openat_defined 1
-#if defined(__CRT_HAVE_openat64) && defined(__USE_FILE_OFFSET64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64)
-#include <local/fcntl/openat.h>
-#define __localdep_openat (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(openat))
-#else /* CUSTOM: openat */
-#undef ____localdep_openat_defined
-#endif /* openat... */
-#endif /* !____localdep_openat_defined */
-
-/* Dependency: "fdopendir" */
-#ifndef ____localdep_fdopendir_defined
-#define ____localdep_fdopendir_defined 1
-#ifdef __CRT_HAVE_fdopendir
-/* Create a new directory stream by inheriting the given `FD' as stream handle */
-__CREDIRECT(__ATTR_WUNUSED,struct __dirstream *,__NOTHROW_NCX,__localdep_fdopendir,(__fd_t __fd),fdopendir,(__fd))
-#else /* LIBC: fdopendir */
-#undef ____localdep_fdopendir_defined
-#endif /* fdopendir... */
-#endif /* !____localdep_fdopendir_defined */
-
-/* Dependency: "close" */
-#ifndef ____localdep_close_defined
-#define ____localdep_close_defined 1
-#ifdef __CRT_HAVE_close
+__NAMESPACE_LOCAL_BEGIN
+/* >> close(2)
+ * Close a file handle */
+__NAMESPACE_GLB_USING(close)
+#define __localdep_close close
+#elif defined(__CRT_HAVE_close)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> close(2)
  * Close a file handle */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> close(2)
  * Close a file handle */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
 #elif defined(__CRT_HAVE___close)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> close(2)
  * Close a file handle */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
-#else /* LIBC: close */
-#undef ____localdep_close_defined
-#endif /* close... */
-#endif /* !____localdep_close_defined */
-
+#else /* ... */
+#undef __local___localdep_close_defined
+#endif /* !... */
+#endif /* !__local___localdep_close_defined */
+/* Dependency: fdopendir from dirent */
+#if !defined(__local___localdep_fdopendir_defined) && defined(__CRT_HAVE_fdopendir)
+#define __local___localdep_fdopendir_defined 1
+/* Create a new directory stream by inheriting the given `FD' as stream handle */
+__CREDIRECT(__ATTR_WUNUSED,struct __dirstream *,__NOTHROW_NCX,__localdep_fdopendir,(__fd_t __fd),fdopendir,(__fd))
+#endif /* !__local___localdep_fdopendir_defined && __CRT_HAVE_fdopendir */
+/* Dependency: openat from fcntl */
+#ifndef __local___localdep_openat_defined
+#define __local___localdep_openat_defined 1
+#ifdef __openat_defined
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+#ifdef __cplusplus
+__NAMESPACE_GLB_USING(openat)
+#else /* __cplusplus */
+#define __localdep_openat openat
+#endif /* !__cplusplus */
+#elif defined(__CRT_HAVE_openat64) && defined(__USE_FILE_OFFSET64)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)
+__NAMESPACE_LOCAL_END
+#include <local/fcntl/openat.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_openat __LIBC_LOCAL_NAME(openat)
+#else /* ... */
+#undef __local___localdep_openat_defined
+#endif /* !... */
+#endif /* !__local___localdep_openat_defined */
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __LOCAL_LIBC(fopendirat) __ATTR_WUNUSED __ATTR_NONNULL((2)) struct __dirstream *
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fopendirat))(__fd_t __dirfd,
-                                                        char const *__name,
-                                                        __oflag_t __oflags) {
-#line 130 "kos/src/libc/magic/dirent.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fopendirat))(__fd_t __dirfd, char const *__name, __oflag_t __oflags) {
 	struct __dirstream *__result;
 	__fd_t __fd = __localdep_openat(__dirfd, __name, __oflags);
 	if __unlikely(__fd < 0)
@@ -90,5 +112,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fopendirat))(__fd_t __dirfd,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_fdopendir && (__CRT_HAVE_openat || __CRT_HAVE_openat64) */
+#ifndef __local___localdep_fopendirat_defined
+#define __local___localdep_fopendirat_defined 1
+#define __localdep_fopendirat __LIBC_LOCAL_NAME(fopendirat)
+#endif /* !__local___localdep_fopendirat_defined */
+#else /* __CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat) */
+#undef __local_fopendirat_defined
+#endif /* !__CRT_HAVE_fdopendir || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat) */
 #endif /* !__local_fopendirat_defined */

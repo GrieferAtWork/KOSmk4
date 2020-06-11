@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb9768d2 */
+/* HASH CRC-32:0x70af943c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,30 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Truncate64_defined
-#ifdef __CRT_HAVE_Truncate
 #define __local_Truncate64_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-/* Dependency: "Truncate32" from "kos.unistd" */
-#ifndef ____localdep_Truncate32_defined
-#define ____localdep_Truncate32_defined 1
 #ifdef __CRT_HAVE_Truncate
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: Truncate32 from kos.unistd */
+#if !defined(__local___localdep_Truncate32_defined) && defined(__CRT_HAVE_Truncate)
+#define __local___localdep_Truncate32_defined 1
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length))
-#else /* LIBC: Truncate */
-#undef ____localdep_Truncate32_defined
-#endif /* Truncate32... */
-#endif /* !____localdep_Truncate32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1)),__vodi,__THROWING,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length))
+#endif /* !__local___localdep_Truncate32_defined && __CRT_HAVE_Truncate */
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __LOCAL_LIBC(Truncate64) __ATTR_NONNULL((1)) void
-(__LIBCCALL __LIBC_LOCAL_NAME(Truncate64))(char const *__file,
-                                           __pos64_t __length) __THROWS(...) {
-#line 492 "kos/src/libc/magic/kos.unistd.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(Truncate64))(char const *__file, __pos64_t __length) __THROWS(...) {
 	__localdep_Truncate32(__file, (__pos32_t)__length);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_Truncate */
+#ifndef __local___localdep_Truncate64_defined
+#define __local___localdep_Truncate64_defined 1
+#define __localdep_Truncate64 __LIBC_LOCAL_NAME(Truncate64)
+#endif /* !__local___localdep_Truncate64_defined */
+#else /* __CRT_HAVE_Truncate */
+#undef __local_Truncate64_defined
+#endif /* !__CRT_HAVE_Truncate */
 #endif /* !__local_Truncate64_defined */

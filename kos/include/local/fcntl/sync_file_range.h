@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa475fb3c */
+/* HASH CRC-32:0x34d5496f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,11 +24,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sync_file_range) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sync_file_range))(__fd_t __fd,
-                                                             __off64_t __offset,
-                                                             __off64_t __count,
-                                                             unsigned int __flags) {
-#line 159 "kos/src/libc/magic/fcntl.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sync_file_range))(__fd_t __fd, __off64_t __offset, __off64_t __count, unsigned int __flags) {
 	(void)__fd;
 	(void)__offset;
 	(void)__count;
@@ -36,4 +32,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sync_file_range))(__fd_t __fd,
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_sync_file_range_defined
+#define __local___localdep_sync_file_range_defined 1
+#define __localdep_sync_file_range __LIBC_LOCAL_NAME(sync_file_range)
+#endif /* !__local___localdep_sync_file_range_defined */
 #endif /* !__local_sync_file_range_defined */

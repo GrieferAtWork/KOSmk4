@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d55642c */
+/* HASH CRC-32:0x1b4fa887 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,29 @@
 #ifndef __local_strlen_defined
 #define __local_strlen_defined 1
 #include <__crt.h>
-/* Dependency: "strend" from "string" */
-#ifndef ____localdep_strend_defined
-#define ____localdep_strend_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strend from string */
+#ifndef __local___localdep_strend_defined
+#define __local___localdep_strend_defined 1
 #ifdef __CRT_HAVE_strend
 /* Same as `STR + strlen(STR)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
-#else /* LIBC: strend */
+#else /* __CRT_HAVE_strend */
+__NAMESPACE_LOCAL_END
 #include <local/string/strend.h>
-/* Same as `STR + strlen(STR)' */
-#define __localdep_strend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strend))
-#endif /* strend... */
-#endif /* !____localdep_strend_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `STR + strlen(STR)' */
+#define __localdep_strend __LIBC_LOCAL_NAME(strend)
+#endif /* !__CRT_HAVE_strend */
+#endif /* !__local___localdep_strend_defined */
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __LOCAL_LIBC(strlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strlen))(char const *__restrict __string) {
-#line 256 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)(__localdep_strend(__string) - __string);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__local___localdep_strlen_defined */
 #endif /* !__local_strlen_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa23c8f47 */
+/* HASH CRC-32:0x8c1bbe19 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,25 +22,10 @@
 #define __local___signbitf_defined 1
 #include <__crt.h>
 #include <libm/signbit.h>
-/* Dependency: "__signbit" from "math" */
-#ifndef ____localdep___signbit_defined
-#define ____localdep___signbit_defined 1
-#ifdef __CRT_HAVE___signbit
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbit,(double __x),__signbit,(__x))
-#elif defined(__CRT_HAVE__dsign)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbit,(double __x),_dsign,(__x))
-#else /* LIBC: __signbit */
-#include <local/math/__signbit.h>
-#define __localdep___signbit (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__signbit))
-#endif /* __signbit... */
-#endif /* !____localdep___signbit_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__signbitf) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitf))(float __x) {
-#line 2108 "kos/src/libc/magic/math.c"
-#ifdef __LIBM_MATHFUNF
-	#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
+#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
 	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
 	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)__x);
@@ -49,9 +34,10 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitf))(float __x) {
 #else /* ... */
 	return __x < 0.0f;
 #endif /* !... */
-#else /* __LIBM_MATHFUNF */
-	return __localdep___signbit((double)__x);
-#endif /* !__LIBM_MATHFUNF */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___signbitf_defined
+#define __local___localdep___signbitf_defined 1
+#define __localdep___signbitf __LIBC_LOCAL_NAME(__signbitf)
+#endif /* !__local___localdep___signbitf_defined */
 #endif /* !__local___signbitf_defined */

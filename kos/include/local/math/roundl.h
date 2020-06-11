@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c8c7c00 */
+/* HASH CRC-32:0x1e64cd48 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,36 +22,14 @@
 #define __local_roundl_defined 1
 #include <__crt.h>
 #include <hybrid/typecore.h>
-
 #include <libm/round.h>
-/* Dependency: "round" from "math" */
-#ifndef ____localdep_round_defined
-#define ____localdep_round_defined 1
-#if __has_builtin(__builtin_round) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_round)
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),round,{ return __builtin_round(__x); })
-#elif defined(__CRT_HAVE_round)
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),round,(__x))
-#elif defined(__CRT_HAVE___round)
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),__round,(__x))
-#else /* LIBC: round */
-#include <local/math/round.h>
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-#define __localdep_round (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(round))
-#endif /* round... */
-#endif /* !____localdep_round_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __LOCAL_LIBC(roundl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(roundl))(__LONGDOUBLE __x) {
-#line 1193 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNL
-	#ifdef __LIBM_MATHFUNL
 	return (__LONGDOUBLE)__LIBM_MATHFUNL(round, __x);
-#else /* __LIBM_MATHFUN */
+#else /* __LIBM_MATHFUNL */
 	__LONGDOUBLE __result;
 	__result = (__LONGDOUBLE)(__INTMAX_TYPE__)__x;
 	if (__x < 0.0L) {
@@ -64,10 +42,11 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(roundl))(__LONGDOUBLE __x) {
 			__result += 1.0L;
 	}
 	return __result;
-#endif /* !__LIBM_MATHFUN */
-#else /* __LIBM_MATHFUNL */
-	return (__LONGDOUBLE)__localdep_round((double)__x);
 #endif /* !__LIBM_MATHFUNL */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_roundl_defined
+#define __local___localdep_roundl_defined 1
+#define __localdep_roundl __LIBC_LOCAL_NAME(roundl)
+#endif /* !__local___localdep_roundl_defined */
 #endif /* !__local_roundl_defined */

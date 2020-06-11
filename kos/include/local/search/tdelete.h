@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x946a2a50 */
+/* HASH CRC-32:0xf8b8970a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,62 +19,66 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tdelete_defined
-#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #define __local_tdelete_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <hybrid/typecore.h>
-
-#include <malloca.h>
-/* Dependency: "memcpyc" from "string" */
-#ifndef ____localdep_memcpyc_defined
-#define ____localdep_memcpyc_defined 1
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#ifndef ____compar_fn_t_defined
+#define ____compar_fn_t_defined 1
+typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
+#endif /* !____compar_fn_t_defined */
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcpyc from string */
+#ifndef __local___localdep_memcpyc_defined
+#define __local___localdep_memcpyc_defined 1
 #ifdef __fast_memcpyc_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))
+__NAMESPACE_FAST_USING(memcpyc)
+#define __localdep_memcpyc __LIBC_FAST_NAME(memcpyc)
 #elif defined(__CRT_HAVE_memcpyc)
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
-#else /* LIBC: memcpyc */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))
-#endif /* memcpyc... */
-#endif /* !____localdep_memcpyc_defined */
-
-/* Dependency: "free" */
-#ifndef ____localdep_free_defined
-#define ____localdep_free_defined 1
-#ifdef __std___localdep_free_defined
-__NAMESPACE_STD_USING(__localdep_free)
+#define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
+#endif /* !... */
+#endif /* !__local___localdep_memcpyc_defined */
+/* Dependency: free from stdlib */
+#ifndef __local___localdep_free_defined
+#define __local___localdep_free_defined 1
+#ifdef __free_defined
+__NAMESPACE_GLB_USING(free)
+#define __localdep_free free
+#elif defined(__std_free_defined)
+__NAMESPACE_STD_USING(free)
+#define __localdep_free free
 #elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
-#else /* LIBC: free */
-#undef ____localdep_free_defined
-#endif /* free... */
-#endif /* !____localdep_free_defined */
-
+#else /* ... */
+#undef __local___localdep_free_defined
+#endif /* !... */
+#endif /* !__local___localdep_free_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+#include <parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Remove the element matching KEY from the tree pointed to by *ROOTP */
-__LOCAL_LIBC(tdelete) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __key,
-                                                     void **__restrict __vrootp,
-                                                     __compar_fn_t __compar) {
-#line 528 "kos/src/libc/magic/search.c"
+__LOCAL_LIBC(tdelete) __ATTR_NONNULL((3)) void *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __key, void **__restrict __vrootp, __compar_fn_t __compar) {
 	typedef struct __node_struct {
-		void const         *__key;
+		void const           *__key;
 		struct __node_struct *__left_node;
 		struct __node_struct *__right_node;
-		__UINTPTR_TYPE__    __is_red;
+		__UINTPTR_TYPE__      __is_red;
 	} *__node;
 	__node __p, __q, __r, __retval;
 	__node __root, __unchained;
@@ -86,7 +90,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __ke
 	__p = *__rootp;
 	if (__p == __NULLPTR)
 		return __NULLPTR;
-	__nodestack = (__node **)malloca(sizeof(__node *) * __stacksize);
+	__nodestack = (__node **)__malloca(sizeof(__node *) * __stacksize);
 	if __unlikely(!__nodestack)
 		return __NULLPTR;
 	__root = __p;
@@ -94,21 +98,19 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __ke
 		if (__sp == __stacksize) {
 			__node **__newstack;
 			__stacksize += 20;
-			__newstack = (__node **)malloca(sizeof(__node *) * __stacksize);
+			__newstack = (__node **)__malloca(sizeof(__node *) * __stacksize);
 			if __unlikely(!__newstack) {
 				__retval = __NULLPTR;
 				goto __done;
 			}
 			__localdep_memcpyc(__newstack, __nodestack, __sp, sizeof(__node *));
-			freea(__nodestack);
+			__freea(__nodestack);
 			__nodestack = __newstack;
 		}
 		__nodestack[__sp++] = __rootp;
 		__p = *__rootp;
-		__rootp = __cmp < 0
-			? &__p->__left_node
-			: &__p->__right_node
-			;
+		__rootp = __cmp < 0 ? &__p->__left_node
+		                : &__p->__right_node;
 		__root = *__rootp;
 		if (__root == __NULLPTR)
 			return __NULLPTR;
@@ -126,13 +128,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __ke
 			if (__sp == __stacksize) {
 				__node **__newstack;
 				__stacksize += 20;
-				__newstack = (__node **)malloca(sizeof(__node *) * __stacksize);
+				__newstack = (__node **)__malloca(sizeof(__node *) * __stacksize);
 				if __unlikely(!__newstack) {
 					__retval = __NULLPTR;
 					goto __done;
 				}
 				__localdep_memcpyc(__newstack, __nodestack, __sp, sizeof(__node *));
-				freea(__nodestack);
+				__freea(__nodestack);
 				__nodestack = __newstack;
 			}
 			__nodestack[__sp++] = __parentp;
@@ -210,7 +212,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __ke
 					__q = __p->__left_node;
 				}
 				if ((__q->__right_node == __NULLPTR || !__q->__right_node->__is_red) &&
-					(__q->__left_node == __NULLPTR || !__q->__left_node->__is_red)) {
+				    (__q->__left_node == __NULLPTR || !__q->__left_node->__is_red)) {
 					__q->__is_red = 1;
 					__r = __p;
 				} else {
@@ -242,9 +244,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __ke
 	}
 	__localdep_free(__unchained);
 __done:
-	freea(__nodestack);
+	__freea(__nodestack);
 	return __retval;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#ifndef __local___localdep_tdelete_defined
+#define __local___localdep_tdelete_defined 1
+#define __localdep_tdelete __LIBC_LOCAL_NAME(tdelete)
+#endif /* !__local___localdep_tdelete_defined */
+#else /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+#undef __local_tdelete_defined
+#endif /* !__CRT_HAVE_free && !__CRT_HAVE_cfree */
 #endif /* !__local_tdelete_defined */

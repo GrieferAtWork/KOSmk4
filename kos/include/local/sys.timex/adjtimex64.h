@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71ba2ba5 */
+/* HASH CRC-32:0xa559d2e9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,25 +19,23 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_adjtimex64_defined
-#if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 #define __local_adjtimex64_defined 1
 #include <__crt.h>
-/* Dependency: "adjtimex32" from "sys.timex" */
-#ifndef ____localdep_adjtimex32_defined
-#define ____localdep_adjtimex32_defined 1
-#ifdef __CRT_HAVE_adjtimex
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict ____ntx),adjtimex,(____ntx))
-#elif defined(__CRT_HAVE___adjtimex)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict ____ntx),__adjtimex,(____ntx))
-#else /* LIBC: adjtimex */
-#undef ____localdep_adjtimex32_defined
-#endif /* adjtimex32... */
-#endif /* !____localdep_adjtimex32_defined */
-
+#if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: adjtimex32 from sys.timex */
+#ifndef __local___localdep_adjtimex32_defined
+#define __local___localdep_adjtimex32_defined 1
+#ifdef __CRT_HAVE_adjtimex
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict __ntx),adjtimex,(__ntx))
+#elif defined(__CRT_HAVE___adjtimex)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict __ntx),__adjtimex,(__ntx))
+#else /* ... */
+#undef __local___localdep_adjtimex32_defined
+#endif /* !... */
+#endif /* !__local___localdep_adjtimex32_defined */
 __LOCAL_LIBC(adjtimex64) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtimex64))(struct timex64 *__restrict __ntx) {
-#line 372 "kos/src/libc/magic/sys.timex.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtimex64))(struct __timex64 *__restrict __ntx) {
 	int __result;
 	struct __timex32 __nxtalt;
 	__nxtalt.time.tv_sec  = (__time32_t)__ntx->time.tv_sec;
@@ -88,5 +86,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtimex64))(struct timex64 *__restri
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex */
+#ifndef __local___localdep_adjtimex64_defined
+#define __local___localdep_adjtimex64_defined 1
+#define __localdep_adjtimex64 __LIBC_LOCAL_NAME(adjtimex64)
+#endif /* !__local___localdep_adjtimex64_defined */
+#else /* __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex */
+#undef __local_adjtimex64_defined
+#endif /* !__CRT_HAVE_adjtimex && !__CRT_HAVE___adjtimex */
 #endif /* !__local_adjtimex64_defined */

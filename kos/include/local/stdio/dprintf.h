@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa953a0b8 */
+/* HASH CRC-32:0x66106b2f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,28 +19,27 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_dprintf_defined
-#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE_vdprintf)
 #define __local_dprintf_defined 1
 #include <__crt.h>
-/* Dependency: "vdprintf" from "stdio" */
-#ifndef ____localdep_vdprintf_defined
-#define ____localdep_vdprintf_defined 1
+#if defined(__CRT_HAVE_vdprintf) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: vdprintf from stdio */
+#ifndef __local___localdep_vdprintf_defined
+#define __local___localdep_vdprintf_defined 1
 #ifdef __CRT_HAVE_vdprintf
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_vdprintf,(__fd_t __fd, char const *__restrict __format, __builtin_va_list __args),vdprintf,(__fd,__format,__args))
 #elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+__NAMESPACE_LOCAL_END
 #include <local/stdio/vdprintf.h>
-#define __localdep_vdprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vdprintf))
-#else /* CUSTOM: vdprintf */
-#undef ____localdep_vdprintf_defined
-#endif /* vdprintf... */
-#endif /* !____localdep_vdprintf_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_vdprintf __LIBC_LOCAL_NAME(vdprintf)
+#else /* ... */
+#undef __local___localdep_vdprintf_defined
+#endif /* !... */
+#endif /* !__local___localdep_vdprintf_defined */
 __LOCAL_LIBC(dprintf) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(dprintf))(__fd_t __fd,
-                                                      char const *__restrict __format,
-                                                      ...) {
-#line 1070 "kos/src/libc/magic/stdio.c"
+__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(dprintf))(__fd_t __fd, char const *__restrict __format, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
@@ -49,5 +48,11 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(dprintf))(__fd_t __fd,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE_vdprintf */
+#ifndef __local___localdep_dprintf_defined
+#define __local___localdep_dprintf_defined 1
+#define __localdep_dprintf __LIBC_LOCAL_NAME(dprintf)
+#endif /* !__local___localdep_dprintf_defined */
+#else /* __CRT_HAVE_vdprintf || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#undef __local_dprintf_defined
+#endif /* !__CRT_HAVE_vdprintf && !__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write */
 #endif /* !__local_dprintf_defined */

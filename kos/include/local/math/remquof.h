@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbaa1c00 */
+/* HASH CRC-32:0x5c398e28 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_remquof_defined
-#if defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
 #define __local_remquof_defined 1
 #include <__crt.h>
-/* Dependency: "remquo" */
-#ifndef ____localdep_remquo_defined
-#define ____localdep_remquo_defined 1
+#if defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: remquo from math */
+#ifndef __local___localdep_remquo_defined
+#define __local___localdep_remquo_defined 1
 #if __has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
@@ -40,22 +41,23 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remquo,(double __x, doubl
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remquo,(double __x, double __y, int *__pquo),__remquo,(__x,__y,__pquo))
-#else /* LIBC: remquo */
-#undef ____localdep_remquo_defined
-#endif /* remquo... */
-#endif /* !____localdep_remquo_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_remquo_defined
+#endif /* !... */
+#endif /* !__local___localdep_remquo_defined */
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 __LOCAL_LIBC(remquof) __ATTR_WUNUSED float
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remquof))(float __x,
-                                                 float __y,
-                                                 int *__pquo) {
-#line 1143 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remquof))(float __x, float __y, int *__pquo) {
 	return (float)__localdep_remquo((double)__x, (double)__y, __pquo);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_remquo || __CRT_HAVE___remquo */
+#ifndef __local___localdep_remquof_defined
+#define __local___localdep_remquof_defined 1
+#define __localdep_remquof __LIBC_LOCAL_NAME(remquof)
+#endif /* !__local___localdep_remquof_defined */
+#else /* __CRT_HAVE_remquo || __CRT_HAVE___remquo */
+#undef __local_remquof_defined
+#endif /* !__CRT_HAVE_remquo && !__CRT_HAVE___remquo */
 #endif /* !__local_remquof_defined */

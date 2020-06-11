@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49dbac8 */
+/* HASH CRC-32:0xb256274f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,10 @@
 #ifndef __local_strtoumax_defined
 #define __local_strtoumax_defined 1
 #include <__crt.h>
-/* Dependency: "strtou32" from "stdlib" */
-#ifndef ____localdep_strtou32_defined
-#define ____localdep_strtou32_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strtou32 from stdlib */
+#ifndef __local___localdep_strtou32_defined
+#define __local___localdep_strtou32_defined 1
 #ifdef __CRT_HAVE_strtou32
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, int __base),strtou32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoul) && (__SIZEOF_LONG__ == 4)
@@ -34,15 +35,16 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__loca
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, int __base),strtouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoumax) && (__SIZEOF_INTMAX_T__ == 4)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, int __base),strtoumax,(__nptr,__endptr,__base))
-#else /* LIBC: strtou32 */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/strtou32.h>
-#define __localdep_strtou32 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32))
-#endif /* strtou32... */
-#endif /* !____localdep_strtou32_defined */
-
-/* Dependency: "strtou64" from "stdlib" */
-#ifndef ____localdep_strtou64_defined
-#define ____localdep_strtou64_defined 1
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strtou32 __LIBC_LOCAL_NAME(strtou32)
+#endif /* !... */
+#endif /* !__local___localdep_strtou32_defined */
+/* Dependency: strtou64 from stdlib */
+#ifndef __local___localdep_strtou64_defined
+#define __local___localdep_strtou64_defined 1
 #ifdef __CRT_HAVE_strtou64
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64,(char const *__restrict __nptr, char **__endptr, int __base),strtou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__strtoui64)
@@ -55,23 +57,24 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__loca
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64,(char const *__restrict __nptr, char **__endptr, int __base),strtouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoumax) && (__SIZEOF_INTMAX_T__ == 8)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64,(char const *__restrict __nptr, char **__endptr, int __base),strtoumax,(__nptr,__endptr,__base))
-#else /* LIBC: strtou64 */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/strtou64.h>
-#define __localdep_strtou64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou64))
-#endif /* strtou64... */
-#endif /* !____localdep_strtou64_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strtou64 __LIBC_LOCAL_NAME(strtou64)
+#endif /* !... */
+#endif /* !__local___localdep_strtou64_defined */
 __LOCAL_LIBC(strtoumax) __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoumax))(char const *__restrict __nptr,
-                                                       char **__endptr,
-                                                       int __base) {
-#line 572 "kos/src/libc/magic/inttypes.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoumax))(char const *__restrict __nptr, char **__endptr, int __base) {
 #if __SIZEOF_INTMAX_T__ <= 4
 	return (__UINTMAX_TYPE__)__localdep_strtou32(__nptr, __endptr, __base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
 	return (__UINTMAX_TYPE__)__localdep_strtou64(__nptr, __endptr, __base);
-#endif /* __SIZEOF_INTMAX_T__ > 4 */
+#endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strtoumax_defined
+#define __local___localdep_strtoumax_defined 1
+#define __localdep_strtoumax __LIBC_LOCAL_NAME(strtoumax)
+#endif /* !__local___localdep_strtoumax_defined */
 #endif /* !__local_strtoumax_defined */

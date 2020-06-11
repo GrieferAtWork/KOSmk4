@@ -1,4 +1,4 @@
-/* HASH TODO_REMOVE_ME:0 */
+/* HASH CRC-32:0xbc5751b4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,9 @@
 #define __local_fdatasync_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> fdatasync(2)
+ * Synchronize only the data of a file (not its descriptor which contains
+ * timestamps, and its size), meaning that changes are written to disk */
 __LOCAL_LIBC(fdatasync) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fdatasync))(__fd_t __fd) {
 	(void)__fd;
@@ -29,4 +32,8 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fdatasync))(__fd_t __fd) {
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_fdatasync_defined
+#define __local___localdep_fdatasync_defined 1
+#define __localdep_fdatasync __LIBC_LOCAL_NAME(fdatasync)
+#endif /* !__local___localdep_fdatasync_defined */
 #endif /* !__local_fdatasync_defined */

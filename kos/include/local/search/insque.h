@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60cfb4b7 */
+/* HASH CRC-32:0xcc22d49d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,29 +21,28 @@
 #ifndef __local_insque_defined
 #define __local_insque_defined 1
 #include <__crt.h>
-/* Dependency: "link" from "unistd" */
-#ifndef ____localdep_link_defined
-#define ____localdep_link_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: link from unistd */
+#ifndef __local___localdep_link_defined
+#define __local___localdep_link_defined 1
 #ifdef __CRT_HAVE_link
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),link,(__from,__to))
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_linkat)
+__NAMESPACE_LOCAL_END
 #include <local/unistd/link.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
-#define __localdep_link (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(link))
-#else /* CUSTOM: link */
-#undef ____localdep_link_defined
-#endif /* link... */
-#endif /* !____localdep_link_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_link __LIBC_LOCAL_NAME(link)
+#else /* ... */
+#undef __local___localdep_link_defined
+#endif /* !... */
+#endif /* !__local___localdep_link_defined */
 /* Insert ELEM into a doubly-linked list, after PREV */
 __LOCAL_LIBC(insque) __ATTR_NONNULL((1)) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(insque))(void *__restrict __elem,
-                                                    void *__prev) {
-#line 109 "kos/src/libc/magic/search.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(insque))(void *__restrict __elem, void *__prev) {
 	struct __localdep_link {
 		struct __localdep_link *__l_forw; /* [0..1] Forward link */
 		struct __localdep_link *__l_back; /* [0..1] Backward link */
@@ -62,4 +61,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(insque))(void *__restrict __elem,
 	}
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_insque_defined
+#define __local___localdep_insque_defined 1
+#define __localdep_insque __LIBC_LOCAL_NAME(insque)
+#endif /* !__local___localdep_insque_defined */
 #endif /* !__local_insque_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf82b34f */
+/* HASH CRC-32:0xf8204b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,35 +19,38 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_logf_defined
-#if defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
 #define __local_logf_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
 #include <bits/math-vector.h>
-#include <bits/math-vector.h>
-/* Dependency: "log" */
-#ifndef ____localdep_log_defined
-#define ____localdep_log_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: log from math */
+#ifndef __local___localdep_log_defined
+#define __local___localdep_log_defined 1
 #if __has_builtin(__builtin_log) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log)
 /* Natural logarithm of X */
-__CEIREDIRECT(__DECL_SIMD_log __ATTR_WUNUSED,double,__NOTHROW,__localdep_log,(double __x),log,{ return __builtin_log(__x); })
+__CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_log,double,__NOTHROW,__localdep_log,(double __x),log,{ return __builtin_log(__x); })
 #elif defined(__CRT_HAVE_log)
 /* Natural logarithm of X */
-__CREDIRECT(__DECL_SIMD_log __ATTR_WUNUSED,double,__NOTHROW,__localdep_log,(double __x),log,(__x))
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_log,double,__NOTHROW,__localdep_log,(double __x),log,(__x))
 #elif defined(__CRT_HAVE___log)
 /* Natural logarithm of X */
-__CREDIRECT(__DECL_SIMD_log __ATTR_WUNUSED,double,__NOTHROW,__localdep_log,(double __x),__log,(__x))
-#else /* LIBC: log */
-#undef ____localdep_log_defined
-#endif /* log... */
-#endif /* !____localdep_log_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_log,double,__NOTHROW,__localdep_log,(double __x),__log,(__x))
+#else /* ... */
+#undef __local___localdep_log_defined
+#endif /* !... */
+#endif /* !__local___localdep_log_defined */
 /* Natural logarithm of X */
-__LOCAL_LIBC(logf) __DECL_SIMD_logf __ATTR_WUNUSED float
+__LOCAL_LIBC(logf) __ATTR_WUNUSED __DECL_SIMD_logf float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(logf))(float __x) {
-#line 408 "kos/src/libc/magic/math.c"
 	return (float)__localdep_log((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_log || __CRT_HAVE___log */
+#ifndef __local___localdep_logf_defined
+#define __local___localdep_logf_defined 1
+#define __localdep_logf __LIBC_LOCAL_NAME(logf)
+#endif /* !__local___localdep_logf_defined */
+#else /* __CRT_HAVE_log || __CRT_HAVE___log */
+#undef __local_logf_defined
+#endif /* !__CRT_HAVE_log && !__CRT_HAVE___log */
 #endif /* !__local_logf_defined */

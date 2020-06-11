@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d704a92 */
+/* HASH CRC-32:0x8ba1da27 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,29 @@
 #ifndef __local_strnlen_defined
 #define __local_strnlen_defined 1
 #include <__crt.h>
-/* Dependency: "strnend" from "string" */
-#ifndef ____localdep_strnend_defined
-#define ____localdep_strnend_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strnend from string */
+#ifndef __local___localdep_strnend_defined
+#define __local___localdep_strnend_defined 1
 #ifdef __CRT_HAVE_strnend
 /* Same as `STR + strnlen(STR, MAX_CHARS)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnend,(char const *__restrict __string, __SIZE_TYPE__ __maxlen),strnend,(__string,__maxlen))
-#else /* LIBC: strnend */
+#else /* __CRT_HAVE_strnend */
+__NAMESPACE_LOCAL_END
 #include <local/string/strnend.h>
-/* Same as `STR + strnlen(STR, MAX_CHARS)' */
-#define __localdep_strnend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnend))
-#endif /* strnend... */
-#endif /* !____localdep_strnend_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `STR + strnlen(STR, MAX_CHARS)' */
+#define __localdep_strnend __LIBC_LOCAL_NAME(strnend)
+#endif /* !__CRT_HAVE_strnend */
+#endif /* !__local___localdep_strnend_defined */
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __LOCAL_LIBC(strnlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnlen))(char const *__restrict __string,
-                                                     __SIZE_TYPE__ __maxlen) {
-#line 470 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnlen))(char const *__restrict __string, __SIZE_TYPE__ __maxlen) {
 	return (__SIZE_TYPE__)(__localdep_strnend(__string, __maxlen) - __string);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strnlen_defined
+#define __local___localdep_strnlen_defined 1
+#define __localdep_strnlen __LIBC_LOCAL_NAME(strnlen)
+#endif /* !__local___localdep_strnlen_defined */
 #endif /* !__local_strnlen_defined */

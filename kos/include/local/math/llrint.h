@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa5c042b */
+/* HASH CRC-32:0x4e695d23 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,38 +21,50 @@
 #ifndef __local_llrint_defined
 #define __local_llrint_defined 1
 #include <__crt.h>
-#include <hybrid/typecore.h>
-
-#include <libm/lrint.h>
-/* Dependency: "rint" from "math" */
-#ifndef ____localdep_rint_defined
-#define ____localdep_rint_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: rint from math */
+#ifndef __local___localdep_rint_defined
+#define __local___localdep_rint_defined 1
 #if __has_builtin(__builtin_rint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rint)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_rint,(double __x),rint,{ return __builtin_rint(__x); })
+#elif __has_builtin(__builtin_nearbyint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyint)
+/* Return the integer nearest X in the direction of the prevailing rounding mode */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_rint,(double __x),nearbyint,{ return __builtin_nearbyint(__x); })
 #elif defined(__CRT_HAVE_rint)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_rint,(double __x),rint,(__x))
+#elif defined(__CRT_HAVE_nearbyint)
+/* Return the integer nearest X in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_rint,(double __x),nearbyint,(__x))
 #elif defined(__CRT_HAVE___rint)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_rint,(double __x),__rint,(__x))
-#else /* LIBC: rint */
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#include <local/math/rint.h>
+#elif defined(__CRT_HAVE___nearbyint)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-#define __localdep_rint (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rint))
-#else /* CUSTOM: rint */
-#undef ____localdep_rint_defined
-#endif /* rint... */
-#endif /* rint... */
-#endif /* !____localdep_rint_defined */
-
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_rint,(double __x),__nearbyint,(__x))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <ieee754.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <local/math/rint.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the integer nearest X in the direction of the prevailing rounding mode */
+#define __localdep_rint __LIBC_LOCAL_NAME(rint)
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local___localdep_rint_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !... */
+#endif /* !__local___localdep_rint_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+#include <libm/lrint.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value according to current rounding direction */
 __LOCAL_LIBC(llrint) __ATTR_CONST __ATTR_WUNUSED __LONGLONG
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(llrint))(double __x) {
-#line 1081 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNI
 	return __LIBM_MATHFUNI(llrint, __x);
 #else /* __LIBM_MATHFUNI */
@@ -60,4 +72,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(llrint))(double __x) {
 #endif /* !__LIBM_MATHFUNI */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_llrint_defined
+#define __local___localdep_llrint_defined 1
+#define __localdep_llrint __LIBC_LOCAL_NAME(llrint)
+#endif /* !__local___localdep_llrint_defined */
 #endif /* !__local_llrint_defined */

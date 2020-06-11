@@ -103,6 +103,7 @@ typedef __fd_mask fd_mask;
 
 }
 
+[[decl_include("<features.h>")]]
 [[cp, ignore, nocrt, alias("select", "__select")]]
 __STDC_INT_AS_SSIZE_T select32(__STDC_INT_AS_SIZE_T nfds,
                                [[nullable]] fd_set *__restrict readfds,
@@ -110,6 +111,7 @@ __STDC_INT_AS_SSIZE_T select32(__STDC_INT_AS_SIZE_T nfds,
                                [[nullable]] fd_set *__restrict exceptfds,
                                [[nullable]] struct $timeval32 *__restrict timeout);
 
+[[decl_include("<features.h>")]]
 [[cp, ignore, nocrt, alias("pselect")]]
 __STDC_INT_AS_SSIZE_T pselect32(__STDC_INT_AS_SIZE_T nfds,
                                 [[nullable]] fd_set *__restrict readfds,
@@ -119,6 +121,7 @@ __STDC_INT_AS_SSIZE_T pselect32(__STDC_INT_AS_SIZE_T nfds,
                                 [[nullable]] $sigset_t const *__restrict sigmask);
 
 
+[[decl_include("<features.h>")]]
 [[cp, no_crt_self_import, export_as("__select")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("select64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("select", "__select")]]
@@ -146,6 +149,7 @@ __STDC_INT_AS_SSIZE_T select(__STDC_INT_AS_SIZE_T nfds,
 }
 
 %#ifdef __USE_XOPEN2K
+[[decl_include("<features.h>")]]
 [[cp, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("pselect64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("pselect")]]
@@ -176,7 +180,8 @@ __STDC_INT_AS_SSIZE_T pselect(__STDC_INT_AS_SIZE_T nfds,
 
 %
 %#ifdef __USE_TIME64
-[[cp, time64_variant_of(select)]]
+[[decl_include("<features.h>")]]
+[[cp, doc_alias("select"), time64_variant_of(select)]]
 [[userimpl, requires_function(select32)]]
 __STDC_INT_AS_SSIZE_T select64(__STDC_INT_AS_SIZE_T nfds,
                                [[nullable]] fd_set *__restrict readfds,
@@ -192,7 +197,8 @@ __STDC_INT_AS_SSIZE_T select64(__STDC_INT_AS_SIZE_T nfds,
 }
 
 %#ifdef __USE_XOPEN2K
-[[time64_variant_of(pselect)]]
+[[decl_include("<features.h>")]]
+[[doc_alias("pselect"), time64_variant_of(pselect)]]
 [[cp, userimpl, requires_function(pselect32)]]
 __STDC_INT_AS_SSIZE_T pselect64(__STDC_INT_AS_SIZE_T nfds,
                                 [[nullable]] fd_set *__restrict readfds,

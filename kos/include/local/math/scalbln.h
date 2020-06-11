@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8be68e23 */
+/* HASH CRC-32:0x272dfee0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,17 +19,15 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_scalbln_defined
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #define __local_scalbln_defined 1
 #include <__crt.h>
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/scalbn.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X times (2 to the Nth power) */
 __LOCAL_LIBC(scalbln) __ATTR_CONST __ATTR_WUNUSED double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbln))(double __x,
-                                                 long int __n) {
-#line 964 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbln))(double __x, long int __n) {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_scalbln((__IEEE754_DOUBLE_TYPE__)__x, __n);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
@@ -39,5 +37,11 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbln))(double __x,
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#ifndef __local___localdep_scalbln_defined
+#define __local___localdep_scalbln_defined 1
+#define __localdep_scalbln __LIBC_LOCAL_NAME(scalbln)
+#endif /* !__local___localdep_scalbln_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_scalbln_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_scalbln_defined */

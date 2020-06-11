@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf5ab818 */
+/* HASH CRC-32:0x32f56dd2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,33 +21,33 @@
 #ifndef __local_mempmoveq_defined
 #define __local_mempmoveq_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "memmoveq" from "string" */
-#ifndef ____localdep_memmoveq_defined
-#define ____localdep_memmoveq_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memmoveq from string */
+#ifndef __local___localdep_memmoveq_defined
+#define __local___localdep_memmoveq_defined 1
 #ifdef __fast_memmoveq_defined
 /* Move memory between potentially overlapping memory blocks. */
-#define __localdep_memmoveq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveq))
+__NAMESPACE_FAST_USING(memmoveq)
+#define __localdep_memmoveq __LIBC_FAST_NAME(memmoveq)
 #elif defined(__CRT_HAVE_memmoveq)
 /* Move memory between potentially overlapping memory blocks. */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveq,(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
-#else /* LIBC: memmoveq */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memmoveq.h>
-/* Move memory between potentially overlapping memory blocks. */
-#define __localdep_memmoveq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveq))
-#endif /* memmoveq... */
-#endif /* !____localdep_memmoveq_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Move memory between potentially overlapping memory blocks. */
+#define __localdep_memmoveq __LIBC_LOCAL_NAME(memmoveq)
+#endif /* !... */
+#endif /* !__local___localdep_memmoveq_defined */
 /* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
 __LOCAL_LIBC(mempmoveq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveq))(/*aligned(8)*/ void *__restrict __dst,
-                                                       /*aligned(8)*/ void const *__restrict __src,
-                                                       __SIZE_TYPE__ __n_qwords) {
-#line 1674 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveq))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords) {
 	return (__UINT64_TYPE__ *)__localdep_memmoveq(__dst, __src, __n_qwords) + __n_qwords;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_mempmoveq_defined
+#define __local___localdep_mempmoveq_defined 1
+#define __localdep_mempmoveq __LIBC_LOCAL_NAME(mempmoveq)
+#endif /* !__local___localdep_mempmoveq_defined */
 #endif /* !__local_mempmoveq_defined */

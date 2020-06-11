@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x670e1fa2 */
+/* HASH CRC-32:0xc95dd194 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,31 @@
 #ifndef __local__mbtowc_l_defined
 #define __local__mbtowc_l_defined 1
 #include <__crt.h>
-/* Dependency: "mbtowc" from "stdlib" */
-#ifndef ____localdep_mbtowc_defined
-#define ____localdep_mbtowc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mbtowc from stdlib */
+#ifndef __local___localdep_mbtowc_defined
+#define __local___localdep_mbtowc_defined 1
 #ifdef __CRT_HAVE_mbtowc
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_mbtowc,(__WCHAR_TYPE__ *__restrict __pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen),mbtowc,(__pwc,__str,__maxlen))
-#else /* LIBC: mbtowc */
+#elif defined(__CRT_HAVE_DOS$mbtowc) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(,int,__NOTHROW_NCX,__localdep_mbtowc,(__CHAR32_TYPE__ *__restrict __pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen),mbtowc,(__pwc,__str,__maxlen))
+#elif defined(__CRT_HAVE_DOS$mbtowc) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(,int,__NOTHROW_NCX,__localdep_mbtowc,(__CHAR16_TYPE__ *__restrict __pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen),mbtowc,(__pwc,__str,__maxlen))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/mbtowc.h>
-#define __localdep_mbtowc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbtowc))
-#endif /* mbtowc... */
-#endif /* !____localdep_mbtowc_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_mbtowc __LIBC_LOCAL_NAME(mbtowc)
+#endif /* !... */
+#endif /* !__local___localdep_mbtowc_defined */
 __LOCAL_LIBC(_mbtowc_l) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbtowc_l))(__WCHAR_TYPE__ *__dst,
-                                                       char const *__src,
-                                                       __SIZE_TYPE__ __srclen,
-                                                       __locale_t __locale) {
-#line 2655 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbtowc_l))(__WCHAR_TYPE__ *__dst, char const *__src, __SIZE_TYPE__ __srclen, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_mbtowc(__dst, __src, __srclen);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__mbtowc_l_defined
+#define __local___localdep__mbtowc_l_defined 1
+#define __localdep__mbtowc_l __LIBC_LOCAL_NAME(_mbtowc_l)
+#endif /* !__local___localdep__mbtowc_l_defined */
 #endif /* !__local__mbtowc_l_defined */

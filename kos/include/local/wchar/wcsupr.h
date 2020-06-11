@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0a8274 */
+/* HASH CRC-32:0x8700b009 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,31 @@
 #ifndef __local_wcsupr_defined
 #define __local_wcsupr_defined 1
 #include <__crt.h>
-/* Dependency: "towupper" from "wctype" */
-#ifndef ____localdep_towupper_defined
-#define ____localdep_towupper_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: towupper from wctype */
+#ifndef __local___localdep_towupper_defined
+#define __local___localdep_towupper_defined 1
 #if __has_builtin(__builtin_towupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towupper)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towupper,(__WINT_TYPE__ __wc),towupper,{ return __builtin_towupper(__wc); })
 #elif defined(__CRT_HAVE_towupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towupper,(__WINT_TYPE__ __wc),towupper,(__wc))
-#else /* LIBC: towupper */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/towupper.h>
-#define __localdep_towupper (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towupper))
-#endif /* towupper... */
-#endif /* !____localdep_towupper_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_towupper __LIBC_LOCAL_NAME(towupper)
+#endif /* !... */
+#endif /* !__local___localdep_towupper_defined */
 __LOCAL_LIBC(wcsupr) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsupr))(__WCHAR_TYPE__ *__restrict __str) {
-#line 4882 "kos/src/libc/magic/string.c"
 	__WCHAR_TYPE__ *__iter, __ch;
 	for (__iter = __str; (__ch = *__iter) != '\0'; ++__iter)
 		*__iter = (__WCHAR_TYPE__)__localdep_towupper(__ch);
 	return __str;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsupr_defined
+#define __local___localdep_wcsupr_defined 1
+#define __localdep_wcsupr __LIBC_LOCAL_NAME(wcsupr)
+#endif /* !__local___localdep_wcsupr_defined */
 #endif /* !__local_wcsupr_defined */

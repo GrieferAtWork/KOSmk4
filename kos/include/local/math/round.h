@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f94f102 */
+/* HASH CRC-32:0x1df73c67 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,11 @@
 #define __local_round_defined 1
 #include <__crt.h>
 #include <hybrid/typecore.h>
-
 #include <libm/round.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __LOCAL_LIBC(round) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(round))(double __x) {
-#line 983 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUN
 	return (double)__LIBM_MATHFUN(round, __x);
 #else /* __LIBM_MATHFUN */
@@ -47,4 +45,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(round))(double __x) {
 #endif /* !__LIBM_MATHFUN */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_round_defined
+#define __local___localdep_round_defined 1
+#define __localdep_round __LIBC_LOCAL_NAME(round)
+#endif /* !__local___localdep_round_defined */
 #endif /* !__local_round_defined */

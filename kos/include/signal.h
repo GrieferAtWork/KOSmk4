@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb1d8e8a */
+/* HASH CRC-32:0x26541be6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -443,10 +443,22 @@ __CDECLARE(,__sighandler_t,__NOTHROW_NCX,sigset,(int __signo, __sighandler_t __d
 
 #ifdef __CRT_HAVE___libc_current_sigrtmin
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__libc_current_sigrtmin,(void),())
-#endif /* __CRT_HAVE___libc_current_sigrtmin */
+#else /* __CRT_HAVE___libc_current_sigrtmin */
+#include <bits/signum-values.h>
+#ifdef __SIGRTMIN
+#include <local/signal/__libc_current_sigrtmin.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmin, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmin))(); })
+#endif /* __SIGRTMIN */
+#endif /* !__CRT_HAVE___libc_current_sigrtmin */
 #ifdef __CRT_HAVE___libc_current_sigrtmax
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__libc_current_sigrtmax,(void),())
-#endif /* __CRT_HAVE___libc_current_sigrtmax */
+#else /* __CRT_HAVE___libc_current_sigrtmax */
+#include <bits/signum-values.h>
+#ifdef __SIGRTMIN
+#include <local/signal/__libc_current_sigrtmax.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmax)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(); })
+#endif /* __SIGRTMIN */
+#endif /* !__CRT_HAVE___libc_current_sigrtmax */
 
 #endif /* __CC__ */
 

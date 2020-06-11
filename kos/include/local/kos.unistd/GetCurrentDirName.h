@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe01a1ada */
+/* HASH CRC-32:0x9c2c548a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,28 +19,28 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_GetCurrentDirName_defined
-#ifdef __CRT_HAVE_GetCwd
 #define __local_GetCurrentDirName_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-/* Dependency: "GetCwd" */
-#ifndef ____localdep_GetCwd_defined
-#define ____localdep_GetCwd_defined 1
 #ifdef __CRT_HAVE_GetCwd
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: GetCwd from kos.unistd */
+#if !defined(__local___localdep_GetCwd_defined) && defined(__CRT_HAVE_GetCwd)
+#define __local___localdep_GetCwd_defined 1
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT(,char *,__THROWING,__localdep_GetCwd,(char *__buf, __SIZE_TYPE__ __bufsize),GetCwd,(__buf,__bufsize))
-#else /* LIBC: GetCwd */
-#undef ____localdep_GetCwd_defined
-#endif /* GetCwd... */
-#endif /* !____localdep_GetCwd_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_GetCwd_defined && __CRT_HAVE_GetCwd */
 __LOCAL_LIBC(GetCurrentDirName) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED char *
 (__LIBCCALL __LIBC_LOCAL_NAME(GetCurrentDirName))(void) __THROWS(...) {
-#line 416 "kos/src/libc/magic/kos.unistd.c"
 	return __localdep_GetCwd(__NULLPTR, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_GetCwd */
+#ifndef __local___localdep_GetCurrentDirName_defined
+#define __local___localdep_GetCurrentDirName_defined 1
+#define __localdep_GetCurrentDirName __LIBC_LOCAL_NAME(GetCurrentDirName)
+#endif /* !__local___localdep_GetCurrentDirName_defined */
+#else /* __CRT_HAVE_GetCwd */
+#undef __local_GetCurrentDirName_defined
+#endif /* !__CRT_HAVE_GetCwd */
 #endif /* !__local_GetCurrentDirName_defined */

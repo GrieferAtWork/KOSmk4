@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x262e72b5 */
+/* HASH CRC-32:0xca8a2a5a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,20 +22,21 @@
 #define __local_wcsncmp_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `wcscmp', but compare at most `MAXLEN' characters from either string */
+/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
 __LOCAL_LIBC(wcsncmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncmp))(__WCHAR_TYPE__ const *__s1,
-                                                     __WCHAR_TYPE__ const *__s2,
-                                                     __SIZE_TYPE__ __maxlen) {
-#line 303 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncmp))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen) {
 	__WCHAR_TYPE__ __c1, __c2;
 	do {
 		if (!__maxlen--)
 			break;
 		if ((__c1 = *__s1++) != (__c2 = *__s2++))
-			return (int)((__WCHAR_TYPE__)__c1 - (__WCHAR_TYPE__)__c2);
+			return (int)((unsigned char)__c1 - (unsigned char)__c2);
 	} while (__c1);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsncmp_defined
+#define __local___localdep_wcsncmp_defined 1
+#define __localdep_wcsncmp __LIBC_LOCAL_NAME(wcsncmp)
+#endif /* !__local___localdep_wcsncmp_defined */
 #endif /* !__local_wcsncmp_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbddf22b0 */
+/* HASH CRC-32:0xe3112b66 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,15 +24,16 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `wcschr', but don't exceed `MAX_CHARS' characters. */
 __LOCAL_LIBC(wcsnchr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnchr))(__WCHAR_TYPE__ const *__restrict __haystack,
-                                                     __WCHAR_TYPE__ __needle,
-                                                     __SIZE_TYPE__ __maxlen) {
-#line 2552 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnchr))(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle, __SIZE_TYPE__ __maxlen) {
 	for (; __maxlen-- && *__haystack; ++__haystack) {
-		if __unlikely((__WCHAR_TYPE__)*__haystack == (__WCHAR_TYPE__)__needle)
+		if __unlikely((unsigned char)*__haystack == (unsigned char)__needle)
 			return (__WCHAR_TYPE__ *)__haystack;
 	}
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsnchr_defined
+#define __local___localdep_wcsnchr_defined 1
+#define __localdep_wcsnchr __LIBC_LOCAL_NAME(wcsnchr)
+#endif /* !__local___localdep_wcsnchr_defined */
 #endif /* !__local_wcsnchr_defined */

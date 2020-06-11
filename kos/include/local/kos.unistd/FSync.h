@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fa627d2 */
+/* HASH CRC-32:0xe6c183ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,12 @@ __NAMESPACE_LOCAL_BEGIN
  * meaning that changes to its data and/or descriptor are written to disk */
 __LOCAL_LIBC(FSync) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FSync))(__fd_t __fd) __THROWS(...) {
-#line 90 "kos/src/libc/magic/kos.unistd.c"
 	(void)__fd;
 	/* No-Op */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_FSync_defined
+#define __local___localdep_FSync_defined 1
+#define __localdep_FSync __LIBC_LOCAL_NAME(FSync)
+#endif /* !__local___localdep_FSync_defined */
 #endif /* !__local_FSync_defined */

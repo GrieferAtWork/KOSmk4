@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bc6266d */
+/* HASH CRC-32:0xb2e605a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,33 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_j1l_defined
-#if defined(__CRT_HAVE_j1) || defined(__CRT_HAVE___j1)
 #define __local_j1l_defined 1
 #include <__crt.h>
-/* Dependency: "j1" */
-#ifndef ____localdep_j1_defined
-#define ____localdep_j1_defined 1
+#if defined(__CRT_HAVE_j1) || defined(__CRT_HAVE___j1)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: j1 from math */
+#ifndef __local___localdep_j1_defined
+#define __local___localdep_j1_defined 1
 #if __has_builtin(__builtin_j1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_j1)
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_j1,(double __x),j1,{ return __builtin_j1(__x); })
 #elif defined(__CRT_HAVE_j1)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_j1,(double __x),j1,(__x))
 #elif defined(__CRT_HAVE___j1)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_j1,(double __x),__j1,(__x))
-#else /* LIBC: j1 */
-#undef ____localdep_j1_defined
-#endif /* j1... */
-#endif /* !____localdep_j1_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_j1_defined
+#endif /* !... */
+#endif /* !__local___localdep_j1_defined */
 __LOCAL_LIBC(j1l) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(j1l))(__LONGDOUBLE __x) {
-#line 1591 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_j1((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_j1 || __CRT_HAVE___j1 */
+#ifndef __local___localdep_j1l_defined
+#define __local___localdep_j1l_defined 1
+#define __localdep_j1l __LIBC_LOCAL_NAME(j1l)
+#endif /* !__local___localdep_j1l_defined */
+#else /* __CRT_HAVE_j1 || __CRT_HAVE___j1 */
+#undef __local_j1l_defined
+#endif /* !__CRT_HAVE_j1 && !__CRT_HAVE___j1 */
 #endif /* !__local_j1l_defined */

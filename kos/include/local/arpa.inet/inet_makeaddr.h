@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c5eab7b */
+/* HASH CRC-32:0x50ee7116 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,12 @@
 #define __local_inet_makeaddr_defined 1
 #include <__crt.h>
 #include <netinet/in.h>
-
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Make Internet host address in network byte order by
  * combining the network number NET with the local address HOST */
 __LOCAL_LIBC(inet_makeaddr) __ATTR_CONST __ATTR_WUNUSED struct in_addr
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_makeaddr))(__UINT32_TYPE__ __net,
-                                                           __UINT32_TYPE__ __host) {
-#line 96 "kos/src/libc/magic/arpa.inet.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_makeaddr))(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host) {
 	struct in_addr __result;
 	__UINT32_TYPE__ __result_addr;
 	if (__net < IN_CLASSA_MAX)
@@ -46,4 +43,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_makeaddr))(__UINT32_TYPE__ __net
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_inet_makeaddr_defined
+#define __local___localdep_inet_makeaddr_defined 1
+#define __localdep_inet_makeaddr __LIBC_LOCAL_NAME(inet_makeaddr)
+#endif /* !__local___localdep_inet_makeaddr_defined */
 #endif /* !__local_inet_makeaddr_defined */

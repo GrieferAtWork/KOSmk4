@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30f767d4 */
+/* HASH CRC-32:0xee20068e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,45 +19,39 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_timerfd_gettime_defined
-#if defined(__CRT_HAVE_timerfd_gettime) || defined(__CRT_HAVE_timerfd_gettime64)
 #define __local_timerfd_gettime_defined 1
 #include <__crt.h>
-/* Dependency: "timerfd_gettime32" from "sys.timerfd" */
-#ifndef ____localdep_timerfd_gettime32_defined
-#define ____localdep_timerfd_gettime32_defined 1
-#ifdef __CRT_HAVE_timerfd_gettime
-/* Return the next expiration time of UFD */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(__fd_t __ufd, struct __itimerspec32 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
-#else /* LIBC: timerfd_gettime */
-#undef ____localdep_timerfd_gettime32_defined
-#endif /* timerfd_gettime32... */
-#endif /* !____localdep_timerfd_gettime32_defined */
-
-/* Dependency: "timerfd_gettime64" from "sys.timerfd" */
-#ifndef ____localdep_timerfd_gettime64_defined
-#define ____localdep_timerfd_gettime64_defined 1
+#if defined(__CRT_HAVE_timerfd_gettime) || defined(__CRT_HAVE_timerfd_gettime64)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: timerfd_gettime64 from sys.timerfd */
+#ifndef __local___localdep_timerfd_gettime64_defined
+#define __local___localdep_timerfd_gettime64_defined 1
 #ifdef __CRT_HAVE_timerfd_gettime64
 /* Return the next expiration time of UFD */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct itimerspec64 *__restrict __otmr),timerfd_gettime64,(__ufd,__otmr))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr),timerfd_gettime64,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Return the next expiration time of UFD */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct itimerspec64 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime)
+__NAMESPACE_LOCAL_END
 #include <local/sys.timerfd/timerfd_gettime64.h>
-/* Return the next expiration time of UFD */
-#define __localdep_timerfd_gettime64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_gettime64))
-#else /* CUSTOM: timerfd_gettime64 */
-#undef ____localdep_timerfd_gettime64_defined
-#endif /* timerfd_gettime64... */
-#endif /* !____localdep_timerfd_gettime64_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* Return the next expiration time of UFD */
+#define __localdep_timerfd_gettime64 __LIBC_LOCAL_NAME(timerfd_gettime64)
+#else /* ... */
+#undef __local___localdep_timerfd_gettime64_defined
+#endif /* !... */
+#endif /* !__local___localdep_timerfd_gettime64_defined */
+/* Dependency: timerfd_gettime32 from sys.timerfd */
+#if !defined(__local___localdep_timerfd_gettime32_defined) && defined(__CRT_HAVE_timerfd_gettime)
+#define __local___localdep_timerfd_gettime32_defined 1
+/* Return the next expiration time of UFD */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(__fd_t __ufd, struct __itimerspec32 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
+#endif /* !__local___localdep_timerfd_gettime32_defined && __CRT_HAVE_timerfd_gettime */
+/* Return the next expiration time of UFD */
 __LOCAL_LIBC(timerfd_gettime) __ATTR_NONNULL((2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_gettime))(__fd_t __ufd,
-                                                             struct itimerspec *__restrict __otmr) {
-#line 124 "kos/src/libc/magic/sys.timerfd.c"
-#ifdef __CRT_HAVE_timer_settime
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_gettime))(__fd_t __ufd, struct itimerspec *__restrict __otmr) {
+#ifdef __CRT_HAVE_timerfd_gettime
 	int __result;
 	struct __itimerspec32 __otmr32;
 	__result = __localdep_timerfd_gettime32(__timerid, &__otmr32);
@@ -68,7 +62,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_gettime))(__fd_t __ufd,
 		__otmr->__it_value.tv_nsec    = __otmr32.__it_value.tv_nsec;
 	}
 	return __result;
-#else
+#else /* __CRT_HAVE_timerfd_gettime */
 	int __result;
 	struct __itimerspec64 __otmr64;
 	__result = __localdep_timerfd_gettime64(__timerid, &__otmr64);
@@ -79,8 +73,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_gettime))(__fd_t __ufd,
 		__otmr->__it_value.tv_nsec    = __otmr64.__it_value.tv_nsec;
 	}
 	return __result;
-#endif
+#endif /* !__CRT_HAVE_timerfd_gettime */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_timerfd_gettime || __CRT_HAVE_timerfd_gettime64 */
+#ifndef __local___localdep_timerfd_gettime_defined
+#define __local___localdep_timerfd_gettime_defined 1
+#define __localdep_timerfd_gettime __LIBC_LOCAL_NAME(timerfd_gettime)
+#endif /* !__local___localdep_timerfd_gettime_defined */
+#else /* __CRT_HAVE_timerfd_gettime || __CRT_HAVE_timerfd_gettime64 */
+#undef __local_timerfd_gettime_defined
+#endif /* !__CRT_HAVE_timerfd_gettime && !__CRT_HAVE_timerfd_gettime64 */
 #endif /* !__local_timerfd_gettime_defined */

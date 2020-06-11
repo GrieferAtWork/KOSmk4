@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d6eebe3 */
+/* HASH CRC-32:0x4f130f7d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,29 @@
 #ifndef __local_memxlen_defined
 #define __local_memxlen_defined 1
 #include <__crt.h>
-/* Dependency: "memxend" from "string" */
-#ifndef ____localdep_memxend_defined
-#define ____localdep_memxend_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memxend from string */
+#ifndef __local___localdep_memxend_defined
+#define __local___localdep_memxend_defined 1
 #ifdef __CRT_HAVE_memxend
 /* Same as `memend', but search for non-matching locations. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memxend,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memxend,(__haystack,__needle,__n_bytes))
-#else /* LIBC: memxend */
+#else /* __CRT_HAVE_memxend */
+__NAMESPACE_LOCAL_END
 #include <local/string/memxend.h>
-/* Same as `memend', but search for non-matching locations. */
-#define __localdep_memxend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memxend))
-#endif /* memxend... */
-#endif /* !____localdep_memxend_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `memend', but search for non-matching locations. */
+#define __localdep_memxend __LIBC_LOCAL_NAME(memxend)
+#endif /* !__CRT_HAVE_memxend */
+#endif /* !__local___localdep_memxend_defined */
 /* Same as `memlen', but search for non-matching locations. */
 __LOCAL_LIBC(memxlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxlen))(void const *__restrict __haystack,
-                                                     int __needle,
-                                                     __SIZE_TYPE__ __n_bytes) {
-#line 1990 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxlen))(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes) {
 	return (__SIZE_TYPE__)((__BYTE_TYPE__ *)__localdep_memxend(__haystack, __needle, __n_bytes) - (__BYTE_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memxlen_defined
+#define __local___localdep_memxlen_defined 1
+#define __localdep_memxlen __LIBC_LOCAL_NAME(memxlen)
+#endif /* !__local___localdep_memxlen_defined */
 #endif /* !__local_memxlen_defined */

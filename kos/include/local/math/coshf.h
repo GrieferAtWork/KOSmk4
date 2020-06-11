@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bfebad7 */
+/* HASH CRC-32:0xf0788172 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_coshf_defined
-#if defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
 #define __local_coshf_defined 1
 #include <__crt.h>
-/* Dependency: "cosh" */
-#ifndef ____localdep_cosh_defined
-#define ____localdep_cosh_defined 1
+#if defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: cosh from math */
+#ifndef __local___localdep_cosh_defined
+#define __local___localdep_cosh_defined 1
 #if __has_builtin(__builtin_cosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosh)
 /* Hyperbolic cosine of X */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_cosh,(double __x),cosh,{ return __builtin_cosh(__x); })
@@ -34,18 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_cosh,(double __x),cosh,(_
 #elif defined(__CRT_HAVE___cosh)
 /* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_cosh,(double __x),__cosh,(__x))
-#else /* LIBC: cosh */
-#undef ____localdep_cosh_defined
-#endif /* cosh... */
-#endif /* !____localdep_cosh_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_cosh_defined
+#endif /* !... */
+#endif /* !__local___localdep_cosh_defined */
 /* Hyperbolic cosine of X */
 __LOCAL_LIBC(coshf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(coshf))(float __x) {
-#line 247 "kos/src/libc/magic/math.c"
 	return (float)__localdep_cosh((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_cosh || __CRT_HAVE___cosh */
+#ifndef __local___localdep_coshf_defined
+#define __local___localdep_coshf_defined 1
+#define __localdep_coshf __LIBC_LOCAL_NAME(coshf)
+#endif /* !__local___localdep_coshf_defined */
+#else /* __CRT_HAVE_cosh || __CRT_HAVE___cosh */
+#undef __local_coshf_defined
+#endif /* !__CRT_HAVE_cosh && !__CRT_HAVE___cosh */
 #endif /* !__local_coshf_defined */

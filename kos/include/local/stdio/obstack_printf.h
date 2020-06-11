@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a0b97e8 */
+/* HASH CRC-32:0x7a7ef364 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,25 +19,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_obstack_printf_defined
-#ifdef __CRT_HAVE_obstack_vprintf
 #define __local_obstack_printf_defined 1
 #include <__crt.h>
-/* Dependency: "obstack_vprintf" */
-#ifndef ____localdep_obstack_vprintf_defined
-#define ____localdep_obstack_vprintf_defined 1
 #ifdef __CRT_HAVE_obstack_vprintf
-__CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_obstack_vprintf,(struct obstack *__restrict __obstack_, char const *__restrict __format, __builtin_va_list __args),obstack_vprintf,(__obstack_,__format,__args))
-#else /* LIBC: obstack_vprintf */
-#undef ____localdep_obstack_vprintf_defined
-#endif /* obstack_vprintf... */
-#endif /* !____localdep_obstack_vprintf_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: obstack_vprintf from stdio */
+#if !defined(__local___localdep_obstack_vprintf_defined) && defined(__CRT_HAVE_obstack_vprintf)
+#define __local___localdep_obstack_vprintf_defined 1
+__CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_obstack_vprintf,(struct obstack *__restrict __obstack_, char const *__restrict __format, __builtin_va_list __args),obstack_vprintf,(__obstack_,__format,__args))
+#endif /* !__local___localdep_obstack_vprintf_defined && __CRT_HAVE_obstack_vprintf */
 __LOCAL_LIBC(obstack_printf) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(obstack_printf))(struct obstack *__restrict __obstack_,
-                                                             char const *__restrict __format,
-                                                             ...) {
-#line 1523 "kos/src/libc/magic/stdio.c"
+__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(obstack_printf))(struct obstack *__restrict __obstack_, char const *__restrict __format, ...) {
 	int __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
@@ -46,5 +38,11 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(obstack_printf))(struct obstack *__r
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_obstack_vprintf */
+#ifndef __local___localdep_obstack_printf_defined
+#define __local___localdep_obstack_printf_defined 1
+#define __localdep_obstack_printf __LIBC_LOCAL_NAME(obstack_printf)
+#endif /* !__local___localdep_obstack_printf_defined */
+#else /* __CRT_HAVE_obstack_vprintf */
+#undef __local_obstack_printf_defined
+#endif /* !__CRT_HAVE_obstack_vprintf */
 #endif /* !__local_obstack_printf_defined */

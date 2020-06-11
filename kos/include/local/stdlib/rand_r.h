@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x403a9ec2 */
+/* HASH CRC-32:0xb35ae3a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,11 +24,14 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(rand_r) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rand_r))(unsigned int *__restrict __pseed) {
-#line 1350 "kos/src/libc/magic/stdlib.c"
 	(void)__pseed;
 	__COMPILER_IMPURE();
 	/* https://xkcd.com/221/ */
 	return 4;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_rand_r_defined
+#define __local___localdep_rand_r_defined 1
+#define __localdep_rand_r __LIBC_LOCAL_NAME(rand_r)
+#endif /* !__local___localdep_rand_r_defined */
 #endif /* !__local_rand_r_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39cdc2a1 */
+/* HASH CRC-32:0x3dcf1d88 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,30 +21,33 @@
 #ifndef __local_toupper_l_defined
 #define __local_toupper_l_defined 1
 #include <__crt.h>
-/* Dependency: "toupper" from "ctype" */
-#ifndef ____localdep_toupper_defined
-#define ____localdep_toupper_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: toupper from ctype */
+#ifndef __local___localdep_toupper_defined
+#define __local___localdep_toupper_defined 1
 #if __has_builtin(__builtin_toupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_toupper)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),toupper,{ return __builtin_toupper(__ch); })
 #elif defined(__CRT_HAVE_toupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),toupper,(__ch))
 #elif defined(__CRT_HAVE__toupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),_toupper,(__ch))
-#else /* LIBC: toupper */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/toupper.h>
-#define __localdep_toupper (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toupper))
-#endif /* toupper... */
-#endif /* !____localdep_toupper_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_toupper __LIBC_LOCAL_NAME(toupper)
+#endif /* !... */
+#endif /* !__local___localdep_toupper_defined */
 __LOCAL_LIBC(toupper_l) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(toupper_l))(int __ch,
-                                                       __locale_t __locale) {
-#line 631 "kos/src/libc/magic/ctype.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(toupper_l))(int __ch, __locale_t __locale) {
 	/* TODO: GLC has a variant for this! */
 	(void)__locale;
 	__COMPILER_IMPURE();
 	return __localdep_toupper(__ch);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_toupper_l_defined
+#define __local___localdep_toupper_l_defined 1
+#define __localdep_toupper_l __LIBC_LOCAL_NAME(toupper_l)
+#endif /* !__local___localdep_toupper_l_defined */
 #endif /* !__local_toupper_l_defined */

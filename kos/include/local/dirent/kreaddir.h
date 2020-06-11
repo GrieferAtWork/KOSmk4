@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea3384c2 */
+/* HASH CRC-32:0x49198b10 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_kreaddir_defined
-#if defined(__CRT_HAVE_kreaddirf) || (defined(__CRT_HAVE_kreaddirf64) && defined(_DIRENT_MATCHES_DIRENT64))
 #define __local_kreaddir_defined 1
 #include <__crt.h>
-/* Dependency: "kreaddirf" */
-#ifndef ____localdep_kreaddirf_defined
-#define ____localdep_kreaddirf_defined 1
-#ifdef __CRT_HAVE_kreaddirf
+#if (defined(__CRT_HAVE_kreaddirf) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_kreaddirf64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: kreaddirf from dirent */
+#ifndef __local___localdep_kreaddirf_defined
+#define __local___localdep_kreaddirf_defined 1
+#if defined(__CRT_HAVE_kreaddirf) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* The KOS-specific system call for reading a single directory entry
  * from a file descriptor referring to an open directory stream.
  * @param: MODE: One of `READDIR_*' (See below)
@@ -35,7 +36,7 @@
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
 __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_kreaddirf,(__fd_t __fd, struct dirent *__buf, __SIZE_TYPE__ __bufsize, unsigned int __mode, __oflag_t __flags),kreaddirf,(__fd,__buf,__bufsize,__mode,__flags))
-#elif defined(__CRT_HAVE_kreaddirf64) && defined(_DIRENT_MATCHES_DIRENT64)
+#elif defined(__CRT_HAVE_kreaddirf64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* The KOS-specific system call for reading a single directory entry
  * from a file descriptor referring to an open directory stream.
  * @param: MODE: One of `READDIR_*' (See below)
@@ -45,12 +46,10 @@ __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_kreaddirf,(__
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
 __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_kreaddirf,(__fd_t __fd, struct dirent *__buf, __SIZE_TYPE__ __bufsize, unsigned int __mode, __oflag_t __flags),kreaddirf64,(__fd,__buf,__bufsize,__mode,__flags))
-#else /* LIBC: kreaddirf */
-#undef ____localdep_kreaddirf_defined
-#endif /* kreaddirf... */
-#endif /* !____localdep_kreaddirf_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_kreaddirf_defined
+#endif /* !... */
+#endif /* !__local___localdep_kreaddirf_defined */
 /* The KOS-specific system call for reading a single directory entry
  * from a file descriptor referring to an open directory stream.
  * @param: MODE: One of `READDIR_*' (See below)
@@ -60,13 +59,15 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
 __LOCAL_LIBC(kreaddir) __ATTR_WUNUSED __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(kreaddir))(__fd_t __fd,
-                                                      struct dirent *__buf,
-                                                      __SIZE_TYPE__ __bufsize,
-                                                      unsigned int __mode) {
-#line 345 "kos/src/libc/magic/dirent.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(kreaddir))(__fd_t __fd, struct dirent *__buf, __SIZE_TYPE__ __bufsize, unsigned int __mode) {
 	return __localdep_kreaddirf(__fd, __buf, __bufsize, __mode, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_kreaddirf || (__CRT_HAVE_kreaddirf64 && _DIRENT_MATCHES_DIRENT64) */
+#ifndef __local___localdep_kreaddir_defined
+#define __local___localdep_kreaddir_defined 1
+#define __localdep_kreaddir __LIBC_LOCAL_NAME(kreaddir)
+#endif /* !__local___localdep_kreaddir_defined */
+#else /* (__CRT_HAVE_kreaddirf && (!__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE_kreaddirf64 && (__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) */
+#undef __local_kreaddir_defined
+#endif /* (!__CRT_HAVE_kreaddirf || (__USE_FILE_OFFSET64 && !_DIRENT_MATCHES_DIRENT64)) && (!__CRT_HAVE_kreaddirf64 || (!__USE_FILE_OFFSET64 && !_DIRENT_MATCHES_DIRENT64)) */
 #endif /* !__local_kreaddir_defined */

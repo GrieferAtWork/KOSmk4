@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x743de9aa */
+/* HASH CRC-32:0x9537cb90 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,11 @@
 #ifndef __local_sprintf_defined
 #define __local_sprintf_defined 1
 #include <__crt.h>
-/* Dependency: "vsprintf" from "stdio" */
-#ifndef ____localdep_vsprintf_defined
-#define ____localdep_vsprintf_defined 1
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: vsprintf from stdio */
+#ifndef __local___localdep_vsprintf_defined
+#define __local___localdep_vsprintf_defined 1
 #if __has_builtin(__builtin_vsprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsprintf)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
@@ -36,22 +38,19 @@ __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsprintf,(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args),_IO_vsprintf,(__dest,__format,__args))
-#else /* LIBC: vsprintf */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdio/vsprintf.h>
-/* Print a formatted string to a given in-member string buffer `BUF'
- * Return the number of written characters, excluding a trailing NUL-character */
-#define __localdep_vsprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsprintf))
-#endif /* vsprintf... */
-#endif /* !____localdep_vsprintf_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
+#define __localdep_vsprintf __LIBC_LOCAL_NAME(vsprintf)
+#endif /* !... */
+#endif /* !__local___localdep_vsprintf_defined */
+/* Print a formatted string to a given in-member string buffer `BUF'
+ * Return the number of written characters, excluding a trailing NUL-character */
 __LOCAL_LIBC(sprintf) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(sprintf))(char *__restrict __buf,
-                                                      char const *__restrict __format,
-                                                      ...) {
-#line 1004 "kos/src/libc/magic/stdio.c"
+__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(sprintf))(char *__restrict __buf, char const *__restrict __format, ...) {
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
@@ -60,4 +59,8 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(sprintf))(char *__restrict __buf,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_sprintf_defined
+#define __local___localdep_sprintf_defined 1
+#define __localdep_sprintf __LIBC_LOCAL_NAME(sprintf)
+#endif /* !__local___localdep_sprintf_defined */
 #endif /* !__local_sprintf_defined */

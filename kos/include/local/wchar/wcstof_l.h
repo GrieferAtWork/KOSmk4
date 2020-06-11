@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5579a9a3 */
+/* HASH CRC-32:0x63eb42df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,37 @@
 #ifndef __local_wcstof_l_defined
 #define __local_wcstof_l_defined 1
 #include <__crt.h>
-/* Dependency: "wcstof" from "wchar" */
-#ifndef ____localdep_wcstof_defined
-#define ____localdep_wcstof_defined 1
-#ifdef __std___localdep_wcstof_defined
-__NAMESPACE_STD_USING(__localdep_wcstof)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcstof from wchar */
+#ifndef __local___localdep_wcstof_defined
+#define __local___localdep_wcstof_defined 1
+#ifdef __wcstof_defined
+__NAMESPACE_GLB_USING(wcstof)
+#define __localdep_wcstof wcstof
+#elif defined(__std_wcstof_defined)
+__NAMESPACE_STD_USING(wcstof)
+#define __localdep_wcstof wcstof
 #elif defined(__CRT_HAVE_wcstof)
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_wcstof,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstof,(__nptr,__endptr))
-#else /* LIBC: wcstof */
+#elif defined(__CRT_HAVE_DOS$wcstof) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_wcstof,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr),wcstof,(__nptr,__endptr))
+#elif defined(__CRT_HAVE_DOS$wcstof) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_wcstof,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr),wcstof,(__nptr,__endptr))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/wcstof.h>
-#define __localdep_wcstof (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstof))
-#endif /* wcstof... */
-#endif /* !____localdep_wcstof_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcstof __LIBC_LOCAL_NAME(wcstof)
+#endif /* !... */
+#endif /* !__local___localdep_wcstof_defined */
 __LOCAL_LIBC(wcstof_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) float
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstof_l))(__WCHAR_TYPE__ const *__restrict __nptr,
-                                                      __WCHAR_TYPE__ **__endptr,
-                                                      __locale_t __locale) {
-#line 1706 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstof_l))(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_wcstof(__nptr, __endptr);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcstof_l_defined
+#define __local___localdep_wcstof_l_defined 1
+#define __localdep_wcstof_l __LIBC_LOCAL_NAME(wcstof_l)
+#endif /* !__local___localdep_wcstof_l_defined */
 #endif /* !__local_wcstof_l_defined */

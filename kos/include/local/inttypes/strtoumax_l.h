@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86083c36 */
+/* HASH CRC-32:0x24f2e699 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,10 @@
 #ifndef __local_strtoumax_l_defined
 #define __local_strtoumax_l_defined 1
 #include <__crt.h>
-/* Dependency: "strtoumax" from "inttypes" */
-#ifndef ____localdep_strtoumax_defined
-#define ____localdep_strtoumax_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strtoumax from inttypes */
+#ifndef __local___localdep_strtoumax_defined
+#define __local___localdep_strtoumax_defined 1
 #ifdef __CRT_HAVE_strtoumax
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, int __base),strtoumax,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoul) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__)
@@ -38,21 +39,21 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__loc
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, int __base),_strtoui64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtou32) && (__SIZEOF_INTMAX_T__ == 4)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, int __base),strtou32,(__nptr,__endptr,__base))
-#else /* LIBC: strtoumax */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/inttypes/strtoumax.h>
-#define __localdep_strtoumax (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoumax))
-#endif /* strtoumax... */
-#endif /* !____localdep_strtoumax_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strtoumax __LIBC_LOCAL_NAME(strtoumax)
+#endif /* !... */
+#endif /* !__local___localdep_strtoumax_defined */
 __LOCAL_LIBC(strtoumax_l) __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoumax_l))(char const *__restrict __nptr,
-                                                         char **__endptr,
-                                                         int __base,
-                                                         __locale_t __locale) {
-#line 625 "kos/src/libc/magic/inttypes.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoumax_l))(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_strtoumax(__nptr, __endptr, __base);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strtoumax_l_defined
+#define __local___localdep_strtoumax_l_defined 1
+#define __localdep_strtoumax_l __LIBC_LOCAL_NAME(strtoumax_l)
+#endif /* !__local___localdep_strtoumax_l_defined */
 #endif /* !__local_strtoumax_l_defined */

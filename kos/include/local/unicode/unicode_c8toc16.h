@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77829168 */
+/* HASH CRC-32:0xabfb1b4d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
 __LOCAL_LIBC(unicode_c8toc16) __ATTR_NONNULL((1, 2, 4)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_c8toc16))(__CHAR16_TYPE__ *__restrict __pc16,
-                                                             /*utf-8*/ char const *__restrict __s,
-                                                             __SIZE_TYPE__ __n,
-                                                             __mbstate_t *__restrict __mbs) {
-#line 1110 "kos/src/libc/magic/unicode.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_c8toc16))(__CHAR16_TYPE__ *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, __mbstate_t *__restrict __mbs) {
 	__CHAR32_TYPE__ __resch;
 	__SIZE_TYPE__ __i;
 	if ((__mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
@@ -144,7 +140,7 @@ __error_ilseq:
 	return (__SIZE_TYPE__)-2;
 __done_empty_chk_surrogate:
 	if ((__resch >= 0xd800 && __resch <= 0xdfff) || (__resch >= 0x10000)) {
-		if __unlikely(__resch >= 0x10ffff)
+		if __unlikely(__resch > 0x10ffff)
 			goto __error_ilseq; /* Cannot be represented as UTF-16 */
 		/* Need a utf-16 surrogate pair. */
 		__resch -= 0x10000;
@@ -159,4 +155,8 @@ __done:
 	return __i + 1;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_unicode_c8toc16_defined
+#define __local___localdep_unicode_c8toc16_defined 1
+#define __localdep_unicode_c8toc16 __LIBC_LOCAL_NAME(unicode_c8toc16)
+#endif /* !__local___localdep_unicode_c8toc16_defined */
 #endif /* !__local_unicode_c8toc16_defined */

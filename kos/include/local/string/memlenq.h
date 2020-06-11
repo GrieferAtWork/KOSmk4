@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc0cde */
+/* HASH CRC-32:0xe311f1a5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,34 +21,34 @@
 #ifndef __local_memlenq_defined
 #define __local_memlenq_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "memendq" from "string" */
-#ifndef ____localdep_memendq_defined
-#define ____localdep_memendq_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memendq from string */
+#ifndef __local___localdep_memendq_defined
+#define __local___localdep_memendq_defined 1
 #ifdef __fast_memendq_defined
 /* Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_memendq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memendq))
+__NAMESPACE_FAST_USING(memendq)
+#define __localdep_memendq __LIBC_FAST_NAME(memendq)
 #elif defined(__CRT_HAVE_memendq)
 /* Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memendq,(/*aligned(8)*/ void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_bytes),memendq,(__haystack,__qword,__n_bytes))
-#else /* LIBC: memendq */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memendq,(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_bytes),memendq,(__haystack,__qword,__n_bytes))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memendq.h>
-/* Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_memendq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memendq))
-#endif /* memendq... */
-#endif /* !____localdep_memendq_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `memchrq', but return `HAYSTACK+N_QWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
+#define __localdep_memendq __LIBC_LOCAL_NAME(memendq)
+#endif /* !... */
+#endif /* !__local___localdep_memendq_defined */
 /* Same as `memendq', but return the offset from `HAYSTACK', rather than the actual address.
  * Returns `N_QWORDS' if the given `NEEDLE' wasn't found */
 __LOCAL_LIBC(memlenq) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memlenq))(/*aligned(8)*/ void const *__restrict __haystack,
-                                                     __UINT64_TYPE__ __qword,
-                                                     __SIZE_TYPE__ __n_qwords) {
-#line 1871 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memlenq))(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) {
 	return (__SIZE_TYPE__)(__localdep_memendq(__haystack, __qword, __n_qwords) - (__UINT64_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memlenq_defined
+#define __local___localdep_memlenq_defined 1
+#define __localdep_memlenq __LIBC_LOCAL_NAME(memlenq)
+#endif /* !__local___localdep_memlenq_defined */
 #endif /* !__local_memlenq_defined */

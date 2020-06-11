@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbc58204 */
+/* HASH CRC-32:0xd4a49785 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,29 @@
 #ifndef __local_stroff_defined
 #define __local_stroff_defined 1
 #include <__crt.h>
-/* Dependency: "strchrnul" from "string" */
-#ifndef ____localdep_strchrnul_defined
-#define ____localdep_strchrnul_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strchrnul from string */
+#ifndef __local___localdep_strchrnul_defined
+#define __local___localdep_strchrnul_defined 1
 #ifdef __CRT_HAVE_strchrnul
 /* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
-#else /* LIBC: strchrnul */
+#else /* __CRT_HAVE_strchrnul */
+__NAMESPACE_LOCAL_END
 #include <local/string/strchrnul.h>
-/* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_strchrnul (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strchrnul))
-#endif /* strchrnul... */
-#endif /* !____localdep_strchrnul_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
+#define __localdep_strchrnul __LIBC_LOCAL_NAME(strchrnul)
+#endif /* !__CRT_HAVE_strchrnul */
+#endif /* !__local___localdep_strchrnul_defined */
 /* Same as `strchrnul', but return the offset from `STR', rather than the actual address */
 __LOCAL_LIBC(stroff) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stroff))(char const *__restrict __haystack,
-                                                    int __needle) {
-#line 2615 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stroff))(char const *__restrict __haystack, int __needle) {
 	return (__SIZE_TYPE__)(__localdep_strchrnul(__haystack, __needle) - __haystack);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_stroff_defined
+#define __local___localdep_stroff_defined 1
+#define __localdep_stroff __LIBC_LOCAL_NAME(stroff)
+#endif /* !__local___localdep_stroff_defined */
 #endif /* !__local_stroff_defined */

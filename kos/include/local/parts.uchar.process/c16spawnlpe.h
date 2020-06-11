@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa91dec56 */
+/* HASH CRC-32:0xd1bea8f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,35 +19,34 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16spawnlpe_defined
-#if (defined(__CRT_HAVE_wspawnvpe) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wspawnvpe) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wspawnvpe)
 #define __local_c16spawnlpe_defined 1
 #include <__crt.h>
-#include <parts/redirect-exec.h>
-/* Dependency: "c16spawnvpe" from "parts.uchar.process" */
-#ifndef ____localdep_c16spawnvpe_defined
-#define ____localdep_c16spawnvpe_defined 1
-#if defined(__CRT_HAVE_wspawnvpe) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2, 3, 4)) __ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_c16spawnvpe,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV, __T16ENVP),wspawnvpe,(__mode,__path,___argv,___envp))
-#elif defined(__CRT_HAVE__wspawnvpe) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2, 3, 4)) __ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_c16spawnvpe,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV, __T16ENVP),_wspawnvpe,(__mode,__path,___argv,___envp))
-#elif defined(__CRT_HAVE_DOS$_wspawnvpe)
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3, 4)) __ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_c16spawnvpe,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV, __T16ENVP),_wspawnvpe,(__mode,__path,___argv,___envp))
-#elif defined(__CRT_HAVE_DOS$_wspawnvpe)
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3, 4)) __ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_c16spawnvpe,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV, __T16ENVP),_wspawnvpe,(__mode,__path,___argv,___envp))
-#else /* LIBC: c16spawnvpe */
-#undef ____localdep_c16spawnvpe_defined
-#endif /* c16spawnvpe... */
-#endif /* !____localdep_c16spawnvpe_defined */
-
+#if (defined(__CRT_HAVE_wspawnvpe) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wspawnvpe)
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c16spawnlpe) __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) __pid_t
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(c16spawnlpe))(int __mode,
-                                                          __CHAR16_TYPE__ const *__restrict __file,
-                                                          __CHAR16_TYPE__ const *__args,
-                                                          ... /*, (char16_t *)NULL, char16_t **environ*/) {
-#line 252 "kos/src/libc/magic/parts.uchar.process.c"
-	__REDIRECT_SPAWNLE(__CHAR16_TYPE__, __localdep_c16spawnvpe, __mode, __file, __args)
+/* Dependency: c16spawnvpe from parts.uchar.process */
+#ifndef __local___localdep_c16spawnvpe_defined
+#define __local___localdep_c16spawnvpe_defined 1
+#if defined(__CRT_HAVE_wspawnvpe) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__LIBDCALL,__localdep_c16spawnvpe,(int __mode, __CHAR16_TYPE__ const *__restrict __file, __T16ARGV, __T16ENVP),wspawnvpe,(__mode,__file,___argv,___envp))
+#elif defined(__CRT_HAVE_DOS$_wspawnvpe)
+__CREDIRECT_DOS(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_c16spawnvpe,(int __mode, __CHAR16_TYPE__ const *__restrict __file, __T16ARGV, __T16ENVP),_wspawnvpe,(__mode,__file,___argv,___envp))
+#else /* ... */
+#undef __local___localdep_c16spawnvpe_defined
+#endif /* !... */
+#endif /* !__local___localdep_c16spawnvpe_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/redirect-exec.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(c16spawnlpe) __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t
+__NOTHROW_RPC(__VLIBDCALL __LIBC_LOCAL_NAME(c16spawnlpe))(int __mode, __CHAR16_TYPE__ const *__restrict __file, __CHAR16_TYPE__ const *__args, ...) {
+	__REDIRECT_SPAWNLPE(__CHAR16_TYPE__, __localdep_c16spawnvpe, __mode, __file, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* (__CRT_HAVE_wspawnvpe && __SIZEOF_WCHAR_T__ == 2) || (__CRT_HAVE__wspawnvpe && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_DOS$_wspawnvpe */
+#ifndef __local___localdep_c16spawnlpe_defined
+#define __local___localdep_c16spawnlpe_defined 1
+#define __localdep_c16spawnlpe __LIBC_LOCAL_NAME(c16spawnlpe)
+#endif /* !__local___localdep_c16spawnlpe_defined */
+#else /* (__CRT_HAVE_wspawnvpe && (__SIZEOF_WCHAR_T__ == 2) && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wspawnvpe */
+#undef __local_c16spawnlpe_defined
+#endif /* (!__CRT_HAVE_wspawnvpe || !(__SIZEOF_WCHAR_T__ == 2) || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$_wspawnvpe */
 #endif /* !__local_c16spawnlpe_defined */

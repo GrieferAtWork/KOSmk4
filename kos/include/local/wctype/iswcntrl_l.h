@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x541d1b7 */
+/* HASH CRC-32:0xaf0834ae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,30 @@
 #ifndef __local_iswcntrl_l_defined
 #define __local_iswcntrl_l_defined 1
 #include <__crt.h>
-/* Dependency: "iswcntrl" from "wctype" */
-#ifndef ____localdep_iswcntrl_defined
-#define ____localdep_iswcntrl_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: iswcntrl from wctype */
+#ifndef __local___localdep_iswcntrl_defined
+#define __local___localdep_iswcntrl_defined 1
 #if __has_builtin(__builtin_iswcntrl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswcntrl)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswcntrl,(__WINT_TYPE__ __wc),iswcntrl,{ return __builtin_iswcntrl(__wc); })
 #elif defined(__CRT_HAVE_iswcntrl)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswcntrl,(__WINT_TYPE__ __wc),iswcntrl,(__wc))
-#else /* LIBC: iswcntrl */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/iswcntrl.h>
-#define __localdep_iswcntrl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswcntrl))
-#endif /* iswcntrl... */
-#endif /* !____localdep_iswcntrl_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_iswcntrl __LIBC_LOCAL_NAME(iswcntrl)
+#endif /* !... */
+#endif /* !__local___localdep_iswcntrl_defined */
 __LOCAL_LIBC(iswcntrl_l) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswcntrl_l))(__WINT_TYPE__ __wc,
-                                                        __locale_t __locale) {
-#line 243 "kos/src/libc/magic/wctype.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswcntrl_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
 	(void)__locale;
 	__COMPILER_IMPURE();
 	return __localdep_iswcntrl(__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswcntrl_l_defined
+#define __local___localdep_iswcntrl_l_defined 1
+#define __localdep_iswcntrl_l __LIBC_LOCAL_NAME(iswcntrl_l)
+#endif /* !__local___localdep_iswcntrl_l_defined */
 #endif /* !__local_iswcntrl_l_defined */

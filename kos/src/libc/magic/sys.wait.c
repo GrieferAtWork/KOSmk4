@@ -114,6 +114,7 @@ $pid_t wait([[nullable]] __WAIT_STATUS stat_loc);
 @@ - `pid == 0':  Wait for any child process whose process group ID is that of the caller
 @@ - `pid > 0':   Wait for the child whose process ID is equal to `PID'
 @@@param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
+[[decl_include("<features.h>")]]
 [[cp, export_alias("__waitpid")]]
 $pid_t waitpid($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
                __STDC_INT_AS_UINT_T options);
@@ -126,7 +127,7 @@ $pid_t waitpid($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
 %#endif /* !__id_t_defined */
 @@@param options: At least one of `WEXITED | WSTOPPED | WCONTINUED',
 @@                optionally or'd with `WNOHANG | WNOWAIT'
-[[cp]]
+[[cp, decl_include("<features.h>")]]
 int waitid(idtype_t idtype, id_t id,
            [[nullable]] siginfo_t *infop,
            __STDC_INT_AS_UINT_T options);
@@ -136,7 +137,8 @@ int waitid(idtype_t idtype, id_t id,
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 %struct rusage;
 
-[[decl_include("<bits/rusage-struct.h>"), cp, doc_alias("wait3"), ignore, nocrt, alias("wait3")]]
+[[decl_include("<features.h>", "<bits/rusage-struct.h>")]]
+[[cp, doc_alias("wait3"), ignore, nocrt, alias("wait3")]]
 $pid_t wait3_32([[nullable]] __WAIT_STATUS stat_loc,
                 __STDC_INT_AS_UINT_T options,
                 [[nullable]] struct $rusage32 *usage);
@@ -147,8 +149,8 @@ $pid_t wait3_32([[nullable]] __WAIT_STATUS stat_loc,
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("wait3_64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("wait3")]]
 [[userimpl, requires($has_function(wait3_32) || $has_function(wait3_64))]]
-[[decl_prefix(struct rusage;)]]
-[[impl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>")]]
+[[decl_include("<features.h>", "<bits/rusage-struct.h>")]]
+[[impl_include("<bits/rusage-convert.h>")]]
 $pid_t wait3([[nullable]] __WAIT_STATUS stat_loc,
              __STDC_INT_AS_UINT_T options,
              [[nullable]] struct rusage *usage) {
@@ -169,7 +171,8 @@ $pid_t wait3([[nullable]] __WAIT_STATUS stat_loc,
 
 %#ifdef __USE_TIME64
 %struct rusage64;
-[[decl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>")]]
+[[decl_include("<features.h>"), decl_prefix(struct rusage64;)]]
+[[impl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>")]]
 [[doc_alias("wait3"), time64_variant_of(wait3)]]
 [[userimpl, requires_function(wait3_32)]]
 $pid_t wait3_64([[nullable]] __WAIT_STATUS stat_loc,
@@ -188,7 +191,8 @@ $pid_t wait3_64([[nullable]] __WAIT_STATUS stat_loc,
 %
 %#ifdef __USE_MISC
 
-[[cp, doc_alias("wait4"), decl_include("<bits/rusage-struct.h>"), ignore, nocrt, alias("wait4")]]
+[[decl_include("<features.h>", "<bits/rusage-struct.h>")]]
+[[cp, doc_alias("wait4"), ignore, nocrt, alias("wait4")]]
 $pid_t wait4_32($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
                 __STDC_INT_AS_UINT_T options,
                 [[nullable]] struct $rusage32 *usage);
@@ -198,7 +202,8 @@ $pid_t wait4_32($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
 [[cp, decl_prefix(struct rusage;)]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("wait4_64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("wait4")]]
-[[impl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>")]]
+[[decl_include("<features.h>", "<bits/rusage-struct.h>")]]
+[[impl_include("<bits/rusage-convert.h>")]]
 [[userimpl, requires($has_function(wait4_32) || $has_function(wait4_64))]]
 $pid_t wait4($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
              __STDC_INT_AS_UINT_T options,
@@ -221,7 +226,8 @@ $pid_t wait4($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
 %#ifdef __USE_TIME64
 %struct rusage64;
 [[doc_alias("wait4"), time64_variant_of(wait4), decl_prefix(struct rusage64;)]]
-[[impl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>")]]
+[[decl_include("<features.h>", "<bits/rusage-struct.h>")]]
+[[impl_include("<bits/rusage-convert.h>")]]
 [[userimpl, requires_function(wait4_32)]]
 $pid_t wait4_64($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
                 __STDC_INT_AS_UINT_T options,

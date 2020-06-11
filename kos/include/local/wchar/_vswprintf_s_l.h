@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9934aa99 */
+/* HASH CRC-32:0x620c2f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,29 +21,38 @@
 #ifndef __local__vswprintf_s_l_defined
 #define __local__vswprintf_s_l_defined 1
 #include <__crt.h>
-/* Dependency: "vswprintf_s" from "wchar" */
-#ifndef ____localdep_vswprintf_s_defined
-#define ____localdep_vswprintf_s_defined 1
-#ifdef __CRT_HAVE_vswprintf_s
-__CREDIRECT(__ATTR_NONNULL((1, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vswprintf_s,(__WCHAR_TYPE__ *__dst, __SIZE_TYPE__ __wchar_count, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),vswprintf_s,(__dst,__wchar_count,__format,__args))
-#elif defined(__CRT_HAVE_vswprintf)
-__CREDIRECT(__ATTR_NONNULL((1, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vswprintf_s,(__WCHAR_TYPE__ *__dst, __SIZE_TYPE__ __wchar_count, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),vswprintf,(__dst,__wchar_count,__format,__args))
-#else /* LIBC: vswprintf */
-#include <local/wchar/vswprintf.h>
-#define __localdep_vswprintf_s (*(__STDC_INT_AS_SSIZE_T(__LIBCCALL*)(__WCHAR_TYPE__ *, __SIZE_TYPE__, __WCHAR_TYPE__ const *, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswprintf)))
-#endif /* vswprintf_s... */
-#endif /* !____localdep_vswprintf_s_defined */
-
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: vswprintf from wchar */
+#ifndef __local___localdep_vswprintf_defined
+#define __local___localdep_vswprintf_defined 1
+#ifdef __vswprintf_defined
+__NAMESPACE_GLB_USING(vswprintf)
+#define __localdep_vswprintf vswprintf
+#elif defined(__std_vswprintf_defined)
+__NAMESPACE_STD_USING(vswprintf)
+#define __localdep_vswprintf vswprintf
+#elif defined(__CRT_HAVE_vswprintf)
+__CREDIRECT(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vswprintf,(__WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
+#elif defined(__CRT_HAVE_DOS$vswprintf) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vswprintf,(__CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
+#elif defined(__CRT_HAVE_DOS$vswprintf) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vswprintf,(__CHAR16_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/vswprintf.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_vswprintf __LIBC_LOCAL_NAME(vswprintf)
+#endif /* !... */
+#endif /* !__local___localdep_vswprintf_defined */
 __LOCAL_LIBC(_vswprintf_s_l) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vswprintf_s_l))(__WCHAR_TYPE__ *__dst,
-                                                            __SIZE_TYPE__ __wchar_count,
-                                                            __WCHAR_TYPE__ const *__format,
-                                                            __locale_t __locale,
-                                                            __builtin_va_list __args) {
-#line 2064 "kos/src/libc/magic/wchar.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vswprintf_s_l))(__WCHAR_TYPE__ *__dst, __SIZE_TYPE__ __wchar_count, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
 	(void)__locale;
-	return __localdep_vswprintf_s(__dst, __wchar_count, __format, __args);
+	return __localdep_vswprintf(__dst, __wchar_count, __format, __args);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__vswprintf_s_l_defined
+#define __local___localdep__vswprintf_s_l_defined 1
+#define __localdep__vswprintf_s_l __LIBC_LOCAL_NAME(_vswprintf_s_l)
+#endif /* !__local___localdep__vswprintf_s_l_defined */
 #endif /* !__local__vswprintf_s_l_defined */

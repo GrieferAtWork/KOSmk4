@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f2b124b */
+/* HASH CRC-32:0xdd577e90 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,10 @@
 #ifndef __local_strto64_l_defined
 #define __local_strto64_l_defined 1
 #include <__crt.h>
-/* Dependency: "strto64" from "stdlib" */
-#ifndef ____localdep_strto64_defined
-#define ____localdep_strto64_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strto64 from stdlib */
+#ifndef __local___localdep_strto64_defined
+#define __local___localdep_strto64_defined 1
 #ifdef __CRT_HAVE_strto64
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64,(char const *__restrict __nptr, char **__endptr, int __base),strto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__strtoi64)
@@ -36,21 +37,21 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__local
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64,(char const *__restrict __nptr, char **__endptr, int __base),strtoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoimax) && (__SIZEOF_INTMAX_T__ == 8)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64,(char const *__restrict __nptr, char **__endptr, int __base),strtoimax,(__nptr,__endptr,__base))
-#else /* LIBC: strto64 */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/strto64.h>
-#define __localdep_strto64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))
-#endif /* strto64... */
-#endif /* !____localdep_strto64_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strto64 __LIBC_LOCAL_NAME(strto64)
+#endif /* !... */
+#endif /* !__local___localdep_strto64_defined */
 __LOCAL_LIBC(strto64_l) __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strto64_l))(char const *__restrict __nptr,
-                                                       char **__endptr,
-                                                       int __base,
-                                                       __locale_t __locale) {
-#line 1116 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strto64_l))(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_strto64(__nptr, __endptr, __base);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strto64_l_defined
+#define __local___localdep_strto64_l_defined 1
+#define __localdep_strto64_l __LIBC_LOCAL_NAME(strto64_l)
+#endif /* !__local___localdep_strto64_l_defined */
 #endif /* !__local_strto64_l_defined */

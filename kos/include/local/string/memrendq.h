@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3135071 */
+/* HASH CRC-32:0x850d03d6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memrchrq', but return `HAYSTACK - 8', rather than `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(memrendq) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrendq))(/*aligned(8)*/ void const *__restrict __haystack,
-                                                      __UINT64_TYPE__ __qword,
-                                                      __SIZE_TYPE__ __n_qwords) {
-#line 1855 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrendq))(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) {
 	__UINT64_TYPE__ *__result = (__UINT64_TYPE__ *)__haystack + __n_qwords;
 	for (;;) {
 		--__result;
@@ -40,4 +37,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrendq))(/*aligned(8)*/ void const 
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memrendq_defined
+#define __local___localdep_memrendq_defined 1
+#define __localdep_memrendq __LIBC_LOCAL_NAME(memrendq)
+#endif /* !__local___localdep_memrendq_defined */
 #endif /* !__local_memrendq_defined */

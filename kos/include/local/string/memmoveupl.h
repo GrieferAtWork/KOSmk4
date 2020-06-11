@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2608d46 */
+/* HASH CRC-32:0x1cbaefc0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
 __LOCAL_LIBC(memmoveupl) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveupl))(/*aligned(4)*/ void *__dst,
-                                                        /*aligned(4)*/ void const *__src,
-                                                        __SIZE_TYPE__ __n_dwords) {
-#line 1185 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveupl))(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords) {
 	__UINT32_TYPE__ *__pdst, *__psrc;
 	__pdst = (__UINT32_TYPE__ *)__dst + __n_dwords;
 	__psrc = (__UINT32_TYPE__ *)__src + __n_dwords;
@@ -38,4 +35,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveupl))(/*aligned(4)*/ void *__d
 	return (__UINT32_TYPE__ *)__dst;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memmoveupl_defined
+#define __local___localdep_memmoveupl_defined 1
+#define __localdep_memmoveupl __LIBC_LOCAL_NAME(memmoveupl)
+#endif /* !__local___localdep_memmoveupl_defined */
 #endif /* !__local_memmoveupl_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd134100 */
+/* HASH CRC-32:0xee25f177 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,48 +21,54 @@
 #ifndef __local_stpcpy_defined
 #define __local_stpcpy_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "mempcpy" from "string" */
-#ifndef ____localdep_mempcpy_defined
-#define ____localdep_mempcpy_defined 1
-#ifdef __fast_mempcpy_defined
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempcpy from string */
+#ifndef __local___localdep_mempcpy_defined
+#define __local___localdep_mempcpy_defined 1
+#ifdef __mempcpy_defined
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))
+__NAMESPACE_GLB_USING(mempcpy)
+#define __localdep_mempcpy mempcpy
+#elif defined(__fast_mempcpy_defined)
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
+__NAMESPACE_FAST_USING(mempcpy)
+#define __localdep_mempcpy __LIBC_FAST_NAME(mempcpy)
 #elif defined(__CRT_HAVE_mempcpy)
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
-#else /* LIBC: mempcpy */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempcpy.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))
-#endif /* mempcpy... */
-#endif /* !____localdep_mempcpy_defined */
-
-/* Dependency: "strlen" from "string" */
-#ifndef ____localdep_strlen_defined
-#define ____localdep_strlen_defined 1
+#define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
+#endif /* !... */
+#endif /* !__local___localdep_mempcpy_defined */
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* LIBC: strlen */
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
 #include <local/string/strlen.h>
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
-#endif /* strlen... */
-#endif /* !____localdep_strlen_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
 /* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
 __LOCAL_LIBC(stpcpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stpcpy))(char *__restrict __buf,
-                                                    char const *__restrict __src) {
-#line 482 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stpcpy))(char *__restrict __buf, char const *__restrict __src) {
 	return (char *)__localdep_mempcpy(__buf, __src, (__localdep_strlen(__src) + 1) * sizeof(char)) - 1;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_stpcpy_defined
+#define __local___localdep_stpcpy_defined 1
+#define __localdep_stpcpy __LIBC_LOCAL_NAME(stpcpy)
+#endif /* !__local___localdep_stpcpy_defined */
 #endif /* !__local_stpcpy_defined */

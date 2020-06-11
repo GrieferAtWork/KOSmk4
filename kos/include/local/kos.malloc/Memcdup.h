@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd58f1359 */
+/* HASH CRC-32:0x7ae9368e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,51 +19,46 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Memcdup_defined
-#if defined(__CRT_HAVE_Malloc) || defined(__CRT_HAVE_Memdup)
 #define __local_Memcdup_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_Memdup) || defined(__CRT_HAVE_Malloc)
 #include <kos/anno.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "memchr" from "string" */
-#ifndef ____localdep_memchr_defined
-#define ____localdep_memchr_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: Memdup from kos.malloc */
+#ifndef __local___localdep_Memdup_defined
+#define __local___localdep_Memdup_defined 1
+#ifdef __CRT_HAVE_Memdup
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)),void *,__THROWING,__localdep_Memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes),Memdup,(__ptr,__num_bytes))
+#elif defined(__CRT_HAVE_Malloc)
+__NAMESPACE_LOCAL_END
+#include <local/kos.malloc/Memdup.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_Memdup __LIBC_LOCAL_NAME(Memdup)
+#else /* ... */
+#undef __local___localdep_Memdup_defined
+#endif /* !... */
+#endif /* !__local___localdep_Memdup_defined */
+/* Dependency: memchr from string */
+#ifndef __local___localdep_memchr_defined
+#define __local___localdep_memchr_defined 1
 #ifdef __fast_memchr_defined
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_memchr (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchr))
+__NAMESPACE_FAST_USING(memchr)
+#define __localdep_memchr __LIBC_FAST_NAME(memchr)
 #elif defined(__CRT_HAVE_memchr)
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memchr,(__haystack,__needle,__n_bytes))
-#else /* LIBC: memchr */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memchr.h>
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_memchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchr))
-#endif /* memchr... */
-#endif /* !____localdep_memchr_defined */
-
-/* Dependency: "Memdup" from "kos.malloc" */
-#ifndef ____localdep_Memdup_defined
-#define ____localdep_Memdup_defined 1
-#ifdef __CRT_HAVE_Memdup
-/* @throws: E_BADALLOC: ... */
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)),void *,__THROWING,__localdep_Memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes),Memdup,(__ptr,__num_bytes))
-#elif defined(__CRT_HAVE_Malloc)
-#include <local/kos.malloc/Memdup.h>
-/* @throws: E_BADALLOC: ... */
-#define __localdep_Memdup (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Memdup))
-#else /* CUSTOM: Memdup */
-#undef ____localdep_Memdup_defined
-#endif /* Memdup... */
-#endif /* !____localdep_Memdup_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+#define __localdep_memchr __LIBC_LOCAL_NAME(memchr)
+#endif /* !... */
+#endif /* !__local___localdep_memchr_defined */
 /* @throws: E_BADALLOC: ... */
 __LOCAL_LIBC(Memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
-(__LIBCCALL __LIBC_LOCAL_NAME(Memcdup))(void const *__restrict __ptr,
-                                        int __needle,
-                                        __SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC) {
-#line 61 "kos/src/libc/magic/kos.malloc.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(Memcdup))(void const *__restrict __ptr, int __needle, __SIZE_TYPE__ __num_bytes) __THROWS(__E_BADALLOC) {
 	if __likely(__num_bytes) {
 		void const *__endaddr;
 		__endaddr = __localdep_memchr(__ptr, __needle, __num_bytes - 1);
@@ -73,5 +68,11 @@ __LOCAL_LIBC(Memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNUL
 	return __localdep_Memdup(__ptr, __num_bytes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_Malloc || __CRT_HAVE_Memdup */
+#ifndef __local___localdep_Memcdup_defined
+#define __local___localdep_Memcdup_defined 1
+#define __localdep_Memcdup __LIBC_LOCAL_NAME(Memcdup)
+#endif /* !__local___localdep_Memcdup_defined */
+#else /* __CRT_HAVE_Memdup || __CRT_HAVE_Malloc */
+#undef __local_Memcdup_defined
+#endif /* !__CRT_HAVE_Memdup && !__CRT_HAVE_Malloc */
 #endif /* !__local_Memcdup_defined */

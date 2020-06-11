@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe11e339 */
+/* HASH CRC-32:0x6cf94fae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,25 +19,25 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tmpnam_r_defined
-#ifdef __CRT_HAVE_tmpnam
 #define __local_tmpnam_r_defined 1
 #include <__crt.h>
-/* Dependency: "tmpnam" */
-#ifndef ____localdep_tmpnam_defined
-#define ____localdep_tmpnam_defined 1
 #ifdef __CRT_HAVE_tmpnam
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_tmpnam,(char *__buf),tmpnam,(__buf))
-#else /* LIBC: tmpnam */
-#undef ____localdep_tmpnam_defined
-#endif /* tmpnam... */
-#endif /* !____localdep_tmpnam_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: tmpnam from stdio */
+#if !defined(__local___localdep_tmpnam_defined) && defined(__CRT_HAVE_tmpnam)
+#define __local___localdep_tmpnam_defined 1
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_tmpnam,(char *__buf),tmpnam,(__buf))
+#endif /* !__local___localdep_tmpnam_defined && __CRT_HAVE_tmpnam */
 __LOCAL_LIBC(tmpnam_r) __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tmpnam_r))(char *__buf) {
-#line 1102 "kos/src/libc/magic/stdio.c"
 	return __buf ? __localdep_tmpnam(__buf) : __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_tmpnam */
+#ifndef __local___localdep_tmpnam_r_defined
+#define __local___localdep_tmpnam_r_defined 1
+#define __localdep_tmpnam_r __LIBC_LOCAL_NAME(tmpnam_r)
+#endif /* !__local___localdep_tmpnam_r_defined */
+#else /* __CRT_HAVE_tmpnam */
+#undef __local_tmpnam_r_defined
+#endif /* !__CRT_HAVE_tmpnam */
 #endif /* !__local_tmpnam_r_defined */

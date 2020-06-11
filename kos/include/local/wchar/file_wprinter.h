@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba67bfc6 */
+/* HASH CRC-32:0x1324c225 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,32 +19,41 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_file_wprinter_defined
-#if defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)
 #define __local_file_wprinter_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-#include <asm/stdio.h>
-/* Dependency: "fputwc" */
-#ifndef ____localdep_fputwc_defined
-#define ____localdep_fputwc_defined 1
-#ifdef __std___localdep_fputwc_defined
-__NAMESPACE_STD_USING(__localdep_fputwc)
+#if defined(__CRT_HAVE_fputwc) || (defined(__CRT_HAVE_DOS$fputwc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$fputwc) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_putwc) || (defined(__CRT_HAVE_DOS$putwc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$putwc) && __SIZEOF_WCHAR_T__ == 2)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fputwc from wchar */
+#ifndef __local___localdep_fputwc_defined
+#define __local___localdep_fputwc_defined 1
+#ifdef __fputwc_defined
+__NAMESPACE_GLB_USING(fputwc)
+#define __localdep_fputwc fputwc
+#elif defined(__std_fputwc_defined)
+__NAMESPACE_STD_USING(fputwc)
+#define __localdep_fputwc fputwc
 #elif defined(__CRT_HAVE_fputwc)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$fputwc) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$fputwc) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
-#else /* LIBC: fputwc */
-#undef ____localdep_fputwc_defined
-#endif /* fputwc... */
-#endif /* !____localdep_fputwc_defined */
-
+#elif defined(__CRT_HAVE_DOS$putwc) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$putwc) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
+#else /* ... */
+#undef __local___localdep_fputwc_defined
+#endif /* !... */
+#endif /* !__local___localdep_fputwc_defined */
+__NAMESPACE_LOCAL_END
+#include <asm/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 /* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __LOCAL_LIBC(file_wprinter) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(file_wprinter))(void *__arg,
-                                              __WCHAR_TYPE__ const *__restrict __data,
-                                              __SIZE_TYPE__ __datalen) __THROWS(...) {
-#line 1158 "kos/src/libc/magic/wchar.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(file_wprinter))(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) {
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {
 		if (__localdep_fputwc(__data[__i], (__FILE *)__arg) == __WEOF)
@@ -53,5 +62,11 @@ __LOCAL_LIBC(file_wprinter) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 	return (__SSIZE_TYPE__)__i;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_fputwc || __CRT_HAVE_putwc */
+#ifndef __local___localdep_file_wprinter_defined
+#define __local___localdep_file_wprinter_defined 1
+#define __localdep_file_wprinter __LIBC_LOCAL_NAME(file_wprinter)
+#endif /* !__local___localdep_file_wprinter_defined */
+#else /* __CRT_HAVE_fputwc || (__CRT_HAVE_DOS$fputwc && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$fputwc && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_putwc || (__CRT_HAVE_DOS$putwc && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$putwc && __SIZEOF_WCHAR_T__ == 2) */
+#undef __local_file_wprinter_defined
+#endif /* !__CRT_HAVE_fputwc && (!__CRT_HAVE_DOS$fputwc || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$fputwc || !__SIZEOF_WCHAR_T__ == 2) && !__CRT_HAVE_putwc && (!__CRT_HAVE_DOS$putwc || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$putwc || !__SIZEOF_WCHAR_T__ == 2) */
 #endif /* !__local_file_wprinter_defined */

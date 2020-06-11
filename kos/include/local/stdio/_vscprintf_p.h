@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5a971b8 */
+/* HASH CRC-32:0x84d9bbc5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,10 @@
 #ifndef __local__vscprintf_p_defined
 #define __local__vscprintf_p_defined 1
 #include <__crt.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_vscprintf_p) __ATTR_WUNUSED __ATTR_LIBC_PRINTF_P(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_p))(char const *__restrict __format,
-                                                          __builtin_va_list __args) {
-#line 2450 "kos/src/libc/magic/stdio.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_p))(char const *__restrict __format, __builtin_va_list __args) {
 	(void)__format;
 	(void)__args;
 	/* TODO */
@@ -33,4 +32,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_p))(char const *__restrict
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__vscprintf_p_defined
+#define __local___localdep__vscprintf_p_defined 1
+#define __localdep__vscprintf_p __LIBC_LOCAL_NAME(_vscprintf_p)
+#endif /* !__local___localdep__vscprintf_p_defined */
 #endif /* !__local__vscprintf_p_defined */

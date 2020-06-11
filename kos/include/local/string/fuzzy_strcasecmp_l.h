@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a074e2e */
+/* HASH CRC-32:0xd1dbd79c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,44 +19,53 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_strcasecmp_l_defined
-#ifndef __NO_MALLOCA
 #define __local_fuzzy_strcasecmp_l_defined 1
 #include <__crt.h>
-#include <parts/malloca.h>
-/* Dependency: "fuzzy_memcasecmp_l" from "string" */
-#ifndef ____localdep_fuzzy_memcasecmp_l_defined
-#define ____localdep_fuzzy_memcasecmp_l_defined 1
-#ifdef __CRT_HAVE_fuzzy_memcasecmp_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcasecmp_l,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes, __locale_t __locale),fuzzy_memcasecmp_l,(__s1,__s1_bytes,__s2,__s2_bytes,__locale))
-#elif !defined(__NO_MALLOCA)
-#include <local/string/fuzzy_memcasecmp_l.h>
-#define __localdep_fuzzy_memcasecmp_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_memcasecmp_l))
-#else /* CUSTOM: fuzzy_memcasecmp_l */
-#undef ____localdep_fuzzy_memcasecmp_l_defined
-#endif /* fuzzy_memcasecmp_l... */
-#endif /* !____localdep_fuzzy_memcasecmp_l_defined */
-
-/* Dependency: "strlen" from "string" */
-#ifndef ____localdep_strlen_defined
-#define ____localdep_strlen_defined 1
+#if defined(__CRT_HAVE_fuzzy_memcasecmp_l) || !defined(__NO_MALLOCA)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* LIBC: strlen */
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
 #include <local/string/strlen.h>
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
-#endif /* strlen... */
-#endif /* !____localdep_strlen_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
+/* Dependency: fuzzy_memcasecmp_l from string */
+#ifndef __local___localdep_fuzzy_memcasecmp_l_defined
+#define __local___localdep_fuzzy_memcasecmp_l_defined 1
+#ifdef __CRT_HAVE_fuzzy_memcasecmp_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcasecmp_l,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes, __locale_t __locale),fuzzy_memcasecmp_l,(__s1,__s1_bytes,__s2,__s2_bytes,__locale))
+#else /* __CRT_HAVE_fuzzy_memcasecmp_l */
+__NAMESPACE_LOCAL_END
+#include <parts/malloca.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __NO_MALLOCA
+__NAMESPACE_LOCAL_END
+#include <local/string/fuzzy_memcasecmp_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_fuzzy_memcasecmp_l __LIBC_LOCAL_NAME(fuzzy_memcasecmp_l)
+#else /* !__NO_MALLOCA */
+#undef __local___localdep_fuzzy_memcasecmp_l_defined
+#endif /* __NO_MALLOCA */
+#endif /* !__CRT_HAVE_fuzzy_memcasecmp_l */
+#endif /* !__local___localdep_fuzzy_memcasecmp_l_defined */
 __LOCAL_LIBC(fuzzy_strcasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_strcasecmp_l))(char const *__s1,
-                                                                char const *__s2,
-                                                                __locale_t __locale) {
-#line 4411 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_strcasecmp_l))(char const *__s1, char const *__s2, __locale_t __locale) {
 	return __localdep_fuzzy_memcasecmp_l(__s1, __localdep_strlen(__s1), __s2, __localdep_strlen(__s2), __locale);
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__NO_MALLOCA */
+#ifndef __local___localdep_fuzzy_strcasecmp_l_defined
+#define __local___localdep_fuzzy_strcasecmp_l_defined 1
+#define __localdep_fuzzy_strcasecmp_l __LIBC_LOCAL_NAME(fuzzy_strcasecmp_l)
+#endif /* !__local___localdep_fuzzy_strcasecmp_l_defined */
+#else /* __CRT_HAVE_fuzzy_memcasecmp_l || !__NO_MALLOCA */
+#undef __local_fuzzy_strcasecmp_l_defined
+#endif /* !__CRT_HAVE_fuzzy_memcasecmp_l && __NO_MALLOCA */
 #endif /* !__local_fuzzy_strcasecmp_l_defined */

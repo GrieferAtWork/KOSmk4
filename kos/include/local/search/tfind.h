@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x422b9e3c */
+/* HASH CRC-32:0x9f3cc2a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,19 +21,20 @@
 #ifndef __local_tfind_defined
 #define __local_tfind_defined 1
 #include <__crt.h>
+#ifndef ____compar_fn_t_defined
+#define ____compar_fn_t_defined 1
+typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
+#endif /* !____compar_fn_t_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Search for an entry matching the given KEY in the tree pointed
  * to by *ROOTP. If no matching entry is available return NULL */
-__LOCAL_LIBC(tfind) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tfind))(void const *__key,
-                                                   void *const *__vrootp,
-                                                   __compar_fn_t __compar) {
-#line 502 "kos/src/libc/magic/search.c"
+__LOCAL_LIBC(tfind) __ATTR_NONNULL((3)) void *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tfind))(void const *__key, void *const *__vrootp, __compar_fn_t __compar) {
 	typedef struct __node_struct {
-		void const         *__key;
+		void const           *__key;
 		struct __node_struct *__left_node;
 		struct __node_struct *__right_node;
-		__UINTPTR_TYPE__    __is_red;
+		__UINTPTR_TYPE__      __is_red;
 	} *__node;
 	__node __root, *__rootp = (__node *)__vrootp;
 	if (__rootp == __NULLPTR)
@@ -42,12 +43,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tfind))(void const *__key,
 		int __r = (*__compar)(__key, __root->__key);
 		if (__r == 0)
 			return __root;
-		__rootp = __r < 0
-			? &__root->__left_node
-			: &__root->__right_node
-			;
+		__rootp = __r < 0 ? &__root->__left_node
+		              : &__root->__right_node;
 	}
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_tfind_defined
+#define __local___localdep_tfind_defined 1
+#define __localdep_tfind __LIBC_LOCAL_NAME(tfind)
+#endif /* !__local___localdep_tfind_defined */
 #endif /* !__local_tfind_defined */

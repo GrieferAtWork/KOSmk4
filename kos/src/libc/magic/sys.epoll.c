@@ -158,13 +158,13 @@ struct __EPOLL_PACKED epoll_event {
 @@The "size" parameter is a hint specifying the number of file
 @@descriptors to be associated with the new instance. The fd
 @@returned by epoll_create() should be closed with close()
-[[ATTR_WUNUSED]]
+[[ATTR_WUNUSED, decl_include("<features.h>")]]
 $fd_t epoll_create(__STDC_INT_AS_SIZE_T size);
 
 @@Same as epoll_create but with an FLAGS parameter.
 @@The unused SIZE parameter has been dropped
 @@@param: flags: Set of `EPOLL_*'
-[[ATTR_WUNUSED]]
+[[ATTR_WUNUSED, decl_include("<features.h>")]]
 $fd_t epoll_create1(__STDC_INT_AS_UINT_T flags);
 
 
@@ -185,13 +185,13 @@ int epoll_ctl($fd_t epfd, enum __epoll_ctl op,
 @@events. The "maxevents" is the maximum number of events to be
 @@returned (usually size of "events"). The "timeout" parameter
 @@specifies the maximum wait time in milliseconds (-1 == infinite).
-[[cp]]
+[[cp, decl_include("<features.h>")]]
 int epoll_wait($fd_t epfd, struct epoll_event *events,
                __STDC_INT_AS_SIZE_T maxevents, int timeout);
 
 @@Same as epoll_wait, but the thread's signal mask is temporarily
 @@and atomically replaced with the one provided as parameter
-[[cp]]
+[[cp, decl_include("<features.h>")]]
 int epoll_pwait($fd_t epfd, struct epoll_event *events,
                 __STDC_INT_AS_SIZE_T maxevents, int timeout,
                 sigset_t const *ss);

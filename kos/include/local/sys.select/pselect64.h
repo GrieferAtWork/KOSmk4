@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33898c4 */
+/* HASH CRC-32:0xbc8f74c5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,28 +19,18 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pselect64_defined
-#ifdef __CRT_HAVE_pselect
 #define __local_pselect64_defined 1
 #include <__crt.h>
-/* Dependency: "pselect32" from "sys.select" */
-#ifndef ____localdep_pselect32_defined
-#define ____localdep_pselect32_defined 1
 #ifdef __CRT_HAVE_pselect
-__CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect32,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec32 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
-#else /* LIBC: pselect */
-#undef ____localdep_pselect32_defined
-#endif /* pselect32... */
-#endif /* !____localdep_pselect32_defined */
-
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: pselect32 from sys.select */
+#if !defined(__local___localdep_pselect32_defined) && defined(__CRT_HAVE_pselect)
+#define __local___localdep_pselect32_defined 1
+__CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect32,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timespec32 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
+#endif /* !__local___localdep_pselect32_defined && __CRT_HAVE_pselect */
 __LOCAL_LIBC(pselect64) __STDC_INT_AS_SSIZE_T
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pselect64))(__STDC_INT_AS_SIZE_T __nfds,
-                                                       fd_set *__restrict __readfds,
-                                                       fd_set *__restrict __writefds,
-                                                       fd_set *__restrict __exceptfds,
-                                                       struct __timespec64 const *__restrict __timeout,
-                                                       struct __sigset_struct const *__restrict __sigmask) {
-#line 189 "kos/src/libc/magic/sys.select.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pselect64))(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask) {
 	struct __timespec32 __tms;
 	if (!__timeout)
 		return __localdep_pselect32(__nfds, __readfds, __writefds, __exceptfds, __NULLPTR, __sigmask);
@@ -49,5 +39,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pselect64))(__STDC_INT_AS_SIZE_T __nf
 	return __localdep_pselect32(__nfds, __readfds, __writefds, __exceptfds, &__tms, __sigmask);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_pselect */
+#ifndef __local___localdep_pselect64_defined
+#define __local___localdep_pselect64_defined 1
+#define __localdep_pselect64 __LIBC_LOCAL_NAME(pselect64)
+#endif /* !__local___localdep_pselect64_defined */
+#else /* __CRT_HAVE_pselect */
+#undef __local_pselect64_defined
+#endif /* !__CRT_HAVE_pselect */
 #endif /* !__local_pselect64_defined */

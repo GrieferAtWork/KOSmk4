@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb36685ab */
+/* HASH CRC-32:0xbca2eee8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -508,31 +508,47 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(fgetc, __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL fgetc)(FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc))(__stream); })
 #endif /* ... */
 #if defined(__CRT_HAVE_fgetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Alias for `fgetc()' */
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Alias for `fgetc()' */
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fgetc)
-/* Alias for `fgetc()' */
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),fgetc,(__stream))
 #elif defined(__CRT_HAVE_getc)
-/* Alias for `fgetc()' */
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE__IO_getc)
-/* Alias for `fgetc()' */
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),_IO_getc,(__stream))
 #elif defined(__CRT_HAVE_fgetc_unlocked)
-/* Alias for `fgetc()' */
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
-/* Alias for `fgetc()' */
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)
 __NAMESPACE_STD_END
 #include <local/stdio/fgetc.h>
 __NAMESPACE_STD_BEGIN
-/* Alias for `fgetc()' */
+/* Read and return a single character from `STREAM'
+ * If the given `STREAM' has been exhausted or if an error occurred, `EOF' is
+ * returned and the exact cause can be determined by using `ferror' and `feof' */
 __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL getc)(FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc))(__stream); }
 #endif /* ... */
 #if defined(__CRT_HAVE_getchar_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -588,34 +604,34 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(fputc, __FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL fputc)(int __ch, FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc))(__ch, __stream); })
 #endif /* ... */
 #if __has_builtin(__builtin_fputc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc)
-/* Alias for `fputc()' */
+/* Write a single character `CH' to `STREAM' */
 __CEIREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),fputc,{ return __builtin_fputc(__ch, __stream); })
 #elif defined(__CRT_HAVE_fputc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Alias for `fputc()' */
+/* Write a single character `CH' to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Alias for `fputc()' */
+/* Write a single character `CH' to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc)
-/* Alias for `fputc()' */
+/* Write a single character `CH' to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),fputc,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc)
-/* Alias for `fputc()' */
+/* Write a single character `CH' to `STREAM' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),(__ch,__stream))
 #elif defined(__CRT_HAVE__IO_putc)
-/* Alias for `fputc()' */
+/* Write a single character `CH' to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),_IO_putc,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc_unlocked)
-/* Alias for `fputc()' */
+/* Write a single character `CH' to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked)
-/* Alias for `fputc()' */
+/* Write a single character `CH' to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)
 __NAMESPACE_STD_END
 #include <local/stdio/fputc.h>
 __NAMESPACE_STD_BEGIN
-/* Alias for `fputc()' */
+/* Write a single character `CH' to `STREAM' */
 __FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL putc)(int __ch, FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc))(__ch, __stream); }
 #endif /* ... */
 #if __has_builtin(__builtin_putchar) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_putchar)
@@ -3079,16 +3095,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_NONNULL((1)) int __N
 #ifdef __CRT_HAVE_unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_unlink,(char const *__filename),unlink,(__filename))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),unlink,(__file))
 #elif defined(__CRT_HAVE__unlink)
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_unlink,(char const *__filename),(__filename))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),(__file))
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <local/unistd/unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _unlink)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__filename); }
+__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); }
 #else /* ... */
 #undef ___unlink_defined
 #endif /* !... */
@@ -4606,9 +4622,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__THROWING,fputwc,(char16_t __wc, FIL
 #endif /* !__fputwc_defined */
 #ifndef __getwc_defined
 #define __getwc_defined 1
-#ifdef __std_getwc_defined
-__NAMESPACE_STD_USING(getwc)
-#elif defined(__std_fgetwc_defined)
+#ifdef __std_fgetwc_defined
 __FORCELOCAL __ATTR_NONNULL((1)) wint_t (__LIBCCALL getwc)(FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_STD_SYM fgetwc)(__stream); }
 #elif defined(__CRT_HAVE_fgetwc)
 __CREDIRECT(__ATTR_NONNULL((1)),wint_t,__THROWING,getwc,(FILE *__restrict __stream),fgetwc,(__stream))
@@ -4654,9 +4668,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getwchar, __FORCELOCAL wint_t (__LIBCCALL getwch
 #endif /* !__getwchar_defined */
 #ifndef __putwc_defined
 #define __putwc_defined 1
-#ifdef __std_putwc_defined
-__NAMESPACE_STD_USING(putwc)
-#elif defined(__std_fputwc_defined)
+#ifdef __std_fputwc_defined
 __FORCELOCAL __ATTR_NONNULL((2)) wint_t (__LIBCCALL putwc)(wchar_t __wc, FILE *__stream) __THROWS(...) { return (__NAMESPACE_STD_SYM fputwc)(__wc, __stream); }
 #elif defined(__CRT_HAVE_fputwc)
 __CREDIRECT(__ATTR_NONNULL((2)),wint_t,__THROWING,putwc,(wchar_t __wc, FILE *__stream),fputwc,(__wc,__stream))
@@ -6027,11 +6039,11 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBDCALL _ws
 #ifndef ___wfsopen_defined
 #define ___wfsopen_defined 1
 #ifdef __CRT_HAVE__wfsopen
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfsopen,(wchar_t const *__filename, wchar_t const *__mode, int __sh_flag),(__filename,__mode,__sh_flag))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfsopen,(wchar_t const *__filename, wchar_t const *__mode, __STDC_INT_AS_UINT_T __sh_flag),(__filename,__mode,__sh_flag))
 #elif defined(__CRT_HAVE_DOS$_wfsopen) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfsopen,(char32_t const *__filename, char32_t const *__mode, int __sh_flag),_wfsopen,(__filename,__mode,__sh_flag))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfsopen,(char32_t const *__filename, char32_t const *__mode, __STDC_INT_AS_UINT_T __sh_flag),_wfsopen,(__filename,__mode,__sh_flag))
 #elif defined(__CRT_HAVE_DOS$_wfsopen) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfsopen,(char16_t const *__filename, char16_t const *__mode, int __sh_flag),_wfsopen,(__filename,__mode,__sh_flag))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfsopen,(char16_t const *__filename, char16_t const *__mode, __STDC_INT_AS_UINT_T __sh_flag),_wfsopen,(__filename,__mode,__sh_flag))
 #else /* ... */
 #undef ___wfsopen_defined
 #endif /* !... */
@@ -6197,9 +6209,7 @@ __CREDIRECT_DOS(__ATTR_WUNUSED,char16_t *,__NOTHROW_NCX,_wtempnam,(char16_t cons
 #endif /* !... */
 #endif /* !___wtempnam_defined */
 #ifndef _CRT_WPERROR_DEFINED
-#define _CRT_WPERROR_DEFINED
-#ifndef ___wperror_defined
-#define ___wperror_defined 1
+#define _CRT_WPERROR_DEFINED 1
 #ifdef __CRT_HAVE__wperror
 __CDECLARE_VOID(__ATTR_COLD,__THROWING,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message))
 #elif defined(__CRT_HAVE_DOS$_wperror) && __SIZEOF_WCHAR_T__ == 4
@@ -6207,10 +6217,19 @@ __CREDIRECT_VOID_KOS(__ATTR_COLD,__THROWING,_wperror,(__CHAR32_TYPE__ const *__r
 #elif defined(__CRT_HAVE_DOS$_wperror) && __SIZEOF_WCHAR_T__ == 2
 __CREDIRECT_VOID_DOS(__ATTR_COLD,__THROWING,_wperror,(__CHAR16_TYPE__ const *__restrict __message),_wperror,(__message))
 #else /* ... */
-#undef ___wperror_defined
+#undef _CRT_WPERROR_DEFINED
 #endif /* !... */
-#endif /* !___wperror_defined */
-#endif  /* _CRT_WPERROR_DEFINED */
+#define _CRT_WPERROR_DEFINED 1
+#ifdef __CRT_HAVE__wperror
+__CDECLARE_VOID(__ATTR_COLD,__THROWING,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message))
+#elif defined(__CRT_HAVE_DOS$_wperror) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_VOID_KOS(__ATTR_COLD,__THROWING,_wperror,(__CHAR32_TYPE__ const *__restrict __message),_wperror,(__message))
+#elif defined(__CRT_HAVE_DOS$_wperror) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_VOID_DOS(__ATTR_COLD,__THROWING,_wperror,(__CHAR16_TYPE__ const *__restrict __message),_wperror,(__message))
+#else /* ... */
+#undef _CRT_WPERROR_DEFINED
+#endif /* !... */
+#endif /* !_CRT_WPERROR_DEFINED */
 #ifndef ___wpopen_defined
 #define ___wpopen_defined 1
 #ifdef __CRT_HAVE_wpopen

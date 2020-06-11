@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff82a7ce */
+/* HASH CRC-32:0xb6164747 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(memchrq) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memchrq))(/*aligned(8)*/ void const *__restrict __haystack,
-                                                     __UINT64_TYPE__ __qword,
-                                                     __SIZE_TYPE__ __n_qwords) {
-#line 1785 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memchrq))(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) {
 	__UINT64_TYPE__ *__hay_iter = (__UINT64_TYPE__ *)__haystack;
 	for (; __n_qwords--; ++__hay_iter) {
 		if __unlikely(*__hay_iter == (__UINT64_TYPE__)__qword)
@@ -36,4 +33,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memchrq))(/*aligned(8)*/ void const *
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memchrq_defined
+#define __local___localdep_memchrq_defined 1
+#define __localdep_memchrq __LIBC_LOCAL_NAME(memchrq)
+#endif /* !__local___localdep_memchrq_defined */
 #endif /* !__local_memchrq_defined */

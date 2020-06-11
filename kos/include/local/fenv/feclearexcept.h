@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x276b6f7e */
+/* HASH CRC-32:0x8798b29f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,12 @@ __NAMESPACE_LOCAL_BEGIN
 /* Clear the supported exceptions represented by EXCEPTS */
 __LOCAL_LIBC(feclearexcept) int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(feclearexcept))(int __excepts) {
-#line 86 "kos/src/libc/magic/fenv.c"
 	__inline_feclearexcept(__excepts);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_feclearexcept_defined
+#define __local___localdep_feclearexcept_defined 1
+#define __localdep_feclearexcept __LIBC_LOCAL_NAME(feclearexcept)
+#endif /* !__local___localdep_feclearexcept_defined */
 #endif /* !__local_feclearexcept_defined */

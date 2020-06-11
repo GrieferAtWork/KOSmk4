@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0d3a698 */
+/* HASH CRC-32:0x5146e10c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,36 +21,36 @@
 #ifndef __local_cfmakesane_defined
 #define __local_cfmakesane_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
 #include <bits/termios.h>
-#include <sys/ttydefaults.h>
-/* Dependency: "memset" from "string" */
-#ifndef ____localdep_memset_defined
-#define ____localdep_memset_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memset from string */
+#ifndef __local___localdep_memset_defined
+#define __local___localdep_memset_defined 1
 #ifdef __fast_memset_defined
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))
+__NAMESPACE_FAST_USING(memset)
+#define __localdep_memset __LIBC_FAST_NAME(memset)
 #elif defined(__CRT_HAVE_memset)
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* LIBC: memset */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memset.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))
-#endif /* memset... */
-#endif /* !____localdep_memset_defined */
-
+#define __localdep_memset __LIBC_LOCAL_NAME(memset)
+#endif /* !... */
+#endif /* !__local___localdep_memset_defined */
+__NAMESPACE_LOCAL_END
+#include <sys/ttydefaults.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
  * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
 __LOCAL_LIBC(cfmakesane) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restrict __termios_p) {
-#line 135 "kos/src/libc/magic/termios.c"
 	/* Set sane values. */
 	__localdep_memset(__termios_p, 0, sizeof(*__termios_p));
 #ifdef TTYDEF_CFLAG
@@ -207,4 +207,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restri
 #endif /* VSTATUS */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_cfmakesane_defined
+#define __local___localdep_cfmakesane_defined 1
+#define __localdep_cfmakesane __LIBC_LOCAL_NAME(cfmakesane)
+#endif /* !__local___localdep_cfmakesane_defined */
 #endif /* !__local_cfmakesane_defined */

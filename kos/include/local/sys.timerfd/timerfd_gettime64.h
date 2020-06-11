@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96b483c */
+/* HASH CRC-32:0xfb5ed8fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,26 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_timerfd_gettime64_defined
-#ifdef __CRT_HAVE_timerfd_gettime
 #define __local_timerfd_gettime64_defined 1
 #include <__crt.h>
-/* Dependency: "timerfd_gettime32" from "sys.timerfd" */
-#ifndef ____localdep_timerfd_gettime32_defined
-#define ____localdep_timerfd_gettime32_defined 1
 #ifdef __CRT_HAVE_timerfd_gettime
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: timerfd_gettime32 from sys.timerfd */
+#if !defined(__local___localdep_timerfd_gettime32_defined) && defined(__CRT_HAVE_timerfd_gettime)
+#define __local___localdep_timerfd_gettime32_defined 1
 /* Return the next expiration time of UFD */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(__fd_t __ufd, struct __itimerspec32 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
-#else /* LIBC: timerfd_gettime */
-#undef ____localdep_timerfd_gettime32_defined
-#endif /* timerfd_gettime32... */
-#endif /* !____localdep_timerfd_gettime32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_timerfd_gettime32_defined && __CRT_HAVE_timerfd_gettime */
 /* Return the next expiration time of UFD */
 __LOCAL_LIBC(timerfd_gettime64) __ATTR_NONNULL((2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_gettime64))(__fd_t __ufd,
-                                                               struct itimerspec64 *__restrict __otmr) {
-#line 175 "kos/src/libc/magic/sys.timerfd.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_gettime64))(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr) {
 	int __result;
 	struct __itimerspec32 __otmr32;
 	__result = __localdep_timerfd_gettime32(__timerid, &__otmr32);
@@ -51,5 +44,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_gettime64))(__fd_t __ufd,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_timerfd_gettime */
+#ifndef __local___localdep_timerfd_gettime64_defined
+#define __local___localdep_timerfd_gettime64_defined 1
+#define __localdep_timerfd_gettime64 __LIBC_LOCAL_NAME(timerfd_gettime64)
+#endif /* !__local___localdep_timerfd_gettime64_defined */
+#else /* __CRT_HAVE_timerfd_gettime */
+#undef __local_timerfd_gettime64_defined
+#endif /* !__CRT_HAVE_timerfd_gettime */
 #endif /* !__local_timerfd_gettime64_defined */

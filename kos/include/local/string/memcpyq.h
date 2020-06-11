@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd86641ee */
+/* HASH CRC-32:0xcda5bb63 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks. */
 __LOCAL_LIBC(memcpyq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcpyq))(/*aligned(8)*/ void *__restrict __dst,
-                                                     /*aligned(8)*/ void const *__restrict __src,
-                                                     __SIZE_TYPE__ __n_qwords) {
-#line 1606 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcpyq))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords) {
 #if __SIZEOF_POINTER__ >= 8
 	__UINT64_TYPE__ *__pdst = (__UINT64_TYPE__ *)__dst;
 	__UINT64_TYPE__ *__psrc = (__UINT64_TYPE__ *)__src;
@@ -44,4 +41,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcpyq))(/*aligned(8)*/ void *__rest
 	return (__UINT64_TYPE__ *)__dst;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memcpyq_defined
+#define __local___localdep_memcpyq_defined 1
+#define __localdep_memcpyq __LIBC_LOCAL_NAME(memcpyq)
+#endif /* !__local___localdep_memcpyq_defined */
 #endif /* !__local_memcpyq_defined */

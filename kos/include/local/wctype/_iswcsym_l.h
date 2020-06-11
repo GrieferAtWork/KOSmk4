@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5689b69 */
+/* HASH CRC-32:0xb8924f8b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,30 @@
 #ifndef __local__iswcsym_l_defined
 #define __local__iswcsym_l_defined 1
 #include <__crt.h>
-/* Dependency: "iswalnum_l" from "wctype" */
-#ifndef ____localdep_iswalnum_l_defined
-#define ____localdep_iswalnum_l_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: iswalnum_l from wctype */
+#ifndef __local___localdep_iswalnum_l_defined
+#define __local___localdep_iswalnum_l_defined 1
 #ifdef __CRT_HAVE_iswalnum_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),iswalnum_l,(__wc,__locale))
 #elif defined(__CRT_HAVE__iswalnum_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),_iswalnum_l,(__wc,__locale))
 #elif defined(__CRT_HAVE___iswalnum_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),__iswalnum_l,(__wc,__locale))
-#else /* LIBC: iswalnum_l */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/iswalnum_l.h>
-#define __localdep_iswalnum_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswalnum_l))
-#endif /* iswalnum_l... */
-#endif /* !____localdep_iswalnum_l_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_iswalnum_l __LIBC_LOCAL_NAME(iswalnum_l)
+#endif /* !... */
+#endif /* !__local___localdep_iswalnum_l_defined */
 __LOCAL_LIBC(_iswcsym_l) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_iswcsym_l))(__WINT_TYPE__ __wc,
-                                                        __locale_t __locale) {
-#line 415 "kos/src/libc/magic/wctype.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_iswcsym_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
 	return __localdep_iswalnum_l(__wc, __locale) || __wc == '_' || __wc == '$';
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__iswcsym_l_defined
+#define __local___localdep__iswcsym_l_defined 1
+#define __localdep__iswcsym_l __LIBC_LOCAL_NAME(_iswcsym_l)
+#endif /* !__local___localdep__iswcsym_l_defined */
 #endif /* !__local__iswcsym_l_defined */

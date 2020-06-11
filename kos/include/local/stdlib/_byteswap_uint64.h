@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8c2944b */
+/* HASH CRC-32:0x154a7277 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,8 +25,11 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_byteswap_uint64) __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_byteswap_uint64))(__UINT64_TYPE__ __val) {
-#line 2297 "kos/src/libc/magic/stdlib.c"
 	return __hybrid_bswap64(__val);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__byteswap_uint64_defined
+#define __local___localdep__byteswap_uint64_defined 1
+#define __localdep__byteswap_uint64 __LIBC_LOCAL_NAME(_byteswap_uint64)
+#endif /* !__local___localdep__byteswap_uint64_defined */
 #endif /* !__local__byteswap_uint64_defined */

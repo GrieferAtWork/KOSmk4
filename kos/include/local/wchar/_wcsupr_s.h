@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe437c4c */
+/* HASH CRC-32:0xb79b53c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,37 +21,47 @@
 #ifndef __local__wcsupr_s_defined
 #define __local__wcsupr_s_defined 1
 #include <__crt.h>
-/* Dependency: "wcsnlen" from "wchar" */
-#ifndef ____localdep_wcsnlen_defined
-#define ____localdep_wcsnlen_defined 1
-#ifdef __CRT_HAVE_wcsnlen
-/* Same as `wcslen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcsnlen from wchar */
+#ifndef __local___localdep_wcsnlen_defined
+#define __local___localdep_wcsnlen_defined 1
+#ifdef __wcsnlen_defined
+/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+__NAMESPACE_GLB_USING(wcsnlen)
+#define __localdep_wcsnlen wcsnlen
+#elif defined(__CRT_HAVE_wcsnlen)
+/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsnlen,(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
-#else /* LIBC: wcsnlen */
+#elif defined(__CRT_HAVE_DOS$wcsnlen) && __SIZEOF_WCHAR_T__ == 4
+/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsnlen,(__CHAR32_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
+#elif defined(__CRT_HAVE_DOS$wcsnlen) && __SIZEOF_WCHAR_T__ == 2
+/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsnlen,(__CHAR16_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/wcsnlen.h>
-/* Same as `wcslen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
-#define __localdep_wcsnlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnlen))
-#endif /* wcsnlen... */
-#endif /* !____localdep_wcsnlen_defined */
-
-/* Dependency: "towupper" from "wctype" */
-#ifndef ____localdep_towupper_defined
-#define ____localdep_towupper_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+#define __localdep_wcsnlen __LIBC_LOCAL_NAME(wcsnlen)
+#endif /* !... */
+#endif /* !__local___localdep_wcsnlen_defined */
+/* Dependency: towupper from wctype */
+#ifndef __local___localdep_towupper_defined
+#define __local___localdep_towupper_defined 1
 #if __has_builtin(__builtin_towupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towupper)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towupper,(__WINT_TYPE__ __wc),towupper,{ return __builtin_towupper(__wc); })
 #elif defined(__CRT_HAVE_towupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towupper,(__WINT_TYPE__ __wc),towupper,(__wc))
-#else /* LIBC: towupper */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/towupper.h>
-#define __localdep_towupper (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towupper))
-#endif /* towupper... */
-#endif /* !____localdep_towupper_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_towupper __LIBC_LOCAL_NAME(towupper)
+#endif /* !... */
+#endif /* !__local___localdep_towupper_defined */
 __LOCAL_LIBC(_wcsupr_s) __ATTR_LEAF __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcsupr_s))(__WCHAR_TYPE__ *__buf,
-                                                       __SIZE_TYPE__ __buflen) {
-#line 5142 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcsupr_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen) {
 	__WCHAR_TYPE__ *__iter, __ch;
 	if (__buf == __NULLPTR)
 		return __EINVAL;
@@ -62,4 +72,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcsupr_s))(__WCHAR_TYPE__ *__buf,
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__wcsupr_s_defined
+#define __local___localdep__wcsupr_s_defined 1
+#define __localdep__wcsupr_s __LIBC_LOCAL_NAME(_wcsupr_s)
+#endif /* !__local___localdep__wcsupr_s_defined */
 #endif /* !__local__wcsupr_s_defined */

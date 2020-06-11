@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28217350 */
+/* HASH CRC-32:0xe9e6a45e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,23 +19,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ntp_gettime64_defined
-#ifdef __CRT_HAVE_ntp_gettimex
 #define __local_ntp_gettime64_defined 1
 #include <__crt.h>
-/* Dependency: "ntp_gettime32" from "sys.timex" */
-#ifndef ____localdep_ntp_gettime32_defined
-#define ____localdep_ntp_gettime32_defined 1
 #ifdef __CRT_HAVE_ntp_gettimex
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime32,(struct __ntptimeval32 *__restrict __ntv),ntp_gettimex,(__ntv))
-#else /* LIBC: ntp_gettimex */
-#undef ____localdep_ntp_gettime32_defined
-#endif /* ntp_gettime32... */
-#endif /* !____localdep_ntp_gettime32_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: ntp_gettime32 from sys.timex */
+#if !defined(__local___localdep_ntp_gettime32_defined) && defined(__CRT_HAVE_ntp_gettimex)
+#define __local___localdep_ntp_gettime32_defined 1
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime32,(struct __ntptimeval32 *__restrict __ntv),ntp_gettimex,(__ntv))
+#endif /* !__local___localdep_ntp_gettime32_defined && __CRT_HAVE_ntp_gettimex */
 __LOCAL_LIBC(ntp_gettime64) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_gettime64))(struct ntptimeval64 *__restrict __ntv) {
-#line 480 "kos/src/libc/magic/sys.timex.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_gettime64))(struct __ntptimeval64 *__restrict __ntv) {
 	struct __ntptimeval32 __ntv32;
 	int __result = __localdep_ntp_gettime32(&__ntv32);
 	if __likely(__result == 0) {
@@ -52,5 +46,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_gettime64))(struct ntptimeval64 *
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_ntp_gettimex */
+#ifndef __local___localdep_ntp_gettime64_defined
+#define __local___localdep_ntp_gettime64_defined 1
+#define __localdep_ntp_gettime64 __LIBC_LOCAL_NAME(ntp_gettime64)
+#endif /* !__local___localdep_ntp_gettime64_defined */
+#else /* __CRT_HAVE_ntp_gettimex */
+#undef __local_ntp_gettime64_defined
+#endif /* !__CRT_HAVE_ntp_gettimex */
 #endif /* !__local_ntp_gettime64_defined */

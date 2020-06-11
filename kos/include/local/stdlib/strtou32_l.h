@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x454fd52e */
+/* HASH CRC-32:0x461b2271 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,10 @@
 #ifndef __local_strtou32_l_defined
 #define __local_strtou32_l_defined 1
 #include <__crt.h>
-/* Dependency: "strtou32" from "stdlib" */
-#ifndef ____localdep_strtou32_defined
-#define ____localdep_strtou32_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strtou32 from stdlib */
+#ifndef __local___localdep_strtou32_defined
+#define __local___localdep_strtou32_defined 1
 #ifdef __CRT_HAVE_strtou32
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, int __base),strtou32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoul) && (__SIZEOF_LONG__ == 4)
@@ -34,21 +35,21 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__loca
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, int __base),strtouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoumax) && (__SIZEOF_INTMAX_T__ == 4)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, int __base),strtoumax,(__nptr,__endptr,__base))
-#else /* LIBC: strtou32 */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/strtou32.h>
-#define __localdep_strtou32 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou32))
-#endif /* strtou32... */
-#endif /* !____localdep_strtou32_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strtou32 __LIBC_LOCAL_NAME(strtou32)
+#endif /* !... */
+#endif /* !__local___localdep_strtou32_defined */
 __LOCAL_LIBC(strtou32_l) __ATTR_LEAF __ATTR_NONNULL((1)) __UINT32_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32_l))(char const *__restrict __nptr,
-                                                        char **__endptr,
-                                                        int __base,
-                                                        __locale_t __locale) {
-#line 1088 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32_l))(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_strtou32(__nptr, __endptr, __base);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strtou32_l_defined
+#define __local___localdep_strtou32_l_defined 1
+#define __localdep_strtou32_l __LIBC_LOCAL_NAME(strtou32_l)
+#endif /* !__local___localdep_strtou32_l_defined */
 #endif /* !__local_strtou32_l_defined */

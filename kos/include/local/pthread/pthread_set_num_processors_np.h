@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x694f54f5 */
+/* HASH CRC-32:0x6768f578 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,30 +19,25 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_set_num_processors_np_defined
-#ifdef __CRT_HAVE_sched_setaffinity
 #define __local_pthread_set_num_processors_np_defined 1
 #include <__crt.h>
-#include <bits/sched.h>
-
-#include <parts/errno.h>
-/* Dependency: "sched_setaffinity" */
-#ifndef ____localdep_sched_setaffinity_defined
-#define ____localdep_sched_setaffinity_defined 1
 #ifdef __CRT_HAVE_sched_setaffinity
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: sched_setaffinity from sched */
+#if !defined(__local___localdep_sched_setaffinity_defined) && defined(__CRT_HAVE_sched_setaffinity)
+#define __local___localdep_sched_setaffinity_defined 1
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, __cpu_set_t const *__cpuset),sched_setaffinity,(__pid,__cpusetsize,__cpuset))
-#else /* LIBC: sched_setaffinity */
-#undef ____localdep_sched_setaffinity_defined
-#endif /* sched_setaffinity... */
-#endif /* !____localdep_sched_setaffinity_defined */
-
+#endif /* !__local___localdep_sched_setaffinity_defined && __CRT_HAVE_sched_setaffinity */
+__NAMESPACE_LOCAL_END
+#include <bits/sched.h>
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_set_num_processors_np) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(int __n) {
-#line 1427 "kos/src/libc/magic/pthread.c"
 	int __i, __result;
 	__cpu_set_t __cset;
 	if (__n < 1) {
-#ifdef __EINVAL
+#ifdef EINVAL
 		return __EINVAL;
 #else /* EINVAL */
 		return 1;
@@ -59,5 +54,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(int _
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_sched_setaffinity */
+#ifndef __local___localdep_pthread_set_num_processors_np_defined
+#define __local___localdep_pthread_set_num_processors_np_defined 1
+#define __localdep_pthread_set_num_processors_np __LIBC_LOCAL_NAME(pthread_set_num_processors_np)
+#endif /* !__local___localdep_pthread_set_num_processors_np_defined */
+#else /* __CRT_HAVE_sched_setaffinity */
+#undef __local_pthread_set_num_processors_np_defined
+#endif /* !__CRT_HAVE_sched_setaffinity */
 #endif /* !__local_pthread_set_num_processors_np_defined */

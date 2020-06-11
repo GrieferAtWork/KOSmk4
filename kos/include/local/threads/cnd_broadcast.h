@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98391bed */
+/* HASH CRC-32:0x63ebbdc1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,30 +19,25 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cnd_broadcast_defined
-#ifdef __CRT_HAVE_pthread_cond_broadcast
 #define __local_cnd_broadcast_defined 1
 #include <__crt.h>
-#include <bits/threads.h>
-
-#include <bits/pthreadtypes.h>
-#include <asm/threads.h>
-/* Dependency: "pthread_cond_broadcast" */
-#ifndef ____localdep_pthread_cond_broadcast_defined
-#define ____localdep_pthread_cond_broadcast_defined 1
 #ifdef __CRT_HAVE_pthread_cond_broadcast
+#include <bits/threads.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pthread_cond_broadcast from pthread */
+#if !defined(__local___localdep_pthread_cond_broadcast_defined) && defined(__CRT_HAVE_pthread_cond_broadcast)
+#define __local___localdep_pthread_cond_broadcast_defined 1
 /* Wake up all threads waiting for condition variables COND */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_cond_broadcast,(__pthread_cond_t *__cond),pthread_cond_broadcast,(__cond))
-#else /* LIBC: pthread_cond_broadcast */
-#undef ____localdep_pthread_cond_broadcast_defined
-#endif /* pthread_cond_broadcast... */
-#endif /* !____localdep_pthread_cond_broadcast_defined */
-
+#endif /* !__local___localdep_pthread_cond_broadcast_defined && __CRT_HAVE_pthread_cond_broadcast */
+__NAMESPACE_LOCAL_END
+#include <asm/threads.h>
+#include <bits/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Unblock all threads currently waiting on condition variable pointed by COND
  * s.a. `pthread_cond_broadcast()' */
 __LOCAL_LIBC(cnd_broadcast) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_broadcast))(__cnd_t *__restrict __cond) {
-#line 456 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_cond_broadcast((__pthread_cond_t *)__cond);
 	if __likely(!__error)
@@ -50,5 +45,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_broadcast))(__cnd_t *__restrict _
 	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_pthread_cond_broadcast */
+#ifndef __local___localdep_cnd_broadcast_defined
+#define __local___localdep_cnd_broadcast_defined 1
+#define __localdep_cnd_broadcast __LIBC_LOCAL_NAME(cnd_broadcast)
+#endif /* !__local___localdep_cnd_broadcast_defined */
+#else /* __CRT_HAVE_pthread_cond_broadcast */
+#undef __local_cnd_broadcast_defined
+#endif /* !__CRT_HAVE_pthread_cond_broadcast */
 #endif /* !__local_cnd_broadcast_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86136045 */
+/* HASH CRC-32:0x1d27e165 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,37 @@
 #ifndef __local_wcssep_defined
 #define __local_wcssep_defined 1
 #include <__crt.h>
-/* Dependency: "wcschr" from "wchar" */
-#ifndef ____localdep_wcschr_defined
-#define ____localdep_wcschr_defined 1
-#ifdef __std___localdep_wcschr_defined
-__NAMESPACE_STD_USING(__localdep_wcschr)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcschr from wchar */
+#ifndef __local___localdep_wcschr_defined
+#define __local___localdep_wcschr_defined 1
+#ifdef __wcschr_defined
+/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+__NAMESPACE_GLB_USING(wcschr)
+#define __localdep_wcschr wcschr
+#elif defined(__std_wcschr_defined)
+/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+__NAMESPACE_STD_USING(wcschr)
+#define __localdep_wcschr wcschr
 #elif defined(__CRT_HAVE_wcschr)
 /* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcschr,(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle),wcschr,(__haystack,__needle))
-#else /* LIBC: wcschr */
-#include <local/wchar/wcschr.h>
+#elif defined(__CRT_HAVE_DOS$wcschr) && __SIZEOF_WCHAR_T__ == 4
 /* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_wcschr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcschr))
-#endif /* wcschr... */
-#endif /* !____localdep_wcschr_defined */
-
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_wcschr,(__CHAR32_TYPE__ const *__restrict __haystack, __CHAR32_TYPE__ __needle),wcschr,(__haystack,__needle))
+#elif defined(__CRT_HAVE_DOS$wcschr) && __SIZEOF_WCHAR_T__ == 2
+/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_wcschr,(__CHAR16_TYPE__ const *__restrict __haystack, __CHAR16_TYPE__ __needle),wcschr,(__haystack,__needle))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wcschr.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+#define __localdep_wcschr __LIBC_LOCAL_NAME(wcschr)
+#endif /* !... */
+#endif /* !__local___localdep_wcschr_defined */
 __LOCAL_LIBC(wcssep) __ATTR_LEAF __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcssep))(__WCHAR_TYPE__ **__restrict __stringp,
-                                                    __WCHAR_TYPE__ const *__restrict __delim) {
-#line 850 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcssep))(__WCHAR_TYPE__ **__restrict __stringp, __WCHAR_TYPE__ const *__restrict __delim) {
 	__WCHAR_TYPE__ *__result, *__iter;
 	if (!__stringp || (__result = *__stringp) == __NULLPTR || !*__result)
 		return __NULLPTR;
@@ -52,4 +63,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcssep))(__WCHAR_TYPE__ **__restrict 
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcssep_defined
+#define __local___localdep_wcssep_defined 1
+#define __localdep_wcssep __LIBC_LOCAL_NAME(wcssep)
+#endif /* !__local___localdep_wcssep_defined */
 #endif /* !__local_wcssep_defined */

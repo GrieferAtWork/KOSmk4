@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e80624e */
+/* HASH CRC-32:0x26fdb235 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,28 +21,33 @@
 #ifndef __local_strcasecoll_l_defined
 #define __local_strcasecoll_l_defined 1
 #include <__crt.h>
-/* Dependency: "strcasecmp_l" from "string" */
-#ifndef ____localdep_strcasecmp_l_defined
-#define ____localdep_strcasecmp_l_defined 1
-#ifdef __CRT_HAVE_strcasecmp_l
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strcasecmp_l from string */
+#ifndef __local___localdep_strcasecmp_l_defined
+#define __local___localdep_strcasecmp_l_defined 1
+#ifdef __strcasecmp_l_defined
+__NAMESPACE_GLB_USING(strcasecmp_l)
+#define __localdep_strcasecmp_l strcasecmp_l
+#elif defined(__CRT_HAVE_strcasecmp_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),strcasecmp_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE__stricmp_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),_stricmp_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE___strcasecmp_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),__strcasecmp_l,(__s1,__s2,__locale))
-#else /* LIBC: strcasecmp_l */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/strcasecmp_l.h>
-#define __localdep_strcasecmp_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcasecmp_l))
-#endif /* strcasecmp_l... */
-#endif /* !____localdep_strcasecmp_l_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strcasecmp_l __LIBC_LOCAL_NAME(strcasecmp_l)
+#endif /* !... */
+#endif /* !__local___localdep_strcasecmp_l_defined */
 __LOCAL_LIBC(strcasecoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcasecoll_l))(char const *__s1,
-                                                           char const *__s2,
-                                                           __locale_t __locale) {
-#line 4769 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcasecoll_l))(char const *__s1, char const *__s2, __locale_t __locale) {
 	return __localdep_strcasecmp_l(__s1, __s2, __locale);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strcasecoll_l_defined
+#define __local___localdep_strcasecoll_l_defined 1
+#define __localdep_strcasecoll_l __LIBC_LOCAL_NAME(strcasecoll_l)
+#endif /* !__local___localdep_strcasecoll_l_defined */
 #endif /* !__local_strcasecoll_l_defined */

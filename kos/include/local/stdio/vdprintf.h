@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50c8ebbe */
+/* HASH CRC-32:0xda943a10 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,15 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vdprintf_defined
-#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 #define __local_vdprintf_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: format_vprintf from format-printer */
+#ifndef __local___localdep_format_vprintf_defined
+#define __local___localdep_format_vprintf_defined 1
+#ifdef __CRT_HAVE_format_vprintf
+__NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/format-printer.h>
-/* Dependency: "format_vprintf" from "format-printer" */
-#ifndef ____localdep_format_vprintf_defined
-#define ____localdep_format_vprintf_defined 1
-#ifdef __CRT_HAVE_format_vprintf
+__NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -116,8 +120,10 @@
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
-#else /* LIBC: format_vprintf */
+#else /* __CRT_HAVE_format_vprintf */
+__NAMESPACE_LOCAL_END
 #include <local/format-printer/format_vprintf.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -205,14 +211,18 @@ __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THR
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-#define __localdep_format_vprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vprintf))
-#endif /* format_vprintf... */
-#endif /* !____localdep_format_vprintf_defined */
-
-/* Dependency: "write" */
-#ifndef ____localdep_write_defined
-#define ____localdep_write_defined 1
-#ifdef __CRT_HAVE_write
+#define __localdep_format_vprintf __LIBC_LOCAL_NAME(format_vprintf)
+#endif /* !__CRT_HAVE_format_vprintf */
+#endif /* !__local___localdep_format_vprintf_defined */
+/* Dependency: write from unistd */
+#ifndef __local___localdep_write_defined
+#define __local___localdep_write_defined 1
+#ifdef __write_defined
+/* >> write(2)
+ * Write data to a given file descriptor `FD' and return the number of bytes written */
+__NAMESPACE_GLB_USING(write)
+#define __localdep_write write
+#elif defined(__CRT_HAVE_write)
 /* >> write(2)
  * Write data to a given file descriptor `FD' and return the number of bytes written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),write,(__fd,__buf,__bufsize))
@@ -224,25 +234,30 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(_
 /* >> write(2)
  * Write data to a given file descriptor `FD' and return the number of bytes written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),__write,(__fd,__buf,__bufsize))
-#else /* LIBC: write */
-#undef ____localdep_write_defined
-#endif /* write... */
-#endif /* !____localdep_write_defined */
-
+#else /* ... */
+#undef __local___localdep_write_defined
+#endif /* !... */
+#endif /* !__local___localdep_write_defined */
+__NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
+
 __LOCAL_LIBC(vdprintf_printer) __ssize_t (__LIBCCALL __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
-	return (__ssize_t)__localdep_write((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
-}
-__LOCAL_LIBC(vdprintf) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(vdprintf))(__fd_t __fd,
-                                                      char const *__restrict __format,
-                                                      __builtin_va_list __args) {
-#line 1060 "kos/src/libc/magic/stdio.c"
-	return __localdep_format_vprintf(&__vdprintf_printer,
-	                     (void *)(__UINTPTR_TYPE__)(unsigned int)__fd,
-	                      __format,
-	                      __args);
+	return (__ssize_t)(__NAMESPACE_LOCAL_SYM __localdep_write)((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vdprintf) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(vdprintf))(__fd_t __fd, char const *__restrict __format, __builtin_va_list __args) {
+	return __localdep_format_vprintf(&__NAMESPACE_LOCAL_SYM __vdprintf_printer,
+	                      (void *)(__UINTPTR_TYPE__)(unsigned int)__fd,
+	                      __format, __args);
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_vdprintf_defined
+#define __local___localdep_vdprintf_defined 1
+#define __localdep_vdprintf __LIBC_LOCAL_NAME(vdprintf)
+#endif /* !__local___localdep_vdprintf_defined */
+#else /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#undef __local_vdprintf_defined
+#endif /* !__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write */
 #endif /* !__local_vdprintf_defined */

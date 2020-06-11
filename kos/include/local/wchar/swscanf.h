@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfee26862 */
+/* HASH CRC-32:0xb84a91ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,32 @@
 #ifndef __local_swscanf_defined
 #define __local_swscanf_defined 1
 #include <__crt.h>
-/* Dependency: "vswscanf" from "wchar" */
-#ifndef ____localdep_vswscanf_defined
-#define ____localdep_vswscanf_defined 1
-#ifdef __std___localdep_vswscanf_defined
-__NAMESPACE_STD_USING(__localdep_vswscanf)
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: vswscanf from wchar */
+#ifndef __local___localdep_vswscanf_defined
+#define __local___localdep_vswscanf_defined 1
+#ifdef __vswscanf_defined
+__NAMESPACE_GLB_USING(vswscanf)
+#define __localdep_vswscanf vswscanf
+#elif defined(__std_vswscanf_defined)
+__NAMESPACE_STD_USING(vswscanf)
+#define __localdep_vswscanf vswscanf
 #elif defined(__CRT_HAVE_vswscanf)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vswscanf,(__WCHAR_TYPE__ const *__restrict __src, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))
-#else /* LIBC: vswscanf */
+#elif defined(__CRT_HAVE_DOS$vswscanf) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vswscanf,(__CHAR32_TYPE__ const *__restrict __src, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))
+#elif defined(__CRT_HAVE_DOS$vswscanf) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vswscanf,(__CHAR16_TYPE__ const *__restrict __src, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/vswscanf.h>
-#define __localdep_vswscanf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswscanf))
-#endif /* vswscanf... */
-#endif /* !____localdep_vswscanf_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_vswscanf __LIBC_LOCAL_NAME(vswscanf)
+#endif /* !... */
+#endif /* !__local___localdep_vswscanf_defined */
 __LOCAL_LIBC(swscanf) __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(swscanf))(__WCHAR_TYPE__ const *__restrict __src,
-                                                      __WCHAR_TYPE__ const *__restrict __format,
-                                                      ...) {
-#line 703 "kos/src/libc/magic/wchar.c"
+__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(swscanf))(__WCHAR_TYPE__ const *__restrict __src, __WCHAR_TYPE__ const *__restrict __format, ...) {
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
@@ -48,4 +55,8 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(swscanf))(__WCHAR_TYPE__ const *__re
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_swscanf_defined
+#define __local___localdep_swscanf_defined 1
+#define __localdep_swscanf __LIBC_LOCAL_NAME(swscanf)
+#endif /* !__local___localdep_swscanf_defined */
 #endif /* !__local_swscanf_defined */

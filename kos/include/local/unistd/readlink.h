@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6473d3d3 */
+/* HASH CRC-32:0xf49f7f2f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_readlink_defined
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_readlinkat)
 #define __local_readlink_defined 1
 #include <__crt.h>
-/* Dependency: "readlinkat" */
-#ifndef ____localdep_readlinkat_defined
-#define ____localdep_readlinkat_defined 1
-#ifdef __CRT_HAVE_readlinkat
+#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_readlinkat)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: readlinkat from unistd */
+#if !defined(__local___localdep_readlinkat_defined) && defined(__CRT_HAVE_readlinkat)
+#define __local___localdep_readlinkat_defined 1
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -35,12 +35,7 @@
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_readlinkat,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, __SIZE_TYPE__ __buflen),readlinkat,(__dfd,__path,__buf,__buflen))
-#else /* LIBC: readlinkat */
-#undef ____localdep_readlinkat_defined
-#endif /* readlinkat... */
-#endif /* !____localdep_readlinkat_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_readlinkat_defined && __CRT_HAVE_readlinkat */
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
@@ -51,12 +46,15 @@ __NAMESPACE_LOCAL_BEGIN
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __LOCAL_LIBC(readlink) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readlink))(char const *__restrict __path,
-                                                      char *__restrict __buf,
-                                                      __SIZE_TYPE__ __buflen) {
-#line 1525 "kos/src/libc/magic/unistd.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readlink))(char const *__restrict __path, char *__restrict __buf, __SIZE_TYPE__ __buflen) {
 	return __localdep_readlinkat(__CRT_AT_FDCWD, __path, __buf, __buflen);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && __CRT_HAVE_readlinkat */
+#ifndef __local___localdep_readlink_defined
+#define __local___localdep_readlink_defined 1
+#define __localdep_readlink __LIBC_LOCAL_NAME(readlink)
+#endif /* !__local___localdep_readlink_defined */
+#else /* __CRT_AT_FDCWD && __CRT_HAVE_readlinkat */
+#undef __local_readlink_defined
+#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_readlinkat */
 #endif /* !__local_readlink_defined */

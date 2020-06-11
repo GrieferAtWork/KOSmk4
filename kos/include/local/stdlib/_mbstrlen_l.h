@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe75096a5 */
+/* HASH CRC-32:0xae02dcbd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,27 @@
 #ifndef __local__mbstrlen_l_defined
 #define __local__mbstrlen_l_defined 1
 #include <__crt.h>
-/* Dependency: "_mbstrlen" from "stdlib" */
-#ifndef ____localdep__mbstrlen_defined
-#define ____localdep__mbstrlen_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: _mbstrlen from stdlib */
+#ifndef __local___localdep__mbstrlen_defined
+#define __local___localdep__mbstrlen_defined 1
 #ifdef __CRT_HAVE__mbstrlen
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstrlen,(char const *__str),_mbstrlen,(__str))
-#else /* LIBC: _mbstrlen */
+#else /* __CRT_HAVE__mbstrlen */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/_mbstrlen.h>
-#define __localdep__mbstrlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstrlen))
-#endif /* _mbstrlen... */
-#endif /* !____localdep__mbstrlen_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep__mbstrlen __LIBC_LOCAL_NAME(_mbstrlen)
+#endif /* !__CRT_HAVE__mbstrlen */
+#endif /* !__local___localdep__mbstrlen_defined */
 __LOCAL_LIBC(_mbstrlen_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstrlen_l))(char const *__str,
-                                                         __locale_t __locale) {
-#line 2636 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstrlen_l))(char const *__str, __locale_t __locale) {
 	(void)__locale;
 	return __localdep__mbstrlen(__str);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__mbstrlen_l_defined
+#define __local___localdep__mbstrlen_l_defined 1
+#define __localdep__mbstrlen_l __LIBC_LOCAL_NAME(_mbstrlen_l)
+#endif /* !__local___localdep__mbstrlen_l_defined */
 #endif /* !__local__mbstrlen_l_defined */

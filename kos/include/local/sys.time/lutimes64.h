@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6bd726 */
+/* HASH CRC-32:0xf1609f3f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,26 +19,19 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lutimes64_defined
-#ifdef __CRT_HAVE_lutimes
 #define __local_lutimes64_defined 1
 #include <__crt.h>
-/* Dependency: "lutimes32" from "sys.time" */
-#ifndef ____localdep_lutimes32_defined
-#define ____localdep_lutimes32_defined 1
 #ifdef __CRT_HAVE_lutimes
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: lutimes32 from sys.time */
+#if !defined(__local___localdep_lutimes32_defined) && defined(__CRT_HAVE_lutimes)
+#define __local___localdep_lutimes32_defined 1
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes32,(char const *__file, struct __timeval32 const __tvp[2]),lutimes,(__file,__tvp))
-#else /* LIBC: lutimes */
-#undef ____localdep_lutimes32_defined
-#endif /* lutimes32... */
-#endif /* !____localdep_lutimes32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_lutimes32_defined && __CRT_HAVE_lutimes */
 /* Same as `utimes', but does not follow symbolic links */
 __LOCAL_LIBC(lutimes64) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lutimes64))(char const *__file,
-                                                       struct __timeval64 const __tvp[2]) {
-#line 526 "kos/src/libc/magic/sys.time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lutimes64))(char const *__file, struct __timeval64 const __tvp[2]) {
 	struct __timeval32 __tv32[2];
 	if (!__tvp)
 		return __localdep_lutimes32(__file, __NULLPTR);
@@ -49,5 +42,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lutimes64))(char const *__file,
 	return __localdep_lutimes32(__file, __tv32);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lutimes */
+#ifndef __local___localdep_lutimes64_defined
+#define __local___localdep_lutimes64_defined 1
+#define __localdep_lutimes64 __LIBC_LOCAL_NAME(lutimes64)
+#endif /* !__local___localdep_lutimes64_defined */
+#else /* __CRT_HAVE_lutimes */
+#undef __local_lutimes64_defined
+#endif /* !__CRT_HAVE_lutimes */
 #endif /* !__local_lutimes64_defined */

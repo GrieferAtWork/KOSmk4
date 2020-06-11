@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0b8fb4e */
+/* HASH CRC-32:0x74931b98 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,10 @@
 #ifndef __local__vsnwscanf_defined
 #define __local__vsnwscanf_defined 1
 #include <__crt.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_vsnwscanf) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnwscanf))(__WCHAR_TYPE__ const *__src,
-                                                        __SIZE_TYPE__ __bufsize,
-                                                        __WCHAR_TYPE__ const *__format,
-                                                        __builtin_va_list __args) {
-#line 2141 "kos/src/libc/magic/wchar.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnwscanf))(__WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, __builtin_va_list __args) {
 	/* TODO */
 	(void)__src;
 	(void)__bufsize;
@@ -37,4 +34,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnwscanf))(__WCHAR_TYPE__ const *__
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__vsnwscanf_defined
+#define __local___localdep__vsnwscanf_defined 1
+#define __localdep__vsnwscanf __LIBC_LOCAL_NAME(_vsnwscanf)
+#endif /* !__local___localdep__vsnwscanf_defined */
 #endif /* !__local__vsnwscanf_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda3f7504 */
+/* HASH CRC-32:0x933e475e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memchr', but return `HAYSTACK + N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(memend) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memend))(void const *__restrict __haystack,
-                                                    int __needle,
-                                                    __SIZE_TYPE__ __n_bytes) {
-#line 2721 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memend))(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__result = (__BYTE_TYPE__ *)__haystack;
 	for (; __n_bytes--; ++__result) {
 		if __unlikely(*__result == (__BYTE_TYPE__)__needle)
@@ -36,4 +33,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memend))(void const *__restrict __hay
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memend_defined
+#define __local___localdep_memend_defined 1
+#define __localdep_memend __LIBC_LOCAL_NAME(memend)
+#endif /* !__local___localdep_memend_defined */
 #endif /* !__local_memend_defined */

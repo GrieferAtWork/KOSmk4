@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x817ea209 */
+/* HASH CRC-32:0x6887efeb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,34 +21,34 @@
 #ifndef __local_memrlenw_defined
 #define __local_memrlenw_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "memrendw" from "string" */
-#ifndef ____localdep_memrendw_defined
-#define ____localdep_memrendw_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memrendw from string */
+#ifndef __local___localdep_memrendw_defined
+#define __local___localdep_memrendw_defined 1
 #ifdef __fast_memrendw_defined
 /* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_memrendw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrendw))
+__NAMESPACE_FAST_USING(memrendw)
+#define __localdep_memrendw __LIBC_FAST_NAME(memrendw)
 #elif defined(__CRT_HAVE_memrendw)
 /* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memrendw,(/*aligned(2)*/ void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),memrendw,(__haystack,__word,__n_words))
-#else /* LIBC: memrendw */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memrendw,(void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),memrendw,(__haystack,__word,__n_words))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memrendw.h>
-/* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_memrendw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrendw))
-#endif /* memrendw... */
-#endif /* !____localdep_memrendw_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `memrchrw', but return `HAYSTACK - 2', rather than `NULL' if `NEEDLE' wasn't found. */
+#define __localdep_memrendw __LIBC_LOCAL_NAME(memrendw)
+#endif /* !... */
+#endif /* !__local___localdep_memrendw_defined */
 /* Same as `memrendw', but return the offset from `HAYSTACK', rather than the actual address.
  * Returns `(size_t)-1 / 2' if the given `NEEDLE' wasn't found */
 __LOCAL_LIBC(memrlenw) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrlenw))(/*aligned(2)*/ void const *__restrict __haystack,
-                                                      __UINT16_TYPE__ __word,
-                                                      __SIZE_TYPE__ __n_words) {
-#line 1553 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrlenw))(void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) {
 	return (__SIZE_TYPE__)(__localdep_memrendw(__haystack, __word, __n_words) - (__UINT16_TYPE__ *)__haystack);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_memrlenw_defined
+#define __local___localdep_memrlenw_defined 1
+#define __localdep_memrlenw __LIBC_LOCAL_NAME(memrlenw)
+#endif /* !__local___localdep_memrlenw_defined */
 #endif /* !__local_memrlenw_defined */

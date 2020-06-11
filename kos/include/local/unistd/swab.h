@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed4b1b0d */
+/* HASH CRC-32:0x6febba84 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,15 +21,13 @@
 #ifndef __local_swab_defined
 #define __local_swab_defined 1
 #include <__crt.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
 __LOCAL_LIBC(swab) __ATTR_NONNULL((1, 2)) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(swab))(void const *__restrict __from,
-                                                  void *__restrict __to,
-                                                  __STDC_INT_AS_SSIZE_T __n_bytes) {
-#line 1717 "kos/src/libc/magic/unistd.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(swab))(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes) {
 	__n_bytes &= ~1;
 	while (__n_bytes >= 2) {
 		__BYTE_TYPE__ __a, __b;
@@ -40,4 +38,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(swab))(void const *__restrict __from,
 	}
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_swab_defined
+#define __local___localdep_swab_defined 1
+#define __localdep_swab __LIBC_LOCAL_NAME(swab)
+#endif /* !__local___localdep_swab_defined */
 #endif /* !__local_swab_defined */

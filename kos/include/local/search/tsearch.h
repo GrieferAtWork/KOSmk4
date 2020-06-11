@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31013d51 */
+/* HASH CRC-32:0xf1ecc2ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,62 +19,56 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tsearch_defined
-#if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #define __local_tsearch_defined 1
 #include <__crt.h>
-/* Dependency: "maybe_split_for_insert" from "search" */
-#ifndef ____localdep_maybe_split_for_insert_defined
-#define ____localdep_maybe_split_for_insert_defined 1
-#ifdef __CRT_HAVE_maybe_split_for_insert
-/* Possibly "split" a node with two red successors, and/or fix up two red
- * edges in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
- * and GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
- * comparison values that determined which way was taken in the tree to reach
- * ROOTP. MODE is 1 if we need not do the split, but must check for two red
- * edges between GPARENTP and ROOTP */
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_maybe_split_for_insert,(void **__rootp, void **__parentp, void **__gparentp, int __p_r, int __gp_r, int __mode),maybe_split_for_insert,(__rootp,__parentp,__gparentp,__p_r,__gp_r,__mode))
-#else /* LIBC: maybe_split_for_insert */
-#include <local/search/maybe_split_for_insert.h>
-/* Possibly "split" a node with two red successors, and/or fix up two red
- * edges in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
- * and GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
- * comparison values that determined which way was taken in the tree to reach
- * ROOTP. MODE is 1 if we need not do the split, but must check for two red
- * edges between GPARENTP and ROOTP */
-#define __localdep_maybe_split_for_insert (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(maybe_split_for_insert))
-#endif /* maybe_split_for_insert... */
-#endif /* !____localdep_maybe_split_for_insert_defined */
-
-/* Dependency: "malloc" from "stdlib" */
-#ifndef ____localdep_malloc_defined
-#define ____localdep_malloc_defined 1
-#ifdef __std___localdep_malloc_defined
-__NAMESPACE_STD_USING(__localdep_malloc)
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#ifndef ____compar_fn_t_defined
+#define ____compar_fn_t_defined 1
+typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
+#endif /* !____compar_fn_t_defined */
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: malloc from stdlib */
+#ifndef __local___localdep_malloc_defined
+#define __local___localdep_malloc_defined 1
+#ifdef __malloc_defined
+__NAMESPACE_GLB_USING(malloc)
+#define __localdep_malloc malloc
+#elif defined(__std_malloc_defined)
+__NAMESPACE_STD_USING(malloc)
+#define __localdep_malloc malloc
 #elif __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,{ return __builtin_malloc(__num_bytes); })
 #elif defined(__CRT_HAVE_malloc)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,(__num_bytes))
-#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)
+#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/malloc.h>
-#define __localdep_malloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(malloc))
-#else /* CUSTOM: malloc */
-#undef ____localdep_malloc_defined
-#endif /* malloc... */
-#endif /* !____localdep_malloc_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_malloc __LIBC_LOCAL_NAME(malloc)
+#else /* ... */
+#undef __local___localdep_malloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_malloc_defined */
+/* Dependency: maybe_split_for_insert from search */
+#ifndef __local___localdep_maybe_split_for_insert_defined
+#define __local___localdep_maybe_split_for_insert_defined 1
+/* Possibly "split" a node with two red successors, and/or fix up two red
+ * edges in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
+ * and GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
+ * comparison values that determined which way was taken in the tree to reach
+ * ROOTP. MODE is 1 if we need not do the split, but must check for two red
+ * edges between GPARENTP and ROOTP */
+__LOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL __localdep_maybe_split_for_insert)(void **__rootp, void **__parentp, void **__gparentp, int __p_r, int __gp_r, int __mode) { typedef struct __node_struct { void const *__key; struct __node_struct *__left_node; struct __node_struct *__right_node; __UINTPTR_TYPE__ __is_red; } *__node; __node __root = *(__node *)__rootp; __node *__rp, *__lp; __node __rpn, __lpn; __rp = &__root->__right_node; __rpn = __root->__right_node; __lp = &__root->__left_node; __lpn = __root->__left_node; if (__mode == 1 || (__rpn != __NULLPTR && __lpn != __NULLPTR && __rpn->__is_red && __lpn->__is_red)) { __root->__is_red = 1; if (__rpn) __rpn->__is_red = 0; if (__lpn) __lpn->__is_red = 0; if (__parentp != __NULLPTR && (*(__node *)__parentp)->__is_red) { __node __gp = *((__node *)__gparentp); __node __p = *((__node *)__parentp); if ((__p_r > 0) != (__gp_r > 0)) { __p->__is_red = 1; __gp->__is_red = 1; __root->__is_red = 0; if (__p_r < 0) { __p->__left_node = __rpn; *__rp = __p; __gp->__right_node = __lpn; *__lp = __gp; } else { __p->__right_node = __lpn; *__lp = __p; __gp->__left_node = __rpn; *__rp = __gp; } *(__node *)__gparentp = __root; } else { *(__node *)__gparentp = __p; __p->__is_red = 0; __gp->__is_red = 1; if (__p_r < 0) { __gp->__left_node = __p->__right_node; __p->__right_node = __gp; } else { __gp->__right_node = __p->__left_node; __p->__left_node = __gp; } } } } }
+#endif /* !__local___localdep_maybe_split_for_insert_defined */
 /* Search for an entry matching the given KEY in the tree
  * pointed to by *ROOTP and insert a new element if not found */
-__LOCAL_LIBC(tsearch) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tsearch))(void const *__key,
-                                                     void **__vrootp,
-                                                     __compar_fn_t __compar) {
-#line 450 "kos/src/libc/magic/search.c"
+__LOCAL_LIBC(tsearch) __ATTR_NONNULL((3)) void *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tsearch))(void const *__key, void **__vrootp, __compar_fn_t __compar) {
 	typedef struct __node_struct {
-		void const         *__key;
+		void const           *__key;
 		struct __node_struct *__left_node;
 		struct __node_struct *__right_node;
-		__UINTPTR_TYPE__    __is_red;
+		__UINTPTR_TYPE__      __is_red;
 	} *__node;
 	__node __q, __root;
 	__node *__parentp = __NULLPTR, *__gparentp = __NULLPTR;
@@ -89,14 +83,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tsearch))(void const *__key,
 	__nextp = __rootp;
 	while (*__nextp != __NULLPTR) {
 		__root = *__rootp;
-		__r = (*__compar) (__key, __root->__key);
+		__r = (*__compar)(__key, __root->__key);
 		if (__r == 0)
 			return __root;
-		__localdep_maybe_split_for_insert((void **)__rootp, (void **)__parentp, (void **)__gparentp, __p_r, __gp_r, 0);
-		__nextp = __r < 0
-			? &__root->__left_node
-			: &__root->__right_node
-			;
+		__localdep_maybe_split_for_insert((void **)__rootp,
+		                       (void **)__parentp,
+		                       (void **)__gparentp,
+		                       __p_r, __gp_r, 0);
+		__nextp = __r < 0 ? &__root->__left_node
+		              : &__root->__right_node;
 		if (*__nextp == __NULLPTR)
 			break;
 		__gparentp = __parentp;
@@ -112,11 +107,21 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tsearch))(void const *__key,
 		__q->__is_red = 1;
 		__q->__left_node = __NULLPTR;
 		__q->__right_node = __NULLPTR;
-		if (__nextp != __rootp)
-			__localdep_maybe_split_for_insert((void **)__nextp, (void **)__rootp, (void **)__parentp, __r, __p_r, 1);
+		if (__nextp != __rootp) {
+			__localdep_maybe_split_for_insert((void **)__nextp,
+			                       (void **)__rootp,
+			                       (void **)__parentp,
+			                       __r, __p_r, 1);
+		}
 	}
 	return __q;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_posix_memalign || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_malloc */
+#ifndef __local___localdep_tsearch_defined
+#define __local___localdep_tsearch_defined 1
+#define __localdep_tsearch __LIBC_LOCAL_NAME(tsearch)
+#endif /* !__local___localdep_tsearch_defined */
+#else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+#undef __local_tsearch_defined
+#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
 #endif /* !__local_tsearch_defined */

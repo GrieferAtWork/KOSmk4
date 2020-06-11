@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8240498 */
+/* HASH CRC-32:0xe51ab415 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,28 +19,21 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_timer_gettime64_defined
-#ifdef __CRT_HAVE_timer_gettime
 #define __local_timer_gettime64_defined 1
 #include <__crt.h>
-#include <bits/itimerspec.h>
-#include <bits/itimerspec.h>
-/* Dependency: "timer_gettime32" from "time" */
-#ifndef ____localdep_timer_gettime32_defined
-#define ____localdep_timer_gettime32_defined 1
 #ifdef __CRT_HAVE_timer_gettime
-/* Get current value of timer TIMERID and store it in VALUE */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime32,(timer_t __timerid, struct itimerspec *__value),timer_gettime,(__timerid,__value))
-#else /* LIBC: timer_gettime */
-#undef ____localdep_timer_gettime32_defined
-#endif /* timer_gettime32... */
-#endif /* !____localdep_timer_gettime32_defined */
-
+#include <bits/itimerspec.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: timer_gettime32 from time */
+#if !defined(__local___localdep_timer_gettime32_defined) && defined(__CRT_HAVE_timer_gettime)
+#define __local___localdep_timer_gettime32_defined 1
+/* Get current value of timer TIMERID and store it in VALUE */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime32,(__timer_t __timerid, struct itimerspec *__value),timer_gettime,(__timerid,__value))
+#endif /* !__local___localdep_timer_gettime32_defined && __CRT_HAVE_timer_gettime */
 /* Get current value of timer TIMERID and store it in VALUE */
 __LOCAL_LIBC(timer_gettime64) __ATTR_NONNULL((2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_gettime64))(timer_t __timerid,
-                                                             struct itimerspec64 *__value) {
-#line 1290 "kos/src/libc/magic/time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_gettime64))(__timer_t __timerid, struct __itimerspec64 *__value) {
 	int __result;
 	struct __itimerspec32 __value32;
 	__result = __localdep_timer_gettime32(__timerid, &__value32);
@@ -53,5 +46,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_gettime64))(timer_t __timerid,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_timer_gettime */
+#ifndef __local___localdep_timer_gettime64_defined
+#define __local___localdep_timer_gettime64_defined 1
+#define __localdep_timer_gettime64 __LIBC_LOCAL_NAME(timer_gettime64)
+#endif /* !__local___localdep_timer_gettime64_defined */
+#else /* __CRT_HAVE_timer_gettime */
+#undef __local_timer_gettime64_defined
+#endif /* !__CRT_HAVE_timer_gettime */
 #endif /* !__local_timer_gettime64_defined */

@@ -99,31 +99,29 @@ struct _finddata64i32_t;
 %[insert:extern(read)]
 %[insert:extern(write)]
 
-_access(*) = access;
-_creat(*) = creat;
-_chmod(*) = chmod;
+%[insert:function(_access = access)]
+%[insert:function(_creat = creat)]
+%[insert:function(_chmod = chmod)]
 
 [[cp, section(".text.crt.dos.fs.property")]]
 errno_t _access_s([[nonnull]] char const *filename, int type);
 
-_chsize(*) = chsize;
-_chsize_s(*) = ftruncate64;
-_commit(*) = fsync;
-_lseek(*) = lseek;
-_lseeki64(*) = lseek64;
-_locking(*) = locking;
-
-%[insert:extern(_unlink)]
-
-_close(*) = close;
-_dup(*) = dup;
-_dup2(*) = dup2;
-_read(*) = read;
-_write(*) = write;
-_open(*) = open;
-_setmode(*) = setmode;
-_umask(*) = umask;
-_isatty(*) = isatty;
+%[insert:function(_chsize = chsize)]
+%[insert:function(_chsize_s = ftruncate64)]
+%[insert:function(_commit = fsync)]
+%[insert:function(_lseek = lseek)]
+%[insert:function(_lseeki64 = lseek64)]
+%[insert:function(_locking = locking)]
+%[insert:guarded_function(_unlink = unlink)]
+%[insert:function(_close = close)]
+%[insert:function(_dup = dup)]
+%[insert:function(_dup2 = dup2)]
+%[insert:function(_read = read)]
+%[insert:function(_write = write)]
+%[insert:function(_open = open)]
+%[insert:function(_setmode = setmode)]
+%[insert:function(_umask = umask)]
+%[insert:function(_isatty = isatty)]
 
 
 %
@@ -196,12 +194,12 @@ errno_t _sopen_s([[nonnull]] $fd_t *fd,
 	return 0;
 }
 
-_sopen_s_nolock(*) = _sopen_s;
+%[insert:function(_sopen_s_nolock = _sopen_s)]
 
 [[section(".text.crt.dos.fs.utility")]]
 errno_t _mktemp_s([[nonnull]] char *template_, size_t size);
 
-_sopen(*) = sopen;
+%[insert:function(_sopen = sopen)]
 
 [[decl_include("<bits/types.h>"), section(".text.crt.dos.fs.io")]]
 [[userimpl, requires_function(pipe2)]]
@@ -212,9 +210,9 @@ int _pipe([[nonnull]] $fd_t pipedes[2],
 }
 
 %[default_impl_section(".text.crt.dos.fs.utility")]
-_eof(*) = eof;
-_filelength(*) = filelength;
-_tell(*) = tell;
+%[insert:function(_eof = eof)]
+%[insert:function(_filelength = filelength)]
+%[insert:function(_tell = tell)]
 
 
 [[impl_include("<asm/stdio.h>")]]
@@ -338,9 +336,9 @@ __LONG32_TYPE__ filelength($fd_t fd) {
 
 [[decl_include("<bits/types.h>")]]
 [[ATTR_WUNUSED, crt_name("_tell")]]
-[[userimpl, requires_function(_lseek)]]
+[[userimpl, requires_function(lseek)]]
 __LONG32_TYPE__ tell($fd_t fd) {
-	return _lseek(fd, 0, SEEK_CUR);
+	return lseek(fd, 0, SEEK_CUR);
 }
 
 

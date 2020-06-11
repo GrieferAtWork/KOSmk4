@@ -198,7 +198,10 @@ __NAMESPACE_STD_USING(lldiv_t)
 
 #ifndef __COMPAR_FN_T
 #define __COMPAR_FN_T 1
+#ifndef ____compar_fn_t_defined
+#define ____compar_fn_t_defined 1
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
+#endif /* !____compar_fn_t_defined */
 #ifdef __USE_GNU
 typedef __compar_fn_t comparison_fn_t;
 #endif /* __USE_GNU */
@@ -211,19 +214,23 @@ typedef void (*__LIBCCALL __atexit_func_t)(void);
 
 }
 %#ifdef __USE_GNU
-%#ifndef __compar_d_fn_t_defined
-%#define __compar_d_fn_t_defined 1
-%typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
-%#endif /* !__compar_d_fn_t_defined */
-
-[[section(".text.crt.utility.stdlib")]]
-[[impl_include("<hybrid/__minmax.h>")]]
-[[decl_prefix(
+%{
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
-), throws]]
+}
+
+%[define(DEFINE_COMPAR_D_FN_T =
+@@pp_ifndef __compar_d_fn_t_defined@@
+#define __compar_d_fn_t_defined 1
+typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+@@pp_endif@@
+)]
+
+[[section(".text.crt.utility.stdlib")]]
+[[impl_include("<hybrid/__minmax.h>")]]
+[[decl_prefix(DEFINE_COMPAR_D_FN_T), throws]]
 void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
              [[nonnull]] __compar_d_fn_t cmp, void *arg) {
 	/* DISCALIMER: The qsort() implementation below has been taken directly
@@ -371,12 +378,7 @@ typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 }
 
 [[section(".text.crt.utility.stdlib")]]
-[[decl_prefix(
-#ifndef __compar_d_fn_t_defined
-#define __compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
-#endif /* !__compar_d_fn_t_defined */
-), throws, ATTR_WUNUSED]]
+[[decl_prefix(DEFINE_COMPAR_D_FN_T), throws, ATTR_WUNUSED]]
 void *bsearch_r([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg)
 	[([[nonnull]] void const *pkey, [[nonnull]] void *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg): void *]
 	[([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg): void const *]
@@ -424,40 +426,49 @@ void *bsearch_r([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $si
 %[insert:std]
 %
 
+%[define(DEFINE_COMPAR_FN_T =
+@@pp_ifndef ____compar_fn_t_defined@@
+#define ____compar_fn_t_defined 1
+typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
+@@pp_endif@@
+)]
+
+%[define(DEFINE_INVOKE_COMPARE_HELPER =
+@@pp_ifndef ____invoke_compare_helper_defined@@
+@@push_namespace(local)@@
+#define ____invoke_compare_helper_defined 1
+__LOCAL_LIBC(__invoke_compare_helper) int
+(__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
+	return (*(__compar_fn_t)__arg)(__a, __b);
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
 %(auto_source)#ifdef ____invoke_compare_helper_defined
 %(auto_source)__NAMESPACE_LOCAL_USING(__invoke_compare_helper)
 %(auto_source)#endif /* ____invoke_compare_helper_defined */
 
 [[section(".text.crt.utility.stdlib")]]
-[[impl_prefix(
-#ifndef ____invoke_compare_helper_defined
-#define ____invoke_compare_helper_defined 1
-__LOCAL_LIBC(__invoke_compare_helper) int
-(__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
-	return (*(__compar_fn_t)__arg)(__a, __b);
-}
-#endif /* !____invoke_compare_helper_defined */
-), throws, std]]
+[[decl_prefix(DEFINE_COMPAR_FN_T)]]
+[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), throws, std]]
 void qsort([[nonnull]] void *pbase, size_t item_count,
            size_t item_size, [[nonnull]] __compar_fn_t cmp) {
-	qsort_r(pbase, item_count, item_size, &@__invoke_compare_helper@, (void *)cmp);
+	qsort_r(pbase, item_count, item_size,
+	        &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
+	        (void *)cmp);
 }
 
 [[section(".text.crt.utility.stdlib")]]
-[[impl_prefix(
-#ifndef ____invoke_compare_helper_defined
-#define ____invoke_compare_helper_defined 1
-__LOCAL_LIBC(__invoke_compare_helper) int
-(__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
-	return (*(__compar_fn_t)__arg)(__a, __b);
-}
-#endif /* !____invoke_compare_helper_defined */
-), ATTR_WUNUSED, std, throws]]
+[[decl_prefix(DEFINE_COMPAR_FN_T)]]
+[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), ATTR_WUNUSED, std, throws]]
 void *bsearch([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp)
 	[([[nonnull]] void const *pkey, [[nonnull]] void *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp): void *]
 	[([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp): void const *]
 {
-	return bsearch_r(pkey, pbase, item_count, item_size, &@__invoke_compare_helper@, (void *)cmp);
+	return bsearch_r(pkey, pbase, item_count, item_size,
+	                 &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
+	                 (void *)cmp);
 }
 
 
@@ -982,8 +993,8 @@ __LONGDOUBLE strtold([[nonnull]] char const *__restrict nptr,
 %
 %#ifdef __USE_MISC
 %#ifdef __ULONGLONG
-strtoq(*) = strtoll;
-strtouq(*) = strtoull;
+%[insert:function(strtoq = strtoll)]
+%[insert:function(strtouq = strtoull)]
 %#endif /* __ULONGLONG */
 %#endif /* __USE_MISC */
 
@@ -1197,12 +1208,14 @@ char *gcvt(double val, int ndigit, [[nonnull]] char *buf) {
 %#ifdef __USE_MISC
 %#ifndef __NO_FPU
 
+[[decl_include("<bits/types.h>")]]
 [[ignore, nocrt, alias("_ecvt_s")]]
 errno_t dos_ecvt_s([[nonnull]] char *buf,
                    $size_t buflen, double val, int ndigit,
                    [[nonnull]] int *__restrict decptr,
                    [[nonnull]] int *__restrict sign);
 
+[[decl_include("<bits/types.h>")]]
 [[ignore, nocrt, alias("_fcvt_s")]]
 errno_t dos_fcvt_s([[nonnull]] char *buf,
                    $size_t buflen, double val, int ndigit,
@@ -1310,9 +1323,9 @@ int qfcvt_r(__LONGDOUBLE val, int ndigit,
 %[define(DEFINE_QCVT_BUFFER =
 #ifndef __CRT_QCVT_BUFFER_DEFINED
 #define __CRT_QCVT_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = {0};
-__NAMESPACE_LOCAL_END
+@@push_namespace(local)@@
+__LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
+@@pop_namespace@@
 #endif /* !__CRT_QCVT_BUFFER_DEFINED */
 )]
 
@@ -1322,9 +1335,11 @@ __NAMESPACE_LOCAL_END
 char *qecvt(__LONGDOUBLE val, int ndigit,
             [[nonnull]] int *__restrict decptr,
             [[nonnull]] int *__restrict sign) {
-	if (qecvt_r(val, ndigit, decptr, sign, @__qcvt_buffer@, sizeof(@__qcvt_buffer@)))
+	if (qecvt_r(val, ndigit, decptr, sign,
+	            __NAMESPACE_LOCAL_SYM __qcvt_buffer,
+	            sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
 		return NULL;
-	return @__qcvt_buffer@;
+	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
 }
 
 [[impl_prefix(DEFINE_QCVT_BUFFER)]]
@@ -1332,9 +1347,11 @@ char *qecvt(__LONGDOUBLE val, int ndigit,
 char *qfcvt(__LONGDOUBLE val, int ndigit,
             [[nonnull]] int *__restrict decptr,
             [[nonnull]] int *__restrict sign) {
-	if (qfcvt_r(val, ndigit, decptr, sign, @__qcvt_buffer@, sizeof(@__qcvt_buffer@)))
+	if (qfcvt_r(val, ndigit, decptr, sign,
+	            __NAMESPACE_LOCAL_SYM __qcvt_buffer,
+	            sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
 		return NULL;
-	return @__qcvt_buffer@;
+	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
 }
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
@@ -1624,10 +1641,11 @@ char *mktemp([[nonnull]] char *template_);
 char *ecvt(double val, int ndigit,
            [[nonnull]] int *__restrict decptr,
            [[nonnull]] int *__restrict sign) {
-	if (ecvt_r(val, ndigit, decptr, sign, @__qcvt_buffer@,
-	           sizeof(@__qcvt_buffer@)))
+	if (ecvt_r(val, ndigit, decptr, sign,
+	           __NAMESPACE_LOCAL_SYM __qcvt_buffer,
+	           sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
 		return NULL;
-	return @__qcvt_buffer@;
+	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
 }
 
 [[impl_prefix(DEFINE_QCVT_BUFFER)]]
@@ -1635,10 +1653,11 @@ char *ecvt(double val, int ndigit,
 char *fcvt(double val, int ndigit,
            [[nonnull]] int *__restrict decptr,
            [[nonnull]] int *__restrict sign) {
-	if (fcvt_r(val, ndigit, decptr, sign, @__qcvt_buffer@,
-	           sizeof(@__qcvt_buffer@)))
+	if (fcvt_r(val, ndigit, decptr, sign,
+	           __NAMESPACE_LOCAL_SYM __qcvt_buffer,
+	           sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
 		return NULL;
-	return @__qcvt_buffer@;
+	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;
 }
 %#endif /* !__NO_FPU */
 
@@ -2046,15 +2065,25 @@ typedef int (__LIBCCALL *_onexit_t)(void);
 %#endif /* ____errno_location_defined */
 %#endif /* !errno */
 %[default_impl_section(".text.crt.errno_access")]
+
+[[decl_include("<bits/types.h>")]]
 errno_t _get_errno(errno_t *perr);
+
+[[decl_include("<bits/types.h>")]]
 errno_t _set_errno(errno_t err);
 %#endif /* !_CRT_ERRNO_DEFINED */
 
 
 %
 %[default_impl_section(".text.crt.dos.errno")]
-[[guard, ATTR_CONST]] $u32 *__doserrno();
+
+[[guard, ATTR_CONST]]
+$u32 *__doserrno();
+
+[[decl_include("<bits/types.h>")]]
 errno_t _get_doserrno($u32 *perr);
+
+[[decl_include("<bits/types.h>")]]
 errno_t _set_doserrno($u32 err);
 
 %{
@@ -2318,6 +2347,7 @@ _invalid_parameter_handler _get_invalid_parameter_handler();
 
 
 %
+[[decl_include("<bits/types.h>")]]
 [[section(".text.crt.dos.application.init")]]
 [[requires_include("<local/program_invocation_name.h>")]]
 [[userimpl, requires(defined(__LOCAL_program_invocation_name))]]
@@ -2326,6 +2356,7 @@ errno_t _get_pgmptr(char **pvalue) {
 	return 0;
 }
 
+[[decl_include("<bits/types.h>")]]
 [[wchar, section(".text.crt.dos.wchar.application.init")]]
 errno_t _get_wpgmptr(wchar_t **pvalue); /* TODO: Implement using `_wpgmptr' */
 
@@ -2340,7 +2371,11 @@ errno_t _get_wpgmptr(wchar_t **pvalue); /* TODO: Implement using `_wpgmptr' */
 %#define _fmode (*__p__fmode())
 %#endif /* ____p__fmode_defined */
 %#endif /* !... */
+
+[[decl_include("<bits/types.h>")]]
 errno_t _set_fmode(int mode);
+
+[[decl_include("<bits/types.h>")]]
 errno_t _get_fmode(int *pmode);
 
 %
@@ -2443,64 +2478,65 @@ typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void
 
 %[default_impl_section(".text.crt.dos.utility")]
 
-[[decl_prefix(
-#ifndef __dos_compar_d_fn_t_defined
+%[define(DEFINE_DOS_COMPAR_D_FN_T =
+@@pp_ifndef __dos_compar_d_fn_t_defined@@
 #define __dos_compar_d_fn_t_defined 1
 typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
-#endif /* !__dos_compar_d_fn_t_defined */
-), impl_prefix(
-#ifndef ____invoke_compare_helper_s_defined
+@@pp_endif@@
+)]
+
+%[define(DEFINE_INVOKE_COMPARE_HELPER_S =
+@@pp_ifndef ____invoke_compare_helper_s_defined@@
 #define ____invoke_compare_helper_s_defined 1
+@@push_namespace(local)@@
 struct __invoke_compare_helper_s_data {
 	__dos_compar_d_fn_t __fun;
 	void               *__arg;
 };
 __LOCAL_LIBC(__invoke_compare_helper_s) int
 (__LIBCCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
-	return (*((struct __invoke_compare_helper_s_data *)__arg)->__fun)(((struct __invoke_compare_helper_s_data *)__arg)->__arg, __a, __b);
+	void *__base_arg = ((struct __invoke_compare_helper_s_data *)__arg)->__arg;
+	return (*((struct __invoke_compare_helper_s_data *)__arg)->__fun)(__base_arg, __a, __b);
 }
-#endif /* !____invoke_compare_helper_defined */
-), throws, ATTR_WUNUSED]]
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+[[throws, ATTR_WUNUSED]]
+[[decl_prefix(DEFINE_DOS_COMPAR_D_FN_T)]]
+[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER_S)]]
 void *bsearch_s([[nonnull]] void const *key, [[nonnull]] void const *base,
                 $size_t nmemb, $size_t size,
                 [[nonnull]] __dos_compar_d_fn_t compar, void *arg) {
 	struct @__invoke_compare_helper_s_data@ data;
 	data.@__fun@ = compar;
 	data.@__arg@ = arg;
-	return bsearch_r(key, base, nmemb, size, &@__invoke_compare_helper_s@, &data);
+	return bsearch_r(key, base, nmemb, size,
+	                 &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
+	                 &data);
 }
 
-[[decl_prefix(
-#ifndef __dos_compar_d_fn_t_defined
-#define __dos_compar_d_fn_t_defined 1
-typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
-#endif /* !__dos_compar_d_fn_t_defined */
-), impl_prefix(
-#ifndef ____invoke_compare_helper_s_defined
-#define ____invoke_compare_helper_s_defined 1
-struct __invoke_compare_helper_s_data {
-	__dos_compar_d_fn_t __fun;
-	void               *__arg;
-};
-__LOCAL_LIBC(__invoke_compare_helper_s) int
-(__LIBCCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
-	return (*((struct __invoke_compare_helper_s_data *)__arg)->__fun)(((struct __invoke_compare_helper_s_data *)__arg)->__arg, __a, __b);
-}
-#endif /* !____invoke_compare_helper_s_defined */
-), throws]]
+[[throws]]
+[[decl_prefix(DEFINE_DOS_COMPAR_D_FN_T)]]
+[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER_S)]]
 void qsort_s([[nonnull]] void *base, $size_t nmemb, $size_t size,
              [[nonnull]] __dos_compar_d_fn_t compar, void *arg) {
-	struct @__invoke_compare_helper_s_data@ data;
-	data.@__fun@ = compar;
-	data.@__arg@ = arg;
-	return qsort_r(base, nmemb, size, &@__invoke_compare_helper_s@, &data);
+	struct __invoke_compare_helper_s_data data;
+	data.__fun = compar;
+	data.__arg = arg;
+	return qsort_r(base, nmemb, size,
+	               &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
+	               &data);
 }
 %#endif  /* _CRT_ALGO_DEFINED */
 %
 
+[[decl_include("<bits/types.h>")]]
 errno_t getenv_s([[nonnull]] $size_t *psize,
                  [[nonnull]] char *buf, rsize_t buflen,
                  [[nonnull]] char const *varname);
+
+[[decl_include("<bits/types.h>")]]
 errno_t _dupenv_s([[nonnull]] char **__restrict pbuf,
                   [[nonnull]] $size_t *pbuflen,
                   [[nonnull]] char const *varname);
@@ -2508,14 +2544,15 @@ errno_t _dupenv_s([[nonnull]] char **__restrict pbuf,
 
 %
 %[default_impl_section(".text.crt.dos.unicode.static.convert")]
-_itoa(*) = itoa;
-_ltoa(*) = ltoa;
-_ultoa(*) = ultoa;
+%[insert:function(_itoa = itoa)]
+%[insert:function(_ltoa = ltoa)]
+%[insert:function(_ultoa = ultoa)]
 
 
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<parts/errno.h>")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_ltoa_s")]]
 [[if(__SIZEOF_INT__ == 8), alias("_i64toa_s")]]
-[[impl_include("<parts/errno.h>")]]
 errno_t _itoa_s(int val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	int temp;
@@ -2553,6 +2590,7 @@ errno_t _itoa_s(int val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	return 0;
 }
 
+[[decl_include("<bits/types.h>")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, "_itoa_s")]]
 [[if(__SIZEOF_LONG__ == 8), alias("_i64toa_s")]]
 [[impl_include("<parts/errno.h>")]]
@@ -2593,8 +2631,9 @@ errno_t _ltoa_s(long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	return 0;
 }
 
-[[if(__SIZEOF_LONG__ == 8), alias("_ui64toa_s")]]
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
+[[if(__SIZEOF_LONG__ == 8), alias("_ui64toa_s")]]
 errno_t _ultoa_s(unsigned long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	char *p;
 	unsigned long temp;
@@ -2640,6 +2679,7 @@ char *_ui64toa($u64 val, [[nonnull]] char *buf, int radix) {
 	return buf;
 }
 
+[[decl_include("<bits/types.h>")]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, _ltoa_s)]]
 [[alt_variant_of(__SIZEOF_INT__ == 8, _itoa_s)]]
 [[impl_include("<parts/errno.h>")]]
@@ -2680,6 +2720,7 @@ errno_t _i64toa_s($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 	return 0;
 }
 
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, _ultoa_s)]]
 errno_t _ui64toa_s($u64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
@@ -2709,10 +2750,10 @@ errno_t _ui64toa_s($u64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 }
 
 
-_strtoi64(*) = strto64;
-_strtoui64(*) = strtou64;
-_strtoi64_l(*) = strto64_l;
-_strtoui64_l(*) = strtou64_l;
+%[insert:function(_strtoi64 = strto64)]
+%[insert:function(_strtoui64 = strtou64)]
+%[insert:function(_strtoi64_l = strto64_l)]
+%[insert:function(_strtoui64_l = strtou64_l)]
 
 
 [[ATTR_PURE, ATTR_WUNUSED]]
@@ -2784,6 +2825,7 @@ $size_t _mbstowcs_l(wchar_t *dst, char const *src,
 }
 
 
+[[decl_include("<bits/types.h>")]]
 [[wchar, impl_include("<parts/errno.h>")]]
 errno_t _mbstowcs_s($size_t *presult,
                     wchar_t *dst, $size_t dstsize,
@@ -2804,7 +2846,7 @@ errno_t _mbstowcs_s($size_t *presult,
 	return 0;
 }
 
-[[wchar]]
+[[wchar, decl_include("<bits/types.h>")]]
 errno_t _mbstowcs_s_l($size_t *presult,
                       wchar_t *dst, $size_t dstsize,
                       char const *src, $size_t dstlen,
@@ -2827,7 +2869,8 @@ errno_t _mbstowcs_s_l($size_t *presult,
 
 %[default_impl_section(".text.crt.dos.random")]
 
-[[impl_include("<parts/errno.h>"), userimpl]]
+[[decl_include("<bits/types.h>")]]
+[[userimpl, impl_include("<parts/errno.h>")]]
 errno_t rand_s([[nonnull]] unsigned int *__restrict randval) {
 	if (!randval) {
 @@pp_ifdef EINVAL@@
@@ -2842,15 +2885,15 @@ errno_t rand_s([[nonnull]] unsigned int *__restrict randval) {
 
 
 %[default_impl_section(".text.crt.unicode.static.convert")];
-_strtol_l(*) = strtol_l;
-_strtoul_l(*) = strtoul_l;
-_strtoll_l(*) = strtoll_l;
-_strtoull_l(*) = strtoull_l;
+%[insert:function(_strtol_l = strtol_l)]
+%[insert:function(_strtoul_l = strtoul_l)]
+%[insert:function(_strtoll_l = strtoll_l)]
+%[insert:function(_strtoull_l = strtoull_l)]
 %#ifndef __NO_FPU
-_strtod_l(*) = strtod_l;
-_strtof_l(*) = strtof_l;
+%[insert:function(_strtod_l = strtod_l)]
+%[insert:function(_strtof_l = strtof_l)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-_strtold_l(*) = strtold_l;
+%[insert:function(_strtold_l = strtold_l)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 
@@ -2870,6 +2913,7 @@ int _wctomb_l(char *buf, wchar_t wc, $locale_t locale) {
 
 %
 %#ifdef __USE_DOS_SLIB
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 errno_t wctomb_s([[nonnull]] int *presult,
                  [[nonnull]] char *buf,
@@ -2893,6 +2937,7 @@ errno_t wctomb_s([[nonnull]] int *presult,
 }
 %#endif /* __USE_DOS_SLIB */
 
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 errno_t _wctomb_s_l([[nonnull]] int *presult, [[nonnull]] char *buf,
                     $size_t buflen, wchar_t wc, $locale_t locale) {
@@ -2900,6 +2945,7 @@ errno_t _wctomb_s_l([[nonnull]] int *presult, [[nonnull]] char *buf,
 	return wctomb_s(presult, buf, buflen, wc);
 }
 
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 errno_t _wcstombs_s_l([[nonnull]] $size_t *presult, [[nonnull]] char *buf,
                       $size_t buflen, [[nonnull]] wchar_t const *src,
@@ -2915,6 +2961,7 @@ $size_t _wcstombs_l([[nonnull]] char *dst,
 	return wcstombs(dst, src, maxlen);
 }
 
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 errno_t wcstombs_s([[nonnull]] $size_t *presult,
                    [[nonnull]] char *buf, $size_t buflen,
@@ -2941,7 +2988,7 @@ errno_t wcstombs_s([[nonnull]] $size_t *presult,
 %/* DOS malloc extensions */
 %[default_impl_section(".text.crt.dos.heap")]
 
-_recalloc(*) = recallocv;
+%[insert:function(_recalloc = recallocv)]
 
 [[userimpl, requires_function(malloc)]]
 _aligned_malloc:($size_t num_bytes, $size_t min_alignment)
@@ -3065,6 +3112,7 @@ char *_fullpath(char *buf, char const *path, $size_t buflen);
 %[default_impl_section(".text.crt.unicode.static.convert")]
 
 %#ifndef __NO_FPU
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 errno_t _ecvt_s([[nonnull]] char *buf, $size_t buflen,
                 double val, int ndigit,
@@ -3076,6 +3124,7 @@ errno_t _ecvt_s([[nonnull]] char *buf, $size_t buflen,
 	return 0;
 }
 
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 errno_t _fcvt_s([[nonnull]] char *buf, $size_t buflen,
                 double val, int ndigit,
@@ -3087,6 +3136,7 @@ errno_t _fcvt_s([[nonnull]] char *buf, $size_t buflen,
 	return 0;
 }
 
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 errno_t _gcvt_s([[nonnull]] char *buf, $size_t buflen,
                 double val, int ndigit) {
@@ -3098,9 +3148,9 @@ errno_t _gcvt_s([[nonnull]] char *buf, $size_t buflen,
 }
 
 
-_ecvt(*) = ecvt;
-_fcvt(*) = fcvt;
-_gcvt(*) = gcvt;
+%[insert:function(_ecvt = ecvt)]
+%[insert:function(_fcvt = fcvt)]
+%[insert:function(_gcvt = gcvt)]
 
 int _atoflt([[nonnull]] float *__restrict result,
             [[nonnull]] char const *__restrict nptr) {
@@ -3116,14 +3166,16 @@ int _atoflt_l([[nonnull]] float *__restrict result,
 
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
-[[if(__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias(_atoldbl)]]
+[[decl_include("<features.h>")]]
+[[if(__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias("_atoldbl")]]
 int _atodbl([[nonnull]] double *__restrict result,
             [[nonnull]] char __KOS_FIXED_CONST *__restrict nptr) {
 	*result = strtod(nptr, NULL);
 	return 0;
 }
 
-[[if(__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias(_atoldbl_l)]]
+[[decl_include("<features.h>")]]
+[[if(__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias("_atoldbl_l")]]
 int _atodbl_l([[nonnull]] double *__restrict result,
               [[nonnull]] char __KOS_FIXED_CONST *__restrict nptr, $locale_t locale) {
 	*result = strtod_l(nptr, NULL, locale);
@@ -3131,6 +3183,7 @@ int _atodbl_l([[nonnull]] double *__restrict result,
 }
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
+[[decl_include("<features.h>")]]
 [[if(__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias("_atodbl")]]
 int _atoldbl([[nonnull]] __LONGDOUBLE *__restrict result,
              [[nonnull]] char __KOS_FIXED_CONST *__restrict nptr) {
@@ -3138,9 +3191,11 @@ int _atoldbl([[nonnull]] __LONGDOUBLE *__restrict result,
 	return 0;
 }
 
+[[decl_include("<features.h>")]]
 [[if(__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias("_atodbl_l")]]
 int _atoldbl_l([[nonnull]] __LONGDOUBLE *__restrict result,
-               [[nonnull]] char __KOS_FIXED_CONST *__restrict nptr, $locale_t locale) {
+               [[nonnull]] char __KOS_FIXED_CONST *__restrict nptr,
+               $locale_t locale) {
 	*result = strtold_l(nptr, NULL, locale);
 	return 0;
 }
@@ -3206,10 +3261,11 @@ unsigned long _lrotr(unsigned long val, int shift) {
 %#endif  /* _CRT_PERROR_DEFINED */
 
 %
-_putenv(*) = putenv;
-_swab(*) = swab;
+%[insert:function(_putenv = putenv)]
+%[insert:function(_swab = swab)]
 
 %[default_impl_section(".text.crt.dos.fs.environ")];
+[[decl_include("<bits/types.h>")]]
 [[userimpl, requires_function(setenv), impl_include("<parts/errno.h>")]]
 errno_t _putenv_s(char const *varname, char const *val) {
 	return setenv(varname, val, 1) ? __libc_geterrno_or(__EINVAL) : 0;
@@ -3223,7 +3279,7 @@ void _searchenv([[nonnull]] char const *file,
 	_searchenv_s(file, envvar, resultpath, ($size_t)-1);
 }
 
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 errno_t _searchenv_s([[nonnull]] char const *file,
                      [[nonnull]] char const *envvar,
                      [[nonnull]] char *__restrict resultpath,
@@ -3246,6 +3302,7 @@ void _splitpath([[nonnull]] char const *__restrict abspath,
 	             ext, ext ? 256 : 0);
 }
 
+[[decl_include("<bits/types.h>")]]
 [[userimpl, impl_include("<parts/errno.h>")]]
 errno_t _makepath_s([[nonnull]] char *buf, $size_t buflen,
                     char const *drive, char const *dir,
@@ -3294,6 +3351,7 @@ err_buflen:
 #undef path_putc
 }
 
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 errno_t _splitpath_s([[nonnull]] char const *__restrict abspath,
                      [[outp_opt(drivelen)]] char *drive, $size_t drivelen,
@@ -3394,10 +3452,7 @@ int _set_error_mode(int mode);
 void _beep(unsigned int freq, unsigned int duration);
 
 %
-%#ifndef _CRT_WPERROR_DEFINED
-%#define _CRT_WPERROR_DEFINED 1
-%[insert:extern(_wperror)]
-%#endif /* !_CRT_WPERROR_DEFINED */
+%[insert:function(_wperror = _wperror, guardName: "_CRT_WPERROR_DEFINED")]
 
 %[default_impl_section(".text.crt.dos.system")];
 [[cp]] void _sleep($u32 duration) = sleep;
@@ -3481,7 +3536,7 @@ char *ultoa(unsigned long val, [[nonnull]] char *buf, int radix) {
 }
 
 %[default_impl_section(".text.crt.dos.sched.process")]
-_onexit(*) = onexit;
+%[insert:function(_onexit = onexit)]
 
 %[define_replacement(onexit_t = _onexit_t)]
 %[define_replacement(_onexit_t = _onexit_t)]
@@ -3503,34 +3558,36 @@ onexit_t onexit(onexit_t func);
 [[guard, wchar, ATTR_WUNUSED]]
 wchar_t *_wgetenv([[nonnull]] wchar_t const *varname);
 
-[[guard, wchar]]
+[[decl_include("<bits/types.h>")]]
+[[guard, wchar, decl_include("<bits/types.h>")]]
 errno_t _wgetenv_s([[nonnull]] $size_t *return_size,
                    [[outp_opt(buflen)]] wchar_t *buf, $size_t buflen,
                    [[nonnull]] wchar_t const *varname);
 
-[[guard, wchar]]
+[[decl_include("<bits/types.h>")]]
+[[guard, wchar, decl_include("<bits/types.h>")]]
 errno_t _wdupenv_s([[nonnull]] wchar_t **pbuf,
                    [[nonnull]] $size_t *pbuflen,
                    [[nonnull]] wchar_t const *varname);
 
-%[insert:extern(_wsystem)]
+%[insert:function(_wsystem = wsystem, guardName: "_CRT_WSYSTEM_DEFINED")]
 
 %[default_impl_section(".text.crt.dos.wchar.unicode.static.convert")]
 %[insert:extern(wcstol)]
 %[insert:extern(wcstoll)]
 %[insert:extern(wcstoul)]
 %[insert:extern(wcstoull)]
-[[guard]] _wcstol_l(*) = wcstol_l;
-[[guard]] _wcstoul_l(*) = wcstoul_l;
+%[insert:guarded_function(_wcstol_l = wcstol_l)]
+%[insert:guarded_function(_wcstoul_l = wcstoul_l)]
 
 %#ifndef __NO_FPU
 %[insert:extern(wcstof)]
 %[insert:extern(wcstod)]
-[[guard]] _wcstof_l(*) = wcstof_l;
-[[guard]] _wcstod_l(*) = wcstod_l;
+%[insert:guarded_function(_wcstof_l = wcstof_l)]
+%[insert:guarded_function(_wcstod_l = wcstod_l)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 %[insert:extern(wcstold)]
-[[guard]] _wcstold_l(*) = wcstold_l;
+%[insert:guarded_function(_wcstold_l = wcstold_l)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 [[guard, wchar, ATTR_WUNUSED, ATTR_PURE]]
@@ -3558,8 +3615,8 @@ double _wtof_l([[nonnull]] wchar_t const *nptr,
 [[guard, wchar]] _ui64tow_s(*) %{generate(str2wcs("_ui64toa_s"))}
 
 %[default_impl_section(".text.crt.dos.wchar.unicode.static.convert")]
-[[guard]] _wtoi(*) = wtoi;
-[[guard]] _wtol(*) = wtol;
+%[insert:guarded_function(_wtoi = wtoi)]
+%[insert:guarded_function(_wtol = wtol)]
 
 [[guard, wchar]]
 [[if(__SIZEOF_INT__ == 8), alias("_wtoi")]]
@@ -3567,8 +3624,8 @@ double _wtof_l([[nonnull]] wchar_t const *nptr,
 [[if(__SIZEOF_LONG_LONG__ == 8), alias("_wtoll")]]
 _wtoi64(*) %{generate(str2wcs("_atoi64"))}
 
-[[guard]] _wcstoi64(*) = wcsto64;
-[[guard]] _wcstoui64(*) = wcstou64;
+%[insert:guarded_function(_wcstoi64 = wcsto64)]
+%[insert:guarded_function(_wcstoui64 = wcstou64)]
 
 %[default_impl_section(".text.crt.dos.wchar.unicode.locale.convert")]
 [[guard, wchar]]
@@ -3589,15 +3646,14 @@ _wtol_l(*) %{generate(str2wcs("_atol_l"))}
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, _wtoll_l)]]
 _wtoi64_l(*) %{generate(str2wcs("_atoi64_l"))}
 
-[[guard]] _wcstoi64_l(*) = wcsto64_l;
-[[guard]] _wcstoui64_l(*) = wcstou64_l;
+%[insert:guarded_function(_wcstoi64_l = wcsto64_l)]
+%[insert:guarded_function(_wcstoui64_l = wcstou64_l)]
 
 
 %#ifdef __LONGLONG
-%[default_impl_section(".text.crt.dos.wchar.unicode.static.convert")]
-[[guard]] _wcstoll_l(*) = wcstoll_l;
-[[guard]] _wcstoull_l(*) = wcstoull_l;
-[[guard]] _wtoll(*) = wtoll;
+%[insert:guarded_function(_wcstoll_l = wcstoll_l)]
+%[insert:guarded_function(_wcstoull_l = wcstoull_l)]
+%[insert:guarded_function(_wtoll = wtoll)]
 
 %[default_impl_section(".text.crt.dos.wchar.unicode.locale.convert")]
 [[guard, wchar]]

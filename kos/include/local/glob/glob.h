@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a237c05 */
+/* HASH CRC-32:0xa8356501 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,10 @@
 #ifndef __local_glob_defined
 #define __local_glob_defined 1
 #include <__crt.h>
-struct __glob64_struct;
-/* Dependency: "glob32" from "glob" */
-#ifndef ____localdep_glob32_defined
-#define ____localdep_glob32_defined 1
-#ifdef __CRT_HAVE_glob
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: glob32 from glob */
+#if !defined(__local___localdep_glob32_defined) && defined(__CRT_HAVE_glob)
+#define __local___localdep_glob32_defined 1
 /* Do glob searching for PATTERN, placing results in PGLOB.
  * The bits defined above may be set in FLAGS.
  * If a directory cannot be opened or read and ERRFUNC is not nil,
@@ -35,38 +34,13 @@ struct __glob64_struct;
  * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
  * Otherwise, `glob' returns zero */
 __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,__localdep_glob32,(char const *__restrict __pattern, int __flags, __glob_errfunc_t __errfunc, void *__restrict __pglob),glob,(__pattern,__flags,__errfunc,__pglob))
-#else /* LIBC: glob */
-#undef ____localdep_glob32_defined
-#endif /* glob32... */
-#endif /* !____localdep_glob32_defined */
-
-/* Dependency: "glob64" from "glob" */
-#ifndef ____localdep_glob64_defined
-#define ____localdep_glob64_defined 1
+#endif /* !__local___localdep_glob32_defined && __CRT_HAVE_glob */
+/* Dependency: glob64 from glob */
+#ifndef __local___localdep_glob64_defined
+#define __local___localdep_glob64_defined 1
 #ifdef __CRT_HAVE_glob64
-/* Do glob searching for PATTERN, placing results in PGLOB.
- * The bits defined above may be set in FLAGS.
- * If a directory cannot be opened or read and ERRFUNC is not nil,
- * it is called with the pathname that caused the error, and the
- * `errno' value from the failing call; if it returns non-zero
- * `glob' returns GLOB_ABEND; if it returns zero, the error is ignored.
- * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
- * Otherwise, `glob' returns zero */
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,__localdep_glob64,(const char *__restrict __pattern, int __flags, __glob_errfunc_t __errfunc, struct __glob64_struct *__restrict __pglob),glob64,(__pattern,__flags,__errfunc,__pglob))
-#else /* LIBC: glob64 */
-#include <local/glob/glob64.h>
-/* Do glob searching for PATTERN, placing results in PGLOB.
- * The bits defined above may be set in FLAGS.
- * If a directory cannot be opened or read and ERRFUNC is not nil,
- * it is called with the pathname that caused the error, and the
- * `errno' value from the failing call; if it returns non-zero
- * `glob' returns GLOB_ABEND; if it returns zero, the error is ignored.
- * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
- * Otherwise, `glob' returns zero */
-#define __localdep_glob64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(glob64))
-#endif /* glob64... */
-#endif /* !____localdep_glob64_defined */
-
+__NAMESPACE_LOCAL_END
+struct __glob64_struct;
 __NAMESPACE_LOCAL_BEGIN
 /* Do glob searching for PATTERN, placing results in PGLOB.
  * The bits defined above may be set in FLAGS.
@@ -76,24 +50,48 @@ __NAMESPACE_LOCAL_BEGIN
  * `glob' returns GLOB_ABEND; if it returns zero, the error is ignored.
  * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
  * Otherwise, `glob' returns zero */
+__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,__localdep_glob64,(const char *__restrict __pattern, int __flags, __glob_errfunc_t __errfunc, struct __glob64_struct *__restrict __pglob),glob64,(__pattern,__flags,__errfunc,__pglob))
+#else /* __CRT_HAVE_glob64 */
+__NAMESPACE_LOCAL_END
+#include <local/glob/glob64.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Do glob searching for PATTERN, placing results in PGLOB.
+ * The bits defined above may be set in FLAGS.
+ * If a directory cannot be opened or read and ERRFUNC is not nil,
+ * it is called with the pathname that caused the error, and the
+ * `errno' value from the failing call; if it returns non-zero
+ * `glob' returns GLOB_ABEND; if it returns zero, the error is ignored.
+ * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
+ * Otherwise, `glob' returns zero */
+#define __localdep_glob64 __LIBC_LOCAL_NAME(glob64)
+#endif /* !__CRT_HAVE_glob64 */
+#endif /* !__local___localdep_glob64_defined */
+/* Do glob searching for PATTERN, placing results in PGLOB.
+ * The bits defined above may be set in FLAGS.
+ * If a directory cannot be opened or read and ERRFUNC is not nil,
+ * it is called with the pathname that caused the error, and the
+ * `errno' value from the failing call; if it returns non-zero
+ * `glob' returns GLOB_ABEND; if it returns zero, the error is ignored.
+ * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
+ * Otherwise, `glob' returns zero */
 __LOCAL_LIBC(glob) __ATTR_NONNULL((1, 4)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(glob))(char const *__restrict __pattern,
-                                                  int __flags,
-                                                  __glob_errfunc_t __errfunc,
-                                                  glob_t *__restrict __pglob) {
-#line 176 "kos/src/libc/magic/glob.c"
-#if defined(__CRT_HAVE_glob)
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(glob))(char const *__restrict __pattern, int __flags, __glob_errfunc_t __errfunc, struct __glob_struct *__restrict __pglob) {
+#ifdef __CRT_HAVE_glob
 	return __localdep_glob32(__pattern, __flags, __errfunc, __pglob);
-#elif defined(__CRT_HAVE_glob64)
+#else /* __CRT_HAVE_glob */
 	return __localdep_glob64(__pattern, __flags, __errfunc, (struct __glob64_struct *)__pglob);
-#else
-	(void)__pattern;
-	(void)__flags;
-	(void)__errfunc;
-	(void)__pglob;
-	__COMPILER_IMPURE();
-	return GLOB_NOSYS;
-#endif
+
+
+
+
+
+
+
+#endif /* !__CRT_HAVE_glob */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_glob_defined
+#define __local___localdep_glob_defined 1
+#define __localdep_glob __LIBC_LOCAL_NAME(glob)
+#endif /* !__local___localdep_glob_defined */
 #endif /* !__local_glob_defined */

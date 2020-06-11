@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdafac8a2 */
+/* HASH CRC-32:0x54a5efd5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,33 +19,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_thrd_sleep64_defined
-#if defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE_nanosleep64)
 #define __local_thrd_sleep64_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
 #include <bits/timespec.h>
-#include <bits/timespec.h>
-/* Dependency: "nanosleep64" from "time" */
-#ifndef ____localdep_nanosleep64_defined
-#define ____localdep_nanosleep64_defined 1
-#ifdef __CRT_HAVE_nanosleep64
-/* Pause execution for a number of nanoseconds */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining),nanosleep64,(__requested_time,__remaining))
-#elif defined(__CRT_HAVE_nanosleep) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* Pause execution for a number of nanoseconds */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining),nanosleep,(__requested_time,__remaining))
-#elif defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
-#include <local/time/nanosleep64.h>
-/* Pause execution for a number of nanoseconds */
-#define __localdep_nanosleep64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nanosleep64))
-#else /* CUSTOM: nanosleep64 */
-#undef ____localdep_nanosleep64_defined
-#endif /* nanosleep64... */
-#endif /* !____localdep_nanosleep64_defined */
-
-/* Dependency: "thrd_sleep32" from "threads" */
-#ifndef ____localdep_thrd_sleep32_defined
-#define ____localdep_thrd_sleep32_defined 1
-#ifdef __CRT_HAVE_thrd_sleep
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: thrd_sleep32 from threads */
+#if !defined(__local___localdep_thrd_sleep32_defined) && defined(__CRT_HAVE_thrd_sleep)
+#define __local___localdep_thrd_sleep32_defined 1
 /* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
@@ -53,12 +34,32 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_thrd_sleep32,(struct __timespec32 const *__time_point, struct __timespec32 *__remaining),thrd_sleep,(__time_point,__remaining))
-#else /* LIBC: thrd_sleep */
-#undef ____localdep_thrd_sleep32_defined
-#endif /* thrd_sleep32... */
-#endif /* !____localdep_thrd_sleep32_defined */
-
+#endif /* !__local___localdep_thrd_sleep32_defined && __CRT_HAVE_thrd_sleep */
+/* Dependency: nanosleep64 from time */
+#ifndef __local___localdep_nanosleep64_defined
+#define __local___localdep_nanosleep64_defined 1
+#ifdef __CRT_HAVE_nanosleep64
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Pause execution for a number of nanoseconds */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining),nanosleep64,(__requested_time,__remaining))
+#elif defined(__CRT_HAVE_nanosleep) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Pause execution for a number of nanoseconds */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining),nanosleep,(__requested_time,__remaining))
+#elif defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
+__NAMESPACE_LOCAL_END
+#include <local/time/nanosleep64.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Pause execution for a number of nanoseconds */
+#define __localdep_nanosleep64 __LIBC_LOCAL_NAME(nanosleep64)
+#else /* ... */
+#undef __local___localdep_nanosleep64_defined
+#endif /* !... */
+#endif /* !__local___localdep_nanosleep64_defined */
 /* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
@@ -66,20 +67,18 @@ __NAMESPACE_LOCAL_BEGIN
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __LOCAL_LIBC(thrd_sleep64) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep64))(struct __timespec64 const *__time_point,
-                                                          struct __timespec64 *__remaining) {
-#line 205 "kos/src/libc/magic/threads.c"
-#if defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE_nanosleep64)
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep64))(struct __timespec64 const *__time_point, struct __timespec64 *__remaining) {
+#if defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
 	int __error;
 	__error = __localdep_nanosleep64(__time_point, __remaining);
 	if __likely(__error == 0)
 		return 0;
-#if defined(__libc_geterrno) && defined(__EINTR)
+#if defined(__libc_geterrno) && defined(EINTR)
 	if (__libc_geterrno() == __EINTR)
 		return -1;
 #endif /* __libc_geterrno && EINTR */
 	return -2;
-#else /* __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE_nanosleep64 */
+#else /* __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep */
 	int __result;
 	struct __timespec32 __tp32;
 	struct __timespec32 __rem32;
@@ -91,8 +90,14 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep64))(struct __timespec64 co
 		__remaining->tv_nsec = __rem32.tv_nsec;
 	}
 	return __result;
-#endif /* !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep && !__CRT_HAVE_nanosleep64 */
+#endif /* !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_thrd_sleep || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE_nanosleep64 */
+#ifndef __local___localdep_thrd_sleep64_defined
+#define __local___localdep_thrd_sleep64_defined 1
+#define __localdep_thrd_sleep64 __LIBC_LOCAL_NAME(thrd_sleep64)
+#endif /* !__local___localdep_thrd_sleep64_defined */
+#else /* __CRT_HAVE_thrd_sleep || __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep */
+#undef __local_thrd_sleep64_defined
+#endif /* !__CRT_HAVE_thrd_sleep && !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep */
 #endif /* !__local_thrd_sleep64_defined */

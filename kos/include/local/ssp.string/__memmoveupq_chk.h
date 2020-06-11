@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5f9af15 */
+/* HASH CRC-32:0xd8bd7df2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,39 +21,39 @@
 #ifndef __local___memmoveupq_chk_defined
 #define __local___memmoveupq_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "memmoveupq" from "string" */
-#ifndef ____localdep_memmoveupq_defined
-#define ____localdep_memmoveupq_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memmoveupq from string */
+#ifndef __local___localdep_memmoveupq_defined
+#define __local___localdep_memmoveupq_defined 1
 #ifdef __fast_memmoveupq_defined
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
-#define __localdep_memmoveupq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupq))
+__NAMESPACE_FAST_USING(memmoveupq)
+#define __localdep_memmoveupq __LIBC_FAST_NAME(memmoveupq)
 #elif defined(__CRT_HAVE_memmoveupq)
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupq,(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords),memmoveupq,(__dst,__src,__n_qwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveupq,(__dst,__src,__n_qwords))
 #elif defined(__CRT_HAVE_memmoveq)
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupq,(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
-#else /* LIBC: memmoveupq */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memmoveupq.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
-#define __localdep_memmoveupq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupq))
-#endif /* memmoveupq... */
-#endif /* !____localdep_memmoveupq_defined */
-
+#define __localdep_memmoveupq __LIBC_LOCAL_NAME(memmoveupq)
+#endif /* !... */
+#endif /* !__local___localdep_memmoveupq_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__memmoveupq_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memmoveupq_chk))(/*aligned(8)*/ void *__dst,
-                                                              /*aligned(8)*/ void const *__src,
-                                                              __SIZE_TYPE__ __n_qwords,
-                                                              __SIZE_TYPE__ __dst_objsize) {
-#line 106 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memmoveupq_chk))(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("memmoveupq", __dst, __n_qwords * 8, __dst_objsize);
 	return __localdep_memmoveupq(__dst, __src, __n_qwords);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___memmoveupq_chk_defined
+#define __local___localdep___memmoveupq_chk_defined 1
+#define __localdep___memmoveupq_chk __LIBC_LOCAL_NAME(__memmoveupq_chk)
+#endif /* !__local___localdep___memmoveupq_chk_defined */
 #endif /* !__local___memmoveupq_chk_defined */

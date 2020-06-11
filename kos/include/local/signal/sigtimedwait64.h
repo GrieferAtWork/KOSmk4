@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x335ba920 */
+/* HASH CRC-32:0xa0e0cc49 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,25 +19,17 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sigtimedwait64_defined
-#ifdef __CRT_HAVE_sigtimedwait
 #define __local_sigtimedwait64_defined 1
 #include <__crt.h>
-/* Dependency: "sigtimedwait32" from "signal" */
-#ifndef ____localdep_sigtimedwait32_defined
-#define ____localdep_sigtimedwait32_defined 1
 #ifdef __CRT_HAVE_sigtimedwait
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(struct __sigset_struct const *__restrict __set, siginfo_t *__restrict __info, struct __timespec32 const *__timeout),sigtimedwait,(__set,__info,__timeout))
-#else /* LIBC: sigtimedwait */
-#undef ____localdep_sigtimedwait32_defined
-#endif /* sigtimedwait32... */
-#endif /* !____localdep_sigtimedwait32_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: sigtimedwait32 from signal */
+#if !defined(__local___localdep_sigtimedwait32_defined) && defined(__CRT_HAVE_sigtimedwait)
+#define __local___localdep_sigtimedwait32_defined 1
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec32 const *__timeout),sigtimedwait,(__set,__info,__timeout))
+#endif /* !__local___localdep_sigtimedwait32_defined && __CRT_HAVE_sigtimedwait */
 __LOCAL_LIBC(sigtimedwait64) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait64))(struct __sigset_struct const *__restrict __set,
-                                                            siginfo_t *__restrict __info,
-                                                            struct __timespec64 const *__timeout) {
-#line 372 "kos/src/libc/magic/signal.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait64))(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__timeout) {
 	struct __timespec32 __tmv;
 	if (!__timeout)
 		return __localdep_sigtimedwait32(__set, __info, __NULLPTR);
@@ -46,5 +38,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait64))(struct __sigset_stru
 	return __localdep_sigtimedwait32(__set, __info, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_sigtimedwait */
+#ifndef __local___localdep_sigtimedwait64_defined
+#define __local___localdep_sigtimedwait64_defined 1
+#define __localdep_sigtimedwait64 __LIBC_LOCAL_NAME(sigtimedwait64)
+#endif /* !__local___localdep_sigtimedwait64_defined */
+#else /* __CRT_HAVE_sigtimedwait */
+#undef __local_sigtimedwait64_defined
+#endif /* !__CRT_HAVE_sigtimedwait */
 #endif /* !__local_sigtimedwait64_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78780c47 */
+/* HASH CRC-32:0x7ecc20eb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,60 +21,39 @@
 #ifndef __local_format_wrepeat_defined
 #define __local_format_wrepeat_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-
+#include <kos/anno.h>
 #include <bits/wformat-printer.h>
-#include <bits/uformat-printer.h>
-
-
-
-#include <hybrid/__alloca.h>
-/* Dependency: "wmemset" from "wchar" */
-#ifndef ____localdep_wmemset_defined
-#define ____localdep_wmemset_defined 1
-#ifdef __CRT_HAVE_wmemset
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmemset,(__dst,__filler,__num_chars))
-#elif defined(__CRT_HAVE_memsetw) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),memsetw,(__dst,__filler,__num_chars))
-#elif defined(__CRT_HAVE_memsetl) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),memsetl,(__dst,__filler,__num_chars))
-#else /* LIBC: wmemset */
-#include <local/wchar/wmemset.h>
-#define __localdep_wmemset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemset))
-#endif /* wmemset... */
-#endif /* !____localdep_wmemset_defined */
-
-/* Dependency: "memset" from "string" */
-#ifndef ____localdep_memset_defined
-#define ____localdep_memset_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memset from string */
+#ifndef __local___localdep_memset_defined
+#define __local___localdep_memset_defined 1
 #ifdef __fast_memset_defined
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))
+__NAMESPACE_FAST_USING(memset)
+#define __localdep_memset __LIBC_FAST_NAME(memset)
 #elif defined(__CRT_HAVE_memset)
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* LIBC: memset */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memset.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
-#define __localdep_memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))
-#endif /* memset... */
-#endif /* !____localdep_memset_defined */
-
+#define __localdep_memset __LIBC_LOCAL_NAME(memset)
+#endif /* !... */
+#endif /* !__local___localdep_memset_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__alloca.h>
+#include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 __LOCAL_LIBC(format_wrepeat) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wrepeat))(__pwformatprinter __printer,
-                                                            void *__arg,
-                                                            __WCHAR_TYPE__ __ch,
-                                                            __SIZE_TYPE__ __num_repetitions) {
-#line 119 "kos/src/libc/magic/format-printer.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(format_wrepeat))(__pwformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions) __THROWS(...) {
 #ifndef __FORMAT_REPEAT_BUFSIZE
 #define __FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
@@ -83,11 +62,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wrepeat))(__pwformatprinter __
 	__WCHAR_TYPE__ *__buffer;
 	if __likely(__num_repetitions <= __FORMAT_REPEAT_BUFSIZE) {
 		__buffer = (__WCHAR_TYPE__ *)__hybrid_alloca(__num_repetitions);
-
-		__localdep_wmemset(__buffer, __ch, __num_repetitions);
-
-
-
+		__libc_memsetc(__buffer, __ch, __num_repetitions, __SIZEOF_WCHAR_T__);
 		return (*__printer)(__arg, __buffer, __num_repetitions);
 	}
 	__buffer = (__WCHAR_TYPE__ *)__hybrid_alloca(__FORMAT_REPEAT_BUFSIZE);
@@ -95,11 +70,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wrepeat))(__pwformatprinter __
 #else /* __hybrid_alloca */
 	__WCHAR_TYPE__ __buffer[__FORMAT_REPEAT_BUFSIZE];
 	if __likely(__num_repetitions <= __FORMAT_REPEAT_BUFSIZE) {
-
-		__localdep_wmemset(__buffer, __ch, __num_repetitions);
-
-
-
+		__libc_memsetc(__buffer, __ch, __num_repetitions, __SIZEOF_WCHAR_T__);
 		return (*__printer)(__arg, __buffer, __num_repetitions);
 	}
 	__localdep_memset(__buffer, __ch, __FORMAT_REPEAT_BUFSIZE);
@@ -128,4 +99,8 @@ __err:
 	return __temp;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_wrepeat_defined
+#define __local___localdep_format_wrepeat_defined 1
+#define __localdep_format_wrepeat __LIBC_LOCAL_NAME(format_wrepeat)
+#endif /* !__local___localdep_format_wrepeat_defined */
 #endif /* !__local_format_wrepeat_defined */

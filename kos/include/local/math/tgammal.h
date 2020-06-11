@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6b781ea */
+/* HASH CRC-32:0xe94e0a83 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tgammal_defined
-#if defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
 #define __local_tgammal_defined 1
 #include <__crt.h>
-/* Dependency: "tgamma" */
-#ifndef ____localdep_tgamma_defined
-#define ____localdep_tgamma_defined 1
+#if defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: tgamma from math */
+#ifndef __local___localdep_tgamma_defined
+#define __local___localdep_tgamma_defined 1
 #if __has_builtin(__builtin_tgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgamma)
 /* True gamma function */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tgamma,(double __x),tgamma,{ return __builtin_tgamma(__x); })
@@ -34,18 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tgamma,(double __x),tgamm
 #elif defined(__CRT_HAVE___tgamma)
 /* True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tgamma,(double __x),__tgamma,(__x))
-#else /* LIBC: tgamma */
-#undef ____localdep_tgamma_defined
-#endif /* tgamma... */
-#endif /* !____localdep_tgamma_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_tgamma_defined
+#endif /* !... */
+#endif /* !__local___localdep_tgamma_defined */
 /* True gamma function */
 __LOCAL_LIBC(tgammal) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tgammal))(__LONGDOUBLE __x) {
-#line 830 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_tgamma((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_tgamma || __CRT_HAVE___tgamma */
+#ifndef __local___localdep_tgammal_defined
+#define __local___localdep_tgammal_defined 1
+#define __localdep_tgammal __LIBC_LOCAL_NAME(tgammal)
+#endif /* !__local___localdep_tgammal_defined */
+#else /* __CRT_HAVE_tgamma || __CRT_HAVE___tgamma */
+#undef __local_tgammal_defined
+#endif /* !__CRT_HAVE_tgamma && !__CRT_HAVE___tgamma */
 #endif /* !__local_tgammal_defined */

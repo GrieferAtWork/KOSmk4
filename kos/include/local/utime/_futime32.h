@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63a38dcb */
+/* HASH CRC-32:0xb0114fbb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,26 +19,25 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__futime32_defined
-#if defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64)
 #define __local__futime32_defined 1
 #include <__crt.h>
-/* Dependency: "crt_futime64" from "utime" */
-#ifndef ____localdep_crt_futime64_defined
-#define ____localdep_crt_futime64_defined 1
+#if defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64)
+#include <features.h>
+#include <bits/utimbuf.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: crt_futime64 from utime */
+#ifndef __local___localdep_crt_futime64_defined
+#define __local___localdep_crt_futime64_defined 1
 #ifdef __CRT_HAVE_futime64
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime64,(__fd_t __fd, struct __utimbuf64 const *__file_times),futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime64)
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime64,(__fd_t __fd, struct __utimbuf64 const *__file_times),_futime64,(__fd,__file_times))
-#else /* LIBC: futime64 */
-#undef ____localdep_crt_futime64_defined
-#endif /* crt_futime64... */
-#endif /* !____localdep_crt_futime64_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_crt_futime64_defined
+#endif /* !... */
+#endif /* !__local___localdep_crt_futime64_defined */
 __LOCAL_LIBC(_futime32) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_futime32))(__fd_t __fd,
-                                                       struct __utimbuf32 __KOS_FIXED_CONST *__file_times) {
-#line 235 "kos/src/libc/magic/utime.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_futime32))(__fd_t __fd, struct __utimbuf32 __KOS_FIXED_CONST *__file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("actime")
 #pragma push_macro("modtime")
@@ -57,5 +56,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_futime32))(__fd_t __fd,
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_futime64 || __CRT_HAVE__futime64 */
+#ifndef __local___localdep__futime32_defined
+#define __local___localdep__futime32_defined 1
+#define __localdep__futime32 __LIBC_LOCAL_NAME(_futime32)
+#endif /* !__local___localdep__futime32_defined */
+#else /* __CRT_HAVE_futime64 || __CRT_HAVE__futime64 */
+#undef __local__futime32_defined
+#endif /* !__CRT_HAVE_futime64 && !__CRT_HAVE__futime64 */
 #endif /* !__local__futime32_defined */

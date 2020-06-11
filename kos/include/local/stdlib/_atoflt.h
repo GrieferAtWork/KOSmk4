@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9938ee07 */
+/* HASH CRC-32:0x90ac8235 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,33 @@
 #ifndef __local__atoflt_defined
 #define __local__atoflt_defined 1
 #include <__crt.h>
-/* Dependency: "strtof" from "stdlib" */
-#ifndef ____localdep_strtof_defined
-#define ____localdep_strtof_defined 1
-#ifdef __std___localdep_strtof_defined
-__NAMESPACE_STD_USING(__localdep_strtof)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strtof from stdlib */
+#ifndef __local___localdep_strtof_defined
+#define __local___localdep_strtof_defined 1
+#ifdef __strtof_defined
+__NAMESPACE_GLB_USING(strtof)
+#define __localdep_strtof strtof
+#elif defined(__std_strtof_defined)
+__NAMESPACE_STD_USING(strtof)
+#define __localdep_strtof strtof
 #elif defined(__CRT_HAVE_strtof)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_strtof,(char const *__restrict __nptr, char **__endptr),strtof,(__nptr,__endptr))
-#else /* LIBC: strtof */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/strtof.h>
-#define __localdep_strtof (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtof))
-#endif /* strtof... */
-#endif /* !____localdep_strtof_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strtof __LIBC_LOCAL_NAME(strtof)
+#endif /* !... */
+#endif /* !__local___localdep_strtof_defined */
 __LOCAL_LIBC(_atoflt) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atoflt))(float *__restrict __result,
-                                                     char const *__restrict __nptr) {
-#line 2985 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atoflt))(float *__restrict __result, char const *__restrict __nptr) {
 	*__result = __localdep_strtof(__nptr, __NULLPTR);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__atoflt_defined
+#define __local___localdep__atoflt_defined 1
+#define __localdep__atoflt __LIBC_LOCAL_NAME(_atoflt)
+#endif /* !__local___localdep__atoflt_defined */
 #endif /* !__local__atoflt_defined */

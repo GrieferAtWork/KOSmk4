@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e8c575f */
+/* HASH CRC-32:0x8eec60e3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,30 +21,30 @@
 #ifndef __local_format_wto8_defined
 #define __local_format_wto8_defined 1
 #include <__crt.h>
-#include <bits/format-printer.h>
-/* Dependency: "unicode_writeutf8" from "unicode" */
-#ifndef ____localdep_unicode_writeutf8_defined
-#define ____localdep_unicode_writeutf8_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: unicode_writeutf8 from unicode */
+#ifndef __local___localdep_unicode_writeutf8_defined
+#define __local___localdep_unicode_writeutf8_defined 1
 #ifdef __CRT_HAVE_unicode_writeutf8
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(/*utf-8*/ char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
-#else /* LIBC: unicode_writeutf8 */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
+#else /* __CRT_HAVE_unicode_writeutf8 */
+__NAMESPACE_LOCAL_END
 #include <local/unicode/unicode_writeutf8.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
-#define __localdep_unicode_writeutf8 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf8))
-#endif /* unicode_writeutf8... */
-#endif /* !____localdep_unicode_writeutf8_defined */
-
+#define __localdep_unicode_writeutf8 __LIBC_LOCAL_NAME(unicode_writeutf8)
+#endif /* !__CRT_HAVE_unicode_writeutf8 */
+#endif /* !__local___localdep_unicode_writeutf8_defined */
+__NAMESPACE_LOCAL_END
+#include <bits/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-8 output */
 __LOCAL_LIBC(format_wto8) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wto8))(/*struct format_wto8_data **/ void *__arg,
-                                                         __WCHAR_TYPE__ const *__data,
-                                                         __SIZE_TYPE__ __datalen) {
-#line 1476 "kos/src/libc/magic/unicode.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wto8))(void *__arg, __WCHAR_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
 #if __SIZEOF_WCHAR_T__ == 2
 	struct __local_format_16to8_data {
 		__pformatprinter __fd_printer;   /* [1..1] Inner printer */
@@ -95,7 +95,7 @@ __after_dst_write:
 	return __result;
 __err:
 	return __temp;
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 	struct __local_format_32to8_data {
 		__pformatprinter __fd_printer; /* [1..1] Inner printer */
 		void            *__fd_arg;     /* Argument for `fd_printer' */
@@ -118,7 +118,11 @@ __err:
 	return __result;
 __err:
 	return __temp;
-#endif
+#endif /* !(__SIZEOF_WCHAR_T__ == 2) */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_wto8_defined
+#define __local___localdep_format_wto8_defined 1
+#define __localdep_format_wto8 __LIBC_LOCAL_NAME(format_wto8)
+#endif /* !__local___localdep_format_wto8_defined */
 #endif /* !__local_format_wto8_defined */

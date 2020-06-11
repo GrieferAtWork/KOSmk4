@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c80ba5f */
+/* HASH CRC-32:0x3aa98d8d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,49 +21,56 @@
 #ifndef __local_format_aprintf_pack_defined
 #define __local_format_aprintf_pack_defined 1
 #include <__crt.h>
-#include <hybrid/__assert.h>
-
-#include <hybrid/typecore.h>
-
-#ifndef __format_aprintf_data_defined
-#define __format_aprintf_data_defined 1
-struct format_aprintf_data {
-	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
-};
-#endif /* !__format_aprintf_data_defined */
-/* Dependency: "realloc" */
-#ifndef ____localdep_realloc_defined
-#define ____localdep_realloc_defined 1
-#ifdef __std___localdep_realloc_defined
-__NAMESPACE_STD_USING(__localdep_realloc)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: realloc from stdlib */
+#ifndef __local___localdep_realloc_defined
+#define __local___localdep_realloc_defined 1
+#ifdef __realloc_defined
+__NAMESPACE_GLB_USING(realloc)
+#define __localdep_realloc realloc
+#elif defined(__std_realloc_defined)
+__NAMESPACE_STD_USING(realloc)
+#define __localdep_realloc realloc
 #elif __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
 __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
 #elif defined(__CRT_HAVE_realloc)
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
-#else /* LIBC: realloc */
-#undef ____localdep_realloc_defined
-#endif /* realloc... */
-#endif /* !____localdep_realloc_defined */
-
-/* Dependency: "malloc" from "stdlib" */
-#ifndef ____localdep_malloc_defined
-#define ____localdep_malloc_defined 1
-#ifdef __std___localdep_malloc_defined
-__NAMESPACE_STD_USING(__localdep_malloc)
+#else /* ... */
+#undef __local___localdep_realloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_realloc_defined */
+/* Dependency: malloc from stdlib */
+#ifndef __local___localdep_malloc_defined
+#define __local___localdep_malloc_defined 1
+#ifdef __malloc_defined
+__NAMESPACE_GLB_USING(malloc)
+#define __localdep_malloc malloc
+#elif defined(__std_malloc_defined)
+__NAMESPACE_STD_USING(malloc)
+#define __localdep_malloc malloc
 #elif __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,{ return __builtin_malloc(__num_bytes); })
 #elif defined(__CRT_HAVE_malloc)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,(__num_bytes))
-#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)
+#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/malloc.h>
-#define __localdep_malloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(malloc))
-#else /* CUSTOM: malloc */
-#undef ____localdep_malloc_defined
-#endif /* malloc... */
-#endif /* !____localdep_malloc_defined */
-
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_malloc __LIBC_LOCAL_NAME(malloc)
+#else /* ... */
+#undef __local___localdep_malloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_malloc_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__assert.h>
+#ifndef __format_aprintf_data_defined
+#define __format_aprintf_data_defined 1
+struct format_aprintf_data {
+	char         *__ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ __ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ __ap_used;  /* Used buffer size */
+};
+#endif
 __NAMESPACE_LOCAL_BEGIN
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
@@ -86,9 +93,7 @@ __NAMESPACE_LOCAL_BEGIN
  *                  printed to the aprintf-printer at one point.
  *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
 __LOCAL_LIBC(format_aprintf_pack) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_aprintf_data *__restrict __self,
-                                                                 __SIZE_TYPE__ *__pstrlen) {
-#line 1150 "kos/src/libc/magic/format-printer.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) {
 	/* Free unused buffer memory. */
 	char *__result;
 	if (__self->ap_avail != 0) {
@@ -104,7 +109,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_a
 		if __unlikely(!__self->ap_used) {
 			/* Special case: Nothing was printed. */
 			__hybrid_assert(!__self->ap_base);
-#if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 			__self->ap_base = (char *)__localdep_malloc(1 * sizeof(char));
 			if __unlikely(!__self->ap_base)
 				return __NULLPTR;
@@ -112,9 +117,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_a
 			__self->ap_base = (char *)__localdep_realloc(__NULLPTR, 1 * sizeof(char));
 			if __unlikely(!__self->ap_base)
 				return __NULLPTR;
-#else /* __CRT_HAVE_realloc */
+#else /* ... */
 			return __NULLPTR;
-#endif /* !__CRT_HAVE_realloc */
+#endif /* !... */
 		}
 	}
 	__result = __self->ap_base;
@@ -122,7 +127,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_a
 	__result[__self->ap_used] = '\0'; /* NUL-terminate */
 	if (__pstrlen)
 		*__pstrlen = __self->ap_used;
-#ifndef __NDEBUG
+#ifndef NDEBUG
 #if __SIZEOF_POINTER__ == 4
 	__self->ap_base  = (char *)__UINT32_C(0xcccccccc);
 	__self->ap_avail = __UINT32_C(0xcccccccc);
@@ -131,9 +136,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_a
 	__self->ap_base  = (char *)__UINT64_C(0xcccccccccccccccc);
 	__self->ap_avail = __UINT64_C(0xcccccccccccccccc);
 	__self->ap_used  = __UINT64_C(0xcccccccccccccccc);
-#endif /* __SIZEOF_POINTER__ == ... */
+#endif /* ... */
 #endif /* !NDEBUG */
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_aprintf_pack_defined
+#define __local___localdep_format_aprintf_pack_defined 1
+#define __localdep_format_aprintf_pack __LIBC_LOCAL_NAME(format_aprintf_pack)
+#endif /* !__local___localdep_format_aprintf_pack_defined */
 #endif /* !__local_format_aprintf_pack_defined */

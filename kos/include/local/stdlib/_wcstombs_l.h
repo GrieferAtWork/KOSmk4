@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fb167a */
+/* HASH CRC-32:0xe36ad8ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,31 @@
 #ifndef __local__wcstombs_l_defined
 #define __local__wcstombs_l_defined 1
 #include <__crt.h>
-/* Dependency: "wcstombs" from "stdlib" */
-#ifndef ____localdep_wcstombs_defined
-#define ____localdep_wcstombs_defined 1
-#ifdef __CRT_HAVE_wcstombs
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcstombs,(char *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __dstlen),wcstombs,(__dst,__src,__dstlen))
-#else /* LIBC: wcstombs */
-#include <local/stdlib/wcstombs.h>
-#define __localdep_wcstombs (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstombs))
-#endif /* wcstombs... */
-#endif /* !____localdep_wcstombs_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcstombs from stdlib */
+#ifndef __local___localdep_wcstombs_defined
+#define __local___localdep_wcstombs_defined 1
+#ifdef __CRT_HAVE_wcstombs
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcstombs,(char *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __dstlen),wcstombs,(__dst,__src,__dstlen))
+#elif defined(__CRT_HAVE_DOS$wcstombs) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcstombs,(char *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __dstlen),wcstombs,(__dst,__src,__dstlen))
+#elif defined(__CRT_HAVE_DOS$wcstombs) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcstombs,(char *__restrict __dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __dstlen),wcstombs,(__dst,__src,__dstlen))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/wcstombs.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcstombs __LIBC_LOCAL_NAME(wcstombs)
+#endif /* !... */
+#endif /* !__local___localdep_wcstombs_defined */
 __LOCAL_LIBC(_wcstombs_l) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcstombs_l))(char *__dst,
-                                                         __WCHAR_TYPE__ const *__src,
-                                                         __SIZE_TYPE__ __maxlen,
-                                                         __locale_t __locale) {
-#line 2792 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcstombs_l))(char *__dst, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_wcstombs(__dst, __src, __maxlen);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__wcstombs_l_defined
+#define __local___localdep__wcstombs_l_defined 1
+#define __localdep__wcstombs_l __LIBC_LOCAL_NAME(_wcstombs_l)
+#endif /* !__local___localdep__wcstombs_l_defined */
 #endif /* !__local__wcstombs_l_defined */

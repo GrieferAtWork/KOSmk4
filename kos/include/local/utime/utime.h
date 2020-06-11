@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76a59efb */
+/* HASH CRC-32:0x9b3ac91e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,38 +19,35 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_utime_defined
-#if defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64)
 #define __local_utime_defined 1
 #include <__crt.h>
-/* Dependency: "crt_utime32" from "utime" */
-#ifndef ____localdep_crt_utime32_defined
-#define ____localdep_crt_utime32_defined 1
+#if defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64)
+#include <bits/utimbuf.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: crt_utime32 from utime */
+#ifndef __local___localdep_crt_utime32_defined
+#define __local___localdep_crt_utime32_defined 1
 #ifdef __CRT_HAVE_utime
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_utime32,(char const *__filename, struct __utimbuf32 const *__file_times),utime,(__filename,__file_times))
 #elif defined(__CRT_HAVE__utime32)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_utime32,(char const *__filename, struct __utimbuf32 const *__file_times),_utime32,(__filename,__file_times))
-#else /* LIBC: utime */
-#undef ____localdep_crt_utime32_defined
-#endif /* crt_utime32... */
-#endif /* !____localdep_crt_utime32_defined */
-
-/* Dependency: "crt_utime64" from "utime" */
-#ifndef ____localdep_crt_utime64_defined
-#define ____localdep_crt_utime64_defined 1
+#else /* ... */
+#undef __local___localdep_crt_utime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_crt_utime32_defined */
+/* Dependency: crt_utime64 from utime */
+#ifndef __local___localdep_crt_utime64_defined
+#define __local___localdep_crt_utime64_defined 1
 #ifdef __CRT_HAVE_utime64
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),utime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__utime64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),_utime64,(__filename,__file_times))
-#else /* LIBC: utime64 */
-#undef ____localdep_crt_utime64_defined
-#endif /* crt_utime64... */
-#endif /* !____localdep_crt_utime64_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_crt_utime64_defined
+#endif /* !... */
+#endif /* !__local___localdep_crt_utime64_defined */
 __LOCAL_LIBC(utime) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utime))(char const *__filename,
-                                                   struct utimbuf const *__file_times) {
-#line 77 "kos/src/libc/magic/utime.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utime))(char const *__filename, struct utimbuf const *__file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("actime")
 #pragma push_macro("modtime")
@@ -78,5 +75,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utime))(char const *__filename,
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_utime || __CRT_HAVE__utime32 || __CRT_HAVE_utime64 || __CRT_HAVE__utime64 */
+#ifndef __local___localdep_utime_defined
+#define __local___localdep_utime_defined 1
+#define __localdep_utime __LIBC_LOCAL_NAME(utime)
+#endif /* !__local___localdep_utime_defined */
+#else /* __CRT_HAVE_utime || __CRT_HAVE__utime32 || __CRT_HAVE_utime64 || __CRT_HAVE__utime64 */
+#undef __local_utime_defined
+#endif /* !__CRT_HAVE_utime && !__CRT_HAVE__utime32 && !__CRT_HAVE_utime64 && !__CRT_HAVE__utime64 */
 #endif /* !__local_utime_defined */

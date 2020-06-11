@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1f5ef33 */
+/* HASH CRC-32:0x49dc7df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,35 +21,40 @@
 #ifndef __local_strrev_defined
 #define __local_strrev_defined 1
 #include <__crt.h>
-/* Dependency: "memrev" from "string" */
-#ifndef ____localdep_memrev_defined
-#define ____localdep_memrev_defined 1
-#ifdef __CRT_HAVE_memrev
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
-#else /* LIBC: memrev */
-#include <local/string/memrev.h>
-#define __localdep_memrev (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrev))
-#endif /* memrev... */
-#endif /* !____localdep_memrev_defined */
-
-/* Dependency: "strlen" from "string" */
-#ifndef ____localdep_strlen_defined
-#define ____localdep_strlen_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* LIBC: strlen */
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
 #include <local/string/strlen.h>
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
-#endif /* strlen... */
-#endif /* !____localdep_strlen_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
+/* Dependency: memrev from string */
+#ifndef __local___localdep_memrev_defined
+#define __local___localdep_memrev_defined 1
+#ifdef __CRT_HAVE_memrev
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
+#else /* __CRT_HAVE_memrev */
+__NAMESPACE_LOCAL_END
+#include <local/string/memrev.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_memrev __LIBC_LOCAL_NAME(memrev)
+#endif /* !__CRT_HAVE_memrev */
+#endif /* !__local___localdep_memrev_defined */
 __LOCAL_LIBC(strrev) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strrev))(char *__restrict __str) {
-#line 4906 "kos/src/libc/magic/string.c"
 	return (char *)__localdep_memrev(__str, __localdep_strlen(__str));
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strrev_defined
+#define __local___localdep_strrev_defined 1
+#define __localdep_strrev __LIBC_LOCAL_NAME(strrev)
+#endif /* !__local___localdep_strrev_defined */
 #endif /* !__local_strrev_defined */

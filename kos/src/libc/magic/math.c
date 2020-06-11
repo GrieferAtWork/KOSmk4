@@ -610,7 +610,7 @@ double fmod(double x, double y) {
 [[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__copysign", "_copysign")]]
 [[impl_include("<libm/copysign.h>")]]
 double copysign(double num, double sign) {
-@@pp_ifdef __LIBM_MATHFUN@@2
+@@pp_ifdef __LIBM_MATHFUN2@@
 	return __LIBM_MATHFUN2(@copysign@, num, sign);
 @@pp_else@@
 	if ((num < 0.0) != (sign < 0.0))
@@ -1499,352 +1499,352 @@ double scalb(double x, double fn) {
 %
 %
 %#if 1 /* GLIBc aliases */
-__acos(*) = acos;
-__asin(*) = asin;
-__atan(*) = atan;
-__atan2(*) = atan2;
-__cos(*) = cos;
-__sin(*) = sin;
-__tan(*) = tan;
-__cosh(*) = cosh;
-__sinh(*) = sinh;
-__tanh(*) = tanh;
-__acosf(*) = acosf;
-__asinf(*) = asinf;
-__atanf(*) = atanf;
-__atan2f(*) = atan2f;
-__cosf(*) = cosf;
-__sinf(*) = sinf;
-__tanf(*) = tanf;
-__coshf(*) = coshf;
-__sinhf(*) = sinhf;
-__tanhf(*) = tanhf;
+%[insert:function(__acos = acos)]
+%[insert:function(__asin = asin)]
+%[insert:function(__atan = atan)]
+%[insert:function(__atan2 = atan2)]
+%[insert:function(__cos = cos)]
+%[insert:function(__sin = sin)]
+%[insert:function(__tan = tan)]
+%[insert:function(__cosh = cosh)]
+%[insert:function(__sinh = sinh)]
+%[insert:function(__tanh = tanh)]
+%[insert:function(__acosf = acosf)]
+%[insert:function(__asinf = asinf)]
+%[insert:function(__atanf = atanf)]
+%[insert:function(__atan2f = atan2f)]
+%[insert:function(__cosf = cosf)]
+%[insert:function(__sinf = sinf)]
+%[insert:function(__tanf = tanf)]
+%[insert:function(__coshf = coshf)]
+%[insert:function(__sinhf = sinhf)]
+%[insert:function(__tanhf = tanhf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__acosl(*) = acosl;
-__asinl(*) = asinl;
-__atanl(*) = atanl;
-__atan2l(*) = atan2l;
-__cosl(*) = cosl;
-__sinl(*) = sinl;
-__tanl(*) = tanl;
-__coshl(*) = coshl;
-__sinhl(*) = sinhl;
-__tanhl(*) = tanhl;
+%[insert:function(__acosl = acosl)]
+%[insert:function(__asinl = asinl)]
+%[insert:function(__atanl = atanl)]
+%[insert:function(__atan2l = atan2l)]
+%[insert:function(__cosl = cosl)]
+%[insert:function(__sinl = sinl)]
+%[insert:function(__tanl = tanl)]
+%[insert:function(__coshl = coshl)]
+%[insert:function(__sinhl = sinhl)]
+%[insert:function(__tanhl = tanhl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#ifdef __USE_GNU
-__sincos(*) = sincos;
-__sincosf(*) = sincosf;
+%[insert:function(__sincos = sincos)]
+%[insert:function(__sincosf = sincosf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__sincosl(*) = sincosl;
+%[insert:function(__sincosl = sincosl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */
 
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-__acosh(*) = acosh;
-__asinh(*) = asinh;
-__atanh(*) = atanh;
-__acoshf(*) = acoshf;
-__asinhf(*) = asinhf;
-__atanhf(*) = atanhf;
+%[insert:function(__acosh = acosh)]
+%[insert:function(__asinh = asinh)]
+%[insert:function(__atanh = atanh)]
+%[insert:function(__acoshf = acoshf)]
+%[insert:function(__asinhf = asinhf)]
+%[insert:function(__atanhf = atanhf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__acoshl(*) = acoshl;
-__asinhl(*) = asinhl;
-__atanhl(*) = atanhl;
+%[insert:function(__acoshl = acoshl)]
+%[insert:function(__asinhl = asinhl)]
+%[insert:function(__atanhl = atanhl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
-__exp(*) = exp;
-__frexp(*) = frexp;
-__ldexp(*) = ldexp;
-__log(*) = log;
-__log10(*) = log10;
-__modf(*) = modf;
-__expf(*) = expf;
-__frexpf(*) = frexpf;
-__ldexpf(*) = ldexpf;
-__logf(*) = logf;
-__log10f(*) = log10f;
-__modff(*) = modff;
+%[insert:function(__exp = exp)]
+%[insert:function(__frexp = frexp)]
+%[insert:function(__ldexp = ldexp)]
+%[insert:function(__log = log)]
+%[insert:function(__log10 = log10)]
+%[insert:function(__modf = modf)]
+%[insert:function(__expf = expf)]
+%[insert:function(__frexpf = frexpf)]
+%[insert:function(__ldexpf = ldexpf)]
+%[insert:function(__logf = logf)]
+%[insert:function(__log10f = log10f)]
+%[insert:function(__modff = modff)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__expl(*) = expl;
-__frexpl(*) = frexpl;
-__ldexpl(*) = ldexpl;
-__logl(*) = logl;
-__log10l(*) = log10l;
-__modfl(*) = modfl;
+%[insert:function(__expl = expl)]
+%[insert:function(__frexpl = frexpl)]
+%[insert:function(__ldexpl = ldexpl)]
+%[insert:function(__logl = logl)]
+%[insert:function(__log10l = log10l)]
+%[insert:function(__modfl = modfl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %
 %#ifdef __USE_GNU
-__exp10(*) = exp10;
-__pow10(*) = pow10;
-__exp10f(*) = exp10f;
-__pow10f(*) = pow10f;
+%[insert:function(__exp10 = exp10)]
+%[insert:function(__pow10 = pow10)]
+%[insert:function(__exp10f = exp10f)]
+%[insert:function(__pow10f = pow10f)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__exp10l(*) = exp10l;
-__pow10l(*) = pow10l;
+%[insert:function(__exp10l = exp10l)]
+%[insert:function(__pow10l = pow10l)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-__expm1(*) = expm1;
-__log1p(*) = log1p;
-__logb(*) = logb;
-__expm1f(*) = expm1f;
-__log1pf(*) = log1pf;
-__logbf(*) = logbf;
+%[insert:function(__expm1 = expm1)]
+%[insert:function(__log1p = log1p)]
+%[insert:function(__logb = logb)]
+%[insert:function(__expm1f = expm1f)]
+%[insert:function(__log1pf = log1pf)]
+%[insert:function(__logbf = logbf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__expm1l(*) = expm1l;
-__log1pl(*) = log1pl;
-__logbl(*) = logbl;
+%[insert:function(__expm1l = expm1l)]
+%[insert:function(__log1pl = log1pl)]
+%[insert:function(__logbl = logbl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
 %
 %#ifdef __USE_ISOC99
-__exp2(*) = exp2;
-__log2(*) = log2;
-__exp2f(*) = exp2f;
-__log2f(*) = log2f;
+%[insert:function(__exp2 = exp2)]
+%[insert:function(__log2 = log2)]
+%[insert:function(__exp2f = exp2f)]
+%[insert:function(__log2f = log2f)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__exp2l(*) = exp2l;
-__log2l(*) = log2l;
+%[insert:function(__exp2l = exp2l)]
+%[insert:function(__log2l = log2l)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
 
-__pow(*) = pow;
-__sqrt(*) = sqrt;
-__powf(*) = powf;
-__sqrtf(*) = sqrtf;
+%[insert:function(__pow = pow)]
+%[insert:function(__sqrt = sqrt)]
+%[insert:function(__powf = powf)]
+%[insert:function(__sqrtf = sqrtf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__powl(*) = powl;
-__sqrtl(*) = sqrtl;
+%[insert:function(__powl = powl)]
+%[insert:function(__sqrtl = sqrtl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %
 %#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
-__hypot(*) = hypot;
-__hypotf(*) = hypotf;
+%[insert:function(__hypot = hypot)]
+%[insert:function(__hypotf = hypotf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__hypotl(*) = hypotl;
+%[insert:function(__hypotl = hypotl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN || __USE_ISOC99 */
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-__cbrt(*) = cbrt;
-__cbrtf(*) = cbrtf;
+%[insert:function(__cbrt = cbrt)]
+%[insert:function(__cbrtf = cbrtf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__cbrtl(*) = cbrtl;
+%[insert:function(__cbrtl = cbrtl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
-__ceil(*) = ceil;
-__fabs(*) = fabs;
-__floor(*) = floor;
-__fmod(*) = fmod;
-__isinf(*) = isinf;
-__finite(*) = finite;
-__ceilf(*) = ceilf;
-__fabsf(*) = fabsf;
-__floorf(*) = floorf;
-__fmodf(*) = fmodf;
-__isinff(*) = isinff;
-__finitef(*) = finitef;
+%[insert:function(__ceil = ceil)]
+%[insert:function(__fabs = fabs)]
+%[insert:function(__floor = floor)]
+%[insert:function(__fmod = fmod)]
+%[insert:function(__isinf = isinf)]
+%[insert:function(__finite = finite)]
+%[insert:function(__ceilf = ceilf)]
+%[insert:function(__fabsf = fabsf)]
+%[insert:function(__floorf = floorf)]
+%[insert:function(__fmodf = fmodf)]
+%[insert:function(__isinff = isinff)]
+%[insert:function(__finitef = finitef)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__ceill(*) = ceill;
-__fabsl(*) = fabsl;
-__floorl(*) = floorl;
-__fmodl(*) = fmodl;
-__isinfl(*) = isinfl;
-__finitel(*) = finitel;
+%[insert:function(__ceill = ceill)]
+%[insert:function(__fabsl = fabsl)]
+%[insert:function(__floorl = floorl)]
+%[insert:function(__fmodl = fmodl)]
+%[insert:function(__isinfl = isinfl)]
+%[insert:function(__finitel = finitel)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %#ifdef __USE_MISC
-__drem(*) = remainder;
-__significand(*) = significand;
-__dremf(*) = remainderf;
-__significandf(*) = significandf;
+%[insert:function(__drem = remainder)]
+%[insert:function(__significand = significand)]
+%[insert:function(__dremf = remainderf)]
+%[insert:function(__significandf = significandf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__dreml(*) = remainderl;
-__significandl(*) = significandl;
+%[insert:function(__dreml = remainderl)]
+%[insert:function(__significandl = significandl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 
 %
 %#ifdef __USE_ISOC99
-__copysign(*) = copysign;
-__nan(*) = nan;
-__copysignf(*) = copysignf;
-__nanf(*) = nanf;
+%[insert:function(__copysign = copysign)]
+%[insert:function(__nan = nan)]
+%[insert:function(__copysignf = copysignf)]
+%[insert:function(__nanf = nanf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__copysignl(*) = copysignl;
-__nanl(*) = nanl;
+%[insert:function(__copysignl = copysignl)]
+%[insert:function(__nanl = nanl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
 
 %
-__isnan(*) = isnan;
-__isnanf(*) = isnanf;
+%[insert:function(__isnan = isnan)]
+%[insert:function(__isnanf = isnanf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__isnanl(*) = isnanl;
+%[insert:function(__isnanl = isnanl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %
 %/* Bessel functions. */
 %#if defined(__USE_MISC) || defined(__USE_XOPEN)
-__j0(*) = j0;
-__j1(*) = j1;
-__jn(*) = jn;
-__y0(*) = y0;
-__y1(*) = y1;
-__yn(*) = yn;
+%[insert:function(__j0 = j0)]
+%[insert:function(__j1 = j1)]
+%[insert:function(__jn = jn)]
+%[insert:function(__y0 = y0)]
+%[insert:function(__y1 = y1)]
+%[insert:function(__yn = yn)]
 %#endif /* __USE_MISC || __USE_XOPEN */
 %#ifdef __USE_MISC
-__j0f(*) = j0f;
-__j1f(*) = j1f;
-__jnf(*) = jnf;
-__y0f(*) = y0f;
-__y1f(*) = y1f;
-__ynf(*) = ynf;
+%[insert:function(__j0f = j0f)]
+%[insert:function(__j1f = j1f)]
+%[insert:function(__jnf = jnf)]
+%[insert:function(__y0f = y0f)]
+%[insert:function(__y1f = y1f)]
+%[insert:function(__ynf = ynf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__j0l(*) = j0l;
-__j1l(*) = j1l;
-__jnl(*) = jnl;
-__y0l(*) = y0l;
-__y1l(*) = y1l;
-__ynl(*) = ynl;
+%[insert:function(__j0l = j0l)]
+%[insert:function(__j1l = j1l)]
+%[insert:function(__jnl = jnl)]
+%[insert:function(__y0l = y0l)]
+%[insert:function(__y1l = y1l)]
+%[insert:function(__ynl = ynl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 
 %
 %#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
-__erf(*) = erf;
-__erfc(*) = erfc;
-__lgamma(*) = lgamma;
-__erff(*) = erff;
-__erfcf(*) = erfcf;
-__lgammaf(*) = lgammaf;
+%[insert:function(__erf = erf)]
+%[insert:function(__erfc = erfc)]
+%[insert:function(__lgamma = lgamma)]
+%[insert:function(__erff = erff)]
+%[insert:function(__erfcf = erfcf)]
+%[insert:function(__lgammaf = lgammaf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__erfl(*) = erfl;
-__erfcl(*) = erfcl;
-__lgammal(*) = lgammal;
+%[insert:function(__erfl = erfl)]
+%[insert:function(__erfcl = erfcl)]
+%[insert:function(__lgammal = lgammal)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN || __USE_ISOC99 */
 
 %
 %#ifdef __USE_ISOC99
-__tgamma(*) = tgamma;
-__tgammaf(*) = tgammaf;
+%[insert:function(__tgamma = tgamma)]
+%[insert:function(__tgammaf = tgammaf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__tgammal(*) = tgammal;
+%[insert:function(__tgammal = tgammal)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
 
 %
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
-__gamma(*) = lgamma;
-__gammaf(*) = lgammaf;
+%[insert:function(__gamma = lgamma)]
+%[insert:function(__gammaf = lgammaf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__gammal(*) = lgammal;
+%[insert:function(__gammal = lgammal)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 %#ifdef __USE_MISC
-__lgamma_r(*) = lgamma_r;
-__lgammaf_r(*) = lgammaf_r;
+%[insert:function(__lgamma_r = lgamma_r)]
+%[insert:function(__lgammaf_r = lgammaf_r)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__lgammal_r(*) = lgammal_r;
+%[insert:function(__lgammal_r = lgammal_r)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-__rint(*) = rint;
-__nextafter(*) = nextafter;
-__remainder(*) = remainder;
-__ilogb(*) = ilogb;
-__rintf(*) = rintf;
-__nextafterf(*) = nextafterf;
-__remainderf(*) = remainderf;
-__ilogbf(*) = ilogbf;
+%[insert:function(__rint = rint)]
+%[insert:function(__nextafter = nextafter)]
+%[insert:function(__remainder = remainder)]
+%[insert:function(__ilogb = ilogb)]
+%[insert:function(__rintf = rintf)]
+%[insert:function(__nextafterf = nextafterf)]
+%[insert:function(__remainderf = remainderf)]
+%[insert:function(__ilogbf = ilogbf)]
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__rintl(*) = rintl;
-__nextafterl(*) = nextafterl;
-__remainderl(*) = remainderl;
-__ilogbl(*) = ilogbl;
+%[insert:function(__rintl = rintl)]
+%[insert:function(__nextafterl = nextafterl)]
+%[insert:function(__remainderl = remainderl)]
+%[insert:function(__ilogbl = ilogbl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
 
 %
 %#ifdef __USE_ISOC99
-__nexttoward(*) = nexttoward;
-__scalbn(*) = scalbn;
-__scalbln(*) = scalbln;
-__nearbyint(*) = rint;
-__round(*) = round;
-__trunc(*) = trunc;
-__remquo(*) = remquo;
-__lrint(*) = lrint;
-__lround(*) = lround;
-__fdim(*) = fdim;
-__fmax(*) = fmax;
-__fmin(*) = fmin;
-__fma(*) = fma;
+%[insert:function(__nexttoward = nexttoward)]
+%[insert:function(__scalbn = scalbn)]
+%[insert:function(__scalbln = scalbln)]
+%[insert:function(__nearbyint = rint)]
+%[insert:function(__round = round)]
+%[insert:function(__trunc = trunc)]
+%[insert:function(__remquo = remquo)]
+%[insert:function(__lrint = lrint)]
+%[insert:function(__lround = lround)]
+%[insert:function(__fdim = fdim)]
+%[insert:function(__fmax = fmax)]
+%[insert:function(__fmin = fmin)]
+%[insert:function(__fma = fma)]
 
-__nexttowardf(*) = nexttowardf;
-__scalbnf(*) = scalbnf;
-__scalblnf(*) = scalblnf;
-__nearbyintf(*) = rintf;
-__roundf(*) = roundf;
-__truncf(*) = truncf;
-__remquof(*) = remquof;
-__lrintf(*) = lrintf;
-__lroundf(*) = lroundf;
-__fdimf(*) = fdimf;
-__fmaxf(*) = fmaxf;
-__fminf(*) = fminf;
-__fmaf(*) = fmaf;
+%[insert:function(__nexttowardf = nexttowardf)]
+%[insert:function(__scalbnf = scalbnf)]
+%[insert:function(__scalblnf = scalblnf)]
+%[insert:function(__nearbyintf = rintf)]
+%[insert:function(__roundf = roundf)]
+%[insert:function(__truncf = truncf)]
+%[insert:function(__remquof = remquof)]
+%[insert:function(__lrintf = lrintf)]
+%[insert:function(__lroundf = lroundf)]
+%[insert:function(__fdimf = fdimf)]
+%[insert:function(__fmaxf = fmaxf)]
+%[insert:function(__fminf = fminf)]
+%[insert:function(__fmaf = fmaf)]
 
 %#ifdef __COMPILER_HAVE_LONGLONG
-__llrint(*) = llrint;
-__llround(*) = llround;
-__llrintf(*) = llrintf;
-__llroundf(*) = llroundf;
+%[insert:function(__llrint = llrint)]
+%[insert:function(__llround = llround)]
+%[insert:function(__llrintf = llrintf)]
+%[insert:function(__llroundf = llroundf)]
 %#endif /* __COMPILER_HAVE_LONGLONG */
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__nexttowardl(*) = nextafterl;
-__scalbnl(*) = scalbnl;
-__scalblnl(*) = scalblnl;
-__nearbyintl(*) = rintl;
-__roundl(*) = roundl;
-__truncl(*) = truncl;
-__remquol(*) = remquol;
-__lrintl(*) = lrintl;
-__lroundl(*) = lroundl;
-__fdiml(*) = fdiml;
-__fmaxl(*) = fmaxl;
-__fminl(*) = fminl;
-__fmal(*) = fmal;
+%[insert:function(__nexttowardl = nextafterl)]
+%[insert:function(__scalbnl = scalbnl)]
+%[insert:function(__scalblnl = scalblnl)]
+%[insert:function(__nearbyintl = rintl)]
+%[insert:function(__roundl = roundl)]
+%[insert:function(__truncl = truncl)]
+%[insert:function(__remquol = remquol)]
+%[insert:function(__lrintl = lrintl)]
+%[insert:function(__lroundl = lroundl)]
+%[insert:function(__fdiml = fdiml)]
+%[insert:function(__fmaxl = fmaxl)]
+%[insert:function(__fminl = fminl)]
+%[insert:function(__fmal = fmal)]
 %#ifdef __COMPILER_HAVE_LONGLONG
-__llrintl(*) = llrintl;
-__llroundl(*) = llroundl;
+%[insert:function(__llrintl = llrintl)]
+%[insert:function(__llroundl = llroundl)]
 %#endif /* __COMPILER_HAVE_LONGLONG */
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
 
 %
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
-__scalb(*) = scalb;
+%[insert:function(__scalb = scalb)]
 %#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 %#ifdef __USE_MISC
-__scalbf(*) = scalbf;
+%[insert:function(__scalbf = scalbf)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__scalbl(*) = scalbl;
+%[insert:function(__scalbl = scalbl)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 %#endif /* GLIBc aliases */
@@ -1920,16 +1920,16 @@ __issignalingl(*) %{generate(double2ldouble("__issignaling"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */
 
-[[ATTR_WUNUSED, ATTR_CONST, ignore, nocrt, alias(_dpcomp)]]
+[[ATTR_WUNUSED, ATTR_CONST, ignore, nocrt, alias("_dpcomp")]]
 int _dpcomp(double x, double y) /* TODO */;
 
-[[ignore, nocrt, alias(_fdpcomp)]] _fdpcomp(*) %{generate(double2float("_dpcomp"))}
-[[ignore, nocrt, alias(_ldpcomp)]] _ldpcomp(*) %{generate(double2ldouble("_dpcomp"))}
+[[ignore, nocrt, alias("_fdpcomp")]] _fdpcomp(*) %{generate(double2float("_dpcomp"))}
+[[ignore, nocrt, alias("_ldpcomp")]] _ldpcomp(*) %{generate(double2ldouble("_dpcomp"))}
 
-__dos_dpcomp(*) = _dpcomp;
-__dos_fdpcomp(*) = _fdpcomp;
+%[insert:function(__dos_dpcomp = _dpcomp)]
+%[insert:function(__dos_fdpcomp = _fdpcomp)]
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-__dos_ldpcomp(*) = _ldpcomp;
+%[insert:function(__dos_ldpcomp = _ldpcomp)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 

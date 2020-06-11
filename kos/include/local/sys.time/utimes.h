@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0892fdd */
+/* HASH CRC-32:0x3bac8cb9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,25 +19,21 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_utimes_defined
-#if defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE_utimes64)
 #define __local_utimes_defined 1
 #include <__crt.h>
-/* Dependency: "utimes32" from "sys.time" */
-#ifndef ____localdep_utimes32_defined
-#define ____localdep_utimes32_defined 1
-#ifdef __CRT_HAVE_utimes
+#if defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE_utimes64)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: utimes32 from sys.time */
+#if !defined(__local___localdep_utimes32_defined) && defined(__CRT_HAVE_utimes)
+#define __local___localdep_utimes32_defined 1
 /* Change the access time of FILE to TVP[0] and the modification time of
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
  * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_utimes32,(char const *__file, struct __timeval32 const __tvp[2]),utimes,(__file,__tvp))
-#else /* LIBC: utimes */
-#undef ____localdep_utimes32_defined
-#endif /* utimes32... */
-#endif /* !____localdep_utimes32_defined */
-
-/* Dependency: "utimes64" from "sys.time" */
-#ifndef ____localdep_utimes64_defined
-#define ____localdep_utimes64_defined 1
+#endif /* !__local___localdep_utimes32_defined && __CRT_HAVE_utimes */
+/* Dependency: utimes64 from sys.time */
+#ifndef __local___localdep_utimes64_defined
+#define __local___localdep_utimes64_defined 1
 #ifdef __CRT_HAVE_utimes64
 /* Change the access time of FILE to TVP[0] and the modification time of
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
@@ -49,24 +45,22 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_utimes64,(char cons
  * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_utimes64,(char const *__file, struct __timeval64 const __tvp[2]),utimes,(__file,__tvp))
 #elif defined(__CRT_HAVE_utimes)
+__NAMESPACE_LOCAL_END
 #include <local/sys.time/utimes64.h>
-/* Change the access time of FILE to TVP[0] and the modification time of
- * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
- * Returns 0 on success, -1 on errors */
-#define __localdep_utimes64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimes64))
-#else /* CUSTOM: utimes64 */
-#undef ____localdep_utimes64_defined
-#endif /* utimes64... */
-#endif /* !____localdep_utimes64_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* Change the access time of FILE to TVP[0] and the modification time of
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
  * Returns 0 on success, -1 on errors */
+#define __localdep_utimes64 __LIBC_LOCAL_NAME(utimes64)
+#else /* ... */
+#undef __local___localdep_utimes64_defined
+#endif /* !... */
+#endif /* !__local___localdep_utimes64_defined */
+/* Change the access time of FILE to TVP[0] and the modification time of
+ * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
+ * Returns 0 on success, -1 on errors */
 __LOCAL_LIBC(utimes) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(utimes))(char const *__file,
-                                                    struct timeval const __tvp[2]) {
-#line 253 "kos/src/libc/magic/sys.time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(utimes))(char const *__file, struct timeval const __tvp[2]) {
 #ifdef __CRT_HAVE_utimes
 	struct __timeval32 __tv32[2];
 	if (!__tvp)
@@ -88,5 +82,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(utimes))(char const *__file,
 #endif /* !__CRT_HAVE_utimes */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_utimes || __CRT_HAVE_utimes64 */
+#ifndef __local___localdep_utimes_defined
+#define __local___localdep_utimes_defined 1
+#define __localdep_utimes __LIBC_LOCAL_NAME(utimes)
+#endif /* !__local___localdep_utimes_defined */
+#else /* __CRT_HAVE_utimes || __CRT_HAVE_utimes64 */
+#undef __local_utimes_defined
+#endif /* !__CRT_HAVE_utimes && !__CRT_HAVE_utimes64 */
 #endif /* !__local_utimes_defined */

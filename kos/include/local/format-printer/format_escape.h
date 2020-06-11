@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe319cb58 */
+/* HASH CRC-32:0xd70d0c4b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,26 +22,36 @@
 #define __local_format_escape_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
-
-
-
-
 #include <bits/format-printer.h>
-
-/* Dependency: "unicode_readutf8_n" from "unicode" */
-#ifndef ____localdep_unicode_readutf8_n_defined
-#define ____localdep_unicode_readutf8_n_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: unicode_readutf8_n from unicode */
+#ifndef __local___localdep_unicode_readutf8_n_defined
+#define __local___localdep_unicode_readutf8_n_defined 1
 #ifdef __CRT_HAVE_unicode_readutf8_n
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(/*utf-8*/ char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
-#else /* LIBC: unicode_readutf8_n */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
+#else /* __CRT_HAVE_unicode_readutf8_n */
+__NAMESPACE_LOCAL_END
 #include <local/unicode/unicode_readutf8_n.h>
-/* Same as `unicode_readutf8()', but don't read past `text_end' */
-#define __localdep_unicode_readutf8_n (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_n))
-#endif /* unicode_readutf8_n... */
-#endif /* !____localdep_unicode_readutf8_n_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `unicode_readutf8()', but don't read past `text_end' */
+#define __localdep_unicode_readutf8_n __LIBC_LOCAL_NAME(unicode_readutf8_n)
+#endif /* !__CRT_HAVE_unicode_readutf8_n */
+#endif /* !__local___localdep_unicode_readutf8_n_defined */
+/* Dependency: unicode_readutf16_n from unicode */
+#ifndef __local___localdep_unicode_readutf16_n_defined
+#define __local___localdep_unicode_readutf16_n_defined 1
+#ifdef __CRT_HAVE_unicode_readutf16_n
+/* Same as `unicode_readutf16()', but don't read past `text_end' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf16_n,(__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_end),unicode_readutf16_n,(__ptext,__text_end))
+#else /* __CRT_HAVE_unicode_readutf16_n */
+__NAMESPACE_LOCAL_END
+#include <local/unicode/unicode_readutf16_n.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `unicode_readutf16()', but don't read past `text_end' */
+#define __localdep_unicode_readutf16_n __LIBC_LOCAL_NAME(unicode_readutf16_n)
+#endif /* !__CRT_HAVE_unicode_readutf16_n */
+#endif /* !__local___localdep_unicode_readutf16_n_defined */
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -56,12 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __LOCAL_LIBC(format_escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(format_escape))(__pformatprinter __printer,
-                                              void *__arg,
-                                              /*utf-8*/ char const *__restrict __text,
-                                              __SIZE_TYPE__ __textlen,
-                                              unsigned int __flags) __THROWS(...) {
-#line 219 "kos/src/libc/magic/format-printer.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(format_escape))(__pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) {
 #define __escape_tooct(__c) ('0' + (char)(unsigned char)(__c))
 #ifndef __DECIMALS_SELECTOR
 #define __LOCAL_DECIMALS_SELECTOR_DEFINED 1
@@ -86,16 +91,15 @@ __LOCAL_LIBC(format_escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 	}
 	while (__text < __textend) {
 		char const *__old_text = __text;
-
-
-
-
-
-
-
-
-		__UINT32_TYPE__ __ch = __localdep_unicode_readutf8_n((char const **)&__text, __textend);
-
+		__UINT32_TYPE__ __ch;
+#if __SIZEOF_CHAR__ == 1
+		__ch = __localdep_unicode_readutf8_n((char const **)&__text, __textend);
+#elif __SIZEOF_CHAR__ == 2
+		__ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__text,
+		                         (__CHAR16_TYPE__ const *)__textend);
+#else /* ... */
+		__ch = (__UINT32_TYPE__)*__text++;
+#endif /* !... */
 		if __unlikely(__ch < 32 || __ch >= 127  || __ch == '\'' ||
 		              __ch == '\"' || __ch == '\\' ||
 		             (__flags & 0x0010)) {
@@ -116,16 +120,15 @@ __default_ctrl:
 __encode_oct:
 					if (__text < __textend) {
 						char const *__new_text = __text;
-
-
-
-
-
-
-
-
-						__UINT32_TYPE__ __next_ch = __localdep_unicode_readutf8_n((char const **)&__new_text, __textend);
-
+						__UINT32_TYPE__ __next_ch;
+#if __SIZEOF_CHAR__ == 1
+						__next_ch = __localdep_unicode_readutf8_n((char const **)&__new_text, __textend);
+#elif __SIZEOF_CHAR__ == 2
+						__next_ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text,
+						                              (__CHAR16_TYPE__ const *)__textend);
+#else /* ... */
+						__next_ch = (__UINT32_TYPE__)*__new_text++;
+#endif /* !... */
 						if (__next_ch >= '0' && __next_ch <= '7')
 							goto __encode_hex;
 					}
@@ -254,16 +257,15 @@ __special_control:
 __encode_hex:
 				if (__text < __textend) {
 					char const *__new_text = __text;
-
-
-
-
-
-
-
-
-					__UINT32_TYPE__ __next_ch = __localdep_unicode_readutf8_n((char const **)&__new_text, __textend);
-
+					__UINT32_TYPE__ __next_ch;
+#if __SIZEOF_CHAR__ == 1
+					__next_ch = __localdep_unicode_readutf8_n((char const **)&__new_text, __textend);
+#elif __SIZEOF_CHAR__ == 2
+					__next_ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text,
+					                              (__CHAR16_TYPE__ const *)__textend);
+#else /* ... */
+					__next_ch = (__UINT32_TYPE__)*__new_text++;
+#endif /* !... */
 					if ((__next_ch >= 'a' && __next_ch <= 'f') ||
 					    (__next_ch >= 'A' && __next_ch <= 'F') ||
 					    (__next_ch >= '0' && __next_ch <= '9'))
@@ -332,4 +334,8 @@ __err:
 #undef __escape_tooct
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_escape_defined
+#define __local___localdep_format_escape_defined 1
+#define __localdep_format_escape __LIBC_LOCAL_NAME(format_escape)
+#endif /* !__local___localdep_format_escape_defined */
 #endif /* !__local_format_escape_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd54ab4f */
+/* HASH CRC-32:0x9d5b7343 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,41 +21,34 @@
 #ifndef __local__splitpath_s_defined
 #define __local__splitpath_s_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <parts/errno.h>
-/* Dependency: "memcpyc" from "string" */
-#ifndef ____localdep_memcpyc_defined
-#define ____localdep_memcpyc_defined 1
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcpyc from string */
+#ifndef __local___localdep_memcpyc_defined
+#define __local___localdep_memcpyc_defined 1
 #ifdef __fast_memcpyc_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))
+__NAMESPACE_FAST_USING(memcpyc)
+#define __localdep_memcpyc __LIBC_FAST_NAME(memcpyc)
 #elif defined(__CRT_HAVE_memcpyc)
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
-#else /* LIBC: memcpyc */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))
-#endif /* memcpyc... */
-#endif /* !____localdep_memcpyc_defined */
-
+#define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
+#endif /* !... */
+#endif /* !__local___localdep_memcpyc_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_splitpath_s) __ATTR_NONNULL((1)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath_s))(char const *__restrict __abspath,
-                                                          char *__drive,
-                                                          __SIZE_TYPE__ __drivelen,
-                                                          char *__dir,
-                                                          __SIZE_TYPE__ __dirlen,
-                                                          char *__file,
-                                                          __SIZE_TYPE__ __filelen,
-                                                          char *__ext,
-                                                          __SIZE_TYPE__ __extlen) {
-#line 3190 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath_s))(char const *__restrict __abspath, char *__drive, __SIZE_TYPE__ __drivelen, char *__dir, __SIZE_TYPE__ __dirlen, char *__file, __SIZE_TYPE__ __filelen, char *__ext, __SIZE_TYPE__ __extlen) {
 	__SIZE_TYPE__ __len, __last_slash, __last_dot;
 	if __unlikely(!__abspath)
 		goto __err_inval;
@@ -126,13 +119,13 @@ __got_drive:
 	}
 	return 0;
 __err_inval:
-#ifdef __EINVAL
+#ifdef EINVAL
 	return __EINVAL;
 #else /* EINVAL */
 	return 1;
 #endif /* !EINVAL */
 __err_range:
-#ifdef __ERANGE
+#ifdef ERANGE
 	__libc_seterrno(__ERANGE);
 	return __ERANGE;
 #else /* ERANGE */
@@ -140,4 +133,8 @@ __err_range:
 #endif /* !ERANGE */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__splitpath_s_defined
+#define __local___localdep__splitpath_s_defined 1
+#define __localdep__splitpath_s __LIBC_LOCAL_NAME(_splitpath_s)
+#endif /* !__local___localdep__splitpath_s_defined */
 #endif /* !__local__splitpath_s_defined */

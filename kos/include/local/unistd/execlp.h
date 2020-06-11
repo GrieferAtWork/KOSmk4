@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad42da77 */
+/* HASH CRC-32:0x60a6196e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,18 +19,24 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_execlp_defined
-#if defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp)
 #define __local_execlp_defined 1
 #include <__crt.h>
-#include <parts/redirect-exec.h>
-/* Dependency: "execvp" */
-#ifndef ____localdep_execvp_defined
-#define ____localdep_execvp_defined 1
-#if __has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execvp)
+#if defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: execvp from unistd */
+#ifndef __local___localdep_execvp_defined
+#define __local___localdep_execvp_defined 1
+#ifdef __execvp_defined
 /* >> execvp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL __localdep_execvp)(char const *__restrict __file, __TARGV) { return __builtin_execvp(__file, (char *const *)___argv); }
+__NAMESPACE_GLB_USING(execvp)
+#define __localdep_execvp execvp
+#elif __has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execvp)
+/* >> execvp(3)
+ * Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
+__CEIREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_execvp,(char const *__restrict __file, __TARGV),execvp,{ return __builtin_execvp(__file, (char *const *)___argv); })
 #elif defined(__CRT_HAVE_execvp)
 /* >> execvp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -41,22 +47,26 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_execvp,(char con
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_execvp,(char const *__restrict __file, __TARGV),_execvp,(__file,___argv))
-#else /* LIBC: execvp */
-#undef ____localdep_execvp_defined
-#endif /* execvp... */
-#endif /* !____localdep_execvp_defined */
-
+#else /* ... */
+#undef __local___localdep_execvp_defined
+#endif /* !... */
+#endif /* !__local___localdep_execvp_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 __LOCAL_LIBC(execlp) __ATTR_SENTINEL __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(execlp))(char const *__restrict __file,
-                                                     char const *__args,
-                                                     ... /*, (char *)NULL*/) {
-#line 293 "kos/src/libc/magic/unistd.c"
+__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(execlp))(char const *__restrict __file, char const *__args, ...) {
 	__REDIRECT_EXECL(char, __localdep_execvp, __file, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_execvp || __CRT_HAVE__execvp */
+#ifndef __local___localdep_execlp_defined
+#define __local___localdep_execlp_defined 1
+#define __localdep_execlp __LIBC_LOCAL_NAME(execlp)
+#endif /* !__local___localdep_execlp_defined */
+#else /* __CRT_HAVE_execvp || __CRT_HAVE__execvp */
+#undef __local_execlp_defined
+#endif /* !__CRT_HAVE_execvp && !__CRT_HAVE__execvp */
 #endif /* !__local_execlp_defined */

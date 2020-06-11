@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf38b781 */
+/* HASH CRC-32:0xe993fe64 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,56 +21,52 @@
 #ifndef __local_format_snprintf_printer_defined
 #define __local_format_snprintf_printer_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <hybrid/typecore.h>
-/* Dependency: "memcpyc" from "string" */
-#ifndef ____localdep_memcpyc_defined
-#define ____localdep_memcpyc_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcpyc from string */
+#ifndef __local___localdep_memcpyc_defined
+#define __local___localdep_memcpyc_defined 1
 #ifdef __fast_memcpyc_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))
+__NAMESPACE_FAST_USING(memcpyc)
+#define __localdep_memcpyc __LIBC_FAST_NAME(memcpyc)
 #elif defined(__CRT_HAVE_memcpyc)
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
-#else /* LIBC: memcpyc */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))
-#endif /* memcpyc... */
-#endif /* !____localdep_memcpyc_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
+#endif /* !... */
+#endif /* !__local___localdep_memcpyc_defined */
 /* Format-printer implementation for printing to a string buffer like `snprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
- * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
+ * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
+ *       the sum of return values of all calls to `format_snprintf_printer()' */
 __LOCAL_LIBC(format_snprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_snprintf_printer))(/*struct format_snprintf_data**/ void *__arg,
-                                                                     /*utf-8*/ char const *__restrict __data,
-                                                                     __SIZE_TYPE__ __datalen) {
-#line 1026 "kos/src/libc/magic/format-printer.c"
-	struct __format_snprintf_data_ {
-		char         *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
-		__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_snprintf_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
+	struct format_snprintf_data_ {
+		char   *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
+		__SIZE_TYPE__  __sd_bufsiz; /* Remaining buffer size. */
 	};
-	struct __format_snprintf_data_ *__ctrl;
+	struct format_snprintf_data_ *__ctrl;
 	__SIZE_TYPE__ __result = __datalen;
-	__ctrl = (struct __format_snprintf_data_ *)__arg;
+	__ctrl = (struct format_snprintf_data_ *)__arg;
 	if (__result > __ctrl->__sd_bufsiz)
 		__result = __ctrl->__sd_bufsiz;
-
-
-
 	__localdep_memcpyc(__ctrl->__sd_buffer, __data, __result, sizeof(char));
-
 	__ctrl->__sd_buffer += __datalen;
 	__ctrl->__sd_bufsiz -= __result;
 	return (__SSIZE_TYPE__)__datalen;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_snprintf_printer_defined
+#define __local___localdep_format_snprintf_printer_defined 1
+#define __localdep_format_snprintf_printer __LIBC_LOCAL_NAME(format_snprintf_printer)
+#endif /* !__local___localdep_format_snprintf_printer_defined */
 #endif /* !__local_format_snprintf_printer_defined */

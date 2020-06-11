@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0733dab */
+/* HASH CRC-32:0x60f9d5f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,39 +19,45 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__calloc_dbg_defined
-#if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #define __local__calloc_dbg_defined 1
 #include <__crt.h>
-/* Dependency: "calloc" from "stdlib" */
-#ifndef ____localdep_calloc_defined
-#define ____localdep_calloc_defined 1
-#ifdef __std___localdep_calloc_defined
-__NAMESPACE_STD_USING(__localdep_calloc)
+#if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: calloc from stdlib */
+#ifndef __local___localdep_calloc_defined
+#define __local___localdep_calloc_defined 1
+#ifdef __calloc_defined
+__NAMESPACE_GLB_USING(calloc)
+#define __localdep_calloc calloc
+#elif defined(__std_calloc_defined)
+__NAMESPACE_STD_USING(calloc)
+#define __localdep_calloc calloc
 #elif __has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),calloc,{ return __builtin_calloc(__count, __num_bytes); })
 #elif defined(__CRT_HAVE_calloc)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),calloc,(__count,__num_bytes))
-#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/calloc.h>
-#define __localdep_calloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(calloc))
-#else /* CUSTOM: calloc */
-#undef ____localdep_calloc_defined
-#endif /* calloc... */
-#endif /* !____localdep_calloc_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_calloc __LIBC_LOCAL_NAME(calloc)
+#else /* ... */
+#undef __local___localdep_calloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_calloc_defined */
 __LOCAL_LIBC(_calloc_dbg) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_calloc_dbg))(__SIZE_TYPE__ __count,
-                                                         __SIZE_TYPE__ __num_bytes,
-                                                         int __block_type,
-                                                         char const *__filename,
-                                                         int __line) {
-#line 298 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_calloc_dbg))(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
 	return __localdep_calloc(__count, __num_bytes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_posix_memalign || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_malloc */
+#ifndef __local___localdep__calloc_dbg_defined
+#define __local___localdep__calloc_dbg_defined 1
+#define __localdep__calloc_dbg __LIBC_LOCAL_NAME(_calloc_dbg)
+#endif /* !__local___localdep__calloc_dbg_defined */
+#else /* __CRT_HAVE_calloc || __CRT_HAVE_malloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+#undef __local__calloc_dbg_defined
+#endif /* !__CRT_HAVE_calloc && !__CRT_HAVE_malloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
 #endif /* !__local__calloc_dbg_defined */

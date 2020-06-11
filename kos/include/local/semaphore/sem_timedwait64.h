@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d997f54 */
+/* HASH CRC-32:0x5d1abb04 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,29 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sem_timedwait64_defined
-#ifdef __CRT_HAVE_sem_timedwait
 #define __local_sem_timedwait64_defined 1
 #include <__crt.h>
-/* Dependency: "sem_timedwait32" from "semaphore" */
-#ifndef ____localdep_sem_timedwait32_defined
-#define ____localdep_sem_timedwait32_defined 1
 #ifdef __CRT_HAVE_sem_timedwait
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: sem_timedwait32 from semaphore */
+#if !defined(__local___localdep_sem_timedwait32_defined) && defined(__CRT_HAVE_sem_timedwait)
+#define __local___localdep_sem_timedwait32_defined 1
 /* Similar to `sem_wait' but wait only until ABSTIME */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,(sem_t *__restrict __sem, struct __timespec32 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
-#else /* LIBC: sem_timedwait */
-#undef ____localdep_sem_timedwait32_defined
-#endif /* sem_timedwait32... */
-#endif /* !____localdep_sem_timedwait32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
-/* Similar to `sem_wait' but wait only until ABSTIME */
+#endif /* !__local___localdep_sem_timedwait32_defined && __CRT_HAVE_sem_timedwait */
 __LOCAL_LIBC(sem_timedwait64) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait64))(sem_t *__restrict __sem,
-                                                             struct __timespec64 const *__restrict __abstime) {
-#line 112 "kos/src/libc/magic/semaphore.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait64))(sem_t *__restrict __sem, struct __timespec64 const *__restrict __abstime) {
 	struct __timespec32 __ts32;
 	__ts32.tv_sec  = (__time32_t)__abstime->tv_sec;
 	__ts32.tv_nsec = __abstime->tv_nsec;
 	return __localdep_sem_timedwait32(__sem, &__ts32);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_sem_timedwait */
+#ifndef __local___localdep_sem_timedwait64_defined
+#define __local___localdep_sem_timedwait64_defined 1
+#define __localdep_sem_timedwait64 __LIBC_LOCAL_NAME(sem_timedwait64)
+#endif /* !__local___localdep_sem_timedwait64_defined */
+#else /* __CRT_HAVE_sem_timedwait */
+#undef __local_sem_timedwait64_defined
+#endif /* !__CRT_HAVE_sem_timedwait */
 #endif /* !__local_sem_timedwait64_defined */

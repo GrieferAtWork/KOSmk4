@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8119b0c */
+/* HASH CRC-32:0xc89bfd4d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,37 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_spawnle_defined
-#if defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve)
 #define __local_spawnle_defined 1
 #include <__crt.h>
-#include <parts/redirect-exec.h>
-/* Dependency: "spawnve" */
-#ifndef ____localdep_spawnve_defined
-#define ____localdep_spawnve_defined 1
-#ifdef __CRT_HAVE_spawnve
+#if defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: spawnve from process */
+#ifndef __local___localdep_spawnve_defined
+#define __local___localdep_spawnve_defined 1
+#ifdef __spawnve_defined
+__NAMESPACE_GLB_USING(spawnve)
+#define __localdep_spawnve spawnve
+#elif defined(__CRT_HAVE_spawnve)
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_spawnve,(int __mode, char const *__restrict __path, __TARGV, __TENVP),spawnve,(__mode,__path,___argv,___envp))
 #elif defined(__CRT_HAVE__spawnve)
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_spawnve,(int __mode, char const *__restrict __path, __TARGV, __TENVP),_spawnve,(__mode,__path,___argv,___envp))
-#else /* LIBC: spawnve */
-#undef ____localdep_spawnve_defined
-#endif /* spawnve... */
-#endif /* !____localdep_spawnve_defined */
-
+#else /* ... */
+#undef __local___localdep_spawnve_defined
+#endif /* !... */
+#endif /* !__local___localdep_spawnve_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(spawnle) __ATTR_NONNULL((2)) __ATTR_SENTINEL_O(1) __pid_t
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(spawnle))(int __mode,
-                                                      char const *__restrict __path,
-                                                      char const *__args,
-                                                      ... /*, (char *)NULL, char **environ*/) {
-#line 256 "kos/src/libc/magic/process.c"
+__LOCAL_LIBC(spawnle) __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t
+__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(spawnle))(int __mode, char const *__restrict __path, char const *__args, ...) {
 	__REDIRECT_SPAWNLE(char, __localdep_spawnve, __mode, __path, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_spawnve || __CRT_HAVE__spawnve */
+#ifndef __local___localdep_spawnle_defined
+#define __local___localdep_spawnle_defined 1
+#define __localdep_spawnle __LIBC_LOCAL_NAME(spawnle)
+#endif /* !__local___localdep_spawnle_defined */
+#else /* __CRT_HAVE_spawnve || __CRT_HAVE__spawnve */
+#undef __local_spawnle_defined
+#endif /* !__CRT_HAVE_spawnve && !__CRT_HAVE__spawnve */
 #endif /* !__local_spawnle_defined */

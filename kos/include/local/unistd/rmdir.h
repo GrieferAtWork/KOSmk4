@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b1626a0 */
+/* HASH CRC-32:0xf16dad13 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,29 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_rmdir_defined
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #define __local_rmdir_defined 1
 #include <__crt.h>
-/* Dependency: "unlinkat" */
-#ifndef ____localdep_unlinkat_defined
-#define ____localdep_unlinkat_defined 1
-#ifdef __CRT_HAVE_unlinkat
+#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: unlinkat from unistd */
+#if !defined(__local___localdep_unlinkat_defined) && defined(__CRT_HAVE_unlinkat)
+#define __local___localdep_unlinkat_defined 1
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_unlinkat,(__fd_t __dfd, char const *__name, __atflag_t __flags),unlinkat,(__dfd,__name,__flags))
-#else /* LIBC: unlinkat */
-#undef ____localdep_unlinkat_defined
-#endif /* unlinkat... */
-#endif /* !____localdep_unlinkat_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_unlinkat_defined && __CRT_HAVE_unlinkat */
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __LOCAL_LIBC(rmdir) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(rmdir))(char const *__path) {
-#line 733 "kos/src/libc/magic/unistd.c"
 	return __localdep_unlinkat(__CRT_AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && __CRT_HAVE_unlinkat */
+#ifndef __local___localdep_rmdir_defined
+#define __local___localdep_rmdir_defined 1
+#define __localdep_rmdir __LIBC_LOCAL_NAME(rmdir)
+#endif /* !__local___localdep_rmdir_defined */
+#else /* __CRT_AT_FDCWD && __CRT_HAVE_unlinkat */
+#undef __local_rmdir_defined
+#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_unlinkat */
 #endif /* !__local_rmdir_defined */

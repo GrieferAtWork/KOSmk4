@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bf5bcdd */
+/* HASH CRC-32:0xad229676 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,28 @@
 #ifndef __local_iswlower_defined
 #define __local_iswlower_defined 1
 #include <__crt.h>
-/* Dependency: "islower" from "ctype" */
-#ifndef ____localdep_islower_defined
-#define ____localdep_islower_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: islower from ctype */
+#ifndef __local___localdep_islower_defined
+#define __local___localdep_islower_defined 1
 #if __has_builtin(__builtin_islower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_islower)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,{ return __builtin_islower(__ch); })
 #elif defined(__CRT_HAVE_islower)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,(__ch))
-#else /* LIBC: islower */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/islower.h>
-#define __localdep_islower (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(islower))
-#endif /* islower... */
-#endif /* !____localdep_islower_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_islower __LIBC_LOCAL_NAME(islower)
+#endif /* !... */
+#endif /* !__local___localdep_islower_defined */
 __LOCAL_LIBC(iswlower) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswlower))(__WINT_TYPE__ __wc) {
-#line 138 "kos/src/libc/magic/wctype.c"
 	return __localdep_islower((int)__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswlower_defined
+#define __local___localdep_iswlower_defined 1
+#define __localdep_iswlower __LIBC_LOCAL_NAME(iswlower)
+#endif /* !__local___localdep_iswlower_defined */
 #endif /* !__local_iswlower_defined */

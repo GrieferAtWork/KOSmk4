@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ad8d83f */
+/* HASH CRC-32:0x495517e6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,28 +19,34 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wprintf_p_defined
-#if !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE__vwprintf_p)
 #define __local__wprintf_p_defined 1
 #include <__crt.h>
-#include <kos/anno.h>
-/* Dependency: "_vwprintf_p" from "wchar" */
-#ifndef ____localdep__vwprintf_p_defined
-#define ____localdep__vwprintf_p_defined 1
-#ifdef __CRT_HAVE__vwprintf_p
-__CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_p,(__WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vwprintf_p,(__format,__args))
-#elif !defined(__NO_STDSTREAMS)
-#include <local/wchar/_vwprintf_p.h>
-#define __localdep__vwprintf_p (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vwprintf_p))
-#else /* CUSTOM: _vwprintf_p */
-#undef ____localdep__vwprintf_p_defined
-#endif /* _vwprintf_p... */
-#endif /* !____localdep__vwprintf_p_defined */
-
+#if defined(__CRT_HAVE__vwprintf_p) || (defined(__CRT_HAVE_DOS$_vwprintf_p) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_vwprintf_p) && __SIZEOF_WCHAR_T__ == 2) || !defined(__NO_STDSTREAMS)
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _vwprintf_p from wchar */
+#ifndef __local___localdep__vwprintf_p_defined
+#define __local___localdep__vwprintf_p_defined 1
+#ifdef ___vwprintf_p_defined
+__NAMESPACE_GLB_USING(_vwprintf_p)
+#define __localdep__vwprintf_p _vwprintf_p
+#elif defined(__CRT_HAVE__vwprintf_p)
+__CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_p,(__WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vwprintf_p,(__format,__args))
+#elif defined(__CRT_HAVE_DOS$_vwprintf_p) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_p,(__CHAR32_TYPE__ const *__format, __builtin_va_list __args),_vwprintf_p,(__format,__args))
+#elif defined(__CRT_HAVE_DOS$_vwprintf_p) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_p,(__CHAR16_TYPE__ const *__format, __builtin_va_list __args),_vwprintf_p,(__format,__args))
+#elif !defined(__NO_STDSTREAMS)
+__NAMESPACE_LOCAL_END
+#include <local/wchar/_vwprintf_p.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__vwprintf_p __LIBC_LOCAL_NAME(_vwprintf_p)
+#else /* ... */
+#undef __local___localdep__vwprintf_p_defined
+#endif /* !... */
+#endif /* !__local___localdep__vwprintf_p_defined */
 __LOCAL_LIBC(_wprintf_p) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
-(__VLIBCCALL __LIBC_LOCAL_NAME(_wprintf_p))(__WCHAR_TYPE__ const *__format,
-                                            ...) __THROWS(...) {
-#line 1933 "kos/src/libc/magic/wchar.c"
+(__VLIBCCALL __LIBC_LOCAL_NAME(_wprintf_p))(__WCHAR_TYPE__ const *__format, ...) __THROWS(...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
@@ -49,5 +55,11 @@ __LOCAL_LIBC(_wprintf_p) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__NO_STDSTREAMS || __CRT_HAVE__vwprintf_p */
+#ifndef __local___localdep__wprintf_p_defined
+#define __local___localdep__wprintf_p_defined 1
+#define __localdep__wprintf_p __LIBC_LOCAL_NAME(_wprintf_p)
+#endif /* !__local___localdep__wprintf_p_defined */
+#else /* __CRT_HAVE__vwprintf_p || (__CRT_HAVE_DOS$_vwprintf_p && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$_vwprintf_p && __SIZEOF_WCHAR_T__ == 2) || !__NO_STDSTREAMS */
+#undef __local__wprintf_p_defined
+#endif /* !__CRT_HAVE__vwprintf_p && (!__CRT_HAVE_DOS$_vwprintf_p || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$_vwprintf_p || !__SIZEOF_WCHAR_T__ == 2) && __NO_STDSTREAMS */
 #endif /* !__local__wprintf_p_defined */

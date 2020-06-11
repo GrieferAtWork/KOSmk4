@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc239e347 */
+/* HASH CRC-32:0x82cddf9d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,42 @@
 #ifndef __local_wcscoll_defined
 #define __local_wcscoll_defined 1
 #include <__crt.h>
-/* Dependency: "wcscmp" from "wchar" */
-#ifndef ____localdep_wcscmp_defined
-#define ____localdep_wcscmp_defined 1
-#ifdef __std___localdep_wcscmp_defined
-__NAMESPACE_STD_USING(__localdep_wcscmp)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcscmp from wchar */
+#ifndef __local___localdep_wcscmp_defined
+#define __local___localdep_wcscmp_defined 1
+#ifdef __wcscmp_defined
+/* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
+__NAMESPACE_GLB_USING(wcscmp)
+#define __localdep_wcscmp wcscmp
+#elif defined(__std_wcscmp_defined)
+/* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
+__NAMESPACE_STD_USING(wcscmp)
+#define __localdep_wcscmp wcscmp
 #elif defined(__CRT_HAVE_wcscmp)
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscmp,(__s1,__s2))
-#else /* LIBC: wcscmp */
-#include <local/wchar/wcscmp.h>
+#elif defined(__CRT_HAVE_DOS$wcscmp) && __SIZEOF_WCHAR_T__ == 4
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-#define __localdep_wcscmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscmp))
-#endif /* wcscmp... */
-#endif /* !____localdep_wcscmp_defined */
-
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2),wcscmp,(__s1,__s2))
+#elif defined(__CRT_HAVE_DOS$wcscmp) && __SIZEOF_WCHAR_T__ == 2
+/* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2),wcscmp,(__s1,__s2))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wcscmp.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
+#define __localdep_wcscmp __LIBC_LOCAL_NAME(wcscmp)
+#endif /* !... */
+#endif /* !__local___localdep_wcscmp_defined */
 __LOCAL_LIBC(wcscoll) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscoll))(__WCHAR_TYPE__ const *__s1,
-                                                     __WCHAR_TYPE__ const *__s2) {
-#line 418 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscoll))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2) {
 	return __localdep_wcscmp(__s1, __s2);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcscoll_defined
+#define __local___localdep_wcscoll_defined 1
+#define __localdep_wcscoll __LIBC_LOCAL_NAME(wcscoll)
+#endif /* !__local___localdep_wcscoll_defined */
 #endif /* !__local_wcscoll_defined */

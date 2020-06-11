@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54a2c8b3 */
+/* HASH CRC-32:0xb4630a88 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,29 +21,33 @@
 #ifndef __local_strupr_defined
 #define __local_strupr_defined 1
 #include <__crt.h>
-/* Dependency: "toupper" from "ctype" */
-#ifndef ____localdep_toupper_defined
-#define ____localdep_toupper_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: toupper from ctype */
+#ifndef __local___localdep_toupper_defined
+#define __local___localdep_toupper_defined 1
 #if __has_builtin(__builtin_toupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_toupper)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),toupper,{ return __builtin_toupper(__ch); })
 #elif defined(__CRT_HAVE_toupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),toupper,(__ch))
 #elif defined(__CRT_HAVE__toupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),_toupper,(__ch))
-#else /* LIBC: toupper */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/toupper.h>
-#define __localdep_toupper (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toupper))
-#endif /* toupper... */
-#endif /* !____localdep_toupper_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_toupper __LIBC_LOCAL_NAME(toupper)
+#endif /* !... */
+#endif /* !__local___localdep_toupper_defined */
 __LOCAL_LIBC(strupr) __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strupr))(char *__restrict __str) {
-#line 4882 "kos/src/libc/magic/string.c"
 	char *__iter, __ch;
 	for (__iter = __str; (__ch = *__iter) != '\0'; ++__iter)
 		*__iter = __localdep_toupper(__ch);
 	return __str;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strupr_defined
+#define __local___localdep_strupr_defined 1
+#define __localdep_strupr __LIBC_LOCAL_NAME(strupr)
+#endif /* !__local___localdep_strupr_defined */
 #endif /* !__local_strupr_defined */

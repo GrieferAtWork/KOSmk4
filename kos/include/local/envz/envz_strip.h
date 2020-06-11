@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdde57f1 */
+/* HASH CRC-32:0xbcc46dd0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,74 +21,76 @@
 #ifndef __local_envz_strip_defined
 #define __local_envz_strip_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-/* Dependency: "strchrnul" from "string" */
-#ifndef ____localdep_strchrnul_defined
-#define ____localdep_strchrnul_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strchrnul from string */
+#ifndef __local___localdep_strchrnul_defined
+#define __local___localdep_strchrnul_defined 1
 #ifdef __CRT_HAVE_strchrnul
 /* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
-#else /* LIBC: strchrnul */
+#else /* __CRT_HAVE_strchrnul */
+__NAMESPACE_LOCAL_END
 #include <local/string/strchrnul.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_strchrnul (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strchrnul))
-#endif /* strchrnul... */
-#endif /* !____localdep_strchrnul_defined */
-
-/* Dependency: "strend" from "string" */
-#ifndef ____localdep_strend_defined
-#define ____localdep_strend_defined 1
-#ifdef __CRT_HAVE_strend
-/* Same as `STR + strlen(STR)' */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
-#else /* LIBC: strend */
-#include <local/string/strend.h>
-/* Same as `STR + strlen(STR)' */
-#define __localdep_strend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strend))
-#endif /* strend... */
-#endif /* !____localdep_strend_defined */
-
-/* Dependency: "memmovedownc" from "string" */
-#ifndef ____localdep_memmovedownc_defined
-#define ____localdep_memmovedownc_defined 1
+#define __localdep_strchrnul __LIBC_LOCAL_NAME(strchrnul)
+#endif /* !__CRT_HAVE_strchrnul */
+#endif /* !__local___localdep_strchrnul_defined */
+/* Dependency: memmovedownc from string */
+#ifndef __local___localdep_memmovedownc_defined
+#define __local___localdep_memmovedownc_defined 1
 #ifdef __fast_memmovedownc_defined
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
-#define __localdep_memmovedownc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownc))
+__NAMESPACE_FAST_USING(memmovedownc)
+#define __localdep_memmovedownc __LIBC_FAST_NAME(memmovedownc)
 #elif defined(__CRT_HAVE_memmovedownc)
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovedownc,(__dst,__src,__elem_count,__elem_size))
-#else /* LIBC: memmovedownc */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memmovedownc.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
-#define __localdep_memmovedownc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownc))
-#endif /* memmovedownc... */
-#endif /* !____localdep_memmovedownc_defined */
-
-/* Dependency: "realloc" */
-#ifndef ____localdep_realloc_defined
-#define ____localdep_realloc_defined 1
-#ifdef __std___localdep_realloc_defined
-__NAMESPACE_STD_USING(__localdep_realloc)
+#define __localdep_memmovedownc __LIBC_LOCAL_NAME(memmovedownc)
+#endif /* !... */
+#endif /* !__local___localdep_memmovedownc_defined */
+/* Dependency: realloc from stdlib */
+#ifndef __local___localdep_realloc_defined
+#define __local___localdep_realloc_defined 1
+#ifdef __realloc_defined
+__NAMESPACE_GLB_USING(realloc)
+#define __localdep_realloc realloc
+#elif defined(__std_realloc_defined)
+__NAMESPACE_STD_USING(realloc)
+#define __localdep_realloc realloc
 #elif __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
 __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
 #elif defined(__CRT_HAVE_realloc)
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
-#else /* LIBC: realloc */
-#undef ____localdep_realloc_defined
-#endif /* realloc... */
-#endif /* !____localdep_realloc_defined */
-
+#else /* ... */
+#undef __local___localdep_realloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_realloc_defined */
+/* Dependency: strend from string */
+#ifndef __local___localdep_strend_defined
+#define __local___localdep_strend_defined 1
+#ifdef __CRT_HAVE_strend
+/* Same as `STR + strlen(STR)' */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
+#else /* __CRT_HAVE_strend */
+__NAMESPACE_LOCAL_END
+#include <local/string/strend.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Same as `STR + strlen(STR)' */
+#define __localdep_strend __LIBC_LOCAL_NAME(strend)
+#endif /* !__CRT_HAVE_strend */
+#endif /* !__local___localdep_strend_defined */
 /* Remove entries that have no value attached */
 __LOCAL_LIBC(envz_strip) __ATTR_NONNULL((1, 2)) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_strip))(char **__restrict __penvz,
-                                                        __SIZE_TYPE__ *__restrict __penvz_len) {
-#line 166 "kos/src/libc/magic/envz.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_strip))(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len) {
 	char *__start, *__ptr, *__end;
 	__SIZE_TYPE__ __oldlen, __newlen;
 	__ptr = __start = *__penvz;
@@ -118,4 +120,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_strip))(char **__restrict __penv
 	}
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_envz_strip_defined
+#define __local___localdep_envz_strip_defined 1
+#define __localdep_envz_strip __LIBC_LOCAL_NAME(envz_strip)
+#endif /* !__local___localdep_envz_strip_defined */
 #endif /* !__local_envz_strip_defined */

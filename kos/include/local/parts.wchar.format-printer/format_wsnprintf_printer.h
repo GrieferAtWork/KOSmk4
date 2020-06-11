@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fe554c0 */
+/* HASH CRC-32:0xf077d9c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,49 +21,51 @@
 #ifndef __local_format_wsnprintf_printer_defined
 #define __local_format_wsnprintf_printer_defined 1
 #include <__crt.h>
-#include <hybrid/typecore.h>
-/* Dependency: "wmemcpy" from "wchar" */
-#ifndef ____localdep_wmemcpy_defined
-#define ____localdep_wmemcpy_defined 1
-#ifdef __CRT_HAVE_wmemcpy
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_memcpyw) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyw,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_memcpyl) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyl,(__dst,__src,__num_chars))
-#else /* LIBC: wmemcpy */
-#include <local/wchar/wmemcpy.h>
-#define __localdep_wmemcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcpy))
-#endif /* wmemcpy... */
-#endif /* !____localdep_wmemcpy_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcpyc from string */
+#ifndef __local___localdep_memcpyc_defined
+#define __local___localdep_memcpyc_defined 1
+#ifdef __fast_memcpyc_defined
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__NAMESPACE_FAST_USING(memcpyc)
+#define __localdep_memcpyc __LIBC_FAST_NAME(memcpyc)
+#elif defined(__CRT_HAVE_memcpyc)
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
+#endif /* !... */
+#endif /* !__local___localdep_memcpyc_defined */
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
 __LOCAL_LIBC(format_wsnprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wsnprintf_printer))(/*struct format_wsnprintf_data**/ void *__arg,
-                                                                      __WCHAR_TYPE__ const *__restrict __data,
-                                                                      __SIZE_TYPE__ __datalen) {
-#line 1026 "kos/src/libc/magic/format-printer.c"
-	struct __format_snprintf_data_ {
-		__WCHAR_TYPE__         *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
-		__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wsnprintf_printer))(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
+	struct format_snprintf_data_ {
+		__WCHAR_TYPE__   *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
+		__SIZE_TYPE__  __sd_bufsiz; /* Remaining buffer size. */
 	};
-	struct __format_snprintf_data_ *__ctrl;
+	struct format_snprintf_data_ *__ctrl;
 	__SIZE_TYPE__ __result = __datalen;
-	__ctrl = (struct __format_snprintf_data_ *)__arg;
+	__ctrl = (struct format_snprintf_data_ *)__arg;
 	if (__result > __ctrl->__sd_bufsiz)
 		__result = __ctrl->__sd_bufsiz;
-
-	__localdep_wmemcpy(__ctrl->__sd_buffer, __data, __result);
-
-
-
+	__localdep_memcpyc(__ctrl->__sd_buffer, __data, __result, sizeof(__WCHAR_TYPE__));
 	__ctrl->__sd_buffer += __datalen;
 	__ctrl->__sd_bufsiz -= __result;
 	return (__SSIZE_TYPE__)__datalen;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_wsnprintf_printer_defined
+#define __local___localdep_format_wsnprintf_printer_defined 1
+#define __localdep_format_wsnprintf_printer __LIBC_LOCAL_NAME(format_wsnprintf_printer)
+#endif /* !__local___localdep_format_wsnprintf_printer_defined */
 #endif /* !__local_format_wsnprintf_printer_defined */

@@ -56,25 +56,28 @@ process_vm_writev:($pid_t pid,
 %#endif /* __USE_GNU */
 
 %
-[[cp, ATTR_WUNUSED, decl_include("<bits/uio.h>")]]
+[[cp, ATTR_WUNUSED, decl_include("<bits/uio.h>", "<features.h>")]]
 ssize_t readv($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 
-[[cp, decl_include("<bits/uio.h>")]]
+[[cp, decl_include("<bits/uio.h>", "<features.h>")]]
 ssize_t writev($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 
 
 %
 %#ifdef __USE_MISC
 
-[[cp, decl_include("<bits/uio.h>"), ignore, nocrt, alias("preadv")]]
+[[cp, ignore, nocrt, alias("preadv")]]
+[[decl_include("<features.h>", "<bits/uio.h>")]]
 ssize_t preadv32($fd_t fd, [[inp(count)]] struct iovec const *iov,
                  __STDC_INT_AS_SIZE_T count, $off32_t offset);
 
-[[cp, decl_include("<bits/uio.h>"), ignore, nocrt, alias("pwritev")]]
+[[cp, ignore, nocrt, alias("pwritev")]]
+[[decl_include("<features.h>", "<bits/uio.h>")]]
 ssize_t pwritev32($fd_t fd, [[inp(count)]] struct iovec const *iov,
                   __STDC_INT_AS_SIZE_T count, $off32_t offset);
 
-[[cp, ATTR_WUNUSED, decl_include("<bits/uio.h>"), no_crt_self_import]]
+[[cp, ATTR_WUNUSED, no_crt_self_import]]
+[[decl_include("<features.h>", "<bits/uio.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("preadv64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("preadv")]]
 [[userimpl, requires($has_function(preadv32) || $has_function(preadv64))]]
@@ -87,7 +90,8 @@ ssize_t preadv($fd_t fd, [[inp(count)]] struct iovec const *iov,
 @@pp_endif@@
 }
 
-[[cp, decl_include("<bits/uio.h>"), no_crt_self_import]]
+[[cp, no_crt_self_import]]
+[[decl_include("<features.h>", "<bits/uio.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias(pwritev64)]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(pwritev)]]
 [[userimpl, requires($has_function(pwritev32) || $has_function(pwritev64))]]
@@ -102,14 +106,16 @@ ssize_t pwritev($fd_t fd, [[inp(count)]] struct iovec const *iov,
 
 %
 %#ifdef __USE_LARGEFILE64
-[[cp, ATTR_WUNUSED, off64_variant_of(preadv)]]
+[[cp, ATTR_WUNUSED, doc_alias("preadv"), off64_variant_of(preadv)]]
+[[decl_include("<features.h>", "<bits/uio.h>")]]
 [[userimpl, requires_function(preadv32)]]
 ssize_t preadv64($fd_t fd, [[inp(count)]] struct iovec const *iov,
                  __STDC_INT_AS_SIZE_T count, $off64_t offset) {
 	return preadv32(fd, iov, count, (off32_t)offset);
 }
 
-[[cp, off64_variant_of(pwritev)]]
+[[cp, doc_alias("pwritev"), off64_variant_of(pwritev)]]
+[[decl_include("<features.h>", "<bits/uio.h>")]]
 [[userimpl, requires_function(pwritev32)]]
 ssize_t pwritev64($fd_t fd, [[inp(count)]] struct iovec const *iov,
                   __STDC_INT_AS_SIZE_T count, $off64_t offset) {

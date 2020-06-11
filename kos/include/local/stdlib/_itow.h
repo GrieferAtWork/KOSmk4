@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44d4201d */
+/* HASH CRC-32:0xe8174f14 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,46 @@
 #ifndef __local__itow_defined
 #define __local__itow_defined 1
 #include <__crt.h>
-/* Dependency: "_itow_s" from "stdlib" */
-#ifndef ____localdep__itow_s_defined
-#define ____localdep__itow_s_defined 1
-#ifdef __CRT_HAVE__itow_s
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep__itow_s,(int __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_itow_s,(__val,__buf,__buflen,__radix))
-#else /* LIBC: _itow_s */
-#include <local/stdlib/_itow_s.h>
-#define __localdep__itow_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_itow_s))
-#endif /* _itow_s... */
-#endif /* !____localdep__itow_s_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _itow_s from stdlib */
+#ifndef __local___localdep__itow_s_defined
+#define __local___localdep__itow_s_defined 1
+#ifdef ___itow_s_defined
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__NAMESPACE_GLB_USING(_itow_s)
+#define __localdep__itow_s _itow_s
+#elif defined(__CRT_HAVE__itow_s)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itow_s,(int __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_itow_s,(__val,__buf,__buflen,__radix))
+#elif defined(__CRT_HAVE_DOS$_itow_s) && __SIZEOF_WCHAR_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__LIBCCALL,__localdep__itow_s,(int __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),KOS$_itow_s,(__val,__buf,__buflen,__radix))
+#elif defined(__CRT_HAVE_DOS$_itow_s) && __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__LIBCCALL,__localdep__itow_s,(int __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),DOS$_itow_s,(__val,__buf,__buflen,__radix))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/_itow_s.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__itow_s __LIBC_LOCAL_NAME(_itow_s)
+#endif /* !... */
+#endif /* !__local___localdep__itow_s_defined */
 __LOCAL_LIBC(_itow) __ATTR_NONNULL((2)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itow))(int __val,
-                                                   __WCHAR_TYPE__ *__buf,
-                                                   int __radix) {
-#line 3350 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itow))(int __val, __WCHAR_TYPE__ *__buf, int __radix) {
 	__localdep__itow_s(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__itow_defined
+#define __local___localdep__itow_defined 1
+#define __localdep__itow __LIBC_LOCAL_NAME(_itow)
+#endif /* !__local___localdep__itow_defined */
 #endif /* !__local__itow_defined */

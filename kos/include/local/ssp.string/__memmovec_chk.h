@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7ae313f */
+/* HASH CRC-32:0xf83eae79 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,40 +21,39 @@
 #ifndef __local___memmovec_chk_defined
 #define __local___memmovec_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "memmovec" from "string" */
-#ifndef ____localdep_memmovec_defined
-#define ____localdep_memmovec_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memmovec from string */
+#ifndef __local___localdep_memmovec_defined
+#define __local___localdep_memmovec_defined 1
 #ifdef __fast_memmovec_defined
 /* Move memory between potentially overlapping memory blocks
  * @return: * : Always re-returns `dst' */
-#define __localdep_memmovec (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovec))
+__NAMESPACE_FAST_USING(memmovec)
+#define __localdep_memmovec __LIBC_FAST_NAME(memmovec)
 #elif defined(__CRT_HAVE_memmovec)
 /* Move memory between potentially overlapping memory blocks
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovec,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovec,(__dst,__src,__elem_count,__elem_size))
-#else /* LIBC: memmovec */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memmovec.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks
  * @return: * : Always re-returns `dst' */
-#define __localdep_memmovec (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovec))
-#endif /* memmovec... */
-#endif /* !____localdep_memmovec_defined */
-
+#define __localdep_memmovec __LIBC_LOCAL_NAME(memmovec)
+#endif /* !... */
+#endif /* !__local___localdep_memmovec_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__memmovec_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memmovec_chk))(void *__dst,
-                                                            void const *__src,
-                                                            __SIZE_TYPE__ __elem_count,
-                                                            __SIZE_TYPE__ __elem_size,
-                                                            __SIZE_TYPE__ __dst_objsize) {
-#line 65 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memmovec_chk))(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("memmovec", __dst, __elem_count * __elem_size, __dst_objsize);
 	return __localdep_memmovec(__dst, __src, __elem_count, __elem_size);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___memmovec_chk_defined
+#define __local___localdep___memmovec_chk_defined 1
+#define __localdep___memmovec_chk __LIBC_LOCAL_NAME(__memmovec_chk)
+#endif /* !__local___localdep___memmovec_chk_defined */
 #endif /* !__local___memmovec_chk_defined */

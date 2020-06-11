@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc99141c1 */
+/* HASH CRC-32:0xe4fae1fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,34 +19,38 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sinl_defined
-#if defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
 #define __local_sinl_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
 #include <bits/math-vector.h>
-/* Dependency: "sin" */
-#ifndef ____localdep_sin_defined
-#define ____localdep_sin_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: sin from math */
+#ifndef __local___localdep_sin_defined
+#define __local___localdep_sin_defined 1
 #if __has_builtin(__builtin_sin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sin)
 /* Sine of X */
-__CEIREDIRECT(__DECL_SIMD_sin __ATTR_WUNUSED,double,__NOTHROW,__localdep_sin,(double __x),sin,{ return __builtin_sin(__x); })
+__CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sin,double,__NOTHROW,__localdep_sin,(double __x),sin,{ return __builtin_sin(__x); })
 #elif defined(__CRT_HAVE_sin)
 /* Sine of X */
-__CREDIRECT(__DECL_SIMD_sin __ATTR_WUNUSED,double,__NOTHROW,__localdep_sin,(double __x),sin,(__x))
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sin,double,__NOTHROW,__localdep_sin,(double __x),sin,(__x))
 #elif defined(__CRT_HAVE___sin)
 /* Sine of X */
-__CREDIRECT(__DECL_SIMD_sin __ATTR_WUNUSED,double,__NOTHROW,__localdep_sin,(double __x),__sin,(__x))
-#else /* LIBC: sin */
-#undef ____localdep_sin_defined
-#endif /* sin... */
-#endif /* !____localdep_sin_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sin,double,__NOTHROW,__localdep_sin,(double __x),__sin,(__x))
+#else /* ... */
+#undef __local___localdep_sin_defined
+#endif /* !... */
+#endif /* !__local___localdep_sin_defined */
 /* Sine of X */
-__LOCAL_LIBC(sinl) __ATTR_WUNUSED __LONGDOUBLE
+__LOCAL_LIBC(sinl) __ATTR_WUNUSED __DECL_SIMD_sinl __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sinl))(__LONGDOUBLE __x) {
-#line 224 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_sin((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_sin || __CRT_HAVE___sin */
+#ifndef __local___localdep_sinl_defined
+#define __local___localdep_sinl_defined 1
+#define __localdep_sinl __LIBC_LOCAL_NAME(sinl)
+#endif /* !__local___localdep_sinl_defined */
+#else /* __CRT_HAVE_sin || __CRT_HAVE___sin */
+#undef __local_sinl_defined
+#endif /* !__CRT_HAVE_sin && !__CRT_HAVE___sin */
 #endif /* !__local_sinl_defined */

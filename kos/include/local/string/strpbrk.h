@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39d82571 */
+/* HASH CRC-32:0x7ae1ffdc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strpbrk) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strpbrk))(char const *__haystack,
-                                                     char const *__accept) {
-#line 395 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strpbrk))(char const *__haystack, char const *__accept) {
 	char __haych, __ch;
 	while ((__haych = *__haystack++) != '\0') {
 		char const *__ned_iter;
@@ -38,4 +36,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strpbrk))(char const *__haystack,
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strpbrk_defined
+#define __local___localdep_strpbrk_defined 1
+#define __localdep_strpbrk __LIBC_LOCAL_NAME(strpbrk)
+#endif /* !__local___localdep_strpbrk_defined */
 #endif /* !__local_strpbrk_defined */

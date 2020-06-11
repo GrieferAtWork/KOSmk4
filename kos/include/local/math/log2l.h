@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20730ca6 */
+/* HASH CRC-32:0x67905eab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_log2l_defined
-#if defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
 #define __local_log2l_defined 1
 #include <__crt.h>
-/* Dependency: "log2" */
-#ifndef ____localdep_log2_defined
-#define ____localdep_log2_defined 1
+#if defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: log2 from math */
+#ifndef __local___localdep_log2_defined
+#define __local___localdep_log2_defined 1
 #if __has_builtin(__builtin_log2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log2)
 /* Compute base-2 logarithm of X */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log2,(double __x),log2,{ return __builtin_log2(__x); })
@@ -34,18 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log2,(double __x),log2,(_
 #elif defined(__CRT_HAVE___log2)
 /* Compute base-2 logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log2,(double __x),__log2,(__x))
-#else /* LIBC: log2 */
-#undef ____localdep_log2_defined
-#endif /* log2... */
-#endif /* !____localdep_log2_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_log2_defined
+#endif /* !... */
+#endif /* !__local___localdep_log2_defined */
 /* Compute base-2 logarithm of X */
 __LOCAL_LIBC(log2l) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(log2l))(__LONGDOUBLE __x) {
-#line 517 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_log2((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_log2 || __CRT_HAVE___log2 */
+#ifndef __local___localdep_log2l_defined
+#define __local___localdep_log2l_defined 1
+#define __localdep_log2l __LIBC_LOCAL_NAME(log2l)
+#endif /* !__local___localdep_log2l_defined */
+#else /* __CRT_HAVE_log2 || __CRT_HAVE___log2 */
+#undef __local_log2l_defined
+#endif /* !__CRT_HAVE_log2 && !__CRT_HAVE___log2 */
 #endif /* !__local_log2l_defined */

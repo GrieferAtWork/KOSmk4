@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7730e4cd */
+/* HASH CRC-32:0x8efd1ac0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
  * If no such needle exists, return `NULL' */
 __LOCAL_LIBC(wcsstr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsstr))(__WCHAR_TYPE__ const *__haystack,
-                                                    __WCHAR_TYPE__ const *__needle) {
-#line 320 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsstr))(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__needle) {
 	__WCHAR_TYPE__ __ch, __needle_start = *__needle++;
 	while ((__ch = *__haystack++) != '\0') {
 		if (__ch == __needle_start) {
@@ -46,4 +44,8 @@ __miss:
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcsstr_defined
+#define __local___localdep_wcsstr_defined 1
+#define __localdep_wcsstr __LIBC_LOCAL_NAME(wcsstr)
+#endif /* !__local___localdep_wcsstr_defined */
 #endif /* !__local_wcsstr_defined */

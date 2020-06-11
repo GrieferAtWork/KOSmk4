@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62be1854 */
+/* HASH CRC-32:0x84d10b39 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,47 +21,64 @@
 #ifndef __local_hsearch_r_defined
 #define __local_hsearch_r_defined 1
 #include <__crt.h>
-#include <parts/errno.h>
-/* Dependency: "strlen" from "string" */
-#ifndef ____localdep_strlen_defined
-#define ____localdep_strlen_defined 1
-#ifdef __CRT_HAVE_strlen
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* LIBC: strlen */
-#include <local/string/strlen.h>
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
-#endif /* strlen... */
-#endif /* !____localdep_strlen_defined */
-
-/* Dependency: "strcmp" from "string" */
-#ifndef ____localdep_strcmp_defined
-#define ____localdep_strcmp_defined 1
+struct entry;
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strcmp from string */
+#ifndef __local___localdep_strcmp_defined
+#define __local___localdep_strcmp_defined 1
 #if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,{ return __builtin_strcmp(__s1, __s2); })
 #elif defined(__CRT_HAVE_strcmp)
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,(__s1,__s2))
-#else /* LIBC: strcmp */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/strcmp.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-#define __localdep_strcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcmp))
-#endif /* strcmp... */
-#endif /* !____localdep_strcmp_defined */
-
+#define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
+#endif /* !... */
+#endif /* !__local___localdep_strcmp_defined */
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
+#ifdef __CRT_HAVE_strlen
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
+#include <local/string/strlen.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
+#ifndef __hsearch_data_defined
+#define __hsearch_data_defined 1
+struct _ENTRY;
+struct hsearch_data {
+	struct _ENTRY  *table;
+	__UINT32_TYPE__ size;
+	__UINT32_TYPE__ filled;
+};
+#endif /* !__hsearch_data_defined */
+#ifndef __ENTRY_defined
+#define __ENTRY_defined 1
+typedef struct entry {
+	char *key;
+	void *data;
+} ENTRY;
+#endif /* !__ENTRY_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Reentrant versions which can handle multiple hashing tables at the same time */
-__LOCAL_LIBC(hsearch_r) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(ENTRY __item,
-                                                       ACTION __action,
-                                                       ENTRY **__retval,
-                                                       struct hsearch_data *__htab) {
-#line 267 "kos/src/libc/magic/search.c"
+__LOCAL_LIBC(hsearch_r) __ATTR_NONNULL((3, 4)) int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, int __action, struct entry **__retval, struct hsearch_data *__htab) {
 	typedef struct {
 		unsigned int __used;
-		ENTRY        __entry;
+		struct entry        __entry;
 	} __entry_type;
 	unsigned int __hval, __count, __idx;
 	unsigned int __len = __localdep_strlen(__item.key);
@@ -96,9 +113,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(ENTRY __item,
 			}
 		} while (((__entry_type *)__htab->table)[__idx].__used);
 	}
-	if (__action == ENTER) {
+	if (__action == 1) {
 		if (__htab->filled == __htab->size) {
-#ifdef __ENOMEM
+#ifdef ENOMEM
 			__libc_seterrno(__ENOMEM);
 #endif /* ENOMEM */
 			*__retval = __NULLPTR;
@@ -110,11 +127,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(ENTRY __item,
 		*__retval = &((__entry_type *)__htab->table)[__idx].__entry;
 		return 1;
 	}
-#ifdef __ESRCH
+#ifdef ESRCH
 	__libc_seterrno(__ESRCH);
 #endif /* ESRCH */
 	*__retval = __NULLPTR;
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_hsearch_r_defined
+#define __local___localdep_hsearch_r_defined 1
+#define __localdep_hsearch_r __LIBC_LOCAL_NAME(hsearch_r)
+#endif /* !__local___localdep_hsearch_r_defined */
 #endif /* !__local_hsearch_r_defined */

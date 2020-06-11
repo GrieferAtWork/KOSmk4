@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29839941 */
+/* HASH CRC-32:0xf5375c43 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,45 +22,21 @@
 #define __local_copysignl_defined 1
 #include <__crt.h>
 #include <libm/copysign.h>
-/* Dependency: "copysign" from "math" */
-#ifndef ____localdep_copysign_defined
-#define ____localdep_copysign_defined 1
-#if __has_builtin(__builtin_copysign) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_copysign)
-/* Return X with its signed changed to Y's */
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_copysign,(double __num, double __sign),copysign,{ return __builtin_copysign(__num, __sign); })
-#elif defined(__CRT_HAVE_copysign)
-/* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_copysign,(double __num, double __sign),copysign,(__num,__sign))
-#elif defined(__CRT_HAVE___copysign)
-/* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_copysign,(double __num, double __sign),__copysign,(__num,__sign))
-#elif defined(__CRT_HAVE__copysign)
-/* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_copysign,(double __num, double __sign),_copysign,(__num,__sign))
-#else /* LIBC: copysign */
-#include <local/math/copysign.h>
-/* Return X with its signed changed to Y's */
-#define __localdep_copysign (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysign))
-#endif /* copysign... */
-#endif /* !____localdep_copysign_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 /* Return X with its signed changed to Y's */
 __LOCAL_LIBC(copysignl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(copysignl))(__LONGDOUBLE __num,
-                                                   __LONGDOUBLE __sign) {
-#line 776 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(copysignl))(__LONGDOUBLE __num, __LONGDOUBLE __sign) {
 #ifdef __LIBM_MATHFUN2L
-	#ifdef __LIBM_MATHFUN2L
 	return __LIBM_MATHFUN2L(copysign, __num, __sign);
-#else /* __LIBM_MATHFUN2 */
+#else /* __LIBM_MATHFUN2L */
 	if ((__num < 0.0L) != (__sign < 0.0L))
 		__num = -__num;
 	return __num;
-#endif /* !__LIBM_MATHFUN2 */
-#else /* __LIBM_MATHFUN2L */
-	return (__LONGDOUBLE)__localdep_copysign((double)__num, (double)__sign);
 #endif /* !__LIBM_MATHFUN2L */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_copysignl_defined
+#define __local___localdep_copysignl_defined 1
+#define __localdep_copysignl __LIBC_LOCAL_NAME(copysignl)
+#endif /* !__local___localdep_copysignl_defined */
 #endif /* !__local_copysignl_defined */

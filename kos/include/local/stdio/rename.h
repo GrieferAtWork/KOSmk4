@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a338c20 */
+/* HASH CRC-32:0xb2a53556 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,36 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_rename_defined
-#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_frenameat) || defined(__CRT_HAVE_renameat))
 #define __local_rename_defined 1
 #include <__crt.h>
-/* Dependency: "renameat" from "stdio" */
-#ifndef ____localdep_renameat_defined
-#define ____localdep_renameat_defined 1
+#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat))
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: renameat from stdio */
+#ifndef __local___localdep_renameat_defined
+#define __local___localdep_renameat_defined 1
 #ifdef __CRT_HAVE_renameat
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_renameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path),renameat,(__oldfd,__oldname,__newfd,__newname_or_path))
 #elif defined(__CRT_HAVE_frenameat)
+__NAMESPACE_LOCAL_END
 #include <local/stdio/renameat.h>
-#define __localdep_renameat (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(renameat))
-#else /* CUSTOM: renameat */
-#undef ____localdep_renameat_defined
-#endif /* renameat... */
-#endif /* !____localdep_renameat_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_renameat __LIBC_LOCAL_NAME(renameat)
+#else /* ... */
+#undef __local___localdep_renameat_defined
+#endif /* !... */
+#endif /* !__local___localdep_renameat_defined */
 /* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
  * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
 __LOCAL_LIBC(rename) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(rename))(char const *__oldname,
-                                                    char const *__newname_or_path) {
-#line 395 "kos/src/libc/magic/stdio.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(rename))(char const *__oldname, char const *__newname_or_path) {
 	return __localdep_renameat(__CRT_AT_FDCWD, __oldname, __CRT_AT_FDCWD, __newname_or_path);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && (__CRT_HAVE_frenameat || __CRT_HAVE_renameat) */
+#ifndef __local___localdep_rename_defined
+#define __local___localdep_rename_defined 1
+#define __localdep_rename __LIBC_LOCAL_NAME(rename)
+#endif /* !__local___localdep_rename_defined */
+#else /* __CRT_AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_frenameat) */
+#undef __local_rename_defined
+#endif /* !__CRT_AT_FDCWD || (!__CRT_HAVE_renameat && !__CRT_HAVE_frenameat) */
 #endif /* !__local_rename_defined */

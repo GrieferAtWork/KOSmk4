@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2416bc30 */
+/* HASH CRC-32:0x28ec5aef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,28 @@
 #ifndef __local_iswprint_defined
 #define __local_iswprint_defined 1
 #include <__crt.h>
-/* Dependency: "isprint" from "ctype" */
-#ifndef ____localdep_isprint_defined
-#define ____localdep_isprint_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: isprint from ctype */
+#ifndef __local___localdep_isprint_defined
+#define __local___localdep_isprint_defined 1
 #if __has_builtin(__builtin_isprint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isprint)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint,(int __ch),isprint,{ return __builtin_isprint(__ch); })
 #elif defined(__CRT_HAVE_isprint)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint,(int __ch),isprint,(__ch))
-#else /* LIBC: isprint */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/isprint.h>
-#define __localdep_isprint (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isprint))
-#endif /* isprint... */
-#endif /* !____localdep_isprint_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_isprint __LIBC_LOCAL_NAME(isprint)
+#endif /* !... */
+#endif /* !__local___localdep_isprint_defined */
 __LOCAL_LIBC(iswprint) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswprint))(__WINT_TYPE__ __wc) {
-#line 142 "kos/src/libc/magic/wctype.c"
 	return __localdep_isprint((int)__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswprint_defined
+#define __local___localdep_iswprint_defined 1
+#define __localdep_iswprint __LIBC_LOCAL_NAME(iswprint)
+#endif /* !__local___localdep_iswprint_defined */
 #endif /* !__local_iswprint_defined */

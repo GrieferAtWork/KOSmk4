@@ -386,7 +386,7 @@ $pid_t getppid();
 $pid_t getpgrp();
 
 %
-__getpgid(*) = getpgid;
+%[insert:function(__getpgid = getpgid)]
 
 %
 @@>> setpgid(2)
@@ -742,6 +742,7 @@ int rmdir([[nonnull]] char const *path) {
 @@>> euidaccess(2)
 @@@param: TYPE: Set of `X_OK | W_OK | R_OK'
 @@Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids
+[[decl_include("<features.h>")]]
 [[cp, ATTR_WUNUSED, export_alias("eaccess")]]
 [[if(defined(__CRT_DOS)), alias("_access")]]
 [[requires_include("<asm/fcntl.h>")]]
@@ -1327,7 +1328,7 @@ int nice(int inc) {
 %#endif /* __USE_MISC || __USE_XOPEN */
 
 %
-%[insert:extern(_exit)]
+%[insert:guarded_function(_exit = _Exit)]
 
 
 %
@@ -1674,6 +1675,7 @@ int fdatasync($fd_t fd) {
 @@Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
 @@exchanging the order of even and odd bytes ("123456" --> "214365")
 @@When `n_bytes <= 1', don't do anything and return immediately
+[[decl_include("<features.h>")]]
 [[guard, export_alias("_swab"), section(".text.crt.string.memory")]]
 void swab([[nonnull]] void const *__restrict from,
           [[nonnull]] void *__restrict to, __STDC_INT_AS_SSIZE_T n_bytes) {

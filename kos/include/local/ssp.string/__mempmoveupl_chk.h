@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef25ab72 */
+/* HASH CRC-32:0x46837dbd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,39 +21,39 @@
 #ifndef __local___mempmoveupl_chk_defined
 #define __local___mempmoveupl_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "mempmoveupl" from "string" */
-#ifndef ____localdep_mempmoveupl_defined
-#define ____localdep_mempmoveupl_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempmoveupl from string */
+#ifndef __local___localdep_mempmoveupl_defined
+#define __local___localdep_mempmoveupl_defined 1
 #ifdef __fast_mempmoveupl_defined
 /* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
-#define __localdep_mempmoveupl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupl))
+__NAMESPACE_FAST_USING(mempmoveupl)
+#define __localdep_mempmoveupl __LIBC_FAST_NAME(mempmoveupl)
 #elif defined(__CRT_HAVE_mempmoveupl)
 /* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupl,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),mempmoveupl,(__dst,__src,__n_dwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),mempmoveupl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_mempmovel)
 /* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupl,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),mempmovel,(__dst,__src,__n_dwords))
-#else /* LIBC: mempmoveupl */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),mempmovel,(__dst,__src,__n_dwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempmoveupl.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
-#define __localdep_mempmoveupl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupl))
-#endif /* mempmoveupl... */
-#endif /* !____localdep_mempmoveupl_defined */
-
+#define __localdep_mempmoveupl __LIBC_LOCAL_NAME(mempmoveupl)
+#endif /* !... */
+#endif /* !__local___localdep_mempmoveupl_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__mempmoveupl_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempmoveupl_chk))(/*aligned(4)*/ void *__dst,
-                                                               /*aligned(4)*/ void const *__src,
-                                                               __SIZE_TYPE__ __n_dwords,
-                                                               __SIZE_TYPE__ __dst_objsize) {
-#line 95 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempmoveupl_chk))(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("mempmoveupl", __dst, __n_dwords * 4, __dst_objsize);
 	return __localdep_mempmoveupl(__dst, __src, __n_dwords);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___mempmoveupl_chk_defined
+#define __local___localdep___mempmoveupl_chk_defined 1
+#define __localdep___mempmoveupl_chk __LIBC_LOCAL_NAME(__mempmoveupl_chk)
+#endif /* !__local___localdep___mempmoveupl_chk_defined */
 #endif /* !__local___mempmoveupl_chk_defined */

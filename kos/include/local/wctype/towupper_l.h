@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34ebafd0 */
+/* HASH CRC-32:0xae43abf1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,30 @@
 #ifndef __local_towupper_l_defined
 #define __local_towupper_l_defined 1
 #include <__crt.h>
-/* Dependency: "towupper" from "wctype" */
-#ifndef ____localdep_towupper_defined
-#define ____localdep_towupper_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: towupper from wctype */
+#ifndef __local___localdep_towupper_defined
+#define __local___localdep_towupper_defined 1
 #if __has_builtin(__builtin_towupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towupper)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towupper,(__WINT_TYPE__ __wc),towupper,{ return __builtin_towupper(__wc); })
 #elif defined(__CRT_HAVE_towupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towupper,(__WINT_TYPE__ __wc),towupper,(__wc))
-#else /* LIBC: towupper */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/towupper.h>
-#define __localdep_towupper (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towupper))
-#endif /* towupper... */
-#endif /* !____localdep_towupper_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_towupper __LIBC_LOCAL_NAME(towupper)
+#endif /* !... */
+#endif /* !__local___localdep_towupper_defined */
 __LOCAL_LIBC(towupper_l) __ATTR_PURE __ATTR_WUNUSED __WINT_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(towupper_l))(__WINT_TYPE__ __wc,
-                                                        __locale_t __locale) {
-#line 320 "kos/src/libc/magic/wctype.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(towupper_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
 	(void)__locale;
 	__COMPILER_IMPURE();
 	return __localdep_towupper(__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_towupper_l_defined
+#define __local___localdep_towupper_l_defined 1
+#define __localdep_towupper_l __LIBC_LOCAL_NAME(towupper_l)
+#endif /* !__local___localdep_towupper_l_defined */
 #endif /* !__local_towupper_l_defined */

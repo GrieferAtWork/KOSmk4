@@ -101,6 +101,7 @@ struct mntent *getmntent([[nonnull]] $FILE *stream);
 %
 %#ifdef __USE_MISC
 @@Reentrant version of the above function
+[[decl_include("<features.h>"), decl_prefix(struct mntent;)]]
 [[cp, export_alias("__getmntent_r")]]
 struct mntent *getmntent_r([[nonnull]] $FILE *__restrict stream,
                            [[nonnull]] struct mntent *__restrict result,

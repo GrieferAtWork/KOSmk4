@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1730514 */
+/* HASH CRC-32:0x99df5faf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,37 +22,22 @@
 #define __local_wmemmove_s_defined 1
 #include <__crt.h>
 #include <parts/errno.h>
-/* Dependency: "wmemmove" from "wchar" */
-#ifndef ____localdep_wmemmove_defined
-#define ____localdep_wmemmove_defined 1
-#ifdef __CRT_HAVE_wmemmove
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemmove,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __num_chars),wmemmove,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_memmovew) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemmove,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __num_chars),memmovew,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_memmovel) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemmove,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __num_chars),memmovel,(__dst,__src,__num_chars))
-#else /* LIBC: wmemmove */
-#include <local/wchar/wmemmove.h>
-#define __localdep_wmemmove (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemmove))
-#endif /* wmemmove... */
-#endif /* !____localdep_wmemmove_defined */
-
+#include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wmemmove_s) __ATTR_NONNULL((1, 3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmemmove_s))(__WCHAR_TYPE__ *__dst,
-                                                        __SIZE_TYPE__ __dstlength,
-                                                        __WCHAR_TYPE__ const *__src,
-                                                        __SIZE_TYPE__ __srclength) {
-#line 4969 "kos/src/libc/magic/string.c"
-
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmemmove_s))(void *__dst, __SIZE_TYPE__ __dstlength, void const *__src, __SIZE_TYPE__ __srclength) {
 	if (!__srclength)
 		return 0;
 	if (!__dst || !__src)
 		return __EINVAL;
 	if (__dstlength < __srclength)
 		return __ERANGE;
-	__localdep_wmemmove(__dst, __src, __srclength);
+	__libc_memmovec(__dst, __src, __srclength, __SIZEOF_WCHAR_T__);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wmemmove_s_defined
+#define __local___localdep_wmemmove_s_defined 1
+#define __localdep_wmemmove_s __LIBC_LOCAL_NAME(wmemmove_s)
+#endif /* !__local___localdep_wmemmove_s_defined */
 #endif /* !__local_wmemmove_s_defined */

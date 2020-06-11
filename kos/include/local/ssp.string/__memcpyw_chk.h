@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea2408fb */
+/* HASH CRC-32:0x691c8e4d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,39 +21,42 @@
 #ifndef __local___memcpyw_chk_defined
 #define __local___memcpyw_chk_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <ssp/chk.h>
-/* Dependency: "memcpyw" from "string" */
-#ifndef ____localdep_memcpyw_defined
-#define ____localdep_memcpyw_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcpyw from string */
+#ifndef __local___localdep_memcpyw_defined
+#define __local___localdep_memcpyw_defined 1
 #ifdef __fast_memcpyw_defined
 /* Copy memory between non-overlapping memory blocks. */
-#define __localdep_memcpyw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyw))
+__NAMESPACE_FAST_USING(memcpyw)
+#define __localdep_memcpyw __LIBC_FAST_NAME(memcpyw)
 #elif defined(__CRT_HAVE_memcpyw)
 /* Copy memory between non-overlapping memory blocks. */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words),memcpyw,(__dst,__src,__n_words))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),memcpyw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_wmemcpy) && (__SIZEOF_WCHAR_T__ == 2)
 /* Copy memory between non-overlapping memory blocks. */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words),wmemcpy,(__dst,__src,__n_words))
-#else /* LIBC: memcpyw */
-#include <local/string/memcpyw.h>
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),wmemcpy,(__dst,__src,__n_words))
+#elif defined(__CRT_HAVE_DOS$wmemcpy)
 /* Copy memory between non-overlapping memory blocks. */
-#define __localdep_memcpyw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyw))
-#endif /* memcpyw... */
-#endif /* !____localdep_memcpyw_defined */
-
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),DOS$wmemcpy,(__dst,__src,__n_words))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpyw.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Copy memory between non-overlapping memory blocks. */
+#define __localdep_memcpyw __LIBC_LOCAL_NAME(memcpyw)
+#endif /* !... */
+#endif /* !__local___localdep_memcpyw_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__memcpyw_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memcpyw_chk))(/*aligned(2)*/ void *__restrict __dst,
-                                                           /*aligned(2)*/ void const *__restrict __src,
-                                                           __SIZE_TYPE__ __n_words,
-                                                           __SIZE_TYPE__ __dst_objsize) {
-#line 76 "kos/src/libc/magic/ssp.string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memcpyw_chk))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("memcpyw", __dst, __n_words * 2, __dst_objsize);
 	return __localdep_memcpyw(__dst, __src, __n_words);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___memcpyw_chk_defined
+#define __local___localdep___memcpyw_chk_defined 1
+#define __localdep___memcpyw_chk __LIBC_LOCAL_NAME(__memcpyw_chk)
+#endif /* !__local___localdep___memcpyw_chk_defined */
 #endif /* !__local___memcpyw_chk_defined */

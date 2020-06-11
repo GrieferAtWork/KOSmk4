@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98163fec */
+/* HASH CRC-32:0x72f9e298 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@ __NAMESPACE_LOCAL_BEGIN
 /* Absolute value of X */
 __LOCAL_LIBC(fabs) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fabs))(double __x) {
-#line 675 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUN
 	return __LIBM_MATHFUN(fabs, __x);
 #else /* __LIBM_MATHFUN */
@@ -34,4 +33,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fabs))(double __x) {
 #endif /* !__LIBM_MATHFUN */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_fabs_defined
+#define __local___localdep_fabs_defined 1
+#define __localdep_fabs __LIBC_LOCAL_NAME(fabs)
+#endif /* !__local___localdep_fabs_defined */
 #endif /* !__local_fabs_defined */

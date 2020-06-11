@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a7921aa */
+/* HASH CRC-32:0x98a41b24 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,27 +21,30 @@
 #ifndef __local_iswupper_l_defined
 #define __local_iswupper_l_defined 1
 #include <__crt.h>
-/* Dependency: "iswupper" from "wctype" */
-#ifndef ____localdep_iswupper_defined
-#define ____localdep_iswupper_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: iswupper from wctype */
+#ifndef __local___localdep_iswupper_defined
+#define __local___localdep_iswupper_defined 1
 #if __has_builtin(__builtin_iswupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswupper)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswupper,(__WINT_TYPE__ __wc),iswupper,{ return __builtin_iswupper(__wc); })
 #elif defined(__CRT_HAVE_iswupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswupper,(__WINT_TYPE__ __wc),iswupper,(__wc))
-#else /* LIBC: iswupper */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/iswupper.h>
-#define __localdep_iswupper (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswupper))
-#endif /* iswupper... */
-#endif /* !____localdep_iswupper_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_iswupper __LIBC_LOCAL_NAME(iswupper)
+#endif /* !... */
+#endif /* !__local___localdep_iswupper_defined */
 __LOCAL_LIBC(iswupper_l) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswupper_l))(__WINT_TYPE__ __wc,
-                                                        __locale_t __locale) {
-#line 292 "kos/src/libc/magic/wctype.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswupper_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
 	(void)__locale;
 	__COMPILER_IMPURE();
 	return __localdep_iswupper(__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswupper_l_defined
+#define __local___localdep_iswupper_l_defined 1
+#define __localdep_iswupper_l __LIBC_LOCAL_NAME(iswupper_l)
+#endif /* !__local___localdep_iswupper_l_defined */
 #endif /* !__local_iswupper_l_defined */

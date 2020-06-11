@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a7dcc1a */
+/* HASH CRC-32:0x3c10b4ba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,29 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_chown_defined
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_fchownat)
 #define __local_chown_defined 1
 #include <__crt.h>
-/* Dependency: "fchownat" */
-#ifndef ____localdep_fchownat_defined
-#define ____localdep_fchownat_defined 1
-#ifdef __CRT_HAVE_fchownat
+#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_fchownat)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fchownat from unistd */
+#if !defined(__local___localdep_fchownat_defined) && defined(__CRT_HAVE_fchownat)
+#define __local___localdep_fchownat_defined 1
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_fchownat,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),fchownat,(__dfd,__file,__owner,__group,__flags))
-#else /* LIBC: fchownat */
-#undef ____localdep_fchownat_defined
-#endif /* fchownat... */
-#endif /* !____localdep_fchownat_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_fchownat_defined && __CRT_HAVE_fchownat */
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __LOCAL_LIBC(chown) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(chown))(char const *__file,
-                                                   __uid_t __owner,
-                                                   __gid_t __group) {
-#line 525 "kos/src/libc/magic/unistd.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(chown))(char const *__file, __uid_t __owner, __gid_t __group) {
 	return __localdep_fchownat(__CRT_AT_FDCWD, __file, __owner, __group, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && __CRT_HAVE_fchownat */
+#ifndef __local___localdep_chown_defined
+#define __local___localdep_chown_defined 1
+#define __localdep_chown __LIBC_LOCAL_NAME(chown)
+#endif /* !__local___localdep_chown_defined */
+#else /* __CRT_AT_FDCWD && __CRT_HAVE_fchownat */
+#undef __local_chown_defined
+#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_fchownat */
 #endif /* !__local_chown_defined */

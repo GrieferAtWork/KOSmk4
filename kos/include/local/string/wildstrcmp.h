@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5026732 */
+/* HASH CRC-32:0x930bcda7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wildstrcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildstrcmp))(char const *__pattern,
-                                                        char const *__string) {
-#line 4170 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildstrcmp))(char const *__pattern, char const *__string) {
 	char __card_post;
 	for (;;) {
 		if (!*__string) {
@@ -67,4 +65,8 @@ __next:
 	return (int)((unsigned char)*__string - (unsigned char)*__pattern);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wildstrcmp_defined
+#define __local___localdep_wildstrcmp_defined 1
+#define __localdep_wildstrcmp __LIBC_LOCAL_NAME(wildstrcmp)
+#endif /* !__local___localdep_wildstrcmp_defined */
 #endif /* !__local_wildstrcmp_defined */

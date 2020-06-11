@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96335f69 */
+/* HASH CRC-32:0x841d0bf2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,28 @@
 #ifndef __local_iswspace_defined
 #define __local_iswspace_defined 1
 #include <__crt.h>
-/* Dependency: "isspace" from "ctype" */
-#ifndef ____localdep_isspace_defined
-#define ____localdep_isspace_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: isspace from ctype */
+#ifndef __local___localdep_isspace_defined
+#define __local___localdep_isspace_defined 1
 #if __has_builtin(__builtin_isspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isspace)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,{ return __builtin_isspace(__ch); })
 #elif defined(__CRT_HAVE_isspace)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,(__ch))
-#else /* LIBC: isspace */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/isspace.h>
-#define __localdep_isspace (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isspace))
-#endif /* isspace... */
-#endif /* !____localdep_isspace_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_isspace __LIBC_LOCAL_NAME(isspace)
+#endif /* !... */
+#endif /* !__local___localdep_isspace_defined */
 __LOCAL_LIBC(iswspace) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswspace))(__WINT_TYPE__ __wc) {
-#line 150 "kos/src/libc/magic/wctype.c"
 	return __localdep_isspace((int)__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswspace_defined
+#define __local___localdep_iswspace_defined 1
+#define __localdep_iswspace __LIBC_LOCAL_NAME(iswspace)
+#endif /* !__local___localdep_iswspace_defined */
 #endif /* !__local_iswspace_defined */

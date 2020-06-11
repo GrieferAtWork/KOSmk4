@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe496b2e4 */
+/* HASH CRC-32:0x2ccba875 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,58 +21,83 @@
 #ifndef __local_inet_neta_defined
 #define __local_inet_neta_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <parts/errno.h>
-/* Dependency: "memcpy" from "string" */
-#ifndef ____localdep_memcpy_defined
-#define ____localdep_memcpy_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcpy from string */
+#ifndef __local___localdep_memcpy_defined
+#define __local___localdep_memcpy_defined 1
 #ifdef __fast_memcpy_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))
+__NAMESPACE_FAST_USING(memcpy)
+#define __localdep_memcpy __LIBC_FAST_NAME(memcpy)
 #elif defined(__CRT_HAVE_memcpy)
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
-#else /* LIBC: memcpy */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memcpy.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))
-#endif /* memcpy... */
-#endif /* !____localdep_memcpy_defined */
-
-/* Dependency: "snprintf" from "stdio" */
-#ifndef ____localdep_snprintf_defined
-#define ____localdep_snprintf_defined 1
-#ifdef __std___localdep_snprintf_defined
-__NAMESPACE_STD_USING(__localdep_snprintf)
-#elif __has_builtin(__builtin_snprintf) && __has_builtin(__builtin_va_arg_pack) && !defined(__NO_EXTERNINLINE) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_snprintf)
+#define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
+#endif /* !... */
+#endif /* !__local___localdep_memcpy_defined */
+/* Dependency: snprintf from stdio */
+#ifndef __local___localdep_snprintf_defined
+#define __local___localdep_snprintf_defined 1
+#ifdef __snprintf_defined
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Print a formatted string to a given in-member string buffer `BUF'
+ * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
+#ifdef __cplusplus
+__NAMESPACE_GLB_USING(snprintf)
+#else /* __cplusplus */
+#define __localdep_snprintf snprintf
+#endif /* !__cplusplus */
+#elif defined(__std_snprintf_defined)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Print a formatted string to a given in-member string buffer `BUF'
+ * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
+#ifdef __cplusplus
+__NAMESPACE_STD_USING(snprintf)
+#else /* __cplusplus */
+#define __localdep_snprintf (__NAMESPACE_STD_SYM snprintf)
+#endif /* !__cplusplus */
+#elif __has_builtin(__builtin_snprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_snprintf) && __has_builtin(__builtin_va_arg_pack)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_snprintf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, ...),snprintf,{ return __builtin_snprintf(__buf, __buflen, __format, __builtin_va_arg_pack()); })
-#elif defined(__CRT_HAVE_snprintf) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_snprintf)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
 __LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_snprintf)(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, ...) __CASMNAME("snprintf");
-#else /* LIBC: snprintf */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdio/snprintf.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
-#define __localdep_snprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(snprintf))
-#endif /* snprintf... */
-#endif /* !____localdep_snprintf_defined */
-
+#define __localdep_snprintf __LIBC_LOCAL_NAME(snprintf)
+#endif /* !... */
+#endif /* !__local___localdep_snprintf_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Format a network number NET into presentation format and place
  * result in buffer starting at BUF with length of LEN bytes */
 __LOCAL_LIBC(inet_neta) __ATTR_NONNULL((2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_neta))(__UINT32_TYPE__ __net,
-                                                       char *__buf,
-                                                       __SIZE_TYPE__ __len) {
-#line 346 "kos/src/libc/magic/arpa.inet.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_neta))(__UINT32_TYPE__ __net, char *__buf, __SIZE_TYPE__ __len) {
 	__SIZE_TYPE__ __reqlen;
 	if (__net <= 0xff) {
 		if (!__net) {
@@ -112,4 +137,8 @@ __too_small:
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_inet_neta_defined
+#define __local___localdep_inet_neta_defined 1
+#define __localdep_inet_neta __LIBC_LOCAL_NAME(inet_neta)
+#endif /* !__local___localdep_inet_neta_defined */
 #endif /* !__local_inet_neta_defined */

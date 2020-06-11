@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9335e3b */
+/* HASH CRC-32:0x4f9b37fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,33 +21,36 @@
 #ifndef __local_fdiml_defined
 #define __local_fdiml_defined 1
 #include <__crt.h>
-/* Dependency: "fabs" from "math" */
-#ifndef ____localdep_fabs_defined
-#define ____localdep_fabs_defined 1
-#if __has_builtin(__builtin_fabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabs)
-/* Absolute value of X */
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double __x),fabs,{ return __builtin_fabs(__x); })
-#elif defined(__CRT_HAVE_fabs)
-/* Absolute value of X */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double __x),fabs,(__x))
-#elif defined(__CRT_HAVE___fabs)
-/* Absolute value of X */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double __x),__fabs,(__x))
-#else /* LIBC: fabs */
-#include <local/math/fabs.h>
-/* Absolute value of X */
-#define __localdep_fabs (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabs))
-#endif /* fabs... */
-#endif /* !____localdep_fabs_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: fabsl from math */
+#ifndef __local___localdep_fabsl_defined
+#define __local___localdep_fabsl_defined 1
+#if __has_builtin(__builtin_fabsl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsl)
+/* Absolute value of X */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,(__LONGDOUBLE __x),fabsl,{ return __builtin_fabsl(__x); })
+#elif defined(__CRT_HAVE_fabsl)
+/* Absolute value of X */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,(__LONGDOUBLE __x),fabsl,(__x))
+#elif defined(__CRT_HAVE___fabsl)
+/* Absolute value of X */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,(__LONGDOUBLE __x),__fabsl,(__x))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/math/fabsl.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Absolute value of X */
+#define __localdep_fabsl __LIBC_LOCAL_NAME(fabsl)
+#endif /* !... */
+#endif /* !__local___localdep_fabsl_defined */
 /* Return positive difference between X and Y */
 __LOCAL_LIBC(fdiml) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fdiml))(__LONGDOUBLE __x,
-                                               __LONGDOUBLE __y) {
-#line 1049 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fdiml))(__LONGDOUBLE __x, __LONGDOUBLE __y) {
 	/* TODO: ieee754-specific function */
-	return __localdep_fabs(__y - __x);
+	return __localdep_fabsl(__y - __x);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_fdiml_defined
+#define __local___localdep_fdiml_defined 1
+#define __localdep_fdiml __LIBC_LOCAL_NAME(fdiml)
+#endif /* !__local___localdep_fdiml_defined */
 #endif /* !__local_fdiml_defined */

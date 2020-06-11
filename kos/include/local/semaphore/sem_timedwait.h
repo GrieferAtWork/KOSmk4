@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a5fc80c */
+/* HASH CRC-32:0x1a1725df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,44 +19,35 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sem_timedwait_defined
-#if defined(__CRT_HAVE_sem_timedwait) || defined(__CRT_HAVE_sem_timedwait64)
 #define __local_sem_timedwait_defined 1
 #include <__crt.h>
-/* Dependency: "sem_timedwait32" from "semaphore" */
-#ifndef ____localdep_sem_timedwait32_defined
-#define ____localdep_sem_timedwait32_defined 1
-#ifdef __CRT_HAVE_sem_timedwait
+#if defined(__CRT_HAVE_sem_timedwait) || defined(__CRT_HAVE_sem_timedwait64)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: sem_timedwait32 from semaphore */
+#if !defined(__local___localdep_sem_timedwait32_defined) && defined(__CRT_HAVE_sem_timedwait)
+#define __local___localdep_sem_timedwait32_defined 1
 /* Similar to `sem_wait' but wait only until ABSTIME */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,(sem_t *__restrict __sem, struct __timespec32 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
-#else /* LIBC: sem_timedwait */
-#undef ____localdep_sem_timedwait32_defined
-#endif /* sem_timedwait32... */
-#endif /* !____localdep_sem_timedwait32_defined */
-
-/* Dependency: "sem_timedwait64" from "semaphore" */
-#ifndef ____localdep_sem_timedwait64_defined
-#define ____localdep_sem_timedwait64_defined 1
+#endif /* !__local___localdep_sem_timedwait32_defined && __CRT_HAVE_sem_timedwait */
+/* Dependency: sem_timedwait64 from semaphore */
+#ifndef __local___localdep_sem_timedwait64_defined
+#define __local___localdep_sem_timedwait64_defined 1
 #ifdef __CRT_HAVE_sem_timedwait64
-/* Similar to `sem_wait' but wait only until ABSTIME */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait64,(sem_t *__restrict __sem, struct __timespec64 const *__restrict __abstime),sem_timedwait64,(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* Similar to `sem_wait' but wait only until ABSTIME */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait64,(sem_t *__restrict __sem, struct __timespec64 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait)
+__NAMESPACE_LOCAL_END
 #include <local/semaphore/sem_timedwait64.h>
-/* Similar to `sem_wait' but wait only until ABSTIME */
-#define __localdep_sem_timedwait64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sem_timedwait64))
-#else /* CUSTOM: sem_timedwait64 */
-#undef ____localdep_sem_timedwait64_defined
-#endif /* sem_timedwait64... */
-#endif /* !____localdep_sem_timedwait64_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_sem_timedwait64 __LIBC_LOCAL_NAME(sem_timedwait64)
+#else /* ... */
+#undef __local___localdep_sem_timedwait64_defined
+#endif /* !... */
+#endif /* !__local___localdep_sem_timedwait64_defined */
 /* Similar to `sem_wait' but wait only until ABSTIME */
 __LOCAL_LIBC(sem_timedwait) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait))(sem_t *__restrict __sem,
-                                                           struct timespec const *__restrict __abstime) {
-#line 93 "kos/src/libc/magic/semaphore.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait))(sem_t *__restrict __sem, struct timespec const *__restrict __abstime) {
 #ifdef __CRT_HAVE_sem_timedwait
 	struct __timespec32 __ts32;
 	__ts32.tv_sec = (__time32_t)__abstime->tv_sec;
@@ -70,5 +61,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait))(sem_t *__restrict __s
 #endif /* !__CRT_HAVE_sem_timedwait */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_sem_timedwait || __CRT_HAVE_sem_timedwait64 */
+#ifndef __local___localdep_sem_timedwait_defined
+#define __local___localdep_sem_timedwait_defined 1
+#define __localdep_sem_timedwait __LIBC_LOCAL_NAME(sem_timedwait)
+#endif /* !__local___localdep_sem_timedwait_defined */
+#else /* __CRT_HAVE_sem_timedwait || __CRT_HAVE_sem_timedwait64 */
+#undef __local_sem_timedwait_defined
+#endif /* !__CRT_HAVE_sem_timedwait && !__CRT_HAVE_sem_timedwait64 */
 #endif /* !__local_sem_timedwait_defined */

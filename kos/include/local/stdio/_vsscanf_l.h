@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1adb8264 */
+/* HASH CRC-32:0x11bda2a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,21 @@
 #ifndef __local__vsscanf_l_defined
 #define __local__vsscanf_l_defined 1
 #include <__crt.h>
-/* Dependency: "vsscanf" from "stdio" */
-#ifndef ____localdep_vsscanf_defined
-#define ____localdep_vsscanf_defined 1
-#ifdef __std___localdep_vsscanf_defined
-__NAMESPACE_STD_USING(__localdep_vsscanf)
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: vsscanf from stdio */
+#ifndef __local___localdep_vsscanf_defined
+#define __local___localdep_vsscanf_defined 1
+#ifdef __vsscanf_defined
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+__NAMESPACE_GLB_USING(vsscanf)
+#define __localdep_vsscanf vsscanf
+#elif defined(__std_vsscanf_defined)
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+__NAMESPACE_STD_USING(vsscanf)
+#define __localdep_vsscanf vsscanf
 #elif __has_builtin(__builtin_vsscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsscanf)
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
@@ -46,23 +56,23 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),__vsscanf,(__input,__format,__args))
-#else /* LIBC: vsscanf */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdio/vsscanf.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
-#define __localdep_vsscanf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsscanf))
-#endif /* vsscanf... */
-#endif /* !____localdep_vsscanf_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#define __localdep_vsscanf __LIBC_LOCAL_NAME(vsscanf)
+#endif /* !... */
+#endif /* !__local___localdep_vsscanf_defined */
 __LOCAL_LIBC(_vsscanf_l) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 4) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsscanf_l))(char const *__restrict __input,
-                                                        char const *__restrict __format,
-                                                        __locale_t __locale,
-                                                        __builtin_va_list __args) {
-#line 2286 "kos/src/libc/magic/stdio.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsscanf_l))(char const *__restrict __input, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) {
 	(void)__locale;
 	return __localdep_vsscanf(__input, __format, __args);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__vsscanf_l_defined
+#define __local___localdep__vsscanf_l_defined 1
+#define __localdep__vsscanf_l __LIBC_LOCAL_NAME(_vsscanf_l)
+#endif /* !__local___localdep__vsscanf_l_defined */
 #endif /* !__local__vsscanf_l_defined */

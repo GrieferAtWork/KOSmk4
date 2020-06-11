@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b9619d3 */
+/* HASH CRC-32:0x743c29f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,26 +21,27 @@
 #ifndef __local_strxfrm_l_defined
 #define __local_strxfrm_l_defined 1
 #include <__crt.h>
-/* Dependency: "strxfrm" from "string" */
-#ifndef ____localdep_strxfrm_defined
-#define ____localdep_strxfrm_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strxfrm from string */
+#ifndef __local___localdep_strxfrm_defined
+#define __local___localdep_strxfrm_defined 1
 #ifdef __CRT_HAVE_strxfrm
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strxfrm,(char *__dst, char const *__restrict __src, __SIZE_TYPE__ __maxlen),strxfrm,(__dst,__src,__maxlen))
-#else /* LIBC: strxfrm */
+#else /* __CRT_HAVE_strxfrm */
+__NAMESPACE_LOCAL_END
 #include <local/string/strxfrm.h>
-#define __localdep_strxfrm (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strxfrm))
-#endif /* strxfrm... */
-#endif /* !____localdep_strxfrm_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strxfrm __LIBC_LOCAL_NAME(strxfrm)
+#endif /* !__CRT_HAVE_strxfrm */
+#endif /* !__local___localdep_strxfrm_defined */
 __LOCAL_LIBC(strxfrm_l) __ATTR_NONNULL((2)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strxfrm_l))(char *__dst,
-                                                       char const *__restrict __src,
-                                                       __SIZE_TYPE__ __maxlen,
-                                                       __locale_t __locale) {
-#line 511 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strxfrm_l))(char *__dst, char const *__restrict __src, __SIZE_TYPE__ __maxlen, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_strxfrm(__dst, __src, __maxlen);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strxfrm_l_defined
+#define __local___localdep_strxfrm_l_defined 1
+#define __localdep_strxfrm_l __LIBC_LOCAL_NAME(strxfrm_l)
+#endif /* !__local___localdep_strxfrm_l_defined */
 #endif /* !__local_strxfrm_l_defined */

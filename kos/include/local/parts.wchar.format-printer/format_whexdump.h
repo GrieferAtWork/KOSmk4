@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93374f0c */
+/* HASH CRC-32:0x6a156940 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,49 +21,61 @@
 #ifndef __local_format_whexdump_defined
 #define __local_format_whexdump_defined 1
 #include <__crt.h>
+#include <kos/anno.h>
 #include <bits/wformat-printer.h>
-#include <bits/uformat-printer.h>
-
-#include <bits/wformat-printer.h>
-#include <bits/uformat-printer.h>
-
-
-
-#include <hybrid/__alloca.h>
-
-#include <hybrid/__unaligned.h>
-
-#include <hybrid/byteorder.h>
-/* Dependency: "format_wrepeat" from "parts.wchar.format-printer" */
-#ifndef ____localdep_format_wrepeat_defined
-#define ____localdep_format_wrepeat_defined 1
-#ifdef __CRT_HAVE_format_wrepeat
-/* Repeat `CH' a number of `NUM_REPETITIONS' times
- * The usual format-printer rules apply, and this function
- * is allowed to call `PRINTER' as often as it chooses */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_wrepeat,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
-#else /* LIBC: format_wrepeat */
-#include <local/parts.wchar.format-printer/format_wrepeat.h>
-/* Repeat `CH' a number of `NUM_REPETITIONS' times
- * The usual format-printer rules apply, and this function
- * is allowed to call `PRINTER' as often as it chooses */
-#define __localdep_format_wrepeat (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wrepeat))
-#endif /* format_wrepeat... */
-#endif /* !____localdep_format_wrepeat_defined */
-
-/* Dependency: "iswprint" from "wctype" */
-#ifndef ____localdep_iswprint_defined
-#define ____localdep_iswprint_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: iswprint from wctype */
+#ifndef __local___localdep_iswprint_defined
+#define __local___localdep_iswprint_defined 1
 #if __has_builtin(__builtin_iswprint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswprint)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswprint,(__WINT_TYPE__ __wc),iswprint,{ return __builtin_iswprint(__wc); })
 #elif defined(__CRT_HAVE_iswprint)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswprint,(__WINT_TYPE__ __wc),iswprint,(__wc))
-#else /* LIBC: iswprint */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wctype/iswprint.h>
-#define __localdep_iswprint (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswprint))
-#endif /* iswprint... */
-#endif /* !____localdep_iswprint_defined */
-
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_iswprint __LIBC_LOCAL_NAME(iswprint)
+#endif /* !... */
+#endif /* !__local___localdep_iswprint_defined */
+/* Dependency: format_wrepeat from parts.wchar.format-printer */
+#ifndef __local___localdep_format_wrepeat_defined
+#define __local___localdep_format_wrepeat_defined 1
+#ifdef __CRT_HAVE_format_wrepeat
+/* Repeat `CH' a number of `NUM_REPETITIONS' times
+ * The usual format-printer rules apply, and this function
+ * is allowed to call `PRINTER' as often as it chooses */
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pwformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
+#elif defined(__CRT_HAVE_DOS$format_wrepeat) && __SIZEOF_WCHAR_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <bits/uformat-printer.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Repeat `CH' a number of `NUM_REPETITIONS' times
+ * The usual format-printer rules apply, and this function
+ * is allowed to call `PRINTER' as often as it chooses */
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pc32formatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
+#elif defined(__CRT_HAVE_DOS$format_wrepeat) && __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <bits/uformat-printer.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Repeat `CH' a number of `NUM_REPETITIONS' times
+ * The usual format-printer rules apply, and this function
+ * is allowed to call `PRINTER' as often as it chooses */
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pc16formatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/parts.wchar.format-printer/format_wrepeat.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Repeat `CH' a number of `NUM_REPETITIONS' times
+ * The usual format-printer rules apply, and this function
+ * is allowed to call `PRINTER' as often as it chooses */
+#define __localdep_format_wrepeat __LIBC_LOCAL_NAME(format_wrepeat)
+#endif /* !... */
+#endif /* !__local___localdep_format_wrepeat_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/__alloca.h>
+#include <hybrid/__unaligned.h>
+#include <hybrid/byteorder.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Print a hex dump of the given data using the provided format printer
  * @param: PRINTER:  A function called for all quoted portions of the text
@@ -75,13 +87,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
 __LOCAL_LIBC(format_whexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_whexdump))(__pwformatprinter __printer,
-                                                             void *__arg,
-                                                             void const *__restrict __data,
-                                                             __SIZE_TYPE__ __size,
-                                                             __SIZE_TYPE__ __linesize,
-                                                             unsigned int __flags) {
-#line 543 "kos/src/libc/magic/format-printer.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(format_whexdump))(__pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) {
 #ifndef __DECIMALS_SELECTOR
 #define __LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define __DECIMALS_SELECTOR  __decimals
@@ -89,7 +95,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_whexdump))(__pwformatprinter _
 		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' },
 		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' },
 	};
-#endif
+#endif /* !DECIMALS_SELECTOR */
 	__PRIVATE __WCHAR_TYPE__ const __lf[1] = { '\n' };
 	char const *__dec;
 	__BYTE_TYPE__ const *__line_data;
@@ -195,14 +201,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_whexdump))(__pwformatprinter _
 						*--__dst = __dec[__q & 0xf];
 						__q >>= 4;
 					}
-#else
+#else /* __SIZEOF_POINTER__ >= 8 */
+					__UINT32_TYPE__ __a, __b;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-					__UINT32_TYPE__ __b = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
-					__UINT32_TYPE__ __a = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i + 4));
+					__a = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i + 4));
+					__b = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-					__UINT32_TYPE__ __a = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
-					__UINT32_TYPE__ __b = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i + 4));
-#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+					__a = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
+					__b = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i + 4));
+#endif /* !(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) */
 					__dst = __buffer + 16;
 					while (__dst > __buffer + 8) {
 						*--__dst = __dec[__b & 0xf];
@@ -212,7 +219,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_whexdump))(__pwformatprinter _
 						*--__dst = __dec[__a & 0xf];
 						__a >>= 4;
 					}
-#endif
+#endif /* !(__SIZEOF_POINTER__ >= 8) */
 					__temp = (*__printer)(__arg, __buffer, 17);
 					if __unlikely(__temp < 0)
 						goto __err;
@@ -269,4 +276,8 @@ __err:
 #endif /* LOCAL_DECIMALS_SELECTOR_DEFINED */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_format_whexdump_defined
+#define __local___localdep_format_whexdump_defined 1
+#define __localdep_format_whexdump __LIBC_LOCAL_NAME(format_whexdump)
+#endif /* !__local___localdep_format_whexdump_defined */
 #endif /* !__local_format_whexdump_defined */

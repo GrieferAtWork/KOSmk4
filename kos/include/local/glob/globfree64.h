@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe53dbc45 */
+/* HASH CRC-32:0x3ebaf8cf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,28 +22,26 @@
 #define __local_globfree64_defined 1
 #include <__crt.h>
 struct __glob64_struct;
-/* Dependency: "globfree32" from "glob" */
-#ifndef ____localdep_globfree32_defined
-#define ____localdep_globfree32_defined 1
-#ifdef __CRT_HAVE_globfree
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: globfree32 from glob */
+#if !defined(__local___localdep_globfree32_defined) && defined(__CRT_HAVE_globfree)
+#define __local___localdep_globfree32_defined 1
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_globfree32,(void *__pglob),globfree,(__pglob))
-#else /* LIBC: globfree */
-#undef ____localdep_globfree32_defined
-#endif /* globfree32... */
-#endif /* !____localdep_globfree32_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_globfree32_defined && __CRT_HAVE_globfree */
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __LOCAL_LIBC(globfree64) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(globfree64))(struct __glob64_struct *__pglob) {
-#line 227 "kos/src/libc/magic/glob.c"
-#if defined(__CRT_HAVE_globfree)
+#ifdef __CRT_HAVE_globfree
 	__localdep_globfree32(__pglob);
-#else
+#else /* __CRT_HAVE_globfree */
 	__COMPILER_IMPURE();
 	(void)__pglob;
-#endif
+#endif /* !__CRT_HAVE_globfree */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_globfree64_defined
+#define __local___localdep_globfree64_defined 1
+#define __localdep_globfree64 __LIBC_LOCAL_NAME(globfree64)
+#endif /* !__local___localdep_globfree64_defined */
 #endif /* !__local_globfree64_defined */

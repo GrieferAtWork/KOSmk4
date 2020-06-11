@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5037edeb */
+/* HASH CRC-32:0xa4829d66 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,40 +19,34 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futimens_defined
-#if defined(__CRT_HAVE_futimens) || defined(__CRT_HAVE_futimens64)
 #define __local_futimens_defined 1
 #include <__crt.h>
-/* Dependency: "futimens64" from "sys.stat" */
-#ifndef ____localdep_futimens64_defined
-#define ____localdep_futimens64_defined 1
+#if defined(__CRT_HAVE_futimens) || defined(__CRT_HAVE_futimens64)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: futimens32 from sys.stat */
+#if !defined(__local___localdep_futimens32_defined) && defined(__CRT_HAVE_futimens)
+#define __local___localdep_futimens32_defined 1
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),futimens,(__fd,__times))
+#endif /* !__local___localdep_futimens32_defined && __CRT_HAVE_futimens */
+/* Dependency: futimens64 from sys.stat */
+#ifndef __local___localdep_futimens64_defined
+#define __local___localdep_futimens64_defined 1
 #ifdef __CRT_HAVE_futimens64
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),futimens64,(__fd,__times))
 #elif defined(__CRT_HAVE_futimens) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),futimens,(__fd,__times))
 #elif defined(__CRT_HAVE_futimens)
+__NAMESPACE_LOCAL_END
 #include <local/sys.stat/futimens64.h>
-#define __localdep_futimens64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimens64))
-#else /* CUSTOM: futimens64 */
-#undef ____localdep_futimens64_defined
-#endif /* futimens64... */
-#endif /* !____localdep_futimens64_defined */
-
-/* Dependency: "futimens32" from "sys.stat" */
-#ifndef ____localdep_futimens32_defined
-#define ____localdep_futimens32_defined 1
-#ifdef __CRT_HAVE_futimens
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),futimens,(__fd,__times))
-#else /* LIBC: futimens */
-#undef ____localdep_futimens32_defined
-#endif /* futimens32... */
-#endif /* !____localdep_futimens32_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_futimens64 __LIBC_LOCAL_NAME(futimens64)
+#else /* ... */
+#undef __local___localdep_futimens64_defined
+#endif /* !... */
+#endif /* !__local___localdep_futimens64_defined */
 __LOCAL_LIBC(futimens) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futimens))(__fd_t __fd,
-                                                      struct timespec const __times[2 /*or:3*/]) {
-#line 672 "kos/src/libc/magic/sys.stat.c"
-#ifdef __CRT_HAVE_utimensat64
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futimens))(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) {
+#if defined(__CRT_HAVE_futimens64) || defined(__CRT_HAVE_futimens)
 	struct __timespec64 __tms[2];
 	if (!__times)
 		return __localdep_futimens64(__fd, __NULLPTR);
@@ -61,7 +55,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futimens))(__fd_t __fd,
 	__tms[1].tv_sec  = (__time64_t)__times[1].tv_sec;
 	__tms[1].tv_nsec = __times[1].tv_nsec;
 	return __localdep_futimens64(__fd, __tms);
-#else /* __CRT_HAVE_utimensat64 */
+#else /* __CRT_HAVE_futimens64 || __CRT_HAVE_futimens */
 	struct __timespec32 __tms[2];
 	if (!__times)
 		return __localdep_futimens32(__fd, __NULLPTR);
@@ -70,8 +64,14 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futimens))(__fd_t __fd,
 	__tms[1].tv_sec  = (__time32_t)__times[1].tv_sec;
 	__tms[1].tv_nsec = __times[1].tv_nsec;
 	return __localdep_futimens32(__fd, __tms);
-#endif /* !__CRT_HAVE_utimensat64 */
+#endif /* !__CRT_HAVE_futimens64 && !__CRT_HAVE_futimens */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_futimens || __CRT_HAVE_futimens64 */
+#ifndef __local___localdep_futimens_defined
+#define __local___localdep_futimens_defined 1
+#define __localdep_futimens __LIBC_LOCAL_NAME(futimens)
+#endif /* !__local___localdep_futimens_defined */
+#else /* __CRT_HAVE_futimens || __CRT_HAVE_futimens64 */
+#undef __local_futimens_defined
+#endif /* !__CRT_HAVE_futimens && !__CRT_HAVE_futimens64 */
 #endif /* !__local_futimens_defined */

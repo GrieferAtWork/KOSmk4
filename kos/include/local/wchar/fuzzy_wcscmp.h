@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x121a4347 */
+/* HASH CRC-32:0x8ec36caa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,45 +19,78 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_wcscmp_defined
-#if !defined(__NO_MALLOCA) || defined(__CRT_HAVE_fuzzy_wmemcmp)
 #define __local_fuzzy_wcscmp_defined 1
 #include <__crt.h>
-#include <parts/malloca.h>
-/* Dependency: "fuzzy_wmemcmp" from "wchar" */
-#ifndef ____localdep_fuzzy_wmemcmp_defined
-#define ____localdep_fuzzy_wmemcmp_defined 1
+#if defined(__CRT_HAVE_fuzzy_wmemcmp) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcmp) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcmp) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE_fuzzy_memcmpw) && (__SIZEOF_WCHAR_T__ == 2)) || (defined(__CRT_HAVE_fuzzy_memcmpl) && (__SIZEOF_WCHAR_T__ == 4)) || !defined(__NO_MALLOCA)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: fuzzy_wmemcmp from wchar */
+#ifndef __local___localdep_fuzzy_wmemcmp_defined
+#define __local___localdep_fuzzy_wmemcmp_defined 1
 #ifdef __CRT_HAVE_fuzzy_wmemcmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcmp,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_chars, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_chars),fuzzy_wmemcmp,(__s1,__s1_chars,__s2,__s2_chars))
-#elif !defined(__NO_MALLOCA)
+#elif defined(__CRT_HAVE_DOS$fuzzy_wmemcmp) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcmp,(__CHAR32_TYPE__ const *__s1, __SIZE_TYPE__ __s1_chars, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __s2_chars),fuzzy_wmemcmp,(__s1,__s1_chars,__s2,__s2_chars))
+#elif defined(__CRT_HAVE_DOS$fuzzy_wmemcmp) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcmp,(__CHAR16_TYPE__ const *__s1, __SIZE_TYPE__ __s1_chars, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __s2_chars),fuzzy_wmemcmp,(__s1,__s1_chars,__s2,__s2_chars))
+#elif defined(__CRT_HAVE_fuzzy_memcmpw) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcmp,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_chars, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_chars),fuzzy_memcmpw,(__s1,__s1_chars,__s2,__s2_chars))
+#elif defined(__CRT_HAVE_fuzzy_memcmpl) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcmp,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_chars, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_chars),fuzzy_memcmpl,(__s1,__s1_chars,__s2,__s2_chars))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <parts/malloca.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __NO_MALLOCA
+__NAMESPACE_LOCAL_END
 #include <local/wchar/fuzzy_wmemcmp.h>
-#define __localdep_fuzzy_wmemcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wmemcmp))
-#else /* CUSTOM: fuzzy_wmemcmp */
-#undef ____localdep_fuzzy_wmemcmp_defined
-#endif /* fuzzy_wmemcmp... */
-#endif /* !____localdep_fuzzy_wmemcmp_defined */
-
-/* Dependency: "wcslen" from "wchar" */
-#ifndef ____localdep_wcslen_defined
-#define ____localdep_wcslen_defined 1
-#ifdef __std___localdep_wcslen_defined
-__NAMESPACE_STD_USING(__localdep_wcslen)
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_fuzzy_wmemcmp __LIBC_LOCAL_NAME(fuzzy_wmemcmp)
+#else /* !__NO_MALLOCA */
+#undef __local___localdep_fuzzy_wmemcmp_defined
+#endif /* __NO_MALLOCA */
+#endif /* !... */
+#endif /* !__local___localdep_fuzzy_wmemcmp_defined */
+/* Dependency: wcslen from wchar */
+#ifndef __local___localdep_wcslen_defined
+#define __local___localdep_wcslen_defined 1
+#ifdef __wcslen_defined
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__NAMESPACE_GLB_USING(wcslen)
+#define __localdep_wcslen wcslen
+#elif defined(__std_wcslen_defined)
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__NAMESPACE_STD_USING(wcslen)
+#define __localdep_wcslen wcslen
 #elif defined(__CRT_HAVE_wcslen)
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
-#else /* LIBC: wcslen */
-#include <local/wchar/wcslen.h>
+#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 4
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_wcslen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))
-#endif /* wcslen... */
-#endif /* !____localdep_wcslen_defined */
-
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
+#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 2
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__CHAR16_TYPE__ const *__restrict __string),wcslen,(__string))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wcslen.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_wcslen __LIBC_LOCAL_NAME(wcslen)
+#endif /* !... */
+#endif /* !__local___localdep_wcslen_defined */
+__NAMESPACE_LOCAL_END
+#include <parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fuzzy_wcscmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wcscmp))(__WCHAR_TYPE__ const *__s1,
-                                                          __WCHAR_TYPE__ const *__s2) {
-#line 1498 "kos/src/libc/magic/wchar.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wcscmp))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2) {
 	return __localdep_fuzzy_wmemcmp(__s1, __localdep_wcslen(__s1), __s2, __localdep_wcslen(__s2));
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__NO_MALLOCA || __CRT_HAVE_fuzzy_wmemcmp */
+#ifndef __local___localdep_fuzzy_wcscmp_defined
+#define __local___localdep_fuzzy_wcscmp_defined 1
+#define __localdep_fuzzy_wcscmp __LIBC_LOCAL_NAME(fuzzy_wcscmp)
+#endif /* !__local___localdep_fuzzy_wcscmp_defined */
+#else /* __CRT_HAVE_fuzzy_wmemcmp || (__CRT_HAVE_DOS$fuzzy_wmemcmp && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$fuzzy_wmemcmp && __SIZEOF_WCHAR_T__ == 2) || (__CRT_HAVE_fuzzy_memcmpw && (__SIZEOF_WCHAR_T__ == 2)) || (__CRT_HAVE_fuzzy_memcmpl && (__SIZEOF_WCHAR_T__ == 4)) || !__NO_MALLOCA */
+#undef __local_fuzzy_wcscmp_defined
+#endif /* !__CRT_HAVE_fuzzy_wmemcmp && (!__CRT_HAVE_DOS$fuzzy_wmemcmp || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$fuzzy_wmemcmp || !__SIZEOF_WCHAR_T__ == 2) && (!__CRT_HAVE_fuzzy_memcmpw || !(__SIZEOF_WCHAR_T__ == 2)) && (!__CRT_HAVE_fuzzy_memcmpl || !(__SIZEOF_WCHAR_T__ == 4)) && __NO_MALLOCA */
 #endif /* !__local_fuzzy_wcscmp_defined */

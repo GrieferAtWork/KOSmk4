@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75127173 */
+/* HASH CRC-32:0xa4251d94 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
 __LOCAL_LIBC(unicode_writeutf16) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf16))(/*utf-16*/ __CHAR16_TYPE__ *__restrict __dst,
-                                                                __CHAR32_TYPE__ __ch) {
-#line 734 "kos/src/libc/magic/unicode.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf16))(__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch) {
 	if __likely(__ch <= 0xffff && (__ch < 0xd800 || __ch > 0xdfff)) {
 		*__dst++ = (__CHAR16_TYPE__)__ch;
 	} else {
@@ -38,4 +36,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf16))(/*utf-16*/ __CHA
 	return __dst;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_unicode_writeutf16_defined
+#define __local___localdep_unicode_writeutf16_defined 1
+#define __localdep_unicode_writeutf16 __LIBC_LOCAL_NAME(unicode_writeutf16)
+#endif /* !__local___localdep_unicode_writeutf16_defined */
 #endif /* !__local_unicode_writeutf16_defined */

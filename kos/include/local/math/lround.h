@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1259d720 */
+/* HASH CRC-32:0xcd014fc6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,10 @@
 #ifndef __local_lround_defined
 #define __local_lround_defined 1
 #include <__crt.h>
-#include <hybrid/typecore.h>
-
-#include <libm/lround.h>
-/* Dependency: "round" from "math" */
-#ifndef ____localdep_round_defined
-#define ____localdep_round_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: round from math */
+#ifndef __local___localdep_round_defined
+#define __local___localdep_round_defined 1
 #if __has_builtin(__builtin_round) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_round)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),round,{ return __builtin_round(__x); })
@@ -36,18 +34,21 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(doubl
 #elif defined(__CRT_HAVE___round)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),__round,(__x))
-#else /* LIBC: round */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/math/round.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-#define __localdep_round (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(round))
-#endif /* round... */
-#endif /* !____localdep_round_defined */
-
+#define __localdep_round __LIBC_LOCAL_NAME(round)
+#endif /* !... */
+#endif /* !__local___localdep_round_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+#include <libm/lround.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __LOCAL_LIBC(lround) __ATTR_CONST __ATTR_WUNUSED long int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lround))(double __x) {
-#line 1039 "kos/src/libc/magic/math.c"
 #ifdef __LIBM_MATHFUNI
 	return __LIBM_MATHFUNI(lround, __x);
 #else /* __LIBM_MATHFUNI */
@@ -55,4 +56,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lround))(double __x) {
 #endif /* !__LIBM_MATHFUNI */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_lround_defined
+#define __local___localdep_lround_defined 1
+#define __localdep_lround __LIBC_LOCAL_NAME(lround)
+#endif /* !__local___localdep_lround_defined */
 #endif /* !__local_lround_defined */

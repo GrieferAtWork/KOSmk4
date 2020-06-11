@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f21b8f8 */
+/* HASH CRC-32:0x5516fcd9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,12 @@ __NAMESPACE_LOCAL_BEGIN
  * needed or fall back on the copy which must exist somewhere else */
 __LOCAL_LIBC(__pthread_cleanup_routine) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__pthread_cleanup_routine))(struct __pthread_cleanup_frame *__frame) {
-#line 643 "kos/src/libc/magic/pthread.c"
 	if (__frame->__do_it)
 		(*__frame->__cancel_routine)(__frame->__cancel_arg);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___pthread_cleanup_routine_defined
+#define __local___localdep___pthread_cleanup_routine_defined 1
+#define __localdep___pthread_cleanup_routine __LIBC_LOCAL_NAME(__pthread_cleanup_routine)
+#endif /* !__local___localdep___pthread_cleanup_routine_defined */
 #endif /* !__local___pthread_cleanup_routine_defined */

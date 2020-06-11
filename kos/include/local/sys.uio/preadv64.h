@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1eefc8 */
+/* HASH CRC-32:0x7e9d702 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,27 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_preadv64_defined
-#ifdef __CRT_HAVE_preadv
 #define __local_preadv64_defined 1
 #include <__crt.h>
-#include <bits/uio.h>
-/* Dependency: "preadv32" from "sys.uio" */
-#ifndef ____localdep_preadv32_defined
-#define ____localdep_preadv32_defined 1
 #ifdef __CRT_HAVE_preadv
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),preadv,(__fd,__iov,__count,__offset))
-#else /* LIBC: preadv */
-#undef ____localdep_preadv32_defined
-#endif /* preadv32... */
-#endif /* !____localdep_preadv32_defined */
-
+#include <features.h>
+#include <bits/uio.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: preadv32 from sys.uio */
+#if !defined(__local___localdep_preadv32_defined) && defined(__CRT_HAVE_preadv)
+#define __local___localdep_preadv32_defined 1
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),preadv,(__fd,__iov,__count,__offset))
+#endif /* !__local___localdep_preadv32_defined && __CRT_HAVE_preadv */
 __LOCAL_LIBC(preadv64) __ATTR_WUNUSED __ATTR_NONNULL((2)) __SSIZE_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadv64))(__fd_t __fd,
-                                                      struct iovec const *__iov,
-                                                      __STDC_INT_AS_SIZE_T __count,
-                                                      __off64_t __offset) {
-#line 106 "kos/src/libc/magic/sys.uio.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadv64))(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset) {
 	return __localdep_preadv32(__fd, __iov, __count, (__off32_t)__offset);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_preadv */
+#ifndef __local___localdep_preadv64_defined
+#define __local___localdep_preadv64_defined 1
+#define __localdep_preadv64 __LIBC_LOCAL_NAME(preadv64)
+#endif /* !__local___localdep_preadv64_defined */
+#else /* __CRT_HAVE_preadv */
+#undef __local_preadv64_defined
+#endif /* !__CRT_HAVE_preadv */
 #endif /* !__local_preadv64_defined */

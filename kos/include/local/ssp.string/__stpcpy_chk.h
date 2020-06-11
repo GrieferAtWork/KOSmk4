@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b3bd563 */
+/* HASH CRC-32:0xb537d241 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,10 +21,10 @@
 #ifndef __local___stpcpy_chk_defined
 #define __local___stpcpy_chk_defined 1
 #include <__crt.h>
-#include <ssp/chk.h>
-/* Dependency: "stpcpy" from "string" */
-#ifndef ____localdep_stpcpy_defined
-#define ____localdep_stpcpy_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: stpcpy from string */
+#ifndef __local___localdep_stpcpy_defined
+#define __local___localdep_stpcpy_defined 1
 #if __has_builtin(__builtin_stpcpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_stpcpy)
 /* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_stpcpy,(char *__restrict __buf, char const *__restrict __src),stpcpy,{ return __builtin_stpcpy(__buf, __src); })
@@ -34,22 +34,25 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHRO
 #elif defined(__CRT_HAVE___stpcpy)
 /* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_stpcpy,(char *__restrict __buf, char const *__restrict __src),__stpcpy,(__buf,__src))
-#else /* LIBC: stpcpy */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/stpcpy.h>
-/* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
-#define __localdep_stpcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stpcpy))
-#endif /* stpcpy... */
-#endif /* !____localdep_stpcpy_defined */
-
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__stpcpy_chk) __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__stpcpy_chk))(char *__restrict __dst,
-                                                          char const *__restrict __src,
-                                                          __SIZE_TYPE__ __dst_objsize) {
-#line 52 "kos/src/libc/magic/ssp.string.c"
+/* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
+#define __localdep_stpcpy __LIBC_LOCAL_NAME(stpcpy)
+#endif /* !... */
+#endif /* !__local___localdep_stpcpy_defined */
+__NAMESPACE_LOCAL_END
+#include <ssp/chk.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(__stpcpy_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__stpcpy_chk))(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dst_objsize) {
 	(void)__dst_objsize; /* TODO */;
 	return __localdep_stpcpy(__dst, __src);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep___stpcpy_chk_defined
+#define __local___localdep___stpcpy_chk_defined 1
+#define __localdep___stpcpy_chk __LIBC_LOCAL_NAME(__stpcpy_chk)
+#endif /* !__local___localdep___stpcpy_chk_defined */
 #endif /* !__local___stpcpy_chk_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a742eee */
+/* HASH CRC-32:0x8b27439a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,15 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(lldiv) __ATTR_CONST __ATTR_WUNUSED struct __lldiv_struct
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lldiv))(__LONGLONG __numer,
-                                                   __LONGLONG __denom) {
-#line 554 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lldiv))(__LONGLONG __numer, __LONGLONG __denom) {
 	struct __lldiv_struct __result;
 	__result.quot = __numer / __denom;
 	__result.rem  = __numer % __denom;
 	return __result;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_lldiv_defined
+#define __local___localdep_lldiv_defined 1
+#define __localdep_lldiv __LIBC_LOCAL_NAME(lldiv)
+#endif /* !__local___localdep_lldiv_defined */
 #endif /* !__local_lldiv_defined */

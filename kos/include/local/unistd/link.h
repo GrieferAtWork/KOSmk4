@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x228266f0 */
+/* HASH CRC-32:0xc287b59b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,30 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_link_defined
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_linkat)
 #define __local_link_defined 1
 #include <__crt.h>
-/* Dependency: "linkat" */
-#ifndef ____localdep_linkat_defined
-#define ____localdep_linkat_defined 1
-#ifdef __CRT_HAVE_linkat
+#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_linkat)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: linkat from unistd */
+#if !defined(__local___localdep_linkat_defined) && defined(__CRT_HAVE_linkat)
+#define __local___localdep_linkat_defined 1
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_linkat,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),linkat,(__fromfd,__from,__tofd,__to,__flags))
-#else /* LIBC: linkat */
-#undef ____localdep_linkat_defined
-#endif /* linkat... */
-#endif /* !____localdep_linkat_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#endif /* !__local___localdep_linkat_defined && __CRT_HAVE_linkat */
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __LOCAL_LIBC(link) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(link))(char const *__from,
-                                                  char const *__to) {
-#line 544 "kos/src/libc/magic/unistd.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(link))(char const *__from, char const *__to) {
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */
 	return __localdep_linkat(__CRT_AT_FDCWD, __from, __CRT_AT_FDCWD, __to, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && __CRT_HAVE_linkat */
+#ifndef __local___localdep_link_defined
+#define __local___localdep_link_defined 1
+#define __localdep_link __LIBC_LOCAL_NAME(link)
+#endif /* !__local___localdep_link_defined */
+#else /* __CRT_AT_FDCWD && __CRT_HAVE_linkat */
+#undef __local_link_defined
+#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_linkat */
 #endif /* !__local_link_defined */

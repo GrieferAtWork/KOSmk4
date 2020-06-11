@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe112d1da */
+/* HASH CRC-32:0x98e9e615 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,14 +23,15 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtIsValidPointer) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtIsValidPointer))(void const *__ptr,
-                                                                __STDC_UINT_AS_SIZE_T __num_bytes,
-                                                                int __writable) {
-#line 564 "kos/src/libc/magic/crtdbg.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtIsValidPointer))(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, int __writable) {
 	__COMPILER_IMPURE();
 	(void)__num_bytes;
 	(void)__writable;
 	return __ptr != __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__CrtIsValidPointer_defined
+#define __local___localdep__CrtIsValidPointer_defined 1
+#define __localdep__CrtIsValidPointer __LIBC_LOCAL_NAME(_CrtIsValidPointer)
+#endif /* !__local___localdep__CrtIsValidPointer_defined */
 #endif /* !__local__CrtIsValidPointer_defined */

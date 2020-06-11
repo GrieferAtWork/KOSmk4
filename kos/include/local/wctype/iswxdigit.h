@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x632abb84 */
+/* HASH CRC-32:0xd8714383 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,28 @@
 #ifndef __local_iswxdigit_defined
 #define __local_iswxdigit_defined 1
 #include <__crt.h>
-/* Dependency: "isdigit" from "ctype" */
-#ifndef ____localdep_isdigit_defined
-#define ____localdep_isdigit_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: isdigit from ctype */
+#ifndef __local___localdep_isdigit_defined
+#define __local___localdep_isdigit_defined 1
 #if __has_builtin(__builtin_isdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isdigit)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isdigit,(int __ch),isdigit,{ return __builtin_isdigit(__ch); })
 #elif defined(__CRT_HAVE_isdigit)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isdigit,(int __ch),isdigit,(__ch))
-#else /* LIBC: isdigit */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/ctype/isdigit.h>
-#define __localdep_isdigit (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isdigit))
-#endif /* isdigit... */
-#endif /* !____localdep_isdigit_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_isdigit __LIBC_LOCAL_NAME(isdigit)
+#endif /* !... */
+#endif /* !__local___localdep_isdigit_defined */
 __LOCAL_LIBC(iswxdigit) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswxdigit))(__WINT_TYPE__ __wc) {
-#line 158 "kos/src/libc/magic/wctype.c"
 	return __localdep_isdigit((int)__wc);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_iswxdigit_defined
+#define __local___localdep_iswxdigit_defined 1
+#define __localdep_iswxdigit __LIBC_LOCAL_NAME(iswxdigit)
+#endif /* !__local___localdep_iswxdigit_defined */
 #endif /* !__local_iswxdigit_defined */

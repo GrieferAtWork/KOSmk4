@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97513620 */
+/* HASH CRC-32:0x759b18b5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,22 +21,25 @@
 #ifndef __local_wcswidth_defined
 #define __local_wcswidth_defined 1
 #include <__crt.h>
-/* Dependency: "wcwidth" from "wchar" */
-#ifndef ____localdep_wcwidth_defined
-#define ____localdep_wcwidth_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wcwidth from wchar */
+#ifndef __local___localdep_wcwidth_defined
+#define __local___localdep_wcwidth_defined 1
 #ifdef __CRT_HAVE_wcwidth
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wcwidth,(__WCHAR_TYPE__ __ch),wcwidth,(__ch))
-#else /* LIBC: wcwidth */
+#elif defined(__CRT_HAVE_DOS$wcwidth) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wcwidth,(__CHAR32_TYPE__ __ch),wcwidth,(__ch))
+#elif defined(__CRT_HAVE_DOS$wcwidth) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wcwidth,(__CHAR16_TYPE__ __ch),wcwidth,(__ch))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/wchar/wcwidth.h>
-#define __localdep_wcwidth (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcwidth))
-#endif /* wcwidth... */
-#endif /* !____localdep_wcwidth_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcwidth __LIBC_LOCAL_NAME(wcwidth)
+#endif /* !... */
+#endif /* !__local___localdep_wcwidth_defined */
 __LOCAL_LIBC(wcswidth) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcswidth))(__WCHAR_TYPE__ const *__restrict __string,
-                                                      __SIZE_TYPE__ __num_chars) {
-#line 925 "kos/src/libc/magic/wchar.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcswidth))(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __num_chars) {
 	int __temp, __result = 0;
 	for (; __num_chars; --__num_chars, ++__string) {
 		__WCHAR_TYPE__ __ch = *__string;
@@ -50,4 +53,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcswidth))(__WCHAR_TYPE__ const *__re
 	return 0;
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_wcswidth_defined
+#define __local___localdep_wcswidth_defined 1
+#define __localdep_wcswidth __LIBC_LOCAL_NAME(wcswidth)
+#endif /* !__local___localdep_wcswidth_defined */
 #endif /* !__local_wcswidth_defined */

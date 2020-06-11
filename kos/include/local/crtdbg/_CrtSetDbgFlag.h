@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc73065e6 */
+/* HASH CRC-32:0xd3e3977a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,23 +19,24 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__CrtSetDbgFlag_defined
-#ifdef __CRT_HAVE___p__crtDbgFlag
 #define __local__CrtSetDbgFlag_defined 1
 #include <__crt.h>
-/* Dependency: "__p__crtDbgFlag" */
-#ifndef ____localdep___p__crtDbgFlag_defined
-#define ____localdep___p__crtDbgFlag_defined 1
 #ifdef __CRT_HAVE___p__crtDbgFlag
-__CREDIRECT(,int *,__NOTHROW_NCX,__localdep___p__crtDbgFlag,(void),__p__crtDbgFlag,())
-#else /* LIBC: __p__crtDbgFlag */
-#undef ____localdep___p__crtDbgFlag_defined
-#endif /* __p__crtDbgFlag... */
-#endif /* !____localdep___p__crtDbgFlag_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: __p__crtDbgFlag from crtdbg */
+#ifndef __local___localdep___p__crtDbgFlag_defined
+#define __local___localdep___p__crtDbgFlag_defined 1
+#ifdef ____p__crtDbgFlag_defined
+__NAMESPACE_GLB_USING(__p__crtDbgFlag)
+#define __localdep___p__crtDbgFlag __p__crtDbgFlag
+#elif defined(__CRT_HAVE___p__crtDbgFlag)
+__CREDIRECT(,int *,__NOTHROW_NCX,__localdep___p__crtDbgFlag,(void),__p__crtDbgFlag,())
+#else /* ... */
+#undef __local___localdep___p__crtDbgFlag_defined
+#endif /* !... */
+#endif /* !__local___localdep___p__crtDbgFlag_defined */
 __LOCAL_LIBC(_CrtSetDbgFlag) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtSetDbgFlag))(int __new_flag) {
-#line 262 "kos/src/libc/magic/crtdbg.c"
 	int __result, *__ptr;
 	__ptr = __localdep___p__crtDbgFlag();
 	__result = *__ptr;
@@ -43,5 +44,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtSetDbgFlag))(int __new_flag) {
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE___p__crtDbgFlag */
+#ifndef __local___localdep__CrtSetDbgFlag_defined
+#define __local___localdep__CrtSetDbgFlag_defined 1
+#define __localdep__CrtSetDbgFlag __LIBC_LOCAL_NAME(_CrtSetDbgFlag)
+#endif /* !__local___localdep__CrtSetDbgFlag_defined */
+#else /* __CRT_HAVE___p__crtDbgFlag */
+#undef __local__CrtSetDbgFlag_defined
+#endif /* !__CRT_HAVE___p__crtDbgFlag */
 #endif /* !__local__CrtSetDbgFlag_defined */

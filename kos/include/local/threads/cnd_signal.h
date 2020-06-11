@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34c7c3f2 */
+/* HASH CRC-32:0xe0b0804 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,30 +19,25 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cnd_signal_defined
-#ifdef __CRT_HAVE_pthread_cond_signal
 #define __local_cnd_signal_defined 1
 #include <__crt.h>
-#include <bits/threads.h>
-
-#include <bits/pthreadtypes.h>
-#include <asm/threads.h>
-/* Dependency: "pthread_cond_signal" */
-#ifndef ____localdep_pthread_cond_signal_defined
-#define ____localdep_pthread_cond_signal_defined 1
 #ifdef __CRT_HAVE_pthread_cond_signal
+#include <bits/threads.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pthread_cond_signal from pthread */
+#if !defined(__local___localdep_pthread_cond_signal_defined) && defined(__CRT_HAVE_pthread_cond_signal)
+#define __local___localdep_pthread_cond_signal_defined 1
 /* Wake up one thread waiting for condition variable COND */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_cond_signal,(__pthread_cond_t *__cond),pthread_cond_signal,(__cond))
-#else /* LIBC: pthread_cond_signal */
-#undef ____localdep_pthread_cond_signal_defined
-#endif /* pthread_cond_signal... */
-#endif /* !____localdep_pthread_cond_signal_defined */
-
+#endif /* !__local___localdep_pthread_cond_signal_defined && __CRT_HAVE_pthread_cond_signal */
+__NAMESPACE_LOCAL_END
+#include <asm/threads.h>
+#include <bits/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Unblock one thread that currently waits on condition variable pointed by COND
  * s.a. `pthread_cond_signal()' */
 __LOCAL_LIBC(cnd_signal) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_signal))(__cnd_t *__restrict __cond) {
-#line 442 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_cond_signal((__pthread_cond_t *)__cond);
 	if __likely(!__error)
@@ -50,5 +45,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_signal))(__cnd_t *__restrict __co
 	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_pthread_cond_signal */
+#ifndef __local___localdep_cnd_signal_defined
+#define __local___localdep_cnd_signal_defined 1
+#define __localdep_cnd_signal __LIBC_LOCAL_NAME(cnd_signal)
+#endif /* !__local___localdep_cnd_signal_defined */
+#else /* __CRT_HAVE_pthread_cond_signal */
+#undef __local_cnd_signal_defined
+#endif /* !__CRT_HAVE_pthread_cond_signal */
 #endif /* !__local_cnd_signal_defined */

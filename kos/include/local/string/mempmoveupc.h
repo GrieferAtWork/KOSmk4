@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x779c71 */
+/* HASH CRC-32:0xa113da3b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,93 +21,94 @@
 #ifndef __local_mempmoveupc_defined
 #define __local_mempmoveupc_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <hybrid/host.h>
-
-#include <hybrid/host.h>
-/* Dependency: "mempmoveup" from "string" */
-#ifndef ____localdep_mempmoveup_defined
-#define ____localdep_mempmoveup_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: mempmoveupq from string */
+#ifndef __local___localdep_mempmoveupq_defined
+#define __local___localdep_mempmoveupq_defined 1
+#ifdef __fast_mempmoveupq_defined
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
+__NAMESPACE_FAST_USING(mempmoveupq)
+#define __localdep_mempmoveupq __LIBC_FAST_NAME(mempmoveupq)
+#elif defined(__CRT_HAVE_mempmoveupq)
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveupq,(__dst,__src,__n_qwords))
+#elif defined(__CRT_HAVE_mempmoveq)
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveq,(__dst,__src,__n_qwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/mempmoveupq.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
+#define __localdep_mempmoveupq __LIBC_LOCAL_NAME(mempmoveupq)
+#endif /* !... */
+#endif /* !__local___localdep_mempmoveupq_defined */
+/* Dependency: mempmoveupl from string */
+#ifndef __local___localdep_mempmoveupl_defined
+#define __local___localdep_mempmoveupl_defined 1
+#ifdef __fast_mempmoveupl_defined
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
+__NAMESPACE_FAST_USING(mempmoveupl)
+#define __localdep_mempmoveupl __LIBC_FAST_NAME(mempmoveupl)
+#elif defined(__CRT_HAVE_mempmoveupl)
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),mempmoveupl,(__dst,__src,__n_dwords))
+#elif defined(__CRT_HAVE_mempmovel)
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),mempmovel,(__dst,__src,__n_dwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/mempmoveupl.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
+#define __localdep_mempmoveupl __LIBC_LOCAL_NAME(mempmoveupl)
+#endif /* !... */
+#endif /* !__local___localdep_mempmoveupl_defined */
+/* Dependency: mempmoveupw from string */
+#ifndef __local___localdep_mempmoveupw_defined
+#define __local___localdep_mempmoveupw_defined 1
+#ifdef __fast_mempmoveupw_defined
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
+__NAMESPACE_FAST_USING(mempmoveupw)
+#define __localdep_mempmoveupw __LIBC_FAST_NAME(mempmoveupw)
+#elif defined(__CRT_HAVE_mempmoveupw)
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),mempmoveupw,(__dst,__src,__n_words))
+#elif defined(__CRT_HAVE_mempmovew)
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),mempmovew,(__dst,__src,__n_words))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/mempmoveupw.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
+#define __localdep_mempmoveupw __LIBC_LOCAL_NAME(mempmoveupw)
+#endif /* !... */
+#endif /* !__local___localdep_mempmoveupw_defined */
+/* Dependency: mempmoveup from string */
+#ifndef __local___localdep_mempmoveup_defined
+#define __local___localdep_mempmoveup_defined 1
 #ifdef __fast_mempmoveup_defined
 /* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
-#define __localdep_mempmoveup (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveup))
+__NAMESPACE_FAST_USING(mempmoveup)
+#define __localdep_mempmoveup __LIBC_FAST_NAME(mempmoveup)
 #elif defined(__CRT_HAVE_mempmoveup)
 /* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmoveup,(__dst,__src,__n_bytes))
-#else /* LIBC: mempmoveup */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/mempmoveup.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
-#define __localdep_mempmoveup (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveup))
-#endif /* mempmoveup... */
-#endif /* !____localdep_mempmoveup_defined */
-
-/* Dependency: "mempmoveupw" from "string" */
-#ifndef ____localdep_mempmoveupw_defined
-#define ____localdep_mempmoveupw_defined 1
-#ifdef __fast_mempmoveupw_defined
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
-#define __localdep_mempmoveupw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupw))
-#elif defined(__CRT_HAVE_mempmoveupw)
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupw,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words),mempmoveupw,(__dst,__src,__n_words))
-#elif defined(__CRT_HAVE_mempmovew)
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupw,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words),mempmovew,(__dst,__src,__n_words))
-#else /* LIBC: mempmoveupw */
-#include <local/string/mempmoveupw.h>
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
-#define __localdep_mempmoveupw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupw))
-#endif /* mempmoveupw... */
-#endif /* !____localdep_mempmoveupw_defined */
-
-/* Dependency: "mempmoveupl" from "string" */
-#ifndef ____localdep_mempmoveupl_defined
-#define ____localdep_mempmoveupl_defined 1
-#ifdef __fast_mempmoveupl_defined
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
-#define __localdep_mempmoveupl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupl))
-#elif defined(__CRT_HAVE_mempmoveupl)
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupl,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),mempmoveupl,(__dst,__src,__n_dwords))
-#elif defined(__CRT_HAVE_mempmovel)
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupl,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords),mempmovel,(__dst,__src,__n_dwords))
-#else /* LIBC: mempmoveupl */
-#include <local/string/mempmoveupl.h>
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
-#define __localdep_mempmoveupl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupl))
-#endif /* mempmoveupl... */
-#endif /* !____localdep_mempmoveupl_defined */
-
-/* Dependency: "mempmoveupq" from "string" */
-#ifndef ____localdep_mempmoveupq_defined
-#define ____localdep_mempmoveupq_defined 1
-#ifdef __fast_mempmoveupq_defined
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
-#define __localdep_mempmoveupq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupq))
-#elif defined(__CRT_HAVE_mempmoveupq)
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupq,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveupq,(__dst,__src,__n_qwords))
-#elif defined(__CRT_HAVE_mempmoveq)
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupq,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveq,(__dst,__src,__n_qwords))
-#else /* LIBC: mempmoveupq */
-#include <local/string/mempmoveupq.h>
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
-#define __localdep_mempmoveupq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupq))
-#endif /* mempmoveupq... */
-#endif /* !____localdep_mempmoveupq_defined */
-
+#define __localdep_mempmoveup __LIBC_LOCAL_NAME(mempmoveup)
+#endif /* !... */
+#endif /* !__local___localdep_mempmoveup_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/host.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memmoveupc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 __LOCAL_LIBC(mempmoveupc) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveupc))(void *__dst,
-                                                         void const *__src,
-                                                         __SIZE_TYPE__ __elem_count,
-                                                         __SIZE_TYPE__ __elem_size) {
-#line 2502 "kos/src/libc/magic/string.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveupc))(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) {
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 	switch (__elem_size) {
 
@@ -131,6 +132,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveupc))(void *__dst,
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	return __localdep_mempmoveup(__dst, __src, __elem_count * __elem_size);
 }
-
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_mempmoveupc_defined
+#define __local___localdep_mempmoveupc_defined 1
+#define __localdep_mempmoveupc __LIBC_LOCAL_NAME(mempmoveupc)
+#endif /* !__local___localdep_mempmoveupc_defined */
 #endif /* !__local_mempmoveupc_defined */

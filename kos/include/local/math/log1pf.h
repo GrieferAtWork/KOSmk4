@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5dcaebcf */
+/* HASH CRC-32:0x134002a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_log1pf_defined
-#if defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 #define __local_log1pf_defined 1
 #include <__crt.h>
-/* Dependency: "log1p" */
-#ifndef ____localdep_log1p_defined
-#define ____localdep_log1p_defined 1
+#if defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: log1p from math */
+#ifndef __local___localdep_log1p_defined
+#define __local___localdep_log1p_defined 1
 #if __has_builtin(__builtin_log1p) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1p)
 /* Return log(1 + X) */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log1p,(double __x),log1p,{ return __builtin_log1p(__x); })
@@ -34,18 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log1p,(double __x),log1p,
 #elif defined(__CRT_HAVE___log1p)
 /* Return log(1 + X) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log1p,(double __x),__log1p,(__x))
-#else /* LIBC: log1p */
-#undef ____localdep_log1p_defined
-#endif /* log1p... */
-#endif /* !____localdep_log1p_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_log1p_defined
+#endif /* !... */
+#endif /* !__local___localdep_log1p_defined */
 /* Return log(1 + X) */
 __LOCAL_LIBC(log1pf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(log1pf))(float __x) {
-#line 476 "kos/src/libc/magic/math.c"
 	return (float)__localdep_log1p((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_log1p || __CRT_HAVE___log1p */
+#ifndef __local___localdep_log1pf_defined
+#define __local___localdep_log1pf_defined 1
+#define __localdep_log1pf __LIBC_LOCAL_NAME(log1pf)
+#endif /* !__local___localdep_log1pf_defined */
+#else /* __CRT_HAVE_log1p || __CRT_HAVE___log1p */
+#undef __local_log1pf_defined
+#endif /* !__CRT_HAVE_log1p && !__CRT_HAVE___log1p */
 #endif /* !__local_log1pf_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7cd414e */
+/* HASH CRC-32:0x5927bf5d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,25 +21,28 @@
 #ifndef __local__vscprintf_p_l_defined
 #define __local__vscprintf_p_l_defined 1
 #include <__crt.h>
-/* Dependency: "_vscprintf_p" from "stdio" */
-#ifndef ____localdep__vscprintf_p_defined
-#define ____localdep__vscprintf_p_defined 1
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: _vscprintf_p from stdio */
+#ifndef __local___localdep__vscprintf_p_defined
+#define __local___localdep__vscprintf_p_defined 1
 #ifdef __CRT_HAVE__vscprintf_p
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_PRINTF_P(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vscprintf_p,(char const *__restrict __format, __builtin_va_list __args),_vscprintf_p,(__format,__args))
-#else /* LIBC: _vscprintf_p */
+#else /* __CRT_HAVE__vscprintf_p */
+__NAMESPACE_LOCAL_END
 #include <local/stdio/_vscprintf_p.h>
-#define __localdep__vscprintf_p (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vscprintf_p))
-#endif /* _vscprintf_p... */
-#endif /* !____localdep__vscprintf_p_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep__vscprintf_p __LIBC_LOCAL_NAME(_vscprintf_p)
+#endif /* !__CRT_HAVE__vscprintf_p */
+#endif /* !__local___localdep__vscprintf_p_defined */
 __LOCAL_LIBC(_vscprintf_p_l) __ATTR_WUNUSED __ATTR_LIBC_PRINTF_P(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_p_l))(char const *__restrict __format,
-                                                            __locale_t __locale,
-                                                            __builtin_va_list __args) {
-#line 2460 "kos/src/libc/magic/stdio.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_p_l))(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args) {
 	(void)__locale;
 	return __localdep__vscprintf_p(__format, __args);
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep__vscprintf_p_l_defined
+#define __local___localdep__vscprintf_p_l_defined 1
+#define __localdep__vscprintf_p_l __LIBC_LOCAL_NAME(_vscprintf_p_l)
+#endif /* !__local___localdep__vscprintf_p_l_defined */
 #endif /* !__local__vscprintf_p_l_defined */

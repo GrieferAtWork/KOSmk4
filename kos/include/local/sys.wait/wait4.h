@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1eed96b */
+/* HASH CRC-32:0xd9cf9dcd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,56 +19,55 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wait4_defined
-#if defined(__CRT_HAVE_wait4) || defined(__CRT_HAVE_wait4_64)
 #define __local_wait4_defined 1
 #include <__crt.h>
-#include <bits/rusage-struct.h>
+#if defined(__CRT_HAVE_wait4) || defined(__CRT_HAVE_wait4_64)
 struct rusage;
-/* Dependency: "wait4_32" from "sys.wait" */
-#ifndef ____localdep_wait4_32_defined
-#define ____localdep_wait4_32_defined 1
-#ifdef __CRT_HAVE_wait4
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait4_32,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct __rusage32 *__usage),wait4,(__pid,__stat_loc,__options,__usage))
-#else /* LIBC: wait4 */
-#undef ____localdep_wait4_32_defined
-#endif /* wait4_32... */
-#endif /* !____localdep_wait4_32_defined */
-
-/* Dependency: "wait4_64" from "sys.wait" */
-#ifndef ____localdep_wait4_64_defined
-#define ____localdep_wait4_64_defined 1
-#ifdef __CRT_HAVE_wait4_64
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct __rusage64 *__usage),wait4_64,(__pid,__stat_loc,__options,__usage))
-#elif defined(__CRT_HAVE_wait4) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct __rusage64 *__usage),wait4,(__pid,__stat_loc,__options,__usage))
-#elif defined(__CRT_HAVE_wait4)
-#include <local/sys.wait/wait4_64.h>
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-#define __localdep_wait4_64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wait4_64))
-#else /* CUSTOM: wait4_64 */
-#undef ____localdep_wait4_64_defined
-#endif /* wait4_64... */
-#endif /* !____localdep_wait4_64_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#include <features.h>
 #include <bits/rusage-struct.h>
-
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: wait4_32 from sys.wait */
+#if !defined(__local___localdep_wait4_32_defined) && defined(__CRT_HAVE_wait4)
+#define __local___localdep_wait4_32_defined 1
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait4_32,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),wait4,(__pid,__stat_loc,__options,__usage))
+#endif /* !__local___localdep_wait4_32_defined && __CRT_HAVE_wait4 */
+/* Dependency: wait4_64 from sys.wait */
+#ifndef __local___localdep_wait4_64_defined
+#define __local___localdep_wait4_64_defined 1
+#ifdef __CRT_HAVE_wait4_64
+__NAMESPACE_LOCAL_END
+struct __rusage64;
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait4_64,(__pid,__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait4) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__NAMESPACE_LOCAL_END
+struct __rusage64;
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait4,(__pid,__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait4)
+__NAMESPACE_LOCAL_END
+#include <local/sys.wait/wait4_64.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+#define __localdep_wait4_64 __LIBC_LOCAL_NAME(wait4_64)
+#else /* ... */
+#undef __local___localdep_wait4_64_defined
+#endif /* !... */
+#endif /* !__local___localdep_wait4_64_defined */
+__NAMESPACE_LOCAL_END
 #include <bits/rusage-convert.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __LOCAL_LIBC(wait4) __pid_t
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wait4))(__pid_t __pid,
-                                                   __WAIT_STATUS __stat_loc,
-                                                   int __options,
-                                                   struct rusage *__usage) {
-#line 192 "kos/src/libc/magic/sys.wait.c"
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wait4))(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct rusage *__usage) {
 	__pid_t __result;
 #ifdef __CRT_HAVE_wait4
 	struct __rusage32 __ru32;
@@ -84,5 +83,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wait4))(__pid_t __pid,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_wait4 || __CRT_HAVE_wait4_64 */
+#ifndef __local___localdep_wait4_defined
+#define __local___localdep_wait4_defined 1
+#define __localdep_wait4 __LIBC_LOCAL_NAME(wait4)
+#endif /* !__local___localdep_wait4_defined */
+#else /* __CRT_HAVE_wait4 || __CRT_HAVE_wait4_64 */
+#undef __local_wait4_defined
+#endif /* !__CRT_HAVE_wait4 && !__CRT_HAVE_wait4_64 */
 #endif /* !__local_wait4_defined */

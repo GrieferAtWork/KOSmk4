@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c6b720f */
+/* HASH CRC-32:0x3713e204 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,55 +19,50 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_wmemcasecmp_l_defined
-#ifndef __NO_MALLOCA
 #define __local_fuzzy_wmemcasecmp_l_defined 1
 #include <__crt.h>
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <optimized/string.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
 #include <parts/malloca.h>
-/* Dependency: "towlower_l" from "wctype" */
-#ifndef ____localdep_towlower_l_defined
-#define ____localdep_towlower_l_defined 1
-#ifdef __CRT_HAVE_towlower_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),towlower_l,(__wc,__locale))
-#elif defined(__CRT_HAVE__towlower_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),_towlower_l,(__wc,__locale))
-#elif defined(__CRT_HAVE___towlower_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),__towlower_l,(__wc,__locale))
-#else /* LIBC: towlower_l */
-#include <local/wctype/towlower_l.h>
-#define __localdep_towlower_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towlower_l))
-#endif /* towlower_l... */
-#endif /* !____localdep_towlower_l_defined */
-
-/* Dependency: "memcpyc" from "string" */
-#ifndef ____localdep_memcpyc_defined
-#define ____localdep_memcpyc_defined 1
+#ifndef __NO_MALLOCA
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcpyc from string */
+#ifndef __local___localdep_memcpyc_defined
+#define __local___localdep_memcpyc_defined 1
 #ifdef __fast_memcpyc_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))
+__NAMESPACE_FAST_USING(memcpyc)
+#define __localdep_memcpyc __LIBC_FAST_NAME(memcpyc)
 #elif defined(__CRT_HAVE_memcpyc)
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
-#else /* LIBC: memcpyc */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/string/memcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))
-#endif /* memcpyc... */
-#endif /* !____localdep_memcpyc_defined */
-
+#define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
+#endif /* !... */
+#endif /* !__local___localdep_memcpyc_defined */
+/* Dependency: tolower_l from ctype */
+#ifndef __local___localdep_tolower_l_defined
+#define __local___localdep_tolower_l_defined 1
+#ifdef __CRT_HAVE_tolower_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),tolower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__tolower_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),_tolower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE___tolower_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),__tolower_l,(__ch,__locale))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/ctype/tolower_l.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fuzzy_wmemcasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wmemcasecmp_l))(__WCHAR_TYPE__ const *__s1,
-                                                                 __SIZE_TYPE__ __s1_bytes,
-                                                                 __WCHAR_TYPE__ const *__s2,
-                                                                 __SIZE_TYPE__ __s2_bytes,
-                                                                 __locale_t __locale) {
-#line 4474 "kos/src/libc/magic/string.c"
+#define __localdep_tolower_l __LIBC_LOCAL_NAME(tolower_l)
+#endif /* !... */
+#endif /* !__local___localdep_tolower_l_defined */
+__LOCAL_LIBC(fuzzy_wmemcasecmp_l) __SIZE_TYPE__
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wmemcasecmp_l))(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes, __locale_t __locale) {
 	__SIZE_TYPE__ *__v0, *__v1, __i, __j, __cost, __temp;
 	if __unlikely(!__s1_bytes)
 		return __s2_bytes;
@@ -75,10 +70,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wmemcasecmp_l))(__WCHAR_TYPE__ 
 		return __s1_bytes;
 	if (__s2_bytes > __s1_bytes) {
 		{
-			__WCHAR_TYPE__ const *__temp;
-			__temp = __s1;
+			void const *__temp;
+			__temp = (void const *)__s1;
 			__s1   = __s2;
-			__s2   = __temp;
+			*(void const **)&__s2 = __temp;
 		}
 		{
 			__SIZE_TYPE__ __temp;
@@ -106,7 +101,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wmemcasecmp_l))(__WCHAR_TYPE__ 
 		for (__j = 0; __j < __s2_bytes; __j++) {
 			__BYTE_TYPE__ __c1 = ((__BYTE_TYPE__ *)__s1)[__i];
 			__BYTE_TYPE__ __c2 = ((__BYTE_TYPE__ *)__s2)[__j];
-			__cost  = __c1 != __c2 && (__WCHAR_TYPE__)__localdep_towlower_l(__c1, __locale) != (__WCHAR_TYPE__)__localdep_towlower_l(__c2, __locale);
+			__cost  = __c1 != __c2 && __localdep_tolower_l(__c1, __locale) != __localdep_tolower_l(__c2, __locale);
 			__cost += __v0[__j];
 			__temp  = __v1[__j] + 1;
 			if (__cost > __temp)
@@ -124,5 +119,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wmemcasecmp_l))(__WCHAR_TYPE__ 
 	return __temp;
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__NO_MALLOCA */
+#ifndef __local___localdep_fuzzy_wmemcasecmp_l_defined
+#define __local___localdep_fuzzy_wmemcasecmp_l_defined 1
+#define __localdep_fuzzy_wmemcasecmp_l __LIBC_LOCAL_NAME(fuzzy_wmemcasecmp_l)
+#endif /* !__local___localdep_fuzzy_wmemcasecmp_l_defined */
+#else /* !__NO_MALLOCA */
+#undef __local_fuzzy_wmemcasecmp_l_defined
+#endif /* __NO_MALLOCA */
 #endif /* !__local_fuzzy_wmemcasecmp_l_defined */

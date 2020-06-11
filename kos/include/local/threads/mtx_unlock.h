@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec23365a */
+/* HASH CRC-32:0x482e055a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,31 +19,26 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mtx_unlock_defined
-#ifdef __CRT_HAVE_pthread_mutex_unlock
 #define __local_mtx_unlock_defined 1
 #include <__crt.h>
-#include <bits/threads.h>
-
-#include <bits/pthreadtypes.h>
-#include <asm/threads.h>
-/* Dependency: "pthread_mutex_unlock" */
-#ifndef ____localdep_pthread_mutex_unlock_defined
-#define ____localdep_pthread_mutex_unlock_defined 1
 #ifdef __CRT_HAVE_pthread_mutex_unlock
+#include <bits/threads.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: pthread_mutex_unlock from pthread */
+#if !defined(__local___localdep_pthread_mutex_unlock_defined) && defined(__CRT_HAVE_pthread_mutex_unlock)
+#define __local___localdep_pthread_mutex_unlock_defined 1
 /* Unlock a mutex */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutex_unlock,(__pthread_mutex_t *__mutex),pthread_mutex_unlock,(__mutex))
-#else /* LIBC: pthread_mutex_unlock */
-#undef ____localdep_pthread_mutex_unlock_defined
-#endif /* pthread_mutex_unlock... */
-#endif /* !____localdep_pthread_mutex_unlock_defined */
-
+#endif /* !__local___localdep_pthread_mutex_unlock_defined && __CRT_HAVE_pthread_mutex_unlock */
+__NAMESPACE_LOCAL_END
+#include <asm/threads.h>
+#include <bits/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Unlock the mutex pointed by MUTEX.
  * It may potentially awake other threads waiting on this mutex
  * s.a. `pthread_mutex_unlock()' */
 __LOCAL_LIBC(mtx_unlock) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_unlock))(__mtx_t *__restrict __mutex) {
-#line 395 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_mutex_unlock((__pthread_mutex_t *)__mutex);
 	if __likely(!__error)
@@ -51,5 +46,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_unlock))(__mtx_t *__restrict __mu
 	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_pthread_mutex_unlock */
+#ifndef __local___localdep_mtx_unlock_defined
+#define __local___localdep_mtx_unlock_defined 1
+#define __localdep_mtx_unlock __LIBC_LOCAL_NAME(mtx_unlock)
+#endif /* !__local___localdep_mtx_unlock_defined */
+#else /* __CRT_HAVE_pthread_mutex_unlock */
+#undef __local_mtx_unlock_defined
+#endif /* !__CRT_HAVE_pthread_mutex_unlock */
 #endif /* !__local_mtx_unlock_defined */

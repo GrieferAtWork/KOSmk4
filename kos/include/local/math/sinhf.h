@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ea796fd */
+/* HASH CRC-32:0xface4e3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sinhf_defined
-#if defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 #define __local_sinhf_defined 1
 #include <__crt.h>
-/* Dependency: "sinh" */
-#ifndef ____localdep_sinh_defined
-#define ____localdep_sinh_defined 1
+#if defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: sinh from math */
+#ifndef __local___localdep_sinh_defined
+#define __local___localdep_sinh_defined 1
 #if __has_builtin(__builtin_sinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinh)
 /* Hyperbolic sine of X */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_sinh,(double __x),sinh,{ return __builtin_sinh(__x); })
@@ -34,18 +35,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_sinh,(double __x),sinh,(_
 #elif defined(__CRT_HAVE___sinh)
 /* Hyperbolic sine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_sinh,(double __x),__sinh,(__x))
-#else /* LIBC: sinh */
-#undef ____localdep_sinh_defined
-#endif /* sinh... */
-#endif /* !____localdep_sinh_defined */
-
-__NAMESPACE_LOCAL_BEGIN
+#else /* ... */
+#undef __local___localdep_sinh_defined
+#endif /* !... */
+#endif /* !__local___localdep_sinh_defined */
 /* Hyperbolic sine of X */
 __LOCAL_LIBC(sinhf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sinhf))(float __x) {
-#line 250 "kos/src/libc/magic/math.c"
 	return (float)__localdep_sinh((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_sinh || __CRT_HAVE___sinh */
+#ifndef __local___localdep_sinhf_defined
+#define __local___localdep_sinhf_defined 1
+#define __localdep_sinhf __LIBC_LOCAL_NAME(sinhf)
+#endif /* !__local___localdep_sinhf_defined */
+#else /* __CRT_HAVE_sinh || __CRT_HAVE___sinh */
+#undef __local_sinhf_defined
+#endif /* !__CRT_HAVE_sinh && !__CRT_HAVE___sinh */
 #endif /* !__local_sinhf_defined */

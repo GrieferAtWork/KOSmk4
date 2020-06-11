@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77dde7b2 */
+/* HASH CRC-32:0x774d3c3c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,38 +19,35 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_open64_defined
-#if defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
 #define __local_open64_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
 #include <bits/types.h>
-#include <bits/types.h>
-#include <bits/fcntl.h>
-/* Dependency: "open32" from "fcntl" */
-#ifndef ____localdep_open32_defined
-#define ____localdep_open32_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: open32 from fcntl */
+#ifndef __local___localdep_open32_defined
+#define __local___localdep_open32_defined 1
 #ifdef __CRT_HAVE_open
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open32,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open32,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open32,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
-#else /* LIBC: open */
-#undef ____localdep_open32_defined
-#endif /* open32... */
-#endif /* !____localdep_open32_defined */
-
+#else /* ... */
+#undef __local___localdep_open32_defined
+#endif /* !... */
+#endif /* !__local___localdep_open32_defined */
+__NAMESPACE_LOCAL_END
+#include <bits/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(open64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(open64))(char const *__filename,
-                                                     __oflag_t __oflags,
-                                                     ...) {
-#line 267 "kos/src/libc/magic/fcntl.c"
+__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(open64))(char const *__filename, __oflag_t __oflags, ...) {
 	__fd_t __result;
 	__builtin_va_list __args;
 	__mode_t __mode;
 	__builtin_va_start(__args, __oflags);
 	__mode = __builtin_va_arg(__args, __mode_t);
-#ifdef __O_LARGEFILE
+#ifdef O_LARGEFILE
 	__result = __localdep_open32(__filename, __oflags | __O_LARGEFILE, __mode);
 #else /* O_LARGEFILE */
 	__result = __localdep_open32(__filename, __oflags, __mode);
@@ -59,5 +56,11 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(open64))(char const *__filename,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open */
+#ifndef __local___localdep_open64_defined
+#define __local___localdep_open64_defined 1
+#define __localdep_open64 __LIBC_LOCAL_NAME(open64)
+#endif /* !__local___localdep_open64_defined */
+#else /* __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open */
+#undef __local_open64_defined
+#endif /* !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open */
 #endif /* !__local_open64_defined */

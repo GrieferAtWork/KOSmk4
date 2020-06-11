@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6d1b6a2 */
+/* HASH CRC-32:0x667fdfae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,10 @@
 #ifndef __local_strtol_defined
 #define __local_strtol_defined 1
 #include <__crt.h>
-/* Dependency: "strto32" from "stdlib" */
-#ifndef ____localdep_strto32_defined
-#define ____localdep_strto32_defined 1
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: strto32 from stdlib */
+#ifndef __local___localdep_strto32_defined
+#define __local___localdep_strto32_defined 1
 #ifdef __CRT_HAVE_strto32
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,__localdep_strto32,(char const *__restrict __nptr, char **__endptr, int __base),strto32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtol) && (__SIZEOF_LONG__ == 4)
@@ -34,15 +35,16 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,__local
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,__localdep_strto32,(char const *__restrict __nptr, char **__endptr, int __base),strtoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoimax) && (__SIZEOF_INTMAX_T__ == 4)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,__localdep_strto32,(char const *__restrict __nptr, char **__endptr, int __base),strtoimax,(__nptr,__endptr,__base))
-#else /* LIBC: strto32 */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/strto32.h>
-#define __localdep_strto32 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto32))
-#endif /* strto32... */
-#endif /* !____localdep_strto32_defined */
-
-/* Dependency: "strto64" from "stdlib" */
-#ifndef ____localdep_strto64_defined
-#define ____localdep_strto64_defined 1
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strto32 __LIBC_LOCAL_NAME(strto32)
+#endif /* !... */
+#endif /* !__local___localdep_strto32_defined */
+/* Dependency: strto64 from stdlib */
+#ifndef __local___localdep_strto64_defined
+#define __local___localdep_strto64_defined 1
 #ifdef __CRT_HAVE_strto64
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64,(char const *__restrict __nptr, char **__endptr, int __base),strto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__strtoi64)
@@ -55,23 +57,24 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__local
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64,(char const *__restrict __nptr, char **__endptr, int __base),strtoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoimax) && (__SIZEOF_INTMAX_T__ == 8)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64,(char const *__restrict __nptr, char **__endptr, int __base),strtoimax,(__nptr,__endptr,__base))
-#else /* LIBC: strto64 */
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <local/stdlib/strto64.h>
-#define __localdep_strto64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strto64))
-#endif /* strto64... */
-#endif /* !____localdep_strto64_defined */
-
 __NAMESPACE_LOCAL_BEGIN
+#define __localdep_strto64 __LIBC_LOCAL_NAME(strto64)
+#endif /* !... */
+#endif /* !__local___localdep_strto64_defined */
 __LOCAL_LIBC(strtol) __ATTR_LEAF __ATTR_NONNULL((1)) long
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtol))(char const *__restrict __nptr,
-                                                    char **__endptr,
-                                                    int __base) {
-#line 869 "kos/src/libc/magic/stdlib.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtol))(char const *__restrict __nptr, char **__endptr, int __base) {
 #if __SIZEOF_LONG__ <= 4
 	return (long)__localdep_strto32(__nptr, __endptr, __base);
 #else /* __SIZEOF_LONG__ <= 4 */
 	return (long)__localdep_strto64(__nptr, __endptr, __base);
-#endif /* __SIZEOF_LONG__ > 4 */
+#endif /* !(__SIZEOF_LONG__ <= 4) */
 }
 __NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strtol_defined
+#define __local___localdep_strtol_defined 1
+#define __localdep_strtol __LIBC_LOCAL_NAME(strtol)
+#endif /* !__local___localdep_strtol_defined */
 #endif /* !__local_strtol_defined */

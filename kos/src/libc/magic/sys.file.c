@@ -79,7 +79,7 @@ __SYSDECL_BEGIN
 }
 
 @@Apply or remove an advisory lock, according to OPERATION, on the file FD refers to
-[[cp]]
+[[cp, decl_include("<features.h>")]]
 int flock($fd_t fd, __STDC_INT_AS_UINT_T operation);
 
 %{
