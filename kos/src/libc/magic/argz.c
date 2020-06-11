@@ -96,11 +96,11 @@ error_t argz_create([[nonnull]] char *const argv[],
 		if unlikely(!argz_string) {
 			*pargz = NULL;
 			*pargz_len  = 0;
-#ifdef ENOMEM
+@@pp_ifdef ENOMEM@@
 			return ENOMEM;
-#else /* ENOMEM */
+@@pp_else@@
 			return 1;
-#endif /* !ENOMEM */
+@@pp_endif@@
 		}
 		*pargz = argz_string;
 		for (i = 0; i < argc; ++i) {
@@ -112,7 +112,7 @@ error_t argz_create([[nonnull]] char *const argv[],
 	return 0;
 }
 
-%[insert:guarded_function(__argz_create = argz_create)]
+%[insert:function(__argz_create = argz_create)]
 
 @@Make a '\0' separated arg vector from a `SEP' separated list in
 @@`STRING', returning it in `PARGZ', and the total length in `PLEN'.
@@ -136,11 +136,11 @@ empty_argz:
 	*pargz = result_string;
 	if unlikely(!result_string) {
 		*pargz_len = 0;
-#ifdef ENOMEM
+@@pp_ifdef ENOMEM@@
 		return ENOMEM;
-#else /* ENOMEM */
+@@pp_else@@
 		return 1;
-#endif /* !ENOMEM */
+@@pp_endif@@
 	}
 	dst = result_string;
 	for (;;) {
@@ -173,7 +173,7 @@ again_check_ch:
 	return 0;
 }
 
-%[insert:guarded_function(__argz_create_sep = argz_create_sep)]
+%[insert:function(__argz_create_sep = argz_create_sep)]
 
 @@Returns the number of strings in `ARGZ'
 @@Simply count the number of`NUL-characters within `argz...+=argz_len'
@@ -194,7 +194,7 @@ size_t argz_count([[inp_opt(argz_len)]] char const *argz, size_t argz_len) {
 	return result;
 }
 
-%[insert:guarded_function(__argz_count = argz_count)]
+%[insert:function(__argz_count = argz_count)]
 
 @@Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
 @@to hold them all (aka: have space for at least `argz_count()' elements)
@@ -217,7 +217,7 @@ void argz_extract([[inp(argz_len)]] char const *__restrict argz, size_t argz_len
 	}
 }
 
-%[insert:guarded_function(__argz_extract = argz_extract)]
+%[insert:function(__argz_extract = argz_extract)]
 
 @@Make '\0' separated arg vector `ARGZ' printable by converting
 @@all the '\0's except the last into the character `SEP'
@@ -237,7 +237,7 @@ void argz_stringify(char *argz, size_t len, int sep) {
 	}
 }
 
-%[insert:guarded_function(__argz_stringify = argz_stringify)]
+%[insert:function(__argz_stringify = argz_stringify)]
 
 
 @@Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN'
@@ -251,11 +251,11 @@ error_t argz_append([[nonnull]] char **__restrict pargz,
 	size_t newlen = oldlen + buf_len;
 	char *newargz = (char *)realloc(*pargz, newlen * sizeof(char));
 	if unlikely(!newargz) {
-#ifdef ENOMEM
+@@pp_ifdef ENOMEM@@
 		return ENOMEM;
-#else /* ENOMEM */
+@@pp_else@@
 		return 1;
-#endif /* !ENOMEM */
+@@pp_endif@@
 	}
 	memcpyc(newargz + oldlen, buf, buf_len, sizeof(char));
 	*pargz     = newargz;
@@ -263,7 +263,7 @@ error_t argz_append([[nonnull]] char **__restrict pargz,
 	return 0;
 }
 
-%[insert:guarded_function(__argz_append = argz_append)]
+%[insert:function(__argz_append = argz_append)]
 
 @@Append `STR' to the argz vector in `PARGZ & PARGZ_LEN'
 [[export_alias("__argz_add")]]
@@ -274,7 +274,7 @@ error_t argz_add([[nonnull]] char **__restrict pargz,
 	return argz_append(pargz, pargz_len, str, strlen(str) + 1);
 }
 
-%[insert:guarded_function(__argz_add = argz_add)]
+%[insert:function(__argz_add = argz_add)]
 
 @@Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN'
 [[export_alias("__argz_add_sep"), impl_include("<parts/errno.h>")]]
@@ -307,11 +307,11 @@ error_t argz_add_sep([[nonnull]] char **__restrict pargz,
 	 */
 	result_string = (char *)realloc(*pargz, (oldlen + (slen + 1)) * sizeof(char));
 	if unlikely(!result_string) {
-#ifdef ENOMEM
+@@pp_ifdef ENOMEM@@
 		return ENOMEM;
-#else /* ENOMEM */
+@@pp_else@@
 		return 1;
-#endif /* !ENOMEM */
+@@pp_endif@@
 	}
 	*pargz = result_string;
 	dst    = result_string + oldlen;
@@ -347,7 +347,7 @@ again_check_ch:
 	return 0;
 }
 
-%[insert:guarded_function(__argz_add_sep = argz_add_sep)]
+%[insert:function(__argz_add_sep = argz_add_sep)]
 
 @@Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
 @@Note that `ENTRY' must be the actual pointer to one of the elements
@@ -375,7 +375,7 @@ void argz_delete([[nonnull]] char **__restrict pargz,
 	             sizeof(char));
 }
 
-%[insert:guarded_function(__argz_delete = argz_delete)]
+%[insert:function(__argz_delete = argz_delete)]
 
 @@Insert `ENTRY' into `ARGZ & ARGZ_LEN' before `BEFORE', which should be an
 @@existing entry in `ARGZ'; if `BEFORE' is `NULL', `ENTRY' is appended to the end.
@@ -398,11 +398,11 @@ error_t argz_insert([[nonnull]] char **__restrict pargz,
 	argz     = *pargz;
 	argz_len = *pargz_len;
 	if (before < argz || before >= argz + argz_len) {
-#ifdef EINVAL
+@@pp_ifdef EINVAL@@
 		return EINVAL;
-#else /* EINVAL */
+@@pp_else@@
 		return 1;
-#endif /* !EINVAL */
+@@pp_endif@@
 	}
 	/* Adjust `before' to point to the start of an entry
 	 * Note that GLibc has a bug here that causes it to accessed
@@ -423,11 +423,11 @@ error_t argz_insert([[nonnull]] char **__restrict pargz,
 	insert_offset = (size_t)(before - argz);
 	argz = (char *)realloc(argz, argz_len * sizeof(char));
 	if unlikely(!argz) {
-#ifdef ENOMEM
+@@pp_ifdef ENOMEM@@
 		return ENOMEM;
-#else /* ENOMEM */
+@@pp_else@@
 		return 1;
-#endif /* !ENOMEM */
+@@pp_endif@@
 	}
 	/* Update ARGZ pointers. */
 	*pargz     = argz;
@@ -444,7 +444,7 @@ error_t argz_insert([[nonnull]] char **__restrict pargz,
 	return 0;
 }
 
-%[insert:guarded_function(__argz_insert = argz_insert)]
+%[insert:function(__argz_insert = argz_insert)]
 
 
 @@Replace any occurrences of the string `STR' in `PARGZ' with `WITH', reallocating
@@ -513,11 +513,11 @@ error_t argz_replace([[nonnull]] char **__restrict pargz,
 			old_argz = *pargz;
 			new_argz = (char *)realloc(old_argz, new_argzlen * sizeof(char));
 			if unlikely(!new_argz) {
-#ifdef ENOMEM
+@@pp_ifdef ENOMEM@@
 				return ENOMEM;
-#else /* ENOMEM */
+@@pp_else@@
 				return 1;
-#endif /* !ENOMEM */
+@@pp_endif@@
 			}
 			pos = new_argz + (pos - old_argz);
 			/* Make space for extra data */
@@ -539,7 +539,7 @@ error_t argz_replace([[nonnull]] char **__restrict pargz,
 }
 
 
-%[insert:guarded_function(__argz_replace = argz_replace)]
+%[insert:function(__argz_replace = argz_replace)]
 
 @@Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
 @@are no more. If entry is NULL, then the first entry is returned. This
@@ -567,7 +567,7 @@ char *argz_next([[inp_opt(argz_len)]] char const *__restrict argz, size_t argz_l
 	return (char *)entry;
 }
 
-%[insert:guarded_function(__argz_next = argz_next)]
+%[insert:function(__argz_next = argz_next)]
 
 
 %{

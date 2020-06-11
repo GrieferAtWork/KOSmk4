@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdf50a06 */
+/* HASH CRC-32:0x96a28f14 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -135,7 +135,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_insert))(char **__restrict __par
 	__argz     = *__pargz;
 	__argz_len = *__pargz_len;
 	if (__before < __argz || __before >= __argz + __argz_len) {
-#ifdef __EINVAL
+#ifdef EINVAL
 		return __EINVAL;
 #else /* EINVAL */
 		return 1;
@@ -160,7 +160,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_insert))(char **__restrict __par
 	__insert_offset = (__SIZE_TYPE__)(__before - __argz);
 	__argz = (char *)__localdep_realloc(__argz, __argz_len * sizeof(char));
 	if __unlikely(!__argz) {
-#ifdef __ENOMEM
+#ifdef ENOMEM
 		return __ENOMEM;
 #else /* ENOMEM */
 		return 1;
