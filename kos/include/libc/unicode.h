@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e3642e8 */
+/* HASH CRC-32:0x200792d8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,14 +94,14 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_CONST,struct __unitraits *,__NOTHROW,__unico
 #ifdef __CRT_HAVE_unicode_fold
 #define __LIBC_UNICODE_FOLDED_MAX 3
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_unicode_fold,(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[__LIBC_UNICODE_FOLDED_MAX]),unicode_fold,(__ch,__buf))
-#else /* unicode_fold... */
+#else /* __CRT_HAVE_unicode_fold */
 #define __LIBC_UNICODE_FOLDED_MAX 1
 __LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __libc_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[__LIBC_UNICODE_FOLDED_MAX]) {
 	__buf[0] = __ch;
 	return __buf + 1;
 }
-#endif /* !unicode_fold... */
+#endif /* !__CRT_HAVE_unicode_fold */
 #ifdef __CRT_HAVE___unicode_asciiflags
 #ifndef ____unicode_asciiflags_defined
 #define ____unicode_asciiflags_defined 1

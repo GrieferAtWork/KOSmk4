@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf70a6742 */
+/* HASH CRC-32:0xed6ad756 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -173,9 +173,9 @@ __CDECLARE_VOID(,__THROWING,SetPGid,(__pid_t __pid, __pid_t __pgid),(__pid,__pgi
  * Make the calling thread's process the leader of its associated
  * process group, before also making it its own session leader.
  * Then return the TID of that new session leader, which is also the PID of the calling process.
- * THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
- * THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
- * return THIS_THREAD->LEADER->PID; */
+ *  - THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
+ *  - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
+ *  - return THIS_THREAD->LEADER->PID; */
 __CDECLARE(,__pid_t,__THROWING,SetSid,(void),())
 #endif /* __CRT_HAVE_SetSid */
 

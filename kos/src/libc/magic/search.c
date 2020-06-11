@@ -786,7 +786,7 @@ typedef void (*__free_fn_t) (void *__nodep);
 }
 
 @@Destroy the whole tree, call FREEFCT for each node or leaf
-[requires_function(free)][[userimpl]]
+[[userimpl, requires_function(free)]]
 void tdestroy([[nullable]] void *root,
               [[nonnull]] __free_fn_t freefct) {
 again:

@@ -417,7 +417,6 @@ try {
 			})
 		);
 	}
-	waitTasks();
 #else /* QUICK_SKIP_SYSTEM_HAEDERS */
 	print "Fast-Preload... (begin)";
 	for (local none, header /*: SystemHeader*/: allSystemHeaders)
@@ -432,6 +431,30 @@ try {
 	print "Fast-Preload... (end)";
 #endif /* QUICK_SKIP_SYSTEM_HAEDERS */
 
+	/* Generate <libc/...> and <libc/core/...> headers */
+	for (local name, header /*: SystemHeader*/: allSystemHeaders) {
+		if (!header.order_libcHeader)
+			continue;
+		startTask(updateHashedFile,
+			("include/libc/{}.h".format({ name }),
+			[](fp: File) {
+				fp << COPYRIGHT << "\n";
+				local cWriter = CWriter(fp);
+				header.cprintLibcHeader(cWriter);
+				cWriter.flush();
+			})
+		);
+		startTask(updateHashedFile,
+			("include/libc/core/{}.h".format({ name }),
+			[](fp: File) {
+				fp << COPYRIGHT << "\n";
+				local cWriter = CWriter(fp);
+				header.cprintLibcCoreHeader(cWriter);
+				cWriter.flush();
+			})
+		);
+	}
+	waitTasks();
 
 #if 0 /* TODO: Some local functions need <libc/...> headers, which we must
        *       generate correctly before we can start generating these headers! */
@@ -471,7 +494,10 @@ try {
 	}
 #endif
 
-
+	/* TODO: When generating libc auto/user implementations, the keyword "static"
+	 *       should be escaped by being suffixed by
+	 *       "ATTR_SECTION(\".data\"\(CURRENT_TEXT_SECTION.lsstrip('.text')))"
+	 */
 
 
 	waitTasks(); /* Should be a no-op! */

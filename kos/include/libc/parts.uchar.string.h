@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x337cb1e6 */
+/* HASH CRC-32:0xce6111cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,29 +27,29 @@
 #include <__crt.h>
 #include "core/parts.uchar.string.h"
 
-/* Same as `STR+c16len(STR)' */
+/* Same as `STR+wcslen(STR)' */
 #define __libc_c16end __libc_core_c16end
-/* Same as `STR+c32len(STR)' */
+/* Same as `STR+wcslen(STR)' */
 #define __libc_c32end __libc_core_c32end
-/* Same as `STR+c16nlen(STR, MAX_CHARS)' */
+/* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
 #define __libc_c16nend __libc_core_c16nend
-/* Same as `STR+c32nlen(STR, MAX_CHARS)' */
+/* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
 #define __libc_c32nend __libc_core_c32nend
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 #define __libc_c16len __libc_core_c16len
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 #define __libc_c32len __libc_core_c32len
-/* Same as `c16len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 #define __libc_c16nlen __libc_core_c16nlen
-/* Same as `c32len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 #define __libc_c32nlen __libc_core_c32nlen
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __libc_c16cmp __libc_core_c16cmp
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __libc_c32cmp __libc_core_c32cmp
-/* Same as `c16cmp', but compare at most `MAXLEN' characters from either string */
+/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
 #define __libc_c16ncmp __libc_core_c16ncmp
-/* Same as `c32cmp', but compare at most `MAXLEN' characters from either string */
+/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
 #define __libc_c32ncmp __libc_core_c32ncmp
 
 #endif /* __CC__ */

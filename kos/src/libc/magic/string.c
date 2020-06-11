@@ -899,7 +899,7 @@ int strncasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t 
 }
 
 
-[[ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 [[impl_include("<hybrid/__bit.h>"), export_alias("__ffs")]]
 __STDC_INT_AS_SIZE_T ffs(int i) {
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned int)i);
@@ -919,13 +919,13 @@ __STDC_INT_AS_SIZE_T ffs(int i) {
 }
 
 %#ifdef __USE_GNU
-[[ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 [[impl_include("<hybrid/__bit.h>")]]
 __STDC_INT_AS_SIZE_T ffsl(long i) {
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned long)i);
 }
 
-[[ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 [[impl_include("<hybrid/__bit.h>")]]
 __STDC_INT_AS_SIZE_T ffsll(__LONGLONG i) {
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((__ULONGLONG)i);
@@ -3014,9 +3014,9 @@ $size_t rawmemrlen([[nonnull]] void const *__restrict haystack, int needle) {
 @@#else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 @@When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
 @@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
-[[libc, ATTR_WUNUSED, ATTR_PURE]][impl_include("<features.h>"), no_crt_self_import]
-[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memrmem0")]
-[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memrmem")]
+[[libc, ATTR_WUNUSED, ATTR_PURE, impl_include("<features.h>"), no_crt_self_import]]
+[[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memrmem0")]]
+[[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memrmem")]]
 void *memrmem([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen)
 	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): void *]
 	[([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): void const *]
@@ -3229,7 +3229,7 @@ char *strcasestr_l([[nonnull]] char const *haystack, [[nonnull]] char const *nee
 %
 
 
-[[ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST]]
 [[userimpl, impl_prefix(
 #ifndef ___local_sys_errlist_defined
 #define ___local_sys_errlist_defined 1
@@ -3688,7 +3688,7 @@ char const *strerror_s(int errnum) {
 #endif
 }
 
-[[ATTR_WUNUSED, ATTR_CONST, nothrow, section(".text.crt.errno")]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST, section(".text.crt.errno")]]
 [[userimpl, impl_include("<parts/errno.h>")]]
 char const *strerrorname_s(int errnum) {
 	char const *result;
@@ -4128,7 +4128,7 @@ char const *strerrorname_s(int errnum) {
 	return result;
 }
 
-[[ATTR_WUNUSED, ATTR_CONST, nothrow, section(".text.crt.errno")]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST, section(".text.crt.errno")]]
 [[userimpl, impl_include("<bits/signum.h>"), impl_prefix(
 #ifndef ___local_sys_siglist_defined
 #define ___local_sys_siglist_defined 1
@@ -5196,7 +5196,7 @@ $errno_t memcpy_s([[nonnull]] void *dst, rsize_t dstlength,
 }
 
 [[impl_include("<parts/errno.h>", "<libc/string.h>")]]
-[section(".text.crt.dos.string.memory")]
+[[section(".text.crt.dos.string.memory")]]
 $errno_t memmove_s([[nonnull]] void *dst, rsize_t dstlength,
                    [[nonnull]] void const *src, rsize_t srclength) {
 	if (!srclength)

@@ -437,11 +437,10 @@ futex_waitwhile_belowequal:([[nonnull]] lfutex_t *uaddr, lfutex_t below_equal_va
 @@@return: 1: Didn't wait
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value)
-[[cp]][requires_function(lfutex64)]
-[decl_include("<bits/types.h>")]
-[impl_include("<bits/timespec.h>")]
-[impl_include("<kos/bits/futex.h>")]
-futex_waitwhile_cmpxch:([[nonnull]] lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value) -> int {
+[[cp, userimpl, requires_function(lfutex64)]]
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<bits/timespec.h>", "<kos/bits/futex.h>")]]
+int futex_waitwhile_cmpxch([[nonnull]] lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_CMPXCH@, old_value, (struct timespec64 const *)NULL, new_value);
 }
 
@@ -450,11 +449,10 @@ futex_waitwhile_cmpxch:([[nonnull]] lfutex_t *uaddr, lfutex_t old_value, lfutex_
 @@@return: 1: Didn't wait
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value)
-[[cp]][requires_function(lfutex64)]
-[decl_include("<bits/types.h>")]
-[impl_include("<bits/timespec.h>")]
-[impl_include("<kos/bits/futex.h>")]
-futex_waituntil_cmpxch:([[nonnull]] lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value) -> int {
+[[cp, userimpl, requires_function(lfutex64)]]
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<bits/timespec.h>", "<kos/bits/futex.h>")]]
+int futex_waituntil_cmpxch([[nonnull]] lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_UNTIL_CMPXCH@, old_value, (struct timespec64 const *)NULL, new_value);
 }
 
@@ -463,11 +461,10 @@ futex_waituntil_cmpxch:([[nonnull]] lfutex_t *uaddr, lfutex_t old_value, lfutex_
 @@@return: 1: Didn't wait
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value)
-[[cp]][requires_function(lfutex64)]
-[decl_include("<bits/types.h>")]
-[impl_include("<bits/timespec.h>")]
-[impl_include("<kos/bits/futex.h>")]
-futex_waitlock:([[nonnull]] lfutex_t *uaddr) -> int {
+[[cp, userimpl, requires_function(lfutex64)]]
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<bits/timespec.h>", "<kos/bits/futex.h>")]]
+int futex_waitlock([[nonnull]] lfutex_t *uaddr) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_LOCK@, 0, (struct timespec64 const *)NULL);
 }
 
@@ -477,11 +474,10 @@ futex_waitlock:([[nonnull]] lfutex_t *uaddr) -> int {
 @@@return: 1: Didn't wait
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
-[[cp]][requires_function(lfutex64)]
-[decl_include("<bits/types.h>")]
-[impl_include("<bits/timespec.h>")]
-[impl_include("<kos/bits/futex.h>")]
-futex_waitwhile_exactbits:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask) -> int {
+[[cp, userimpl, requires_function(lfutex64)]]
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<bits/timespec.h>", "<kos/bits/futex.h>")]]
+int futex_waitwhile_exactbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_BITMASK@, bitmask, (struct timespec64 const *)NULL, setmask);
 }
 
@@ -490,11 +486,10 @@ futex_waitwhile_exactbits:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex
 @@@return: 1: Didn't wait
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
-[[cp]][requires_function(lfutex64)]
-[decl_include("<bits/types.h>")]
-[impl_include("<bits/timespec.h>")]
-[impl_include("<kos/bits/futex.h>")]
-futex_waituntil_exactbits:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask) -> int {
+[[cp, userimpl, requires_function(lfutex64)]]
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<bits/timespec.h>", "<kos/bits/futex.h>")]]
+int futex_waituntil_exactbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, (struct timespec64 const *)NULL, setmask);
 }
 
@@ -503,11 +498,10 @@ futex_waituntil_exactbits:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask, lfutex
 @@@return: 1: Didn't wait
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
-[[cp]][requires_function(lfutex64)]
-[decl_include("<bits/types.h>")]
-[impl_include("<bits/timespec.h>")]
-[impl_include("<kos/bits/futex.h>")]
-futex_waitwhile_anybit:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask) -> int {
+[[cp, userimpl, requires_function(lfutex64)]]
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<bits/timespec.h>", "<kos/bits/futex.h>")]]
+int futex_waitwhile_anybit([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_UNTIL_BITMASK@, bitmask, (struct timespec64 const *)NULL, 0);
 }
 
@@ -516,11 +510,10 @@ futex_waitwhile_anybit:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask) -> int {
 @@@return: 1: Didn't wait
 @@@return: -1:EFAULT: A faulty pointer was given
 @@@return: -1:EINTR:  Operation was interrupted
-[[cp]][requires_function(lfutex64)]
-[decl_include("<bits/types.h>")]
-[impl_include("<bits/timespec.h>")]
-[impl_include("<kos/bits/futex.h>")]
-futex_waitwhile_allbits:([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask) -> int {
+[[cp, userimpl, requires_function(lfutex64)]]
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<bits/timespec.h>", "<kos/bits/futex.h>")]]
+int futex_waitwhile_allbits([[nonnull]] lfutex_t *uaddr, lfutex_t bitmask) {
 	return lfutex64(uaddr, @LFUTEX_WAIT_WHILE_BITMASK@, bitmask, (struct timespec64 const *)NULL, bitmask);
 }
 
@@ -995,10 +988,11 @@ __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_allbits)(lfutex_t *__uaddr, lfutex_t
 @@>> return lfutex(uaddr, LFUTEX_WAIT_WHILE, val, (struct timespec const *)NULL);
 @@Upon startup, `futex_getspin()' is pre-initialized to `4'.
 @@@return: * : The current (get) / old (set) spin value
-[[ATTR_WUNUSED, nothrow]] futex_getspin:() -> unsigned int;
+[[ATTR_WUNUSED, nothrow]]
+unsigned int futex_getspin();
 
-[doc_alias(futex_getspin)][[nothrow]]
-futex_setspin:(unsigned int new_spin) -> unsigned int;
+[[nothrow, doc_alias("futex_getspin")]]
+unsigned int futex_setspin(unsigned int new_spin);
 
 %
 %

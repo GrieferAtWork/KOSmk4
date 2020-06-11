@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x976b1d18 */
+/* HASH CRC-32:0x7002ac9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -249,7 +249,7 @@ struct gaicb {
 #define ____h_errno_location_defined 1
 #ifdef __CRT_HAVE___h_errno_location
 /* Function to get address of global `h_errno' variable */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int *,__NOTHROW_NCX,__h_errno_location,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__h_errno_location,(void),())
 #else /* __CRT_HAVE___h_errno_location */
 #undef ____h_errno_location_defined
 #endif /* !__CRT_HAVE___h_errno_location */

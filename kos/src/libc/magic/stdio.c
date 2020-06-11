@@ -546,11 +546,11 @@ __STDC_INT_AS_SSIZE_T fputs([[nonnull]] char const *__restrict str,
 }
 
 @@Print a given string `STR', followed by a line-feed to `STDOUT'
-[[std, cp_stdio, userimpl]]
-[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(puts_unlocked)]
-[requires(!defined(__NO_STDSTREAMS) && $has_function(fputs) && $has_function(fputc))]
-[[requires_include("<__crt.h>")]][export_alias(_IO_puts)]
-[impl_include("<local/stdstreams.h>")][[crtbuiltin]]
+[[std, cp_stdio, crtbuiltin]]
+[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("puts_unlocked")]]
+[[export_alias("_IO_puts"), alias("puts_unlocked")]]
+[[requires_include("<__crt.h>"), impl_include("<local/stdstreams.h>")]]
+[[userimpl, requires(!defined(__NO_STDSTREAMS) && $has_function(fputs) && $has_function(fputc))]]
 __STDC_INT_AS_SSIZE_T puts([[nonnull]] char const *__restrict string) {
 	__STDC_INT_AS_SSIZE_T result, temp;
 	result = fputs(string, stdout);
@@ -823,7 +823,7 @@ __STDC_INT_AS_SSIZE_T fprintf([[nonnull]] FILE *__restrict stream,
 @@Print data to `stdout', following `FORMAT'
 @@Return the number of successfully printed bytes
 [[std, cp_stdio, crtbuiltin, ATTR_LIBC_PRINTF(1, 0)]]
-[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("vprintf_unlocked")]
+[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("vprintf_unlocked")]]
 [[alias("vprintf_s", "vprintf_unlocked")]]
 [[requires_include("<__crt.h>"), impl_include("<local/stdstreams.h>")]]
 [[userimpl, requires(!defined(__NO_STDSTREAMS) && $has_function(vfprintf))]]
@@ -1020,7 +1020,7 @@ __STDC_INT_AS_SIZE_T snprintf([[outp_opt(min(return, buflen))]] char *__restrict
 
 %
 %#ifdef __USE_XOPEN2K8
-[section(".text.crt.io.write")]
+[[section(".text.crt.io.write")]]
 [[cp, userimpl, requires_dependent_function(write), impl_prefix(
 __LOCAL_LIBC(@vdprintf_printer@) __ssize_t (__LIBCCALL __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
 	return (__ssize_t)write((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
@@ -1063,7 +1063,7 @@ int frenameat($fd_t oldfd, [[nonnull]] char const *oldname,
 %
 %#ifdef __USE_MISC
 [[ATTR_WUNUSED, userimpl, requires_function(tmpnam)]]
-[section(".text.crt.fs.utility")]
+[[section(".text.crt.fs.utility")]]
 char *tmpnam_r([[nonnull]] char *buf) {
 	return buf ? tmpnam(buf) : NULL;
 }

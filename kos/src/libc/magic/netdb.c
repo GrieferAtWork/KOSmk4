@@ -250,7 +250,7 @@ struct gaicb {
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K8)
 @@Function to get address of global `h_errno' variable
 [[guard, ATTR_CONST, ATTR_WUNUSED]]
-int *__h_errno_location();
+[[nonnull]] int *__h_errno_location();
 
 %/* Error status for non-reentrant lookup functions.
 % * We use a macro to access always the thread-specific `h_errno' variable. */
@@ -441,7 +441,7 @@ int getservbyport_r(int port, char const *__restrict proto,
 void setprotoent(int stay_open);
 
 @@Close protocol data base files and clear `stay open' flag
-[cp_nokos]
+[[cp_nokos]]
 void endprotoent();
 
 @@Get next entry from protocol data base file. Open data base if necessary

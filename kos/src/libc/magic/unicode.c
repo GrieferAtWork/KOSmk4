@@ -745,7 +745,7 @@ $char16_t *unicode_writeutf16([[nonnull]] /*utf-16*/ $char16_t *__restrict dst, 
 @@Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false
 [[ATTR_WUNUSED]]
 $char16_t *unicode_writeutf16_chk([[nonnull]] /*utf-16*/ $char16_t *__restrict dst, $char32_t ch) {
-	if unlikely(ch > 0x10ffff)
+	if unlikely(ch > UNICODE_MAXCHAR)
 		return NULL;
 	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
 		*dst++ = (char16_t)ch;
@@ -997,7 +997,7 @@ $char16_t *unicode_8to16_chk([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_
 	while (utf8_text < utf8_end) {
 		char32_t ch;
 		ch = unicode_readutf8_n((char const **)&utf8_text,utf8_end);
-		if (ch > 0x10ffff || (ch >= 0xd800 && ch <= 0xdfff))
+		if (ch > UNICODE_MAXCHAR || (ch >= 0xd800 && ch <= 0xdfff))
 			return NULL;
 		utf16_dst = unicode_writeutf16(utf16_dst,ch);
 	}
@@ -1218,7 +1218,7 @@ error_ilseq:
 	return (size_t)-2;
 done_empty_chk_surrogate:
 	if ((resch >= 0xd800 && resch <= 0xdfff) || (resch >= 0x10000)) {
-		if unlikely(resch >= 0x10ffff)
+		if unlikely(resch > UNICODE_MAXCHAR)
 			goto error_ilseq; /* Cannot be represented as UTF-16 */
 		/* Need a utf-16 surrogate pair. */
 		resch -= 0x10000;
@@ -1774,7 +1774,7 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_CONST,struct __unitraits *,__NOTHROW,__unico
 
 /* Fold the given unicode character CH */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,unicode_fold,(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[UNICODE_FOLDED_MAX]),(__ch,__buf))
-#else /* unicode_fold... */
+#else /* __CRT_HAVE_unicode_fold */
 /* The max number of characters ever written by `unicode_fold' */
 #define UNICODE_FOLDED_MAX 1
 
@@ -1784,7 +1784,7 @@ __NOTHROW_NCX(__LIBCCALL unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __b
 	__buf[0] = __ch;
 	return __buf + 1;
 }
-#endif /* !unicode_fold... */
+#endif /* !__CRT_HAVE_unicode_fold */
 
 /* Unicode character conversion. */
 #ifdef __CRT_HAVE___unicode_asciiflags
@@ -1920,14 +1920,14 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_CONST,struct __unitraits *,__NOTHROW,__unico
 #ifdef __CRT_HAVE_unicode_fold
 #define __LIBC_UNICODE_FOLDED_MAX 3
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_unicode_fold,(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[__LIBC_UNICODE_FOLDED_MAX]),unicode_fold,(__ch,__buf))
-#else /* unicode_fold... */
+#else /* __CRT_HAVE_unicode_fold */
 #define __LIBC_UNICODE_FOLDED_MAX 1
 __LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __libc_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[__LIBC_UNICODE_FOLDED_MAX]) {
 	__buf[0] = __ch;
 	return __buf + 1;
 }
-#endif /* !unicode_fold... */
+#endif /* !__CRT_HAVE_unicode_fold */
 #ifdef __CRT_HAVE___unicode_asciiflags
 #ifndef ____unicode_asciiflags_defined
 #define ____unicode_asciiflags_defined 1

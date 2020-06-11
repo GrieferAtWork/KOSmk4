@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc079fb09 */
+/* HASH CRC-32:0xd3c4efa2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -919,7 +919,7 @@ __CDECLARE_VOID(__cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthr
 #endif /* __USE_GNU */
 #ifdef __CRT_HAVE___pthread_unwind_next
 /* Internal interface to initiate cleanup */
-__CDECLARE_VOID(__cleanup_fct_attribute __ATTR_NORETURN __ATTR_WEAK __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unwind_next,(__pthread_unwind_buf_t *__buf),(__buf))
+__CDECLARE_VOID(__ATTR_WEAK __cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unwind_next,(__pthread_unwind_buf_t *__buf),(__buf))
 #endif /* __CRT_HAVE___pthread_unwind_next */
 #endif /* !__GNUC__ || !__EXCEPTIONS */
 

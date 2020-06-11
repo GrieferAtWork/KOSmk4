@@ -266,7 +266,8 @@ error_t argz_append([[nonnull]] char **__restrict pargz,
 __argz_append(*) = argz_append;
 
 @@Append `STR' to the argz vector in `PARGZ & PARGZ_LEN'
-[export_alias(__argz_add)][[userimpl]][requires($has_function(argz_append))]
+[[export_alias("__argz_add")]]
+[[userimpl, requires_function(argz_append)]]
 error_t argz_add([[nonnull]] char **__restrict pargz,
                  [[nonnull]] size_t *__restrict pargz_len,
                  [[nonnull]] char const *__restrict str) {

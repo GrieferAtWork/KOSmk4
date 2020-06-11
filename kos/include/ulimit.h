@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4bc0610 */
+/* HASH CRC-32:0xd7a89754 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@ enum {
 #ifdef __CC__
 #ifdef __CRT_HAVE_ulimit
 /* Control process limits according to CMD */
-__LIBC long int __NOTHROW_NCX(__VLIBCCALL ulimit)(int __cmd, ...) __CASMNAME_SAME("ulimit");
+__LIBC __LONGPTR_TYPE__ __NOTHROW_NCX(__VLIBCCALL ulimit)(int __cmd, ...) __CASMNAME_SAME("ulimit");
 #endif /* __CRT_HAVE_ulimit */
 #endif /* __CC__ */
 

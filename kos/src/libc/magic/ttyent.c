@@ -80,10 +80,16 @@ struct ttyent {
 
 };
 
-[[cp_kos]] struct ttyent *getttyent();
-[[cp_kos]] struct ttyent *getttynam([[nonnull]] char const *tty);
-[[cp_kos]] int setttyent();
-[[cp_kos]] int endttyent();
+[[cp_kos]]
+struct ttyent *getttyent();
+
+[[cp_kos]]
+struct ttyent *getttynam([[nonnull]] char const *tty);
+
+[[cp_kos]]
+int setttyent();
+
+int endttyent();
 
 
 %{

@@ -392,7 +392,8 @@ int inet6_option_find(struct cmsghdr const *cmsg, $uint8_t **tptrp, int type);
 int inet6_opt_init(void *extbuf, socklen_t extlen);
 
 [[cp_kos, doc_alias("inet6_opt_init")]]
-int inet6_opt_append(void *extbuf, socklen_t extlen, int offset, $uint8_t type, socklen_t len, $uint8_t align, void **databufp);
+int inet6_opt_append(void *extbuf, socklen_t extlen, int offset, $uint8_t type,
+                     socklen_t len, $uint8_t align, void **databufp);
 
 [[cp_kos, doc_alias("inet6_opt_init")]]
 int inet6_opt_finish(void *extbuf, socklen_t extlen, int offset);
@@ -401,10 +402,12 @@ int inet6_opt_finish(void *extbuf, socklen_t extlen, int offset);
 int inet6_opt_set_val(void *databuf, int offset, void *val, socklen_t vallen);
 
 [[cp_kos, doc_alias("inet6_opt_init")]]
-int inet6_opt_next(void *extbuf, socklen_t extlen, int offset, $uint8_t *typep, socklen_t *lenp, void **databufp);
+int inet6_opt_next(void *extbuf, socklen_t extlen, int offset,
+                   $uint8_t *typep, socklen_t *lenp, void **databufp);
 
 [[cp_kos, doc_alias("inet6_opt_init")]]
-int inet6_opt_find(void *extbuf, socklen_t extlen, int offset, $uint8_t type, socklen_t *lenp, void **databufp);
+int inet6_opt_find(void *extbuf, socklen_t extlen, int offset,
+                   $uint8_t type, socklen_t *lenp, void **databufp);
 
 [[cp_kos, doc_alias("inet6_opt_init")]]
 int inet6_opt_get_val(void *databuf, int offset, void *val, socklen_t vallen);
@@ -418,12 +421,16 @@ socklen_t inet6_rth_space(int type, int segments);
 
 [[cp_kos, doc_alias("inet6_rth_space")]]
 void *inet6_rth_init(void *bp, socklen_t bp_len, int type, int segments);
+
 [[cp_kos, doc_alias("inet6_rth_space")]]
 int inet6_rth_add(void *bp, struct in6_addr const *addr);
+
 [[cp_kos, doc_alias("inet6_rth_space")]]
 int inet6_rth_reverse(void const *in, void *out);
+
 [[cp_kos, doc_alias("inet6_rth_space")]]
 int inet6_rth_segments(void const *bp);
+
 [[cp_kos, doc_alias("inet6_rth_space")]]
 struct in6_addr *inet6_rth_getaddr(void const *bp, int index);
 

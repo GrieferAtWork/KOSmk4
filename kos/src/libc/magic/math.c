@@ -155,8 +155,8 @@ double atan(double x) {
 
 @@Arc tangent of Y/X
 [[std, ATTR_WUNUSED, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__atan2")]]
-[impl_include("<bits/huge_val.h>")][impl_include("<libm/matherr.h>")]
-[[requires_include("<ieee754.h>")]][impl_include("<libm/atan2.h>")]
+[[impl_include("<bits/huge_val.h>", "<libm/matherr.h>")]]
+[[requires_include("<ieee754.h>"), impl_include("<libm/atan2.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
@@ -420,7 +420,7 @@ double log2(double x); /* TODO */
 %(std, c)/* Power functions. */
 
 @@Return X to the Y power
-[attribute("__DECL_SIMD_pow")][decl_include("<bits/math-vector.h>")]
+[[attribute("__DECL_SIMD_pow"), decl_include("<bits/math-vector.h>")]]
 [[std, ATTR_WUNUSED, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__pow")]]
 [[impl_include("<libm/finite.h>", "<libm/isnan.h>", "<libm/matherr.h>")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/pow.h>")]]
@@ -516,7 +516,7 @@ double hypot(double x, double y); /* TODO */
 %(std, c)
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Return the cube root of X
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__cbrt")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__cbrt")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/cbrt.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -535,7 +535,7 @@ double cbrt(double x) {
 %(std, c)/* Nearest integer, absolute value, and remainder functions. */
 
 @@Smallest integral value not less than X
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__ceil")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__ceil")]]
 [[impl_include("<hybrid/typecore.h>"), impl_include("<libm/ceil.h>")]]
 double ceil(double x) {
 @@pp_ifdef __LIBM_MATHFUN@@
@@ -550,7 +550,7 @@ double ceil(double x) {
 }
 
 @@Absolute value of X
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__fabs")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__fabs")]]
 [[impl_include("<libm/fabs.h>")]]
 double fabs(double x) {
 @@pp_ifdef __LIBM_MATHFUN@@
@@ -561,7 +561,7 @@ double fabs(double x) {
 }
 
 @@Largest integer not greater than X
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__floor")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__floor")]]
 [[impl_include("<hybrid/typecore.h>", "<libm/floor.h>")]]
 double floor(double x) {
 @@pp_ifdef __LIBM_MATHFUN@@
@@ -607,7 +607,7 @@ double fmod(double x, double y) {
 %(std, c)
 %(std, c, ccompat)#ifdef __USE_ISOC99
 @@Return X with its signed changed to Y's
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__copysign", "_copysign")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__copysign", "_copysign")]]
 [[impl_include("<libm/copysign.h>")]]
 double copysign(double num, double sign) {
 @@pp_ifdef __LIBM_MATHFUN@@2
@@ -620,7 +620,7 @@ double copysign(double num, double sign) {
 }
 
 @@Return representation of qNaN for double type
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__nan")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__nan")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/nan.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -689,7 +689,7 @@ double tgamma(double x); /* TODO */
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 
 @@Return the integer nearest X in the direction of the prevailing rounding mode
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("nearbyint", "__rint", "__nearbyint")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("nearbyint", "__rint", "__nearbyint")]]
 [[if(__has_builtin(__builtin_nearbyint) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("nearbyint", { return __builtin_nearbyint(x); })]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/rint.h>")]]
@@ -702,11 +702,11 @@ double rint(double x) {
 
 
 @@Return X + epsilon if X < Y, X - epsilon if X > Y
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("nexttoward")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("nexttoward")]]
 [[export_alias("__nextafter", "_nextafter", "__nexttoward")]]
 [[if(__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("nexttoward", { return __builtin_nexttoward(x); })]]
-[[requires_include("<ieee754.h>")]][impl_include("<libm/nextafter.h>")]
+[[requires_include("<ieee754.h>"), impl_include("<libm/nextafter.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
@@ -747,12 +747,12 @@ int ilogb(double x) {
 	return result;
 }
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("nearbyintf", "__rintf", "__nearbyintf")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("nearbyintf", "__rintf", "__nearbyintf")]]
 [[if(__has_builtin(__builtin_nearbyintf) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("nearbyintf", { return __builtin_nearbyintf(x); })]]
 float rintf(float x) %{generate(double2float("rint"))}
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("nexttowardf", "__nextafterf", "__nexttowardf")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("nexttowardf", "__nextafterf", "__nexttowardf")]]
 [[if(__has_builtin(__builtin_nexttowardf) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("nexttowardf", { return __builtin_nexttowardf(x); })]]
 float nextafterf(float x, float y) %{generate(double2float("nextafter"))}
@@ -767,12 +767,12 @@ int ilogbf(float x) %{generate(double2float("ilogb"))}
 
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("nearbyintl", "__rintl", "__nearbyintl")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("nearbyintl", "__rintl", "__nearbyintl")]]
 [[if(__has_builtin(__builtin_nearbyintl) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("nearbyintl", { return __builtin_nearbyintl(x); })]]
 __LONGDOUBLE rintl(__LONGDOUBLE x) %{generate(double2ldouble("rint"))}
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("nexttowardl", "__nextafterl", "__nexttowardl")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("nexttowardl", "__nextafterl", "__nexttowardl")]]
 [[if(__has_builtin(__builtin_nexttowardl) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("nexttowardl", { return __builtin_nexttowardl(x); })]]
 __LONGDOUBLE nextafterl(__LONGDOUBLE x, __LONGDOUBLE y) %{generate(double2ldouble("nextafter"))}
@@ -792,7 +792,7 @@ int ilogbl(__LONGDOUBLE x) %{generate(double2ldouble("ilogb"))}
 %(std, c)
 %(std, c, ccompat)#ifdef __USE_ISOC99
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__nexttoward")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__nexttoward")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/nexttoward.h>")]]
 [[requires(((defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
              defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)) &&
@@ -811,7 +811,7 @@ double nexttoward(double x, __LONGDOUBLE y) {
 }
 
 @@Return X times (2 to the Nth power)
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__scalbn")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__scalbn")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("scalbln", "__scalbln")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/scalbn.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -828,7 +828,7 @@ double scalbn(double x, int n) {
 }
 
 [[doc_alias("scalbn")]]
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__scalbln")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__scalbln")]]
 [[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbn)]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbn")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/scalbn.h>")]]
@@ -848,7 +848,7 @@ double scalbln(double x, long int n) {
 nearbyint(*) = rint;
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__round")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__round")]]
 [[impl_include("<hybrid/typecore.h>", "<libm/round.h>")]]
 double round(double x) {
 @@pp_ifdef __LIBM_MATHFUN@@
@@ -871,7 +871,7 @@ double round(double x) {
 
 @@Round X to the integral value in floating-point
 @@format nearest but not larger in magnitude
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__trunc")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__trunc")]]
 [[impl_include("<hybrid/typecore.h>", "<libm/trunc.h>")]]
 double trunc(double x) {
 @@pp_ifdef __LIBM_MATHFUN@@
@@ -888,7 +888,7 @@ double trunc(double x) {
 double remquo(double x, double y, int *pquo); /* TODO */
 
 @@Round X to nearest integral value according to current rounding direction
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__lrint")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__lrint")]]
 [[impl_include("<hybrid/typecore.h>", "<libm/lrint.h>")]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llrint")]]
 long int lrint(double x) {
@@ -900,7 +900,7 @@ long int lrint(double x) {
 }
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__lround")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__lround")]]
 [[impl_include("<hybrid/typecore.h>", "<libm/lround.h>")]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llround")]]
 long int lround(double x) {
@@ -912,28 +912,28 @@ long int lround(double x) {
 }
 
 @@Return positive difference between X and Y
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__fdim")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__fdim")]]
 double fdim(double x, double y) {
 	/* TODO: ieee754-specific function */
 	return fabs(y - x);
 }
 
 @@Return maximum numeric value from X and Y
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__fmax")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__fmax")]]
 double fmax(double x, double y) {
 	/* TODO: ieee754-specific function */
 	return x < y ? y : x;
 }
 
 @@Return minimum numeric value from X and Y
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__fmin")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__fmin")]]
 double fmin(double x, double y) {
 	/* TODO: ieee754-specific function */
 	return x < y ? x : y;
 }
 
 @@Multiply-add function computed as a ternary operation
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__fma")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__fma")]]
 double fma(double x, double y, double z) {
 	/* TODO: ieee754-specific function */
 	return (x * y) + z;
@@ -941,7 +941,7 @@ double fma(double x, double y, double z) {
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 @@Round X to nearest integral value according to current rounding direction
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__llrint")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__llrint")]]
 [[impl_include("<hybrid/typecore.h>", "<libm/lrint.h>")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrint)]]
 __LONGLONG llrint(double x) {
@@ -953,7 +953,7 @@ __LONGLONG llrint(double x) {
 }
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__llround")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__llround")]]
 [[impl_include("<hybrid/typecore.h>", "<libm/lround.h>")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lround)]]
 __LONGLONG llround(double x) {
@@ -965,7 +965,7 @@ __LONGLONG llround(double x) {
 }
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__nexttowardf")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__nexttowardf")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/nexttoward.h>")]]
 [[requires(((defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
              defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)) &&
@@ -985,11 +985,11 @@ float nexttowardf(float x, __LONGDOUBLE y) {
 
 
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__scalbnf")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__scalbnf")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("scalblnf", "__scalblnf")]]
 float scalbnf(float x, int n) %{generate(double2float("scalbn"))}
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__scalblnf")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__scalblnf")]]
 [[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbnf)]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbnf")]]
 float scalblnf(float x, long int n) %{generate(double2float("scalbln"))}
@@ -1004,7 +1004,7 @@ nearbyintf(*) = rintf;
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llrintf", "__llrintf")]]
 long int lrintf(float x) %{generate(double2float("lrint"))}
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__lroundf")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__lroundf")]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llroundf", "__llroundf")]]
 long int lroundf(float x) %{generate(double2float("lround"))}
 
@@ -1014,12 +1014,12 @@ long int lroundf(float x) %{generate(double2float("lround"))}
 [[std, crtbuiltin, export_alias("__fmaf")]]  fmaf(*)  %{generate(double2float("fma"))}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__llrintf")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__llrintf")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrintf)]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lrintf")]]
 __LONGLONG llrintf(float x) %{generate(double2float("llrint"))}
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__llroundf")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__llroundf")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lroundf)]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lroundf")]]
 __LONGLONG llroundf(float x) %{generate(double2float("llround"))}
@@ -1028,11 +1028,11 @@ __LONGLONG llroundf(float x) %{generate(double2float("llround"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 nexttowardl(*) = nextafterl;
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__scalbnl")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__scalbnl")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("scalblnl", "__scalblnl")]]
 __LONGDOUBLE scalbnl(__LONGDOUBLE x, int n) %{generate(double2ldouble("scalbn"))}
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__scalblnl")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__scalblnl")]]
 [[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbnl)]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbnl")]]
 __LONGDOUBLE scalblnl(__LONGDOUBLE x, long int n) %{generate(double2ldouble("scalbln"))}
@@ -1043,11 +1043,11 @@ nearbyintl(*) = rintl;
 [[std, crtbuiltin, export_alias("__truncl")]]  truncl(*)  %{generate(double2ldouble("trunc"))}
 [[std, crtbuiltin, export_alias("__remquol")]] remquol(*) %{generate(double2ldouble("remquo"))}
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__lrintl")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__lrintl")]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llrintl", "__llrintl")]]
 long int lrintl(__LONGDOUBLE x) %{generate(double2ldouble("lrint"))}
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__lroundl")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__lroundl")]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llroundl", "__llroundl")]]
 long int lroundl(__LONGDOUBLE x) %{generate(double2ldouble("lround"))}
 
@@ -1057,12 +1057,12 @@ long int lroundl(__LONGDOUBLE x) %{generate(double2ldouble("lround"))}
 [[std, crtbuiltin, export_alias("__fmal")]]  fmal(*)  %{generate(double2ldouble("fma"))}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__llrintl")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__llrintl")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrintl)]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lrintl")]]
 __LONGLONG llrintl(__LONGDOUBLE x) %{generate(double2ldouble("llrint"))}
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__llroundl")]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__llroundl")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lroundl)]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lroundl")]]
 __LONGLONG llroundl(__LONGDOUBLE x) %{generate(double2ldouble("llround"))}
@@ -1272,7 +1272,7 @@ void sincosl(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *psinx, [[nonnull]] __LONG
 
 %#if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isinf conflicts with C++11. */
 @@Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity
-[[ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__isinf")]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__isinf")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/isinf.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -1292,7 +1292,7 @@ int isinf(double x) {
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 @@Return nonzero if VALUE is finite and not NaN
-[[ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__finite", "_finite")]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__finite", "_finite")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/finite.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -1309,7 +1309,7 @@ int finite(double x) {
 drem(*) = remainder;
 
 @@Return the fractional part of X after dividing out `ilogb(X)'
-[[ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__significand")]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__significand")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/significand.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -1341,7 +1341,7 @@ significandl(*) %{generate(double2ldouble("significand"))}
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 %#if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isnan conflicts with C++11. */
 @@Return nonzero if VALUE is not a number
-[[ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin, export_alias("__isnan", "_isnan")]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin, export_alias("__isnan", "_isnan")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/isnan.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -1855,7 +1855,7 @@ __scalbl(*) = scalbl;
 %
 %/* Floating point classification */
 %#ifdef __USE_ISOC99
-[[ATTR_WUNUSED, ATTR_CONST, nothrow, export_alias("_dclass", "fpclassify")]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST, export_alias("_dclass", "fpclassify")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/fpclassify.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -1871,7 +1871,7 @@ int __fpclassify(double x) {
 }
 
 
-[[ATTR_WUNUSED, ATTR_CONST, nothrow, export_alias("_dsign")]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST, export_alias("_dsign")]]
 [[impl_include("<libm/signbit.h>")]]
 int __signbit(double x) {
 @@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
@@ -1896,7 +1896,7 @@ int __signbit(double x) {
 
 %
 %#ifdef __USE_GNU
-[[ATTR_WUNUSED, ATTR_CONST, nothrow, preferred_export_alias("issignaling")]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST, preferred_export_alias("issignaling")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/issignaling.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||

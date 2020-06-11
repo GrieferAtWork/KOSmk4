@@ -94,7 +94,7 @@ int sl_add([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) {
 @@Free a given string list. When `ALL' is non-zero, all contained
 @@string pointers (as previously added with `sl_add()') will also
 @@be `free(3)'ed.
-[decl_prefix(DEFINE_STRINGLIST)]
+[[decl_prefix(DEFINE_STRINGLIST)]]
 [[userimpl, requires_function(free)]]
 void sl_free([[nullable]] struct _stringlist *sl, int all) {
 	if unlikely(!sl)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x481d7cdb */
+/* HASH CRC-32:0xb8948491 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -123,7 +123,7 @@ __SYSDECL_BEGIN
 #define USEC_PER_SEC    1000000l
 #define NSEC_PER_SEC    1000000000l
 #define FSEC_PER_SEC    1000000000000000ll
-#endif
+#endif /* __USE_KOS */
 
 #ifdef __USE_ISOC11
 #define TIME_UTC 1
@@ -146,8 +146,8 @@ __SYSDECL_BEGIN
 #define NULL __NULLPTR
 #endif /* NULL */
 
-#if defined(__USE_DOS) || \
-  (!defined(__USE_XOPEN2K) && !defined(__USE_ISOC_PURE) && !defined(__STRICT_ANSI__))
+#if (defined(__USE_DOS) || \
+     (!defined(__USE_XOPEN2K) && !defined(__USE_ISOC_PURE) && !defined(__STRICT_ANSI__)))
 #ifndef CLK_TCK
 #define CLK_TCK CLOCKS_PER_SEC
 #endif /* !CLK_TCK */

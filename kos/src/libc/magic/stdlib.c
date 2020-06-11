@@ -2221,7 +2221,7 @@ __LIBC char *__progname_full;
 }
 @@Alias for argv[0], as passed to main()
 [[guard, ATTR_WUNUSED, ATTR_CONST]]
-[export_alias(__p_program_invocation_name)]
+[[export_alias("__p_program_invocation_name")]]
 [[nonnull]] char **__p__pgmptr();
 %{
 #ifdef ____p__pgmptr_defined
@@ -3149,7 +3149,7 @@ int _atoldbl_l([[nonnull]] __LONGDOUBLE *__restrict result,
 
 
 %[default_impl_section(".text.crt.dos.math.utility")]
-[[ATTR_CONST, nothrow]]
+[[nothrow, ATTR_CONST]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_lrotl")]]
 [[if(__SIZEOF_INT__ == 8), alias("_rotl64")]]
@@ -3157,7 +3157,7 @@ unsigned int _rotl(unsigned int val, int shift) {
 	return __hybrid_rol(val, shift);
 }
 
-[[ATTR_CONST, nothrow]]
+[[nothrow, ATTR_CONST]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_lrotr")]]
 [[if(__SIZEOF_INT__ == 8), alias("_rotr64")]]
@@ -3166,7 +3166,7 @@ unsigned int _rotr(unsigned int val, int shift) {
 }
 
 %#ifdef __UINT64_TYPE__
-[[ATTR_CONST, nothrow]]
+[[nothrow, ATTR_CONST]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if(__SIZEOF_LONG__ == 8), alias("_lrotl")]]
 [[if(__SIZEOF_INT__ == 8), alias("_rotl")]]
@@ -3174,7 +3174,7 @@ $u64 _rotl64($u64 val, int shift) {
 	return __hybrid_rol64(val, shift);
 }
 
-[[ATTR_CONST, nothrow]]
+[[nothrow, ATTR_CONST]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if(__SIZEOF_LONG__ == 8), alias("_lrotr")]]
 [[if(__SIZEOF_INT__ == 8), alias("_rotr")]]
@@ -3183,7 +3183,7 @@ $u64 _rotr64($u64 val, int shift) {
 }
 %#endif /* __UINT64_TYPE__ */
 
-[[ATTR_CONST, nothrow]]
+[[nothrow, ATTR_CONST]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_rotl")]]
 [[if(__SIZEOF_LONG__ == 8), alias("_rotl64")]]
@@ -3191,7 +3191,7 @@ unsigned long _lrotl(unsigned long val, int shift) {
 	return __hybrid_rol(val, shift);
 }
 
-[[ATTR_CONST, nothrow]]
+[[nothrow, ATTR_CONST]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_rotr")]]
 [[if(__SIZEOF_LONG__ == 8), alias("_rotr64")]]

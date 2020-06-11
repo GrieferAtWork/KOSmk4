@@ -96,8 +96,8 @@ char *envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len,
 @@will return `NULL', although `envz_entry()' will still return an entry. This is handy
 @@because when merging with another envz, the null entry can override an
 @@entry in the other one. Such entries can be removed with `envz_strip()'
-[requires($has_function(realloc) && $has_function(argz_add))]
-[[impl_include("<parts/errno.h>"), userimpl]]
+[[impl_include("<parts/errno.h>")]]
+[[userimpl, requires_function(realloc, argz_add)]]
 error_t envz_add([[nonnull]] char **__restrict penvz,
                  [[nonnull]] size_t *__restrict penvz_len,
                  [[nonnull]] char const *__restrict name,
@@ -132,7 +132,7 @@ error_t envz_add([[nonnull]] char **__restrict penvz,
 @@Adds each entry in `ENVZ2' to `ENVZ & ENVZ_LEN', as if with `envz_add()'.
 @@If `OVERRIDE' is true, then values in `ENVZ2' will supersede those
 @@with the same name in `ENV', otherwise they don't
-[requires($has_function(argz_append))][[userimpl]]
+[[userimpl, requires_function(argz_append)]]
 error_t envz_merge([[nonnull]] char **__restrict penvz,
                    [[nonnull]] size_t *__restrict penvz_len,
                    [[nonnull]] char const *__restrict envz2,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec3e05da */
+/* HASH CRC-32:0x25e7933a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,7 +94,7 @@ __CDECLARE(__ATTR_NONNULL((1)),struct ttyent *,__NOTHROW_RPC_KOS,getttynam,(char
 __CDECLARE(,int,__NOTHROW_RPC_KOS,setttyent,(void),())
 #endif /* __CRT_HAVE_setttyent */
 #ifdef __CRT_HAVE_endttyent
-__CDECLARE(,int,__NOTHROW_RPC_KOS,endttyent,(void),())
+__CDECLARE(,int,__NOTHROW_NCX,endttyent,(void),())
 #endif /* __CRT_HAVE_endttyent */
 #endif /* __CC__ */
 

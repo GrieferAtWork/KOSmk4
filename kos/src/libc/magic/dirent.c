@@ -189,8 +189,8 @@ $fd_t fdclosedir([[nonnull]] DIR *dirp);
 @@Read and return the next pending directory entry of the given directory stream `DIRP'
 @@@EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong
 [[cp, decl_prefix(DEFINE_STRUCT_DIRSTREAM), no_crt_self_import]]
-[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("readdir")]
-[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("readdir64")]
+[[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("readdir")]]
+[[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("readdir64")]]
 struct dirent *readdir([[nonnull]] DIR *__restrict dirp);
 
 %

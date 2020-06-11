@@ -572,12 +572,14 @@ int munmap([[nonnull]] void *addr, size_t len);
 [[section(".text.crt.system.mman")]]
 int mprotect([[nonnull]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot);
 
-@@@param flags: Set of `MS_ASYNC|MS_INVALIDATE|MS_SYNC'
-[[cp]] int msync([[nonnull]] void *addr, size_t len, __STDC_INT_AS_UINT_T flags);
+@@@param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC'
+[[cp]]
+int msync([[nonnull]] void *addr, size_t len, __STDC_INT_AS_UINT_T flags);
+
 int mlock([[nonnull]] void const *addr, size_t len);
 int munlock([[nonnull]] void const *addr, size_t len);
 
-@@@param flags: Set of `MCL_CURRENT|MCL_FUTURE|MCL_ONFAULT'
+@@@param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT'
 int mlockall(__STDC_INT_AS_UINT_T flags);
 
 int munlockall();
@@ -609,8 +611,9 @@ int mincore([[nonnull]] void *start, size_t len, unsigned char *vec);
 
 %
 %#ifdef __USE_LARGEFILE64
-[[ATTR_WUNUSED, section(".text.crt.heap.mman"), off64_variant_of(mmap)]]
-[[doc_alias("mmap"), userimpl, requires_function(mmap32)]]
+[[ATTR_WUNUSED, section(".text.crt.heap.mman")]]
+[[doc_alias("mmap"), off64_variant_of(mmap)]]
+[[userimpl, requires_function(mmap32)]]
 void *mmap64(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
              __STDC_INT_AS_UINT_T flags, $fd_t fd, $off64_t offset) {
 	return mmap32(addr, len, prot, flags, fd, (off32_t)offset);
@@ -636,7 +639,7 @@ int posix_madvise([[nonnull]] void *addr, size_t len,
 %
 %#ifdef __USE_GNU
 
-@@@param flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED'
+@@@param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED'
 [[section(".text.crt.heap.mman"), vartypes(void *)]]
 void *mremap(void *addr, size_t old_len, size_t new_len,
              __STDC_INT_AS_UINT_T flags, ... /* void *new_address */);

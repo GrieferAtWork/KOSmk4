@@ -531,17 +531,18 @@ __NAMESPACE_STD_USING(imaxdiv_t)
 %[insert:std]
 
 
-[[std]]
-[section(".text.crt.math.utility")]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_INT__), alias(abs)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(labs)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(llabs)]
-[[ATTR_CONST, nothrow, crtbuiltin]] imaxabs:($intmax_t x) -> $intmax_t {
+[[std, section(".text.crt.math.utility")]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_INT__), alias("abs")]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("labs")]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("llabs")]]
+[[nothrow, ATTR_CONST, crtbuiltin]]
+$intmax_t imaxabs($intmax_t x) {
 	return x < 0 ? -x : x;
 }
 
-[[std]][section(".text.crt.math.utility")]
-[[ATTR_CONST, nothrow]] imaxdiv:($intmax_t numer, $intmax_t denom) -> imaxdiv_t {
+[[std, nothrow, ATTR_CONST]]
+[[section(".text.crt.math.utility")]]
+imaxdiv_t imaxdiv($intmax_t numer, $intmax_t denom) {
 	imaxdiv_t result;
 	result.@quot@ = numer / denom;
 	result.@rem@  = numer % denom;
@@ -549,50 +550,54 @@ __NAMESPACE_STD_USING(imaxdiv_t)
 }
 
 
-[[std, ATTR_LEAF]][section(".text.crt.unicode.static.convert")]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(strtol)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(strtoll, strtoq)]
-[if(__SIZEOF_INTMAX_T__ == 8), alias(strto64, _strtoi64)]
-[if(__SIZEOF_INTMAX_T__ == 4), alias(strto32)]
-strtoimax:([[nonnull]] char const *__restrict nptr, [[nullable]] char **endptr, int base) -> $intmax_t {
-#if __SIZEOF_INTMAX_T__ <= 4
+[[std, ATTR_LEAF, section(".text.crt.unicode.static.convert")]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("strtol")]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("strtoll", "strtoq")]]
+[[if(__SIZEOF_INTMAX_T__ == 8), alias("strto64", "_strtoi64")]]
+[[if(__SIZEOF_INTMAX_T__ == 4), alias("strto32")]]
+$intmax_t strtoimax([[nonnull]] char const *__restrict nptr,
+                    [[nullable]] char **endptr, int base) {
+@@pp_if __SIZEOF_INTMAX_T__ <= 4@@
 	return (intmax_t)strto32(nptr, endptr, base);
-#else /* __SIZEOF_INTMAX_T__ <= 4 */
+@@pp_else@@
 	return (intmax_t)strto64(nptr, endptr, base);
-#endif /* __SIZEOF_INTMAX_T__ > 4 */
+@@pp_endif@@
 }
 
 
-[[std, ATTR_LEAF]][section(".text.crt.unicode.static.convert")]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(strtoul)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(strtoull, strtouq)]
-[if(__SIZEOF_INTMAX_T__ == 8), alias(strtou64, _strtoui64)]
-[if(__SIZEOF_INTMAX_T__ == 4), alias(strtou32)]
-strtoumax:([[nonnull]] char const *__restrict nptr, char ** endptr, int base) -> $uintmax_t {
-#if __SIZEOF_INTMAX_T__ <= 4
+[[std, ATTR_LEAF, section(".text.crt.unicode.static.convert")]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("strtoul")]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("strtoull", "strtouq")]]
+[[if(__SIZEOF_INTMAX_T__ == 8), alias("strtou64", "_strtoui64")]]
+[[if(__SIZEOF_INTMAX_T__ == 4), alias("strtou32")]]
+$uintmax_t strtoumax([[nonnull]] char const *__restrict nptr,
+                     [[nullable]] char ** endptr, int base) {
+@@pp_if __SIZEOF_INTMAX_T__ <= 4@@
 	return (uintmax_t)strtou32(nptr, endptr, base);
-#else /* __SIZEOF_INTMAX_T__ <= 4 */
+@@pp_else@@
 	return (uintmax_t)strtou64(nptr, endptr, base);
-#endif /* __SIZEOF_INTMAX_T__ > 4 */
+@@pp_endif@@
 }
 
 
 [[std, wchar, ATTR_LEAF]]
 [[section("{.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert}")]]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(wcstol)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(wcstoll, wcstoq)]
-[if(__SIZEOF_INTMAX_T__ == 8), alias(wcsto64, _wcstoi64)]
-[if(__SIZEOF_INTMAX_T__ == 4), alias(wcsto32)]
-wcstoimax:([[nonnull]] $wchar_t const *__restrict nptr, $wchar_t **endptr, int base) -> $intmax_t
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("wcstol")]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("wcstoll", "wcstoq")]]
+[[if(__SIZEOF_INTMAX_T__ == 8), alias("wcsto64", "_wcstoi64")]]
+[[if(__SIZEOF_INTMAX_T__ == 4), alias("wcsto32")]]
+$intmax_t wcstoimax([[nonnull]] $wchar_t const *__restrict nptr,
+                    [[nullable]] $wchar_t **endptr, int base)
 	%{generate(str2wcs)}
 
 [[std, wchar, ATTR_LEAF]]
 [[section("{.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert}")]]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias(wcstoul)]
-[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias(wcstoull, wcstouq)]
-[if(__SIZEOF_INTMAX_T__ == 8), alias(wcstou64, _wcstoui64)]
-[if(__SIZEOF_INTMAX_T__ == 4), alias(wcstou32)]
-wcstoumax:([[nonnull]] $wchar_t const *__restrict nptr, $wchar_t **endptr, int base) -> $uintmax_t
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("wcstoul")]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("wcstoull", "wcstouq")]]
+[[if(__SIZEOF_INTMAX_T__ == 8), alias("wcstou64", "_wcstoui64")]]
+[[if(__SIZEOF_INTMAX_T__ == 4), alias("wcstou32")]]
+$uintmax_t wcstoumax([[nonnull]] $wchar_t const *__restrict nptr,
+                     [[nullable]] $wchar_t **endptr, int base)
 	%{generate(str2wcs)}
 
 %
@@ -630,7 +635,7 @@ $uintmax_t strtoumax_l([[nonnull]] char const *__restrict nptr,
 	return strtoumax(nptr, endptr, base);
 }
 
-[[wchar, ATTR_LEAF, export_alias("_wcstoimax_l")]]
+[[wchar, ATTR_LEAF, crt_dosname("_wcstoimax_l")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("wcstol_l", "_wcstol_l", "__wcstol_l")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("wcstoll_l", "_wcstoll_l", "__wcstoll_l")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("wcsto64_l", "_wcstoi64_l")]]
@@ -641,7 +646,7 @@ $intmax_t wcstoimax_l([[nonnull]] $wchar_t const *__restrict nptr,
                       $locale_t locale)
 	%{generate(str2wcs)}
 
-[[wchar, ATTR_LEAF, export_alias("_wcstoumax_l")]]
+[[wchar, ATTR_LEAF, crt_dosname("_wcstoumax_l")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("wcstoul_l", "_wcstoul_l", "__wcstoul_l")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("wcstoull_l", "_wcstoull_l", "__wcstoull_l")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("wcstou64_l", "_wcstoui64_l")]]

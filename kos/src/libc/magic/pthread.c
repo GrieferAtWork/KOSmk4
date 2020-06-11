@@ -865,7 +865,15 @@ void __pthread_cleanup_routine([[nonnull]] struct __pthread_cleanup_frame *frame
 %		do {
 %
 
-[attribute(@__cleanup_fct_attribute@)]
+%[define(DEFINE___cleanup_fct_attribute =
+#ifndef __cleanup_fct_attribute
+#define __cleanup_fct_attribute /* nothing */
+#endif /* !__cleanup_fct_attribute */
+)]
+
+
+[[decl_prefix(DEFINE___cleanup_fct_attribute)]]
+[[attribute(__cleanup_fct_attribute)]]
 __pthread_register_cancel:(__pthread_unwind_buf_t *buf);
 
 %/* Remove a cleanup handler installed by the matching pthread_cleanup_push.
@@ -879,7 +887,8 @@ __pthread_register_cancel:(__pthread_unwind_buf_t *buf);
 %			(*__cancel_routine)(__cancel_arg);                                 \
 %	} __WHILE0
 
-[[attribute(@__cleanup_fct_attribute@)]]
+[[decl_prefix(DEFINE___cleanup_fct_attribute)]]
+[[attribute(__cleanup_fct_attribute)]]
 void __pthread_unregister_cancel([[nonnull]] __pthread_unwind_buf_t *buf);
 
 %#ifdef __USE_GNU
@@ -900,7 +909,8 @@ void __pthread_unregister_cancel([[nonnull]] __pthread_unwind_buf_t *buf);
 %		__pthread_register_cancel_defer(&__cancel_buf);                                                       \
 %		do {
 
-[[attribute(@__cleanup_fct_attribute@)]]
+[[decl_prefix(DEFINE___cleanup_fct_attribute)]]
+[[attribute(__cleanup_fct_attribute)]]
 void __pthread_register_cancel_defer([[nonnull]] __pthread_unwind_buf_t *buf);
 
 %/* Remove a cleanup handler as pthread_cleanup_pop does, but also
@@ -915,13 +925,15 @@ void __pthread_register_cancel_defer([[nonnull]] __pthread_unwind_buf_t *buf);
 %			(*__cancel_routine)(__cancel_arg);                                 \
 %	} __WHILE0
 
-[[attribute(@__cleanup_fct_attribute@)]]
+[[decl_prefix(DEFINE___cleanup_fct_attribute)]]
+[[attribute(__cleanup_fct_attribute)]]
 void __pthread_unregister_cancel_restore([[nonnull]] __pthread_unwind_buf_t *buf);
 %#endif /* __USE_GNU */
 
 @@Internal interface to initiate cleanup
 [[ATTR_WEAK]] /* XXX:[if(!defined(SHARED)), ATTR_WEAK] */
-[[attribute(@__cleanup_fct_attribute@), ATTR_NORETURN]]
+[[decl_prefix(DEFINE___cleanup_fct_attribute)]]
+[[attribute(__cleanup_fct_attribute)]]
 void __pthread_unwind_next([[nonnull]] __pthread_unwind_buf_t *buf);
 
 %#endif /* !__GNUC__ || !__EXCEPTIONS */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x129223a */
+/* HASH CRC-32:0x1d8ccbfe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -226,46 +226,52 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wrmdir, __FORCELOCAL __ATTR_NONNULL((1)) int __N
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,weuidaccess,(wchar_t const *__file, int __type),(__file,__type))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,weuidaccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
 #elif defined(__CRT_HAVE_DOS$weuidaccess) && __SIZEOF_WCHAR_T__ == 4
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBCCALL,weuidaccess,(wchar_t const *__file, int __type),KOS$weuidaccess,(__file,__type))
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBCCALL,weuidaccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),KOS$weuidaccess,(__file,__type))
 #elif defined(__CRT_HAVE_DOS$weuidaccess) && __SIZEOF_WCHAR_T__ == 2
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBCCALL,weuidaccess,(wchar_t const *__file, int __type),DOS$weuidaccess,(__file,__type))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_faccessat)
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBCCALL,weuidaccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),DOS$weuidaccess,(__file,__type))
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && defined(__CRT_HAVE_faccessat)
 #include <local/parts.wchar.unistd/weuidaccess.h>
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__NAMESPACE_LOCAL_USING_OR_IMPL(weuidaccess, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL weuidaccess)(wchar_t const *__file, int __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(weuidaccess))(__file, __type); })
-#endif /* ... */
+__NAMESPACE_LOCAL_USING_OR_IMPL(weuidaccess, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL weuidaccess)(wchar_t const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(weuidaccess))(__file, __type); })
+#endif /* __CRT_AT_FDCWD && __AT_EACCESS && __CRT_HAVE_faccessat */
+#endif /* !... */
 #ifdef __CRT_HAVE_weuidaccess
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,weaccess,(wchar_t const *__file, int __type),weuidaccess,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,weaccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
 #elif defined(__CRT_HAVE_DOS$weuidaccess) && __SIZEOF_WCHAR_T__ == 4
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBCCALL,weaccess,(wchar_t const *__file, int __type),KOS$weuidaccess,(__file,__type))
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBCCALL,weaccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),KOS$weuidaccess,(__file,__type))
 #elif defined(__CRT_HAVE_DOS$weuidaccess) && __SIZEOF_WCHAR_T__ == 2
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBCCALL,weaccess,(wchar_t const *__file, int __type),DOS$weuidaccess,(__file,__type))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_faccessat)
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBCCALL,weaccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),DOS$weuidaccess,(__file,__type))
+#else /* ... */
+#include <asm/fcntl.h>
+#if defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && defined(__CRT_HAVE_faccessat)
 #include <local/parts.wchar.unistd/weuidaccess.h>
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL weaccess)(wchar_t const *__file, int __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(weuidaccess))(__file, __type); }
-#endif /* ... */
+__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL weaccess)(wchar_t const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(weuidaccess))(__file, __type); }
+#endif /* __CRT_AT_FDCWD && __AT_EACCESS && __CRT_HAVE_faccessat */
+#endif /* !... */
 #ifdef __CRT_HAVE_wget_current_dir_name
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wget_current_dir_name,(void),())
 #elif defined(__CRT_HAVE_DOS$wget_current_dir_name) && __SIZEOF_WCHAR_T__ == 4

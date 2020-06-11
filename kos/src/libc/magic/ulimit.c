@@ -19,6 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
+%[define_replacement(longptr_t = __LONGPTR_TYPE__)]
 
 %{
 #include <features.h>
@@ -76,7 +77,7 @@ enum {
 
 @@Control process limits according to CMD
 [[vartypes(long)]]
-long int ulimit(int cmd, ...);
+$longptr_t ulimit(int cmd, ...);
 
 %{
 #endif /* __CC__ */

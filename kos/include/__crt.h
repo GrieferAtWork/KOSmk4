@@ -151,7 +151,7 @@
 #if !defined(__INTELLISENSE__) && \
     (defined(__OPTIMIZE__) || defined(__KERNEL__))
 #define __LIBC_BIND_OPTIMIZATIONS 1
-#endif
+#endif /* ... */
 
 
 #ifdef __LIBC_BIND_CRTBUILTINS

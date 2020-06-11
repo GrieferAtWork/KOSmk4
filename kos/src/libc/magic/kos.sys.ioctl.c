@@ -29,7 +29,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 }
 
-[[cp, throws]][doc_alias(ioctl)][[guard]][vartypes(void *)]
+[[cp, throws, guard, doc_alias("ioctl"), vartypes(void *)]]
 Ioctl:($fd_t fd, unsigned long int request, ...) -> $ssize_t;
 
 %{

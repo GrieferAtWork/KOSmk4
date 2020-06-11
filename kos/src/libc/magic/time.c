@@ -83,7 +83,7 @@ __SYSDECL_BEGIN
 #define USEC_PER_SEC    1000000l
 #define NSEC_PER_SEC    1000000000l
 #define FSEC_PER_SEC    1000000000000000ll
-#endif
+#endif /* __USE_KOS */
 
 #ifdef __USE_ISOC11
 #define TIME_UTC 1
@@ -106,8 +106,8 @@ __SYSDECL_BEGIN
 #define NULL __NULLPTR
 #endif /* NULL */
 
-#if defined(__USE_DOS) || \
-  (!defined(__USE_XOPEN2K) && !defined(__USE_ISOC_PURE) && !defined(__STRICT_ANSI__))
+#if (defined(__USE_DOS) || \
+     (!defined(__USE_XOPEN2K) && !defined(__USE_ISOC_PURE) && !defined(__STRICT_ANSI__)))
 #ifndef CLK_TCK
 #define CLK_TCK CLOCKS_PER_SEC
 #endif /* !CLK_TCK */
@@ -356,7 +356,7 @@ $errno_t dos_ctime64_s([[nonnull]] char buf[26], $size_t bufsize,
 [[doc_alias("time"), ignore, nocrt, alias("time", "_time32")]]
 $time32_t time32([[nullable]] $time32_t *timer);
 
-[[ATTR_WUNUSED, ATTR_CONST, nothrow, doc_alias("difftime")]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST, doc_alias("difftime")]]
 [[ignore, nocrt, alias("difftime", "_difftime32")]]
 double difftime32($time32_t time1, $time32_t time0);
 
@@ -431,7 +431,7 @@ double difftime(time_t time1, time_t time0) {
 time_t mktime([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) {
 @@pp_ifdef __BUILDING_LIBC@@
 	__TM_TYPE(@time@) result;
-	result = @__yearstodays@(tp->@tm_year@) - @__yearstodays@(1970); /* LINUX_TIME_START_YEAR */
+	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
 	result += tp->@tm_yday@;
 	result *= 86400; /* SECONDS_PER_DAY */
 	result += tp->@tm_hour@*60*60;
@@ -444,7 +444,7 @@ time_t mktime([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) {
 	return (time_t)mktime32(tp);
 @@pp_else@@
 	__TM_TYPE(@time@) result;
-	result = @__yearstodays@(tp->@tm_year@) - @__yearstodays@(1970); /* LINUX_TIME_START_YEAR */
+	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
 	result += tp->@tm_yday@;
 	result *= 86400; /* SECONDS_PER_DAY */
 	result += tp->@tm_hour@*60*60;
@@ -663,7 +663,7 @@ double difftime64($time64_t time1, $time64_t time0) {
 $time64_t mktime64([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) {
 @@pp_ifdef __BUILDING_LIBC@@
 	time64_t result;
-	result = @__yearstodays@(tp->@tm_year@) - @__yearstodays@(1970); /* LINUX_TIME_START_YEAR */
+	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
 	result += tp->@tm_yday@;
 	result *= 86400; /* SECONDS_PER_DAY */
 	result += tp->@tm_hour@*60*60;
@@ -674,7 +674,7 @@ $time64_t mktime64([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp) {
 	return (time64_t)mktime32(tp);
 @@pp_else@@
 	time64_t result;
-	result = @__yearstodays@(tp->@tm_year@) - @__yearstodays@(1970); /* LINUX_TIME_START_YEAR */
+	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
 	result += tp->@tm_yday@;
 	result *= 86400; /* SECONDS_PER_DAY */
 	result += tp->@tm_hour@*60*60;
@@ -1103,7 +1103,7 @@ int timer_create(clockid_t clock_id,
                  [[nonnull]] timer_t *__restrict timerid);
 
 @@Delete timer TIMERID
-[section(".text.crt.timer")]
+[[section(".text.crt.timer")]]
 int timer_delete(timer_t timerid);
 
 @@Set timer TIMERID to VALUE, returning old value in OVALUE
@@ -1512,8 +1512,8 @@ __STRUCT_TM *gmtime_r([[nonnull]] $time_t const *__restrict timer,
 	u16 const *monthvec;
 	t = *timer;
 	tp->@tm_sec@  = (int)(t % 60);
-	tp->@tm_min@  = (int)((t/60) % 60);
-	tp->@tm_hour@ = (int)((t/(60*60)) % 24);
+	tp->@tm_min@  = (int)((t / 60) % 60);
+	tp->@tm_hour@ = (int)((t / (60 * 60)) % 24);
 	t /= 86400; /* SECONDS_PER_DAY */
 	t += __yearstodays(1970); /* LINUX_TIME_START_YEAR */
 	tp->@tm_wday@ = (int)(t % 7); /* DAYS_PER_WEEK */

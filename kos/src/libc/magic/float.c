@@ -239,7 +239,7 @@ int __control87_2($uint32_t newval, $uint32_t mask,
 
 _copysign(*) = copysign;
 
-[[ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST]]
 double _chgsign(double x) {
 	return -x;
 }
@@ -250,7 +250,7 @@ _nextafter(*) = nextafter;
 _finite(*) = finite;
 _isnan(*) = isnan;
 
-[[ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST]]
 int _fpclass(double x);
 
 %#if defined(__x86_64__) || defined(__i386__)
@@ -274,7 +274,7 @@ _scalbf(*) = scalbf;
 #ifdef __CC__
 }
 
-[export_alias("_fpreset")]
+[[export_alias("_fpreset")]]
 void fpreset();
 
 %{

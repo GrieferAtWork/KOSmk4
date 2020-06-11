@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefd32ac3 */
+/* HASH CRC-32:0xc6e7c7b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -570,7 +570,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munmap,(void *__addr, size_t __
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mprotect,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot),(__addr,__len,__prot))
 #endif /* __CRT_HAVE_mprotect */
 #ifdef __CRT_HAVE_msync
-/* @param flags: Set of `MS_ASYNC|MS_INVALIDATE|MS_SYNC' */
+/* @param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,msync,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __flags),(__addr,__len,__flags))
 #endif /* __CRT_HAVE_msync */
 #ifdef __CRT_HAVE_mlock
@@ -580,7 +580,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mlock,(void const *__addr, size
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munlock,(void const *__addr, size_t __len),(__addr,__len))
 #endif /* __CRT_HAVE_munlock */
 #ifdef __CRT_HAVE_mlockall
-/* @param flags: Set of `MCL_CURRENT|MCL_FUTURE|MCL_ONFAULT' */
+/* @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 __CDECLARE(,int,__NOTHROW_NCX,mlockall,(__STDC_INT_AS_UINT_T __flags),(__flags))
 #endif /* __CRT_HAVE_mlockall */
 #ifdef __CRT_HAVE_munlockall
@@ -644,7 +644,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_madvise, __FORCELOCAL __ATTR_NONNULL((1)) 
 
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_mremap
-/* @param flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
+/* @param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 __LIBC void *__NOTHROW_NCX(__VLIBCCALL mremap)(void *__addr, size_t __old_len, size_t __new_len, __STDC_INT_AS_UINT_T __flags, ...) __CASMNAME_SAME("mremap");
 #endif /* __CRT_HAVE_mremap */
 #ifdef __CRT_HAVE_remap_file_pages

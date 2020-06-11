@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13480448 */
+/* HASH CRC-32:0x6f7cedf8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@
 
 __SYSDECL_BEGIN
 
-#include "stdlib.h"
 
 __SYSDECL_END
+
 #endif /* __CC__ */
 
 #endif /* !_LIBC_CORE_MALLOC_H */

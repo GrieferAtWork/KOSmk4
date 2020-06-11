@@ -329,7 +329,7 @@ $pid_t getpid();
 @@Return the TID of the calling thread
 @@THIS_THREAD->PID
 [[guard, ATTR_WUNUSED, section(".text.crt.sched.thread")]]
-gettid:() -> $pid_t;
+$pid_t gettid();
 %#endif /* __USE_KOS */
 
 [[ignore, nocrt, alias("_pipe")]]
@@ -373,7 +373,8 @@ int fsync($fd_t fd) {
 @@Return the PID of the calling process's parent.
 @@(That is the TID of the leader of the parent of the calling thread's leader)
 @@THIS_THREAD->LEADER->PARENT->LEADER->PID
-[[ATTR_WUNUSED]] getppid:() -> $pid_t;
+[[ATTR_WUNUSED]]
+$pid_t getppid();
 
 
 %
@@ -381,7 +382,8 @@ int fsync($fd_t fd) {
 @@Return the ID of the calling process's process group.
 @@(That is the TID of the leader of the process group of the calling thread's leader)
 @@THIS_THREAD->LEADER->GROUP_LEADER->PID
-[[ATTR_WUNUSED]] getpgrp:() -> $pid_t;
+[[ATTR_WUNUSED]]
+$pid_t getpgrp();
 
 %
 __getpgid(*) = getpgid;
@@ -393,7 +395,7 @@ __getpgid(*) = getpgid;
 @@THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
 @@When `PID' is ZERO(0), use `gettid()' for it instead.
 @@When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead
-[export_alias("__setpgid")]
+[[export_alias("__setpgid")]]
 int setpgid($pid_t pid, $pid_t pgid);
 
 %
@@ -401,36 +403,40 @@ int setpgid($pid_t pid, $pid_t pgid);
 @@Make the calling thread's process the leader of its associated
 @@process group, before also making it its own session leader.
 @@Then return the TID of that new session leader, which is also the PID of the calling process.
-@@THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
-@@THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
-@@return THIS_THREAD->LEADER->PID;
-setsid:() -> $pid_t;
+@@ - THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
+@@ - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
+@@ - return THIS_THREAD->LEADER->PID;
+$pid_t setsid();
 
 %[default_impl_section(".text.crt.sched.user")]
 
 %
 @@>> getuid(2)
 @@Return the real user ID of the calling process
-[[ATTR_WUNUSED]] getuid:() -> $uid_t;
+[[ATTR_WUNUSED]]
+$uid_t getuid();
 
 %
 @@>> geteuid(2)
 @@Return the effective user ID of the calling process
-[[ATTR_WUNUSED]] geteuid:() -> $uid_t;
+[[ATTR_WUNUSED]]
+$uid_t geteuid();
 
 %
 @@>> getgid(2)
 @@Return the real group ID of the calling process
-[[ATTR_WUNUSED]] getgid:() -> $gid_t;
+[[ATTR_WUNUSED]]
+$gid_t getgid();
 
 %
 @@>> getegid(2)
 @@Return the effective group ID of the calling process
-[[ATTR_WUNUSED]] getegid:() -> $gid_t;
+[[ATTR_WUNUSED]]
+$gid_t getegid();
 
 %
 %/* ... */
-getgroups:(int size, $gid_t list[]) -> int;
+int getgroups(int size, $gid_t list[]);
 
 %
 @@>> setuid(2)
@@ -438,7 +444,7 @@ getgroups:(int size, $gid_t list[]) -> int;
 @@@return: 0 : Success
 @@@return: -1: [errno=EINVAL] : The given `UID' is invalid
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
-setuid:($uid_t uid) -> int;
+int setuid($uid_t uid);
 
 %
 @@>> setgid(2)
@@ -446,7 +452,7 @@ setuid:($uid_t uid) -> int;
 @@@return: 0 : Success
 @@@return: -1: [errno=EINVAL] : The given `GID' is invalid
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
-setgid:($gid_t gid) -> int;
+int setgid($gid_t gid);
 
 
 %
@@ -471,12 +477,13 @@ $pid_t fork();
 @@@return: * : The number of seconds yet to pass before a previous alarm would have elapsed.
 @@Schedule an to deliver a `SIGALRM' after letting `seconds' elapse.
 @@You may pass ZERO(0) for SECONDS to disable a previously scheduled alarm
-alarm:(unsigned int seconds) -> unsigned int;
+unsigned int alarm(unsigned int seconds);
 
 %
 @@>> pause(2)
 @@Suspend execution until the delivery of a POSIX_SIGNAL
-[[cp]] pause:() -> int;
+[[cp]]
+int pause();
 
 %
 @@>> fpathconf(2)
@@ -485,8 +492,7 @@ alarm:(unsigned int seconds) -> unsigned int;
 @@return: * : The configuration limit associated with `NAME' for `FD'
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
-[[section(".text.crt.fs.property")]]
-[[cp, ATTR_WUNUSED]]
+[[cp, ATTR_WUNUSED, section(".text.crt.fs.property")]]
 long int fpathconf($fd_t fd, int name);
 
 %[default_impl_section(".text.crt.io.tty")]
@@ -574,10 +580,9 @@ ssize_t write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
 @@If an error occurrs before all data could be read, try to use SEEK_CUR to rewind
 @@the file descriptor by the amount of data that had already been loaded. - Errors
 @@during this phase are silently ignored and don't cause `errno' to change
-[[cp, guard]][section(".text.crt.io.read")]
-[requires($has_function(read) && $has_function(lseek))]
-[[impl_include("<parts/errno.h>")]]
-readall:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) -> ssize_t {
+[[cp, guard, section(".text.crt.io.read"), impl_include("<parts/errno.h>")]]
+[[userimpl, requires_function(read, lseek)]]
+ssize_t readall($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
 	ssize_t result, temp;
 	result = read(fd, buf, bufsize);
 	if (result > 0 && (size_t)result < bufsize) {
@@ -587,14 +592,14 @@ readall:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) -> ssize_t {
 			            (byte_t *)buf + (size_t)result,
 			            bufsize - (size_t)result);
 			if (temp <= 0) {
-#ifdef @__errno@
-				int old_error = @__errno@;
-#endif /* __errno */
+@@pp_ifdef __libc_geterrno@@
+				int old_error = __libc_geterrno();
+@@pp_endif@@
 				/* Try to un-read data that had already been loaded. */
 				lseek(fd, -(off_t)(pos_t)result, SEEK_CUR);
-#ifdef @__errno@
-				@__errno@ = old_error;
-#endif /* __errno */
+@@pp_ifdef __libc_geterrno@@
+				__libc_seterrno(old_error);
+@@pp_endif@@
 				result = temp;
 				break;
 			}
@@ -610,10 +615,9 @@ readall:($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) -> ssize_t {
 @@Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
 @@`writeall()' to immediately return `0') or the entirety of the given buffer has been
 @@written (in which case `bufsize' is returned).
-[[cp, guard]][section(".text.crt.io.write")]
-[requires($has_function(write) && $has_function(lseek))]
-[[impl_include("<parts/errno.h>")]]
-writeall:($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) -> ssize_t {
+[[cp, guard, section(".text.crt.io.write"), impl_include("<parts/errno.h>")]]
+[[userimpl, requires($has_function(write) && $has_function(lseek))]]
+ssize_t writeall($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) {
 	ssize_t result, temp;
 	result = write(fd, buf, bufsize);
 	if (result > 0 && (size_t)result < bufsize) {
@@ -643,8 +647,8 @@ $off32_t lseek32($fd_t fd, $off32_t offset, int whence);
 @@>> lseek(2)
 @@Change the position of the file read/write pointer within a file referred to by `FD'
 [[guard, no_crt_self_import]]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias("lseek64", "_lseeki64")]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("lseek", "_lseek", "__lseek")]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("lseek64", "_lseeki64")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("lseek", "_lseek", "__lseek")]]
 [[userimpl, requires($has_function(lseek32) || $has_function(lseek64))]]
 [[section(".text.crt.io.seek"), export_as("_lseek", "__lseek")]]
 $off_t lseek($fd_t fd, $off_t offset, int whence) {
@@ -738,11 +742,12 @@ int rmdir([[nonnull]] char const *path) {
 @@>> euidaccess(2)
 @@@param: TYPE: Set of `X_OK | W_OK | R_OK'
 @@Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids
-[[cp, export_alias(eaccess), ATTR_WUNUSED]]
+[[cp, ATTR_WUNUSED, export_alias("eaccess")]]
 [[if(defined(__CRT_DOS)), alias("_access")]]
-[[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(faccessat))]]
-euidaccess:([[nonnull]] char const *file, int type) -> int {
-	return faccessat(__CRT_AT_FDCWD, file, type, 0x0200); /* AT_EACCESS */
+[[requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires(defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && $has_function(faccessat))]]
+int euidaccess([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
+	return faccessat(__CRT_AT_FDCWD, file, type, __AT_EACCESS);
 }
 
 %

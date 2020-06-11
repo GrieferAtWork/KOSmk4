@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0a6cabc */
+/* HASH CRC-32:0xbd9f21eb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -628,6 +628,14 @@
 /* Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
 #define __libc_mempatq __libc_core_mempatq
 #endif /* !__fast_mempatq_defined */
+#define __libc_PRIVATE_memset1 __libc_memset
+#define __libc_PRIVATE_memset2 __libc_memsetw
+#define __libc_PRIVATE_memset4 __libc_memsetl
+#define __libc_PRIVATE_memset8 __libc_memsetq
+#define __libc_PRIVATE_memset(dst, word, elem_count, elem_size) \
+	__libc_PRIVATE_memset##elem_size(dst, word, elem_count)
+#define __libc_memsetc(dst, word, elem_count, elem_size) \
+	__libc_PRIVATE_memset(dst, word, elem_count, elem_size)
 
 #endif /* __CC__ */
 

@@ -113,57 +113,57 @@ __NAMESPACE_STD_USING(wctrans_t)
 %[insert:std]
 %[default_impl_section("{.text.crt.wchar.unicode.static.ctype|.text.crt.dos.wchar.unicode.static.ctype}")];
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 int iswalnum(wint_t wc) {
 	return isalnum((int)wc);
 }
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 int iswalpha(wint_t wc) {
 	return isalpha((int)wc);
 }
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 int iswcntrl(wint_t wc) {
 	return iscntrl((int)wc);
 }
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 int iswdigit(wint_t wc) {
 	return isdigit((int)wc);
 }
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 int iswgraph(wint_t wc) {
 	return isgraph((int)wc);
 }
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 int iswlower(wint_t wc) {
 	return islower((int)wc);
 }
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 int iswprint(wint_t wc) {
 	return isprint((int)wc);
 }
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 int iswpunct(wint_t wc) {
 	return ispunct((int)wc);
 }
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 int iswspace(wint_t wc) {
 	return isspace((int)wc);
 }
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 int iswupper(wint_t wc) {
 	return isupper((int)wc);
 }
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 int iswxdigit(wint_t wc) {
 	return isdigit((int)wc);
 }
@@ -206,17 +206,17 @@ int iswctype(wint_t wc, wctype_t desc) {
 
 %[default_impl_section("{.text.crt.wchar.unicode.static.ctype|.text.crt.dos.wchar.unicode.static.ctype}")]
 %(std)#ifdef __USE_ISOC99
-[[std, guard, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, guard, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 int iswblank(wint_t wc) {
 	return isblank((int)wc);
 }
 %(std)#endif /* __USE_ISOC99 */
 
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 wint_t towlower(wint_t wc) {
 	return (wint_t)tolower((int)wc);
 }
-[[std, ATTR_WUNUSED, ATTR_CONST, nothrow, crtbuiltin]]
+[[std, ATTR_WUNUSED, nothrow, ATTR_CONST, crtbuiltin]]
 wint_t towupper(wint_t wc) {
 	return (wint_t)toupper((int)wc);
 }
@@ -224,7 +224,7 @@ wint_t towupper(wint_t wc) {
 
 %
 %#if defined(__USE_KOS) || defined(__USE_DOS)
-[[ATTR_WUNUSED, ATTR_CONST, nothrow]]
+[[ATTR_WUNUSED, nothrow, ATTR_CONST]]
 int iswascii($wint_t wc) {
 	return (unsigned int)wc <= 0x7f;
 }

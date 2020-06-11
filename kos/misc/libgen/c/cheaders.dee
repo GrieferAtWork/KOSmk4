@@ -631,7 +631,7 @@ class FunctionPrototype {
 					dstArg.ctype.cprintCCastPrefix(fp, escapeMode);
 				fp << a.name;
 			}
-			for (; i < usedPrototypeArgc; ++i) {
+			for (++i; i < usedPrototypeArgc; ++i) {
 				if (!isFirst)
 					fp << ", ";
 				isFirst = false;
@@ -1612,6 +1612,25 @@ class FunctionBinding {
 		}
 	}
 
+	@@Check if this binding has a *primary* prototype (or return @none if it doesn't)
+	@@A primary prototype exists if at least one @prototypes has a condition string
+	@@that evaluates to @"1". The first set of prototypes that does this is then
+	@@considered the set of primary prototypes. Furthermore, should this set then be
+	@@made up of exactly one prototype, that prototype is then *the* primary prototype.
+	@@In all other cases, no primary prototype exists, and this property returns @none
+	public property primaryPrototype: FunctionPrototype | none = {
+		get(): FunctionPrototype | none {
+			for (local ppCond, protos: functionPrototypes) {
+				if (ppCond != "1")
+					continue;
+				if (#protos == 1)
+					return protos.first;
+				break;
+			}
+			return none;
+		}
+	}
+
 	@@Return @binding, but unwind @Callable wrappers
 	public property functionBinding: LocalFunction | InlineFunction | string | UserString | NamespaceBinding = {
 		get(): LocalFunction | InlineFunction | string | UserString | NamespaceBinding {
@@ -1704,28 +1723,37 @@ class FunctionBinding {
 
 	@@Print a normal binding, as may be found in `<string.h>`
 	@@NOTE: The caller is responsible to ensure that @ppCond evaluates to non-zero at compile-time
-	@@@param: escapeMode:          One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
-	@@@param: decl:                Declaration prefix (e.g. @"__LIBC")
-	@@@param: exposedName:         The name by which to expose this binding (e.g. @"strlen")
-	@@@param: doc:                 A human-readable description of the associated function
-	@@@param: guardName:           The name of a macro that must be #undef'd if no prototype
-	@@                             has been exposed at compile-time. Set to @none if no such macro exists
-	@@@param: preferBindingMacros: Prefer function bindings to be done with macros, rather than
-	@@                             through use of inline functions.
+	@@@param: escapeMode:                One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	@@@param: decl:                      Declaration prefix (e.g. @"__LIBC")
+	@@@param: exposedName:               The name by which to expose this binding (e.g. @"strlen")
+	@@@param: doc:                       A human-readable description of the associated function
+	@@@param: guardName:                 The name of a macro that must be #undef'd if no prototype
+	@@                                   has been exposed at compile-time. Set to @none if no such macro exists
+	@@@param: preferBindingMacros:       Prefer function bindings to be done with macros, rather than
+	@@                                   through use of inline functions.
+	@@@param: printDeclarationPrefixes:  Print prototype declaration prefixes
+	@@@param: onlyPrintPrimaryPrototype: Only bind against @primaryPrototype (but fall back to binding
+	@@                                   against all prototypes if no @primaryPrototype exists)
 	public function cprintBindFunction(
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
 			guardName: string | none = none, doc: string = "",
 			preferBindingMacros: bool = false,
-			printDeclarationPrefixes: bool = false) {
+			printDeclarationPrefixes: bool = false,
+			onlyPrintPrimaryPrototype: bool = false) {
 		local usedBinding = functionBinding;
 		local usedPrototypes = functionPrototypes;
+		if (onlyPrintPrimaryPrototype && #usedPrototypes > 1) {
+			local prim = primaryPrototype;
+			if (prim !is none)
+				usedPrototypes = { ("1", { prim }) };
+		}
 		if (usedBinding is NamespaceBinding) {
 			local usedNs = usedBinding.namespace;
 			assert usedNs !== fp.namespace, "The caller must check this!";
 			local nsCImportName = usedNs.keyCSymbolName(usedBinding.importName);
 			if (nsCImportName == exposedName) {
 				if (prototypes === usedBinding.prototypes ||
-				    areFunctionPrototypesCompatible(functionPrototypes, usedBinding.functionPrototypes)) {
+				    areFunctionPrototypesCompatible(usedPrototypes, usedBinding.functionPrototypes)) {
 					/* Simple case: C doesn't perform any name mangling,
 					 * and the prototypes of the existing declaration match
 					 * those from the new declaration.
@@ -1913,6 +1941,16 @@ class Function {
 	}
 	private member m_functionBindings: {FunctionBinding...};
 
+	@@Check if @this @Function has any @bindings for imports from the given @ns
+	public function hasNamespaceImportBinding(ns: Namespace): bool {
+		for (local b: functionBindings) {
+			b = b.functionBinding;
+			if (b is NamespaceBinding && b.namespace === ns)
+				return true;
+		}
+		return false;
+	}
+
 	public function preload() {
 		try {
 			documentationString;
@@ -1922,6 +1960,29 @@ class Function {
 			print "... while preloading Function", repr(name);
 			throw;
 		}
+	}
+
+	@@Check if this function is always, never, or only dynamically available
+	@@@return: true:  Always available
+	@@@return: false: Never available
+	@@@return: none:  Availability must be determined at compile-time
+	public function getRequiresConstant(): bool | none {
+		local usedBindings = functionBindings;
+		if (!usedBindings)
+			return false;
+		local hasDynamicBindings = false;
+		for (local bind: usedBindings) {
+			if (bind.functionBinding is NamespaceBinding)
+				continue;
+			local c = bind.getRequiresConstant();
+			if (c === true)
+				return true;
+			if (c is none)
+				hasDynamicBindings = true;
+		}
+		if (hasDynamicBindings)
+			return none;
+		return false;
 	}
 
 	@@Print requires-conditions for this function (has used by @"$has_function(...)")
@@ -1978,19 +2039,24 @@ no_usable_bindings:
 	}
 
 	@@Print this function's normal declaration, as might be found in `<string.h>`
-	@@@param: escapeMode:          One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
-	@@@param: decl:                The declaration prefix (e.g. @"__LIBC") with which to link
-	@@@param: exposedName:         The name under which functions should be exposed (or @none
-	@@                             if @this.name should be used instead)
-	@@@param: guardName:           The name of a guard that should be used to wrap the declaration
-	@@                             When set to @true, use fp.namespace.keyDefaultGuard(exposedName)
-	@@@param: preferBindingMacros: Prefer function bindings to be done with macros, rather than
-	@@                             through use of inline functions.
+	@@@param: escapeMode:                One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
+	@@@param: decl:                      The declaration prefix (e.g. @"__LIBC") with which to link
+	@@@param: exposedName:               The name under which functions should be exposed (or @none
+	@@                                   if @this.name should be used instead)
+	@@@param: guardName:                 The name of a guard that should be used to wrap the declaration
+	@@                                   When set to @true, use fp.namespace.keyDefaultGuard(exposedName)
+	@@@param: preferBindingMacros:       Prefer function bindings to be done with macros, rather than
+	@@                                   through use of inline functions.
+	@@@param: printDeclarationPrefixes:  Print prototype declaration prefixes
+	@@@param: onlyPrintPrimaryPrototype: Try to only bind against primary prototypes
+	@@@param: ignoreNamespaceBindings:   Ignore namespace import bindings
 	public function cprintHeaderDeclaration(
 			fp: CWriter, escapeMode: int, decl: string = "__LIBC",
 			exposedName: string = none, guardName: string | bool = none,
 			preferBindingMacros: bool = false,
-			printDeclarationPrefixes: bool = false) {
+			printDeclarationPrefixes: bool = false,
+			onlyPrintPrimaryPrototype: bool = false,
+			ignoreNamespaceBindings: bool = false) {
 		try {
 			local usedBindings = functionBindings;
 			if (!usedBindings)
@@ -2030,7 +2096,7 @@ no_usable_bindings:
 					if (bind.binding is Callable)
 						bind.binding = bind.binding();
 					if (bind.binding is NamespaceBinding &&
-					    bind.binding.namespace === fp.namespace)
+					    (bind.binding.namespace === fp.namespace || ignoreNamespaceBindings))
 						return;
 					for (local x: bind.ppCondPrefix) {
 						if (!fp.wasPrefixPrinted(escapeText(x, escapeMode)))
@@ -2044,7 +2110,8 @@ no_usable_bindings:
 					bind.cprintBindFunction(
 						fp, escapeMode, decl, exposedName, guardName,
 						documentationString, preferBindingMacros,
-						printDeclarationPrefixes);
+						printDeclarationPrefixes,
+						onlyPrintPrimaryPrototype);
 					fp.ppEndif();
 					return;
 				}
@@ -2056,9 +2123,12 @@ normal_guardName_binding:
 			local numNeededEndif = [];
 			for (local bind: usedBindings) {
 				/* Special case: Can't bind against a declaration from the current namespace! */
-				if (bind.binding is NamespaceBinding &&
-				    bind.binding.namespace === fp.namespace)
-					continue;
+				if (bind.binding is NamespaceBinding) {
+					if (ignoreNamespaceBindings)
+						continue;
+					if (bind.binding.namespace === fp.namespace)
+						continue;
+				}
 				local usedPpCond = expandPreprocessorConditionString(bind.ppCond);
 				local oldNs: Namespace | none = none;
 				local oldExternLinkage;
@@ -2094,7 +2164,8 @@ normal_guardName_binding:
 				bind.cprintBindFunction(
 					fp, escapeMode, decl, exposedName, guardName,
 					documentationString, preferBindingMacros,
-					printDeclarationPrefixes);
+					printDeclarationPrefixes,
+					onlyPrintPrimaryPrototype);
 				isFirst = false;
 			}
 			while (numNeededEndif) {
@@ -2142,6 +2213,13 @@ class ExposedFunction {
 	@@Print @FunctionPrototype.declPrefix
 	public member printDeclarationPrefixes: bool = false;
 
+	@@Only bind against @FunctionBinding.primaryPrototype (but fall back to binding
+	@@against all prototypes if no @FunctionBinding.primaryPrototype exists)
+	public member onlyPrintPrimaryPrototype: bool = false;
+
+	@@Don't bind against @NamespaceBinding
+	public member ignoreNamespaceBindings: bool = false;
+
 	@@An override for the active namespace during function declaration
 	public member namespaceOverride: Namespace | UserString | string | none = none;
 
@@ -2174,7 +2252,9 @@ class ExposedFunction {
 		func.cprintHeaderDeclaration(
 			fp, escapeMode, decl, exposedName,
 			guardName, preferBindingMacros,
-			printDeclarationPrefixes);
+			printDeclarationPrefixes,
+			onlyPrintPrimaryPrototype,
+			ignoreNamespaceBindings);
 		fp.externLinkage = oldExternLinkage;
 		fp.namespace = oldNs;
 	}
@@ -2474,7 +2554,7 @@ class SystemHeader {
 	public member order_libcUserSource: {LibraryFunction...} = [];
 
 	@@Print the contents of the exposed header (such as `<string.h>`),
-	@@excluding the leading/trailing COPYRIGHT
+	@@excluding the leading COPYRIGHT
 	public function cprintHeader(fp: CWriter, escapeMode: int) {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "0" */
 		for (local part: order_header) {
@@ -2486,6 +2566,136 @@ class SystemHeader {
 				fp << part;
 			}
 		}
+	}
+
+	@@Print the header <libc/string.h>
+	public function cprintLibcHeader(fp: CWriter) {
+		local hasFastBindings = false;
+		local nsFast = NAMESPACES["fast"];
+		for (local part: order_libcHeader) {
+			if (part !is Function)
+				continue;
+			if (part.hasNamespaceImportBinding(nsFast)) {
+				hasFastBindings = true;
+				break;
+			}
+		}
+		local guardName = "_LIBC_{}_H"
+			.format({ name.replace("-", "_").replace(".", "_").upper() });
+		fp << "#ifndef " << guardName << "\n"
+			"#define " << guardName << " 1\n"
+			"\n"
+			"#include <__stdinc.h>\n"
+			"\n"
+			"#ifdef __CC__\n"
+			"#include <__crt.h>\n";
+		if (hasFastBindings) {
+			fp << "#ifdef __LIBC_BIND_OPTIMIZATIONS\n"
+				"#include <optimized/" << name << ".h>\n"
+				"#endif /* __LIBC_BIND_OPTIMIZATIONS */\n";
+		}
+		fp << "#include \"core/" << name << ".h\"\n"
+			"\n";
+		for (local part: order_libcHeader) {
+			if (part !is Function) {
+				fp << part;
+				continue;
+			}
+			local rc = part.getRequiresConstant();
+			if (rc === false)
+				continue;
+			local partName = part.name;
+			local partDoc = part.documentationString;
+			local partFast = hasFastBindings && part.hasNamespaceImportBinding(nsFast);
+			if (rc is none) {
+				/* Conditionally link against some guard. */
+				local coreGuardName = "____libc_core_{}_defined".format({ partName });
+				local myGuardName = "____libc_{}_defined".format({ partName });
+				if (partFast) {
+					fp << "#ifndef " << myGuardName << "\n"
+						"#ifdef __fast_" << partName << "_defined\n"
+						"#define " << myGuardName << " 1\n"
+						"#define __libc_" << partName << " ("
+							<< nsFast.prefix << " "
+							<< nsFast.keyCSymbolName(partName) << ")\n"
+						"#elif defined(" << coreGuardName << ")\n"
+						"#define " << myGuardName << " 1\n"
+						"#define __libc_" << partName << " __libc_core_" << partName << "\n"
+						"#endif /* ... */\n"
+						"#endif /* !" << myGuardName << " */\n";
+				} else {
+					fp << "#if !defined(" << myGuardName << ") && defined(" << coreGuardName << ")\n"
+						"#define " << myGuardName << " 1\n"
+						"#define __libc_" << partName << " __libc_core_" << partName << "\n"
+						"#endif /* !" << myGuardName << " && " << coreGuardName << " */\n";
+				}
+			} else {
+				if (partFast) {
+					fp << "#ifdef __fast_" << partName << "_defined\n";
+					if (partDoc)
+						fp.printComment(partDoc);
+					fp << "#define __libc_" << partName << " ("
+						<< nsFast.prefix << " "
+						<< nsFast.keyCSymbolName(partName) << ")\n"
+						<< "#else /* __fast_" << partName << "_defined */\n";
+				}
+				if (partDoc)
+					fp.printComment(partDoc);
+				fp << "#define __libc_" << partName << " __libc_core_" << partName << "\n";
+				if (partFast)
+					fp << "#endif /* !__fast_" << partName << "_defined */\n";
+			}
+		}
+		fp << "\n"
+			"#endif /* __CC__ */\n"
+			"\n"
+			"#endif /* !" << guardName << " */\n";
+	}
+
+	@@Print the header <libc/core/string.h>
+	public function cprintLibcCoreHeader(fp: CWriter) {
+		for (local part: order_libcHeader) {
+			if (part !is Function)
+				continue;
+		}
+		local guardName = "_LIBC_CORE_{}_H"
+			.format({ name.replace("-", "_").replace(".", "_").upper() });
+		fp << "#ifndef " << guardName << "\n"
+			"#define " << guardName << " 1\n"
+			"\n"
+			"#include <__stdinc.h>\n"
+			"\n"
+			"#ifdef __CC__\n"
+			"#include <__crt.h>\n"
+			"#include <hybrid/typecore.h>\n"
+			"\n"
+			"__SYSDECL_BEGIN\n"
+			"\n";
+		for (local part: order_libcHeader) {
+			if (part !is Function)
+				continue;
+			local rc = part.getRequiresConstant();
+			if (rc === false)
+				continue;
+			local guardName = none;
+			local exposedName = "__libc_core_" + part.name;
+			if (rc is none)
+				guardName = "__{}_defined".format({ exposedName });
+			part.cprintHeaderDeclaration(
+				fp, ESCAPE_MODE_FULL, "__LIBC",
+				exposedName:               exposedName,
+				guardName:                 guardName,
+				preferBindingMacros:       true,
+				printDeclarationPrefixes:  true,
+				onlyPrintPrimaryPrototype: true,
+				ignoreNamespaceBindings:   true);
+		}
+		fp << "\n"
+			"__SYSDECL_END\n"
+			"\n"
+			"#endif /* __CC__ */\n"
+			"\n"
+			"#endif /* !" << guardName << " */\n";
 	}
 
 	@@Print the header /kos/src/libc/auto/string.h

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68d05bdd */
+/* HASH CRC-32:0xacfcefb8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1004,7 +1004,7 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_CONST,struct __unitraits *,__NOTHROW,__unico
 
 /* Fold the given unicode character CH */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,unicode_fold,(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[UNICODE_FOLDED_MAX]),(__ch,__buf))
-#else /* unicode_fold... */
+#else /* __CRT_HAVE_unicode_fold */
 /* The max number of characters ever written by `unicode_fold' */
 #define UNICODE_FOLDED_MAX 1
 
@@ -1014,7 +1014,7 @@ __NOTHROW_NCX(__LIBCCALL unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __b
 	__buf[0] = __ch;
 	return __buf + 1;
 }
-#endif /* !unicode_fold... */
+#endif /* !__CRT_HAVE_unicode_fold */
 
 /* Unicode character conversion. */
 #ifdef __CRT_HAVE___unicode_asciiflags

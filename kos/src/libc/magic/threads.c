@@ -382,7 +382,7 @@ int mtx_timedlock([[nonnull]] mtx_t *__restrict mutex,
 [[cp, doc_alias("mtx_timedlock"), time64_variant_of(mtx_timedlock)]]
 [[decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl]][requires($has_function(pthread_mutex_timedlock64))]
+[[userimpl, requires_function(pthread_mutex_timedlock64)]]
 int mtx_timedlock64([[nonnull]] mtx_t *__restrict mutex,
                     [[nonnull]] struct timespec64 const *__restrict time_point) {
 	int error;

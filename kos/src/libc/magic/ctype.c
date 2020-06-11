@@ -1092,13 +1092,13 @@ __NAMESPACE_INT_END
 %[default_impl_section(".text.crt.unicode.static.ctype")];
 
 @@Returns non-zero if `(C & ~0x7f) == 0'
-[[ATTR_CONST, nothrow]]
+[[nothrow, ATTR_CONST]]
 int isascii(int c) {
 	return (c & ~0x7f) == 0;
 }
 
 @@Re-returns `C & 0x7f'
-[[ATTR_CONST, nothrow]]
+[[nothrow, ATTR_CONST]]
 int toascii(int c) {
 	return c & 0x7f;
 }

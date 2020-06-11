@@ -66,7 +66,7 @@ int sem_init([[nonnull]] sem_t *sem, int pshared, unsigned int value);
 int sem_destroy([[nonnull]] sem_t *sem);
 
 @@Open a named semaphore NAME with open flags OFLAGS
-[[cp_kos]][vartypes($mode_t, unsigned int)]
+[[cp_kos, vartypes($mode_t, unsigned int)]]
 sem_t *sem_open([[nonnull]] char const *name, $oflag_t oflags, ...);
 
 @@Close descriptor for named semaphore SEM
