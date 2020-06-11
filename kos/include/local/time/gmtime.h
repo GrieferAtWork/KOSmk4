@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b768b4e */
+/* HASH CRC-32:0x9879c5f8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,10 +116,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __LIBC_GMTIME_BUFFER_DEFINED
 #define __LIBC_GMTIME_BUFFER_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
-
 __LOCAL_LIBC_DATA(__gmtime_buf) __STRUCT_TM __gmtime_buf = { 0 };
 __NAMESPACE_LOCAL_END
-
 #endif
 #endif /* __BUILDING_LIBC */
 __NAMESPACE_LOCAL_BEGIN
@@ -128,7 +126,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gmtime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime))(__TM_TYPE(time) const *__timer) {
 #ifdef __BUILDING_LIBC
-	return __localdep_gmtime_r(__timer, &__gmtime_buf);
+	return __localdep_gmtime_r(__timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
 #else /* __BUILDING_LIBC */
 	__time64_t __tm64 = (__time64_t)*__timer;
 	return __localdep_gmtime64(&__tm64);

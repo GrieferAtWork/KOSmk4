@@ -743,7 +743,7 @@ $char16_t *unicode_writeutf16([[nonnull]] /*utf-16*/ $char16_t *__restrict dst, 
 
 %
 @@Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false
-[[ATTR_WUNUSED]]
+[[kernel, wunused]]
 $char16_t *unicode_writeutf16_chk([[nonnull]] /*utf-16*/ $char16_t *__restrict dst, $char32_t ch) {
 	if unlikely(ch > UNICODE_MAXCHAR)
 		return NULL;
@@ -989,7 +989,7 @@ $char16_t *unicode_8to16([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst,
 @@@param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
 @@@return: * : A pointer after the last written UTF-16 character.
 @@@return: NULL: Attempted to write an invalid character
-[[ATTR_WUNUSED]]
+[[wunused]]
 $char16_t *unicode_8to16_chk([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst,
                              [[inp(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
                              $size_t utf8_characters) {

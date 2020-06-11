@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33ef3304 */
+/* HASH CRC-32:0x2ae3fff4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,20 +22,22 @@
 #define GUARD_LIBC_USER_KOS_FCNTL_H 1
 
 #include "../api.h"
-#include <kos/anno.h>
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <kos/fcntl.h>
 
 DECL_BEGIN
 
-INTDEF __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_Fcntl)(fd_t fd, int cmd, ...) __THROWS(...);
-INTDEF WUNUSED NONNULL((1)) fd_t (VLIBCCALL libc_Open)(char const *filename, oflag_t oflags, ...) __THROWS(...);
-INTDEF WUNUSED NONNULL((1)) fd_t (LIBCCALL libc_Creat)(char const *filename, mode_t mode) __THROWS(...);
-INTDEF WUNUSED NONNULL((1)) fd_t (VLIBCCALL libc_Open64)(char const *filename, oflag_t oflags, ...) __THROWS(...);
-INTDEF WUNUSED NONNULL((1)) fd_t (LIBCCALL libc_Creat64)(char const *filename, mode_t mode) __THROWS(...);
-INTDEF WUNUSED NONNULL((2)) fd_t (VLIBCCALL libc_OpenAt)(fd_t dirfd, char const *filename, oflag_t oflags, ...) __THROWS(...);
-INTDEF WUNUSED NONNULL((2)) fd_t (VLIBCCALL libc_OpenAt64)(fd_t dirfd, char const *filename, oflag_t oflags, ...) __THROWS(...);
+#ifndef __KERNEL__
+INTDEF __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_Fcntl)(fd_t fd, int cmd, ...) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) fd_t (VLIBCCALL libc_Open)(char const *filename, oflag_t oflags, ...) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) fd_t (LIBCCALL libc_Creat)(char const *filename, mode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) fd_t (VLIBCCALL libc_Open64)(char const *filename, oflag_t oflags, ...) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) fd_t (LIBCCALL libc_Creat64)(char const *filename, mode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((2)) fd_t (VLIBCCALL libc_OpenAt)(fd_t dirfd, char const *filename, oflag_t oflags, ...) THROWS(...);
+INTDEF WUNUSED NONNULL((2)) fd_t (VLIBCCALL libc_OpenAt64)(fd_t dirfd, char const *filename, oflag_t oflags, ...) THROWS(...);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x857735ee */
+/* HASH CRC-32:0xf8579ad7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,20 +23,21 @@
 
 #include "../api.h"
 #include "../auto/pthread.h"
-#include <kos/anno.h>
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <pthread.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Create a new thread, starting with execution of START-ROUTINE
  * getting passed ARG. Creation attributed come from ATTR. The new
  * handle is stored in *NEWTHREAD */
 INTDEF NONNULL((1, 3)) int NOTHROW_NCX(LIBCCALL libc_pthread_create)(pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr, __pthread_start_routine_t start_routine, void *__restrict arg);
 /* Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-INTDEF ATTR_NORETURN void (LIBCCALL libc_pthread_exit)(void *retval);
+INTDEF ATTR_NORETURN void (LIBCCALL libc_pthread_exit)(void *retval) THROWS(...);
 /* Make calling thread wait for termination of the thread THREAD. The
  * exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
  * is not NULL */
@@ -48,9 +49,6 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_tryjoin_np)(pthread_t pthread, void
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t pthread, void **thread_return, struct timespec const *abstime);
-/* Make calling thread wait for termination of the thread THREAD, but only
- * until TIMEOUT. The exit status of the thread is stored in
- * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t pthread, void **thread_return, struct timespec64 const *abstime);
 /* Indicate that the thread THREAD is never to be joined with PTHREAD_JOIN.
  * The resources of THREAD will therefore be freed immediately when it
@@ -136,11 +134,6 @@ INTDEF ATTR_CONST WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pth
 INTDEF ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_pthread_getconcurrency)(void);
 /* Set new concurrency level to LEVEL */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_setconcurrency)(int level);
-/* Yield the processor to another thread or process.
- * This function is similar to the POSIX `sched_yield' function but
- * might be differently implemented in the case of a m-on-n thread
- * implementation */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_yield)(void);
 /* Limit specified thread THREAD to run only on the processors represented in CPUSET */
 INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_pthread_setaffinity_np)(pthread_t pthread, size_t cpusetsize, cpu_set_t const *cpuset);
 /* Get bit set in CPUSET representing the processors THREAD can run on */
@@ -149,7 +142,7 @@ INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_pthread_getaffinity_np)(pthrea
  * only once, even if pthread_once is executed several times with the
  * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
  * extern variable initialized to PTHREAD_ONCE_INIT. */
-INTDEF NONNULL((1, 2)) int (LIBCCALL libc_pthread_once)(pthread_once_t *once_control, __pthread_once_routine_t init_routine) __THROWS(...);
+INTDEF NONNULL((1, 2)) int (LIBCCALL libc_pthread_once)(pthread_once_t *once_control, __pthread_once_routine_t init_routine) THROWS(...);
 /* Set cancelability state of current thread to STATE,
  * returning old state in *OLDSTATE if OLDSTATE is not NULL */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_setcancelstate)(int state, int *oldstate);
@@ -166,7 +159,7 @@ INTDEF __cleanup_fct_attribute NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pth
 INTDEF __cleanup_fct_attribute NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel_defer)(__pthread_unwind_buf_t *buf);
 INTDEF __cleanup_fct_attribute NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel_restore)(__pthread_unwind_buf_t *buf);
 /* Internal interface to initiate cleanup */
-INTDEF __cleanup_fct_attribute ATTR_NORETURN ATTR_WEAK NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf);
+INTDEF ATTR_WEAK __cleanup_fct_attribute NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf);
 /* Initialize a mutex */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_mutex_init)(pthread_mutex_t *mutex, pthread_mutexattr_t const *mutexattr);
 /* Destroy a mutex */
@@ -329,6 +322,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(__pthread_atfork_func_t prepare, __pthread_atfork_func_t parent, __pthread_atfork_func_t child);
 INTDEF __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

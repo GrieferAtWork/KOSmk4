@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa984914 */
+/* HASH CRC-32:0xee6b82fa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,17 @@
 #define GUARD_LIBC_USER_ULIMIT_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <ulimit.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Control process limits according to CMD */
-INTDEF long int NOTHROW_NCX(VLIBCCALL libc_ulimit)(int cmd, ...);
+INTDEF longptr_t NOTHROW_NCX(VLIBCCALL libc_ulimit)(int cmd, ...);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

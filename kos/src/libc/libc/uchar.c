@@ -72,7 +72,7 @@ libc_uchar_c16tombs(char16_t const *__restrict str) {
 		libc_seterrno(EINVAL);
 		return NULL;
 	}
-	len = c16len(str);
+	len = c16slen(str);
 	return libc_uchar_c16tombsn(str, len, NULL);
 }
 
@@ -84,7 +84,7 @@ libc_uchar_c32tombs(char32_t const *__restrict str) {
 		libc_seterrno(EINVAL);
 		return NULL;
 	}
-	len = c32len(str);
+	len = c32slen(str);
 	return libc_uchar_c32tombsn(str, len, NULL);
 }
 

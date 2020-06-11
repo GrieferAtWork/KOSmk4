@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62f6f23a */
+/* HASH CRC-32:0x6f4db8e9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,18 +22,21 @@
 #define GUARD_LIBC_USER_SYS_TIMEX_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/timex.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_adjtimex)(struct timex *__restrict ntx);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ntp_gettime)(struct ntptimeval *__restrict ntv);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ntp_gettimex)(struct ntptimeval *__restrict ntv);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ntp_adjtime)(struct timex *__restrict tntx);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_adjtimex64)(struct timex64 *__restrict ntx);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ntp_adjtime64)(struct timex64 *__restrict tntx);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ntp_gettime64)(struct ntptimeval64 *__restrict ntv);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ntp_gettimex64)(struct ntptimeval64 *__restrict ntv);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

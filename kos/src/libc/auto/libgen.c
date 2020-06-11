@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99c9b57 */
+/* HASH CRC-32:0xf5f02d24 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,16 +25,14 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "libgen.h"
-#include "string.h"
+#include <string.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
 /* Return directory part of PATH or "." if none is available */
-INTERN ATTR_RETNONNULL
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.dirname") char *
+INTERN ATTR_RETNONNULL char *
 NOTHROW_NCX(LIBCCALL libc_dirname)(char *path) {
-#line 34 "kos/src/libc/magic/libgen.c"
 	/* NOTE: This implementation is taken from GLibc */
 	/* dirname - return directory part of PATH.
 	   Copyright (C) 1996-2017 Free Software Foundation, Inc.
@@ -55,7 +53,7 @@ NOTHROW_NCX(LIBCCALL libc_dirname)(char *path) {
 	   License along with the GNU C Library; if not, see
 	   <http://www.gnu.org/licenses/>.  */
 	char *last_slash;
-	last_slash = path ? libc_strrchr(path, '/') : NULL;
+	last_slash = path ? strrchr(path, '/') : NULL;
 	if (last_slash && last_slash != path && last_slash[1] == '\0') {
 		char *runp;
 		for (runp = last_slash; runp != path; --runp) {
@@ -63,7 +61,7 @@ NOTHROW_NCX(LIBCCALL libc_dirname)(char *path) {
 				break;
 		}
 		if (runp != path)
-			last_slash = (char *)libc_memrchr(path, '/', (size_t)(runp - path));
+			last_slash = (char *)memrchr(path, '/', (size_t)(runp - path));
 	}
 	if (last_slash) {
 		char *runp;
@@ -86,16 +84,13 @@ NOTHROW_NCX(LIBCCALL libc_dirname)(char *path) {
 	}
 	return path;
 }
-
 /* Return final component of PATH.
  * This is the weird XPG version of this function. It sometimes will
  * modify its argument. Therefore we normally use the GNU version (in
  * <string.h>) and only if this header is included make the XPG
  * version available under the real name */
-INTERN ATTR_RETNONNULL
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.__xpg_basename") char *
+INTERN ATTR_RETNONNULL char *
 NOTHROW_NCX(LIBCCALL libc___xpg_basename)(char *filename) {
-#line 92 "kos/src/libc/magic/libgen.c"
 	/* NOTE: This implementation is taken from GLibc */
 	/* Return basename of given pathname according to the weird XPG specification.
 	   Copyright (C) 1997-2017 Free Software Foundation, Inc.
@@ -119,7 +114,7 @@ NOTHROW_NCX(LIBCCALL libc___xpg_basename)(char *filename) {
 	if (!filename || !filename[0])
 		result = (char *)".";
 	else {
-		result = libc_strrchr(filename, '/');
+		result = strrchr(filename, '/');
 		if (!result)
 			result = filename;
 		else if (!result[1]) {
@@ -139,13 +134,13 @@ NOTHROW_NCX(LIBCCALL libc___xpg_basename)(char *filename) {
 	}
 	return result;
 }
-
 #endif /* !__KERNEL__ */
+
+DECL_END
+
 #ifndef __KERNEL__
 DEFINE_PUBLIC_WEAK_ALIAS(dirname, libc_dirname);
 DEFINE_PUBLIC_WEAK_ALIAS(__xpg_basename, libc___xpg_basename);
 #endif /* !__KERNEL__ */
-
-DECL_END
 
 #endif /* !GUARD_LIBC_AUTO_LIBGEN_C */

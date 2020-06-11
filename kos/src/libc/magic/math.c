@@ -41,7 +41,6 @@
 %[define_double_replacement(__DECL_SIMD_exp = __DECL_SIMD_expf, __DECL_SIMD_expl)]
 %[define_double_replacement(__DECL_SIMD_pow = __DECL_SIMD_powf, __DECL_SIMD_powl)]
 
-
 %(c, ccompat)#ifndef __NO_FPU
 %{
 #include <features.h>
@@ -1231,14 +1230,14 @@ double exp10(double x); /* TODO */
 
 @@Another name occasionally used
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__pow10")]]
-[[userimpl, requires($has_function(pow))]]
+[[requires($has_function(pow))]]
 double pow10(double x) {
 	return pow(10.0, x);
 }
 
 [[crtbuiltin, export_alias("__sincosf"), nothrow, doc_alias(sincos)]]
 [[attribute("__DECL_SIMD_sincosf"), decl_include("<bits/math-vector.h>")]]
-[[userimpl, requires_function(sincos)]]
+[[requires_function(sincos)]]
 void sincosf(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx) {
 	double sinx, cosx;
 	sincos((double)x, &sinx, &cosx);
@@ -1253,7 +1252,7 @@ void sincosf(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx) {
 [[nothrow, crtbuiltin, export_alias("__sincosl"), doc_alias(sincos)]]
 [[attribute("__DECL_SIMD_sincosl"), decl_include("<bits/math-vector.h>")]]
 [[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("__sincos", "sincos")]]
-[[userimpl, requires_function(sincos)]]
+[[requires_function(sincos)]]
 void sincosl(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *psinx, [[nonnull]] __LONGDOUBLE *pcosx) {
 	double sinx, cosx;
 	sincos((double)x, &sinx, &cosx);

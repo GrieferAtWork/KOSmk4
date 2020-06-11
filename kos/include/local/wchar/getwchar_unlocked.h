@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x972bac7d */
+/* HASH CRC-32:0xb17fa9d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,9 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_u
 #undef __local___localdep_fgetwc_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetwc_unlocked_defined */
+__NAMESPACE_LOCAL_END
+#include <local/stdstreams.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getwchar_unlocked) __WINT_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(getwchar_unlocked))(void) __THROWS(...) {
 	return __localdep_fgetwc_unlocked(__LOCAL_stdin);

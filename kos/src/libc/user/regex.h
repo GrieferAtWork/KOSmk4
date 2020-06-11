@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe46eef1 */
+/* HASH CRC-32:0x296ceb56 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_REGEX_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <regex.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Sets the current default syntax to SYNTAX, and return the old syntax.
  * You can also simply assign to the `re_syntax_options' variable */
 INTDEF reg_syntax_t NOTHROW_NCX(LIBCCALL libc_re_set_syntax)(reg_syntax_t syntax);
@@ -67,6 +69,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict preg, char con
 INTDEF int NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict preg, char const *__restrict string, size_t nmatch, regmatch_t pmatch[__restrict_arr], int eflags);
 INTDEF size_t NOTHROW_NCX(LIBCCALL libc_regerror)(int errcode, regex_t const *__restrict preg, char *__restrict errbuf, size_t errbuf_size);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_regfree)(regex_t *preg);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

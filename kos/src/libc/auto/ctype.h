@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea21a2a6 */
+/* HASH CRC-32:0xa40f6674 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_AUTO_CTYPE_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <ctype.h>

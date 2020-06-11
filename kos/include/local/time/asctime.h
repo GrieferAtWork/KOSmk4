@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26eb9d39 */
+/* HASH CRC-32:0x88dba62a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,17 +76,15 @@ __NAMESPACE_LOCAL_END
 #ifndef __LIBC_CTIME_BUFFER_DEFINED
 #define __LIBC_CTIME_BUFFER_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
-
 __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 __NAMESPACE_LOCAL_END
-
 #endif
 __NAMESPACE_LOCAL_BEGIN
 /* Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
 __LOCAL_LIBC(asctime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime))(struct __NAMESPACE_STD_SYM tm const *__tp) {
-	return __localdep_asctime_r(__tp, __ctime_buf);
+	return __localdep_asctime_r(__tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_asctime_defined

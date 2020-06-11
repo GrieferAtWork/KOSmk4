@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4b0956 */
+/* HASH CRC-32:0xd2a17f6d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,16 +52,14 @@ struct hsearch_data {
 #ifndef __local_htab_defined
 #define __local_htab_defined 1
 __NAMESPACE_LOCAL_BEGIN
-
 __LOCAL_LIBC_DATA(__htab) struct hsearch_data __htab = {__NULLPTR, 0, 0};
 __NAMESPACE_LOCAL_END
-
 #endif /* !__local_htab_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Create a new hashing table which will at most contain NEL elements */
 __LOCAL_LIBC(hcreate) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate))(__SIZE_TYPE__ __nel) {
-	return __localdep_hcreate_r(__nel, &__htab);
+	return __localdep_hcreate_r(__nel, &__NAMESPACE_LOCAL_SYM __htab);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_hcreate_defined

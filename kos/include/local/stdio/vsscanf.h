@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e7ade9e */
+/* HASH CRC-32:0xc63affb3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -121,7 +121,6 @@ __NAMESPACE_LOCAL_END
 #include <asm/stdio.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-
 __LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ __result = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8)((char const **)__arg);
 	return __result ? __result : __EOF;

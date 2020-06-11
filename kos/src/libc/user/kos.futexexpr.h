@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x878e1c26 */
+/* HASH CRC-32:0xa6b43ab3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_KOS_FUTEXEXPR_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <kos/futexexpr.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
@@ -140,6 +142,7 @@ INTDEF NONNULL((3)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(void *base, size
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 INTDEF NONNULL((1, 4)) int NOTHROW_RPC(LIBCCALL libc_lfutexlockexpr64)(lfutex_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr const *exprv, struct timespec64 const *timeout, unsigned int timeout_flags);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

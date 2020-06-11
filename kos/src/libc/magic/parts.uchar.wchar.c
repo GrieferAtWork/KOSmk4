@@ -99,6 +99,10 @@ c32stold_l(*) %{uchar32("wcstold_l")}
 %#endif /* !__NO_FPU */
 %#endif /* __USE_GNU */
 
+%#ifdef __USE_XOPEN
+c16width(*) %{uchar16("wcwidth")}
+c32width(*) %{uchar32("wcwidth")}
+%#endif /* __USE_XOPEN */
 
 %
 %#ifdef __USE_KOS

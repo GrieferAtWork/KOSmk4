@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25609c99 */
+/* HASH CRC-32:0x4d8df131 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,23 +24,21 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "float.h"
+#include "../user/float.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.float._chgsign") double
+INTERN ATTR_SECTION(".text.crt.math.float") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc__chgsign)(double x) {
-#line 236 "kos/src/libc/magic/float.c"
 	return -x;
 }
-
-#endif /* !__KERNEL__ */
-#ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(_chgsign, libc__chgsign);
 #endif /* !__KERNEL__ */
 
 DECL_END
+
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(_chgsign, libc__chgsign);
+#endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FLOAT_C */

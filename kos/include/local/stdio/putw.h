@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd62a06d */
+/* HASH CRC-32:0x2e894f16 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,13 +54,16 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fwrite_defined
 #endif /* !... */
 #endif /* !__local___localdep_fwrite_defined */
+__NAMESPACE_LOCAL_END
+#include <asm/stdio.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
 __LOCAL_LIBC(putw) __ATTR_NONNULL((2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(putw))(int __w, __FILE *__restrict __stream) __THROWS(...) {
-	__UINT16_TYPE__ __word = (__UINT16_TYPE__)(unsigned int)__w;
-	if (!__localdep_fwrite(&__word, 2, 1, __stream))
-		return __EOF;
-	return __w;
+	__UINT16_TYPE__ __c = (__UINT16_TYPE__)__w;
+	return __localdep_fwrite(&__c, sizeof(__c), 1, __stream)
+	       ? __w
+	       : __EOF;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_putw_defined

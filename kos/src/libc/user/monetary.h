@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60188dc */
+/* HASH CRC-32:0x5d127249 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,17 @@
 #define GUARD_LIBC_USER_MONETARY_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <monetary.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 INTDEF ATTR_LIBC_STRFMON(3, 4) NONNULL((1, 3)) ssize_t NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s, size_t maxsize, char const *__restrict format, ...);
 INTDEF ATTR_LIBC_STRFMON(4, 5) NONNULL((1, 4)) ssize_t NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s, size_t maxsize, locale_t loc, const char *__restrict format, ...);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f772e20 */
+/* HASH CRC-32:0x417e6b4d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,6 +92,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fgetc_unlocked_defined */
 __NAMESPACE_LOCAL_END
+#include <asm/stdio.h>
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG' */

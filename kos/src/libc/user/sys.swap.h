@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3dfcdedf */
+/* HASH CRC-32:0x584ee73c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,18 @@
 #define GUARD_LIBC_USER_SYS_SWAP_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/swap.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* @param swapflags: Set of `SWAP_FLAG_*' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_swapon)(char const *path, int swapflags);
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_swapon)(char const *path, __STDC_INT_AS_UINT_T swapflags);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_swapoff)(char const *path);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

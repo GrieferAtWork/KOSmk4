@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac5bb2b3 */
+/* HASH CRC-32:0x8027e262 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_MALLOC_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <malloc.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
  *           possible due to the requested memory above `MALLPTR' already being
  *           in use. However, an `E_BADALLOC' exception is thrown if insufficient
@@ -38,16 +40,15 @@ INTDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_ALLOC_SIZE((2)) void *NOTHRO
 INTDEF ATTR_MALLOC ATTR_MALL_PAGEALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_pvalloc)(size_t n_bytes);
 INTDEF ATTR_MALL_PAGEALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_valloc)(size_t n_bytes);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_memalign)(void **__restrict pp, size_t alignment, size_t n_bytes);
-INTDEF void NOTHROW_NCX(LIBCCALL libc_cfree)(void *__restrict mallptr);
-INTDEF int NOTHROW_NCX(LIBCCALL libc__heapmin)(void);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_malloc_trim)(size_t pad);
 INTDEF ATTR_PURE WUNUSED size_t NOTHROW_NCX(LIBCCALL libc_malloc_usable_size)(void *__restrict mallptr);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_mallopt)(int parameter_number, int parameter_value);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memdup)(void const *__restrict ptr, size_t n_bytes);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memcdup)(void const *__restrict ptr, int needle, size_t n_bytes);
-INTDEF ATTR_MALL_DEFAULT_ALIGNED ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc_reallocarray)(void *ptr, size_t elem_count, size_t elem_size);
+INTDEF ATTR_MALL_DEFAULT_ALIGNED ATTR_MALL_DEFAULT_ALIGNED WUNUSED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc_reallocarray)(void *ptr, size_t elem_count, size_t elem_size);
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_recalloc)(void *mallptr, size_t num_bytes);
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc_recallocv)(void *mallptr, size_t elem_count, size_t elem_size);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

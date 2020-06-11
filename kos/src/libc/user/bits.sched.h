@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2d156b */
+/* HASH CRC-32:0xfffab47f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_BITS_SCHED_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <bits/sched.h>
@@ -34,7 +35,8 @@ DECL_BEGIN
 typedef __cpu_set_t    cpu_set_t;
 #endif /* !__cpu_set_t_defined */
 
-INTDEF NONNULL((1)) pid_t NOTHROW_NCX(VLIBCCALL libc_clone)(__clone_func_t fn, void *child_stack, int flags, void *arg, ... /* pid_t *ptid, void *newtls, pid_t *ctid */);
+#ifndef __KERNEL__
+INTDEF NONNULL((1)) pid_t NOTHROW_NCX(VLIBCCALL libc_clone)(__clone_func_t fn, void *child_stack, int flags, void *arg, ...);
 /* >> unshare(2)
  * Unshare certain components of the calling thread that may be shared with other
  * threads or processes, such as the filesystem, or opened file descriptors.
@@ -81,6 +83,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setns)(fd_t fd, int nstype);
  * calling this function has the same effect as returning `EXIT_CODE'
  * from `clone()'s `FN' callback */
 INTDEF ATTR_NORETURN void NOTHROW_NCX(LIBCCALL libc_exit_thread)(int exit_code);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

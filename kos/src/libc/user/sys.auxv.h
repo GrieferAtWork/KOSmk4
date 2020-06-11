@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee481f13 */
+/* HASH CRC-32:0xbeeea094 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,16 +22,19 @@
 #define GUARD_LIBC_USER_SYS_AUXV_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/auxv.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Return the value associated with an Elf*_auxv_t type from the auxv list
  * passed to the program on startup.  If TYPE was not present in the auxv
  * list, returns zero and sets errno to ENOENT */
 INTDEF ulongptr_t NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72fcaf8c */
+/* HASH CRC-32:0x1f448a33 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,6 +72,9 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fputws_defined
 #endif /* !... */
 #endif /* !__local___localdep_fputws_defined */
+__NAMESPACE_LOCAL_END
+#include <local/stdstreams.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_putws) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_putws))(__WCHAR_TYPE__ const *__string) {
 	return __localdep_fputws(__string, __LOCAL_stdout);

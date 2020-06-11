@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73ebb47 */
+/* HASH CRC-32:0xd23b1e2e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,23 +22,25 @@
 #define GUARD_LIBC_USER_ERROR_H 1
 
 #include "../api.h"
-#include <kos/anno.h>
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <error.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Helper function for printing an error message to `stderr' and possibly exiting the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
-INTDEF ATTR_LIBC_PRINTF(3, 4) void (VLIBCCALL libc_error)(int status, errno_t errnum, const char *format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(3, 4) void (VLIBCCALL libc_error)(int status, errno_t errnum, const char *format, ...) THROWS(...);
 /* Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
  * Additionally, when `error_one_per_line' is non-zero, consecutive calls to this function that
  * pass the same values for `filename' and `line' will not produce the error message. */
-INTDEF ATTR_LIBC_PRINTF(5, 6) void (VLIBCCALL libc_error_at_line)(int status, errno_t errnum, char const *filename, unsigned int line, char const *format, ...) __THROWS(...);
+INTDEF ATTR_LIBC_PRINTF(5, 6) void (VLIBCCALL libc_error_at_line)(int status, errno_t errnum, char const *filename, unsigned int line, char const *format, ...) THROWS(...);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

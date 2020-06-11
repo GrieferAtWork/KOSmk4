@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7fe7741 */
+/* HASH CRC-32:0xe46391dd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,16 @@
 #define GUARD_LIBC_USER_NETDB_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <netdb.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Function to get address of global `h_errno' variable */
-INTDEF ATTR_CONST WUNUSED int *NOTHROW_NCX(LIBCCALL libc___h_errno_location)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW_NCX(LIBCCALL libc___h_errno_location)(void);
 /* Print error indicated by `h_errno' variable on standard error.
  * STR, if non-null, is printed before the error string */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_herror)(char const *str);
@@ -39,7 +41,7 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_hstrerror)(int e
  * open even after a later search if STAY_OPEN is non-zero */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_sethostent)(int stay_open);
 /* Close host data base files and clear `stay open' flag */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_endhostent)(void);
+INTDEF void NOTHROW_RPC_NOKOS(LIBCCALL libc_endhostent)(void);
 /* Get next entry from host data base file. Open data base if necessary */
 INTDEF struct hostent *NOTHROW_RPC(LIBCCALL libc_gethostent)(void);
 /* Return entry from host data base which address match ADDR with length LEN and type TYPE */
@@ -131,12 +133,12 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_getservent_r)(struct servent *__restrict re
  * arguments specify a buffer of BUFLEN starting at BUF.
  * These functions are not part of POSIX and therefore no official
  * cancellation point */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_getservbyname_r)(char const *__restrict name, char const *__restrict __proto, struct servent *__restrict result_buf, char *__restrict buf, size_t buflen, struct servent **__restrict result);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_getservbyname_r)(char const *__restrict name, char const *__restrict proto, struct servent *__restrict result_buf, char *__restrict buf, size_t buflen, struct servent **__restrict result);
 /* Reentrant versions of the functions above. The additional
  * arguments specify a buffer of BUFLEN starting at BUF.
  * These functions are not part of POSIX and therefore no official
  * cancellation point */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_getservbyport_r)(int __port, char const *__restrict __proto, struct servent *__restrict result_buf, char *__restrict buf, size_t buflen, struct servent **__restrict result);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_getservbyport_r)(int port, char const *__restrict proto, struct servent *__restrict result_buf, char *__restrict buf, size_t buflen, struct servent **__restrict result);
 /* Open protocol data base files and mark them as staying open even
  * after a later search if STAY_OPEN is non-zero */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_setprotoent)(int stay_open);
@@ -162,7 +164,7 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_getprotobyname_r)(char const *__restrict na
  * arguments specify a buffer of BUFLEN starting at BUF.
  * These functions are not part of POSIX and therefore no official
  * cancellation point */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_getprotobynumber_r)(int __proto, struct protoent *__restrict result_buf, char *__restrict buf, size_t buflen, struct protoent **__restrict result);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_getprotobynumber_r)(int proto, struct protoent *__restrict result_buf, char *__restrict buf, size_t buflen, struct protoent **__restrict result);
 /* Establish network group NETGROUP for enumeration.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
@@ -247,7 +249,7 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_rresvport)(int *alport);
  * cancellation point */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_rresvport_af)(int *alport, sa_family_t af);
 /* Translate name of a service location and/or a service name to set of socket addresses */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_getaddrinfo)(char const *__restrict name, char const *__restrict service, const struct addrinfo *__restrict req, struct addrinfo **__restrict pai);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_getaddrinfo)(char const *__restrict name, char const *__restrict service, struct addrinfo const *__restrict req, struct addrinfo **__restrict pai);
 /* Free `addrinfo' structure AI including associated storage */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_freeaddrinfo)(struct addrinfo *ai);
 /* Convert error return from getaddrinfo() to a string */
@@ -276,6 +278,7 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_gai_suspend64)(struct gaicb const *const li
 INTDEF int NOTHROW_NCX(LIBCCALL libc_gai_error)(struct gaicb *req);
 /* Cancel the requests associated with GAICBP */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_gai_cancel)(struct gaicb *gaicbp);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2895218 */
+/* HASH CRC-32:0x79633764 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SYS_POLL_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/poll.h>
@@ -37,10 +38,12 @@ DECL_BEGIN
 typedef __sigset_t sigset_t;
 #endif /* !__sigset_t_defined */
 
+#ifndef __KERNEL__
 /* @param timeout: Timeout in milliseconds (or negative for infinity) */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_poll)(struct pollfd *fds, nfds_t nfds, int timeout);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_ppoll)(struct pollfd *fds, nfds_t nfds, struct timespec const *timeout, sigset_t const *ss);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_ppoll64)(struct pollfd *fds, nfds_t nfds, struct timespec64 const *timeout, sigset_t const *ss);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

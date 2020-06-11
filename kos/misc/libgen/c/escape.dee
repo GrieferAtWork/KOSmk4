@@ -585,6 +585,7 @@ single_got_escapedTok:
 		local tok = self.next();
 again_handle_tok:
 		switch (tok) {
+			local numLines;
 
 		case "":
 			goto done;
@@ -667,6 +668,8 @@ again_handle_tok:
 					self.err(e.message);
 				}
 				self.skip(")");
+				numLines = 1;
+				goto handle_numLines_after_pp_directive;
 			}	break;
 
 			case "pop_namespace": {
@@ -674,6 +677,8 @@ again_handle_tok:
 					self.err("Empty namespace stack");
 				self.next();
 				fp.namespace = namespaceStack.popback();
+				numLines = 1;
+				goto handle_numLines_after_pp_directive;
 			}	break;
 
 			case "if":
@@ -754,8 +759,6 @@ parse_if_or_elif_condition:
 				self.next();
 			}	break;
 
-			{
-				local numLines;
 			case "pp_if":
 			case "pp_ifdef":
 			case "pp_ifndef":
@@ -838,7 +841,6 @@ handle_numLines_after_pp_directive:
 				numLines = fp.ppEndif();
 				self.next();
 				goto handle_numLines_after_pp_directive;
-			}
 
 			default:
 				self.err("Unknown directive: {!r}"

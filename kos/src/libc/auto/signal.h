@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x238f94d3 */
+/* HASH CRC-32:0x7afaa38e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_AUTO_SIGNAL_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <signal.h>
@@ -37,9 +38,11 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set, int 
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set, int signo);
 /* @param signo: One of `SIG*' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set, int signo);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *set);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *__restrict set);
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_sigandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95a78f9a */
+/* HASH CRC-32:0x5fcafe8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,12 +23,14 @@
 
 #include "../api.h"
 #include "../auto/float.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <float.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 INTDEF uint32_t NOTHROW_NCX(LIBCCALL libc__clearfp)(void);
 INTDEF uint32_t NOTHROW_NCX(LIBCCALL libc__controlfp)(uint32_t newval, uint32_t mask);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__set_controlfp)(uint32_t newval, uint32_t mask);
@@ -40,6 +42,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc___control87_2)(uint32_t newval, uint32_t ma
 INTDEF int *NOTHROW_NCX(LIBCCALL libc___fpecode)(void);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__fpclass)(double x);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_fpreset)(void);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

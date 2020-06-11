@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x608ea3d6 */
+/* HASH CRC-32:0xf28215cc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,16 +22,19 @@
 #define GUARD_LIBC_USER_UTIME_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <utime.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_utime)(char const *filename, struct utimbuf const *file_times);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_utime64)(char const *filename, struct utimbuf64 const *file_times);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_futime)(fd_t fd, struct utimbuf const *file_times);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_futime64)(fd_t fd, struct utimbuf64 const *file_times);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

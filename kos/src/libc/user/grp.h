@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4b323ea */
+/* HASH CRC-32:0xca5d6cff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_GRP_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <grp.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Search for an entry with a matching group ID */
 INTDEF struct group *NOTHROW_RPC(LIBCCALL libc_getgrgid)(gid_t gid);
 /* Search for an entry with a matching group name */
@@ -60,6 +62,7 @@ INTDEF NONNULL((1, 3, 4)) int NOTHROW_RPC(LIBCCALL libc_getgrouplist)(char const
  * by reading the group database and using all groups
  * of which USER is a member. Also include GROUP. */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user, gid_t group);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

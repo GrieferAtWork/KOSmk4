@@ -305,7 +305,7 @@ NOTHROW_RPC(LIBCCALL libc_wgetcwd)(char32_t *buf,
 		char32_t *new_result;
 		if (!bufsize)
 			return result;
-		result_len = c32len(result);
+		result_len = c32slen(result);
 		if (bufsize <= result_len) {
 			libc_seterrno(ERANGE);
 			free(result);
@@ -318,7 +318,7 @@ NOTHROW_RPC(LIBCCALL libc_wgetcwd)(char32_t *buf,
 		}
 		return new_result;
 	}
-	result_len = c32len(result);
+	result_len = c32slen(result);
 	if (bufsize <= result_len) {
 		libc_seterrno(ERANGE);
 		free(result);
@@ -334,7 +334,7 @@ NOTHROW_RPC(LIBCCALL libc_wgetcwd)(char32_t *buf,
 /* >> wgetcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `wchdir(2)' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wgetcwd") char16_t *
-NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf,
+NOTHROW_RPC(LIBDCALL libd__wgetcwd)(char16_t *buf,
                                    size_t bufsize)
 /*[[[body:DOS$wgetcwd]]]*/
 {
@@ -347,7 +347,7 @@ NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf,
 		char16_t *new_result;
 		if (!bufsize)
 			return result;
-		result_len = c16len(result);
+		result_len = c16slen(result);
 		if (bufsize <= result_len) {
 			libc_seterrno(ERANGE);
 			free(result);
@@ -360,7 +360,7 @@ NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf,
 		}
 		return new_result;
 	}
-	result_len = c16len(result);
+	result_len = c16slen(result);
 	if (bufsize <= result_len) {
 		libc_seterrno(ERANGE);
 		free(result);
@@ -1440,7 +1440,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(DOS$waccess, libd_waccess);
 DEFINE_PUBLIC_WEAK_ALIAS(wchdir, libc_wchdir);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wchdir, libd_wchdir);
 DEFINE_PUBLIC_WEAK_ALIAS(wgetcwd, libc_wgetcwd);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wgetcwd, libd_wgetcwd);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wgetcwd, libd__wgetcwd);
 DEFINE_PUBLIC_WEAK_ALIAS(wunlink, libc_wunlink);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wunlink, libd_wunlink);
 DEFINE_PUBLIC_WEAK_ALIAS(wrmdir, libc_wrmdir);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaaf71fc0 */
+/* HASH CRC-32:0x58c7e004 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_EXECINFO_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <execinfo.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Store up to SIZE return address of the current program state
  * in ARRAY and return the exact number of values stored */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array, int size);
@@ -37,6 +39,7 @@ INTDEF NONNULL((1)) char **NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *co
 /* This function is similar to backtrace_symbols()
  * but it writes the result immediately to a file */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array, int size, fd_t fd);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

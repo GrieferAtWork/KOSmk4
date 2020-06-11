@@ -19,10 +19,10 @@
  */
 #ifndef GUARD_LIBC_API_H
 #define GUARD_LIBC_API_H 1
-#define __BUILDING_LIBC 1
+#define __BUILDING_LIBC  1
 
 #define __CRT_KOS_PRIMARY 1
-#define __CRT_KOS 1
+#define __CRT_KOS         1
 #ifdef __KERNEL__
 #define __CRT_KOS_KERNEL 1
 #endif /* __KERNEL__ */
@@ -61,13 +61,14 @@
 #undef _LARGEFILE64_SOURCE
 #undef _TIME64_SOURCE
 #define _LARGEFILE64_SOURCE 1
-#define _TIME64_SOURCE 1
+#define _TIME64_SOURCE      1
 #undef _TIME_T_BITS
 #define _TIME_T_BITS 32
 #undef _FILE_OFFSET_BITS
 #define _FILE_OFFSET_BITS 32
 
 #include <__crt.h>
+#include <features.h>
 #include <hybrid/compiler.h>
 
 #include <hybrid/host.h>
@@ -76,8 +77,258 @@
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 
+#include <limits.h>
 #include <stdarg.h>
 #include <stddef.h>
+
+/* Pull in arch-specific LIBC feature information */
+#if defined(__i386__) || defined(__x86_64__)
+#include "hybrid/arch/i386/config.h"
+#endif /* ARCH... */
+
+
+/* TODO:REMOVE_ME:BEGIN */
+/* Since a more consistent implementation of int-as-... has been
+ * added as part of updating the magic generator, user-level function
+ * implementations aren't being generated automatically, yet. As a
+ * result of this, libc contains some inconsistent prototypes internally,
+ * with regards to these macros.
+ * To bypass that inconsistency (for the moment), override these macros
+ * until user-level source files are once again automated as well. */
+#pragma GCC system_header
+#undef __STDC_INT_AS_SSIZE_T
+#undef __STDC_INT_AS_SIZE_T
+#undef __STDC_INT32_AS_SSIZE_T
+#undef __STDC_INT32_AS_SIZE_T
+#undef __STDC_UINT_AS_SIZE_T
+#undef __STDC_UINT32_AS_SIZE_T
+#undef __STDC_INT_AS_UINT_T
+#define __STDC_INT_AS_SSIZE_T   int
+#define __STDC_INT_AS_SIZE_T    int
+#define __STDC_INT32_AS_SSIZE_T __INT32_TYPE__
+#define __STDC_INT32_AS_SIZE_T  __INT32_TYPE__
+#define __STDC_UINT_AS_SIZE_T   unsigned int
+#define __STDC_UINT32_AS_SIZE_T __UINT32_TYPE__
+#define __STDC_INT_AS_UINT_T    int
+/* TODO:REMOVE_ME:END */
+
+/* TODO:REMOVE_ME:BEGIN */
+/* Find a better solution for dealing with libc-implementation dependencies on [[ignore]] functions...
+ * (Maybe the old magic was onto something by escaping `strlen' into `libc_strlen' for auto/user impls...) */
+#define _vscc16printf     libd__vscwprintf
+#define _vscc32printf     libc__vscwprintf
+#define _scc16printf      libd__scwprintf
+#define _scc32printf      libc__scwprintf
+#define _vscc16printf_p   libd__vscwprintf_p
+#define _vscc32printf_p   libc__vscwprintf_p
+#define _scc16printf_p    libd__scwprintf_p
+#define _scc32printf_p    libc__scwprintf_p
+#define _vscc16printf_l   libd__vscwprintf_l
+#define _vscc32printf_l   libc__vscwprintf_l
+#define _scc16printf_l    libd__scwprintf_l
+#define _scc32printf_l    libc__scwprintf_l
+#define _vscc16printf_p_l libd__vscwprintf_p_l
+#define _vscc32printf_p_l libc__vscwprintf_p_l
+#define _scc16printf_p_l  libd__scwprintf_p_l
+#define _scc32printf_p_l  libc__scwprintf_p_l
+#define _vsnc16printf_s   libd__vsnwprintf_s
+#define _vsnc32printf_s   libc__vsnwprintf_s
+#define _snc16printf_s    libd__snwprintf_s
+#define _snc32printf_s    libc__snwprintf_s
+#define _vfc16printf_p    libd__vfwprintf_p
+#define _vfc32printf_p    libc__vfwprintf_p
+#define _fc16printf_p     libd__fwprintf_p
+#define _fc32printf_p     libc__fwprintf_p
+#define _vc16printf_p     libd__vwprintf_p
+#define _vc32printf_p     libc__vwprintf_p
+#define _c16printf_p      libd__wprintf_p
+#define _c32printf_p      libc__wprintf_p
+#define _vsc16printf_p    libd__vswprintf_p
+#define _vsc32printf_p    libc__vswprintf_p
+#define _sc16printf_p     libd__swprintf_p
+#define _sc32printf_p     libc__swprintf_p
+#define _vc16printf_l     libd__vwprintf_l
+#define _vc32printf_l     libc__vwprintf_l
+#define _c16printf_l      libd__wprintf_l
+#define _c32printf_l      libc__wprintf_l
+#define _vc16printf_p_l   libd__vwprintf_p_l
+#define _vc32printf_p_l   libc__vwprintf_p_l
+#define _c16printf_p_l    libd__wprintf_p_l
+#define _c32printf_p_l    libc__wprintf_p_l
+#define _vc16printf_s_l   libd__vwprintf_s_l
+#define _vc32printf_s_l   libc__vwprintf_s_l
+#define _c16printf_s_l    libd__wprintf_s_l
+#define _c32printf_s_l    libc__wprintf_s_l
+#define _vfc16printf_l    libd__vfwprintf_l
+#define _vfc32printf_l    libc__vfwprintf_l
+#define _fc16printf_l     libd__fwprintf_l
+#define _fc32printf_l     libc__fwprintf_l
+#define _vfc16printf_p_l  libd__vfwprintf_p_l
+#define _vfc32printf_p_l  libc__vfwprintf_p_l
+#define _fc16printf_p_l   libd__fwprintf_p_l
+#define _fc32printf_p_l   libc__fwprintf_p_l
+#define _vfc16printf_s_l  libd__vfwprintf_s_l
+#define _vfc32printf_s_l  libc__vfwprintf_s_l
+#define _fc16printf_s_l   libd__fwprintf_s_l
+#define _fc32printf_s_l   libc__fwprintf_s_l
+#define _vsc16printf_c_l  libd__vswprintf_c_l
+#define _vsc32printf_c_l  libc__vswprintf_c_l
+#define _sc16printf_c_l   libd__swprintf_c_l
+#define _sc32printf_c_l   libc__swprintf_c_l
+#define _vsc16printf_p_l  libd__vswprintf_p_l
+#define _vsc32printf_p_l  libc__vswprintf_p_l
+#define _sc16printf_p_l   libd__swprintf_p_l
+#define _sc32printf_p_l   libc__swprintf_p_l
+#define _vsc16printf_s_l  libd__vswprintf_s_l
+#define _vsc32printf_s_l  libc__vswprintf_s_l
+#define _sc16printf_s_l   libd__swprintf_s_l
+#define _sc32printf_s_l   libc__swprintf_s_l
+#define _vsnc16printf_l   libd__vsnwprintf_l
+#define _vsnc32printf_l   libc__vsnwprintf_l
+#define _snc16printf_l    libd__snwprintf_l
+#define _snc32printf_l    libc__snwprintf_l
+#define _vsnc16printf_s_l libd__vsnwprintf_s_l
+#define _vsnc32printf_s_l libc__vsnwprintf_s_l
+#define _snc16printf_s_l  libd__snwprintf_s_l
+#define _snc32printf_s_l  libc__snwprintf_s_l
+#define _vfc16scanf_l     libd__vfwscanf_l
+#define _vfc32scanf_l     libc__vfwscanf_l
+#define _fc16scanf_l      libd__fwscanf_l
+#define _fc32scanf_l      libc__fwscanf_l
+#define _vsc16scanf_l     libd__vswscanf_l
+#define _vsc32scanf_l     libc__vswscanf_l
+#define _sc16scanf_l      libd__swscanf_l
+#define _sc32scanf_l      libc__swscanf_l
+#define _vsnc16scanf      libd__vsnwscanf
+#define _vsnc32scanf      libc__vsnwscanf
+#define _snc16scanf       libd__snwscanf
+#define _snc32scanf       libc__snwscanf
+#define _vsnc16scanf_l    libd__vsnwscanf_l
+#define _vsnc32scanf_l    libc__vsnwscanf_l
+#define _snc16scanf_l     libd__snwscanf_l
+#define _snc32scanf_l     libc__snwscanf_l
+#define _vsnc16scanf_s_l  libd__vsnwscanf_s_l
+#define _vsnc32scanf_s_l  libc__vsnwscanf_s_l
+#define _snc16scanf_s_l   libd__snwscanf_s_l
+#define _snc32scanf_s_l   libc__snwscanf_s_l
+#define _vc16scanf_l      libd__vwscanf_l
+#define _vc32scanf_l      libc__vwscanf_l
+#define _c16scanf_l       libd__wscanf_l
+#define _c32scanf_l       libc__wscanf_l
+#define _c16fsopen        libd__wfsopen
+#define _c32fsopen        libc__wfsopen
+#define _c16fdopen        libd__wfdopen
+#define _c32fdopen        libc__wfdopen
+#define _c16fopen_s       libd__wfopen_s
+#define _c32fopen_s       libc__wfopen_s
+#define _c16freopen_s     libd__wfreopen_s
+#define _c32freopen_s     libc__wfreopen_s
+#define _getc16s_s        libd__getws_s
+#define _getc32s_s        libc__getws_s
+#define _putc16s          libd__putws
+#define _putc32s          libc__putws
+#define _c16tempnam       libd__wtempnam
+#define _c32tempnam       libc__wtempnam
+#define _c16tmpnam_s      libd__wtmpnam_s
+#define _c32tmpnam_s      libc__wtmpnam_s
+#define __p___c16argv     libd___p___wargv
+#define __p___c32argv     libc___p___wargv
+#define __p__c16environ   libd___p__wenviron
+#define __p__c32environ   libc___p__wenviron
+#define __p__c16pgmptr    libd___p__wpgmptr
+#define __p__c32pgmptr    libc___p__wpgmptr
+#define _get_c16pgmptr    libd__get_wpgmptr
+#define _get_c32pgmptr    libc__get_wpgmptr
+#define _mbtoc16_l        libd__mbtowc_l
+#define _mbtoc32_l        libc__mbtowc_l
+#define _mbstoc16s_l      libd__mbstowcs_l
+#define _mbstoc32s_l      libc__mbstowcs_l
+#define _mbstoc16s_s      libd__mbstowcs_s
+#define _mbstoc32s_s      libc__mbstowcs_s
+#define _mbstoc16s_s_l    libd__mbstowcs_s_l
+#define _mbstoc32s_s_l    libc__mbstowcs_s_l
+#define c16tomb_s         libd_wctomb_s
+#define c32tomb_s         libc_wctomb_s
+#define _c16tomb_s_l      libd__wctomb_s_l
+#define _c32tomb_s_l      libc__wctomb_s_l
+#define _c16stombs_s_l    libd__wcstombs_s_l
+#define _c32stombs_s_l    libc__wcstombs_s_l
+#define _c16stombs_l      libd__wcstombs_l
+#define _c32stombs_l      libc__wcstombs_l
+#define c16stombs_s       libd_wcstombs_s
+#define c32stombs_s       libc_wcstombs_s
+#define _c16getenv        libd__wgetenv
+#define _c32getenv        libc__wgetenv
+#define _c16getenv_s      libd__wgetenv_s
+#define _c32getenv_s      libc__wgetenv_s
+#define _c16dupenv_s      libd__wdupenv_s
+#define _c32dupenv_s      libc__wdupenv_s
+#define _c16tof           libd__wtof
+#define _c32tof           libc__wtof
+#define _c16tof_l         libd__wtof_l
+#define _c32tof_l         libc__wtof_l
+#define _itoc16           libd__itow
+#define _itoc32           libc__itow
+#define _ltoc16           libd__ltow
+#define _ltoc32           libc__ltow
+#define _ultoc16          libd__ultow
+#define _ultoc32          libc__ultow
+#define _i64toc16         libd__i64tow
+#define _i64toc32         libc__i64tow
+#define _ui64toc16        libd__ui64tow
+#define _ui64toc32        libc__ui64tow
+#define _itoc16_s         libd__itow_s
+#define _itoc32_s         libc__itow_s
+#define _ltoc16_s         libd__ltow_s
+#define _ltoc32_s         libc__ltow_s
+#define _ultoc16_s        libd__ultow_s
+#define _ultoc32_s        libc__ultow_s
+#define _i64toc16_s       libd__i64tow_s
+#define _i64toc32_s       libc__i64tow_s
+#define _ui64toc16_s      libd__ui64tow_s
+#define _ui64toc32_s      libc__ui64tow_s
+#define _c16toi64         libd__wtoi64
+#define _c32toi64         libc__wtoi64
+#define _c16toi_l         libd__wtoi_l
+#define _c32toi_l         libc__wtoi_l
+#define _c16tol_l         libd__wtol_l
+#define _c32tol_l         libc__wtol_l
+#define _c16toi64_l       libd__wtoi64_l
+#define _c32toi64_l       libc__wtoi64_l
+#define _c16toll_l        libd__wtoll_l
+#define _c32toll_l        libc__wtoll_l
+#define _vscanf_l         libc__vscanf_l
+#define _vfscanf_l        libc__vfscanf_l
+#define _vsscanf_l        libc__vsscanf_l
+#define _vscanf_s         libc__vscanf_s
+#define _vscanf_s_l       libc__vscanf_s_l
+#define _vfscanf          libc__vfscanf
+#define _vfscanf_s        libc__vfscanf_s
+#define _vfscanf_s_l      libc__vfscanf_s_l
+#define _vsscanf          libc__vsscanf
+#define _vsscanf_s        libc__vsscanf_s
+#define _vsscanf_s_l      libc__vsscanf_s_l
+#define _vsnscanf         libc__vsnscanf
+#define _vsnscanf_s       libc__vsnscanf_s
+#define _vsnscanf_l       libc__vsnscanf_l
+#define _vsnscanf_s_l     libc__vsnscanf_s_l
+#ifdef __CC__
+#undef __DEFINE_PRIVATE_ALIAS
+#undef __DEFINE_PUBLIC_ALIAS
+#undef __DEFINE_INTERN_ALIAS
+#undef __DEFINE_PRIVATE_WEAK_ALIAS
+#undef __DEFINE_PUBLIC_WEAK_ALIAS
+#undef __DEFINE_INTERN_WEAK_ALIAS
+/* Work-around required due to the macros above! */
+#define __DEFINE_PRIVATE_ALIAS(new, old)      __asm__(".local " #new "\n.set " #new "," #old "\n")
+#define __DEFINE_PUBLIC_ALIAS(new, old)       __asm__(".global " #new "\n.set " #new "," #old "\n")
+#define __DEFINE_INTERN_ALIAS(new, old)       __asm__(".global " #new "\n.hidden " #new "\n.set " #new "," #old "\n")
+#define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) __asm__(".weak " #new "\n.local " #new "\n.set " #new "," #old "\n")
+#define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  __asm__(".weak " #new "\n.global " #new "\n.set " #new "," #old "\n")
+#define __DEFINE_INTERN_WEAK_ALIAS(new, old)  __asm__(".weak " #new "\n.global " #new "\n.hidden " #new "\n.set " #new "," #old "\n")
+#endif /* __CC__ */
+/* TODO:REMOVE_ME:END */
+
 
 /* Delete CRT features for stuff that we don't implement (yet)
  * TODO: Once we do implement this stuff, delete this part! */
@@ -110,25 +361,10 @@
 
 #define LIBCCALL  __LIBCCALL
 #define LIBDCALL  __LIBDCALL
+#define LIBKCALL  __LIBKCALL
 #define VLIBCCALL __VLIBCCALL
 #define VLIBDCALL __VLIBDCALL
-#undef LIBCCALL_CALLER_CLEANUP
-#undef VLIBCCALL_CALLER_CLEANUP
-#undef LIBDCALL_CALLER_CLEANUP
-#undef VLIBDCALL_CALLER_CLEANUP
-#ifdef __LIBCCALL_CALLER_CLEANUP
-#define LIBCCALL_CALLER_CLEANUP 1
-#endif /* !__LIBCCALL_CALLER_CLEANUP */
-#ifdef __VLIBCCALL_CALLER_CLEANUP
-#define VLIBCCALL_CALLER_CLEANUP 1
-#endif /* __VLIBCCALL_CALLER_CLEANUP */
-#ifdef __LIBDCALL_CALLER_CLEANUP
-#define LIBDCALL_CALLER_CLEANUP 1
-#endif /* __LIBDCALL_CALLER_CLEANUP */
-#ifdef __VLIBDCALL_CALLER_CLEANUP
-#define VLIBDCALL_CALLER_CLEANUP 1
-#endif /* __VLIBDCALL_CALLER_CLEANUP */
-
+#define VLIBKCALL __VLIBKCALL
 
 #ifndef NOBLOCK
 #define NOBLOCK __NOBLOCK
@@ -159,12 +395,16 @@
 #define libc_isgraph(ch)  isgraph(ch)
 #define libc_iscntrl(ch)  iscntrl(ch)
 #ifdef __USE_ISOC99
-#define libc_isblank(ch)  isblank(ch)
+#define libc_isblank(ch) isblank(ch)
 #endif /* __USE_ISOC99 */
 
 
-#include <errno.h>
+#include <parts/dos/errno.h>
 #include <parts/errno.h>
+#include <parts/generic/errno.h>
+
+#include <errno.h>
+
 #define libc_seterrno_syserr(e) \
 	(likely(!E_ISERR(e)) ? (e) : libc_seterrno((errno_t) - (syscall_slong_t)(syscall_ulong_t)(e)))
 #define libc_seterrno_syserr2(e, ERR) \
@@ -196,7 +436,7 @@
 
 #undef ____errno_location_defined
 #define ____errno_location_defined 1
-#define __errno_location() libc_errno_p()
+#define __errno_location()         libc_errno_p()
 
 #ifdef __CC__
 DECL_BEGIN
@@ -262,6 +502,7 @@ DECL_END
 #else /* __INTELLISENSE__ */
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
+
 #include <dlfcn.h>
 #define DEFINE_NOREL_GLOBAL_META(T, name, section)                                                  \
 	INTERN ATTR_SECTION(".bss" section "." #name) T *__pdyn_##name               = __NULLPTR;       \

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b372ecd */
+/* HASH CRC-32:0x45e2b10a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_SYS_STATFS_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/statfs.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Return information about the filesystem on which FILE resides */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_statfs)(char const *file, struct statfs *buf);
 /* Return information about the filesystem containing the file FILDES refers to */
@@ -36,6 +38,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_fstatfs)(fd_t filedes, struct 
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_statfs64)(const char *file, struct statfs64 *buf);
 /* Return information about the filesystem containing the file FILDES refers to */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_fstatfs64)(fd_t filedes, struct statfs64 *buf);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

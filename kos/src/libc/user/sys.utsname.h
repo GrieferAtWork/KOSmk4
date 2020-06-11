@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3c276eb */
+/* HASH CRC-32:0x4e102ec0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,17 @@
 #define GUARD_LIBC_USER_SYS_UTSNAME_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/utsname.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Put information about the system in NAME */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_uname)(struct utsname *name);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

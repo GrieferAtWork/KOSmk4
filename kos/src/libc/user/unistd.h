@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1ae64db */
+/* HASH CRC-32:0x63f4324f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 
 #include "../api.h"
 #include "../auto/unistd.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <unistd.h>
@@ -30,6 +31,7 @@
 DECL_BEGIN
 
 INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_environ)(void);
+#ifndef __KERNEL__
 /* >> execv(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
@@ -45,15 +47,16 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_execvp)(char const *__restr
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
-INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path, char const *args, ... /*, (char *)NULL*/);
+INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path, char const *args, ...);
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-INTDEF NONNULL((1)) ATTR_SENTINEL_O(1) int NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/);
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * and setting `environ' to a `char **' passed after the NULL sentinel */
+INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path, char const *args, ...);
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
-INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execlp)(char const *__restrict file, char const *args, ... /*, (char *)NULL*/);
+INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execlp)(char const *__restrict file, char const *args, ...);
 /* >> execvpe(3)
  * Replace the calling process with the application image referred to by `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
@@ -61,7 +64,7 @@ INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__r
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-INTDEF NONNULL((1)) ATTR_SENTINEL_O(1) int NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/);
+INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file, char const *args, ...);
 /* >> getpid(2)
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
  * THIS_THREAD->LEADER->PID */
@@ -101,9 +104,9 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setpgid)(pid_t pid, pid_t pgid);
  * Make the calling thread's process the leader of its associated
  * process group, before also making it its own session leader.
  * Then return the TID of that new session leader, which is also the PID of the calling process.
- * THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
- * THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
- * return THIS_THREAD->LEADER->PID; */
+ *  - THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
+ *  - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
+ *  - return THIS_THREAD->LEADER->PID; */
 INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_setsid)(void);
 /* >> getuid(2)
  * Return the real user ID of the calling process */
@@ -237,11 +240,11 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_unlink)(char const *file);
  * Remove a directory referred to by `PATH' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_rmdir)(char const *path);
 /* >> euidaccess(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file, int type);
+INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file, __STDC_INT_AS_UINT_T type);
 /* >> faccessat(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd, char const *file, int type, atflag_t flags);
 /* >> fchownat(2)
@@ -306,8 +309,6 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_getresuid)(uid_t *ruid, uid_t *euid, uid_t 
 INTDEF int NOTHROW_NCX(LIBCCALL libc_getresgid)(gid_t *rgid, gid_t *egid, gid_t *sgid);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setresuid)(uid_t ruid, uid_t euid, uid_t suid);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setresgid)(gid_t rgid, gid_t egid, gid_t sgid);
-/* Hidden function exported by DOS that allows for millisecond precision */
-INTDEF void NOTHROW_RPC(LIBCCALL libc___crtSleep)(__UINT32_TYPE__ msecs);
 /* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds);
 INTDEF ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf);
@@ -355,6 +356,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_nice)(int inc);
  * @return: 1 :    Empty configuration string.
  * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
 INTDEF size_t NOTHROW_NCX(LIBCCALL libc_confstr)(int name, char *buf, size_t buflen);
+INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_getopt)(int argc, char *const argv[], char const *shortopts);
 /* >> sync(2)
  * Synchronize all disk operations of all mounted file systems and flush
  * unwritten buffers down to the hardware layer, ensuring that modifications
@@ -367,9 +369,6 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setpgrp)(void);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setreuid)(uid_t ruid, uid_t euid);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid, gid_t egid);
 INTDEF WUNUSED long int NOTHROW_NCX(LIBCCALL libc_gethostid)(void);
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_getpagesize)(void);
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
@@ -420,7 +419,6 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_endusershell)(void);
 INTDEF void NOTHROW_RPC(LIBCCALL libc_setusershell)(void);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_daemon)(int nochdir, int noclose);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_acct)(char const *name);
 INTDEF long int NOTHROW_RPC(VLIBCCALL libc_syscall)(long int sysno, ...);
 INTDEF __LONG64_TYPE__ NOTHROW_RPC(VLIBCCALL libc_syscall64)(__syscall_ulong_t sysno, ...);
 /* >> chroot(2)
@@ -454,6 +452,7 @@ INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTDEF WUNUSED long int NOTHROW_RPC(LIBCCALL libc_sysconf)(int name);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

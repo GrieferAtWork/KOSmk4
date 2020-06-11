@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65fcbd55 */
+/* HASH CRC-32:0x615cae16 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,17 @@
 #define GUARD_LIBC_USER_DOS_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <dos.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_delay)(unsigned int mill);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

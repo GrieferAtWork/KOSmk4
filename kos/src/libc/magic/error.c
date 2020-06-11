@@ -98,6 +98,7 @@ __LIBC int error_one_per_line;
 [[impl_include("<local/stdstreams.h>")]]
 [[impl_prefix(DEFINE_LOCAL_error_print_progname)]]
 [[impl_prefix(DEFINE_LOCAL_error_message_count)]]
+[[impl_include("<local/program_invocation_name.h>")]]
 [[requires_include("<__crt.h>", "<local/program_invocation_name.h>")]]
 [[userimpl, requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
                      $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
@@ -137,6 +138,7 @@ void error(int status, $errno_t errnum, const char *format, ...) {
 [[fast, libc, throws, ATTR_LIBC_PRINTF(5, 6)]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<local/stdstreams.h>")]]
+[[impl_include("<local/program_invocation_name.h>")]]
 [[requires_include("<__crt.h>", "<local/program_invocation_name.h>")]]
 [[userimpl, requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
                      $has_function(fprintf) && $has_function(vfprintf) &&

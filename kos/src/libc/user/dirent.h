@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc399b03 */
+/* HASH CRC-32:0x757fe6f5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,12 +23,14 @@
 
 #include "../api.h"
 #include "../auto/dirent.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <dirent.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Open and return a new directory stream for reading, referring to `name' */
 INTDEF WUNUSED NONNULL((1)) DIR *NOTHROW_RPC(LIBCCALL libc_opendir)(char const *name);
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
@@ -97,6 +99,7 @@ INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBCCALL libc_kreaddirf)(fd_t fd, struct dire
 INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBCCALL libc_kreaddir64)(fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode);
 /* 64-bit variant of `kreaddirf()' */
 INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBCCALL libc_kreaddirf64)(fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode, oflag_t flags);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

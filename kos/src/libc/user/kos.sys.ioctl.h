@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1f44c85 */
+/* HASH CRC-32:0xab6ac847 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,17 +22,19 @@
 #define GUARD_LIBC_USER_KOS_SYS_IOCTL_H 1
 
 #include "../api.h"
-#include <kos/anno.h>
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <kos/sys/ioctl.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Perform the I/O control operation specified by REQUEST on FD.
  * One argument may follow; its presence and type depend on REQUEST.
  * Return value depends on REQUEST. Usually -1 indicates error */
-INTDEF ssize_t (VLIBCCALL libc_Ioctl)(fd_t fd, unsigned long int request, ...) __THROWS(...);
+INTDEF ssize_t (VLIBCCALL libc_Ioctl)(fd_t fd, unsigned long int request, ...) THROWS(...);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

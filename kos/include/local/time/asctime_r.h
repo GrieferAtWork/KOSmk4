@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd614bcb */
+/* HASH CRC-32:0x492fd5cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,20 +99,16 @@ __NAMESPACE_LOCAL_END
 #ifndef __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED
 #define __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
-
 __LOCAL_LIBC_CONST_DATA(__abbr_wday_names) char const __abbr_wday_names[7][4] =
 	{ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 __NAMESPACE_LOCAL_END
-
 #endif
 #ifndef __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED
 #define __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
-
 __LOCAL_LIBC_CONST_DATA(__abbr_month_names) char const __abbr_month_names[12][4] =
 	{ "Jan", "Feb", "Mar", "Apr", "May", "Jun",  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 __NAMESPACE_LOCAL_END
-
 #endif
 #endif /* __BUILDING_LIBC || !__CRT_HAVE_asctime_s */
 __NAMESPACE_LOCAL_BEGIN
@@ -123,30 +119,30 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_r))(__STRUCT_TM const *__rest
 #ifdef __BUILDING_LIBC
 	__localdep_sprintf(__buf,
 	        "%.3s %.3s%3u %.2u:%.2u:%.2u %u\n",
-	       (unsigned int)__tp->tm_wday >= 7 ? "??" "?" :
-	        __abbr_wday_names[__tp->tm_wday],
-	       (unsigned int)__tp->tm_mon >= 12 ? "??" "?" :
-	        __abbr_month_names[__tp->tm_mon],
-	       (unsigned int)__tp->tm_mday,
-	       (unsigned int)__tp->tm_hour,
-	       (unsigned int)__tp->tm_min,
-	       (unsigned int)__tp->tm_sec,
-	       (unsigned int)__tp->tm_year + 1900);
+	        (unsigned int)__tp->tm_wday >= 7 ? "??" "?" :
+	        __NAMESPACE_LOCAL_SYM __abbr_wday_names[__tp->tm_wday],
+	        (unsigned int)__tp->tm_mon >= 12 ? "??" "?" :
+	        __NAMESPACE_LOCAL_SYM __abbr_month_names[__tp->tm_mon],
+	        (unsigned int)__tp->tm_mday,
+	        (unsigned int)__tp->tm_hour,
+	        (unsigned int)__tp->tm_min,
+	        (unsigned int)__tp->tm_sec,
+	        (unsigned int)__tp->tm_year + 1900);
 	return __buf;
 #elif defined(__CRT_HAVE_asctime_s)
 	return __localdep_crt_asctime_s(__buf, 26, __tp) ? __NULLPTR : __buf;
 #else /* ... */
 	__localdep_sprintf(__buf,
 	        "%.3s %.3s%3u %.2u:%.2u:%.2u %u\n",
-	       (unsigned int)__tp->tm_wday >= 7 ? "??" "?" :
-	        __abbr_wday_names[__tp->tm_wday],
-	       (unsigned int)__tp->tm_mon >= 12 ? "??" "?" :
-	        __abbr_month_names[__tp->tm_mon],
-	       (unsigned int)__tp->tm_mday,
-	       (unsigned int)__tp->tm_hour,
-	       (unsigned int)__tp->tm_min,
-	       (unsigned int)__tp->tm_sec,
-	       (unsigned int)__tp->tm_year + 1900);
+	        (unsigned int)__tp->tm_wday >= 7 ? "??" "?" :
+	        __NAMESPACE_LOCAL_SYM __abbr_wday_names[__tp->tm_wday],
+	        (unsigned int)__tp->tm_mon >= 12 ? "??" "?" :
+	        __NAMESPACE_LOCAL_SYM __abbr_month_names[__tp->tm_mon],
+	        (unsigned int)__tp->tm_mday,
+	        (unsigned int)__tp->tm_hour,
+	        (unsigned int)__tp->tm_min,
+	        (unsigned int)__tp->tm_sec,
+	        (unsigned int)__tp->tm_year + 1900);
 	return __buf;
 #endif /* !... */
 }

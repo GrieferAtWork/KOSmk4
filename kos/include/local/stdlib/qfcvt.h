@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0132c24 */
+/* HASH CRC-32:0x99f4a0e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,10 +38,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __CRT_QCVT_BUFFER_DEFINED
 #define __CRT_QCVT_BUFFER_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
-
 __LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = { 0 };
 __NAMESPACE_LOCAL_END
-
 #endif
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qfcvt) __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *

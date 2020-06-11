@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e6706f3 */
+/* HASH CRC-32:0x347f605c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,14 +48,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN
-
 #define ____invoke_compare_helper_defined 1
 __LOCAL_LIBC(__invoke_compare_helper) int
 (__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
 	return (*(__compar_fn_t)__arg)(__a, __b);
 }
 __NAMESPACE_LOCAL_END
-
 #endif /* !____invoke_compare_helper_defined */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qsort) __ATTR_NONNULL((1, 4)) void

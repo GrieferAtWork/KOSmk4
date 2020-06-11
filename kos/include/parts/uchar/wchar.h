@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x406778e8 */
+/* HASH CRC-32:0xb5ca48d4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -989,6 +989,30 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32stold_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNU
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 #endif /* __USE_GNU */
+#ifdef __USE_XOPEN
+#if defined(__CRT_HAVE_wcwidth) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+__COMPILER_REDIRECT(__LIBC,__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBDCALL,c16width,(char16_t __ch),wcwidth,(__ch))
+#elif defined(__CRT_HAVE_DOS$wcwidth)
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c16width,(char16_t __ch),wcwidth,(__ch))
+#elif (__SIZEOF_WCHAR_T__ == 2)
+#include <local/wchar/wcwidth.h>
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL c16width)(char16_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcwidth))((__WCHAR_TYPE__)__ch); }
+#else /* ... */
+#include <local/parts.uchar.wchar/c16width.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16width, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL c16width)(char16_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16width))(__ch); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wcwidth) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+__COMPILER_REDIRECT(__LIBC,__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__LIBKCALL,c32width,(char32_t __ch),wcwidth,(__ch))
+#elif defined(__CRT_HAVE_DOS$wcwidth)
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c32width,(char32_t __ch),wcwidth,(__ch))
+#elif (__SIZEOF_WCHAR_T__ == 4)
+#include <local/wchar/wcwidth.h>
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL c32width)(char32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcwidth))((__WCHAR_TYPE__)__ch); }
+#else /* ... */
+#include <local/parts.uchar.wchar/c32width.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32width, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL c32width)(char32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32width))(__ch); })
+#endif /* !... */
+#endif /* __USE_XOPEN */
 
 #ifdef __USE_KOS
 #if defined(__CRT_HAVE_wcsto32) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)

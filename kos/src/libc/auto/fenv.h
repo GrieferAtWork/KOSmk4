@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x816a93c1 */
+/* HASH CRC-32:0xdf3ad1f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,10 +22,10 @@
 #define GUARD_LIBC_AUTO_FENV_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <fenv.h>
-#include <kos/anno.h>
 
 DECL_BEGIN
 
@@ -33,7 +33,7 @@ DECL_BEGIN
 /* Clear the supported exceptions represented by EXCEPTS */
 INTDEF int NOTHROW(LIBCCALL libc_feclearexcept)(int excepts);
 /* Raise the supported exceptions represented by EXCEPTS */
-INTDEF int (LIBCCALL libc_feraiseexcept)(int excepts) __THROWS(...);
+INTDEF int (LIBCCALL libc_feraiseexcept)(int excepts) THROWS(...);
 /* Store implementation-defined representation of the exception
  * flags indicated by EXCEPTS in the object pointed to by FLAGP */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp, int excepts);

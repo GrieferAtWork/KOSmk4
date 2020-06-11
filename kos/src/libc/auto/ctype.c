@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f5c9b22 */
+/* HASH CRC-32:0xe3090b26 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,273 +24,621 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "ctype.h"
+#include "../user/ctype.h"
 
 DECL_BEGIN
 
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.iscntrl") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iscntrl)(int ch) {
-#line 70 "kos/src/libc/magic/ctype.c"
+#ifdef __BUILDING_LIBC
 	return (u8)ch <= 0x1f || (u8)ch == 0x7f;
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return (*__ctype_b_loc())[ch] & (1 << 9);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return (*__ctype_b_loc())[ch] & (1 << 1);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 040) != 0;
+#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+	return _isctype(ch, 0x0020);
+#else
+	return (u8)ch <= 0x1f || (u8)ch == 0x7f;
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.isspace") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isspace)(int ch) {
-#line 90 "kos/src/libc/magic/ctype.c"
+#ifdef __BUILDING_LIBC
 	return ((u8)ch >= 0x09 && (u8)ch <= 0x0d) || (u8)ch == 0x20;
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return (*__ctype_b_loc())[ch] & (1 << 5);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return (*__ctype_b_loc())[ch] & (1 << 13);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 010) != 0;
+#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+	return _isctype(ch, 0x0008);
+#else
+	return ((u8)ch >= 0x09 && (u8)ch <= 0x0d) || (u8)ch == 0x20;
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.isupper") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isupper)(int ch) {
-#line 109 "kos/src/libc/magic/ctype.c"
+#ifdef __BUILDING_LIBC
 	return (u8)ch >= 0x41 && (u8)ch <= 0x5a;
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return (*__ctype_b_loc())[ch] & (1 << 0);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return (*__ctype_b_loc())[ch] & (1 << 8);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 3) == 1;
+#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+	return _isctype(ch, 0x0001);
+#else
+	return (u8)ch >= 0x41 && (u8)ch <= 0x5a;
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.islower") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_islower)(int ch) {
-#line 129 "kos/src/libc/magic/ctype.c"
+#ifdef __BUILDING_LIBC
 	return (u8)ch >= 0x61 && (u8)ch <= 0x7a;
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return (*__ctype_b_loc())[ch] & (1 << 1);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return (*__ctype_b_loc())[ch] & (1 << 9);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 3) == 2;
+#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+	return _isctype(ch, 0x0002);
+#else
+	return (u8)ch >= 0x61 && (u8)ch <= 0x7a;
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.isalpha") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isalpha)(int ch) {
-#line 148 "kos/src/libc/magic/ctype.c"
+#ifdef __BUILDING_LIBC
 	return libc_isupper(ch) || libc_islower(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return (*__ctype_b_loc())[ch] & (1 << 2);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return (*__ctype_b_loc())[ch] & (1 << 10);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 3) != 0;
+#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+	return _isctype(ch, 0x0103);
+#else
+	return isupper(ch) || islower(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.isdigit") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isdigit)(int ch) {
-#line 167 "kos/src/libc/magic/ctype.c"
+#ifdef __BUILDING_LIBC
 	return (u8)ch >= 0x30 && (u8)ch <= 0x39;
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return (*__ctype_b_loc())[ch] & (1 << 3);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return (*__ctype_b_loc())[ch] & (1 << 11);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 4) != 0;
+#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+	return _isctype(ch, 0x0004);
+#else
+	return (u8)ch >= 0x30 && (u8)ch <= 0x39;
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.isxdigit") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isxdigit)(int ch) {
-#line 188 "kos/src/libc/magic/ctype.c"
-	return libc_isdigit(ch) ||
+#ifdef __BUILDING_LIBC
+	return isdigit(ch) ||
 	       ((u8)ch >= 0x41 && (u8)ch <= 0x46) ||
 	       ((u8)ch >= 0x61 && (u8)ch <= 0x66);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return (*__ctype_b_loc())[ch] & (1 << 4);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return (*__ctype_b_loc())[ch] & (1 << 12);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 0104) != 0;
+#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+	return _isctype(ch, 0x0080);
+#else
+	return isdigit(ch) ||
+	       ((u8)ch >= 0x41 && (u8)ch <= 0x46) ||
+	       ((u8)ch >= 0x61 && (u8)ch <= 0x66);
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.isalnum") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isalnum)(int ch) {
-#line 209 "kos/src/libc/magic/ctype.c"
-	return libc_isupper(ch) || libc_islower(ch) || libc_isdigit(ch);
+#ifdef __BUILDING_LIBC
+	return isupper(ch) || islower(ch) || isdigit(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return (*__ctype_b_loc())[ch] & (1 << 11);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return (*__ctype_b_loc())[ch] & (1 << 3);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 7) != 0;
+#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+	return _isctype(ch, 0x0107);
+#else
+	return isupper(ch) || islower(ch) || isdigit(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.ispunct") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_ispunct)(int ch) {
-#line 231 "kos/src/libc/magic/ctype.c"
+#ifdef __BUILDING_LIBC
 	return ((u8)ch >= 0x21 && (u8)ch <= 0x2f) ||
 	       ((u8)ch >= 0x3a && (u8)ch <= 0x40) ||
 	       ((u8)ch >= 0x5b && (u8)ch <= 0x60) ||
 	       ((u8)ch >= 0x7b && (u8)ch <= 0x7e);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return (*__ctype_b_loc())[ch] & (1 << 10);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return (*__ctype_b_loc())[ch] & (1 << 2);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 020) != 0;
+#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+	return _isctype(ch, 0x0010);
+#else
+	return ((u8)ch >= 0x21 && (u8)ch <= 0x2f) ||
+	       ((u8)ch >= 0x3a && (u8)ch <= 0x40) ||
+	       ((u8)ch >= 0x5b && (u8)ch <= 0x60) ||
+	       ((u8)ch >= 0x7b && (u8)ch <= 0x7e);
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.isgraph") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isgraph)(int ch) {
-#line 253 "kos/src/libc/magic/ctype.c"
+#ifdef __BUILDING_LIBC
 	return (u8)ch >= 0x21 && (u8)ch <= 0x7e;
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return (*__ctype_b_loc())[ch] & (1 << 7);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return (*__ctype_b_loc())[ch] & (1 << 15);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 027) != 0;
+#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+	return _isctype(ch, 0x0117);
+#else
+	return (u8)ch >= 0x21 && (u8)ch <= 0x7e;
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.isprint") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isprint)(int ch) {
-#line 272 "kos/src/libc/magic/ctype.c"
+#ifdef __BUILDING_LIBC
 	return (u8)ch >= 0x20 && (u8)ch <= 0x7e;
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return (*__ctype_b_loc())[ch] & (1 << 6);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return (*__ctype_b_loc())[ch] & (1 << 14);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 0227) != 0;
+#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
+	return _isctype(ch, 0x0157);
+#else
+	return (u8)ch >= 0x20 && (u8)ch <= 0x7e;
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.tolower") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_tolower)(int ch) {
-#line 291 "kos/src/libc/magic/ctype.c"
-	return libc_isupper(ch) ? ((u8)ch+0x20) : ch;
+#ifdef __BUILDING_LIBC
+	return isupper(ch) ? ((u8)ch+0x20) : ch;
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_tolower_loc) && defined(__CRT_CYG)
+	return ch >= -128 && ch < 256 ? (*__ctype_tolower_loc())[ch] : ch;
+#else /* __CRT_HAVE___ctype_tolower_loc && __CRT_CYG */
+	return isupper(ch) ? ((u8)ch+0x20) : ch;
+#endif /* !__CRT_HAVE___ctype_tolower_loc || !__CRT_CYG */
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.toupper") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_toupper)(int ch) {
-#line 300 "kos/src/libc/magic/ctype.c"
-	return libc_islower(ch) ? ((u8)ch-0x20) : ch;
+#ifdef __BUILDING_LIBC
+	return islower(ch) ? ((u8)ch-0x20) : ch;
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_toupper_loc) && defined(__CRT_CYG)
+	return ch >= -128 && ch < 256 ? (*__ctype_toupper_loc())[ch] : ch;
+#else /* __CRT_HAVE___ctype_toupper_loc && __CRT_CYG */
+	return islower(ch) ? ((u8)ch-0x20) : ch;
+#endif /* !__CRT_HAVE___ctype_toupper_loc || !__CRT_CYG */
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.isblank") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_isblank)(int ch) {
-#line 312 "kos/src/libc/magic/ctype.c"
+#ifdef __BUILDING_LIBC
 	return (u8)ch == 0x09 || (u8)ch == 0x20;
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return (*__ctype_b_loc())[ch] & (1 << 8);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return (*__ctype_b_loc())[ch] & (1 << 0);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 0200) != 0 || ch == '\t';
+#else
+	return (u8)ch == 0x09 || (u8)ch == 0x20;
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
 #ifndef __KERNEL__
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.iscntrl_l") int
-NOTHROW_NCX(LIBCCALL libc_iscntrl_l)(int ch,
-                                     __locale_t locale) {
-#line 339 "kos/src/libc/magic/ctype.c"
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_iscntrl_l)(int ch, __locale_t locale) {
+#ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_iscntrl(ch);
-}
-
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isspace_l") int
-NOTHROW_NCX(LIBCCALL libc_isspace_l)(int ch,
-                                     __locale_t locale) {
-#line 364 "kos/src/libc/magic/ctype.c"
+	return iscntrl(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return locale->__ctype_b[ch] & (1 << 9);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return locale->__ctype_b[ch] & (1 << 1);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 040) != 0;
+#elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
+	return _isctype_l(ch, 0x0020, locale);
+#else
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_isspace(ch);
+	return iscntrl(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isupper_l") int
-NOTHROW_NCX(LIBCCALL libc_isupper_l)(int ch,
-                                     __locale_t locale) {
-#line 388 "kos/src/libc/magic/ctype.c"
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_isspace_l)(int ch, __locale_t locale) {
+#ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_isupper(ch);
-}
-
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.islower_l") int
-NOTHROW_NCX(LIBCCALL libc_islower_l)(int ch,
-                                     __locale_t locale) {
-#line 412 "kos/src/libc/magic/ctype.c"
+	return isspace(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return locale->__ctype_b[ch] & (1 << 5);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return locale->__ctype_b[ch] & (1 << 13);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 010) != 0;
+#elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
+	return _isctype_l(ch, 0x0008, locale);
+#else
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_islower(ch);
+	return isspace(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isalpha_l") int
-NOTHROW_NCX(LIBCCALL libc_isalpha_l)(int ch,
-                                     __locale_t locale) {
-#line 436 "kos/src/libc/magic/ctype.c"
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_isupper_l)(int ch, __locale_t locale) {
+#ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_isalpha(ch);
-}
-
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isdigit_l") int
-NOTHROW_NCX(LIBCCALL libc_isdigit_l)(int ch,
-                                     __locale_t locale) {
-#line 460 "kos/src/libc/magic/ctype.c"
+	return isupper(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return locale->__ctype_b[ch] & (1 << 0);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return locale->__ctype_b[ch] & (1 << 8);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 3) == 1;
+#elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
+	return _isctype_l(ch, 0x0001, locale);
+#else
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_isdigit(ch);
+	return isupper(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isxdigit_l") int
-NOTHROW_NCX(LIBCCALL libc_isxdigit_l)(int ch,
-                                      __locale_t locale) {
-#line 484 "kos/src/libc/magic/ctype.c"
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_islower_l)(int ch, __locale_t locale) {
+#ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_isxdigit(ch);
-}
-
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isalnum_l") int
-NOTHROW_NCX(LIBCCALL libc_isalnum_l)(int ch,
-                                     __locale_t locale) {
-#line 508 "kos/src/libc/magic/ctype.c"
+	return islower(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return locale->__ctype_b[ch] & (1 << 1);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return locale->__ctype_b[ch] & (1 << 9);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 3) == 2;
+#elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
+	return _isctype_l(ch, 0x0002, locale);
+#else
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_isalnum(ch);
+	return islower(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.ispunct_l") int
-NOTHROW_NCX(LIBCCALL libc_ispunct_l)(int ch,
-                                     __locale_t locale) {
-#line 532 "kos/src/libc/magic/ctype.c"
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_isalpha_l)(int ch, __locale_t locale) {
+#ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_ispunct(ch);
-}
-
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isgraph_l") int
-NOTHROW_NCX(LIBCCALL libc_isgraph_l)(int ch,
-                                     __locale_t locale) {
-#line 556 "kos/src/libc/magic/ctype.c"
+	return isalpha(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return locale->__ctype_b[ch] & (1 << 2);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return locale->__ctype_b[ch] & (1 << 10);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 3) != 0;
+#elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
+	return _isctype_l(ch, 0x0103, locale);
+#else
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_isgraph(ch);
+	return isalpha(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isprint_l") int
-NOTHROW_NCX(LIBCCALL libc_isprint_l)(int ch,
-                                     __locale_t locale) {
-#line 580 "kos/src/libc/magic/ctype.c"
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_isdigit_l)(int ch, __locale_t locale) {
+#ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_isprint(ch);
-}
-
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isblank_l") int
-NOTHROW_NCX(LIBCCALL libc_isblank_l)(int ch,
-                                     __locale_t locale) {
-#line 604 "kos/src/libc/magic/ctype.c"
+	return isdigit(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return locale->__ctype_b[ch] & (1 << 3);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return locale->__ctype_b[ch] & (1 << 11);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 4) != 0;
+#elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
+	return _isctype_l(ch, 0x0004, locale);
+#else
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_isblank(ch);
+	return isdigit(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
 }
-
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.tolower_l") int
-NOTHROW_NCX(LIBCCALL libc_tolower_l)(int ch,
-                                     __locale_t locale) {
-#line 623 "kos/src/libc/magic/ctype.c"
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_isxdigit_l)(int ch, __locale_t locale) {
+#ifdef __BUILDING_LIBC
+	(void)locale;
+	COMPILER_IMPURE();
+	return isxdigit(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return locale->__ctype_b[ch] & (1 << 4);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return locale->__ctype_b[ch] & (1 << 12);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 0104) != 0;
+#elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
+	return _isctype_l(ch, 0x0080, locale);
+#else
+	(void)locale;
+	COMPILER_IMPURE();
+	return isxdigit(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
+}
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_isalnum_l)(int ch, __locale_t locale) {
+#ifdef __BUILDING_LIBC
+	(void)locale;
+	COMPILER_IMPURE();
+	return isalnum(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return locale->__ctype_b[ch] & (1 << 11);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return locale->__ctype_b[ch] & (1 << 3);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 7) != 0;
+#elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
+	return _isctype_l(ch, 0x0107, locale);
+#else
+	(void)locale;
+	COMPILER_IMPURE();
+	return isalnum(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
+}
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_ispunct_l)(int ch, __locale_t locale) {
+#ifdef __BUILDING_LIBC
+	(void)locale;
+	COMPILER_IMPURE();
+	return ispunct(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return locale->__ctype_b[ch] & (1 << 10);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return locale->__ctype_b[ch] & (1 << 2);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 020) != 0;
+#elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
+	return _isctype_l(ch, 0x0010, locale);
+#else
+	(void)locale;
+	COMPILER_IMPURE();
+	return ispunct(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
+}
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_isgraph_l)(int ch, __locale_t locale) {
+#ifdef __BUILDING_LIBC
+	(void)locale;
+	COMPILER_IMPURE();
+	return isgraph(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return locale->__ctype_b[ch] & (1 << 7);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return locale->__ctype_b[ch] & (1 << 15);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 027) != 0;
+#elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
+	return _isctype_l(ch, 0x0117, locale);
+#else
+	(void)locale;
+	COMPILER_IMPURE();
+	return isgraph(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
+}
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_isprint_l)(int ch, __locale_t locale) {
+#ifdef __BUILDING_LIBC
+	(void)locale;
+	COMPILER_IMPURE();
+	return isprint(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return locale->__ctype_b[ch] & (1 << 6);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return locale->__ctype_b[ch] & (1 << 14);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 0227) != 0;
+#elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
+	return _isctype_l(ch, 0x0157, locale);
+#else
+	(void)locale;
+	COMPILER_IMPURE();
+	return isprint(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
+}
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_isblank_l)(int ch, __locale_t locale) {
+#ifdef __BUILDING_LIBC
+	(void)locale;
+	COMPILER_IMPURE();
+	return isblank(ch);
+#else /* __BUILDING_LIBC */
+#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
+#include <hybrid/byteorder.h>
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return locale->__ctype_b[ch] & (1 << 8);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return locale->__ctype_b[ch] & (1 << 0);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
+	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 0200) != 0 || ch == '\t';
+#else
+	(void)locale;
+	COMPILER_IMPURE();
+	return isblank(ch);
+#endif
+#endif /* !__BUILDING_LIBC */
+}
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_tolower_l)(int ch, __locale_t locale) {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_tolower(ch);
+	return tolower(ch);
 }
-
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.toupper_l") int
-NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch,
-                                     __locale_t locale) {
-#line 631 "kos/src/libc/magic/ctype.c"
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch, __locale_t locale) {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_toupper(ch);
+	return toupper(ch);
 }
-
 /* Returns non-zero if `(C & ~0x7f) == 0' */
-INTERN ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.isascii") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST int
 NOTHROW(LIBCCALL libc_isascii)(int c) {
-#line 1000 "kos/src/libc/magic/ctype.c"
 	return (c & ~0x7f) == 0;
 }
-
 /* Re-returns `C & 0x7f' */
-INTERN ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.toascii") int
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST int
 NOTHROW(LIBCCALL libc_toascii)(int c) {
-#line 1005 "kos/src/libc/magic/ctype.c"
 	return c & 0x7f;
 }
-
 #endif /* !__KERNEL__ */
+
+DECL_END
+
 DEFINE_PUBLIC_WEAK_ALIAS(iscntrl, libc_iscntrl);
 DEFINE_PUBLIC_WEAK_ALIAS(isspace, libc_isspace);
 DEFINE_PUBLIC_WEAK_ALIAS(isupper, libc_isupper);
@@ -302,46 +650,48 @@ DEFINE_PUBLIC_WEAK_ALIAS(isalnum, libc_isalnum);
 DEFINE_PUBLIC_WEAK_ALIAS(ispunct, libc_ispunct);
 DEFINE_PUBLIC_WEAK_ALIAS(isgraph, libc_isgraph);
 DEFINE_PUBLIC_WEAK_ALIAS(isprint, libc_isprint);
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(_tolower, libc_tolower);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_WEAK_ALIAS(tolower, libc_tolower);
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(_toupper, libc_toupper);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_WEAK_ALIAS(toupper, libc_toupper);
 DEFINE_PUBLIC_WEAK_ALIAS(isblank, libc_isblank);
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(_tolower, libc_tolower);
-DEFINE_PUBLIC_WEAK_ALIAS(_toupper, libc_toupper);
-DEFINE_PUBLIC_WEAK_ALIAS(iscntrl_l, libc_iscntrl_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__iscntrl_l, libc_iscntrl_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isspace_l, libc_isspace_l);
+DEFINE_PUBLIC_WEAK_ALIAS(iscntrl_l, libc_iscntrl_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__isspace_l, libc_isspace_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isupper_l, libc_isupper_l);
+DEFINE_PUBLIC_WEAK_ALIAS(isspace_l, libc_isspace_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__isupper_l, libc_isupper_l);
-DEFINE_PUBLIC_WEAK_ALIAS(islower_l, libc_islower_l);
+DEFINE_PUBLIC_WEAK_ALIAS(isupper_l, libc_isupper_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__islower_l, libc_islower_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isalpha_l, libc_isalpha_l);
+DEFINE_PUBLIC_WEAK_ALIAS(islower_l, libc_islower_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__isalpha_l, libc_isalpha_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isdigit_l, libc_isdigit_l);
+DEFINE_PUBLIC_WEAK_ALIAS(isalpha_l, libc_isalpha_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__isdigit_l, libc_isdigit_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isxdigit_l, libc_isxdigit_l);
+DEFINE_PUBLIC_WEAK_ALIAS(isdigit_l, libc_isdigit_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__isxdigit_l, libc_isxdigit_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isalnum_l, libc_isalnum_l);
+DEFINE_PUBLIC_WEAK_ALIAS(isxdigit_l, libc_isxdigit_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__isalnum_l, libc_isalnum_l);
-DEFINE_PUBLIC_WEAK_ALIAS(ispunct_l, libc_ispunct_l);
+DEFINE_PUBLIC_WEAK_ALIAS(isalnum_l, libc_isalnum_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__ispunct_l, libc_ispunct_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isgraph_l, libc_isgraph_l);
+DEFINE_PUBLIC_WEAK_ALIAS(ispunct_l, libc_ispunct_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__isgraph_l, libc_isgraph_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isprint_l, libc_isprint_l);
+DEFINE_PUBLIC_WEAK_ALIAS(isgraph_l, libc_isgraph_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__isprint_l, libc_isprint_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isblank_l, libc_isblank_l);
+DEFINE_PUBLIC_WEAK_ALIAS(isprint_l, libc_isprint_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__isblank_l, libc_isblank_l);
-DEFINE_PUBLIC_WEAK_ALIAS(tolower_l, libc_tolower_l);
+DEFINE_PUBLIC_WEAK_ALIAS(isblank_l, libc_isblank_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_tolower_l, libc_tolower_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__tolower_l, libc_tolower_l);
-DEFINE_PUBLIC_WEAK_ALIAS(toupper_l, libc_toupper_l);
+DEFINE_PUBLIC_WEAK_ALIAS(tolower_l, libc_tolower_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_toupper_l, libc_toupper_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__toupper_l, libc_toupper_l);
+DEFINE_PUBLIC_WEAK_ALIAS(toupper_l, libc_toupper_l);
 DEFINE_PUBLIC_WEAK_ALIAS(isascii, libc_isascii);
 DEFINE_PUBLIC_WEAK_ALIAS(toascii, libc_toascii);
 #endif /* !__KERNEL__ */
-
-DECL_END
 
 #endif /* !GUARD_LIBC_AUTO_CTYPE_C */

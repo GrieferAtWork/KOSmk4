@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x512c7f2b */
+/* HASH CRC-32:0x843e49ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,19 +24,60 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "termios.h"
-#include "string.h"
+#include "../user/termios.h"
+#include <string.h>
 
 DECL_BEGIN
 
-#include <bits/termios.h>
+#ifndef __KERNEL__
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_PURE WUNUSED NONNULL((1)) speed_t
+NOTHROW_NCX(LIBCCALL libc_cfgetospeed)(struct termios const *__restrict termios_p) {
+	return termios_p->c_ospeed;
+}
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_PURE WUNUSED NONNULL((1)) speed_t
+NOTHROW_NCX(LIBCCALL libc_cfgetispeed)(struct termios const *__restrict termios_p) {
+	return termios_p->c_ispeed;
+}
+INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_cfsetospeed)(struct termios *__restrict termios_p, speed_t speed) {
+	termios_p->c_ospeed = speed;
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_cfsetispeed)(struct termios *__restrict termios_p, speed_t speed) {
+	termios_p->c_ispeed = speed;
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p, speed_t speed) {
+	termios_p->c_ospeed = speed;
+	termios_p->c_ispeed = speed;
+	return 0;
+}
+/* Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
+ * This entails the CANON and all control characters being disabled, as well as
+ * any sort of input/output text processing no longer taking place. */
+INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_cfmakeraw)(struct termios *__restrict termios_p) {
+	/* As documented here: http://man7.org/linux/man-pages/man3/termios.3.html
+	 * Note that the following additions were made:
+	 *  - Clear `IXOFF' (ensuring that TTY output can be streamed)
+	 *  - Always set `CREAD' (ensuring that data can be received) */
+	termios_p->c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP |
+	                          INLCR | IGNCR | ICRNL | IXON | IXOFF);
+	termios_p->c_oflag &= ~(OPOST);
+	termios_p->c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+	termios_p->c_cflag &= ~(CSIZE | PARENB);
+	termios_p->c_cflag |= CS8 | CREAD;
+	termios_p->c_cc[VMIN]  = 1; /* Read returns when one byte was read. */
+	termios_p->c_cc[VTIME] = 0;
+}
+#endif /* !__KERNEL__ */
 #include <sys/ttydefaults.h>
 /* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
  * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfmakesane") void
+INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p) {
-#line 135 "kos/src/libc/magic/termios.c"
 	/* Set sane values. */
 	memset(termios_p, 0, sizeof(*termios_p));
 #ifdef TTYDEF_CFLAG
@@ -193,78 +234,8 @@ NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p) {
 #endif /* VSTATUS */
 }
 
-#ifndef __KERNEL__
-#include <bits/termios.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfgetospeed") speed_t
-NOTHROW_NCX(LIBCCALL libc_cfgetospeed)(struct termios const *__restrict termios_p) {
-#line 54 "kos/src/libc/magic/termios.c"
-	return termios_p->c_ospeed;
-}
+DECL_END
 
-#include <bits/termios.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfgetispeed") speed_t
-NOTHROW_NCX(LIBCCALL libc_cfgetispeed)(struct termios const *__restrict termios_p) {
-#line 60 "kos/src/libc/magic/termios.c"
-	return termios_p->c_ispeed;
-}
-
-#include <bits/termios.h>
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfsetospeed") int
-NOTHROW_NCX(LIBCCALL libc_cfsetospeed)(struct termios *__restrict termios_p,
-                                       speed_t speed) {
-#line 65 "kos/src/libc/magic/termios.c"
-	termios_p->c_ospeed = speed;
-	return 0;
-}
-
-#include <bits/termios.h>
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfsetispeed") int
-NOTHROW_NCX(LIBCCALL libc_cfsetispeed)(struct termios *__restrict termios_p,
-                                       speed_t speed) {
-#line 71 "kos/src/libc/magic/termios.c"
-	termios_p->c_ispeed = speed;
-	return 0;
-}
-
-#include <bits/termios.h>
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfsetspeed") int
-NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p,
-                                      speed_t speed) {
-#line 103 "kos/src/libc/magic/termios.c"
-	termios_p->c_ospeed = speed;
-	termios_p->c_ispeed = speed;
-	return 0;
-}
-
-#include <bits/termios.h>
-/* Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
- * This entails the CANON and all control characters being disabled, as well as
- * any sort of input/output text processing no longer taking place. */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfmakeraw") void
-NOTHROW_NCX(LIBCCALL libc_cfmakeraw)(struct termios *__restrict termios_p) {
-#line 113 "kos/src/libc/magic/termios.c"
-	/* As documented here: http://man7.org/linux/man-pages/man3/termios.3.html
-	 * Note that the following additions were made:
-	 *  - Clear `IXOFF' (ensuring that TTY output can be streamed)
-	 *  - Always set `CREAD' (ensuring that data can be received) */
-	termios_p->c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP |
-	                          INLCR | IGNCR | ICRNL | IXON | IXOFF);
-	termios_p->c_oflag &= ~(OPOST);
-	termios_p->c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-	termios_p->c_cflag &= ~(CSIZE | PARENB);
-	termios_p->c_cflag |= CS8 | CREAD;
-	termios_p->c_cc[VMIN]  = 1; /* Read returns when one byte was read. */
-	termios_p->c_cc[VTIME] = 0;
-}
-
-#endif /* !__KERNEL__ */
-DEFINE_PUBLIC_WEAK_ALIAS(cfmakesane, libc_cfmakesane);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_WEAK_ALIAS(cfgetospeed, libc_cfgetospeed);
 DEFINE_PUBLIC_WEAK_ALIAS(cfgetispeed, libc_cfgetispeed);
@@ -273,7 +244,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(cfsetispeed, libc_cfsetispeed);
 DEFINE_PUBLIC_WEAK_ALIAS(cfsetspeed, libc_cfsetspeed);
 DEFINE_PUBLIC_WEAK_ALIAS(cfmakeraw, libc_cfmakeraw);
 #endif /* !__KERNEL__ */
-
-DECL_END
+DEFINE_PUBLIC_WEAK_ALIAS(cfmakesane, libc_cfmakesane);
 
 #endif /* !GUARD_LIBC_AUTO_TERMIOS_C */

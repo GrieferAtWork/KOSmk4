@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa703677f */
+/* HASH CRC-32:0x3927967e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,33 +55,33 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_file_c32printer_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_file_c32printer_unlocked_defined */
-/* Dependency: c32len from parts.uchar.string */
-#ifndef __local___localdep_c32len_defined
-#define __local___localdep_c32len_defined 1
+/* Dependency: c32slen from parts.uchar.string */
+#ifndef __local___localdep_c32slen_defined
+#define __local___localdep_c32slen_defined 1
 #if defined(__CRT_HAVE_wcslen) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__LIBKCALL,__localdep_c32len,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
+__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__LIBKCALL,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
 #elif defined(__CRT_HAVE_DOS$wcslen)
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32len,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_c32len (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcslen))
+#define __localdep_c32slen (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcslen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <local/parts.uchar.string/c32len.h>
+#include <local/parts.uchar.string/c32slen.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_c32len __LIBC_LOCAL_NAME(c32len)
+#define __localdep_c32slen __LIBC_LOCAL_NAME(c32slen)
 #endif /* !... */
-#endif /* !__local___localdep_c32len_defined */
+#endif /* !__local___localdep_c32slen_defined */
 __LOCAL_LIBC(fputc32s_unlocked) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBKCALL __LIBC_LOCAL_NAME(fputc32s_unlocked))(__CHAR32_TYPE__ const *__restrict __string, __FILE *__restrict __stream) __THROWS(...) {
 	__STDC_INT_AS_SIZE_T __result;
-	__result = __localdep_file_c32printer_unlocked(__stream, __string, __localdep_c32len(__string));
+	__result = __localdep_file_c32printer_unlocked(__stream, __string, __localdep_c32slen(__string));
 	return __result;
 }
 __NAMESPACE_LOCAL_END

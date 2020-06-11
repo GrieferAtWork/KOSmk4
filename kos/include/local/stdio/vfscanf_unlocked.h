@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4df16b79 */
+/* HASH CRC-32:0x40b4b7fd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,75 +21,136 @@
 #ifndef __local_vfscanf_unlocked_defined
 #define __local_vfscanf_unlocked_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)))
+#if (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock) || defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: vfscanf from stdio */
-#ifndef __local___localdep_vfscanf_defined
-#define __local___localdep_vfscanf_defined 1
-#ifdef __vfscanf_defined
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
-__NAMESPACE_GLB_USING(vfscanf)
-#define __localdep_vfscanf vfscanf
-#elif defined(__std_vfscanf_defined)
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
-__NAMESPACE_STD_USING(vfscanf)
-#define __localdep_vfscanf vfscanf
-#elif defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfscanf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfscanf_unlocked,(__stream,__format,__args))
-#elif __has_builtin(__builtin_vfscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vfscanf)
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
-__CEIREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfscanf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfscanf,{ return __builtin_vfscanf(__stream, __format, __args); })
-#elif defined(__CRT_HAVE_vfscanf)
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfscanf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfscanf,(__stream,__format,__args))
-#elif defined(__CRT_HAVE__vfscanf)
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfscanf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),_vfscanf,(__stream,__format,__args))
-#elif defined(__CRT_HAVE__vfscanf_s)
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfscanf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),_vfscanf_s,(__stream,__format,__args))
-#elif defined(__CRT_HAVE__IO_vfscanf)
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfscanf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),_IO_vfscanf,(__stream,__format,__args))
-#elif defined(__CRT_HAVE_vfscanf_unlocked)
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfscanf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfscanf_unlocked,(__stream,__format,__args))
-#elif defined(__CRT_HAVE___vfscanf)
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfscanf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),__vfscanf,(__stream,__format,__args))
-#elif (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))
+/* Dependency: format_vscanf from format-printer */
+#ifndef __local___localdep_format_vscanf_defined
+#define __local___localdep_format_vscanf_defined 1
+#ifdef __CRT_HAVE_format_vscanf
 __NAMESPACE_LOCAL_END
-#include <local/stdio/vfscanf.h>
+#include <kos/anno.h>
+#include <bits/format-printer.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Generic scanf implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will call the given `SCANNER' function which in
+ * return should successively yield a character at a time from
+ * some kind of input source.
+ *  - If `SCANNER' returns `< 0', scanning aborts and that value is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may use `SCANNER' to track the last read character to get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `SCANNER' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier reads a `size_t' from the argument list,
+ *                    that specifies the size of the following string buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__CREDIRECT(__ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__localdep_format_vscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vscanf,(__pgetc,__pungetc,__arg,__format,__args))
+#else /* __CRT_HAVE_format_vscanf */
+__NAMESPACE_LOCAL_END
+#include <local/format-printer/format_vscanf.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Generic scanf implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will call the given `SCANNER' function which in
+ * return should successively yield a character at a time from
+ * some kind of input source.
+ *  - If `SCANNER' returns `< 0', scanning aborts and that value is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may use `SCANNER' to track the last read character to get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `SCANNER' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier reads a `size_t' from the argument list,
+ *                    that specifies the size of the following string buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+#define __localdep_format_vscanf __LIBC_LOCAL_NAME(format_vscanf)
+#endif /* !__CRT_HAVE_format_vscanf */
+#endif /* !__local___localdep_format_vscanf_defined */
+/* Dependency: fgetc_unlocked from stdio */
+#ifndef __local___localdep_fgetc_unlocked_defined
+#define __local___localdep_fgetc_unlocked_defined 1
+#ifdef __CRT_HAVE_fgetc_unlocked
+/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_getc_unlocked)
+/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),getc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
+/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),getc,(__stream))
+#elif defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
+/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc,(__stream))
+#elif defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
+/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),_IO_getc,(__stream))
+#elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)
+__NAMESPACE_LOCAL_END
+#include <local/stdio/fgetc_unlocked.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
+#define __localdep_fgetc_unlocked __LIBC_LOCAL_NAME(fgetc_unlocked)
+#else /* ... */
+#undef __local___localdep_fgetc_unlocked_defined
+#endif /* !... */
+#endif /* !__local___localdep_fgetc_unlocked_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if __SIZEOF_SIZE_T__ != __SIZEOF_INT__
+__LOCAL_LIBC(vfscanf_getc_unlocked) __SSIZE_TYPE__
+(__LIBCCALL __vfscanf_getc_unlocked)(void *__arg) {
+	return (__SSIZE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked)((__FILE *)__arg);
+}
+#endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
+__LOCAL_LIBC(vfscanf_ungetc_unlocked) __SSIZE_TYPE__
+(__LIBCCALL __vfscanf_ungetc_unlocked)(void *__arg, __CHAR32_TYPE__ __ch) {
+	return __ungetc_unlocked((int)(unsigned int)__ch, (__FILE *)__arg);
+}
+__NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
-#define __localdep_vfscanf __LIBC_LOCAL_NAME(vfscanf)
-#else /* ... */
-#undef __local___localdep_vfscanf_defined
-#endif /* !... */
-#endif /* !__local___localdep_vfscanf_defined */
 __LOCAL_LIBC(vfscanf_unlocked) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vfscanf_unlocked))(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
-	return __localdep_vfscanf(__stream, __format, __args);
+#if __SIZEOF_SIZE_T__ == __SIZEOF_INT__
+	return __localdep_format_vscanf(*(__pformatgetc)&__localdep_fgetc_unlocked,
+	                     &__NAMESPACE_LOCAL_SYM __vfscanf_ungetc_unlocked,
+	                     (void *)__stream,
+	                     __format, __args);
+#else /* __SIZEOF_SIZE_T__ == __SIZEOF_INT__ */
+	return __localdep_format_vscanf(&__NAMESPACE_LOCAL_SYM __vfscanf_getc_unlocked,
+	                     &__NAMESPACE_LOCAL_SYM __vfscanf_ungetc_unlocked,
+	                     (void *)__stream,
+	                     __format, __args);
+#endif /* !(__SIZEOF_SIZE_T__ == __SIZEOF_INT__) */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vfscanf_unlocked_defined
 #define __local___localdep_vfscanf_unlocked_defined 1
 #define __localdep_vfscanf_unlocked __LIBC_LOCAL_NAME(vfscanf_unlocked)
 #endif /* !__local___localdep_vfscanf_unlocked_defined */
-#else /* __CRT_HAVE_vfscanf || __CRT_HAVE__vfscanf || __CRT_HAVE__vfscanf_s || __CRT_HAVE__IO_vfscanf || __CRT_HAVE_vfscanf_unlocked || __CRT_HAVE___vfscanf || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock || __CRT_HAVE__IO_fread) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock)) */
+#else /* (__CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_HAVE_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE_fgetc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_HAVE__IO_getc && (!__CRT_DOS || !__CRT_HAVE__filbuf)) || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock || __CRT_HAVE__IO_fread || __CRT_HAVE_fread) && (__CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock || __CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc) */
 #undef __local_vfscanf_unlocked_defined
-#endif /* !__CRT_HAVE_vfscanf && !__CRT_HAVE__vfscanf && !__CRT_HAVE__vfscanf_s && !__CRT_HAVE__IO_vfscanf && !__CRT_HAVE_vfscanf_unlocked && !__CRT_HAVE___vfscanf && ((!__CRT_HAVE_fgetc && !__CRT_HAVE_getc && !__CRT_HAVE__IO_getc && !__CRT_HAVE_fgetc_unlocked && !__CRT_HAVE_getc_unlocked && (!__CRT_DOS || !__CRT_HAVE__filbuf) && !__CRT_HAVE_fread && !__CRT_HAVE_fread_unlocked && !__CRT_HAVE__fread_nolock && !__CRT_HAVE__IO_fread) || (!__CRT_HAVE_ungetc && !__CRT_HAVE__IO_ungetc && !__CRT_HAVE_ungetc_unlocked && !__CRT_HAVE__ungetc_nolock)) */
+#endif /* (!__CRT_HAVE_fgetc_unlocked && !__CRT_HAVE_getc_unlocked && (!__CRT_HAVE_getc || (__CRT_DOS && __CRT_HAVE__filbuf)) && (!__CRT_HAVE_fgetc || (__CRT_DOS && __CRT_HAVE__filbuf)) && (!__CRT_HAVE__IO_getc || (__CRT_DOS && __CRT_HAVE__filbuf)) && (!__CRT_DOS || !__CRT_HAVE__filbuf) && !__CRT_HAVE_fread_unlocked && !__CRT_HAVE__fread_nolock && !__CRT_HAVE__IO_fread && !__CRT_HAVE_fread) || (!__CRT_HAVE_ungetc_unlocked && !__CRT_HAVE__ungetc_nolock && !__CRT_HAVE_ungetc && !__CRT_HAVE__IO_ungetc) */
 #endif /* !__local_vfscanf_unlocked_defined */

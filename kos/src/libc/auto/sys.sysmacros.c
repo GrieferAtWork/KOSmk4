@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bb03b40 */
+/* HASH CRC-32:0xb8988f8a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,35 +29,26 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.gnu_dev_major") major_t
+INTERN ATTR_SECTION(".text.crt.system.utility") ATTR_CONST WUNUSED major_t
 NOTHROW(LIBCCALL libc_gnu_dev_major)(dev_t dev) {
-#line 38 "kos/src/libc/magic/sys.sysmacros.c"
 	return (major_t)((uintptr_t)dev >> 20);
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.gnu_dev_minor") minor_t
+INTERN ATTR_SECTION(".text.crt.system.utility") ATTR_CONST WUNUSED minor_t
 NOTHROW(LIBCCALL libc_gnu_dev_minor)(dev_t dev) {
-#line 43 "kos/src/libc/magic/sys.sysmacros.c"
 	return (minor_t)((uintptr_t)dev & ((1 << 20) - 1));
 }
-
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.gnu_dev_makedev") dev_t
-NOTHROW(LIBCCALL libc_gnu_dev_makedev)(major_t major,
-                                       minor_t minor) {
-#line 48 "kos/src/libc/magic/sys.sysmacros.c"
+INTERN ATTR_SECTION(".text.crt.system.utility") ATTR_CONST WUNUSED dev_t
+NOTHROW(LIBCCALL libc_gnu_dev_makedev)(major_t major, minor_t minor) {
 	return (dev_t)major << 20 | (dev_t)minor;
 }
-
 #endif /* !__KERNEL__ */
+
+DECL_END
+
 #ifndef __KERNEL__
 DEFINE_PUBLIC_WEAK_ALIAS(gnu_dev_major, libc_gnu_dev_major);
 DEFINE_PUBLIC_WEAK_ALIAS(gnu_dev_minor, libc_gnu_dev_minor);
 DEFINE_PUBLIC_WEAK_ALIAS(gnu_dev_makedev, libc_gnu_dev_makedev);
 #endif /* !__KERNEL__ */
-
-DECL_END
 
 #endif /* !GUARD_LIBC_AUTO_SYS_SYSMACROS_C */

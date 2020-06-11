@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f125567 */
+/* HASH CRC-32:0xef25cb57 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_STROPTS_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <stropts.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Test whether FILDES is associated with a STREAM-based file */
 INTDEF int NOTHROW(LIBCCALL libc_isastream)(fd_t fildes);
 /* Receive next message from a STREAMS file */
@@ -42,6 +44,7 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fildes, struct strbuf const *
 INTDEF NONNULL((2)) int NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fildes, char const *__restrict path);
 /* Detach a name PATH from a STREAMS-based file descriptor */
 INTDEF NONNULL((1)) int NOTHROW_RPC_KOS(LIBCCALL libc_fdetach)(char const *__restrict path);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

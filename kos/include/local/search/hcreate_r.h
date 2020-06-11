@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x971243de */
+/* HASH CRC-32:0xe18646da */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,16 +45,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_calloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_calloc_defined */
-/* Dependency: isprime from search */
-#ifndef __local___localdep_isprime_defined
-#define __local___localdep_isprime_defined 1
-/* For the used double hash method the table size has to be a prime. To
- * correct the user given table size we need a prime test.  This trivial
- * algorithm is adequate because
- * a)  the code is (most probably) called a few times per program run and
- * b)  the number is small because the table must fit in the core */
-__LOCAL __ATTR_CONST int __NOTHROW_NCX(__LIBCCALL __localdep_isprime)(unsigned int __number) { /* no even number will be passed */ for (unsigned int __div = 3; __div <= __number / __div; __div += 2) { if (__number % __div == 0) return 0; } return 1; }
-#endif /* !__local___localdep_isprime_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __hsearch_data_defined
 #define __hsearch_data_defined 1
@@ -74,6 +64,22 @@ typedef struct entry {
 #endif /* !__ENTRY_defined */
 #include <hybrid/limitcore.h>
 #include <parts/errno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* For the used double hash method the table size has to be a prime. To
+ * correct the user given table size we need a prime test.  This trivial
+ * algorithm is adequate because
+ * a)  the code is (most probably) called a few times per program run and
+ * b)  the number is small because the table must fit in the core */
+__LOCAL_LIBC(__isprime) __ATTR_CONST int
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__isprime))(unsigned int __number) {
+	/* no even number will be passed */
+	for (unsigned int __div = 3; __div <= __number / __div; __div += 2) {
+		if (__number % __div == 0)
+			return 0;
+	}
+	return 1;
+}
+__NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __LOCAL_LIBC(hcreate_r) int
@@ -99,7 +105,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate_r))(__SIZE_TYPE__ __nel, stru
 #endif /* ENOMEM */
 			return 0;
 		}
-		if (__localdep_isprime(__nel))
+		if (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__isprime)(__nel))
 			break;
 	}
 	__htab->size   = __nel;

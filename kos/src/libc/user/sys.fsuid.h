@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81459ce2 */
+/* HASH CRC-32:0x119ad5f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,17 +22,20 @@
 #define GUARD_LIBC_USER_SYS_FSUID_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/fsuid.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Change uid used for file access control to UID, without affecting
  * other privileges (such as who can send signals at the process) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setfsuid)(uid_t uid);
 /* Ditto for group id */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setfsgid)(gid_t gid);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e154624 */
+/* HASH CRC-32:0xfa7a1ee8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_LOCALE_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <locale.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Set and/or return the current locale */
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_setlocale)(int category, char const *locale);
 /* Return the numeric/monetary information for the current locale */
@@ -49,6 +51,7 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_freelocale)(locale_t dataset);
  * for all threads and can also be installed any time, meaning
  * the thread uses the global settings controlled by `setlocale' */
 INTDEF locale_t NOTHROW_NCX(LIBCCALL libc_uselocale)(locale_t dataset);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

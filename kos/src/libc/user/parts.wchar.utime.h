@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5757d696 */
+/* HASH CRC-32:0x60fb0598 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,16 +22,19 @@
 #define GUARD_LIBC_USER_PARTS_WCHAR_UTIME_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <parts/wchar/utime.h>
 
 DECL_BEGIN
 
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_wutime)(char32_t const *filename, struct utimbuf const *file_times);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wutime)(char16_t const *filename, struct utimbuf const *file_times);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_wutime64)(char32_t const *filename, struct utimbuf64 const *file_times);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wutime64)(char16_t const *filename, struct utimbuf64 const *file_times);
+#ifndef __KERNEL__
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd__wutime32)(char16_t const *filename, struct utimbuf const *file_times);
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wutime)(char32_t const *filename, struct utimbuf const *file_times);
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd__wutime64)(char16_t const *filename, struct utimbuf64 const *file_times);
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wutime64)(char32_t const *filename, struct utimbuf64 const *file_times);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

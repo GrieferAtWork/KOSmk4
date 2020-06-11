@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4cd3e2a */
+/* HASH CRC-32:0x6e469b2f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,15 +24,19 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "unistd.h"
+#include "../user/unistd.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.system.configuration.getdtablesize") int
+/* >> getpagesize(3)
+ * Return the size of a PAGE (in bytes) */
+INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_getpagesize)(void) {
+	return __ARCH_PAGESIZE;
+}
+INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void) {
-#line 1452 "kos/src/libc/magic/unistd.c"
 #if defined(__KOS__)
 	return 0x7fffffff; /* INT_MAX */
 #elif defined(__linux__) || defined(__linux) || defined(linux)
@@ -41,16 +45,11 @@ NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void) {
 	return 256;        /* UINT8_MAX + 1 */
 #endif
 }
-
 /* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.swab") void
-NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
-                                void *__restrict to,
-                                __STDC_INT_AS_SSIZE_T n_bytes) {
-#line 1717 "kos/src/libc/magic/unistd.c"
+INTERN ATTR_SECTION(".text.crt.string.memory") NONNULL((1, 2)) void
+NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from, void *__restrict to, __STDC_INT_AS_SSIZE_T n_bytes) {
 	n_bytes &= ~1;
 	while (n_bytes >= 2) {
 		byte_t a, b;
@@ -60,14 +59,16 @@ NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
 		((byte_t *)to)[n_bytes+1] = b;
 	}
 }
-
-#endif /* !__KERNEL__ */
-#ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(getdtablesize, libc_getdtablesize);
-DEFINE_PUBLIC_WEAK_ALIAS(swab, libc_swab);
-DEFINE_PUBLIC_WEAK_ALIAS(_swab, libc_swab);
 #endif /* !__KERNEL__ */
 
 DECL_END
+
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(__getpagesize, libc_getpagesize);
+DEFINE_PUBLIC_WEAK_ALIAS(getpagesize, libc_getpagesize);
+DEFINE_PUBLIC_WEAK_ALIAS(getdtablesize, libc_getdtablesize);
+DEFINE_PUBLIC_WEAK_ALIAS(_swab, libc_swab);
+DEFINE_PUBLIC_WEAK_ALIAS(swab, libc_swab);
+#endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_UNISTD_C */

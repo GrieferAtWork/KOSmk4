@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4df79a8 */
+/* HASH CRC-32:0xe1aee1d3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,19 +22,33 @@
 #define __local_twalk_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: trecurse from search */
-#ifndef __local___localdep_trecurse_defined
-#define __local___localdep_trecurse_defined 1
 /* Walk the nodes of a tree.
  * ROOT is the root of the tree to be walked, ACTION the function to be
  * called at each node. LEVEL is the level of ROOT in the whole tree */
-__LOCAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL __localdep_trecurse)(void const *__root, __action_fn_t __action, int __level) { void *__l, *__r; __l = ((void **)__root)[1]; __r = ((void **)__root)[2]; if (!__l && !__r) (*__action)(__root, (VISIT)leaf, __level); else { (*__action)(__root, (VISIT)preorder, __level); if (__l != __NULLPTR) __localdep_trecurse(__l, __action, __level+1); (*__action)(__root, (VISIT)postorder, __level); if (__r != __NULLPTR) __localdep_trecurse(__r, __action, __level+1); (*__action)(__root, (VISIT)endorder, __level); } }
-#endif /* !__local___localdep_trecurse_defined */
+__LOCAL_LIBC(__trecurse) __ATTR_NONNULL((1, 2)) void
+__LIBC_LOCAL_NAME(__trecurse)(void const *__root, __action_fn_t __action, int __level) {
+	void *__l, *__r;
+	__l = ((void **)__root)[1];
+	__r = ((void **)__root)[2];
+	if (!__l && !__r) {
+		(*__action)(__root, (VISIT)3, __level);
+	} else {
+		(*__action)(__root, (VISIT)0, __level);
+		if (__l != __NULLPTR)
+			__trecurse(__l, __action, __level + 1);
+		(*__action)(__root, (VISIT)1, __level);
+		if (__r != __NULLPTR)
+			__trecurse(__r, __action, __level + 1);
+		(*__action)(__root, (VISIT)2, __level);
+	}
+}
+__NAMESPACE_LOCAL_END
+__NAMESPACE_LOCAL_BEGIN
 /* Walk through the whole tree and call the ACTION callback for every node or leaf */
 __LOCAL_LIBC(twalk) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(twalk))(void const *__root, __action_fn_t __action) {
 	if (__root && __action)
-		__localdep_trecurse(__root, __action, 0);
+		__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__trecurse)(__root, __action, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_twalk_defined

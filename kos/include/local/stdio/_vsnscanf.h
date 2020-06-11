@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ddbeb41 */
+/* HASH CRC-32:0x25fda23f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -121,7 +121,6 @@ __NAMESPACE_LOCAL_END
 #include <asm/stdio.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-
 struct __vsnscanf_data {
 	char const *__ptr;
 	char const *__end;

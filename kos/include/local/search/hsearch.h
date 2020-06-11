@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf49f0fe */
+/* HASH CRC-32:0x2572cde1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,10 +52,8 @@ struct hsearch_data {
 #ifndef __local_htab_defined
 #define __local_htab_defined 1
 __NAMESPACE_LOCAL_BEGIN
-
 __LOCAL_LIBC_DATA(__htab) struct hsearch_data __htab = {__NULLPTR, 0, 0};
 __NAMESPACE_LOCAL_END
-
 #endif /* !__local_htab_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Search for entry matching ITEM.key in internal hash table.
@@ -64,7 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(hsearch) struct entry *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch))(struct entry __item, int __action) {
 	struct entry *__result;
-	__localdep_hsearch_r(__item, __action, &__result, &__htab);
+	__localdep_hsearch_r(__item, __action, &__result, &__NAMESPACE_LOCAL_SYM __htab);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b3b6795 */
+/* HASH CRC-32:0x8f44d7a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_SYS_TIME_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/time.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Get the current time of day and timezone information,
  * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
  * Returns 0 on success, -1 on errors.
@@ -88,6 +90,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_lutimes64)(char const *file, s
 INTDEF int NOTHROW_NCX(LIBCCALL libc_futimes64)(fd_t fd, struct timeval64 const tvp[2]);
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_futimesat64)(fd_t fd, char const *file, struct timeval64 const tvp[2]);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

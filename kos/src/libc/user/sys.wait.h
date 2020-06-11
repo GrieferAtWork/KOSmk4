@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdccdf009 */
+/* HASH CRC-32:0x7f813a13 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_SYS_WAIT_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/wait.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */
 INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_wait)(__WAIT_STATUS stat_loc);
 /* Wait for a child process:
@@ -36,21 +38,22 @@ INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_wait)(__WAIT_STATUS stat_loc);
  *  - `pid == 0':  Wait for any child process whose process group ID is that of the caller
  *  - `pid > 0':   Wait for the child whose process ID is equal to `PID'
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_waitpid)(pid_t pid, __WAIT_STATUS stat_loc, int options);
-/* @param options: At least one of `WEXITED|WSTOPPED|WCONTINUED', optionally or'd with `WNOHANG|WNOWAIT' */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_waitid)(idtype_t idtype, id_t id, siginfo_t *infop, int options);
+INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_waitpid)(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options);
+/* @param options: At least one of `WEXITED | WSTOPPED | WCONTINUED',
+ *                 optionally or'd with `WNOHANG | WNOWAIT' */
+INTDEF int NOTHROW_RPC(LIBCCALL libc_waitid)(idtype_t idtype, id_t id, siginfo_t *infop, __STDC_INT_AS_UINT_T options);
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_wait3)(__WAIT_STATUS stat_loc, int options, struct rusage *usage);
+ * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_wait3)(__WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage);
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_wait3_64)(__WAIT_STATUS stat_loc, int options, struct rusage64 *usage);
+ * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_wait3_64)(__WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage);
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid, __WAIT_STATUS stat_loc, int options, struct rusage *usage);
+INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage);
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid, __WAIT_STATUS stat_loc, int options, struct rusage64 *usage);
+INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage);
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -140,6 +143,7 @@ INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid, __WAIT_STATUS stat_l
  *                              and exited, or that the `PID' is just invalid (which
  *                              would also be the case if it was valid at some point) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_detach)(pid_t pid);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

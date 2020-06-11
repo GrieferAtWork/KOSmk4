@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x792ad3c6 */
+/* HASH CRC-32:0x122cd507 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_SYS_RANDOM_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/random.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Ask the kernel for up to `NUM_BYTES' bytes of random data, which
  * should then be written to `BUFFER'.
  * @param: FLAGS: Set of `GRND_NONBLOCK | GRND_RANDOM'
@@ -50,6 +52,7 @@ INTDEF WUNUSED NONNULL((1)) ssize_t NOTHROW_NCX(LIBCCALL libc_getrandom)(void *b
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_getentropy)(void *buf, size_t num_bytes);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

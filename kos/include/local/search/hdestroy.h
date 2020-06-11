@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2e1be22 */
+/* HASH CRC-32:0xbeeef6a4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,16 +52,14 @@ struct hsearch_data {
 #ifndef __local_htab_defined
 #define __local_htab_defined 1
 __NAMESPACE_LOCAL_BEGIN
-
 __LOCAL_LIBC_DATA(__htab) struct hsearch_data __htab = {__NULLPTR, 0, 0};
 __NAMESPACE_LOCAL_END
-
 #endif /* !__local_htab_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Destroy current internal hashing table */
 __LOCAL_LIBC(hdestroy) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hdestroy))(void) {
-	__localdep_hdestroy_r(&__htab);
+	__localdep_hdestroy_r(&__NAMESPACE_LOCAL_SYM __htab);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_hdestroy_defined

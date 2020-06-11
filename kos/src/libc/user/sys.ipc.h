@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48ac204b */
+/* HASH CRC-32:0xebff6211 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,17 @@
 #define GUARD_LIBC_USER_SYS_IPC_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/ipc.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Generates key for System V style IPC */
-INTDEF NONNULL((1)) key_t NOTHROW_RPC(LIBCCALL libc_ftok)(char const *pathname, int proj_id);
+INTDEF NONNULL((1)) key_t NOTHROW_RPC(LIBCCALL libc_ftok)(char const *pathname, __STDC_INT_AS_UINT_T proj_id);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

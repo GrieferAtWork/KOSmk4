@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f0180d2 */
+/* HASH CRC-32:0x9773aeba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,84 +25,138 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "search.h"
-#include "string.h"
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
 /* Insert ELEM into a doubly-linked list, after PREV */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.insque") void
-NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem,
-                                  void *prev) {
-#line 109 "kos/src/libc/magic/search.c"
-	struct libc_link {
-		struct libc_link *l_forw; /* [0..1] Forward link */
-		struct libc_link *l_back; /* [0..1] Backward link */
+INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem, void *prev) {
+	struct link {
+		struct link *l_forw; /* [0..1] Forward link */
+		struct link *l_back; /* [0..1] Backward link */
 	};
 	if (prev) {
-		struct libc_link *next;
-		next = ((struct libc_link *)prev)->l_forw;
-		((struct libc_link *)elem)->l_back = (struct libc_link *)prev;
-		((struct libc_link *)elem)->l_forw = next;
-		((struct libc_link *)prev)->l_forw = (struct libc_link *)elem;
+		struct link *next;
+		next = ((struct link *)prev)->l_forw;
+		((struct link *)elem)->l_back = (struct link *)prev;
+		((struct link *)elem)->l_forw = next;
+		((struct link *)prev)->l_forw = (struct link *)elem;
 		if (next)
-			next->l_back = (struct libc_link *)elem;
+			next->l_back = (struct link *)elem;
 	} else {
-		((struct libc_link *)elem)->l_back = NULL;
-		((struct libc_link *)elem)->l_forw = NULL;
+		((struct link *)elem)->l_back = NULL;
+		((struct link *)elem)->l_forw = NULL;
 	}
 }
-
 /* Unlink ELEM from the doubly-linked list that it is in */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.remque") void
+INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_remque)(void *__restrict elem) {
-#line 129 "kos/src/libc/magic/search.c"
-	struct libc_link {
-		struct libc_link *l_forw; /* [0..1] Forward link */
-		struct libc_link *l_back; /* [0..1] Backward link */
+	struct link {
+		struct link *l_forw; /* [0..1] Forward link */
+		struct link *l_back; /* [0..1] Backward link */
 	};
-	struct libc_link *prev, *next;
-	prev = ((struct libc_link *)elem)->l_back;
-	next = ((struct libc_link *)elem)->l_forw;
+	struct link *prev, *next;
+	prev = ((struct link *)elem)->l_back;
+	next = ((struct link *)elem)->l_forw;
 	if (prev)
 		prev->l_forw = next;
 	if (next)
 		next->l_back = prev;
 }
-
-/* For the used double hash method the table size has to be a prime. To
- * correct the user given table size we need a prime test.  This trivial
- * algorithm is adequate because
- * a)  the code is (most probably) called a few times per program run and
- * b)  the number is small because the table must fit in the core */
-INTERN ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.isprime") int
-NOTHROW_NCX(LIBCCALL libc_isprime)(unsigned int number) {
-#line 256 "kos/src/libc/magic/search.c"
-	/* no even number will be passed */
-	for (unsigned int div = 3; div <= number / div; div += 2) {
-		if (number % div == 0)
-			return 0;
-	}
-	return 1;
+#ifndef __hsearch_data_defined
+#define __hsearch_data_defined 1
+struct _ENTRY;
+struct hsearch_data {
+	struct _ENTRY  *table;
+	__UINT32_TYPE__ size;
+	__UINT32_TYPE__ filled;
+};
+#endif /* !__hsearch_data_defined */
+#ifndef __local_htab_defined
+#define __local_htab_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC_DATA(htab) struct hsearch_data htab = {NULL, 0, 0};
+__NAMESPACE_LOCAL_END
+#endif /* !__local_htab_defined */
+/* Search for entry matching ITEM.key in internal hash table.
+ * If ACTION is `FIND' return found entry or signal error by returning NULL.
+ * If ACTION is `ENTER' replace existing data (if any) with ITEM.data */
+INTERN ATTR_SECTION(".text.crt.utility.search") ENTRY *
+NOTHROW_NCX(LIBCCALL libc_hsearch)(ENTRY item, ACTION action) {
+	ENTRY *result;
+	hsearch_r(item, action, &result, &__NAMESPACE_LOCAL_SYM htab);
+	return result;
 }
-
+#ifndef __hsearch_data_defined
+#define __hsearch_data_defined 1
+struct _ENTRY;
+struct hsearch_data {
+	struct _ENTRY  *table;
+	__UINT32_TYPE__ size;
+	__UINT32_TYPE__ filled;
+};
+#endif /* !__hsearch_data_defined */
+#ifndef __local_htab_defined
+#define __local_htab_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC_DATA(htab) struct hsearch_data htab = {NULL, 0, 0};
+__NAMESPACE_LOCAL_END
+#endif /* !__local_htab_defined */
+/* Create a new hashing table which will at most contain NEL elements */
+INTERN ATTR_SECTION(".text.crt.utility.search") int
+NOTHROW_NCX(LIBCCALL libc_hcreate)(size_t nel) {
+	return hcreate_r(nel, &__NAMESPACE_LOCAL_SYM htab);
+}
+#ifndef __hsearch_data_defined
+#define __hsearch_data_defined 1
+struct _ENTRY;
+struct hsearch_data {
+	struct _ENTRY  *table;
+	__UINT32_TYPE__ size;
+	__UINT32_TYPE__ filled;
+};
+#endif /* !__hsearch_data_defined */
+#ifndef __local_htab_defined
+#define __local_htab_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC_DATA(htab) struct hsearch_data htab = {NULL, 0, 0};
+__NAMESPACE_LOCAL_END
+#endif /* !__local_htab_defined */
+/* Destroy current internal hashing table */
+INTERN ATTR_SECTION(".text.crt.utility.search") void
+NOTHROW_NCX(LIBCCALL libc_hdestroy)(void) {
+	hdestroy_r(&__NAMESPACE_LOCAL_SYM htab);
+}
 #include <parts/errno.h>
+#ifndef __hsearch_data_defined
+#define __hsearch_data_defined 1
+struct _ENTRY;
+struct hsearch_data {
+	struct _ENTRY  *table;
+	__UINT32_TYPE__ size;
+	__UINT32_TYPE__ filled;
+};
+#endif /* !__hsearch_data_defined */
+#ifndef __ENTRY_defined
+#define __ENTRY_defined 1
+typedef struct entry {
+	char *key;
+	void *data;
+} ENTRY;
+#endif /* !__ENTRY_defined */
 /* Reentrant versions which can handle multiple hashing tables at the same time */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.hsearch_r") int
-NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
-                                     ACTION action,
-                                     ENTRY **retval,
-                                     struct hsearch_data *htab) {
-#line 267 "kos/src/libc/magic/search.c"
+INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3, 4)) int
+NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab) {
 	typedef struct {
 		unsigned int used;
 		ENTRY        entry;
 	} entry_type;
 	unsigned int hval, count, idx;
-	unsigned int len = libc_strlen(item.key);
+	unsigned int len = strlen(item.key);
 	hval = count = len;
 	while (count-- > 0) {
 		hval <<= 4;
@@ -114,7 +168,7 @@ NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
 	if (((entry_type *)htab->table)[idx].used) {
 		unsigned int hval2, first_idx;
 		if (((entry_type *)htab->table)[idx].used == hval &&
-		    libc_strcmp(item.key, ((entry_type *)htab->table)[idx].entry.key) == 0) {
+		    strcmp(item.key, ((entry_type *)htab->table)[idx].entry.key) == 0) {
 			*retval = &((entry_type *)htab->table)[idx].entry;
 			return 1;
 		}
@@ -128,13 +182,13 @@ NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
 			if (idx == first_idx)
 				break;
 			if (((entry_type *)htab->table)[idx].used == hval &&
-			    libc_strcmp(item.key, ((entry_type *)htab->table)[idx].entry.key) == 0) {
+			    strcmp(item.key, ((entry_type *)htab->table)[idx].entry.key) == 0) {
 				*retval = &((entry_type *)htab->table)[idx].entry;
 				return 1;
 			}
 		} while (((entry_type *)htab->table)[idx].used);
 	}
-	if (action == ENTER) {
+	if (action == 1) {
 		if (htab->filled == htab->size) {
 #ifdef ENOMEM
 			__libc_seterrno(ENOMEM);
@@ -154,26 +208,111 @@ NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
 	*retval = NULL;
 	return 0;
 }
-
+#ifndef __hsearch_data_defined
+#define __hsearch_data_defined 1
+struct _ENTRY;
+struct hsearch_data {
+	struct _ENTRY  *table;
+	__UINT32_TYPE__ size;
+	__UINT32_TYPE__ filled;
+};
+#endif /* !__hsearch_data_defined */
+#ifndef __ENTRY_defined
+#define __ENTRY_defined 1
+typedef struct entry {
+	char *key;
+	void *data;
+} ENTRY;
+#endif /* !__ENTRY_defined */
+#include <hybrid/limitcore.h>
+#include <parts/errno.h>
+__NAMESPACE_LOCAL_BEGIN
+/* For the used double hash method the table size has to be a prime. To
+ * correct the user given table size we need a prime test.  This trivial
+ * algorithm is adequate because
+ * a)  the code is (most probably) called a few times per program run and
+ * b)  the number is small because the table must fit in the core */
+__LOCAL_LIBC(isprime) ATTR_CONST int
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isprime))(unsigned int number) {
+	/* no even number will be passed */
+	for (unsigned int div = 3; div <= number / div; div += 2) {
+		if (number % div == 0)
+			return 0;
+	}
+	return 1;
+}
+__NAMESPACE_LOCAL_END
+/* Reentrant versions which can handle multiple hashing tables at the same time */
+INTERN ATTR_SECTION(".text.crt.utility.search") int
+NOTHROW_NCX(LIBCCALL libc_hcreate_r)(size_t nel, struct hsearch_data *htab) {
+	typedef struct {
+		unsigned int used;
+		ENTRY        entry;
+	} entry_type;
+	if (htab == NULL) {
+#ifdef EINVAL
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
+		return 0;
+	}
+	if (htab->table != NULL)
+		return 0;
+	if (nel < 3)
+		nel = 3;
+	for (nel |= 1; ; nel += 2) {
+		if (UINT_MAX - 2 < nel) {
+#ifdef ENOMEM
+			__libc_seterrno(ENOMEM);
+#endif /* ENOMEM */
+			return 0;
+		}
+		if (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isprime)(nel))
+			break;
+	}
+	htab->size   = nel;
+	htab->filled = 0;
+	htab->table  = (struct _ENTRY *)calloc(htab->size+1, sizeof(entry_type));
+	if (htab->table == NULL)
+		return 0;
+	return 1;
+}
+#ifndef __hsearch_data_defined
+#define __hsearch_data_defined 1
+struct _ENTRY;
+struct hsearch_data {
+	struct _ENTRY  *table;
+	__UINT32_TYPE__ size;
+	__UINT32_TYPE__ filled;
+};
+#endif /* !__hsearch_data_defined */
+#include <parts/errno.h>
+/* Reentrant versions which can handle multiple hashing tables at the same time */
+INTERN ATTR_SECTION(".text.crt.utility.search") void
+NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab) {
+	if (htab == NULL) {
+#ifdef EINVAL
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
+		return;
+	}
+	free(htab->table);
+	htab->table = NULL;
+}
+__NAMESPACE_LOCAL_BEGIN
 /* Possibly "split" a node with two red successors, and/or fix up two red
  * edges in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
  * and GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
  * comparison values that determined which way was taken in the tree to reach
  * ROOTP. MODE is 1 if we need not do the split, but must check for two red
  * edges between GPARENTP and ROOTP */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.maybe_split_for_insert") void
-NOTHROW_NCX(LIBCCALL libc_maybe_split_for_insert)(void **rootp,
-                                                  void **parentp,
-                                                  void **gparentp,
-                                                  int p_r,
-                                                  int gp_r,
-                                                  int mode) {
-#line 392 "kos/src/libc/magic/search.c"
-	typedef struct node_struct {
-		void const         *key;
-		struct node_struct *left_node;
-		struct node_struct *right_node;
-		__UINTPTR_TYPE__    is_red;
+__LOCAL_LIBC(maybe_split_for_insert) NONNULL((1)) void
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(maybe_split_for_insert))(void **rootp, /*nullable*/ void **parentp,
+                                                                    void **gparentp, int p_r, int gp_r, int mode) {
+	typedef struct __node_struct {
+		void const           *key;
+		struct __node_struct *left_node;
+		struct __node_struct *right_node;
+		__UINTPTR_TYPE__      is_red;
 	} *node;
 	node root = *(node *)rootp;
 	node *rp, *lp;
@@ -222,19 +361,72 @@ NOTHROW_NCX(LIBCCALL libc_maybe_split_for_insert)(void **rootp,
 		}
 	}
 }
-
+__NAMESPACE_LOCAL_END
+/* Search for an entry matching the given KEY in the tree
+ * pointed to by *ROOTP and insert a new element if not found */
+INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
+NOTHROW_NCX(LIBCCALL libc_tsearch)(void const *key, void **vrootp, __compar_fn_t compar) {
+	typedef struct __node_struct {
+		void const           *key;
+		struct __node_struct *left_node;
+		struct __node_struct *right_node;
+		__UINTPTR_TYPE__      is_red;
+	} *node;
+	node q, root;
+	node *parentp = NULL, *gparentp = NULL;
+	node *rootp = (node *)vrootp;
+	node *nextp;
+	int r = 0, p_r = 0, gp_r = 0;
+	if (rootp == NULL)
+		return NULL;
+	root = *rootp;
+	if (root != NULL)
+		root->is_red = 0;
+	nextp = rootp;
+	while (*nextp != NULL) {
+		root = *rootp;
+		r = (*compar)(key, root->key);
+		if (r == 0)
+			return root;
+		__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(maybe_split_for_insert)((void **)rootp,
+		                                                                (void **)parentp,
+		                                                                (void **)gparentp,
+		                                                                p_r, gp_r, 0);
+		nextp = r < 0 ? &root->left_node
+		              : &root->right_node;
+		if (*nextp == NULL)
+			break;
+		gparentp = parentp;
+		parentp = rootp;
+		rootp = nextp;
+		gp_r = p_r;
+		p_r = r;
+	}
+	q = (node)malloc(sizeof(struct __node_struct));
+	if (q != NULL) {
+		*nextp = q;
+		q->key = key;
+		q->is_red = 1;
+		q->left_node = NULL;
+		q->right_node = NULL;
+		if (nextp != rootp) {
+			__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(maybe_split_for_insert)((void **)nextp,
+			                                                                (void **)rootp,
+			                                                                (void **)parentp,
+			                                                                r, p_r, 1);
+		}
+	}
+	return q;
+}
 /* Search for an entry matching the given KEY in the tree pointed
  * to by *ROOTP. If no matching entry is available return NULL */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.tfind") void *
-NOTHROW_NCX(LIBCCALL libc_tfind)(void const *key,
-                                 void *const *vrootp,
-                                 __compar_fn_t compar) {
-#line 502 "kos/src/libc/magic/search.c"
-	typedef struct node_struct {
-		void const         *key;
-		struct node_struct *left_node;
-		struct node_struct *right_node;
-		__UINTPTR_TYPE__    is_red;
+INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
+NOTHROW_NCX(LIBCCALL libc_tfind)(void const *key, void *const *vrootp, __compar_fn_t compar) {
+	typedef struct __node_struct {
+		void const           *key;
+		struct __node_struct *left_node;
+		struct __node_struct *right_node;
+		__UINTPTR_TYPE__      is_red;
 	} *node;
 	node root, *rootp = (node *)vrootp;
 	if (rootp == NULL)
@@ -243,55 +435,242 @@ NOTHROW_NCX(LIBCCALL libc_tfind)(void const *key,
 		int r = (*compar)(key, root->key);
 		if (r == 0)
 			return root;
-		rootp = r < 0
-			? &root->left_node
-			: &root->right_node
-			;
+		rootp = r < 0 ? &root->left_node
+		              : &root->right_node;
 	}
 	return NULL;
 }
-
+#include <hybrid/typecore.h>
+#include <parts/malloca.h>
+/* Remove the element matching KEY from the tree pointed to by *ROOTP */
+INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
+NOTHROW_NCX(LIBCCALL libc_tdelete)(void const *__restrict key, void **__restrict vrootp, __compar_fn_t compar) {
+	typedef struct __node_struct {
+		void const           *key;
+		struct __node_struct *left_node;
+		struct __node_struct *right_node;
+		__UINTPTR_TYPE__      is_red;
+	} *node;
+	node p, q, r, retval;
+	node root, unchained;
+	node *rootp = (node *)vrootp;
+	int cmp, stacksize = 40, sp = 0;
+	node **nodestack;
+	if (rootp == NULL)
+		return NULL;
+	p = *rootp;
+	if (p == NULL)
+		return NULL;
+	nodestack = (node **)__malloca(sizeof(node *) * stacksize);
+	if unlikely(!nodestack)
+		return NULL;
+	root = p;
+	while ((cmp = (*compar)(key, root->key)) != 0) {
+		if (sp == stacksize) {
+			node **newstack;
+			stacksize += 20;
+			newstack = (node **)__malloca(sizeof(node *) * stacksize);
+			if unlikely(!newstack) {
+				retval = NULL;
+				goto done;
+			}
+			memcpyc(newstack, nodestack, sp, sizeof(node *));
+			__freea(nodestack);
+			nodestack = newstack;
+		}
+		nodestack[sp++] = rootp;
+		p = *rootp;
+		rootp = cmp < 0 ? &p->left_node
+		                : &p->right_node;
+		root = *rootp;
+		if (root == NULL)
+			return NULL;
+	}
+	retval = p;
+	root = *rootp;
+	r = root->right_node;
+	q = root->left_node;
+	if (q == NULL || r == NULL)
+		unchained = root;
+	else {
+		node *parentp = rootp, *up = &root->right_node;
+		node upn;
+		for (;;) {
+			if (sp == stacksize) {
+				node **newstack;
+				stacksize += 20;
+				newstack = (node **)__malloca(sizeof(node *) * stacksize);
+				if unlikely(!newstack) {
+					retval = NULL;
+					goto done;
+				}
+				memcpyc(newstack, nodestack, sp, sizeof(node *));
+				__freea(nodestack);
+				nodestack = newstack;
+			}
+			nodestack[sp++] = parentp;
+			parentp = up;
+			upn = *up;
+			if (upn->left_node == NULL)
+				break;
+			up = &upn->left_node;
+		}
+		unchained = *up;
+	}
+	r = unchained->left_node;
+	if (r == NULL)
+		r = unchained->right_node;
+	if (sp == 0)
+		*rootp = r;
+	else {
+		q = *nodestack[sp-1];
+		if (unchained == q->right_node)
+			q->right_node = r;
+		else
+			q->left_node = r;
+	}
+	if (unchained != root)
+		root->key = unchained->key;
+	if (!unchained->is_red) {
+		while (sp > 0 && (r == NULL || !r->is_red)) {
+			node *pp = nodestack[sp - 1];
+			p = *pp;
+			if (r == p->left_node) {
+				q = p->right_node;
+				if (q->is_red) {
+					q->is_red = 0;
+					p->is_red = 1;
+					p->right_node = q->left_node;
+					q->left_node = p;
+					*pp = q;
+					nodestack[sp++] = pp = &q->left_node;
+					q = p->right_node;
+				}
+				if ((q->left_node == NULL || !q->left_node->is_red) &&
+					(q->right_node == NULL || !q->right_node->is_red)) {
+					q->is_red = 1;
+					r = p;
+				} else {
+					if (q->right_node == NULL || !q->right_node->is_red) {
+						node q2 = q->left_node;
+						q2->is_red = p->is_red;
+						p->right_node = q2->left_node;
+						q->left_node = q2->right_node;
+						q2->right_node = q;
+						q2->left_node = p;
+						*pp = q2;
+						p->is_red = 0;
+					} else {
+						q->is_red = p->is_red;
+						p->is_red = 0;
+						q->right_node->is_red = 0;
+						p->right_node = q->left_node;
+						q->left_node = p;
+						*pp = q;
+					}
+					sp = 1;
+					r = NULL;
+				}
+			} else {
+				q = p->left_node;
+				if (q->is_red) {
+					q->is_red = 0;
+					p->is_red = 1;
+					p->left_node = q->right_node;
+					q->right_node = p;
+					*pp = q;
+					nodestack[sp++] = pp = &q->right_node;
+					q = p->left_node;
+				}
+				if ((q->right_node == NULL || !q->right_node->is_red) &&
+				    (q->left_node == NULL || !q->left_node->is_red)) {
+					q->is_red = 1;
+					r = p;
+				} else {
+					if (q->left_node == NULL || !q->left_node->is_red) {
+						node q2 = q->right_node;
+						q2->is_red = p->is_red;
+						p->left_node = q2->right_node;
+						q->right_node = q2->left_node;
+						q2->left_node = q;
+						q2->right_node = p;
+						*pp = q2;
+						p->is_red = 0;
+					} else {
+						q->is_red = p->is_red;
+						p->is_red = 0;
+						q->left_node->is_red = 0;
+						p->left_node = q->right_node;
+						q->right_node = p;
+						*pp = q;
+					}
+					sp = 1;
+					r = NULL;
+				}
+			}
+			--sp;
+		}
+		if (r != NULL)
+			r->is_red = 0;
+	}
+	free(unchained);
+done:
+	__freea(nodestack);
+	return retval;
+}
+__NAMESPACE_LOCAL_BEGIN
 /* Walk the nodes of a tree.
  * ROOT is the root of the tree to be walked, ACTION the function to be
  * called at each node. LEVEL is the level of ROOT in the whole tree */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.trecurse") void
-NOTHROW_NCX(LIBCCALL libc_trecurse)(void const *root,
-                                    __action_fn_t action,
-                                    int level) {
-#line 716 "kos/src/libc/magic/search.c"
+__LOCAL_LIBC(trecurse) NONNULL((1, 2)) void
+__LIBC_LOCAL_NAME(trecurse)(void const *root, __action_fn_t action, int level) {
 	void *l, *r;
 	l = ((void **)root)[1];
 	r = ((void **)root)[2];
-	if (!l && !r)
-		(*action)(root, (VISIT)leaf, level);
-	else {
-		(*action)(root, (VISIT)preorder, level);
+	if (!l && !r) {
+		(*action)(root, (VISIT)3, level);
+	} else {
+		(*action)(root, (VISIT)0, level);
 		if (l != NULL)
-			libc_trecurse(l, action, level+1);
-		(*action)(root, (VISIT)postorder, level);
+			trecurse(l, action, level + 1);
+		(*action)(root, (VISIT)1, level);
 		if (r != NULL)
-			libc_trecurse(r, action, level+1);
-		(*action)(root, (VISIT)endorder, level);
+			trecurse(r, action, level + 1);
+		(*action)(root, (VISIT)2, level);
 	}
 }
-
+__NAMESPACE_LOCAL_END
 /* Walk through the whole tree and call the ACTION callback for every node or leaf */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.twalk") void
-NOTHROW_NCX(LIBCCALL libc_twalk)(void const *root,
-                                 __action_fn_t action) {
-#line 735 "kos/src/libc/magic/search.c"
+INTERN ATTR_SECTION(".text.crt.utility.search") void
+NOTHROW_NCX(LIBCCALL libc_twalk)(void const *root, __action_fn_t action) {
 	if (root && action)
-		libc_trecurse(root, action, 0);
+		__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trecurse)(root, action, 0);
 }
-
+/* Destroy the whole tree, call FREEFCT for each node or leaf */
+INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2)) void
+NOTHROW_NCX(LIBCCALL libc_tdestroy)(void *root, __free_fn_t freefct) {
+again:
+	if (root) {
+		void *l, *r;
+		l = ((void **)root)[1];
+		r = ((void **)root)[2];
+		(*freefct)(((void **)root)[0]);
+		free(root);
+		if (l) {
+			if (r)
+				tdestroy(r, freefct);
+			root = l;
+			goto again;
+		}
+		if (r) {
+			root = r;
+			goto again;
+		}
+	}
+}
 /* Perform linear search for KEY by comparing by COMPAR in an array [BASE, BASE+NMEMB*SIZE) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.lfind") void *
-NOTHROW_NCX(LIBCCALL libc_lfind)(void const *key,
-                                 void const *base,
-                                 size_t *nmemb,
-                                 size_t size,
-                                 __compar_fn_t compar) {
-#line 776 "kos/src/libc/magic/search.c"
+INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2, 3, 5)) void *
+NOTHROW_NCX(LIBCCALL libc_lfind)(void const *key, void const *base, size_t __KOS_FIXED_CONST *nmemb, size_t size, __compar_fn_t compar) {
 	size_t i, count = *nmemb;
 	void const *result = base;
 	for (i = 0; i < count; ++i) {
@@ -301,38 +680,42 @@ NOTHROW_NCX(LIBCCALL libc_lfind)(void const *key,
 	}
 	return NULL;
 }
-
 /* Perform linear search for KEY by comparing by COMPAR function
  * in array [BASE, BASE+NMEMB*SIZE) and insert entry if not found */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.lsearch") void *
-NOTHROW_NCX(LIBCCALL libc_lsearch)(void const *key,
-                                   void *base,
-                                   size_t *nmemb,
-                                   size_t size,
-                                   __compar_fn_t compar) {
-#line 789 "kos/src/libc/magic/search.c"
+INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2, 3, 5)) void *
+NOTHROW_NCX(LIBCCALL libc_lsearch)(void const *key, void *base, size_t *nmemb, size_t size, __compar_fn_t compar) {
 	void *result;
-	result = libc_lfind(key, base, nmemb, size, compar);
+	result = lfind(key, base, nmemb, size, compar);
 	if (result == NULL) {
 		result = memcpy((byte_t *)base + (*nmemb) * size, key, size);
 		++(*nmemb);
 	}
 	return result;
 }
-
-#endif /* !__KERNEL__ */
-#ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(insque, libc_insque);
-DEFINE_PUBLIC_WEAK_ALIAS(remque, libc_remque);
-DEFINE_PUBLIC_WEAK_ALIAS(hsearch_r, libc_hsearch_r);
-DEFINE_PUBLIC_WEAK_ALIAS(tfind, libc_tfind);
-DEFINE_PUBLIC_WEAK_ALIAS(__tfind, libc_tfind);
-DEFINE_PUBLIC_WEAK_ALIAS(twalk, libc_twalk);
-DEFINE_PUBLIC_WEAK_ALIAS(__twalk, libc_twalk);
-DEFINE_PUBLIC_WEAK_ALIAS(lfind, libc_lfind);
-DEFINE_PUBLIC_WEAK_ALIAS(lsearch, libc_lsearch);
 #endif /* !__KERNEL__ */
 
 DECL_END
+
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(insque, libc_insque);
+DEFINE_PUBLIC_WEAK_ALIAS(remque, libc_remque);
+DEFINE_PUBLIC_WEAK_ALIAS(hsearch, libc_hsearch);
+DEFINE_PUBLIC_WEAK_ALIAS(hcreate, libc_hcreate);
+DEFINE_PUBLIC_WEAK_ALIAS(hdestroy, libc_hdestroy);
+DEFINE_PUBLIC_WEAK_ALIAS(hsearch_r, libc_hsearch_r);
+DEFINE_PUBLIC_WEAK_ALIAS(hcreate_r, libc_hcreate_r);
+DEFINE_PUBLIC_WEAK_ALIAS(hdestroy_r, libc_hdestroy_r);
+DEFINE_PUBLIC_WEAK_ALIAS(__tsearch, libc_tsearch);
+DEFINE_PUBLIC_WEAK_ALIAS(tsearch, libc_tsearch);
+DEFINE_PUBLIC_WEAK_ALIAS(__tfind, libc_tfind);
+DEFINE_PUBLIC_WEAK_ALIAS(tfind, libc_tfind);
+DEFINE_PUBLIC_WEAK_ALIAS(__tdelete, libc_tdelete);
+DEFINE_PUBLIC_WEAK_ALIAS(tdelete, libc_tdelete);
+DEFINE_PUBLIC_WEAK_ALIAS(__twalk, libc_twalk);
+DEFINE_PUBLIC_WEAK_ALIAS(twalk, libc_twalk);
+DEFINE_PUBLIC_WEAK_ALIAS(tdestroy, libc_tdestroy);
+DEFINE_PUBLIC_WEAK_ALIAS(lfind, libc_lfind);
+DEFINE_PUBLIC_WEAK_ALIAS(lsearch, libc_lsearch);
+#endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SEARCH_C */

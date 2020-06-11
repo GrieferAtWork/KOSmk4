@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94430267 */
+/* HASH CRC-32:0x5ddad6e4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_SYS_PTRACE_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/ptrace.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Perform process tracing functions. REQUEST is one of
  * the values above, and determines the action to be taken.
  * For all requests except PTRACE_TRACEME, PID specifies the process to be traced.
@@ -36,7 +38,8 @@ DECL_BEGIN
  * appear (those that are used for the particular request) as:
  *     pid_t PID, void *ADDR, int DATA, void *ADDR2
  * after REQUEST */
-INTDEF long int NOTHROW_NCX(VLIBCCALL libc_ptrace)(__ptrace_request_t request, ...);
+INTDEF longptr_t NOTHROW_NCX(VLIBCCALL libc_ptrace)(__ptrace_request_t request, ...);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

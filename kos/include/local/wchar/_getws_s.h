@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25f5b43a */
+/* HASH CRC-32:0x8acbca3e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,6 +122,9 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fgetws_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetws_defined */
+__NAMESPACE_LOCAL_END
+#include <local/stdstreams.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_getws_s) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_getws_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen) {
 	return __localdep_fgetws(__buf, __buflen, __LOCAL_stdin);

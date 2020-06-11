@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10a94de9 */
+/* HASH CRC-32:0x5670b7b0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_SHADOW_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <shadow.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Open database for reading.
  * This function is not part of POSIX and therefore no official cancellation point */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_setspent)(void);
@@ -64,6 +66,7 @@ INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_fgetspent_r)(FILE *__
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_lckpwdf)(void);
 /* Unlock password file */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ulckpwdf)(void);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

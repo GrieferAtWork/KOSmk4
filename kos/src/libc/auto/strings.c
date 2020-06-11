@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a129175 */
+/* HASH CRC-32:0x54c27fd5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,33 +25,21 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "strings.h"
-#include "string.h"
+#include <string.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.bcopy") void
-NOTHROW_NCX(LIBCCALL libc_bcopy)(void const *src,
-                                 void *dst,
-                                 size_t num_bytes) {
-#line 41 "kos/src/libc/magic/strings.c"
+INTERN NONNULL((1, 2)) void
+NOTHROW_NCX(LIBCCALL libc_bcopy)(void const *src, void *dst, size_t num_bytes) {
 	memmove(dst, src, num_bytes);
 }
-
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.bzero") void
-NOTHROW_NCX(LIBCCALL libc_bzero)(void *__restrict dst,
-                                 size_t num_bytes) {
-#line 46 "kos/src/libc/magic/strings.c"
+INTERN NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_bzero)(void *__restrict dst, size_t num_bytes) {
 	memset(dst, 0, num_bytes);
 }
-
-INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.index") char *
-NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,
-                                 int needle) {
-#line 60 "kos/src/libc/magic/strings.c"
+INTERN ATTR_PURE WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack, int needle) {
 	for (; *haystack; ++haystack) {
 		if (*haystack == needle)
 			return (char *)haystack;
@@ -60,12 +48,8 @@ NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,
 		return (char *)haystack;
 	return NULL;
 }
-
-INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.rindex") char *
-NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack,
-                                  int needle) {
-#line 74 "kos/src/libc/magic/strings.c"
+INTERN ATTR_PURE WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack, int needle) {
 	char const *result = NULL;
 	for (; *haystack; ++haystack) {
 		if (*haystack == needle)
@@ -75,17 +59,17 @@ NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack,
 		return (char *)haystack;
 	return (char *)result;
 }
-
-#endif /* !__KERNEL__ */
-#ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(bcopy, libc_bcopy);
-DEFINE_PUBLIC_WEAK_ALIAS(bzero, libc_bzero);
-DEFINE_PUBLIC_WEAK_ALIAS(__bzero, libc_bzero);
-DEFINE_PUBLIC_WEAK_ALIAS(explicit_bzero, libc_bzero);
-DEFINE_PUBLIC_WEAK_ALIAS(index, libc_index);
-DEFINE_PUBLIC_WEAK_ALIAS(rindex, libc_rindex);
 #endif /* !__KERNEL__ */
 
 DECL_END
+
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(bcopy, libc_bcopy);
+DEFINE_PUBLIC_WEAK_ALIAS(__bzero, libc_bzero);
+DEFINE_PUBLIC_WEAK_ALIAS(explicit_bzero, libc_bzero);
+DEFINE_PUBLIC_WEAK_ALIAS(bzero, libc_bzero);
+DEFINE_PUBLIC_WEAK_ALIAS(index, libc_index);
+DEFINE_PUBLIC_WEAK_ALIAS(rindex, libc_rindex);
+#endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_STRINGS_C */

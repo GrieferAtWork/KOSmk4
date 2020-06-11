@@ -76,37 +76,37 @@ enum {
 }
 
 @@Return the size of the buffer of FP in bytes currently in use by the given stream
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 $size_t __fbufsize([[nonnull]] $FILE *fp);
 
 @@Return non-zero value iff the stream FP is opened readonly,
 @@or if the last operation on the stream was a read operation
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 int __freading([[nonnull]] $FILE *fp);
 
 @@Return non-zero value iff the stream FP is opened write-only or
 @@append-only, or if the last operation on the stream was a write
 @@operation
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 int __fwriting([[nonnull]] $FILE *fp);
 
 @@Return non-zero value iff stream FP is not opened write-only or append-only
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 int __freadable([[nonnull]] $FILE *fp);
 
 @@Return non-zero value iff stream FP is not opened read-only
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 int __fwritable([[nonnull]] $FILE *fp);
 
 @@Return non-zero value iff the stream FP is line-buffered
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 int __flbf([[nonnull]] $FILE *fp);
 
 @@Discard all pending buffered I/O on the stream FP
 void __fpurge([[nonnull]] $FILE *fp);
 
 @@Return amount of output in bytes pending on a stream FP
-[[ATTR_WUNUSED, ATTR_PURE]]
+[[wunused, ATTR_PURE]]
 size_t __fpending([[nonnull]] $FILE *fp);
 
 @@Flush all line-buffered files

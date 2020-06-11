@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca7047b8 */
+/* HASH CRC-32:0xc82b97f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,20 +22,23 @@
 #define GUARD_LIBC_USER_SYS_SEM_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/sem.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Semaphore control operation. */
-INTDEF int NOTHROW_NCX(VLIBCCALL libc_semctl)(int semid, int semnum, int cmd, ...);
+INTDEF int NOTHROW_NCX(VLIBCCALL libc_semctl)(int semid, __STDC_INT_AS_UINT_T semnum, __STDC_INT_AS_UINT_T cmd, ...);
 /* Get semaphore */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_semget)(key_t key, int nsems, int semflg);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_semget)(key_t key, __STDC_INT_AS_UINT_T nsems, __STDC_INT_AS_UINT_T semflg);
 /* Operate on semaphore */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_semop)(int semid, struct sembuf *sops, size_t nsops);
 /* Operate on semaphore with timeout */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_semtimedop)(int semid, struct sembuf *sops, size_t nsops, struct timespec const *timeout);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

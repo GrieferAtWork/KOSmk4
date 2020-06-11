@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5219b680 */
+/* HASH CRC-32:0x10da0d79 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,21 +23,23 @@
 
 #include "../api.h"
 #include "../auto/arpa.inet.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <arpa/inet.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Convert network number for interface type AF in buffer starting at CP
  * to presentation format. The result will specify BITS bits of the number */
 INTDEF char *NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_ntop)(int af, void const *cp, int bits, char *buf, size_t len);
 /* Convert network number for interface type AF from presentation in buffer starting
  * at CP to network format and store result int buffer starting at BUF of size LEN */
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_pton)(int af, char const *cp, void *buf, size_t len);
+INTDEF void NOTHROW_RPC_KOS(LIBCCALL libc_intinet_net_pton)(int af, char const *cp, void *buf, size_t len);
 /* Convert ASCII representation in hexadecimal form of the Internet address
  * to binary form and place result in buffer of length LEN starting at BUF */
-INTDEF unsigned int NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_addr)(char const *cp, unsigned char *buf, int len);
+INTDEF unsigned NOTHROW_RPC_KOS(LIBCCALL libc_intinet_nsap_addr)(char const *cp, unsigned char *buf, int len);
 /* Convert internet address in binary form in LEN bytes
  * starting at CP a presentation form and place result in BUF */
 INTDEF char *NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_ntoa)(int len, unsigned char const *cp, char *buf);
@@ -49,6 +51,7 @@ INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet_pton)(int af, char const *__restri
  * type AF in buffer starting at CP to presentation form and place
  * result in buffer of length LEN starting at BUF */
 INTDEF char const *NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntop)(int af, void const *__restrict cp, char *__restrict buf, socklen_t len);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

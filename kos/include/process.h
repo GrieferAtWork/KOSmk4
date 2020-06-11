@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba99eeea */
+/* HASH CRC-32:0x729eb7c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -166,8 +166,6 @@ __CDECLARE_VOID(,__THROWING,_c_exit,(void),())
 #include <local/process/_c_exit.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_c_exit, __FORCELOCAL void (__LIBCCALL _c_exit)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c_exit))(); })
 #endif /* !__CRT_HAVE__c_exit */
-#ifndef ___getpid_defined
-#define ___getpid_defined 1
 #ifdef __CRT_HAVE_getpid
 /* >> getpid(2)
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
@@ -183,10 +181,7 @@ __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,_getpid,(void),())
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
  * THIS_THREAD->LEADER->PID */
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,_getpid,(void),__getpid,())
-#else /* ... */
-#undef ___getpid_defined
-#endif /* !... */
-#endif /* !___getpid_defined */
+#endif /* ... */
 #if __has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execv)
 /* >> execv(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'

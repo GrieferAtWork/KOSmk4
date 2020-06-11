@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x275d6d2b */
+/* HASH CRC-32:0x5a72bb45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,15 @@
 #define GUARD_LIBC_USER_STRINGLIST_H 1
 
 #include "../api.h"
+#include "../auto/stringlist.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <stringlist.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Allocates and returns a new StringList object. Upon error, `NULL' is returned */
 INTDEF WUNUSED struct _stringlist *NOTHROW_NCX(LIBCCALL libc_sl_init)(void);
 /* Append a given `NAME' to `SL'. `NAME' is considered
@@ -37,11 +40,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_sl_add)(struct _stringlist 
  * string pointers (as previously added with `sl_add()') will also
  * be `free(3)'ed. */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_sl_free)(struct _stringlist *sl, int all);
-/* Search for `NAME' within the given StringList. Upon success,
- * return a pointer to the equivalent string within `SL' (i.e. the
- * pointer originally passed to `sl_add()' to insert that string).
- * If `SL' doesn't contain an equivalent string, return `NULL' instead. */
-INTDEF ATTR_PURE NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl, char const *name);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

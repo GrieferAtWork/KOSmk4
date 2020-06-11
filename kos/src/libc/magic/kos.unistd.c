@@ -55,25 +55,25 @@ void Execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonn
 [[cp, throws, ATTR_NORETURN, doc_alias(execvp), argument_names(file, ___argv)]]
 void Execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV);
 
-[[cp, throws, impl_include("<parts/redirect-exec.h>"), doc_alias(execl)]]
+[[cp, throws, userimpl, impl_include("<parts/redirect-exec.h>"), doc_alias(execl)]]
 [[requires_dependent_function(Execv), ATTR_SENTINEL, ATTR_NORETURN]]
 void Execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_XEXECL(char, Execv, path, args)
 }
 
-[[cp, throws, impl_include("<parts/redirect-exec.h>"), doc_alias(execle)]]
+[[cp, throws, userimpl, impl_include("<parts/redirect-exec.h>"), doc_alias(execle)]]
 [[requires_dependent_function(Execve), ATTR_SENTINEL_O(1), ATTR_NORETURN]]
 void Execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_XEXECLE(char, Execve, path, args)
 }
 
-[[cp, throws, impl_include("<parts/redirect-exec.h>"), doc_alias(execlp)]]
+[[cp, throws, userimpl, impl_include("<parts/redirect-exec.h>"), doc_alias(execlp)]]
 [[requires_dependent_function(Execvp), ATTR_SENTINEL, ATTR_NORETURN]]
 void Execpl([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_XEXECL(char, Execvp, file, args)
 }
 
-[[cp, throws, impl_include("<parts/redirect-exec.h>"), doc_alias(execle)]]
+[[cp, throws, userimpl, impl_include("<parts/redirect-exec.h>"), doc_alias(execle)]]
 [[requires_dependent_function(Execvpe), ATTR_SENTINEL_O(1), ATTR_NORETURN]]
 void Execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_XEXECLE(char, Execvpe, file, args)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8ee5198 */
+/* HASH CRC-32:0x1e73ce57 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,10 +92,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __LIBC_GMTIME_BUFFER_DEFINED
 #define __LIBC_GMTIME_BUFFER_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
-
 __LOCAL_LIBC_DATA(__gmtime_buf) __STRUCT_TM __gmtime_buf = { 0 };
 __NAMESPACE_LOCAL_END
-
 #endif
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE_gmtime && !__CRT_HAVE__gmtime32) */
 __NAMESPACE_LOCAL_BEGIN
@@ -104,12 +102,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gmtime64) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __STRUCT_TM *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64))(__time64_t const *__timer) {
 #ifdef __BUILDING_LIBC
-	return __localdep_gmtime64_r(__timer, &__gmtime_buf);
+	return __localdep_gmtime64_r(__timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
 #elif defined(__CRT_HAVE_gmtime) || defined(__CRT_HAVE__gmtime32)
 	__time32_t __tm32 = (__time32_t)*__timer;
 	return __localdep_gmtime32(&__tm32);
 #else /* ... */
-	return __localdep_gmtime64_r(__timer, &__gmtime_buf);
+	return __localdep_gmtime64_r(__timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END

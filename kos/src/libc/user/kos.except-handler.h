@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98066e1f */
+/* HASH CRC-32:0xeb19cf18 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_KOS_EXCEPT_HANDLER_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <kos/except-handler.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *     Set mode #1: set_exception_handler(EXCEPT_HANDLER_MODE_DISABLED, NULL, NULL)
@@ -58,6 +60,11 @@ INTDEF int NOTHROW(LIBCCALL libc_set_exception_handler)(int mode, except_handler
  * @return: 0 :         Success.
  * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_get_exception_handler)(int *pmode, except_handler_t *phandler, void **phandler_sp);
+/* Mode #2 / #3 exception handler (see description above) */
+INTDEF ATTR_NORETURN void (__EXCEPT_HANDLER_CC libc_except_handler3)(error_register_state_t *__restrict state, struct exception_data *__restrict error) THROWS(...);
+/* Mode #4 exception handler (see description above) */
+INTDEF ATTR_NORETURN void (__EXCEPT_HANDLER_CC libc_except_handler4)(error_register_state_t *__restrict state, struct exception_data *__restrict error) THROWS(...);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

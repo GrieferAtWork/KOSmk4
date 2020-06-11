@@ -568,15 +568,30 @@ class FunctionPrototype {
 	@@> __NOTHROW_NCX(__LIBCCALL strlen)(char const *__restrict __str)
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintDeclarationWithoutTerminator(
-			fp: CWriter, escapeMode: int, decl: string, exposedName: string) {
+			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
+			injectedAttributes: {string...} = none,
+			breakAfterReturnType: bool = false) {
 		/* Same symbol name -> declare normally */
 		escapeTextIntoFile(fp, decl, escapeMode);
 		if (decl)
 			fp << " ";
+		if (injectedAttributes) {
+			local isFirst = true;
+			for (local a: injectedAttributes) {
+				if (!isFirst)
+					fp << " ";
+				isFirst = false;
+				escapeTextIntoFile(fp, a, escapeMode);
+			}
+			if (!isFirst)
+				fp << " ";
+		}
 		if (cprintAttributeList(fp, escapeMode))
 			fp << " ";
-		if (returnType.cprint(fp, escapeMode))
+		if (returnType.cprint(fp, escapeMode) && !breakAfterReturnType)
 			fp << " ";
+		if (breakAfterReturnType)
+			fp << "\n";
 		if (!isNothrowThrowing)
 			escapeTextIntoFile(fp, nothrow, escapeMode);
 		fp << "(";
@@ -2479,6 +2494,39 @@ class LibraryFunction {
 	}
 	private member m_functionBindings: {LibraryFunctionBinding...};
 
+	@@Returns the preprocessor condition that must be true in order
+	@@for @this @LibraryFunction to actually get declared within the
+	@@associated, internal library header
+	@@This condition is essentially:
+	@@    @(this.ppCond && (functionBindings.each.ppCond || ...))
+	public property declarationPpCond: string = {
+		get(): string {
+			if (ppCond == "0")
+				return "0";
+			local hasUniversalBinding = false;
+			for (local b: functionBindings) {
+				if (b.ppCond == "1") {
+					hasUniversalBinding = true;
+					break;
+				}
+			}
+			if (hasUniversalBinding)
+				return ppCond;
+			local bindingConditions = [];
+			for (local b: functionBindings) {
+				if (b.ppCond == "0")
+					continue;
+				bindingConditions.append("({})".format({ b.ppCond }));
+			}
+			bindingConditions = "||".join(bindingConditions);
+			if (ppCond != "1") {
+				bindingConditions = "({})&&({})"
+					.format({ ppCond, bindingConditions });
+			}
+			return bindingConditions;
+		}
+	}
+
 	public function preload() {
 		documentationString;
 		functionPrototype;
@@ -2492,25 +2540,16 @@ class LibraryFunction {
 		local usedBindings = functionBindings;
 		if (!usedBindings)
 			return;
-		fp.ppIf(ppCond);
-		local isFirst = true;
+		local declCond = declarationPpCond;
+		if (declCond == "0")
+			return;
+		fp.ppIf(declCond);
 		local doc = documentationString;
-		local proto = functionPrototype;
-		for (local bind: usedBindings) {
-			if (isFirst) {
-				fp.ppIf(bind.ppCond);
-			} else {
-				fp.ppElif(bind.ppCond);
-			}
-			if (doc)
-				fp.printComment(doc);
-			proto.cprintDeclarationWithoutTerminator(
-				fp, escapeMode, decl: decl, exposedName: this.name);
-			fp << ";\n";
-			isFirst = false;
-		}
-		if (!isFirst)
-			fp.ppEndif();
+		if (doc)
+			fp.printComment(doc);
+		functionPrototype.cprintDeclarationWithoutTerminator(
+			fp, escapeMode, decl: decl, exposedName: this.name);
+		fp << ";\n";
 		fp.ppEndif();
 	}
 
@@ -2524,7 +2563,7 @@ class LibraryFunction {
 		local isFirst = true;
 		local doc = documentationString;
 		local proto = functionPrototype;
-		for (local bind: usedBindings) {
+		for (local bind /*: LibraryFunctionBinding*/: usedBindings) {
 			if (isFirst) {
 				fp.ppIf(bind.ppCond);
 				isFirst = false;
@@ -2544,11 +2583,17 @@ class LibraryFunction {
 						},
 						forceKeyEscape: true);
 				}
-				/* TODO: Include @impl.implementationSection as @"ATTR_SECTION(...)"! */
 				if (doc)
 					fp.printComment(doc);
 				proto.cprintDeclarationWithoutTerminator(
-					fp, escapeMode, decl: decl, exposedName: this.name);
+					fp, escapeMode,
+					decl:                 decl,
+					exposedName:          this.name,
+					injectedAttributes:   bind.implSection !is none
+						? { "ATTR_SECTION({!r})".format({ bind.implSection }) }
+						: none,
+					breakAfterReturnType: true);
+				fp << " ";
 				escapeTextIntoFile(fp, impl.body, escapeMode,
 					[](keyword: string): string {
 						if (keyword == impl.implementationName)
@@ -2559,7 +2604,7 @@ class LibraryFunction {
 						return none;
 					},
 				);
-				fp.forceStartOfLine();
+				fp << "\n";
 			} else {
 				fp << "DEFINE_" << decl << "_ALIAS("
 					<< this.name << ", "
@@ -2825,7 +2870,7 @@ class SystemHeader {
 			"#define " << guardName << " 1\n"
 			"\n"
 			"#include \"../api.h\"\n";
-		if (!isAuto)
+		if (!isAuto && order_libcAutoHeader)
 			fp << "#include \"../auto/" << name << ".h\"\n";
 		fp << "\n"
 			"#include <hybrid/typecore.h>\n"
@@ -2853,11 +2898,57 @@ class SystemHeader {
 	}
 
 	@@Print the implementations from /kos/src/libc/auto/string.c
-	public function cprintLibraryAutoSourceImplementations(fp: CWriter) {
+	public function cprintLibraryAutoSource(fp: CWriter) {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
 		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
 		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
 		 *       replaced by the export-condition */
+		local guardName = "GUARD_LIBC_AUTO_{}_C".format({
+			name.replace("-", "_").replace(".", "_").upper()
+		});
+		fp << "#ifndef " << guardName << "\n"
+			"#define " << guardName << " 1\n"
+			"\n"
+			"#include \"../api.h\"\n"
+			"#include <hybrid/typecore.h>\n"
+			"#include <kos/types.h>\n"
+			"#include \"";
+		if (order_libcUserHeader)
+			fp << "../user/";
+		fp << name << ".h\"\n";
+		local dependentFunctionHeaders: {string: {string...}} = Dict();
+		/* Gather declaring headers of all dependent functions */
+		for (local part: order_libcAutoSource) {
+			if (part !is LibraryFunction)
+				continue;
+			for (local binding /*: LibraryFunctionBinding*/: part.functionBindings) {
+				local b = binding.functionBinding;
+				if (b !is FunctionImplementation)
+					continue;
+				local bindingDeps: {string: Function} = b.dependencyFunctions;
+				if (!bindingDeps)
+					continue;
+				local deps: {string...} = dependentFunctionHeaders.get(binding.ppCond);
+				if (deps is none)
+					deps = dependentFunctionHeaders[binding.ppCond] = HashSet();
+				deps.update(bindingDeps.values.each.originalSystemHeaderName);
+			}
+		}
+		/* Include declaration headers of all dependent functions */
+		for (local cond: dependentFunctionHeaders.keys.sorted()) {
+			fp.ppIf(cond);
+			for (local hdr: dependentFunctionHeaders[cond].sorted()) {
+				if (allSystemHeaders[hdr] === this)
+					continue; /* Not needed! */
+				fp.ppInclude("<{}.h>".format({ hdr.replace(".", "/") }));
+			}
+			fp.ppEndif();
+		}
+		/* Go through all functions once again, and  */
+
+		fp << "\n"
+			"DECL_BEGIN\n"
+			"\n";
 		for (local part: order_libcAutoSource) {
 			if (part is LibraryFunction) {
 				part.cprintInLibraryAutoImplementation(fp, ESCAPE_MODE_NONE, "INTERN");
@@ -2865,6 +2956,26 @@ class SystemHeader {
 				fp << part;
 			}
 		}
+		fp << "\n"
+			"DECL_END\n"
+			"\n";
+		/* Print out the symbol export table. */
+		for (local part: order_libcAutoSource) {
+			if (part !is LibraryFunction)
+				continue;
+			if (!part.exportSymbolNames)
+				continue;
+			fp.ppIf(part.ppCond);
+			for (local ppCond, asmname: part.exportSymbolNames) {
+				fp.ppIf(ppCond);
+				fp << "DEFINE_PUBLIC_WEAK_ALIAS("
+					<< asmname << ", " << part.name << ");\n";
+				fp.ppEndif();
+			}
+			fp.ppEndif();
+		}
+		fp << "\n"
+			"#endif /* !" << guardName << " */\n";
 	}
 
 	@@Print the export table from /kos/src/libc/auto/string.c

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2250a8ae */
+/* HASH CRC-32:0xe66cb7bd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_SYS_SENDFILE_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/sendfile.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
@@ -38,6 +40,7 @@ INTDEF ssize_t NOTHROW_NCX(LIBCCALL libc_sendfile)(fd_t out_fd, fd_t in_fd, off_
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
  * Return the number of written bytes, or -1 in case of error */
 INTDEF ssize_t NOTHROW_NCX(LIBCCALL libc_sendfile64)(fd_t out_fd, fd_t in_fd, off64_t *offset, size_t count);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

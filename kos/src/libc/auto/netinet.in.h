@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x581b8e77 */
+/* HASH CRC-32:0xc86c6a57 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_AUTO_NETINET_IN_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <netinet/in.h>
@@ -33,8 +34,8 @@ INTDEF ATTR_CONST uint16_t NOTHROW_NCX(LIBCCALL libc_htons)(uint16_t hostword);
 INTDEF ATTR_CONST uint16_t NOTHROW_NCX(LIBCCALL libc_ntohs)(uint16_t netshort);
 INTDEF ATTR_CONST uint32_t NOTHROW_NCX(LIBCCALL libc_htonl)(uint32_t hostlong);
 INTDEF ATTR_CONST uint32_t NOTHROW_NCX(LIBCCALL libc_ntohl)(uint32_t netlong);
-INTDEF ATTR_CONST uint64_t NOTHROW_NCX(LIBCCALL libc_htonq)(uint64_t hostlong);
-INTDEF ATTR_CONST uint64_t NOTHROW_NCX(LIBCCALL libc_ntohq)(uint64_t netlong);
+INTDEF ATTR_CONST uint64_t NOTHROW_NCX(LIBCCALL libc_htonq)(uint64_t hostquad);
+INTDEF ATTR_CONST uint64_t NOTHROW_NCX(LIBCCALL libc_ntohq)(uint64_t netquad);
 #endif /* !__KERNEL__ */
 
 DECL_END

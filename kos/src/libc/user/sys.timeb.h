@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a01ec1e */
+/* HASH CRC-32:0xf806e742 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,28 +22,27 @@
 #define GUARD_LIBC_USER_SYS_TIMEB_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/timeb.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Fill in TIMEBUF with information about the current time */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc__ftime32)(struct __timeb32 *timebuf);
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc__ftime32)(struct timeb32 *timebuf);
 /* Fill in TIMEBUF with information about the current time */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc__ftime64)(struct __timeb64 *timebuf);
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc__ftime64)(struct timeb64 *timebuf);
 /* Fill in TIMEBUF with information about the current time */
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__ftime32_s)(struct __timeb32 *timebuf);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__ftime32_s)(struct timeb32 *timebuf);
 /* Fill in TIMEBUF with information about the current time */
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__ftime32_s)(struct __timeb32 *timebuf);
-/* Fill in TIMEBUF with information about the current time */
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__ftime64_s)(struct __timeb64 *timebuf);
-/* Fill in TIMEBUF with information about the current time */
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__ftime64_s)(struct __timeb64 *timebuf);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__ftime64_s)(struct timeb64 *timebuf);
 /* Fill in TIMEBUF with information about the current time */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ftime)(struct timeb *timebuf);
 /* Fill in TIMEBUF with information about the current time */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ftime64)(struct timeb64 *timebuf);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

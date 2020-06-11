@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3dbe8e8b */
+/* HASH CRC-32:0x20e04c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_STDIO_EXT_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <stdio_ext.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Return the size of the buffer of FP in bytes currently in use by the given stream */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc___fbufsize)(FILE *fp);
 /* Return non-zero value iff the stream FP is opened readonly,
@@ -48,9 +50,10 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___fpurge)(FILE *fp);
 /* Return amount of output in bytes pending on a stream FP */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc___fpending)(FILE *fp);
 /* Flush all line-buffered files */
-INTDEF void NOTHROW_NCX(LIBCCALL libc__flushlbf)(void);
+INTDEF void (LIBCCALL libc__flushlbf)(void) THROWS(...);
 /* Set locking status of stream FP to TYPE */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *fp, int type);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

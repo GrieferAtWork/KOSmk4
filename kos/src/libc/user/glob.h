@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25038cd9 */
+/* HASH CRC-32:0x7f3276d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_GLOB_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <glob.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Do glob searching for PATTERN, placing results in PGLOB.
  * The bits defined above may be set in FLAGS.
  * If a directory cannot be opened or read and ERRFUNC is not nil,
@@ -50,6 +52,7 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob);
 INTDEF NONNULL((1, 4)) int NOTHROW_NCX(LIBCCALL libc_glob64)(const char *__restrict pattern, int flags, __glob_errfunc_t errfunc, struct __glob64_struct *__restrict pglob);
 /* Free storage allocated in PGLOB by a previous `glob' call */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_globfree64)(struct __glob64_struct *pglob);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

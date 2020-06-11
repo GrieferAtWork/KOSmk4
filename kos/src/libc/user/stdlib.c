@@ -1887,24 +1887,6 @@ NOTHROW_NCX(LIBCCALL libc___p___initenv)(void)
 }
 /*[[[end:__p___initenv]]]*/
 
-/*[[[head:_aligned_malloc,hash:CRC-32=0xcc7d3c39]]]*/
-INTERN ATTR_MALLOC WUNUSED ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_malloc") void *
-NOTHROW_NCX(LIBCCALL libc__aligned_malloc)(size_t num_bytes,
-                                           size_t min_alignment)
-/*[[[body:_aligned_malloc]]]*/
-/*AUTO*/{
-	void *result = libc_malloc(num_bytes + 2 * sizeof(void *) + min_alignment - 1);
-	if (result) {
-		void *base = (void *)(((uintptr_t)result + (min_alignment - 1)) & ~(min_alignment - 1));
-		((void **)base)[-1] = result;
-		((void **)base)[-2] = (void *)num_bytes;
-		result = base;
-	}
-	return result;
-}
-/*[[[end:_aligned_malloc]]]*/
-
 /*[[[head:DOS$__p__wenviron,hash:CRC-32=0x2a342ca3]]]*/
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wenviron") char16_t ***
@@ -2014,40 +1996,6 @@ NOTHROW_RPC(LIBCCALL libc__fullpath)(char *buf,
 }
 /*[[[end:_fullpath]]]*/
 
-/*[[[head:_aligned_free,hash:CRC-32=0x4008441f]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_free") void
-NOTHROW_NCX(LIBCCALL libc__aligned_free)(void *aligned_mallptr)
-/*[[[body:_aligned_free]]]*/
-/*AUTO*/{
-	if (aligned_mallptr)
-		libc_free(((void **)aligned_mallptr)[-1]);
-}
-/*[[[end:_aligned_free]]]*/
-
-/*[[[head:_aligned_recalloc,hash:CRC-32=0x2a91e490]]]*/
-INTERN WUNUSED ATTR_ALLOC_ALIGN(4) ATTR_ALLOC_SIZE((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_recalloc") void *
-NOTHROW_NCX(LIBCCALL libc__aligned_recalloc)(void *aligned_mallptr,
-                                             size_t count,
-                                             size_t num_bytes,
-                                             size_t min_alignment)
-/*[[[body:_aligned_recalloc]]]*/
-/*AUTO*/{
-	void *result;
-	num_bytes *= count;
-	result = libc__aligned_malloc(num_bytes, min_alignment);
-	if (result) {
-		size_t temp = libc__aligned_msize(aligned_mallptr, min_alignment, 0);
-		if (temp > num_bytes)
-			temp = num_bytes;
-		memcpy(result, aligned_mallptr, temp);
-		memset((byte_t *)result + temp, 0, num_bytes - temp);
-		libc__aligned_free(aligned_mallptr);
-	}
-	return result;
-}
-/*[[[end:_aligned_recalloc]]]*/
-
 /* All of these are implemented in libc/libc/errno.c */
 /*[[[skip:_get_errno]]]*/
 /*[[[skip:_set_errno]]]*/
@@ -2077,96 +2025,6 @@ NOTHROW_NCX(LIBCCALL libc__set_error_mode)(int mode)
 	return -1;
 }
 /*[[[end:_set_error_mode]]]*/
-
-/*[[[head:_aligned_offset_malloc,hash:CRC-32=0x2b246c46]]]*/
-INTERN ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_offset_malloc") void *
-NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc)(size_t num_bytes,
-                                                  size_t min_alignment,
-                                                  size_t offset)
-/*[[[body:_aligned_offset_malloc]]]*/
-/*AUTO*/{
-	void *result;
-	offset &= (min_alignment - 1);
-	result = libc_malloc(num_bytes + 2 * sizeof(void *) + min_alignment - 1 + (min_alignment - offset));
-	if (result) {
-		void *base = (void *)((((uintptr_t)result + (min_alignment - 1)) & ~(min_alignment - 1)) + offset);
-		((void **)base)[-1] = result;
-		((void **)base)[-2] = (void *)num_bytes;
-		result = base;
-	}
-	return result;
-}
-/*[[[end:_aligned_offset_malloc]]]*/
-
-/*[[[head:_aligned_offset_realloc,hash:CRC-32=0x2efa4de1]]]*/
-INTERN WUNUSED ATTR_ALLOC_SIZE((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_offset_realloc") void *
-NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc)(void *aligned_mallptr,
-                                                   size_t newsize,
-                                                   size_t min_alignment,
-                                                   size_t offset)
-/*[[[body:_aligned_offset_realloc]]]*/
-/*AUTO*/{
-	void *result;
-	result = libc__aligned_offset_malloc(newsize, min_alignment, offset);
-	if (result) {
-		size_t temp = libc__aligned_msize(aligned_mallptr, min_alignment, offset);
-		if (temp > newsize)
-			temp = newsize;
-		memcpy(result, aligned_mallptr, temp);
-		libc__aligned_free(aligned_mallptr);
-	}
-	return result;
-}
-/*[[[end:_aligned_offset_realloc]]]*/
-
-/*[[[head:_aligned_offset_recalloc,hash:CRC-32=0x7ba0218d]]]*/
-INTERN WUNUSED ATTR_ALLOC_SIZE((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_offset_recalloc") void *
-NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc)(void *aligned_mallptr,
-                                                    size_t count,
-                                                    size_t num_bytes,
-                                                    size_t min_alignment,
-                                                    size_t offset)
-/*[[[body:_aligned_offset_recalloc]]]*/
-/*AUTO*/{
-	void *result;
-	num_bytes *= count;
-	result = libc__aligned_offset_malloc(num_bytes, min_alignment, offset);
-	if (result) {
-		size_t temp = libc__aligned_msize(aligned_mallptr, min_alignment, offset);
-		if (temp > num_bytes)
-			temp = num_bytes;
-		memcpy(result, aligned_mallptr, temp);
-		memset((byte_t *)result + temp, 0, num_bytes - temp);
-		libc__aligned_free(aligned_mallptr);
-	}
-	return result;
-}
-/*[[[end:_aligned_offset_recalloc]]]*/
-
-
-/*[[[head:_aligned_realloc,hash:CRC-32=0x1c92aa6c]]]*/
-INTERN WUNUSED ATTR_ALLOC_ALIGN(3) ATTR_ALLOC_SIZE((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_realloc") void *
-NOTHROW_NCX(LIBCCALL libc__aligned_realloc)(void *aligned_mallptr,
-                                            size_t newsize,
-                                            size_t min_alignment)
-/*[[[body:_aligned_realloc]]]*/
-/*AUTO*/{
-	void *result;
-	result = libc__aligned_malloc(newsize, min_alignment);
-	if (result && aligned_mallptr) {
-		size_t temp = libc__aligned_msize(aligned_mallptr, min_alignment, 0);
-		if (temp > newsize)
-			temp = newsize;
-		memcpy(result, aligned_mallptr, temp);
-		libc__aligned_free(aligned_mallptr);
-	}
-	return result;
-}
-/*[[[end:_aligned_realloc]]]*/
 
 /*[[[head:_get_pgmptr,hash:CRC-32=0xea63c11c]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init._get_pgmptr") errno_t

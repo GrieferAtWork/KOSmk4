@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x915ba4c */
+/* HASH CRC-32:0xae69c884 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_SEMAPHORE_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <semaphore.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Initialize semaphore object SEM to VALUE.
  * If PSHARED then share it with other processes */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem, int pshared, unsigned int value);
@@ -43,7 +45,6 @@ INTDEF NONNULL((1)) int NOTHROW_RPC_KOS(LIBCCALL libc_sem_unlink)(const char *na
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *sem);
 /* Similar to `sem_wait' but wait only until ABSTIME */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict sem, struct timespec const *__restrict abstime);
-/* Similar to `sem_wait' but wait only until ABSTIME */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict sem, struct timespec64 const *__restrict abstime);
 /* Test whether SEM is posted */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *sem);
@@ -51,6 +52,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *sem);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *sem);
 /* Get current value of SEM and store it in *SVAL */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict sem, int *__restrict sval);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

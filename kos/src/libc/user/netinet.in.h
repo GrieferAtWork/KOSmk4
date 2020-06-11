@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d59fb11 */
+/* HASH CRC-32:0x77301d92 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,12 +23,14 @@
 
 #include "../api.h"
 #include "../auto/netinet.in.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <netinet/in.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Bind socket to a privileged IP port */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_bindresvport)(fd_t sockfd, struct sockaddr_in *sock_in);
 /* The IPv6 version of this function */
@@ -79,6 +81,7 @@ INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd, struc
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd, uint32_t interface_addr, struct sockaddr const *group, socklen_t grouplen, uint32_t *fmode, uint32_t *numsrc, struct sockaddr_storage *slist);
 /* Set source filter */
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd, uint32_t interface_addr, struct sockaddr const *group, socklen_t grouplen, uint32_t fmode, uint32_t numsrc, struct sockaddr_storage const *slist);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

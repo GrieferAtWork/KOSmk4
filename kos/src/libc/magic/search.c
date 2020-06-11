@@ -246,25 +246,25 @@ typedef struct entry {
 @@If ACTION is `FIND' return found entry or signal error by returning NULL.
 @@If ACTION is `ENTER' replace existing data (if any) with ITEM.data
 [[impl_prefix(DEFINE_HSEARCH_DATA), impl_prefix(DEFINE_HSEARCH_HTAB)]]
-[[userimpl, requires_function(hsearch_r)]]
+[[requires_function(hsearch_r)]]
 ENTRY *hsearch(ENTRY item, ACTION action) {
 	ENTRY *result;
-	hsearch_r(item, action, &result, &htab);
+	hsearch_r(item, action, &result, &__NAMESPACE_LOCAL_SYM htab);
 	return result;
 }
 
 @@Create a new hashing table which will at most contain NEL elements
 [[impl_prefix(DEFINE_HSEARCH_DATA), impl_prefix(DEFINE_HSEARCH_HTAB)]]
-[[userimpl, requires_function(hcreate_r)]]
+[[requires_function(hcreate_r)]]
 int hcreate(size_t nel) {
-	return hcreate_r(nel, &htab);
+	return hcreate_r(nel, &__NAMESPACE_LOCAL_SYM htab);
 }
 
 @@Destroy current internal hashing table
 [[impl_prefix(DEFINE_HSEARCH_DATA), impl_prefix(DEFINE_HSEARCH_HTAB)]]
-[[userimpl, requires_function(hdestroy_r)]]
+[[requires_function(hdestroy_r)]]
 void hdestroy() {
-	hdestroy_r(&htab);
+	hdestroy_r(&__NAMESPACE_LOCAL_SYM htab);
 }
 
 %{
@@ -278,21 +278,6 @@ struct hsearch_data {
 	unsigned int   filled;
 };
 #endif /* !__hsearch_data_defined */
-}
-
-@@For the used double hash method the table size has to be a prime. To
-@@correct the user given table size we need a prime test.  This trivial
-@@algorithm is adequate because
-@@a)  the code is (most probably) called a few times per program run and
-@@b)  the number is small because the table must fit in the core
-[[static, inline, nocrt, ATTR_CONST]]
-int isprime(unsigned int number) {
-	/* no even number will be passed */
-	for (unsigned int div = 3; div <= number / div; div += 2) {
-		if (number % div == 0)
-			return 0;
-	}
-	return 1;
 }
 
 @@Reentrant versions which can handle multiple hashing tables at the same time
@@ -363,8 +348,26 @@ int hsearch_r(ENTRY item, ACTION action,
 
 [[impl_prefix(DEFINE_HSEARCH_DATA)]]
 [[impl_prefix(DEFINE_SEARCH_ENTRY)]]
-[[userimpl, requires_function(calloc), doc_alias("hsearch_r")]]
+[[requires_function(calloc), doc_alias("hsearch_r")]]
 [[impl_include("<hybrid/limitcore.h>", "<parts/errno.h>")]]
+[[impl_prefix(
+@@push_namespace(local)@@
+/* For the used double hash method the table size has to be a prime. To
+ * correct the user given table size we need a prime test.  This trivial
+ * algorithm is adequate because
+ * a)  the code is (most probably) called a few times per program run and
+ * b)  the number is small because the table must fit in the core */
+__LOCAL_LIBC(isprime) ATTR_CONST int
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isprime))(unsigned int number) {
+	/* no even number will be passed */
+	for (unsigned int div = 3; div <= number / div; div += 2) {
+		if (number % div == 0)
+			return 0;
+	}
+	return 1;
+}
+@@pop_namespace@@
+)]]
 int hcreate_r(size_t nel, struct hsearch_data *htab) {
 	typedef struct {
 		unsigned int used;
@@ -387,7 +390,7 @@ int hcreate_r(size_t nel, struct hsearch_data *htab) {
 @@pp_endif@@
 			return 0;
 		}
-		if (isprime(nel))
+		if (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isprime)(nel))
 			break;
 	}
 	htab->@size@   = nel;
@@ -400,7 +403,7 @@ int hcreate_r(size_t nel, struct hsearch_data *htab) {
 
 [[impl_prefix(DEFINE_HSEARCH_DATA)]]
 [[doc_alias("hsearch_r"), impl_include("<parts/errno.h>")]]
-[[userimpl, requires_function(free)]]
+[[requires_function(free)]]
 void hdestroy_r(struct hsearch_data *htab) {
 	if (htab == NULL) {
 @@pp_ifdef EINVAL@@
@@ -421,16 +424,29 @@ void hdestroy_r(struct hsearch_data *htab) {
 }
 
 
-@@Possibly "split" a node with two red successors, and/or fix up two red
-@@edges in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
-@@and GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
-@@comparison values that determined which way was taken in the tree to reach
-@@ROOTP. MODE is 1 if we need not do the split, but must check for two red
-@@edges between GPARENTP and ROOTP
-[[static, inline, nocrt]]
-void maybe_split_for_insert([[nonnull]] void **rootp, [[nullable]] void **parentp,
-                            /*[[if(rootp != NULL), nonnull]]*/ void **gparentp,
-                            int p_r, int gp_r, int mode) {
+
+%[define(DEFINE_COMPAR_FN_T =
+@@pp_ifndef ____compar_fn_t_defined@@
+#define ____compar_fn_t_defined 1
+typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
+@@pp_endif@@
+)]
+
+@@Search for an entry matching the given KEY in the tree
+@@pointed to by *ROOTP and insert a new element if not found
+[[decl_prefix(DEFINE_COMPAR_FN_T)]]
+[[requires_function(malloc), export_alias("__tsearch")]]
+[[impl_prefix(
+@@push_namespace(local)@@
+/* Possibly "split" a node with two red successors, and/or fix up two red
+ * edges in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
+ * and GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
+ * comparison values that determined which way was taken in the tree to reach
+ * ROOTP. MODE is 1 if we need not do the split, but must check for two red
+ * edges between GPARENTP and ROOTP */
+__LOCAL_LIBC(maybe_split_for_insert) NONNULL((1)) void
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(maybe_split_for_insert))(void **rootp, /*nullable*/ void **parentp,
+                                                                    void **gparentp, int p_r, int gp_r, int mode) {
 	typedef struct __node_struct {
 		void const           *key;
 		struct __node_struct *left_node;
@@ -484,18 +500,8 @@ void maybe_split_for_insert([[nonnull]] void **rootp, [[nullable]] void **parent
 		}
 	}
 }
-
-%[define(DEFINE_COMPAR_FN_T =
-@@pp_ifndef ____compar_fn_t_defined@@
-#define ____compar_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
-@@pp_endif@@
-)]
-
-@@Search for an entry matching the given KEY in the tree
-@@pointed to by *ROOTP and insert a new element if not found
-[[decl_prefix(DEFINE_COMPAR_FN_T)]]
-[[userimpl, requires_function(malloc), export_alias("__tsearch")]]
+@@pop_namespace@@
+)]]
 void *tsearch(void const *key,
               [[nullable]] void **vrootp,
               [[nonnull]] __compar_fn_t compar) {
@@ -521,10 +527,10 @@ void *tsearch(void const *key,
 		r = (*compar)(key, root->key);
 		if (r == 0)
 			return root;
-		maybe_split_for_insert((void **)rootp,
-		                       (void **)parentp,
-		                       (void **)gparentp,
-		                       p_r, gp_r, 0);
+		__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(maybe_split_for_insert)((void **)rootp,
+		                                                                (void **)parentp,
+		                                                                (void **)gparentp,
+		                                                                p_r, gp_r, 0);
 		nextp = r < 0 ? &root->left_node
 		              : &root->right_node;
 		if (*nextp == NULL)
@@ -543,10 +549,10 @@ void *tsearch(void const *key,
 		q->left_node = NULL;
 		q->right_node = NULL;
 		if (nextp != rootp) {
-			maybe_split_for_insert((void **)nextp,
-			                       (void **)rootp,
-			                       (void **)parentp,
-			                       r, p_r, 1);
+			__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(maybe_split_for_insert)((void **)nextp,
+			                                                                (void **)rootp,
+			                                                                (void **)parentp,
+			                                                                r, p_r, 1);
 		}
 	}
 	return q;
@@ -582,7 +588,7 @@ void *tfind(void const *key,
 [[decl_prefix(DEFINE_COMPAR_FN_T)]]
 [[export_alias("__tdelete")]]
 [[impl_include("<hybrid/typecore.h>", "<parts/malloca.h>")]]
-[[userimpl, requires_function(free)]]
+[[requires_function(free)]]
 void *tdelete(void const *__restrict key,
               [[nullable]] void **__restrict vrootp,
               [[nonnull]] __compar_fn_t compar) {
@@ -767,34 +773,35 @@ typedef void (__LIBCCALL *__action_fn_t)(void const *nodep, VISIT value, int lev
 #endif /* !__ACTION_FN_T */
 }
 
-@@Walk the nodes of a tree.
-@@ROOT is the root of the tree to be walked, ACTION the function to be
-@@called at each node. LEVEL is the level of ROOT in the whole tree
-[[static, inline, nocrt]]
-void trecurse([[nonnull]] void const *root,
-              [[nonnull]] __action_fn_t action, int level) {
+@@Walk through the whole tree and call the ACTION callback for every node or leaf
+[[export_alias("__twalk"), impl_prefix(
+@@push_namespace(local)@@
+/* Walk the nodes of a tree.
+ * ROOT is the root of the tree to be walked, ACTION the function to be
+ * called at each node. LEVEL is the level of ROOT in the whole tree */
+__LOCAL_LIBC(trecurse) NONNULL((1, 2)) void
+__LIBC_LOCAL_NAME(trecurse)(void const *root, __action_fn_t action, int level) {
 	void *l, *r;
 	l = ((void **)root)[1];
 	r = ((void **)root)[2];
-	if (!l && !r)
-		(*action)(root, (@VISIT@)@leaf@, level);
-	else {
-		(*action)(root, (@VISIT@)@preorder@, level);
+	if (!l && !r) {
+		(*action)(root, (@VISIT@)leaf, level);
+	} else {
+		(*action)(root, (@VISIT@)preorder, level);
 		if (l != NULL)
-			trecurse(l, action, level+1);
-		(*action)(root, (@VISIT@)@postorder@, level);
+			trecurse(l, action, level + 1);
+		(*action)(root, (@VISIT@)postorder, level);
 		if (r != NULL)
-			trecurse(r, action, level+1);
-		(*action)(root, (@VISIT@)@endorder@, level);
+			trecurse(r, action, level + 1);
+		(*action)(root, (@VISIT@)endorder, level);
 	}
 }
-
-@@Walk through the whole tree and call the ACTION callback for every node or leaf
-[[export_alias("__twalk")]]
+@@pop_namespace@@
+)]]
 void twalk([[nullable]] void const *root,
            [[nullable]] __action_fn_t action) {
 	if (root && action)
-		trecurse(root, action, 0);
+		__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trecurse)(root, action, 0);
 }
 
 %{
@@ -805,7 +812,7 @@ typedef void (*__free_fn_t) (void *__nodep);
 }
 
 @@Destroy the whole tree, call FREEFCT for each node or leaf
-[[userimpl, requires_function(free)]]
+[[requires_function(free)]]
 void tdestroy([[nullable]] void *root,
               [[nonnull]] __free_fn_t freefct) {
 again:

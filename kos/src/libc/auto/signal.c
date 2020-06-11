@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec85130a */
+/* HASH CRC-32:0x26c176d4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,123 +24,98 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "signal.h"
+#include "../user/signal.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-#include <bits/sigset.h>
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigemptyset") int
+INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigemptyset)(sigset_t *set) {
-#line 245 "kos/src/libc/magic/signal.c"
 	size_t cnt;
 	cnt = sizeof(__sigset_t) / sizeof(ulongptr_t);
 	while (cnt--)
 		set->__val[cnt] = 0;
 	return 0;
 }
-
-#include <bits/sigset.h>
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigfillset") int
+INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set) {
-#line 253 "kos/src/libc/magic/signal.c"
 	size_t cnt;
 	cnt = sizeof(__sigset_t) / sizeof(ulongptr_t);
 	while (cnt--)
-		set->__val[cnt] = ~(__ULONGPTR_TYPE__)0;
+		set->__val[cnt] = ~(ulongptr_t)0;
 	return 0;
 }
-
-#include <bits/sigset.h>
 /* @param signo: One of `SIG*' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigaddset") int
-NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set,
-                                     int signo) {
-#line 263 "kos/src/libc/magic/signal.c"
+INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set, int signo) {
 	ulongptr_t mask = __sigmask(signo);
 	ulongptr_t word = __sigword(signo);
 	set->__val[word] |= mask;
 	return 0;
 }
-
-#include <bits/sigset.h>
 /* @param signo: One of `SIG*' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigdelset") int
-NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set,
-                                     int signo) {
-#line 272 "kos/src/libc/magic/signal.c"
+INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set, int signo) {
 	ulongptr_t mask = __sigmask(signo);
 	ulongptr_t word = __sigword(signo);
 	set->__val[word] &= ~mask;
 	return 0;
 }
-
-#include <bits/sigset.h>
 /* @param signo: One of `SIG*' */
-INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigismember") int
-NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
-                                       int signo) {
-#line 282 "kos/src/libc/magic/signal.c"
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set, int signo) {
 	ulongptr_t mask = __sigmask(signo);
 	ulongptr_t word = __sigword(signo);
 	return (set->__val[word] & mask) != 0;
 }
-
-#include <bits/sigset.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigisemptyset") int
-NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *set) {
-#line 305 "kos/src/libc/magic/signal.c"
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *__restrict set) {
 	size_t i;
 	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
 		if (set->__val[i])
 			return 0;
 	return 1;
 }
-
-#include <bits/sigset.h>
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigandset") int
-NOTHROW_NCX(LIBCCALL libc_sigandset)(sigset_t *set,
-                                     sigset_t const *left,
-                                     sigset_t const *right) {
-#line 315 "kos/src/libc/magic/signal.c"
+INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1, 2, 3)) int
+NOTHROW_NCX(LIBCCALL libc_sigandset)(sigset_t *set, sigset_t const *left, sigset_t const *right) {
 	size_t i;
 	for (i = 0; i < sizeof(__sigset_t) / sizeof(ulongptr_t); ++i)
 		set->__val[i] = left->__val[i] & right->__val[i];
 	return 0;
 }
-
-#include <bits/sigset.h>
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigorset") int
-NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set,
-                                    sigset_t const *left,
-                                    sigset_t const *right) {
-#line 325 "kos/src/libc/magic/signal.c"
+INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1, 2, 3)) int
+NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set, sigset_t const *left, sigset_t const *right) {
 	size_t i;
 	for (i = 0; i < sizeof(__sigset_t) / sizeof(ulongptr_t); ++i)
 		set->__val[i] = left->__val[i] | right->__val[i];
 	return 0;
 }
-
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void) {
+	return __SIGRTMIN;
+}
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void) {
+	return __SIGRTMAX;
+}
 #endif /* !__KERNEL__ */
+
+DECL_END
+
 #ifndef __KERNEL__
 DEFINE_PUBLIC_WEAK_ALIAS(sigemptyset, libc_sigemptyset);
 DEFINE_PUBLIC_WEAK_ALIAS(sigfillset, libc_sigfillset);
+DEFINE_PUBLIC_WEAK_ALIAS(__sigaddset, libc_sigaddset);
 DEFINE_PUBLIC_WEAK_ALIAS(sigaddset, libc_sigaddset);
+DEFINE_PUBLIC_WEAK_ALIAS(__sigdelset, libc_sigdelset);
 DEFINE_PUBLIC_WEAK_ALIAS(sigdelset, libc_sigdelset);
+DEFINE_PUBLIC_WEAK_ALIAS(__sigismember, libc_sigismember);
 DEFINE_PUBLIC_WEAK_ALIAS(sigismember, libc_sigismember);
 DEFINE_PUBLIC_WEAK_ALIAS(sigisemptyset, libc_sigisemptyset);
 DEFINE_PUBLIC_WEAK_ALIAS(sigandset, libc_sigandset);
 DEFINE_PUBLIC_WEAK_ALIAS(sigorset, libc_sigorset);
+DEFINE_PUBLIC_WEAK_ALIAS(__libc_current_sigrtmin, libc___libc_current_sigrtmin);
+DEFINE_PUBLIC_WEAK_ALIAS(__libc_current_sigrtmax, libc___libc_current_sigrtmax);
 #endif /* !__KERNEL__ */
-
-DECL_END
 
 #endif /* !GUARD_LIBC_AUTO_SIGNAL_C */

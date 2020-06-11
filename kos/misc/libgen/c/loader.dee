@@ -54,7 +54,7 @@ import Function from .cheaders;
 
 
 /* How [[wchar]] and associated %{uchar} functions are handled:
- * >> [[wchar, ATTR_WUNUSED]]
+ * >> [[wchar, wunused]]
  * >> size_t wcslen([[nonnull]] wchar_t const *__restrict str) {
  * >> 	size_t result = 0;
  * >> 	while (str[result])
@@ -67,7 +67,7 @@ import Function from .cheaders;
  * ============================================ EXPANDED ============================================
  * >> [[if(defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 2), raw_alias(DOS$wcslen)]]
  * >> [[if(defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 4), raw_alias(KOS$wcslen)]]
- * >> [[ATTR_WUNUSED]]
+ * >> [[wunused]]
  * >> size_t wcslen([[nonnull]] wchar_t const *__restrict str) {
  * >> 	size_t result = 0;
  * >> 	while (str[result])
@@ -77,7 +77,7 @@ import Function from .cheaders;
  * >>
  * >>
  * >> [[if(__SIZEOF_WCHAR_T__ == 2), alias(wcslen), alias(DOS$wcslen)]]
- * >> [[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(wcslen), nocrt, ATTR_WUNUSED]]
+ * >> [[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(wcslen), nocrt, wunused]]
  * >> size_t c16len([[nonnull]] char16_t const *__restrict str) {
  * >> 	size_t result = 0;
  * >> 	while (str[result])
@@ -86,7 +86,7 @@ import Function from .cheaders;
  * >> }
  * >>
  * >> [[if(__SIZEOF_WCHAR_T__ == 4), alias(wcslen), alias(KOS$wcslen)]]
- * >> [[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(wcslen), nocrt, ATTR_WUNUSED]]
+ * >> [[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(wcslen), nocrt, wunused]]
  * >> size_t c32len([[nonnull]] char32_t const *__restrict str) {
  * >> 	size_t result = 0;
  * >> 	while (str[result])
@@ -136,12 +136,13 @@ global final CXX_SYSTEM_HEADER_END   = "#endif /* !__CXX_SYSTEM_HEADER */\n";
 global final DEFAULT_CC              = "LIBCCALL";
 global final DEFAULT_VCC             = "VLIBCCALL";
 global final DEFAULT_NOTHROW         = "NOTHROW_NCX";
+global final DEFAULT_LIBFUN_COND     = "!defined(__KERNEL__)";
 global final INCLUDE_KOS_ANNO        = "#include <kos/anno.h>";
 
 @@Simple return type annotations which (when used) will be converted into attributes
 global final SIMPLE_RETURN_TYPE_ATTRIBUTE_ANNOTATIONS: {string: string} = {
 	"nonnull"  : "ATTR_RETNONNULL",
-	"wunused"  : "ATTR_WUNUSED",
+	"wunused"  : "WUNUSED",
 	"nullable" : "",
 	"null"     : "",
 };
@@ -662,7 +663,7 @@ again_parse_annotations:
 				case "malloc_unaligned": {
 					if (result.attributes === defaultAttributes)
 						result.attributes = List(defaultAttributes);
-					result.attributes.append("ATTR_WUNUSED");
+					result.attributes.append("WUNUSED");
 					result.attributes.append("ATTR_MALLOC");
 					if (tok != "malloc_unaligned")
 						result.attributes.append("ATTR_MALL_DEFAULT_ALIGNED");
@@ -710,7 +711,7 @@ again_parse_annotations:
 					}
 					if (result.attributes === defaultAttributes)
 						result.attributes = List(defaultAttributes);
-					result.attributes.append("ATTR_WUNUSED");
+					result.attributes.append("WUNUSED");
 					if (tok != "realloc_unaligned")
 						result.attributes.append("ATTR_MALL_DEFAULT_ALIGNED");
 					result.attributes.append("ATTR_ALLOC_SIZE(({}))"
@@ -759,7 +760,7 @@ again_parse_annotations:
 					}
 					if (result.attributes === defaultAttributes)
 						result.attributes = List(defaultAttributes);
-					result.attributes.append("ATTR_WUNUSED");
+					result.attributes.append("WUNUSED");
 					if (tok != "realign")
 						result.attributes.append("ATTR_MALLOC");
 					result.attributes.append(minAlignmentAttrib);
@@ -877,7 +878,6 @@ class FunctionFeatures {
 	public member crt_noSelfImport: bool = false;                    /* [[no_]crt_self_import] Prevent importing from ASMNAME(crt_name || current.name) */
 	public member crt_noSelfExport: bool = false;                    /* [[no_]crt_self_export] Prevent exporting as ASMNAME(crt_name || current.name) */
 	public member crt_userimpl: bool = false;                        /* [[no_]userimpl]        Prevent implementation in libc/auto and always use libc/user */
-	public member crt_kernel: bool = false;                          /* [[no_]kernel]          Also export in kernel-space */
 	public member crt_kosSection: UserString | string | none = none; /* [kos_section(...)]     Section name for the KOS implementation */
 	public member crt_dosSection: UserString | string | none = none; /* [dos_section(...)]     Section name for the DOS implementation (if @wchar) */
 	public member crt_dosname: UserString | string | none = none;    /* [[default_]crt_dosname(...)] Same as @crt_name, but only for the DOS variant */
@@ -976,9 +976,6 @@ class FunctionFeatures {
 			"no_crt_self_export"          : ("crt_noSelfExport", true),
 			"userimpl"                    : ("crt_userimpl", true),
 			"no_userimpl"                 : ("crt_userimpl", false),
-			"kernel"                      : ("crt_kernel", true),
-			"nokernel"                    : ("crt_kernel", false),
-			"no_kernel"                   : ("crt_kernel", false),
 			"default_kos_section"         : ("crt_kosSection", none),
 			"default_dos_section"         : ("crt_dosSection", none),
 			"auto_dependency_scanning"    : ("noAutoDependencyScanning", false),
@@ -1001,8 +998,6 @@ class FunctionFeatures {
 			 *   - HINT: Can be used in conjunction with [[inline]]
 			 */
 			namespaces   = ();
-			libc         = false;
-			noLocal      = false;
 			macroBinding = true;
 			guard        = false;
 			/* FALLTHRU */
@@ -1322,8 +1317,6 @@ err_unexpected_if:
 	@@function body is present match the annotations of @defaultFeatures
 	public function assertDefaultAttributesWithoutImplementation(
 			defaultFeatures: FunctionFeatures): string {
-		if (crt_kernel !== defaultFeatures.crt_kernel)
-			return "[no_]kernel";
 		if (inline !== defaultFeatures.inline)
 			return "[no_]inline";
 		if (crt_userimpl !== defaultFeatures.crt_userimpl)
@@ -2302,7 +2295,9 @@ function loadSystemHeaderDefinitions(
 		local current = Function(originalSystemHeaderName: headerName);
 		local currentPrototype = FunctionPrototype(nothrow: DEFAULT_NOTHROW);
 		local currentPrototypes = [("1", { currentPrototype })];
-		local currentLibraryFunction = LibraryFunction(originalSystemHeaderName: headerName);
+		local currentLibraryFunction = LibraryFunction(
+			originalSystemHeaderName: headerName,
+			ppCond: DEFAULT_LIBFUN_COND);
 		local currentDosLibraryFunction: LibraryFunction = none;
 		/* # of leading entires in @current.bindings that should appear before the self-binding */
 		local numPreferredBindings = 0;
@@ -2472,20 +2467,24 @@ again_parse_annotations:
 					self.skip(")");
 					break;
 
-				case "intern_alias": {
+				case "crt_intern_alias":
+				case "crt_intern_kos_alias": {
 					self.next();
 					self.skip("(");
-					if (isCString(tok))
-						tok = tok.decode("c-escape");
-					else if (!tok.issymbol()) {
-						self.err("Expected keyword or string in [intern_alias(...)], but got {!r}"
-							.format({ tok }));
-					}
 					currentLibraryFunction.bindings.append(
 						LibraryFunctionBinding(
-							ppCond:  currentConditions,
-							binding: "libc_" + tok));
+							ppCond:  currentConditions !is none ? currentConditions : "1",
+							binding: parseCStringOrKeyword(self)));
+					self.skip(")");
+				}	break;
+
+				case "crt_intern_dos_alias": {
 					self.next();
+					self.skip("(");
+					currentLibraryFunction.bindings.append(
+						LibraryFunctionBinding(
+							ppCond:  currentConditions !is none ? currentConditions : "1",
+							binding: parseCStringOrKeyword(self)));
 					self.skip(")");
 				}	break;
 
@@ -2506,6 +2505,8 @@ again_parse_annotations:
 						local ppCond = currentConditions;
 						if (!mode.endswith("raw_alias"))
 							ppCond = constructAliasConditions(ppCond, tok);
+						if (ppCond is none)
+							ppCond = "1";
 						local binding = FunctionBinding(
 							ppCond:     ppCond,
 							prototypes: currentPrototypes,
@@ -2516,8 +2517,11 @@ again_parse_annotations:
 						} else {
 							current.bindings.append(binding);
 						}
-						currentLibraryFunction.exportSymbolNames
-							.append((currentConditions, tok));
+						currentLibraryFunction.exportSymbolNames.append((
+							currentConditions is none
+								? "1"
+								: currentConditions,
+							tok));
 						tok = self.next();
 						if (tok != ",")
 							break;
@@ -2538,8 +2542,11 @@ again_parse_annotations:
 							self.err("Expected string or keyword for [export_as(...)], but got {!r}"
 								.format({ tok }));
 						}
-						currentLibraryFunction.exportSymbolNames
-							.append((currentConditions, tok));
+						currentLibraryFunction.exportSymbolNames.append((
+							currentConditions !is none
+								? currentConditions
+								: "1",
+							tok));
 						tok = self.next();
 						if (tok != ",")
 							break;
@@ -2814,7 +2821,7 @@ again_parse_annotations:
 					 * or [[if(cond), alt_variant_of(name)]]
 					 * Same as:
 					 * [[if(cond), alias(name)]]
-					 * [[if(cond), intern_alias(name)]]
+					 * [[if(cond), crt_intern_alias(name)]]
 					 * In other words: When "cond" is true, link the current function
 					 *                 against some other function "name" in both the
 					 *                 system header, as well as the internal libc
@@ -2854,6 +2861,48 @@ do_handle_alt_variant_of:
 					}
 					self.skip(")");
 				}	break;
+
+				case "kernel":
+					/* >> [[kernel]]
+					 * Same as:
+					 * >> [[crt_impl_if(1)]]
+					 * Whereas the default for `crt_export_if' is:
+					 * >> [[crt_impl_if(!defined(__KERNEL__)))]]
+					 */
+					if (currentConditions !is none)
+						goto illegal_annotation_with_condition;
+					currentLibraryFunction.ppCond = "1";
+					self.next();
+					break;
+
+				case "crt_impl_if":
+				case "crt_kos_impl_if":
+					/* >> [[crt_impl_if(!defined(LIBC_ARCH_HAVE_MEMCPY))]]
+					 * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
+					 * Specify a preprocessor condition that must be met for the function
+					 * to be provided as a libc auto- or user-implementations. */
+					if (currentConditions !is none)
+						goto illegal_annotation_with_condition;
+					self.next();
+					self.skip("(");
+					currentLibraryFunction.ppCond = parseCStringOrAllUntilRParen(self);
+					self.skip(")");
+					break;
+
+				case "crt_dos_impl_if":
+					/* >> [[crt_dos_impl_if(!defined(LIBC_ARCH_HAVE_C16SLEN))]]
+					 * >> [[crt_kos_impl_if(!defined(LIBC_ARCH_HAVE_C32SLEN))]]
+					 * >> size_t wcslen(wchar_t const *str);
+					 * Same as crt_impl_if, but for the dos variant of a wchar-function. */
+					if (currentConditions !is none)
+						goto illegal_annotation_with_condition;
+					self.next();
+					self.skip("(");
+					if (currentDosLibraryFunction is none)
+						currentDosLibraryFunction = LibraryFunction();
+					currentDosLibraryFunction.ppCond = parseCStringOrAllUntilRParen(self);
+					self.skip(")");
+					break;
 
 				default:
 					if (isCString(tok)) {
@@ -3106,27 +3155,6 @@ again_skip_annotation_rbracket:
 					.format({ currentName }));
 			}
 		} /* !currentFeatures.wchar */
-
-		if (!currentFeatures.crt_kernel) {
-			/* Set-up the pp-cond of the current library function to only
-			 * be implemented when not being compiled for kernel-space. */
-			final local IFNDEF_KERNEL = "!defined(__KERNEL__)";
-			if (currentLibraryFunction.ppCond == "1")
-				currentLibraryFunction.ppCond = IFNDEF_KERNEL;
-			else {
-				currentLibraryFunction.ppCond = "({})&&{}"
-					.format({ currentLibraryFunction.ppCond, IFNDEF_KERNEL });
-			}
-			if (currentDosLibraryFunction !is none) {
-				if (currentDosLibraryFunction.ppCond == "1")
-					currentDosLibraryFunction.ppCond = IFNDEF_KERNEL;
-				else {
-					currentDosLibraryFunction.ppCond = "({})&&{}"
-						.format({ currentDosLibraryFunction.ppCond, IFNDEF_KERNEL });
-				}
-			}
-		}
-
 
 		/* Check for special case: @"dstFunction(*) = srcFunction;"
 		 * This case is handled by:
@@ -3696,12 +3724,17 @@ got_chkExpr:
 						self, context.defaultFeatures, currentName);
 					if (currentLibraryFunction.exportSymbolNames) {
 						self.errAt(currentNameTokStart,
-							"[export_as(...)] used with %{{uchar}} function {!r}"
+							"[[export_as(...)]] used with %{{uchar}} function {!r}"
+								.format({ currentName }));
+					}
+					if (currentLibraryFunction.ppCond != DEFAULT_LIBFUN_COND) {
+						self.errAt(currentNameTokStart,
+							"[[kernel]] used with %{{uchar}} function {!r}"
 								.format({ currentName }));
 					}
 					if (currentLibraryFunction.bindings) {
 						self.errAt(currentNameTokStart,
-							"[intern_alias(...)] or [alt_variant_of(...)] "
+							"[[crt_intern_alias(...)]] or [alt_variant_of(...)] "
 							"used with %{{uchar}} function {!r}"
 							.format({ currentName }));
 					}
@@ -4263,6 +4296,8 @@ again_lookup_wcsCurrent:
 					local dosVariantName = "libd_" + dosCrtName;
 					if (!currentFeatures.crt_noSelfExport) {
 						kosVariant.exportSymbolNames.append(("1", crtName));
+						/* TODO: the DOS$ prefix isn't required if no symbol of the same
+						 *       name is being exported from the default namespace! */
 						dosVariant.exportSymbolNames.append(("1", "DOS$" + dosCrtName));
 					}
 					kosVariant.name = kosVariantName;
@@ -4365,12 +4400,17 @@ handle_eq_after_prototype:
 					.format({ currentName, current.bindings }));
 			if (currentLibraryFunction.exportSymbolNames) {
 				self.errAt(currentNameTokStart,
-					"[export_as(...)] used with aliasing function {!r}"
+					"[[export_as(...)]] used with aliasing function {!r}"
 						.format({ current. name }));
+			}
+			if (currentLibraryFunction.ppCond != DEFAULT_LIBFUN_COND) {
+				self.errAt(currentNameTokStart,
+					"[[kernel]] used with aliasing function {!r}"
+					.format({ currentName }));
 			}
 			if (currentLibraryFunction.bindings) {
 				self.errAt(currentNameTokStart,
-					"[intern_alias(...)] or [alt_variant_of(...)] "
+					"[[crt_intern_alias(...)]] or [[alt_variant_of(...)]] "
 					"used with aliasing function {!r}"
 					.format({ currentName }));
 			}
@@ -4454,7 +4494,7 @@ done_function:
 				self.errAt(currentNameTokStart, "[export_as(...)] used, but function's isn't actually being exported");
 			/* Don't assert this: `alt_variant_of()' would still be allowed here! */
 //			if (currentLibraryFunction.bindings)
-//				self.errAt(currentNameTokStart, "[intern_alias(...)] or [alt_variant_of(...)] used, but function's isn't actually being exported");
+//				self.errAt(currentNameTokStart, "[crt_intern_alias(...)] or [alt_variant_of(...)] used, but function's isn't actually being exported");
 		}
 
 		/* Register the function, and insert it into listings where it should show up */

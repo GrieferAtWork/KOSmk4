@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc94d29fe */
+/* HASH CRC-32:0x101ce45b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_IFADDRS_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <ifaddrs.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Create a linked list of `struct ifaddrs' structures, one for each
  * network interface on the host machine. If successful, store the
  * list in *IFAP and return 0. On errors, return -1 and set `errno'.
@@ -36,6 +38,7 @@ DECL_BEGIN
 INTDEF int NOTHROW_NCX(LIBCCALL libc_getifaddrs)(struct ifaddrs **ifap);
 /* Reclaim the storage allocated by a previous `getifaddrs' call */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_freeifaddrs)(struct ifaddrs *ifa);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

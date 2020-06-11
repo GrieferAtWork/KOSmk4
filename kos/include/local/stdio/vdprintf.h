@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda943a10 */
+/* HASH CRC-32:0xa7489674 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -239,18 +239,27 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(_
 #endif /* !... */
 #endif /* !__local___localdep_write_defined */
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+#include <hybrid/host.h>
+#if __SIZEOF_INT__ != __SIZEOF_POINTER__ && !defined(__x86_64__)
 __NAMESPACE_LOCAL_BEGIN
-
 __LOCAL_LIBC(vdprintf_printer) __ssize_t (__LIBCCALL __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
 	return (__ssize_t)(__NAMESPACE_LOCAL_SYM __localdep_write)((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
 }
 __NAMESPACE_LOCAL_END
+#endif /* __SIZEOF_INT__ != __SIZEOF_POINTER__ && !__x86_64__ */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vdprintf) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(vdprintf))(__fd_t __fd, char const *__restrict __format, __builtin_va_list __args) {
+#if __SIZEOF_INT__ != __SIZEOF_POINTER__ && !defined(__x86_64__)
 	return __localdep_format_vprintf(&__NAMESPACE_LOCAL_SYM __vdprintf_printer,
 	                      (void *)(__UINTPTR_TYPE__)(unsigned int)__fd,
 	                      __format, __args);
+#else /* __SIZEOF_INT__ != __SIZEOF_POINTER__ && !__x86_64__ */
+	return __localdep_format_vprintf((__pformatprinter)&__localdep_write,
+	                      (void *)(__UINTPTR_TYPE__)(unsigned int)__fd,
+	                      __format, __args);
+#endif /* !__SIZEOF_INT__ != __SIZEOF_POINTER__ || __x86_64__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vdprintf_defined

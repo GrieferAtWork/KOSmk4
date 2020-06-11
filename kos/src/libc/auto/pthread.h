@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68bbb116 */
+/* HASH CRC-32:0x6f58d7a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_AUTO_PTHREAD_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <pthread.h>
@@ -30,7 +31,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* Compare two thread identifiers */
-INTDEF ATTR_CONST int NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t pthread1, pthread_t pthread2);
+INTDEF ATTR_CONST int NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t thr1, pthread_t thr2);
 /* Function called to call the cleanup handler. As an extern inline
  * function the compiler is free to decide inlining the change when
  * needed or fall back on the copy which must exist somewhere else */

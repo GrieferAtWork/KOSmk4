@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4719c10a */
+/* HASH CRC-32:0x7ab1d808 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,16 +22,19 @@
 #define GUARD_LIBC_USER_SGTTY_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sgtty.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Fill in *PARAMS with terminal parameters associated with FD */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_gtty)(fd_t fd, struct sgttyb *params);
 /* Set the terminal parameters associated with FD to *PARAMS */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_stty)(fd_t fd, struct sgttyb const *params);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

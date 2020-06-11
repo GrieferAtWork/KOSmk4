@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48f5a4a2 */
+/* HASH CRC-32:0xc6fe2450 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,6 +88,9 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fgetc_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetc_unlocked_defined */
+__NAMESPACE_LOCAL_END
+#include <asm/stdio.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getdelim_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(getdelim_unlocked))(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream) __THROWS(...) {
 	int __ch;

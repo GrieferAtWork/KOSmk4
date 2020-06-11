@@ -140,36 +140,6 @@ NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:strdup,hash:CRC-32=0xa5b692b4]]]*/
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.heap.strdup.strdup") char *
-NOTHROW_NCX(LIBCCALL libc_strdup)(char const *__restrict string)
-/*[[[body:strdup]]]*/
-/*AUTO*/{
-	size_t resultsize = (libc_strlen(string) + 1) * sizeof(char);
-	char *result = (char *)libc_malloc(resultsize);
-	if likely(result)
-		memcpy(result, string, resultsize);
-	return result;
-}
-/*[[[end:strdup]]]*/
-
-/*[[[head:strndup,hash:CRC-32=0x3496e51d]]]*/
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.heap.strdup.strndup") char *
-NOTHROW_NCX(LIBCCALL libc_strndup)(char const *__restrict string,
-                                   size_t max_chars)
-/*[[[body:strndup]]]*/
-/*AUTO*/{
-	size_t resultlen = libc_strnlen(string, max_chars);
-	char *result = (char *)libc_malloc((resultlen + 1) * sizeof(char));
-	if likely(result)
-		*(char *)mempcpy(result, string, resultlen * sizeof(char)) = '\0';
-	return result;
-}
-/*[[[end:strndup]]]*/
-
-
 
 PRIVATE ATTR_SECTION(".bss.crt.errno.strerror.strerror_buf") char strerror_buf[64];
 PRIVATE ATTR_SECTION(".bss.crt.errno.strsignal.strsignal_buf") char strsignal_buf[32];

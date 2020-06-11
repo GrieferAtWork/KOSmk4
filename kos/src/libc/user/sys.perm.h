@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e3d1367 */
+/* HASH CRC-32:0xdf640a09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,16 +22,19 @@
 #define GUARD_LIBC_USER_SYS_PERM_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/perm.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Change I/O port permissions for a specific I/O port range */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_ioperm)(ulongptr_t from, ulongptr_t num, int turn_on);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_ioperm)(ulongptr_t from, ulongptr_t num, __STDC_INT_AS_UINT_T turn_on);
 /* Change I/O port permissions for all I/O ports */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_iopl)(int level);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_iopl)(__STDC_INT_AS_UINT_T level);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

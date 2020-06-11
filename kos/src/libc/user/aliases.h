@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e3d8012 */
+/* HASH CRC-32:0x40309529 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_ALIASES_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <aliases.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Open alias data base files */
 INTDEF void NOTHROW_RPC_KOS(LIBCCALL libc_setaliasent)(void);
 /* Close alias data base files */
@@ -40,6 +42,7 @@ INTDEF NONNULL((1, 2, 4)) int NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struc
 INTDEF NONNULL((1)) struct aliasent *NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname)(char const *name);
 /* Get alias entry corresponding to NAME and put it in RESULT_BUF */
 INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name, struct aliasent *__restrict result_buf, char *__restrict buffer, size_t buflen, struct aliasent **__restrict result);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

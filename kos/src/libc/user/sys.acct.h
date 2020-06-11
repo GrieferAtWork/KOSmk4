@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1ad129e */
+/* HASH CRC-32:0xf12a48ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,17 @@
 #define GUARD_LIBC_USER_SYS_ACCT_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/acct.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Switch process accounting on and off */
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_acct)(const char *filename);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_acct)(const char *filename);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

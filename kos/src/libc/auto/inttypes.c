@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95c0f350 */
+/* HASH CRC-32:0x14a4f03c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,192 +25,123 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "inttypes.h"
-#include "stdlib.h"
-#include "wchar.h"
+#include <parts/uchar/inttypes.h>
+#include <parts/uchar/wchar.h>
+#include <stdlib.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.math.utility.imaxabs") intmax_t
+INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST intmax_t
 NOTHROW(LIBCCALL libc_imaxabs)(intmax_t x) {
-#line 540 "kos/src/libc/magic/inttypes.c"
 	return x < 0 ? -x : x;
 }
-
-INTERN ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.math.utility.imaxdiv") imaxdiv_t
-NOTHROW(LIBCCALL libc_imaxdiv)(intmax_t numer,
-                               intmax_t denom) {
-#line 545 "kos/src/libc/magic/inttypes.c"
+INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST imaxdiv_t
+NOTHROW(LIBCCALL libc_imaxdiv)(intmax_t numer, intmax_t denom) {
 	imaxdiv_t result;
 	result.quot = numer / denom;
 	result.rem  = numer % denom;
 	return result;
 }
-
-INTERN ATTR_LEAF NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.strtoimax") intmax_t
-NOTHROW_NCX(LIBCCALL libc_strtoimax)(char const *__restrict nptr,
-                                     char **endptr,
-                                     int base) {
-#line 558 "kos/src/libc/magic/inttypes.c"
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) intmax_t
+NOTHROW_NCX(LIBCCALL libc_strtoimax)(char const *__restrict nptr, char **endptr, int base) {
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (intmax_t)libc_strto32(nptr, endptr, base);
+	return (intmax_t)strto32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (intmax_t)libc_strto64(nptr, endptr, base);
-#endif /* __SIZEOF_INTMAX_T__ > 4 */
+	return (intmax_t)strto64(nptr, endptr, base);
+#endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
-
-INTERN ATTR_LEAF NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.strtoumax") uintmax_t
-NOTHROW_NCX(LIBCCALL libc_strtoumax)(char const *__restrict nptr,
-                                     char **endptr,
-                                     int base) {
-#line 572 "kos/src/libc/magic/inttypes.c"
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+NOTHROW_NCX(LIBCCALL libc_strtoumax)(char const *__restrict nptr, char **endptr, int base) {
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (uintmax_t)libc_strtou32(nptr, endptr, base);
+	return (uintmax_t)strtou32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (uintmax_t)libc_strtou64(nptr, endptr, base);
-#endif /* __SIZEOF_INTMAX_T__ > 4 */
+	return (uintmax_t)strtou64(nptr, endptr, base);
+#endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
-
-INTERN ATTR_LEAF NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcstoimax") intmax_t
-NOTHROW_NCX(LIBCCALL libc_wcstoimax)(char32_t const *__restrict nptr,
-                                     char32_t **endptr,
-                                     int base) {
-#line 558 "kos/src/libc/magic/inttypes.c"
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) intmax_t
+NOTHROW_NCX(LIBDCALL libd_wcstoimax)(char16_t const *__restrict nptr, char16_t **endptr, int base) {
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (intmax_t)libc_wcsto32(nptr, endptr, base);
+	return (intmax_t)c16sto32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (intmax_t)libc_wcsto64(nptr, endptr, base);
-#endif /* __SIZEOF_INTMAX_T__ > 4 */
+	return (intmax_t)c16sto64(nptr, endptr, base);
+#endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
-INTERN ATTR_LEAF NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcstoimax") intmax_t
-NOTHROW_NCX(LIBDCALL libd_wcstoimax)(char16_t const *__restrict nptr,
-                                     char16_t **endptr,
-                                     int base) {
-#line 558 "kos/src/libc/magic/inttypes.c"
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) intmax_t
+NOTHROW_NCX(LIBKCALL libc_wcstoimax)(char32_t const *__restrict nptr, char32_t **endptr, int base) {
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (intmax_t)libd_wcsto32(nptr, endptr, base);
+	return (intmax_t)c32sto32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (intmax_t)libd_wcsto64(nptr, endptr, base);
-#endif /* __SIZEOF_INTMAX_T__ > 4 */
+	return (intmax_t)c32sto64(nptr, endptr, base);
+#endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
-
-INTERN ATTR_LEAF NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcstoumax") uintmax_t
-NOTHROW_NCX(LIBCCALL libc_wcstoumax)(char32_t const *__restrict nptr,
-                                     char32_t **endptr,
-                                     int base) {
-#line 572 "kos/src/libc/magic/inttypes.c"
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+NOTHROW_NCX(LIBDCALL libd_wcstoumax)(char16_t const *__restrict nptr, char16_t **endptr, int base) {
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (uintmax_t)libc_wcstou32(nptr, endptr, base);
+	return (uintmax_t)c16stou32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (uintmax_t)libc_wcstou64(nptr, endptr, base);
-#endif /* __SIZEOF_INTMAX_T__ > 4 */
+	return (uintmax_t)c16stou64(nptr, endptr, base);
+#endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
-INTERN ATTR_LEAF NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcstoumax") uintmax_t
-NOTHROW_NCX(LIBDCALL libd_wcstoumax)(char16_t const *__restrict nptr,
-                                     char16_t **endptr,
-                                     int base) {
-#line 572 "kos/src/libc/magic/inttypes.c"
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+NOTHROW_NCX(LIBKCALL libc_wcstoumax)(char32_t const *__restrict nptr, char32_t **endptr, int base) {
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (uintmax_t)libd_wcstou32(nptr, endptr, base);
+	return (uintmax_t)c32stou32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (uintmax_t)libd_wcstou64(nptr, endptr, base);
-#endif /* __SIZEOF_INTMAX_T__ > 4 */
+	return (uintmax_t)c32stou64(nptr, endptr, base);
+#endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
-
-INTERN ATTR_LEAF NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.convert.strtoimax_l") intmax_t
-NOTHROW_NCX(LIBCCALL libc_strtoimax_l)(char const *__restrict nptr,
-                                       char **endptr,
-                                       int base,
-                                       locale_t locale) {
-#line 613 "kos/src/libc/magic/inttypes.c"
+INTERN ATTR_SECTION(".text.crt.unicode.locale.convert") ATTR_LEAF NONNULL((1)) intmax_t
+NOTHROW_NCX(LIBCCALL libc_strtoimax_l)(char const *__restrict nptr, char **endptr, int base, locale_t locale) {
 	(void)locale;
-	return libc_strtoimax(nptr, endptr, base);
+	return strtoimax(nptr, endptr, base);
 }
-
-INTERN ATTR_LEAF NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.convert.strtoumax_l") uintmax_t
-NOTHROW_NCX(LIBCCALL libc_strtoumax_l)(char const *__restrict nptr,
-                                       char **endptr,
-                                       int base,
-                                       locale_t locale) {
-#line 625 "kos/src/libc/magic/inttypes.c"
+INTERN ATTR_SECTION(".text.crt.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+NOTHROW_NCX(LIBCCALL libc_strtoumax_l)(char const *__restrict nptr, char **endptr, int base, locale_t locale) {
 	(void)locale;
-	return libc_strtoumax(nptr, endptr, base);
+	return strtoumax(nptr, endptr, base);
 }
-
-INTERN ATTR_LEAF NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.locale.convert.wcstoimax_l") intmax_t
-NOTHROW_NCX(LIBCCALL libc_wcstoimax_l)(char32_t const *__restrict nptr,
-                                       char32_t **endptr,
-                                       int base,
-                                       locale_t locale) {
-#line 613 "kos/src/libc/magic/inttypes.c"
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) intmax_t
+NOTHROW_NCX(LIBDCALL libd__wcstoimax_l)(char16_t const *__restrict nptr, char16_t **endptr, int base, locale_t locale) {
 	(void)locale;
-	return libc_wcstoimax(nptr, endptr, base);
+	return c16toimax(nptr, endptr, base);
 }
-INTERN ATTR_LEAF NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert.wcstoimax_l") intmax_t
-NOTHROW_NCX(LIBDCALL libd_wcstoimax_l)(char16_t const *__restrict nptr,
-                                       char16_t **endptr,
-                                       int base,
-                                       locale_t locale) {
-#line 613 "kos/src/libc/magic/inttypes.c"
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) intmax_t
+NOTHROW_NCX(LIBKCALL libc_wcstoimax_l)(char32_t const *__restrict nptr, char32_t **endptr, int base, locale_t locale) {
 	(void)locale;
-	return libd_wcstoimax(nptr, endptr, base);
+	return c32toimax(nptr, endptr, base);
 }
-
-INTERN ATTR_LEAF NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.locale.convert.wcstoumax_l") uintmax_t
-NOTHROW_NCX(LIBCCALL libc_wcstoumax_l)(char32_t const *__restrict nptr,
-                                       char32_t **endptr,
-                                       int base,
-                                       locale_t locale) {
-#line 625 "kos/src/libc/magic/inttypes.c"
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+NOTHROW_NCX(LIBDCALL libd__wcstoumax_l)(char16_t const *__restrict nptr, char16_t **endptr, int base, locale_t locale) {
 	(void)locale;
-	return libc_wcstoumax(nptr, endptr, base);
+	return c16toumax(nptr, endptr, base);
 }
-INTERN ATTR_LEAF NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert.wcstoumax_l") uintmax_t
-NOTHROW_NCX(LIBDCALL libd_wcstoumax_l)(char16_t const *__restrict nptr,
-                                       char16_t **endptr,
-                                       int base,
-                                       locale_t locale) {
-#line 625 "kos/src/libc/magic/inttypes.c"
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+NOTHROW_NCX(LIBKCALL libc_wcstoumax_l)(char32_t const *__restrict nptr, char32_t **endptr, int base, locale_t locale) {
 	(void)locale;
-	return libd_wcstoumax(nptr, endptr, base);
+	return c32toumax(nptr, endptr, base);
 }
-
 #endif /* !__KERNEL__ */
+
+DECL_END
+
 #ifndef __KERNEL__
 DEFINE_PUBLIC_WEAK_ALIAS(imaxabs, libc_imaxabs);
 DEFINE_PUBLIC_WEAK_ALIAS(imaxdiv, libc_imaxdiv);
 DEFINE_PUBLIC_WEAK_ALIAS(strtoimax, libc_strtoimax);
 DEFINE_PUBLIC_WEAK_ALIAS(strtoumax, libc_strtoumax);
-DEFINE_PUBLIC_WEAK_ALIAS(wcstoimax, libc_wcstoimax);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$wcstoimax, libd_wcstoimax);
-DEFINE_PUBLIC_WEAK_ALIAS(wcstoumax, libc_wcstoumax);
+DEFINE_PUBLIC_WEAK_ALIAS(wcstoimax, libc_wcstoimax);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$wcstoumax, libd_wcstoumax);
-DEFINE_PUBLIC_WEAK_ALIAS(strtoimax_l, libc_strtoimax_l);
+DEFINE_PUBLIC_WEAK_ALIAS(wcstoumax, libc_wcstoumax);
 DEFINE_PUBLIC_WEAK_ALIAS(_strtoimax_l, libc_strtoimax_l);
-DEFINE_PUBLIC_WEAK_ALIAS(strtoumax_l, libc_strtoumax_l);
+DEFINE_PUBLIC_WEAK_ALIAS(strtoimax_l, libc_strtoimax_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_strtoumax_l, libc_strtoumax_l);
+DEFINE_PUBLIC_WEAK_ALIAS(strtoumax_l, libc_strtoumax_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wcstoimax_l, libd__wcstoimax_l);
 DEFINE_PUBLIC_WEAK_ALIAS(wcstoimax_l, libc_wcstoimax_l);
-DEFINE_PUBLIC_WEAK_ALIAS(_wcstoimax_l, libc_wcstoimax_l);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wcstoimax_l, libd_wcstoimax_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wcstoumax_l, libd__wcstoumax_l);
 DEFINE_PUBLIC_WEAK_ALIAS(wcstoumax_l, libc_wcstoumax_l);
-DEFINE_PUBLIC_WEAK_ALIAS(_wcstoumax_l, libc_wcstoumax_l);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wcstoumax_l, libd_wcstoumax_l);
 #endif /* !__KERNEL__ */
-
-DECL_END
 
 #endif /* !GUARD_LIBC_AUTO_INTTYPES_C */

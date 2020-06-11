@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8778e30 */
+/* HASH CRC-32:0xd1577a8c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_AUTO_WCTYPE_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <wctype.h>
@@ -66,22 +67,6 @@ INTDEF ATTR_PURE WUNUSED wint_t NOTHROW_NCX(LIBCCALL libc_towlower_l)(wint_t wc,
 INTDEF WUNUSED NONNULL((1)) wctype_t NOTHROW_NCX(LIBCCALL libc_wctype_l)(char const *prop, locale_t locale);
 INTDEF WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop, locale_t locale);
 INTDEF WUNUSED wint_t NOTHROW_NCX(LIBCCALL libc_towctrans_l)(wint_t wc, wctrans_t desc, locale_t locale);
-#define libc__iswalnum_l libc_iswalnum_l
-#define libc__iswalpha_l libc_iswalpha_l
-#define libc__iswcntrl_l libc_iswcntrl_l
-#define libc__iswdigit_l libc_iswdigit_l
-#define libc__iswgraph_l libc_iswgraph_l
-#define libc__iswlower_l libc_iswlower_l
-#define libc__iswprint_l libc_iswprint_l
-#define libc__iswpunct_l libc_iswpunct_l
-#define libc__iswspace_l libc_iswspace_l
-#define libc__iswupper_l libc_iswupper_l
-#define libc__iswxdigit_l libc_iswxdigit_l
-#define libc__iswblank_l libc_iswblank_l
-#define libc__towupper_l libc_towupper_l
-#define libc__towlower_l libc_towlower_l
-#define libc__iswctype_l libc_iswctype_l
-#define libc_is_wctype libc_iswctype
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_isleadbyte)(int wc);
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__isleadbyte_l)(int wc, locale_t locale);
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc___iswcsymf)(wint_t wc);

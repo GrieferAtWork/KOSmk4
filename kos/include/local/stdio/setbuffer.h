@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x126652a3 */
+/* HASH CRC-32:0x8705eb16 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_setbuffer_defined
 #define __local_setbuffer_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
+#include <asm/stdio.h>
+#if defined(___IOFBF) && defined(___IONBF) && (defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: setvbuf from stdio */
 #ifndef __local___localdep_setvbuf_defined
@@ -59,7 +60,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_setbuffer_defined 1
 #define __localdep_setbuffer __LIBC_LOCAL_NAME(setbuffer)
 #endif /* !__local___localdep_setbuffer_defined */
-#else /* __CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked */
+#else /* ___IOFBF && ___IONBF && (__CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked) */
 #undef __local_setbuffer_defined
-#endif /* !__CRT_HAVE_setvbuf && !__CRT_HAVE__IO_setvbuf && !__CRT_HAVE_setvbuf_unlocked */
+#endif /* !___IOFBF || !___IONBF || (!__CRT_HAVE_setvbuf && !__CRT_HAVE__IO_setvbuf && !__CRT_HAVE_setvbuf_unlocked) */
 #endif /* !__local_setbuffer_defined */

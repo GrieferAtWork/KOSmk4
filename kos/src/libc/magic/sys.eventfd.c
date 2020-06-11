@@ -80,7 +80,7 @@ int eventfd_read($fd_t fd, eventfd_t *value) {
 }
 
 @@Increment event counter
-[[cp, requires_function(write)]]
+[[cp, userimpl, requires_function(write)]]
 [[decl_include("<bits/types.h>"), impl_include("<parts/errno.h>")]]
 int eventfd_write($fd_t fd, eventfd_t value) {
 	ssize_t error;

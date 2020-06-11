@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa55dd73e */
+/* HASH CRC-32:0x6bc6a1e9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,11 +59,25 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fread_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
+#include <hybrid/__overflow.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fread_s) __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __SIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fread_s))(void *__restrict __buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) {
-	__bufsize = __elemsize ? __bufsize / __elemsize : 0;
-	return __localdep_fread(__buf, __elemsize, __bufsize < __elemcount ? __bufsize : __elemcount, __stream);
+	__SIZE_TYPE__ __reqbuf;
+	if (__hybrid_overflow_umul(__elemsize, __elemcount, &__reqbuf) ||
+	    __reqbuf > __bufsize) {
+#ifdef ERANGE
+		__libc_seterrno(__ERANGE);
+#endif /* ERANGE */
+		return 0;
+	}
+	if __unlikely(!__stream || !__buf) {
+#ifdef EINVAL
+		__libc_seterrno(__EINVAL);
+#endif /* EINVAL */
+		return 0;
+	}
+	return __localdep_fread(__buf, __elemsize, __elemcount, __stream);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fread_s_defined

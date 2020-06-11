@@ -466,9 +466,9 @@ void *bsearch([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_
 	[([[nonnull]] void const *pkey, [[nonnull]] void *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp): void *]
 	[([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp): void const *]
 {
-	return bsearch_r(pkey, pbase, item_count, item_size,
-	                 &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
-	                 (void *)cmp);
+	return (void *)bsearch_r(pkey, pbase, item_count, item_size,
+	                         &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
+	                         (void *)cmp);
 }
 
 
@@ -2349,8 +2349,9 @@ _invalid_parameter_handler _get_invalid_parameter_handler();
 %
 [[decl_include("<bits/types.h>")]]
 [[section(".text.crt.dos.application.init")]]
+[[impl_include("<local/program_invocation_name.h>")]]
 [[requires_include("<local/program_invocation_name.h>")]]
-[[userimpl, requires(defined(__LOCAL_program_invocation_name))]]
+[[requires(defined(__LOCAL_program_invocation_name))]]
 errno_t _get_pgmptr(char **pvalue) {
 	*pvalue = __LOCAL_program_invocation_name;
 	return 0;
@@ -2508,12 +2509,12 @@ __LOCAL_LIBC(__invoke_compare_helper_s) int
 void *bsearch_s([[nonnull]] void const *key, [[nonnull]] void const *base,
                 $size_t nmemb, $size_t size,
                 [[nonnull]] __dos_compar_d_fn_t compar, void *arg) {
-	struct @__invoke_compare_helper_s_data@ data;
-	data.@__fun@ = compar;
-	data.@__arg@ = arg;
-	return bsearch_r(key, base, nmemb, size,
-	                 &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
-	                 &data);
+	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data data;
+	data.__fun = compar;
+	data.__arg = arg;
+	return (void *)bsearch_r(key, base, nmemb, size,
+	                         &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
+	                         &data);
 }
 
 [[throws]]
@@ -2521,7 +2522,7 @@ void *bsearch_s([[nonnull]] void const *key, [[nonnull]] void const *base,
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER_S)]]
 void qsort_s([[nonnull]] void *base, $size_t nmemb, $size_t size,
              [[nonnull]] __dos_compar_d_fn_t compar, void *arg) {
-	struct __invoke_compare_helper_s_data data;
+	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data data;
 	data.__fun = compar;
 	data.__arg = arg;
 	return qsort_r(base, nmemb, size,
@@ -2870,7 +2871,7 @@ errno_t _mbstowcs_s_l($size_t *presult,
 %[default_impl_section(".text.crt.dos.random")]
 
 [[decl_include("<bits/types.h>")]]
-[[userimpl, impl_include("<parts/errno.h>")]]
+[[impl_include("<parts/errno.h>")]]
 errno_t rand_s([[nonnull]] unsigned int *__restrict randval) {
 	if (!randval) {
 @@pp_ifdef EINVAL@@
@@ -2990,7 +2991,7 @@ errno_t wcstombs_s([[nonnull]] $size_t *presult,
 
 %[insert:function(_recalloc = recallocv)]
 
-[[userimpl, requires_function(malloc)]]
+[[requires_function(malloc)]]
 _aligned_malloc:($size_t num_bytes, $size_t min_alignment)
 	-> [[memalign(min_alignment, num_bytes)]] void *
 {
@@ -3004,7 +3005,7 @@ _aligned_malloc:($size_t num_bytes, $size_t min_alignment)
 	return result;
 }
 
-[[userimpl, requires_function(malloc)]]
+[[requires_function(malloc)]]
 _aligned_offset_malloc:($size_t num_bytes, $size_t min_alignment, $size_t offset)
 	-> [[malloc_unaligned(num_bytes)]] void *
 {
@@ -3020,7 +3021,7 @@ _aligned_offset_malloc:($size_t num_bytes, $size_t min_alignment, $size_t offset
 	return result;
 }
 
-[[userimpl, requires_function(_aligned_malloc, _aligned_free, _aligned_msize)]]
+[[requires_function(_aligned_malloc, _aligned_free, _aligned_msize)]]
 _aligned_realloc:(void *aligned_mallptr, $size_t newsize, $size_t min_alignment)
 	-> [[realign(aligned_mallptr, min_alignment, newsize)]] void *
 {
@@ -3036,7 +3037,7 @@ _aligned_realloc:(void *aligned_mallptr, $size_t newsize, $size_t min_alignment)
 	return result;
 }
 
-[[userimpl, requires_function(_aligned_malloc, _aligned_free, _aligned_msize)]]
+[[requires_function(_aligned_malloc, _aligned_free, _aligned_msize)]]
 _aligned_recalloc:(void *aligned_mallptr, $size_t count, $size_t num_bytes, $size_t min_alignment)
 	-> [[realign(aligned_mallptr, min_alignment, count * num_bytes)]] void *
 {
@@ -3054,7 +3055,7 @@ _aligned_recalloc:(void *aligned_mallptr, $size_t count, $size_t num_bytes, $siz
 	return result;
 }
 
-[[userimpl, requires_function(_aligned_offset_malloc, _aligned_free, _aligned_msize)]]
+[[requires_function(_aligned_offset_malloc, _aligned_free, _aligned_msize)]]
 _aligned_offset_realloc:(void *aligned_mallptr, $size_t newsize, $size_t min_alignment, $size_t offset)
 	-> [[realloc_unaligned(aligned_mallptr, newsize)]] void *
 {
@@ -3070,7 +3071,7 @@ _aligned_offset_realloc:(void *aligned_mallptr, $size_t newsize, $size_t min_ali
 	return result;
 }
 
-[[userimpl, requires_function(_aligned_offset_malloc, _aligned_free, _aligned_msize)]]
+[[requires_function(_aligned_offset_malloc, _aligned_free, _aligned_msize)]]
 _aligned_offset_recalloc:(void *aligned_mallptr, $size_t count, $size_t num_bytes, $size_t min_alignment, $size_t offset)
 	-> [[realloc_unaligned(aligned_mallptr, count * num_bytes)]] void *
 {
@@ -3088,7 +3089,7 @@ _aligned_offset_recalloc:(void *aligned_mallptr, $size_t count, $size_t num_byte
 	return result;
 }
 
-[[wunused, ATTR_PURE, userimpl]]
+[[wunused, ATTR_PURE]]
 $size_t _aligned_msize(void *aligned_mallptr, $size_t min_alignment, $size_t offset) {
 	(void)min_alignment;
 	(void)offset;
@@ -3097,7 +3098,7 @@ $size_t _aligned_msize(void *aligned_mallptr, $size_t min_alignment, $size_t off
 	return ($size_t)(uintptr_t)((void **)aligned_mallptr)[-2];
 }
 
-[[userimpl, requires_function(free)]]
+[[requires_function(free)]]
 void _aligned_free(void *aligned_mallptr) {
 	if (aligned_mallptr)
 		free(((void **)aligned_mallptr)[-1]);
@@ -3266,13 +3267,13 @@ unsigned long _lrotr(unsigned long val, int shift) {
 
 %[default_impl_section(".text.crt.dos.fs.environ")];
 [[decl_include("<bits/types.h>")]]
-[[userimpl, requires_function(setenv), impl_include("<parts/errno.h>")]]
+[[requires_function(setenv), impl_include("<parts/errno.h>")]]
 errno_t _putenv_s(char const *varname, char const *val) {
 	return setenv(varname, val, 1) ? __libc_geterrno_or(__EINVAL) : 0;
 }
 
 %[default_impl_section(".text.crt.dos.fs.utility")];
-[[cp, userimpl, requires_function(_searchenv_s)]]
+[[cp, requires_function(_searchenv_s)]]
 void _searchenv([[nonnull]] char const *file,
                 [[nonnull]] char const *envvar,
                 [[nonnull]] char *__restrict resultpath) {
@@ -3285,14 +3286,12 @@ errno_t _searchenv_s([[nonnull]] char const *file,
                      [[nonnull]] char *__restrict resultpath,
                      $size_t buflen);
 
-[[userimpl]]
 void _makepath([[nonnull]] char *__restrict buf,
                char const *drive, char const *dir,
                char const *file, char const *ext) {
 	_makepath_s(buf, ($size_t)-1, drive, dir, file, ext);
 }
 
-[[userimpl]]
 void _splitpath([[nonnull]] char const *__restrict abspath,
                 char *drive, char *dir, char *file, char *ext) {
 	_splitpath_s(abspath,
@@ -3303,7 +3302,7 @@ void _splitpath([[nonnull]] char const *__restrict abspath,
 }
 
 [[decl_include("<bits/types.h>")]]
-[[userimpl, impl_include("<parts/errno.h>")]]
+[[impl_include("<parts/errno.h>")]]
 errno_t _makepath_s([[nonnull]] char *buf, $size_t buflen,
                     char const *drive, char const *dir,
                     char const *file, char const *ext) {

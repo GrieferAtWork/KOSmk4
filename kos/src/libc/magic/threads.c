@@ -177,8 +177,8 @@ thrd_t thrd_current() = pthread_self;
 [[cp, no_crt_self_import, decl_include("<bits/timespec.h>")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("thrd_sleep64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("thrd_sleep")]]
-[[requires($has_function(thrd_sleep32) || $has_function(crt_thrd_sleep64) || $has_function(nanosleep))]]
 [[impl_include("<asm/threads.h>", "<parts/errno.h>")]]
+[[userimpl, requires($has_function(thrd_sleep32) || $has_function(crt_thrd_sleep64) || $has_function(nanosleep))]]
 int thrd_sleep([[nonnull]] struct timespec const *time_point,
                [[nullable]] struct timespec *remaining) {
 @@pp_if $has_function(thrd_sleep32)@@

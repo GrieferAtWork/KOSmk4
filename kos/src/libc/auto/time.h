@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13c1341a */
+/* HASH CRC-32:0xea3106de */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_AUTO_TIME_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <time.h>
@@ -61,14 +62,10 @@ INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL li
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer);
 /* Like `mktime', but TP represents Universal Time (UTC), not local time */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) time_t NOTHROW_NCX(LIBCCALL libc_timegm)(__STRUCT_TM *tp);
-/* Another name for `mktime' */
-#define libc_timelocal libc_mktime
 /* Return the number of days in YEAR */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_dysize)(int year);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_dysize)(__STDC_INT_AS_UINT_T year);
 /* Like `mktime', but TP represents Universal Time (UTC), not local time */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBCCALL libc_timegm64)(__STRUCT_TM *tp);
-/* Another name for `mktime64' */
-#define libc_timelocal64 libc_mktime64
 /* Similar to `strftime' but take the information from
  * the provided locale and not the global locale */
 INTDEF NONNULL((1, 3, 4)) size_t NOTHROW_NCX(LIBCCALL libc_strftime_l)(char *__restrict buf, size_t bufsize, char const *__restrict format, __STRUCT_TM const *__restrict tp, locale_t locale);
@@ -78,6 +75,11 @@ INTDEF NONNULL((1, 2, 3)) char *NOTHROW_NCX(LIBCCALL libc_strptime)(char const *
 /* Similar to `strptime' but take the information from
  * the provided locale and not the global locale */
 INTDEF NONNULL((1, 2, 3)) char *NOTHROW_NCX(LIBCCALL libc_strptime_l)(char const *__restrict s, char const *__restrict format, __STRUCT_TM *__restrict tp, locale_t locale);
+/* Since `getdate' is not reentrant because of the use of `getdate_err'
+ * and the static buffer to return the result in, we provide a thread-safe
+ * variant.  The functionality is the same.  The result is returned in
+ * the buffer pointed to by RESBUFP and in case of an error the return
+ * value is != 0 with the same values as given above for `getdate_err'. */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_getdate_r)(char const *__restrict string, __STRUCT_TM *__restrict resbufp);
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 INTDEF NONNULL((1, 2)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer, __STRUCT_TM *__restrict tp);

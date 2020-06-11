@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb5365cb */
+/* HASH CRC-32:0xa3218c24 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,12 +23,14 @@
 
 #include "../api.h"
 #include "../auto/time.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <time.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Time used by the program so far (user time + system time)
  * The result / CLOCKS_PER_SECOND is program time in seconds */
 INTDEF WUNUSED clock_t NOTHROW_NCX(LIBCCALL libc_clock)(void);
@@ -56,13 +58,13 @@ INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_timer_create)(clockid_t clock_
 /* Delete timer TIMERID */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_timer_delete)(timer_t timerid);
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
-INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_timer_settime)(timer_t timerid, int flags, struct itimerspec const *__restrict value, struct itimerspec *__restrict ovalue);
+INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_timer_settime)(timer_t timerid, __STDC_INT_AS_UINT_T flags, struct itimerspec const *__restrict value, struct itimerspec *__restrict ovalue);
 /* Get current value of timer TIMERID and store it in VALUE */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_timer_gettime)(timer_t timerid, struct itimerspec *value);
 /* Get expiration overrun for timer TIMERID */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_timer_getoverrun)(timer_t timerid);
 /* High-resolution sleep with the specified clock */
-INTDEF NONNULL((3)) int NOTHROW_RPC(LIBCCALL libc_clock_nanosleep)(clockid_t clock_id, int flags, struct timespec const *__restrict requested_time, struct timespec *remaining);
+INTDEF NONNULL((3)) int NOTHROW_RPC(LIBCCALL libc_clock_nanosleep)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec const *__restrict requested_time, struct timespec *remaining);
 /* Return clock ID for CPU-time clock */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_clock_getcpuclockid)(pid_t pid, clockid_t *clock_id);
 /* Pause execution for a number of nanoseconds */
@@ -74,24 +76,19 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_gettime64)(clockid_t clo
 /* Set clock CLOCK_ID to value TP */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_settime64)(clockid_t clock_id, struct timespec64 const *tp);
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
-INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid, int flags, struct itimerspec64 const *__restrict value, struct itimerspec64 *__restrict ovalue);
+INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid, __STDC_INT_AS_UINT_T flags, struct itimerspec64 const *__restrict value, struct itimerspec64 *__restrict ovalue);
 /* Get current value of timer TIMERID and store it in VALUE */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_timer_gettime64)(timer_t timerid, struct itimerspec64 *value);
 /* High-resolution sleep with the specified clock */
-INTDEF NONNULL((3)) int NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id, int flags, struct timespec64 const *requested_time, struct timespec64 *remaining);
+INTDEF NONNULL((3)) int NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec64 const *requested_time, struct timespec64 *remaining);
 /* Set TS to calendar time based in time base BASE */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts, int base);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts, __STDC_INT_AS_UINT_T base);
 /* Parse the given string as a date specification and return a value
  * representing the value.  The templates from the file identified by
  * the environment variable DATEMSK are used.  In case of an error
  * `getdate_err' is set */
 INTDEF NONNULL((1)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string);
-/* Since `getdate' is not reentrant because of the use of `getdate_err'
- * and the static buffer to return the result in, we provide a thread-safe
- * variant.  The functionality is the same.  The result is returned in
- * the buffer pointed to by RESBUFP and in case of an error the return
- * value is != 0 with the same values as given above for `getdate_err'. */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_getdate_r)(const char *__restrict string, __STRUCT_TM *__restrict resbufp);
+#endif /* !__KERNEL__ */
 INTDEF char *libc_tzname[2];
 INTDEF int libc_daylight;
 INTDEF longptr_t libc_timezone;

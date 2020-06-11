@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe238773b */
+/* HASH CRC-32:0x6fed02de */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,12 +23,14 @@
 
 #include "../api.h"
 #include "../auto/mntent.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <mntent.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Prepare to begin reading and/or writing mount table
  * entries from the beginning of FILE.  MODE is as for `fopen' */
 INTDEF NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc_setmntent)(char const *file, char const *mode);
@@ -42,6 +44,7 @@ INTDEF NONNULL((1, 2, 3)) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent_r)(
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt);
 /* Close a stream opened with `setmntent' */
 INTDEF NONNULL((1)) int NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

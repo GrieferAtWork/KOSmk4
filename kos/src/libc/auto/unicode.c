@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85e0b68 */
+/* HASH CRC-32:0x7dc9c94b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,8 @@ DECL_BEGIN
 
 #include <local/unicode_utf8seqlen.h>
 /* Read a single Unicode character from a given UTF-8 string */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf8") char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf8)(/*utf-8*/ char const **__restrict ptext) {
-#line 135 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf8)(char const **__restrict ptext) {
 	char32_t result;
 	char const *iter = *ptext;
 	result = (char32_t)(u8)*iter++;
@@ -112,14 +110,11 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8)(/*utf-8*/ char const **__restrict pt
 	*ptext = iter;
 	return result;
 }
-
 /* Same as `unicode_readutf8', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf8_rev") char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev)(/*utf-8*/ char const **__restrict ptext) {
-#line 223 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev)(char const **__restrict ptext) {
 	char32_t result;
 	char const *iter = *ptext;
 	uint8_t seqlen = 1;
@@ -199,14 +194,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev)(/*utf-8*/ char const **__restric
 	*ptext = iter;
 	return result;
 }
-
-#include <local/unicode_utf8seqlen.h>
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf8_n") char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_n)(/*utf-8*/ char const **__restrict ptext,
-                                              char const *text_end) {
-#line 310 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_n)(char const **__restrict ptext, char const *text_end) {
 	char32_t result;
 	char const *iter = *ptext;
 	if __unlikely(iter >= text_end)
@@ -291,13 +281,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_n)(/*utf-8*/ char const **__restrict 
 	*ptext = iter;
 	return result;
 }
-
 /* Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf8_rev_n") char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev_n)(/*utf-8*/ char const **__restrict ptext,
-                                                  char const *text_start) {
-#line 402 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev_n)(char const **__restrict ptext, char const *text_start) {
 	char32_t result;
 	char const *iter = *ptext;
 	uint8_t seqlen = 1;
@@ -381,12 +367,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev_n)(/*utf-8*/ char const **__restr
 	*ptext = iter;
 	return result;
 }
-
 /* Read a single Unicode character from a given UTF-16 string */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16") char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf16)(/*utf-16*/ char16_t const **__restrict ptext) {
-#line 493 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf16)(char16_t const **__restrict ptext) {
 	char32_t result;
 	char16_t const *text = *ptext;
 	result = (char32_t)(u16)*text++;
@@ -400,13 +383,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16)(/*utf-16*/ char16_t const **__restr
 	*ptext = text;
 	return result;
 }
-
 /* Same as `unicode_readutf16()', but don't read past `text_end' */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_n") char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_n)(/*utf-16*/ char16_t const **__restrict ptext,
-                                               char16_t const *text_end) {
-#line 514 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_n)(char16_t const **__restrict ptext, char16_t const *text_end) {
 	char32_t result;
 	char16_t const *text = *ptext;
 	if (text >= text_end)
@@ -423,13 +402,10 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_n)(/*utf-16*/ char16_t const **__res
 	*ptext = text;
 	return result;
 }
-
 #include <hybrid/__byteswap.h>
 /* Same as `unicode_readutf16()', but read in reverse endian as that of the host CPU */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_swap") char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap)(/*utf-16-swap*/ char16_t const **__restrict ptext) {
-#line 539 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap)(char16_t const **__restrict ptext) {
 	char32_t result;
 	char16_t const *text = *ptext;
 	result = (char32_t)__hybrid_bswap16((u16)*text);
@@ -445,14 +421,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap)(/*utf-16-swap*/ char16_t const
 	*ptext = text;
 	return result;
 }
-
-#include <hybrid/__byteswap.h>
 /* Same as `unicode_readutf16_n()', but read in reverse endian as that of the host CPU */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_swap_n") char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_n)(/*utf-16-swap*/ char16_t const **__restrict ptext,
-                                                    char16_t const *text_end) {
-#line 562 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_n)(char16_t const **__restrict ptext, char16_t const *text_end) {
 	char32_t result;
 	char16_t const *text = *ptext;
 	if (text >= text_end)
@@ -471,14 +442,11 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_n)(/*utf-16-swap*/ char16_t con
 	*ptext = text;
 	return result;
 }
-
 /* Same as `unicode_readutf16', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_rev") char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev)(/*utf-16*/ char16_t const **__restrict ptext) {
-#line 590 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev)(char16_t const **__restrict ptext) {
 	char32_t result;
 	char16_t const *text = *ptext;
 	result = (char32_t)(u16)*--text;
@@ -493,12 +461,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev)(/*utf-16*/ char16_t const **__r
 	*ptext = text;
 	return result;
 }
-
 /* Same as `unicode_readutf16_rev()', but read in reverse endian as that of the host CPU */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_swap_rev") char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev)(/*utf-16*/ char16_t const **__restrict ptext) {
-#line 612 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev)(char16_t const **__restrict ptext) {
 	char32_t result;
 	char16_t const *text = *ptext;
 	--text;
@@ -514,13 +479,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev)(/*utf-16*/ char16_t const 
 	*ptext = text;
 	return result;
 }
-
 /* Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_rev_n") char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev_n)(/*utf-16*/ char16_t const **__restrict ptext,
-                                                   char16_t const *text_start) {
-#line 634 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev_n)(char16_t const **__restrict ptext, char16_t const *text_start) {
 	char32_t result;
 	char16_t const *text = *ptext;
 	if (text <= text_start)
@@ -537,13 +498,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev_n)(/*utf-16*/ char16_t const **_
 	*ptext = text;
 	return result;
 }
-
 /* Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_readutf16_swap_rev_n") char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(/*utf-16*/ char16_t const **__restrict ptext,
-                                                        char16_t const *text_start) {
-#line 657 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(char16_t const **__restrict ptext, char16_t const *text_start) {
 	char32_t result;
 	char16_t const *text = *ptext;
 	if (text <= text_start)
@@ -561,14 +518,10 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(/*utf-16*/ char16_t cons
 	*ptext = text;
 	return result;
 }
-
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
-INTERN ATTR_RETNONNULL NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_writeutf8") char *
-NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(/*utf-8*/ char *__restrict dst,
-                                             char32_t ch) {
-#line 690 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst, char32_t ch) {
 	if likely(ch <= ((uint32_t)1 << 7)-1) {
 		*dst++ = (char)(u8)ch;
 	} else if (ch <= ((uint32_t)1 << 11)-1) {
@@ -607,14 +560,10 @@ NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(/*utf-8*/ char *__restrict dst,
 	}
 	return dst;
 }
-
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
-INTERN ATTR_RETNONNULL NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_writeutf16") char16_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(/*utf-16*/ char16_t *__restrict dst,
-                                              char32_t ch) {
-#line 734 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1)) char16_t *
+NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(char16_t *__restrict dst, char32_t ch) {
 	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
 		*dst++ = (char16_t)ch;
 	} else {
@@ -624,59 +573,78 @@ NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(/*utf-16*/ char16_t *__restrict ds
 	}
 	return dst;
 }
-
+/* Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false */
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") WUNUSED NONNULL((1)) char16_t *
+NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16_chk)(char16_t *__restrict dst, char32_t ch) {
+	if unlikely(ch > 0x10ffff)
+		return NULL;
+	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
+		*dst++ = (char16_t)ch;
+	} else {
+		ch -= 0x10000;
+		*dst++ = 0xd800 + (char16_t)(ch >> 10);
+		*dst++ = 0xdc00 + (char16_t)(ch & 0x3ff);
+	}
+	return dst;
+}
 /* Convert a given utf-8 string to utf-16.
  * @param: utf16_dst: A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_characters)' words, or `*2' bytes
  * @param: utf8_text: The input UTF-8 string to convert
  * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
  * @return: * : A pointer after the last written UTF-16 character */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_8to16") char16_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_8to16)(/*utf-16*/ char16_t *__restrict utf16_dst,
-                                         /*utf-8*/ char const *__restrict utf8_text,
-                                         size_t utf8_characters) {
-#line 975 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+NOTHROW_NCX(LIBCCALL libc_unicode_8to16)(char16_t *__restrict utf16_dst, char const *__restrict utf8_text, size_t utf8_characters) {
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
-		ch = libc_unicode_readutf8_n((char const **)&utf8_text,utf8_end);
-		utf16_dst = libc_unicode_writeutf16(utf16_dst,ch);
+		ch = unicode_readutf8_n((char const **)&utf8_text,utf8_end);
+		utf16_dst = unicode_writeutf16(utf16_dst,ch);
 	}
 	return utf16_dst;
 }
-
+#ifndef __KERNEL__
+/* Same as `unicode_8to16()', but return `NULL' if an attempt was made to write an invalid character.
+ * @param: utf16_dst: A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_characters)' words, or `*2' bytes
+ * @param: utf8_text: The input UTF-8 string to convert
+ * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
+ * @return: * : A pointer after the last written UTF-16 character.
+ * @return: NULL: Attempted to write an invalid character */
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") WUNUSED NONNULL((1, 2)) char16_t *
+NOTHROW_NCX(LIBCCALL libc_unicode_8to16_chk)(char16_t *__restrict utf16_dst, char const *__restrict utf8_text, size_t utf8_characters) {
+	char const *utf8_end = utf8_text + utf8_characters;
+	while (utf8_text < utf8_end) {
+		char32_t ch;
+		ch = unicode_readutf8_n((char const **)&utf8_text,utf8_end);
+		if (ch > 0x10ffff || (ch >= 0xd800 && ch <= 0xdfff))
+			return NULL;
+		utf16_dst = unicode_writeutf16(utf16_dst,ch);
+	}
+	return utf16_dst;
+}
+#endif /* !__KERNEL__ */
 /* Convert a given utf-8 string to utf-32.
  * @param: utf32_dst: A buffer of at least `UNICODE_8TO32_MAXBUF(utf8_characters)' dwords, or `*4' bytes
  * @param: utf8_text: The input UTF-8 string to convert
  * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
  * @return: * : A pointer after the last written UTF-32 character. */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_8to32") char32_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_8to32)(/*utf-32*/ char32_t *__restrict utf32_dst,
-                                         /*utf-8*/ char const *__restrict utf8_text,
-                                         size_t utf8_characters) {
-#line 1017 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
+NOTHROW_NCX(LIBCCALL libc_unicode_8to32)(char32_t *__restrict utf32_dst, char const *__restrict utf8_text, size_t utf8_characters) {
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end)
-		*utf32_dst++ = libc_unicode_readutf8_n((char const **)&utf8_text,utf8_end);
+		*utf32_dst++ = unicode_readutf8_n((char const **)&utf8_text,utf8_end);
 	return utf32_dst;
 }
-
 /* Convert a given utf-16 string to utf-8.
  * @param: utf8_dst: A buffer of at least `UNICODE_16TO8_MAXBUF(utf16_characters)' bytes
  * @param: utf16_text: The input UTF-16 string to convert
  * @param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
  * @return: * : A pointer after the last written UTF-8 character */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_16to8") char *
-NOTHROW_NCX(LIBCCALL libc_unicode_16to8)(/*utf-8*/ char *__restrict utf8_dst,
-                                         /*utf-16*/ char16_t const *__restrict utf16_text,
-                                         size_t utf16_characters) {
-#line 1034 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1, 2)) char *
+NOTHROW_NCX(LIBCCALL libc_unicode_16to8)(char *__restrict utf8_dst, char16_t const *__restrict utf16_text, size_t utf16_characters) {
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end) {
 		char32_t ch;
-		ch = libc_unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
+		ch = unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
 		if (ch <= ((uint32_t)1 << 7)-1) {
 			*utf8_dst++ = (char)(u8)ch;
 		} else if (ch <= ((uint32_t)1 << 11)-1) {
@@ -690,110 +658,47 @@ NOTHROW_NCX(LIBCCALL libc_unicode_16to8)(/*utf-8*/ char *__restrict utf8_dst,
 	}
 	return utf8_dst;
 }
-
 /* Convert a given utf-16 string to utf-32.
  * @param: utf32_dst: A buffer of at least `UNICODE_16TO32_MAXBUF(utf16_characters)' dwords, or *4 bytes
  * @param: utf16_text: The input UTF-16 string to convert
  * @param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
  * @return: * : A pointer after the last written UTF-32 character */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_16to32") char32_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_16to32)(/*utf-32*/ char32_t *__restrict utf32_dst,
-                                          /*utf-16*/ char16_t const *__restrict utf16_text,
-                                          size_t utf16_characters) {
-#line 1062 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
+NOTHROW_NCX(LIBCCALL libc_unicode_16to32)(char32_t *__restrict utf32_dst, char16_t const *__restrict utf16_text, size_t utf16_characters) {
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end)
-		*utf32_dst++ = libc_unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
+		*utf32_dst++ = unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
 	return utf32_dst;
 }
-
 /* Convert a given utf-32 string to utf-8.
  * @param: utf8_dst: A buffer of at least `UNICODE_32TO8_MAXBUF(utf16_characters)' bytes
  * @param: utf32_text: The input UTF-32 string to convert
  * @param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
  * @return: * : A pointer after the last written UTF-8 character */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_32to8") char *
-NOTHROW_NCX(LIBCCALL libc_unicode_32to8)(/*utf-8*/ char *__restrict utf8_dst,
-                                         /*utf-32*/ char32_t const *__restrict utf32_text,
-                                         size_t utf32_characters) {
-#line 1078 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1, 2)) char *
+NOTHROW_NCX(LIBCCALL libc_unicode_32to8)(char *__restrict utf8_dst, char32_t const *__restrict utf32_text, size_t utf32_characters) {
 	while (utf32_characters--)
-		utf8_dst = libc_unicode_writeutf8(utf8_dst, *utf32_text++);
+		utf8_dst = unicode_writeutf8(utf8_dst, *utf32_text++);
 	return utf8_dst;
 }
-
 /* Convert a given utf-32 string to utf-16.
  * @param: utf16_dst: A buffer of at least `UNICODE_32TO16_MAXBUF(utf16_characters)' words, or *2 bytes
  * @param: utf32_text: The input UTF-32 string to convert
  * @param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
  * @return: * : A pointer after the last written UTF-16 character */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_32to16") char16_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_32to16)(/*utf-16*/ char16_t *__restrict utf16_dst,
-                                          /*utf-32*/ char32_t const *__restrict utf32_text,
-                                          size_t utf32_characters) {
-#line 1094 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+NOTHROW_NCX(LIBCCALL libc_unicode_32to16)(char16_t *__restrict utf16_dst, char32_t const *__restrict utf32_text, size_t utf32_characters) {
 	while (utf32_characters--)
-		utf16_dst = libc_unicode_writeutf16(utf16_dst, *utf32_text++);
+		utf16_dst = unicode_writeutf16(utf16_dst, *utf32_text++);
 	return utf16_dst;
 }
-
 #ifndef __KERNEL__
-/* Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false */
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_writeutf16_chk") char16_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16_chk)(/*utf-16*/ char16_t *__restrict dst,
-                                                  char32_t ch) {
-#line 748 "kos/src/libc/magic/unicode.c"
-	if unlikely(ch > 0x10ffff)
-		return NULL;
-	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
-		*dst++ = (char16_t)ch;
-	} else {
-		ch -= 0x10000;
-		*dst++ = 0xd800 + (char16_t)(ch >> 10);
-		*dst++ = 0xdc00 + (char16_t)(ch & 0x3ff);
-	}
-	return dst;
-}
-
-/* Same as `unicode_8to16()', but return `NULL' if an attempt was made to write an invalid character.
- * @param: utf16_dst: A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_characters)' words, or `*2' bytes
- * @param: utf8_text: The input UTF-8 string to convert
- * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
- * @return: * : A pointer after the last written UTF-16 character.
- * @return: NULL: Attempted to write an invalid character */
-INTERN WUNUSED NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_8to16_chk") char16_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_8to16_chk)(/*utf-16*/ char16_t *__restrict utf16_dst,
-                                             /*utf-8*/ char const *__restrict utf8_text,
-                                             size_t utf8_characters) {
-#line 996 "kos/src/libc/magic/unicode.c"
-	char const *utf8_end = utf8_text + utf8_characters;
-	while (utf8_text < utf8_end) {
-		char32_t ch;
-		ch = libc_unicode_readutf8_n((char const **)&utf8_text,utf8_end);
-		if (ch > 0x10ffff || (ch >= 0xd800 && ch <= 0xdfff))
-			return NULL;
-		utf16_dst = libc_unicode_writeutf16(utf16_dst,ch);
-	}
-	return utf16_dst;
-}
-
-#include <bits/mbstate.h>
 /* @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
  * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
-INTERN NONNULL((1, 2, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_c8toc16") size_t
-NOTHROW_NCX(LIBCCALL libc_unicode_c8toc16)(char16_t *__restrict pc16,
-                                           /*utf-8*/ char const *__restrict s,
-                                           size_t n,
-                                           __mbstate_t *__restrict mbs) {
-#line 1110 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2, 4)) size_t
+NOTHROW_NCX(LIBCCALL libc_unicode_c8toc16)(char16_t *__restrict pc16, char const *__restrict s, size_t n, __mbstate_t *__restrict mbs) {
 	char32_t resch;
 	size_t i;
 	if ((mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
@@ -905,7 +810,7 @@ error_ilseq:
 	return (size_t)-2;
 done_empty_chk_surrogate:
 	if ((resch >= 0xd800 && resch <= 0xdfff) || (resch >= 0x10000)) {
-		if unlikely(resch >= 0x10ffff)
+		if unlikely(resch > 0x10ffff)
 			goto error_ilseq; /* Cannot be represented as UTF-16 */
 		/* Need a utf-16 surrogate pair. */
 		resch -= 0x10000;
@@ -919,18 +824,11 @@ done_empty:
 done:
 	return i + 1;
 }
-
-#include <bits/mbstate.h>
 /* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
-INTERN NONNULL((1, 2, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.unicode_c8toc32") size_t
-NOTHROW_NCX(LIBCCALL libc_unicode_c8toc32)(char32_t *__restrict pc32,
-                                           /*utf-8*/ char const *__restrict s,
-                                           size_t n,
-                                           __mbstate_t *__restrict mbs) {
-#line 1244 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2, 4)) size_t
+NOTHROW_NCX(LIBCCALL libc_unicode_c8toc32)(char32_t *__restrict pc32, char const *__restrict s, size_t n, __mbstate_t *__restrict mbs) {
 	size_t i;
 	for (i = 0; i < n; ++i) {
 		uint32_t state;
@@ -1039,19 +937,13 @@ done_empty:
 done:
 	return i + 1;
 }
-
 #include <bits/mbstate.h>
-
 #include <bits/format-printer.h>
-
 #include <bits/uformat-printer.h>
 /* Format printer (compatible with `__pformatprinter') for
  * converting UTF-8 unicode input data into a UTF-16 output */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_8to16") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_8to16)(/*struct format_8to16_data **/ void *arg,
-                                        /*utf-8*/ char const *data,
-                                        size_t datalen) {
-#line 1375 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
+NOTHROW_NCX(LIBCCALL libc_format_8to16)(void *arg, char const *data, size_t datalen) {
 	struct __local_format_8to16_data {
 		__pc16formatprinter fd_printer;    /* [1..1] Inner printer */
 		void               *fd_arg;        /* Argument for `fd_printer' */
@@ -1063,7 +955,7 @@ NOTHROW_NCX(LIBCCALL libc_format_8to16)(/*struct format_8to16_data **/ void *arg
 	closure = (struct __local_format_8to16_data *)arg;
 	while (datalen) {
 		do {
-			size_t error = libc_unicode_c8toc16(dst, data, datalen, &closure->fd_incomplete);
+			size_t error = unicode_c8toc16(dst, data, datalen, &closure->fd_incomplete);
 			if unlikely(error == (size_t)-1) {
 				closure->fd_incomplete.__word = __MBSTATE_TYPE_EMPTY;
 				*dst = data[0];
@@ -1086,19 +978,13 @@ NOTHROW_NCX(LIBCCALL libc_format_8to16)(/*struct format_8to16_data **/ void *arg
 err:
 	return temp;
 }
-
 #include <bits/mbstate.h>
-
 #include <bits/format-printer.h>
-
 #include <bits/uformat-printer.h>
 /* Format printer (compatible with `__pformatprinter') for
  * converting UTF-8 unicode input data into a UTF-32 output */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_8to32") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_8to32)(/*struct format_8to32_data **/ void *arg,
-                                        /*utf-8*/ char const *data,
-                                        size_t datalen) {
-#line 1427 "kos/src/libc/magic/unicode.c"
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
+NOTHROW_NCX(LIBCCALL libc_format_8to32)(void *arg, char const *data, size_t datalen) {
 	struct __local_format_8to32_data {
 		__pc32formatprinter fd_printer;    /* [1..1] Inner printer */
 		void               *fd_arg;        /* Argument for `fd_printer' */
@@ -1110,7 +996,7 @@ NOTHROW_NCX(LIBCCALL libc_format_8to32)(/*struct format_8to32_data **/ void *arg
 	closure = (struct __local_format_8to32_data *)arg;
 	while (datalen) {
 		do {
-			size_t error = libc_unicode_c8toc32(dst, data, datalen, &closure->fd_incomplete);
+			size_t error = unicode_c8toc32(dst, data, datalen, &closure->fd_incomplete);
 			if unlikely(error == (size_t)-1) {
 				closure->fd_incomplete.__word = __MBSTATE_TYPE_EMPTY;
 				*dst = data[0];
@@ -1133,98 +1019,11 @@ NOTHROW_NCX(LIBCCALL libc_format_8to32)(/*struct format_8to32_data **/ void *arg
 err:
 	return temp;
 }
-
 #include <bits/format-printer.h>
 /* Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-8 output */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_wto8") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_wto8)(/*struct format_wto8_data **/ void *arg,
-                                       char32_t const *data,
-                                       size_t datalen) {
-#line 1476 "kos/src/libc/magic/unicode.c"
-#if 4 == 2
-	struct __local_format_16to8_data {
-		__pformatprinter fd_printer;   /* [1..1] Inner printer */
-		void            *fd_arg;       /* Argument for `fd_printer' */
-		__CHAR16_TYPE__  fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
-	};
-	char buf[64], *dst = buf;
-	struct __local_format_16to8_data *closure;
-	ssize_t temp, result = 0;
-	size_t i = 0;
-	char32_t ch;
-	closure = (struct __local_format_16to8_data *)arg;
-	if (closure->fd_surrogate && datalen) {
-		ch  = closure->fd_surrogate - 0xd800;
-		closure->fd_surrogate = 0;
-		ch += 0x10000;
-		ch += ((char16_t const *)data)[0] - 0xdc00;
-		dst = libc_unicode_writeutf8(dst, ch);
-		i = 1;
-		goto after_dst_write;
-	}
-	while (i < datalen) {
-		do {
-			char16_t ch16;
-			ch16 = ((char16_t const *)data)[i++];
-			if (ch16 >= 0xd800 &&
-			    ch16 <= 0xdbff) {
-				if (i >= datalen) {
-					closure->fd_surrogate = ch16;
-					break;
-				}
-				ch  = ch16 - 0xd800;
-				ch += 0x10000;
-				ch += data[i++] - 0xdc00;
-			} else {
-				ch = ch16;
-			}
-			dst = libc_unicode_writeutf8(dst, ch);
-after_dst_write:
-			;
-		} while ((dst + 4) < COMPILER_ENDOF(buf) && i < datalen);
-		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
-		dst = buf;
-	}
-	return result;
-err:
-	return temp;
-#else
-	struct __local_format_32to8_data {
-		__pformatprinter fd_printer; /* [1..1] Inner printer */
-		void            *fd_arg;     /* Argument for `fd_printer' */
-	};
-	char buf[64];
-	struct __local_format_32to8_data *closure;
-	ssize_t temp, result = 0;
-	size_t i = 0;
-	closure = (struct __local_format_32to8_data *)arg;
-	while (i < datalen) {
-		char *dst = buf;
-		do {
-			dst = libc_unicode_writeutf8(dst, ((char32_t const *)data)[i++]);
-		} while ((dst + 7) < COMPILER_ENDOF(buf) && i < datalen);
-		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
-	}
-	return result;
-err:
-	return temp;
-#endif
-}
-#include <bits/format-printer.h>
-/* Format printer (compatible with `__pc16formatprinter') for
- * converting wide-character unicode input data into a UTF-8 output */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_wto8") ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wto8)(/*struct format_wto8_data **/ void *arg,
-                                       char16_t const *data,
-                                       size_t datalen) {
-#line 1476 "kos/src/libc/magic/unicode.c"
+INTERN ssize_t
+NOTHROW_NCX(LIBDCALL libd_format_wto8)(void *arg, char16_t const *data, size_t datalen) {
 #if 2 == 2
 	struct __local_format_16to8_data {
 		__pformatprinter fd_printer;   /* [1..1] Inner printer */
@@ -1242,7 +1041,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wto8)(/*struct format_wto8_data **/ void *arg,
 		closure->fd_surrogate = 0;
 		ch += 0x10000;
 		ch += ((char16_t const *)data)[0] - 0xdc00;
-		dst = libc_unicode_writeutf8(dst, ch);
+		dst = unicode_writeutf8(dst, ch);
 		i = 1;
 		goto after_dst_write;
 	}
@@ -1262,7 +1061,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wto8)(/*struct format_wto8_data **/ void *arg,
 			} else {
 				ch = ch16;
 			}
-			dst = libc_unicode_writeutf8(dst, ch);
+			dst = unicode_writeutf8(dst, ch);
 after_dst_write:
 			;
 		} while ((dst + 4) < COMPILER_ENDOF(buf) && i < datalen);
@@ -1275,7 +1074,7 @@ after_dst_write:
 	return result;
 err:
 	return temp;
-#else
+#else /* 2 == 2 */
 	struct __local_format_32to8_data {
 		__pformatprinter fd_printer; /* [1..1] Inner printer */
 		void            *fd_arg;     /* Argument for `fd_printer' */
@@ -1288,7 +1087,7 @@ err:
 	while (i < datalen) {
 		char *dst = buf;
 		do {
-			dst = libc_unicode_writeutf8(dst, ((char32_t const *)data)[i++]);
+			dst = unicode_writeutf8(dst, ((char32_t const *)data)[i++]);
 		} while ((dst + 7) < COMPILER_ENDOF(buf) && i < datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)
@@ -1298,42 +1097,38 @@ err:
 	return result;
 err:
 	return temp;
-#endif
+#endif /* !(2 == 2) */
 }
-
-#include <bits/uformat-printer.h>
+#include <bits/format-printer.h>
 /* Format printer (compatible with `__pc16formatprinter') for
- * converting wide-character unicode input data into a UTF-32 output */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_wto32") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_wto32)(/*struct format_wto32_data **/ void *arg,
-                                        char32_t const *data,
-                                        size_t datalen) {
-#line 1600 "kos/src/libc/magic/unicode.c"
+ * converting wide-character unicode input data into a UTF-8 output */
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
+NOTHROW_NCX(LIBKCALL libc_format_wto8)(void *arg, char32_t const *data, size_t datalen) {
 #if 4 == 2
-	struct __local_format_16to32_data {
-		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
-		void               *fd_arg;       /* Argument for `fd_printer' */
-		__CHAR16_TYPE__     fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+	struct __local_format_16to8_data {
+		__pformatprinter fd_printer;   /* [1..1] Inner printer */
+		void            *fd_arg;       /* Argument for `fd_printer' */
+		__CHAR16_TYPE__  fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 	};
-	char32_t buf[64], *dst = buf;
-	struct __local_format_16to32_data *closure;
+	char buf[64], *dst = buf;
+	struct __local_format_16to8_data *closure;
 	ssize_t temp, result = 0;
 	size_t i = 0;
 	char32_t ch;
-	closure = (struct __local_format_16to32_data *)arg;
+	closure = (struct __local_format_16to8_data *)arg;
 	if (closure->fd_surrogate && datalen) {
 		ch  = closure->fd_surrogate - 0xd800;
 		closure->fd_surrogate = 0;
 		ch += 0x10000;
-		ch += data[0] - 0xdc00;
-		*dst++ = ch;
+		ch += ((char16_t const *)data)[0] - 0xdc00;
+		dst = unicode_writeutf8(dst, ch);
 		i = 1;
 		goto after_dst_write;
 	}
 	while (i < datalen) {
 		do {
 			char16_t ch16;
-			ch16 = data[i++];
+			ch16 = ((char16_t const *)data)[i++];
 			if (ch16 >= 0xd800 &&
 			    ch16 <= 0xdbff) {
 				if (i >= datalen) {
@@ -1346,10 +1141,10 @@ NOTHROW_NCX(LIBCCALL libc_format_wto32)(/*struct format_wto32_data **/ void *arg
 			} else {
 				ch = ch16;
 			}
-			*dst++ = ch;
+			dst = unicode_writeutf8(dst, ch);
 after_dst_write:
 			;
-		} while (dst < COMPILER_ENDOF(buf) && i < datalen);
+		} while ((dst + 4) < COMPILER_ENDOF(buf) && i < datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)
 			goto err;
@@ -1359,24 +1154,36 @@ after_dst_write:
 	return result;
 err:
 	return temp;
-#else /* __SIZEOF_WCHAR_T__ == 2 */
-	struct __local_format_32to32_data {
-		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
-		void               *fd_arg;       /* Argument for `fd_printer' */
+#else /* 4 == 2 */
+	struct __local_format_32to8_data {
+		__pformatprinter fd_printer; /* [1..1] Inner printer */
+		void            *fd_arg;     /* Argument for `fd_printer' */
 	};
-	struct __local_format_32to32_data *closure;
-	closure = (struct __local_format_32to32_data *)arg;
-	return (*closure->fd_printer)(closure->fd_arg, (char32_t const *)data, datalen);
-#endif /* __SIZEOF_WCHAR_T__ != 2 */
+	char buf[64];
+	struct __local_format_32to8_data *closure;
+	ssize_t temp, result = 0;
+	size_t i = 0;
+	closure = (struct __local_format_32to8_data *)arg;
+	while (i < datalen) {
+		char *dst = buf;
+		do {
+			dst = unicode_writeutf8(dst, ((char32_t const *)data)[i++]);
+		} while ((dst + 7) < COMPILER_ENDOF(buf) && i < datalen);
+		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+	}
+	return result;
+err:
+	return temp;
+#endif /* !(4 == 2) */
 }
 #include <bits/uformat-printer.h>
 /* Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-32 output */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_wto32") ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wto32)(/*struct format_wto32_data **/ void *arg,
-                                        char16_t const *data,
-                                        size_t datalen) {
-#line 1600 "kos/src/libc/magic/unicode.c"
+INTERN ssize_t
+NOTHROW_NCX(LIBDCALL libd_format_wto32)(void *arg, char16_t const *data, size_t datalen) {
 #if 2 == 2
 	struct __local_format_16to32_data {
 		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
@@ -1427,7 +1234,7 @@ after_dst_write:
 	return result;
 err:
 	return temp;
-#else /* __SIZEOF_WCHAR_T__ == 2 */
+#else /* 2 == 2 */
 	struct __local_format_32to32_data {
 		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
 		void               *fd_arg;       /* Argument for `fd_printer' */
@@ -1435,62 +1242,79 @@ err:
 	struct __local_format_32to32_data *closure;
 	closure = (struct __local_format_32to32_data *)arg;
 	return (*closure->fd_printer)(closure->fd_arg, (char32_t const *)data, datalen);
-#endif /* __SIZEOF_WCHAR_T__ != 2 */
+#endif /* !(2 == 2) */
 }
-
-#include <bits/format-printer.h>
-
 #include <bits/uformat-printer.h>
-/* Format printer (compatible with `__pwformatprinter') for
- * converting wide-character unicode input data into a UTF-16 output */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_wto16") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_wto16)(/*struct format_wto16_data **/ void *arg,
-                                        char32_t const *data,
-                                        size_t datalen) {
-#line 1690 "kos/src/libc/magic/unicode.c"
-#if 4 == 4
-	struct __local_format_32to16_data {
-		__pc16formatprinter fd_printer; /* [1..1] Inner printer */
-		void               *fd_arg;     /* Argument for `fd_printer' */
+/* Format printer (compatible with `__pc16formatprinter') for
+ * converting wide-character unicode input data into a UTF-32 output */
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
+NOTHROW_NCX(LIBKCALL libc_format_wto32)(void *arg, char32_t const *data, size_t datalen) {
+#if 4 == 2
+	struct __local_format_16to32_data {
+		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
+		void               *fd_arg;       /* Argument for `fd_printer' */
+		__CHAR16_TYPE__     fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 	};
-	char16_t buf[64];
-	struct __local_format_32to16_data *closure;
+	char32_t buf[64], *dst = buf;
+	struct __local_format_16to32_data *closure;
 	ssize_t temp, result = 0;
 	size_t i = 0;
-	closure = (struct __local_format_32to16_data *)arg;
+	char32_t ch;
+	closure = (struct __local_format_16to32_data *)arg;
+	if (closure->fd_surrogate && datalen) {
+		ch  = closure->fd_surrogate - 0xd800;
+		closure->fd_surrogate = 0;
+		ch += 0x10000;
+		ch += data[0] - 0xdc00;
+		*dst++ = ch;
+		i = 1;
+		goto after_dst_write;
+	}
 	while (i < datalen) {
-		char16_t *dst = buf;
 		do {
-			dst = libc_unicode_writeutf16(dst, data[i++]);
-		} while ((dst + 2) < COMPILER_ENDOF(buf) && i < datalen);
+			char16_t ch16;
+			ch16 = data[i++];
+			if (ch16 >= 0xd800 &&
+			    ch16 <= 0xdbff) {
+				if (i >= datalen) {
+					closure->fd_surrogate = ch16;
+					break;
+				}
+				ch  = ch16 - 0xd800;
+				ch += 0x10000;
+				ch += data[i++] - 0xdc00;
+			} else {
+				ch = ch16;
+			}
+			*dst++ = ch;
+after_dst_write:
+			;
+		} while (dst < COMPILER_ENDOF(buf) && i < datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)
 			goto err;
 		result += temp;
+		dst = buf;
 	}
 	return result;
 err:
 	return temp;
-#else /* __SIZEOF_WCHAR_T__ == 4 */
-	struct __local_format_16to16_data {
-		__pc16formatprinter fd_printer;   /* [1..1] Inner printer */
+#else /* 4 == 2 */
+	struct __local_format_32to32_data {
+		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
 		void               *fd_arg;       /* Argument for `fd_printer' */
 	};
-	struct __local_format_16to16_data *closure;
-	closure = (struct __local_format_16to16_data *)arg;
-	return (*closure->fd_printer)(closure->fd_arg, (char16_t const *)data, datalen);
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
+	struct __local_format_32to32_data *closure;
+	closure = (struct __local_format_32to32_data *)arg;
+	return (*closure->fd_printer)(closure->fd_arg, (char32_t const *)data, datalen);
+#endif /* !(4 == 2) */
 }
 #include <bits/format-printer.h>
-
 #include <bits/uformat-printer.h>
 /* Format printer (compatible with `__pwformatprinter') for
  * converting wide-character unicode input data into a UTF-16 output */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.UTF.format_wto16") ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wto16)(/*struct format_wto16_data **/ void *arg,
-                                        char16_t const *data,
-                                        size_t datalen) {
-#line 1690 "kos/src/libc/magic/unicode.c"
+INTERN ssize_t
+NOTHROW_NCX(LIBDCALL libd_format_wto16)(void *arg, char16_t const *data, size_t datalen) {
 #if 2 == 4
 	struct __local_format_32to16_data {
 		__pc16formatprinter fd_printer; /* [1..1] Inner printer */
@@ -1504,7 +1328,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wto16)(/*struct format_wto16_data **/ void *arg
 	while (i < datalen) {
 		char16_t *dst = buf;
 		do {
-			dst = libc_unicode_writeutf16(dst, data[i++]);
+			dst = unicode_writeutf16(dst, data[i++]);
 		} while ((dst + 2) < COMPILER_ENDOF(buf) && i < datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)
@@ -1514,7 +1338,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wto16)(/*struct format_wto16_data **/ void *arg
 	return result;
 err:
 	return temp;
-#else /* __SIZEOF_WCHAR_T__ == 4 */
+#else /* 2 == 4 */
 	struct __local_format_16to16_data {
 		__pc16formatprinter fd_printer;   /* [1..1] Inner printer */
 		void               *fd_arg;       /* Argument for `fd_printer' */
@@ -1522,10 +1346,51 @@ err:
 	struct __local_format_16to16_data *closure;
 	closure = (struct __local_format_16to16_data *)arg;
 	return (*closure->fd_printer)(closure->fd_arg, (char16_t const *)data, datalen);
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
+#endif /* !(2 == 4) */
 }
-
+#include <bits/format-printer.h>
+#include <bits/uformat-printer.h>
+/* Format printer (compatible with `__pwformatprinter') for
+ * converting wide-character unicode input data into a UTF-16 output */
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
+NOTHROW_NCX(LIBKCALL libc_format_wto16)(void *arg, char32_t const *data, size_t datalen) {
+#if 4 == 4
+	struct __local_format_32to16_data {
+		__pc16formatprinter fd_printer; /* [1..1] Inner printer */
+		void               *fd_arg;     /* Argument for `fd_printer' */
+	};
+	char16_t buf[64];
+	struct __local_format_32to16_data *closure;
+	ssize_t temp, result = 0;
+	size_t i = 0;
+	closure = (struct __local_format_32to16_data *)arg;
+	while (i < datalen) {
+		char16_t *dst = buf;
+		do {
+			dst = unicode_writeutf16(dst, data[i++]);
+		} while ((dst + 2) < COMPILER_ENDOF(buf) && i < datalen);
+		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+	}
+	return result;
+err:
+	return temp;
+#else /* 4 == 4 */
+	struct __local_format_16to16_data {
+		__pc16formatprinter fd_printer;   /* [1..1] Inner printer */
+		void               *fd_arg;       /* Argument for `fd_printer' */
+	};
+	struct __local_format_16to16_data *closure;
+	closure = (struct __local_format_16to16_data *)arg;
+	return (*closure->fd_printer)(closure->fd_arg, (char16_t const *)data, datalen);
+#endif /* !(4 == 4) */
+}
 #endif /* !__KERNEL__ */
+
+DECL_END
+
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf8, libc_unicode_readutf8);
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf8_rev, libc_unicode_readutf8_rev);
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf8_n, libc_unicode_readutf8_n);
@@ -1540,27 +1405,27 @@ DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf16_rev_n, libc_unicode_readutf16_rev_n);
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf16_swap_rev_n, libc_unicode_readutf16_swap_rev_n);
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_writeutf8, libc_unicode_writeutf8);
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_writeutf16, libc_unicode_writeutf16);
+DEFINE_PUBLIC_WEAK_ALIAS(unicode_writeutf16_chk, libc_unicode_writeutf16_chk);
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_8to16, libc_unicode_8to16);
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(unicode_8to16_chk, libc_unicode_8to16_chk);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_8to32, libc_unicode_8to32);
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_16to8, libc_unicode_16to8);
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_16to32, libc_unicode_16to32);
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_32to8, libc_unicode_32to8);
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_32to16, libc_unicode_32to16);
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_writeutf16_chk, libc_unicode_writeutf16_chk);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_8to16_chk, libc_unicode_8to16_chk);
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_c8toc16, libc_unicode_c8toc16);
 DEFINE_PUBLIC_WEAK_ALIAS(unicode_c8toc32, libc_unicode_c8toc32);
 DEFINE_PUBLIC_WEAK_ALIAS(format_8to16, libc_format_8to16);
 DEFINE_PUBLIC_WEAK_ALIAS(format_8to32, libc_format_8to32);
-DEFINE_PUBLIC_WEAK_ALIAS(format_wto8, libc_format_wto8);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_wto8, libd_format_wto8);
-DEFINE_PUBLIC_WEAK_ALIAS(format_wto32, libc_format_wto32);
+DEFINE_PUBLIC_WEAK_ALIAS(format_wto8, libc_format_wto8);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_wto32, libd_format_wto32);
-DEFINE_PUBLIC_WEAK_ALIAS(format_wto16, libc_format_wto16);
+DEFINE_PUBLIC_WEAK_ALIAS(format_wto32, libc_format_wto32);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_wto16, libd_format_wto16);
+DEFINE_PUBLIC_WEAK_ALIAS(format_wto16, libc_format_wto16);
 #endif /* !__KERNEL__ */
-
-DECL_END
 
 #endif /* !GUARD_LIBC_AUTO_UNICODE_C */

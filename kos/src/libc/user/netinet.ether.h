@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9b8177 */
+/* HASH CRC-32:0xa7bbe74d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,16 +23,19 @@
 
 #include "../api.h"
 #include "../auto/netinet.ether.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <netinet/ether.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Map 48 bit Ethernet number ADDR to HOSTNAME */
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname, struct ether_addr const *addr);
 /* Map HOSTNAME to 48 bit Ethernet address */
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname, struct ether_addr *addr);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd7021b6 */
+/* HASH CRC-32:0x6e7bc359 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_UTMPX_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <utmpx.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Open user accounting database */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_setutxent)(void);
 /* Close user accounting database */
@@ -52,6 +54,7 @@ INTDEF void NOTHROW_RPC(LIBCCALL libc_getutmp)(struct utmpx const *utmpx, struct
 /* Copy the information in UTMP to UTMPX.
  * This function is not part of POSIX and therefore no official cancellation point */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_getutmpx)(struct utmp const *utmp, struct utmpx *utmpx);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

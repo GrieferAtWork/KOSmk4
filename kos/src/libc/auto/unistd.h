@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabbdce0e */
+/* HASH CRC-32:0x41d0b5a3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_AUTO_UNISTD_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <unistd.h>
@@ -29,11 +30,10 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+/* >> getpagesize(3)
+ * Return the size of a PAGE (in bytes) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_getpagesize)(void);
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void);
-/* >> fdatasync(2)
- * Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd);
 /* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe29640a2 */
+/* HASH CRC-32:0xd4613f8a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,14 @@
 #define GUARD_LIBC_USER_IO_H 1
 
 #include "../api.h"
-#include "../auto/io.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <io.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename, int type);
 INTDEF int NOTHROW_NCX(LIBCCALL libc__findclose)(intptr_t findfd);
 INTDEF WUNUSED NONNULL((1, 2)) intptr_t NOTHROW_RPC(LIBCCALL libc__findfirst32)(char const *__restrict filename, struct _finddata32_t *__restrict finddata);
@@ -45,11 +46,14 @@ INTDEF WUNUSED int64_t NOTHROW_NCX(LIBCCALL libc__telli64)(fd_t fd);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_umask_s)(mode_t newmode, mode_t *oldmode);
 INTDEF int NOTHROW_RPC(LIBCCALL libc___lock_fhandle)(fd_t fd);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__unlock_fhandle)(fd_t fd);
+INTDEF ATTR_PURE WUNUSED intptr_t NOTHROW_NCX(LIBCCALL libc__get_osfhandle)(fd_t fd);
+INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc__open_osfhandle)(intptr_t osfd, oflag_t flags);
 INTDEF oflag_t NOTHROW_NCX(LIBCCALL libc_setmode)(fd_t fd, oflag_t mode);
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(VLIBCCALL libc_sopen)(char const *filename, oflag_t oflags, int sflags, ...);
-INTDEF WUNUSED __LONG32_TYPE__ NOTHROW_NCX(LIBCCALL libc_filelength)(fd_t fd);
-INTDEF WUNUSED __LONG32_TYPE__ NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd);
-INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_eof)(fd_t fd);
+INTDEF WUNUSED __LONG32_TYPE__ NOTHROW_NCX(LIBCCALL libc__filelength)(fd_t fd);
+INTDEF WUNUSED __LONG32_TYPE__ NOTHROW_NCX(LIBCCALL libc__tell)(fd_t fd);
+INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc__eof)(fd_t fd);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

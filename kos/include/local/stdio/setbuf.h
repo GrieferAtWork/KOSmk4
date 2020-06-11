@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6124a2b6 */
+/* HASH CRC-32:0x30c5ee74 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_setbuf_defined
 #define __local_setbuf_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
+#include <asm/stdio.h>
+#if defined(___IOFBF) && defined(___IONBF) && defined(__BUFSIZ) && (defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: setvbuf from stdio */
 #ifndef __local___localdep_setvbuf_defined
@@ -46,9 +47,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__
 #undef __local___localdep_setvbuf_defined
 #endif /* !... */
 #endif /* !__local___localdep_setvbuf_defined */
-__NAMESPACE_LOCAL_END
-#include <asm/stdio.h>
-__NAMESPACE_LOCAL_BEGIN
 /* Alias for `setvbuf(STREAM, buf, _IOFBF, BUFSIZ)' */
 __LOCAL_LIBC(setbuf) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setbuf))(__FILE *__restrict __stream, char *__buf) {
@@ -61,7 +59,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_setbuf_defined 1
 #define __localdep_setbuf __LIBC_LOCAL_NAME(setbuf)
 #endif /* !__local___localdep_setbuf_defined */
-#else /* __CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked */
+#else /* ___IOFBF && ___IONBF && __BUFSIZ && (__CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked) */
 #undef __local_setbuf_defined
-#endif /* !__CRT_HAVE_setvbuf && !__CRT_HAVE__IO_setvbuf && !__CRT_HAVE_setvbuf_unlocked */
+#endif /* !___IOFBF || !___IONBF || !__BUFSIZ || (!__CRT_HAVE_setvbuf && !__CRT_HAVE__IO_setvbuf && !__CRT_HAVE_setvbuf_unlocked) */
 #endif /* !__local_setbuf_defined */

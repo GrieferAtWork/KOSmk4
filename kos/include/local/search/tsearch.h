@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1ecc2ad */
+/* HASH CRC-32:0xb97882b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,17 +49,72 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
-/* Dependency: maybe_split_for_insert from search */
-#ifndef __local___localdep_maybe_split_for_insert_defined
-#define __local___localdep_maybe_split_for_insert_defined 1
+__NAMESPACE_LOCAL_END
+__NAMESPACE_LOCAL_BEGIN
 /* Possibly "split" a node with two red successors, and/or fix up two red
  * edges in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
  * and GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the
  * comparison values that determined which way was taken in the tree to reach
  * ROOTP. MODE is 1 if we need not do the split, but must check for two red
  * edges between GPARENTP and ROOTP */
-__LOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL __localdep_maybe_split_for_insert)(void **__rootp, void **__parentp, void **__gparentp, int __p_r, int __gp_r, int __mode) { typedef struct __node_struct { void const *__key; struct __node_struct *__left_node; struct __node_struct *__right_node; __UINTPTR_TYPE__ __is_red; } *__node; __node __root = *(__node *)__rootp; __node *__rp, *__lp; __node __rpn, __lpn; __rp = &__root->__right_node; __rpn = __root->__right_node; __lp = &__root->__left_node; __lpn = __root->__left_node; if (__mode == 1 || (__rpn != __NULLPTR && __lpn != __NULLPTR && __rpn->__is_red && __lpn->__is_red)) { __root->__is_red = 1; if (__rpn) __rpn->__is_red = 0; if (__lpn) __lpn->__is_red = 0; if (__parentp != __NULLPTR && (*(__node *)__parentp)->__is_red) { __node __gp = *((__node *)__gparentp); __node __p = *((__node *)__parentp); if ((__p_r > 0) != (__gp_r > 0)) { __p->__is_red = 1; __gp->__is_red = 1; __root->__is_red = 0; if (__p_r < 0) { __p->__left_node = __rpn; *__rp = __p; __gp->__right_node = __lpn; *__lp = __gp; } else { __p->__right_node = __lpn; *__lp = __p; __gp->__left_node = __rpn; *__rp = __gp; } *(__node *)__gparentp = __root; } else { *(__node *)__gparentp = __p; __p->__is_red = 0; __gp->__is_red = 1; if (__p_r < 0) { __gp->__left_node = __p->__right_node; __p->__right_node = __gp; } else { __gp->__right_node = __p->__left_node; __p->__left_node = __gp; } } } } }
-#endif /* !__local___localdep_maybe_split_for_insert_defined */
+__LOCAL_LIBC(__maybe_split_for_insert) __ATTR_NONNULL((1)) void
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__maybe_split_for_insert))(void **__rootp, /*nullable*/ void **__parentp,
+                                                                    void **__gparentp, int __p_r, int __gp_r, int __mode) {
+	typedef struct __node_struct {
+		void const           *__key;
+		struct __node_struct *__left_node;
+		struct __node_struct *__right_node;
+		__UINTPTR_TYPE__      __is_red;
+	} *__node;
+	__node __root = *(__node *)__rootp;
+	__node *__rp, *__lp;
+	__node __rpn, __lpn;
+	__rp = &__root->__right_node;
+	__rpn = __root->__right_node;
+	__lp = &__root->__left_node;
+	__lpn = __root->__left_node;
+	if (__mode == 1 || (__rpn != __NULLPTR && __lpn != __NULLPTR && __rpn->__is_red && __lpn->__is_red)) {
+		__root->__is_red = 1;
+		if (__rpn)
+			__rpn->__is_red = 0;
+		if (__lpn)
+			__lpn->__is_red = 0;
+		if (__parentp != __NULLPTR && (*(__node *)__parentp)->__is_red) {
+			__node __gp = *((__node *)__gparentp);
+			__node __p = *((__node *)__parentp);
+			if ((__p_r > 0) != (__gp_r > 0)) {
+				__p->__is_red = 1;
+				__gp->__is_red = 1;
+				__root->__is_red = 0;
+				if (__p_r < 0) {
+					__p->__left_node = __rpn;
+					*__rp = __p;
+					__gp->__right_node = __lpn;
+					*__lp = __gp;
+				} else {
+					__p->__right_node = __lpn;
+					*__lp = __p;
+					__gp->__left_node = __rpn;
+					*__rp = __gp;
+				}
+				*(__node *)__gparentp = __root;
+			} else {
+				*(__node *)__gparentp = __p;
+				__p->__is_red = 0;
+				__gp->__is_red = 1;
+				if (__p_r < 0) {
+					__gp->__left_node = __p->__right_node;
+					__p->__right_node = __gp;
+				} else {
+					__gp->__right_node = __p->__left_node;
+					__p->__left_node = __gp;
+				}
+			}
+		}
+	}
+}
+__NAMESPACE_LOCAL_END
+__NAMESPACE_LOCAL_BEGIN
 /* Search for an entry matching the given KEY in the tree
  * pointed to by *ROOTP and insert a new element if not found */
 __LOCAL_LIBC(tsearch) __ATTR_NONNULL((3)) void *
@@ -86,10 +141,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tsearch))(void const *__key, void **_
 		__r = (*__compar)(__key, __root->__key);
 		if (__r == 0)
 			return __root;
-		__localdep_maybe_split_for_insert((void **)__rootp,
-		                       (void **)__parentp,
-		                       (void **)__gparentp,
-		                       __p_r, __gp_r, 0);
+		__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__maybe_split_for_insert)((void **)__rootp,
+		                                                                (void **)__parentp,
+		                                                                (void **)__gparentp,
+		                                                                __p_r, __gp_r, 0);
 		__nextp = __r < 0 ? &__root->__left_node
 		              : &__root->__right_node;
 		if (*__nextp == __NULLPTR)
@@ -108,10 +163,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tsearch))(void const *__key, void **_
 		__q->__left_node = __NULLPTR;
 		__q->__right_node = __NULLPTR;
 		if (__nextp != __rootp) {
-			__localdep_maybe_split_for_insert((void **)__nextp,
-			                       (void **)__rootp,
-			                       (void **)__parentp,
-			                       __r, __p_r, 1);
+			__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__maybe_split_for_insert)((void **)__nextp,
+			                                                                (void **)__rootp,
+			                                                                (void **)__parentp,
+			                                                                __r, __p_r, 1);
 		}
 	}
 	return __q;

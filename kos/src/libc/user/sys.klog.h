@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x611edc7e */
+/* HASH CRC-32:0xa331d9ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,17 +22,19 @@
 #define GUARD_LIBC_USER_SYS_KLOG_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/klog.h>
 
 DECL_BEGIN
 
-/* Control the kernel's logging facility.  This corresponds exactly to
- * the kernel's syslog system call, but that name is easily confused
- * with the user-level syslog facility, which is something completely
- * different */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_klogctl)(int type, char *bufp, int len);
+#ifndef __KERNEL__
+/* Control the kernel's logging facility.  This corresponds exactly to the
+ * kernel's syslog system call, but that name is easily confused with the
+ * user-level syslog facility, which is something completely different */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_klogctl)(__STDC_INT_AS_UINT_T type, char *bufp, __STDC_INT_AS_SIZE_T len);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

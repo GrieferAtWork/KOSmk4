@@ -700,8 +700,15 @@ done:
 
 	@@Remember the inclusion of a given @header
 	private function rememberPrefixAlreadyPrinted(prefix: string) {
-		local set = m_IfdefStack
-			? m_IfdefStack.last.printedPrefixes
+		local ppStackIndex = #m_IfdefStack - 1;
+		while (ppStackIndex >= 0) {
+			local ent: IfDefStackEntry = m_IfdefStack[ppStackIndex];
+			if (ent.didWriteIf || ent.didWriteElse)
+				break;
+			--ppStackIndex;
+		}
+		local set = ppStackIndex >= 0
+			? m_IfdefStack[ppStackIndex].printedPrefixes
 			: m_GlobalPrintedPrefixes;
 		set.insert(prefix);
 	}

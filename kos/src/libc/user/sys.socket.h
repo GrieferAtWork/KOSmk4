@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf56d221d */
+/* HASH CRC-32:0xd3815a69 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_SYS_SOCKET_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/socket.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Create a new socket of type TYPE in domain FAMILY, using
  * protocol PROTOCOL. If PROTOCOL is zero, one is chosen automatically.
  * Returns a file descriptor for the new socket, or -1 for errors
@@ -155,6 +157,7 @@ INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_sockatmark)(fd_t sockfd);
  * type, 0 if not, or -1 for errors (setting errno)
  * @param: fdtype: One of `S_IF*' from `<sys/stat.h>' */
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_isfdtype)(fd_t fd, __STDC_INT_AS_UINT_T fdtype);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

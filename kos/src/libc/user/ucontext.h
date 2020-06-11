@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65607578 */
+/* HASH CRC-32:0x29b0cbea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_UCONTEXT_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <ucontext.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Get user context and store it in variable pointed to by UCP */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_getcontext)(ucontext_t *__restrict ucp);
 /* Set user context from information of variable pointed to by UCP */
@@ -41,6 +43,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__
  * We cannot say anything about the parameters FUNC takes; `void'
  * is as good as any other choice */
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp, __makecontext_func_t func, int argc, ...);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

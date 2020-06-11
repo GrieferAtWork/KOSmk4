@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x100b4dfa */
+/* HASH CRC-32:0xf6345399 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,21 +48,19 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN
-
 #define ____invoke_compare_helper_defined 1
 __LOCAL_LIBC(__invoke_compare_helper) int
 (__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
 	return (*(__compar_fn_t)__arg)(__a, __b);
 }
 __NAMESPACE_LOCAL_END
-
 #endif /* !____invoke_compare_helper_defined */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(bsearch) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(bsearch))(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) {
-	return __localdep_bsearch_r(__pkey, __pbase, __item_count, __item_size,
-	                 &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
-	                 (void *)__cmp);
+	return (void *)__localdep_bsearch_r(__pkey, __pbase, __item_count, __item_size,
+	                         &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
+	                         (void *)__cmp);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_bsearch_defined

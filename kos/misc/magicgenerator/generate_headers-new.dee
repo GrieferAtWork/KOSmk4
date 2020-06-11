@@ -455,6 +455,46 @@ try {
 		startTask(header.preload);
 #endif /* QUICK_SKIP_SYSTEM_HAEDERS */
 
+	/* Generate /src/libc/auto/<...>.h headers and sources */
+	for (local name, header /*: SystemHeader*/: allSystemHeaders) {
+		if (header.order_libcAutoHeader) {
+			startTask(updateHashedFile,
+				("src/libc/auto/{}.h".format({ name }),
+				[](fp: File) {
+					fp << COPYRIGHT << "\n";
+					local cWriter = CWriter(fp);
+					header.cprintLibraryAutoHeader(cWriter);
+					cWriter.flush();
+				})
+			);
+		}
+		if (header.order_libcAutoSource) {
+			startTask(updateHashedFile,
+				("src/libc/auto/{}.c".format({ name }),
+				[](fp: File) {
+					fp << COPYRIGHT << "\n";
+					local cWriter = CWriter(fp);
+					header.cprintLibraryAutoSource(cWriter);
+					cWriter.flush();
+				})
+			);
+		}
+	}
+
+	/* Generate /src/libc/user/<...>.h headers */
+	for (local name, header /*: SystemHeader*/: allSystemHeaders) {
+		if (header.order_libcUserHeader) {
+			startTask(updateHashedFile,
+				("src/libc/user/{}.h".format({ name }),
+				[](fp: File) {
+					fp << COPYRIGHT << "\n";
+					local cWriter = CWriter(fp);
+					header.cprintLibraryUserHeader(cWriter);
+					cWriter.flush();
+				})
+			);
+		}
+	}
 
 	waitTasks();
 	messagePrefix = "3/3";

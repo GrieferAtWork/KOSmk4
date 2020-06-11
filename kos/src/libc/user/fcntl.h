@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a746561 */
+/* HASH CRC-32:0x293f1852 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_FCNTL_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <fcntl.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 INTDEF ssize_t NOTHROW_NCX(LIBCCALL libc_readahead)(fd_t fd, off64_t offset, size_t count);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sync_file_range)(fd_t fd, off64_t offset, off64_t count, unsigned int flags);
 INTDEF ssize_t NOTHROW_RPC(LIBCCALL libc_vmsplice)(fd_t fdout, struct iovec const *iov, size_t count, unsigned int flags);
@@ -50,6 +52,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_posix_fadvise64)(fd_t fd, off64_t offset, o
 INTDEF int NOTHROW_NCX(LIBCCALL libc_posix_fallocate64)(fd_t fd, off64_t offset, off64_t length);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_lockf)(fd_t fd, int cmd, off_t length);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_lockf64)(fd_t fd, int cmd, off64_t length);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

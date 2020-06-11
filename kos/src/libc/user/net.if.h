@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe83293bc */
+/* HASH CRC-32:0xd65d456e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_NET_IF_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <net/if.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Convert an interface name to an index, and vice versa */
 INTDEF unsigned int NOTHROW_RPC_KOS(LIBCCALL libc_if_nametoindex)(char const *ifname);
 /* Convert an interface name to an index, and vice versa */
@@ -36,6 +38,7 @@ INTDEF char *NOTHROW_RPC_KOS(LIBCCALL libc_if_indextoname)(unsigned int ifindex,
 INTDEF struct if_nameindex *NOTHROW_RPC_KOS(LIBCCALL libc_if_nameindex)(void);
 /* Free the data returned from if_nameindex */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_if_freenameindex)(struct if_nameindex *ptr);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

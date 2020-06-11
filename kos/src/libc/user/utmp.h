@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd963737e */
+/* HASH CRC-32:0xcd0b337 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_UTMP_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <utmp.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Make FD be the controlling terminal, stdin, stdout, and stderr;
  * then close FD. Returns 0 on success, nonzero on error */
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd);
@@ -61,6 +63,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC_KOS(LIBCCALL libc_getutent_r)(struct utmp
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC_KOS(LIBCCALL libc_getutid_r)(struct utmp const *id, struct utmp *buffer, struct utmp **result);
 /* Reentrant versions of the file for handling utmp files */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC_KOS(LIBCCALL libc_getutline_r)(struct utmp const *line, struct utmp *buffer, struct utmp **result);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

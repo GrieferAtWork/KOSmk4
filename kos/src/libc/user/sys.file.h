@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16336bcb */
+/* HASH CRC-32:0xfaa9c7d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,17 @@
 #define GUARD_LIBC_USER_SYS_FILE_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/file.h>
 
 DECL_BEGIN
 
-INTDEF int NOTHROW_RPC(LIBCCALL libc_flock)(fd_t fd, int operation);
+#ifndef __KERNEL__
+/* Apply or remove an advisory lock, according to OPERATION, on the file FD refers to */
+INTDEF int NOTHROW_RPC(LIBCCALL libc_flock)(fd_t fd, __STDC_INT_AS_UINT_T operation);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

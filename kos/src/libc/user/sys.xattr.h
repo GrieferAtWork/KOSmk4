@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15fe2832 */
+/* HASH CRC-32:0xb4615acb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,25 +22,27 @@
 #define GUARD_LIBC_USER_SYS_XATTR_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/xattr.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Set the attribute NAME of the file pointed to by PATH to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_setxattr)(char const *path, char const *name, void const *buf, size_t bufsize, int flags);
+INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_setxattr)(char const *path, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
 /* Set the attribute NAME of the file pointed to by PATH to VALUE (which is
  * SIZE bytes long), not following symlinks for the last pathname component.
  * Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_lsetxattr)(char const *path, char const *name, void const *buf, size_t bufsize, int flags);
+INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_lsetxattr)(char const *path, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
 /* Set the attribute NAME of the file descriptor FD to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
-INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBCCALL libc_fsetxattr)(fd_t fd, char const *name, void const *buf, size_t bufsize, int flags);
+INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBCCALL libc_fsetxattr)(fd_t fd, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
 /* Get the attribute NAME of the file pointed to by PATH to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors */
 INTDEF NONNULL((1, 2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_getxattr)(char const *path, char const *name, void *buf, size_t bufsize);
@@ -72,6 +74,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_lremovexattr)(char const *p
 /* Remove the attribute NAME from the file descriptor FD.
  * Return 0 on success, -1 for errors */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_fremovexattr)(fd_t fd, char const *name);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

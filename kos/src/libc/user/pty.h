@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4986108c */
+/* HASH CRC-32:0xa613412e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,19 +22,22 @@
 #define GUARD_LIBC_USER_PTY_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <pty.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Create pseudo tty master slave pair with NAME and set terminal
  * attributes according to TERMP and WINP and return handles for
  * both ends in AMASTER and ASLAVE */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_openpty)(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp);
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_openpty)(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp);
 /* Create child process and establish the slave pseudo
  * terminal as the child's controlling terminal */
-INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_forkpty)(fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp);
+INTDEF NONNULL((1, 2)) pid_t NOTHROW_NCX(LIBCCALL libc_forkpty)(fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

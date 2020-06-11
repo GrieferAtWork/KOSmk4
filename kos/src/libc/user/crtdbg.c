@@ -33,8 +33,8 @@
 #include "unistd.h"
 #include "wchar.h"
 
-#define libc_c16dup    libd_wcsdup
-#define libc_c16getcwd libd_wgetcwd
+#define libc_c16dup    libd__wcsdup
+#define libc_c16getcwd libd__wgetcwd
 #define libc__msize    libc_malloc_usable_size
 
 DECL_BEGIN

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75b9f2f8 */
+/* HASH CRC-32:0x5bf8823d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_RPC_NETDB_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <rpc/netdb.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 INTDEF void NOTHROW_RPC_KOS(LIBCCALL libc_setrpcent)(int stayopen);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_endrpcent)(void);
 INTDEF struct rpcent *NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbyname)(char const *name);
@@ -36,6 +38,7 @@ INTDEF struct rpcent *NOTHROW_RPC_KOS(LIBCCALL libc_getrpcent)(void);
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbyname_r)(char const *name, struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result);
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbynumber_r)(int number, struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result);
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_getrpcent_r)(struct rpcent *result_buf, char *buffer, size_t buflen, struct rpcent **result);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

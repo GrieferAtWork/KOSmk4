@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ee75524 */
+/* HASH CRC-32:0xc905718b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,21 +22,23 @@
 #define GUARD_LIBC_USER_SYS_EPOLL_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/epoll.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Creates an epoll instance.  Returns an fd for the new instance.
  * The "size" parameter is a hint specifying the number of file
  * descriptors to be associated with the new instance. The fd
  * returned by epoll_create() should be closed with close() */
-INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_epoll_create)(int size);
+INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_epoll_create)(__STDC_INT_AS_SIZE_T size);
 /* Same as epoll_create but with an FLAGS parameter.
  * The unused SIZE parameter has been dropped
  * @param: flags: Set of `EPOLL_*' */
-INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_epoll_create1)(int flags);
+INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_epoll_create1)(__STDC_INT_AS_UINT_T flags);
 /* Manipulate an epoll instance "epfd". Returns 0 in case of success,
  * -1 in case of error (the "errno" variable will contain the
  * specific error code) The "op" parameter is one of the EPOLL_CTL_*
@@ -51,10 +53,11 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd, enum __epoll_ctl op, 
  * events. The "maxevents" is the maximum number of events to be
  * returned (usually size of "events"). The "timeout" parameter
  * specifies the maximum wait time in milliseconds (-1 == infinite). */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_epoll_wait)(fd_t epfd, struct epoll_event *events, int maxevents, int timeout);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_epoll_wait)(fd_t epfd, struct epoll_event *events, __STDC_INT_AS_SIZE_T maxevents, int timeout);
 /* Same as epoll_wait, but the thread's signal mask is temporarily
  * and atomically replaced with the one provided as parameter */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd, struct epoll_event *events, int maxevents, int timeout, sigset_t const *ss);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd, struct epoll_event *events, __STDC_INT_AS_SIZE_T maxevents, int timeout, sigset_t const *ss);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

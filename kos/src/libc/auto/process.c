@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12cd59b4 */
+/* HASH CRC-32:0x3a6771e1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,21 +24,20 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "process.h"
+#include "../user/process.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.process._c_exit") void
-(LIBCCALL libc__c_exit)(void) __THROWS(...) {
-#line 112 "kos/src/libc/magic/process.c"
+INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
+(LIBCCALL libc__c_exit)(void) THROWS(...) {
 }
-
-#endif /* !__KERNEL__ */
-#ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(_c_exit, libc__c_exit);
 #endif /* !__KERNEL__ */
 
 DECL_END
+
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(_c_exit, libc__c_exit);
+#endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PROCESS_C */

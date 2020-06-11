@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafb885d4 */
+/* HASH CRC-32:0x673c908d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_SCHED_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sched.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_setparam)(pid_t pid, struct sched_param const *param);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_getparam)(pid_t pid, struct sched_param *param);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_setscheduler)(pid_t pid, int policy, struct sched_param const *param);
@@ -42,6 +44,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_setaffinity)(pid_t pid, size_t cpuset
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_getaffinity)(pid_t pid, size_t cpusetsize, cpu_set_t *cpuset);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval)(pid_t pid, struct timespec *tms);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid, struct timespec64 *tms);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

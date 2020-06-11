@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe35e4aa4 */
+/* HASH CRC-32:0x9b830296 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,37 +24,34 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "mntent.h"
-#include "string.h"
+#include "../user/mntent.h"
+#include <string.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
 /* Search MNT->mnt_opts for an option matching OPT.
  * Returns the address of the substring, or null if none found */
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.hasmntopt") char *
-NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt,
-                                     char const *opt) {
-#line 121 "kos/src/libc/magic/mntent.c"
+INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_PURE WUNUSED char *
+NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt, char const *opt) {
 	char *str;
 	if likely(mnt && opt && (str = mnt->mnt_opts) != NULL) {
-		size_t optlen = libc_strlen(opt);
+		size_t optlen = strlen(opt);
 		while (*str) {
 			if (memcmp(str, opt, optlen * sizeof(char)) == 0 &&
 			   (str[optlen] == ',' || str[optlen] == '\0'))
 				return str;
-			str = libc_strchrnul(str, ',');
+			str = strchrnul(str, ',');
 		}
 	}
 	return NULL;
 }
-
-#endif /* !__KERNEL__ */
-#ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(hasmntopt, libc_hasmntopt);
 #endif /* !__KERNEL__ */
 
 DECL_END
+
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(hasmntopt, libc_hasmntopt);
+#endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_MNTENT_C */

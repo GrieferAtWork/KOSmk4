@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14e656ef */
+/* HASH CRC-32:0xba0a22b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,9 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputc16_
 #undef __local___localdep_fputc16_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fputc16_unlocked_defined */
+__NAMESPACE_LOCAL_END
+#include <local/stdstreams.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(putchar16_unlocked) __WINT_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(putchar16_unlocked))(__CHAR16_TYPE__ __wc) __THROWS(...) {
 	return __localdep_fputc16_unlocked(__wc, __LOCAL_stdin);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cb392d8 */
+/* HASH CRC-32:0x4b19af6e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,17 @@
 #define GUARD_LIBC_USER_BITS_RESOURCE_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <bits/resource.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 INTDEF int NOTHROW_NCX(LIBCCALL libc_prlimit)(pid_t pid, __rlimit_resource_t resource, struct rlimit const *new_limit, struct rlimit *old_limit);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_prlimit64)(pid_t pid, __rlimit_resource_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

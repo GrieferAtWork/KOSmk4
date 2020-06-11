@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd207d805 */
+/* HASH CRC-32:0x7dbc168e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_BITS_SIGTHREAD_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <bits/sigthread.h>
@@ -38,9 +39,11 @@ DECL_BEGIN
 typedef __sigset_t sigset_t;
 #endif /* !__sigset_t_defined */
 
-INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_sigmask)(int how, sigset_t const *__restrict newmask, sigset_t *__restrict oldmask);
+#ifndef __KERNEL__
+INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_sigmask)(int how, sigset_t const *newmask, sigset_t *oldmask);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t threadid, int signo);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t threadid, int signo, union sigval const value);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadfb8fd8 */
+/* HASH CRC-32:0x6909c19 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,18 @@
 #define GUARD_LIBC_USER_SYS_REBOOT_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/reboot.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Reboot or halt the system
  * @param: howto: One of the `RB_*' constants above */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_reboot)(int howto);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_reboot)(__STDC_INT_AS_UINT_T howto);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

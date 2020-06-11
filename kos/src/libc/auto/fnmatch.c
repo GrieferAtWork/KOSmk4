@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85c50940 */
+/* HASH CRC-32:0xf0d61c33 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,19 +25,15 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "fnmatch.h"
-#include "ctype.h"
+#include <ctype.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
 /* Match NAME against the filename pattern PATTERN,
  * returning zero if it matches, FNM_NOMATCH if not */
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.string.match.fnmatch") int
-NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern,
-                                   char const *name,
-                                   int match_flags) {
-#line 77 "kos/src/libc/magic/fnmatch.c"
+INTERN ATTR_SECTION(".text.crt.string.match") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern, char const *name, int match_flags) {
 	char card_post;
 	for (;;) {
 		if (!*name) {
@@ -61,9 +57,9 @@ NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern,
 				char ch = *name++;
 				if (ch == card_post ||
 				    ((match_flags & 0x10) &&
-				     libc_tolower(ch) == libc_tolower(card_post))) {
+				     tolower(ch) == tolower(card_post))) {
 					/* Recursively check if the rest of the name and pattern match */
-					if (!libc_fnmatch(name, pattern, match_flags))
+					if (!fnmatch(name, pattern, match_flags))
 						return 0;
 				} else if (!ch) {
 					goto nomatch; /* Wildcard suffix not found */
@@ -97,12 +93,12 @@ next:
 nomatch:
 	return 1;
 }
-
-#endif /* !__KERNEL__ */
-#ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(fnmatch, libc_fnmatch);
 #endif /* !__KERNEL__ */
 
 DECL_END
+
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(fnmatch, libc_fnmatch);
+#endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FNMATCH_C */

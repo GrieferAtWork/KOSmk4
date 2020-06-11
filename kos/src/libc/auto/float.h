@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21a87c4e */
+/* HASH CRC-32:0xed63080 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_AUTO_FLOAT_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <float.h>
@@ -29,8 +30,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Return X with its signed changed to Y's */
-#define libc__copysign libc_copysign
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc__chgsign)(double x);
 #endif /* !__KERNEL__ */
 

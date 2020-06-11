@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54eaebe1 */
+/* HASH CRC-32:0xc9a14224 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,17 +22,20 @@
 #define GUARD_LIBC_USER_SYS_SYSINFO_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/sysinfo.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_sysinfo)(struct sysinfo *info);
 INTDEF WUNUSED int NOTHROW_RPC(LIBCCALL libc_get_nprocs_conf)(void);
 INTDEF WUNUSED int NOTHROW_RPC(LIBCCALL libc_get_nprocs)(void);
 INTDEF WUNUSED __INTPTR_TYPE__ NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void);
 INTDEF WUNUSED __INTPTR_TYPE__ NOTHROW_RPC(LIBCCALL libc_get_avphys_pages)(void);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

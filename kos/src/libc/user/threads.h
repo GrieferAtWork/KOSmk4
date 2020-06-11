@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbab2a8a */
+/* HASH CRC-32:0xc20f19d6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_THREADS_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <threads.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Create a new thread executing the function FUNC.  Arguments for FUNC
  * are passed through ARG. If successful, THR is set to new thread identifier */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr, thrd_start_t func, void *arg);
@@ -48,7 +50,7 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_thrd_sleep64)(struct timespec6
 /* Terminate current thread execution, cleaning up any thread local
  * storage and freeing resources. Returns the value specified in RES
  * s.a. `pthread_exit()' */
-INTDEF ATTR_NORETURN void (LIBCCALL libc_thrd_exit)(int res);
+INTDEF ATTR_NORETURN void (LIBCCALL libc_thrd_exit)(int res) THROWS(...);
 /* Detach the thread identified by THR from the current
  * environment (it does not allow join or wait for it)
  * s.a. `pthread_detach()' */
@@ -60,7 +62,7 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr, int *res);
 /* Creates a new mutex object with type TYPE.
  * If successful the new object is pointed by MUTEX
  * s.a. `pthread_mutex_init()' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mtx_init)(mtx_t *__restrict mutex, int type);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mtx_init)(mtx_t *__restrict mutex, __STDC_INT_AS_UINT_T type);
 /* Block the current thread until the mutex pointed to by MUTEX is
  * unlocked.  In that case current thread will not be blocked
  * s.a. `pthread_mutex_lock()' */
@@ -112,6 +114,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_tss_create)(tss_t *tss_id, tss_dtor_t destr
  * identified by TSS_ID for the current thread to VAL
  * s.a. `pthread_setspecific()' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_tss_set)(tss_t tss_id, void *val);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

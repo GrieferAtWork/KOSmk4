@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25ce2dde */
+/* HASH CRC-32:0x78d72c09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,242 +22,245 @@
 #define GUARD_LIBC_USER_PARTS_WCHAR_UNISTD_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <parts/wchar/unistd.h>
 
 DECL_BEGIN
 
-/* >> wttyname(3)
- * Return the name of a TTY given its file descriptor */
-INTDEF WUNUSED char32_t *NOTHROW_RPC(LIBCCALL libc_wttyname)(fd_t fd);
-/* >> wttyname(3)
+#ifndef __KERNEL__
+/* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 INTDEF WUNUSED char16_t *NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd);
-/* >> wttyname_r(3)
+/* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_wttyname_r)(fd_t fd, char32_t *buf, size_t buflen);
-/* >> wttyname_r(3)
+INTDEF WUNUSED char32_t *NOTHROW_RPC(LIBKCALL libc_wttyname)(fd_t fd);
+/* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd, char16_t *buf, size_t buflen);
-INTDEF WUNUSED char32_t *NOTHROW_NCX(LIBCCALL libc_wgetlogin)(void);
+/* >> ttyname_r(3)
+ * Return the name of a TTY given its file descriptor */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd, char32_t *buf, size_t buflen);
 INTDEF WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd_wgetlogin)(void);
-/* >> wchown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_wchown)(char32_t const *file, uid_t owner, gid_t group);
-/* >> wchown(2)
+INTDEF WUNUSED char32_t *NOTHROW_NCX(LIBKCALL libc_wgetlogin)(void);
+/* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wchown)(char16_t const *file, uid_t owner, gid_t group);
-/* >> wpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTDEF NONNULL((1)) long int NOTHROW_RPC(LIBCCALL libc_wpathconf)(char32_t const *path, int name);
-/* >> wpathconf(2)
+/* >> chown(2)
+ * Change the ownership of a given `FILE' to `GROUP:OWNER' */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wchown)(char32_t const *file, uid_t owner, gid_t group);
+/* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTDEF NONNULL((1)) long int NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path, int name);
-/* >> wlink(2)
- * Create a hard link from `FROM', leading to `TO' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_wlink)(char32_t const *from, char32_t const *to);
-/* >> wlink(2)
+/* >> pathconf(2)
+ * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+INTDEF NONNULL((1)) long int NOTHROW_RPC(LIBKCALL libc_wpathconf)(char32_t const *path, int name);
+/* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_wlink)(char16_t const *from, char16_t const *to);
-/* >> waccess(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE' */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_waccess)(char32_t const *file, int type);
-/* >> waccess(2)
+/* >> link(2)
+ * Create a hard link from `FROM', leading to `TO' */
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBKCALL libc_wlink)(char32_t const *from, char32_t const *to);
+/* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_waccess)(char16_t const *file, int type);
-/* >> wchdir(2)
- * Change the current working directory to `PATH' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_wchdir)(char32_t const *path);
-/* >> wchdir(2)
- * Change the current working directory to `PATH' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wchdir)(char16_t const *path);
-/* >> wgetcwd(2)
- * Return the path of the current working directory, relative to the filesystem root set by `wchdir(2)' */
-INTDEF char32_t *NOTHROW_RPC(LIBCCALL libc_wgetcwd)(char32_t *buf, size_t bufsize);
-/* >> wgetcwd(2)
- * Return the path of the current working directory, relative to the filesystem root set by `wchdir(2)' */
-INTDEF char16_t *NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf, size_t bufsize);
-/* >> wunlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_wunlink)(char32_t const *file);
-/* >> wunlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wunlink)(char16_t const *file);
-/* >> wrmdir(2)
- * Remove a directory referred to by `PATH' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_wrmdir)(char32_t const *path);
-/* >> wrmdir(2)
- * Remove a directory referred to by `PATH' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wrmdir)(char16_t const *path);
-/* >> weuidaccess(2)
+/* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
+ * Test for access to the specified file `FILE', testing for `TYPE' */
+INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_waccess)(char32_t const *file, int type);
+/* >> chdir(2)
+ * Change the current working directory to `PATH' */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd__wchdir)(char16_t const *path);
+/* >> chdir(2)
+ * Change the current working directory to `PATH' */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wchdir)(char32_t const *path);
+/* >> getcwd(2)
+ * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
+INTDEF char16_t *NOTHROW_RPC(LIBDCALL libd__wgetcwd)(char16_t *buf, size_t bufsize);
+/* >> getcwd(2)
+ * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
+INTDEF char32_t *NOTHROW_RPC(LIBKCALL libc_wgetcwd)(char32_t *buf, size_t bufsize);
+/* >> unlink(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd__wunlink)(char16_t const *file);
+/* >> unlink(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wunlink)(char32_t const *file);
+/* >> rmdir(2)
+ * Remove a directory referred to by `PATH' */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd__wrmdir)(char16_t const *path);
+/* >> rmdir(2)
+ * Remove a directory referred to by `PATH' */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wrmdir)(char32_t const *path);
+/* >> euidaccess(2)
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_weuidaccess)(char32_t const *file, int type);
-/* >> weuidaccess(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
+INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_weuidaccess)(char16_t const *file, __STDC_INT_AS_UINT_T type);
+/* >> euidaccess(2)
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_weuidaccess)(char16_t const *file, int type);
-INTDEF ATTR_MALLOC WUNUSED char32_t *NOTHROW_RPC(LIBCCALL libc_wget_current_dir_name)(void);
+INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_weuidaccess)(char32_t const *file, __STDC_INT_AS_UINT_T type);
 INTDEF ATTR_MALLOC WUNUSED char16_t *NOTHROW_RPC(LIBDCALL libd_wget_current_dir_name)(void);
-/* >> wfaccessat(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
- * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_wfaccessat)(fd_t dfd, char32_t const *file, int type, atflag_t flags);
-/* >> wfaccessat(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
+INTDEF ATTR_MALLOC WUNUSED char32_t *NOTHROW_RPC(LIBKCALL libc_wget_current_dir_name)(void);
+/* >> faccessat(2)
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wfaccessat)(fd_t dfd, char16_t const *file, int type, atflag_t flags);
-/* >> wfchownat(2)
- * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_wfchownat)(fd_t dfd, char32_t const *file, uid_t owner, gid_t group, atflag_t flags);
-/* >> wfchownat(2)
+/* >> faccessat(2)
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
+ * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wfaccessat)(fd_t dfd, char32_t const *file, int type, atflag_t flags);
+/* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wfchownat)(fd_t dfd, char16_t const *file, uid_t owner, gid_t group, atflag_t flags);
-/* >> wlinkat(2)
- * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
-INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_wlinkat)(fd_t fromfd, char32_t const *from, fd_t tofd, char32_t const *to, atflag_t flags);
-/* >> wlinkat(2)
+/* >> fchownat(2)
+ * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wfchownat)(fd_t dfd, char32_t const *file, uid_t owner, gid_t group, atflag_t flags);
+/* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_wlinkat)(fd_t fromfd, char16_t const *from, fd_t tofd, char16_t const *to, atflag_t flags);
-/* >> wsymlinkat(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
-INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_wsymlinkat)(char32_t const *link_text, fd_t tofd, char32_t const *target_path);
-/* >> wsymlinkat(3)
+/* >> linkat(2)
+ * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
+INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBKCALL libc_wlinkat)(fd_t fromfd, char32_t const *from, fd_t tofd, char32_t const *to, atflag_t flags);
+/* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
 INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *link_text, fd_t tofd, char16_t const *target_path);
-/* >> wreadlinkat(2)
+/* >> symlinkat(3)
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBKCALL libc_wsymlinkat)(char32_t const *link_text, fd_t tofd, char32_t const *target_path);
+/* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `wfreadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_wreadlinkat)(fd_t dfd, char32_t const *__restrict path, char32_t *__restrict buf, size_t buflen);
-/* >> wreadlinkat(2)
- * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
- *          NUL-character to the buffer, nor will it return the required buffer
- *          size. Instead, it will return the written size, and the caller must
- *          keep on over allocating until the function indicates that it didn't
- *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `wfreadlinkat(2)' with `AT_READLINK_REQSIZE'. */
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd, char16_t const *__restrict path, char16_t *__restrict buf, size_t buflen);
-/* >> wfreadlinkat(2)
+/* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
- * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_wfreadlinkat)(fd_t dfd, char32_t const *__restrict path, char32_t *__restrict buf, size_t buflen, atflag_t flags);
-/* >> wfreadlinkat(2)
+ * WARNING: This function is badly designed and will neither append a trailing
+ *          NUL-character to the buffer, nor will it return the required buffer
+ *          size. Instead, it will return the written size, and the caller must
+ *          keep on over allocating until the function indicates that it didn't
+ *          make use of the buffer in its entirety.
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
+INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd, char32_t const *__restrict path, char32_t *__restrict buf, size_t buflen);
+/* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
 INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd, char16_t const *__restrict path, char16_t *__restrict buf, size_t buflen, atflag_t flags);
-/* >> wunlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_wunlinkat)(fd_t dfd, char32_t const *name, atflag_t flags);
-/* >> wunlinkat(2)
+/* >> freadlinkat(2)
+ * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
+ * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
+INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd, char32_t const *__restrict path, char32_t *__restrict buf, size_t buflen, atflag_t flags);
+/* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd, char16_t const *name, atflag_t flags);
-/* >> wlchown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER',
- * but don't reference it if that file is a symbolic link */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_wlchown)(char32_t const *file, uid_t owner, gid_t group);
-/* >> wlchown(2)
+/* >> unlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wunlinkat)(fd_t dfd, char32_t const *name, atflag_t flags);
+/* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wlchown)(char16_t const *file, uid_t owner, gid_t group);
-/* >> wtruncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_wtruncate)(char32_t const *file, __PIO_OFFSET length);
-/* >> wtruncate(2)
+/* >> lchown(2)
+ * Change the ownership of a given `FILE' to `GROUP:OWNER',
+ * but don't reference it if that file is a symbolic link */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wlchown)(char32_t const *file, uid_t owner, gid_t group);
+/* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wtruncate)(char16_t const *file, __PIO_OFFSET length);
-/* >> wtruncate(2)
+/* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_wtruncate64)(char32_t const *file, __PIO_OFFSET64 length);
-/* >> wtruncate(2)
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wtruncate)(char32_t const *file, __PIO_OFFSET length);
+/* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *file, __PIO_OFFSET64 length);
-/* >> wsymlink(3)
+/* >> truncate64(2)
+ * Truncate the given file `FILE' to a length of `LENGTH' */
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wtruncate64)(char32_t const *file, __PIO_OFFSET64 length);
+/* >> symlink(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TARGET_PATH'.
- * Same as `wsymlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_wsymlink)(char32_t const *link_text, char32_t const *target_path);
-/* >> wsymlink(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TARGET_PATH'.
- * Same as `wsymlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+ * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *link_text, char16_t const *target_path);
-/* >> wreadlink(3)
+/* >> symlink(3)
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBKCALL libc_wsymlink)(char32_t const *link_text, char32_t const *target_path);
+/* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
- * Same as `wreadlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
+ * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `wfreadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBCCALL libc_wreadlink)(char32_t const *__restrict path, char32_t *__restrict buf, size_t buflen);
-/* >> wreadlink(3)
- * Read the text of a symbolic link under `PATH' into the provided buffer.
- * Same as `wreadlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
- * WARNING: This function is badly designed and will neither append a trailing
- *          NUL-character to the buffer, nor will it return the required buffer
- *          size. Instead, it will return the written size, and the caller must
- *          keep on over allocating until the function indicates that it didn't
- *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `wfreadlinkat(2)' with `AT_READLINK_REQSIZE' */
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *__restrict path, char16_t *__restrict buf, size_t buflen);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_wgetlogin_r)(char32_t *name, size_t name_len);
+/* >> readlink(3)
+ * Read the text of a symbolic link under `PATH' into the provided buffer.
+ * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
+ * WARNING: This function is badly designed and will neither append a trailing
+ *          NUL-character to the buffer, nor will it return the required buffer
+ *          size. Instead, it will return the written size, and the caller must
+ *          keep on over allocating until the function indicates that it didn't
+ *          make use of the buffer in its entirety.
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *__restrict path, char32_t *__restrict buf, size_t buflen);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wgetlogin_r)(char16_t *name, size_t name_len);
-/* >> wgethostname(3)
- * Return the name assigned to the hosting machine, as set by `wsethostname(2)' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_wgethostname)(char32_t *name, size_t buflen);
-/* >> wgethostname(3)
- * Return the name assigned to the hosting machine, as set by `wsethostname(2)' */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wgetlogin_r)(char32_t *name, size_t name_len);
+/* >> gethostname(3)
+ * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name, size_t buflen);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_wsetlogin)(char32_t const *name);
+/* >> gethostname(3)
+ * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wgethostname)(char32_t *name, size_t buflen);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wsetlogin)(char16_t const *name);
-/* >> wsethostname(2)
- * Set the name of the hosting machine */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_wsethostname)(char32_t const *name, size_t len);
-/* >> wsethostname(2)
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wsetlogin)(char32_t const *name);
+/* >> sethostname(2)
  * Set the name of the hosting machine */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wsethostname)(char16_t const *name, size_t len);
-/* >> wgetdomainname(3)
- * Return the name assigned to the hosting machine's domain, as set by `wsetdomainname(2)' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_wgetdomainname)(char32_t *name, size_t buflen);
-/* >> wgetdomainname(3)
- * Return the name assigned to the hosting machine's domain, as set by `wsetdomainname(2)' */
+/* >> sethostname(2)
+ * Set the name of the hosting machine */
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wsethostname)(char32_t const *name, size_t len);
+/* >> getdomainname(3)
+ * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wgetdomainname)(char16_t *name, size_t buflen);
-/* >> wsetdomainname(2)
- * Set the name of the hosting machine's domain */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_wsetdomainname)(char32_t const *name, size_t len);
-/* >> wsetdomainname(2)
+/* >> getdomainname(3)
+ * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wgetdomainname)(char32_t *name, size_t buflen);
+/* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wsetdomainname)(char16_t const *name, size_t len);
-/* >> wchroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
- * (usually the process) to a path that was previously address by `PATH' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_wchroot)(char32_t const *__restrict path);
-/* >> wchroot(2)
+/* >> setdomainname(2)
+ * Set the name of the hosting machine's domain */
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wsetdomainname)(char32_t const *name, size_t len);
+/* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wchroot)(char16_t const *__restrict path);
-INTDEF char32_t *NOTHROW_NCX(LIBCCALL libc_wctermid)(char32_t *s);
+/* >> chroot(2)
+ * Change the root directory of the calling `CLONE_FS' group of threads
+ * (usually the process) to a path that was previously address by `PATH' */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wchroot)(char32_t const *__restrict path);
 INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd_wctermid)(char16_t *s);
+INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc_wctermid)(char32_t *s);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

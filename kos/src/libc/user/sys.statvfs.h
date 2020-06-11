@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4684e737 */
+/* HASH CRC-32:0x1f55870f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_SYS_STATVFS_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/statvfs.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Return information about the filesystem on which FILE resides */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_statvfs)(char const *file, struct statvfs *buf);
 /* Return information about the filesystem containing the file FILDES refers to */
@@ -36,6 +38,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_fstatvfs)(fd_t filedes, struct
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_statvfs64)(const char *file, struct statvfs64 *buf);
 /* Return information about the filesystem containing the file FILDES refers to */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_fstatvfs64)(fd_t filedes, struct statvfs64 *buf);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

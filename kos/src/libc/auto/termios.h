@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90de18bf */
+/* HASH CRC-32:0x8a9d722f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,13 @@
 #define GUARD_LIBC_AUTO_TERMIOS_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <termios.h>
 
 DECL_BEGIN
 
-/* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
- * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p);
 #ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) speed_t NOTHROW_NCX(LIBCCALL libc_cfgetospeed)(struct termios const *__restrict termios_p);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) speed_t NOTHROW_NCX(LIBCCALL libc_cfgetispeed)(struct termios const *__restrict termios_p);
@@ -42,6 +40,9 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__
  * any sort of input/output text processing no longer taking place. */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_cfmakeraw)(struct termios *__restrict termios_p);
 #endif /* !__KERNEL__ */
+/* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
+ * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p);
 
 DECL_END
 

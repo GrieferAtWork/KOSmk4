@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd57ace9d */
+/* HASH CRC-32:0xdabb970 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_SPAWN_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <spawn.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Spawn a new process executing PATH with the attributes describes in *ATTRP.
  * Before running the process perform the actions described in FILE-ACTIONS.
  * This function is a possible cancellation point and therefore not marked with __THROW */
@@ -53,7 +55,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getflags)(p
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setflags)(posix_spawnattr_t *__restrict attr, short int flags);
 /* Get process group ID from the attribute structure */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getpgroup)(posix_spawnattr_t const *__restrict attr, pid_t *__restrict pgroup);
-/* Store process group ID in the attribute structure */
+/* Store rocess group ID in the attribute structure */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setpgroup)(posix_spawnattr_t *__restrict attr, pid_t pgroup);
 /* Get scheduling policy from the attribute structure */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedpolicy)(posix_spawnattr_t const *__restrict attr, int *__restrict schedpolicy);
@@ -76,6 +78,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addcl
 /* Add an action to FILE-ACTIONS which tells the implementation to
  * call `dup2' for the given file descriptors during the `spawn' call */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd, fd_t newfd);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

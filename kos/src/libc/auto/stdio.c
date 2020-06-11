@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ffedb21 */
+/* HASH CRC-32:0xe0dc3d04 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,148 +24,708 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "stdio.h"
-#include "format-printer.h"
-#include "unicode.h"
+#include "../user/stdio.h"
+#include <format-printer.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unicode.h>
+#include <unistd.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
+#include <asm/stdio.h>
+/* Alias for `setvbuf(STREAM, buf, _IOFBF, BUFSIZ)' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_setbuf)(FILE *__restrict stream, char *buf) {
+	setvbuf(stream, buf,
+	        buf ? ___IOFBF : ___IONBF,
+	        buf ? __BUFSIZ : 0);
+}
+#include <local/stdstreams.h>
+/* Alias for `fgetc(stdin)' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") int
+(LIBCCALL libc_getchar)(void) THROWS(...) {
+	return fgetc(stdin);
+}
+#include <local/stdstreams.h>
+/* Alias for `fputc(CH, stdout)' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") int
+(LIBCCALL libc_putchar)(int ch) THROWS(...) {
+	return fputc(ch, stdout);
+}
+#include <parts/errno.h>
+/* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
+ * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `BUF')
+ * Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred. */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) char *
+(LIBCCALL libc_fgets)(char *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...) {
+	size_t n;
+	if unlikely(!buf || !bufsize) {
+		/* The buffer cannot be empty! */
+#ifdef ERANGE
+		__libc_seterrno(ERANGE);
+#endif /* ERANGE */
+		return NULL;
+	}
+	for (n = 0; n < bufsize - 1; ++n) {
+		int ch = fgetc(stream);
+		if (ch == EOF) {
+			if (n == 0 || ferror(stream))
+				return NULL;
+			break;
+		}
+		if (ch == '\r') {
+			/* Special handling to convert both `\r' and `\r\n' into `\n' */
+			buf[n++] = '\n';
+			ch = fgetc(stream);
+			if (ch == EOF) {
+				if (n == 0 || ferror(stream))
+					return NULL;
+				break;
+			}
+			if (ch == '\r')
+				continue;
+			ungetc(ch, stream);
+			break;
+		}
+		buf[n] = (char)ch;
+		if (ch == '\n')
+			break;
+	}
+	buf[n] = '\0';
+	return buf;
+}
+/* Print a given string `STR' to `STREAM'. This is identical to:
+ * >> fwrite(str, sizeof(char), strlen(str), stream); */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc_fputs)(char const *__restrict str, FILE *__restrict stream) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	result = fwrite(str,
+	                sizeof(char),
+	                strlen(str),
+	                stream);
+	return result;
+}
+#include <local/stdstreams.h>
+/* Print a given string `STR', followed by a line-feed to `STDOUT' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1)) __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc_puts)(char const *__restrict string) THROWS(...) {
+	__STDC_INT_AS_SSIZE_T result, temp;
+	result = fputs(string, stdout);
+	if (result >= 0) {
+		temp = fputc('\n', stdout);
+		if (temp <= 0)
+			result = temp;
+		else
+			result += temp;
+	}
+	return result;
+}
+#include <local/stdstreams.h>
+#include <parts/errno.h>
+/* Print a given `MESSAGE' alongside `strerror(errno)' to stderr:
+ * >> if (message) {
+ * >>     fprintf(stderr, "%s: %s\n", message, strerror(errno));
+ * >> } else {
+ * >>     fprintf(stderr, "%s\n", strerror(errno));
+ * >> } */
+INTERN ATTR_SECTION(".text.crt.errno.utility") void
+NOTHROW_RPC(LIBCCALL libc_perror)(char const *message) {
+	char const *enodesc;
+	enodesc = strerror(__libc_geterrno());
+	if (message) {
+		fprintf(stderr, "%s: %s\n",
+		        message, enodesc);
+	} else {
+		fprintf(stderr, "%s\n",
+		        enodesc);
+	}
+}
+/* Print data to `STREAM', following `FORMAT'
+ * Return the number of successfully printed bytes */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...) {
+	return (__STDC_INT_AS_SSIZE_T)format_vprintf(&file_printer, stream, format, args);
+}
+/* Print data to `STREAM', following `FORMAT'
+ * Return the number of successfully printed bytes */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc_fprintf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...) {
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = vfprintf(stream, format, args);
+	va_end(args);
+	return result;
+}
+#include <local/stdstreams.h>
+/* Print data to `stdout', following `FORMAT'
+ * Return the number of successfully printed bytes */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc_vprintf)(char const *__restrict format, va_list args) THROWS(...) {
+	return vfprintf(stdout, format, args);
+}
+/* Print data to `stdout', following `FORMAT'
+ * Return the number of successfully printed bytes */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc_printf)(char const *__restrict format, ...) THROWS(...) {
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = vprintf(format, args);
+	va_end(args);
+	return result;
+}
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if __SIZEOF_SIZE_T__ != __SIZEOF_INT__
+__LOCAL_LIBC(vfscanf_getc) ssize_t
+(__LIBCCALL vfscanf_getc)(void *arg) {
+	return (ssize_t)fgetc((FILE *)arg);
+}
+#endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
+__LOCAL_LIBC(vfscanf_ungetc) ssize_t
+(__LIBCCALL vfscanf_ungetc)(void *arg, char32_t ch) {
+	return ungetc((int)(unsigned int)ch, (FILE *)arg);
+}
+__NAMESPACE_LOCAL_END
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(LIBCCALL libc_vfscanf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...) {
+#if __SIZEOF_SIZE_T__ == __SIZEOF_INT__
+	return format_vscanf(*(pformatgetc)&fgetc,
+	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc,
+	                     (void *)stream,
+	                     format, args);
+#else /* __SIZEOF_SIZE_T__ == __SIZEOF_INT__ */
+	return format_vscanf(&__NAMESPACE_LOCAL_SYM vfscanf_getc,
+	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc,
+	                     (void *)stream,
+	                     format, args);
+#endif /* !(__SIZEOF_SIZE_T__ == __SIZEOF_INT__) */
+}
+#include <local/stdstreams.h>
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(LIBCCALL libc_vscanf)(char const *__restrict format, va_list args) THROWS(...) {
+	return vfscanf(stdin, format, args);
+}
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc_fscanf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = vfscanf(stream, format, args);
+	va_end(args);
+	return result;
+}
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc_scanf)(char const *__restrict format, ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = vscanf(format, args);
+	va_end(args);
+	return result;
+}
+#include <local/stdstreams.h>
+#include <hybrid/typecore.h>
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)") NONNULL((1)) char *
+(LIBCCALL libc_gets)(char *__restrict buf) THROWS(...) {
+	return fgets(buf, INT_MAX, stdin);
+}
+#include <asm/stdio.h>
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_getc)(void *__arg) {
+	__CHAR32_TYPE__ __result = unicode_readutf8((char const **)__arg);
+	return __result ? __result : __EOF;
+}
+__LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
+	unicode_readutf8_rev((char const **)__arg);
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+INTERN ATTR_SECTION(".text.crt.unicode.static.format.scanf") WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input, char const *__restrict format, va_list args) {
+	char const *input_pointer = input;
+	return format_vscanf(&__NAMESPACE_LOCAL_SYM __vsscanf_getc,
+	                     &__NAMESPACE_LOCAL_SYM __vsscanf_ungetc,
+	                     (void *)&input_pointer, format, args);
+}
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+INTERN ATTR_SECTION(".text.crt.unicode.static.format.scanf") ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc_sscanf)(char const *__restrict input, char const *__restrict format, ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = vsscanf(input, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__KERNEL__ */
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-INTERN ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.format.printf.vsprintf") __STDC_INT_AS_SSIZE_T
-NOTHROW_NCX(LIBCCALL libc_vsprintf)(char *__restrict dest,
-                                    char const *__restrict format,
-                                    va_list args) {
-#line 985 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.unicode.static.format.printf") ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc_vsprintf)(char *__restrict dest, char const *__restrict format, va_list args) {
 	__STDC_INT_AS_SSIZE_T result;
 	char *dest_pointer = dest;
-	result = (__STDC_INT_AS_SSIZE_T)libc_format_vprintf(&libc_format_sprintf_printer,
-	                                                 (void *)&dest_pointer,
-	                                                 format,
-	                                                 args);
+	result = (__STDC_INT_AS_SSIZE_T)format_vprintf(&format_sprintf_printer,
+	                                               (void *)&dest_pointer,
+	                                               format, args);
 	if (result >= 0)
 		*dest_pointer = '\0';
 	return result;
 }
-
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-INTERN ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.format.printf.sprintf") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc_sprintf)(char *__restrict buf,
-                                    char const *__restrict format,
-                                    ...) {
-#line 1004 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.unicode.static.format.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc_sprintf)(char *__restrict buf, char const *__restrict format, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = libc_vsprintf(buf, format, args);
+	result = vsprintf(buf, format, args);
 	va_end(args);
 	return result;
 }
-
 #ifndef ____format_snprintf_data_defined
 #define ____format_snprintf_data_defined 1
 struct __format_snprintf_data {
 	char         *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 	__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
 };
-#endif /* !____format_snprintf_data_defined */
+#endif
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
-INTERN ATTR_LIBC_PRINTF(3, 0) NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.format.printf.vsnprintf") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf,
-                                     size_t buflen,
-                                     char const *__restrict format,
-                                     va_list args) {
-#line 1026 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, va_list args) {
 	struct __format_snprintf_data data;
 	__STDC_INT_AS_SSIZE_T result;
 	data.__sd_buffer = buf;
 	data.__sd_bufsiz = buflen;
-	result = (__STDC_INT_AS_SSIZE_T)libc_format_vprintf(&libc_format_snprintf_printer,
-	                                                (void *)&data,
-	                                                 format,
-	                                                 args);
+	result = (__STDC_INT_AS_SSIZE_T)format_vprintf(&format_snprintf_printer,
+	                                               (void *)&data, format, args);
 	if (result >= 0 && data.__sd_bufsiz != 0)
 		*data.__sd_buffer = '\0';
 	return result;
 }
-
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
-INTERN ATTR_LIBC_PRINTF(3, 4) NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.format.printf.snprintf") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf,
-                                     size_t buflen,
-                                     char const *__restrict format,
-                                     ...) {
-#line 1046 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = libc_vsnprintf(buf, buflen, format, args);
+	result = vsnprintf(buf, buflen, format, args);
 	va_end(args);
 	return result;
 }
-
 #ifndef __KERNEL__
-#include <asm/stdio.h>
 #include <hybrid/typecore.h>
-__LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_getc)(void *__arg) {
-	__CHAR32_TYPE__ __result = libc_unicode_readutf8((char const **)__arg);
-	return __result ? __result : __EOF;
+#include <hybrid/host.h>
+#if __SIZEOF_INT__ != __SIZEOF_POINTER__ && !defined(__x86_64__)
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vdprintf_printer) __ssize_t (__LIBCCALL __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
+	return (__ssize_t)write((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
 }
-__LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	libc_unicode_readutf8_rev((char const **)__arg);
-	return 0;
+__NAMESPACE_LOCAL_END
+#endif /* __SIZEOF_INT__ != __SIZEOF_POINTER__ && !__x86_64__ */
+INTERN ATTR_SECTION(".text.crt.io.write") ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
+NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd, char const *__restrict format, va_list args) {
+#if __SIZEOF_INT__ != __SIZEOF_POINTER__ && !defined(__x86_64__)
+	return format_vprintf(&__NAMESPACE_LOCAL_SYM __vdprintf_printer,
+	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
+	                      format, args);
+#else /* __SIZEOF_INT__ != __SIZEOF_POINTER__ && !__x86_64__ */
+	return format_vprintf((pformatprinter)&write,
+	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
+	                      format, args);
+#endif /* !__SIZEOF_INT__ != __SIZEOF_POINTER__ || __x86_64__ */
 }
-/* Scan data from a given `INPUT' string, following `FORMAT'
- * Return the number of successfully scanned data items */
-INTERN WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.format.scanf.vsscanf") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input,
-                                   char const *__restrict format,
-                                   va_list args) {
-#line 960 "kos/src/libc/magic/stdio.c"
-	char const *input_pointer = input;
-	return libc_format_vscanf(&__vsscanf_getc, &__vsscanf_ungetc,
-	                     (void *)&input_pointer, format, args);
-}
-
-/* Scan data from a given `INPUT' string, following `FORMAT'
- * Return the number of successfully scanned data items */
-INTERN ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.format.scanf.sscanf") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc_sscanf)(char const *__restrict input,
-                                   char const *__restrict format,
-                                   ...) {
-#line 974 "kos/src/libc/magic/stdio.c"
-	__STDC_INT_AS_SIZE_T result;
+INTERN ATTR_SECTION(".text.crt.io.write") ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T
+NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd, char const *__restrict format, ...) {
+	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = libc_vsscanf(input, format, args);
+	result = vdprintf(fd, format, args);
 	va_end(args);
 	return result;
 }
-
-DEFINE_PUBLIC_WEAK_ALIAS(_IO_vsprintf, libc_vsprintf);
-DEFINE_PUBLIC_WEAK_ALIAS(_IO_sprintf, libc_sprintf);
-INTERN WUNUSED ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf._vsscanf_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vsscanf_l)(char const *__restrict input,
-                                      char const *__restrict format,
-                                      locale_t locale,
-                                      va_list args) {
-#line 2286 "kos/src/libc/magic/stdio.c"
-	(void)locale;
-	return libc_vsscanf(input, format, args);
+#include <asm/stdio.h>
+/* Specify the location and size for the buffer to-be used by `STREAM' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_setbuffer)(FILE *__restrict stream, char *buf, size_t bufsize) {
+	setvbuf(stream,
+	        buf,
+	        buf ? ___IOFBF : ___IONBF,
+	        buf ? bufsize : (size_t)0);
 }
-
+/* Change the given `STREAM' to become line-buffered */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_setlinebuf)(FILE *__restrict stream) {
+	setvbuf(stream, NULL, _IOLBF, 0);
+}
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 2, 4)) ssize_t
+(LIBCCALL libc_getdelim)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...) {
+	int ch;
+	char *buffer;
+	size_t bufsize, result = 0;
+	buffer  = *lineptr;
+	bufsize = buffer ? *pcount : 0;
+	for (;;) {
+		if (result + 1 >= bufsize) {
+			/* Allocate more memory. */
+			size_t new_bufsize = bufsize * 2;
+			if (new_bufsize <= result + 1)
+				new_bufsize = 16;
+			assert(new_bufsize > result + 1);
+			buffer = (char *)realloc(buffer,
+			                         new_bufsize *
+			                         sizeof(char));
+			if unlikely(!buffer)
+				return -1;
+			*lineptr = buffer;
+			*pcount  = bufsize;
+		}
+		ch = fgetc(stream);
+		if (ch == EOF)
+			break; /* EOF */
+		buffer[result++] = (char)ch;
+		if (ch == delimiter)
+			break; /* Delimiter reached */
+		/* Special case for line-delimiter. */
+		if (delimiter == '\n' && ch == '\r') {
+			/* Deal with '\r\n', as well as '\r' */
+			ch = fgetc(stream);
+			if (ch != EOF && ch != '\n')
+				ungetc(ch, stream);
+			/* Unify linefeeds (to use POSIX notation) */
+			buffer[result - 1] = '\n';
+			break;
+		}
+	}
+	/* NUL-Terminate the buffer. */
+	buffer[result] = '\0';
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 2, 3)) ssize_t
+(LIBCCALL libc_getline)(char **__restrict lineptr, size_t *__restrict pcount, FILE *__restrict stream) THROWS(...) {
+	return getdelim(lineptr, pcount, '\n', stream);
+}
+#include <local/stdstreams.h>
+/* Same as `getchar()', but performs I/O without acquiring a lock to `stdin' */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") int
+(LIBCCALL libc_getchar_unlocked)(void) THROWS(...) {
+	return fgetc_unlocked(stdin);
+}
+#include <local/stdstreams.h>
+/* Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") int
+(LIBCCALL libc_putchar_unlocked)(int ch) THROWS(...) {
+	return fputc_unlocked(ch, stdout);
+}
+#include <asm/stdio.h>
+/* Similar to `getc()', but read 2 bytes */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") NONNULL((1)) int
+(LIBCCALL libc_getw)(FILE *__restrict stream) THROWS(...) {
+	u16 result;
+	return fread(&result, sizeof(result), 1, stream)
+	       ? (int)result
+	       : (int)EOF;
+}
+#include <asm/stdio.h>
+/* Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") NONNULL((2)) int
+(LIBCCALL libc_putw)(int w, FILE *__restrict stream) THROWS(...) {
+	u16 c = (u16)w;
+	return fwrite(&c, sizeof(c), 1, stream)
+	       ? w
+	       : EOF;
+}
+#include <asm/stdio.h>
+#include <parts/errno.h>
+/* Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 3)) char *
+(LIBCCALL libc_fgets_unlocked)(char *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...) {
+	size_t n;
+	if unlikely(!buf || !bufsize) {
+		/* The buffer cannot be empty! */
+#ifdef ERANGE
+		__libc_seterrno(ERANGE);
+#endif /* ERANGE */
+		return NULL;
+	}
+	for (n = 0; n < bufsize - 1; ++n) {
+		int ch = fgetc_unlocked(stream);
+		if (ch == EOF) {
+			if (n == 0 || ferror_unlocked(stream))
+				return NULL;
+			break;
+		}
+		if (ch == '\r') {
+			/* Special handling to convert both `\r' and `\r\n' into `\n' */
+			buf[n++] = '\n';
+			ch = fgetc_unlocked(stream);
+			if (ch == EOF) {
+				if (n == 0 || ferror_unlocked(stream))
+					return NULL;
+				break;
+			}
+			if (ch == '\r')
+				continue;
+			ungetc_unlocked(ch, stream);
+			break;
+		}
+		buf[n] = (char)ch;
+		if (ch == '\n')
+			break;
+	}
+	buf[n] = '\0';
+	return buf;
+}
+/* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(LIBCCALL libc_fputs_unlocked)(char const *__restrict string, FILE *__restrict stream) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	result = fwrite_unlocked(string,
+	                         sizeof(char),
+	                         strlen(string),
+	                         stream);
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.obstack") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) int
+NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict obstack_, char const *__restrict format, ...) {
+	int result;
+	va_list args;
+	va_start(args, format);
+	result = obstack_vprintf(obstack_, format, args);
+	va_end(args);
+	return result;
+}
+#include <hybrid/__assert.h>
+#ifndef __format_aprintf_data_defined
+#define __format_aprintf_data_defined 1
+struct format_aprintf_data {
+	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owend] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+};
+#endif
+/* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
+INTERN ATTR_SECTION(".text.crt.heap.strdup") WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args) {
+	char *result;
+	ssize_t error;
+	struct format_aprintf_data data;
+	__hybrid_assert(pstr != NULL);
+	data.ap_avail = 0;
+	data.ap_used  = 0;
+	data.ap_base  = NULL;
+	error = format_vprintf(&format_aprintf_printer, &data, format, args);
+	if unlikely(error < 0) {
+		free(data.ap_base);
+		return -1;
+	}
+	result = format_aprintf_pack(&data, NULL);
+	if unlikely(!result)
+		return -1;
+	*pstr = result;
+	return (__STDC_INT_AS_SSIZE_T)error;
+}
+/* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
+INTERN ATTR_SECTION(".text.crt.heap.strdup") WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr, char const *__restrict format, ...) {
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = vasprintf(pstr, format, args);
+	va_end(args);
+	return result;
+}
+#include <asm/stdio.h>
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") NONNULL((1)) int
+(LIBCCALL libc_getw_unlocked)(FILE *__restrict stream) THROWS(...) {
+	u16 result;
+	return fread_unlocked(&result, sizeof(result), 1, stream)
+	       ? (int)result
+	       : (int)EOF;
+}
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") NONNULL((2)) int
+(LIBCCALL libc_putw_unlocked)(int w, FILE *__restrict stream) THROWS(...) {
+	u16 c = (u16)w;
+	return fwrite_unlocked(&c, sizeof(c), 1, stream)
+	       ? w
+	       : EOF;
+}
+#include <asm/stdio.h>
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 4)) ssize_t
+(LIBCCALL libc_getdelim_unlocked)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...) {
+	int ch;
+	char *buffer;
+	size_t bufsize, result = 0;
+	buffer  = *lineptr;
+	bufsize = buffer ? *pcount : 0;
+	for (;;) {
+		if (result + 1 >= bufsize) {
+			/* Allocate more memory. */
+			size_t new_bufsize = bufsize * 2;
+			if (new_bufsize <= result + 1)
+				new_bufsize = 16;
+			assert(new_bufsize > result + 1);
+			buffer = (char *)realloc(buffer,
+			                         new_bufsize *
+			                         sizeof(char));
+			if unlikely(!buffer)
+				return -1;
+			*lineptr = buffer;
+			*pcount  = bufsize;
+		}
+		ch = fgetc_unlocked(stream);
+		if (ch == EOF)
+			break; /* EOF */
+		buffer[result++] = (char)ch;
+		if (ch == delimiter)
+			break; /* Delimiter reached */
+		/* Special case for line-delimiter. */
+		if (delimiter == '\n' && ch == '\r') {
+			/* Deal with '\r\n', as well as '\r' */
+			ch = fgetc_unlocked(stream);
+			if (ch != EOF && ch != '\n')
+				ungetc_unlocked(ch, stream);
+			/* Unify linefeeds (to use POSIX notation) */
+			buffer[result - 1] = '\n';
+			break;
+		}
+	}
+	/* NUL-Terminate the buffer. */
+	buffer[result] = '\0';
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 3)) ssize_t
+(LIBCCALL libc_getline_unlocked)(char **__restrict lineptr, size_t *__restrict pcount, FILE *__restrict stream) THROWS(...) {
+	return getdelim_unlocked(lineptr, pcount, '\n', stream);
+}
+#include <local/stdstreams.h>
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") NONNULL((1)) __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc_puts_unlocked)(char const *__restrict string) THROWS(...) {
+	__STDC_INT_AS_SSIZE_T result, temp;
+	result = fputs_unlocked(string, stdout);
+	if (result >= 0) {
+		temp = fputc_unlocked('\n', stdout);
+		if (temp <= 0)
+			result = temp;
+		else
+			result += temp;
+	}
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc_vfprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...) {
+	return (__STDC_INT_AS_SSIZE_T)format_vprintf(&file_printer_unlocked, stream, format, args);
+}
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc_fprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...) {
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = vfprintf_unlocked(stream, format, args);
+	va_end(args);
+	return result;
+}
+#include <local/stdstreams.h>
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc_vprintf_unlocked)(char const *__restrict format, va_list args) THROWS(...) {
+	return vfprintf_unlocked(stdout, format, args);
+}
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc_printf_unlocked)(char const *__restrict format, ...) THROWS(...) {
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = vprintf_unlocked(format, args);
+	va_end(args);
+	return result;
+}
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if __SIZEOF_SIZE_T__ != __SIZEOF_INT__
+__LOCAL_LIBC(vfscanf_getc_unlocked) ssize_t
+(__LIBCCALL vfscanf_getc_unlocked)(void *arg) {
+	return (ssize_t)fgetc_unlocked((FILE *)arg);
+}
+#endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
+__LOCAL_LIBC(vfscanf_ungetc_unlocked) ssize_t
+(__LIBCCALL vfscanf_ungetc_unlocked)(void *arg, char32_t ch) {
+	return ungetc_unlocked((int)(unsigned int)ch, (FILE *)arg);
+}
+__NAMESPACE_LOCAL_END
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(LIBCCALL libc_vfscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...) {
+#if __SIZEOF_SIZE_T__ == __SIZEOF_INT__
+	return format_vscanf(*(pformatgetc)&fgetc_unlocked,
+	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc_unlocked,
+	                     (void *)stream,
+	                     format, args);
+#else /* __SIZEOF_SIZE_T__ == __SIZEOF_INT__ */
+	return format_vscanf(&__NAMESPACE_LOCAL_SYM vfscanf_getc_unlocked,
+	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc_unlocked,
+	                     (void *)stream,
+	                     format, args);
+#endif /* !(__SIZEOF_SIZE_T__ == __SIZEOF_INT__) */
+}
+#include <local/stdstreams.h>
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(LIBCCALL libc_vscanf_unlocked)(char const *__restrict format, va_list args) THROWS(...) {
+	return vfscanf_unlocked(stdin, format, args);
+}
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc_fscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = vfscanf_unlocked(stream, format, args);
+	va_end(args);
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc_scanf_unlocked)(char const *__restrict format, ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = vscanf_unlocked(format, args);
+	va_end(args);
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(LIBCCALL libc__vscanf_l)(char const *__restrict format, locale_t locale, va_list args) THROWS(...) {
+	(void)locale;
+	return vscanf(format, args);
+}
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(LIBCCALL libc__vfscanf_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, va_list args) THROWS(...) {
+	(void)locale;
+	return vfscanf(stream, format, args);
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf") WUNUSED ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsscanf_l)(char const *__restrict input, char const *__restrict format, locale_t locale, va_list args) {
+	(void)locale;
+	return vsscanf(input, format, args);
+}
 #include <asm/stdio.h>
 #include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 struct __vsnscanf_data {
 	char const *__ptr;
 	char const *__end;
@@ -173,136 +733,60 @@ struct __vsnscanf_data {
 __LOCAL_LIBC(vsnscanf_getc) __SSIZE_TYPE__
 (__LIBCCALL __vsnscanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ __result;
-	__result = libc_unicode_readutf8_n(&((struct __vsnscanf_data *)__arg)->__ptr,
+	__result = unicode_readutf8_n(&((struct __vsnscanf_data *)__arg)->__ptr,
 	                              ((struct __vsnscanf_data *)__arg)->__end);
 	return __result ? __result : __EOF;
 }
 
 __LOCAL_LIBC(vsnscanf_ungetc) __SSIZE_TYPE__
 (__LIBCCALL __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	libc_unicode_readutf8_rev(&((struct __vsnscanf_data *)__arg)->__ptr);
+	unicode_readutf8_rev(&((struct __vsnscanf_data *)__arg)->__ptr);
 	return 0;
 }
-INTERN WUNUSED ATTR_LIBC_SCANF(3, 4) NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.scanf._vsnscanf") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vsnscanf)(char const *__restrict input,
-                                     size_t inputlen,
-                                     char const *__restrict format,
-                                     va_list args) {
-#line 2320 "kos/src/libc/magic/stdio.c"
-	struct __vsnscanf_data data;
+__NAMESPACE_LOCAL_END
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.scanf") WUNUSED ATTR_LIBC_SCANF(3, 4) NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsnscanf)(char const *__restrict input, size_t inputlen, char const *__restrict format, va_list args) {
+	struct __NAMESPACE_LOCAL_SYM __vsnscanf_data data;
 	data.__ptr = input;
 	data.__end = input + inputlen;
-	return libc_format_vscanf(&__vsnscanf_getc, &__vsnscanf_ungetc, (void *)&data, format, args);
+	return format_vscanf(&__NAMESPACE_LOCAL_SYM __vsnscanf_getc,
+	                     &__NAMESPACE_LOCAL_SYM __vsnscanf_ungetc,
+	                     (void *)&data, format, args);
 }
-
-INTERN ATTR_LIBC_SCANF(3, 5) NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf._vsnscanf_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vsnscanf_l)(char const *__restrict input,
-                                       size_t inputlen,
-                                       char const *__restrict format,
-                                       locale_t locale,
-                                       va_list args) {
-#line 2333 "kos/src/libc/magic/stdio.c"
-	(void)locale;
-	return libc__vsnscanf(input, inputlen, format, args);
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc__scanf_l)(char const *__restrict format, locale_t locale, ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = _vscanf_l(format, locale, args);
+	va_end(args);
+	return result;
 }
-
-INTERN ATTR_LIBC_SCANF(3, 4) NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.scanf._snscanf") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__snscanf)(char const *__restrict input,
-                                     size_t inputlen,
-                                     char const *__restrict format,
-                                     ...) {
-#line 2355 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc__fscanf_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = _vfscanf_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.scanf") ATTR_LIBC_SCANF(3, 4) NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snscanf)(char const *__restrict input, size_t inputlen, char const *__restrict format, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = libc__vsnscanf(input, inputlen, format, args);
+	result = _vsnscanf(input, inputlen, format, args);
 	va_end(args);
 	return result;
 }
-
-INTERN ATTR_LIBC_SCANF(3, 5) NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf._snscanf_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__snscanf_l)(char const *__restrict input,
-                                       size_t inputlen,
-                                       char const *__restrict format,
-                                       locale_t locale,
-                                       ...) {
-#line 2360 "kos/src/libc/magic/stdio.c"
-	__STDC_INT_AS_SIZE_T result;
-	va_list args;
-	va_start(args, locale);
-	result = libc__vsnscanf_l(input, inputlen, format, locale, args);
-	va_end(args);
-	return result;
-}
-
-INTERN ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf._sscanf_s_l") __STDC_INT_AS_SIZE_T
-(VLIBCCALL libc__sscanf_s_l)(char const *__restrict input,
-                             char const *__restrict format,
-                             locale_t locale,
-                             ...) __THROWS(...) {
-#line 2368 "kos/src/libc/magic/stdio.c"
-	__STDC_INT_AS_SIZE_T result;
-	va_list args;
-	va_start(args, locale);
-	result = libc__vsscanf_s_l(input, format, locale, args);
-	va_end(args);
-	return result;
-}
-
-INTERN ATTR_LIBC_SCANF(3, 4) NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.scanf._snscanf_s") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__snscanf_s)(char const *__restrict input,
-                                       size_t inputlen,
-                                       char const *__restrict format,
-                                       ...) {
-#line 2377 "kos/src/libc/magic/stdio.c"
-	__STDC_INT_AS_SIZE_T result;
-	va_list args;
-	va_start(args, format);
-	result = libc__vsnscanf_s(input, inputlen, format, args);
-	va_end(args);
-	return result;
-}
-
-INTERN ATTR_LIBC_SCANF(3, 5) NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf._snscanf_s_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__snscanf_s_l)(char const *__restrict input,
-                                         size_t inputlen,
-                                         char const *__restrict format,
-                                         locale_t locale,
-                                         ...) {
-#line 2382 "kos/src/libc/magic/stdio.c"
-	__STDC_INT_AS_SIZE_T result;
-	va_list args;
-	va_start(args, locale);
-	result = libc__vsnscanf_s_l(input, inputlen, format, locale, args);
-	va_end(args);
-	return result;
-}
-
-INTERN ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vsprintf_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vsprintf_l)(char *__restrict buf,
-                                       char const *__restrict format,
-                                       locale_t locale,
-                                       va_list args) {
-#line 2388 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsprintf_l)(char *__restrict buf, char const *__restrict format, locale_t locale, va_list args) {
 	(void)locale;
-	return libc_vsprintf(buf, format, args);
+	return vsprintf(buf, format, args);
 }
-
-INTERN ATTR_LIBC_PRINTF_P(3, 0) NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vsprintf_p") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vsprintf_p)(char *__restrict buf,
-                                       size_t bufsize,
-                                       char const *__restrict format,
-                                       va_list args) {
-#line 2401 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsprintf_p)(char *__restrict buf, size_t bufsize, char const *__restrict format, va_list args) {
 	(void)buf;
 	(void)bufsize;
 	(void)format;
@@ -311,387 +795,549 @@ NOTHROW_NCX(LIBCCALL libc__vsprintf_p)(char *__restrict buf,
 	__COMPILER_IMPURE();
 	return 0;
 }
-
-INTERN ATTR_LIBC_PRINTF_P(3, 0) NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vsprintf_p_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vsprintf_p_l)(char *__restrict buf,
-                                         size_t bufsize,
-                                         char const *__restrict format,
-                                         locale_t locale,
-                                         va_list args) {
-#line 2414 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsprintf_p_l)(char *__restrict buf, size_t bufsize, char const *__restrict format, locale_t locale, va_list args) {
 	(void)locale;
-	return libc__vsprintf_p(buf, bufsize, format, args);
+	return _vsprintf_p(buf, bufsize, format, args);
 }
-
-INTERN ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._sprintf_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__sprintf_l)(char *__restrict buf,
-                                       char const *__restrict format,
-                                       locale_t locale,
-                                       ...) {
-#line 2421 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__sprintf_l)(char *__restrict buf, char const *__restrict format, locale_t locale, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = libc__vsprintf_l(buf, format, locale, args);
+	result = _vsprintf_l(buf, format, locale, args);
 	va_end(args);
 	return result;
 }
-
-INTERN ATTR_LIBC_PRINTF(3, 5) NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._sprintf_s_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__sprintf_s_l)(char *__restrict buf,
-                                         size_t bufsize,
-                                         char const *__restrict format,
-                                         locale_t locale,
-                                         ...) {
-#line 2422 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__sprintf_s_l)(char *__restrict buf, size_t bufsize, char const *__restrict format, locale_t locale, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = libc__vsprintf_s_l(buf, bufsize, format, locale, args);
+	result = _vsprintf_s_l(buf, bufsize, format, locale, args);
 	va_end(args);
 	return result;
 }
-
-INTERN ATTR_LIBC_PRINTF_P(3, 4) NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._sprintf_p") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__sprintf_p)(char *__restrict buf,
-                                       size_t bufsize,
-                                       char const *__restrict format,
-                                       ...) {
-#line 2423 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__sprintf_p)(char *__restrict buf, size_t bufsize, char const *__restrict format, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = libc__vsprintf_p(buf, bufsize, format, args);
+	result = _vsprintf_p(buf, bufsize, format, args);
 	va_end(args);
 	return result;
 }
-
-INTERN ATTR_LIBC_PRINTF_P(3, 5) NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._sprintf_p_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__sprintf_p_l)(char *__restrict buf,
-                                         size_t bufsize,
-                                         char const *__restrict format,
-                                         locale_t locale,
-                                         ...) {
-#line 2424 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(3, 5) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__sprintf_p_l)(char *__restrict buf, size_t bufsize, char const *__restrict format, locale_t locale, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = libc__vsprintf_p_l(buf, bufsize, format, locale, args);
+	result = _vsprintf_p_l(buf, bufsize, format, locale, args);
 	va_end(args);
 	return result;
 }
-
-INTERN WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vscprintf") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vscprintf)(char const *__restrict format,
-                                      va_list args) {
-#line 2429 "kos/src/libc/magic/stdio.c"
-	return libc_vsnprintf(NULL, 0, format, args);
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vscprintf)(char const *__restrict format, va_list args) {
+	return vsnprintf(NULL, 0, format, args);
 }
-
-INTERN WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._scprintf") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__scprintf)(char const *__restrict format,
-                                      ...) {
-#line 2436 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__scprintf)(char const *__restrict format, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = libc__vscprintf(format, args);
+	result = _vscprintf(format, args);
 	va_end(args);
 	return result;
 }
-
-INTERN WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vscprintf_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vscprintf_l)(char const *__restrict format,
-                                        locale_t locale,
-                                        va_list args) {
-#line 2443 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vscprintf_l)(char const *__restrict format, locale_t locale, va_list args) {
 	(void)locale;
-	return libc__vscprintf(format, args);
+	return _vscprintf(format, args);
 }
-
-INTERN WUNUSED ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vscprintf_p") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vscprintf_p)(char const *__restrict format,
-                                        va_list args) {
-#line 2450 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") WUNUSED ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vscprintf_p)(char const *__restrict format, va_list args) {
 	(void)format;
 	(void)args;
 	/* TODO */
 	__COMPILER_IMPURE();
 	return 0;
 }
-
-INTERN WUNUSED ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vscprintf_p_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vscprintf_p_l)(char const *__restrict format,
-                                          locale_t locale,
-                                          va_list args) {
-#line 2460 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") WUNUSED ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vscprintf_p_l)(char const *__restrict format, locale_t locale, va_list args) {
 	(void)locale;
-	return libc__vscprintf_p(format, args);
+	return _vscprintf_p(format, args);
 }
-
-INTERN WUNUSED ATTR_LIBC_PRINTF(1, 3) NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._scprintf_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__scprintf_l)(char const *__restrict format,
-                                        locale_t locale,
-                                        ...) {
-#line 2467 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") WUNUSED ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__scprintf_l)(char const *__restrict format, locale_t locale, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = libc__vscprintf_l(format, locale, args);
+	result = _vscprintf_l(format, locale, args);
 	va_end(args);
 	return result;
 }
-
-INTERN WUNUSED ATTR_LIBC_PRINTF_P(1, 2) NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._scprintf_p") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__scprintf_p)(char const *__restrict format,
-                                        ...) {
-#line 2471 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") WUNUSED ATTR_LIBC_PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__scprintf_p)(char const *__restrict format, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = libc__vscprintf_p(format, args);
+	result = _vscprintf_p(format, args);
 	va_end(args);
 	return result;
 }
-
-INTERN WUNUSED ATTR_LIBC_PRINTF_P(1, 3) NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._scprintf_p_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__scprintf_p_l)(char const *__restrict format,
-                                          locale_t locale,
-                                          ...) {
-#line 2475 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") WUNUSED ATTR_LIBC_PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__scprintf_p_l)(char const *__restrict format, locale_t locale, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = libc__vscprintf_p_l(format, locale, args);
+	result = _vscprintf_p_l(format, locale, args);
 	va_end(args);
 	return result;
 }
-
 /* WARNING: This function returns the number of written character. - Not the required buffer size! */
-INTERN ATTR_LIBC_PRINTF(3, 0) NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vsnprintf") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vsnprintf)(char *__restrict buf,
-                                      size_t bufsize,
-                                      char const *__restrict format,
-                                      va_list args) {
-#line 2482 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsnprintf)(char *__restrict buf, size_t bufsize, char const *__restrict format, va_list args) {
 	__STDC_INT_AS_SIZE_T result;
-	result = libc_vsnprintf(buf, bufsize, format, args);
+	result = vsnprintf(buf, bufsize, format, args);
 	if (result > bufsize)
 		result = bufsize;
 	return result;
 }
-
-INTERN ATTR_LIBC_PRINTF(3, 0) NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vsnprintf_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vsnprintf_l)(char *__restrict buf,
-                                        size_t bufsize,
-                                        char const *__restrict format,
-                                        locale_t locale,
-                                        va_list args) {
-#line 2493 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsnprintf_l)(char *__restrict buf, size_t bufsize, char const *__restrict format, locale_t locale, va_list args) {
 	(void)locale;
-	return libc__vsnprintf(buf, bufsize, format, args);
+	return _vsnprintf(buf, bufsize, format, args);
 }
-
-INTERN ATTR_LIBC_PRINTF(4, 0) NONNULL((4))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vsnprintf_s") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vsnprintf_s)(char *__restrict buf,
-                                        size_t bufsize,
-                                        size_t buflen,
-                                        char const *__restrict format,
-                                        va_list args) {
-#line 2506 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsnprintf_s)(char *__restrict buf, size_t bufsize, size_t buflen, char const *__restrict format, va_list args) {
 	(void)buflen;
-	return libc__vsnprintf(buf, bufsize, format, args);
+	return _vsnprintf(buf, bufsize, format, args);
 }
-
-INTERN ATTR_LIBC_PRINTF(4, 0) NONNULL((4))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vsnprintf_s_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vsnprintf_s_l)(char *__restrict buf,
-                                          size_t bufsize,
-                                          size_t buflen,
-                                          char const *__restrict format,
-                                          locale_t locale,
-                                          va_list args) {
-#line 2513 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsnprintf_s_l)(char *__restrict buf, size_t bufsize, size_t buflen, char const *__restrict format, locale_t locale, va_list args) {
 	(void)buflen;
 	(void)locale;
-	return libc__vsnprintf(buf, bufsize, format, args);
+	return _vsnprintf(buf, bufsize, format, args);
 }
-
-INTERN ATTR_LIBC_PRINTF(3, 4) NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._snprintf") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__snprintf)(char *__restrict buf,
-                                      size_t bufsize,
-                                      char const *__restrict format,
-                                      ...) {
-#line 2520 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snprintf)(char *__restrict buf, size_t bufsize, char const *__restrict format, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = libc__vsnprintf(buf, bufsize, format, args);
+	result = _vsnprintf(buf, bufsize, format, args);
 	va_end(args);
 	return result;
 }
-
-INTERN ATTR_LIBC_PRINTF(3, 5) NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._snprintf_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__snprintf_l)(char *__restrict buf,
-                                        size_t bufsize,
-                                        char const *__restrict format,
-                                        locale_t locale,
-                                        ...) {
-#line 2523 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snprintf_l)(char *__restrict buf, size_t bufsize, char const *__restrict format, locale_t locale, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = libc__vsnprintf_l(buf, bufsize, format, locale, args);
+	result = _vsnprintf_l(buf, bufsize, format, locale, args);
 	va_end(args);
 	return result;
 }
-
-INTERN ATTR_LIBC_PRINTF(3, 4) NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._snprintf_c") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__snprintf_c)(char *__restrict buf,
-                                        size_t bufsize,
-                                        char const *__restrict format,
-                                        ...) {
-#line 2526 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snprintf_c)(char *__restrict buf, size_t bufsize, char const *__restrict format, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = libc__vsnprintf_c(buf, bufsize, format, args);
+	result = _vsnprintf_c(buf, bufsize, format, args);
 	va_end(args);
 	return result;
 }
-
-INTERN ATTR_LIBC_PRINTF(3, 5) NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._snprintf_c_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__snprintf_c_l)(char *__restrict buf,
-                                          size_t bufsize,
-                                          char const *__restrict format,
-                                          locale_t locale,
-                                          ...) {
-#line 2529 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snprintf_c_l)(char *__restrict buf, size_t bufsize, char const *__restrict format, locale_t locale, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = libc__vsnprintf_c_l(buf, bufsize, format, locale, args);
+	result = _vsnprintf_c_l(buf, bufsize, format, locale, args);
 	va_end(args);
 	return result;
 }
-
-INTERN ATTR_LIBC_PRINTF(4, 5) NONNULL((4))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._snprintf_s") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__snprintf_s)(char *__restrict buf,
-                                        size_t bufsize,
-                                        size_t buflen,
-                                        char const *__restrict format,
-                                        ...) {
-#line 2532 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(4, 5) NONNULL((4)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snprintf_s)(char *__restrict buf, size_t bufsize, size_t buflen, char const *__restrict format, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = libc__vsnprintf_s(buf, bufsize, buflen, format, args);
+	result = _vsnprintf_s(buf, bufsize, buflen, format, args);
 	va_end(args);
 	return result;
 }
-
-INTERN ATTR_LIBC_PRINTF(4, 6) NONNULL((4))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._snprintf_s_l") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__snprintf_s_l)(char *__restrict buf,
-                                          size_t bufsize,
-                                          size_t buflen,
-                                          char const *__restrict format,
-                                          locale_t locale,
-                                          ...) {
-#line 2535 "kos/src/libc/magic/stdio.c"
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(4, 6) NONNULL((4)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snprintf_s_l)(char *__restrict buf, size_t bufsize, size_t buflen, char const *__restrict format, locale_t locale, ...) {
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = libc__vsnprintf_s_l(buf, bufsize, buflen, format, locale, args);
+	result = _vsnprintf_s_l(buf, bufsize, buflen, format, locale, args);
 	va_end(args);
 	return result;
 }
-
-INTERN ATTR_LIBC_PRINTF(4, 0) NONNULL((4))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf.vsnprintf_s") __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf,
-                                       size_t bufsize,
-                                       size_t buflen,
-                                       char const *__restrict format,
-                                       va_list args) {
-#line 2724 "kos/src/libc/magic/stdio.c"
-	return libc_vsnprintf(buf, buflen < bufsize ? buflen : bufsize, format, args);
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(LIBCCALL libc__vprintf_l)(char const *__restrict format, locale_t locale, va_list args) THROWS(...) {
+	(void)locale;
+	return vprintf(format, args);
 }
-
+#include <local/stdstreams.h>
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(LIBCCALL libc__vprintf_p)(char const *__restrict format, va_list args) THROWS(...) {
+	return _vfprintf_p(stdout, format, args);
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(LIBCCALL libc__vprintf_p_l)(char const *__restrict format, locale_t locale, va_list args) THROWS(...) {
+	(void)locale;
+	return _vprintf_p(format, args);
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc__printf_l)(char const *__restrict format, locale_t locale, ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = _vprintf_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc__printf_s_l)(char const *__restrict format, locale_t locale, ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = _vprintf_s_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc__printf_p)(char const *__restrict format, ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = _vprintf_p(format, args);
+	va_end(args);
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc__printf_p_l)(char const *__restrict format, locale_t locale, ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = _vprintf_p_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(LIBCCALL libc__vfprintf_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, va_list args) THROWS(...) {
+	(void)locale;
+	return vfprintf(stream, format, args);
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF_P(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(LIBCCALL libc__vfprintf_p)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...) {
+	(void)stream;
+	(void)format;
+	(void)args;
+	/* TODO */
+	__COMPILER_IMPURE();
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(LIBCCALL libc__vfprintf_p_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, va_list args) THROWS(...) {
+	(void)locale;
+	return _vfprintf_p(stream, format, args);
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc__fprintf_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = _vfprintf_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc__fprintf_s_l)(FILE *__restrict stream, char const *__restrict format, locale_t locale, ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = _vfprintf_s_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF_P(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc__fprintf_p)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = _vfprintf_p(stream, format, args);
+	va_end(args);
+	return result;
+}
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
+NOTHROW_RPC(LIBCCALL libc_fopen_s)(FILE **pstream, char const *filename, char const *modes) {
+	FILE *result;
+	if unlikely(!pstream || !filename || !modes) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	result = fopen64(filename, modes);
+	if unlikely(!result) {
+#ifdef ENOMEM
+		return __libc_geterrno_or(ENOMEM);
+#else /* ENOMEM */
+		return 1;
+#endif /* !ENOMEM */
+	}
+	*pstream = result;
+	return EOK;
+}
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1, 2, 3, 4)) errno_t
+NOTHROW_RPC(LIBCCALL libc_freopen_s)(FILE **pstream, char const *filename, char const *modes, FILE *oldstream) {
+	if unlikely(!pstream || !filename || !modes || !oldstream) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	oldstream = freopen(filename, modes, oldstream);
+	if unlikely(!oldstream) {
+#ifdef __libc_geterrno
+		return __libc_geterrno();
+#else /* __libc_geterrno */
+		return 1;
+#endif /* !__libc_geterrno */
+	}
+	*pstream = oldstream;
+	return EOK;
+}
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBCCALL libc_tmpnam_s)(char *__restrict buf, rsize_t bufsize) {
+	if unlikely(!buf) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	if unlikely(bufsize < L_tmpnam) {
+#ifdef ERANGE
+		return ERANGE; /* XXX: Is this what dos does? */
+#else /* ERANGE */
+		return 1;
+#endif /* !ERANGE */
+	}
+	if unlikely(!tmpnam(buf)) {
+#ifdef __libc_geterrno
+		return __libc_geterrno();
+#else /* __libc_geterrno */
+		return 1;
+#endif /* !__libc_geterrno */
+	}
+	return EOK;
+}
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.utility") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBCCALL libc_clearerr_s)(FILE *__restrict stream) {
+	if (!stream) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	clearerr(stream);
+	return 0;
+}
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") NONNULL((1)) errno_t
+NOTHROW_RPC(LIBCCALL libc_tmpfile_s)(FILE **pstream) {
+	if (!pstream) {
+#ifdef EINVAL
+		return EINVAL;
+#else /* EINVAL */
+		return 1;
+#endif /* !EINVAL */
+	}
+	*pstream = tmpfile64();
+	if (!*pstream) {
+#ifdef ENOMEM
+		return __libc_geterrno_or(ENOMEM);
+#else /* ENOMEM */
+		return __libc_geterrno_or(1);
+#endif /* !ENOMEM */
+	}
+	return 0;
+}
+#include <parts/errno.h>
+#include <hybrid/__overflow.h>
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.read") WUNUSED NONNULL((1, 5)) size_t
+NOTHROW_RPC(LIBCCALL libc_fread_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream) {
+	size_t reqbuf;
+	if (__hybrid_overflow_umul(elemsize, elemcount, &reqbuf) ||
+	    reqbuf > bufsize) {
+#ifdef ERANGE
+		__libc_seterrno(ERANGE);
+#endif /* ERANGE */
+		return 0;
+	}
+	if unlikely(!stream || !buf) {
+#ifdef EINVAL
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
+		return 0;
+	}
+	return fread(buf, elemsize, elemcount, stream);
+}
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.read") ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf, size_t bufsize, size_t buflen, char const *__restrict format, va_list args) {
+	return vsnprintf(buf, buflen < bufsize ? buflen : bufsize, format, args);
+}
+#include <local/stdstreams.h>
+#include <parts/errno.h>
+INTERN ATTR_COLD void
+(LIBDCALL libd__wperror)(char16_t const *__restrict message) THROWS(...) {
+	char const *enodesc;
+	enodesc = strerror(__libc_geterrno());
+	if (message) {
+#if 2 == 2
+		fprintf(stderr, "%I16s: %s\n", message, enodesc);
+#else /* 2 == 2 */
+		fprintf(stderr, "%I32s: %s\n", message, enodesc);
+#endif /* !(2 == 2) */
+	} else {
+		fprintf(stderr, "%s\n",
+		        enodesc);
+	}
+}
+#include <local/stdstreams.h>
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
+(LIBKCALL libc__wperror)(char32_t const *__restrict message) THROWS(...) {
+	char const *enodesc;
+	enodesc = strerror(__libc_geterrno());
+	if (message) {
+#if 4 == 2
+		fprintf(stderr, "%I16s: %s\n", message, enodesc);
+#else /* 4 == 2 */
+		fprintf(stderr, "%I32s: %s\n", message, enodesc);
+#endif /* !(4 == 2) */
+	} else {
+		fprintf(stderr, "%s\n",
+		        enodesc);
+	}
+}
+INTERN ATTR_SECTION(".text.crt.dos.FILE.unlocked.read.read") WUNUSED NONNULL((1, 5)) size_t
+(LIBCCALL libc__fread_nolock_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...) {
+	bufsize = elemsize ? bufsize / elemsize : 0;
+	return fread_unlocked(buf, elemsize,
+	                      bufsize < elemcount
+	                      ? bufsize
+	                      : elemcount,
+	                      stream);
+}
 #endif /* !__KERNEL__ */
-#undef sprintf
-#undef snprintf
+
+DECL_END
+
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(setbuf, libc_setbuf);
+DEFINE_PUBLIC_WEAK_ALIAS(_fgetchar, libc_getchar);
+DEFINE_PUBLIC_WEAK_ALIAS(getchar, libc_getchar);
+DEFINE_PUBLIC_WEAK_ALIAS(_fputchar, libc_putchar);
+DEFINE_PUBLIC_WEAK_ALIAS(putchar, libc_putchar);
+DEFINE_PUBLIC_WEAK_ALIAS(fgets, libc_fgets);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fputs, libc_fputs);
+DEFINE_PUBLIC_WEAK_ALIAS(fputs, libc_fputs);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_puts, libc_puts);
+DEFINE_PUBLIC_WEAK_ALIAS(puts, libc_puts);
+DEFINE_PUBLIC_WEAK_ALIAS(perror, libc_perror);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_vfprintf, libc_vfprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(vfprintf, libc_vfprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_fprintf, libc_fprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(fprintf, libc_fprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(vprintf, libc_vprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_printf, libc_printf);
+DEFINE_PUBLIC_WEAK_ALIAS(printf_s, libc_printf);
+DEFINE_PUBLIC_WEAK_ALIAS(printf, libc_printf);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_vfscanf, libc_vfscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(__vfscanf, libc_vfscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(vfscanf, libc_vfscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(vscanf, libc_vscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(fscanf, libc_fscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(scanf, libc_scanf);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_gets, libc_gets);
+DEFINE_PUBLIC_WEAK_ALIAS(gets, libc_gets);
+DEFINE_PUBLIC_WEAK_ALIAS(__vsscanf, libc_vsscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(vsscanf, libc_vsscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_sscanf, libc_sscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(sscanf, libc_sscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_vsprintf, libc_vsprintf);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_WEAK_ALIAS(vsprintf, libc_vsprintf);
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_sprintf, libc_sprintf);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_WEAK_ALIAS(sprintf, libc_sprintf);
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(__vsnprintf, libc_vsnprintf);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_WEAK_ALIAS(vsnprintf, libc_vsnprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(snprintf, libc_snprintf);
 #ifndef __KERNEL__
-#undef sprintf_s
-DEFINE_PUBLIC_WEAK_ALIAS(__vsnprintf, libc_vsnprintf);
-DEFINE_PUBLIC_WEAK_ALIAS(vsprintf_s, libc_vsnprintf);
-DEFINE_PUBLIC_WEAK_ALIAS(sprintf_s, libc_snprintf);
-#undef sscanf
-#undef _IO_sscanf
-#undef sscanf_s
-#undef _snscanf
-#undef _snscanf_s
-#undef _snscanf_l
-#undef _snscanf_s_l
-#undef _sscanf_s_l
-#undef _snscanf_s
-#undef _snscanf_s_l
-#undef _sprintf_l
-#undef _sprintf_s_l
-#undef _sprintf_p
-#undef _sprintf_p_l
-#undef _scprintf
-#undef _scprintf_l
-#undef _scprintf_p
-#undef _scprintf_p_l
-#undef _snprintf
-#undef _snprintf_l
-#undef _snprintf_c
-#undef _snprintf_c_l
-#undef _snprintf_s
-#undef _snprintf_s_l
-DEFINE_PUBLIC_WEAK_ALIAS(vsscanf, libc_vsscanf);
-DEFINE_PUBLIC_WEAK_ALIAS(__vsscanf, libc_vsscanf);
-DEFINE_PUBLIC_WEAK_ALIAS(_vsscanf, libc_vsscanf);
-DEFINE_PUBLIC_WEAK_ALIAS(_vsscanf_s, libc_vsscanf);
-DEFINE_PUBLIC_WEAK_ALIAS(vsscanf_s, libc_vsscanf);
-DEFINE_PUBLIC_WEAK_ALIAS(sscanf, libc_sscanf);
-DEFINE_PUBLIC_WEAK_ALIAS(_IO_sscanf, libc_sscanf);
-DEFINE_PUBLIC_WEAK_ALIAS(sscanf_s, libc_sscanf);
-DEFINE_PUBLIC_WEAK_ALIAS(_IO_vsprintf, libc_vsprintf);
-DEFINE_PUBLIC_WEAK_ALIAS(_IO_sprintf, libc_sprintf);
-DEFINE_PUBLIC_WEAK_ALIAS(_snscanf, libc__snscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(vdprintf, libc_vdprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(dprintf, libc_dprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(_IO_setbuffer, libc_setbuffer);
+DEFINE_PUBLIC_WEAK_ALIAS(setbuffer, libc_setbuffer);
+DEFINE_PUBLIC_WEAK_ALIAS(setlinebuf, libc_setlinebuf);
+DEFINE_PUBLIC_WEAK_ALIAS(__getdelim, libc_getdelim);
+DEFINE_PUBLIC_WEAK_ALIAS(getdelim, libc_getdelim);
+DEFINE_PUBLIC_WEAK_ALIAS(getline, libc_getline);
+DEFINE_PUBLIC_WEAK_ALIAS(getchar_unlocked, libc_getchar_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(putchar_unlocked, libc_putchar_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_getw, libc_getw);
+DEFINE_PUBLIC_WEAK_ALIAS(getw, libc_getw);
+DEFINE_PUBLIC_WEAK_ALIAS(_putw, libc_putw);
+DEFINE_PUBLIC_WEAK_ALIAS(putw, libc_putw);
+DEFINE_PUBLIC_WEAK_ALIAS(fgets_unlocked, libc_fgets_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(fputs_unlocked, libc_fputs_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(obstack_printf, libc_obstack_printf);
+DEFINE_PUBLIC_WEAK_ALIAS(vasprintf, libc_vasprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(__asprintf, libc_asprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(asprintf, libc_asprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(getw_unlocked, libc_getw_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(putw_unlocked, libc_putw_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(getdelim_unlocked, libc_getdelim_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(getline_unlocked, libc_getline_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(puts_unlocked, libc_puts_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(vfprintf_unlocked, libc_vfprintf_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(fprintf_s, libc_fprintf_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(fprintf_unlocked, libc_fprintf_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(vprintf_s, libc_vprintf_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(vprintf_unlocked, libc_vprintf_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(printf_s, libc_printf_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(printf_unlocked, libc_printf_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(vfscanf_unlocked, libc_vfscanf_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(vscanf_unlocked, libc_vscanf_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(fscanf_unlocked, libc_fscanf_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(scanf_unlocked, libc_scanf_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_vscanf_s_l, libc__vscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vscanf_l, libc__vscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vfscanf_s_l, libc__vfscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vfscanf_l, libc__vfscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vsscanf_s_l, libc__vsscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vsscanf_l, libc__vsscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vsnscanf_s, libc__vsnscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(_vsnscanf, libc__vsnscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(_scanf_s_l, libc__scanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_scanf_l, libc__scanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_fscanf_s_l, libc__fscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_fscanf_l, libc__fscanf_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_snscanf_s, libc__snscanf);
-DEFINE_PUBLIC_WEAK_ALIAS(_snscanf_l, libc__snscanf_l);
-DEFINE_PUBLIC_WEAK_ALIAS(_snscanf_s_l, libc__snscanf_l);
-DEFINE_PUBLIC_WEAK_ALIAS(_sscanf_s_l, libc__sscanf_s_l);
-DEFINE_PUBLIC_WEAK_ALIAS(_snscanf_s, libc__snscanf_s);
-DEFINE_PUBLIC_WEAK_ALIAS(_snscanf_s_l, libc__snscanf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_snscanf, libc__snscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(_vsprintf_l, libc__vsprintf_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_vsprintf_p, libc__vsprintf_p);
 DEFINE_PUBLIC_WEAK_ALIAS(_vsprintf_p_l, libc__vsprintf_p_l);
@@ -708,10 +1354,8 @@ DEFINE_PUBLIC_WEAK_ALIAS(_scprintf_l, libc__scprintf_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_scprintf_p, libc__scprintf_p);
 DEFINE_PUBLIC_WEAK_ALIAS(_scprintf_p_l, libc__scprintf_p_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_vsnprintf, libc__vsnprintf);
-DEFINE_PUBLIC_WEAK_ALIAS(_vsnprintf_c, libc__vsnprintf);
-DEFINE_PUBLIC_WEAK_ALIAS(_vsnprintf_l, libc__vsnprintf_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_vsprintf_s_l, libc__vsnprintf_l);
-DEFINE_PUBLIC_WEAK_ALIAS(_vsnprintf_c_l, libc__vsnprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vsnprintf_l, libc__vsnprintf_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_vsnprintf_s, libc__vsnprintf_s);
 DEFINE_PUBLIC_WEAK_ALIAS(_vsnprintf_s_l, libc__vsnprintf_s_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_snprintf, libc__snprintf);
@@ -720,9 +1364,31 @@ DEFINE_PUBLIC_WEAK_ALIAS(_snprintf_c, libc__snprintf_c);
 DEFINE_PUBLIC_WEAK_ALIAS(_snprintf_c_l, libc__snprintf_c_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_snprintf_s, libc__snprintf_s);
 DEFINE_PUBLIC_WEAK_ALIAS(_snprintf_s_l, libc__snprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vprintf_s_l, libc__vprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vprintf_l, libc__vprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vprintf_p, libc__vprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(_vprintf_p_l, libc__vprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_printf_l, libc__printf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_printf_s_l, libc__printf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_printf_p, libc__printf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(_printf_p_l, libc__printf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vfprintf_s_l, libc__vfprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vfprintf_l, libc__vfprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vfprintf_p, libc__vfprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(_vfprintf_p_l, libc__vfprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_fprintf_l, libc__fprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_fprintf_s_l, libc__fprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_fprintf_p, libc__fprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(fopen_s, libc_fopen_s);
+DEFINE_PUBLIC_WEAK_ALIAS(freopen_s, libc_freopen_s);
+DEFINE_PUBLIC_WEAK_ALIAS(tmpnam_s, libc_tmpnam_s);
+DEFINE_PUBLIC_WEAK_ALIAS(clearerr_s, libc_clearerr_s);
+DEFINE_PUBLIC_WEAK_ALIAS(tmpfile_s, libc_tmpfile_s);
+DEFINE_PUBLIC_WEAK_ALIAS(fread_s, libc_fread_s);
 DEFINE_PUBLIC_WEAK_ALIAS(vsnprintf_s, libc_vsnprintf_s);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wperror, libd__wperror);
+DEFINE_PUBLIC_WEAK_ALIAS(_wperror, libc__wperror);
+DEFINE_PUBLIC_WEAK_ALIAS(_fread_nolock_s, libc__fread_nolock_s);
 #endif /* !__KERNEL__ */
-
-DECL_END
 
 #endif /* !GUARD_LIBC_AUTO_STDIO_C */

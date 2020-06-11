@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa07de721 */
+/* HASH CRC-32:0xeb6d0f79 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,15 +74,14 @@ __NAMESPACE_LOCAL_END
 #ifndef ____TIME_MONTHSTART_YDAY_DEFINED
 #define ____TIME_MONTHSTART_YDAY_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
-
 __LOCAL_LIBC_CONST_DATA(__time_monthstart_yday)
 __UINT16_TYPE__ const __time_monthstart_yday[2][13] = {
 	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
 	{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 }
 };
 __NAMESPACE_LOCAL_END
+#endif /* !____TIME_MONTHSTART_YDAY_DEFINED */
 
-#endif
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE__gmtime64_s && !__CRT_HAVE__gmtime32_s) */
 #ifndef __isleap
 #define __isleap(__year) ((__year)%4 == 0 && ((__year)%100 != 0 || (__year)%400 == 0))
@@ -110,7 +109,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__rest
 	__tp->tm_year = (int)__daystoyears(__t);
 	__t -= __yearstodays(__tp->tm_year);
 	__tp->tm_yday = (int)__t;
-	__monthvec = __time_monthstart_yday[__isleap(__tp->tm_year)];
+	__monthvec = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(__tp->tm_year)];
 	for (__i = 1; __i < 12; ++__i)
 		if (__monthvec[__i] >= __t)
 			break;
@@ -153,7 +152,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__rest
 	__tp->tm_year = (int)__daystoyears(__t);
 	__t -= __yearstodays(__tp->tm_year);
 	__tp->tm_yday = (int)__t;
-	__monthvec = __time_monthstart_yday[__isleap(__tp->tm_year)];
+	__monthvec = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(__tp->tm_year)];
 	for (__i = 1; __i < 12; ++__i)
 		if (__monthvec[__i] >= __t)
 			break;

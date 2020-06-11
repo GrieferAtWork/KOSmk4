@@ -118,8 +118,7 @@ void _endthreadex($u32 exitcode);
 [[throws]] void _c_exit() {
 }
 
-[[guard, ATTR_WUNUSED]]
-$pid_t _getpid() = getpid;
+%[insert:function(_getpid = getpid)]
 
 %[default_impl_section(".text.crt.dos.fs.exec.exec")]
 %[insert:function(_execv = execv)]

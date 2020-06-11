@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x538236d4 */
+/* HASH CRC-32:0xe1364592 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,15 @@
 #define GUARD_LIBC_AUTO_PROCESS_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <process.h>
-#include <kos/anno.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF void (LIBCCALL libc__c_exit)(void) __THROWS(...);
+INTDEF void (LIBCCALL libc__c_exit)(void) THROWS(...);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x303ee0b */
+/* HASH CRC-32:0x4266476f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,16 +22,19 @@
 #define GUARD_LIBC_USER_SYS_SHM_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/shm.h>
 
 DECL_BEGIN
 
-INTDEF int NOTHROW_NCX(LIBCCALL libc_shmctl)(int shmid, int cmd, struct shmid_ds *buf);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_shmget)(key_t key, size_t size, int shmflg);
-INTDEF void *NOTHROW_NCX(LIBCCALL libc_shmat)(int shmid, void const *shmaddr, int shmflg);
+#ifndef __KERNEL__
+INTDEF int NOTHROW_NCX(LIBCCALL libc_shmctl)(int shmid, __STDC_INT_AS_UINT_T cmd, struct shmid_ds *buf);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_shmget)(key_t key, size_t size, __STDC_INT_AS_UINT_T shmflg);
+INTDEF void *NOTHROW_NCX(LIBCCALL libc_shmat)(int shmid, void const *shmaddr, __STDC_INT_AS_UINT_T shmflg);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_shmdt)(void const *shmaddr);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

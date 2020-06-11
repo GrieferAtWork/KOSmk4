@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x372aaf99 */
+/* HASH CRC-32:0xf824c45f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,34 +21,38 @@
 #ifndef __local_rewind_unlocked_defined
 #define __local_rewind_unlocked_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_rewind) || defined(__CRT_HAVE_rewind_unlocked)
+#if defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: rewind from stdio */
-#ifndef __local___localdep_rewind_defined
-#define __local___localdep_rewind_defined 1
-#if defined(__CRT_HAVE_rewind_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Rewind the current in-file position of `STREAM' to its starting position */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind_unlocked,(__stream))
-#elif defined(__CRT_HAVE_rewind)
-/* Rewind the current in-file position of `STREAM' to its starting position */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind,(__stream))
-#elif defined(__CRT_HAVE_rewind_unlocked)
-/* Rewind the current in-file position of `STREAM' to its starting position */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind_unlocked,(__stream))
+/* Dependency: fsetpos_unlocked from stdio */
+#ifndef __local___localdep_fsetpos_unlocked_defined
+#define __local___localdep_fsetpos_unlocked_defined 1
+#if defined(__CRT_HAVE_fsetpos64_unlocked) && defined(__USE_FILE_OFFSET64)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
+#elif defined(__CRT_HAVE_fsetpos64) && defined(__USE_FILE_OFFSET64)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),fsetpos64,(__stream,__pos))
+#elif defined(__CRT_HAVE_fsetpos_unlocked) && !defined(__USE_FILE_OFFSET64)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
+#elif defined(__CRT_HAVE_fsetpos) && !defined(__USE_FILE_OFFSET64)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),fsetpos,(__stream,__pos))
+#elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
+__NAMESPACE_LOCAL_END
+#include <local/stdio/fsetpos_unlocked.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_fsetpos_unlocked __LIBC_LOCAL_NAME(fsetpos_unlocked)
 #else /* ... */
-#undef __local___localdep_rewind_defined
+#undef __local___localdep_fsetpos_unlocked_defined
 #endif /* !... */
-#endif /* !__local___localdep_rewind_defined */
+#endif /* !__local___localdep_fsetpos_unlocked_defined */
 __LOCAL_LIBC(rewind_unlocked) __ATTR_NONNULL((1)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(rewind_unlocked))(__FILE *__restrict __stream) __THROWS(...) {
-	__localdep_rewind(__stream);
+	__localdep_fsetpos_unlocked(__stream, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_rewind_unlocked_defined
 #define __local___localdep_rewind_unlocked_defined 1
 #define __localdep_rewind_unlocked __LIBC_LOCAL_NAME(rewind_unlocked)
 #endif /* !__local___localdep_rewind_unlocked_defined */
-#else /* __CRT_HAVE_rewind || __CRT_HAVE_rewind_unlocked */
+#else /* __CRT_HAVE_fseeko64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE__fseeki64 || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || __CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock */
 #undef __local_rewind_unlocked_defined
-#endif /* !__CRT_HAVE_rewind && !__CRT_HAVE_rewind_unlocked */
+#endif /* !__CRT_HAVE_fseeko64 && !__CRT_HAVE_fseeko64_unlocked && !__CRT_HAVE__fseeki64_nolock && !__CRT_HAVE__fseeki64 && !__CRT_HAVE_fsetpos && !__CRT_HAVE__IO_fsetpos && !__CRT_HAVE_fsetpos_unlocked && !__CRT_HAVE_fsetpos64 && !__CRT_HAVE__IO_fsetpos64 && !__CRT_HAVE_fsetpos64_unlocked && !__CRT_HAVE_fseeko && !__CRT_HAVE_fseeko_unlocked && !__CRT_HAVE_fseek && !__CRT_HAVE_fseek_unlocked && !__CRT_HAVE__fseek_nolock */
 #endif /* !__local_rewind_unlocked_defined */

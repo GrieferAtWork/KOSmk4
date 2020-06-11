@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd82ad5f8 */
+/* HASH CRC-32:0x92e5bcb0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_KOS_FUTEX_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <kos/futex.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
@@ -50,7 +52,7 @@ DECL_BEGIN
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(LIBCCALL libc_lfutex)(lfutex_t *uaddr, syscall_ulong_t futex_op, lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...);
+INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(VLIBCCALL libc_lfutex)(lfutex_t *uaddr, syscall_ulong_t futex_op, lfutex_t val, ...);
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
@@ -73,7 +75,7 @@ INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(LIBCCALL libc_lfutex)(lfutex_t *uaddr, s
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(LIBCCALL libc_lfutex64)(lfutex_t *uaddr, syscall_ulong_t futex_op, lfutex_t val, /*struct timespec64 const *timeout, lfutex_t val2*/...);
+INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(VLIBCCALL libc_lfutex64)(lfutex_t *uaddr, syscall_ulong_t futex_op, lfutex_t val, ...);
 /* Wake up to `MAX_WAKE' threads waiting for `*UADDR'
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */
@@ -381,6 +383,7 @@ INTDEF WUNUSED unsigned int NOTHROW(LIBCCALL libc_futex_getspin)(void);
  * Upon startup, `futex_getspin()' is pre-initialized to `4'.
  * @return: * : The current (get) / old (set) spin value */
 INTDEF unsigned int NOTHROW(LIBCCALL libc_futex_setspin)(unsigned int new_spin);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

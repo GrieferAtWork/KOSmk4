@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x179f9e26 */
+/* HASH CRC-32:0x1a2f99b3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,107 +25,80 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "parts.wchar.stdlib.h"
-#include "wchar.h"
+#include <parts/uchar/wchar.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wtoi") int
-NOTHROW_NCX(LIBCCALL libc_wtoi)(char32_t const *nptr) {
-#line 818 "kos/src/libc/magic/stdlib.c"
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) int
+NOTHROW_NCX(LIBDCALL libd__wtoi)(char16_t const *nptr) {
 #if __SIZEOF_INT__ <= 4
-	return (int)libc_wcsto32(nptr, NULL, 10);
+	return (int)c16sto32(nptr, NULL, 10);
 #else /* __SIZEOF_INT__ <= 4 */
-	return (int)libc_wcsto64(nptr, NULL, 10);
-#endif /* __SIZEOF_INT__ > 4 */
+	return (int)c16sto64(nptr, NULL, 10);
+#endif /* !(__SIZEOF_INT__ <= 4) */
 }
-INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wtoi") int
-NOTHROW_NCX(LIBDCALL libd_wtoi)(char16_t const *nptr) {
-#line 818 "kos/src/libc/magic/stdlib.c"
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) int
+NOTHROW_NCX(LIBKCALL libc_wtoi)(char32_t const *nptr) {
 #if __SIZEOF_INT__ <= 4
-	return (int)libd_wcsto32(nptr, NULL, 10);
+	return (int)c32sto32(nptr, NULL, 10);
 #else /* __SIZEOF_INT__ <= 4 */
-	return (int)libd_wcsto64(nptr, NULL, 10);
-#endif /* __SIZEOF_INT__ > 4 */
+	return (int)c32sto64(nptr, NULL, 10);
+#endif /* !(__SIZEOF_INT__ <= 4) */
 }
-
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) long
+NOTHROW_NCX(LIBDCALL libd__wtol)(char16_t const *nptr) {
+#if __SIZEOF_LONG__ <= 4
+	return (long)c16sto32(nptr, NULL, 10);
+#else /* __SIZEOF_LONG__ <= 4 */
+	return (long)c16sto64(nptr, NULL, 10);
+#endif /* !(__SIZEOF_LONG__ <= 4) */
+}
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_wtol, libc_wtoi);
-#else
-INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wtol") long
-NOTHROW_NCX(LIBCCALL libc_wtol)(char32_t const *nptr) {
-#line 828 "kos/src/libc/magic/stdlib.c"
+#else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) long
+NOTHROW_NCX(LIBKCALL libc_wtol)(char32_t const *nptr) {
 #if __SIZEOF_LONG__ <= 4
-	return (long)libc_wcsto32(nptr, NULL, 10);
+	return (long)c32sto32(nptr, NULL, 10);
 #else /* __SIZEOF_LONG__ <= 4 */
-	return (long)libc_wcsto64(nptr, NULL, 10);
-#endif /* __SIZEOF_LONG__ > 4 */
+	return (long)c32sto64(nptr, NULL, 10);
+#endif /* !(__SIZEOF_LONG__ <= 4) */
 }
-#endif /* MAGIC:alias */
-#if __SIZEOF_LONG__ == __SIZEOF_INT__
-DEFINE_INTERN_ALIAS(libd_wtol, libd_wtoi);
-#else
-INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wtol") long
-NOTHROW_NCX(LIBDCALL libd_wtol)(char16_t const *nptr) {
-#line 828 "kos/src/libc/magic/stdlib.c"
-#if __SIZEOF_LONG__ <= 4
-	return (long)libd_wcsto32(nptr, NULL, 10);
-#else /* __SIZEOF_LONG__ <= 4 */
-	return (long)libd_wcsto64(nptr, NULL, 10);
-#endif /* __SIZEOF_LONG__ > 4 */
+#endif /* !(__SIZEOF_LONG__ == __SIZEOF_INT__) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG
+NOTHROW_NCX(LIBDCALL libd__wtoll)(char16_t const *nptr) {
+#if __SIZEOF_LONG_LONG__
+	return (__LONGLONG)c16sto32(nptr, NULL, 10);
+#else /* __SIZEOF_LONG_LONG__ */
+	return (__LONGLONG)c16sto64(nptr, NULL, 10);
+#endif /* !__SIZEOF_LONG_LONG__ */
 }
-#endif /* MAGIC:alias */
-
 #if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_wtoll, libc_wtoi);
 #elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_wtoll, libc_wtol);
-#else
-INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wtoll") __LONGLONG
-NOTHROW_NCX(LIBCCALL libc_wtoll)(char32_t const *nptr) {
-#line 839 "kos/src/libc/magic/stdlib.c"
-#if __SIZEOF_LONG_LONG__ <= 4
-	return (__LONGLONG)libc_wcsto32(nptr, NULL, 10);
-#else /* __SIZEOF_LONG_LONG__ <= 4 */
-	return (__LONGLONG)libc_wcsto64(nptr, NULL, 10);
-#endif /* __SIZEOF_LONG_LONG__ > 4 */
+#else /* ... */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG
+NOTHROW_NCX(LIBKCALL libc_wtoll)(char32_t const *nptr) {
+#if __SIZEOF_LONG_LONG__
+	return (__LONGLONG)c32sto32(nptr, NULL, 10);
+#else /* __SIZEOF_LONG_LONG__ */
+	return (__LONGLONG)c32sto64(nptr, NULL, 10);
+#endif /* !__SIZEOF_LONG_LONG__ */
 }
-#endif /* MAGIC:alias */
-#if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-DEFINE_INTERN_ALIAS(libd_wtoll, libd_wtoi);
-#elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-DEFINE_INTERN_ALIAS(libd_wtoll, libd_wtol);
-#else
-INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wtoll") __LONGLONG
-NOTHROW_NCX(LIBDCALL libd_wtoll)(char16_t const *nptr) {
-#line 839 "kos/src/libc/magic/stdlib.c"
-#if __SIZEOF_LONG_LONG__ <= 4
-	return (__LONGLONG)libd_wcsto32(nptr, NULL, 10);
-#else /* __SIZEOF_LONG_LONG__ <= 4 */
-	return (__LONGLONG)libd_wcsto64(nptr, NULL, 10);
-#endif /* __SIZEOF_LONG_LONG__ > 4 */
-}
-#endif /* MAGIC:alias */
-
-#endif /* !__KERNEL__ */
-#ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(wtoi, libc_wtoi);
-DEFINE_PUBLIC_WEAK_ALIAS(_wtoi, libc_wtoi);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wtoi, libd_wtoi);
-DEFINE_PUBLIC_WEAK_ALIAS(wtol, libc_wtol);
-DEFINE_PUBLIC_WEAK_ALIAS(_wtol, libc_wtol);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wtol, libd_wtol);
-DEFINE_PUBLIC_WEAK_ALIAS(wtoll, libc_wtoll);
-DEFINE_PUBLIC_WEAK_ALIAS(_wtoll, libc_wtoll);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wtoll, libd_wtoll);
+#endif /* !... */
 #endif /* !__KERNEL__ */
 
 DECL_END
+
+#ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wtoi, libd__wtoi);
+DEFINE_PUBLIC_WEAK_ALIAS(wtoi, libc_wtoi);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wtol, libd__wtol);
+DEFINE_PUBLIC_WEAK_ALIAS(wtol, libc_wtol);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wtoll, libd__wtoll);
+DEFINE_PUBLIC_WEAK_ALIAS(wtoll, libc_wtoll);
+#endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PARTS_WCHAR_STDLIB_C */

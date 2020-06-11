@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76bfbdad */
+/* HASH CRC-32:0xf861bbc2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,18 @@
 #define GUARD_LIBC_USER_SYS_MOUNT_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/mount.h>
 
 DECL_BEGIN
 
-INTDEF int NOTHROW_RPC(LIBCCALL libc_mount)(char const *special_file, char const *dir, char const *fstype, unsigned long int mountflags, void const *data);
+#ifndef __KERNEL__
+INTDEF int NOTHROW_RPC(LIBCCALL libc_mount)(char const *special_file, char const *dir, char const *fstype, ulongptr_t mountflags, void const *data);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_umount)(char const *special_file);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_umount2)(char const *special_file, int flags);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_umount2)(char const *special_file, __STDC_INT_AS_UINT_T flags);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

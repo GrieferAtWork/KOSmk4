@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfd630b4 */
+/* HASH CRC-32:0x2f14a5c9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define GUARD_LIBC_USER_SYS_RESOURCE_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/resource.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Put the soft and hard limits for RESOURCE in *RLIMITS.
  * Returns 0 if successful, -1 if not (and sets errno) */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_getrlimit)(__rlimit_resource_t resource, struct rlimit *rlimits);
@@ -53,6 +55,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_getrlimit64)(__rlimit_resource
  * Only the super-user can increase hard limits.
  * Return 0 if successful, -1 if not (and sets errno) */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_setrlimit64)(__rlimit_resource_t resource, struct rlimit64 const *rlimits);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

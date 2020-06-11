@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd214cd3d */
+/* HASH CRC-32:0x4d2145c5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,20 +22,23 @@
 #define GUARD_LIBC_USER_SYS_MSG_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include <sys/msg.h>
 
 DECL_BEGIN
 
+#ifndef __KERNEL__
 /* Message queue control operation */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_msgctl)(int msqid, int cmd, struct msqid_ds *buf);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_msgctl)(int msqid, __STDC_INT_AS_UINT_T cmd, struct msqid_ds *buf);
 /* Get messages queue */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_msgget)(key_t key, int msgflg);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_msgget)(key_t key, __STDC_INT_AS_UINT_T msgflg);
 /* Receive message from message queue */
-INTDEF ssize_t NOTHROW_RPC(LIBCCALL libc_msgrcv)(int msqid, void *msgp, size_t msgsz, longptr_t msgtyp, int msgflg);
+INTDEF ssize_t NOTHROW_RPC(LIBCCALL libc_msgrcv)(int msqid, void *msgp, size_t msgsz, longptr_t msgtyp, __STDC_INT_AS_UINT_T msgflg);
 /* Send message to message queue */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_msgsnd)(int msqid, const void *msgp, size_t msgsz, int msgflg);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_msgsnd)(int msqid, const void *msgp, size_t msgsz, __STDC_INT_AS_UINT_T msgflg);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

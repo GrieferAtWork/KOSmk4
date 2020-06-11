@@ -494,7 +494,7 @@ DEFINE_CTIME_BUFFER
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("ctime", "_ctime32")]]
 [[nonnull]] char *ctime([[nonnull]] time_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
-	return ctime_r(timer, @__ctime_buf@);
+	return ctime_r(timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
 @@pp_elif $has_function(ctime64)@@
 	time64_t tm64 = (time64_t)*timer;
 	return ctime64(&tm64);
@@ -502,7 +502,7 @@ DEFINE_CTIME_BUFFER
 	time32_t tm32 = (time32_t)*timer;
 	return ctime32(&tm32);
 @@pp_else@@
-	return ctime_r(timer, @__ctime_buf@);
+	return ctime_r(timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
 @@pp_endif@@
 }
 
@@ -530,7 +530,7 @@ DEFINE_GMTIME_BUFFER
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("gmtime", "_gmtime32")]]
 [[nonnull]] struct tm *gmtime([[nonnull]] time_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
-	return gmtime_r(timer, &@__gmtime_buf@);
+	return gmtime_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
 @@pp_elif $has_function(gmtime64)@@
 	time64_t tm64 = (time64_t)*timer;
 	return gmtime64(&tm64);
@@ -538,7 +538,7 @@ DEFINE_GMTIME_BUFFER
 	time32_t tm32 = (time32_t)*timer;
 	return gmtime32(&tm32);
 @@pp_else@@
-	return gmtime_r(timer, &@__gmtime_buf@);
+	return gmtime_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
 @@pp_endif@@
 }
 
@@ -555,7 +555,7 @@ DEFINE_GMTIME_BUFFER
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("localtime", "_localtime32")]]
 [[nonnull]] struct tm *localtime([[nonnull]] time_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
-	return localtime_r(timer, &@__gmtime_buf@);
+	return localtime_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
 @@pp_elif $has_function(localtime64)@@
 	time64_t tm64 = (time64_t)*timer;
 	return localtime64(&tm64);
@@ -563,7 +563,7 @@ DEFINE_GMTIME_BUFFER
 	time32_t tm32 = (time32_t)*timer;
 	return localtime32(&tm32);
 @@pp_else@@
-	return localtime_r(timer, &@__gmtime_buf@);
+	return localtime_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
 @@pp_endif@@
 }
 
@@ -619,7 +619,7 @@ __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 @@that is the representation of TP in this format
 [[std, wunused, impl_prefix(DEFINE_CTIME_BUFFER)]]
 [[nonnull]] char *asctime([[nonnull]] struct tm const *tp) {
-	return asctime_r(tp, @__ctime_buf@);
+	return asctime_r(tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
 }
 
 %(std)#ifdef __USE_ISOC11
@@ -704,12 +704,12 @@ DEFINE_CTIME_BUFFER
 ), wunused, export_alias("_ctime64")]]
 [[nonnull]] char *ctime64([[nonnull]] $time64_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
-	return ctime64_r(timer, @__ctime_buf@);
+	return ctime64_r(timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
 @@pp_elif $has_function(ctime32)@@
 	time32_t tm32 = (time32_t)*timer;
 	return ctime32(&tm32);
 @@pp_else@@
-	return ctime64_r(timer, @__ctime_buf@);
+	return ctime64_r(timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
 @@pp_endif@@
 }
 
@@ -723,12 +723,12 @@ DEFINE_GMTIME_BUFFER
 ), wunused, export_alias("_gmtime64")]]
 [[nonnull]] __STRUCT_TM *gmtime64([[nonnull]] $time64_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
-	return gmtime64_r(timer, &@__gmtime_buf@);
+	return gmtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
 @@pp_elif $has_function(gmtime32)@@
 	time32_t tm32 = (time32_t)*timer;
 	return gmtime32(&tm32);
 @@pp_else@@
-	return gmtime64_r(timer, &@__gmtime_buf@);
+	return gmtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
 @@pp_endif@@
 }
 
@@ -743,12 +743,12 @@ DEFINE_GMTIME_BUFFER
 ), wunused, export_alias("_localtime64")]]
 [[nonnull]] __STRUCT_TM *localtime64([[nonnull]] $time64_t const *timer) {
 @@pp_ifdef __BUILDING_LIBC@@
-	return localtime64_r(timer, &@__gmtime_buf@);
+	return localtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
 @@pp_elif $has_function(localtime32)@@
 	time32_t tm32 = (time32_t)*timer;
 	return localtime32(&tm32);
 @@pp_else@@
-	return localtime64_r(timer, &@__gmtime_buf@);
+	return localtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
 @@pp_endif@@
 }
 
@@ -892,7 +892,7 @@ int stime32([[nonnull]] $time32_t const *when);
 [[decl_include("<bits/types.h>"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("stime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("stime")]]
-[[requires($has_function(stime32) || $has_function("stime64"))]]
+[[userimpl, requires($has_function(stime32) || $has_function("stime64"))]]
 int stime([[nonnull]] $time_t const *when) {
 @@pp_if $has_function(stime32)@@
 	time32_t tms = (time32_t)*when;
@@ -955,7 +955,8 @@ int dysize(__STDC_INT_AS_UINT_T year) {
 %
 %#ifdef __USE_TIME64
 [[decl_include("<bits/types.h>")]]
-[[doc_alias("stime"), time64_variant_of(stime), userimpl, requires_function(stime32)]]
+[[doc_alias("stime"), time64_variant_of(stime)]]
+[[userimpl, requires_function(stime32)]]
 int stime64([[nonnull]] $time64_t const *when) {
 	time32_t tms = (time32_t)*when;
 	return stime32(&tms);
@@ -1190,7 +1191,7 @@ int timer_gettime32(timer_t timerid, [[nonnull]] struct itimerspec *value);
 [[no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("timer_gettime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("timer_gettime")]]
-[[requires($has_function(timer_gettime32) || $has_function(timer_gettime64))]]
+[[userimpl, requires($has_function(timer_gettime32) || $has_function(timer_gettime64))]]
 [[section(".text.crt.timer"), decl_include("<bits/itimerspec.h>", "<bits/types.h>")]]
 int timer_gettime(timer_t timerid, [[nonnull]] struct itimerspec *value) {
 @@pp_if $has_function(timer_gettime32)@@
@@ -1529,6 +1530,23 @@ int getdate_r([[nonnull]] char const *__restrict string,
 
 
 
+%[define(DEFINE_TIME_MONTHSTART_YDAY =
+@@pp_ifndef ____TIME_MONTHSTART_YDAY_DEFINED@@
+#define ____TIME_MONTHSTART_YDAY_DEFINED 1
+@@push_namespace(local)@@
+__LOCAL_LIBC_CONST_DATA(__time_monthstart_yday)
+__UINT16_TYPE__ const __time_monthstart_yday[2][13] = {
+	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
+	{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 }
+};
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+
+
+
+
 %
 %#ifdef __USE_POSIX
 
@@ -1558,7 +1576,7 @@ __STRUCT_TM *gmtime_r([[nonnull]] $time_t const *__restrict timer,
 	tp->@tm_year@ = (int)__daystoyears(t);
 	t -= __yearstodays(tp->@tm_year@);
 	tp->@tm_yday@ = (int)t;
-	monthvec = @__time_monthstart_yday@[__isleap(tp->@tm_year@)];
+	monthvec = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(tp->@tm_year@)];
 	for (i = 1; i < 12; ++i)
 		if (monthvec[i] >= t)
 			break;
@@ -1631,20 +1649,6 @@ char *ctime_r([[nonnull]] $time_t const *__restrict timer,
 %
 %#ifdef __USE_TIME64
 
-%[define(DEFINE_TIME_MONTHSTART_YDAY =
-#ifndef ____TIME_MONTHSTART_YDAY_DEFINED
-#define ____TIME_MONTHSTART_YDAY_DEFINED 1
-@@push_namespace(local)@@
-__LOCAL_LIBC_CONST_DATA(__time_monthstart_yday)
-__UINT16_TYPE__ const __time_monthstart_yday[2][13] = {
-	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
-	{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 }
-};
-@@pop_namespace@@
-#endif /* !____TIME_MONTHSTART_YDAY_DEFINED */
-)]
-
-
 [[doc_alias("gmtime_r"), time64_variant_of(gmtime_r)]]
 [[decl_include("<bits/types.h>")]]
 [[decl_prefix(DEFINE_STRUCT_TM)]]
@@ -1671,7 +1675,7 @@ __STRUCT_TM *gmtime64_r([[nonnull]] $time64_t const *__restrict timer,
 	tp->@tm_year@ = (int)__daystoyears(t);
 	t -= __yearstodays(tp->@tm_year@);
 	tp->@tm_yday@ = (int)t;
-	monthvec = @__time_monthstart_yday@[__isleap(tp->@tm_year@)];
+	monthvec = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(tp->@tm_year@)];
 	for (i = 1; i < 12; ++i)
 		if (monthvec[i] >= t)
 			break;
@@ -1714,7 +1718,7 @@ __STRUCT_TM *gmtime64_r([[nonnull]] $time64_t const *__restrict timer,
 	tp->@tm_year@ = (int)__daystoyears(t);
 	t -= __yearstodays(tp->@tm_year@);
 	tp->@tm_yday@ = (int)t;
-	monthvec = @__time_monthstart_yday@[__isleap(tp->@tm_year@)];
+	monthvec = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(tp->@tm_year@)];
 	for (i = 1; i < 12; ++i)
 		if (monthvec[i] >= t)
 			break;
@@ -1815,30 +1819,30 @@ char *asctime_r([[nonnull]] __STRUCT_TM const *__restrict tp,
 @@pp_ifdef __BUILDING_LIBC@@
 	sprintf(buf,
 	        "%.3s %.3s%3u %.2u:%.2u:%.2u %u\n",
-	       (unsigned int)tp->@tm_wday@ >= 7 ? "??" "?" :
-	        @__abbr_wday_names@[tp->@tm_wday@],
-	       (unsigned int)tp->@tm_mon@ >= 12 ? "??" "?" :
-	        @__abbr_month_names@[tp->@tm_mon@],
-	       (unsigned int)tp->@tm_mday@,
-	       (unsigned int)tp->@tm_hour@,
-	       (unsigned int)tp->@tm_min@,
-	       (unsigned int)tp->@tm_sec@,
-	       (unsigned int)tp->@tm_year@ + 1900);
+	        (unsigned int)tp->@tm_wday@ >= 7 ? "??" "?" :
+	        __NAMESPACE_LOCAL_SYM __abbr_wday_names[tp->@tm_wday@],
+	        (unsigned int)tp->@tm_mon@ >= 12 ? "??" "?" :
+	        __NAMESPACE_LOCAL_SYM __abbr_month_names[tp->@tm_mon@],
+	        (unsigned int)tp->@tm_mday@,
+	        (unsigned int)tp->@tm_hour@,
+	        (unsigned int)tp->@tm_min@,
+	        (unsigned int)tp->@tm_sec@,
+	        (unsigned int)tp->@tm_year@ + 1900);
 	return buf;
 @@pp_elif $has_function(crt_asctime_s)@@
 	return crt_asctime_s(buf, 26, tp) ? NULL : buf;
 @@pp_else@@
 	sprintf(buf,
 	        "%.3s %.3s%3u %.2u:%.2u:%.2u %u\n",
-	       (unsigned int)tp->@tm_wday@ >= 7 ? "??" "?" :
-	        @__abbr_wday_names@[tp->@tm_wday@],
-	       (unsigned int)tp->@tm_mon@ >= 12 ? "??" "?" :
-	        @__abbr_month_names@[tp->@tm_mon@],
-	       (unsigned int)tp->@tm_mday@,
-	       (unsigned int)tp->@tm_hour@,
-	       (unsigned int)tp->@tm_min@,
-	       (unsigned int)tp->@tm_sec@,
-	       (unsigned int)tp->@tm_year@ + 1900);
+	        (unsigned int)tp->@tm_wday@ >= 7 ? "??" "?" :
+	        __NAMESPACE_LOCAL_SYM __abbr_wday_names[tp->@tm_wday@],
+	        (unsigned int)tp->@tm_mon@ >= 12 ? "??" "?" :
+	        __NAMESPACE_LOCAL_SYM __abbr_month_names[tp->@tm_mon@],
+	        (unsigned int)tp->@tm_mday@,
+	        (unsigned int)tp->@tm_hour@,
+	        (unsigned int)tp->@tm_min@,
+	        (unsigned int)tp->@tm_sec@,
+	        (unsigned int)tp->@tm_year@ + 1900);
 	return buf;
 @@pp_endif@@
 }

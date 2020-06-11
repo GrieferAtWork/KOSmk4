@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4376f9f4 */
+/* HASH CRC-32:0xb5f9bb2a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,64 +24,53 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "dirent.h"
-#include "string.h"
+#include "../user/dirent.h"
+#include <string.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <bits/dirent.h>
 /* Sort the 2 given directory entries `E1' and `E2' the same way `strcmp(3)' would */
-INTERN ATTR_PURE NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.alphasort") int
-NOTHROW_NCX(LIBCCALL libc_alphasort)(struct dirent const **e1,
-                                     struct dirent const **e2) {
-#line 253 "kos/src/libc/magic/dirent.c"
-	return libc_strcoll((*e1)->d_name, (*e2)->d_name);
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_alphasort)(struct dirent const **e1, struct dirent const **e2) {
+	return strcoll((*e1)->d_name, (*e2)->d_name);
 }
-
-/* 64-bit variant of `alphasort()' */
-#if defined(_DIRENT_MATCHES_DIRENT64)
+#ifdef _DIRENT_MATCHES_DIRENT64
 DEFINE_INTERN_ALIAS(libc_alphasort64, libc_alphasort);
-#else
-INTERN ATTR_PURE NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.alphasort64") int
-NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct dirent64 const **e1,
-                                       struct dirent64 const **e2) {
-#line 259 "kos/src/libc/magic/dirent.c"
-	return libc_strcoll((*e1)->d_name, (*e2)->d_name);
+#else /* _DIRENT_MATCHES_DIRENT64 */
+#include <bits/dirent.h>
+/* 64-bit variant of `alphasort()' */
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct dirent64 const **e1, struct dirent64 const **e2) {
+	return strcoll((*e1)->d_name, (*e2)->d_name);
 }
-#endif /* MAGIC:alias */
-
+#endif /* !_DIRENT_MATCHES_DIRENT64 */
+#include <bits/dirent.h>
 /* Sort the 2 given directory entries `E1' and `E2' the same way `strvercmp(3)' would. */
-INTERN ATTR_PURE NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.versionsort") int
-NOTHROW_NCX(LIBCCALL libc_versionsort)(struct dirent const **e1,
-                                       struct dirent const **e2) {
-#line 320 "kos/src/libc/magic/dirent.c"
-	return libc_strverscmp((*e1)->d_name, (*e2)->d_name);
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_versionsort)(struct dirent const **e1, struct dirent const **e2) {
+	return strverscmp((*e1)->d_name, (*e2)->d_name);
 }
-
-/* 64-bit variant of `versionsort()' */
-#if defined(_DIRENT_MATCHES_DIRENT64)
+#ifdef _DIRENT_MATCHES_DIRENT64
 DEFINE_INTERN_ALIAS(libc_versionsort64, libc_versionsort);
-#else
-INTERN ATTR_PURE NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.versionsort64") int
-NOTHROW_NCX(LIBCCALL libc_versionsort64)(struct dirent64 const **e1,
-                                         struct dirent64 const **e2) {
-#line 326 "kos/src/libc/magic/dirent.c"
-	return libc_strverscmp((*e1)->d_name, (*e2)->d_name);
+#else /* _DIRENT_MATCHES_DIRENT64 */
+#include <bits/dirent.h>
+/* 64-bit variant of `versionsort()' */
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_versionsort64)(struct dirent64 const **e1, struct dirent64 const **e2) {
+	return strverscmp((*e1)->d_name, (*e2)->d_name);
 }
-#endif /* MAGIC:alias */
-
+#endif /* !_DIRENT_MATCHES_DIRENT64 */
 #endif /* !__KERNEL__ */
+
+DECL_END
+
 #ifndef __KERNEL__
 DEFINE_PUBLIC_WEAK_ALIAS(alphasort, libc_alphasort);
 DEFINE_PUBLIC_WEAK_ALIAS(alphasort64, libc_alphasort64);
 DEFINE_PUBLIC_WEAK_ALIAS(versionsort, libc_versionsort);
 DEFINE_PUBLIC_WEAK_ALIAS(versionsort64, libc_versionsort64);
 #endif /* !__KERNEL__ */
-
-DECL_END
 
 #endif /* !GUARD_LIBC_AUTO_DIRENT_C */

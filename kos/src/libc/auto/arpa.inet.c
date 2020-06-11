@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x436256e4 */
+/* HASH CRC-32:0x8bfac09d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,21 +24,18 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "arpa.inet.h"
-#include "stdio.h"
-#include "string.h"
+#include "../user/arpa.inet.h"
+#include <stdio.h>
+#include <string.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <netinet/in.h>
-
 #include <hybrid/__byteswap.h>
 /* Return network number part of the Internet address IN */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_netof") uint32_t
+INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_CONST WUNUSED uint32_t
 NOTHROW_NCX(LIBCCALL libc_inet_netof)(struct in_addr inaddr) {
-#line 65 "kos/src/libc/magic/arpa.inet.c"
 	uint32_t addr = __hybrid_betoh32(inaddr.s_addr);
 	if (IN_CLASSA(addr)) {
 		return (addr & IN_CLASSA_NET) >> IN_CLASSA_NSHIFT;
@@ -48,15 +45,11 @@ NOTHROW_NCX(LIBCCALL libc_inet_netof)(struct in_addr inaddr) {
 		return (addr & IN_CLASSC_NET) >> IN_CLASSC_NSHIFT;
 	}
 }
-
 #include <netinet/in.h>
-
 #include <hybrid/__byteswap.h>
 /* Return the local host address part of the Internet address in IN */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_lnaof") uint32_t
+INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_CONST WUNUSED uint32_t
 NOTHROW_NCX(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr) {
-#line 80 "kos/src/libc/magic/arpa.inet.c"
 	uint32_t addr = __hybrid_betoh32(inaddr.s_addr);
 	if (IN_CLASSA(addr)) {
 		return addr & IN_CLASSA_HOST;
@@ -66,17 +59,12 @@ NOTHROW_NCX(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr) {
 		return addr & IN_CLASSC_HOST;
 	}
 }
-
 #include <netinet/in.h>
-
 #include <hybrid/__byteswap.h>
 /* Make Internet host address in network byte order by
  * combining the network number NET with the local address HOST */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_makeaddr") struct in_addr
-NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net,
-                                         uint32_t host) {
-#line 96 "kos/src/libc/magic/arpa.inet.c"
+INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_CONST WUNUSED struct in_addr
+NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net, uint32_t host) {
 	struct in_addr result;
 	uint32_t result_addr;
 	if (net < IN_CLASSA_MAX)
@@ -91,7 +79,6 @@ NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net,
 	result.s_addr = __hybrid_htobe32(result_addr);
 	return result;
 }
-
 #include <netinet/in.h>
 /* Convert Internet host address from numbers-and-dots
  * notation in CP into binary data in network byte order
@@ -104,59 +91,44 @@ NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net,
  *     123      (decimal)
  *     0x123    (hex)
  *     0123     (oct) */
-INTERN ATTR_PURE NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_addr") in_addr_t
+INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE NONNULL((1)) in_addr_t
 NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp) {
-#line 124 "kos/src/libc/magic/arpa.inet.c"
 	struct in_addr addr;
-	if (!libc_inet_paton((char const **)&cp, &addr, 0) || *cp)
+	if (!inet_paton((char const **)&cp, &addr, 0) || *cp)
 		return INADDR_NONE;
 	return addr.s_addr;
 }
-
 /* Convert Internet number in IN to ASCII representation. The return
  * value is a pointer to an internal array containing the string */
-INTERN ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_ntoa") char *
+INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_inet_ntoa)(struct in_addr inaddr) {
-#line 134 "kos/src/libc/magic/arpa.inet.c"
 	static char buf[16];
-	return libc_inet_ntoa_r(inaddr, buf);
+	return inet_ntoa_r(inaddr, buf);
 }
-
 #include <netinet/in.h>
-
 #include <hybrid/__byteswap.h>
 /* Re-entrant version of `inet_ntoa()' */
-INTERN ATTR_RETNONNULL NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_ntoa_r") char *
-NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr,
-                                       char buf[16]) {
-#line 144 "kos/src/libc/magic/arpa.inet.c"
+INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_RETNONNULL NONNULL((2)) char *
+NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr, char buf[16]) {
 	uint32_t addr = __hybrid_betoh32(inaddr.s_addr);
-	libc_sprintf(buf, "%u.%u.%u.%u",
+	sprintf(buf, "%u.%u.%u.%u",
 	        (unsigned int)(u8)((addr & __UINT32_C(0xff000000)) >> 24),
 	        (unsigned int)(u8)((addr & __UINT32_C(0x00ff0000)) >> 16),
 	        (unsigned int)(u8)((addr & __UINT32_C(0x0000ff00)) >> 8),
 	        (unsigned int)(u8)((addr & __UINT32_C(0x000000ff))));
 	return buf;
 }
-
 #include <netinet/in.h>
-
 #include <hybrid/__byteswap.h>
 /* This function is the same as `inet_addr()', except that
  * the return value is in host-endian, rather than net-endian */
-INTERN ATTR_PURE NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_network") uint32_t
+INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp) {
-#line 159 "kos/src/libc/magic/arpa.inet.c"
 	struct in_addr addr;
-	if (!libc_inet_paton((char const **)&cp, &addr, 1) || *cp)
+	if (!inet_paton((char const **)&cp, &addr, 1) || *cp)
 		return INADDR_NONE;
 	return addr.s_addr;
 }
-
 /* Convert Internet host address from numbers-and-dots notation in
  * CP into binary data and store the result in the structure INP
  * Accepted notations are:
@@ -170,14 +142,10 @@ NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp) {
  *     0123     (oct)
  * @return: 0: Bad input format
  * @return: 1: Success */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_aton") int
-NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp,
-                                     struct in_addr *__restrict inp) {
-#line 184 "kos/src/libc/magic/arpa.inet.c"
-	return libc_inet_paton((char const **)&cp, inp, 0) && !*cp;
+INTERN ATTR_SECTION(".text.crt.net.inet") NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp, struct in_addr *__restrict inp) {
+	return inet_paton((char const **)&cp, inp, 0) && !*cp;
 }
-
 #include <hybrid/__byteswap.h>
 /* Same as `inet_aton()', but update `*pcp' to point after the address
  * Accepted notations are:
@@ -192,12 +160,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp,
  * @param: network_addr: When non-zero, `*pcp' is a network address
  * @return: 0: Bad input format
  * @return: 1: Success */
-INTERN WUNUSED NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_paton") int
-NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp,
-                                      struct in_addr *__restrict inp,
-                                      int network_addr) {
-#line 205 "kos/src/libc/magic/arpa.inet.c"
+INTERN ATTR_SECTION(".text.crt.net.inet") WUNUSED NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp, struct in_addr *__restrict inp, int network_addr) {
 	uint32_t result;
 	uint32_t parts[4];
 	char const *cp = *pcp;
@@ -282,6 +246,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp,
 		++cp;
 	}
 	switch (__builtin_expect(i, 4)) {
+
 	case 4:
 		if unlikely(parts[3] > 0xff)
 			goto err;
@@ -290,6 +255,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp,
 		         parts[2] << 8 |
 		         parts[3];
 		break;
+
 	case 3:
 		if (network_addr) {
 			if unlikely(parts[2] > 0xff)
@@ -305,6 +271,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp,
 			         parts[2];
 		}
 		break;
+
 	case 2:
 		if (network_addr) {
 			if unlikely(parts[1] > 0xff)
@@ -318,6 +285,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp,
 			         parts[1];
 		}
 		break;
+
 	case 1:
 		if (network_addr) {
 			if unlikely(parts[0] > 0xff)
@@ -325,6 +293,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp,
 		}
 		result = parts[0];
 		break;
+
 	default: __builtin_unreachable();
 	}
 	inp->s_addr = __hybrid_htobe32(result);
@@ -333,16 +302,11 @@ NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp,
 err:
 	return 0;
 }
-
 #include <parts/errno.h>
 /* Format a network number NET into presentation format and place
  * result in buffer starting at BUF with length of LEN bytes */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_neta") char *
-NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net,
-                                     char *buf,
-                                     size_t len) {
-#line 346 "kos/src/libc/magic/arpa.inet.c"
+INTERN ATTR_SECTION(".text.crt.net.inet") NONNULL((2)) char *
+NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net, char *buf, size_t len) {
 	size_t reqlen;
 	if (net <= 0xff) {
 		if (!net) {
@@ -350,19 +314,19 @@ NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net,
 			if likely(len >= 8)
 				memcpy(buf, "0.0.0.0", 8 * sizeof(char));
 		} else {
-			reqlen = libc_snprintf(buf, len, "%u", (unsigned int)net);
+			reqlen = snprintf(buf, len, "%u", (unsigned int)net);
 		}
 	} else if (net <= 0xffff) {
-		reqlen = libc_snprintf(buf, len, "%u.%u",
+		reqlen = snprintf(buf, len, "%u.%u",
 		                  (unsigned int)((net & 0xff00) >> 8),
 		                  (unsigned int)(net & 0xff));
 	} else if (net <= 0xffffff) {
-		reqlen = libc_snprintf(buf, len, "%u.%u.%u",
+		reqlen = snprintf(buf, len, "%u.%u.%u",
 		                  (unsigned int)((net & 0xff0000) >> 16),
 		                  (unsigned int)((net & 0xff00) >> 8),
 		                  (unsigned int)(net & 0xff));
 	} else {
-		reqlen = libc_snprintf(buf, len, "%u.%u.%u.%u",
+		reqlen = snprintf(buf, len, "%u.%u.%u.%u",
 		                  (unsigned int)((net & 0xff000000) >> 24),
 		                  (unsigned int)((net & 0xff0000) >> 16),
 		                  (unsigned int)((net & 0xff00) >> 8),
@@ -381,8 +345,10 @@ too_small:
 #endif
 	return NULL;
 }
-
 #endif /* !__KERNEL__ */
+
+DECL_END
+
 #ifndef __KERNEL__
 DEFINE_PUBLIC_WEAK_ALIAS(inet_netof, libc_inet_netof);
 DEFINE_PUBLIC_WEAK_ALIAS(inet_lnaof, libc_inet_lnaof);
@@ -395,7 +361,5 @@ DEFINE_PUBLIC_WEAK_ALIAS(inet_aton, libc_inet_aton);
 DEFINE_PUBLIC_WEAK_ALIAS(inet_paton, libc_inet_paton);
 DEFINE_PUBLIC_WEAK_ALIAS(inet_neta, libc_inet_neta);
 #endif /* !__KERNEL__ */
-
-DECL_END
 
 #endif /* !GUARD_LIBC_AUTO_ARPA_INET_C */
