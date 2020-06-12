@@ -644,11 +644,10 @@ DEFINE_INTERN_ALIAS(libc_gsignal, libc_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x461c412e]]]*/
+/*[[[start:exports,hash:CRC-32=0x9d99980e]]]*/
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(__sysv_signal, libc_sysv_signal);
 DEFINE_PUBLIC_ALIAS(sysv_signal, libc_sysv_signal);
-DEFINE_PUBLIC_ALIAS(sysv_signal, libc_signal);
 DEFINE_PUBLIC_ALIAS(_signal, libc_signal);
 DEFINE_PUBLIC_ALIAS(signal, libc_signal);
 DEFINE_PUBLIC_ALIAS(ssignal, libc_ssignal);

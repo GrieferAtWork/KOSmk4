@@ -42,7 +42,7 @@ DEFINE_TEST(signal_works_correctly) {
 	hand_called = 0;
 
 	/* Install the signal handler. */
-	ohand = signal(SIGUSR1, &myhand);
+	ohand = sysv_signal(SIGUSR1, &myhand);
 	assert(hand_called == 0);
 
 	/* Raise the signal. */
@@ -52,7 +52,7 @@ DEFINE_TEST(signal_works_correctly) {
 	assert(hand_called == 1);
 
 	/* Restore the previous handler. */
-	signal(SIGUSR1, ohand);
+	sysv_signal(SIGUSR1, ohand);
 }
 
 

@@ -175,7 +175,7 @@ $sighandler_t sysv_signal(int signo, $sighandler_t handler);
 
 
 @@@param signo: One of `SIG*'
-[[std, preferred_export_alias(sysv_signal), export_alias(_signal) /*, dos_variant*/]]
+[[std, preferred_alias(sysv_signal), export_alias(_signal) /*, dos_variant*/]]
 $sighandler_t signal(int signo, $sighandler_t handler);
 
 %#ifdef __USE_MISC
