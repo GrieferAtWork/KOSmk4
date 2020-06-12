@@ -738,7 +738,7 @@ __STDC_INT_AS_SIZE_T vswprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__
 }
 
 [[decl_include("<features.h>")]]
-[[std, guard, wchar, ATTR_LIBC_WPRINTF(3, 4), export_alias("_swprintf")]]
+[[std, guard, wchar, ATTR_LIBC_WPRINTF(3, 4), crt_dosname("_swprintf")]]
 [[section("{.text.crt.wchar.unicode.static.format.printf|.text.crt.dos.wchar.unicode.static.format.printf}")]]
 __STDC_INT_AS_SIZE_T swprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__restrict buf, size_t buflen,
                               [[nonnull]] wchar_t const *__restrict format, ...)
@@ -869,39 +869,39 @@ __NAMESPACE_STD_USING(wcstok)
 
 %
 %#ifdef __USE_XOPEN2K8
-[[wchar, wunused, ATTR_PURE, export_alias("_wcsicmp", "wcsicmp")]]
+[[wchar, wunused, ATTR_PURE, crt_dosname("_wcsicmp")]]
 [[section("{.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory}")]]
 int wcscasecmp([[nonnull]] wchar_t const *s1,
                [[nonnull]] wchar_t const *s2)
 	%{generate(str2wcs)}
 
-[[wchar, wunused, ATTR_PURE, export_alias("_wcsnicmp", "wcsnicmp")]]
+[[wchar, wunused, ATTR_PURE, crt_dosname("_wcsnicmp")]]
 [[section("{.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory}")]]
 int wcsncasecmp([[nonnull]] wchar_t const *s1,
                 [[nonnull]] wchar_t const *s2, $size_t maxlen)
 	%{generate(str2wcs)}
 
-[[wchar, wunused, ATTR_PURE, export_alias("_wcsicmp_l", "wcsicmp_l", "__wcscasecmp_l")]]
+[[wchar, wunused, ATTR_PURE, crt_dosname("_wcsicmp_l"), export_alias("__wcscasecmp_l")]]
 [[section("{.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory}")]]
 int wcscasecmp_l([[nonnull]] wchar_t const *s1,
                  [[nonnull]] wchar_t const *s2, $locale_t locale)
 	%{generate(str2wcs)}
 
-[[wchar, wunused, ATTR_PURE, export_alias("_wcsnicmp_l", "wcsnicmp_l", "__wcsncasecmp_l")]]
+[[wchar, wunused, ATTR_PURE, crt_dosname("_wcsnicmp_l"), export_alias("__wcsncasecmp_l")]]
 [[section("{.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory}")]]
 int wcsncasecmp_l([[nonnull]] wchar_t const *s1,
                   [[nonnull]] wchar_t const *s2,
                   $size_t maxlen, $locale_t locale)
 	%{generate(str2wcs)}
 
-[[wchar, wunused, ATTR_PURE, export_alias("_wcscoll_l", "__wcscoll_l")]]
+[[wchar, wunused, ATTR_PURE, crt_dosname("_wcscoll_l"), export_alias("__wcscoll_l")]]
 [[section("{.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory}")]]
 int wcscoll_l([[nonnull]] wchar_t const *s1,
               [[nonnull]] wchar_t const *s2,
               $locale_t locale)
 	%{generate(str2wcs)}
 
-[[wchar, export_alias("_wcsxfrm_l", "__wcsxfrm_l")]]
+[[wchar, crt_dosname("_wcsxfrm_l"), export_alias("__wcsxfrm_l")]]
 [[section("{.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory}")]]
 $size_t wcsxfrm_l(wchar_t *dst, [[nonnull]] wchar_t const *__restrict src,
                   $size_t maxlen, $locale_t locale)
@@ -1039,13 +1039,13 @@ wchar_t *wmempmove([[outp(num_chars)]] wchar_t *dst,
 @@pp_endif@@
 }
 
-[[ATTR_PURE, wchar, wunused, export_alias("_wcstol_l", "__wcstol_l")]]
+[[ATTR_PURE, wchar, wunused, crt_dosname("_wcstol_l"), export_alias("__wcstol_l")]]
 [[section("{.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert}")]]
 long wcstol_l([[nonnull]] wchar_t const *__restrict nptr,
               wchar_t **endptr, int base, $locale_t locale)
 	%{generate(str2wcs)}
 
-[[ATTR_PURE, wchar, wunused, export_alias("_wcstoul_l", "__wcstoul_l")]]
+[[ATTR_PURE, wchar, wunused, crt_dosname("_wcstoul_l"), export_alias("__wcstoul_l")]]
 [[section("{.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert}")]]
 unsigned long wcstoul_l([[nonnull]] wchar_t const *__restrict nptr,
                         wchar_t **endptr, int base, $locale_t locale)
@@ -1075,20 +1075,20 @@ __ULONGLONG wcstoull_l([[nonnull]] wchar_t const *__restrict nptr,
 	%{generate(str2wcs)}
 
 %#ifndef __NO_FPU
-[[ATTR_PURE, wchar, wunused, export_alias("_wcstof_l", "__wcstof_l")]]
+[[ATTR_PURE, wchar, wunused, crt_dosname("_wcstof_l"), export_alias("__wcstof_l")]]
 [[section("{.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert}")]]
 float wcstof_l([[nonnull]] wchar_t const *__restrict nptr,
                [[nullable]] wchar_t **endptr, $locale_t locale)
 	%{generate(str2wcs)}
 
-[[ATTR_PURE, wchar, wunused, export_alias("_wcstod_l", "__wcstod_l")]]
+[[ATTR_PURE, wchar, wunused, crt_dosname("_wcstod_l"), export_alias("__wcstod_l")]]
 [[section("{.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert}")]]
 double wcstod_l([[nonnull]] wchar_t const *__restrict nptr,
                 [[nullable]] wchar_t **endptr, $locale_t locale)
 	%{generate(str2wcs)}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[ATTR_PURE, wchar, wunused, export_alias("_wcstold_l", "__wcstold_l")]]
+[[ATTR_PURE, wchar, wunused, crt_dosname("_wcstold_l"), export_alias("__wcstold_l")]]
 [[section("{.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert}")]]
 __LONGDOUBLE wcstold_l([[nonnull]] wchar_t const *__restrict nptr,
                        [[nullable]] wchar_t **endptr, $locale_t locale)

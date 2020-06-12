@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91fa448b */
+/* HASH CRC-32:0x5cad9e42 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -138,7 +138,7 @@ INTDEF ATTR_LIBC_WSCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(V
 INTDEF ATTR_LIBC_WSCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBKCALL libc_swscanf)(char32_t const *__restrict src, char32_t const *__restrict format, ...);
 INTDEF ATTR_LIBC_WPRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_vswprintf)(char16_t *__restrict buf, size_t buflen, char16_t const *__restrict format, va_list args);
 INTDEF ATTR_LIBC_WPRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBKCALL libc_vswprintf)(char32_t *__restrict buf, size_t buflen, char32_t const *__restrict format, va_list args);
-INTDEF ATTR_LIBC_WPRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_swprintf)(char16_t *__restrict buf, size_t buflen, char16_t const *__restrict format, ...);
+INTDEF ATTR_LIBC_WPRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd__swprintf)(char16_t *__restrict buf, size_t buflen, char16_t const *__restrict format, ...);
 INTDEF ATTR_LIBC_WPRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBKCALL libc_swprintf)(char32_t *__restrict buf, size_t buflen, char32_t const *__restrict format, ...);
 INTDEF NONNULL((1)) double NOTHROW_NCX(LIBDCALL libd_wcstod)(char16_t const *__restrict nptr, char16_t **endptr);
 INTDEF NONNULL((1)) double NOTHROW_NCX(LIBKCALL libc_wcstod)(char32_t const *__restrict nptr, char32_t **endptr);
@@ -154,17 +154,17 @@ INTDEF WUNUSED ATTR_LIBC_WSCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBDCAL
 INTDEF WUNUSED ATTR_LIBC_WSCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBKCALL libc_vwscanf)(char32_t const *__restrict format, va_list args) THROWS(...);
 INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_vswscanf)(char16_t const *__restrict src, char16_t const *__restrict format, va_list args);
 INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBKCALL libc_vswscanf)(char32_t const *__restrict src, char32_t const *__restrict format, va_list args);
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wcscasecmp)(char16_t const *s1, char16_t const *s2);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd__wcsicmp)(char16_t const *s1, char16_t const *s2);
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBKCALL libc_wcscasecmp)(char32_t const *s1, char32_t const *s2);
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wcsncasecmp)(char16_t const *s1, char16_t const *s2, size_t maxlen);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd__wcsnicmp)(char16_t const *s1, char16_t const *s2, size_t maxlen);
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBKCALL libc_wcsncasecmp)(char32_t const *s1, char32_t const *s2, size_t maxlen);
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wcscasecmp_l)(char16_t const *s1, char16_t const *s2, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd__wcsicmp_l)(char16_t const *s1, char16_t const *s2, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBKCALL libc_wcscasecmp_l)(char32_t const *s1, char32_t const *s2, locale_t locale);
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wcsncasecmp_l)(char16_t const *s1, char16_t const *s2, size_t maxlen, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd__wcsnicmp_l)(char16_t const *s1, char16_t const *s2, size_t maxlen, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBKCALL libc_wcsncasecmp_l)(char32_t const *s1, char32_t const *s2, size_t maxlen, locale_t locale);
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wcscoll_l)(char16_t const *s1, char16_t const *s2, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd__wcscoll_l)(char16_t const *s1, char16_t const *s2, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBKCALL libc_wcscoll_l)(char32_t const *s1, char32_t const *s2, locale_t locale);
-INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_wcsxfrm_l)(char16_t *dst, char16_t const *__restrict src, size_t maxlen, locale_t locale);
+INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd__wcsxfrm_l)(char16_t *dst, char16_t const *__restrict src, size_t maxlen, locale_t locale);
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBKCALL libc_wcsxfrm_l)(char32_t *dst, char32_t const *__restrict src, size_t maxlen, locale_t locale);
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBDCALL libd_wcpcpy)(char16_t *__restrict dst, char16_t const *__restrict src);
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char32_t *NOTHROW_NCX(LIBKCALL libc_wcpcpy)(char32_t *__restrict dst, char32_t const *__restrict src);
@@ -188,19 +188,19 @@ INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBDCALL libd_wmemp
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char32_t *NOTHROW_NCX(LIBKCALL libc_wmempcpy)(char32_t *__restrict dst, char32_t const *__restrict src, size_t num_chars);
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBDCALL libd_wmempmove)(char16_t *dst, char16_t const *src, size_t num_chars);
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char32_t *NOTHROW_NCX(LIBKCALL libc_wmempmove)(char32_t *dst, char32_t const *src, size_t num_chars);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_wcstol_l)(char16_t const *__restrict nptr, char16_t **endptr, int base, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd__wcstol_l)(char16_t const *__restrict nptr, char16_t **endptr, int base, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBKCALL libc_wcstol_l)(char32_t const *__restrict nptr, char32_t **endptr, int base, locale_t locale);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) unsigned long NOTHROW_NCX(LIBDCALL libd_wcstoul_l)(char16_t const *__restrict nptr, char16_t **endptr, int base, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) unsigned long NOTHROW_NCX(LIBDCALL libd__wcstoul_l)(char16_t const *__restrict nptr, char16_t **endptr, int base, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) unsigned long NOTHROW_NCX(LIBKCALL libc_wcstoul_l)(char32_t const *__restrict nptr, char32_t **endptr, int base, locale_t locale);
 INTDEF NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBDCALL libd_wcstoll_l)(char16_t const *__restrict nptr, char16_t **endptr, int base, locale_t locale);
 INTDEF NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBKCALL libc_wcstoll_l)(char32_t const *__restrict nptr, char32_t **endptr, int base, locale_t locale);
 INTDEF NONNULL((1)) __ULONGLONG NOTHROW_NCX(LIBDCALL libd_wcstoull_l)(char16_t const *__restrict nptr, char16_t **endptr, int base, locale_t locale);
 INTDEF NONNULL((1)) __ULONGLONG NOTHROW_NCX(LIBKCALL libc_wcstoull_l)(char32_t const *__restrict nptr, char32_t **endptr, int base, locale_t locale);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) float NOTHROW_NCX(LIBDCALL libd_wcstof_l)(char16_t const *__restrict nptr, char16_t **endptr, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) float NOTHROW_NCX(LIBDCALL libd__wcstof_l)(char16_t const *__restrict nptr, char16_t **endptr, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) float NOTHROW_NCX(LIBKCALL libc_wcstof_l)(char32_t const *__restrict nptr, char32_t **endptr, locale_t locale);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) double NOTHROW_NCX(LIBDCALL libd_wcstod_l)(char16_t const *__restrict nptr, char16_t **endptr, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) double NOTHROW_NCX(LIBDCALL libd__wcstod_l)(char16_t const *__restrict nptr, char16_t **endptr, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) double NOTHROW_NCX(LIBKCALL libc_wcstod_l)(char32_t const *__restrict nptr, char32_t **endptr, locale_t locale);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_wcstold_l)(char16_t const *__restrict nptr, char16_t **endptr, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd__wcstold_l)(char16_t const *__restrict nptr, char16_t **endptr, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBKCALL libc_wcstold_l)(char32_t const *__restrict nptr, char32_t **endptr, locale_t locale);
 INTDEF wint_t (LIBDCALL libd_getwchar_unlocked)(void) THROWS(...);
 INTDEF wint_t (LIBKCALL libc_getwchar_unlocked)(void) THROWS(...);

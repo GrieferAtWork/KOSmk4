@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d2e4595 */
+/* HASH CRC-32:0xff7d47ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2108,7 +2108,7 @@ NOTHROW_NCX(LIBKCALL libc__wtof)(char32_t const *nptr) {
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) double
 NOTHROW_NCX(LIBDCALL libd__wtof_l)(char16_t const *nptr,
                                    locale_t locale) {
-	return libd_wcstod_l(nptr, NULL, locale);
+	return libd__wcstod_l(nptr, NULL, locale);
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) double
 NOTHROW_NCX(LIBKCALL libc__wtof_l)(char32_t const *nptr,
@@ -2562,7 +2562,7 @@ NOTHROW_NCX(LIBKCALL libc__wtoi64)(char32_t const *__restrict nptr) {
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd__wtoi_l)(char16_t const *__restrict nptr,
                                    locale_t locale) {
-	return (int)libd_wcstol_l(nptr, NULL, 10, locale);
+	return (int)libd__wcstol_l(nptr, NULL, 10, locale);
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBKCALL libc__wtoi_l)(char32_t const *__restrict nptr,
@@ -2572,7 +2572,7 @@ NOTHROW_NCX(LIBKCALL libc__wtoi_l)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) long int
 NOTHROW_NCX(LIBDCALL libd__wtol_l)(char16_t const *__restrict nptr,
                                    locale_t locale) {
-	return libd_wcstol_l(nptr, NULL, 10, locale);
+	return libd__wcstol_l(nptr, NULL, 10, locale);
 }
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc__wtol_l, libc__wtoi_l);
