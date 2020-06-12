@@ -4330,8 +4330,14 @@ again_lookup_wcsCurrent:
 					local dosVariantName = "libd_" + dosCrtName;
 					if (!currentFeatures.crt_noSelfExport) {
 						kosVariant.exportSymbolNames.append(("1", crtName));
-						/* TODO: the DOS$ prefix isn't required if no symbol of the same
-						 *       name is being exported from the default namespace! */
+						/* XXX: the DOS$ prefix isn't required if no symbol of the same
+						 *      name is being exported from the default namespace!
+						 * However, it may prove a good idea to keep all char16_t-variants
+						 * of functions constrained to the DOS$ namespace:
+						 *   #1: Forward-compatibility may one day define a KOS-mode
+						 *       function using a name already in use under DOS-mode
+						 *   #2: The __C(DECLARE|REDIRECT)-system isn't designed to
+						 *       be able to deal with this kind of linkage. */
 						dosVariant.exportSymbolNames.append(("1", "DOS$" + dosCrtName));
 					}
 					current.internalName = kosVariantName;

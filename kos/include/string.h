@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5744b39 */
+/* HASH CRC-32:0x5814e007 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6266,13 +6266,7 @@ __NAMESPACE_STD_USING(wcstok)
 __CDECLARE(__ATTR_NONNULL((2, 3)),wchar_t *,__NOTHROW_NCX,wcstok,(wchar_t *__string, wchar_t const *__restrict __delim, wchar_t **__restrict __save_ptr),(__string,__delim,__save_ptr))
 #elif defined(__CRT_HAVE_DOS$wcstok) && !defined(__CRT_DOS_PRIMARY) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),char32_t *,__NOTHROW_NCX,wcstok,(char32_t *__string, char32_t const *__restrict __delim, char32_t **__restrict __save_ptr),wcstok,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_DOS$wcstok) && !defined(__CRT_DOS_PRIMARY) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),char16_t *,__NOTHROW_NCX,wcstok,(char16_t *__string, char16_t const *__restrict __delim, char16_t **__restrict __save_ptr),wcstok,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_wcstok_s)
-__CREDIRECT(__ATTR_NONNULL((2, 3)),wchar_t *,__NOTHROW_NCX,wcstok,(wchar_t *__string, wchar_t const *__restrict __delim, wchar_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_DOS$wcstok_s) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),char32_t *,__NOTHROW_NCX,wcstok,(char32_t *__string, char32_t const *__restrict __delim, char32_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_DOS$wcstok_s) && __SIZEOF_WCHAR_T__ == 2
+#elif defined(__CRT_HAVE_DOS$wcstok_s) && !defined(__CRT_DOS_PRIMARY) && __SIZEOF_WCHAR_T__ == 2
 __CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),char16_t *,__NOTHROW_NCX,wcstok,(char16_t *__string, char16_t const *__restrict __delim, char16_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
 #else /* ... */
 #include <local/wchar/wcstok.h>
@@ -7186,13 +7180,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcsncpy_s, __FORCELOCAL __errno_t __NOTHROW_NCX(
 __CREDIRECT(__ATTR_NONNULL((2, 3)),wchar_t *,__NOTHROW_NCX,wcstok_s,(wchar_t *__string, wchar_t const *__restrict __delim, wchar_t **__restrict __save_ptr),wcstok,(__string,__delim,__save_ptr))
 #elif defined(__CRT_HAVE_DOS$wcstok) && !defined(__CRT_DOS_PRIMARY) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),char32_t *,__NOTHROW_NCX,wcstok_s,(char32_t *__string, char32_t const *__restrict __delim, char32_t **__restrict __save_ptr),wcstok,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_DOS$wcstok) && !defined(__CRT_DOS_PRIMARY) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),char16_t *,__NOTHROW_NCX,wcstok_s,(char16_t *__string, char16_t const *__restrict __delim, char16_t **__restrict __save_ptr),wcstok,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_wcstok_s)
-__CDECLARE(__ATTR_NONNULL((2, 3)),wchar_t *,__NOTHROW_NCX,wcstok_s,(wchar_t *__string, wchar_t const *__restrict __delim, wchar_t **__restrict __save_ptr),(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_DOS$wcstok_s) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),char32_t *,__NOTHROW_NCX,wcstok_s,(char32_t *__string, char32_t const *__restrict __delim, char32_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_DOS$wcstok_s) && __SIZEOF_WCHAR_T__ == 2
+#elif defined(__CRT_HAVE_DOS$wcstok_s) && !defined(__CRT_DOS_PRIMARY) && __SIZEOF_WCHAR_T__ == 2
 __CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),char16_t *,__NOTHROW_NCX,wcstok_s,(char16_t *__string, char16_t const *__restrict __delim, char16_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
 #else /* ... */
 #include <local/wchar/wcstok.h>

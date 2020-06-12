@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74337bc8 */
+/* HASH CRC-32:0xdf9804b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2055,11 +2055,7 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char32_t *__NOTHR
 #define __c16stok_defined 1
 #if defined(__CRT_HAVE_wcstok) && !defined(__CRT_DOS_PRIMARY) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),char16_t *,__NOTHROW_NCX,__LIBDCALL,c16stok,(char16_t *__string, char16_t const *__restrict __delim, char16_t **__restrict __save_ptr),wcstok,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_DOS$wcstok) && !defined(__CRT_DOS_PRIMARY)
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),char16_t *,__NOTHROW_NCX,c16stok,(char16_t *__string, char16_t const *__restrict __delim, char16_t **__restrict __save_ptr),wcstok,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_wcstok_s) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),char16_t *,__NOTHROW_NCX,__LIBDCALL,c16stok,(char16_t *__string, char16_t const *__restrict __delim, char16_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_DOS$wcstok_s)
+#elif defined(__CRT_HAVE_DOS$wcstok_s) && !defined(__CRT_DOS_PRIMARY)
 __CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),char16_t *,__NOTHROW_NCX,c16stok,(char16_t *__string, char16_t const *__restrict __delim, char16_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/wchar/wcstok.h>
@@ -2075,10 +2071,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16stok, __FORCELOCAL __ATTR_NONNULL((2, 3)) cha
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),char32_t *,__NOTHROW_NCX,__LIBKCALL,c32stok,(char32_t *__string, char32_t const *__restrict __delim, char32_t **__restrict __save_ptr),wcstok,(__string,__delim,__save_ptr))
 #elif defined(__CRT_HAVE_DOS$wcstok) && !defined(__CRT_DOS_PRIMARY)
 __CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),char32_t *,__NOTHROW_NCX,c32stok,(char32_t *__string, char32_t const *__restrict __delim, char32_t **__restrict __save_ptr),wcstok,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_wcstok_s) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),char32_t *,__NOTHROW_NCX,__LIBKCALL,c32stok,(char32_t *__string, char32_t const *__restrict __delim, char32_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_DOS$wcstok_s)
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),char32_t *,__NOTHROW_NCX,c32stok,(char32_t *__string, char32_t const *__restrict __delim, char32_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/wchar/wcstok.h>
 __FORCELOCAL __ATTR_NONNULL((2, 3)) char32_t *__NOTHROW_NCX(__LIBKCALL c32stok)(char32_t *__string, char32_t const *__restrict __delim, char32_t **__restrict __save_ptr) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstok))((__WCHAR_TYPE__ *)__string, (__WCHAR_TYPE__ const *)__delim, (__WCHAR_TYPE__ **)__save_ptr); }

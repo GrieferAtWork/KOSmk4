@@ -603,7 +603,7 @@ size_t wcsftime([[outp(min(return, buflen))]] wchar_t *__restrict buf, size_t bu
 %[default_impl_section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]
 %(std)
 %(std)#if !defined(__USE_DOS) || defined(__USE_ISOC95)
-[[std, guard, wchar, no_crt_self_import, alias("wcstok_s")]]
+[[std, guard, wchar, no_crt_self_import, crt_dosname("wcstok_s")]]
 [[if(!defined(__CRT_DOS_PRIMARY)), preferred_alias("wcstok")]]
 wchar_t *wcstok([[nullable]] wchar_t *string,
                 [[nonnull]] wchar_t const *__restrict delim,

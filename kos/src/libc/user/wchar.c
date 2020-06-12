@@ -82,79 +82,22 @@ DECLARE_NOREL_GLOBAL_META(FILE *, stderr);
 #define __LOCAL_stderr  stderr
 
 
-INTERN NONNULL((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.memory.wcstok_s") char16_t *
-(LIBDCALL libd_wcstok)(char16_t *string,
-                       char16_t const *__restrict delim,
-                       char16_t **__restrict save_ptr) {
-	char16_t *end;
-	if (!string)
-		string = *save_ptr;
-	if (!*string) {
-		*save_ptr = string;
-		return NULL;
-	}
-	string += libd_wcsspn(string, delim);
-	if (!*string) {
-		*save_ptr = string;
-		return NULL;
-	}
-	end = string + libd_wcscspn(string, delim);
-	if (!*end) {
-		*save_ptr = end;
-		return string;
-	}
-	*end      = '\0';
-	*save_ptr = end + 1;
-	return string;
-}
-
+/* The DOS version of wcstok() doesn't take the 3rd safe-ptr argument,
+ * but rather only takes 2 arguments (under DOS, the 3-argument form
+ * carries the name `wcstok_s')
+ * Define this special variant manually, since magic wouldn't understand
+ * some weird function that only exists in DOS-mode, but uses a name that
+ * is bound to a different function in KOS-mode... */
 PRIVATE ATTR_SECTION(".bss.crt.dos.wchar.string.memory.wcstok_safe_ptr")
 char16_t *wcstok_safe_ptr = NULL;
 
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.memory.wcstok") char16_t *
-(LIBDCALL libd_wcstok_nosafe)(char16_t *string,
-                              char16_t const *__restrict delim) {
-	return libd_wcstok(string, delim, &wcstok_safe_ptr);
+DEFINE_PUBLIC_ALIAS(DOS$wcstok, libd_wcstok_nosafe);
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory.wcstok") NONNULL((2)) char16_t *
+NOTHROW_NCX(LIBDCALL libd_wcstok_nosafe)(char16_t *string,
+                                         char16_t const *__restrict delim) {
+	return libd_wcstok_s(string, delim, &wcstok_safe_ptr);
 }
 
-
-INTERN NONNULL((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.memory.wcstok") char32_t *
-(LIBCCALL libc_wcstok)(char32_t *string,
-                       char32_t const *__restrict delim,
-                       char32_t **__restrict save_ptr) {
-	char32_t *end;
-	if (!string)
-		string = *save_ptr;
-	if (!*string) {
-		*save_ptr = string;
-		return NULL;
-	}
-	string += libc_wcsspn(string, delim);
-	if (!*string) {
-		*save_ptr = string;
-		return NULL;
-	}
-	end = string + libc_wcscspn(string, delim);
-	if (!*end) {
-		*save_ptr = end;
-		return string;
-	}
-	*end      = '\0';
-	*save_ptr = end + 1;
-	return string;
-}
-
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wcstok_s, libd_wcstok);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wcstok, libd_wcstok_nosafe);
-DEFINE_PUBLIC_WEAK_ALIAS(wcstok_s, libc_wcstok);
-DEFINE_PUBLIC_WEAK_ALIAS(wcstok, libc_wcstok);
-
-
-
-/*[[[start:implementation]]]*/
 
 
 

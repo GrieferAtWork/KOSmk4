@@ -4819,7 +4819,6 @@
 #define __CRT_HAVE_wcstoimax 1
 #define __CRT_HAVE_wcstoimax_l 1
 #define __CRT_HAVE_wcstok 1
-#define __CRT_HAVE_wcstok_s 1
 #define __CRT_HAVE_wcstol 1
 #define __CRT_HAVE_wcstol_l 1
 #define __CRT_HAVE_wcstold 1

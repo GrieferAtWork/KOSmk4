@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd41ba94f */
+/* HASH CRC-32:0xb39e40b7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -758,9 +758,9 @@ NOTHROW_NCX(LIBKCALL libc_wcsftime)(char32_t *__restrict buf,
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((2, 3)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wcstok)(char16_t *string,
-                                  char16_t const *__restrict delim,
-                                  char16_t **__restrict save_ptr) {
+NOTHROW_NCX(LIBDCALL libd_wcstok_s)(char16_t *string,
+                                    char16_t const *__restrict delim,
+                                    char16_t **__restrict save_ptr) {
 	char16_t *end;
 	if (!string)
 		string = *save_ptr;
@@ -5222,7 +5222,7 @@ DEFINE_PUBLIC_ALIAS(DOS$fputws, libd_fputws);
 DEFINE_PUBLIC_ALIAS(fputws, libc_fputws);
 DEFINE_PUBLIC_ALIAS(DOS$wcsftime, libd_wcsftime);
 DEFINE_PUBLIC_ALIAS(wcsftime, libc_wcsftime);
-DEFINE_PUBLIC_ALIAS(DOS$wcstok, libd_wcstok);
+DEFINE_PUBLIC_ALIAS(DOS$wcstok_s, libd_wcstok_s);
 DEFINE_PUBLIC_ALIAS(wcstok, libc_wcstok);
 DEFINE_PUBLIC_ALIAS(DOS$wcslen, libd_wcslen);
 DEFINE_PUBLIC_ALIAS(wcslen, libc_wcslen);
