@@ -34,17 +34,17 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:openpty,hash:CRC-32=0xa48d70d7]]]*/
+/*[[[head:libc_openpty,hash:CRC-32=0x874698f6]]]*/
 /* Create pseudo tty master slave pair with NAME and set terminal
  * attributes according to TERMP and WINP and return handles for
  * both ends in AMASTER and ASLAVE */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.openpty") int
+INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_openpty)(fd_t *amaster,
                                    fd_t *aslave,
                                    char *name,
                                    struct termios const *termp,
                                    struct winsize const *winp)
-/*[[[body:openpty]]]*/
+/*[[[body:libc_openpty]]]*/
 {
 	errno_t result;
 	result = sys_openpty(amaster,
@@ -54,17 +54,17 @@ NOTHROW_NCX(LIBCCALL libc_openpty)(fd_t *amaster,
 	                     winp);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:openpty]]]*/
+/*[[[end:libc_openpty]]]*/
 
-/*[[[head:forkpty,hash:CRC-32=0x1448b4e5]]]*/
+/*[[[head:libc_forkpty,hash:CRC-32=0xc29add38]]]*/
 /* Create child process and establish the slave pseudo
  * terminal as the child's controlling terminal */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.forkpty") pid_t
+INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1, 2)) pid_t
 NOTHROW_NCX(LIBCCALL libc_forkpty)(fd_t *amaster,
                                    char *name,
                                    struct termios const *termp,
                                    struct winsize const *winp)
-/*[[[body:forkpty]]]*/
+/*[[[body:libc_forkpty]]]*/
 {
 	int error, master, slave;
 	pid_t pid;
@@ -89,15 +89,15 @@ NOTHROW_NCX(LIBCCALL libc_forkpty)(fd_t *amaster,
 	close(slave);
 	return pid;
 }
-/*[[[end:forkpty]]]*/
+/*[[[end:libc_forkpty]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x396159a5]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(openpty, libc_openpty);
-DEFINE_PUBLIC_WEAK_ALIAS(forkpty, libc_forkpty);
+/*[[[start:exports,hash:CRC-32=0xfab8961d]]]*/
+DEFINE_PUBLIC_ALIAS(openpty, libc_openpty);
+DEFINE_PUBLIC_ALIAS(forkpty, libc_forkpty);
 /*[[[end:exports]]]*/
 
 DECL_END

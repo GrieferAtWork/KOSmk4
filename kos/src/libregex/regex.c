@@ -981,7 +981,7 @@ do_match_lparen_escaped:
 				if unlikely(!match.mc_min) {
 					/* Don't allow optional matches, which would mean that the entire lookahead
 					 * was optional in itself. And considering that it's not meant to consume any
-					 * data, it would become a no-op alltogether! */
+					 * data, it would become a no-op altogether! */
 err_lookahead_must_be_nonzero:
 					if (data->flags & REGEX_FLAG_IGNORE_NOOP_PATTERNS)
 						goto next;

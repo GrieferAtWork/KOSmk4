@@ -479,12 +479,11 @@ NOTHROW_RPC(LIBCCALL libc_dos_stat64)(char const *__restrict filename,
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:mkdir,hash:CRC-32=0x6f2a9192]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.mkdir") int
+/*[[[head:libc_mkdir,hash:CRC-32=0xd15b9301]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_mkdir)(char const *pathname,
                                  mode_t mode)
-/*[[[body:mkdir]]]*/
+/*[[[body:libc_mkdir]]]*/
 {
 	errno_t result;
 	result = sys_mkdirat(AT_FDCWD,
@@ -492,14 +491,13 @@ NOTHROW_RPC(LIBCCALL libc_mkdir)(char const *pathname,
 	                     mode);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:mkdir]]]*/
+/*[[[end:libc_mkdir]]]*/
 
-/*[[[head:chmod,hash:CRC-32=0xd584609d]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.chmod") int
+/*[[[head:libc_chmod,hash:CRC-32=0x4c77b6a9]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_chmod)(char const *filename,
                                  mode_t mode)
-/*[[[body:chmod]]]*/
+/*[[[body:libc_chmod]]]*/
 {
 	errno_t result;
 	result = sys_fchmodat(AT_FDCWD,
@@ -508,17 +506,16 @@ NOTHROW_RPC(LIBCCALL libc_chmod)(char const *filename,
 	                      0);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:chmod]]]*/
+/*[[[end:libc_chmod]]]*/
 DEFINE_INTERN_ALIAS(libc__chmod, libc_chmod);
 DEFINE_PUBLIC_WEAK_ALIAS(_chmod, libc__chmod);
 
 
-/*[[[head:lchmod,hash:CRC-32=0x6b42d38f]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.lchmod") int
+/*[[[head:libc_lchmod,hash:CRC-32=0xda2c7e30]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_lchmod)(char const *filename,
                                   mode_t mode)
-/*[[[body:lchmod]]]*/
+/*[[[body:libc_lchmod]]]*/
 {
 	errno_t result;
 	result = sys_fchmodat(AT_FDCWD,
@@ -527,40 +524,39 @@ NOTHROW_RPC(LIBCCALL libc_lchmod)(char const *filename,
 	                      AT_SYMLINK_NOFOLLOW);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:lchmod]]]*/
+/*[[[end:libc_lchmod]]]*/
 
-/*[[[head:umask,hash:CRC-32=0xf001d99b]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.basic_property.umask") mode_t
+/*[[[head:libc_umask,hash:CRC-32=0xe4c0afb5]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.basic_property") mode_t
 NOTHROW_NCX(LIBCCALL libc_umask)(mode_t mode)
-/*[[[body:umask]]]*/
+/*[[[body:libc_umask]]]*/
 {
 	return sys_umask(mode);
 }
-/*[[[end:umask]]]*/
+/*[[[end:libc_umask]]]*/
 
-/*[[[head:getumask,hash:CRC-32=0x16105000]]]*/
+/*[[[head:libc_getumask,hash:CRC-32=0x7bc9cea4]]]*/
 /* Return the current umask.
  * WARNING: This function isn't thread-safe */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.basic_property.getumask") mode_t
+INTERN ATTR_SECTION(".text.crt.fs.basic_property") mode_t
 NOTHROW_NCX(LIBCCALL libc_getumask)(void)
-/*[[[body:getumask]]]*/
+/*[[[body:libc_getumask]]]*/
 {
 	mode_t result;
 	result = sys_umask(0);
 	sys_umask(result);
 	return result;
 }
-/*[[[end:getumask]]]*/
+/*[[[end:libc_getumask]]]*/
 
-/*[[[head:fmkdirat,hash:CRC-32=0x171a590c]]]*/
-/* @param flags: Set of `0|AT_DOSPATH' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.fmkdirat") int
+/*[[[head:libc_fmkdirat,hash:CRC-32=0xec4900f0]]]*/
+/* @param flags: Set of `0 | AT_DOSPATH' */
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_fmkdirat)(fd_t dirfd,
                                     char const *pathname,
                                     mode_t mode,
                                     atflag_t flags)
-/*[[[body:fmkdirat]]]*/
+/*[[[body:libc_fmkdirat]]]*/
 {
 	errno_t result;
 	result = sys_fmkdirat(dirfd,
@@ -569,18 +565,17 @@ NOTHROW_RPC(LIBCCALL libc_fmkdirat)(fd_t dirfd,
 	                      flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:fmkdirat]]]*/
+/*[[[end:libc_fmkdirat]]]*/
 
-/*[[[head:fmknodat,hash:CRC-32=0x1b55cfa2]]]*/
-/* @param flags: Set of `0|AT_DOSPATH' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.fmknodat") int
+/*[[[head:libc_fmknodat,hash:CRC-32=0x8b2fc75b]]]*/
+/* @param flags: Set of `0 | AT_DOSPATH' */
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_fmknodat)(fd_t dirfd,
                                     char const *nodename,
                                     mode_t mode,
                                     dev_t dev,
                                     atflag_t flags)
-/*[[[body:fmknodat]]]*/
+/*[[[body:libc_fmknodat]]]*/
 {
 	errno_t result;
 	result = sys_fmknodat(dirfd,
@@ -590,28 +585,26 @@ NOTHROW_RPC(LIBCCALL libc_fmknodat)(fd_t dirfd,
 	                      flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:fmknodat]]]*/
+/*[[[end:libc_fmknodat]]]*/
 
-/*[[[head:mkfifo,hash:CRC-32=0xe709c355]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.mkfifo") int
+/*[[[head:libc_mkfifo,hash:CRC-32=0x8e4cb40e]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_mkfifo)(char const *fifoname,
                                   mode_t mode)
-/*[[[body:mkfifo]]]*/
+/*[[[body:libc_mkfifo]]]*/
 {
 	return mknod(fifoname, S_IFIFO | mode, 0);
 }
-/*[[[end:mkfifo]]]*/
+/*[[[end:libc_mkfifo]]]*/
 
-/*[[[head:fchmodat,hash:CRC-32=0x27f8f28b]]]*/
+/*[[[head:libc_fchmodat,hash:CRC-32=0x11161263]]]*/
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.fchmodat") int
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_fchmodat)(fd_t dirfd,
                                     char const *filename,
                                     mode_t mode,
                                     atflag_t flags)
-/*[[[body:fchmodat]]]*/
+/*[[[body:libc_fchmodat]]]*/
 {
 	errno_t result;
 	result = sys_fchmodat(dirfd,
@@ -620,15 +613,14 @@ NOTHROW_RPC(LIBCCALL libc_fchmodat)(fd_t dirfd,
 	                      flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:fchmodat]]]*/
+/*[[[end:libc_fchmodat]]]*/
 
-/*[[[head:mkdirat,hash:CRC-32=0x9a1e59ff]]]*/
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.mkdirat") int
+/*[[[head:libc_mkdirat,hash:CRC-32=0x7210f157]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_mkdirat)(fd_t dirfd,
                                    char const *pathname,
                                    mode_t mode)
-/*[[[body:mkdirat]]]*/
+/*[[[body:libc_mkdirat]]]*/
 {
 	errno_t result;
 	result = sys_mkdirat(dirfd,
@@ -636,40 +628,38 @@ NOTHROW_RPC(LIBCCALL libc_mkdirat)(fd_t dirfd,
 	                     mode);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:mkdirat]]]*/
+/*[[[end:libc_mkdirat]]]*/
 
-/*[[[head:mkfifoat,hash:CRC-32=0x5fadfde]]]*/
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.mkfifoat") int
+/*[[[head:libc_mkfifoat,hash:CRC-32=0x3b7c88b7]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_mkfifoat)(fd_t dirfd,
                                     char const *fifoname,
                                     mode_t mode)
-/*[[[body:mkfifoat]]]*/
+/*[[[body:libc_mkfifoat]]]*/
 {
 	return mknodat(dirfd, fifoname, S_IFIFO | mode, 0);
 }
-/*[[[end:mkfifoat]]]*/
+/*[[[end:libc_mkfifoat]]]*/
 
-/*[[[head:fchmod,hash:CRC-32=0xc7b04afd]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.fchmod") int
+/*[[[head:libc_fchmod,hash:CRC-32=0x3cb37aa0]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.modify") int
 NOTHROW_RPC(LIBCCALL libc_fchmod)(fd_t fd,
                                   mode_t mode)
-/*[[[body:fchmod]]]*/
+/*[[[body:libc_fchmod]]]*/
 {
 	errno_t result;
 	result = sys_fchmod(fd,
 	                    mode);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:fchmod]]]*/
+/*[[[end:libc_fchmod]]]*/
 
-/*[[[head:mknod,hash:CRC-32=0x7ecd01ca]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.mknod") int
+/*[[[head:libc_mknod,hash:CRC-32=0x18d62bde]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_mknod)(char const *nodename,
                                  mode_t mode,
                                  dev_t dev)
-/*[[[body:mknod]]]*/
+/*[[[body:libc_mknod]]]*/
 {
 	errno_t result;
 	result = sys_mknodat(AT_FDCWD,
@@ -678,16 +668,15 @@ NOTHROW_RPC(LIBCCALL libc_mknod)(char const *nodename,
 	                     dev);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:mknod]]]*/
+/*[[[end:libc_mknod]]]*/
 
-/*[[[head:mknodat,hash:CRC-32=0xb168e1e7]]]*/
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.mknodat") int
+/*[[[head:libc_mknodat,hash:CRC-32=0xa16ab194]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_mknodat)(fd_t dirfd,
                                    char const *nodename,
                                    mode_t mode,
                                    dev_t dev)
-/*[[[body:mknodat]]]*/
+/*[[[body:libc_mknodat]]]*/
 {
 	errno_t result;
 	result = sys_mknodat(dirfd,
@@ -696,19 +685,18 @@ NOTHROW_RPC(LIBCCALL libc_mknodat)(fd_t dirfd,
 	                     dev);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:mknodat]]]*/
+/*[[[end:libc_mknodat]]]*/
 
 
 
-/*[[[head:utimensat,hash:CRC-32=0xba1bba02]]]*/
+/*[[[head:libc_utimensat,hash:CRC-32=0x29bcfaa9]]]*/
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.utimensat") int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_utimensat)(fd_t dirfd,
                                      char const *filename,
                                      struct timespec const times[2 /*or:3*/],
                                      atflag_t flags)
-/*[[[body:utimensat]]]*/
+/*[[[body:libc_utimensat]]]*/
 {
 	errno_t result;
 	result = sys_utimensat(dirfd,
@@ -717,20 +705,18 @@ NOTHROW_RPC(LIBCCALL libc_utimensat)(fd_t dirfd,
 	                       flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:utimensat]]]*/
+/*[[[end:libc_utimensat]]]*/
 
-/*[[[head:utimensat64,hash:CRC-32=0x37740ef2]]]*/
-/* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
+/*[[[head:libc_utimensat64,hash:CRC-32=0xcd992e3]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_utimensat64, libc_utimensat);
-#else
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.utimensat64") int
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_utimensat64)(fd_t dirfd,
                                        char const *filename,
                                        struct timespec64 const times[2 /*or:3*/],
                                        atflag_t flags)
-/*[[[body:utimensat64]]]*/
+/*[[[body:libc_utimensat64]]]*/
 {
 	errno_t result;
 	result = sys_utimensat64(dirfd,
@@ -740,13 +726,13 @@ NOTHROW_RPC(LIBCCALL libc_utimensat64)(fd_t dirfd,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:utimensat64]]]*/
+/*[[[end:libc_utimensat64]]]*/
 
-/*[[[head:futimens,hash:CRC-32=0x6d60548c]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.futimens") int
+/*[[[head:libc_futimens,hash:CRC-32=0x21c4a0c1]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") int
 NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd,
                                     struct timespec const times[2 /*or:3*/])
-/*[[[body:futimens]]]*/
+/*[[[body:libc_futimens]]]*/
 {
 	errno_t result;
 	result = sys_utimensat(fd,
@@ -755,16 +741,16 @@ NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd,
 	                       0);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futimens]]]*/
+/*[[[end:libc_futimens]]]*/
 
-/*[[[head:futimens64,hash:CRC-32=0x59e96fe3]]]*/
+/*[[[head:libc_futimens64,hash:CRC-32=0x727ddb86]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimens64, libc_futimens);
-#else
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.futimens64") int
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") int
 NOTHROW_RPC(LIBCCALL libc_futimens64)(fd_t fd,
                                       struct timespec64 const times[2 /*or:3*/])
-/*[[[body:futimens64]]]*/
+/*[[[body:libc_futimens64]]]*/
 {
 	errno_t result;
 	result = sys_utimensat64(fd,
@@ -774,19 +760,18 @@ NOTHROW_RPC(LIBCCALL libc_futimens64)(fd_t fd,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futimens64]]]*/
+/*[[[end:libc_futimens64]]]*/
 
-/*[[[impl:_wstat64i32]]]*/
-/*[[[impl:DOS$_wstat64i32]]]*/
+/*[[[impl:libc__wstat64i32]]]*/
+/*[[[impl:libd__wstat64i32]]]*/
 DEFINE_INTERN_ALIAS(libc__wstat64i32, libc__wstat64);
 DEFINE_INTERN_ALIAS(libd__wstat64i32, libd__wstat64);
 
-/*[[[head:_wstat64,hash:CRC-32=0x7ea9427]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat64") int
-NOTHROW_NCX(LIBCCALL libc__wstat64)(char32_t const *filename,
+/*[[[head:libc__wstat64,hash:CRC-32=0x2b12ba1e]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.stat") NONNULL((1, 2)) int
+NOTHROW_NCX(LIBKCALL libc__wstat64)(char32_t const *filename,
                                     struct __dos_stat64 *buf)
-/*[[[body:_wstat64]]]*/
+/*[[[body:libc__wstat64]]]*/
 {
 	int result = -1;
 	char *used_filename;
@@ -797,14 +782,13 @@ NOTHROW_NCX(LIBCCALL libc__wstat64)(char32_t const *filename,
 	}
 	return result;
 }
-/*[[[end:_wstat64]]]*/
+/*[[[end:libc__wstat64]]]*/
 
-/*[[[head:DOS$_wstat64,hash:CRC-32=0x1bff22b]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat64") int
+/*[[[head:libd__wstat64,hash:CRC-32=0xc9955cda]]]*/
+INTERN NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd__wstat64)(char16_t const *filename,
                                     struct __dos_stat64 *buf)
-/*[[[body:DOS$_wstat64]]]*/
+/*[[[body:libd__wstat64]]]*/
 {
 	int result = -1;
 	char *used_filename;
@@ -815,14 +799,13 @@ NOTHROW_NCX(LIBDCALL libd__wstat64)(char16_t const *filename,
 	}
 	return result;
 }
-/*[[[end:DOS$_wstat64]]]*/
+/*[[[end:libd__wstat64]]]*/
 
-/*[[[head:_wstat32i64,hash:CRC-32=0x1f9a0df]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat32i64") int
-NOTHROW_NCX(LIBCCALL libc__wstat32i64)(char32_t const *filename,
+/*[[[head:libc__wstat32i64,hash:CRC-32=0x9e88dcc0]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.stat") NONNULL((1, 2)) int
+NOTHROW_NCX(LIBKCALL libc__wstat32i64)(char32_t const *filename,
                                        struct __dos_stat32i64 *buf)
-/*[[[body:_wstat32i64]]]*/
+/*[[[body:libc__wstat32i64]]]*/
 {
 	int result = -1;
 	char *used_filename;
@@ -833,14 +816,13 @@ NOTHROW_NCX(LIBCCALL libc__wstat32i64)(char32_t const *filename,
 	}
 	return result;
 }
-/*[[[end:_wstat32i64]]]*/
+/*[[[end:libc__wstat32i64]]]*/
 
-/*[[[head:DOS$_wstat32i64,hash:CRC-32=0x8d52c647]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat32i64") int
+/*[[[head:libd__wstat32i64,hash:CRC-32=0x9d2aacbf]]]*/
+INTERN NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd__wstat32i64)(char16_t const *filename,
                                        struct __dos_stat32i64 *buf)
-/*[[[body:DOS$_wstat32i64]]]*/
+/*[[[body:libd__wstat32i64]]]*/
 {
 	int result = -1;
 	char *used_filename;
@@ -851,14 +833,13 @@ NOTHROW_NCX(LIBDCALL libd__wstat32i64)(char16_t const *filename,
 	}
 	return result;
 }
-/*[[[end:DOS$_wstat32i64]]]*/
+/*[[[end:libd__wstat32i64]]]*/
 
-/*[[[head:_wstat32,hash:CRC-32=0xba2e88ba]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat32") int
-NOTHROW_NCX(LIBCCALL libc__wstat32)(char32_t const *filename,
+/*[[[head:libc__wstat32,hash:CRC-32=0x1bdc2abc]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.stat") NONNULL((1, 2)) int
+NOTHROW_NCX(LIBKCALL libc__wstat32)(char32_t const *filename,
                                     struct __dos_stat32 *buf)
-/*[[[body:_wstat32]]]*/
+/*[[[body:libc__wstat32]]]*/
 {
 	int result = -1;
 	char *used_filename;
@@ -869,14 +850,13 @@ NOTHROW_NCX(LIBCCALL libc__wstat32)(char32_t const *filename,
 	}
 	return result;
 }
-/*[[[end:_wstat32]]]*/
+/*[[[end:libc__wstat32]]]*/
 
-/*[[[head:DOS$_wstat32,hash:CRC-32=0xbc7beeb6]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat32") int
+/*[[[head:libd__wstat32,hash:CRC-32=0xf95bcc78]]]*/
+INTERN NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
                                     struct __dos_stat32 *buf)
-/*[[[body:DOS$_wstat32]]]*/
+/*[[[body:libd__wstat32]]]*/
 {
 	int result = -1;
 	char *used_filename;
@@ -887,41 +867,41 @@ NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
 	}
 	return result;
 }
-/*[[[end:DOS$_wstat32]]]*/
+/*[[[end:libd__wstat32]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4b7e23c]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(mkdir, libc_mkdir);
-DEFINE_PUBLIC_WEAK_ALIAS(chmod, libc_chmod);
-DEFINE_PUBLIC_WEAK_ALIAS(_chmod, libc_chmod);
-DEFINE_PUBLIC_WEAK_ALIAS(lchmod, libc_lchmod);
-DEFINE_PUBLIC_WEAK_ALIAS(umask, libc_umask);
-DEFINE_PUBLIC_WEAK_ALIAS(_umask, libc_umask);
-DEFINE_PUBLIC_WEAK_ALIAS(getumask, libc_getumask);
-DEFINE_PUBLIC_WEAK_ALIAS(fmkdirat, libc_fmkdirat);
-DEFINE_PUBLIC_WEAK_ALIAS(fmknodat, libc_fmknodat);
-DEFINE_PUBLIC_WEAK_ALIAS(mkfifo, libc_mkfifo);
-DEFINE_PUBLIC_WEAK_ALIAS(fchmodat, libc_fchmodat);
-DEFINE_PUBLIC_WEAK_ALIAS(mkdirat, libc_mkdirat);
-DEFINE_PUBLIC_WEAK_ALIAS(mkfifoat, libc_mkfifoat);
-DEFINE_PUBLIC_WEAK_ALIAS(fchmod, libc_fchmod);
-DEFINE_PUBLIC_WEAK_ALIAS(mknod, libc_mknod);
-DEFINE_PUBLIC_WEAK_ALIAS(mknodat, libc_mknodat);
-DEFINE_PUBLIC_WEAK_ALIAS(utimensat, libc_utimensat);
-DEFINE_PUBLIC_WEAK_ALIAS(utimensat64, libc_utimensat64);
-DEFINE_PUBLIC_WEAK_ALIAS(futimens, libc_futimens);
-DEFINE_PUBLIC_WEAK_ALIAS(futimens64, libc_futimens64);
-DEFINE_PUBLIC_WEAK_ALIAS(_wstat32, libc__wstat32);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wstat32, libd__wstat32);
-DEFINE_PUBLIC_WEAK_ALIAS(_wstat64, libc__wstat64);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wstat64, libd__wstat64);
-DEFINE_PUBLIC_WEAK_ALIAS(_wstat32i64, libc__wstat32i64);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wstat32i64, libd__wstat32i64);
-DEFINE_PUBLIC_WEAK_ALIAS(_wstat64i32, libc__wstat64i32);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wstat64i32, libd__wstat64i32);
+/*[[[start:exports,hash:CRC-32=0x4107dd50]]]*/
+DEFINE_PUBLIC_ALIAS(mkdir, libc_mkdir);
+DEFINE_PUBLIC_ALIAS(_chmod, libc_chmod);
+DEFINE_PUBLIC_ALIAS(chmod, libc_chmod);
+DEFINE_PUBLIC_ALIAS(lchmod, libc_lchmod);
+DEFINE_PUBLIC_ALIAS(_umask, libc_umask);
+DEFINE_PUBLIC_ALIAS(umask, libc_umask);
+DEFINE_PUBLIC_ALIAS(getumask, libc_getumask);
+DEFINE_PUBLIC_ALIAS(fmkdirat, libc_fmkdirat);
+DEFINE_PUBLIC_ALIAS(fmknodat, libc_fmknodat);
+DEFINE_PUBLIC_ALIAS(mkfifo, libc_mkfifo);
+DEFINE_PUBLIC_ALIAS(fchmodat, libc_fchmodat);
+DEFINE_PUBLIC_ALIAS(mkdirat, libc_mkdirat);
+DEFINE_PUBLIC_ALIAS(mkfifoat, libc_mkfifoat);
+DEFINE_PUBLIC_ALIAS(fchmod, libc_fchmod);
+DEFINE_PUBLIC_ALIAS(mknod, libc_mknod);
+DEFINE_PUBLIC_ALIAS(mknodat, libc_mknodat);
+DEFINE_PUBLIC_ALIAS(utimensat, libc_utimensat);
+DEFINE_PUBLIC_ALIAS(utimensat64, libc_utimensat64);
+DEFINE_PUBLIC_ALIAS(futimens, libc_futimens);
+DEFINE_PUBLIC_ALIAS(futimens64, libc_futimens64);
+DEFINE_PUBLIC_ALIAS(DOS$_wstat32, libd__wstat32);
+DEFINE_PUBLIC_ALIAS(_wstat32, libc__wstat32);
+DEFINE_PUBLIC_ALIAS(DOS$_wstat64, libd__wstat64);
+DEFINE_PUBLIC_ALIAS(_wstat64, libc__wstat64);
+DEFINE_PUBLIC_ALIAS(DOS$_wstat32i64, libd__wstat32i64);
+DEFINE_PUBLIC_ALIAS(_wstat32i64, libc__wstat32i64);
+DEFINE_PUBLIC_ALIAS(DOS$_wstat64i32, libd__wstat64i32);
+DEFINE_PUBLIC_ALIAS(_wstat64i32, libc__wstat64i32);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -28,120 +28,95 @@
 DECL_BEGIN
 
 
-
-
-
-/*[[[start:implementation]]]*/
-
-/*[[[head:FUtimens,hash:CRC-32=0xd2903bd5]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify_time.FUtimens") void
+/*[[[head:libc_FUtimens,hash:CRC-32=0x590d9e41]]]*/
+INTERN ATTR_SECTION(".text.crt.except.fs.modify_time") void
 (LIBCCALL libc_FUtimens)(fd_t fd,
-                         struct timespec const times[2 /*or:3*/])
-		__THROWS(...)
-/*[[[body:FUtimens]]]*/
+                         struct timespec const times[2 /*or:3*/]) THROWS(...)
+/*[[[body:libc_FUtimens]]]*/
 {
 	sys_Xutimensat(fd, NULL, times, 0);
 }
-/*[[[end:FUtimens]]]*/
+/*[[[end:libc_FUtimens]]]*/
 
-/*[[[head:FUtimens64,hash:CRC-32=0x3ad01c9b]]]*/
+/*[[[head:libc_FUtimens64,hash:CRC-32=0xe66decc3]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_FUtimens64, libc_FUtimens);
-#else
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify_time.FUtimens64") void
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.except.fs.modify_time") void
 (LIBCCALL libc_FUtimens64)(fd_t fd,
-                           struct timespec64 const times[2 /*or:3*/])
-		__THROWS(...)
-/*[[[body:FUtimens64]]]*/
+                           struct timespec64 const times[2 /*or:3*/]) THROWS(...)
+/*[[[body:libc_FUtimens64]]]*/
 {
 	sys_Xutimensat64(fd, NULL, times, 0);
 }
 #endif /* MAGIC:alias */
-/*[[[end:FUtimens64]]]*/
+/*[[[end:libc_FUtimens64]]]*/
 
-/*[[[head:Mknod,hash:CRC-32=0x3ee0713a]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify.Mknod") void
+/*[[[head:libc_Mknod,hash:CRC-32=0xcc8c53fa]]]*/
+INTERN ATTR_SECTION(".text.crt.except.fs.modify") NONNULL((1)) void
 (LIBCCALL libc_Mknod)(char const *nodename,
                       mode_t mode,
-                      dev_t dev)
-		__THROWS(...)
-/*[[[body:Mknod]]]*/
+                      dev_t dev) THROWS(...)
+/*[[[body:libc_Mknod]]]*/
 {
 	sys_Xmknodat(AT_FDCWD,
 	             nodename,
 	             mode,
 	             dev);
 }
-/*[[[end:Mknod]]]*/
+/*[[[end:libc_Mknod]]]*/
 
-/*[[[head:Mkfifo,hash:CRC-32=0x466f3d3]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify.Mkfifo") void
+/*[[[head:libc_Mkfifo,hash:CRC-32=0x7144ebeb]]]*/
+INTERN ATTR_SECTION(".text.crt.except.fs.modify") NONNULL((1)) void
 (LIBCCALL libc_Mkfifo)(char const *fifoname,
-                       mode_t mode)
-		__THROWS(...)
-/*[[[body:Mkfifo]]]*/
+                       mode_t mode) THROWS(...)
+/*[[[body:libc_Mkfifo]]]*/
 {
 	return Mknod(fifoname, S_IFIFO | mode, 0);
 }
-/*[[[end:Mkfifo]]]*/
+/*[[[end:libc_Mkfifo]]]*/
 
-/*[[[head:MkfifoAt,hash:CRC-32=0x3cf621d1]]]*/
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify.MkfifoAt") void
+/*[[[head:libc_MkfifoAt,hash:CRC-32=0x8e7f5a6f]]]*/
+INTERN ATTR_SECTION(".text.crt.except.fs.modify") NONNULL((2)) void
 (LIBCCALL libc_MkfifoAt)(fd_t dirfd,
                          char const *fifoname,
-                         mode_t mode)
-		__THROWS(...)
-/*[[[body:MkfifoAt]]]*/
+                         mode_t mode) THROWS(...)
+/*[[[body:libc_MkfifoAt]]]*/
 {
 	return MknodAt(dirfd, fifoname, S_IFIFO | mode, 0);
 }
-/*[[[end:MkfifoAt]]]*/
+/*[[[end:libc_MkfifoAt]]]*/
 
-/*[[[skip:Stat]]]*/
-/*[[[skip:FStat]]]*/
-/*[[[skip:LStat]]]*/
-/*[[[skip:FStatAt]]]*/
-/*[[[skip:Stat64]]]*/
-/*[[[skip:FStat64]]]*/
-/*[[[skip:LStat64]]]*/
-/*[[[skip:FStatAt64]]]*/
-/*[[[skip:Chmod]]]*/
-/*[[[skip:FChmodAt]]]*/
-/*[[[skip:FChmod]]]*/
-/*[[[skip:UTimensAt]]]*/
-/*[[[skip:UTimensAt64]]]*/
-/*[[[skip:Mkdir]]]*/
-/*[[[skip:FMkdirAt]]]*/
-/*[[[skip:FMknodAt]]]*/
-/*[[[skip:MkdirAt]]]*/
-/*[[[skip:MknodAt]]]*/
-
-/*[[[head:LChmod,hash:CRC-32=0x862ce55e]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify.LChmod") void
+/*[[[head:libc_LChmod,hash:CRC-32=0x3add021d]]]*/
+INTERN ATTR_SECTION(".text.crt.except.fs.modify") NONNULL((1)) void
 (LIBCCALL libc_LChmod)(char const *filename,
-                       mode_t mode)
-		__THROWS(...)
-/*[[[body:LChmod]]]*/
+                       mode_t mode) THROWS(...)
+/*[[[body:libc_LChmod]]]*/
 {
 	sys_Xfchmodat(AT_FDCWD, filename, mode, AT_SYMLINK_NOFOLLOW);
 }
-/*[[[end:LChmod]]]*/
+/*[[[end:libc_LChmod]]]*/
 
-/*[[[end:implementation]]]*/
+/*[[[skip:libc_Chmod]]]*/
+/*[[[skip:libc_FChmodAt]]]*/
+/*[[[skip:libc_FChmod]]]*/
+/*[[[skip:libc_UTimensAt]]]*/
+/*[[[skip:libc_UTimensAt64]]]*/
+/*[[[skip:libc_Mkdir]]]*/
+/*[[[skip:libc_FMkdirAt]]]*/
+/*[[[skip:libc_FMknodAt]]]*/
+/*[[[skip:libc_MkdirAt]]]*/
+/*[[[skip:libc_MknodAt]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa5ff7617]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(LChmod, libc_LChmod);
-DEFINE_PUBLIC_WEAK_ALIAS(Mkfifo, libc_Mkfifo);
-DEFINE_PUBLIC_WEAK_ALIAS(MkfifoAt, libc_MkfifoAt);
-DEFINE_PUBLIC_WEAK_ALIAS(Mknod, libc_Mknod);
-DEFINE_PUBLIC_WEAK_ALIAS(FUtimens, libc_FUtimens);
-DEFINE_PUBLIC_WEAK_ALIAS(FUtimens64, libc_FUtimens64);
+/*[[[start:exports,hash:CRC-32=0x42790cdf]]]*/
+DEFINE_PUBLIC_ALIAS(LChmod, libc_LChmod);
+DEFINE_PUBLIC_ALIAS(Mkfifo, libc_Mkfifo);
+DEFINE_PUBLIC_ALIAS(MkfifoAt, libc_MkfifoAt);
+DEFINE_PUBLIC_ALIAS(Mknod, libc_Mknod);
+DEFINE_PUBLIC_ALIAS(FUtimens, libc_FUtimens);
+DEFINE_PUBLIC_ALIAS(FUtimens64, libc_FUtimens64);
 /*[[[end:exports]]]*/
 
 DECL_END

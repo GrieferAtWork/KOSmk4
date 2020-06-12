@@ -310,17 +310,16 @@ err_nomem:
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:pthread_create,hash:CRC-32=0x4cd3ccdf]]]*/
+/*[[[head:libc_pthread_create,hash:CRC-32=0x70339ff2]]]*/
 /* Create a new thread, starting with execution of START-ROUTINE
  * getting passed ARG. Creation attributed come from ATTR. The new
  * handle is stored in *NEWTHREAD */
-INTERN NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_create") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 3)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_create)(pthread_t *__restrict newthread,
                                           pthread_attr_t const *__restrict attr,
                                           __pthread_start_routine_t start_routine,
                                           void *__restrict arg)
-/*[[[body:pthread_create]]]*/
+/*[[[body:libc_pthread_create]]]*/
 {
 	int result;
 	if (attr) {
@@ -335,15 +334,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_create)(pthread_t *__restrict newthread,
 	}
 	return result;
 }
-/*[[[end:pthread_create]]]*/
+/*[[[end:libc_pthread_create]]]*/
 
-/*[[[head:pthread_exit,hash:CRC-32=0xb210153e]]]*/
+/*[[[head:libc_pthread_exit,hash:CRC-32=0x67ca671f]]]*/
 /* Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-INTERN ATTR_NORETURN
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_exit") void
-(LIBCCALL libc_pthread_exit)(void *retval)
-/*[[[body:pthread_exit]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_NORETURN void
+(LIBCCALL libc_pthread_exit)(void *retval) THROWS(...)
+/*[[[body:libc_pthread_exit]]]*/
 {
 	__REF struct pthread *me = pthread_self_p;
 	if (me) {
@@ -355,16 +353,16 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_exit") void
 	 * To terminate the calling process, you'd have to call `sys_exit_group()'! */
 	sys_exit(0);
 }
-/*[[[end:pthread_exit]]]*/
+/*[[[end:libc_pthread_exit]]]*/
 
-/*[[[head:pthread_join,hash:CRC-32=0xdf1ee89f]]]*/
+/*[[[head:libc_pthread_join,hash:CRC-32=0xaf9aa8f1]]]*/
 /* Make calling thread wait for termination of the thread THREAD. The
  * exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
  * is not NULL */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_join") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_RPC(LIBCCALL libc_pthread_join)(pthread_t pthread,
                                         void **thread_return)
-/*[[[body:pthread_join]]]*/
+/*[[[body:libc_pthread_join]]]*/
 {
 	int result;
 	result = libc_pthread_timedjoin_np(pthread,
@@ -372,15 +370,15 @@ NOTHROW_RPC(LIBCCALL libc_pthread_join)(pthread_t pthread,
 	                                   NULL);
 	return result;
 }
-/*[[[end:pthread_join]]]*/
+/*[[[end:libc_pthread_join]]]*/
 
-/*[[[head:pthread_tryjoin_np,hash:CRC-32=0x688a98be]]]*/
+/*[[[head:libc_pthread_tryjoin_np,hash:CRC-32=0x8b3d02d6]]]*/
 /* Check whether thread THREAD has terminated. If yes return the status of
  * the thread in *THREAD_RETURN, if THREAD_RETURN is not NULL */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_tryjoin_np") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_tryjoin_np)(pthread_t pthread,
                                               void **thread_return)
-/*[[[body:pthread_tryjoin_np]]]*/
+/*[[[body:libc_pthread_tryjoin_np]]]*/
 {
 	struct pthread *pt = (struct pthread *)pthread;
 	if (ATOMIC_READ(pt->pt_tid) == 0) {
@@ -394,17 +392,17 @@ NOTHROW_NCX(LIBCCALL libc_pthread_tryjoin_np)(pthread_t pthread,
 		return EDEADLK;
 	return EBUSY;
 }
-/*[[[end:pthread_tryjoin_np]]]*/
+/*[[[end:libc_pthread_tryjoin_np]]]*/
 
-/*[[[head:pthread_timedjoin_np,hash:CRC-32=0x2795182]]]*/
+/*[[[head:libc_pthread_timedjoin_np,hash:CRC-32=0x1f6734b6]]]*/
 /* Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_timedjoin_np") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t pthread,
                                                 void **thread_return,
                                                 struct timespec const *abstime)
-/*[[[body:pthread_timedjoin_np]]]*/
+/*[[[body:libc_pthread_timedjoin_np]]]*/
 {
 	struct pthread *pt = (struct pthread *)pthread;
 	for (;;) {
@@ -429,15 +427,15 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t pthread,
 		destroy(pt);
 	return EOK;
 }
-/*[[[end:pthread_timedjoin_np]]]*/
+/*[[[end:libc_pthread_timedjoin_np]]]*/
 
-/*[[[head:pthread_detach,hash:CRC-32=0x3e01c1ba]]]*/
+/*[[[head:libc_pthread_detach,hash:CRC-32=0x97439529]]]*/
 /* Indicate that the thread THREAD is never to be joined with PTHREAD_JOIN.
  * The resources of THREAD will therefore be freed immediately when it
  * terminates, instead of waiting for another thread to perform PTHREAD_JOIN on it */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_detach") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread)
-/*[[[body:pthread_detach]]]*/
+/*[[[body:libc_pthread_detach]]]*/
 {
 	struct pthread *pt;
 	refcnt_t refcnt;
@@ -470,14 +468,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread)
 	}
 	return EOK;
 }
-/*[[[end:pthread_detach]]]*/
+/*[[[end:libc_pthread_detach]]]*/
 
-/*[[[head:pthread_self,hash:CRC-32=0xa7fca7a]]]*/
+/*[[[head:libc_pthread_self,hash:CRC-32=0xd8a2de59]]]*/
 /* Obtain the identifier of the current thread */
-INTERN ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_self") pthread_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST pthread_t
 NOTHROW_NCX(LIBCCALL libc_pthread_self)(void)
-/*[[[body:pthread_self]]]*/
+/*[[[body:libc_pthread_self]]]*/
 {
 	struct pthread *result;
 	result = pthread_self_p;
@@ -501,15 +498,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_self)(void)
 	}
 	return (pthread_t)result;
 }
-/*[[[end:pthread_self]]]*/
+/*[[[end:libc_pthread_self]]]*/
 
-/*[[[head:pthread_gettid_np,hash:CRC-32=0xd1a98be0]]]*/
+/*[[[head:libc_pthread_gettid_np,hash:CRC-32=0x66dcbc0f]]]*/
 /* Return the TID of the given `target_thread'
  * If the given `target_thread' has already terminated, 0 is returned */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_gettid_np") pid_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread)
-/*[[[body:pthread_gettid_np]]]*/
+/*[[[body:libc_pthread_gettid_np]]]*/
 {
 	pid_t result;
 	struct pthread *pt;
@@ -517,15 +513,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread)
 	result = pt->pt_tid;
 	return result;
 }
-/*[[[end:pthread_gettid_np]]]*/
+/*[[[end:libc_pthread_gettid_np]]]*/
 
-/*[[[head:pthread_attr_init,hash:CRC-32=0x4457033b]]]*/
+/*[[[head:libc_pthread_attr_init,hash:CRC-32=0xac3da8d5]]]*/
 /* Initialize thread attribute *ATTR with default attributes
  * (detachstate is PTHREAD_JOINABLE, scheduling policy is SCHED_OTHER, no user-provided stack) */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_init") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_init)(pthread_attr_t *attr)
-/*[[[body:pthread_attr_init]]]*/
+/*[[[body:libc_pthread_attr_init]]]*/
 {
 	struct pthread_attr *at;
 	memset(attr, '\0', __SIZEOF_PTHREAD_ATTR_T);
@@ -533,14 +528,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_init)(pthread_attr_t *attr)
 	at->pa_guardsize = getpagesize();
 	return EOK;
 }
-/*[[[end:pthread_attr_init]]]*/
+/*[[[end:libc_pthread_attr_init]]]*/
 
-/*[[[head:pthread_attr_destroy,hash:CRC-32=0xa7da020c]]]*/
+/*[[[head:libc_pthread_attr_destroy,hash:CRC-32=0xf4138810]]]*/
 /* Destroy thread attribute *ATTR */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_destroy") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_destroy)(pthread_attr_t *attr)
-/*[[[body:pthread_attr_destroy]]]*/
+/*[[[body:libc_pthread_attr_destroy]]]*/
 {
 	struct pthread_attr *at = (struct pthread_attr *)attr;
 	if likely(!(at->pa_flags & ATTR_FLAG_OLDATTR)) {
@@ -549,15 +543,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_destroy)(pthread_attr_t *attr)
 	}
 	return EOK;
 }
-/*[[[end:pthread_attr_destroy]]]*/
+/*[[[end:libc_pthread_attr_destroy]]]*/
 
-/*[[[head:pthread_attr_getdetachstate,hash:CRC-32=0x936b331e]]]*/
+/*[[[head:libc_pthread_attr_getdetachstate,hash:CRC-32=0x6eb268b7]]]*/
 /* Get detach state attribute */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_getdetachstate") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getdetachstate)(pthread_attr_t const *attr,
                                                        int *detachstate)
-/*[[[body:pthread_attr_getdetachstate]]]*/
+/*[[[body:libc_pthread_attr_getdetachstate]]]*/
 {
 	struct pthread_attr const *at;
 	at = (struct pthread_attr const *)attr;
@@ -566,15 +559,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getdetachstate)(pthread_attr_t const *att
 	                : PTHREAD_CREATE_JOINABLE);
 	return EOK;
 }
-/*[[[end:pthread_attr_getdetachstate]]]*/
+/*[[[end:libc_pthread_attr_getdetachstate]]]*/
 
-/*[[[head:pthread_attr_setdetachstate,hash:CRC-32=0x64e01565]]]*/
+/*[[[head:libc_pthread_attr_setdetachstate,hash:CRC-32=0x2d42f4ca]]]*/
 /* Set detach state attribute */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_setdetachstate") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setdetachstate)(pthread_attr_t *attr,
                                                        int detachstate)
-/*[[[body:pthread_attr_setdetachstate]]]*/
+/*[[[body:libc_pthread_attr_setdetachstate]]]*/
 {
 	struct pthread_attr *at;
 	at = (struct pthread_attr *)attr;
@@ -587,90 +579,84 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setdetachstate)(pthread_attr_t *attr,
 	}
 	return EOK;
 }
-/*[[[end:pthread_attr_setdetachstate]]]*/
+/*[[[end:libc_pthread_attr_setdetachstate]]]*/
 
-/*[[[head:pthread_attr_getguardsize,hash:CRC-32=0x847d7643]]]*/
+/*[[[head:libc_pthread_attr_getguardsize,hash:CRC-32=0xdc3b17b0]]]*/
 /* Get the size of the guard area created for stack overflow protection */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_getguardsize") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getguardsize)(pthread_attr_t const *attr,
                                                      size_t *guardsize)
-/*[[[body:pthread_attr_getguardsize]]]*/
+/*[[[body:libc_pthread_attr_getguardsize]]]*/
 {
 	struct pthread_attr const *at;
 	at = (struct pthread_attr const *)attr;
 	*guardsize = at->pa_guardsize;
 	return EOK;
 }
-/*[[[end:pthread_attr_getguardsize]]]*/
+/*[[[end:libc_pthread_attr_getguardsize]]]*/
 
-/*[[[head:pthread_attr_setguardsize,hash:CRC-32=0xfd0c25f1]]]*/
+/*[[[head:libc_pthread_attr_setguardsize,hash:CRC-32=0xa35e46db]]]*/
 /* Set the size of the guard area created for stack overflow protection */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_setguardsize") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setguardsize)(pthread_attr_t *attr,
                                                      size_t guardsize)
-/*[[[body:pthread_attr_setguardsize]]]*/
+/*[[[body:libc_pthread_attr_setguardsize]]]*/
 {
 	struct pthread_attr *at;
 	at = (struct pthread_attr *)attr;
 	at->pa_guardsize = guardsize;
 	return EOK;
 }
-/*[[[end:pthread_attr_setguardsize]]]*/
+/*[[[end:libc_pthread_attr_setguardsize]]]*/
 
-/*[[[head:pthread_attr_getschedparam,hash:CRC-32=0x847c208e]]]*/
+/*[[[head:libc_pthread_attr_getschedparam,hash:CRC-32=0x98cbb122]]]*/
 /* Return in *PARAM the scheduling parameters of *ATTR */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_getschedparam") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getschedparam)(pthread_attr_t const *__restrict attr,
                                                       struct sched_param *__restrict param)
-/*[[[body:pthread_attr_getschedparam]]]*/
+/*[[[body:libc_pthread_attr_getschedparam]]]*/
 {
 	struct pthread_attr const *at;
 	at = (struct pthread_attr const *)attr;
 	memcpy(param, &at->pa_schedparam, sizeof(struct sched_param));
 	return EOK;
 }
-/*[[[end:pthread_attr_getschedparam]]]*/
+/*[[[end:libc_pthread_attr_getschedparam]]]*/
 
-/*[[[head:pthread_attr_setschedparam,hash:CRC-32=0x93733b0f]]]*/
+/*[[[head:libc_pthread_attr_setschedparam,hash:CRC-32=0x8a656885]]]*/
 /* Set scheduling parameters (priority, etc) in *ATTR according to PARAM */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_setschedparam") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setschedparam)(pthread_attr_t *__restrict attr,
                                                       struct sched_param const *__restrict param)
-/*[[[body:pthread_attr_setschedparam]]]*/
+/*[[[body:libc_pthread_attr_setschedparam]]]*/
 {
 	struct pthread_attr *at;
 	at = (struct pthread_attr *)attr;
 	memcpy(&at->pa_schedparam, param, sizeof(struct sched_param));
 	return EOK;
 }
-/*[[[end:pthread_attr_setschedparam]]]*/
+/*[[[end:libc_pthread_attr_setschedparam]]]*/
 
-/*[[[head:pthread_attr_getschedpolicy,hash:CRC-32=0xc614d14f]]]*/
+/*[[[head:libc_pthread_attr_getschedpolicy,hash:CRC-32=0xb93356c1]]]*/
 /* Return in *POLICY the scheduling policy of *ATTR */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_getschedpolicy") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getschedpolicy)(pthread_attr_t const *__restrict attr,
                                                        int *__restrict policy)
-/*[[[body:pthread_attr_getschedpolicy]]]*/
+/*[[[body:libc_pthread_attr_getschedpolicy]]]*/
 {
 	struct pthread_attr const *at;
 	at = (struct pthread_attr const *)attr;
 	*policy = at->pa_schedpolicy;
 	return EOK;
 }
-/*[[[end:pthread_attr_getschedpolicy]]]*/
+/*[[[end:libc_pthread_attr_getschedpolicy]]]*/
 
-/*[[[head:pthread_attr_setschedpolicy,hash:CRC-32=0x523cfeab]]]*/
+/*[[[head:libc_pthread_attr_setschedpolicy,hash:CRC-32=0x5b094177]]]*/
 /* Set scheduling policy in *ATTR according to POLICY */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_setschedpolicy") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setschedpolicy)(pthread_attr_t *attr,
                                                        int policy)
-/*[[[body:pthread_attr_setschedpolicy]]]*/
+/*[[[body:libc_pthread_attr_setschedpolicy]]]*/
 {
 	struct pthread_attr *at;
 	at = (struct pthread_attr *)attr;
@@ -680,15 +666,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setschedpolicy)(pthread_attr_t *attr,
 	at->pa_flags |= ATTR_FLAG_POLICY_SET;
 	return EOK;
 }
-/*[[[end:pthread_attr_setschedpolicy]]]*/
+/*[[[end:libc_pthread_attr_setschedpolicy]]]*/
 
-/*[[[head:pthread_attr_getinheritsched,hash:CRC-32=0x113279fb]]]*/
+/*[[[head:libc_pthread_attr_getinheritsched,hash:CRC-32=0x2431029f]]]*/
 /* Return in *INHERIT the scheduling inheritance mode of *ATTR */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_getinheritsched") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getinheritsched)(pthread_attr_t const *__restrict attr,
                                                         int *__restrict inherit)
-/*[[[body:pthread_attr_getinheritsched]]]*/
+/*[[[body:libc_pthread_attr_getinheritsched]]]*/
 {
 	struct pthread_attr const *at;
 	at = (struct pthread_attr const *)attr;
@@ -697,15 +682,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getinheritsched)(pthread_attr_t const *__
 	            : PTHREAD_INHERIT_SCHED);
 	return EOK;
 }
-/*[[[end:pthread_attr_getinheritsched]]]*/
+/*[[[end:libc_pthread_attr_getinheritsched]]]*/
 
-/*[[[head:pthread_attr_setinheritsched,hash:CRC-32=0xe6b51997]]]*/
+/*[[[head:libc_pthread_attr_setinheritsched,hash:CRC-32=0x4c45341d]]]*/
 /* Set scheduling inheritance mode in *ATTR according to INHERIT */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_setinheritsched") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setinheritsched)(pthread_attr_t *attr,
                                                         int inherit)
-/*[[[body:pthread_attr_setinheritsched]]]*/
+/*[[[body:libc_pthread_attr_setinheritsched]]]*/
 {
 	struct pthread_attr *at;
 	at = (struct pthread_attr *)attr;
@@ -718,15 +702,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setinheritsched)(pthread_attr_t *attr,
 	}
 	return EOK;
 }
-/*[[[end:pthread_attr_setinheritsched]]]*/
+/*[[[end:libc_pthread_attr_setinheritsched]]]*/
 
-/*[[[head:pthread_attr_getscope,hash:CRC-32=0x408c3149]]]*/
+/*[[[head:libc_pthread_attr_getscope,hash:CRC-32=0x3d93077b]]]*/
 /* Return in *SCOPE the scheduling contention scope of *ATTR */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_getscope") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getscope)(pthread_attr_t const *__restrict attr,
                                                  int *__restrict scope)
-/*[[[body:pthread_attr_getscope]]]*/
+/*[[[body:libc_pthread_attr_getscope]]]*/
 {
 	struct pthread_attr *at;
 	at = (struct pthread_attr *)attr;
@@ -735,15 +718,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getscope)(pthread_attr_t const *__restric
 	          : PTHREAD_SCOPE_SYSTEM);
 	return EOK;
 }
-/*[[[end:pthread_attr_getscope]]]*/
+/*[[[end:libc_pthread_attr_getscope]]]*/
 
-/*[[[head:pthread_attr_setscope,hash:CRC-32=0x850f0151]]]*/
+/*[[[head:libc_pthread_attr_setscope,hash:CRC-32=0x98f5f599]]]*/
 /* Set scheduling contention scope in *ATTR according to SCOPE */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_setscope") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setscope)(pthread_attr_t *attr,
                                                  int scope)
-/*[[[body:pthread_attr_setscope]]]*/
+/*[[[body:libc_pthread_attr_setscope]]]*/
 {
 	struct pthread_attr *at;
 	at = (struct pthread_attr *)attr;
@@ -756,33 +738,31 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setscope)(pthread_attr_t *attr,
 	}
 	return EOK;
 }
-/*[[[end:pthread_attr_setscope]]]*/
+/*[[[end:libc_pthread_attr_setscope]]]*/
 
-/*[[[head:pthread_attr_getstackaddr,hash:CRC-32=0xcbcc5389]]]*/
+/*[[[head:libc_pthread_attr_getstackaddr,hash:CRC-32=0xe0c9033]]]*/
 /* Return the previously set address for the stack */
-INTERN ATTR_DEPRECATED_ NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_getstackaddr") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_DEPRECATED_ NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstackaddr)(pthread_attr_t const *__restrict attr,
                                                      void **__restrict stackaddr)
-/*[[[body:pthread_attr_getstackaddr]]]*/
+/*[[[body:libc_pthread_attr_getstackaddr]]]*/
 {
 	struct pthread_attr const *at;
 	at = (struct pthread_attr const *)attr;
 	*stackaddr = at->pa_stackaddr;
 	return EOK;
 }
-/*[[[end:pthread_attr_getstackaddr]]]*/
+/*[[[end:libc_pthread_attr_getstackaddr]]]*/
 
-/*[[[head:pthread_attr_setstackaddr,hash:CRC-32=0x4e60e20b]]]*/
+/*[[[head:libc_pthread_attr_setstackaddr,hash:CRC-32=0x9907714e]]]*/
 /* Set the starting address of the stack of the thread to be created.
  * Depending on whether the stack grows up or down the value must either
  * be higher or lower than all the address in the memory block. The
  * minimal size of the block must be PTHREAD_STACK_MIN */
-INTERN ATTR_DEPRECATED_ NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_setstackaddr") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_DEPRECATED_ NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstackaddr)(pthread_attr_t *attr,
                                                      void *stackaddr)
-/*[[[body:pthread_attr_setstackaddr]]]*/
+/*[[[body:libc_pthread_attr_setstackaddr]]]*/
 {
 	struct pthread_attr *at;
 	at = (struct pthread_attr *)attr;
@@ -790,32 +770,30 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstackaddr)(pthread_attr_t *attr,
 	at->pa_flags |= ATTR_FLAG_STACKADDR;
 	return EOK;
 }
-/*[[[end:pthread_attr_setstackaddr]]]*/
+/*[[[end:libc_pthread_attr_setstackaddr]]]*/
 
-/*[[[head:pthread_attr_getstacksize,hash:CRC-32=0xe55a54cc]]]*/
+/*[[[head:libc_pthread_attr_getstacksize,hash:CRC-32=0xc04970d9]]]*/
 /* Return the currently used minimal stack size */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_getstacksize") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstacksize)(pthread_attr_t const *__restrict attr,
                                                      size_t *__restrict stacksize)
-/*[[[body:pthread_attr_getstacksize]]]*/
+/*[[[body:libc_pthread_attr_getstacksize]]]*/
 {
 	struct pthread_attr const *at;
 	at = (struct pthread_attr const *)attr;
 	*stacksize = at->pa_stacksize;
 	return EOK;
 }
-/*[[[end:pthread_attr_getstacksize]]]*/
+/*[[[end:libc_pthread_attr_getstacksize]]]*/
 
-/*[[[head:pthread_attr_setstacksize,hash:CRC-32=0xba3e5780]]]*/
+/*[[[head:libc_pthread_attr_setstacksize,hash:CRC-32=0xaa6c7b6a]]]*/
 /* Add information about the minimum stack size needed for the thread
  * to be started. This size must never be less than PTHREAD_STACK_MIN
  * and must also not exceed the system limits */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_setstacksize") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstacksize)(pthread_attr_t *attr,
                                                      size_t stacksize)
-/*[[[body:pthread_attr_setstacksize]]]*/
+/*[[[body:libc_pthread_attr_setstacksize]]]*/
 {
 	struct pthread_attr *at;
 	at = (struct pthread_attr *)attr;
@@ -824,16 +802,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstacksize)(pthread_attr_t *attr,
 	at->pa_stacksize = stacksize;
 	return EOK;
 }
-/*[[[end:pthread_attr_setstacksize]]]*/
+/*[[[end:libc_pthread_attr_setstacksize]]]*/
 
-/*[[[head:pthread_attr_getstack,hash:CRC-32=0x2b7dd426]]]*/
+/*[[[head:libc_pthread_attr_getstack,hash:CRC-32=0x96c8274e]]]*/
 /* Return the previously set address for the stack */
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_getstack") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2, 3)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstack)(pthread_attr_t const *__restrict attr,
                                                  void **__restrict stackaddr,
                                                  size_t *__restrict stacksize)
-/*[[[body:pthread_attr_getstack]]]*/
+/*[[[body:libc_pthread_attr_getstack]]]*/
 {
 	struct pthread_attr *at;
 	at = (struct pthread_attr *)attr;
@@ -845,18 +822,17 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstack)(pthread_attr_t const *__restric
 	*stacksize = at->pa_stacksize;
 	return EOK;
 }
-/*[[[end:pthread_attr_getstack]]]*/
+/*[[[end:libc_pthread_attr_getstack]]]*/
 
-/*[[[head:pthread_attr_setstack,hash:CRC-32=0xb2943a12]]]*/
+/*[[[head:libc_pthread_attr_setstack,hash:CRC-32=0x291c1e1c]]]*/
 /* The following two interfaces are intended to replace the last two. They
  * require setting the address as well as the size since only setting the
  * address will make the implementation on some architectures impossible */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_setstack") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstack)(pthread_attr_t *attr,
                                                  void *stackaddr,
                                                  size_t stacksize)
-/*[[[body:pthread_attr_setstack]]]*/
+/*[[[body:libc_pthread_attr_setstack]]]*/
 {
 	struct pthread_attr *at;
 	at = (struct pthread_attr *)attr;
@@ -871,17 +847,16 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstack)(pthread_attr_t *attr,
 	at->pa_flags |= ATTR_FLAG_STACKADDR;
 	return EOK;
 }
-/*[[[end:pthread_attr_setstack]]]*/
+/*[[[end:libc_pthread_attr_setstack]]]*/
 
-/*[[[head:pthread_attr_setaffinity_np,hash:CRC-32=0xb36d19f1]]]*/
+/*[[[head:libc_pthread_attr_setaffinity_np,hash:CRC-32=0xf34081f4]]]*/
 /* Thread created with attribute ATTR will be limited to run only on
  * the processors represented in CPUSET */
-INTERN NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_setaffinity_np") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 3)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_setaffinity_np)(pthread_attr_t *attr,
                                                        size_t cpusetsize,
                                                        cpu_set_t const *cpuset)
-/*[[[body:pthread_attr_setaffinity_np]]]*/
+/*[[[body:libc_pthread_attr_setaffinity_np]]]*/
 {
 	struct pthread_attr *at;
 	at = (struct pthread_attr *)attr;
@@ -927,16 +902,15 @@ use_newset:
 	}
 	return EOK;
 }
-/*[[[end:pthread_attr_setaffinity_np]]]*/
+/*[[[end:libc_pthread_attr_setaffinity_np]]]*/
 
-/*[[[head:pthread_attr_getaffinity_np,hash:CRC-32=0xcff9bbfd]]]*/
+/*[[[head:libc_pthread_attr_getaffinity_np,hash:CRC-32=0x7e4fac56]]]*/
 /* Get bit set in CPUSET representing the processors threads created with ATTR can run on */
-INTERN NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_getaffinity_np") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 3)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_getaffinity_np)(pthread_attr_t const *attr,
                                                        size_t cpusetsize,
                                                        cpu_set_t *cpuset)
-/*[[[body:pthread_attr_getaffinity_np]]]*/
+/*[[[body:libc_pthread_attr_getaffinity_np]]]*/
 {
 	struct pthread_attr const *at;
 	at = (struct pthread_attr const *)attr;
@@ -961,14 +935,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getaffinity_np)(pthread_attr_t const *att
 	}
 	return EOK;
 }
-/*[[[end:pthread_attr_getaffinity_np]]]*/
+/*[[[end:libc_pthread_attr_getaffinity_np]]]*/
 
-/*[[[head:pthread_getattr_default_np,hash:CRC-32=0xc651782e]]]*/
+/*[[[head:libc_pthread_getattr_default_np,hash:CRC-32=0x4103fb40]]]*/
 /* Get the default attributes used by pthread_create in this process */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_getattr_default_np") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_getattr_default_np)(pthread_attr_t *attr)
-/*[[[body:pthread_getattr_default_np]]]*/
+/*[[[body:libc_pthread_getattr_default_np]]]*/
 {
 	struct pthread_attr *at;
 	cpu_set_t *cpuset = NULL;
@@ -1002,14 +975,13 @@ again:
 	}
 	return EOK;
 }
-/*[[[end:pthread_getattr_default_np]]]*/
+/*[[[end:libc_pthread_getattr_default_np]]]*/
 
-/*[[[head:pthread_setattr_default_np,hash:CRC-32=0x62eae5b9]]]*/
+/*[[[head:libc_pthread_setattr_default_np,hash:CRC-32=0x3f3f6002]]]*/
 /* Set the default attributes to be used by pthread_create in this process */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_setattr_default_np") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_setattr_default_np)(pthread_attr_t const *attr)
-/*[[[body:pthread_setattr_default_np]]]*/
+/*[[[body:libc_pthread_setattr_default_np]]]*/
 {
 	struct pthread_attr *at;
 	cpu_set_t *old_set = NULL;
@@ -1051,17 +1023,16 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setattr_default_np)(pthread_attr_t const *attr
 	free(old_set);
 	return EOK;
 }
-/*[[[end:pthread_setattr_default_np]]]*/
+/*[[[end:libc_pthread_setattr_default_np]]]*/
 
-/*[[[head:pthread_getattr_np,hash:CRC-32=0x63ca275a]]]*/
+/*[[[head:libc_pthread_getattr_np,hash:CRC-32=0xcb4f1bd1]]]*/
 /* Initialize thread attribute *ATTR with attributes corresponding to the
  * already running thread THREAD. It shall be called on uninitialized ATTR
  * and destroyed with pthread_attr_destroy when no longer needed */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_getattr_np") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_getattr_np)(pthread_t pthread,
                                               pthread_attr_t *attr)
-/*[[[body:pthread_getattr_np]]]*/
+/*[[[body:libc_pthread_getattr_np]]]*/
 {
 	int result;
 	struct pthread *pt = (struct pthread *)pthread;
@@ -1119,16 +1090,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getattr_np)(pthread_t pthread,
 done:
 	return result;
 }
-/*[[[end:pthread_getattr_np]]]*/
+/*[[[end:libc_pthread_getattr_np]]]*/
 
-/*[[[head:pthread_setschedparam,hash:CRC-32=0x4fc75eec]]]*/
+/*[[[head:libc_pthread_setschedparam,hash:CRC-32=0xcf207c5e]]]*/
 /* Set the scheduling parameters for TARGET_THREAD according to POLICY and *PARAM */
-INTERN NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_setschedparam") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_setschedparam)(pthread_t target_thread,
                                                  int policy,
                                                  struct sched_param const *param)
-/*[[[body:pthread_setschedparam]]]*/
+/*[[[body:libc_pthread_setschedparam]]]*/
 {
 	errno_t result;
 	struct pthread *pt = (struct pthread *)target_thread;
@@ -1157,16 +1127,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedparam)(pthread_t target_thread,
 	}
 	return EOK;
 }
-/*[[[end:pthread_setschedparam]]]*/
+/*[[[end:libc_pthread_setschedparam]]]*/
 
-/*[[[head:pthread_getschedparam,hash:CRC-32=0x136c8c41]]]*/
+/*[[[head:libc_pthread_getschedparam,hash:CRC-32=0x55a3df30]]]*/
 /* Return in *POLICY and *PARAM the scheduling parameters for TARGET_THREAD */
-INTERN NONNULL((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_getschedparam") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((2, 3)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_getschedparam)(pthread_t target_thread,
                                                  int *__restrict policy,
                                                  struct sched_param *__restrict param)
-/*[[[body:pthread_getschedparam]]]*/
+/*[[[body:libc_pthread_getschedparam]]]*/
 {
 	errno_t result;
 	struct pthread *pt = (struct pthread *)target_thread;
@@ -1189,14 +1158,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getschedparam)(pthread_t target_thread,
 	}
 	return EOK;
 }
-/*[[[end:pthread_getschedparam]]]*/
+/*[[[end:libc_pthread_getschedparam]]]*/
 
-/*[[[head:pthread_setschedprio,hash:CRC-32=0xd1442670]]]*/
+/*[[[head:libc_pthread_setschedprio,hash:CRC-32=0xdd196b70]]]*/
 /* Set the scheduling priority for TARGET_THREAD */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_setschedprio") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_setschedprio)(pthread_t target_thread,
                                                 int prio)
-/*[[[body:pthread_setschedprio]]]*/
+/*[[[body:libc_pthread_setschedprio]]]*/
 {
 	errno_t error;
 	syscall_slong_t old_prio;
@@ -1219,16 +1188,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedprio)(pthread_t target_thread,
 	}
 	return EOK;
 }
-/*[[[end:pthread_setschedprio]]]*/
+/*[[[end:libc_pthread_setschedprio]]]*/
 
-/*[[[head:pthread_getname_np,hash:CRC-32=0x196903db]]]*/
+/*[[[head:libc_pthread_getname_np,hash:CRC-32=0xc77e38e4]]]*/
 /* Get thread name visible in the kernel and its interfaces */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_getname_np") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pthread_t target_thread,
                                               char *buf,
                                               size_t buflen)
-/*[[[body:pthread_getname_np]]]*/
+/*[[[body:libc_pthread_getname_np]]]*/
 {
 	struct pthread *pt = (struct pthread *)target_thread;
 	pid_t tid = ATOMIC_READ(pt->pt_tid);
@@ -1240,15 +1208,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pthread_t target_thread,
 		return ESRCH;
 	return EOK;
 }
-/*[[[end:pthread_getname_np]]]*/
+/*[[[end:libc_pthread_getname_np]]]*/
 
-/*[[[head:pthread_setname_np,hash:CRC-32=0xe16b94da]]]*/
+/*[[[head:libc_pthread_setname_np,hash:CRC-32=0xfb17a33f]]]*/
 /* Set thread name visible in the kernel and its interfaces */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_setname_np") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t target_thread,
                                               const char *name)
-/*[[[body:pthread_setname_np]]]*/
+/*[[[body:libc_pthread_setname_np]]]*/
 {
 	struct pthread *pt = (struct pthread *)target_thread;
 	pid_t tid = ATOMIC_READ(pt->pt_tid);
@@ -1259,55 +1226,40 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t target_thread,
 	(void)name;
 	return ENOSYS;
 }
-/*[[[end:pthread_setname_np]]]*/
+/*[[[end:libc_pthread_setname_np]]]*/
 
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.pthread_concurrency_level") int pthread_concurrency_level = 0;
 
-/*[[[head:pthread_getconcurrency,hash:CRC-32=0xca918186]]]*/
+/*[[[head:libc_pthread_getconcurrency,hash:CRC-32=0x6cd2b98f]]]*/
 /* Determine level of concurrency */
-INTERN ATTR_PURE
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_getconcurrency") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_PURE int
 NOTHROW_NCX(LIBCCALL libc_pthread_getconcurrency)(void)
-/*[[[body:pthread_getconcurrency]]]*/
+/*[[[body:libc_pthread_getconcurrency]]]*/
 {
 	return pthread_concurrency_level;
 }
-/*[[[end:pthread_getconcurrency]]]*/
+/*[[[end:libc_pthread_getconcurrency]]]*/
 
-/*[[[head:pthread_setconcurrency,hash:CRC-32=0x9c460ef6]]]*/
+/*[[[head:libc_pthread_setconcurrency,hash:CRC-32=0x5594c050]]]*/
 /* Set new concurrency level to LEVEL */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_setconcurrency") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_setconcurrency)(int level)
-/*[[[body:pthread_setconcurrency]]]*/
+/*[[[body:libc_pthread_setconcurrency]]]*/
 {
 	if unlikely(level < 0)
 		return EINVAL;
 	pthread_concurrency_level = level;
 	return EOK;
 }
-/*[[[end:pthread_setconcurrency]]]*/
+/*[[[end:libc_pthread_setconcurrency]]]*/
 
-/*[[[head:pthread_yield,hash:CRC-32=0xdf52320a]]]*/
-/* Yield the processor to another thread or process.
- * This function is similar to the POSIX `sched_yield' function but
- * might be differently implemented in the case of a m-on-n thread
- * implementation */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_yield") int
-NOTHROW_NCX(LIBCCALL libc_pthread_yield)(void)
-/*[[[body:pthread_yield]]]*/
-{
-	return -sys_sched_yield();
-}
-/*[[[end:pthread_yield]]]*/
-
-/*[[[head:pthread_setaffinity_np,hash:CRC-32=0x15f9eb40]]]*/
+/*[[[head:libc_pthread_setaffinity_np,hash:CRC-32=0x7ded8422]]]*/
 /* Limit specified thread THREAD to run only on the processors represented in CPUSET */
-INTERN NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_setaffinity_np") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_setaffinity_np)(pthread_t pthread,
                                                   size_t cpusetsize,
                                                   cpu_set_t const *cpuset)
-/*[[[body:pthread_setaffinity_np]]]*/
+/*[[[body:libc_pthread_setaffinity_np]]]*/
 {
 	errno_t error;
 	struct pthread *pt = (struct pthread *)pthread;
@@ -1368,16 +1320,15 @@ got_old_affinity:
 		free(old_cpuset);
 	return (int)-error;
 }
-/*[[[end:pthread_setaffinity_np]]]*/
+/*[[[end:libc_pthread_setaffinity_np]]]*/
 
-/*[[[head:pthread_getaffinity_np,hash:CRC-32=0x720b3ab5]]]*/
+/*[[[head:libc_pthread_getaffinity_np,hash:CRC-32=0x4549bb94]]]*/
 /* Get bit set in CPUSET representing the processors THREAD can run on */
-INTERN NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_getaffinity_np") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_getaffinity_np)(pthread_t pthread,
                                                   size_t cpusetsize,
                                                   cpu_set_t *cpuset)
-/*[[[body:pthread_getaffinity_np]]]*/
+/*[[[body:libc_pthread_getaffinity_np]]]*/
 {
 	errno_t error;
 	struct pthread *pt = (struct pthread *)pthread;
@@ -1395,19 +1346,17 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getaffinity_np)(pthread_t pthread,
 	}
 	return (int)-error;
 }
-/*[[[end:pthread_getaffinity_np]]]*/
+/*[[[end:libc_pthread_getaffinity_np]]]*/
 
-/*[[[head:pthread_once,hash:CRC-32=0x79194f41]]]*/
+/*[[[head:libc_pthread_once,hash:CRC-32=0xdce2c9cb]]]*/
 /* Guarantee that the initialization function INIT_ROUTINE will be called
  * only once, even if pthread_once is executed several times with the
  * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
  * extern variable initialized to PTHREAD_ONCE_INIT. */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_once") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 (LIBCCALL libc_pthread_once)(pthread_once_t *once_control,
-                             __pthread_once_routine_t init_routine)
-		__THROWS(...)
-/*[[[body:pthread_once]]]*/
+                             __pthread_once_routine_t init_routine) THROWS(...)
+/*[[[body:libc_pthread_once]]]*/
 {
 	(void)once_control;
 	(void)init_routine;
@@ -1415,15 +1364,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_once") int
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_once]]]*/
+/*[[[end:libc_pthread_once]]]*/
 
-/*[[[head:pthread_setcancelstate,hash:CRC-32=0x5bf9a4b8]]]*/
+/*[[[head:libc_pthread_setcancelstate,hash:CRC-32=0x2fb90931]]]*/
 /* Set cancelability state of current thread to STATE,
  * returning old state in *OLDSTATE if OLDSTATE is not NULL */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_setcancelstate") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_setcancelstate)(int state,
                                                   int *oldstate)
-/*[[[body:pthread_setcancelstate]]]*/
+/*[[[body:libc_pthread_setcancelstate]]]*/
 {
 	(void)state;
 	(void)oldstate;
@@ -1431,15 +1380,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setcancelstate)(int state,
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_setcancelstate]]]*/
+/*[[[end:libc_pthread_setcancelstate]]]*/
 
-/*[[[head:pthread_setcanceltype,hash:CRC-32=0x6578c0bb]]]*/
+/*[[[head:libc_pthread_setcanceltype,hash:CRC-32=0x7d4c4eaa]]]*/
 /* Set cancellation state of current thread to TYPE, returning the old
  * type in *OLDTYPE if OLDTYPE is not NULL */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_setcanceltype") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_setcanceltype)(int type,
                                                  int *oldtype)
-/*[[[body:pthread_setcanceltype]]]*/
+/*[[[body:libc_pthread_setcanceltype]]]*/
 {
 	(void)type;
 	(void)oldtype;
@@ -1447,18 +1396,18 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setcanceltype)(int type,
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_setcanceltype]]]*/
+/*[[[end:libc_pthread_setcanceltype]]]*/
 
 PRIVATE ATTR_SECTION(".text.crt.sched.pthread.pthread_cancel_self")
 void LIBCCALL pthread_cancel_self(void) {
 	THROW(E_EXIT_THREAD);
 }
 
-/*[[[head:pthread_cancel,hash:CRC-32=0x2e8ff8d9]]]*/
+/*[[[head:libc_pthread_cancel,hash:CRC-32=0x5632a510]]]*/
 /* Cancel THREAD immediately or at the next possibility */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cancel") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread)
-/*[[[body:pthread_cancel]]]*/
+/*[[[body:libc_pthread_cancel]]]*/
 {
 	struct pthread *pt = (struct pthread *)pthread;
 	pid_t tid;
@@ -1480,14 +1429,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread)
 		return libc_geterrno();
 	return EOK;
 }
-/*[[[end:pthread_cancel]]]*/
+/*[[[end:libc_pthread_cancel]]]*/
 
-/*[[[head:pthread_testcancel,hash:CRC-32=0xc47b2d2c]]]*/
+/*[[[head:libc_pthread_testcancel,hash:CRC-32=0x11233c93]]]*/
 /* Test for pending cancellation for the current thread and terminate
  * the thread as per pthread_exit(PTHREAD_CANCELED) if it has been canceled */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_testcancel") void
+INTERN ATTR_SECTION(".text.crt.sched.pthread") void
 NOTHROW_RPC(LIBCCALL libc_pthread_testcancel)(void)
-/*[[[body:pthread_testcancel]]]*/
+/*[[[body:libc_pthread_testcancel]]]*/
 {
 	/* Load librpc and use it to service RPCs
 	 * Technically, we could just directly invoke `sys_rpc_service()', however
@@ -1496,38 +1445,35 @@ NOTHROW_RPC(LIBCCALL libc_pthread_testcancel)(void)
 	if (librpc_init())
 		(*pdyn_rpc_service)();
 }
-/*[[[end:pthread_testcancel]]]*/
+/*[[[end:libc_pthread_testcancel]]]*/
 
-/*[[[head:__pthread_unregister_cancel,hash:CRC-32=0xf4a0de07]]]*/
-INTERN __cleanup_fct_attribute NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_unregister_cancel") void
+/*[[[head:libc___pthread_unregister_cancel,hash:CRC-32=0x58f63eed]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread") __cleanup_fct_attribute NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel)(__pthread_unwind_buf_t *buf)
-/*[[[body:__pthread_unregister_cancel]]]*/
+/*[[[body:libc___pthread_unregister_cancel]]]*/
 {
 	(void)buf;
 	CRT_UNIMPLEMENTED("__pthread_unregister_cancel"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:__pthread_unregister_cancel]]]*/
+/*[[[end:libc___pthread_unregister_cancel]]]*/
 
-/*[[[head:__pthread_unregister_cancel_restore,hash:CRC-32=0x7b125f3]]]*/
-INTERN __cleanup_fct_attribute NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_unregister_cancel_restore") void
+/*[[[head:libc___pthread_unregister_cancel_restore,hash:CRC-32=0xecef4ef3]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread") __cleanup_fct_attribute NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel_restore)(__pthread_unwind_buf_t *buf)
-/*[[[body:__pthread_unregister_cancel_restore]]]*/
+/*[[[body:libc___pthread_unregister_cancel_restore]]]*/
 {
 	(void)buf;
 	CRT_UNIMPLEMENTED("__pthread_unregister_cancel_restore"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:__pthread_unregister_cancel_restore]]]*/
+/*[[[end:libc___pthread_unregister_cancel_restore]]]*/
 
-/*[[[head:__pthread_unwind_next,hash:CRC-32=0xb55496c]]]*/
+/*[[[head:libc___pthread_unwind_next,hash:CRC-32=0xb72a137c]]]*/
 /* Internal interface to initiate cleanup */
-INTERN __cleanup_fct_attribute ATTR_NORETURN ATTR_WEAK NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_unwind_next") void
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_WEAK __cleanup_fct_attribute NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf)
-/*[[[body:__pthread_unwind_next]]]*/
+/*[[[body:libc___pthread_unwind_next]]]*/
 {
 	(void)buf;
 	CRT_UNIMPLEMENTED("__pthread_unwind_next"); /* TODO */
@@ -1535,16 +1481,15 @@ NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf)
 	for (;;) {
 	}
 }
-/*[[[end:__pthread_unwind_next]]]*/
+/*[[[end:libc___pthread_unwind_next]]]*/
 
 
-/*[[[head:pthread_mutex_init,hash:CRC-32=0x93957f5c]]]*/
+/*[[[head:libc_pthread_mutex_init,hash:CRC-32=0xeb03d55f]]]*/
 /* Initialize a mutex */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_init") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_init)(pthread_mutex_t *mutex,
                                               pthread_mutexattr_t const *mutexattr)
-/*[[[body:pthread_mutex_init]]]*/
+/*[[[body:libc_pthread_mutex_init]]]*/
 {
 	(void)mutex;
 	(void)mutexattr;
@@ -1552,57 +1497,53 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_init)(pthread_mutex_t *mutex,
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutex_init]]]*/
+/*[[[end:libc_pthread_mutex_init]]]*/
 
-/*[[[head:pthread_mutex_destroy,hash:CRC-32=0x90eae0d9]]]*/
+/*[[[head:libc_pthread_mutex_destroy,hash:CRC-32=0xfeaf9401]]]*/
 /* Destroy a mutex */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_destroy") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_destroy)(pthread_mutex_t *mutex)
-/*[[[body:pthread_mutex_destroy]]]*/
+/*[[[body:libc_pthread_mutex_destroy]]]*/
 {
 	(void)mutex;
 	CRT_UNIMPLEMENTED("pthread_mutex_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutex_destroy]]]*/
+/*[[[end:libc_pthread_mutex_destroy]]]*/
 
-/*[[[head:pthread_mutex_trylock,hash:CRC-32=0x592ae13d]]]*/
+/*[[[head:libc_pthread_mutex_trylock,hash:CRC-32=0xe4cab051]]]*/
 /* Try locking a mutex */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_trylock") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_trylock)(pthread_mutex_t *mutex)
-/*[[[body:pthread_mutex_trylock]]]*/
+/*[[[body:libc_pthread_mutex_trylock]]]*/
 {
 	(void)mutex;
 	CRT_UNIMPLEMENTED("pthread_mutex_trylock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutex_trylock]]]*/
+/*[[[end:libc_pthread_mutex_trylock]]]*/
 
-/*[[[head:pthread_mutex_lock,hash:CRC-32=0xbeec8ae]]]*/
+/*[[[head:libc_pthread_mutex_lock,hash:CRC-32=0x6161f01d]]]*/
 /* Lock a mutex */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_lock") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_lock)(pthread_mutex_t *mutex)
-/*[[[body:pthread_mutex_lock]]]*/
+/*[[[body:libc_pthread_mutex_lock]]]*/
 {
 	(void)mutex;
 	CRT_UNIMPLEMENTED("pthread_mutex_lock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutex_lock]]]*/
+/*[[[end:libc_pthread_mutex_lock]]]*/
 
-/*[[[head:pthread_mutex_timedlock,hash:CRC-32=0x4789d8d6]]]*/
+/*[[[head:libc_pthread_mutex_timedlock,hash:CRC-32=0xfaef1e49]]]*/
 /* Wait until lock becomes available, or specified time passes */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_timedlock") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock)(pthread_mutex_t *__restrict mutex,
                                                    struct timespec const *__restrict abstime)
-/*[[[body:pthread_mutex_timedlock]]]*/
+/*[[[body:libc_pthread_mutex_timedlock]]]*/
 {
 	(void)mutex;
 	(void)abstime;
@@ -1610,29 +1551,27 @@ NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock)(pthread_mutex_t *__restrict m
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutex_timedlock]]]*/
+/*[[[end:libc_pthread_mutex_timedlock]]]*/
 
-/*[[[head:pthread_mutex_unlock,hash:CRC-32=0x2b608358]]]*/
+/*[[[head:libc_pthread_mutex_unlock,hash:CRC-32=0x2906c14c]]]*/
 /* Unlock a mutex */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_unlock") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_unlock)(pthread_mutex_t *mutex)
-/*[[[body:pthread_mutex_unlock]]]*/
+/*[[[body:libc_pthread_mutex_unlock]]]*/
 {
 	(void)mutex;
 	CRT_UNIMPLEMENTED("pthread_mutex_unlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutex_unlock]]]*/
+/*[[[end:libc_pthread_mutex_unlock]]]*/
 
-/*[[[head:pthread_mutex_getprioceiling,hash:CRC-32=0x25933aba]]]*/
+/*[[[head:libc_pthread_mutex_getprioceiling,hash:CRC-32=0x830468c2]]]*/
 /* Get the priority ceiling of MUTEX */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_getprioceiling") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_getprioceiling)(pthread_mutex_t const *__restrict mutex,
                                                         int *__restrict prioceiling)
-/*[[[body:pthread_mutex_getprioceiling]]]*/
+/*[[[body:libc_pthread_mutex_getprioceiling]]]*/
 {
 	(void)mutex;
 	(void)prioceiling;
@@ -1640,17 +1579,16 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_getprioceiling)(pthread_mutex_t const *_
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutex_getprioceiling]]]*/
+/*[[[end:libc_pthread_mutex_getprioceiling]]]*/
 
-/*[[[head:pthread_mutex_setprioceiling,hash:CRC-32=0xa0dd32e6]]]*/
+/*[[[head:libc_pthread_mutex_setprioceiling,hash:CRC-32=0x82cd5d27]]]*/
 /* Set the priority ceiling of MUTEX to PRIOCEILING, return old
  * priority ceiling value in *OLD_CEILING */
-INTERN NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_setprioceiling") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 3)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_setprioceiling)(pthread_mutex_t *__restrict mutex,
                                                         int prioceiling,
                                                         int *__restrict old_ceiling)
-/*[[[body:pthread_mutex_setprioceiling]]]*/
+/*[[[body:libc_pthread_mutex_setprioceiling]]]*/
 {
 	(void)mutex;
 	(void)prioceiling;
@@ -1659,70 +1597,65 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_setprioceiling)(pthread_mutex_t *__restr
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutex_setprioceiling]]]*/
+/*[[[end:libc_pthread_mutex_setprioceiling]]]*/
 
-/*[[[head:pthread_mutex_consistent,hash:CRC-32=0xc3e78b92]]]*/
+/*[[[head:libc_pthread_mutex_consistent,hash:CRC-32=0x191805]]]*/
 /* Declare the state protected by MUTEX as consistent */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_consistent") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_consistent)(pthread_mutex_t *mutex)
-/*[[[body:pthread_mutex_consistent]]]*/
+/*[[[body:libc_pthread_mutex_consistent]]]*/
 {
 	(void)mutex;
 	CRT_UNIMPLEMENTED("pthread_mutex_consistent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutex_consistent]]]*/
+/*[[[end:libc_pthread_mutex_consistent]]]*/
 
-/*[[[head:pthread_mutex_consistent_np,hash:CRC-32=0xf8fe9831]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_consistent_np") int
+/*[[[head:libc_pthread_mutex_consistent_np,hash:CRC-32=0x99a68bf]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutex_consistent_np)(pthread_mutex_t *mutex)
-/*[[[body:pthread_mutex_consistent_np]]]*/
+/*[[[body:libc_pthread_mutex_consistent_np]]]*/
 {
 	(void)mutex;
 	CRT_UNIMPLEMENTED("pthread_mutex_consistent_np"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutex_consistent_np]]]*/
+/*[[[end:libc_pthread_mutex_consistent_np]]]*/
 
-/*[[[head:pthread_mutexattr_init,hash:CRC-32=0x5e8055c2]]]*/
+/*[[[head:libc_pthread_mutexattr_init,hash:CRC-32=0xfac11c86]]]*/
 /* Initialize mutex attribute object ATTR with default attributes (kind is PTHREAD_MUTEX_TIMED_NP) */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_init") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_init)(pthread_mutexattr_t *attr)
-/*[[[body:pthread_mutexattr_init]]]*/
+/*[[[body:libc_pthread_mutexattr_init]]]*/
 {
 	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_init]]]*/
+/*[[[end:libc_pthread_mutexattr_init]]]*/
 
-/*[[[head:pthread_mutexattr_destroy,hash:CRC-32=0xeedd15c7]]]*/
+/*[[[head:libc_pthread_mutexattr_destroy,hash:CRC-32=0xd5aef2ca]]]*/
 /* Destroy mutex attribute object ATTR */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_destroy") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_destroy)(pthread_mutexattr_t *attr)
-/*[[[body:pthread_mutexattr_destroy]]]*/
+/*[[[body:libc_pthread_mutexattr_destroy]]]*/
 {
 	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_mutexattr_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_destroy]]]*/
+/*[[[end:libc_pthread_mutexattr_destroy]]]*/
 
-/*[[[head:pthread_mutexattr_getpshared,hash:CRC-32=0x4ded2205]]]*/
+/*[[[head:libc_pthread_mutexattr_getpshared,hash:CRC-32=0x8ee5d795]]]*/
 /* Get the process-shared flag of the mutex attribute ATTR */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_getpshared") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getpshared)(pthread_mutexattr_t const *__restrict attr,
                                                         int *__restrict pshared)
-/*[[[body:pthread_mutexattr_getpshared]]]*/
+/*[[[body:libc_pthread_mutexattr_getpshared]]]*/
 {
 	(void)attr;
 	(void)pshared;
@@ -1730,15 +1663,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getpshared)(pthread_mutexattr_t cons
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_getpshared]]]*/
+/*[[[end:libc_pthread_mutexattr_getpshared]]]*/
 
-/*[[[head:pthread_mutexattr_setpshared,hash:CRC-32=0x4ccd2e71]]]*/
+/*[[[head:libc_pthread_mutexattr_setpshared,hash:CRC-32=0x58a7a864]]]*/
 /* Set the process-shared flag of the mutex attribute ATTR */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_setpshared") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setpshared)(pthread_mutexattr_t *attr,
                                                         int pshared)
-/*[[[body:pthread_mutexattr_setpshared]]]*/
+/*[[[body:libc_pthread_mutexattr_setpshared]]]*/
 {
 	(void)attr;
 	(void)pshared;
@@ -1746,15 +1678,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setpshared)(pthread_mutexattr_t *att
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_setpshared]]]*/
+/*[[[end:libc_pthread_mutexattr_setpshared]]]*/
 
-/*[[[head:pthread_mutexattr_gettype,hash:CRC-32=0x61a1cb84]]]*/
+/*[[[head:libc_pthread_mutexattr_gettype,hash:CRC-32=0xf24761b0]]]*/
 /* Return in *KIND the mutex kind attribute in *ATTR */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_gettype") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_gettype)(pthread_mutexattr_t const *__restrict attr,
                                                      int *__restrict kind)
-/*[[[body:pthread_mutexattr_gettype]]]*/
+/*[[[body:libc_pthread_mutexattr_gettype]]]*/
 {
 	(void)attr;
 	(void)kind;
@@ -1762,16 +1693,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_gettype)(pthread_mutexattr_t const *
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_gettype]]]*/
+/*[[[end:libc_pthread_mutexattr_gettype]]]*/
 
-/*[[[head:pthread_mutexattr_settype,hash:CRC-32=0x660cd35a]]]*/
+/*[[[head:libc_pthread_mutexattr_settype,hash:CRC-32=0x6a5a99b8]]]*/
 /* Set the mutex kind attribute in *ATTR to KIND (either PTHREAD_MUTEX_NORMAL,
  * PTHREAD_MUTEX_RECURSIVE, PTHREAD_MUTEX_ERRORCHECK, or PTHREAD_MUTEX_DEFAULT) */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_settype") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_settype)(pthread_mutexattr_t *attr,
                                                      int kind)
-/*[[[body:pthread_mutexattr_settype]]]*/
+/*[[[body:libc_pthread_mutexattr_settype]]]*/
 {
 	(void)attr;
 	(void)kind;
@@ -1779,15 +1709,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_settype)(pthread_mutexattr_t *attr,
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_settype]]]*/
+/*[[[end:libc_pthread_mutexattr_settype]]]*/
 
-/*[[[head:pthread_mutexattr_getprotocol,hash:CRC-32=0xee9374d]]]*/
+/*[[[head:libc_pthread_mutexattr_getprotocol,hash:CRC-32=0xb13927ca]]]*/
 /* Return in *PROTOCOL the mutex protocol attribute in *ATTR */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_getprotocol") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getprotocol)(pthread_mutexattr_t const *__restrict attr,
                                                          int *__restrict protocol)
-/*[[[body:pthread_mutexattr_getprotocol]]]*/
+/*[[[body:libc_pthread_mutexattr_getprotocol]]]*/
 {
 	(void)attr;
 	(void)protocol;
@@ -1795,16 +1724,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getprotocol)(pthread_mutexattr_t con
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_getprotocol]]]*/
+/*[[[end:libc_pthread_mutexattr_getprotocol]]]*/
 
-/*[[[head:pthread_mutexattr_setprotocol,hash:CRC-32=0xbb8d7332]]]*/
+/*[[[head:libc_pthread_mutexattr_setprotocol,hash:CRC-32=0x1c2d328a]]]*/
 /* Set the mutex protocol attribute in *ATTR to PROTOCOL (either
  * PTHREAD_PRIO_NONE, PTHREAD_PRIO_INHERIT, or PTHREAD_PRIO_PROTECT) */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_setprotocol") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setprotocol)(pthread_mutexattr_t *attr,
                                                          int protocol)
-/*[[[body:pthread_mutexattr_setprotocol]]]*/
+/*[[[body:libc_pthread_mutexattr_setprotocol]]]*/
 {
 	(void)attr;
 	(void)protocol;
@@ -1812,15 +1740,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setprotocol)(pthread_mutexattr_t *at
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_setprotocol]]]*/
+/*[[[end:libc_pthread_mutexattr_setprotocol]]]*/
 
-/*[[[head:pthread_mutexattr_getprioceiling,hash:CRC-32=0xe51cdad7]]]*/
+/*[[[head:libc_pthread_mutexattr_getprioceiling,hash:CRC-32=0x333dc2c6]]]*/
 /* Return in *PRIOCEILING the mutex prioceiling attribute in *ATTR */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_getprioceiling") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getprioceiling)(pthread_mutexattr_t const *__restrict attr,
                                                             int *__restrict prioceiling)
-/*[[[body:pthread_mutexattr_getprioceiling]]]*/
+/*[[[body:libc_pthread_mutexattr_getprioceiling]]]*/
 {
 	(void)attr;
 	(void)prioceiling;
@@ -1828,15 +1755,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getprioceiling)(pthread_mutexattr_t 
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_getprioceiling]]]*/
+/*[[[end:libc_pthread_mutexattr_getprioceiling]]]*/
 
-/*[[[head:pthread_mutexattr_setprioceiling,hash:CRC-32=0x740655d4]]]*/
+/*[[[head:libc_pthread_mutexattr_setprioceiling,hash:CRC-32=0xca19e1c2]]]*/
 /* Set the mutex prioceiling attribute in *ATTR to PRIOCEILING */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_setprioceiling") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setprioceiling)(pthread_mutexattr_t *attr,
                                                             int prioceiling)
-/*[[[body:pthread_mutexattr_setprioceiling]]]*/
+/*[[[body:libc_pthread_mutexattr_setprioceiling]]]*/
 {
 	(void)attr;
 	(void)prioceiling;
@@ -1844,15 +1770,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setprioceiling)(pthread_mutexattr_t 
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_setprioceiling]]]*/
+/*[[[end:libc_pthread_mutexattr_setprioceiling]]]*/
 
-/*[[[head:pthread_mutexattr_getrobust,hash:CRC-32=0xeb9be2b1]]]*/
+/*[[[head:libc_pthread_mutexattr_getrobust,hash:CRC-32=0x3ad8b2bc]]]*/
 /* Get the robustness flag of the mutex attribute ATTR */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_getrobust") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getrobust)(pthread_mutexattr_t const *attr,
                                                        int *robustness)
-/*[[[body:pthread_mutexattr_getrobust]]]*/
+/*[[[body:libc_pthread_mutexattr_getrobust]]]*/
 {
 	(void)attr;
 	(void)robustness;
@@ -1860,14 +1785,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getrobust)(pthread_mutexattr_t const
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_getrobust]]]*/
+/*[[[end:libc_pthread_mutexattr_getrobust]]]*/
 
-/*[[[head:pthread_mutexattr_getrobust_np,hash:CRC-32=0x10995634]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_getrobust_np") int
+/*[[[head:libc_pthread_mutexattr_getrobust_np,hash:CRC-32=0x265f5ef9]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getrobust_np)(pthread_mutexattr_t const *attr,
                                                           int *robustness)
-/*[[[body:pthread_mutexattr_getrobust_np]]]*/
+/*[[[body:libc_pthread_mutexattr_getrobust_np]]]*/
 {
 	(void)attr;
 	(void)robustness;
@@ -1875,15 +1799,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_getrobust_np)(pthread_mutexattr_t co
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_getrobust_np]]]*/
+/*[[[end:libc_pthread_mutexattr_getrobust_np]]]*/
 
-/*[[[head:pthread_mutexattr_setrobust,hash:CRC-32=0x21a49b32]]]*/
+/*[[[head:libc_pthread_mutexattr_setrobust,hash:CRC-32=0x1d3c219e]]]*/
 /* Set the robustness flag of the mutex attribute ATTR */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_setrobust") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setrobust)(pthread_mutexattr_t *attr,
                                                        int robustness)
-/*[[[body:pthread_mutexattr_setrobust]]]*/
+/*[[[body:libc_pthread_mutexattr_setrobust]]]*/
 {
 	(void)attr;
 	(void)robustness;
@@ -1891,14 +1814,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setrobust)(pthread_mutexattr_t *attr
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_setrobust]]]*/
+/*[[[end:libc_pthread_mutexattr_setrobust]]]*/
 
-/*[[[head:pthread_mutexattr_setrobust_np,hash:CRC-32=0x720fff61]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutexattr_setrobust_np") int
+/*[[[head:libc_pthread_mutexattr_setrobust_np,hash:CRC-32=0x4fb6e4a4]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setrobust_np)(pthread_mutexattr_t *attr,
                                                           int robustness)
-/*[[[body:pthread_mutexattr_setrobust_np]]]*/
+/*[[[body:libc_pthread_mutexattr_setrobust_np]]]*/
 {
 	(void)attr;
 	(void)robustness;
@@ -1906,16 +1828,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutexattr_setrobust_np)(pthread_mutexattr_t *a
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_mutexattr_setrobust_np]]]*/
+/*[[[end:libc_pthread_mutexattr_setrobust_np]]]*/
 
-/*[[[head:pthread_rwlock_init,hash:CRC-32=0x7fe2e8e0]]]*/
+/*[[[head:libc_pthread_rwlock_init,hash:CRC-32=0xdc11945e]]]*/
 /* Initialize read-write lock RWLOCK using attributes ATTR,
  * or use the default values if later is NULL */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_init") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_init)(pthread_rwlock_t *__restrict rwlock,
                                                pthread_rwlockattr_t const *__restrict attr)
-/*[[[body:pthread_rwlock_init]]]*/
+/*[[[body:libc_pthread_rwlock_init]]]*/
 {
 	(void)rwlock;
 	(void)attr;
@@ -1923,57 +1844,53 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_init)(pthread_rwlock_t *__restrict rwlo
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlock_init]]]*/
+/*[[[end:libc_pthread_rwlock_init]]]*/
 
-/*[[[head:pthread_rwlock_destroy,hash:CRC-32=0xe60b25b9]]]*/
+/*[[[head:libc_pthread_rwlock_destroy,hash:CRC-32=0xa6ddd65]]]*/
 /* Destroy read-write lock RWLOCK */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_destroy") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_destroy)(pthread_rwlock_t *rwlock)
-/*[[[body:pthread_rwlock_destroy]]]*/
+/*[[[body:libc_pthread_rwlock_destroy]]]*/
 {
 	(void)rwlock;
 	CRT_UNIMPLEMENTED("pthread_rwlock_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlock_destroy]]]*/
+/*[[[end:libc_pthread_rwlock_destroy]]]*/
 
-/*[[[head:pthread_rwlock_rdlock,hash:CRC-32=0x6db9e722]]]*/
+/*[[[head:libc_pthread_rwlock_rdlock,hash:CRC-32=0x77edb9a5]]]*/
 /* Acquire read lock for RWLOCK */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_rdlock") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_rdlock)(pthread_rwlock_t *rwlock)
-/*[[[body:pthread_rwlock_rdlock]]]*/
+/*[[[body:libc_pthread_rwlock_rdlock]]]*/
 {
 	(void)rwlock;
 	CRT_UNIMPLEMENTED("pthread_rwlock_rdlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlock_rdlock]]]*/
+/*[[[end:libc_pthread_rwlock_rdlock]]]*/
 
-/*[[[head:pthread_rwlock_tryrdlock,hash:CRC-32=0xccd39ac1]]]*/
+/*[[[head:libc_pthread_rwlock_tryrdlock,hash:CRC-32=0x3f9cd3e9]]]*/
 /* Try to acquire read lock for RWLOCK */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_tryrdlock") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_tryrdlock)(pthread_rwlock_t *rwlock)
-/*[[[body:pthread_rwlock_tryrdlock]]]*/
+/*[[[body:libc_pthread_rwlock_tryrdlock]]]*/
 {
 	(void)rwlock;
 	CRT_UNIMPLEMENTED("pthread_rwlock_tryrdlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlock_tryrdlock]]]*/
+/*[[[end:libc_pthread_rwlock_tryrdlock]]]*/
 
-/*[[[head:pthread_rwlock_timedrdlock,hash:CRC-32=0x3f11d88e]]]*/
+/*[[[head:libc_pthread_rwlock_timedrdlock,hash:CRC-32=0x63000280]]]*/
 /* Try to acquire read lock for RWLOCK or return after specfied time */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_timedrdlock") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict rwlock,
                                                       struct timespec const *__restrict abstime)
-/*[[[body:pthread_rwlock_timedrdlock]]]*/
+/*[[[body:libc_pthread_rwlock_timedrdlock]]]*/
 {
 	(void)rwlock;
 	(void)abstime;
@@ -1981,43 +1898,40 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restri
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlock_timedrdlock]]]*/
+/*[[[end:libc_pthread_rwlock_timedrdlock]]]*/
 
-/*[[[head:pthread_rwlock_wrlock,hash:CRC-32=0x3ddf43c]]]*/
+/*[[[head:libc_pthread_rwlock_wrlock,hash:CRC-32=0xc4201721]]]*/
 /* Acquire write lock for RWLOCK */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_wrlock") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_wrlock)(pthread_rwlock_t *rwlock)
-/*[[[body:pthread_rwlock_wrlock]]]*/
+/*[[[body:libc_pthread_rwlock_wrlock]]]*/
 {
 	(void)rwlock;
 	CRT_UNIMPLEMENTED("pthread_rwlock_wrlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlock_wrlock]]]*/
+/*[[[end:libc_pthread_rwlock_wrlock]]]*/
 
-/*[[[head:pthread_rwlock_trywrlock,hash:CRC-32=0xea1c7f0c]]]*/
+/*[[[head:libc_pthread_rwlock_trywrlock,hash:CRC-32=0x3ee515]]]*/
 /* Try to acquire write lock for RWLOCK */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_trywrlock") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_trywrlock)(pthread_rwlock_t *rwlock)
-/*[[[body:pthread_rwlock_trywrlock]]]*/
+/*[[[body:libc_pthread_rwlock_trywrlock]]]*/
 {
 	(void)rwlock;
 	CRT_UNIMPLEMENTED("pthread_rwlock_trywrlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlock_trywrlock]]]*/
+/*[[[end:libc_pthread_rwlock_trywrlock]]]*/
 
-/*[[[head:pthread_rwlock_timedwrlock,hash:CRC-32=0xfc4265f5]]]*/
+/*[[[head:libc_pthread_rwlock_timedwrlock,hash:CRC-32=0x94ea7a8]]]*/
 /* Try to acquire write lock for RWLOCK or return after specfied time */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_timedwrlock") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict rwlock,
                                                       struct timespec const *__restrict abstime)
-/*[[[body:pthread_rwlock_timedwrlock]]]*/
+/*[[[body:libc_pthread_rwlock_timedwrlock]]]*/
 {
 	(void)rwlock;
 	(void)abstime;
@@ -2025,57 +1939,53 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restri
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlock_timedwrlock]]]*/
+/*[[[end:libc_pthread_rwlock_timedwrlock]]]*/
 
-/*[[[head:pthread_rwlock_unlock,hash:CRC-32=0x49657fbf]]]*/
+/*[[[head:libc_pthread_rwlock_unlock,hash:CRC-32=0x30d43869]]]*/
 /* Unlock RWLOCK */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_unlock") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_unlock)(pthread_rwlock_t *rwlock)
-/*[[[body:pthread_rwlock_unlock]]]*/
+/*[[[body:libc_pthread_rwlock_unlock]]]*/
 {
 	(void)rwlock;
 	CRT_UNIMPLEMENTED("pthread_rwlock_unlock"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlock_unlock]]]*/
+/*[[[end:libc_pthread_rwlock_unlock]]]*/
 
-/*[[[head:pthread_rwlockattr_init,hash:CRC-32=0xa2ed681]]]*/
+/*[[[head:libc_pthread_rwlockattr_init,hash:CRC-32=0x2f6d281a]]]*/
 /* Initialize attribute object ATTR with default values */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlockattr_init") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_init)(pthread_rwlockattr_t *attr)
-/*[[[body:pthread_rwlockattr_init]]]*/
+/*[[[body:libc_pthread_rwlockattr_init]]]*/
 {
 	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_rwlockattr_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlockattr_init]]]*/
+/*[[[end:libc_pthread_rwlockattr_init]]]*/
 
-/*[[[head:pthread_rwlockattr_destroy,hash:CRC-32=0x16704472]]]*/
+/*[[[head:libc_pthread_rwlockattr_destroy,hash:CRC-32=0x47696cbe]]]*/
 /* Destroy attribute object ATTR */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlockattr_destroy") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_destroy)(pthread_rwlockattr_t *attr)
-/*[[[body:pthread_rwlockattr_destroy]]]*/
+/*[[[body:libc_pthread_rwlockattr_destroy]]]*/
 {
 	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_rwlockattr_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlockattr_destroy]]]*/
+/*[[[end:libc_pthread_rwlockattr_destroy]]]*/
 
-/*[[[head:pthread_rwlockattr_getpshared,hash:CRC-32=0x7e4c8499]]]*/
+/*[[[head:libc_pthread_rwlockattr_getpshared,hash:CRC-32=0x8964b482]]]*/
 /* Return current setting of process-shared attribute of ATTR in PSHARED */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlockattr_getpshared") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_getpshared)(pthread_rwlockattr_t const *__restrict attr,
                                                          int *__restrict pshared)
-/*[[[body:pthread_rwlockattr_getpshared]]]*/
+/*[[[body:libc_pthread_rwlockattr_getpshared]]]*/
 {
 	(void)attr;
 	(void)pshared;
@@ -2083,15 +1993,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_getpshared)(pthread_rwlockattr_t co
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlockattr_getpshared]]]*/
+/*[[[end:libc_pthread_rwlockattr_getpshared]]]*/
 
-/*[[[head:pthread_rwlockattr_setpshared,hash:CRC-32=0xfed06dbd]]]*/
+/*[[[head:libc_pthread_rwlockattr_setpshared,hash:CRC-32=0xbfdab841]]]*/
 /* Set process-shared attribute of ATTR to PSHARED */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlockattr_setpshared") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_setpshared)(pthread_rwlockattr_t *attr,
                                                          int pshared)
-/*[[[body:pthread_rwlockattr_setpshared]]]*/
+/*[[[body:libc_pthread_rwlockattr_setpshared]]]*/
 {
 	(void)attr;
 	(void)pshared;
@@ -2099,15 +2008,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_setpshared)(pthread_rwlockattr_t *a
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlockattr_setpshared]]]*/
+/*[[[end:libc_pthread_rwlockattr_setpshared]]]*/
 
-/*[[[head:pthread_rwlockattr_getkind_np,hash:CRC-32=0x1eb7d2f]]]*/
+/*[[[head:libc_pthread_rwlockattr_getkind_np,hash:CRC-32=0xa6f9241e]]]*/
 /* Return current setting of reader/writer preference */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlockattr_getkind_np") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_getkind_np)(pthread_rwlockattr_t const *__restrict attr,
                                                          int *__restrict pref)
-/*[[[body:pthread_rwlockattr_getkind_np]]]*/
+/*[[[body:libc_pthread_rwlockattr_getkind_np]]]*/
 {
 	(void)attr;
 	(void)pref;
@@ -2115,15 +2023,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_getkind_np)(pthread_rwlockattr_t co
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlockattr_getkind_np]]]*/
+/*[[[end:libc_pthread_rwlockattr_getkind_np]]]*/
 
-/*[[[head:pthread_rwlockattr_setkind_np,hash:CRC-32=0x86608d0e]]]*/
+/*[[[head:libc_pthread_rwlockattr_setkind_np,hash:CRC-32=0x4fdbbdfe]]]*/
 /* Set reader/write preference */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlockattr_setkind_np") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_setkind_np)(pthread_rwlockattr_t *attr,
                                                          int pref)
-/*[[[body:pthread_rwlockattr_setkind_np]]]*/
+/*[[[body:libc_pthread_rwlockattr_setkind_np]]]*/
 {
 	(void)attr;
 	(void)pref;
@@ -2131,16 +2038,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlockattr_setkind_np)(pthread_rwlockattr_t *a
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_rwlockattr_setkind_np]]]*/
+/*[[[end:libc_pthread_rwlockattr_setkind_np]]]*/
 
-/*[[[head:pthread_cond_init,hash:CRC-32=0x326fc526]]]*/
+/*[[[head:libc_pthread_cond_init,hash:CRC-32=0xa0e555f6]]]*/
 /* Initialize condition variable COND using attributes ATTR, or use
  * the default values if later is NULL */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cond_init") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_init)(pthread_cond_t *__restrict cond,
                                              pthread_condattr_t const *__restrict cond_attr)
-/*[[[body:pthread_cond_init]]]*/
+/*[[[body:libc_pthread_cond_init]]]*/
 {
 	(void)cond;
 	(void)cond_attr;
@@ -2148,58 +2054,54 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cond_init)(pthread_cond_t *__restrict cond,
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_cond_init]]]*/
+/*[[[end:libc_pthread_cond_init]]]*/
 
-/*[[[head:pthread_cond_destroy,hash:CRC-32=0x1d618c10]]]*/
+/*[[[head:libc_pthread_cond_destroy,hash:CRC-32=0x40aa7736]]]*/
 /* Destroy condition variable COND */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cond_destroy") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_destroy)(pthread_cond_t *cond)
-/*[[[body:pthread_cond_destroy]]]*/
+/*[[[body:libc_pthread_cond_destroy]]]*/
 {
 	(void)cond;
 	CRT_UNIMPLEMENTED("pthread_cond_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_cond_destroy]]]*/
+/*[[[end:libc_pthread_cond_destroy]]]*/
 
-/*[[[head:pthread_cond_signal,hash:CRC-32=0xe770409e]]]*/
+/*[[[head:libc_pthread_cond_signal,hash:CRC-32=0xb650a87a]]]*/
 /* Wake up one thread waiting for condition variable COND */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cond_signal") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_signal)(pthread_cond_t *cond)
-/*[[[body:pthread_cond_signal]]]*/
+/*[[[body:libc_pthread_cond_signal]]]*/
 {
 	(void)cond;
 	CRT_UNIMPLEMENTED("pthread_cond_signal"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_cond_signal]]]*/
+/*[[[end:libc_pthread_cond_signal]]]*/
 
-/*[[[head:pthread_cond_broadcast,hash:CRC-32=0xa9098c09]]]*/
+/*[[[head:libc_pthread_cond_broadcast,hash:CRC-32=0x901c1973]]]*/
 /* Wake up all threads waiting for condition variables COND */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cond_broadcast") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_cond_broadcast)(pthread_cond_t *cond)
-/*[[[body:pthread_cond_broadcast]]]*/
+/*[[[body:libc_pthread_cond_broadcast]]]*/
 {
 	(void)cond;
 	CRT_UNIMPLEMENTED("pthread_cond_broadcast"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_cond_broadcast]]]*/
+/*[[[end:libc_pthread_cond_broadcast]]]*/
 
-/*[[[head:pthread_cond_wait,hash:CRC-32=0x671dcdba]]]*/
+/*[[[head:libc_pthread_cond_wait,hash:CRC-32=0xacce102]]]*/
 /* Wait for condition variable COND to be signaled or broadcast.
  * MUTEX is assumed to be locked before. */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cond_wait") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict cond,
                                              pthread_mutex_t *__restrict mutex)
-/*[[[body:pthread_cond_wait]]]*/
+/*[[[body:libc_pthread_cond_wait]]]*/
 {
 	(void)cond;
 	(void)mutex;
@@ -2207,19 +2109,18 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict cond,
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_cond_wait]]]*/
+/*[[[end:libc_pthread_cond_wait]]]*/
 
-/*[[[head:pthread_cond_timedwait,hash:CRC-32=0x9715cce6]]]*/
+/*[[[head:libc_pthread_cond_timedwait,hash:CRC-32=0xa77e9d35]]]*/
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cond_timedwait") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict cond,
                                                   pthread_mutex_t *__restrict mutex,
                                                   struct timespec const *__restrict abstime)
-/*[[[body:pthread_cond_timedwait]]]*/
+/*[[[body:libc_pthread_cond_timedwait]]]*/
 {
 	(void)cond;
 	(void)mutex;
@@ -2228,43 +2129,40 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict con
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_cond_timedwait]]]*/
+/*[[[end:libc_pthread_cond_timedwait]]]*/
 
-/*[[[head:pthread_condattr_init,hash:CRC-32=0xbed3805c]]]*/
+/*[[[head:libc_pthread_condattr_init,hash:CRC-32=0xe0b840ba]]]*/
 /* Initialize condition variable attribute ATTR */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_condattr_init") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_init)(pthread_condattr_t *attr)
-/*[[[body:pthread_condattr_init]]]*/
+/*[[[body:libc_pthread_condattr_init]]]*/
 {
 	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_condattr_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_condattr_init]]]*/
+/*[[[end:libc_pthread_condattr_init]]]*/
 
-/*[[[head:pthread_condattr_destroy,hash:CRC-32=0xc34287d4]]]*/
+/*[[[head:libc_pthread_condattr_destroy,hash:CRC-32=0x2d5cdafa]]]*/
 /* Destroy condition variable attribute ATTR */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_condattr_destroy") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_destroy)(pthread_condattr_t *attr)
-/*[[[body:pthread_condattr_destroy]]]*/
+/*[[[body:libc_pthread_condattr_destroy]]]*/
 {
 	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_condattr_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_condattr_destroy]]]*/
+/*[[[end:libc_pthread_condattr_destroy]]]*/
 
-/*[[[head:pthread_condattr_getpshared,hash:CRC-32=0xb0316583]]]*/
+/*[[[head:libc_pthread_condattr_getpshared,hash:CRC-32=0xa6ec87ec]]]*/
 /* Get the process-shared flag of the condition variable attribute ATTR */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_condattr_getpshared") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_getpshared)(pthread_condattr_t const *__restrict attr,
                                                        int *__restrict pshared)
-/*[[[body:pthread_condattr_getpshared]]]*/
+/*[[[body:libc_pthread_condattr_getpshared]]]*/
 {
 	(void)attr;
 	(void)pshared;
@@ -2272,15 +2170,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_getpshared)(pthread_condattr_t const 
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_condattr_getpshared]]]*/
+/*[[[end:libc_pthread_condattr_getpshared]]]*/
 
-/*[[[head:pthread_condattr_setpshared,hash:CRC-32=0x685e1ec4]]]*/
+/*[[[head:libc_pthread_condattr_setpshared,hash:CRC-32=0xb938cd78]]]*/
 /* Set the process-shared flag of the condition variable attribute ATTR */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_condattr_setpshared") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setpshared)(pthread_condattr_t *attr,
                                                        int pshared)
-/*[[[body:pthread_condattr_setpshared]]]*/
+/*[[[body:libc_pthread_condattr_setpshared]]]*/
 {
 	(void)attr;
 	(void)pshared;
@@ -2288,15 +2185,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setpshared)(pthread_condattr_t *attr,
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_condattr_setpshared]]]*/
+/*[[[end:libc_pthread_condattr_setpshared]]]*/
 
-/*[[[head:pthread_condattr_getclock,hash:CRC-32=0x61dbaf52]]]*/
+/*[[[head:libc_pthread_condattr_getclock,hash:CRC-32=0x53837cbb]]]*/
 /* Get the clock selected for the condition variable attribute ATTR */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_condattr_getclock") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_getclock)(pthread_condattr_t const *__restrict attr,
                                                      clockid_t *__restrict clock_id)
-/*[[[body:pthread_condattr_getclock]]]*/
+/*[[[body:libc_pthread_condattr_getclock]]]*/
 {
 	(void)attr;
 	(void)clock_id;
@@ -2304,15 +2200,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_getclock)(pthread_condattr_t const *_
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_condattr_getclock]]]*/
+/*[[[end:libc_pthread_condattr_getclock]]]*/
 
-/*[[[head:pthread_condattr_setclock,hash:CRC-32=0x3d90bd52]]]*/
+/*[[[head:libc_pthread_condattr_setclock,hash:CRC-32=0xe44b87f7]]]*/
 /* Set the clock selected for the condition variable attribute ATTR */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_condattr_setclock") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setclock)(pthread_condattr_t *attr,
                                                      clockid_t clock_id)
-/*[[[body:pthread_condattr_setclock]]]*/
+/*[[[body:libc_pthread_condattr_setclock]]]*/
 {
 	(void)attr;
 	(void)clock_id;
@@ -2320,7 +2215,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setclock)(pthread_condattr_t *attr,
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_condattr_setclock]]]*/
+/*[[[end:libc_pthread_condattr_setclock]]]*/
 
 
 
@@ -2331,15 +2226,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setclock)(pthread_condattr_t *attr,
 
 
 
-/*[[[head:pthread_barrier_init,hash:CRC-32=0x2d772507]]]*/
+/*[[[head:libc_pthread_barrier_init,hash:CRC-32=0x11e9a45d]]]*/
 /* Initialize BARRIER with the attributes in ATTR.
  * The barrier is opened when COUNT waiters arrived */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_barrier_init") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_barrier_init)(pthread_barrier_t *__restrict barrier,
                                                 pthread_barrierattr_t const *__restrict attr,
                                                 unsigned int count)
-/*[[[body:pthread_barrier_init]]]*/
+/*[[[body:libc_pthread_barrier_init]]]*/
 {
 	(void)barrier;
 	(void)attr;
@@ -2348,71 +2242,66 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrier_init)(pthread_barrier_t *__restrict ba
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_barrier_init]]]*/
+/*[[[end:libc_pthread_barrier_init]]]*/
 
-/*[[[head:pthread_barrier_destroy,hash:CRC-32=0xb15a3987]]]*/
+/*[[[head:libc_pthread_barrier_destroy,hash:CRC-32=0x200f465b]]]*/
 /* Destroy a previously dynamically initialized barrier BARRIER */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_barrier_destroy") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_barrier_destroy)(pthread_barrier_t *barrier)
-/*[[[body:pthread_barrier_destroy]]]*/
+/*[[[body:libc_pthread_barrier_destroy]]]*/
 {
 	(void)barrier;
 	CRT_UNIMPLEMENTED("pthread_barrier_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_barrier_destroy]]]*/
+/*[[[end:libc_pthread_barrier_destroy]]]*/
 
-/*[[[head:pthread_barrier_wait,hash:CRC-32=0xb3222d0a]]]*/
+/*[[[head:libc_pthread_barrier_wait,hash:CRC-32=0xdc6e2284]]]*/
 /* Wait on barrier BARRIER */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_barrier_wait") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_pthread_barrier_wait)(pthread_barrier_t *barrier)
-/*[[[body:pthread_barrier_wait]]]*/
+/*[[[body:libc_pthread_barrier_wait]]]*/
 {
 	(void)barrier;
 	CRT_UNIMPLEMENTED("pthread_barrier_wait"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_barrier_wait]]]*/
+/*[[[end:libc_pthread_barrier_wait]]]*/
 
-/*[[[head:pthread_barrierattr_init,hash:CRC-32=0xc052fa2e]]]*/
+/*[[[head:libc_pthread_barrierattr_init,hash:CRC-32=0x2546111b]]]*/
 /* Initialize barrier attribute ATTR */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_barrierattr_init") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_init)(pthread_barrierattr_t *attr)
-/*[[[body:pthread_barrierattr_init]]]*/
+/*[[[body:libc_pthread_barrierattr_init]]]*/
 {
 	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_barrierattr_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_barrierattr_init]]]*/
+/*[[[end:libc_pthread_barrierattr_init]]]*/
 
-/*[[[head:pthread_barrierattr_destroy,hash:CRC-32=0xd4ccb674]]]*/
+/*[[[head:libc_pthread_barrierattr_destroy,hash:CRC-32=0xec2093eb]]]*/
 /* Destroy previously dynamically initialized barrier attribute ATTR */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_barrierattr_destroy") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_destroy)(pthread_barrierattr_t *attr)
-/*[[[body:pthread_barrierattr_destroy]]]*/
+/*[[[body:libc_pthread_barrierattr_destroy]]]*/
 {
 	(void)attr;
 	CRT_UNIMPLEMENTED("pthread_barrierattr_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_barrierattr_destroy]]]*/
+/*[[[end:libc_pthread_barrierattr_destroy]]]*/
 
-/*[[[head:pthread_barrierattr_getpshared,hash:CRC-32=0x1c0c575e]]]*/
+/*[[[head:libc_pthread_barrierattr_getpshared,hash:CRC-32=0x8c731c39]]]*/
 /* Get the process-shared flag of the barrier attribute ATTR */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_barrierattr_getpshared") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_getpshared)(pthread_barrierattr_t const *__restrict attr,
                                                           int *__restrict pshared)
-/*[[[body:pthread_barrierattr_getpshared]]]*/
+/*[[[body:libc_pthread_barrierattr_getpshared]]]*/
 {
 	(void)attr;
 	(void)pshared;
@@ -2420,15 +2309,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_getpshared)(pthread_barrierattr_t 
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_barrierattr_getpshared]]]*/
+/*[[[end:libc_pthread_barrierattr_getpshared]]]*/
 
-/*[[[head:pthread_barrierattr_setpshared,hash:CRC-32=0x1c1596c5]]]*/
+/*[[[head:libc_pthread_barrierattr_setpshared,hash:CRC-32=0x539d2aa5]]]*/
 /* Set the process-shared flag of the barrier attribute ATTR */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_barrierattr_setpshared") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_setpshared)(pthread_barrierattr_t *attr,
                                                           int pshared)
-/*[[[body:pthread_barrierattr_setpshared]]]*/
+/*[[[body:libc_pthread_barrierattr_setpshared]]]*/
 {
 	(void)attr;
 	(void)pshared;
@@ -2436,20 +2324,19 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_setpshared)(pthread_barrierattr_t 
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_barrierattr_setpshared]]]*/
+/*[[[end:libc_pthread_barrierattr_setpshared]]]*/
 
-/*[[[head:pthread_key_create,hash:CRC-32=0x55336654]]]*/
+/*[[[head:libc_pthread_key_create,hash:CRC-32=0xb7f538a3]]]*/
 /* Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data
  * area. DESTR_FUNCTION, if non-NULL, is called with the value
  * associated to that key when the key is destroyed.
  * DESTR_FUNCTION is not called if the value associated is NULL when
  * the key is destroyed */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_key_create") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_key_create)(pthread_key_t *key,
                                               __pthread_destr_function_t destr_function)
-/*[[[body:pthread_key_create]]]*/
+/*[[[body:libc_pthread_key_create]]]*/
 {
 	(void)key;
 	(void)destr_function;
@@ -2457,40 +2344,40 @@ NOTHROW_NCX(LIBCCALL libc_pthread_key_create)(pthread_key_t *key,
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_key_create]]]*/
+/*[[[end:libc_pthread_key_create]]]*/
 
-/*[[[head:pthread_key_delete,hash:CRC-32=0x650ded69]]]*/
+/*[[[head:libc_pthread_key_delete,hash:CRC-32=0xb016144e]]]*/
 /* Destroy KEY */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_key_delete") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_key_delete)(pthread_key_t key)
-/*[[[body:pthread_key_delete]]]*/
+/*[[[body:libc_pthread_key_delete]]]*/
 {
 	(void)key;
 	CRT_UNIMPLEMENTED("pthread_key_delete"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_key_delete]]]*/
+/*[[[end:libc_pthread_key_delete]]]*/
 
-/*[[[head:pthread_getspecific,hash:CRC-32=0xc26e9854]]]*/
+/*[[[head:libc_pthread_getspecific,hash:CRC-32=0xa9599c9f]]]*/
 /* Return current value of the thread-specific data slot identified by KEY */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_getspecific") void *
+INTERN ATTR_SECTION(".text.crt.sched.pthread") void *
 NOTHROW_NCX(LIBCCALL libc_pthread_getspecific)(pthread_key_t key)
-/*[[[body:pthread_getspecific]]]*/
+/*[[[body:libc_pthread_getspecific]]]*/
 {
 	(void)key;
 	CRT_UNIMPLEMENTED("pthread_getspecific"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:pthread_getspecific]]]*/
+/*[[[end:libc_pthread_getspecific]]]*/
 
-/*[[[head:pthread_setspecific,hash:CRC-32=0x9ea495de]]]*/
+/*[[[head:libc_pthread_setspecific,hash:CRC-32=0xde9bce8]]]*/
 /* Store POINTER in the thread-specific data slot identified by KEY */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_setspecific") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
                                                void const *pointer)
-/*[[[body:pthread_setspecific]]]*/
+/*[[[body:libc_pthread_setspecific]]]*/
 {
 	(void)key;
 	(void)pointer;
@@ -2498,15 +2385,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_setspecific]]]*/
+/*[[[end:libc_pthread_setspecific]]]*/
 
-/*[[[head:pthread_getcpuclockid,hash:CRC-32=0xce88fca3]]]*/
+/*[[[head:libc_pthread_getcpuclockid,hash:CRC-32=0xf9274d5]]]*/
 /* Get ID of CPU-time clock for thread THREAD_ID */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_getcpuclockid") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t pthread_id,
                                                  clockid_t *clock_id)
-/*[[[body:pthread_getcpuclockid]]]*/
+/*[[[body:libc_pthread_getcpuclockid]]]*/
 {
 	(void)pthread_id;
 	(void)clock_id;
@@ -2514,9 +2400,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t pthread_id,
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_getcpuclockid]]]*/
+/*[[[end:libc_pthread_getcpuclockid]]]*/
 
-/*[[[head:pthread_atfork,hash:CRC-32=0xbbfe6dcd]]]*/
+/*[[[head:libc_pthread_atfork,hash:CRC-32=0xe3d12b5]]]*/
 /* Install handlers to be called when a new process is created with FORK.
  * The PREPARE handler is called in the parent process just before performing
  * FORK. The PARENT handler is called in the parent process just after FORK.
@@ -2527,11 +2413,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t pthread_id,
  * handlers are called in LIFO order (last added with PTHREAD_ATFORK,
  * first called before FORK), and the PARENT and CHILD handlers are called
  * in FIFO (first added, first called) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_atfork") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(__pthread_atfork_func_t prepare,
                                           __pthread_atfork_func_t parent,
                                           __pthread_atfork_func_t child)
-/*[[[body:pthread_atfork]]]*/
+/*[[[body:libc_pthread_atfork]]]*/
 {
 	(void)prepare;
 	(void)parent;
@@ -2540,42 +2426,39 @@ NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(__pthread_atfork_func_t prepare,
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:pthread_atfork]]]*/
+/*[[[end:libc_pthread_atfork]]]*/
 
-/*[[[head:__pthread_register_cancel,hash:CRC-32=0x363e7c72]]]*/
-INTERN __cleanup_fct_attribute
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_register_cancel") void
+/*[[[head:libc___pthread_register_cancel,hash:CRC-32=0xa8bf5df4]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread") __cleanup_fct_attribute void
 NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel)(__pthread_unwind_buf_t *buf)
-/*[[[body:__pthread_register_cancel]]]*/
+/*[[[body:libc___pthread_register_cancel]]]*/
 {
 	(void)buf;
 	CRT_UNIMPLEMENTED("__pthread_register_cancel"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:__pthread_register_cancel]]]*/
+/*[[[end:libc___pthread_register_cancel]]]*/
 
-/*[[[head:__pthread_register_cancel_defer,hash:CRC-32=0xb58b0283]]]*/
-INTERN __cleanup_fct_attribute NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_register_cancel_defer") void
+/*[[[head:libc___pthread_register_cancel_defer,hash:CRC-32=0x9c4cb803]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread") __cleanup_fct_attribute NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel_defer)(__pthread_unwind_buf_t *buf)
-/*[[[body:__pthread_register_cancel_defer]]]*/
+/*[[[body:libc___pthread_register_cancel_defer]]]*/
 {
 	(void)buf;
 	CRT_UNIMPLEMENTED("__pthread_register_cancel_defer"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:__pthread_register_cancel_defer]]]*/
+/*[[[end:libc___pthread_register_cancel_defer]]]*/
 
-/*[[[head:pthread_mutex_timedlock64,hash:CRC-32=0x9b0d055d]]]*/
-/* Wait until lock becomes available, or specified time passes */
+/*[[[head:libc_pthread_mutex_timedlock64,hash:CRC-32=0x5901f300]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_mutex_timedlock64, libc_pthread_mutex_timedlock);
-#else
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_timedlock64") int
+#else /* MAGIC:alias */
+/* Wait until lock becomes available, or specified time passes */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock64)(pthread_mutex_t *__restrict mutex,
                                                      struct timespec64 const *__restrict abstime)
-/*[[[body:pthread_mutex_timedlock64]]]*/
+/*[[[body:libc_pthread_mutex_timedlock64]]]*/
 {
 	(void)mutex;
 	(void)abstime;
@@ -2584,22 +2467,21 @@ NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock64)(pthread_mutex_t *__restrict
 	return -1;
 }
 #endif /* MAGIC:alias */
-/*[[[end:pthread_mutex_timedlock64]]]*/
+/*[[[end:libc_pthread_mutex_timedlock64]]]*/
 
-/*[[[head:pthread_cond_timedwait64,hash:CRC-32=0xa876cc99]]]*/
+/*[[[head:libc_pthread_cond_timedwait64,hash:CRC-32=0xf3120bde]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_cond_timedwait64, libc_pthread_cond_timedwait);
+#else /* MAGIC:alias */
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_pthread_cond_timedwait64, libc_pthread_cond_timedwait);
-#else
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cond_timedwait64") int
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict cond,
                                                     pthread_mutex_t *__restrict mutex,
                                                     struct timespec64 const *__restrict abstime)
-/*[[[body:pthread_cond_timedwait64]]]*/
+/*[[[body:libc_pthread_cond_timedwait64]]]*/
 {
 	(void)cond;
 	(void)mutex;
@@ -2609,20 +2491,17 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict c
 	return -1;
 }
 #endif /* MAGIC:alias */
-/*[[[end:pthread_cond_timedwait64]]]*/
+/*[[[end:libc_pthread_cond_timedwait64]]]*/
 
-/*[[[head:pthread_timedjoin64_np,hash:CRC-32=0x2be70a09]]]*/
-/* Make calling thread wait for termination of the thread THREAD, but only
- * until TIMEOUT. The exit status of the thread is stored in
- * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
+/*[[[head:libc_pthread_timedjoin64_np,hash:CRC-32=0x40adcd9]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_timedjoin64_np, libc_pthread_timedjoin_np);
-#else
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_timedjoin64_np") int
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t pthread,
                                                   void **thread_return,
                                                   struct timespec64 const *abstime)
-/*[[[body:pthread_timedjoin64_np]]]*/
+/*[[[body:libc_pthread_timedjoin64_np]]]*/
 {
 	(void)pthread;
 	(void)thread_return;
@@ -2632,18 +2511,17 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t pthread,
 	return -1;
 }
 #endif /* MAGIC:alias */
-/*[[[end:pthread_timedjoin64_np]]]*/
+/*[[[end:libc_pthread_timedjoin64_np]]]*/
 
-/*[[[head:pthread_rwlock_timedrdlock64,hash:CRC-32=0x28b490d2]]]*/
-/* Try to acquire read lock for RWLOCK or return after specfied time */
+/*[[[head:libc_pthread_rwlock_timedrdlock64,hash:CRC-32=0x258406b2]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock);
-#else
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_timedrdlock64") int
+#else /* MAGIC:alias */
+/* Try to acquire read lock for RWLOCK or return after specfied time */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict rwlock,
                                                         struct timespec64 const *__restrict abstime)
-/*[[[body:pthread_rwlock_timedrdlock64]]]*/
+/*[[[body:libc_pthread_rwlock_timedrdlock64]]]*/
 {
 	(void)rwlock;
 	(void)abstime;
@@ -2652,18 +2530,17 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__rest
 	return -1;
 }
 #endif /* MAGIC:alias */
-/*[[[end:pthread_rwlock_timedrdlock64]]]*/
+/*[[[end:libc_pthread_rwlock_timedrdlock64]]]*/
 
-/*[[[head:pthread_rwlock_timedwrlock64,hash:CRC-32=0x307decc5]]]*/
-/* Try to acquire write lock for RWLOCK or return after specfied time */
+/*[[[head:libc_pthread_rwlock_timedwrlock64,hash:CRC-32=0x36107529]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timedwrlock);
-#else
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_timedwrlock64") int
+#else /* MAGIC:alias */
+/* Try to acquire write lock for RWLOCK or return after specfied time */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict rwlock,
                                                         struct timespec64 const *__restrict abstime)
-/*[[[body:pthread_rwlock_timedwrlock64]]]*/
+/*[[[body:libc_pthread_rwlock_timedwrlock64]]]*/
 {
 	(void)rwlock;
 	(void)abstime;
@@ -2672,24 +2549,24 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__rest
 	return -1;
 }
 #endif /* MAGIC:alias */
-/*[[[end:pthread_rwlock_timedwrlock64]]]*/
+/*[[[end:libc_pthread_rwlock_timedwrlock64]]]*/
 
-/*[[[head:pthread_num_processors_np,hash:CRC-32=0x54cc3b90]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread_ext.pthread_num_processors_np") __STDC_INT_AS_SIZE_T
+/*[[[head:libc_pthread_num_processors_np,hash:CRC-32=0xc86d87d]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void)
-/*[[[body:pthread_num_processors_np]]]*/
+/*[[[body:libc_pthread_num_processors_np]]]*/
 /*AUTO*/{
 	cpu_set_t cset;
-	if unlikely(libc_sched_getaffinity(0, sizeof(cset), &cset) != 0)
+	if unlikely(sched_getaffinity(0, sizeof(cset), &cset) != 0)
 		return 1;
 	return (__STDC_INT_AS_SIZE_T)__CPU_COUNT_S(sizeof(cset), &cset);
 }
-/*[[[end:pthread_num_processors_np]]]*/
+/*[[[end:libc_pthread_num_processors_np]]]*/
 
-/*[[[head:pthread_set_num_processors_np,hash:CRC-32=0x83c09375]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread_ext.pthread_set_num_processors_np") int
+/*[[[head:libc_pthread_set_num_processors_np,hash:CRC-32=0xbd87b829]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") int
 NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n)
-/*[[[body:pthread_set_num_processors_np]]]*/
+/*[[[body:libc_pthread_set_num_processors_np]]]*/
 /*AUTO*/{
 	int i, result;
 	cpu_set_t cset;
@@ -2705,149 +2582,147 @@ NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n)
 		if (!__CPU_SET_S(i, sizeof(cset), &cset))
 			break;
 	}
-	result = libc_sched_setaffinity(0, sizeof(cset), &cset);
+	result = sched_setaffinity(0, sizeof(cset), &cset);
 	if unlikely(result != 0)
 		result = __libc_geterrno_or(1);
 	return result;
 }
-/*[[[end:pthread_set_num_processors_np]]]*/
+/*[[[end:libc_pthread_set_num_processors_np]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xcd3e59f5]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_create, libc_pthread_create);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_exit, libc_pthread_exit);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_join, libc_pthread_join);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_tryjoin_np, libc_pthread_tryjoin_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_timedjoin_np, libc_pthread_timedjoin_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_timedjoin64_np, libc_pthread_timedjoin64_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_detach, libc_pthread_detach);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_self, libc_pthread_self);
-DEFINE_PUBLIC_WEAK_ALIAS(thrd_current, libc_pthread_self);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_init, libc_pthread_attr_init);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_destroy, libc_pthread_attr_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_getdetachstate, libc_pthread_attr_getdetachstate);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_setdetachstate, libc_pthread_attr_setdetachstate);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_getguardsize, libc_pthread_attr_getguardsize);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_setguardsize, libc_pthread_attr_setguardsize);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_getschedparam, libc_pthread_attr_getschedparam);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_setschedparam, libc_pthread_attr_setschedparam);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_getschedpolicy, libc_pthread_attr_getschedpolicy);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_setschedpolicy, libc_pthread_attr_setschedpolicy);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_getinheritsched, libc_pthread_attr_getinheritsched);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_setinheritsched, libc_pthread_attr_setinheritsched);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_getscope, libc_pthread_attr_getscope);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_setscope, libc_pthread_attr_setscope);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_getstackaddr, libc_pthread_attr_getstackaddr);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_setstackaddr, libc_pthread_attr_setstackaddr);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_getstacksize, libc_pthread_attr_getstacksize);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_setstacksize, libc_pthread_attr_setstacksize);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_getstack, libc_pthread_attr_getstack);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_setstack, libc_pthread_attr_setstack);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_setaffinity_np, libc_pthread_attr_setaffinity_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_getaffinity_np, libc_pthread_attr_getaffinity_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_getattr_default_np, libc_pthread_getattr_default_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_setattr_default_np, libc_pthread_setattr_default_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_getattr_np, libc_pthread_getattr_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_setschedparam, libc_pthread_setschedparam);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_getschedparam, libc_pthread_getschedparam);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_setschedprio, libc_pthread_setschedprio);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_getname_np, libc_pthread_getname_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_setname_np, libc_pthread_setname_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_gettid_np, libc_pthread_gettid_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_getconcurrency, libc_pthread_getconcurrency);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_setconcurrency, libc_pthread_setconcurrency);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_yield, libc_pthread_yield);
-DEFINE_PUBLIC_WEAK_ALIAS(thrd_yield, libc_pthread_yield);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_setaffinity_np, libc_pthread_setaffinity_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_getaffinity_np, libc_pthread_getaffinity_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_once, libc_pthread_once);
-DEFINE_PUBLIC_WEAK_ALIAS(call_once, libc_pthread_once);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_setcancelstate, libc_pthread_setcancelstate);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_setcanceltype, libc_pthread_setcanceltype);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_cancel, libc_pthread_cancel);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_testcancel, libc_pthread_testcancel);
-DEFINE_PUBLIC_WEAK_ALIAS(__pthread_register_cancel, libc___pthread_register_cancel);
-DEFINE_PUBLIC_WEAK_ALIAS(__pthread_unregister_cancel, libc___pthread_unregister_cancel);
-DEFINE_PUBLIC_WEAK_ALIAS(__pthread_register_cancel_defer, libc___pthread_register_cancel_defer);
-DEFINE_PUBLIC_WEAK_ALIAS(__pthread_unregister_cancel_restore, libc___pthread_unregister_cancel_restore);
-DEFINE_PUBLIC_WEAK_ALIAS(__pthread_unwind_next, libc___pthread_unwind_next);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_init, libc_pthread_mutex_init);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_destroy, libc_pthread_mutex_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(mtx_destroy, libc_pthread_mutex_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_trylock, libc_pthread_mutex_trylock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_lock, libc_pthread_mutex_lock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_timedlock, libc_pthread_mutex_timedlock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_timedlock64, libc_pthread_mutex_timedlock64);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_unlock, libc_pthread_mutex_unlock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_getprioceiling, libc_pthread_mutex_getprioceiling);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_setprioceiling, libc_pthread_mutex_setprioceiling);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_consistent, libc_pthread_mutex_consistent);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_consistent_np, libc_pthread_mutex_consistent_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_init, libc_pthread_mutexattr_init);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_destroy, libc_pthread_mutexattr_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_getpshared, libc_pthread_mutexattr_getpshared);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_setpshared, libc_pthread_mutexattr_setpshared);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_gettype, libc_pthread_mutexattr_gettype);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_settype, libc_pthread_mutexattr_settype);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_getprotocol, libc_pthread_mutexattr_getprotocol);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_setprotocol, libc_pthread_mutexattr_setprotocol);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_getprioceiling, libc_pthread_mutexattr_getprioceiling);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_setprioceiling, libc_pthread_mutexattr_setprioceiling);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_getrobust, libc_pthread_mutexattr_getrobust);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_setrobust, libc_pthread_mutexattr_setrobust);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_getrobust_np, libc_pthread_mutexattr_getrobust_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutexattr_setrobust_np, libc_pthread_mutexattr_setrobust_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_init, libc_pthread_rwlock_init);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_destroy, libc_pthread_rwlock_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_rdlock, libc_pthread_rwlock_rdlock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_tryrdlock, libc_pthread_rwlock_tryrdlock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_timedrdlock, libc_pthread_rwlock_timedrdlock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock64);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_wrlock, libc_pthread_rwlock_wrlock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_trywrlock, libc_pthread_rwlock_trywrlock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_timedwrlock, libc_pthread_rwlock_timedwrlock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timedwrlock64);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_unlock, libc_pthread_rwlock_unlock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlockattr_init, libc_pthread_rwlockattr_init);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlockattr_destroy, libc_pthread_rwlockattr_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlockattr_getpshared, libc_pthread_rwlockattr_getpshared);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlockattr_setpshared, libc_pthread_rwlockattr_setpshared);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlockattr_getkind_np, libc_pthread_rwlockattr_getkind_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlockattr_setkind_np, libc_pthread_rwlockattr_setkind_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_init, libc_pthread_cond_init);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_destroy, libc_pthread_cond_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(cnd_destroy, libc_pthread_cond_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_signal, libc_pthread_cond_signal);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_broadcast, libc_pthread_cond_broadcast);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_wait, libc_pthread_cond_wait);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_timedwait, libc_pthread_cond_timedwait);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_timedwait64, libc_pthread_cond_timedwait64);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_condattr_init, libc_pthread_condattr_init);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_condattr_destroy, libc_pthread_condattr_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_condattr_getpshared, libc_pthread_condattr_getpshared);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_condattr_setpshared, libc_pthread_condattr_setpshared);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_condattr_getclock, libc_pthread_condattr_getclock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_condattr_setclock, libc_pthread_condattr_setclock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_barrier_init, libc_pthread_barrier_init);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_barrier_destroy, libc_pthread_barrier_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_barrier_wait, libc_pthread_barrier_wait);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_barrierattr_init, libc_pthread_barrierattr_init);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_barrierattr_destroy, libc_pthread_barrierattr_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_barrierattr_getpshared, libc_pthread_barrierattr_getpshared);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_barrierattr_setpshared, libc_pthread_barrierattr_setpshared);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_key_create, libc_pthread_key_create);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_key_delete, libc_pthread_key_delete);
-DEFINE_PUBLIC_WEAK_ALIAS(tss_delete, libc_pthread_key_delete);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_getspecific, libc_pthread_getspecific);
-DEFINE_PUBLIC_WEAK_ALIAS(tss_get, libc_pthread_getspecific);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_setspecific, libc_pthread_setspecific);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_getcpuclockid, libc_pthread_getcpuclockid);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_atfork, libc_pthread_atfork);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_num_processors_np, libc_pthread_num_processors_np);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_set_num_processors_np, libc_pthread_set_num_processors_np);
+/*[[[start:exports,hash:CRC-32=0x4419fe9f]]]*/
+DEFINE_PUBLIC_ALIAS(pthread_create, libc_pthread_create);
+DEFINE_PUBLIC_ALIAS(pthread_exit, libc_pthread_exit);
+DEFINE_PUBLIC_ALIAS(pthread_join, libc_pthread_join);
+DEFINE_PUBLIC_ALIAS(pthread_tryjoin_np, libc_pthread_tryjoin_np);
+DEFINE_PUBLIC_ALIAS(pthread_timedjoin_np, libc_pthread_timedjoin_np);
+DEFINE_PUBLIC_ALIAS(pthread_timedjoin64_np, libc_pthread_timedjoin64_np);
+DEFINE_PUBLIC_ALIAS(pthread_detach, libc_pthread_detach);
+DEFINE_PUBLIC_ALIAS(thrd_current, libc_pthread_self);
+DEFINE_PUBLIC_ALIAS(pthread_self, libc_pthread_self);
+DEFINE_PUBLIC_ALIAS(pthread_attr_init, libc_pthread_attr_init);
+DEFINE_PUBLIC_ALIAS(pthread_attr_destroy, libc_pthread_attr_destroy);
+DEFINE_PUBLIC_ALIAS(pthread_attr_getdetachstate, libc_pthread_attr_getdetachstate);
+DEFINE_PUBLIC_ALIAS(pthread_attr_setdetachstate, libc_pthread_attr_setdetachstate);
+DEFINE_PUBLIC_ALIAS(pthread_attr_getguardsize, libc_pthread_attr_getguardsize);
+DEFINE_PUBLIC_ALIAS(pthread_attr_setguardsize, libc_pthread_attr_setguardsize);
+DEFINE_PUBLIC_ALIAS(pthread_attr_getschedparam, libc_pthread_attr_getschedparam);
+DEFINE_PUBLIC_ALIAS(pthread_attr_setschedparam, libc_pthread_attr_setschedparam);
+DEFINE_PUBLIC_ALIAS(pthread_attr_getschedpolicy, libc_pthread_attr_getschedpolicy);
+DEFINE_PUBLIC_ALIAS(pthread_attr_setschedpolicy, libc_pthread_attr_setschedpolicy);
+DEFINE_PUBLIC_ALIAS(pthread_attr_getinheritsched, libc_pthread_attr_getinheritsched);
+DEFINE_PUBLIC_ALIAS(pthread_attr_setinheritsched, libc_pthread_attr_setinheritsched);
+DEFINE_PUBLIC_ALIAS(pthread_attr_getscope, libc_pthread_attr_getscope);
+DEFINE_PUBLIC_ALIAS(pthread_attr_setscope, libc_pthread_attr_setscope);
+DEFINE_PUBLIC_ALIAS(pthread_attr_getstackaddr, libc_pthread_attr_getstackaddr);
+DEFINE_PUBLIC_ALIAS(pthread_attr_setstackaddr, libc_pthread_attr_setstackaddr);
+DEFINE_PUBLIC_ALIAS(pthread_attr_getstacksize, libc_pthread_attr_getstacksize);
+DEFINE_PUBLIC_ALIAS(pthread_attr_setstacksize, libc_pthread_attr_setstacksize);
+DEFINE_PUBLIC_ALIAS(pthread_attr_getstack, libc_pthread_attr_getstack);
+DEFINE_PUBLIC_ALIAS(pthread_attr_setstack, libc_pthread_attr_setstack);
+DEFINE_PUBLIC_ALIAS(pthread_attr_setaffinity_np, libc_pthread_attr_setaffinity_np);
+DEFINE_PUBLIC_ALIAS(pthread_attr_getaffinity_np, libc_pthread_attr_getaffinity_np);
+DEFINE_PUBLIC_ALIAS(pthread_getattr_default_np, libc_pthread_getattr_default_np);
+DEFINE_PUBLIC_ALIAS(pthread_setattr_default_np, libc_pthread_setattr_default_np);
+DEFINE_PUBLIC_ALIAS(pthread_getattr_np, libc_pthread_getattr_np);
+DEFINE_PUBLIC_ALIAS(pthread_setschedparam, libc_pthread_setschedparam);
+DEFINE_PUBLIC_ALIAS(pthread_getschedparam, libc_pthread_getschedparam);
+DEFINE_PUBLIC_ALIAS(pthread_setschedprio, libc_pthread_setschedprio);
+DEFINE_PUBLIC_ALIAS(pthread_getname_np, libc_pthread_getname_np);
+DEFINE_PUBLIC_ALIAS(pthread_setname_np, libc_pthread_setname_np);
+DEFINE_PUBLIC_ALIAS(pthread_gettid_np, libc_pthread_gettid_np);
+DEFINE_PUBLIC_ALIAS(pthread_getconcurrency, libc_pthread_getconcurrency);
+DEFINE_PUBLIC_ALIAS(pthread_setconcurrency, libc_pthread_setconcurrency);
+DEFINE_PUBLIC_ALIAS(pthread_setaffinity_np, libc_pthread_setaffinity_np);
+DEFINE_PUBLIC_ALIAS(pthread_getaffinity_np, libc_pthread_getaffinity_np);
+DEFINE_PUBLIC_ALIAS(call_once, libc_pthread_once);
+DEFINE_PUBLIC_ALIAS(pthread_once, libc_pthread_once);
+DEFINE_PUBLIC_ALIAS(pthread_setcancelstate, libc_pthread_setcancelstate);
+DEFINE_PUBLIC_ALIAS(pthread_setcanceltype, libc_pthread_setcanceltype);
+DEFINE_PUBLIC_ALIAS(pthread_cancel, libc_pthread_cancel);
+DEFINE_PUBLIC_ALIAS(pthread_testcancel, libc_pthread_testcancel);
+DEFINE_PUBLIC_ALIAS(__pthread_register_cancel, libc___pthread_register_cancel);
+DEFINE_PUBLIC_ALIAS(__pthread_unregister_cancel, libc___pthread_unregister_cancel);
+DEFINE_PUBLIC_ALIAS(__pthread_register_cancel_defer, libc___pthread_register_cancel_defer);
+DEFINE_PUBLIC_ALIAS(__pthread_unregister_cancel_restore, libc___pthread_unregister_cancel_restore);
+DEFINE_PUBLIC_ALIAS(__pthread_unwind_next, libc___pthread_unwind_next);
+DEFINE_PUBLIC_ALIAS(pthread_mutex_init, libc_pthread_mutex_init);
+DEFINE_PUBLIC_ALIAS(mtx_destroy, libc_pthread_mutex_destroy);
+DEFINE_PUBLIC_ALIAS(pthread_mutex_destroy, libc_pthread_mutex_destroy);
+DEFINE_PUBLIC_ALIAS(pthread_mutex_trylock, libc_pthread_mutex_trylock);
+DEFINE_PUBLIC_ALIAS(pthread_mutex_lock, libc_pthread_mutex_lock);
+DEFINE_PUBLIC_ALIAS(pthread_mutex_timedlock, libc_pthread_mutex_timedlock);
+DEFINE_PUBLIC_ALIAS(pthread_mutex_timedlock64, libc_pthread_mutex_timedlock64);
+DEFINE_PUBLIC_ALIAS(pthread_mutex_unlock, libc_pthread_mutex_unlock);
+DEFINE_PUBLIC_ALIAS(pthread_mutex_getprioceiling, libc_pthread_mutex_getprioceiling);
+DEFINE_PUBLIC_ALIAS(pthread_mutex_setprioceiling, libc_pthread_mutex_setprioceiling);
+DEFINE_PUBLIC_ALIAS(pthread_mutex_consistent, libc_pthread_mutex_consistent);
+DEFINE_PUBLIC_ALIAS(pthread_mutex_consistent_np, libc_pthread_mutex_consistent_np);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_init, libc_pthread_mutexattr_init);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_destroy, libc_pthread_mutexattr_destroy);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_getpshared, libc_pthread_mutexattr_getpshared);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_setpshared, libc_pthread_mutexattr_setpshared);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_gettype, libc_pthread_mutexattr_gettype);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_settype, libc_pthread_mutexattr_settype);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_getprotocol, libc_pthread_mutexattr_getprotocol);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_setprotocol, libc_pthread_mutexattr_setprotocol);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_getprioceiling, libc_pthread_mutexattr_getprioceiling);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_setprioceiling, libc_pthread_mutexattr_setprioceiling);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_getrobust, libc_pthread_mutexattr_getrobust);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_setrobust, libc_pthread_mutexattr_setrobust);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_getrobust_np, libc_pthread_mutexattr_getrobust_np);
+DEFINE_PUBLIC_ALIAS(pthread_mutexattr_setrobust_np, libc_pthread_mutexattr_setrobust_np);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_init, libc_pthread_rwlock_init);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_destroy, libc_pthread_rwlock_destroy);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_rdlock, libc_pthread_rwlock_rdlock);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_tryrdlock, libc_pthread_rwlock_tryrdlock);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedrdlock, libc_pthread_rwlock_timedrdlock);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock64);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_wrlock, libc_pthread_rwlock_wrlock);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_trywrlock, libc_pthread_rwlock_trywrlock);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedwrlock, libc_pthread_rwlock_timedwrlock);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timedwrlock64);
+DEFINE_PUBLIC_ALIAS(pthread_rwlock_unlock, libc_pthread_rwlock_unlock);
+DEFINE_PUBLIC_ALIAS(pthread_rwlockattr_init, libc_pthread_rwlockattr_init);
+DEFINE_PUBLIC_ALIAS(pthread_rwlockattr_destroy, libc_pthread_rwlockattr_destroy);
+DEFINE_PUBLIC_ALIAS(pthread_rwlockattr_getpshared, libc_pthread_rwlockattr_getpshared);
+DEFINE_PUBLIC_ALIAS(pthread_rwlockattr_setpshared, libc_pthread_rwlockattr_setpshared);
+DEFINE_PUBLIC_ALIAS(pthread_rwlockattr_getkind_np, libc_pthread_rwlockattr_getkind_np);
+DEFINE_PUBLIC_ALIAS(pthread_rwlockattr_setkind_np, libc_pthread_rwlockattr_setkind_np);
+DEFINE_PUBLIC_ALIAS(pthread_cond_init, libc_pthread_cond_init);
+DEFINE_PUBLIC_ALIAS(cnd_destroy, libc_pthread_cond_destroy);
+DEFINE_PUBLIC_ALIAS(pthread_cond_destroy, libc_pthread_cond_destroy);
+DEFINE_PUBLIC_ALIAS(pthread_cond_signal, libc_pthread_cond_signal);
+DEFINE_PUBLIC_ALIAS(pthread_cond_broadcast, libc_pthread_cond_broadcast);
+DEFINE_PUBLIC_ALIAS(pthread_cond_wait, libc_pthread_cond_wait);
+DEFINE_PUBLIC_ALIAS(pthread_cond_timedwait, libc_pthread_cond_timedwait);
+DEFINE_PUBLIC_ALIAS(pthread_cond_timedwait64, libc_pthread_cond_timedwait64);
+DEFINE_PUBLIC_ALIAS(pthread_condattr_init, libc_pthread_condattr_init);
+DEFINE_PUBLIC_ALIAS(pthread_condattr_destroy, libc_pthread_condattr_destroy);
+DEFINE_PUBLIC_ALIAS(pthread_condattr_getpshared, libc_pthread_condattr_getpshared);
+DEFINE_PUBLIC_ALIAS(pthread_condattr_setpshared, libc_pthread_condattr_setpshared);
+DEFINE_PUBLIC_ALIAS(pthread_condattr_getclock, libc_pthread_condattr_getclock);
+DEFINE_PUBLIC_ALIAS(pthread_condattr_setclock, libc_pthread_condattr_setclock);
+DEFINE_PUBLIC_ALIAS(pthread_barrier_init, libc_pthread_barrier_init);
+DEFINE_PUBLIC_ALIAS(pthread_barrier_destroy, libc_pthread_barrier_destroy);
+DEFINE_PUBLIC_ALIAS(pthread_barrier_wait, libc_pthread_barrier_wait);
+DEFINE_PUBLIC_ALIAS(pthread_barrierattr_init, libc_pthread_barrierattr_init);
+DEFINE_PUBLIC_ALIAS(pthread_barrierattr_destroy, libc_pthread_barrierattr_destroy);
+DEFINE_PUBLIC_ALIAS(pthread_barrierattr_getpshared, libc_pthread_barrierattr_getpshared);
+DEFINE_PUBLIC_ALIAS(pthread_barrierattr_setpshared, libc_pthread_barrierattr_setpshared);
+DEFINE_PUBLIC_ALIAS(pthread_key_create, libc_pthread_key_create);
+DEFINE_PUBLIC_ALIAS(tss_delete, libc_pthread_key_delete);
+DEFINE_PUBLIC_ALIAS(pthread_key_delete, libc_pthread_key_delete);
+DEFINE_PUBLIC_ALIAS(tss_get, libc_pthread_getspecific);
+DEFINE_PUBLIC_ALIAS(pthread_getspecific, libc_pthread_getspecific);
+DEFINE_PUBLIC_ALIAS(pthread_setspecific, libc_pthread_setspecific);
+DEFINE_PUBLIC_ALIAS(pthread_getcpuclockid, libc_pthread_getcpuclockid);
+DEFINE_PUBLIC_ALIAS(pthread_atfork, libc_pthread_atfork);
+DEFINE_PUBLIC_ALIAS(pthread_num_processors_np, libc_pthread_num_processors_np);
+DEFINE_PUBLIC_ALIAS(pthread_set_num_processors_np, libc_pthread_set_num_processors_np);
 /*[[[end:exports]]]*/
 
 DECL_END

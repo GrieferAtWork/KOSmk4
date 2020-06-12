@@ -44,110 +44,103 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:wttyname,hash:CRC-32=0x2dc3e995]]]*/
-/* >> wttyname(3)
+/*[[[head:libc_wttyname,hash:CRC-32=0xb3c72f2c]]]*/
+/* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wttyname") char32_t *
-NOTHROW_RPC(LIBCCALL libc_wttyname)(fd_t fd)
-/*[[[body:wttyname]]]*/
-{
+INTERN WUNUSED char32_t *
+NOTHROW_RPC(LIBKCALL libc_wttyname)(fd_t fd)
+/*[[[body:libc_wttyname]]]*/
+/*AUTO*/{
 	(void)fd;
 	CRT_UNIMPLEMENTED("wttyname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:wttyname]]]*/
+/*[[[end:libc_wttyname]]]*/
 
-/*[[[head:DOS$wttyname,hash:CRC-32=0x6184bfa5]]]*/
-/* >> wttyname(3)
+/*[[[head:libd_wttyname,hash:CRC-32=0x1af42499]]]*/
+/* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wttyname") char16_t *
+INTERN WUNUSED char16_t *
 NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd)
-/*[[[body:DOS$wttyname]]]*/
-{
+/*[[[body:libd_wttyname]]]*/
+/*AUTO*/{
 	(void)fd;
 	CRT_UNIMPLEMENTED("wttyname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:DOS$wttyname]]]*/
+/*[[[end:libd_wttyname]]]*/
 
-/*[[[head:wttyname_r,hash:CRC-32=0xf6fd93d4]]]*/
-/* >> wttyname_r(3)
+/*[[[head:libc_wttyname_r,hash:CRC-32=0xa5d2a910]]]*/
+/* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wttyname_r") int
-NOTHROW_RPC(LIBCCALL libc_wttyname_r)(fd_t fd,
+INTERN NONNULL((2)) int
+NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd,
                                       char32_t *buf,
                                       size_t buflen)
-/*[[[body:wttyname_r]]]*/
-{
+/*[[[body:libc_wttyname_r]]]*/
+/*AUTO*/{
 	(void)fd;
 	(void)buf;
 	(void)buflen;
 	CRT_UNIMPLEMENTED("wttyname_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:wttyname_r]]]*/
+/*[[[end:libc_wttyname_r]]]*/
 
-/*[[[head:DOS$wttyname_r,hash:CRC-32=0xc2cd9e98]]]*/
-/* >> wttyname_r(3)
+/*[[[head:libd_wttyname_r,hash:CRC-32=0xd279b8cb]]]*/
+/* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wttyname_r") int
+INTERN NONNULL((2)) int
 NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
                                       char16_t *buf,
                                       size_t buflen)
-/*[[[body:DOS$wttyname_r]]]*/
-{
+/*[[[body:libd_wttyname_r]]]*/
+/*AUTO*/{
 	(void)fd;
 	(void)buf;
 	(void)buflen;
 	CRT_UNIMPLEMENTED("wttyname_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:DOS$wttyname_r]]]*/
+/*[[[end:libd_wttyname_r]]]*/
 
-/*[[[head:wgetlogin,hash:CRC-32=0x75af8f9]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wgetlogin") char32_t *
-NOTHROW_NCX(LIBCCALL libc_wgetlogin)(void)
-/*[[[body:wgetlogin]]]*/
-{
+/*[[[head:libc_wgetlogin,hash:CRC-32=0xf0ef4e56]]]*/
+INTERN WUNUSED char32_t *
+NOTHROW_NCX(LIBKCALL libc_wgetlogin)(void)
+/*[[[body:libc_wgetlogin]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("wgetlogin"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:wgetlogin]]]*/
+/*[[[end:libc_wgetlogin]]]*/
 
-/*[[[head:DOS$wgetlogin,hash:CRC-32=0x8ba7b756]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wgetlogin") char16_t *
+/*[[[head:libd_wgetlogin,hash:CRC-32=0x30975d8a]]]*/
+INTERN WUNUSED char16_t *
 NOTHROW_NCX(LIBDCALL libd_wgetlogin)(void)
-/*[[[body:DOS$wgetlogin]]]*/
-{
+/*[[[body:libd_wgetlogin]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("wgetlogin"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:DOS$wgetlogin]]]*/
+/*[[[end:libd_wgetlogin]]]*/
 
-/*[[[head:wpathconf,hash:CRC-32=0xa8a91835]]]*/
-/* >> wpathconf(2)
+/*[[[head:libc_wpathconf,hash:CRC-32=0x2a23afaf]]]*/
+/* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wpathconf") long int
-NOTHROW_RPC(LIBCCALL libc_wpathconf)(char32_t const *path,
+INTERN NONNULL((1)) long int
+NOTHROW_RPC(LIBKCALL libc_wpathconf)(char32_t const *path,
                                      int name)
-/*[[[body:wpathconf]]]*/
+/*[[[body:libc_wpathconf]]]*/
 {
 	long int result;
 	char *used_path;
@@ -158,20 +151,19 @@ NOTHROW_RPC(LIBCCALL libc_wpathconf)(char32_t const *path,
 	free(used_path);
 	return result;
 }
-/*[[[end:wpathconf]]]*/
+/*[[[end:libc_wpathconf]]]*/
 
-/*[[[head:DOS$wpathconf,hash:CRC-32=0x508852e8]]]*/
-/* >> wpathconf(2)
+/*[[[head:libd_wpathconf,hash:CRC-32=0x2a14473d]]]*/
+/* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wpathconf") long int
+INTERN NONNULL((1)) long int
 NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path,
                                      int name)
-/*[[[body:DOS$wpathconf]]]*/
+/*[[[body:libd_wpathconf]]]*/
 {
 	long int result;
 	char *used_path;
@@ -182,19 +174,18 @@ NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path,
 	free(used_path);
 	return result;
 }
-/*[[[end:DOS$wpathconf]]]*/
+/*[[[end:libd_wpathconf]]]*/
 
-/*[[[head:wlinkat,hash:CRC-32=0x7b261ddf]]]*/
-/* >> wlinkat(2)
+/*[[[head:libc_wlinkat,hash:CRC-32=0xc4ff1ec7]]]*/
+/* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
-INTERN NONNULL((2, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wlinkat") int
-NOTHROW_RPC(LIBCCALL libc_wlinkat)(fd_t fromfd,
+INTERN NONNULL((2, 4)) int
+NOTHROW_RPC(LIBKCALL libc_wlinkat)(fd_t fromfd,
                                    char32_t const *from,
                                    fd_t tofd,
                                    char32_t const *to,
                                    atflag_t flags)
-/*[[[body:wlinkat]]]*/
+/*[[[body:libc_wlinkat]]]*/
 {
 	int result = -1;
 	char *used_from = NULL, *used_to = NULL;
@@ -215,19 +206,18 @@ done_from:
 done:
 	return result;
 }
-/*[[[end:wlinkat]]]*/
+/*[[[end:libc_wlinkat]]]*/
 
-/*[[[head:DOS$wlinkat,hash:CRC-32=0x5239abd]]]*/
-/* >> wlinkat(2)
+/*[[[head:libd_wlinkat,hash:CRC-32=0xe6544a2]]]*/
+/* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
-INTERN NONNULL((2, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wlinkat") int
+INTERN NONNULL((2, 4)) int
 NOTHROW_RPC(LIBDCALL libd_wlinkat)(fd_t fromfd,
                                    char16_t const *from,
                                    fd_t tofd,
                                    char16_t const *to,
                                    atflag_t flags)
-/*[[[body:DOS$wlinkat]]]*/
+/*[[[body:libd_wlinkat]]]*/
 {
 	int result = -1;
 	char *used_from = NULL, *used_to = NULL;
@@ -248,15 +238,14 @@ done_from:
 done:
 	return result;
 }
-/*[[[end:DOS$wlinkat]]]*/
+/*[[[end:libd_wlinkat]]]*/
 
-/*[[[head:wchdir,hash:CRC-32=0x22c3752f]]]*/
-/* >> wchdir(2)
+/*[[[head:libc_wchdir,hash:CRC-32=0xc06d78e]]]*/
+/* >> chdir(2)
  * Change the current working directory to `PATH' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wchdir") int
-NOTHROW_RPC(LIBCCALL libc_wchdir)(char32_t const *path)
-/*[[[body:wchdir]]]*/
+INTERN NONNULL((1)) int
+NOTHROW_RPC(LIBKCALL libc_wchdir)(char32_t const *path)
+/*[[[body:libc_wchdir]]]*/
 {
 	int result = -1;
 	char *used_path;
@@ -267,15 +256,14 @@ NOTHROW_RPC(LIBCCALL libc_wchdir)(char32_t const *path)
 	}
 	return result;
 }
-/*[[[end:wchdir]]]*/
+/*[[[end:libc_wchdir]]]*/
 
-/*[[[head:DOS$wchdir,hash:CRC-32=0x226a90c2]]]*/
-/* >> wchdir(2)
+/*[[[head:libd__wchdir,hash:CRC-32=0x30fbea7b]]]*/
+/* >> chdir(2)
  * Change the current working directory to `PATH' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wchdir") int
-NOTHROW_RPC(LIBDCALL libd_wchdir)(char16_t const *path)
-/*[[[body:DOS$wchdir]]]*/
+INTERN NONNULL((1)) int
+NOTHROW_RPC(LIBDCALL libd__wchdir)(char16_t const *path)
+/*[[[body:libd__wchdir]]]*/
 {
 	int result = -1;
 	char *used_path;
@@ -286,15 +274,15 @@ NOTHROW_RPC(LIBDCALL libd_wchdir)(char16_t const *path)
 	}
 	return result;
 }
-/*[[[end:DOS$wchdir]]]*/
+/*[[[end:libd__wchdir]]]*/
 
-/*[[[head:wgetcwd,hash:CRC-32=0xa33eb42a]]]*/
-/* >> wgetcwd(2)
- * Return the path of the current working directory, relative to the filesystem root set by `wchdir(2)' */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wgetcwd") char32_t *
-NOTHROW_RPC(LIBCCALL libc_wgetcwd)(char32_t *buf,
+/*[[[head:libc_wgetcwd,hash:CRC-32=0xd4bdbee6]]]*/
+/* >> getcwd(2)
+ * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
+INTERN char32_t *
+NOTHROW_RPC(LIBKCALL libc_wgetcwd)(char32_t *buf,
                                    size_t bufsize)
-/*[[[body:wgetcwd]]]*/
+/*[[[body:libc_wgetcwd]]]*/
 {
 	char32_t *result;
 	size_t result_len;
@@ -328,15 +316,15 @@ NOTHROW_RPC(LIBCCALL libc_wgetcwd)(char32_t *buf,
 	free(result);
 	return buf;
 }
-/*[[[end:wgetcwd]]]*/
+/*[[[end:libc_wgetcwd]]]*/
 
-/*[[[head:DOS$wgetcwd,hash:CRC-32=0xc11b61bb]]]*/
-/* >> wgetcwd(2)
- * Return the path of the current working directory, relative to the filesystem root set by `wchdir(2)' */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wgetcwd") char16_t *
+/*[[[head:libd__wgetcwd,hash:CRC-32=0x7674a916]]]*/
+/* >> getcwd(2)
+ * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
+INTERN char16_t *
 NOTHROW_RPC(LIBDCALL libd__wgetcwd)(char16_t *buf,
-                                   size_t bufsize)
-/*[[[body:DOS$wgetcwd]]]*/
+                                    size_t bufsize)
+/*[[[body:libd__wgetcwd]]]*/
 {
 	char16_t *result;
 	size_t result_len;
@@ -370,19 +358,18 @@ NOTHROW_RPC(LIBDCALL libd__wgetcwd)(char16_t *buf,
 	free(result);
 	return buf;
 }
-/*[[[end:DOS$wgetcwd]]]*/
+/*[[[end:libd__wgetcwd]]]*/
 
-/*[[[head:wfaccessat,hash:CRC-32=0x187722a7]]]*/
-/* >> wfaccessat(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
+/*[[[head:libc_wfaccessat,hash:CRC-32=0xc08b2abb]]]*/
+/* >> faccessat(2)
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wfaccessat") int
-NOTHROW_RPC(LIBCCALL libc_wfaccessat)(fd_t dfd,
+INTERN NONNULL((2)) int
+NOTHROW_RPC(LIBKCALL libc_wfaccessat)(fd_t dfd,
                                       char32_t const *file,
                                       int type,
                                       atflag_t flags)
-/*[[[body:wfaccessat]]]*/
+/*[[[body:libc_wfaccessat]]]*/
 {
 	int result = -1;
 	char *used_file;
@@ -393,19 +380,18 @@ NOTHROW_RPC(LIBCCALL libc_wfaccessat)(fd_t dfd,
 	}
 	return result;
 }
-/*[[[end:wfaccessat]]]*/
+/*[[[end:libc_wfaccessat]]]*/
 
-/*[[[head:DOS$wfaccessat,hash:CRC-32=0x461f8866]]]*/
-/* >> wfaccessat(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
+/*[[[head:libd_wfaccessat,hash:CRC-32=0xcb07f57c]]]*/
+/* >> faccessat(2)
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wfaccessat") int
+INTERN NONNULL((2)) int
 NOTHROW_RPC(LIBDCALL libd_wfaccessat)(fd_t dfd,
                                       char16_t const *file,
                                       int type,
                                       atflag_t flags)
-/*[[[body:DOS$wfaccessat]]]*/
+/*[[[body:libd_wfaccessat]]]*/
 {
 	int result = -1;
 	char *used_file;
@@ -416,19 +402,18 @@ NOTHROW_RPC(LIBDCALL libd_wfaccessat)(fd_t dfd,
 	}
 	return result;
 }
-/*[[[end:DOS$wfaccessat]]]*/
+/*[[[end:libd_wfaccessat]]]*/
 
-/*[[[head:wfchownat,hash:CRC-32=0x23bb4d15]]]*/
-/* >> wfchownat(2)
+/*[[[head:libc_wfchownat,hash:CRC-32=0xd8d63c75]]]*/
+/* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wfchownat") int
-NOTHROW_RPC(LIBCCALL libc_wfchownat)(fd_t dfd,
+INTERN NONNULL((2)) int
+NOTHROW_RPC(LIBKCALL libc_wfchownat)(fd_t dfd,
                                      char32_t const *file,
                                      uid_t owner,
                                      gid_t group,
                                      atflag_t flags)
-/*[[[body:wfchownat]]]*/
+/*[[[body:libc_wfchownat]]]*/
 {
 	int result = -1;
 	char *used_file;
@@ -439,19 +424,18 @@ NOTHROW_RPC(LIBCCALL libc_wfchownat)(fd_t dfd,
 	}
 	return result;
 }
-/*[[[end:wfchownat]]]*/
+/*[[[end:libc_wfchownat]]]*/
 
-/*[[[head:DOS$wfchownat,hash:CRC-32=0x850f97fb]]]*/
-/* >> wfchownat(2)
+/*[[[head:libd_wfchownat,hash:CRC-32=0xbcd0d40d]]]*/
+/* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wfchownat") int
+INTERN NONNULL((2)) int
 NOTHROW_RPC(LIBDCALL libd_wfchownat)(fd_t dfd,
                                      char16_t const *file,
                                      uid_t owner,
                                      gid_t group,
                                      atflag_t flags)
-/*[[[body:DOS$wfchownat]]]*/
+/*[[[body:libd_wfchownat]]]*/
 {
 	int result = -1;
 	char *used_file;
@@ -462,18 +446,17 @@ NOTHROW_RPC(LIBDCALL libd_wfchownat)(fd_t dfd,
 	}
 	return result;
 }
-/*[[[end:DOS$wfchownat]]]*/
+/*[[[end:libd_wfchownat]]]*/
 
-/*[[[head:wsymlinkat,hash:CRC-32=0x2e2ba70b]]]*/
-/* >> wsymlinkat(3)
+/*[[[head:libc_wsymlinkat,hash:CRC-32=0xc2ec180d]]]*/
+/* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
-INTERN NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wsymlinkat") int
-NOTHROW_RPC(LIBCCALL libc_wsymlinkat)(char32_t const *link_text,
+INTERN NONNULL((1, 3)) int
+NOTHROW_RPC(LIBKCALL libc_wsymlinkat)(char32_t const *link_text,
                                       fd_t tofd,
                                       char32_t const *target_path)
-/*[[[body:wsymlinkat]]]*/
+/*[[[body:libc_wsymlinkat]]]*/
 {
 	int result = -1;
 	char *used_from, *used_to;
@@ -490,18 +473,17 @@ done_from:
 done:
 	return result;
 }
-/*[[[end:wsymlinkat]]]*/
+/*[[[end:libc_wsymlinkat]]]*/
 
-/*[[[head:DOS$wsymlinkat,hash:CRC-32=0xee2b59e2]]]*/
-/* >> wsymlinkat(3)
+/*[[[head:libd_wsymlinkat,hash:CRC-32=0xe4f4c6e9]]]*/
+/* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
-INTERN NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wsymlinkat") int
+INTERN NONNULL((1, 3)) int
 NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *link_text,
                                       fd_t tofd,
                                       char16_t const *target_path)
-/*[[[body:DOS$wsymlinkat]]]*/
+/*[[[body:libd_wsymlinkat]]]*/
 {
 	int result = -1;
 	char *used_from, *used_to;
@@ -518,63 +500,60 @@ done_from:
 done:
 	return result;
 }
-/*[[[end:DOS$wsymlinkat]]]*/
+/*[[[end:libd_wsymlinkat]]]*/
 
-/*[[[head:wreadlinkat,hash:CRC-32=0xa9a1367a]]]*/
-/* >> wreadlinkat(2)
+/*[[[head:libc_wreadlinkat,hash:CRC-32=0x249b921b]]]*/
+/* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `wfreadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTERN NONNULL((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wreadlinkat") ssize_t
-NOTHROW_RPC(LIBCCALL libc_wreadlinkat)(fd_t dfd,
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
+INTERN NONNULL((2, 3)) ssize_t
+NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd,
                                        char32_t const *__restrict path,
                                        char32_t *__restrict buf,
                                        size_t buflen)
-/*[[[body:wreadlinkat]]]*/
+/*[[[body:libc_wreadlinkat]]]*/
 {
 	return libc_wfreadlinkat(dfd, path, buf, buflen, 0);
 }
-/*[[[end:wreadlinkat]]]*/
+/*[[[end:libc_wreadlinkat]]]*/
 
-/*[[[head:DOS$wreadlinkat,hash:CRC-32=0x36cf2449]]]*/
-/* >> wreadlinkat(2)
+/*[[[head:libd_wreadlinkat,hash:CRC-32=0xc5dd4a14]]]*/
+/* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `wfreadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTERN NONNULL((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wreadlinkat") ssize_t
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
+INTERN NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd,
                                        char16_t const *__restrict path,
                                        char16_t *__restrict buf,
                                        size_t buflen)
-/*[[[body:DOS$wreadlinkat]]]*/
+/*[[[body:libd_wreadlinkat]]]*/
 {
 	return libd_wfreadlinkat(dfd, path, buf, buflen, 0);
 }
-/*[[[end:DOS$wreadlinkat]]]*/
+/*[[[end:libd_wreadlinkat]]]*/
 
-/*[[[head:wfreadlinkat,hash:CRC-32=0xb0ddaa5a]]]*/
-/* >> wfreadlinkat(2)
+/*[[[head:libc_wfreadlinkat,hash:CRC-32=0x4f379990]]]*/
+/* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
-INTERN NONNULL((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wfreadlinkat") ssize_t
-NOTHROW_RPC(LIBCCALL libc_wfreadlinkat)(fd_t dfd,
+INTERN NONNULL((2, 3)) ssize_t
+NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd,
                                         char32_t const *__restrict path,
                                         char32_t *__restrict buf,
                                         size_t buflen,
                                         atflag_t flags)
-/*[[[body:wfreadlinkat]]]*/
-{
+/*[[[body:libc_wfreadlinkat]]]*/
+/*AUTO*/{
 	(void)dfd;
 	(void)path;
 	(void)buf;
@@ -582,23 +561,22 @@ NOTHROW_RPC(LIBCCALL libc_wfreadlinkat)(fd_t dfd,
 	(void)flags;
 	CRT_UNIMPLEMENTED("wfreadlinkat"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:wfreadlinkat]]]*/
+/*[[[end:libc_wfreadlinkat]]]*/
 
-/*[[[head:DOS$wfreadlinkat,hash:CRC-32=0xd55a9f11]]]*/
-/* >> wfreadlinkat(2)
+/*[[[head:libd_wfreadlinkat,hash:CRC-32=0x54eee550]]]*/
+/* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
-INTERN NONNULL((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wfreadlinkat") ssize_t
+INTERN NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd,
                                         char16_t const *__restrict path,
                                         char16_t *__restrict buf,
                                         size_t buflen,
                                         atflag_t flags)
-/*[[[body:DOS$wfreadlinkat]]]*/
-{
+/*[[[body:libd_wfreadlinkat]]]*/
+/*AUTO*/{
 	(void)dfd;
 	(void)path;
 	(void)buf;
@@ -606,19 +584,18 @@ NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd,
 	(void)flags;
 	CRT_UNIMPLEMENTED("wfreadlinkat"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:DOS$wfreadlinkat]]]*/
+/*[[[end:libd_wfreadlinkat]]]*/
 
-/*[[[head:wunlinkat,hash:CRC-32=0x20ee1237]]]*/
-/* >> wunlinkat(2)
+/*[[[head:libc_wunlinkat,hash:CRC-32=0x2a32de8f]]]*/
+/* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wunlinkat") int
-NOTHROW_RPC(LIBCCALL libc_wunlinkat)(fd_t dfd,
+INTERN NONNULL((2)) int
+NOTHROW_RPC(LIBKCALL libc_wunlinkat)(fd_t dfd,
                                      char32_t const *name,
                                      atflag_t flags)
-/*[[[body:wunlinkat]]]*/
+/*[[[body:libc_wunlinkat]]]*/
 {
 	int result = -1;
 	char *used_name;
@@ -629,17 +606,16 @@ NOTHROW_RPC(LIBCCALL libc_wunlinkat)(fd_t dfd,
 	}
 	return result;
 }
-/*[[[end:wunlinkat]]]*/
+/*[[[end:libc_wunlinkat]]]*/
 
-/*[[[head:DOS$wunlinkat,hash:CRC-32=0x96914c5]]]*/
-/* >> wunlinkat(2)
+/*[[[head:libd_wunlinkat,hash:CRC-32=0x454fbd58]]]*/
+/* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wunlinkat") int
+INTERN NONNULL((2)) int
 NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd,
                                      char16_t const *name,
                                      atflag_t flags)
-/*[[[body:DOS$wunlinkat]]]*/
+/*[[[body:libd_wunlinkat]]]*/
 {
 	int result = -1;
 	char *used_name;
@@ -650,46 +626,43 @@ NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd,
 	}
 	return result;
 }
-/*[[[end:DOS$wunlinkat]]]*/
+/*[[[end:libd_wunlinkat]]]*/
 
-/*[[[head:wgetlogin_r,hash:CRC-32=0x288917a9]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wgetlogin_r") int
-NOTHROW_RPC(LIBCCALL libc_wgetlogin_r)(char32_t *name,
+/*[[[head:libc_wgetlogin_r,hash:CRC-32=0x1a244048]]]*/
+INTERN NONNULL((1)) int
+NOTHROW_RPC(LIBKCALL libc_wgetlogin_r)(char32_t *name,
                                        size_t name_len)
-/*[[[body:wgetlogin_r]]]*/
-{
+/*[[[body:libc_wgetlogin_r]]]*/
+/*AUTO*/{
 	(void)name;
 	(void)name_len;
 	CRT_UNIMPLEMENTED("wgetlogin_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:wgetlogin_r]]]*/
+/*[[[end:libc_wgetlogin_r]]]*/
 
-/*[[[head:DOS$wgetlogin_r,hash:CRC-32=0x4a5deb12]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wgetlogin_r") int
+/*[[[head:libd_wgetlogin_r,hash:CRC-32=0x41d988b9]]]*/
+INTERN NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wgetlogin_r)(char16_t *name,
                                        size_t name_len)
-/*[[[body:DOS$wgetlogin_r]]]*/
-{
+/*[[[body:libd_wgetlogin_r]]]*/
+/*AUTO*/{
 	(void)name;
 	(void)name_len;
 	CRT_UNIMPLEMENTED("wgetlogin_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:DOS$wgetlogin_r]]]*/
+/*[[[end:libd_wgetlogin_r]]]*/
 
-/*[[[head:wgethostname,hash:CRC-32=0x310039bc]]]*/
-/* >> wgethostname(3)
- * Return the name assigned to the hosting machine, as set by `wsethostname(2)' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wgethostname") int
-NOTHROW_NCX(LIBCCALL libc_wgethostname)(char32_t *name,
+/*[[[head:libc_wgethostname,hash:CRC-32=0x231975d0]]]*/
+/* >> gethostname(3)
+ * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
+INTERN NONNULL((1)) int
+NOTHROW_NCX(LIBKCALL libc_wgethostname)(char32_t *name,
                                         size_t buflen)
-/*[[[body:wgethostname]]]*/
+/*[[[body:libc_wgethostname]]]*/
 {
 	struct utsname uts;
 	int result = uname(&uts);
@@ -714,16 +687,15 @@ NOTHROW_NCX(LIBCCALL libc_wgethostname)(char32_t *name,
 	}
 	return result;
 }
-/*[[[end:wgethostname]]]*/
+/*[[[end:libc_wgethostname]]]*/
 
-/*[[[head:DOS$wgethostname,hash:CRC-32=0x6be75ee6]]]*/
-/* >> wgethostname(3)
- * Return the name assigned to the hosting machine, as set by `wsethostname(2)' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wgethostname") int
+/*[[[head:libd_wgethostname,hash:CRC-32=0xd72e6a0a]]]*/
+/* >> gethostname(3)
+ * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
+INTERN NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name,
                                         size_t buflen)
-/*[[[body:DOS$wgethostname]]]*/
+/*[[[body:libd_wgethostname]]]*/
 {
 	struct utsname uts;
 	int result = uname(&uts);
@@ -748,13 +720,12 @@ NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name,
 	}
 	return result;
 }
-/*[[[end:DOS$wgethostname]]]*/
+/*[[[end:libd_wgethostname]]]*/
 
-/*[[[head:wsetlogin,hash:CRC-32=0xc5de7b1e]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wsetlogin") int
-NOTHROW_NCX(LIBCCALL libc_wsetlogin)(char32_t const *name)
-/*[[[body:wsetlogin]]]*/
+/*[[[head:libc_wsetlogin,hash:CRC-32=0x35662388]]]*/
+INTERN NONNULL((1)) int
+NOTHROW_NCX(LIBKCALL libc_wsetlogin)(char32_t const *name)
+/*[[[body:libc_wsetlogin]]]*/
 {
 	int result = -1;
 	char *used_name;
@@ -765,13 +736,12 @@ NOTHROW_NCX(LIBCCALL libc_wsetlogin)(char32_t const *name)
 	}
 	return result;
 }
-/*[[[end:wsetlogin]]]*/
+/*[[[end:libc_wsetlogin]]]*/
 
-/*[[[head:DOS$wsetlogin,hash:CRC-32=0x4c732bc9]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wsetlogin") int
+/*[[[head:libd_wsetlogin,hash:CRC-32=0x1c1b6e00]]]*/
+INTERN NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wsetlogin)(char16_t const *name)
-/*[[[body:DOS$wsetlogin]]]*/
+/*[[[body:libd_wsetlogin]]]*/
 {
 	int result = -1;
 	char *used_name;
@@ -782,16 +752,15 @@ NOTHROW_NCX(LIBDCALL libd_wsetlogin)(char16_t const *name)
 	}
 	return result;
 }
-/*[[[end:DOS$wsetlogin]]]*/
+/*[[[end:libd_wsetlogin]]]*/
 
-/*[[[head:wsethostname,hash:CRC-32=0x8aa0a91d]]]*/
-/* >> wsethostname(2)
+/*[[[head:libc_wsethostname,hash:CRC-32=0xa3d0ba8]]]*/
+/* >> sethostname(2)
  * Set the name of the hosting machine */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wsethostname") int
-NOTHROW_NCX(LIBCCALL libc_wsethostname)(char32_t const *name,
+INTERN NONNULL((1)) int
+NOTHROW_NCX(LIBKCALL libc_wsethostname)(char32_t const *name,
                                         size_t len)
-/*[[[body:wsethostname]]]*/
+/*[[[body:libc_wsethostname]]]*/
 {
 	int result = -1;
 	char *used_name;
@@ -803,16 +772,15 @@ NOTHROW_NCX(LIBCCALL libc_wsethostname)(char32_t const *name,
 	}
 	return result;
 }
-/*[[[end:wsethostname]]]*/
+/*[[[end:libc_wsethostname]]]*/
 
-/*[[[head:DOS$wsethostname,hash:CRC-32=0x984954d0]]]*/
-/* >> wsethostname(2)
+/*[[[head:libd_wsethostname,hash:CRC-32=0xffc4102b]]]*/
+/* >> sethostname(2)
  * Set the name of the hosting machine */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wsethostname") int
+INTERN NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wsethostname)(char16_t const *name,
                                         size_t len)
-/*[[[body:DOS$wsethostname]]]*/
+/*[[[body:libd_wsethostname]]]*/
 {
 	int result = -1;
 	char *used_name;
@@ -824,16 +792,15 @@ NOTHROW_NCX(LIBDCALL libd_wsethostname)(char16_t const *name,
 	}
 	return result;
 }
-/*[[[end:DOS$wsethostname]]]*/
+/*[[[end:libd_wsethostname]]]*/
 
-/*[[[head:wgetdomainname,hash:CRC-32=0x8970e606]]]*/
-/* >> wgetdomainname(3)
- * Return the name assigned to the hosting machine's domain, as set by `wsetdomainname(2)' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wgetdomainname") int
-NOTHROW_NCX(LIBCCALL libc_wgetdomainname)(char32_t *name,
+/*[[[head:libc_wgetdomainname,hash:CRC-32=0x251d4d38]]]*/
+/* >> getdomainname(3)
+ * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
+INTERN NONNULL((1)) int
+NOTHROW_NCX(LIBKCALL libc_wgetdomainname)(char32_t *name,
                                           size_t buflen)
-/*[[[body:wgetdomainname]]]*/
+/*[[[body:libc_wgetdomainname]]]*/
 {
 	struct utsname uts;
 	int result = uname(&uts);
@@ -858,16 +825,15 @@ NOTHROW_NCX(LIBCCALL libc_wgetdomainname)(char32_t *name,
 	}
 	return result;
 }
-/*[[[end:wgetdomainname]]]*/
+/*[[[end:libc_wgetdomainname]]]*/
 
-/*[[[head:DOS$wgetdomainname,hash:CRC-32=0xe31c46ae]]]*/
-/* >> wgetdomainname(3)
- * Return the name assigned to the hosting machine's domain, as set by `wsetdomainname(2)' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wgetdomainname") int
+/*[[[head:libd_wgetdomainname,hash:CRC-32=0xbe4ea2b5]]]*/
+/* >> getdomainname(3)
+ * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
+INTERN NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wgetdomainname)(char16_t *name,
                                           size_t buflen)
-/*[[[body:DOS$wgetdomainname]]]*/
+/*[[[body:libd_wgetdomainname]]]*/
 {
 	struct utsname uts;
 	int result = uname(&uts);
@@ -892,16 +858,15 @@ NOTHROW_NCX(LIBDCALL libd_wgetdomainname)(char16_t *name,
 	}
 	return result;
 }
-/*[[[end:DOS$wgetdomainname]]]*/
+/*[[[end:libd_wgetdomainname]]]*/
 
-/*[[[head:wsetdomainname,hash:CRC-32=0x4485cbb0]]]*/
-/* >> wsetdomainname(2)
+/*[[[head:libc_wsetdomainname,hash:CRC-32=0xa6a7ca34]]]*/
+/* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wsetdomainname") int
-NOTHROW_NCX(LIBCCALL libc_wsetdomainname)(char32_t const *name,
+INTERN NONNULL((1)) int
+NOTHROW_NCX(LIBKCALL libc_wsetdomainname)(char32_t const *name,
                                           size_t len)
-/*[[[body:wsetdomainname]]]*/
+/*[[[body:libc_wsetdomainname]]]*/
 {
 	int result = -1;
 	char *used_name;
@@ -913,16 +878,15 @@ NOTHROW_NCX(LIBCCALL libc_wsetdomainname)(char32_t const *name,
 	}
 	return result;
 }
-/*[[[end:wsetdomainname]]]*/
+/*[[[end:libc_wsetdomainname]]]*/
 
-/*[[[head:DOS$wsetdomainname,hash:CRC-32=0xcc52b8db]]]*/
-/* >> wsetdomainname(2)
+/*[[[head:libd_wsetdomainname,hash:CRC-32=0x64cead11]]]*/
+/* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wsetdomainname") int
+INTERN NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wsetdomainname)(char16_t const *name,
                                           size_t len)
-/*[[[body:DOS$wsetdomainname]]]*/
+/*[[[body:libd_wsetdomainname]]]*/
 {
 	int result = -1;
 	char *used_name;
@@ -934,16 +898,15 @@ NOTHROW_NCX(LIBDCALL libd_wsetdomainname)(char16_t const *name,
 	}
 	return result;
 }
-/*[[[end:DOS$wsetdomainname]]]*/
+/*[[[end:libd_wsetdomainname]]]*/
 
-/*[[[head:wchroot,hash:CRC-32=0x81c5a79c]]]*/
-/* >> wchroot(2)
+/*[[[head:libc_wchroot,hash:CRC-32=0x80fdc578]]]*/
+/* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wchroot") int
-NOTHROW_RPC(LIBCCALL libc_wchroot)(char32_t const *__restrict path)
-/*[[[body:wchroot]]]*/
+INTERN NONNULL((1)) int
+NOTHROW_RPC(LIBKCALL libc_wchroot)(char32_t const *__restrict path)
+/*[[[body:libc_wchroot]]]*/
 {
 	int result = -1;
 	char *used_path;
@@ -954,16 +917,15 @@ NOTHROW_RPC(LIBCCALL libc_wchroot)(char32_t const *__restrict path)
 	}
 	return result;
 }
-/*[[[end:wchroot]]]*/
+/*[[[end:libc_wchroot]]]*/
 
-/*[[[head:DOS$wchroot,hash:CRC-32=0x416813fa]]]*/
-/* >> wchroot(2)
+/*[[[head:libd_wchroot,hash:CRC-32=0x75a0b366]]]*/
+/* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wchroot") int
+INTERN NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wchroot)(char16_t const *__restrict path)
-/*[[[body:DOS$wchroot]]]*/
+/*[[[body:libd_wchroot]]]*/
 {
 	int result = -1;
 	char *used_path;
@@ -974,12 +936,12 @@ NOTHROW_RPC(LIBDCALL libd_wchroot)(char16_t const *__restrict path)
 	}
 	return result;
 }
-/*[[[end:DOS$wchroot]]]*/
+/*[[[end:libd_wchroot]]]*/
 
-/*[[[head:wctermid,hash:CRC-32=0x1ae07c7a]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wctermid") char32_t *
-NOTHROW_NCX(LIBCCALL libc_wctermid)(char32_t *s)
-/*[[[body:wctermid]]]*/
+/*[[[head:libc_wctermid,hash:CRC-32=0xed825ac]]]*/
+INTERN char32_t *
+NOTHROW_NCX(LIBKCALL libc_wctermid)(char32_t *s)
+/*[[[body:libc_wctermid]]]*/
 {
 	char32_t *printer_data = s;
 	struct format_8to32_data convert_data;
@@ -997,12 +959,12 @@ NOTHROW_NCX(LIBCCALL libc_wctermid)(char32_t *s)
 	*printer_data = '\0'; /* NUL-terminate */
 	return s;
 }
-/*[[[end:wctermid]]]*/
+/*[[[end:libc_wctermid]]]*/
 
-/*[[[head:DOS$wctermid,hash:CRC-32=0xc59ce96c]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wctermid") char16_t *
+/*[[[head:libd_wctermid,hash:CRC-32=0xd9fc2ce5]]]*/
+INTERN char16_t *
 NOTHROW_NCX(LIBDCALL libd_wctermid)(char16_t *s)
-/*[[[body:DOS$wctermid]]]*/
+/*[[[body:libd_wctermid]]]*/
 {
 	char16_t *printer_data = s;
 	struct format_8to16_data convert_data;
@@ -1020,17 +982,16 @@ NOTHROW_NCX(LIBDCALL libd_wctermid)(char16_t *s)
 	*printer_data = '\0'; /* NUL-terminate */
 	return s;
 }
-/*[[[end:DOS$wctermid]]]*/
+/*[[[end:libd_wctermid]]]*/
 
-/*[[[head:wchown,hash:CRC-32=0xb986505c]]]*/
-/* >> wchown(2)
+/*[[[head:libc_wchown,hash:CRC-32=0xdf7821f7]]]*/
+/* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wchown") int
-NOTHROW_RPC(LIBCCALL libc_wchown)(char32_t const *file,
+INTERN NONNULL((1)) int
+NOTHROW_RPC(LIBKCALL libc_wchown)(char32_t const *file,
                                   uid_t owner,
                                   gid_t group)
-/*[[[body:wchown]]]*/
+/*[[[body:libc_wchown]]]*/
 {
 	int result = -1;
 	char *used_file;
@@ -1041,17 +1002,16 @@ NOTHROW_RPC(LIBCCALL libc_wchown)(char32_t const *file,
 	}
 	return result;
 }
-/*[[[end:wchown]]]*/
+/*[[[end:libc_wchown]]]*/
 
-/*[[[head:DOS$wchown,hash:CRC-32=0x7c37379]]]*/
-/* >> wchown(2)
+/*[[[head:libd_wchown,hash:CRC-32=0x8be021b7]]]*/
+/* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wchown") int
+INTERN NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wchown)(char16_t const *file,
                                   uid_t owner,
                                   gid_t group)
-/*[[[body:DOS$wchown]]]*/
+/*[[[body:libd_wchown]]]*/
 {
 	int result = -1;
 	char *used_file;
@@ -1062,143 +1022,132 @@ NOTHROW_RPC(LIBDCALL libd_wchown)(char16_t const *file,
 	}
 	return result;
 }
-/*[[[end:DOS$wchown]]]*/
+/*[[[end:libd_wchown]]]*/
 
-/*[[[head:wlink,hash:CRC-32=0x18c1b933]]]*/
-/* >> wlink(2)
+/*[[[head:libc_wlink,hash:CRC-32=0x167cfc8e]]]*/
+/* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wlink") int
-NOTHROW_RPC(LIBCCALL libc_wlink)(char32_t const *from,
+INTERN NONNULL((1, 2)) int
+NOTHROW_RPC(LIBKCALL libc_wlink)(char32_t const *from,
                                  char32_t const *to)
-/*[[[body:wlink]]]*/
+/*[[[body:libc_wlink]]]*/
 {
 	return libc_wlinkat(AT_FDCWD, from, AT_FDCWD, to, 0);
 }
-/*[[[end:wlink]]]*/
+/*[[[end:libc_wlink]]]*/
 
-/*[[[head:DOS$wlink,hash:CRC-32=0xabeeab3c]]]*/
-/* >> wlink(2)
+/*[[[head:libd_wlink,hash:CRC-32=0x1ac81edb]]]*/
+/* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wlink") int
+INTERN NONNULL((1, 2)) int
 NOTHROW_RPC(LIBDCALL libd_wlink)(char16_t const *from,
                                  char16_t const *to)
-/*[[[body:DOS$wlink]]]*/
+/*[[[body:libd_wlink]]]*/
 {
 	return libd_wlinkat(AT_FDCWD, from, AT_FDCWD, to, 0);
 }
-/*[[[end:DOS$wlink]]]*/
+/*[[[end:libd_wlink]]]*/
 
-/*[[[head:waccess,hash:CRC-32=0x96b2a743]]]*/
-/* >> waccess(2)
+/*[[[head:libc_waccess,hash:CRC-32=0x2e7435f7]]]*/
+/* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.waccess") int
-NOTHROW_RPC(LIBCCALL libc_waccess)(char32_t const *file,
+INTERN WUNUSED NONNULL((1)) int
+NOTHROW_RPC(LIBKCALL libc_waccess)(char32_t const *file,
                                    int type)
-/*[[[body:waccess]]]*/
+/*[[[body:libc_waccess]]]*/
 {
 	return libc_wfaccessat(AT_FDCWD, file, type, 0);
 }
-/*[[[end:waccess]]]*/
+/*[[[end:libc_waccess]]]*/
 
-/*[[[head:DOS$waccess,hash:CRC-32=0xdc509302]]]*/
-/* >> waccess(2)
+/*[[[head:libd_waccess,hash:CRC-32=0x3fbb4add]]]*/
+/* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.waccess") int
+INTERN WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_waccess)(char16_t const *file,
                                    int type)
-/*[[[body:DOS$waccess]]]*/
+/*[[[body:libd_waccess]]]*/
 {
 	return libd_wfaccessat(AT_FDCWD, file, type, 0);
 }
-/*[[[end:DOS$waccess]]]*/
+/*[[[end:libd_waccess]]]*/
 
-/*[[[head:wunlink,hash:CRC-32=0xe6e44f69]]]*/
-/* >> wunlink(2)
+/*[[[head:libc_wunlink,hash:CRC-32=0x1be84ee8]]]*/
+/* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wunlink") int
-NOTHROW_RPC(LIBCCALL libc_wunlink)(char32_t const *file)
-/*[[[body:wunlink]]]*/
+INTERN NONNULL((1)) int
+NOTHROW_RPC(LIBKCALL libc_wunlink)(char32_t const *file)
+/*[[[body:libc_wunlink]]]*/
 {
 	return libc_wunlinkat(AT_FDCWD, file, 0);
 }
-/*[[[end:wunlink]]]*/
+/*[[[end:libc_wunlink]]]*/
 
-/*[[[head:DOS$wunlink,hash:CRC-32=0x45b4f2a9]]]*/
-/* >> wunlink(2)
+/*[[[head:libd__wunlink,hash:CRC-32=0xac76829e]]]*/
+/* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wunlink") int
-NOTHROW_RPC(LIBDCALL libd_wunlink)(char16_t const *file)
-/*[[[body:DOS$wunlink]]]*/
+INTERN NONNULL((1)) int
+NOTHROW_RPC(LIBDCALL libd__wunlink)(char16_t const *file)
+/*[[[body:libd__wunlink]]]*/
 {
 	return libd_wunlinkat(AT_FDCWD, file, 0);
 }
-/*[[[end:DOS$wunlink]]]*/
+/*[[[end:libd__wunlink]]]*/
 
-/*[[[head:wrmdir,hash:CRC-32=0x673c628e]]]*/
-/* >> wrmdir(2)
+/*[[[head:libc_wrmdir,hash:CRC-32=0xff738ed7]]]*/
+/* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wrmdir") int
-NOTHROW_RPC(LIBCCALL libc_wrmdir)(char32_t const *path)
-/*[[[body:wrmdir]]]*/
+INTERN NONNULL((1)) int
+NOTHROW_RPC(LIBKCALL libc_wrmdir)(char32_t const *path)
+/*[[[body:libc_wrmdir]]]*/
 {
 	return libc_wunlinkat(AT_FDCWD, path, AT_REMOVEDIR);
 }
-/*[[[end:wrmdir]]]*/
+/*[[[end:libc_wrmdir]]]*/
 
-/*[[[head:DOS$wrmdir,hash:CRC-32=0xe5872df6]]]*/
-/* >> wrmdir(2)
+/*[[[head:libd__wrmdir,hash:CRC-32=0xb8f74fc5]]]*/
+/* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wrmdir") int
-NOTHROW_RPC(LIBDCALL libd_wrmdir)(char16_t const *path)
-/*[[[body:DOS$wrmdir]]]*/
+INTERN NONNULL((1)) int
+NOTHROW_RPC(LIBDCALL libd__wrmdir)(char16_t const *path)
+/*[[[body:libd__wrmdir]]]*/
 {
 	return libd_wunlinkat(AT_FDCWD, path, AT_REMOVEDIR);
 }
-/*[[[end:DOS$wrmdir]]]*/
+/*[[[end:libd__wrmdir]]]*/
 
-/*[[[head:weuidaccess,hash:CRC-32=0xa3774a26]]]*/
-/* >> weuidaccess(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
+/*[[[head:libc_weuidaccess,hash:CRC-32=0xef5335d5]]]*/
+/* >> euidaccess(2)
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.weuidaccess") int
-NOTHROW_RPC(LIBCCALL libc_weuidaccess)(char32_t const *file,
-                                       int type)
-/*[[[body:weuidaccess]]]*/
+INTERN WUNUSED NONNULL((1)) int
+NOTHROW_RPC(LIBKCALL libc_weuidaccess)(char32_t const *file,
+                                       __STDC_INT_AS_UINT_T type)
+/*[[[body:libc_weuidaccess]]]*/
 {
 	return libc_wfaccessat(AT_FDCWD, file, type, AT_EACCESS);
 }
-/*[[[end:weuidaccess]]]*/
+/*[[[end:libc_weuidaccess]]]*/
 
-/*[[[head:DOS$weuidaccess,hash:CRC-32=0x4ec53ba5]]]*/
-/* >> weuidaccess(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
+/*[[[head:libd_weuidaccess,hash:CRC-32=0xb9f019c6]]]*/
+/* >> euidaccess(2)
+ * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.weuidaccess") int
+INTERN WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_weuidaccess)(char16_t const *file,
-                                       int type)
-/*[[[body:DOS$weuidaccess]]]*/
+                                       __STDC_INT_AS_UINT_T type)
+/*[[[body:libd_weuidaccess]]]*/
 {
 	return libd_wfaccessat(AT_FDCWD, file, type, AT_EACCESS);
 }
-/*[[[end:DOS$weuidaccess]]]*/
+/*[[[end:libd_weuidaccess]]]*/
 
-/*[[[head:wget_current_dir_name,hash:CRC-32=0x6b7d8b33]]]*/
-INTERN ATTR_MALLOC WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wget_current_dir_name") char32_t *
-NOTHROW_RPC(LIBCCALL libc_wget_current_dir_name)(void)
-/*[[[body:wget_current_dir_name]]]*/
+/*[[[head:libc_wget_current_dir_name,hash:CRC-32=0x1434d3a4]]]*/
+INTERN ATTR_MALLOC WUNUSED char32_t *
+NOTHROW_RPC(LIBKCALL libc_wget_current_dir_name)(void)
+/*[[[body:libc_wget_current_dir_name]]]*/
 {
 	char *utf8_path;
 	char32_t *result;
@@ -1209,13 +1158,12 @@ NOTHROW_RPC(LIBCCALL libc_wget_current_dir_name)(void)
 	free(utf8_path);
 	return result;
 }
-/*[[[end:wget_current_dir_name]]]*/
+/*[[[end:libc_wget_current_dir_name]]]*/
 
-/*[[[head:DOS$wget_current_dir_name,hash:CRC-32=0x7610a1d2]]]*/
-INTERN ATTR_MALLOC WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wget_current_dir_name") char16_t *
+/*[[[head:libd_wget_current_dir_name,hash:CRC-32=0x27cfcf27]]]*/
+INTERN ATTR_MALLOC WUNUSED char16_t *
 NOTHROW_RPC(LIBDCALL libd_wget_current_dir_name)(void)
-/*[[[body:DOS$wget_current_dir_name]]]*/
+/*[[[body:libd_wget_current_dir_name]]]*/
 {
 	char *utf8_path;
 	char16_t *result;
@@ -1226,46 +1174,43 @@ NOTHROW_RPC(LIBDCALL libd_wget_current_dir_name)(void)
 	free(utf8_path);
 	return result;
 }
-/*[[[end:DOS$wget_current_dir_name]]]*/
+/*[[[end:libd_wget_current_dir_name]]]*/
 
-/*[[[head:wlchown,hash:CRC-32=0x54b72900]]]*/
-/* >> wlchown(2)
+/*[[[head:libc_wlchown,hash:CRC-32=0x57a65dd5]]]*/
+/* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wlchown") int
-NOTHROW_RPC(LIBCCALL libc_wlchown)(char32_t const *file,
+INTERN NONNULL((1)) int
+NOTHROW_RPC(LIBKCALL libc_wlchown)(char32_t const *file,
                                    uid_t owner,
                                    gid_t group)
-/*[[[body:wlchown]]]*/
+/*[[[body:libc_wlchown]]]*/
 {
 	return libc_wfchownat(AT_FDCWD, file, owner, group, AT_SYMLINK_NOFOLLOW);
 }
-/*[[[end:wlchown]]]*/
+/*[[[end:libc_wlchown]]]*/
 
-/*[[[head:DOS$wlchown,hash:CRC-32=0x3e647610]]]*/
-/* >> wlchown(2)
+/*[[[head:libd_wlchown,hash:CRC-32=0x3468b473]]]*/
+/* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wlchown") int
+INTERN NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wlchown)(char16_t const *file,
                                    uid_t owner,
                                    gid_t group)
-/*[[[body:DOS$wlchown]]]*/
+/*[[[body:libd_wlchown]]]*/
 {
 	return libd_wfchownat(AT_FDCWD, file, owner, group, AT_SYMLINK_NOFOLLOW);
 }
-/*[[[end:DOS$wlchown]]]*/
+/*[[[end:libd_wlchown]]]*/
 
-/*[[[head:wtruncate,hash:CRC-32=0x9ac3ac01]]]*/
-/* >> wtruncate(2)
+/*[[[head:libc_wtruncate,hash:CRC-32=0xdc48511]]]*/
+/* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wtruncate") int
-NOTHROW_NCX(LIBCCALL libc_wtruncate)(char32_t const *file,
+INTERN NONNULL((1)) int
+NOTHROW_NCX(LIBKCALL libc_wtruncate)(char32_t const *file,
                                      __PIO_OFFSET length)
-/*[[[body:wtruncate]]]*/
+/*[[[body:libc_wtruncate]]]*/
 {
 	int result = -1;
 	char *used_file;
@@ -1276,16 +1221,15 @@ NOTHROW_NCX(LIBCCALL libc_wtruncate)(char32_t const *file,
 	}
 	return result;
 }
-/*[[[end:wtruncate]]]*/
+/*[[[end:libc_wtruncate]]]*/
 
-/*[[[head:DOS$wtruncate,hash:CRC-32=0xbb99e47]]]*/
-/* >> wtruncate(2)
+/*[[[head:libd_wtruncate,hash:CRC-32=0xe2da2d1a]]]*/
+/* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wtruncate") int
+INTERN NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wtruncate)(char16_t const *file,
                                      __PIO_OFFSET length)
-/*[[[body:DOS$wtruncate]]]*/
+/*[[[body:libd_wtruncate]]]*/
 {
 	int result = -1;
 	char *used_file;
@@ -1296,19 +1240,18 @@ NOTHROW_NCX(LIBDCALL libd_wtruncate)(char16_t const *file,
 	}
 	return result;
 }
-/*[[[end:DOS$wtruncate]]]*/
+/*[[[end:libd_wtruncate]]]*/
 
-/*[[[head:wtruncate64,hash:CRC-32=0xa86b1e54]]]*/
-/* >> wtruncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
+/*[[[head:libc_wtruncate64,hash:CRC-32=0x123b8ec7]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_wtruncate64, libc_wtruncate);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wtruncate64") int
-NOTHROW_NCX(LIBCCALL libc_wtruncate64)(char32_t const *file,
+#else /* MAGIC:alias */
+/* >> truncate64(2)
+ * Truncate the given file `FILE' to a length of `LENGTH' */
+INTERN NONNULL((1)) int
+NOTHROW_NCX(LIBKCALL libc_wtruncate64)(char32_t const *file,
                                        __PIO_OFFSET64 length)
-/*[[[body:wtruncate64]]]*/
+/*[[[body:libc_wtruncate64]]]*/
 {
 	int result = -1;
 	char *used_file;
@@ -1320,19 +1263,15 @@ NOTHROW_NCX(LIBCCALL libc_wtruncate64)(char32_t const *file,
 	return result;
 }
 #endif /* MAGIC:alias */
-/*[[[end:wtruncate64]]]*/
+/*[[[end:libc_wtruncate64]]]*/
 
-/*[[[head:DOS$wtruncate64,hash:CRC-32=0x29937fbc]]]*/
-/* >> wtruncate(2)
+/*[[[head:libd_wtruncate64,hash:CRC-32=0xfdbd05c9]]]*/
+/* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libd_wtruncate64, libd_wtruncate);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wtruncate64") int
+INTERN NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *file,
                                        __PIO_OFFSET64 length)
-/*[[[body:DOS$wtruncate64]]]*/
+/*[[[body:libd_wtruncate64]]]*/
 {
 	int result = -1;
 	char *used_file;
@@ -1343,153 +1282,147 @@ NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *file,
 	}
 	return result;
 }
-#endif /* MAGIC:alias */
-/*[[[end:DOS$wtruncate64]]]*/
+/*[[[end:libd_wtruncate64]]]*/
 
-/*[[[head:wsymlink,hash:CRC-32=0x98dedafa]]]*/
-/* >> wsymlink(3)
+/*[[[head:libc_wsymlink,hash:CRC-32=0xee8a9e8d]]]*/
+/* >> symlink(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TARGET_PATH'.
- * Same as `wsymlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wsymlink") int
-NOTHROW_RPC(LIBCCALL libc_wsymlink)(char32_t const *link_text,
+ * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+INTERN NONNULL((1, 2)) int
+NOTHROW_RPC(LIBKCALL libc_wsymlink)(char32_t const *link_text,
                                     char32_t const *target_path)
-/*[[[body:wsymlink]]]*/
+/*[[[body:libc_wsymlink]]]*/
 {
 	return libc_wsymlinkat(link_text, AT_FDCWD, target_path);
 }
-/*[[[end:wsymlink]]]*/
+/*[[[end:libc_wsymlink]]]*/
 
-/*[[[head:DOS$wsymlink,hash:CRC-32=0x15d289b2]]]*/
-/* >> wsymlink(3)
+/*[[[head:libd_wsymlink,hash:CRC-32=0x42939323]]]*/
+/* >> symlink(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TARGET_PATH'.
- * Same as `wsymlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wsymlink") int
+ * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+INTERN NONNULL((1, 2)) int
 NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *link_text,
                                     char16_t const *target_path)
-/*[[[body:DOS$wsymlink]]]*/
+/*[[[body:libd_wsymlink]]]*/
 {
 	return libd_wsymlinkat(link_text, AT_FDCWD, target_path);
 }
-/*[[[end:DOS$wsymlink]]]*/
+/*[[[end:libd_wsymlink]]]*/
 
-/*[[[head:wreadlink,hash:CRC-32=0xb41a54bc]]]*/
-/* >> wreadlink(3)
+/*[[[head:libc_wreadlink,hash:CRC-32=0xba9d00dc]]]*/
+/* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
- * Same as `wreadlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
+ * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `wfreadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wreadlink") ssize_t
-NOTHROW_RPC(LIBCCALL libc_wreadlink)(char32_t const *__restrict path,
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
+INTERN NONNULL((1, 2)) ssize_t
+NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *__restrict path,
                                      char32_t *__restrict buf,
                                      size_t buflen)
-/*[[[body:wreadlink]]]*/
+/*[[[body:libc_wreadlink]]]*/
 {
 	return libc_wfreadlinkat(AT_FDCWD, path, buf, buflen, 0);
 }
-/*[[[end:wreadlink]]]*/
+/*[[[end:libc_wreadlink]]]*/
 
-/*[[[head:DOS$wreadlink,hash:CRC-32=0x8cf5e543]]]*/
-/* >> wreadlink(3)
+/*[[[head:libd_wreadlink,hash:CRC-32=0xffde0dda]]]*/
+/* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
- * Same as `wreadlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
+ * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
  * WARNING: This function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `wfreadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wreadlink") ssize_t
+ * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
+INTERN NONNULL((1, 2)) ssize_t
 NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *__restrict path,
                                      char16_t *__restrict buf,
                                      size_t buflen)
-/*[[[body:DOS$wreadlink]]]*/
+/*[[[body:libd_wreadlink]]]*/
 {
 	return libd_wfreadlinkat(AT_FDCWD, path, buf, buflen, 0);
 }
-/*[[[end:DOS$wreadlink]]]*/
+/*[[[end:libd_wreadlink]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xd6375a9c]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(wttyname, libc_wttyname);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wttyname, libd_wttyname);
-DEFINE_PUBLIC_WEAK_ALIAS(wttyname_r, libc_wttyname_r);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wttyname_r, libd_wttyname_r);
-DEFINE_PUBLIC_WEAK_ALIAS(wgetlogin, libc_wgetlogin);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wgetlogin, libd_wgetlogin);
-DEFINE_PUBLIC_WEAK_ALIAS(wchown, libc_wchown);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wchown, libd_wchown);
-DEFINE_PUBLIC_WEAK_ALIAS(wpathconf, libc_wpathconf);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wpathconf, libd_wpathconf);
-DEFINE_PUBLIC_WEAK_ALIAS(wlink, libc_wlink);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wlink, libd_wlink);
-DEFINE_PUBLIC_WEAK_ALIAS(waccess, libc_waccess);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$waccess, libd_waccess);
-DEFINE_PUBLIC_WEAK_ALIAS(wchdir, libc_wchdir);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wchdir, libd_wchdir);
-DEFINE_PUBLIC_WEAK_ALIAS(wgetcwd, libc_wgetcwd);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wgetcwd, libd__wgetcwd);
-DEFINE_PUBLIC_WEAK_ALIAS(wunlink, libc_wunlink);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wunlink, libd_wunlink);
-DEFINE_PUBLIC_WEAK_ALIAS(wrmdir, libc_wrmdir);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wrmdir, libd_wrmdir);
-DEFINE_PUBLIC_WEAK_ALIAS(weuidaccess, libc_weuidaccess);
-DEFINE_PUBLIC_WEAK_ALIAS(weaccess, libc_weuidaccess);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$weuidaccess, libd_weuidaccess);
-DEFINE_PUBLIC_WEAK_ALIAS(wget_current_dir_name, libc_wget_current_dir_name);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wget_current_dir_name, libd_wget_current_dir_name);
-DEFINE_PUBLIC_WEAK_ALIAS(wfaccessat, libc_wfaccessat);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wfaccessat, libd_wfaccessat);
-DEFINE_PUBLIC_WEAK_ALIAS(wfchownat, libc_wfchownat);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wfchownat, libd_wfchownat);
-DEFINE_PUBLIC_WEAK_ALIAS(wlinkat, libc_wlinkat);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wlinkat, libd_wlinkat);
-DEFINE_PUBLIC_WEAK_ALIAS(wsymlinkat, libc_wsymlinkat);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wsymlinkat, libd_wsymlinkat);
-DEFINE_PUBLIC_WEAK_ALIAS(wreadlinkat, libc_wreadlinkat);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wreadlinkat, libd_wreadlinkat);
-DEFINE_PUBLIC_WEAK_ALIAS(wfreadlinkat, libc_wfreadlinkat);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wfreadlinkat, libd_wfreadlinkat);
-DEFINE_PUBLIC_WEAK_ALIAS(wunlinkat, libc_wunlinkat);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wunlinkat, libd_wunlinkat);
-DEFINE_PUBLIC_WEAK_ALIAS(wlchown, libc_wlchown);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wlchown, libd_wlchown);
-DEFINE_PUBLIC_WEAK_ALIAS(wtruncate, libc_wtruncate);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wtruncate, libd_wtruncate);
-DEFINE_PUBLIC_WEAK_ALIAS(wtruncate64, libc_wtruncate64);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wtruncate64, libd_wtruncate64);
-DEFINE_PUBLIC_WEAK_ALIAS(wsymlink, libc_wsymlink);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wsymlink, libd_wsymlink);
-DEFINE_PUBLIC_WEAK_ALIAS(wreadlink, libc_wreadlink);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wreadlink, libd_wreadlink);
-DEFINE_PUBLIC_WEAK_ALIAS(wgetlogin_r, libc_wgetlogin_r);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wgetlogin_r, libd_wgetlogin_r);
-DEFINE_PUBLIC_WEAK_ALIAS(wgethostname, libc_wgethostname);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wgethostname, libd_wgethostname);
-DEFINE_PUBLIC_WEAK_ALIAS(wsetlogin, libc_wsetlogin);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wsetlogin, libd_wsetlogin);
-DEFINE_PUBLIC_WEAK_ALIAS(wsethostname, libc_wsethostname);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wsethostname, libd_wsethostname);
-DEFINE_PUBLIC_WEAK_ALIAS(wgetdomainname, libc_wgetdomainname);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wgetdomainname, libd_wgetdomainname);
-DEFINE_PUBLIC_WEAK_ALIAS(wsetdomainname, libc_wsetdomainname);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wsetdomainname, libd_wsetdomainname);
-DEFINE_PUBLIC_WEAK_ALIAS(wchroot, libc_wchroot);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wchroot, libd_wchroot);
-DEFINE_PUBLIC_WEAK_ALIAS(wctermid, libc_wctermid);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wctermid, libd_wctermid);
+/*[[[start:exports,hash:CRC-32=0xdcadb7cf]]]*/
+DEFINE_PUBLIC_ALIAS(DOS$wttyname, libd_wttyname);
+DEFINE_PUBLIC_ALIAS(wttyname, libc_wttyname);
+DEFINE_PUBLIC_ALIAS(DOS$wttyname_r, libd_wttyname_r);
+DEFINE_PUBLIC_ALIAS(wttyname_r, libc_wttyname_r);
+DEFINE_PUBLIC_ALIAS(DOS$wgetlogin, libd_wgetlogin);
+DEFINE_PUBLIC_ALIAS(wgetlogin, libc_wgetlogin);
+DEFINE_PUBLIC_ALIAS(DOS$wchown, libd_wchown);
+DEFINE_PUBLIC_ALIAS(wchown, libc_wchown);
+DEFINE_PUBLIC_ALIAS(DOS$wpathconf, libd_wpathconf);
+DEFINE_PUBLIC_ALIAS(wpathconf, libc_wpathconf);
+DEFINE_PUBLIC_ALIAS(DOS$wlink, libd_wlink);
+DEFINE_PUBLIC_ALIAS(wlink, libc_wlink);
+DEFINE_PUBLIC_ALIAS(DOS$waccess, libd_waccess);
+DEFINE_PUBLIC_ALIAS(waccess, libc_waccess);
+DEFINE_PUBLIC_ALIAS(DOS$_wchdir, libd__wchdir);
+DEFINE_PUBLIC_ALIAS(wchdir, libc_wchdir);
+DEFINE_PUBLIC_ALIAS(DOS$_wgetcwd, libd__wgetcwd);
+DEFINE_PUBLIC_ALIAS(wgetcwd, libc_wgetcwd);
+DEFINE_PUBLIC_ALIAS(DOS$_wunlink, libd__wunlink);
+DEFINE_PUBLIC_ALIAS(wunlink, libc_wunlink);
+DEFINE_PUBLIC_ALIAS(DOS$_wrmdir, libd__wrmdir);
+DEFINE_PUBLIC_ALIAS(wrmdir, libc_wrmdir);
+DEFINE_PUBLIC_ALIAS(DOS$weuidaccess, libd_weuidaccess);
+DEFINE_PUBLIC_ALIAS(weuidaccess, libc_weuidaccess);
+DEFINE_PUBLIC_ALIAS(DOS$wget_current_dir_name, libd_wget_current_dir_name);
+DEFINE_PUBLIC_ALIAS(wget_current_dir_name, libc_wget_current_dir_name);
+DEFINE_PUBLIC_ALIAS(DOS$wfaccessat, libd_wfaccessat);
+DEFINE_PUBLIC_ALIAS(wfaccessat, libc_wfaccessat);
+DEFINE_PUBLIC_ALIAS(DOS$wfchownat, libd_wfchownat);
+DEFINE_PUBLIC_ALIAS(wfchownat, libc_wfchownat);
+DEFINE_PUBLIC_ALIAS(DOS$wlinkat, libd_wlinkat);
+DEFINE_PUBLIC_ALIAS(wlinkat, libc_wlinkat);
+DEFINE_PUBLIC_ALIAS(DOS$wsymlinkat, libd_wsymlinkat);
+DEFINE_PUBLIC_ALIAS(wsymlinkat, libc_wsymlinkat);
+DEFINE_PUBLIC_ALIAS(DOS$wreadlinkat, libd_wreadlinkat);
+DEFINE_PUBLIC_ALIAS(wreadlinkat, libc_wreadlinkat);
+DEFINE_PUBLIC_ALIAS(DOS$wfreadlinkat, libd_wfreadlinkat);
+DEFINE_PUBLIC_ALIAS(wfreadlinkat, libc_wfreadlinkat);
+DEFINE_PUBLIC_ALIAS(DOS$wunlinkat, libd_wunlinkat);
+DEFINE_PUBLIC_ALIAS(wunlinkat, libc_wunlinkat);
+DEFINE_PUBLIC_ALIAS(DOS$wlchown, libd_wlchown);
+DEFINE_PUBLIC_ALIAS(wlchown, libc_wlchown);
+DEFINE_PUBLIC_ALIAS(DOS$wtruncate, libd_wtruncate);
+DEFINE_PUBLIC_ALIAS(wtruncate, libc_wtruncate);
+DEFINE_PUBLIC_ALIAS(DOS$wtruncate64, libd_wtruncate64);
+DEFINE_PUBLIC_ALIAS(wtruncate64, libc_wtruncate64);
+DEFINE_PUBLIC_ALIAS(DOS$wsymlink, libd_wsymlink);
+DEFINE_PUBLIC_ALIAS(wsymlink, libc_wsymlink);
+DEFINE_PUBLIC_ALIAS(DOS$wreadlink, libd_wreadlink);
+DEFINE_PUBLIC_ALIAS(wreadlink, libc_wreadlink);
+DEFINE_PUBLIC_ALIAS(DOS$wgetlogin_r, libd_wgetlogin_r);
+DEFINE_PUBLIC_ALIAS(wgetlogin_r, libc_wgetlogin_r);
+DEFINE_PUBLIC_ALIAS(DOS$wgethostname, libd_wgethostname);
+DEFINE_PUBLIC_ALIAS(wgethostname, libc_wgethostname);
+DEFINE_PUBLIC_ALIAS(DOS$wsetlogin, libd_wsetlogin);
+DEFINE_PUBLIC_ALIAS(wsetlogin, libc_wsetlogin);
+DEFINE_PUBLIC_ALIAS(DOS$wsethostname, libd_wsethostname);
+DEFINE_PUBLIC_ALIAS(wsethostname, libc_wsethostname);
+DEFINE_PUBLIC_ALIAS(DOS$wgetdomainname, libd_wgetdomainname);
+DEFINE_PUBLIC_ALIAS(wgetdomainname, libc_wgetdomainname);
+DEFINE_PUBLIC_ALIAS(DOS$wsetdomainname, libd_wsetdomainname);
+DEFINE_PUBLIC_ALIAS(wsetdomainname, libc_wsetdomainname);
+DEFINE_PUBLIC_ALIAS(DOS$wchroot, libd_wchroot);
+DEFINE_PUBLIC_ALIAS(wchroot, libc_wchroot);
+DEFINE_PUBLIC_ALIAS(DOS$wctermid, libd_wctermid);
+DEFINE_PUBLIC_ALIAS(wctermid, libc_wctermid);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -750,7 +750,11 @@ int system([[nullable]] char const *command);
 %[default_impl_section(".text.crt.application.exit")]
 [[std, guard, crtbuiltin, ATTR_NORETURN, throws]]
 [[export_alias("_ZSt9terminatev", "?terminate@@YAXXZ")]]
-void abort();
+[[crt_impl_if(!defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_ABORT))]]
+[[requires_function(_Exit)]]
+void abort() {
+	_Exit(/* EXIT_FAILURE */ 1);
+}
 
 [[std, guard, crtbuiltin, ATTR_NORETURN, throws]]
 [[alias("quick_exit", "_exit", "_Exit")]]
@@ -2354,12 +2358,16 @@ _invalid_parameter_handler _get_invalid_parameter_handler();
 [[requires(defined(__LOCAL_program_invocation_name))]]
 errno_t _get_pgmptr(char **pvalue) {
 	*pvalue = __LOCAL_program_invocation_name;
-	return 0;
+	return EOK;
 }
 
 [[decl_include("<bits/types.h>")]]
 [[wchar, section(".text.crt.dos.wchar.application.init")]]
-errno_t _get_wpgmptr(wchar_t **pvalue); /* TODO: Implement using `_wpgmptr' */
+[[requires_function(__p__wpgmptr)]]
+errno_t _get_wpgmptr(wchar_t **pvalue) {
+	*pvalue = *__p__wpgmptr();
+	return EOK;
+}
 
 %
 %[default_impl_section(".text.crt.dos.FILE.utility")]

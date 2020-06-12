@@ -1304,112 +1304,105 @@ int32_t const *libc___ctype_toupper_loc_pointer = NULL;
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:__ctype_b_loc,hash:CRC-32=0x36d09888]]]*/
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.__ctype_b_loc") uint16_t const **
+/*[[[head:libc___ctype_b_loc,hash:CRC-32=0xde267e1c]]]*/
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_PURE WUNUSED uint16_t const **
 NOTHROW(LIBCCALL libc___ctype_b_loc)(void)
-/*[[[body:__ctype_b_loc]]]*/
+/*[[[body:libc___ctype_b_loc]]]*/
 {
 	if (!libc___ctype_b_loc_pointer)
 		libc___ctype_b_loc_pointer = libc___ctype_b_loc_matrix + 128;
 	return &libc___ctype_b_loc_pointer;
 }
-/*[[[end:__ctype_b_loc]]]*/
+/*[[[end:libc___ctype_b_loc]]]*/
 
-/*[[[head:__ctype_tolower_loc,hash:CRC-32=0x395f2168]]]*/
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.__ctype_tolower_loc") int32_t const **
+/*[[[head:libc___ctype_tolower_loc,hash:CRC-32=0x285bc49d]]]*/
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_PURE WUNUSED int32_t const **
 NOTHROW(LIBCCALL libc___ctype_tolower_loc)(void)
-/*[[[body:__ctype_tolower_loc]]]*/
+/*[[[body:libc___ctype_tolower_loc]]]*/
 {
 	if (!libc___ctype_tolower_loc_pointer)
 		libc___ctype_tolower_loc_pointer = libc___ctype_tolower_loc_matrix + 128;
 	return &libc___ctype_tolower_loc_pointer;
 }
-/*[[[end:__ctype_tolower_loc]]]*/
+/*[[[end:libc___ctype_tolower_loc]]]*/
 
-/*[[[head:__ctype_toupper_loc,hash:CRC-32=0x2eb732d]]]*/
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.__ctype_toupper_loc") int32_t const **
+/*[[[head:libc___ctype_toupper_loc,hash:CRC-32=0xad708f83]]]*/
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_PURE WUNUSED int32_t const **
 NOTHROW(LIBCCALL libc___ctype_toupper_loc)(void)
-/*[[[body:__ctype_toupper_loc]]]*/
+/*[[[body:libc___ctype_toupper_loc]]]*/
 {
 	if (!libc___ctype_toupper_loc_pointer)
 		libc___ctype_toupper_loc_pointer = libc___ctype_toupper_loc_matrix + 128;
 	return &libc___ctype_toupper_loc_pointer;
 }
-/*[[[end:__ctype_toupper_loc]]]*/
+/*[[[end:libc___ctype_toupper_loc]]]*/
 
 
-/*[[[head:__locale_ctype_ptr,hash:CRC-32=0x6238c0b9]]]*/
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.__locale_ctype_ptr") char const *
+/*[[[head:libc___locale_ctype_ptr,hash:CRC-32=0xed204c59]]]*/
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBCCALL libc___locale_ctype_ptr)(void)
-/*[[[body:__locale_ctype_ptr]]]*/
-{
+/*[[[body:libc___locale_ctype_ptr]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("__locale_ctype_ptr"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:__locale_ctype_ptr]]]*/
+/*[[[end:libc___locale_ctype_ptr]]]*/
 
-/*[[[head:__locale_ctype_ptr_l,hash:CRC-32=0x69ac728b]]]*/
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.__locale_ctype_ptr_l") char const *
+/*[[[head:libc___locale_ctype_ptr_l,hash:CRC-32=0x90d435e7]]]*/
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED char const *
 NOTHROW_NCX(LIBCCALL libc___locale_ctype_ptr_l)(locale_t locale)
-/*[[[body:__locale_ctype_ptr_l]]]*/
-{
+/*[[[body:libc___locale_ctype_ptr_l]]]*/
+/*AUTO*/{
 	(void)locale;
 	CRT_UNIMPLEMENTED("__locale_ctype_ptr_l"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:__locale_ctype_ptr_l]]]*/
+/*[[[end:libc___locale_ctype_ptr_l]]]*/
 
-/*[[[head:_isctype,hash:CRC-32=0x4e34ccbe]]]*/
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype._isctype") int
+/*[[[head:libc__isctype,hash:CRC-32=0x9fc6416]]]*/
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc__isctype)(int ch,
                                 int mask)
-/*[[[body:_isctype]]]*/
-{
+/*[[[body:libc__isctype]]]*/
+/*AUTO*/{
 	(void)ch;
 	(void)mask;
 	CRT_UNIMPLEMENTED("_isctype"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:_isctype]]]*/
+/*[[[end:libc__isctype]]]*/
 
-/*[[[head:_isctype_l,hash:CRC-32=0xc1733b08]]]*/
-INTERN ATTR_PURE WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype._isctype_l") int
+/*[[[head:libc__isctype_l,hash:CRC-32=0xa30114a7]]]*/
+INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch,
                                       int mask,
                                       locale_t locale)
-/*[[[body:_isctype_l]]]*/
-{
+/*[[[body:libc__isctype_l]]]*/
+/*AUTO*/{
 	(void)ch;
 	(void)mask;
 	(void)locale;
 	CRT_UNIMPLEMENTED("_isctype_l"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:_isctype_l]]]*/
+/*[[[end:libc__isctype_l]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf09b1f79]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(__locale_ctype_ptr, libc___locale_ctype_ptr);
-DEFINE_PUBLIC_WEAK_ALIAS(__locale_ctype_ptr_l, libc___locale_ctype_ptr_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__ctype_b_loc, libc___ctype_b_loc);
-DEFINE_PUBLIC_WEAK_ALIAS(__ctype_tolower_loc, libc___ctype_tolower_loc);
-DEFINE_PUBLIC_WEAK_ALIAS(__ctype_toupper_loc, libc___ctype_toupper_loc);
-DEFINE_PUBLIC_WEAK_ALIAS(_isctype, libc__isctype);
-DEFINE_PUBLIC_WEAK_ALIAS(_isctype_l, libc__isctype_l);
+/*[[[start:exports,hash:CRC-32=0x617f98de]]]*/
+DEFINE_PUBLIC_ALIAS(__locale_ctype_ptr, libc___locale_ctype_ptr);
+DEFINE_PUBLIC_ALIAS(__locale_ctype_ptr_l, libc___locale_ctype_ptr_l);
+DEFINE_PUBLIC_ALIAS(__ctype_b_loc, libc___ctype_b_loc);
+DEFINE_PUBLIC_ALIAS(__ctype_tolower_loc, libc___ctype_tolower_loc);
+DEFINE_PUBLIC_ALIAS(__ctype_toupper_loc, libc___ctype_toupper_loc);
+DEFINE_PUBLIC_ALIAS(_isctype, libc__isctype);
+DEFINE_PUBLIC_ALIAS(_isctype_l, libc__isctype_l);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -86,32 +86,6 @@
 #include "hybrid/arch/i386/config.h"
 #endif /* ARCH... */
 
-
-/* TODO:REMOVE_ME:BEGIN */
-/* Since a more consistent implementation of int-as-... has been
- * added as part of updating the magic generator, user-level function
- * implementations aren't being generated automatically, yet. As a
- * result of this, libc contains some inconsistent prototypes internally,
- * with regards to these macros.
- * To bypass that inconsistency (for the moment), override these macros
- * until user-level source files are once again automated as well. */
-#pragma GCC system_header
-#undef __STDC_INT_AS_SSIZE_T
-#undef __STDC_INT_AS_SIZE_T
-#undef __STDC_INT32_AS_SSIZE_T
-#undef __STDC_INT32_AS_SIZE_T
-#undef __STDC_UINT_AS_SIZE_T
-#undef __STDC_UINT32_AS_SIZE_T
-#undef __STDC_INT_AS_UINT_T
-#define __STDC_INT_AS_SSIZE_T   int
-#define __STDC_INT_AS_SIZE_T    int
-#define __STDC_INT32_AS_SSIZE_T __INT32_TYPE__
-#define __STDC_INT32_AS_SIZE_T  __INT32_TYPE__
-#define __STDC_UINT_AS_SIZE_T   unsigned int
-#define __STDC_UINT32_AS_SIZE_T __UINT32_TYPE__
-#define __STDC_INT_AS_UINT_T    int
-/* TODO:REMOVE_ME:END */
-
 /* TODO:REMOVE_ME:BEGIN */
 /* Find a better solution for dealing with libc-implementation dependencies on [[ignore]] functions...
  * (Maybe the old magic was onto something by escaping `strlen' into `libc_strlen' for auto/user impls...) */

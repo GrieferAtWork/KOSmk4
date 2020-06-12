@@ -27,34 +27,26 @@
 
 DECL_BEGIN
 
-
 #undef program_invocation_short_name
 DEFINE_NOREL_GLOBAL_META(char *, program_invocation_short_name, ".crt.errno.utility");
 #define program_invocation_short_name GET_NOREL_GLOBAL(program_invocation_short_name)
 
-
-
-/*[[[start:implementation]]]*/
-
-/*[[[skip:__errno_location]]]*/
-
-/*[[[head:__p_program_invocation_short_name,hash:CRC-32=0x2a911ebc]]]*/
+/*[[[head:libc___p_program_invocation_short_name,hash:CRC-32=0x2aa3856c]]]*/
 /* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.errno.utility.__p_program_invocation_short_name") char **
+INTERN ATTR_SECTION(".text.crt.errno.utility") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
 NOTHROW_NCX(LIBCCALL libc___p_program_invocation_short_name)(void)
-/*[[[body:__p_program_invocation_short_name]]]*/
+/*[[[body:libc___p_program_invocation_short_name]]]*/
 {
 	return &program_invocation_short_name;
 }
-/*[[[end:__p_program_invocation_short_name]]]*/
-
-/*[[[end:implementation]]]*/
+/*[[[end:libc___p_program_invocation_short_name]]]*/
 
 
+/*[[[skip:libc___errno_location]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x2ec9f144]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(__p_program_invocation_short_name, libc___p_program_invocation_short_name);
+
+/*[[[start:exports,hash:CRC-32=0x349517a]]]*/
+DEFINE_PUBLIC_ALIAS(__p_program_invocation_short_name, libc___p_program_invocation_short_name);
 /*[[[end:exports]]]*/
 
 DECL_END

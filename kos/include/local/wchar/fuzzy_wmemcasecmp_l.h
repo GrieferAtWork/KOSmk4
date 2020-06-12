@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4494217 */
+/* HASH CRC-32:0xd3e62f8e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,22 +40,22 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
-/* Dependency: tolower_l from ctype */
-#ifndef __local___localdep_tolower_l_defined
-#define __local___localdep_tolower_l_defined 1
-#ifdef __CRT_HAVE_tolower_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),tolower_l,(__ch,__locale))
-#elif defined(__CRT_HAVE__tolower_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),_tolower_l,(__ch,__locale))
-#elif defined(__CRT_HAVE___tolower_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),__tolower_l,(__ch,__locale))
+/* Dependency: towlower_l from wctype */
+#ifndef __local___localdep_towlower_l_defined
+#define __local___localdep_towlower_l_defined 1
+#ifdef __CRT_HAVE_towlower_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),towlower_l,(__wc,__locale))
+#elif defined(__CRT_HAVE__towlower_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),_towlower_l,(__wc,__locale))
+#elif defined(__CRT_HAVE___towlower_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),__towlower_l,(__wc,__locale))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <local/ctype/tolower_l.h>
+#include <local/wctype/towlower_l.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_tolower_l __LIBC_LOCAL_NAME(tolower_l)
+#define __localdep_towlower_l __LIBC_LOCAL_NAME(towlower_l)
 #endif /* !... */
-#endif /* !__local___localdep_tolower_l_defined */
+#endif /* !__local___localdep_towlower_l_defined */
 __LOCAL_LIBC(fuzzy_wmemcasecmp_l) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wmemcasecmp_l))(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes, __locale_t __locale) {
 	__SIZE_TYPE__ *__v0, *__v1, __i, __j, __cost, __temp;
@@ -96,7 +96,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wmemcasecmp_l))(__WCHAR_TYPE__ 
 		for (__j = 0; __j < __s2_bytes; __j++) {
 			__BYTE_TYPE__ __c1 = ((__BYTE_TYPE__ *)__s1)[__i];
 			__BYTE_TYPE__ __c2 = ((__BYTE_TYPE__ *)__s2)[__j];
-			__cost  = __c1 != __c2 && __localdep_tolower_l(__c1, __locale) != __localdep_tolower_l(__c2, __locale);
+			__cost  = __c1 != __c2 && (__WCHAR_TYPE__)__localdep_towlower_l(__c1, __locale) != (__WCHAR_TYPE__)__localdep_towlower_l(__c2, __locale);
 			__cost += __v0[__j];
 			__temp  = __v1[__j] + 1;
 			if (__cost > __temp)

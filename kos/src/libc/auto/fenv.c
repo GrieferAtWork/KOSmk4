@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bfed87c */
+/* HASH CRC-32:0xe80b7249 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,8 @@ INTERN ATTR_SECTION(".text.crt.math.fenv") int
 /* Store implementation-defined representation of the exception
  * flags indicated by EXCEPTS in the object pointed to by FLAGP */
 INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp, int excepts) {
+NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp,
+                                           int excepts) {
 #ifdef __inline_fegetexceptflag
 	__inline_fegetexceptflag(flagp, excepts);
 #else /* __inline_fegetexceptflag */
@@ -60,7 +61,8 @@ NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp, int excepts) {
 /* Set complete status for exceptions indicated by EXCEPTS according
  * to the representation in the object pointed to by FLAGP */
 INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t const *flagp, int excepts) {
+NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t const *flagp,
+                                           int excepts) {
 #ifdef __inline_fesetexceptflag
 	__inline_fesetexceptflag(flagp, excepts);
 #else /* __inline_fesetexceptflag */
@@ -157,20 +159,20 @@ NOTHROW(LIBCCALL libc_fegetexcept)(void) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(feclearexcept, libc_feclearexcept);
-DEFINE_PUBLIC_WEAK_ALIAS(feraiseexcept, libc_feraiseexcept);
-DEFINE_PUBLIC_WEAK_ALIAS(fegetexceptflag, libc_fegetexceptflag);
-DEFINE_PUBLIC_WEAK_ALIAS(fesetexceptflag, libc_fesetexceptflag);
-DEFINE_PUBLIC_WEAK_ALIAS(fetestexcept, libc_fetestexcept);
-DEFINE_PUBLIC_WEAK_ALIAS(fegetround, libc_fegetround);
-DEFINE_PUBLIC_WEAK_ALIAS(fesetround, libc_fesetround);
-DEFINE_PUBLIC_WEAK_ALIAS(fegetenv, libc_fegetenv);
-DEFINE_PUBLIC_WEAK_ALIAS(feholdexcept, libc_feholdexcept);
-DEFINE_PUBLIC_WEAK_ALIAS(fesetenv, libc_fesetenv);
-DEFINE_PUBLIC_WEAK_ALIAS(feupdateenv, libc_feupdateenv);
-DEFINE_PUBLIC_WEAK_ALIAS(feenableexcept, libc_feenableexcept);
-DEFINE_PUBLIC_WEAK_ALIAS(fedisableexcept, libc_fedisableexcept);
-DEFINE_PUBLIC_WEAK_ALIAS(fegetexcept, libc_fegetexcept);
+DEFINE_PUBLIC_ALIAS(feclearexcept, libc_feclearexcept);
+DEFINE_PUBLIC_ALIAS(feraiseexcept, libc_feraiseexcept);
+DEFINE_PUBLIC_ALIAS(fegetexceptflag, libc_fegetexceptflag);
+DEFINE_PUBLIC_ALIAS(fesetexceptflag, libc_fesetexceptflag);
+DEFINE_PUBLIC_ALIAS(fetestexcept, libc_fetestexcept);
+DEFINE_PUBLIC_ALIAS(fegetround, libc_fegetround);
+DEFINE_PUBLIC_ALIAS(fesetround, libc_fesetround);
+DEFINE_PUBLIC_ALIAS(fegetenv, libc_fegetenv);
+DEFINE_PUBLIC_ALIAS(feholdexcept, libc_feholdexcept);
+DEFINE_PUBLIC_ALIAS(fesetenv, libc_fesetenv);
+DEFINE_PUBLIC_ALIAS(feupdateenv, libc_feupdateenv);
+DEFINE_PUBLIC_ALIAS(feenableexcept, libc_feenableexcept);
+DEFINE_PUBLIC_ALIAS(fedisableexcept, libc_fedisableexcept);
+DEFINE_PUBLIC_ALIAS(fegetexcept, libc_fegetexcept);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FENV_C */

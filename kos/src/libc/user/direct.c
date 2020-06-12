@@ -39,12 +39,12 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:_getdcwd,hash:CRC-32=0xda8c98ab]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.property._getdcwd") char *
+/*[[[head:libc__getdcwd,hash:CRC-32=0x887f4d]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") char *
 NOTHROW_RPC(LIBCCALL libc__getdcwd)(int drive,
                                     char *buf,
                                     size_t size)
-/*[[[body:_getdcwd]]]*/
+/*[[[body:libc__getdcwd]]]*/
 {
 	if unlikely(drive < AT_DOS_DRIVEMIN || drive > AT_DOS_DRIVEMAX) {
 		libc_seterrno(EINVAL);
@@ -55,24 +55,24 @@ NOTHROW_RPC(LIBCCALL libc__getdcwd)(int drive,
 	                  size,
 	                  0);
 }
-/*[[[end:_getdcwd]]]*/
+/*[[[end:libc__getdcwd]]]*/
 
-/*[[[head:_chdrive,hash:CRC-32=0x6f94a8ac]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.property._chdrive") int
+/*[[[head:libc__chdrive,hash:CRC-32=0xb48bbfa2]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") int
 NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive)
-/*[[[body:_chdrive]]]*/
+/*[[[body:libc__chdrive]]]*/
 {
 	drive = toupper(drive);
 	if unlikely(drive < AT_DOS_DRIVEMIN || drive > AT_DOS_DRIVEMAX)
 		return (int)libc_seterrno(EINVAL);
 	return fchdir(AT_FDDRIVE_ROOT(drive));
 }
-/*[[[end:_chdrive]]]*/
+/*[[[end:libc__chdrive]]]*/
 
-/*[[[head:_getdrive,hash:CRC-32=0xa9ca7337]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.property._getdrive") int
+/*[[[head:libc__getdrive,hash:CRC-32=0xa2abfff3]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") int
 NOTHROW_RPC(LIBCCALL libc__getdrive)(void)
-/*[[[body:_getdrive]]]*/
+/*[[[body:libc__getdrive]]]*/
 {
 	char buf[2];
 	ssize_t error;
@@ -90,12 +90,12 @@ NOTHROW_RPC(LIBCCALL libc__getdrive)(void)
 	}
 	return (int)(buf[0] - AT_DOS_DRIVEMIN);
 }
-/*[[[end:_getdrive]]]*/
+/*[[[end:libc__getdrive]]]*/
 
-/*[[[head:_getdrives,hash:CRC-32=0xd3791409]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.property._getdrives") __ULONG32_TYPE__
+/*[[[head:libc__getdrives,hash:CRC-32=0x1f5628c4]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") __ULONG32_TYPE__
 NOTHROW_RPC(LIBCCALL libc__getdrives)(void)
-/*[[[body:_getdrives]]]*/
+/*[[[body:libc__getdrives]]]*/
 {
 	syscall_slong_t result;
 	result = sys_getdrives();
@@ -105,45 +105,44 @@ NOTHROW_RPC(LIBCCALL libc__getdrives)(void)
 	}
 	return (__ULONG32_TYPE__)(syscall_ulong_t)result;
 }
-/*[[[end:_getdrives]]]*/
+/*[[[end:libc__getdrives]]]*/
 
-/*[[[head:_getdiskfree,hash:CRC-32=0x6127f901]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.property._getdiskfree") unsigned int
+/*[[[head:libc__getdiskfree,hash:CRC-32=0x62358abe]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") unsigned int
 NOTHROW_RPC(LIBCCALL libc__getdiskfree)(unsigned int drive,
                                         struct _diskfree_t *diskfree)
-/*[[[body:_getdiskfree]]]*/
-{
+/*[[[body:libc__getdiskfree]]]*/
+/*AUTO*/{
 	(void)drive;
 	(void)diskfree;
 	CRT_UNIMPLEMENTED("_getdiskfree"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:_getdiskfree]]]*/
+/*[[[end:libc__getdiskfree]]]*/
 
-/*[[[head:_mkdir,hash:CRC-32=0x2432c618]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.modify._mkdir") int
+/*[[[head:libc__mkdir,hash:CRC-32=0xa805db12]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc__mkdir)(char const *path)
-/*[[[body:_mkdir]]]*/
+/*[[[body:libc__mkdir]]]*/
 {
 	errno_t result;
 	result = sys_mkdir(path, 0755);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:_mkdir]]]*/
+/*[[[end:libc__mkdir]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x3aa41bca]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(_getdcwd, libc__getdcwd);
-DEFINE_PUBLIC_WEAK_ALIAS(_chdrive, libc__chdrive);
-DEFINE_PUBLIC_WEAK_ALIAS(_getdrive, libc__getdrive);
-DEFINE_PUBLIC_WEAK_ALIAS(_getdrives, libc__getdrives);
-DEFINE_PUBLIC_WEAK_ALIAS(_getdiskfree, libc__getdiskfree);
-DEFINE_PUBLIC_WEAK_ALIAS(_mkdir, libc__mkdir);
+/*[[[start:exports,hash:CRC-32=0xaa2dc853]]]*/
+DEFINE_PUBLIC_ALIAS(_getdcwd, libc__getdcwd);
+DEFINE_PUBLIC_ALIAS(_chdrive, libc__chdrive);
+DEFINE_PUBLIC_ALIAS(_getdrive, libc__getdrive);
+DEFINE_PUBLIC_ALIAS(_getdrives, libc__getdrives);
+DEFINE_PUBLIC_ALIAS(_getdiskfree, libc__getdiskfree);
+DEFINE_PUBLIC_ALIAS(_mkdir, libc__mkdir);
 /*[[[end:exports]]]*/
 
 DECL_END

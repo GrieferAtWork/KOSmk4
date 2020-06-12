@@ -76,13 +76,13 @@ PRIVATE bool LIBCCALL libc_has_kernel64(void) {
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getauxval,hash:CRC-32=0xc1a5766c]]]*/
+/*[[[head:libc_getauxval,hash:CRC-32=0x71fb96a6]]]*/
 /* Return the value associated with an Elf*_auxv_t type from the auxv list
  * passed to the program on startup.  If TYPE was not present in the auxv
  * list, returns zero and sets errno to ENOENT */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.auxv.getauxval") ulongptr_t
+INTERN ATTR_SECTION(".text.crt.system.auxv") ulongptr_t
 NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
-/*[[[body:getauxval]]]*/
+/*[[[body:libc_getauxval]]]*/
 {
 	ulongptr_t result;
 	switch (type) {
@@ -210,15 +210,15 @@ not_found:
 	}
 	return result;
 }
-/*[[[end:getauxval]]]*/
+/*[[[end:libc_getauxval]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x987e790e]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(getauxval, libc_getauxval);
-DEFINE_PUBLIC_WEAK_ALIAS(__getauxval, libc_getauxval);
+/*[[[start:exports,hash:CRC-32=0x9d59b425]]]*/
+DEFINE_PUBLIC_ALIAS(__getauxval, libc_getauxval);
+DEFINE_PUBLIC_ALIAS(getauxval, libc_getauxval);
 /*[[[end:exports]]]*/
 
 DECL_END

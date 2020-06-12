@@ -20,6 +20,8 @@
 
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
+%[define_replacement(utimbuf32 = __utimbuf32)]
+%[define_replacement(utimbuf64 = __utimbuf64)]
 %[default_impl_section("{.text.crt.wchar.fs.modify_time|.text.crt.dos.wchar.fs.modify_time}")]
 
 %{
@@ -40,11 +42,11 @@ __SYSDECL_BEGIN
 
 [[cp, wchar, ignore, nocrt, alias("wutime", "_wutime32")]]
 int crt_wutime32([[nonnull]] $wchar_t const *filename,
-                 [[nullable]] struct __utimbuf32 const *file_times);
+                 [[nullable]] struct $utimbuf32 const *file_times);
 
 [[cp, wchar, ignore, nocrt, alias("wutime64", "_wutime64")]]
 int crt_wutime64([[nonnull]] $wchar_t const *filename,
-                 [[nullable]] struct __utimbuf64 const *file_times);
+                 [[nullable]] struct $utimbuf64 const *file_times);
 
 [[cp, wchar, crt_dosname("_wutime32"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("wutime64", "_wutime64")]]
@@ -59,14 +61,14 @@ int wutime([[nonnull]] wchar_t const *filename,
 #undef @actime@
 #undef @modtime@
 @@pp_if $has_function(crt_wutime32)@@
-	struct __utimbuf32 buf32;
+	struct utimbuf32 buf32;
 	if (!file_times)
 		return crt_wutime32(filename, NULL);
 	buf32.@actime@  = (time32_t)file_times->@actime@;
 	buf32.@modtime@ = (time32_t)file_times->@modtime@;
 	return crt_wutime32(filename, &buf32);
 @@pp_else@@
-	struct __utimbuf64 buf64;
+	struct utimbuf64 buf64;
 	if (!file_times)
 		return wutime64(filename, NULL);
 	buf64.@actime@  = (time64_t)file_times->@actime@;
@@ -81,7 +83,8 @@ int wutime([[nonnull]] wchar_t const *filename,
 
 %
 %#ifdef __USE_TIME64
-[[cp, wchar, crt_dosname("_wutime64"), time64_variant_of(wutime)]]
+[[time64_variant_of(wutime)]]
+[[cp, wchar, crt_dosname("_wutime64"), doc_alias("wutime")]]
 [[userimpl, requires_function(crt_wutime32)]]
 int wutime64([[nonnull]] $wchar_t const *filename,
              [[nullable]] struct utimbuf64 const *file_times) {
@@ -91,7 +94,7 @@ int wutime64([[nonnull]] $wchar_t const *filename,
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #undef @actime@
 #undef @modtime@
-	struct __utimbuf32 buf32;
+	struct utimbuf32 buf32;
 	if (!file_times)
 		return crt_wutime32(filename, NULL);
 	buf32.@actime@  = (time32_t)file_times->@actime@;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bfac09d */
+/* HASH CRC-32:0x15b1b513 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr) {
 /* Make Internet host address in network byte order by
  * combining the network number NET with the local address HOST */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_CONST WUNUSED struct in_addr
-NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net, uint32_t host) {
+NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net,
+                                         uint32_t host) {
 	struct in_addr result;
 	uint32_t result_addr;
 	if (net < IN_CLASSA_MAX)
@@ -109,7 +110,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_ntoa)(struct in_addr inaddr) {
 #include <hybrid/__byteswap.h>
 /* Re-entrant version of `inet_ntoa()' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_RETNONNULL NONNULL((2)) char *
-NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr, char buf[16]) {
+NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr,
+                                       char buf[16]) {
 	uint32_t addr = __hybrid_betoh32(inaddr.s_addr);
 	sprintf(buf, "%u.%u.%u.%u",
 	        (unsigned int)(u8)((addr & __UINT32_C(0xff000000)) >> 24),
@@ -143,7 +145,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp) {
  * @return: 0: Bad input format
  * @return: 1: Success */
 INTERN ATTR_SECTION(".text.crt.net.inet") NONNULL((1, 2)) int
-NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp, struct in_addr *__restrict inp) {
+NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp,
+                                     struct in_addr *__restrict inp) {
 	return inet_paton((char const **)&cp, inp, 0) && !*cp;
 }
 #include <hybrid/__byteswap.h>
@@ -161,7 +164,9 @@ NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp, struct in_addr *
  * @return: 0: Bad input format
  * @return: 1: Success */
 INTERN ATTR_SECTION(".text.crt.net.inet") WUNUSED NONNULL((1, 2)) int
-NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp, struct in_addr *__restrict inp, int network_addr) {
+NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp,
+                                      struct in_addr *__restrict inp,
+                                      int network_addr) {
 	uint32_t result;
 	uint32_t parts[4];
 	char const *cp = *pcp;
@@ -306,7 +311,9 @@ err:
 /* Format a network number NET into presentation format and place
  * result in buffer starting at BUF with length of LEN bytes */
 INTERN ATTR_SECTION(".text.crt.net.inet") NONNULL((2)) char *
-NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net, char *buf, size_t len) {
+NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net,
+                                     char *buf,
+                                     size_t len) {
 	size_t reqlen;
 	if (net <= 0xff) {
 		if (!net) {
@@ -350,16 +357,16 @@ too_small:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(inet_netof, libc_inet_netof);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_lnaof, libc_inet_lnaof);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_makeaddr, libc_inet_makeaddr);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_addr, libc_inet_addr);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_ntoa, libc_inet_ntoa);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_ntoa_r, libc_inet_ntoa_r);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_network, libc_inet_network);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_aton, libc_inet_aton);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_paton, libc_inet_paton);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_neta, libc_inet_neta);
+DEFINE_PUBLIC_ALIAS(inet_netof, libc_inet_netof);
+DEFINE_PUBLIC_ALIAS(inet_lnaof, libc_inet_lnaof);
+DEFINE_PUBLIC_ALIAS(inet_makeaddr, libc_inet_makeaddr);
+DEFINE_PUBLIC_ALIAS(inet_addr, libc_inet_addr);
+DEFINE_PUBLIC_ALIAS(inet_ntoa, libc_inet_ntoa);
+DEFINE_PUBLIC_ALIAS(inet_ntoa_r, libc_inet_ntoa_r);
+DEFINE_PUBLIC_ALIAS(inet_network, libc_inet_network);
+DEFINE_PUBLIC_ALIAS(inet_aton, libc_inet_aton);
+DEFINE_PUBLIC_ALIAS(inet_paton, libc_inet_paton);
+DEFINE_PUBLIC_ALIAS(inet_neta, libc_inet_neta);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ARPA_INET_C */

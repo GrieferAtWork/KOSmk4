@@ -24,6 +24,38 @@
 %[define_replacement(wctype_t = __WCTYPE_TYPE__)]
 %[define_replacement(wctrans_t = __wctrans_t)]
 
+%[define_str2wcs_replacement(iscntrl = iswcntrl)]
+%[define_str2wcs_replacement(isspace = iswspace)]
+%[define_str2wcs_replacement(isupper = iswupper)]
+%[define_str2wcs_replacement(islower = iswlower)]
+%[define_str2wcs_replacement(isalpha = iswalpha)]
+%[define_str2wcs_replacement(isdigit = iswdigit)]
+%[define_str2wcs_replacement(isxdigit = iswxdigit)]
+%[define_str2wcs_replacement(isalnum = iswalnum)]
+%[define_str2wcs_replacement(ispunct = iswpunct)]
+%[define_str2wcs_replacement(isgraph = iswgraph)]
+%[define_str2wcs_replacement(isprint = iswprint)]
+%[define_str2wcs_replacement(tolower = "(wchar_t)towlower")]
+%[define_str2wcs_replacement(toupper = "(wchar_t)towupper")]
+%[define_str2wcs_replacement(isblank = iswblank)]
+%[define_str2wcs_replacement(iscntrl_l = iswcntrl_l)]
+%[define_str2wcs_replacement(isspace_l = iswspace_l)]
+%[define_str2wcs_replacement(isupper_l = iswupper_l)]
+%[define_str2wcs_replacement(islower_l = iswlower_l)]
+%[define_str2wcs_replacement(isalpha_l = iswalpha_l)]
+%[define_str2wcs_replacement(isdigit_l = iswdigit_l)]
+%[define_str2wcs_replacement(isxdigit_l = iswxdigit_l)]
+%[define_str2wcs_replacement(isalnum_l = iswalnum_l)]
+%[define_str2wcs_replacement(ispunct_l = iswpunct_l)]
+%[define_str2wcs_replacement(isgraph_l = iswgraph_l)]
+%[define_str2wcs_replacement(isprint_l = iswprint_l)]
+%[define_str2wcs_replacement(isblank_l = iswblank_l)]
+%[define_str2wcs_replacement(tolower_l = "(wchar_t)towlower_l")]
+%[define_str2wcs_replacement(toupper_l = "(wchar_t)towupper_l")]
+%[define_str2wcs_replacement(isascii = iswascii)]
+//%[define_str2wcs_replacement(toascii = "(wchar_t)towascii")]
+
+
 %{
 #include <features.h>
 

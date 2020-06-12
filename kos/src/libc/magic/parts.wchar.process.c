@@ -105,7 +105,7 @@ int wexecle([[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ...
 }
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function(wexecvpe), ATTR_SENTINEL_O(1), crt_dosname("_wexecle"), allow_macros]]
+[[requires_dependent_function(wexecvpe), ATTR_SENTINEL_O(1), crt_dosname("_wexeclpe"), allow_macros]]
 int wexeclpe([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
 	__REDIRECT_EXECLE(wchar_t, wexecvpe, file, args)
 }
@@ -134,7 +134,7 @@ $pid_t wspawnl(int mode, [[nonnull]] wchar_t const *__restrict path, wchar_t con
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(wspawnvp), ATTR_SENTINEL, crt_dosname("_wspawnlp"), allow_macros]]
 $pid_t wspawnlp(int mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
-	__REDIRECT_SPAWNLP(wchar_t, wspawnvp, mode, file, args)
+	__REDIRECT_SPAWNL(wchar_t, wspawnvp, mode, file, args)
 }
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
@@ -144,9 +144,9 @@ $pid_t wspawnle(int mode, [[nonnull]] wchar_t const *__restrict path, wchar_t co
 }
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function(wspawnvpe), ATTR_SENTINEL_O(1), crt_dosname("_wspawnle"), allow_macros]]
+[[requires_dependent_function(wspawnvpe), ATTR_SENTINEL_O(1), crt_dosname("_wspawnlpe"), allow_macros]]
 $pid_t wspawnlpe(int mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
-	__REDIRECT_SPAWNLPE(wchar_t, wspawnvpe, mode, file, args)
+	__REDIRECT_SPAWNLE(wchar_t, wspawnvpe, mode, file, args)
 }
 
 [[cp, guard, wchar, crt_dosname("_wsystem")]]

@@ -39,7 +39,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:socket,hash:CRC-32=0xd1f3c75e]]]*/
+/*[[[head:libc_socket,hash:CRC-32=0x7faf1f6]]]*/
 /* Create a new socket of type TYPE in domain FAMILY, using
  * protocol PROTOCOL. If PROTOCOL is zero, one is chosen automatically.
  * Returns a file descriptor for the new socket, or -1 for errors
@@ -51,12 +51,11 @@ DECL_BEGIN
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.socket") fd_t
+INTERN ATTR_SECTION(".text.crt.net.socket") WUNUSED fd_t
 NOTHROW_NCX(LIBCCALL libc_socket)(__STDC_INT_AS_UINT_T family,
                                   __STDC_INT_AS_UINT_T type,
                                   __STDC_INT_AS_UINT_T protocol)
-/*[[[body:socket]]]*/
+/*[[[body:libc_socket]]]*/
 {
 	fd_t result;
 	result = sys_socket((syscall_ulong_t)family,
@@ -64,9 +63,9 @@ NOTHROW_NCX(LIBCCALL libc_socket)(__STDC_INT_AS_UINT_T family,
 	                    (syscall_ulong_t)protocol);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:socket]]]*/
+/*[[[end:libc_socket]]]*/
 
-/*[[[head:socketpair,hash:CRC-32=0x548bd75d]]]*/
+/*[[[head:libc_socketpair,hash:CRC-32=0x8f6242da]]]*/
 /* Create two new sockets, of type TYPE in domain FAMILY and using
  * protocol PROTOCOL, which are connected to each other, and put file
  * descriptors for them in FDS[0] and FDS[1].  If PROTOCOL is zero,
@@ -79,13 +78,12 @@ NOTHROW_NCX(LIBCCALL libc_socket)(__STDC_INT_AS_UINT_T family,
  *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
-INTERN NONNULL((4))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.socketpair") int
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((4)) int
 NOTHROW_NCX(LIBCCALL libc_socketpair)(__STDC_INT_AS_UINT_T family,
                                       __STDC_INT_AS_UINT_T type,
                                       __STDC_INT_AS_UINT_T protocol,
                                       fd_t fds[2])
-/*[[[body:socketpair]]]*/
+/*[[[body:libc_socketpair]]]*/
 {
 	errno_t error;
 	error = sys_socketpair((syscall_ulong_t)family,
@@ -94,16 +92,15 @@ NOTHROW_NCX(LIBCCALL libc_socketpair)(__STDC_INT_AS_UINT_T family,
 	                       fds);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:socketpair]]]*/
+/*[[[end:libc_socketpair]]]*/
 
-/*[[[head:bind,hash:CRC-32=0x438712cc]]]*/
+/*[[[head:libc_bind,hash:CRC-32=0x2c36083e]]]*/
 /* Give the socket FD the local address ADDR (which is LEN bytes long) */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.bind") int
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_bind)(fd_t sockfd,
                                 __CONST_SOCKADDR_ARG addr,
                                 socklen_t addr_len)
-/*[[[body:bind]]]*/
+/*[[[body:libc_bind]]]*/
 {
 	errno_t error;
 	error = sys_bind(sockfd,
@@ -111,16 +108,15 @@ NOTHROW_NCX(LIBCCALL libc_bind)(fd_t sockfd,
 	                 addr_len);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:bind]]]*/
+/*[[[end:libc_bind]]]*/
 
-/*[[[head:getsockname,hash:CRC-32=0xe20e139b]]]*/
+/*[[[head:libc_getsockname,hash:CRC-32=0x4824daef]]]*/
 /* Put the local address of FD into *ADDR and its length in *LEN */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.getsockname") int
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_getsockname)(fd_t sockfd,
                                        __SOCKADDR_ARG addr,
                                        socklen_t *__restrict addr_len)
-/*[[[body:getsockname]]]*/
+/*[[[body:libc_getsockname]]]*/
 {
 	errno_t error;
 	error = sys_getsockname(sockfd,
@@ -128,17 +124,16 @@ NOTHROW_NCX(LIBCCALL libc_getsockname)(fd_t sockfd,
 	                        addr_len);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:getsockname]]]*/
+/*[[[end:libc_getsockname]]]*/
 
-/*[[[head:getpeername,hash:CRC-32=0xee1d7305]]]*/
+/*[[[head:libc_getpeername,hash:CRC-32=0x65687fa9]]]*/
 /* Put the address of the peer connected to socket FD into *ADDR
  * (which is *LEN bytes long), and its actual length into *LEN */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.getpeername") int
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_getpeername)(fd_t sockfd,
                                        __SOCKADDR_ARG addr,
                                        socklen_t *__restrict addr_len)
-/*[[[body:getpeername]]]*/
+/*[[[body:libc_getpeername]]]*/
 {
 	errno_t error;
 	error = sys_getpeername(sockfd,
@@ -146,19 +141,18 @@ NOTHROW_NCX(LIBCCALL libc_getpeername)(fd_t sockfd,
 	                        addr_len);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:getpeername]]]*/
+/*[[[end:libc_getpeername]]]*/
 
-/*[[[head:connect,hash:CRC-32=0x3596573b]]]*/
+/*[[[head:libc_connect,hash:CRC-32=0xd4c6cb1e]]]*/
 /* Open a connection on socket FD to peer at ADDR (which LEN bytes long).
  * For connectionless socket types, just set the default address to send to
  * and the only address from which to accept transmissions.
  * Return 0 on success, -1 for errors */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.connect") int
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_connect)(fd_t sockfd,
                                    __CONST_SOCKADDR_ARG addr,
                                    socklen_t addr_len)
-/*[[[body:connect]]]*/
+/*[[[body:libc_connect]]]*/
 {
 	errno_t error;
 	error = sys_connect(sockfd,
@@ -166,20 +160,19 @@ NOTHROW_RPC(LIBCCALL libc_connect)(fd_t sockfd,
 	                    addr_len);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:connect]]]*/
+/*[[[end:libc_connect]]]*/
 
-/*[[[head:recv,hash:CRC-32=0x7aa05a4f]]]*/
+/*[[[head:libc_recv,hash:CRC-32=0x51c5af64]]]*/
 /* Read BUFSIZE bytes into BUF from socket FD.
  * Returns the number read or -1 for errors
  * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-INTERN WUNUSED NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.recv") ssize_t
+INTERN ATTR_SECTION(".text.crt.net.socket") WUNUSED NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_recv)(fd_t sockfd,
                                 void *buf,
                                 size_t bufsize,
                                 __STDC_INT_AS_UINT_T msg_flags)
-/*[[[body:recv]]]*/
+/*[[[body:libc_recv]]]*/
 {
 	ssize_t result;
 #ifdef SYS_recv
@@ -217,24 +210,23 @@ NOTHROW_RPC(LIBCCALL libc_recv)(fd_t sockfd,
 #endif /* !... */
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:recv]]]*/
+/*[[[end:libc_recv]]]*/
 
-/*[[[head:recvfrom,hash:CRC-32=0x4e66968d]]]*/
+/*[[[head:libc_recvfrom,hash:CRC-32=0xe71ffb09]]]*/
 /* Read BUFSIZE bytes into BUF through socket FD.
  * If ADDR is not NULL, fill in *ADDR_LEN bytes of it with tha address of
  * the sender, and store the actual size of the address in *ADDR_LEN.
  * Returns the number of bytes read or -1 for errors
  * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-INTERN WUNUSED NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.recvfrom") ssize_t
+INTERN ATTR_SECTION(".text.crt.net.socket") WUNUSED NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_recvfrom)(fd_t sockfd,
                                     void *__restrict buf,
                                     size_t bufsize,
                                     __STDC_INT_AS_UINT_T msg_flags,
                                     __SOCKADDR_ARG addr,
                                     socklen_t *__restrict addr_len)
-/*[[[body:recvfrom]]]*/
+/*[[[body:libc_recvfrom]]]*/
 {
 	ssize_t result;
 #ifdef SYS_recvfrom
@@ -276,20 +268,19 @@ NOTHROW_RPC(LIBCCALL libc_recvfrom)(fd_t sockfd,
 #endif /* !... */
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:recvfrom]]]*/
+/*[[[end:libc_recvfrom]]]*/
 
-/*[[[head:recvmsg,hash:CRC-32=0x69377018]]]*/
+/*[[[head:libc_recvmsg,hash:CRC-32=0x91c46dce]]]*/
 /* Receive a message as described by MESSAGE from socket FD.
  * Returns the number of bytes read or -1 for errors.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-INTERN WUNUSED NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.recvmsg") ssize_t
+INTERN ATTR_SECTION(".text.crt.net.socket") WUNUSED NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_recvmsg)(fd_t sockfd,
                                    struct msghdr *message,
                                    __STDC_INT_AS_UINT_T msg_flags)
-/*[[[body:recvmsg]]]*/
+/*[[[body:libc_recvmsg]]]*/
 {
 	ssize_t result;
 	result = sys_recvmsg(sockfd,
@@ -297,22 +288,21 @@ NOTHROW_RPC(LIBCCALL libc_recvmsg)(fd_t sockfd,
 	                     (syscall_ulong_t)msg_flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:recvmsg]]]*/
+/*[[[end:libc_recvmsg]]]*/
 
-/*[[[head:recvmmsg,hash:CRC-32=0x32f6de72]]]*/
+/*[[[head:libc_recvmmsg,hash:CRC-32=0x65850ce9]]]*/
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.recvmmsg") int
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_recvmmsg)(fd_t sockfd,
                                     struct mmsghdr *vmessages,
                                     __STDC_UINT_AS_SIZE_T vlen,
                                     __STDC_INT_AS_UINT_T msg_flags,
                                     struct timespec *tmo)
-/*[[[body:recvmmsg]]]*/
+/*[[[body:libc_recvmmsg]]]*/
 {
 	ssize_t error;
 	error = sys_recvmmsg(sockfd,
@@ -322,25 +312,24 @@ NOTHROW_RPC(LIBCCALL libc_recvmmsg)(fd_t sockfd,
 	                     tmo);
 	return (int)libc_seterrno_syserr(error);
 }
-/*[[[end:recvmmsg]]]*/
+/*[[[end:libc_recvmmsg]]]*/
 
-/*[[[head:recvmmsg64,hash:CRC-32=0x1b275033]]]*/
+/*[[[head:libc_recvmmsg64,hash:CRC-32=0xf4d2bdb8]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_recvmmsg64, libc_recvmmsg);
+#else /* MAGIC:alias */
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_recvmmsg64, libc_recvmmsg);
-#else
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.recvmmsg64") int
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd,
                                       struct mmsghdr *vmessages,
                                       __STDC_UINT_AS_SIZE_T vlen,
                                       __STDC_INT_AS_UINT_T msg_flags,
                                       struct timespec64 *tmo)
-/*[[[body:recvmmsg64]]]*/
+/*[[[body:libc_recvmmsg64]]]*/
 {
 	ssize_t error;
 	error = sys_recvmmsg64(sockfd,
@@ -351,19 +340,18 @@ NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd,
 	return (int)libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */
-/*[[[end:recvmmsg64]]]*/
+/*[[[end:libc_recvmmsg64]]]*/
 
-/*[[[head:send,hash:CRC-32=0x3358c9e2]]]*/
+/*[[[head:libc_send,hash:CRC-32=0x4f6dd0cc]]]*/
 /* Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.send") ssize_t
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_send)(fd_t sockfd,
                                 void const *buf,
                                 size_t bufsize,
                                 __STDC_INT_AS_UINT_T msg_flags)
-/*[[[body:send]]]*/
+/*[[[body:libc_send]]]*/
 {
 	ssize_t result;
 #ifdef SYS_send
@@ -401,22 +389,21 @@ NOTHROW_RPC(LIBCCALL libc_send)(fd_t sockfd,
 #endif /* !... */
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:send]]]*/
+/*[[[end:libc_send]]]*/
 
-/*[[[head:sendto,hash:CRC-32=0xbda676b2]]]*/
+/*[[[head:libc_sendto,hash:CRC-32=0x88d38e66]]]*/
 /* Send BUFSIZE bytes of BUF on socket FD to peer at address ADDR
  * (which is ADDR_LEN bytes long). Returns the number sent, or -1 for errors.
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.sendto") ssize_t
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_sendto)(fd_t sockfd,
                                   void const *buf,
                                   size_t bufsize,
                                   __STDC_INT_AS_UINT_T msg_flags,
                                   __CONST_SOCKADDR_ARG addr,
                                   socklen_t addr_len)
-/*[[[body:sendto]]]*/
+/*[[[body:libc_sendto]]]*/
 {
 	ssize_t result;
 #ifdef SYS_sendto
@@ -453,19 +440,18 @@ NOTHROW_RPC(LIBCCALL libc_sendto)(fd_t sockfd,
 #endif /* !... */
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:sendto]]]*/
+/*[[[end:libc_sendto]]]*/
 
-/*[[[head:sendmsg,hash:CRC-32=0x13f475cb]]]*/
+/*[[[head:libc_sendmsg,hash:CRC-32=0xe322e751]]]*/
 /* Send a message described MESSAGE on socket FD.
  * Returns the number of bytes sent, or -1 for errors
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.sendmsg") ssize_t
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_sendmsg)(fd_t sockfd,
                                    struct msghdr const *message,
                                    __STDC_INT_AS_UINT_T msg_flags)
-/*[[[body:sendmsg]]]*/
+/*[[[body:libc_sendmsg]]]*/
 {
 	ssize_t result;
 	result = sys_sendmsg(sockfd,
@@ -473,20 +459,19 @@ NOTHROW_RPC(LIBCCALL libc_sendmsg)(fd_t sockfd,
 	                     (syscall_ulong_t)msg_flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:sendmsg]]]*/
+/*[[[end:libc_sendmsg]]]*/
 
-/*[[[head:sendmmsg,hash:CRC-32=0x7394a1e2]]]*/
+/*[[[head:libc_sendmmsg,hash:CRC-32=0x226c8ae8]]]*/
 /* Send a VLEN messages as described by VMESSAGES to socket FD.
  * Returns the number of datagrams successfully written or -1 for errors
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.sendmmsg") int
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_sendmmsg)(fd_t sockfd,
                                     struct mmsghdr *vmessages,
                                     __STDC_UINT_AS_SIZE_T vlen,
                                     __STDC_INT_AS_UINT_T msg_flags)
-/*[[[body:sendmmsg]]]*/
+/*[[[body:libc_sendmmsg]]]*/
 {
 	ssize_t error;
 	error = sys_sendmmsg(sockfd,
@@ -495,22 +480,21 @@ NOTHROW_RPC(LIBCCALL libc_sendmmsg)(fd_t sockfd,
 	                     (syscall_ulong_t)msg_flags);
 	return (int)libc_seterrno_syserr(error);
 }
-/*[[[end:sendmmsg]]]*/
+/*[[[end:libc_sendmmsg]]]*/
 
-/*[[[head:getsockopt,hash:CRC-32=0xe4054b23]]]*/
+/*[[[head:libc_getsockopt,hash:CRC-32=0x11f87c50]]]*/
 /* Put the current value for socket FD's option OPTNAME at protocol level LEVEL
  * into OPTVAL (which is *OPTLEN bytes long), and set *OPTLEN to the value's
  * actual length.  Returns 0 on success, -1 for errors
  * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
  * @param: optname: Dependent on `level' */
-INTERN NONNULL((4))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.getsockopt") int
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((4)) int
 NOTHROW_NCX(LIBCCALL libc_getsockopt)(fd_t sockfd,
                                       __STDC_INT_AS_UINT_T level,
                                       __STDC_INT_AS_UINT_T optname,
                                       void *__restrict optval,
                                       socklen_t *__restrict optlen)
-/*[[[body:getsockopt]]]*/
+/*[[[body:libc_getsockopt]]]*/
 {
 	errno_t error;
 	error = sys_getsockopt(sockfd,
@@ -520,21 +504,20 @@ NOTHROW_NCX(LIBCCALL libc_getsockopt)(fd_t sockfd,
 	                       optlen);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:getsockopt]]]*/
+/*[[[end:libc_getsockopt]]]*/
 
-/*[[[head:setsockopt,hash:CRC-32=0x3da16144]]]*/
+/*[[[head:libc_setsockopt,hash:CRC-32=0xea50bda1]]]*/
 /* Set socket FD's option OPTNAME at protocol level LEVEL to *OPTVAL
  * (which is OPTLEN bytes long). Returns 0 on success, -1 for errors
  * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
  * @param: optname: Dependent on `level' */
-INTERN NONNULL((4))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.setsockopt") int
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((4)) int
 NOTHROW_NCX(LIBCCALL libc_setsockopt)(fd_t sockfd,
                                       __STDC_INT_AS_UINT_T level,
                                       __STDC_INT_AS_UINT_T optname,
                                       void const *optval,
                                       socklen_t optlen)
-/*[[[body:setsockopt]]]*/
+/*[[[body:libc_setsockopt]]]*/
 {
 	errno_t error;
 	error = sys_setsockopt(sockfd,
@@ -544,36 +527,35 @@ NOTHROW_NCX(LIBCCALL libc_setsockopt)(fd_t sockfd,
 	                       optlen);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:setsockopt]]]*/
+/*[[[end:libc_setsockopt]]]*/
 
-/*[[[head:listen,hash:CRC-32=0xd9217911]]]*/
+/*[[[head:libc_listen,hash:CRC-32=0xa0462268]]]*/
 /* Prepare to accept connections on socket FD.
  * `MAX_BACKLOG' connection requests will be queued before further
  * requests are refused. Returns 0 on success, -1 for errors */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.listen") int
+INTERN ATTR_SECTION(".text.crt.net.socket") int
 NOTHROW_NCX(LIBCCALL libc_listen)(fd_t sockfd,
                                   __STDC_INT_AS_UINT_T max_backlog)
-/*[[[body:listen]]]*/
+/*[[[body:libc_listen]]]*/
 {
 	errno_t error;
 	error = sys_listen(sockfd,
 	                   (syscall_ulong_t)max_backlog);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:listen]]]*/
+/*[[[end:libc_listen]]]*/
 
-/*[[[head:accept,hash:CRC-32=0x217e4e80]]]*/
+/*[[[head:libc_accept,hash:CRC-32=0x45feb021]]]*/
 /* Await a connection on socket FD.
  * When a connection arrives, open a new socket to communicate with it,
  * set *ADDR (which is *ADDR_LEN bytes long) to the address of the
  * connecting peer and *ADDR_LEN to the address's actual length, and
  * return the new socket's descriptor, or -1 for errors */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.accept") fd_t
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) fd_t
 NOTHROW_RPC(LIBCCALL libc_accept)(fd_t sockfd,
                                   __SOCKADDR_ARG addr,
                                   socklen_t *__restrict addr_len)
-/*[[[body:accept]]]*/
+/*[[[body:libc_accept]]]*/
 {
 	fd_t result;
 	result = sys_accept4(sockfd,
@@ -582,37 +564,36 @@ NOTHROW_RPC(LIBCCALL libc_accept)(fd_t sockfd,
 	                     0);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:accept]]]*/
+/*[[[end:libc_accept]]]*/
 
-/*[[[head:shutdown,hash:CRC-32=0x221cc98b]]]*/
+/*[[[head:libc_shutdown,hash:CRC-32=0x1402b8f4]]]*/
 /* Shut down all or part of the connection open on socket FD.
  * HOW determines what to shut down:
  *     - SHUT_RD   = No more receptions;
  *     - SHUT_WR   = No more transmissions;
  *     - SHUT_RDWR = No more receptions or transmissions.
  * Returns 0 on success, -1 for errors */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.shutdown") int
+INTERN ATTR_SECTION(".text.crt.net.socket") int
 NOTHROW_NCX(LIBCCALL libc_shutdown)(fd_t sockfd,
                                     __STDC_INT_AS_UINT_T how)
-/*[[[body:shutdown]]]*/
+/*[[[body:libc_shutdown]]]*/
 {
 	errno_t error;
 	error = sys_shutdown(sockfd,
 	                     (syscall_ulong_t)how);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:shutdown]]]*/
+/*[[[end:libc_shutdown]]]*/
 
-/*[[[head:accept4,hash:CRC-32=0x5fbacf6d]]]*/
+/*[[[head:libc_accept4,hash:CRC-32=0x8f13ab04]]]*/
 /* Similar to 'accept(2)' but takes an additional parameter to specify socket flags.
  * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.accept4") fd_t
+INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2)) fd_t
 NOTHROW_RPC(LIBCCALL libc_accept4)(fd_t sockfd,
                                    __SOCKADDR_ARG addr,
                                    socklen_t *__restrict addr_len,
                                    __STDC_INT_AS_UINT_T sock_flags)
-/*[[[body:accept4]]]*/
+/*[[[body:libc_accept4]]]*/
 {
 	fd_t result;
 	result = sys_accept4(sockfd,
@@ -621,33 +602,31 @@ NOTHROW_RPC(LIBCCALL libc_accept4)(fd_t sockfd,
 	                     (syscall_ulong_t)sock_flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:accept4]]]*/
+/*[[[end:libc_accept4]]]*/
 
-/*[[[head:sockatmark,hash:CRC-32=0x2db71a10]]]*/
+/*[[[head:libc_sockatmark,hash:CRC-32=0x69d1f65f]]]*/
 /* Determine whether socket is at a out-of-band mark
  * @return: > 0 : The read-pointer is pointing at out-of-band data
  * @return: == 0: The read-pointer is not pointing at out-of-band data
  * @return: < 0 : Error (s.a. `errno') */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.sockatmark") int
+INTERN ATTR_SECTION(".text.crt.net.socket") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_sockatmark)(fd_t sockfd)
-/*[[[body:sockatmark]]]*/
+/*[[[body:libc_sockatmark]]]*/
 {
 	int result;
 	return ioctl(sockfd, SIOCATMARK, &result) == -1 ? -1 : result;
 }
-/*[[[end:sockatmark]]]*/
+/*[[[end:libc_sockatmark]]]*/
 
-/*[[[head:isfdtype,hash:CRC-32=0x2e926b72]]]*/
+/*[[[head:libc_isfdtype,hash:CRC-32=0x7ddb7320]]]*/
 /* FDTYPE is S_IFSOCK or another S_IF* macro defined in <sys/stat.h>;
  * returns 1 if FD is open on an object of the indicated
  * type, 0 if not, or -1 for errors (setting errno)
  * @param: fdtype: One of `S_IF*' from `<sys/stat.h>' */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.isfdtype") int
+INTERN ATTR_SECTION(".text.crt.net.socket") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isfdtype)(fd_t fd,
                                     __STDC_INT_AS_UINT_T fdtype)
-/*[[[body:isfdtype]]]*/
+/*[[[body:libc_isfdtype]]]*/
 {
 	struct stat st;
 	errno_t error = sys_kfstat(fd, &st);
@@ -657,41 +636,41 @@ NOTHROW_NCX(LIBCCALL libc_isfdtype)(fd_t fd,
 	}
 	return (st.st_mode & S_IFMT) == (mode_t)fdtype;
 }
-/*[[[end:isfdtype]]]*/
+/*[[[end:libc_isfdtype]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x363de1ba]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(socket, libc_socket);
-DEFINE_PUBLIC_WEAK_ALIAS(__socket, libc_socket);
-DEFINE_PUBLIC_WEAK_ALIAS(socketpair, libc_socketpair);
-DEFINE_PUBLIC_WEAK_ALIAS(bind, libc_bind);
-DEFINE_PUBLIC_WEAK_ALIAS(getsockname, libc_getsockname);
-DEFINE_PUBLIC_WEAK_ALIAS(connect, libc_connect);
-DEFINE_PUBLIC_WEAK_ALIAS(__connect, libc_connect);
-DEFINE_PUBLIC_WEAK_ALIAS(getpeername, libc_getpeername);
-DEFINE_PUBLIC_WEAK_ALIAS(send, libc_send);
-DEFINE_PUBLIC_WEAK_ALIAS(__send, libc_send);
-DEFINE_PUBLIC_WEAK_ALIAS(recv, libc_recv);
-DEFINE_PUBLIC_WEAK_ALIAS(__recv, libc_recv);
-DEFINE_PUBLIC_WEAK_ALIAS(sendto, libc_sendto);
-DEFINE_PUBLIC_WEAK_ALIAS(recvfrom, libc_recvfrom);
-DEFINE_PUBLIC_WEAK_ALIAS(sendmsg, libc_sendmsg);
-DEFINE_PUBLIC_WEAK_ALIAS(recvmsg, libc_recvmsg);
-DEFINE_PUBLIC_WEAK_ALIAS(getsockopt, libc_getsockopt);
-DEFINE_PUBLIC_WEAK_ALIAS(setsockopt, libc_setsockopt);
-DEFINE_PUBLIC_WEAK_ALIAS(listen, libc_listen);
-DEFINE_PUBLIC_WEAK_ALIAS(accept, libc_accept);
-DEFINE_PUBLIC_WEAK_ALIAS(shutdown, libc_shutdown);
-DEFINE_PUBLIC_WEAK_ALIAS(accept4, libc_accept4);
-DEFINE_PUBLIC_WEAK_ALIAS(sendmmsg, libc_sendmmsg);
-DEFINE_PUBLIC_WEAK_ALIAS(__sendmmsg, libc_sendmmsg);
-DEFINE_PUBLIC_WEAK_ALIAS(recvmmsg, libc_recvmmsg);
-DEFINE_PUBLIC_WEAK_ALIAS(recvmmsg64, libc_recvmmsg64);
-DEFINE_PUBLIC_WEAK_ALIAS(sockatmark, libc_sockatmark);
-DEFINE_PUBLIC_WEAK_ALIAS(isfdtype, libc_isfdtype);
+/*[[[start:exports,hash:CRC-32=0x7bd3d037]]]*/
+DEFINE_PUBLIC_ALIAS(__socket, libc_socket);
+DEFINE_PUBLIC_ALIAS(socket, libc_socket);
+DEFINE_PUBLIC_ALIAS(socketpair, libc_socketpair);
+DEFINE_PUBLIC_ALIAS(bind, libc_bind);
+DEFINE_PUBLIC_ALIAS(getsockname, libc_getsockname);
+DEFINE_PUBLIC_ALIAS(__connect, libc_connect);
+DEFINE_PUBLIC_ALIAS(connect, libc_connect);
+DEFINE_PUBLIC_ALIAS(getpeername, libc_getpeername);
+DEFINE_PUBLIC_ALIAS(__send, libc_send);
+DEFINE_PUBLIC_ALIAS(send, libc_send);
+DEFINE_PUBLIC_ALIAS(__recv, libc_recv);
+DEFINE_PUBLIC_ALIAS(recv, libc_recv);
+DEFINE_PUBLIC_ALIAS(sendto, libc_sendto);
+DEFINE_PUBLIC_ALIAS(recvfrom, libc_recvfrom);
+DEFINE_PUBLIC_ALIAS(sendmsg, libc_sendmsg);
+DEFINE_PUBLIC_ALIAS(recvmsg, libc_recvmsg);
+DEFINE_PUBLIC_ALIAS(getsockopt, libc_getsockopt);
+DEFINE_PUBLIC_ALIAS(setsockopt, libc_setsockopt);
+DEFINE_PUBLIC_ALIAS(listen, libc_listen);
+DEFINE_PUBLIC_ALIAS(accept, libc_accept);
+DEFINE_PUBLIC_ALIAS(shutdown, libc_shutdown);
+DEFINE_PUBLIC_ALIAS(accept4, libc_accept4);
+DEFINE_PUBLIC_ALIAS(__sendmmsg, libc_sendmmsg);
+DEFINE_PUBLIC_ALIAS(sendmmsg, libc_sendmmsg);
+DEFINE_PUBLIC_ALIAS(recvmmsg, libc_recvmmsg);
+DEFINE_PUBLIC_ALIAS(recvmmsg64, libc_recvmmsg64);
+DEFINE_PUBLIC_ALIAS(sockatmark, libc_sockatmark);
+DEFINE_PUBLIC_ALIAS(isfdtype, libc_isfdtype);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -87,19 +87,17 @@ DECLARE_NOREL_GLOBAL_META(char *, program_invocation_short_name); /* Defined in 
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:error,hash:CRC-32=0x42f825dd]]]*/
+/*[[[head:libc_error,hash:CRC-32=0x1957e4c9]]]*/
 /* Helper function for printing an error message to `stderr' and possibly exiting the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
-INTERN ATTR_LIBC_PRINTF(3, 4)
-ATTR_WEAK ATTR_SECTION(".text.crt.error.error") void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(3, 4) void
 (VLIBCCALL libc_error)(int status,
                        errno_t errnum,
                        const char *format,
-                       ...)
-		__THROWS(...)
-/*[[[body:error]]]*/
+                       ...) THROWS(...)
+/*[[[body:libc_error]]]*/
 /*AUTO*/{
 #ifdef __LOCAL_error_print_progname
 	if (__LOCAL_error_print_progname) {
@@ -107,41 +105,39 @@ ATTR_WEAK ATTR_SECTION(".text.crt.error.error") void
 	} else
 #endif /* __LOCAL_error_print_progname */
 	{
-		libc_fflush(stdout);
-		libc_fprintf(stderr, "%s: ", __LOCAL_program_invocation_short_name);
+		fflush(stdout);
+		fprintf(stderr, "%s: ", __LOCAL_program_invocation_short_name);
 	}
 	if (format) {
 		va_list args;
 		va_start(args, format);
-		libc_vfprintf(stderr, format, args);
+		vfprintf(stderr, format, args);
 		va_end(args);
 	}
 #ifdef __LOCAL_error_message_count
 	++__LOCAL_error_message_count;
 #endif /* __LOCAL_error_message_count */
 	if (errnum != 0)
-		libc_fprintf(stderr, ": %s", libc_strerror(errnum));
-	libc_fputc('\n', stderr);
+		fprintf(stderr, ": %s", strerror(errnum));
+	fputc('\n', stderr);
 	if (status != 0)
-		libc_exit(status);
+		exit(status);
 }
-/*[[[end:error]]]*/
+/*[[[end:libc_error]]]*/
 
-/*[[[head:error_at_line,hash:CRC-32=0x9ffded27]]]*/
+/*[[[head:libc_error_at_line,hash:CRC-32=0xdbb843b7]]]*/
 /* Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
  * Additionally, when `error_one_per_line' is non-zero, consecutive calls to this function that
  * pass the same values for `filename' and `line' will not produce the error message. */
-INTERN ATTR_LIBC_PRINTF(5, 6)
-ATTR_WEAK ATTR_SECTION(".text.crt.error.error_at_line") void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(5, 6) void
 (VLIBCCALL libc_error_at_line)(int status,
                                errno_t errnum,
                                char const *filename,
                                unsigned int line,
                                char const *format,
-                               ...)
-		__THROWS(...)
-/*[[[body:error_at_line]]]*/
+                               ...) THROWS(...)
+/*[[[body:libc_error_at_line]]]*/
 /*AUTO*/{
 #ifdef __LOCAL_error_one_per_line
 	static char const *last_filename = NULL;
@@ -149,7 +145,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.error.error_at_line") void
 	if (__LOCAL_error_one_per_line != 0 &&
 	    line == last_line &&
 	    (filename == last_filename ||
-	     libc_strcmp(filename, last_filename) == 0)) {
+	     strcmp(filename, last_filename) == 0)) {
 		/* Don't print the same error more than once */
 	} else
 #endif /* __LOCAL_error_one_per_line */
@@ -164,39 +160,37 @@ ATTR_WEAK ATTR_SECTION(".text.crt.error.error_at_line") void
 		} else
 #endif /* __LOCAL_error_print_progname */
 		{
-			libc_fflush(stdout);
-			libc_fprintf(stderr, "%s:", __LOCAL_program_invocation_short_name);
+			fflush(stdout);
+			fprintf(stderr, "%s:", __LOCAL_program_invocation_short_name);
 		}
-		libc_fprintf(stderr, "%s:%u: ", filename, line);
+		fprintf(stderr, "%s:%u: ", filename, line);
 		if (format) {
 			va_list args;
 			va_start(args, format);
-			libc_vfprintf(stderr, format, args);
+			vfprintf(stderr, format, args);
 			va_end(args);
 		}
 #ifdef __LOCAL_error_message_count
 		++__LOCAL_error_message_count;
 #endif /* __LOCAL_error_message_count */
 		if (errnum != 0)
-			libc_fprintf(stderr, ": %s", libc_strerror(errnum));
-		libc_fputc('\n', stderr);
+			fprintf(stderr, ": %s", strerror(errnum));
+		fputc('\n', stderr);
 		if (status != 0)
-			libc_exit(status);
+			exit(status);
 	}
 	if (status != 0)
-		libc_exit(status);
+		exit(status);
 }
-/*[[[end:error_at_line]]]*/
+/*[[[end:libc_error_at_line]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x50bd4cea]]]*/
-#undef error
-#undef error_at_line
-DEFINE_PUBLIC_WEAK_ALIAS(error, libc_error);
-DEFINE_PUBLIC_WEAK_ALIAS(error_at_line, libc_error_at_line);
+/*[[[start:exports,hash:CRC-32=0xd9181567]]]*/
+DEFINE_PUBLIC_ALIAS(error, libc_error);
+DEFINE_PUBLIC_ALIAS(error_at_line, libc_error_at_line);
 /*[[[end:exports]]]*/
 
 DECL_END

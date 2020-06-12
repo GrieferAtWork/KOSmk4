@@ -33,27 +33,27 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:times,hash:CRC-32=0x141b050]]]*/
+/*[[[head:libc_times,hash:CRC-32=0x17fc0682]]]*/
 /* Store the CPU time used by this process and all its
  * dead children (and their dead children) in BUFFER.
  * Return the elapsed real time, or (clock_t) -1 for errors.
  * All times are in CLK_TCKths of a second */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.times") clock_t
+INTERN clock_t
 NOTHROW_NCX(LIBCCALL libc_times)(struct tms *buffer)
-/*[[[body:times]]]*/
+/*[[[body:libc_times]]]*/
 {
 	clock_t result;
 	result = sys_times(buffer);
 	return libc_seterrno_syserr2(result, (clock_t)-1);
 }
-/*[[[end:times]]]*/
+/*[[[end:libc_times]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xd97f92dd]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(times, libc_times);
+/*[[[start:exports,hash:CRC-32=0x71047dcf]]]*/
+DEFINE_PUBLIC_ALIAS(times, libc_times);
 /*[[[end:exports]]]*/
 
 DECL_END

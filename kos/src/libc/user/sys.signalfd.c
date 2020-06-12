@@ -29,28 +29,27 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:signalfd,hash:CRC-32=0x71241a1b]]]*/
+/*[[[head:libc_signalfd,hash:CRC-32=0xc64e0764]]]*/
 /* Request notification for delivery of signals in MASK to be performed using descriptor FD */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.signalfd.signalfd") fd_t
+INTERN ATTR_SECTION(".text.crt.sched.signalfd") NONNULL((2)) fd_t
 NOTHROW_NCX(LIBCCALL libc_signalfd)(fd_t fd,
                                     sigset_t const *mask,
-                                    int flags)
-/*[[[body:signalfd]]]*/
+                                    __STDC_INT_AS_UINT_T flags)
+/*[[[body:libc_signalfd]]]*/
 {
 	fd_t result;
 	result = sys_signalfd4(fd, mask, sizeof(sigset_t),
 	                       (syscall_ulong_t)(unsigned int)flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:signalfd]]]*/
+/*[[[end:libc_signalfd]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x17d058d5]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(signalfd, libc_signalfd);
+/*[[[start:exports,hash:CRC-32=0xcd6e98ec]]]*/
+DEFINE_PUBLIC_ALIAS(signalfd, libc_signalfd);
 /*[[[end:exports]]]*/
 
 DECL_END

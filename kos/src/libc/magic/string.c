@@ -172,6 +172,32 @@ typedef size_t rsize_t;
 }
 
 
+/* TODO: [[fast]] is somewhat broken at the moment, though
+ *       I'm also not entirely sure on how to fix it.
+ *
+ * The current way of using namespace-import-bindings is flawed, as
+ * it doesn't allow for the user to take the address of a function
+ * that has been linked against a fast implementation (since the
+ * fast implementations are inline functions, they don't get linked
+ * against libc)
+ *
+ * The alternative would be to use (with memcpy as an example):
+ * >> [[libc, std, kernel, ATTR_LEAF]]
+ * >> [[if(defined(__fast_memcpy_defined)), preferred_extern_inline("memcpy", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))(dst, src, n_bytes); })]]
+ * >> [[if(defined(__fast_memcpy_defined)), preferred_inline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))(dst, src, n_bytes); })]]
+ * >> [[crt_impl_if(!defined(LIBC_ARCH_HAVE_MEMCPY))]]
+ * >> [[nonnull]] void *memcpy([[nonnull]] void *__restrict dst,
+ * >>                          [[nonnull]] void const *__restrict src,
+ * >>                          size_t n_bytes) {
+ * >>     ...
+ * >> }
+ *
+ * But this way, we're not taking advantage of namespacing, _and_ only adding on-to
+ * the already immense bloat found in headers (though this is probably still what
+ * we'll eventually have to end up using, whilst scrapping the [[fast]] annotation
+ * altogether...)
+ */
+
 @@Copy memory between non-overlapping memory blocks.
 @@@return: * : Always re-returns `dst'
 [[fast, libc, std, kernel, ATTR_LEAF]]
@@ -449,17 +475,26 @@ size_t strxfrm(char *dst, [[nonnull]] char const *__restrict src, size_t maxlen)
 	return n;
 }
 
+%[define(DEFINE_STRERROR_BUF =
+@@pp_ifndef __local_strerror_buf_defined@@
+#define __local_strerror_buf_defined 1
+@@push_namespace(local)@@
+__LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
 [[std, wunused, ATTR_COLD]]
-[[section(".text.crt.errno")]]
-[[nonnull]] char *strerror(int errnum) {
-	static char strerror_buf[64] = { 0 };
-	char *result = strerror_buf;
+[[nonnull, section(".text.crt.errno")]]
+[[impl_prefix(DEFINE_STRERROR_BUF)]]
+char *strerror(int errnum) {
+	char *result = __NAMESPACE_LOCAL_SYM strerror_buf;
 	char const *string;
 	string = strerror_s(errnum);
 	if (string) {
 		/* Copy the descriptor text. */
-		result[__COMPILER_LENOF(strerror_buf) - 1] = '\0';
-		strncpy(result, string, __COMPILER_LENOF(strerror_buf) - 1);
+		result[COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf) - 1] = '\0';
+		strncpy(result, string, COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf) - 1);
 	} else {
 		sprintf(result, "Unknown error %d", errnum);
 	}
@@ -545,7 +580,22 @@ char *strerror_l(int errnum, $locale_t locale) {
 	return strerror(errnum);
 }
 
-[[wunused]] char *strsignal(int signo);
+[[std, wunused, ATTR_COLD]]
+[[nonnull, section(".text.crt.string.memory.strsignal")]]
+char *strsignal(int signo) {
+	static char strsignal_buf[64] = { 0 };
+	char *result = strsignal_buf;
+	char const *string;
+	string = strsignal_s(signo);
+	if (string) {
+		/* Copy the descriptor text. */
+		result[COMPILER_LENOF(strsignal_buf) - 1] = '\0';
+		strncpy(result, string, COMPILER_LENOF(strsignal_buf) - 1);
+	} else {
+		sprintf(result, "Unknown signal %d", signo);
+	}
+	return result;
+}
 
 [[crtbuiltin, export_alias("__strndup")]]
 [[requires_function(malloc), section(".text.crt.heap.strdup")]]
@@ -870,12 +920,69 @@ int strncasecmp_l([[nonnull]] char const *s1,
 %
 %#ifdef __USE_XOPEN2K
 %#ifdef __USE_GNU
-[[ATTR_COLD, export_alias("__strerror_r"), section(".text.crt.errno")]]
-[[nonnull]] char *strerror_r(int errnum, [[nonnull]] char *buf, $size_t buflen);
+[[ATTR_COLD, export_alias("__strerror_r")]]
+[[nonnull, section(".text.crt.errno")]]
+[[impl_include("<hybrid/__assert.h>")]]
+[[impl_prefix(DEFINE_STRERROR_BUF)]]
+char *strerror_r(int errnum, [[nonnull]] char *buf, $size_t buflen) {
+	char const *string;
+	string = strerror_s(errnum);
+	if (!buf || !buflen) {
+		buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
+		buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
+	}
+	if (string) {
+		/* Copy the descriptor text. */
+		size_t msg_len = strlen(string) + 1;
+		if (msg_len > buflen) {
+			buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
+			buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
+			if unlikely(msg_len > buflen) {
+				msg_len      = buflen - 1;
+				buf[msg_len] = '\0';
+			}
+		}
+		memcpyc(buf, string, msg_len, sizeof(char));
+	} else {
+again_unknown:
+		if (snprintf(buf, buflen, "Unknown error %d", errnum) >= buflen) {
+			__hybrid_assert(buf != __NAMESPACE_LOCAL_SYM strerror_buf);
+			buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
+			buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
+			goto again_unknown;
+		}
+	}
+	return buf;
+}
 
 %#else /* __USE_GNU */
 [[ATTR_COLD, exposed_name("strerror_r"), section(".text.crt.errno")]]
-$errno_t __xpg_strerror_r(int errnum, [[nonnull]] char *buf, $size_t buflen);
+[[impl_include("<parts/errno.h>")]]
+$errno_t __xpg_strerror_r(int errnum, [[nonnull]] char *buf, $size_t buflen) {
+	size_t msg_len;
+	char const *string;
+	string = strerror_s(errnum);
+	if (!buf)
+		buflen = 0;
+	if (!string) {
+@@pp_ifdef EINVAL@@
+		return EINVAL;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
+	/* Copy the descriptor text. */
+	msg_len = strlen(string) + 1;
+	if (msg_len > buflen) {
+@@pp_ifdef ERANGE@@
+		return ERANGE;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
+	memcpyc(buf, string, msg_len, sizeof(char));
+	return EOK;
+}
 %#endif /* !__USE_GNU */
 %#endif /* __USE_XOPEN2K */
 %
@@ -5511,11 +5618,46 @@ $errno_t strncpy_s(char *dst, $size_t dstsize, char const *src, $size_t maxlen) 
 %[insert:function(_strnicoll_l = strncasecoll_l)]
 
 [[cp, wunused, section(".text.crt.dos.errno")]]
-char *_strerror(char const *message);
+[[impl_prefix(DEFINE_STRERROR_BUF)]]
+[[requires($has_function(_strerror_s))]]
+char *_strerror(char const *message) {
+	_strerror_s(__NAMESPACE_LOCAL_SYM strerror_buf,
+	            COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf),
+	            message);
+	return __NAMESPACE_LOCAL_SYM strerror_buf;
+}
 
-[[cp, wchar, section(".text.crt.dos.errno")]]
+[[cp, section(".text.crt.dos.errno")]]
+[[requires_include("<parts/errno.h>")]]
+[[requires(defined(__libc_geterrno))]]
+[[impl_include("<bits/types.h>")]]
+[[impl_include("<parts/errno.h>")]]
 $errno_t _strerror_s([[nonnull]] char *__restrict buf,
-                     $size_t buflen, char const *message);
+                     $size_t buflen, char const *message) {
+	char const *string;
+	size_t reqlen;
+	errno_t eno = __libc_geterrno();
+	string = strerror_s(eno);
+	if (string) {
+		if (message) {
+			reqlen = snprintf(buf, buflen, "%s: %s\n", message, string);
+		} else {
+			reqlen = snprintf(buf, buflen, "%s\n", string);
+		}
+	} else if (message) {
+		reqlen = snprintf(buf, buflen, "%s: Unknown error %d\n", message, eno);
+	} else {
+		reqlen = snprintf(buf, buflen, "Unknown error %d\n", eno);
+	}
+	if (reqlen > buflen) {
+@@pp_ifdef ERANGE@@
+		return ERANGE;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
+	return 0;
+}
 
 [[ATTR_LEAF, impl_include("<parts/errno.h>")]]
 [[section(".text.crt.dos.unicode.static.memory")]]

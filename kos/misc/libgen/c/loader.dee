@@ -1434,8 +1434,10 @@ function printDefaultLibraryImplementationForPrototype(
 		fp: File, prototype: FunctionPrototype,
 		functionName: string | UserString) {
 	fp << "{\n";
-	for (local a: prototype.argv)
-		fp << "\t(void)" << a.name << ";\n";
+	for (local a: prototype.argv) {
+		if (a.name)
+			fp << "\t(void)" << a.name << ";\n";
+	}
 	fp << "\tCRT_UNIMPLEMENTED(" << repr(functionName) << "); /* TO" "DO */\n"
 		"\tlibc_seterrno(ENOSYS);\n";
 	if (prototype.isNoreturn) {
@@ -1457,10 +1459,10 @@ function printDefaultLibraryImplementationForPrototype(
 @@Return a default, stub-library-implementation for a given @prototype
 function getDefaultLibraryImplementationForPrototype(
 		prototype: FunctionPrototype,
-		functionName: string | UserString): string {
+		functionName: string | UserString): FunctionImplementation {
 	local fp = File.Writer();
 	printDefaultLibraryImplementationForPrototype(fp, prototype, functionName);
-	return fp.string;
+	return FunctionImplementation(body: fp.string, name: functionName);
 }
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9f3b11e */
+/* HASH CRC-32:0xaea6c828 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,12 +76,12 @@ NOTHROW_NCX(LIBCCALL libc_ntohq)(uint64_t netquad) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(htons, libc_htons);
-DEFINE_PUBLIC_WEAK_ALIAS(ntohs, libc_ntohs);
-DEFINE_PUBLIC_WEAK_ALIAS(htonl, libc_htonl);
-DEFINE_PUBLIC_WEAK_ALIAS(ntohl, libc_ntohl);
-DEFINE_PUBLIC_WEAK_ALIAS(htonq, libc_htonq);
-DEFINE_PUBLIC_WEAK_ALIAS(ntohq, libc_ntohq);
+DEFINE_PUBLIC_ALIAS(htons, libc_htons);
+DEFINE_PUBLIC_ALIAS(ntohs, libc_ntohs);
+DEFINE_PUBLIC_ALIAS(htonl, libc_htonl);
+DEFINE_PUBLIC_ALIAS(ntohl, libc_ntohl);
+DEFINE_PUBLIC_ALIAS(htonq, libc_htonq);
+DEFINE_PUBLIC_ALIAS(ntohq, libc_ntohq);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_NETINET_IN_C */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedd2ec0 */
+/* HASH CRC-32:0x262b9f01 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -187,8 +187,8 @@ __NAMESPACE_LOCAL_USING(c32execle)
 #endif /* ... */
 #if defined(__CRT_HAVE_wexeclpe) && (__SIZEOF_WCHAR_T__ == 2) && defined(__VLIBCCALL_IS_VLIBDCALL)
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBDCALL c16execlpe)(char16_t const *__restrict __file, char16_t const *__args, ...) __CASMNAME("wexeclpe");
-#elif defined(__CRT_HAVE_DOS$_wexecle)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBDCALL c16execlpe)(char16_t const *__restrict __file, char16_t const *__args, ...) __CASMNAME_DOS("_wexecle");
+#elif defined(__CRT_HAVE_DOS$_wexeclpe)
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBDCALL c16execlpe)(char16_t const *__restrict __file, char16_t const *__args, ...) __CASMNAME_DOS("_wexeclpe");
 #elif (defined(__CRT_HAVE_wexecvpe) || (defined(__CRT_HAVE_DOS$wexecvpe) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wexecvpe) && __SIZEOF_WCHAR_T__ == 2)) && (__SIZEOF_WCHAR_T__ == 2)
 #include <local/parts.wchar.process/wexeclpe.h>
 #define c16execlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclpe))
@@ -347,8 +347,8 @@ __NAMESPACE_LOCAL_USING(c32spawnle)
 #endif /* ... */
 #if defined(__CRT_HAVE_wspawnlpe) && (__SIZEOF_WCHAR_T__ == 2) && defined(__VLIBCCALL_IS_VLIBDCALL)
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBDCALL c16spawnlpe)(int __mode, char16_t const *__restrict __file, char16_t const *__args, ...) __CASMNAME("wspawnlpe");
-#elif defined(__CRT_HAVE_DOS$_wspawnle)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBDCALL c16spawnlpe)(int __mode, char16_t const *__restrict __file, char16_t const *__args, ...) __CASMNAME_DOS("_wspawnle");
+#elif defined(__CRT_HAVE_DOS$_wspawnlpe)
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBDCALL c16spawnlpe)(int __mode, char16_t const *__restrict __file, char16_t const *__args, ...) __CASMNAME_DOS("_wspawnlpe");
 #elif (defined(__CRT_HAVE_wspawnvpe) || (defined(__CRT_HAVE_DOS$wspawnvpe) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wspawnvpe) && __SIZEOF_WCHAR_T__ == 2)) && (__SIZEOF_WCHAR_T__ == 2)
 #include <local/parts.wchar.process/wspawnlpe.h>
 #define c16spawnlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlpe))

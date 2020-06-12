@@ -34,50 +34,49 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:closelog,hash:CRC-32=0x54f0e523]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.closelog") void
+/*[[[head:libc_closelog,hash:CRC-32=0x68d099ce]]]*/
+INTERN ATTR_SECTION(".text.crt.system.syslog") void
 NOTHROW_NCX(LIBCCALL libc_closelog)(void)
-/*[[[body:closelog]]]*/
-{
+/*[[[body:libc_closelog]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("closelog"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:closelog]]]*/
+/*[[[end:libc_closelog]]]*/
 
-/*[[[head:openlog,hash:CRC-32=0x716b33f5]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.openlog") void
+/*[[[head:libc_openlog,hash:CRC-32=0x417f05be]]]*/
+INTERN ATTR_SECTION(".text.crt.system.syslog") void
 NOTHROW_RPC(LIBCCALL libc_openlog)(char const *ident,
-                                   int option,
-                                   int facility)
-/*[[[body:openlog]]]*/
-{
+                                   __STDC_INT_AS_UINT_T option,
+                                   __STDC_INT_AS_UINT_T facility)
+/*[[[body:libc_openlog]]]*/
+/*AUTO*/{
 	(void)ident;
 	(void)option;
 	(void)facility;
 	CRT_UNIMPLEMENTED("openlog"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:openlog]]]*/
+/*[[[end:libc_openlog]]]*/
 
-/*[[[head:setlogmask,hash:CRC-32=0xccb38207]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.setlogmask") int
-NOTHROW_NCX(LIBCCALL libc_setlogmask)(int mask)
-/*[[[body:setlogmask]]]*/
-{
+/*[[[head:libc_setlogmask,hash:CRC-32=0xdc24a181]]]*/
+INTERN ATTR_SECTION(".text.crt.system.syslog") int
+NOTHROW_NCX(LIBCCALL libc_setlogmask)(__STDC_INT_AS_UINT_T mask)
+/*[[[body:libc_setlogmask]]]*/
+/*AUTO*/{
 	(void)mask;
 	CRT_UNIMPLEMENTED("setlogmask"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:setlogmask]]]*/
+/*[[[end:libc_setlogmask]]]*/
 
-/*[[[head:syslog,hash:CRC-32=0xc3bbe50b]]]*/
-INTERN ATTR_LIBC_PRINTF(2,3) NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.syslog") void
-NOTHROW_RPC(VLIBCCALL libc_syslog)(int level,
+/*[[[head:libc_syslog,hash:CRC-32=0xdae646ad]]]*/
+INTERN ATTR_SECTION(".text.crt.system.syslog") ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) void
+NOTHROW_RPC(VLIBCCALL libc_syslog)(__STDC_INT_AS_UINT_T level,
                                    char const *format,
                                    ...)
-/*[[[body:syslog]]]*/
+/*[[[body:libc_syslog]]]*/
 {
 	va_list args;
 	va_start(args, format);
@@ -87,31 +86,29 @@ NOTHROW_RPC(VLIBCCALL libc_syslog)(int level,
 	               args);
 	va_end(args);
 }
-/*[[[end:syslog]]]*/
+/*[[[end:libc_syslog]]]*/
 
-/*[[[head:vsyslog,hash:CRC-32=0xe30c304]]]*/
-INTERN ATTR_LIBC_PRINTF(2,0) NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.vsyslog") void
-NOTHROW_RPC(LIBCCALL libc_vsyslog)(int level,
+/*[[[head:libc_vsyslog,hash:CRC-32=0x2f0cae23]]]*/
+INTERN ATTR_SECTION(".text.crt.system.syslog") ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) void
+NOTHROW_RPC(LIBCCALL libc_vsyslog)(__STDC_INT_AS_UINT_T level,
                                    char const *format,
                                    va_list args)
-/*[[[body:vsyslog]]]*/
+/*[[[body:libc_vsyslog]]]*/
 {
 	format_vprintf(&syslog_printer,
 	               (void *)(uintptr_t)(unsigned int)level,
 	               format,
 	               args);
 }
-/*[[[end:vsyslog]]]*/
+/*[[[end:libc_vsyslog]]]*/
 
-/*[[[head:syslog_printer,hash:CRC-32=0x90817ab9]]]*/
+/*[[[head:libc_syslog_printer,hash:CRC-32=0x5edc4812]]]*/
 /* Helper functions for printing to the system log */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.syslog_printer") ssize_t
+INTERN ATTR_SECTION(".text.crt.system.syslog") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_syslog_printer)(void *arg,
                                           char const *__restrict data,
                                           size_t datalen)
-/*[[[body:syslog_printer]]]*/
+/*[[[body:libc_syslog_printer]]]*/
 {
 	ssize_t result;
 	result = sys_syslog((syscall_ulong_t)(uintptr_t)arg,
@@ -119,20 +116,19 @@ NOTHROW_RPC(LIBCCALL libc_syslog_printer)(void *arg,
 	                    datalen);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:syslog_printer]]]*/
+/*[[[end:libc_syslog_printer]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbfbd2114]]]*/
-#undef syslog
-DEFINE_PUBLIC_WEAK_ALIAS(closelog, libc_closelog);
-DEFINE_PUBLIC_WEAK_ALIAS(openlog, libc_openlog);
-DEFINE_PUBLIC_WEAK_ALIAS(setlogmask, libc_setlogmask);
-DEFINE_PUBLIC_WEAK_ALIAS(syslog, libc_syslog);
-DEFINE_PUBLIC_WEAK_ALIAS(vsyslog, libc_vsyslog);
-DEFINE_PUBLIC_WEAK_ALIAS(syslog_printer, libc_syslog_printer);
+/*[[[start:exports,hash:CRC-32=0x5297673b]]]*/
+DEFINE_PUBLIC_ALIAS(closelog, libc_closelog);
+DEFINE_PUBLIC_ALIAS(openlog, libc_openlog);
+DEFINE_PUBLIC_ALIAS(setlogmask, libc_setlogmask);
+DEFINE_PUBLIC_ALIAS(syslog, libc_syslog);
+DEFINE_PUBLIC_ALIAS(vsyslog, libc_vsyslog);
+DEFINE_PUBLIC_ALIAS(syslog_printer, libc_syslog_printer);
 /*[[[end:exports]]]*/
 
 DECL_END

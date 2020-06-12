@@ -21,19 +21,10 @@
 #define GUARD_LIBC_USER_KOS_SYS_IOCTL_C 1
 
 #include "../api.h"
-#include "kos.sys.ioctl.h"
 
 DECL_BEGIN
 
-
-
-
-
-/*[[[start:implementation]]]*/
-/*[[[skip:Ioctl]]]*/
-/*[[[end:implementation]]]*/
-
-
+/*[[[skip:libc_Ioctl]]]*/
 
 /*[[[start:exports,hash:CRC-32=0x0]]]*/
 /*[[[end:exports]]]*/

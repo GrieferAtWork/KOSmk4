@@ -61,7 +61,7 @@ INTERN ATTR_READMOSTLY unsigned int futex_spin_counter = 4;
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:lfutex,hash:CRC-32=0xeb80522b]]]*/
+/*[[[head:libc_lfutex,hash:CRC-32=0xab151a58]]]*/
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
@@ -84,13 +84,12 @@ INTERN ATTR_READMOSTLY unsigned int futex_spin_counter = 4;
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.lfutex") ssize_t
-NOTHROW_RPC(LIBCCALL libc_lfutex)(lfutex_t *uaddr,
-                                  syscall_ulong_t futex_op,
-                                  lfutex_t val,
-                                  /*struct timespec const *timeout, lfutex_t val2*/...)
-/*[[[body:lfutex]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) ssize_t
+NOTHROW_RPC(VLIBCCALL libc_lfutex)(lfutex_t *uaddr,
+                                   syscall_ulong_t futex_op,
+                                   lfutex_t val,
+                                   ...)
+/*[[[body:libc_lfutex]]]*/
 {
 	ssize_t result;
 	va_list args;
@@ -120,9 +119,12 @@ NOTHROW_RPC(LIBCCALL libc_lfutex)(lfutex_t *uaddr,
 	return result;
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 }
-/*[[[end:lfutex]]]*/
+/*[[[end:libc_lfutex]]]*/
 
-/*[[[head:lfutex64,hash:CRC-32=0x25c606d9]]]*/
+/*[[[head:libc_lfutex64,hash:CRC-32=0x49288cd6]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_lfutex64, libc_lfutex);
+#else /* MAGIC:alias */
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
@@ -145,16 +147,12 @@ NOTHROW_RPC(LIBCCALL libc_lfutex)(lfutex_t *uaddr,
  * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_lfutex64, libc_lfutex);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.lfutex64") ssize_t
-NOTHROW_RPC(LIBCCALL libc_lfutex64)(lfutex_t *uaddr,
-                                    syscall_ulong_t futex_op,
-                                    lfutex_t val,
-                                    /*struct timespec64 const *timeout, lfutex_t val2*/...)
-/*[[[body:lfutex64]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) ssize_t
+NOTHROW_RPC(VLIBCCALL libc_lfutex64)(lfutex_t *uaddr,
+                                     syscall_ulong_t futex_op,
+                                     lfutex_t val,
+                                     ...)
+/*[[[body:libc_lfutex64]]]*/
 {
 	va_list args;
 	struct timespec64 *timeout;
@@ -172,36 +170,34 @@ NOTHROW_RPC(LIBCCALL libc_lfutex64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:lfutex64]]]*/
+/*[[[end:libc_lfutex64]]]*/
 
-/*[[[head:futex_wake,hash:CRC-32=0x9ec6c034]]]*/
+/*[[[head:libc_futex_wake,hash:CRC-32=0x1b7562d9]]]*/
 /* Wake up to `MAX_WAKE' threads waiting for `*UADDR'
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_wake") ssize_t
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) ssize_t
 NOTHROW_NCX(LIBCCALL libc_futex_wake)(lfutex_t *uaddr,
                                       size_t max_wake)
-/*[[[body:futex_wake]]]*/
+/*[[[body:libc_futex_wake]]]*/
 {
 	ssize_t result;
 	result = sys_lfutex(uaddr, LFUTEX_WAKE, (uintptr_t)max_wake, NULL, 0);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_wake]]]*/
+/*[[[end:libc_futex_wake]]]*/
 
-/*[[[head:futex_wakemask,hash:CRC-32=0xe4d44eab]]]*/
+/*[[[head:libc_futex_wakemask,hash:CRC-32=0xeaaa51f4]]]*/
 /* Similar to `futex_wake()', however once there are no more threads that
  * can be awoken, perform the following operation: `*uaddr = (*uaddr & mask_and) | mask_or'
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_wakemask") ssize_t
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) ssize_t
 NOTHROW_NCX(LIBCCALL libc_futex_wakemask)(lfutex_t *uaddr,
                                           size_t max_wake,
                                           lfutex_t mask_and,
                                           lfutex_t mask_or)
-/*[[[body:futex_wakemask]]]*/
+/*[[[body:libc_futex_wakemask]]]*/
 {
 	ssize_t result;
 	result = sys_lfutex(uaddr, LFUTEX_WAKEMASK,
@@ -210,16 +206,15 @@ NOTHROW_NCX(LIBCCALL libc_futex_wakemask)(lfutex_t *uaddr,
 	                    (uintptr_t)mask_or);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_wakemask]]]*/
+/*[[[end:libc_futex_wakemask]]]*/
 
-/*[[[head:futex_wakeall,hash:CRC-32=0x94371019]]]*/
+/*[[[head:libc_futex_wakeall,hash:CRC-32=0xedbeda1a]]]*/
 /* Wake all threads waiting for `*UADDR' (same as `futex_wake(uaddr, (size_t)-1)')
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_wakeall") ssize_t
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) ssize_t
 NOTHROW_NCX(LIBCCALL libc_futex_wakeall)(lfutex_t *uaddr)
-/*[[[body:futex_wakeall]]]*/
+/*[[[body:libc_futex_wakeall]]]*/
 {
 	ssize_t result;
 	result = sys_lfutex(uaddr,
@@ -229,19 +224,18 @@ NOTHROW_NCX(LIBCCALL libc_futex_wakeall)(lfutex_t *uaddr)
 	                    0);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_wakeall]]]*/
+/*[[[end:libc_futex_wakeall]]]*/
 
-/*[[[head:futex_waitwhile,hash:CRC-32=0x2dcee111]]]*/
+/*[[[head:libc_futex_waitwhile,hash:CRC-32=0xeedffec2]]]*/
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_waitwhile") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waitwhile)(lfutex_t *uaddr,
                                            lfutex_t equal_to_value)
-/*[[[body:futex_waitwhile]]]*/
+/*[[[body:libc_futex_waitwhile]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) == equal_to_value);
@@ -252,19 +246,18 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile)(lfutex_t *uaddr,
 	                             0);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_waitwhile]]]*/
+/*[[[end:libc_futex_waitwhile]]]*/
 
-/*[[[head:futex_waituntil,hash:CRC-32=0x8e078cd9]]]*/
+/*[[[head:libc_futex_waituntil,hash:CRC-32=0x2105aeeb]]]*/
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_waituntil") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waituntil)(lfutex_t *uaddr,
                                            lfutex_t not_equal_to_value)
-/*[[[body:futex_waituntil]]]*/
+/*[[[body:libc_futex_waituntil]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) != not_equal_to_value);
@@ -275,19 +268,18 @@ NOTHROW_RPC(LIBCCALL libc_futex_waituntil)(lfutex_t *uaddr,
 	                             0);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_waituntil]]]*/
+/*[[[end:libc_futex_waituntil]]]*/
 
-/*[[[head:futex_waitwhile_above,hash:CRC-32=0x4fcd3ed]]]*/
+/*[[[head:libc_futex_waitwhile_above,hash:CRC-32=0x18e09b67]]]*/
 /* Wait if `*uaddr > above_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_waitwhile_above") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_above)(lfutex_t *uaddr,
                                                  lfutex_t above_value)
-/*[[[body:futex_waitwhile_above]]]*/
+/*[[[body:libc_futex_waitwhile_above]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) > above_value);
@@ -298,19 +290,18 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_above)(lfutex_t *uaddr,
 	                             0);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_waitwhile_above]]]*/
+/*[[[end:libc_futex_waitwhile_above]]]*/
 
-/*[[[head:futex_waitwhile_below,hash:CRC-32=0x762e48c]]]*/
+/*[[[head:libc_futex_waitwhile_below,hash:CRC-32=0x9a5a7e0b]]]*/
 /* Wait if `*uaddr < below_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_waitwhile_below") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_below)(lfutex_t *uaddr,
                                                  lfutex_t below_value)
-/*[[[body:futex_waitwhile_below]]]*/
+/*[[[body:libc_futex_waitwhile_below]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) < below_value);
@@ -321,19 +312,18 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_below)(lfutex_t *uaddr,
 	                             0);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_waitwhile_below]]]*/
+/*[[[end:libc_futex_waitwhile_below]]]*/
 
-/*[[[head:futex_waitwhile_aboveequal,hash:CRC-32=0xbc8266c4]]]*/
+/*[[[head:libc_futex_waitwhile_aboveequal,hash:CRC-32=0xf87e09a2]]]*/
 /* Wait if `*uaddr >= above_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_waitwhile_aboveequal") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_aboveequal)(lfutex_t *uaddr,
                                                       lfutex_t above_equal_value)
-/*[[[body:futex_waitwhile_aboveequal]]]*/
+/*[[[body:libc_futex_waitwhile_aboveequal]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) >= above_equal_value);
@@ -346,19 +336,18 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_aboveequal)(lfutex_t *uaddr,
 	                             0);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_waitwhile_aboveequal]]]*/
+/*[[[end:libc_futex_waitwhile_aboveequal]]]*/
 
-/*[[[head:futex_waitwhile_belowequal,hash:CRC-32=0xacbadfa9]]]*/
+/*[[[head:libc_futex_waitwhile_belowequal,hash:CRC-32=0xcad12894]]]*/
 /* Wait if `*uaddr <= below_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_waitwhile_belowequal") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_belowequal)(lfutex_t *uaddr,
                                                       lfutex_t below_equal_value)
-/*[[[body:futex_waitwhile_belowequal]]]*/
+/*[[[body:libc_futex_waitwhile_belowequal]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) <= below_equal_value);
@@ -371,20 +360,19 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_belowequal)(lfutex_t *uaddr,
 	                             0);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_waitwhile_belowequal]]]*/
+/*[[[end:libc_futex_waitwhile_belowequal]]]*/
 
-/*[[[head:futex_waitwhile_cmpxch,hash:CRC-32=0x5237a91a]]]*/
+/*[[[head:libc_futex_waitwhile_cmpxch,hash:CRC-32=0x25e80417]]]*/
 /* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_waitwhile_cmpxch") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_cmpxch)(lfutex_t *uaddr,
                                                   lfutex_t old_value,
                                                   lfutex_t new_value)
-/*[[[body:futex_waitwhile_cmpxch]]]*/
+/*[[[body:libc_futex_waitwhile_cmpxch]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) == old_value);
@@ -395,20 +383,19 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_cmpxch)(lfutex_t *uaddr,
 	                             (uintptr_t)new_value);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_waitwhile_cmpxch]]]*/
+/*[[[end:libc_futex_waitwhile_cmpxch]]]*/
 
-/*[[[head:futex_waituntil_cmpxch,hash:CRC-32=0xef61194c]]]*/
+/*[[[head:libc_futex_waituntil_cmpxch,hash:CRC-32=0x4b5d0a99]]]*/
 /* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_waituntil_cmpxch") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waituntil_cmpxch)(lfutex_t *uaddr,
                                                   lfutex_t old_value,
                                                   lfutex_t new_value)
-/*[[[body:futex_waituntil_cmpxch]]]*/
+/*[[[body:libc_futex_waituntil_cmpxch]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(futex_trywaituntil_cmpxch(uaddr, old_value, new_value) == 0);
@@ -419,18 +406,17 @@ NOTHROW_RPC(LIBCCALL libc_futex_waituntil_cmpxch)(lfutex_t *uaddr,
 	                             (uintptr_t)new_value);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_waituntil_cmpxch]]]*/
+/*[[[end:libc_futex_waituntil_cmpxch]]]*/
 
-/*[[[head:futex_waitlock,hash:CRC-32=0xc4fa7f8d]]]*/
+/*[[[head:libc_futex_waitlock,hash:CRC-32=0xb3e7735f]]]*/
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_waitlock") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waitlock)(lfutex_t *uaddr)
-/*[[[body:futex_waitlock]]]*/
+/*[[[body:libc_futex_waitlock]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(futex_trywaitlock(uaddr) == 0);
@@ -441,20 +427,19 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitlock)(lfutex_t *uaddr)
 	                             0);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_waitlock]]]*/
+/*[[[end:libc_futex_waitlock]]]*/
 
-/*[[[head:futex_waitwhile_exactbits,hash:CRC-32=0x5d5d120e]]]*/
+/*[[[head:libc_futex_waitwhile_exactbits,hash:CRC-32=0x3db826fd]]]*/
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_waitwhile_exactbits") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_exactbits)(lfutex_t *uaddr,
                                                      lfutex_t bitmask,
                                                      lfutex_t setmask)
-/*[[[body:futex_waitwhile_exactbits]]]*/
+/*[[[body:libc_futex_waitwhile_exactbits]]]*/
 {
 	errno_t result;
 	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) == setmask);
@@ -465,20 +450,19 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_exactbits)(lfutex_t *uaddr,
 	                             (uintptr_t)setmask);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_waitwhile_exactbits]]]*/
+/*[[[end:libc_futex_waitwhile_exactbits]]]*/
 
-/*[[[head:futex_waituntil_exactbits,hash:CRC-32=0x38f04d]]]*/
+/*[[[head:libc_futex_waituntil_exactbits,hash:CRC-32=0xb6bd44c9]]]*/
 /* Wait if `(*uaddr & bitmask) != setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_waituntil_exactbits") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waituntil_exactbits)(lfutex_t *uaddr,
                                                      lfutex_t bitmask,
                                                      lfutex_t setmask)
-/*[[[body:futex_waituntil_exactbits]]]*/
+/*[[[body:libc_futex_waituntil_exactbits]]]*/
 {
 	errno_t result;
 	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) != setmask);
@@ -489,19 +473,18 @@ NOTHROW_RPC(LIBCCALL libc_futex_waituntil_exactbits)(lfutex_t *uaddr,
 	                             (uintptr_t)setmask);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_waituntil_exactbits]]]*/
+/*[[[end:libc_futex_waituntil_exactbits]]]*/
 
-/*[[[head:futex_waitwhile_anybit,hash:CRC-32=0x17283928]]]*/
+/*[[[head:libc_futex_waitwhile_anybit,hash:CRC-32=0xd63baaa5]]]*/
 /* Wait if `(*uaddr & bitmask) != 0'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_waitwhile_anybit") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_anybit)(lfutex_t *uaddr,
                                                   lfutex_t bitmask)
-/*[[[body:futex_waitwhile_anybit]]]*/
+/*[[[body:libc_futex_waitwhile_anybit]]]*/
 {
 	errno_t result;
 	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) != 0);
@@ -512,19 +495,18 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_anybit)(lfutex_t *uaddr,
 	                             (uintptr_t)0);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_waitwhile_anybit]]]*/
+/*[[[end:libc_futex_waitwhile_anybit]]]*/
 
-/*[[[head:futex_waitwhile_allbits,hash:CRC-32=0x211d9e8e]]]*/
+/*[[[head:libc_futex_waitwhile_allbits,hash:CRC-32=0x39d4548b]]]*/
 /* Wait if `(*uaddr & bitmask) == bitmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_waitwhile_allbits") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_allbits)(lfutex_t *uaddr,
                                                    lfutex_t bitmask)
-/*[[[body:futex_waitwhile_allbits]]]*/
+/*[[[body:libc_futex_waitwhile_allbits]]]*/
 {
 	errno_t result;
 	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) == bitmask);
@@ -535,21 +517,20 @@ NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_allbits)(lfutex_t *uaddr,
 	                             (uintptr_t)bitmask);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futex_waitwhile_allbits]]]*/
+/*[[[end:libc_futex_waitwhile_allbits]]]*/
 
-/*[[[head:futex_timedwaitwhile,hash:CRC-32=0x8d6d9cfe]]]*/
+/*[[[head:libc_futex_timedwaitwhile,hash:CRC-32=0x15b33e5e]]]*/
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile)(lfutex_t *uaddr,
                                                 lfutex_t equal_to_value,
                                                 struct timespec const *rel_timeout)
-/*[[[body:futex_timedwaitwhile]]]*/
+/*[[[body:libc_futex_timedwaitwhile]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
@@ -558,21 +539,20 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile)(lfutex_t *uaddr,
 	tms64.tv_nsec = rel_timeout->tv_nsec;
 	return futex_timedwaitwhile64(uaddr, equal_to_value, &tms64);
 }
-/*[[[end:futex_timedwaitwhile]]]*/
+/*[[[end:libc_futex_timedwaitwhile]]]*/
 
-/*[[[head:futex_timedwaituntil,hash:CRC-32=0xf2a6a192]]]*/
+/*[[[head:libc_futex_timedwaituntil,hash:CRC-32=0xe4644efd]]]*/
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaituntil") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil)(lfutex_t *uaddr,
                                                 lfutex_t not_equal_to_value,
                                                 struct timespec const *rel_timeout)
-/*[[[body:futex_timedwaituntil]]]*/
+/*[[[body:libc_futex_timedwaituntil]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
@@ -581,21 +561,20 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil)(lfutex_t *uaddr,
 	tms64.tv_nsec = rel_timeout->tv_nsec;
 	return futex_timedwaituntil64(uaddr, not_equal_to_value, &tms64);
 }
-/*[[[end:futex_timedwaituntil]]]*/
+/*[[[end:libc_futex_timedwaituntil]]]*/
 
-/*[[[head:futex_timedwaitwhile_above,hash:CRC-32=0x8bfff3cd]]]*/
+/*[[[head:libc_futex_timedwaitwhile_above,hash:CRC-32=0x2a4771a8]]]*/
 /* Wait if `*uaddr > above_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_above") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_above)(lfutex_t *uaddr,
                                                       lfutex_t above_value,
                                                       struct timespec const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_above]]]*/
+/*[[[body:libc_futex_timedwaitwhile_above]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
@@ -604,21 +583,20 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_above)(lfutex_t *uaddr,
 	tms64.tv_nsec = rel_timeout->tv_nsec;
 	return futex_timedwaitwhile_above64(uaddr, above_value, &tms64);
 }
-/*[[[end:futex_timedwaitwhile_above]]]*/
+/*[[[end:libc_futex_timedwaitwhile_above]]]*/
 
-/*[[[head:futex_timedwaitwhile_below,hash:CRC-32=0x3c1e99b2]]]*/
+/*[[[head:libc_futex_timedwaitwhile_below,hash:CRC-32=0xf1409dd0]]]*/
 /* Wait if `*uaddr < below_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_below") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_below)(lfutex_t *uaddr,
                                                       lfutex_t below_value,
                                                       struct timespec const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_below]]]*/
+/*[[[body:libc_futex_timedwaitwhile_below]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
@@ -627,21 +605,20 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_below)(lfutex_t *uaddr,
 	tms64.tv_nsec = rel_timeout->tv_nsec;
 	return futex_timedwaitwhile_below64(uaddr, below_value, &tms64);
 }
-/*[[[end:futex_timedwaitwhile_below]]]*/
+/*[[[end:libc_futex_timedwaitwhile_below]]]*/
 
-/*[[[head:futex_timedwaitwhile_aboveequal,hash:CRC-32=0xb29060a4]]]*/
+/*[[[head:libc_futex_timedwaitwhile_aboveequal,hash:CRC-32=0xc4809155]]]*/
 /* Wait if `*uaddr >= above_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_aboveequal") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequal)(lfutex_t *uaddr,
                                                            lfutex_t above_equal_value,
                                                            struct timespec const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_aboveequal]]]*/
+/*[[[body:libc_futex_timedwaitwhile_aboveequal]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
@@ -650,21 +627,20 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequal)(lfutex_t *uaddr,
 	tms64.tv_nsec = rel_timeout->tv_nsec;
 	return futex_timedwaitwhile_aboveequal64(uaddr, above_equal_value, &tms64);
 }
-/*[[[end:futex_timedwaitwhile_aboveequal]]]*/
+/*[[[end:libc_futex_timedwaitwhile_aboveequal]]]*/
 
-/*[[[head:futex_timedwaitwhile_belowequal,hash:CRC-32=0xbf605cb]]]*/
+/*[[[head:libc_futex_timedwaitwhile_belowequal,hash:CRC-32=0x322c6907]]]*/
 /* Wait if `*uaddr <= below_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_belowequal") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal)(lfutex_t *uaddr,
                                                            lfutex_t below_equal_value,
                                                            struct timespec const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_belowequal]]]*/
+/*[[[body:libc_futex_timedwaitwhile_belowequal]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
@@ -673,22 +649,21 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal)(lfutex_t *uaddr,
 	tms64.tv_nsec = rel_timeout->tv_nsec;
 	return futex_timedwaitwhile_belowequal64(uaddr, below_equal_value, &tms64);
 }
-/*[[[end:futex_timedwaitwhile_belowequal]]]*/
+/*[[[end:libc_futex_timedwaitwhile_belowequal]]]*/
 
-/*[[[head:futex_timedwaitwhile_cmpxch,hash:CRC-32=0x638289d7]]]*/
+/*[[[head:libc_futex_timedwaitwhile_cmpxch,hash:CRC-32=0x2bdc3a0e]]]*/
 /* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_cmpxch") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_cmpxch)(lfutex_t *uaddr,
                                                        lfutex_t old_value,
                                                        lfutex_t new_value,
                                                        struct timespec const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_cmpxch]]]*/
+/*[[[body:libc_futex_timedwaitwhile_cmpxch]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
@@ -697,22 +672,21 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_cmpxch)(lfutex_t *uaddr,
 	tms64.tv_nsec = rel_timeout->tv_nsec;
 	return futex_timedwaitwhile_cmpxch64(uaddr, old_value, new_value, &tms64);
 }
-/*[[[end:futex_timedwaitwhile_cmpxch]]]*/
+/*[[[end:libc_futex_timedwaitwhile_cmpxch]]]*/
 
-/*[[[head:futex_timedwaituntil_cmpxch,hash:CRC-32=0xe30c6068]]]*/
+/*[[[head:libc_futex_timedwaituntil_cmpxch,hash:CRC-32=0x1ac737df]]]*/
 /* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaituntil_cmpxch") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_cmpxch)(lfutex_t *uaddr,
                                                        lfutex_t old_value,
                                                        lfutex_t new_value,
                                                        struct timespec const *rel_timeout)
-/*[[[body:futex_timedwaituntil_cmpxch]]]*/
+/*[[[body:libc_futex_timedwaituntil_cmpxch]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
@@ -721,20 +695,19 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_cmpxch)(lfutex_t *uaddr,
 	tms64.tv_nsec = rel_timeout->tv_nsec;
 	return futex_timedwaituntil_cmpxch64(uaddr, old_value, new_value, &tms64);
 }
-/*[[[end:futex_timedwaituntil_cmpxch]]]*/
+/*[[[end:libc_futex_timedwaituntil_cmpxch]]]*/
 
-/*[[[head:futex_timedwaitlock,hash:CRC-32=0x235fc1ee]]]*/
+/*[[[head:libc_futex_timedwaitlock,hash:CRC-32=0x95e65ba7]]]*/
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitlock") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitlock)(lfutex_t *uaddr,
                                                struct timespec const *rel_timeout)
-/*[[[body:futex_timedwaitlock]]]*/
+/*[[[body:libc_futex_timedwaitlock]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
@@ -743,21 +716,20 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitlock)(lfutex_t *uaddr,
 	tms64.tv_nsec = rel_timeout->tv_nsec;
 	return futex_timedwaitlock64(uaddr, &tms64);
 }
-/*[[[end:futex_timedwaitlock]]]*/
+/*[[[end:libc_futex_timedwaitlock]]]*/
 
-/*[[[head:futex_timedwaitwhile_exactbits,hash:CRC-32=0xde3a5db5]]]*/
+/*[[[head:libc_futex_timedwaitwhile_exactbits,hash:CRC-32=0x47a87624]]]*/
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_exactbits") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_exactbits)(lfutex_t *uaddr,
                                                           lfutex_t bitmask,
                                                           lfutex_t setmask,
                                                           struct timespec const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_exactbits]]]*/
+/*[[[body:libc_futex_timedwaitwhile_exactbits]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
@@ -766,21 +738,20 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_exactbits)(lfutex_t *uaddr,
 	tms64.tv_nsec = rel_timeout->tv_nsec;
 	return futex_timedwaitwhile_exactbits64(uaddr, bitmask, setmask, &tms64);
 }
-/*[[[end:futex_timedwaitwhile_exactbits]]]*/
+/*[[[end:libc_futex_timedwaitwhile_exactbits]]]*/
 
-/*[[[head:futex_timedwaituntil_exactbits,hash:CRC-32=0x5f77a749]]]*/
+/*[[[head:libc_futex_timedwaituntil_exactbits,hash:CRC-32=0x6bec5286]]]*/
 /* Wait if `(*uaddr & bitmask) != setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaituntil_exactbits") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_exactbits)(lfutex_t *uaddr,
                                                           lfutex_t bitmask,
                                                           lfutex_t setmask,
                                                           struct timespec const *rel_timeout)
-/*[[[body:futex_timedwaituntil_exactbits]]]*/
+/*[[[body:libc_futex_timedwaituntil_exactbits]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
@@ -789,20 +760,19 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_exactbits)(lfutex_t *uaddr,
 	tms64.tv_nsec = rel_timeout->tv_nsec;
 	return futex_timedwaituntil_exactbits64(uaddr, bitmask, setmask, &tms64);
 }
-/*[[[end:futex_timedwaituntil_exactbits]]]*/
+/*[[[end:libc_futex_timedwaituntil_exactbits]]]*/
 
-/*[[[head:futex_timedwaitwhile_anybit,hash:CRC-32=0x9a072a7e]]]*/
+/*[[[head:libc_futex_timedwaitwhile_anybit,hash:CRC-32=0xbc490b4a]]]*/
 /* Wait if `(*uaddr & bitmask) != 0'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_anybit") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_anybit)(lfutex_t *uaddr,
                                                        lfutex_t bitmask,
                                                        struct timespec const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_anybit]]]*/
+/*[[[body:libc_futex_timedwaitwhile_anybit]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
@@ -811,20 +781,19 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_anybit)(lfutex_t *uaddr,
 	tms64.tv_nsec = rel_timeout->tv_nsec;
 	return futex_timedwaitwhile_anybit64(uaddr, bitmask, &tms64);
 }
-/*[[[end:futex_timedwaitwhile_anybit]]]*/
+/*[[[end:libc_futex_timedwaitwhile_anybit]]]*/
 
-/*[[[head:futex_timedwaitwhile_allbits,hash:CRC-32=0x2be43701]]]*/
+/*[[[head:libc_futex_timedwaitwhile_allbits,hash:CRC-32=0xc4c8438d]]]*/
 /* Wait if `(*uaddr & bitmask) == bitmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_allbits") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits)(lfutex_t *uaddr,
                                                         lfutex_t bitmask,
                                                         struct timespec const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_allbits]]]*/
+/*[[[body:libc_futex_timedwaitwhile_allbits]]]*/
 {
 	struct timespec64 tms64;
 	if (!rel_timeout)
@@ -833,24 +802,23 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits)(lfutex_t *uaddr,
 	tms64.tv_nsec = rel_timeout->tv_nsec;
 	return futex_timedwaitwhile_allbits64(uaddr, bitmask, &tms64);
 }
-/*[[[end:futex_timedwaitwhile_allbits]]]*/
+/*[[[end:libc_futex_timedwaitwhile_allbits]]]*/
 
-/*[[[head:futex_timedwaitwhile64,hash:CRC-32=0x2840a225]]]*/
+/*[[[head:libc_futex_timedwaitwhile64,hash:CRC-32=0x91327692]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile64, libc_futex_timedwaitwhile);
+#else /* MAGIC:alias */
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile64, libc_futex_timedwaitwhile);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile64") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile64)(lfutex_t *uaddr,
                                                   lfutex_t equal_to_value,
                                                   struct timespec64 const *rel_timeout)
-/*[[[body:futex_timedwaitwhile64]]]*/
+/*[[[body:libc_futex_timedwaitwhile64]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) == equal_to_value);
@@ -863,24 +831,23 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futex_timedwaitwhile64]]]*/
+/*[[[end:libc_futex_timedwaitwhile64]]]*/
 
-/*[[[head:futex_timedwaituntil64,hash:CRC-32=0xc3e5aa93]]]*/
+/*[[[head:libc_futex_timedwaituntil64,hash:CRC-32=0xdbf33fe4]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_futex_timedwaituntil64, libc_futex_timedwaituntil);
+#else /* MAGIC:alias */
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaituntil64, libc_futex_timedwaituntil);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaituntil64") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil64)(lfutex_t *uaddr,
                                                   lfutex_t not_equal_to_value,
                                                   struct timespec64 const *rel_timeout)
-/*[[[body:futex_timedwaituntil64]]]*/
+/*[[[body:libc_futex_timedwaituntil64]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) != not_equal_to_value);
@@ -893,24 +860,23 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futex_timedwaituntil64]]]*/
+/*[[[end:libc_futex_timedwaituntil64]]]*/
 
-/*[[[head:futex_timedwaitwhile_above64,hash:CRC-32=0x1ad3f376]]]*/
+/*[[[head:libc_futex_timedwaitwhile_above64,hash:CRC-32=0x4b8f2647]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_above64, libc_futex_timedwaitwhile_above);
+#else /* MAGIC:alias */
 /* Wait if `*uaddr > above_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_above64, libc_futex_timedwaitwhile_above);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_above64") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_above64)(lfutex_t *uaddr,
                                                         lfutex_t above_value,
                                                         struct timespec64 const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_above64]]]*/
+/*[[[body:libc_futex_timedwaitwhile_above64]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) > above_value);
@@ -923,24 +889,23 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_above64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futex_timedwaitwhile_above64]]]*/
+/*[[[end:libc_futex_timedwaitwhile_above64]]]*/
 
-/*[[[head:futex_timedwaitwhile_below64,hash:CRC-32=0xa909603]]]*/
+/*[[[head:libc_futex_timedwaitwhile_below64,hash:CRC-32=0x333da096]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_below64, libc_futex_timedwaitwhile_below);
+#else /* MAGIC:alias */
 /* Wait if `*uaddr < below_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_below64, libc_futex_timedwaitwhile_below);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_below64") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_below64)(lfutex_t *uaddr,
                                                         lfutex_t below_value,
                                                         struct timespec64 const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_below64]]]*/
+/*[[[body:libc_futex_timedwaitwhile_below64]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) < below_value);
@@ -953,24 +918,23 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_below64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futex_timedwaitwhile_below64]]]*/
+/*[[[end:libc_futex_timedwaitwhile_below64]]]*/
 
-/*[[[head:futex_timedwaitwhile_aboveequal64,hash:CRC-32=0x548e14da]]]*/
+/*[[[head:libc_futex_timedwaitwhile_aboveequal64,hash:CRC-32=0xec688560]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_aboveequal64, libc_futex_timedwaitwhile_aboveequal);
+#else /* MAGIC:alias */
 /* Wait if `*uaddr >= above_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_aboveequal64, libc_futex_timedwaitwhile_aboveequal);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_aboveequal64") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequal64)(lfutex_t *uaddr,
                                                              lfutex_t above_equal_value,
                                                              struct timespec64 const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_aboveequal64]]]*/
+/*[[[body:libc_futex_timedwaitwhile_aboveequal64]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) >= above_equal_value);
@@ -984,24 +948,23 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequal64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futex_timedwaitwhile_aboveequal64]]]*/
+/*[[[end:libc_futex_timedwaitwhile_aboveequal64]]]*/
 
-/*[[[head:futex_timedwaitwhile_belowequal64,hash:CRC-32=0xe1e373cc]]]*/
+/*[[[head:libc_futex_timedwaitwhile_belowequal64,hash:CRC-32=0x448a5668]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_belowequal64, libc_futex_timedwaitwhile_belowequal);
+#else /* MAGIC:alias */
 /* Wait if `*uaddr <= below_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_belowequal64, libc_futex_timedwaitwhile_belowequal);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_belowequal64") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal64)(lfutex_t *uaddr,
                                                              lfutex_t below_equal_value,
                                                              struct timespec64 const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_belowequal64]]]*/
+/*[[[body:libc_futex_timedwaitwhile_belowequal64]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) <= below_equal_value);
@@ -1015,25 +978,24 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futex_timedwaitwhile_belowequal64]]]*/
+/*[[[end:libc_futex_timedwaitwhile_belowequal64]]]*/
 
-/*[[[head:futex_timedwaitwhile_cmpxch64,hash:CRC-32=0x7f3ff5fb]]]*/
+/*[[[head:libc_futex_timedwaitwhile_cmpxch64,hash:CRC-32=0x9d22fc1c]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_cmpxch64, libc_futex_timedwaitwhile_cmpxch);
+#else /* MAGIC:alias */
 /* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_cmpxch64, libc_futex_timedwaitwhile_cmpxch);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_cmpxch64") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_cmpxch64)(lfutex_t *uaddr,
                                                          lfutex_t old_value,
                                                          lfutex_t new_value,
                                                          struct timespec64 const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_cmpxch64]]]*/
+/*[[[body:libc_futex_timedwaitwhile_cmpxch64]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(ATOMIC_READ(*uaddr) != old_value);
@@ -1046,25 +1008,24 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_cmpxch64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futex_timedwaitwhile_cmpxch64]]]*/
+/*[[[end:libc_futex_timedwaitwhile_cmpxch64]]]*/
 
-/*[[[head:futex_timedwaituntil_cmpxch64,hash:CRC-32=0xfbe42e9f]]]*/
+/*[[[head:libc_futex_timedwaituntil_cmpxch64,hash:CRC-32=0x7f368272]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_futex_timedwaituntil_cmpxch64, libc_futex_timedwaituntil_cmpxch);
+#else /* MAGIC:alias */
 /* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaituntil_cmpxch64, libc_futex_timedwaituntil_cmpxch);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaituntil_cmpxch64") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_cmpxch64)(lfutex_t *uaddr,
                                                          lfutex_t old_value,
                                                          lfutex_t new_value,
                                                          struct timespec64 const *rel_timeout)
-/*[[[body:futex_timedwaituntil_cmpxch64]]]*/
+/*[[[body:libc_futex_timedwaituntil_cmpxch64]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(futex_trywaituntil_cmpxch(uaddr, old_value, new_value) == 0);
@@ -1077,23 +1038,22 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_cmpxch64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futex_timedwaituntil_cmpxch64]]]*/
+/*[[[end:libc_futex_timedwaituntil_cmpxch64]]]*/
 
-/*[[[head:futex_timedwaitlock64,hash:CRC-32=0x8dab44cc]]]*/
+/*[[[head:libc_futex_timedwaitlock64,hash:CRC-32=0xcf98f4e9]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_futex_timedwaitlock64, libc_futex_timedwaitlock);
+#else /* MAGIC:alias */
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaitlock64, libc_futex_timedwaitlock);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitlock64") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitlock64)(lfutex_t *uaddr,
                                                  struct timespec64 const *rel_timeout)
-/*[[[body:futex_timedwaitlock64]]]*/
+/*[[[body:libc_futex_timedwaitlock64]]]*/
 {
 	errno_t result;
 	SPIN_WHILE(futex_trywaitlock(uaddr) == 0);
@@ -1106,24 +1066,23 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitlock64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futex_timedwaitlock64]]]*/
+/*[[[end:libc_futex_timedwaitlock64]]]*/
 
-/*[[[head:futex_timedwaitwhile_exactbits64,hash:CRC-32=0xab513d67]]]*/
+/*[[[head:libc_futex_timedwaitwhile_exactbits64,hash:CRC-32=0x9d4d878]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_exactbits64, libc_futex_timedwaitwhile_exactbits);
+#else /* MAGIC:alias */
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_exactbits64, libc_futex_timedwaitwhile_exactbits);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_exactbits64") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_exactbits64)(lfutex_t *uaddr,
                                                             lfutex_t bitmask,
                                                             lfutex_t setmask,
                                                             struct timespec64 const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_exactbits64]]]*/
+/*[[[body:libc_futex_timedwaitwhile_exactbits64]]]*/
 {
 	errno_t result;
 	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) == setmask);
@@ -1136,24 +1095,23 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_exactbits64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futex_timedwaitwhile_exactbits64]]]*/
+/*[[[end:libc_futex_timedwaitwhile_exactbits64]]]*/
 
-/*[[[head:futex_timedwaituntil_exactbits64,hash:CRC-32=0xccea58f1]]]*/
+/*[[[head:libc_futex_timedwaituntil_exactbits64,hash:CRC-32=0xe607512c]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_futex_timedwaituntil_exactbits64, libc_futex_timedwaituntil_exactbits);
+#else /* MAGIC:alias */
 /* Wait if `(*uaddr & bitmask) != setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaituntil_exactbits64, libc_futex_timedwaituntil_exactbits);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaituntil_exactbits64") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_exactbits64)(lfutex_t *uaddr,
                                                             lfutex_t bitmask,
                                                             lfutex_t setmask,
                                                             struct timespec64 const *rel_timeout)
-/*[[[body:futex_timedwaituntil_exactbits64]]]*/
+/*[[[body:libc_futex_timedwaituntil_exactbits64]]]*/
 {
 	errno_t result;
 	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) != setmask);
@@ -1166,23 +1124,22 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_exactbits64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futex_timedwaituntil_exactbits64]]]*/
+/*[[[end:libc_futex_timedwaituntil_exactbits64]]]*/
 
-/*[[[head:futex_timedwaitwhile_anybit64,hash:CRC-32=0x6db613d6]]]*/
+/*[[[head:libc_futex_timedwaitwhile_anybit64,hash:CRC-32=0x8215edc0]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_anybit64, libc_futex_timedwaitwhile_anybit);
+#else /* MAGIC:alias */
 /* Wait if `(*uaddr & bitmask) != 0'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_anybit64, libc_futex_timedwaitwhile_anybit);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_anybit64") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_anybit64)(lfutex_t *uaddr,
                                                          lfutex_t bitmask,
                                                          struct timespec64 const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_anybit64]]]*/
+/*[[[body:libc_futex_timedwaitwhile_anybit64]]]*/
 {
 	errno_t result;
 	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) != 0);
@@ -1195,23 +1152,22 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_anybit64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futex_timedwaitwhile_anybit64]]]*/
+/*[[[end:libc_futex_timedwaitwhile_anybit64]]]*/
 
-/*[[[head:futex_timedwaitwhile_allbits64,hash:CRC-32=0x638557f2]]]*/
+/*[[[head:libc_futex_timedwaitwhile_allbits64,hash:CRC-32=0x3b1902ea]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_allbits64, libc_futex_timedwaitwhile_allbits);
+#else /* MAGIC:alias */
 /* Wait if `(*uaddr & bitmask) == bitmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_futex_timedwaitwhile_allbits64, libc_futex_timedwaitwhile_allbits);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_timedwaitwhile_allbits64") int
+INTERN ATTR_SECTION(".text.crt.sched.futex") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits64)(lfutex_t *uaddr,
                                                           lfutex_t bitmask,
                                                           struct timespec64 const *rel_timeout)
-/*[[[body:futex_timedwaitwhile_allbits64]]]*/
+/*[[[body:libc_futex_timedwaitwhile_allbits64]]]*/
 {
 	errno_t result;
 	SPIN_WHILE((ATOMIC_READ(*uaddr) & bitmask) == bitmask);
@@ -1224,9 +1180,9 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits64)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futex_timedwaitwhile_allbits64]]]*/
+/*[[[end:libc_futex_timedwaitwhile_allbits64]]]*/
 
-/*[[[head:futex_getspin,hash:CRC-32=0x1e14afb3]]]*/
+/*[[[head:libc_futex_getspin,hash:CRC-32=0xe8b5ffe]]]*/
 /* Get/Set the number of times to spin the following futex operations without
  * entering kernel-space, setting waiter-bits, and entering sleep mode:
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
@@ -1247,10 +1203,9 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits64)(lfutex_t *uaddr,
  * >> return lfutex(uaddr, LFUTEX_WAIT_WHILE, val, (struct timespec const *)NULL);
  * Upon startup, `futex_getspin()' is pre-initialized to `4'.
  * @return: * : The current (get) / old (set) spin value */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_getspin") unsigned int
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED unsigned int
 NOTHROW(LIBCCALL libc_futex_getspin)(void)
-/*[[[body:futex_getspin]]]*/
+/*[[[body:libc_futex_getspin]]]*/
 {
 #ifdef NO_FUTEX_SPIN
 	return 0;
@@ -1258,9 +1213,9 @@ NOTHROW(LIBCCALL libc_futex_getspin)(void)
 	return ATOMIC_READ(futex_spin_counter);
 #endif
 }
-/*[[[end:futex_getspin]]]*/
+/*[[[end:libc_futex_getspin]]]*/
 
-/*[[[head:futex_setspin,hash:CRC-32=0xeaeda144]]]*/
+/*[[[head:libc_futex_setspin,hash:CRC-32=0x2c0e5724]]]*/
 /* Get/Set the number of times to spin the following futex operations without
  * entering kernel-space, setting waiter-bits, and entering sleep mode:
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
@@ -1281,9 +1236,9 @@ NOTHROW(LIBCCALL libc_futex_getspin)(void)
  * >> return lfutex(uaddr, LFUTEX_WAIT_WHILE, val, (struct timespec const *)NULL);
  * Upon startup, `futex_getspin()' is pre-initialized to `4'.
  * @return: * : The current (get) / old (set) spin value */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.futex.futex_setspin") unsigned int
+INTERN ATTR_SECTION(".text.crt.sched.futex") unsigned int
 NOTHROW(LIBCCALL libc_futex_setspin)(unsigned int new_spin)
-/*[[[body:futex_setspin]]]*/
+/*[[[body:libc_futex_setspin]]]*/
 {
 #ifdef NO_FUTEX_SPIN
 	(void)new_spin;
@@ -1292,59 +1247,59 @@ NOTHROW(LIBCCALL libc_futex_setspin)(unsigned int new_spin)
 	return ATOMIC_XCH(futex_spin_counter, new_spin);
 #endif
 }
-/*[[[end:futex_setspin]]]*/
+/*[[[end:libc_futex_setspin]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa38d3a58]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(lfutex, libc_lfutex);
-DEFINE_PUBLIC_WEAK_ALIAS(lfutex64, libc_lfutex64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_wake, libc_futex_wake);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_wakeall, libc_futex_wakeall);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_wakemask, libc_futex_wakemask);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_waitwhile, libc_futex_waitwhile);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_waituntil, libc_futex_waituntil);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_waitwhile_above, libc_futex_waitwhile_above);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_waitwhile_below, libc_futex_waitwhile_below);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_waitwhile_aboveequal, libc_futex_waitwhile_aboveequal);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_waitwhile_belowequal, libc_futex_waitwhile_belowequal);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_waitwhile_cmpxch, libc_futex_waitwhile_cmpxch);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_waituntil_cmpxch, libc_futex_waituntil_cmpxch);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_waitlock, libc_futex_waitlock);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_waitwhile_exactbits, libc_futex_waitwhile_exactbits);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_waituntil_exactbits, libc_futex_waituntil_exactbits);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_waitwhile_anybit, libc_futex_waitwhile_anybit);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_waitwhile_allbits, libc_futex_waitwhile_allbits);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile, libc_futex_timedwaitwhile);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaituntil, libc_futex_timedwaituntil);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_above, libc_futex_timedwaitwhile_above);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_below, libc_futex_timedwaitwhile_below);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_aboveequal, libc_futex_timedwaitwhile_aboveequal);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_belowequal, libc_futex_timedwaitwhile_belowequal);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_cmpxch, libc_futex_timedwaitwhile_cmpxch);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaituntil_cmpxch, libc_futex_timedwaituntil_cmpxch);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitlock, libc_futex_timedwaitlock);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_exactbits, libc_futex_timedwaitwhile_exactbits);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaituntil_exactbits, libc_futex_timedwaituntil_exactbits);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_anybit, libc_futex_timedwaitwhile_anybit);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_allbits, libc_futex_timedwaitwhile_allbits);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile64, libc_futex_timedwaitwhile64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaituntil64, libc_futex_timedwaituntil64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_above64, libc_futex_timedwaitwhile_above64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_below64, libc_futex_timedwaitwhile_below64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_aboveequal64, libc_futex_timedwaitwhile_aboveequal64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_belowequal64, libc_futex_timedwaitwhile_belowequal64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_cmpxch64, libc_futex_timedwaitwhile_cmpxch64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaituntil_cmpxch64, libc_futex_timedwaituntil_cmpxch64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitlock64, libc_futex_timedwaitlock64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_exactbits64, libc_futex_timedwaitwhile_exactbits64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaituntil_exactbits64, libc_futex_timedwaituntil_exactbits64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_anybit64, libc_futex_timedwaitwhile_anybit64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_timedwaitwhile_allbits64, libc_futex_timedwaitwhile_allbits64);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_getspin, libc_futex_getspin);
-DEFINE_PUBLIC_WEAK_ALIAS(futex_setspin, libc_futex_setspin);
+/*[[[start:exports,hash:CRC-32=0xd6880b82]]]*/
+DEFINE_PUBLIC_ALIAS(lfutex, libc_lfutex);
+DEFINE_PUBLIC_ALIAS(lfutex64, libc_lfutex64);
+DEFINE_PUBLIC_ALIAS(futex_wake, libc_futex_wake);
+DEFINE_PUBLIC_ALIAS(futex_wakeall, libc_futex_wakeall);
+DEFINE_PUBLIC_ALIAS(futex_wakemask, libc_futex_wakemask);
+DEFINE_PUBLIC_ALIAS(futex_waitwhile, libc_futex_waitwhile);
+DEFINE_PUBLIC_ALIAS(futex_waituntil, libc_futex_waituntil);
+DEFINE_PUBLIC_ALIAS(futex_waitwhile_above, libc_futex_waitwhile_above);
+DEFINE_PUBLIC_ALIAS(futex_waitwhile_below, libc_futex_waitwhile_below);
+DEFINE_PUBLIC_ALIAS(futex_waitwhile_aboveequal, libc_futex_waitwhile_aboveequal);
+DEFINE_PUBLIC_ALIAS(futex_waitwhile_belowequal, libc_futex_waitwhile_belowequal);
+DEFINE_PUBLIC_ALIAS(futex_waitwhile_cmpxch, libc_futex_waitwhile_cmpxch);
+DEFINE_PUBLIC_ALIAS(futex_waituntil_cmpxch, libc_futex_waituntil_cmpxch);
+DEFINE_PUBLIC_ALIAS(futex_waitlock, libc_futex_waitlock);
+DEFINE_PUBLIC_ALIAS(futex_waitwhile_exactbits, libc_futex_waitwhile_exactbits);
+DEFINE_PUBLIC_ALIAS(futex_waituntil_exactbits, libc_futex_waituntil_exactbits);
+DEFINE_PUBLIC_ALIAS(futex_waitwhile_anybit, libc_futex_waitwhile_anybit);
+DEFINE_PUBLIC_ALIAS(futex_waitwhile_allbits, libc_futex_waitwhile_allbits);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile, libc_futex_timedwaitwhile);
+DEFINE_PUBLIC_ALIAS(futex_timedwaituntil, libc_futex_timedwaituntil);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_above, libc_futex_timedwaitwhile_above);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_below, libc_futex_timedwaitwhile_below);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_aboveequal, libc_futex_timedwaitwhile_aboveequal);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_belowequal, libc_futex_timedwaitwhile_belowequal);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_cmpxch, libc_futex_timedwaitwhile_cmpxch);
+DEFINE_PUBLIC_ALIAS(futex_timedwaituntil_cmpxch, libc_futex_timedwaituntil_cmpxch);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitlock, libc_futex_timedwaitlock);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_exactbits, libc_futex_timedwaitwhile_exactbits);
+DEFINE_PUBLIC_ALIAS(futex_timedwaituntil_exactbits, libc_futex_timedwaituntil_exactbits);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_anybit, libc_futex_timedwaitwhile_anybit);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_allbits, libc_futex_timedwaitwhile_allbits);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile64, libc_futex_timedwaitwhile64);
+DEFINE_PUBLIC_ALIAS(futex_timedwaituntil64, libc_futex_timedwaituntil64);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_above64, libc_futex_timedwaitwhile_above64);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_below64, libc_futex_timedwaitwhile_below64);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_aboveequal64, libc_futex_timedwaitwhile_aboveequal64);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_belowequal64, libc_futex_timedwaitwhile_belowequal64);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_cmpxch64, libc_futex_timedwaitwhile_cmpxch64);
+DEFINE_PUBLIC_ALIAS(futex_timedwaituntil_cmpxch64, libc_futex_timedwaituntil_cmpxch64);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitlock64, libc_futex_timedwaitlock64);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_exactbits64, libc_futex_timedwaitwhile_exactbits64);
+DEFINE_PUBLIC_ALIAS(futex_timedwaituntil_exactbits64, libc_futex_timedwaituntil_exactbits64);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_anybit64, libc_futex_timedwaitwhile_anybit64);
+DEFINE_PUBLIC_ALIAS(futex_timedwaitwhile_allbits64, libc_futex_timedwaitwhile_allbits64);
+DEFINE_PUBLIC_ALIAS(futex_getspin, libc_futex_getspin);
+DEFINE_PUBLIC_ALIAS(futex_setspin, libc_futex_setspin);
 /*[[[end:exports]]]*/
 
 DECL_END

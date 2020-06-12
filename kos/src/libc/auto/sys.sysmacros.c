@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8988f8a */
+/* HASH CRC-32:0x9bd2483 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,8 @@ NOTHROW(LIBCCALL libc_gnu_dev_minor)(dev_t dev) {
 	return (minor_t)((uintptr_t)dev & ((1 << 20) - 1));
 }
 INTERN ATTR_SECTION(".text.crt.system.utility") ATTR_CONST WUNUSED dev_t
-NOTHROW(LIBCCALL libc_gnu_dev_makedev)(major_t major, minor_t minor) {
+NOTHROW(LIBCCALL libc_gnu_dev_makedev)(major_t major,
+                                       minor_t minor) {
 	return (dev_t)major << 20 | (dev_t)minor;
 }
 #endif /* !__KERNEL__ */
@@ -46,9 +47,9 @@ NOTHROW(LIBCCALL libc_gnu_dev_makedev)(major_t major, minor_t minor) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(gnu_dev_major, libc_gnu_dev_major);
-DEFINE_PUBLIC_WEAK_ALIAS(gnu_dev_minor, libc_gnu_dev_minor);
-DEFINE_PUBLIC_WEAK_ALIAS(gnu_dev_makedev, libc_gnu_dev_makedev);
+DEFINE_PUBLIC_ALIAS(gnu_dev_major, libc_gnu_dev_major);
+DEFINE_PUBLIC_ALIAS(gnu_dev_minor, libc_gnu_dev_minor);
+DEFINE_PUBLIC_ALIAS(gnu_dev_makedev, libc_gnu_dev_makedev);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SYS_SYSMACROS_C */

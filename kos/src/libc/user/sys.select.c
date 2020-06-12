@@ -32,20 +32,20 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:select,hash:CRC-32=0x4c32efc7]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.select") __STDC_INT_AS_SSIZE_T
+/*[[[head:libc_select,hash:CRC-32=0x9c2d65fd]]]*/
+INTERN ATTR_SECTION(".text.crt.io.poll") __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_select)(__STDC_INT_AS_SIZE_T nfds,
                                   fd_set *__restrict readfds,
                                   fd_set *__restrict writefds,
                                   fd_set *__restrict exceptfds,
                                   struct timeval *__restrict timeout)
-/*[[[body:select]]]*/
+/*[[[body:libc_select]]]*/
 {
 	ssize_t result;
 	result = sys_select(nfds, readfds, writefds, exceptfds, timeout);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:select]]]*/
+/*[[[end:libc_select]]]*/
 
 struct sigset_and_len {
 	sigset_t const *ss_ptr;
@@ -53,15 +53,15 @@ struct sigset_and_len {
 };
 
 
-/*[[[head:pselect,hash:CRC-32=0xdc377b8f]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.pselect") __STDC_INT_AS_SSIZE_T
+/*[[[head:libc_pselect,hash:CRC-32=0x945cfb8b]]]*/
+INTERN ATTR_SECTION(".text.crt.io.poll") __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_pselect)(__STDC_INT_AS_SIZE_T nfds,
                                    fd_set *__restrict readfds,
                                    fd_set *__restrict writefds,
                                    fd_set *__restrict exceptfds,
                                    struct timespec const *__restrict timeout,
                                    sigset_t const *__restrict sigmask)
-/*[[[body:pselect]]]*/
+/*[[[body:libc_pselect]]]*/
 {
 	ssize_t result;
 	struct sigset_and_len ss;
@@ -70,39 +70,39 @@ NOTHROW_RPC(LIBCCALL libc_pselect)(__STDC_INT_AS_SIZE_T nfds,
 	result = sys_pselect6(nfds, readfds, writefds, exceptfds, timeout, &ss);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:pselect]]]*/
+/*[[[end:libc_pselect]]]*/
 
-/*[[[head:select64,hash:CRC-32=0x6a763ffc]]]*/
+/*[[[head:libc_select64,hash:CRC-32=0x6a377a28]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_select64, libc_select);
-#else
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.select64") __STDC_INT_AS_SSIZE_T
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.io.poll") __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_select64)(__STDC_INT_AS_SIZE_T nfds,
                                     fd_set *__restrict readfds,
                                     fd_set *__restrict writefds,
                                     fd_set *__restrict exceptfds,
                                     struct timeval64 *__restrict timeout)
-/*[[[body:select64]]]*/
+/*[[[body:libc_select64]]]*/
 {
 	ssize_t result;
 	result = sys_select64(nfds, readfds, writefds, exceptfds, timeout);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:select64]]]*/
+/*[[[end:libc_select64]]]*/
 
-/*[[[head:pselect64,hash:CRC-32=0x7385089e]]]*/
+/*[[[head:libc_pselect64,hash:CRC-32=0xdc174be2]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pselect64, libc_pselect);
-#else
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.pselect64") __STDC_INT_AS_SSIZE_T
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.io.poll") __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_pselect64)(__STDC_INT_AS_SIZE_T nfds,
                                      fd_set *__restrict readfds,
                                      fd_set *__restrict writefds,
                                      fd_set *__restrict exceptfds,
                                      struct timespec64 const *__restrict timeout,
                                      sigset_t const *__restrict sigmask)
-/*[[[body:pselect64]]]*/
+/*[[[body:libc_pselect64]]]*/
 {
 	ssize_t result;
 	struct sigset_and_len ss;
@@ -112,18 +112,18 @@ NOTHROW_RPC(LIBCCALL libc_pselect64)(__STDC_INT_AS_SIZE_T nfds,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:pselect64]]]*/
+/*[[[end:libc_pselect64]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x38e4cd60]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(select, libc_select);
-DEFINE_PUBLIC_WEAK_ALIAS(__select, libc_select);
-DEFINE_PUBLIC_WEAK_ALIAS(pselect, libc_pselect);
-DEFINE_PUBLIC_WEAK_ALIAS(select64, libc_select64);
-DEFINE_PUBLIC_WEAK_ALIAS(pselect64, libc_pselect64);
+/*[[[start:exports,hash:CRC-32=0x80a21f10]]]*/
+DEFINE_PUBLIC_ALIAS(__select, libc_select);
+DEFINE_PUBLIC_ALIAS(select, libc_select);
+DEFINE_PUBLIC_ALIAS(pselect, libc_pselect);
+DEFINE_PUBLIC_ALIAS(select64, libc_select64);
+DEFINE_PUBLIC_ALIAS(pselect64, libc_pselect64);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0d61c33 */
+/* HASH CRC-32:0xc2bc32c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,9 @@ DECL_BEGIN
 /* Match NAME against the filename pattern PATTERN,
  * returning zero if it matches, FNM_NOMATCH if not */
 INTERN ATTR_SECTION(".text.crt.string.match") ATTR_PURE WUNUSED NONNULL((1, 2)) int
-NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern, char const *name, int match_flags) {
+NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern,
+                                   char const *name,
+                                   int match_flags) {
 	char card_post;
 	for (;;) {
 		if (!*name) {
@@ -98,7 +100,7 @@ nomatch:
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(fnmatch, libc_fnmatch);
+DEFINE_PUBLIC_ALIAS(fnmatch, libc_fnmatch);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FNMATCH_C */

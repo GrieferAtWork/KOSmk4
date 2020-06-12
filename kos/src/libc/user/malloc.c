@@ -38,31 +38,22 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[skip:valloc]]]*/
-/*[[[skip:realloc_in_place]]]*/
-/*[[[skip:posix_memalign]]]*/
-/*[[[skip:memalign]]]*/
-/*[[[skip:pvalloc]]]*/
-/*[[[skip:malloc_usable_size]]]*/
-/*[[[skip:cfree]]]*/
-
-/*[[[head:_heapmin,hash:CRC-32=0x85c22195]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.heap.utility._heapmin") int
-NOTHROW_NCX(LIBCCALL libc__heapmin)(void)
-/*[[[body:_heapmin]]]*/
-{
-	return malloc_trim(0);
-}
-/*[[[end:_heapmin]]]*/
+/*[[[skip:libc_valloc]]]*/
+/*[[[skip:libc_realloc_in_place]]]*/
+/*[[[skip:libc_posix_memalign]]]*/
+/*[[[skip:libc_memalign]]]*/
+/*[[[skip:libc_pvalloc]]]*/
+/*[[[skip:libc_malloc_usable_size]]]*/
+/*[[[skip:libc_malloc_trim]]]*/
+/*[[[skip:libc_mallopt]]]*/
 
 
-/*[[[head:memcdup,hash:CRC-32=0xbad869c1]]]*/
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.memcdup") void *
+/*[[[head:libc_memcdup,hash:CRC-32=0x6fbec01a]]]*/
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_memcdup)(void const *__restrict ptr,
                                    int needle,
                                    size_t n_bytes)
-/*[[[body:memcdup]]]*/
+/*[[[body:libc_memcdup]]]*/
 {
 	if likely(n_bytes) {
 		void const *endaddr;
@@ -74,14 +65,13 @@ NOTHROW_NCX(LIBCCALL libc_memcdup)(void const *__restrict ptr,
 	}
 	return memdup(ptr, n_bytes);
 }
-/*[[[end:memcdup]]]*/
+/*[[[end:libc_memcdup]]]*/
 
-/*[[[head:memdup,hash:CRC-32=0x1f6fe48c]]]*/
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.memdup") void *
+/*[[[head:libc_memdup,hash:CRC-32=0x52592fb8]]]*/
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_memdup)(void const *__restrict ptr,
                                   size_t n_bytes)
-/*[[[body:memdup]]]*/
+/*[[[body:libc_memdup]]]*/
 {
 	void *result;
 	result = malloc(n_bytes);
@@ -89,106 +79,74 @@ NOTHROW_NCX(LIBCCALL libc_memdup)(void const *__restrict ptr,
 		memcpy(result, ptr, n_bytes);
 	return result;
 }
-/*[[[end:memdup]]]*/
+/*[[[end:libc_memdup]]]*/
 
-/*[[[head:malloc_trim,hash:CRC-32=0xff7232d0]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.heap.utility.malloc_trim") int
-NOTHROW_NCX(LIBCCALL libc_malloc_trim)(size_t pad)
-/*[[[body:malloc_trim]]]*/
-/*AUTO*/{
-	/* NO-OP (indicate failure to release memory) */
-	COMPILER_IMPURE();
-	(void)pad;
-	return 0;
-}
-/*[[[end:malloc_trim]]]*/
-
-/*[[[head:mallopt,hash:CRC-32=0x90b86537]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.heap.utility.mallopt") int
-NOTHROW_NCX(LIBCCALL libc_mallopt)(int parameter_number,
-                                   int parameter_value)
-/*[[[body:mallopt]]]*/
-/*AUTO*/{
-	/* NO-OP */
-	COMPILER_IMPURE();
-	(void)parameter_number;
-	(void)parameter_value;
-	return 0;
-}
-/*[[[end:mallopt]]]*/
-
-/*[[[head:reallocarray,hash:CRC-32=0xe6b2d3bc]]]*/
-INTERN ATTR_MALL_DEFAULT_ALIGNED ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_SIZE((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.reallocarray") void *
+/*[[[head:libc_reallocarray,hash:CRC-32=0x7866db3c]]]*/
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED ATTR_MALL_DEFAULT_ALIGNED WUNUSED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_SIZE((2, 3)) void *
 NOTHROW_NCX(LIBCCALL libc_reallocarray)(void *ptr,
                                         size_t elem_count,
                                         size_t elem_size)
-/*[[[body:reallocarray]]]*/
+/*[[[body:libc_reallocarray]]]*/
 /*AUTO*/{
 	size_t total_bytes;
 	if (__hybrid_overflow_umul(elem_count, elem_size, &total_bytes))
 		total_bytes = (size_t)-1; /* Force down-stream failure */
-	return libc_realloc(ptr, total_bytes);
+	return realloc(ptr, total_bytes);
 }
-/*[[[end:reallocarray]]]*/
+/*[[[end:libc_reallocarray]]]*/
 
-/*[[[head:recalloc,hash:CRC-32=0xad7e5859]]]*/
-INTERN ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.recalloc") void *
+/*[[[head:libc_recalloc,hash:CRC-32=0x6198e8db]]]*/
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *
 NOTHROW_NCX(LIBCCALL libc_recalloc)(void *mallptr,
                                     size_t num_bytes)
-/*[[[body:recalloc]]]*/
+/*[[[body:libc_recalloc]]]*/
 /*AUTO*/{
 	void *result;
 	size_t oldsize;
-	oldsize = libc_malloc_usable_size(mallptr);
-	result  = libc_realloc(mallptr, num_bytes);
+	oldsize = malloc_usable_size(mallptr);
+	result  = realloc(mallptr, num_bytes);
 	if likely(result) {
 		if (num_bytes > oldsize)
 			memset((byte_t *)result + oldsize, 0, num_bytes - oldsize);
 	}
 	return result;
 }
-/*[[[end:recalloc]]]*/
+/*[[[end:libc_recalloc]]]*/
 
-/*[[[head:recallocv,hash:CRC-32=0x1b8a1d16]]]*/
-INTERN ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.recallocv") void *
+/*[[[head:libc_recallocv,hash:CRC-32=0x5fcdcb24]]]*/
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *
 NOTHROW_NCX(LIBCCALL libc_recallocv)(void *mallptr,
                                      size_t elem_count,
                                      size_t elem_size)
-/*[[[body:recallocv]]]*/
+/*[[[body:libc_recallocv]]]*/
 /*AUTO*/{
 	void *result;
 	size_t total_bytes, oldsize;
-	oldsize = libc_malloc_usable_size(mallptr);
+	oldsize = malloc_usable_size(mallptr);
 	if unlikely(__hybrid_overflow_umul(elem_count, elem_size, &total_bytes))
 		total_bytes = (size_t)-1; /* Force down-stream failure */
-	result = libc_realloc(mallptr, total_bytes);
+	result = realloc(mallptr, total_bytes);
 	if likely(result) {
 		if (total_bytes > oldsize)
 			memset((byte_t *)result + oldsize, 0, total_bytes - oldsize);
 	}
 	return result;
 }
-/*[[[end:recallocv]]]*/
+/*[[[end:libc_recallocv]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xfeb8448e]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(_heapmin, libc__heapmin);
-DEFINE_PUBLIC_WEAK_ALIAS(malloc_trim, libc_malloc_trim);
-DEFINE_PUBLIC_WEAK_ALIAS(mallopt, libc_mallopt);
-DEFINE_PUBLIC_WEAK_ALIAS(memdup, libc_memdup);
-DEFINE_PUBLIC_WEAK_ALIAS(__memdup, libc_memdup);
-DEFINE_PUBLIC_WEAK_ALIAS(memcdup, libc_memcdup);
-DEFINE_PUBLIC_WEAK_ALIAS(__memcdup, libc_memcdup);
-DEFINE_PUBLIC_WEAK_ALIAS(reallocarray, libc_reallocarray);
-DEFINE_PUBLIC_WEAK_ALIAS(recalloc, libc_recalloc);
-DEFINE_PUBLIC_WEAK_ALIAS(recallocv, libc_recallocv);
-DEFINE_PUBLIC_WEAK_ALIAS(_recalloc, libc_recallocv);
+/*[[[start:exports,hash:CRC-32=0xf193f3ac]]]*/
+DEFINE_PUBLIC_ALIAS(__memdup, libc_memdup);
+DEFINE_PUBLIC_ALIAS(memdup, libc_memdup);
+DEFINE_PUBLIC_ALIAS(__memcdup, libc_memcdup);
+DEFINE_PUBLIC_ALIAS(memcdup, libc_memcdup);
+DEFINE_PUBLIC_ALIAS(reallocarray, libc_reallocarray);
+DEFINE_PUBLIC_ALIAS(recalloc, libc_recalloc);
+DEFINE_PUBLIC_ALIAS(_recalloc, libc_recallocv);
+DEFINE_PUBLIC_ALIAS(recallocv, libc_recallocv);
 /*[[[end:exports]]]*/
 
 DECL_END

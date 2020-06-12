@@ -33,14 +33,14 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:mount,hash:CRC-32=0x6309402e]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.mount.mount") int
+/*[[[head:libc_mount,hash:CRC-32=0xa4f3bc75]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.mount") int
 NOTHROW_RPC(LIBCCALL libc_mount)(char const *special_file,
                                  char const *dir,
                                  char const *fstype,
-                                 unsigned long int mountflags,
+                                 ulongptr_t mountflags,
                                  void const *data)
-/*[[[body:mount]]]*/
+/*[[[body:libc_mount]]]*/
 {
 	errno_t result;
 	result = sys_mount(special_file,
@@ -50,12 +50,12 @@ NOTHROW_RPC(LIBCCALL libc_mount)(char const *special_file,
 	                   data);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:mount]]]*/
+/*[[[end:libc_mount]]]*/
 
-/*[[[head:umount,hash:CRC-32=0x96d2a7ad]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.mount.umount") int
+/*[[[head:libc_umount,hash:CRC-32=0xd87f66f7]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.mount") int
 NOTHROW_RPC(LIBCCALL libc_umount)(char const *special_file)
-/*[[[body:umount]]]*/
+/*[[[body:libc_umount]]]*/
 {
 	errno_t result;
 #ifdef __NR_umount
@@ -65,29 +65,29 @@ NOTHROW_RPC(LIBCCALL libc_umount)(char const *special_file)
 #endif /* !__NR_umount */
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:umount]]]*/
+/*[[[end:libc_umount]]]*/
 
-/*[[[head:umount2,hash:CRC-32=0x9b341e02]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.mount.umount2") int
+/*[[[head:libc_umount2,hash:CRC-32=0xbe0b47d9]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.mount") int
 NOTHROW_RPC(LIBCCALL libc_umount2)(char const *special_file,
-                                   int flags)
-/*[[[body:umount2]]]*/
+                                   __STDC_INT_AS_UINT_T flags)
+/*[[[body:libc_umount2]]]*/
 {
 	errno_t result;
 	result = sys_umount2(special_file,
 	                     (syscall_ulong_t)(unsigned int)flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:umount2]]]*/
+/*[[[end:libc_umount2]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xd52505d0]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(mount, libc_mount);
-DEFINE_PUBLIC_WEAK_ALIAS(umount, libc_umount);
-DEFINE_PUBLIC_WEAK_ALIAS(umount2, libc_umount2);
+/*[[[start:exports,hash:CRC-32=0x5bf6184c]]]*/
+DEFINE_PUBLIC_ALIAS(mount, libc_mount);
+DEFINE_PUBLIC_ALIAS(umount, libc_umount);
+DEFINE_PUBLIC_ALIAS(umount2, libc_umount2);
 /*[[[end:exports]]]*/
 
 DECL_END

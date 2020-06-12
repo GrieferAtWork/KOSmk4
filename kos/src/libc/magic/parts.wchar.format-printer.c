@@ -205,6 +205,8 @@ $ssize_t format_wsnprintf_printer([[nonnull]] /*struct format_wsnprintf_data**/ 
 
 [[wchar, doc_alias("format_width"), ATTR_PURE]]
 [[if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(format_length)]]
+/* Don't export in KOS-mode (in that mode, we're an alias for `libc_format_length') */
+[[crt_kos_impl_if(0), crt_dos_impl_if(!defined(__KERNEL__))]]
 $ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	size_t result = 0;
@@ -316,7 +318,7 @@ struct format_waprintf_data {
 [[wchar, impl_include("<hybrid/__assert.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[decl_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]]
-[[userimpl, requires_function(realloc)]]
+[[requires_function(realloc)]]
 wchar_t *format_waprintf_pack([[nonnull]] struct format_waprintf_data *__restrict self,
                               [[nullable]] $size_t *pstrlen) {
 	/* Free unused buffer memory. */
@@ -367,7 +369,7 @@ wchar_t *format_waprintf_pack([[nonnull]] struct format_waprintf_data *__restric
 @@@return: NULL: Failed to allocate additional memory
 [[wchar, wunused, impl_include("<hybrid/__assert.h>")]]
 [[decl_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]]
-[[userimpl, requires_function(realloc)]]
+[[requires_function(realloc)]]
 format_waprintf_alloc:([[nonnull]] struct format_waprintf_data *__restrict self,
                        $size_t num_wchars) -> [[malloc /*(num_wchars * sizeof(wchar_t))*/]] wchar_t * {
 	wchar_t *result;
@@ -397,7 +399,7 @@ format_waprintf_alloc:([[nonnull]] struct format_waprintf_data *__restrict self,
 }
 
 @@Print data to a dynamically allocated heap buffer. On error, -1 is returned
-[[wchar, wunused, userimpl, requires_function(format_waprintf_alloc)]]
+[[wchar, wunused, requires_function(format_waprintf_alloc)]]
 $ssize_t format_waprintf_printer([[nonnull]] /*struct format_waprintf_data **/ void *arg,
                                  [[nonnull]] wchar_t const *__restrict data, $size_t datalen) {
 	wchar_t *buf;

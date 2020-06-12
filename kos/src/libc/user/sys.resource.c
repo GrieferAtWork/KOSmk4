@@ -32,61 +32,58 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getrlimit,hash:CRC-32=0xf680a78f]]]*/
+/*[[[head:libc_getrlimit,hash:CRC-32=0x183c9dc8]]]*/
 /* Put the soft and hard limits for RESOURCE in *RLIMITS.
  * Returns 0 if successful, -1 if not (and sets errno) */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.resource.getrlimit") int
+INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_getrlimit)(__rlimit_resource_t resource,
                                      struct rlimit *rlimits)
-/*[[[body:getrlimit]]]*/
+/*[[[body:libc_getrlimit]]]*/
 {
 	errno_t error;
 	error = sys_getrlimit((syscall_ulong_t)resource, rlimits);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:getrlimit]]]*/
+/*[[[end:libc_getrlimit]]]*/
 
-/*[[[head:setrlimit,hash:CRC-32=0xd8b536dc]]]*/
+/*[[[head:libc_setrlimit,hash:CRC-32=0xec5181e9]]]*/
 /* Set the soft and hard limits for RESOURCE to *RLIMITS.
  * Only the super-user can increase hard limits.
  * Return 0 if successful, -1 if not (and sets errno) */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.resource.setrlimit") int
+INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_setrlimit)(__rlimit_resource_t resource,
                                      struct rlimit const *rlimits)
-/*[[[body:setrlimit]]]*/
+/*[[[body:libc_setrlimit]]]*/
 {
 	errno_t error;
 	error = sys_setrlimit((syscall_ulong_t)resource, rlimits);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:setrlimit]]]*/
+/*[[[end:libc_setrlimit]]]*/
 
-/*[[[head:getrusage,hash:CRC-32=0xbec786ef]]]*/
+/*[[[head:libc_getrusage,hash:CRC-32=0xfd6e5154]]]*/
 /* Return resource usage information on process indicated by WHO
  * and put it in *USAGE. Returns 0 for success, -1 for failure */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.resource.getrusage") int
+INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_getrusage)(__rusage_who_t who,
                                      struct rusage *usage)
-/*[[[body:getrusage]]]*/
+/*[[[body:libc_getrusage]]]*/
 {
 	errno_t error;
 	error = sys_getrusage((syscall_slong_t)who, usage);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:getrusage]]]*/
+/*[[[end:libc_getrusage]]]*/
 
-/*[[[head:getpriority,hash:CRC-32=0x67344261]]]*/
+/*[[[head:libc_getpriority,hash:CRC-32=0xb9800c80]]]*/
 /* Return the highest priority of any process specified by WHICH and
  * WHO (see above); if WHO is zero, the current process, process group,
  * or user (as specified by WHO) is used.  A lower priority number means
  * higher priority. Priorities range from PRIO_MIN to PRIO_MAX (above) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.resource.getpriority") int
+INTERN ATTR_SECTION(".text.crt.sched.resource") int
 NOTHROW_NCX(LIBCCALL libc_getpriority)(__priority_which_t which,
                                        id_t who)
-/*[[[body:getpriority]]]*/
+/*[[[body:libc_getpriority]]]*/
 {
 	syscall_slong_t result;
 	result = sys_getpriority((syscall_ulong_t)which, who);
@@ -96,78 +93,77 @@ NOTHROW_NCX(LIBCCALL libc_getpriority)(__priority_which_t which,
 	}
 	return (int)(20 - result);
 }
-/*[[[end:getpriority]]]*/
+/*[[[end:libc_getpriority]]]*/
 
-/*[[[head:setpriority,hash:CRC-32=0xc81fe9d0]]]*/
+/*[[[head:libc_setpriority,hash:CRC-32=0xf4c0f8e0]]]*/
 /* Set the priority of all processes specified by WHICH and WHO (see above) to PRIO.
  * Returns 0 on success, -1 on errors */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.resource.setpriority") int
+INTERN ATTR_SECTION(".text.crt.sched.resource") int
 NOTHROW_NCX(LIBCCALL libc_setpriority)(__priority_which_t which,
                                        id_t who,
                                        int prio)
-/*[[[body:setpriority]]]*/
+/*[[[body:libc_setpriority]]]*/
 {
 	errno_t error;
 	error = sys_setpriority((syscall_ulong_t)which, who, (syscall_ulong_t)(20 - prio));
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:setpriority]]]*/
+/*[[[end:libc_setpriority]]]*/
 
-/*[[[head:getrlimit64,hash:CRC-32=0xcdba0ca9]]]*/
-/* Put the soft and hard limits for RESOURCE in *RLIMITS.
- * Returns 0 if successful, -1 if not (and sets errno) */
+/*[[[head:libc_getrlimit64,hash:CRC-32=0xd1409457]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_getrlimit64, libc_getrlimit);
-#else
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.resource.getrlimit64") int
+#else /* MAGIC:alias */
+/* Put the soft and hard limits for RESOURCE in *RLIMITS.
+ * Returns 0 if successful, -1 if not (and sets errno) */
+INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_getrlimit64)(__rlimit_resource_t resource,
                                        struct rlimit64 *rlimits)
-/*[[[body:getrlimit64]]]*/
-{
+/*[[[body:libc_getrlimit64]]]*/
+/*AUTO*/{
 	(void)resource;
 	(void)rlimits;
 	CRT_UNIMPLEMENTED("getrlimit64"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
 #endif /* MAGIC:alias */
-/*[[[end:getrlimit64]]]*/
+/*[[[end:libc_getrlimit64]]]*/
 
-/*[[[head:setrlimit64,hash:CRC-32=0x9cb114d0]]]*/
+/*[[[head:libc_setrlimit64,hash:CRC-32=0xb198cd0b]]]*/
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+DEFINE_INTERN_ALIAS(libc_setrlimit64, libc_setrlimit);
+#else /* MAGIC:alias */
 /* Set the soft and hard limits for RESOURCE to *RLIMITS.
  * Only the super-user can increase hard limits.
  * Return 0 if successful, -1 if not (and sets errno) */
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_setrlimit64, libc_setrlimit);
-#else
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.resource.setrlimit64") int
+INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_setrlimit64)(__rlimit_resource_t resource,
                                        struct rlimit64 const *rlimits)
-/*[[[body:setrlimit64]]]*/
-{
+/*[[[body:libc_setrlimit64]]]*/
+/*AUTO*/{
 	(void)resource;
 	(void)rlimits;
 	CRT_UNIMPLEMENTED("setrlimit64"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
 #endif /* MAGIC:alias */
-/*[[[end:setrlimit64]]]*/
+/*[[[end:libc_setrlimit64]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x181f7199]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(getrlimit, libc_getrlimit);
-DEFINE_PUBLIC_WEAK_ALIAS(setrlimit, libc_setrlimit);
-DEFINE_PUBLIC_WEAK_ALIAS(getrusage, libc_getrusage);
-DEFINE_PUBLIC_WEAK_ALIAS(getpriority, libc_getpriority);
-DEFINE_PUBLIC_WEAK_ALIAS(setpriority, libc_setpriority);
-DEFINE_PUBLIC_WEAK_ALIAS(getrlimit64, libc_getrlimit64);
-DEFINE_PUBLIC_WEAK_ALIAS(setrlimit64, libc_setrlimit64);
+/*[[[start:exports,hash:CRC-32=0xec91bd85]]]*/
+DEFINE_PUBLIC_ALIAS(__getrlimit, libc_getrlimit);
+DEFINE_PUBLIC_ALIAS(getrlimit, libc_getrlimit);
+DEFINE_PUBLIC_ALIAS(setrlimit, libc_setrlimit);
+DEFINE_PUBLIC_ALIAS(getrusage, libc_getrusage);
+DEFINE_PUBLIC_ALIAS(getpriority, libc_getpriority);
+DEFINE_PUBLIC_ALIAS(setpriority, libc_setpriority);
+DEFINE_PUBLIC_ALIAS(getrlimit64, libc_getrlimit64);
+DEFINE_PUBLIC_ALIAS(setrlimit64, libc_setrlimit64);
 /*[[[end:exports]]]*/
 
 DECL_END

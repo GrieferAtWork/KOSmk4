@@ -31,45 +31,43 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:gtty,hash:CRC-32=0xdfabfd4e]]]*/
+/*[[[head:libc_gtty,hash:CRC-32=0xc264f852]]]*/
 /* Fill in *PARAMS with terminal parameters associated with FD */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.gtty") int
+INTERN ATTR_SECTION(".text.crt.database.utmpx") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_gtty)(fd_t fd,
                                 struct sgttyb *params)
-/*[[[body:gtty]]]*/
-{
+/*[[[body:libc_gtty]]]*/
+/*AUTO*/{
 	(void)fd;
 	(void)params;
 	CRT_UNIMPLEMENTED("gtty"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:gtty]]]*/
+/*[[[end:libc_gtty]]]*/
 
-/*[[[head:stty,hash:CRC-32=0x91e6970d]]]*/
+/*[[[head:libc_stty,hash:CRC-32=0x60762401]]]*/
 /* Set the terminal parameters associated with FD to *PARAMS */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.stty") int
+INTERN ATTR_SECTION(".text.crt.database.utmpx") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_stty)(fd_t fd,
                                 struct sgttyb const *params)
-/*[[[body:stty]]]*/
-{
+/*[[[body:libc_stty]]]*/
+/*AUTO*/{
 	(void)fd;
 	(void)params;
 	CRT_UNIMPLEMENTED("stty"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:stty]]]*/
+/*[[[end:libc_stty]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x27273b1]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(gtty, libc_gtty);
-DEFINE_PUBLIC_WEAK_ALIAS(stty, libc_stty);
+/*[[[start:exports,hash:CRC-32=0x974c9a28]]]*/
+DEFINE_PUBLIC_ALIAS(gtty, libc_gtty);
+DEFINE_PUBLIC_ALIAS(stty, libc_stty);
 /*[[[end:exports]]]*/
 
 DECL_END

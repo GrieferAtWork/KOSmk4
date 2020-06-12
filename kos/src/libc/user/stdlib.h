@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13e4b3d1 */
+/* HASH CRC-32:0x7178f4ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,6 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_system)(char const *command);
-INTDEF ATTR_NORETURN void (LIBCCALL libc_abort)(void) THROWS(...);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_exit)(int status) THROWS(...);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_quick_exit)(int status) THROWS(...);
@@ -165,8 +164,6 @@ INTDEF _purecall_handler NOTHROW_NCX(LIBCCALL libc__set_purecall_handler)(_purec
 INTDEF _purecall_handler NOTHROW_NCX(LIBCCALL libc__get_purecall_handler)(void);
 INTDEF _invalid_parameter_handler NOTHROW_NCX(LIBCCALL libc__set_invalid_parameter_handler)(_invalid_parameter_handler __handler);
 INTDEF _invalid_parameter_handler NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void);
-INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_wpgmptr)(char16_t **pvalue);
-INTDEF errno_t NOTHROW_NCX(LIBKCALL libc__get_wpgmptr)(char32_t **pvalue);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW_NCX(LIBCCALL libc___p__fmode)(void);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__set_fmode)(int mode);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_fmode)(int *pmode);

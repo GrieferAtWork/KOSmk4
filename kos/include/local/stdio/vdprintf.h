@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x939d2f54 */
+/* HASH CRC-32:0xc2644e12 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -251,7 +251,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(vdprintf))(__fd_t __fd, char const *_
 	                      (void *)(__UINTPTR_TYPE__)(unsigned int)__fd,
 	                      __format, __args);
 #else /* __SIZEOF_INT__ != __SIZEOF_POINTER__ && !__x86_64__ */
-	return __localdep_format_vprintf((__pformatprinter)&__localdep_write,
+	return __localdep_format_vprintf((__pformatprinter)(void *)&__localdep_write,
 	                      (void *)(__UINTPTR_TYPE__)(unsigned int)__fd,
 	                      __format, __args);
 #endif /* !__SIZEOF_INT__ != __SIZEOF_POINTER__ || __x86_64__ */

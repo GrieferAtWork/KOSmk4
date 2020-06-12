@@ -31,42 +31,42 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getifaddrs,hash:CRC-32=0xe4d9ffa]]]*/
+/*[[[head:libc_getifaddrs,hash:CRC-32=0xe4fd59b1]]]*/
 /* Create a linked list of `struct ifaddrs' structures, one for each
  * network interface on the host machine. If successful, store the
  * list in *IFAP and return 0. On errors, return -1 and set `errno'.
  * The storage returned in *IFAP is allocated dynamically and can
  * only be properly freed by passing it to `freeifaddrs' */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.getifaddrs") int
+INTERN int
 NOTHROW_NCX(LIBCCALL libc_getifaddrs)(struct ifaddrs **ifap)
-/*[[[body:getifaddrs]]]*/
-{
+/*[[[body:libc_getifaddrs]]]*/
+/*AUTO*/{
 	(void)ifap;
 	CRT_UNIMPLEMENTED("getifaddrs"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getifaddrs]]]*/
+/*[[[end:libc_getifaddrs]]]*/
 
-/*[[[head:freeifaddrs,hash:CRC-32=0x90a6ae29]]]*/
+/*[[[head:libc_freeifaddrs,hash:CRC-32=0x11e9f9ac]]]*/
 /* Reclaim the storage allocated by a previous `getifaddrs' call */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.freeifaddrs") void
+INTERN void
 NOTHROW_NCX(LIBCCALL libc_freeifaddrs)(struct ifaddrs *ifa)
-/*[[[body:freeifaddrs]]]*/
-{
+/*[[[body:libc_freeifaddrs]]]*/
+/*AUTO*/{
 	(void)ifa;
 	CRT_UNIMPLEMENTED("freeifaddrs"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:freeifaddrs]]]*/
+/*[[[end:libc_freeifaddrs]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb53e034d]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(getifaddrs, libc_getifaddrs);
-DEFINE_PUBLIC_WEAK_ALIAS(freeifaddrs, libc_freeifaddrs);
+/*[[[start:exports,hash:CRC-32=0x50e02489]]]*/
+DEFINE_PUBLIC_ALIAS(getifaddrs, libc_getifaddrs);
+DEFINE_PUBLIC_ALIAS(freeifaddrs, libc_freeifaddrs);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -31,32 +31,31 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:klogctl,hash:CRC-32=0xd9345e8a]]]*/
-/* Control the kernel's logging facility.  This corresponds exactly to
- * the kernel's syslog system call, but that name is easily confused
- * with the user-level syslog facility, which is something completely
- * different */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.klog.klogctl") int
-NOTHROW_NCX(LIBCCALL libc_klogctl)(int type,
+/*[[[head:libc_klogctl,hash:CRC-32=0x8cb71f37]]]*/
+/* Control the kernel's logging facility.  This corresponds exactly to the
+ * kernel's syslog system call, but that name is easily confused with the
+ * user-level syslog facility, which is something completely different */
+INTERN ATTR_SECTION(".text.crt.utility.klog") int
+NOTHROW_NCX(LIBCCALL libc_klogctl)(__STDC_INT_AS_UINT_T type,
                                    char *bufp,
-                                   int len)
-/*[[[body:klogctl]]]*/
-{
+                                   __STDC_INT_AS_SIZE_T len)
+/*[[[body:libc_klogctl]]]*/
+/*AUTO*/{
 	(void)type;
 	(void)bufp;
 	(void)len;
 	CRT_UNIMPLEMENTED("klogctl"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:klogctl]]]*/
+/*[[[end:libc_klogctl]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbc85017f]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(klogctl, libc_klogctl);
+/*[[[start:exports,hash:CRC-32=0x7159d9e]]]*/
+DEFINE_PUBLIC_ALIAS(klogctl, libc_klogctl);
 /*[[[end:exports]]]*/
 
 DECL_END

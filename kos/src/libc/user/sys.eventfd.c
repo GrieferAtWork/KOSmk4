@@ -32,30 +32,29 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:eventfd,hash:CRC-32=0x317b29e1]]]*/
+/*[[[head:libc_eventfd,hash:CRC-32=0xd8b0888d]]]*/
 /* Return file descriptor for generic event channel. Set initial value to COUNT */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.eventfd.eventfd") fd_t
-NOTHROW_NCX(LIBCCALL libc_eventfd)(unsigned int count,
-                                   int flags)
-/*[[[body:eventfd]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.eventfd") WUNUSED fd_t
+NOTHROW_NCX(LIBCCALL libc_eventfd)(__STDC_UINT_AS_SIZE_T count,
+                                   __STDC_INT_AS_UINT_T flags)
+/*[[[body:libc_eventfd]]]*/
 {
 	fd_t result;
 	result = sys_eventfd2((syscall_ulong_t)count,
 	                      (syscall_ulong_t)flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:eventfd]]]*/
+/*[[[end:libc_eventfd]]]*/
 
-/*[[[head:eventfd_read,hash:CRC-32=0xcb08c7c7]]]*/
+/*[[[head:libc_eventfd_read,hash:CRC-32=0xc626fdce]]]*/
 /* Read event counter and possibly wait for events */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.eventfd.eventfd_read") int
+INTERN ATTR_SECTION(".text.crt.sched.eventfd") int
 NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd,
                                         eventfd_t *value)
-/*[[[body:eventfd_read]]]*/
+/*[[[body:libc_eventfd_read]]]*/
 /*AUTO*/{
 	ssize_t error;
-	error = libc_read(fd, value, sizeof(eventfd_t));
+	error = read(fd, value, sizeof(eventfd_t));
 	if (error == sizeof(eventfd_t))
 		return 0;
 #ifdef EINVAL
@@ -64,17 +63,17 @@ NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd,
 #endif /* EINVAL */
 	return -1;
 }
-/*[[[end:eventfd_read]]]*/
+/*[[[end:libc_eventfd_read]]]*/
 
-/*[[[head:eventfd_write,hash:CRC-32=0xbce4c292]]]*/
+/*[[[head:libc_eventfd_write,hash:CRC-32=0x4590dd0c]]]*/
 /* Increment event counter */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.eventfd.eventfd_write") int
+INTERN ATTR_SECTION(".text.crt.sched.eventfd") int
 NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd,
                                          eventfd_t value)
-/*[[[body:eventfd_write]]]*/
+/*[[[body:libc_eventfd_write]]]*/
 /*AUTO*/{
 	ssize_t error;
-	error = libc_write(fd, &value, sizeof(eventfd_t));
+	error = write(fd, &value, sizeof(eventfd_t));
 	if (error == sizeof(eventfd_t))
 		return 0;
 #ifdef EINVAL
@@ -83,16 +82,16 @@ NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd,
 #endif /* EINVAL */
 	return -1;
 }
-/*[[[end:eventfd_write]]]*/
+/*[[[end:libc_eventfd_write]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x35c0103a]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(eventfd, libc_eventfd);
-DEFINE_PUBLIC_WEAK_ALIAS(eventfd_read, libc_eventfd_read);
-DEFINE_PUBLIC_WEAK_ALIAS(eventfd_write, libc_eventfd_write);
+/*[[[start:exports,hash:CRC-32=0x4fd87928]]]*/
+DEFINE_PUBLIC_ALIAS(eventfd, libc_eventfd);
+DEFINE_PUBLIC_ALIAS(eventfd_read, libc_eventfd_read);
+DEFINE_PUBLIC_ALIAS(eventfd_write, libc_eventfd_write);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfebe28c2 */
+/* HASH CRC-32:0x9271ab61 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,86 +46,137 @@ NOTHROW_NCX(LIBCCALL libc__CrtSetDbgFlag)(int new_flag) {
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) void *
-NOTHROW_NCX(LIBCCALL libc__malloc_dbg)(size_t num_bytes, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__malloc_dbg)(size_t num_bytes,
+                                       int block_type,
+                                       char const *filename,
+                                       int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
 	return malloc(num_bytes);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1, 2)) void *
-NOTHROW_NCX(LIBCCALL libc__calloc_dbg)(size_t count, size_t num_bytes, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__calloc_dbg)(size_t count,
+                                       size_t num_bytes,
+                                       int block_type,
+                                       char const *filename,
+                                       int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
 	return calloc(count, num_bytes);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ALLOC_SIZE((2)) void *
-NOTHROW_NCX(LIBCCALL libc__realloc_dbg)(void *ptr, size_t num_bytes, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__realloc_dbg)(void *ptr,
+                                        size_t num_bytes,
+                                        int block_type,
+                                        char const *filename,
+                                        int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
 	return realloc(ptr, num_bytes);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *
-NOTHROW_NCX(LIBCCALL libc__recalloc_dbg)(void *ptr, size_t count, size_t num_bytes, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__recalloc_dbg)(void *ptr,
+                                         size_t count,
+                                         size_t num_bytes,
+                                         int block_type,
+                                         char const *filename,
+                                         int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
 	return recallocv(ptr, count, num_bytes);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *
-NOTHROW_NCX(LIBCCALL libc__expand_dbg)(void *ptr, size_t num_bytes, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__expand_dbg)(void *ptr,
+                                       size_t num_bytes,
+                                       int block_type,
+                                       char const *filename,
+                                       int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
 	return realloc_in_place(ptr, num_bytes);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") void
-NOTHROW_NCX(LIBCCALL libc__free_dbg)(void *ptr, int block_type) {
+NOTHROW_NCX(LIBCCALL libc__free_dbg)(void *ptr,
+                                     int block_type) {
 	(void)block_type;
 	free(ptr);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_PURE WUNUSED NONNULL((1)) size_t
-NOTHROW_NCX(LIBCCALL libc__msize_dbg)(void *ptr, int block_type) {
+NOTHROW_NCX(LIBCCALL libc__msize_dbg)(void *ptr,
+                                      int block_type) {
 	(void)block_type;
 	return _msize(ptr);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_PURE WUNUSED NONNULL((1)) size_t
-NOTHROW_NCX(LIBCCALL libc__aligned_msize_dbg)(void *ptr, size_t min_alignment, size_t offset) {
+NOTHROW_NCX(LIBCCALL libc__aligned_msize_dbg)(void *ptr,
+                                              size_t min_alignment,
+                                              size_t offset) {
 	return _aligned_msize(ptr, min_alignment, offset);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_MALLOC WUNUSED ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1)) void *
-NOTHROW_NCX(LIBCCALL libc__aligned_malloc_dbg)(size_t num_bytes, size_t min_alignment, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__aligned_malloc_dbg)(size_t num_bytes,
+                                               size_t min_alignment,
+                                               char const *filename,
+                                               int line) {
 	(void)filename;
 	(void)line;
 	return _aligned_malloc(num_bytes, min_alignment);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ALLOC_ALIGN(3) ATTR_ALLOC_SIZE((2)) void *
-NOTHROW_NCX(LIBCCALL libc__aligned_realloc_dbg)(void *ptr, size_t num_bytes, size_t min_alignment, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__aligned_realloc_dbg)(void *ptr,
+                                                size_t num_bytes,
+                                                size_t min_alignment,
+                                                char const *filename,
+                                                int line) {
 	(void)filename;
 	(void)line;
 	return _aligned_realloc(ptr, num_bytes, min_alignment);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ALLOC_ALIGN(4) ATTR_ALLOC_SIZE((2, 3)) void *
-NOTHROW_NCX(LIBCCALL libc__aligned_recalloc_dbg)(void *ptr, size_t count, size_t num_bytes, size_t min_alignment, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__aligned_recalloc_dbg)(void *ptr,
+                                                 size_t count,
+                                                 size_t num_bytes,
+                                                 size_t min_alignment,
+                                                 char const *filename,
+                                                 int line) {
 	(void)filename;
 	(void)line;
 	return _aligned_recalloc(ptr, count, num_bytes, min_alignment);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) void *
-NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc_dbg)(size_t num_bytes, size_t min_alignment, size_t offset, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc_dbg)(size_t num_bytes,
+                                                      size_t min_alignment,
+                                                      size_t offset,
+                                                      char const *filename,
+                                                      int line) {
 	(void)filename;
 	(void)line;
 	return _aligned_offset_malloc(num_bytes, min_alignment, offset);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ALLOC_SIZE((2)) void *
-NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc_dbg)(void *ptr, size_t num_bytes, size_t min_alignment, size_t offset, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc_dbg)(void *ptr,
+                                                       size_t num_bytes,
+                                                       size_t min_alignment,
+                                                       size_t offset,
+                                                       char const *filename,
+                                                       int line) {
 	(void)filename;
 	(void)line;
 	return _aligned_offset_realloc(ptr, num_bytes, min_alignment, offset);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *
-NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc_dbg)(void *ptr, size_t count, size_t num_bytes, size_t min_alignment, size_t offset, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc_dbg)(void *ptr,
+                                                        size_t count,
+                                                        size_t num_bytes,
+                                                        size_t min_alignment,
+                                                        size_t offset,
+                                                        char const *filename,
+                                                        int line) {
 	(void)filename;
 	(void)line;
 	return _aligned_offset_recalloc(ptr, count, num_bytes, min_alignment, offset);
@@ -135,28 +186,42 @@ NOTHROW_NCX(LIBCCALL libc__aligned_free_dbg)(void *ptr) {
 	_aligned_free(ptr);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_MALLOC WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc__strdup_dbg)(char const *string, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__strdup_dbg)(char const *string,
+                                       int block_type,
+                                       char const *filename,
+                                       int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
 	return strdup(string);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_MALLOC WUNUSED __WCHAR16_TYPE__ *
-NOTHROW_NCX(LIBCCALL libc__wcsdup_dbg)(__WCHAR16_TYPE__ const *string, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__wcsdup_dbg)(__WCHAR16_TYPE__ const *string,
+                                       int block_type,
+                                       char const *filename,
+                                       int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
 	return (__WCHAR16_TYPE__ *)c16sdup((char16_t const *)string);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_MALLOC WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc__tempnam_dbg)(char const *dir_name, char const *file_prefix, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__tempnam_dbg)(char const *dir_name,
+                                        char const *file_prefix,
+                                        int block_type,
+                                        char const *filename,
+                                        int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
 	return tempnam(dir_name, file_prefix);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED __WCHAR16_TYPE__ *
-NOTHROW_NCX(LIBCCALL libc__wtempnam_dbg)(__WCHAR16_TYPE__ const *dir_name, __WCHAR16_TYPE__ const *file_prefix, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__wtempnam_dbg)(__WCHAR16_TYPE__ const *dir_name,
+                                         __WCHAR16_TYPE__ const *file_prefix,
+                                         int block_type,
+                                         char const *filename,
+                                         int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
@@ -167,14 +232,24 @@ NOTHROW_NCX(LIBCCALL libc__wtempnam_dbg)(__WCHAR16_TYPE__ const *dir_name, __WCH
 	return NULL;
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED NONNULL((2)) char *
-NOTHROW_NCX(LIBCCALL libc__fullpath_dbg)(char *full_path, char const *path, size_t bufsize, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__fullpath_dbg)(char *full_path,
+                                         char const *path,
+                                         size_t bufsize,
+                                         int block_type,
+                                         char const *filename,
+                                         int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
 	return _fullpath(full_path, path, bufsize);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED NONNULL((2)) __WCHAR16_TYPE__ *
-NOTHROW_NCX(LIBCCALL libc__wfullpath_dbg)(__WCHAR16_TYPE__ *full_path, __WCHAR16_TYPE__ const *path, size_t buflen, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__wfullpath_dbg)(__WCHAR16_TYPE__ *full_path,
+                                          __WCHAR16_TYPE__ const *path,
+                                          size_t buflen,
+                                          int block_type,
+                                          char const *filename,
+                                          int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
@@ -186,28 +261,46 @@ NOTHROW_NCX(LIBCCALL libc__wfullpath_dbg)(__WCHAR16_TYPE__ *full_path, __WCHAR16
 	return NULL;
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc__getcwd_dbg)(char *buf, __STDC_INT_AS_SIZE_T bufsize, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__getcwd_dbg)(char *buf,
+                                       __STDC_INT_AS_SIZE_T bufsize,
+                                       int block_type,
+                                       char const *filename,
+                                       int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
 	return getcwd(buf, (size_t)bufsize);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED __WCHAR16_TYPE__ *
-NOTHROW_NCX(LIBCCALL libc__wgetcwd_dbg)(__WCHAR16_TYPE__ *buf, __STDC_INT_AS_SIZE_T buflen, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__wgetcwd_dbg)(__WCHAR16_TYPE__ *buf,
+                                        __STDC_INT_AS_SIZE_T buflen,
+                                        int block_type,
+                                        char const *filename,
+                                        int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
 	return (__WCHAR16_TYPE__ *)c16getcwd((char16_t *)buf, buflen);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc__getdcwd_dbg)(int driveno, char *buf, __STDC_INT_AS_SIZE_T bufsize, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__getdcwd_dbg)(int driveno,
+                                        char *buf,
+                                        __STDC_INT_AS_SIZE_T bufsize,
+                                        int block_type,
+                                        char const *filename,
+                                        int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
 	return _getdcwd(driveno, buf, bufsize);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED __WCHAR16_TYPE__ *
-NOTHROW_NCX(LIBCCALL libc__wgetdcwd_dbg)(int driveno, __WCHAR16_TYPE__ *buf, __STDC_INT_AS_SIZE_T buflen, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__wgetdcwd_dbg)(int driveno,
+                                         __WCHAR16_TYPE__ *buf,
+                                         __STDC_INT_AS_SIZE_T buflen,
+                                         int block_type,
+                                         char const *filename,
+                                         int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
@@ -219,14 +312,24 @@ NOTHROW_NCX(LIBCCALL libc__wgetdcwd_dbg)(int driveno, __WCHAR16_TYPE__ *buf, __S
 	return NULL;
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _Check_return_wat_ NONNULL((3)) errno_t
-NOTHROW_NCX(LIBCCALL libc__dupenv_s_dbg)(char **pbuf, size_t *pbufsize, char const *varname, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__dupenv_s_dbg)(char **pbuf,
+                                         size_t *pbufsize,
+                                         char const *varname,
+                                         int block_type,
+                                         char const *filename,
+                                         int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
 	return _dupenv_s(pbuf, pbufsize, varname);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _Check_return_wat_ NONNULL((3)) errno_t
-NOTHROW_NCX(LIBCCALL libc__wdupenv_s_dbg)(__WCHAR16_TYPE__ **pbuf, size_t *pbuflen, __WCHAR16_TYPE__ const *varname, int block_type, char const *filename, int line) {
+NOTHROW_NCX(LIBCCALL libc__wdupenv_s_dbg)(__WCHAR16_TYPE__ **pbuf,
+                                          size_t *pbuflen,
+                                          __WCHAR16_TYPE__ const *varname,
+                                          int block_type,
+                                          char const *filename,
+                                          int line) {
 	(void)block_type;
 	(void)filename;
 	(void)line;
@@ -243,13 +346,16 @@ NOTHROW_NCX(LIBCCALL libc__CrtCheckMemory)(void) {
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") NONNULL((1)) void
-NOTHROW_NCX(LIBCCALL libc__CrtDoForAllClientObjects)(_PFNCRTDOFORALLCLIENTOBJECTS pfn, void *context) {
+NOTHROW_NCX(LIBCCALL libc__CrtDoForAllClientObjects)(_PFNCRTDOFORALLCLIENTOBJECTS pfn,
+                                                     void *context) {
 	COMPILER_IMPURE();
 	(void)pfn;
 	(void)context;
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__CrtIsValidPointer)(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes, int writable) {
+NOTHROW_NCX(LIBCCALL libc__CrtIsValidPointer)(void const *ptr,
+                                              __STDC_UINT_AS_SIZE_T num_bytes,
+                                              int writable) {
 	COMPILER_IMPURE();
 	(void)num_bytes;
 	(void)writable;
@@ -261,7 +367,11 @@ NOTHROW_NCX(LIBCCALL libc__CrtIsValidHeapPointer)(void const *heap_ptr) {
 	return heap_ptr != NULL;
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int
-NOTHROW_NCX(LIBCCALL libc__CrtIsMemoryBlock)(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes, __LONG32_TYPE__ *prequest_number, char **filename, int *line) {
+NOTHROW_NCX(LIBCCALL libc__CrtIsMemoryBlock)(void const *ptr,
+                                             __STDC_UINT_AS_SIZE_T num_bytes,
+                                             __LONG32_TYPE__ *prequest_number,
+                                             char **filename,
+                                             int *line) {
 	(void)ptr;
 	(void)num_bytes;
 	if (prequest_number)
@@ -282,7 +392,9 @@ NOTHROW_NCX(LIBCCALL libc__CrtMemCheckpoint)(_CrtMemState *state) {
 	memset(state, 0, sizeof(*state));
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") NONNULL((1, 2, 3)) int
-NOTHROW_NCX(LIBCCALL libc__CrtMemDifference)(_CrtMemState *state, _CrtMemState const *old_state, _CrtMemState const *new_state) {
+NOTHROW_NCX(LIBCCALL libc__CrtMemDifference)(_CrtMemState *state,
+                                             _CrtMemState const *old_state,
+                                             _CrtMemState const *new_state) {
 	(void)old_state;
 	(void)new_state;
 	memset(state, 0, sizeof(*state));
@@ -319,47 +431,47 @@ NOTHROW_NCX(LIBCCALL libc__CrtGetCheckCount)(void) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtSetDbgFlag, libc__CrtSetDbgFlag);
-DEFINE_PUBLIC_WEAK_ALIAS(_malloc_dbg, libc__malloc_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_calloc_dbg, libc__calloc_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_realloc_dbg, libc__realloc_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_recalloc_dbg, libc__recalloc_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_expand_dbg, libc__expand_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_free_dbg, libc__free_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_msize_dbg, libc__msize_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_msize_dbg, libc__aligned_msize_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_malloc_dbg, libc__aligned_malloc_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_realloc_dbg, libc__aligned_realloc_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_recalloc_dbg, libc__aligned_recalloc_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_offset_malloc_dbg, libc__aligned_offset_malloc_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_offset_realloc_dbg, libc__aligned_offset_realloc_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_offset_recalloc_dbg, libc__aligned_offset_recalloc_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_free_dbg, libc__aligned_free_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_strdup_dbg, libc__strdup_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_wcsdup_dbg, libc__wcsdup_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_tempnam_dbg, libc__tempnam_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_wtempnam_dbg, libc__wtempnam_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_fullpath_dbg, libc__fullpath_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_wfullpath_dbg, libc__wfullpath_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_getcwd_dbg, libc__getcwd_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_wgetcwd_dbg, libc__wgetcwd_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_getdcwd_dbg, libc__getdcwd_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_wgetdcwd_dbg, libc__wgetdcwd_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_dupenv_s_dbg, libc__dupenv_s_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_wdupenv_s_dbg, libc__wdupenv_s_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtCheckMemory, libc__CrtCheckMemory);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtDoForAllClientObjects, libc__CrtDoForAllClientObjects);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtIsValidPointer, libc__CrtIsValidPointer);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtIsValidHeapPointer, libc__CrtIsValidHeapPointer);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtIsMemoryBlock, libc__CrtIsMemoryBlock);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtReportBlockType, libc__CrtReportBlockType);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtMemCheckpoint, libc__CrtMemCheckpoint);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtMemDifference, libc__CrtMemDifference);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtMemDumpAllObjectsSince, libc__CrtMemDumpAllObjectsSince);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtMemDumpStatistics, libc__CrtMemDumpStatistics);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtDumpMemoryLeaks, libc__CrtDumpMemoryLeaks);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtSetCheckCount, libc__CrtSetCheckCount);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtGetCheckCount, libc__CrtGetCheckCount);
+DEFINE_PUBLIC_ALIAS(_CrtSetDbgFlag, libc__CrtSetDbgFlag);
+DEFINE_PUBLIC_ALIAS(_malloc_dbg, libc__malloc_dbg);
+DEFINE_PUBLIC_ALIAS(_calloc_dbg, libc__calloc_dbg);
+DEFINE_PUBLIC_ALIAS(_realloc_dbg, libc__realloc_dbg);
+DEFINE_PUBLIC_ALIAS(_recalloc_dbg, libc__recalloc_dbg);
+DEFINE_PUBLIC_ALIAS(_expand_dbg, libc__expand_dbg);
+DEFINE_PUBLIC_ALIAS(_free_dbg, libc__free_dbg);
+DEFINE_PUBLIC_ALIAS(_msize_dbg, libc__msize_dbg);
+DEFINE_PUBLIC_ALIAS(_aligned_msize_dbg, libc__aligned_msize_dbg);
+DEFINE_PUBLIC_ALIAS(_aligned_malloc_dbg, libc__aligned_malloc_dbg);
+DEFINE_PUBLIC_ALIAS(_aligned_realloc_dbg, libc__aligned_realloc_dbg);
+DEFINE_PUBLIC_ALIAS(_aligned_recalloc_dbg, libc__aligned_recalloc_dbg);
+DEFINE_PUBLIC_ALIAS(_aligned_offset_malloc_dbg, libc__aligned_offset_malloc_dbg);
+DEFINE_PUBLIC_ALIAS(_aligned_offset_realloc_dbg, libc__aligned_offset_realloc_dbg);
+DEFINE_PUBLIC_ALIAS(_aligned_offset_recalloc_dbg, libc__aligned_offset_recalloc_dbg);
+DEFINE_PUBLIC_ALIAS(_aligned_free_dbg, libc__aligned_free_dbg);
+DEFINE_PUBLIC_ALIAS(_strdup_dbg, libc__strdup_dbg);
+DEFINE_PUBLIC_ALIAS(_wcsdup_dbg, libc__wcsdup_dbg);
+DEFINE_PUBLIC_ALIAS(_tempnam_dbg, libc__tempnam_dbg);
+DEFINE_PUBLIC_ALIAS(_wtempnam_dbg, libc__wtempnam_dbg);
+DEFINE_PUBLIC_ALIAS(_fullpath_dbg, libc__fullpath_dbg);
+DEFINE_PUBLIC_ALIAS(_wfullpath_dbg, libc__wfullpath_dbg);
+DEFINE_PUBLIC_ALIAS(_getcwd_dbg, libc__getcwd_dbg);
+DEFINE_PUBLIC_ALIAS(_wgetcwd_dbg, libc__wgetcwd_dbg);
+DEFINE_PUBLIC_ALIAS(_getdcwd_dbg, libc__getdcwd_dbg);
+DEFINE_PUBLIC_ALIAS(_wgetdcwd_dbg, libc__wgetdcwd_dbg);
+DEFINE_PUBLIC_ALIAS(_dupenv_s_dbg, libc__dupenv_s_dbg);
+DEFINE_PUBLIC_ALIAS(_wdupenv_s_dbg, libc__wdupenv_s_dbg);
+DEFINE_PUBLIC_ALIAS(_CrtCheckMemory, libc__CrtCheckMemory);
+DEFINE_PUBLIC_ALIAS(_CrtDoForAllClientObjects, libc__CrtDoForAllClientObjects);
+DEFINE_PUBLIC_ALIAS(_CrtIsValidPointer, libc__CrtIsValidPointer);
+DEFINE_PUBLIC_ALIAS(_CrtIsValidHeapPointer, libc__CrtIsValidHeapPointer);
+DEFINE_PUBLIC_ALIAS(_CrtIsMemoryBlock, libc__CrtIsMemoryBlock);
+DEFINE_PUBLIC_ALIAS(_CrtReportBlockType, libc__CrtReportBlockType);
+DEFINE_PUBLIC_ALIAS(_CrtMemCheckpoint, libc__CrtMemCheckpoint);
+DEFINE_PUBLIC_ALIAS(_CrtMemDifference, libc__CrtMemDifference);
+DEFINE_PUBLIC_ALIAS(_CrtMemDumpAllObjectsSince, libc__CrtMemDumpAllObjectsSince);
+DEFINE_PUBLIC_ALIAS(_CrtMemDumpStatistics, libc__CrtMemDumpStatistics);
+DEFINE_PUBLIC_ALIAS(_CrtDumpMemoryLeaks, libc__CrtDumpMemoryLeaks);
+DEFINE_PUBLIC_ALIAS(_CrtSetCheckCount, libc__CrtSetCheckCount);
+DEFINE_PUBLIC_ALIAS(_CrtGetCheckCount, libc__CrtGetCheckCount);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CRTDBG_C */

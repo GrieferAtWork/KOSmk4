@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdeaaa07 */
+/* HASH CRC-32:0x69e369d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,27 +22,27 @@
 #define __local_wcsupr_l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: toupper_l from ctype */
-#ifndef __local___localdep_toupper_l_defined
-#define __local___localdep_toupper_l_defined 1
-#ifdef __CRT_HAVE_toupper_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_toupper_l,(int __ch, __locale_t __locale),toupper_l,(__ch,__locale))
-#elif defined(__CRT_HAVE__toupper_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_toupper_l,(int __ch, __locale_t __locale),_toupper_l,(__ch,__locale))
-#elif defined(__CRT_HAVE___toupper_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_toupper_l,(int __ch, __locale_t __locale),__toupper_l,(__ch,__locale))
+/* Dependency: towupper_l from wctype */
+#ifndef __local___localdep_towupper_l_defined
+#define __local___localdep_towupper_l_defined 1
+#ifdef __CRT_HAVE_towupper_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towupper_l,(__WINT_TYPE__ __wc, __locale_t __locale),towupper_l,(__wc,__locale))
+#elif defined(__CRT_HAVE__towupper_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towupper_l,(__WINT_TYPE__ __wc, __locale_t __locale),_towupper_l,(__wc,__locale))
+#elif defined(__CRT_HAVE___towupper_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towupper_l,(__WINT_TYPE__ __wc, __locale_t __locale),__towupper_l,(__wc,__locale))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <local/ctype/toupper_l.h>
+#include <local/wctype/towupper_l.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_toupper_l __LIBC_LOCAL_NAME(toupper_l)
+#define __localdep_towupper_l __LIBC_LOCAL_NAME(towupper_l)
 #endif /* !... */
-#endif /* !__local___localdep_toupper_l_defined */
+#endif /* !__local___localdep_towupper_l_defined */
 __LOCAL_LIBC(wcsupr_l) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsupr_l))(__WCHAR_TYPE__ *__restrict __str, __locale_t __locale) {
 	__WCHAR_TYPE__ *__iter, __ch;
 	for (__iter = __str; (__ch = *__iter) != '\0'; ++__iter)
-		*__iter = __localdep_toupper_l(__ch, __locale);
+		*__iter = (__WCHAR_TYPE__)__localdep_towupper_l(__ch, __locale);
 	return __str;
 }
 __NAMESPACE_LOCAL_END

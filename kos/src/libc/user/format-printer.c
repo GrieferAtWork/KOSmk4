@@ -34,7 +34,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:format_aprintf_pack,hash:CRC-32=0x9b90612d]]]*/
+/*[[[head:libc_format_aprintf_pack,hash:CRC-32=0xb8949415]]]*/
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
@@ -55,18 +55,17 @@ DECL_BEGIN
  *                  but may differ from `strlen(return)' when NUL characters were
  *                  printed to the aprintf-printer at one point.
  *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_aprintf_pack") char *
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__restrict self,
                                                size_t *pstrlen)
-/*[[[body:format_aprintf_pack]]]*/
+/*[[[body:libc_format_aprintf_pack]]]*/
 /*AUTO*/{
 	/* Free unused buffer memory. */
 	char *result;
 	if (self->ap_avail != 0) {
 #ifdef __CRT_HAVE_realloc
 		char *newbuf;
-		newbuf = (char *)libc_realloc(self->ap_base,
+		newbuf = (char *)realloc(self->ap_base,
 		                         (self->ap_used + 1) *
 		                         sizeof(char));
 		if likely(newbuf)
@@ -76,17 +75,17 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__res
 		if unlikely(!self->ap_used) {
 			/* Special case: Nothing was printed. */
 			__hybrid_assert(!self->ap_base);
-#if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
-			self->ap_base = (char *)libc_malloc(1 * sizeof(char));
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+			self->ap_base = (char *)malloc(1 * sizeof(char));
 			if unlikely(!self->ap_base)
 				return NULL;
 #elif defined(__CRT_HAVE_realloc)
-			self->ap_base = (char *)libc_realloc(NULL, 1 * sizeof(char));
+			self->ap_base = (char *)realloc(NULL, 1 * sizeof(char));
 			if unlikely(!self->ap_base)
 				return NULL;
-#else /* __CRT_HAVE_realloc */
+#else /* ... */
 			return NULL;
-#endif /* !__CRT_HAVE_realloc */
+#endif /* !... */
 		}
 	}
 	result = self->ap_base;
@@ -103,43 +102,41 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__res
 	self->ap_base  = (char *)__UINT64_C(0xcccccccccccccccc);
 	self->ap_avail = __UINT64_C(0xcccccccccccccccc);
 	self->ap_used  = __UINT64_C(0xcccccccccccccccc);
-#endif /* __SIZEOF_POINTER__ == ... */
+#endif /* ... */
 #endif /* !NDEBUG */
 	return result;
 }
-/*[[[end:format_aprintf_pack]]]*/
+/*[[[end:libc_format_aprintf_pack]]]*/
 
-/*[[[head:format_aprintf_printer,hash:CRC-32=0x27da08f9]]]*/
+/*[[[head:libc_format_aprintf_printer,hash:CRC-32=0x66301058]]]*/
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned
  * This function is intended to be used as a pformatprinter-compatibile printer sink */
-INTERN WUNUSED NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_aprintf_printer") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(/*struct format_aprintf_data **/ void *arg,
-                                                  /*utf-8*/ char const *__restrict data,
+INTERN ATTR_SECTION(".text.crt.string.format") WUNUSED NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(void *arg,
+                                                  char const *__restrict data,
                                                   size_t datalen)
-/*[[[body:format_aprintf_printer]]]*/
+/*[[[body:libc_format_aprintf_printer]]]*/
 /*AUTO*/{
 	char *buf;
-	buf = libc_format_aprintf_alloc((struct format_aprintf_data *)arg,
+	buf = format_aprintf_alloc((struct format_aprintf_data *)arg,
 	                           datalen);
 	if unlikely(!buf)
 		return -1;
 	memcpyc(buf, data, datalen, sizeof(char));
 	return (ssize_t)datalen;
 }
-/*[[[end:format_aprintf_printer]]]*/
+/*[[[end:libc_format_aprintf_printer]]]*/
 
-/*[[[head:format_aprintf_alloc,hash:CRC-32=0xb9692050]]]*/
+/*[[[head:libc_format_aprintf_alloc,hash:CRC-32=0x9cbd58df]]]*/
 /* Allocate a buffer of `num_chars' characters at the end of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_aprintf_alloc") char *
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__restrict self,
                                                 size_t num_chars)
-/*[[[body:format_aprintf_alloc]]]*/
+/*[[[body:libc_format_aprintf_alloc]]]*/
 /*AUTO*/{
 	char *result;
 	if (self->ap_avail < num_chars) {
@@ -150,10 +147,10 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__re
 			new_alloc = 8;
 		while (new_alloc < min_alloc)
 			new_alloc *= 2;
-		newbuf = (char *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char));
+		newbuf = (char *)realloc(self->ap_base, (new_alloc + 1) * sizeof(char));
 		if unlikely(!newbuf) {
 			new_alloc = min_alloc;
-			newbuf    = (char *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char));
+			newbuf    = (char *)realloc(self->ap_base, (new_alloc + 1) * sizeof(char));
 			if unlikely(!newbuf)
 				return NULL;
 		}
@@ -166,16 +163,16 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__re
 	self->ap_used  += num_chars;
 	return result;
 }
-/*[[[end:format_aprintf_alloc]]]*/
+/*[[[end:libc_format_aprintf_alloc]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x914031f8]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(format_aprintf_pack, libc_format_aprintf_pack);
-DEFINE_PUBLIC_WEAK_ALIAS(format_aprintf_alloc, libc_format_aprintf_alloc);
-DEFINE_PUBLIC_WEAK_ALIAS(format_aprintf_printer, libc_format_aprintf_printer);
+/*[[[start:exports,hash:CRC-32=0xe758d5ce]]]*/
+DEFINE_PUBLIC_ALIAS(format_aprintf_pack, libc_format_aprintf_pack);
+DEFINE_PUBLIC_ALIAS(format_aprintf_alloc, libc_format_aprintf_alloc);
+DEFINE_PUBLIC_ALIAS(format_aprintf_printer, libc_format_aprintf_printer);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -31,98 +31,94 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:bindresvport,hash:CRC-32=0xfab11b09]]]*/
+/*[[[head:libc_bindresvport,hash:CRC-32=0x4003ad13]]]*/
 /* Bind socket to a privileged IP port */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.bind_reserved.bindresvport") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.bind_reserved") int
 NOTHROW_RPC(LIBCCALL libc_bindresvport)(fd_t sockfd,
                                         struct sockaddr_in *sock_in)
-/*[[[body:bindresvport]]]*/
-{
+/*[[[body:libc_bindresvport]]]*/
+/*AUTO*/{
 	(void)sockfd;
 	(void)sock_in;
 	CRT_UNIMPLEMENTED("bindresvport"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:bindresvport]]]*/
+/*[[[end:libc_bindresvport]]]*/
 
-/*[[[head:bindresvport6,hash:CRC-32=0xb3f3c897]]]*/
+/*[[[head:libc_bindresvport6,hash:CRC-32=0x56418686]]]*/
 /* The IPv6 version of this function */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.bind_reserved.bindresvport6") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.bind_reserved") int
 NOTHROW_RPC(LIBCCALL libc_bindresvport6)(fd_t sockfd,
                                          struct sockaddr_in6 *sock_in)
-/*[[[body:bindresvport6]]]*/
-{
+/*[[[body:libc_bindresvport6]]]*/
+/*AUTO*/{
 	(void)sockfd;
 	(void)sock_in;
 	CRT_UNIMPLEMENTED("bindresvport6"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:bindresvport6]]]*/
+/*[[[end:libc_bindresvport6]]]*/
 
-/*[[[head:inet6_option_space,hash:CRC-32=0x9c9db436]]]*/
+/*[[[head:libc_inet6_option_space,hash:CRC-32=0xdaf7bb26]]]*/
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
-INTERN ATTR_DEPRECATED_
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_2292.inet6_option_space") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_2292") ATTR_DEPRECATED_ int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_space)(int nbytes)
-/*[[[body:inet6_option_space]]]*/
-{
+/*[[[body:libc_inet6_option_space]]]*/
+/*AUTO*/{
 	(void)nbytes;
 	CRT_UNIMPLEMENTED("inet6_option_space"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_option_space]]]*/
+/*[[[end:libc_inet6_option_space]]]*/
 
-/*[[[head:inet6_option_init,hash:CRC-32=0x8fc5380d]]]*/
+/*[[[head:libc_inet6_option_init,hash:CRC-32=0xedc2d7c2]]]*/
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
-INTERN ATTR_DEPRECATED_
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_2292.inet6_option_init") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_2292") ATTR_DEPRECATED_ int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_init)(void *bp,
                                                  struct cmsghdr **cmsgp,
                                                  int type)
-/*[[[body:inet6_option_init]]]*/
-{
+/*[[[body:libc_inet6_option_init]]]*/
+/*AUTO*/{
 	(void)bp;
 	(void)cmsgp;
 	(void)type;
 	CRT_UNIMPLEMENTED("inet6_option_init"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_option_init]]]*/
+/*[[[end:libc_inet6_option_init]]]*/
 
-/*[[[head:inet6_option_append,hash:CRC-32=0x11458101]]]*/
+/*[[[head:libc_inet6_option_append,hash:CRC-32=0x54b54a8e]]]*/
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
-INTERN ATTR_DEPRECATED_
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_2292.inet6_option_append") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_2292") ATTR_DEPRECATED_ int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_append)(struct cmsghdr *cmsg,
                                                    uint8_t const *typep,
                                                    int multx,
                                                    int plusy)
-/*[[[body:inet6_option_append]]]*/
-{
+/*[[[body:libc_inet6_option_append]]]*/
+/*AUTO*/{
 	(void)cmsg;
 	(void)typep;
 	(void)multx;
 	(void)plusy;
 	CRT_UNIMPLEMENTED("inet6_option_append"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_option_append]]]*/
+/*[[[end:libc_inet6_option_append]]]*/
 
-/*[[[head:inet6_option_alloc,hash:CRC-32=0xf5e405e2]]]*/
+/*[[[head:libc_inet6_option_alloc,hash:CRC-32=0x641f649f]]]*/
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
-INTERN ATTR_DEPRECATED_
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_2292.inet6_option_alloc") uint8_t *
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_2292") ATTR_DEPRECATED_ uint8_t *
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_alloc)(struct cmsghdr *cmsg,
                                                   int datalen,
                                                   int multx,
                                                   int plusy)
-/*[[[body:inet6_option_alloc]]]*/
-{
+/*[[[body:libc_inet6_option_alloc]]]*/
+/*AUTO*/{
 	(void)cmsg;
 	(void)datalen;
 	(void)multx;
@@ -131,60 +127,58 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_alloc)(struct cmsghdr *cmsg,
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:inet6_option_alloc]]]*/
+/*[[[end:libc_inet6_option_alloc]]]*/
 
-/*[[[head:inet6_option_next,hash:CRC-32=0x324c15fd]]]*/
+/*[[[head:libc_inet6_option_next,hash:CRC-32=0xa9713de0]]]*/
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
-INTERN ATTR_DEPRECATED_
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_2292.inet6_option_next") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_2292") ATTR_DEPRECATED_ int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_next)(struct cmsghdr const *cmsg,
                                                  uint8_t **tptrp)
-/*[[[body:inet6_option_next]]]*/
-{
+/*[[[body:libc_inet6_option_next]]]*/
+/*AUTO*/{
 	(void)cmsg;
 	(void)tptrp;
 	CRT_UNIMPLEMENTED("inet6_option_next"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_option_next]]]*/
+/*[[[end:libc_inet6_option_next]]]*/
 
-/*[[[head:inet6_option_find,hash:CRC-32=0x7894c466]]]*/
+/*[[[head:libc_inet6_option_find,hash:CRC-32=0x6afbcfca]]]*/
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
-INTERN ATTR_DEPRECATED_
-ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_2292.inet6_option_find") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_2292") ATTR_DEPRECATED_ int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_find)(struct cmsghdr const *cmsg,
                                                  uint8_t **tptrp,
                                                  int type)
-/*[[[body:inet6_option_find]]]*/
-{
+/*[[[body:libc_inet6_option_find]]]*/
+/*AUTO*/{
 	(void)cmsg;
 	(void)tptrp;
 	(void)type;
 	CRT_UNIMPLEMENTED("inet6_option_find"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_option_find]]]*/
+/*[[[end:libc_inet6_option_find]]]*/
 
-/*[[[head:inet6_opt_init,hash:CRC-32=0x275263c0]]]*/
+/*[[[head:libc_inet6_opt_init,hash:CRC-32=0xf0e93adc]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_init") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_3542") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_init)(void *extbuf,
                                               socklen_t extlen)
-/*[[[body:inet6_opt_init]]]*/
-{
+/*[[[body:libc_inet6_opt_init]]]*/
+/*AUTO*/{
 	(void)extbuf;
 	(void)extlen;
 	CRT_UNIMPLEMENTED("inet6_opt_init"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_opt_init]]]*/
+/*[[[end:libc_inet6_opt_init]]]*/
 
-/*[[[head:inet6_opt_append,hash:CRC-32=0x2410fcb2]]]*/
+/*[[[head:libc_inet6_opt_append,hash:CRC-32=0xb70dd4d9]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_append") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_3542") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_append)(void *extbuf,
                                                 socklen_t extlen,
                                                 int offset,
@@ -192,8 +186,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_append)(void *extbuf,
                                                 socklen_t len,
                                                 uint8_t align,
                                                 void **databufp)
-/*[[[body:inet6_opt_append]]]*/
-{
+/*[[[body:libc_inet6_opt_append]]]*/
+/*AUTO*/{
 	(void)extbuf;
 	(void)extlen;
 	(void)offset;
@@ -203,57 +197,57 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_append)(void *extbuf,
 	(void)databufp;
 	CRT_UNIMPLEMENTED("inet6_opt_append"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_opt_append]]]*/
+/*[[[end:libc_inet6_opt_append]]]*/
 
-/*[[[head:inet6_opt_finish,hash:CRC-32=0x6fd0c98b]]]*/
+/*[[[head:libc_inet6_opt_finish,hash:CRC-32=0x8420822e]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_finish") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_3542") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_finish)(void *extbuf,
                                                 socklen_t extlen,
                                                 int offset)
-/*[[[body:inet6_opt_finish]]]*/
-{
+/*[[[body:libc_inet6_opt_finish]]]*/
+/*AUTO*/{
 	(void)extbuf;
 	(void)extlen;
 	(void)offset;
 	CRT_UNIMPLEMENTED("inet6_opt_finish"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_opt_finish]]]*/
+/*[[[end:libc_inet6_opt_finish]]]*/
 
-/*[[[head:inet6_opt_set_val,hash:CRC-32=0xc538d4a4]]]*/
+/*[[[head:libc_inet6_opt_set_val,hash:CRC-32=0x64eac87e]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_set_val") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_3542") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_set_val)(void *databuf,
                                                  int offset,
                                                  void *val,
                                                  socklen_t vallen)
-/*[[[body:inet6_opt_set_val]]]*/
-{
+/*[[[body:libc_inet6_opt_set_val]]]*/
+/*AUTO*/{
 	(void)databuf;
 	(void)offset;
 	(void)val;
 	(void)vallen;
 	CRT_UNIMPLEMENTED("inet6_opt_set_val"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_opt_set_val]]]*/
+/*[[[end:libc_inet6_opt_set_val]]]*/
 
-/*[[[head:inet6_opt_next,hash:CRC-32=0xac69f704]]]*/
+/*[[[head:libc_inet6_opt_next,hash:CRC-32=0xc4e63f9b]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_next") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_3542") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_next)(void *extbuf,
                                               socklen_t extlen,
                                               int offset,
                                               uint8_t *typep,
                                               socklen_t *lenp,
                                               void **databufp)
-/*[[[body:inet6_opt_next]]]*/
-{
+/*[[[body:libc_inet6_opt_next]]]*/
+/*AUTO*/{
 	(void)extbuf;
 	(void)extlen;
 	(void)offset;
@@ -262,21 +256,21 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_next)(void *extbuf,
 	(void)databufp;
 	CRT_UNIMPLEMENTED("inet6_opt_next"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_opt_next]]]*/
+/*[[[end:libc_inet6_opt_next]]]*/
 
-/*[[[head:inet6_opt_find,hash:CRC-32=0xd1308eb0]]]*/
+/*[[[head:libc_inet6_opt_find,hash:CRC-32=0x976bc0eb]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_find") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_3542") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_find)(void *extbuf,
                                               socklen_t extlen,
                                               int offset,
                                               uint8_t type,
                                               socklen_t *lenp,
                                               void **databufp)
-/*[[[body:inet6_opt_find]]]*/
-{
+/*[[[body:libc_inet6_opt_find]]]*/
+/*AUTO*/{
 	(void)extbuf;
 	(void)extlen;
 	(void)offset;
@@ -285,53 +279,53 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_find)(void *extbuf,
 	(void)databufp;
 	CRT_UNIMPLEMENTED("inet6_opt_find"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_opt_find]]]*/
+/*[[[end:libc_inet6_opt_find]]]*/
 
-/*[[[head:inet6_opt_get_val,hash:CRC-32=0x54598588]]]*/
+/*[[[head:libc_inet6_opt_get_val,hash:CRC-32=0x2d5f9fa7]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_get_val") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_3542") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_get_val)(void *databuf,
                                                  int offset,
                                                  void *val,
                                                  socklen_t vallen)
-/*[[[body:inet6_opt_get_val]]]*/
-{
+/*[[[body:libc_inet6_opt_get_val]]]*/
+/*AUTO*/{
 	(void)databuf;
 	(void)offset;
 	(void)val;
 	(void)vallen;
 	CRT_UNIMPLEMENTED("inet6_opt_get_val"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_opt_get_val]]]*/
+/*[[[end:libc_inet6_opt_get_val]]]*/
 
-/*[[[head:inet6_rth_space,hash:CRC-32=0xd9a39ba3]]]*/
+/*[[[head:libc_inet6_rth_space,hash:CRC-32=0x6f9b13e8]]]*/
 /* Routing Header Option (RFC 3542) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_rth_space") socklen_t
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_3542") socklen_t
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_space)(int type,
                                                int segments)
-/*[[[body:inet6_rth_space]]]*/
-{
+/*[[[body:libc_inet6_rth_space]]]*/
+/*AUTO*/{
 	(void)type;
 	(void)segments;
 	CRT_UNIMPLEMENTED("inet6_rth_space"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:inet6_rth_space]]]*/
+/*[[[end:libc_inet6_rth_space]]]*/
 
-/*[[[head:inet6_rth_init,hash:CRC-32=0x1afe122d]]]*/
+/*[[[head:libc_inet6_rth_init,hash:CRC-32=0x7faa461d]]]*/
 /* Routing Header Option (RFC 3542) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_rth_init") void *
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_3542") void *
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_init)(void *bp,
                                               socklen_t bp_len,
                                               int type,
                                               int segments)
-/*[[[body:inet6_rth_init]]]*/
-{
+/*[[[body:libc_inet6_rth_init]]]*/
+/*AUTO*/{
 	(void)bp;
 	(void)bp_len;
 	(void)type;
@@ -340,77 +334,77 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_init)(void *bp,
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:inet6_rth_init]]]*/
+/*[[[end:libc_inet6_rth_init]]]*/
 
-/*[[[head:inet6_rth_add,hash:CRC-32=0xab75a3c7]]]*/
+/*[[[head:libc_inet6_rth_add,hash:CRC-32=0xb736d318]]]*/
 /* Routing Header Option (RFC 3542) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_rth_add") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_3542") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_add)(void *bp,
                                              struct in6_addr const *addr)
-/*[[[body:inet6_rth_add]]]*/
-{
+/*[[[body:libc_inet6_rth_add]]]*/
+/*AUTO*/{
 	(void)bp;
 	(void)addr;
 	CRT_UNIMPLEMENTED("inet6_rth_add"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_rth_add]]]*/
+/*[[[end:libc_inet6_rth_add]]]*/
 
-/*[[[head:inet6_rth_reverse,hash:CRC-32=0x206f1701]]]*/
+/*[[[head:libc_inet6_rth_reverse,hash:CRC-32=0xa6b48827]]]*/
 /* Routing Header Option (RFC 3542) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_rth_reverse") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_3542") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_reverse)(void const *in,
                                                  void *out)
-/*[[[body:inet6_rth_reverse]]]*/
-{
+/*[[[body:libc_inet6_rth_reverse]]]*/
+/*AUTO*/{
 	(void)in;
 	(void)out;
 	CRT_UNIMPLEMENTED("inet6_rth_reverse"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_rth_reverse]]]*/
+/*[[[end:libc_inet6_rth_reverse]]]*/
 
-/*[[[head:inet6_rth_segments,hash:CRC-32=0x6d19fb8f]]]*/
+/*[[[head:libc_inet6_rth_segments,hash:CRC-32=0x18999078]]]*/
 /* Routing Header Option (RFC 3542) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_rth_segments") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_3542") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_segments)(void const *bp)
-/*[[[body:inet6_rth_segments]]]*/
-{
+/*[[[body:libc_inet6_rth_segments]]]*/
+/*AUTO*/{
 	(void)bp;
 	CRT_UNIMPLEMENTED("inet6_rth_segments"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet6_rth_segments]]]*/
+/*[[[end:libc_inet6_rth_segments]]]*/
 
-/*[[[head:inet6_rth_getaddr,hash:CRC-32=0x141d119b]]]*/
+/*[[[head:libc_inet6_rth_getaddr,hash:CRC-32=0xe005a9fe]]]*/
 /* Routing Header Option (RFC 3542) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_rth_getaddr") struct in6_addr *
+INTERN ATTR_SECTION(".text.crt.net.inet.6.RFC_3542") struct in6_addr *
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_getaddr)(void const *bp,
                                                  int index)
-/*[[[body:inet6_rth_getaddr]]]*/
-{
+/*[[[body:libc_inet6_rth_getaddr]]]*/
+/*AUTO*/{
 	(void)bp;
 	(void)index;
 	CRT_UNIMPLEMENTED("inet6_rth_getaddr"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:inet6_rth_getaddr]]]*/
+/*[[[end:libc_inet6_rth_getaddr]]]*/
 
-/*[[[head:getipv4sourcefilter,hash:CRC-32=0x393a6d7f]]]*/
+/*[[[head:libc_getipv4sourcefilter,hash:CRC-32=0xfaa3aef2]]]*/
 /* Get IPv4 source filter */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.ipv4_source_filter.getipv4sourcefilter") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.ipv4_source_filter") int
 NOTHROW_RPC_KOS(LIBCCALL libc_getipv4sourcefilter)(fd_t sockfd,
                                                    struct in_addr interface_addr,
                                                    struct in_addr group,
                                                    uint32_t *fmode,
                                                    uint32_t *numsrc,
                                                    struct in_addr *slist)
-/*[[[body:getipv4sourcefilter]]]*/
-{
+/*[[[body:libc_getipv4sourcefilter]]]*/
+/*AUTO*/{
 	(void)sockfd;
 	(void)interface_addr;
 	(void)group;
@@ -419,21 +413,21 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getipv4sourcefilter)(fd_t sockfd,
 	(void)slist;
 	CRT_UNIMPLEMENTED("getipv4sourcefilter"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getipv4sourcefilter]]]*/
+/*[[[end:libc_getipv4sourcefilter]]]*/
 
-/*[[[head:setipv4sourcefilter,hash:CRC-32=0x2cfe631b]]]*/
+/*[[[head:libc_setipv4sourcefilter,hash:CRC-32=0x2040ffab]]]*/
 /* Set IPv4 source filter */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.ipv4_source_filter.setipv4sourcefilter") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.ipv4_source_filter") int
 NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd,
                                                    struct in_addr interface_addr,
                                                    struct in_addr group,
                                                    uint32_t fmode,
                                                    uint32_t numsrc,
                                                    struct in_addr const *slist)
-/*[[[body:setipv4sourcefilter]]]*/
-{
+/*[[[body:libc_setipv4sourcefilter]]]*/
+/*AUTO*/{
 	(void)sockfd;
 	(void)interface_addr;
 	(void)group;
@@ -442,13 +436,13 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd,
 	(void)slist;
 	CRT_UNIMPLEMENTED("setipv4sourcefilter"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:setipv4sourcefilter]]]*/
+/*[[[end:libc_setipv4sourcefilter]]]*/
 
-/*[[[head:getsourcefilter,hash:CRC-32=0xb61f7b9e]]]*/
+/*[[[head:libc_getsourcefilter,hash:CRC-32=0x9f200748]]]*/
 /* Get source filter */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.source_filter.getsourcefilter") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.source_filter") int
 NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd,
                                                uint32_t interface_addr,
                                                struct sockaddr const *group,
@@ -456,8 +450,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd,
                                                uint32_t *fmode,
                                                uint32_t *numsrc,
                                                struct sockaddr_storage *slist)
-/*[[[body:getsourcefilter]]]*/
-{
+/*[[[body:libc_getsourcefilter]]]*/
+/*AUTO*/{
 	(void)sockfd;
 	(void)interface_addr;
 	(void)group;
@@ -467,13 +461,13 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd,
 	(void)slist;
 	CRT_UNIMPLEMENTED("getsourcefilter"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getsourcefilter]]]*/
+/*[[[end:libc_getsourcefilter]]]*/
 
-/*[[[head:setsourcefilter,hash:CRC-32=0x97f63420]]]*/
+/*[[[head:libc_setsourcefilter,hash:CRC-32=0xfca2b7c3]]]*/
 /* Set source filter */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.source_filter.setsourcefilter") int
+INTERN ATTR_SECTION(".text.crt.net.inet.6.source_filter") int
 NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd,
                                                uint32_t interface_addr,
                                                struct sockaddr const *group,
@@ -481,8 +475,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd,
                                                uint32_t fmode,
                                                uint32_t numsrc,
                                                struct sockaddr_storage const *slist)
-/*[[[body:setsourcefilter]]]*/
-{
+/*[[[body:libc_setsourcefilter]]]*/
+/*AUTO*/{
 	(void)sockfd;
 	(void)interface_addr;
 	(void)group;
@@ -492,40 +486,40 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd,
 	(void)slist;
 	CRT_UNIMPLEMENTED("setsourcefilter"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:setsourcefilter]]]*/
+/*[[[end:libc_setsourcefilter]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe3ae14f4]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(bindresvport, libc_bindresvport);
-DEFINE_PUBLIC_WEAK_ALIAS(bindresvport6, libc_bindresvport6);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_option_space, libc_inet6_option_space);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_option_init, libc_inet6_option_init);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_option_append, libc_inet6_option_append);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_option_alloc, libc_inet6_option_alloc);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_option_next, libc_inet6_option_next);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_option_find, libc_inet6_option_find);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_opt_init, libc_inet6_opt_init);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_opt_append, libc_inet6_opt_append);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_opt_finish, libc_inet6_opt_finish);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_opt_set_val, libc_inet6_opt_set_val);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_opt_next, libc_inet6_opt_next);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_opt_find, libc_inet6_opt_find);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_opt_get_val, libc_inet6_opt_get_val);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_rth_space, libc_inet6_rth_space);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_rth_init, libc_inet6_rth_init);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_rth_add, libc_inet6_rth_add);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_rth_reverse, libc_inet6_rth_reverse);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_rth_segments, libc_inet6_rth_segments);
-DEFINE_PUBLIC_WEAK_ALIAS(inet6_rth_getaddr, libc_inet6_rth_getaddr);
-DEFINE_PUBLIC_WEAK_ALIAS(getipv4sourcefilter, libc_getipv4sourcefilter);
-DEFINE_PUBLIC_WEAK_ALIAS(setipv4sourcefilter, libc_setipv4sourcefilter);
-DEFINE_PUBLIC_WEAK_ALIAS(getsourcefilter, libc_getsourcefilter);
-DEFINE_PUBLIC_WEAK_ALIAS(setsourcefilter, libc_setsourcefilter);
+/*[[[start:exports,hash:CRC-32=0x411506f3]]]*/
+DEFINE_PUBLIC_ALIAS(bindresvport, libc_bindresvport);
+DEFINE_PUBLIC_ALIAS(bindresvport6, libc_bindresvport6);
+DEFINE_PUBLIC_ALIAS(inet6_option_space, libc_inet6_option_space);
+DEFINE_PUBLIC_ALIAS(inet6_option_init, libc_inet6_option_init);
+DEFINE_PUBLIC_ALIAS(inet6_option_append, libc_inet6_option_append);
+DEFINE_PUBLIC_ALIAS(inet6_option_alloc, libc_inet6_option_alloc);
+DEFINE_PUBLIC_ALIAS(inet6_option_next, libc_inet6_option_next);
+DEFINE_PUBLIC_ALIAS(inet6_option_find, libc_inet6_option_find);
+DEFINE_PUBLIC_ALIAS(inet6_opt_init, libc_inet6_opt_init);
+DEFINE_PUBLIC_ALIAS(inet6_opt_append, libc_inet6_opt_append);
+DEFINE_PUBLIC_ALIAS(inet6_opt_finish, libc_inet6_opt_finish);
+DEFINE_PUBLIC_ALIAS(inet6_opt_set_val, libc_inet6_opt_set_val);
+DEFINE_PUBLIC_ALIAS(inet6_opt_next, libc_inet6_opt_next);
+DEFINE_PUBLIC_ALIAS(inet6_opt_find, libc_inet6_opt_find);
+DEFINE_PUBLIC_ALIAS(inet6_opt_get_val, libc_inet6_opt_get_val);
+DEFINE_PUBLIC_ALIAS(inet6_rth_space, libc_inet6_rth_space);
+DEFINE_PUBLIC_ALIAS(inet6_rth_init, libc_inet6_rth_init);
+DEFINE_PUBLIC_ALIAS(inet6_rth_add, libc_inet6_rth_add);
+DEFINE_PUBLIC_ALIAS(inet6_rth_reverse, libc_inet6_rth_reverse);
+DEFINE_PUBLIC_ALIAS(inet6_rth_segments, libc_inet6_rth_segments);
+DEFINE_PUBLIC_ALIAS(inet6_rth_getaddr, libc_inet6_rth_getaddr);
+DEFINE_PUBLIC_ALIAS(getipv4sourcefilter, libc_getipv4sourcefilter);
+DEFINE_PUBLIC_ALIAS(setipv4sourcefilter, libc_setipv4sourcefilter);
+DEFINE_PUBLIC_ALIAS(getsourcefilter, libc_getsourcefilter);
+DEFINE_PUBLIC_ALIAS(setsourcefilter, libc_setsourcefilter);
 /*[[[end:exports]]]*/
 
 DECL_END

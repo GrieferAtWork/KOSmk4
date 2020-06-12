@@ -33,14 +33,13 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:poll,hash:CRC-32=0x45d8570e]]]*/
+/*[[[head:libc_poll,hash:CRC-32=0xe87b09d0]]]*/
 /* @param timeout: Timeout in milliseconds (or negative for infinity) */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.poll") int
+INTERN ATTR_SECTION(".text.crt.io.poll") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_poll)(struct pollfd *fds,
                                 nfds_t nfds,
                                 int timeout)
-/*[[[body:poll]]]*/
+/*[[[body:libc_poll]]]*/
 {
 	struct timespec64 tms;
 	if (timeout < 0)
@@ -49,51 +48,49 @@ NOTHROW_RPC(LIBCCALL libc_poll)(struct pollfd *fds,
 	tms.tv_nsec = ((unsigned int)timeout % 1000) * (__NSECS_PER_SEC / 1000);
 	return ppoll64(fds, nfds, &tms, NULL);
 }
-/*[[[end:poll]]]*/
+/*[[[end:libc_poll]]]*/
 
-/*[[[head:ppoll,hash:CRC-32=0xbbec0961]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.ppoll") int
+/*[[[head:libc_ppoll,hash:CRC-32=0x3a69f9fa]]]*/
+INTERN ATTR_SECTION(".text.crt.io.poll") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_ppoll)(struct pollfd *fds,
                                  nfds_t nfds,
                                  struct timespec const *timeout,
                                  sigset_t const *ss)
-/*[[[body:ppoll]]]*/
+/*[[[body:libc_ppoll]]]*/
 {
 	syscall_slong_t result;
 	result = sys_ppoll(fds, (size_t)nfds, timeout, ss, sizeof(sigset_t));
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:ppoll]]]*/
+/*[[[end:libc_ppoll]]]*/
 
-/*[[[head:ppoll64,hash:CRC-32=0x9297f185]]]*/
+/*[[[head:libc_ppoll64,hash:CRC-32=0x4252ba72]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ppoll64, libc_ppoll);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.ppoll64") int
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.io.poll") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_ppoll64)(struct pollfd *fds,
                                    nfds_t nfds,
                                    struct timespec64 const *timeout,
                                    sigset_t const *ss)
-/*[[[body:ppoll64]]]*/
+/*[[[body:libc_ppoll64]]]*/
 {
 	syscall_slong_t result;
 	result = sys_ppoll64(fds, (size_t)nfds, timeout, ss, sizeof(sigset_t));
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:ppoll64]]]*/
+/*[[[end:libc_ppoll64]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x81df5e06]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(poll, libc_poll);
-DEFINE_PUBLIC_WEAK_ALIAS(__poll, libc_poll);
-DEFINE_PUBLIC_WEAK_ALIAS(ppoll, libc_ppoll);
-DEFINE_PUBLIC_WEAK_ALIAS(ppoll64, libc_ppoll64);
+/*[[[start:exports,hash:CRC-32=0xc439b09b]]]*/
+DEFINE_PUBLIC_ALIAS(__poll, libc_poll);
+DEFINE_PUBLIC_ALIAS(poll, libc_poll);
+DEFINE_PUBLIC_ALIAS(ppoll, libc_ppoll);
+DEFINE_PUBLIC_ALIAS(ppoll64, libc_ppoll64);
 /*[[[end:exports]]]*/
 
 DECL_END

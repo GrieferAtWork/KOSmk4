@@ -36,7 +36,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getrandom,hash:CRC-32=0x8b2e1e8c]]]*/
+/*[[[head:libc_getrandom,hash:CRC-32=0x17d362f6]]]*/
 /* Ask the kernel for up to `NUM_BYTES' bytes of random data, which
  * should then be written to `BUFFER'.
  * @param: FLAGS: Set of `GRND_NONBLOCK | GRND_RANDOM'
@@ -47,12 +47,11 @@ DECL_BEGIN
  *                calling thread being interrupted, EINTR is only set
  *                if no random data had already been retrieved from
  *                the kernel's random data sink. */
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.random.getrandom") ssize_t
+INTERN ATTR_SECTION(".text.crt.system.random") WUNUSED NONNULL((1)) ssize_t
 NOTHROW_NCX(LIBCCALL libc_getrandom)(void *buf,
                                      size_t num_bytes,
                                      unsigned int flags)
-/*[[[body:getrandom]]]*/
+/*[[[body:libc_getrandom]]]*/
 {
 #ifdef SYS_getrandom
 	ssize_t result;
@@ -80,9 +79,9 @@ err:
 	return -1;
 #endif /* !SYS_getrandom */
 }
-/*[[[end:getrandom]]]*/
+/*[[[end:libc_getrandom]]]*/
 
-/*[[[head:getentropy,hash:CRC-32=0x1ff663ce]]]*/
+/*[[[head:libc_getentropy,hash:CRC-32=0x79cf97b1]]]*/
 /* Similar to `getrandom(BUF, NUM_BYTES, GRND_RANDOM)', however
  * the case where the calling thread is interrupted, causing an
  * less than `NUM_BYTES' of data to be read is handled by reading
@@ -93,16 +92,15 @@ err:
  * Also note that any other than `EFAULT' and `ENOSYS' are translated into `EIO'
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.random.getentropy") int
+INTERN ATTR_SECTION(".text.crt.system.random") WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_getentropy)(void *buf,
                                       size_t num_bytes)
-/*[[[body:getentropy]]]*/
+/*[[[body:libc_getentropy]]]*/
 /*AUTO*/{
 	size_t result = 0;
 	ssize_t temp;
 	while (result < num_bytes) {
-		temp = libc_getrandom((byte_t *)buf + result,
+		temp = getrandom((byte_t *)buf + result,
 		                 num_bytes - result,
 		                 GRND_RANDOM);
 		if (temp < 0) {
@@ -118,15 +116,15 @@ NOTHROW_NCX(LIBCCALL libc_getentropy)(void *buf,
 err:
 	return -1;
 }
-/*[[[end:getentropy]]]*/
+/*[[[end:libc_getentropy]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x52a90821]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(getrandom, libc_getrandom);
-DEFINE_PUBLIC_WEAK_ALIAS(getentropy, libc_getentropy);
+/*[[[start:exports,hash:CRC-32=0x52c4e2e3]]]*/
+DEFINE_PUBLIC_ALIAS(getrandom, libc_getrandom);
+DEFINE_PUBLIC_ALIAS(getentropy, libc_getentropy);
 /*[[[end:exports]]]*/
 
 DECL_END

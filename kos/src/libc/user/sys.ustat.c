@@ -32,23 +32,22 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:ustat,hash:CRC-32=0x7e56b8b1]]]*/
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.ustat") int
+/*[[[head:libc_ustat,hash:CRC-32=0x301ef744]]]*/
+INTERN NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_ustat)(dev_t dev,
                                  struct ustat *ubuf)
-/*[[[body:ustat]]]*/
+/*[[[body:libc_ustat]]]*/
 {
 	errno_t result;
 	result = sys_ustat(dev, ubuf);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:ustat]]]*/
+/*[[[end:libc_ustat]]]*/
 
 /*[[[end:implementation]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xe88b8b47]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(ustat, libc_ustat);
+/*[[[start:exports,hash:CRC-32=0x61eff38c]]]*/
+DEFINE_PUBLIC_ALIAS(ustat, libc_ustat);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -445,7 +445,7 @@ NOTHROW_NCX(LIBCCALL libc___posix_getopt)(int argc,
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getopt,hash:CRC-32=0xf8d530e2]]]*/
+/*[[[head:libc_getopt,hash:CRC-32=0xae650c5]]]*/
 /* Return the option character from OPTS just read.  Return -1 when
  * there are no more options.  For unrecognized options, or options
  * missing arguments, `optopt' is set to the option letter, and '?' is
@@ -461,12 +461,11 @@ NOTHROW_NCX(LIBCCALL libc___posix_getopt)(int argc,
  * - If OPTS begins with `--', then non-option arguments are treated as
  *   arguments to the option '\0'.  This behavior is specific to the GNU
  *   `getopt' */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.application.options.getopt") int
+INTERN ATTR_SECTION(".text.crt.application.options") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_getopt)(int argc,
                                   char *const argv[],
                                   char const *shortopts)
-/*[[[body:getopt]]]*/
+/*[[[body:libc_getopt]]]*/
 {
 	return _getopt_internal_r(argc,
 	                          (char **)argv,
@@ -476,17 +475,31 @@ NOTHROW_NCX(LIBCCALL libc_getopt)(int argc,
 	                          0,
 	                          0);
 }
-/*[[[end:getopt]]]*/
+/*[[[end:libc_getopt]]]*/
 
-/*[[[head:getopt_long,hash:CRC-32=0xe5690ba6]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.application.options.getopt_long") int
+/*[[[head:libc_getopt_long,hash:CRC-32=0x94bf339]]]*/
+/* Return the option character from OPTS just read.  Return -1 when
+ * there are no more options.  For unrecognized options, or options
+ * missing arguments, `optopt' is set to the option letter, and '?' is
+ * returned.
+ * - The OPTS string is a list of characters which are recognized option
+ *   letters, optionally followed by colons, specifying that that letter
+ *   takes an argument, to be placed in `optarg'.
+ * - If a letter in OPTS is followed by two colons, its argument is
+ *   optional.  This behavior is specific to the GNU `getopt'.
+ * - The argument `--' causes premature termination of argument
+ *   scanning, explicitly telling `getopt' that there are no more
+ *   options.
+ * - If OPTS begins with `--', then non-option arguments are treated as
+ *   arguments to the option '\0'.  This behavior is specific to the GNU
+ *   `getopt' */
+INTERN ATTR_SECTION(".text.crt.application.options") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_getopt_long)(int argc,
                                        char *const argv[],
                                        char const *shortopts,
                                        struct option const *longopts,
                                        int *longind)
-/*[[[body:getopt_long]]]*/
+/*[[[body:libc_getopt_long]]]*/
 {
 	return _getopt_internal_r(argc,
 	                          (char **)argv,
@@ -496,17 +509,31 @@ NOTHROW_NCX(LIBCCALL libc_getopt_long)(int argc,
 	                          0,
 	                          0);
 }
-/*[[[end:getopt_long]]]*/
+/*[[[end:libc_getopt_long]]]*/
 
-/*[[[head:getopt_long_only,hash:CRC-32=0x784a30b2]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.application.options.getopt_long_only") int
+/*[[[head:libc_getopt_long_only,hash:CRC-32=0x42c5ac14]]]*/
+/* Return the option character from OPTS just read.  Return -1 when
+ * there are no more options.  For unrecognized options, or options
+ * missing arguments, `optopt' is set to the option letter, and '?' is
+ * returned.
+ * - The OPTS string is a list of characters which are recognized option
+ *   letters, optionally followed by colons, specifying that that letter
+ *   takes an argument, to be placed in `optarg'.
+ * - If a letter in OPTS is followed by two colons, its argument is
+ *   optional.  This behavior is specific to the GNU `getopt'.
+ * - The argument `--' causes premature termination of argument
+ *   scanning, explicitly telling `getopt' that there are no more
+ *   options.
+ * - If OPTS begins with `--', then non-option arguments are treated as
+ *   arguments to the option '\0'.  This behavior is specific to the GNU
+ *   `getopt' */
+INTERN ATTR_SECTION(".text.crt.application.options") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_getopt_long_only)(int argc,
                                             char *const argv[],
                                             char const *shortopts,
                                             struct option const *longopts,
                                             int *longind)
-/*[[[body:getopt_long_only]]]*/
+/*[[[body:libc_getopt_long_only]]]*/
 {
 	return _getopt_internal_r(argc,
 	                          (char **)argv,
@@ -516,16 +543,16 @@ NOTHROW_NCX(LIBCCALL libc_getopt_long_only)(int argc,
 	                          1,
 	                          0);
 }
-/*[[[end:getopt_long_only]]]*/
+/*[[[end:libc_getopt_long_only]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7cead5e3]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(getopt, libc_getopt);
-DEFINE_PUBLIC_WEAK_ALIAS(getopt_long, libc_getopt_long);
-DEFINE_PUBLIC_WEAK_ALIAS(getopt_long_only, libc_getopt_long_only);
+/*[[[start:exports,hash:CRC-32=0xbacef226]]]*/
+DEFINE_PUBLIC_ALIAS(getopt, libc_getopt);
+DEFINE_PUBLIC_ALIAS(getopt_long, libc_getopt_long);
+DEFINE_PUBLIC_ALIAS(getopt_long_only, libc_getopt_long_only);
 /*[[[end:exports]]]*/
 
 DECL_END

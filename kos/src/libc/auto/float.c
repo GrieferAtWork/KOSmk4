@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d8df131 */
+/* HASH CRC-32:0x381bf171 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ NOTHROW(LIBCCALL libc__chgsign)(double x) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(_chgsign, libc__chgsign);
+DEFINE_PUBLIC_ALIAS(_chgsign, libc__chgsign);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FLOAT_C */

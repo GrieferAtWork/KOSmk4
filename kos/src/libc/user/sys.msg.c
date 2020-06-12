@@ -31,48 +31,48 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:msgctl,hash:CRC-32=0x2e14daed]]]*/
+/*[[[head:libc_msgctl,hash:CRC-32=0xf717f6e0]]]*/
 /* Message queue control operation */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.msg.msgctl") int
+INTERN ATTR_SECTION(".text.crt.sched.msg") int
 NOTHROW_NCX(LIBCCALL libc_msgctl)(int msqid,
-                                  int cmd,
+                                  __STDC_INT_AS_UINT_T cmd,
                                   struct msqid_ds *buf)
-/*[[[body:msgctl]]]*/
-{
+/*[[[body:libc_msgctl]]]*/
+/*AUTO*/{
 	(void)msqid;
 	(void)cmd;
 	(void)buf;
 	CRT_UNIMPLEMENTED("msgctl"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:msgctl]]]*/
+/*[[[end:libc_msgctl]]]*/
 
-/*[[[head:msgget,hash:CRC-32=0xb918008d]]]*/
+/*[[[head:libc_msgget,hash:CRC-32=0x3b93d677]]]*/
 /* Get messages queue */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.msg.msgget") int
+INTERN ATTR_SECTION(".text.crt.sched.msg") int
 NOTHROW_NCX(LIBCCALL libc_msgget)(key_t key,
-                                  int msgflg)
-/*[[[body:msgget]]]*/
-{
+                                  __STDC_INT_AS_UINT_T msgflg)
+/*[[[body:libc_msgget]]]*/
+/*AUTO*/{
 	(void)key;
 	(void)msgflg;
 	CRT_UNIMPLEMENTED("msgget"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:msgget]]]*/
+/*[[[end:libc_msgget]]]*/
 
-/*[[[head:msgrcv,hash:CRC-32=0xf3780846]]]*/
+/*[[[head:libc_msgrcv,hash:CRC-32=0x7f9751e6]]]*/
 /* Receive message from message queue */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.msg.msgrcv") ssize_t
+INTERN ATTR_SECTION(".text.crt.sched.msg") ssize_t
 NOTHROW_RPC(LIBCCALL libc_msgrcv)(int msqid,
                                   void *msgp,
                                   size_t msgsz,
                                   longptr_t msgtyp,
-                                  int msgflg)
-/*[[[body:msgrcv]]]*/
-{
+                                  __STDC_INT_AS_UINT_T msgflg)
+/*[[[body:libc_msgrcv]]]*/
+/*AUTO*/{
 	(void)msqid;
 	(void)msgp;
 	(void)msgsz;
@@ -80,38 +80,38 @@ NOTHROW_RPC(LIBCCALL libc_msgrcv)(int msqid,
 	(void)msgflg;
 	CRT_UNIMPLEMENTED("msgrcv"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:msgrcv]]]*/
+/*[[[end:libc_msgrcv]]]*/
 
-/*[[[head:msgsnd,hash:CRC-32=0x4b0dd8b0]]]*/
+/*[[[head:libc_msgsnd,hash:CRC-32=0x2749a6da]]]*/
 /* Send message to message queue */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.msg.msgsnd") int
+INTERN ATTR_SECTION(".text.crt.sched.msg") int
 NOTHROW_RPC(LIBCCALL libc_msgsnd)(int msqid,
                                   const void *msgp,
                                   size_t msgsz,
-                                  int msgflg)
-/*[[[body:msgsnd]]]*/
-{
+                                  __STDC_INT_AS_UINT_T msgflg)
+/*[[[body:libc_msgsnd]]]*/
+/*AUTO*/{
 	(void)msqid;
 	(void)msgp;
 	(void)msgsz;
 	(void)msgflg;
 	CRT_UNIMPLEMENTED("msgsnd"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:msgsnd]]]*/
+/*[[[end:libc_msgsnd]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xd4606b2c]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(msgctl, libc_msgctl);
-DEFINE_PUBLIC_WEAK_ALIAS(msgget, libc_msgget);
-DEFINE_PUBLIC_WEAK_ALIAS(msgrcv, libc_msgrcv);
-DEFINE_PUBLIC_WEAK_ALIAS(msgsnd, libc_msgsnd);
+/*[[[start:exports,hash:CRC-32=0x5e2c04b0]]]*/
+DEFINE_PUBLIC_ALIAS(msgctl, libc_msgctl);
+DEFINE_PUBLIC_ALIAS(msgget, libc_msgget);
+DEFINE_PUBLIC_ALIAS(msgrcv, libc_msgrcv);
+DEFINE_PUBLIC_ALIAS(msgsnd, libc_msgsnd);
 /*[[[end:exports]]]*/
 
 DECL_END

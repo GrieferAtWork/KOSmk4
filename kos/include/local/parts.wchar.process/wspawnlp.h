@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x156bd3aa */
+/* HASH CRC-32:0xa83d2d9b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wspawnlp) __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(wspawnlp))(int __mode, __WCHAR_TYPE__ const *__restrict __file, __WCHAR_TYPE__ const *__args, ...) {
-	__REDIRECT_SPAWNLP(__WCHAR_TYPE__, __localdep_wspawnvp, __mode, __file, __args)
+	__REDIRECT_SPAWNL(__WCHAR_TYPE__, __localdep_wspawnvp, __mode, __file, __args)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wspawnlp_defined

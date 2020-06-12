@@ -32,25 +32,25 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:reboot,hash:CRC-32=0xc06314be]]]*/
+/*[[[head:libc_reboot,hash:CRC-32=0x7a5a0c26]]]*/
 /* Reboot or halt the system
  * @param: howto: One of the `RB_*' constants above */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.reboot.reboot") int
-NOTHROW_NCX(LIBCCALL libc_reboot)(int howto)
-/*[[[body:reboot]]]*/
+INTERN ATTR_SECTION(".text.crt.system.reboot") int
+NOTHROW_NCX(LIBCCALL libc_reboot)(__STDC_INT_AS_UINT_T howto)
+/*[[[body:libc_reboot]]]*/
 {
 	errno_t error;
 	error = sys_reboot((syscall_ulong_t)(unsigned int)howto);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:reboot]]]*/
+/*[[[end:libc_reboot]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4d62a40e]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(reboot, libc_reboot);
+/*[[[start:exports,hash:CRC-32=0x2679280]]]*/
+DEFINE_PUBLIC_ALIAS(reboot, libc_reboot);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -35,13 +35,10 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:Malloc,hash:CRC-32=0x9063a437]]]*/
-/* @throws: E_BADALLOC: ... */
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Malloc") void *
-(LIBCCALL libc_Malloc)(size_t num_bytes)
-		__THROWS(E_BADALLOC)
-/*[[[body:Malloc]]]*/
+/*[[[head:libc_Malloc,hash:CRC-32=0x1d1e4071]]]*/
+INTERN ATTR_SECTION(".text.crt.except.heap.malloc") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1)) void *
+(LIBCCALL libc_Malloc)(size_t num_bytes) THROWS(E_BADALLOC)
+/*[[[body:libc_Malloc]]]*/
 {
 	void *result;
 	result = malloc(num_bytes);
@@ -49,16 +46,13 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Malloc") void *
 		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes);
 	return result;
 }
-/*[[[end:Malloc]]]*/
+/*[[[end:libc_Malloc]]]*/
 
-/*[[[head:Calloc,hash:CRC-32=0x15fc407e]]]*/
-/* @throws: E_BADALLOC: ... */
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Calloc") void *
+/*[[[head:libc_Calloc,hash:CRC-32=0xf88a9ecf]]]*/
+INTERN ATTR_SECTION(".text.crt.except.heap.malloc") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1, 2)) void *
 (LIBCCALL libc_Calloc)(size_t count,
-                       size_t num_bytes)
-		__THROWS(E_BADALLOC)
-/*[[[body:Calloc]]]*/
+                       size_t num_bytes) THROWS(E_BADALLOC)
+/*[[[body:libc_Calloc]]]*/
 {
 	void *result;
 	result = calloc(count, num_bytes);
@@ -70,16 +64,13 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Calloc") void *
 	}
 	return result;
 }
-/*[[[end:Calloc]]]*/
+/*[[[end:libc_Calloc]]]*/
 
-/*[[[head:Realloc,hash:CRC-32=0x2c3082e7]]]*/
-/* @throws: E_BADALLOC: ... */
-INTERN ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Realloc") void *
+/*[[[head:libc_Realloc,hash:CRC-32=0x8a517edf]]]*/
+INTERN ATTR_SECTION(".text.crt.except.heap.malloc") ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2)) void *
 (LIBCCALL libc_Realloc)(void *mallptr,
-                        size_t num_bytes)
-		__THROWS(E_BADALLOC)
-/*[[[body:Realloc]]]*/
+                        size_t num_bytes) THROWS(E_BADALLOC)
+/*[[[body:libc_Realloc]]]*/
 {
 	void *result;
 	result = realloc(mallptr, num_bytes);
@@ -87,16 +78,13 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Realloc") void *
 		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes);
 	return result;
 }
-/*[[[end:Realloc]]]*/
+/*[[[end:libc_Realloc]]]*/
 
-/*[[[head:Memalign,hash:CRC-32=0xb7ad3dab]]]*/
-/* @throws: E_BADALLOC: ... */
-INTERN ATTR_MALLOC ATTR_RETNONNULL WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_ALLOC_SIZE((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Memalign") void *
+/*[[[head:libc_Memalign,hash:CRC-32=0x86a07a71]]]*/
+INTERN ATTR_SECTION(".text.crt.except.heap.malloc") ATTR_MALLOC ATTR_RETNONNULL WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_ALLOC_SIZE((2)) void *
 (LIBCCALL libc_Memalign)(size_t alignment,
-                         size_t num_bytes)
-		__THROWS(E_BADALLOC)
-/*[[[body:Memalign]]]*/
+                         size_t num_bytes) THROWS(E_BADALLOC)
+/*[[[body:libc_Memalign]]]*/
 {
 	void *result;
 	result = memalign(alignment, num_bytes);
@@ -104,15 +92,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Memalign") void *
 		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes);
 	return result;
 }
-/*[[[end:Memalign]]]*/
+/*[[[end:libc_Memalign]]]*/
 
-/*[[[head:PValloc,hash:CRC-32=0xfe5a199]]]*/
-/* @throws: E_BADALLOC: ... */
-INTERN ATTR_MALLOC ATTR_MALL_PAGEALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.PValloc") void *
-(LIBCCALL libc_PValloc)(size_t num_bytes)
-		__THROWS(E_BADALLOC)
-/*[[[body:PValloc]]]*/
+/*[[[head:libc_PValloc,hash:CRC-32=0xa7b75305]]]*/
+INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_RETNONNULL WUNUSED __ATTR_MALL_PAGEALIGNED ATTR_ALLOC_SIZE((1)) void *
+(LIBCCALL libc_PValloc)(size_t num_bytes) THROWS(E_BADALLOC)
+/*[[[body:libc_PValloc]]]*/
 {
 	void *result;
 	result = pvalloc(num_bytes);
@@ -120,15 +105,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.PValloc") void *
 		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes);
 	return result;
 }
-/*[[[end:PValloc]]]*/
+/*[[[end:libc_PValloc]]]*/
 
-/*[[[head:Valloc,hash:CRC-32=0x6a5d2657]]]*/
-/* @throws: E_BADALLOC: ... */
-INTERN ATTR_MALLOC ATTR_MALL_PAGEALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.Valloc") void *
-(LIBCCALL libc_Valloc)(size_t num_bytes)
-		__THROWS(E_BADALLOC)
-/*[[[body:Valloc]]]*/
+/*[[[head:libc_Valloc,hash:CRC-32=0xd09a829e]]]*/
+INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_RETNONNULL WUNUSED __ATTR_MALL_PAGEALIGNED ATTR_ALLOC_SIZE((1)) void *
+(LIBCCALL libc_Valloc)(size_t num_bytes) THROWS(E_BADALLOC)
+/*[[[body:libc_Valloc]]]*/
 {
 	void *result;
 	result = valloc(num_bytes);
@@ -136,16 +118,13 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.Valloc") void *
 		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes);
 	return result;
 }
-/*[[[end:Valloc]]]*/
+/*[[[end:libc_Valloc]]]*/
 
-/*[[[head:Memdup,hash:CRC-32=0xceca1e4f]]]*/
-/* @throws: E_BADALLOC: ... */
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.Memdup") void *
+/*[[[head:libc_Memdup,hash:CRC-32=0x6692dc85]]]*/
+INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *
 (LIBCCALL libc_Memdup)(void const *__restrict ptr,
-                       size_t num_bytes)
-		__THROWS(E_BADALLOC)
-/*[[[body:Memdup]]]*/
+                       size_t num_bytes) THROWS(E_BADALLOC)
+/*[[[body:libc_Memdup]]]*/
 {
 	void *result;
 	result = memdup(ptr, num_bytes);
@@ -153,17 +132,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.Memdup") void *
 		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes);
 	return result;
 }
-/*[[[end:Memdup]]]*/
+/*[[[end:libc_Memdup]]]*/
 
-/*[[[head:Memcdup,hash:CRC-32=0x9252cbec]]]*/
+/*[[[head:libc_Memcdup,hash:CRC-32=0x61260375]]]*/
 /* @throws: E_BADALLOC: ... */
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.Memcdup") void *
+INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
 (LIBCCALL libc_Memcdup)(void const *__restrict ptr,
                         int needle,
-                        size_t num_bytes)
-		__THROWS(E_BADALLOC)
-/*[[[body:Memcdup]]]*/
+                        size_t num_bytes) THROWS(E_BADALLOC)
+/*[[[body:libc_Memcdup]]]*/
 {
 	if likely(num_bytes) {
 		void const *endaddr;
@@ -173,21 +150,21 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.Memcdup") void *
 	}
 	return Memdup(ptr, num_bytes);
 }
-/*[[[end:Memcdup]]]*/
+/*[[[end:libc_Memcdup]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1e5e31f6]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(Malloc, libc_Malloc);
-DEFINE_PUBLIC_WEAK_ALIAS(Calloc, libc_Calloc);
-DEFINE_PUBLIC_WEAK_ALIAS(Realloc, libc_Realloc);
-DEFINE_PUBLIC_WEAK_ALIAS(Memalign, libc_Memalign);
-DEFINE_PUBLIC_WEAK_ALIAS(PValloc, libc_PValloc);
-DEFINE_PUBLIC_WEAK_ALIAS(Valloc, libc_Valloc);
-DEFINE_PUBLIC_WEAK_ALIAS(Memdup, libc_Memdup);
-DEFINE_PUBLIC_WEAK_ALIAS(Memcdup, libc_Memcdup);
+/*[[[start:exports,hash:CRC-32=0xebd79f79]]]*/
+DEFINE_PUBLIC_ALIAS(Malloc, libc_Malloc);
+DEFINE_PUBLIC_ALIAS(Calloc, libc_Calloc);
+DEFINE_PUBLIC_ALIAS(Realloc, libc_Realloc);
+DEFINE_PUBLIC_ALIAS(Memalign, libc_Memalign);
+DEFINE_PUBLIC_ALIAS(PValloc, libc_PValloc);
+DEFINE_PUBLIC_ALIAS(Valloc, libc_Valloc);
+DEFINE_PUBLIC_ALIAS(Memdup, libc_Memdup);
+DEFINE_PUBLIC_ALIAS(Memcdup, libc_Memcdup);
 /*[[[end:exports]]]*/
 
 DECL_END

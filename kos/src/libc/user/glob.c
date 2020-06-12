@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:glob,hash:CRC-32=0xb987b302]]]*/
+/*[[[head:libc_glob,hash:CRC-32=0xaa9e134f]]]*/
 /* Do glob searching for PATTERN, placing results in PGLOB.
  * The bits defined above may be set in FLAGS.
  * If a directory cannot be opened or read and ERRFUNC is not nil,
@@ -40,13 +40,12 @@ DECL_BEGIN
  * `glob' returns GLOB_ABEND; if it returns zero, the error is ignored.
  * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
  * Otherwise, `glob' returns zero */
-INTERN NONNULL((1, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.utility.glob.glob") int
+INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1, 4)) int
 NOTHROW_NCX(LIBCCALL libc_glob)(char const *__restrict pattern,
                                 int flags,
                                 __glob_errfunc_t errfunc,
                                 glob_t *__restrict pglob)
-/*[[[body:glob]]]*/
+/*[[[body:libc_glob]]]*/
 {
 	(void)pattern;
 	(void)flags;
@@ -56,22 +55,21 @@ NOTHROW_NCX(LIBCCALL libc_glob)(char const *__restrict pattern,
 	/* TODO */
 	return GLOB_NOSYS;
 }
-/*[[[end:glob]]]*/
+/*[[[end:libc_glob]]]*/
 
-/*[[[head:globfree,hash:CRC-32=0xc49448d2]]]*/
+/*[[[head:libc_globfree,hash:CRC-32=0xe8b659c9]]]*/
 /* Free storage allocated in PGLOB by a previous `glob' call */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.utility.glob.globfree") void
+INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob)
-/*[[[body:globfree]]]*/
+/*[[[body:libc_globfree]]]*/
 {
 	(void)pglob;
 	CRT_UNIMPLEMENTED("globfree"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:globfree]]]*/
+/*[[[end:libc_globfree]]]*/
 
-/*[[[head:glob64,hash:CRC-32=0x31ff354e]]]*/
+/*[[[head:libc_glob64,hash:CRC-32=0x3dac10fb]]]*/
 /* Do glob searching for PATTERN, placing results in PGLOB.
  * The bits defined above may be set in FLAGS.
  * If a directory cannot be opened or read and ERRFUNC is not nil,
@@ -80,13 +78,12 @@ NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob)
  * `glob' returns GLOB_ABEND; if it returns zero, the error is ignored.
  * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
  * Otherwise, `glob' returns zero */
-INTERN NONNULL((1, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.utility.glob.glob64") int
+INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1, 4)) int
 NOTHROW_NCX(LIBCCALL libc_glob64)(const char *__restrict pattern,
                                   int flags,
                                   __glob_errfunc_t errfunc,
                                   struct __glob64_struct *__restrict pglob)
-/*[[[body:glob64]]]*/
+/*[[[body:libc_glob64]]]*/
 {
 	(void)pattern;
 	(void)flags;
@@ -96,30 +93,29 @@ NOTHROW_NCX(LIBCCALL libc_glob64)(const char *__restrict pattern,
 	/* TODO */
 	return GLOB_NOSYS;
 }
-/*[[[end:glob64]]]*/
+/*[[[end:libc_glob64]]]*/
 
-/*[[[head:globfree64,hash:CRC-32=0xe87aae80]]]*/
+/*[[[head:libc_globfree64,hash:CRC-32=0x25fe68c5]]]*/
 /* Free storage allocated in PGLOB by a previous `glob' call */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.utility.glob.globfree64") void
+INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_globfree64)(struct __glob64_struct *pglob)
-/*[[[body:globfree64]]]*/
+/*[[[body:libc_globfree64]]]*/
 {
 	(void)pglob;
 	CRT_UNIMPLEMENTED("globfree64"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:globfree64]]]*/
+/*[[[end:libc_globfree64]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x5affe86d]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(glob, libc_glob);
-DEFINE_PUBLIC_WEAK_ALIAS(globfree, libc_globfree);
-DEFINE_PUBLIC_WEAK_ALIAS(glob64, libc_glob64);
-DEFINE_PUBLIC_WEAK_ALIAS(globfree64, libc_globfree64);
+/*[[[start:exports,hash:CRC-32=0x3798dee4]]]*/
+DEFINE_PUBLIC_ALIAS(glob, libc_glob);
+DEFINE_PUBLIC_ALIAS(globfree, libc_globfree);
+DEFINE_PUBLIC_ALIAS(glob64, libc_glob64);
+DEFINE_PUBLIC_ALIAS(globfree64, libc_globfree64);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -26,47 +26,36 @@
 DECL_BEGIN
 
 
-
-
-
-/*[[[start:implementation]]]*/
-
-
-
-
-
-
-
-/*[[[head:inet_pton,hash:CRC-32=0x537a65dd]]]*/
+/*[[[head:libc_inet_pton,hash:CRC-32=0xe889b2c2]]]*/
 /* Convert from presentation format of an Internet number in buffer
  * starting at CP to the binary network format and store result for
  * interface type AF in buffer starting at BUF */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_pton") int
+INTERN ATTR_SECTION(".text.crt.net.inet") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_pton)(int af,
                                          char const *__restrict cp,
                                          void *__restrict buf)
-/*[[[body:inet_pton]]]*/
-{
+/*[[[body:libc_inet_pton]]]*/
+/*AUTO*/{
 	(void)af;
 	(void)cp;
 	(void)buf;
 	CRT_UNIMPLEMENTED("inet_pton"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet_pton]]]*/
+/*[[[end:libc_inet_pton]]]*/
 
-/*[[[head:inet_ntop,hash:CRC-32=0x6bc41ef7]]]*/
+/*[[[head:libc_inet_ntop,hash:CRC-32=0xbc87c43f]]]*/
 /* Convert a Internet address in binary network format for interface
  * type AF in buffer starting at CP to presentation form and place
  * result in buffer of length LEN starting at BUF */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_ntop") char const *
+INTERN ATTR_SECTION(".text.crt.net.inet") char const *
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntop)(int af,
                                          void const *__restrict cp,
                                          char *__restrict buf,
                                          socklen_t len)
-/*[[[body:inet_ntop]]]*/
-{
+/*[[[body:libc_inet_ntop]]]*/
+/*AUTO*/{
 	(void)af;
 	(void)cp;
 	(void)buf;
@@ -75,21 +64,21 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntop)(int af,
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:inet_ntop]]]*/
+/*[[[end:libc_inet_ntop]]]*/
 
 
 
-/*[[[head:inet_net_ntop,hash:CRC-32=0x87c1ed22]]]*/
+/*[[[head:libc_inet_net_ntop,hash:CRC-32=0x8b638e10]]]*/
 /* Convert network number for interface type AF in buffer starting at CP
  * to presentation format. The result will specify BITS bits of the number */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_net_ntop") char *
+INTERN ATTR_SECTION(".text.crt.net.inet") char *
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_ntop)(int af,
                                              void const *cp,
                                              int bits,
                                              char *buf,
                                              size_t len)
-/*[[[body:inet_net_ntop]]]*/
-{
+/*[[[body:libc_inet_net_ntop]]]*/
+/*AUTO*/{
 	(void)af;
 	(void)cp;
 	(void)bits;
@@ -99,37 +88,37 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_ntop)(int af,
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:inet_net_ntop]]]*/
+/*[[[end:libc_inet_net_ntop]]]*/
 
-/*[[[head:inet_net_pton,hash:CRC-32=0xbb662b9e]]]*/
+/*[[[head:libc_inet_net_pton,hash:CRC-32=0xfe918308]]]*/
 /* Convert network number for interface type AF from presentation in buffer starting
  * at CP to network format and store result int buffer starting at BUF of size LEN */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_net_pton") int
+INTERN ATTR_SECTION(".text.crt.net.inet") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_pton)(int af,
                                              char const *cp,
                                              void *buf,
                                              size_t len)
-/*[[[body:inet_net_pton]]]*/
-{
+/*[[[body:libc_inet_net_pton]]]*/
+/*AUTO*/{
 	(void)af;
 	(void)cp;
 	(void)buf;
 	(void)len;
 	CRT_UNIMPLEMENTED("inet_net_pton"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:inet_net_pton]]]*/
+/*[[[end:libc_inet_net_pton]]]*/
 
-/*[[[head:inet_nsap_addr,hash:CRC-32=0xb379172f]]]*/
+/*[[[head:libc_inet_nsap_addr,hash:CRC-32=0x47e82d78]]]*/
 /* Convert ASCII representation in hexadecimal form of the Internet address
  * to binary form and place result in buffer of length LEN starting at BUF */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_nsap_addr") unsigned int
+INTERN ATTR_SECTION(".text.crt.net.inet") unsigned int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_addr)(char const *cp,
                                               unsigned char *buf,
                                               int len)
-/*[[[body:inet_nsap_addr]]]*/
-{
+/*[[[body:libc_inet_nsap_addr]]]*/
+/*AUTO*/{
 	(void)cp;
 	(void)buf;
 	(void)len;
@@ -137,17 +126,21 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_addr)(char const *cp,
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:inet_nsap_addr]]]*/
+/*[[[end:libc_inet_nsap_addr]]]*/
 
-/*[[[head:inet_nsap_ntoa,hash:CRC-32=0x37f0e109]]]*/
+
+
+
+
+/*[[[head:libc_inet_nsap_ntoa,hash:CRC-32=0xf5ad2200]]]*/
 /* Convert internet address in binary form in LEN bytes
  * starting at CP a presentation form and place result in BUF */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_nsap_ntoa") char *
+INTERN ATTR_SECTION(".text.crt.net.inet") char *
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_ntoa)(int len,
                                               unsigned char const *cp,
                                               char *buf)
-/*[[[body:inet_nsap_ntoa]]]*/
-{
+/*[[[body:libc_inet_nsap_ntoa]]]*/
+/*AUTO*/{
 	(void)len;
 	(void)cp;
 	(void)buf;
@@ -155,19 +148,17 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_ntoa)(int len,
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:inet_nsap_ntoa]]]*/
-
-/*[[[end:implementation]]]*/
+/*[[[end:libc_inet_nsap_ntoa]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x2bdd37d7]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(inet_net_ntop, libc_inet_net_ntop);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_net_pton, libc_inet_net_pton);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_nsap_addr, libc_inet_nsap_addr);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_nsap_ntoa, libc_inet_nsap_ntoa);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_pton, libc_inet_pton);
-DEFINE_PUBLIC_WEAK_ALIAS(inet_ntop, libc_inet_ntop);
+/*[[[start:exports,hash:CRC-32=0xb02206ab]]]*/
+DEFINE_PUBLIC_ALIAS(inet_net_ntop, libc_inet_net_ntop);
+DEFINE_PUBLIC_ALIAS(inet_net_pton, libc_inet_net_pton);
+DEFINE_PUBLIC_ALIAS(inet_nsap_addr, libc_inet_nsap_addr);
+DEFINE_PUBLIC_ALIAS(inet_nsap_ntoa, libc_inet_nsap_ntoa);
+DEFINE_PUBLIC_ALIAS(inet_pton, libc_inet_pton);
+DEFINE_PUBLIC_ALIAS(inet_ntop, libc_inet_ntop);
 /*[[[end:exports]]]*/
 
 DECL_END

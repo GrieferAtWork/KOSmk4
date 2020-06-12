@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e469b2f */
+/* HASH CRC-32:0xd5a58a70 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,9 @@ NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void) {
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
 INTERN ATTR_SECTION(".text.crt.string.memory") NONNULL((1, 2)) void
-NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from, void *__restrict to, __STDC_INT_AS_SSIZE_T n_bytes) {
+NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
+                                void *__restrict to,
+                                __STDC_INT_AS_SSIZE_T n_bytes) {
 	n_bytes &= ~1;
 	while (n_bytes >= 2) {
 		byte_t a, b;
@@ -64,11 +66,11 @@ NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from, void *__restrict to
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(__getpagesize, libc_getpagesize);
-DEFINE_PUBLIC_WEAK_ALIAS(getpagesize, libc_getpagesize);
-DEFINE_PUBLIC_WEAK_ALIAS(getdtablesize, libc_getdtablesize);
-DEFINE_PUBLIC_WEAK_ALIAS(_swab, libc_swab);
-DEFINE_PUBLIC_WEAK_ALIAS(swab, libc_swab);
+DEFINE_PUBLIC_ALIAS(__getpagesize, libc_getpagesize);
+DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
+DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
+DEFINE_PUBLIC_ALIAS(_swab, libc_swab);
+DEFINE_PUBLIC_ALIAS(swab, libc_swab);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_UNISTD_C */

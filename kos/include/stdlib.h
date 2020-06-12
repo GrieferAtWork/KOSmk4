@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ff6e0bc */
+/* HASH CRC-32:0x8f8ed6eb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -685,6 +685,11 @@ __CDECLARE_VOID(__ATTR_NORETURN,__THROWING,abort,(void),())
 __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,abort,(void),_ZSt9terminatev,())
 #elif defined(__CRT_HAVE_$Qterminate$A$AYAXXZ)
 __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,abort,(void),?terminate@@YAXXZ,())
+#elif defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)
+__NAMESPACE_STD_END
+#include <local/stdlib/abort.h>
+__NAMESPACE_STD_BEGIN
+__NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abort))(); })
 #else /* ... */
 #undef __std_abort_defined
 #endif /* !... */
@@ -2588,6 +2593,9 @@ __CDECLARE(,errno_t,__NOTHROW_NCX,_get_wpgmptr,(wchar_t **__pvalue),(__pvalue))
 __CREDIRECT_KOS(,errno_t,__NOTHROW_NCX,_get_wpgmptr,(char32_t **__pvalue),_get_wpgmptr,(__pvalue))
 #elif defined(__CRT_HAVE_DOS$_get_wpgmptr) && __SIZEOF_WCHAR_T__ == 2
 __CREDIRECT_DOS(,errno_t,__NOTHROW_NCX,_get_wpgmptr,(char16_t **__pvalue),_get_wpgmptr,(__pvalue))
+#elif defined(__CRT_HAVE___p__wpgmptr) || (defined(__CRT_HAVE_DOS$__p__wpgmptr) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$__p__wpgmptr) && __SIZEOF_WCHAR_T__ == 2)
+#include <local/stdlib/_get_wpgmptr.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_get_wpgmptr, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _get_wpgmptr)(wchar_t **__pvalue) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_get_wpgmptr))(__pvalue); })
 #endif /* ... */
 
 #ifdef __CRT_HAVE__fmode

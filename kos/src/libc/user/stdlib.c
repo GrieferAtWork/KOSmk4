@@ -200,19 +200,19 @@ NOTHROW(LIBCCALL libc_do_random)(unsigned int *pseed) {
 	return old_seed;
 }
 
-/*[[[head:srand,hash:CRC-32=0xc8e1187f]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.random.srand") void
+/*[[[head:libc_srand,hash:CRC-32=0x953f72d4]]]*/
+INTERN ATTR_SECTION(".text.crt.random") void
 NOTHROW(LIBCCALL libc_srand)(long seed)
-/*[[[body:srand]]]*/
+/*[[[body:libc_srand]]]*/
 {
 	libc_seed = (u32)(unsigned long)seed;
 }
-/*[[[end:srand]]]*/
+/*[[[end:libc_srand]]]*/
 
-/*[[[head:rand,hash:CRC-32=0xc5723c5a]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.random.rand") int
+/*[[[head:libc_rand,hash:CRC-32=0xcfa45bbe]]]*/
+INTERN ATTR_SECTION(".text.crt.random") int
 NOTHROW(LIBCCALL libc_rand)(void)
-/*[[[body:rand]]]*/
+/*[[[body:libc_rand]]]*/
 {
 	unsigned int result;
 	result = libc_do_random(&libc_seed);
@@ -222,13 +222,12 @@ NOTHROW(LIBCCALL libc_rand)(void)
 	return (int)(result % (RAND_MAX + 1));
 #endif
 }
-/*[[[end:rand]]]*/
+/*[[[end:libc_rand]]]*/
 
-/*[[[head:rand_r,hash:CRC-32=0x50d01815]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.rand_r") int
+/*[[[head:libc_rand_r,hash:CRC-32=0x50bd9f7e]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict pseed)
-/*[[[body:rand_r]]]*/
+/*[[[body:libc_rand_r]]]*/
 {
 	unsigned int result;
 	result = libc_do_random(pseed);
@@ -238,10 +237,10 @@ NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict pseed)
 	return (int)(result % (RAND_MAX + 1));
 #endif
 }
-/*[[[end:rand_r]]]*/
+/*[[[end:libc_rand_r]]]*/
 
-/*[[[impl:random]]]*/
-/*[[[impl:srandom]]]*/
+/*[[[impl:libc_random]]]*/
+/*[[[impl:libc_srandom]]]*/
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_random, libc_rand);
 DEFINE_INTERN_ALIAS(libc_srandom, libc_srand);
@@ -264,44 +263,13 @@ NOTHROW_NCX(LIBCCALL libc_srandom)(unsigned int seed) {
 #endif
 
 
-/*[[[head:rand_s,hash:CRC-32=0xa99a8e5]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.random.rand_s") errno_t
-NOTHROW_NCX(LIBCCALL libc_rand_s)(unsigned int *__restrict randval)
-/*[[[body:rand_s]]]*/
-/*AUTO*/{
-	if (!randval) {
-#ifdef EINVAL
-		return EINVAL;
-#else /* EINVAL */
-		return 1;
-#endif /* !EINVAL */
-	}
-	*randval = libc_rand();
-	return 0;
-}
-/*[[[end:rand_s]]]*/
-
-/*[[[head:DOS$rand_s,hash:CRC-32=0xc2849c27]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.random.rand_s") errno_t
-NOTHROW_NCX(LIBDCALL libd_rand_s)(unsigned int *__restrict randval)
-/*[[[body:DOS$rand_s]]]*/
-{
-	if (!randval)
-		return __DOS_EINVAL;
-	*randval = libc_rand();
-	return 0;
-}
-/*[[[end:DOS$rand_s]]]*/
 
 
 
-/*[[[head:getenv,hash:CRC-32=0x27bd1e2e]]]*/
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.getenv") char *
+/*[[[head:libc_getenv,hash:CRC-32=0x5a7650b6]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.environ") WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
-/*[[[body:getenv]]]*/
+/*[[[body:libc_getenv]]]*/
 {
 	size_t namelen;
 	char *result, **envp;
@@ -324,18 +292,17 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 	atomic_rwlock_endread(&libc_environ_lock);
 	return result;
 }
-/*[[[end:getenv]]]*/
+/*[[[end:libc_getenv]]]*/
 
 
 
 
-/*[[[head:setenv,hash:CRC-32=0xb3054959]]]*/
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.setenv") int
+/*[[[head:libc_setenv,hash:CRC-32=0x4507caac]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.environ") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname,
                                   char const *val,
                                   int replace)
-/*[[[body:setenv]]]*/
+/*[[[body:libc_setenv]]]*/
 {
 	char **envp, **new_envp, **old_heap_envp;
 	struct environ_heapstr *line;
@@ -449,13 +416,12 @@ do_fill_environ:
 
 	return 0;
 }
-/*[[[end:setenv]]]*/
+/*[[[end:libc_setenv]]]*/
 
-/*[[[head:unsetenv,hash:CRC-32=0xe95b689e]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.unsetenv") int
+/*[[[head:libc_unsetenv,hash:CRC-32=0x823d2ab5]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.environ") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname)
-/*[[[body:unsetenv]]]*/
+/*[[[body:libc_unsetenv]]]*/
 {
 	char **envp;
 	size_t namelen;
@@ -511,12 +477,12 @@ NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname)
 	atomic_rwlock_endwrite(&libc_environ_lock);
 	return 0;
 }
-/*[[[end:unsetenv]]]*/
+/*[[[end:libc_unsetenv]]]*/
 
-/*[[[head:clearenv,hash:CRC-32=0x13a7d7a3]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.clearenv") int
+/*[[[head:libc_clearenv,hash:CRC-32=0x7a5bba38]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.environ") int
 NOTHROW_NCX(LIBCCALL libc_clearenv)(void)
-/*[[[body:clearenv]]]*/
+/*[[[body:libc_clearenv]]]*/
 {
 	char **heap_envp;
 	struct environ_heapstr *heap_strings, *next;
@@ -537,13 +503,12 @@ NOTHROW_NCX(LIBCCALL libc_clearenv)(void)
 	free(heap_envp);
 	return 0;
 }
-/*[[[end:clearenv]]]*/
+/*[[[end:libc_clearenv]]]*/
 
-/*[[[head:putenv,hash:CRC-32=0x18400de0]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.putenv") int
+/*[[[head:libc_putenv,hash:CRC-32=0x9816a81b]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.environ") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_putenv)(char *string)
-/*[[[body:putenv]]]*/
+/*[[[body:libc_putenv]]]*/
 {
 	char *eq, **envp, **new_envp, **old_heap_envp;
 	size_t namelen, envc, new_enva;
@@ -628,38 +593,27 @@ do_fill_environ:
 
 	return 0;
 }
-/*[[[end:putenv]]]*/
+/*[[[end:libc_putenv]]]*/
 
-/*[[[head:secure_getenv,hash:CRC-32=0xc94db2bd]]]*/
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.secure_getenv") char *
+/*[[[head:libc_secure_getenv,hash:CRC-32=0x43530c7b]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.environ") WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname)
-/*[[[body:secure_getenv]]]*/
+/*[[[body:libc_secure_getenv]]]*/
 {
 	if (getauxval(AT_SECURE))
 		return NULL; /* Unconditionally return `NULL' for setuid() programs */
 	return getenv(varname);
 }
-/*[[[end:secure_getenv]]]*/
+/*[[[end:libc_secure_getenv]]]*/
 
-/*[[[head:_putenv_s,hash:CRC-32=0x9712fa75]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.environ._putenv_s") errno_t
-NOTHROW_NCX(LIBCCALL libc__putenv_s)(char const *varname,
-                                     char const *val)
-/*[[[body:_putenv_s]]]*/
-/*AUTO*/{
-	return libc_setenv(varname, val, 1) ? __libc_geterrno_or(__EINVAL) : 0;
-}
-/*[[[end:_putenv_s]]]*/
 
-/*[[[head:_dupenv_s,hash:CRC-32=0x70fe2978]]]*/
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.utility._dupenv_s") errno_t
+/*[[[head:libc__dupenv_s,hash:CRC-32=0x58aa7375]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 2, 3)) errno_t
 NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf,
                                      size_t *pbuflen,
                                      char const *varname)
-/*[[[body:_dupenv_s]]]*/
-{
+/*[[[body:libc__dupenv_s]]]*/
+/*AUTO*/{
 	(void)pbuf;
 	(void)pbuflen;
 	(void)varname;
@@ -667,17 +621,16 @@ NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf,
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:_dupenv_s]]]*/
+/*[[[end:libc__dupenv_s]]]*/
 
-/*[[[head:getenv_s,hash:CRC-32=0x8218b797]]]*/
-INTERN NONNULL((1, 2, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.utility.getenv_s") errno_t
+/*[[[head:libc_getenv_s,hash:CRC-32=0x7ab40405]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 2, 4)) errno_t
 NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *psize,
                                     char *buf,
                                     rsize_t buflen,
                                     char const *varname)
-/*[[[body:getenv_s]]]*/
-{
+/*[[[body:libc_getenv_s]]]*/
+/*AUTO*/{
 	(void)psize;
 	(void)buf;
 	(void)buflen;
@@ -686,17 +639,16 @@ NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *psize,
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:getenv_s]]]*/
+/*[[[end:libc_getenv_s]]]*/
 
-/*[[[head:_searchenv_s,hash:CRC-32=0x5cde1c3]]]*/
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._searchenv_s") errno_t
+/*[[[head:libc__searchenv_s,hash:CRC-32=0x46622a54]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1, 2, 3)) errno_t
 NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file,
                                         char const *envvar,
                                         char *__restrict resultpath,
                                         size_t buflen)
-/*[[[body:_searchenv_s]]]*/
-{
+/*[[[body:libc__searchenv_s]]]*/
+/*AUTO*/{
 	(void)file;
 	(void)envvar;
 	(void)resultpath;
@@ -705,19 +657,8 @@ NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file,
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:_searchenv_s]]]*/
+/*[[[end:libc__searchenv_s]]]*/
 
-/*[[[head:_searchenv,hash:CRC-32=0xcf9d896b]]]*/
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._searchenv") void
-NOTHROW_RPC(LIBCCALL libc__searchenv)(char const *file,
-                                      char const *envvar,
-                                      char *__restrict resultpath)
-/*[[[body:_searchenv]]]*/
-/*AUTO*/{
-	libc__searchenv_s(file, envvar, resultpath, (size_t)-1);
-}
-/*[[[end:_searchenv]]]*/
 
 
 
@@ -738,10 +679,10 @@ NOTHROW_RPC(LIBCCALL libc_do_system_spawn)(char const *__restrict command) {
 	return cpid;
 }
 
-/*[[[head:system,hash:CRC-32=0x46b37e69]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.system.system") int
-NOTHROW_RPC(LIBCCALL libc_system)(char const *__restrict command)
-/*[[[body:system]]]*/
+/*[[[head:libc_system,hash:CRC-32=0x5ec78712]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.exec.system") int
+NOTHROW_RPC(LIBCCALL libc_system)(char const *command)
+/*[[[body:libc_system]]]*/
 {
 	pid_t cpid, error;
 	int status;
@@ -761,17 +702,7 @@ NOTHROW_RPC(LIBCCALL libc_system)(char const *__restrict command)
 	       ? WEXITSTATUS(status)
 	       : 1;
 }
-/*[[[end:system]]]*/
-
-/*[[[head:abort,hash:CRC-32=0x1f73605]]]*/
-INTERN ATTR_NORETURN
-ATTR_WEAK ATTR_SECTION(".text.crt.application.exit.abort") void
-(LIBCCALL libc_abort)(void)
-/*[[[body:abort]]]*/
-{
-	_Exit(EXIT_FAILURE);
-}
-/*[[[end:abort]]]*/
+/*[[[end:libc_system]]]*/
 
 
 struct atexit_callback {
@@ -809,12 +740,11 @@ void LIBCCALL libc_run_atexit(int status) {
 	}
 }
 
-/*[[[head:on_exit,hash:CRC-32=0xcd734836]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.on_exit") int
+/*[[[head:libc_on_exit,hash:CRC-32=0xc49f8108]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.process") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_on_exit)(__on_exit_func_t func,
                                    void *arg)
-/*[[[body:on_exit]]]*/
+/*[[[body:libc_on_exit]]]*/
 {
 	struct atexit_callback *new_vector;
 	while (!atomic_rwlock_trywrite(&atexit_vector.av_lock)) {
@@ -839,7 +769,7 @@ NOTHROW_NCX(LIBCCALL libc_on_exit)(__on_exit_func_t func,
 	atomic_rwlock_endwrite(&atexit_vector.av_lock);
 	return 0;
 }
-/*[[[end:on_exit]]]*/
+/*[[[end:libc_on_exit]]]*/
 
 PRIVATE ATTR_SECTION(".text.crt.sched.process.libc_atexit_wrapper") void
 NOTHROW_NCX(LIBCCALL libc_atexit_wrapper)(int status, void *arg) {
@@ -847,15 +777,14 @@ NOTHROW_NCX(LIBCCALL libc_atexit_wrapper)(int status, void *arg) {
 	(*(__atexit_func_t)arg)();
 }
 
-/*[[[head:atexit,hash:CRC-32=0x7b9caa0b]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.atexit") int
+/*[[[head:libc_atexit,hash:CRC-32=0x1e48b9c9]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.process") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func)
-/*[[[body:atexit]]]*/
+/*[[[body:libc_atexit]]]*/
 {
 	return on_exit(&libc_atexit_wrapper, (void *)func);
 }
-/*[[[end:atexit]]]*/
+/*[[[end:libc_atexit]]]*/
 
 
 
@@ -888,11 +817,10 @@ void LIBCCALL libc_run_at_quick_exit(int status) {
 	}
 }
 
-/*[[[head:at_quick_exit,hash:CRC-32=0x8671a9ef]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.at_quick_exit") int
+/*[[[head:libc_at_quick_exit,hash:CRC-32=0x85221818]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.process") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(__atexit_func_t func)
-/*[[[body:at_quick_exit]]]*/
+/*[[[body:libc_at_quick_exit]]]*/
 {
 	struct at_quick_exit_callback *new_vector;
 	while (!atomic_rwlock_trywrite(&atexit_vector.av_lock)) {
@@ -916,14 +844,12 @@ NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(__atexit_func_t func)
 	atomic_rwlock_endwrite(&atexit_vector.av_lock);
 	return 0;
 }
-/*[[[end:at_quick_exit]]]*/
+/*[[[end:libc_at_quick_exit]]]*/
 
-/*[[[head:exit,hash:CRC-32=0x14509474]]]*/
-INTERN ATTR_NORETURN
-ATTR_WEAK ATTR_SECTION(".text.crt.application.exit.exit") void
-(LIBCCALL libc_exit)(int status)
-		__THROWS(...)
-/*[[[body:exit]]]*/
+/*[[[head:libc_exit,hash:CRC-32=0xc5fc2590]]]*/
+INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
+(LIBCCALL libc_exit)(int status) THROWS(...)
+/*[[[body:libc_exit]]]*/
 {
 	/* Finalizer TLS objects for the calling thread (c++11-specific) */
 	dlauxctrl(NULL, DLAUXCTRL_RUNTLSFINI, NULL, NULL);
@@ -934,14 +860,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.application.exit.exit") void
 	dlauxctrl(NULL, DLAUXCTRL_RUNFINI, NULL, NULL);
 	_Exit(status);
 }
-/*[[[end:exit]]]*/
+/*[[[end:libc_exit]]]*/
 
-/*[[[head:quick_exit,hash:CRC-32=0xfa3c2759]]]*/
-INTERN ATTR_NORETURN
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.quick_exit") void
-(LIBCCALL libc_quick_exit)(int status)
-		__THROWS(...)
-/*[[[body:quick_exit]]]*/
+/*[[[head:libc_quick_exit,hash:CRC-32=0x66efab6c]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.process") ATTR_NORETURN void
+(LIBCCALL libc_quick_exit)(int status) THROWS(...)
+/*[[[body:libc_quick_exit]]]*/
 {
 	/* Run at_quick_exit() functions */
 	libc_run_at_quick_exit(status);
@@ -953,27 +877,26 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.quick_exit") void
 	libc_fini();
 	_Exit(status);
 }
-/*[[[end:quick_exit]]]*/
+/*[[[end:libc_quick_exit]]]*/
 
-/*[[[head:_Exit,hash:CRC-32=0x2a36c796]]]*/
-INTERN ATTR_NORETURN
-ATTR_WEAK ATTR_SECTION(".text.crt.application.exit._Exit") void
-(LIBCCALL libc__Exit)(int status)
-/*[[[body:_Exit]]]*/
+/*[[[head:libc__Exit,hash:CRC-32=0x57701208]]]*/
+INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
+(LIBCCALL libc__Exit)(int status) THROWS(...)
+/*[[[body:libc__Exit]]]*/
 {
 	sys_exit_group((syscall_ulong_t)(unsigned int)status);
 }
-/*[[[end:_Exit]]]*/
+/*[[[end:libc__Exit]]]*/
 
 PRIVATE ATTR_SECTION(".text.crt.dos.sched.process.libc_onexit_wrapper")
 void LIBCCALL libc_onexit_wrapper(void *arg) {
 	(*(onexit_t)arg)();
 }
 
-/*[[[head:onexit,hash:CRC-32=0xd0591068]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.process.onexit") onexit_t
+/*[[[head:libc_onexit,hash:CRC-32=0x48d44540]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.sched.process") onexit_t
 NOTHROW_NCX(LIBCCALL libc_onexit)(onexit_t func)
-/*[[[body:onexit]]]*/
+/*[[[body:libc_onexit]]]*/
 {
 	int error;
 	error = libc___cxa_atexit(&libc_onexit_wrapper,
@@ -981,390 +904,368 @@ NOTHROW_NCX(LIBCCALL libc_onexit)(onexit_t func)
 	                          __builtin_return_address(0));
 	return error ? NULL : func;
 }
-/*[[[end:onexit]]]*/
+/*[[[end:libc_onexit]]]*/
 
-/*[[[head:drand48_r,hash:CRC-32=0x739469fd]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.drand48_r") int
+/*[[[head:libc_drand48_r,hash:CRC-32=0x1d0c3083]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_drand48_r)(struct drand48_data *__restrict buffer,
                                      double *__restrict result)
-/*[[[body:drand48_r]]]*/
-{
+/*[[[body:libc_drand48_r]]]*/
+/*AUTO*/{
 	(void)buffer;
 	(void)result;
 	CRT_UNIMPLEMENTED("drand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:drand48_r]]]*/
+/*[[[end:libc_drand48_r]]]*/
 
-/*[[[head:erand48_r,hash:CRC-32=0x241699f9]]]*/
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.erand48_r") int
+/*[[[head:libc_erand48_r,hash:CRC-32=0x7b00694f]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1, 2, 3)) int
 NOTHROW_NCX(LIBCCALL libc_erand48_r)(unsigned short xsubi[3],
                                      struct drand48_data *__restrict buffer,
                                      double *__restrict result)
-/*[[[body:erand48_r]]]*/
-{
+/*[[[body:libc_erand48_r]]]*/
+/*AUTO*/{
 	(void)xsubi;
 	(void)buffer;
 	(void)result;
 	CRT_UNIMPLEMENTED("erand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:erand48_r]]]*/
+/*[[[end:libc_erand48_r]]]*/
 
-/*[[[head:lrand48_r,hash:CRC-32=0x420a4735]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.lrand48_r") int
+/*[[[head:libc_lrand48_r,hash:CRC-32=0x5645a408]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_lrand48_r)(struct drand48_data *__restrict buffer,
                                      long *__restrict result)
-/*[[[body:lrand48_r]]]*/
-{
+/*[[[body:libc_lrand48_r]]]*/
+/*AUTO*/{
 	(void)buffer;
 	(void)result;
 	CRT_UNIMPLEMENTED("lrand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:lrand48_r]]]*/
+/*[[[end:libc_lrand48_r]]]*/
 
-/*[[[head:nrand48_r,hash:CRC-32=0xec488ce6]]]*/
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.nrand48_r") int
+/*[[[head:libc_nrand48_r,hash:CRC-32=0x57cf1edb]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1, 2, 3)) int
 NOTHROW_NCX(LIBCCALL libc_nrand48_r)(unsigned short xsubi[3],
                                      struct drand48_data *__restrict buffer,
                                      long *__restrict result)
-/*[[[body:nrand48_r]]]*/
-{
+/*[[[body:libc_nrand48_r]]]*/
+/*AUTO*/{
 	(void)xsubi;
 	(void)buffer;
 	(void)result;
 	CRT_UNIMPLEMENTED("nrand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:nrand48_r]]]*/
+/*[[[end:libc_nrand48_r]]]*/
 
-/*[[[head:mrand48_r,hash:CRC-32=0x78955e8e]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.mrand48_r") int
+/*[[[head:libc_mrand48_r,hash:CRC-32=0xe0127105]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_mrand48_r)(struct drand48_data *__restrict buffer,
                                      long *__restrict result)
-/*[[[body:mrand48_r]]]*/
-{
+/*[[[body:libc_mrand48_r]]]*/
+/*AUTO*/{
 	(void)buffer;
 	(void)result;
 	CRT_UNIMPLEMENTED("mrand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:mrand48_r]]]*/
+/*[[[end:libc_mrand48_r]]]*/
 
-/*[[[head:jrand48_r,hash:CRC-32=0xc1083299]]]*/
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.jrand48_r") int
+/*[[[head:libc_jrand48_r,hash:CRC-32=0x2e720523]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1, 2, 3)) int
 NOTHROW_NCX(LIBCCALL libc_jrand48_r)(unsigned short xsubi[3],
                                      struct drand48_data *__restrict buffer,
                                      long *__restrict result)
-/*[[[body:jrand48_r]]]*/
-{
+/*[[[body:libc_jrand48_r]]]*/
+/*AUTO*/{
 	(void)xsubi;
 	(void)buffer;
 	(void)result;
 	CRT_UNIMPLEMENTED("jrand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:jrand48_r]]]*/
+/*[[[end:libc_jrand48_r]]]*/
 
-/*[[[head:srand48_r,hash:CRC-32=0x6b07f412]]]*/
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.srand48_r") int
+/*[[[head:libc_srand48_r,hash:CRC-32=0xbea2e522]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_srand48_r)(long seedval,
                                      struct drand48_data *buffer)
-/*[[[body:srand48_r]]]*/
-{
+/*[[[body:libc_srand48_r]]]*/
+/*AUTO*/{
 	(void)seedval;
 	(void)buffer;
 	CRT_UNIMPLEMENTED("srand48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:srand48_r]]]*/
+/*[[[end:libc_srand48_r]]]*/
 
-/*[[[head:seed48_r,hash:CRC-32=0x879782f5]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.seed48_r") int
+/*[[[head:libc_seed48_r,hash:CRC-32=0x7caba8b6]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_seed48_r)(unsigned short seed16v[3],
                                     struct drand48_data *buffer)
-/*[[[body:seed48_r]]]*/
-{
+/*[[[body:libc_seed48_r]]]*/
+/*AUTO*/{
 	(void)seed16v;
 	(void)buffer;
 	CRT_UNIMPLEMENTED("seed48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:seed48_r]]]*/
+/*[[[end:libc_seed48_r]]]*/
 
-/*[[[head:lcong48_r,hash:CRC-32=0xe15fdff8]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.lcong48_r") int
+/*[[[head:libc_lcong48_r,hash:CRC-32=0x629b77fb]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_lcong48_r)(unsigned short param[7],
                                      struct drand48_data *buffer)
-/*[[[body:lcong48_r]]]*/
-{
+/*[[[body:libc_lcong48_r]]]*/
+/*AUTO*/{
 	(void)param;
 	(void)buffer;
 	CRT_UNIMPLEMENTED("lcong48_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:lcong48_r]]]*/
+/*[[[end:libc_lcong48_r]]]*/
 
-/*[[[head:random_r,hash:CRC-32=0x36c5a774]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.random_r") int
+/*[[[head:libc_random_r,hash:CRC-32=0x867fd0f4]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_random_r)(struct random_data *__restrict buf,
                                     int32_t *__restrict result)
-/*[[[body:random_r]]]*/
-{
+/*[[[body:libc_random_r]]]*/
+/*AUTO*/{
 	(void)buf;
 	(void)result;
 	CRT_UNIMPLEMENTED("random_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:random_r]]]*/
+/*[[[end:libc_random_r]]]*/
 
-/*[[[head:srandom_r,hash:CRC-32=0xa0691f77]]]*/
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.srandom_r") int
+/*[[[head:libc_srandom_r,hash:CRC-32=0xe840ebc5]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_srandom_r)(unsigned int seed,
                                      struct random_data *buf)
-/*[[[body:srandom_r]]]*/
-{
+/*[[[body:libc_srandom_r]]]*/
+/*AUTO*/{
 	(void)seed;
 	(void)buf;
 	CRT_UNIMPLEMENTED("srandom_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:srandom_r]]]*/
+/*[[[end:libc_srandom_r]]]*/
 
-/*[[[head:initstate_r,hash:CRC-32=0x9d6e3c55]]]*/
-INTERN NONNULL((2, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.initstate_r") int
+/*[[[head:libc_initstate_r,hash:CRC-32=0x3fa13c2a]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((2, 4)) int
 NOTHROW_NCX(LIBCCALL libc_initstate_r)(unsigned int seed,
                                        char *__restrict statebuf,
                                        size_t statelen,
                                        struct random_data *__restrict buf)
-/*[[[body:initstate_r]]]*/
-{
+/*[[[body:libc_initstate_r]]]*/
+/*AUTO*/{
 	(void)seed;
 	(void)statebuf;
 	(void)statelen;
 	(void)buf;
 	CRT_UNIMPLEMENTED("initstate_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:initstate_r]]]*/
+/*[[[end:libc_initstate_r]]]*/
 
-/*[[[head:setstate_r,hash:CRC-32=0xfbc7d8a5]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.setstate_r") int
+/*[[[head:libc_setstate_r,hash:CRC-32=0x6113ff06]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_setstate_r)(char *__restrict statebuf,
                                       struct random_data *__restrict buf)
-/*[[[body:setstate_r]]]*/
-{
+/*[[[body:libc_setstate_r]]]*/
+/*AUTO*/{
 	(void)statebuf;
 	(void)buf;
 	CRT_UNIMPLEMENTED("setstate_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:setstate_r]]]*/
+/*[[[end:libc_setstate_r]]]*/
 
-/*[[[head:mkstemps,hash:CRC-32=0x78f97579]]]*/
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.mkstemps") int
+/*[[[head:libc_mkstemps,hash:CRC-32=0xfd5623f5]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mkstemps)(char *template_,
                                     int suffixlen)
-/*[[[body:mkstemps]]]*/
-{
+/*[[[body:libc_mkstemps]]]*/
+/*AUTO*/{
 	(void)template_;
 	(void)suffixlen;
 	CRT_UNIMPLEMENTED("mkstemps"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:mkstemps]]]*/
+/*[[[end:libc_mkstemps]]]*/
 
-/*[[[head:rpmatch,hash:CRC-32=0x1e8600e1]]]*/
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.rpmatch") int
+/*[[[head:libc_rpmatch,hash:CRC-32=0x30b72b07]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response)
-/*[[[body:rpmatch]]]*/
-{
+/*[[[body:libc_rpmatch]]]*/
+/*AUTO*/{
 	(void)response;
 	CRT_UNIMPLEMENTED("rpmatch"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:rpmatch]]]*/
+/*[[[end:libc_rpmatch]]]*/
 
-/*[[[head:mkstemps64,hash:CRC-32=0x5ce33c02]]]*/
+/*[[[head:libc_mkstemps64,hash:CRC-32=0x5d24fb80]]]*/
 #if !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0
 DEFINE_INTERN_ALIAS(libc_mkstemps64, libc_mkstemps);
-#else
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.mkstemps64") int
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mkstemps64)(char *template_,
                                       int suffixlen)
-/*[[[body:mkstemps64]]]*/
-{
+/*[[[body:libc_mkstemps64]]]*/
+/*AUTO*/{
 	(void)template_;
 	(void)suffixlen;
 	CRT_UNIMPLEMENTED("mkstemps64"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
 #endif /* MAGIC:alias */
-/*[[[end:mkstemps64]]]*/
+/*[[[end:libc_mkstemps64]]]*/
 
-/*[[[head:getloadavg,hash:CRC-32=0x24f50b2d]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.getloadavg") int
+/*[[[head:libc_getloadavg,hash:CRC-32=0x20bc57b0]]]*/
+INTERN ATTR_SECTION(".text.crt.system.utility") int
 NOTHROW_RPC(LIBCCALL libc_getloadavg)(double loadavg[],
                                       int nelem)
-/*[[[body:getloadavg]]]*/
-{
+/*[[[body:libc_getloadavg]]]*/
+/*AUTO*/{
 	(void)loadavg;
 	(void)nelem;
 	CRT_UNIMPLEMENTED("getloadavg"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getloadavg]]]*/
+/*[[[end:libc_getloadavg]]]*/
 
-/*[[[head:drand48,hash:CRC-32=0x415f3fb9]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.random.drand48") double
+/*[[[head:libc_drand48,hash:CRC-32=0x154b0864]]]*/
+INTERN ATTR_SECTION(".text.crt.random") double
 NOTHROW_NCX(LIBCCALL libc_drand48)(void)
-/*[[[body:drand48]]]*/
-{
+/*[[[body:libc_drand48]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("drand48"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:drand48]]]*/
+/*[[[end:libc_drand48]]]*/
 
-/*[[[head:lrand48,hash:CRC-32=0xf8e8f88d]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.random.lrand48") long
+/*[[[head:libc_lrand48,hash:CRC-32=0x3d0384e2]]]*/
+INTERN ATTR_SECTION(".text.crt.random") long
 NOTHROW_NCX(LIBCCALL libc_lrand48)(void)
-/*[[[body:lrand48]]]*/
-{
+/*[[[body:libc_lrand48]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("lrand48"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:lrand48]]]*/
+/*[[[end:libc_lrand48]]]*/
 
-/*[[[head:mrand48,hash:CRC-32=0x47e4aaeb]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.random.mrand48") long
+/*[[[head:libc_mrand48,hash:CRC-32=0x84f85f0a]]]*/
+INTERN ATTR_SECTION(".text.crt.random") long
 NOTHROW_NCX(LIBCCALL libc_mrand48)(void)
-/*[[[body:mrand48]]]*/
-{
+/*[[[body:libc_mrand48]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("mrand48"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:mrand48]]]*/
+/*[[[end:libc_mrand48]]]*/
 
-/*[[[head:erand48,hash:CRC-32=0x5f030d9a]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.erand48") double
+/*[[[head:libc_erand48,hash:CRC-32=0xcacb6009]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1)) double
 NOTHROW_NCX(LIBCCALL libc_erand48)(unsigned short xsubi[3])
-/*[[[body:erand48]]]*/
-{
+/*[[[body:libc_erand48]]]*/
+/*AUTO*/{
 	(void)xsubi;
 	CRT_UNIMPLEMENTED("erand48"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:erand48]]]*/
+/*[[[end:libc_erand48]]]*/
 
-/*[[[head:nrand48,hash:CRC-32=0x82ab480]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.nrand48") long
+/*[[[head:libc_nrand48,hash:CRC-32=0xf0cd3639]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1)) long
 NOTHROW_NCX(LIBCCALL libc_nrand48)(unsigned short xsubi[3])
-/*[[[body:nrand48]]]*/
-{
+/*[[[body:libc_nrand48]]]*/
+/*AUTO*/{
 	(void)xsubi;
 	CRT_UNIMPLEMENTED("nrand48"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:nrand48]]]*/
+/*[[[end:libc_nrand48]]]*/
 
-/*[[[head:jrand48,hash:CRC-32=0xf83d7ea2]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.jrand48") long
+/*[[[head:libc_jrand48,hash:CRC-32=0x62c472e1]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1)) long
 NOTHROW_NCX(LIBCCALL libc_jrand48)(unsigned short xsubi[3])
-/*[[[body:jrand48]]]*/
-{
+/*[[[body:libc_jrand48]]]*/
+/*AUTO*/{
 	(void)xsubi;
 	CRT_UNIMPLEMENTED("jrand48"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:jrand48]]]*/
+/*[[[end:libc_jrand48]]]*/
 
-/*[[[head:srand48,hash:CRC-32=0x54f59449]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.random.srand48") void
+/*[[[head:libc_srand48,hash:CRC-32=0x1c9c73b7]]]*/
+INTERN ATTR_SECTION(".text.crt.random") void
 NOTHROW_NCX(LIBCCALL libc_srand48)(long seedval)
-/*[[[body:srand48]]]*/
-{
+/*[[[body:libc_srand48]]]*/
+/*AUTO*/{
 	(void)seedval;
 	CRT_UNIMPLEMENTED("srand48"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:srand48]]]*/
+/*[[[end:libc_srand48]]]*/
 
-/*[[[head:seed48,hash:CRC-32=0x66816c1a]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.seed48") unsigned short *
+/*[[[head:libc_seed48,hash:CRC-32=0x65a13274]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1)) unsigned short *
 NOTHROW_NCX(LIBCCALL libc_seed48)(unsigned short seed16v[3])
-/*[[[body:seed48]]]*/
-{
+/*[[[body:libc_seed48]]]*/
+/*AUTO*/{
 	(void)seed16v;
 	CRT_UNIMPLEMENTED("seed48"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:seed48]]]*/
+/*[[[end:libc_seed48]]]*/
 
-/*[[[head:lcong48,hash:CRC-32=0xd5ba93ee]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.lcong48") void
+/*[[[head:libc_lcong48,hash:CRC-32=0xa48fb33]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_lcong48)(unsigned short param[7])
-/*[[[body:lcong48]]]*/
-{
+/*[[[body:libc_lcong48]]]*/
+/*AUTO*/{
 	(void)param;
 	CRT_UNIMPLEMENTED("lcong48"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:lcong48]]]*/
+/*[[[end:libc_lcong48]]]*/
 
-/*[[[head:initstate,hash:CRC-32=0x533d5321]]]*/
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.initstate") char *
+/*[[[head:libc_initstate,hash:CRC-32=0x3f377d70]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((2)) char *
 NOTHROW_NCX(LIBCCALL libc_initstate)(unsigned int seed,
                                      char *statebuf,
                                      size_t statelen)
-/*[[[body:initstate]]]*/
-{
+/*[[[body:libc_initstate]]]*/
+/*AUTO*/{
 	(void)seed;
 	(void)statebuf;
 	(void)statelen;
@@ -1372,96 +1273,90 @@ NOTHROW_NCX(LIBCCALL libc_initstate)(unsigned int seed,
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:initstate]]]*/
+/*[[[end:libc_initstate]]]*/
 
-/*[[[head:setstate,hash:CRC-32=0x7172660c]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.random.setstate") char *
+/*[[[head:libc_setstate,hash:CRC-32=0xd2fa96df]]]*/
+INTERN ATTR_SECTION(".text.crt.random") NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf)
-/*[[[body:setstate]]]*/
-{
+/*[[[body:libc_setstate]]]*/
+/*AUTO*/{
 	(void)statebuf;
 	CRT_UNIMPLEMENTED("setstate"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:setstate]]]*/
+/*[[[end:libc_setstate]]]*/
 
-/*[[[head:l64a,hash:CRC-32=0x913a8790]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.string.encrypt.l64a") char *
+/*[[[head:libc_l64a,hash:CRC-32=0xc2c78b77]]]*/
+INTERN ATTR_SECTION(".text.crt.string.encrypt") WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_l64a)(long n)
-/*[[[body:l64a]]]*/
-{
+/*[[[body:libc_l64a]]]*/
+/*AUTO*/{
 	(void)n;
 	CRT_UNIMPLEMENTED("l64a"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:l64a]]]*/
+/*[[[end:libc_l64a]]]*/
 
-/*[[[head:a64l,hash:CRC-32=0xa0e1d45a]]]*/
-INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.string.encrypt.a64l") long
+/*[[[head:libc_a64l,hash:CRC-32=0xea4a21cb]]]*/
+INTERN ATTR_SECTION(".text.crt.string.encrypt") ATTR_PURE WUNUSED NONNULL((1)) long
 NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s)
-/*[[[body:a64l]]]*/
-{
+/*[[[body:libc_a64l]]]*/
+/*AUTO*/{
 	(void)s;
 	CRT_UNIMPLEMENTED("a64l"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:a64l]]]*/
+/*[[[end:libc_a64l]]]*/
 
-/*[[[head:realpath,hash:CRC-32=0x2dea3a06]]]*/
+/*[[[head:libc_realpath,hash:CRC-32=0x30ce7bd1]]]*/
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink()', but will also function for
  * non-symlink paths, as well as always return an absolute (unambiguous) path
  * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
  *                   path, or NULL to automatically `malloc()'ate and return a
  *                   buffer of sufficient size. */
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.property.realpath") char *
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBCCALL libc_realpath)(char const *__restrict filename,
                                     char *resolved)
-/*[[[body:realpath]]]*/
+/*[[[body:libc_realpath]]]*/
 {
 	return libc_frealpathat(AT_FDCWD, filename, resolved,
 	                        resolved ? PATH_MAX : 0, 0);
 }
-/*[[[end:realpath]]]*/
+/*[[[end:libc_realpath]]]*/
 
-/*[[[head:frealpath,hash:CRC-32=0xb9392b84]]]*/
+/*[[[head:libc_frealpath,hash:CRC-32=0xaabc516]]]*/
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
  *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.property.frealpath") char *
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED char *
 NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd,
                                      char *resolved,
                                      size_t buflen)
-/*[[[body:frealpath]]]*/
+/*[[[body:libc_frealpath]]]*/
 {
 	return frealpath4(fd, resolved, buflen, 0);
 }
-/*[[[end:frealpath]]]*/
+/*[[[end:libc_frealpath]]]*/
 
-/*[[[head:frealpath4,hash:CRC-32=0xd1c669d6]]]*/
+/*[[[head:libc_frealpath4,hash:CRC-32=0x66630493]]]*/
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * @param flags: Set of `0|AT_ALTPATH|AT_DOSPATH'
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
  *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.property.frealpath4") char *
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED char *
 NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd,
                                       char *resolved,
                                       size_t buflen,
                                       atflag_t flags)
-/*[[[body:frealpath4]]]*/
+/*[[[body:libc_frealpath4]]]*/
 {
 	ssize_t result;
 	char *buffer = resolved;
@@ -1520,9 +1415,9 @@ err_buffer_result_errno:
 done:
 	return buffer;
 }
-/*[[[end:frealpath4]]]*/
+/*[[[end:libc_frealpath4]]]*/
 
-/*[[[head:frealpathat,hash:CRC-32=0x8631def6]]]*/
+/*[[[head:libc_frealpathat,hash:CRC-32=0xc7c2c07d]]]*/
 /* Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_FOLLOW' is given, a final symlink is dereferenced,
  * causing the pointed-to file location to be retrieved. - Otherwise, the
@@ -1531,14 +1426,13 @@ done:
  *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size.
  * @param flags: Set of `0|AT_ALTPATH|AT_SYMLINK_FOLLOW|AT_DOSPATH' */
-INTERN WUNUSED NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.property.frealpathat") char *
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((2)) char *
 NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd,
                                        char const *filename,
                                        char *resolved,
                                        size_t buflen,
                                        atflag_t flags)
-/*[[[body:frealpathat]]]*/
+/*[[[body:libc_frealpathat]]]*/
 {
 	ssize_t result;
 	char *buffer = resolved;
@@ -1599,260 +1493,241 @@ err_buffer_result_errno:
 done:
 	return buffer;
 }
-/*[[[end:frealpathat]]]*/
+/*[[[end:libc_frealpathat]]]*/
 
-/*[[[head:mktemp,hash:CRC-32=0x1e8369]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.mktemp") char *
+/*[[[head:libc_mktemp,hash:CRC-32=0x4ab0ffae]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.utility") NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_mktemp)(char *template_)
-/*[[[body:mktemp]]]*/
-{
+/*[[[body:libc_mktemp]]]*/
+/*AUTO*/{
 	(void)template_;
 	CRT_UNIMPLEMENTED("mktemp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:mktemp]]]*/
+/*[[[end:libc_mktemp]]]*/
 
-/*[[[head:mkstemp,hash:CRC-32=0x3c28455d]]]*/
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.mkstemp") int
+/*[[[head:libc_mkstemp,hash:CRC-32=0x3fc81c66]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mkstemp)(char *template_)
-/*[[[body:mkstemp]]]*/
-{
-	(void)template_;
-	CRT_UNIMPLEMENTED("mkstemp"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+/*[[[body:libc_mkstemp]]]*/
+/*AUTO*/{
+	return mktemp(template_) ? 0 : -1;
 }
-/*[[[end:mkstemp]]]*/
+/*[[[end:libc_mkstemp]]]*/
 
-/*[[[head:mkdtemp,hash:CRC-32=0x2efcd67b]]]*/
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.mkdtemp") char *
+/*[[[head:libc_mkstemp64,hash:CRC-32=0x7c2879f6]]]*/
+#if !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0
+DEFINE_INTERN_ALIAS(libc_mkstemp64, libc_mkstemp);
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_mkstemp64)(char *template_)
+/*[[[body:libc_mkstemp64]]]*/
+/*AUTO*/{
+	return mkstemp(template_);
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_mkstemp64]]]*/
+
+/*[[[head:libc_mkdtemp,hash:CRC-32=0xeb048757]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_mkdtemp)(char *template_)
-/*[[[body:mkdtemp]]]*/
-{
+/*[[[body:libc_mkdtemp]]]*/
+/*AUTO*/{
 	(void)template_;
 	CRT_UNIMPLEMENTED("mkdtemp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:mkdtemp]]]*/
+/*[[[end:libc_mkdtemp]]]*/
 
-/*[[[head:setkey,hash:CRC-32=0x2efe9326]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.setkey") void
-NOTHROW_NCX(LIBCCALL libc_setkey)(char const *key)
-/*[[[body:setkey]]]*/
-{
-	(void)key;
-	CRT_UNIMPLEMENTED("setkey"); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:setkey]]]*/
 
-/*[[[head:grantpt,hash:CRC-32=0xaef0dcd4]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.grantpt") int
+/*[[[head:libc_grantpt,hash:CRC-32=0xd1e26f46]]]*/
+INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd)
-/*[[[body:grantpt]]]*/
-{
+/*[[[body:libc_grantpt]]]*/
+/*AUTO*/{
 	(void)fd;
 	CRT_UNIMPLEMENTED("grantpt"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:grantpt]]]*/
+/*[[[end:libc_grantpt]]]*/
 
-/*[[[head:unlockpt,hash:CRC-32=0xbf9aab92]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.unlockpt") int
+/*[[[head:libc_unlockpt,hash:CRC-32=0x861f28fa]]]*/
+INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd)
-/*[[[body:unlockpt]]]*/
-{
+/*[[[body:libc_unlockpt]]]*/
+/*AUTO*/{
 	(void)fd;
 	CRT_UNIMPLEMENTED("unlockpt"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:unlockpt]]]*/
+/*[[[end:libc_unlockpt]]]*/
 
-/*[[[head:ptsname,hash:CRC-32=0x2e14f3ce]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.ptsname") char *
+/*[[[head:libc_ptsname,hash:CRC-32=0xf5496d8]]]*/
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd)
-/*[[[body:ptsname]]]*/
-{
+/*[[[body:libc_ptsname]]]*/
+/*AUTO*/{
 	(void)fd;
 	CRT_UNIMPLEMENTED("ptsname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:ptsname]]]*/
+/*[[[end:libc_ptsname]]]*/
 
-/*[[[head:posix_openpt,hash:CRC-32=0x48dcac22]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.posix_openpt") int
+/*[[[head:libc_posix_openpt,hash:CRC-32=0xe65ede97]]]*/
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED int
 NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags)
-/*[[[body:posix_openpt]]]*/
-{
+/*[[[body:libc_posix_openpt]]]*/
+/*AUTO*/{
 	(void)oflags;
 	CRT_UNIMPLEMENTED("posix_openpt"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:posix_openpt]]]*/
+/*[[[end:libc_posix_openpt]]]*/
 
-/*[[[head:getpt,hash:CRC-32=0x4662c95f]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.getpt") int
+/*[[[head:libc_getpt,hash:CRC-32=0xa0920e89]]]*/
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") int
 NOTHROW_RPC(LIBCCALL libc_getpt)(void)
-/*[[[body:getpt]]]*/
-{
+/*[[[body:libc_getpt]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("getpt"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getpt]]]*/
+/*[[[end:libc_getpt]]]*/
 
-/*[[[head:ptsname_r,hash:CRC-32=0xa47ed5ed]]]*/
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.ptsname_r") int
+/*[[[head:libc_ptsname_r,hash:CRC-32=0xcd858348]]]*/
+INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd,
                                      char *buf,
                                      size_t buflen)
-/*[[[body:ptsname_r]]]*/
-{
+/*[[[body:libc_ptsname_r]]]*/
+/*AUTO*/{
 	(void)fd;
 	(void)buf;
 	(void)buflen;
 	CRT_UNIMPLEMENTED("ptsname_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:ptsname_r]]]*/
+/*[[[end:libc_ptsname_r]]]*/
 
-/*[[[head:canonicalize_file_name,hash:CRC-32=0x7a381eaf]]]*/
+/*[[[head:libc_canonicalize_file_name,hash:CRC-32=0xf563004a]]]*/
 /* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
  * Upon error, `NULL' is returned instead */
-INTERN ATTR_MALLOC WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.property.canonicalize_file_name") char *
+INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_MALLOC WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBCCALL libc_canonicalize_file_name)(char const *filename)
-/*[[[body:canonicalize_file_name]]]*/
+/*[[[body:libc_canonicalize_file_name]]]*/
 {
 	return realpath(filename, NULL);
 }
-/*[[[end:canonicalize_file_name]]]*/
+/*[[[end:libc_canonicalize_file_name]]]*/
 
-/*[[[head:mkostemp,hash:CRC-32=0x57c47d03]]]*/
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.mkostemp") int
+/*[[[head:libc_mkostemp,hash:CRC-32=0xebe47ea3]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_mkostemp)(char *template_,
                                     int flags)
-/*[[[body:mkostemp]]]*/
-{
+/*[[[body:libc_mkostemp]]]*/
+/*AUTO*/{
 	(void)template_;
 	(void)flags;
 	CRT_UNIMPLEMENTED("mkostemp"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:mkostemp]]]*/
+/*[[[end:libc_mkostemp]]]*/
 
-/*[[[head:mkostemps,hash:CRC-32=0xa2715472]]]*/
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.mkostemps") int
+/*[[[head:libc_mkostemps,hash:CRC-32=0x4ddfea24]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_mkostemps)(char *template_,
                                      int suffixlen,
                                      int flags)
-/*[[[body:mkostemps]]]*/
-{
+/*[[[body:libc_mkostemps]]]*/
+/*AUTO*/{
 	(void)template_;
 	(void)suffixlen;
 	(void)flags;
 	CRT_UNIMPLEMENTED("mkostemps"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:mkostemps]]]*/
+/*[[[end:libc_mkostemps]]]*/
 
-/*[[[head:mkostemp64,hash:CRC-32=0xfa792204]]]*/
+/*[[[head:libc_mkostemp64,hash:CRC-32=0x9a868612]]]*/
 #if !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0
 DEFINE_INTERN_ALIAS(libc_mkostemp64, libc_mkostemp);
-#else
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.mkostemp64") int
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_mkostemp64)(char *template_,
                                       int flags)
-/*[[[body:mkostemp64]]]*/
-{
+/*[[[body:libc_mkostemp64]]]*/
+/*AUTO*/{
 	(void)template_;
 	(void)flags;
 	CRT_UNIMPLEMENTED("mkostemp64"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
 #endif /* MAGIC:alias */
-/*[[[end:mkostemp64]]]*/
+/*[[[end:libc_mkostemp64]]]*/
 
-/*[[[head:mkostemps64,hash:CRC-32=0x9f5110c3]]]*/
+/*[[[head:libc_mkostemps64,hash:CRC-32=0x181bc576]]]*/
 #if !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0
 DEFINE_INTERN_ALIAS(libc_mkostemps64, libc_mkostemps);
-#else
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.mkostemps64") int
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_mkostemps64)(char *template_,
                                        int suffixlen,
                                        int flags)
-/*[[[body:mkostemps64]]]*/
-{
+/*[[[body:libc_mkostemps64]]]*/
+/*AUTO*/{
 	(void)template_;
 	(void)suffixlen;
 	(void)flags;
 	CRT_UNIMPLEMENTED("mkostemps64"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
 #endif /* MAGIC:alias */
-/*[[[end:mkostemps64]]]*/
+/*[[[end:libc_mkostemps64]]]*/
 
-/*[[[skip:malloc]]]*/
-/*[[[skip:free]]]*/
-/*[[[skip:calloc]]]*/
-/*[[[skip:realloc]]]*/
+/*[[[skip:libc_malloc]]]*/
+/*[[[skip:libc_free]]]*/
+/*[[[skip:libc_calloc]]]*/
+/*[[[skip:libc_realloc]]]*/
 
-
-/* `__errno_location' is provided in libc/errno.c */
-/*[[[skip:__errno_location]]]*/
-
-/*[[[head:__p___argc,hash:CRC-32=0xb5855cce]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___argc") int *
+/*[[[head:libc___p___argc,hash:CRC-32=0x247bbd5d]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED int *
 NOTHROW_NCX(LIBCCALL libc___p___argc)(void)
-/*[[[body:__p___argc]]]*/
+/*[[[body:libc___p___argc]]]*/
 {
 	return &__argc;
 }
-/*[[[end:__p___argc]]]*/
+/*[[[end:libc___p___argc]]]*/
 
-/*[[[head:__p___argv,hash:CRC-32=0x3c793cc4]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___argv") char ***
+/*[[[head:libc___p___argv,hash:CRC-32=0xc89484f3]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char ***
 NOTHROW_NCX(LIBCCALL libc___p___argv)(void)
-/*[[[body:__p___argv]]]*/
+/*[[[body:libc___p___argv]]]*/
 {
 	return &__argv;
 }
-/*[[[end:__p___argv]]]*/
+/*[[[end:libc___p___argv]]]*/
 
-/*[[[head:__p__pgmptr,hash:CRC-32=0xe184d114]]]*/
+/*[[[head:libc___p__pgmptr,hash:CRC-32=0x156ac752]]]*/
 /* Alias for argv[0], as passed to main() */
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__pgmptr") char **
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
 NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void)
-/*[[[body:__p__pgmptr]]]*/
+/*[[[body:libc___p__pgmptr]]]*/
 {
 	return &_pgmptr;
 }
-/*[[[end:__p__pgmptr]]]*/
+/*[[[end:libc___p__pgmptr]]]*/
 
 PRIVATE ATTR_CONST WUNUSED
 ATTR_SECTION(".text.crt.dos.application.init.__p___initenv.get_initenv")
@@ -1873,333 +1748,290 @@ char **libc___p___initenv_pointer = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init.__p___initenv.initialized")
 struct atomic_once libc___p___initenv_initialized = ATOMIC_ONCE_INIT;
 
-/*[[[head:__p___initenv,hash:CRC-32=0x4f63fd8d]]]*/
+/*[[[head:libc___p___initenv,hash:CRC-32=0xb551ec82]]]*/
 /* Access to the initial environment block */
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___initenv") char ***
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char ***
 NOTHROW_NCX(LIBCCALL libc___p___initenv)(void)
-/*[[[body:__p___initenv]]]*/
+/*[[[body:libc___p___initenv]]]*/
 {
 	ATOMIC_ONCE_RUN(&libc___p___initenv_initialized, {
 		libc___p___initenv_pointer = libc_get_initenv();
 	});
 	return &libc___p___initenv_pointer;
 }
-/*[[[end:__p___initenv]]]*/
+/*[[[end:libc___p___initenv]]]*/
 
-/*[[[head:DOS$__p__wenviron,hash:CRC-32=0x2a342ca3]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wenviron") char16_t ***
+/*[[[head:libd___p__wenviron,hash:CRC-32=0xe56931f1]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
-/*[[[body:DOS$__p__wenviron]]]*/
-{
+/*[[[body:libd___p__wenviron]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("__p__wenviron"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:DOS$__p__wenviron]]]*/
+/*[[[end:libd___p__wenviron]]]*/
 
-/*[[[head:__p__wenviron,hash:CRC-32=0x25cb482c]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wenviron") char32_t ***
-NOTHROW_NCX(LIBCCALL libc___p__wenviron)(void)
-/*[[[body:__p__wenviron]]]*/
-{
+/*[[[head:libc___p__wenviron,hash:CRC-32=0x19797235]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
+NOTHROW_NCX(LIBKCALL libc___p__wenviron)(void)
+/*[[[body:libc___p__wenviron]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("__p__wenviron"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:__p__wenviron]]]*/
+/*[[[end:libc___p__wenviron]]]*/
 
-/*[[[head:DOS$__p___winitenv,hash:CRC-32=0xf86cfdf]]]*/
+/*[[[head:libd___p___winitenv,hash:CRC-32=0x6a4ac2c7]]]*/
 /* Access to the initial environment block */
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___winitenv") char16_t ***
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
-/*[[[body:DOS$__p___winitenv]]]*/
-{
+/*[[[body:libd___p___winitenv]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("__p___winitenv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:DOS$__p___winitenv]]]*/
+/*[[[end:libd___p___winitenv]]]*/
 
-/*[[[head:__p___winitenv,hash:CRC-32=0x728eae0a]]]*/
+/*[[[head:libc___p___winitenv,hash:CRC-32=0xa93012a]]]*/
 /* Access to the initial environment block */
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___winitenv") char32_t ***
-NOTHROW_NCX(LIBCCALL libc___p___winitenv)(void)
-/*[[[body:__p___winitenv]]]*/
-{
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
+NOTHROW_NCX(LIBKCALL libc___p___winitenv)(void)
+/*[[[body:libc___p___winitenv]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("__p___winitenv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:__p___winitenv]]]*/
+/*[[[end:libc___p___winitenv]]]*/
 
-/*[[[head:DOS$__p___wargv,hash:CRC-32=0x15cc90ff]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___wargv") char16_t ***
+/*[[[head:libd___p___wargv,hash:CRC-32=0xa6ec59e4]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p___wargv)(void)
-/*[[[body:DOS$__p___wargv]]]*/
-{
+/*[[[body:libd___p___wargv]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("__p___wargv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:DOS$__p___wargv]]]*/
+/*[[[end:libd___p___wargv]]]*/
 
-/*[[[head:__p___wargv,hash:CRC-32=0x871da926]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___wargv") char32_t ***
-NOTHROW_NCX(LIBCCALL libc___p___wargv)(void)
-/*[[[body:__p___wargv]]]*/
-{
+/*[[[head:libc___p___wargv,hash:CRC-32=0xd1fa5108]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***
+NOTHROW_NCX(LIBKCALL libc___p___wargv)(void)
+/*[[[body:libc___p___wargv]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("__p___wargv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:__p___wargv]]]*/
+/*[[[end:libc___p___wargv]]]*/
 
-/*[[[head:DOS$__p__wpgmptr,hash:CRC-32=0x87790bd9]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wpgmptr") char16_t **
+/*[[[head:libd___p__wpgmptr,hash:CRC-32=0x187393f3]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t **
 NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void)
-/*[[[body:DOS$__p__wpgmptr]]]*/
-{
+/*[[[body:libd___p__wpgmptr]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("__p__wpgmptr"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:DOS$__p__wpgmptr]]]*/
+/*[[[end:libd___p__wpgmptr]]]*/
 
-/*[[[head:__p__wpgmptr,hash:CRC-32=0xda4fb24e]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wpgmptr") char32_t **
-NOTHROW_NCX(LIBCCALL libc___p__wpgmptr)(void)
-/*[[[body:__p__wpgmptr]]]*/
-{
+/*[[[head:libc___p__wpgmptr,hash:CRC-32=0xb1874881]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t **
+NOTHROW_NCX(LIBKCALL libc___p__wpgmptr)(void)
+/*[[[body:libc___p__wpgmptr]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("__p__wpgmptr"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:__p__wpgmptr]]]*/
+/*[[[end:libc___p__wpgmptr]]]*/
 
-/*[[[head:_fullpath,hash:CRC-32=0xb89e2b18]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._fullpath") char *
+/*[[[head:libc__fullpath,hash:CRC-32=0x78797651]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") char *
 NOTHROW_RPC(LIBCCALL libc__fullpath)(char *buf,
                                      char const *path,
                                      size_t buflen)
-/*[[[body:_fullpath]]]*/
+/*[[[body:libc__fullpath]]]*/
 {
 	return frealpathat(AT_FDCWD, path, buf, buflen, AT_DOSPATH);
 }
-/*[[[end:_fullpath]]]*/
+/*[[[end:libc__fullpath]]]*/
 
 /* All of these are implemented in libc/libc/errno.c */
-/*[[[skip:_get_errno]]]*/
-/*[[[skip:_set_errno]]]*/
-/*[[[skip:__doserrno]]]*/
-/*[[[skip:_get_doserrno]]]*/
-/*[[[skip:_set_doserrno]]]*/
+/*[[[skip:libc__get_errno]]]*/
+/*[[[skip:libc__set_errno]]]*/
+/*[[[skip:libc___doserrno]]]*/
+/*[[[skip:libc__get_doserrno]]]*/
+/*[[[skip:libc__set_doserrno]]]*/
 
-/*[[[head:_seterrormode,hash:CRC-32=0x62b91e01]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._seterrormode") void
+/*[[[head:libc__seterrormode,hash:CRC-32=0xb76bea9f]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") void
 NOTHROW_NCX(LIBCCALL libc__seterrormode)(int mode)
-/*[[[body:_seterrormode]]]*/
-{
+/*[[[body:libc__seterrormode]]]*/
+/*AUTO*/{
 	(void)mode;
 	CRT_UNIMPLEMENTED("_seterrormode"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:_seterrormode]]]*/
+/*[[[end:libc__seterrormode]]]*/
 
-/*[[[head:_set_error_mode,hash:CRC-32=0x2e83accf]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._set_error_mode") int
+/*[[[head:libc__set_error_mode,hash:CRC-32=0x2437863d]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") int
 NOTHROW_NCX(LIBCCALL libc__set_error_mode)(int mode)
-/*[[[body:_set_error_mode]]]*/
-{
+/*[[[body:libc__set_error_mode]]]*/
+/*AUTO*/{
 	(void)mode;
 	CRT_UNIMPLEMENTED("_set_error_mode"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:_set_error_mode]]]*/
-
-/*[[[head:_get_pgmptr,hash:CRC-32=0xea63c11c]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init._get_pgmptr") errno_t
-NOTHROW_NCX(LIBCCALL libc__get_pgmptr)(char **pvalue)
-/*[[[body:_get_pgmptr]]]*/
-{
-	*pvalue = *libc___p__pgmptr();
 	return 0;
 }
-/*[[[end:_get_pgmptr]]]*/
+/*[[[end:libc__set_error_mode]]]*/
 
-/*[[[head:_get_wpgmptr,hash:CRC-32=0x4cfa0529]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.application.init._get_wpgmptr") errno_t
-NOTHROW_NCX(LIBCCALL libc__get_wpgmptr)(char32_t **pvalue)
-/*[[[body:_get_wpgmptr]]]*/
-{
-	*pvalue = *libc___p__wpgmptr();
-	return 0;
-}
-/*[[[end:_get_wpgmptr]]]*/
-
-/*[[[head:DOS$_get_wpgmptr,hash:CRC-32=0x9ca8da30]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.application.init._get_wpgmptr") errno_t
-NOTHROW_NCX(LIBDCALL libd__get_wpgmptr)(char16_t **pvalue)
-/*[[[body:DOS$_get_wpgmptr]]]*/
-{
-	*pvalue = *libd___p__wpgmptr();
-	return 0;
-}
-/*[[[end:DOS$_get_wpgmptr]]]*/
-
-/*[[[head:_beep,hash:CRC-32=0xac9f7eb3]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.system._beep") void
+/*[[[head:libc__beep,hash:CRC-32=0x369ee9ec]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.system") void
 NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq,
                                  unsigned int duration)
-/*[[[body:_beep]]]*/
-{
+/*[[[body:libc__beep]]]*/
+/*AUTO*/{
 	(void)freq;
 	(void)duration;
 	CRT_UNIMPLEMENTED("_beep"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:_beep]]]*/
+/*[[[end:libc__beep]]]*/
 
-/*[[[head:_set_purecall_handler,hash:CRC-32=0x33e1e92f]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._set_purecall_handler") _purecall_handler
+/*[[[head:libc__set_purecall_handler,hash:CRC-32=0xa0356abb]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") _purecall_handler
 NOTHROW_NCX(LIBCCALL libc__set_purecall_handler)(_purecall_handler __handler)
-/*[[[body:_set_purecall_handler]]]*/
-{
+/*[[[body:libc__set_purecall_handler]]]*/
+/*AUTO*/{
 	(void)__handler;
 	CRT_UNIMPLEMENTED("_set_purecall_handler"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:_set_purecall_handler]]]*/
+/*[[[end:libc__set_purecall_handler]]]*/
 
-/*[[[head:_get_purecall_handler,hash:CRC-32=0x3eb6a390]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._get_purecall_handler") _purecall_handler
+/*[[[head:libc__get_purecall_handler,hash:CRC-32=0x47e9bd6f]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") _purecall_handler
 NOTHROW_NCX(LIBCCALL libc__get_purecall_handler)(void)
-/*[[[body:_get_purecall_handler]]]*/
-{
+/*[[[body:libc__get_purecall_handler]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("_get_purecall_handler"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:_get_purecall_handler]]]*/
+/*[[[end:libc__get_purecall_handler]]]*/
 
-/*[[[head:_set_invalid_parameter_handler,hash:CRC-32=0x456a68ba]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._set_invalid_parameter_handler") _invalid_parameter_handler
+/*[[[head:libc__set_invalid_parameter_handler,hash:CRC-32=0xdb334151]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") _invalid_parameter_handler
 NOTHROW_NCX(LIBCCALL libc__set_invalid_parameter_handler)(_invalid_parameter_handler __handler)
-/*[[[body:_set_invalid_parameter_handler]]]*/
-{
+/*[[[body:libc__set_invalid_parameter_handler]]]*/
+/*AUTO*/{
 	(void)__handler;
 	CRT_UNIMPLEMENTED("_set_invalid_parameter_handler"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:_set_invalid_parameter_handler]]]*/
+/*[[[end:libc__set_invalid_parameter_handler]]]*/
 
-/*[[[head:_get_invalid_parameter_handler,hash:CRC-32=0xc589f926]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._get_invalid_parameter_handler") _invalid_parameter_handler
+/*[[[head:libc__get_invalid_parameter_handler,hash:CRC-32=0x31cb9fb2]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") _invalid_parameter_handler
 NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void)
-/*[[[body:_get_invalid_parameter_handler]]]*/
-{
+/*[[[body:libc__get_invalid_parameter_handler]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("_get_invalid_parameter_handler"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:_get_invalid_parameter_handler]]]*/
+/*[[[end:libc__get_invalid_parameter_handler]]]*/
 
-/*[[[head:__p__fmode,hash:CRC-32=0x21cb19d3]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.utility.__p__fmode") int *
+/*[[[head:libc___p__fmode,hash:CRC-32=0x75afe2d]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") ATTR_CONST ATTR_RETNONNULL WUNUSED int *
 NOTHROW_NCX(LIBCCALL libc___p__fmode)(void)
-/*[[[body:__p__fmode]]]*/
-{
+/*[[[body:libc___p__fmode]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("__p__fmode"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:__p__fmode]]]*/
+/*[[[end:libc___p__fmode]]]*/
 
-/*[[[head:_set_fmode,hash:CRC-32=0x86ca3f17]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.utility._set_fmode") errno_t
+/*[[[head:libc__set_fmode,hash:CRC-32=0xba018643]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") errno_t
 NOTHROW_NCX(LIBCCALL libc__set_fmode)(int mode)
-/*[[[body:_set_fmode]]]*/
-{
+/*[[[body:libc__set_fmode]]]*/
+/*AUTO*/{
 	(void)mode;
 	CRT_UNIMPLEMENTED("_set_fmode"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:_set_fmode]]]*/
+/*[[[end:libc__set_fmode]]]*/
 
-/*[[[head:_get_fmode,hash:CRC-32=0xeb5b8056]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.utility._get_fmode") errno_t
+/*[[[head:libc__get_fmode,hash:CRC-32=0xce6fa140]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") errno_t
 NOTHROW_NCX(LIBCCALL libc__get_fmode)(int *pmode)
-/*[[[body:_get_fmode]]]*/
-{
+/*[[[body:libc__get_fmode]]]*/
+/*AUTO*/{
 	(void)pmode;
 	CRT_UNIMPLEMENTED("_get_fmode"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:_get_fmode]]]*/
+/*[[[end:libc__get_fmode]]]*/
 
-/*[[[head:_set_abort_behavior,hash:CRC-32=0xb1b4da51]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._set_abort_behavior") unsigned int
+/*[[[head:libc__set_abort_behavior,hash:CRC-32=0x9642f3c4]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") unsigned int
 NOTHROW_NCX(LIBCCALL libc__set_abort_behavior)(unsigned int flags,
                                                unsigned int mask)
-/*[[[body:_set_abort_behavior]]]*/
-{
+/*[[[body:libc__set_abort_behavior]]]*/
+/*AUTO*/{
 	(void)flags;
 	(void)mask;
 	CRT_UNIMPLEMENTED("_set_abort_behavior"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:_set_abort_behavior]]]*/
+/*[[[end:libc__set_abort_behavior]]]*/
 
-/*[[[head:_wgetenv,hash:CRC-32=0x25bbc61f]]]*/
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.environ._wgetenv") char32_t *
-NOTHROW_NCX(LIBCCALL libc__wgetenv)(char32_t const *varname)
-/*[[[body:_wgetenv]]]*/
-{
+/*[[[head:libc__wgetenv,hash:CRC-32=0x47d36374]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") WUNUSED NONNULL((1)) char32_t *
+NOTHROW_NCX(LIBKCALL libc__wgetenv)(char32_t const *varname)
+/*[[[body:libc__wgetenv]]]*/
+/*AUTO*/{
 	(void)varname;
 	CRT_UNIMPLEMENTED("_wgetenv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:_wgetenv]]]*/
+/*[[[end:libc__wgetenv]]]*/
 
-/*[[[head:DOS$_wgetenv,hash:CRC-32=0xbb8837b2]]]*/
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.environ._wgetenv") char16_t *
+/*[[[head:libd__wgetenv,hash:CRC-32=0x11cde7c3]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname)
-/*[[[body:DOS$_wgetenv]]]*/
-{
+/*[[[body:libd__wgetenv]]]*/
+/*AUTO*/{
 	(void)varname;
 	CRT_UNIMPLEMENTED("_wgetenv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:DOS$_wgetenv]]]*/
+/*[[[end:libd__wgetenv]]]*/
 
-/*[[[head:_wgetenv_s,hash:CRC-32=0x5bf3d15e]]]*/
-INTERN NONNULL((1, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.environ._wgetenv_s") errno_t
-NOTHROW_NCX(LIBCCALL libc__wgetenv_s)(size_t *return_size,
+/*[[[head:libc__wgetenv_s,hash:CRC-32=0x6726fc33]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 4)) errno_t
+NOTHROW_NCX(LIBKCALL libc__wgetenv_s)(size_t *return_size,
                                       char32_t *buf,
                                       size_t buflen,
                                       char32_t const *varname)
-/*[[[body:_wgetenv_s]]]*/
-{
+/*[[[body:libc__wgetenv_s]]]*/
+/*AUTO*/{
 	(void)return_size;
 	(void)buf;
 	(void)buflen;
@@ -2208,17 +2040,16 @@ NOTHROW_NCX(LIBCCALL libc__wgetenv_s)(size_t *return_size,
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:_wgetenv_s]]]*/
+/*[[[end:libc__wgetenv_s]]]*/
 
-/*[[[head:DOS$_wgetenv_s,hash:CRC-32=0x46d43da9]]]*/
-INTERN NONNULL((1, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.environ._wgetenv_s") errno_t
+/*[[[head:libd__wgetenv_s,hash:CRC-32=0x14e6f897]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 4)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *return_size,
                                       char16_t *buf,
                                       size_t buflen,
                                       char16_t const *varname)
-/*[[[body:DOS$_wgetenv_s]]]*/
-{
+/*[[[body:libd__wgetenv_s]]]*/
+/*AUTO*/{
 	(void)return_size;
 	(void)buf;
 	(void)buflen;
@@ -2227,16 +2058,15 @@ NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *return_size,
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:DOS$_wgetenv_s]]]*/
+/*[[[end:libd__wgetenv_s]]]*/
 
-/*[[[head:_wdupenv_s,hash:CRC-32=0x22db3b45]]]*/
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.environ._wdupenv_s") errno_t
-NOTHROW_NCX(LIBCCALL libc__wdupenv_s)(char32_t **pbuf,
+/*[[[head:libc__wdupenv_s,hash:CRC-32=0xfdaac8e8]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
+NOTHROW_NCX(LIBKCALL libc__wdupenv_s)(char32_t **pbuf,
                                       size_t *pbuflen,
                                       char32_t const *varname)
-/*[[[body:_wdupenv_s]]]*/
-{
+/*[[[body:libc__wdupenv_s]]]*/
+/*AUTO*/{
 	(void)pbuf;
 	(void)pbuflen;
 	(void)varname;
@@ -2244,16 +2074,15 @@ NOTHROW_NCX(LIBCCALL libc__wdupenv_s)(char32_t **pbuf,
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:_wdupenv_s]]]*/
+/*[[[end:libc__wdupenv_s]]]*/
 
-/*[[[head:DOS$_wdupenv_s,hash:CRC-32=0xe861a7cf]]]*/
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.environ._wdupenv_s") errno_t
+/*[[[head:libd__wdupenv_s,hash:CRC-32=0x77bdc1a2]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2, 3)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf,
                                       size_t *pbuflen,
                                       char16_t const *varname)
-/*[[[body:DOS$_wdupenv_s]]]*/
-{
+/*[[[body:libd__wdupenv_s]]]*/
+/*AUTO*/{
 	(void)pbuf;
 	(void)pbuflen;
 	(void)varname;
@@ -2261,212 +2090,193 @@ NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf,
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:DOS$_wdupenv_s]]]*/
+/*[[[end:libd__wdupenv_s]]]*/
 
-/*[[[head:reallocf,hash:CRC-32=0x8a28cd59]]]*/
-INTERN ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.reallocf") void *
+/*[[[head:libc_reallocf,hash:CRC-32=0x79be04b8]]]*/
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *
 NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
                                     size_t num_bytes)
-/*[[[body:reallocf]]]*/
+/*[[[body:libc_reallocf]]]*/
 /*AUTO*/{
 	void *result;
-	result = libc_realloc(mallptr, num_bytes);
+	result = realloc(mallptr, num_bytes);
 	if unlikely(!result)
-		libc_free(mallptr);
+		free(mallptr);
 	return result;
 }
-/*[[[end:reallocf]]]*/
+/*[[[end:libc_reallocf]]]*/
 
-/*[[[head:recallocarray,hash:CRC-32=0xd3b1231b]]]*/
+/*[[[head:libc_recallocarray,hash:CRC-32=0x15c974db]]]*/
 /* Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
  * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
  * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
-INTERN ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.recallocarray") void *
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *
 NOTHROW_NCX(LIBCCALL libc_recallocarray)(void *mallptr,
                                          size_t old_elem_count,
                                          size_t new_elem_count,
                                          size_t elem_size)
-/*[[[body:recallocarray]]]*/
+/*[[[body:libc_recallocarray]]]*/
 /*AUTO*/{
 	if (mallptr != NULL && old_elem_count != 0) {
 		void *result;
 		size_t oldusable, newneeded;
-		oldusable = libc_malloc_usable_size(mallptr);
+		oldusable = malloc_usable_size(mallptr);
 		newneeded = new_elem_count * elem_size;
 		if (oldusable >= newneeded) {
 			if (old_elem_count > new_elem_count) {
 				size_t zero_bytes;
 				zero_bytes = (old_elem_count - new_elem_count) * elem_size;
-				libc_explicit_bzero((byte_t *)mallptr + newneeded, zero_bytes);
+				explicit_bzero((byte_t *)mallptr + newneeded, zero_bytes);
 			}
 			return mallptr;
 		}
 		/* Allocate a new block so we can ensure that an
 		 * existing block gets freezero()'ed in all cases */
-		result = libc_calloc(new_elem_count, elem_size);
+		result = calloc(new_elem_count, elem_size);
 		if (result) {
 			if (oldusable > newneeded)
 				oldusable = newneeded;
 			memcpy(result, mallptr, oldusable);
-			libc_freezero(mallptr, old_elem_count * elem_size);
+			freezero(mallptr, old_elem_count * elem_size);
 		}
 		return result;
 	}
-	return libc_recallocv(mallptr, new_elem_count, elem_size);
+	return recallocv(mallptr, new_elem_count, elem_size);
 }
-/*[[[end:recallocarray]]]*/
+/*[[[end:libc_recallocarray]]]*/
 
-/*[[[head:freezero,hash:CRC-32=0x9639e1e8]]]*/
+/*[[[head:libc_freezero,hash:CRC-32=0xe08eaf1c]]]*/
 /* Same as `free(mallptr)', but also ensure that the memory region
  * described by `mallptr...+=size' is explicitly freed to zero, or
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.freezero") void
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") void
 NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
                                     size_t size)
-/*[[[body:freezero]]]*/
+/*[[[body:libc_freezero]]]*/
 /*AUTO*/{
 	if likely(mallptr) {
-		libc_explicit_bzero(mallptr, size);
-		libc_free(mallptr);
+		explicit_bzero(mallptr, size);
+		free(mallptr);
 	}
 }
-/*[[[end:freezero]]]*/
+/*[[[end:libc_freezero]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa8f7694c]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(getenv, libc_getenv);
-DEFINE_PUBLIC_WEAK_ALIAS(system, libc_system);
-DEFINE_PUBLIC_WEAK_ALIAS(abort, libc_abort);
-DEFINE_PUBLIC_WEAK_ALIAS(_ZSt9terminatev, libc_abort);
-DEFINE_PUBLIC_WEAK_ALIAS("?terminate@@YAXXZ", libc_abort);
-DEFINE_PUBLIC_WEAK_ALIAS(exit, libc_exit);
-DEFINE_PUBLIC_WEAK_ALIAS(atexit, libc_atexit);
-DEFINE_PUBLIC_WEAK_ALIAS(quick_exit, libc_quick_exit);
-DEFINE_PUBLIC_WEAK_ALIAS(at_quick_exit, libc_at_quick_exit);
-DEFINE_PUBLIC_WEAK_ALIAS(_Exit, libc__Exit);
-DEFINE_PUBLIC_WEAK_ALIAS(_exit, libc__Exit);
-DEFINE_PUBLIC_WEAK_ALIAS(srand, libc_srand);
-DEFINE_PUBLIC_WEAK_ALIAS(rand, libc_rand);
-DEFINE_PUBLIC_WEAK_ALIAS(drand48_r, libc_drand48_r);
-DEFINE_PUBLIC_WEAK_ALIAS(erand48_r, libc_erand48_r);
-DEFINE_PUBLIC_WEAK_ALIAS(lrand48_r, libc_lrand48_r);
-DEFINE_PUBLIC_WEAK_ALIAS(nrand48_r, libc_nrand48_r);
-DEFINE_PUBLIC_WEAK_ALIAS(mrand48_r, libc_mrand48_r);
-DEFINE_PUBLIC_WEAK_ALIAS(jrand48_r, libc_jrand48_r);
-DEFINE_PUBLIC_WEAK_ALIAS(srand48_r, libc_srand48_r);
-DEFINE_PUBLIC_WEAK_ALIAS(seed48_r, libc_seed48_r);
-DEFINE_PUBLIC_WEAK_ALIAS(lcong48_r, libc_lcong48_r);
-DEFINE_PUBLIC_WEAK_ALIAS(random_r, libc_random_r);
-DEFINE_PUBLIC_WEAK_ALIAS(srandom_r, libc_srandom_r);
-DEFINE_PUBLIC_WEAK_ALIAS(initstate_r, libc_initstate_r);
-DEFINE_PUBLIC_WEAK_ALIAS(setstate_r, libc_setstate_r);
-DEFINE_PUBLIC_WEAK_ALIAS(on_exit, libc_on_exit);
-DEFINE_PUBLIC_WEAK_ALIAS(clearenv, libc_clearenv);
-DEFINE_PUBLIC_WEAK_ALIAS(mkstemps, libc_mkstemps);
-DEFINE_PUBLIC_WEAK_ALIAS(rpmatch, libc_rpmatch);
-DEFINE_PUBLIC_WEAK_ALIAS(mkstemps64, libc_mkstemps64);
-DEFINE_PUBLIC_WEAK_ALIAS(rand_r, libc_rand_r);
-DEFINE_PUBLIC_WEAK_ALIAS(getloadavg, libc_getloadavg);
-DEFINE_PUBLIC_WEAK_ALIAS(drand48, libc_drand48);
-DEFINE_PUBLIC_WEAK_ALIAS(lrand48, libc_lrand48);
-DEFINE_PUBLIC_WEAK_ALIAS(mrand48, libc_mrand48);
-DEFINE_PUBLIC_WEAK_ALIAS(erand48, libc_erand48);
-DEFINE_PUBLIC_WEAK_ALIAS(nrand48, libc_nrand48);
-DEFINE_PUBLIC_WEAK_ALIAS(jrand48, libc_jrand48);
-DEFINE_PUBLIC_WEAK_ALIAS(srand48, libc_srand48);
-DEFINE_PUBLIC_WEAK_ALIAS(seed48, libc_seed48);
-DEFINE_PUBLIC_WEAK_ALIAS(lcong48, libc_lcong48);
-DEFINE_PUBLIC_WEAK_ALIAS(putenv, libc_putenv);
-DEFINE_PUBLIC_WEAK_ALIAS(_putenv, libc_putenv);
-DEFINE_PUBLIC_WEAK_ALIAS(random, libc_random);
-DEFINE_PUBLIC_WEAK_ALIAS(srandom, libc_srandom);
-DEFINE_PUBLIC_WEAK_ALIAS(initstate, libc_initstate);
-DEFINE_PUBLIC_WEAK_ALIAS(setstate, libc_setstate);
-DEFINE_PUBLIC_WEAK_ALIAS(l64a, libc_l64a);
-DEFINE_PUBLIC_WEAK_ALIAS(a64l, libc_a64l);
-DEFINE_PUBLIC_WEAK_ALIAS(realpath, libc_realpath);
-DEFINE_PUBLIC_WEAK_ALIAS(frealpath, libc_frealpath);
-DEFINE_PUBLIC_WEAK_ALIAS(frealpath4, libc_frealpath4);
-DEFINE_PUBLIC_WEAK_ALIAS(frealpathat, libc_frealpathat);
-DEFINE_PUBLIC_WEAK_ALIAS(setenv, libc_setenv);
-DEFINE_PUBLIC_WEAK_ALIAS(unsetenv, libc_unsetenv);
-DEFINE_PUBLIC_WEAK_ALIAS(mktemp, libc_mktemp);
-DEFINE_PUBLIC_WEAK_ALIAS(__mktemp, libc_mktemp);
-DEFINE_PUBLIC_WEAK_ALIAS(mkstemp, libc_mkstemp);
-DEFINE_PUBLIC_WEAK_ALIAS(mkdtemp, libc_mkdtemp);
-DEFINE_PUBLIC_WEAK_ALIAS(setkey, libc_setkey);
-DEFINE_PUBLIC_WEAK_ALIAS(grantpt, libc_grantpt);
-DEFINE_PUBLIC_WEAK_ALIAS(unlockpt, libc_unlockpt);
-DEFINE_PUBLIC_WEAK_ALIAS(ptsname, libc_ptsname);
-DEFINE_PUBLIC_WEAK_ALIAS(posix_openpt, libc_posix_openpt);
-DEFINE_PUBLIC_WEAK_ALIAS(secure_getenv, libc_secure_getenv);
-DEFINE_PUBLIC_WEAK_ALIAS(__secure_getenv, libc_secure_getenv);
-DEFINE_PUBLIC_WEAK_ALIAS(ptsname_r, libc_ptsname_r);
-DEFINE_PUBLIC_WEAK_ALIAS(getpt, libc_getpt);
-DEFINE_PUBLIC_WEAK_ALIAS(canonicalize_file_name, libc_canonicalize_file_name);
-DEFINE_PUBLIC_WEAK_ALIAS(mkostemp, libc_mkostemp);
-DEFINE_PUBLIC_WEAK_ALIAS(mkostemps, libc_mkostemps);
-DEFINE_PUBLIC_WEAK_ALIAS(mkostemp64, libc_mkostemp64);
-DEFINE_PUBLIC_WEAK_ALIAS(mkostemps64, libc_mkostemps64);
-DEFINE_PUBLIC_WEAK_ALIAS(reallocf, libc_reallocf);
-DEFINE_PUBLIC_WEAK_ALIAS(recallocarray, libc_recallocarray);
-DEFINE_PUBLIC_WEAK_ALIAS(freezero, libc_freezero);
-DEFINE_PUBLIC_WEAK_ALIAS(__p___argc, libc___p___argc);
-DEFINE_PUBLIC_WEAK_ALIAS(__p___argv, libc___p___argv);
-DEFINE_PUBLIC_WEAK_ALIAS(__p___wargv, libc___p___wargv);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$__p___wargv, libd___p___wargv);
-DEFINE_PUBLIC_WEAK_ALIAS(__p__wenviron, libc___p__wenviron);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$__p__wenviron, libd___p__wenviron);
-DEFINE_PUBLIC_WEAK_ALIAS(__p__wpgmptr, libc___p__wpgmptr);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$__p__wpgmptr, libd___p__wpgmptr);
-DEFINE_PUBLIC_WEAK_ALIAS(__p__pgmptr, libc___p__pgmptr);
-DEFINE_PUBLIC_WEAK_ALIAS(__p_program_invocation_name, libc___p__pgmptr);
-DEFINE_PUBLIC_WEAK_ALIAS(__p___initenv, libc___p___initenv);
-DEFINE_PUBLIC_WEAK_ALIAS(__p___winitenv, libc___p___winitenv);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$__p___winitenv, libd___p___winitenv);
-DEFINE_PUBLIC_WEAK_ALIAS(_set_purecall_handler, libc__set_purecall_handler);
-DEFINE_PUBLIC_WEAK_ALIAS(_get_purecall_handler, libc__get_purecall_handler);
-DEFINE_PUBLIC_WEAK_ALIAS(_set_invalid_parameter_handler, libc__set_invalid_parameter_handler);
-DEFINE_PUBLIC_WEAK_ALIAS(_get_invalid_parameter_handler, libc__get_invalid_parameter_handler);
-DEFINE_PUBLIC_WEAK_ALIAS(_get_pgmptr, libc__get_pgmptr);
-DEFINE_PUBLIC_WEAK_ALIAS(_get_wpgmptr, libc__get_wpgmptr);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_get_wpgmptr, libd__get_wpgmptr);
-DEFINE_PUBLIC_WEAK_ALIAS(__p__fmode, libc___p__fmode);
-DEFINE_PUBLIC_WEAK_ALIAS(_set_fmode, libc__set_fmode);
-DEFINE_PUBLIC_WEAK_ALIAS(_get_fmode, libc__get_fmode);
-DEFINE_PUBLIC_WEAK_ALIAS(_set_abort_behavior, libc__set_abort_behavior);
-DEFINE_PUBLIC_WEAK_ALIAS(getenv_s, libc_getenv_s);
-DEFINE_PUBLIC_WEAK_ALIAS(_dupenv_s, libc__dupenv_s);
-DEFINE_PUBLIC_WEAK_ALIAS(rand_s, libc_rand_s);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$rand_s, libd_rand_s);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_malloc, libc__aligned_malloc);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_offset_malloc, libc__aligned_offset_malloc);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_realloc, libc__aligned_realloc);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_recalloc, libc__aligned_recalloc);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_offset_realloc, libc__aligned_offset_realloc);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_offset_recalloc, libc__aligned_offset_recalloc);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_free, libc__aligned_free);
-DEFINE_PUBLIC_WEAK_ALIAS(_fullpath, libc__fullpath);
-DEFINE_PUBLIC_WEAK_ALIAS(_putenv_s, libc__putenv_s);
-DEFINE_PUBLIC_WEAK_ALIAS(_searchenv, libc__searchenv);
-DEFINE_PUBLIC_WEAK_ALIAS(_searchenv_s, libc__searchenv_s);
-DEFINE_PUBLIC_WEAK_ALIAS(_seterrormode, libc__seterrormode);
-DEFINE_PUBLIC_WEAK_ALIAS(_set_error_mode, libc__set_error_mode);
-DEFINE_PUBLIC_WEAK_ALIAS(_beep, libc__beep);
-DEFINE_PUBLIC_WEAK_ALIAS(onexit, libc_onexit);
-DEFINE_PUBLIC_WEAK_ALIAS(_onexit, libc_onexit);
-DEFINE_PUBLIC_WEAK_ALIAS(_wgetenv, libc__wgetenv);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wgetenv, libd__wgetenv);
-DEFINE_PUBLIC_WEAK_ALIAS(_wgetenv_s, libc__wgetenv_s);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wgetenv_s, libd__wgetenv_s);
-DEFINE_PUBLIC_WEAK_ALIAS(_wdupenv_s, libc__wdupenv_s);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wdupenv_s, libd__wdupenv_s);
+/*[[[start:exports,hash:CRC-32=0x11627722]]]*/
+DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
+DEFINE_PUBLIC_ALIAS(system, libc_system);
+DEFINE_PUBLIC_ALIAS(exit, libc_exit);
+DEFINE_PUBLIC_ALIAS(atexit, libc_atexit);
+DEFINE_PUBLIC_ALIAS(quick_exit, libc_quick_exit);
+DEFINE_PUBLIC_ALIAS(at_quick_exit, libc_at_quick_exit);
+DEFINE_PUBLIC_ALIAS(_exit, libc__Exit);
+DEFINE_PUBLIC_ALIAS(_Exit, libc__Exit);
+DEFINE_PUBLIC_ALIAS(srand, libc_srand);
+DEFINE_PUBLIC_ALIAS(rand, libc_rand);
+DEFINE_PUBLIC_ALIAS(drand48_r, libc_drand48_r);
+DEFINE_PUBLIC_ALIAS(erand48_r, libc_erand48_r);
+DEFINE_PUBLIC_ALIAS(lrand48_r, libc_lrand48_r);
+DEFINE_PUBLIC_ALIAS(nrand48_r, libc_nrand48_r);
+DEFINE_PUBLIC_ALIAS(mrand48_r, libc_mrand48_r);
+DEFINE_PUBLIC_ALIAS(jrand48_r, libc_jrand48_r);
+DEFINE_PUBLIC_ALIAS(srand48_r, libc_srand48_r);
+DEFINE_PUBLIC_ALIAS(seed48_r, libc_seed48_r);
+DEFINE_PUBLIC_ALIAS(lcong48_r, libc_lcong48_r);
+DEFINE_PUBLIC_ALIAS(random_r, libc_random_r);
+DEFINE_PUBLIC_ALIAS(srandom_r, libc_srandom_r);
+DEFINE_PUBLIC_ALIAS(initstate_r, libc_initstate_r);
+DEFINE_PUBLIC_ALIAS(setstate_r, libc_setstate_r);
+DEFINE_PUBLIC_ALIAS(on_exit, libc_on_exit);
+DEFINE_PUBLIC_ALIAS(clearenv, libc_clearenv);
+DEFINE_PUBLIC_ALIAS(mkstemps, libc_mkstemps);
+DEFINE_PUBLIC_ALIAS(rpmatch, libc_rpmatch);
+DEFINE_PUBLIC_ALIAS(mkstemps64, libc_mkstemps64);
+DEFINE_PUBLIC_ALIAS(rand_r, libc_rand_r);
+DEFINE_PUBLIC_ALIAS(getloadavg, libc_getloadavg);
+DEFINE_PUBLIC_ALIAS(drand48, libc_drand48);
+DEFINE_PUBLIC_ALIAS(lrand48, libc_lrand48);
+DEFINE_PUBLIC_ALIAS(mrand48, libc_mrand48);
+DEFINE_PUBLIC_ALIAS(erand48, libc_erand48);
+DEFINE_PUBLIC_ALIAS(nrand48, libc_nrand48);
+DEFINE_PUBLIC_ALIAS(jrand48, libc_jrand48);
+DEFINE_PUBLIC_ALIAS(srand48, libc_srand48);
+DEFINE_PUBLIC_ALIAS(seed48, libc_seed48);
+DEFINE_PUBLIC_ALIAS(lcong48, libc_lcong48);
+DEFINE_PUBLIC_ALIAS(_putenv, libc_putenv);
+DEFINE_PUBLIC_ALIAS(putenv, libc_putenv);
+DEFINE_PUBLIC_ALIAS(random, libc_random);
+DEFINE_PUBLIC_ALIAS(srandom, libc_srandom);
+DEFINE_PUBLIC_ALIAS(initstate, libc_initstate);
+DEFINE_PUBLIC_ALIAS(setstate, libc_setstate);
+DEFINE_PUBLIC_ALIAS(l64a, libc_l64a);
+DEFINE_PUBLIC_ALIAS(a64l, libc_a64l);
+DEFINE_PUBLIC_ALIAS(realpath, libc_realpath);
+DEFINE_PUBLIC_ALIAS(frealpath, libc_frealpath);
+DEFINE_PUBLIC_ALIAS(frealpath4, libc_frealpath4);
+DEFINE_PUBLIC_ALIAS(frealpathat, libc_frealpathat);
+DEFINE_PUBLIC_ALIAS(setenv, libc_setenv);
+DEFINE_PUBLIC_ALIAS(unsetenv, libc_unsetenv);
+DEFINE_PUBLIC_ALIAS(__mktemp, libc_mktemp);
+DEFINE_PUBLIC_ALIAS(mktemp, libc_mktemp);
+DEFINE_PUBLIC_ALIAS(mkstemp, libc_mkstemp);
+DEFINE_PUBLIC_ALIAS(mkstemp64, libc_mkstemp64);
+DEFINE_PUBLIC_ALIAS(mkdtemp, libc_mkdtemp);
+DEFINE_PUBLIC_ALIAS(grantpt, libc_grantpt);
+DEFINE_PUBLIC_ALIAS(unlockpt, libc_unlockpt);
+DEFINE_PUBLIC_ALIAS(ptsname, libc_ptsname);
+DEFINE_PUBLIC_ALIAS(posix_openpt, libc_posix_openpt);
+DEFINE_PUBLIC_ALIAS(__secure_getenv, libc_secure_getenv);
+DEFINE_PUBLIC_ALIAS(secure_getenv, libc_secure_getenv);
+DEFINE_PUBLIC_ALIAS(ptsname_r, libc_ptsname_r);
+DEFINE_PUBLIC_ALIAS(getpt, libc_getpt);
+DEFINE_PUBLIC_ALIAS(canonicalize_file_name, libc_canonicalize_file_name);
+DEFINE_PUBLIC_ALIAS(mkostemp, libc_mkostemp);
+DEFINE_PUBLIC_ALIAS(mkostemps, libc_mkostemps);
+DEFINE_PUBLIC_ALIAS(mkostemp64, libc_mkostemp64);
+DEFINE_PUBLIC_ALIAS(mkostemps64, libc_mkostemps64);
+DEFINE_PUBLIC_ALIAS(reallocf, libc_reallocf);
+DEFINE_PUBLIC_ALIAS(recallocarray, libc_recallocarray);
+DEFINE_PUBLIC_ALIAS(freezero, libc_freezero);
+DEFINE_PUBLIC_ALIAS(__p___argc, libc___p___argc);
+DEFINE_PUBLIC_ALIAS(__p___argv, libc___p___argv);
+DEFINE_PUBLIC_ALIAS(DOS$__p___wargv, libd___p___wargv);
+DEFINE_PUBLIC_ALIAS(__p___wargv, libc___p___wargv);
+DEFINE_PUBLIC_ALIAS(DOS$__p__wenviron, libd___p__wenviron);
+DEFINE_PUBLIC_ALIAS(__p__wenviron, libc___p__wenviron);
+DEFINE_PUBLIC_ALIAS(DOS$__p__wpgmptr, libd___p__wpgmptr);
+DEFINE_PUBLIC_ALIAS(__p__wpgmptr, libc___p__wpgmptr);
+DEFINE_PUBLIC_ALIAS(__p_program_invocation_name, libc___p__pgmptr);
+DEFINE_PUBLIC_ALIAS(__p__pgmptr, libc___p__pgmptr);
+DEFINE_PUBLIC_ALIAS(__p___initenv, libc___p___initenv);
+DEFINE_PUBLIC_ALIAS(DOS$__p___winitenv, libd___p___winitenv);
+DEFINE_PUBLIC_ALIAS(__p___winitenv, libc___p___winitenv);
+DEFINE_PUBLIC_ALIAS(_set_purecall_handler, libc__set_purecall_handler);
+DEFINE_PUBLIC_ALIAS(_get_purecall_handler, libc__get_purecall_handler);
+DEFINE_PUBLIC_ALIAS(_set_invalid_parameter_handler, libc__set_invalid_parameter_handler);
+DEFINE_PUBLIC_ALIAS(_get_invalid_parameter_handler, libc__get_invalid_parameter_handler);
+DEFINE_PUBLIC_ALIAS(__p__fmode, libc___p__fmode);
+DEFINE_PUBLIC_ALIAS(_set_fmode, libc__set_fmode);
+DEFINE_PUBLIC_ALIAS(_get_fmode, libc__get_fmode);
+DEFINE_PUBLIC_ALIAS(_set_abort_behavior, libc__set_abort_behavior);
+DEFINE_PUBLIC_ALIAS(getenv_s, libc_getenv_s);
+DEFINE_PUBLIC_ALIAS(_dupenv_s, libc__dupenv_s);
+DEFINE_PUBLIC_ALIAS(_fullpath, libc__fullpath);
+DEFINE_PUBLIC_ALIAS(_searchenv_s, libc__searchenv_s);
+DEFINE_PUBLIC_ALIAS(_seterrormode, libc__seterrormode);
+DEFINE_PUBLIC_ALIAS(_set_error_mode, libc__set_error_mode);
+DEFINE_PUBLIC_ALIAS(_beep, libc__beep);
+DEFINE_PUBLIC_ALIAS(_onexit, libc_onexit);
+DEFINE_PUBLIC_ALIAS(onexit, libc_onexit);
+DEFINE_PUBLIC_ALIAS(DOS$_wgetenv, libd__wgetenv);
+DEFINE_PUBLIC_ALIAS(_wgetenv, libc__wgetenv);
+DEFINE_PUBLIC_ALIAS(DOS$_wgetenv_s, libd__wgetenv_s);
+DEFINE_PUBLIC_ALIAS(_wgetenv_s, libc__wgetenv_s);
+DEFINE_PUBLIC_ALIAS(DOS$_wdupenv_s, libd__wdupenv_s);
+DEFINE_PUBLIC_ALIAS(_wdupenv_s, libc__wdupenv_s);
 /*[[[end:exports]]]*/
 
 DECL_END

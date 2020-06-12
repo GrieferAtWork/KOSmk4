@@ -32,101 +32,97 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:timerfd_create,hash:CRC-32=0xf52726d4]]]*/
+/*[[[head:libc_timerfd_create,hash:CRC-32=0x4a61a0af]]]*/
 /* Return file descriptor for new interval timer source */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.timer.timerfd_create") fd_t
+INTERN ATTR_SECTION(".text.crt.timer") fd_t
 NOTHROW(LIBCCALL libc_timerfd_create)(clockid_t clock_id,
-                                      int flags)
-/*[[[body:timerfd_create]]]*/
+                                      __STDC_INT_AS_UINT_T flags)
+/*[[[body:libc_timerfd_create]]]*/
 {
 	fd_t result;
 	result = sys_timerfd_create(clock_id, flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:timerfd_create]]]*/
+/*[[[end:libc_timerfd_create]]]*/
 
-/*[[[head:timerfd_settime,hash:CRC-32=0xf134c1a3]]]*/
+/*[[[head:libc_timerfd_settime,hash:CRC-32=0xc572a963]]]*/
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */
-INTERN NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.timer.timerfd_settime") int
+INTERN ATTR_SECTION(".text.crt.timer") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_timerfd_settime)(fd_t ufd,
-                                           int flags,
+                                           __STDC_INT_AS_UINT_T flags,
                                            struct itimerspec const *utmr,
                                            struct itimerspec *otmr)
-/*[[[body:timerfd_settime]]]*/
+/*[[[body:libc_timerfd_settime]]]*/
 {
 	errno_t error;
 	error = sys_timerfd_settime(ufd, (syscall_ulong_t)flags, utmr, otmr);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:timerfd_settime]]]*/
+/*[[[end:libc_timerfd_settime]]]*/
 
-/*[[[head:timerfd_gettime,hash:CRC-32=0x3c5cb1be]]]*/
+/*[[[head:libc_timerfd_gettime,hash:CRC-32=0xf14de7e5]]]*/
 /* Return the next expiration time of UFD */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.timer.timerfd_gettime") int
+INTERN ATTR_SECTION(".text.crt.timer") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_timerfd_gettime)(fd_t ufd,
                                            struct itimerspec *__restrict otmr)
-/*[[[body:timerfd_gettime]]]*/
+/*[[[body:libc_timerfd_gettime]]]*/
 {
 	errno_t error;
 	error = sys_timerfd_gettime(ufd, otmr);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:timerfd_gettime]]]*/
+/*[[[end:libc_timerfd_gettime]]]*/
 
-/*[[[head:timerfd_settime64,hash:CRC-32=0x8ccf7a5d]]]*/
+/*[[[head:libc_timerfd_settime64,hash:CRC-32=0xe494f92d]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_timerfd_settime64, libc_timerfd_settime);
+#else /* MAGIC:alias */
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_timerfd_settime64, libc_timerfd_settime);
-#else
-INTERN NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.timer.timerfd_settime64") int
+INTERN ATTR_SECTION(".text.crt.timer") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_timerfd_settime64)(fd_t ufd,
-                                             int flags,
+                                             __STDC_INT_AS_UINT_T flags,
                                              struct itimerspec64 const *utmr,
                                              struct itimerspec64 *otmr)
-/*[[[body:timerfd_settime64]]]*/
+/*[[[body:libc_timerfd_settime64]]]*/
 {
 	errno_t error;
 	error = sys_timerfd_settime64(ufd, (syscall_ulong_t)flags, utmr, otmr);
 	return libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */
-/*[[[end:timerfd_settime64]]]*/
+/*[[[end:libc_timerfd_settime64]]]*/
 
-/*[[[head:timerfd_gettime64,hash:CRC-32=0x1b09caeb]]]*/
-/* Return the next expiration time of UFD */
+/*[[[head:libc_timerfd_gettime64,hash:CRC-32=0xb71fd16]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timerfd_gettime64, libc_timerfd_gettime);
-#else
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.timer.timerfd_gettime64") int
+#else /* MAGIC:alias */
+/* Return the next expiration time of UFD */
+INTERN ATTR_SECTION(".text.crt.timer") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_timerfd_gettime64)(fd_t ufd,
                                              struct itimerspec64 *__restrict otmr)
-/*[[[body:timerfd_gettime64]]]*/
+/*[[[body:libc_timerfd_gettime64]]]*/
 {
 	errno_t error;
 	error = sys_timerfd_gettime64(ufd, otmr);
 	return libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */
-/*[[[end:timerfd_gettime64]]]*/
+/*[[[end:libc_timerfd_gettime64]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x819948c6]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(timerfd_create, libc_timerfd_create);
-DEFINE_PUBLIC_WEAK_ALIAS(timerfd_settime, libc_timerfd_settime);
-DEFINE_PUBLIC_WEAK_ALIAS(timerfd_gettime, libc_timerfd_gettime);
-DEFINE_PUBLIC_WEAK_ALIAS(timerfd_settime64, libc_timerfd_settime64);
-DEFINE_PUBLIC_WEAK_ALIAS(timerfd_gettime64, libc_timerfd_gettime64);
+/*[[[start:exports,hash:CRC-32=0xb329c30d]]]*/
+DEFINE_PUBLIC_ALIAS(timerfd_create, libc_timerfd_create);
+DEFINE_PUBLIC_ALIAS(timerfd_settime, libc_timerfd_settime);
+DEFINE_PUBLIC_ALIAS(timerfd_gettime, libc_timerfd_gettime);
+DEFINE_PUBLIC_ALIAS(timerfd_settime64, libc_timerfd_settime64);
+DEFINE_PUBLIC_ALIAS(timerfd_gettime64, libc_timerfd_gettime64);
 /*[[[end:exports]]]*/
 
 DECL_END

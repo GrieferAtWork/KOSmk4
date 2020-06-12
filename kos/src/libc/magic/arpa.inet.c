@@ -391,12 +391,12 @@ char *inet_net_ntop(int af, void const *cp, int bits, char *buf, $size_t len);
 @@Convert network number for interface type AF from presentation in buffer starting
 @@at CP to network format and store result int buffer starting at BUF of size LEN
 [[cp_kos]]
-intinet_net_pton(int af, char const *cp, void *buf, $size_t len);
+int inet_net_pton(int af, char const *cp, void *buf, $size_t len);
 
 @@Convert ASCII representation in hexadecimal form of the Internet address
 @@to binary form and place result in buffer of length LEN starting at BUF
 [[cp_kos]]
-unsigned intinet_nsap_addr(char const *cp, unsigned char *buf, int len);
+unsigned int inet_nsap_addr(char const *cp, unsigned char *buf, int len);
 
 @@Convert internet address in binary form in LEN bytes
 @@starting at CP a presentation form and place result in BUF

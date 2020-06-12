@@ -1088,7 +1088,7 @@ __STDC_INT_AS_SSIZE_T vdprintf($fd_t fd, [[nonnull]] char const *__restrict form
 	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
 	                      format, args);
 @@pp_else@@
-	return format_vprintf((pformatprinter)&write,
+	return format_vprintf((pformatprinter)(void *)&write,
 	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
 	                      format, args);
 @@pp_endif@@

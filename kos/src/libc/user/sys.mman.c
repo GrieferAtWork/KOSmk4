@@ -36,21 +36,20 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:mmap,hash:CRC-32=0x2a06ccc8]]]*/
-/* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+/*[[[head:libc_mmap,hash:CRC-32=0xd7707631]]]*/
+/* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
- *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.heap.mman.mmap") void *
+ *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
+ *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_DONT_OVERRIDE' */
+INTERN ATTR_SECTION(".text.crt.heap.mman") WUNUSED void *
 NOTHROW_NCX(LIBCCALL libc_mmap)(void *addr,
                                 size_t len,
-                                int prot,
-                                int flags,
+                                __STDC_INT_AS_UINT_T prot,
+                                __STDC_INT_AS_UINT_T flags,
                                 fd_t fd,
                                 off_t offset)
-/*[[[body:mmap]]]*/
+/*[[[body:libc_mmap]]]*/
 {
 	void *result;
 	result = sys_mmap(addr,
@@ -61,33 +60,31 @@ NOTHROW_NCX(LIBCCALL libc_mmap)(void *addr,
 	                  (syscall_ulong_t)(syscall_slong_t)offset);
 	return libc_seterrno_syserr2(result, MAP_FAILED);
 }
-/*[[[end:mmap]]]*/
+/*[[[end:libc_mmap]]]*/
 
-/*[[[head:munmap,hash:CRC-32=0xfdc6d560]]]*/
+/*[[[head:libc_munmap,hash:CRC-32=0x9a2a58aa]]]*/
 /* Unmap memory from `addr...+=len' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.heap.mman.munmap") int
+INTERN ATTR_SECTION(".text.crt.heap.mman") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr,
                                   size_t len)
-/*[[[body:munmap]]]*/
+/*[[[body:libc_munmap]]]*/
 {
 	errno_t result;
 	result = sys_munmap(addr,
 	                    len);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:munmap]]]*/
+/*[[[end:libc_munmap]]]*/
 
-/*[[[head:mprotect,hash:CRC-32=0x2ac89ff1]]]*/
-/* @param prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|
- *              PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED|PROT_GROWSUP|
- *              PROT_GROWSDOWN' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.mprotect") int
+/*[[[head:libc_mprotect,hash:CRC-32=0x6d731db2]]]*/
+/* @param prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE |
+ *              PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED |
+ *              PROT_GROWSUP | PROT_GROWSDOWN' */
+INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr,
                                     size_t len,
-                                    int prot)
-/*[[[body:mprotect]]]*/
+                                    __STDC_INT_AS_UINT_T prot)
+/*[[[body:libc_mprotect]]]*/
 {
 	errno_t result;
 	result = sys_mprotect(addr,
@@ -95,16 +92,15 @@ NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr,
 	                      (syscall_ulong_t)(unsigned int)prot);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:mprotect]]]*/
+/*[[[end:libc_mprotect]]]*/
 
-/*[[[head:msync,hash:CRC-32=0x7508ff65]]]*/
-/* @param flags: Set of `MS_ASYNC|MS_INVALIDATE|MS_SYNC' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.msync") int
+/*[[[head:libc_msync,hash:CRC-32=0xfd7a4a5c]]]*/
+/* @param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC' */
+INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_msync)(void *addr,
                                  size_t len,
-                                 int flags)
-/*[[[body:msync]]]*/
+                                 __STDC_INT_AS_UINT_T flags)
+/*[[[body:libc_msync]]]*/
 {
 	errno_t result;
 	result = sys_msync(addr,
@@ -112,96 +108,91 @@ NOTHROW_RPC(LIBCCALL libc_msync)(void *addr,
 	                   (syscall_ulong_t)(unsigned int)flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:msync]]]*/
+/*[[[end:libc_msync]]]*/
 
-/*[[[head:mlock,hash:CRC-32=0x28267a22]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.mlock") int
+/*[[[head:libc_mlock,hash:CRC-32=0xc9f34cf2]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mlock)(void const *addr,
                                  size_t len)
-/*[[[body:mlock]]]*/
+/*[[[body:libc_mlock]]]*/
 {
 	errno_t result;
 	result = sys_mlock(addr,
 	                   len);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:mlock]]]*/
+/*[[[end:libc_mlock]]]*/
 
-/*[[[head:munlock,hash:CRC-32=0xdb208ffe]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.munlock") int
+/*[[[head:libc_munlock,hash:CRC-32=0xf01c7204]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr,
                                    size_t len)
-/*[[[body:munlock]]]*/
+/*[[[body:libc_munlock]]]*/
 {
 	errno_t result;
 	result = sys_munlock(addr,
 	                     len);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:munlock]]]*/
+/*[[[end:libc_munlock]]]*/
 
-/*[[[head:mlockall,hash:CRC-32=0x259b4078]]]*/
-/* @param flags: Set of `MCL_CURRENT|MCL_FUTURE|MCL_ONFAULT' */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.mlockall") int
-NOTHROW_NCX(LIBCCALL libc_mlockall)(int flags)
-/*[[[body:mlockall]]]*/
+/*[[[head:libc_mlockall,hash:CRC-32=0xeb39f473]]]*/
+/* @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
+INTERN ATTR_SECTION(".text.crt.system.mman") int
+NOTHROW_NCX(LIBCCALL libc_mlockall)(__STDC_INT_AS_UINT_T flags)
+/*[[[body:libc_mlockall]]]*/
 {
 	errno_t result;
 	result = sys_mlockall((syscall_ulong_t)(unsigned int)flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:mlockall]]]*/
+/*[[[end:libc_mlockall]]]*/
 
-/*[[[head:munlockall,hash:CRC-32=0xc4a643fc]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.munlockall") int
+/*[[[head:libc_munlockall,hash:CRC-32=0x616b898c]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_munlockall)(void)
-/*[[[body:munlockall]]]*/
+/*[[[body:libc_munlockall]]]*/
 {
 	errno_t result;
 	result = sys_munlockall();
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:munlockall]]]*/
+/*[[[end:libc_munlockall]]]*/
 
-/*[[[head:shm_open,hash:CRC-32=0xf5e38312]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.shm_open") int
+/*[[[head:libc_shm_open,hash:CRC-32=0xaa615a35]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
                                     oflag_t oflags,
                                     mode_t mode)
-/*[[[body:shm_open]]]*/
-{
+/*[[[body:libc_shm_open]]]*/
+/*AUTO*/{
 	(void)name;
 	(void)oflags;
 	(void)mode;
 	CRT_UNIMPLEMENTED("shm_open"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:shm_open]]]*/
+/*[[[end:libc_shm_open]]]*/
 
-/*[[[head:shm_unlink,hash:CRC-32=0x25c99c5]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.shm_unlink") int
+/*[[[head:libc_shm_unlink,hash:CRC-32=0x21646eee]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name)
-/*[[[body:shm_unlink]]]*/
-{
+/*[[[body:libc_shm_unlink]]]*/
+/*AUTO*/{
 	(void)name;
 	CRT_UNIMPLEMENTED("shm_unlink"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:shm_unlink]]]*/
+/*[[[end:libc_shm_unlink]]]*/
 
-/*[[[head:madvise,hash:CRC-32=0xf32e87f2]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.madvise") int
+/*[[[head:libc_madvise,hash:CRC-32=0x6ab3bd0b]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr,
                                    size_t len,
-                                   int advice)
-/*[[[body:madvise]]]*/
+                                   __STDC_INT_AS_UINT_T advice)
+/*[[[body:libc_madvise]]]*/
 {
 	errno_t result;
 	result = sys_madvise(addr,
@@ -209,15 +200,14 @@ NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr,
 	                     (syscall_ulong_t)(unsigned int)advice);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:madvise]]]*/
+/*[[[end:libc_madvise]]]*/
 
-/*[[[head:mincore,hash:CRC-32=0xe025e057]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.mincore") int
+/*[[[head:libc_mincore,hash:CRC-32=0xb92dc176]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_mincore)(void *start,
                                    size_t len,
                                    unsigned char *vec)
-/*[[[body:mincore]]]*/
+/*[[[body:libc_mincore]]]*/
 {
 	errno_t result;
 	result = sys_mincore(start,
@@ -225,26 +215,25 @@ NOTHROW_NCX(LIBCCALL libc_mincore)(void *start,
 	                     (uint8_t *)vec);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:mincore]]]*/
+/*[[[end:libc_mincore]]]*/
 
-/*[[[head:mmap64,hash:CRC-32=0xf1bcecd8]]]*/
-/* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
- * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
- *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
+/*[[[head:libc_mmap64,hash:CRC-32=0x27a0ad37]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_mmap64, libc_mmap);
-#else
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.heap.mman.mmap64") void *
+#else /* MAGIC:alias */
+/* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+ * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+ *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
+ *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_DONT_OVERRIDE' */
+INTERN ATTR_SECTION(".text.crt.heap.mman") WUNUSED void *
 NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr,
                                   size_t len,
-                                  int prot,
-                                  int flags,
+                                  __STDC_INT_AS_UINT_T prot,
+                                  __STDC_INT_AS_UINT_T flags,
                                   fd_t fd,
                                   off64_t offset)
-/*[[[body:mmap64]]]*/
+/*[[[body:libc_mmap64]]]*/
 {
 	void *result;
 #if __SIZEOF_SYSCALL_LONG_T__ < 8
@@ -269,34 +258,32 @@ NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr,
 	return libc_seterrno_syserr2(result, MAP_FAILED);
 }
 #endif /* MAGIC:alias */
-/*[[[end:mmap64]]]*/
+/*[[[end:libc_mmap64]]]*/
 
-/*[[[head:posix_madvise,hash:CRC-32=0x3cbcf0e2]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.posix_madvise") int
+/*[[[head:libc_posix_madvise,hash:CRC-32=0xb62b9980]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr,
                                          size_t len,
-                                         int advice)
-/*[[[body:posix_madvise]]]*/
-{
+                                         __STDC_INT_AS_UINT_T advice)
+/*[[[body:libc_posix_madvise]]]*/
+/*AUTO*/{
+	/* Implement as a no-op, since this function is merely meant as a hint */
 	(void)addr;
 	(void)len;
 	(void)advice;
-	CRT_UNIMPLEMENTED("posix_madvise"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:posix_madvise]]]*/
+/*[[[end:libc_posix_madvise]]]*/
 
-/*[[[head:mremap,hash:CRC-32=0xd559c1d0]]]*/
-/* @param flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.heap.mman.mremap") void *
+/*[[[head:libc_mremap,hash:CRC-32=0x31cbe7cb]]]*/
+/* @param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
+INTERN ATTR_SECTION(".text.crt.heap.mman") void *
 NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr,
                                    size_t old_len,
                                    size_t new_len,
-                                   int flags,
-                                   ... /* void *new_address */)
-/*[[[body:mremap]]]*/
+                                   __STDC_INT_AS_UINT_T flags,
+                                   ...)
+/*[[[body:libc_mremap]]]*/
 {
 	void *result;
 	va_list args;
@@ -309,16 +296,16 @@ NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr,
 	va_end(args);
 	return libc_seterrno_syserr2(result, MAP_FAILED);
 }
-/*[[[end:mremap]]]*/
+/*[[[end:libc_mremap]]]*/
 
-/*[[[head:remap_file_pages,hash:CRC-32=0xd5e4d222]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.remap_file_pages") int
+/*[[[head:libc_remap_file_pages,hash:CRC-32=0xd51bfd2e]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start,
                                             size_t size,
-                                            int prot,
+                                            __STDC_INT_AS_UINT_T prot,
                                             size_t pgoff,
-                                            int flags)
-/*[[[body:remap_file_pages]]]*/
+                                            __STDC_INT_AS_UINT_T flags)
+/*[[[body:libc_remap_file_pages]]]*/
 {
 	errno_t result;
 	result = sys_remap_file_pages(start,
@@ -328,138 +315,137 @@ NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start,
 	                              (syscall_ulong_t)(unsigned int)flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:remap_file_pages]]]*/
+/*[[[end:libc_remap_file_pages]]]*/
 
-/*[[[head:memfd_create,hash:CRC-32=0x9bf85513]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.memfd_create") fd_t
+/*[[[head:libc_memfd_create,hash:CRC-32=0xb3c4f089]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") fd_t
 NOTHROW_NCX(LIBCCALL libc_memfd_create)(char const *name,
                                         unsigned int flags)
-/*[[[body:memfd_create]]]*/
-{
+/*[[[body:libc_memfd_create]]]*/
+/*AUTO*/{
 	(void)name;
 	(void)flags;
 	CRT_UNIMPLEMENTED("memfd_create"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:memfd_create]]]*/
+/*[[[end:libc_memfd_create]]]*/
 
-/*[[[head:mlock2,hash:CRC-32=0xca5eea7b]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.mlock2") int
+/*[[[head:libc_mlock2,hash:CRC-32=0xa7787755]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_mlock2)(void const *addr,
                                   size_t length,
                                   unsigned int flags)
-/*[[[body:mlock2]]]*/
-{
+/*[[[body:libc_mlock2]]]*/
+/*AUTO*/{
 	(void)addr;
 	(void)length;
 	(void)flags;
 	CRT_UNIMPLEMENTED("mlock2"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:mlock2]]]*/
+/*[[[end:libc_mlock2]]]*/
 
-/*[[[head:pkey_alloc,hash:CRC-32=0xcd9cf6c4]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.pkey_alloc") int
+/*[[[head:libc_pkey_alloc,hash:CRC-32=0x365873c6]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_pkey_alloc)(unsigned int flags,
                                       unsigned int access_rights)
-/*[[[body:pkey_alloc]]]*/
-{
+/*[[[body:libc_pkey_alloc]]]*/
+/*AUTO*/{
 	(void)flags;
 	(void)access_rights;
 	CRT_UNIMPLEMENTED("pkey_alloc"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:pkey_alloc]]]*/
+/*[[[end:libc_pkey_alloc]]]*/
 
-/*[[[head:pkey_set,hash:CRC-32=0x174d5cbb]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.pkey_set") int
+/*[[[head:libc_pkey_set,hash:CRC-32=0xe240f11a]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_pkey_set)(int key,
                                     unsigned int access_rights)
-/*[[[body:pkey_set]]]*/
-{
+/*[[[body:libc_pkey_set]]]*/
+/*AUTO*/{
 	(void)key;
 	(void)access_rights;
 	CRT_UNIMPLEMENTED("pkey_set"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:pkey_set]]]*/
+/*[[[end:libc_pkey_set]]]*/
 
-/*[[[head:pkey_get,hash:CRC-32=0xf6e2d3b5]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.pkey_get") int
+/*[[[head:libc_pkey_get,hash:CRC-32=0x2f2b16ef]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_pkey_get)(int key)
-/*[[[body:pkey_get]]]*/
-{
+/*[[[body:libc_pkey_get]]]*/
+/*AUTO*/{
 	(void)key;
 	CRT_UNIMPLEMENTED("pkey_get"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:pkey_get]]]*/
+/*[[[end:libc_pkey_get]]]*/
 
-/*[[[head:pkey_free,hash:CRC-32=0x68ab8966]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.pkey_free") int
+/*[[[head:libc_pkey_free,hash:CRC-32=0x1832d1ee]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_pkey_free)(int key)
-/*[[[body:pkey_free]]]*/
-{
+/*[[[body:libc_pkey_free]]]*/
+/*AUTO*/{
 	(void)key;
 	CRT_UNIMPLEMENTED("pkey_free"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:pkey_free]]]*/
+/*[[[end:libc_pkey_free]]]*/
 
-/*[[[head:pkey_mprotect,hash:CRC-32=0x60bdcbb4]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.pkey_mprotect") int
+/*[[[head:libc_pkey_mprotect,hash:CRC-32=0x831af7f4]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr,
                                          size_t len,
-                                         int prot,
+                                         __STDC_INT_AS_UINT_T prot,
                                          int pkey)
-/*[[[body:pkey_mprotect]]]*/
-{
+/*[[[body:libc_pkey_mprotect]]]*/
+/*AUTO*/{
 	(void)addr;
 	(void)len;
 	(void)prot;
 	(void)pkey;
 	CRT_UNIMPLEMENTED("pkey_mprotect"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:pkey_mprotect]]]*/
+/*[[[end:libc_pkey_mprotect]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x681074e3]]]*/
-#undef mremap
-DEFINE_PUBLIC_WEAK_ALIAS(mmap, libc_mmap);
-DEFINE_PUBLIC_WEAK_ALIAS(munmap, libc_munmap);
-DEFINE_PUBLIC_WEAK_ALIAS(mprotect, libc_mprotect);
-DEFINE_PUBLIC_WEAK_ALIAS(msync, libc_msync);
-DEFINE_PUBLIC_WEAK_ALIAS(mlock, libc_mlock);
-DEFINE_PUBLIC_WEAK_ALIAS(munlock, libc_munlock);
-DEFINE_PUBLIC_WEAK_ALIAS(mlockall, libc_mlockall);
-DEFINE_PUBLIC_WEAK_ALIAS(munlockall, libc_munlockall);
-DEFINE_PUBLIC_WEAK_ALIAS(shm_open, libc_shm_open);
-DEFINE_PUBLIC_WEAK_ALIAS(shm_unlink, libc_shm_unlink);
-DEFINE_PUBLIC_WEAK_ALIAS(madvise, libc_madvise);
-DEFINE_PUBLIC_WEAK_ALIAS(__madvise, libc_madvise);
-DEFINE_PUBLIC_WEAK_ALIAS(mincore, libc_mincore);
-DEFINE_PUBLIC_WEAK_ALIAS(mmap64, libc_mmap64);
-DEFINE_PUBLIC_WEAK_ALIAS(posix_madvise, libc_posix_madvise);
-DEFINE_PUBLIC_WEAK_ALIAS(mremap, libc_mremap);
-DEFINE_PUBLIC_WEAK_ALIAS(remap_file_pages, libc_remap_file_pages);
-DEFINE_PUBLIC_WEAK_ALIAS(memfd_create, libc_memfd_create);
-DEFINE_PUBLIC_WEAK_ALIAS(mlock2, libc_mlock2);
-DEFINE_PUBLIC_WEAK_ALIAS(pkey_alloc, libc_pkey_alloc);
-DEFINE_PUBLIC_WEAK_ALIAS(pkey_set, libc_pkey_set);
-DEFINE_PUBLIC_WEAK_ALIAS(pkey_get, libc_pkey_get);
-DEFINE_PUBLIC_WEAK_ALIAS(pkey_free, libc_pkey_free);
-DEFINE_PUBLIC_WEAK_ALIAS(pkey_mprotect, libc_pkey_mprotect);
+/*[[[start:exports,hash:CRC-32=0xf500e6d3]]]*/
+DEFINE_PUBLIC_ALIAS(mmap, libc_mmap);
+DEFINE_PUBLIC_ALIAS(munmap, libc_munmap);
+DEFINE_PUBLIC_ALIAS(mprotect, libc_mprotect);
+DEFINE_PUBLIC_ALIAS(msync, libc_msync);
+DEFINE_PUBLIC_ALIAS(mlock, libc_mlock);
+DEFINE_PUBLIC_ALIAS(munlock, libc_munlock);
+DEFINE_PUBLIC_ALIAS(mlockall, libc_mlockall);
+DEFINE_PUBLIC_ALIAS(munlockall, libc_munlockall);
+DEFINE_PUBLIC_ALIAS(shm_open, libc_shm_open);
+DEFINE_PUBLIC_ALIAS(shm_unlink, libc_shm_unlink);
+DEFINE_PUBLIC_ALIAS(__madvise, libc_madvise);
+DEFINE_PUBLIC_ALIAS(madvise, libc_madvise);
+DEFINE_PUBLIC_ALIAS(mincore, libc_mincore);
+DEFINE_PUBLIC_ALIAS(mmap64, libc_mmap64);
+DEFINE_PUBLIC_ALIAS(posix_madvise, libc_posix_madvise);
+DEFINE_PUBLIC_ALIAS(mremap, libc_mremap);
+DEFINE_PUBLIC_ALIAS(remap_file_pages, libc_remap_file_pages);
+DEFINE_PUBLIC_ALIAS(memfd_create, libc_memfd_create);
+DEFINE_PUBLIC_ALIAS(mlock2, libc_mlock2);
+DEFINE_PUBLIC_ALIAS(pkey_alloc, libc_pkey_alloc);
+DEFINE_PUBLIC_ALIAS(pkey_set, libc_pkey_set);
+DEFINE_PUBLIC_ALIAS(pkey_get, libc_pkey_get);
+DEFINE_PUBLIC_ALIAS(pkey_free, libc_pkey_free);
+DEFINE_PUBLIC_ALIAS(pkey_mprotect, libc_pkey_mprotect);
 /*[[[end:exports]]]*/
 
 DECL_END

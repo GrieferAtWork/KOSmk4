@@ -31,137 +31,131 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setspent,hash:CRC-32=0x6dfa6052]]]*/
+/*[[[head:libc_setspent,hash:CRC-32=0x381becd4]]]*/
 /* Open database for reading.
  * This function is not part of POSIX and therefore no official cancellation point */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.setspent") void
+INTERN ATTR_SECTION(".text.crt.database.shadow") void
 NOTHROW_RPC(LIBCCALL libc_setspent)(void)
-/*[[[body:setspent]]]*/
-{
+/*[[[body:libc_setspent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("setspent"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:setspent]]]*/
+/*[[[end:libc_setspent]]]*/
 
-/*[[[head:endspent,hash:CRC-32=0xfff1c73f]]]*/
+/*[[[head:libc_endspent,hash:CRC-32=0x35b44d37]]]*/
 /* Close database. */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.endspent") void
+INTERN ATTR_SECTION(".text.crt.database.shadow") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endspent)(void)
-/*[[[body:endspent]]]*/
-{
+/*[[[body:libc_endspent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("endspent"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:endspent]]]*/
+/*[[[end:libc_endspent]]]*/
 
-/*[[[head:getspent,hash:CRC-32=0xf659bab2]]]*/
+/*[[[head:libc_getspent,hash:CRC-32=0x895461bd]]]*/
 /* Get next entry from database, perhaps after opening the file.
  * This function is not part of POSIX and therefore no official cancellation point */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.getspent") struct spwd *
+INTERN ATTR_SECTION(".text.crt.database.shadow") struct spwd *
 NOTHROW_RPC(LIBCCALL libc_getspent)(void)
-/*[[[body:getspent]]]*/
-{
+/*[[[body:libc_getspent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("getspent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getspent]]]*/
+/*[[[end:libc_getspent]]]*/
 
-/*[[[head:getspnam,hash:CRC-32=0xc935ac36]]]*/
+/*[[[head:libc_getspnam,hash:CRC-32=0xe006374e]]]*/
 /* Get shadow entry matching NAME.
  * This function is not part of POSIX and therefore no official cancellation point */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.getspnam") struct spwd *
+INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1)) struct spwd *
 NOTHROW_RPC(LIBCCALL libc_getspnam)(char const *__restrict name)
-/*[[[body:getspnam]]]*/
-{
+/*[[[body:libc_getspnam]]]*/
+/*AUTO*/{
 	(void)name;
 	CRT_UNIMPLEMENTED("getspnam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getspnam]]]*/
+/*[[[end:libc_getspnam]]]*/
 
-/*[[[head:sgetspent,hash:CRC-32=0x4064e4e9]]]*/
+/*[[[head:libc_sgetspent,hash:CRC-32=0x4165ee3c]]]*/
 /* Read shadow entry from STRING.
  * This function is not part of POSIX and therefore no official cancellation point */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.sgetspent") struct spwd *
+INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1)) struct spwd *
 NOTHROW_RPC(LIBCCALL libc_sgetspent)(char const *__restrict string)
-/*[[[body:sgetspent]]]*/
-{
+/*[[[body:libc_sgetspent]]]*/
+/*AUTO*/{
 	(void)string;
 	CRT_UNIMPLEMENTED("sgetspent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:sgetspent]]]*/
+/*[[[end:libc_sgetspent]]]*/
 
-/*[[[head:fgetspent,hash:CRC-32=0xd70c1a72]]]*/
+/*[[[head:libc_fgetspent,hash:CRC-32=0xb3eb2a3e]]]*/
 /* Read next shadow entry from STREAM.
  * This function is not part of POSIX and therefore no official cancellation point */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.fgetspent") struct spwd *
+INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1)) struct spwd *
 NOTHROW_RPC(LIBCCALL libc_fgetspent)(FILE *__restrict stream)
-/*[[[body:fgetspent]]]*/
-{
+/*[[[body:libc_fgetspent]]]*/
+/*AUTO*/{
 	(void)stream;
 	CRT_UNIMPLEMENTED("fgetspent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:fgetspent]]]*/
+/*[[[end:libc_fgetspent]]]*/
 
-/*[[[head:putspent,hash:CRC-32=0x40464108]]]*/
+/*[[[head:libc_putspent,hash:CRC-32=0x6a8112a4]]]*/
 /* Write line containing shadow password entry to stream.
  * This function is not part of POSIX and therefore no official cancellation point */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.putspent") int
+INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_putspent)(struct spwd const *__restrict p,
                                     FILE *__restrict stream)
-/*[[[body:putspent]]]*/
-{
+/*[[[body:libc_putspent]]]*/
+/*AUTO*/{
 	(void)p;
 	(void)stream;
 	CRT_UNIMPLEMENTED("putspent"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:putspent]]]*/
+/*[[[end:libc_putspent]]]*/
 
-/*[[[head:getspent_r,hash:CRC-32=0xbd8ea05f]]]*/
+/*[[[head:libc_getspent_r,hash:CRC-32=0xfab378af]]]*/
 /* Reentrant versions of some of the functions above.
  * These functions are not part of POSIX and therefore no official cancellation point */
-INTERN NONNULL((1, 2, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.getspent_r") int
+INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1, 2, 4)) int
 NOTHROW_RPC(LIBCCALL libc_getspent_r)(struct spwd *__restrict result_buf,
                                       char *__restrict buffer,
                                       size_t buflen,
                                       struct spwd **__restrict result)
-/*[[[body:getspent_r]]]*/
-{
+/*[[[body:libc_getspent_r]]]*/
+/*AUTO*/{
 	(void)result_buf;
 	(void)buffer;
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTED("getspent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getspent_r]]]*/
+/*[[[end:libc_getspent_r]]]*/
 
-/*[[[head:getspnam_r,hash:CRC-32=0x2d32830b]]]*/
+/*[[[head:libc_getspnam_r,hash:CRC-32=0x5629111e]]]*/
 /* Reentrant versions of some of the functions above.
  * These functions are not part of POSIX and therefore no official cancellation point */
-INTERN NONNULL((1, 2, 3, 5))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.getspnam_r") int
+INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1, 2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_getspnam_r)(char const *__restrict name,
                                       struct spwd *__restrict result_buf,
                                       char *__restrict buffer,
                                       size_t buflen,
                                       struct spwd **__restrict result)
-/*[[[body:getspnam_r]]]*/
-{
+/*[[[body:libc_getspnam_r]]]*/
+/*AUTO*/{
 	(void)name;
 	(void)result_buf;
 	(void)buffer;
@@ -169,22 +163,21 @@ NOTHROW_RPC(LIBCCALL libc_getspnam_r)(char const *__restrict name,
 	(void)result;
 	CRT_UNIMPLEMENTED("getspnam_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getspnam_r]]]*/
+/*[[[end:libc_getspnam_r]]]*/
 
-/*[[[head:sgetspent_r,hash:CRC-32=0x1761f05]]]*/
+/*[[[head:libc_sgetspent_r,hash:CRC-32=0x1a7bc87]]]*/
 /* Reentrant versions of some of the functions above.
  * These functions are not part of POSIX and therefore no official cancellation point */
-INTERN NONNULL((1, 2, 3, 5))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.sgetspent_r") int
+INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1, 2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_sgetspent_r)(char const *__restrict string,
                                        struct spwd *__restrict result_buf,
                                        char *__restrict buffer,
                                        size_t buflen,
                                        struct spwd **__restrict result)
-/*[[[body:sgetspent_r]]]*/
-{
+/*[[[body:libc_sgetspent_r]]]*/
+/*AUTO*/{
 	(void)string;
 	(void)result_buf;
 	(void)buffer;
@@ -192,22 +185,21 @@ NOTHROW_RPC(LIBCCALL libc_sgetspent_r)(char const *__restrict string,
 	(void)result;
 	CRT_UNIMPLEMENTED("sgetspent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:sgetspent_r]]]*/
+/*[[[end:libc_sgetspent_r]]]*/
 
-/*[[[head:fgetspent_r,hash:CRC-32=0xf54bf1bf]]]*/
+/*[[[head:libc_fgetspent_r,hash:CRC-32=0x799adf59]]]*/
 /* Reentrant versions of some of the functions above.
  * These functions are not part of POSIX and therefore no official cancellation point */
-INTERN NONNULL((1, 2, 3, 5))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.fgetspent_r") int
+INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1, 2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_fgetspent_r)(FILE *__restrict stream,
                                        struct spwd *__restrict result_buf,
                                        char *__restrict buffer,
                                        size_t buflen,
                                        struct spwd **__restrict result)
-/*[[[body:fgetspent_r]]]*/
-{
+/*[[[body:libc_fgetspent_r]]]*/
+/*AUTO*/{
 	(void)stream;
 	(void)result_buf;
 	(void)buffer;
@@ -215,52 +207,52 @@ NOTHROW_RPC(LIBCCALL libc_fgetspent_r)(FILE *__restrict stream,
 	(void)result;
 	CRT_UNIMPLEMENTED("fgetspent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:fgetspent_r]]]*/
+/*[[[end:libc_fgetspent_r]]]*/
 
-/*[[[head:lckpwdf,hash:CRC-32=0xcb3c07b7]]]*/
+/*[[[head:libc_lckpwdf,hash:CRC-32=0x52f047fc]]]*/
 /* Protect password file against multi writers */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.lckpwdf") int
+INTERN ATTR_SECTION(".text.crt.database.shadow") int
 NOTHROW_RPC_KOS(LIBCCALL libc_lckpwdf)(void)
-/*[[[body:lckpwdf]]]*/
-{
+/*[[[body:libc_lckpwdf]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("lckpwdf"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:lckpwdf]]]*/
+/*[[[end:libc_lckpwdf]]]*/
 
-/*[[[head:ulckpwdf,hash:CRC-32=0x9ba809e4]]]*/
+/*[[[head:libc_ulckpwdf,hash:CRC-32=0x9ca5bf33]]]*/
 /* Unlock password file */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.ulckpwdf") int
+INTERN ATTR_SECTION(".text.crt.database.shadow") int
 NOTHROW_NCX(LIBCCALL libc_ulckpwdf)(void)
-/*[[[body:ulckpwdf]]]*/
-{
+/*[[[body:libc_ulckpwdf]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("ulckpwdf"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:ulckpwdf]]]*/
+/*[[[end:libc_ulckpwdf]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x13b46cd0]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(setspent, libc_setspent);
-DEFINE_PUBLIC_WEAK_ALIAS(endspent, libc_endspent);
-DEFINE_PUBLIC_WEAK_ALIAS(getspent, libc_getspent);
-DEFINE_PUBLIC_WEAK_ALIAS(getspnam, libc_getspnam);
-DEFINE_PUBLIC_WEAK_ALIAS(sgetspent, libc_sgetspent);
-DEFINE_PUBLIC_WEAK_ALIAS(fgetspent, libc_fgetspent);
-DEFINE_PUBLIC_WEAK_ALIAS(putspent, libc_putspent);
-DEFINE_PUBLIC_WEAK_ALIAS(getspent_r, libc_getspent_r);
-DEFINE_PUBLIC_WEAK_ALIAS(getspnam_r, libc_getspnam_r);
-DEFINE_PUBLIC_WEAK_ALIAS(sgetspent_r, libc_sgetspent_r);
-DEFINE_PUBLIC_WEAK_ALIAS(fgetspent_r, libc_fgetspent_r);
-DEFINE_PUBLIC_WEAK_ALIAS(lckpwdf, libc_lckpwdf);
-DEFINE_PUBLIC_WEAK_ALIAS(ulckpwdf, libc_ulckpwdf);
+/*[[[start:exports,hash:CRC-32=0xc9cf3d45]]]*/
+DEFINE_PUBLIC_ALIAS(setspent, libc_setspent);
+DEFINE_PUBLIC_ALIAS(endspent, libc_endspent);
+DEFINE_PUBLIC_ALIAS(getspent, libc_getspent);
+DEFINE_PUBLIC_ALIAS(getspnam, libc_getspnam);
+DEFINE_PUBLIC_ALIAS(sgetspent, libc_sgetspent);
+DEFINE_PUBLIC_ALIAS(fgetspent, libc_fgetspent);
+DEFINE_PUBLIC_ALIAS(putspent, libc_putspent);
+DEFINE_PUBLIC_ALIAS(getspent_r, libc_getspent_r);
+DEFINE_PUBLIC_ALIAS(getspnam_r, libc_getspnam_r);
+DEFINE_PUBLIC_ALIAS(sgetspent_r, libc_sgetspent_r);
+DEFINE_PUBLIC_ALIAS(fgetspent_r, libc_fgetspent_r);
+DEFINE_PUBLIC_ALIAS(lckpwdf, libc_lckpwdf);
+DEFINE_PUBLIC_ALIAS(ulckpwdf, libc_ulckpwdf);
 /*[[[end:exports]]]*/
 
 DECL_END

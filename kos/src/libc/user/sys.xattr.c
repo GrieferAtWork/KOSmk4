@@ -32,229 +32,217 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setxattr,hash:CRC-32=0x8b94443b]]]*/
+/*[[[head:libc_setxattr,hash:CRC-32=0xd192d3de]]]*/
 /* Set the attribute NAME of the file pointed to by PATH to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.setxattr") int
+INTERN NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_setxattr)(char const *path,
                                     char const *name,
                                     void const *buf,
                                     size_t bufsize,
-                                    int flags)
-/*[[[body:setxattr]]]*/
+                                    __STDC_INT_AS_UINT_T flags)
+/*[[[body:libc_setxattr]]]*/
 {
 	errno_t result;
 	result = sys_setxattr(path, name, buf, bufsize, flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:setxattr]]]*/
+/*[[[end:libc_setxattr]]]*/
 
-/*[[[head:lsetxattr,hash:CRC-32=0xbdfba82d]]]*/
+/*[[[head:libc_lsetxattr,hash:CRC-32=0x67f820aa]]]*/
 /* Set the attribute NAME of the file pointed to by PATH to VALUE (which is
  * SIZE bytes long), not following symlinks for the last pathname component.
  * Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.lsetxattr") int
+INTERN NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_lsetxattr)(char const *path,
                                      char const *name,
                                      void const *buf,
                                      size_t bufsize,
-                                     int flags)
-/*[[[body:lsetxattr]]]*/
+                                     __STDC_INT_AS_UINT_T flags)
+/*[[[body:libc_lsetxattr]]]*/
 {
 	errno_t result;
 	result = sys_lsetxattr(path, name, buf, bufsize, flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:lsetxattr]]]*/
+/*[[[end:libc_lsetxattr]]]*/
 
-/*[[[head:fsetxattr,hash:CRC-32=0x68b80750]]]*/
+/*[[[head:libc_fsetxattr,hash:CRC-32=0x11efd3d5]]]*/
 /* Set the attribute NAME of the file descriptor FD to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
-INTERN NONNULL((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.fsetxattr") int
+INTERN NONNULL((2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_fsetxattr)(fd_t fd,
                                      char const *name,
                                      void const *buf,
                                      size_t bufsize,
-                                     int flags)
-/*[[[body:fsetxattr]]]*/
+                                     __STDC_INT_AS_UINT_T flags)
+/*[[[body:libc_fsetxattr]]]*/
 {
 	errno_t result;
 	result = sys_fsetxattr(fd, name, buf, bufsize, flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:fsetxattr]]]*/
+/*[[[end:libc_fsetxattr]]]*/
 
-/*[[[head:getxattr,hash:CRC-32=0xe88dba55]]]*/
+/*[[[head:libc_getxattr,hash:CRC-32=0xf911aa89]]]*/
 /* Get the attribute NAME of the file pointed to by PATH to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors */
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.getxattr") ssize_t
+INTERN NONNULL((1, 2, 3)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_getxattr)(char const *path,
                                     char const *name,
                                     void *buf,
                                     size_t bufsize)
-/*[[[body:getxattr]]]*/
+/*[[[body:libc_getxattr]]]*/
 {
 	ssize_t result;
 	result = sys_getxattr(path, name, buf, bufsize);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:getxattr]]]*/
+/*[[[end:libc_getxattr]]]*/
 
-/*[[[head:lgetxattr,hash:CRC-32=0x385d911c]]]*/
+/*[[[head:libc_lgetxattr,hash:CRC-32=0xa0c4d5da]]]*/
 /* Get the attribute NAME of the file pointed to by PATH to VALUE (which is
  * SIZE bytes long), not following symlinks for the last pathname component.
  * Return 0 on success, -1 for errors */
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.lgetxattr") ssize_t
+INTERN NONNULL((1, 2, 3)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_lgetxattr)(char const *path,
                                      char const *name,
                                      void *buf,
                                      size_t bufsize)
-/*[[[body:lgetxattr]]]*/
+/*[[[body:libc_lgetxattr]]]*/
 {
 	ssize_t result;
 	result = sys_lgetxattr(path, name, buf, bufsize);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:lgetxattr]]]*/
+/*[[[end:libc_lgetxattr]]]*/
 
-/*[[[head:fgetxattr,hash:CRC-32=0x207145d0]]]*/
+/*[[[head:libc_fgetxattr,hash:CRC-32=0x65f14770]]]*/
 /* Get the attribute NAME of the file descriptor FD to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors */
-INTERN NONNULL((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.fgetxattr") ssize_t
+INTERN NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_fgetxattr)(fd_t fd,
                                      char const *name,
                                      void *buf,
                                      size_t bufsize)
-/*[[[body:fgetxattr]]]*/
+/*[[[body:libc_fgetxattr]]]*/
 {
 	ssize_t result;
 	result = sys_fgetxattr(fd, name, buf, bufsize);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:fgetxattr]]]*/
+/*[[[end:libc_fgetxattr]]]*/
 
-/*[[[head:listxattr,hash:CRC-32=0xa8177bea]]]*/
+/*[[[head:libc_listxattr,hash:CRC-32=0x78fe2cdf]]]*/
 /* List attributes of the file pointed to by PATH into the
  * user-supplied buffer LIST (which is SIZE bytes big).
  * Return 0 on success, -1 for errors */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.listxattr") ssize_t
+INTERN NONNULL((1, 2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_listxattr)(char const *path,
                                      char *listbuf,
                                      size_t listbufsize)
-/*[[[body:listxattr]]]*/
+/*[[[body:libc_listxattr]]]*/
 {
 	ssize_t result;
 	result = sys_listxattr(path, listbuf, listbufsize);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:listxattr]]]*/
+/*[[[end:libc_listxattr]]]*/
 
-/*[[[head:llistxattr,hash:CRC-32=0x71dd9ce3]]]*/
+/*[[[head:libc_llistxattr,hash:CRC-32=0xaf5ff751]]]*/
 /* List attributes of the file pointed to by PATH into the user-supplied
  * buffer LIST (which is SIZE bytes big), not following symlinks for the
  * last pathname component. Return 0 on success, -1 for errors */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.llistxattr") ssize_t
+INTERN NONNULL((1, 2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_llistxattr)(char const *path,
                                       char *listbuf,
                                       size_t listbufsize)
-/*[[[body:llistxattr]]]*/
+/*[[[body:libc_llistxattr]]]*/
 {
 	ssize_t result;
 	result = sys_llistxattr(path, listbuf, listbufsize);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:llistxattr]]]*/
+/*[[[end:libc_llistxattr]]]*/
 
-/*[[[head:flistxattr,hash:CRC-32=0x46e5eea1]]]*/
+/*[[[head:libc_flistxattr,hash:CRC-32=0x6cbefcae]]]*/
 /* List attributes of the file descriptor FD into the user-supplied buffer
  * LIST (which is SIZE bytes big). Return 0 on success, -1 for errors */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.flistxattr") ssize_t
+INTERN NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_flistxattr)(fd_t fd,
                                       char *listbuf,
                                       size_t listbufsize)
-/*[[[body:flistxattr]]]*/
+/*[[[body:libc_flistxattr]]]*/
 {
 	ssize_t result;
 	result = sys_flistxattr(fd, listbuf, listbufsize);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:flistxattr]]]*/
+/*[[[end:libc_flistxattr]]]*/
 
-/*[[[head:removexattr,hash:CRC-32=0xa58bcabc]]]*/
+/*[[[head:libc_removexattr,hash:CRC-32=0x7d851dda]]]*/
 /* Remove the attribute NAME from the file pointed to by PATH.
  * Return 0 on success, -1 for errors */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.removexattr") int
+INTERN NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_removexattr)(char const *path,
                                        char const *name)
-/*[[[body:removexattr]]]*/
+/*[[[body:libc_removexattr]]]*/
 {
 	ssize_t result;
 	result = sys_removexattr(path, name);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:removexattr]]]*/
+/*[[[end:libc_removexattr]]]*/
 
-/*[[[head:lremovexattr,hash:CRC-32=0xf1a2c7df]]]*/
+/*[[[head:libc_lremovexattr,hash:CRC-32=0x339442a6]]]*/
 /* Remove the attribute NAME from the file pointed to by PATH, not
  * following symlinks for the last pathname component.
  * Return 0 on success, -1 for errors */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.lremovexattr") int
+INTERN NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_lremovexattr)(char const *path,
                                         char const *name)
-/*[[[body:lremovexattr]]]*/
+/*[[[body:libc_lremovexattr]]]*/
 {
 	ssize_t result;
 	result = sys_lremovexattr(path, name);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:lremovexattr]]]*/
+/*[[[end:libc_lremovexattr]]]*/
 
-/*[[[head:fremovexattr,hash:CRC-32=0x8907691]]]*/
+/*[[[head:libc_fremovexattr,hash:CRC-32=0x552c4a0e]]]*/
 /* Remove the attribute NAME from the file descriptor FD.
  * Return 0 on success, -1 for errors */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.fremovexattr") int
+INTERN NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_fremovexattr)(fd_t fd,
                                         char const *name)
-/*[[[body:fremovexattr]]]*/
+/*[[[body:libc_fremovexattr]]]*/
 {
 	ssize_t result;
 	result = sys_fremovexattr(fd, name);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:fremovexattr]]]*/
+/*[[[end:libc_fremovexattr]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7249f2c7]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(setxattr, libc_setxattr);
-DEFINE_PUBLIC_WEAK_ALIAS(lsetxattr, libc_lsetxattr);
-DEFINE_PUBLIC_WEAK_ALIAS(fsetxattr, libc_fsetxattr);
-DEFINE_PUBLIC_WEAK_ALIAS(getxattr, libc_getxattr);
-DEFINE_PUBLIC_WEAK_ALIAS(lgetxattr, libc_lgetxattr);
-DEFINE_PUBLIC_WEAK_ALIAS(fgetxattr, libc_fgetxattr);
-DEFINE_PUBLIC_WEAK_ALIAS(listxattr, libc_listxattr);
-DEFINE_PUBLIC_WEAK_ALIAS(llistxattr, libc_llistxattr);
-DEFINE_PUBLIC_WEAK_ALIAS(flistxattr, libc_flistxattr);
-DEFINE_PUBLIC_WEAK_ALIAS(removexattr, libc_removexattr);
-DEFINE_PUBLIC_WEAK_ALIAS(lremovexattr, libc_lremovexattr);
-DEFINE_PUBLIC_WEAK_ALIAS(fremovexattr, libc_fremovexattr);
+/*[[[start:exports,hash:CRC-32=0x1435a00]]]*/
+DEFINE_PUBLIC_ALIAS(setxattr, libc_setxattr);
+DEFINE_PUBLIC_ALIAS(lsetxattr, libc_lsetxattr);
+DEFINE_PUBLIC_ALIAS(fsetxattr, libc_fsetxattr);
+DEFINE_PUBLIC_ALIAS(getxattr, libc_getxattr);
+DEFINE_PUBLIC_ALIAS(lgetxattr, libc_lgetxattr);
+DEFINE_PUBLIC_ALIAS(fgetxattr, libc_fgetxattr);
+DEFINE_PUBLIC_ALIAS(listxattr, libc_listxattr);
+DEFINE_PUBLIC_ALIAS(llistxattr, libc_llistxattr);
+DEFINE_PUBLIC_ALIAS(flistxattr, libc_flistxattr);
+DEFINE_PUBLIC_ALIAS(removexattr, libc_removexattr);
+DEFINE_PUBLIC_ALIAS(lremovexattr, libc_lremovexattr);
+DEFINE_PUBLIC_ALIAS(fremovexattr, libc_fremovexattr);
 /*[[[end:exports]]]*/
 
 DECL_END

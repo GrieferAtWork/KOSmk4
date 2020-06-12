@@ -124,29 +124,29 @@ DEFINE_NOREL_GLOBAL_META(reg_syntax_t, re_syntax_options, ".crt.utility.regex");
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:re_set_syntax,hash:CRC-32=0x76a52738]]]*/
+/*[[[head:libc_re_set_syntax,hash:CRC-32=0x1557e442]]]*/
 /* Sets the current default syntax to SYNTAX, and return the old syntax.
  * You can also simply assign to the `re_syntax_options' variable */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_set_syntax") reg_syntax_t
+INTERN ATTR_SECTION(".text.crt.utility.regex") reg_syntax_t
 NOTHROW_NCX(LIBCCALL libc_re_set_syntax)(reg_syntax_t syntax)
-/*[[[body:re_set_syntax]]]*/
+/*[[[body:libc_re_set_syntax]]]*/
 {
 	return ATOMIC_XCH(re_syntax_options, syntax);
 }
-/*[[[end:re_set_syntax]]]*/
+/*[[[end:libc_re_set_syntax]]]*/
 
-/*[[[head:re_compile_pattern,hash:CRC-32=0x2df41685]]]*/
+/*[[[head:libc_re_compile_pattern,hash:CRC-32=0x290e93e8]]]*/
 /* Compile the regular expression PATTERN, with length LENGTH
  * and syntax given by the global `re_syntax_options', into the buffer
  * BUFFER. Return NULL if successful, and an error string if not.
  * To free the allocated storage, you must call `regfree' on BUFFER.
  * Note that the translate table must either have been initialized by
  * `regcomp', with a malloc'd value, or set to NULL before calling `regfree' */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_compile_pattern") char const *
+INTERN ATTR_SECTION(".text.crt.utility.regex") char const *
 NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern,
                                               size_t length,
                                               struct re_pattern_buffer *buffer)
-/*[[[body:re_compile_pattern]]]*/
+/*[[[body:libc_re_compile_pattern]]]*/
 {
 	if unlikely(!buffer)
 		return strerrorname_s(EINVAL);
@@ -155,35 +155,35 @@ NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern,
 		return strerrorname_s(libc_geterrno());
 	return NULL;
 }
-/*[[[end:re_compile_pattern]]]*/
+/*[[[end:libc_re_compile_pattern]]]*/
 
-/*[[[head:re_compile_fastmap,hash:CRC-32=0x7f01b7bb]]]*/
+/*[[[head:libc_re_compile_fastmap,hash:CRC-32=0x4d2da87b]]]*/
 /* Compile a fastmap for the compiled pattern in BUFFER; used to
  * accelerate searches. Return 0 if successful and -2 if was an internal error */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_compile_fastmap") int
+INTERN ATTR_SECTION(".text.crt.utility.regex") int
 NOTHROW_NCX(LIBCCALL libc_re_compile_fastmap)(struct re_pattern_buffer *buffer)
-/*[[[body:re_compile_fastmap]]]*/
+/*[[[body:libc_re_compile_fastmap]]]*/
 {
 	(void)buffer; /* no-op */
 	COMPILER_IMPURE();
 	return 0;
 }
-/*[[[end:re_compile_fastmap]]]*/
+/*[[[end:libc_re_compile_fastmap]]]*/
 
-/*[[[head:re_search,hash:CRC-32=0xc45c2c8]]]*/
+/*[[[head:libc_re_search,hash:CRC-32=0xdd579930]]]*/
 /* Search in the string STRING (with length LENGTH) for the pattern
  * compiled into BUFFER. Start searching at position START, for RANGE
  * characters. Return the starting position of the match, -1 for no
  * match, or -2 for an internal error. Also return register
  * information in REGS (if REGS and BUFFER->no_sub are nonzero) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_search") int
+INTERN ATTR_SECTION(".text.crt.utility.regex") int
 NOTHROW_NCX(LIBCCALL libc_re_search)(struct re_pattern_buffer *buffer,
                                      char const *string,
                                      int length,
                                      int start,
                                      int range,
                                      struct re_registers *regs)
-/*[[[body:re_search]]]*/
+/*[[[body:libc_re_search]]]*/
 {
 	return libc_re_search_2(buffer,
 	                        string,
@@ -195,12 +195,12 @@ NOTHROW_NCX(LIBCCALL libc_re_search)(struct re_pattern_buffer *buffer,
 	                        regs,
 	                        range);
 }
-/*[[[end:re_search]]]*/
+/*[[[end:libc_re_search]]]*/
 
-/*[[[head:re_search_2,hash:CRC-32=0x54dae2f1]]]*/
+/*[[[head:libc_re_search_2,hash:CRC-32=0x18286ad5]]]*/
 /* Like `re_search', but search in the concatenation of STRING1
  * and STRING2. Also, stop searching at index START + STOP */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_search_2") int
+INTERN ATTR_SECTION(".text.crt.utility.regex") int
 NOTHROW_NCX(LIBCCALL libc_re_search_2)(struct re_pattern_buffer *buffer,
                                        char const *string1,
                                        int length1,
@@ -210,7 +210,7 @@ NOTHROW_NCX(LIBCCALL libc_re_search_2)(struct re_pattern_buffer *buffer,
                                        int range,
                                        struct re_registers *regs,
                                        int stop)
-/*[[[body:re_search_2]]]*/
+/*[[[body:libc_re_search_2]]]*/
 {
 	if (!REGEX_ONDEMAND())
 		return -2;
@@ -228,18 +228,18 @@ NOTHROW_NCX(LIBCCALL libc_re_search_2)(struct re_pattern_buffer *buffer,
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:re_search_2]]]*/
+/*[[[end:libc_re_search_2]]]*/
 
-/*[[[head:re_match,hash:CRC-32=0xf34c14fa]]]*/
+/*[[[head:libc_re_match,hash:CRC-32=0x1897b9ec]]]*/
 /* Like `re_search', but return how many characters in STRING
  * the regexp in BUFFER matched, starting at position START */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_match") int
+INTERN ATTR_SECTION(".text.crt.utility.regex") int
 NOTHROW_NCX(LIBCCALL libc_re_match)(struct re_pattern_buffer *buffer,
                                     char const *string,
                                     int length,
                                     int start,
                                     struct re_registers *regs)
-/*[[[body:re_match]]]*/
+/*[[[body:libc_re_match]]]*/
 {
 	return libc_re_match_2(buffer,
 	                       string,
@@ -250,11 +250,11 @@ NOTHROW_NCX(LIBCCALL libc_re_match)(struct re_pattern_buffer *buffer,
 	                       regs,
 	                       length);
 }
-/*[[[end:re_match]]]*/
+/*[[[end:libc_re_match]]]*/
 
-/*[[[head:re_match_2,hash:CRC-32=0x97439455]]]*/
+/*[[[head:libc_re_match_2,hash:CRC-32=0x572fd06d]]]*/
 /* Relates to `re_match' as `re_search_2' relates to `re_search' */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_match_2") int
+INTERN ATTR_SECTION(".text.crt.utility.regex") int
 NOTHROW_NCX(LIBCCALL libc_re_match_2)(struct re_pattern_buffer *buffer,
                                       char const *string1,
                                       int length1,
@@ -263,8 +263,8 @@ NOTHROW_NCX(LIBCCALL libc_re_match_2)(struct re_pattern_buffer *buffer,
                                       int start,
                                       struct re_registers *regs,
                                       int stop)
-/*[[[body:re_match_2]]]*/
-{
+/*[[[body:libc_re_match_2]]]*/
+/*AUTO*/{
 	(void)buffer;
 	(void)string1;
 	(void)length1;
@@ -275,11 +275,11 @@ NOTHROW_NCX(LIBCCALL libc_re_match_2)(struct re_pattern_buffer *buffer,
 	(void)stop;
 	CRT_UNIMPLEMENTED("re_match_2"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:re_match_2]]]*/
+/*[[[end:libc_re_match_2]]]*/
 
-/*[[[head:re_set_registers,hash:CRC-32=0x59800159]]]*/
+/*[[[head:libc_re_set_registers,hash:CRC-32=0x5eab0051]]]*/
 /* Set REGS to hold NUM_REGS registers, storing them in STARTS and
  * ENDS. Subsequent matches using BUFFER and REGS will use this memory
  * for recording register information. STARTS and ENDS must be allocated
@@ -287,14 +287,14 @@ NOTHROW_NCX(LIBCCALL libc_re_match_2)(struct re_pattern_buffer *buffer,
  * If NUM_REGS == 0, then subsequent matches should allocate their own register data.
  * Unless this function is called, the first search or match using
  * PATTERN_BUFFER will allocate its own register data, without freeing the old data */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_set_registers") void
+INTERN ATTR_SECTION(".text.crt.utility.regex") void
 NOTHROW_NCX(LIBCCALL libc_re_set_registers)(struct re_pattern_buffer *buffer,
                                             struct re_registers *regs,
                                             unsigned int num_regs,
                                             regoff_t *starts,
                                             regoff_t *ends)
-/*[[[body:re_set_registers]]]*/
-{
+/*[[[body:libc_re_set_registers]]]*/
+/*AUTO*/{
 	(void)buffer;
 	(void)regs;
 	(void)num_regs;
@@ -303,33 +303,33 @@ NOTHROW_NCX(LIBCCALL libc_re_set_registers)(struct re_pattern_buffer *buffer,
 	CRT_UNIMPLEMENTED("re_set_registers"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:re_set_registers]]]*/
+/*[[[end:libc_re_set_registers]]]*/
 
-/*[[[head:regcomp,hash:CRC-32=0xa5c28382]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.regcomp") int
+/*[[[head:libc_regcomp,hash:CRC-32=0xd2f28c93]]]*/
+INTERN ATTR_SECTION(".text.crt.utility.regex") int
 NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict preg,
                                    char const *__restrict pattern,
                                    int cflags)
-/*[[[body:regcomp]]]*/
-{
+/*[[[body:libc_regcomp]]]*/
+/*AUTO*/{
 	(void)preg;
 	(void)pattern;
 	(void)cflags;
 	CRT_UNIMPLEMENTED("regcomp"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:regcomp]]]*/
+/*[[[end:libc_regcomp]]]*/
 
-/*[[[head:regexec,hash:CRC-32=0x86fb3b30]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.regexec") int
+/*[[[head:libc_regexec,hash:CRC-32=0xec92f4c2]]]*/
+INTERN ATTR_SECTION(".text.crt.utility.regex") int
 NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict preg,
                                    char const *__restrict string,
                                    size_t nmatch,
                                    regmatch_t pmatch[__restrict_arr],
                                    int eflags)
-/*[[[body:regexec]]]*/
-{
+/*[[[body:libc_regexec]]]*/
+/*AUTO*/{
 	(void)preg;
 	(void)string;
 	(void)nmatch;
@@ -337,18 +337,18 @@ NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict preg,
 	(void)eflags;
 	CRT_UNIMPLEMENTED("regexec"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:regexec]]]*/
+/*[[[end:libc_regexec]]]*/
 
-/*[[[head:regerror,hash:CRC-32=0x690d5c1]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.regerror") size_t
+/*[[[head:libc_regerror,hash:CRC-32=0xbfc3249d]]]*/
+INTERN ATTR_SECTION(".text.crt.utility.regex") size_t
 NOTHROW_NCX(LIBCCALL libc_regerror)(int errcode,
                                     regex_t const *__restrict preg,
                                     char *__restrict errbuf,
                                     size_t errbuf_size)
-/*[[[body:regerror]]]*/
-{
+/*[[[body:libc_regerror]]]*/
+/*AUTO*/{
 	(void)errcode;
 	(void)preg;
 	(void)errbuf;
@@ -357,35 +357,35 @@ NOTHROW_NCX(LIBCCALL libc_regerror)(int errcode,
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:regerror]]]*/
+/*[[[end:libc_regerror]]]*/
 
-/*[[[head:regfree,hash:CRC-32=0x61d2afc3]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.regfree") void
+/*[[[head:libc_regfree,hash:CRC-32=0xbb22ec1a]]]*/
+INTERN ATTR_SECTION(".text.crt.utility.regex") void
 NOTHROW_NCX(LIBCCALL libc_regfree)(regex_t *preg)
-/*[[[body:regfree]]]*/
+/*[[[body:libc_regfree]]]*/
 {
 	if (preg)
 		free(preg->buffer);
 }
-/*[[[end:regfree]]]*/
+/*[[[end:libc_regfree]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x28500a93]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(re_set_syntax, libc_re_set_syntax);
-DEFINE_PUBLIC_WEAK_ALIAS(re_compile_pattern, libc_re_compile_pattern);
-DEFINE_PUBLIC_WEAK_ALIAS(re_compile_fastmap, libc_re_compile_fastmap);
-DEFINE_PUBLIC_WEAK_ALIAS(re_search, libc_re_search);
-DEFINE_PUBLIC_WEAK_ALIAS(re_search_2, libc_re_search_2);
-DEFINE_PUBLIC_WEAK_ALIAS(re_match, libc_re_match);
-DEFINE_PUBLIC_WEAK_ALIAS(re_match_2, libc_re_match_2);
-DEFINE_PUBLIC_WEAK_ALIAS(re_set_registers, libc_re_set_registers);
-DEFINE_PUBLIC_WEAK_ALIAS(regcomp, libc_regcomp);
-DEFINE_PUBLIC_WEAK_ALIAS(regexec, libc_regexec);
-DEFINE_PUBLIC_WEAK_ALIAS(regerror, libc_regerror);
-DEFINE_PUBLIC_WEAK_ALIAS(regfree, libc_regfree);
+/*[[[start:exports,hash:CRC-32=0xac5be75f]]]*/
+DEFINE_PUBLIC_ALIAS(re_set_syntax, libc_re_set_syntax);
+DEFINE_PUBLIC_ALIAS(re_compile_pattern, libc_re_compile_pattern);
+DEFINE_PUBLIC_ALIAS(re_compile_fastmap, libc_re_compile_fastmap);
+DEFINE_PUBLIC_ALIAS(re_search, libc_re_search);
+DEFINE_PUBLIC_ALIAS(re_search_2, libc_re_search_2);
+DEFINE_PUBLIC_ALIAS(re_match, libc_re_match);
+DEFINE_PUBLIC_ALIAS(re_match_2, libc_re_match_2);
+DEFINE_PUBLIC_ALIAS(re_set_registers, libc_re_set_registers);
+DEFINE_PUBLIC_ALIAS(regcomp, libc_regcomp);
+DEFINE_PUBLIC_ALIAS(regexec, libc_regexec);
+DEFINE_PUBLIC_ALIAS(regerror, libc_regerror);
+DEFINE_PUBLIC_ALIAS(regfree, libc_regfree);
 /*[[[end:exports]]]*/
 
 DECL_END

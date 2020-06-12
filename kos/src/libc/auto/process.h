@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1364592 */
+/* HASH CRC-32:0xfa9f3110 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,12 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+INTDEF void NOTHROW_NCX(LIBCCALL libc__endthread)(void);
 INTDEF void (LIBCCALL libc__c_exit)(void) THROWS(...);
+INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnl)(int mode, char const *__restrict path, char const *args, ...);
+INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlp)(int mode, char const *__restrict file, char const *args, ...);
+INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode, char const *__restrict path, char const *args, ...);
+INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(int mode, char const *__restrict file, char const *args, ...);
 #endif /* !__KERNEL__ */
 
 DECL_END

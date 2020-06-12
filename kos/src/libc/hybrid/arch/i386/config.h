@@ -68,5 +68,6 @@
 #define LIBC_ARCH_HAVE_C32SNLEN      1
 #define LIBC_ARCH_HAVE_C32SEND       1
 #define LIBC_ARCH_HAVE_C32SNEND      1
+#define LIBC_ARCH_HAVE_ABORT         1
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_CONFIG_H */

@@ -21,28 +21,16 @@
 #define GUARD_LIBC_USER_KOS_FCNTL_C 1
 
 #include "../api.h"
-#include "kos.fcntl.h"
-#include <kos/syscalls.h>
 
 DECL_BEGIN
 
-
-
-
-
-/*[[[start:implementation]]]*/
-
-/*[[[skip:Fcntl]]]*/
-/*[[[skip:Open]]]*/
-/*[[[skip:Creat]]]*/
-/*[[[skip:Open64]]]*/
-/*[[[skip:Creat64]]]*/
-/*[[[skip:OpenAt]]]*/
-/*[[[skip:OpenAt64]]]*/
-
-/*[[[end:implementation]]]*/
-
-
+/*[[[skip:libc_Fcntl]]]*/
+/*[[[skip:libc_Open]]]*/
+/*[[[skip:libc_Creat]]]*/
+/*[[[skip:libc_Open64]]]*/
+/*[[[skip:libc_Creat64]]]*/
+/*[[[skip:libc_OpenAt]]]*/
+/*[[[skip:libc_OpenAt64]]]*/
 
 /*[[[start:exports,hash:CRC-32=0x0]]]*/
 /*[[[end:exports]]]*/

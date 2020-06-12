@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a2f99b3 */
+/* HASH CRC-32:0xe5c54d26 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,12 +93,12 @@ NOTHROW_NCX(LIBKCALL libc_wtoll)(char32_t const *nptr) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wtoi, libd__wtoi);
-DEFINE_PUBLIC_WEAK_ALIAS(wtoi, libc_wtoi);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wtol, libd__wtol);
-DEFINE_PUBLIC_WEAK_ALIAS(wtol, libc_wtol);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wtoll, libd__wtoll);
-DEFINE_PUBLIC_WEAK_ALIAS(wtoll, libc_wtoll);
+DEFINE_PUBLIC_ALIAS(DOS$_wtoi, libd__wtoi);
+DEFINE_PUBLIC_ALIAS(wtoi, libc_wtoi);
+DEFINE_PUBLIC_ALIAS(DOS$_wtol, libd__wtol);
+DEFINE_PUBLIC_ALIAS(wtol, libc_wtol);
+DEFINE_PUBLIC_ALIAS(DOS$_wtoll, libd__wtoll);
+DEFINE_PUBLIC_ALIAS(wtoll, libc_wtoll);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PARTS_WCHAR_STDLIB_C */

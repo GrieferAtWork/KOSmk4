@@ -31,153 +31,153 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setutxent,hash:CRC-32=0x916e0b96]]]*/
+/*[[[head:libc_setutxent,hash:CRC-32=0xaa3ffd17]]]*/
 /* Open user accounting database */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.setutxent") void
+INTERN ATTR_SECTION(".text.crt.database.utmpx") void
 NOTHROW_RPC(LIBCCALL libc_setutxent)(void)
-/*[[[body:setutxent]]]*/
-{
+/*[[[body:libc_setutxent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("setutxent"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:setutxent]]]*/
+/*[[[end:libc_setutxent]]]*/
 
-/*[[[head:endutxent,hash:CRC-32=0x46023aad]]]*/
+/*[[[head:libc_endutxent,hash:CRC-32=0xa269e300]]]*/
 /* Close user accounting database */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.endutxent") void
+INTERN ATTR_SECTION(".text.crt.database.utmpx") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endutxent)(void)
-/*[[[body:endutxent]]]*/
-{
+/*[[[body:libc_endutxent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("endutxent"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:endutxent]]]*/
+/*[[[end:libc_endutxent]]]*/
 
-/*[[[head:getutxent,hash:CRC-32=0x1c775566]]]*/
+/*[[[head:libc_getutxent,hash:CRC-32=0xadc1a678]]]*/
 /* Get the next entry from the user accounting database */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.getutxent") struct utmpx *
+INTERN ATTR_SECTION(".text.crt.database.utmpx") struct utmpx *
 NOTHROW_RPC(LIBCCALL libc_getutxent)(void)
-/*[[[body:getutxent]]]*/
-{
+/*[[[body:libc_getutxent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("getutxent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getutxent]]]*/
+/*[[[end:libc_getutxent]]]*/
 
-/*[[[head:getutxid,hash:CRC-32=0xb4f04635]]]*/
+/*[[[head:libc_getutxid,hash:CRC-32=0x9cdc536e]]]*/
 /* Get the user accounting database entry corresponding to ID */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.getutxid") struct utmpx *
+INTERN ATTR_SECTION(".text.crt.database.utmpx") struct utmpx *
 NOTHROW_RPC(LIBCCALL libc_getutxid)(struct utmpx const *id)
-/*[[[body:getutxid]]]*/
-{
+/*[[[body:libc_getutxid]]]*/
+/*AUTO*/{
 	(void)id;
 	CRT_UNIMPLEMENTED("getutxid"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getutxid]]]*/
+/*[[[end:libc_getutxid]]]*/
 
-/*[[[head:getutxline,hash:CRC-32=0x7eec4e9]]]*/
+/*[[[head:libc_getutxline,hash:CRC-32=0x16c819a7]]]*/
 /* Get the user accounting database entry corresponding to LINE */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.getutxline") struct utmpx *
+INTERN ATTR_SECTION(".text.crt.database.utmpx") struct utmpx *
 NOTHROW_RPC(LIBCCALL libc_getutxline)(struct utmpx const *line)
-/*[[[body:getutxline]]]*/
-{
+/*[[[body:libc_getutxline]]]*/
+/*AUTO*/{
 	(void)line;
 	CRT_UNIMPLEMENTED("getutxline"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getutxline]]]*/
+/*[[[end:libc_getutxline]]]*/
 
-/*[[[head:pututxline,hash:CRC-32=0xad8e9fb6]]]*/
+/*[[[head:libc_pututxline,hash:CRC-32=0x25e30005]]]*/
 /* Write the entry UTMPX into the user accounting database */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.pututxline") struct utmpx *
+INTERN ATTR_SECTION(".text.crt.database.utmpx") struct utmpx *
 NOTHROW_RPC(LIBCCALL libc_pututxline)(struct utmpx const *utmpx)
-/*[[[body:pututxline]]]*/
-{
+/*[[[body:libc_pututxline]]]*/
+/*AUTO*/{
 	(void)utmpx;
 	CRT_UNIMPLEMENTED("pututxline"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:pututxline]]]*/
+/*[[[end:libc_pututxline]]]*/
 
-/*[[[head:utmpxname,hash:CRC-32=0xce16f6c1]]]*/
+/*[[[head:libc_utmpxname,hash:CRC-32=0x86d75556]]]*/
 /* Change name of the utmpx file to be examined.
  * This function is not part of POSIX and therefore no official cancellation point */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.utmpxname") int
+INTERN ATTR_SECTION(".text.crt.database.utmpx") int
 NOTHROW_RPC(LIBCCALL libc_utmpxname)(char const *file)
-/*[[[body:utmpxname]]]*/
-{
+/*[[[body:libc_utmpxname]]]*/
+/*AUTO*/{
 	(void)file;
 	CRT_UNIMPLEMENTED("utmpxname"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:utmpxname]]]*/
+/*[[[end:libc_utmpxname]]]*/
 
-/*[[[head:updwtmpx,hash:CRC-32=0xb764f48b]]]*/
+/*[[[head:libc_updwtmpx,hash:CRC-32=0x5d0f5568]]]*/
 /* Append entry UTMP to the wtmpx-like file WTMPX_FILE.
  * This function is not part of POSIX and therefore no official cancellation point */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.updwtmpx") void
+INTERN ATTR_SECTION(".text.crt.database.utmpx") void
 NOTHROW_RPC(LIBCCALL libc_updwtmpx)(char const *wtmpx_file,
                                     struct utmpx const *utmpx)
-/*[[[body:updwtmpx]]]*/
-{
+/*[[[body:libc_updwtmpx]]]*/
+/*AUTO*/{
 	(void)wtmpx_file;
 	(void)utmpx;
 	CRT_UNIMPLEMENTED("updwtmpx"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:updwtmpx]]]*/
+/*[[[end:libc_updwtmpx]]]*/
 
-/*[[[head:getutmp,hash:CRC-32=0xf848fddb]]]*/
+/*[[[head:libc_getutmp,hash:CRC-32=0x340a01bf]]]*/
 /* Copy the information in UTMPX to UTMP.
  * This function is not part of POSIX and therefore no official cancellation point */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.getutmp") void
+INTERN ATTR_SECTION(".text.crt.database.utmpx") void
 NOTHROW_RPC(LIBCCALL libc_getutmp)(struct utmpx const *utmpx,
                                    struct utmp *utmp)
-/*[[[body:getutmp]]]*/
-{
+/*[[[body:libc_getutmp]]]*/
+/*AUTO*/{
 	(void)utmpx;
 	(void)utmp;
 	CRT_UNIMPLEMENTED("getutmp"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:getutmp]]]*/
+/*[[[end:libc_getutmp]]]*/
 
-/*[[[head:getutmpx,hash:CRC-32=0xad602cbc]]]*/
+/*[[[head:libc_getutmpx,hash:CRC-32=0x85da6b1d]]]*/
 /* Copy the information in UTMP to UTMPX.
  * This function is not part of POSIX and therefore no official cancellation point */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.getutmpx") void
+INTERN ATTR_SECTION(".text.crt.database.utmpx") void
 NOTHROW_RPC(LIBCCALL libc_getutmpx)(struct utmp const *utmp,
                                     struct utmpx *utmpx)
-/*[[[body:getutmpx]]]*/
-{
+/*[[[body:libc_getutmpx]]]*/
+/*AUTO*/{
 	(void)utmp;
 	(void)utmpx;
 	CRT_UNIMPLEMENTED("getutmpx"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:getutmpx]]]*/
+/*[[[end:libc_getutmpx]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xee1a6167]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(setutxent, libc_setutxent);
-DEFINE_PUBLIC_WEAK_ALIAS(endutxent, libc_endutxent);
-DEFINE_PUBLIC_WEAK_ALIAS(getutxent, libc_getutxent);
-DEFINE_PUBLIC_WEAK_ALIAS(getutxid, libc_getutxid);
-DEFINE_PUBLIC_WEAK_ALIAS(getutxline, libc_getutxline);
-DEFINE_PUBLIC_WEAK_ALIAS(pututxline, libc_pututxline);
-DEFINE_PUBLIC_WEAK_ALIAS(utmpxname, libc_utmpxname);
-DEFINE_PUBLIC_WEAK_ALIAS(updwtmpx, libc_updwtmpx);
-DEFINE_PUBLIC_WEAK_ALIAS(getutmp, libc_getutmp);
-DEFINE_PUBLIC_WEAK_ALIAS(getutmpx, libc_getutmpx);
+/*[[[start:exports,hash:CRC-32=0x570fae3d]]]*/
+DEFINE_PUBLIC_ALIAS(setutxent, libc_setutxent);
+DEFINE_PUBLIC_ALIAS(endutxent, libc_endutxent);
+DEFINE_PUBLIC_ALIAS(getutxent, libc_getutxent);
+DEFINE_PUBLIC_ALIAS(getutxid, libc_getutxid);
+DEFINE_PUBLIC_ALIAS(getutxline, libc_getutxline);
+DEFINE_PUBLIC_ALIAS(pututxline, libc_pututxline);
+DEFINE_PUBLIC_ALIAS(utmpxname, libc_utmpxname);
+DEFINE_PUBLIC_ALIAS(updwtmpx, libc_updwtmpx);
+DEFINE_PUBLIC_ALIAS(getutmp, libc_getutmp);
+DEFINE_PUBLIC_ALIAS(getutmpx, libc_getutmpx);
 /*[[[end:exports]]]*/
 
 DECL_END

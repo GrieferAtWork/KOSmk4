@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c0478f9 */
+/* HASH CRC-32:0x1d8c54e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,10 @@ DECL_BEGIN
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
-(LIBCCALL libc_format_repeat)(pformatprinter printer, void *arg, char ch, size_t num_repetitions) THROWS(...) {
+(LIBCCALL libc_format_repeat)(pformatprinter printer,
+                              void *arg,
+                              char ch,
+                              size_t num_repetitions) THROWS(...) {
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
@@ -123,7 +126,11 @@ err:
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
-(LIBCCALL libc_format_escape)(pformatprinter printer, void *arg, char const *__restrict text, size_t textlen, unsigned int flags) THROWS(...) {
+(LIBCCALL libc_format_escape)(pformatprinter printer,
+                              void *arg,
+                              char const *__restrict text,
+                              size_t textlen,
+                              unsigned int flags) THROWS(...) {
 #define escape_tooct(c) ('0' + (char)(unsigned char)(c))
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
@@ -402,7 +409,12 @@ err:
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
 INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
-(LIBCCALL libc_format_hexdump)(pformatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...) {
+(LIBCCALL libc_format_hexdump)(pformatprinter printer,
+                               void *arg,
+                               void const *__restrict data,
+                               size_t size,
+                               size_t linesize,
+                               unsigned int flags) THROWS(...) {
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals
@@ -695,7 +707,10 @@ err:
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3)) ssize_t
-(LIBCCALL libc_format_vprintf)(pformatprinter printer, void *arg, char const *__restrict format, va_list args) THROWS(...) {
+(LIBCCALL libc_format_vprintf)(pformatprinter printer,
+                               void *arg,
+                               char const *__restrict format,
+                               va_list args) THROWS(...) {
 #ifndef __INTELLISENSE__
 #define __FORMAT_PRINTER            printer
 #define __FORMAT_ARG                arg
@@ -805,7 +820,10 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 0) NONNULL((1
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3)) ssize_t
-(VLIBCCALL libc_format_printf)(pformatprinter printer, void *arg, char const *__restrict format, ...) THROWS(...) {
+(VLIBCCALL libc_format_printf)(pformatprinter printer,
+                               void *arg,
+                               char const *__restrict format,
+                               ...) THROWS(...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -838,7 +856,11 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 4) NONNULL((1
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2, 4)) ssize_t
-(LIBCCALL libc_format_vscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, va_list args) THROWS(...) {
+(LIBCCALL libc_format_vscanf)(pformatgetc pgetc,
+                              pformatungetc pungetc,
+                              void *arg,
+                              char const *__restrict format,
+                              va_list args) THROWS(...) {
 #define __CHAR_TYPE      char
 #define __CHAR_SIZE      __SIZEOF_CHAR__
 #define __FORMAT_PGETC   pgetc
@@ -872,7 +894,11 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_SCANF(4, 0) NONNULL((1,
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2, 4)) ssize_t
-(VLIBCCALL libc_format_scanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, ...) THROWS(...) {
+(VLIBCCALL libc_format_scanf)(pformatgetc pgetc,
+                              pformatungetc pungetc,
+                              void *arg,
+                              char const *__restrict format,
+                              ...) THROWS(...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -883,7 +909,9 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_SCANF(4, 5) NONNULL((1,
 /* Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(void *arg, char const *__restrict data, size_t datalen) {
+NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(void *arg,
+                                                  char const *__restrict data,
+                                                  size_t datalen) {
 	*(char **)arg = (char *)mempcpyc(*(char **)arg, data, datalen, sizeof(char));
 	return (ssize_t)datalen;
 }
@@ -893,7 +921,9 @@ NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(void *arg, char const *__restr
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
  *       the sum of return values of all calls to `format_snprintf_printer()' */
 INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(void *arg, char const *__restrict data, size_t datalen) {
+NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(void *arg,
+                                                   char const *__restrict data,
+                                                   size_t datalen) {
 	struct format_snprintf_data_ {
 		char   *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		size_t  sd_bufsiz; /* Remaining buffer size. */
@@ -911,7 +941,9 @@ NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(void *arg, char const *__rest
 #include <local/unicode_utf8seqlen.h>
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_PURE NONNULL((2)) ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_width)(void *arg, char const *__restrict data, size_t datalen) {
+NOTHROW_NCX(LIBCCALL libc_format_width)(void *arg,
+                                        char const *__restrict data,
+                                        size_t datalen) {
 	size_t result = 0;
 	char const *iter, *end;
 	(void)arg;
@@ -929,7 +961,9 @@ NOTHROW_NCX(LIBCCALL libc_format_width)(void *arg, char const *__restrict data, 
 #ifndef __KERNEL__
 /* Always re-return `datalen' and ignore all other arguments */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_CONST ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_length)(void *arg, char const *__restrict data, size_t datalen) {
+NOTHROW_NCX(LIBCCALL libc_format_length)(void *arg,
+                                         char const *__restrict data,
+                                         size_t datalen) {
 	(void)arg;
 	(void)data;
 	return (ssize_t)datalen;
@@ -938,22 +972,22 @@ NOTHROW_NCX(LIBCCALL libc_format_length)(void *arg, char const *__restrict data,
 
 DECL_END
 
-DEFINE_PUBLIC_WEAK_ALIAS(format_repeat, libc_format_repeat);
+DEFINE_PUBLIC_ALIAS(format_repeat, libc_format_repeat);
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(format_quote, libc_format_escape);
+DEFINE_PUBLIC_ALIAS(format_quote, libc_format_escape);
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_WEAK_ALIAS(format_escape, libc_format_escape);
-DEFINE_PUBLIC_WEAK_ALIAS(format_hexdump, libc_format_hexdump);
-DEFINE_PUBLIC_WEAK_ALIAS(format_vprintf, libc_format_vprintf);
-DEFINE_PUBLIC_WEAK_ALIAS(format_printf, libc_format_printf);
-DEFINE_PUBLIC_WEAK_ALIAS(format_vscanf, libc_format_vscanf);
-DEFINE_PUBLIC_WEAK_ALIAS(format_scanf, libc_format_scanf);
-DEFINE_PUBLIC_WEAK_ALIAS(format_sprintf_printer, libc_format_sprintf_printer);
-DEFINE_PUBLIC_WEAK_ALIAS(format_snprintf_printer, libc_format_snprintf_printer);
-DEFINE_PUBLIC_WEAK_ALIAS(format_width, libc_format_width);
+DEFINE_PUBLIC_ALIAS(format_escape, libc_format_escape);
+DEFINE_PUBLIC_ALIAS(format_hexdump, libc_format_hexdump);
+DEFINE_PUBLIC_ALIAS(format_vprintf, libc_format_vprintf);
+DEFINE_PUBLIC_ALIAS(format_printf, libc_format_printf);
+DEFINE_PUBLIC_ALIAS(format_vscanf, libc_format_vscanf);
+DEFINE_PUBLIC_ALIAS(format_scanf, libc_format_scanf);
+DEFINE_PUBLIC_ALIAS(format_sprintf_printer, libc_format_sprintf_printer);
+DEFINE_PUBLIC_ALIAS(format_snprintf_printer, libc_format_snprintf_printer);
+DEFINE_PUBLIC_ALIAS(format_width, libc_format_width);
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(format_wwidth, libc_format_length);
-DEFINE_PUBLIC_WEAK_ALIAS(format_length, libc_format_length);
+DEFINE_PUBLIC_ALIAS(format_wwidth, libc_format_length);
+DEFINE_PUBLIC_ALIAS(format_length, libc_format_length);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_FORMAT_PRINTER_C */

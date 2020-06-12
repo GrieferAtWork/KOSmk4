@@ -31,67 +31,67 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:if_nametoindex,hash:CRC-32=0x7f481076]]]*/
+/*[[[head:libc_if_nametoindex,hash:CRC-32=0x52994efd]]]*/
 /* Convert an interface name to an index, and vice versa */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.interface.if_nametoindex") unsigned int
+INTERN ATTR_SECTION(".text.crt.net.interface") unsigned int
 NOTHROW_RPC_KOS(LIBCCALL libc_if_nametoindex)(char const *ifname)
-/*[[[body:if_nametoindex]]]*/
-{
+/*[[[body:libc_if_nametoindex]]]*/
+/*AUTO*/{
 	(void)ifname;
 	CRT_UNIMPLEMENTED("if_nametoindex"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:if_nametoindex]]]*/
+/*[[[end:libc_if_nametoindex]]]*/
 
-/*[[[head:if_indextoname,hash:CRC-32=0xeb47f6b9]]]*/
+/*[[[head:libc_if_indextoname,hash:CRC-32=0xb3011369]]]*/
 /* Convert an interface name to an index, and vice versa */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.interface.if_indextoname") char *
+INTERN ATTR_SECTION(".text.crt.net.interface") char *
 NOTHROW_RPC_KOS(LIBCCALL libc_if_indextoname)(unsigned int ifindex,
                                               char *ifname)
-/*[[[body:if_indextoname]]]*/
-{
+/*[[[body:libc_if_indextoname]]]*/
+/*AUTO*/{
 	(void)ifindex;
 	(void)ifname;
 	CRT_UNIMPLEMENTED("if_indextoname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:if_indextoname]]]*/
+/*[[[end:libc_if_indextoname]]]*/
 
-/*[[[head:if_nameindex,hash:CRC-32=0x6a9f5e41]]]*/
+/*[[[head:libc_if_nameindex,hash:CRC-32=0x7cb3a615]]]*/
 /* Return a list of all interfaces and their indices */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.interface.if_nameindex") struct if_nameindex *
+INTERN ATTR_SECTION(".text.crt.net.interface") struct if_nameindex *
 NOTHROW_RPC_KOS(LIBCCALL libc_if_nameindex)(void)
-/*[[[body:if_nameindex]]]*/
-{
+/*[[[body:libc_if_nameindex]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("if_nameindex"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:if_nameindex]]]*/
+/*[[[end:libc_if_nameindex]]]*/
 
-/*[[[head:if_freenameindex,hash:CRC-32=0xac5d832d]]]*/
+/*[[[head:libc_if_freenameindex,hash:CRC-32=0xf1c5dd39]]]*/
 /* Free the data returned from if_nameindex */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.interface.if_freenameindex") void
+INTERN ATTR_SECTION(".text.crt.net.interface") void
 NOTHROW_NCX(LIBCCALL libc_if_freenameindex)(struct if_nameindex *ptr)
-/*[[[body:if_freenameindex]]]*/
-{
+/*[[[body:libc_if_freenameindex]]]*/
+/*AUTO*/{
 	(void)ptr;
 	CRT_UNIMPLEMENTED("if_freenameindex"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:if_freenameindex]]]*/
+/*[[[end:libc_if_freenameindex]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x3f9d14fe]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(if_nametoindex, libc_if_nametoindex);
-DEFINE_PUBLIC_WEAK_ALIAS(if_indextoname, libc_if_indextoname);
-DEFINE_PUBLIC_WEAK_ALIAS(if_nameindex, libc_if_nameindex);
-DEFINE_PUBLIC_WEAK_ALIAS(if_freenameindex, libc_if_freenameindex);
+/*[[[start:exports,hash:CRC-32=0x1795a706]]]*/
+DEFINE_PUBLIC_ALIAS(if_nametoindex, libc_if_nametoindex);
+DEFINE_PUBLIC_ALIAS(if_indextoname, libc_if_indextoname);
+DEFINE_PUBLIC_ALIAS(if_nameindex, libc_if_nameindex);
+DEFINE_PUBLIC_ALIAS(if_freenameindex, libc_if_freenameindex);
 /*[[[end:exports]]]*/
 
 DECL_END

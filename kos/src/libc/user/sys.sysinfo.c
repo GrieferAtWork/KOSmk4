@@ -33,80 +33,75 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:sysinfo,hash:CRC-32=0x26384dcb]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.system.info.sysinfo") int
+/*[[[head:libc_sysinfo,hash:CRC-32=0x8a97e059]]]*/
+INTERN ATTR_SECTION(".text.crt.system.info") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_sysinfo)(struct sysinfo *info)
-/*[[[body:sysinfo]]]*/
+/*[[[body:libc_sysinfo]]]*/
 {
 	errno_t error;
 	error = sys_sysinfo(info);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:sysinfo]]]*/
+/*[[[end:libc_sysinfo]]]*/
 
-/*[[[head:get_nprocs_conf,hash:CRC-32=0x5fbd960b]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.system.info.get_nprocs_conf") int
+/*[[[head:libc_get_nprocs_conf,hash:CRC-32=0x53f971d4]]]*/
+INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED int
 NOTHROW_RPC(LIBCCALL libc_get_nprocs_conf)(void)
-/*[[[body:get_nprocs_conf]]]*/
+/*[[[body:libc_get_nprocs_conf]]]*/
 {
 	/* TODO: Configured processor count (aka: The kernel's `cpu_count' global) */
 	CRT_UNIMPLEMENTED("get_nprocs_conf"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
-/*[[[end:get_nprocs_conf]]]*/
+/*[[[end:libc_get_nprocs_conf]]]*/
 
-/*[[[head:get_nprocs,hash:CRC-32=0xd29da6c8]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.system.info.get_nprocs") int
+/*[[[head:libc_get_nprocs,hash:CRC-32=0xfaee0d0a]]]*/
+INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED int
 NOTHROW_RPC(LIBCCALL libc_get_nprocs)(void)
-/*[[[body:get_nprocs]]]*/
+/*[[[body:libc_get_nprocs]]]*/
 {
 	struct sysinfo info;
 	if (libc_sysinfo(&info))
 		return -1;
 	return info.procs;
 }
-/*[[[end:get_nprocs]]]*/
+/*[[[end:libc_get_nprocs]]]*/
 
-/*[[[head:get_phys_pages,hash:CRC-32=0x88c7fce5]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.system.info.get_phys_pages") __INTPTR_TYPE__
+/*[[[head:libc_get_phys_pages,hash:CRC-32=0x13904100]]]*/
+INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED __INTPTR_TYPE__
 NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void)
-/*[[[body:get_phys_pages]]]*/
+/*[[[body:libc_get_phys_pages]]]*/
 {
 	struct sysinfo info;
 	if (libc_sysinfo(&info))
 		return -1;
 	return info.totalram / info.mem_unit;
 }
-/*[[[end:get_phys_pages]]]*/
+/*[[[end:libc_get_phys_pages]]]*/
 
-/*[[[head:get_avphys_pages,hash:CRC-32=0x46d41c4c]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.system.info.get_avphys_pages") __INTPTR_TYPE__
+/*[[[head:libc_get_avphys_pages,hash:CRC-32=0x7832c6d9]]]*/
+INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED __INTPTR_TYPE__
 NOTHROW_RPC(LIBCCALL libc_get_avphys_pages)(void)
-/*[[[body:get_avphys_pages]]]*/
+/*[[[body:libc_get_avphys_pages]]]*/
 {
 	struct sysinfo info;
 	if (libc_sysinfo(&info))
 		return -1;
 	return info.freeram / info.mem_unit;
 }
-/*[[[end:get_avphys_pages]]]*/
+/*[[[end:libc_get_avphys_pages]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8a6ea4c]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(sysinfo, libc_sysinfo);
-DEFINE_PUBLIC_WEAK_ALIAS(get_nprocs_conf, libc_get_nprocs_conf);
-DEFINE_PUBLIC_WEAK_ALIAS(get_nprocs, libc_get_nprocs);
-DEFINE_PUBLIC_WEAK_ALIAS(get_phys_pages, libc_get_phys_pages);
-DEFINE_PUBLIC_WEAK_ALIAS(get_avphys_pages, libc_get_avphys_pages);
+/*[[[start:exports,hash:CRC-32=0xb9ffe000]]]*/
+DEFINE_PUBLIC_ALIAS(sysinfo, libc_sysinfo);
+DEFINE_PUBLIC_ALIAS(get_nprocs_conf, libc_get_nprocs_conf);
+DEFINE_PUBLIC_ALIAS(get_nprocs, libc_get_nprocs);
+DEFINE_PUBLIC_ALIAS(get_phys_pages, libc_get_phys_pages);
+DEFINE_PUBLIC_ALIAS(get_avphys_pages, libc_get_avphys_pages);
 /*[[[end:exports]]]*/
 
 DECL_END

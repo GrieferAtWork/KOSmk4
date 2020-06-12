@@ -31,45 +31,45 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:shmctl,hash:CRC-32=0x63ba5214]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.shm.shmctl") int
+/*[[[head:libc_shmctl,hash:CRC-32=0x8db49986]]]*/
+INTERN ATTR_SECTION(".text.crt.utility.shm") int
 NOTHROW_NCX(LIBCCALL libc_shmctl)(int shmid,
-                                  int cmd,
+                                  __STDC_INT_AS_UINT_T cmd,
                                   struct shmid_ds *buf)
-/*[[[body:shmctl]]]*/
-{
+/*[[[body:libc_shmctl]]]*/
+/*AUTO*/{
 	(void)shmid;
 	(void)cmd;
 	(void)buf;
 	CRT_UNIMPLEMENTED("shmctl"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:shmctl]]]*/
+/*[[[end:libc_shmctl]]]*/
 
-/*[[[head:shmget,hash:CRC-32=0x5f93079d]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.shm.shmget") int
+/*[[[head:libc_shmget,hash:CRC-32=0x6e5fbd86]]]*/
+INTERN ATTR_SECTION(".text.crt.utility.shm") int
 NOTHROW_NCX(LIBCCALL libc_shmget)(key_t key,
                                   size_t size,
-                                  int shmflg)
-/*[[[body:shmget]]]*/
-{
+                                  __STDC_INT_AS_UINT_T shmflg)
+/*[[[body:libc_shmget]]]*/
+/*AUTO*/{
 	(void)key;
 	(void)size;
 	(void)shmflg;
 	CRT_UNIMPLEMENTED("shmget"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:shmget]]]*/
+/*[[[end:libc_shmget]]]*/
 
-/*[[[head:shmat,hash:CRC-32=0xd354a954]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.shm.shmat") void *
+/*[[[head:libc_shmat,hash:CRC-32=0x182af4ff]]]*/
+INTERN ATTR_SECTION(".text.crt.utility.shm") void *
 NOTHROW_NCX(LIBCCALL libc_shmat)(int shmid,
                                  void const *shmaddr,
-                                 int shmflg)
-/*[[[body:shmat]]]*/
-{
+                                 __STDC_INT_AS_UINT_T shmflg)
+/*[[[body:libc_shmat]]]*/
+/*AUTO*/{
 	(void)shmid;
 	(void)shmaddr;
 	(void)shmflg;
@@ -77,29 +77,29 @@ NOTHROW_NCX(LIBCCALL libc_shmat)(int shmid,
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:shmat]]]*/
+/*[[[end:libc_shmat]]]*/
 
-/*[[[head:shmdt,hash:CRC-32=0x98fc4352]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.shm.shmdt") int
+/*[[[head:libc_shmdt,hash:CRC-32=0xca4775e1]]]*/
+INTERN ATTR_SECTION(".text.crt.utility.shm") int
 NOTHROW_NCX(LIBCCALL libc_shmdt)(void const *shmaddr)
-/*[[[body:shmdt]]]*/
-{
+/*[[[body:libc_shmdt]]]*/
+/*AUTO*/{
 	(void)shmaddr;
 	CRT_UNIMPLEMENTED("shmdt"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:shmdt]]]*/
+/*[[[end:libc_shmdt]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa4c16ee9]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(shmctl, libc_shmctl);
-DEFINE_PUBLIC_WEAK_ALIAS(shmget, libc_shmget);
-DEFINE_PUBLIC_WEAK_ALIAS(shmat, libc_shmat);
-DEFINE_PUBLIC_WEAK_ALIAS(shmdt, libc_shmdt);
+/*[[[start:exports,hash:CRC-32=0x8b4a25ab]]]*/
+DEFINE_PUBLIC_ALIAS(shmctl, libc_shmctl);
+DEFINE_PUBLIC_ALIAS(shmget, libc_shmget);
+DEFINE_PUBLIC_ALIAS(shmat, libc_shmat);
+DEFINE_PUBLIC_ALIAS(shmdt, libc_shmdt);
 /*[[[end:exports]]]*/
 
 DECL_END

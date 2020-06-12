@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bb0ec7f */
+/* HASH CRC-32:0xa796bd55 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,9 @@ DECL_BEGIN
  * Note that if `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
 INTERN ATTR_SECTION(".text.crt.string.envz") ATTR_PURE WUNUSED NONNULL((3)) char *
-NOTHROW_NCX(LIBCCALL libc_envz_entry)(char const *__restrict envz, size_t envz_len, char const *__restrict name) {
+NOTHROW_NCX(LIBCCALL libc_envz_entry)(char const *__restrict envz,
+                                      size_t envz_len,
+                                      char const *__restrict name) {
 	size_t namelen;
 	char *envz_end = (char *)(envz + envz_len);
 	namelen = stroff(name, '=');
@@ -51,7 +53,9 @@ NOTHROW_NCX(LIBCCALL libc_envz_entry)(char const *__restrict envz, size_t envz_l
 /* Returns a pointer to the value portion of the entry
  * in `ENVZ' for `NAME', or `NULL' if there is none. */
 INTERN ATTR_SECTION(".text.crt.string.envz") ATTR_PURE WUNUSED NONNULL((3)) char *
-NOTHROW_NCX(LIBCCALL libc_envz_get)(char const *__restrict envz, size_t envz_len, char const *__restrict name) {
+NOTHROW_NCX(LIBCCALL libc_envz_get)(char const *__restrict envz,
+                                    size_t envz_len,
+                                    char const *__restrict name) {
 	char *result;
 	result = (char *)envz_entry(envz, envz_len, name);
 	if (result) {
@@ -69,7 +73,10 @@ NOTHROW_NCX(LIBCCALL libc_envz_get)(char const *__restrict envz, size_t envz_len
  * because when merging with another envz, the null entry can override an
  * entry in the other one. Such entries can be removed with `envz_strip()' */
 INTERN ATTR_SECTION(".text.crt.string.envz") NONNULL((1, 2, 3)) error_t
-NOTHROW_NCX(LIBCCALL libc_envz_add)(char **__restrict penvz, size_t *__restrict penvz_len, char const *__restrict name, char const *value) {
+NOTHROW_NCX(LIBCCALL libc_envz_add)(char **__restrict penvz,
+                                    size_t *__restrict penvz_len,
+                                    char const *__restrict name,
+                                    char const *value) {
 	char *new_envz;
 	size_t namelen, valuelen, morelen;
 	envz_remove(penvz, penvz_len, name);
@@ -100,7 +107,11 @@ NOTHROW_NCX(LIBCCALL libc_envz_add)(char **__restrict penvz, size_t *__restrict 
  * If `OVERRIDE' is true, then values in `ENVZ2' will supersede those
  * with the same name in `ENV', otherwise they don't */
 INTERN ATTR_SECTION(".text.crt.string.envz") NONNULL((1, 2, 3)) error_t
-NOTHROW_NCX(LIBCCALL libc_envz_merge)(char **__restrict penvz, size_t *__restrict penvz_len, char const *__restrict envz2, size_t envz2_len, int override_) {
+NOTHROW_NCX(LIBCCALL libc_envz_merge)(char **__restrict penvz,
+                                      size_t *__restrict penvz_len,
+                                      char const *__restrict envz2,
+                                      size_t envz2_len,
+                                      int override_) {
 	error_t result = 0;
 	while (envz2_len && result == 0) {
 		char *existing = envz_entry(*penvz, *penvz_len, envz2);
@@ -118,7 +129,9 @@ NOTHROW_NCX(LIBCCALL libc_envz_merge)(char **__restrict penvz, size_t *__restric
 }
 /* Remove the entry for `NAME' from `ENVZ & ENVZ_LEN', if any */
 INTERN ATTR_SECTION(".text.crt.string.envz") NONNULL((1, 2, 3)) void
-NOTHROW_NCX(LIBCCALL libc_envz_remove)(char **__restrict penvz, size_t *__restrict penvz_len, char const *__restrict name) {
+NOTHROW_NCX(LIBCCALL libc_envz_remove)(char **__restrict penvz,
+                                       size_t *__restrict penvz_len,
+                                       char const *__restrict name) {
 	char *entry;
 	entry = envz_entry(*penvz, *penvz_len, name);
 	if (entry)
@@ -126,7 +139,8 @@ NOTHROW_NCX(LIBCCALL libc_envz_remove)(char **__restrict penvz, size_t *__restri
 }
 /* Remove entries that have no value attached */
 INTERN ATTR_SECTION(".text.crt.string.envz") NONNULL((1, 2)) void
-NOTHROW_NCX(LIBCCALL libc_envz_strip)(char **__restrict penvz, size_t *__restrict penvz_len) {
+NOTHROW_NCX(LIBCCALL libc_envz_strip)(char **__restrict penvz,
+                                      size_t *__restrict penvz_len) {
 	char *start, *ptr, *end;
 	size_t oldlen, newlen;
 	ptr = start = *penvz;
@@ -160,12 +174,12 @@ NOTHROW_NCX(LIBCCALL libc_envz_strip)(char **__restrict penvz, size_t *__restric
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(envz_entry, libc_envz_entry);
-DEFINE_PUBLIC_WEAK_ALIAS(envz_get, libc_envz_get);
-DEFINE_PUBLIC_WEAK_ALIAS(envz_add, libc_envz_add);
-DEFINE_PUBLIC_WEAK_ALIAS(envz_merge, libc_envz_merge);
-DEFINE_PUBLIC_WEAK_ALIAS(envz_remove, libc_envz_remove);
-DEFINE_PUBLIC_WEAK_ALIAS(envz_strip, libc_envz_strip);
+DEFINE_PUBLIC_ALIAS(envz_entry, libc_envz_entry);
+DEFINE_PUBLIC_ALIAS(envz_get, libc_envz_get);
+DEFINE_PUBLIC_ALIAS(envz_add, libc_envz_add);
+DEFINE_PUBLIC_ALIAS(envz_merge, libc_envz_merge);
+DEFINE_PUBLIC_ALIAS(envz_remove, libc_envz_remove);
+DEFINE_PUBLIC_ALIAS(envz_strip, libc_envz_strip);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ENVZ_C */

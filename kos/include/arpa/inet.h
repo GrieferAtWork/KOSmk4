@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf1cefc3 */
+/* HASH CRC-32:0xb5444ab0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -229,16 +229,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_neta, __FORCELOCAL __ATTR_NONNULL((2)) char
  * to presentation format. The result will specify BITS bits of the number */
 __CDECLARE(,char *,__NOTHROW_RPC_KOS,inet_net_ntop,(int __af, void const *__cp, int __bits, char *__buf, __SIZE_TYPE__ __len),(__af,__cp,__bits,__buf,__len))
 #endif /* __CRT_HAVE_inet_net_ntop */
-#ifdef __CRT_HAVE_intinet_net_pton
+#ifdef __CRT_HAVE_inet_net_pton
 /* Convert network number for interface type AF from presentation in buffer starting
  * at CP to network format and store result int buffer starting at BUF of size LEN */
-__CDECLARE_VOID(,__NOTHROW_RPC_KOS,intinet_net_pton,(int __af, char const *__cp, void *__buf, __SIZE_TYPE__ __len),(__af,__cp,__buf,__len))
-#endif /* __CRT_HAVE_intinet_net_pton */
-#ifdef __CRT_HAVE_intinet_nsap_addr
+__CDECLARE(,int,__NOTHROW_RPC_KOS,inet_net_pton,(int __af, char const *__cp, void *__buf, __SIZE_TYPE__ __len),(__af,__cp,__buf,__len))
+#endif /* __CRT_HAVE_inet_net_pton */
+#ifdef __CRT_HAVE_inet_nsap_addr
 /* Convert ASCII representation in hexadecimal form of the Internet address
  * to binary form and place result in buffer of length LEN starting at BUF */
-__CDECLARE(,unsigned,__NOTHROW_RPC_KOS,intinet_nsap_addr,(char const *__cp, unsigned char *__buf, int __len),(__cp,__buf,__len))
-#endif /* __CRT_HAVE_intinet_nsap_addr */
+__CDECLARE(,unsigned int,__NOTHROW_RPC_KOS,inet_nsap_addr,(char const *__cp, unsigned char *__buf, int __len),(__cp,__buf,__len))
+#endif /* __CRT_HAVE_inet_nsap_addr */
 #ifdef __CRT_HAVE_inet_nsap_ntoa
 /* Convert internet address in binary form in LEN bytes
  * starting at CP a presentation form and place result in BUF */

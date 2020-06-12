@@ -33,7 +33,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:lfutexexpr,hash:CRC-32=0x3dc7a605]]]*/
+/*[[[head:libc_lfutexexpr,hash:CRC-32=0xde650e6f]]]*/
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
@@ -61,14 +61,13 @@ DECL_BEGIN
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-INTERN NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexexpr.lfutexexpr") int
+INTERN ATTR_SECTION(".text.crt.sched.futexexpr") NONNULL((3)) int
 NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(void *base,
                                       size_t exprc,
                                       struct lfutexexpr const *exprv,
                                       struct timespec const *timeout,
                                       unsigned int timeout_flags)
-/*[[[body:lfutexexpr]]]*/
+/*[[[body:libc_lfutexexpr]]]*/
 {
 	struct timespec64 tm64;
 	if (!timeout) {
@@ -86,9 +85,9 @@ NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(void *base,
 	                    &tm64,
 	                    timeout_flags);
 }
-/*[[[end:lfutexexpr]]]*/
+/*[[[end:libc_lfutexexpr]]]*/
 
-/*[[[head:lfutexlockexpr,hash:CRC-32=0xae634c1e]]]*/
+/*[[[head:libc_lfutexlockexpr,hash:CRC-32=0xb0538e12]]]*/
 /* >> lfutexlockexpr(2)
  * A function that is similar to `lfutexexpr()', but allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex
@@ -116,15 +115,14 @@ NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(void *base,
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-INTERN NONNULL((1, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlockexpr.lfutexlockexpr") int
+INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") NONNULL((1, 4)) int
 NOTHROW_RPC(LIBCCALL libc_lfutexlockexpr)(lfutex_t *ulockaddr,
                                           void *base,
                                           size_t exprc,
                                           struct lfutexexpr const *exprv,
                                           struct timespec const *timeout,
                                           unsigned int timeout_flags)
-/*[[[body:lfutexlockexpr]]]*/
+/*[[[body:libc_lfutexlockexpr]]]*/
 {
 	struct timespec64 tm64;
 	if (!timeout) {
@@ -144,9 +142,12 @@ NOTHROW_RPC(LIBCCALL libc_lfutexlockexpr)(lfutex_t *ulockaddr,
 	                        &tm64,
 	                        timeout_flags);
 }
-/*[[[end:lfutexlockexpr]]]*/
+/*[[[end:libc_lfutexlockexpr]]]*/
 
-/*[[[head:lfutexexpr64,hash:CRC-32=0xb7c4fc5b]]]*/
+/*[[[head:libc_lfutexexpr64,hash:CRC-32=0x1ed1d05f]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_lfutexexpr64, libc_lfutexexpr);
+#else /* MAGIC:alias */
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
@@ -174,17 +175,13 @@ NOTHROW_RPC(LIBCCALL libc_lfutexlockexpr)(lfutex_t *ulockaddr,
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_lfutexexpr64, libc_lfutexexpr);
-#else
-INTERN NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexexpr.lfutexexpr64") int
+INTERN ATTR_SECTION(".text.crt.sched.futexexpr") NONNULL((3)) int
 NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(void *base,
                                         size_t exprc,
                                         struct lfutexexpr const *exprv,
                                         struct timespec64 const *timeout,
                                         unsigned int timeout_flags)
-/*[[[body:lfutexexpr64]]]*/
+/*[[[body:libc_lfutexexpr64]]]*/
 {
 	errno_t error;
 	error = sys_lfutexexpr(base,
@@ -195,9 +192,12 @@ NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(void *base,
 	return libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */
-/*[[[end:lfutexexpr64]]]*/
+/*[[[end:libc_lfutexexpr64]]]*/
 
-/*[[[head:lfutexlockexpr64,hash:CRC-32=0x2359daf0]]]*/
+/*[[[head:libc_lfutexlockexpr64,hash:CRC-32=0x924337c7]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_lfutexlockexpr64, libc_lfutexlockexpr);
+#else /* MAGIC:alias */
 /* >> lfutexlockexpr(2)
  * A function that is similar to `lfutexexpr()', but allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex
@@ -225,18 +225,14 @@ NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(void *base,
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_lfutexlockexpr64, libc_lfutexlockexpr);
-#else
-INTERN NONNULL((1, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlockexpr.lfutexlockexpr64") int
+INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") NONNULL((1, 4)) int
 NOTHROW_RPC(LIBCCALL libc_lfutexlockexpr64)(lfutex_t *ulockaddr,
                                             void *base,
                                             size_t exprc,
                                             struct lfutexexpr const *exprv,
                                             struct timespec64 const *timeout,
                                             unsigned int timeout_flags)
-/*[[[body:lfutexlockexpr64]]]*/
+/*[[[body:libc_lfutexlockexpr64]]]*/
 {
 	errno_t error;
 	error = sys_lfutexlockexpr(ulockaddr,
@@ -248,17 +244,17 @@ NOTHROW_RPC(LIBCCALL libc_lfutexlockexpr64)(lfutex_t *ulockaddr,
 	return libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */
-/*[[[end:lfutexlockexpr64]]]*/
+/*[[[end:libc_lfutexlockexpr64]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xaca9cef5]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(lfutexexpr, libc_lfutexexpr);
-DEFINE_PUBLIC_WEAK_ALIAS(lfutexlockexpr, libc_lfutexlockexpr);
-DEFINE_PUBLIC_WEAK_ALIAS(lfutexexpr64, libc_lfutexexpr64);
-DEFINE_PUBLIC_WEAK_ALIAS(lfutexlockexpr64, libc_lfutexlockexpr64);
+/*[[[start:exports,hash:CRC-32=0xb696490c]]]*/
+DEFINE_PUBLIC_ALIAS(lfutexexpr, libc_lfutexexpr);
+DEFINE_PUBLIC_ALIAS(lfutexlockexpr, libc_lfutexlockexpr);
+DEFINE_PUBLIC_ALIAS(lfutexexpr64, libc_lfutexexpr64);
+DEFINE_PUBLIC_ALIAS(lfutexlockexpr64, libc_lfutexlockexpr64);
 /*[[[end:exports]]]*/
 
 DECL_END

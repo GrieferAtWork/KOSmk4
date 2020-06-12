@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc868e29 */
+/* HASH CRC-32:0x3193c5e4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,8 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
-(VLIBCCALL libc_warn)(char const *format, ...) THROWS(...) {
+(VLIBCCALL libc_warn)(char const *format,
+                      ...) THROWS(...) {
 	va_list args;
 	va_start(args, format);
 	vwarn(format, args);
@@ -45,7 +46,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
 #include <local/program_invocation_name.h>
 /* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
-(LIBCCALL libc_vwarn)(char const *format, va_list args) THROWS(...) {
+(LIBCCALL libc_vwarn)(char const *format,
+                      va_list args) THROWS(...) {
 	int errval = __libc_geterrno_or(0);
 #if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
 	flockfile(stderr);
@@ -63,7 +65,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 }
 /* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
-(VLIBCCALL libc_warnx)(char const *format, ...) THROWS(...) {
+(VLIBCCALL libc_warnx)(char const *format,
+                       ...) THROWS(...) {
 	va_list args;
 	va_start(args, format);
 	vwarnx(format, args);
@@ -73,7 +76,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
 #include <local/program_invocation_name.h>
 /* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
-(LIBCCALL libc_vwarnx)(char const *format, va_list args) THROWS(...) {
+(LIBCCALL libc_vwarnx)(char const *format,
+                       va_list args) THROWS(...) {
 #if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
 	flockfile(stderr);
 #endif /* (__CRT_HAVE_flockfile || __CRT_HAVE__lock_file || __CRT_HAVE__IO_flockfile) && (__CRT_HAVE_funlockfile || __CRT_HAVE__unlock_file || __CRT_HAVE__IO_funlockfile) */
@@ -87,27 +91,35 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 }
 /* Same as `warn()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
-(VLIBCCALL libc_err)(int status, char const *format, ...) THROWS(...) {
+(VLIBCCALL libc_err)(int status,
+                     char const *format,
+                     ...) THROWS(...) {
 	va_list args;
 	va_start(args, format);
 	verr(status, format, args);
 }
 /* Same as `warn()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void
-(LIBCCALL libc_verr)(int status, char const *format, va_list args) THROWS(...) {
+(LIBCCALL libc_verr)(int status,
+                     char const *format,
+                     va_list args) THROWS(...) {
 	vwarn(format, args);
 	exit(status);
 }
 /* Same as `warnx()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
-(VLIBCCALL libc_errx)(int status, char const *format, ...) THROWS(...) {
+(VLIBCCALL libc_errx)(int status,
+                      char const *format,
+                      ...) THROWS(...) {
 	va_list args;
 	va_start(args, format);
 	verrx(status, format, args);
 }
 /* Same as `warn()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void
-(LIBCCALL libc_verrx)(int status, char const *format, va_list args) THROWS(...) {
+(LIBCCALL libc_verrx)(int status,
+                      char const *format,
+                      va_list args) THROWS(...) {
 	vwarnx(format, args);
 	exit(status);
 }
@@ -116,14 +128,14 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(warn, libc_warn);
-DEFINE_PUBLIC_WEAK_ALIAS(vwarn, libc_vwarn);
-DEFINE_PUBLIC_WEAK_ALIAS(warnx, libc_warnx);
-DEFINE_PUBLIC_WEAK_ALIAS(vwarnx, libc_vwarnx);
-DEFINE_PUBLIC_WEAK_ALIAS(err, libc_err);
-DEFINE_PUBLIC_WEAK_ALIAS(verr, libc_verr);
-DEFINE_PUBLIC_WEAK_ALIAS(errx, libc_errx);
-DEFINE_PUBLIC_WEAK_ALIAS(verrx, libc_verrx);
+DEFINE_PUBLIC_ALIAS(warn, libc_warn);
+DEFINE_PUBLIC_ALIAS(vwarn, libc_vwarn);
+DEFINE_PUBLIC_ALIAS(warnx, libc_warnx);
+DEFINE_PUBLIC_ALIAS(vwarnx, libc_vwarnx);
+DEFINE_PUBLIC_ALIAS(err, libc_err);
+DEFINE_PUBLIC_ALIAS(verr, libc_verr);
+DEFINE_PUBLIC_ALIAS(errx, libc_errx);
+DEFINE_PUBLIC_ALIAS(verrx, libc_verrx);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ERR_C */

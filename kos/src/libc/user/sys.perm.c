@@ -36,13 +36,13 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:ioperm,hash:CRC-32=0x30acde48]]]*/
+/*[[[head:libc_ioperm,hash:CRC-32=0x3342be26]]]*/
 /* Change I/O port permissions for a specific I/O port range */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.ioperm.ioperm") int
+INTERN ATTR_SECTION(".text.crt.system.ioperm") int
 NOTHROW_NCX(LIBCCALL libc_ioperm)(ulongptr_t from,
                                   ulongptr_t num,
-                                  int turn_on)
-/*[[[body:ioperm]]]*/
+                                  __STDC_INT_AS_UINT_T turn_on)
+/*[[[body:libc_ioperm]]]*/
 {
 #ifdef SYS_ioperm
 	errno_t error;
@@ -55,13 +55,13 @@ NOTHROW_NCX(LIBCCALL libc_ioperm)(ulongptr_t from,
 	return -1;
 #endif /* !SYS_ioperm */
 }
-/*[[[end:ioperm]]]*/
+/*[[[end:libc_ioperm]]]*/
 
-/*[[[head:iopl,hash:CRC-32=0x6b54d9b4]]]*/
+/*[[[head:libc_iopl,hash:CRC-32=0x4bd4f2b]]]*/
 /* Change I/O port permissions for all I/O ports */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.ioperm.iopl") int
-NOTHROW_NCX(LIBCCALL libc_iopl)(int level)
-/*[[[body:iopl]]]*/
+INTERN ATTR_SECTION(".text.crt.system.ioperm") int
+NOTHROW_NCX(LIBCCALL libc_iopl)(__STDC_INT_AS_UINT_T level)
+/*[[[body:libc_iopl]]]*/
 {
 #ifdef SYS_iopl
 	errno_t error;
@@ -72,15 +72,15 @@ NOTHROW_NCX(LIBCCALL libc_iopl)(int level)
 	return -1;
 #endif /* !SYS_iopl */
 }
-/*[[[end:iopl]]]*/
+/*[[[end:libc_iopl]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe65fa090]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(ioperm, libc_ioperm);
-DEFINE_PUBLIC_WEAK_ALIAS(iopl, libc_iopl);
+/*[[[start:exports,hash:CRC-32=0x21225f62]]]*/
+DEFINE_PUBLIC_ALIAS(ioperm, libc_ioperm);
+DEFINE_PUBLIC_ALIAS(iopl, libc_iopl);
 /*[[[end:exports]]]*/
 
 DECL_END

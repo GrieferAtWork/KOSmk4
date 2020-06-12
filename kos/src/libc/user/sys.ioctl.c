@@ -33,15 +33,15 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:ioctl,hash:CRC-32=0x1305bc25]]]*/
+/*[[[head:libc_ioctl,hash:CRC-32=0x7c152c2e]]]*/
 /* Perform the I/O control operation specified by REQUEST on FD.
  * One argument may follow; its presence and type depend on REQUEST.
  * Return value depends on REQUEST. Usually -1 indicates error */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.utility.ioctl") __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.io.utility") __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(VLIBCCALL libc_ioctl)(fd_t fd,
-                                  unsigned long int request,
+                                  ulongptr_t request,
                                   ...)
-/*[[[body:ioctl]]]*/
+/*[[[body:libc_ioctl]]]*/
 {
 	ssize_t result;
 	va_list args;
@@ -52,15 +52,14 @@ NOTHROW_RPC(VLIBCCALL libc_ioctl)(fd_t fd,
 	va_end(args);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:ioctl]]]*/
+/*[[[end:libc_ioctl]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe0fe93a6]]]*/
-#undef ioctl
-DEFINE_PUBLIC_WEAK_ALIAS(ioctl, libc_ioctl);
+/*[[[start:exports,hash:CRC-32=0xb0c64b0c]]]*/
+DEFINE_PUBLIC_ALIAS(ioctl, libc_ioctl);
 /*[[[end:exports]]]*/
 
 DECL_END

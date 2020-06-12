@@ -38,12 +38,12 @@ char current_locale[] = "C.UTF-8";
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setlocale,hash:CRC-32=0xfb0ee566]]]*/
+/*[[[head:libc_setlocale,hash:CRC-32=0xf082dda6]]]*/
 /* Set and/or return the current locale */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.setlocale") char *
+INTERN char *
 NOTHROW_NCX(LIBCCALL libc_setlocale)(int category,
                                      char const *locale)
-/*[[[body:setlocale]]]*/
+/*[[[body:libc_setlocale]]]*/
 {
 	(void)category;
 	(void)locale;
@@ -51,31 +51,31 @@ NOTHROW_NCX(LIBCCALL libc_setlocale)(int category,
 	libc_seterrno(ENOSYS);
 	return current_locale;
 }
-/*[[[end:setlocale]]]*/
+/*[[[end:libc_setlocale]]]*/
 
-/*[[[head:localeconv,hash:CRC-32=0x1ee9be68]]]*/
+/*[[[head:libc_localeconv,hash:CRC-32=0x1507cc5b]]]*/
 /* Return the numeric/monetary information for the current locale */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.localeconv") struct lconv *
+INTERN struct lconv *
 NOTHROW_NCX(LIBCCALL libc_localeconv)(void)
-/*[[[body:localeconv]]]*/
-{
+/*[[[body:libc_localeconv]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("localeconv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:localeconv]]]*/
+/*[[[end:libc_localeconv]]]*/
 
-/*[[[head:newlocale,hash:CRC-32=0x172b0606]]]*/
+/*[[[head:libc_newlocale,hash:CRC-32=0xb2d93284]]]*/
 /* Return a reference to a data structure representing a set of locale
  * datasets. Unlike for the CATEGORY parameter for `setlocale' the
  * CATEGORY_MASK parameter here uses a single bit for each category,
  * made by OR'ing together LC_*_MASK bits above */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.newlocale") locale_t
+INTERN locale_t
 NOTHROW_NCX(LIBCCALL libc_newlocale)(int category_mask,
                                      char const *locale,
                                      locale_t base)
-/*[[[body:newlocale]]]*/
-{
+/*[[[body:libc_newlocale]]]*/
+/*AUTO*/{
 	(void)category_mask;
 	(void)locale;
 	(void)base;
@@ -83,67 +83,67 @@ NOTHROW_NCX(LIBCCALL libc_newlocale)(int category_mask,
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:newlocale]]]*/
+/*[[[end:libc_newlocale]]]*/
 
-/*[[[head:duplocale,hash:CRC-32=0xb1bab76c]]]*/
+/*[[[head:libc_duplocale,hash:CRC-32=0x848cc6]]]*/
 /* Return a duplicate of the set of locale in DATASET.
  * All usage counters are increased if necessary */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.duplocale") locale_t
+INTERN locale_t
 NOTHROW_NCX(LIBCCALL libc_duplocale)(locale_t dataset)
-/*[[[body:duplocale]]]*/
-{
+/*[[[body:libc_duplocale]]]*/
+/*AUTO*/{
 	(void)dataset;
 	CRT_UNIMPLEMENTED("duplocale"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:duplocale]]]*/
+/*[[[end:libc_duplocale]]]*/
 
-/*[[[head:freelocale,hash:CRC-32=0xfa9bb671]]]*/
+/*[[[head:libc_freelocale,hash:CRC-32=0x7fc13a3e]]]*/
 /* Free the data associated with a locale dataset
  * previously returned by a call to `setlocale_r' */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.freelocale") void
+INTERN void
 NOTHROW_NCX(LIBCCALL libc_freelocale)(locale_t dataset)
-/*[[[body:freelocale]]]*/
-{
+/*[[[body:libc_freelocale]]]*/
+/*AUTO*/{
 	(void)dataset;
 	CRT_UNIMPLEMENTED("freelocale"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:freelocale]]]*/
+/*[[[end:libc_freelocale]]]*/
 
-/*[[[head:uselocale,hash:CRC-32=0x10db78cf]]]*/
+/*[[[head:libc_uselocale,hash:CRC-32=0x8e8cfe75]]]*/
 /* Switch the current thread's locale to DATASET.
  * If DATASET is null, instead just return the current setting.
  * The special value LC_GLOBAL_LOCALE is the initial setting
  * for all threads and can also be installed any time, meaning
  * the thread uses the global settings controlled by `setlocale' */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.uselocale") locale_t
+INTERN locale_t
 NOTHROW_NCX(LIBCCALL libc_uselocale)(locale_t dataset)
-/*[[[body:uselocale]]]*/
-{
+/*[[[body:libc_uselocale]]]*/
+/*AUTO*/{
 	(void)dataset;
 	CRT_UNIMPLEMENTED("uselocale"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:uselocale]]]*/
+/*[[[end:libc_uselocale]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf248928a]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(setlocale, libc_setlocale);
-DEFINE_PUBLIC_WEAK_ALIAS(localeconv, libc_localeconv);
-DEFINE_PUBLIC_WEAK_ALIAS(newlocale, libc_newlocale);
-DEFINE_PUBLIC_WEAK_ALIAS(__newlocale, libc_newlocale);
-DEFINE_PUBLIC_WEAK_ALIAS(duplocale, libc_duplocale);
-DEFINE_PUBLIC_WEAK_ALIAS(__duplocale, libc_duplocale);
-DEFINE_PUBLIC_WEAK_ALIAS(freelocale, libc_freelocale);
-DEFINE_PUBLIC_WEAK_ALIAS(__freelocale, libc_freelocale);
-DEFINE_PUBLIC_WEAK_ALIAS(uselocale, libc_uselocale);
-DEFINE_PUBLIC_WEAK_ALIAS(__uselocale, libc_uselocale);
+/*[[[start:exports,hash:CRC-32=0xe0a21aaa]]]*/
+DEFINE_PUBLIC_ALIAS(setlocale, libc_setlocale);
+DEFINE_PUBLIC_ALIAS(localeconv, libc_localeconv);
+DEFINE_PUBLIC_ALIAS(__newlocale, libc_newlocale);
+DEFINE_PUBLIC_ALIAS(newlocale, libc_newlocale);
+DEFINE_PUBLIC_ALIAS(__duplocale, libc_duplocale);
+DEFINE_PUBLIC_ALIAS(duplocale, libc_duplocale);
+DEFINE_PUBLIC_ALIAS(__freelocale, libc_freelocale);
+DEFINE_PUBLIC_ALIAS(freelocale, libc_freelocale);
+DEFINE_PUBLIC_ALIAS(__uselocale, libc_uselocale);
+DEFINE_PUBLIC_ALIAS(uselocale, libc_uselocale);
 /*[[[end:exports]]]*/
 
 DECL_END

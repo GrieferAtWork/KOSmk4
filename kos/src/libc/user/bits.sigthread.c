@@ -41,12 +41,12 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:pthread_sigmask,hash:CRC-32=0x7a19d7df]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_sigmask") int
+/*[[[head:libc_pthread_sigmask,hash:CRC-32=0xa43ff15a]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_sigmask)(int how,
-                                           sigset_t const *__restrict newmask,
-                                           sigset_t *__restrict oldmask)
-/*[[[body:pthread_sigmask]]]*/
+                                           sigset_t const *newmask,
+                                           sigset_t *oldmask)
+/*[[[body:libc_pthread_sigmask]]]*/
 {
 	errno_t result;
 #ifdef __NR_sigprocmask
@@ -58,13 +58,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_sigmask)(int how,
 #endif /* !__NR_sigprocmask */
 	return -result;
 }
-/*[[[end:pthread_sigmask]]]*/
+/*[[[end:libc_pthread_sigmask]]]*/
 
-/*[[[head:pthread_kill,hash:CRC-32=0x60b7371f]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_kill") int
+/*[[[head:libc_pthread_kill,hash:CRC-32=0xc3a6d06f]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t threadid,
                                         int signo)
-/*[[[body:pthread_kill]]]*/
+/*[[[body:libc_pthread_kill]]]*/
 {
 	struct pthread *pt = (struct pthread *)threadid;
 	pid_t tid;
@@ -77,14 +77,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t threadid,
 	result = sys_kill(tid, signo);
 	return -result;
 }
-/*[[[end:pthread_kill]]]*/
+/*[[[end:libc_pthread_kill]]]*/
 
-/*[[[head:pthread_sigqueue,hash:CRC-32=0x9e96b219]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_sigqueue") int
+/*[[[head:libc_pthread_sigqueue,hash:CRC-32=0x4094fa66]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t threadid,
                                             int signo,
                                             union sigval const value)
-/*[[[body:pthread_sigqueue]]]*/
+/*[[[body:libc_pthread_sigqueue]]]*/
 {
 	struct pthread *pt = (struct pthread *)threadid;
 	siginfo_t info;
@@ -101,16 +101,16 @@ NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t threadid,
 	result = sys_rt_sigqueueinfo(tid, signo, &info);
 	return -result;
 }
-/*[[[end:pthread_sigqueue]]]*/
+/*[[[end:libc_pthread_sigqueue]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc13f78d]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_sigmask, libc_pthread_sigmask);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_kill, libc_pthread_kill);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_sigqueue, libc_pthread_sigqueue);
+/*[[[start:exports,hash:CRC-32=0xfcf6031d]]]*/
+DEFINE_PUBLIC_ALIAS(pthread_sigmask, libc_pthread_sigmask);
+DEFINE_PUBLIC_ALIAS(pthread_kill, libc_pthread_kill);
+DEFINE_PUBLIC_ALIAS(pthread_sigqueue, libc_pthread_sigqueue);
 /*[[[end:exports]]]*/
 
 DECL_END

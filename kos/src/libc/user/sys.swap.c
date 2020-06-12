@@ -32,39 +32,37 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:swapon,hash:CRC-32=0xc3d67668]]]*/
+/*[[[head:libc_swapon,hash:CRC-32=0x93b3e652]]]*/
 /* @param swapflags: Set of `SWAP_FLAG_*' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.swap.swapon") int
+INTERN ATTR_SECTION(".text.crt.fs.swap") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_swapon)(char const *path,
-                                  int swapflags)
-/*[[[body:swapon]]]*/
+                                  __STDC_INT_AS_UINT_T swapflags)
+/*[[[body:libc_swapon]]]*/
 {
 	errno_t error;
 	error = sys_swapon(path, (syscall_ulong_t)swapflags);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:swapon]]]*/
+/*[[[end:libc_swapon]]]*/
 
-/*[[[head:swapoff,hash:CRC-32=0x11430d9e]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.swap.swapoff") int
+/*[[[head:libc_swapoff,hash:CRC-32=0x42376f40]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.swap") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_swapoff)(char const *path)
-/*[[[body:swapoff]]]*/
+/*[[[body:libc_swapoff]]]*/
 {
 	errno_t error;
 	error = sys_swapoff(path);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:swapoff]]]*/
+/*[[[end:libc_swapoff]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x48eef5a1]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(swapon, libc_swapon);
-DEFINE_PUBLIC_WEAK_ALIAS(swapoff, libc_swapoff);
+/*[[[start:exports,hash:CRC-32=0xc8b8c5fc]]]*/
+DEFINE_PUBLIC_ALIAS(swapon, libc_swapon);
+DEFINE_PUBLIC_ALIAS(swapoff, libc_swapoff);
 /*[[[end:exports]]]*/
 
 DECL_END

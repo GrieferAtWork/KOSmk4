@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdcff91 */
+/* HASH CRC-32:0x538d9a08 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,12 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "../user/parts.wchar.format-printer.h"
+#include "parts.wchar.format-printer.h"
 #include <format-printer.h>
 #include <parts/uchar/format-printer.h>
+#include <parts/uchar/string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unicode.h>
 #include <wctype.h>
@@ -53,7 +55,10 @@ DECL_BEGIN
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
-(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer, void *arg, char ch, size_t num_repetitions) THROWS(...) {
+(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
+                               void *arg,
+                               char ch,
+                               size_t num_repetitions) THROWS(...) {
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
@@ -104,7 +109,10 @@ err:
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
-(LIBKCALL libc_format_wrepeat)(pc32formatprinter printer, void *arg, char ch, size_t num_repetitions) THROWS(...) {
+(LIBKCALL libc_format_wrepeat)(pc32formatprinter printer,
+                               void *arg,
+                               char ch,
+                               size_t num_repetitions) THROWS(...) {
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
@@ -163,7 +171,11 @@ err:
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
-(LIBDCALL libd_format_wescape)(pc16formatprinter printer, void *arg, char16_t const *__restrict text, size_t textlen, unsigned int flags) THROWS(...) {
+(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
+                               void *arg,
+                               char16_t const *__restrict text,
+                               size_t textlen,
+                               unsigned int flags) THROWS(...) {
 #define escape_tooct(c) ('0' + (char16_t)(unsigned char)(c))
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
@@ -444,7 +456,11 @@ err:
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
-(LIBKCALL libc_format_wescape)(pc32formatprinter printer, void *arg, char32_t const *__restrict text, size_t textlen, unsigned int flags) THROWS(...) {
+(LIBKCALL libc_format_wescape)(pc32formatprinter printer,
+                               void *arg,
+                               char32_t const *__restrict text,
+                               size_t textlen,
+                               unsigned int flags) THROWS(...) {
 #define escape_tooct(c) ('0' + (char32_t)(unsigned char)(c))
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
@@ -724,7 +740,12 @@ err:
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
-(LIBDCALL libd_format_whexdump)(pc16formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...) {
+(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
+                                void *arg,
+                                void const *__restrict data,
+                                size_t size,
+                                size_t linesize,
+                                unsigned int flags) THROWS(...) {
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals
@@ -925,7 +946,12 @@ err:
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
-(LIBKCALL libc_format_whexdump)(pc32formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...) {
+(LIBKCALL libc_format_whexdump)(pc32formatprinter printer,
+                                void *arg,
+                                void const *__restrict data,
+                                size_t size,
+                                size_t linesize,
+                                unsigned int flags) THROWS(...) {
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals
@@ -1219,7 +1245,10 @@ err:
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t
-(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, va_list args) THROWS(...) {
+(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
+                                void *arg,
+                                char16_t const *__restrict format,
+                                va_list args) THROWS(...) {
 #ifndef __INTELLISENSE__
 #define __FORMAT_PRINTER            printer
 #define __FORMAT_ARG                arg
@@ -1357,7 +1386,10 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t
-(LIBKCALL libc_format_vwprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, va_list args) THROWS(...) {
+(LIBKCALL libc_format_vwprintf)(pc32formatprinter printer,
+                                void *arg,
+                                char32_t const *__restrict format,
+                                va_list args) THROWS(...) {
 #ifndef __INTELLISENSE__
 #define __FORMAT_PRINTER            printer
 #define __FORMAT_ARG                arg
@@ -1477,7 +1509,10 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NON
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t
-(LIBDCALL libd_format_wprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, ...) THROWS(...) {
+(LIBDCALL libd_format_wprintf)(pc16formatprinter printer,
+                               void *arg,
+                               char16_t const *__restrict format,
+                               ...) THROWS(...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1573,7 +1608,10 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NONNULL((1, 3)) ssize_t
-(LIBKCALL libc_format_wprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, ...) THROWS(...) {
+(LIBKCALL libc_format_wprintf)(pc32formatprinter printer,
+                               void *arg,
+                               char32_t const *__restrict format,
+                               ...) THROWS(...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1584,14 +1622,18 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NON
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen) {
+NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(void *arg,
+                                                   char16_t const *__restrict data,
+                                                   size_t datalen) {
 	*(char16_t **)arg = (char16_t *)mempcpyc(*(char16_t **)arg, data, datalen, sizeof(char16_t));
 	return (ssize_t)datalen;
 }
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBKCALL libc_format_wsprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen) {
+NOTHROW_NCX(LIBKCALL libc_format_wsprintf_printer)(void *arg,
+                                                   char32_t const *__restrict data,
+                                                   size_t datalen) {
 	*(char32_t **)arg = (char32_t *)mempcpyc(*(char32_t **)arg, data, datalen, sizeof(char32_t));
 	return (ssize_t)datalen;
 }
@@ -1600,7 +1642,9 @@ NOTHROW_NCX(LIBKCALL libc_format_wsprintf_printer)(void *arg, char32_t const *__
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen) {
+NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(void *arg,
+                                                    char16_t const *__restrict data,
+                                                    size_t datalen) {
 	struct format_snprintf_data_ {
 		char16_t   *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		size_t  sd_bufsiz; /* Remaining buffer size. */
@@ -1620,7 +1664,9 @@ NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(void *arg, char16_t const *_
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(LIBKCALL libc_format_wsnprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen) {
+NOTHROW_NCX(LIBKCALL libc_format_wsnprintf_printer)(void *arg,
+                                                    char32_t const *__restrict data,
+                                                    size_t datalen) {
 	struct format_snprintf_data_ {
 		char32_t   *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		size_t  sd_bufsiz; /* Remaining buffer size. */
@@ -1637,7 +1683,9 @@ NOTHROW_NCX(LIBKCALL libc_format_wsnprintf_printer)(void *arg, char32_t const *_
 }
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_PURE NONNULL((2)) ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg, char16_t const *__restrict data, size_t datalen) {
+NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
+                                         char16_t const *__restrict data,
+                                         size_t datalen) {
 #if 2 == 2
 	size_t result = 0;
 	char16_t const *iter, *end;
@@ -1665,57 +1713,250 @@ NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg, char16_t const *__restrict d
 	return (ssize_t)datalen;
 #endif /* !(2 == 2) */
 }
-/* Returns the width (number of characters; not bytes) of the given unicode string */
-INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_PURE NONNULL((2)) ssize_t
-NOTHROW_NCX(LIBKCALL libc_format_wwidth)(void *arg, char32_t const *__restrict data, size_t datalen) {
-#if 4 == 2
-	size_t result = 0;
-	char32_t const *iter, *end;
-	(void)arg;
-	end = (iter = data) + datalen;
-	while (iter < end) {
-		char32_t ch;
-		ch = *iter++;
-		if (ch >= 0xd800 && ch <= 0xd800 && iter < end) {
-			ch = *iter;
-			if (ch >= 0xdc00 && ch <= 0xdfff)
-				++iter;
+#include <hybrid/__assert.h>
+/* Pack and finalize a given aprintf format printer
+ * Together with `format_waprintf_printer()', the aprintf
+ * format printer sub-system should be used as follows:
+ * >> char *result; ssize_t error;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
+ * >> if unlikely(error < 0) {
+ * >>     format_waprintf_data_fini(&p);
+ * >>     return NULL;
+ * >> }
+ * >> result = format_waprintf_pack(&p, NULL);
+ * >> return result;
+ * WARNING: Note that `format_waprintf_pack()' is able to return `NULL' as well,
+ *          but will finalize the given aprintf printer an all cases.
+ * NOTE:    The caller must destroy the returned string by passing it to `free()'
+ * @param: pstrlen: When non-NULL, store the length of the constructed string here
+ *                  Note that this is the actual length if the constructed string,
+ *                  but may differ from `wcslen(return)' when NUL characters were
+ *                  printed to the waprintf-printer at one point.
+ *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
+NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *__restrict self,
+                                                size_t *pstrlen) {
+	/* Free unused buffer memory. */
+	char16_t *result;
+	if (self->ap_avail != 0) {
+		char16_t *newbuf;
+		newbuf = (char16_t *)realloc(self->ap_base,
+		                         (self->ap_used + 1) * sizeof(char16_t));
+		if likely(newbuf)
+			self->ap_base = newbuf;
+	} else {
+		if unlikely(!self->ap_used) {
+			/* Special case: Nothing was printed. */
+			__hybrid_assert(!self->ap_base);
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+			self->ap_base = (char16_t *)malloc(1 * sizeof(char16_t));
+#else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+			self->ap_base = (char16_t *)realloc(NULL, 1 * sizeof(char16_t));
+#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
+			if unlikely(!self->ap_base)
+				return NULL;
 		}
-		++result;
 	}
-	return (ssize_t)result;
-#else /* 4 == 2 */
-	(void)arg;
-	(void)data;
-	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
-	 *      However, magic headers don't support conditional attributes, so we can't just do
-	 *      [if(__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
-	 *      [if(__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
-	COMPILER_IMPURE();
+	result = self->ap_base;
+	__hybrid_assert(result);
+	result[self->ap_used] = '\0'; /* NUL-terminate */
+	if (pstrlen)
+		*pstrlen = self->ap_used;
+#ifndef NDEBUG
+#if __SIZEOF_POINTER__ == 4
+	self->ap_base  = (char16_t *)__UINT32_C(0xcccccccc);
+	self->ap_avail = __UINT32_C(0xcccccccc);
+	self->ap_used  = __UINT32_C(0xcccccccc);
+#elif __SIZEOF_POINTER__ == 8
+	self->ap_base  = (char16_t *)__UINT64_C(0xcccccccccccccccc);
+	self->ap_avail = __UINT64_C(0xcccccccccccccccc);
+	self->ap_used  = __UINT64_C(0xcccccccccccccccc);
+#endif /* ... */
+#endif /* !NDEBUG */
+	return result;
+}
+#include <hybrid/__assert.h>
+/* Pack and finalize a given aprintf format printer
+ * Together with `format_waprintf_printer()', the aprintf
+ * format printer sub-system should be used as follows:
+ * >> char *result; ssize_t error;
+ * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
+ * >> if unlikely(error < 0) {
+ * >>     format_waprintf_data_fini(&p);
+ * >>     return NULL;
+ * >> }
+ * >> result = format_waprintf_pack(&p, NULL);
+ * >> return result;
+ * WARNING: Note that `format_waprintf_pack()' is able to return `NULL' as well,
+ *          but will finalize the given aprintf printer an all cases.
+ * NOTE:    The caller must destroy the returned string by passing it to `free()'
+ * @param: pstrlen: When non-NULL, store the length of the constructed string here
+ *                  Note that this is the actual length if the constructed string,
+ *                  but may differ from `wcslen(return)' when NUL characters were
+ *                  printed to the waprintf-printer at one point.
+ *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
+INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *
+NOTHROW_NCX(LIBKCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *__restrict self,
+                                                size_t *pstrlen) {
+	/* Free unused buffer memory. */
+	char32_t *result;
+	if (self->ap_avail != 0) {
+		char32_t *newbuf;
+		newbuf = (char32_t *)realloc(self->ap_base,
+		                         (self->ap_used + 1) * sizeof(char32_t));
+		if likely(newbuf)
+			self->ap_base = newbuf;
+	} else {
+		if unlikely(!self->ap_used) {
+			/* Special case: Nothing was printed. */
+			__hybrid_assert(!self->ap_base);
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+			self->ap_base = (char32_t *)malloc(1 * sizeof(char32_t));
+#else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+			self->ap_base = (char32_t *)realloc(NULL, 1 * sizeof(char32_t));
+#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
+			if unlikely(!self->ap_base)
+				return NULL;
+		}
+	}
+	result = self->ap_base;
+	__hybrid_assert(result);
+	result[self->ap_used] = '\0'; /* NUL-terminate */
+	if (pstrlen)
+		*pstrlen = self->ap_used;
+#ifndef NDEBUG
+#if __SIZEOF_POINTER__ == 4
+	self->ap_base  = (char32_t *)__UINT32_C(0xcccccccc);
+	self->ap_avail = __UINT32_C(0xcccccccc);
+	self->ap_used  = __UINT32_C(0xcccccccc);
+#elif __SIZEOF_POINTER__ == 8
+	self->ap_base  = (char32_t *)__UINT64_C(0xcccccccccccccccc);
+	self->ap_avail = __UINT64_C(0xcccccccccccccccc);
+	self->ap_used  = __UINT64_C(0xcccccccccccccccc);
+#endif /* ... */
+#endif /* !NDEBUG */
+	return result;
+}
+#include <hybrid/__assert.h>
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED WUNUSED NONNULL((1)) char16_t *
+NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *__restrict self,
+                                                 size_t num_wchars) {
+	char16_t *result;
+	if (self->ap_avail < num_wchars) {
+		char16_t *newbuf;
+		size_t min_alloc = self->ap_used + num_wchars;
+		size_t new_alloc = self->ap_used + self->ap_avail;
+		if (!new_alloc)
+			new_alloc = 8;
+		while (new_alloc < min_alloc)
+			new_alloc *= 2;
+		newbuf = (char16_t *)realloc(self->ap_base, (new_alloc + 1) * sizeof(char16_t));
+		if unlikely(!newbuf) {
+			new_alloc = min_alloc;
+			newbuf    = (char16_t *)realloc(self->ap_base, (new_alloc + 1) * sizeof(char16_t));
+			if unlikely(!newbuf)
+				return NULL;
+		}
+		__hybrid_assert(new_alloc >= self->ap_used + num_wchars);
+		self->ap_base  = newbuf;
+		self->ap_avail = new_alloc - self->ap_used;
+	}
+	result = self->ap_base + self->ap_used;
+	self->ap_avail -= num_wchars;
+	self->ap_used  += num_wchars;
+	return result;
+}
+#include <hybrid/__assert.h>
+/* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * The returned pointer remains valid until the next time this function is called,
+ * the format_aprintf buffer `self' is finalized, or some other function is used
+ * to append additional data to the end of `self'
+ * @return: NULL: Failed to allocate additional memory */
+INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED WUNUSED NONNULL((1)) char32_t *
+NOTHROW_NCX(LIBKCALL libc_format_waprintf_alloc)(struct format_c32aprintf_data *__restrict self,
+                                                 size_t num_wchars) {
+	char32_t *result;
+	if (self->ap_avail < num_wchars) {
+		char32_t *newbuf;
+		size_t min_alloc = self->ap_used + num_wchars;
+		size_t new_alloc = self->ap_used + self->ap_avail;
+		if (!new_alloc)
+			new_alloc = 8;
+		while (new_alloc < min_alloc)
+			new_alloc *= 2;
+		newbuf = (char32_t *)realloc(self->ap_base, (new_alloc + 1) * sizeof(char32_t));
+		if unlikely(!newbuf) {
+			new_alloc = min_alloc;
+			newbuf    = (char32_t *)realloc(self->ap_base, (new_alloc + 1) * sizeof(char32_t));
+			if unlikely(!newbuf)
+				return NULL;
+		}
+		__hybrid_assert(new_alloc >= self->ap_used + num_wchars);
+		self->ap_base  = newbuf;
+		self->ap_avail = new_alloc - self->ap_used;
+	}
+	result = self->ap_base + self->ap_used;
+	self->ap_avail -= num_wchars;
+	self->ap_used  += num_wchars;
+	return result;
+}
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") WUNUSED NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(LIBDCALL libd_format_waprintf_printer)(void *arg,
+                                                   char16_t const *__restrict data,
+                                                   size_t datalen) {
+	char16_t *buf;
+	buf = format_c16aprintf_alloc((struct format_c16aprintf_data *)arg, datalen);
+	if unlikely(!buf)
+		return -1;
+	c16memcpy(buf, data, datalen);
 	return (ssize_t)datalen;
-#endif /* !(4 == 2) */
+}
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
+INTERN ATTR_SECTION(".text.crt.wchar.string.format") WUNUSED NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(LIBKCALL libc_format_waprintf_printer)(void *arg,
+                                                   char32_t const *__restrict data,
+                                                   size_t datalen) {
+	char32_t *buf;
+	buf = format_c32aprintf_alloc((struct format_c32aprintf_data *)arg, datalen);
+	if unlikely(!buf)
+		return -1;
+	c32memcpy(buf, data, datalen);
+	return (ssize_t)datalen;
 }
 #endif /* !__KERNEL__ */
 
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_wrepeat, libd_format_wrepeat);
-DEFINE_PUBLIC_WEAK_ALIAS(format_wrepeat, libc_format_wrepeat);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_wescape, libd_format_wescape);
-DEFINE_PUBLIC_WEAK_ALIAS(format_wescape, libc_format_wescape);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_whexdump, libd_format_whexdump);
-DEFINE_PUBLIC_WEAK_ALIAS(format_whexdump, libc_format_whexdump);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_vwprintf, libd_format_vwprintf);
-DEFINE_PUBLIC_WEAK_ALIAS(format_vwprintf, libc_format_vwprintf);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_wprintf, libd_format_wprintf);
-DEFINE_PUBLIC_WEAK_ALIAS(format_wprintf, libc_format_wprintf);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_wsprintf_printer, libd_format_wsprintf_printer);
-DEFINE_PUBLIC_WEAK_ALIAS(format_wsprintf_printer, libc_format_wsprintf_printer);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_wsnprintf_printer, libd_format_wsnprintf_printer);
-DEFINE_PUBLIC_WEAK_ALIAS(format_wsnprintf_printer, libc_format_wsnprintf_printer);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_wwidth, libd_format_wwidth);
-DEFINE_PUBLIC_WEAK_ALIAS(format_wwidth, libc_format_wwidth);
+DEFINE_PUBLIC_ALIAS(DOS$format_wrepeat, libd_format_wrepeat);
+DEFINE_PUBLIC_ALIAS(format_wrepeat, libc_format_wrepeat);
+DEFINE_PUBLIC_ALIAS(DOS$format_wescape, libd_format_wescape);
+DEFINE_PUBLIC_ALIAS(format_wescape, libc_format_wescape);
+DEFINE_PUBLIC_ALIAS(DOS$format_whexdump, libd_format_whexdump);
+DEFINE_PUBLIC_ALIAS(format_whexdump, libc_format_whexdump);
+DEFINE_PUBLIC_ALIAS(DOS$format_vwprintf, libd_format_vwprintf);
+DEFINE_PUBLIC_ALIAS(format_vwprintf, libc_format_vwprintf);
+DEFINE_PUBLIC_ALIAS(DOS$format_wprintf, libd_format_wprintf);
+DEFINE_PUBLIC_ALIAS(format_wprintf, libc_format_wprintf);
+DEFINE_PUBLIC_ALIAS(DOS$format_wsprintf_printer, libd_format_wsprintf_printer);
+DEFINE_PUBLIC_ALIAS(format_wsprintf_printer, libc_format_wsprintf_printer);
+DEFINE_PUBLIC_ALIAS(DOS$format_wsnprintf_printer, libd_format_wsnprintf_printer);
+DEFINE_PUBLIC_ALIAS(format_wsnprintf_printer, libc_format_wsnprintf_printer);
+DEFINE_PUBLIC_ALIAS(DOS$format_wwidth, libd_format_wwidth);
+DEFINE_PUBLIC_ALIAS(DOS$format_waprintf_pack, libd_format_waprintf_pack);
+DEFINE_PUBLIC_ALIAS(format_waprintf_pack, libc_format_waprintf_pack);
+DEFINE_PUBLIC_ALIAS(DOS$format_waprintf_alloc, libd_format_waprintf_alloc);
+DEFINE_PUBLIC_ALIAS(format_waprintf_alloc, libc_format_waprintf_alloc);
+DEFINE_PUBLIC_ALIAS(DOS$format_waprintf_printer, libd_format_waprintf_printer);
+DEFINE_PUBLIC_ALIAS(format_waprintf_printer, libc_format_waprintf_printer);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PARTS_WCHAR_FORMAT_PRINTER_C */

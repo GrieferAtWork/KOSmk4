@@ -33,7 +33,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:ptrace,hash:CRC-32=0x4836010d]]]*/
+/*[[[head:libc_ptrace,hash:CRC-32=0x21d6ab4a]]]*/
 /* Perform process tracing functions. REQUEST is one of
  * the values above, and determines the action to be taken.
  * For all requests except PTRACE_TRACEME, PID specifies the process to be traced.
@@ -42,10 +42,10 @@ DECL_BEGIN
  * appear (those that are used for the particular request) as:
  *     pid_t PID, void *ADDR, int DATA, void *ADDR2
  * after REQUEST */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.ptrace.ptrace") long int
+INTERN ATTR_SECTION(".text.crt.system.ptrace") longptr_t
 NOTHROW_NCX(VLIBCCALL libc_ptrace)(__ptrace_request_t request,
                                    ...)
-/*[[[body:ptrace]]]*/
+/*[[[body:libc_ptrace]]]*/
 {
 	syscall_slong_t result;
 	va_list args;
@@ -59,15 +59,14 @@ NOTHROW_NCX(VLIBCCALL libc_ptrace)(__ptrace_request_t request,
 	result = sys_ptrace(request, pid, addr, data);
 	return (long int)libc_seterrno_syserr(result);
 }
-/*[[[end:ptrace]]]*/
+/*[[[end:libc_ptrace]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xfaf35d71]]]*/
-#undef ptrace
-DEFINE_PUBLIC_WEAK_ALIAS(ptrace, libc_ptrace);
+/*[[[start:exports,hash:CRC-32=0xeeda6583]]]*/
+DEFINE_PUBLIC_ALIAS(ptrace, libc_ptrace);
 /*[[[end:exports]]]*/
 
 DECL_END

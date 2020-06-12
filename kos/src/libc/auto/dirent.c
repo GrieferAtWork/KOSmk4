@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5f9bb2a */
+/* HASH CRC-32:0x49505577 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,8 @@ DECL_BEGIN
 #include <bits/dirent.h>
 /* Sort the 2 given directory entries `E1' and `E2' the same way `strcmp(3)' would */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
-NOTHROW_NCX(LIBCCALL libc_alphasort)(struct dirent const **e1, struct dirent const **e2) {
+NOTHROW_NCX(LIBCCALL libc_alphasort)(struct dirent const **e1,
+                                     struct dirent const **e2) {
 	return strcoll((*e1)->d_name, (*e2)->d_name);
 }
 #ifdef _DIRENT_MATCHES_DIRENT64
@@ -42,14 +43,16 @@ DEFINE_INTERN_ALIAS(libc_alphasort64, libc_alphasort);
 #include <bits/dirent.h>
 /* 64-bit variant of `alphasort()' */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
-NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct dirent64 const **e1, struct dirent64 const **e2) {
+NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct dirent64 const **e1,
+                                       struct dirent64 const **e2) {
 	return strcoll((*e1)->d_name, (*e2)->d_name);
 }
 #endif /* !_DIRENT_MATCHES_DIRENT64 */
 #include <bits/dirent.h>
 /* Sort the 2 given directory entries `E1' and `E2' the same way `strvercmp(3)' would. */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
-NOTHROW_NCX(LIBCCALL libc_versionsort)(struct dirent const **e1, struct dirent const **e2) {
+NOTHROW_NCX(LIBCCALL libc_versionsort)(struct dirent const **e1,
+                                       struct dirent const **e2) {
 	return strverscmp((*e1)->d_name, (*e2)->d_name);
 }
 #ifdef _DIRENT_MATCHES_DIRENT64
@@ -58,7 +61,8 @@ DEFINE_INTERN_ALIAS(libc_versionsort64, libc_versionsort);
 #include <bits/dirent.h>
 /* 64-bit variant of `versionsort()' */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
-NOTHROW_NCX(LIBCCALL libc_versionsort64)(struct dirent64 const **e1, struct dirent64 const **e2) {
+NOTHROW_NCX(LIBCCALL libc_versionsort64)(struct dirent64 const **e1,
+                                         struct dirent64 const **e2) {
 	return strverscmp((*e1)->d_name, (*e2)->d_name);
 }
 #endif /* !_DIRENT_MATCHES_DIRENT64 */
@@ -67,10 +71,10 @@ NOTHROW_NCX(LIBCCALL libc_versionsort64)(struct dirent64 const **e1, struct dire
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(alphasort, libc_alphasort);
-DEFINE_PUBLIC_WEAK_ALIAS(alphasort64, libc_alphasort64);
-DEFINE_PUBLIC_WEAK_ALIAS(versionsort, libc_versionsort);
-DEFINE_PUBLIC_WEAK_ALIAS(versionsort64, libc_versionsort64);
+DEFINE_PUBLIC_ALIAS(alphasort, libc_alphasort);
+DEFINE_PUBLIC_ALIAS(alphasort64, libc_alphasort64);
+DEFINE_PUBLIC_ALIAS(versionsort, libc_versionsort);
+DEFINE_PUBLIC_ALIAS(versionsort64, libc_versionsort64);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_DIRENT_C */

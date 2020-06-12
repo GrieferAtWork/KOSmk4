@@ -35,109 +35,104 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:gettimeofday,hash:CRC-32=0x7609ea3c]]]*/
+/*[[[head:libc_gettimeofday,hash:CRC-32=0x7d60db56]]]*/
 /* Get the current time of day and timezone information,
  * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
  * Returns 0 on success, -1 on errors.
  * NOTE: This form of timezone information is obsolete.
  * Use the functions and variables declared in <time.h> instead */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.time.gettimeofday") int
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_gettimeofday)(struct timeval *__restrict tv,
                                         __timezone_ptr_t tz)
-/*[[[body:gettimeofday]]]*/
+/*[[[body:libc_gettimeofday]]]*/
 {
 	errno_t result;
 	result = sys_gettimeofday(tv, tz);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:gettimeofday]]]*/
+/*[[[end:libc_gettimeofday]]]*/
 
-/*[[[head:getitimer,hash:CRC-32=0x213b3a5e]]]*/
+/*[[[head:libc_getitimer,hash:CRC-32=0x4ef3ac6e]]]*/
 /* Set *VALUE to the current setting of timer WHICH.
  * Return 0 on success, -1 on errors */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.time.getitimer") int
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_getitimer)(__itimer_which_t which,
                                      struct itimerval *curr_value)
-/*[[[body:getitimer]]]*/
+/*[[[body:libc_getitimer]]]*/
 {
 	errno_t result;
 	result = sys_getitimer((syscall_ulong_t)which, curr_value);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:getitimer]]]*/
+/*[[[end:libc_getitimer]]]*/
 
-/*[[[head:setitimer,hash:CRC-32=0x9ca764ad]]]*/
+/*[[[head:libc_setitimer,hash:CRC-32=0x10064eba]]]*/
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.time.setitimer") int
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_setitimer)(__itimer_which_t which,
                                      struct itimerval const *newval,
                                      struct itimerval *oldval)
-/*[[[body:setitimer]]]*/
+/*[[[body:libc_setitimer]]]*/
 {
 	errno_t result;
 	result = sys_setitimer((syscall_ulong_t)which, newval, oldval);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:setitimer]]]*/
+/*[[[end:libc_setitimer]]]*/
 
-/*[[[head:utimes,hash:CRC-32=0xfa149490]]]*/
+/*[[[head:libc_utimes,hash:CRC-32=0xced4e1f5]]]*/
 /* Change the access time of FILE to TVP[0] and the modification time of
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
  * Returns 0 on success, -1 on errors */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.utimes") int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_utimes)(char const *file,
                                   struct timeval const tvp[2])
-/*[[[body:utimes]]]*/
+/*[[[body:libc_utimes]]]*/
 {
 	errno_t result;
 	result = sys_utimes(file, tvp);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:utimes]]]*/
+/*[[[end:libc_utimes]]]*/
 
-/*[[[head:futimesat,hash:CRC-32=0xb82d4f22]]]*/
+/*[[[head:libc_futimesat,hash:CRC-32=0xe20d5226]]]*/
 /* Same as `utimes', but takes an open file descriptor instead of a name */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.futimesat") int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_futimesat)(fd_t fd,
                                      char const *file,
                                      struct timeval const tvp[2])
-/*[[[body:futimesat]]]*/
+/*[[[body:libc_futimesat]]]*/
 {
 	errno_t result;
 	result = sys_futimesat(fd, file, tvp);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futimesat]]]*/
+/*[[[end:libc_futimesat]]]*/
 
-/*[[[head:settimeofday,hash:CRC-32=0x2fd8087f]]]*/
+/*[[[head:libc_settimeofday,hash:CRC-32=0x895297d0]]]*/
 /* Set the current time of day and timezone information.
  * This call is restricted to the super-user */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.adjtime.settimeofday") int
+INTERN ATTR_SECTION(".text.crt.system.adjtime") int
 NOTHROW_NCX(LIBCCALL libc_settimeofday)(struct timeval const *tv,
                                         struct timezone const *tz)
-/*[[[body:settimeofday]]]*/
+/*[[[body:libc_settimeofday]]]*/
 {
 	errno_t result;
 	result = sys_settimeofday(tv, tz);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:settimeofday]]]*/
+/*[[[end:libc_settimeofday]]]*/
 
-/*[[[head:adjtime,hash:CRC-32=0xfde21674]]]*/
+/*[[[head:libc_adjtime,hash:CRC-32=0xfaf47ce]]]*/
 /* Adjust the current time of day by the amount in DELTA.
  * If OLDDELTA is not NULL, it is filled in with the amount of time
  * adjustment remaining to be done from the last `adjtime' call.
  * This call is restricted to the super-user */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.adjtime.adjtime") int
+INTERN ATTR_SECTION(".text.crt.system.adjtime") int
 NOTHROW_NCX(LIBCCALL libc_adjtime)(struct timeval const *delta,
                                    struct timeval *olddelta)
-/*[[[body:adjtime]]]*/
+/*[[[body:libc_adjtime]]]*/
 {
 	struct timeval64 delta64;
 	struct timeval64 olddelta64;
@@ -154,15 +149,14 @@ NOTHROW_NCX(LIBCCALL libc_adjtime)(struct timeval const *delta,
 	}
 	return result;
 }
-/*[[[end:adjtime]]]*/
+/*[[[end:libc_adjtime]]]*/
 
-/*[[[head:lutimes,hash:CRC-32=0x2c6cff56]]]*/
+/*[[[head:libc_lutimes,hash:CRC-32=0xcf1ff6c3]]]*/
 /* Same as `utimes', but does not follow symbolic links */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.lutimes") int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_lutimes)(char const *file,
                                    struct timeval const tvp[2])
-/*[[[body:lutimes]]]*/
+/*[[[body:libc_lutimes]]]*/
 {
 	struct timespec ts[2];
 	if (!tvp)
@@ -171,14 +165,14 @@ NOTHROW_NCX(LIBCCALL libc_lutimes)(char const *file,
 	TIMEVAL_TO_TIMESPEC(&tvp[1], &ts[1]);
 	return utimensat(AT_FDCWD, file, ts, AT_SYMLINK_NOFOLLOW);
 }
-/*[[[end:lutimes]]]*/
+/*[[[end:libc_lutimes]]]*/
 
-/*[[[head:futimes,hash:CRC-32=0xb33ee961]]]*/
+/*[[[head:libc_futimes,hash:CRC-32=0x78b80c81]]]*/
 /* Same as `utimes', but takes an open file descriptor instead of a name */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.futimes") int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") int
 NOTHROW_NCX(LIBCCALL libc_futimes)(fd_t fd,
                                    struct timeval const tvp[2])
-/*[[[body:futimes]]]*/
+/*[[[body:libc_futimes]]]*/
 {
 	errno_t result;
 	if (!tvp)
@@ -191,119 +185,115 @@ NOTHROW_NCX(LIBCCALL libc_futimes)(fd_t fd,
 	}
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:futimes]]]*/
+/*[[[end:libc_futimes]]]*/
 
-/*[[[head:gettimeofday64,hash:CRC-32=0xbb8e1c36]]]*/
+/*[[[head:libc_gettimeofday64,hash:CRC-32=0x9442025]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_gettimeofday64, libc_gettimeofday);
+#else /* MAGIC:alias */
 /* Get the current time of day and timezone information,
  * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
  * Returns 0 on success, -1 on errors.
  * NOTE: This form of timezone information is obsolete.
  * Use the functions and variables declared in <time.h> instead */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_gettimeofday64, libc_gettimeofday);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.time.gettimeofday64") int
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_gettimeofday64)(struct timeval64 *__restrict tv,
                                           __timezone_ptr_t tz)
-/*[[[body:gettimeofday64]]]*/
+/*[[[body:libc_gettimeofday64]]]*/
 {
 	errno_t result;
 	result = sys_gettimeofday64(tv, tz);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:gettimeofday64]]]*/
+/*[[[end:libc_gettimeofday64]]]*/
 
-/*[[[head:getitimer64,hash:CRC-32=0x3a34ee27]]]*/
-/* Set *VALUE to the current setting of timer WHICH.
- * Return 0 on success, -1 on errors */
+/*[[[head:libc_getitimer64,hash:CRC-32=0x7b6411d7]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_getitimer64, libc_getitimer);
-#else
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.time.getitimer64") int
+#else /* MAGIC:alias */
+/* Set *VALUE to the current setting of timer WHICH.
+ * Return 0 on success, -1 on errors */
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_getitimer64)(__itimer_which_t which,
                                        struct itimerval64 *curr_value)
-/*[[[body:getitimer64]]]*/
+/*[[[body:libc_getitimer64]]]*/
 {
 	errno_t result;
 	result = sys_getitimer64((syscall_ulong_t)which, curr_value);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:getitimer64]]]*/
+/*[[[end:libc_getitimer64]]]*/
 
-/*[[[head:setitimer64,hash:CRC-32=0x8b17a63d]]]*/
-/* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
- * Returns 0 on success, -1 on errors */
+/*[[[head:libc_setitimer64,hash:CRC-32=0x84c5123f]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_setitimer64, libc_setitimer);
-#else
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.time.setitimer64") int
+#else /* MAGIC:alias */
+/* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
+ * Returns 0 on success, -1 on errors */
+INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_setitimer64)(__itimer_which_t which,
                                        struct itimerval64 const *newval,
                                        struct itimerval64 *oldval)
-/*[[[body:setitimer64]]]*/
+/*[[[body:libc_setitimer64]]]*/
 {
 	errno_t result;
 	result = sys_setitimer64((syscall_ulong_t)which, newval, oldval);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:setitimer64]]]*/
+/*[[[end:libc_setitimer64]]]*/
 
-/*[[[head:utimes64,hash:CRC-32=0x9e404299]]]*/
+/*[[[head:libc_utimes64,hash:CRC-32=0xc373a3d8]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_utimes64, libc_utimes);
+#else /* MAGIC:alias */
 /* Change the access time of FILE to TVP[0] and the modification time of
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
  * Returns 0 on success, -1 on errors */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_utimes64, libc_utimes);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.utimes64") int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_utimes64)(char const *file,
                                     struct timeval64 const tvp[2])
-/*[[[body:utimes64]]]*/
+/*[[[body:libc_utimes64]]]*/
 {
 	errno_t result;
 	result = sys_utimes64(file, tvp);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:utimes64]]]*/
+/*[[[end:libc_utimes64]]]*/
 
-/*[[[head:settimeofday64,hash:CRC-32=0x6627348b]]]*/
-/* Set the current time of day and timezone information.
- * This call is restricted to the super-user */
+/*[[[head:libc_settimeofday64,hash:CRC-32=0x85fa7c30]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_settimeofday64, libc_settimeofday);
-#else
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.adjtime.settimeofday64") int
+#else /* MAGIC:alias */
+/* Set the current time of day and timezone information.
+ * This call is restricted to the super-user */
+INTERN ATTR_SECTION(".text.crt.system.adjtime") int
 NOTHROW_NCX(LIBCCALL libc_settimeofday64)(struct timeval64 const *tv,
                                           struct timezone const *tz)
-/*[[[body:settimeofday64]]]*/
+/*[[[body:libc_settimeofday64]]]*/
 {
 	errno_t result;
 	result = sys_settimeofday64(tv, tz);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:settimeofday64]]]*/
+/*[[[end:libc_settimeofday64]]]*/
 
-/*[[[head:adjtime64,hash:CRC-32=0x82a73cd5]]]*/
+/*[[[head:libc_adjtime64,hash:CRC-32=0x7264254c]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_adjtime64, libc_adjtime);
+#else /* MAGIC:alias */
 /* Adjust the current time of day by the amount in DELTA.
  * If OLDDELTA is not NULL, it is filled in with the amount of time
  * adjustment remaining to be done from the last `adjtime' call.
  * This call is restricted to the super-user */
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_adjtime64, libc_adjtime);
-#else
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.adjtime.adjtime64") int
+INTERN ATTR_SECTION(".text.crt.system.adjtime") int
 NOTHROW_NCX(LIBCCALL libc_adjtime64)(struct timeval64 const *delta,
                                      struct timeval64 *olddelta)
-/*[[[body:adjtime64]]]*/
+/*[[[body:libc_adjtime64]]]*/
 {
 	int result;
 	struct timex64 tntx;
@@ -332,18 +322,17 @@ NOTHROW_NCX(LIBCCALL libc_adjtime64)(struct timeval64 const *delta,
 	return result;
 }
 #endif /* MAGIC:alias */
-/*[[[end:adjtime64]]]*/
+/*[[[end:libc_adjtime64]]]*/
 
-/*[[[head:lutimes64,hash:CRC-32=0xdd76983e]]]*/
-/* Same as `utimes', but does not follow symbolic links */
+/*[[[head:libc_lutimes64,hash:CRC-32=0xb4df29b0]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_lutimes64, libc_lutimes);
-#else
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.lutimes64") int
+#else /* MAGIC:alias */
+/* Same as `utimes', but does not follow symbolic links */
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_lutimes64)(char const *file,
                                      struct timeval64 const tvp[2])
-/*[[[body:lutimes64]]]*/
+/*[[[body:libc_lutimes64]]]*/
 {
 	struct timespec64 ts[2];
 	if (!tvp)
@@ -353,17 +342,17 @@ NOTHROW_NCX(LIBCCALL libc_lutimes64)(char const *file,
 	return utimensat64(AT_FDCWD, file, ts, AT_SYMLINK_NOFOLLOW);
 }
 #endif /* MAGIC:alias */
-/*[[[end:lutimes64]]]*/
+/*[[[end:libc_lutimes64]]]*/
 
-/*[[[head:futimes64,hash:CRC-32=0x3663dd8]]]*/
-/* Same as `utimes', but does not follow symbolic links */
+/*[[[head:libc_futimes64,hash:CRC-32=0xbc4657f4]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimes64, libc_lutimes);
-#else
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.futimes64") int
+#else /* MAGIC:alias */
+/* Same as `utimes', but does not follow symbolic links */
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") int
 NOTHROW_NCX(LIBCCALL libc_futimes64)(fd_t fd,
                                      struct timeval64 const tvp[2])
-/*[[[body:futimes64]]]*/
+/*[[[body:libc_futimes64]]]*/
 {
 	errno_t result;
 	if (!tvp)
@@ -377,51 +366,50 @@ NOTHROW_NCX(LIBCCALL libc_futimes64)(fd_t fd,
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futimes64]]]*/
+/*[[[end:libc_futimes64]]]*/
 
-/*[[[head:futimesat64,hash:CRC-32=0xddd91621]]]*/
-/* Same as `utimes', but takes an open file descriptor instead of a name */
+/*[[[head:libc_futimesat64,hash:CRC-32=0x46a9bd3d]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimesat64, libc_futimesat);
-#else
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.futimesat64") int
+#else /* MAGIC:alias */
+/* Same as `utimes', but takes an open file descriptor instead of a name */
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_futimesat64)(fd_t fd,
                                        char const *file,
                                        struct timeval64 const tvp[2])
-/*[[[body:futimesat64]]]*/
+/*[[[body:libc_futimesat64]]]*/
 {
 	errno_t result;
 	result = sys_futimesat64(fd, file, tvp);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:futimesat64]]]*/
+/*[[[end:libc_futimesat64]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x993d443a]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(gettimeofday, libc_gettimeofday);
-DEFINE_PUBLIC_WEAK_ALIAS(__gettimeofday, libc_gettimeofday);
-DEFINE_PUBLIC_WEAK_ALIAS(getitimer, libc_getitimer);
-DEFINE_PUBLIC_WEAK_ALIAS(setitimer, libc_setitimer);
-DEFINE_PUBLIC_WEAK_ALIAS(utimes, libc_utimes);
-DEFINE_PUBLIC_WEAK_ALIAS(futimesat, libc_futimesat);
-DEFINE_PUBLIC_WEAK_ALIAS(settimeofday, libc_settimeofday);
-DEFINE_PUBLIC_WEAK_ALIAS(adjtime, libc_adjtime);
-DEFINE_PUBLIC_WEAK_ALIAS(lutimes, libc_lutimes);
-DEFINE_PUBLIC_WEAK_ALIAS(futimes, libc_futimes);
-DEFINE_PUBLIC_WEAK_ALIAS(gettimeofday64, libc_gettimeofday64);
-DEFINE_PUBLIC_WEAK_ALIAS(getitimer64, libc_getitimer64);
-DEFINE_PUBLIC_WEAK_ALIAS(setitimer64, libc_setitimer64);
-DEFINE_PUBLIC_WEAK_ALIAS(utimes64, libc_utimes64);
-DEFINE_PUBLIC_WEAK_ALIAS(settimeofday64, libc_settimeofday64);
-DEFINE_PUBLIC_WEAK_ALIAS(adjtime64, libc_adjtime64);
-DEFINE_PUBLIC_WEAK_ALIAS(lutimes64, libc_lutimes64);
-DEFINE_PUBLIC_WEAK_ALIAS(futimes64, libc_futimes64);
-DEFINE_PUBLIC_WEAK_ALIAS(futimesat64, libc_futimesat64);
+/*[[[start:exports,hash:CRC-32=0xbc4749a8]]]*/
+DEFINE_PUBLIC_ALIAS(__gettimeofday, libc_gettimeofday);
+DEFINE_PUBLIC_ALIAS(gettimeofday, libc_gettimeofday);
+DEFINE_PUBLIC_ALIAS(getitimer, libc_getitimer);
+DEFINE_PUBLIC_ALIAS(setitimer, libc_setitimer);
+DEFINE_PUBLIC_ALIAS(utimes, libc_utimes);
+DEFINE_PUBLIC_ALIAS(futimesat, libc_futimesat);
+DEFINE_PUBLIC_ALIAS(settimeofday, libc_settimeofday);
+DEFINE_PUBLIC_ALIAS(adjtime, libc_adjtime);
+DEFINE_PUBLIC_ALIAS(lutimes, libc_lutimes);
+DEFINE_PUBLIC_ALIAS(futimes, libc_futimes);
+DEFINE_PUBLIC_ALIAS(gettimeofday64, libc_gettimeofday64);
+DEFINE_PUBLIC_ALIAS(getitimer64, libc_getitimer64);
+DEFINE_PUBLIC_ALIAS(setitimer64, libc_setitimer64);
+DEFINE_PUBLIC_ALIAS(utimes64, libc_utimes64);
+DEFINE_PUBLIC_ALIAS(settimeofday64, libc_settimeofday64);
+DEFINE_PUBLIC_ALIAS(adjtime64, libc_adjtime64);
+DEFINE_PUBLIC_ALIAS(lutimes64, libc_lutimes64);
+DEFINE_PUBLIC_ALIAS(futimes64, libc_futimes64);
+DEFINE_PUBLIC_ALIAS(futimesat64, libc_futimesat64);
 /*[[[end:exports]]]*/
 
 DECL_END

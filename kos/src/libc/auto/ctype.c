@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3090b26 */
+/* HASH CRC-32:0xfcef26ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -314,7 +314,8 @@ NOTHROW(LIBCCALL libc_isblank)(int ch) {
 }
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iscntrl_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_iscntrl_l)(int ch,
+                                     __locale_t locale) {
 #ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
@@ -339,7 +340,8 @@ NOTHROW_NCX(LIBCCALL libc_iscntrl_l)(int ch, __locale_t locale) {
 #endif /* !__BUILDING_LIBC */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_isspace_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_isspace_l)(int ch,
+                                     __locale_t locale) {
 #ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
@@ -364,7 +366,8 @@ NOTHROW_NCX(LIBCCALL libc_isspace_l)(int ch, __locale_t locale) {
 #endif /* !__BUILDING_LIBC */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_isupper_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_isupper_l)(int ch,
+                                     __locale_t locale) {
 #ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
@@ -389,7 +392,8 @@ NOTHROW_NCX(LIBCCALL libc_isupper_l)(int ch, __locale_t locale) {
 #endif /* !__BUILDING_LIBC */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_islower_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_islower_l)(int ch,
+                                     __locale_t locale) {
 #ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
@@ -414,7 +418,8 @@ NOTHROW_NCX(LIBCCALL libc_islower_l)(int ch, __locale_t locale) {
 #endif /* !__BUILDING_LIBC */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_isalpha_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_isalpha_l)(int ch,
+                                     __locale_t locale) {
 #ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
@@ -439,7 +444,8 @@ NOTHROW_NCX(LIBCCALL libc_isalpha_l)(int ch, __locale_t locale) {
 #endif /* !__BUILDING_LIBC */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_isdigit_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_isdigit_l)(int ch,
+                                     __locale_t locale) {
 #ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
@@ -464,7 +470,8 @@ NOTHROW_NCX(LIBCCALL libc_isdigit_l)(int ch, __locale_t locale) {
 #endif /* !__BUILDING_LIBC */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_isxdigit_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_isxdigit_l)(int ch,
+                                      __locale_t locale) {
 #ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
@@ -489,7 +496,8 @@ NOTHROW_NCX(LIBCCALL libc_isxdigit_l)(int ch, __locale_t locale) {
 #endif /* !__BUILDING_LIBC */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_isalnum_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_isalnum_l)(int ch,
+                                     __locale_t locale) {
 #ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
@@ -514,7 +522,8 @@ NOTHROW_NCX(LIBCCALL libc_isalnum_l)(int ch, __locale_t locale) {
 #endif /* !__BUILDING_LIBC */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_ispunct_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_ispunct_l)(int ch,
+                                     __locale_t locale) {
 #ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
@@ -539,7 +548,8 @@ NOTHROW_NCX(LIBCCALL libc_ispunct_l)(int ch, __locale_t locale) {
 #endif /* !__BUILDING_LIBC */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_isgraph_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_isgraph_l)(int ch,
+                                     __locale_t locale) {
 #ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
@@ -564,7 +574,8 @@ NOTHROW_NCX(LIBCCALL libc_isgraph_l)(int ch, __locale_t locale) {
 #endif /* !__BUILDING_LIBC */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_isprint_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_isprint_l)(int ch,
+                                     __locale_t locale) {
 #ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
@@ -589,7 +600,8 @@ NOTHROW_NCX(LIBCCALL libc_isprint_l)(int ch, __locale_t locale) {
 #endif /* !__BUILDING_LIBC */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_isblank_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_isblank_l)(int ch,
+                                     __locale_t locale) {
 #ifdef __BUILDING_LIBC
 	(void)locale;
 	COMPILER_IMPURE();
@@ -612,14 +624,16 @@ NOTHROW_NCX(LIBCCALL libc_isblank_l)(int ch, __locale_t locale) {
 #endif /* !__BUILDING_LIBC */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_tolower_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_tolower_l)(int ch,
+                                     __locale_t locale) {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;
 	COMPILER_IMPURE();
 	return tolower(ch);
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch, __locale_t locale) {
+NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch,
+                                     __locale_t locale) {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;
 	COMPILER_IMPURE();
@@ -639,59 +653,59 @@ NOTHROW(LIBCCALL libc_toascii)(int c) {
 
 DECL_END
 
-DEFINE_PUBLIC_WEAK_ALIAS(iscntrl, libc_iscntrl);
-DEFINE_PUBLIC_WEAK_ALIAS(isspace, libc_isspace);
-DEFINE_PUBLIC_WEAK_ALIAS(isupper, libc_isupper);
-DEFINE_PUBLIC_WEAK_ALIAS(islower, libc_islower);
-DEFINE_PUBLIC_WEAK_ALIAS(isalpha, libc_isalpha);
-DEFINE_PUBLIC_WEAK_ALIAS(isdigit, libc_isdigit);
-DEFINE_PUBLIC_WEAK_ALIAS(isxdigit, libc_isxdigit);
-DEFINE_PUBLIC_WEAK_ALIAS(isalnum, libc_isalnum);
-DEFINE_PUBLIC_WEAK_ALIAS(ispunct, libc_ispunct);
-DEFINE_PUBLIC_WEAK_ALIAS(isgraph, libc_isgraph);
-DEFINE_PUBLIC_WEAK_ALIAS(isprint, libc_isprint);
+DEFINE_PUBLIC_ALIAS(iscntrl, libc_iscntrl);
+DEFINE_PUBLIC_ALIAS(isspace, libc_isspace);
+DEFINE_PUBLIC_ALIAS(isupper, libc_isupper);
+DEFINE_PUBLIC_ALIAS(islower, libc_islower);
+DEFINE_PUBLIC_ALIAS(isalpha, libc_isalpha);
+DEFINE_PUBLIC_ALIAS(isdigit, libc_isdigit);
+DEFINE_PUBLIC_ALIAS(isxdigit, libc_isxdigit);
+DEFINE_PUBLIC_ALIAS(isalnum, libc_isalnum);
+DEFINE_PUBLIC_ALIAS(ispunct, libc_ispunct);
+DEFINE_PUBLIC_ALIAS(isgraph, libc_isgraph);
+DEFINE_PUBLIC_ALIAS(isprint, libc_isprint);
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(_tolower, libc_tolower);
+DEFINE_PUBLIC_ALIAS(_tolower, libc_tolower);
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_WEAK_ALIAS(tolower, libc_tolower);
+DEFINE_PUBLIC_ALIAS(tolower, libc_tolower);
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(_toupper, libc_toupper);
+DEFINE_PUBLIC_ALIAS(_toupper, libc_toupper);
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_WEAK_ALIAS(toupper, libc_toupper);
-DEFINE_PUBLIC_WEAK_ALIAS(isblank, libc_isblank);
+DEFINE_PUBLIC_ALIAS(toupper, libc_toupper);
+DEFINE_PUBLIC_ALIAS(isblank, libc_isblank);
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(__iscntrl_l, libc_iscntrl_l);
-DEFINE_PUBLIC_WEAK_ALIAS(iscntrl_l, libc_iscntrl_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__isspace_l, libc_isspace_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isspace_l, libc_isspace_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__isupper_l, libc_isupper_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isupper_l, libc_isupper_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__islower_l, libc_islower_l);
-DEFINE_PUBLIC_WEAK_ALIAS(islower_l, libc_islower_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__isalpha_l, libc_isalpha_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isalpha_l, libc_isalpha_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__isdigit_l, libc_isdigit_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isdigit_l, libc_isdigit_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__isxdigit_l, libc_isxdigit_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isxdigit_l, libc_isxdigit_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__isalnum_l, libc_isalnum_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isalnum_l, libc_isalnum_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__ispunct_l, libc_ispunct_l);
-DEFINE_PUBLIC_WEAK_ALIAS(ispunct_l, libc_ispunct_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__isgraph_l, libc_isgraph_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isgraph_l, libc_isgraph_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__isprint_l, libc_isprint_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isprint_l, libc_isprint_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__isblank_l, libc_isblank_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isblank_l, libc_isblank_l);
-DEFINE_PUBLIC_WEAK_ALIAS(_tolower_l, libc_tolower_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__tolower_l, libc_tolower_l);
-DEFINE_PUBLIC_WEAK_ALIAS(tolower_l, libc_tolower_l);
-DEFINE_PUBLIC_WEAK_ALIAS(_toupper_l, libc_toupper_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__toupper_l, libc_toupper_l);
-DEFINE_PUBLIC_WEAK_ALIAS(toupper_l, libc_toupper_l);
-DEFINE_PUBLIC_WEAK_ALIAS(isascii, libc_isascii);
-DEFINE_PUBLIC_WEAK_ALIAS(toascii, libc_toascii);
+DEFINE_PUBLIC_ALIAS(__iscntrl_l, libc_iscntrl_l);
+DEFINE_PUBLIC_ALIAS(iscntrl_l, libc_iscntrl_l);
+DEFINE_PUBLIC_ALIAS(__isspace_l, libc_isspace_l);
+DEFINE_PUBLIC_ALIAS(isspace_l, libc_isspace_l);
+DEFINE_PUBLIC_ALIAS(__isupper_l, libc_isupper_l);
+DEFINE_PUBLIC_ALIAS(isupper_l, libc_isupper_l);
+DEFINE_PUBLIC_ALIAS(__islower_l, libc_islower_l);
+DEFINE_PUBLIC_ALIAS(islower_l, libc_islower_l);
+DEFINE_PUBLIC_ALIAS(__isalpha_l, libc_isalpha_l);
+DEFINE_PUBLIC_ALIAS(isalpha_l, libc_isalpha_l);
+DEFINE_PUBLIC_ALIAS(__isdigit_l, libc_isdigit_l);
+DEFINE_PUBLIC_ALIAS(isdigit_l, libc_isdigit_l);
+DEFINE_PUBLIC_ALIAS(__isxdigit_l, libc_isxdigit_l);
+DEFINE_PUBLIC_ALIAS(isxdigit_l, libc_isxdigit_l);
+DEFINE_PUBLIC_ALIAS(__isalnum_l, libc_isalnum_l);
+DEFINE_PUBLIC_ALIAS(isalnum_l, libc_isalnum_l);
+DEFINE_PUBLIC_ALIAS(__ispunct_l, libc_ispunct_l);
+DEFINE_PUBLIC_ALIAS(ispunct_l, libc_ispunct_l);
+DEFINE_PUBLIC_ALIAS(__isgraph_l, libc_isgraph_l);
+DEFINE_PUBLIC_ALIAS(isgraph_l, libc_isgraph_l);
+DEFINE_PUBLIC_ALIAS(__isprint_l, libc_isprint_l);
+DEFINE_PUBLIC_ALIAS(isprint_l, libc_isprint_l);
+DEFINE_PUBLIC_ALIAS(__isblank_l, libc_isblank_l);
+DEFINE_PUBLIC_ALIAS(isblank_l, libc_isblank_l);
+DEFINE_PUBLIC_ALIAS(_tolower_l, libc_tolower_l);
+DEFINE_PUBLIC_ALIAS(__tolower_l, libc_tolower_l);
+DEFINE_PUBLIC_ALIAS(tolower_l, libc_tolower_l);
+DEFINE_PUBLIC_ALIAS(_toupper_l, libc_toupper_l);
+DEFINE_PUBLIC_ALIAS(__toupper_l, libc_toupper_l);
+DEFINE_PUBLIC_ALIAS(toupper_l, libc_toupper_l);
+DEFINE_PUBLIC_ALIAS(isascii, libc_isascii);
+DEFINE_PUBLIC_ALIAS(toascii, libc_toascii);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CTYPE_C */

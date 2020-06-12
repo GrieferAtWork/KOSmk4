@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa09d5f7e */
+/* HASH CRC-32:0xe39f2110 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,8 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* Compare two thread identifiers */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST int
-NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t thr1, pthread_t thr2) {
+NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t thr1,
+                                         pthread_t thr2) {
 	return thr1 == thr2;
 }
 /* Function called to call the cleanup handler. As an extern inline
@@ -46,7 +47,8 @@ NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_fr
 /* Initialize the spinlock LOCK. If PSHARED is nonzero the
  * spinlock can be shared between different processes */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock, int pshared) {
+NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
+                                             int pshared) {
 	(void)pshared;
 	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELAXED);
 	return 0;
@@ -96,14 +98,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(thrd_equal, libc_pthread_equal);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_equal, libc_pthread_equal);
-DEFINE_PUBLIC_WEAK_ALIAS(__pthread_cleanup_routine, libc___pthread_cleanup_routine);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_spin_init, libc_pthread_spin_init);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_spin_destroy, libc_pthread_spin_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_spin_lock, libc_pthread_spin_lock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_spin_trylock, libc_pthread_spin_trylock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_spin_unlock, libc_pthread_spin_unlock);
+DEFINE_PUBLIC_ALIAS(thrd_equal, libc_pthread_equal);
+DEFINE_PUBLIC_ALIAS(pthread_equal, libc_pthread_equal);
+DEFINE_PUBLIC_ALIAS(__pthread_cleanup_routine, libc___pthread_cleanup_routine);
+DEFINE_PUBLIC_ALIAS(pthread_spin_init, libc_pthread_spin_init);
+DEFINE_PUBLIC_ALIAS(pthread_spin_destroy, libc_pthread_spin_destroy);
+DEFINE_PUBLIC_ALIAS(pthread_spin_lock, libc_pthread_spin_lock);
+DEFINE_PUBLIC_ALIAS(pthread_spin_trylock, libc_pthread_spin_trylock);
+DEFINE_PUBLIC_ALIAS(pthread_spin_unlock, libc_pthread_spin_unlock);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PTHREAD_C */

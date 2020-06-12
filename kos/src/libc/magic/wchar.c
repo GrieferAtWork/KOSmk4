@@ -651,7 +651,7 @@ wchar_t *wcsstr([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *
 	[([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *needle): wchar_t const *]
 	%{generate(str2wcs)}
 
-[[std, wchar, wunused, ATTR_PURE]]
+[[std, wchar, wunused, ATTR_PURE, no_crt_impl]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("memchrw")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("memchrl")]]
 wchar_t *wmemchr([[inp(num_chars)]] wchar_t const *__restrict haystack, wchar_t needle, size_t num_chars)

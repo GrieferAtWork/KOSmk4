@@ -32,53 +32,53 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:sendfile,hash:CRC-32=0xec68991c]]]*/
+/*[[[head:libc_sendfile,hash:CRC-32=0x5c50d5cf]]]*/
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
  * Return the number of written bytes, or -1 in case of error */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.statfs.statfs.sendfile") ssize_t
+INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ssize_t
 NOTHROW_NCX(LIBCCALL libc_sendfile)(fd_t out_fd,
                                     fd_t in_fd,
                                     off_t *offset,
                                     size_t count)
-/*[[[body:sendfile]]]*/
+/*[[[body:libc_sendfile]]]*/
 {
 	ssize_t result;
 	result = sys_sendfile(out_fd, in_fd, (syscall_ulong_t *)offset, count);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:sendfile]]]*/
+/*[[[end:libc_sendfile]]]*/
 
-/*[[[head:sendfile64,hash:CRC-32=0xc3e39e4c]]]*/
+/*[[[head:libc_sendfile64,hash:CRC-32=0xeb326a7a]]]*/
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+DEFINE_INTERN_ALIAS(libc_sendfile64, libc_sendfile);
+#else /* MAGIC:alias */
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
  * Return the number of written bytes, or -1 in case of error */
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_sendfile64, libc_sendfile);
-#else
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.statfs.statfs.sendfile64") ssize_t
+INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ssize_t
 NOTHROW_NCX(LIBCCALL libc_sendfile64)(fd_t out_fd,
                                       fd_t in_fd,
                                       off64_t *offset,
                                       size_t count)
-/*[[[body:sendfile64]]]*/
+/*[[[body:libc_sendfile64]]]*/
 {
 	ssize_t result;
 	result = sys_sendfile64(out_fd, in_fd, (uint64_t *)offset, count);
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
-/*[[[end:sendfile64]]]*/
+/*[[[end:libc_sendfile64]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4253a57b]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(sendfile, libc_sendfile);
-DEFINE_PUBLIC_WEAK_ALIAS(sendfile64, libc_sendfile64);
+/*[[[start:exports,hash:CRC-32=0x7772fdfe]]]*/
+DEFINE_PUBLIC_ALIAS(sendfile, libc_sendfile);
+DEFINE_PUBLIC_ALIAS(sendfile64, libc_sendfile64);
 /*[[[end:exports]]]*/
 
 DECL_END

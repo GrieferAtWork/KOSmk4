@@ -31,85 +31,82 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setaliasent,hash:CRC-32=0x7aa4e8c]]]*/
+/*[[[head:libc_setaliasent,hash:CRC-32=0x42de9768]]]*/
 /* Open alias data base files */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.aliases.setaliasent") void
+INTERN ATTR_SECTION(".text.crt.database.aliases") void
 NOTHROW_RPC_KOS(LIBCCALL libc_setaliasent)(void)
-/*[[[body:setaliasent]]]*/
-{
+/*[[[body:libc_setaliasent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("setaliasent"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:setaliasent]]]*/
+/*[[[end:libc_setaliasent]]]*/
 
-/*[[[head:endaliasent,hash:CRC-32=0x18c47f61]]]*/
+/*[[[head:libc_endaliasent,hash:CRC-32=0x8947e081]]]*/
 /* Close alias data base files */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.aliases.endaliasent") void
+INTERN ATTR_SECTION(".text.crt.database.aliases") void
 NOTHROW_NCX(LIBCCALL libc_endaliasent)(void)
-/*[[[body:endaliasent]]]*/
-{
+/*[[[body:libc_endaliasent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("endaliasent"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:endaliasent]]]*/
+/*[[[end:libc_endaliasent]]]*/
 
-/*[[[head:getaliasent,hash:CRC-32=0x6c2cef2f]]]*/
+/*[[[head:libc_getaliasent,hash:CRC-32=0xe63b925a]]]*/
 /* Get the next entry from the alias data base */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.aliases.getaliasent") struct aliasent *
+INTERN ATTR_SECTION(".text.crt.database.aliases") struct aliasent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent)(void)
-/*[[[body:getaliasent]]]*/
-{
+/*[[[body:libc_getaliasent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("getaliasent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getaliasent]]]*/
+/*[[[end:libc_getaliasent]]]*/
 
-/*[[[head:getaliasent_r,hash:CRC-32=0x617dd09e]]]*/
+/*[[[head:libc_getaliasent_r,hash:CRC-32=0x27b9befb]]]*/
 /* Get the next entry from the alias data base and put it in RESULT_BUF */
-INTERN NONNULL((1, 2, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.aliases.getaliasent_r") int
+INTERN ATTR_SECTION(".text.crt.database.aliases") NONNULL((1, 2, 4)) int
 NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struct aliasent *__restrict result_buf,
                                              char *__restrict buffer,
                                              size_t buflen,
                                              struct aliasent **__restrict result)
-/*[[[body:getaliasent_r]]]*/
-{
+/*[[[body:libc_getaliasent_r]]]*/
+/*AUTO*/{
 	(void)result_buf;
 	(void)buffer;
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTED("getaliasent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getaliasent_r]]]*/
+/*[[[end:libc_getaliasent_r]]]*/
 
-/*[[[head:getaliasbyname,hash:CRC-32=0x592b56f1]]]*/
+/*[[[head:libc_getaliasbyname,hash:CRC-32=0x809747b6]]]*/
 /* Get alias entry corresponding to NAME */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.aliases.getaliasbyname") struct aliasent *
+INTERN ATTR_SECTION(".text.crt.database.aliases") NONNULL((1)) struct aliasent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname)(char const *name)
-/*[[[body:getaliasbyname]]]*/
-{
+/*[[[body:libc_getaliasbyname]]]*/
+/*AUTO*/{
 	(void)name;
 	CRT_UNIMPLEMENTED("getaliasbyname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getaliasbyname]]]*/
+/*[[[end:libc_getaliasbyname]]]*/
 
-/*[[[head:getaliasbyname_r,hash:CRC-32=0xacfc38d0]]]*/
+/*[[[head:libc_getaliasbyname_r,hash:CRC-32=0x63e77e66]]]*/
 /* Get alias entry corresponding to NAME and put it in RESULT_BUF */
-INTERN NONNULL((1, 2, 3, 5))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.aliases.getaliasbyname_r") int
+INTERN ATTR_SECTION(".text.crt.database.aliases") NONNULL((1, 2, 3, 5)) int
 NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name,
                                                 struct aliasent *__restrict result_buf,
                                                 char *__restrict buffer,
                                                 size_t buflen,
                                                 struct aliasent **__restrict result)
-/*[[[body:getaliasbyname_r]]]*/
-{
+/*[[[body:libc_getaliasbyname_r]]]*/
+/*AUTO*/{
 	(void)name;
 	(void)result_buf;
 	(void)buffer;
@@ -117,21 +114,21 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name,
 	(void)result;
 	CRT_UNIMPLEMENTED("getaliasbyname_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getaliasbyname_r]]]*/
+/*[[[end:libc_getaliasbyname_r]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x26b82686]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(setaliasent, libc_setaliasent);
-DEFINE_PUBLIC_WEAK_ALIAS(endaliasent, libc_endaliasent);
-DEFINE_PUBLIC_WEAK_ALIAS(getaliasent, libc_getaliasent);
-DEFINE_PUBLIC_WEAK_ALIAS(getaliasent_r, libc_getaliasent_r);
-DEFINE_PUBLIC_WEAK_ALIAS(getaliasbyname, libc_getaliasbyname);
-DEFINE_PUBLIC_WEAK_ALIAS(getaliasbyname_r, libc_getaliasbyname_r);
+/*[[[start:exports,hash:CRC-32=0x6b7992dd]]]*/
+DEFINE_PUBLIC_ALIAS(setaliasent, libc_setaliasent);
+DEFINE_PUBLIC_ALIAS(endaliasent, libc_endaliasent);
+DEFINE_PUBLIC_ALIAS(getaliasent, libc_getaliasent);
+DEFINE_PUBLIC_ALIAS(getaliasent_r, libc_getaliasent_r);
+DEFINE_PUBLIC_ALIAS(getaliasbyname, libc_getaliasbyname);
+DEFINE_PUBLIC_ALIAS(getaliasbyname_r, libc_getaliasbyname_r);
 /*[[[end:exports]]]*/
 
 DECL_END

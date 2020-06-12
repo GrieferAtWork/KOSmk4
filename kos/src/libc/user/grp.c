@@ -37,94 +37,91 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getgrgid,hash:CRC-32=0xcf16527b]]]*/
+/*[[[head:libc_getgrgid,hash:CRC-32=0xa1dcf07]]]*/
 /* Search for an entry with a matching group ID */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.group.getgrgid") struct group *
+INTERN ATTR_SECTION(".text.crt.database.group") struct group *
 NOTHROW_RPC(LIBCCALL libc_getgrgid)(gid_t gid)
-/*[[[body:getgrgid]]]*/
-{
+/*[[[body:libc_getgrgid]]]*/
+/*AUTO*/{
 	(void)gid;
 	CRT_UNIMPLEMENTED("getgrgid"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getgrgid]]]*/
+/*[[[end:libc_getgrgid]]]*/
 
-/*[[[head:getgrnam,hash:CRC-32=0x3156c088]]]*/
+/*[[[head:libc_getgrnam,hash:CRC-32=0x1039e5d3]]]*/
 /* Search for an entry with a matching group name */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.group.getgrnam") struct group *
+INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1)) struct group *
 NOTHROW_RPC(LIBCCALL libc_getgrnam)(char const *__restrict name)
-/*[[[body:getgrnam]]]*/
-{
+/*[[[body:libc_getgrnam]]]*/
+/*AUTO*/{
 	(void)name;
 	CRT_UNIMPLEMENTED("getgrnam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getgrnam]]]*/
+/*[[[end:libc_getgrnam]]]*/
 
-/*[[[head:setgrent,hash:CRC-32=0xbbdf4b5d]]]*/
+/*[[[head:libc_setgrent,hash:CRC-32=0x719f2952]]]*/
 /* Rewind the group-file stream */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.group.setgrent") void
+INTERN ATTR_SECTION(".text.crt.database.group") void
 NOTHROW_RPC(LIBCCALL libc_setgrent)(void)
-/*[[[body:setgrent]]]*/
-{
+/*[[[body:libc_setgrent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("setgrent"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:setgrent]]]*/
+/*[[[end:libc_setgrent]]]*/
 
-/*[[[head:endgrent,hash:CRC-32=0xda822205]]]*/
+/*[[[head:libc_endgrent,hash:CRC-32=0x94c6ff8d]]]*/
 /* Close the group-file stream */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.group.endgrent") void
+INTERN ATTR_SECTION(".text.crt.database.group") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endgrent)(void)
-/*[[[body:endgrent]]]*/
-{
+/*[[[body:libc_endgrent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("endgrent"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:endgrent]]]*/
+/*[[[end:libc_endgrent]]]*/
 
-/*[[[head:getgrent,hash:CRC-32=0x64b907df]]]*/
+/*[[[head:libc_getgrent,hash:CRC-32=0xc9029de5]]]*/
 /* Read an entry from the group-file stream, opening it if necessary */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.group.getgrent") struct group *
+INTERN ATTR_SECTION(".text.crt.database.group") struct group *
 NOTHROW_RPC(LIBCCALL libc_getgrent)(void)
-/*[[[body:getgrent]]]*/
-{
+/*[[[body:libc_getgrent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("getgrent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getgrent]]]*/
+/*[[[end:libc_getgrent]]]*/
 
-/*[[[head:putgrent,hash:CRC-32=0x4d5aa4b9]]]*/
+/*[[[head:libc_putgrent,hash:CRC-32=0xaca86e5d]]]*/
 /* Write the given entry onto the given stream */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.group.putgrent") int
+INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_putgrent)(struct group const *__restrict entry,
                                     FILE *__restrict stream)
-/*[[[body:putgrent]]]*/
-{
+/*[[[body:libc_putgrent]]]*/
+/*AUTO*/{
 	(void)entry;
 	(void)stream;
 	CRT_UNIMPLEMENTED("putgrent"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:putgrent]]]*/
+/*[[[end:libc_putgrent]]]*/
 
-/*[[[head:getgrgid_r,hash:CRC-32=0x2d73d7c7]]]*/
+/*[[[head:libc_getgrgid_r,hash:CRC-32=0x1c903276]]]*/
 /* Search for an entry with a matching group ID */
-INTERN NONNULL((2, 3, 5))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.group.getgrgid_r") int
+INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_getgrgid_r)(gid_t gid,
                                       struct group *__restrict resultbuf,
                                       char *__restrict buffer,
                                       size_t buflen,
                                       struct group **__restrict result)
-/*[[[body:getgrgid_r]]]*/
-{
+/*[[[body:libc_getgrgid_r]]]*/
+/*AUTO*/{
 	(void)gid;
 	(void)resultbuf;
 	(void)buffer;
@@ -132,21 +129,20 @@ NOTHROW_RPC(LIBCCALL libc_getgrgid_r)(gid_t gid,
 	(void)result;
 	CRT_UNIMPLEMENTED("getgrgid_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getgrgid_r]]]*/
+/*[[[end:libc_getgrgid_r]]]*/
 
-/*[[[head:getgrnam_r,hash:CRC-32=0x7dfe4498]]]*/
+/*[[[head:libc_getgrnam_r,hash:CRC-32=0x53d0d3cc]]]*/
 /* Search for an entry with a matching group name */
-INTERN NONNULL((1, 2, 3, 5))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.group.getgrnam_r") int
+INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_getgrnam_r)(char const *__restrict name,
                                       struct group *__restrict resultbuf,
                                       char *__restrict buffer,
                                       size_t buflen,
                                       struct group **__restrict result)
-/*[[[body:getgrnam_r]]]*/
-{
+/*[[[body:libc_getgrnam_r]]]*/
+/*AUTO*/{
 	(void)name;
 	(void)resultbuf;
 	(void)buffer;
@@ -154,41 +150,39 @@ NOTHROW_RPC(LIBCCALL libc_getgrnam_r)(char const *__restrict name,
 	(void)result;
 	CRT_UNIMPLEMENTED("getgrnam_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getgrnam_r]]]*/
+/*[[[end:libc_getgrnam_r]]]*/
 
-/*[[[head:getgrent_r,hash:CRC-32=0xef83a58e]]]*/
+/*[[[head:libc_getgrent_r,hash:CRC-32=0x359e238f]]]*/
 /* Read an entry from the group-file stream, opening it if necessary */
-INTERN NONNULL((1, 2, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.group.getgrent_r") int
+INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 2, 4)) int
 NOTHROW_RPC(LIBCCALL libc_getgrent_r)(struct group *__restrict resultbuf,
                                       char *__restrict buffer,
                                       size_t buflen,
                                       struct group **__restrict result)
-/*[[[body:getgrent_r]]]*/
-{
+/*[[[body:libc_getgrent_r]]]*/
+/*AUTO*/{
 	(void)resultbuf;
 	(void)buffer;
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTED("getgrent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getgrent_r]]]*/
+/*[[[end:libc_getgrent_r]]]*/
 
-/*[[[head:fgetgrent_r,hash:CRC-32=0x1c527bcb]]]*/
+/*[[[head:libc_fgetgrent_r,hash:CRC-32=0xd5c49c02]]]*/
 /* Read a group entry from STREAM */
-INTERN NONNULL((1, 2, 3, 5))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.group.fgetgrent_r") int
+INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream,
                                        struct group *__restrict resultbuf,
                                        char *__restrict buffer,
                                        size_t buflen,
                                        struct group **__restrict result)
-/*[[[body:fgetgrent_r]]]*/
-{
+/*[[[body:libc_fgetgrent_r]]]*/
+/*AUTO*/{
 	(void)stream;
 	(void)resultbuf;
 	(void)buffer;
@@ -196,30 +190,29 @@ NOTHROW_RPC(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream,
 	(void)result;
 	CRT_UNIMPLEMENTED("fgetgrent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:fgetgrent_r]]]*/
+/*[[[end:libc_fgetgrent_r]]]*/
 
-/*[[[head:fgetgrent,hash:CRC-32=0xe843a41b]]]*/
+/*[[[head:libc_fgetgrent,hash:CRC-32=0xc1a3adce]]]*/
 /* Read a group entry from STREAM */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.group.fgetgrent") struct group *
+INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1)) struct group *
 NOTHROW_RPC(LIBCCALL libc_fgetgrent)(FILE *__restrict stream)
-/*[[[body:fgetgrent]]]*/
-{
+/*[[[body:libc_fgetgrent]]]*/
+/*AUTO*/{
 	(void)stream;
 	CRT_UNIMPLEMENTED("fgetgrent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:fgetgrent]]]*/
+/*[[[end:libc_fgetgrent]]]*/
 
-/*[[[head:setgroups,hash:CRC-32=0x756fbbe1]]]*/
+/*[[[head:libc_setgroups,hash:CRC-32=0xa46ba23e]]]*/
 /* Set the group set for the current user to GROUPS (N of them) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.group.setgroups") int
+INTERN ATTR_SECTION(".text.crt.database.group") int
 NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count,
                                      gid_t const *groups)
-/*[[[body:setgroups]]]*/
+/*[[[body:libc_setgroups]]]*/
 {
 	errno_t error;
 #if defined(SYS_setgroups32) && __SIZEOF_GID_T__ == 4
@@ -229,67 +222,65 @@ NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count,
 #endif /* !SYS_setgroups32 || __SIZEOF_GID_T__ != 4 */
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:setgroups]]]*/
+/*[[[end:libc_setgroups]]]*/
 
-/*[[[head:getgrouplist,hash:CRC-32=0x996b8552]]]*/
+/*[[[head:libc_getgrouplist,hash:CRC-32=0xa73f1812]]]*/
 /* Store at most *NGROUPS members of the group set for USER into
  * *GROUPS. Also include GROUP. The actual number of groups found is
  * returned in *NGROUPS.  Return -1 if the if *NGROUPS is too small */
-INTERN NONNULL((1, 3, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.group.getgrouplist") int
+INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 3, 4)) int
 NOTHROW_RPC(LIBCCALL libc_getgrouplist)(char const *user,
                                         gid_t group,
                                         gid_t *groups,
                                         int *ngroups)
-/*[[[body:getgrouplist]]]*/
-{
+/*[[[body:libc_getgrouplist]]]*/
+/*AUTO*/{
 	(void)user;
 	(void)group;
 	(void)groups;
 	(void)ngroups;
 	CRT_UNIMPLEMENTED("getgrouplist"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getgrouplist]]]*/
+/*[[[end:libc_getgrouplist]]]*/
 
-/*[[[head:initgroups,hash:CRC-32=0xcd0d5493]]]*/
+/*[[[head:libc_initgroups,hash:CRC-32=0xc4ff9a82]]]*/
 /* Initialize the group set for the current user
  * by reading the group database and using all groups
  * of which USER is a member. Also include GROUP. */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.group.initgroups") int
+INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user,
                                       gid_t group)
-/*[[[body:initgroups]]]*/
-{
+/*[[[body:libc_initgroups]]]*/
+/*AUTO*/{
 	(void)user;
 	(void)group;
 	CRT_UNIMPLEMENTED("initgroups"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:initgroups]]]*/
+/*[[[end:libc_initgroups]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x13c7e39a]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(getgrgid, libc_getgrgid);
-DEFINE_PUBLIC_WEAK_ALIAS(getgrnam, libc_getgrnam);
-DEFINE_PUBLIC_WEAK_ALIAS(setgrent, libc_setgrent);
-DEFINE_PUBLIC_WEAK_ALIAS(endgrent, libc_endgrent);
-DEFINE_PUBLIC_WEAK_ALIAS(getgrent, libc_getgrent);
-DEFINE_PUBLIC_WEAK_ALIAS(putgrent, libc_putgrent);
-DEFINE_PUBLIC_WEAK_ALIAS(getgrgid_r, libc_getgrgid_r);
-DEFINE_PUBLIC_WEAK_ALIAS(getgrnam_r, libc_getgrnam_r);
-DEFINE_PUBLIC_WEAK_ALIAS(getgrent_r, libc_getgrent_r);
-DEFINE_PUBLIC_WEAK_ALIAS(fgetgrent_r, libc_fgetgrent_r);
-DEFINE_PUBLIC_WEAK_ALIAS(fgetgrent, libc_fgetgrent);
-DEFINE_PUBLIC_WEAK_ALIAS(setgroups, libc_setgroups);
-DEFINE_PUBLIC_WEAK_ALIAS(getgrouplist, libc_getgrouplist);
-DEFINE_PUBLIC_WEAK_ALIAS(initgroups, libc_initgroups);
+/*[[[start:exports,hash:CRC-32=0x61a9e11e]]]*/
+DEFINE_PUBLIC_ALIAS(getgrgid, libc_getgrgid);
+DEFINE_PUBLIC_ALIAS(getgrnam, libc_getgrnam);
+DEFINE_PUBLIC_ALIAS(setgrent, libc_setgrent);
+DEFINE_PUBLIC_ALIAS(endgrent, libc_endgrent);
+DEFINE_PUBLIC_ALIAS(getgrent, libc_getgrent);
+DEFINE_PUBLIC_ALIAS(putgrent, libc_putgrent);
+DEFINE_PUBLIC_ALIAS(getgrgid_r, libc_getgrgid_r);
+DEFINE_PUBLIC_ALIAS(getgrnam_r, libc_getgrnam_r);
+DEFINE_PUBLIC_ALIAS(getgrent_r, libc_getgrent_r);
+DEFINE_PUBLIC_ALIAS(fgetgrent_r, libc_fgetgrent_r);
+DEFINE_PUBLIC_ALIAS(fgetgrent, libc_fgetgrent);
+DEFINE_PUBLIC_ALIAS(setgroups, libc_setgroups);
+DEFINE_PUBLIC_ALIAS(getgrouplist, libc_getgrouplist);
+DEFINE_PUBLIC_ALIAS(initgroups, libc_initgroups);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63f4324f */
+/* HASH CRC-32:0x350c6535 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -356,7 +356,6 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_nice)(int inc);
  * @return: 1 :    Empty configuration string.
  * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
 INTDEF size_t NOTHROW_NCX(LIBCCALL libc_confstr)(int name, char *buf, size_t buflen);
-INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_getopt)(int argc, char *const argv[], char const *shortopts);
 /* >> sync(2)
  * Synchronize all disk operations of all mounted file systems and flush
  * unwritten buffers down to the hardware layer, ensuring that modifications

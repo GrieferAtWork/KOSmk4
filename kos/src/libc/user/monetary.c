@@ -31,55 +31,50 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:strfmon,hash:CRC-32=0xf98316ab]]]*/
-INTERN ATTR_LIBC_STRFMON(3, 4) NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.utility.monetary.strfmon") ssize_t
+/*[[[head:libc_strfmon,hash:CRC-32=0x52cfa8a8]]]*/
+INTERN ATTR_SECTION(".text.crt.utility.monetary") ATTR_LIBC_STRFMON(3, 4) NONNULL((1, 3)) ssize_t
 NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s,
                                     size_t maxsize,
                                     char const *__restrict format,
                                     ...)
-/*[[[body:strfmon]]]*/
-{
+/*[[[body:libc_strfmon]]]*/
+/*AUTO*/{
 	(void)s;
 	(void)maxsize;
 	(void)format;
 	CRT_UNIMPLEMENTED("strfmon"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:strfmon]]]*/
+/*[[[end:libc_strfmon]]]*/
 
-/*[[[head:strfmon_l,hash:CRC-32=0xf1cc417]]]*/
-INTERN ATTR_LIBC_STRFMON(4, 5) NONNULL((1, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.utility.monetary.strfmon_l") ssize_t
+/*[[[head:libc_strfmon_l,hash:CRC-32=0x22732bdf]]]*/
+INTERN ATTR_SECTION(".text.crt.utility.monetary") ATTR_LIBC_STRFMON(4, 5) NONNULL((1, 4)) ssize_t
 NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s,
                                       size_t maxsize,
                                       locale_t loc,
                                       const char *__restrict format,
                                       ...)
-/*[[[body:strfmon_l]]]*/
-{
+/*[[[body:libc_strfmon_l]]]*/
+/*AUTO*/{
 	(void)s;
 	(void)maxsize;
 	(void)loc;
 	(void)format;
 	CRT_UNIMPLEMENTED("strfmon_l"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:strfmon_l]]]*/
+/*[[[end:libc_strfmon_l]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8cfe79bd]]]*/
-#undef strfmon
-#undef strfmon_l
-#undef __strfmon_l
-DEFINE_PUBLIC_WEAK_ALIAS(strfmon, libc_strfmon);
-DEFINE_PUBLIC_WEAK_ALIAS(strfmon_l, libc_strfmon_l);
-DEFINE_PUBLIC_WEAK_ALIAS(__strfmon_l, libc_strfmon_l);
+/*[[[start:exports,hash:CRC-32=0xe4855736]]]*/
+DEFINE_PUBLIC_ALIAS(strfmon, libc_strfmon);
+DEFINE_PUBLIC_ALIAS(__strfmon_l, libc_strfmon_l);
+DEFINE_PUBLIC_ALIAS(strfmon_l, libc_strfmon_l);
 /*[[[end:exports]]]*/
 
 DECL_END

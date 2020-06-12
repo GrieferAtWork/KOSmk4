@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6db201f0 */
+/* HASH CRC-32:0x2f04a9e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,8 @@ NOTHROW_NCX(LIBCCALL libc_ether_ntoa)(struct ether_addr const *__restrict addr) 
 #include <net/ethernet.h>
 /* Convert 48 bit Ethernet ADDRess to ASCII */
 INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL NONNULL((1, 2)) char *
-NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr, char *__restrict buf) {
+NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr,
+                                        char *__restrict buf) {
 	sprintf(buf, "%x:%x:%x:%x:%x:%x",
 	        addr->ether_addr_octet[0], addr->ether_addr_octet[1],
 	        addr->ether_addr_octet[2], addr->ether_addr_octet[3],
@@ -59,13 +60,15 @@ NOTHROW_NCX(LIBCCALL libc_ether_aton)(char const *__restrict asc) {
 #include <net/ethernet.h>
 /* Convert ASCII string S to 48 bit Ethernet address */
 INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED NONNULL((1, 2)) struct ether_addr *
-NOTHROW_NCX(LIBCCALL libc_ether_aton_r)(char const *__restrict asc, struct ether_addr *__restrict addr) {
+NOTHROW_NCX(LIBCCALL libc_ether_aton_r)(char const *__restrict asc,
+                                        struct ether_addr *__restrict addr) {
 	return ether_paton_r((char const **)&asc, addr);
 }
 #include <net/ethernet.h>
 /* Convert ASCII string S to 48 bit Ethernet address */
 INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED NONNULL((1, 2)) struct ether_addr *
-NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc, struct ether_addr *__restrict addr) {
+NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc,
+                                         struct ether_addr *__restrict addr) {
 	unsigned int i;
 	char const *asc = *pasc;
 	for (i = 0; i < 6; ++i) {
@@ -109,7 +112,9 @@ NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc, struct et
 }
 /* Scan LINE and set ADDR and HOSTNAME */
 INTERN ATTR_SECTION(".text.crt.net.ether") NONNULL((1, 2, 3)) int
-NOTHROW_NCX(LIBCCALL libc_ether_line)(char const *line, struct ether_addr *addr, char *hostname) {
+NOTHROW_NCX(LIBCCALL libc_ether_line)(char const *line,
+                                      struct ether_addr *addr,
+                                      char *hostname) {
 	size_t hnlen;
 	while (isspace(*line) && *line != '\r' && *line != '\n')
 		++line;
@@ -133,12 +138,12 @@ NOTHROW_NCX(LIBCCALL libc_ether_line)(char const *line, struct ether_addr *addr,
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(ether_ntoa, libc_ether_ntoa);
-DEFINE_PUBLIC_WEAK_ALIAS(ether_ntoa_r, libc_ether_ntoa_r);
-DEFINE_PUBLIC_WEAK_ALIAS(ether_aton, libc_ether_aton);
-DEFINE_PUBLIC_WEAK_ALIAS(ether_aton_r, libc_ether_aton_r);
-DEFINE_PUBLIC_WEAK_ALIAS(ether_paton_r, libc_ether_paton_r);
-DEFINE_PUBLIC_WEAK_ALIAS(ether_line, libc_ether_line);
+DEFINE_PUBLIC_ALIAS(ether_ntoa, libc_ether_ntoa);
+DEFINE_PUBLIC_ALIAS(ether_ntoa_r, libc_ether_ntoa_r);
+DEFINE_PUBLIC_ALIAS(ether_aton, libc_ether_aton);
+DEFINE_PUBLIC_ALIAS(ether_aton_r, libc_ether_aton_r);
+DEFINE_PUBLIC_ALIAS(ether_paton_r, libc_ether_paton_r);
+DEFINE_PUBLIC_ALIAS(ether_line, libc_ether_line);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_NETINET_ETHER_C */

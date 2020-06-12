@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40a428dc */
+/* HASH CRC-32:0x81b8df44 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__filelengthi64_defined
 #define __local__filelengthi64_defined 1
 #include <__crt.h>
+#include <asm/stdio.h>
 #if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(SEEK_CUR) && defined(SEEK_END) && defined(SEEK_SET)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -50,9 +51,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_lseek64_defined
 #endif /* !... */
 #endif /* !__local___localdep_lseek64_defined */
-__NAMESPACE_LOCAL_END
-#include <asm/stdio.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_filelengthi64) __ATTR_WUNUSED __INT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_filelengthi64))(__fd_t __fd) {
 	__INT64_TYPE__ __oldpos, __result;

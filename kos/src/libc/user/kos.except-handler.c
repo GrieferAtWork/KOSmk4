@@ -28,7 +28,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:set_exception_handler,hash:CRC-32=0x91268b3c]]]*/
+/*[[[head:libc_set_exception_handler,hash:CRC-32=0x2048d50a]]]*/
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *     Set mode #1: set_exception_handler(EXCEPT_HANDLER_MODE_DISABLED, NULL, NULL)
@@ -44,11 +44,11 @@ DECL_BEGIN
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.set_exception_handler") int
+INTERN int
 NOTHROW(LIBCCALL libc_set_exception_handler)(int mode,
                                              except_handler_t handler,
                                              void *handler_sp)
-/*[[[body:set_exception_handler]]]*/
+/*[[[body:libc_set_exception_handler]]]*/
 {
 	errno_t result;
 	result = sys_set_exception_handler((syscall_ulong_t)mode,
@@ -56,9 +56,9 @@ NOTHROW(LIBCCALL libc_set_exception_handler)(int mode,
 	                                   handler_sp);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:set_exception_handler]]]*/
+/*[[[end:libc_set_exception_handler]]]*/
 
-/*[[[head:get_exception_handler,hash:CRC-32=0x7a9a2c12]]]*/
+/*[[[head:libc_get_exception_handler,hash:CRC-32=0x83658349]]]*/
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
@@ -72,11 +72,11 @@ NOTHROW(LIBCCALL libc_set_exception_handler)(int mode,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
  * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.get_exception_handler") int
+INTERN int
 NOTHROW_NCX(LIBCCALL libc_get_exception_handler)(int *pmode,
                                                  except_handler_t *phandler,
                                                  void **phandler_sp)
-/*[[[body:get_exception_handler]]]*/
+/*[[[body:libc_get_exception_handler]]]*/
 {
 	errno_t result;
 #if __SIZEOF_SYSCALL_LONG_T__ == __SIZEOF_INT__
@@ -93,15 +93,20 @@ NOTHROW_NCX(LIBCCALL libc_get_exception_handler)(int *pmode,
 #endif /* __SIZEOF_SYSCALL_LONG_T__ != __SIZEOF_INT__ */
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:get_exception_handler]]]*/
+/*[[[end:libc_get_exception_handler]]]*/
+
+
+/* These are defined in assembly */
+/*[[[skip:libc_except_handler3]]]*/
+/*[[[skip:libc_except_handler4]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1abb0a1d]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(set_exception_handler, libc_set_exception_handler);
-DEFINE_PUBLIC_WEAK_ALIAS(get_exception_handler, libc_get_exception_handler);
+/*[[[start:exports,hash:CRC-32=0x5365bf47]]]*/
+DEFINE_PUBLIC_ALIAS(set_exception_handler, libc_set_exception_handler);
+DEFINE_PUBLIC_ALIAS(get_exception_handler, libc_get_exception_handler);
 /*[[[end:exports]]]*/
 
 DECL_END

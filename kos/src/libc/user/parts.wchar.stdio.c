@@ -38,11 +38,10 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:wremove,hash:CRC-32=0xf6a1a683]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.modify.wremove") int
-NOTHROW_NCX(LIBCCALL libc_wremove)(char32_t const *filename)
-/*[[[body:wremove]]]*/
+/*[[[head:libc_wremove,hash:CRC-32=0xff46ff3c]]]*/
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
+NOTHROW_NCX(LIBKCALL libc_wremove)(char32_t const *filename)
+/*[[[body:libc_wremove]]]*/
 {
 	int result = -1;
 	/*utf-8*/ char *utf8_filename;
@@ -53,13 +52,12 @@ NOTHROW_NCX(LIBCCALL libc_wremove)(char32_t const *filename)
 	}
 	return result;
 }
-/*[[[end:wremove]]]*/
+/*[[[end:libc_wremove]]]*/
 
-/*[[[head:DOS$wremove,hash:CRC-32=0xa0d3f86f]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.modify.wremove") int
-NOTHROW_NCX(LIBDCALL libd_wremove)(char16_t const *filename)
-/*[[[body:DOS$wremove]]]*/
+/*[[[head:libd__wremove,hash:CRC-32=0x965f4cb2]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
+NOTHROW_NCX(LIBDCALL libd__wremove)(char16_t const *filename)
+/*[[[body:libd__wremove]]]*/
 {
 	int result = -1;
 	/*utf-8*/ char *utf8_filename;
@@ -70,14 +68,13 @@ NOTHROW_NCX(LIBDCALL libd_wremove)(char16_t const *filename)
 	}
 	return result;
 }
-/*[[[end:DOS$wremove]]]*/
+/*[[[end:libd__wremove]]]*/
 
-/*[[[head:wfopen,hash:CRC-32=0xcf9a2e1d]]]*/
-INTERN WUNUSED NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.FILE.locked.access.wfopen") FILE *
-NOTHROW_NCX(LIBCCALL libc_wfopen)(char32_t const *filename,
+/*[[[head:libc_wfopen,hash:CRC-32=0x6eca40bf]]]*/
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_NCX(LIBKCALL libc_wfopen)(char32_t const *filename,
                                   char32_t const *mode)
-/*[[[body:wfopen]]]*/
+/*[[[body:libc_wfopen]]]*/
 {
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_filename;
@@ -96,14 +93,13 @@ NOTHROW_NCX(LIBCCALL libc_wfopen)(char32_t const *filename,
 done:
 	return result;
 }
-/*[[[end:wfopen]]]*/
+/*[[[end:libc_wfopen]]]*/
 
-/*[[[head:DOS$wfopen,hash:CRC-32=0x9d8f28d7]]]*/
-INTERN WUNUSED NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access.wfopen") FILE *
-NOTHROW_NCX(LIBDCALL libd_wfopen)(char16_t const *filename,
-                                  char16_t const *mode)
-/*[[[body:DOS$wfopen]]]*/
+/*[[[head:libd__wfopen,hash:CRC-32=0xb1ca1c62]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_NCX(LIBDCALL libd__wfopen)(char16_t const *filename,
+                                   char16_t const *mode)
+/*[[[body:libd__wfopen]]]*/
 {
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_filename;
@@ -122,15 +118,14 @@ NOTHROW_NCX(LIBDCALL libd_wfopen)(char16_t const *filename,
 done:
 	return result;
 }
-/*[[[end:DOS$wfopen]]]*/
+/*[[[end:libd__wfopen]]]*/
 
-/*[[[head:wfreopen,hash:CRC-32=0x82a70bb1]]]*/
-INTERN WUNUSED NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.FILE.locked.access.wfreopen") FILE *
-NOTHROW_NCX(LIBCCALL libc_wfreopen)(char32_t const *filename,
+/*[[[head:libc_wfreopen,hash:CRC-32=0x4ea495f0]]]*/
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_NCX(LIBKCALL libc_wfreopen)(char32_t const *filename,
                                     char32_t const *mode,
                                     FILE *stream)
-/*[[[body:wfreopen]]]*/
+/*[[[body:libc_wfreopen]]]*/
 {
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_filename;
@@ -149,15 +144,14 @@ NOTHROW_NCX(LIBCCALL libc_wfreopen)(char32_t const *filename,
 done:
 	return result;
 }
-/*[[[end:wfreopen]]]*/
+/*[[[end:libc_wfreopen]]]*/
 
-/*[[[head:DOS$wfreopen,hash:CRC-32=0x5879d237]]]*/
-INTERN WUNUSED NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access.wfreopen") FILE *
-NOTHROW_NCX(LIBDCALL libd_wfreopen)(char16_t const *filename,
-                                    char16_t const *mode,
-                                    FILE *stream)
-/*[[[body:DOS$wfreopen]]]*/
+/*[[[head:libd__wfreopen,hash:CRC-32=0xbb5a5991]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_NCX(LIBDCALL libd__wfreopen)(char16_t const *filename,
+                                     char16_t const *mode,
+                                     FILE *stream)
+/*[[[body:libd__wfreopen]]]*/
 {
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_filename;
@@ -176,14 +170,13 @@ NOTHROW_NCX(LIBDCALL libd_wfreopen)(char16_t const *filename,
 done:
 	return result;
 }
-/*[[[end:DOS$wfreopen]]]*/
+/*[[[end:libd__wfreopen]]]*/
 
-/*[[[head:wpopen,hash:CRC-32=0x9399bc11]]]*/
-INTERN WUNUSED NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.FILE.locked.access.wpopen") FILE *
-NOTHROW_NCX(LIBCCALL libc_wpopen)(char32_t const *command,
+/*[[[head:libc_wpopen,hash:CRC-32=0x81ec51f1]]]*/
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_NCX(LIBKCALL libc_wpopen)(char32_t const *command,
                                   char32_t const *mode)
-/*[[[body:wpopen]]]*/
+/*[[[body:libc_wpopen]]]*/
 {
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_command;
@@ -202,14 +195,13 @@ NOTHROW_NCX(LIBCCALL libc_wpopen)(char32_t const *command,
 done:
 	return result;
 }
-/*[[[end:wpopen]]]*/
+/*[[[end:libc_wpopen]]]*/
 
-/*[[[head:DOS$wpopen,hash:CRC-32=0xe3acdce2]]]*/
-INTERN WUNUSED NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access.wpopen") FILE *
-NOTHROW_NCX(LIBDCALL libd_wpopen)(char16_t const *command,
-                                  char16_t const *mode)
-/*[[[body:DOS$wpopen]]]*/
+/*[[[head:libd__wpopen,hash:CRC-32=0x9c72e4cf]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_NCX(LIBDCALL libd__wpopen)(char16_t const *command,
+                                   char16_t const *mode)
+/*[[[body:libd__wpopen]]]*/
 {
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_command;
@@ -228,25 +220,21 @@ NOTHROW_NCX(LIBDCALL libd_wpopen)(char16_t const *command,
 done:
 	return result;
 }
-/*[[[end:DOS$wpopen]]]*/
+/*[[[end:libd__wpopen]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xfb3ce698]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(wremove, libc_wremove);
-DEFINE_PUBLIC_WEAK_ALIAS(_wremove, libc_wremove);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wremove, libd_wremove);
-DEFINE_PUBLIC_WEAK_ALIAS(wfopen, libc_wfopen);
-DEFINE_PUBLIC_WEAK_ALIAS(_wfopen, libc_wfopen);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wfopen, libd_wfopen);
-DEFINE_PUBLIC_WEAK_ALIAS(wfreopen, libc_wfreopen);
-DEFINE_PUBLIC_WEAK_ALIAS(_wfreopen, libc_wfreopen);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wfreopen, libd_wfreopen);
-DEFINE_PUBLIC_WEAK_ALIAS(wpopen, libc_wpopen);
-DEFINE_PUBLIC_WEAK_ALIAS(_wpopen, libc_wpopen);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wpopen, libd_wpopen);
+/*[[[start:exports,hash:CRC-32=0x2cf26e4e]]]*/
+DEFINE_PUBLIC_ALIAS(DOS$_wremove, libd__wremove);
+DEFINE_PUBLIC_ALIAS(wremove, libc_wremove);
+DEFINE_PUBLIC_ALIAS(DOS$_wfopen, libd__wfopen);
+DEFINE_PUBLIC_ALIAS(wfopen, libc_wfopen);
+DEFINE_PUBLIC_ALIAS(DOS$_wfreopen, libd__wfreopen);
+DEFINE_PUBLIC_ALIAS(wfreopen, libc_wfreopen);
+DEFINE_PUBLIC_ALIAS(DOS$_wpopen, libd__wpopen);
+DEFINE_PUBLIC_ALIAS(wpopen, libc_wpopen);
 /*[[[end:exports]]]*/
 
 DECL_END

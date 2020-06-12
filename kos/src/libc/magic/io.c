@@ -166,10 +166,10 @@ int _findnext64i32(intptr_t findfd,
 
 %[default_impl_section(".text.crt.dos.fs.io")]
 %
-[[cp, alias(_sopen_s_nolock)]]
+[[cp, export_alias("_sopen_s_nolock")]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
-[[userimpl, requires($has_function(sopen))]]
+[[userimpl, requires_function(sopen)]]
 errno_t _sopen_s([[nonnull]] $fd_t *fd,
                  [[nonnull]] char const *filename,
                  $oflag_t oflags, int sflags,
@@ -201,8 +201,8 @@ errno_t _mktemp_s([[nonnull]] char *template_, size_t size);
 
 %[insert:function(_sopen = sopen)]
 
+[[requires_function(pipe2)]]
 [[decl_include("<bits/types.h>"), section(".text.crt.dos.fs.io")]]
-[[userimpl, requires_function(pipe2)]]
 int _pipe([[nonnull]] $fd_t pipedes[2],
           $uint32_t pipesize, $oflag_t textmode) {
 	(void)pipesize;
@@ -217,7 +217,8 @@ int _pipe([[nonnull]] $fd_t pipedes[2],
 
 [[impl_include("<asm/stdio.h>")]]
 [[decl_include("<bits/types.h>"), wunused]]
-[[userimpl, requires($has_function(lseek64) && defined(SEEK_CUR) && defined(SEEK_END) && defined(SEEK_SET))]]
+[[requires_include("<asm/stdio.h>")]]
+[[requires($has_function(lseek64) && defined(SEEK_CUR) && defined(SEEK_END) && defined(SEEK_SET))]]
 $int64_t _filelengthi64($fd_t fd) {
 	int64_t oldpos, result;
 	oldpos = lseek64(fd, 0, SEEK_CUR);
@@ -231,17 +232,18 @@ $int64_t _filelengthi64($fd_t fd) {
 
 
 [[wunused, decl_include("<bits/types.h>")]]
-[[userimpl, requires($has_function(lseek64))]]
+[[requires_include("<asm/stdio.h>")]]
+[[requires($has_function(lseek64) && defined(__SEEK_CUR))]]
 [[impl_include("<asm/stdio.h>")]]
 $int64_t _telli64($fd_t fd) {
-	return lseek64(fd, 0, SEEK_CUR);
+	return lseek64(fd, 0, __SEEK_CUR);
 }
 
 %[default_impl_section(".text.crt.dos.fs.basic_property")]
 
 [[impl_include("<parts/errno.h>")]]
 [[decl_include("<bits/types.h>")]]
-[[userimpl, requires($has_function(umask))]]
+[[requires($has_function(umask))]]
 errno_t umask_s($mode_t newmode, $mode_t *oldmode) {
 	if (!oldmode) {
 @@pp_ifdef EINVAL@@
@@ -264,7 +266,7 @@ void _unlock_fhandle($fd_t fd);
 
 
 [[decl_include("<bits/types.h>"), ATTR_PURE, wunused]]
-[[userimpl, requires(!defined(__CRT_DOS))]]
+[[requires(!defined(__CRT_DOS))]]
 intptr_t _get_osfhandle($fd_t fd) {
 	COMPILER_IMPURE();
 	return (intptr_t)fd;
@@ -272,7 +274,7 @@ intptr_t _get_osfhandle($fd_t fd) {
 
 
 [[decl_include("<bits/types.h>"), wunused]]
-[[userimpl, requires(!defined(__CRT_DOS))]]
+[[requires(!defined(__CRT_DOS))]]
 $fd_t _open_osfhandle(intptr_t osfd, $oflag_t flags) {
 	(void)flags;
 	COMPILER_IMPURE();
@@ -287,7 +289,7 @@ $fd_t _open_osfhandle(intptr_t osfd, $oflag_t flags) {
 %[default_impl_section(".text.crt.dos.fs.io")]
 
 [[export_alias("_setmode"), requires_include("<asm/fcntl.h>"), decl_include("<bits/types.h>")]]
-[[userimpl, requires($has_function(fcntl) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL))))]]
+[[requires($has_function(fcntl) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL))))]]
 $oflag_t setmode($fd_t fd, $oflag_t mode) {
 @@pp_ifdef __F_SETFL_XCH@@
 	return fcntl(fd, __F_SETFL_XCH, mode);
@@ -305,8 +307,8 @@ chsize(*) = ftruncate;
 locking(*) = lockf;
 
 [[decl_include("<bits/types.h>")]]
-[[cp, vartypes($mode_t), wunused, export_alias(_sopen)]]
-[[userimpl, requires_function(open), section(".text.crt.dos.fs.io")]]
+[[cp, vartypes($mode_t), wunused, export_alias("_sopen")]]
+[[requires_function(open), section(".text.crt.dos.fs.io")]]
 $fd_t sopen([[nonnull]] char const *filename, $oflag_t oflags, int sflags, ...) {
 	fd_t result;
 	va_list args;
@@ -321,7 +323,7 @@ $fd_t sopen([[nonnull]] char const *filename, $oflag_t oflags, int sflags, ...) 
 
 [[decl_include("<bits/types.h>")]]
 [[wunused, crt_name("_filelength")]]
-[[userimpl, requires_function(lseek)]]
+[[requires_function(lseek)]]
 __LONG32_TYPE__ filelength($fd_t fd) {
 	__LONG32_TYPE__ oldpos, result;
 	oldpos = lseek(fd, 0, SEEK_CUR);
@@ -336,7 +338,7 @@ __LONG32_TYPE__ filelength($fd_t fd) {
 
 [[decl_include("<bits/types.h>")]]
 [[wunused, crt_name("_tell")]]
-[[userimpl, requires_function(lseek)]]
+[[requires_function(lseek)]]
 __LONG32_TYPE__ tell($fd_t fd) {
 	return lseek(fd, 0, SEEK_CUR);
 }
@@ -344,7 +346,7 @@ __LONG32_TYPE__ tell($fd_t fd) {
 
 [[decl_include("<bits/types.h>")]]
 [[wunused, crt_name("_eof")]]
-[[userimpl, requires_function(lseek64)]]
+[[requires_function(lseek64)]]
 [[impl_include("<asm/stdio.h>")]]
 int eof($fd_t fd) {
 	$int64_t oldpos, endpos;

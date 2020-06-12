@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28825a06 */
+/* HASH CRC-32:0xb5744b39 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,6 +56,7 @@ __NAMESPACE_STD_USING(strtok)
 __NAMESPACE_STD_USING(strcoll)
 __NAMESPACE_STD_USING(strxfrm)
 __NAMESPACE_STD_USING(strerror)
+__NAMESPACE_STD_USING(strsignal)
 #undef _CXX_STDONLY_CSTRING
 #endif /* !__CXX_SYSTEM_HEADER */
 #else /* _CXX_STDONLY_CSTRING */
@@ -649,6 +650,14 @@ __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHRO
 #endif /* !__CRT_HAVE_memmovec */
 } /* extern "C++" */
 #endif /* __cplusplus && __USE_STRING_OVERLOADS */
+#ifdef __CRT_HAVE_strsignal
+__CDECLARE(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,strsignal,(int __signo),(__signo))
+#else /* __CRT_HAVE_strsignal */
+__NAMESPACE_STD_END
+#include <local/string/strsignal.h>
+__NAMESPACE_STD_BEGIN
+__NAMESPACE_LOCAL_USING_OR_IMPL(strsignal, __FORCELOCAL __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strsignal)(int __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strsignal))(__signo); })
+#endif /* !__CRT_HAVE_strsignal */
 __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
@@ -771,9 +780,9 @@ __CDECLARE(__ATTR_COLD __ATTR_WUNUSED,char *,__NOTHROW_NCX,strerror_l,(int __err
 #include <local/string/strerror_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strerror_l, __FORCELOCAL __ATTR_COLD __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strerror_l)(int __errnum, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror_l))(__errnum, __locale); })
 #endif /* !__CRT_HAVE_strerror_l */
-#ifdef __CRT_HAVE_strsignal
-__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,strsignal,(int __signo),(__signo))
-#endif /* __CRT_HAVE_strsignal */
+#ifndef __CXX_SYSTEM_HEADER
+__NAMESPACE_STD_USING(strsignal)
+#endif /* !__CXX_SYSTEM_HEADER */
 #if __has_builtin(__builtin_strndup) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strndup)
 __CEIDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,strndup,(char const *__restrict __string, __SIZE_TYPE__ __max_chars),{ return __builtin_strndup(__string, __max_chars); })
 #elif defined(__CRT_HAVE_strndup)
@@ -1156,11 +1165,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strncasecmp_l, __FORCELOCAL __ATTR_PURE __ATTR_W
 __CDECLARE(__ATTR_COLD __ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,strerror_r,(int __errnum, char *__buf, __SIZE_TYPE__ __buflen),(__errnum,__buf,__buflen))
 #elif defined(__CRT_HAVE___strerror_r)
 __CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,strerror_r,(int __errnum, char *__buf, __SIZE_TYPE__ __buflen),__strerror_r,(__errnum,__buf,__buflen))
-#endif /* ... */
+#else /* ... */
+#include <local/string/strerror_r.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(strerror_r, __FORCELOCAL __ATTR_COLD __ATTR_RETNONNULL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL strerror_r)(int __errnum, char *__buf, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror_r))(__errnum, __buf, __buflen); })
+#endif /* !... */
 #else /* __USE_GNU */
 #ifdef __CRT_HAVE___xpg_strerror_r
 __CREDIRECT(__ATTR_COLD __ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,strerror_r,(int __errnum, char *__buf, __SIZE_TYPE__ __buflen),__xpg_strerror_r,(__errnum,__buf,__buflen))
-#endif /* __CRT_HAVE___xpg_strerror_r */
+#else /* __CRT_HAVE___xpg_strerror_r */
+#include <local/string/__xpg_strerror_r.h>
+__FORCELOCAL __ATTR_COLD __ATTR_NONNULL((2)) __errno_t __NOTHROW_NCX(__LIBCCALL strerror_r)(int __errnum, char *__buf, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__xpg_strerror_r))(__errnum, __buf, __buflen); }
+#endif /* !__CRT_HAVE___xpg_strerror_r */
 #endif /* !__USE_GNU */
 #endif /* __USE_XOPEN2K */
 
@@ -5604,14 +5619,19 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX
 #endif /* !... */
 #ifdef __CRT_HAVE__strerror
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,_strerror,(char const *__message),(__message))
-#endif /* __CRT_HAVE__strerror */
+#elif defined(__CRT_HAVE__strerror_s) || defined(__libc_geterrno)
+#include <local/string/_strerror.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_strerror, __FORCELOCAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL _strerror)(char const *__message) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strerror))(__message); })
+#endif /* ... */
 #ifdef __CRT_HAVE__strerror_s
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,_strerror_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__message),(__buf,__buflen,__message))
-#elif defined(__CRT_HAVE_DOS$_strerror_s) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,_strerror_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__message),_strerror_s,(__buf,__buflen,__message))
-#elif defined(__CRT_HAVE_DOS$_strerror_s) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,_strerror_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__message),_strerror_s,(__buf,__buflen,__message))
-#endif /* ... */
+#else /* __CRT_HAVE__strerror_s */
+#include <parts/errno.h>
+#ifdef __libc_geterrno
+#include <local/string/_strerror_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_strerror_s, __FORCELOCAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_RPC(__LIBCCALL _strerror_s)(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__message) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strerror_s))(__buf, __buflen, __message); })
+#endif /* __libc_geterrno */
+#endif /* !__CRT_HAVE__strerror_s */
 #ifdef __CRT_HAVE__strlwr_s
 __CDECLARE(__ATTR_LEAF,__errno_t,__NOTHROW_NCX,_strlwr_s,(char *__buf, __SIZE_TYPE__ __buflen),(__buf,__buflen))
 #else /* __CRT_HAVE__strlwr_s */

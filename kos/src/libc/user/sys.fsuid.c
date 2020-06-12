@@ -32,12 +32,12 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setfsuid,hash:CRC-32=0x882ccb24]]]*/
+/*[[[head:libc_setfsuid,hash:CRC-32=0x102f7477]]]*/
 /* Change uid used for file access control to UID, without affecting
  * other privileges (such as who can send signals at the process) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.setfsuid") int
+INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_setfsuid)(uid_t uid)
-/*[[[body:setfsuid]]]*/
+/*[[[body:libc_setfsuid]]]*/
 {
 	errno_t result;
 #ifdef SYS_setfsuid32
@@ -47,13 +47,13 @@ NOTHROW_NCX(LIBCCALL libc_setfsuid)(uid_t uid)
 #endif /* !SYS_setfsuid32 */
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:setfsuid]]]*/
+/*[[[end:libc_setfsuid]]]*/
 
-/*[[[head:setfsgid,hash:CRC-32=0x8d9425e7]]]*/
+/*[[[head:libc_setfsgid,hash:CRC-32=0x9864f42d]]]*/
 /* Ditto for group id */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.setfsgid") int
+INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_setfsgid)(gid_t gid)
-/*[[[body:setfsgid]]]*/
+/*[[[body:libc_setfsgid]]]*/
 {
 	errno_t result;
 #ifdef SYS_setfsgid32
@@ -63,15 +63,15 @@ NOTHROW_NCX(LIBCCALL libc_setfsgid)(gid_t gid)
 #endif /* !SYS_setfsgid32 */
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:setfsgid]]]*/
+/*[[[end:libc_setfsgid]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x2ca593b6]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(setfsuid, libc_setfsuid);
-DEFINE_PUBLIC_WEAK_ALIAS(setfsgid, libc_setfsgid);
+/*[[[start:exports,hash:CRC-32=0xb1293c3]]]*/
+DEFINE_PUBLIC_ALIAS(setfsuid, libc_setfsuid);
+DEFINE_PUBLIC_ALIAS(setfsgid, libc_setfsgid);
 /*[[[end:exports]]]*/
 
 DECL_END

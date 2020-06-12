@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37bfcba5 */
+/* HASH CRC-32:0x4d445de5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local__telli64_defined
 #define __local__telli64_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+#include <asm/stdio.h>
+#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: lseek64 from unistd */
@@ -50,9 +51,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_lseek64_defined
 #endif /* !... */
 #endif /* !__local___localdep_lseek64_defined */
-__NAMESPACE_LOCAL_END
-#include <asm/stdio.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_telli64) __ATTR_WUNUSED __INT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_telli64))(__fd_t __fd) {
 	return __localdep_lseek64(__fd, 0, __SEEK_CUR);
@@ -62,7 +60,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__telli64_defined 1
 #define __localdep__telli64 __LIBC_LOCAL_NAME(_telli64)
 #endif /* !__local___localdep__telli64_defined */
-#else /* __CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek */
+#else /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) && __SEEK_CUR */
 #undef __local__telli64_defined
-#endif /* !__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 && !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek */
+#endif /* (!__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 && !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek) || !__SEEK_CUR */
 #endif /* !__local__telli64_defined */

@@ -570,7 +570,8 @@ class FunctionPrototype {
 	public function cprintDeclarationWithoutTerminator(
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
 			injectedAttributes: {string...} = none,
-			breakAfterReturnType: bool = false) {
+			breakAfterReturnType: bool = false,
+			oneArgumentPerLine: bool = false) {
 		/* Same symbol name -> declare normally */
 		escapeTextIntoFile(fp, decl, escapeMode);
 		if (decl)
@@ -599,7 +600,58 @@ class FunctionPrototype {
 		if (cc)
 			fp << " ";
 		fp << exposedName << ")";
-		cprintArgumentListWithTypes(fp, escapeMode);
+		if (oneArgumentPerLine && #argv >= 2) {
+			local indentWidth;
+			{
+				local tempfp = File.Writer();
+				local tempWriter = CWriter(tempfp);
+				if (!breakAfterReturnType) {
+					escapeTextIntoFile(tempWriter, decl, escapeMode);
+					if (decl)
+						tempWriter << " ";
+					if (injectedAttributes) {
+						local isFirst = true;
+						for (local a: injectedAttributes) {
+							if (!isFirst)
+								tempWriter << " ";
+							isFirst = false;
+							escapeTextIntoFile(tempWriter, a, escapeMode);
+						}
+						if (!isFirst)
+							tempWriter << " ";
+					}
+					if (cprintAttributeList(tempWriter, escapeMode))
+						tempWriter << " ";
+					if (returnType.cprint(tempWriter, escapeMode))
+						tempWriter << " ";
+				}
+				if (!isNothrowThrowing)
+					escapeTextIntoFile(tempWriter, nothrow, escapeMode);
+				tempWriter << "(";
+				escapeTextIntoFile(tempWriter, cc, escapeMode);
+				tempWriter.flush();
+				del tempWriter;
+				tempfp = tempfp.string;
+				local i = tempfp.rfind("\n");
+				if (i >= 0)
+					tempfp = tempfp[i + 1:];
+				indentWidth = #tempfp + #exposedName + 2;
+				if (cc)
+					++indentWidth;
+			}
+			fp << "(";
+			local isFirst = true;
+			indentWidth = " " * indentWidth;
+			for (local arg: argv) {
+				if (!isFirst)
+					fp << ",\n" << indentWidth;
+				arg.cprint(fp, escapeMode);
+				isFirst = false;
+			}
+			fp << ")";
+		} else {
+			cprintArgumentListWithTypes(fp, escapeMode);
+		}
 		if (isNothrowThrowing) {
 			fp << " ";
 			escapeTextIntoFile(fp, nothrow, escapeMode);
@@ -2561,69 +2613,78 @@ class LibraryFunction {
 	@@Print the in-library auto-implementation of this function
 	public function cprintInLibraryAutoImplementation(
 			fp: CWriter, escapeMode: int, decl: string) {
-		local usedBindings = functionBindings;
-		if (!usedBindings)
-			return;
-		fp.ppIf(ppCond);
-		local isFirst = true;
-		local doc = documentationString;
-		local proto = functionPrototype;
-		for (local bind /*: LibraryFunctionBinding*/: usedBindings) {
-			if (isFirst) {
-				fp.ppIf(bind.ppCond);
-				isFirst = false;
-			} else {
-				fp.ppElif(bind.ppCond);
-			}
-			local impl: FunctionImplementation | string | UserString = bind.functionBinding;
-			if (impl is FunctionImplementation) {
-				local deps: {string: Function} = impl.dependencyFunctions;
-				for (local x: impl.implPrefix) {
-					escapeNonRepeatingTextIntoFile(fp, x, escapeMode,
-						keyEscape: [](keyword: string): string {
+		try {
+			local usedBindings = functionBindings;
+			if (!usedBindings)
+				return;
+			fp.ppIf(ppCond);
+			local isFirst = true;
+			local doc = documentationString;
+			local proto = functionPrototype;
+			for (local bind /*: LibraryFunctionBinding*/: usedBindings) {
+				if (isFirst) {
+					fp.ppIf(bind.ppCond);
+					isFirst = false;
+				} else {
+					fp.ppElif(bind.ppCond);
+				}
+				local impl: FunctionImplementation | string | UserString = bind.functionBinding;
+				if (impl is FunctionImplementation) {
+					local deps: {string: Function} = impl.dependencyFunctions;
+					for (local x: impl.implPrefix) {
+						escapeNonRepeatingTextIntoFile(fp, x, escapeMode,
+							keyEscape: [](keyword: string): string {
+								local depFun = deps.get(keyword);
+								if (depFun !is none)
+									return depFun.name;
+								return none;
+							},
+							forceKeyEscape: true);
+					}
+					if (doc)
+						fp.printComment(doc);
+					proto.cprintDeclarationWithoutTerminator(
+						fp, escapeMode,
+						decl:                 decl,
+						exposedName:          this.name,
+						injectedAttributes:   bind.implSection !is none
+							? { "ATTR_SECTION({!r})".format({ bind.implSection }) }
+							: none,
+						breakAfterReturnType: true,
+						oneArgumentPerLine:   true);
+					fp << " ";
+					escapeTextIntoFile(fp, impl.body, escapeMode,
+						[](keyword: string): string {
+							if (keyword == impl.implementationName)
+								return this.name;
 							local depFun = deps.get(keyword);
 							if (depFun !is none)
 								return depFun.name;
 							return none;
 						},
-						forceKeyEscape: true);
+					);
+					fp << "\n";
+				} else {
+					fp << "DEFINE_" << decl << "_ALIAS("
+						<< this.name << ", "
+						<< impl << ");\n";
 				}
-				if (doc)
-					fp.printComment(doc);
-				proto.cprintDeclarationWithoutTerminator(
-					fp, escapeMode,
-					decl:                 decl,
-					exposedName:          this.name,
-					injectedAttributes:   bind.implSection !is none
-						? { "ATTR_SECTION({!r})".format({ bind.implSection }) }
-						: none,
-					breakAfterReturnType: true);
-				fp << " ";
-				escapeTextIntoFile(fp, impl.body, escapeMode,
-					[](keyword: string): string {
-						if (keyword == impl.implementationName)
-							return this.name;
-						local depFun = deps.get(keyword);
-						if (depFun !is none)
-							return depFun.name;
-						return none;
-					},
-				);
-				fp << "\n";
-			} else {
-				fp << "DEFINE_" << decl << "_ALIAS("
-					<< this.name << ", "
-					<< impl << ");\n";
 			}
-		}
-		if (!isFirst)
+			if (!isFirst)
+				fp.ppEndif();
 			fp.ppEndif();
-		fp.ppEndif();
+		} catch (...) {
+			print("... while printing in-library auto implementation for ",
+				repr(this.name));
+			throw;
+		}
 	}
 
 	@@Print the in-library export table of this function
 	public function cprintInLibraryExports(
-			fp: CWriter, escapeMode: int) {
+			fp: CWriter, escapeMode: int,
+			/* TODO: Get rid of @assumeNdefKernel and implement a proper assumptions system! */
+			assumeNdefKernel: bool = false) {
 		local hasUsableExport = false;
 		for (local ppCond, none: exportSymbolNames) {
 			if (ppCond != "0") {
@@ -2634,7 +2695,7 @@ class LibraryFunction {
 		if (!hasUsableExport)
 			return;
 		local usedBindings = functionBindings;
-		fp.ppIf(ppCond);
+		fp.ppIf(assumeNdefKernel && ppCond == "!defined(__KERNEL__)" ? "1" : ppCond);
 		local hasUniversalBinding = false;
 		for (local bind: usedBindings) {
 			if (bind.ppCond == "1") {
@@ -2655,6 +2716,8 @@ class LibraryFunction {
 		}
 		for (local ppCond, symbolName: exportSymbolNames) {
 			fp.ppIf(ppCond);
+			if (!symbolName.issymbol())
+				symbolName = repr(symbolName);
 			fp << "DEFINE_PUBLIC_ALIAS(" << symbolName << ", " << this.name << ");\n";
 			fp.ppEndif();
 		}
@@ -2973,7 +3036,9 @@ class SystemHeader {
 			fp.ppIf(part.ppCond);
 			for (local ppCond, asmname: part.exportSymbolNames) {
 				fp.ppIf(ppCond);
-				fp << "DEFINE_PUBLIC_WEAK_ALIAS("
+				if (!asmname.issymbol())
+					asmname = repr(asmname);
+				fp << "DEFINE_PUBLIC_ALIAS("
 					<< asmname << ", " << part.name << ");\n";
 				fp.ppEndif();
 			}
@@ -3003,34 +3068,18 @@ class SystemHeader {
 		return cprintInternalLibraryHeader(fp, false);
 	}
 
-	@@Print the source /kos/src/libc/user/string.c
-	public function cprintLibraryUserSourceImplementations(fp: CWriter) {
-		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
-		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
-		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
-		 *       replaced by the export-condition */
-		/* TODO: This needs special handling! */
-		for (local part: order_libcUserSource) {
-			if (part is LibraryFunction) {
-				part.cprintInLibraryAutoImplementation(fp, ESCAPE_MODE_NONE, "INTERN");
-			} else {
-				fp << part;
-			}
-		}
-	}
-
 	@@Print the export table from /kos/src/libc/user/string.c
-	public function cprintLibraryUserSourceExports(fp: CWriter) {
+	public function cprintLibraryUserSourceExports(
+			fp: CWriter, skippedFunctionNames: {string...} = none) {
 		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
+		/* TODO: Assume that "defined(__KERNEL__)" == "0" */
 		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
 		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
 		 *       replaced by the export-condition */
-		for (local part: order_libcUserSource) {
-			if (part is LibraryFunction) {
-				part.cprintInLibraryExports(fp, ESCAPE_MODE_NONE);
-			} else {
-				fp << part;
-			}
+		for (local part /*: LibraryFunction*/ : order_libcUserSource) {
+			if (part.name in skippedFunctionNames)
+				continue;
+			part.cprintInLibraryExports(fp, ESCAPE_MODE_NONE, assumeNdefKernel: true);
 		}
 	}
 }

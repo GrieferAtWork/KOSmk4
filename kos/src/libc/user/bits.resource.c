@@ -31,13 +31,13 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:prlimit,hash:CRC-32=0x9eaefd14]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.resource.prlimit") int
+/*[[[head:libc_prlimit,hash:CRC-32=0xcc2a3cc6]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.resource") int
 NOTHROW_NCX(LIBCCALL libc_prlimit)(pid_t pid,
                                    __rlimit_resource_t resource,
                                    struct rlimit const *new_limit,
                                    struct rlimit *old_limit)
-/*[[[body:prlimit]]]*/
+/*[[[body:libc_prlimit]]]*/
 {
 	errno_t error;
 #if __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__
@@ -60,33 +60,33 @@ NOTHROW_NCX(LIBCCALL libc_prlimit)(pid_t pid,
 #endif /* __SIZEOF_RLIM32_T__ != __SIZEOF_RLIM64_T__ */
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:prlimit]]]*/
+/*[[[end:libc_prlimit]]]*/
 
-/*[[[head:prlimit64,hash:CRC-32=0x6a07d8b3]]]*/
+/*[[[head:libc_prlimit64,hash:CRC-32=0x61d945b2]]]*/
 #if __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__
 DEFINE_INTERN_ALIAS(libc_prlimit64, libc_prlimit);
-#else
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.resource.prlimit64") int
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.sched.resource") int
 NOTHROW_NCX(LIBCCALL libc_prlimit64)(pid_t pid,
                                      __rlimit_resource_t resource,
                                      struct rlimit64 const *new_limit,
                                      struct rlimit64 *old_limit)
-/*[[[body:prlimit64]]]*/
+/*[[[body:libc_prlimit64]]]*/
 {
 	errno_t error;
 	error = sys_prlimit64(pid, (syscall_ulong_t)resource, new_limit, old_limit);
 	return libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */
-/*[[[end:prlimit64]]]*/
+/*[[[end:libc_prlimit64]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa01dde2b]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(prlimit, libc_prlimit);
-DEFINE_PUBLIC_WEAK_ALIAS(prlimit64, libc_prlimit64);
+/*[[[start:exports,hash:CRC-32=0xb3077426]]]*/
+DEFINE_PUBLIC_ALIAS(prlimit, libc_prlimit);
+DEFINE_PUBLIC_ALIAS(prlimit64, libc_prlimit64);
 /*[[[end:exports]]]*/
 
 DECL_END

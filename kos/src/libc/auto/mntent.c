@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b830296 */
+/* HASH CRC-32:0xcb05cb14 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,8 @@ DECL_BEGIN
 /* Search MNT->mnt_opts for an option matching OPT.
  * Returns the address of the substring, or null if none found */
 INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_PURE WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt, char const *opt) {
+NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt,
+                                     char const *opt) {
 	char *str;
 	if likely(mnt && opt && (str = mnt->mnt_opts) != NULL) {
 		size_t optlen = strlen(opt);
@@ -51,7 +52,7 @@ NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt, char const *opt) 
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(hasmntopt, libc_hasmntopt);
+DEFINE_PUBLIC_ALIAS(hasmntopt, libc_hasmntopt);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_MNTENT_C */

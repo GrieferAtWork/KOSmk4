@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x971dc49a */
+/* HASH CRC-32:0xaf3bcb44 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,8 @@ DECL_BEGIN
  * pointer originally passed to `sl_add()' to insert that string).
  * If `SL' doesn't contain an equivalent string, return `NULL' instead. */
 INTERN ATTR_SECTION(".text.crt.bsd.stringlist") ATTR_PURE NONNULL((1, 2)) char *
-NOTHROW_NCX(LIBCCALL libc_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl, char const *name) {
+NOTHROW_NCX(LIBCCALL libc_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl,
+                                   char const *name) {
 	size_t i;
 	for (i = 0; i < sl->sl_cur; ++i) {
 		char *s = sl->sl_str[i];
@@ -49,7 +50,7 @@ NOTHROW_NCX(LIBCCALL libc_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl, cha
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(sl_find, libc_sl_find);
+DEFINE_PUBLIC_ALIAS(sl_find, libc_sl_find);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_STRINGLIST_C */

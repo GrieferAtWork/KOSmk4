@@ -43,15 +43,14 @@ struct sem {
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:sem_init,hash:CRC-32=0x9b49de17]]]*/
+/*[[[head:libc_sem_init,hash:CRC-32=0x7f8fdd81]]]*/
 /* Initialize semaphore object SEM to VALUE.
  * If PSHARED then share it with other processes */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_init") int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem,
                                     int pshared,
                                     unsigned int value)
-/*[[[body:sem_init]]]*/
+/*[[[body:libc_sem_init]]]*/
 {
 	struct sem *self;
 	(void)pshared;
@@ -65,35 +64,33 @@ NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem,
 	self->s_count = value;
 	return 0;
 }
-/*[[[end:sem_init]]]*/
+/*[[[end:libc_sem_init]]]*/
 
-/*[[[head:sem_destroy,hash:CRC-32=0xbc662e37]]]*/
+/*[[[head:libc_sem_destroy,hash:CRC-32=0x956fa4c4]]]*/
 /* Free resources associated with semaphore object SEM */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_destroy") int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *sem)
-/*[[[body:sem_destroy]]]*/
+/*[[[body:libc_sem_destroy]]]*/
 {
 	COMPILER_IMPURE();
 	(void)sem;
 	/* Nothing to do here... */
 	return 0;
 }
-/*[[[end:sem_destroy]]]*/
+/*[[[end:libc_sem_destroy]]]*/
 
 
 PRIVATE ATTR_SECTION(".rodata.crt.sched.semaphore.named_prefix")
 char const named_prefix[] = "/dev/shm/sem.";
 
 
-/*[[[head:sem_open,hash:CRC-32=0x39b93373]]]*/
+/*[[[head:libc_sem_open,hash:CRC-32=0xa7ea6ecb]]]*/
 /* Open a named semaphore NAME with open flags OFLAGS */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_open") sem_t *
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) sem_t *
 NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name,
                                          oflag_t oflags,
                                          ...)
-/*[[[body:sem_open]]]*/
+/*[[[body:libc_sem_open]]]*/
 {
 	char *filename;
 	size_t name_length;
@@ -133,25 +130,23 @@ NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name,
 err:
 	return NULL;
 }
-/*[[[end:sem_open]]]*/
+/*[[[end:libc_sem_open]]]*/
 
-/*[[[head:sem_close,hash:CRC-32=0xbe535676]]]*/
+/*[[[head:libc_sem_close,hash:CRC-32=0x57ccdb2b]]]*/
 /* Close descriptor for named semaphore SEM */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_close") int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *sem)
-/*[[[body:sem_close]]]*/
+/*[[[body:libc_sem_close]]]*/
 {
 	return munmap(sem, sizeof(struct sem));
 }
-/*[[[end:sem_close]]]*/
+/*[[[end:libc_sem_close]]]*/
 
-/*[[[head:sem_unlink,hash:CRC-32=0xb789d603]]]*/
+/*[[[head:libc_sem_unlink,hash:CRC-32=0x7f03fc7e]]]*/
 /* Remove named semaphore NAME */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_unlink") int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
 NOTHROW_RPC_KOS(LIBCCALL libc_sem_unlink)(const char *name)
-/*[[[body:sem_unlink]]]*/
+/*[[[body:libc_sem_unlink]]]*/
 {
 	int result;
 	char *filename;
@@ -176,14 +171,13 @@ NOTHROW_RPC_KOS(LIBCCALL libc_sem_unlink)(const char *name)
 err:
 	return -1;
 }
-/*[[[end:sem_unlink]]]*/
+/*[[[end:libc_sem_unlink]]]*/
 
-/*[[[head:sem_wait,hash:CRC-32=0x57284335]]]*/
+/*[[[head:libc_sem_wait,hash:CRC-32=0x3f152a22]]]*/
 /* Wait for SEM being posted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_wait") int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *sem)
-/*[[[body:sem_wait]]]*/
+/*[[[body:libc_sem_wait]]]*/
 {
 	struct sem *self;
 	self = (struct sem *)sem;
@@ -212,15 +206,14 @@ NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *sem)
 	}
 	return 0;
 }
-/*[[[end:sem_wait]]]*/
+/*[[[end:libc_sem_wait]]]*/
 
-/*[[[head:sem_timedwait,hash:CRC-32=0xe2bd3d49]]]*/
+/*[[[head:libc_sem_timedwait,hash:CRC-32=0xb414824d]]]*/
 /* Similar to `sem_wait' but wait only until ABSTIME */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_timedwait") int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict sem,
                                          struct timespec const *__restrict abstime)
-/*[[[body:sem_timedwait]]]*/
+/*[[[body:libc_sem_timedwait]]]*/
 {
 	struct sem *self;
 	self = (struct sem *)sem;
@@ -251,18 +244,16 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict sem,
 	}
 	return 0;
 }
-/*[[[end:sem_timedwait]]]*/
+/*[[[end:libc_sem_timedwait]]]*/
 
-/*[[[head:sem_timedwait64,hash:CRC-32=0x77a1bf9b]]]*/
-/* Similar to `sem_wait' but wait only until ABSTIME */
+/*[[[head:libc_sem_timedwait64,hash:CRC-32=0x97eeef5f]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_sem_timedwait64, libc_sem_timedwait);
-#else
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_timedwait64") int
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict sem,
                                            struct timespec64 const *__restrict abstime)
-/*[[[body:sem_timedwait64]]]*/
+/*[[[body:libc_sem_timedwait64]]]*/
 {
 	struct sem *self;
 	self = (struct sem *)sem;
@@ -294,14 +285,13 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict sem,
 	return 0;
 }
 #endif /* MAGIC:alias */
-/*[[[end:sem_timedwait64]]]*/
+/*[[[end:libc_sem_timedwait64]]]*/
 
-/*[[[head:sem_trywait,hash:CRC-32=0x8c0b11f3]]]*/
+/*[[[head:libc_sem_trywait,hash:CRC-32=0x16506a61]]]*/
 /* Test whether SEM is posted */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_trywait") int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *sem)
-/*[[[body:sem_trywait]]]*/
+/*[[[body:libc_sem_trywait]]]*/
 {
 	struct sem *self;
 	lfutex_t oldval;
@@ -317,14 +307,13 @@ again:
 	libc_seterrno(EAGAIN);
 	return -1;
 }
-/*[[[end:sem_trywait]]]*/
+/*[[[end:libc_sem_trywait]]]*/
 
-/*[[[head:sem_post,hash:CRC-32=0xb4a241a8]]]*/
+/*[[[head:libc_sem_post,hash:CRC-32=0x420ee467]]]*/
 /* Post SEM */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_post") int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *sem)
-/*[[[body:sem_post]]]*/
+/*[[[body:libc_sem_post]]]*/
 {
 	struct sem *self;
 	lfutex_t oldval;
@@ -351,15 +340,14 @@ again:
 	}
 	return 0;
 }
-/*[[[end:sem_post]]]*/
+/*[[[end:libc_sem_post]]]*/
 
-/*[[[head:sem_getvalue,hash:CRC-32=0x80176003]]]*/
+/*[[[head:libc_sem_getvalue,hash:CRC-32=0x569d88fb]]]*/
 /* Get current value of SEM and store it in *SVAL */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_getvalue") int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict sem,
                                         int *__restrict sval)
-/*[[[body:sem_getvalue]]]*/
+/*[[[body:libc_sem_getvalue]]]*/
 {
 	struct sem *self;
 	self = (struct sem *)sem;
@@ -368,25 +356,24 @@ NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict sem,
 	                                      LFUTEX_WAIT_LOCK_TIDMASK);
 	return 0;
 }
-/*[[[end:sem_getvalue]]]*/
+/*[[[end:libc_sem_getvalue]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x5d60f078]]]*/
-#undef sem_open
-DEFINE_PUBLIC_WEAK_ALIAS(sem_init, libc_sem_init);
-DEFINE_PUBLIC_WEAK_ALIAS(sem_destroy, libc_sem_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(sem_open, libc_sem_open);
-DEFINE_PUBLIC_WEAK_ALIAS(sem_close, libc_sem_close);
-DEFINE_PUBLIC_WEAK_ALIAS(sem_unlink, libc_sem_unlink);
-DEFINE_PUBLIC_WEAK_ALIAS(sem_wait, libc_sem_wait);
-DEFINE_PUBLIC_WEAK_ALIAS(sem_timedwait, libc_sem_timedwait);
-DEFINE_PUBLIC_WEAK_ALIAS(sem_timedwait64, libc_sem_timedwait64);
-DEFINE_PUBLIC_WEAK_ALIAS(sem_trywait, libc_sem_trywait);
-DEFINE_PUBLIC_WEAK_ALIAS(sem_post, libc_sem_post);
-DEFINE_PUBLIC_WEAK_ALIAS(sem_getvalue, libc_sem_getvalue);
+/*[[[start:exports,hash:CRC-32=0x83453b4]]]*/
+DEFINE_PUBLIC_ALIAS(sem_init, libc_sem_init);
+DEFINE_PUBLIC_ALIAS(sem_destroy, libc_sem_destroy);
+DEFINE_PUBLIC_ALIAS(sem_open, libc_sem_open);
+DEFINE_PUBLIC_ALIAS(sem_close, libc_sem_close);
+DEFINE_PUBLIC_ALIAS(sem_unlink, libc_sem_unlink);
+DEFINE_PUBLIC_ALIAS(sem_wait, libc_sem_wait);
+DEFINE_PUBLIC_ALIAS(sem_timedwait, libc_sem_timedwait);
+DEFINE_PUBLIC_ALIAS(sem_timedwait64, libc_sem_timedwait64);
+DEFINE_PUBLIC_ALIAS(sem_trywait, libc_sem_trywait);
+DEFINE_PUBLIC_ALIAS(sem_post, libc_sem_post);
+DEFINE_PUBLIC_ALIAS(sem_getvalue, libc_sem_getvalue);
 /*[[[end:exports]]]*/
 
 DECL_END

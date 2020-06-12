@@ -96,7 +96,7 @@ uintptr_t _beginthread(__dos_beginthread_entry_t entry, $u32 stacksz, void *arg)
 uintptr_t _beginthreadex(void *sec, $u32 stacksz, __dos_beginthreadex_entry_t entry,
                          void *arg, $u32 flags, $u32 *threadaddr);
 
-[[userimpl, requires($has_function(_endthreadex))]]
+[[requires($has_function(_endthreadex))]]
 void _endthread() {
 	_endthreadex(0);
 }
@@ -300,31 +300,31 @@ $pid_t spawnve(int mode, [[nonnull]] char const *__restrict path, [[nonnull]] __
 $pid_t spawnvpe(int mode, [[nonnull]] char const *__restrict file, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
 [[cp, guard, allow_macros, ATTR_SENTINEL, impl_include("<parts/redirect-exec.h>")]]
-[[userimpl, requires_dependent_function("spawnv"), export_alias("_spawnl")]]
+[[requires_dependent_function("spawnv"), export_alias("_spawnl")]]
 $pid_t spawnl(int mode, [[nonnull]] char const *__restrict path,
               char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_SPAWNL(char, spawnv, mode, path, args)
 }
 
 [[cp, guard, allow_macros, ATTR_SENTINEL, impl_include("<parts/redirect-exec.h>")]]
-[[userimpl, requires_dependent_function("spawnvp"), export_alias("_spawnlp")]]
+[[requires_dependent_function("spawnvp"), export_alias("_spawnlp")]]
 $pid_t spawnlp(int mode, [[nonnull]] char const *__restrict file,
                char const *args, ... /*, (char *)NULL*/) {
-	__REDIRECT_SPAWNLP(char, spawnvp, mode, file, args)
+	__REDIRECT_SPAWNL(char, spawnvp, mode, file, args)
 }
 
 [[cp, guard, allow_macros, ATTR_SENTINEL_O(1), impl_include("<parts/redirect-exec.h>")]]
-[[userimpl, requires_dependent_function("spawnve"), export_alias("_spawnle")]]
+[[requires_dependent_function("spawnve"), export_alias("_spawnle")]]
 $pid_t spawnle(int mode, [[nonnull]] char const *__restrict path,
                char const *args, ... /*, (char *)NULL, char **environ*/) {
 	__REDIRECT_SPAWNLE(char, spawnve, mode, path, args)
 }
 
 [[cp, guard, allow_macros, ATTR_SENTINEL_O(1), impl_include("<parts/redirect-exec.h>")]]
-[[userimpl, requires_dependent_function("spawnvpe"), export_alias("_spawnlpe")]]
+[[requires_dependent_function("spawnvpe"), export_alias("_spawnlpe")]]
 $pid_t spawnlpe(int mode, [[nonnull]] char const *__restrict file,
                 char const *args, ... /*, (char *)NULL, char **environ*/) {
-	__REDIRECT_SPAWNLPE(char, spawnvpe, mode, file, args)
+	__REDIRECT_SPAWNLE(char, spawnvpe, mode, file, args)
 }
 
 %#endif /* __USE_DOS || __USE_KOS */

@@ -31,28 +31,27 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:ftok,hash:CRC-32=0x8ccd7d4c]]]*/
+/*[[[head:libc_ftok,hash:CRC-32=0xba0db3b3]]]*/
 /* Generates key for System V style IPC */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.ftok") key_t
+INTERN NONNULL((1)) key_t
 NOTHROW_RPC(LIBCCALL libc_ftok)(char const *pathname,
-                                int proj_id)
-/*[[[body:ftok]]]*/
-{
+                                __STDC_INT_AS_UINT_T proj_id)
+/*[[[body:libc_ftok]]]*/
+/*AUTO*/{
 	(void)pathname;
 	(void)proj_id;
 	CRT_UNIMPLEMENTED("ftok"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
-/*[[[end:ftok]]]*/
+/*[[[end:libc_ftok]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x48be70aa]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(ftok, libc_ftok);
+/*[[[start:exports,hash:CRC-32=0xef549e08]]]*/
+DEFINE_PUBLIC_ALIAS(ftok, libc_ftok);
 /*[[[end:exports]]]*/
 
 DECL_END

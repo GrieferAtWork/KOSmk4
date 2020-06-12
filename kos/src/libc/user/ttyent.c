@@ -31,61 +31,60 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getttyent,hash:CRC-32=0xacd058f]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.getttyent") struct ttyent *
+/*[[[head:libc_getttyent,hash:CRC-32=0xb5fd7cdb]]]*/
+INTERN ATTR_SECTION(".text.crt.database.utmpx") struct ttyent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getttyent)(void)
-/*[[[body:getttyent]]]*/
-{
+/*[[[body:libc_getttyent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("getttyent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getttyent]]]*/
+/*[[[end:libc_getttyent]]]*/
 
-/*[[[head:getttynam,hash:CRC-32=0xf75ae736]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.getttynam") struct ttyent *
+/*[[[head:libc_getttynam,hash:CRC-32=0x781db2f0]]]*/
+INTERN ATTR_SECTION(".text.crt.database.utmpx") NONNULL((1)) struct ttyent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getttynam)(char const *tty)
-/*[[[body:getttynam]]]*/
-{
+/*[[[body:libc_getttynam]]]*/
+/*AUTO*/{
 	(void)tty;
 	CRT_UNIMPLEMENTED("getttynam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getttynam]]]*/
+/*[[[end:libc_getttynam]]]*/
 
-/*[[[head:setttyent,hash:CRC-32=0xd671f5ae]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.setttyent") int
+/*[[[head:libc_setttyent,hash:CRC-32=0x2d705ed9]]]*/
+INTERN ATTR_SECTION(".text.crt.database.utmpx") int
 NOTHROW_RPC_KOS(LIBCCALL libc_setttyent)(void)
-/*[[[body:setttyent]]]*/
-{
+/*[[[body:libc_setttyent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("setttyent"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:setttyent]]]*/
+/*[[[end:libc_setttyent]]]*/
 
-/*[[[head:endttyent,hash:CRC-32=0xa6a6312b]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.endttyent") int
-NOTHROW_RPC_KOS(LIBCCALL libc_endttyent)(void)
-/*[[[body:endttyent]]]*/
-{
+/*[[[head:libc_endttyent,hash:CRC-32=0x8ab52af9]]]*/
+INTERN ATTR_SECTION(".text.crt.database.utmpx") int
+NOTHROW_NCX(LIBCCALL libc_endttyent)(void)
+/*[[[body:libc_endttyent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("endttyent"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:endttyent]]]*/
+/*[[[end:libc_endttyent]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6e8a6eb0]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(getttyent, libc_getttyent);
-DEFINE_PUBLIC_WEAK_ALIAS(getttynam, libc_getttynam);
-DEFINE_PUBLIC_WEAK_ALIAS(setttyent, libc_setttyent);
-DEFINE_PUBLIC_WEAK_ALIAS(endttyent, libc_endttyent);
+/*[[[start:exports,hash:CRC-32=0xe8fc5230]]]*/
+DEFINE_PUBLIC_ALIAS(getttyent, libc_getttyent);
+DEFINE_PUBLIC_ALIAS(getttynam, libc_getttynam);
+DEFINE_PUBLIC_ALIAS(setttyent, libc_setttyent);
+DEFINE_PUBLIC_ALIAS(endttyent, libc_endttyent);
 /*[[[end:exports]]]*/
 
 DECL_END

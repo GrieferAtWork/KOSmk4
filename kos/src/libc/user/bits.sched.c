@@ -34,9 +34,9 @@ DECL_BEGIN
 /*[[[start:implementation]]]*/
 
 /* Clone must be implemented in assembly! */
-/*[[[skip:clone]]]*/
+/*[[[skip:libc_clone]]]*/
 
-/*[[[head:unshare,hash:CRC-32=0x1fac0a45]]]*/
+/*[[[head:libc_unshare,hash:CRC-32=0xc23eb45e]]]*/
 /* >> unshare(2)
  * Unshare certain components of the calling thread that may be shared with other
  * threads or processes, such as the filesystem, or opened file descriptors.
@@ -61,26 +61,26 @@ DECL_BEGIN
  *                 - CLONE_SYSVSEM:   ...
  *                 - CLONE_VM:        Unshare the current VM (KOS extension)
  *                 - CLONE_SIGHAND:   Unshare signal handlers (KOS extension) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.utility.unshare") int
+INTERN ATTR_SECTION(".text.crt.sched.utility") int
 NOTHROW_NCX(LIBCCALL libc_unshare)(int flags)
-/*[[[body:unshare]]]*/
+/*[[[body:libc_unshare]]]*/
 {
 	errno_t result;
 	result = sys_unshare((syscall_ulong_t)(unsigned int)flags);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:unshare]]]*/
+/*[[[end:libc_unshare]]]*/
 
-/*[[[head:sched_getcpu,hash:CRC-32=0x3f296be5]]]*/
+/*[[[head:libc_sched_getcpu,hash:CRC-32=0x8272ac7c]]]*/
 /* >> sched_getcpu(3)
  * Returns the number of the CPU for the calling thread.
  * Note that due to unforeseeable scheduling conditions, this may change at any
  * moment, even before this function returns, or before the caller was able to
  * act on its return value. For that reason, this function must only be taken
  * as a hint */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.utility.sched_getcpu") int
+INTERN ATTR_SECTION(".text.crt.sched.utility") int
 NOTHROW_NCX(LIBCCALL libc_sched_getcpu)(void)
-/*[[[body:sched_getcpu]]]*/
+/*[[[body:libc_sched_getcpu]]]*/
 {
 	errno_t error;
 	uint32_t res;
@@ -92,9 +92,9 @@ NOTHROW_NCX(LIBCCALL libc_sched_getcpu)(void)
 	}
 	return (int)(unsigned int)res;
 }
-/*[[[end:sched_getcpu]]]*/
+/*[[[end:libc_sched_getcpu]]]*/
 
-/*[[[head:setns,hash:CRC-32=0x2ad1758]]]*/
+/*[[[head:libc_setns,hash:CRC-32=0xa4c62731]]]*/
 /* >> setns(2)
  * With `FD' referring to a namespace, reassociate the calling thread with that namespace.
  * For this purpose, `FD' was opened for one of the files in `/proc/[pid]/ns/'
@@ -102,28 +102,27 @@ NOTHROW_NCX(LIBCCALL libc_sched_getcpu)(void)
  *                 type of namespace, or one of `CLONE_NEWCGROUP', `CLONE_NEWIPC',
  *                `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',
  *                `CLONE_NEWUTS') */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.utility.setns") int
+INTERN ATTR_SECTION(".text.crt.sched.utility") int
 NOTHROW_NCX(LIBCCALL libc_setns)(fd_t fd,
                                  int nstype)
-/*[[[body:setns]]]*/
+/*[[[body:libc_setns]]]*/
 {
 	errno_t result;
 	result = sys_setns(fd,
 	                   (syscall_ulong_t)(unsigned int)nstype);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:setns]]]*/
+/*[[[end:libc_setns]]]*/
 
-/*[[[head:exit_thread,hash:CRC-32=0x7d2ac39a]]]*/
+/*[[[head:libc_exit_thread,hash:CRC-32=0x75d45953]]]*/
 /* Exits the current thread by invoking the SYS_exit system call,
  * after performing some additional cleanup not done by the kernel.
  * Assuming that the calling thread was constructed by `clone()',
  * calling this function has the same effect as returning `EXIT_CODE'
  * from `clone()'s `FN' callback */
-INTERN ATTR_NORETURN
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.access.exit_thread") void
+INTERN ATTR_SECTION(".text.crt.sched.access") ATTR_NORETURN void
 NOTHROW_NCX(LIBCCALL libc_exit_thread)(int exit_code)
-/*[[[body:exit_thread]]]*/
+/*[[[body:libc_exit_thread]]]*/
 {
 	/* NOTE: The TLS segment, and stack are explicitly defined when calling the clone() function.
 	 *       Seeing this, we'd be wrong to assume and free a DL-based TLS segment, or munmap()
@@ -141,17 +140,17 @@ NOTHROW_NCX(LIBCCALL libc_exit_thread)(int exit_code)
 	 *   - sys_exit_group() terminated the calling _process_ */
 	sys_exit((syscall_ulong_t)(unsigned int)exit_code);
 }
-/*[[[end:exit_thread]]]*/
+/*[[[end:libc_exit_thread]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x79af6541]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(unshare, libc_unshare);
-DEFINE_PUBLIC_WEAK_ALIAS(sched_getcpu, libc_sched_getcpu);
-DEFINE_PUBLIC_WEAK_ALIAS(setns, libc_setns);
-DEFINE_PUBLIC_WEAK_ALIAS(exit_thread, libc_exit_thread);
+/*[[[start:exports,hash:CRC-32=0xbfe421ce]]]*/
+DEFINE_PUBLIC_ALIAS(unshare, libc_unshare);
+DEFINE_PUBLIC_ALIAS(sched_getcpu, libc_sched_getcpu);
+DEFINE_PUBLIC_ALIAS(setns, libc_setns);
+DEFINE_PUBLIC_ALIAS(exit_thread, libc_exit_thread);
 /*[[[end:exports]]]*/
 
 DECL_END

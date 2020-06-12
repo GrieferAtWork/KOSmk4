@@ -37,27 +37,25 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:tcgetattr,hash:CRC-32=0x7f67402b]]]*/
+/*[[[head:libc_tcgetattr,hash:CRC-32=0x24560589]]]*/
 /* Get terminal attributes */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.tcgetattr") int
+INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_tcgetattr)(fd_t fd,
                                      struct termios *__restrict termios_p)
-/*[[[body:tcgetattr]]]*/
+/*[[[body:libc_tcgetattr]]]*/
 {
 	return (int)ioctl(fd, TCGETA, termios_p);
 }
-/*[[[end:tcgetattr]]]*/
+/*[[[end:libc_tcgetattr]]]*/
 
-/*[[[head:tcsetattr,hash:CRC-32=0x950e80ba]]]*/
+/*[[[head:libc_tcsetattr,hash:CRC-32=0x260b07a5]]]*/
 /* Set terminal attributes
  * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
-INTERN NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.tcsetattr") int
+INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_tcsetattr)(fd_t fd,
-                                     int optional_actions,
+                                     __STDC_INT_AS_UINT_T optional_actions,
                                      struct termios const *__restrict termios_p)
-/*[[[body:tcsetattr]]]*/
+/*[[[body:libc_tcsetattr]]]*/
 {
 	int cmd;
 	switch (optional_actions) {
@@ -80,64 +78,66 @@ NOTHROW_NCX(LIBCCALL libc_tcsetattr)(fd_t fd,
 	}
 	return (int)ioctl(fd, cmd, termios_p);
 }
-/*[[[end:tcsetattr]]]*/
+/*[[[end:libc_tcsetattr]]]*/
 
-/*[[[head:tcsendbreak,hash:CRC-32=0x5185275c]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.tcsendbreak") int
+/*[[[head:libc_tcsendbreak,hash:CRC-32=0xbb1825dc]]]*/
+INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_NCX(LIBCCALL libc_tcsendbreak)(fd_t fd,
                                        int duration)
-/*[[[body:tcsendbreak]]]*/
+/*[[[body:libc_tcsendbreak]]]*/
 {
 	return (int)ioctl(fd, TCSBRKP, duration);
 }
-/*[[[end:tcsendbreak]]]*/
+/*[[[end:libc_tcsendbreak]]]*/
 
-/*[[[head:tcdrain,hash:CRC-32=0x62f2458]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.tcdrain") int
+/*[[[head:libc_tcdrain,hash:CRC-32=0x139938ae]]]*/
+INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_RPC(LIBCCALL libc_tcdrain)(fd_t fd)
-/*[[[body:tcdrain]]]*/
+/*[[[body:libc_tcdrain]]]*/
 {
 	return (int)ioctl(fd, TCSBRK, 1);
 }
-/*[[[end:tcdrain]]]*/
+/*[[[end:libc_tcdrain]]]*/
 
-/*[[[head:tcflush,hash:CRC-32=0xdb08381d]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.tcflush") int
+/*[[[head:libc_tcflush,hash:CRC-32=0xaf207f31]]]*/
+/* @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
+INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_NCX(LIBCCALL libc_tcflush)(fd_t fd,
-                                   int queue_selector)
-/*[[[body:tcflush]]]*/
+                                   __STDC_INT_AS_UINT_T queue_selector)
+/*[[[body:libc_tcflush]]]*/
 {
 	return (int)ioctl(fd, TCFLSH, queue_selector);
 }
-/*[[[end:tcflush]]]*/
+/*[[[end:libc_tcflush]]]*/
 
-/*[[[head:tcflow,hash:CRC-32=0xde7df722]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.tcflow") int
+/*[[[head:libc_tcflow,hash:CRC-32=0xdfdb05e3]]]*/
+/* @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
+INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_NCX(LIBCCALL libc_tcflow)(fd_t fd,
-                                  int action)
-/*[[[body:tcflow]]]*/
+                                  __STDC_INT_AS_UINT_T action)
+/*[[[body:libc_tcflow]]]*/
 {
 	return (int)ioctl(fd, TCXONC, action);
 }
-/*[[[end:tcflow]]]*/
+/*[[[end:libc_tcflow]]]*/
 
-/*[[[head:tcgetsid,hash:CRC-32=0x98b5e982]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.tcgetsid") pid_t
+/*[[[head:libc_tcgetsid,hash:CRC-32=0x7dcf9df9]]]*/
+INTERN ATTR_SECTION(".text.crt.io.tty") pid_t
 NOTHROW_NCX(LIBCCALL libc_tcgetsid)(fd_t fd)
-/*[[[body:tcgetsid]]]*/
+/*[[[body:libc_tcgetsid]]]*/
 {
 	pid_t result;
 	if (ioctl(fd, TIOCGSID, &result) < 0)
 		result = -1;
 	return result;
 }
-/*[[[end:tcgetsid]]]*/
+/*[[[end:libc_tcgetsid]]]*/
 
-/*[[[head:tcsetsid,hash:CRC-32=0xfb4658fe]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.tcsetsid") int
+/*[[[head:libc_tcsetsid,hash:CRC-32=0x5188e6d2]]]*/
+INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd,
                                     pid_t pid)
-/*[[[body:tcsetsid]]]*/
+/*[[[body:libc_tcsetsid]]]*/
 {
 	int result;
 	if (pid != getsid(0)) {
@@ -148,21 +148,21 @@ NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd,
 	}
 	return result;
 }
-/*[[[end:tcsetsid]]]*/
+/*[[[end:libc_tcsetsid]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x81c01dea]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(tcgetattr, libc_tcgetattr);
-DEFINE_PUBLIC_WEAK_ALIAS(tcsetattr, libc_tcsetattr);
-DEFINE_PUBLIC_WEAK_ALIAS(tcsendbreak, libc_tcsendbreak);
-DEFINE_PUBLIC_WEAK_ALIAS(tcdrain, libc_tcdrain);
-DEFINE_PUBLIC_WEAK_ALIAS(tcflush, libc_tcflush);
-DEFINE_PUBLIC_WEAK_ALIAS(tcflow, libc_tcflow);
-DEFINE_PUBLIC_WEAK_ALIAS(tcgetsid, libc_tcgetsid);
-DEFINE_PUBLIC_WEAK_ALIAS(tcsetsid, libc_tcsetsid);
+/*[[[start:exports,hash:CRC-32=0x8ab10d80]]]*/
+DEFINE_PUBLIC_ALIAS(tcgetattr, libc_tcgetattr);
+DEFINE_PUBLIC_ALIAS(tcsetattr, libc_tcsetattr);
+DEFINE_PUBLIC_ALIAS(tcsendbreak, libc_tcsendbreak);
+DEFINE_PUBLIC_ALIAS(tcdrain, libc_tcdrain);
+DEFINE_PUBLIC_ALIAS(tcflush, libc_tcflush);
+DEFINE_PUBLIC_ALIAS(tcflow, libc_tcflow);
+DEFINE_PUBLIC_ALIAS(tcgetsid, libc_tcgetsid);
+DEFINE_PUBLIC_ALIAS(tcsetsid, libc_tcsetsid);
 /*[[[end:exports]]]*/
 
 DECL_END

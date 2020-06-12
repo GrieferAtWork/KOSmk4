@@ -33,24 +33,25 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:flock,hash:CRC-32=0x3c0354aa]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.flock") int
+/*[[[head:libc_flock,hash:CRC-32=0x9beb2afa]]]*/
+/* Apply or remove an advisory lock, according to OPERATION, on the file FD refers to */
+INTERN int
 NOTHROW_RPC(LIBCCALL libc_flock)(fd_t fd,
-                                 int operation)
-/*[[[body:flock]]]*/
+                                 __STDC_INT_AS_UINT_T operation)
+/*[[[body:libc_flock]]]*/
 {
 	errno_t result;
 	result = sys_flock(fd, operation);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:flock]]]*/
+/*[[[end:libc_flock]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbb27860a]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(flock, libc_flock);
+/*[[[start:exports,hash:CRC-32=0x69d162ac]]]*/
+DEFINE_PUBLIC_ALIAS(flock, libc_flock);
 /*[[[end:exports]]]*/
 
 DECL_END

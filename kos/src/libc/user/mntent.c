@@ -31,48 +31,45 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setmntent,hash:CRC-32=0x8be63af0]]]*/
+/*[[[head:libc_setmntent,hash:CRC-32=0x425b46a0]]]*/
 /* Prepare to begin reading and/or writing mount table
  * entries from the beginning of FILE.  MODE is as for `fopen' */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.setmntent") FILE *
+INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1, 2)) FILE *
 NOTHROW_RPC(LIBCCALL libc_setmntent)(char const *file,
                                      char const *mode)
-/*[[[body:setmntent]]]*/
-{
+/*[[[body:libc_setmntent]]]*/
+/*AUTO*/{
 	(void)file;
 	(void)mode;
 	CRT_UNIMPLEMENTED("setmntent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:setmntent]]]*/
+/*[[[end:libc_setmntent]]]*/
 
-/*[[[head:getmntent,hash:CRC-32=0x3e073f87]]]*/
+/*[[[head:libc_getmntent,hash:CRC-32=0x78c8c9c7]]]*/
 /* Read one mount table entry from STREAM.  Returns a pointer to storage
  * reused on the next call, or null for EOF or error (use feof/ferror to check) */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.getmntent") struct mntent *
+INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1)) struct mntent *
 NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream)
-/*[[[body:getmntent]]]*/
-{
+/*[[[body:libc_getmntent]]]*/
+/*AUTO*/{
 	(void)stream;
 	CRT_UNIMPLEMENTED("getmntent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getmntent]]]*/
+/*[[[end:libc_getmntent]]]*/
 
-/*[[[head:getmntent_r,hash:CRC-32=0x955948c3]]]*/
+/*[[[head:libc_getmntent_r,hash:CRC-32=0xeca4e26d]]]*/
 /* Reentrant version of the above function */
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.getmntent_r") struct mntent *
+INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1, 2, 3)) struct mntent *
 NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,
                                        struct mntent *__restrict result,
                                        char *__restrict buffer,
                                        __STDC_INT_AS_SIZE_T bufsize)
-/*[[[body:getmntent_r]]]*/
-{
+/*[[[body:libc_getmntent_r]]]*/
+/*AUTO*/{
 	(void)stream;
 	(void)result;
 	(void)buffer;
@@ -81,52 +78,50 @@ NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getmntent_r]]]*/
+/*[[[end:libc_getmntent_r]]]*/
 
-/*[[[head:addmntent,hash:CRC-32=0x303ff22e]]]*/
+/*[[[head:libc_addmntent,hash:CRC-32=0xfea49365]]]*/
 /* Write the mount table entry described by MNT to STREAM.
  * Return zero on success, nonzero on failure */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.addmntent") int
+INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_addmntent)(FILE *__restrict stream,
                                      struct mntent const *__restrict mnt)
-/*[[[body:addmntent]]]*/
-{
+/*[[[body:libc_addmntent]]]*/
+/*AUTO*/{
 	(void)stream;
 	(void)mnt;
 	CRT_UNIMPLEMENTED("addmntent"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:addmntent]]]*/
+/*[[[end:libc_addmntent]]]*/
 
-/*[[[head:endmntent,hash:CRC-32=0x670faef7]]]*/
+/*[[[head:libc_endmntent,hash:CRC-32=0xe276ba32]]]*/
 /* Close a stream opened with `setmntent' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.endmntent") int
+INTERN ATTR_SECTION(".text.crt.database.mntent") NONNULL((1)) int
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream)
-/*[[[body:endmntent]]]*/
-{
+/*[[[body:libc_endmntent]]]*/
+/*AUTO*/{
 	(void)stream;
 	CRT_UNIMPLEMENTED("endmntent"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:endmntent]]]*/
+/*[[[end:libc_endmntent]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7f9d24d1]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(setmntent, libc_setmntent);
-DEFINE_PUBLIC_WEAK_ALIAS(__setmntent, libc_setmntent);
-DEFINE_PUBLIC_WEAK_ALIAS(getmntent, libc_getmntent);
-DEFINE_PUBLIC_WEAK_ALIAS(getmntent_r, libc_getmntent_r);
-DEFINE_PUBLIC_WEAK_ALIAS(__getmntent_r, libc_getmntent_r);
-DEFINE_PUBLIC_WEAK_ALIAS(addmntent, libc_addmntent);
-DEFINE_PUBLIC_WEAK_ALIAS(endmntent, libc_endmntent);
-DEFINE_PUBLIC_WEAK_ALIAS(__endmntent, libc_endmntent);
+/*[[[start:exports,hash:CRC-32=0x1975f556]]]*/
+DEFINE_PUBLIC_ALIAS(__setmntent, libc_setmntent);
+DEFINE_PUBLIC_ALIAS(setmntent, libc_setmntent);
+DEFINE_PUBLIC_ALIAS(getmntent, libc_getmntent);
+DEFINE_PUBLIC_ALIAS(__getmntent_r, libc_getmntent_r);
+DEFINE_PUBLIC_ALIAS(getmntent_r, libc_getmntent_r);
+DEFINE_PUBLIC_ALIAS(addmntent, libc_addmntent);
+DEFINE_PUBLIC_ALIAS(__endmntent, libc_endmntent);
+DEFINE_PUBLIC_ALIAS(endmntent, libc_endmntent);
 /*[[[end:exports]]]*/
 
 DECL_END

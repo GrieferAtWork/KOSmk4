@@ -1363,9 +1363,8 @@ __LIBC int optopt;
 %
 
 
-[[guard, wunused, section(".text.crt.application.options")]]
+[[guard, wunused, no_crt_impl, crt_name("getopt"), exposed_name("getopt")]]
 [[if(defined(__USE_POSIX2) && !defined(__USE_POSIX_IMPLICITLY) && !defined(__USE_GNU)), preferred_alias(__posix_getopt)]]
-[[crt_name("getopt"), exposed_name("getopt")]]
 int unistd_getopt(int argc, char *const argv[], char const *shortopts);
 
 %#endif /* __USE_POSIX2 */

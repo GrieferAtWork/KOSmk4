@@ -33,25 +33,24 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:uname,hash:CRC-32=0x839c748c]]]*/
+/*[[[head:libc_uname,hash:CRC-32=0x77d9801f]]]*/
 /* Put information about the system in NAME */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.uname") int
+INTERN NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_uname)(struct utsname *name)
-/*[[[body:uname]]]*/
+/*[[[body:libc_uname]]]*/
 {
 	errno_t result;
 	result = sys_uname(name);
 	return libc_seterrno_syserr(result);
 }
-/*[[[end:uname]]]*/
+/*[[[end:libc_uname]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xccbd8562]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(uname, libc_uname);
+/*[[[start:exports,hash:CRC-32=0x2acf11c5]]]*/
+DEFINE_PUBLIC_ALIAS(uname, libc_uname);
 /*[[[end:exports]]]*/
 
 DECL_END

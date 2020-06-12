@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x843e49ee */
+/* HASH CRC-32:0xf57642d7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,17 +39,20 @@ NOTHROW_NCX(LIBCCALL libc_cfgetispeed)(struct termios const *__restrict termios_
 	return termios_p->c_ispeed;
 }
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_cfsetospeed)(struct termios *__restrict termios_p, speed_t speed) {
+NOTHROW_NCX(LIBCCALL libc_cfsetospeed)(struct termios *__restrict termios_p,
+                                       speed_t speed) {
 	termios_p->c_ospeed = speed;
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_cfsetispeed)(struct termios *__restrict termios_p, speed_t speed) {
+NOTHROW_NCX(LIBCCALL libc_cfsetispeed)(struct termios *__restrict termios_p,
+                                       speed_t speed) {
 	termios_p->c_ispeed = speed;
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p, speed_t speed) {
+NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p,
+                                      speed_t speed) {
 	termios_p->c_ospeed = speed;
 	termios_p->c_ispeed = speed;
 	return 0;
@@ -237,13 +240,13 @@ NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(cfgetospeed, libc_cfgetospeed);
-DEFINE_PUBLIC_WEAK_ALIAS(cfgetispeed, libc_cfgetispeed);
-DEFINE_PUBLIC_WEAK_ALIAS(cfsetospeed, libc_cfsetospeed);
-DEFINE_PUBLIC_WEAK_ALIAS(cfsetispeed, libc_cfsetispeed);
-DEFINE_PUBLIC_WEAK_ALIAS(cfsetspeed, libc_cfsetspeed);
-DEFINE_PUBLIC_WEAK_ALIAS(cfmakeraw, libc_cfmakeraw);
+DEFINE_PUBLIC_ALIAS(cfgetospeed, libc_cfgetospeed);
+DEFINE_PUBLIC_ALIAS(cfgetispeed, libc_cfgetispeed);
+DEFINE_PUBLIC_ALIAS(cfsetospeed, libc_cfsetospeed);
+DEFINE_PUBLIC_ALIAS(cfsetispeed, libc_cfsetispeed);
+DEFINE_PUBLIC_ALIAS(cfsetspeed, libc_cfsetspeed);
+DEFINE_PUBLIC_ALIAS(cfmakeraw, libc_cfmakeraw);
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_WEAK_ALIAS(cfmakesane, libc_cfmakesane);
+DEFINE_PUBLIC_ALIAS(cfmakesane, libc_cfmakesane);
 
 #endif /* !GUARD_LIBC_AUTO_TERMIOS_C */

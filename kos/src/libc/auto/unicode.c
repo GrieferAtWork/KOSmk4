@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7dc9c94b */
+/* HASH CRC-32:0xdc7f720e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -196,7 +196,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev)(char const **__restrict ptext) {
 }
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_n)(char const **__restrict ptext, char const *text_end) {
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_n)(char const **__restrict ptext,
+                                              char const *text_end) {
 	char32_t result;
 	char const *iter = *ptext;
 	if __unlikely(iter >= text_end)
@@ -283,7 +284,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_n)(char const **__restrict ptext, cha
 }
 /* Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev_n)(char const **__restrict ptext, char const *text_start) {
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev_n)(char const **__restrict ptext,
+                                                  char const *text_start) {
 	char32_t result;
 	char const *iter = *ptext;
 	uint8_t seqlen = 1;
@@ -385,7 +387,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16)(char16_t const **__restrict ptext) 
 }
 /* Same as `unicode_readutf16()', but don't read past `text_end' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_n)(char16_t const **__restrict ptext, char16_t const *text_end) {
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_n)(char16_t const **__restrict ptext,
+                                               char16_t const *text_end) {
 	char32_t result;
 	char16_t const *text = *ptext;
 	if (text >= text_end)
@@ -423,7 +426,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap)(char16_t const **__restrict pt
 }
 /* Same as `unicode_readutf16_n()', but read in reverse endian as that of the host CPU */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_n)(char16_t const **__restrict ptext, char16_t const *text_end) {
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_n)(char16_t const **__restrict ptext,
+                                                    char16_t const *text_end) {
 	char32_t result;
 	char16_t const *text = *ptext;
 	if (text >= text_end)
@@ -481,7 +485,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev)(char16_t const **__restric
 }
 /* Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev_n)(char16_t const **__restrict ptext, char16_t const *text_start) {
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev_n)(char16_t const **__restrict ptext,
+                                                   char16_t const *text_start) {
 	char32_t result;
 	char16_t const *text = *ptext;
 	if (text <= text_start)
@@ -500,7 +505,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev_n)(char16_t const **__restrict p
 }
 /* Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2)) char32_t
-NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(char16_t const **__restrict ptext, char16_t const *text_start) {
+NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(char16_t const **__restrict ptext,
+                                                        char16_t const *text_start) {
 	char32_t result;
 	char16_t const *text = *ptext;
 	if (text <= text_start)
@@ -521,7 +527,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(char16_t const **__restr
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1)) char *
-NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst, char32_t ch) {
+NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst,
+                                             char32_t ch) {
 	if likely(ch <= ((uint32_t)1 << 7)-1) {
 		*dst++ = (char)(u8)ch;
 	} else if (ch <= ((uint32_t)1 << 11)-1) {
@@ -563,7 +570,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst, char32_t ch) 
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1)) char16_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(char16_t *__restrict dst, char32_t ch) {
+NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(char16_t *__restrict dst,
+                                              char32_t ch) {
 	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
 		*dst++ = (char16_t)ch;
 	} else {
@@ -575,7 +583,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(char16_t *__restrict dst, char32_t
 }
 /* Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") WUNUSED NONNULL((1)) char16_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16_chk)(char16_t *__restrict dst, char32_t ch) {
+NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16_chk)(char16_t *__restrict dst,
+                                                  char32_t ch) {
 	if unlikely(ch > 0x10ffff)
 		return NULL;
 	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
@@ -593,7 +602,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16_chk)(char16_t *__restrict dst, char
  * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
  * @return: * : A pointer after the last written UTF-16 character */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_8to16)(char16_t *__restrict utf16_dst, char const *__restrict utf8_text, size_t utf8_characters) {
+NOTHROW_NCX(LIBCCALL libc_unicode_8to16)(char16_t *__restrict utf16_dst,
+                                         char const *__restrict utf8_text,
+                                         size_t utf8_characters) {
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
@@ -610,7 +621,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_8to16)(char16_t *__restrict utf16_dst, char co
  * @return: * : A pointer after the last written UTF-16 character.
  * @return: NULL: Attempted to write an invalid character */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") WUNUSED NONNULL((1, 2)) char16_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_8to16_chk)(char16_t *__restrict utf16_dst, char const *__restrict utf8_text, size_t utf8_characters) {
+NOTHROW_NCX(LIBCCALL libc_unicode_8to16_chk)(char16_t *__restrict utf16_dst,
+                                             char const *__restrict utf8_text,
+                                             size_t utf8_characters) {
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
@@ -628,7 +641,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_8to16_chk)(char16_t *__restrict utf16_dst, cha
  * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
  * @return: * : A pointer after the last written UTF-32 character. */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_8to32)(char32_t *__restrict utf32_dst, char const *__restrict utf8_text, size_t utf8_characters) {
+NOTHROW_NCX(LIBCCALL libc_unicode_8to32)(char32_t *__restrict utf32_dst,
+                                         char const *__restrict utf8_text,
+                                         size_t utf8_characters) {
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end)
 		*utf32_dst++ = unicode_readutf8_n((char const **)&utf8_text,utf8_end);
@@ -640,7 +655,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_8to32)(char32_t *__restrict utf32_dst, char co
  * @param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
  * @return: * : A pointer after the last written UTF-8 character */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1, 2)) char *
-NOTHROW_NCX(LIBCCALL libc_unicode_16to8)(char *__restrict utf8_dst, char16_t const *__restrict utf16_text, size_t utf16_characters) {
+NOTHROW_NCX(LIBCCALL libc_unicode_16to8)(char *__restrict utf8_dst,
+                                         char16_t const *__restrict utf16_text,
+                                         size_t utf16_characters) {
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end) {
 		char32_t ch;
@@ -664,7 +681,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_16to8)(char *__restrict utf8_dst, char16_t con
  * @param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
  * @return: * : A pointer after the last written UTF-32 character */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_16to32)(char32_t *__restrict utf32_dst, char16_t const *__restrict utf16_text, size_t utf16_characters) {
+NOTHROW_NCX(LIBCCALL libc_unicode_16to32)(char32_t *__restrict utf32_dst,
+                                          char16_t const *__restrict utf16_text,
+                                          size_t utf16_characters) {
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end)
 		*utf32_dst++ = unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
@@ -676,7 +695,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_16to32)(char32_t *__restrict utf32_dst, char16
  * @param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
  * @return: * : A pointer after the last written UTF-8 character */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1, 2)) char *
-NOTHROW_NCX(LIBCCALL libc_unicode_32to8)(char *__restrict utf8_dst, char32_t const *__restrict utf32_text, size_t utf32_characters) {
+NOTHROW_NCX(LIBCCALL libc_unicode_32to8)(char *__restrict utf8_dst,
+                                         char32_t const *__restrict utf32_text,
+                                         size_t utf32_characters) {
 	while (utf32_characters--)
 		utf8_dst = unicode_writeutf8(utf8_dst, *utf32_text++);
 	return utf8_dst;
@@ -687,7 +708,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_32to8)(char *__restrict utf8_dst, char32_t con
  * @param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
  * @return: * : A pointer after the last written UTF-16 character */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
-NOTHROW_NCX(LIBCCALL libc_unicode_32to16)(char16_t *__restrict utf16_dst, char32_t const *__restrict utf32_text, size_t utf32_characters) {
+NOTHROW_NCX(LIBCCALL libc_unicode_32to16)(char16_t *__restrict utf16_dst,
+                                          char32_t const *__restrict utf32_text,
+                                          size_t utf32_characters) {
 	while (utf32_characters--)
 		utf16_dst = unicode_writeutf16(utf16_dst, *utf32_text++);
 	return utf16_dst;
@@ -698,7 +721,10 @@ NOTHROW_NCX(LIBCCALL libc_unicode_32to16)(char16_t *__restrict utf16_dst, char32
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2, 4)) size_t
-NOTHROW_NCX(LIBCCALL libc_unicode_c8toc16)(char16_t *__restrict pc16, char const *__restrict s, size_t n, __mbstate_t *__restrict mbs) {
+NOTHROW_NCX(LIBCCALL libc_unicode_c8toc16)(char16_t *__restrict pc16,
+                                           char const *__restrict s,
+                                           size_t n,
+                                           __mbstate_t *__restrict mbs) {
 	char32_t resch;
 	size_t i;
 	if ((mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
@@ -828,7 +854,10 @@ done:
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2, 4)) size_t
-NOTHROW_NCX(LIBCCALL libc_unicode_c8toc32)(char32_t *__restrict pc32, char const *__restrict s, size_t n, __mbstate_t *__restrict mbs) {
+NOTHROW_NCX(LIBCCALL libc_unicode_c8toc32)(char32_t *__restrict pc32,
+                                           char const *__restrict s,
+                                           size_t n,
+                                           __mbstate_t *__restrict mbs) {
 	size_t i;
 	for (i = 0; i < n; ++i) {
 		uint32_t state;
@@ -943,7 +972,9 @@ done:
 /* Format printer (compatible with `__pformatprinter') for
  * converting UTF-8 unicode input data into a UTF-16 output */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_8to16)(void *arg, char const *data, size_t datalen) {
+NOTHROW_NCX(LIBCCALL libc_format_8to16)(void *arg,
+                                        char const *data,
+                                        size_t datalen) {
 	struct __local_format_8to16_data {
 		__pc16formatprinter fd_printer;    /* [1..1] Inner printer */
 		void               *fd_arg;        /* Argument for `fd_printer' */
@@ -984,7 +1015,9 @@ err:
 /* Format printer (compatible with `__pformatprinter') for
  * converting UTF-8 unicode input data into a UTF-32 output */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
-NOTHROW_NCX(LIBCCALL libc_format_8to32)(void *arg, char const *data, size_t datalen) {
+NOTHROW_NCX(LIBCCALL libc_format_8to32)(void *arg,
+                                        char const *data,
+                                        size_t datalen) {
 	struct __local_format_8to32_data {
 		__pc32formatprinter fd_printer;    /* [1..1] Inner printer */
 		void               *fd_arg;        /* Argument for `fd_printer' */
@@ -1023,7 +1056,9 @@ err:
 /* Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-8 output */
 INTERN ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wto8)(void *arg, char16_t const *data, size_t datalen) {
+NOTHROW_NCX(LIBDCALL libd_format_wto8)(void *arg,
+                                       char16_t const *data,
+                                       size_t datalen) {
 #if 2 == 2
 	struct __local_format_16to8_data {
 		__pformatprinter fd_printer;   /* [1..1] Inner printer */
@@ -1103,7 +1138,9 @@ err:
 /* Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-8 output */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
-NOTHROW_NCX(LIBKCALL libc_format_wto8)(void *arg, char32_t const *data, size_t datalen) {
+NOTHROW_NCX(LIBKCALL libc_format_wto8)(void *arg,
+                                       char32_t const *data,
+                                       size_t datalen) {
 #if 4 == 2
 	struct __local_format_16to8_data {
 		__pformatprinter fd_printer;   /* [1..1] Inner printer */
@@ -1183,7 +1220,9 @@ err:
 /* Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-32 output */
 INTERN ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wto32)(void *arg, char16_t const *data, size_t datalen) {
+NOTHROW_NCX(LIBDCALL libd_format_wto32)(void *arg,
+                                        char16_t const *data,
+                                        size_t datalen) {
 #if 2 == 2
 	struct __local_format_16to32_data {
 		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
@@ -1248,7 +1287,9 @@ err:
 /* Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-32 output */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
-NOTHROW_NCX(LIBKCALL libc_format_wto32)(void *arg, char32_t const *data, size_t datalen) {
+NOTHROW_NCX(LIBKCALL libc_format_wto32)(void *arg,
+                                        char32_t const *data,
+                                        size_t datalen) {
 #if 4 == 2
 	struct __local_format_16to32_data {
 		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
@@ -1314,7 +1355,9 @@ err:
 /* Format printer (compatible with `__pwformatprinter') for
  * converting wide-character unicode input data into a UTF-16 output */
 INTERN ssize_t
-NOTHROW_NCX(LIBDCALL libd_format_wto16)(void *arg, char16_t const *data, size_t datalen) {
+NOTHROW_NCX(LIBDCALL libd_format_wto16)(void *arg,
+                                        char16_t const *data,
+                                        size_t datalen) {
 #if 2 == 4
 	struct __local_format_32to16_data {
 		__pc16formatprinter fd_printer; /* [1..1] Inner printer */
@@ -1353,7 +1396,9 @@ err:
 /* Format printer (compatible with `__pwformatprinter') for
  * converting wide-character unicode input data into a UTF-16 output */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
-NOTHROW_NCX(LIBKCALL libc_format_wto16)(void *arg, char32_t const *data, size_t datalen) {
+NOTHROW_NCX(LIBKCALL libc_format_wto16)(void *arg,
+                                        char32_t const *data,
+                                        size_t datalen) {
 #if 4 == 4
 	struct __local_format_32to16_data {
 		__pc16formatprinter fd_printer; /* [1..1] Inner printer */
@@ -1391,41 +1436,41 @@ err:
 
 DECL_END
 
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf8, libc_unicode_readutf8);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf8_rev, libc_unicode_readutf8_rev);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf8_n, libc_unicode_readutf8_n);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf8_rev_n, libc_unicode_readutf8_rev_n);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf16, libc_unicode_readutf16);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf16_n, libc_unicode_readutf16_n);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf16_swap, libc_unicode_readutf16_swap);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf16_swap_n, libc_unicode_readutf16_swap_n);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf16_rev, libc_unicode_readutf16_rev);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf16_swap_rev, libc_unicode_readutf16_swap_rev);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf16_rev_n, libc_unicode_readutf16_rev_n);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_readutf16_swap_rev_n, libc_unicode_readutf16_swap_rev_n);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_writeutf8, libc_unicode_writeutf8);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_writeutf16, libc_unicode_writeutf16);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_writeutf16_chk, libc_unicode_writeutf16_chk);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_8to16, libc_unicode_8to16);
+DEFINE_PUBLIC_ALIAS(unicode_readutf8, libc_unicode_readutf8);
+DEFINE_PUBLIC_ALIAS(unicode_readutf8_rev, libc_unicode_readutf8_rev);
+DEFINE_PUBLIC_ALIAS(unicode_readutf8_n, libc_unicode_readutf8_n);
+DEFINE_PUBLIC_ALIAS(unicode_readutf8_rev_n, libc_unicode_readutf8_rev_n);
+DEFINE_PUBLIC_ALIAS(unicode_readutf16, libc_unicode_readutf16);
+DEFINE_PUBLIC_ALIAS(unicode_readutf16_n, libc_unicode_readutf16_n);
+DEFINE_PUBLIC_ALIAS(unicode_readutf16_swap, libc_unicode_readutf16_swap);
+DEFINE_PUBLIC_ALIAS(unicode_readutf16_swap_n, libc_unicode_readutf16_swap_n);
+DEFINE_PUBLIC_ALIAS(unicode_readutf16_rev, libc_unicode_readutf16_rev);
+DEFINE_PUBLIC_ALIAS(unicode_readutf16_swap_rev, libc_unicode_readutf16_swap_rev);
+DEFINE_PUBLIC_ALIAS(unicode_readutf16_rev_n, libc_unicode_readutf16_rev_n);
+DEFINE_PUBLIC_ALIAS(unicode_readutf16_swap_rev_n, libc_unicode_readutf16_swap_rev_n);
+DEFINE_PUBLIC_ALIAS(unicode_writeutf8, libc_unicode_writeutf8);
+DEFINE_PUBLIC_ALIAS(unicode_writeutf16, libc_unicode_writeutf16);
+DEFINE_PUBLIC_ALIAS(unicode_writeutf16_chk, libc_unicode_writeutf16_chk);
+DEFINE_PUBLIC_ALIAS(unicode_8to16, libc_unicode_8to16);
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_8to16_chk, libc_unicode_8to16_chk);
+DEFINE_PUBLIC_ALIAS(unicode_8to16_chk, libc_unicode_8to16_chk);
 #endif /* !__KERNEL__ */
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_8to32, libc_unicode_8to32);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_16to8, libc_unicode_16to8);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_16to32, libc_unicode_16to32);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_32to8, libc_unicode_32to8);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_32to16, libc_unicode_32to16);
+DEFINE_PUBLIC_ALIAS(unicode_8to32, libc_unicode_8to32);
+DEFINE_PUBLIC_ALIAS(unicode_16to8, libc_unicode_16to8);
+DEFINE_PUBLIC_ALIAS(unicode_16to32, libc_unicode_16to32);
+DEFINE_PUBLIC_ALIAS(unicode_32to8, libc_unicode_32to8);
+DEFINE_PUBLIC_ALIAS(unicode_32to16, libc_unicode_32to16);
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_c8toc16, libc_unicode_c8toc16);
-DEFINE_PUBLIC_WEAK_ALIAS(unicode_c8toc32, libc_unicode_c8toc32);
-DEFINE_PUBLIC_WEAK_ALIAS(format_8to16, libc_format_8to16);
-DEFINE_PUBLIC_WEAK_ALIAS(format_8to32, libc_format_8to32);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_wto8, libd_format_wto8);
-DEFINE_PUBLIC_WEAK_ALIAS(format_wto8, libc_format_wto8);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_wto32, libd_format_wto32);
-DEFINE_PUBLIC_WEAK_ALIAS(format_wto32, libc_format_wto32);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_wto16, libd_format_wto16);
-DEFINE_PUBLIC_WEAK_ALIAS(format_wto16, libc_format_wto16);
+DEFINE_PUBLIC_ALIAS(unicode_c8toc16, libc_unicode_c8toc16);
+DEFINE_PUBLIC_ALIAS(unicode_c8toc32, libc_unicode_c8toc32);
+DEFINE_PUBLIC_ALIAS(format_8to16, libc_format_8to16);
+DEFINE_PUBLIC_ALIAS(format_8to32, libc_format_8to32);
+DEFINE_PUBLIC_ALIAS(DOS$format_wto8, libd_format_wto8);
+DEFINE_PUBLIC_ALIAS(format_wto8, libc_format_wto8);
+DEFINE_PUBLIC_ALIAS(DOS$format_wto32, libd_format_wto32);
+DEFINE_PUBLIC_ALIAS(format_wto32, libc_format_wto32);
+DEFINE_PUBLIC_ALIAS(DOS$format_wto16, libd_format_wto16);
+DEFINE_PUBLIC_ALIAS(format_wto16, libc_format_wto16);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_UNICODE_C */

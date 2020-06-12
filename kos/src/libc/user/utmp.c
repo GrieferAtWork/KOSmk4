@@ -31,243 +31,232 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:login_tty,hash:CRC-32=0x1bf4e7e3]]]*/
+/*[[[head:libc_login_tty,hash:CRC-32=0x36f215a5]]]*/
 /* Make FD be the controlling terminal, stdin, stdout, and stderr;
  * then close FD. Returns 0 on success, nonzero on error */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.login_tty") int
+INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd)
-/*[[[body:login_tty]]]*/
-{
+/*[[[body:libc_login_tty]]]*/
+/*AUTO*/{
 	(void)fd;
 	CRT_UNIMPLEMENTED("login_tty"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:login_tty]]]*/
+/*[[[end:libc_login_tty]]]*/
 
-/*[[[head:login,hash:CRC-32=0x865e839a]]]*/
+/*[[[head:libc_login,hash:CRC-32=0xbe7a4316]]]*/
 /* Write the given entry into utmp and wtmp */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.login") void
+INTERN ATTR_SECTION(".text.crt.database.utmp") NONNULL((1)) void
 NOTHROW_RPC_KOS(LIBCCALL libc_login)(struct utmp const *entry)
-/*[[[body:login]]]*/
-{
+/*[[[body:libc_login]]]*/
+/*AUTO*/{
 	(void)entry;
 	CRT_UNIMPLEMENTED("login"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:login]]]*/
+/*[[[end:libc_login]]]*/
 
-/*[[[head:logout,hash:CRC-32=0x232da6a6]]]*/
+/*[[[head:libc_logout,hash:CRC-32=0xdfbff372]]]*/
 /* Write the utmp entry to say the user on UT_LINE has logged out */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.logout") int
+INTERN ATTR_SECTION(".text.crt.database.utmp") NONNULL((1)) int
 NOTHROW_RPC_KOS(LIBCCALL libc_logout)(char const *ut_line)
-/*[[[body:logout]]]*/
-{
+/*[[[body:libc_logout]]]*/
+/*AUTO*/{
 	(void)ut_line;
 	CRT_UNIMPLEMENTED("logout"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:logout]]]*/
+/*[[[end:libc_logout]]]*/
 
-/*[[[head:logwtmp,hash:CRC-32=0x8fe820d9]]]*/
+/*[[[head:libc_logwtmp,hash:CRC-32=0x2d7d39f]]]*/
 /* Append to wtmp an entry for the current time and the given info */
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.logwtmp") void
+INTERN ATTR_SECTION(".text.crt.database.utmp") NONNULL((1, 2, 3)) void
 NOTHROW_RPC_KOS(LIBCCALL libc_logwtmp)(char const *ut_line,
                                        char const *ut_name,
                                        char const *ut_host)
-/*[[[body:logwtmp]]]*/
-{
+/*[[[body:libc_logwtmp]]]*/
+/*AUTO*/{
 	(void)ut_line;
 	(void)ut_name;
 	(void)ut_host;
 	CRT_UNIMPLEMENTED("logwtmp"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:logwtmp]]]*/
+/*[[[end:libc_logwtmp]]]*/
 
-/*[[[head:updwtmp,hash:CRC-32=0x14e3ef78]]]*/
+/*[[[head:libc_updwtmp,hash:CRC-32=0xe1c89d5a]]]*/
 /* Append entry UTMP to the wtmp-like file WTMP_FILE */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.updwtmp") void
+INTERN ATTR_SECTION(".text.crt.database.utmp") NONNULL((1, 2)) void
 NOTHROW_RPC_KOS(LIBCCALL libc_updwtmp)(char const *wtmp_file,
                                        struct utmp const *utmp)
-/*[[[body:updwtmp]]]*/
-{
+/*[[[body:libc_updwtmp]]]*/
+/*AUTO*/{
 	(void)wtmp_file;
 	(void)utmp;
 	CRT_UNIMPLEMENTED("updwtmp"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:updwtmp]]]*/
+/*[[[end:libc_updwtmp]]]*/
 
-/*[[[head:utmpname,hash:CRC-32=0x7e197479]]]*/
+/*[[[head:libc_utmpname,hash:CRC-32=0xab38a47d]]]*/
 /* Change name of the utmp file to be examined */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.utmpname") int
+INTERN ATTR_SECTION(".text.crt.database.utmp") NONNULL((1)) int
 NOTHROW_RPC_KOS(LIBCCALL libc_utmpname)(char const *file)
-/*[[[body:utmpname]]]*/
-{
+/*[[[body:libc_utmpname]]]*/
+/*AUTO*/{
 	(void)file;
 	CRT_UNIMPLEMENTED("utmpname"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:utmpname]]]*/
+/*[[[end:libc_utmpname]]]*/
 
-/*[[[head:getutent,hash:CRC-32=0xe9817520]]]*/
+/*[[[head:libc_getutent,hash:CRC-32=0x2a141ce]]]*/
 /* Read next entry from a utmp-like file */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.getutent") struct utmp *
+INTERN ATTR_SECTION(".text.crt.database.utmp") struct utmp *
 NOTHROW_RPC_KOS(LIBCCALL libc_getutent)(void)
-/*[[[body:getutent]]]*/
-{
+/*[[[body:libc_getutent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("getutent"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getutent]]]*/
+/*[[[end:libc_getutent]]]*/
 
-/*[[[head:setutent,hash:CRC-32=0x6cb582bb]]]*/
+/*[[[head:libc_setutent,hash:CRC-32=0x82568b11]]]*/
 /* Reset the input stream to the beginning of the file */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.setutent") void
+INTERN ATTR_SECTION(".text.crt.database.utmp") void
 NOTHROW_RPC_KOS(LIBCCALL libc_setutent)(void)
-/*[[[body:setutent]]]*/
-{
+/*[[[body:libc_setutent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("setutent"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:setutent]]]*/
+/*[[[end:libc_setutent]]]*/
 
-/*[[[head:endutent,hash:CRC-32=0x6784bc4b]]]*/
+/*[[[head:libc_endutent,hash:CRC-32=0x52de6168]]]*/
 /* Close the current open file */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.endutent") void
+INTERN ATTR_SECTION(".text.crt.database.utmp") void
 NOTHROW_NCX(LIBCCALL libc_endutent)(void)
-/*[[[body:endutent]]]*/
-{
+/*[[[body:libc_endutent]]]*/
+/*AUTO*/{
 	CRT_UNIMPLEMENTED("endutent"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
-/*[[[end:endutent]]]*/
+/*[[[end:libc_endutent]]]*/
 
-/*[[[head:getutid,hash:CRC-32=0x425c0421]]]*/
+/*[[[head:libc_getutid,hash:CRC-32=0x77943bc1]]]*/
 /* Search forward from the current point in the utmp file
  * until the next entry with a ut_type matching ID->ut_type */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.getutid") struct utmp *
+INTERN ATTR_SECTION(".text.crt.database.utmp") NONNULL((1)) struct utmp *
 NOTHROW_RPC_KOS(LIBCCALL libc_getutid)(struct utmp const *id)
-/*[[[body:getutid]]]*/
-{
+/*[[[body:libc_getutid]]]*/
+/*AUTO*/{
 	(void)id;
 	CRT_UNIMPLEMENTED("getutid"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getutid]]]*/
+/*[[[end:libc_getutid]]]*/
 
-/*[[[head:getutline,hash:CRC-32=0x4ace86dd]]]*/
+/*[[[head:libc_getutline,hash:CRC-32=0x7b4b9959]]]*/
 /* Search forward from the current point in the utmp file
  * until the next entry with a ut_line matching LINE->ut_line */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.getutline") struct utmp *
+INTERN ATTR_SECTION(".text.crt.database.utmp") NONNULL((1)) struct utmp *
 NOTHROW_RPC_KOS(LIBCCALL libc_getutline)(struct utmp const *line)
-/*[[[body:getutline]]]*/
-{
+/*[[[body:libc_getutline]]]*/
+/*AUTO*/{
 	(void)line;
 	CRT_UNIMPLEMENTED("getutline"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:getutline]]]*/
+/*[[[end:libc_getutline]]]*/
 
-/*[[[head:pututline,hash:CRC-32=0x79dbc6fc]]]*/
+/*[[[head:libc_pututline,hash:CRC-32=0xaaebab74]]]*/
 /* Write out entry pointed to by UTMP_PTR into the utmp file */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.pututline") struct utmp *
+INTERN ATTR_SECTION(".text.crt.database.utmp") NONNULL((1)) struct utmp *
 NOTHROW_RPC_KOS(LIBCCALL libc_pututline)(struct utmp const *utmp_ptr)
-/*[[[body:pututline]]]*/
-{
+/*[[[body:libc_pututline]]]*/
+/*AUTO*/{
 	(void)utmp_ptr;
 	CRT_UNIMPLEMENTED("pututline"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
-/*[[[end:pututline]]]*/
+/*[[[end:libc_pututline]]]*/
 
-/*[[[head:getutent_r,hash:CRC-32=0xcf0e8f9d]]]*/
+/*[[[head:libc_getutent_r,hash:CRC-32=0xd2fd2aa3]]]*/
 /* Reentrant versions of the file for handling utmp files */
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.getutent_r") int
+INTERN ATTR_SECTION(".text.crt.database.utmp") NONNULL((1, 2)) int
 NOTHROW_RPC_KOS(LIBCCALL libc_getutent_r)(struct utmp *buffer,
                                           struct utmp **result)
-/*[[[body:getutent_r]]]*/
-{
+/*[[[body:libc_getutent_r]]]*/
+/*AUTO*/{
 	(void)buffer;
 	(void)result;
 	CRT_UNIMPLEMENTED("getutent_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getutent_r]]]*/
+/*[[[end:libc_getutent_r]]]*/
 
-/*[[[head:getutid_r,hash:CRC-32=0x8c7a81b1]]]*/
+/*[[[head:libc_getutid_r,hash:CRC-32=0x95a5b62f]]]*/
 /* Reentrant versions of the file for handling utmp files */
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.getutid_r") int
+INTERN ATTR_SECTION(".text.crt.database.utmp") NONNULL((1, 2, 3)) int
 NOTHROW_RPC_KOS(LIBCCALL libc_getutid_r)(struct utmp const *id,
                                          struct utmp *buffer,
                                          struct utmp **result)
-/*[[[body:getutid_r]]]*/
-{
+/*[[[body:libc_getutid_r]]]*/
+/*AUTO*/{
 	(void)id;
 	(void)buffer;
 	(void)result;
 	CRT_UNIMPLEMENTED("getutid_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getutid_r]]]*/
+/*[[[end:libc_getutid_r]]]*/
 
-/*[[[head:getutline_r,hash:CRC-32=0xb2d7fc9b]]]*/
+/*[[[head:libc_getutline_r,hash:CRC-32=0x3a490b00]]]*/
 /* Reentrant versions of the file for handling utmp files */
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.database.utmp.getutline_r") int
+INTERN ATTR_SECTION(".text.crt.database.utmp") NONNULL((1, 2, 3)) int
 NOTHROW_RPC_KOS(LIBCCALL libc_getutline_r)(struct utmp const *line,
                                            struct utmp *buffer,
                                            struct utmp **result)
-/*[[[body:getutline_r]]]*/
-{
+/*[[[body:libc_getutline_r]]]*/
+/*AUTO*/{
 	(void)line;
 	(void)buffer;
 	(void)result;
 	CRT_UNIMPLEMENTED("getutline_r"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:getutline_r]]]*/
+/*[[[end:libc_getutline_r]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x705431a9]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(login_tty, libc_login_tty);
-DEFINE_PUBLIC_WEAK_ALIAS(login, libc_login);
-DEFINE_PUBLIC_WEAK_ALIAS(logout, libc_logout);
-DEFINE_PUBLIC_WEAK_ALIAS(logwtmp, libc_logwtmp);
-DEFINE_PUBLIC_WEAK_ALIAS(updwtmp, libc_updwtmp);
-DEFINE_PUBLIC_WEAK_ALIAS(utmpname, libc_utmpname);
-DEFINE_PUBLIC_WEAK_ALIAS(getutent, libc_getutent);
-DEFINE_PUBLIC_WEAK_ALIAS(setutent, libc_setutent);
-DEFINE_PUBLIC_WEAK_ALIAS(endutent, libc_endutent);
-DEFINE_PUBLIC_WEAK_ALIAS(getutid, libc_getutid);
-DEFINE_PUBLIC_WEAK_ALIAS(getutline, libc_getutline);
-DEFINE_PUBLIC_WEAK_ALIAS(pututline, libc_pututline);
-DEFINE_PUBLIC_WEAK_ALIAS(getutent_r, libc_getutent_r);
-DEFINE_PUBLIC_WEAK_ALIAS(getutid_r, libc_getutid_r);
-DEFINE_PUBLIC_WEAK_ALIAS(getutline_r, libc_getutline_r);
+/*[[[start:exports,hash:CRC-32=0x726e9e3f]]]*/
+DEFINE_PUBLIC_ALIAS(login_tty, libc_login_tty);
+DEFINE_PUBLIC_ALIAS(login, libc_login);
+DEFINE_PUBLIC_ALIAS(logout, libc_logout);
+DEFINE_PUBLIC_ALIAS(logwtmp, libc_logwtmp);
+DEFINE_PUBLIC_ALIAS(updwtmp, libc_updwtmp);
+DEFINE_PUBLIC_ALIAS(utmpname, libc_utmpname);
+DEFINE_PUBLIC_ALIAS(getutent, libc_getutent);
+DEFINE_PUBLIC_ALIAS(setutent, libc_setutent);
+DEFINE_PUBLIC_ALIAS(endutent, libc_endutent);
+DEFINE_PUBLIC_ALIAS(getutid, libc_getutid);
+DEFINE_PUBLIC_ALIAS(getutline, libc_getutline);
+DEFINE_PUBLIC_ALIAS(pututline, libc_pututline);
+DEFINE_PUBLIC_ALIAS(getutent_r, libc_getutent_r);
+DEFINE_PUBLIC_ALIAS(getutid_r, libc_getutid_r);
+DEFINE_PUBLIC_ALIAS(getutline_r, libc_getutline_r);
 /*[[[end:exports]]]*/
 
 DECL_END

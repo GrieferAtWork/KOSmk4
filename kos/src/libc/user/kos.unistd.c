@@ -51,50 +51,42 @@ DECLARE_NOREL_GLOBAL_META(char **, environ);
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:Execv,hash:CRC-32=0x20d6d5c5]]]*/
+/*[[[head:libc_Execv,hash:CRC-32=0x17a5ddde]]]*/
 /* >> execv(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-INTERN ATTR_NORETURN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execv") void
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2)) void
 (LIBCCALL libc_Execv)(char const *__restrict path,
-                      __TARGV)
-		__THROWS(...)
-/*[[[body:Execv]]]*/
+                      __TARGV) THROWS(...)
+/*[[[body:libc_Execv]]]*/
 {
 	sys_Xexecve(path, ___argv, environ);
 	__builtin_unreachable();
 }
-/*[[[end:Execv]]]*/
+/*[[[end:libc_Execv]]]*/
 
-/*[[[skip:Execve]]]*/
-
-/*[[[head:Execvp,hash:CRC-32=0x3e8d8bfa]]]*/
+/*[[[head:libc_Execvp,hash:CRC-32=0x97e853b1]]]*/
 /* >> execvp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-INTERN ATTR_NORETURN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execvp") void
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2)) void
 (LIBCCALL libc_Execvp)(char const *__restrict file,
-                       __TARGV)
-		__THROWS(...)
-/*[[[body:Execvp]]]*/
+                       __TARGV) THROWS(...)
+/*[[[body:libc_Execvp]]]*/
 {
 	libc_Execvpe(file, ___argv, environ);
 }
-/*[[[end:Execvp]]]*/
+/*[[[end:libc_Execvp]]]*/
 
-/*[[[head:Execvpe,hash:CRC-32=0x104dbbbf]]]*/
+/*[[[head:libc_Execvpe,hash:CRC-32=0xc71178b5]]]*/
 /* >> execvpe(3)
  * Replace the calling process with the application image referred to by `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-INTERN ATTR_NORETURN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execvpe") void
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2, 3)) void
 (LIBCCALL libc_Execvpe)(char const *__restrict file,
                         __TARGV,
-                        __TENVP)
-		__THROWS(...)
-/*[[[body:Execvpe]]]*/
+                        __TENVP) THROWS(...)
+/*[[[body:libc_Execvpe]]]*/
 {
 	/* Search $PATH */
 	size_t taillen = strlen(file);
@@ -134,21 +126,19 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execvpe") void
 	}
 	THROW(E_FSERROR_FILE_NOT_FOUND);
 }
-/*[[[end:Execvpe]]]*/
+/*[[[end:libc_Execvpe]]]*/
 
 
 
-/*[[[head:Execl,hash:CRC-32=0xe0bb8799]]]*/
+/*[[[head:libc_Execl,hash:CRC-32=0xfeda1e35]]]*/
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
-INTERN ATTR_NORETURN ATTR_SENTINEL NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execl") void
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void
 (VLIBCCALL libc_Execl)(char const *__restrict path,
                        char const *args,
-                       ... /*, (char *)NULL*/)
-		__THROWS(...)
-/*[[[body:Execl]]]*/
+                       ...) THROWS(...)
+/*[[[body:libc_Execl]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
 	Execv(path,
@@ -164,19 +154,18 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execl") void
 #endif
 	__builtin_unreachable();
 }
-/*[[[end:Execl]]]*/
+/*[[[end:libc_Execl]]]*/
 
-/*[[[head:Execle,hash:CRC-32=0x9715277c]]]*/
+/*[[[head:libc_Execle,hash:CRC-32=0x8d7fd6d]]]*/
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-INTERN ATTR_NORETURN NONNULL((1)) ATTR_SENTINEL_O(1)
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execle") void
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * and setting `environ' to a `char **' passed after the NULL sentinel */
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void
 (VLIBCCALL libc_Execle)(char const *__restrict path,
                         char const *args,
-                        ... /*, (char *)NULL, (char **)environ*/)
-		__THROWS(...)
-/*[[[body:Execle]]]*/
+                        ...) THROWS(...)
+/*[[[body:libc_Execle]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
 	char ***penvp = (char ***)&args;
@@ -198,19 +187,17 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execle") void
 #endif
 	__builtin_unreachable();
 }
-/*[[[end:Execle]]]*/
+/*[[[end:libc_Execle]]]*/
 
-/*[[[head:Execpl,hash:CRC-32=0x99e46934]]]*/
+/*[[[head:libc_Execpl,hash:CRC-32=0x28fa657d]]]*/
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
-INTERN ATTR_NORETURN ATTR_SENTINEL NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execpl") void
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void
 (VLIBCCALL libc_Execpl)(char const *__restrict file,
                         char const *args,
-                        ... /*, (char *)NULL*/)
-		__THROWS(...)
-/*[[[body:Execpl]]]*/
+                        ...) THROWS(...)
+/*[[[body:libc_Execpl]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
 	Execvp(file,
@@ -226,19 +213,18 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execpl") void
 #endif
 	__builtin_unreachable();
 }
-/*[[[end:Execpl]]]*/
+/*[[[end:libc_Execpl]]]*/
 
-/*[[[head:Execlpe,hash:CRC-32=0xcc5ade4b]]]*/
+/*[[[head:libc_Execlpe,hash:CRC-32=0x2de7c8ab]]]*/
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-INTERN ATTR_NORETURN NONNULL((1)) ATTR_SENTINEL_O(1)
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execlpe") void
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * and setting `environ' to a `char **' passed after the NULL sentinel */
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void
 (VLIBCCALL libc_Execlpe)(char const *__restrict file,
                          char const *args,
-                         ... /*, (char *)NULL, (char **)environ*/)
-		__THROWS(...)
-/*[[[body:Execlpe]]]*/
+                         ...) THROWS(...)
+/*[[[body:libc_Execlpe]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
 	char ***penvp = (char ***)&args;
@@ -260,54 +246,50 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execlpe") void
 #endif
 	__builtin_unreachable();
 }
-/*[[[end:Execlpe]]]*/
+/*[[[end:libc_Execlpe]]]*/
 
-/*[[[head:FPathConf,hash:CRC-32=0x5faeff12]]]*/
+/*[[[head:libc_FPathConf,hash:CRC-32=0xa719e6c2]]]*/
 /* >> fpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.property.FPathConf") long int
+INTERN ATTR_SECTION(".text.crt.except.fs.property") WUNUSED long int
 (LIBCCALL libc_FPathConf)(fd_t fd,
-                          int name)
-		__THROWS(...)
-/*[[[body:FPathConf]]]*/
-{
+                          int name) THROWS(...)
+/*[[[body:libc_FPathConf]]]*/
+/*AUTO*/{
 	(void)fd;
 	(void)name;
 	CRT_UNIMPLEMENTED("FPathConf"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:FPathConf]]]*/
+/*[[[end:libc_FPathConf]]]*/
 
-/*[[[head:PathConf,hash:CRC-32=0xf7fe9fe2]]]*/
+/*[[[head:libc_PathConf,hash:CRC-32=0x3dead8f3]]]*/
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.property.PathConf") long int
+INTERN ATTR_SECTION(".text.crt.except.fs.property") NONNULL((1)) long int
 (LIBCCALL libc_PathConf)(char const *path,
-                         int name)
-		__THROWS(...)
-/*[[[body:PathConf]]]*/
-{
+                         int name) THROWS(...)
+/*[[[body:libc_PathConf]]]*/
+/*AUTO*/{
 	(void)path;
 	(void)name;
 	CRT_UNIMPLEMENTED("PathConf"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return -1;
+	return 0;
 }
-/*[[[end:PathConf]]]*/
+/*[[[end:libc_PathConf]]]*/
 
 
-/*[[[head:ReadAll,hash:CRC-32=0x9dde3e2c]]]*/
+/*[[[head:libc_ReadAll,hash:CRC-32=0x65a5d0e4]]]*/
 /* >> readall(3)
  * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
@@ -315,13 +297,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.property.PathConf") long int
  * If an error occurrs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.io.read.ReadAll") size_t
+INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
 (LIBCCALL libc_ReadAll)(fd_t fd,
                         void *buf,
-                        size_t bufsize)
-		__THROWS(...)
-/*[[[body:ReadAll]]]*/
+                        size_t bufsize) THROWS(...)
+/*[[[body:libc_ReadAll]]]*/
 {
 	size_t result, temp;
 	result = Read(fd, buf, bufsize);
@@ -350,17 +330,16 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.io.read.ReadAll") size_t
 	}
 	return result;
 }
-/*[[[end:ReadAll]]]*/
+/*[[[end:libc_ReadAll]]]*/
 
 
-/*[[[head:GetCwd,hash:CRC-32=0x74bb4835]]]*/
+/*[[[head:libc_GetCwd,hash:CRC-32=0xa34d7bfa]]]*/
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.basic_property.GetCwd") char *
+INTERN ATTR_SECTION(".text.crt.except.fs.basic_property") char *
 (LIBCCALL libc_GetCwd)(char *buf,
-                       size_t bufsize)
-		__THROWS(...)
-/*[[[body:GetCwd]]]*/
+                       size_t bufsize) THROWS(...)
+/*[[[body:libc_GetCwd]]]*/
 {
 	size_t result;
 	char *buffer = buf;
@@ -407,70 +386,62 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.basic_property.GetCwd") char 
 	}
 	return buffer;
 }
-/*[[[end:GetCwd]]]*/
+/*[[[end:libc_GetCwd]]]*/
 
-/*[[[head:PRead,hash:CRC-32=0x88aea0de]]]*/
+/*[[[head:libc_PRead,hash:CRC-32=0xb3504a36]]]*/
 /* >> pread(2)
  * Read data from a file at a specific offset */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.io.read.PRead") size_t
+INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
 (LIBCCALL libc_PRead)(fd_t fd,
                       void *buf,
                       size_t bufsize,
-                      pos_t offset)
-		__THROWS(...)
-/*[[[body:PRead]]]*/
+                      pos_t offset) THROWS(...)
+/*[[[body:libc_PRead]]]*/
 {
 	return (size_t)sys_Xpread64(fd, buf, bufsize, (u64)offset);
 }
-/*[[[end:PRead]]]*/
+/*[[[end:libc_PRead]]]*/
 
-/*[[[head:PWrite,hash:CRC-32=0x544807fa]]]*/
+/*[[[head:libc_PWrite,hash:CRC-32=0xd6c42a2c]]]*/
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.io.write.PWrite") size_t
+INTERN ATTR_SECTION(".text.crt.except.io.write") NONNULL((2)) size_t
 (LIBCCALL libc_PWrite)(fd_t fd,
                        void const *buf,
                        size_t bufsize,
-                       pos_t offset)
-		__THROWS(...)
-/*[[[body:PWrite]]]*/
+                       pos_t offset) THROWS(...)
+/*[[[body:libc_PWrite]]]*/
 {
 	return (size_t)sys_Xpwrite64(fd, buf, bufsize, (u64)offset);
 }
-/*[[[end:PWrite]]]*/
+/*[[[end:libc_PWrite]]]*/
 
-/*[[[head:PReadAll,hash:CRC-32=0x42a91a7f]]]*/
+/*[[[head:libc_PReadAll,hash:CRC-32=0x42df31c5]]]*/
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.io.read.PReadAll") size_t
+INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
 (LIBCCALL libc_PReadAll)(fd_t fd,
                          void *buf,
                          size_t bufsize,
-                         pos_t offset)
-		__THROWS(...)
-/*[[[body:PReadAll]]]*/
+                         pos_t offset) THROWS(...)
+/*[[[body:libc_PReadAll]]]*/
 {
 	return PReadAll64(fd, buf, bufsize, offset);
 }
-/*[[[end:PReadAll]]]*/
+/*[[[end:libc_PReadAll]]]*/
 
-/*[[[head:PReadAll64,hash:CRC-32=0x25e9c92b]]]*/
-/* >> preadall64(3)
- * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
+/*[[[head:libc_PReadAll64,hash:CRC-32=0x2ef5e7a0]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_PReadAll64, libc_PReadAll);
-#else
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.io.large.read.PReadAll64") size_t
+#else /* MAGIC:alias */
+/* >> preadall64(3)
+ * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
+INTERN ATTR_SECTION(".text.crt.except.io.large.read") NONNULL((2)) size_t
 (LIBCCALL libc_PReadAll64)(fd_t fd,
                            void *buf,
                            size_t bufsize,
-                           pos64_t offset)
-		__THROWS(...)
-/*[[[body:PReadAll64]]]*/
+                           pos64_t offset) THROWS(...)
+/*[[[body:libc_PReadAll64]]]*/
 {
 	size_t result, temp;
 	result = PRead64(fd, buf, bufsize, offset);
@@ -493,30 +464,26 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.io.large.read.PReadAll64") size_t
 	return result;
 }
 #endif /* MAGIC:alias */
-/*[[[end:PReadAll64]]]*/
+/*[[[end:libc_PReadAll64]]]*/
 
-/*[[[head:GetCurrentDirName,hash:CRC-32=0x7906c608]]]*/
-INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.basic_property.GetCurrentDirName") char *
-(LIBCCALL libc_GetCurrentDirName)(void)
-		__THROWS(...)
-/*[[[body:GetCurrentDirName]]]*/
+/*[[[head:libc_GetCurrentDirName,hash:CRC-32=0x749e7a69]]]*/
+INTERN ATTR_SECTION(".text.crt.except.fs.basic_property") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *
+(LIBCCALL libc_GetCurrentDirName)(void) THROWS(...)
+/*[[[body:libc_GetCurrentDirName]]]*/
 {
 	return GetCwd(NULL, 0);
 }
-/*[[[end:GetCurrentDirName]]]*/
+/*[[[end:libc_GetCurrentDirName]]]*/
 
-/*[[[head:FExecve,hash:CRC-32=0x9cc9a3ce]]]*/
+/*[[[head:libc_FExecve,hash:CRC-32=0xacec86d9]]]*/
 /* >> fexecve(2)
  * Replace the calling process with the application image referred to by `FD' and
  * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-INTERN ATTR_NORETURN NONNULL((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.FExecve") void
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((2, 3)) void
 (LIBCCALL libc_FExecve)(fd_t fd,
                         __TARGV,
-                        __TENVP)
-		__THROWS(...)
-/*[[[body:FExecve]]]*/
+                        __TENVP) THROWS(...)
+/*[[[body:libc_FExecve]]]*/
 {
 	sys_Xexecveat(fd,
 	              "",
@@ -525,13 +492,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.FExecve") void
 	              AT_EMPTY_PATH);
 	__builtin_unreachable();
 }
-/*[[[end:FExecve]]]*/
+/*[[[end:libc_FExecve]]]*/
 
-/*[[[head:Nice,hash:CRC-32=0xdb38ede6]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.param.Nice") int
-(LIBCCALL libc_Nice)(int inc)
-		__THROWS(...)
-/*[[[body:Nice]]]*/
+/*[[[head:libc_Nice,hash:CRC-32=0x857a694b]]]*/
+INTERN ATTR_SECTION(".text.crt.except.sched.param") int
+(LIBCCALL libc_Nice)(int inc) THROWS(...)
+/*[[[body:libc_Nice]]]*/
 {
 #ifdef __sys_Xnice_defined
 	return 20 - sys_Xnice(inc);
@@ -545,31 +511,29 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.param.Nice") int
 	return 20 - prio;
 #endif /* !__sys_Xnice_defined */
 }
-/*[[[end:Nice]]]*/
+/*[[[end:libc_Nice]]]*/
 
-/*[[[head:SetPGrp,hash:CRC-32=0xd2c4da8b]]]*/
+/*[[[head:libc_SetPGrp,hash:CRC-32=0xc2d23811]]]*/
 /* >> setpgrp(3)
  * Move the calling process into its own process group.
  * Equivalent to `setpgid(0, 0)' */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.process.SetPGrp") void
-(LIBCCALL libc_SetPGrp)(void)
-		__THROWS(...)
-/*[[[body:SetPGrp]]]*/
+INTERN ATTR_SECTION(".text.crt.except.sched.process") void
+(LIBCCALL libc_SetPGrp)(void) THROWS(...)
+/*[[[body:libc_SetPGrp]]]*/
 {
 	sys_Xsetpgid(0, 0);
 }
-/*[[[end:SetPGrp]]]*/
+/*[[[end:libc_SetPGrp]]]*/
 
-/*[[[head:SetEUid,hash:CRC-32=0xee65fbd2]]]*/
+/*[[[head:libc_SetEUid,hash:CRC-32=0xdf1a87ff]]]*/
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `EUID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.user.SetEUid") void
-(LIBCCALL libc_SetEUid)(uid_t euid)
-		__THROWS(...)
-/*[[[body:SetEUid]]]*/
+INTERN ATTR_SECTION(".text.crt.except.sched.user") void
+(LIBCCALL libc_SetEUid)(uid_t euid) THROWS(...)
+/*[[[body:libc_SetEUid]]]*/
 {
 #ifdef SYS_getresuid32
 	uint32_t ruid;
@@ -581,18 +545,17 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.user.SetEUid") void
 	sys_Xsetreuid(ruid, euid);
 #endif /* !SYS_getresuid32 */
 }
-/*[[[end:SetEUid]]]*/
+/*[[[end:libc_SetEUid]]]*/
 
-/*[[[head:SetEGid,hash:CRC-32=0x1eb8561a]]]*/
+/*[[[head:libc_SetEGid,hash:CRC-32=0xa634d45f]]]*/
 /* >> setegid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `EGID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.user.SetEGid") void
-(LIBCCALL libc_SetEGid)(gid_t egid)
-		__THROWS(...)
-/*[[[body:SetEGid]]]*/
+INTERN ATTR_SECTION(".text.crt.except.sched.user") void
+(LIBCCALL libc_SetEGid)(gid_t egid) THROWS(...)
+/*[[[body:libc_SetEGid]]]*/
 {
 #ifdef SYS_getresgid32
 	uint32_t rgid;
@@ -604,17 +567,15 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.user.SetEGid") void
 	sys_Xsetregid(rgid, egid);
 #endif /* !SYS_getresgid32 */
 }
-/*[[[end:SetEGid]]]*/
+/*[[[end:libc_SetEGid]]]*/
 
-/*[[[head:GetHostName,hash:CRC-32=0x6c477876]]]*/
+/*[[[head:libc_GetHostName,hash:CRC-32=0x76a2aaf6]]]*/
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.system.configuration.GetHostName") void
+INTERN ATTR_SECTION(".text.crt.except.system.configuration") NONNULL((1)) void
 (LIBCCALL libc_GetHostName)(char *name,
-                            size_t buflen)
-		__THROWS(...)
-/*[[[body:GetHostName]]]*/
+                            size_t buflen) THROWS(...)
+/*[[[body:libc_GetHostName]]]*/
 {
 	struct utsname uts;
 	size_t len;
@@ -625,17 +586,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.system.configuration.GetHostName") void
 	memcpy(name, uts.nodename, len, sizeof(char));
 	name[len] = '\0';
 }
-/*[[[end:GetHostName]]]*/
+/*[[[end:libc_GetHostName]]]*/
 
-/*[[[head:GetDomainName,hash:CRC-32=0x19e73961]]]*/
+/*[[[head:libc_GetDomainName,hash:CRC-32=0x39d964ef]]]*/
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.except.system.configuration.GetDomainName") void
+INTERN ATTR_SECTION(".text.crt.except.system.configuration") NONNULL((1)) void
 (LIBCCALL libc_GetDomainName)(char *name,
-                              size_t buflen)
-		__THROWS(...)
-/*[[[body:GetDomainName]]]*/
+                              size_t buflen) THROWS(...)
+/*[[[body:libc_GetDomainName]]]*/
 {
 	struct utsname uts;
 	size_t len;
@@ -646,95 +605,92 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.system.configuration.GetDomainName") vo
 	memcpy(name, uts.domainname, len, sizeof(char));
 	name[len] = '\0';
 }
-/*[[[end:GetDomainName]]]*/
+/*[[[end:libc_GetDomainName]]]*/
 
 
-/*[[[skip:Pipe]]]*/
-/*[[[skip:SetPGid]]]*/
-/*[[[skip:SetSid]]]*/
-/*[[[skip:SetUid]]]*/
-/*[[[skip:SetGid]]]*/
-/*[[[skip:Fork]]]*/
-/*[[[skip:Chown]]]*/
-/*[[[skip:Link]]]*/
-/*[[[skip:Read]]]*/
-/*[[[skip:Write]]]*/
-/*[[[skip:LSeek]]]*/
-/*[[[skip:Dup2]]]*/
-/*[[[skip:Dup]]]*/
-/*[[[skip:Chdir]]]*/
-/*[[[skip:Unlink]]]*/
-/*[[[skip:Rmdir]]]*/
-/*[[[skip:FChownAt]]]*/
-/*[[[skip:LinkAt]]]*/
-/*[[[skip:SymlinkAt]]]*/
-/*[[[skip:ReadlinkAt]]]*/
-/*[[[skip:FReadlinkAt]]]*/
-/*[[[skip:UnlinkAt]]]*/
-/*[[[skip:LSeek64]]]*/
-/*[[[skip:PRead64]]]*/
-/*[[[skip:PWrite64]]]*/
-/*[[[skip:Pipe2]]]*/
-/*[[[skip:Dup3]]]*/
-/*[[[skip:SyncFs]]]*/
-/*[[[skip:GetResUid]]]*/
-/*[[[skip:GetResGid]]]*/
-/*[[[skip:SetResUid]]]*/
-/*[[[skip:SetResGid]]]*/
-/*[[[skip:VFork]]]*/
-/*[[[skip:FChown]]]*/
-/*[[[skip:FChdir]]]*/
-/*[[[skip:GetPGid]]]*/
-/*[[[skip:GetSid]]]*/
-/*[[[skip:LChown]]]*/
-/*[[[skip:Truncate]]]*/
-/*[[[skip:Truncate64]]]*/
-/*[[[skip:SetReUid]]]*/
-/*[[[skip:SetReGid]]]*/
-/*[[[skip:Symlink]]]*/
-/*[[[skip:Readlink]]]*/
-/*[[[skip:SetHostName]]]*/
-/*[[[skip:SetDomainName]]]*/
-/*[[[skip:ChRoot]]]*/
-/*[[[skip:FTruncate64]]]*/
-/*[[[skip:FDataSync]]]*/
-/*[[[skip:Syscall]]]*/
-/*[[[skip:Syscall64]]]*/
-/*[[[skip:FTruncate]]]*/
-/*[[[skip:FSync]]]*/
+/*[[[skip:libc_Execve]]]*/
+/*[[[skip:libc_Pipe]]]*/
+/*[[[skip:libc_SetPGid]]]*/
+/*[[[skip:libc_SetSid]]]*/
+/*[[[skip:libc_SetUid]]]*/
+/*[[[skip:libc_SetGid]]]*/
+/*[[[skip:libc_Fork]]]*/
+/*[[[skip:libc_Chown]]]*/
+/*[[[skip:libc_Link]]]*/
+/*[[[skip:libc_Read]]]*/
+/*[[[skip:libc_Write]]]*/
+/*[[[skip:libc_LSeek]]]*/
+/*[[[skip:libc_Dup2]]]*/
+/*[[[skip:libc_Dup]]]*/
+/*[[[skip:libc_Chdir]]]*/
+/*[[[skip:libc_Unlink]]]*/
+/*[[[skip:libc_Rmdir]]]*/
+/*[[[skip:libc_FChownAt]]]*/
+/*[[[skip:libc_LinkAt]]]*/
+/*[[[skip:libc_SymlinkAt]]]*/
+/*[[[skip:libc_ReadlinkAt]]]*/
+/*[[[skip:libc_FReadlinkAt]]]*/
+/*[[[skip:libc_UnlinkAt]]]*/
+/*[[[skip:libc_LSeek64]]]*/
+/*[[[skip:libc_PRead64]]]*/
+/*[[[skip:libc_PWrite64]]]*/
+/*[[[skip:libc_Pipe2]]]*/
+/*[[[skip:libc_Dup3]]]*/
+/*[[[skip:libc_SyncFs]]]*/
+/*[[[skip:libc_GetResUid]]]*/
+/*[[[skip:libc_GetResGid]]]*/
+/*[[[skip:libc_SetResUid]]]*/
+/*[[[skip:libc_SetResGid]]]*/
+/*[[[skip:libc_VFork]]]*/
+/*[[[skip:libc_FChown]]]*/
+/*[[[skip:libc_FChdir]]]*/
+/*[[[skip:libc_GetPGid]]]*/
+/*[[[skip:libc_GetSid]]]*/
+/*[[[skip:libc_LChown]]]*/
+/*[[[skip:libc_Truncate]]]*/
+/*[[[skip:libc_Truncate64]]]*/
+/*[[[skip:libc_SetReUid]]]*/
+/*[[[skip:libc_SetReGid]]]*/
+/*[[[skip:libc_Symlink]]]*/
+/*[[[skip:libc_Readlink]]]*/
+/*[[[skip:libc_SetHostName]]]*/
+/*[[[skip:libc_SetDomainName]]]*/
+/*[[[skip:libc_ChRoot]]]*/
+/*[[[skip:libc_FTruncate64]]]*/
+/*[[[skip:libc_FDataSync]]]*/
+/*[[[skip:libc_Syscall]]]*/
+/*[[[skip:libc_Syscall64]]]*/
+/*[[[skip:libc_FTruncate]]]*/
+/*[[[skip:libc_FSync]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x73c8397f]]]*/
-#undef Execl
-#undef Execle
-#undef Execpl
-#undef Execlpe
-DEFINE_PUBLIC_WEAK_ALIAS(Execv, libc_Execv);
-DEFINE_PUBLIC_WEAK_ALIAS(Execvp, libc_Execvp);
-DEFINE_PUBLIC_WEAK_ALIAS(Execl, libc_Execl);
-DEFINE_PUBLIC_WEAK_ALIAS(Execle, libc_Execle);
-DEFINE_PUBLIC_WEAK_ALIAS(Execpl, libc_Execpl);
-DEFINE_PUBLIC_WEAK_ALIAS(Execlpe, libc_Execlpe);
-DEFINE_PUBLIC_WEAK_ALIAS(FPathConf, libc_FPathConf);
-DEFINE_PUBLIC_WEAK_ALIAS(PathConf, libc_PathConf);
-DEFINE_PUBLIC_WEAK_ALIAS(ReadAll, libc_ReadAll);
-DEFINE_PUBLIC_WEAK_ALIAS(GetCwd, libc_GetCwd);
-DEFINE_PUBLIC_WEAK_ALIAS(PRead, libc_PRead);
-DEFINE_PUBLIC_WEAK_ALIAS(PWrite, libc_PWrite);
-DEFINE_PUBLIC_WEAK_ALIAS(PReadAll, libc_PReadAll);
-DEFINE_PUBLIC_WEAK_ALIAS(PReadAll64, libc_PReadAll64);
-DEFINE_PUBLIC_WEAK_ALIAS(GetCurrentDirName, libc_GetCurrentDirName);
-DEFINE_PUBLIC_WEAK_ALIAS(FExecve, libc_FExecve);
-DEFINE_PUBLIC_WEAK_ALIAS(Execvpe, libc_Execvpe);
-DEFINE_PUBLIC_WEAK_ALIAS(Nice, libc_Nice);
-DEFINE_PUBLIC_WEAK_ALIAS(SetPGrp, libc_SetPGrp);
-DEFINE_PUBLIC_WEAK_ALIAS(SetEUid, libc_SetEUid);
-DEFINE_PUBLIC_WEAK_ALIAS(SetEGid, libc_SetEGid);
-DEFINE_PUBLIC_WEAK_ALIAS(GetHostName, libc_GetHostName);
-DEFINE_PUBLIC_WEAK_ALIAS(GetDomainName, libc_GetDomainName);
+/*[[[start:exports,hash:CRC-32=0xda6bf7b6]]]*/
+DEFINE_PUBLIC_ALIAS(Execv, libc_Execv);
+DEFINE_PUBLIC_ALIAS(Execvp, libc_Execvp);
+DEFINE_PUBLIC_ALIAS(Execl, libc_Execl);
+DEFINE_PUBLIC_ALIAS(Execle, libc_Execle);
+DEFINE_PUBLIC_ALIAS(Execpl, libc_Execpl);
+DEFINE_PUBLIC_ALIAS(Execlpe, libc_Execlpe);
+DEFINE_PUBLIC_ALIAS(FPathConf, libc_FPathConf);
+DEFINE_PUBLIC_ALIAS(PathConf, libc_PathConf);
+DEFINE_PUBLIC_ALIAS(ReadAll, libc_ReadAll);
+DEFINE_PUBLIC_ALIAS(GetCwd, libc_GetCwd);
+DEFINE_PUBLIC_ALIAS(PRead, libc_PRead);
+DEFINE_PUBLIC_ALIAS(PWrite, libc_PWrite);
+DEFINE_PUBLIC_ALIAS(PReadAll, libc_PReadAll);
+DEFINE_PUBLIC_ALIAS(PReadAll64, libc_PReadAll64);
+DEFINE_PUBLIC_ALIAS(GetCurrentDirName, libc_GetCurrentDirName);
+DEFINE_PUBLIC_ALIAS(FExecve, libc_FExecve);
+DEFINE_PUBLIC_ALIAS(Execvpe, libc_Execvpe);
+DEFINE_PUBLIC_ALIAS(Nice, libc_Nice);
+DEFINE_PUBLIC_ALIAS(SetPGrp, libc_SetPGrp);
+DEFINE_PUBLIC_ALIAS(SetEUid, libc_SetEUid);
+DEFINE_PUBLIC_ALIAS(SetEGid, libc_SetEGid);
+DEFINE_PUBLIC_ALIAS(GetHostName, libc_GetHostName);
+DEFINE_PUBLIC_ALIAS(GetDomainName, libc_GetDomainName);
 /*[[[end:exports]]]*/
 
 DECL_END

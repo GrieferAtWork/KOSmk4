@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce04625a */
+/* HASH CRC-32:0xe5f9edac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,9 @@ DECL_BEGIN
  * `PARGZ', and the total length in `PLEN'. If a memory allocation error occurs,
  * `ENOMEM' is returned, otherwise `0'. The result can be destroyed using `free()' */
 INTERN ATTR_SECTION(".text.crt.string.argz") NONNULL((1, 2, 3)) error_t
-NOTHROW_NCX(LIBCCALL libc_argz_create)(char *const argv[], char **__restrict pargz, size_t *__restrict pargz_len) {
+NOTHROW_NCX(LIBCCALL libc_argz_create)(char *const argv[],
+                                       char **__restrict pargz,
+                                       size_t *__restrict pargz_len) {
 	size_t i, argc, total_len = 0;
 	for (argc = 0; argv[argc] != NULL; ++argc)
 		total_len += strlen(argv[argc]) + 1;
@@ -70,7 +72,10 @@ NOTHROW_NCX(LIBCCALL libc_argz_create)(char *const argv[], char **__restrict par
  * If a memory allocation error occurs, `ENOMEM' is returned, otherwise `0'.
  * The result can be destroyed using `free()' */
 INTERN ATTR_SECTION(".text.crt.string.argz") NONNULL((1, 3, 4)) error_t
-NOTHROW_NCX(LIBCCALL libc_argz_create_sep)(char const *__restrict string, int sep, char **__restrict pargz, size_t *__restrict pargz_len) {
+NOTHROW_NCX(LIBCCALL libc_argz_create_sep)(char const *__restrict string,
+                                           int sep,
+                                           char **__restrict pargz,
+                                           size_t *__restrict pargz_len) {
 	/* return string.replace(sep, "\0").replaceall("\0\0", "\0"); */
 	char *result_string, *dst;
 	size_t slen = strlen(string);
@@ -123,7 +128,8 @@ again_check_ch:
 /* Returns the number of strings in `ARGZ'
  * Simply count the number of`NUL-characters within `argz...+=argz_len' */
 INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_PURE size_t
-NOTHROW_NCX(LIBCCALL libc_argz_count)(char const *argz, size_t argz_len) {
+NOTHROW_NCX(LIBCCALL libc_argz_count)(char const *argz,
+                                      size_t argz_len) {
 	size_t result = 0;
 	if likely(argz_len) {
 		for (;;) {
@@ -141,7 +147,9 @@ NOTHROW_NCX(LIBCCALL libc_argz_count)(char const *argz, size_t argz_len) {
 /* Puts pointers to each string in `ARGZ' into `ARGV', which must be large enough
  * to hold them all (aka: have space for at least `argz_count()' elements) */
 INTERN ATTR_SECTION(".text.crt.string.argz") NONNULL((1, 3)) void
-NOTHROW_NCX(LIBCCALL libc_argz_extract)(char const *__restrict argz, size_t argz_len, char **__restrict argv) {
+NOTHROW_NCX(LIBCCALL libc_argz_extract)(char const *__restrict argz,
+                                        size_t argz_len,
+                                        char **__restrict argv) {
 	size_t i;
 	if unlikely(!argz_len)
 		return;
@@ -158,7 +166,9 @@ NOTHROW_NCX(LIBCCALL libc_argz_extract)(char const *__restrict argz, size_t argz
 /* Make '\0' separated arg vector `ARGZ' printable by converting
  * all the '\0's except the last into the character `SEP' */
 INTERN ATTR_SECTION(".text.crt.string.argz") void
-NOTHROW_NCX(LIBCCALL libc_argz_stringify)(char *argz, size_t len, int sep) {
+NOTHROW_NCX(LIBCCALL libc_argz_stringify)(char *argz,
+                                          size_t len,
+                                          int sep) {
 	/* replace(base: argz, count: len - 1, old: '\0', new: sep); */
 	if unlikely(!len)
 		return;
@@ -175,7 +185,10 @@ NOTHROW_NCX(LIBCCALL libc_argz_stringify)(char *argz, size_t len, int sep) {
 #include <parts/errno.h>
 /* Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN' */
 INTERN ATTR_SECTION(".text.crt.string.argz") NONNULL((1, 2)) error_t
-NOTHROW_NCX(LIBCCALL libc_argz_append)(char **__restrict pargz, size_t *__restrict pargz_len, char const *__restrict buf, size_t buf_len) {
+NOTHROW_NCX(LIBCCALL libc_argz_append)(char **__restrict pargz,
+                                       size_t *__restrict pargz_len,
+                                       char const *__restrict buf,
+                                       size_t buf_len) {
 	size_t oldlen = *pargz_len;
 	size_t newlen = oldlen + buf_len;
 	char *newargz = (char *)realloc(*pargz, newlen * sizeof(char));
@@ -193,13 +206,18 @@ NOTHROW_NCX(LIBCCALL libc_argz_append)(char **__restrict pargz, size_t *__restri
 }
 /* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
 INTERN ATTR_SECTION(".text.crt.string.argz") NONNULL((1, 2, 3)) error_t
-NOTHROW_NCX(LIBCCALL libc_argz_add)(char **__restrict pargz, size_t *__restrict pargz_len, char const *__restrict str) {
+NOTHROW_NCX(LIBCCALL libc_argz_add)(char **__restrict pargz,
+                                    size_t *__restrict pargz_len,
+                                    char const *__restrict str) {
 	return argz_append(pargz, pargz_len, str, strlen(str) + 1);
 }
 #include <parts/errno.h>
 /* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
 INTERN ATTR_SECTION(".text.crt.string.argz") NONNULL((1, 2, 3)) error_t
-NOTHROW_NCX(LIBCCALL libc_argz_add_sep)(char **__restrict pargz, size_t *__restrict pargz_len, char const *__restrict string, int sep) {
+NOTHROW_NCX(LIBCCALL libc_argz_add_sep)(char **__restrict pargz,
+                                        size_t *__restrict pargz_len,
+                                        char const *__restrict string,
+                                        int sep) {
 	char *result_string, *dst;
 	size_t oldlen;
 	size_t slen = strlen(string);
@@ -268,7 +286,9 @@ again_check_ch:
  * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 INTERN ATTR_SECTION(".text.crt.string.argz") NONNULL((1, 2)) void
-NOTHROW_NCX(LIBCCALL libc_argz_delete)(char **__restrict pargz, size_t *__restrict pargz_len, char *entry) {
+NOTHROW_NCX(LIBCCALL libc_argz_delete)(char **__restrict pargz,
+                                       size_t *__restrict pargz_len,
+                                       char *entry) {
 	size_t entrylen, newlen;
 	if unlikely(!entry)
 		return;
@@ -294,7 +314,10 @@ NOTHROW_NCX(LIBCCALL libc_argz_delete)(char **__restrict pargz, size_t *__restri
  * is returned, else if memory can't be allocated for the new `ARGZ', `ENOMEM' is returned.
  * On success, `0' is returned */
 INTERN ATTR_SECTION(".text.crt.string.argz") NONNULL((1, 2, 4)) error_t
-NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz, size_t *__restrict pargz_len, char *before, char const *__restrict entry) {
+NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
+                                       size_t *__restrict pargz_len,
+                                       char *before,
+                                       char const *__restrict entry) {
 	char *argz;
 	size_t argz_len;
 	size_t entry_len;
@@ -354,7 +377,11 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz, size_t *__restri
  * `PARGZ' as necessary. If `PREPLACE_COUNT' is non-NULL, `*PREPLACE_COUNT' will be
  * incremented by number of replacements performed */
 INTERN ATTR_SECTION(".text.crt.string.argz") NONNULL((1, 2, 4)) error_t
-NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz, size_t *__restrict pargz_len, char const *__restrict str, char const *__restrict with, unsigned int *__restrict replace_count) {
+NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
+                                        size_t *__restrict pargz_len,
+                                        char const *__restrict str,
+                                        char const *__restrict with,
+                                        unsigned int *__restrict replace_count) {
 	size_t findlen, repllen;
 	size_t find_offset;
 	if unlikely(!str)
@@ -446,7 +473,9 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz, size_t *__restr
  * >> for (entry = NULL; entry; entry = argz_next(argz, argz_len, entry))
  * >>     ...; */
 INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_PURE WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc_argz_next)(char const *__restrict argz, size_t argz_len, char const *__restrict entry) {
+NOTHROW_NCX(LIBCCALL libc_argz_next)(char const *__restrict argz,
+                                     size_t argz_len,
+                                     char const *__restrict entry) {
 	char const *argz_end;
 	if (!entry)
 		return argz_len ? (char *)argz : NULL;
@@ -462,30 +491,30 @@ NOTHROW_NCX(LIBCCALL libc_argz_next)(char const *__restrict argz, size_t argz_le
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(__argz_create, libc_argz_create);
-DEFINE_PUBLIC_WEAK_ALIAS(argz_create, libc_argz_create);
-DEFINE_PUBLIC_WEAK_ALIAS(__argz_create_sep, libc_argz_create_sep);
-DEFINE_PUBLIC_WEAK_ALIAS(argz_create_sep, libc_argz_create_sep);
-DEFINE_PUBLIC_WEAK_ALIAS(__argz_count, libc_argz_count);
-DEFINE_PUBLIC_WEAK_ALIAS(argz_count, libc_argz_count);
-DEFINE_PUBLIC_WEAK_ALIAS(__argz_extract, libc_argz_extract);
-DEFINE_PUBLIC_WEAK_ALIAS(argz_extract, libc_argz_extract);
-DEFINE_PUBLIC_WEAK_ALIAS(__argz_stringify, libc_argz_stringify);
-DEFINE_PUBLIC_WEAK_ALIAS(argz_stringify, libc_argz_stringify);
-DEFINE_PUBLIC_WEAK_ALIAS(__argz_create_sep, libc_argz_append);
-DEFINE_PUBLIC_WEAK_ALIAS(argz_append, libc_argz_append);
-DEFINE_PUBLIC_WEAK_ALIAS(__argz_add, libc_argz_add);
-DEFINE_PUBLIC_WEAK_ALIAS(argz_add, libc_argz_add);
-DEFINE_PUBLIC_WEAK_ALIAS(__argz_add_sep, libc_argz_add_sep);
-DEFINE_PUBLIC_WEAK_ALIAS(argz_add_sep, libc_argz_add_sep);
-DEFINE_PUBLIC_WEAK_ALIAS(__argz_add_sep, libc_argz_delete);
-DEFINE_PUBLIC_WEAK_ALIAS(argz_delete, libc_argz_delete);
-DEFINE_PUBLIC_WEAK_ALIAS(__argz_insert, libc_argz_insert);
-DEFINE_PUBLIC_WEAK_ALIAS(argz_insert, libc_argz_insert);
-DEFINE_PUBLIC_WEAK_ALIAS(__argz_replace, libc_argz_replace);
-DEFINE_PUBLIC_WEAK_ALIAS(argz_replace, libc_argz_replace);
-DEFINE_PUBLIC_WEAK_ALIAS(__argz_next, libc_argz_next);
-DEFINE_PUBLIC_WEAK_ALIAS(argz_next, libc_argz_next);
+DEFINE_PUBLIC_ALIAS(__argz_create, libc_argz_create);
+DEFINE_PUBLIC_ALIAS(argz_create, libc_argz_create);
+DEFINE_PUBLIC_ALIAS(__argz_create_sep, libc_argz_create_sep);
+DEFINE_PUBLIC_ALIAS(argz_create_sep, libc_argz_create_sep);
+DEFINE_PUBLIC_ALIAS(__argz_count, libc_argz_count);
+DEFINE_PUBLIC_ALIAS(argz_count, libc_argz_count);
+DEFINE_PUBLIC_ALIAS(__argz_extract, libc_argz_extract);
+DEFINE_PUBLIC_ALIAS(argz_extract, libc_argz_extract);
+DEFINE_PUBLIC_ALIAS(__argz_stringify, libc_argz_stringify);
+DEFINE_PUBLIC_ALIAS(argz_stringify, libc_argz_stringify);
+DEFINE_PUBLIC_ALIAS(__argz_create_sep, libc_argz_append);
+DEFINE_PUBLIC_ALIAS(argz_append, libc_argz_append);
+DEFINE_PUBLIC_ALIAS(__argz_add, libc_argz_add);
+DEFINE_PUBLIC_ALIAS(argz_add, libc_argz_add);
+DEFINE_PUBLIC_ALIAS(__argz_add_sep, libc_argz_add_sep);
+DEFINE_PUBLIC_ALIAS(argz_add_sep, libc_argz_add_sep);
+DEFINE_PUBLIC_ALIAS(__argz_add_sep, libc_argz_delete);
+DEFINE_PUBLIC_ALIAS(argz_delete, libc_argz_delete);
+DEFINE_PUBLIC_ALIAS(__argz_insert, libc_argz_insert);
+DEFINE_PUBLIC_ALIAS(argz_insert, libc_argz_insert);
+DEFINE_PUBLIC_ALIAS(__argz_replace, libc_argz_replace);
+DEFINE_PUBLIC_ALIAS(argz_replace, libc_argz_replace);
+DEFINE_PUBLIC_ALIAS(__argz_next, libc_argz_next);
+DEFINE_PUBLIC_ALIAS(argz_next, libc_argz_next);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_ARGZ_C */

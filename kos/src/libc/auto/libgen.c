@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5f02d24 */
+/* HASH CRC-32:0x5dbd004a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -139,8 +139,8 @@ NOTHROW_NCX(LIBCCALL libc___xpg_basename)(char *filename) {
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(dirname, libc_dirname);
-DEFINE_PUBLIC_WEAK_ALIAS(__xpg_basename, libc___xpg_basename);
+DEFINE_PUBLIC_ALIAS(dirname, libc_dirname);
+DEFINE_PUBLIC_ALIAS(__xpg_basename, libc___xpg_basename);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_LIBGEN_C */

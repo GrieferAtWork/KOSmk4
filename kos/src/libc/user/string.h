@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cd12e3d */
+/* HASH CRC-32:0xbf4c4305 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,15 +31,9 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_strsignal)(int signo);
-INTDEF ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_strerror_r)(int errnum, char *buf, size_t buflen);
-INTDEF ATTR_COLD NONNULL((2)) errno_t NOTHROW_NCX(LIBCCALL libc___xpg_strerror_r)(int errnum, char *buf, size_t buflen);
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerror_s)(int errnum);
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerrorname_s)(int errnum);
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strsignal_s)(int signum);
-INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc__strerror)(char const *message);
-INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBDCALL libd__strerror_s)(char *__restrict buf, size_t buflen, char const *message);
-INTDEF NONNULL((1)) errno_t NOTHROW_RPC(LIBKCALL libc__strerror_s)(char *__restrict buf, size_t buflen, char const *message);
 #endif /* !__KERNEL__ */
 
 DECL_END

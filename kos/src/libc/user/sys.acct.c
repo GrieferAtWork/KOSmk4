@@ -32,24 +32,24 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:acct,hash:CRC-32=0x8e9ce467]]]*/
+/*[[[head:libc_acct,hash:CRC-32=0xcd3ca374]]]*/
 /* Switch process accounting on and off */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.acct") int
-NOTHROW_RPC_KOS(LIBCCALL libc_acct)(const char *filename)
-/*[[[body:acct]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.modify") int
+NOTHROW_RPC(LIBCCALL libc_acct)(const char *filename)
+/*[[[body:libc_acct]]]*/
 {
 	errno_t error;
 	error = sys_acct(filename);
 	return libc_seterrno_syserr(error);
 }
-/*[[[end:acct]]]*/
+/*[[[end:libc_acct]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x9448cbab]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(acct, libc_acct);
+/*[[[start:exports,hash:CRC-32=0x988f5825]]]*/
+DEFINE_PUBLIC_ALIAS(acct, libc_acct);
 /*[[[end:exports]]]*/
 
 DECL_END

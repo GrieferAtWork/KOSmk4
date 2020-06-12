@@ -132,14 +132,13 @@ bool LIBCCALL init_libdebuginfo(void) {
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:backtrace,hash:CRC-32=0xfdb608de]]]*/
+/*[[[head:libc_backtrace,hash:CRC-32=0x33cd6fb1]]]*/
 /* Store up to SIZE return address of the current program state
  * in ARRAY and return the exact number of values stored */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.debug.backtrace") int
+INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
                                      int size)
-/*[[[body:backtrace]]]*/
+/*[[[body:libc_backtrace]]]*/
 {
 	unsigned int result;
 	struct lcpustate ost, st;
@@ -164,7 +163,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
 	}
 	return (int)result;
 }
-/*[[[end:backtrace]]]*/
+/*[[[end:libc_backtrace]]]*/
 
 PRIVATE ATTR_SECTION(".text.crt.debug.print_function_name") ssize_t
 NOTHROW_NCX(LIBCCALL print_function_name)(void *pc,
@@ -206,14 +205,13 @@ err0:
 	return 0;
 }
 
-/*[[[head:backtrace_symbols,hash:CRC-32=0xe737224e]]]*/
+/*[[[head:libc_backtrace_symbols,hash:CRC-32=0x16089ff3]]]*/
 /* Return names of functions from the backtrace list
  * in ARRAY in a newly malloc()ed memory block */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.debug.backtrace_symbols") char **
+INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) char **
 NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array,
                                              int size)
-/*[[[body:backtrace_symbols]]]*/
+/*[[[body:libc_backtrace_symbols]]]*/
 {
 	char **result;
 	unsigned int i;
@@ -249,17 +247,16 @@ err:
 	format_aprintf_data_fini(&data);
 	return NULL;
 }
-/*[[[end:backtrace_symbols]]]*/
+/*[[[end:libc_backtrace_symbols]]]*/
 
-/*[[[head:backtrace_symbols_fd,hash:CRC-32=0x6bfe21b0]]]*/
+/*[[[head:libc_backtrace_symbols_fd,hash:CRC-32=0xf9a92b20]]]*/
 /* This function is similar to backtrace_symbols()
  * but it writes the result immediately to a file */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.debug.backtrace_symbols_fd") void
+INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
                                                 int size,
                                                 fd_t fd)
-/*[[[body:backtrace_symbols_fd]]]*/
+/*[[[body:libc_backtrace_symbols_fd]]]*/
 {
 	ssize_t error;
 	unsigned int i;
@@ -280,19 +277,19 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
 		write(fd, debug_lf, sizeof(debug_lf));
 	}
 }
-/*[[[end:backtrace_symbols_fd]]]*/
+/*[[[end:libc_backtrace_symbols_fd]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7322107e]]]*/
-DEFINE_PUBLIC_WEAK_ALIAS(backtrace, libc_backtrace);
-DEFINE_PUBLIC_WEAK_ALIAS(__backtrace, libc_backtrace);
-DEFINE_PUBLIC_WEAK_ALIAS(backtrace_symbols, libc_backtrace_symbols);
-DEFINE_PUBLIC_WEAK_ALIAS(__backtrace_symbols, libc_backtrace_symbols);
-DEFINE_PUBLIC_WEAK_ALIAS(backtrace_symbols_fd, libc_backtrace_symbols_fd);
-DEFINE_PUBLIC_WEAK_ALIAS(__backtrace_symbols_fd, libc_backtrace_symbols_fd);
+/*[[[start:exports,hash:CRC-32=0xf511d171]]]*/
+DEFINE_PUBLIC_ALIAS(__backtrace, libc_backtrace);
+DEFINE_PUBLIC_ALIAS(backtrace, libc_backtrace);
+DEFINE_PUBLIC_ALIAS(__backtrace_symbols, libc_backtrace_symbols);
+DEFINE_PUBLIC_ALIAS(backtrace_symbols, libc_backtrace_symbols);
+DEFINE_PUBLIC_ALIAS(__backtrace_symbols_fd, libc_backtrace_symbols_fd);
+DEFINE_PUBLIC_ALIAS(backtrace_symbols_fd, libc_backtrace_symbols_fd);
 /*[[[end:exports]]]*/
 
 DECL_END

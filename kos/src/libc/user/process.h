@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdd49162 */
+/* HASH CRC-32:0xdc507139 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,6 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthread)(__dos_beginthread_entry_t entry, u32 stacksz, void *arg);
 INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec, u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, u32 flags, u32 *threadaddr);
-INTDEF void NOTHROW_NCX(LIBCCALL libc__endthread)(void);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode);
 INTDEF void (LIBCCALL libc__cexit)(void) THROWS(...);
 INTDEF intptr_t (LIBCCALL libc__loaddll)(char __KOS_FIXED_CONST *file) THROWS(...);
@@ -44,10 +43,6 @@ INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnv)(int mode, char co
 INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnvp)(int mode, char const *__restrict file, __TARGV);
 INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnve)(int mode, char const *__restrict path, __TARGV, __TENVP);
 INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnvpe)(int mode, char const *__restrict file, __TARGV, __TENVP);
-INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnl)(int mode, char const *__restrict path, char const *args, ...);
-INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlp)(int mode, char const *__restrict file, char const *args, ...);
-INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode, char const *__restrict path, char const *args, ...);
-INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(int mode, char const *__restrict file, char const *args, ...);
 #endif /* !__KERNEL__ */
 
 DECL_END
