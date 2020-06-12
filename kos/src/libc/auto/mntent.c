@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb05cb14 */
+/* HASH CRC-32:0xd12a5f9d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/mntent.h"
-#include <string.h>
+#include "../user/string.h"
 
 DECL_BEGIN
 
@@ -37,12 +37,12 @@ NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt,
                                      char const *opt) {
 	char *str;
 	if likely(mnt && opt && (str = mnt->mnt_opts) != NULL) {
-		size_t optlen = strlen(opt);
+		size_t optlen = libc_strlen(opt);
 		while (*str) {
-			if (memcmp(str, opt, optlen * sizeof(char)) == 0 &&
+			if (libc_memcmp(str, opt, optlen * sizeof(char)) == 0 &&
 			   (str[optlen] == ',' || str[optlen] == '\0'))
 				return str;
-			str = strchrnul(str, ',');
+			str = libc_strchrnul(str, ',');
 		}
 	}
 	return NULL;

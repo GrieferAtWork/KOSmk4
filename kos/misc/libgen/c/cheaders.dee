@@ -2022,6 +2022,10 @@ class Function {
 	@@Name of the function in public headers (e.g. @"strlen")
 	public member name: string | UserString;
 
+	@@Name of the function inside of the actual library
+	@@Unbound if the function isn't actually being exported from its associated library
+	public member internalName: string | UserString | Callable;
+
 	@@Name of the original defining system header (may differ from the containing
 	@@header in case @"%[insert:extern(...)]" was used to inject a foreign function)
 	public member originalSystemHeaderName: string | UserString;
@@ -2033,6 +2037,16 @@ class Function {
 
 	@@The documentation text of this function
 	public member documentation: string | UserString | Callable = "";
+
+	@@Helper wrapper for @internalName to automatically unwind callable objects
+	public property internalFunctionName: string | UserString = {
+		get(): string | UserString {
+			local result = internalName;
+			if (result is Callable)
+				result = internalName = result();
+			return result;
+		}
+	}
 
 	@@Helper wrapper for @documentation to automatically unwind callable objects
 	public property documentationString: string | UserString = {
@@ -2129,6 +2143,8 @@ class Function {
 			documentationString;
 			for (local b: functionBindings)
 				b.preload();
+			if (internalName is bound)
+				internalFunctionName;
 		} catch (...) {
 			print "... while preloading Function", repr(name);
 			throw;
@@ -2551,39 +2567,6 @@ class LibraryFunction {
 	}
 	private member m_functionBindings: {LibraryFunctionBinding...};
 
-	@@Returns the preprocessor condition that must be true in order
-	@@for @this @LibraryFunction to actually get declared within the
-	@@associated, internal library header
-	@@This condition is essentially:
-	@@    @(this.ppCond && (functionBindings.each.ppCond || ...))
-	public property declarationPpCond: string = {
-		get(): string {
-			if (ppCond == "0")
-				return "0";
-			local hasUniversalBinding = false;
-			for (local b: functionBindings) {
-				if (b.ppCond == "1") {
-					hasUniversalBinding = true;
-					break;
-				}
-			}
-			if (hasUniversalBinding)
-				return ppCond;
-			local bindingConditions = [];
-			for (local b: functionBindings) {
-				if (b.ppCond == "0")
-					continue;
-				bindingConditions.append("({})".format({ b.ppCond }));
-			}
-			bindingConditions = "||".join(bindingConditions);
-			if (ppCond != "1") {
-				bindingConditions = "({})&&({})"
-					.format({ ppCond, bindingConditions });
-			}
-			return bindingConditions;
-		}
-	}
-
 	public function preload() {
 		documentationString;
 		functionPrototype;
@@ -2597,10 +2580,9 @@ class LibraryFunction {
 		local usedBindings = functionBindings;
 		if (!usedBindings)
 			return;
-		local declCond = declarationPpCond;
-		if (declCond == "0")
+		if (ppCond == "0")
 			return;
-		fp.ppIf(declCond);
+		fp.ppIf(ppCond);
 		local doc = documentationString;
 		if (doc)
 			fp.printComment(doc);
@@ -2631,14 +2613,21 @@ class LibraryFunction {
 				local impl: FunctionImplementation | string | UserString = bind.functionBinding;
 				if (impl is FunctionImplementation) {
 					local deps: {string: Function} = impl.dependencyFunctions;
+					local keyEscape = [](keyword: string): string {
+						if (keyword == impl.name)
+							return this.name;
+						local depFun = deps.get(keyword);
+						if (depFun !is none) {
+							if (depFun.internalName is bound)
+								return depFun.internalFunctionName;
+							return depFun.name;
+						}
+						return none;
+					};
 					for (local x: impl.implPrefix) {
-						escapeNonRepeatingTextIntoFile(fp, x, escapeMode,
-							keyEscape: [](keyword: string): string {
-								local depFun = deps.get(keyword);
-								if (depFun !is none)
-									return depFun.name;
-								return none;
-							},
+						escapeNonRepeatingTextIntoFile(
+							fp, x, escapeMode,
+							keyEscape: keyEscape,
 							forceKeyEscape: true);
 					}
 					if (doc)
@@ -2653,16 +2642,10 @@ class LibraryFunction {
 						breakAfterReturnType: true,
 						oneArgumentPerLine:   true);
 					fp << " ";
-					escapeTextIntoFile(fp, impl.body, escapeMode,
-						[](keyword: string): string {
-							if (keyword == impl.implementationName)
-								return this.name;
-							local depFun = deps.get(keyword);
-							if (depFun !is none)
-								return depFun.name;
-							return none;
-						},
-					);
+					escapeTextIntoFile(
+						fp, impl.body, escapeMode,
+						keyEscape: keyEscape,
+						forceKeyEscape: true);
 					fp << "\n";
 				} else {
 					fp << "DEFINE_" << decl << "_ALIAS("
@@ -2999,16 +2982,27 @@ class SystemHeader {
 				local deps: {string...} = dependentFunctionHeaders.get(binding.ppCond);
 				if (deps is none)
 					deps = dependentFunctionHeaders[binding.ppCond] = HashSet();
-				deps.update(bindingDeps.values.each.originalSystemHeaderName);
+				for (local none, func: bindingDeps) {
+					if (func.internalName !is bound)
+						continue; /* No internal name override! */
+					deps.insert(allLibraryFunctionsByName[func.internalFunctionName]
+						.originalSystemHeaderName);
+				}
 			}
 		}
 		/* Include declaration headers of all dependent functions */
 		for (local cond: dependentFunctionHeaders.keys.sorted()) {
 			fp.ppIf(cond);
 			for (local hdr: dependentFunctionHeaders[cond].sorted()) {
-				if (allSystemHeaders[hdr] === this)
+				local shdr: SystemHeader = allSystemHeaders[hdr];
+				if (shdr === this)
 					continue; /* Not needed! */
-				fp.ppInclude("<{}.h>".format({ hdr.replace(".", "/") }));
+				if (shdr.order_libcUserHeader) {
+					hdr = "\"../user/{}.h\"".format({ hdr });
+				} else {
+					hdr = "\"{}.h\"".format({ hdr });
+				}
+				fp.ppInclude(hdr);
 			}
 			fp.ppEndif();
 		}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15b1b513 */
+/* HASH CRC-32:0x6f1f23bd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,8 +25,8 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/arpa.inet.h"
-#include <stdio.h>
-#include <string.h>
+#include "../user/stdio.h"
+#include "../user/string.h"
 
 DECL_BEGIN
 
@@ -95,7 +95,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net,
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE NONNULL((1)) in_addr_t
 NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp) {
 	struct in_addr addr;
-	if (!inet_paton((char const **)&cp, &addr, 0) || *cp)
+	if (!libc_inet_paton((char const **)&cp, &addr, 0) || *cp)
 		return INADDR_NONE;
 	return addr.s_addr;
 }
@@ -104,7 +104,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp) {
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_inet_ntoa)(struct in_addr inaddr) {
 	static char buf[16];
-	return inet_ntoa_r(inaddr, buf);
+	return libc_inet_ntoa_r(inaddr, buf);
 }
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
@@ -113,7 +113,7 @@ INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_RETNONNULL NONNULL((2)) char *
 NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr,
                                        char buf[16]) {
 	uint32_t addr = __hybrid_betoh32(inaddr.s_addr);
-	sprintf(buf, "%u.%u.%u.%u",
+	libc_sprintf(buf, "%u.%u.%u.%u",
 	        (unsigned int)(u8)((addr & __UINT32_C(0xff000000)) >> 24),
 	        (unsigned int)(u8)((addr & __UINT32_C(0x00ff0000)) >> 16),
 	        (unsigned int)(u8)((addr & __UINT32_C(0x0000ff00)) >> 8),
@@ -127,7 +127,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr,
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp) {
 	struct in_addr addr;
-	if (!inet_paton((char const **)&cp, &addr, 1) || *cp)
+	if (!libc_inet_paton((char const **)&cp, &addr, 1) || *cp)
 		return INADDR_NONE;
 	return addr.s_addr;
 }
@@ -147,7 +147,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp) {
 INTERN ATTR_SECTION(".text.crt.net.inet") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp,
                                      struct in_addr *__restrict inp) {
-	return inet_paton((char const **)&cp, inp, 0) && !*cp;
+	return libc_inet_paton((char const **)&cp, inp, 0) && !*cp;
 }
 #include <hybrid/__byteswap.h>
 /* Same as `inet_aton()', but update `*pcp' to point after the address
@@ -319,21 +319,21 @@ NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net,
 		if (!net) {
 			reqlen = 8;
 			if likely(len >= 8)
-				memcpy(buf, "0.0.0.0", 8 * sizeof(char));
+				libc_memcpy(buf, "0.0.0.0", 8 * sizeof(char));
 		} else {
-			reqlen = snprintf(buf, len, "%u", (unsigned int)net);
+			reqlen = libc_snprintf(buf, len, "%u", (unsigned int)net);
 		}
 	} else if (net <= 0xffff) {
-		reqlen = snprintf(buf, len, "%u.%u",
+		reqlen = libc_snprintf(buf, len, "%u.%u",
 		                  (unsigned int)((net & 0xff00) >> 8),
 		                  (unsigned int)(net & 0xff));
 	} else if (net <= 0xffffff) {
-		reqlen = snprintf(buf, len, "%u.%u.%u",
+		reqlen = libc_snprintf(buf, len, "%u.%u.%u",
 		                  (unsigned int)((net & 0xff0000) >> 16),
 		                  (unsigned int)((net & 0xff00) >> 8),
 		                  (unsigned int)(net & 0xff));
 	} else {
-		reqlen = snprintf(buf, len, "%u.%u.%u.%u",
+		reqlen = libc_snprintf(buf, len, "%u.%u.%u.%u",
 		                  (unsigned int)((net & 0xff000000) >> 24),
 		                  (unsigned int)((net & 0xff0000) >> 16),
 		                  (unsigned int)((net & 0xff00) >> 8),

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5f9edac */
+/* HASH CRC-32:0x3b5ba959 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,8 +25,8 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "argz.h"
-#include <stdlib.h>
-#include <string.h>
+#include "../user/stdlib.h"
+#include "../user/string.h"
 
 DECL_BEGIN
 
@@ -42,12 +42,12 @@ NOTHROW_NCX(LIBCCALL libc_argz_create)(char *const argv[],
                                        size_t *__restrict pargz_len) {
 	size_t i, argc, total_len = 0;
 	for (argc = 0; argv[argc] != NULL; ++argc)
-		total_len += strlen(argv[argc]) + 1;
+		total_len += libc_strlen(argv[argc]) + 1;
 	if unlikely(total_len == 0) {
 		*pargz = NULL;
 	} else {
 		char *argz_string;
-		argz_string = (char *)malloc(total_len * sizeof(char));
+		argz_string = (char *)libc_malloc(total_len * sizeof(char));
 		if unlikely(!argz_string) {
 			*pargz = NULL;
 			*pargz_len  = 0;
@@ -59,7 +59,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_create)(char *const argv[],
 		}
 		*pargz = argz_string;
 		for (i = 0; i < argc; ++i) {
-			argz_string = stpcpy(argz_string, argv[argc]) + 1;
+			argz_string = libc_stpcpy(argz_string, argv[argc]) + 1;
 		}
 		__hybrid_assert(argz_string == *pargz + total_len);
 	}
@@ -78,14 +78,14 @@ NOTHROW_NCX(LIBCCALL libc_argz_create_sep)(char const *__restrict string,
                                            size_t *__restrict pargz_len) {
 	/* return string.replace(sep, "\0").replaceall("\0\0", "\0"); */
 	char *result_string, *dst;
-	size_t slen = strlen(string);
+	size_t slen = libc_strlen(string);
 	if unlikely(!slen) {
 empty_argz:
 		*pargz     = NULL;
 		*pargz_len = 0;
 		return 0;
 	}
-	result_string = (char *)malloc((slen + 1) * sizeof(char));
+	result_string = (char *)libc_malloc((slen + 1) * sizeof(char));
 	*pargz = result_string;
 	if unlikely(!result_string) {
 		*pargz_len = 0;
@@ -116,7 +116,7 @@ again_check_ch:
 	}
 	if unlikely(dst == result_string) {
 		/* Empty string. (this can happen if `string' only consisted of `sep' characters) */
-		free(result_string);
+		libc_free(result_string);
 		goto empty_argz;
 	}
 	/* Write the terminating NUL-byte (if there isn't one already) */
@@ -135,7 +135,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_count)(char const *argz,
 		for (;;) {
 			size_t temp;
 			++result;
-			temp = strlen(argz) + 1;
+			temp = libc_strlen(argz) + 1;
 			if (temp >= argz_len)
 				break;
 			argz_len -= temp;
@@ -156,7 +156,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_extract)(char const *__restrict argz,
 	for (i = 0;;) {
 		size_t temp;
 		argv[i++] = (char *)argz;
-		temp = strlen(argz) + 1;
+		temp = libc_strlen(argz) + 1;
 		if (temp >= argz_len)
 			break;
 		argz_len -= temp;
@@ -174,7 +174,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_stringify)(char *argz,
 		return;
 	for (;;) {
 		size_t temp;
-		temp = strlen(argz) + 1;
+		temp = libc_strlen(argz) + 1;
 		if (temp >= len)
 			break;
 		len  -= temp;
@@ -191,7 +191,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_append)(char **__restrict pargz,
                                        size_t buf_len) {
 	size_t oldlen = *pargz_len;
 	size_t newlen = oldlen + buf_len;
-	char *newargz = (char *)realloc(*pargz, newlen * sizeof(char));
+	char *newargz = (char *)libc_realloc(*pargz, newlen * sizeof(char));
 	if unlikely(!newargz) {
 #ifdef ENOMEM
 		return ENOMEM;
@@ -199,7 +199,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_append)(char **__restrict pargz,
 		return 1;
 #endif /* !ENOMEM */
 	}
-	memcpyc(newargz + oldlen, buf, buf_len, sizeof(char));
+	libc_memcpyc(newargz + oldlen, buf, buf_len, sizeof(char));
 	*pargz     = newargz;
 	*pargz_len = newlen;
 	return 0;
@@ -209,7 +209,7 @@ INTERN ATTR_SECTION(".text.crt.string.argz") NONNULL((1, 2, 3)) error_t
 NOTHROW_NCX(LIBCCALL libc_argz_add)(char **__restrict pargz,
                                     size_t *__restrict pargz_len,
                                     char const *__restrict str) {
-	return argz_append(pargz, pargz_len, str, strlen(str) + 1);
+	return libc_argz_append(pargz, pargz_len, str, libc_strlen(str) + 1);
 }
 #include <parts/errno.h>
 /* Append `SEP' separated list in `STRING' to the argz vector in `PARGZ & PARGZ_LEN' */
@@ -220,7 +220,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_add_sep)(char **__restrict pargz,
                                         int sep) {
 	char *result_string, *dst;
 	size_t oldlen;
-	size_t slen = strlen(string);
+	size_t slen = libc_strlen(string);
 	if unlikely(!slen)
 		return 0;
 	oldlen = *pargz_len;
@@ -240,7 +240,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_add_sep)(char **__restrict pargz,
 	 * Glibc's version of `argz_append()', which handles that case as
 	 * leaving all pointers unmodified (just as one should)
 	 */
-	result_string = (char *)realloc(*pargz, (oldlen + (slen + 1)) * sizeof(char));
+	result_string = (char *)libc_realloc(*pargz, (oldlen + (slen + 1)) * sizeof(char));
 	if unlikely(!result_string) {
 #ifdef ENOMEM
 		return ENOMEM;
@@ -270,7 +270,7 @@ again_check_ch:
 	}
 	if unlikely(dst == result_string) {
 		/* Empty string. (this can happen if `string' only consisted of `sep' characters) */
-		free(result_string);
+		libc_free(result_string);
 		*pargz     = NULL;
 		*pargz_len = 0;
 		return 0;
@@ -292,17 +292,17 @@ NOTHROW_NCX(LIBCCALL libc_argz_delete)(char **__restrict pargz,
 	size_t entrylen, newlen;
 	if unlikely(!entry)
 		return;
-	entrylen  = strlen(entry) + 1;
+	entrylen  = libc_strlen(entry) + 1;
 	newlen    = *pargz_len - entrylen;
 	*pargz_len = newlen;
 	if unlikely(newlen == 0) {
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-		free(*pargz);
+		libc_free(*pargz);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 		*pargz = NULL;
 		return;
 	}
-	memmovedownc(entry, entry + entrylen,
+	libc_memmovedownc(entry, entry + entrylen,
 	             (newlen - (size_t)(entry - *pargz)),
 	             sizeof(char));
 }
@@ -323,7 +323,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
 	size_t entry_len;
 	size_t insert_offset;
 	if (!before)
-		return argz_add(pargz, pargz_len, entry);
+		return libc_argz_add(pargz, pargz_len, entry);
 	argz     = *pargz;
 	argz_len = *pargz_len;
 	if (before < argz || before >= argz + argz_len) {
@@ -347,10 +347,10 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
 	 */
 	while (before > argz && before[-1])
 		--before;
-	entry_len = strlen(entry) + 1;
+	entry_len = libc_strlen(entry) + 1;
 	argz_len += entry_len;
 	insert_offset = (size_t)(before - argz);
-	argz = (char *)realloc(argz, argz_len * sizeof(char));
+	argz = (char *)libc_realloc(argz, argz_len * sizeof(char));
 	if unlikely(!argz) {
 #ifdef ENOMEM
 		return ENOMEM;
@@ -362,12 +362,12 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
 	*pargz     = argz;
 	*pargz_len = argz_len;
 	/* Make space for the new entry. */
-	memmoveupc(argz + insert_offset + entry_len,
+	libc_memmoveupc(argz + insert_offset + entry_len,
 	           argz + insert_offset,
 	           (argz_len - (insert_offset + entry_len)),
 	           sizeof(char));
 	/* Insert the new entry. */
-	memcpyc(argz + insert_offset,
+	libc_memcpyc(argz + insert_offset,
 	        entry, entry_len,
 	        sizeof(char));
 	return 0;
@@ -386,10 +386,10 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 	size_t find_offset;
 	if unlikely(!str)
 		return 0; /* no-op */
-	findlen = strlen(str);
+	findlen = libc_strlen(str);
 	if unlikely(!findlen)
 		return 0; /* no-op */
-	repllen = strlen(with);
+	repllen = libc_strlen(with);
 	find_offset = 0;
 	/* I have no idea what the GLibc implementation does here, and I'm not
 	 * quite sure it knows either. - At first I though that this function
@@ -407,7 +407,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 	 * Anyways... At least my version is readable... */
 	while (find_offset < *pargz_len) {
 		char *pos;
-		pos = (char *)memmem(*pargz + find_offset,
+		pos = (char *)libc_memmem(*pargz + find_offset,
 		                     *pargz_len - find_offset,
 		                     str, findlen);
 		if (!pos)
@@ -416,13 +416,13 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 			/* Simple case: The replacement string is smaller than the find-string */
 			char *old_argz, *new_argz;
 			size_t diff, trailing_characters;
-			pos  = (char *)mempcpyc(pos, with, repllen, sizeof(char));
+			pos  = (char *)libc_mempcpyc(pos, with, repllen, sizeof(char));
 			diff = findlen - repllen;
 			*pargz_len -= diff;
 			old_argz = *pargz;
 			trailing_characters = *pargz_len - (size_t)(pos - old_argz);
-			memmovedownc(pos, pos + diff, trailing_characters, sizeof(char));
-			new_argz = (char *)realloc(old_argz, *pargz_len * sizeof(char));
+			libc_memmovedownc(pos, pos + diff, trailing_characters, sizeof(char));
+			new_argz = (char *)libc_realloc(old_argz, *pargz_len * sizeof(char));
 			if likely(new_argz) {
 				pos    = new_argz + (pos - old_argz);
 				*pargz = new_argz;
@@ -436,7 +436,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 			old_argzlen = *pargz_len;
 			new_argzlen = old_argzlen + diff;
 			old_argz = *pargz;
-			new_argz = (char *)realloc(old_argz, new_argzlen * sizeof(char));
+			new_argz = (char *)libc_realloc(old_argz, new_argzlen * sizeof(char));
 			if unlikely(!new_argz) {
 #ifdef ENOMEM
 				return ENOMEM;
@@ -447,15 +447,15 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 			pos = new_argz + (pos - old_argz);
 			/* Make space for extra data */
 			trailing_characters = new_argzlen - ((pos + repllen) - new_argz);
-			memmoveupc(pos + repllen,
+			libc_memmoveupc(pos + repllen,
 			           pos + findlen,
 			           trailing_characters,
 			           sizeof(char));
 			/* Fill in the replacement string. */
-			pos = (char *)mempcpyc(pos, with, repllen, sizeof(char));
+			pos = (char *)libc_mempcpyc(pos, with, repllen, sizeof(char));
 		} else {
 			/* Simple case: The replacement string has the same length as the find-string */
-			pos = (char *)mempcpyc(pos, with, repllen, sizeof(char));
+			pos = (char *)libc_mempcpyc(pos, with, repllen, sizeof(char));
 		}
 		if (replace_count)
 			++*replace_count;
@@ -481,7 +481,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_next)(char const *__restrict argz,
 		return argz_len ? (char *)argz : NULL;
 	argz_end = argz + argz_len;
 	if (entry < argz_end)
-		entry = strend(entry) + 1;
+		entry = libc_strend(entry) + 1;
 	if (entry >= argz_end)
 		return NULL;
 	return (char *)entry;

@@ -69,5 +69,6 @@
 #define LIBC_ARCH_HAVE_C32SEND       1
 #define LIBC_ARCH_HAVE_C32SNEND      1
 #define LIBC_ARCH_HAVE_ABORT         1
+#define LIBC_ARCH_HAVE_SIG_RESTORE   1 /* void ASMCALL libc_sig_restore(void); */
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_CONFIG_H */

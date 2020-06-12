@@ -33,22 +33,18 @@
 %[default_impl_section("{.text.crt.wchar.string.format|.text.crt.dos.wchar.string.format}")]
 
 
-%(auto_header)#include <parts/uchar/format-printer.h>
-
-%(auto_source){
+%(auto_header){
 #include <parts/uchar/format-printer.h>
-#include <unicode.h>
-#define libc_format_8to16     format_8to16
-#define libc_format_8to32     format_8to32
-#define libc_format_16to8     format_16to8
-#define libc_format_16to32    format_16to32
-#define libc_format_32to8     format_32to8
-#define libc_format_32to16    format_32to16
-#define libc_format_c16escape format_c16escape
-#define libc_format_c16width  format_c16width
-#define libc_format_c32escape format_c32escape
-#define libc_format_c32width  format_c32width
+#ifndef __KERNEL__
+#include "format-printer.h"
+INTDEF ATTR_CONST ssize_t
+NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
+                                         char32_t const *__restrict data,
+                                         size_t datalen)
+	ASMNAME("libc_format_length");
+#endif /* !__KERNEL__ */
 }
+
 
 
 %{
@@ -90,7 +86,7 @@ typedef __pwformatprinter pwformatprinter;
 [[wchar]]
 [[throws, decl_include("<bits/wformat-printer.h>")]]
 $ssize_t format_wrepeat([[nonnull]] pwformatprinter printer, void *arg,
-                        char ch, $size_t num_repetitions)
+                        wchar_t ch, $size_t num_repetitions)
 	%{generate(str2wcs("format_repeat"))}
 
 [[wchar]] format_wescape(*) %{generate(str2wcs("format_escape"))}
@@ -138,17 +134,15 @@ $ssize_t format_vwprintf([[nonnull]] pwformatprinter printer, void *arg,
 #define __FORMAT_HEXDUMP            format_whexdump
 #define __FORMAT_WIDTH              format_wwidth
 #define __FORMAT_ESCAPE             format_wescape
-@@pp_if __SIZEOF_WCHAR_T__ == 2@@
 #define __FORMAT_WIDTH8             format_width
 #define __FORMAT_ESCAPE8            format_escape
+@@pp_if __SIZEOF_WCHAR_T__ == 2@@
 #define __FORMAT_WIDTH32            format_c32width
 #define __FORMAT_ESCAPE32           format_c32escape
 #define __FORMAT_UNICODE_WRITECHAR  unicode_writeutf16
 #define __FORMAT_UNICODE_FORMAT8    format_8to16
 #define __FORMAT_UNICODE_FORMAT32   format_32to16
 @@pp_else@@
-#define __FORMAT_WIDTH8             format_width
-#define __FORMAT_ESCAPE8            format_escape
 #define __FORMAT_WIDTH16            format_c16width
 #define __FORMAT_ESCAPE16           format_c16escape
 #define __FORMAT_UNICODE_WRITECHAR(dst, ch) ((dst)[0] = (ch), (dst) + 1)
@@ -201,7 +195,6 @@ $ssize_t format_wsnprintf_printer([[nonnull]] /*struct format_wsnprintf_data**/ 
                                   [[nonnull]] wchar_t const *__restrict data,
                                   $size_t datalen)
 	%{generate(str2wcs("format_snprintf_printer"))}
-
 
 [[wchar, doc_alias("format_width"), ATTR_PURE]]
 [[if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(format_length)]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd12f24b1 */
+/* HASH CRC-32:0x7d7525a2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "ssp.string.h"
-#include <string.h>
+#include "../user/string.h"
 
 DECL_BEGIN
 
@@ -37,7 +37,7 @@ NOTHROW_NCX(LIBCCALL libc___memcpy_chk)(void *__restrict dst,
                                         size_t n_bytes,
                                         size_t dst_objsize) {
 	__ssp_chk_dstbuf("memcpy", dst, n_bytes, dst_objsize);
-	return memcpy(dst, src, n_bytes);
+	return libc_memcpy(dst, src, n_bytes);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBCCALL libc___memmove_chk)(void *dst,
                                          size_t n_bytes,
                                          size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmove", dst, n_bytes, dst_objsize);
-	return memmove(dst, src, n_bytes);
+	return libc_memmove(dst, src, n_bytes);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) void *
@@ -55,7 +55,7 @@ NOTHROW_NCX(LIBCCALL libc___memset_chk)(void *__restrict dst,
                                         size_t n_bytes,
                                         size_t dst_objsize) {
 	__ssp_chk_dstbuf("memset", dst, n_bytes, dst_objsize);
-	return memset(dst, byte, n_bytes);
+	return libc_memset(dst, byte, n_bytes);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
@@ -63,7 +63,7 @@ NOTHROW_NCX(LIBCCALL libc___strcat_chk)(char *__restrict dst,
                                         char const *__restrict src,
                                         size_t dst_objsize) {
 	(void)dst_objsize; /* TODO */;
-	return strcat(dst, src);
+	return libc_strcat(dst, src);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
@@ -71,7 +71,7 @@ NOTHROW_NCX(LIBCCALL libc___strcpy_chk)(char *__restrict dst,
                                         char const *__restrict src,
                                         size_t dst_objsize) {
 	(void)dst_objsize; /* TODO */;
-	return strcpy(dst, src);
+	return libc_strcpy(dst, src);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
@@ -80,7 +80,7 @@ NOTHROW_NCX(LIBCCALL libc___strncat_chk)(char *__restrict dst,
                                          size_t buflen,
                                          size_t dst_objsize) {
 	(void)dst_objsize; /* TODO */;
-	return strncat(dst, src, buflen);
+	return libc_strncat(dst, src, buflen);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
@@ -89,7 +89,7 @@ NOTHROW_NCX(LIBCCALL libc___strncpy_chk)(char *__restrict dst,
                                          size_t buflen,
                                          size_t dst_objsize) {
 	(void)dst_objsize; /* TODO */;
-	return strncpy(dst, src, buflen);
+	return libc_strncpy(dst, src, buflen);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -98,7 +98,7 @@ NOTHROW_NCX(LIBCCALL libc___mempcpy_chk)(void *__restrict dst,
                                          size_t n_bytes,
                                          size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempcpy", dst, n_bytes, dst_objsize);
-	return mempcpy(dst, src, n_bytes);
+	return libc_mempcpy(dst, src, n_bytes);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
@@ -106,7 +106,7 @@ NOTHROW_NCX(LIBCCALL libc___stpcpy_chk)(char *__restrict dst,
                                         char const *__restrict src,
                                         size_t dst_objsize) {
 	(void)dst_objsize; /* TODO */;
-	return stpcpy(dst, src);
+	return libc_stpcpy(dst, src);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
@@ -115,7 +115,7 @@ NOTHROW_NCX(LIBCCALL libc___stpncpy_chk)(char *__restrict dst,
                                          size_t buflen,
                                          size_t dst_objsize) {
 	(void)dst_objsize; /* TODO */;
-	return stpncpy(dst, src, buflen);
+	return libc_stpncpy(dst, src, buflen);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -124,7 +124,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmove_chk)(void *dst,
                                           size_t n_bytes,
                                           size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmove", dst, n_bytes, dst_objsize);
-	return mempmove(dst, src, n_bytes);
+	return libc_mempmove(dst, src, n_bytes);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) void *
@@ -133,7 +133,7 @@ NOTHROW_NCX(LIBCCALL libc___mempset_chk)(void *__restrict dst,
                                          size_t n_bytes,
                                          size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempset", dst, n_bytes, dst_objsize);
-	return mempset(dst, byte, n_bytes);
+	return libc_mempset(dst, byte, n_bytes);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -142,7 +142,7 @@ NOTHROW_NCX(LIBCCALL libc___memmoveup_chk)(void *dst,
                                            size_t n_bytes,
                                            size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmoveup", dst, n_bytes, dst_objsize);
-	return memmoveup(dst, src, n_bytes);
+	return libc_memmoveup(dst, src, n_bytes);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -151,7 +151,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovedown_chk)(void *dst,
                                              size_t n_bytes,
                                              size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmovedown", dst, n_bytes, dst_objsize);
-	return memmovedown(dst, src, n_bytes);
+	return libc_memmovedown(dst, src, n_bytes);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -160,7 +160,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmoveup_chk)(void *dst,
                                             size_t n_bytes,
                                             size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmoveup", dst, n_bytes, dst_objsize);
-	return mempmoveup(dst, src, n_bytes);
+	return libc_mempmoveup(dst, src, n_bytes);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -169,7 +169,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovedown_chk)(void *dst,
                                               size_t n_bytes,
                                               size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmovedown", dst, n_bytes, dst_objsize);
-	return mempmovedown(dst, src, n_bytes);
+	return libc_mempmovedown(dst, src, n_bytes);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -179,7 +179,7 @@ NOTHROW_NCX(LIBCCALL libc___memcpyc_chk)(void *__restrict dst,
                                          size_t elem_size,
                                          size_t dst_objsize) {
 	__ssp_chk_dstbuf("memcpyc", dst, elem_count * elem_size, dst_objsize);
-	return memcpyc(dst, src, elem_count, elem_size);
+	return libc_memcpyc(dst, src, elem_count, elem_size);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -189,7 +189,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovec_chk)(void *dst,
                                           size_t elem_size,
                                           size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmovec", dst, elem_count * elem_size, dst_objsize);
-	return memmovec(dst, src, elem_count, elem_size);
+	return libc_memmovec(dst, src, elem_count, elem_size);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -199,7 +199,7 @@ NOTHROW_NCX(LIBCCALL libc___mempcpyc_chk)(void *__restrict dst,
                                           size_t elem_size,
                                           size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempcpyc", dst, elem_count * elem_size, dst_objsize);
-	return mempcpyc(dst, src, elem_count, elem_size);
+	return libc_mempcpyc(dst, src, elem_count, elem_size);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -209,7 +209,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovec_chk)(void *dst,
                                            size_t elem_size,
                                            size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmovec", dst, elem_count * elem_size, dst_objsize);
-	return mempmovec(dst, src, elem_count, elem_size);
+	return libc_mempmovec(dst, src, elem_count, elem_size);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -219,7 +219,7 @@ NOTHROW_NCX(LIBCCALL libc___memmoveupc_chk)(void *dst,
                                             size_t elem_size,
                                             size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmoveupc", dst, elem_count * elem_size, dst_objsize);
-	return memmoveupc(dst, src, elem_count, elem_size);
+	return libc_memmoveupc(dst, src, elem_count, elem_size);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -229,7 +229,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovedownc_chk)(void *dst,
                                               size_t elem_size,
                                               size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmovedownc", dst, elem_count * elem_size, dst_objsize);
-	return memmovedownc(dst, src, elem_count, elem_size);
+	return libc_memmovedownc(dst, src, elem_count, elem_size);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -239,7 +239,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmoveupc_chk)(void *dst,
                                              size_t elem_size,
                                              size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmoveupc", dst, elem_count * elem_size, dst_objsize);
-	return mempmoveupc(dst, src, elem_count, elem_size);
+	return libc_mempmoveupc(dst, src, elem_count, elem_size);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
@@ -249,7 +249,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovedownc_chk)(void *dst,
                                                size_t elem_size,
                                                size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmovedownc", dst, elem_count * elem_size, dst_objsize);
-	return mempmovedownc(dst, src, elem_count, elem_size);
+	return libc_mempmovedownc(dst, src, elem_count, elem_size);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
@@ -258,7 +258,7 @@ NOTHROW_NCX(LIBCCALL libc___memcpyw_chk)(void *__restrict dst,
                                          size_t n_words,
                                          size_t dst_objsize) {
 	__ssp_chk_dstbuf("memcpyw", dst, n_words * 2, dst_objsize);
-	return memcpyw(dst, src, n_words);
+	return libc_memcpyw(dst, src, n_words);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
@@ -267,7 +267,7 @@ NOTHROW_NCX(LIBCCALL libc___mempcpyw_chk)(void *__restrict dst,
                                           size_t n_words,
                                           size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempcpyw", dst, n_words * 2, dst_objsize);
-	return mempcpyw(dst, src, n_words);
+	return libc_mempcpyw(dst, src, n_words);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
@@ -276,7 +276,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovew_chk)(void *dst,
                                           size_t n_words,
                                           size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmovew", dst, n_words * 2, dst_objsize);
-	return memmovew(dst, src, n_words);
+	return libc_memmovew(dst, src, n_words);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
@@ -285,7 +285,7 @@ NOTHROW_NCX(LIBCCALL libc___memcpyl_chk)(void *__restrict dst,
                                          size_t n_dwords,
                                          size_t dst_objsize) {
 	__ssp_chk_dstbuf("memcpyl", dst, n_dwords * 4, dst_objsize);
-	return memcpyl(dst, src, n_dwords);
+	return libc_memcpyl(dst, src, n_dwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
@@ -294,7 +294,7 @@ NOTHROW_NCX(LIBCCALL libc___mempcpyl_chk)(void *__restrict dst,
                                           size_t n_dwords,
                                           size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempcpyl", dst, n_dwords * 4, dst_objsize);
-	return mempcpyl(dst, src, n_dwords);
+	return libc_mempcpyl(dst, src, n_dwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
@@ -303,7 +303,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovel_chk)(void *dst,
                                           size_t n_dwords,
                                           size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmovel", dst, n_dwords * 4, dst_objsize);
-	return memmovel(dst, src, n_dwords);
+	return libc_memmovel(dst, src, n_dwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
@@ -312,7 +312,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovew_chk)(void *dst,
                                            size_t n_words,
                                            size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmovew", dst, n_words * 2, dst_objsize);
-	return mempmovew(dst, src, n_words);
+	return libc_mempmovew(dst, src, n_words);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
@@ -321,7 +321,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovel_chk)(void *dst,
                                            size_t n_dwords,
                                            size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmovel", dst, n_dwords * 4, dst_objsize);
-	return mempmovel(dst, src, n_dwords);
+	return libc_mempmovel(dst, src, n_dwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint16_t *
@@ -330,7 +330,7 @@ NOTHROW_NCX(LIBCCALL libc___memsetw_chk)(void *__restrict dst,
                                          size_t n_words,
                                          size_t dst_objsize) {
 	__ssp_chk_dstbuf("memsetw", dst, n_words * 2, dst_objsize);
-	return memsetw(dst, word, n_words);
+	return libc_memsetw(dst, word, n_words);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint16_t *
@@ -339,7 +339,7 @@ NOTHROW_NCX(LIBCCALL libc___mempsetw_chk)(void *__restrict dst,
                                           size_t n_words,
                                           size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempsetw", dst, n_words * 2, dst_objsize);
-	return mempsetw(dst, word, n_words);
+	return libc_mempsetw(dst, word, n_words);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint32_t *
@@ -348,7 +348,7 @@ NOTHROW_NCX(LIBCCALL libc___memsetl_chk)(void *__restrict dst,
                                          size_t n_dwords,
                                          size_t dst_objsize) {
 	__ssp_chk_dstbuf("memsetl", dst, n_dwords * 4, dst_objsize);
-	return memsetl(dst, dword, n_dwords);
+	return libc_memsetl(dst, dword, n_dwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint32_t *
@@ -357,7 +357,7 @@ NOTHROW_NCX(LIBCCALL libc___mempsetl_chk)(void *__restrict dst,
                                           size_t n_dwords,
                                           size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempsetl", dst, n_dwords * 4, dst_objsize);
-	return mempsetl(dst, dword, n_dwords);
+	return libc_mempsetl(dst, dword, n_dwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
@@ -366,7 +366,7 @@ NOTHROW_NCX(LIBCCALL libc___memmoveupw_chk)(void *dst,
                                             size_t n_words,
                                             size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmoveupw", dst, n_words * 2, dst_objsize);
-	return memmoveupw(dst, src, n_words);
+	return libc_memmoveupw(dst, src, n_words);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
@@ -375,7 +375,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovedownw_chk)(void *dst,
                                               size_t n_words,
                                               size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmovedownw", dst, n_words * 2, dst_objsize);
-	return memmovedownw(dst, src, n_words);
+	return libc_memmovedownw(dst, src, n_words);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
@@ -384,7 +384,7 @@ NOTHROW_NCX(LIBCCALL libc___memmoveupl_chk)(void *dst,
                                             size_t n_dwords,
                                             size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmoveupl", dst, n_dwords * 4, dst_objsize);
-	return memmoveupl(dst, src, n_dwords);
+	return libc_memmoveupl(dst, src, n_dwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
@@ -393,7 +393,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovedownl_chk)(void *dst,
                                               size_t n_dwords,
                                               size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmovedownl", dst, n_dwords * 4, dst_objsize);
-	return memmovedownl(dst, src, n_dwords);
+	return libc_memmovedownl(dst, src, n_dwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
@@ -402,7 +402,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmoveupw_chk)(void *dst,
                                              size_t n_words,
                                              size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmoveupw", dst, n_words * 2, dst_objsize);
-	return mempmoveupw(dst, src, n_words);
+	return libc_mempmoveupw(dst, src, n_words);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
@@ -411,7 +411,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovedownw_chk)(void *dst,
                                                size_t n_words,
                                                size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmovedownw", dst, n_words * 2, dst_objsize);
-	return mempmovedownw(dst, src, n_words);
+	return libc_mempmovedownw(dst, src, n_words);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
@@ -420,7 +420,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmoveupl_chk)(void *dst,
                                              size_t n_dwords,
                                              size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmoveupl", dst, n_dwords * 4, dst_objsize);
-	return mempmoveupl(dst, src, n_dwords);
+	return libc_mempmoveupl(dst, src, n_dwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint32_t *
@@ -429,7 +429,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovedownl_chk)(void *dst,
                                                size_t n_dwords,
                                                size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmovedownl", dst, n_dwords * 4, dst_objsize);
-	return mempmovedownl(dst, src, n_dwords);
+	return libc_mempmovedownl(dst, src, n_dwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
@@ -438,7 +438,7 @@ NOTHROW_NCX(LIBCCALL libc___memcpyq_chk)(void *__restrict dst,
                                          size_t n_qwords,
                                          size_t dst_objsize) {
 	__ssp_chk_dstbuf("memcpyq", dst, n_qwords * 8, dst_objsize);
-	return memcpyq(dst, src, n_qwords);
+	return libc_memcpyq(dst, src, n_qwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
@@ -447,7 +447,7 @@ NOTHROW_NCX(LIBCCALL libc___mempcpyq_chk)(void *__restrict dst,
                                           size_t n_qwords,
                                           size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempcpyq", dst, n_qwords * 8, dst_objsize);
-	return mempcpyq(dst, src, n_qwords);
+	return libc_mempcpyq(dst, src, n_qwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
@@ -456,7 +456,7 @@ NOTHROW_NCX(LIBCCALL libc___memmoveq_chk)(void *dst,
                                           size_t n_qwords,
                                           size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmoveq", dst, n_qwords * 8, dst_objsize);
-	return memmoveq(dst, src, n_qwords);
+	return libc_memmoveq(dst, src, n_qwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
@@ -465,7 +465,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmoveq_chk)(void *__restrict dst,
                                            size_t n_qwords,
                                            size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmoveq", dst, n_qwords * 8, dst_objsize);
-	return mempmoveq(dst, src, n_qwords);
+	return libc_mempmoveq(dst, src, n_qwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint64_t *
@@ -474,7 +474,7 @@ NOTHROW_NCX(LIBCCALL libc___memsetq_chk)(void *__restrict dst,
                                          size_t n_qwords,
                                          size_t dst_objsize) {
 	__ssp_chk_dstbuf("memsetq", dst, n_qwords * 8, dst_objsize);
-	return memsetq(dst, qword, n_qwords);
+	return libc_memsetq(dst, qword, n_qwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint64_t *
@@ -483,7 +483,7 @@ NOTHROW_NCX(LIBCCALL libc___mempsetq_chk)(void *__restrict dst,
                                           size_t n_qwords,
                                           size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempsetq", dst, n_qwords * 8, dst_objsize);
-	return mempsetq(dst, qword, n_qwords);
+	return libc_mempsetq(dst, qword, n_qwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
@@ -492,7 +492,7 @@ NOTHROW_NCX(LIBCCALL libc___memmoveupq_chk)(void *dst,
                                             size_t n_qwords,
                                             size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmoveupq", dst, n_qwords * 8, dst_objsize);
-	return memmoveupq(dst, src, n_qwords);
+	return libc_memmoveupq(dst, src, n_qwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
@@ -501,7 +501,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovedownq_chk)(void *dst,
                                               size_t n_qwords,
                                               size_t dst_objsize) {
 	__ssp_chk_dstbuf("memmovedownq", dst, n_qwords * 8, dst_objsize);
-	return memmovedownq(dst, src, n_qwords);
+	return libc_memmovedownq(dst, src, n_qwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
@@ -510,7 +510,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmoveupq_chk)(void *__restrict dst,
                                              size_t n_qwords,
                                              size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmoveupq", dst, n_qwords * 8, dst_objsize);
-	return mempmoveupq(dst, src, n_qwords);
+	return libc_mempmoveupq(dst, src, n_qwords);
 }
 #include <ssp/chk.h>
 INTERN ATTR_SECTION(".text.crt.ssp.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint64_t *
@@ -519,7 +519,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovedownq_chk)(void *__restrict dst,
                                                size_t n_qwords,
                                                size_t dst_objsize) {
 	__ssp_chk_dstbuf("mempmovedownq", dst, n_qwords * 8, dst_objsize);
-	return mempmovedownq(dst, src, n_qwords);
+	return libc_mempmovedownq(dst, src, n_qwords);
 }
 #endif /* !__KERNEL__ */
 

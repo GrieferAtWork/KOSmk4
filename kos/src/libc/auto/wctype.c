@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ce15631 */
+/* HASH CRC-32:0x4febf363 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,54 +25,54 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "wctype.h"
-#include <ctype.h>
+#include "../user/ctype.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iswalnum)(wint_t wc) {
-	return isalnum((int)wc);
+	return libc_isalnum((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iswalpha)(wint_t wc) {
-	return isalpha((int)wc);
+	return libc_isalpha((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iswcntrl)(wint_t wc) {
-	return iscntrl((int)wc);
+	return libc_iscntrl((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iswdigit)(wint_t wc) {
-	return isdigit((int)wc);
+	return libc_isdigit((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iswgraph)(wint_t wc) {
-	return isgraph((int)wc);
+	return libc_isgraph((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iswlower)(wint_t wc) {
-	return islower((int)wc);
+	return libc_islower((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iswprint)(wint_t wc) {
-	return isprint((int)wc);
+	return libc_isprint((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iswpunct)(wint_t wc) {
-	return ispunct((int)wc);
+	return libc_ispunct((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iswspace)(wint_t wc) {
-	return isspace((int)wc);
+	return libc_isspace((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iswupper)(wint_t wc) {
-	return isupper((int)wc);
+	return libc_isupper((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iswxdigit)(wint_t wc) {
-	return isdigit((int)wc);
+	return libc_isdigit((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) wctrans_t
 NOTHROW_NCX(LIBCCALL libc_wctrans)(char const *prop) {
@@ -106,15 +106,15 @@ NOTHROW_NCX(LIBCCALL libc_iswctype)(wint_t wc,
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iswblank)(wint_t wc) {
-	return isblank((int)wc);
+	return libc_isblank((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint_t
 NOTHROW(LIBCCALL libc_towlower)(wint_t wc) {
-	return (wint_t)tolower((int)wc);
+	return (wint_t)libc_tolower((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint_t
 NOTHROW(LIBCCALL libc_towupper)(wint_t wc) {
-	return (wint_t)toupper((int)wc);
+	return (wint_t)libc_toupper((int)wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_iswascii)(wint_t wc) {
@@ -125,84 +125,84 @@ NOTHROW_NCX(LIBCCALL libc_iswalnum_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return iswalnum(wc);
+	return libc_iswalnum(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_iswalpha_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return iswalpha(wc);
+	return libc_iswalpha(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_iswcntrl_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return iswcntrl(wc);
+	return libc_iswcntrl(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_iswdigit_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return iswdigit(wc);
+	return libc_iswdigit(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_iswgraph_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return iswgraph(wc);
+	return libc_iswgraph(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_iswlower_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return iswlower(wc);
+	return libc_iswlower(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_iswprint_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return iswprint(wc);
+	return libc_iswprint(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_iswpunct_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return iswpunct(wc);
+	return libc_iswpunct(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_iswspace_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return iswspace(wc);
+	return libc_iswspace(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_iswupper_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return iswupper(wc);
+	return libc_iswupper(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_iswxdigit_l)(wint_t wc,
                                        locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return iswxdigit(wc);
+	return libc_iswxdigit(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_iswblank_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return iswblank(wc);
+	return libc_iswblank(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_iswctype_l)(wint_t wc,
@@ -210,35 +210,35 @@ NOTHROW_NCX(LIBCCALL libc_iswctype_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return iswctype(wc, type);
+	return libc_iswctype(wc, type);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint_t
 NOTHROW_NCX(LIBCCALL libc_towupper_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return towupper(wc);
+	return libc_towupper(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint_t
 NOTHROW_NCX(LIBCCALL libc_towlower_l)(wint_t wc,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return towlower(wc);
+	return libc_towlower(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.mbs") WUNUSED NONNULL((1)) wctype_t
 NOTHROW_NCX(LIBCCALL libc_wctype_l)(char const *prop,
                                     locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return wctype(prop);
+	return libc_wctype(prop);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.mbs") WUNUSED NONNULL((1)) wctrans_t
 NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop,
                                      locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return wctrans(prop);
+	return libc_wctrans(prop);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.mbs") WUNUSED wint_t
 NOTHROW_NCX(LIBCCALL libc_towctrans_l)(wint_t wc,
@@ -246,7 +246,7 @@ NOTHROW_NCX(LIBCCALL libc_towctrans_l)(wint_t wc,
                                        locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return towctrans(wc, desc);
+	return libc_towctrans(wc, desc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isleadbyte)(int wc) {
@@ -257,25 +257,25 @@ NOTHROW_NCX(LIBCCALL libc__isleadbyte_l)(int wc,
                                          locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return isleadbyte(wc);
+	return libc_isleadbyte(wc);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBCCALL libc___iswcsymf)(wint_t wc) {
-	return iswalpha(wc) || wc == '_' || wc == '$';
+	return libc_iswalpha(wc) || wc == '_' || wc == '$';
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBCCALL libc___iswcsym)(wint_t wc) {
-	return iswalnum(wc) || wc == '_' || wc == '$';
+	return libc_iswalnum(wc) || wc == '_' || wc == '$';
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__iswcsymf_l)(wint_t wc,
                                        locale_t locale) {
-	return iswalpha_l(wc, locale) || wc == '_' || wc == '$';
+	return libc_iswalpha_l(wc, locale) || wc == '_' || wc == '$';
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__iswcsym_l)(wint_t wc,
                                       locale_t locale) {
-	return iswalnum_l(wc, locale) || wc == '_' || wc == '$';
+	return libc_iswalnum_l(wc, locale) || wc == '_' || wc == '$';
 }
 #endif /* !__KERNEL__ */
 

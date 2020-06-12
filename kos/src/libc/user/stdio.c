@@ -2909,18 +2909,6 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf)
 }
 /*[[[end:libc_tmpnam_r]]]*/
 
-/*[[[head:libc__fsopen,hash:CRC-32=0x1f453151]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
-NOTHROW_RPC(LIBCCALL libc__fsopen)(char const *filename,
-                                   char const *modes,
-                                   int sflag)
-/*[[[body:libc__fsopen]]]*/
-{
-	(void)sflag;
-	return fopen(filename, modes);
-}
-/*[[[end:libc__fsopen]]]*/
-
 /*[[[head:libc_fcloseall,hash:CRC-32=0x744e6cbe]]]*/
 /* Alias for `_fcloseall()' */
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") int
@@ -3343,70 +3331,9 @@ NOTHROW_NCX(LIBCCALL libc__set_output_format)(uint32_t format)
 }
 /*[[[end:libc__set_output_format]]]*/
 
-/*[[[head:libc__vsnscanf_l,hash:CRC-32=0x44735d0c]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf") ATTR_LIBC_SCANF(3, 5) NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc__vsnscanf_l)(char const *__restrict input,
-                                       size_t inputlen,
-                                       char const *__restrict format,
-                                       locale_t locale,
-                                       va_list args)
-/*[[[body:libc__vsnscanf_l]]]*/
-/*AUTO*/{
-	(void)locale;
-	return _vsnscanf(input, inputlen, format, args);
-}
-/*[[[end:libc__vsnscanf_l]]]*/
 
-/*[[[head:libc__snscanf_l,hash:CRC-32=0x1b03c2ba]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf") ATTR_LIBC_SCANF(3, 5) NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(VLIBCCALL libc__snscanf_l)(char const *__restrict input,
-                                       size_t inputlen,
-                                       char const *__restrict format,
-                                       locale_t locale,
-                                       ...)
-/*[[[body:libc__snscanf_l]]]*/
-/*AUTO*/{
-	__STDC_INT_AS_SIZE_T result;
-	va_list args;
-	va_start(args, locale);
-	result = _vsnscanf_l(input, inputlen, format, locale, args);
-	va_end(args);
-	return result;
-}
-/*[[[end:libc__snscanf_l]]]*/
 
-/*[[[head:libc__fprintf_p_l,hash:CRC-32=0xe9f77368]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-(VLIBCCALL libc__fprintf_p_l)(FILE *__restrict stream,
-                              char const *__restrict format,
-                              locale_t locale,
-                              ...) THROWS(...)
-/*[[[body:libc__fprintf_p_l]]]*/
-/*AUTO*/{
-	__STDC_INT_AS_SIZE_T result;
-	va_list args;
-	va_start(args, locale);
-	result = _vfprintf_p_l(stream, format, locale, args);
-	va_end(args);
-	return result;
-}
-/*[[[end:libc__fprintf_p_l]]]*/
 
-/*[[[head:libc_gets_s,hash:CRC-32=0x901414fe]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.read") WUNUSED NONNULL((1)) char *
-NOTHROW_RPC(LIBCCALL libc_gets_s)(char *__restrict buf,
-                                  rsize_t bufsize)
-/*[[[body:libc_gets_s]]]*/
-/*AUTO*/{
-	if unlikely(!buf) {
-#ifdef EINVAL
-		__libc_seterrno(EINVAL);
-#endif /* EINVAL */
-		return NULL;
-	}
-	return fgets(buf, (__STDC_INT_AS_SIZE_T)(unsigned int)bufsize, stdin);
-}
-/*[[[end:libc_gets_s]]]*/
 
 /*[[[head:libc__getmaxstdio,hash:CRC-32=0x4a8b137e]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") WUNUSED int
@@ -3613,7 +3540,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1bdbe890]]]*/
+/*[[[start:exports,hash:CRC-32=0x535632d]]]*/
 DEFINE_PUBLIC_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_ALIAS(rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(tmpnam, libc_tmpnam);
@@ -3739,7 +3666,6 @@ DEFINE_PUBLIC_ALIAS(fgetpos64_unlocked, libc_fgetpos64_unlocked);
 DEFINE_PUBLIC_ALIAS(fsetpos64_unlocked, libc_fsetpos64_unlocked);
 DEFINE_PUBLIC_ALIAS(fftruncate64, libc_fftruncate64);
 DEFINE_PUBLIC_ALIAS(fftruncate64_unlocked, libc_fftruncate64_unlocked);
-DEFINE_PUBLIC_ALIAS(_fsopen, libc__fsopen);
 DEFINE_PUBLIC_ALIAS(_IO_flush_all, libc__flushall);
 DEFINE_PUBLIC_ALIAS(_flushall, libc__flushall);
 DEFINE_PUBLIC_ALIAS(_rmtmp, libc__rmtmp);
@@ -3751,12 +3677,6 @@ DEFINE_PUBLIC_ALIAS(_get_printf_count_output, libc__get_printf_count_output);
 DEFINE_PUBLIC_ALIAS(_set_printf_count_output, libc__set_printf_count_output);
 DEFINE_PUBLIC_ALIAS(_get_output_format, libc__get_output_format);
 DEFINE_PUBLIC_ALIAS(_set_output_format, libc__set_output_format);
-DEFINE_PUBLIC_ALIAS(_vsnscanf_s_l, libc__vsnscanf_l);
-DEFINE_PUBLIC_ALIAS(_vsnscanf_l, libc__vsnscanf_l);
-DEFINE_PUBLIC_ALIAS(_snscanf_s_l, libc__snscanf_l);
-DEFINE_PUBLIC_ALIAS(_snscanf_l, libc__snscanf_l);
-DEFINE_PUBLIC_ALIAS(_fprintf_p_l, libc__fprintf_p_l);
-DEFINE_PUBLIC_ALIAS(gets_s, libc_gets_s);
 /*[[[end:exports]]]*/
 
 DECL_END

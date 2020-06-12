@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf57642d7 */
+/* HASH CRC-32:0x89962cc7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/termios.h"
-#include <string.h>
+#include "../user/string.h"
 
 DECL_BEGIN
 
@@ -82,7 +82,7 @@ NOTHROW_NCX(LIBCCALL libc_cfmakeraw)(struct termios *__restrict termios_p) {
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p) {
 	/* Set sane values. */
-	memset(termios_p, 0, sizeof(*termios_p));
+	libc_memset(termios_p, 0, sizeof(*termios_p));
 #ifdef TTYDEF_CFLAG
 	termios_p->c_cflag  = TTYDEF_CFLAG;
 #endif /* TTYDEF_CFLAG */

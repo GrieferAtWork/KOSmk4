@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc38aa49 */
+/* HASH CRC-32:0x49638e95 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "search.h"
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include "../user/stdlib.h"
+#include "../user/string.h"
+#include "../user/unistd.h"
 
 DECL_BEGIN
 
@@ -36,33 +36,33 @@ DECL_BEGIN
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem,
                                   void *prev) {
-	struct link {
-		struct link *l_forw; /* [0..1] Forward link */
-		struct link *l_back; /* [0..1] Backward link */
+	struct libc_link {
+		struct libc_link *l_forw; /* [0..1] Forward link */
+		struct libc_link *l_back; /* [0..1] Backward link */
 	};
 	if (prev) {
-		struct link *next;
-		next = ((struct link *)prev)->l_forw;
-		((struct link *)elem)->l_back = (struct link *)prev;
-		((struct link *)elem)->l_forw = next;
-		((struct link *)prev)->l_forw = (struct link *)elem;
+		struct libc_link *next;
+		next = ((struct libc_link *)prev)->l_forw;
+		((struct libc_link *)elem)->l_back = (struct libc_link *)prev;
+		((struct libc_link *)elem)->l_forw = next;
+		((struct libc_link *)prev)->l_forw = (struct libc_link *)elem;
 		if (next)
-			next->l_back = (struct link *)elem;
+			next->l_back = (struct libc_link *)elem;
 	} else {
-		((struct link *)elem)->l_back = NULL;
-		((struct link *)elem)->l_forw = NULL;
+		((struct libc_link *)elem)->l_back = NULL;
+		((struct libc_link *)elem)->l_forw = NULL;
 	}
 }
 /* Unlink ELEM from the doubly-linked list that it is in */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_remque)(void *__restrict elem) {
-	struct link {
-		struct link *l_forw; /* [0..1] Forward link */
-		struct link *l_back; /* [0..1] Backward link */
+	struct libc_link {
+		struct libc_link *l_forw; /* [0..1] Forward link */
+		struct libc_link *l_back; /* [0..1] Backward link */
 	};
-	struct link *prev, *next;
-	prev = ((struct link *)elem)->l_back;
-	next = ((struct link *)elem)->l_forw;
+	struct libc_link *prev, *next;
+	prev = ((struct libc_link *)elem)->l_back;
+	next = ((struct libc_link *)elem)->l_forw;
 	if (prev)
 		prev->l_forw = next;
 	if (next)
@@ -90,7 +90,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") ENTRY *
 NOTHROW_NCX(LIBCCALL libc_hsearch)(ENTRY item,
                                    ACTION action) {
 	ENTRY *result;
-	hsearch_r(item, action, &result, &__NAMESPACE_LOCAL_SYM htab);
+	libc_hsearch_r(item, action, &result, &__NAMESPACE_LOCAL_SYM htab);
 	return result;
 }
 #ifndef __hsearch_data_defined
@@ -111,7 +111,7 @@ __NAMESPACE_LOCAL_END
 /* Create a new hashing table which will at most contain NEL elements */
 INTERN ATTR_SECTION(".text.crt.utility.search") int
 NOTHROW_NCX(LIBCCALL libc_hcreate)(size_t nel) {
-	return hcreate_r(nel, &__NAMESPACE_LOCAL_SYM htab);
+	return libc_hcreate_r(nel, &__NAMESPACE_LOCAL_SYM htab);
 }
 #ifndef __hsearch_data_defined
 #define __hsearch_data_defined 1
@@ -131,7 +131,7 @@ __NAMESPACE_LOCAL_END
 /* Destroy current internal hashing table */
 INTERN ATTR_SECTION(".text.crt.utility.search") void
 NOTHROW_NCX(LIBCCALL libc_hdestroy)(void) {
-	hdestroy_r(&__NAMESPACE_LOCAL_SYM htab);
+	libc_hdestroy_r(&__NAMESPACE_LOCAL_SYM htab);
 }
 #include <parts/errno.h>
 #ifndef __hsearch_data_defined
@@ -161,7 +161,7 @@ NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
 		ENTRY        entry;
 	} entry_type;
 	unsigned int hval, count, idx;
-	unsigned int len = strlen(item.key);
+	unsigned int len = libc_strlen(item.key);
 	hval = count = len;
 	while (count-- > 0) {
 		hval <<= 4;
@@ -173,7 +173,7 @@ NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
 	if (((entry_type *)htab->table)[idx].used) {
 		unsigned int hval2, first_idx;
 		if (((entry_type *)htab->table)[idx].used == hval &&
-		    strcmp(item.key, ((entry_type *)htab->table)[idx].entry.key) == 0) {
+		    libc_strcmp(item.key, ((entry_type *)htab->table)[idx].entry.key) == 0) {
 			*retval = &((entry_type *)htab->table)[idx].entry;
 			return 1;
 		}
@@ -187,7 +187,7 @@ NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
 			if (idx == first_idx)
 				break;
 			if (((entry_type *)htab->table)[idx].used == hval &&
-			    strcmp(item.key, ((entry_type *)htab->table)[idx].entry.key) == 0) {
+			    libc_strcmp(item.key, ((entry_type *)htab->table)[idx].entry.key) == 0) {
 				*retval = &((entry_type *)htab->table)[idx].entry;
 				return 1;
 			}
@@ -277,7 +277,7 @@ NOTHROW_NCX(LIBCCALL libc_hcreate_r)(size_t nel,
 	}
 	htab->size   = nel;
 	htab->filled = 0;
-	htab->table  = (struct _ENTRY *)calloc(htab->size+1, sizeof(entry_type));
+	htab->table  = (struct _ENTRY *)libc_calloc(htab->size+1, sizeof(entry_type));
 	if (htab->table == NULL)
 		return 0;
 	return 1;
@@ -301,7 +301,7 @@ NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab) {
 #endif /* EINVAL */
 		return;
 	}
-	free(htab->table);
+	libc_free(htab->table);
 	htab->table = NULL;
 }
 __NAMESPACE_LOCAL_BEGIN
@@ -410,7 +410,7 @@ NOTHROW_NCX(LIBCCALL libc_tsearch)(void const *key,
 		gp_r = p_r;
 		p_r = r;
 	}
-	q = (node)malloc(sizeof(struct __node_struct));
+	q = (node)libc_malloc(sizeof(struct __node_struct));
 	if (q != NULL) {
 		*nextp = q;
 		q->key = key;
@@ -486,7 +486,7 @@ NOTHROW_NCX(LIBCCALL libc_tdelete)(void const *__restrict key,
 				retval = NULL;
 				goto done;
 			}
-			memcpyc(newstack, nodestack, sp, sizeof(node *));
+			libc_memcpyc(newstack, nodestack, sp, sizeof(node *));
 			__freea(nodestack);
 			nodestack = newstack;
 		}
@@ -516,7 +516,7 @@ NOTHROW_NCX(LIBCCALL libc_tdelete)(void const *__restrict key,
 					retval = NULL;
 					goto done;
 				}
-				memcpyc(newstack, nodestack, sp, sizeof(node *));
+				libc_memcpyc(newstack, nodestack, sp, sizeof(node *));
 				__freea(nodestack);
 				nodestack = newstack;
 			}
@@ -625,7 +625,7 @@ NOTHROW_NCX(LIBCCALL libc_tdelete)(void const *__restrict key,
 		if (r != NULL)
 			r->is_red = 0;
 	}
-	free(unchained);
+	libc_free(unchained);
 done:
 	__freea(nodestack);
 	return retval;
@@ -669,10 +669,10 @@ again:
 		l = ((void **)root)[1];
 		r = ((void **)root)[2];
 		(*freefct)(((void **)root)[0]);
-		free(root);
+		libc_free(root);
 		if (l) {
 			if (r)
-				tdestroy(r, freefct);
+				libc_tdestroy(r, freefct);
 			root = l;
 			goto again;
 		}
@@ -707,9 +707,9 @@ NOTHROW_NCX(LIBCCALL libc_lsearch)(void const *key,
                                    size_t size,
                                    __compar_fn_t compar) {
 	void *result;
-	result = lfind(key, base, nmemb, size, compar);
+	result = libc_lfind(key, base, nmemb, size, compar);
 	if (result == NULL) {
-		result = memcpy((byte_t *)base + (*nmemb) * size, key, size);
+		result = libc_memcpy((byte_t *)base + (*nmemb) * size, key, size);
 		++(*nmemb);
 	}
 	return result;

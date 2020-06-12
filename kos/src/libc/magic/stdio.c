@@ -2352,7 +2352,7 @@ __NAMESPACE_STD_USING(FILE)
 %[insert:function(_pclose = pclose)]
 
 [[cp, wunused, section(".text.crt.dos.FILE.locked.access")]]
-[[userimpl, requires_function(fopen)]]
+[[requires_function(fopen)]]
 $FILE *_fsopen([[nonnull]] char const *filename,
                [[nonnull]] char const *modes, int sflag) {
 	(void)sflag;
@@ -2492,7 +2492,7 @@ __STDC_INT_AS_SIZE_T _vsnscanf([[inp(inputlen)]] char const *__restrict input, $
 [[decl_include("<features.h>")]]
 [[ignore, ATTR_LIBC_SCANF(3, 5), export_alias("_vsnscanf_s_l")]]
 [[section(".text.crt.dos.unicode.locale.format.scanf")]]
-[[userimpl, requires_function(_vsnscanf)]]
+[[requires_function(_vsnscanf)]]
 __STDC_INT_AS_SIZE_T _vsnscanf_l([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
                                  [[nonnull]] char const *__restrict format, $locale_t locale, $va_list args) {
 	(void)locale;
@@ -2526,7 +2526,7 @@ __STDC_INT_AS_SIZE_T _snscanf([[inp(inputlen)]] char const *__restrict input, $s
 
 [[decl_include("<features.h>")]]
 [[section(".text.crt.dos.unicode.locale.format.scanf")]]
-[[ATTR_LIBC_SCANF(3, 5), export_alias("_snscanf_s_l"), userimpl]]
+[[ATTR_LIBC_SCANF(3, 5), export_alias("_snscanf_s_l")]]
 __STDC_INT_AS_SIZE_T _snscanf_l([[inp(inputlen)]] char const *__restrict input, $size_t inputlen,
                                 [[nonnull]] char const *__restrict format, $locale_t locale, ...)
 	%{printf("_vsnscanf_l")}
@@ -2866,7 +2866,7 @@ __STDC_INT_AS_SIZE_T _fprintf_p([[nonnull]] $FILE *__restrict stream,
 	%{printf("_vfprintf_p")}
 
 [[cp_stdio, ATTR_LIBC_PRINTF_P(2, 4), decl_include("<features.h>")]]
-[[section(".text.crt.dos.unicode.locale.format.printf"), userimpl]]
+[[section(".text.crt.dos.unicode.locale.format.printf")]]
 __STDC_INT_AS_SIZE_T _fprintf_p_l([[nonnull]] $FILE *__restrict stream,
                                   [[nonnull]] char const *__restrict format,
                                   $locale_t locale, ...)
@@ -3019,7 +3019,7 @@ $size_t fread_s([[outp(min(return * elemsize, elemcount * elemsize, bufsize))]] 
 %[default_impl_section(".text.crt.dos.FILE.locked.read.read")];
 [[cp, wunused, requires_include("<__crt.h>")]]
 [[impl_include("<local/stdstreams.h>", "<parts/errno.h>")]]
-[[userimpl, requires(!defined(__NO_STDSTREAMS) && $has_function(fgets))]]
+[[requires(!defined(__NO_STDSTREAMS) && $has_function(fgets))]]
 char *gets_s([[outp(min(strlen(return), bufsize))]] char *__restrict buf, rsize_t bufsize) {
 	if unlikely(!buf) {
 @@pp_ifdef EINVAL@@

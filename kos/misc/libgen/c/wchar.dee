@@ -97,10 +97,15 @@ function replaceWcharTextKeyword(keyword: string, mode: int): string {
 @@      Whatever is returned by this function is still going to be passed
 @@      through @escapeTextIntoFile, at which point further replacements
 @@      may still take place!
-@@@param: mode: Either @WCHAR_REPLACEMENT_CHAR16, or @WCHAR_REPLACEMENT_CHAR32
+@@@param: mode:        Either @WCHAR_REPLACEMENT_CHAR16, or @WCHAR_REPLACEMENT_CHAR32
+@@@param: keyOverride: An optional callback that may be used to override the replacement
+@@                     for certain keywords.
+@@                     When given, this callback is invoked with every keyword, such that
+@@                     a non-@none return value becomes the replacement string, and a @none
+@@                     return value causes normal replacement to be performed.
 function replaceWcharText(
-		text: string | CParser | UserString,
-		mode: int): string | UserString {
+		text: string | CParser | UserString, mode: int,
+		keyOverride: Callable with string = none): string | UserString {
 	{
 		/* Quick check: If @test is a single keyword, then we don't need a file writer and CParser */
 		local usedText = text;
@@ -112,6 +117,11 @@ function replaceWcharText(
 			/* Simple case: replace-single-keyword */
 			if (usedText.issymbol()) {
 				local result;
+				if (keyOverride !is none) {
+					result = keyOverride(usedText);
+					if (result !is none)
+						goto got_simple_result;
+				}
 				try {
 					result = replaceWcharTextKeyword(usedText, mode);
 				} catch (Error as e) {
@@ -119,6 +129,7 @@ function replaceWcharText(
 						text.err(e.message);
 					throw;
 				}
+got_simple_result:
 				if (result === usedText)
 					result = text; /* Maintain the @UserString indirection if possible */
 				return result;
@@ -208,6 +219,11 @@ function replaceWcharText(
 			break;
 		}
 		local repl;
+		if (keyOverride !is none) {
+			repl = keyOverride(tok);
+			if (repl !is none)
+				goto got_repl;
+		}
 		try {
 			repl = replaceWcharTextKeyword(tok, mode);
 		} catch (Error as e) {
@@ -217,6 +233,7 @@ function replaceWcharText(
 		 * @replaceWcharTextKeyword re-returns the given keyword if
 		 * no replacement was performed, meaning that we don't actually
 		 * have to compare the underlying strings (or rather: string)) */
+got_repl:
 		if (repl === tok)
 			continue;
 		/* Insert the keyword replacement */
@@ -233,14 +250,14 @@ done:
 
 
 function replaceWcharTextArray(
-		textArray: {(string | CParser | UserString)...},
-		mode: int): {(string | UserString)...} {
+		textArray: {(string | CParser | UserString)...}, mode: int,
+		keyOverride: Callable with string = none): {(string | UserString)...} {
 	if (!textArray)
 		return textArray;
 	local result = [];
 	local changed = false;
 	for (local text: textArray) {
-		local repl = replaceWcharText(text, mode);
+		local repl = replaceWcharText(text, mode, keyOverride);
 		if (repl !== text)
 			changed = true;
 		result.append(repl);
@@ -333,10 +350,19 @@ function replaceWcharPrototypesShallow(
 function replaceWcharFunctionImplementation(
 		self: FunctionImplementation, mode: int,
 		functionName: string | UserString): FunctionImplementation {
+	local oldFunctionName: string = str(self.name);
+	local keyOverride = [](keyword: string): string | none {
+		/* Special handling: References to the function's own name
+		 * must be replaced with `functionName', rather than with
+		 * the default uchar-replacement */
+		if (keyword == oldFunctionName)
+			return functionName;
+		return none;
+	};
 	local result = FunctionImplementation(
-		body:         replaceWcharText(self.body, mode),
+		body:         replaceWcharText(self.body, mode, keyOverride: keyOverride),
 		name:         functionName,
-		implPrefix:   replaceWcharTextArray(self.implPrefix, mode),
+		implPrefix:   replaceWcharTextArray(self.implPrefix, mode, keyOverride: keyOverride),
 		dependencies: ());
 	local deps: {string: Function} = self.dependencyFunctions;
 	if (deps) {
@@ -377,6 +403,7 @@ class WcharFunction {
 	public member wc_prototypes: {(string | UserString, {FunctionPrototype...})...} | Callable; /* Extended prototypes */
 	/* The associated %{uchar16} and %{uchar32} functions (if any) */
 	public member wc_header_uchar: (Function, Function) = [none, none];
+	public member wc_internal_uchar: (LibraryFunction, LibraryFunction);
 
 	public property wcLoaderImpl: none | LoaderFunctionImplementation = {
 		get(): none | LoaderFunctionImplementation {

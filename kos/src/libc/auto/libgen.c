@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5dbd004a */
+/* HASH CRC-32:0x59e3d964 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "libgen.h"
-#include <string.h>
+#include "../user/string.h"
 
 DECL_BEGIN
 
@@ -53,7 +53,7 @@ NOTHROW_NCX(LIBCCALL libc_dirname)(char *path) {
 	   License along with the GNU C Library; if not, see
 	   <http://www.gnu.org/licenses/>.  */
 	char *last_slash;
-	last_slash = path ? strrchr(path, '/') : NULL;
+	last_slash = path ? libc_strrchr(path, '/') : NULL;
 	if (last_slash && last_slash != path && last_slash[1] == '\0') {
 		char *runp;
 		for (runp = last_slash; runp != path; --runp) {
@@ -61,7 +61,7 @@ NOTHROW_NCX(LIBCCALL libc_dirname)(char *path) {
 				break;
 		}
 		if (runp != path)
-			last_slash = (char *)memrchr(path, '/', (size_t)(runp - path));
+			last_slash = (char *)libc_memrchr(path, '/', (size_t)(runp - path));
 	}
 	if (last_slash) {
 		char *runp;
@@ -114,7 +114,7 @@ NOTHROW_NCX(LIBCCALL libc___xpg_basename)(char *filename) {
 	if (!filename || !filename[0])
 		result = (char *)".";
 	else {
-		result = strrchr(filename, '/');
+		result = libc_strrchr(filename, '/');
 		if (!result)
 			result = filename;
 		else if (!result[1]) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f8ed6eb */
+/* HASH CRC-32:0x9616a75 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3185,35 +3185,55 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wctomb_l, __FORCELOCAL int __NOTHROW_NCX(__LIBC
 #ifdef __USE_DOS_SLIB
 #ifdef __CRT_HAVE_wctomb_s
 __CDECLARE(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_NCX,wctomb_s,(int *__presult, char *__buf, rsize_t __buflen, wchar_t __wc),(__presult,__buf,__buflen,__wc))
-#else /* __CRT_HAVE_wctomb_s */
+#elif defined(__CRT_HAVE_DOS$wctomb_s) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_NCX,wctomb_s,(int *__presult, char *__buf, rsize_t __buflen, char32_t __wc),wctomb_s,(__presult,__buf,__buflen,__wc))
+#elif defined(__CRT_HAVE_DOS$wctomb_s) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_NCX,wctomb_s,(int *__presult, char *__buf, rsize_t __buflen, char16_t __wc),wctomb_s,(__presult,__buf,__buflen,__wc))
+#else /* ... */
 #include <local/stdlib/wctomb_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(wctomb_s, __FORCELOCAL __ATTR_NONNULL((1, 2)) errno_t __NOTHROW_NCX(__LIBCCALL wctomb_s)(int *__presult, char *__buf, rsize_t __buflen, wchar_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctomb_s))(__presult, __buf, __buflen, __wc); })
-#endif /* !__CRT_HAVE_wctomb_s */
+#endif /* !... */
 #endif /* __USE_DOS_SLIB */
 #ifdef __CRT_HAVE__wctomb_s_l
 __CDECLARE(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_NCX,_wctomb_s_l,(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t __wc, __locale_t __locale),(__presult,__buf,__buflen,__wc,__locale))
-#else /* __CRT_HAVE__wctomb_s_l */
+#elif defined(__CRT_HAVE_DOS$_wctomb_s_l) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_NCX,_wctomb_s_l,(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, char32_t __wc, __locale_t __locale),_wctomb_s_l,(__presult,__buf,__buflen,__wc,__locale))
+#elif defined(__CRT_HAVE_DOS$_wctomb_s_l) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_NCX,_wctomb_s_l,(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, char16_t __wc, __locale_t __locale),_wctomb_s_l,(__presult,__buf,__buflen,__wc,__locale))
+#else /* ... */
 #include <local/stdlib/_wctomb_s_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_wctomb_s_l, __FORCELOCAL __ATTR_NONNULL((1, 2)) errno_t __NOTHROW_NCX(__LIBCCALL _wctomb_s_l)(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wctomb_s_l))(__presult, __buf, __buflen, __wc, __locale); })
-#endif /* !__CRT_HAVE__wctomb_s_l */
+#endif /* !... */
 #ifdef __CRT_HAVE__wcstombs_s_l
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,_wcstombs_s_l,(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale),(__presult,__buf,__buflen,__src,__maxlen,__locale))
-#else /* __CRT_HAVE__wcstombs_s_l */
+#elif defined(__CRT_HAVE_DOS$_wcstombs_s_l) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,_wcstombs_s_l,(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, char32_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale),_wcstombs_s_l,(__presult,__buf,__buflen,__src,__maxlen,__locale))
+#elif defined(__CRT_HAVE_DOS$_wcstombs_s_l) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,_wcstombs_s_l,(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, char16_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale),_wcstombs_s_l,(__presult,__buf,__buflen,__src,__maxlen,__locale))
+#else /* ... */
 #include <local/stdlib/_wcstombs_s_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_wcstombs_s_l, __FORCELOCAL __ATTR_NONNULL((1, 2, 4)) errno_t __NOTHROW_NCX(__LIBCCALL _wcstombs_s_l)(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wcstombs_s_l))(__presult, __buf, __buflen, __src, __maxlen, __locale); })
-#endif /* !__CRT_HAVE__wcstombs_s_l */
+#endif /* !... */
 #ifdef __CRT_HAVE__wcstombs_l
 __CDECLARE(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,_wcstombs_l,(char *__dst, wchar_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale),(__dst,__src,__maxlen,__locale))
-#else /* __CRT_HAVE__wcstombs_l */
+#elif defined(__CRT_HAVE_DOS$_wcstombs_l) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,_wcstombs_l,(char *__dst, char32_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale),_wcstombs_l,(__dst,__src,__maxlen,__locale))
+#elif defined(__CRT_HAVE_DOS$_wcstombs_l) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,_wcstombs_l,(char *__dst, char16_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale),_wcstombs_l,(__dst,__src,__maxlen,__locale))
+#else /* ... */
 #include <local/stdlib/_wcstombs_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_wcstombs_l, __FORCELOCAL __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstombs_l)(char *__dst, wchar_t const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wcstombs_l))(__dst, __src, __maxlen, __locale); })
-#endif /* !__CRT_HAVE__wcstombs_l */
+#endif /* !... */
 #ifdef __CRT_HAVE_wcstombs_s
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,wcstombs_s,(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__src, __SIZE_TYPE__ __maxlen),(__presult,__buf,__buflen,__src,__maxlen))
-#else /* __CRT_HAVE_wcstombs_s */
+#elif defined(__CRT_HAVE_DOS$wcstombs_s) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,wcstombs_s,(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, char32_t const *__src, __SIZE_TYPE__ __maxlen),wcstombs_s,(__presult,__buf,__buflen,__src,__maxlen))
+#elif defined(__CRT_HAVE_DOS$wcstombs_s) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,wcstombs_s,(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, char16_t const *__src, __SIZE_TYPE__ __maxlen),wcstombs_s,(__presult,__buf,__buflen,__src,__maxlen))
+#else /* ... */
 #include <local/stdlib/wcstombs_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcstombs_s, __FORCELOCAL __ATTR_NONNULL((1, 2, 4)) errno_t __NOTHROW_NCX(__LIBCCALL wcstombs_s)(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__src, __SIZE_TYPE__ __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstombs_s))(__presult, __buf, __buflen, __src, __maxlen); })
-#endif /* !__CRT_HAVE_wcstombs_s */
+#endif /* !... */
 
 /* DOS malloc extensions */
 #ifdef __CRT_HAVE_recallocv

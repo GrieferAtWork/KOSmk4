@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23493049 */
+/* HASH CRC-32:0x968d218b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,11 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/stdio.h"
-#include <format-printer.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unicode.h>
-#include <unistd.h>
+#include "../user/format-printer.h"
+#include "../user/stdlib.h"
+#include "../user/string.h"
+#include "unicode.h"
+#include "../user/unistd.h"
 
 DECL_BEGIN
 
@@ -39,7 +39,7 @@ DECL_BEGIN
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_setbuf)(FILE *__restrict stream,
                                   char *buf) {
-	setvbuf(stream, buf,
+	libc_setvbuf(stream, buf,
 	        buf ? ___IOFBF : ___IONBF,
 	        buf ? __BUFSIZ : 0);
 }
@@ -47,13 +47,13 @@ NOTHROW_NCX(LIBCCALL libc_setbuf)(FILE *__restrict stream,
 /* Alias for `fgetc(stdin)' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") int
 (LIBCCALL libc_getchar)(void) THROWS(...) {
-	return fgetc(stdin);
+	return libc_fgetc(stdin);
 }
 #include <local/stdstreams.h>
 /* Alias for `fputc(CH, stdout)' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") int
 (LIBCCALL libc_putchar)(int ch) THROWS(...) {
-	return fputc(ch, stdout);
+	return libc_fputc(ch, stdout);
 }
 #include <parts/errno.h>
 /* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
@@ -72,24 +72,24 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) c
 		return NULL;
 	}
 	for (n = 0; n < bufsize - 1; ++n) {
-		int ch = fgetc(stream);
+		int ch = libc_fgetc(stream);
 		if (ch == EOF) {
-			if (n == 0 || ferror(stream))
+			if (n == 0 || libc_ferror(stream))
 				return NULL;
 			break;
 		}
 		if (ch == '\r') {
 			/* Special handling to convert both `\r' and `\r\n' into `\n' */
 			buf[n++] = '\n';
-			ch = fgetc(stream);
+			ch = libc_fgetc(stream);
 			if (ch == EOF) {
-				if (n == 0 || ferror(stream))
+				if (n == 0 || libc_ferror(stream))
 					return NULL;
 				break;
 			}
 			if (ch == '\r')
 				continue;
-			ungetc(ch, stream);
+			libc_ungetc(ch, stream);
 			break;
 		}
 		buf[n] = (char)ch;
@@ -105,9 +105,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 2)) __STDC_
 (LIBCCALL libc_fputs)(char const *__restrict str,
                       FILE *__restrict stream) THROWS(...) {
 	__STDC_INT_AS_SIZE_T result;
-	result = fwrite(str,
+	result = libc_fwrite(str,
 	                sizeof(char),
-	                strlen(str),
+	                libc_strlen(str),
 	                stream);
 	return result;
 }
@@ -116,9 +116,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 2)) __STDC_
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (LIBCCALL libc_puts)(char const *__restrict string) THROWS(...) {
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = fputs(string, stdout);
+	result = libc_fputs(string, stdout);
 	if (result >= 0) {
-		temp = fputc('\n', stdout);
+		temp = libc_fputc('\n', stdout);
 		if (temp <= 0)
 			result = temp;
 		else
@@ -137,12 +137,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1)) __STDC_INT
 INTERN ATTR_SECTION(".text.crt.errno.utility") void
 NOTHROW_RPC(LIBCCALL libc_perror)(char const *message) {
 	char const *enodesc;
-	enodesc = strerror(__libc_geterrno());
+	enodesc = libc_strerror(__libc_geterrno());
 	if (message) {
-		fprintf(stderr, "%s: %s\n",
+		libc_fprintf(stderr, "%s: %s\n",
 		        message, enodesc);
 	} else {
-		fprintf(stderr, "%s\n",
+		libc_fprintf(stderr, "%s\n",
 		        enodesc);
 	}
 }
@@ -152,7 +152,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 0)
 (LIBCCALL libc_vfprintf)(FILE *__restrict stream,
                          char const *__restrict format,
                          va_list args) THROWS(...) {
-	return (__STDC_INT_AS_SSIZE_T)format_vprintf(&file_printer, stream, format, args);
+	return (__STDC_INT_AS_SSIZE_T)libc_format_vprintf(&libc_file_printer, stream, format, args);
 }
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -163,7 +163,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 3)
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = vfprintf(stream, format, args);
+	result = libc_vfprintf(stream, format, args);
 	va_end(args);
 	return result;
 }
@@ -173,7 +173,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 3)
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (LIBCCALL libc_vprintf)(char const *__restrict format,
                         va_list args) THROWS(...) {
-	return vfprintf(stdout, format, args);
+	return libc_vfprintf(stdout, format, args);
 }
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -183,7 +183,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(1, 2)
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = vprintf(format, args);
+	result = libc_vprintf(format, args);
 	va_end(args);
 	return result;
 }
@@ -192,7 +192,7 @@ __NAMESPACE_LOCAL_BEGIN
 #if __SIZEOF_SIZE_T__ != __SIZEOF_INT__
 __LOCAL_LIBC(vfscanf_getc) ssize_t
 (__LIBCCALL vfscanf_getc)(void *arg) {
-	return (ssize_t)fgetc((FILE *)arg);
+	return (ssize_t)libc_fgetc((FILE *)arg);
 }
 #endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 __LOCAL_LIBC(vfscanf_ungetc) ssize_t
@@ -207,12 +207,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
                         char const *__restrict format,
                         va_list args) THROWS(...) {
 #if __SIZEOF_SIZE_T__ == __SIZEOF_INT__
-	return format_vscanf(*(pformatgetc)&fgetc,
+	return libc_format_vscanf(*(pformatgetc)&libc_fgetc,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc,
 	                     (void *)stream,
 	                     format, args);
 #else /* __SIZEOF_SIZE_T__ == __SIZEOF_INT__ */
-	return format_vscanf(&__NAMESPACE_LOCAL_SYM vfscanf_getc,
+	return libc_format_vscanf(&__NAMESPACE_LOCAL_SYM vfscanf_getc,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc,
 	                     (void *)stream,
 	                     format, args);
@@ -224,7 +224,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBCCALL libc_vscanf)(char const *__restrict format,
                        va_list args) THROWS(...) {
-	return vfscanf(stdin, format, args);
+	return libc_vfscanf(stdin, format, args);
 }
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
@@ -235,7 +235,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = vfscanf(stream, format, args);
+	result = libc_vfscanf(stream, format, args);
 	va_end(args);
 	return result;
 }
@@ -247,7 +247,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = vscanf(format, args);
+	result = libc_vscanf(format, args);
 	va_end(args);
 	return result;
 }
@@ -255,17 +255,17 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
 #include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)") NONNULL((1)) char *
 (LIBCCALL libc_gets)(char *__restrict buf) THROWS(...) {
-	return fgets(buf, INT_MAX, stdin);
+	return libc_fgets(buf, INT_MAX, stdin);
 }
 #include <asm/stdio.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_getc)(void *__arg) {
-	__CHAR32_TYPE__ __result = unicode_readutf8((char const **)__arg);
+	__CHAR32_TYPE__ __result = libc_unicode_readutf8((char const **)__arg);
 	return __result ? __result : __EOF;
 }
 __LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	unicode_readutf8_rev((char const **)__arg);
+	libc_unicode_readutf8_rev((char const **)__arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -276,7 +276,7 @@ NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input,
                                    char const *__restrict format,
                                    va_list args) {
 	char const *input_pointer = input;
-	return format_vscanf(&__NAMESPACE_LOCAL_SYM __vsscanf_getc,
+	return libc_format_vscanf(&__NAMESPACE_LOCAL_SYM __vsscanf_getc,
 	                     &__NAMESPACE_LOCAL_SYM __vsscanf_ungetc,
 	                     (void *)&input_pointer, format, args);
 }
@@ -289,7 +289,7 @@ NOTHROW_NCX(VLIBCCALL libc_sscanf)(char const *__restrict input,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = vsscanf(input, format, args);
+	result = libc_vsscanf(input, format, args);
 	va_end(args);
 	return result;
 }
@@ -302,7 +302,7 @@ NOTHROW_NCX(LIBCCALL libc_vsprintf)(char *__restrict dest,
                                     va_list args) {
 	__STDC_INT_AS_SSIZE_T result;
 	char *dest_pointer = dest;
-	result = (__STDC_INT_AS_SSIZE_T)format_vprintf(&format_sprintf_printer,
+	result = (__STDC_INT_AS_SSIZE_T)libc_format_vprintf(&libc_format_sprintf_printer,
 	                                               (void *)&dest_pointer,
 	                                               format, args);
 	if (result >= 0)
@@ -318,7 +318,7 @@ NOTHROW_NCX(VLIBCCALL libc_sprintf)(char *__restrict buf,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = vsprintf(buf, format, args);
+	result = libc_vsprintf(buf, format, args);
 	va_end(args);
 	return result;
 }
@@ -340,7 +340,7 @@ NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf,
 	__STDC_INT_AS_SSIZE_T result;
 	data.__sd_buffer = buf;
 	data.__sd_bufsiz = buflen;
-	result = (__STDC_INT_AS_SSIZE_T)format_vprintf(&format_snprintf_printer,
+	result = (__STDC_INT_AS_SSIZE_T)libc_format_vprintf(&libc_format_snprintf_printer,
 	                                               (void *)&data, format, args);
 	if (result >= 0 && data.__sd_bufsiz != 0)
 		*data.__sd_buffer = '\0';
@@ -356,7 +356,7 @@ NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = vsnprintf(buf, buflen, format, args);
+	result = libc_vsnprintf(buf, buflen, format, args);
 	va_end(args);
 	return result;
 }
@@ -366,7 +366,7 @@ NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf,
 #if __SIZEOF_INT__ != __SIZEOF_POINTER__ && !defined(__x86_64__)
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vdprintf_printer) __ssize_t (__LIBCCALL __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
-	return (__ssize_t)write((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
+	return (__ssize_t)libc_write((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __SIZEOF_INT__ != __SIZEOF_POINTER__ && !__x86_64__ */
@@ -375,11 +375,11 @@ NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd,
                                     char const *__restrict format,
                                     va_list args) {
 #if __SIZEOF_INT__ != __SIZEOF_POINTER__ && !defined(__x86_64__)
-	return format_vprintf(&__NAMESPACE_LOCAL_SYM __vdprintf_printer,
+	return libc_format_vprintf(&__NAMESPACE_LOCAL_SYM __vdprintf_printer,
 	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
 	                      format, args);
 #else /* __SIZEOF_INT__ != __SIZEOF_POINTER__ && !__x86_64__ */
-	return format_vprintf((pformatprinter)(void *)&write,
+	return libc_format_vprintf((pformatprinter)(void *)&libc_write,
 	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
 	                      format, args);
 #endif /* !__SIZEOF_INT__ != __SIZEOF_POINTER__ || __x86_64__ */
@@ -391,7 +391,7 @@ NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd,
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = vdprintf(fd, format, args);
+	result = libc_vdprintf(fd, format, args);
 	va_end(args);
 	return result;
 }
@@ -401,7 +401,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_setbuffer)(FILE *__restrict stream,
                                      char *buf,
                                      size_t bufsize) {
-	setvbuf(stream,
+	libc_setvbuf(stream,
 	        buf,
 	        buf ? ___IOFBF : ___IONBF,
 	        buf ? bufsize : (size_t)0);
@@ -409,7 +409,7 @@ NOTHROW_NCX(LIBCCALL libc_setbuffer)(FILE *__restrict stream,
 /* Change the given `STREAM' to become line-buffered */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_setlinebuf)(FILE *__restrict stream) {
-	setvbuf(stream, NULL, _IOLBF, 0);
+	libc_setvbuf(stream, NULL, _IOLBF, 0);
 }
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 2, 4)) ssize_t
 (LIBCCALL libc_getdelim)(char **__restrict lineptr,
@@ -428,7 +428,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 2, 4)
 			if (new_bufsize <= result + 1)
 				new_bufsize = 16;
 			assert(new_bufsize > result + 1);
-			buffer = (char *)realloc(buffer,
+			buffer = (char *)libc_realloc(buffer,
 			                         new_bufsize *
 			                         sizeof(char));
 			if unlikely(!buffer)
@@ -436,7 +436,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 2, 4)
 			*lineptr = buffer;
 			*pcount  = bufsize;
 		}
-		ch = fgetc(stream);
+		ch = libc_fgetc(stream);
 		if (ch == EOF)
 			break; /* EOF */
 		buffer[result++] = (char)ch;
@@ -445,9 +445,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 2, 4)
 		/* Special case for line-delimiter. */
 		if (delimiter == '\n' && ch == '\r') {
 			/* Deal with '\r\n', as well as '\r' */
-			ch = fgetc(stream);
+			ch = libc_fgetc(stream);
 			if (ch != EOF && ch != '\n')
-				ungetc(ch, stream);
+				libc_ungetc(ch, stream);
 			/* Unify linefeeds (to use POSIX notation) */
 			buffer[result - 1] = '\n';
 			break;
@@ -461,26 +461,26 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 2, 3)
 (LIBCCALL libc_getline)(char **__restrict lineptr,
                         size_t *__restrict pcount,
                         FILE *__restrict stream) THROWS(...) {
-	return getdelim(lineptr, pcount, '\n', stream);
+	return libc_getdelim(lineptr, pcount, '\n', stream);
 }
 #include <local/stdstreams.h>
 /* Same as `getchar()', but performs I/O without acquiring a lock to `stdin' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") int
 (LIBCCALL libc_getchar_unlocked)(void) THROWS(...) {
-	return fgetc_unlocked(stdin);
+	return libc_fgetc_unlocked(stdin);
 }
 #include <local/stdstreams.h>
 /* Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") int
 (LIBCCALL libc_putchar_unlocked)(int ch) THROWS(...) {
-	return fputc_unlocked(ch, stdout);
+	return libc_fputc_unlocked(ch, stdout);
 }
 #include <asm/stdio.h>
 /* Similar to `getc()', but read 2 bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") NONNULL((1)) int
 (LIBCCALL libc_getw)(FILE *__restrict stream) THROWS(...) {
 	u16 result;
-	return fread(&result, sizeof(result), 1, stream)
+	return libc_fread(&result, sizeof(result), 1, stream)
 	       ? (int)result
 	       : (int)EOF;
 }
@@ -490,7 +490,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") NONNULL((2)) int
 (LIBCCALL libc_putw)(int w,
                      FILE *__restrict stream) THROWS(...) {
 	u16 c = (u16)w;
-	return fwrite(&c, sizeof(c), 1, stream)
+	return libc_fwrite(&c, sizeof(c), 1, stream)
 	       ? w
 	       : EOF;
 }
@@ -510,7 +510,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 3))
 		return NULL;
 	}
 	for (n = 0; n < bufsize - 1; ++n) {
-		int ch = fgetc_unlocked(stream);
+		int ch = libc_fgetc_unlocked(stream);
 		if (ch == EOF) {
 			if (n == 0 || ferror_unlocked(stream))
 				return NULL;
@@ -519,7 +519,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 3))
 		if (ch == '\r') {
 			/* Special handling to convert both `\r' and `\r\n' into `\n' */
 			buf[n++] = '\n';
-			ch = fgetc_unlocked(stream);
+			ch = libc_fgetc_unlocked(stream);
 			if (ch == EOF) {
 				if (n == 0 || ferror_unlocked(stream))
 					return NULL;
@@ -527,7 +527,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 3))
 			}
 			if (ch == '\r')
 				continue;
-			ungetc_unlocked(ch, stream);
+			libc_ungetc_unlocked(ch, stream);
 			break;
 		}
 		buf[n] = (char)ch;
@@ -542,9 +542,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") NONNULL((1, 2)) __STD
 (LIBCCALL libc_fputs_unlocked)(char const *__restrict string,
                                FILE *__restrict stream) THROWS(...) {
 	__STDC_INT_AS_SIZE_T result;
-	result = fwrite_unlocked(string,
+	result = libc_fwrite_unlocked(string,
 	                         sizeof(char),
-	                         strlen(string),
+	                         libc_strlen(string),
 	                         stream);
 	return result;
 }
@@ -555,7 +555,7 @@ NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict obstack_,
 	int result;
 	va_list args;
 	va_start(args, format);
-	result = obstack_vprintf(obstack_, format, args);
+	result = libc_obstack_vprintf(obstack_, format, args);
 	va_end(args);
 	return result;
 }
@@ -580,12 +580,12 @@ NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr,
 	data.ap_avail = 0;
 	data.ap_used  = 0;
 	data.ap_base  = NULL;
-	error = format_vprintf(&format_aprintf_printer, &data, format, args);
+	error = libc_format_vprintf(&libc_format_aprintf_printer, &data, format, args);
 	if unlikely(error < 0) {
-		free(data.ap_base);
+		libc_free(data.ap_base);
 		return -1;
 	}
-	result = format_aprintf_pack(&data, NULL);
+	result = libc_format_aprintf_pack(&data, NULL);
 	if unlikely(!result)
 		return -1;
 	*pstr = result;
@@ -599,7 +599,7 @@ NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr,
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = vasprintf(pstr, format, args);
+	result = libc_vasprintf(pstr, format, args);
 	va_end(args);
 	return result;
 }
@@ -607,7 +607,7 @@ NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr,
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") NONNULL((1)) int
 (LIBCCALL libc_getw_unlocked)(FILE *__restrict stream) THROWS(...) {
 	u16 result;
-	return fread_unlocked(&result, sizeof(result), 1, stream)
+	return libc_fread_unlocked(&result, sizeof(result), 1, stream)
 	       ? (int)result
 	       : (int)EOF;
 }
@@ -615,7 +615,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") NONNULL((2)) int
 (LIBCCALL libc_putw_unlocked)(int w,
                               FILE *__restrict stream) THROWS(...) {
 	u16 c = (u16)w;
-	return fwrite_unlocked(&c, sizeof(c), 1, stream)
+	return libc_fwrite_unlocked(&c, sizeof(c), 1, stream)
 	       ? w
 	       : EOF;
 }
@@ -637,7 +637,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 
 			if (new_bufsize <= result + 1)
 				new_bufsize = 16;
 			assert(new_bufsize > result + 1);
-			buffer = (char *)realloc(buffer,
+			buffer = (char *)libc_realloc(buffer,
 			                         new_bufsize *
 			                         sizeof(char));
 			if unlikely(!buffer)
@@ -645,7 +645,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 
 			*lineptr = buffer;
 			*pcount  = bufsize;
 		}
-		ch = fgetc_unlocked(stream);
+		ch = libc_fgetc_unlocked(stream);
 		if (ch == EOF)
 			break; /* EOF */
 		buffer[result++] = (char)ch;
@@ -654,9 +654,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 
 		/* Special case for line-delimiter. */
 		if (delimiter == '\n' && ch == '\r') {
 			/* Deal with '\r\n', as well as '\r' */
-			ch = fgetc_unlocked(stream);
+			ch = libc_fgetc_unlocked(stream);
 			if (ch != EOF && ch != '\n')
-				ungetc_unlocked(ch, stream);
+				libc_ungetc_unlocked(ch, stream);
 			/* Unify linefeeds (to use POSIX notation) */
 			buffer[result - 1] = '\n';
 			break;
@@ -670,15 +670,15 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 
 (LIBCCALL libc_getline_unlocked)(char **__restrict lineptr,
                                  size_t *__restrict pcount,
                                  FILE *__restrict stream) THROWS(...) {
-	return getdelim_unlocked(lineptr, pcount, '\n', stream);
+	return libc_getdelim_unlocked(lineptr, pcount, '\n', stream);
 }
 #include <local/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (LIBCCALL libc_puts_unlocked)(char const *__restrict string) THROWS(...) {
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = fputs_unlocked(string, stdout);
+	result = libc_fputs_unlocked(string, stdout);
 	if (result >= 0) {
-		temp = fputc_unlocked('\n', stdout);
+		temp = libc_fputc_unlocked('\n', stdout);
 		if (temp <= 0)
 			result = temp;
 		else
@@ -690,7 +690,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(2, 
 (LIBCCALL libc_vfprintf_unlocked)(FILE *__restrict stream,
                                   char const *__restrict format,
                                   va_list args) THROWS(...) {
-	return (__STDC_INT_AS_SSIZE_T)format_vprintf(&file_printer_unlocked, stream, format, args);
+	return (__STDC_INT_AS_SSIZE_T)libc_format_vprintf(&libc_file_printer_unlocked, stream, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 (VLIBCCALL libc_fprintf_unlocked)(FILE *__restrict stream,
@@ -699,7 +699,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(2, 
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = vfprintf_unlocked(stream, format, args);
+	result = libc_vfprintf_unlocked(stream, format, args);
 	va_end(args);
 	return result;
 }
@@ -707,7 +707,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(2, 
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (LIBCCALL libc_vprintf_unlocked)(char const *__restrict format,
                                  va_list args) THROWS(...) {
-	return vfprintf_unlocked(stdout, format, args);
+	return libc_vfprintf_unlocked(stdout, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (VLIBCCALL libc_printf_unlocked)(char const *__restrict format,
@@ -715,7 +715,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(1, 
 	__STDC_INT_AS_SSIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = vprintf_unlocked(format, args);
+	result = libc_vprintf_unlocked(format, args);
 	va_end(args);
 	return result;
 }
@@ -724,7 +724,7 @@ __NAMESPACE_LOCAL_BEGIN
 #if __SIZEOF_SIZE_T__ != __SIZEOF_INT__
 __LOCAL_LIBC(vfscanf_getc_unlocked) ssize_t
 (__LIBCCALL vfscanf_getc_unlocked)(void *arg) {
-	return (ssize_t)fgetc_unlocked((FILE *)arg);
+	return (ssize_t)libc_fgetc_unlocked((FILE *)arg);
 }
 #endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 __LOCAL_LIBC(vfscanf_ungetc_unlocked) ssize_t
@@ -739,12 +739,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCAN
                                  char const *__restrict format,
                                  va_list args) THROWS(...) {
 #if __SIZEOF_SIZE_T__ == __SIZEOF_INT__
-	return format_vscanf(*(pformatgetc)&fgetc_unlocked,
+	return libc_format_vscanf(*(pformatgetc)&libc_fgetc_unlocked,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc_unlocked,
 	                     (void *)stream,
 	                     format, args);
 #else /* __SIZEOF_SIZE_T__ == __SIZEOF_INT__ */
-	return format_vscanf(&__NAMESPACE_LOCAL_SYM vfscanf_getc_unlocked,
+	return libc_format_vscanf(&__NAMESPACE_LOCAL_SYM vfscanf_getc_unlocked,
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc_unlocked,
 	                     (void *)stream,
 	                     format, args);
@@ -754,7 +754,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCAN
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBCCALL libc_vscanf_unlocked)(char const *__restrict format,
                                 va_list args) THROWS(...) {
-	return vfscanf_unlocked(stdin, format, args);
+	return libc_vfscanf_unlocked(stdin, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc_fscanf_unlocked)(FILE *__restrict stream,
@@ -763,7 +763,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCAN
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = vfscanf_unlocked(stream, format, args);
+	result = libc_vfscanf_unlocked(stream, format, args);
 	va_end(args);
 	return result;
 }
@@ -773,16 +773,23 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCAN
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = vscanf_unlocked(format, args);
+	result = libc_vscanf_unlocked(format, args);
 	va_end(args);
 	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
+NOTHROW_RPC(LIBCCALL libc__fsopen)(char const *filename,
+                                   char const *modes,
+                                   int sflag) {
+	(void)sflag;
+	return libc_fopen(filename, modes);
 }
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vscanf_l)(char const *__restrict format,
                           locale_t locale,
                           va_list args) THROWS(...) {
 	(void)locale;
-	return vscanf(format, args);
+	return libc_vscanf(format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vfscanf_l)(FILE *__restrict stream,
@@ -790,7 +797,7 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SC
                            locale_t locale,
                            va_list args) THROWS(...) {
 	(void)locale;
-	return vfscanf(stream, format, args);
+	return libc_vfscanf(stream, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf") WUNUSED ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsscanf_l)(char const *__restrict input,
@@ -798,7 +805,7 @@ NOTHROW_NCX(LIBCCALL libc__vsscanf_l)(char const *__restrict input,
                                       locale_t locale,
                                       va_list args) {
 	(void)locale;
-	return vsscanf(input, format, args);
+	return libc_vsscanf(input, format, args);
 }
 #include <asm/stdio.h>
 #include <hybrid/typecore.h>
@@ -810,14 +817,14 @@ struct __vsnscanf_data {
 __LOCAL_LIBC(vsnscanf_getc) __SSIZE_TYPE__
 (__LIBCCALL __vsnscanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ __result;
-	__result = unicode_readutf8_n(&((struct __vsnscanf_data *)__arg)->__ptr,
+	__result = libc_unicode_readutf8_n(&((struct __vsnscanf_data *)__arg)->__ptr,
 	                              ((struct __vsnscanf_data *)__arg)->__end);
 	return __result ? __result : __EOF;
 }
 
 __LOCAL_LIBC(vsnscanf_ungetc) __SSIZE_TYPE__
 (__LIBCCALL __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	unicode_readutf8_rev(&((struct __vsnscanf_data *)__arg)->__ptr);
+	libc_unicode_readutf8_rev(&((struct __vsnscanf_data *)__arg)->__ptr);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -829,9 +836,18 @@ NOTHROW_NCX(LIBCCALL libc__vsnscanf)(char const *__restrict input,
 	struct __NAMESPACE_LOCAL_SYM __vsnscanf_data data;
 	data.__ptr = input;
 	data.__end = input + inputlen;
-	return format_vscanf(&__NAMESPACE_LOCAL_SYM __vsnscanf_getc,
+	return libc_format_vscanf(&__NAMESPACE_LOCAL_SYM __vsnscanf_getc,
 	                     &__NAMESPACE_LOCAL_SYM __vsnscanf_ungetc,
 	                     (void *)&data, format, args);
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf") ATTR_LIBC_SCANF(3, 5) NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsnscanf_l)(char const *__restrict input,
+                                       size_t inputlen,
+                                       char const *__restrict format,
+                                       locale_t locale,
+                                       va_list args) {
+	(void)locale;
+	return libc__vsnscanf(input, inputlen, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__scanf_l)(char const *__restrict format,
@@ -840,7 +856,7 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") ATTR_LIBC_SCANF(1, 3
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vscanf_l(format, locale, args);
+	result = libc__vscanf_l(format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -852,7 +868,7 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") ATTR_LIBC_SCANF(2, 4
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vfscanf_l(stream, format, locale, args);
+	result = libc__vfscanf_l(stream, format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -864,7 +880,20 @@ NOTHROW_NCX(VLIBCCALL libc__snscanf)(char const *__restrict input,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = _vsnscanf(input, inputlen, format, args);
+	result = libc__vsnscanf(input, inputlen, format, args);
+	va_end(args);
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf") ATTR_LIBC_SCANF(3, 5) NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snscanf_l)(char const *__restrict input,
+                                       size_t inputlen,
+                                       char const *__restrict format,
+                                       locale_t locale,
+                                       ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vsnscanf_l(input, inputlen, format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -874,7 +903,7 @@ NOTHROW_NCX(LIBCCALL libc__vsprintf_l)(char *__restrict buf,
                                        locale_t locale,
                                        va_list args) {
 	(void)locale;
-	return vsprintf(buf, format, args);
+	return libc_vsprintf(buf, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsprintf_p)(char *__restrict buf,
@@ -896,7 +925,7 @@ NOTHROW_NCX(LIBCCALL libc__vsprintf_p_l)(char *__restrict buf,
                                          locale_t locale,
                                          va_list args) {
 	(void)locale;
-	return _vsprintf_p(buf, bufsize, format, args);
+	return libc__vsprintf_p(buf, bufsize, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__sprintf_l)(char *__restrict buf,
@@ -906,7 +935,7 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_l)(char *__restrict buf,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vsprintf_l(buf, format, locale, args);
+	result = libc__vsprintf_l(buf, format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -931,7 +960,7 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_p)(char *__restrict buf,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = _vsprintf_p(buf, bufsize, format, args);
+	result = libc__vsprintf_p(buf, bufsize, format, args);
 	va_end(args);
 	return result;
 }
@@ -944,14 +973,14 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_p_l)(char *__restrict buf,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vsprintf_p_l(buf, bufsize, format, locale, args);
+	result = libc__vsprintf_p_l(buf, bufsize, format, locale, args);
 	va_end(args);
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vscprintf)(char const *__restrict format,
                                       va_list args) {
-	return vsnprintf(NULL, 0, format, args);
+	return libc_vsnprintf(NULL, 0, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__scprintf)(char const *__restrict format,
@@ -959,7 +988,7 @@ NOTHROW_NCX(VLIBCCALL libc__scprintf)(char const *__restrict format,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = _vscprintf(format, args);
+	result = libc__vscprintf(format, args);
 	va_end(args);
 	return result;
 }
@@ -968,7 +997,7 @@ NOTHROW_NCX(LIBCCALL libc__vscprintf_l)(char const *__restrict format,
                                         locale_t locale,
                                         va_list args) {
 	(void)locale;
-	return _vscprintf(format, args);
+	return libc__vscprintf(format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") WUNUSED ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vscprintf_p)(char const *__restrict format,
@@ -984,7 +1013,7 @@ NOTHROW_NCX(LIBCCALL libc__vscprintf_p_l)(char const *__restrict format,
                                           locale_t locale,
                                           va_list args) {
 	(void)locale;
-	return _vscprintf_p(format, args);
+	return libc__vscprintf_p(format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") WUNUSED ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__scprintf_l)(char const *__restrict format,
@@ -993,7 +1022,7 @@ NOTHROW_NCX(VLIBCCALL libc__scprintf_l)(char const *__restrict format,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vscprintf_l(format, locale, args);
+	result = libc__vscprintf_l(format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -1003,7 +1032,7 @@ NOTHROW_NCX(VLIBCCALL libc__scprintf_p)(char const *__restrict format,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = _vscprintf_p(format, args);
+	result = libc__vscprintf_p(format, args);
 	va_end(args);
 	return result;
 }
@@ -1014,7 +1043,7 @@ NOTHROW_NCX(VLIBCCALL libc__scprintf_p_l)(char const *__restrict format,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vscprintf_p_l(format, locale, args);
+	result = libc__vscprintf_p_l(format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -1025,7 +1054,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf)(char *__restrict buf,
                                       char const *__restrict format,
                                       va_list args) {
 	__STDC_INT_AS_SIZE_T result;
-	result = vsnprintf(buf, bufsize, format, args);
+	result = libc_vsnprintf(buf, bufsize, format, args);
 	if (result > bufsize)
 		result = bufsize;
 	return result;
@@ -1037,7 +1066,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf_l)(char *__restrict buf,
                                         locale_t locale,
                                         va_list args) {
 	(void)locale;
-	return _vsnprintf(buf, bufsize, format, args);
+	return libc__vsnprintf(buf, bufsize, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsnprintf_s)(char *__restrict buf,
@@ -1046,7 +1075,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf_s)(char *__restrict buf,
                                         char const *__restrict format,
                                         va_list args) {
 	(void)buflen;
-	return _vsnprintf(buf, bufsize, format, args);
+	return libc__vsnprintf(buf, bufsize, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsnprintf_s_l)(char *__restrict buf,
@@ -1057,7 +1086,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf_s_l)(char *__restrict buf,
                                           va_list args) {
 	(void)buflen;
 	(void)locale;
-	return _vsnprintf(buf, bufsize, format, args);
+	return libc__vsnprintf(buf, bufsize, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snprintf)(char *__restrict buf,
@@ -1067,7 +1096,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf)(char *__restrict buf,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = _vsnprintf(buf, bufsize, format, args);
+	result = libc__vsnprintf(buf, bufsize, format, args);
 	va_end(args);
 	return result;
 }
@@ -1080,7 +1109,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_l)(char *__restrict buf,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vsnprintf_l(buf, bufsize, format, locale, args);
+	result = libc__vsnprintf_l(buf, bufsize, format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -1118,7 +1147,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_s)(char *__restrict buf,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = _vsnprintf_s(buf, bufsize, buflen, format, args);
+	result = libc__vsnprintf_s(buf, bufsize, buflen, format, args);
 	va_end(args);
 	return result;
 }
@@ -1132,7 +1161,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_s_l)(char *__restrict buf,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vsnprintf_s_l(buf, bufsize, buflen, format, locale, args);
+	result = libc__vsnprintf_s_l(buf, bufsize, buflen, format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -1141,20 +1170,20 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
                            locale_t locale,
                            va_list args) THROWS(...) {
 	(void)locale;
-	return vprintf(format, args);
+	return libc_vprintf(format, args);
 }
 #include <local/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vprintf_p)(char const *__restrict format,
                            va_list args) THROWS(...) {
-	return _vfprintf_p(stdout, format, args);
+	return libc__vfprintf_p(stdout, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vprintf_p_l)(char const *__restrict format,
                              locale_t locale,
                              va_list args) THROWS(...) {
 	(void)locale;
-	return _vprintf_p(format, args);
+	return libc__vprintf_p(format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__printf_l)(char const *__restrict format,
@@ -1163,7 +1192,7 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vprintf_l(format, locale, args);
+	result = libc__vprintf_l(format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -1184,7 +1213,7 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRIN
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = _vprintf_p(format, args);
+	result = libc__vprintf_p(format, args);
 	va_end(args);
 	return result;
 }
@@ -1195,7 +1224,7 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vprintf_p_l(format, locale, args);
+	result = libc__vprintf_p_l(format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -1205,7 +1234,7 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
                             locale_t locale,
                             va_list args) THROWS(...) {
 	(void)locale;
-	return vfprintf(stream, format, args);
+	return libc_vfprintf(stream, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF_P(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vfprintf_p)(FILE *__restrict stream,
@@ -1224,7 +1253,7 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
                               locale_t locale,
                               va_list args) THROWS(...) {
 	(void)locale;
-	return _vfprintf_p(stream, format, args);
+	return libc__vfprintf_p(stream, format, args);
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__fprintf_l)(FILE *__restrict stream,
@@ -1234,7 +1263,7 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vfprintf_l(stream, format, locale, args);
+	result = libc__vfprintf_l(stream, format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -1257,7 +1286,19 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRIN
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = _vfprintf_p(stream, format, args);
+	result = libc__vfprintf_p(stream, format, args);
+	va_end(args);
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBCCALL libc__fprintf_p_l)(FILE *__restrict stream,
+                              char const *__restrict format,
+                              locale_t locale,
+                              ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vfprintf_p_l(stream, format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -1274,7 +1315,7 @@ NOTHROW_RPC(LIBCCALL libc_fopen_s)(FILE **pstream,
 		return 1;
 #endif /* !EINVAL */
 	}
-	result = fopen64(filename, modes);
+	result = libc_fopen64(filename, modes);
 	if unlikely(!result) {
 #ifdef ENOMEM
 		return __libc_geterrno_or(ENOMEM);
@@ -1298,7 +1339,7 @@ NOTHROW_RPC(LIBCCALL libc_freopen_s)(FILE **pstream,
 		return 1;
 #endif /* !EINVAL */
 	}
-	oldstream = freopen(filename, modes, oldstream);
+	oldstream = libc_freopen(filename, modes, oldstream);
 	if unlikely(!oldstream) {
 #ifdef __libc_geterrno
 		return __libc_geterrno();
@@ -1327,7 +1368,7 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam_s)(char *__restrict buf,
 		return 1;
 #endif /* !ERANGE */
 	}
-	if unlikely(!tmpnam(buf)) {
+	if unlikely(!libc_tmpnam(buf)) {
 #ifdef __libc_geterrno
 		return __libc_geterrno();
 #else /* __libc_geterrno */
@@ -1346,7 +1387,7 @@ NOTHROW_NCX(LIBCCALL libc_clearerr_s)(FILE *__restrict stream) {
 		return 1;
 #endif /* !EINVAL */
 	}
-	clearerr(stream);
+	libc_clearerr(stream);
 	return 0;
 }
 #include <parts/errno.h>
@@ -1359,7 +1400,7 @@ NOTHROW_RPC(LIBCCALL libc_tmpfile_s)(FILE **pstream) {
 		return 1;
 #endif /* !EINVAL */
 	}
-	*pstream = tmpfile64();
+	*pstream = libc_tmpfile64();
 	if (!*pstream) {
 #ifdef ENOMEM
 		return __libc_geterrno_or(ENOMEM);
@@ -1391,7 +1432,20 @@ NOTHROW_RPC(LIBCCALL libc_fread_s)(void *__restrict buf,
 #endif /* EINVAL */
 		return 0;
 	}
-	return fread(buf, elemsize, elemcount, stream);
+	return libc_fread(buf, elemsize, elemcount, stream);
+}
+#include <local/stdstreams.h>
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.read") WUNUSED NONNULL((1)) char *
+NOTHROW_RPC(LIBCCALL libc_gets_s)(char *__restrict buf,
+                                  rsize_t bufsize) {
+	if unlikely(!buf) {
+#ifdef EINVAL
+		__libc_seterrno(EINVAL);
+#endif /* EINVAL */
+		return NULL;
+	}
+	return libc_fgets(buf, (__STDC_INT_AS_SIZE_T)(unsigned int)bufsize, stdin);
 }
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.read") ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf,
@@ -1399,22 +1453,22 @@ NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf,
                                        size_t buflen,
                                        char const *__restrict format,
                                        va_list args) {
-	return vsnprintf(buf, buflen < bufsize ? buflen : bufsize, format, args);
+	return libc_vsnprintf(buf, buflen < bufsize ? buflen : bufsize, format, args);
 }
 #include <local/stdstreams.h>
 #include <parts/errno.h>
 INTERN ATTR_COLD void
 (LIBDCALL libd__wperror)(char16_t const *__restrict message) THROWS(...) {
 	char const *enodesc;
-	enodesc = strerror(__libc_geterrno());
+	enodesc = libc_strerror(__libc_geterrno());
 	if (message) {
 #if 2 == 2
-		fprintf(stderr, "%I16s: %s\n", message, enodesc);
+		libc_fprintf(stderr, "%I16s: %s\n", message, enodesc);
 #else /* 2 == 2 */
-		fprintf(stderr, "%I32s: %s\n", message, enodesc);
+		libc_fprintf(stderr, "%I32s: %s\n", message, enodesc);
 #endif /* !(2 == 2) */
 	} else {
-		fprintf(stderr, "%s\n",
+		libc_fprintf(stderr, "%s\n",
 		        enodesc);
 	}
 }
@@ -1423,15 +1477,15 @@ INTERN ATTR_COLD void
 INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
 (LIBKCALL libc__wperror)(char32_t const *__restrict message) THROWS(...) {
 	char const *enodesc;
-	enodesc = strerror(__libc_geterrno());
+	enodesc = libc_strerror(__libc_geterrno());
 	if (message) {
 #if 4 == 2
-		fprintf(stderr, "%I16s: %s\n", message, enodesc);
+		libc_fprintf(stderr, "%I16s: %s\n", message, enodesc);
 #else /* 4 == 2 */
-		fprintf(stderr, "%I32s: %s\n", message, enodesc);
+		libc_fprintf(stderr, "%I32s: %s\n", message, enodesc);
 #endif /* !(4 == 2) */
 	} else {
-		fprintf(stderr, "%s\n",
+		libc_fprintf(stderr, "%s\n",
 		        enodesc);
 	}
 }
@@ -1442,7 +1496,7 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.unlocked.read.read") WUNUSED NONNULL((1,
                                 size_t elemcount,
                                 FILE *__restrict stream) THROWS(...) {
 	bufsize = elemsize ? bufsize / elemsize : 0;
-	return fread_unlocked(buf, elemsize,
+	return libc_fread_unlocked(buf, elemsize,
 	                      bufsize < elemcount
 	                      ? bufsize
 	                      : elemcount,
@@ -1533,6 +1587,7 @@ DEFINE_PUBLIC_ALIAS(vfscanf_unlocked, libc_vfscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(vscanf_unlocked, libc_vscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(fscanf_unlocked, libc_fscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(scanf_unlocked, libc_scanf_unlocked);
+DEFINE_PUBLIC_ALIAS(_fsopen, libc__fsopen);
 DEFINE_PUBLIC_ALIAS(_vscanf_s_l, libc__vscanf_l);
 DEFINE_PUBLIC_ALIAS(_vscanf_l, libc__vscanf_l);
 DEFINE_PUBLIC_ALIAS(_vfscanf_s_l, libc__vfscanf_l);
@@ -1541,12 +1596,16 @@ DEFINE_PUBLIC_ALIAS(_vsscanf_s_l, libc__vsscanf_l);
 DEFINE_PUBLIC_ALIAS(_vsscanf_l, libc__vsscanf_l);
 DEFINE_PUBLIC_ALIAS(_vsnscanf_s, libc__vsnscanf);
 DEFINE_PUBLIC_ALIAS(_vsnscanf, libc__vsnscanf);
+DEFINE_PUBLIC_ALIAS(_vsnscanf_s_l, libc__vsnscanf_l);
+DEFINE_PUBLIC_ALIAS(_vsnscanf_l, libc__vsnscanf_l);
 DEFINE_PUBLIC_ALIAS(_scanf_s_l, libc__scanf_l);
 DEFINE_PUBLIC_ALIAS(_scanf_l, libc__scanf_l);
 DEFINE_PUBLIC_ALIAS(_fscanf_s_l, libc__fscanf_l);
 DEFINE_PUBLIC_ALIAS(_fscanf_l, libc__fscanf_l);
 DEFINE_PUBLIC_ALIAS(_snscanf_s, libc__snscanf);
 DEFINE_PUBLIC_ALIAS(_snscanf, libc__snscanf);
+DEFINE_PUBLIC_ALIAS(_snscanf_s_l, libc__snscanf_l);
+DEFINE_PUBLIC_ALIAS(_snscanf_l, libc__snscanf_l);
 DEFINE_PUBLIC_ALIAS(_vsprintf_l, libc__vsprintf_l);
 DEFINE_PUBLIC_ALIAS(_vsprintf_p, libc__vsprintf_p);
 DEFINE_PUBLIC_ALIAS(_vsprintf_p_l, libc__vsprintf_p_l);
@@ -1588,12 +1647,14 @@ DEFINE_PUBLIC_ALIAS(_vfprintf_p_l, libc__vfprintf_p_l);
 DEFINE_PUBLIC_ALIAS(_fprintf_l, libc__fprintf_l);
 DEFINE_PUBLIC_ALIAS(_fprintf_s_l, libc__fprintf_s_l);
 DEFINE_PUBLIC_ALIAS(_fprintf_p, libc__fprintf_p);
+DEFINE_PUBLIC_ALIAS(_fprintf_p_l, libc__fprintf_p_l);
 DEFINE_PUBLIC_ALIAS(fopen_s, libc_fopen_s);
 DEFINE_PUBLIC_ALIAS(freopen_s, libc_freopen_s);
 DEFINE_PUBLIC_ALIAS(tmpnam_s, libc_tmpnam_s);
 DEFINE_PUBLIC_ALIAS(clearerr_s, libc_clearerr_s);
 DEFINE_PUBLIC_ALIAS(tmpfile_s, libc_tmpfile_s);
 DEFINE_PUBLIC_ALIAS(fread_s, libc_fread_s);
+DEFINE_PUBLIC_ALIAS(gets_s, libc_gets_s);
 DEFINE_PUBLIC_ALIAS(vsnprintf_s, libc_vsnprintf_s);
 DEFINE_PUBLIC_ALIAS(DOS$_wperror, libd__wperror);
 DEFINE_PUBLIC_ALIAS(_wperror, libc__wperror);

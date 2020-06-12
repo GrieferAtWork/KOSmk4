@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe39f2110 */
+/* HASH CRC-32:0xa837efbc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock) {
 /* Wait until spinlock LOCK is retrieved */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock) {
-	while (pthread_spin_trylock(lock) != 0)
+	while (libc_pthread_spin_trylock(lock) != 0)
 		__hybrid_yield();
 	return 0;
 }

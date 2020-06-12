@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf3bcb44 */
+/* HASH CRC-32:0x9a944df6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/stringlist.h"
-#include <string.h>
+#include "../user/string.h"
 
 DECL_BEGIN
 
@@ -40,7 +40,7 @@ NOTHROW_NCX(LIBCCALL libc_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl,
 	size_t i;
 	for (i = 0; i < sl->sl_cur; ++i) {
 		char *s = sl->sl_str[i];
-		if (strcmp(s, name) == 0)
+		if (libc_strcmp(s, name) == 0)
 			return s;
 	}
 	return NULL;

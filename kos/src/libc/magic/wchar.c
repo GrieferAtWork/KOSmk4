@@ -612,8 +612,8 @@ wchar_t *wcstok([[nullable]] wchar_t *string,
 %(std)#endif
 
 [[std, guard, wchar, wunused, ATTR_PURE]]
-[[crt_dos_impl_if(!defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16SLEN))]]
-[[crt_kos_impl_if(!defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C32SLEN))]]
+[[crt_dos_impl_requires(!defined(LIBC_ARCH_HAVE_C16SLEN))]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_C32SLEN))]]
 $size_t wcslen([[nonnull]] wchar_t const *__restrict string)
 	%{generate(str2wcs("strlen"))}
 
@@ -943,8 +943,8 @@ $FILE *open_wmemstream(wchar_t **bufloc, $size_t *sizeloc);
 
 [[guard, wchar, wunused, ATTR_PURE]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
-[[crt_dos_impl_if(!defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16SNLEN))]]
-[[crt_kos_impl_if(!defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C32SNLEN))]]
+[[crt_dos_impl_requires(!defined(LIBC_ARCH_HAVE_C16SNLEN))]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_C32SNLEN))]]
 $size_t wcsnlen([[nonnull]] wchar_t const *__restrict string, $size_t maxlen)
 	%{generate(str2wcs("strnlen"))}
 
@@ -1300,8 +1300,8 @@ __STDC_INT_AS_SIZE_T wscanf_unlocked([[nonnull]] wchar_t const *__restrict forma
 /* KOS String extension functions. */
 @@Same as `STR+wcslen(STR)'
 [[wchar, wunused, ATTR_PURE, ATTR_RETNONNULL]]
-[[crt_dos_impl_if(!defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16SEND))]]
-[[crt_kos_impl_if(!defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C32SEND))]]
+[[crt_dos_impl_requires(!defined(LIBC_ARCH_HAVE_C16SEND))]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_C32SEND))]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
 wchar_t *wcsend([[nonnull]] wchar_t const *__restrict string)
 	[([[nonnull]] wchar_t *__restrict string): wchar_t *]
@@ -1310,8 +1310,8 @@ wchar_t *wcsend([[nonnull]] wchar_t const *__restrict string)
 
 @@Same as `STR+wcsnlen(STR, MAX_CHARS)'
 [[wchar, wunused, ATTR_PURE]]
-[[crt_dos_impl_if(!defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16SNEND))]]
-[[crt_kos_impl_if(!defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C32SNEND))]]
+[[crt_dos_impl_requires(!defined(LIBC_ARCH_HAVE_C16SNEND))]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_C32SNEND))]]
 [[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
 wchar_t *wcsnend([[inp(maxlen)]] wchar_t const *__restrict string, $size_t maxlen)
 	[([[inp(maxlen)]] wchar_t *__restrict string, $size_t maxlen): wchar_t *]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc7f720e */
+/* HASH CRC-32:0xad2e4e5d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -608,8 +608,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_8to16)(char16_t *__restrict utf16_dst,
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
-		ch = unicode_readutf8_n((char const **)&utf8_text,utf8_end);
-		utf16_dst = unicode_writeutf16(utf16_dst,ch);
+		ch = libc_unicode_readutf8_n((char const **)&utf8_text,utf8_end);
+		utf16_dst = libc_unicode_writeutf16(utf16_dst,ch);
 	}
 	return utf16_dst;
 }
@@ -627,10 +627,10 @@ NOTHROW_NCX(LIBCCALL libc_unicode_8to16_chk)(char16_t *__restrict utf16_dst,
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
-		ch = unicode_readutf8_n((char const **)&utf8_text,utf8_end);
+		ch = libc_unicode_readutf8_n((char const **)&utf8_text,utf8_end);
 		if (ch > 0x10ffff || (ch >= 0xd800 && ch <= 0xdfff))
 			return NULL;
-		utf16_dst = unicode_writeutf16(utf16_dst,ch);
+		utf16_dst = libc_unicode_writeutf16(utf16_dst,ch);
 	}
 	return utf16_dst;
 }
@@ -646,7 +646,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_8to32)(char32_t *__restrict utf32_dst,
                                          size_t utf8_characters) {
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end)
-		*utf32_dst++ = unicode_readutf8_n((char const **)&utf8_text,utf8_end);
+		*utf32_dst++ = libc_unicode_readutf8_n((char const **)&utf8_text,utf8_end);
 	return utf32_dst;
 }
 /* Convert a given utf-16 string to utf-8.
@@ -661,7 +661,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_16to8)(char *__restrict utf8_dst,
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end) {
 		char32_t ch;
-		ch = unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
+		ch = libc_unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
 		if (ch <= ((uint32_t)1 << 7)-1) {
 			*utf8_dst++ = (char)(u8)ch;
 		} else if (ch <= ((uint32_t)1 << 11)-1) {
@@ -686,7 +686,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_16to32)(char32_t *__restrict utf32_dst,
                                           size_t utf16_characters) {
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end)
-		*utf32_dst++ = unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
+		*utf32_dst++ = libc_unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
 	return utf32_dst;
 }
 /* Convert a given utf-32 string to utf-8.
@@ -699,7 +699,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_32to8)(char *__restrict utf8_dst,
                                          char32_t const *__restrict utf32_text,
                                          size_t utf32_characters) {
 	while (utf32_characters--)
-		utf8_dst = unicode_writeutf8(utf8_dst, *utf32_text++);
+		utf8_dst = libc_unicode_writeutf8(utf8_dst, *utf32_text++);
 	return utf8_dst;
 }
 /* Convert a given utf-32 string to utf-16.
@@ -712,7 +712,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_32to16)(char16_t *__restrict utf16_dst,
                                           char32_t const *__restrict utf32_text,
                                           size_t utf32_characters) {
 	while (utf32_characters--)
-		utf16_dst = unicode_writeutf16(utf16_dst, *utf32_text++);
+		utf16_dst = libc_unicode_writeutf16(utf16_dst, *utf32_text++);
 	return utf16_dst;
 }
 #ifndef __KERNEL__
@@ -986,7 +986,7 @@ NOTHROW_NCX(LIBCCALL libc_format_8to16)(void *arg,
 	closure = (struct __local_format_8to16_data *)arg;
 	while (datalen) {
 		do {
-			size_t error = unicode_c8toc16(dst, data, datalen, &closure->fd_incomplete);
+			size_t error = libc_unicode_c8toc16(dst, data, datalen, &closure->fd_incomplete);
 			if unlikely(error == (size_t)-1) {
 				closure->fd_incomplete.__word = __MBSTATE_TYPE_EMPTY;
 				*dst = data[0];
@@ -1029,7 +1029,7 @@ NOTHROW_NCX(LIBCCALL libc_format_8to32)(void *arg,
 	closure = (struct __local_format_8to32_data *)arg;
 	while (datalen) {
 		do {
-			size_t error = unicode_c8toc32(dst, data, datalen, &closure->fd_incomplete);
+			size_t error = libc_unicode_c8toc32(dst, data, datalen, &closure->fd_incomplete);
 			if unlikely(error == (size_t)-1) {
 				closure->fd_incomplete.__word = __MBSTATE_TYPE_EMPTY;
 				*dst = data[0];
@@ -1076,7 +1076,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wto8)(void *arg,
 		closure->fd_surrogate = 0;
 		ch += 0x10000;
 		ch += ((char16_t const *)data)[0] - 0xdc00;
-		dst = unicode_writeutf8(dst, ch);
+		dst = libc_unicode_writeutf8(dst, ch);
 		i = 1;
 		goto after_dst_write;
 	}
@@ -1096,7 +1096,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wto8)(void *arg,
 			} else {
 				ch = ch16;
 			}
-			dst = unicode_writeutf8(dst, ch);
+			dst = libc_unicode_writeutf8(dst, ch);
 after_dst_write:
 			;
 		} while ((dst + 4) < COMPILER_ENDOF(buf) && i < datalen);
@@ -1122,7 +1122,7 @@ err:
 	while (i < datalen) {
 		char *dst = buf;
 		do {
-			dst = unicode_writeutf8(dst, ((char32_t const *)data)[i++]);
+			dst = libc_unicode_writeutf8(dst, ((char32_t const *)data)[i++]);
 		} while ((dst + 7) < COMPILER_ENDOF(buf) && i < datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)
@@ -1158,7 +1158,7 @@ NOTHROW_NCX(LIBKCALL libc_format_wto8)(void *arg,
 		closure->fd_surrogate = 0;
 		ch += 0x10000;
 		ch += ((char16_t const *)data)[0] - 0xdc00;
-		dst = unicode_writeutf8(dst, ch);
+		dst = libc_unicode_writeutf8(dst, ch);
 		i = 1;
 		goto after_dst_write;
 	}
@@ -1178,7 +1178,7 @@ NOTHROW_NCX(LIBKCALL libc_format_wto8)(void *arg,
 			} else {
 				ch = ch16;
 			}
-			dst = unicode_writeutf8(dst, ch);
+			dst = libc_unicode_writeutf8(dst, ch);
 after_dst_write:
 			;
 		} while ((dst + 4) < COMPILER_ENDOF(buf) && i < datalen);
@@ -1204,7 +1204,7 @@ err:
 	while (i < datalen) {
 		char *dst = buf;
 		do {
-			dst = unicode_writeutf8(dst, ((char32_t const *)data)[i++]);
+			dst = libc_unicode_writeutf8(dst, ((char32_t const *)data)[i++]);
 		} while ((dst + 7) < COMPILER_ENDOF(buf) && i < datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)
@@ -1371,7 +1371,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wto16)(void *arg,
 	while (i < datalen) {
 		char16_t *dst = buf;
 		do {
-			dst = unicode_writeutf16(dst, data[i++]);
+			dst = libc_unicode_writeutf16(dst, data[i++]);
 		} while ((dst + 2) < COMPILER_ENDOF(buf) && i < datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)
@@ -1412,7 +1412,7 @@ NOTHROW_NCX(LIBKCALL libc_format_wto16)(void *arg,
 	while (i < datalen) {
 		char16_t *dst = buf;
 		do {
-			dst = unicode_writeutf16(dst, data[i++]);
+			dst = libc_unicode_writeutf16(dst, data[i++]);
 		} while ((dst + 2) < COMPILER_ENDOF(buf) && i < datalen);
 		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
 		if unlikely(temp < 0)

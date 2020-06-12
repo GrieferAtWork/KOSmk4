@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa796bd55 */
+/* HASH CRC-32:0xc719287b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "envz.h"
-#include <argz.h>
-#include <stdlib.h>
-#include <string.h>
+#include "argz.h"
+#include "../user/stdlib.h"
+#include "../user/string.h"
 
 DECL_BEGIN
 
@@ -41,12 +41,12 @@ NOTHROW_NCX(LIBCCALL libc_envz_entry)(char const *__restrict envz,
                                       char const *__restrict name) {
 	size_t namelen;
 	char *envz_end = (char *)(envz + envz_len);
-	namelen = stroff(name, '=');
+	namelen = libc_stroff(name, '=');
 	while (envz < envz_end) {
-		if (memcmp(envz, name, namelen) == 0 &&
+		if (libc_memcmp(envz, name, namelen) == 0 &&
 		    (envz[namelen] == '\0' || envz[namelen] == '='))
 			return (char *)envz; /* Found it! */
-		envz = strend(envz) + 1;
+		envz = libc_strend(envz) + 1;
 	}
 	return NULL;
 }
@@ -57,9 +57,9 @@ NOTHROW_NCX(LIBCCALL libc_envz_get)(char const *__restrict envz,
                                     size_t envz_len,
                                     char const *__restrict name) {
 	char *result;
-	result = (char *)envz_entry(envz, envz_len, name);
+	result = (char *)libc_envz_entry(envz, envz_len, name);
 	if (result) {
-		result = strchr(result, '=');
+		result = libc_strchr(result, '=');
 		if (result)
 			++result; /* Point to the value-portion */
 	}
@@ -79,14 +79,14 @@ NOTHROW_NCX(LIBCCALL libc_envz_add)(char **__restrict penvz,
                                     char const *value) {
 	char *new_envz;
 	size_t namelen, valuelen, morelen;
-	envz_remove(penvz, penvz_len, name);
+	libc_envz_remove(penvz, penvz_len, name);
 	if (!value)
-		return argz_add(penvz, penvz_len, name);
+		return libc_argz_add(penvz, penvz_len, name);
 	/* Append a new string `name=value\0' */
-	namelen  = strlen(name);
-	valuelen = strlen(value);
+	namelen  = libc_strlen(name);
+	valuelen = libc_strlen(value);
 	morelen  = namelen + 1 + valuelen + 1;
-	new_envz = (char *)realloc(*penvz, (*penvz_len + morelen) * sizeof(char));
+	new_envz = (char *)libc_realloc(*penvz, (*penvz_len + morelen) * sizeof(char));
 	if unlikely(!new_envz) {
 #ifdef ENOMEM
 		return ENOMEM;
@@ -97,9 +97,9 @@ NOTHROW_NCX(LIBCCALL libc_envz_add)(char **__restrict penvz,
 	*penvz = new_envz;
 	new_envz += *penvz_len;
 	*penvz_len += morelen;
-	new_envz = (char *)mempcpyc(new_envz, name, namelen, sizeof(char));
+	new_envz = (char *)libc_mempcpyc(new_envz, name, namelen, sizeof(char));
 	*new_envz++ = '=';
-	new_envz = (char *)mempcpyc(new_envz, value, valuelen, sizeof(char));
+	new_envz = (char *)libc_mempcpyc(new_envz, value, valuelen, sizeof(char));
 	*new_envz = '\0';
 	return 0;
 }
@@ -114,13 +114,13 @@ NOTHROW_NCX(LIBCCALL libc_envz_merge)(char **__restrict penvz,
                                       int override_) {
 	error_t result = 0;
 	while (envz2_len && result == 0) {
-		char *existing = envz_entry(*penvz, *penvz_len, envz2);
-		size_t newlen  = strlen(envz2) + 1;
+		char *existing = libc_envz_entry(*penvz, *penvz_len, envz2);
+		size_t newlen  = libc_strlen(envz2) + 1;
 		if (!existing)
-			result = argz_append(penvz, penvz_len, envz2, newlen);
+			result = libc_argz_append(penvz, penvz_len, envz2, newlen);
 		else if (override_) {
-			argz_delete(penvz, penvz_len, existing);
-			result = argz_append(penvz, penvz_len, envz2, newlen);
+			libc_argz_delete(penvz, penvz_len, existing);
+			result = libc_argz_append(penvz, penvz_len, envz2, newlen);
 		}
 		envz2     += newlen;
 		envz2_len -= newlen;
@@ -133,9 +133,9 @@ NOTHROW_NCX(LIBCCALL libc_envz_remove)(char **__restrict penvz,
                                        size_t *__restrict penvz_len,
                                        char const *__restrict name) {
 	char *entry;
-	entry = envz_entry(*penvz, *penvz_len, name);
+	entry = libc_envz_entry(*penvz, *penvz_len, name);
 	if (entry)
-		argz_delete(penvz, penvz_len, entry);
+		libc_argz_delete(penvz, penvz_len, entry);
 }
 /* Remove entries that have no value attached */
 INTERN ATTR_SECTION(".text.crt.string.envz") NONNULL((1, 2)) void
@@ -148,22 +148,22 @@ NOTHROW_NCX(LIBCCALL libc_envz_strip)(char **__restrict penvz,
 	while (ptr < end) {
 		char *next;
 		size_t partlen;
-		next = strchrnul(ptr, '=');
+		next = libc_strchrnul(ptr, '=');
 		if (*next) {
-			ptr = strend(next) + 1;
+			ptr = libc_strend(next) + 1;
 			continue;
 		}
 		/* Remove this entry. */
-		next = strend(next) + 1;
+		next = libc_strend(next) + 1;
 		partlen = (size_t)(end - next);
-		memmovedownc(ptr, next, partlen, sizeof(char));
+		libc_memmovedownc(ptr, next, partlen, sizeof(char));
 		end -= partlen;
 	}
 	newlen = (size_t)(end - start);
 	if (newlen < oldlen) {
 		*penvz_len = newlen;
 #ifdef __CRT_HAVE_realloc
-		start = (char *)realloc(start, newlen);
+		start = (char *)libc_realloc(start, newlen);
 		if likely(start)
 			*penvz = start;
 #endif /* __CRT_HAVE_realloc */

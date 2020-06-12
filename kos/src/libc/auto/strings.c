@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b4842d */
+/* HASH CRC-32:0x3995a432 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "strings.h"
-#include <string.h>
+#include "../user/string.h"
 
 DECL_BEGIN
 
@@ -34,12 +34,12 @@ INTERN NONNULL((1, 2)) void
 NOTHROW_NCX(LIBCCALL libc_bcopy)(void const *src,
                                  void *dst,
                                  size_t num_bytes) {
-	memmove(dst, src, num_bytes);
+	libc_memmove(dst, src, num_bytes);
 }
 INTERN NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_bzero)(void *__restrict dst,
                                  size_t num_bytes) {
-	memset(dst, 0, num_bytes);
+	libc_memset(dst, 0, num_bytes);
 }
 INTERN ATTR_PURE WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4b632b6 */
+/* HASH CRC-32:0xd7e8dbef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/io.h"
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include "../user/fcntl.h"
+#include "../user/sys.stat.h"
+#include "../user/unistd.h"
 
 DECL_BEGIN
 
@@ -37,24 +37,24 @@ NOTHROW_NCX(LIBCCALL libc__pipe)(fd_t pipedes[2],
                                  uint32_t pipesize,
                                  oflag_t textmode) {
 	(void)pipesize;
-	return pipe2(pipedes, textmode);
+	return libc_pipe2(pipedes, textmode);
 }
 #include <asm/stdio.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED int64_t
 NOTHROW_NCX(LIBCCALL libc__filelengthi64)(fd_t fd) {
 	int64_t oldpos, result;
-	oldpos = lseek64(fd, 0, SEEK_CUR);
+	oldpos = libc_lseek64(fd, 0, SEEK_CUR);
 	if unlikely(oldpos < 0)
 		return -1;
-	result = lseek64(fd, 0, SEEK_END);
+	result = libc_lseek64(fd, 0, SEEK_END);
 	if likely(result >= 0)
-		lseek64(fd, oldpos, SEEK_SET);
+		libc_lseek64(fd, oldpos, SEEK_SET);
 	return result;
 }
 #include <asm/stdio.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED int64_t
 NOTHROW_NCX(LIBCCALL libc__telli64)(fd_t fd) {
-	return lseek64(fd, 0, __SEEK_CUR);
+	return libc_lseek64(fd, 0, __SEEK_CUR);
 }
 #include <parts/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.basic_property") errno_t
@@ -67,7 +67,7 @@ NOTHROW_NCX(LIBCCALL libc_umask_s)(mode_t newmode,
 		return 1;
 #endif /* !EINVAL */
 	}
-	*oldmode = umask(newmode);
+	*oldmode = libc_umask(newmode);
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_PURE WUNUSED intptr_t
@@ -86,13 +86,13 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.io") oflag_t
 NOTHROW_NCX(LIBCCALL libc_setmode)(fd_t fd,
                                    oflag_t mode) {
 #ifdef __F_SETFL_XCH
-	return fcntl(fd, __F_SETFL_XCH, mode);
+	return libc_fcntl(fd, __F_SETFL_XCH, mode);
 #else /* __F_SETFL_XCH */
 	oflag_t result;
-	result = fcntl(fd, __F_GETFL);
+	result = libc_fcntl(fd, __F_GETFL);
 	if unlikely(result < 0)
 		return -1;
-	return fcntl(fd, __F_SETFL, mode);
+	return libc_fcntl(fd, __F_SETFL, mode);
 #endif /* !__F_SETFL_XCH */
 }
 INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED NONNULL((1)) fd_t
@@ -104,37 +104,37 @@ NOTHROW_RPC(VLIBCCALL libc_sopen)(char const *filename,
 	va_list args;
 	va_start(args, sflags);
 	(void)sflags;
-	result = open(filename, oflags, va_arg(args, mode_t));
+	result = libc_open(filename, oflags, va_arg(args, mode_t));
 	va_end(args);
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED __LONG32_TYPE__
 NOTHROW_NCX(LIBCCALL libc__filelength)(fd_t fd) {
 	__LONG32_TYPE__ oldpos, result;
-	oldpos = lseek(fd, 0, SEEK_CUR);
+	oldpos = libc_lseek(fd, 0, SEEK_CUR);
 	if unlikely(oldpos < 0)
 		return -1;
-	result = lseek(fd, 0, SEEK_END);
+	result = libc_lseek(fd, 0, SEEK_END);
 	if likely(result >= 0)
-		lseek(fd, oldpos, SEEK_SET);
+		libc_lseek(fd, oldpos, SEEK_SET);
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED __LONG32_TYPE__
 NOTHROW_NCX(LIBCCALL libc__tell)(fd_t fd) {
-	return lseek(fd, 0, SEEK_CUR);
+	return libc_lseek(fd, 0, SEEK_CUR);
 }
 #include <asm/stdio.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__eof)(fd_t fd) {
 	int64_t oldpos, endpos;
-	oldpos = lseek64(fd, 0, SEEK_CUR);
+	oldpos = libc_lseek64(fd, 0, SEEK_CUR);
 	if unlikely(oldpos < 0)
 		return -1;
-	endpos = lseek64(fd, 0, SEEK_END);
+	endpos = libc_lseek64(fd, 0, SEEK_END);
 	if likely(endpos >= 0) {
 		if (endpos == oldpos)
 			return 1;
-		lseek64(fd, oldpos, SEEK_SET);
+		libc_lseek64(fd, oldpos, SEEK_SET);
 	}
 	return 0;
 }

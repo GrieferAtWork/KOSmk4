@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d8c54e2 */
+/* HASH CRC-32:0xbab4e89d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,11 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/format-printer.h"
-#include <ctype.h>
-#include <parts/uchar/format-printer.h>
-#include <stdio.h>
-#include <string.h>
-#include <unicode.h>
+#include "../user/ctype.h"
+#include "parts.wchar.format-printer.h"
+#include "../user/stdio.h"
+#include "../user/string.h"
+#include "unicode.h"
 
 DECL_BEGIN
 
@@ -45,19 +45,6 @@ DECL_BEGIN
 #else /* __KERNEL__ */
 #include <libdebuginfo/addr2line.h>
 #endif /* !__KERNEL__ */
-
-#include <unicode.h>
-#include <parts/uchar/format-printer.h>
-#define libc_format_8to16     format_8to16
-#define libc_format_8to32     format_8to32
-#define libc_format_16to8     format_16to8
-#define libc_format_16to32    format_16to32
-#define libc_format_32to8     format_32to8
-#define libc_format_32to16    format_32to16
-#define libc_format_c16escape format_c16escape
-#define libc_format_c16width  format_c16width
-#define libc_format_c32escape format_c32escape
-#define libc_format_c32width  format_c32width
 #include <hybrid/__alloca.h>
 #include <libc/string.h>
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
@@ -80,14 +67,14 @@ INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
 		return (*printer)(arg, buffer, num_repetitions);
 	}
 	buffer = (char *)__hybrid_alloca(FORMAT_REPEAT_BUFSIZE);
-	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
+	libc_memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
 #else /* __hybrid_alloca */
 	char buffer[FORMAT_REPEAT_BUFSIZE];
 	if likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
 		__libc_memsetc(buffer, ch, num_repetitions, __SIZEOF_CHAR__);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
+	libc_memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
 #endif /* !__hybrid_alloca */
 	result = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
 	if unlikely(result < 0)
@@ -157,9 +144,9 @@ INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
 		char const *old_text = text;
 		uint32_t ch;
 #if __SIZEOF_CHAR__ == 1
-		ch = unicode_readutf8_n((char const **)&text, textend);
+		ch = libc_unicode_readutf8_n((char const **)&text, textend);
 #elif __SIZEOF_CHAR__ == 2
-		ch = unicode_readutf16_n((char16_t const **)&text,
+		ch = libc_unicode_readutf16_n((char16_t const **)&text,
 		                         (char16_t const *)textend);
 #else /* ... */
 		ch = (uint32_t)*text++;
@@ -186,9 +173,9 @@ encode_oct:
 						char const *new_text = text;
 						uint32_t next_ch;
 #if __SIZEOF_CHAR__ == 1
-						next_ch = unicode_readutf8_n((char const **)&new_text, textend);
+						next_ch = libc_unicode_readutf8_n((char const **)&new_text, textend);
 #elif __SIZEOF_CHAR__ == 2
-						next_ch = unicode_readutf16_n((char16_t const **)&new_text,
+						next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text,
 						                              (char16_t const *)textend);
 #else /* ... */
 						next_ch = (uint32_t)*new_text++;
@@ -323,9 +310,9 @@ encode_hex:
 					char const *new_text = text;
 					uint32_t next_ch;
 #if __SIZEOF_CHAR__ == 1
-					next_ch = unicode_readutf8_n((char const **)&new_text, textend);
+					next_ch = libc_unicode_readutf8_n((char const **)&new_text, textend);
 #elif __SIZEOF_CHAR__ == 2
-					next_ch = unicode_readutf16_n((char16_t const **)&new_text,
+					next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text,
 					                              (char16_t const *)textend);
 #else /* ... */
 					next_ch = (uint32_t)*new_text++;
@@ -567,7 +554,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
 				tailspace_count -= 3;
 			}
 			if (tailspace_count) {
-				temp = format_repeat(printer, arg, ' ', tailspace_count);
+				temp = libc_format_repeat(printer, arg, ' ', tailspace_count);
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;
@@ -576,7 +563,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
 		if (!(flags & 0x0010)) {
 			for (i = 0; i < line_len; ++i) {
 				byte_t b = line_data[i];
-				if (!isprint(b))
+				if (!libc_isprint(b))
 					b = '.';
 				temp = (*printer)(arg, (char const *)&b, 1);
 				if unlikely(temp < 0)
@@ -718,17 +705,17 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 0) NONNULL((1
 #define __FORMAT_ARGS               args
 #define __CHAR_TYPE                 char
 #define __CHAR_SIZE                 __SIZEOF_CHAR__
-#define __FORMAT_REPEAT             format_repeat
-#define __FORMAT_HEXDUMP            format_hexdump
-#define __FORMAT_WIDTH              format_width
-#define __FORMAT_ESCAPE             format_escape
-#define __FORMAT_WIDTH16            format_c16width
-#define __FORMAT_WIDTH32            format_c32width
-#define __FORMAT_ESCAPE16           format_c16escape
-#define __FORMAT_ESCAPE32           format_c32escape
-#define __FORMAT_UNICODE_WRITECHAR  unicode_writeutf8
-#define __FORMAT_UNICODE_FORMAT16   format_16to8
-#define __FORMAT_UNICODE_FORMAT32   format_32to8
+#define __FORMAT_REPEAT             libc_format_repeat
+#define __FORMAT_HEXDUMP            libc_format_hexdump
+#define __FORMAT_WIDTH              libc_format_width
+#define __FORMAT_ESCAPE             libc_format_escape
+#define __FORMAT_WIDTH16            libd_format_wwidth
+#define __FORMAT_WIDTH32            libc_format_wwidth
+#define __FORMAT_ESCAPE16           libd_format_wescape
+#define __FORMAT_ESCAPE32           libc_format_wescape
+#define __FORMAT_UNICODE_WRITECHAR  libc_unicode_writeutf8
+#define __FORMAT_UNICODE_FORMAT16   libd_format_wto8
+#define __FORMAT_UNICODE_FORMAT32   libc_format_wto8
 #include <local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }
@@ -827,7 +814,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 4) NONNULL((1
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
-	result = format_vprintf(printer, arg, format, args);
+	result = libc_format_vprintf(printer, arg, format, args);
 	va_end(args);
 	return result;
 }
@@ -902,7 +889,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_SCANF(4, 5) NONNULL((1,
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
-	result = format_vscanf(pgetc, pungetc, arg, format, args);
+	result = libc_format_vscanf(pgetc, pungetc, arg, format, args);
 	va_end(args);
 	return result;
 }
@@ -912,7 +899,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(void *arg,
                                                   char const *__restrict data,
                                                   size_t datalen) {
-	*(char **)arg = (char *)mempcpyc(*(char **)arg, data, datalen, sizeof(char));
+	*(char **)arg = (char *)libc_mempcpyc(*(char **)arg, data, datalen, sizeof(char));
 	return (ssize_t)datalen;
 }
 /* Format-printer implementation for printing to a string buffer like `snprintf' would
@@ -933,7 +920,7 @@ NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(void *arg,
 	ctrl = (struct format_snprintf_data_ *)arg;
 	if (result > ctrl->sd_bufsiz)
 		result = ctrl->sd_bufsiz;
-	memcpyc(ctrl->sd_buffer, data, result, sizeof(char));
+	libc_memcpyc(ctrl->sd_buffer, data, result, sizeof(char));
 	ctrl->sd_buffer += datalen;
 	ctrl->sd_bufsiz -= result;
 	return (ssize_t)datalen;

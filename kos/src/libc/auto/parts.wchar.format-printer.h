@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb15736e */
+/* HASH CRC-32:0x49d95b1c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,14 +31,22 @@ DECL_BEGIN
 
 #include <parts/uchar/format-printer.h>
 #ifndef __KERNEL__
+#include "format-printer.h"
+INTDEF ATTR_CONST ssize_t
+NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
+                                         char32_t const *__restrict data,
+                                         size_t datalen)
+	ASMNAME("libc_format_length");
+#endif /* !__KERNEL__ */
+#ifndef __KERNEL__
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
-INTDEF NONNULL((1)) ssize_t (LIBDCALL libd_format_wrepeat)(pc16formatprinter printer, void *arg, char ch, size_t num_repetitions) THROWS(...);
+INTDEF NONNULL((1)) ssize_t (LIBDCALL libd_format_wrepeat)(pc16formatprinter printer, void *arg, char16_t ch, size_t num_repetitions) THROWS(...);
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
-INTDEF NONNULL((1)) ssize_t (LIBKCALL libc_format_wrepeat)(pc32formatprinter printer, void *arg, char ch, size_t num_repetitions) THROWS(...);
+INTDEF NONNULL((1)) ssize_t (LIBKCALL libc_format_wrepeat)(pc32formatprinter printer, void *arg, char32_t ch, size_t num_repetitions) THROWS(...);
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W

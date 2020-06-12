@@ -36,6 +36,7 @@ libc_signo_dos2kos(int dos_signo) {
 		return SIGABRT;
 	return dos_signo;
 }
+
 LOCAL int LIBCCALL
 libc_sigms_dos2kos(int dos_sigms) {
 	if ((unsigned int)dos_sigms & (1 << (22 - 1))) {
@@ -46,15 +47,10 @@ libc_sigms_dos2kos(int dos_sigms) {
 }
 
 
-#ifdef __x86_64__
-#define HAVE_SET_SIGRESTORE 1
-INTDEF void libc_sig_restore(void);
+#ifdef LIBC_ARCH_HAVE_SIG_RESTORE
+INTDEF void /*ASMCALL*/ libc_sig_restore(void);
 #define SET_SIGRESTORE(x) ((x).sa_restorer = &libc_sig_restore, (x).sa_flags |= SA_RESTORER)
-#elif defined(__i386__)
-#define HAVE_SET_SIGRESTORE 1
-INTDEF void libc_sig_restore(void);
-#define SET_SIGRESTORE(x) ((x).sa_restorer = &libc_sig_restore, (x).sa_flags |= SA_RESTORER)
-#endif
+#endif /* LIBC_ARCH_HAVE_SIG_RESTORE */
 
 #ifndef SET_SIGRESTORE
 #define SET_SIGRESTORE(x) (void)0
@@ -289,14 +285,14 @@ NOTHROW_NCX(LIBCCALL libc_sigaction)(int signo,
 /*[[[body:libc_sigaction]]]*/
 {
 	errno_t result;
-#ifdef HAVE_SET_SIGRESTORE
+#ifdef LIBC_ARCH_HAVE_SIG_RESTORE
 	struct sigaction real_act;
 	if (act && !(act->sa_flags & SA_RESTORER)) {
 		memcpy(&real_act, act, sizeof(struct sigaction));
 		SET_SIGRESTORE(real_act);
 		act = &real_act;
 	}
-#endif /* HAVE_SET_SIGRESTORE */
+#endif /* LIBC_ARCH_HAVE_SIG_RESTORE */
 #ifdef __NR_sigaction
 	result = sys_sigaction(signo, act, oact);
 #else /* __NR_sigaction */

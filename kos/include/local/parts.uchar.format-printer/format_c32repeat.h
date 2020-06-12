@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5f56542 */
+/* HASH CRC-32:0x1efe84f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 __LOCAL_LIBC(format_c32repeat) __ATTR_NONNULL((1)) __SSIZE_TYPE__
-(__LIBKCALL __LIBC_LOCAL_NAME(format_c32repeat))(__pc32formatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions) __THROWS(...) {
+(__LIBKCALL __LIBC_LOCAL_NAME(format_c32repeat))(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions) __THROWS(...) {
 #ifndef __FORMAT_REPEAT_BUFSIZE
 #define __FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */

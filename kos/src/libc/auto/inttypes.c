@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x241af8d6 */
+/* HASH CRC-32:0xf518d673 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,8 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "inttypes.h"
-#include <parts/uchar/inttypes.h>
-#include <parts/uchar/wchar.h>
-#include <stdlib.h>
+#include "../user/stdlib.h"
+#include "../user/wchar.h"
 
 DECL_BEGIN
 
@@ -49,9 +48,9 @@ NOTHROW_NCX(LIBCCALL libc_strtoimax)(char const *__restrict nptr,
                                      char **endptr,
                                      int base) {
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (intmax_t)strto32(nptr, endptr, base);
+	return (intmax_t)libc_strto32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (intmax_t)strto64(nptr, endptr, base);
+	return (intmax_t)libc_strto64(nptr, endptr, base);
 #endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
@@ -59,9 +58,9 @@ NOTHROW_NCX(LIBCCALL libc_strtoumax)(char const *__restrict nptr,
                                      char **endptr,
                                      int base) {
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (uintmax_t)strtou32(nptr, endptr, base);
+	return (uintmax_t)libc_strtou32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (uintmax_t)strtou64(nptr, endptr, base);
+	return (uintmax_t)libc_strtou64(nptr, endptr, base);
 #endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) intmax_t
@@ -69,9 +68,9 @@ NOTHROW_NCX(LIBDCALL libd_wcstoimax)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      int base) {
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (intmax_t)c16sto32(nptr, endptr, base);
+	return (intmax_t)libd_wcsto32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (intmax_t)c16sto64(nptr, endptr, base);
+	return (intmax_t)libd__wcstoi64(nptr, endptr, base);
 #endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) intmax_t
@@ -79,9 +78,9 @@ NOTHROW_NCX(LIBKCALL libc_wcstoimax)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
                                      int base) {
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (intmax_t)c32sto32(nptr, endptr, base);
+	return (intmax_t)libc_wcsto32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (intmax_t)c32sto64(nptr, endptr, base);
+	return (intmax_t)libc_wcsto64(nptr, endptr, base);
 #endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
@@ -89,9 +88,9 @@ NOTHROW_NCX(LIBDCALL libd_wcstoumax)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      int base) {
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (uintmax_t)c16stou32(nptr, endptr, base);
+	return (uintmax_t)libd_wcstou32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (uintmax_t)c16stou64(nptr, endptr, base);
+	return (uintmax_t)libd__wcstoui64(nptr, endptr, base);
 #endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
@@ -99,9 +98,9 @@ NOTHROW_NCX(LIBKCALL libc_wcstoumax)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
                                      int base) {
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (uintmax_t)c32stou32(nptr, endptr, base);
+	return (uintmax_t)libc_wcstou32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (uintmax_t)c32stou64(nptr, endptr, base);
+	return (uintmax_t)libc_wcstou64(nptr, endptr, base);
 #endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.convert") ATTR_LEAF NONNULL((1)) intmax_t
@@ -110,7 +109,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoimax_l)(char const *__restrict nptr,
                                        int base,
                                        locale_t locale) {
 	(void)locale;
-	return strtoimax(nptr, endptr, base);
+	return libc_strtoimax(nptr, endptr, base);
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uintmax_t
 NOTHROW_NCX(LIBCCALL libc_strtoumax_l)(char const *__restrict nptr,
@@ -118,7 +117,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoumax_l)(char const *__restrict nptr,
                                        int base,
                                        locale_t locale) {
 	(void)locale;
-	return strtoumax(nptr, endptr, base);
+	return libc_strtoumax(nptr, endptr, base);
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) intmax_t
 NOTHROW_NCX(LIBDCALL libd__wcstoimax_l)(char16_t const *__restrict nptr,
@@ -126,7 +125,7 @@ NOTHROW_NCX(LIBDCALL libd__wcstoimax_l)(char16_t const *__restrict nptr,
                                         int base,
                                         locale_t locale) {
 	(void)locale;
-	return c16toimax(nptr, endptr, base);
+	return libd_wcstoimax(nptr, endptr, base);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) intmax_t
 NOTHROW_NCX(LIBKCALL libc_wcstoimax_l)(char32_t const *__restrict nptr,
@@ -134,7 +133,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoimax_l)(char32_t const *__restrict nptr,
                                        int base,
                                        locale_t locale) {
 	(void)locale;
-	return c32toimax(nptr, endptr, base);
+	return libc_wcstoimax(nptr, endptr, base);
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uintmax_t
 NOTHROW_NCX(LIBDCALL libd__wcstoumax_l)(char16_t const *__restrict nptr,
@@ -142,7 +141,7 @@ NOTHROW_NCX(LIBDCALL libd__wcstoumax_l)(char16_t const *__restrict nptr,
                                         int base,
                                         locale_t locale) {
 	(void)locale;
-	return c16toumax(nptr, endptr, base);
+	return libd_wcstoumax(nptr, endptr, base);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uintmax_t
 NOTHROW_NCX(LIBKCALL libc_wcstoumax_l)(char32_t const *__restrict nptr,
@@ -150,7 +149,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoumax_l)(char32_t const *__restrict nptr,
                                        int base,
                                        locale_t locale) {
 	(void)locale;
-	return c32toumax(nptr, endptr, base);
+	return libc_wcstoumax(nptr, endptr, base);
 }
 #endif /* !__KERNEL__ */
 

@@ -23,6 +23,7 @@ import * from collections;
 
 #define Function           Object /* Function from .cheaders */
 #define LocalFunction      Object /* LocalFunction from .cheaders */
+#define LibraryFunction    Object /* LibraryFunction from .cheaders */
 #define SystemHeader       Object /* SystemHeader from .cheaders */
 #define FunctionPrototype  Object /* FunctionPrototype from .cheaders */
 #define UserString         Object /* UserString from .parser */
@@ -37,6 +38,9 @@ global allFunctionsByName: {string: (Function | _DuplicateFunctionMarker)} = Dic
 @@Mapping of all local functions ever defined (by name)
 @@Functions with multiple definitions are stored as @DuplicateFunctionMarker
 global allLocalFunctionsByName: {string: LocalFunction | _DuplicateFunctionMarker} = Dict();
+
+@@Mapping of all library functions ever defined (by name)
+global allLibraryFunctionsByName: {string: LibraryFunction} = Dict();
 
 @@Mapping of system header names to the actual system headers
 @@e.g.: @allSystemheaders["sys.stat"] for <sys/stat.h>

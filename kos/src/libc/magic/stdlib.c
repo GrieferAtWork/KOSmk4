@@ -750,7 +750,7 @@ int system([[nullable]] char const *command);
 %[default_impl_section(".text.crt.application.exit")]
 [[std, guard, crtbuiltin, ATTR_NORETURN, throws]]
 [[export_alias("_ZSt9terminatev", "?terminate@@YAXXZ")]]
-[[crt_impl_if(!defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_ABORT))]]
+[[crt_impl_requires(!defined(LIBC_ARCH_HAVE_ABORT))]]
 [[requires_function(_Exit)]]
 void abort() {
 	_Exit(/* EXIT_FAILURE */ 1);
@@ -2922,7 +2922,7 @@ int _wctomb_l(char *buf, wchar_t wc, $locale_t locale) {
 
 %
 %#ifdef __USE_DOS_SLIB
-[[decl_include("<bits/types.h>")]]
+[[wchar, decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 errno_t wctomb_s([[nonnull]] int *presult,
                  [[nonnull]] char *buf,
@@ -2946,7 +2946,7 @@ errno_t wctomb_s([[nonnull]] int *presult,
 }
 %#endif /* __USE_DOS_SLIB */
 
-[[decl_include("<bits/types.h>")]]
+[[wchar, decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 errno_t _wctomb_s_l([[nonnull]] int *presult, [[nonnull]] char *buf,
                     $size_t buflen, wchar_t wc, $locale_t locale) {
@@ -2954,7 +2954,7 @@ errno_t _wctomb_s_l([[nonnull]] int *presult, [[nonnull]] char *buf,
 	return wctomb_s(presult, buf, buflen, wc);
 }
 
-[[decl_include("<bits/types.h>")]]
+[[wchar, decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 errno_t _wcstombs_s_l([[nonnull]] $size_t *presult, [[nonnull]] char *buf,
                       $size_t buflen, [[nonnull]] wchar_t const *src,
@@ -2963,6 +2963,7 @@ errno_t _wcstombs_s_l([[nonnull]] $size_t *presult, [[nonnull]] char *buf,
 	return wcstombs_s(presult, buf, buflen, src, maxlen);
 }
 
+[[wchar]]
 $size_t _wcstombs_l([[nonnull]] char *dst,
                     [[nonnull]] wchar_t const *src,
                     $size_t maxlen, $locale_t locale) {
@@ -2970,7 +2971,7 @@ $size_t _wcstombs_l([[nonnull]] char *dst,
 	return wcstombs(dst, src, maxlen);
 }
 
-[[decl_include("<bits/types.h>")]]
+[[wchar, decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
 errno_t wcstombs_s([[nonnull]] $size_t *presult,
                    [[nonnull]] char *buf, $size_t buflen,

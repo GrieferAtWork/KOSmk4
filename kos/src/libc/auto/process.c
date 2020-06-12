@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3f9ff24 */
+/* HASH CRC-32:0xd9d837be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.sched.thread") void
 NOTHROW_NCX(LIBCCALL libc__endthread)(void) {
-	_endthreadex(0);
+	libc__endthreadex(0);
 }
 INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
 (LIBCCALL libc__c_exit)(void) THROWS(...) {
@@ -42,7 +42,7 @@ NOTHROW_RPC(VLIBCCALL libc_spawnl)(int mode,
                                    char const *__restrict path,
                                    char const *args,
                                    ...) {
-	__REDIRECT_SPAWNL(char, spawnv, mode, path, args)
+	__REDIRECT_SPAWNL(char, libc_spawnv, mode, path, args)
 }
 #include <parts/redirect-exec.h>
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") ATTR_SENTINEL NONNULL((2)) pid_t
@@ -50,7 +50,7 @@ NOTHROW_RPC(VLIBCCALL libc_spawnlp)(int mode,
                                     char const *__restrict file,
                                     char const *args,
                                     ...) {
-	__REDIRECT_SPAWNL(char, spawnvp, mode, file, args)
+	__REDIRECT_SPAWNL(char, libc_spawnvp, mode, file, args)
 }
 #include <parts/redirect-exec.h>
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
@@ -58,7 +58,7 @@ NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode,
                                     char const *__restrict path,
                                     char const *args,
                                     ...) {
-	__REDIRECT_SPAWNLE(char, spawnve, mode, path, args)
+	__REDIRECT_SPAWNLE(char, libc_spawnve, mode, path, args)
 }
 #include <parts/redirect-exec.h>
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
@@ -66,7 +66,7 @@ NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(int mode,
                                      char const *__restrict file,
                                      char const *args,
                                      ...) {
-	__REDIRECT_SPAWNLE(char, spawnvpe, mode, file, args)
+	__REDIRECT_SPAWNLE(char, libc_spawnvpe, mode, file, args)
 }
 #endif /* !__KERNEL__ */
 

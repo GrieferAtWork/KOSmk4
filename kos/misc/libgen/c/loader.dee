@@ -873,14 +873,16 @@ class FunctionFeatures {
 	public member wchar_noAlias: bool = false; /* [[no_]wchar_alias] Prevent duplication of function aliases */
 
 	/* CRT Features */
-	public member crt_name: UserString | string | none = none;       /* [[default_]crt_name(...)]   Symbol name override for the default CRT function binding */
-	public member crt_noImpl: bool = false;                          /* [[no_]crt_impl]        Don't implement function within the CRT */
-	public member crt_noSelfImport: bool = false;                    /* [[no_]crt_self_import] Prevent importing from ASMNAME(crt_name || current.name) */
-	public member crt_noSelfExport: bool = false;                    /* [[no_]crt_self_export] Prevent exporting as ASMNAME(crt_name || current.name) */
-	public member crt_userimpl: bool = false;                        /* [[no_]userimpl]        Prevent implementation in libc/auto and always use libc/user */
-	public member crt_kosSection: UserString | string | none = none; /* [kos_section(...)]     Section name for the KOS implementation */
-	public member crt_dosSection: UserString | string | none = none; /* [dos_section(...)]     Section name for the DOS implementation (if @wchar) */
+	public member crt_name: UserString | string | none = none;       /* [[default_]crt_name(...)]    Symbol name override for the default CRT function binding */
+	public member crt_noImpl: bool = false;                          /* [[no_]crt_impl]              Don't implement function within the CRT */
+	public member crt_noSelfImport: bool = false;                    /* [[no_]crt_self_import]       Prevent importing from ASMNAME(crt_name || current.name) */
+	public member crt_noSelfExport: bool = false;                    /* [[no_]crt_self_export]       Prevent exporting as ASMNAME(crt_name || current.name) */
+	public member crt_userimpl: bool = false;                        /* [[no_]userimpl]              Prevent implementation in libc/auto and always use libc/user */
+	public member crt_kosSection: UserString | string | none = none; /* [kos_section(...)]           Section name for the KOS implementation */
+	public member crt_dosSection: UserString | string | none = none; /* [dos_section(...)]           Section name for the DOS implementation (if @wchar) */
 	public member crt_dosname: UserString | string | none = none;    /* [[default_]crt_dosname(...)] Same as @crt_name, but only for the DOS variant */
+	public member crt_kosImplRequires: UserString | string = "1";    /* [crt_kos_impl_requires(...)] Condition to meet for auto implementation (does not affect declaration; e.g. `!defined(LIBC_ARCH_HAVE_MEMCHR)') */
+	public member crt_dosImplRequires: UserString | string = "1";    /* [crt_dos_impl_requires(...)] Same as `crt_kosImplRequires', but for the DOS implementation (if @wchar) */
 
 	@@Enable a given namespace binding (via `using`)
 	public function addNamespaceUsingBinding(name: string) {
@@ -974,6 +976,9 @@ class FunctionFeatures {
 			"no_crt_self_import"          : ("crt_noSelfImport", true),
 			"crt_self_export"             : ("crt_noSelfExport", false),
 			"no_crt_self_export"          : ("crt_noSelfExport", true),
+			"no_crt_impl_requires"        : ("crt_kosImplRequires", "1"),
+			"no_crt_kos_impl_requires"    : ("crt_kosImplRequires", "1"),
+			"no_crt_dos_impl_requires"    : ("crt_dosImplRequires", "1"),
 			"userimpl"                    : ("crt_userimpl", true),
 			"no_userimpl"                 : ("crt_userimpl", false),
 			"default_kos_section"         : ("crt_kosSection", none),
@@ -1233,6 +1238,25 @@ class FunctionFeatures {
 			self.skip(")");
 			break;
 
+		case "crt_impl_requires":
+		case "crt_kos_impl_requires":
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			crt_kosImplRequires = parseCStringOrAllUntilRParen(self);
+			self.skip(")");
+			break;
+
+		case "crt_dos_impl_requires":
+			if (ppCond !is none)
+				goto err_unexpected_if;
+			self.next();
+			self.skip("(");
+			crt_dosImplRequires = parseCStringOrAllUntilRParen(self);
+			self.skip(")");
+			break;
+
 		case "dependency":
 		case "not_dependency": {
 			local my = tok;
@@ -1365,6 +1389,10 @@ err_unexpected_if:
 			return "[no_]kos_section";
 		if (crt_dosname !== defaultFeatures.crt_dosname)
 			return "[default_]dosname";
+		if (crt_dosImplRequires !== defaultFeatures.crt_dosImplRequires)
+			return "[no_]crt_kos_impl_requires";
+		if (crt_kosImplRequires !== defaultFeatures.crt_kosImplRequires)
+			return "[no_]crt_kos_impl_requires";
 		return none;
 	}
 
@@ -3155,6 +3183,10 @@ again_skip_annotation_rbracket:
 				self.err("Function {!r} has a [dosname()] annotation, but no [[wchar]]"
 					.format({ currentName }));
 			}
+			if (currentFeatures.crt_dosImplRequires !== context.defaultFeatures.crt_dosImplRequires) {
+				self.err("Function {!r} has a [crt_dos_impl_requires()] annotation, but no [[wchar]]"
+					.format({ currentName }));
+			}
 		} /* !currentFeatures.wchar */
 
 		/* Check for special case: @"dstFunction(*) = srcFunction;"
@@ -3790,6 +3822,7 @@ got_chkExpr:
 							return getWcharFunction().documentationString;
 						};
 					}
+					current.internalName = [] -> wcharFunction.wc_internal_uchar[mode].name;
 					/* Lazily construct function bindings upon first access */
 					current.bindings = [](): {FunctionBinding...} {
 						@@The referenced [[wchar]]-Function
@@ -4301,8 +4334,16 @@ again_lookup_wcsCurrent:
 						 *       name is being exported from the default namespace! */
 						dosVariant.exportSymbolNames.append(("1", "DOS$" + dosCrtName));
 					}
+					current.internalName = kosVariantName;
 					kosVariant.name = kosVariantName;
 					dosVariant.name = dosVariantName;
+					if (!allLibraryFunctionsByName.setnew(kosVariantName, kosVariant))
+						self.errAt(currentNameTokStart, "Duplicate library function: {!r}"
+							.format({ kosVariantName }));
+					if (!allLibraryFunctionsByName.setnew(dosVariantName, dosVariant))
+						self.errAt(currentNameTokStart, "Duplicate library function: {!r}"
+							.format({ dosVariantName }));
+					wcsCurrent.wc_internal_uchar = { dosVariant, kosVariant };
 					dosVariant.prototype = [] -> wcsCurrent.getXCharImplementation(
 						kosVariantName, WCHAR_REPLACEMENT_CHAR16).prototype;
 					kosVariant.prototype = [] -> wcsCurrent.getXCharImplementation(
@@ -4311,6 +4352,7 @@ again_lookup_wcsCurrent:
 						dosVariant.documentation = kosVariant.documentation;
 					function createXCharBinding(
 							functionName: string | UserString,
+							ppCond: string | UserString,
 							crtName: string | UserString, mode: int,
 							implSection: UserString | string | none): Callable {
 						return []{
@@ -4320,7 +4362,8 @@ again_lookup_wcsCurrent:
 							if (xcLoaderImpl is Callable)
 								xcLoaderImpl = xcLoaderImpl();
 							return LibraryFunctionBinding(
-								binding: xcLoaderImpl is none
+								ppCond:      ppCond,
+								binding:     xcLoaderImpl is none
 									? getDefaultLibraryImplementationForPrototype(
 										wcsCurrent.wc_prototype, crtName)
 									: xcLoaderImpl.impl,
@@ -4331,10 +4374,12 @@ again_lookup_wcsCurrent:
 					 * NOTE: This has to happen delayed, so that everything will be
 					 *       available once the implementation gets generated. */
 					dosVariant.bindings.append(createXCharBinding(
-						dosVariantName, dosCrtName, WCHAR_REPLACEMENT_CHAR16,
+						dosVariantName, currentFeatures.crt_dosImplRequires,
+						dosCrtName, WCHAR_REPLACEMENT_CHAR16,
 						currentFeatures.crt_dosSection));
 					kosVariant.bindings.append(createXCharBinding(
-						kosVariantName, crtName, WCHAR_REPLACEMENT_CHAR32,
+						kosVariantName, currentFeatures.crt_kosImplRequires,
+						crtName, WCHAR_REPLACEMENT_CHAR32,
 						currentFeatures.crt_kosSection));
 					/* Insert the library implementations into the system header order */
 					if (currentFeatures.crt_userimpl || loaderImpl is none) {
@@ -4358,11 +4403,13 @@ again_lookup_wcsCurrent:
 								currentPrototype, crtName);
 						}
 						libImpl = LibraryFunctionBinding(
+							ppCond:      currentFeatures.crt_kosImplRequires,
 							binding:     defaultImpl,
 							implSection: currentFeatures.crt_kosSection);
 					} else {
 						libImpl = LibraryFunctionBinding(
-							binding: loaderImpl is Callable
+							ppCond:      currentFeatures.crt_kosImplRequires,
+							binding:     loaderImpl is Callable
 								? [] -> loaderImpl().impl
 								: loaderImpl.impl,
 							implSection: currentFeatures.crt_kosSection);
@@ -4375,7 +4422,12 @@ again_lookup_wcsCurrent:
 					currentLibraryFunction.exportSymbolNames
 						.append(("1", crtName));
 				}
-				currentLibraryFunction.name = "libc_" + crtName;
+				local internal_crtName = "libc_" + crtName;
+				currentLibraryFunction.name = internal_crtName;
+				current.internalName = internal_crtName;
+				if (!allLibraryFunctionsByName.setnew(internal_crtName, currentLibraryFunction))
+					self.errAt(currentNameTokStart, "Duplicate library function: {!r}"
+						.format({ internal_crtName }));
 				if (currentFeatures.crt_userimpl || loaderImpl is none) {
 					result.order_libcUserHeader.append(currentLibraryFunction);
 					result.order_libcUserSource.append(currentLibraryFunction);

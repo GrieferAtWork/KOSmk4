@@ -130,6 +130,8 @@
 #define __CRT_HAVE_DOS$_wcstoi64 1
 #define __CRT_HAVE_DOS$_wcstoi64_l 1
 #define __CRT_HAVE_DOS$_wcstoimax_l 1
+#define __CRT_HAVE_DOS$_wcstombs_l 1
+#define __CRT_HAVE_DOS$_wcstombs_s_l 1
 #define __CRT_HAVE_DOS$_wcstoui64 1
 #define __CRT_HAVE_DOS$_wcstoui64_l 1
 #define __CRT_HAVE_DOS$_wcstoumax_l 1
@@ -138,6 +140,7 @@
 #define __CRT_HAVE_DOS$_wcsupr_s 1
 #define __CRT_HAVE_DOS$_wcsupr_s_l 1
 #define __CRT_HAVE_DOS$_wctomb_l 1
+#define __CRT_HAVE_DOS$_wctomb_s_l 1
 #define __CRT_HAVE_DOS$_wdupenv_s 1
 #define __CRT_HAVE_DOS$_wexecl 1
 #define __CRT_HAVE_DOS$_wexecle 1
@@ -336,6 +339,7 @@
 #define __CRT_HAVE_DOS$wcstoll 1
 #define __CRT_HAVE_DOS$wcstoll_l 1
 #define __CRT_HAVE_DOS$wcstombs 1
+#define __CRT_HAVE_DOS$wcstombs_s 1
 #define __CRT_HAVE_DOS$wcstou32 1
 #define __CRT_HAVE_DOS$wcstou32_l 1
 #define __CRT_HAVE_DOS$wcstoul 1
@@ -349,6 +353,7 @@
 #define __CRT_HAVE_DOS$wcsxfrm_l 1
 #define __CRT_HAVE_DOS$wctermid 1
 #define __CRT_HAVE_DOS$wctomb 1
+#define __CRT_HAVE_DOS$wctomb_s 1
 #define __CRT_HAVE_DOS$wcwidth 1
 #define __CRT_HAVE_DOS$weuidaccess 1
 #define __CRT_HAVE_DOS$wfaccessat 1

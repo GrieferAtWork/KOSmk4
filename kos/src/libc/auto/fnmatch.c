@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2bc32c */
+/* HASH CRC-32:0x15bafb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "fnmatch.h"
-#include <ctype.h>
+#include "../user/ctype.h"
 
 DECL_BEGIN
 
@@ -59,9 +59,9 @@ NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern,
 				char ch = *name++;
 				if (ch == card_post ||
 				    ((match_flags & 0x10) &&
-				     tolower(ch) == tolower(card_post))) {
+				     libc_tolower(ch) == libc_tolower(card_post))) {
 					/* Recursively check if the rest of the name and pattern match */
-					if (!fnmatch(name, pattern, match_flags))
+					if (!libc_fnmatch(name, pattern, match_flags))
 						return 0;
 				} else if (!ch) {
 					goto nomatch; /* Wildcard suffix not found */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x538d9a08 */
+/* HASH CRC-32:0x2943d156 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,29 +25,16 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "parts.wchar.format-printer.h"
-#include <format-printer.h>
-#include <parts/uchar/format-printer.h>
-#include <parts/uchar/string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unicode.h>
-#include <wctype.h>
+#include "../user/format-printer.h"
+#include "../user/stdio.h"
+#include "../user/stdlib.h"
+#include "../user/string.h"
+#include "unicode.h"
+#include "../user/wchar.h"
+#include "wctype.h"
 
 DECL_BEGIN
 
-#include <parts/uchar/format-printer.h>
-#include <unicode.h>
-#define libc_format_8to16     format_8to16
-#define libc_format_8to32     format_8to32
-#define libc_format_16to8     format_16to8
-#define libc_format_16to32    format_16to32
-#define libc_format_32to8     format_32to8
-#define libc_format_32to16    format_32to16
-#define libc_format_c16escape format_c16escape
-#define libc_format_c16width  format_c16width
-#define libc_format_c32escape format_c32escape
-#define libc_format_c32width  format_c32width
 #ifndef __KERNEL__
 #include <hybrid/__alloca.h>
 #include <libc/string.h>
@@ -57,7 +44,7 @@ DECL_BEGIN
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 (LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
                                void *arg,
-                               char ch,
+                               char16_t ch,
                                size_t num_repetitions) THROWS(...) {
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
@@ -71,14 +58,14 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 		return (*printer)(arg, buffer, num_repetitions);
 	}
 	buffer = (char16_t *)__hybrid_alloca(FORMAT_REPEAT_BUFSIZE);
-	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
+	libc_memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
 #else /* __hybrid_alloca */
 	char16_t buffer[FORMAT_REPEAT_BUFSIZE];
 	if likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
 		__libc_memsetc(buffer, ch, num_repetitions, 2);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
+	libc_memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
 #endif /* !__hybrid_alloca */
 	result = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
 	if unlikely(result < 0)
@@ -111,7 +98,7 @@ err:
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 (LIBKCALL libc_format_wrepeat)(pc32formatprinter printer,
                                void *arg,
-                               char ch,
+                               char32_t ch,
                                size_t num_repetitions) THROWS(...) {
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
@@ -125,14 +112,14 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 		return (*printer)(arg, buffer, num_repetitions);
 	}
 	buffer = (char32_t *)__hybrid_alloca(FORMAT_REPEAT_BUFSIZE);
-	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
+	libc_memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
 #else /* __hybrid_alloca */
 	char32_t buffer[FORMAT_REPEAT_BUFSIZE];
 	if likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
 		__libc_memsetc(buffer, ch, num_repetitions, 4);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
+	libc_memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
 #endif /* !__hybrid_alloca */
 	result = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
 	if unlikely(result < 0)
@@ -202,9 +189,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 		char16_t const *old_text = text;
 		uint32_t ch;
 #if 2 == 1
-		ch = unicode_readutf8_n((char16_t const **)&text, textend);
+		ch = libc_unicode_readutf8_n((char16_t const **)&text, textend);
 #elif 2 == 2
-		ch = unicode_readutf16_n((char16_t const **)&text,
+		ch = libc_unicode_readutf16_n((char16_t const **)&text,
 		                         (char16_t const *)textend);
 #else /* ... */
 		ch = (uint32_t)*text++;
@@ -231,9 +218,9 @@ encode_oct:
 						char16_t const *new_text = text;
 						uint32_t next_ch;
 #if 2 == 1
-						next_ch = unicode_readutf8_n((char16_t const **)&new_text, textend);
+						next_ch = libc_unicode_readutf8_n((char16_t const **)&new_text, textend);
 #elif 2 == 2
-						next_ch = unicode_readutf16_n((char16_t const **)&new_text,
+						next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text,
 						                              (char16_t const *)textend);
 #else /* ... */
 						next_ch = (uint32_t)*new_text++;
@@ -368,9 +355,9 @@ encode_hex:
 					char16_t const *new_text = text;
 					uint32_t next_ch;
 #if 2 == 1
-					next_ch = unicode_readutf8_n((char16_t const **)&new_text, textend);
+					next_ch = libc_unicode_readutf8_n((char16_t const **)&new_text, textend);
 #elif 2 == 2
-					next_ch = unicode_readutf16_n((char16_t const **)&new_text,
+					next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text,
 					                              (char16_t const *)textend);
 #else /* ... */
 					next_ch = (uint32_t)*new_text++;
@@ -487,9 +474,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 		char32_t const *old_text = text;
 		uint32_t ch;
 #if 4 == 1
-		ch = unicode_readutf8_n((char32_t const **)&text, textend);
+		ch = libc_unicode_readutf8_n((char32_t const **)&text, textend);
 #elif 4 == 2
-		ch = unicode_readutf16_n((char16_t const **)&text,
+		ch = libc_unicode_readutf16_n((char16_t const **)&text,
 		                         (char16_t const *)textend);
 #else /* ... */
 		ch = (uint32_t)*text++;
@@ -516,9 +503,9 @@ encode_oct:
 						char32_t const *new_text = text;
 						uint32_t next_ch;
 #if 4 == 1
-						next_ch = unicode_readutf8_n((char32_t const **)&new_text, textend);
+						next_ch = libc_unicode_readutf8_n((char32_t const **)&new_text, textend);
 #elif 4 == 2
-						next_ch = unicode_readutf16_n((char16_t const **)&new_text,
+						next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text,
 						                              (char16_t const *)textend);
 #else /* ... */
 						next_ch = (uint32_t)*new_text++;
@@ -653,9 +640,9 @@ encode_hex:
 					char32_t const *new_text = text;
 					uint32_t next_ch;
 #if 4 == 1
-					next_ch = unicode_readutf8_n((char32_t const **)&new_text, textend);
+					next_ch = libc_unicode_readutf8_n((char32_t const **)&new_text, textend);
 #elif 4 == 2
-					next_ch = unicode_readutf16_n((char16_t const **)&new_text,
+					next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text,
 					                              (char16_t const *)textend);
 #else /* ... */
 					next_ch = (uint32_t)*new_text++;
@@ -898,7 +885,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 				tailspace_count -= 3;
 			}
 			if (tailspace_count) {
-				temp = format_c16repeat(printer, arg, ' ', tailspace_count);
+				temp = libd_format_wrepeat(printer, arg, ' ', tailspace_count);
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;
@@ -907,7 +894,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 		if (!(flags & 0x0010)) {
 			for (i = 0; i < line_len; ++i) {
 				byte_t b = line_data[i];
-				if (!iswprint(b))
+				if (!libc_iswprint(b))
 					b = '.';
 				temp = (*printer)(arg, (char16_t const *)&b, 1);
 				if unlikely(temp < 0)
@@ -1104,7 +1091,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 				tailspace_count -= 3;
 			}
 			if (tailspace_count) {
-				temp = format_c32repeat(printer, arg, ' ', tailspace_count);
+				temp = libc_format_wrepeat(printer, arg, ' ', tailspace_count);
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;
@@ -1113,7 +1100,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 		if (!(flags & 0x0010)) {
 			for (i = 0; i < line_len; ++i) {
 				byte_t b = line_data[i];
-				if (!iswprint(b))
+				if (!libc_iswprint(b))
 					b = '.';
 				temp = (*printer)(arg, (char32_t const *)&b, 1);
 				if unlikely(temp < 0)
@@ -1256,26 +1243,24 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
 #define __FORMAT_ARGS               args
 #define __CHAR_TYPE                 char16_t
 #define __CHAR_SIZE                 2
-#define __FORMAT_REPEAT             format_c16repeat
-#define __FORMAT_HEXDUMP            format_c16hexdump
-#define __FORMAT_WIDTH              format_c16width
-#define __FORMAT_ESCAPE             format_c16escape
+#define __FORMAT_REPEAT             libd_format_wrepeat
+#define __FORMAT_HEXDUMP            libd_format_whexdump
+#define __FORMAT_WIDTH              libd_format_wwidth
+#define __FORMAT_ESCAPE             libd_format_wescape
+#define __FORMAT_WIDTH8             libc_format_width
+#define __FORMAT_ESCAPE8            libc_format_escape
 #if 2 == 2
-#define __FORMAT_WIDTH8             format_width
-#define __FORMAT_ESCAPE8            format_escape
-#define __FORMAT_WIDTH32            format_c32width
-#define __FORMAT_ESCAPE32           format_c32escape
-#define __FORMAT_UNICODE_WRITECHAR  unicode_writeutf16
-#define __FORMAT_UNICODE_FORMAT8    format_8to16
-#define __FORMAT_UNICODE_FORMAT32   format_32to16
+#define __FORMAT_WIDTH32            libc_format_wwidth
+#define __FORMAT_ESCAPE32           libc_format_wescape
+#define __FORMAT_UNICODE_WRITECHAR  libc_unicode_writeutf16
+#define __FORMAT_UNICODE_FORMAT8    libc_format_8to16
+#define __FORMAT_UNICODE_FORMAT32   libc_format_wto16
 #else /* 2 == 2 */
-#define __FORMAT_WIDTH8             format_width
-#define __FORMAT_ESCAPE8            format_escape
-#define __FORMAT_WIDTH16            format_c16width
-#define __FORMAT_ESCAPE16           format_c16escape
+#define __FORMAT_WIDTH16            libd_format_wwidth
+#define __FORMAT_ESCAPE16           libd_format_wescape
 #define __FORMAT_UNICODE_WRITECHAR(dst, ch) ((dst)[0] = (ch), (dst) + 1)
-#define __FORMAT_UNICODE_FORMAT8    format_8to32
-#define __FORMAT_UNICODE_FORMAT16   format_16to32
+#define __FORMAT_UNICODE_FORMAT8    libc_format_8to32
+#define __FORMAT_UNICODE_FORMAT16   libd_format_wto32
 #endif /* !(2 == 2) */
 #include <local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
@@ -1397,26 +1382,24 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NON
 #define __FORMAT_ARGS               args
 #define __CHAR_TYPE                 char32_t
 #define __CHAR_SIZE                 4
-#define __FORMAT_REPEAT             format_c32repeat
-#define __FORMAT_HEXDUMP            format_c32hexdump
-#define __FORMAT_WIDTH              format_c32width
-#define __FORMAT_ESCAPE             format_c32escape
+#define __FORMAT_REPEAT             libc_format_wrepeat
+#define __FORMAT_HEXDUMP            libc_format_whexdump
+#define __FORMAT_WIDTH              libc_format_wwidth
+#define __FORMAT_ESCAPE             libc_format_wescape
+#define __FORMAT_WIDTH8             libc_format_width
+#define __FORMAT_ESCAPE8            libc_format_escape
 #if 4 == 2
-#define __FORMAT_WIDTH8             format_width
-#define __FORMAT_ESCAPE8            format_escape
-#define __FORMAT_WIDTH32            format_c32width
-#define __FORMAT_ESCAPE32           format_c32escape
-#define __FORMAT_UNICODE_WRITECHAR  unicode_writeutf16
-#define __FORMAT_UNICODE_FORMAT8    format_8to16
-#define __FORMAT_UNICODE_FORMAT32   format_32to16
+#define __FORMAT_WIDTH32            libc_format_wwidth
+#define __FORMAT_ESCAPE32           libc_format_wescape
+#define __FORMAT_UNICODE_WRITECHAR  libc_unicode_writeutf16
+#define __FORMAT_UNICODE_FORMAT8    libc_format_8to16
+#define __FORMAT_UNICODE_FORMAT32   libc_format_wto16
 #else /* 4 == 2 */
-#define __FORMAT_WIDTH8             format_width
-#define __FORMAT_ESCAPE8            format_escape
-#define __FORMAT_WIDTH16            format_c16width
-#define __FORMAT_ESCAPE16           format_c16escape
+#define __FORMAT_WIDTH16            libd_format_wwidth
+#define __FORMAT_ESCAPE16           libd_format_wescape
 #define __FORMAT_UNICODE_WRITECHAR(dst, ch) ((dst)[0] = (ch), (dst) + 1)
-#define __FORMAT_UNICODE_FORMAT8    format_8to32
-#define __FORMAT_UNICODE_FORMAT16   format_16to32
+#define __FORMAT_UNICODE_FORMAT8    libc_format_8to32
+#define __FORMAT_UNICODE_FORMAT16   libd_format_wto32
 #endif /* !(4 == 2) */
 #include <local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
@@ -1516,7 +1499,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
-	result = format_vc16printf(printer, arg, format, args);
+	result = libd_format_vwprintf(printer, arg, format, args);
 	va_end(args);
 	return result;
 }
@@ -1615,7 +1598,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NON
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
-	result = format_vc32printf(printer, arg, format, args);
+	result = libc_format_vwprintf(printer, arg, format, args);
 	va_end(args);
 	return result;
 }
@@ -1625,7 +1608,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(void *arg,
                                                    char16_t const *__restrict data,
                                                    size_t datalen) {
-	*(char16_t **)arg = (char16_t *)mempcpyc(*(char16_t **)arg, data, datalen, sizeof(char16_t));
+	*(char16_t **)arg = (char16_t *)libc_mempcpyc(*(char16_t **)arg, data, datalen, sizeof(char16_t));
 	return (ssize_t)datalen;
 }
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
@@ -1634,7 +1617,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(LIBKCALL libc_format_wsprintf_printer)(void *arg,
                                                    char32_t const *__restrict data,
                                                    size_t datalen) {
-	*(char32_t **)arg = (char32_t *)mempcpyc(*(char32_t **)arg, data, datalen, sizeof(char32_t));
+	*(char32_t **)arg = (char32_t *)libc_mempcpyc(*(char32_t **)arg, data, datalen, sizeof(char32_t));
 	return (ssize_t)datalen;
 }
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
@@ -1654,7 +1637,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(void *arg,
 	ctrl = (struct format_snprintf_data_ *)arg;
 	if (result > ctrl->sd_bufsiz)
 		result = ctrl->sd_bufsiz;
-	memcpyc(ctrl->sd_buffer, data, result, sizeof(char16_t));
+	libc_memcpyc(ctrl->sd_buffer, data, result, sizeof(char16_t));
 	ctrl->sd_buffer += datalen;
 	ctrl->sd_bufsiz -= result;
 	return (ssize_t)datalen;
@@ -1676,7 +1659,7 @@ NOTHROW_NCX(LIBKCALL libc_format_wsnprintf_printer)(void *arg,
 	ctrl = (struct format_snprintf_data_ *)arg;
 	if (result > ctrl->sd_bufsiz)
 		result = ctrl->sd_bufsiz;
-	memcpyc(ctrl->sd_buffer, data, result, sizeof(char32_t));
+	libc_memcpyc(ctrl->sd_buffer, data, result, sizeof(char32_t));
 	ctrl->sd_buffer += datalen;
 	ctrl->sd_bufsiz -= result;
 	return (ssize_t)datalen;
@@ -1741,7 +1724,7 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *_
 	char16_t *result;
 	if (self->ap_avail != 0) {
 		char16_t *newbuf;
-		newbuf = (char16_t *)realloc(self->ap_base,
+		newbuf = (char16_t *)libc_realloc(self->ap_base,
 		                         (self->ap_used + 1) * sizeof(char16_t));
 		if likely(newbuf)
 			self->ap_base = newbuf;
@@ -1750,9 +1733,9 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *_
 			/* Special case: Nothing was printed. */
 			__hybrid_assert(!self->ap_base);
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
-			self->ap_base = (char16_t *)malloc(1 * sizeof(char16_t));
+			self->ap_base = (char16_t *)libc_malloc(1 * sizeof(char16_t));
 #else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
-			self->ap_base = (char16_t *)realloc(NULL, 1 * sizeof(char16_t));
+			self->ap_base = (char16_t *)libc_realloc(NULL, 1 * sizeof(char16_t));
 #endif /* !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
 			if unlikely(!self->ap_base)
 				return NULL;
@@ -1804,7 +1787,7 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *_
 	char32_t *result;
 	if (self->ap_avail != 0) {
 		char32_t *newbuf;
-		newbuf = (char32_t *)realloc(self->ap_base,
+		newbuf = (char32_t *)libc_realloc(self->ap_base,
 		                         (self->ap_used + 1) * sizeof(char32_t));
 		if likely(newbuf)
 			self->ap_base = newbuf;
@@ -1813,9 +1796,9 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *_
 			/* Special case: Nothing was printed. */
 			__hybrid_assert(!self->ap_base);
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
-			self->ap_base = (char32_t *)malloc(1 * sizeof(char32_t));
+			self->ap_base = (char32_t *)libc_malloc(1 * sizeof(char32_t));
 #else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
-			self->ap_base = (char32_t *)realloc(NULL, 1 * sizeof(char32_t));
+			self->ap_base = (char32_t *)libc_realloc(NULL, 1 * sizeof(char32_t));
 #endif /* !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
 			if unlikely(!self->ap_base)
 				return NULL;
@@ -1857,10 +1840,10 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *
 			new_alloc = 8;
 		while (new_alloc < min_alloc)
 			new_alloc *= 2;
-		newbuf = (char16_t *)realloc(self->ap_base, (new_alloc + 1) * sizeof(char16_t));
+		newbuf = (char16_t *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char16_t));
 		if unlikely(!newbuf) {
 			new_alloc = min_alloc;
-			newbuf    = (char16_t *)realloc(self->ap_base, (new_alloc + 1) * sizeof(char16_t));
+			newbuf    = (char16_t *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char16_t));
 			if unlikely(!newbuf)
 				return NULL;
 		}
@@ -1891,10 +1874,10 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_alloc)(struct format_c32aprintf_data *
 			new_alloc = 8;
 		while (new_alloc < min_alloc)
 			new_alloc *= 2;
-		newbuf = (char32_t *)realloc(self->ap_base, (new_alloc + 1) * sizeof(char32_t));
+		newbuf = (char32_t *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char32_t));
 		if unlikely(!newbuf) {
 			new_alloc = min_alloc;
-			newbuf    = (char32_t *)realloc(self->ap_base, (new_alloc + 1) * sizeof(char32_t));
+			newbuf    = (char32_t *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char32_t));
 			if unlikely(!newbuf)
 				return NULL;
 		}
@@ -1913,10 +1896,10 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_printer)(void *arg,
                                                    char16_t const *__restrict data,
                                                    size_t datalen) {
 	char16_t *buf;
-	buf = format_c16aprintf_alloc((struct format_c16aprintf_data *)arg, datalen);
+	buf = libd_format_waprintf_alloc((struct format_c16aprintf_data *)arg, datalen);
 	if unlikely(!buf)
 		return -1;
-	c16memcpy(buf, data, datalen);
+	libd_wmemcpy(buf, data, datalen);
 	return (ssize_t)datalen;
 }
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
@@ -1925,10 +1908,10 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_printer)(void *arg,
                                                    char32_t const *__restrict data,
                                                    size_t datalen) {
 	char32_t *buf;
-	buf = format_c32aprintf_alloc((struct format_c32aprintf_data *)arg, datalen);
+	buf = libc_format_waprintf_alloc((struct format_c32aprintf_data *)arg, datalen);
 	if unlikely(!buf)
 		return -1;
-	c32memcpy(buf, data, datalen);
+	libc_wmemcpy(buf, data, datalen);
 	return (ssize_t)datalen;
 }
 #endif /* !__KERNEL__ */

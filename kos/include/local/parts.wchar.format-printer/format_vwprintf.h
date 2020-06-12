@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d8e012c */
+/* HASH CRC-32:0x1780ee63 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -144,7 +144,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pwformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
 #elif defined(__CRT_HAVE_DOS$format_wrepeat) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <bits/uformat-printer.h>
@@ -152,7 +152,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pc32formatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
 #elif defined(__CRT_HAVE_DOS$format_wrepeat) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <bits/uformat-printer.h>
@@ -160,7 +160,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pc16formatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_wrepeat.h>
@@ -796,17 +796,15 @@ __LOCAL_LIBC(format_vwprintf) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) _
 #define __FORMAT_HEXDUMP            __localdep_format_whexdump
 #define __FORMAT_WIDTH              __localdep_format_wwidth
 #define __FORMAT_ESCAPE             __localdep_format_wescape
-#if __SIZEOF_WCHAR_T__ == 2
 #define __FORMAT_WIDTH8             __localdep_format_width
 #define __FORMAT_ESCAPE8            __localdep_format_escape
+#if __SIZEOF_WCHAR_T__ == 2
 #define __FORMAT_WIDTH32            __localdep_format_c32width
 #define __FORMAT_ESCAPE32           __localdep_format_c32escape
 #define __FORMAT_UNICODE_WRITECHAR  __localdep_unicode_writeutf16
 #define __FORMAT_UNICODE_FORMAT8    __localdep_format_8to16
 #define __FORMAT_UNICODE_FORMAT32   __localdep_format_32to16
 #else /* __SIZEOF_WCHAR_T__ == 2 */
-#define __FORMAT_WIDTH8             __localdep_format_width
-#define __FORMAT_ESCAPE8            __localdep_format_escape
 #define __FORMAT_WIDTH16            __localdep_format_c16width
 #define __FORMAT_ESCAPE16           __localdep_format_c16escape
 #define __FORMAT_UNICODE_WRITECHAR(__dst, __ch) ((__dst)[0] = (__ch), (__dst) + 1)
