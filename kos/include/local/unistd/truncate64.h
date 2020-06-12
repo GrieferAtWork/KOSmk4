@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e300be */
+/* HASH CRC-32:0x36bbd43f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,15 +129,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: close from unistd */
 #ifndef __local___localdep_close_defined
 #define __local___localdep_close_defined 1
-#ifdef __close_defined
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> close(2)
- * Close a file handle */
-__NAMESPACE_GLB_USING(close)
-#define __localdep_close close
-#elif defined(__CRT_HAVE_close)
+#ifdef __CRT_HAVE_close
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN

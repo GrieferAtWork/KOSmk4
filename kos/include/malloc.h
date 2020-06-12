@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3ca40e0 */
+/* HASH CRC-32:0x122a47db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -167,9 +167,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_memalign, __FORCELOCAL __ATTR_NONNULL((1))
 #endif /* !__posix_memalign_defined */
 #ifndef __cfree_defined
 #define __cfree_defined 1
-#ifdef __std_free_defined
-__FORCELOCAL void __NOTHROW_NCX(__LIBCCALL cfree)(void *__mallptr) { (__NAMESPACE_STD_SYM free)(__mallptr); }
-#elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
+#if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,cfree,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
 __CREDIRECT_VOID(,__NOTHROW_NCX,cfree,(void *__mallptr),free,(__mallptr))

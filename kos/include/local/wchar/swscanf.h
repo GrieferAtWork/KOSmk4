@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb84a91ea */
+/* HASH CRC-32:0x1ea50b59 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,13 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: vswscanf from wchar */
 #ifndef __local___localdep_vswscanf_defined
 #define __local___localdep_vswscanf_defined 1
-#ifdef __vswscanf_defined
-__NAMESPACE_GLB_USING(vswscanf)
-#define __localdep_vswscanf vswscanf
-#elif defined(__std_vswscanf_defined)
-__NAMESPACE_STD_USING(vswscanf)
-#define __localdep_vswscanf vswscanf
-#elif defined(__CRT_HAVE_vswscanf)
+#ifdef __CRT_HAVE_vswscanf
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vswscanf,(__WCHAR_TYPE__ const *__restrict __src, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))
 #elif defined(__CRT_HAVE_DOS$vswscanf) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vswscanf,(__CHAR32_TYPE__ const *__restrict __src, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))

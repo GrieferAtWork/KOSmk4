@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96a28f14 */
+/* HASH CRC-32:0x459eae70 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,34 +40,23 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined
 #define __local___localdep_memcpyc_defined 1
-#ifdef __fast_memcpyc_defined
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-__NAMESPACE_FAST_USING(memcpyc)
-#define __localdep_memcpyc __LIBC_FAST_NAME(memcpyc)
-#elif defined(__CRT_HAVE_memcpyc)
+#ifdef __CRT_HAVE_memcpyc
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
-#else /* ... */
+#else /* __CRT_HAVE_memcpyc */
 __NAMESPACE_LOCAL_END
 #include <local/string/memcpyc.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
 /* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined 1
-#ifdef __realloc_defined
-__NAMESPACE_GLB_USING(realloc)
-#define __localdep_realloc realloc
-#elif defined(__std_realloc_defined)
-__NAMESPACE_STD_USING(realloc)
-#define __localdep_realloc realloc
-#elif __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
+#if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
 __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
 #elif defined(__CRT_HAVE_realloc)
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
@@ -97,23 +86,18 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmoveupc from string */
 #ifndef __local___localdep_memmoveupc_defined
 #define __local___localdep_memmoveupc_defined 1
-#ifdef __fast_memmoveupc_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
- * @return: * : Always re-returns `dst' */
-__NAMESPACE_FAST_USING(memmoveupc)
-#define __localdep_memmoveupc __LIBC_FAST_NAME(memmoveupc)
-#elif defined(__CRT_HAVE_memmoveupc)
+#ifdef __CRT_HAVE_memmoveupc
 /* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmoveupc,(__dst,__src,__elem_count,__elem_size))
-#else /* ... */
+#else /* __CRT_HAVE_memmoveupc */
 __NAMESPACE_LOCAL_END
 #include <local/string/memmoveupc.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 #define __localdep_memmoveupc __LIBC_LOCAL_NAME(memmoveupc)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memmoveupc */
 #endif /* !__local___localdep_memmoveupc_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>

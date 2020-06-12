@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf929ff29 */
+/* HASH CRC-32:0xdc7c903b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,44 +25,34 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
-#ifdef __fast_memcpy_defined
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-__NAMESPACE_FAST_USING(memcpy)
-#define __localdep_memcpy __LIBC_FAST_NAME(memcpy)
-#elif defined(__CRT_HAVE_memcpy)
+#ifdef __CRT_HAVE_memcpy
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_memcpy */
 __NAMESPACE_LOCAL_END
 #include <local/string/memcpy.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
 /* Dependency: memset from string */
 #ifndef __local___localdep_memset_defined
 #define __local___localdep_memset_defined 1
-#ifdef __fast_memset_defined
-/* Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
-__NAMESPACE_FAST_USING(memset)
-#define __localdep_memset __LIBC_FAST_NAME(memset)
-#elif defined(__CRT_HAVE_memset)
+#ifdef __CRT_HAVE_memset
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_memset */
 __NAMESPACE_LOCAL_END
 #include <local/string/memset.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 #define __localdep_memset __LIBC_LOCAL_NAME(memset)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memset */
 #endif /* !__local___localdep_memset_defined */
 /* Dependency: strnlen from string */
 #ifndef __local___localdep_strnlen_defined

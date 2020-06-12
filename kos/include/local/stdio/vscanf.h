@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19f4afd8 */
+/* HASH CRC-32:0x77c7f11c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,17 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: vfscanf from stdio */
 #ifndef __local___localdep_vfscanf_defined
 #define __local___localdep_vfscanf_defined 1
-#ifdef __vfscanf_defined
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
-__NAMESPACE_GLB_USING(vfscanf)
-#define __localdep_vfscanf vfscanf
-#elif defined(__std_vfscanf_defined)
-/* Scan data from `STREAM', following `FORMAT'
- * Return the number of successfully scanned data items */
-__NAMESPACE_STD_USING(vfscanf)
-#define __localdep_vfscanf vfscanf
-#elif defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)
+#if defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfscanf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfscanf_unlocked,(__stream,__format,__args))

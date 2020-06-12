@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f448a33 */
+/* HASH CRC-32:0xb492b36d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fputws from wchar */
 #ifndef __local___localdep_fputws_defined
 #define __local___localdep_fputws_defined 1
-#ifdef __fputws_defined
-__NAMESPACE_GLB_USING(fputws)
-#define __localdep_fputws fputws
-#elif defined(__std_fputws_defined)
-__NAMESPACE_STD_USING(fputws)
-#define __localdep_fputws fputws
-#elif defined(__CRT_HAVE_fputws_unlocked) && defined(__USE_STDIO_UNLOCKED)
+#if defined(__CRT_HAVE_fputws_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_fputws,(__WCHAR_TYPE__ const *__restrict __string, __FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
 #elif defined(__CRT_HAVE_DOS$fputws_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_fputws,(__CHAR32_TYPE__ const *__restrict __string, __FILE *__restrict __stream),fputws_unlocked,(__string,__stream))

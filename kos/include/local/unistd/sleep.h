@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x534fa3a7 */
+/* HASH CRC-32:0x4568722e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,11 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: dos_sleep from dos */
 #ifndef __local___localdep_dos_sleep_defined
 #define __local___localdep_dos_sleep_defined 1
-#ifdef __sleep_defined
-/* Sleep for up to `duration' seconds */
-__NAMESPACE_GLB_USING(sleep)
-#define __localdep_dos_sleep sleep
-#elif defined(__CRT_HAVE__sleep)
+#ifdef __CRT_HAVE__sleep
 /* Sleep for up to `duration' seconds */
 __CREDIRECT_VOID(,__NOTHROW_RPC,__localdep_dos_sleep,(unsigned int __duration),_sleep,(__duration))
 #elif defined(__CRT_HAVE_sleep)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc05652eb */
+/* HASH CRC-32:0x156bd3aa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wspawnvp from parts.wchar.process */
 #ifndef __local___localdep_wspawnvp_defined
 #define __local___localdep_wspawnvp_defined 1
-#ifdef __wspawnvp_defined
-__NAMESPACE_GLB_USING(wspawnvp)
-#define __localdep_wspawnvp wspawnvp
-#elif defined(__CRT_HAVE_wspawnvp)
+#ifdef __CRT_HAVE_wspawnvp
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvp,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV),wspawnvp,(__mode,__file,___argv))
 #elif defined(__CRT_HAVE_DOS$wspawnvp) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvp,(int __mode, __CHAR32_TYPE__ const *__restrict __file, __T32ARGV),wspawnvp,(__mode,__file,___argv))

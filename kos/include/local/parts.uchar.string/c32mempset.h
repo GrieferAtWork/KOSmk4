@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb79bf2c */
+/* HASH CRC-32:0x675eacac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,47 +25,35 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempsetl from string */
 #ifndef __local___localdep_mempsetl_defined
 #define __local___localdep_mempsetl_defined 1
-#ifdef __fast_mempsetl_defined
-/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
-__NAMESPACE_FAST_USING(mempsetl)
-#define __localdep_mempsetl __LIBC_FAST_NAME(mempsetl)
-#elif defined(__CRT_HAVE_mempsetl)
+#ifdef __CRT_HAVE_mempsetl
 /* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),mempsetl,(__dst,__dword,__n_dwords))
-#else /* ... */
+#else /* __CRT_HAVE_mempsetl */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempsetl.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
 #define __localdep_mempsetl __LIBC_LOCAL_NAME(mempsetl)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mempsetl */
 #endif /* !__local___localdep_mempsetl_defined */
 /* Dependency: mempset from string */
 #ifndef __local___localdep_mempset_defined
 #define __local___localdep_mempset_defined 1
-#ifdef __fast_mempset_defined
-/* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
-__NAMESPACE_FAST_USING(mempset)
-#define __localdep_mempset __LIBC_FAST_NAME(mempset)
-#elif defined(__CRT_HAVE_mempset)
+#ifdef __CRT_HAVE_mempset
 /* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_mempset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),mempset,(__dst,__byte,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_mempset */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempset.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
 #define __localdep_mempset __LIBC_LOCAL_NAME(mempset)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mempset */
 #endif /* !__local___localdep_mempset_defined */
 /* Dependency: mempsetw from string */
 #ifndef __local___localdep_mempsetw_defined
 #define __local___localdep_mempsetw_defined 1
-#ifdef __fast_mempsetw_defined
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
-__NAMESPACE_FAST_USING(mempsetw)
-#define __localdep_mempsetw __LIBC_FAST_NAME(mempsetw)
-#elif defined(__CRT_HAVE_mempsetw)
+#ifdef __CRT_HAVE_mempsetw
 /* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),mempsetw,(__dst,__word,__n_words))
 #elif defined(__CRT_HAVE_wmempset) && (__SIZEOF_WCHAR_T__ == 2)

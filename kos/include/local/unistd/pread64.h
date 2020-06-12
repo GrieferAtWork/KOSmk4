@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24e3962 */
+/* HASH CRC-32:0x66d000f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,13 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: read from unistd */
 #ifndef __local___localdep_read_defined
 #define __local___localdep_read_defined 1
-#ifdef __read_defined
-/* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
-__NAMESPACE_GLB_USING(read)
-#define __localdep_read read
-#elif defined(__CRT_HAVE_read)
+#ifdef __CRT_HAVE_read
 /* >> read(2)
  * Read data from a given file descriptor `FD' and return the number of bytes read.
  * A return value of ZERO(0) is indicative of EOF */

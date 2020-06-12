@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9989d812 */
+/* HASH CRC-32:0xc95f7e5c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,34 +39,23 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmovedownc from string */
 #ifndef __local___localdep_memmovedownc_defined
 #define __local___localdep_memmovedownc_defined 1
-#ifdef __fast_memmovedownc_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
- * @return: * : Always re-returns `dst' */
-__NAMESPACE_FAST_USING(memmovedownc)
-#define __localdep_memmovedownc __LIBC_FAST_NAME(memmovedownc)
-#elif defined(__CRT_HAVE_memmovedownc)
+#ifdef __CRT_HAVE_memmovedownc
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovedownc,(__dst,__src,__elem_count,__elem_size))
-#else /* ... */
+#else /* __CRT_HAVE_memmovedownc */
 __NAMESPACE_LOCAL_END
 #include <local/string/memmovedownc.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
 #define __localdep_memmovedownc __LIBC_LOCAL_NAME(memmovedownc)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memmovedownc */
 #endif /* !__local___localdep_memmovedownc_defined */
 /* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
-#ifdef __free_defined
-__NAMESPACE_GLB_USING(free)
-#define __localdep_free free
-#elif defined(__std_free_defined)
-__NAMESPACE_STD_USING(free)
-#define __localdep_free free
-#elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
+#if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))

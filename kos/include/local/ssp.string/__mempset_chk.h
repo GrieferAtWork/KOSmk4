@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb9e50ff */
+/* HASH CRC-32:0xb3235c9c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempset from string */
 #ifndef __local___localdep_mempset_defined
 #define __local___localdep_mempset_defined 1
-#ifdef __fast_mempset_defined
-/* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
-__NAMESPACE_FAST_USING(mempset)
-#define __localdep_mempset __LIBC_FAST_NAME(mempset)
-#elif defined(__CRT_HAVE_mempset)
+#ifdef __CRT_HAVE_mempset
 /* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_mempset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),mempset,(__dst,__byte,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_mempset */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempset.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memset', but return `DST + N_BYTES', rather than `DST' */
 #define __localdep_mempset __LIBC_LOCAL_NAME(mempset)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mempset */
 #endif /* !__local___localdep_mempset_defined */
 __NAMESPACE_LOCAL_END
 #include <ssp/chk.h>

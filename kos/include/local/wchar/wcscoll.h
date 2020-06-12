@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82cddf9d */
+/* HASH CRC-32:0xcf019625 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,15 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcscmp from wchar */
 #ifndef __local___localdep_wcscmp_defined
 #define __local___localdep_wcscmp_defined 1
-#ifdef __wcscmp_defined
-/* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-__NAMESPACE_GLB_USING(wcscmp)
-#define __localdep_wcscmp wcscmp
-#elif defined(__std_wcscmp_defined)
-/* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-__NAMESPACE_STD_USING(wcscmp)
-#define __localdep_wcscmp wcscmp
-#elif defined(__CRT_HAVE_wcscmp)
+#ifdef __CRT_HAVE_wcscmp
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_DOS$wcscmp) && __SIZEOF_WCHAR_T__ == 4

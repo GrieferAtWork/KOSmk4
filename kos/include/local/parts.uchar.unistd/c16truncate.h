@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d947916 */
+/* HASH CRC-32:0xac2425b5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,15 +88,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: close from unistd */
 #ifndef __local___localdep_close_defined
 #define __local___localdep_close_defined 1
-#ifdef __close_defined
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> close(2)
- * Close a file handle */
-__NAMESPACE_GLB_USING(close)
-#define __localdep_close close
-#elif defined(__CRT_HAVE_close)
+#ifdef __CRT_HAVE_close
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -124,16 +116,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 /* Dependency: open from fcntl */
 #ifndef __local___localdep_open_defined
 #define __local___localdep_open_defined 1
-#ifdef __open_defined
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifdef __cplusplus
-__NAMESPACE_GLB_USING(open)
-#else /* __cplusplus */
-#define __localdep_open open
-#endif /* !__cplusplus */
-#elif defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN

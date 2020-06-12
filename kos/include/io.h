@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b145c0d */
+/* HASH CRC-32:0x837278ac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,6 +88,7 @@ struct _finddata64i32_t;
 #ifndef __remove_defined
 #define __remove_defined 1
 #ifdef __std_remove_defined
+/* Remove a file or directory `FILENAME' */
 __NAMESPACE_STD_USING(remove)
 #elif defined(__CRT_HAVE_remove)
 /* Remove a file or directory `FILENAME' */
@@ -103,6 +104,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(remove, __FORCELOCAL __ATTR_NONNULL((1)) int __N
 #ifndef __rename_defined
 #define __rename_defined 1
 #ifdef __std_rename_defined
+/* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
+ * that `NEWNAME_OR_PATH' refers to a directory, place the file within. */
 __NAMESPACE_STD_USING(rename)
 #elif defined(__CRT_HAVE_rename)
 /* Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event

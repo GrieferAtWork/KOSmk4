@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85b6ed19 */
+/* HASH CRC-32:0x55254204 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,32 +25,23 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memset from string */
 #ifndef __local___localdep_memset_defined
 #define __local___localdep_memset_defined 1
-#ifdef __fast_memset_defined
-/* Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
-__NAMESPACE_FAST_USING(memset)
-#define __localdep_memset __LIBC_FAST_NAME(memset)
-#elif defined(__CRT_HAVE_memset)
+#ifdef __CRT_HAVE_memset
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_memset */
 __NAMESPACE_LOCAL_END
 #include <local/string/memset.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 #define __localdep_memset __LIBC_LOCAL_NAME(memset)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memset */
 #endif /* !__local___localdep_memset_defined */
 /* Dependency: memsetw from string */
 #ifndef __local___localdep_memsetw_defined
 #define __local___localdep_memsetw_defined 1
-#ifdef __fast_memsetw_defined
-/* Fill memory with a given word */
-__NAMESPACE_FAST_USING(memsetw)
-#define __localdep_memsetw __LIBC_FAST_NAME(memsetw)
-#elif defined(__CRT_HAVE_memsetw)
+#ifdef __CRT_HAVE_memsetw
 /* Fill memory with a given word */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),memsetw,(__dst,__word,__n_words))
 #elif defined(__CRT_HAVE_wmemset) && (__SIZEOF_WCHAR_T__ == 2)
@@ -70,20 +61,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memsetl from string */
 #ifndef __local___localdep_memsetl_defined
 #define __local___localdep_memsetl_defined 1
-#ifdef __fast_memsetl_defined
-/* Fill memory with a given dword */
-__NAMESPACE_FAST_USING(memsetl)
-#define __localdep_memsetl __LIBC_FAST_NAME(memsetl)
-#elif defined(__CRT_HAVE_memsetl)
+#ifdef __CRT_HAVE_memsetl
 /* Fill memory with a given dword */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memsetl,(__dst,__dword,__n_dwords))
-#else /* ... */
+#else /* __CRT_HAVE_memsetl */
 __NAMESPACE_LOCAL_END
 #include <local/string/memsetl.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given dword */
 #define __localdep_memsetl __LIBC_LOCAL_NAME(memsetl)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memsetl */
 #endif /* !__local___localdep_memsetl_defined */
 __LOCAL_LIBC(wmemset) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmemset))(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars) {

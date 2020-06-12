@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa113da3b */
+/* HASH CRC-32:0xdf5d8203 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmoveupq from string */
 #ifndef __local___localdep_mempmoveupq_defined
 #define __local___localdep_mempmoveupq_defined 1
-#ifdef __fast_mempmoveupq_defined
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
-__NAMESPACE_FAST_USING(mempmoveupq)
-#define __localdep_mempmoveupq __LIBC_FAST_NAME(mempmoveupq)
-#elif defined(__CRT_HAVE_mempmoveupq)
+#ifdef __CRT_HAVE_mempmoveupq
 /* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST >= SRC || !N_QWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveupq,(__dst,__src,__n_qwords))
 #elif defined(__CRT_HAVE_mempmoveq)
@@ -46,11 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmoveupl from string */
 #ifndef __local___localdep_mempmoveupl_defined
 #define __local___localdep_mempmoveupl_defined 1
-#ifdef __fast_mempmoveupl_defined
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
-__NAMESPACE_FAST_USING(mempmoveupl)
-#define __localdep_mempmoveupl __LIBC_FAST_NAME(mempmoveupl)
-#elif defined(__CRT_HAVE_mempmoveupl)
+#ifdef __CRT_HAVE_mempmoveupl
 /* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),mempmoveupl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_mempmovel)
@@ -67,11 +59,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmoveupw from string */
 #ifndef __local___localdep_mempmoveupw_defined
 #define __local___localdep_mempmoveupw_defined 1
-#ifdef __fast_mempmoveupw_defined
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
-__NAMESPACE_FAST_USING(mempmoveupw)
-#define __localdep_mempmoveupw __LIBC_FAST_NAME(mempmoveupw)
-#elif defined(__CRT_HAVE_mempmoveupw)
+#ifdef __CRT_HAVE_mempmoveupw
 /* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveupw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),mempmoveupw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_mempmovew)
@@ -88,20 +76,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmoveup from string */
 #ifndef __local___localdep_mempmoveup_defined
 #define __local___localdep_mempmoveup_defined 1
-#ifdef __fast_mempmoveup_defined
-/* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
-__NAMESPACE_FAST_USING(mempmoveup)
-#define __localdep_mempmoveup __LIBC_FAST_NAME(mempmoveup)
-#elif defined(__CRT_HAVE_mempmoveup)
+#ifdef __CRT_HAVE_mempmoveup
 /* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmoveup,(__dst,__src,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_mempmoveup */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempmoveup.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memmoveup', but return `DST + N_BYTES', rather than `DST' (assumes that `DST >= SRC || !N_BYTES') */
 #define __localdep_mempmoveup __LIBC_LOCAL_NAME(mempmoveup)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mempmoveup */
 #endif /* !__local___localdep_mempmoveup_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>

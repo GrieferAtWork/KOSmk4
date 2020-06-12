@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc01fb168 */
+/* HASH CRC-32:0xb06aceb0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,13 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: calloc from stdlib */
 #ifndef __local___localdep_calloc_defined
 #define __local___localdep_calloc_defined 1
-#ifdef __calloc_defined
-__NAMESPACE_GLB_USING(calloc)
-#define __localdep_calloc calloc
-#elif defined(__std_calloc_defined)
-__NAMESPACE_STD_USING(calloc)
-#define __localdep_calloc calloc
-#elif __has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)
+#if __has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),calloc,{ return __builtin_calloc(__count, __num_bytes); })
 #elif defined(__CRT_HAVE_calloc)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),calloc,(__count,__num_bytes))
@@ -48,23 +42,18 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
-#ifdef __fast_memcpy_defined
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-__NAMESPACE_FAST_USING(memcpy)
-#define __localdep_memcpy __LIBC_FAST_NAME(memcpy)
-#elif defined(__CRT_HAVE_memcpy)
+#ifdef __CRT_HAVE_memcpy
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_memcpy */
 __NAMESPACE_LOCAL_END
 #include <local/string/memcpy.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
 /* Dependency: malloc_usable_size from malloc */
 #ifndef __local___localdep_malloc_usable_size_defined
@@ -134,10 +123,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: recallocv from malloc */
 #ifndef __local___localdep_recallocv_defined
 #define __local___localdep_recallocv_defined 1
-#ifdef __recallocv_defined
-__NAMESPACE_GLB_USING(recallocv)
-#define __localdep_recallocv recallocv
-#elif defined(__CRT_HAVE_recallocv)
+#ifdef __CRT_HAVE_recallocv
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,__localdep_recallocv,(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),recallocv,(__mallptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE__recalloc)
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,__localdep_recallocv,(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),_recalloc,(__mallptr,__elem_count,__elem_size))

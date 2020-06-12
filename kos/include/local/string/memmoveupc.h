@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cf84ee4 */
+/* HASH CRC-32:0x4f0e86ab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmoveupq from string */
 #ifndef __local___localdep_memmoveupq_defined
 #define __local___localdep_memmoveupq_defined 1
-#ifdef __fast_memmoveupq_defined
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
-__NAMESPACE_FAST_USING(memmoveupq)
-#define __localdep_memmoveupq __LIBC_FAST_NAME(memmoveupq)
-#elif defined(__CRT_HAVE_memmoveupq)
+#ifdef __CRT_HAVE_memmoveupq
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveupq,(__dst,__src,__n_qwords))
 #elif defined(__CRT_HAVE_memmoveq)
@@ -46,11 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmoveupl from string */
 #ifndef __local___localdep_memmoveupl_defined
 #define __local___localdep_memmoveupl_defined 1
-#ifdef __fast_memmoveupl_defined
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
-__NAMESPACE_FAST_USING(memmoveupl)
-#define __localdep_memmoveupl __LIBC_FAST_NAME(memmoveupl)
-#elif defined(__CRT_HAVE_memmoveupl)
+#ifdef __CRT_HAVE_memmoveupl
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),memmoveupl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_memmovel)
@@ -73,11 +65,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmoveupw from string */
 #ifndef __local___localdep_memmoveupw_defined
 #define __local___localdep_memmoveupw_defined 1
-#ifdef __fast_memmoveupw_defined
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS') */
-__NAMESPACE_FAST_USING(memmoveupw)
-#define __localdep_memmoveupw __LIBC_FAST_NAME(memmoveupw)
-#elif defined(__CRT_HAVE_memmoveupw)
+#ifdef __CRT_HAVE_memmoveupw
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),memmoveupw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_memmovew)
@@ -100,23 +88,18 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmoveup from string */
 #ifndef __local___localdep_memmoveup_defined
 #define __local___localdep_memmoveup_defined 1
-#ifdef __fast_memmoveup_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
- * @return: * : Always re-returns `dst' */
-__NAMESPACE_FAST_USING(memmoveup)
-#define __localdep_memmoveup __LIBC_FAST_NAME(memmoveup)
-#elif defined(__CRT_HAVE_memmoveup)
+#ifdef __CRT_HAVE_memmoveup
 /* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmoveup,(__dst,__src,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_memmoveup */
 __NAMESPACE_LOCAL_END
 #include <local/string/memmoveup.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 #define __localdep_memmoveup __LIBC_LOCAL_NAME(memmoveup)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memmoveup */
 #endif /* !__local___localdep_memmoveup_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde021c82 */
+/* HASH CRC-32:0x5461a15b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mktemp from stdlib */
 #ifndef __local___localdep_mktemp_defined
 #define __local___localdep_mktemp_defined 1
-#ifdef __mktemp_defined
-__NAMESPACE_GLB_USING(mktemp)
-#define __localdep_mktemp mktemp
-#elif defined(__CRT_HAVE_mktemp)
+#ifdef __CRT_HAVE_mktemp
 __CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_mktemp,(char *__template_),mktemp,(__template_))
 #elif defined(__CRT_HAVE__mktemp)
 __CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_mktemp,(char *__template_),_mktemp,(__template_))

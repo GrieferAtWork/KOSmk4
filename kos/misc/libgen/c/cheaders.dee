@@ -622,7 +622,7 @@ class FunctionPrototype {
 		fp << "#define " << exposedName;
 		/* Check if the prototypes are already compatible */
 		if (this.compatibleWith(callToPrototype)) {
-			fp << " " << callToName;
+			fp << " " << callToName << "\n";
 			return;
 		}
 		local myArgc = #argv;
@@ -677,7 +677,7 @@ class FunctionPrototype {
 					fp << ", ";
 				fp << "__VA_ARGS__";
 			}
-			fp << ")";
+			fp << ")\n";
 			return;
 		}
 		/* Same # of arguments, and same ellipsis behavior.
@@ -703,7 +703,7 @@ class FunctionPrototype {
 				fp << ", ";
 			fp << "...";
 		}
-		fp << "))&" << callToName << ")";
+		fp << "))&" << callToName << ")\n";
 	}
 
 	@@Print a declaration akin to:
@@ -1558,110 +1558,103 @@ class NamespaceBinding {
 	@@Name of the function within @namespace
 	public member importName: string | UserString;
 
-	@@Prototype selectors (usually simply @({ "1", { <primaryPrototype> } }))
-	@@These are the prototypes of @importName within its associated @namespace
-	public member prototypes: {(string | UserString, {FunctionPrototype...})...} | Callable = ();
+	@@The prototype to match when doing a call-to import
+	@@Ignored when @namespace doesn't do any escaping.
+	@@i.e. @(namespace.keyCSymbolName(importName) == importName)
+	public member prototype: FunctionPrototype | Callable;
 
-	public property functionPrototypes: {(string | UserString, {FunctionPrototype...})...} = {
-		get(): {(string | UserString, {FunctionPrototype...})...} {
-			local result = prototypes;
+	@@Wrapper for @prototype
+	public property functionPrototype: FunctionPrototype = {
+		get(): FunctionPrototype {
+			local result = prototype;
 			if (result is Callable)
-				result = prototypes = result();
+				result = prototype = result();
 			return result;
 		}
 	}
 
 	public function preload() {
-		functionPrototypes;
+		if (prototype is bound)
+			functionPrototype;
 	}
 
 	@@Print a binding for this namespace import
 	@@@param: preferBindingMacros: Prefer function bindings to be done with macros, rather than
 	@@                             through use of inline functions.
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
-	public function cprintFunctionBinding(
-			fp: CWriter, escapeMode: int, decl/*unused*/: string, exposedName: string,
-			prototypes: {FunctionPrototype...}, doc: string, preferBindingMacros: bool) {
-		/* Bind a function declaration from @namespace, inside of which it was
-		 * declared under the name @importName, and @this.prototypes to a new
-		 * function or macro by the name of @exposedName, using @prototypes */
-		local callToPrototypes = this.functionPrototypes;
-		local explicitCastAllTypes =
-			(#callToPrototypes != 1) ||
-			(#callToPrototypes.first[1] != 1);
-		local callToSymbolName = this.namespace.keyCSymbolName(this.importName);
-		local callToName = callToSymbolName;
-		if (this.namespace.prefix)
-			callToName = "({} {})".format({ this.namespace.prefix, callToName });
-		if (prototypes.each.hasEllipsis || ...) {
-			/* _Must_ (try to) use keyUsing for c++, or a macro for C */
-			if (doc)
-				fp.printComment(doc);
-			fp.ppIfdef("__cplusplus");
-			this.namespace.keyUsing(fp, this.importName);
-			fp.ppElse();
-			fp << "#define " << exposedName << " " << callToName << "\n";
-			fp.ppEndif();
+	public function cprintNamespaceImportBinding(
+			fp: CWriter, escapeMode: int, exposedName: string,
+			conditionalPrototypes: {(string | UserString, {FunctionPrototype...})...},
+			doc: string, preferBindingMacros/*unused*/: bool) {
+		assert namespace !== fp.namespace;
+		assert importName == exposedName;
+		if (doc)
+			fp.printComment(doc);
+		/* There are 2 ways in which we must import namespace imports:
+		 * The (simple) C++ way:
+		 * >> namespace.keyUsing(fp, exposedName);
+		 * And the (complicated) C way:
+		 * >> __NAMESPACE_FAST_USING_OR_IMPL(<exposedName>, ...) */
+		local cSymbolName = namespace.keyCSymbolName(exposedName);
+		if (cSymbolName == exposedName) {
+			/* The namespace doesn't do any sort of name escape
+			 * (this is the case for the std- and global namespaces)
+			 * In this case, we can simply do a conditional namespace
+			 * import in C++-mode, and don't have to do anything
+			 * in C-mode (since the symbol will have already been
+			 * imported in that case) */
+			namespace.keyUsing(fp, exposedName);
 			return;
 		}
-		local usedCallToProto = none;
-		for (local callToPrototypePpCond, callToProtos: callToPrototypes) {
-			if (callToPrototypePpCond != "1")
-				continue;
-			usedCallToProto = callToProtos;
-			break;
-		}
-		if (usedCallToProto is none) {
-			usedCallToProto = callToPrototypes
-				? callToPrototypes.first.last
-				: prototypes;
-		}
-		usedCallToProto = usedCallToProto.first;
-		for (local ptype: prototypes) {
-			if (doc)
-				fp.printComment(doc);
-			if (exposedName == this.importName && #prototypes == 1 &&
-			    ptype.compatibleWith(usedCallToProto)) {
-				/* Can only be done if the prototypes match up! */
-				this.namespace.keyUsingOrImpl(fp, exposedName, []{
-					ptype.cprintCallToFunction(
-						fp, escapeMode, NAMESPACE_IMPORT_DECL,
-						exposedName, callToName, usedCallToProto,
-						explicitCastAllTypes: explicitCastAllTypes);
-				});
-			} else if (preferBindingMacros) {
-				if (fp.namespace !== GLOBAL_NAMESPACE) {
-					if (#prototypes == 1 && ptype.compatibleWith(usedCallToProto)) {
-						/* Compatible prototypes -> Do this:
-						 * >> __NAMESPACE_STD_BEGIN
-						 * >> void foo(void);
-						 * >> __NAMESPACE_STD_END
-						 * >>
-						 * >> ...
-						 * >>
-						 * >> __NAMESPACE_LOCAL_BEGIN
-						 * >> __NAMESPACE_STD_USING(foo);
-						 * >> #define __MY_BINDING_NAME_FOR_FOO foo
-						 * >> __NAMESPACE_LOCAL_END */
-						this.namespace.keyUsing(fp, this.importName);
-						fp << "#define " << exposedName << " " << callToSymbolName << "\n";
-					} else {
-						goto do_bind_by_call;
-					}
-				} else {
-					ptype.cprintCallToMacro(
-						fp, escapeMode, exposedName, callToName, usedCallToProto,
-						explicitCastAllTypes: explicitCastAllTypes);
-				}
+		if (!conditionalPrototypes)
+			return; /* Shouldn't happen... */
+		if (namespace.prefix)
+			cSymbolName = "({} {})".format({ namespace.prefix, cSymbolName });
+		local callToEscapeMode = escapeMode;
+		if (callToEscapeMode == ESCAPE_MODE_PART)
+			callToEscapeMode = ESCAPE_MODE_FULL;
+		local isFirst = true;
+		for (local ppCond, prototypes: conditionalPrototypes) {
+			if (isFirst) {
+				isFirst = false;
+				fp.ppIf(ppCond);
 			} else {
-do_bind_by_call:
-				ptype.cprintCallToFunction(
-					fp, escapeMode, NAMESPACE_IMPORT_DECL,
-					exposedName, callToName, usedCallToProto,
-					explicitCastAllTypes: explicitCastAllTypes);
-				fp << "\n";
+				fp.ppElif(ppCond);
+			}
+			if (#prototypes == 1) {
+				/* The complicated case: Must use `keyUsingOrImpl' */
+				namespace.keyUsingOrImpl(fp, exposedName, []{
+					prototypes.first.cprintCallToFunction(
+						fp, escapeMode, NAMESPACE_IMPORT_DECL,
+						exposedName, cSymbolName, prototype,
+						callToEscapeMode: callToEscapeMode);
+				});
+			} else {
+				/* TODO: preferBindingMacros */
+				/* The even more complicated case:
+				 * >> #ifdef __cplusplus
+				 * >> __NAMESPACE_FAST_USING(<exposedName>)
+				 * >> #else
+				 * >> <CallToProto1>
+				 * >> <CallToProto2>
+				 * >> <CallToProto...>
+				 * >> <CallToProtoN>
+				 * >> #endif */
+				fp.ppIfdef("__cplusplus");
+				namespace.keyUsing(fp, exposedName);
+				fp.ppElse();
+				for (local proto: prototypes) {
+					proto.cprintCallToFunction(
+						fp, escapeMode, NAMESPACE_IMPORT_DECL,
+						exposedName, cSymbolName, prototype,
+						callToEscapeMode: callToEscapeMode);
+					fp << "\n";
+				}
+				fp.ppEndif();
 			}
 		}
+		if (!isFirst)
+			fp.ppEndif();
 	}
 }
 
@@ -1749,8 +1742,15 @@ class FunctionBinding {
 	@@may not necessary detect it as being known. Only note that a return value
 	@@other than @none indicates a guarantied, known value
 	public function getRequiresConstant(): bool | none {
+		if (ppCond == "0")
+			return false;
+		if (functionBinding is NamespaceBinding) {
+			if (ppCond == "1")
+				return false;
+			return none;
+		}
 		local usedProtos = functionPrototypes;
-		if (!usedProtos || ppCond == "0")
+		if (!usedProtos)
 			return false;
 		local hasBindablePrototype = false;
 		for (local protoCond, none: usedProtos) {
@@ -1770,8 +1770,16 @@ class FunctionBinding {
 
 	@@Print requires-conditions for this function (has used by @"$has_function(...)")
 	public function cprintRequires(fp: CWriter | File) {
+		if (ppCond == "0") {
+			fp << "0";
+			return;
+		}
+		if (functionBinding is NamespaceBinding) {
+			fp << ppCond;
+			return;
+		}
 		local usedProtos = functionPrototypes;
-		if (!usedProtos || ppCond == "0") {
+		if (!usedProtos) {
 			fp << "0";
 			return;
 		}
@@ -1838,26 +1846,19 @@ class FunctionBinding {
 			onlyPrintPrimaryPrototype: bool = false) {
 		local usedBinding = functionBinding;
 		local usedPrototypes = functionPrototypes;
+		if (usedBinding is NamespaceBinding) {
+			local usedNs = usedBinding.namespace;
+			assert usedNs !== fp.namespace, "The caller must check this!";
+			assert usedBinding.importName == exposedName, "The caller must check this!";
+			usedBinding.cprintNamespaceImportBinding(
+				fp, escapeMode, exposedName,
+				usedPrototypes, doc, preferBindingMacros);
+			return;
+		}
 		if (onlyPrintPrimaryPrototype && #usedPrototypes > 1) {
 			local prim = primaryPrototype;
 			if (prim !is none)
 				usedPrototypes = { ("1", { prim }) };
-		}
-		if (usedBinding is NamespaceBinding) {
-			local usedNs = usedBinding.namespace;
-			assert usedNs !== fp.namespace, "The caller must check this!";
-			local nsCImportName = usedNs.keyCSymbolName(usedBinding.importName);
-			if (nsCImportName == exposedName) {
-				if (prototypes === usedBinding.prototypes ||
-				    areFunctionPrototypesCompatible(usedPrototypes, usedBinding.functionPrototypes)) {
-					/* Simple case: C doesn't perform any name mangling,
-					 * and the prototypes of the existing declaration match
-					 * those from the new declaration.
-					 * This is the case for functions imported from  */
-					usedNs.keyUsing(fp, exposedName);
-					return;
-				}
-			}
 		}
 		if (#usedPrototypes >= 2) {
 			for (local ppCond, none: usedPrototypes) {
@@ -2216,7 +2217,9 @@ no_usable_bindings:
 					if (bind.binding is Callable)
 						bind.binding = bind.binding();
 					if (bind.binding is NamespaceBinding &&
-					    (bind.binding.namespace === fp.namespace || ignoreNamespaceBindings))
+					    (ignoreNamespaceBindings ||
+					     bind.binding.namespace === fp.namespace ||
+					     bind.binding.importName != exposedName))
 						return;
 					for (local x: bind.ppCondPrefix) {
 						if (!fp.wasPrefixPrinted(escapeText(x, escapeMode)))
@@ -2247,6 +2250,8 @@ normal_guardName_binding:
 					if (ignoreNamespaceBindings)
 						continue;
 					if (bind.binding.namespace === fp.namespace)
+						continue;
+					if (bind.binding.importName != exposedName)
 						continue;
 				}
 				local usedPpCond = expandPreprocessorConditionString(bind.ppCond);

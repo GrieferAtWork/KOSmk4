@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1a30726 */
+/* HASH CRC-32:0xd909923a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -219,13 +219,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: exit from stdlib */
 #ifndef __local___localdep_exit_defined
 #define __local___localdep_exit_defined 1
-#ifdef __exit_defined
-__NAMESPACE_GLB_USING(exit)
-#define __localdep_exit exit
-#elif defined(__std_exit_defined)
-__NAMESPACE_STD_USING(exit)
-#define __localdep_exit exit
-#elif __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
+#if __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
 __CEIREDIRECT(__ATTR_NORETURN,void,__THROWING,__localdep_exit,(int __status),exit,{ return __builtin_exit(__status); })
 #elif defined(__CRT_HAVE_exit)
 __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_exit,(int __status),exit,(__status))

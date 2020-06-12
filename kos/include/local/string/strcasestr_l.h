@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x828e2eb8 */
+/* HASH CRC-32:0x381e7268 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strcasecmp_l from string */
 #ifndef __local___localdep_strcasecmp_l_defined
 #define __local___localdep_strcasecmp_l_defined 1
-#ifdef __strcasecmp_l_defined
-__NAMESPACE_GLB_USING(strcasecmp_l)
-#define __localdep_strcasecmp_l strcasecmp_l
-#elif defined(__CRT_HAVE_strcasecmp_l)
+#ifdef __CRT_HAVE_strcasecmp_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),strcasecmp_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE__stricmp_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),_stricmp_l,(__s1,__s2,__locale))

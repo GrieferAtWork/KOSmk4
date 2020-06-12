@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x587aff7c */
+/* HASH CRC-32:0x61b59161 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,23 +25,18 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmove from string */
 #ifndef __local___localdep_memmove_defined
 #define __local___localdep_memmove_defined 1
-#ifdef __fast_memmove_defined
-/* Move memory between potentially overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-__NAMESPACE_FAST_USING(memmove)
-#define __localdep_memmove __LIBC_FAST_NAME(memmove)
-#elif defined(__CRT_HAVE_memmove)
+#ifdef __CRT_HAVE_memmove
 /* Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_memmove */
 __NAMESPACE_LOCAL_END
 #include <local/string/memmove.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memmove __LIBC_LOCAL_NAME(memmove)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memmove */
 #endif /* !__local___localdep_memmove_defined */
 __LOCAL_LIBC(bcopy) __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bcopy))(void const *__src, void *__dst, __SIZE_TYPE__ __num_bytes) {

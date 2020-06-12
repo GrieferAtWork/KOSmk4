@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f7b009a */
+/* HASH CRC-32:0xe88ebb40 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcpyq from string */
 #ifndef __local___localdep_memcpyq_defined
 #define __local___localdep_memcpyq_defined 1
-#ifdef __fast_memcpyq_defined
-/* Copy memory between non-overlapping memory blocks. */
-__NAMESPACE_FAST_USING(memcpyq)
-#define __localdep_memcpyq __LIBC_FAST_NAME(memcpyq)
-#elif defined(__CRT_HAVE_memcpyq)
+#ifdef __CRT_HAVE_memcpyq
 /* Copy memory between non-overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),memcpyq,(__dst,__src,__n_qwords))
-#else /* ... */
+#else /* __CRT_HAVE_memcpyq */
 __NAMESPACE_LOCAL_END
 #include <local/string/memcpyq.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks. */
 #define __localdep_memcpyq __LIBC_LOCAL_NAME(memcpyq)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memcpyq */
 #endif /* !__local___localdep_memcpyq_defined */
 /* Same as `memcpyq', but return `DST + N_QWORDS', rather than `DST' */
 __LOCAL_LIBC(mempcpyq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *

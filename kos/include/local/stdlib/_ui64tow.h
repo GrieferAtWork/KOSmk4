@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf2e094c */
+/* HASH CRC-32:0xbfa75df6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _ui64tow_s from stdlib */
 #ifndef __local___localdep__ui64tow_s_defined
 #define __local___localdep__ui64tow_s_defined 1
-#ifdef ___ui64tow_s_defined
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-__NAMESPACE_GLB_USING(_ui64tow_s)
-#define __localdep__ui64tow_s _ui64tow_s
-#elif defined(__CRT_HAVE__ui64tow_s)
+#ifdef __CRT_HAVE__ui64tow_s
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf73128a */
+/* HASH CRC-32:0x9932469f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,13 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: execvpe from unistd */
 #ifndef __local___localdep_execvpe_defined
 #define __local___localdep_execvpe_defined 1
-#ifdef __execvpe_defined
-/* >> execvpe(3)
- * Replace the calling process with the application image referred to by `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__NAMESPACE_GLB_USING(execvpe)
-#define __localdep_execvpe execvpe
-#elif defined(__CRT_HAVE_execvpe)
+#ifdef __CRT_HAVE_execvpe
 /* >> execvpe(3)
  * Replace the calling process with the application image referred to by `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8acbca3e */
+/* HASH CRC-32:0xb0dc6363 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,19 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fgetws from wchar */
 #ifndef __local___localdep_fgetws_defined
 #define __local___localdep_fgetws_defined 1
-#ifdef __fgetws_defined
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-__NAMESPACE_GLB_USING(fgetws)
-#define __localdep_fgetws fgetws
-#elif defined(__std_fgetws_defined)
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-__NAMESPACE_STD_USING(fgetws)
-#define __localdep_fgetws fgetws
-#elif defined(__CRT_HAVE_fgetws_unlocked) && defined(__USE_STDIO_UNLOCKED)
+#if defined(__CRT_HAVE_fgetws_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN

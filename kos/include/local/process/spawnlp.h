@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf04139dd */
+/* HASH CRC-32:0x5d50f675 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: spawnvp from process */
 #ifndef __local___localdep_spawnvp_defined
 #define __local___localdep_spawnvp_defined 1
-#ifdef __spawnvp_defined
-__NAMESPACE_GLB_USING(spawnvp)
-#define __localdep_spawnvp spawnvp
-#elif defined(__CRT_HAVE_spawnvp)
+#ifdef __CRT_HAVE_spawnvp
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_spawnvp,(int __mode, char const *__restrict __file, __TARGV),spawnvp,(__mode,__file,___argv))
 #elif defined(__CRT_HAVE__spawnvp)
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_spawnvp,(int __mode, char const *__restrict __file, __TARGV),_spawnvp,(__mode,__file,___argv))

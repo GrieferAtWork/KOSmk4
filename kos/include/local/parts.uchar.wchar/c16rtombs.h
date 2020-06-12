@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3cc343d */
+/* HASH CRC-32:0xe09c8f38 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,15 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempcpy from string */
 #ifndef __local___localdep_mempcpy_defined
 #define __local___localdep_mempcpy_defined 1
-#ifdef __mempcpy_defined
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-__NAMESPACE_GLB_USING(mempcpy)
-#define __localdep_mempcpy mempcpy
-#elif defined(__fast_mempcpy_defined)
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-__NAMESPACE_FAST_USING(mempcpy)
-#define __localdep_mempcpy __LIBC_FAST_NAME(mempcpy)
-#elif defined(__CRT_HAVE_mempcpy)
+#ifdef __CRT_HAVE_mempcpy
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)

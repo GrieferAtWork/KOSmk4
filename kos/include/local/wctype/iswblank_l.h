@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c922e42 */
+/* HASH CRC-32:0xa159f18c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: iswblank from wctype */
 #ifndef __local___localdep_iswblank_defined
 #define __local___localdep_iswblank_defined 1
-#ifdef __iswblank_defined
-__NAMESPACE_GLB_USING(iswblank)
-#define __localdep_iswblank iswblank
-#elif defined(__std_iswblank_defined)
-__NAMESPACE_STD_USING(iswblank)
-#define __localdep_iswblank iswblank
-#elif __has_builtin(__builtin_iswblank) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswblank)
+#if __has_builtin(__builtin_iswblank) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswblank)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswblank,(__WINT_TYPE__ __wc),iswblank,{ return __builtin_iswblank(__wc); })
 #elif defined(__CRT_HAVE_iswblank)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswblank,(__WINT_TYPE__ __wc),iswblank,(__wc))

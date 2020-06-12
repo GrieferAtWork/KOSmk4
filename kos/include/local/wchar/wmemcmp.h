@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdccfcdb */
+/* HASH CRC-32:0x3efc57dd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcmpl from string */
 #ifndef __local___localdep_memcmpl_defined
 #define __local___localdep_memcmpl_defined 1
-#ifdef __fast_memcmpl_defined
-/* Compare memory buffers and return the difference of the first non-matching dword */
-__NAMESPACE_FAST_USING(memcmpl)
-#define __localdep_memcmpl __LIBC_FAST_NAME(memcmpl)
-#elif defined(__CRT_HAVE_memcmpl)
+#ifdef __CRT_HAVE_memcmpl
 /* Compare memory buffers and return the difference of the first non-matching dword */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__INT32_TYPE__,__NOTHROW_NCX,__localdep_memcmpl,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords),memcmpl,(__s1,__s2,__n_dwords))
 #elif defined(__CRT_HAVE_wmemcmp) && (__SIZEOF_WCHAR_T__ == 4)
@@ -49,11 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcmpw from string */
 #ifndef __local___localdep_memcmpw_defined
 #define __local___localdep_memcmpw_defined 1
-#ifdef __fast_memcmpw_defined
-/* Compare memory buffers and return the difference of the first non-matching word */
-__NAMESPACE_FAST_USING(memcmpw)
-#define __localdep_memcmpw __LIBC_FAST_NAME(memcmpw)
-#elif defined(__CRT_HAVE_memcmpw)
+#ifdef __CRT_HAVE_memcmpw
 /* Compare memory buffers and return the difference of the first non-matching word */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__INT16_TYPE__,__NOTHROW_NCX,__localdep_memcmpw,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words),memcmpw,(__s1,__s2,__n_words))
 #elif defined(__CRT_HAVE_wmemcmp) && (__SIZEOF_WCHAR_T__ == 2)
@@ -73,14 +65,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcmp from string */
 #ifndef __local___localdep_memcmp_defined
 #define __local___localdep_memcmp_defined 1
-#ifdef __fast_memcmp_defined
-/* Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-__NAMESPACE_FAST_USING(memcmp)
-#define __localdep_memcmp __LIBC_FAST_NAME(memcmp)
-#elif defined(__CRT_HAVE_memcmp)
+#ifdef __CRT_HAVE_memcmp
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'

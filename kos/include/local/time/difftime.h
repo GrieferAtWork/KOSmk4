@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8896a11c */
+/* HASH CRC-32:0x79dd79 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,11 +39,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(
 /* Dependency: difftime64 from time */
 #ifndef __local___localdep_difftime64_defined
 #define __local___localdep_difftime64_defined 1
-#ifdef __difftime64_defined
-/* Return the difference between TIME1 and TIME0 */
-__NAMESPACE_GLB_USING(difftime64)
-#define __localdep_difftime64 difftime64
-#elif defined(__CRT_HAVE_difftime64)
+#ifdef __CRT_HAVE_difftime64
 /* Return the difference between TIME1 and TIME0 */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),difftime64,(__time1,__time0))
 #elif defined(__CRT_HAVE_difftime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

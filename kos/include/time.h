@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8948491 */
+/* HASH CRC-32:0xa4b3efef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -291,6 +291,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(time, __FORCELOCAL time_t __NOTHROW_NCX(__LIBCCA
 #ifndef __std_difftime_defined
 #define __std_difftime_defined 1
 #ifdef __difftime_defined
+/* Return the difference between TIME1 and TIME0 */
 __NAMESPACE_GLB_USING(difftime)
 #elif defined(__CRT_HAVE_difftime64) && defined(__USE_TIME_BITS64)
 /* Return the difference between TIME1 and TIME0 */
@@ -455,6 +456,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(asctime_s, __FORCELOCAL __ATTR_NONNULL((1, 3)) _
 #ifndef __std_timespec_get_defined
 #define __std_timespec_get_defined 1
 #ifdef __timespec_get_defined
+/* Set TS to calendar time based in time base BASE */
 __NAMESPACE_GLB_USING(timespec_get)
 #elif defined(__CRT_HAVE_timespec_get)
 /* Set TS to calendar time based in time base BASE */
@@ -1018,6 +1020,7 @@ __NAMESPACE_STD_USING(timespec_get)
 #ifndef __timespec_get_defined
 #define __timespec_get_defined 1
 #ifdef __std_timespec_get_defined
+/* Set TS to calendar time based in time base BASE */
 __NAMESPACE_STD_USING(timespec_get)
 #elif defined(__CRT_HAVE_timespec_get)
 /* Set TS to calendar time based in time base BASE */

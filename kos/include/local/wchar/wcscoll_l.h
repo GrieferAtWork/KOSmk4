@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f843161 */
+/* HASH CRC-32:0xe1210b3c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcscoll from wchar */
 #ifndef __local___localdep_wcscoll_defined
 #define __local___localdep_wcscoll_defined 1
-#ifdef __wcscoll_defined
-__NAMESPACE_GLB_USING(wcscoll)
-#define __localdep_wcscoll wcscoll
-#elif defined(__std_wcscoll_defined)
-__NAMESPACE_STD_USING(wcscoll)
-#define __localdep_wcscoll wcscoll
-#elif defined(__CRT_HAVE_wcscoll)
+#ifdef __CRT_HAVE_wcscoll
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscoll,(__s1,__s2))
 #elif defined(__CRT_HAVE_DOS$wcscoll) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscoll,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2),wcscoll,(__s1,__s2))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84a3d5d2 */
+/* HASH CRC-32:0xb303efd9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mkdir from sys.stat */
 #ifndef __local___localdep_mkdir_defined
 #define __local___localdep_mkdir_defined 1
-#ifdef __mkdir_defined
-__NAMESPACE_GLB_USING(mkdir)
-#define __localdep_mkdir mkdir
-#elif defined(__CRT_HAVE_mkdir)
+#ifdef __CRT_HAVE_mkdir
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_mkdir,(char const *__pathname, __mode_t __mode),mkdir,(__pathname,__mode))
 #elif defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
 __NAMESPACE_LOCAL_END

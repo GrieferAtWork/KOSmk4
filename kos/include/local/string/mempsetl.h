@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62db05e2 */
+/* HASH CRC-32:0x4f128f08 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memsetl from string */
 #ifndef __local___localdep_memsetl_defined
 #define __local___localdep_memsetl_defined 1
-#ifdef __fast_memsetl_defined
-/* Fill memory with a given dword */
-__NAMESPACE_FAST_USING(memsetl)
-#define __localdep_memsetl __LIBC_FAST_NAME(memsetl)
-#elif defined(__CRT_HAVE_memsetl)
+#ifdef __CRT_HAVE_memsetl
 /* Fill memory with a given dword */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memsetl,(__dst,__dword,__n_dwords))
-#else /* ... */
+#else /* __CRT_HAVE_memsetl */
 __NAMESPACE_LOCAL_END
 #include <local/string/memsetl.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given dword */
 #define __localdep_memsetl __LIBC_LOCAL_NAME(memsetl)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memsetl */
 #endif /* !__local___localdep_memsetl_defined */
 /* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
 __LOCAL_LIBC(mempsetl) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT32_TYPE__ *

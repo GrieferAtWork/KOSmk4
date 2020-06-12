@@ -1843,8 +1843,7 @@ again_parse_default_annotation:
 							prototypes: protos,
 							binding:    NamespaceBinding(
 								namespace:  nsStd,
-								importName: exposedName,
-								prototypes: protos));
+								importName: exposedName));
 					});
 				if (gblGuard !== false) {
 					local gblExposure = copy exposedFunction;
@@ -4528,7 +4527,7 @@ done_function:
 					binding:    NamespaceBinding(
 						namespace:  ns,
 						importName: exposedName,
-						prototypes: currentPrototypes),
+						prototype:  currentPrototype),
 				));
 			}
 			if (moreBindings) {
@@ -4596,8 +4595,7 @@ done_function:
 							/* Bind against the std:: namespace export */
 							binding: NamespaceBinding(
 								namespace:  nsStd,
-								importName: exposedName,
-								prototypes: currentPrototypes),
+								importName: exposedName),
 						),
 					});
 				if (gblGuard !== false) {

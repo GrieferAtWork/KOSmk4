@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60f9d5f9 */
+/* HASH CRC-32:0xe61c996d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,13 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: calloc from stdlib */
 #ifndef __local___localdep_calloc_defined
 #define __local___localdep_calloc_defined 1
-#ifdef __calloc_defined
-__NAMESPACE_GLB_USING(calloc)
-#define __localdep_calloc calloc
-#elif defined(__std_calloc_defined)
-__NAMESPACE_STD_USING(calloc)
-#define __localdep_calloc calloc
-#elif __has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)
+#if __has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),calloc,{ return __builtin_calloc(__count, __num_bytes); })
 #elif defined(__CRT_HAVE_calloc)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),calloc,(__count,__num_bytes))

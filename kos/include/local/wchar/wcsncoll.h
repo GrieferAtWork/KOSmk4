@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4cbd47d */
+/* HASH CRC-32:0xaef35bcd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,15 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcsncmp from wchar */
 #ifndef __local___localdep_wcsncmp_defined
 #define __local___localdep_wcsncmp_defined 1
-#ifdef __wcsncmp_defined
-/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
-__NAMESPACE_GLB_USING(wcsncmp)
-#define __localdep_wcsncmp wcsncmp
-#elif defined(__std_wcsncmp_defined)
-/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
-__NAMESPACE_STD_USING(wcsncmp)
-#define __localdep_wcsncmp wcsncmp
-#elif defined(__CRT_HAVE_wcsncmp)
+#ifdef __CRT_HAVE_wcsncmp
 /* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE_DOS$wcsncmp) && __SIZEOF_WCHAR_T__ == 4

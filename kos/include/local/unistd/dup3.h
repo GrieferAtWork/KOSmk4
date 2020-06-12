@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x436751db */
+/* HASH CRC-32:0xdf54a98f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,16 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: dup2 from unistd */
 #ifndef __local___localdep_dup2_defined
 #define __local___localdep_dup2_defined 1
-#ifdef __dup2_defined
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> dup2(2)
- * @return: NEWFD: Returns the new handle upon success.
- * Duplicate a file referred to by `OLDFD' into `NEWFD' */
-__NAMESPACE_GLB_USING(dup2)
-#define __localdep_dup2 dup2
-#elif defined(__CRT_HAVE_dup2)
+#ifdef __CRT_HAVE_dup2
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN

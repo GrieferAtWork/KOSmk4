@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a514dc1 */
+/* HASH CRC-32:0x79daf57b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strtoll from stdlib */
 #ifndef __local___localdep_strtoll_defined
 #define __local___localdep_strtoll_defined 1
-#ifdef __strtoll_defined
-__NAMESPACE_GLB_USING(strtoll)
-#define __localdep_strtoll strtoll
-#elif defined(__std_strtoll_defined)
-__NAMESPACE_STD_USING(strtoll)
-#define __localdep_strtoll strtoll
-#elif defined(__CRT_HAVE_strtoll)
+#ifdef __CRT_HAVE_strtoll
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll,(char const *__restrict __nptr, char **__endptr, int __base),strtoll,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoq)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll,(char const *__restrict __nptr, char **__endptr, int __base),strtoq,(__nptr,__endptr,__base))

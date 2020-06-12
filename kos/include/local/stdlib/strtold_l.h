@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f9c0942 */
+/* HASH CRC-32:0x17f660ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strtold from stdlib */
 #ifndef __local___localdep_strtold_defined
 #define __local___localdep_strtold_defined 1
-#ifdef __strtold_defined
-__NAMESPACE_GLB_USING(strtold)
-#define __localdep_strtold strtold
-#elif defined(__std_strtold_defined)
-__NAMESPACE_STD_USING(strtold)
-#define __localdep_strtold strtold
-#elif defined(__CRT_HAVE_strtold)
+#ifdef __CRT_HAVE_strtold
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),strtold,(__nptr,__endptr))
 #elif defined(__CRT_HAVE_strtod) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),strtod,(__nptr,__endptr))

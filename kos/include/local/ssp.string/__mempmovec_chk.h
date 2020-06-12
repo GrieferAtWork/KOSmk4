@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x451de812 */
+/* HASH CRC-32:0x3e0126c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmovec from string */
 #ifndef __local___localdep_mempmovec_defined
 #define __local___localdep_mempmovec_defined 1
-#ifdef __fast_mempmovec_defined
-/* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
-__NAMESPACE_FAST_USING(mempmovec)
-#define __localdep_mempmovec __LIBC_FAST_NAME(mempmovec)
-#elif defined(__CRT_HAVE_mempmovec)
+#ifdef __CRT_HAVE_mempmovec
 /* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmovec,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempmovec,(__dst,__src,__elem_count,__elem_size))
-#else /* ... */
+#else /* __CRT_HAVE_mempmovec */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempmovec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovec', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
 #define __localdep_mempmovec __LIBC_LOCAL_NAME(mempmovec)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mempmovec */
 #endif /* !__local___localdep_mempmovec_defined */
 __NAMESPACE_LOCAL_END
 #include <ssp/chk.h>

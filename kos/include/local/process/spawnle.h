@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc89bfd4d */
+/* HASH CRC-32:0xab5148d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: spawnve from process */
 #ifndef __local___localdep_spawnve_defined
 #define __local___localdep_spawnve_defined 1
-#ifdef __spawnve_defined
-__NAMESPACE_GLB_USING(spawnve)
-#define __localdep_spawnve spawnve
-#elif defined(__CRT_HAVE_spawnve)
+#ifdef __CRT_HAVE_spawnve
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_spawnve,(int __mode, char const *__restrict __path, __TARGV, __TENVP),spawnve,(__mode,__path,___argv,___envp))
 #elif defined(__CRT_HAVE__spawnve)
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_spawnve,(int __mode, char const *__restrict __path, __TARGV, __TENVP),_spawnve,(__mode,__path,___argv,___envp))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14ed3dc0 */
+/* HASH CRC-32:0xbd6f30ab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcsxfrm from wchar */
 #ifndef __local___localdep_wcsxfrm_defined
 #define __local___localdep_wcsxfrm_defined 1
-#ifdef __wcsxfrm_defined
-__NAMESPACE_GLB_USING(wcsxfrm)
-#define __localdep_wcsxfrm wcsxfrm
-#elif defined(__std_wcsxfrm_defined)
-__NAMESPACE_STD_USING(wcsxfrm)
-#define __localdep_wcsxfrm wcsxfrm
-#elif defined(__CRT_HAVE_wcsxfrm)
+#ifdef __CRT_HAVE_wcsxfrm
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsxfrm,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __maxlen),wcsxfrm,(__dst,__src,__maxlen))
 #elif defined(__CRT_HAVE_DOS$wcsxfrm) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsxfrm,(__CHAR32_TYPE__ *__dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __maxlen),wcsxfrm,(__dst,__src,__maxlen))

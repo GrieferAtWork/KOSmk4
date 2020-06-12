@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe763901 */
+/* HASH CRC-32:0xd225685f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,15 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcschr from wchar */
 #ifndef __local___localdep_wcschr_defined
 #define __local___localdep_wcschr_defined 1
-#ifdef __wcschr_defined
-/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-__NAMESPACE_GLB_USING(wcschr)
-#define __localdep_wcschr wcschr
-#elif defined(__std_wcschr_defined)
-/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-__NAMESPACE_STD_USING(wcschr)
-#define __localdep_wcschr wcschr
-#elif defined(__CRT_HAVE_wcschr)
+#ifdef __CRT_HAVE_wcschr
 /* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcschr,(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle),wcschr,(__haystack,__needle))
 #elif defined(__CRT_HAVE_DOS$wcschr) && __SIZEOF_WCHAR_T__ == 4

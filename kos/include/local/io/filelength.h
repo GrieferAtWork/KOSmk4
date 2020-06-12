@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x600f0e6 */
+/* HASH CRC-32:0x2daf4da3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,12 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: lseek from unistd */
 #ifndef __local___localdep_lseek_defined
 #define __local___localdep_lseek_defined 1
-#ifdef __lseek_defined
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
-__NAMESPACE_GLB_USING(lseek)
-#define __localdep_lseek lseek
-#elif defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),lseek64,(__fd,__offset,__whence))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1324c225 */
+/* HASH CRC-32:0x1fd009a2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,13 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fputwc from wchar */
 #ifndef __local___localdep_fputwc_defined
 #define __local___localdep_fputwc_defined 1
-#ifdef __fputwc_defined
-__NAMESPACE_GLB_USING(fputwc)
-#define __localdep_fputwc fputwc
-#elif defined(__std_fputwc_defined)
-__NAMESPACE_STD_USING(fputwc)
-#define __localdep_fputwc fputwc
-#elif defined(__CRT_HAVE_fputwc)
+#ifdef __CRT_HAVE_fputwc
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))

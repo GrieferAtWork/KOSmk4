@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4964e61 */
+/* HASH CRC-32:0x8037bc76 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fcntl from fcntl */
 #ifndef __local___localdep_fcntl_defined
 #define __local___localdep_fcntl_defined 1
-#ifdef __fcntl_defined
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifdef __cplusplus
-__NAMESPACE_GLB_USING(fcntl)
-#else /* __cplusplus */
-#define __localdep_fcntl fcntl
-#endif /* !__cplusplus */
-#elif defined(__CRT_HAVE_fcntl)
+#ifdef __CRT_HAVE_fcntl
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN

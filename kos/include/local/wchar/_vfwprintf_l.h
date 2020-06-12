@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0f2b3e2 */
+/* HASH CRC-32:0xffce776b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: vfwprintf from wchar */
 #ifndef __local___localdep_vfwprintf_defined
 #define __local___localdep_vfwprintf_defined 1
-#ifdef __vfwprintf_defined
-__NAMESPACE_GLB_USING(vfwprintf)
-#define __localdep_vfwprintf vfwprintf
-#elif defined(__std_vfwprintf_defined)
-__NAMESPACE_STD_USING(vfwprintf)
-#define __localdep_vfwprintf vfwprintf
-#elif defined(__CRT_HAVE_vfwprintf)
+#ifdef __CRT_HAVE_vfwprintf
 __CREDIRECT(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfwprintf,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_DOS$vfwprintf) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfwprintf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args))

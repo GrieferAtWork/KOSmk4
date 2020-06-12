@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde6ad2ff */
+/* HASH CRC-32:0xfc9cbf63 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,32 +25,23 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmove from string */
 #ifndef __local___localdep_memmove_defined
 #define __local___localdep_memmove_defined 1
-#ifdef __fast_memmove_defined
-/* Move memory between potentially overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-__NAMESPACE_FAST_USING(memmove)
-#define __localdep_memmove __LIBC_FAST_NAME(memmove)
-#elif defined(__CRT_HAVE_memmove)
+#ifdef __CRT_HAVE_memmove
 /* Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_memmove */
 __NAMESPACE_LOCAL_END
 #include <local/string/memmove.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memmove __LIBC_LOCAL_NAME(memmove)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memmove */
 #endif /* !__local___localdep_memmove_defined */
 /* Dependency: memmovew from string */
 #ifndef __local___localdep_memmovew_defined
 #define __local___localdep_memmovew_defined 1
-#ifdef __fast_memmovew_defined
-/* Move memory between potentially overlapping memory blocks. */
-__NAMESPACE_FAST_USING(memmovew)
-#define __localdep_memmovew __LIBC_FAST_NAME(memmovew)
-#elif defined(__CRT_HAVE_memmovew)
+#ifdef __CRT_HAVE_memmovew
 /* Move memory between potentially overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memmovew,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),memmovew,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_wmemmove) && (__SIZEOF_WCHAR_T__ == 2)
@@ -70,11 +61,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmovel from string */
 #ifndef __local___localdep_memmovel_defined
 #define __local___localdep_memmovel_defined 1
-#ifdef __fast_memmovel_defined
-/* Move memory between potentially overlapping memory blocks. */
-__NAMESPACE_FAST_USING(memmovel)
-#define __localdep_memmovel __LIBC_FAST_NAME(memmovel)
-#elif defined(__CRT_HAVE_memmovel)
+#ifdef __CRT_HAVE_memmovel
 /* Move memory between potentially overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovel,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),memmovel,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_wmemmove) && (__SIZEOF_WCHAR_T__ == 4)

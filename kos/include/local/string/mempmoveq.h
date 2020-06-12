@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32f56dd2 */
+/* HASH CRC-32:0x3803e193 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmoveq from string */
 #ifndef __local___localdep_memmoveq_defined
 #define __local___localdep_memmoveq_defined 1
-#ifdef __fast_memmoveq_defined
-/* Move memory between potentially overlapping memory blocks. */
-__NAMESPACE_FAST_USING(memmoveq)
-#define __localdep_memmoveq __LIBC_FAST_NAME(memmoveq)
-#elif defined(__CRT_HAVE_memmoveq)
+#ifdef __CRT_HAVE_memmoveq
 /* Move memory between potentially overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
-#else /* ... */
+#else /* __CRT_HAVE_memmoveq */
 __NAMESPACE_LOCAL_END
 #include <local/string/memmoveq.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. */
 #define __localdep_memmoveq __LIBC_LOCAL_NAME(memmoveq)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memmoveq */
 #endif /* !__local___localdep_memmoveq_defined */
 /* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
 __LOCAL_LIBC(mempmoveq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *

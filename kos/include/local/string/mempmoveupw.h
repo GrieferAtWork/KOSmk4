@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b4a4101 */
+/* HASH CRC-32:0xfb937055 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmoveupw from string */
 #ifndef __local___localdep_memmoveupw_defined
 #define __local___localdep_memmoveupw_defined 1
-#ifdef __fast_memmoveupw_defined
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS') */
-__NAMESPACE_FAST_USING(memmoveupw)
-#define __localdep_memmoveupw __LIBC_FAST_NAME(memmoveupw)
-#elif defined(__CRT_HAVE_memmoveupw)
+#ifdef __CRT_HAVE_memmoveupw
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),memmoveupw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_memmovew)

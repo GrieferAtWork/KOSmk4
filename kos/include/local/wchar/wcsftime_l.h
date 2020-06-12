@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1b9de9e */
+/* HASH CRC-32:0xb52b1588 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,13 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcsftime from wchar */
 #ifndef __local___localdep_wcsftime_defined
 #define __local___localdep_wcsftime_defined 1
-#ifdef __wcsftime_defined
-__NAMESPACE_GLB_USING(wcsftime)
-#define __localdep_wcsftime wcsftime
-#elif defined(__std_wcsftime_defined)
-__NAMESPACE_STD_USING(wcsftime)
-#define __localdep_wcsftime wcsftime
-#elif defined(__CRT_HAVE_wcsftime)
+#ifdef __CRT_HAVE_wcsftime
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsftime,(__WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
 #elif defined(__CRT_HAVE_DOS$wcsftime) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsftime,(__CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR32_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))

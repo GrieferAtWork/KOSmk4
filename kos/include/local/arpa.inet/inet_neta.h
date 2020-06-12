@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ccba875 */
+/* HASH CRC-32:0x75954d9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,50 +25,23 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
-#ifdef __fast_memcpy_defined
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-__NAMESPACE_FAST_USING(memcpy)
-#define __localdep_memcpy __LIBC_FAST_NAME(memcpy)
-#elif defined(__CRT_HAVE_memcpy)
+#ifdef __CRT_HAVE_memcpy
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_memcpy */
 __NAMESPACE_LOCAL_END
 #include <local/string/memcpy.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
 /* Dependency: snprintf from stdio */
 #ifndef __local___localdep_snprintf_defined
 #define __local___localdep_snprintf_defined 1
-#ifdef __snprintf_defined
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Print a formatted string to a given in-member string buffer `BUF'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
-#ifdef __cplusplus
-__NAMESPACE_GLB_USING(snprintf)
-#else /* __cplusplus */
-#define __localdep_snprintf snprintf
-#endif /* !__cplusplus */
-#elif defined(__std_snprintf_defined)
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Print a formatted string to a given in-member string buffer `BUF'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
-#ifdef __cplusplus
-__NAMESPACE_STD_USING(snprintf)
-#else /* __cplusplus */
-#define __localdep_snprintf (__NAMESPACE_STD_SYM snprintf)
-#endif /* !__cplusplus */
-#elif __has_builtin(__builtin_snprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_snprintf) && __has_builtin(__builtin_va_arg_pack)
+#if __has_builtin(__builtin_snprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_snprintf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN

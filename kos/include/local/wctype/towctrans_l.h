@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48e469a */
+/* HASH CRC-32:0x566dd914 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: towctrans from wctype */
 #ifndef __local___localdep_towctrans_defined
 #define __local___localdep_towctrans_defined 1
-#ifdef __towctrans_defined
-__NAMESPACE_GLB_USING(towctrans)
-#define __localdep_towctrans towctrans
-#elif defined(__std_towctrans_defined)
-__NAMESPACE_STD_USING(towctrans)
-#define __localdep_towctrans towctrans
-#elif defined(__CRT_HAVE_towctrans)
+#ifdef __CRT_HAVE_towctrans
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towctrans,(__WINT_TYPE__ __wc, __wctrans_t __desc),towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE___towctrans)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towctrans,(__WINT_TYPE__ __wc, __wctrans_t __desc),__towctrans,(__wc,__desc))

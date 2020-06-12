@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65f8ea1 */
+/* HASH CRC-32:0xc3669300 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf32,(__fd_t __fd, int __cmd, __off
 /* Dependency: lockf64 from fcntl */
 #ifndef __local___localdep_lockf64_defined
 #define __local___localdep_lockf64_defined 1
-#ifdef __lockf64_defined
-__NAMESPACE_GLB_USING(lockf64)
-#define __localdep_lockf64 lockf64
-#elif defined(__CRT_HAVE_lockf64)
+#ifdef __CRT_HAVE_lockf64
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf64,(__fd_t __fd, int __cmd, __off64_t __length),lockf64,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf64,(__fd_t __fd, int __cmd, __off64_t __length),lockf,(__fd,__cmd,__length))

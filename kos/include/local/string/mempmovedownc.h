@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x659607b3 */
+/* HASH CRC-32:0xedd2d62a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmovedownw from string */
 #ifndef __local___localdep_mempmovedownw_defined
 #define __local___localdep_mempmovedownw_defined 1
-#ifdef __fast_mempmovedownw_defined
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
-__NAMESPACE_FAST_USING(mempmovedownw)
-#define __localdep_mempmovedownw __LIBC_FAST_NAME(mempmovedownw)
-#elif defined(__CRT_HAVE_mempmovedownw)
+#ifdef __CRT_HAVE_mempmovedownw
 /* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),mempmovedownw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_mempmovew)
@@ -46,29 +42,21 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmovedown from string */
 #ifndef __local___localdep_mempmovedown_defined
 #define __local___localdep_mempmovedown_defined 1
-#ifdef __fast_mempmovedown_defined
-/* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
-__NAMESPACE_FAST_USING(mempmovedown)
-#define __localdep_mempmovedown __LIBC_FAST_NAME(mempmovedown)
-#elif defined(__CRT_HAVE_mempmovedown)
+#ifdef __CRT_HAVE_mempmovedown
 /* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmovedown,(__dst,__src,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_mempmovedown */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempmovedown.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovedown', but return `DST + N_BYTES', rather than `DST' (assumes that `DST <= SRC || !N_BYTES') */
 #define __localdep_mempmovedown __LIBC_LOCAL_NAME(mempmovedown)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mempmovedown */
 #endif /* !__local___localdep_mempmovedown_defined */
 /* Dependency: mempmovedownl from string */
 #ifndef __local___localdep_mempmovedownl_defined
 #define __local___localdep_mempmovedownl_defined 1
-#ifdef __fast_mempmovedownl_defined
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
-__NAMESPACE_FAST_USING(mempmovedownl)
-#define __localdep_mempmovedownl __LIBC_FAST_NAME(mempmovedownl)
-#elif defined(__CRT_HAVE_mempmovedownl)
+#ifdef __CRT_HAVE_mempmovedownl
 /* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),mempmovedownl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_mempmovel)
@@ -85,11 +73,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmovedownq from string */
 #ifndef __local___localdep_mempmovedownq_defined
 #define __local___localdep_mempmovedownq_defined 1
-#ifdef __fast_mempmovedownq_defined
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
-__NAMESPACE_FAST_USING(mempmovedownq)
-#define __localdep_mempmovedownq __LIBC_FAST_NAME(mempmovedownq)
-#elif defined(__CRT_HAVE_mempmovedownq)
+#ifdef __CRT_HAVE_mempmovedownq
 /* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' (assumes that `DST <= SRC || !N_QWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmovedownq,(__dst,__src,__n_qwords))
 #elif defined(__CRT_HAVE_mempmoveq)

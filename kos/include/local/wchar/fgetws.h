@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf54d4be */
+/* HASH CRC-32:0xc34aa71d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fgetwc from wchar */
 #ifndef __local___localdep_fgetwc_defined
 #define __local___localdep_fgetwc_defined 1
-#ifdef __fgetwc_defined
-__NAMESPACE_GLB_USING(fgetwc)
-#define __localdep_fgetwc fgetwc
-#elif defined(__std_fgetwc_defined)
-__NAMESPACE_STD_USING(fgetwc)
-#define __localdep_fgetwc fgetwc
-#elif defined(__CRT_HAVE_fgetwc)
+#ifdef __CRT_HAVE_fgetwc
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc,(__stream))
@@ -52,13 +46,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(
 /* Dependency: ungetwc from wchar */
 #ifndef __local___localdep_ungetwc_defined
 #define __local___localdep_ungetwc_defined 1
-#ifdef __ungetwc_defined
-__NAMESPACE_GLB_USING(ungetwc)
-#define __localdep_ungetwc ungetwc
-#elif defined(__std_ungetwc_defined)
-__NAMESPACE_STD_USING(ungetwc)
-#define __localdep_ungetwc ungetwc
-#elif defined(__CRT_HAVE_ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
+#if defined(__CRT_HAVE_ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(__WINT_TYPE__ __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e18d6fe */
+/* HASH CRC-32:0x10659db0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempsetl from string */
 #ifndef __local___localdep_mempsetl_defined
 #define __local___localdep_mempsetl_defined 1
-#ifdef __fast_mempsetl_defined
-/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
-__NAMESPACE_FAST_USING(mempsetl)
-#define __localdep_mempsetl __LIBC_FAST_NAME(mempsetl)
-#elif defined(__CRT_HAVE_mempsetl)
+#ifdef __CRT_HAVE_mempsetl
 /* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),mempsetl,(__dst,__dword,__n_dwords))
-#else /* ... */
+#else /* __CRT_HAVE_mempsetl */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempsetl.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
 #define __localdep_mempsetl __LIBC_LOCAL_NAME(mempsetl)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mempsetl */
 #endif /* !__local___localdep_mempsetl_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/__wordbits.h>

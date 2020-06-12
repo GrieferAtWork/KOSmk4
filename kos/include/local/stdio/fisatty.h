@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97aa6f35 */
+/* HASH CRC-32:0x4fa4a7d5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,17 +45,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_f
 /* Dependency: isatty from unistd */
 #ifndef __local___localdep_isatty_defined
 #define __local___localdep_isatty_defined 1
-#ifdef __isatty_defined
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> isatty(2)
- * @return: 1: Is a tty
- * @return: 0: Not a tty
- * Check if the given file handle `FD' refers to a TTY */
-__NAMESPACE_GLB_USING(isatty)
-#define __localdep_isatty isatty
-#elif defined(__CRT_HAVE_isatty)
+#ifdef __CRT_HAVE_isatty
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcaade9a9 */
+/* HASH CRC-32:0x3f412bb8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,14 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wctrans from wctype */
 #ifndef __local___localdep_wctrans_defined
 #define __local___localdep_wctrans_defined 1
-#ifdef __wctrans_defined
-__NAMESPACE_GLB_USING(wctrans)
-#define __localdep_wctrans wctrans
-#elif defined(__std_wctrans_defined)
-__NAMESPACE_STD_USING(wctrans)
-#define __localdep_wctrans wctrans
-#elif defined(__CRT_HAVE_wctrans)
+#ifdef __CRT_HAVE_wctrans
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__wctrans_t,__NOTHROW_NCX,__localdep_wctrans,(char const *__prop),wctrans,(__prop))
-#else /* ... */
+#else /* __CRT_HAVE_wctrans */
 __NAMESPACE_LOCAL_END
 #include <local/wctype/wctrans.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wctrans __LIBC_LOCAL_NAME(wctrans)
-#endif /* !... */
+#endif /* !__CRT_HAVE_wctrans */
 #endif /* !__local___localdep_wctrans_defined */
 __LOCAL_LIBC(wctrans_l) __ATTR_WUNUSED __ATTR_NONNULL((1)) __wctrans_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctrans_l))(char const *__prop, __locale_t __locale) {

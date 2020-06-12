@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4f56997 */
+/* HASH CRC-32:0x948c1ced */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,17 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: vsscanf from stdio */
 #ifndef __local___localdep_vsscanf_defined
 #define __local___localdep_vsscanf_defined 1
-#ifdef __vsscanf_defined
-/* Scan data from a given `INPUT' string, following `FORMAT'
- * Return the number of successfully scanned data items */
-__NAMESPACE_GLB_USING(vsscanf)
-#define __localdep_vsscanf vsscanf
-#elif defined(__std_vsscanf_defined)
-/* Scan data from a given `INPUT' string, following `FORMAT'
- * Return the number of successfully scanned data items */
-__NAMESPACE_STD_USING(vsscanf)
-#define __localdep_vsscanf vsscanf
-#elif __has_builtin(__builtin_vsscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsscanf)
+#if __has_builtin(__builtin_vsscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsscanf)
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 __CEIREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),vsscanf,{ return __builtin_vsscanf(__input, __format, __args); })

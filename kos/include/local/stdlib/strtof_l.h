@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x124767ba */
+/* HASH CRC-32:0x9c130dc9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,14 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strtof from stdlib */
 #ifndef __local___localdep_strtof_defined
 #define __local___localdep_strtof_defined 1
-#ifdef __strtof_defined
-__NAMESPACE_GLB_USING(strtof)
-#define __localdep_strtof strtof
-#elif defined(__std_strtof_defined)
-__NAMESPACE_STD_USING(strtof)
-#define __localdep_strtof strtof
-#elif defined(__CRT_HAVE_strtof)
+#ifdef __CRT_HAVE_strtof
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_strtof,(char const *__restrict __nptr, char **__endptr),strtof,(__nptr,__endptr))
-#else /* ... */
+#else /* __CRT_HAVE_strtof */
 __NAMESPACE_LOCAL_END
 #include <local/stdlib/strtof.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtof __LIBC_LOCAL_NAME(strtof)
-#endif /* !... */
+#endif /* !__CRT_HAVE_strtof */
 #endif /* !__local___localdep_strtof_defined */
 __LOCAL_LIBC(strtof_l) __ATTR_NONNULL((1)) float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtof_l))(char const *__restrict __nptr, char **__endptr, __locale_t __locale) {

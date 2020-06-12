@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3649841a */
+/* HASH CRC-32:0x2615e5ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,32 +25,23 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmovedown from string */
 #ifndef __local___localdep_memmovedown_defined
 #define __local___localdep_memmovedown_defined 1
-#ifdef __fast_memmovedown_defined
-/* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
- * @return: * : Always re-returns `dst' */
-__NAMESPACE_FAST_USING(memmovedown)
-#define __localdep_memmovedown __LIBC_FAST_NAME(memmovedown)
-#elif defined(__CRT_HAVE_memmovedown)
+#ifdef __CRT_HAVE_memmovedown
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmovedown,(__dst,__src,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_memmovedown */
 __NAMESPACE_LOCAL_END
 #include <local/string/memmovedown.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks (assumes that `DST <= SRC || !N_BYTES')
  * @return: * : Always re-returns `dst' */
 #define __localdep_memmovedown __LIBC_LOCAL_NAME(memmovedown)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memmovedown */
 #endif /* !__local___localdep_memmovedown_defined */
 /* Dependency: memmovedownq from string */
 #ifndef __local___localdep_memmovedownq_defined
 #define __local___localdep_memmovedownq_defined 1
-#ifdef __fast_memmovedownq_defined
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
-__NAMESPACE_FAST_USING(memmovedownq)
-#define __localdep_memmovedownq __LIBC_FAST_NAME(memmovedownq)
-#elif defined(__CRT_HAVE_memmovedownq)
+#ifdef __CRT_HAVE_memmovedownq
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_QWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmovedownq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmovedownq,(__dst,__src,__n_qwords))
 #elif defined(__CRT_HAVE_memmoveq)
@@ -67,11 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmovedownl from string */
 #ifndef __local___localdep_memmovedownl_defined
 #define __local___localdep_memmovedownl_defined 1
-#ifdef __fast_memmovedownl_defined
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_DWORDS') */
-__NAMESPACE_FAST_USING(memmovedownl)
-#define __localdep_memmovedownl __LIBC_FAST_NAME(memmovedownl)
-#elif defined(__CRT_HAVE_memmovedownl)
+#ifdef __CRT_HAVE_memmovedownl
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_DWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovedownl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),memmovedownl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_memmovel)
@@ -94,11 +81,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memmovedownw from string */
 #ifndef __local___localdep_memmovedownw_defined
 #define __local___localdep_memmovedownw_defined 1
-#ifdef __fast_memmovedownw_defined
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS') */
-__NAMESPACE_FAST_USING(memmovedownw)
-#define __localdep_memmovedownw __LIBC_FAST_NAME(memmovedownw)
-#elif defined(__CRT_HAVE_memmovedownw)
+#ifdef __CRT_HAVE_memmovedownw
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memmovedownw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),memmovedownw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_memmovew)

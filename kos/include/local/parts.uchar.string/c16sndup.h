@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4562a56 */
+/* HASH CRC-32:0xc18d5d0b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,15 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempcpy from string */
 #ifndef __local___localdep_mempcpy_defined
 #define __local___localdep_mempcpy_defined 1
-#ifdef __mempcpy_defined
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-__NAMESPACE_GLB_USING(mempcpy)
-#define __localdep_mempcpy mempcpy
-#elif defined(__fast_mempcpy_defined)
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-__NAMESPACE_FAST_USING(mempcpy)
-#define __localdep_mempcpy __LIBC_FAST_NAME(mempcpy)
-#elif defined(__CRT_HAVE_mempcpy)
+#ifdef __CRT_HAVE_mempcpy
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
@@ -74,13 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined 1
-#ifdef __malloc_defined
-__NAMESPACE_GLB_USING(malloc)
-#define __localdep_malloc malloc
-#elif defined(__std_malloc_defined)
-__NAMESPACE_STD_USING(malloc)
-#define __localdep_malloc malloc
-#elif __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
+#if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,{ return __builtin_malloc(__num_bytes); })
 #elif defined(__CRT_HAVE_malloc)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,(__num_bytes))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56523689 */
+/* HASH CRC-32:0x9958aedb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,13 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: execv from unistd */
 #ifndef __local___localdep_execv_defined
 #define __local___localdep_execv_defined 1
-#ifdef __execv_defined
-/* >> execv(3)
- * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__NAMESPACE_GLB_USING(execv)
-#define __localdep_execv execv
-#elif __has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execv)
+#if __has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execv)
 /* >> execv(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */

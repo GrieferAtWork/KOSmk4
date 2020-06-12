@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53552340 */
+/* HASH CRC-32:0x3a962a70 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,14 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcmp from string */
 #ifndef __local___localdep_memcmp_defined
 #define __local___localdep_memcmp_defined 1
-#ifdef __fast_memcmp_defined
-/* Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-__NAMESPACE_FAST_USING(memcmp)
-#define __localdep_memcmp __LIBC_FAST_NAME(memcmp)
-#elif defined(__CRT_HAVE_memcmp)
+#ifdef __CRT_HAVE_memcmp
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'

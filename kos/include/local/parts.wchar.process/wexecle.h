@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b01067 */
+/* HASH CRC-32:0x6a9bfc38 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wexecve from parts.wchar.process */
 #ifndef __local___localdep_wexecve_defined
 #define __local___localdep_wexecve_defined 1
-#ifdef __wexecve_defined
-__NAMESPACE_GLB_USING(wexecve)
-#define __localdep_wexecve wexecve
-#elif defined(__CRT_HAVE_wexecve)
+#ifdef __CRT_HAVE_wexecve
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecve,(__WCHAR_TYPE__ const *__restrict __path, __TWARGV, __TWENVP),wexecve,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$wexecve) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecve,(__CHAR32_TYPE__ const *__restrict __path, __T32ARGV, __T32ENVP),wexecve,(__path,___argv,___envp))

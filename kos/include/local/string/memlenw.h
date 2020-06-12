@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3347c9a1 */
+/* HASH CRC-32:0x504d0a23 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memendw from string */
 #ifndef __local___localdep_memendw_defined
 #define __local___localdep_memendw_defined 1
-#ifdef __fast_memendw_defined
-/* Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found. */
-__NAMESPACE_FAST_USING(memendw)
-#define __localdep_memendw __LIBC_FAST_NAME(memendw)
-#elif defined(__CRT_HAVE_memendw)
+#ifdef __CRT_HAVE_memendw
 /* Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memendw,(void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_bytes),memendw,(__haystack,__word,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_memendw */
 __NAMESPACE_LOCAL_END
 #include <local/string/memendw.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memchrw', but return `HAYSTACK + N_WORDS * 2', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memendw __LIBC_LOCAL_NAME(memendw)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memendw */
 #endif /* !__local___localdep_memendw_defined */
 /* Same as `memendw', but return the offset from `HAYSTACK', rather than the actual address.
  * Returns `HAYSTACK + N_DWORDS * 2' if the given `NEEDLE' wasn't found */

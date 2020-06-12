@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd72f9f9a */
+/* HASH CRC-32:0xb5798ee1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strtoull from stdlib */
 #ifndef __local___localdep_strtoull_defined
 #define __local___localdep_strtoull_defined 1
-#ifdef __strtoull_defined
-__NAMESPACE_GLB_USING(strtoull)
-#define __localdep_strtoull strtoull
-#elif defined(__std_strtoull_defined)
-__NAMESPACE_STD_USING(strtoull)
-#define __localdep_strtoull strtoull
-#elif defined(__CRT_HAVE_strtoull)
+#ifdef __CRT_HAVE_strtoull
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,__localdep_strtoull,(char const *__restrict __nptr, char **__endptr, int __base),strtoull,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtouq)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,__localdep_strtoull,(char const *__restrict __nptr, char **__endptr, int __base),strtouq,(__nptr,__endptr,__base))

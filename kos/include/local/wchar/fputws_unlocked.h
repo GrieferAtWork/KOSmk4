@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf737e4f */
+/* HASH CRC-32:0x59b1d002 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,15 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcslen from wchar */
 #ifndef __local___localdep_wcslen_defined
 #define __local___localdep_wcslen_defined 1
-#ifdef __wcslen_defined
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__NAMESPACE_GLB_USING(wcslen)
-#define __localdep_wcslen wcslen
-#elif defined(__std_wcslen_defined)
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__NAMESPACE_STD_USING(wcslen)
-#define __localdep_wcslen wcslen
-#elif defined(__CRT_HAVE_wcslen)
+#ifdef __CRT_HAVE_wcslen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
 #elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 4

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f2b0952 */
+/* HASH CRC-32:0xb61f856 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _ultow_s from stdlib */
 #ifndef __local___localdep__ultow_s_defined
 #define __local___localdep__ultow_s_defined 1
-#ifdef ___ultow_s_defined
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-__NAMESPACE_GLB_USING(_ultow_s)
-#define __localdep__ultow_s _ultow_s
-#elif defined(__CRT_HAVE__ultow_s)
+#ifdef __CRT_HAVE__ultow_s
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN

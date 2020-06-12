@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1643e1f */
+/* HASH CRC-32:0x9b91114 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,15 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempcpy from string */
 #ifndef __local___localdep_mempcpy_defined
 #define __local___localdep_mempcpy_defined 1
-#ifdef __mempcpy_defined
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-__NAMESPACE_GLB_USING(mempcpy)
-#define __localdep_mempcpy mempcpy
-#elif defined(__fast_mempcpy_defined)
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-__NAMESPACE_FAST_USING(mempcpy)
-#define __localdep_mempcpy __LIBC_FAST_NAME(mempcpy)
-#elif defined(__CRT_HAVE_mempcpy)
+#ifdef __CRT_HAVE_mempcpy
 /* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
@@ -50,11 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempcpyl from string */
 #ifndef __local___localdep_mempcpyl_defined
 #define __local___localdep_mempcpyl_defined 1
-#ifdef __fast_mempcpyl_defined
-/* Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST' */
-__NAMESPACE_FAST_USING(mempcpyl)
-#define __localdep_mempcpyl __LIBC_FAST_NAME(mempcpyl)
-#elif defined(__CRT_HAVE_mempcpyl)
+#ifdef __CRT_HAVE_mempcpyl
 /* Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),mempcpyl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_wmempcpy) && (__SIZEOF_WCHAR_T__ == 4)
@@ -74,11 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempcpyw from string */
 #ifndef __local___localdep_mempcpyw_defined
 #define __local___localdep_mempcpyw_defined 1
-#ifdef __fast_mempcpyw_defined
-/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
-__NAMESPACE_FAST_USING(mempcpyw)
-#define __localdep_mempcpyw __LIBC_FAST_NAME(mempcpyw)
-#elif defined(__CRT_HAVE_mempcpyw)
+#ifdef __CRT_HAVE_mempcpyw
 /* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),mempcpyw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_wmempcpy) && (__SIZEOF_WCHAR_T__ == 2)

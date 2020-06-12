@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3454ff1 */
+/* HASH CRC-32:0x5d761c88 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempsetw from string */
 #ifndef __local___localdep_mempsetw_defined
 #define __local___localdep_mempsetw_defined 1
-#ifdef __fast_mempsetw_defined
-/* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
-__NAMESPACE_FAST_USING(mempsetw)
-#define __localdep_mempsetw __LIBC_FAST_NAME(mempsetw)
-#elif defined(__CRT_HAVE_mempsetw)
+#ifdef __CRT_HAVE_mempsetw
 /* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),mempsetw,(__dst,__word,__n_words))
 #elif defined(__CRT_HAVE_wmempset) && (__SIZEOF_WCHAR_T__ == 2)

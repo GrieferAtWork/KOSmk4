@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ddb3aef */
+/* HASH CRC-32:0x95fd501e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,12 +86,7 @@ __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t 
 /* Dependency: write from unistd */
 #ifndef __local___localdep_write_defined
 #define __local___localdep_write_defined 1
-#ifdef __write_defined
-/* >> write(2)
- * Write data to a given file descriptor `FD' and return the number of bytes written */
-__NAMESPACE_GLB_USING(write)
-#define __localdep_write write
-#elif defined(__CRT_HAVE_write)
+#ifdef __CRT_HAVE_write
 /* >> write(2)
  * Write data to a given file descriptor `FD' and return the number of bytes written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),write,(__fd,__buf,__bufsize))

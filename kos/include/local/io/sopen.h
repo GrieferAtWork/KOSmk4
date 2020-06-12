@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fb1560c */
+/* HASH CRC-32:0x1edbc383 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: open from fcntl */
 #ifndef __local___localdep_open_defined
 #define __local___localdep_open_defined 1
-#ifdef __open_defined
-#ifdef __cplusplus
-__NAMESPACE_GLB_USING(open)
-#else /* __cplusplus */
-#define __localdep_open open
-#endif /* !__cplusplus */
-#elif defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))

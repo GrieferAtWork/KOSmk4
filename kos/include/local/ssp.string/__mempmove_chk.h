@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50a3a240 */
+/* HASH CRC-32:0xb6a3bd3d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmove from string */
 #ifndef __local___localdep_mempmove_defined
 #define __local___localdep_mempmove_defined 1
-#ifdef __fast_mempmove_defined
-/* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
-__NAMESPACE_FAST_USING(mempmove)
-#define __localdep_mempmove __LIBC_FAST_NAME(mempmove)
-#elif defined(__CRT_HAVE_mempmove)
+#ifdef __CRT_HAVE_mempmove
 /* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_mempmove */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempmove.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
 #define __localdep_mempmove __LIBC_LOCAL_NAME(mempmove)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mempmove */
 #endif /* !__local___localdep_mempmove_defined */
 __NAMESPACE_LOCAL_END
 #include <ssp/chk.h>

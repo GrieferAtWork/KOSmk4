@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59972cc3 */
+/* HASH CRC-32:0x8bedc5a9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memrendl from string */
 #ifndef __local___localdep_memrendl_defined
 #define __local___localdep_memrendl_defined 1
-#ifdef __fast_memrendl_defined
-/* Same as `memrchrl', but return `HAYSTACK - 4', rather than `NULL' if `NEEDLE' wasn't found. */
-__NAMESPACE_FAST_USING(memrendl)
-#define __localdep_memrendl __LIBC_FAST_NAME(memrendl)
-#elif defined(__CRT_HAVE_memrendl)
+#ifdef __CRT_HAVE_memrendl
 /* Same as `memrchrl', but return `HAYSTACK - 4', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrendl,(void const *__restrict __haystack, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memrendl,(__haystack,__dword,__n_dwords))
-#else /* ... */
+#else /* __CRT_HAVE_memrendl */
 __NAMESPACE_LOCAL_END
 #include <local/string/memrendl.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memrchrl', but return `HAYSTACK - 4', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memrendl __LIBC_LOCAL_NAME(memrendl)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memrendl */
 #endif /* !__local___localdep_memrendl_defined */
 /* Same as `memrendl', but return the offset from `HAYSTACK', rather than the actual address.
  * Returns `(size_t)-1 / 4' if the given `NEEDLE' wasn't found */

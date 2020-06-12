@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6232479c */
+/* HASH CRC-32:0xc3384cfd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,14 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcmp from string */
 #ifndef __local___localdep_memcmp_defined
 #define __local___localdep_memcmp_defined 1
-#ifdef __fast_memcmp_defined
-/* Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-__NAMESPACE_FAST_USING(memcmp)
-#define __localdep_memcmp __LIBC_FAST_NAME(memcmp)
-#elif defined(__CRT_HAVE_memcmp)
+#ifdef __CRT_HAVE_memcmp
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
@@ -58,20 +51,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memchr from string */
 #ifndef __local___localdep_memchr_defined
 #define __local___localdep_memchr_defined 1
-#ifdef __fast_memchr_defined
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
-__NAMESPACE_FAST_USING(memchr)
-#define __localdep_memchr __LIBC_FAST_NAME(memchr)
-#elif defined(__CRT_HAVE_memchr)
+#ifdef __CRT_HAVE_memchr
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memchr,(__haystack,__needle,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_memchr */
 __NAMESPACE_LOCAL_END
 #include <local/string/memchr.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memchr __LIBC_LOCAL_NAME(memchr)
-#endif /* !... */
+#endif /* !__CRT_HAVE_memchr */
 #endif /* !__local___localdep_memchr_defined */
 __NAMESPACE_LOCAL_END
 #include <features.h>

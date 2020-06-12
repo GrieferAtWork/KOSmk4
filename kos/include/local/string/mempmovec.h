@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d0b1287 */
+/* HASH CRC-32:0x9db8bb95 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,65 +25,49 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmove from string */
 #ifndef __local___localdep_mempmove_defined
 #define __local___localdep_mempmove_defined 1
-#ifdef __fast_mempmove_defined
-/* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
-__NAMESPACE_FAST_USING(mempmove)
-#define __localdep_mempmove __LIBC_FAST_NAME(mempmove)
-#elif defined(__CRT_HAVE_mempmove)
+#ifdef __CRT_HAVE_mempmove
 /* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
-#else /* ... */
+#else /* __CRT_HAVE_mempmove */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempmove.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memmove', but return `DST + N_BYTES', rather than `DST' */
 #define __localdep_mempmove __LIBC_LOCAL_NAME(mempmove)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mempmove */
 #endif /* !__local___localdep_mempmove_defined */
 /* Dependency: mempmoveq from string */
 #ifndef __local___localdep_mempmoveq_defined
 #define __local___localdep_mempmoveq_defined 1
-#ifdef __fast_mempmoveq_defined
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
-__NAMESPACE_FAST_USING(mempmoveq)
-#define __localdep_mempmoveq __LIBC_FAST_NAME(mempmoveq)
-#elif defined(__CRT_HAVE_mempmoveq)
+#ifdef __CRT_HAVE_mempmoveq
 /* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveq,(__dst,__src,__n_qwords))
-#else /* ... */
+#else /* __CRT_HAVE_mempmoveq */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempmoveq.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
 #define __localdep_mempmoveq __LIBC_LOCAL_NAME(mempmoveq)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mempmoveq */
 #endif /* !__local___localdep_mempmoveq_defined */
 /* Dependency: mempmovew from string */
 #ifndef __local___localdep_mempmovew_defined
 #define __local___localdep_mempmovew_defined 1
-#ifdef __fast_mempmovew_defined
-/* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' */
-__NAMESPACE_FAST_USING(mempmovew)
-#define __localdep_mempmovew __LIBC_FAST_NAME(mempmovew)
-#elif defined(__CRT_HAVE_mempmovew)
+#ifdef __CRT_HAVE_mempmovew
 /* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovew,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),mempmovew,(__dst,__src,__n_words))
-#else /* ... */
+#else /* __CRT_HAVE_mempmovew */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempmovew.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' */
 #define __localdep_mempmovew __LIBC_LOCAL_NAME(mempmovew)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mempmovew */
 #endif /* !__local___localdep_mempmovew_defined */
 /* Dependency: mempmovel from string */
 #ifndef __local___localdep_mempmovel_defined
 #define __local___localdep_mempmovel_defined 1
-#ifdef __fast_mempmovel_defined
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' */
-__NAMESPACE_FAST_USING(mempmovel)
-#define __localdep_mempmovel __LIBC_FAST_NAME(mempmovel)
-#elif defined(__CRT_HAVE_mempmovel)
+#ifdef __CRT_HAVE_mempmovel
 /* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovel,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),mempmovel,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_wmempmove) && (__SIZEOF_WCHAR_T__ == 4)

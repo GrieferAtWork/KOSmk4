@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd25add86 */
+/* HASH CRC-32:0x835323db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmoveq from string */
 #ifndef __local___localdep_mempmoveq_defined
 #define __local___localdep_mempmoveq_defined 1
-#ifdef __fast_mempmoveq_defined
-/* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
-__NAMESPACE_FAST_USING(mempmoveq)
-#define __localdep_mempmoveq __LIBC_FAST_NAME(mempmoveq)
-#elif defined(__CRT_HAVE_mempmoveq)
+#ifdef __CRT_HAVE_mempmoveq
 /* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmoveq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveq,(__dst,__src,__n_qwords))
-#else /* ... */
+#else /* __CRT_HAVE_mempmoveq */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempmoveq.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovew', but return `DST + N_QWORDS', rather than `DST' */
 #define __localdep_mempmoveq __LIBC_LOCAL_NAME(mempmoveq)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mempmoveq */
 #endif /* !__local___localdep_mempmoveq_defined */
 __NAMESPACE_LOCAL_END
 #include <ssp/chk.h>

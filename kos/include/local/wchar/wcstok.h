@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6a95df7 */
+/* HASH CRC-32:0xf353f4f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcsspn from wchar */
 #ifndef __local___localdep_wcsspn_defined
 #define __local___localdep_wcsspn_defined 1
-#ifdef __wcsspn_defined
-__NAMESPACE_GLB_USING(wcsspn)
-#define __localdep_wcsspn wcsspn
-#elif defined(__std_wcsspn_defined)
-__NAMESPACE_STD_USING(wcsspn)
-#define __localdep_wcsspn wcsspn
-#elif defined(__CRT_HAVE_wcsspn)
+#ifdef __CRT_HAVE_wcsspn
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #elif defined(__CRT_HAVE_DOS$wcsspn) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
@@ -47,13 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wcscspn from wchar */
 #ifndef __local___localdep_wcscspn_defined
 #define __local___localdep_wcscspn_defined 1
-#ifdef __wcscspn_defined
-__NAMESPACE_GLB_USING(wcscspn)
-#define __localdep_wcscspn wcscspn
-#elif defined(__std_wcscspn_defined)
-__NAMESPACE_STD_USING(wcscspn)
-#define __localdep_wcscspn wcscspn
-#elif defined(__CRT_HAVE_wcscspn)
+#ifdef __CRT_HAVE_wcscspn
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
 #elif defined(__CRT_HAVE_DOS$wcscspn) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__reject),wcscspn,(__haystack,__reject))

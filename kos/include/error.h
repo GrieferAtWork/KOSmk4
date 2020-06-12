@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3cb5f1bb */
+/* HASH CRC-32:0x483e32a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,11 +43,7 @@ __SYSDECL_BEGIN
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
-#ifdef __cplusplus
-__NAMESPACE_FAST_USING(error)
-#else /* __cplusplus */
-#define error (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error))
-#endif /* !__cplusplus */
+__NAMESPACE_FAST_USING_OR_IMPL(error, __FORCELOCAL __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL error)(int __status, __errno_t __errnum, const char *__format, ...) __THROWS(...) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error))(__status, __errnum, __format, ); })
 #elif defined(__CRT_HAVE_error)
 /* Helper function for printing an error message to `stderr' and possibly exiting the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
@@ -75,11 +71,7 @@ __NAMESPACE_LOCAL_USING(error)
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
  * Additionally, when `error_one_per_line' is non-zero, consecutive calls to this function that
  * pass the same values for `filename' and `line' will not produce the error message. */
-#ifdef __cplusplus
-__NAMESPACE_FAST_USING(error_at_line)
-#else /* __cplusplus */
-#define error_at_line (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error_at_line))
-#endif /* !__cplusplus */
+__NAMESPACE_FAST_USING_OR_IMPL(error_at_line, __FORCELOCAL __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) __THROWS(...) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error_at_line))(__status, __errnum, __filename, __line, __format, ); })
 #elif defined(__CRT_HAVE_error_at_line)
 /* Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'

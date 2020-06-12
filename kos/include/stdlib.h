@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x586f890a */
+/* HASH CRC-32:0x8ff6e0bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1146,9 +1146,7 @@ __NAMESPACE_STD_USING(strtold)
 
 #ifdef __USE_MISC
 #ifdef __ULONGLONG
-#ifdef __std_strtoll_defined
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, int __base) { return (__NAMESPACE_STD_SYM strtoll)(__nptr, __endptr, __base); }
-#elif defined(__CRT_HAVE_strtoll)
+#ifdef __CRT_HAVE_strtoll
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, int __base),strtoll,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoq)
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(char const *__restrict __nptr, char **__endptr, int __base),(__nptr,__endptr,__base))
@@ -1166,9 +1164,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoq,(cha
 #include <local/stdlib/strtoll.h>
 __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strtoq)(char const *__restrict __nptr, char **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoll))(__nptr, __endptr, __base); }
 #endif /* !... */
-#ifdef __std_strtoull_defined
-__FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL strtouq)(char const *__restrict __nptr, char **__endptr, int __base) { return (__NAMESPACE_STD_SYM strtoull)(__nptr, __endptr, __base); }
-#elif defined(__CRT_HAVE_strtoull)
+#ifdef __CRT_HAVE_strtoull
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, int __base),strtoull,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtouq)
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtouq,(char const *__restrict __nptr, char **__endptr, int __base),(__nptr,__endptr,__base))
@@ -1548,9 +1544,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rand_r, __FORCELOCAL __ATTR_NONNULL((1)) int __N
 #ifdef __USE_MISC
 #ifndef __cfree_defined
 #define __cfree_defined 1
-#ifdef __std_free_defined
-__FORCELOCAL void __NOTHROW_NCX(__LIBCCALL cfree)(void *__mallptr) { (__NAMESPACE_STD_SYM free)(__mallptr); }
-#elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
+#if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
 __CEIREDIRECT(,void,__NOTHROW_NCX,cfree,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
 __CREDIRECT_VOID(,__NOTHROW_NCX,cfree,(void *__mallptr),free,(__mallptr))
@@ -3433,6 +3427,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_lrotr, __FORCELOCAL __ATTR_CONST unsigned long 
 #ifndef __perror_defined
 #define __perror_defined 1
 #ifdef __std_perror_defined
+/* Print a given `MESSAGE' alongside `strerror(errno)' to stderr:
+ * >> if (message) {
+ * >>     fprintf(stderr, "%s: %s\n", message, strerror(errno));
+ * >> } else {
+ * >>     fprintf(stderr, "%s\n", strerror(errno));
+ * >> } */
 __NAMESPACE_STD_USING(perror)
 #elif defined(__CRT_HAVE_perror)
 /* Print a given `MESSAGE' alongside `strerror(errno)' to stderr:

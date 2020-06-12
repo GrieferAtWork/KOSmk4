@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bb75e65 */
+/* HASH CRC-32:0x378fd450 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmovedownc from string */
 #ifndef __local___localdep_mempmovedownc_defined
 #define __local___localdep_mempmovedownc_defined 1
-#ifdef __fast_mempmovedownc_defined
-/* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
-__NAMESPACE_FAST_USING(mempmovedownc)
-#define __localdep_mempmovedownc __LIBC_FAST_NAME(mempmovedownc)
-#elif defined(__CRT_HAVE_mempmovedownc)
+#ifdef __CRT_HAVE_mempmovedownc
 /* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempmovedownc,(__dst,__src,__elem_count,__elem_size))
-#else /* ... */
+#else /* __CRT_HAVE_mempmovedownc */
 __NAMESPACE_LOCAL_END
 #include <local/string/mempmovedownc.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memmovedownc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' (assumes that `DST <= SRC || !ELEM_COUNT || !ELEM_SIZE') */
 #define __localdep_mempmovedownc __LIBC_LOCAL_NAME(mempmovedownc)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mempmovedownc */
 #endif /* !__local___localdep_mempmovedownc_defined */
 __NAMESPACE_LOCAL_END
 #include <ssp/chk.h>

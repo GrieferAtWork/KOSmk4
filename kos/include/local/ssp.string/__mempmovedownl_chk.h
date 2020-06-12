@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1093cb87 */
+/* HASH CRC-32:0x6e828b09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempmovedownl from string */
 #ifndef __local___localdep_mempmovedownl_defined
 #define __local___localdep_mempmovedownl_defined 1
-#ifdef __fast_mempmovedownl_defined
-/* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
-__NAMESPACE_FAST_USING(mempmovedownl)
-#define __localdep_mempmovedownl __LIBC_FAST_NAME(mempmovedownl)
-#elif defined(__CRT_HAVE_mempmovedownl)
+#ifdef __CRT_HAVE_mempmovedownl
 /* Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),mempmovedownl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_mempmovel)

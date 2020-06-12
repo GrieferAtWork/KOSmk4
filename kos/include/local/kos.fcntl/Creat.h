@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bcad106 */
+/* HASH CRC-32:0x1b47fcc8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,13 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: Open from kos.fcntl */
 #ifndef __local___localdep_Open_defined
 #define __local___localdep_Open_defined 1
-#ifdef __Open_defined
-#ifdef __cplusplus
-__NAMESPACE_GLB_USING(Open)
-#else /* __cplusplus */
-#define __localdep_Open Open
-#endif /* !__cplusplus */
-#elif defined(__CRT_HAVE_Open64) && defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_Open64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_Open) && !defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))

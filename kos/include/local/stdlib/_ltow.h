@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f1e653f */
+/* HASH CRC-32:0xce4e59e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _ltow_s from stdlib */
 #ifndef __local___localdep__ltow_s_defined
 #define __local___localdep__ltow_s_defined 1
-#ifdef ___ltow_s_defined
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-__NAMESPACE_GLB_USING(_ltow_s)
-#define __localdep__ltow_s _ltow_s
-#elif defined(__CRT_HAVE__ltow_s)
+#ifdef __CRT_HAVE__ltow_s
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN

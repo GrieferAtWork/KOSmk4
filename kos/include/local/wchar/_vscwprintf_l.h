@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe18f3698 */
+/* HASH CRC-32:0x765dc87 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _vscwprintf from wchar */
 #ifndef __local___localdep__vscwprintf_defined
 #define __local___localdep__vscwprintf_defined 1
-#ifdef ___vscwprintf_defined
-__NAMESPACE_GLB_USING(_vscwprintf)
-#define __localdep__vscwprintf _vscwprintf
-#elif defined(__CRT_HAVE__vscwprintf)
+#ifdef __CRT_HAVE__vscwprintf
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vscwprintf,(__WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vscwprintf,(__format,__args))
 #elif defined(__CRT_HAVE_DOS$_vscwprintf) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vscwprintf,(__CHAR32_TYPE__ const *__format, __builtin_va_list __args),_vscwprintf,(__format,__args))
