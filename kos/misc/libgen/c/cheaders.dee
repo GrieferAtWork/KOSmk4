@@ -1060,7 +1060,7 @@ class FunctionImplementation {
 	public property dependencyFunctions: {string: Function} = {
 		get(): {Function...} {
 			if (m_dependencyFunctions !is bound) {
-				m_dependencyFunctions = Dict();
+				local result = Dict();
 				local usedDeps = dependencies;
 				if (usedDeps is Callable)
 					usedDeps = usedDeps();
@@ -1069,8 +1069,11 @@ class FunctionImplementation {
 						elem = elem();
 					if (elem !is Function)
 						elem = findFunctionByName(elem);
-					m_dependencyFunctions[name] = elem;
+					result[name] = elem;
 				}
+				m_dependencyFunctions = result;
+				dependencies          = result;
+				return result;
 			}
 			return m_dependencyFunctions;
 		}
@@ -2281,12 +2284,11 @@ no_usable_bindings:
 					 * >> #endif // !__wcslen_defined && (__std_wcslen_defined || $has_function(wcslen)) */
 					local bind = usedBindings.first;
 					/* Special case: Can't bind against a declaration from the current namespace! */
-					if (bind.binding is Callable)
-						bind.binding = bind.binding();
-					if (bind.binding is NamespaceBinding &&
+					local bindBinding = bind.functionBinding;
+					if (bindBinding is NamespaceBinding &&
 					    (ignoreNamespaceBindings ||
-					     bind.binding.namespace === fp.namespace ||
-					     bind.binding.importName != exposedName))
+					     bindBinding.namespace === fp.namespace ||
+					     bindBinding.importName != exposedName))
 						return;
 					for (local x: bind.ppCondPrefix) {
 						if (!fp.wasPrefixPrinted(escapeText(x, escapeMode)))
@@ -2313,12 +2315,13 @@ normal_guardName_binding:
 			local numNeededEndif = [];
 			for (local bind: usedBindings) {
 				/* Special case: Can't bind against a declaration from the current namespace! */
-				if (bind.binding is NamespaceBinding) {
+				local bindBinding = bind.functionBinding;
+				if (bindBinding is NamespaceBinding) {
 					if (ignoreNamespaceBindings)
 						continue;
-					if (bind.binding.namespace === fp.namespace)
+					if (bindBinding.namespace === fp.namespace)
 						continue;
-					if (bind.binding.importName != exposedName)
+					if (bindBinding.importName != exposedName)
 						continue;
 				}
 				local usedPpCond = expandPreprocessorConditionString(bind.ppCond);
@@ -2418,14 +2421,23 @@ class ExposedFunction {
 	@@An override for the active `extern "<externLinkage>"` during function declaration
 	public member externLinkageOverride: string | none = none;
 
+	@@Wrapper for @func
+	public property exposedFunc: Function = {
+		get(): Function {
+			local result = func;
+			if (result is Callable)
+				result = func = result();
+			return result;
+		}
+	}
+
 	public function preload() {
 		try {
-			if (func is Callable)
-				func = func();
-			func.preload();
+			exposedFunc.preload();
 		} catch (...) {
 			print "... while preloading ExposedFunction",
-				repr(func.name), "as", repr(exposedName);
+				repr(func is Function ? func.name : none),
+				"as", repr(exposedName);
 			throw;
 		}
 	}
@@ -2439,9 +2451,7 @@ class ExposedFunction {
 		local oldExternLinkage = fp.externLinkage;
 		if (externLinkageOverride !is none)
 			fp.externLinkage = externLinkageOverride;
-		if (func is Callable)
-			func = func();
-		func.cprintHeaderDeclaration(
+		exposedFunc.cprintHeaderDeclaration(
 			fp, escapeMode, decl, exposedName,
 			guardName, preferBindingMacros,
 			printDeclarationPrefixes,
@@ -2652,8 +2662,6 @@ class LibraryFunction {
 							local intName = depFun.internalFunctionName;
 							if (intName !is none)
 								return intName;
-							print "Non-libc dependency:", repr depFun.name;
-							return depFun.name;
 						}
 						return none;
 					};
@@ -3040,8 +3048,7 @@ class SystemHeader {
 			}
 			fp.ppEndif();
 		}
-		/* Go through all functions once again, and  */
-
+		/* Go through all functions once again, and print their implementations */
 		fp << "\n"
 			"DECL_BEGIN\n"
 			"\n";
