@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f62b616 */
+/* HASH CRC-32:0xacb1944d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-
 
 #define __CRT_HAVE__Unwind_Resume 1
 #define __CRT_HAVE__ZSt9terminatev 1
@@ -52,7 +51,6 @@
 #define __CRT_HAVE_format_escape 1
 #define __CRT_HAVE_format_hexdump 1
 #define __CRT_HAVE_format_printf 1
-#define __CRT_HAVE_format_quote 1
 #define __CRT_HAVE_format_repeat 1
 #define __CRT_HAVE_format_scanf 1
 #define __CRT_HAVE_format_snprintf_printer 1
@@ -193,6 +191,7 @@
 #define __CRT_HAVE_unicode_readutf8_rev_n 1
 #define __CRT_HAVE_unicode_utf8seqlen 1
 #define __CRT_HAVE_unicode_writeutf16 1
+#define __CRT_HAVE_unicode_writeutf16_chk 1
 #define __CRT_HAVE_unicode_writeutf8 1
 #define __CRT_HAVE_vsnprintf 1
 #define __CRT_HAVE_vsprintf 1

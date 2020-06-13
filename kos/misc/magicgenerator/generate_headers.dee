@@ -572,15 +572,69 @@ try {
 			wrt.flush();
 		}));
 
-	/* TODO: /kos/src/libc/crt-features.h:
-	 *   >> #define __CRT_HAVE_DOS$...
-	 *   >> #define __CRT_HAVE_...
-	 * Crt feature macros where:
-	 *   - Every INTERN libc_foo appears as a macro #define __CRT_HAVE_foo
-	 *   - Every INTERN libd_bar appears as a macro #define __CRT_HAVE_DOS$bar
-	 * This header will replace <crt-features/all.h> (where the later
-	 * will be deleted once this new header is being generated)
-	 */
+	/* Define /kos/include/crt-features/crt-kos-kernel.h */
+	startTask(updateHashedFile, (
+		"include/crt-features/crt-kos-kernel.h",
+		[](fp: File) {
+			fp << COPYRIGHT << "\n\n";
+			local crtFeatureConditions: {string: string} = Dict();
+			for (local x: knownKernelExports)
+				crtFeatureConditions.setnew(str(x), "1");
+			for (local x: knownKernelOnlyExports)
+				crtFeatureConditions.setnew(str(x), "1");
+			/* Go through all library functions, as well as their exports,
+			 * and filter out the ones that require "!defined(__KERNEL__)"
+			 * The ones that remain will be the symbol names that are defined
+			 * when building libc as part of the kernel core.
+			 * Also note that we can skip scanning of user-level source files,
+			 * as those don't even get included as part of the kernel build
+			 * tree */
+			final local NOT_DEFINED_KERNEL = "!defined(__KERNEL__)";
+			for (local none, header: allSystemHeaders) {
+				for (local part: header.order_libcAutoHeader) {
+					if (part !is LibraryFunction)
+						continue;
+					local partPpCond = str(part.ppCond);
+					if (NOT_DEFINED_KERNEL in partPpCond)
+						continue;
+					if (partPpCond == "0")
+						continue;
+					for (local exportPpCond, exportAsmname: part.exportSymbolNames) {
+						exportPpCond = str(exportPpCond);
+						exportAsmname = str(exportAsmname);
+						if (NOT_DEFINED_KERNEL in exportPpCond)
+							continue;
+						if (partPpCond != "1") {
+							exportPpCond = "({})&&({})".format({
+								partPpCond, exportPpCond });
+						}
+						if (exportPpCond == "0")
+							continue;
+						if (!crtFeatureConditions.setnew(exportAsmname, exportPpCond)) {
+							if (exportPpCond == "1")
+								crtFeatureConditions[exportAsmname] = "1";
+							else {
+								crtFeatureConditions[exportAsmname] = "({})||({})".format({
+									crtFeatureConditions[exportAsmname], exportPpCond });
+							}
+						}
+					}
+				}
+			}
+			local wrt = CWriter(fp);
+			for (local name: crtFeatureConditions.keys.sorted()) {
+				local cond = crtFeatureConditions[name];
+				if (cond == "1") {
+					/* Speed up file printing in this simple case */
+					wrt << "#define __CRT_HAVE_" << name << " 1\n";
+				} else {
+					wrt.ppIf(cond);
+					wrt << "#define __CRT_HAVE_" << name << " 1\n";
+					wrt.ppEndif();
+				}
+			}
+			wrt.flush();
+		}));
 
 	waitTasks();
 	messagePrefix = "3/3";

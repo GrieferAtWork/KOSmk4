@@ -47,8 +47,8 @@
 
 /* Indicate that we have support for all of the different assert functions. */
 %[declare_kernel_export("__afail", "__afailf")]
-%[declare_kernel_export("__assert", "__assert_fail", "__assert_func")]
-%[declare_kernel_export("__assertfail", "_assert")]
+%[declare_user_export("__assert", "__assert_fail", "__assert_func")]
+%[declare_user_export("__assertfail", "_assert")]
 
 
 %[define_replacement(sigset_t = "struct __sigset_struct")]

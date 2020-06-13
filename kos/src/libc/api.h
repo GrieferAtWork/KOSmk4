@@ -94,7 +94,6 @@
 #undef __CRT_HAVE___locale_ctype_ptr
 #undef __CRT_HAVE___locale_ctype_ptr_l
 #undef __CRT_HAVE__isctype
-#define __CRT_HAVE_unicode_utf8seqlen 1
 
 /* Do some quick probing if crt linkage was configured correctly */
 #ifndef __CRT_HAVE_memmove
