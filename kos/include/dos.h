@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb436ff7 */
+/* HASH CRC-32:0xe01daef9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,11 +93,11 @@ __CDECLARE_VOID(,__NOTHROW_RPC,delay,(unsigned int __mill),(__mill))
 #elif defined(__CRT_HAVE___crtSleep)
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
 __CREDIRECT_VOID(,__NOTHROW_RPC,delay,(unsigned int __mill),__crtSleep,(__mill))
-#else /* ... */
+#elif defined(__CRT_HAVE_usleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
 #include <local/dos/delay.h>
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(delay, __FORCELOCAL void __NOTHROW_RPC(__LIBCCALL delay)(unsigned int __mill) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(delay))(__mill); })
-#endif /* !... */
+#endif /* ... */
 #ifdef __CRT_HAVE__getdiskfree
 __CREDIRECT(,unsigned int,__NOTHROW_RPC,_dos_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),_getdiskfree,(__drive,__diskfree))
 #endif /* __CRT_HAVE__getdiskfree */

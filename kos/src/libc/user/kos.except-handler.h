@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb19cf18 */
+/* HASH CRC-32:0x8e4a759d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ DECL_BEGIN
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-INTDEF int NOTHROW(LIBCCALL libc_set_exception_handler)(int mode, except_handler_t handler, void *handler_sp);
+INTDEF int NOTHROW(LIBCCALL libc_set_exception_handler)(unsigned int mode, except_handler_t handler, void *handler_sp);
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
@@ -59,7 +59,7 @@ INTDEF int NOTHROW(LIBCCALL libc_set_exception_handler)(int mode, except_handler
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
  * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_get_exception_handler)(int *pmode, except_handler_t *phandler, void **phandler_sp);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_get_exception_handler)(unsigned int *pmode, except_handler_t *phandler, void **phandler_sp);
 /* Mode #2 / #3 exception handler (see description above) */
 INTDEF ATTR_NORETURN void (__EXCEPT_HANDLER_CC libc_except_handler3)(error_register_state_t *__restrict state, struct exception_data *__restrict error) THROWS(...);
 /* Mode #4 exception handler (see description above) */

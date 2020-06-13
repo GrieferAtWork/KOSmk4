@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeca919b7 */
+/* HASH CRC-32:0xb748e91 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -251,7 +251,7 @@ typedef __except_handler_t except_handler_t;
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-__CDECLARE(,int,__NOTHROW,set_exception_handler,(int __mode, except_handler_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
+__CDECLARE(,int,__NOTHROW,set_exception_handler,(unsigned int __mode, except_handler_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
 #endif /* __CRT_HAVE_set_exception_handler */
 #ifdef __CRT_HAVE_get_exception_handler
 /* Get the current exception handler mode for the calling thread.
@@ -267,7 +267,7 @@ __CDECLARE(,int,__NOTHROW,set_exception_handler,(int __mode, except_handler_t __
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
  * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
-__CDECLARE(,int,__NOTHROW_NCX,get_exception_handler,(int *__pmode, except_handler_t *__phandler, void **__phandler_sp),(__pmode,__phandler,__phandler_sp))
+__CDECLARE(,int,__NOTHROW_NCX,get_exception_handler,(unsigned int *__pmode, except_handler_t *__phandler, void **__phandler_sp),(__pmode,__phandler,__phandler_sp))
 #endif /* __CRT_HAVE_get_exception_handler */
 #ifdef __CRT_HAVE_except_handler3
 /* Mode #2 / #3 exception handler (see description above) */

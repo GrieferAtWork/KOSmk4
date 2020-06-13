@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13250de7 */
+/* HASH CRC-32:0x6beaca09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_delay_defined
 #define __local_delay_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_usleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: usleep from unistd */
 #ifndef __local___localdep_usleep_defined
@@ -41,6 +42,9 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_usleep_defined
 #endif /* !... */
 #endif /* !__local___localdep_usleep_defined */
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
 __LOCAL_LIBC(delay) void
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(delay))(unsigned int __mill) {
@@ -51,4 +55,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_delay_defined 1
 #define __localdep_delay __LIBC_LOCAL_NAME(delay)
 #endif /* !__local___localdep_delay_defined */
+#else /* __CRT_HAVE_usleep || __CRT_HAVE___crtSleep || __CRT_HAVE_delay */
+#undef __local_delay_defined
+#endif /* !__CRT_HAVE_usleep && !__CRT_HAVE___crtSleep && !__CRT_HAVE_delay */
 #endif /* !__local_delay_defined */

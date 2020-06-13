@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x9200f189 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,43 +18,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_DOS_C
-#define GUARD_LIBC_USER_DOS_C 1
+#ifndef GUARD_LIBC_AUTO_DOS_H
+#define GUARD_LIBC_AUTO_DOS_H 1
 
 #include "../api.h"
-/**/
 
-#include <unistd.h>
-
-#include "dos.h"
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include <dos.h>
 
 DECL_BEGIN
 
-
-
-
-
-/*[[[start:implementation]]]*/
-
-/*[[[head:libc_delay,hash:CRC-32=0xfb499925]]]*/
+#ifndef __KERNEL__
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
-INTERN ATTR_SECTION(".text.crt.dos.system") void
-NOTHROW_RPC(LIBCCALL libc_delay)(unsigned int mill)
-/*[[[body:libc_delay]]]*/
-{
-	usleep((useconds_t)mill * 1000);
-}
-/*[[[end:libc_delay]]]*/
-
-/*[[[end:implementation]]]*/
-
-
-
-/*[[[start:exports,hash:CRC-32=0x35fbe531]]]*/
-DEFINE_PUBLIC_ALIAS(__crtSleep, libc_delay);
-DEFINE_PUBLIC_ALIAS(delay, libc_delay);
-/*[[[end:exports]]]*/
+INTDEF void NOTHROW_RPC(LIBCCALL libc_delay)(unsigned int mill);
+#endif /* !__KERNEL__ */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_USER_DOS_C */
+#endif /* !GUARD_LIBC_AUTO_DOS_H */

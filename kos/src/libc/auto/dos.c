@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x615cae16 */
+/* HASH CRC-32:0xecc7724 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +18,31 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_DOS_H
-#define GUARD_LIBC_USER_DOS_H 1
+#ifndef GUARD_LIBC_AUTO_DOS_C
+#define GUARD_LIBC_AUTO_DOS_C 1
 
 #include "../api.h"
-
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include <dos.h>
+#include "dos.h"
+#include "../user/unistd.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <bits/types.h>
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
-INTDEF void NOTHROW_RPC(LIBCCALL libc_delay)(unsigned int mill);
+INTERN ATTR_SECTION(".text.crt.dos.system") void
+NOTHROW_RPC(LIBCCALL libc_delay)(unsigned int mill) {
+	libc_usleep((useconds_t)mill * 1000);
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_USER_DOS_H */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__crtSleep, libc_delay);
+DEFINE_PUBLIC_ALIAS(delay, libc_delay);
+#endif /* !__KERNEL__ */
+
+#endif /* !GUARD_LIBC_AUTO_DOS_C */

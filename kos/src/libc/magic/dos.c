@@ -81,9 +81,10 @@ __FORCELOCAL void (__LIBCCALL _enable)(void) { __sti(); }
 %[default_impl_section(".text.crt.dos.system")]
 
 @@Sleep for `mill' milliseconds (1/1.000 seconds)
-[[cp, userimpl, export_alias("__crtSleep")]]
+[[cp, export_alias("__crtSleep")]]
+[[impl_include("<bits/types.h>"), requires_function(usleep)]]
 void delay(unsigned int mill) {
-	usleep((__useconds_t)__mill * 1000);
+	usleep((useconds_t)mill * 1000);
 }
 
 %[insert:function(_dos_getdiskfree = _getdiskfree)]

@@ -248,7 +248,7 @@ typedef __except_handler_t except_handler_t;
 @@@return: 0 :        Success.
 @@@return: -1:EINVAL: The given MODE is invalid
 [[nothrow]]
-int set_exception_handler(int mode, except_handler_t handler, void *handler_sp);
+int set_exception_handler(unsigned int mode, except_handler_t handler, void *handler_sp);
 
 @@Get the current exception handler mode for the calling thread.
 @@@param: PMODE:       When non-NULL, store the current mode, which is encoded as:
@@ -263,7 +263,7 @@ int set_exception_handler(int mode, except_handler_t handler, void *handler_sp);
 @@                     then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
 @@@return: 0 :         Success.
 @@@return: -1:EFAULT:  One of the given pointers is non-NULL and faulty
-int get_exception_handler([[nullable]] int *pmode,
+int get_exception_handler([[nullable]] unsigned int *pmode,
                           [[nullable]] except_handler_t *phandler,
                           [[nullable]] void **phandler_sp);
 
