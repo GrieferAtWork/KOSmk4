@@ -68,6 +68,41 @@
 #define _FILE_OFFSET_BITS 32
 
 #include <__crt.h>
+
+/* Pull in CRT feature definitions */
+#ifdef __CC__
+#include "crt-features.h" /* Auto-generated file (by generate_headers.dee) */
+#ifndef __KERNEL__
+/* The user-space libc provides exports for defined system calls (by name).
+ * As such, these symbols also exists within the libc_* namespace, meaning
+ * that we're allowed to advertise this fact while building libc itself. */
+#include <crt-features/crt-kos-syscalls.h>
+#else /* !__KERNEL__ */
+
+#if defined(CONFIG_NO_ASSERT_RESTARTABLE) || defined(CONFIG_NO_DEBUGGER)
+#undef __CRT_HAVE___acheck
+#undef __CRT_HAVE___acheckf
+#endif /* CONFIG_NO_ASSERT_RESTARTABLE || CONFIG_NO_DEBUGGER */
+
+#endif /* __KERNEL__ */
+
+/* Delete CRT features for stuff that we don't implement (yet)
+ * TODO: Once we do implement this stuff, delete this part! */
+#undef __CRT_HAVE___ctype_b_loc
+#undef __CRT_HAVE___ctype_tolower_loc
+#undef __CRT_HAVE___ctype_toupper_loc
+#undef __CRT_HAVE___locale_ctype_ptr
+#undef __CRT_HAVE___locale_ctype_ptr_l
+#undef __CRT_HAVE__isctype
+#define __CRT_HAVE_unicode_utf8seqlen 1
+
+/* Do some quick probing if crt linkage was configured correctly */
+#ifndef __CRT_HAVE_memmove
+#error "Bad libc build environment"
+#endif /* !__CRT_HAVE_memmove */
+
+#endif /* __CC__ */
+
 #include <features.h>
 #include <hybrid/compiler.h>
 
@@ -85,30 +120,6 @@
 #if defined(__i386__) || defined(__x86_64__)
 #include "hybrid/arch/i386/config.h"
 #endif /* ARCH... */
-
-/* Delete CRT features for stuff that we don't implement (yet)
- * TODO: Once we do implement this stuff, delete this part! */
-#undef __CRT_HAVE___ctype_b_loc
-#undef __CRT_HAVE___ctype_tolower_loc
-#undef __CRT_HAVE___ctype_toupper_loc
-#undef __CRT_HAVE___locale_ctype_ptr
-#undef __CRT_HAVE___locale_ctype_ptr_l
-#undef __CRT_HAVE__isctype
-#define __CRT_HAVE_unicode_utf8seqlen 1
-
-/* Indicate that we have support for all of the different assert functions. */
-#define __CRT_HAVE___afail       1
-#define __CRT_HAVE___afailf      1
-#define __CRT_HAVE___assert      1
-#define __CRT_HAVE___assert_fail 1
-#define __CRT_HAVE___assert_func 1
-#define __CRT_HAVE___assertfail  1
-#define __CRT_HAVE__assert       1
-
-/* Do some quick probing if crt linkage was configured correctly */
-#ifndef __CRT_HAVE_memmove
-#error "Bad libc build environment"
-#endif /* !__CRT_HAVE_memmove */
 
 
 #ifdef __KERNEL__

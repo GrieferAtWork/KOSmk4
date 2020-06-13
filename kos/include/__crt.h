@@ -90,19 +90,18 @@
 #endif /* __KERNEL__ && __KOS__ */
 
 #ifdef __CRT_KOS_PRIMARY
+#ifndef __BUILDING_LIBC
 #ifdef __CRT_KOS_KERNEL
 #define __NO_STDSTREAMS 1
 #include <crt-features/crt-kos-kernel.h>
 #if defined(CONFIG_NO_ASSERT_RESTARTABLE) || defined(CONFIG_NO_DEBUGGER)
 #undef __CRT_HAVE___acheck
 #undef __CRT_HAVE___acheckf
-#endif
-#elif defined(__BUILDING_LIBC)
-#include <crt-features/all.h>
-#include <crt-features/crt-kos-syscalls.h>
-#else
+#endif /* CONFIG_NO_ASSERT_RESTARTABLE || CONFIG_NO_DEBUGGER */
+#else /* __CRT_KOS_KERNEL */
 #include <crt-features/crt-kos.h>
-#endif
+#endif /* !__CRT_KOS_KERNEL */
+#endif /* !__BUILDING_LIBC */
 #elif defined(__CRT_CYG_PRIMARY)
 #include <crt-features/crt-cyg.h>
 #elif defined(__CRT_GLC_PRIMARY)
@@ -641,8 +640,7 @@ typedef void *__locale_t;
  * However, this makes debugging much harder than it needs to be, so to
  * make our lives a bit easier, provide a functions that gets called in these
  * situations, with the equivalent effect of `abort()' and `std::terminate()' */
-#if !defined(NDEBUG) && \
-    (defined(__BUILDING_LIBC) || defined(__CRT_HAVE___crt_unreachable))
+#if !defined(NDEBUG) && defined(__CRT_HAVE___crt_unreachable)
 __DECL_BEGIN
 __CDECLARE_VOID(__ATTR_NORETURN,,__crt_unreachable,(void),())
 __DECL_END

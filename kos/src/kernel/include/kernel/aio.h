@@ -745,7 +745,7 @@ aio_multihandle_generic_poll(struct aio_multihandle_generic *__restrict self)
 		THROWS(...) {
 	if (aio_multihandle_generic_hascompleted(self))
 		return true;
-		task_connect(&self->mg_signal);
+	task_connect(&self->mg_signal);
 	return aio_multihandle_generic_hascompleted(self);
 }
 
@@ -754,7 +754,7 @@ aio_multihandle_generic_poll_err(struct aio_multihandle_generic *__restrict self
 		THROWS(...) {
 	if (aio_multihandle_generic_hascompleted(self))
 		goto check_error_and_return_true;
-		task_connect(&self->mg_signal);
+	task_connect(&self->mg_signal);
 	if (aio_multihandle_generic_hascompleted(self))
 		goto check_error_and_return_true;
 	return false;

@@ -461,7 +461,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains)(di_debuginfo_ranges_t c
 			range_end   = __hybrid_unaligned_get64((__uint64_t *)iter);
 			iter       += 8;
 			break;
-#endif
+#endif /* __SIZEOF_POINTER__ > 4 */
 		default:
 			__builtin_unreachable();
 		}

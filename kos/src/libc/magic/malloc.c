@@ -210,7 +210,7 @@ reallocarray:(void *ptr, $size_t elem_count, $size_t elem_size)
 	return realloc(ptr, total_bytes);
 }
 
-reallocv(*) = reallocarray;
+[[guard]] reallocv(*) = reallocarray;
 
 [[guard, section(".text.crt.heap.rare_helpers")]]
 [[userimpl, requires($has_function(realloc) && $has_function(malloc_usable_size))]]

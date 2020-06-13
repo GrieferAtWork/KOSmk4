@@ -284,6 +284,7 @@ global final knownUserExports: {string...} = HashSet();
 
 @@Set of known kernel exports (populated by %[declare_kernel_export(...)])
 global final knownKernelExports: {string...} = HashSet();
+global final knownKernelOnlyExports: {string...} = HashSet();
 
 @@Set of known libc section names
 global final knownLibcSections: {string...} = HashSet();
@@ -353,11 +354,14 @@ function customDirectivesParser(context: LoaderContext): bool {
 
 	case "declare_user_export":
 	case "declare_kernel_export":
+	case "declare_kernel_only_export":
 	case "declare_known_section": {
 		local s = tok == "declare_user_export"
 			? knownUserExports
 			: tok == "declare_kernel_export"
 			? knownKernelExports
+			: tok == "declare_kernel_only_export"
+			? knownKernelOnlyExports
 			: knownLibcSections;
 		self.next();
 		tok = self.skip("(");
@@ -497,6 +501,76 @@ try {
 				HASH_FUNCTION));
 		}
 	}
+
+	/* Define the libc-internal feature list header */
+	startTask(updateHashedFile, (
+		"src/libc/crt-features.h",
+		[](fp: File) {
+			fp << COPYRIGHT << "\n\n";
+			@@Mapping of feature-asmname to ppCond required for the feature to be defined
+			local crtFeatureConditions: {string: string} = Dict();
+			for (local x: knownKernelExports)
+				crtFeatureConditions.setnew(str(x), "1");
+			for (local x: knownUserExports)
+				crtFeatureConditions.setnew(str(x), "!defined(__KERNEL__)");
+			for (local x: knownKernelOnlyExports) {
+				x = str(x);
+				if (!crtFeatureConditions.setnew(x, "defined(__KERNEL__)"))
+					crtFeatureConditions[x] = "1";
+			}
+			/* Now for the actual heart of the thing:
+			 * Go through all system headers and look at the lists of
+			 * library functions that are being declared. Then, remember
+			 * information about all of them within @crtFeatureConditions,
+			 * including define-if requirements */
+			for (local none, header: allSystemHeaders) {
+				for (local parts: {
+					header.order_libcAutoHeader,
+					header.order_libcUserHeader
+				}) {
+					for (local part: parts) {
+						if (part !is LibraryFunction)
+							continue;
+						local effectiveAsmName = str(part.name);
+						if (effectiveAsmName.startswith("libc_"))
+							effectiveAsmName = effectiveAsmName[5:];
+						else if (effectiveAsmName.startswith("libd_"))
+							effectiveAsmName = "DOS$" + effectiveAsmName[5:];
+						else {
+							continue; /* Shouldn't happen... */
+						}
+						local newCond = part.ppCond;
+						if (newCond == "0")
+							continue; /* Shouldn't happen... */
+						if (!crtFeatureConditions.setnew(effectiveAsmName, newCond)) {
+							local oldCond = crtFeatureConditions[effectiveAsmName];
+							if (oldCond == "1")
+								continue; /* Already universal */
+							if (newCond == "1") {
+								crtFeatureConditions[effectiveAsmName] = "1";
+								continue; /* New condition was universal */
+							}
+							/* Merge defined-if conditions */
+							crtFeatureConditions[effectiveAsmName] =
+								"({})||({})".format({ oldCond, newCond });
+						}
+					}
+				}
+			}
+			local wrt = CWriter(fp);
+			for (local name: crtFeatureConditions.keys.sorted()) {
+				local cond = crtFeatureConditions[name];
+				if (cond == "1") {
+					/* Speed up file printing in this simple case */
+					wrt << "#define __CRT_HAVE_" << name << " 1\n";
+				} else {
+					wrt.ppIf(cond);
+					wrt << "#define __CRT_HAVE_" << name << " 1\n";
+					wrt.ppEndif();
+				}
+			}
+			wrt.flush();
+		}));
 
 	/* TODO: /kos/src/libc/crt-features.h:
 	 *   >> #define __CRT_HAVE_DOS$...

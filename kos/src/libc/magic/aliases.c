@@ -24,26 +24,31 @@
  *  - /kos/src/kernel/core/... */
 
 /* /kos/src/libc/hybrid/arch/[...]/assert[...].S */
-%[declare_kernel_export(__stack_chk_fail, abort, _ZSt9terminatev, __crt_unreachable)]
-%[declare_kernel_export(__afail, __afailf, __acheck, __acheckf, __stack_chk_guard)]
+%[declare_kernel_export("__stack_chk_fail", "abort", "_ZSt9terminatev", "__crt_unreachable")]
+%[declare_kernel_export("__afail", "__afailf", "__stack_chk_guard")]
+%[declare_kernel_only_export("__acheck", "__acheckf")]
 
 /* /kos/src/libc/hybrid/arch/[...]/except[...].S */
-%[declare_kernel_export(error_rethrow, __cxa_rethrow, _Unwind_Resume)]
-%[declare_kernel_export(error_thrown, error_throw, error_throw_current)]
+%[declare_kernel_export("error_rethrow", "__cxa_rethrow", "_Unwind_Resume")]
+%[declare_kernel_export("error_thrown", "error_throw", "error_throw_current")]
 
 /* /kos/src/kernel/core/misc/except.c */
-%[declare_kernel_export(error_info, error_data, error_register_state)]
-%[declare_kernel_export(error_code, error_active, error_class, error_subclass)]
+%[declare_kernel_export("error_info", "error_data", "error_register_state")]
+%[declare_kernel_export("error_code", "error_active", "error_class", "error_subclass")]
 
 /* /kos/src/kernel/core/arch/[...]/except.c */
-%[declare_kernel_export(error_unwind, __gxx_personality_v0, __cxa_begin_catch, __cxa_end_catch)]
+%[declare_kernel_export("error_unwind", "__gxx_personality_v0", "__cxa_begin_catch", "__cxa_end_catch")]
 
 /* /kos/src/libc/hybrid/except_to_posix.c */
-%[declare_kernel_export(error_as_errno, error_as_signal)]
+%[declare_kernel_export("error_as_errno", "error_as_signal")]
 
 /* /kos/src/libc/hybrid/unicode.c */
-%[declare_kernel_export(unicode_utf8seqlen)]
+%[declare_kernel_export("unicode_utf8seqlen")]
 
+/* Indicate that we have support for all of the different assert functions. */
+%[declare_kernel_export("__afail", "__afailf")]
+%[declare_kernel_export("__assert", "__assert_fail", "__assert_func")]
+%[declare_kernel_export("__assertfail", "_assert")]
 
 
 %[define_replacement(sigset_t = "struct __sigset_struct")]
