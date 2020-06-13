@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb5885cb */
+/* HASH CRC-32:0x79e45e97 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,10 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcschrnul,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ __needle),wcschrnul,(__haystack,__needle))
 #elif defined(__CRT_HAVE_DOS$wcschrnul) && __SIZEOF_WCHAR_T__ == 4
 /* Same as `wcschr', but return `wcsend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_wcschrnul,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ __needle),wcschrnul,(__haystack,__needle))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcschrnul,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ __needle),wcschrnul,(__haystack,__needle))
 #elif defined(__CRT_HAVE_DOS$wcschrnul) && __SIZEOF_WCHAR_T__ == 2
 /* Same as `wcschr', but return `wcsend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_wcschrnul,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ __needle),wcschrnul,(__haystack,__needle))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcschrnul,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ __needle),wcschrnul,(__haystack,__needle))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcschrnul.h>

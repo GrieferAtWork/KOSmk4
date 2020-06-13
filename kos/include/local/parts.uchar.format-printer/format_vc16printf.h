@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7d1fabd */
+/* HASH CRC-32:0x2de42a54 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBDCALL,__localdep_format_c16hexdump,(__pc16formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
-#elif defined(__CRT_HAVE_DOS$format_whexdump) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$format_whexdump)
 /* Print a hex dump of the given data using the provided format printer
  * @param: PRINTER:  A function called for all quoted portions of the text
  * @param: DATA:     A pointer to the data that should be dumped
@@ -81,17 +81,6 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBDC
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16hexdump,(__pc16formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
-#elif defined(__CRT_HAVE_DOS$DOS$format_whexdump)
-/* Print a hex dump of the given data using the provided format printer
- * @param: PRINTER:  A function called for all quoted portions of the text
- * @param: DATA:     A pointer to the data that should be dumped
- * @param: SIZE:     The amount of bytes read starting at DATA
- * @param: LINESIZE: The max amount of bytes to include per-line
- *                   HINT: Pass ZERO(0) to use a default size (16)
- * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
- * @return: 0: The given data was successfully hex-dumped
- * @return: *: The first non-ZERO(0) return value of PRINTER */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16hexdump,(__pc16formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),DOS$format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_whexdump.h>
@@ -196,7 +185,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBDCALL,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif defined(__CRT_HAVE_DOS$format_wescape) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$format_wescape)
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -211,21 +200,6 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBDC
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif defined(__CRT_HAVE_DOS$DOS$format_wescape)
-/* Do C-style escape on the given text, printing it to the given printer.
- * Input:
- * >> Hello "World" W
- * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
- * This function escapes all control and non-ascii characters,
- * preferring octal encoding for control characters and hex-encoding
- * for other non-ascii characters, a behavior that may be modified
- * with the `FORMAT_ESCAPE_FFORCE*' flags
- * @param: PRINTER: A function called for all quoted portions of the text
- * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),DOS$format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_wescape.h>
@@ -340,7 +314,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBKCALL,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif defined(__CRT_HAVE_DOS$format_wescape) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$format_wescape)
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -355,21 +329,6 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBKC
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif defined(__CRT_HAVE_DOS$KOS$format_wescape)
-/* Do C-style escape on the given text, printing it to the given printer.
- * Input:
- * >> Hello "World" W
- * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
- * This function escapes all control and non-ascii characters,
- * preferring octal encoding for control characters and hex-encoding
- * for other non-ascii characters, a behavior that may be modified
- * with the `FORMAT_ESCAPE_FFORCE*' flags
- * @param: PRINTER: A function called for all quoted portions of the text
- * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),KOS$format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_wescape.h>

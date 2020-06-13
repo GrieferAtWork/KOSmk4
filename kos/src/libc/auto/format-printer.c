@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbee3e000 */
+/* HASH CRC-32:0x6e33b3da */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,8 +32,6 @@
 #include "unicode.h"
 
 DECL_BEGIN
-
-#include <hybrid/__assert.h>
 
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
 #include "../libc/string.h"  /* Dependency of `#include <local/format-printf.h>' */

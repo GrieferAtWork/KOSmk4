@@ -45,6 +45,19 @@ NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
 #endif /* !__KERNEL__ */
 }
 
+%(auto_source){
+#include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
+#include "../libc/string.h"  /* Dependency of `#include <local/format-printf.h>' */
+#include "../libc/unicode.h" /* Dependency of `#include <local/format-scanf.h>' */
+
+#include <libdisasm/disassembler.h>
+#ifdef __KERNEL__
+#include <kernel/addr2line.h>
+#else /* __KERNEL__ */
+#include <libdebuginfo/addr2line.h>
+#endif /* !__KERNEL__ */
+}
+
 
 
 %{

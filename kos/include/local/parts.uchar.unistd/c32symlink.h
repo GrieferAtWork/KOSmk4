@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x165d83c9 */
+/* HASH CRC-32:0xf4e957bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_c32symlink_defined
 #define __local_c32symlink_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wsymlinkat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || (defined(__CRT_HAVE_DOS$wsymlinkat) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$KOS$wsymlinkat))
+#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wsymlinkat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wsymlinkat))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32symlinkat from parts.uchar.unistd */
 #ifndef __local___localdep_c32symlinkat_defined
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__LIBKCALL,__localdep_c32symlinkat,(__CHAR32_TYPE__ const *__link_text, __fd_t __tofd, __CHAR32_TYPE__ const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
-#elif defined(__CRT_HAVE_DOS$wsymlinkat) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wsymlinkat)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -42,14 +42,6 @@ __NAMESPACE_LOCAL_BEGIN
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_c32symlinkat,(__CHAR32_TYPE__ const *__link_text, __fd_t __tofd, __CHAR32_TYPE__ const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
-#elif defined(__CRT_HAVE_DOS$KOS$wsymlinkat)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> symlinkat(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_c32symlinkat,(__CHAR32_TYPE__ const *__link_text, __fd_t __tofd, __CHAR32_TYPE__ const *__target_path),KOS$wsymlinkat,(__link_text,__tofd,__target_path))
 #else /* ... */
 #undef __local___localdep_c32symlinkat_defined
 #endif /* !... */
@@ -68,7 +60,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c32symlink_defined 1
 #define __localdep_c32symlink __LIBC_LOCAL_NAME(c32symlink)
 #endif /* !__local___localdep_c32symlink_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wsymlinkat && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || (__CRT_HAVE_DOS$wsymlinkat && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$KOS$wsymlinkat) */
+#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wsymlinkat && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$wsymlinkat) */
 #undef __local_c32symlink_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wsymlinkat || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && (!__CRT_HAVE_DOS$wsymlinkat || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$KOS$wsymlinkat) */
+#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wsymlinkat || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$wsymlinkat) */
 #endif /* !__local_c32symlink_defined */

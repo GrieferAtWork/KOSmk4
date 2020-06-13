@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x381e9da2 */
+/* HASH CRC-32:0xd73a6cad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wspawnv
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnv,(int __mode, __WCHAR_TYPE__ const *__restrict __path, __TWARGV),wspawnv,(__mode,__path,___argv))
 #elif defined(__CRT_HAVE_DOS$wspawnv) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnv,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV),wspawnv,(__mode,__path,___argv))
+__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnv,(int __mode, __WCHAR_TYPE__ const *__restrict __path, __TWARGV),wspawnv,(__mode,__path,___argv))
 #elif defined(__CRT_HAVE_DOS$_wspawnv) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnv,(int __mode, __CHAR16_TYPE__ const *__restrict __path, __T16ARGV),_wspawnv,(__mode,__path,___argv))
+__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnv,(int __mode, __WCHAR_TYPE__ const *__restrict __path, __TWARGV),_wspawnv,(__mode,__path,___argv))
 #else /* ... */
 #undef __local___localdep_wspawnv_defined
 #endif /* !... */

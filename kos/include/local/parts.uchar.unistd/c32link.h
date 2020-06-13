@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f7c2aaf */
+/* HASH CRC-32:0x847918a7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_c32link_defined
 #define __local_c32link_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wlinkat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || (defined(__CRT_HAVE_DOS$wlinkat) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$KOS$wlinkat))
+#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wlinkat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wlinkat))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32linkat from parts.uchar.unistd */
 #ifndef __local___localdep_c32linkat_defined
@@ -33,20 +33,13 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__LIBKCALL,__localdep_c32linkat,(__fd_t __fromfd, __CHAR32_TYPE__ const *__from, __fd_t __tofd, __CHAR32_TYPE__ const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
-#elif defined(__CRT_HAVE_DOS$wlinkat) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wlinkat)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 __CREDIRECT_KOS(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_c32linkat,(__fd_t __fromfd, __CHAR32_TYPE__ const *__from, __fd_t __tofd, __CHAR32_TYPE__ const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
-#elif defined(__CRT_HAVE_DOS$KOS$wlinkat)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> linkat(2)
- * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_c32linkat,(__fd_t __fromfd, __CHAR32_TYPE__ const *__from, __fd_t __tofd, __CHAR32_TYPE__ const *__to, __atflag_t __flags),KOS$wlinkat,(__fromfd,__from,__tofd,__to,__flags))
 #else /* ... */
 #undef __local___localdep_c32linkat_defined
 #endif /* !... */
@@ -63,7 +56,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c32link_defined 1
 #define __localdep_c32link __LIBC_LOCAL_NAME(c32link)
 #endif /* !__local___localdep_c32link_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wlinkat && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || (__CRT_HAVE_DOS$wlinkat && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$KOS$wlinkat) */
+#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wlinkat && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$wlinkat) */
 #undef __local_c32link_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wlinkat || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && (!__CRT_HAVE_DOS$wlinkat || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$KOS$wlinkat) */
+#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wlinkat || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$wlinkat) */
 #endif /* !__local_c32link_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d759436 */
+/* HASH CRC-32:0xfbcebb1b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -149,7 +149,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBDCALL,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif defined(__CRT_HAVE_DOS$format_wescape) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$format_wescape)
 __NAMESPACE_LOCAL_END
 #include <bits/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -167,24 +167,6 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif defined(__CRT_HAVE_DOS$DOS$format_wescape)
-__NAMESPACE_LOCAL_END
-#include <bits/uformat-printer.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Do C-style escape on the given text, printing it to the given printer.
- * Input:
- * >> Hello "World" W
- * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
- * This function escapes all control and non-ascii characters,
- * preferring octal encoding for control characters and hex-encoding
- * for other non-ascii characters, a behavior that may be modified
- * with the `FORMAT_ESCAPE_FFORCE*' flags
- * @param: PRINTER: A function called for all quoted portions of the text
- * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),DOS$format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 __NAMESPACE_LOCAL_END
 #include <bits/uformat-printer.h>
@@ -315,7 +297,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBKCALL,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif defined(__CRT_HAVE_DOS$format_wescape) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$format_wescape)
 __NAMESPACE_LOCAL_END
 #include <bits/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -333,24 +315,6 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif defined(__CRT_HAVE_DOS$KOS$format_wescape)
-__NAMESPACE_LOCAL_END
-#include <bits/uformat-printer.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Do C-style escape on the given text, printing it to the given printer.
- * Input:
- * >> Hello "World" W
- * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
- * This function escapes all control and non-ascii characters,
- * preferring octal encoding for control characters and hex-encoding
- * for other non-ascii characters, a behavior that may be modified
- * with the `FORMAT_ESCAPE_FFORCE*' flags
- * @param: PRINTER: A function called for all quoted portions of the text
- * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),KOS$format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 __NAMESPACE_LOCAL_END
 #include <bits/uformat-printer.h>

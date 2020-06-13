@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x248f9976 */
+/* HASH CRC-32:0x79043527 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,14 +39,14 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__name, __atflag_t __flags),KOS$wunlinkat,(__dfd,__name,__flags))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
 #elif defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__name, __atflag_t __flags),DOS$wunlinkat,(__dfd,__name,__flags))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
 #else /* ... */
 #undef __local___localdep_wunlinkat_defined
 #endif /* !... */

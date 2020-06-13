@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x636e88b2 */
+/* HASH CRC-32:0x20841f5d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__LIBCCALL,__localdep_wreadlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__restrict __path, __WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen),KOS$wreadlinkat,(__dfd,__path,__buf,__buflen))
+__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_wreadlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__restrict __path, __WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
 #elif defined(__CRT_HAVE_DOS$wreadlinkat) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_BEGIN
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__LIBCCALL,__localdep_wreadlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__restrict __path, __WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen),DOS$wreadlinkat,(__dfd,__path,__buf,__buflen))
+__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_wreadlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__restrict __path, __WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
 #else /* ... */
 #undef __local___localdep_wreadlinkat_defined
 #endif /* !... */

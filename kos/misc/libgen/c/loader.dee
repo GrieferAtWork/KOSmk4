@@ -3092,8 +3092,7 @@ again_skip_annotation_rbracket:
 						continue;
 					}
 					local symbolName = bind.binding;
-					if (symbolName !is string &&
-						symbolName !is UserString) {
+					if (symbolName !is string && symbolName !is UserString) {
 						++i;
 						continue;
 					}
@@ -3137,33 +3136,21 @@ again_skip_annotation_rbracket:
 					local kosSymbolName = "KOS$" + symbolName;
 					local cDosPrototypes = Cell();
 					local cKosPrototypes = Cell();
-					local bindProtos = bind.prototypes;
-					function getDosPrototypes() {
-						if (!cDosPrototypes) {
-							local result = replaceWcharPrototypes(
-								bindProtos, WCHAR_REPLACEMENT_CHAR16);
-							cDosPrototypes.value = result;
-							return result;
-						}
-						return cDosPrototypes.value;
-					}
-					function getKosPrototypes() {
-						if (!cKosPrototypes) {
-							local result = replaceWcharPrototypes(
-								bindProtos, WCHAR_REPLACEMENT_CHAR32);
-							cKosPrototypes.value = result;
-							return result;
-						}
-						return cKosPrototypes.value;
-					}
-
 					local dosBinding = FunctionBinding(
 						ppCond: "({}) && __SIZEOF_WCHAR_T__ == 2".format({
 							replaceCrtHaveFromPreprocessorCondition(
 								bind.ppCond, symbolName, dosSymbolName)
 						}),
 						ppCondPrefix: bind.ppCondPrefix,
-						prototypes:   getDosPrototypes,
+						prototypes:   []{
+							if (!cDosPrototypes) {
+								local result = replaceWcharPrototypesShallow(
+									bind.prototypes, WCHAR_REPLACEMENT_CHAR16);
+								cDosPrototypes.value = result;
+								return result;
+							}
+							return cDosPrototypes.value;
+						},
 						binding:      dosSymbolName);
 					local kosBinding = FunctionBinding(
 						ppCond: "({}) && __SIZEOF_WCHAR_T__ == 4".format({
@@ -3171,7 +3158,15 @@ again_skip_annotation_rbracket:
 								bind.ppCond, symbolName, kosSymbolName)
 						}),
 						ppCondPrefix: bind.ppCondPrefix,
-						prototypes:   getKosPrototypes,
+						prototypes:   []{
+							if (!cKosPrototypes) {
+								local result = replaceWcharPrototypesShallow(
+									bind.prototypes, WCHAR_REPLACEMENT_CHAR32);
+								cKosPrototypes.value = result;
+								return result;
+							}
+							return cKosPrototypes.value;
+						},
 						binding:      kosSymbolName);
 					current.bindings.insert(i + 1, kosBinding);
 					current.bindings.insert(i + 2, dosBinding);
@@ -3236,12 +3231,15 @@ again_skip_annotation_rbracket:
 							.format({ currentName, functionArgumentNamesOverride }));
 				}
 				currentPrototypes.clear();
+				for (local binding: current.bindings) {
+					if (binding is Callable)
+						continue;
+					if (binding.prototypes !== currentPrototypes)
+						continue;
+					binding.prototypes = none;
+				}
 				currentPrototype  = none;
 				currentPrototypes = none;
-				for (local binding: current.bindings) {
-					if (binding !is Callable)
-						binding.prototypes = none;
-				}
 				if (tok == "=")
 					goto handle_eq_after_prototype;
 				if (tok == "%")

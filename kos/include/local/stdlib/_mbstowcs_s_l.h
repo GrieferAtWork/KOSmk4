@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf94f61b2 */
+/* HASH CRC-32:0x552c7053 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE__mbstowcs_l
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstowcs_l,(__WCHAR_TYPE__ *__dst, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale),_mbstowcs_l,(__dst,__src,__dstlen,__locale))
 #elif defined(__CRT_HAVE_DOS$_mbstowcs_l) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstowcs_l,(__CHAR32_TYPE__ *__dst, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale),_mbstowcs_l,(__dst,__src,__dstlen,__locale))
+__CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstowcs_l,(__WCHAR_TYPE__ *__dst, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale),_mbstowcs_l,(__dst,__src,__dstlen,__locale))
 #elif defined(__CRT_HAVE_DOS$_mbstowcs_l) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstowcs_l,(__CHAR16_TYPE__ *__dst, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale),_mbstowcs_l,(__dst,__src,__dstlen,__locale))
+__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstowcs_l,(__WCHAR_TYPE__ *__dst, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale),_mbstowcs_l,(__dst,__src,__dstlen,__locale))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/stdlib/_mbstowcs_l.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7f86d01 */
+/* HASH CRC-32:0x7e136d5e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,12 +36,12 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfaccessat,(__fd_t 
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,__localdep_wfaccessat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),KOS$wfaccessat,(__dfd,__file,__type,__flags))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfaccessat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
 #elif defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 2
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,__localdep_wfaccessat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),DOS$wfaccessat,(__dfd,__file,__type,__flags))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfaccessat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
 #else /* ... */
 #undef __local___localdep_wfaccessat_defined
 #endif /* !... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43aea8a5 */
+/* HASH CRC-32:0xa2b56988 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcrtomb
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_DOS$wcrtomb) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __CHAR32_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
+__CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_DOS$wcrtomb) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
+__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcrtomb.h>

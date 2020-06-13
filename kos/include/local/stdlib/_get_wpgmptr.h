@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc252d6f2 */
+/* HASH CRC-32:0xe70d11f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE___p__wpgmptr
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__WCHAR_TYPE__ **,__NOTHROW_NCX,__localdep___p__wpgmptr,(void),__p__wpgmptr,())
 #elif defined(__CRT_HAVE_DOS$__p__wpgmptr) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__CHAR32_TYPE__ **,__NOTHROW_NCX,__localdep___p__wpgmptr,(void),__p__wpgmptr,())
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__WCHAR_TYPE__ **,__NOTHROW_NCX,__localdep___p__wpgmptr,(void),__p__wpgmptr,())
 #elif defined(__CRT_HAVE_DOS$__p__wpgmptr) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__CHAR16_TYPE__ **,__NOTHROW_NCX,__localdep___p__wpgmptr,(void),__p__wpgmptr,())
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__WCHAR_TYPE__ **,__NOTHROW_NCX,__localdep___p__wpgmptr,(void),__p__wpgmptr,())
 #else /* ... */
 #undef __local___localdep___p__wpgmptr_defined
 #endif /* !... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8ba23d3 */
+/* HASH CRC-32:0xd23b7e1a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcsrtombs
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsrtombs,(char *__dst, __WCHAR_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
 #elif defined(__CRT_HAVE_DOS$wcsrtombs) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsrtombs,(char *__dst, __CHAR32_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsrtombs,(char *__dst, __WCHAR_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
 #elif defined(__CRT_HAVE_DOS$wcsrtombs) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsrtombs,(char *__dst, __CHAR16_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsrtombs,(char *__dst, __WCHAR_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcsrtombs.h>

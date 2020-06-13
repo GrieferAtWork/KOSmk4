@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0dc6363 */
+/* HASH CRC-32:0xef5b340b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,12 +35,12 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetws,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__localdep_fgetws,(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_DOS$fgetws_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__CHAR16_TYPE__ *,__THROWING,__localdep_fgetws,(__CHAR16_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__localdep_fgetws,(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE__fgetws_nolock) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -50,12 +50,12 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetws,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__localdep_fgetws,(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_DOS$_fgetws_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__CHAR16_TYPE__ *,__THROWING,__localdep_fgetws,(__CHAR16_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__localdep_fgetws,(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgetws)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -65,12 +65,12 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetws,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__localdep_fgetws,(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_DOS$fgetws) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__CHAR16_TYPE__ *,__THROWING,__localdep_fgetws,(__CHAR16_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__localdep_fgetws,(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgetws_unlocked)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -80,12 +80,12 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetws,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__localdep_fgetws,(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_DOS$fgetws_unlocked) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__CHAR16_TYPE__ *,__THROWING,__localdep_fgetws,(__CHAR16_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__localdep_fgetws,(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE__fgetws_nolock)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -95,12 +95,12 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetws,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__localdep_fgetws,(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_DOS$_fgetws_nolock) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__CHAR16_TYPE__ *,__THROWING,__localdep_fgetws,(__CHAR16_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__WCHAR_TYPE__ *,__THROWING,__localdep_fgetws,(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif (defined(__CRT_HAVE_fgetwc) || (defined(__CRT_HAVE_DOS$fgetwc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$fgetwc) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_getwc) || (defined(__CRT_HAVE_DOS$getwc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$getwc) && __SIZEOF_WCHAR_T__ == 2)) && ((defined(__CRT_HAVE_DOS$ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_ungetwc) || (defined(__CRT_HAVE_DOS$ungetwc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$ungetwc) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_ungetwc_unlocked) || (defined(__CRT_HAVE_DOS$ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
 __NAMESPACE_LOCAL_END
 #include <local/wchar/fgetws.h>

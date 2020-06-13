@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c87363d */
+/* HASH CRC-32:0x6d1720ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_c32access_defined
 #define __local_c32access_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wfaccessat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || (defined(__CRT_HAVE_DOS$wfaccessat) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$KOS$wfaccessat))
+#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wfaccessat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wfaccessat))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32faccessat from parts.uchar.unistd */
@@ -32,16 +32,11 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBKCALL,__localdep_c32faccessat,(__fd_t __dfd, __CHAR32_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
-#elif defined(__CRT_HAVE_DOS$wfaccessat) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wfaccessat)
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
 __CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c32faccessat,(__fd_t __dfd, __CHAR32_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
-#elif defined(__CRT_HAVE_DOS$KOS$wfaccessat)
-/* >> faccessat(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c32faccessat,(__fd_t __dfd, __CHAR32_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),KOS$wfaccessat,(__dfd,__file,__type,__flags))
 #else /* ... */
 #undef __local___localdep_c32faccessat_defined
 #endif /* !... */
@@ -58,7 +53,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c32access_defined 1
 #define __localdep_c32access __LIBC_LOCAL_NAME(c32access)
 #endif /* !__local___localdep_c32access_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wfaccessat && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || (__CRT_HAVE_DOS$wfaccessat && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$KOS$wfaccessat) */
+#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wfaccessat && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$wfaccessat) */
 #undef __local_c32access_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wfaccessat || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && (!__CRT_HAVE_DOS$wfaccessat || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$KOS$wfaccessat) */
+#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wfaccessat || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$wfaccessat) */
 #endif /* !__local_c32access_defined */

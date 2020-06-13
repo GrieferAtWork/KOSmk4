@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ca6af44 */
+/* HASH CRC-32:0x2964218c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_vwscanf_unlocked
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vwscanf_unlocked,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf_unlocked,(__format,__args))
 #elif defined(__CRT_HAVE_DOS$vwscanf_unlocked) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vwscanf_unlocked,(__CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf_unlocked,(__format,__args))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vwscanf_unlocked,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf_unlocked,(__format,__args))
 #elif defined(__CRT_HAVE_DOS$vwscanf_unlocked) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vwscanf_unlocked,(__CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf_unlocked,(__format,__args))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vwscanf_unlocked,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf_unlocked,(__format,__args))
 #elif (defined(__CRT_HAVE_vfwscanf_unlocked) || (defined(__CRT_HAVE_DOS$vfwscanf_unlocked) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$vfwscanf_unlocked) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_vfwscanf) || (defined(__CRT_HAVE_DOS$vfwscanf) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$vfwscanf) && __SIZEOF_WCHAR_T__ == 2)) && !defined(__NO_STDSTREAMS)
 __NAMESPACE_LOCAL_END
 #include <local/wchar/vwscanf_unlocked.h>

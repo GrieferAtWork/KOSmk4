@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf353f4f9 */
+/* HASH CRC-32:0xfd075867 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcsspn
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #elif defined(__CRT_HAVE_DOS$wcsspn) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #elif defined(__CRT_HAVE_DOS$wcsspn) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcsspn.h>
@@ -44,9 +44,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcscspn
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
 #elif defined(__CRT_HAVE_DOS$wcscspn) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
 #elif defined(__CRT_HAVE_DOS$wcscspn) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcscspn.h>

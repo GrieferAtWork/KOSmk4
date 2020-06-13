@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf559ac4 */
+/* HASH CRC-32:0x53611815 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,11 +134,11 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate32,(__WCHA
 #elif defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 4
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBCCALL,__localdep_wtruncate32,(__WCHAR_TYPE__ const *__file, __pos32_t __length),KOS$wtruncate,(__file,__length))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate32,(__WCHAR_TYPE__ const *__file, __pos32_t __length),wtruncate,(__file,__length))
 #elif defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 2
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBCCALL,__localdep_wtruncate32,(__WCHAR_TYPE__ const *__file, __pos32_t __length),DOS$wtruncate,(__file,__length))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate32,(__WCHAR_TYPE__ const *__file, __pos32_t __length),wtruncate,(__file,__length))
 #else /* ... */
 #undef __local___localdep_wtruncate32_defined
 #endif /* !... */

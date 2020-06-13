@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1210b3c */
+/* HASH CRC-32:0xa7315968 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcscoll
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscoll,(__s1,__s2))
 #elif defined(__CRT_HAVE_DOS$wcscoll) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscoll,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2),wcscoll,(__s1,__s2))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscoll,(__s1,__s2))
 #elif defined(__CRT_HAVE_DOS$wcscoll) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscoll,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2),wcscoll,(__s1,__s2))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscoll,(__s1,__s2))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcscoll.h>

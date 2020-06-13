@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15e3dfb1 */
+/* HASH CRC-32:0x647bfbd1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -578,7 +578,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_getcwd_dbg, __FORCELOCAL __ATTR_WUNUSED char *_
 #define ___wgetcwd_dbg_defined 1
 #ifdef __CRT_HAVE__wgetcwd_dbg
 __CDECLARE(__ATTR_WUNUSED,__WCHAR16_TYPE__ *,__NOTHROW_NCX,_wgetcwd_dbg,(__WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line),(__buf,__buflen,__block_type,__filename,__line))
-#elif (defined(__CRT_HAVE_wgetcwd) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || (defined(__CRT_HAVE_DOS$_wgetcwd) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$DOS$_wgetcwd)
+#elif (defined(__CRT_HAVE_wgetcwd) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wgetcwd)
 #include <local/crtdbg/_wgetcwd_dbg.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_wgetcwd_dbg, __FORCELOCAL __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBCCALL _wgetcwd_dbg)(__WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetcwd_dbg))(__buf, __buflen, __block_type, __filename, __line); })
 #else /* ... */

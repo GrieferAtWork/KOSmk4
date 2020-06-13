@@ -47,8 +47,6 @@
 %[define_str2wcs_header_replacement("<bits/format-printer.h>" = "<bits/wformat-printer.h>")]
 
 %(auto_source){
-#include <hybrid/__assert.h>
-
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
 #include "../libc/string.h"  /* Dependency of `#include <local/format-printf.h>' */
 #include "../libc/unicode.h" /* Dependency of `#include <local/format-scanf.h>' */

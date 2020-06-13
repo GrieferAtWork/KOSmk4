@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89ccc789 */
+/* HASH CRC-32:0xbd30040d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,16 @@
 
 DECL_BEGIN
 
+#include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
+#include "../libc/string.h"  /* Dependency of `#include <local/format-printf.h>' */
+#include "../libc/unicode.h" /* Dependency of `#include <local/format-scanf.h>' */
+
+#include <libdisasm/disassembler.h>
+#ifdef __KERNEL__
+#include <kernel/addr2line.h>
+#else /* __KERNEL__ */
+#include <libdebuginfo/addr2line.h>
+#endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #include <hybrid/__alloca.h>
 #include <libc/string.h>

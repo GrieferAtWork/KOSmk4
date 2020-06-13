@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd94bd4dc */
+/* HASH CRC-32:0xb9c1a4af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE__vswscanf_l
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vswscanf_l,(__WCHAR_TYPE__ const *__src, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vswscanf_l,(__src,__format,__locale,__args))
 #elif defined(__CRT_HAVE_DOS$_vswscanf_l) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vswscanf_l,(__CHAR32_TYPE__ const *__src, __CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vswscanf_l,(__src,__format,__locale,__args))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vswscanf_l,(__WCHAR_TYPE__ const *__src, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vswscanf_l,(__src,__format,__locale,__args))
 #elif defined(__CRT_HAVE_DOS$_vswscanf_l) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vswscanf_l,(__CHAR16_TYPE__ const *__src, __CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vswscanf_l,(__src,__format,__locale,__args))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vswscanf_l,(__WCHAR_TYPE__ const *__src, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vswscanf_l,(__src,__format,__locale,__args))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/_vswscanf_l.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3a069c6 */
+/* HASH CRC-32:0x9f162769 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,12 +70,12 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wrepeat,(pwforma
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wrepeat,(pc32formatprinter __printer, void *__arg, char32_t __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wrepeat,(pwformatprinter __printer, void *__arg, wchar_t __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
 #elif defined(__CRT_HAVE_DOS$format_wrepeat) && __SIZEOF_WCHAR_T__ == 2
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wrepeat,(pc16formatprinter __printer, void *__arg, char16_t __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wrepeat,(pwformatprinter __printer, void *__arg, wchar_t __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
 #else /* ... */
 #include <local/parts.wchar.format-printer/format_wrepeat.h>
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
@@ -112,7 +112,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wescape,(pwforma
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBCCALL,format_wescape,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),KOS$format_wescape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wescape,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_DOS$format_wescape) && __SIZEOF_WCHAR_T__ == 2
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -127,7 +127,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBCC
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBCCALL,format_wescape,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),DOS$format_wescape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wescape,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #else /* ... */
 #include <local/parts.wchar.format-printer/format_wescape.h>
 /* Do C-style escape on the given text, printing it to the given printer.
@@ -166,7 +166,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_whexdump,(pwform
  * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBCCALL,format_whexdump,(pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),KOS$format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_whexdump,(pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
 #elif defined(__CRT_HAVE_DOS$format_whexdump) && __SIZEOF_WCHAR_T__ == 2
 /* Print a hex dump of the given data using the provided format printer
  * @param: PRINTER:  A function called for all quoted portions of the text
@@ -177,7 +177,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBCC
  * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBCCALL,format_whexdump,(pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),DOS$format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_whexdump,(pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
 #else /* ... */
 #include <local/parts.wchar.format-printer/format_whexdump.h>
 /* Print a hex dump of the given data using the provided format printer
@@ -372,7 +372,7 @@ __CDECLARE(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THR
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__CREDIRECT_KOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,format_vwprintf,(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
+__CREDIRECT_KOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,format_vwprintf,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
 #elif defined(__CRT_HAVE_DOS$format_vwprintf) && __SIZEOF_WCHAR_T__ == 2
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
@@ -461,7 +461,7 @@ __CREDIRECT_KOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__CREDIRECT_DOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,format_vwprintf,(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
+__CREDIRECT_DOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,format_vwprintf,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
 #else /* ... */
 #include <local/parts.wchar.format-printer/format_vwprintf.h>
 /* Generic printf implementation
@@ -730,7 +730,7 @@ __LIBC __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCA
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__LIBC __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_KOS("format_wprintf");
+__LIBC __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBKCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_KOS("format_wprintf");
 #elif defined(__CRT_HAVE_DOS$format_wprintf) && __SIZEOF_WCHAR_T__ == 2
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
@@ -819,7 +819,7 @@ __LIBC __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCA
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-__LIBC __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_DOS("format_wprintf");
+__LIBC __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBDCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_DOS("format_wprintf");
 #else /* ... */
 #include <local/parts.wchar.format-printer/format_wprintf.h>
 /* Generic printf implementation
@@ -925,11 +925,11 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wsprintf_p
 #elif defined(__CRT_HAVE_DOS$format_wsprintf_printer) && __SIZEOF_WCHAR_T__ == 4
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wsprintf_printer,(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsprintf_printer,(__arg,__data,__datalen))
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wsprintf_printer,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsprintf_printer,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wsprintf_printer) && __SIZEOF_WCHAR_T__ == 2
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wsprintf_printer,(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsprintf_printer,(__arg,__data,__datalen))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wsprintf_printer,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsprintf_printer,(__arg,__data,__datalen))
 #else /* ... */
 #include <local/parts.wchar.format-printer/format_wsprintf_printer.h>
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
@@ -960,13 +960,13 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wsnprintf_
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wsnprintf_printer,(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsnprintf_printer,(__arg,__data,__datalen))
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wsnprintf_printer,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsnprintf_printer,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wsnprintf_printer) && __SIZEOF_WCHAR_T__ == 2
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wsnprintf_printer,(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsnprintf_printer,(__arg,__data,__datalen))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wsnprintf_printer,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsnprintf_printer,(__arg,__data,__datalen))
 #else /* ... */
 #include <local/parts.wchar.format-printer/format_wsnprintf_printer.h>
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
@@ -983,10 +983,10 @@ __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_
 __CDECLARE(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wwidth,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wwidth) && __SIZEOF_WCHAR_T__ == 4
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wwidth,(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wwidth,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wwidth) && __SIZEOF_WCHAR_T__ == 2
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wwidth,(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wwidth,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #else /* ... */
 #include <local/parts.wchar.format-printer/format_wwidth.h>
 /* Returns the width (number of characters; not bytes) of the given unicode string */
@@ -1082,7 +1082,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNU
  *                  but may differ from `wcslen(return)' when NUL characters were
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,format_waprintf_pack,(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),format_waprintf_pack,(__self,__pstrlen))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,format_waprintf_pack,(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),format_waprintf_pack,(__self,__pstrlen))
 #elif defined(__CRT_HAVE_DOS$format_waprintf_pack) && __SIZEOF_WCHAR_T__ == 2
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
@@ -1104,7 +1104,7 @@ __CREDIRECT_KOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_
  *                  but may differ from `wcslen(return)' when NUL characters were
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
-__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,format_waprintf_pack,(struct format_c16aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),format_waprintf_pack,(__self,__pstrlen))
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,format_waprintf_pack,(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),format_waprintf_pack,(__self,__pstrlen))
 #elif defined(__CRT_HAVE_realloc)
 #include <local/parts.wchar.format-printer/format_waprintf_pack.h>
 /* Pack and finalize a given aprintf format printer
@@ -1142,14 +1142,14 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_WUNUS
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_WUNUSED __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,format_waprintf_alloc,(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,format_waprintf_alloc,(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
 #elif defined(__CRT_HAVE_DOS$format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 2
 /* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
-__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_WUNUSED __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,format_waprintf_alloc,(struct format_c16aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,format_waprintf_alloc,(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
 #elif defined(__CRT_HAVE_realloc)
 #include <local/parts.wchar.format-printer/format_waprintf_alloc.h>
 /* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
@@ -1164,10 +1164,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_alloc, __FORCELOCAL __ATTR_MALLO
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_waprintf_printer,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_waprintf_printer) && __SIZEOF_WCHAR_T__ == 4
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_waprintf_printer,(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_waprintf_printer,(__arg,__data,__datalen))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_waprintf_printer,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_waprintf_printer,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_waprintf_printer) && __SIZEOF_WCHAR_T__ == 2
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_waprintf_printer,(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_waprintf_printer,(__arg,__data,__datalen))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_waprintf_printer,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_waprintf_printer,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_format_waprintf_alloc) || (defined(__CRT_HAVE_DOS$format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_realloc)
 #include <local/parts.wchar.format-printer/format_waprintf_printer.h>
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */

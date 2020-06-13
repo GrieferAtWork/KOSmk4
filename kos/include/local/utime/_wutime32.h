@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d1e9999 */
+/* HASH CRC-32:0x1ecec012 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,15 +31,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wutime64
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$wutime64) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__CHAR32_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$wutime64) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__CHAR16_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$_wutime64) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__CHAR32_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$_wutime64) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__CHAR16_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
 #else /* ... */
 #undef __local___localdep_crt_wutime64_defined
 #endif /* !... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc58d80e8 */
+/* HASH CRC-32:0x3241642e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2379,10 +2379,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32sncasecoll, __FORCELOCAL __ATTR_PURE __ATTR_W
 #endif /* !... */
 #if defined(__CRT_HAVE_wcslwr) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,__LIBDCALL,c16slwr,(char16_t *__restrict __str),wcslwr,(__str))
-#elif defined(__CRT_HAVE_DOS$_wcslwr) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$_wcslwr)
 __CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16slwr,(char16_t *__restrict __str),_wcslwr,(__str))
-#elif defined(__CRT_HAVE_DOS$DOS$_wcslwr)
-__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16slwr,(char16_t *__restrict __str),DOS$_wcslwr,(__str))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/wchar/wcslwr.h>
 __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBDCALL c16slwr)(char16_t *__restrict __str) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslwr))((__WCHAR_TYPE__ *)__str); }
@@ -2392,10 +2390,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16slwr, __FORCELOCAL __ATTR_RETNONNULL __ATTR_N
 #endif /* !... */
 #if defined(__CRT_HAVE_wcslwr) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,__LIBKCALL,c32slwr,(char32_t *__restrict __str),wcslwr,(__str))
-#elif defined(__CRT_HAVE_DOS$wcslwr) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wcslwr)
 __CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32slwr,(char32_t *__restrict __str),wcslwr,(__str))
-#elif defined(__CRT_HAVE_DOS$KOS$wcslwr)
-__CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32slwr,(char32_t *__restrict __str),KOS$wcslwr,(__str))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/wchar/wcslwr.h>
 __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL c32slwr)(char32_t *__restrict __str) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslwr))((__WCHAR_TYPE__ *)__str); }
@@ -2405,10 +2401,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32slwr, __FORCELOCAL __ATTR_RETNONNULL __ATTR_N
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsupr) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,__LIBDCALL,c16supr,(char16_t *__restrict __str),wcsupr,(__str))
-#elif defined(__CRT_HAVE_DOS$_wcsupr) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$_wcsupr)
 __CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16supr,(char16_t *__restrict __str),_wcsupr,(__str))
-#elif defined(__CRT_HAVE_DOS$DOS$_wcsupr)
-__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16supr,(char16_t *__restrict __str),DOS$_wcsupr,(__str))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/wchar/wcsupr.h>
 __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBDCALL c16supr)(char16_t *__restrict __str) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsupr))((__WCHAR_TYPE__ *)__str); }
@@ -2418,10 +2412,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16supr, __FORCELOCAL __ATTR_RETNONNULL __ATTR_N
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsupr) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,__LIBKCALL,c32supr,(char32_t *__restrict __str),wcsupr,(__str))
-#elif defined(__CRT_HAVE_DOS$wcsupr) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wcsupr)
 __CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32supr,(char32_t *__restrict __str),wcsupr,(__str))
-#elif defined(__CRT_HAVE_DOS$KOS$wcsupr)
-__CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32supr,(char32_t *__restrict __str),KOS$wcsupr,(__str))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/wchar/wcsupr.h>
 __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL c32supr)(char32_t *__restrict __str) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsupr))((__WCHAR_TYPE__ *)__str); }
@@ -2475,10 +2467,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32snrev, __FORCELOCAL __ATTR_LEAF __ATTR_RETNON
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsset) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,__LIBDCALL,c16sset,(char16_t *__restrict __str, int __ch),wcsset,(__str,__ch))
-#elif defined(__CRT_HAVE_DOS$_wcsset) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$_wcsset)
 __CREDIRECT_DOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16sset,(char16_t *__restrict __str, int __ch),_wcsset,(__str,__ch))
-#elif defined(__CRT_HAVE_DOS$DOS$_wcsset)
-__CREDIRECT_DOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16sset,(char16_t *__restrict __str, int __ch),DOS$_wcsset,(__str,__ch))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/wchar/wcsset.h>
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBDCALL c16sset)(char16_t *__restrict __str, int __ch) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsset))((__WCHAR_TYPE__ *)__str, __ch); }
@@ -2488,10 +2478,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16sset, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONN
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsset) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,__LIBKCALL,c32sset,(char32_t *__restrict __str, int __ch),wcsset,(__str,__ch))
-#elif defined(__CRT_HAVE_DOS$wcsset) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wcsset)
 __CREDIRECT_KOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32sset,(char32_t *__restrict __str, int __ch),wcsset,(__str,__ch))
-#elif defined(__CRT_HAVE_DOS$KOS$wcsset)
-__CREDIRECT_KOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32sset,(char32_t *__restrict __str, int __ch),KOS$wcsset,(__str,__ch))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/wchar/wcsset.h>
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL c32sset)(char32_t *__restrict __str, int __ch) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsset))((__WCHAR_TYPE__ *)__str, __ch); }
@@ -2754,10 +2742,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32sverscmp, __FORCELOCAL __ATTR_PURE __ATTR_WUN
 #ifdef __USE_XOPEN2K8
 #if defined(__CRT_HAVE_wcscasestr_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char16_t *,__NOTHROW_NCX,__LIBDCALL,c16scasestr_l,(char16_t const *__haystack, char16_t const *__needle, __locale_t __locale),wcscasestr_l,(__haystack,__needle,__locale))
-#elif defined(__CRT_HAVE_DOS$wcscasestr_l) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$wcscasestr_l)
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char16_t *,__NOTHROW_NCX,c16scasestr_l,(char16_t const *__haystack, char16_t const *__needle, __locale_t __locale),wcscasestr_l,(__haystack,__needle,__locale))
-#elif defined(__CRT_HAVE_DOS$DOS$wcscasestr_l)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char16_t *,__NOTHROW_NCX,c16scasestr_l,(char16_t const *__haystack, char16_t const *__needle, __locale_t __locale),DOS$wcscasestr_l,(__haystack,__needle,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/wchar/wcscasestr_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char16_t *__NOTHROW_NCX(__LIBDCALL c16scasestr_l)(char16_t const *__haystack, char16_t const *__needle, __locale_t __locale) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscasestr_l))((__WCHAR_TYPE__ const *)__haystack, (__WCHAR_TYPE__ const *)__needle, __locale); }
@@ -2767,10 +2753,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16scasestr_l, __FORCELOCAL __ATTR_PURE __ATTR_W
 #endif /* !... */
 #if defined(__CRT_HAVE_wcscasestr_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char32_t *,__NOTHROW_NCX,__LIBKCALL,c32scasestr_l,(char32_t const *__haystack, char32_t const *__needle, __locale_t __locale),wcscasestr_l,(__haystack,__needle,__locale))
-#elif defined(__CRT_HAVE_DOS$wcscasestr_l) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wcscasestr_l)
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char32_t *,__NOTHROW_NCX,c32scasestr_l,(char32_t const *__haystack, char32_t const *__needle, __locale_t __locale),wcscasestr_l,(__haystack,__needle,__locale))
-#elif defined(__CRT_HAVE_DOS$KOS$wcscasestr_l)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char32_t *,__NOTHROW_NCX,c32scasestr_l,(char32_t const *__haystack, char32_t const *__needle, __locale_t __locale),KOS$wcscasestr_l,(__haystack,__needle,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/wchar/wcscasestr_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char32_t *__NOTHROW_NCX(__LIBKCALL c32scasestr_l)(char32_t const *__haystack, char32_t const *__needle, __locale_t __locale) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscasestr_l))((__WCHAR_TYPE__ const *)__haystack, (__WCHAR_TYPE__ const *)__needle, __locale); }
@@ -2900,10 +2884,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32scoll_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNU
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsncoll_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBDCALL,c16sncoll_l,(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),wcsncoll_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$_wcsncoll_l) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$_wcsncoll_l)
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16sncoll_l,(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),_wcsncoll_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$DOS$_wcsncoll_l)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16sncoll_l,(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),DOS$_wcsncoll_l,(__s1,__s2,__maxlen,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/wchar/wcsncoll_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBDCALL c16sncoll_l)(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncoll_l))((__WCHAR_TYPE__ const *)__s1, (__WCHAR_TYPE__ const *)__s2, __maxlen, __locale); }
@@ -2913,10 +2895,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16sncoll_l, __FORCELOCAL __ATTR_PURE __ATTR_WUN
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsncoll_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBKCALL,c32sncoll_l,(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),wcsncoll_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$wcsncoll_l) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wcsncoll_l)
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32sncoll_l,(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),wcsncoll_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$KOS$wcsncoll_l)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32sncoll_l,(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),KOS$wcsncoll_l,(__s1,__s2,__maxlen,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/wchar/wcsncoll_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBKCALL c32sncoll_l)(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncoll_l))((__WCHAR_TYPE__ const *)__s1, (__WCHAR_TYPE__ const *)__s2, __maxlen, __locale); }
@@ -2926,22 +2906,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32sncoll_l, __FORCELOCAL __ATTR_PURE __ATTR_WUN
 #endif /* !... */
 #if defined(__CRT_HAVE_wcscasecoll_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBDCALL,c16scasecoll_l,(char16_t const *__s1, char16_t const *__s2, __locale_t __locale),wcscasecoll_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$_wcsicoll_l) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$_wcsicoll_l)
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16scasecoll_l,(char16_t const *__s1, char16_t const *__s2, __locale_t __locale),_wcsicoll_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$DOS$_wcsicoll_l)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16scasecoll_l,(char16_t const *__s1, char16_t const *__s2, __locale_t __locale),DOS$_wcsicoll_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE_wcscasecmp_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBDCALL,c16scasecoll_l,(char16_t const *__s1, char16_t const *__s2, __locale_t __locale),wcscasecmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$wcscasecmp_l) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$wcscasecmp_l)
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16scasecoll_l,(char16_t const *__s1, char16_t const *__s2, __locale_t __locale),wcscasecmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$DOS$wcscasecmp_l)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16scasecoll_l,(char16_t const *__s1, char16_t const *__s2, __locale_t __locale),DOS$wcscasecmp_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE__wcsicmp_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBDCALL,c16scasecoll_l,(char16_t const *__s1, char16_t const *__s2, __locale_t __locale),_wcsicmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$_wcsicmp_l) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$_wcsicmp_l)
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16scasecoll_l,(char16_t const *__s1, char16_t const *__s2, __locale_t __locale),_wcsicmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$DOS$_wcsicmp_l)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16scasecoll_l,(char16_t const *__s1, char16_t const *__s2, __locale_t __locale),DOS$_wcsicmp_l,(__s1,__s2,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/wchar/wcscasecoll_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBDCALL c16scasecoll_l)(char16_t const *__s1, char16_t const *__s2, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscasecoll_l))((__WCHAR_TYPE__ const *)__s1, (__WCHAR_TYPE__ const *)__s2, __locale); }
@@ -2951,22 +2925,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16scasecoll_l, __FORCELOCAL __ATTR_PURE __ATTR_
 #endif /* !... */
 #if defined(__CRT_HAVE_wcscasecoll_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBKCALL,c32scasecoll_l,(char32_t const *__s1, char32_t const *__s2, __locale_t __locale),wcscasecoll_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$wcscasecoll_l) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wcscasecoll_l)
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32scasecoll_l,(char32_t const *__s1, char32_t const *__s2, __locale_t __locale),wcscasecoll_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$KOS$wcscasecoll_l)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32scasecoll_l,(char32_t const *__s1, char32_t const *__s2, __locale_t __locale),KOS$wcscasecoll_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE_wcscasecmp_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBKCALL,c32scasecoll_l,(char32_t const *__s1, char32_t const *__s2, __locale_t __locale),wcscasecmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$wcscasecmp_l) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wcscasecmp_l)
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32scasecoll_l,(char32_t const *__s1, char32_t const *__s2, __locale_t __locale),wcscasecmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$KOS$wcscasecmp_l)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32scasecoll_l,(char32_t const *__s1, char32_t const *__s2, __locale_t __locale),KOS$wcscasecmp_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE__wcsicmp_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBKCALL,c32scasecoll_l,(char32_t const *__s1, char32_t const *__s2, __locale_t __locale),_wcsicmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$_wcsicmp_l) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$_wcsicmp_l)
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32scasecoll_l,(char32_t const *__s1, char32_t const *__s2, __locale_t __locale),_wcsicmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$KOS$_wcsicmp_l)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32scasecoll_l,(char32_t const *__s1, char32_t const *__s2, __locale_t __locale),KOS$_wcsicmp_l,(__s1,__s2,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/wchar/wcscasecoll_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBKCALL c32scasecoll_l)(char32_t const *__s1, char32_t const *__s2, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscasecoll_l))((__WCHAR_TYPE__ const *)__s1, (__WCHAR_TYPE__ const *)__s2, __locale); }
@@ -2976,22 +2944,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32scasecoll_l, __FORCELOCAL __ATTR_PURE __ATTR_
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsncasecoll_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBDCALL,c16sncasecoll_l,(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),wcsncasecoll_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$_wcsnicoll_l) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$_wcsnicoll_l)
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16sncasecoll_l,(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),_wcsnicoll_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$DOS$_wcsnicoll_l)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16sncasecoll_l,(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),DOS$_wcsnicoll_l,(__s1,__s2,__maxlen,__locale))
 #elif defined(__CRT_HAVE_wcsncasecmp_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBDCALL,c16sncasecoll_l,(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),wcsncasecmp_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$wcsncasecmp_l) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$wcsncasecmp_l)
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16sncasecoll_l,(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),wcsncasecmp_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$DOS$wcsncasecmp_l)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16sncasecoll_l,(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),DOS$wcsncasecmp_l,(__s1,__s2,__maxlen,__locale))
 #elif defined(__CRT_HAVE__wcsnicmp_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBDCALL,c16sncasecoll_l,(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),_wcsnicmp_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$_wcsnicmp_l) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$_wcsnicmp_l)
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16sncasecoll_l,(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),_wcsnicmp_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$DOS$_wcsnicmp_l)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16sncasecoll_l,(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),DOS$_wcsnicmp_l,(__s1,__s2,__maxlen,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/wchar/wcsncasecoll_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBDCALL c16sncasecoll_l)(char16_t const *__s1, char16_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncasecoll_l))((__WCHAR_TYPE__ const *)__s1, (__WCHAR_TYPE__ const *)__s2, __maxlen, __locale); }
@@ -3001,22 +2963,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16sncasecoll_l, __FORCELOCAL __ATTR_PURE __ATTR
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsncasecoll_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBKCALL,c32sncasecoll_l,(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),wcsncasecoll_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$wcsncasecoll_l) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wcsncasecoll_l)
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32sncasecoll_l,(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),wcsncasecoll_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$KOS$wcsncasecoll_l)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32sncasecoll_l,(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),KOS$wcsncasecoll_l,(__s1,__s2,__maxlen,__locale))
 #elif defined(__CRT_HAVE_wcsncasecmp_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBKCALL,c32sncasecoll_l,(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),wcsncasecmp_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$wcsncasecmp_l) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wcsncasecmp_l)
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32sncasecoll_l,(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),wcsncasecmp_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$KOS$wcsncasecmp_l)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32sncasecoll_l,(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),KOS$wcsncasecmp_l,(__s1,__s2,__maxlen,__locale))
 #elif defined(__CRT_HAVE__wcsnicmp_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBKCALL,c32sncasecoll_l,(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),_wcsnicmp_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$_wcsnicmp_l) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$_wcsnicmp_l)
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32sncasecoll_l,(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),_wcsnicmp_l,(__s1,__s2,__maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$KOS$_wcsnicmp_l)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32sncasecoll_l,(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),KOS$_wcsnicmp_l,(__s1,__s2,__maxlen,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/wchar/wcsncasecoll_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBKCALL c32sncasecoll_l)(char32_t const *__s1, char32_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncasecoll_l))((__WCHAR_TYPE__ const *)__s1, (__WCHAR_TYPE__ const *)__s2, __maxlen, __locale); }
@@ -3026,10 +2982,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32sncasecoll_l, __FORCELOCAL __ATTR_PURE __ATTR
 #endif /* !... */
 #if defined(__CRT_HAVE_wcslwr_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,__LIBDCALL,c16slwr_l,(char16_t *__restrict __str, __locale_t __locale),wcslwr_l,(__str,__locale))
-#elif defined(__CRT_HAVE_DOS$_wcslwr_l) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$_wcslwr_l)
 __CREDIRECT_DOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16slwr_l,(char16_t *__restrict __str, __locale_t __locale),_wcslwr_l,(__str,__locale))
-#elif defined(__CRT_HAVE_DOS$DOS$_wcslwr_l)
-__CREDIRECT_DOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16slwr_l,(char16_t *__restrict __str, __locale_t __locale),DOS$_wcslwr_l,(__str,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/wchar/wcslwr_l.h>
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBDCALL c16slwr_l)(char16_t *__restrict __str, __locale_t __locale) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslwr_l))((__WCHAR_TYPE__ *)__str, __locale); }
@@ -3039,10 +2993,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16slwr_l, __FORCELOCAL __ATTR_LEAF __ATTR_RETNO
 #endif /* !... */
 #if defined(__CRT_HAVE_wcslwr_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,__LIBKCALL,c32slwr_l,(char32_t *__restrict __str, __locale_t __locale),wcslwr_l,(__str,__locale))
-#elif defined(__CRT_HAVE_DOS$wcslwr_l) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wcslwr_l)
 __CREDIRECT_KOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32slwr_l,(char32_t *__restrict __str, __locale_t __locale),wcslwr_l,(__str,__locale))
-#elif defined(__CRT_HAVE_DOS$KOS$wcslwr_l)
-__CREDIRECT_KOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32slwr_l,(char32_t *__restrict __str, __locale_t __locale),KOS$wcslwr_l,(__str,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/wchar/wcslwr_l.h>
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL c32slwr_l)(char32_t *__restrict __str, __locale_t __locale) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslwr_l))((__WCHAR_TYPE__ *)__str, __locale); }
@@ -3052,10 +3004,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32slwr_l, __FORCELOCAL __ATTR_LEAF __ATTR_RETNO
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsupr_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,__LIBDCALL,c16supr_l,(char16_t *__restrict __str, __locale_t __locale),wcsupr_l,(__str,__locale))
-#elif defined(__CRT_HAVE_DOS$_wcsupr_l) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$_wcsupr_l)
 __CREDIRECT_DOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16supr_l,(char16_t *__restrict __str, __locale_t __locale),_wcsupr_l,(__str,__locale))
-#elif defined(__CRT_HAVE_DOS$DOS$_wcsupr_l)
-__CREDIRECT_DOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,c16supr_l,(char16_t *__restrict __str, __locale_t __locale),DOS$_wcsupr_l,(__str,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/wchar/wcsupr_l.h>
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBDCALL c16supr_l)(char16_t *__restrict __str, __locale_t __locale) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsupr_l))((__WCHAR_TYPE__ *)__str, __locale); }
@@ -3065,10 +3015,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16supr_l, __FORCELOCAL __ATTR_LEAF __ATTR_RETNO
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsupr_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,__LIBKCALL,c32supr_l,(char32_t *__restrict __str, __locale_t __locale),wcsupr_l,(__str,__locale))
-#elif defined(__CRT_HAVE_DOS$wcsupr_l) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wcsupr_l)
 __CREDIRECT_KOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32supr_l,(char32_t *__restrict __str, __locale_t __locale),wcsupr_l,(__str,__locale))
-#elif defined(__CRT_HAVE_DOS$KOS$wcsupr_l)
-__CREDIRECT_KOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,c32supr_l,(char32_t *__restrict __str, __locale_t __locale),KOS$wcsupr_l,(__str,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/wchar/wcsupr_l.h>
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char32_t *__NOTHROW_NCX(__LIBKCALL c32supr_l)(char32_t *__restrict __str, __locale_t __locale) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsupr_l))((__WCHAR_TYPE__ *)__str, __locale); }
@@ -3112,10 +3060,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_c32memcasecmp_l, __FORCELOCAL __SIZE_TYPE_
 #endif /* !... */
 #if defined(__CRT_HAVE_fuzzy_wcscasecmp_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__LIBDCALL,fuzzy_c16scasecmp_l,(char16_t const *__s1, char16_t const *__s2, __locale_t __locale),fuzzy_wcscasecmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$fuzzy_wcscasecmp_l) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$fuzzy_wcscasecmp_l)
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_c16scasecmp_l,(char16_t const *__s1, char16_t const *__s2, __locale_t __locale),fuzzy_wcscasecmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$DOS$fuzzy_wcscasecmp_l)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_c16scasecmp_l,(char16_t const *__s1, char16_t const *__s2, __locale_t __locale),DOS$fuzzy_wcscasecmp_l,(__s1,__s2,__locale))
 #elif (defined(__CRT_HAVE_fuzzy_wmemcasecmp_l) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 2) || !defined(__NO_MALLOCA)) && (__SIZEOF_WCHAR_T__ == 2)
 #include <local/wchar/fuzzy_wcscasecmp_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL fuzzy_c16scasecmp_l)(char16_t const *__s1, char16_t const *__s2, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wcscasecmp_l))((__WCHAR_TYPE__ const *)__s1, (__WCHAR_TYPE__ const *)__s2, __locale); }
@@ -3125,10 +3071,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_c16scasecmp_l, __FORCELOCAL __ATTR_PURE __
 #endif /* ... */
 #if defined(__CRT_HAVE_fuzzy_wcscasecmp_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__LIBKCALL,fuzzy_c32scasecmp_l,(char32_t const *__s1, char32_t const *__s2, __locale_t __locale),fuzzy_wcscasecmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$fuzzy_wcscasecmp_l) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$fuzzy_wcscasecmp_l)
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_c32scasecmp_l,(char32_t const *__s1, char32_t const *__s2, __locale_t __locale),fuzzy_wcscasecmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE_DOS$KOS$fuzzy_wcscasecmp_l)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_c32scasecmp_l,(char32_t const *__s1, char32_t const *__s2, __locale_t __locale),KOS$fuzzy_wcscasecmp_l,(__s1,__s2,__locale))
 #elif (defined(__CRT_HAVE_fuzzy_wmemcasecmp_l) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 2) || !defined(__NO_MALLOCA)) && (__SIZEOF_WCHAR_T__ == 4)
 #include <local/wchar/fuzzy_wcscasecmp_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL fuzzy_c32scasecmp_l)(char32_t const *__s1, char32_t const *__s2, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wcscasecmp_l))((__WCHAR_TYPE__ const *)__s1, (__WCHAR_TYPE__ const *)__s2, __locale); }
@@ -3138,10 +3082,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_c32scasecmp_l, __FORCELOCAL __ATTR_PURE __
 #endif /* ... */
 #if defined(__CRT_HAVE_fuzzy_wcsncasecmp_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__LIBDCALL,fuzzy_c16sncasecmp_l,(char16_t const *__s1, __SIZE_TYPE__ __s1_maxlen, char16_t const *__s2, __SIZE_TYPE__ __s2_maxlen, __locale_t __locale),fuzzy_wcsncasecmp_l,(__s1,__s1_maxlen,__s2,__s2_maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$fuzzy_wcsncasecmp_l) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$fuzzy_wcsncasecmp_l)
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_c16sncasecmp_l,(char16_t const *__s1, __SIZE_TYPE__ __s1_maxlen, char16_t const *__s2, __SIZE_TYPE__ __s2_maxlen, __locale_t __locale),fuzzy_wcsncasecmp_l,(__s1,__s1_maxlen,__s2,__s2_maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$DOS$fuzzy_wcsncasecmp_l)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_c16sncasecmp_l,(char16_t const *__s1, __SIZE_TYPE__ __s1_maxlen, char16_t const *__s2, __SIZE_TYPE__ __s2_maxlen, __locale_t __locale),DOS$fuzzy_wcsncasecmp_l,(__s1,__s1_maxlen,__s2,__s2_maxlen,__locale))
 #elif (defined(__CRT_HAVE_fuzzy_wmemcasecmp_l) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 2) || !defined(__NO_MALLOCA)) && (__SIZEOF_WCHAR_T__ == 2)
 #include <local/wchar/fuzzy_wcsncasecmp_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL fuzzy_c16sncasecmp_l)(char16_t const *__s1, __SIZE_TYPE__ __s1_maxlen, char16_t const *__s2, __SIZE_TYPE__ __s2_maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wcsncasecmp_l))((__WCHAR_TYPE__ const *)__s1, __s1_maxlen, (__WCHAR_TYPE__ const *)__s2, __s2_maxlen, __locale); }
@@ -3151,10 +3093,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_c16sncasecmp_l, __FORCELOCAL __ATTR_PURE _
 #endif /* ... */
 #if defined(__CRT_HAVE_fuzzy_wcsncasecmp_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__LIBKCALL,fuzzy_c32sncasecmp_l,(char32_t const *__s1, __SIZE_TYPE__ __s1_maxlen, char32_t const *__s2, __SIZE_TYPE__ __s2_maxlen, __locale_t __locale),fuzzy_wcsncasecmp_l,(__s1,__s1_maxlen,__s2,__s2_maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$fuzzy_wcsncasecmp_l) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$fuzzy_wcsncasecmp_l)
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_c32sncasecmp_l,(char32_t const *__s1, __SIZE_TYPE__ __s1_maxlen, char32_t const *__s2, __SIZE_TYPE__ __s2_maxlen, __locale_t __locale),fuzzy_wcsncasecmp_l,(__s1,__s1_maxlen,__s2,__s2_maxlen,__locale))
-#elif defined(__CRT_HAVE_DOS$KOS$fuzzy_wcsncasecmp_l)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,fuzzy_c32sncasecmp_l,(char32_t const *__s1, __SIZE_TYPE__ __s1_maxlen, char32_t const *__s2, __SIZE_TYPE__ __s2_maxlen, __locale_t __locale),KOS$fuzzy_wcsncasecmp_l,(__s1,__s1_maxlen,__s2,__s2_maxlen,__locale))
 #elif (defined(__CRT_HAVE_fuzzy_wmemcasecmp_l) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 2) || !defined(__NO_MALLOCA)) && (__SIZEOF_WCHAR_T__ == 4)
 #include <local/wchar/fuzzy_wcsncasecmp_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL fuzzy_c32sncasecmp_l)(char32_t const *__s1, __SIZE_TYPE__ __s1_maxlen, char32_t const *__s2, __SIZE_TYPE__ __s2_maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wcsncasecmp_l))((__WCHAR_TYPE__ const *)__s1, __s1_maxlen, (__WCHAR_TYPE__ const *)__s2, __s2_maxlen, __locale); }
@@ -3164,10 +3104,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_c32sncasecmp_l, __FORCELOCAL __ATTR_PURE _
 #endif /* ... */
 #if defined(__CRT_HAVE_wildwcscasecmp_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBDCALL,wildc16scasecmp_l,(char16_t const *__pattern, char16_t const *__string, __locale_t __locale),wildwcscasecmp_l,(__pattern,__string,__locale))
-#elif defined(__CRT_HAVE_DOS$wildwcscasecmp_l) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$wildwcscasecmp_l)
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wildc16scasecmp_l,(char16_t const *__pattern, char16_t const *__string, __locale_t __locale),wildwcscasecmp_l,(__pattern,__string,__locale))
-#elif defined(__CRT_HAVE_DOS$DOS$wildwcscasecmp_l)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wildc16scasecmp_l,(char16_t const *__pattern, char16_t const *__string, __locale_t __locale),DOS$wildwcscasecmp_l,(__pattern,__string,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/wchar/wildwcscasecmp_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBDCALL wildc16scasecmp_l)(char16_t const *__pattern, char16_t const *__string, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wildwcscasecmp_l))((__WCHAR_TYPE__ const *)__pattern, (__WCHAR_TYPE__ const *)__string, __locale); }
@@ -3177,10 +3115,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wildc16scasecmp_l, __FORCELOCAL __ATTR_PURE __AT
 #endif /* !... */
 #if defined(__CRT_HAVE_wildwcscasecmp_l) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__LIBKCALL,wildc32scasecmp_l,(char32_t const *__pattern, char32_t const *__string, __locale_t __locale),wildwcscasecmp_l,(__pattern,__string,__locale))
-#elif defined(__CRT_HAVE_DOS$wildwcscasecmp_l) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$wildwcscasecmp_l)
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wildc32scasecmp_l,(char32_t const *__pattern, char32_t const *__string, __locale_t __locale),wildwcscasecmp_l,(__pattern,__string,__locale))
-#elif defined(__CRT_HAVE_DOS$KOS$wildwcscasecmp_l)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wildc32scasecmp_l,(char32_t const *__pattern, char32_t const *__string, __locale_t __locale),KOS$wildwcscasecmp_l,(__pattern,__string,__locale))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/wchar/wildwcscasecmp_l.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBKCALL wildc32scasecmp_l)(char32_t const *__pattern, char32_t const *__string, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wildwcscasecmp_l))((__WCHAR_TYPE__ const *)__pattern, (__WCHAR_TYPE__ const *)__string, __locale); }

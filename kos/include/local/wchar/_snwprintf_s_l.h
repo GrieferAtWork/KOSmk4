@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53d1f63f */
+/* HASH CRC-32:0x8a4ab9b4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE__vsnwprintf_s_l
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnwprintf_s_l,(__WCHAR_TYPE__ *__dst, __SIZE_TYPE__ __wchar_count, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vsnwprintf_s_l,(__dst,__wchar_count,__bufsize,__format,__locale,__args))
 #elif defined(__CRT_HAVE_DOS$_vsnwprintf_s_l) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnwprintf_s_l,(__CHAR32_TYPE__ *__dst, __SIZE_TYPE__ __wchar_count, __SIZE_TYPE__ __bufsize, __CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vsnwprintf_s_l,(__dst,__wchar_count,__bufsize,__format,__locale,__args))
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnwprintf_s_l,(__WCHAR_TYPE__ *__dst, __SIZE_TYPE__ __wchar_count, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vsnwprintf_s_l,(__dst,__wchar_count,__bufsize,__format,__locale,__args))
 #elif defined(__CRT_HAVE_DOS$_vsnwprintf_s_l) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnwprintf_s_l,(__CHAR16_TYPE__ *__dst, __SIZE_TYPE__ __wchar_count, __SIZE_TYPE__ __bufsize, __CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vsnwprintf_s_l,(__dst,__wchar_count,__bufsize,__format,__locale,__args))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnwprintf_s_l,(__WCHAR_TYPE__ *__dst, __SIZE_TYPE__ __wchar_count, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vsnwprintf_s_l,(__dst,__wchar_count,__bufsize,__format,__locale,__args))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/_vsnwprintf_s_l.h>

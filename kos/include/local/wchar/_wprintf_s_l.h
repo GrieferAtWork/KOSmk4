@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe799975f */
+/* HASH CRC-32:0x2020e839 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE__vwprintf_s_l
 __CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_s_l,(__WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwprintf_s_l,(__format,__locale,__args))
 #elif defined(__CRT_HAVE_DOS$_vwprintf_s_l) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_s_l,(__CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwprintf_s_l,(__format,__locale,__args))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_s_l,(__WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwprintf_s_l,(__format,__locale,__args))
 #elif defined(__CRT_HAVE_DOS$_vwprintf_s_l) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_s_l,(__CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwprintf_s_l,(__format,__locale,__args))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_s_l,(__WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwprintf_s_l,(__format,__locale,__args))
 #elif defined(__CRT_HAVE_vwprintf) || (defined(__CRT_HAVE_DOS$vwprintf) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$vwprintf) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_vfwprintf) || (defined(__CRT_HAVE_DOS$vfwprintf) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$vfwprintf) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE_DOS$file_wprinter_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$file_wprinter_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_file_wprinter) || (defined(__CRT_HAVE_DOS$file_wprinter) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$file_wprinter) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_file_wprinter_unlocked) || (defined(__CRT_HAVE_DOS$file_wprinter_unlocked) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$file_wprinter_unlocked) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_fputwc) || (defined(__CRT_HAVE_DOS$fputwc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$fputwc) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_putwc) || (defined(__CRT_HAVE_DOS$putwc) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$putwc) && __SIZEOF_WCHAR_T__ == 2)) && !defined(__NO_STDSTREAMS))
 __NAMESPACE_LOCAL_END
 #include <local/wchar/_vwprintf_s_l.h>

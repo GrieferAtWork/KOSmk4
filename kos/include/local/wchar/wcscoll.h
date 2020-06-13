@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf019625 */
+/* HASH CRC-32:0x8c83956d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,10 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_DOS$wcscmp) && __SIZEOF_WCHAR_T__ == 4
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2),wcscmp,(__s1,__s2))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_DOS$wcscmp) && __SIZEOF_WCHAR_T__ == 2
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2),wcscmp,(__s1,__s2))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscmp,(__s1,__s2))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcscmp.h>

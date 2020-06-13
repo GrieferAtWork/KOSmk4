@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2da77cd1 */
+/* HASH CRC-32:0x5cc91ddd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,12 +34,12 @@ __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64tow_s,(__
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__LIBCCALL,__localdep__i64tow_s,(__INT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),KOS$_i64tow_s,(__val,__buf,__buflen,__radix))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64tow_s,(__INT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64tow_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE_DOS$_i64tow_s) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__LIBCCALL,__localdep__i64tow_s,(__INT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),DOS$_i64tow_s,(__val,__buf,__buflen,__radix))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64tow_s,(__INT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64tow_s,(__val,__buf,__buflen,__radix))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/stdlib/_i64tow_s.h>

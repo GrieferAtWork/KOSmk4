@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1780ee63 */
+/* HASH CRC-32:0x7e44e551 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,21 +146,15 @@ __NAMESPACE_LOCAL_BEGIN
  * is allowed to call `PRINTER' as often as it chooses */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
 #elif defined(__CRT_HAVE_DOS$format_wrepeat) && __SIZEOF_WCHAR_T__ == 4
-__NAMESPACE_LOCAL_END
-#include <bits/uformat-printer.h>
-__NAMESPACE_LOCAL_BEGIN
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
 #elif defined(__CRT_HAVE_DOS$format_wrepeat) && __SIZEOF_WCHAR_T__ == 2
-__NAMESPACE_LOCAL_END
-#include <bits/uformat-printer.h>
-__NAMESPACE_LOCAL_BEGIN
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_wrepeat.h>
@@ -222,7 +216,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_whex
  * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBCCALL,__localdep_format_whexdump,(__pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),KOS$format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_whexdump,(__pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
 #elif defined(__CRT_HAVE_DOS$format_whexdump) && __SIZEOF_WCHAR_T__ == 2
 /* Print a hex dump of the given data using the provided format printer
  * @param: PRINTER:  A function called for all quoted portions of the text
@@ -233,7 +227,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBCC
  * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBCCALL,__localdep_format_whexdump,(__pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),DOS$format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_whexdump,(__pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_whexdump.h>
@@ -364,7 +358,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wesc
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBCCALL,__localdep_format_wescape,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),KOS$format_wescape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wescape,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_DOS$format_wescape) && __SIZEOF_WCHAR_T__ == 2
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -379,7 +373,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBCC
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBCCALL,__localdep_format_wescape,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),DOS$format_wescape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wescape,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_wescape.h>
@@ -427,10 +421,10 @@ __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__local
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_wwidth,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wwidth) && __SIZEOF_WCHAR_T__ == 4
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_wwidth,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_wwidth,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wwidth) && __SIZEOF_WCHAR_T__ == 2
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_wwidth,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_wwidth,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_wwidth.h>
@@ -460,7 +454,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBDCALL,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif defined(__CRT_HAVE_DOS$format_wescape) && defined(__LIBCCALL_IS_LIBDCALL)
+#elif defined(__CRT_HAVE_DOS$format_wescape)
 __NAMESPACE_LOCAL_END
 #include <bits/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -478,24 +472,6 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif defined(__CRT_HAVE_DOS$DOS$format_wescape)
-__NAMESPACE_LOCAL_END
-#include <bits/uformat-printer.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Do C-style escape on the given text, printing it to the given printer.
- * Input:
- * >> Hello "World" W
- * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
- * This function escapes all control and non-ascii characters,
- * preferring octal encoding for control characters and hex-encoding
- * for other non-ascii characters, a behavior that may be modified
- * with the `FORMAT_ESCAPE_FFORCE*' flags
- * @param: PRINTER: A function called for all quoted portions of the text
- * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),DOS$format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 __NAMESPACE_LOCAL_END
 #include <bits/uformat-printer.h>
@@ -572,7 +548,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__LIBKCALL,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif defined(__CRT_HAVE_DOS$format_wescape) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_DOS$format_wescape)
 __NAMESPACE_LOCAL_END
 #include <bits/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -590,24 +566,6 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif defined(__CRT_HAVE_DOS$KOS$format_wescape)
-__NAMESPACE_LOCAL_END
-#include <bits/uformat-printer.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Do C-style escape on the given text, printing it to the given printer.
- * Input:
- * >> Hello "World" W
- * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
- * This function escapes all control and non-ascii characters,
- * preferring octal encoding for control characters and hex-encoding
- * for other non-ascii characters, a behavior that may be modified
- * with the `FORMAT_ESCAPE_FFORCE*' flags
- * @param: PRINTER: A function called for all quoted portions of the text
- * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),KOS$format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 __NAMESPACE_LOCAL_END
 #include <bits/uformat-printer.h>

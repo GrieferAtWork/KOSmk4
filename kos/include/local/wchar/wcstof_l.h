@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x481e7400 */
+/* HASH CRC-32:0xf2fa333b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcstof
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_wcstof,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstof,(__nptr,__endptr))
 #elif defined(__CRT_HAVE_DOS$wcstof) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_wcstof,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr),wcstof,(__nptr,__endptr))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_wcstof,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstof,(__nptr,__endptr))
 #elif defined(__CRT_HAVE_DOS$wcstof) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_wcstof,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr),wcstof,(__nptr,__endptr))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_wcstof,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstof,(__nptr,__endptr))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcstof.h>

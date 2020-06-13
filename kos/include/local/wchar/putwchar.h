@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef89935e */
+/* HASH CRC-32:0x220889d3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,15 +29,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_fputwc
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__CHAR32_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__CHAR16_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$putwc) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__CHAR32_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$putwc) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__CHAR16_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
 #else /* ... */
 #undef __local___localdep_fputwc_defined
 #endif /* !... */

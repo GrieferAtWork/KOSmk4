@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cb61780 */
+/* HASH CRC-32:0xafbd9567 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wctomb
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __WCHAR_TYPE__ __wc),wctomb,(__str,__wc))
 #elif defined(__CRT_HAVE_DOS$wctomb) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(,int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __CHAR32_TYPE__ __wc),wctomb,(__str,__wc))
+__CREDIRECT_KOS(,int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __WCHAR_TYPE__ __wc),wctomb,(__str,__wc))
 #elif defined(__CRT_HAVE_DOS$wctomb) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(,int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __CHAR16_TYPE__ __wc),wctomb,(__str,__wc))
+__CREDIRECT_DOS(,int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __WCHAR_TYPE__ __wc),wctomb,(__str,__wc))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/stdlib/wctomb.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4aac7adf */
+/* HASH CRC-32:0xe2c56772 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,11 +43,11 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHA
 #elif defined(__CRT_HAVE_DOS$wtruncate64) && __SIZEOF_WCHAR_T__ == 4
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBCCALL,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),KOS$wtruncate64,(__file,__length))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
 #elif defined(__CRT_HAVE_DOS$wtruncate64) && __SIZEOF_WCHAR_T__ == 2
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBCCALL,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),DOS$wtruncate64,(__file,__length))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
 #elif defined(__CRT_HAVE_wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -55,11 +55,11 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHA
 #elif defined(__CRT_HAVE_DOS$wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && __SIZEOF_WCHAR_T__ == 4
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBCCALL,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),KOS$wtruncate,(__file,__length))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
 #elif defined(__CRT_HAVE_DOS$wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && __SIZEOF_WCHAR_T__ == 2
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBCCALL,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),DOS$wtruncate,(__file,__length))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
 #elif defined(__CRT_HAVE_wtruncate) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.unistd/wtruncate64.h>
@@ -154,11 +154,11 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate32,(__WCHA
 #elif defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 4
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBCCALL,__localdep_wtruncate32,(__WCHAR_TYPE__ const *__file, __pos32_t __length),KOS$wtruncate,(__file,__length))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate32,(__WCHAR_TYPE__ const *__file, __pos32_t __length),wtruncate,(__file,__length))
 #elif defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 2
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBCCALL,__localdep_wtruncate32,(__WCHAR_TYPE__ const *__file, __pos32_t __length),DOS$wtruncate,(__file,__length))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate32,(__WCHAR_TYPE__ const *__file, __pos32_t __length),wtruncate,(__file,__length))
 #else /* ... */
 #undef __local___localdep_wtruncate32_defined
 #endif /* !... */

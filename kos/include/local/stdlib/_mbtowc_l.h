@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc95dd194 */
+/* HASH CRC-32:0x7e02312 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_mbtowc
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_mbtowc,(__WCHAR_TYPE__ *__restrict __pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen),mbtowc,(__pwc,__str,__maxlen))
 #elif defined(__CRT_HAVE_DOS$mbtowc) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(,int,__NOTHROW_NCX,__localdep_mbtowc,(__CHAR32_TYPE__ *__restrict __pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen),mbtowc,(__pwc,__str,__maxlen))
+__CREDIRECT_KOS(,int,__NOTHROW_NCX,__localdep_mbtowc,(__WCHAR_TYPE__ *__restrict __pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen),mbtowc,(__pwc,__str,__maxlen))
 #elif defined(__CRT_HAVE_DOS$mbtowc) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(,int,__NOTHROW_NCX,__localdep_mbtowc,(__CHAR16_TYPE__ *__restrict __pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen),mbtowc,(__pwc,__str,__maxlen))
+__CREDIRECT_DOS(,int,__NOTHROW_NCX,__localdep_mbtowc,(__WCHAR_TYPE__ *__restrict __pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen),mbtowc,(__pwc,__str,__maxlen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/stdlib/mbtowc.h>

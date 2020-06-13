@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23ea3c05 */
+/* HASH CRC-32:0xbba352c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,11 +33,11 @@ __CREDIRECT(,__WCHAR_TYPE__ *,__NOTHROW_RPC,__localdep_wgetcwd,(__WCHAR_TYPE__ *
 #elif defined(__CRT_HAVE_DOS$wgetcwd) && __SIZEOF_WCHAR_T__ == 4
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-__COMPILER_REDIRECT(__LIBC,,__WCHAR_TYPE__ *,__NOTHROW_RPC,__LIBCCALL,__localdep_wgetcwd,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),KOS$wgetcwd,(__buf,__bufsize))
+__CREDIRECT_KOS(,__WCHAR_TYPE__ *,__NOTHROW_RPC,__localdep_wgetcwd,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),wgetcwd,(__buf,__bufsize))
 #elif defined(__CRT_HAVE_DOS$_wgetcwd) && __SIZEOF_WCHAR_T__ == 2
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-__COMPILER_REDIRECT(__LIBC,,__WCHAR_TYPE__ *,__NOTHROW_RPC,__LIBCCALL,__localdep_wgetcwd,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),DOS$_wgetcwd,(__buf,__bufsize))
+__CREDIRECT_DOS(,__WCHAR_TYPE__ *,__NOTHROW_RPC,__localdep_wgetcwd,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),_wgetcwd,(__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_wgetcwd_defined
 #endif /* !... */

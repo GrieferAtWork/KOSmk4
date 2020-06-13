@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22ebdade */
+/* HASH CRC-32:0x406efee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wexecvpe
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecvpe,(__WCHAR_TYPE__ const *__restrict __file, __TWARGV, __TWENVP),wexecvpe,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$wexecvpe) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecvpe,(__CHAR32_TYPE__ const *__restrict __file, __T32ARGV, __T32ENVP),wexecvpe,(__path,___argv,___envp))
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecvpe,(__WCHAR_TYPE__ const *__restrict __file, __TWARGV, __TWENVP),wexecvpe,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$_wexecvpe) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecvpe,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV, __T16ENVP),_wexecvpe,(__path,___argv,___envp))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecvpe,(__WCHAR_TYPE__ const *__restrict __file, __TWARGV, __TWENVP),_wexecvpe,(__path,___argv,___envp))
 #else /* ... */
 #undef __local___localdep_wexecvpe_defined
 #endif /* !... */

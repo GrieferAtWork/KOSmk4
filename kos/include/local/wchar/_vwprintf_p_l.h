@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab9c4b73 */
+/* HASH CRC-32:0xe9f8e51b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE__vwprintf_p
 __CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_p,(__WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vwprintf_p,(__format,__args))
 #elif defined(__CRT_HAVE_DOS$_vwprintf_p) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_p,(__CHAR32_TYPE__ const *__format, __builtin_va_list __args),_vwprintf_p,(__format,__args))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_p,(__WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vwprintf_p,(__format,__args))
 #elif defined(__CRT_HAVE_DOS$_vwprintf_p) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_p,(__CHAR16_TYPE__ const *__format, __builtin_va_list __args),_vwprintf_p,(__format,__args))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwprintf_p,(__WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vwprintf_p,(__format,__args))
 #elif !defined(__NO_STDSTREAMS)
 __NAMESPACE_LOCAL_END
 #include <local/wchar/_vwprintf_p.h>

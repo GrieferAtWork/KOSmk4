@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb61f856 */
+/* HASH CRC-32:0xd96e6f46 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,12 +34,12 @@ __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultow_s,(uns
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__LIBCCALL,__localdep__ultow_s,(unsigned long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),KOS$_ultow_s,(__val,__buf,__buflen,__radix))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultow_s,(unsigned long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_ultow_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE_DOS$_ultow_s) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__LIBCCALL,__localdep__ultow_s,(unsigned long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),DOS$_ultow_s,(__val,__buf,__buflen,__radix))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultow_s,(unsigned long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_ultow_s,(__val,__buf,__buflen,__radix))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/stdlib/_ultow_s.h>

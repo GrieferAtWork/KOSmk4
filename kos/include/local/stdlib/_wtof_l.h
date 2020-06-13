@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3485f811 */
+/* HASH CRC-32:0x6240f28d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,15 +28,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcstod_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),wcstod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstod_l) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, __locale_t __locale),wcstod_l,(__nptr,__endptr,__locale))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),wcstod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE_DOS$_wcstod_l) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __locale_t __locale),_wcstod_l,(__nptr,__endptr,__locale))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),_wcstod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE___wcstod_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),__wcstod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE_DOS$__wcstod_l) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, __locale_t __locale),__wcstod_l,(__nptr,__endptr,__locale))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),__wcstod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE_DOS$__wcstod_l) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __locale_t __locale),__wcstod_l,(__nptr,__endptr,__locale))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),__wcstod_l,(__nptr,__endptr,__locale))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcstod_l.h>
