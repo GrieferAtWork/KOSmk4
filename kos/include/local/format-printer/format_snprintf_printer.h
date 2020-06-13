@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ddc2a00 */
+/* HASH CRC-32:0xa6ba6c84 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,13 +45,13 @@ __NAMESPACE_LOCAL_BEGIN
  *       the sum of return values of all calls to `format_snprintf_printer()' */
 __LOCAL_LIBC(format_snprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_snprintf_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
-	struct format_snprintf_data_ {
+	struct __format_snprintf_data_ {
 		char   *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__  __sd_bufsiz; /* Remaining buffer size. */
 	};
-	struct format_snprintf_data_ *__ctrl;
+	struct __format_snprintf_data_ *__ctrl;
 	__SIZE_TYPE__ __result = __datalen;
-	__ctrl = (struct format_snprintf_data_ *)__arg;
+	__ctrl = (struct __format_snprintf_data_ *)__arg;
 	if (__result > __ctrl->__sd_bufsiz)
 		__result = __ctrl->__sd_bufsiz;
 	__localdep_memcpyc(__ctrl->__sd_buffer, __data, __result, sizeof(char));

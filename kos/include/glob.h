@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x270a960f */
+/* HASH CRC-32:0xb8449b63 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -158,7 +158,10 @@ typedef struct __glob64_struct {
 #endif /* __USE_LARGEFILE64 */
 
 
+#ifndef ____glob_errfunc_t_defined
+#define ____glob_errfunc_t_defined 1
 typedef int (__LIBCCALL *__glob_errfunc_t)(char const *__path, int __flags);
+#endif /* !____glob_errfunc_t_defined */
 
 #if defined(__CRT_HAVE_glob64) && defined(__USE_FILE_OFFSET64)
 /* Do glob searching for PATTERN, placing results in PGLOB.

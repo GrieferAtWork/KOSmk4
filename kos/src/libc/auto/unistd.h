@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41d0b5a3 */
+/* HASH CRC-32:0xdca157fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,8 +32,8 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_getpagesize)(void);
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void);
+INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_getpagesize)(void);
+INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void);
 /* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */

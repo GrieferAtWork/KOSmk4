@@ -197,11 +197,11 @@ done:
 }
 /*[[[end:libc_fdopendir]]]*/
 
-/*[[[head:libc_seekdir,hash:CRC-32=0x80f1244e]]]*/
+/*[[[head:libc_seekdir,hash:CRC-32=0x1bdc7219]]]*/
 /* Get the directory stream position */
 INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_seekdir)(DIR *__restrict dirp,
-                                   long int pos)
+                                   longptr_t pos)
 /*[[[body:libc_seekdir]]]*/
 {
 	if likely(dirp) {

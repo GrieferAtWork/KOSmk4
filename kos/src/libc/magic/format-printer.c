@@ -817,23 +817,23 @@ $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
                         [[nonnull]] char const *__restrict format,
                         $va_list args) {
 #ifndef __INTELLISENSE__
-#define __FORMAT_PRINTER            printer
-#define __FORMAT_ARG                arg
-#define __FORMAT_FORMAT             format
-#define __FORMAT_ARGS               args
-#define __CHAR_TYPE                 char
-#define __CHAR_SIZE                 __SIZEOF_CHAR__
-#define __FORMAT_REPEAT             format_repeat
-#define __FORMAT_HEXDUMP            format_hexdump
-#define __FORMAT_WIDTH              format_width
-#define __FORMAT_ESCAPE             format_escape
-#define __FORMAT_WIDTH16            format_c16width
-#define __FORMAT_WIDTH32            format_c32width
-#define __FORMAT_ESCAPE16           format_c16escape
-#define __FORMAT_ESCAPE32           format_c32escape
-#define __FORMAT_UNICODE_WRITECHAR  unicode_writeutf8
-#define __FORMAT_UNICODE_FORMAT16   format_16to8
-#define __FORMAT_UNICODE_FORMAT32   format_32to8
+#define __FORMAT_PRINTER           printer
+#define __FORMAT_ARG               arg
+#define __FORMAT_FORMAT            format
+#define __FORMAT_ARGS              args
+#define __CHAR_TYPE                char
+#define __CHAR_SIZE                __SIZEOF_CHAR__
+#define __FORMAT_REPEAT            format_repeat
+#define __FORMAT_HEXDUMP           format_hexdump
+#define __FORMAT_WIDTH             format_width
+#define __FORMAT_ESCAPE            format_escape
+#define __FORMAT_WIDTH16           format_c16width
+#define __FORMAT_WIDTH32           format_c32width
+#define __FORMAT_ESCAPE16          format_c16escape
+#define __FORMAT_ESCAPE32          format_c32escape
+#define __FORMAT_UNICODE_WRITECHAR unicode_writeutf8
+#define __FORMAT_UNICODE_FORMAT16  format_16to8
+#define __FORMAT_UNICODE_FORMAT32  format_32to8
 #include <local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }
@@ -946,13 +946,13 @@ struct format_snprintf_data {
 [[kernel]]
 $ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ void *arg,
                                  [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
-	struct format_snprintf_data_ {
+	struct __format_snprintf_data_ {
 		char   *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		size_t  sd_bufsiz; /* Remaining buffer size. */
 	};
-	struct format_snprintf_data_ *ctrl;
+	struct __format_snprintf_data_ *ctrl;
 	size_t result = datalen;
-	ctrl = (struct format_snprintf_data_ *)arg;
+	ctrl = (struct __format_snprintf_data_ *)arg;
 	if (result > ctrl->sd_bufsiz)
 		result = ctrl->sd_bufsiz;
 	memcpyc(ctrl->sd_buffer, data, result, sizeof(char));
@@ -1029,14 +1029,14 @@ struct format_aprintf_data {
 }
 
 %[define(DEFINE_FORMAT_APRINTF_DATA =
-#ifndef __format_aprintf_data_defined
+@@pp_ifndef __format_aprintf_data_defined@@
 #define __format_aprintf_data_defined 1
 struct format_aprintf_data {
-	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+	char         *@ap_base@;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ @ap_avail@; /* Unused buffer size */
+	__SIZE_TYPE__ @ap_used@;  /* Used buffer size */
 };
-#endif /* !__format_aprintf_data_defined */
+@@pp_endif@@
 )]
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7e8dbef */
+/* HASH CRC-32:0x770eeae5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,12 +43,12 @@ NOTHROW_NCX(LIBCCALL libc__pipe)(fd_t pipedes[2],
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED int64_t
 NOTHROW_NCX(LIBCCALL libc__filelengthi64)(fd_t fd) {
 	int64_t oldpos, result;
-	oldpos = libc_lseek64(fd, 0, SEEK_CUR);
+	oldpos = libc_lseek64(fd, 0, __SEEK_CUR);
 	if unlikely(oldpos < 0)
 		return -1;
-	result = libc_lseek64(fd, 0, SEEK_END);
+	result = libc_lseek64(fd, 0, __SEEK_END);
 	if likely(result >= 0)
-		libc_lseek64(fd, oldpos, SEEK_SET);
+		libc_lseek64(fd, oldpos, __SEEK_SET);
 	return result;
 }
 #include <asm/stdio.h>

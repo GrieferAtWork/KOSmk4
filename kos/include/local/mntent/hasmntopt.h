@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a962a70 */
+/* HASH CRC-32:0x4aa5dd41 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,7 +85,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hasmntopt))(struct mntent const *__mn
 		__SIZE_TYPE__ __optlen = __localdep_strlen(__opt);
 		while (*__str) {
 			if (__localdep_memcmp(__str, __opt, __optlen * sizeof(char)) == 0 &&
-			   (__str[__optlen] == ',' || __str[__optlen] == '\0'))
+			    (__str[__optlen] == ',' || __str[__optlen] == '\0'))
 				return __str;
 			__str = __localdep_strchrnul(__str, ',');
 		}

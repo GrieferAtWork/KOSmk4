@@ -2658,7 +2658,6 @@
 #define __CRT_HAVE_localtime_r 1
 #define __CRT_HAVE_lockf 1
 #define __CRT_HAVE_lockf64 1
-#define __CRT_HAVE_locking 1
 #define __CRT_HAVE_log 1
 #define __CRT_HAVE_log10 1
 #define __CRT_HAVE_log10f 1

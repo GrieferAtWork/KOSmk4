@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf87587f7 */
+/* HASH CRC-32:0xd8f6f3ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_lchown_defined 1
 #include <__crt.h>
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_fchownat)
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fchownat from unistd */
 #if !defined(__local___localdep_fchownat_defined) && defined(__CRT_HAVE_fchownat)

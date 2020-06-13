@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x511f2a7d */
+/* HASH CRC-32:0xb7a6e652 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,6 +109,10 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fgetc_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetc_defined */
+__NAMESPACE_LOCAL_END
+#include <asm/stdio.h>
+#include <hybrid/__assert.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getdelim) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(getdelim))(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream) __THROWS(...) {
 	int __ch;
@@ -122,7 +126,7 @@ __LOCAL_LIBC(getdelim) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__
 			__SIZE_TYPE__ __new_bufsize = __bufsize * 2;
 			if (__new_bufsize <= __result + 1)
 				__new_bufsize = 16;
-			__assert(__new_bufsize > __result + 1);
+			__hybrid_assert(__new_bufsize > __result + 1);
 			__buffer = (char *)__localdep_realloc(__buffer,
 			                         __new_bufsize *
 			                         sizeof(char));

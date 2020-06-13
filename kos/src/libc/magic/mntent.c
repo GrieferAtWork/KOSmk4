@@ -130,7 +130,7 @@ char *hasmntopt([[nullable]] struct mntent const *mnt,
 		size_t optlen = strlen(opt);
 		while (*str) {
 			if (memcmp(str, opt, optlen * sizeof(char)) == 0 &&
-			   (str[optlen] == ',' || str[optlen] == '\0'))
+			    (str[optlen] == ',' || str[optlen] == '\0'))
 				return str;
 			str = strchrnul(str, ',');
 		}

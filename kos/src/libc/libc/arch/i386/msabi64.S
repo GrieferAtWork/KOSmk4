@@ -22,6 +22,7 @@
 
 #include <hybrid/compiler.h>
 
+#if 0 /* TODO */
 #include <asm/cfi.h>
 #include <bits/types.h>
 
@@ -627,5 +628,6 @@ for (local n: [1:CRT_MAX_ALIASES]) {
 #ifndef __INTELLISENSE__
 #include "../../../../../include/crt-features/crt-kos-functions.h"
 #endif /* !__INTELLISENSE__ */
+#endif
 
 #endif /* !GUARD_LIBC_LIBC_ARCH_I386_MSABI64_S */

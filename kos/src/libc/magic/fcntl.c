@@ -178,7 +178,7 @@ int fallocate32($fd_t fd, int mode, $off64_t offset, $off64_t length);
 
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias(fallocate64)]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fallocate)]]
-[[userimpl, decl_include("<bits/types.h>"), no_crt_self_import]]
+[[userimpl, decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
 int fallocate($fd_t fd, int mode, $off_t offset, $off_t length) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)fd;
@@ -341,11 +341,11 @@ $fd_t openat64($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, .
 int posix_fadvise32($fd_t fd, $off32_t offset, $off32_t length, int advise);
 
 
-[[decl_include("<bits/types.h>"), no_crt_self_import]]
+[[decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fadvise64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fadvise")]]
 [[userimpl, section(".text.crt.io.utility")]]
-posix_fadvise:($fd_t fd, $off_t offset, $off_t length, int advise) -> int {
+int posix_fadvise($fd_t fd, $off_t offset, $off_t length, int advise) {
 @@pp_ifdef __BUILDING_LIBC@@
 	(void)fd;
 	(void)offset;
@@ -368,7 +368,7 @@ posix_fadvise:($fd_t fd, $off_t offset, $off_t length, int advise) -> int {
 [[decl_include("<bits/types.h>"), ignore, nocrt, alias("posix_fallocate")]]
 int posix_fallocate32($fd_t fd, $off32_t offset, $off32_t length);
 
-[[decl_include("<bits/types.h>"), no_crt_self_import]]
+[[decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fallocate64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fallocate")]]
 [[userimpl, section(".text.crt.io.utility")]]
@@ -435,10 +435,10 @@ int crt_locking($fd_t fd, int cmd, $off32_t length);
 [[cp, decl_include("<bits/types.h>"), ignore, nocrt, alias("lockf")]]
 int lockf32($fd_t fd, int cmd, $off32_t length);
 
-[[cp, guard, export_as("_locking", "locking"), no_crt_self_import]]
+[[cp, guard, export_as("_locking"), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("lockf64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("lockf", "_locking", "locking")]]
-[[decl_include("<bits/types.h>"), section(".text.crt.io.lock")]]
+[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("lockf", "_locking")]]
+[[decl_include("<features.h>", "<bits/types.h>"), section(".text.crt.io.lock")]]
 [[userimpl, requires($has_function(lockf64) || $has_function(lockf32) || $has_function(crt_locking))]]
 int lockf($fd_t fd, int cmd, $off_t length) {
 @@pp_if $has_function(lockf64)@@

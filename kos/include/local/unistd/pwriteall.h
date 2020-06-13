@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7531411 */
+/* HASH CRC-32:0xc9efc0fd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,13 +24,14 @@
 #if defined(__CRT_HAVE_pwriteall64) || (defined(__CRT_HAVE_pwriteall) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || defined(__CRT_HAVE_pwrite64) || defined(__CRT_HAVE___pwrite64) || defined(__CRT_HAVE_pwrite) || ((defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS
-#define __PIO_OFFSET     __FS_TYPE(__pos)
-#define __PIO_OFFSET64   __pos64_t
+#define __PIO_OFFSET   __FS_TYPE(__pos)
+#define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS */
-#define __PIO_OFFSET     __FS_TYPE(__off)
-#define __PIO_OFFSET64   __off64_t
+#define __PIO_OFFSET   __FS_TYPE(__off)
+#define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
 #endif
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pwriteall64 from unistd */
 #ifndef __local___localdep_pwriteall64_defined

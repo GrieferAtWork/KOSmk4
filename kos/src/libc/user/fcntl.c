@@ -461,7 +461,7 @@ NOTHROW_RPC(LIBCCALL libc_lockf64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe25f67f1]]]*/
+/*[[[start:exports,hash:CRC-32=0xc774c9c4]]]*/
 DEFINE_PUBLIC_ALIAS(readahead, libc_readahead);
 DEFINE_PUBLIC_ALIAS(sync_file_range, libc_sync_file_range);
 DEFINE_PUBLIC_ALIAS(vmsplice, libc_vmsplice);
@@ -486,7 +486,6 @@ DEFINE_PUBLIC_ALIAS(posix_fallocate, libc_posix_fallocate);
 DEFINE_PUBLIC_ALIAS(posix_fadvise64, libc_posix_fadvise64);
 DEFINE_PUBLIC_ALIAS(posix_fallocate64, libc_posix_fallocate64);
 DEFINE_PUBLIC_ALIAS(_locking, libc_lockf);
-DEFINE_PUBLIC_ALIAS(locking, libc_lockf);
 DEFINE_PUBLIC_ALIAS(lockf, libc_lockf);
 DEFINE_PUBLIC_ALIAS(lockf64, libc_lockf64);
 /*[[[end:exports]]]*/

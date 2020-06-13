@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2943d156 */
+/* HASH CRC-32:0x89ccc789 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1628,13 +1628,13 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(void *arg,
                                                     char16_t const *__restrict data,
                                                     size_t datalen) {
-	struct format_snprintf_data_ {
+	struct __format_snprintf_data_ {
 		char16_t   *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		size_t  sd_bufsiz; /* Remaining buffer size. */
 	};
-	struct format_snprintf_data_ *ctrl;
+	struct __format_snprintf_data_ *ctrl;
 	size_t result = datalen;
-	ctrl = (struct format_snprintf_data_ *)arg;
+	ctrl = (struct __format_snprintf_data_ *)arg;
 	if (result > ctrl->sd_bufsiz)
 		result = ctrl->sd_bufsiz;
 	libc_memcpyc(ctrl->sd_buffer, data, result, sizeof(char16_t));
@@ -1650,13 +1650,13 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(LIBKCALL libc_format_wsnprintf_printer)(void *arg,
                                                     char32_t const *__restrict data,
                                                     size_t datalen) {
-	struct format_snprintf_data_ {
+	struct __format_snprintf_data_ {
 		char32_t   *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		size_t  sd_bufsiz; /* Remaining buffer size. */
 	};
-	struct format_snprintf_data_ *ctrl;
+	struct __format_snprintf_data_ *ctrl;
 	size_t result = datalen;
-	ctrl = (struct format_snprintf_data_ *)arg;
+	ctrl = (struct __format_snprintf_data_ *)arg;
 	if (result > ctrl->sd_bufsiz)
 		result = ctrl->sd_bufsiz;
 	libc_memcpyc(ctrl->sd_buffer, data, result, sizeof(char32_t));

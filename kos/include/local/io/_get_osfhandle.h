@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae6a0fee */
+/* HASH CRC-32:0x2369b7a2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__get_osfhandle_defined
 #define __local__get_osfhandle_defined 1
 #include <__crt.h>
-#ifndef __CRT_DOS
+#ifndef __CRT_DOS_PRIMARY
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_get_osfhandle) __ATTR_PURE __ATTR_WUNUSED __INTPTR_TYPE__
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__get_osfhandle_defined 1
 #define __localdep__get_osfhandle __LIBC_LOCAL_NAME(_get_osfhandle)
 #endif /* !__local___localdep__get_osfhandle_defined */
-#else /* !__CRT_DOS */
+#else /* !__CRT_DOS_PRIMARY */
 #undef __local__get_osfhandle_defined
-#endif /* __CRT_DOS */
+#endif /* __CRT_DOS_PRIMARY */
 #endif /* !__local__get_osfhandle_defined */

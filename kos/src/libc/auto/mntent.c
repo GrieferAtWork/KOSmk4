@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd12a5f9d */
+/* HASH CRC-32:0x574dab94 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt,
 		size_t optlen = libc_strlen(opt);
 		while (*str) {
 			if (libc_memcmp(str, opt, optlen * sizeof(char)) == 0 &&
-			   (str[optlen] == ',' || str[optlen] == '\0'))
+			    (str[optlen] == ',' || str[optlen] == '\0'))
 				return str;
 			str = libc_strchrnul(str, ',');
 		}

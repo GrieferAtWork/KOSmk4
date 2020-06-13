@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc5751b4 */
+/* HASH CRC-32:0x5de690bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_fdatasync_defined
 #define __local_fdatasync_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains

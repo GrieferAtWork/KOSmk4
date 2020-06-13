@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x350c6535 */
+/* HASH CRC-32:0x1e6151ae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -157,7 +157,7 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_pause)(void);
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTDEF WUNUSED long int NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd, int name);
+INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd, int name);
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd);
@@ -180,7 +180,7 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_chown)(char const *file, uid_t
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTDEF NONNULL((1)) long int NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path, int name);
+INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path, __STDC_INT_AS_UINT_T name);
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_link)(char const *from, char const *to);
@@ -206,7 +206,7 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd, void *bu
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd, void const *buf, size_t bufsize);
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
-INTDEF off_t NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd, off_t offset, int whence);
+INTDEF off_t NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd, off_t offset, __STDC_INT_AS_UINT_T whence);
 /* >> isatty(2)
  * @return: 1: Is a tty
  * @return: 0: Not a tty
@@ -226,7 +226,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd);
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_access)(char const *file, int type);
+INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_access)(char const *file, __STDC_INT_AS_UINT_T type);
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_chdir)(char const *path);
@@ -246,7 +246,7 @@ INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd, char const *file, int type, atflag_t flags);
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd, char const *file, __STDC_INT_AS_UINT_T type, atflag_t flags);
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_fchownat)(fd_t dfd, char const *file, uid_t owner, gid_t group, atflag_t flags);
@@ -275,7 +275,7 @@ INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd, 
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
-INTDEF off64_t NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd, off64_t offset, int whence);
+INTDEF off64_t NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd, off64_t offset, __STDC_INT_AS_UINT_T whence);
 /* >> pread(2)
  * Read data from a file at a specific offset */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
@@ -355,7 +355,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_nice)(int inc);
  * @return: * :    Required buffer size (including a trailing \0-character)
  * @return: 1 :    Empty configuration string.
  * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
-INTDEF size_t NOTHROW_NCX(LIBCCALL libc_confstr)(int name, char *buf, size_t buflen);
+INTDEF size_t NOTHROW_NCX(LIBCCALL libc_confstr)(__STDC_INT_AS_UINT_T name, char *buf, size_t buflen);
 /* >> sync(2)
  * Synchronize all disk operations of all mounted file systems and flush
  * unwritten buffers down to the hardware layer, ensuring that modifications
@@ -367,7 +367,7 @@ INTDEF void NOTHROW_RPC(LIBCCALL libc_sync)(void);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setpgrp)(void);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setreuid)(uid_t ruid, uid_t euid);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid, gid_t egid);
-INTDEF WUNUSED long int NOTHROW_NCX(LIBCCALL libc_gethostid)(void);
+INTDEF WUNUSED longptr_t NOTHROW_NCX(LIBCCALL libc_gethostid)(void);
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
@@ -404,7 +404,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name);
 /* >> sethostname(2)
  * Set the name of the hosting machine */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sethostname)(char const *name, size_t len);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_sethostid)(long int id);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_sethostid)(longptr_t id);
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_getdomainname)(char *name, size_t buflen);
@@ -412,14 +412,14 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_getdomainname)(char *name, siz
  * Set the name of the hosting machine's domain */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_setdomainname)(char const *name, size_t len);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_vhangup)(void);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_profil)(unsigned short int *sample_buffer, size_t size, size_t offset, unsigned int scale);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_profil)(uint16_t *sample_buffer, size_t size, size_t offset, unsigned int scale);
 INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_getusershell)(void);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_endusershell)(void);
 INTDEF void NOTHROW_RPC(LIBCCALL libc_setusershell)(void);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_daemon)(int nochdir, int noclose);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_daemon)(__STDC_INT_AS_UINT_T nochdir, __STDC_INT_AS_UINT_T noclose);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file);
-INTDEF long int NOTHROW_RPC(VLIBCCALL libc_syscall)(long int sysno, ...);
-INTDEF __LONG64_TYPE__ NOTHROW_RPC(VLIBCCALL libc_syscall64)(__syscall_ulong_t sysno, ...);
+INTDEF longptr_t NOTHROW_RPC(VLIBCCALL libc_syscall)(longptr_t sysno, ...);
+INTDEF __LONG64_TYPE__ NOTHROW_RPC(VLIBCCALL libc_syscall64)(syscall_ulong_t sysno, ...);
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
@@ -450,7 +450,7 @@ INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);
  * return: -1: [errno=<unchanged>] `NAME' referrs to a maximum or minimum
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTDEF WUNUSED long int NOTHROW_RPC(LIBCCALL libc_sysconf)(int name);
+INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBCCALL libc_sysconf)(__STDC_INT_AS_UINT_T name);
 #endif /* !__KERNEL__ */
 
 DECL_END

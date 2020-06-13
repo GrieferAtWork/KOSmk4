@@ -218,15 +218,15 @@ int _pipe([[nonnull]] $fd_t pipedes[2],
 [[impl_include("<asm/stdio.h>")]]
 [[decl_include("<bits/types.h>"), wunused]]
 [[requires_include("<asm/stdio.h>")]]
-[[requires($has_function(lseek64) && defined(SEEK_CUR) && defined(SEEK_END) && defined(SEEK_SET))]]
+[[requires($has_function(lseek64) && defined(__SEEK_CUR) && defined(__SEEK_END) && defined(__SEEK_SET))]]
 $int64_t _filelengthi64($fd_t fd) {
 	int64_t oldpos, result;
-	oldpos = lseek64(fd, 0, SEEK_CUR);
+	oldpos = lseek64(fd, 0, __SEEK_CUR);
 	if unlikely(oldpos < 0)
 		return -1;
-	result = lseek64(fd, 0, SEEK_END);
+	result = lseek64(fd, 0, __SEEK_END);
 	if likely(result >= 0)
-		lseek64(fd, oldpos, SEEK_SET);
+		lseek64(fd, oldpos, __SEEK_SET);
 	return result;
 }
 
@@ -266,7 +266,7 @@ void _unlock_fhandle($fd_t fd);
 
 
 [[decl_include("<bits/types.h>"), ATTR_PURE, wunused]]
-[[requires(!defined(__CRT_DOS))]]
+[[requires(!defined(__CRT_DOS_PRIMARY))]]
 intptr_t _get_osfhandle($fd_t fd) {
 	COMPILER_IMPURE();
 	return (intptr_t)fd;
@@ -274,7 +274,7 @@ intptr_t _get_osfhandle($fd_t fd) {
 
 
 [[decl_include("<bits/types.h>"), wunused]]
-[[requires(!defined(__CRT_DOS))]]
+[[requires(!defined(__CRT_DOS_PRIMARY))]]
 $fd_t _open_osfhandle(intptr_t osfd, $oflag_t flags) {
 	(void)flags;
 	COMPILER_IMPURE();

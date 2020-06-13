@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeacdce7c */
+/* HASH CRC-32:0xfd07d5c7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,7 +110,7 @@ INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_PURE WUNUSED NONNULL
 NOTHROW_NCX(LIBCCALL libc__msize_dbg)(void *ptr,
                                       int block_type) {
 	(void)block_type;
-	return _msize(ptr);
+	return libc_malloc_usable_size(ptr);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__aligned_msize_dbg)(void *ptr,

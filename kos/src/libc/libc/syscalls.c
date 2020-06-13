@@ -29,6 +29,9 @@
 #include <errno.h>
 #include <stdarg.h>
 
+/* TODO: Replace this file with /kos/src/libc/user/kos.hop.api.c
+ *       -> Consequently, also generate other related files! */
+
 DECL_BEGIN
 
 INTERN ATTR_SECTION(".text.crt.syscall.hop") syscall_slong_t

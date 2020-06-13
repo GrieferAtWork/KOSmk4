@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b1b2867 */
+/* HASH CRC-32:0x191f14d6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_c32lchown_defined 1
 #include <__crt.h>
 #if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wfchownat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || (defined(__CRT_HAVE_DOS$wfchownat) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$KOS$wfchownat))
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32fchownat from parts.uchar.unistd */
 #ifndef __local___localdep_c32fchownat_defined

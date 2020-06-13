@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5a58a70 */
+/* HASH CRC-32:0xb3b31947 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,11 +31,11 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_CONST WUNUSED int
+INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_getpagesize)(void) {
 	return __ARCH_PAGESIZE;
 }
-INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_CONST WUNUSED int
+INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void) {
 #if defined(__KOS__)
 	return 0x7fffffff; /* INT_MAX */

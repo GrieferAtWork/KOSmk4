@@ -1299,6 +1299,7 @@ $FILE *open_memstream(char **bufloc, $size_t *sizeloc);
 [[cp_stdio, wunused, alias("getdelim_unlocked"), export_alias("__getdelim")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("getdelim_unlocked")]]
 [[requires($has_function(realloc) && $has_function(fgetc) && $has_function(ungetc))]]
+[[impl_include("<asm/stdio.h>", "<hybrid/__assert.h>")]]
 $ssize_t getdelim([[nonnull]] char **__restrict lineptr,
                   [[nonnull]] $size_t *__restrict pcount, int delimiter,
                   [[nonnull]] $FILE *__restrict stream) {
@@ -1313,7 +1314,7 @@ $ssize_t getdelim([[nonnull]] char **__restrict lineptr,
 			$size_t new_bufsize = bufsize * 2;
 			if (new_bufsize <= result + 1)
 				new_bufsize = 16;
-			assert(new_bufsize > result + 1);
+			__hybrid_assert(new_bufsize > result + 1);
 			buffer = (char *)realloc(buffer,
 			                         new_bufsize *
 			                         sizeof(char));
@@ -1724,15 +1725,15 @@ int fgetpos64([[nonnull]] $FILE *__restrict stream, [[nonnull]] fpos64_t *__rest
                                               $has_function(crt_fseek))))]]
 int fsetpos64([[nonnull]] $FILE *__restrict stream,
               [[nonnull]] fpos64_t const *__restrict pos) {
-@@pp_if defined(SEEK_SET) && $has_function(crt_fseeko64)@@
-	return crt_fseeko64(stream, (off64_t)*pos, SEEK_SET);
+@@pp_if defined(__SEEK_SET) && $has_function(crt_fseeko64)@@
+	return crt_fseeko64(stream, (off64_t)*pos, __SEEK_SET);
 @@pp_elif $has_function(crt_fsetpos)@@
 	pos32_t pos32 = (pos32_t)*pos;
 	return crt_fsetpos(stream, &pos32);
 @@pp_elif $has_function(crt_fseeko)@@
-	return crt_fseeko(stream, (off32_t)*pos, SEEK_SET);
+	return crt_fseeko(stream, (off32_t)*pos, __SEEK_SET);
 @@pp_else@@
-	return crt_fseek(stream, (long int)*pos, SEEK_SET);
+	return crt_fseek(stream, (long int)*pos, __SEEK_SET);
 @@pp_endif@@
 }
 
@@ -1963,7 +1964,7 @@ int ungetc_unlocked(int ch, [[nonnull]] $FILE *__restrict stream) {
 [[cp_stdio, wunused, alias("getdelim"), doc_alias("getdelim")]]
 [[section(".text.crt.FILE.unlocked.read.read")]]
 [[requires_function(realloc, fgetc_unlocked, ungetc_unlocked)]]
-[[impl_include("<asm/stdio.h>")]]
+[[impl_include("<asm/stdio.h>", "<hybrid/__assert.h>")]]
 $ssize_t getdelim_unlocked([[nonnull]] char **__restrict lineptr,
                            [[nonnull]] $size_t *__restrict pcount, int delimiter,
                            [[nonnull]] $FILE *__restrict stream) {
@@ -1978,7 +1979,7 @@ $ssize_t getdelim_unlocked([[nonnull]] char **__restrict lineptr,
 			$size_t new_bufsize = bufsize * 2;
 			if (new_bufsize <= result + 1)
 				new_bufsize = 16;
-			assert(new_bufsize > result + 1);
+			__hybrid_assert(new_bufsize > result + 1);
 			buffer = (char *)realloc(buffer,
 			                         new_bufsize *
 			                         sizeof(char));
@@ -2046,11 +2047,11 @@ int fisatty([[nonnull]] $FILE *__restrict stream) {
 %[define(DEFINE_PIO_OFFSET =
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS
-#define __PIO_OFFSET     __FS_TYPE(pos)
-#define __PIO_OFFSET64   __pos64_t
+#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS */
-#define __PIO_OFFSET     __FS_TYPE(off)
-#define __PIO_OFFSET64   __off64_t
+#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 )]

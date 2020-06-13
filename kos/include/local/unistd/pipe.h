@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12a2904a */
+/* HASH CRC-32:0x68e07172 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_pipe_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE__pipe
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: dos_pipe from unistd */
 #if !defined(__local___localdep_dos_pipe_defined) && defined(__CRT_HAVE__pipe)

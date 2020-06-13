@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9c9c69a */
+/* HASH CRC-32:0xa092086f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_globfree_defined
 #define __local_globfree_defined 1
 #include <__crt.h>
+struct __glob_struct;
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: globfree64 from glob */
 #ifndef __local___localdep_globfree64_defined

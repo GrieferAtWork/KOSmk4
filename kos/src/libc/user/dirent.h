@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x757fe6f5 */
+/* HASH CRC-32:0xcfb213aa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_readdir_r)(DIR *__restri
  *    per-directory buffer of sufficient size to house any directory entry (s.a.: `READDIR_DEFAULT') */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_readdir64_r)(DIR *__restrict dirp, struct dirent64 *__restrict entry, struct dirent64 **__restrict result);
 /* Get the directory stream position */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_seekdir)(DIR *__restrict dirp, long int pos);
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_seekdir)(DIR *__restrict dirp, longptr_t pos);
 /* Get the directory stream position */
 INTDEF NONNULL((1)) long int NOTHROW_NCX(LIBCCALL libc_telldir)(DIR *__restrict dirp);
 /* Return the underlying file descriptor of the given directory stream */

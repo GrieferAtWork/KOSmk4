@@ -30,7 +30,7 @@
 
 DECL_BEGIN
 
-PRIVATE int hand_called = 0;
+PRIVATE sig_atomic_t hand_called = 0;
 
 PRIVATE void myhand(int signo) {
 	assert(signo == SIGUSR1);

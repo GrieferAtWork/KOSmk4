@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x565bc14b */
+/* HASH CRC-32:0x13250de7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_usleep_defined
 #define __local___localdep_usleep_defined 1
 #ifdef __CRT_HAVE_usleep
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_usleep,(__useconds_t __useconds),usleep,(__useconds))
 #elif defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)

@@ -4395,7 +4395,6 @@ again_lookup_wcsCurrent:
 						result.order_libcAutoHeader.extend({ dosVariant, kosVariant });
 						result.order_libcAutoSource.extend({ dosVariant, kosVariant });
 					}
-					goto done_currentLibraryFunction;
 				} else {
 					/* Create a default implementation for user-sources */
 					local libImpl;
@@ -4421,27 +4420,26 @@ again_lookup_wcsCurrent:
 							implSection: currentFeatures.crt_kosSection);
 					}
 					currentLibraryFunction.bindings.append(libImpl);
+					if (currentLibraryFunction.prototype !is bound)
+						currentLibraryFunction.prototype = currentPrototype;
+					if (!currentFeatures.crt_noSelfExport) {
+						currentLibraryFunction.exportSymbolNames
+							.append(("1", crtName));
+					}
+					local internal_crtName = "libc_" + crtName;
+					currentLibraryFunction.name = internal_crtName;
+					current.internalName = internal_crtName;
+					if (!allLibraryFunctionsByName.setnew(internal_crtName, currentLibraryFunction))
+						self.errAt(currentNameTokStart, "Duplicate library function: {!r}"
+							.format({ internal_crtName }));
+					if (currentFeatures.crt_userimpl || loaderImpl is none) {
+						result.order_libcUserHeader.append(currentLibraryFunction);
+						result.order_libcUserSource.append(currentLibraryFunction);
+					} else {
+						result.order_libcAutoHeader.append(currentLibraryFunction);
+						result.order_libcAutoSource.append(currentLibraryFunction);
+					}
 				}
-				if (currentLibraryFunction.prototype !is bound)
-					currentLibraryFunction.prototype = currentPrototype;
-				if (!currentFeatures.crt_noSelfExport) {
-					currentLibraryFunction.exportSymbolNames
-						.append(("1", crtName));
-				}
-				local internal_crtName = "libc_" + crtName;
-				currentLibraryFunction.name = internal_crtName;
-				current.internalName = internal_crtName;
-				if (!allLibraryFunctionsByName.setnew(internal_crtName, currentLibraryFunction))
-					self.errAt(currentNameTokStart, "Duplicate library function: {!r}"
-						.format({ internal_crtName }));
-				if (currentFeatures.crt_userimpl || loaderImpl is none) {
-					result.order_libcUserHeader.append(currentLibraryFunction);
-					result.order_libcUserSource.append(currentLibraryFunction);
-				} else {
-					result.order_libcAutoHeader.append(currentLibraryFunction);
-					result.order_libcAutoSource.append(currentLibraryFunction);
-				}
-done_currentLibraryFunction:
 				currentLibraryFunction = none;
 			}
 		}	break;
@@ -4493,6 +4491,7 @@ handle_eq_after_prototype:
 			/* Inherit the documentation so-long as none was specified for this function. */
 			if (current.documentation is string && !current.documentation)
 				current.documentation = [] -> getBoundFunction().documentationString;
+			current.internalName = [] -> getBoundFunction().internalFunctionName;
 			if (currentPrototypes is none) {
 				/* Simple case: Also inherit all prototypes (in which case we can
 				 *              also simply inherit all bindings from the other

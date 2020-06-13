@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefbcf294 */
+/* HASH CRC-32:0xdf3254ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,11 +54,11 @@ __NAMESPACE_LOCAL_END
 #ifndef __format_aprintf_data_defined
 #define __format_aprintf_data_defined 1
 struct format_aprintf_data {
-	char         *__ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ __ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ __ap_used;  /* Used buffer size */
+	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
-#endif
+#endif /* !__format_aprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf

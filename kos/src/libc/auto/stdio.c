@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x968d218b */
+/* HASH CRC-32:0xd94a9acb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -411,6 +411,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_setlinebuf)(FILE *__restrict stream) {
 	libc_setvbuf(stream, NULL, _IOLBF, 0);
 }
+#include <asm/stdio.h>
+#include <hybrid/__assert.h>
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 2, 4)) ssize_t
 (LIBCCALL libc_getdelim)(char **__restrict lineptr,
                          size_t *__restrict pcount,
@@ -427,7 +429,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 2, 4)
 			size_t new_bufsize = bufsize * 2;
 			if (new_bufsize <= result + 1)
 				new_bufsize = 16;
-			assert(new_bufsize > result + 1);
+			__hybrid_assert(new_bufsize > result + 1);
 			buffer = (char *)libc_realloc(buffer,
 			                         new_bufsize *
 			                         sizeof(char));
@@ -512,7 +514,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 3))
 	for (n = 0; n < bufsize - 1; ++n) {
 		int ch = libc_fgetc_unlocked(stream);
 		if (ch == EOF) {
-			if (n == 0 || ferror_unlocked(stream))
+			if (n == 0 || libc_ferror(stream))
 				return NULL;
 			break;
 		}
@@ -521,7 +523,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 3))
 			buf[n++] = '\n';
 			ch = libc_fgetc_unlocked(stream);
 			if (ch == EOF) {
-				if (n == 0 || ferror_unlocked(stream))
+				if (n == 0 || libc_ferror(stream))
 					return NULL;
 				break;
 			}
@@ -620,6 +622,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") NONNULL((2)) int
 	       : EOF;
 }
 #include <asm/stdio.h>
+#include <hybrid/__assert.h>
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 4)) ssize_t
 (LIBCCALL libc_getdelim_unlocked)(char **__restrict lineptr,
                                   size_t *__restrict pcount,
@@ -636,7 +639,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 
 			size_t new_bufsize = bufsize * 2;
 			if (new_bufsize <= result + 1)
 				new_bufsize = 16;
-			assert(new_bufsize > result + 1);
+			__hybrid_assert(new_bufsize > result + 1);
 			buffer = (char *)libc_realloc(buffer,
 			                         new_bufsize *
 			                         sizeof(char));
@@ -948,7 +951,7 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_s_l)(char *__restrict buf,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vsprintf_s_l(buf, bufsize, format, locale, args);
+	result = libc__vsnprintf_l(buf, bufsize, format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -1121,7 +1124,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_c)(char *__restrict buf,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = _vsnprintf_c(buf, bufsize, format, args);
+	result = libc__vsnprintf(buf, bufsize, format, args);
 	va_end(args);
 	return result;
 }
@@ -1134,7 +1137,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_c_l)(char *__restrict buf,
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vsnprintf_c_l(buf, bufsize, format, locale, args);
+	result = libc__vsnprintf_l(buf, bufsize, format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -1203,7 +1206,7 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vprintf_s_l(format, locale, args);
+	result = libc__vprintf_l(format, locale, args);
 	va_end(args);
 	return result;
 }
@@ -1275,7 +1278,7 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, locale);
-	result = _vfprintf_s_l(stream, format, locale, args);
+	result = libc__vfprintf_l(stream, format, locale, args);
 	va_end(args);
 	return result;
 }

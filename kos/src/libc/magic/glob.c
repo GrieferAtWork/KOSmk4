@@ -154,10 +154,22 @@ typedef struct __glob64_struct {
 #endif /* __USE_LARGEFILE64 */
 
 
+#ifndef ____glob_errfunc_t_defined
+#define ____glob_errfunc_t_defined 1
 typedef int (__LIBCCALL *__glob_errfunc_t)(char const *__path, int __flags);
+#endif /* !____glob_errfunc_t_defined */
 
-};
+}
 
+%[define(DEFINE_GLOB_ERRFUNC_T =
+@@pp_ifndef ____glob_errfunc_t_defined@@
+#define ____glob_errfunc_t_defined 1
+typedef int (__LIBCCALL *__glob_errfunc_t)(char const *__path, int __flags);
+@@pp_endif@@
+)]
+
+
+[[decl_prefix(DEFINE_GLOB_ERRFUNC_T)]]
 [[ignore, nocrt, doc_alias("glob"), alias("glob")]]
 int glob32([[nonnull]] char const *__restrict pattern,
            int flags, __glob_errfunc_t errfunc,
@@ -174,9 +186,11 @@ void globfree32(void *pglob);
 @@`glob' returns GLOB_ABEND; if it returns zero, the error is ignored.
 @@If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
 @@Otherwise, `glob' returns zero
+[[userimpl, no_crt_self_import]]
+[[decl_prefix(DEFINE_GLOB_ERRFUNC_T)]]
+[[decl_prefix(struct __glob_struct;)]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("glob64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("glob")]]
-[[userimpl, no_crt_self_import]]
 int glob([[nonnull]] char const *__restrict pattern, int flags,
          [[nullable]] __glob_errfunc_t errfunc,
          [[nonnull]] glob_t *__restrict pglob) {
@@ -198,9 +212,10 @@ int glob([[nonnull]] char const *__restrict pattern, int flags,
 
 
 @@Free storage allocated in PGLOB by a previous `glob' call
+[[userimpl, no_crt_self_import]]
+[[decl_prefix(struct __glob_struct;)]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("globfree64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("globfree")]]
-[[userimpl, no_crt_self_import]]
 void globfree([[nonnull]] glob_t *pglob) {
 @@pp_if $has_function(globfree32)@@
 	globfree32(pglob);
@@ -214,6 +229,7 @@ void globfree([[nonnull]] glob_t *pglob) {
 
 %
 %#ifdef __USE_LARGEFILE64
+[[decl_prefix(DEFINE_GLOB_ERRFUNC_T)]]
 [[doc_alias("glob"), decl_prefix(struct __glob64_struct;), userimpl]]
 int glob64([[nonnull]] const char *__restrict pattern, int flags,
            [[nullable]] __glob_errfunc_t errfunc,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd88ffc3 */
+/* HASH CRC-32:0x3d600d4d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: symlinkat from unistd */
 #if !defined(__local___localdep_symlinkat_defined) && defined(__CRT_HAVE_symlinkat)
 #define __local___localdep_symlinkat_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */

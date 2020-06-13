@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3973df3a */
+/* HASH CRC-32:0x70afe798 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,157 +25,9 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/string.h"
-#ifndef LIBC_ARCH_HAVE_RAWMEMRLENQ
-#endif /* !LIBC_ARCH_HAVE_RAWMEMRLENQ */
-#ifndef LIBC_ARCH_HAVE_STRCSPN
-#endif /* !LIBC_ARCH_HAVE_STRCSPN */
-#ifndef LIBC_ARCH_HAVE_RAWMEMLEN
-#endif /* !LIBC_ARCH_HAVE_RAWMEMLEN */
-#ifndef LIBC_ARCH_HAVE_STRXFRM
-#endif /* !LIBC_ARCH_HAVE_STRXFRM */
-#ifndef LIBC_ARCH_HAVE_MEMPMOVEUPL
-#endif /* !LIBC_ARCH_HAVE_MEMPMOVEUPL */
-#ifndef LIBC_ARCH_HAVE_MEMRLEN
-#endif /* !LIBC_ARCH_HAVE_MEMRLEN */
-#ifndef LIBC_ARCH_HAVE_STROFF
-#endif /* !LIBC_ARCH_HAVE_STROFF */
-#ifndef LIBC_ARCH_HAVE_MEMPSETQ
-#endif /* !LIBC_ARCH_HAVE_MEMPSETQ */
-#ifndef LIBC_ARCH_HAVE_RAWMEMXLENL
-#endif /* !LIBC_ARCH_HAVE_RAWMEMXLENL */
-#ifndef LIBC_ARCH_HAVE_MEMLENL
-#endif /* !LIBC_ARCH_HAVE_MEMLENL */
-#ifndef LIBC_ARCH_HAVE_MEMPMOVEDOWNL
-#endif /* !LIBC_ARCH_HAVE_MEMPMOVEDOWNL */
-#ifndef LIBC_ARCH_HAVE_MEMRLENL
-#endif /* !LIBC_ARCH_HAVE_MEMRLENL */
-#ifndef LIBC_ARCH_HAVE_MEMPMOVE
-#endif /* !LIBC_ARCH_HAVE_MEMPMOVE */
-#ifndef LIBC_ARCH_HAVE_RAWMEMRXLENW
-#endif /* !LIBC_ARCH_HAVE_RAWMEMRXLENW */
-#ifndef LIBC_ARCH_HAVE_STRLCAT
-#endif /* !LIBC_ARCH_HAVE_STRLCAT */
-#ifndef LIBC_ARCH_HAVE_STPCPY
-#endif /* !LIBC_ARCH_HAVE_STPCPY */
-#ifndef LIBC_ARCH_HAVE_MEMPMOVEDOWNQ
-#endif /* !LIBC_ARCH_HAVE_MEMPMOVEDOWNQ */
-#ifndef LIBC_ARCH_HAVE_RAWMEMRLEN
-#endif /* !LIBC_ARCH_HAVE_RAWMEMRLEN */
-#ifndef LIBC_ARCH_HAVE_MEMPATQ
-#endif /* !LIBC_ARCH_HAVE_MEMPATQ */
-#ifndef LIBC_ARCH_HAVE_STPNCPY
-#endif /* !LIBC_ARCH_HAVE_STPNCPY */
-#ifndef LIBC_ARCH_HAVE_MEMPATW
-#endif /* !LIBC_ARCH_HAVE_MEMPATW */
-#ifndef LIBC_ARCH_HAVE_MEMRXLENL
-#endif /* !LIBC_ARCH_HAVE_MEMRXLENL */
-#ifndef LIBC_ARCH_HAVE_RAWMEMLENW
-#endif /* !LIBC_ARCH_HAVE_RAWMEMLENW */
-#ifndef LIBC_ARCH_HAVE_MEMPATL
-#endif /* !LIBC_ARCH_HAVE_MEMPATL */
-#ifndef LIBC_ARCH_HAVE_STRROFF
-#endif /* !LIBC_ARCH_HAVE_STRROFF */
 #include "../user/ctype.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
-#ifndef LIBC_ARCH_HAVE_STRSPN
-#endif /* !LIBC_ARCH_HAVE_STRSPN */
-#ifndef LIBC_ARCH_HAVE_MEMPMOVEDOWN
-#endif /* !LIBC_ARCH_HAVE_MEMPMOVEDOWN */
-#ifndef LIBC_ARCH_HAVE_MEMPSET
-#endif /* !LIBC_ARCH_HAVE_MEMPSET */
-#ifndef LIBC_ARCH_HAVE_RAWMEMXLENQ
-#endif /* !LIBC_ARCH_HAVE_RAWMEMXLENQ */
-#ifndef LIBC_ARCH_HAVE_RAWMEMRLENL
-#endif /* !LIBC_ARCH_HAVE_RAWMEMRLENL */
-#ifndef LIBC_ARCH_HAVE_MEMRXLEN
-#endif /* !LIBC_ARCH_HAVE_MEMRXLEN */
-#ifndef LIBC_ARCH_HAVE_MEMRLENQ
-#endif /* !LIBC_ARCH_HAVE_MEMRLENQ */
-#ifndef LIBC_ARCH_HAVE_STRLCPY
-#endif /* !LIBC_ARCH_HAVE_STRLCPY */
-#ifndef LIBC_ARCH_HAVE_RAWMEMRXLENQ
-#endif /* !LIBC_ARCH_HAVE_RAWMEMRXLENQ */
-#ifndef LIBC_ARCH_HAVE_MEMPMOVEQ
-#endif /* !LIBC_ARCH_HAVE_MEMPMOVEQ */
-#ifndef LIBC_ARCH_HAVE_RAWMEMRXLEN
-#endif /* !LIBC_ARCH_HAVE_RAWMEMRXLEN */
-#ifndef LIBC_ARCH_HAVE_STRCAT
-#endif /* !LIBC_ARCH_HAVE_STRCAT */
-#ifndef LIBC_ARCH_HAVE_STRNLEN
-#endif /* !LIBC_ARCH_HAVE_STRNLEN */
-#ifndef LIBC_ARCH_HAVE_MEMXLENW
-#endif /* !LIBC_ARCH_HAVE_MEMXLENW */
-#ifndef LIBC_ARCH_HAVE_MEMPMOVEW
-#endif /* !LIBC_ARCH_HAVE_MEMPMOVEW */
-#ifndef LIBC_ARCH_HAVE_STRNCAT
-#endif /* !LIBC_ARCH_HAVE_STRNCAT */
-#ifndef LIBC_ARCH_HAVE_MEMPSETW
-#endif /* !LIBC_ARCH_HAVE_MEMPSETW */
-#ifndef LIBC_ARCH_HAVE_MEMPMOVEL
-#endif /* !LIBC_ARCH_HAVE_MEMPMOVEL */
-#ifndef LIBC_ARCH_HAVE_MEMLENQ
-#endif /* !LIBC_ARCH_HAVE_MEMLENQ */
-#ifndef LIBC_ARCH_HAVE_MEMPSETL
-#endif /* !LIBC_ARCH_HAVE_MEMPSETL */
-#ifndef LIBC_ARCH_HAVE_RAWMEMXLENW
-#endif /* !LIBC_ARCH_HAVE_RAWMEMXLENW */
-#ifndef LIBC_ARCH_HAVE_MEMRXLENW
-#endif /* !LIBC_ARCH_HAVE_MEMRXLENW */
-#ifndef LIBC_ARCH_HAVE_MEMPMOVEUPW
-#endif /* !LIBC_ARCH_HAVE_MEMPMOVEUPW */
-#ifndef LIBC_ARCH_HAVE_MEMMEM
-#endif /* !LIBC_ARCH_HAVE_MEMMEM */
-#ifndef LIBC_ARCH_HAVE_STRCOLL
-#endif /* !LIBC_ARCH_HAVE_STRCOLL */
-#ifndef LIBC_ARCH_HAVE_MEMXLENQ
-#endif /* !LIBC_ARCH_HAVE_MEMXLENQ */
-#ifndef LIBC_ARCH_HAVE_STRLEN
-#endif /* !LIBC_ARCH_HAVE_STRLEN */
-#ifndef LIBC_ARCH_HAVE_MEMLENW
-#endif /* !LIBC_ARCH_HAVE_MEMLENW */
-#ifndef LIBC_ARCH_HAVE_STRCPY
-#endif /* !LIBC_ARCH_HAVE_STRCPY */
-#ifndef LIBC_ARCH_HAVE_MEMXLENL
-#endif /* !LIBC_ARCH_HAVE_MEMXLENL */
-#ifndef LIBC_ARCH_HAVE_MEMPCPYW
-#endif /* !LIBC_ARCH_HAVE_MEMPCPYW */
-#ifndef LIBC_ARCH_HAVE_MEMPMOVEDOWNW
-#endif /* !LIBC_ARCH_HAVE_MEMPMOVEDOWNW */
-#ifndef LIBC_ARCH_HAVE_MEMXLEN
-#endif /* !LIBC_ARCH_HAVE_MEMXLEN */
-#ifndef LIBC_ARCH_HAVE_MEMPMOVEUPQ
-#endif /* !LIBC_ARCH_HAVE_MEMPMOVEUPQ */
-#ifndef LIBC_ARCH_HAVE_RAWMEMRLENW
-#endif /* !LIBC_ARCH_HAVE_RAWMEMRLENW */
-#ifndef LIBC_ARCH_HAVE_RAWMEMLENQ
-#endif /* !LIBC_ARCH_HAVE_RAWMEMLENQ */
-#ifndef LIBC_ARCH_HAVE_MEMLEN
-#endif /* !LIBC_ARCH_HAVE_MEMLEN */
-#ifndef LIBC_ARCH_HAVE_RAWMEMRXLENL
-#endif /* !LIBC_ARCH_HAVE_RAWMEMRXLENL */
-#ifndef LIBC_ARCH_HAVE_MEMRXLENQ
-#endif /* !LIBC_ARCH_HAVE_MEMRXLENQ */
-#ifndef LIBC_ARCH_HAVE_MEMRLENW
-#endif /* !LIBC_ARCH_HAVE_MEMRLENW */
-#ifndef LIBC_ARCH_HAVE_STRNCPY
-#endif /* !LIBC_ARCH_HAVE_STRNCPY */
-#ifndef LIBC_ARCH_HAVE_RAWMEMLENL
-#endif /* !LIBC_ARCH_HAVE_RAWMEMLENL */
-#ifndef LIBC_ARCH_HAVE_MEMPMOVEUP
-#endif /* !LIBC_ARCH_HAVE_MEMPMOVEUP */
-#ifndef LIBC_ARCH_HAVE_MEMPCPYL
-#endif /* !LIBC_ARCH_HAVE_MEMPCPYL */
-#ifndef LIBC_ARCH_HAVE_MEMRMEM
-#endif /* !LIBC_ARCH_HAVE_MEMRMEM */
-#ifndef LIBC_ARCH_HAVE_STRNOFF
-#endif /* !LIBC_ARCH_HAVE_STRNOFF */
-#ifndef LIBC_ARCH_HAVE_RAWMEMXLEN
-#endif /* !LIBC_ARCH_HAVE_RAWMEMXLEN */
-#ifndef LIBC_ARCH_HAVE_MEMPCPYQ
-#endif /* !LIBC_ARCH_HAVE_MEMPCPYQ */
-#ifndef LIBC_ARCH_HAVE_STRNROFF
-#endif /* !LIBC_ARCH_HAVE_STRNROFF */
 
 DECL_BEGIN
 
@@ -4201,41 +4053,87 @@ NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode,
 
 DECL_END
 
+#ifndef LIBC_ARCH_HAVE_MEMCPY
 DEFINE_PUBLIC_ALIAS(memcpy, libc_memcpy);
+#endif /* !LIBC_ARCH_HAVE_MEMCPY */
+#ifndef LIBC_ARCH_HAVE_MEMMOVE
 DEFINE_PUBLIC_ALIAS(memmove, libc_memmove);
+#endif /* !LIBC_ARCH_HAVE_MEMMOVE */
+#ifndef LIBC_ARCH_HAVE_MEMSET
 DEFINE_PUBLIC_ALIAS(memset, libc_memset);
+#endif /* !LIBC_ARCH_HAVE_MEMSET */
+#ifndef LIBC_ARCH_HAVE_MEMCMP
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(bcmp, libc_memcmp);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memcmp, libc_memcmp);
+#endif /* !LIBC_ARCH_HAVE_MEMCMP */
+#ifndef LIBC_ARCH_HAVE_MEMCHR
 DEFINE_PUBLIC_ALIAS(memchr, libc_memchr);
+#endif /* !LIBC_ARCH_HAVE_MEMCHR */
+#ifndef LIBC_ARCH_HAVE_STRLEN
 DEFINE_PUBLIC_ALIAS(strlen, libc_strlen);
+#endif /* !LIBC_ARCH_HAVE_STRLEN */
+#ifndef LIBC_ARCH_HAVE_STRCHR
 DEFINE_PUBLIC_ALIAS(strchr, libc_strchr);
-#ifndef __KERNEL__
+#endif /* !LIBC_ARCH_HAVE_STRCHR */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRRCHR)
 DEFINE_PUBLIC_ALIAS(strrchr, libc_strrchr);
-#endif /* !__KERNEL__ */
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRRCHR */
+#ifndef LIBC_ARCH_HAVE_STRCMP
 DEFINE_PUBLIC_ALIAS(strcmp, libc_strcmp);
-#ifndef __KERNEL__
+#endif /* !LIBC_ARCH_HAVE_STRCMP */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRNCMP)
 DEFINE_PUBLIC_ALIAS(strncmp, libc_strncmp);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRNCMP */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRSTR)
 DEFINE_PUBLIC_ALIAS(strstr, libc_strstr);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRSTR */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRCPY)
 DEFINE_PUBLIC_ALIAS(strcpy, libc_strcpy);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRCPY */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRNCPY)
 DEFINE_PUBLIC_ALIAS(strncpy, libc_strncpy);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRNCPY */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRCAT)
 DEFINE_PUBLIC_ALIAS(strcat, libc_strcat);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRCAT */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRNCAT)
 DEFINE_PUBLIC_ALIAS(strncat, libc_strncat);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRNCAT */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRCSPN)
 DEFINE_PUBLIC_ALIAS(strcspn, libc_strcspn);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRCSPN */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRSPN)
 DEFINE_PUBLIC_ALIAS(strspn, libc_strspn);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRSPN */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRPBRK)
 DEFINE_PUBLIC_ALIAS(strpbrk, libc_strpbrk);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRPBRK */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(strtok, libc_strtok);
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRCOLL)
 DEFINE_PUBLIC_ALIAS(strcoll, libc_strcoll);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRCOLL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRXFRM)
 DEFINE_PUBLIC_ALIAS(strxfrm, libc_strxfrm);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRXFRM */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(strerror, libc_strerror);
 #endif /* !__KERNEL__ */
+#ifndef LIBC_ARCH_HAVE_STRNLEN
 DEFINE_PUBLIC_ALIAS(strnlen, libc_strnlen);
-#ifndef __KERNEL__
+#endif /* !LIBC_ARCH_HAVE_STRNLEN */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STPCPY)
 DEFINE_PUBLIC_ALIAS(__stpcpy, libc_stpcpy);
 DEFINE_PUBLIC_ALIAS(stpcpy, libc_stpcpy);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STPCPY */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STPNCPY)
 DEFINE_PUBLIC_ALIAS(__stpncpy, libc_stpncpy);
 DEFINE_PUBLIC_ALIAS(stpncpy, libc_stpncpy);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STPNCPY */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_strcoll_l, libc_strcoll_l);
 DEFINE_PUBLIC_ALIAS(__strcoll_l, libc_strcoll_l);
 DEFINE_PUBLIC_ALIAS(strcoll_l, libc_strcoll_l);
@@ -4253,22 +4151,36 @@ DEFINE_PUBLIC_ALIAS(strtok_s, libc_strtok_r);
 DEFINE_PUBLIC_ALIAS(__strtok_r, libc_strtok_r);
 DEFINE_PUBLIC_ALIAS(strtok_r, libc_strtok_r);
 #endif /* !__KERNEL__ */
+#ifndef LIBC_ARCH_HAVE_MEMRCHR
 DEFINE_PUBLIC_ALIAS(memrchr, libc_memrchr);
+#endif /* !LIBC_ARCH_HAVE_MEMRCHR */
+#ifndef LIBC_ARCH_HAVE_RAWMEMCHR
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__rawmemchr, libc_rawmemchr);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(rawmemchr, libc_rawmemchr);
-#ifndef __KERNEL__
+#endif /* !LIBC_ARCH_HAVE_RAWMEMCHR */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRCHRNUL)
 DEFINE_PUBLIC_ALIAS(strchrnul, libc_strchrnul);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRCHRNUL */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(basename, libc_basename);
 DEFINE_PUBLIC_ALIAS(__strcasestr, libc_strcasestr);
 DEFINE_PUBLIC_ALIAS(strcasestr, libc_strcasestr);
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMMEM)
 DEFINE_PUBLIC_ALIAS(memmem, libc_memmem);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMMEM */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__strverscmp, libc_strverscmp);
 DEFINE_PUBLIC_ALIAS(strverscmp, libc_strverscmp);
+#endif /* !__KERNEL__ */
+#ifndef LIBC_ARCH_HAVE_MEMPCPY
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__mempcpy, libc_mempcpy);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(mempcpy, libc_mempcpy);
+#endif /* !LIBC_ARCH_HAVE_MEMPCPY */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(strfry, libc_strfry);
 DEFINE_PUBLIC_ALIAS(memfrob, libc_memfrob);
@@ -4294,159 +4206,381 @@ DEFINE_PUBLIC_ALIAS(strnicmp, libc_strncasecmp);
 DEFINE_PUBLIC_ALIAS(_strncmpi, libc_strncasecmp);
 DEFINE_PUBLIC_ALIAS(strncmpi, libc_strncasecmp);
 DEFINE_PUBLIC_ALIAS(strncasecmp, libc_strncasecmp);
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_FFS)
 DEFINE_PUBLIC_ALIAS(__ffs, libc_ffs);
 DEFINE_PUBLIC_ALIAS(ffs, libc_ffs);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_FFS */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_FFSL)
 DEFINE_PUBLIC_ALIAS(ffsl, libc_ffsl);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_FFSL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_FFSLL)
 DEFINE_PUBLIC_ALIAS(ffsll, libc_ffsll);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_FFSLL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRLCAT)
 DEFINE_PUBLIC_ALIAS(strlcat, libc_strlcat);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRLCAT */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRLCPY)
 DEFINE_PUBLIC_ALIAS(strlcpy, libc_strlcpy);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRLCPY */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMCCPY)
 DEFINE_PUBLIC_ALIAS(_memccpy, libc_memccpy);
 DEFINE_PUBLIC_ALIAS(memccpy, libc_memccpy);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMCCPY */
+#ifndef LIBC_ARCH_HAVE_MEMCPYW
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$wmemcpy, libc_memcpyw);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memcpyw, libc_memcpyw);
+#endif /* !LIBC_ARCH_HAVE_MEMCPYW */
+#ifndef LIBC_ARCH_HAVE_MEMPCPYW
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$wmempcpy, libc_mempcpyw);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(mempcpyw, libc_mempcpyw);
+#endif /* !LIBC_ARCH_HAVE_MEMPCPYW */
+#ifndef LIBC_ARCH_HAVE_MEMCPYL
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(wmemcpy, libc_memcpyl);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memcpyl, libc_memcpyl);
+#endif /* !LIBC_ARCH_HAVE_MEMCPYL */
+#ifndef LIBC_ARCH_HAVE_MEMPCPYL
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(wmempcpy, libc_mempcpyl);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(mempcpyl, libc_mempcpyl);
+#endif /* !LIBC_ARCH_HAVE_MEMPCPYL */
+#ifndef LIBC_ARCH_HAVE_MEMMOVEW
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$wmemmove, libc_memmovew);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memmovew, libc_memmovew);
+#endif /* !LIBC_ARCH_HAVE_MEMMOVEW */
+#ifndef LIBC_ARCH_HAVE_MEMPMOVEW
 DEFINE_PUBLIC_ALIAS(mempmovew, libc_mempmovew);
+#endif /* !LIBC_ARCH_HAVE_MEMPMOVEW */
+#ifndef LIBC_ARCH_HAVE_MEMMOVEL
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(wmemmove, libc_memmovel);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memmovel, libc_memmovel);
+#endif /* !LIBC_ARCH_HAVE_MEMMOVEL */
+#ifndef LIBC_ARCH_HAVE_MEMPMOVEL
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(wmempmove, libc_mempmovel);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(mempmovel, libc_mempmovel);
+#endif /* !LIBC_ARCH_HAVE_MEMPMOVEL */
+#ifndef LIBC_ARCH_HAVE_MEMMOVEUPW
 DEFINE_PUBLIC_ALIAS(memmoveupw, libc_memmoveupw);
+#endif /* !LIBC_ARCH_HAVE_MEMMOVEUPW */
+#ifndef LIBC_ARCH_HAVE_MEMMOVEDOWNW
 DEFINE_PUBLIC_ALIAS(memmovedownw, libc_memmovedownw);
+#endif /* !LIBC_ARCH_HAVE_MEMMOVEDOWNW */
+#ifndef LIBC_ARCH_HAVE_MEMPMOVEUPW
 DEFINE_PUBLIC_ALIAS(mempmoveupw, libc_mempmoveupw);
+#endif /* !LIBC_ARCH_HAVE_MEMPMOVEUPW */
+#ifndef LIBC_ARCH_HAVE_MEMPMOVEDOWNW
 DEFINE_PUBLIC_ALIAS(mempmovedownw, libc_mempmovedownw);
+#endif /* !LIBC_ARCH_HAVE_MEMPMOVEDOWNW */
+#ifndef LIBC_ARCH_HAVE_MEMMOVEUPL
 DEFINE_PUBLIC_ALIAS(memmoveupl, libc_memmoveupl);
+#endif /* !LIBC_ARCH_HAVE_MEMMOVEUPL */
+#ifndef LIBC_ARCH_HAVE_MEMMOVEDOWNL
 DEFINE_PUBLIC_ALIAS(memmovedownl, libc_memmovedownl);
+#endif /* !LIBC_ARCH_HAVE_MEMMOVEDOWNL */
+#ifndef LIBC_ARCH_HAVE_MEMPMOVEUPL
 DEFINE_PUBLIC_ALIAS(mempmoveupl, libc_mempmoveupl);
+#endif /* !LIBC_ARCH_HAVE_MEMPMOVEUPL */
+#ifndef LIBC_ARCH_HAVE_MEMPMOVEDOWNL
 DEFINE_PUBLIC_ALIAS(mempmovedownl, libc_mempmovedownl);
+#endif /* !LIBC_ARCH_HAVE_MEMPMOVEDOWNL */
+#ifndef LIBC_ARCH_HAVE_MEMSETW
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$wmemset, libc_memsetw);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memsetw, libc_memsetw);
+#endif /* !LIBC_ARCH_HAVE_MEMSETW */
+#ifndef LIBC_ARCH_HAVE_MEMPSETW
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$wmempset, libc_mempsetw);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(mempsetw, libc_mempsetw);
+#endif /* !LIBC_ARCH_HAVE_MEMPSETW */
+#ifndef LIBC_ARCH_HAVE_MEMSETL
 DEFINE_PUBLIC_ALIAS(memsetl, libc_memsetl);
+#endif /* !LIBC_ARCH_HAVE_MEMSETL */
+#ifndef LIBC_ARCH_HAVE_MEMPSETL
 DEFINE_PUBLIC_ALIAS(mempsetl, libc_mempsetl);
+#endif /* !LIBC_ARCH_HAVE_MEMPSETL */
+#ifndef LIBC_ARCH_HAVE_MEMCMPW
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$wmemcmp, libc_memcmpw);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memcmpw, libc_memcmpw);
+#endif /* !LIBC_ARCH_HAVE_MEMCMPW */
+#ifndef LIBC_ARCH_HAVE_MEMCMPL
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(wmemcmp, libc_memcmpl);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memcmpl, libc_memcmpl);
+#endif /* !LIBC_ARCH_HAVE_MEMCMPL */
+#ifndef LIBC_ARCH_HAVE_MEMCHRW
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$wmemchr, libc_memchrw);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memchrw, libc_memchrw);
+#endif /* !LIBC_ARCH_HAVE_MEMCHRW */
+#ifndef LIBC_ARCH_HAVE_MEMCHRL
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(wmemchr, libc_memchrl);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memchrl, libc_memchrl);
+#endif /* !LIBC_ARCH_HAVE_MEMCHRL */
+#ifndef LIBC_ARCH_HAVE_MEMRCHRW
 DEFINE_PUBLIC_ALIAS(memrchrw, libc_memrchrw);
+#endif /* !LIBC_ARCH_HAVE_MEMRCHRW */
+#ifndef LIBC_ARCH_HAVE_MEMRCHRL
 DEFINE_PUBLIC_ALIAS(memrchrl, libc_memrchrl);
+#endif /* !LIBC_ARCH_HAVE_MEMRCHRL */
+#ifndef LIBC_ARCH_HAVE_RAWMEMCHRW
 DEFINE_PUBLIC_ALIAS(rawmemchrw, libc_rawmemchrw);
+#endif /* !LIBC_ARCH_HAVE_RAWMEMCHRW */
+#ifndef LIBC_ARCH_HAVE_RAWMEMCHRL
 DEFINE_PUBLIC_ALIAS(rawmemchrl, libc_rawmemchrl);
+#endif /* !LIBC_ARCH_HAVE_RAWMEMCHRL */
+#ifndef LIBC_ARCH_HAVE_RAWMEMRCHRW
 DEFINE_PUBLIC_ALIAS(rawmemrchrw, libc_rawmemrchrw);
+#endif /* !LIBC_ARCH_HAVE_RAWMEMRCHRW */
+#ifndef LIBC_ARCH_HAVE_RAWMEMRCHRL
 DEFINE_PUBLIC_ALIAS(rawmemrchrl, libc_rawmemrchrl);
+#endif /* !LIBC_ARCH_HAVE_RAWMEMRCHRL */
+#ifndef LIBC_ARCH_HAVE_MEMENDW
 DEFINE_PUBLIC_ALIAS(memendw, libc_memendw);
+#endif /* !LIBC_ARCH_HAVE_MEMENDW */
+#ifndef LIBC_ARCH_HAVE_MEMENDL
 DEFINE_PUBLIC_ALIAS(memendl, libc_memendl);
+#endif /* !LIBC_ARCH_HAVE_MEMENDL */
+#ifndef LIBC_ARCH_HAVE_MEMRENDW
 DEFINE_PUBLIC_ALIAS(memrendw, libc_memrendw);
+#endif /* !LIBC_ARCH_HAVE_MEMRENDW */
+#ifndef LIBC_ARCH_HAVE_MEMRENDL
 DEFINE_PUBLIC_ALIAS(memrendl, libc_memrendl);
+#endif /* !LIBC_ARCH_HAVE_MEMRENDL */
+#ifndef LIBC_ARCH_HAVE_MEMLENW
 DEFINE_PUBLIC_ALIAS(memlenw, libc_memlenw);
+#endif /* !LIBC_ARCH_HAVE_MEMLENW */
+#ifndef LIBC_ARCH_HAVE_MEMLENL
 DEFINE_PUBLIC_ALIAS(memlenl, libc_memlenl);
+#endif /* !LIBC_ARCH_HAVE_MEMLENL */
+#ifndef LIBC_ARCH_HAVE_MEMRLENW
 DEFINE_PUBLIC_ALIAS(memrlenw, libc_memrlenw);
+#endif /* !LIBC_ARCH_HAVE_MEMRLENW */
+#ifndef LIBC_ARCH_HAVE_MEMRLENL
 DEFINE_PUBLIC_ALIAS(memrlenl, libc_memrlenl);
+#endif /* !LIBC_ARCH_HAVE_MEMRLENL */
+#ifndef LIBC_ARCH_HAVE_RAWMEMLENW
 DEFINE_PUBLIC_ALIAS(rawmemlenw, libc_rawmemlenw);
+#endif /* !LIBC_ARCH_HAVE_RAWMEMLENW */
+#ifndef LIBC_ARCH_HAVE_RAWMEMLENL
 DEFINE_PUBLIC_ALIAS(rawmemlenl, libc_rawmemlenl);
+#endif /* !LIBC_ARCH_HAVE_RAWMEMLENL */
+#ifndef LIBC_ARCH_HAVE_RAWMEMRLENW
 DEFINE_PUBLIC_ALIAS(rawmemrlenw, libc_rawmemrlenw);
+#endif /* !LIBC_ARCH_HAVE_RAWMEMRLENW */
+#ifndef LIBC_ARCH_HAVE_RAWMEMRLENL
 DEFINE_PUBLIC_ALIAS(rawmemrlenl, libc_rawmemrlenl);
+#endif /* !LIBC_ARCH_HAVE_RAWMEMRLENL */
+#ifndef LIBC_ARCH_HAVE_MEMCPYQ
 DEFINE_PUBLIC_ALIAS(memcpyq, libc_memcpyq);
+#endif /* !LIBC_ARCH_HAVE_MEMCPYQ */
+#ifndef LIBC_ARCH_HAVE_MEMPCPYQ
 DEFINE_PUBLIC_ALIAS(mempcpyq, libc_mempcpyq);
+#endif /* !LIBC_ARCH_HAVE_MEMPCPYQ */
+#ifndef LIBC_ARCH_HAVE_MEMMOVEQ
 DEFINE_PUBLIC_ALIAS(memmoveq, libc_memmoveq);
+#endif /* !LIBC_ARCH_HAVE_MEMMOVEQ */
+#ifndef LIBC_ARCH_HAVE_MEMPMOVEQ
 DEFINE_PUBLIC_ALIAS(mempmoveq, libc_mempmoveq);
+#endif /* !LIBC_ARCH_HAVE_MEMPMOVEQ */
+#ifndef LIBC_ARCH_HAVE_MEMMOVEUPQ
 DEFINE_PUBLIC_ALIAS(memmoveupq, libc_memmoveupq);
+#endif /* !LIBC_ARCH_HAVE_MEMMOVEUPQ */
+#ifndef LIBC_ARCH_HAVE_MEMMOVEDOWNQ
 DEFINE_PUBLIC_ALIAS(memmovedownq, libc_memmovedownq);
+#endif /* !LIBC_ARCH_HAVE_MEMMOVEDOWNQ */
+#ifndef LIBC_ARCH_HAVE_MEMPMOVEUPQ
 DEFINE_PUBLIC_ALIAS(mempmoveupq, libc_mempmoveupq);
+#endif /* !LIBC_ARCH_HAVE_MEMPMOVEUPQ */
+#ifndef LIBC_ARCH_HAVE_MEMPMOVEDOWNQ
 DEFINE_PUBLIC_ALIAS(mempmovedownq, libc_mempmovedownq);
+#endif /* !LIBC_ARCH_HAVE_MEMPMOVEDOWNQ */
+#ifndef LIBC_ARCH_HAVE_MEMSETQ
 DEFINE_PUBLIC_ALIAS(memsetq, libc_memsetq);
+#endif /* !LIBC_ARCH_HAVE_MEMSETQ */
+#ifndef LIBC_ARCH_HAVE_MEMPSETQ
 DEFINE_PUBLIC_ALIAS(mempsetq, libc_mempsetq);
+#endif /* !LIBC_ARCH_HAVE_MEMPSETQ */
+#ifndef LIBC_ARCH_HAVE_MEMCMPQ
 DEFINE_PUBLIC_ALIAS(memcmpq, libc_memcmpq);
+#endif /* !LIBC_ARCH_HAVE_MEMCMPQ */
+#ifndef LIBC_ARCH_HAVE_MEMCHRQ
 DEFINE_PUBLIC_ALIAS(memchrq, libc_memchrq);
+#endif /* !LIBC_ARCH_HAVE_MEMCHRQ */
+#ifndef LIBC_ARCH_HAVE_MEMRCHRQ
 DEFINE_PUBLIC_ALIAS(memrchrq, libc_memrchrq);
+#endif /* !LIBC_ARCH_HAVE_MEMRCHRQ */
+#ifndef LIBC_ARCH_HAVE_RAWMEMCHRQ
 DEFINE_PUBLIC_ALIAS(rawmemchrq, libc_rawmemchrq);
+#endif /* !LIBC_ARCH_HAVE_RAWMEMCHRQ */
+#ifndef LIBC_ARCH_HAVE_RAWMEMRCHRQ
 DEFINE_PUBLIC_ALIAS(rawmemrchrq, libc_rawmemrchrq);
+#endif /* !LIBC_ARCH_HAVE_RAWMEMRCHRQ */
+#ifndef LIBC_ARCH_HAVE_MEMENDQ
 DEFINE_PUBLIC_ALIAS(memendq, libc_memendq);
+#endif /* !LIBC_ARCH_HAVE_MEMENDQ */
+#ifndef LIBC_ARCH_HAVE_MEMRENDQ
 DEFINE_PUBLIC_ALIAS(memrendq, libc_memrendq);
+#endif /* !LIBC_ARCH_HAVE_MEMRENDQ */
+#ifndef LIBC_ARCH_HAVE_MEMLENQ
 DEFINE_PUBLIC_ALIAS(memlenq, libc_memlenq);
+#endif /* !LIBC_ARCH_HAVE_MEMLENQ */
+#ifndef LIBC_ARCH_HAVE_MEMRLENQ
 DEFINE_PUBLIC_ALIAS(memrlenq, libc_memrlenq);
+#endif /* !LIBC_ARCH_HAVE_MEMRLENQ */
+#ifndef LIBC_ARCH_HAVE_RAWMEMLENQ
 DEFINE_PUBLIC_ALIAS(rawmemlenq, libc_rawmemlenq);
+#endif /* !LIBC_ARCH_HAVE_RAWMEMLENQ */
+#ifndef LIBC_ARCH_HAVE_RAWMEMRLENQ
 DEFINE_PUBLIC_ALIAS(rawmemrlenq, libc_rawmemrlenq);
-#ifndef __KERNEL__
+#endif /* !LIBC_ARCH_HAVE_RAWMEMRLENQ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMXCHR)
 DEFINE_PUBLIC_ALIAS(memxchr, libc_memxchr);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMXCHR */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMRXCHR)
 DEFINE_PUBLIC_ALIAS(memrxchr, libc_memrxchr);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMRXCHR */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMXCHR)
 DEFINE_PUBLIC_ALIAS(rawmemxchr, libc_rawmemxchr);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMXCHR */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMRXCHR)
 DEFINE_PUBLIC_ALIAS(rawmemrxchr, libc_rawmemrxchr);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMRXCHR */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMXEND)
 DEFINE_PUBLIC_ALIAS(memxend, libc_memxend);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMXEND */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMRXEND)
 DEFINE_PUBLIC_ALIAS(memrxend, libc_memrxend);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMRXEND */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMXLEN)
 DEFINE_PUBLIC_ALIAS(memxlen, libc_memxlen);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMXLEN */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMRXLEN)
 DEFINE_PUBLIC_ALIAS(memrxlen, libc_memrxlen);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMRXLEN */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMXLEN)
 DEFINE_PUBLIC_ALIAS(rawmemxlen, libc_rawmemxlen);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMXLEN */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMRXLEN)
 DEFINE_PUBLIC_ALIAS(rawmemrxlen, libc_rawmemrxlen);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMRXLEN */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMXCHRW)
 DEFINE_PUBLIC_ALIAS(memxchrw, libc_memxchrw);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMXCHRW */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMXCHRL)
 DEFINE_PUBLIC_ALIAS(memxchrl, libc_memxchrl);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMXCHRL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMRXCHRW)
 DEFINE_PUBLIC_ALIAS(memrxchrw, libc_memrxchrw);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMRXCHRW */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMRXCHRL)
 DEFINE_PUBLIC_ALIAS(memrxchrl, libc_memrxchrl);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMRXCHRL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMXCHRW)
 DEFINE_PUBLIC_ALIAS(rawmemxchrw, libc_rawmemxchrw);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMXCHRW */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMXCHRL)
 DEFINE_PUBLIC_ALIAS(rawmemxchrl, libc_rawmemxchrl);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMXCHRL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMRXCHRW)
 DEFINE_PUBLIC_ALIAS(rawmemrxchrw, libc_rawmemrxchrw);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMRXCHRW */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMRXCHRL)
 DEFINE_PUBLIC_ALIAS(rawmemrxchrl, libc_rawmemrxchrl);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMRXCHRL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMXENDW)
 DEFINE_PUBLIC_ALIAS(memxendw, libc_memxendw);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMXENDW */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMXENDL)
 DEFINE_PUBLIC_ALIAS(memxendl, libc_memxendl);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMXENDL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMRXENDW)
 DEFINE_PUBLIC_ALIAS(memrxendw, libc_memrxendw);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMRXENDW */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMRXENDL)
 DEFINE_PUBLIC_ALIAS(memrxendl, libc_memrxendl);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMRXENDL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMXLENW)
 DEFINE_PUBLIC_ALIAS(memxlenw, libc_memxlenw);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMXLENW */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMXLENL)
 DEFINE_PUBLIC_ALIAS(memxlenl, libc_memxlenl);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMXLENL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMRXLENW)
 DEFINE_PUBLIC_ALIAS(memrxlenw, libc_memrxlenw);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMRXLENW */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMRXLENL)
 DEFINE_PUBLIC_ALIAS(memrxlenl, libc_memrxlenl);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMRXLENL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMXLENW)
 DEFINE_PUBLIC_ALIAS(rawmemxlenw, libc_rawmemxlenw);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMXLENW */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMXLENL)
 DEFINE_PUBLIC_ALIAS(rawmemxlenl, libc_rawmemxlenl);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMXLENL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMRXLENW)
 DEFINE_PUBLIC_ALIAS(rawmemrxlenw, libc_rawmemrxlenw);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMRXLENW */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMRXLENL)
 DEFINE_PUBLIC_ALIAS(rawmemrxlenl, libc_rawmemrxlenl);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMRXLENL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMXCHRQ)
 DEFINE_PUBLIC_ALIAS(memxchrq, libc_memxchrq);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMXCHRQ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMRXCHRQ)
 DEFINE_PUBLIC_ALIAS(memrxchrq, libc_memrxchrq);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMRXCHRQ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMXCHRQ)
 DEFINE_PUBLIC_ALIAS(rawmemxchrq, libc_rawmemxchrq);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMXCHRQ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMRXCHRQ)
 DEFINE_PUBLIC_ALIAS(rawmemrxchrq, libc_rawmemrxchrq);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMRXCHRQ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMXENDQ)
 DEFINE_PUBLIC_ALIAS(memxendq, libc_memxendq);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMXENDQ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMRXENDQ)
 DEFINE_PUBLIC_ALIAS(memrxendq, libc_memrxendq);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMRXENDQ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMXLENQ)
 DEFINE_PUBLIC_ALIAS(memxlenq, libc_memxlenq);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMXLENQ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMRXLENQ)
 DEFINE_PUBLIC_ALIAS(memrxlenq, libc_memrxlenq);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMRXLENQ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMXLENQ)
 DEFINE_PUBLIC_ALIAS(rawmemxlenq, libc_rawmemxlenq);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMXLENQ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_RAWMEMRXLENQ)
 DEFINE_PUBLIC_ALIAS(rawmemrxlenq, libc_rawmemrxlenq);
-#endif /* !__KERNEL__ */
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_RAWMEMRXLENQ */
+#ifndef LIBC_ARCH_HAVE_MEMMOVEUP
 DEFINE_PUBLIC_ALIAS(memmoveup, libc_memmoveup);
+#endif /* !LIBC_ARCH_HAVE_MEMMOVEUP */
+#ifndef LIBC_ARCH_HAVE_MEMMOVEDOWN
 DEFINE_PUBLIC_ALIAS(memmovedown, libc_memmovedown);
+#endif /* !LIBC_ARCH_HAVE_MEMMOVEDOWN */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(memcpyc, libc_memcpyc);
 DEFINE_PUBLIC_ALIAS(mempcpyc, libc_mempcpyc);
@@ -4457,36 +4591,84 @@ DEFINE_PUBLIC_ALIAS(mempmoveupc, libc_mempmoveupc);
 DEFINE_PUBLIC_ALIAS(memmovedownc, libc_memmovedownc);
 DEFINE_PUBLIC_ALIAS(mempmovedownc, libc_mempmovedownc);
 #endif /* !__KERNEL__ */
+#ifndef LIBC_ARCH_HAVE_STREND
 DEFINE_PUBLIC_ALIAS(strend, libc_strend);
+#endif /* !LIBC_ARCH_HAVE_STREND */
+#ifndef LIBC_ARCH_HAVE_STRNEND
 DEFINE_PUBLIC_ALIAS(strnend, libc_strnend);
-#ifndef __KERNEL__
+#endif /* !LIBC_ARCH_HAVE_STRNEND */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRNCHR)
 DEFINE_PUBLIC_ALIAS(strnchr, libc_strnchr);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRNCHR */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRNRCHR)
 DEFINE_PUBLIC_ALIAS(strnrchr, libc_strnrchr);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRNRCHR */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRRCHRNUL)
 DEFINE_PUBLIC_ALIAS(strrchrnul, libc_strrchrnul);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRRCHRNUL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRNCHRNUL)
 DEFINE_PUBLIC_ALIAS(strnchrnul, libc_strnchrnul);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRNCHRNUL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRNRCHRNUL)
 DEFINE_PUBLIC_ALIAS(strnrchrnul, libc_strnrchrnul);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRNRCHRNUL */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STROFF)
 DEFINE_PUBLIC_ALIAS(stroff, libc_stroff);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STROFF */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRROFF)
 DEFINE_PUBLIC_ALIAS(strroff, libc_strroff);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRROFF */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRNOFF)
 DEFINE_PUBLIC_ALIAS(strnoff, libc_strnoff);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRNOFF */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRNROFF)
 DEFINE_PUBLIC_ALIAS(strnroff, libc_strnroff);
-#endif /* !__KERNEL__ */
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRNROFF */
+#ifndef LIBC_ARCH_HAVE_MEMPSET
 DEFINE_PUBLIC_ALIAS(mempset, libc_mempset);
+#endif /* !LIBC_ARCH_HAVE_MEMPSET */
+#ifndef LIBC_ARCH_HAVE_MEMPMOVE
 DEFINE_PUBLIC_ALIAS(mempmove, libc_mempmove);
+#endif /* !LIBC_ARCH_HAVE_MEMPMOVE */
+#ifndef LIBC_ARCH_HAVE_MEMPMOVEUP
 DEFINE_PUBLIC_ALIAS(mempmoveup, libc_mempmoveup);
+#endif /* !LIBC_ARCH_HAVE_MEMPMOVEUP */
+#ifndef LIBC_ARCH_HAVE_MEMPMOVEDOWN
 DEFINE_PUBLIC_ALIAS(mempmovedown, libc_mempmovedown);
+#endif /* !LIBC_ARCH_HAVE_MEMPMOVEDOWN */
+#ifndef LIBC_ARCH_HAVE_RAWMEMRCHR
 DEFINE_PUBLIC_ALIAS(rawmemrchr, libc_rawmemrchr);
+#endif /* !LIBC_ARCH_HAVE_RAWMEMRCHR */
+#ifndef LIBC_ARCH_HAVE_MEMEND
 DEFINE_PUBLIC_ALIAS(memend, libc_memend);
+#endif /* !LIBC_ARCH_HAVE_MEMEND */
+#ifndef LIBC_ARCH_HAVE_MEMREND
 DEFINE_PUBLIC_ALIAS(memrend, libc_memrend);
+#endif /* !LIBC_ARCH_HAVE_MEMREND */
+#ifndef LIBC_ARCH_HAVE_MEMLEN
 DEFINE_PUBLIC_ALIAS(memlen, libc_memlen);
+#endif /* !LIBC_ARCH_HAVE_MEMLEN */
+#ifndef LIBC_ARCH_HAVE_MEMRLEN
 DEFINE_PUBLIC_ALIAS(memrlen, libc_memrlen);
+#endif /* !LIBC_ARCH_HAVE_MEMRLEN */
+#ifndef LIBC_ARCH_HAVE_RAWMEMLEN
 DEFINE_PUBLIC_ALIAS(rawmemlen, libc_rawmemlen);
+#endif /* !LIBC_ARCH_HAVE_RAWMEMLEN */
+#ifndef LIBC_ARCH_HAVE_RAWMEMRLEN
 DEFINE_PUBLIC_ALIAS(rawmemrlen, libc_rawmemrlen);
-#ifndef __KERNEL__
+#endif /* !LIBC_ARCH_HAVE_RAWMEMRLEN */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_MEMRMEM)
 DEFINE_PUBLIC_ALIAS(memrmem, libc_memrmem);
-#endif /* !__KERNEL__ */
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_MEMRMEM */
+#ifndef LIBC_ARCH_HAVE_MEMPATW
 DEFINE_PUBLIC_ALIAS(mempatw, libc_mempatw);
+#endif /* !LIBC_ARCH_HAVE_MEMPATW */
+#ifndef LIBC_ARCH_HAVE_MEMPATL
 DEFINE_PUBLIC_ALIAS(mempatl, libc_mempatl);
+#endif /* !LIBC_ARCH_HAVE_MEMPATL */
+#ifndef LIBC_ARCH_HAVE_MEMPATQ
 DEFINE_PUBLIC_ALIAS(mempatq, libc_mempatq);
+#endif /* !LIBC_ARCH_HAVE_MEMPATQ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(memicmp, libc_memcasecmp);
 DEFINE_PUBLIC_ALIAS(_memicmp, libc_memcasecmp);

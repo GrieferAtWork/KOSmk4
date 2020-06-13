@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x813bac9e */
+/* HASH CRC-32:0x417da9fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,12 @@
 #define __local_scandir64_defined 1
 #include <__crt.h>
 #if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_scandirat64) || (defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)))
+#include <bits/dirent.h>
+#ifndef ____scandir64_selector_t_defined
+#define ____scandir64_selector_t_defined 1
+typedef int (*__scandir64_selector_t)(struct dirent64 const *);
+typedef int (*__scandir64_cmp_t)(struct dirent64 const **, struct dirent64 const **);
+#endif /* !____scandir64_selector_t_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: scandirat64 from dirent */
 #ifndef __local___localdep_scandirat64_defined

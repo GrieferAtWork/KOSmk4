@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc787d85 */
+/* HASH CRC-32:0xbfe727e1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -231,7 +231,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir64_r,(DIR *__rest
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifdef __CRT_HAVE_seekdir
 /* Get the directory stream position */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,seekdir,(DIR *__restrict __dirp, long int __pos),(__dirp,__pos))
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,seekdir,(DIR *__restrict __dirp, __LONGPTR_TYPE__ __pos),(__dirp,__pos))
 #endif /* __CRT_HAVE_seekdir */
 #ifdef __CRT_HAVE_telldir
 /* Get the directory stream position */
@@ -244,8 +244,11 @@ __CDECLARE(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,telldir,(DIR *__restrict _
 /* Return the underlying file descriptor of the given directory stream */
 __CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,dirfd,(DIR __KOS_FIXED_CONST *__restrict __dirp),(__dirp))
 #endif /* __CRT_HAVE_dirfd */
+#ifndef ____scandir_selector_t_defined
+#define ____scandir_selector_t_defined 1
 typedef int (*__scandir_selector_t)(struct dirent const *);
 typedef int (*__scandir_cmp_t)(struct dirent const **, struct dirent const **);
+#endif /* !____scandir_selector_t_defined */
 
 #if defined(__CRT_HAVE_scandir) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* Scan a directory `DIR' for all contained directory entries */
@@ -294,8 +297,11 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,scandirat,(__fd_t __dirfd, 
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
+#ifndef ____scandir64_selector_t_defined
+#define ____scandir64_selector_t_defined 1
 typedef int (*__scandir64_selector_t)(struct dirent64 const *);
 typedef int (*__scandir64_cmp_t)(struct dirent64 const **, struct dirent64 const **);
+#endif /* !____scandir64_selector_t_defined */
 #ifdef __CRT_HAVE_scandir64
 /* 64-bit variant of `scandir()' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,scandir64,(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp),(__dir,__namelist,__selector,__cmp))

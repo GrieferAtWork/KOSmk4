@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53f3ab83 */
+/* HASH CRC-32:0xb0451df1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_posix_fallocate_defined
 #define __local_posix_fallocate_defined 1
 #include <__crt.h>
+#include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: posix_fallocate32 from fcntl */

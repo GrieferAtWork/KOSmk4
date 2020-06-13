@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf49f7f2f */
+/* HASH CRC-32:0xcf5a20fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: readlinkat from unistd */
 #if !defined(__local___localdep_readlinkat_defined) && defined(__CRT_HAVE_readlinkat)
 #define __local___localdep_readlinkat_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing

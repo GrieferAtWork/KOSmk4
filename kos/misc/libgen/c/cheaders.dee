@@ -2023,8 +2023,8 @@ class Function {
 	public member name: string | UserString;
 
 	@@Name of the function inside of the actual library
-	@@Unbound if the function isn't actually being exported from its associated library
-	public member internalName: string | UserString | Callable;
+	@@Set to @none if the function isn't actually being exported from its associated library
+	public member internalName: string | UserString | none | Callable = none;
 
 	@@Name of the original defining system header (may differ from the containing
 	@@header in case @"%[insert:extern(...)]" was used to inject a foreign function)
@@ -2039,7 +2039,7 @@ class Function {
 	public member documentation: string | UserString | Callable = "";
 
 	@@Helper wrapper for @internalName to automatically unwind callable objects
-	public property internalFunctionName: string | UserString = {
+	public property internalFunctionName: string | UserString | none = {
 		get(): string | UserString {
 			local result = internalName;
 			if (result is Callable)
@@ -2143,8 +2143,7 @@ class Function {
 			documentationString;
 			for (local b: functionBindings)
 				b.preload();
-			if (internalName is bound)
-				internalFunctionName;
+			internalFunctionName;
 		} catch (...) {
 			print "... while preloading Function", repr(name);
 			throw;
@@ -2521,6 +2520,38 @@ class LibraryFunction {
 	@@Pairs of @(ppCond, symbolName) of how @this Binding should be exported from the library.
 	public member exportSymbolNames: {(string | UserString, string | UserString)...} = [];
 
+	@@The preprocessor-condition that must be met for @this @LibraryFunction
+	@@to actually be implemented as part of its auto- or user-source
+	@@This condition is essentially:
+	@@    @(this.ppCond && (functionBindings.each.ppCond || ...))
+	public property implementationPpCond: string = {
+		get(): string {
+			if (ppCond == "0")
+				return "0";
+			local hasUniversalBinding = false;
+			for (local b: functionBindings) {
+				if (b.ppCond == "1") {
+					hasUniversalBinding = true;
+					break;
+				}
+			}
+			if (hasUniversalBinding)
+				return ppCond;
+			local bindingConditions = [];
+			for (local b: functionBindings) {
+				if (b.ppCond == "0")
+					continue;
+				bindingConditions.append("({})".format({ b.ppCond }));
+			}
+			bindingConditions = "||".join(bindingConditions);
+			if (ppCond != "1") {
+				bindingConditions = "({})&&({})"
+					.format({ ppCond, bindingConditions });
+			}
+			return bindingConditions;
+		}
+	}
+
 	@@Helper wrapper for @documentation to automatically unwind callable objects
 	public property documentationString: string | UserString = {
 		get(): string | UserString {
@@ -2618,8 +2649,10 @@ class LibraryFunction {
 							return this.name;
 						local depFun = deps.get(keyword);
 						if (depFun !is none) {
-							if (depFun.internalName is bound)
-								return depFun.internalFunctionName;
+							local intName = depFun.internalFunctionName;
+							if (intName !is none)
+								return intName;
+							print "Non-libc dependency:", repr depFun.name;
 							return depFun.name;
 						}
 						return none;
@@ -2983,9 +3016,10 @@ class SystemHeader {
 				if (deps is none)
 					deps = dependentFunctionHeaders[binding.ppCond] = HashSet();
 				for (local none, func: bindingDeps) {
-					if (func.internalName !is bound)
+					local intName = func.internalFunctionName;
+					if (intName is none)
 						continue; /* No internal name override! */
-					deps.insert(allLibraryFunctionsByName[func.internalFunctionName]
+					deps.insert(allLibraryFunctionsByName[intName]
 						.originalSystemHeaderName);
 				}
 			}
@@ -3027,7 +3061,7 @@ class SystemHeader {
 				continue;
 			if (!part.exportSymbolNames)
 				continue;
-			fp.ppIf(part.ppCond);
+			fp.ppIf(part.implementationPpCond);
 			for (local ppCond, asmname: part.exportSymbolNames) {
 				fp.ppIf(ppCond);
 				if (!asmname.issymbol())

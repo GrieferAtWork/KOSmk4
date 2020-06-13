@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbab4e89d */
+/* HASH CRC-32:0xbee3e000 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -699,23 +699,23 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 0) NONNULL((1
                                char const *__restrict format,
                                va_list args) THROWS(...) {
 #ifndef __INTELLISENSE__
-#define __FORMAT_PRINTER            printer
-#define __FORMAT_ARG                arg
-#define __FORMAT_FORMAT             format
-#define __FORMAT_ARGS               args
-#define __CHAR_TYPE                 char
-#define __CHAR_SIZE                 __SIZEOF_CHAR__
-#define __FORMAT_REPEAT             libc_format_repeat
-#define __FORMAT_HEXDUMP            libc_format_hexdump
-#define __FORMAT_WIDTH              libc_format_width
-#define __FORMAT_ESCAPE             libc_format_escape
-#define __FORMAT_WIDTH16            libd_format_wwidth
-#define __FORMAT_WIDTH32            libc_format_wwidth
-#define __FORMAT_ESCAPE16           libd_format_wescape
-#define __FORMAT_ESCAPE32           libc_format_wescape
-#define __FORMAT_UNICODE_WRITECHAR  libc_unicode_writeutf8
-#define __FORMAT_UNICODE_FORMAT16   libd_format_wto8
-#define __FORMAT_UNICODE_FORMAT32   libc_format_wto8
+#define __FORMAT_PRINTER           printer
+#define __FORMAT_ARG               arg
+#define __FORMAT_FORMAT            format
+#define __FORMAT_ARGS              args
+#define __CHAR_TYPE                char
+#define __CHAR_SIZE                __SIZEOF_CHAR__
+#define __FORMAT_REPEAT            libc_format_repeat
+#define __FORMAT_HEXDUMP           libc_format_hexdump
+#define __FORMAT_WIDTH             libc_format_width
+#define __FORMAT_ESCAPE            libc_format_escape
+#define __FORMAT_WIDTH16           libd_format_wwidth
+#define __FORMAT_WIDTH32           libc_format_wwidth
+#define __FORMAT_ESCAPE16          libd_format_wescape
+#define __FORMAT_ESCAPE32          libc_format_wescape
+#define __FORMAT_UNICODE_WRITECHAR libc_unicode_writeutf8
+#define __FORMAT_UNICODE_FORMAT16  libd_format_wto8
+#define __FORMAT_UNICODE_FORMAT32  libc_format_wto8
 #include <local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }
@@ -911,13 +911,13 @@ INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(void *arg,
                                                    char const *__restrict data,
                                                    size_t datalen) {
-	struct format_snprintf_data_ {
+	struct __format_snprintf_data_ {
 		char   *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		size_t  sd_bufsiz; /* Remaining buffer size. */
 	};
-	struct format_snprintf_data_ *ctrl;
+	struct __format_snprintf_data_ *ctrl;
 	size_t result = datalen;
-	ctrl = (struct format_snprintf_data_ *)arg;
+	ctrl = (struct __format_snprintf_data_ *)arg;
 	if (result > ctrl->sd_bufsiz)
 		result = ctrl->sd_bufsiz;
 	libc_memcpyc(ctrl->sd_buffer, data, result, sizeof(char));

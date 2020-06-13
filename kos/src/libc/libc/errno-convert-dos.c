@@ -67,6 +67,7 @@ DEFINE_PUBLIC_ALIAS(errno_kos2dos, libd_errno_dos2kos);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_kos2dos")
 NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/ errno_t value) {
 	errno_t result;
+	/* TODO: Don't use a giant switch for this. Instead, use a vector of number-pairs */
 	switch (value) {
 	case EPERM:           result = __DOS_EPERM;           break; /* Operation not permitted */
 	case ENOENT:          result = __DOS_ENOENT;          break; /* No such file or directory */
@@ -155,6 +156,7 @@ DEFINE_PUBLIC_ALIAS(errno_dos2kos, libd_errno_dos2kos);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_dos2kos")
 NOBLOCK ATTR_CONST /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2kos)(/*dos*/ errno_t value) {
 	errno_t result;
+	/* TODO: Don't use a giant switch for this. Instead, use a vector of number-pairs */
 	switch (value) {
 	case __DOS_EPERM:           result = EPERM;           break; /* Operation not permitted */
 	case __DOS_ENOENT:          result = ENOENT;          break; /* No such file or directory */

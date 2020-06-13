@@ -130,16 +130,16 @@ NOTHROW_NCX(LIBDCALL libd_wgetlogin)(void)
 }
 /*[[[end:libd_wgetlogin]]]*/
 
-/*[[[head:libc_wpathconf,hash:CRC-32=0x2a23afaf]]]*/
+/*[[[head:libc_wpathconf,hash:CRC-32=0xdb4b9b14]]]*/
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTERN NONNULL((1)) long int
+INTERN NONNULL((1)) longptr_t
 NOTHROW_RPC(LIBKCALL libc_wpathconf)(char32_t const *path,
-                                     int name)
+                                     __STDC_INT_AS_UINT_T name)
 /*[[[body:libc_wpathconf]]]*/
 {
 	long int result;
@@ -153,16 +153,16 @@ NOTHROW_RPC(LIBKCALL libc_wpathconf)(char32_t const *path,
 }
 /*[[[end:libc_wpathconf]]]*/
 
-/*[[[head:libd_wpathconf,hash:CRC-32=0x2a14473d]]]*/
+/*[[[head:libd_wpathconf,hash:CRC-32=0xe3a308b1]]]*/
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTERN NONNULL((1)) long int
+INTERN NONNULL((1)) longptr_t
 NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path,
-                                     int name)
+                                     __STDC_INT_AS_UINT_T name)
 /*[[[body:libd_wpathconf]]]*/
 {
 	long int result;
@@ -360,14 +360,14 @@ NOTHROW_RPC(LIBDCALL libd__wgetcwd)(char16_t *buf,
 }
 /*[[[end:libd__wgetcwd]]]*/
 
-/*[[[head:libc_wfaccessat,hash:CRC-32=0xc08b2abb]]]*/
+/*[[[head:libc_wfaccessat,hash:CRC-32=0xf8ec0018]]]*/
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
 INTERN NONNULL((2)) int
 NOTHROW_RPC(LIBKCALL libc_wfaccessat)(fd_t dfd,
                                       char32_t const *file,
-                                      int type,
+                                      __STDC_INT_AS_UINT_T type,
                                       atflag_t flags)
 /*[[[body:libc_wfaccessat]]]*/
 {
@@ -382,14 +382,14 @@ NOTHROW_RPC(LIBKCALL libc_wfaccessat)(fd_t dfd,
 }
 /*[[[end:libc_wfaccessat]]]*/
 
-/*[[[head:libd_wfaccessat,hash:CRC-32=0xcb07f57c]]]*/
+/*[[[head:libd_wfaccessat,hash:CRC-32=0x61b0f257]]]*/
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
 INTERN NONNULL((2)) int
 NOTHROW_RPC(LIBDCALL libd_wfaccessat)(fd_t dfd,
                                       char16_t const *file,
-                                      int type,
+                                      __STDC_INT_AS_UINT_T type,
                                       atflag_t flags)
 /*[[[body:libd_wfaccessat]]]*/
 {
@@ -1048,26 +1048,26 @@ NOTHROW_RPC(LIBDCALL libd_wlink)(char16_t const *from,
 }
 /*[[[end:libd_wlink]]]*/
 
-/*[[[head:libc_waccess,hash:CRC-32=0x2e7435f7]]]*/
+/*[[[head:libc_waccess,hash:CRC-32=0x287b71f5]]]*/
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
 INTERN WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBKCALL libc_waccess)(char32_t const *file,
-                                   int type)
+                                   __STDC_INT_AS_UINT_T type)
 /*[[[body:libc_waccess]]]*/
 {
 	return libc_wfaccessat(AT_FDCWD, file, type, 0);
 }
 /*[[[end:libc_waccess]]]*/
 
-/*[[[head:libd_waccess,hash:CRC-32=0x3fbb4add]]]*/
+/*[[[head:libd_waccess,hash:CRC-32=0x4e31dd34]]]*/
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
 INTERN WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_waccess)(char16_t const *file,
-                                   int type)
+                                   __STDC_INT_AS_UINT_T type)
 /*[[[body:libd_waccess]]]*/
 {
 	return libd_wfaccessat(AT_FDCWD, file, type, 0);

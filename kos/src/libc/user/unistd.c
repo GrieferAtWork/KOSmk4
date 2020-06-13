@@ -831,13 +831,13 @@ NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd,
 }
 /*[[[end:libc_write]]]*/
 
-/*[[[head:libc_lseek,hash:CRC-32=0xb5bad767]]]*/
+/*[[[head:libc_lseek,hash:CRC-32=0x559c2bf8]]]*/
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 INTERN ATTR_SECTION(".text.crt.io.seek") off_t
 NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd,
                                  off_t offset,
-                                 int whence)
+                                 __STDC_INT_AS_UINT_T whence)
 /*[[[body:libc_lseek]]]*/
 {
 	off_t result;
@@ -906,13 +906,13 @@ NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd)
 }
 /*[[[end:libc_close]]]*/
 
-/*[[[head:libc_access,hash:CRC-32=0xcc94957d]]]*/
+/*[[[head:libc_access,hash:CRC-32=0x960e2f3]]]*/
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
 INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_access)(char const *file,
-                                  int type)
+                                  __STDC_INT_AS_UINT_T type)
 /*[[[body:libc_access]]]*/
 {
 	errno_t result;
@@ -1047,14 +1047,14 @@ NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file,
 }
 /*[[[end:libc_euidaccess]]]*/
 
-/*[[[head:libc_faccessat,hash:CRC-32=0x45a6576d]]]*/
+/*[[[head:libc_faccessat,hash:CRC-32=0x1d183b66]]]*/
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
 INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd,
                                      char const *file,
-                                     int type,
+                                     __STDC_INT_AS_UINT_T type,
                                      atflag_t flags)
 /*[[[body:libc_faccessat]]]*/
 {
@@ -1169,7 +1169,7 @@ NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd,
 }
 /*[[[end:libc_unlinkat]]]*/
 
-/*[[[head:libc_lseek64,hash:CRC-32=0x67534879]]]*/
+/*[[[head:libc_lseek64,hash:CRC-32=0x804bca6]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_lseek64, libc_lseek);
 #else /* MAGIC:alias */
@@ -1178,7 +1178,7 @@ DEFINE_INTERN_ALIAS(libc_lseek64, libc_lseek);
 INTERN ATTR_SECTION(".text.crt.io.large.seek") off64_t
 NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd,
                                    off64_t offset,
-                                   int whence)
+                                   __STDC_INT_AS_UINT_T whence)
 /*[[[body:libc_lseek64]]]*/
 {
 	off64_t result;
@@ -1673,8 +1673,8 @@ NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid,
 PRIVATE ATTR_SECTION(".rodata.crt.system.configuration.hostid_pathname") char const hostid_pathname[] = "/etc";
 PRIVATE ATTR_SECTION(".rodata.crt.system.configuration.hostid_filename") char const hostid_filename[] = "/etc/hostid";
 
-/*[[[head:libc_gethostid,hash:CRC-32=0x259bfeb0]]]*/
-INTERN ATTR_SECTION(".text.crt.system.configuration") WUNUSED long int
+/*[[[head:libc_gethostid,hash:CRC-32=0x309164ac]]]*/
+INTERN ATTR_SECTION(".text.crt.system.configuration") WUNUSED longptr_t
 NOTHROW_NCX(LIBCCALL libc_gethostid)(void)
 /*[[[body:libc_gethostid]]]*/
 {
@@ -1693,9 +1693,9 @@ NOTHROW_NCX(LIBCCALL libc_gethostid)(void)
 }
 /*[[[end:libc_gethostid]]]*/
 
-/*[[[head:libc_sethostid,hash:CRC-32=0xbb7b3baf]]]*/
+/*[[[head:libc_sethostid,hash:CRC-32=0x804d684b]]]*/
 INTERN ATTR_SECTION(".text.crt.system.configuration") int
-NOTHROW_NCX(LIBCCALL libc_sethostid)(long int id)
+NOTHROW_NCX(LIBCCALL libc_sethostid)(longptr_t id)
 /*[[[body:libc_sethostid]]]*/
 {
 	fd_t fd;
@@ -1925,9 +1925,9 @@ NOTHROW_NCX(LIBCCALL libc_vhangup)(void)
 }
 /*[[[end:libc_vhangup]]]*/
 
-/*[[[head:libc_profil,hash:CRC-32=0x8f3f5615]]]*/
+/*[[[head:libc_profil,hash:CRC-32=0x994cbdf3]]]*/
 INTERN ATTR_SECTION(".text.crt.system.utility") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_profil)(unsigned short int *sample_buffer,
+NOTHROW_NCX(LIBCCALL libc_profil)(uint16_t *sample_buffer,
                                   size_t size,
                                   size_t offset,
                                   unsigned int scale)
@@ -1985,10 +1985,10 @@ NOTHROW_RPC(LIBCCALL libc_setusershell)(void)
 PRIVATE ATTR_SECTION(".rodata.crt.system.utility.root") char const root[] = "/";
 PRIVATE ATTR_SECTION(".rodata.crt.system.utility.dev_null") char const dev_null[] = "/dev/null";
 
-/*[[[head:libc_daemon,hash:CRC-32=0x4ad237b7]]]*/
+/*[[[head:libc_daemon,hash:CRC-32=0xae3ecb6]]]*/
 INTERN ATTR_SECTION(".text.crt.system.utility") int
-NOTHROW_RPC(LIBCCALL libc_daemon)(int nochdir,
-                                  int noclose)
+NOTHROW_RPC(LIBCCALL libc_daemon)(__STDC_INT_AS_UINT_T nochdir,
+                                  __STDC_INT_AS_UINT_T noclose)
 /*[[[body:libc_daemon]]]*/
 {
 	pid_t cpid;
@@ -2197,14 +2197,14 @@ NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s)
 }
 /*[[[end:libc_ctermid]]]*/
 
-/*[[[head:libc_fpathconf,hash:CRC-32=0xfd089b72]]]*/
+/*[[[head:libc_fpathconf,hash:CRC-32=0x68bc5593]]]*/
 /* >> fpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED long int
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED longptr_t
 NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
                                      int name)
 /*[[[body:libc_fpathconf]]]*/
@@ -2218,16 +2218,16 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 /*[[[end:libc_fpathconf]]]*/
 
 
-/*[[[head:libc_pathconf,hash:CRC-32=0x66eb8073]]]*/
+/*[[[head:libc_pathconf,hash:CRC-32=0xa51c8ad0]]]*/
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((1)) long int
+INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((1)) longptr_t
 NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
-                                    int name)
+                                    __STDC_INT_AS_UINT_T name)
 /*[[[body:libc_pathconf]]]*/
 /*AUTO*/{
 	(void)path;
@@ -2238,7 +2238,7 @@ NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
 }
 /*[[[end:libc_pathconf]]]*/
 
-/*[[[head:libc_confstr,hash:CRC-32=0xfdf3b344]]]*/
+/*[[[head:libc_confstr,hash:CRC-32=0x3fd15238]]]*/
 /* Retrieve a system configuration string specified by `name'
  * @param: name:   One of `_CS_*' from <bits/confname.h>
  * @param: buf:    Target buffer
@@ -2247,7 +2247,7 @@ NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
  * @return: 1 :    Empty configuration string.
  * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
 INTERN ATTR_SECTION(".text.crt.system.configuration") size_t
-NOTHROW_NCX(LIBCCALL libc_confstr)(int name,
+NOTHROW_NCX(LIBCCALL libc_confstr)(__STDC_INT_AS_UINT_T name,
                                    char *buf,
                                    size_t buflen)
 /*[[[body:libc_confstr]]]*/
@@ -2361,7 +2361,7 @@ NOTHROW_NCX(LIBCCALL libc_confstr)(int name,
 }
 /*[[[end:libc_confstr]]]*/
 
-/*[[[head:libc_sysconf,hash:CRC-32=0x6196af8d]]]*/
+/*[[[head:libc_sysconf,hash:CRC-32=0xa1c47dad]]]*/
 /* >> sysconf(2)
  * @param: NAME: One of `_SC_*' from <bits/confname.h>
  * Return a system configuration value `NAME'
@@ -2369,8 +2369,8 @@ NOTHROW_NCX(LIBCCALL libc_confstr)(int name,
  * return: -1: [errno=<unchanged>] `NAME' referrs to a maximum or minimum
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTERN ATTR_SECTION(".text.crt.system.configuration") WUNUSED long int
-NOTHROW_RPC(LIBCCALL libc_sysconf)(int name)
+INTERN ATTR_SECTION(".text.crt.system.configuration") WUNUSED longptr_t
+NOTHROW_RPC(LIBCCALL libc_sysconf)(__STDC_INT_AS_UINT_T name)
 /*[[[body:libc_sysconf]]]*/
 {
 	long int result;

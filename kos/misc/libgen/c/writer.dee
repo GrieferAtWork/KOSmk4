@@ -179,6 +179,23 @@ done:
 	public function addPpElif(cond: string): CGenerator {
 		deleteTrailingForceNl();
 		optimizeTrailingStrings();
+		if (pendingParts) {
+			local lastPart = pendingParts.last;
+			if (lastPart[0] in [CGP_IF, CGP_ELIF]) {
+				/* Optimize:
+				 * >> #if FOO
+				 * >> #elif BAR
+				 * >> ...
+				 * Into:
+				 * >> #if !FOO && BAR
+				 * >> ... */
+				pendingParts.popback();
+				cond = optimizePreprocessorExpression("!({}) && ({})"
+					.format({ lastPart[1], cond }));
+				pendingParts.append((lastPart[0], cond));
+				return this;
+			}
+		}
 		pendingParts.append((CGP_ELIF, cond));
 		return this;
 	}
@@ -186,6 +203,23 @@ done:
 	public function addPpElse(comment: string): CGenerator {
 		deleteTrailingForceNl();
 		optimizeTrailingStrings();
+		if (pendingParts) {
+			local lastPart = pendingParts.last;
+			if (lastPart[0] in [CGP_IF, CGP_ELIF]) {
+				/* Optimize:
+				 * >> #if FOO
+				 * >> #else
+				 * >> ...
+				 * Into:
+				 * >> #if !FOO
+				 * >> ... */
+				pendingParts.popback();
+				local cond = optimizePreprocessorExpression("!({})"
+					.format({ lastPart[1] }));
+				pendingParts.append((lastPart[0], cond));
+				return this;
+			}
+		}
 		pendingParts.append((CGP_ELSE, comment));
 		return this;
 	}
@@ -193,6 +227,22 @@ done:
 	public function addPpEndif(comment: string): CGenerator {
 		deleteTrailingForceNl();
 		optimizeTrailingStrings();
+		/* Optimize away if the preceding block was entirely empty.
+		 * i.e. the last-written part was a CGP_IF */
+		if (pendingParts) {
+			local lastPart = pendingParts.last;
+			if (lastPart[0] == CGP_IF) {
+				pendingParts.popback();
+				return this;
+			} else if (lastPart[0] == CGP_ELIF) {
+				/* Delete the preceding ELIF, but will write the follow-up ENDIF */
+				pendingParts.popback();
+			} else if (lastPart[0] == CGP_ELSE) {
+				/* Same as with ELIF, but inherit the comment from the ELSE-block */
+				pendingParts.popback();
+				comment = lastPart[1];
+			}
+		}
 		pendingParts.append((CGP_ENDIF, comment));
 		return this;
 	}

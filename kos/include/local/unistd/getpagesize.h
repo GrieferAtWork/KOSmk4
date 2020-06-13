@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbfe10f1 */
+/* HASH CRC-32:0xc6ea4bc0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,11 @@
 #include <__crt.h>
 #include <asm/pagesize.h>
 #ifdef __ARCH_PAGESIZE
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-__LOCAL_LIBC(getpagesize) __ATTR_CONST __ATTR_WUNUSED int
+__LOCAL_LIBC(getpagesize) __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getpagesize))(void) {
 	return __ARCH_PAGESIZE;
 }

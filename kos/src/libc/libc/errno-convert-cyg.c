@@ -40,6 +40,7 @@ DEFINE_PUBLIC_ALIAS(errno_cyg2kos, libd_errno_cyg2kos);
 INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access.errno_cyg2kos")
 NOBLOCK /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_cyg2kos)(/*cyg*/ errno_t value) {
 	errno_t result;
+	/* TODO: Don't use a giant switch for this. Instead, use a vector of number-pairs */
 	switch (value) {
 
 	case __CYG_EPERM:           result = EPERM;           break; /* Not owner */
@@ -180,6 +181,7 @@ DEFINE_PUBLIC_ALIAS(errno_kos2cyg, libd_errno_kos2cyg);
 INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access.errno_kos2cyg")
 NOBLOCK /*cyg*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2cyg)(/*kos*/ errno_t value) {
 	errno_t result;
+	/* TODO: Don't use a giant switch for this. Instead, use a vector of number-pairs */
 	switch (value) {
 
 	case EPERM:           result = __CYG_EPERM;           break; /* Not owner */

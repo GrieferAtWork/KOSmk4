@@ -31,6 +31,10 @@
 %[define_replacement(atflag_t   = __atflag_t)]
 %[define_replacement(useconds_t = __useconds_t)]
 %[define_replacement(oflag_t    = __oflag_t)]
+%[define_replacement(longptr_t  = __LONGPTR_TYPE__)]
+%[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
+%[define_replacement(syscall_slong_t = __syscall_slong_t)]
+%[define_replacement(syscall_ulong_t = __syscall_ulong_t)]
 
 
 %{
@@ -333,6 +337,7 @@ $pid_t gettid();
 %#endif /* __USE_KOS */
 
 [[ignore, nocrt, alias("_pipe")]]
+[[decl_include("<bits/types.h>")]]
 int dos_pipe([[nonnull]] $fd_t pipedes[2],
              $uint32_t pipesize, $oflag_t textmode);
 
@@ -341,6 +346,7 @@ int dos_pipe([[nonnull]] $fd_t pipedes[2],
 @@Create a new pair of connected pipes ([0] = reader, [1] = writer)
 [[section(".text.crt.io.access"), export_alias("__pipe")]]
 [[userimpl, requires_function(dos_pipe)]]
+[[decl_include("<bits/types.h>")]]
 int pipe([[nonnull]] $fd_t pipedes[2]) {
 	return dos_pipe(pipedes, 4096, 0x8000); /* O_BINARY */
 }
@@ -361,6 +367,7 @@ unsigned int sleep(unsigned int seconds) {
 @@meaning that changes to its data and/or descriptor are written to disk
 [[cp, export_alias("_commit"), alias("fdatasync")]]
 [[userimpl, section(".text.crt.io.sync")]]
+[[decl_include("<bits/types.h>")]]
 int fsync($fd_t fd) {
 	(void)fd;
 	/* NO-OP */
@@ -374,6 +381,7 @@ int fsync($fd_t fd) {
 @@(That is the TID of the leader of the parent of the calling thread's leader)
 @@THIS_THREAD->LEADER->PARENT->LEADER->PID
 [[wunused]]
+[[decl_include("<bits/types.h>")]]
 $pid_t getppid();
 
 
@@ -383,6 +391,7 @@ $pid_t getppid();
 @@(That is the TID of the leader of the process group of the calling thread's leader)
 @@THIS_THREAD->LEADER->GROUP_LEADER->PID
 [[wunused]]
+[[decl_include("<bits/types.h>")]]
 $pid_t getpgrp();
 
 %
@@ -396,6 +405,7 @@ $pid_t getpgrp();
 @@When `PID' is ZERO(0), use `gettid()' for it instead.
 @@When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead
 [[export_alias("__setpgid")]]
+[[decl_include("<bits/types.h>")]]
 int setpgid($pid_t pid, $pid_t pgid);
 
 %
@@ -406,6 +416,7 @@ int setpgid($pid_t pid, $pid_t pgid);
 @@ - THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
 @@ - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
 @@ - return THIS_THREAD->LEADER->PID;
+[[decl_include("<bits/types.h>")]]
 $pid_t setsid();
 
 %[default_impl_section(".text.crt.sched.user")]
@@ -413,29 +424,30 @@ $pid_t setsid();
 %
 @@>> getuid(2)
 @@Return the real user ID of the calling process
-[[wunused]]
+[[wunused, decl_include("<bits/types.h>")]]
 $uid_t getuid();
 
 %
 @@>> geteuid(2)
 @@Return the effective user ID of the calling process
-[[wunused]]
+[[wunused, decl_include("<bits/types.h>")]]
 $uid_t geteuid();
 
 %
 @@>> getgid(2)
 @@Return the real group ID of the calling process
-[[wunused]]
+[[wunused, decl_include("<bits/types.h>")]]
 $gid_t getgid();
 
 %
 @@>> getegid(2)
 @@Return the effective group ID of the calling process
-[[wunused]]
+[[wunused, decl_include("<bits/types.h>")]]
 $gid_t getegid();
 
 %
 %/* ... */
+[[decl_include("<bits/types.h>")]]
 int getgroups(int size, $gid_t list[]);
 
 %
@@ -444,6 +456,7 @@ int getgroups(int size, $gid_t list[]);
 @@@return: 0 : Success
 @@@return: -1: [errno=EINVAL] : The given `UID' is invalid
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
+[[decl_include("<bits/types.h>")]]
 int setuid($uid_t uid);
 
 %
@@ -452,6 +465,7 @@ int setuid($uid_t uid);
 @@@return: 0 : Success
 @@@return: -1: [errno=EINVAL] : The given `GID' is invalid
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
+[[decl_include("<bits/types.h>")]]
 int setgid($gid_t gid);
 
 
@@ -466,6 +480,7 @@ int setgid($gid_t gid);
 @@parent can then `wait(2)' for
 [[crtbuiltin, wunused, export_alias("__fork")]]
 [[section(".text.crt.sched.access")]]
+[[decl_include("<bits/types.h>")]]
 $pid_t fork();
 
 
@@ -492,31 +507,32 @@ int pause();
 @@return: * : The configuration limit associated with `NAME' for `FD'
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
-[[cp, wunused, section(".text.crt.fs.property")]]
-long int fpathconf($fd_t fd, int name);
+[[cp, wunused, section(".text.crt.fs.property"), decl_include("<bits/types.h>")]]
+$longptr_t fpathconf($fd_t fd, int name);
 
 %[default_impl_section(".text.crt.io.tty")]
 
 %
 @@>> ttyname(3)
 @@Return the name of a TTY given its file descriptor
-[[cp, wunused]]
+[[cp, wunused, decl_include("<bits/types.h>")]]
 char *ttyname($fd_t fd);
 
 @@>> ttyname_r(3)
 @@Return the name of a TTY given its file descriptor
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 int ttyname_r($fd_t fd, [[outp(buflen)]] char *buf, size_t buflen);
 
 %
 @@>> tcgetpgrp(2)
 @@Return the foreground process group of a given TTY file descriptor
-[[wunused]]
+[[wunused, decl_include("<bits/types.h>")]]
 $pid_t tcgetpgrp($fd_t fd);
 
 %
 @@>> tcsetpgrp(2)
 @@Set the foreground process group of a given TTY file descriptor
+[[decl_include("<bits/types.h>")]]
 int tcsetpgrp($fd_t fd, $pid_t pgrp_id);
 
 %
@@ -529,6 +545,7 @@ char *getlogin();
 %
 @@>> chown(2)
 @@Change the ownership of a given `FILE' to `GROUP:OWNER'
+[[decl_include("<bits/types.h>")]]
 [[cp, userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(fchownat))]]
 int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	return fchownat(__CRT_AT_FDCWD, file, owner, group, 0);
@@ -541,8 +558,8 @@ int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 @@return: * : The configuration limit associated with `NAME' for `PATH'
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
-[[cp, section(".text.crt.fs.property")]]
-long int pathconf([[nonnull]] char const *path, int name);
+[[cp, section(".text.crt.fs.property"), decl_include("<features.h>")]]
+$longptr_t pathconf([[nonnull]] char const *path, __STDC_INT_AS_UINT_T name);
 
 %
 @@>> link(2)
@@ -562,12 +579,14 @@ int link([[nonnull]] char const *from, [[nonnull]] char const *to) {
 @@>> read(2)
 @@Read data from a given file descriptor `FD' and return the number of bytes read.
 @@A return value of ZERO(0) is indicative of EOF
+[[decl_include("<bits/types.h>")]]
 [[cp, guard, export_alias(_read, __read), section(".text.crt.io.read")]]
 ssize_t read($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize);
 
 %
 @@>> write(2)
 @@Write data to a given file descriptor `FD' and return the number of bytes written
+[[decl_include("<bits/types.h>")]]
 [[cp, guard, export_alias(_write, __write), section(".text.crt.io.write")]]
 ssize_t write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
 
@@ -581,7 +600,7 @@ ssize_t write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
 @@the file descriptor by the amount of data that had already been loaded. - Errors
 @@during this phase are silently ignored and don't cause `errno' to change
 [[cp, guard, section(".text.crt.io.read"), impl_include("<parts/errno.h>")]]
-[[userimpl, requires_function(read, lseek)]]
+[[userimpl, requires_function(read, lseek), decl_include("<bits/types.h>")]]
 ssize_t readall($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
 	ssize_t result, temp;
 	result = read(fd, buf, bufsize);
@@ -617,6 +636,7 @@ ssize_t readall($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
 @@written (in which case `bufsize' is returned).
 [[cp, guard, section(".text.crt.io.write"), impl_include("<parts/errno.h>")]]
 [[userimpl, requires($has_function(write) && $has_function(lseek))]]
+[[decl_include("<bits/types.h>")]]
 ssize_t writeall($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) {
 	ssize_t result, temp;
 	result = write(fd, buf, bufsize);
@@ -641,17 +661,18 @@ ssize_t writeall($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) {
 
 
 [[doc_alias("lseek"), ignore, nocrt, alias("lseek", "_lseek", "__lseek")]]
-$off32_t lseek32($fd_t fd, $off32_t offset, int whence);
+[[decl_include("<bits/types.h>", "<features.h>")]]
+$off32_t lseek32($fd_t fd, $off32_t offset, __STDC_INT_AS_UINT_T whence);
 
 %
 @@>> lseek(2)
 @@Change the position of the file read/write pointer within a file referred to by `FD'
-[[guard, no_crt_self_import]]
+[[guard, no_crt_self_import, decl_include("<features.h>", "<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("lseek64", "_lseeki64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("lseek", "_lseek", "__lseek")]]
 [[userimpl, requires($has_function(lseek32) || $has_function(lseek64))]]
 [[section(".text.crt.io.seek"), export_as("_lseek", "__lseek")]]
-$off_t lseek($fd_t fd, $off_t offset, int whence) {
+$off_t lseek($fd_t fd, $off_t offset, __STDC_INT_AS_UINT_T whence) {
 @@pp_if $has_function(lseek32)@@
 	return lseek32(fd, ($off32_t)offset, whence);
 @@pp_else@@
@@ -695,10 +716,10 @@ int close($fd_t fd);
 @@>> access(2)
 @@@param: TYPE: Set of `X_OK|W_OK|R_OK'
 @@Test for access to the specified file `FILE', testing for `TYPE'
-[[cp, guard, wunused]]
+[[cp, guard, wunused, decl_include("<features.h>")]]
 [[export_alias("_access"), section(".text.crt.fs.property")]]
 [[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(faccessat))]]
-int access([[nonnull]] char const *file, int type) {
+int access([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
 	return faccessat(__CRT_AT_FDCWD, file, type, 0);
 }
 
@@ -764,22 +785,23 @@ eaccess(*) = euidaccess;
 @@>> faccessat(2)
 @@@param: TYPE: Set of `X_OK | W_OK | R_OK'
 @@Test for access to the specified file `DFD:FILE', testing for `TYPE'
-[[cp]]
-int faccessat($fd_t dfd, [[nonnull]] char const *file, int type, $atflag_t flags);
+[[cp, decl_include("<features.h>")]]
+int faccessat($fd_t dfd, [[nonnull]] char const *file,
+              __STDC_INT_AS_UINT_T type, $atflag_t flags);
 
 %[default_impl_section(".text.crt.fs.modify")];
 
 %
 @@>> fchownat(2)
 @@Change the ownership of a given `DFD:FILE' to `GROUP:OWNER'
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 int fchownat($fd_t dfd, [[nonnull]] char const *file,
              $uid_t owner, $gid_t group, $atflag_t flags);
 
 %
 @@>> linkat(2)
 @@Create a hard link from `FROMFD:FROM', leading to `TOFD:TO'
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 int linkat($fd_t fromfd, [[nonnull]] char const *from,
            $fd_t tofd, [[nonnull]] char const *to, $atflag_t flags);
 
@@ -787,7 +809,7 @@ int linkat($fd_t fromfd, [[nonnull]] char const *from,
 @@>> symlinkat(3)
 @@Create a new symbolic link loaded with `LINK_TEXT' as link
 @@text, at the filesystem location referred to by `TOFD:TARGET_PATH'
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
               [[nonnull]] char const *target_path);
 
@@ -802,7 +824,7 @@ int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
 @@         keep on over allocating until the function indicates that it didn't
 @@         make use of the buffer in its entirety.
 @@When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'.
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 ssize_t readlinkat($fd_t dfd, [[nonnull]] char const *__restrict path,
                    [[outp(buflen)]] char *__restrict buf, size_t buflen);
 
@@ -811,7 +833,7 @@ ssize_t readlinkat($fd_t dfd, [[nonnull]] char const *__restrict path,
 @@>> freadlinkat(2)
 @@Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
 @@@param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE'
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 ssize_t freadlinkat($fd_t dfd, [[nonnull]] char const *__restrict path,
                     [[outp(buflen)]] char *__restrict buf, size_t buflen, $atflag_t flags);
 %#endif /* __USE_KOS */
@@ -821,7 +843,7 @@ ssize_t freadlinkat($fd_t dfd, [[nonnull]] char const *__restrict path,
 %
 @@>> unlinkat(2)
 @@Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME'
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 int unlinkat($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 %#endif /* __USE_ATFILE */
 
@@ -830,9 +852,10 @@ int unlinkat($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 %#ifdef __USE_LARGEFILE64
 @@>> lseek64(2)
 @@Change the position of the file read/write pointer within a file referred to by `FD'
-[[off64_variant_of(lseek), export_alias("_lseeki64")]]
+[[off64_variant_of(lseek), export_alias("_lseeki64"), decl_include("<bits/types.h>")]]
 [[section(".text.crt.io.large.seek"), userimpl, requires_function(lseek32)]]
-$off64_t lseek64($fd_t fd, $off64_t offset, int whence) {
+[[decl_include("<bits/types.h>")]]
+$off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 	return lseek32(fd, (__off32_t)offset, whence);
 }
 %#endif /* __USE_LARGEFILE64 */
@@ -855,11 +878,11 @@ $off64_t lseek64($fd_t fd, $off64_t offset, int whence) {
 %[define(DEFINE_PIO_OFFSET =
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS
-#define __PIO_OFFSET     __FS_TYPE(pos)
-#define __PIO_OFFSET64   __pos64_t
+#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS */
-#define __PIO_OFFSET     __FS_TYPE(off)
-#define __PIO_OFFSET64   __off64_t
+#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 )]
@@ -871,7 +894,7 @@ $off64_t lseek64($fd_t fd, $off64_t offset, int whence) {
 [[cp, decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pread64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pread")]]
-[[section(".text.crt.io.read"), requires_include("<asm/stdio.h>")]]
+[[section(".text.crt.io.read"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pread64) || ($has_function(lseek) && $has_function(read) && defined(__SEEK_SET) && defined(__SEEK_CUR)))]]
 ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET offset) {
 @@pp_if $has_function(pread64)@@
@@ -896,7 +919,7 @@ ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSE
 [[cp, decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pwrite64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pwrite")]]
-[[section(".text.crt.io.write"), requires_include("<asm/stdio.h>")]]
+[[section(".text.crt.io.write"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pwrite64) || ($has_function(lseek) && $has_function(write) && defined(__SEEK_SET) && defined(__SEEK_CUR)))]]
 ssize_t pwrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO_OFFSET offset) {
 @@pp_if $has_function(pwrite64)@@
@@ -925,7 +948,7 @@ ssize_t pwrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("preadall64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("preadall")]]
 [[section(".text.crt.io.read"), impl_include("<parts/errno.h>")]]
-[[userimpl, requires_function(preadall64)]]
+[[userimpl, requires_function(preadall64), decl_include("<bits/types.h>")]]
 ssize_t preadall($fd_t fd, [[outp(bufsize)]] void *buf,
                  size_t bufsize, __PIO_OFFSET offset) {
 	return preadall64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
@@ -937,7 +960,7 @@ ssize_t preadall($fd_t fd, [[outp(bufsize)]] void *buf,
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pwriteall64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pwriteall")]]
 [[impl_include("<parts/errno.h>"), section(".text.crt.io.write")]]
-[[userimpl, requires_function(pwriteall64)]]
+[[userimpl, requires_function(pwriteall64), decl_include("<bits/types.h>")]]
 ssize_t pwriteall($fd_t fd, [[inp(bufsize)]] void const *buf,
                   size_t bufsize, __PIO_OFFSET offset) {
 	return pwriteall64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
@@ -950,17 +973,19 @@ ssize_t pwriteall($fd_t fd, [[inp(bufsize)]] void const *buf,
 %#ifdef __USE_LARGEFILE64
 
 [[cp, ignore, nocrt, alias("pread")]]
+[[decl_include("<bits/types.h>")]]
 ssize_t pread32($fd_t fd, [[outp(bufsize)]] void *buf,
                 size_t bufsize, $pos32_t offset);
 
 [[cp, ignore, nocrt, alias("pwrite")]]
+[[decl_include("<bits/types.h>")]]
 ssize_t pwrite32($fd_t fd, [[inp(bufsize)]] void const *buf,
                  size_t bufsize, $pos32_t offset);
 
 @@>> pread64(2)
 @@Read data from a file at a specific offset
 [[cp, decl_prefix(DEFINE_PIO_OFFSET), off64_variant_of(pread), section(".text.crt.io.large.read")]]
-[[export_alias("__pread64"), requires_include("<asm/stdio.h>")]]
+[[export_alias("__pread64"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pread32) || ($has_function(lseek) && $has_function(read) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
 ssize_t pread64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET64 offset) {
 @@pp_if $has_function(pread32)@@
@@ -995,7 +1020,7 @@ ssize_t pread64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFF
 @@>> pwrite64(2)
 @@Write data to a file at a specific offset
 [[cp, decl_prefix(DEFINE_PIO_OFFSET), off64_variant_of(pwrite), section(".text.crt.io.large.write")]]
-[[export_alias("__pwrite64"), requires_include("<asm/stdio.h>")]]
+[[export_alias("__pwrite64"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pwrite32) || ($has_function(lseek) && $has_function(write) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
 ssize_t pwrite64($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO_OFFSET64 offset) {
 @@pp_if $has_function(pwrite32)@@
@@ -1032,7 +1057,7 @@ ssize_t pwrite64($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __P
 @@>> preadall64(3)
 @@Same as `readall(3)', but using `pread64(2)' instead of `read()'
 [[cp, off64_variant_of(preadall), section(".text.crt.io.large.read")]]
-[[userimpl, requires_function(pread64)]]
+[[userimpl, requires_function(pread64), decl_include("<bits/types.h>")]]
 ssize_t preadall64($fd_t fd, [[inp(bufsize)]] void *buf,
                    size_t bufsize, __PIO_OFFSET64 offset) {
 	ssize_t result, temp;
@@ -1059,7 +1084,7 @@ ssize_t preadall64($fd_t fd, [[inp(bufsize)]] void *buf,
 @@>> pwriteall64(3)
 @@Same as `writeall(3)', but using `pwrite64(2)' instead of `write()'
 [[cp, off64_variant_of(pwriteall), section(".text.crt.io.large.write")]]
-[[userimpl, requires_function(pwrite64)]]
+[[userimpl, requires_function(pwrite64), decl_include("<bits/types.h>")]]
 ssize_t pwriteall64($fd_t fd, [[inp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET64 offset) {
 	ssize_t result, temp;
 	result = pwrite64(fd, buf, bufsize, offset);
@@ -1121,6 +1146,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 
 [[section(".text.crt.io.access")]]
 [[userimpl, requires_function(pipe)]]
+[[decl_include("<bits/types.h>")]]
 int pipe2([[nonnull]] $fd_t pipedes[2], $oflag_t flags) {
 	(void)flags;
 	return pipe(pipedes);
@@ -1128,6 +1154,7 @@ int pipe2([[nonnull]] $fd_t pipedes[2], $oflag_t flags) {
 
 [[section(".text.crt.io.access")]]
 [[userimpl, requires_function(dup2)]]
+[[decl_include("<bits/types.h>")]]
 $fd_t dup3($fd_t oldfd, $fd_t newfd, $oflag_t flags) {
 	(void)flags;
 	return newfd != oldfd ? dup2(oldfd, newfd) : -1;
@@ -1141,6 +1168,7 @@ char *get_current_dir_name() {
 }
 
 [[cp, userimpl, section(".text.crt.fs.modify")]]
+[[decl_include("<bits/types.h>")]]
 int syncfs($fd_t fd) {
 	(void)fd;
 	/* NO-OP */
@@ -1149,10 +1177,19 @@ int syncfs($fd_t fd) {
 
 %[default_impl_section(".text.crt.sched.user")];
 
+[[decl_include("<bits/types.h>")]]
 int group_member($gid_t gid);
+
+[[decl_include("<bits/types.h>")]]
 int getresuid($uid_t *ruid, $uid_t *euid, $uid_t *suid);
+
+[[decl_include("<bits/types.h>")]]
 int getresgid($gid_t *rgid, $gid_t *egid, $gid_t *sgid);
+
+[[decl_include("<bits/types.h>")]]
 int setresuid($uid_t ruid, $uid_t euid, $uid_t suid);
+
+[[decl_include("<bits/types.h>")]]
 int setresgid($gid_t rgid, $gid_t egid, $gid_t sgid);
 %#endif /* __USE_GNU */
 
@@ -1161,12 +1198,13 @@ int setresgid($gid_t rgid, $gid_t egid, $gid_t sgid);
 
 @@Hidden function exported by DOS that allows for millisecond precision
 [[cp, ignore, nocrt, alias("__crtSleep", "delay")]]
-void __crtSleep(__UINT32_TYPE__ msecs);
+void __crtSleep($uint32_t msecs);
 
 
 @@Sleep for `useconds' microseconds (1/1.000.000 seconds)
 [[cp, section(".text.crt.system.utility")]]
 [[userimpl, requires_function(__crtSleep)]]
+[[decl_include("<bits/types.h>")]]
 int usleep($useconds_t useconds) {
 	__crtSleep(useconds / 1000l); /*USEC_PER_MSEC*/
 	return 0;
@@ -1180,6 +1218,7 @@ char *getwd([[nonnull]] char *buf) {
 }
 
 [[section(".text.crt.system.utility")]]
+[[decl_include("<bits/types.h>")]]
 $useconds_t ualarm($useconds_t value, $useconds_t interval);
 
 %
@@ -1187,7 +1226,7 @@ $useconds_t ualarm($useconds_t value, $useconds_t interval);
 @@Same as `fork(2)', but possibly suspend the calling process until the
 @@child process either calls `exit(2)' or one of the many `exec(2)' functions
 [[guard, section(".text.crt.sched.access"), export_alias("__vfork")]]
-[[ATTR_RETURNS_TWICE, wunused]]
+[[ATTR_RETURNS_TWICE, wunused, decl_include("<bits/types.h>")]]
 $pid_t vfork();
 %#endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) || __USE_MISC */
 
@@ -1195,12 +1234,14 @@ $pid_t vfork();
 @@>> fchown(2)
 @@Change the ownership of a given `FD' to `GROUP:OWNER'
 [[cp, section(".text.crt.fs.modify")]]
+[[decl_include("<bits/types.h>")]]
 int fchown($fd_t fd, $uid_t owner, $gid_t group);
 
 %
 @@>> chdir(2)
 @@Change the current working directory to `PATH'
 [[cp, section(".text.crt.fs.basic_property")]]
+[[decl_include("<bits/types.h>")]]
 int fchdir($fd_t fd);
 
 %
@@ -1210,6 +1251,7 @@ int fchdir($fd_t fd);
 @@THREAD[PID]->LEADER->GROUP_LEADER->PID
 @@When `PID' is ZERO(0), use `gettid()' for it instead
 [[wunused, section(".text.crt.sched.user"), export_alias("__getpgid")]]
+[[decl_include("<bits/types.h>")]]
 $pid_t getpgid($pid_t pid);
 
 %
@@ -1217,13 +1259,14 @@ $pid_t getpgid($pid_t pid);
 @@Return the ID of the session which a process `PID' is apart of.
 @@return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID;
 [[wunused, section(".text.crt.sched.process")]]
+[[decl_include("<bits/types.h>")]]
 $pid_t getsid($pid_t pid);
 
 %
 @@>> lchown(2)
 @@Change the ownership of a given `FILE' to `GROUP:OWNER',
 @@but don't reference it if that file is a symbolic link
-[[cp, section(".text.crt.fs.modify")]]
+[[cp, section(".text.crt.fs.modify"), decl_include("<bits/types.h>")]]
 [[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(fchownat))]]
 int lchown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	return fchownat(__CRT_AT_FDCWD, file, owner, group, 0x0100); /* AT_SYMLINK_NOFOLLOW */
@@ -1235,16 +1278,17 @@ int lchown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS
-#define __PIO_OFFSET     __FS_TYPE(pos)
-#define __PIO_OFFSET64   __pos64_t
+#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS */
-#define __PIO_OFFSET     __FS_TYPE(off)
-#define __PIO_OFFSET64   __off64_t
+#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 }
 
 [[doc_alias("truncate"), ignore, nocrt, alias("truncate")]]
+[[decl_include("<bits/types.h>")]]
 int truncate32([[nonnull]] char const *file, $pos32_t length);
 
 
@@ -1254,7 +1298,7 @@ int truncate32([[nonnull]] char const *file, $pos32_t length);
 [[decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("truncate64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("truncate")]]
-[[section(".text.crt.fs.modify")]]
+[[section(".text.crt.fs.modify"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(truncate64) || $has_function(truncate32) || ($has_function(open) && $has_function(ftruncate)))]]
 int truncate([[nonnull]] char const *file, __PIO_OFFSET length) {
 @@pp_if $has_function(truncate32)@@
@@ -1279,7 +1323,8 @@ int truncate([[nonnull]] char const *file, __PIO_OFFSET length) {
 %#ifdef __USE_LARGEFILE64
 @@>> truncate64(2)
 @@Truncate the given file `FILE' to a length of `LENGTH'
-[[off64_variant_of(truncate), impl_prefix(DEFINE_PIO_OFFSET), section(".text.crt.fs.modify")]]
+[[section(".text.crt.fs.modify"), decl_include("<bits/types.h>")]]
+[[off64_variant_of(truncate), impl_prefix(DEFINE_PIO_OFFSET)]]
 [[userimpl, requires($has_function(truncate32) || ($has_function(open64) && $has_function(ftruncate64)))]]
 int truncate64([[nonnull]] char const *file, __PIO_OFFSET64 length) {
 @@pp_if $has_function(truncate32)@@
@@ -1306,7 +1351,8 @@ int truncate64([[nonnull]] char const *file, __PIO_OFFSET64 length) {
 @@>> fexecve(2)
 @@Replace the calling process with the application image referred to by `FD' and
 @@execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP'
-[[cp, guard, argument_names(fd, ___argv, ___envp), section(".text.crt.fs.exec.exec")]]
+[[cp, guard, argument_names(fd, ___argv, ___envp)]]
+[[decl_include("<bits/types.h>"), section(".text.crt.fs.exec.exec")]]
 int fexecve($fd_t fd, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
 %#endif /* __USE_XOPEN2K8 */
@@ -1342,7 +1388,8 @@ int nice(int inc) {
 @@@return: 1 :    Empty configuration string.
 @@@return: 0 :    [errno=EINVAL] Bad configuration `name'.
 [[section(".text.crt.system.configuration")]]
-size_t confstr(int name, char *buf, size_t buflen);
+[[decl_include("<features.h>")]]
+size_t confstr(__STDC_INT_AS_UINT_T name, char *buf, size_t buflen);
 
 %
 %[push_macro @undef { optarg optind opterr optopt }]%{
@@ -1391,32 +1438,35 @@ int setpgrp();
 %
 %/* ... */
 [[section(".text.crt.sched.user")]]
+[[decl_include("<bits/types.h>")]]
 int setreuid($uid_t ruid, $uid_t euid);
 
 %
 %/* ... */
 [[section(".text.crt.sched.user")]]
+[[decl_include("<bits/types.h>")]]
 int setregid($gid_t rgid, $gid_t egid);
 
 %
 %/* ... */
 [[section(".text.crt.system.configuration")]]
-[[wunused]] long int gethostid();
+[[wunused]] $longptr_t gethostid();
 
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K)
 @@>> getpagesize(3)
 @@Return the size of a PAGE (in bytes)
 [[ATTR_CONST, wunused, export_alias("__getpagesize")]]
 [[requires_include("<asm/pagesize.h>"), requires(defined(__ARCH_PAGESIZE))]]
-[[section(".text.crt.system.configuration")]]
-int getpagesize() {
+[[section(".text.crt.system.configuration"), decl_include("<features.h>")]]
+__STDC_INT_AS_SIZE_T getpagesize() {
 	return __ARCH_PAGESIZE;
 }
 
 %
 %/* ... */
 [[ATTR_CONST, wunused, section(".text.crt.system.configuration")]]
-int getdtablesize() {
+[[decl_include("<features.h>")]]
+__STDC_INT_AS_SIZE_T getdtablesize() {
 #if defined(__KOS__)
 	return 0x7fffffff; /* INT_MAX */
 #elif defined(__linux__) || defined(__linux) || defined(linux)
@@ -1438,6 +1488,7 @@ int getdtablesize() {
 @@@return: -1: [errno=EINVAL] : The given `EUID' is invalid
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
 [[section(".text.crt.sched.user")]]
+[[decl_include("<bits/types.h>")]]
 int seteuid($uid_t euid);
 
 %
@@ -1447,6 +1498,7 @@ int seteuid($uid_t euid);
 @@@return: -1: [errno=EINVAL] : The given `EGID' is invalid
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
 [[section(".text.crt.sched.user")]]
+[[decl_include("<bits/types.h>")]]
 int setegid($gid_t egid);
 
 %#endif /* __USE_XOPEN2K */
@@ -1470,7 +1522,8 @@ int ttyslot();
 @@Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)'
 [[cp, section(".text.crt.fs.modify")]]
 [[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(symlinkat))]]
-int symlink([[nonnull]] char const *link_text, [[nonnull]] char const *target_path) {
+int symlink([[nonnull]] char const *link_text,
+            [[nonnull]] char const *target_path) {
 	/* TODO: Header-implementation for `symlink()' on DOS (using the windows API) */
 	return symlinkat(link_text, __CRT_AT_FDCWD, target_path);
 }
@@ -1488,7 +1541,8 @@ int symlink([[nonnull]] char const *link_text, [[nonnull]] char const *target_pa
 [[cp, section(".text.crt.fs.property")]]
 [[userimpl, requires(defined(__CRT_AT_FDCWD) && $has_function(readlinkat))]]
 ssize_t readlink([[nonnull]] char const *__restrict path,
-                 [[outp(buflen)]] char *__restrict buf, size_t buflen) {
+                 [[outp(buflen)]] char *__restrict buf,
+                 size_t buflen) {
 	return readlinkat(__CRT_AT_FDCWD, path, buf, buflen);
 }
 
@@ -1497,7 +1551,7 @@ ssize_t readlink([[nonnull]] char const *__restrict path,
 %
 %#if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
 [[cp, section(".text.crt.io.tty")]]
-int getlogin_r([outp(name_len)] char *name, size_t name_len);
+int getlogin_r([[outp(name_len)]] char *name, size_t name_len);
 %#endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
 %
@@ -1524,7 +1578,7 @@ int sethostname([[inp(len)]] char const *name, size_t len);
 %
 %/* ... */
 [[section(".text.crt.system.configuration")]]
-int sethostid(long int id);
+int sethostid($longptr_t id);
 
 %
 @@>> getdomainname(3)
@@ -1546,8 +1600,9 @@ int vhangup();
 %
 %/* ... */
 [[section(".text.crt.system.utility")]]
-int profil([[nonnull]] unsigned short int *sample_buffer,
-           size_t size, size_t offset, unsigned int scale);
+int profil([[nonnull]] $uint16_t *sample_buffer,
+           size_t size, size_t offset,
+           unsigned int scale);
 
 %
 %/* ... */
@@ -1567,7 +1622,9 @@ void setusershell();
 %
 %/* ... */
 [[cp, section(".text.crt.system.utility")]]
-int daemon(int nochdir, int noclose);
+[[decl_include("<features.h>")]]
+int daemon(__STDC_INT_AS_UINT_T nochdir,
+           __STDC_INT_AS_UINT_T noclose);
 
 %
 %/* ... */
@@ -1578,12 +1635,12 @@ int revoke([[nonnull]] char const *file);
 %[insert:extern(acct)]
 
 [[cp, section(".text.crt.system.utility")]]
-long int syscall(long int sysno, ...);
+$longptr_t syscall($longptr_t sysno, ...);
 
 %
 %#ifdef __USE_KOS
 [[cp, section(".text.crt.system.utility"), preferred_alias("syscall")]]
-__LONG64_TYPE__ syscall64(__syscall_ulong_t sysno, ...);
+__LONG64_TYPE__ syscall64($syscall_ulong_t sysno, ...);
 %#endif /* __USE_KOS */
 %
 
@@ -1609,11 +1666,12 @@ char *getpass([[nonnull]] char const *__restrict prompt);
 %#if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 
 [[doc_alias(ftruncate), ignore, nocrt, alias("ftruncate")]]
-int ftruncate32($fd_t fd, __pos32_t length);
+[[decl_include("<bits/types.h>")]]
+int ftruncate32($fd_t fd, $pos32_t length);
 
 @@>> ftruncate(2)
 @@Truncate the given file `FD' to a length of `LENGTH'
-[[decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+[[decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import, decl_include("<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("ftruncate64", "_chsize_s")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("ftruncate", "_chsize", "chsize")]]
 [[userimpl, requires($has_function(ftruncate32) || $has_function(ftruncate64))]]
@@ -1632,7 +1690,7 @@ int ftruncate($fd_t fd, __PIO_OFFSET length) {
 @@Truncate the given file `FD' to a length of `LENGTH'
 [[off64_variant_of(ftruncate), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[export_alias("_chsize_s"), section(".text.crt.io.large.write")]]
-[[userimpl, requires_function(ftruncate32)]]
+[[userimpl, requires_function(ftruncate32), decl_include("<bits/types.h>")]]
 int ftruncate64($fd_t fd, __PIO_OFFSET64 length) {
 	return ftruncate32(fd, (pos32_t)length);
 }
@@ -1657,6 +1715,7 @@ void *sbrk(intptr_t delta);
 @@>> fdatasync(2)
 @@Synchronize only the data of a file (not its descriptor which contains
 @@timestamps, and its size), meaning that changes are written to disk
+[[decl_include("<bits/types.h>")]]
 [[cp, alias("fsync", "_commit"), userimpl, section(".text.crt.io.sync")]]
 int fdatasync($fd_t fd) {
 	(void)fd;
@@ -1677,7 +1736,8 @@ int fdatasync($fd_t fd) {
 [[decl_include("<features.h>")]]
 [[guard, export_alias("_swab"), section(".text.crt.string.memory")]]
 void swab([[nonnull]] void const *__restrict from,
-          [[nonnull]] void *__restrict to, __STDC_INT_AS_SSIZE_T n_bytes) {
+          [[nonnull]] void *__restrict to,
+          __STDC_INT_AS_SSIZE_T n_bytes) {
 	n_bytes &= ~1;
 	while (n_bytes >= 2) {
 		byte_t a, b;
@@ -1736,8 +1796,8 @@ char *ctermid_r([[nullable]] char *s) {
 @@                                limit, and that limit is indeterminate
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
 [[cp, wunused, section(".text.crt.system.configuration")]]
-[[export_alias("_sysconf", "__sysconf")]]
-long int sysconf(int name);
+[[export_alias("_sysconf", "__sysconf"), decl_include("<features.h>")]]
+$longptr_t sysconf(__STDC_INT_AS_UINT_T name);
 
 
 %

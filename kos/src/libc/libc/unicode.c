@@ -26,6 +26,8 @@
 
 #include <unicode.h>
 
+/* TODO: Move all of this stuff into /kos/src/libc/user/unicode.c */
+
 DECL_BEGIN
 
 #ifndef __UNICODE_FPRINT

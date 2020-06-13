@@ -223,7 +223,7 @@ NONNULL((1)) off64_t LIBCCALL file_system_seek(FILE *__restrict self,
 		struct iofile_data *ex;
 		ex     = self->if_exdata;
 		result = offset;
-		if ((*ex->io_vtab.seek)(ex->io_magi, &result, whence))
+		if ((*ex->io_vtab.seek)(ex->io_magi, (pos64_t *)&result, whence))
 			result = -1;
 	} else {
 		result = lseek64(self->if_fd, offset, whence);
@@ -1554,11 +1554,10 @@ struct open_option {
 #endif /* !O_HIDDEN */
 
 /* Open options are parsed from a comma-separated
- * string passed as second argument to file.open:
- * >> file.open("foo.txt","w+");                    // STD-C mode name.
- * >> file.open("foo.txt","text,RW,T,C");           // Extended form.
- * >> file.open("foo.txt","text,rdwr,trunc,creat"); // Long form.
- */
+ * string passed as second argument to fopen:
+ * >> fopen("foo.txt", "w+");                    // STD-C mode name.
+ * >> fopen("foo.txt", "text,RW,T,C");           // Extended form.
+ * >> fopen("foo.txt", "text,rdwr,trunc,creat"); // Long form. */
 #define BASEMODE_MASK (O_ACCMODE | O_CREAT | O_EXCL | O_TRUNC | O_APPEND)
 PRIVATE ATTR_SECTION(".rodata.crt.FILE.core.utility.open_options")
 struct open_option const open_options[] = {
@@ -1593,9 +1592,20 @@ struct open_option const open_options[] = {
 	{ "nofollow", OPEN_EXFLAG_FNORMAL, O_NOFOLLOW, O_NOFOLLOW },
 	{ "noatime", OPEN_EXFLAG_FNORMAL, O_NOATIME, O_NOATIME },
 	{ "cloexec", OPEN_EXFLAG_FNORMAL, O_CLOEXEC, O_CLOEXEC },
+	{ "clofork", OPEN_EXFLAG_FNORMAL, O_CLOFORK, O_CLOFORK },
+	{ "dospath", OPEN_EXFLAG_FNORMAL, O_DOSPATH, O_DOSPATH },
+	{ "symlink", OPEN_EXFLAG_FNORMAL, O_SYMLINK, O_SYMLINK },
+	{ "tmpfile", OPEN_EXFLAG_FNORMAL, O_TMPFILE, O_TMPFILE },
 	{ "xread", OPEN_EXFLAG_FNORMAL, O_XREAD, O_XREAD },
 	{ "xwrite", OPEN_EXFLAG_FNORMAL, O_XWRITE, O_XWRITE },
 	{ "hidden", OPEN_EXFLAG_FNORMAL, O_HIDDEN, O_HIDDEN },
+	{ "dsync", OPEN_EXFLAG_FNORMAL, O_DSYNC, O_DSYNC },
+	{ "async", OPEN_EXFLAG_FNORMAL, O_ASYNC, O_ASYNC },
+	{ "rsync", OPEN_EXFLAG_FNORMAL, O_RSYNC, O_RSYNC },
+	{ "noctty", OPEN_EXFLAG_FNORMAL, O_NOCTTY, O_NOCTTY },
+	{ "largefile", OPEN_EXFLAG_FNORMAL, O_LARGEFILE, O_LARGEFILE },
+	{ "directory", OPEN_EXFLAG_FNORMAL, O_DIRECTORY, O_DIRECTORY },
+	{ "path", OPEN_EXFLAG_FNORMAL, O_PATH, O_PATH },
 	/* Extended flag names. */
 	{ "binary", OPEN_EXFLAG_FNORMAL, 0, 0 },
 	{ "text", OPEN_EXFLAG_FTEXT, 0, 0 },
@@ -1703,8 +1713,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.core.utility.file_openfd")
 WUNUSED FILE *LIBCCALL file_openfd(/*inherit(on_success)*/ fd_t fd, uint32_t flags) {
 	FILE *result;
 	struct iofile_data *ex;
-	result = (FILE *)calloc(1,
-	                        sizeof(FILE) +
+	result = (FILE *)calloc(sizeof(FILE) +
 	                        sizeof(struct iofile_data_novtab));
 	if unlikely(!result)
 		goto done;
@@ -1756,8 +1765,7 @@ WUNUSED FILE *LIBCCALL file_opencookie(cookie_io_functions_t const *__restrict i
                                        void *magic, uint32_t flags) {
 	FILE *result;
 	struct iofile_data *ex;
-	result = (FILE *)calloc(1,
-	                        sizeof(FILE) +
+	result = (FILE *)calloc(sizeof(FILE) +
 	                        sizeof(struct iofile_data));
 	if unlikely(!result)
 		goto done;
@@ -2975,12 +2983,12 @@ ssize_t LIBCCALL memopen_write(void *cookie, char const *buf, size_t num_bytes) 
 }
 
 PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen.seek")
-int LIBCCALL memopen_seek(void *cookie, off64_t *pos, int whence) {
+int LIBCCALL memopen_seek(void *cookie, pos64_t *pos, int whence) {
 	pos64_t newpos;
 	struct memopen_cookie *me;
 	size_t maxlen;
 	me = (struct memopen_cookie *)cookie;
-	newpos = (pos64_t)*pos;
+	newpos = *pos;
 	maxlen = (size_t)(me->moc_end - me->moc_cur);
 	switch (whence) {
 
@@ -3006,7 +3014,7 @@ int LIBCCALL memopen_seek(void *cookie, off64_t *pos, int whence) {
 	if (newpos > maxlen)
 		newpos = maxlen;
 	me->moc_cur = me->moc_base + (size_t)newpos;
-	*pos = (off64_t)newpos;
+	*pos = newpos;
 	return 0;
 err_EOVERFLOW:
 	libc_seterrno(EOVERFLOW);
@@ -3116,9 +3124,9 @@ err:
 }
 
 PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream.seek")
-int LIBCCALL memstream_seek(void *cookie, off64_t *offset, int whence) {
+int LIBCCALL memstream_seek(void *cookie, pos64_t *offset, int whence) {
 	struct memstream_file *me;
-	off64_t new_pos;
+	pos64_t new_pos;
 	me = (struct memstream_file *)cookie;
 	new_pos = (size_t)(me->mf_ptr - me->mf_base);
 	switch (whence) {
@@ -3142,7 +3150,7 @@ int LIBCCALL memstream_seek(void *cookie, off64_t *offset, int whence) {
 	if unlikely(new_pos < 0)
 		goto err_EOVERFLOW;
 	me->mf_ptr = me->mf_base + (size_t)new_pos;
-	*offset      = (off64_t)new_pos;
+	*offset      = (pos64_t)new_pos;
 	return 0;
 err_EOVERFLOW:
 	libc_seterrno(EOVERFLOW);

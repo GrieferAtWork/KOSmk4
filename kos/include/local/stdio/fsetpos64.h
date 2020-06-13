@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3346737 */
+/* HASH CRC-32:0xaf4cd3ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,7 +91,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__
 /* 64-bit variant of `fsetpos' */
 __LOCAL_LIBC(fsetpos64) __ATTR_NONNULL((1, 2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fsetpos64))(__FILE *__restrict __stream, __pos64_t const *__restrict __pos) __THROWS(...) {
-#if defined(SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64))
+#if defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64))
 	return __localdep_crt_fseeko64(__stream, (__off64_t)*__pos, __SEEK_SET);
 #elif defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked)
 	__pos32_t __pos32 = (__pos32_t)*__pos;

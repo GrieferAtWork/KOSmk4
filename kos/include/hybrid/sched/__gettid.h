@@ -168,24 +168,24 @@ typedef pid_t __hybrid_tid_t;
 #define __HYBRID_SIZEOF_TID__  __SIZEOF_PTHREAD_T__
 #elif defined(__SIZEOF_PTHREAD_T)
 #define __HYBRID_SIZEOF_TID__  __SIZEOF_PTHREAD_T
-#else
+#else /* ... */
 #include <hybrid/typecore.h>
 #define __HYBRID_SIZEOF_TID__  __SIZEOF_POINTER__
-__STATIC_ASSERT_MSG(sizeof(pthread_t) == __HYBRID_SIZEOF_TID__,"Please adjust");
-#endif
+__STATIC_ASSERT_MSG(sizeof(pthread_t) == __HYBRID_SIZEOF_TID__, "Please adjust");
+#endif /* !... */
 typedef pthread_t __hybrid_tid_t;
 #if __HYBRID_SIZEOF_TID__ <= __SIZEOF_POINTER__
 #if __HYBRID_SIZEOF_TID__ <= __SIZEOF_INT__
 #define __HYBRID_GETTID_PRINTF_FMT     "%u"
 #define __HYBRID_GETTID_PRINTF_ARG(x)  (unsigned int)(x)
-#else
+#else /* __HYBRID_SIZEOF_TID__ <= __SIZEOF_INT__ */
 #define __HYBRID_GETTID_PRINTF_FMT     "%llu"
 #define __HYBRID_GETTID_PRINTF_ARG(x)  (unsigned long long)(x)
-#endif
-#else
+#endif /* __HYBRID_SIZEOF_TID__ > __SIZEOF_INT__ */
+#else /* __HYBRID_SIZEOF_TID__ <= __SIZEOF_POINTER__ */
 #define __HYBRID_GETTID_PRINTF_FMT     "%u?"
 #define __HYBRID_GETTID_PRINTF_ARG(x)   0u
-#endif
+#endif /* __HYBRID_SIZEOF_TID__ > __SIZEOF_POINTER__ */
 
 #define __hybrid_gettid()               pthread_self()
 #define __HYBRID_GETTID_INVALID_IS_ZERO 1 /* Not always, but good enough? */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6b528e3 */
+/* HASH CRC-32:0xb8c3c81e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,7 +101,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wchown, __FORCELOCAL __ATTR_NONNULL((1)) int __N
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__CDECLARE(__ATTR_NONNULL((1)),long int,__NOTHROW_RPC,wpathconf,(wchar_t const *__path, int __name),(__path,__name))
+__CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,wpathconf,(wchar_t const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
 #elif defined(__CRT_HAVE_DOS$wpathconf) && __SIZEOF_WCHAR_T__ == 4
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
@@ -109,7 +109,7 @@ __CDECLARE(__ATTR_NONNULL((1)),long int,__NOTHROW_RPC,wpathconf,(wchar_t const *
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),long int,__NOTHROW_RPC,__LIBCCALL,wpathconf,(wchar_t const *__path, int __name),KOS$wpathconf,(__path,__name))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,__LIBCCALL,wpathconf,(wchar_t const *__path, __STDC_INT_AS_UINT_T __name),KOS$wpathconf,(__path,__name))
 #elif defined(__CRT_HAVE_DOS$wpathconf) && __SIZEOF_WCHAR_T__ == 2
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
@@ -117,7 +117,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),long int,__NOTHROW_RPC,__LIBCCALL
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),long int,__NOTHROW_RPC,__LIBCCALL,wpathconf,(wchar_t const *__path, int __name),DOS$wpathconf,(__path,__name))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,__LIBCCALL,wpathconf,(wchar_t const *__path, __STDC_INT_AS_UINT_T __name),DOS$wpathconf,(__path,__name))
 #endif /* ... */
 #ifdef __CRT_HAVE_wlink
 /* >> link(2)
@@ -141,23 +141,23 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) int _
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,waccess,(wchar_t const *__file, int __type),(__file,__type))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,waccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
 #elif defined(__CRT_HAVE_DOS$waccess) && __SIZEOF_WCHAR_T__ == 4
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBCCALL,waccess,(wchar_t const *__file, int __type),KOS$waccess,(__file,__type))
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBCCALL,waccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),KOS$waccess,(__file,__type))
 #elif defined(__CRT_HAVE_DOS$waccess) && __SIZEOF_WCHAR_T__ == 2
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBCCALL,waccess,(wchar_t const *__file, int __type),DOS$waccess,(__file,__type))
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBCCALL,waccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),DOS$waccess,(__file,__type))
 #elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wfaccessat) || (defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 2))
 #include <local/parts.wchar.unistd/waccess.h>
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(waccess, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL waccess)(wchar_t const *__file, int __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(waccess))(__file, __type); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(waccess, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL waccess)(wchar_t const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(waccess))(__file, __type); })
 #endif /* ... */
 #ifdef __CRT_HAVE_wchdir
 /* >> chdir(2)
@@ -288,17 +288,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wget_current_dir_name, __FORCELOCAL __ATTR_MALLO
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfaccessat,(__fd_t __dfd, wchar_t const *__file, int __type, __atflag_t __flags),(__dfd,__file,__type,__flags))
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfaccessat,(__fd_t __dfd, wchar_t const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),(__dfd,__file,__type,__flags))
 #elif defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 4
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,wfaccessat,(__fd_t __dfd, wchar_t const *__file, int __type, __atflag_t __flags),KOS$wfaccessat,(__dfd,__file,__type,__flags))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,wfaccessat,(__fd_t __dfd, wchar_t const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),KOS$wfaccessat,(__dfd,__file,__type,__flags))
 #elif defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 2
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,wfaccessat,(__fd_t __dfd, wchar_t const *__file, int __type, __atflag_t __flags),DOS$wfaccessat,(__dfd,__file,__type,__flags))
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBCCALL,wfaccessat,(__fd_t __dfd, wchar_t const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),DOS$wfaccessat,(__dfd,__file,__type,__flags))
 #endif /* ... */
 #ifdef __CRT_HAVE_wfchownat
 /* >> fchownat(2)

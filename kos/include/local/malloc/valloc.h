@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ad0053d */
+/* HASH CRC-32:0x1635e0d2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getpagesize_defined
 #define __local___localdep_getpagesize_defined 1
 #ifdef __CRT_HAVE_getpagesize
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_getpagesize,(void),getpagesize,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_getpagesize,(void),getpagesize,())
 #elif defined(__CRT_HAVE___getpagesize)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_getpagesize,(void),__getpagesize,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_getpagesize,(void),__getpagesize,())
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <asm/pagesize.h>

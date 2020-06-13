@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ae60c45 */
+/* HASH CRC-32:0x7d759436 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -619,23 +619,23 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_vprintf) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_vprintf))(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 #ifndef __INTELLISENSE__
-#define __FORMAT_PRINTER            __printer
-#define __FORMAT_ARG                __arg
-#define __FORMAT_FORMAT             __format
-#define __FORMAT_ARGS               __args
-#define __CHAR_TYPE                 char
-#define __CHAR_SIZE                 __SIZEOF_CHAR__
-#define __FORMAT_REPEAT             __localdep_format_repeat
-#define __FORMAT_HEXDUMP            __localdep_format_hexdump
-#define __FORMAT_WIDTH              __localdep_format_width
-#define __FORMAT_ESCAPE             __localdep_format_escape
-#define __FORMAT_WIDTH16            __localdep_format_c16width
-#define __FORMAT_WIDTH32            __localdep_format_c32width
-#define __FORMAT_ESCAPE16           __localdep_format_c16escape
-#define __FORMAT_ESCAPE32           __localdep_format_c32escape
-#define __FORMAT_UNICODE_WRITECHAR  __localdep_unicode_writeutf8
-#define __FORMAT_UNICODE_FORMAT16   __localdep_format_16to8
-#define __FORMAT_UNICODE_FORMAT32   __localdep_format_32to8
+#define __FORMAT_PRINTER           __printer
+#define __FORMAT_ARG               __arg
+#define __FORMAT_FORMAT            __format
+#define __FORMAT_ARGS              __args
+#define __CHAR_TYPE                char
+#define __CHAR_SIZE                __SIZEOF_CHAR__
+#define __FORMAT_REPEAT            __localdep_format_repeat
+#define __FORMAT_HEXDUMP           __localdep_format_hexdump
+#define __FORMAT_WIDTH             __localdep_format_width
+#define __FORMAT_ESCAPE            __localdep_format_escape
+#define __FORMAT_WIDTH16           __localdep_format_c16width
+#define __FORMAT_WIDTH32           __localdep_format_c32width
+#define __FORMAT_ESCAPE16          __localdep_format_c16escape
+#define __FORMAT_ESCAPE32          __localdep_format_c32escape
+#define __FORMAT_UNICODE_WRITECHAR __localdep_unicode_writeutf8
+#define __FORMAT_UNICODE_FORMAT16  __localdep_format_16to8
+#define __FORMAT_UNICODE_FORMAT32  __localdep_format_32to8
 #include <local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }

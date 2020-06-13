@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8356501 */
+/* HASH CRC-32:0xfc783e22 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,11 @@
 #ifndef __local_glob_defined
 #define __local_glob_defined 1
 #include <__crt.h>
+#ifndef ____glob_errfunc_t_defined
+#define ____glob_errfunc_t_defined 1
+typedef int (__LIBCCALL *__glob_errfunc_t)(char const *__path, int __flags);
+#endif /* !____glob_errfunc_t_defined */
+struct __glob_struct;
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: glob32 from glob */
 #if !defined(__local___localdep_glob32_defined) && defined(__CRT_HAVE_glob)

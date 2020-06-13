@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78d72c09 */
+/* HASH CRC-32:0x408a641d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,14 +56,14 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wchown)(char32_t const *file, 
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTDEF NONNULL((1)) long int NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path, int name);
+INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path, __STDC_INT_AS_UINT_T name);
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTDEF NONNULL((1)) long int NOTHROW_RPC(LIBKCALL libc_wpathconf)(char32_t const *path, int name);
+INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBKCALL libc_wpathconf)(char32_t const *path, __STDC_INT_AS_UINT_T name);
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_wlink)(char16_t const *from, char16_t const *to);
@@ -73,11 +73,11 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBKCALL libc_wlink)(char32_t const *from
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_waccess)(char16_t const *file, int type);
+INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_waccess)(char16_t const *file, __STDC_INT_AS_UINT_T type);
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_waccess)(char32_t const *file, int type);
+INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_waccess)(char32_t const *file, __STDC_INT_AS_UINT_T type);
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd__wchdir)(char16_t const *path);
@@ -115,11 +115,11 @@ INTDEF ATTR_MALLOC WUNUSED char32_t *NOTHROW_RPC(LIBKCALL libc_wget_current_dir_
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wfaccessat)(fd_t dfd, char16_t const *file, int type, atflag_t flags);
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wfaccessat)(fd_t dfd, char16_t const *file, __STDC_INT_AS_UINT_T type, atflag_t flags);
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wfaccessat)(fd_t dfd, char32_t const *file, int type, atflag_t flags);
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wfaccessat)(fd_t dfd, char32_t const *file, __STDC_INT_AS_UINT_T type, atflag_t flags);
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wfchownat)(fd_t dfd, char16_t const *file, uid_t owner, gid_t group, atflag_t flags);

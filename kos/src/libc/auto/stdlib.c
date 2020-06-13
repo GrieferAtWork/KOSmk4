@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff7d47ea */
+/* HASH CRC-32:0x12ba62d9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,8 +29,6 @@
 #include "../user/string.h"
 #include "unicode.h"
 #include "../user/wchar.h"
-#ifndef LIBC_ARCH_HAVE_ABORT
-#endif /* !LIBC_ARCH_HAVE_ABORT */
 
 DECL_BEGIN
 
@@ -2641,9 +2639,13 @@ DEFINE_PUBLIC_ALIAS(DOS$mbstowcs, libd_mbstowcs);
 DEFINE_PUBLIC_ALIAS(mbstowcs, libc_mbstowcs);
 DEFINE_PUBLIC_ALIAS(DOS$wcstombs, libd_wcstombs);
 DEFINE_PUBLIC_ALIAS(wcstombs, libc_wcstombs);
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_ABORT)
 DEFINE_PUBLIC_ALIAS(_ZSt9terminatev, libc_abort);
 DEFINE_PUBLIC_ALIAS("?terminate@@YAXXZ", libc_abort);
 DEFINE_PUBLIC_ALIAS(abort, libc_abort);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_ABORT */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(atoi, libc_atoi);
 DEFINE_PUBLIC_ALIAS(atol, libc_atol);
 DEFINE_PUBLIC_ALIAS(atoll, libc_atoll);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b924351 */
+/* HASH CRC-32:0x3b9508d2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,12 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/wchar.h"
-#ifndef LIBC_ARCH_HAVE_C32SNLEN
-#endif /* !LIBC_ARCH_HAVE_C32SNLEN */
-#ifndef LIBC_ARCH_HAVE_C32SLEN
-#endif /* !LIBC_ARCH_HAVE_C32SLEN */
-#ifndef LIBC_ARCH_HAVE_C16SNLEN
-#endif /* !LIBC_ARCH_HAVE_C16SNLEN */
 #include "parts.wchar.format-printer.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
 #include "unicode.h"
 #include "wctype.h"
-#ifndef LIBC_ARCH_HAVE_C16SLEN
-#endif /* !LIBC_ARCH_HAVE_C16SLEN */
 
 DECL_BEGIN
 
@@ -1716,7 +1708,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.read") NONNULL((1, 3
 	for (n = 0; n < bufsize - 1; ++n) {
 		wint_t ch = libd__fgetwc_nolock(stream);
 		if (ch == __WEOF16) {
-			if (n == 0 || ferror_unlocked(stream))
+			if (n == 0 || libc_ferror(stream))
 				return NULL;
 			break;
 		}
@@ -1725,7 +1717,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.read") NONNULL((1, 3
 			buf[n++] = '\n';
 			ch = libd__fgetwc_nolock(stream);
 			if (ch == __WEOF16) {
-				if (n == 0 || ferror_unlocked(stream))
+				if (n == 0 || libc_ferror(stream))
 					return NULL;
 				break;
 			}
@@ -1758,7 +1750,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) c
 	for (n = 0; n < bufsize - 1; ++n) {
 		wint_t ch = libc_fgetwc_unlocked(stream);
 		if (ch == __WEOF32) {
-			if (n == 0 || ferror_unlocked(stream))
+			if (n == 0 || libc_ferror(stream))
 				return NULL;
 			break;
 		}
@@ -1767,7 +1759,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) c
 			buf[n++] = '\n';
 			ch = libc_fgetwc_unlocked(stream);
 			if (ch == __WEOF32) {
-				if (n == 0 || ferror_unlocked(stream))
+				if (n == 0 || libc_ferror(stream))
 					return NULL;
 				break;
 			}
@@ -5224,8 +5216,14 @@ DEFINE_PUBLIC_ALIAS(DOS$wcsftime, libd_wcsftime);
 DEFINE_PUBLIC_ALIAS(wcsftime, libc_wcsftime);
 DEFINE_PUBLIC_ALIAS(DOS$wcstok_s, libd_wcstok_s);
 DEFINE_PUBLIC_ALIAS(wcstok, libc_wcstok);
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16SLEN)
 DEFINE_PUBLIC_ALIAS(DOS$wcslen, libd_wcslen);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C16SLEN */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C32SLEN)
 DEFINE_PUBLIC_ALIAS(wcslen, libc_wcslen);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C32SLEN */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$wcsspn, libd_wcsspn);
 DEFINE_PUBLIC_ALIAS(wcsspn, libc_wcsspn);
 DEFINE_PUBLIC_ALIAS(DOS$wcscspn, libd_wcscspn);
@@ -5294,8 +5292,14 @@ DEFINE_PUBLIC_ALIAS(DOS$wcpcpy, libd_wcpcpy);
 DEFINE_PUBLIC_ALIAS(wcpcpy, libc_wcpcpy);
 DEFINE_PUBLIC_ALIAS(DOS$wcpncpy, libd_wcpncpy);
 DEFINE_PUBLIC_ALIAS(wcpncpy, libc_wcpncpy);
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16SNLEN)
 DEFINE_PUBLIC_ALIAS(DOS$wcsnlen, libd_wcsnlen);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C16SNLEN */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C32SNLEN)
 DEFINE_PUBLIC_ALIAS(wcsnlen, libc_wcsnlen);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C32SNLEN */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$_wcsdup, libd__wcsdup);
 DEFINE_PUBLIC_ALIAS(wcsdup, libc_wcsdup);
 DEFINE_PUBLIC_ALIAS(DOS$wcwidth, libd_wcwidth);
@@ -5355,10 +5359,20 @@ DEFINE_PUBLIC_ALIAS(DOS$fwscanf_unlocked, libd_fwscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(fwscanf_unlocked, libc_fwscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$wscanf_unlocked, libd_wscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(wscanf_unlocked, libc_wscanf_unlocked);
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16SEND)
 DEFINE_PUBLIC_ALIAS(DOS$wcsend, libd_wcsend);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C16SEND */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C32SEND)
 DEFINE_PUBLIC_ALIAS(wcsend, libc_wcsend);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C32SEND */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16SNEND)
 DEFINE_PUBLIC_ALIAS(DOS$wcsnend, libd_wcsnend);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C16SNEND */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C32SNEND)
 DEFINE_PUBLIC_ALIAS(wcsnend, libc_wcsnend);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C32SNEND */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$wcsto32, libd_wcsto32);
 DEFINE_PUBLIC_ALIAS(wcsto32, libc_wcsto32);
 DEFINE_PUBLIC_ALIAS(DOS$wcstou32, libd_wcstou32);

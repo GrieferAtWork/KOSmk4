@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6072c806 */
+/* HASH CRC-32:0x9407ed53 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_alphasort64_defined
 #define __local_alphasort64_defined 1
 #include <__crt.h>
+#include <bits/dirent.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: strcoll from string */
 #ifndef __local___localdep_strcoll_defined
@@ -34,9 +35,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcoll __LIBC_LOCAL_NAME(strcoll)
 #endif /* !__CRT_HAVE_strcoll */
 #endif /* !__local___localdep_strcoll_defined */
-__NAMESPACE_LOCAL_END
-#include <bits/dirent.h>
-__NAMESPACE_LOCAL_BEGIN
 /* 64-bit variant of `alphasort()' */
 __LOCAL_LIBC(alphasort64) __ATTR_PURE __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(alphasort64))(struct dirent64 const **__e1, struct dirent64 const **__e2) {

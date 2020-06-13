@@ -32,7 +32,8 @@
 #define __IO_FILE_IOMALLBUF 0x0008 /* The buffer was allocated internally. */
 #define __IO_FILE_IOEOF     0x0010 /* Set when the file pointed to by 'if_fd' has been exhausted. */
 #define __IO_FILE_IOERR     0x0020 /* Set when an I/O error occurred. */
-#define __IO_FILE_IONOFD    0x0040 /* The file acts as output to buffer only. - 'if_fd' is not valid. (Currently ignored when loading/flushing data) */
+#define __IO_FILE_IONOFD    0x0040 /* The file acts as output to buffer only. - 'if_fd' is not valid.
+                                    * Under KOS this flag is used to indicate the use of file cookies; s.a. `fopencookie(3)' */
 #define __IO_FILE_IORW      0x0080 /* The file was opened for read+write permissions ('+' flag) */
 #define __IO_FILE_IOUSERBUF 0x0100 /* The buffer was given by the user. */
 #define __IO_FILE_IOLNBUF   0x0200 /* NOT ORIGINALLY DEFINED IN DOS: Use line-buffering. */

@@ -53,7 +53,6 @@
    This exception applies to code released by its copyright holders
    in files containing the exception.  */
 
-
 #ifndef EOF
 #define EOF (-1)
 #endif /* !EOF */
@@ -88,12 +87,16 @@ typedef __ssize_t (__LIBCCALL __io_read_fn)(void *__cookie, char *__buf, __size_
 typedef __ssize_t (__LIBCCALL __io_write_fn)(void *__cookie, const char *__buf, __size_t __num_bytes);
 
 /* Move COOKIE's file position to *POS bytes from the
- * beginning of the file (if W is SEEK_SET),
- * the current position (if W is SEEK_CUR),
- * or the end of the file (if W is SEEK_END).
+ * beginning of the file (if WHENCE is SEEK_SET),
+ * the current position (if WHENCE is SEEK_CUR),
+ * or the end of the file (if WHENCE is SEEK_END).
  * Set *POS to the new file position.
  * Returns zero if successful, nonzero if not. */
+#ifdef __USE_KOS
+typedef int (__LIBCCALL __io_seek_fn)(void *__cookie, __pos64_t *__pos, int __whence);
+#else /* __USE_KOS */
 typedef int (__LIBCCALL __io_seek_fn)(void *__cookie, __off64_t *__pos, int __whence);
+#endif /* !__USE_KOS */
 
 /* Close COOKIE. */
 typedef int (__LIBCCALL __io_close_fn)(void *__cookie);

@@ -392,11 +392,6 @@ function compileSystemHeaderSourceFile(filename: string, headerName: string) {
 
 
 
-
-//#define QUICK_SKIP_SYSTEM_HAEDERS
-//#define QUICK_ONLY_UPDATE_USER_SOURCES
-
-
 try {
 
 	messagePrefix = "1/3";
@@ -422,8 +417,6 @@ try {
 	waitTasks();
 	messagePrefix = "2/3";
 
-#ifndef QUICK_ONLY_UPDATE_USER_SOURCES
-#ifndef QUICK_SKIP_SYSTEM_HAEDERS
 	/* Generate the actual system headers (i.e. <string.h>) */
 	for (local name /*: string*/, header /*: SystemHeader*/: allSystemHeaders) {
 		startTask(updateHashedFile, (
@@ -458,19 +451,11 @@ try {
 			}));
 	}
 
-#else /* QUICK_SKIP_SYSTEM_HAEDERS */
-	print "Fast-Preload... (begin)";
-	for (local none, header /*: SystemHeader*/: allSystemHeaders)
-		startTask(header.preload);
-#endif /* QUICK_SKIP_SYSTEM_HAEDERS */
-#endif /* !QUICK_ONLY_UPDATE_USER_SOURCES */
-
 	/* TODO: When generating libc auto/user implementations, the keyword "static"
 	 *       should be escaped by being suffixed by
 	 *       "ATTR_SECTION(\".data\"\(CURRENT_TEXT_SECTION.lsstrip('.text')))"
-	 */
+	 * HINT: This can be done via keyEscape */
 
-#ifndef QUICK_ONLY_UPDATE_USER_SOURCES
 	/* Generate /src/libc/auto/<...>.h headers and sources */
 	for (local name, header /*: SystemHeader*/: allSystemHeaders) {
 		if (header.order_libcAutoHeader) {
@@ -494,7 +479,6 @@ try {
 				}));
 		}
 	}
-#endif /* !QUICK_ONLY_UPDATE_USER_SOURCES */
 
 	/* Generate /src/libc/user/<...>.h headers, and update sources */
 	for (local name, header /*: SystemHeader*/: allSystemHeaders) {
@@ -514,18 +498,18 @@ try {
 		}
 	}
 
+	/* TODO: /kos/src/libc/crt-features.h:
+	 *   >> #define __CRT_HAVE_DOS$...
+	 *   >> #define __CRT_HAVE_...
+	 * Crt feature macros where:
+	 *   - Every INTERN libc_foo appears as a macro #define __CRT_HAVE_foo
+	 *   - Every INTERN libd_bar appears as a macro #define __CRT_HAVE_DOS$bar
+	 * This header will replace <crt-features/all.h> (where the later
+	 * will be deleted once this new header is being generated)
+	 */
+
 	waitTasks();
 	messagePrefix = "3/3";
-
-#ifndef QUICK_ONLY_UPDATE_USER_SOURCES
-#ifdef QUICK_SKIP_SYSTEM_HAEDERS
-	for (local none, header /*: SystemHeader*/: allSystemHeaders) {
-		for (local none, lfun: header.localFunctionsByName) {
-			if (lfun.impl is bound)
-				neededLocalFunction.insert(lfun);
-		}
-	}
-#endif /* QUICK_SKIP_SYSTEM_HAEDERS */
 
 	/* Generate all of the needed <local/...> headers */
 	local printedLocalFunctions: HashSet with LocalFunction = HashSet();
@@ -561,7 +545,6 @@ try {
 		if (#printedLocalFunctions >= #neededLocalFunction)
 			break;
 	}
-#endif /* !QUICK_ONLY_UPDATE_USER_SOURCES */
 
 	waitTasks(); /* Should be a no-op! */
 } @[interrupt] catch (e...) {

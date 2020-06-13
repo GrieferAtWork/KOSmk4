@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3a632ab */
+/* HASH CRC-32:0x77f5d972 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_writeall_defined 1
 #include <__crt.h>
 #if (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64))
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: write from unistd */
 #ifndef __local___localdep_write_defined

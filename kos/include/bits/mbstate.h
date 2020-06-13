@@ -71,7 +71,7 @@ typedef struct __ATTR_PACKED __mbstate {
 
 #ifdef __USE_KOS
 #ifndef MBSTATE_INIT
-#define MBSTATE_INIT     __MBSTATE_INIT
+#define MBSTATE_INIT __MBSTATE_INIT
 #endif /* !MBSTATE_INIT */
 #endif /* __USE_KOS */
 #endif /* __CC__ */
