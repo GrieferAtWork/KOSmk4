@@ -21,6 +21,15 @@
 %[define_replacement(errno_t = __errno_t)]
 %[default_impl_section(".text.crt.error")]
 
+%(auto_source){
+/* Use the KOS-special `libc_strerror_s()' functions, rather than strerror()
+ * below (thus making these functions a bit more light-weight by having just
+ * a bit less dependencies) */
+#define strerror        libc_strerror_s
+#define libc_strerror   libc_strerror_s
+#include "../libc/globals.h" /* For norel access to global variables */
+}
+
 %{
 #include <bits/types.h>
 #include <kos/anno.h>
@@ -35,57 +44,51 @@ __SYSDECL_BEGIN
 }
 
 %[define(DEFINE_LOCAL_error_print_progname =
-#ifndef __LOCAL_error_print_progname
-#ifdef error_print_progname
+@@pp_ifndef __LOCAL_error_print_progname@@
+@@pp_ifdef error_print_progname@@
 #define __LOCAL_error_print_progname error_print_progname
-#elif defined(__CRT_HAVE_error_print_progname)
-#ifdef __NO_ASMNAME
+@@pp_elif defined(__CRT_HAVE_error_print_progname)@@
+@@pp_ifdef __NO_ASMNAME@@
 __LIBC void (__LIBCCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
-#else /* __NO_ASMNAME */
+@@pp_else@@
 __LIBC void (__LIBCCALL *error_print_progname)(void);
-#ifndef __cplusplus
 #define error_print_progname         error_print_progname
-#endif /* !__cplusplus */
 #define __LOCAL_error_print_progname error_print_progname
-#endif /* !__NO_ASMNAME */
-#endif /* __CRT_HAVE_error_print_progname */
-#endif /* !__LOCAL_error_print_progname */
+@@pp_endif@@
+@@pp_endif@@
+@@pp_endif@@
 )]
 
 %[define(DEFINE_LOCAL_error_message_count =
-#ifndef __LOCAL_error_message_count
-#ifdef error_message_count
+@@pp_ifndef __LOCAL_error_message_count@@
+@@pp_ifdef error_message_count@@
 #define __LOCAL_error_message_count error_message_count
-#elif defined(__CRT_HAVE_error_message_count)
-#ifdef __NO_ASMNAME
+@@pp_elif defined(__CRT_HAVE_error_message_count)@@
+@@pp_ifdef __NO_ASMNAME@@
 __LIBC unsigned int __LOCAL_error_message_count __ASMNAME("error_message_count");
-#else /* __NO_ASMNAME */
+@@pp_else@@
 __LIBC unsigned int error_message_count;
-#ifndef __cplusplus
 #define error_message_count         error_message_count
-#endif /* !__cplusplus */
 #define __LOCAL_error_message_count error_message_count
-#endif /* !__NO_ASMNAME */
-#endif /* __CRT_HAVE_error_message_count */
-#endif /* !__LOCAL_error_message_count */
+@@pp_endif@@
+@@pp_endif@@
+@@pp_endif@@
 )]
 
 %[define(DEFINE_LOCAL_error_one_per_line =
-#ifndef __LOCAL_error_one_per_line
-#ifdef error_one_per_line
+@@pp_ifndef __LOCAL_error_one_per_line@@
+@@pp_ifdef error_one_per_line@@
 #define __LOCAL_error_one_per_line error_one_per_line
-#elif defined(__CRT_HAVE_error_one_per_line)
-#ifdef __NO_ASMNAME
+@@pp_elif defined(__CRT_HAVE_error_one_per_line)@@
+@@pp_ifdef __NO_ASMNAME@@
 __LIBC int __LOCAL_error_one_per_line __ASMNAME("error_one_per_line");
-#else /* __NO_ASMNAME */
+@@pp_else@@
 __LIBC int error_one_per_line;
-#ifndef __cplusplus
 #define error_one_per_line         error_one_per_line
-#endif /* !__cplusplus */
 #define __LOCAL_error_one_per_line error_one_per_line
-#endif /* !__NO_ASMNAME */
-#endif /* __CRT_HAVE_error_one_per_line */
-#endif /* !__LOCAL_error_one_per_line */
+@@pp_endif@@
+@@pp_endif@@
+@@pp_endif@@
 )]
 
 
@@ -100,19 +103,19 @@ __LIBC int error_one_per_line;
 [[impl_prefix(DEFINE_LOCAL_error_message_count)]]
 [[impl_include("<local/program_invocation_name.h>")]]
 [[requires_include("<__crt.h>", "<local/program_invocation_name.h>")]]
-[[userimpl, requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
-                     $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
-                     defined(__LOCAL_program_invocation_short_name) &&
-                     $has_function(strerror))]]
+[[requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
+           $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc) &&
+           defined(__LOCAL_program_invocation_short_name) &&
+           $has_function(strerror))]]
 void error(int status, $errno_t errnum, const char *format, ...) {
-#ifdef @__LOCAL_error_print_progname@
+@@pp_ifdef __LOCAL_error_print_progname@@
 	if (__LOCAL_error_print_progname) {
 		(*__LOCAL_error_print_progname)();
 	} else
-#endif /* __LOCAL_error_print_progname */
+@@pp_endif@@
 	{
 		fflush(stdout);
-		fprintf(stderr, "%s: ", @__LOCAL_program_invocation_short_name@);
+		fprintf(stderr, "%s: ", __LOCAL_program_invocation_short_name);
 	}
 	if (format) {
 		va_list args;
@@ -120,9 +123,9 @@ void error(int status, $errno_t errnum, const char *format, ...) {
 		vfprintf(stderr, format, args);
 		va_end(args);
 	}
-#ifdef @__LOCAL_error_message_count@
-	++@__LOCAL_error_message_count@;
-#endif /* __LOCAL_error_message_count */
+@@pp_ifdef __LOCAL_error_message_count@@
+	++__LOCAL_error_message_count;
+@@pp_endif@@
 	if (errnum != 0)
 		fprintf(stderr, ": %s", strerror(errnum));
 	fputc('\n', stderr);
@@ -140,38 +143,38 @@ void error(int status, $errno_t errnum, const char *format, ...) {
 [[impl_include("<local/stdstreams.h>")]]
 [[impl_include("<local/program_invocation_name.h>")]]
 [[requires_include("<__crt.h>", "<local/program_invocation_name.h>")]]
-[[userimpl, requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
-                     $has_function(fprintf) && $has_function(vfprintf) &&
-                     $has_function(fputc) && defined(__LOCAL_program_invocation_short_name) &&
-                     $has_function(strerror))]]
+[[requires(!defined(__NO_STDSTREAMS) && $has_function(exit) &&
+           $has_function(fprintf) && $has_function(vfprintf) &&
+           $has_function(fputc) && defined(__LOCAL_program_invocation_short_name) &&
+           $has_function(strerror))]]
 [[impl_prefix(DEFINE_LOCAL_error_print_progname)]]
 [[impl_prefix(DEFINE_LOCAL_error_one_per_line)]]
 [[impl_prefix(DEFINE_LOCAL_error_message_count)]]
 void error_at_line(int status, $errno_t errnum, char const *filename,
                    unsigned int line, char const *format, ...) {
-#ifdef @__LOCAL_error_one_per_line@
+@@pp_ifdef __LOCAL_error_one_per_line@@
 	static char const *last_filename = NULL;
 	static unsigned int last_line = 0;
-	if (@__LOCAL_error_one_per_line@ != 0 &&
+	if (__LOCAL_error_one_per_line != 0 &&
 	    line == last_line &&
 	    (filename == last_filename ||
 	     strcmp(filename, last_filename) == 0)) {
 		/* Don't print the same error more than once */
 	} else
-#endif /* __LOCAL_error_one_per_line */
+@@pp_endif@@
 	{
-#ifdef @__LOCAL_error_one_per_line@
+@@pp_ifdef __LOCAL_error_one_per_line@@
 		filename = last_filename;
 		line     = last_line;
-#endif /* __LOCAL_error_one_per_line */
-#ifdef @__LOCAL_error_print_progname@
+@@pp_endif@@
+@@pp_ifdef __LOCAL_error_print_progname@@
 		if (__LOCAL_error_print_progname) {
 			(*__LOCAL_error_print_progname)();
 		} else
-#endif /* __LOCAL_error_print_progname */
+@@pp_endif@@
 		{
 			fflush(stdout);
-			fprintf(stderr, "%s:", @__LOCAL_program_invocation_short_name@);
+			fprintf(stderr, "%s:", __LOCAL_program_invocation_short_name);
 		}
 		fprintf(stderr, "%s:%u: ", filename, line);
 		if (format) {
@@ -180,9 +183,9 @@ void error_at_line(int status, $errno_t errnum, char const *filename,
 			vfprintf(stderr, format, args);
 			va_end(args);
 		}
-#ifdef @__LOCAL_error_message_count@
-		++@__LOCAL_error_message_count@;
-#endif /* __LOCAL_error_message_count */
+@@pp_ifdef __LOCAL_error_message_count@@
+		++__LOCAL_error_message_count;
+@@pp_endif@@
 		if (errnum != 0)
 			fprintf(stderr, ": %s", strerror(errnum));
 		fputc('\n', stderr);

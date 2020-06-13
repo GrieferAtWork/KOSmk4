@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19351ae7 */
+/* HASH CRC-32:0xd07dd6e5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2498,7 +2498,14 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,_
 /* Alias for argv[0], as passed to main() */
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),__p_program_invocation_name,())
 #else /* ... */
+#include <local/program_invocation_name.h>
+#ifdef __LOCAL_program_invocation_name_p
+#include <local/stdlib/__p__pgmptr.h>
+/* Alias for argv[0], as passed to main() */
+__NAMESPACE_LOCAL_USING_OR_IMPL(__p__pgmptr, __FORCELOCAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL __p__pgmptr)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p__pgmptr))(); })
+#else /* __LOCAL_program_invocation_name_p */
 #undef ____p__pgmptr_defined
+#endif /* !__LOCAL_program_invocation_name_p */
 #endif /* !... */
 #endif /* !____p__pgmptr_defined */
 #ifdef ____p__pgmptr_defined

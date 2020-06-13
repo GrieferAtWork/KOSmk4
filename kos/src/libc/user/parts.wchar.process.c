@@ -23,24 +23,19 @@
 #include "../api.h"
 /**/
 
-#include <unistd.h>
-#include <process.h>
-#include <malloc.h>
-#include <stdarg.h>
 #include <hybrid/host.h>
-#include "../libc/uchar.h"
+
+#include <malloc.h>
+#include <process.h>
+#include <stdarg.h>
+#include <unistd.h>
+
 #include "../libc/capture-varargs.h"
+#include "../libc/globals.h"
+#include "../libc/uchar.h"
 #include "parts.wchar.process.h"
 
 DECL_BEGIN
-
-#undef environ
-#ifndef __environ_defined
-#define __environ_defined 1
-extern char **environ;
-#endif /* !__environ_defined */
-DECLARE_NOREL_GLOBAL_META(char **, environ);
-#define environ  GET_NOREL_GLOBAL(environ)
 
 
 INTERN NONNULL((1, 2))

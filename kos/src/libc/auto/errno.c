@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xc7454a2a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,21 +18,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_ERRNO_C
-#define GUARD_LIBC_USER_ERRNO_C 1
+#ifndef GUARD_LIBC_AUTO_ERRNO_C
+#define GUARD_LIBC_AUTO_ERRNO_C 1
 
 #include "../api.h"
-/**/
-
-#include "errno.h"
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include "../user/errno.h"
 
 DECL_BEGIN
 
-/*[[[skip:libc___errno_location]]]*/
-
-/*[[[start:exports,hash:CRC-32=0x0]]]*/
-/*[[[end:exports]]]*/
+#include "../libc/globals.h"
+#ifndef __KERNEL__
+/* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
+INTERN ATTR_SECTION(".text.crt.errno.utility") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
+NOTHROW_NCX(LIBCCALL libc___p_program_invocation_short_name)(void) {
+	return &__LOCAL_program_invocation_short_name_p;
+}
+#endif /* !__KERNEL__ */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_USER_ERRNO_C */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__p_program_invocation_short_name, libc___p_program_invocation_short_name);
+#endif /* !__KERNEL__ */
+
+#endif /* !GUARD_LIBC_AUTO_ERRNO_C */

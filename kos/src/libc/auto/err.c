@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xead8fec6 */
+/* HASH CRC-32:0x23a15f1e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,7 @@
 
 DECL_BEGIN
 
+#include "../libc/globals.h"
 #ifndef __KERNEL__
 /* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void

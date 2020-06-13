@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12ba62d9 */
+/* HASH CRC-32:0x9a7456e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@
 
 DECL_BEGIN
 
-#include "stdio.h"
+#include "../libc/globals.h"
 #ifndef __KERNEL__
 #include <hybrid/__minmax.h>
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
@@ -963,6 +963,12 @@ NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const *__restrict nptr,
 	return libc_strtold(nptr, endptr);
 }
 #endif /* !(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__) */
+#include <local/program_invocation_name.h>
+/* Alias for argv[0], as passed to main() */
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
+NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void) {
+	return &__LOCAL_program_invocation_name_p;
+}
 #include <local/program_invocation_name.h>
 INTERN ATTR_SECTION(".text.crt.dos.application.init") errno_t
 NOTHROW_NCX(LIBCCALL libc__get_pgmptr)(char **pvalue) {
@@ -2714,6 +2720,8 @@ DEFINE_PUBLIC_ALIAS(strtof_l, libc_strtof_l);
 DEFINE_PUBLIC_ALIAS(_strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(__strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(strtold_l, libc_strtold_l);
+DEFINE_PUBLIC_ALIAS(__p_program_invocation_name, libc___p__pgmptr);
+DEFINE_PUBLIC_ALIAS(__p__pgmptr, libc___p__pgmptr);
 DEFINE_PUBLIC_ALIAS(_get_pgmptr, libc__get_pgmptr);
 DEFINE_PUBLIC_ALIAS(DOS$_get_wpgmptr, libd__get_wpgmptr);
 DEFINE_PUBLIC_ALIAS(_get_wpgmptr, libc__get_wpgmptr);

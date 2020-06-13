@@ -83,6 +83,9 @@
 %[define_replacement(BUFSIZ = __BUFSIZ)]
 %[define_replacement(EOF = __EOF)]
 
+%(auto_source){
+#include "../libc/globals.h"
+}
 
 %{
 #include <features.h>

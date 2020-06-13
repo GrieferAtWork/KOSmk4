@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../libc/globals.h"
 #include "getopt.h"
 #include "stdio-api.h"
 
@@ -71,22 +72,14 @@ DECL_BEGIN
 #define GETOPT_TEXT(name)   ATTR_SECTION(".text.crt.application.options." name) 
 #define GETOPT_RODATA(name) ATTR_SECTION(".rodata.crt.application.options." name) 
 
-#undef optarg
-#undef optind
-#undef opterr
-#undef optopt
-PUBLIC GETOPT_BSS("optarg") char *optarg = NULL;
-PUBLIC GETOPT_DATA("optind") int  optind = 1;
-PUBLIC GETOPT_DATA("opterr") int  opterr = 1;
-PUBLIC GETOPT_DATA("optopt") int  optopt = '?';
-DEFINE_NOREL_GLOBAL_META(char *, optarg, ".crt.application.options");
-DEFINE_NOREL_GLOBAL_META(int, optind, ".crt.application.options");
-DEFINE_NOREL_GLOBAL_META(int, opterr, ".crt.application.options");
-DEFINE_NOREL_GLOBAL_META(int, optopt, ".crt.application.options");
-#define optarg GET_NOREL_GLOBAL(optarg)
-#define optind GET_NOREL_GLOBAL(optind)
-#define opterr GET_NOREL_GLOBAL(opterr)
-#define optopt GET_NOREL_GLOBAL(optopt)
+DATDEF /**/ char *g_optarg ASMNAME("optarg");
+DATDEF /*  */ int g_optind ASMNAME("optind");
+DATDEF /*  */ int g_opterr ASMNAME("opterr");
+DATDEF /*  */ int g_optopt ASMNAME("optopt");
+PUBLIC GETOPT_BSS("optarg") char *g_optarg = NULL;
+PUBLIC GETOPT_DATA("optind") int g_optind  = 1;
+PUBLIC GETOPT_DATA("opterr") int g_opterr  = 1;
+PUBLIC GETOPT_DATA("optopt") int g_optopt  = '?';
 
 
 PRIVATE GETOPT_BSS("__nextchar")     char *__nextchar;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd94a9acb */
+/* HASH CRC-32:0x14e02117 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,7 @@
 
 DECL_BEGIN
 
+#include "../libc/globals.h"
 #ifndef __KERNEL__
 #include <asm/stdio.h>
 /* Alias for `setvbuf(STREAM, buf, _IOFBF, BUFSIZ)' */

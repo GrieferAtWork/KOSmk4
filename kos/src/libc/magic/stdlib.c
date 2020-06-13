@@ -34,7 +34,9 @@
 %[define_replacement(s32 = __INT32_TYPE__)]
 %[define_replacement(s64 = __INT64_TYPE__)]
 
-%(auto_source)#include "stdio.h"
+%(auto_source){
+#include "../libc/globals.h"
+}
 
 
 %{
@@ -2255,7 +2257,13 @@ __LIBC char *__progname_full;
 @@Alias for argv[0], as passed to main()
 [[guard, wunused, ATTR_CONST]]
 [[export_alias("__p_program_invocation_name")]]
-[[nonnull]] char **__p__pgmptr();
+[[impl_include("<local/program_invocation_name.h>")]]
+[[requires_include("<local/program_invocation_name.h>")]]
+[[requires(defined(__LOCAL_program_invocation_name_p))]]
+[[nonnull]] char **__p__pgmptr() {
+	return &__LOCAL_program_invocation_name_p;
+}
+
 %{
 #ifdef ____p__pgmptr_defined
 #define _pgmptr   (*__p__pgmptr())

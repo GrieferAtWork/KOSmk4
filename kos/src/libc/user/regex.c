@@ -37,6 +37,7 @@
 #include <libregex/regex.h>
 
 #include "../libc/dl.h"
+#include "../libc/globals.h"
 #include "regex.h"
 
 DECL_BEGIN
@@ -113,13 +114,6 @@ err:
 #else /* !LIBREGEX_WANT_PROTOTYPES */
 #define REGEX_ONDEMAND()   true
 #endif /* LIBREGEX_WANT_PROTOTYPES */
-
-#undef re_syntax_options
-PUBLIC REGEX_BSS reg_syntax_t re_syntax_options = 0;
-#ifndef __OPTIMIZE_SIZE__
-DEFINE_NOREL_GLOBAL_META(reg_syntax_t, re_syntax_options, ".crt.utility.regex");
-#define re_syntax_options GET_NOREL_GLOBAL(re_syntax_options)
-#endif /* !__OPTIMIZE_SIZE__ */
 
 
 /*[[[start:implementation]]]*/

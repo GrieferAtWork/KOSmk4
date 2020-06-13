@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x61b35df5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,21 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_ERRNO_C
-#define GUARD_LIBC_USER_ERRNO_C 1
-
-#include "../api.h"
-/**/
-
-#include "errno.h"
-
-DECL_BEGIN
-
-/*[[[skip:libc___errno_location]]]*/
-
-/*[[[start:exports,hash:CRC-32=0x0]]]*/
-/*[[[end:exports]]]*/
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_ERRNO_C */
+#ifndef __local___p_program_invocation_short_name_defined
+#define __local___p_program_invocation_short_name_defined 1
+#include <__crt.h>
+#include <local/program_invocation_name.h>
+#ifdef __LOCAL_program_invocation_short_name_p
+__NAMESPACE_LOCAL_BEGIN
+/* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
+__LOCAL_LIBC(__p_program_invocation_short_name) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__p_program_invocation_short_name))(void) {
+	return &__LOCAL_program_invocation_short_name_p;
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep___p_program_invocation_short_name_defined
+#define __local___localdep___p_program_invocation_short_name_defined 1
+#define __localdep___p_program_invocation_short_name __LIBC_LOCAL_NAME(__p_program_invocation_short_name)
+#endif /* !__local___localdep___p_program_invocation_short_name_defined */
+#else /* __LOCAL_program_invocation_short_name_p */
+#undef __local___p_program_invocation_short_name_defined
+#endif /* !__LOCAL_program_invocation_short_name_p */
+#endif /* !__local___p_program_invocation_short_name_defined */

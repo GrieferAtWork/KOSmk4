@@ -73,24 +73,20 @@ struct iofile_data_novtab std_files_io[3] = {
 };
 
 INTERN ATTR_SECTION(".data.crt.FILE.locked.utility.std_files") FILE std_files[3] = {
-	/* [0] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_LNBUF, STDIN_FILENO, { 0 }, 0, (struct iofile_data *)&std_files_io[0]),
-	/* [1] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDOUT_FILENO, { 0 }, 0, (struct iofile_data *)&std_files_io[1]),
-	/* [2] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDERR_FILENO, { 0 }, 0, (struct iofile_data *)&std_files_io[2]),
+	/* [0] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_LNBUF, STDIN_FILENO, { 0 }, 0, (struct iofile_data *)&std_files_io[0]),            /* !Relocation */
+	/* [1] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDOUT_FILENO, { 0 }, 0, (struct iofile_data *)&std_files_io[1]), /* !Relocation */
+	/* [2] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDERR_FILENO, { 0 }, 0, (struct iofile_data *)&std_files_io[2]), /* !Relocation */
 };
 
-#undef stdin
-#undef stdout
-#undef stderr
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.read.read.stdin")    FILE *stdin  = &std_files[0];
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stdout") FILE *stdout = &std_files[1];
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stderr") FILE *stderr = &std_files[2];
 
-DEFINE_NOREL_GLOBAL_META(FILE *, stdin, ".crt.FILE.locked.read.read.stdin");
-DEFINE_NOREL_GLOBAL_META(FILE *, stdout, ".crt.FILE.locked.write.write.stdout");
-DEFINE_NOREL_GLOBAL_META(FILE *, stderr, ".crt.FILE.locked.write.write.stderr");
-#define stdin  GET_NOREL_GLOBAL(stdin)
-#define stdout GET_NOREL_GLOBAL(stdout)
-#define stderr GET_NOREL_GLOBAL(stderr)
+/* These are the actual, exported std* stream symbols. */
+DATDEF FILE *g_stdin ASMNAME("stdin");
+DATDEF FILE *g_stdout ASMNAME("stdout");
+DATDEF FILE *g_stderr ASMNAME("stderr");
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.read.read.stdin")    FILE *g_stdin  = &std_files[0]; /* !Relocation */
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stdout") FILE *g_stdout = &std_files[1]; /* !Relocation */
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stderr") FILE *g_stderr = &std_files[2]; /* !Relocation */
+
 
 
 /* [0..1][lock(all_files_lock)] Chain of all files.

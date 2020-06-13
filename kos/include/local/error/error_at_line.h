@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c1fe21f */
+/* HASH CRC-32:0x84cea1a8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -253,50 +253,44 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_exit,(int __status),_Exit
 __NAMESPACE_LOCAL_END
 #include <local/stdstreams.h>
 #ifndef __LOCAL_error_print_progname
-#ifdef __error_print_progname
+#ifdef error_print_progname
 #define __LOCAL_error_print_progname __error_print_progname
 #elif defined(__CRT_HAVE_error_print_progname)
 #ifdef __NO_ASMNAME
 __LIBC void (__LIBCCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
 #else /* __NO_ASMNAME */
 __LIBC void (__LIBCCALL *__error_print_progname)(void);
-#ifndef __cplusplus
 #define __error_print_progname         __error_print_progname
-#endif /* !__cplusplus */
 #define __LOCAL_error_print_progname __error_print_progname
 #endif /* !__NO_ASMNAME */
-#endif /* __CRT_HAVE_error_print_progname */
-#endif
+#endif /* ... */
+#endif /* !__LOCAL_error_print_progname */
 #ifndef __LOCAL_error_one_per_line
-#ifdef __error_one_per_line
+#ifdef error_one_per_line
 #define __LOCAL_error_one_per_line __error_one_per_line
 #elif defined(__CRT_HAVE_error_one_per_line)
 #ifdef __NO_ASMNAME
 __LIBC int __LOCAL_error_one_per_line __ASMNAME("error_one_per_line");
 #else /* __NO_ASMNAME */
 __LIBC int __error_one_per_line;
-#ifndef __cplusplus
 #define __error_one_per_line         __error_one_per_line
-#endif /* !__cplusplus */
 #define __LOCAL_error_one_per_line __error_one_per_line
 #endif /* !__NO_ASMNAME */
-#endif /* __CRT_HAVE_error_one_per_line */
-#endif
+#endif /* ... */
+#endif /* !__LOCAL_error_one_per_line */
 #ifndef __LOCAL_error_message_count
-#ifdef __error_message_count
+#ifdef error_message_count
 #define __LOCAL_error_message_count __error_message_count
 #elif defined(__CRT_HAVE_error_message_count)
 #ifdef __NO_ASMNAME
 __LIBC unsigned int __LOCAL_error_message_count __ASMNAME("error_message_count");
 #else /* __NO_ASMNAME */
 __LIBC unsigned int __error_message_count;
-#ifndef __cplusplus
 #define __error_message_count         __error_message_count
-#endif /* !__cplusplus */
 #define __LOCAL_error_message_count __error_message_count
 #endif /* !__NO_ASMNAME */
-#endif /* __CRT_HAVE_error_message_count */
-#endif
+#endif /* ... */
+#endif /* !__LOCAL_error_message_count */
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'

@@ -37,6 +37,8 @@
 
 #include <libio.h>
 
+#include "../libc/globals.h"
+
 DECL_BEGIN
 
 #undef EOF
@@ -45,19 +47,11 @@ DECL_BEGIN
 #define EOF16 ((char16_t)__WEOF16)
 #define EOF32 ((char32_t)__WEOF32)
 
-
-
 #ifndef __mbstate_t_defined
 #define __mbstate_t_defined 1
 typedef __mbstate_t mbstate_t;
 #endif /* !__mbstate_t_defined */
 
-#undef __LOCAL_stdin
-#undef __LOCAL_stdout
-#undef __LOCAL_stderr
-#define __LOCAL_stdin  stdin
-#define __LOCAL_stdout stdout
-#define __LOCAL_stderr stderr
 
 #define IO_RW           __IO_FILE_IORW      /* The file was opened for read+write permissions ('+' flag) */
 #define IO_MALLBUF      __IO_FILE_IOMALLBUF /* The buffer was allocated internally. */
@@ -155,17 +149,6 @@ struct iofile_data: iofile_data_novtab {
 	void                 *io_magi; /* [const] Magic cook */
 };
 
-
-
-#undef stdin
-#undef stdout
-#undef stderr
-DECLARE_NOREL_GLOBAL_META(FILE *, stdin);
-DECLARE_NOREL_GLOBAL_META(FILE *, stdout);
-DECLARE_NOREL_GLOBAL_META(FILE *, stderr);
-#define stdin  GET_NOREL_GLOBAL(stdin)
-#define stdout GET_NOREL_GLOBAL(stdout)
-#define stderr GET_NOREL_GLOBAL(stderr)
 
 #define FEOF(self)      ((self)->if_flag & IO_EOF)
 #define FERROR(self)    ((self)->if_flag & IO_ERR)

@@ -46,24 +46,13 @@
 
 #include "../libc/dl.h"
 #include "../libc/init.h"
+#include "../libc/globals.h"
 #include "malloc.h"
 #include "stdlib.h"
 
 
 DECL_BEGIN
 
-#undef libc_explicit_bzero
-#define libc_explicit_bzero explicit_bzero
-#undef __libc_geterrno_or
-#define __libc_geterrno_or(alt) libc_geterrno()
-
-#undef environ
-#ifndef __environ_defined
-#define __environ_defined 1
-extern char **environ;
-#endif /* !__environ_defined */
-DECLARE_NOREL_GLOBAL_META(char **, environ);
-#define environ GET_NOREL_GLOBAL(environ)
 INTDEF struct atomic_rwlock libc_environ_lock;
 
 /* Since `environ' can easily contain strings that weren't allocated
@@ -106,24 +95,6 @@ bool LIBCCALL environ_remove_heapstring_locked(struct environ_heapstr *ptr) {
 	}
 	return false;
 }
-
-
-
-#undef __argc
-#undef __argv
-#undef _pgmptr
-DEFINE_NOREL_GLOBAL_META(int, __argc, ".crt.dos.application.init");
-DEFINE_NOREL_GLOBAL_META(char **, __argv, ".crt.dos.application.init");
-DEFINE_NOREL_GLOBAL_META(char *, _pgmptr, ".crt.dos.application.init");
-#define __argc  GET_NOREL_GLOBAL(__argc)
-#define __argv  GET_NOREL_GLOBAL(__argv)
-#define _pgmptr GET_NOREL_GLOBAL(_pgmptr)
-
-
-#undef __peb
-DEFINE_NOREL_GLOBAL_META(struct process_peb, __peb, ".crt.glibc.application.init");
-#define __peb GET_NOREL_GLOBAL(__peb)
-
 
 
 
@@ -1719,15 +1690,6 @@ NOTHROW_NCX(LIBCCALL libc___p___argv)(void)
 }
 /*[[[end:libc___p___argv]]]*/
 
-/*[[[head:libc___p__pgmptr,hash:CRC-32=0x156ac752]]]*/
-/* Alias for argv[0], as passed to main() */
-INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
-NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void)
-/*[[[body:libc___p__pgmptr]]]*/
-{
-	return &_pgmptr;
-}
-/*[[[end:libc___p__pgmptr]]]*/
 
 PRIVATE ATTR_CONST WUNUSED
 ATTR_SECTION(".text.crt.dos.application.init.__p___initenv.get_initenv")
@@ -2166,7 +2128,7 @@ NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x11627722]]]*/
+/*[[[start:exports,hash:CRC-32=0xca5f7548]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(system, libc_system);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
@@ -2249,8 +2211,6 @@ DEFINE_PUBLIC_ALIAS(DOS$__p__wenviron, libd___p__wenviron);
 DEFINE_PUBLIC_ALIAS(__p__wenviron, libc___p__wenviron);
 DEFINE_PUBLIC_ALIAS(DOS$__p__wpgmptr, libd___p__wpgmptr);
 DEFINE_PUBLIC_ALIAS(__p__wpgmptr, libc___p__wpgmptr);
-DEFINE_PUBLIC_ALIAS(__p_program_invocation_name, libc___p__pgmptr);
-DEFINE_PUBLIC_ALIAS(__p__pgmptr, libc___p__pgmptr);
 DEFINE_PUBLIC_ALIAS(__p___initenv, libc___p___initenv);
 DEFINE_PUBLIC_ALIAS(DOS$__p___winitenv, libd___p___winitenv);
 DEFINE_PUBLIC_ALIAS(__p___winitenv, libc___p___winitenv);

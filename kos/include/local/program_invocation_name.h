@@ -25,37 +25,46 @@ __SYSDECL_BEGIN
 
 #ifndef __LOCAL_program_invocation_name
 #ifdef program_invocation_name
-#define __LOCAL_program_invocation_name program_invocation_name
+#define __LOCAL_program_invocation_name   program_invocation_name
+#define __LOCAL_program_invocation_name_p program_invocation_name
 #elif defined(_pgmptr)
-#define __LOCAL_program_invocation_name _pgmptr
+#define __LOCAL_program_invocation_name   _pgmptr
+#define __LOCAL_program_invocation_name_p _pgmptr
 #elif defined(__progname_full)
-#define __LOCAL_program_invocation_name __progname_full
+#define __LOCAL_program_invocation_name   __progname_full
+#define __LOCAL_program_invocation_name_p __progname_full
 #elif defined(__CRT_HAVE_program_invocation_name)
 #ifndef __NO_ASMNAME
 __LIBC char *__LOCAL_program_invocation_name __ASMNAME("program_invocation_name");
-#define __LOCAL_program_invocation_name __LOCAL_program_invocation_name
+#define __LOCAL_program_invocation_name   __LOCAL_program_invocation_name
+#define __LOCAL_program_invocation_name_p __LOCAL_program_invocation_name
 #else /* !__NO_ASMNAME */
 __LIBC char *program_invocation_name;
-#define program_invocation_name         program_invocation_name
-#define __LOCAL_program_invocation_name program_invocation_name
+#define program_invocation_name           program_invocation_name
+#define __LOCAL_program_invocation_name   program_invocation_name
+#define __LOCAL_program_invocation_name_p program_invocation_name
 #endif /* __NO_ASMNAME */
 #elif defined(__CRT_HAVE__pgmptr)
 #ifndef __NO_ASMNAME
 __LIBC char *__LOCAL_program_invocation_name __ASMNAME("_pgmptr");
-#define __LOCAL_program_invocation_name __LOCAL_program_invocation_name
+#define __LOCAL_program_invocation_name   __LOCAL_program_invocation_name
+#define __LOCAL_program_invocation_name_p __LOCAL_program_invocation_name
 #else /* !__NO_ASMNAME */
 __LIBC char *_pgmptr;
-#define _pgmptr                         _pgmptr
-#define __LOCAL_program_invocation_name _pgmptr
+#define _pgmptr                           _pgmptr
+#define __LOCAL_program_invocation_name   _pgmptr
+#define __LOCAL_program_invocation_name_p _pgmptr
 #endif /* __NO_ASMNAME */
 #elif defined(__CRT_HAVE___progname_full)
 #ifndef __NO_ASMNAME
 __LIBC char *__LOCAL_program_invocation_name __ASMNAME("__progname_full");
-#define __LOCAL_program_invocation_name __LOCAL_program_invocation_name
+#define __LOCAL_program_invocation_name   __LOCAL_program_invocation_name
+#define __LOCAL_program_invocation_name_p __LOCAL_program_invocation_name_p
 #else /* !__NO_ASMNAME */
 __LIBC char *__progname_full;
-#define __progname_full                 __progname_full
-#define __LOCAL_program_invocation_name __progname_full
+#define __progname_full                   __progname_full
+#define __LOCAL_program_invocation_name   __progname_full
+#define __LOCAL_program_invocation_name_p __LOCAL_program_invocation_name_p
 #endif /* __NO_ASMNAME */
 #else /* ... */
 #ifndef ____p__pgmptr_defined
@@ -72,6 +81,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,
 #endif /* !____p__pgmptr_defined */
 #ifdef ____p__pgmptr_defined
 #define __LOCAL_program_invocation_name   (*__p__pgmptr())
+#define __LOCAL_program_invocation_name_p (*__p__pgmptr())
 #endif /* ____p__pgmptr_defined */
 #endif /* !... */
 #endif /* !__LOCAL_program_invocation_name */
@@ -79,26 +89,32 @@ __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,
 /* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
 #ifndef __LOCAL_program_invocation_short_name
 #ifdef program_invocation_short_name
-#define __LOCAL_program_invocation_short_name program_invocation_short_name
+#define __LOCAL_program_invocation_short_name   program_invocation_short_name
+#define __LOCAL_program_invocation_short_name_p program_invocation_short_name
 #elif defined(__progname)
-#define __LOCAL_program_invocation_short_name __progname
+#define __LOCAL_program_invocation_short_name   __progname
+#define __LOCAL_program_invocation_short_name_p __progname
 #elif defined(__CRT_HAVE_program_invocation_short_name)
 #ifndef __NO_ASMNAME
 __LIBC char *__LOCAL_program_invocation_short_name __ASMNAME("program_invocation_short_name");
-#define __LOCAL_program_invocation_short_name __LOCAL_program_invocation_short_name
+#define __LOCAL_program_invocation_short_name   __LOCAL_program_invocation_short_name
+#define __LOCAL_program_invocation_short_name_p __LOCAL_program_invocation_short_name
 #else /* !__NO_ASMNAME */
 __LIBC char *program_invocation_short_name;
-#define program_invocation_short_name         program_invocation_short_name
-#define __LOCAL_program_invocation_short_name program_invocation_short_name
+#define program_invocation_short_name           program_invocation_short_name
+#define __LOCAL_program_invocation_short_name   program_invocation_short_name
+#define __LOCAL_program_invocation_short_name_p program_invocation_short_name
 #endif /* __NO_ASMNAME */
 #elif defined(__CRT_HAVE___progname)
 #ifndef __NO_ASMNAME
 __LIBC char *__LOCAL_program_invocation_short_name __ASMNAME("__progname");
-#define __LOCAL_program_invocation_short_name __LOCAL_program_invocation_short_name
+#define __LOCAL_program_invocation_short_name   __LOCAL_program_invocation_short_name
+#define __LOCAL_program_invocation_short_name_p __LOCAL_program_invocation_short_name
 #else /* !__NO_ASMNAME */
 __LIBC char *__progname;
-#define __progname                            __progname
-#define __LOCAL_program_invocation_short_name __progname
+#define __progname                              __progname
+#define __LOCAL_program_invocation_short_name   __progname
+#define __LOCAL_program_invocation_short_name_p __progname
 #endif /* __NO_ASMNAME */
 #else /* ... */
 #ifndef ____p_program_invocation_short_name_defined
@@ -111,7 +127,8 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,_
 #endif /* __p_program_invocation_short_name... */
 #endif /* !____p_program_invocation_short_name_defined */
 #ifdef ____p__pgmptr_defined
-#define __LOCAL_program_invocation_short_name (*__p__pgmptr())
+#define __LOCAL_program_invocation_short_name   (*__p__pgmptr())
+#define __LOCAL_program_invocation_short_name_p (*__p__pgmptr())
 #elif defined(__LOCAL_program_invocation_name)
 __SYSDECL_END
 #include <libc/string.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b9508d2 */
+/* HASH CRC-32:0x629311cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,7 @@
 
 DECL_BEGIN
 
+#include "../libc/globals.h"
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED wint_t
 NOTHROW_NCX(LIBDCALL libd_btowc)(int ch) {

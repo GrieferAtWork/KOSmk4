@@ -145,6 +145,12 @@ do_overwrite_file:
 	}
 }
 
+function escapeSymbolName(name: string): string {
+	if (name in ["argc", "argv", "envp"])
+		return "___" + name;
+	return "__" + name;
+}
+
 
 @@Mapping between types and their respective origins
 global syscallTypeDeclarationOrigins: {string: string} = Dict();
@@ -1679,11 +1685,11 @@ function printSyscallDeclarations(
 			if (x.args) {
 				fp << ", ".join(
 					for (local t, n: x.args)
-						joinVariableName(t.escapedTypenameBase, "__" + n));
+						joinVariableName(t.escapedTypenameBase, escapeSymbolName(n)));
 			} else {
 				fp << "void";
 			}
-			fp << "),(" << ",".join(for (local none, n: x.args) "__" + n) << "))\n";
+			fp << "),(" << ",".join(for (local none, n: x.args) escapeSymbolName(n)) << "))\n";
 			fp << "#endif /* __CRT_HAVE_" << conditionalX << "SC(" << x.name << ") */\n";
 		}
 	}

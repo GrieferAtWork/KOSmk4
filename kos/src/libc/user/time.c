@@ -28,29 +28,10 @@
 #include <syscall.h>
 
 #include "time.h"
+#include "../libc/globals.h"
 
 DECL_BEGIN
 
-
-#undef tzname
-#undef __tzname
-#undef timezone
-#undef __timezone
-#undef daylight
-#undef __daylight
-PUBLIC ATTR_SECTION(".bss.crt.time.timezone.tzname") char *tzname[2]      = { NULL, NULL };
-PUBLIC ATTR_SECTION(".bss.crt.time.timezone.timezone") longptr_t timezone = 0;
-PUBLIC ATTR_SECTION(".bss.crt.time.timezone.daylight") int daylight       = 0;
-DEFINE_PUBLIC_ALIAS(__tzname, tzname);
-DEFINE_PUBLIC_ALIAS(__timezone, timezone);
-DEFINE_PUBLIC_ALIAS(__daylight, daylight);
-
-DEFINE_NOREL_GLOBAL_META(char *, tzname, ".crt.time.timezone.tzname");
-DEFINE_NOREL_GLOBAL_META(longptr_t, timezone, ".crt.time.timezone.timezone");
-DEFINE_NOREL_GLOBAL_META(int, daylight, ".crt.time.timezone.daylight");
-#define tzname     GET_NOREL_GLOBAL(tzname)
-#define timezone   GET_NOREL_GLOBAL(timezone)
-#define daylight   GET_NOREL_GLOBAL(daylight)
 
 DEFINE_PUBLIC_ALIAS(DOS$__tzname, libd___tzname);
 INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone.__tzname") char **

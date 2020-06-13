@@ -30,6 +30,7 @@
 
 #include "../auto/parts.wchar.format-printer.h"
 #include "../libc/uchar.h"
+#include "../libc/globals.h"
 #include "malloc.h"
 #include "stdio-api.h"
 #include "stdio.h"
@@ -37,50 +38,7 @@
 #include "string.h"
 #include "wchar.h"
 
-#define libc_vswprintf_s libc_vswprintf
-#define libd_vswprintf_s libd_vswprintf
-#define libc_swprintf_s  libc_swprintf
-#define libd_swprintf_s  libd_swprintf
-#define libc_vfwprintf_s libc_vfwprintf
-#define libd_vfwprintf_s libd_vfwprintf
-#define libc_fwprintf_s  libc_fwprintf
-#define libd_fwprintf_s  libd_fwprintf
-#define libc_vwprintf_s  libc_vwprintf
-#define libd_vwprintf_s  libd_vwprintf
-#define libc_wprintf_s   libc_wprintf
-#define libd_wprintf_s   libd_wprintf
-#define libc_vswscanf_s  libc_vswscanf
-#define libd_vswscanf_s  libd_vswscanf
-#define libc_swscanf_s   libc_swscanf
-#define libd_swscanf_s   libd_swscanf
-#define libc_vfwscanf_s  libc_vfwscanf
-#define libd_vfwscanf_s  libd_vfwscanf
-#define libc_fwscanf_s   libc_fwscanf
-#define libd_fwscanf_s   libd_fwscanf
-#define libc_vwscanf_s   libc_vwscanf
-#define libd_vwscanf_s   libd_vwscanf
-#define libc_wscanf_s    libc_wscanf
-#define libd_wscanf_s    libd_wscanf
-
 DECL_BEGIN
-
-#undef stdin
-#undef stdout
-#undef stderr
-DECLARE_NOREL_GLOBAL_META(FILE *, stdin);
-DECLARE_NOREL_GLOBAL_META(FILE *, stdout);
-DECLARE_NOREL_GLOBAL_META(FILE *, stderr);
-#define stdin  GET_NOREL_GLOBAL(stdin)
-#define stdout GET_NOREL_GLOBAL(stdout)
-#define stderr GET_NOREL_GLOBAL(stderr)
-
-#undef __LOCAL_stdin
-#undef __LOCAL_stdout
-#undef __LOCAL_stderr
-#define __LOCAL_stdin   stdin
-#define __LOCAL_stdout  stdout
-#define __LOCAL_stderr  stderr
-
 
 /* The DOS version of wcstok() doesn't take the 3rd safe-ptr argument,
  * but rather only takes 2 arguments (under DOS, the 3-argument form

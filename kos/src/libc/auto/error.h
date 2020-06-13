@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd23b1e2e */
+/* HASH CRC-32:0x6ab258 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_ERROR_H
-#define GUARD_LIBC_USER_ERROR_H 1
+#ifndef GUARD_LIBC_AUTO_ERROR_H
+#define GUARD_LIBC_AUTO_ERROR_H 1
 
 #include "../api.h"
 
@@ -44,4 +44,4 @@ INTDEF ATTR_LIBC_PRINTF(5, 6) void (VLIBCCALL libc_error_at_line)(int status, er
 
 DECL_END
 
-#endif /* !GUARD_LIBC_USER_ERROR_H */
+#endif /* !GUARD_LIBC_AUTO_ERROR_H */

@@ -29,6 +29,10 @@
 
 %[define_replacement(rsize_t  = __SIZE_TYPE__)]
 
+%(auto_source){
+#include "../libc/globals.h"
+}
+
 %(auto_header){
 #ifndef __errno_t_defined
 #define __errno_t_defined 1

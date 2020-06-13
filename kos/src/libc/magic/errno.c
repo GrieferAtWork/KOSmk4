@@ -324,7 +324,7 @@
 //%[define_wchar_replacement(__EOWNERDEAD      = __DOS_EOWNERDEAD,        __GEN_EOWNERDEAD)]      /* Owner died */
 //%[define_wchar_replacement(__ENOTRECOVERABLE = __DOS_ENOTRECOVERABLE,   __GEN_ENOTRECOVERABLE)] /* State not recoverable */
 
-
+%(auto_source)#include "../libc/globals.h"
 
 %{
 #include <features.h>
@@ -930,7 +930,11 @@ __LIBC char *__progname;
 }
 @@Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main()
 [[guard, wunused, ATTR_CONST, nonnull]]
-char **__p_program_invocation_short_name();
+[[requires_include("<local/program_invocation_name.h>")]]
+[[requires(defined(__LOCAL_program_invocation_short_name_p))]]
+char **__p_program_invocation_short_name() {
+	return &__LOCAL_program_invocation_short_name_p;
+}
 %{
 #ifdef ____p__pgmptr_defined
 #define program_invocation_name (*__p__pgmptr())

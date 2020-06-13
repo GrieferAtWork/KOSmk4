@@ -31,6 +31,7 @@
 #include <stdlib.h> /* exit() */
 
 #include "except.h" /* EXCEPT_INITIALIZER_KERNEL_EXCEPTION_HANDLER() */
+#include "globals.h"
 
 
 DECL_BEGIN
@@ -62,10 +63,6 @@ void LIBCCALL libc_fini(void) {
 	/* Flush all file buffers to disk. */
 	flushall();
 }
-
-#undef __peb
-DECLARE_NOREL_GLOBAL_META(struct process_peb, __peb);
-#define __peb GET_NOREL_GLOBAL(__peb)
 
 INTERN ATTR_SECTION(".text.crt.glibc.application.init.libc_start_main")
 NONNULL((1)) int LIBCCALL

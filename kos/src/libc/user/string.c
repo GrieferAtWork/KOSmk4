@@ -30,6 +30,7 @@
 #include <malloc.h>
 #include <signal.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "../libc/errno.h"
 #include "malloc.h"
@@ -40,6 +41,8 @@
 DECL_BEGIN
 
 
+/* TODO: Declare these functions through magic
+ * -> Simply use the [[ignore]] annotation to hide these from headers! */
 DEFINE_PUBLIC_ALIAS(memcasemem0_l, libc_memcasemem0_l);
 INTERN WUNUSED ATTR_PURE NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.memcasemem0_l") void *

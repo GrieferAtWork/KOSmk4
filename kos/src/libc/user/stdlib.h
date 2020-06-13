@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7178f4ee */
+/* HASH CRC-32:0xf0509ae8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,8 +152,6 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***NOTHROW_NCX(LIBDCALL libd_
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***NOTHROW_NCX(LIBKCALL libc___p__wenviron)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t **NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t **NOTHROW_NCX(LIBKCALL libc___p__wpgmptr)(void);
-/* Alias for argv[0], as passed to main() */
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char **NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void);
 /* Access to the initial environment block */
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char ***NOTHROW_NCX(LIBCCALL libc___p___initenv)(void);
 /* Access to the initial environment block */

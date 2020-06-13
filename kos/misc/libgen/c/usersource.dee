@@ -263,8 +263,7 @@ discard_function_during_scan:
 		local fp = File.Writer();
 		local guardName = "GUARD_LIBC_USER_{}_C"
 			.format({ header.name.replace(".", "_").replace("/", "_").upper() });
-		fp << COPYRIGHT,
-			"\n"
+		fp << COPYRIGHT << "\n"
 			"#ifndef " << guardName << "\n"
 			"#define " << guardName << " 1\n"
 			"\n"
@@ -283,6 +282,7 @@ discard_function_during_scan:
 			"DECL_END\n"
 			"\n"
 			"#endif /* !" << guardName << " */\n";
+		userSourceLayout.append(UserSourceExportTable);
 		userSourceLayout.append(fp.string);
 		missingSourceFunctionsByName = none;
 		hasExportTable = true;
@@ -461,6 +461,14 @@ discard_function_during_scan:
 	/* Check if the new contents differ from origText */
 	if (fp == origText)
 		return; /* No change -> Nothing to do here! */
+	if (!origText) {
+		printUpdateMessage("Creating: {!r}".format({ filename }));
+		with (criticalSection) {
+			with (local newfp = File.open(filename, "wb"))
+				newfp.write(fp.encode("utf-8"));
+		}
+		return;
+	}
 	/* If the content differ, then write the new contents back to the file. */
 	printUpdateMessage("Updating: {!r}".format({ filename }));
 	/* Use a temporary file to guaranty that deemon crashing will

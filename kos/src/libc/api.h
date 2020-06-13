@@ -137,24 +137,6 @@
 #define ATTR_LIBC_WPRINTF_P(a, b) __ATTR_LIBC_WPRINTF_P(a, b)
 #define ATTR_LIBC_WSCANF(a, b)    __ATTR_LIBC_WSCANF(a, b)
 
-#include <ctype.h>
-
-#define libc_isalnum(ch)  isalnum(ch)
-#define libc_isalpha(ch)  isalpha(ch)
-#define libc_isupper(ch)  isupper(ch)
-#define libc_islower(ch)  islower(ch)
-#define libc_isdigit(ch)  isdigit(ch)
-#define libc_isxdigit(ch) isxdigit(ch)
-#define libc_isspace(ch)  isspace(ch)
-#define libc_ispunct(ch)  ispunct(ch)
-#define libc_isprint(ch)  isprint(ch)
-#define libc_isgraph(ch)  isgraph(ch)
-#define libc_iscntrl(ch)  iscntrl(ch)
-#ifdef __USE_ISOC99
-#define libc_isblank(ch) isblank(ch)
-#endif /* __USE_ISOC99 */
-
-
 #include <parts/dos/errno.h>
 #include <parts/errno.h>
 #include <parts/generic/errno.h>
@@ -237,41 +219,6 @@ INTDEF void LIBCCALL libc_unimplemented(char const *__restrict name);
 
 
 DECL_END
-
-
-#ifndef __KERNEL__
-#if defined(__OPTIMIZE_SIZE__)
-/* Disable norel access. */
-#define GET_NOREL_GLOBAL(name)             __bind_##name
-#define DECLARE_NOREL_GLOBAL_META(T, name) DATDEF T __bind_##name ASMNAME(#name)
-#define DEFINE_NOREL_GLOBAL_META(T, name)  DATDEF T __bind_##name ASMNAME(#name)
-#else /* __OPTIMIZE_SIZE__ */
-#define GET_NOREL_GLOBAL(name) (*(__pdyn_##name ? __pdyn_##name : __##name##_impl()))
-#define DECLARE_NOREL_GLOBAL_META(T, name) \
-	INTDEF T *__pdyn_##name;               \
-	INTDEF ATTR_CONST T *(LIBCCALL __##name##_impl)(void)
-#ifdef __INTELLISENSE__
-#define DEFINE_NOREL_GLOBAL_META(T, name, section)                                            \
-	INTERN ATTR_SECTION(".bss" section "." #name) T *__pdyn_##name               = __NULLPTR; \
-	PRIVATE ATTR_SECTION(".rodata" section "." #name) char const __name_##name[] = #name;     \
-	INTERN ATTR_CONST ATTR_SECTION(".text" section "." #name) T *(LIBCCALL __##name##_impl)(void)
-#else /* __INTELLISENSE__ */
-#include <hybrid/__assert.h>
-#include <hybrid/__atomic.h>
-
-#include <dlfcn.h>
-#define DEFINE_NOREL_GLOBAL_META(T, name, section)                                                  \
-	INTERN ATTR_SECTION(".bss" section "." #name) T *__pdyn_##name               = __NULLPTR;       \
-	PRIVATE ATTR_SECTION(".rodata" section "." #name) char const __name_##name[] = #name;           \
-	INTERN ATTR_CONST ATTR_SECTION(".text" section "." #name) T *(LIBCCALL __##name##_impl)(void) { \
-		T *ptr = (T *)dlsym(RTLD_DEFAULT, __name_##name);                                           \
-		__hybrid_assert(ptr);                                                                       \
-		__hybrid_atomic_store(__pdyn_##name, ptr, __ATOMIC_RELEASE);                                \
-		return ptr;                                                                                 \
-	}
-#endif /* !__INTELLISENSE__ */
-#endif /* !__OPTIMIZE_SIZE__ */
-#endif /* !__KERNEL__ */
 
 #endif /* __CC__ */
 
