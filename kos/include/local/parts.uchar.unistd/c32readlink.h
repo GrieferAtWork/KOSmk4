@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2654924 */
+/* HASH CRC-32:0xb59be929 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__LIBKCALL,__localdep_c32readlinkat,(__fd_t __dfd, __CHAR32_TYPE__ const *__restrict __path, __CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_c32readlinkat,(__fd_t __dfd, __CHAR32_TYPE__ const *__restrict __path, __CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
 #elif defined(__CRT_HAVE_DOS$wreadlinkat)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>

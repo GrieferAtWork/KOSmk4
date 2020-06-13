@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x337ef692 */
+/* HASH CRC-32:0xb7f1c49c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __SYSDECL_BEGIN
 #if defined(__CRT_HAVE_wttyname) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,__LIBDCALL,c16ttyname,(__fd_t __fd),wttyname,(__fd))
+__CREDIRECT(__ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,c16ttyname,(__fd_t __fd),wttyname,(__fd))
 #elif defined(__CRT_HAVE_DOS$wttyname)
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
@@ -55,7 +55,7 @@ __CREDIRECT_DOS(__ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,c16ttyname,(__fd_t __fd)
 #if defined(__CRT_HAVE_wttyname) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED,char32_t *,__NOTHROW_RPC,__LIBKCALL,c32ttyname,(__fd_t __fd),wttyname,(__fd))
+__CREDIRECT(__ATTR_WUNUSED,char32_t *,__NOTHROW_RPC,c32ttyname,(__fd_t __fd),wttyname,(__fd))
 #elif defined(__CRT_HAVE_DOS$wttyname)
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
@@ -64,7 +64,7 @@ __CREDIRECT_KOS(__ATTR_WUNUSED,char32_t *,__NOTHROW_RPC,c32ttyname,(__fd_t __fd)
 #if defined(__CRT_HAVE_wttyname_r) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBDCALL,c16ttyname_r,(__fd_t __fd, char16_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c16ttyname_r,(__fd_t __fd, char16_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
 #elif defined(__CRT_HAVE_DOS$wttyname_r)
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
@@ -73,26 +73,26 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c16ttyname_r,(__fd_t __fd,
 #if defined(__CRT_HAVE_wttyname_r) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBKCALL,c32ttyname_r,(__fd_t __fd, char32_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32ttyname_r,(__fd_t __fd, char32_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
 #elif defined(__CRT_HAVE_DOS$wttyname_r)
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 __CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32ttyname_r,(__fd_t __fd, char32_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
 #endif /* ... */
 #if defined(__CRT_HAVE_wgetlogin) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED,char16_t *,__NOTHROW_NCX,__LIBDCALL,c16getlogin,(void),wgetlogin,())
+__CREDIRECT(__ATTR_WUNUSED,char16_t *,__NOTHROW_NCX,c16getlogin,(void),wgetlogin,())
 #elif defined(__CRT_HAVE_DOS$wgetlogin)
 __CREDIRECT_DOS(__ATTR_WUNUSED,char16_t *,__NOTHROW_NCX,c16getlogin,(void),wgetlogin,())
 #endif /* ... */
 #if defined(__CRT_HAVE_wgetlogin) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED,char32_t *,__NOTHROW_NCX,__LIBKCALL,c32getlogin,(void),wgetlogin,())
+__CREDIRECT(__ATTR_WUNUSED,char32_t *,__NOTHROW_NCX,c32getlogin,(void),wgetlogin,())
 #elif defined(__CRT_HAVE_DOS$wgetlogin)
 __CREDIRECT_KOS(__ATTR_WUNUSED,char32_t *,__NOTHROW_NCX,c32getlogin,(void),wgetlogin,())
 #endif /* ... */
 #if defined(__CRT_HAVE_wchown) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBDCALL,c16chown,(char16_t const *__file, __uid_t __owner, __gid_t __group),wchown,(__file,__owner,__group))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16chown,(char16_t const *__file, __uid_t __owner, __gid_t __group),wchown,(__file,__owner,__group))
 #elif defined(__CRT_HAVE_DOS$wchown)
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
@@ -111,7 +111,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16chown, __FORCELOCAL __ATTR_NONNULL((1)) int _
 #if defined(__CRT_HAVE_wchown) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBKCALL,c32chown,(char32_t const *__file, __uid_t __owner, __gid_t __group),wchown,(__file,__owner,__group))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chown,(char32_t const *__file, __uid_t __owner, __gid_t __group),wchown,(__file,__owner,__group))
 #elif defined(__CRT_HAVE_DOS$wchown)
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
@@ -134,7 +134,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32chown, __FORCELOCAL __ATTR_NONNULL((1)) int _
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,__LIBDCALL,c16pathconf,(char16_t const *__path, __STDC_INT_AS_UINT_T __name),wpathconf,(__path,__name))
+__CREDIRECT(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,c16pathconf,(char16_t const *__path, __STDC_INT_AS_UINT_T __name),wpathconf,(__path,__name))
 #elif defined(__CRT_HAVE_DOS$wpathconf)
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
@@ -151,7 +151,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,c16pathconf,(
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,__LIBKCALL,c32pathconf,(char32_t const *__path, __STDC_INT_AS_UINT_T __name),wpathconf,(__path,__name))
+__CREDIRECT(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,c32pathconf,(char32_t const *__path, __STDC_INT_AS_UINT_T __name),wpathconf,(__path,__name))
 #elif defined(__CRT_HAVE_DOS$wpathconf)
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
@@ -164,7 +164,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,c32pathconf,(
 #if defined(__CRT_HAVE_wlink) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBDCALL,c16link,(char16_t const *__from, char16_t const *__to),wlink,(__from,__to))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16link,(char16_t const *__from, char16_t const *__to),wlink,(__from,__to))
 #elif defined(__CRT_HAVE_DOS$wlink)
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
@@ -183,7 +183,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16link, __FORCELOCAL __ATTR_NONNULL((1, 2)) int
 #if defined(__CRT_HAVE_wlink) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBKCALL,c32link,(char32_t const *__from, char32_t const *__to),wlink,(__from,__to))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c32link,(char32_t const *__from, char32_t const *__to),wlink,(__from,__to))
 #elif defined(__CRT_HAVE_DOS$wlink)
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
@@ -203,7 +203,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32link, __FORCELOCAL __ATTR_NONNULL((1, 2)) int
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBDCALL,c16access,(char16_t const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16access,(char16_t const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
 #elif defined(__CRT_HAVE_DOS$waccess)
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
@@ -226,7 +226,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16access, __FORCELOCAL __ATTR_WUNUSED __ATTR_NO
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBKCALL,c32access,(char32_t const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32access,(char32_t const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
 #elif defined(__CRT_HAVE_DOS$waccess)
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
@@ -248,7 +248,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32access, __FORCELOCAL __ATTR_WUNUSED __ATTR_NO
 #if defined(__CRT_HAVE_wchdir) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBDCALL,c16chdir,(char16_t const *__path),wchdir,(__path))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16chdir,(char16_t const *__path),wchdir,(__path))
 #elif defined(__CRT_HAVE_DOS$_wchdir)
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
@@ -257,7 +257,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16chdir,(char16_t const *
 #if defined(__CRT_HAVE_wchdir) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBKCALL,c32chdir,(char32_t const *__path),wchdir,(__path))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chdir,(char32_t const *__path),wchdir,(__path))
 #elif defined(__CRT_HAVE_DOS$wchdir)
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
@@ -266,7 +266,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chdir,(char32_t const *
 #if defined(__CRT_HAVE_wgetcwd) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-__COMPILER_REDIRECT(__LIBC,,char16_t *,__NOTHROW_RPC,__LIBDCALL,c16getcwd,(char16_t *__buf, size_t __bufsize),wgetcwd,(__buf,__bufsize))
+__CREDIRECT(,char16_t *,__NOTHROW_RPC,c16getcwd,(char16_t *__buf, size_t __bufsize),wgetcwd,(__buf,__bufsize))
 #elif defined(__CRT_HAVE_DOS$_wgetcwd)
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
@@ -275,7 +275,7 @@ __CREDIRECT_DOS(,char16_t *,__NOTHROW_RPC,c16getcwd,(char16_t *__buf, size_t __b
 #if defined(__CRT_HAVE_wgetcwd) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-__COMPILER_REDIRECT(__LIBC,,char32_t *,__NOTHROW_RPC,__LIBKCALL,c32getcwd,(char32_t *__buf, size_t __bufsize),wgetcwd,(__buf,__bufsize))
+__CREDIRECT(,char32_t *,__NOTHROW_RPC,c32getcwd,(char32_t *__buf, size_t __bufsize),wgetcwd,(__buf,__bufsize))
 #elif defined(__CRT_HAVE_DOS$wgetcwd)
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
@@ -284,7 +284,7 @@ __CREDIRECT_KOS(,char32_t *,__NOTHROW_RPC,c32getcwd,(char32_t *__buf, size_t __b
 #if defined(__CRT_HAVE_wunlink) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBDCALL,c16unlink,(char16_t const *__file),wunlink,(__file))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16unlink,(char16_t const *__file),wunlink,(__file))
 #elif defined(__CRT_HAVE_DOS$_wunlink)
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
@@ -303,7 +303,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16unlink, __FORCELOCAL __ATTR_NONNULL((1)) int 
 #if defined(__CRT_HAVE_wunlink) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBKCALL,c32unlink,(char32_t const *__file),wunlink,(__file))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32unlink,(char32_t const *__file),wunlink,(__file))
 #elif defined(__CRT_HAVE_DOS$wunlink)
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
@@ -322,7 +322,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32unlink, __FORCELOCAL __ATTR_NONNULL((1)) int 
 #if defined(__CRT_HAVE_wrmdir) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBDCALL,c16rmdir,(char16_t const *__path),wrmdir,(__path))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16rmdir,(char16_t const *__path),wrmdir,(__path))
 #elif defined(__CRT_HAVE_DOS$_wrmdir)
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
@@ -341,7 +341,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16rmdir, __FORCELOCAL __ATTR_NONNULL((1)) int _
 #if defined(__CRT_HAVE_wrmdir) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBKCALL,c32rmdir,(char32_t const *__path),wrmdir,(__path))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32rmdir,(char32_t const *__path),wrmdir,(__path))
 #elif defined(__CRT_HAVE_DOS$wrmdir)
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
@@ -362,7 +362,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32rmdir, __FORCELOCAL __ATTR_NONNULL((1)) int _
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBDCALL,c16euidaccess,(char16_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16euidaccess,(char16_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
 #elif defined(__CRT_HAVE_DOS$weuidaccess)
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
@@ -391,7 +391,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16euidaccess, __FORCELOCAL __ATTR_WUNUSED __ATT
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBKCALL,c32euidaccess,(char32_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32euidaccess,(char32_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
 #elif defined(__CRT_HAVE_DOS$weuidaccess)
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
@@ -420,7 +420,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32euidaccess, __FORCELOCAL __ATTR_WUNUSED __ATT
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBDCALL,c16eaccess,(char16_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16eaccess,(char16_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
 #elif defined(__CRT_HAVE_DOS$weuidaccess)
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
@@ -449,7 +449,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBDCALL c16
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBKCALL,c32eaccess,(char32_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32eaccess,(char32_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
 #elif defined(__CRT_HAVE_DOS$weuidaccess)
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
@@ -475,7 +475,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBKCALL c32
 #endif /* !__CRT_AT_FDCWD || !__AT_EACCESS || (!__CRT_HAVE_wfaccessat && (!__CRT_HAVE_DOS$wfaccessat || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$wfaccessat || !__SIZEOF_WCHAR_T__ == 2)) || !(__SIZEOF_WCHAR_T__ == 4) */
 #endif /* !... */
 #if defined(__CRT_HAVE_wget_current_dir_name) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_MALLOC __ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,__LIBDCALL,c16get_current_dir_name,(void),wget_current_dir_name,())
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,c16get_current_dir_name,(void),wget_current_dir_name,())
 #elif defined(__CRT_HAVE_DOS$wget_current_dir_name)
 __CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,c16get_current_dir_name,(void),wget_current_dir_name,())
 #elif (defined(__CRT_HAVE_wgetcwd) || (defined(__CRT_HAVE_DOS$wgetcwd) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wgetcwd) && __SIZEOF_WCHAR_T__ == 2)) && (__SIZEOF_WCHAR_T__ == 2)
@@ -486,7 +486,7 @@ __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char16_t *__NOTHROW_RPC(__LIBDCALL c16
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16get_current_dir_name, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char16_t *__NOTHROW_RPC(__LIBDCALL c16get_current_dir_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16get_current_dir_name))(); })
 #endif /* ... */
 #if defined(__CRT_HAVE_wget_current_dir_name) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_MALLOC __ATTR_WUNUSED,char32_t *,__NOTHROW_RPC,__LIBKCALL,c32get_current_dir_name,(void),wget_current_dir_name,())
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char32_t *,__NOTHROW_RPC,c32get_current_dir_name,(void),wget_current_dir_name,())
 #elif defined(__CRT_HAVE_DOS$wget_current_dir_name)
 __CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,char32_t *,__NOTHROW_RPC,c32get_current_dir_name,(void),wget_current_dir_name,())
 #elif (defined(__CRT_HAVE_wgetcwd) || (defined(__CRT_HAVE_DOS$wgetcwd) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wgetcwd) && __SIZEOF_WCHAR_T__ == 2)) && (__SIZEOF_WCHAR_T__ == 4)
@@ -502,7 +502,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32get_current_dir_name, __FORCELOCAL __ATTR_MAL
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBDCALL,c16faccessat,(__fd_t __dfd, char16_t const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c16faccessat,(__fd_t __dfd, char16_t const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
 #elif defined(__CRT_HAVE_DOS$wfaccessat)
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
@@ -513,7 +513,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c16faccessat,(__fd_t __dfd
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBKCALL,c32faccessat,(__fd_t __dfd, char32_t const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32faccessat,(__fd_t __dfd, char32_t const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
 #elif defined(__CRT_HAVE_DOS$wfaccessat)
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
@@ -523,7 +523,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32faccessat,(__fd_t __dfd
 #if defined(__CRT_HAVE_wfchownat) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBDCALL,c16fchownat,(__fd_t __dfd, char16_t const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c16fchownat,(__fd_t __dfd, char16_t const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
 #elif defined(__CRT_HAVE_DOS$wfchownat)
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
@@ -532,7 +532,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c16fchownat,(__fd_t __dfd,
 #if defined(__CRT_HAVE_wfchownat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBKCALL,c32fchownat,(__fd_t __dfd, char32_t const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32fchownat,(__fd_t __dfd, char32_t const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
 #elif defined(__CRT_HAVE_DOS$wfchownat)
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
@@ -541,7 +541,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32fchownat,(__fd_t __dfd,
 #if defined(__CRT_HAVE_wlinkat) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__LIBDCALL,c16linkat,(__fd_t __fromfd, char16_t const *__from, __fd_t __tofd, char16_t const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
+__CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,c16linkat,(__fd_t __fromfd, char16_t const *__from, __fd_t __tofd, char16_t const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
 #elif defined(__CRT_HAVE_DOS$wlinkat)
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
@@ -550,7 +550,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,c16linkat,(__fd_t __fro
 #if defined(__CRT_HAVE_wlinkat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__LIBKCALL,c32linkat,(__fd_t __fromfd, char32_t const *__from, __fd_t __tofd, char32_t const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
+__CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,c32linkat,(__fd_t __fromfd, char32_t const *__from, __fd_t __tofd, char32_t const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
 #elif defined(__CRT_HAVE_DOS$wlinkat)
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
@@ -560,7 +560,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,c32linkat,(__fd_t __fro
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__LIBDCALL,c16symlinkat,(char16_t const *__link_text, __fd_t __tofd, char16_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c16symlinkat,(char16_t const *__link_text, __fd_t __tofd, char16_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
 #elif defined(__CRT_HAVE_DOS$wsymlinkat)
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
@@ -571,7 +571,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c16symlinkat,(char16_t 
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__LIBKCALL,c32symlinkat,(char32_t const *__link_text, __fd_t __tofd, char32_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c32symlinkat,(char32_t const *__link_text, __fd_t __tofd, char32_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
 #elif defined(__CRT_HAVE_DOS$wsymlinkat)
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
@@ -587,7 +587,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c32symlinkat,(char32_t 
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,__LIBDCALL,c16readlinkat,(__fd_t __dfd, char16_t const *__restrict __path, char16_t *__restrict __buf, size_t __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c16readlinkat,(__fd_t __dfd, char16_t const *__restrict __path, char16_t *__restrict __buf, size_t __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
 #elif defined(__CRT_HAVE_DOS$wreadlinkat)
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
@@ -608,7 +608,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c16readlinkat,(__fd
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,__LIBKCALL,c32readlinkat,(__fd_t __dfd, char32_t const *__restrict __path, char32_t *__restrict __buf, size_t __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c32readlinkat,(__fd_t __dfd, char32_t const *__restrict __path, char32_t *__restrict __buf, size_t __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
 #elif defined(__CRT_HAVE_DOS$wreadlinkat)
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
@@ -625,7 +625,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c32readlinkat,(__fd
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,__LIBDCALL,c16freadlinkat,(__fd_t __dfd, char16_t const *__restrict __path, char16_t *__restrict __buf, size_t __buflen, __atflag_t __flags),wfreadlinkat,(__dfd,__path,__buf,__buflen,__flags))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c16freadlinkat,(__fd_t __dfd, char16_t const *__restrict __path, char16_t *__restrict __buf, size_t __buflen, __atflag_t __flags),wfreadlinkat,(__dfd,__path,__buf,__buflen,__flags))
 #elif defined(__CRT_HAVE_DOS$wfreadlinkat)
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
@@ -636,7 +636,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c16freadlinkat,(__f
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,__LIBKCALL,c32freadlinkat,(__fd_t __dfd, char32_t const *__restrict __path, char32_t *__restrict __buf, size_t __buflen, __atflag_t __flags),wfreadlinkat,(__dfd,__path,__buf,__buflen,__flags))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c32freadlinkat,(__fd_t __dfd, char32_t const *__restrict __path, char32_t *__restrict __buf, size_t __buflen, __atflag_t __flags),wfreadlinkat,(__dfd,__path,__buf,__buflen,__flags))
 #elif defined(__CRT_HAVE_DOS$wfreadlinkat)
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
@@ -647,7 +647,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c32freadlinkat,(__f
 #if defined(__CRT_HAVE_wunlinkat) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBDCALL,c16unlinkat,(__fd_t __dfd, char16_t const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c16unlinkat,(__fd_t __dfd, char16_t const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
 #elif defined(__CRT_HAVE_DOS$wunlinkat)
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
@@ -656,7 +656,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c16unlinkat,(__fd_t __dfd,
 #if defined(__CRT_HAVE_wunlinkat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__LIBKCALL,c32unlinkat,(__fd_t __dfd, char32_t const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32unlinkat,(__fd_t __dfd, char32_t const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
 #elif defined(__CRT_HAVE_DOS$wunlinkat)
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
@@ -667,7 +667,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32unlinkat,(__fd_t __dfd,
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBDCALL,c16lchown,(char16_t const *__file, __uid_t __owner, __gid_t __group),wlchown,(__file,__owner,__group))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16lchown,(char16_t const *__file, __uid_t __owner, __gid_t __group),wlchown,(__file,__owner,__group))
 #elif defined(__CRT_HAVE_DOS$wlchown)
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
@@ -690,7 +690,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16lchown, __FORCELOCAL __ATTR_NONNULL((1)) int 
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBKCALL,c32lchown,(char32_t const *__file, __uid_t __owner, __gid_t __group),wlchown,(__file,__owner,__group))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32lchown,(char32_t const *__file, __uid_t __owner, __gid_t __group),wlchown,(__file,__owner,__group))
 #elif defined(__CRT_HAVE_DOS$wlchown)
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
@@ -722,7 +722,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32lchown, __FORCELOCAL __ATTR_NONNULL((1)) int 
 #if defined(__CRT_HAVE_wtruncate64) && defined(__USE_FILE_OFFSET64) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBDCALL,c16truncate,(char16_t const *__file, __PIO_OFFSET __length),wtruncate64,(__file,__length))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate,(char16_t const *__file, __PIO_OFFSET __length),wtruncate64,(__file,__length))
 #elif defined(__CRT_HAVE_DOS$wtruncate64) && defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -730,7 +730,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate,(char16_t cons
 #elif defined(__CRT_HAVE_wtruncate) && !defined(__USE_FILE_OFFSET64) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBDCALL,c16truncate,(char16_t const *__file, __PIO_OFFSET __length),wtruncate,(__file,__length))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate,(char16_t const *__file, __PIO_OFFSET __length),wtruncate,(__file,__length))
 #elif defined(__CRT_HAVE_DOS$wtruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -749,7 +749,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16truncate, __FORCELOCAL __ATTR_NONNULL((1)) in
 #if defined(__CRT_HAVE_wtruncate64) && defined(__USE_FILE_OFFSET64) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBKCALL,c32truncate,(char32_t const *__file, __PIO_OFFSET __length),wtruncate64,(__file,__length))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32truncate,(char32_t const *__file, __PIO_OFFSET __length),wtruncate64,(__file,__length))
 #elif defined(__CRT_HAVE_DOS$wtruncate64) && defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -757,7 +757,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32truncate,(char32_t cons
 #elif defined(__CRT_HAVE_wtruncate) && !defined(__USE_FILE_OFFSET64) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBKCALL,c32truncate,(char32_t const *__file, __PIO_OFFSET __length),wtruncate,(__file,__length))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32truncate,(char32_t const *__file, __PIO_OFFSET __length),wtruncate,(__file,__length))
 #elif defined(__CRT_HAVE_DOS$wtruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -777,7 +777,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32truncate, __FORCELOCAL __ATTR_NONNULL((1)) in
 #if defined(__CRT_HAVE_wtruncate64) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBDCALL,c16truncate64,(char16_t const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate64,(char16_t const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
 #elif defined(__CRT_HAVE_DOS$wtruncate64)
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -785,7 +785,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate64,(char16_t co
 #elif defined(__CRT_HAVE_wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBDCALL,c16truncate64,(char16_t const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate64,(char16_t const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
 #elif defined(__CRT_HAVE_DOS$wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -804,7 +804,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16truncate64, __FORCELOCAL __ATTR_NONNULL((1)) 
 #if defined(__CRT_HAVE_wtruncate64) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBKCALL,c32truncate64,(char32_t const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32truncate64,(char32_t const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
 #elif defined(__CRT_HAVE_DOS$wtruncate64)
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -812,7 +812,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32truncate64,(char32_t co
 #elif defined(__CRT_HAVE_wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBKCALL,c32truncate64,(char32_t const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32truncate64,(char32_t const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
 #elif defined(__CRT_HAVE_DOS$wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -836,7 +836,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32truncate64, __FORCELOCAL __ATTR_NONNULL((1)) 
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TARGET_PATH'.
  * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBDCALL,c16symlink,(char16_t const *__link_text, char16_t const *__target_path),wsymlink,(__link_text,__target_path))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16symlink,(char16_t const *__link_text, char16_t const *__target_path),wsymlink,(__link_text,__target_path))
 #elif defined(__CRT_HAVE_DOS$wsymlink)
 /* >> symlink(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
@@ -863,7 +863,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16symlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) 
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TARGET_PATH'.
  * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__LIBKCALL,c32symlink,(char32_t const *__link_text, char32_t const *__target_path),wsymlink,(__link_text,__target_path))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c32symlink,(char32_t const *__link_text, char32_t const *__target_path),wsymlink,(__link_text,__target_path))
 #elif defined(__CRT_HAVE_DOS$wsymlink)
 /* >> symlink(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
@@ -895,7 +895,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32symlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) 
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,__LIBDCALL,c16readlink,(char16_t const *__restrict __path, char16_t *__restrict __buf, size_t __buflen),wreadlink,(__path,__buf,__buflen))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,c16readlink,(char16_t const *__restrict __path, char16_t *__restrict __buf, size_t __buflen),wreadlink,(__path,__buf,__buflen))
 #elif defined(__CRT_HAVE_DOS$wreadlink)
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
@@ -942,7 +942,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16readlink, __FORCELOCAL __ATTR_NONNULL((1, 2))
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,__LIBKCALL,c32readlink,(char32_t const *__restrict __path, char32_t *__restrict __buf, size_t __buflen),wreadlink,(__path,__buf,__buflen))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,c32readlink,(char32_t const *__restrict __path, char32_t *__restrict __buf, size_t __buflen),wreadlink,(__path,__buf,__buflen))
 #elif defined(__CRT_HAVE_DOS$wreadlink)
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
@@ -982,12 +982,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32readlink, __FORCELOCAL __ATTR_NONNULL((1, 2))
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 #if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
 #if defined(__CRT_HAVE_wgetlogin_r) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBDCALL,c16getlogin_r,(char16_t *__name, size_t __name_len),wgetlogin_r,(__name,__name_len))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16getlogin_r,(char16_t *__name, size_t __name_len),wgetlogin_r,(__name,__name_len))
 #elif defined(__CRT_HAVE_DOS$wgetlogin_r)
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16getlogin_r,(char16_t *__name, size_t __name_len),wgetlogin_r,(__name,__name_len))
 #endif /* ... */
 #if defined(__CRT_HAVE_wgetlogin_r) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBKCALL,c32getlogin_r,(char32_t *__name, size_t __name_len),wgetlogin_r,(__name,__name_len))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32getlogin_r,(char32_t *__name, size_t __name_len),wgetlogin_r,(__name,__name_len))
 #elif defined(__CRT_HAVE_DOS$wgetlogin_r)
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32getlogin_r,(char32_t *__name, size_t __name_len),wgetlogin_r,(__name,__name_len))
 #endif /* ... */
@@ -997,7 +997,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32getlogin_r,(char32_t *_
 #if defined(__CRT_HAVE_wgethostname) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBDCALL,c16gethostname,(char16_t *__name, size_t __buflen),wgethostname,(__name,__buflen))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16gethostname,(char16_t *__name, size_t __buflen),wgethostname,(__name,__buflen))
 #elif defined(__CRT_HAVE_DOS$wgethostname)
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
@@ -1006,7 +1006,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16gethostname,(char16_t *
 #if defined(__CRT_HAVE_wgethostname) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBKCALL,c32gethostname,(char32_t *__name, size_t __buflen),wgethostname,(__name,__buflen))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32gethostname,(char32_t *__name, size_t __buflen),wgethostname,(__name,__buflen))
 #elif defined(__CRT_HAVE_DOS$wgethostname)
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
@@ -1015,19 +1015,19 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32gethostname,(char32_t *
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 #ifdef __USE_MISC
 #if defined(__CRT_HAVE_wsetlogin) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBDCALL,c16setlogin,(char16_t const *__name),wsetlogin,(__name))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16setlogin,(char16_t const *__name),wsetlogin,(__name))
 #elif defined(__CRT_HAVE_DOS$wsetlogin)
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16setlogin,(char16_t const *__name),wsetlogin,(__name))
 #endif /* ... */
 #if defined(__CRT_HAVE_wsetlogin) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBKCALL,c32setlogin,(char32_t const *__name),wsetlogin,(__name))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32setlogin,(char32_t const *__name),wsetlogin,(__name))
 #elif defined(__CRT_HAVE_DOS$wsetlogin)
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32setlogin,(char32_t const *__name),wsetlogin,(__name))
 #endif /* ... */
 #if defined(__CRT_HAVE_wsethostname) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> sethostname(2)
  * Set the name of the hosting machine */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBDCALL,c16sethostname,(char16_t const *__name, size_t __len),wsethostname,(__name,__len))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16sethostname,(char16_t const *__name, size_t __len),wsethostname,(__name,__len))
 #elif defined(__CRT_HAVE_DOS$wsethostname)
 /* >> sethostname(2)
  * Set the name of the hosting machine */
@@ -1036,7 +1036,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16sethostname,(char16_t c
 #if defined(__CRT_HAVE_wsethostname) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> sethostname(2)
  * Set the name of the hosting machine */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBKCALL,c32sethostname,(char32_t const *__name, size_t __len),wsethostname,(__name,__len))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32sethostname,(char32_t const *__name, size_t __len),wsethostname,(__name,__len))
 #elif defined(__CRT_HAVE_DOS$wsethostname)
 /* >> sethostname(2)
  * Set the name of the hosting machine */
@@ -1045,7 +1045,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32sethostname,(char32_t c
 #if defined(__CRT_HAVE_wgetdomainname) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBDCALL,c16getdomainname,(char16_t *__name, size_t __buflen),wgetdomainname,(__name,__buflen))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16getdomainname,(char16_t *__name, size_t __buflen),wgetdomainname,(__name,__buflen))
 #elif defined(__CRT_HAVE_DOS$wgetdomainname)
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
@@ -1054,7 +1054,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16getdomainname,(char16_t
 #if defined(__CRT_HAVE_wgetdomainname) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBKCALL,c32getdomainname,(char32_t *__name, size_t __buflen),wgetdomainname,(__name,__buflen))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32getdomainname,(char32_t *__name, size_t __buflen),wgetdomainname,(__name,__buflen))
 #elif defined(__CRT_HAVE_DOS$wgetdomainname)
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
@@ -1063,7 +1063,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32getdomainname,(char32_t
 #if defined(__CRT_HAVE_wsetdomainname) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBDCALL,c16setdomainname,(char16_t const *__name, size_t __len),wsetdomainname,(__name,__len))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16setdomainname,(char16_t const *__name, size_t __len),wsetdomainname,(__name,__len))
 #elif defined(__CRT_HAVE_DOS$wsetdomainname)
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
@@ -1072,7 +1072,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16setdomainname,(char16_t
 #if defined(__CRT_HAVE_wsetdomainname) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__LIBKCALL,c32setdomainname,(char32_t const *__name, size_t __len),wsetdomainname,(__name,__len))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32setdomainname,(char32_t const *__name, size_t __len),wsetdomainname,(__name,__len))
 #elif defined(__CRT_HAVE_DOS$wsetdomainname)
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
@@ -1085,7 +1085,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32setdomainname,(char32_t
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBDCALL,c16chroot,(char16_t const *__restrict __path),wchroot,(__path))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16chroot,(char16_t const *__restrict __path),wchroot,(__path))
 #elif defined(__CRT_HAVE_DOS$wchroot)
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
@@ -1096,7 +1096,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16chroot,(char16_t const 
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBKCALL,c32chroot,(char32_t const *__restrict __path),wchroot,(__path))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chroot,(char32_t const *__restrict __path),wchroot,(__path))
 #elif defined(__CRT_HAVE_DOS$wchroot)
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
@@ -1108,12 +1108,12 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chroot,(char32_t const 
 #if (defined(_EVERY_SOURCE) || \
      (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 #if defined(__CRT_HAVE_wctermid) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,,char16_t *,__NOTHROW_NCX,__LIBDCALL,c16ctermid,(char16_t *__s),wctermid,(__s))
+__CREDIRECT(,char16_t *,__NOTHROW_NCX,c16ctermid,(char16_t *__s),wctermid,(__s))
 #elif defined(__CRT_HAVE_DOS$wctermid)
 __CREDIRECT_DOS(,char16_t *,__NOTHROW_NCX,c16ctermid,(char16_t *__s),wctermid,(__s))
 #endif /* ... */
 #if defined(__CRT_HAVE_wctermid) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,,char32_t *,__NOTHROW_NCX,__LIBKCALL,c32ctermid,(char32_t *__s),wctermid,(__s))
+__CREDIRECT(,char32_t *,__NOTHROW_NCX,c32ctermid,(char32_t *__s),wctermid,(__s))
 #elif defined(__CRT_HAVE_DOS$wctermid)
 __CREDIRECT_KOS(,char32_t *,__NOTHROW_NCX,c32ctermid,(char32_t *__s),wctermid,(__s))
 #endif /* ... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d9476ff */
+/* HASH CRC-32:0x8b97887 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -507,30 +507,30 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBDCALL _w
 #ifdef __CRT_HAVE_wspawnv
 __CREDIRECT(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnv,(int __mode, wchar_t const *__restrict __path, __TWARGV),wspawnv,(__mode,__path,___argv))
 #elif defined(__CRT_HAVE_DOS$wspawnv) && __SIZEOF_WCHAR_T__ == 4
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,__LIBCCALL,_wspawnv,(int __mode, wchar_t const *__restrict __path, __TWARGV),KOS$wspawnv,(__mode,__path,___argv))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnv,(int __mode, wchar_t const *__restrict __path, __TWARGV),wspawnv,(__mode,__path,___argv))
 #elif defined(__CRT_HAVE_DOS$_wspawnv) && __SIZEOF_WCHAR_T__ == 2
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,__LIBCCALL,_wspawnv,(int __mode, wchar_t const *__restrict __path, __TWARGV),DOS$_wspawnv,(__mode,__path,___argv))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnv,(int __mode, wchar_t const *__restrict __path, __TWARGV),_wspawnv,(__mode,__path,___argv))
 #endif /* ... */
 #ifdef __CRT_HAVE_wspawnvp
 __CREDIRECT(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnvp,(int __mode, wchar_t const *__restrict __path, __TWARGV),wspawnvp,(__mode,__path,___argv))
 #elif defined(__CRT_HAVE_DOS$wspawnvp) && __SIZEOF_WCHAR_T__ == 4
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,__LIBCCALL,_wspawnvp,(int __mode, wchar_t const *__restrict __path, __TWARGV),KOS$wspawnvp,(__mode,__path,___argv))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnvp,(int __mode, wchar_t const *__restrict __path, __TWARGV),wspawnvp,(__mode,__path,___argv))
 #elif defined(__CRT_HAVE_DOS$_wspawnvp) && __SIZEOF_WCHAR_T__ == 2
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,__LIBCCALL,_wspawnvp,(int __mode, wchar_t const *__restrict __path, __TWARGV),DOS$_wspawnvp,(__mode,__path,___argv))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnvp,(int __mode, wchar_t const *__restrict __path, __TWARGV),_wspawnvp,(__mode,__path,___argv))
 #endif /* ... */
 #ifdef __CRT_HAVE_wspawnve
 __CREDIRECT(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnve,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),wspawnve,(__mode,__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$wspawnve) && __SIZEOF_WCHAR_T__ == 4
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,__LIBCCALL,_wspawnve,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),KOS$wspawnve,(__mode,__path,___argv,___envp))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnve,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),wspawnve,(__mode,__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$_wspawnve) && __SIZEOF_WCHAR_T__ == 2
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,__LIBCCALL,_wspawnve,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),DOS$_wspawnve,(__mode,__path,___argv,___envp))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnve,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),_wspawnve,(__mode,__path,___argv,___envp))
 #endif /* ... */
 #ifdef __CRT_HAVE_wspawnvpe
 __CREDIRECT(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnvpe,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),wspawnvpe,(__mode,__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$wspawnvpe) && __SIZEOF_WCHAR_T__ == 4
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,__LIBCCALL,_wspawnvpe,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),KOS$wspawnvpe,(__mode,__path,___argv,___envp))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnvpe,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),wspawnvpe,(__mode,__path,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$_wspawnvpe) && __SIZEOF_WCHAR_T__ == 2
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,__LIBCCALL,_wspawnvpe,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),DOS$_wspawnvpe,(__mode,__path,___argv,___envp))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnvpe,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),_wspawnvpe,(__mode,__path,___argv,___envp))
 #endif /* ... */
 #ifdef __CRT_HAVE_wspawnl
 __LIBC __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnl)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME("wspawnl");

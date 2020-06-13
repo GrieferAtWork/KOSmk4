@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x503bcb65 */
+/* HASH CRC-32:0x529ec185 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 
 #if defined(__CRT_HAVE_mbtowc) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,,int,__NOTHROW_NCX,__LIBDCALL,mbtoc16,(char16_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen),mbtowc,(__pwc,__str,__maxlen))
+__CREDIRECT(,int,__NOTHROW_NCX,mbtoc16,(char16_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen),mbtowc,(__pwc,__str,__maxlen))
 #elif defined(__CRT_HAVE_DOS$mbtowc)
 __CREDIRECT_DOS(,int,__NOTHROW_NCX,mbtoc16,(char16_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen),mbtowc,(__pwc,__str,__maxlen))
 #elif (__SIZEOF_WCHAR_T__ == 2)
@@ -52,7 +52,7 @@ __FORCELOCAL int __NOTHROW_NCX(__LIBDCALL mbtoc16)(char16_t *__restrict __pwc, c
 __NAMESPACE_LOCAL_USING_OR_IMPL(mbtoc16, __FORCELOCAL int __NOTHROW_NCX(__LIBDCALL mbtoc16)(char16_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbtoc16))(__pwc, __str, __maxlen); })
 #endif /* !... */
 #if defined(__CRT_HAVE_mbtowc) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,,int,__NOTHROW_NCX,__LIBKCALL,mbtoc32,(char32_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen),mbtowc,(__pwc,__str,__maxlen))
+__CREDIRECT(,int,__NOTHROW_NCX,mbtoc32,(char32_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen),mbtowc,(__pwc,__str,__maxlen))
 #elif defined(__CRT_HAVE_DOS$mbtowc)
 __CREDIRECT_KOS(,int,__NOTHROW_NCX,mbtoc32,(char32_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen),mbtowc,(__pwc,__str,__maxlen))
 #elif (__SIZEOF_WCHAR_T__ == 4)
@@ -63,7 +63,7 @@ __FORCELOCAL int __NOTHROW_NCX(__LIBKCALL mbtoc32)(char32_t *__restrict __pwc, c
 __NAMESPACE_LOCAL_USING_OR_IMPL(mbtoc32, __FORCELOCAL int __NOTHROW_NCX(__LIBKCALL mbtoc32)(char32_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbtoc32))(__pwc, __str, __maxlen); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wctomb) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,,int,__NOTHROW_NCX,__LIBDCALL,c16tomb,(char *__str, char16_t __wc),wctomb,(__str,__wc))
+__CREDIRECT(,int,__NOTHROW_NCX,c16tomb,(char *__str, char16_t __wc),wctomb,(__str,__wc))
 #elif defined(__CRT_HAVE_DOS$wctomb)
 __CREDIRECT_DOS(,int,__NOTHROW_NCX,c16tomb,(char *__str, char16_t __wc),wctomb,(__str,__wc))
 #elif (__SIZEOF_WCHAR_T__ == 2)
@@ -74,7 +74,7 @@ __FORCELOCAL int __NOTHROW_NCX(__LIBDCALL c16tomb)(char *__str, char16_t __wc) {
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16tomb, __FORCELOCAL int __NOTHROW_NCX(__LIBDCALL c16tomb)(char *__str, char16_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16tomb))(__str, __wc); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wctomb) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,,int,__NOTHROW_NCX,__LIBKCALL,c32tomb,(char *__str, char32_t __wc),wctomb,(__str,__wc))
+__CREDIRECT(,int,__NOTHROW_NCX,c32tomb,(char *__str, char32_t __wc),wctomb,(__str,__wc))
 #elif defined(__CRT_HAVE_DOS$wctomb)
 __CREDIRECT_KOS(,int,__NOTHROW_NCX,c32tomb,(char *__str, char32_t __wc),wctomb,(__str,__wc))
 #elif (__SIZEOF_WCHAR_T__ == 4)
@@ -85,7 +85,7 @@ __FORCELOCAL int __NOTHROW_NCX(__LIBKCALL c32tomb)(char *__str, char32_t __wc) {
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32tomb, __FORCELOCAL int __NOTHROW_NCX(__LIBKCALL c32tomb)(char *__str, char32_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32tomb))(__str, __wc); })
 #endif /* !... */
 #if defined(__CRT_HAVE_mbstowcs) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,__LIBDCALL,mbstoc16s,(char16_t *__restrict __dst, char const *__restrict __src, size_t __dstlen),mbstowcs,(__dst,__src,__dstlen))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,mbstoc16s,(char16_t *__restrict __dst, char const *__restrict __src, size_t __dstlen),mbstowcs,(__dst,__src,__dstlen))
 #elif defined(__CRT_HAVE_DOS$mbstowcs)
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,mbstoc16s,(char16_t *__restrict __dst, char const *__restrict __src, size_t __dstlen),mbstowcs,(__dst,__src,__dstlen))
 #elif (__SIZEOF_WCHAR_T__ == 2)
@@ -96,7 +96,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBDCALL mbstoc16s)(c
 __NAMESPACE_LOCAL_USING_OR_IMPL(mbstoc16s, __FORCELOCAL __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBDCALL mbstoc16s)(char16_t *__restrict __dst, char const *__restrict __src, size_t __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbstoc16s))(__dst, __src, __dstlen); })
 #endif /* !... */
 #if defined(__CRT_HAVE_mbstowcs) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,__LIBKCALL,mbstoc32s,(char32_t *__restrict __dst, char const *__restrict __src, size_t __dstlen),mbstowcs,(__dst,__src,__dstlen))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,mbstoc32s,(char32_t *__restrict __dst, char const *__restrict __src, size_t __dstlen),mbstowcs,(__dst,__src,__dstlen))
 #elif defined(__CRT_HAVE_DOS$mbstowcs)
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,mbstoc32s,(char32_t *__restrict __dst, char const *__restrict __src, size_t __dstlen),mbstowcs,(__dst,__src,__dstlen))
 #elif (__SIZEOF_WCHAR_T__ == 4)
@@ -107,7 +107,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBKCALL mbstoc32s)(c
 __NAMESPACE_LOCAL_USING_OR_IMPL(mbstoc32s, __FORCELOCAL __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBKCALL mbstoc32s)(char32_t *__restrict __dst, char const *__restrict __src, size_t __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbstoc32s))(__dst, __src, __dstlen); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcstombs) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,__LIBDCALL,c16stombs,(char *__restrict __dst, char16_t const *__restrict __src, size_t __dstlen),wcstombs,(__dst,__src,__dstlen))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c16stombs,(char *__restrict __dst, char16_t const *__restrict __src, size_t __dstlen),wcstombs,(__dst,__src,__dstlen))
 #elif defined(__CRT_HAVE_DOS$wcstombs)
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c16stombs,(char *__restrict __dst, char16_t const *__restrict __src, size_t __dstlen),wcstombs,(__dst,__src,__dstlen))
 #elif (__SIZEOF_WCHAR_T__ == 2)
@@ -118,7 +118,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBDCALL c16stombs)(c
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16stombs, __FORCELOCAL __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBDCALL c16stombs)(char *__restrict __dst, char16_t const *__restrict __src, size_t __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16stombs))(__dst, __src, __dstlen); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcstombs) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,__LIBKCALL,c32stombs,(char *__restrict __dst, char32_t const *__restrict __src, size_t __dstlen),wcstombs,(__dst,__src,__dstlen))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c32stombs,(char *__restrict __dst, char32_t const *__restrict __src, size_t __dstlen),wcstombs,(__dst,__src,__dstlen))
 #elif defined(__CRT_HAVE_DOS$wcstombs)
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c32stombs,(char *__restrict __dst, char32_t const *__restrict __src, size_t __dstlen),wcstombs,(__dst,__src,__dstlen))
 #elif (__SIZEOF_WCHAR_T__ == 4)

@@ -3966,6 +3966,7 @@ got_chkExpr:
 									/* Bind against an external symbol name.
 									 * -> Must also assert (in `myCond') that `origCC' and `replCC'
 									 *    are the same calling conventions at compile-time. */
+									local wcBindingStr = str(wcBinding);
 									local cc1 = replCC, cc2 = origCC;
 									if (cc1 < cc2) {
 										local temp = cc2;
@@ -3973,11 +3974,30 @@ got_chkExpr:
 										cc1 = temp;
 									}
 									/* assert cc1 > cc2; */
-									basicBindings.append(FunctionBinding(
-										ppCond:       "{} && defined(__{}_IS_{})".format({ myCond, cc2, cc1 }),
-										ppCondPrefix: replaceWcharTextArray(wc_bind.ppCondPrefix, mode),
-										prototypes:   replacedPrototypes,
-										binding:      wcBinding));
+									{
+										local replacedPrototypes2 = replacedPrototypes;
+										if (origCC in ["LIBCCALL", "__LIBCCALL"]) {
+											/* Optimize `replacedPrototypes2' to use `origCC', thus allowing
+											 * their eventual declaration to make use of __CDECLARE, rather
+											 * than having to use __COMPILER_REDIRECT... */
+											replacedPrototypes2 = [];
+											for (local ppCond, protos: replacedPrototypes) {
+												local newProtos = [];
+												for (local p: protos) {
+													assert p.cc == replCC;
+													p = copy p;
+													p.cc = origCC;
+													newProtos.append(p);
+												}
+												replacedPrototypes2.append((ppCond, newProtos));
+											}
+										}
+										basicBindings.append(FunctionBinding(
+											ppCond:       "{} && defined(__{}_IS_{})".format({ myCond, cc2, cc1 }),
+											ppCondPrefix: replaceWcharTextArray(wc_bind.ppCondPrefix, mode),
+											prototypes:   replacedPrototypes2,
+											binding:      wcBinding));
+									}
 									/* Note a couple of special cases where we can still bind:
 									 * >> ...
 									 * >> #elif defined(__CRT_HAVE_memcpyw) && defined(__LIBCCALL_IS_LIBDCALL)
@@ -4006,8 +4026,7 @@ got_chkExpr:
 									 * >> ...
 									 */
 									if (!myCondRequiresMySize) {
-										wcBinding = str(wcBinding);
-										local wcBindingCrtHaveKey = keyCrtHave(wcBinding);
+										local wcBindingCrtHaveKey = keyCrtHave(wcBindingStr);
 										if (wcBindingCrtHaveKey in myCond) {
 											local ccSpecificPrefix = {
 												"LIBKCALL"   : "KOS$",
@@ -4017,12 +4036,12 @@ got_chkExpr:
 											}.get(replCC);
 											if (ccSpecificPrefix is none)
 												goto wc_bind_continue_scan_bindings;
-											wcBinding = ccSpecificPrefix + wcBinding;
+											wcBindingStr = ccSpecificPrefix + wcBindingStr;
 											basicBindings.append(FunctionBinding(
-												ppCond:       myCond.replace(wcBindingCrtHaveKey, keyCrtHave(wcBinding)),
+												ppCond:       myCond.replace(wcBindingCrtHaveKey, keyCrtHave(wcBindingStr)),
 												ppCondPrefix: replaceWcharTextArray(wc_bind.ppCondPrefix, mode),
 												prototypes:   replacedPrototypes,
-												binding:      wcBinding));
+												binding:      wcBindingStr));
 										}
 									}
 									goto wc_bind_continue_scan_bindings;
@@ -4525,10 +4544,38 @@ handle_eq_after_prototype:
 					for (local otherBind /*: FunctionBinding*/ : func.functionBindings) {
 						if (otherBind.binding is Callable)
 							otherBind.binding = otherBind.binding();
+						/* Special case: For all prototypes that use same-object DEFAULT_CC
+						 * as calling convention, we must still inherit the calling convention
+						 * from the bound @otherBind (should there be a single one common to
+						 * all of them)
+						 * This special case is required to properly deal with differing CCs
+						 * for different bindings, as is the case when the function being
+						 * bound is a [[wchar]]-function.
+						 * An example for where this behavior is necessary is `_wspawnv(...) = wspawnv',
+						 * which overrides the prototype to change the return type in compliance
+						 * with DOS, but still needs to inherit specific calling conventions for
+						 * the different binding cases */
+						local usedPrototypes = currentPrototypes;
+						local otherCommonCC = getCommonCCFromPrototypes(
+							otherBind.functionPrototypes);
+						if (otherCommonCC != DEFAULT_CC) {
+							usedPrototypes = [];
+							for (local ppCond, protos: currentPrototypes) {
+								local newProtos = [];
+								for (local p: protos) {
+									if (p.cc === DEFAULT_CC) {
+										p = copy p;
+										p.cc = otherCommonCC;
+									}
+									newProtos.append(p);
+								}
+								usedPrototypes.append((ppCond, newProtos));
+							}
+						}
 						yield FunctionBinding(
 							ppCond:       otherBind.ppCond,
 							ppCondPrefix: otherBind.ppCondPrefix,
-							prototypes:   currentPrototypes,
+							prototypes:   usedPrototypes,
 							binding:      otherBind.binding);
 					}
 				};

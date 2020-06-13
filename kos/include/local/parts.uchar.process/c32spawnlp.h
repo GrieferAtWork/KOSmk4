@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1aa49599 */
+/* HASH CRC-32:0x7c735a4a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32spawnvp_defined
 #define __local___localdep_c32spawnvp_defined 1
 #if defined(__CRT_HAVE_wspawnvp) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__LIBKCALL,__localdep_c32spawnvp,(int __mode, __CHAR32_TYPE__ const *__restrict __file, __T32ARGV),wspawnvp,(__mode,__file,___argv))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnvp,(int __mode, __CHAR32_TYPE__ const *__restrict __file, __T32ARGV),wspawnvp,(__mode,__file,___argv))
 #elif defined(__CRT_HAVE_DOS$wspawnvp)
 __CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnvp,(int __mode, __CHAR32_TYPE__ const *__restrict __file, __T32ARGV),wspawnvp,(__mode,__file,___argv))
 #else /* ... */
