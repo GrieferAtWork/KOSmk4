@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52231178 */
+/* HASH CRC-32:0xf11bd45b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,13 +44,13 @@ __NAMESPACE_LOCAL_BEGIN
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
 __LOCAL_LIBC(format_c16snprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16snprintf_printer))(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
-	struct __format_snprintf_data_ {
-		__CHAR16_TYPE__   *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
-		__SIZE_TYPE__  __sd_bufsiz; /* Remaining buffer size. */
+	struct __local_format_snprintf_data {
+		__CHAR16_TYPE__  *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
+		__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
 	};
-	struct __format_snprintf_data_ *__ctrl;
+	struct __local_format_snprintf_data *__ctrl;
 	__SIZE_TYPE__ __result = __datalen;
-	__ctrl = (struct __format_snprintf_data_ *)__arg;
+	__ctrl = (struct __local_format_snprintf_data *)__arg;
 	if (__result > __ctrl->__sd_bufsiz)
 		__result = __ctrl->__sd_bufsiz;
 	__localdep_memcpyc(__ctrl->__sd_buffer, __data, __result, sizeof(__CHAR16_TYPE__));

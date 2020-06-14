@@ -19,7 +19,7 @@
  */
 
 
-%[default_impl_section(".text.crt.fs.modify_time")]
+%[default:section(".text.crt.fs.modify_time")]
 %[define_replacement(fd_t       = __fd_t)]
 %[define_replacement(time_t     = "__TM_TYPE(time)")]
 %[define_replacement(time32_t   = __time32_t)]

@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(".text.crt.net.rpc")]
+%[default:section(".text.crt.net.rpc")]
 
 %{
 #include <bits/types.h>

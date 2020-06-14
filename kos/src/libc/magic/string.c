@@ -22,7 +22,7 @@
 
 %[define_replacement(locale_t = __locale_t)]
 %[define_replacement(rsize_t  = __SIZE_TYPE__)]
-%[default_impl_section(".text.crt.string.memory")]
+%[default:section(".text.crt.string.memory")]
 
 %(auto_header){
 #ifdef __KERNEL__

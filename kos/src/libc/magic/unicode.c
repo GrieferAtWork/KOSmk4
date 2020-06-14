@@ -21,7 +21,7 @@
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 %[define_replacement(COMPILER_ENDOF = __COMPILER_ENDOF)]
-%[default_impl_section(".text.crt.unicode.UTF")]
+%[default:section(".text.crt.unicode.UTF")]
 %[define_wchar_replacement(__SIZEOF_WCHAR_T__ = "2", "4")]
 
 %[declare_user_export("__unicode_asciiflags")]
@@ -1466,7 +1466,7 @@ err:
 
 @@Format printer (compatible with `__pc16formatprinter') for
 @@converting wide-character unicode input data into a UTF-8 output
-[[hidden, dependency_include("<bits/format-printer.h>"), wchar]]
+[[hidden, impl_include("<bits/format-printer.h>"), wchar]]
 $ssize_t format_wto8(/*struct format_wto8_data **/ void *arg,
                      $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
@@ -1662,7 +1662,7 @@ struct format_16to32_data {
 };
 }
 
-@@Format printer (compatible with `__pc16formatprinter') for
+@@Format printer (compatible with `pc16formatprinter') for
 @@converting UTF-16 unicode input data into a UTF-32 output
 $ssize_t format_16to32(/*struct format_16to32_data **/ void *arg,
                        $char16_t const *data, $size_t datalen)
@@ -1674,7 +1674,7 @@ $ssize_t format_16to32(/*struct format_16to32_data **/ void *arg,
 //	void               *fd_arg;     /* Argument for `fd_printer' */
 //};
 
-@@Format printer (compatible with `__pwformatprinter') for
+@@Format printer (compatible with `pwformatprinter') for
 @@converting wide-character unicode input data into a UTF-16 output
 [[hidden, wchar, impl_include("<bits/format-printer.h>", "<bits/uformat-printer.h>")]]
 $ssize_t format_wto16(/*struct format_wto16_data **/ void *arg,

@@ -126,7 +126,7 @@ errno_t _access_s([[nonnull]] char const *filename, int type);
 
 %
 %
-%[default_impl_section(".text.crt.dos.fs.dir")]
+%[default:section(".text.crt.dos.fs.dir")]
 int _findclose(intptr_t findfd);
 
 [[cp, wunused, export_alias("_findfirst")]]
@@ -164,7 +164,7 @@ int _findnext64i32(intptr_t findfd,
 	= _findnext64;
 
 
-%[default_impl_section(".text.crt.dos.fs.io")]
+%[default:section(".text.crt.dos.fs.io")]
 %
 [[cp, export_alias("_sopen_s_nolock")]]
 [[decl_include("<bits/types.h>")]]
@@ -209,7 +209,7 @@ int _pipe([[nonnull]] $fd_t pipedes[2],
 	return pipe2(pipedes, textmode);
 }
 
-%[default_impl_section(".text.crt.dos.fs.utility")]
+%[default:section(".text.crt.dos.fs.utility")]
 %[insert:function(_eof = eof)]
 %[insert:function(_filelength = filelength)]
 %[insert:function(_tell = tell)]
@@ -239,7 +239,7 @@ $int64_t _telli64($fd_t fd) {
 	return lseek64(fd, 0, __SEEK_CUR);
 }
 
-%[default_impl_section(".text.crt.dos.fs.basic_property")]
+%[default:section(".text.crt.dos.fs.basic_property")]
 
 [[impl_include("<parts/errno.h>")]]
 [[decl_include("<bits/types.h>")]]
@@ -256,7 +256,7 @@ errno_t umask_s($mode_t newmode, $mode_t *oldmode) {
 	return 0;
 }
 
-%[default_impl_section(".text.crt.dos.fs.utility")];
+%[default:section(".text.crt.dos.fs.utility")];
 
 [[cp, decl_include("<bits/types.h>")]]
 int __lock_fhandle($fd_t fd) {
@@ -293,7 +293,7 @@ $fd_t _open_osfhandle(intptr_t osfd, $oflag_t flags) {
 %/* Weird, new functions not apart of any well-established standard. */
 %
 
-%[default_impl_section(".text.crt.dos.fs.io")]
+%[default:section(".text.crt.dos.fs.io")]
 
 [[export_alias("_setmode"), requires_include("<asm/fcntl.h>"), decl_include("<bits/types.h>")]]
 [[requires($has_function(fcntl) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL))))]]
@@ -326,7 +326,7 @@ $fd_t sopen([[nonnull]] char const *filename, $oflag_t oflags, int sflags, ...) 
 	return result;
 }
 
-%[default_impl_section(".text.crt.dos.fs.utility")]
+%[default:section(".text.crt.dos.fs.utility")]
 
 [[decl_include("<bits/types.h>")]]
 [[wunused, crt_name("_filelength")]]

@@ -20,7 +20,7 @@
 
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
-%[default_impl_section("{.text.crt.wchar.string.format|.text.crt.dos.wchar.string.format}")]
+%[default:section("{.text.crt.wchar.string.format|.text.crt.dos.wchar.string.format}")]
 
 %{
 #include <features.h>

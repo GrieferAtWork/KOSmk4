@@ -29,7 +29,7 @@ __SYSDECL_BEGIN
 
 }
 
-%[default_impl_section(".text.crt.except.heap.malloc")]
+%[default:section(".text.crt.except.heap.malloc")]
 
 [[throws(E_BADALLOC)]] Malloc:(size_t num_bytes) -> [[nonnull, malloc(num_bytes)]] void *;
 [[throws(E_BADALLOC)]] Calloc:(size_t count, size_t num_bytes) -> [[nonnull, malloc(count * num_bytes)]] void *;

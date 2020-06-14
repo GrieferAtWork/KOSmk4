@@ -22,7 +22,7 @@
 %[define_replacement(oflag_t = __oflag_t)]
 %[define_replacement(posix_spawnattr_t = posix_spawnattr_t)]
 %[define_replacement(posix_spawn_file_actions_t = posix_spawn_file_actions_t)]
-%[default_impl_section(".text.crt.fs.exec.posix_spawn")]
+%[default:section(".text.crt.fs.exec.posix_spawn")]
 
 
 %{

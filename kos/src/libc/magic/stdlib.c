@@ -474,7 +474,7 @@ void *bsearch([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_
 }
 
 
-%[default_impl_section(".text.crt.math.utility")]
+%[default:section(".text.crt.math.utility")]
 
 [[ATTR_CONST, wunused, nothrow, std, crtbuiltin]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, abs)]]
@@ -713,7 +713,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __float128 __NOTHROW(__LIBCCALL abs)(__
 [[std, wunused, section(".text.crt.fs.environ")]]
 char *getenv([[nonnull]] char const *varname);
 
-%[default_impl_section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]
+%[default:section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]
 [[std]]
 int mblen([[inp_opt(maxlen)]] char const *str, size_t maxlen) {
 	return mbrlen(str, maxlen, NULL);
@@ -749,7 +749,7 @@ size_t wcstombs([[nonnull]] char *__restrict dst,
 int system([[nullable]] char const *command);
 
 
-%[default_impl_section(".text.crt.application.exit")]
+%[default:section(".text.crt.application.exit")]
 [[std, guard, crtbuiltin, ATTR_NORETURN, throws]]
 [[export_alias("_ZSt9terminatev", "?terminate@@YAXXZ")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_ABORT))]]
@@ -769,7 +769,7 @@ typedef void (*__LIBCCALL __atexit_func_t)(void);
 #endif /* !____atexit_func_t_defined */
 )]
 
-%[default_impl_section(".text.crt.sched.process")]
+%[default:section(".text.crt.sched.process")]
 [[std, alias("at_quick_exit"), decl_prefix(DEFINE_ATEXIT_FUNC_T)]]
 int atexit([[nonnull]] __atexit_func_t func);
 
@@ -791,7 +791,7 @@ int at_quick_exit([[nonnull]] __atexit_func_t func);
 void _Exit(int status);
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
 
-%[default_impl_section(".text.crt.heap.malloc")];
+%[default:section(".text.crt.heap.malloc")];
 [[ignore, nocrt, alias("calloc")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
 void *crt_calloc(size_t count, size_t num_bytes);
@@ -831,7 +831,7 @@ void *realloc(void *mallptr, size_t num_bytes);
 void free(void *mallptr);
 
 
-%[default_impl_section(".text.crt.random")];
+%[default:section(".text.crt.random")];
 [[std, nothrow, userimpl]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("srandom")]]
 void srand(long seed) {
@@ -849,7 +849,7 @@ int rand() {
 }
 
 
-%[default_impl_section(".text.crt.unicode.static.convert")]
+%[default:section(".text.crt.unicode.static.convert")]
 /* Convert a string to an integer.  */
 [[std, ATTR_PURE, wunused]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("atol")]]
@@ -1362,7 +1362,7 @@ char *qfcvt(__LONGDOUBLE val, int ndigit,
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 
-%[default_impl_section(".text.crt.random")]
+%[default:section(".text.crt.random")]
 %{
 struct drand48_data {
 	unsigned short __x[3];
@@ -1403,14 +1403,14 @@ int srandom_r(unsigned int seed, [[nonnull]] struct random_data *buf);
 int initstate_r(unsigned int seed, [[nonnull]] char *__restrict statebuf, $size_t statelen, [[nonnull]] struct random_data *__restrict buf);
 int setstate_r([[nonnull]] char *__restrict statebuf, [[nonnull]] struct random_data *__restrict buf);
 
-%[default_impl_section(".text.crt.sched.process")]
+%[default:section(".text.crt.sched.process")]
 %typedef void (__LIBCCALL *__on_exit_func_t)(int __status, void *__arg);
 int on_exit([[nonnull]] __on_exit_func_t func, void *arg);
 
-%[default_impl_section(".text.crt.fs.environ")]
+%[default:section(".text.crt.fs.environ")]
 int clearenv();
 
-%[default_impl_section(".text.crt.fs.utility")]
+%[default:section(".text.crt.fs.utility")]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemps64")]]
 [[wunused]] int mkstemps([[nonnull]] char *template_, int suffixlen);
 [[wunused]] int rpmatch([[nonnull]] char const *response);
@@ -1421,7 +1421,7 @@ int mkstemps64([[nonnull]] char *template_, int suffixlen);
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_MISC */
 
-%[default_impl_section(".text.crt.random")]
+%[default:section(".text.crt.random")]
 %
 %
 %#ifdef __USE_POSIX
@@ -1436,7 +1436,7 @@ int rand_r([[nonnull]] unsigned int *__restrict pseed) {
 
 %
 %
-%[default_impl_section(".text.crt.system.utility")]
+%[default:section(".text.crt.system.utility")]
 
 %#ifdef __USE_MISC
 %[insert:extern(cfree)]
@@ -1450,7 +1450,7 @@ int getloadavg(double loadavg[], int nelem);
 %
 %
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K))
-%[default_impl_section(".text.crt.heap")]
+%[default:section(".text.crt.heap")]
 %[insert:extern(valloc)]
 %#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K) */
 
@@ -1489,7 +1489,7 @@ __CDECLARE(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW,__ctype_get_mb_cur_max,(void),
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN)
-%[default_impl_section(".text.crt.random")]
+%[default:section(".text.crt.random")]
 %#ifndef __NO_FPU
 double drand48();
 %#endif /* !__NO_FPU */
@@ -1506,13 +1506,13 @@ void lcong48([[nonnull]] unsigned short param[7]);
 %#endif /* __USE_MISC || __USE_XOPEN */
 
 %#if defined(__USE_MISC) || defined(__USE_XOPEN) || defined(__USE_DOS)
-%[default_impl_section(".text.crt.fs.environ")]
+%[default:section(".text.crt.fs.environ")]
 [[export_alias("_putenv")]]
 int putenv([[nonnull]] char *string);
 %#endif /* __USE_MISC || __USE_XOPEN || __USE_DOS */
 
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-%[default_impl_section(".text.crt.random")];
+%[default:section(".text.crt.random")];
 
 [[userimpl]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias("rand")]]
@@ -1530,7 +1530,7 @@ void srandom(unsigned int seed) {
 char *initstate(unsigned int seed, [[outp(statelen)]] char *statebuf, $size_t statelen);
 char *setstate([[nonnull]] char *statebuf);
 
-%[default_impl_section(".text.crt.string.encrypt")]
+%[default:section(".text.crt.string.encrypt")]
 
 [[wunused]]
 char *l64a(long n); /* TODO: Implement here */
@@ -1591,7 +1591,7 @@ char *frealpathat($fd_t dirfd, [[nonnull]] char const *filename,
 %
 %
 %#ifdef __USE_XOPEN2K
-%[default_impl_section(".text.crt.fs.environ")]
+%[default:section(".text.crt.fs.environ")]
 [[ignore, nocrt, alias("_putenv_s")]]
 int dos_putenv_s([[nonnull]] char const *varname,
                  [[nonnull]] char const *val);
@@ -1629,7 +1629,7 @@ int unsetenv([[nonnull]] char const *varname) {
 %
 %#if defined(__USE_MISC) || \
 %   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
-%[default_impl_section(".text.crt.fs.utility")]
+%[default:section(".text.crt.fs.utility")]
 [[guard, alias("_mktemp"), export_alias("__mktemp")]]
 char *mktemp([[nonnull]] char *template_);
 %#endif
@@ -1639,7 +1639,7 @@ char *mktemp([[nonnull]] char *template_);
 %
 %#if defined(__USE_MISC) || defined(__USE_DOS) || \
 %   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
-%[default_impl_section(".text.crt.unicode.static.convert")]
+%[default:section(".text.crt.unicode.static.convert")]
 
 %#ifndef __NO_FPU
 [[impl_prefix(DEFINE_QCVT_BUFFER)]]
@@ -1671,7 +1671,7 @@ char *fcvt(double val, int ndigit,
 
 
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
-%[default_impl_section(".text.crt.application.options")]
+%[default:section(".text.crt.application.options")]
 [[wunused]]
 int getsubopt([[nonnull]] char **__restrict optionp,
               [[nonnull]] char *const *__restrict tokens,
@@ -1711,7 +1711,7 @@ int getsubopt([[nonnull]] char **__restrict optionp,
 	return -1;
 }
 
-%[default_impl_section(".text.crt.fs.utility")]
+%[default:section(".text.crt.fs.utility")]
 [[wunused, alias("mkstemp64")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemp64")]]
 [[userimpl, requires_function(mktemp)]]
@@ -1737,7 +1737,7 @@ char *mkdtemp([[nonnull]] char *template_);
 
 %
 %#ifdef __USE_XOPEN
-%[default_impl_section(".text.crt.io.tty")]
+%[default:section(".text.crt.io.tty")]
 %[insert:extern(setkey)]
 int grantpt($fd_t fd);
 int unlockpt($fd_t fd);
@@ -1754,7 +1754,7 @@ int posix_openpt($oflag_t oflags);
 
 
 %#ifdef __USE_GNU
-%[default_impl_section(".text.crt.unicode.static.convert")]
+%[default:section(".text.crt.unicode.static.convert")]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("strtoll_l", "_strtoll_l", "__strtoll_l")]]
 [[alt_variant_of(__SIZEOF_LONG__ == 4, "strto32_l")]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, "strto64_l")]]
@@ -1842,7 +1842,7 @@ int getpt();
 [[cp, ATTR_MALLOC, wunused, section(".text.crt.fs.property")]]
 char *canonicalize_file_name([[nonnull]] char const *filename);
 
-%[default_impl_section(".text.crt.fs.utility")]
+%[default:section(".text.crt.fs.utility")]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemp64")]]
 [[cp, wunused, alias("mkostemp64")]]
 int mkostemp([[nonnull]] char *template_, int flags);
@@ -2070,7 +2070,7 @@ typedef int (__LIBCCALL *_onexit_t)(void);
 %#define errno     (*__errno_location())
 %#endif /* ____errno_location_defined */
 %#endif /* !errno */
-%[default_impl_section(".text.crt.errno_access")]
+%[default:section(".text.crt.errno_access")]
 
 [[decl_include("<bits/types.h>")]]
 errno_t _get_errno(errno_t *perr);
@@ -2081,7 +2081,7 @@ errno_t _set_errno(errno_t err);
 
 
 %
-%[default_impl_section(".text.crt.dos.errno")]
+%[default:section(".text.crt.dos.errno")]
 
 [[guard, ATTR_CONST]]
 $u32 *__doserrno();
@@ -2147,7 +2147,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 
 }
 
-%[default_impl_section(".text.crt.dos.application.init")]
+%[default:section(".text.crt.dos.application.init")]
 
 %{
 #ifndef __argc
@@ -2311,7 +2311,7 @@ __LIBC wchar_t **__winitenv;
 
 
 %
-%[default_impl_section(".text.crt.dos.errno")]
+%[default:section(".text.crt.dos.errno")]
 %{
 #ifndef ___purecall_handler_defined
 #define ___purecall_handler_defined 1
@@ -2335,7 +2335,7 @@ _purecall_handler _set_purecall_handler(_purecall_handler __handler);
 _purecall_handler _get_purecall_handler();
 
 %
-%[default_impl_section(".text.crt.dos.errno")]
+%[default:section(".text.crt.dos.errno")]
 %{
 #ifndef ___invalid_parameter_handler_defined
 #define ___invalid_parameter_handler_defined 1
@@ -2378,7 +2378,7 @@ errno_t _get_wpgmptr(wchar_t **pvalue) {
 }
 
 %
-%[default_impl_section(".text.crt.dos.FILE.utility")]
+%[default:section(".text.crt.dos.FILE.utility")]
 %#ifdef __CRT_HAVE__fmode
 %__LIBC int _fmode;
 %#else /* ... */
@@ -2396,7 +2396,7 @@ errno_t _set_fmode(int mode);
 errno_t _get_fmode(int *pmode);
 
 %
-%[default_impl_section(".text.crt.dos.errno")]
+%[default:section(".text.crt.dos.errno")]
 unsigned int _set_abort_behavior(unsigned int flags, unsigned int mask);
 
 %
@@ -2405,7 +2405,7 @@ unsigned int _set_abort_behavior(unsigned int flags, unsigned int mask);
 %extern __ATTR_CONST __INT64_TYPE__ (__LIBCCALL _abs64)(__INT64_TYPE__ __x);
 %#pragma intrinsic(_abs64)
 %#else /* _MSC_VER */
-%[default_impl_section(".text.crt.dos.math.utility")]
+%[default:section(".text.crt.dos.math.utility")]
 [[ATTR_CONST, wunused, nothrow]]
 [[alt_variant_of(__SIZEOF_INT__ == 8, abs)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, llabs)]]
@@ -2417,7 +2417,7 @@ __INT64_TYPE__ _abs64(__INT64_TYPE__ x) {
 %#endif /* __INT64_TYPE__ */
 
 
-%[default_impl_section(".text.crt.dos.unicode.locale.convert")]
+%[default:section(".text.crt.dos.unicode.locale.convert")]
 %#ifndef __NO_FPU
 [[wunused, ATTR_PURE]]
 double _atof_l([[nonnull]] char const *__restrict nptr, $locale_t locale) {
@@ -2458,7 +2458,7 @@ extern unsigned __int64 (_byteswap_uint64)(unsigned __int64 __x);
 #else /* _MSC_VER */
 }
 
-%[default_impl_section(".text.crt.dos.math.utility")]
+%[default:section(".text.crt.dos.math.utility")]
 [[ATTR_CONST, wunused, impl_include("<hybrid/__byteswap.h>")]]
 $u16 _byteswap_ushort($u16 val) {
 	return __hybrid_bswap16(val);
@@ -2493,7 +2493,7 @@ typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void
 #endif /* !__dos_compar_d_fn_t_defined */
 }
 
-%[default_impl_section(".text.crt.dos.utility")]
+%[default:section(".text.crt.dos.utility")]
 
 %[define(DEFINE_DOS_COMPAR_D_FN_T =
 @@pp_ifndef __dos_compar_d_fn_t_defined@@
@@ -2560,7 +2560,7 @@ errno_t _dupenv_s([[nonnull]] char **__restrict pbuf,
 %#endif /* __USE_DOS_SLIB */
 
 %
-%[default_impl_section(".text.crt.dos.unicode.static.convert")]
+%[default:section(".text.crt.dos.unicode.static.convert")]
 %[insert:function(_itoa = itoa)]
 %[insert:function(_ltoa = ltoa)]
 %[insert:function(_ultoa = ultoa)]
@@ -2790,7 +2790,7 @@ $s64 _atoi64_l([[nonnull]] char const *__restrict nptr, $locale_t locale) {
 }
 %#endif /* __UINT64_TYPE__ */
 
-%[default_impl_section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]
+%[default:section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]
 
 [[ATTR_PURE, wunused]]
 $size_t _mbstrlen([[nonnull]] char const *str) {
@@ -2884,7 +2884,7 @@ errno_t _mbstowcs_s_l($size_t *presult,
 	return 0;
 }
 
-%[default_impl_section(".text.crt.dos.random")]
+%[default:section(".text.crt.dos.random")]
 
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
@@ -2901,7 +2901,7 @@ errno_t rand_s([[nonnull]] unsigned int *__restrict randval) {
 }
 
 
-%[default_impl_section(".text.crt.unicode.static.convert")];
+%[default:section(".text.crt.unicode.static.convert")];
 %[insert:function(_strtol_l = strtol_l)]
 %[insert:function(_strtoul_l = strtoul_l)]
 %[insert:function(_strtoll_l = strtoll_l)]
@@ -2919,7 +2919,7 @@ errno_t rand_s([[nonnull]] unsigned int *__restrict randval) {
 %#define _CRT_SYSTEM_DEFINED 1
 %#endif /* !_CRT_SYSTEM_DEFINED */
 
-%[default_impl_section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]
+%[default:section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]
 
 %
 [[wchar]]
@@ -3004,7 +3004,7 @@ errno_t wcstombs_s([[nonnull]] $size_t *presult,
 
 %
 %/* DOS malloc extensions */
-%[default_impl_section(".text.crt.dos.heap")]
+%[default:section(".text.crt.dos.heap")]
 
 %[insert:function(_recalloc = recallocv)]
 
@@ -3123,11 +3123,11 @@ void _aligned_free(void *aligned_mallptr) {
 
 %
 %#define _CVTBUFSIZE   349
-%[default_impl_section(".text.crt.dos.fs.utility")]
+%[default:section(".text.crt.dos.fs.utility")]
 [[cp]]
 char *_fullpath(char *buf, char const *path, $size_t buflen);
 
-%[default_impl_section(".text.crt.unicode.static.convert")]
+%[default:section(".text.crt.unicode.static.convert")]
 
 %#ifndef __NO_FPU
 [[decl_include("<bits/types.h>")]]
@@ -3221,7 +3221,7 @@ int _atoldbl_l([[nonnull]] __LONGDOUBLE *__restrict result,
 %#endif /* !__NO_FPU */
 
 
-%[default_impl_section(".text.crt.dos.math.utility")]
+%[default:section(".text.crt.dos.math.utility")]
 [[nothrow, ATTR_CONST]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_lrotl")]]
@@ -3282,14 +3282,14 @@ unsigned long _lrotr(unsigned long val, int shift) {
 %[insert:function(_putenv = putenv)]
 %[insert:function(_swab = swab)]
 
-%[default_impl_section(".text.crt.dos.fs.environ")];
+%[default:section(".text.crt.dos.fs.environ")];
 [[decl_include("<bits/types.h>")]]
 [[requires_function(setenv), impl_include("<parts/errno.h>")]]
 errno_t _putenv_s(char const *varname, char const *val) {
 	return setenv(varname, val, 1) ? __libc_geterrno_or(__EINVAL) : 0;
 }
 
-%[default_impl_section(".text.crt.dos.fs.utility")];
+%[default:section(".text.crt.dos.fs.utility")];
 [[cp, requires_function(_searchenv_s)]]
 void _searchenv([[nonnull]] char const *file,
                 [[nonnull]] char const *envvar,
@@ -3459,18 +3459,18 @@ err_range:
 }
 
 %
-%[default_impl_section(".text.crt.dos.errno")];
+%[default:section(".text.crt.dos.errno")];
 void _seterrormode(int mode);
 int _set_error_mode(int mode);
 
 %
-%[default_impl_section(".text.crt.dos.system")]
+%[default:section(".text.crt.dos.system")]
 void _beep(unsigned int freq, unsigned int duration);
 
 %
 %[insert:function(_wperror = _wperror, guardName: "_CRT_WPERROR_DEFINED")]
 
-%[default_impl_section(".text.crt.dos.system")];
+%[default:section(".text.crt.dos.system")];
 [[cp]] void _sleep($u32 duration) = sleep;
 
 %
@@ -3518,9 +3518,9 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 }
 
 %
-%[default_impl_section(".text.crt.dos.string.utility")];
+%[default:section(".text.crt.dos.string.utility")];
 %[insert:extern(swab)]
-%[default_impl_section(".text.crt.unicode.static.convert")];
+%[default:section(".text.crt.unicode.static.convert")];
 
 
 %
@@ -3551,7 +3551,7 @@ char *ultoa(unsigned long val, [[nonnull]] char *buf, int radix) {
 	return buf;
 }
 
-%[default_impl_section(".text.crt.dos.sched.process")]
+%[default:section(".text.crt.dos.sched.process")]
 %[insert:function(_onexit = onexit)]
 
 %[define_replacement(onexit_t = _onexit_t)]
@@ -3570,7 +3570,7 @@ onexit_t onexit(onexit_t func);
 %#ifndef _WSTDLIB_DEFINED
 %#define _WSTDLIB_DEFINED
 
-%[default_impl_section(".text.crt.dos.wchar.fs.environ")]
+%[default:section(".text.crt.dos.wchar.fs.environ")]
 [[guard, wchar, wunused]]
 wchar_t *_wgetenv([[nonnull]] wchar_t const *varname);
 
@@ -3588,7 +3588,7 @@ errno_t _wdupenv_s([[nonnull]] wchar_t **pbuf,
 
 %[insert:function(_wsystem = wsystem, guardName: "_CRT_WSYSTEM_DEFINED")]
 
-%[default_impl_section(".text.crt.dos.wchar.unicode.static.convert")]
+%[default:section(".text.crt.dos.wchar.unicode.static.convert")]
 %[insert:extern(wcstol)]
 %[insert:extern(wcstoll)]
 %[insert:extern(wcstoul)]
@@ -3618,7 +3618,7 @@ double _wtof_l([[nonnull]] wchar_t const *nptr,
 }
 %#endif /* !__NO_FPU */
 
-%[default_impl_section(".text.crt.dos.wchar.unicode.static.convert")]
+%[default:section(".text.crt.dos.wchar.unicode.static.convert")]
 [[guard, wchar]] _itow(*) %{generate(str2wcs("itoa"))}
 [[guard, wchar]] _ltow(*) %{generate(str2wcs("ltoa"))}
 [[guard, wchar]] _ultow(*) %{generate(str2wcs("ultoa"))}
@@ -3630,7 +3630,7 @@ double _wtof_l([[nonnull]] wchar_t const *nptr,
 [[guard, wchar]] _i64tow_s(*) %{generate(str2wcs("_i64toa_s"))}
 [[guard, wchar]] _ui64tow_s(*) %{generate(str2wcs("_ui64toa_s"))}
 
-%[default_impl_section(".text.crt.dos.wchar.unicode.static.convert")]
+%[default:section(".text.crt.dos.wchar.unicode.static.convert")]
 %[insert:guarded_function(_wtoi = wtoi)]
 %[insert:guarded_function(_wtol = wtol)]
 
@@ -3643,7 +3643,7 @@ _wtoi64(*) %{generate(str2wcs("_atoi64"))}
 %[insert:guarded_function(_wcstoi64 = wcsto64)]
 %[insert:guarded_function(_wcstoui64 = wcstou64)]
 
-%[default_impl_section(".text.crt.dos.wchar.unicode.locale.convert")]
+%[default:section(".text.crt.dos.wchar.unicode.locale.convert")]
 [[guard, wchar]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_wtol_l")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("_wtoll_l")]]
@@ -3671,7 +3671,7 @@ _wtoi64_l(*) %{generate(str2wcs("_atoi64_l"))}
 %[insert:guarded_function(_wcstoull_l = wcstoull_l)]
 %[insert:guarded_function(_wtoll = wtoll)]
 
-%[default_impl_section(".text.crt.dos.wchar.unicode.locale.convert")]
+%[default:section(".text.crt.dos.wchar.unicode.locale.convert")]
 [[guard, wchar]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, _wtoi_l)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, _wtol_l)]]

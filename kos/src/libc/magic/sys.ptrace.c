@@ -20,7 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(longptr_t = __LONGPTR_TYPE__)]
-%[default_impl_section(".text.crt.system.ptrace")]
+%[default:section(".text.crt.system.ptrace")]
 
 %{
 #include <features.h>

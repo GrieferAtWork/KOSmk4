@@ -26,7 +26,7 @@
 %[define_replacement(regex_t = "struct re_pattern_buffer")]
 %[define_replacement(regoff_t = __INT32_TYPE__)]
 
-%[default_impl_section(".text.crt.utility.regex")]
+%[default:section(".text.crt.utility.regex")]
 
 %{
 #include <features.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4835c9c2 */
+/* HASH CRC-32:0x115919f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,25 +28,25 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_16to32_defined
 #define __local___localdep_format_16to32_defined 1
 #if defined(__CRT_HAVE_format_wto32) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-/* Format printer (compatible with `__pc16formatprinter') for
+/* Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wto32)
-/* Format printer (compatible with `__pc16formatprinter') for
+/* Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __CREDIRECT_DOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 __NAMESPACE_LOCAL_END
 #include <local/unicode/format_wto32.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `__pc16formatprinter') for
+/* Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 #define __localdep_format_16to32 (*(__SSIZE_TYPE__(__LIBDCALL *)(void *, __CHAR16_TYPE__ const *, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_wto32))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/unicode/format_16to32.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `__pc16formatprinter') for
+/* Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 #define __localdep_format_16to32 __LIBC_LOCAL_NAME(format_16to32)
 #endif /* !... */

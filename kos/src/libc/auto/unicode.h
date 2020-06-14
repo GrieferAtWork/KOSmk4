@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x294920bf */
+/* HASH CRC-32:0x3fa29621 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -138,10 +138,10 @@ INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_format_wto32)(void *arg, char16_t const
 /* Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-32 output */
 INTDEF ssize_t NOTHROW_NCX(LIBKCALL libc_format_wto32)(void *arg, char32_t const *data, size_t datalen);
-/* Format printer (compatible with `__pwformatprinter') for
+/* Format printer (compatible with `pwformatprinter') for
  * converting wide-character unicode input data into a UTF-16 output */
 INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_format_wto16)(void *arg, char16_t const *data, size_t datalen);
-/* Format printer (compatible with `__pwformatprinter') for
+/* Format printer (compatible with `pwformatprinter') for
  * converting wide-character unicode input data into a UTF-16 output */
 INTDEF ssize_t NOTHROW_NCX(LIBKCALL libc_format_wto16)(void *arg, char32_t const *data, size_t datalen);
 #endif /* !__KERNEL__ */

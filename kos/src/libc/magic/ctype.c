@@ -48,7 +48,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 }
 
-%[default_impl_section(".text.crt.unicode.static.ctype")];
+%[default:section(".text.crt.unicode.static.ctype")];
 
 [[ignore, ATTR_CONST, wunused, nothrow]]
 char const *__locale_ctype_ptr();
@@ -400,7 +400,7 @@ int isblank(int ch) {
 #ifdef __USE_XOPEN2K8
 }
 
-%[default_impl_section(".text.crt.unicode.locale.ctype")]
+%[default:section(".text.crt.unicode.locale.ctype")]
 
 [[ATTR_PURE, wunused, export_alias("__iscntrl_l")]]
 int iscntrl_l(int ch, __locale_t locale) {
@@ -1089,7 +1089,7 @@ __NAMESPACE_INT_END
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 }
-%[default_impl_section(".text.crt.unicode.static.ctype")];
+%[default:section(".text.crt.unicode.static.ctype")];
 
 @@Returns non-zero if `(C & ~0x7f) == 0'
 [[nothrow, ATTR_CONST]]

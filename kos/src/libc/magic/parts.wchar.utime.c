@@ -22,7 +22,7 @@
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 %[define_replacement(utimbuf32 = __utimbuf32)]
 %[define_replacement(utimbuf64 = __utimbuf64)]
-%[default_impl_section("{.text.crt.wchar.fs.modify_time|.text.crt.dos.wchar.fs.modify_time}")]
+%[default:section("{.text.crt.wchar.fs.modify_time|.text.crt.dos.wchar.fs.modify_time}")]
 
 %{
 #include <features.h>

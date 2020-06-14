@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57083e81 */
+/* HASH CRC-32:0xfafbe5e0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_aprintf_alloc_defined
 #define __local___localdep_format_aprintf_alloc_defined 1
 #ifdef __CRT_HAVE_format_aprintf_alloc
+__NAMESPACE_LOCAL_END
+#ifndef __format_aprintf_data_defined
+#define __format_aprintf_data_defined 1
+struct format_aprintf_data {
+	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+};
+#endif /* !__format_aprintf_data_defined */
+__NAMESPACE_LOCAL_BEGIN
 /* Allocate a buffer of `num_chars' characters at the end of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized, or some other function is used

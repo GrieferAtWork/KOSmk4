@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(".text.crt.io.poll")]
+%[default:section(".text.crt.io.poll")]
 
 %{
 #include <features.h>

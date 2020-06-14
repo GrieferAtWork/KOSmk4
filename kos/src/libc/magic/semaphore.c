@@ -23,7 +23,7 @@
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
 %[define_replacement(sem_t = sem_t)]
-%[default_impl_section(".text.crt.sched.semaphore")]
+%[default:section(".text.crt.sched.semaphore")]
 
 %{
 #include <features.h>

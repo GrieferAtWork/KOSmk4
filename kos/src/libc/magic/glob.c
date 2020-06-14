@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default_impl_section(".text.crt.utility.glob")]
+%[default:section(".text.crt.utility.glob")]
 %[define_replacement(glob_t = "struct __glob_struct")]
 %[define_replacement(glob64_t = "struct __glob64_struct")]
 

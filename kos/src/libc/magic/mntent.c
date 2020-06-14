@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(".text.crt.database.mntent")]
+%[default:section(".text.crt.database.mntent")]
 
 %{
 #include <features.h>

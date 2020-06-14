@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%[default_impl_section(".text.crt.io.utility")]
+%[default:section(".text.crt.io.utility")]
 
 %[define_replacement(fd_t    = __fd_t)]
 %[define_replacement(off_t   = "__FS_TYPE(off)")]
@@ -152,6 +152,7 @@ readahead:($fd_t fd, $off64_t offset, $size_t count) -> $ssize_t {
 	(void)offset;
 	return count;
 }
+
 [[userimpl, decl_include("<bits/types.h>")]]
 int sync_file_range($fd_t fd, $off64_t offset, $off64_t count, unsigned int flags) {
 	(void)fd;
@@ -160,6 +161,7 @@ int sync_file_range($fd_t fd, $off64_t offset, $off64_t count, unsigned int flag
 	(void)flags;
 	return 0;
 }
+
 %struct iovec;
 
 [[cp, decl_include("<bits/types.h>")]]
@@ -180,13 +182,7 @@ int fallocate32($fd_t fd, int mode, $off64_t offset, $off64_t length);
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fallocate)]]
 [[userimpl, decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
 int fallocate($fd_t fd, int mode, $off_t offset, $off_t length) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)fd;
-	(void)mode;
-	(void)offset;
-	(void)length;
-	return 0;
-@@pp_elif $has_function(fallocate64)@@
+@@pp_if $has_function(fallocate64)@@
 	return fallocate64(fd, mode, ($off64_t)offset, ($off64_t)length);
 @@pp_elif $has_function(fallocate32)@@
 	return fallocate32(fd, mode, ($off32_t)offset, ($off32_t)length);
@@ -202,13 +198,7 @@ int fallocate($fd_t fd, int mode, $off_t offset, $off_t length) {
 %#ifdef __USE_LARGEFILE64
 [[userimpl, off64_variant_of(fallocate), decl_include("<bits/types.h>")]]
 int fallocate64($fd_t fd, int mode, $off64_t offset, $off64_t length) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)fd;
-	(void)mode;
-	(void)offset;
-	(void)length;
-	return 0;
-@@pp_elif $has_function(fallocate32)@@
+@@pp_if $has_function(fallocate32)@@
 	return fallocate32(fd, mode, ($off32_t)offset, ($off32_t)length);
 @@pp_else@@
 	(void)fd;
@@ -226,7 +216,7 @@ int fallocate64($fd_t fd, int mode, $off64_t offset, $off64_t length) {
 [[vartypes(void *), guard, export_alias("__fcntl")]]
 __STDC_INT_AS_SSIZE_T fcntl($fd_t fd, int cmd, ...);
 
-%[default_impl_section(".text.crt.io.access")]
+%[default:section(".text.crt.io.access")]
 
 [[ignore, vartypes($mode_t), decl_include("<bits/types.h>")]]
 [[nocrt, alias(open, _open, __open), cp, wunused]]
@@ -251,17 +241,13 @@ $fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	return result;
 }
 
-[[cp, guard, wunused, no_crt_self_import, alias("_creat")]]
+[[cp, guard, wunused, no_crt_self_import, alias("_creat", "creat64")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("creat64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("creat")]]
 [[userimpl, requires_function(creat64, open)]]
 [[impl_include("<bits/fcntl.h>"), decl_include("<bits/types.h>")]]
 $fd_t creat([[nonnull]] char const *filename, $mode_t mode) {
-@@pp_if $has_function(creat64)@@
-	return creat64(filename, mode);
-@@pp_else@@
 	return open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode);
-@@pp_endif@@
 }
 
 %
@@ -346,13 +332,7 @@ int posix_fadvise32($fd_t fd, $off32_t offset, $off32_t length, int advise);
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fadvise")]]
 [[userimpl, section(".text.crt.io.utility")]]
 int posix_fadvise($fd_t fd, $off_t offset, $off_t length, int advise) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)fd;
-	(void)offset;
-	(void)length;
-	(void)advise;
-	return 0;
-@@pp_elif $has_function(posix_fadvise64)@@
+@@pp_if $has_function(posix_fadvise64)@@
 	return posix_fadvise64(fd, ($off64_t)offset, ($off64_t)length, advise);
 @@pp_elif $has_function(posix_fadvise32)@@
 	return posix_fadvise32(fd, ($off32_t)offset, ($off32_t)length, advise);
@@ -373,12 +353,7 @@ int posix_fallocate32($fd_t fd, $off32_t offset, $off32_t length);
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fallocate")]]
 [[userimpl, section(".text.crt.io.utility")]]
 int posix_fallocate($fd_t fd, $off_t offset, $off_t length) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)fd;
-	(void)offset;
-	(void)length;
-	return 0;
-@@pp_elif $has_function(posix_fallocate64)@@
+@@pp_if $has_function(posix_fallocate64)@@
 	return posix_fallocate64(fd, ($off64_t)offset, ($off64_t)length);
 @@pp_elif $has_function(posix_fallocate32)@@
 	return posix_fallocate32(fd, ($off32_t)offset, ($off32_t)length);

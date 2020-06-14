@@ -23,7 +23,7 @@
 %[define_replacement(fexcept_t = __fexcept_t)]
 %[define_replacement(fenv_t = "struct __fenv_struct")]
 %[define_partial_replacement(envp = ___envp)]
-%[default_impl_section(".text.crt.math.fenv")]
+%[default:section(".text.crt.math.fenv")]
 
 %(c, ccompat)#ifndef __NO_FPU
 %{

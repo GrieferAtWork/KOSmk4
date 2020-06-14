@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66328663 */
+/* HASH CRC-32:0xb9a57586 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -314,7 +314,11 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(execl)
+#else /* __cplusplus */
 #define execl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl))
+#endif /* !__cplusplus */
 #else /* ... */
 #undef __execl_defined
 #endif /* !... */
@@ -345,7 +349,11 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL ex
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(execle)
+#else /* __cplusplus */
 #define execle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execle))
+#endif /* !__cplusplus */
 #else /* ... */
 #undef __execle_defined
 #endif /* !... */
@@ -372,7 +380,11 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(execlp)
+#else /* __cplusplus */
 #define execlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp))
+#endif /* !__cplusplus */
 #else /* ... */
 #undef __execlp_defined
 #endif /* !... */
@@ -413,7 +425,11 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL ex
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(execlpe)
+#else /* __cplusplus */
 #define execlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe))
+#endif /* !__cplusplus */
 #else /* ... */
 #undef __execlpe_defined
 #endif /* !... */

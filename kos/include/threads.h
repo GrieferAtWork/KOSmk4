@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3104e32 */
+/* HASH CRC-32:0xe4c74ec3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -455,7 +455,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait64,(cnd_t *_
  * pointed by COND is signaled or time pointed by TIME_POINT is reached
  * s.a. `pthread_cond_timedwait()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait64,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point),cnd_timedwait,(__cond,__mutex,__time_point))
-#elif defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64)
+#elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <local/threads/cnd_timedwait64.h>
 /* Block current thread on the condition variable until condition variable
  * pointed by COND is signaled or time pointed by TIME_POINT is reached

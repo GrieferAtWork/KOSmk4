@@ -514,7 +514,7 @@ struct sched_param {
 
 }
 
-%[default_impl_section(".text.crt.sched.utility")];
+%[default:section(".text.crt.sched.utility")];
 
 %#if defined(__USE_GNU) || defined(__USE_KOS)
 %typedef int (__LIBCCALL *__clone_func_t)(void *__arg);

@@ -22,7 +22,7 @@
 %[define_replacement(off_t = "__FS_TYPE(off)")]
 %[define_replacement(off32_t = __off32_t)]
 %[define_replacement(off64_t = __off64_t)]
-%[default_impl_section(".text.crt.fs.statfs.statfs")]
+%[default:section(".text.crt.fs.statfs.statfs")]
 
 %{
 #include <features.h>

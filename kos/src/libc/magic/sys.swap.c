@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(".text.crt.fs.swap")]
+%[default:section(".text.crt.fs.swap")]
 
 %{
 #include <features.h>

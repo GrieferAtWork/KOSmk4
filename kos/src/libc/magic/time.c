@@ -19,7 +19,7 @@
  */
 
 %[define_ccompat_header("ctime")]
-%[default_impl_section(".text.crt.time")]
+%[default:section(".text.crt.time")]
 
 %[define_replacement(time_t    = "__TM_TYPE(time)")]
 %[define_replacement(time32_t  = __time32_t)]

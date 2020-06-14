@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(".text.crt.system.info")]
+%[default:section(".text.crt.system.info")]
 
 %{
 #include <features.h>

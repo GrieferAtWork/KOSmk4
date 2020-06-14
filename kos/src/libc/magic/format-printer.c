@@ -22,7 +22,7 @@
 %[define_replacement(pformatgetc    = __pformatgetc)]
 %[define_replacement(pformatungetc  = __pformatungetc)]
 
-%[default_impl_section(".text.crt.string.format")]
+%[default:section(".text.crt.string.format")]
 
 %[define_str2wcs_replacement(pformatprinter = pwformatprinter)]
 %[define_str2wcs_replacement(__pformatprinter = __pwformatprinter)]
@@ -100,6 +100,9 @@ typedef __pformatungetc pformatungetc;
 
 }
 
+%[define(FORMAT_REPEAT_BUFSIZE = 64)]
+
+
 @@Repeat `CH' a number of `NUM_REPETITIONS' times
 @@The usual format-printer rules apply, and this function
 @@is allowed to call `PRINTER' as often as it chooses
@@ -107,9 +110,6 @@ typedef __pformatungetc pformatungetc;
 [[impl_include("<hybrid/__alloca.h>", "<libc/string.h>")]]
 $ssize_t format_repeat([[nonnull]] pformatprinter printer, void *arg,
                        char ch, $size_t num_repetitions) {
-#ifndef FORMAT_REPEAT_BUFSIZE
-#define FORMAT_REPEAT_BUFSIZE 64
-#endif /* !FORMAT_REPEAT_BUFSIZE */
 	ssize_t result, temp;
 @@pp_ifdef __hybrid_alloca@@
 	char *buffer;
@@ -944,13 +944,13 @@ struct format_snprintf_data {
 [[kernel]]
 $ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ void *arg,
                                  [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
-	struct __format_snprintf_data_ {
-		char   *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
-		size_t  sd_bufsiz; /* Remaining buffer size. */
+	struct __local_format_snprintf_data {
+		char  *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
+		size_t sd_bufsiz; /* Remaining buffer size. */
 	};
-	struct __format_snprintf_data_ *ctrl;
+	struct __local_format_snprintf_data *ctrl;
 	size_t result = datalen;
-	ctrl = (struct __format_snprintf_data_ *)arg;
+	ctrl = (struct __local_format_snprintf_data *)arg;
 	if (result > ctrl->sd_bufsiz)
 		result = ctrl->sd_bufsiz;
 	memcpyc(ctrl->sd_buffer, data, result, sizeof(char));
@@ -1117,7 +1117,7 @@ char *format_aprintf_pack([[nonnull]] struct format_aprintf_data *__restrict sel
 @@to append additional data to the end of `self'
 @@@return: NULL: Failed to allocate additional memory
 [[impl_include("<hybrid/__assert.h>"), wunused]]
-[[dependency_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
+[[decl_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
 [[requires_function(realloc)]]
 format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
                       $size_t num_chars) -> [[malloc(num_chars)]] char * {
@@ -1154,7 +1154,7 @@ format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
 $ssize_t format_aprintf_printer([[nonnull]] /*struct format_aprintf_data **/ void *arg,
                                 [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	char *buf;
-	buf = format_aprintf_alloc((struct @format_aprintf_data@ *)arg,
+	buf = format_aprintf_alloc((struct format_aprintf_data *)arg,
 	                           datalen);
 	if unlikely(!buf)
 		return -1;

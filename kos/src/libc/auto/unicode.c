@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad2e4e5d */
+/* HASH CRC-32:0x76c9a242 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1352,7 +1352,7 @@ err:
 }
 #include <bits/format-printer.h>
 #include <bits/uformat-printer.h>
-/* Format printer (compatible with `__pwformatprinter') for
+/* Format printer (compatible with `pwformatprinter') for
  * converting wide-character unicode input data into a UTF-16 output */
 INTERN ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wto16)(void *arg,
@@ -1393,7 +1393,7 @@ err:
 }
 #include <bits/format-printer.h>
 #include <bits/uformat-printer.h>
-/* Format printer (compatible with `__pwformatprinter') for
+/* Format printer (compatible with `pwformatprinter') for
  * converting wide-character unicode input data into a UTF-16 output */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBKCALL libc_format_wto16)(void *arg,

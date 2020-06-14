@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe795a751 */
+/* HASH CRC-32:0xa558776b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,35 +55,32 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
                                void *arg,
                                char16_t ch,
                                size_t num_repetitions) THROWS(...) {
-#ifndef FORMAT_REPEAT_BUFSIZE
-#define FORMAT_REPEAT_BUFSIZE 64
-#endif /* !FORMAT_REPEAT_BUFSIZE */
 	ssize_t result, temp;
 #ifdef __hybrid_alloca
 	char16_t *buffer;
-	if likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
+	if likely(num_repetitions <= 64) {
 		buffer = (char16_t *)__hybrid_alloca(num_repetitions);
 		__libc_memsetc(buffer, ch, num_repetitions, 2);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	buffer = (char16_t *)__hybrid_alloca(FORMAT_REPEAT_BUFSIZE);
-	libc_memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
+	buffer = (char16_t *)__hybrid_alloca(64);
+	libc_memset(buffer, ch, 64);
 #else /* __hybrid_alloca */
-	char16_t buffer[FORMAT_REPEAT_BUFSIZE];
-	if likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
+	char16_t buffer[64];
+	if likely(num_repetitions <= 64) {
 		__libc_memsetc(buffer, ch, num_repetitions, 2);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	libc_memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
+	libc_memset(buffer, ch, 64);
 #endif /* !__hybrid_alloca */
-	result = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
+	result = (*printer)(arg, buffer, 64);
 	if unlikely(result < 0)
 		goto done;
 	for (;;) {
-		num_repetitions -= FORMAT_REPEAT_BUFSIZE;
-		if (num_repetitions < FORMAT_REPEAT_BUFSIZE)
+		num_repetitions -= 64;
+		if (num_repetitions < 64)
 			break;
-		temp = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
+		temp = (*printer)(arg, buffer, 64);
 		if unlikely(temp < 0)
 			goto done;
 		result += temp;
@@ -109,35 +106,32 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
                                void *arg,
                                char32_t ch,
                                size_t num_repetitions) THROWS(...) {
-#ifndef FORMAT_REPEAT_BUFSIZE
-#define FORMAT_REPEAT_BUFSIZE 64
-#endif /* !FORMAT_REPEAT_BUFSIZE */
 	ssize_t result, temp;
 #ifdef __hybrid_alloca
 	char32_t *buffer;
-	if likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
+	if likely(num_repetitions <= 64) {
 		buffer = (char32_t *)__hybrid_alloca(num_repetitions);
 		__libc_memsetc(buffer, ch, num_repetitions, 4);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	buffer = (char32_t *)__hybrid_alloca(FORMAT_REPEAT_BUFSIZE);
-	libc_memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
+	buffer = (char32_t *)__hybrid_alloca(64);
+	libc_memset(buffer, ch, 64);
 #else /* __hybrid_alloca */
-	char32_t buffer[FORMAT_REPEAT_BUFSIZE];
-	if likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
+	char32_t buffer[64];
+	if likely(num_repetitions <= 64) {
 		__libc_memsetc(buffer, ch, num_repetitions, 4);
 		return (*printer)(arg, buffer, num_repetitions);
 	}
-	libc_memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
+	libc_memset(buffer, ch, 64);
 #endif /* !__hybrid_alloca */
-	result = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
+	result = (*printer)(arg, buffer, 64);
 	if unlikely(result < 0)
 		goto done;
 	for (;;) {
-		num_repetitions -= FORMAT_REPEAT_BUFSIZE;
-		if (num_repetitions < FORMAT_REPEAT_BUFSIZE)
+		num_repetitions -= 64;
+		if (num_repetitions < 64)
 			break;
-		temp = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
+		temp = (*printer)(arg, buffer, 64);
 		if unlikely(temp < 0)
 			goto done;
 		result += temp;
@@ -1637,13 +1631,13 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(void *arg,
                                                     char16_t const *__restrict data,
                                                     size_t datalen) {
-	struct __format_snprintf_data_ {
-		char16_t   *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
-		size_t  sd_bufsiz; /* Remaining buffer size. */
+	struct __local_format_snprintf_data {
+		char16_t  *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
+		size_t sd_bufsiz; /* Remaining buffer size. */
 	};
-	struct __format_snprintf_data_ *ctrl;
+	struct __local_format_snprintf_data *ctrl;
 	size_t result = datalen;
-	ctrl = (struct __format_snprintf_data_ *)arg;
+	ctrl = (struct __local_format_snprintf_data *)arg;
 	if (result > ctrl->sd_bufsiz)
 		result = ctrl->sd_bufsiz;
 	libc_memcpyc(ctrl->sd_buffer, data, result, sizeof(char16_t));
@@ -1659,13 +1653,13 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(LIBKCALL libc_format_wsnprintf_printer)(void *arg,
                                                     char32_t const *__restrict data,
                                                     size_t datalen) {
-	struct __format_snprintf_data_ {
-		char32_t   *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
-		size_t  sd_bufsiz; /* Remaining buffer size. */
+	struct __local_format_snprintf_data {
+		char32_t  *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
+		size_t sd_bufsiz; /* Remaining buffer size. */
 	};
-	struct __format_snprintf_data_ *ctrl;
+	struct __local_format_snprintf_data *ctrl;
 	size_t result = datalen;
-	ctrl = (struct __format_snprintf_data_ *)arg;
+	ctrl = (struct __local_format_snprintf_data *)arg;
 	if (result > ctrl->sd_bufsiz)
 		result = ctrl->sd_bufsiz;
 	libc_memcpyc(ctrl->sd_buffer, data, result, sizeof(char32_t));

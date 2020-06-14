@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee082ca9 */
+/* HASH CRC-32:0x940c710a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,13 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_posix_fadvise64_defined */
 __LOCAL_LIBC(posix_fadvise) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fadvise))(__fd_t __fd, __FS_TYPE(off) __offset, __FS_TYPE(off) __length, int __advise) {
-#ifdef __BUILDING_LIBC
-	(void)__fd;
-	(void)__offset;
-	(void)__length;
-	(void)__advise;
-	return 0;
-#else /* __BUILDING_LIBC */
+
 	return __localdep_posix_fadvise64(__fd, (__off64_t)__offset, (__off64_t)__length, __advise);
 
 
@@ -61,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fadvise))(__fd_t __fd, __FS_TYP
 
 
 
-#endif /* !__BUILDING_LIBC */
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_posix_fadvise_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7af0e37b */
+/* HASH CRC-32:0x19e2f6c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,11 +50,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_gettime))(struct ntptimeval *__re
 	struct __ntptimeval32 __ntv32;
 	int __result = __localdep_ntp_gettime32(&__ntv32);
 	if __likely(__result == 0) {
-		__ntv->time.tv_sec   = (__time64_t)__ntv32.time.tv_sec;
-		__ntv->time.tv_nsec  = __ntv32.time.tv_nsec;
-		__ntv->maxerror        = __ntv32.maxerror;
-		__ntv->esterror        = __ntv32.esterror;
-		__ntv->tai             = __ntv32.tai;
+		__ntv->time.tv_sec       = (__time64_t)__ntv32.time.tv_sec;
+		__ntv->time.tv_usec      = __ntv32.time.tv_usec;
+		__ntv->maxerror          = __ntv32.maxerror;
+		__ntv->esterror          = __ntv32.esterror;
+		__ntv->tai               = __ntv32.tai;
 		__ntv->__glibc_reserved1 = __ntv32.__glibc_reserved1;
 		__ntv->__glibc_reserved2 = __ntv32.__glibc_reserved2;
 		__ntv->__glibc_reserved3 = __ntv32.__glibc_reserved3;
@@ -65,11 +65,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_gettime))(struct ntptimeval *__re
 	struct __ntptimeval64 __ntv64;
 	int __result = __localdep_ntp_gettime64(&__ntv64);
 	if __likely(__result == 0) {
-		__ntv->time.tv_sec   = (__time32_t)__ntv64.time.tv_sec;
-		__ntv->time.tv_nsec  = __ntv64.time.tv_nsec;
-		__ntv->maxerror        = __ntv64.maxerror;
-		__ntv->esterror        = __ntv64.esterror;
-		__ntv->tai             = __ntv64.tai;
+		__ntv->time.tv_sec       = (__time32_t)__ntv64.time.tv_sec;
+		__ntv->time.tv_usec      = __ntv64.time.tv_usec;
+		__ntv->maxerror          = __ntv64.maxerror;
+		__ntv->esterror          = __ntv64.esterror;
+		__ntv->tai               = __ntv64.tai;
 		__ntv->__glibc_reserved1 = __ntv64.__glibc_reserved1;
 		__ntv->__glibc_reserved2 = __ntv64.__glibc_reserved2;
 		__ntv->__glibc_reserved3 = __ntv64.__glibc_reserved3;

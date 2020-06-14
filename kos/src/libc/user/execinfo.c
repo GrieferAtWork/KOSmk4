@@ -132,17 +132,17 @@ bool LIBCCALL init_libdebuginfo(void) {
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_backtrace,hash:CRC-32=0x33cd6fb1]]]*/
+/*[[[head:libc_backtrace,hash:CRC-32=0x55192660]]]*/
 /* Store up to SIZE return address of the current program state
  * in ARRAY and return the exact number of values stored */
-INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) __STDC_INT_AS_UINT_T
 NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
-                                     int size)
+                                     __STDC_INT_AS_UINT_T size)
 /*[[[body:libc_backtrace]]]*/
 {
 	unsigned int result;
 	struct lcpustate ost, st;
-	if unlikely(size < 0) {
+	if unlikely((int)size < 0) {
 		libc_seterrno(EINVAL);
 		return -1;
 	}
@@ -151,7 +151,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
 		return -1;
 	}
 	lcpustate_current(&st);
-	for (result = 0; result < (unsigned int)size; ++result) {
+	for (result = 0; result < size; ++result) {
 		unsigned int error;
 		memcpy(&ost, &st, sizeof(struct lcpustate));
 		error = unwind((void *)lcpustate_getpc(&ost),
@@ -161,7 +161,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
 			break;
 		array[result] = (void *)lcpustate_getpc(&st);
 	}
-	return (int)result;
+	return result;
 }
 /*[[[end:libc_backtrace]]]*/
 
@@ -205,18 +205,18 @@ err0:
 	return 0;
 }
 
-/*[[[head:libc_backtrace_symbols,hash:CRC-32=0x16089ff3]]]*/
+/*[[[head:libc_backtrace_symbols,hash:CRC-32=0x3304ceef]]]*/
 /* Return names of functions from the backtrace list
  * in ARRAY in a newly malloc()ed memory block */
 INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) char **
 NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array,
-                                             int size)
+                                             __STDC_INT_AS_UINT_T size)
 /*[[[body:libc_backtrace_symbols]]]*/
 {
 	char **result;
 	unsigned int i;
 	struct format_aprintf_data data;
-	if unlikely(size < 0) {
+	if unlikely((int)size < 0) {
 		libc_seterrno(EINVAL);
 		return NULL;
 	}
@@ -226,9 +226,9 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array,
 	}
 	format_aprintf_data_init(&data);
 	/* Make space for the string array itself. */
-	if unlikely(!format_aprintf_alloc(&data, CEILDIV(((unsigned int)size + 1) * sizeof(char *), sizeof(char))))
+	if unlikely(!format_aprintf_alloc(&data, CEILDIV((size + 1) * sizeof(char *), sizeof(char))))
 		goto err;
-	for (i = 0; i < (unsigned int)size; ++i) {
+	for (i = 0; i < size; ++i) {
 		PRIVATE SECTION_DEBUG_STRING("debug_empty_string") char const debug_empty_string[1] = { 0 };
 		if unlikely(print_function_name(array[i], &format_aprintf_printer, &data) < 0)
 			goto err;
@@ -237,8 +237,10 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array,
 	}
 	result = (char **)format_aprintf_pack(&data, NULL);
 	if likely(result) {
-		char *name = (char *)result + CEILDIV(((unsigned int)size + 1) * sizeof(char *), sizeof(char));
-		for (i = 0; i < (unsigned int)size; ++i, name = strend(name) + 1)
+		char *name = (char *)result + CEILDIV((size + 1) *
+		                                      sizeof(char *),
+		                                      sizeof(char));
+		for (i = 0; i < size; ++i, name = strend(name) + 1)
 			result[i] = name;
 		result[i] = NULL;
 	}
@@ -249,22 +251,22 @@ err:
 }
 /*[[[end:libc_backtrace_symbols]]]*/
 
-/*[[[head:libc_backtrace_symbols_fd,hash:CRC-32=0xf9a92b20]]]*/
+/*[[[head:libc_backtrace_symbols_fd,hash:CRC-32=0x1d1f8601]]]*/
 /* This function is similar to backtrace_symbols()
  * but it writes the result immediately to a file */
 INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
-                                                int size,
+                                                __STDC_INT_AS_UINT_T size,
                                                 fd_t fd)
 /*[[[body:libc_backtrace_symbols_fd]]]*/
 {
 	ssize_t error;
 	unsigned int i;
-	if unlikely(size < 0)
+	if unlikely((int)size < 0)
 		return;
 	if (!init_libdebuginfo())
 		return;
-	for (i = 0; i < (unsigned int)size; ++i) {
+	for (i = 0; i < size; ++i) {
 		PRIVATE SECTION_DEBUG_STRING("debug_lf") char const debug_lf[1] = { '\n' };
 		PRIVATE SECTION_DEBUG_STRING("debug_unknown_name") char const debug_unknown_name[1] = { '?' };
 		error = print_function_name(array[i],

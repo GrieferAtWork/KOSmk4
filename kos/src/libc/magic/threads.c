@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default_impl_section(".text.crt.sched.threads")]
+%[default:section(".text.crt.sched.threads")]
 
 %[define_replacement(tss_t = __tss_t)]
 %[define_replacement(thrd_t = __thrd_t)]
@@ -40,6 +40,9 @@
 %[define_replacement(mtx_recursive = __mtx_recursive)]
 %[define_replacement(mtx_timed     = __mtx_timed)]
 
+%(auto_source){
+STATIC_ASSERT(sizeof(int) <= sizeof(void *));
+}
 
 %{
 #include <features.h>
@@ -144,7 +147,7 @@ typedef __cnd_t cnd_t;
 @@are passed through ARG. If successful, THR is set to new thread identifier
 [[decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<parts/errno.h>")]]
-[[userimpl, requires_function(pthread_create)]]
+[[requires_function(pthread_create)]]
 int thrd_create(thrd_t *thr, thrd_start_t func, void *arg) {
 	int error;
 	STATIC_ASSERT(sizeof(int) <= sizeof(void *));
@@ -262,7 +265,7 @@ int thrd_sleep64([[nonnull]] struct timespec64 const *time_point,
 @@storage and freeing resources. Returns the value specified in RES
 @@s.a. `pthread_exit()'
 [[ATTR_NORETURN, throws]]
-[[userimpl, requires_function(pthread_exit)]]
+[[requires_function(pthread_exit)]]
 void thrd_exit(int res) {
 	pthread_exit((void *)(uintptr_t)(unsigned int)res);
 }
@@ -272,7 +275,7 @@ void thrd_exit(int res) {
 @@s.a. `pthread_detach()'
 [[impl_include("<asm/threads.h>")]]
 [[decl_include("<bits/threads.h>")]]
-[[userimpl, requires_function(pthread_detach)]]
+[[requires_function(pthread_detach)]]
 int thrd_detach(thrd_t thr) {
 	int error;
 	error = pthread_detach((pthread_t)thr);
@@ -286,7 +289,7 @@ int thrd_detach(thrd_t thr) {
 @@s.a. `pthread_join()'
 [[cp, decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>")]]
-[[userimpl, requires_function(pthread_join)]]
+[[requires_function(pthread_join)]]
 int thrd_join(thrd_t thr, int *res) {
 	int error;
 @@pp_if __SIZEOF_POINTER__ != __SIZEOF_INT__@@
@@ -323,7 +326,7 @@ void thrd_yield() = pthread_yield;
 @@s.a. `pthread_mutex_init()'
 [[decl_include("<features.h>", "<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadvalues.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires_function(pthread_mutex_init)]]
+[[requires_function(pthread_mutex_init)]]
 int mtx_init([[nonnull]] mtx_t *__restrict mutex, __STDC_INT_AS_UINT_T type) {
 	int error;
 	if (type == mtx_plain) {
@@ -350,7 +353,7 @@ int mtx_init([[nonnull]] mtx_t *__restrict mutex, __STDC_INT_AS_UINT_T type) {
 @@s.a. `pthread_mutex_lock()'
 [[cp, decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires_function(pthread_mutex_lock)]]
+[[requires_function(pthread_mutex_lock)]]
 int mtx_lock([[nonnull]] mtx_t *__restrict mutex) {
 	int error;
 	error = pthread_mutex_lock((pthread_mutex_t *)mutex);
@@ -368,7 +371,7 @@ int mtx_lock([[nonnull]] mtx_t *__restrict mutex) {
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("mtx_timedlock")]]
 [[decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires_function(pthread_mutex_timedlock)]]
+[[requires_function(pthread_mutex_timedlock)]]
 int mtx_timedlock([[nonnull]] mtx_t *__restrict mutex,
                   [[nonnull]] struct timespec const *__restrict time_point) {
 	int error;
@@ -382,7 +385,7 @@ int mtx_timedlock([[nonnull]] mtx_t *__restrict mutex,
 [[cp, doc_alias("mtx_timedlock"), time64_variant_of(mtx_timedlock)]]
 [[decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires_function(pthread_mutex_timedlock64)]]
+[[requires_function(pthread_mutex_timedlock64)]]
 int mtx_timedlock64([[nonnull]] mtx_t *__restrict mutex,
                     [[nonnull]] struct timespec64 const *__restrict time_point) {
 	int error;
@@ -400,7 +403,7 @@ int mtx_timedlock64([[nonnull]] mtx_t *__restrict mutex,
 @@s.a. `pthread_mutex_trylock()'
 [[decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires_function(pthread_mutex_trylock)]]
+[[requires_function(pthread_mutex_trylock)]]
 int mtx_trylock([[nonnull]] mtx_t *__restrict mutex) {
 	int error;
 	error = pthread_mutex_trylock((pthread_mutex_t *)mutex);
@@ -414,7 +417,7 @@ int mtx_trylock([[nonnull]] mtx_t *__restrict mutex) {
 @@s.a. `pthread_mutex_unlock()'
 [[decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires_function(pthread_mutex_unlock)]]
+[[requires_function(pthread_mutex_unlock)]]
 int mtx_unlock([[nonnull]] mtx_t *__restrict mutex) {
 	int error;
 	error = pthread_mutex_unlock((pthread_mutex_t *)mutex);
@@ -446,7 +449,7 @@ void call_once([[nonnull]] once_flag *__restrict flag,
 @@s.a. `pthread_cond_init()'
 [[decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires_function(pthread_cond_init)]]
+[[requires_function(pthread_cond_init)]]
 int cnd_init([[nonnull]] cnd_t *__restrict cond) {
 	int error;
 	error = pthread_cond_init((pthread_cond_t *)cond, NULL);
@@ -459,7 +462,7 @@ int cnd_init([[nonnull]] cnd_t *__restrict cond) {
 @@s.a. `pthread_cond_signal()'
 [[decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires_function(pthread_cond_signal)]]
+[[requires_function(pthread_cond_signal)]]
 int cnd_signal([[nonnull]] cnd_t *__restrict cond) {
 	int error;
 	error = pthread_cond_signal((pthread_cond_t *)cond);
@@ -472,7 +475,7 @@ int cnd_signal([[nonnull]] cnd_t *__restrict cond) {
 @@s.a. `pthread_cond_broadcast()'
 [[decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires($has_function(pthread_cond_broadcast))]]
+[[requires($has_function(pthread_cond_broadcast))]]
 int cnd_broadcast([[nonnull]] cnd_t *__restrict cond) {
 	int error;
 	error = pthread_cond_broadcast((pthread_cond_t *)cond);
@@ -485,7 +488,7 @@ int cnd_broadcast([[nonnull]] cnd_t *__restrict cond) {
 @@s.a. `pthread_cond_wait()'
 [[cp, decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires_function(pthread_cond_wait)]]
+[[requires_function(pthread_cond_wait)]]
 int cnd_wait([[nonnull]] cnd_t *__restrict cond,
              [[nonnull]] mtx_t *__restrict mutex) {
 	int error;
@@ -504,7 +507,7 @@ int cnd_wait([[nonnull]] cnd_t *__restrict cond,
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias(cnd_timedwait)]]
 [[decl_include("<bits/threads.h>", "<bits/timespec.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires($has_function(pthread_cond_timedwait))]]
+[[requires($has_function(pthread_cond_timedwait))]]
 int cnd_timedwait([[nonnull]] cnd_t *__restrict cond,
                   [[nonnull]] mtx_t *__restrict mutex,
                   [[nonnull]] struct timespec const *__restrict time_point) {
@@ -523,7 +526,7 @@ int cnd_timedwait([[nonnull]] cnd_t *__restrict cond,
 [[cp, doc_alias("cnd_timedwait"), time64_variant_of(cnd_timedwait)]]
 [[decl_include("<bits/threads.h>", "<bits/timespec.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires($has_function(pthread_cond_timedwait))]]
+[[requires($has_function(pthread_cond_timedwait64))]]
 int cnd_timedwait64([[nonnull]] cnd_t *__restrict cond,
                     [[nonnull]] mtx_t *__restrict mutex,
                     [[nonnull]] struct timespec64 const *__restrict time_point) {
@@ -553,7 +556,7 @@ void cnd_destroy(cnd_t *cond) = pthread_cond_destroy;
 @@s.a. `pthread_key_create()'
 [[decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires_function(pthread_key_create)]]
+[[requires_function(pthread_key_create)]]
 int tss_create(tss_t *tss_id, tss_dtor_t destructor) {
 	int error;
 	error = pthread_key_create((pthread_key_t *)tss_id, destructor);
@@ -573,7 +576,7 @@ void *tss_get(tss_t tss_id) = pthread_getspecific;
 @@s.a. `pthread_setspecific()'
 [[decl_include("<bits/threads.h>")]]
 [[impl_include("<asm/threads.h>", "<bits/pthreadtypes.h>")]]
-[[userimpl, requires_function(pthread_setspecific)]]
+[[requires_function(pthread_setspecific)]]
 int tss_set(tss_t tss_id, void *val) {
 	int error;
 	error = pthread_setspecific((pthread_key_t)tss_id, val);

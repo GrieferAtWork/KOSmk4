@@ -26,7 +26,7 @@
 %[define_replacement(time64_t = __time64_t)]
 %[define_replacement(__SOCKADDR_ARG       = "struct sockaddr *__restrict")]
 %[define_replacement(__CONST_SOCKADDR_ARG = "struct sockaddr const *__restrict")]
-%[default_impl_section(".text.crt.net.socket")]
+%[default:section(".text.crt.net.socket")]
 
 %{
 #include <features.h>

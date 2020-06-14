@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(uid_t = __uid_t)]
-%[default_impl_section(".text.crt.database.pwd")]
+%[default:section(".text.crt.database.pwd")]
 
 %{
 #include <features.h>

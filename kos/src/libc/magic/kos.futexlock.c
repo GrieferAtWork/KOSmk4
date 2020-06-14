@@ -20,7 +20,7 @@
 
 %[define_replacement(lfutex_t = __uintptr_t)]
 %[define_replacement(syscall_ulong_t = __syscall_ulong_t)]
-%[default_impl_section(".text.crt.sched.futexlock")]
+%[default:section(".text.crt.sched.futexlock")]
 
 %{
 #include <features.h>

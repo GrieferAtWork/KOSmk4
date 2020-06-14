@@ -22,7 +22,7 @@
 %[define_partial_replacement(argc = ___argc)]
 %[define_partial_replacement(argv = ___argv)]
 %[define_partial_replacement(envp = ___envp)]
-%[default_impl_section(".text.crt.application.options")]
+%[default:section(".text.crt.application.options")]
 
 %{
 #include <features.h>

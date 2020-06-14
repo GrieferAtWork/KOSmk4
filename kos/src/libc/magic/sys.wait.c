@@ -22,7 +22,7 @@
 %[define_replacement(rusage32 = __rusage32)]
 %[define_replacement(rusage64 = __rusage64)]
 %[define_replacement(idtype_t = int)]
-%[default_impl_section(".text.crt.sched.wait")]
+%[default:section(".text.crt.sched.wait")]
 
 %{
 #include <features.h>

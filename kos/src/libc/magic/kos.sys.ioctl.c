@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default_impl_section(".text.crt.except.io.utility")]
+%[default:section(".text.crt.except.io.utility")]
 
 %{
 #include <sys/ioctl.h>

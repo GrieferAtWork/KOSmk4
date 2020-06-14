@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5833cad */
+/* HASH CRC-32:0x46ed284d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -920,21 +920,21 @@ struct format_16to32_data {
 	__CHAR16_TYPE__     fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 };
 #if defined(__CRT_HAVE_format_wto32) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-/* Format printer (compatible with `__pc16formatprinter') for
+/* Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wto32)
-/* Format printer (compatible with `__pc16formatprinter') for
+/* Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __CREDIRECT_DOS(,__SSIZE_TYPE__,__NOTHROW_NCX,format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 #include <local/unicode/format_wto32.h>
-/* Format printer (compatible with `__pc16formatprinter') for
+/* Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL format_16to32)(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wto32))(__arg, (__WCHAR_TYPE__ const *)__data, __datalen); }
 #else /* ... */
 #include <local/unicode/format_16to32.h>
-/* Format printer (compatible with `__pc16formatprinter') for
+/* Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_16to32, __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL format_16to32)(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_16to32))(__arg, __data, __datalen); })
 #endif /* !... */

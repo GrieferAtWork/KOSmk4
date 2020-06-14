@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(errno_t = __errno_t)]
-%[default_impl_section(".text.crt.errno.utility")]
+%[default:section(".text.crt.errno.utility")]
 
 %[define_replacement(EPERM           = __EPERM)]           /* Operation not permitted */
 %[define_replacement(ENOENT          = __ENOENT)]          /* No such file or directory */

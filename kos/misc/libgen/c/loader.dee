@@ -954,12 +954,8 @@ class FunctionFeatures {
 			"no_requires"                 : ("requires", "1"),
 			"no_requires_prefix"          : ("requiresPrefix", ""),
 			"no_impl_prefix"              : ("implPrefix", ""),
-			"macro"                       : ("macroBinding", true),
-			"macros"                      : ("macroBinding", true),
-			"no_macro"                    : ("macroBinding", false),
-			"no_macros"                   : ("macroBinding", false),
-			"allow_macros"                : ("macroBinding", true), /* Deprecated name */
-			"disallow_macros"             : ("macroBinding", false), /* Deprecated name */
+			"macro_bindings"              : ("macroBinding", true),
+			"no_macro_bindings"           : ("macroBinding", false),
 			"noguard"                     : ("guard", false),
 			"no_guard"                    : ("guard", false),
 			"default_guard_names"         : ("guardNames", none),
@@ -1118,7 +1114,6 @@ class FunctionFeatures {
 			self.skip(")");
 		}	break;
 
-		case "dependency_include": /* Deprecated alias */
 		case "impl_include": {
 			if (ppCond !is none)
 				goto err_unexpected_if;
@@ -1137,7 +1132,6 @@ class FunctionFeatures {
 			self.skip(")");
 		}	break;
 
-		case "dependency_prefix": /* Deprecated alias */
 		case "impl_prefix": {
 			if (ppCond !is none)
 				goto err_unexpected_if;
@@ -1724,11 +1718,6 @@ do_push_macroList:
 		if (!pushedDefaultFeatures)
 			self.err("%[popdefault] without %[pushdefault]");
 		defaultFeatures = pushedDefaultFeatures.popback();
-	}
-
-	public function parseDirective_default_impl_section() {
-		self.tok = "section"; /* Deprecated alias for "%[default:section(...)]" */
-		defaultFeatures.tryParseAttribute(self, none);
 	}
 
 	public function parseDirective_default() {
@@ -2560,8 +2549,6 @@ again_parse_annotations:
 				}	break;
 
 				case "export_as":
-				case "alternate_name":  /* Deprecated alias */
-				case "alternate_names": /* Deprecated alias */
 					self.next();
 					tok = self.skip("(");
 					while (tok !in ["", ")"]) {

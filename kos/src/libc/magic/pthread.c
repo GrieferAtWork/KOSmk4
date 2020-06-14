@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default_impl_section(".text.crt.sched.pthread")]
+%[default:section(".text.crt.sched.pthread")]
 %[define_replacement(clockid_t = __clockid_t)]
 %[define_replacement(pthread_t = __pthread_t)]
 %[define_replacement(pthread_attr_t = __pthread_attr_t)]
@@ -1558,7 +1558,7 @@ int pthread_atfork([[nullable]] __pthread_atfork_func_t prepare,
                    [[nullable]] __pthread_atfork_func_t parent,
                    [[nullable]] __pthread_atfork_func_t child);
 
-%[default_impl_section(".text.crt.sched.pthread_ext")]
+%[default:section(".text.crt.sched.pthread_ext")]
 
 %
 %

@@ -20,7 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
-%[default_impl_section(".text.crt.io.utility")]
+%[default:section(".text.crt.io.utility")]
 
 %{
 #include <features.h>

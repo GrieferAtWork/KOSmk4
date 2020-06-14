@@ -122,28 +122,16 @@ NOTHROW_RPC(LIBCCALL libc__getdiskfree)(unsigned int drive,
 }
 /*[[[end:libc__getdiskfree]]]*/
 
-/*[[[head:libc__mkdir,hash:CRC-32=0xa805db12]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc__mkdir)(char const *path)
-/*[[[body:libc__mkdir]]]*/
-{
-	errno_t result;
-	result = sys_mkdir(path, 0755);
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libc__mkdir]]]*/
-
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xaa2dc853]]]*/
+/*[[[start:exports,hash:CRC-32=0x842fe167]]]*/
 DEFINE_PUBLIC_ALIAS(_getdcwd, libc__getdcwd);
 DEFINE_PUBLIC_ALIAS(_chdrive, libc__chdrive);
 DEFINE_PUBLIC_ALIAS(_getdrive, libc__getdrive);
 DEFINE_PUBLIC_ALIAS(_getdrives, libc__getdrives);
 DEFINE_PUBLIC_ALIAS(_getdiskfree, libc__getdiskfree);
-DEFINE_PUBLIC_ALIAS(_mkdir, libc__mkdir);
 /*[[[end:exports]]]*/
 
 DECL_END

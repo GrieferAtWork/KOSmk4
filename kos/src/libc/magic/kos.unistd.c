@@ -46,7 +46,7 @@ typedef __pos64_t pos64_t; /* File/device position */
 
 }
 
-%[default_impl_section(".text.crt.except.fs.exec.exec")];
+%[default:section(".text.crt.except.fs.exec.exec")];
 
 [[cp, throws, ATTR_NORETURN, doc_alias(execv), argument_names(path, ___argv)]]
 void Execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV);
@@ -94,7 +94,7 @@ void FSync($fd_t fd) {
 }
 
 
-%[default_impl_section(".text.crt.except.sched.process")]
+%[default:section(".text.crt.except.sched.process")]
 
 %
 [[throws, doc_alias("setpgid")]]
@@ -124,7 +124,7 @@ $pid_t Fork();
 long int FPathConf($fd_t fd, int name);
 
 
-%[default_impl_section(".text.crt.except.fs.modify")]
+%[default:section(".text.crt.except.fs.modify")]
 
 
 %
@@ -229,7 +229,7 @@ void Chdir([[nonnull]] char const *path);
 [[section(".text.crt.except.fs.basic_property")]]
 char *GetCwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 
-%[default_impl_section(".text.crt.fs.modify")]
+%[default:section(".text.crt.fs.modify")]
 
 %
 [[cp, throws, doc_alias("unlink")]]
@@ -247,7 +247,7 @@ void Rmdir([[nonnull]] char const *path) {
 
 %
 %#ifdef __USE_ATFILE
-%[default_impl_section(".text.crt.except.fs.modify")]
+%[default:section(".text.crt.except.fs.modify")]
 
 %
 [[cp, throws, doc_alias("fchownat")]]
@@ -265,7 +265,7 @@ void LinkAt($fd_t fromfd, [[nonnull]] char const *from,
 void SymlinkAt([[nonnull]] char const *link_text, $fd_t tofd,
                [[nonnull]] char const *target_path);
 
-%[default_impl_section(".text.crt.except.fs.property")]
+%[default:section(".text.crt.except.fs.property")]
 
 %
 [[cp, throws, doc_alias("readlinkat")]]
@@ -279,7 +279,7 @@ size_t FReadlinkAt($fd_t dfd, [[nonnull]] char const *__restrict path,
                    [[outp(buflen)]] char *__restrict buf, size_t buflen, $atflag_t flags);
 %#endif /* __USE_KOS */
 
-%[default_impl_section(".text.crt.except.fs.modify")]
+%[default:section(".text.crt.except.fs.modify")]
 
 %
 [[cp, throws, doc_alias("unlinkat")]]
@@ -424,7 +424,7 @@ void SyncFs($fd_t fd) {
 	/* NO-OP */
 }
 
-%[default_impl_section(".text.crt.except.sched.user")];
+%[default:section(".text.crt.except.sched.user")];
 
 void GetResUid($uid_t *ruid, $uid_t *euid, $uid_t *suid);
 void GetResGid($gid_t *rgid, $gid_t *egid, $gid_t *sgid);

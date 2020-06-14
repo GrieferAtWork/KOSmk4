@@ -132,11 +132,6 @@ function updateUserImplementationSourceFile(
 					local functionDeclHash: int;
 					try {
 						functionDeclHash = hash(functionDeclHashMethod, functionDecl);
-						/* TODO:REMOVE_ME:BEGIN */
-						/* Only here for the transitional period to the new generator */
-						if (functionDeclHash != functionDeclHashValue)
-							functionDeclHash = hash(functionDeclHashMethod, functionDecl.strip());
-						/* TODO:REMOVE_ME:END */
 					} catch (Error as e) {
 						errAt(tagStart, e.message);
 					}
@@ -156,26 +151,13 @@ function updateUserImplementationSourceFile(
 				if (bodyText.endswith(MAGIC_ALIAS_ENDIF))
 					bodyText = bodyText[:-#MAGIC_ALIAS_ENDIF];
 				if (func is none) {
-					/* TODO:REMOVE_ME:BEGIN */
-					/* Only here for the transitional period to the new generator */
-					local functionName2;
-					if (functionName.startswith("DOS$"))
-						functionName2 = "libd_" + functionName[4:];
-					else {
-						functionName2 = "libc_" + functionName;
+					/* Discard the function if its body is auto-generated */
+					if (isFunctionBodyGenerated(none, bodyText)) {
+						printUpdateMessage("Removing deleted function: {!r}"
+							.format({ functionName }));
+						goto discard_function_during_scan;
 					}
-					func = missingSourceFunctionsByName.pop(functionName2, none);
-					if (func is none)
-					/* TODO:REMOVE_ME:END */
-					{
-						/* Discard the function if its body is auto-generated */
-						if (isFunctionBodyGenerated(none, bodyText)) {
-							printUpdateMessage("Removing deleted function: {!r}"
-								.format({ functionName }));
-							goto discard_function_during_scan;
-						}
-						errAt(tagStart, "Unknown function {!r}".format({ functionName }));
-					}
+					errAt(tagStart, "Unknown function {!r}".format({ functionName }));
 				}
 				/* Delete the body (thus forcing it to be re-generated)
 				 * if the old body was simply auto-generated. */
@@ -209,11 +191,6 @@ discard_function_during_scan:
 					local exportTableHash;
 					try {
 						exportTableHash = hash(hashMethod, exportTableText);
-						/* TODO:REMOVE_ME:BEGIN */
-						/* Only here for the transitional period to the new generator */
-						if (exportTableHash != hashValue)
-							exportTableHash = hash(hashMethod, exportTableText.strip());
-						/* TODO:REMOVE_ME:END */
 					} catch (Error as e) {
 						errAt(tagStart, e.message);
 					}

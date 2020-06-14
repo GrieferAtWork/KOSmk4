@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19d17763 */
+/* HASH CRC-32:0xa8a908e9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/format-printer.h>
 #include <bits/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `__pwformatprinter') for
+/* Format printer (compatible with `pwformatprinter') for
  * converting wide-character unicode input data into a UTF-16 output */
 __LOCAL_LIBC(format_32to16) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_32to16))(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {

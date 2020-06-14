@@ -22,7 +22,7 @@
 %[define_replacement(syscall_ulong_t = __syscall_ulong_t)]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
-%[default_impl_section(".text.crt.sched.futexexpr")]
+%[default:section(".text.crt.sched.futexexpr")]
 
 %{
 #include <features.h>

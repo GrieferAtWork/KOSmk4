@@ -19,7 +19,7 @@
  */
 
 
-%[default_impl_section(".text.crt.system.reboot")]
+%[default:section(".text.crt.system.reboot")]
 
 %{
 #include <features.h>

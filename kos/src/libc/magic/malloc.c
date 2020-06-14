@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default_impl_section(".text.crt.heap.malloc")]
+%[default:section(".text.crt.heap.malloc")]
 
 %(libc_fast){
 #include "stdlib.h"

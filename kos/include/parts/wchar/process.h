@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4f8638e */
+/* HASH CRC-32:0x147de93e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,7 +108,11 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBKCALL wexecl)
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBDCALL wexecl)(wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_DOS("_wexecl");
 #elif defined(__CRT_HAVE_wexecv) || (defined(__CRT_HAVE_DOS$wexecv) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wexecv) && __SIZEOF_WCHAR_T__ == 2)
 #include <local/parts.wchar.process/wexecl.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(wexecl)
+#else /* __cplusplus */
 #define wexecl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecl))
+#endif /* !__cplusplus */
 #else /* ... */
 #undef __wexecl_defined
 #endif /* !... */
@@ -123,7 +127,11 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBKCALL wexeclp
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBDCALL wexeclp)(wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME_DOS("_wexeclp");
 #elif defined(__CRT_HAVE_wexecvp) || (defined(__CRT_HAVE_DOS$wexecvp) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wexecvp) && __SIZEOF_WCHAR_T__ == 2)
 #include <local/parts.wchar.process/wexeclp.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(wexeclp)
+#else /* __cplusplus */
 #define wexeclp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclp))
+#endif /* !__cplusplus */
 #else /* ... */
 #undef __wexeclp_defined
 #endif /* !... */
@@ -138,7 +146,11 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBKCALL we
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBDCALL wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_DOS("_wexecle");
 #elif defined(__CRT_HAVE_wexecve) || (defined(__CRT_HAVE_DOS$wexecve) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wexecve) && __SIZEOF_WCHAR_T__ == 2)
 #include <local/parts.wchar.process/wexecle.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(wexecle)
+#else /* __cplusplus */
 #define wexecle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecle))
+#endif /* !__cplusplus */
 #else /* ... */
 #undef __wexecle_defined
 #endif /* !... */
@@ -153,7 +165,11 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBKCALL we
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBDCALL wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME_DOS("_wexeclpe");
 #elif defined(__CRT_HAVE_wexecvpe) || (defined(__CRT_HAVE_DOS$wexecvpe) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wexecvpe) && __SIZEOF_WCHAR_T__ == 2)
 #include <local/parts.wchar.process/wexeclpe.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(wexeclpe)
+#else /* __cplusplus */
 #define wexeclpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclpe))
+#endif /* !__cplusplus */
 #else /* ... */
 #undef __wexeclpe_defined
 #endif /* !... */
@@ -216,7 +232,11 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBKCALL wsp
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBDCALL wspawnl)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_DOS("_wspawnl");
 #elif defined(__CRT_HAVE_wspawnv) || (defined(__CRT_HAVE_DOS$wspawnv) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wspawnv) && __SIZEOF_WCHAR_T__ == 2)
 #include <local/parts.wchar.process/wspawnl.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(wspawnl)
+#else /* __cplusplus */
 #define wspawnl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnl))
+#endif /* !__cplusplus */
 #else /* ... */
 #undef __wspawnl_defined
 #endif /* !... */
@@ -231,7 +251,11 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBKCALL wsp
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBDCALL wspawnlp)(int __mode, wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME_DOS("_wspawnlp");
 #elif defined(__CRT_HAVE_wspawnvp) || (defined(__CRT_HAVE_DOS$wspawnvp) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wspawnvp) && __SIZEOF_WCHAR_T__ == 2)
 #include <local/parts.wchar.process/wspawnlp.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(wspawnlp)
+#else /* __cplusplus */
 #define wspawnlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlp))
+#endif /* !__cplusplus */
 #else /* ... */
 #undef __wspawnlp_defined
 #endif /* !... */
@@ -246,7 +270,11 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBKCAL
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBDCALL wspawnle)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_DOS("_wspawnle");
 #elif defined(__CRT_HAVE_wspawnve) || (defined(__CRT_HAVE_DOS$wspawnve) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wspawnve) && __SIZEOF_WCHAR_T__ == 2)
 #include <local/parts.wchar.process/wspawnle.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(wspawnle)
+#else /* __cplusplus */
 #define wspawnle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnle))
+#endif /* !__cplusplus */
 #else /* ... */
 #undef __wspawnle_defined
 #endif /* !... */
@@ -261,7 +289,11 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBKCAL
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBDCALL wspawnlpe)(int __mode, wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME_DOS("_wspawnlpe");
 #elif defined(__CRT_HAVE_wspawnvpe) || (defined(__CRT_HAVE_DOS$wspawnvpe) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wspawnvpe) && __SIZEOF_WCHAR_T__ == 2)
 #include <local/parts.wchar.process/wspawnlpe.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(wspawnlpe)
+#else /* __cplusplus */
 #define wspawnlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlpe))
+#endif /* !__cplusplus */
 #else /* ... */
 #undef __wspawnlpe_defined
 #endif /* !... */

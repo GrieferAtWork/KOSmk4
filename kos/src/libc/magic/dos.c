@@ -78,7 +78,7 @@ __FORCELOCAL void (__LIBCCALL _enable)(void) { __sti(); }
 
 
 %#ifdef __USE_OLD_DOS
-%[default_impl_section(".text.crt.dos.system")]
+%[default:section(".text.crt.dos.system")]
 
 @@Sleep for `mill' milliseconds (1/1.000 seconds)
 [[cp, export_alias("__crtSleep")]]
@@ -93,7 +93,7 @@ void delay(unsigned int mill) {
 [[cp, guard, nocrt, alias("_sleep", "sleep"), exposed_name("sleep")]]
 void dos_sleep(unsigned int duration);
 
-%[default_impl_section(".text.crt.fs.modify")]
+%[default:section(".text.crt.fs.modify")]
 %[insert:extern(unlink)]
 
 %{

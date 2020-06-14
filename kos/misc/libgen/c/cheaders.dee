@@ -379,12 +379,14 @@ class FunctionPrototype {
 	public property argsByName: {string: Argument} = {
 		get(): {string: Argument} {
 			if (m_argsByName !is bound) {
-				m_argsByName = Dict();
+				local result = Dict();
 				for (local a: argv) {
-					local usedName = str a.name;
+					local usedName = str(a.name);
 					if (usedName)
-						m_argsByName[usedName] = a;
+						result[usedName] = a;
 				}
+				m_argsByName = result;
+				return result;
 			}
 			return m_argsByName;
 		}

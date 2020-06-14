@@ -193,7 +193,7 @@ __NAMESPACE_STD_USING(wint_t)
 
 
 
-%[default_impl_section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")];
+%[default:section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")];
 [[std, wunused, ATTR_CONST, wchar]]
 wint_t btowc(int ch) {
 	if (ch >= 0 && ch <= 0x7f)
@@ -503,7 +503,7 @@ $size_t wcsxfrm([[nonnull]] wchar_t *dst,
 	%{generate(str2wcs)}
 
 
-%[default_impl_section("{.text.crt.wchar.FILE.locked.read.getc|.text.crt.dos.wchar.FILE.locked.read.getc}")]
+%[default:section("{.text.crt.wchar.FILE.locked.read.getc|.text.crt.dos.wchar.FILE.locked.read.getc}")]
 [[cp_stdio, std, guard, wchar, requires_include("<__crt.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && $has_function(fgetwc))]]
 [[impl_include("<local/stdstreams.h>"), export_alias("_fgetwchar")]]
@@ -609,7 +609,7 @@ size_t wcsftime([[outp(min(return, buflen))]] wchar_t *__restrict buf, size_t bu
 	return 0;
 }
 
-%[default_impl_section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]
+%[default:section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]
 %(std)
 %(std)#if !defined(__USE_DOS) || defined(__USE_ISOC95)
 [[std, guard, wchar, no_crt_self_import, crt_dosname("wcstok_s")]]
@@ -757,7 +757,7 @@ __STDC_INT_AS_SIZE_T swprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__r
 
 %(std)#endif /* __USE_ISOC95 || __USE_UNIX98 || __USE_DOS */
 
-%[default_impl_section("{.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert}")]
+%[default:section("{.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert}")]
 %(std)
 
 %(std,c,ccompat)#ifndef __NO_FPU
@@ -799,7 +799,7 @@ __ULONGLONG wcstoull([[nonnull]] wchar_t const *__restrict nptr,
                      [[nullable]] wchar_t **endptr, int base)
 	%{generate(str2wcs)}
 
-%[default_impl_section("{.text.crt.wchar.FILE.locked.read.scanf|.text.crt.dos.wchar.FILE.locked.read.scanf}")]
+%[default:section("{.text.crt.wchar.FILE.locked.read.scanf|.text.crt.dos.wchar.FILE.locked.read.scanf}")]
 
 [[decl_include("<features.h>")]]
 [[cp_stdio, std, guard, wchar, wunused, ATTR_LIBC_WSCANF(2, 0)]]
@@ -815,7 +815,7 @@ __STDC_INT_AS_SIZE_T vwscanf([[nonnull]] wchar_t const *__restrict format, $va_l
 	return vfwscanf(stdin, format, args);
 }
 
-%[default_impl_section("{.text.crt.wchar.unicode.static.format.scanf|.text.crt.dos.wchar.unicode.static.format.scanf}")]
+%[default:section("{.text.crt.wchar.unicode.static.format.scanf|.text.crt.dos.wchar.unicode.static.format.scanf}")]
 
 [[decl_include("<features.h>")]]
 [[std, guard, wchar, wunused, ATTR_LIBC_WSCANF(2, 0)]]
@@ -1210,7 +1210,7 @@ $size_t wcsftime_l([[outp(maxsize)]] wchar_t *__restrict buf, $size_t maxsize,
 %/* KOS FILE extension functions. */
 %
 
-%[default_impl_section(".text.crt.wchar.FILE.locked.write.write")]
+%[default:section(".text.crt.wchar.FILE.locked.write.write")]
 @@For use with `format_printf()' and friends: Prints to a `FILE *' closure argument
 [[cp_stdio, wchar, impl_include("<asm/stdio.h>")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("file_wprinter_unlocked")]]
@@ -1227,7 +1227,7 @@ $ssize_t file_wprinter([[nonnull]] void *arg,
 	return (ssize_t)i;
 }
 
-%[default_impl_section(".text.crt.wchar.FILE.unlocked.write.write")]
+%[default:section(".text.crt.wchar.FILE.unlocked.write.write")]
 @@Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG'
 [[cp_stdio, wchar, impl_include("<asm/stdio.h>"), alias("file_wprinter")]]
 [[userimpl, requires_function(fputwc_unlocked)]]
@@ -1277,7 +1277,7 @@ __STDC_INT_AS_SIZE_T vwprintf_unlocked([[nonnull]] wchar_t const *__restrict for
 	return vfwprintf_unlocked(stdout, format, args);
 }
 
-%[default_impl_section("{.text.crt.wchar.FILE.unlocked.read.scanf|.text.crt.dos.wchar.FILE.unlocked.read.scanf}")]
+%[default:section("{.text.crt.wchar.FILE.unlocked.read.scanf|.text.crt.dos.wchar.FILE.unlocked.read.scanf}")]
 
 [[decl_include("<features.h>")]]
 [[cp_stdio, wunused, ATTR_LIBC_WSCANF(2, 0), wchar, alias("vfwscanf")]]
@@ -1662,7 +1662,7 @@ int wcsverscmp([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2)
 
 %
 %#ifdef __USE_XOPEN2K8
-%[default_impl_section("{.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory}")]
+%[default:section("{.text.crt.wchar.unicode.locale.memory|.text.crt.dos.wchar.unicode.locale.memory}")]
 
 [[wchar, crt_dosname("_wcsncoll_l")]]
 wcsncoll_l(*) %{generate(str2wcs)}
@@ -1761,7 +1761,7 @@ wcsncpy_s(*) %{generate(str2wcs)}
 
 %#endif  /* __USE_DOS_SLIB */
 
-%[default_impl_section(".text.crt.dos.wchar.errno")];
+%[default:section(".text.crt.dos.wchar.errno")];
 [[guard, wchar]] wchar_t *_wcserror(int errno_value);
 [[guard, wchar]] $errno_t _wcserror_s(wchar_t *buf, $size_t bufsize, int errno_value);
 [[guard, wchar]] wchar_t *__wcserror(wchar_t const *message);
@@ -1880,7 +1880,7 @@ wcsupr(*) %{generate(str2wcs)}
 %[insert:guarded_function(wscanf_s = wscanf)]
 %#endif /* __USE_DOS_SLIB */
 
-%[default_impl_section(".text.crt.dos.wchar.FILE.locked.write.printf")]
+%[default:section(".text.crt.dos.wchar.FILE.locked.write.printf")]
 
 [[guard, wchar, wunused, decl_include("<features.h>")]]
 __STDC_INT_AS_SSIZE_T _vscwprintf([[nonnull]] wchar_t const *format, $va_list args) {
@@ -2166,7 +2166,7 @@ __STDC_INT_AS_SSIZE_T _snwprintf_s_l([[outp(wchar_count)]] wchar_t *dst, $size_t
 
 
 
-%[default_impl_section(".text.crt.dos.wchar.FILE.locked.read.scanf")]
+%[default:section(".text.crt.dos.wchar.FILE.locked.read.scanf")]
 
 [[ignore, cp_stdio, wchar, wunused]]
 [[decl_include("<features.h>"), requires_function(vfwscanf)]]
@@ -2265,7 +2265,7 @@ __STDC_INT_AS_SSIZE_T _wscanf_l([[nonnull]] wchar_t const *format,
 %[insert:guarded_function(_wscanf_s_l = _wscanf_l)]
 
 
-%[default_impl_section(".text.crt.dos.wchar.FILE.locked.access")]
+%[default:section(".text.crt.dos.wchar.FILE.locked.access")]
 
 [[decl_include("<features.h>")]]
 [[guard, wchar, wunused]]

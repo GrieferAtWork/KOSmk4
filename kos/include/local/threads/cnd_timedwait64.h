@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc957b932 */
+/* HASH CRC-32:0x5eda594f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_cnd_timedwait64_defined
 #define __local_cnd_timedwait64_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64)
+#if defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <bits/threads.h>
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -83,7 +83,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_cnd_timedwait64_defined 1
 #define __localdep_cnd_timedwait64 __LIBC_LOCAL_NAME(cnd_timedwait64)
 #endif /* !__local___localdep_cnd_timedwait64_defined */
-#else /* __CRT_HAVE_pthread_cond_timedwait || __CRT_HAVE_pthread_cond_timedwait64 */
+#else /* __CRT_HAVE_pthread_cond_timedwait64 || __CRT_HAVE_pthread_cond_timedwait */
 #undef __local_cnd_timedwait64_defined
-#endif /* !__CRT_HAVE_pthread_cond_timedwait && !__CRT_HAVE_pthread_cond_timedwait64 */
+#endif /* !__CRT_HAVE_pthread_cond_timedwait64 && !__CRT_HAVE_pthread_cond_timedwait */
 #endif /* !__local_cnd_timedwait64_defined */

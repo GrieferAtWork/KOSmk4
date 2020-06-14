@@ -20,7 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(pid_t = __pid_t)]
-%[default_impl_section(".text.crt.utility.search")]
+%[default:section(".text.crt.utility.search")]
 
 %{
 #include <features.h>

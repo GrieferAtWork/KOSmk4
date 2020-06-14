@@ -21,7 +21,7 @@
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(itimerspec32 = __itimerspec32)]
 %[define_replacement(itimerspec64 = __itimerspec64)]
-%[default_impl_section(".text.crt.timer")]
+%[default:section(".text.crt.timer")]
 
 %{
 #include <features.h>

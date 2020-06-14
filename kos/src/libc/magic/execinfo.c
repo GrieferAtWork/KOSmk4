@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default_impl_section(".text.crt.debug")]
+%[default:section(".text.crt.debug")]
 
 %{
 #include <features.h>
@@ -51,17 +51,23 @@ __SYSDECL_BEGIN
 @@Store up to SIZE return address of the current program state
 @@in ARRAY and return the exact number of values stored
 [[export_alias("__backtrace")]]
-int backtrace([[nonnull]] void **array, int size);
+[[decl_include("<features.h>")]]
+__STDC_INT_AS_UINT_T backtrace([[nonnull]] void **array,
+                               __STDC_INT_AS_UINT_T size);
 
 @@Return names of functions from the backtrace list
 @@in ARRAY in a newly malloc()ed memory block
 [[export_alias("__backtrace_symbols")]]
-char **backtrace_symbols([[nonnull]] void *const *array, int size);
+[[decl_include("<features.h>")]]
+char **backtrace_symbols([[nonnull]] void *const *array,
+                         __STDC_INT_AS_UINT_T size);
 
 @@This function is similar to backtrace_symbols()
 @@but it writes the result immediately to a file
 [[export_alias("__backtrace_symbols_fd")]]
-void backtrace_symbols_fd([[nonnull]] void *const *array, int size, $fd_t fd);
+[[decl_include("<features.h>", "<bits/types.h>")]]
+void backtrace_symbols_fd([[nonnull]] void *const *array,
+                          __STDC_INT_AS_UINT_T size, $fd_t fd);
 
 
 %{

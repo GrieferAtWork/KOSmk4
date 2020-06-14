@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(pid_t = __pid_t)]
-%[default_impl_section(".text.crt.sched.resource")]
+%[default:section(".text.crt.sched.resource")]
 
 %{
 #include <features.h>

@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(sigset_t = "struct __sigset_struct")]
-%[default_impl_section(".text.crt.database.shadow")]
+%[default:section(".text.crt.database.shadow")]
 
 
 %{

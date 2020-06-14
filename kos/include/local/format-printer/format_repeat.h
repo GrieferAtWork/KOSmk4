@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b37733e */
+/* HASH CRC-32:0xb49ba1f6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,35 +49,32 @@ __NAMESPACE_LOCAL_BEGIN
  * is allowed to call `PRINTER' as often as it chooses */
 __LOCAL_LIBC(format_repeat) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_repeat))(__pformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions) __THROWS(...) {
-#ifndef __FORMAT_REPEAT_BUFSIZE
-#define __FORMAT_REPEAT_BUFSIZE 64
-#endif /* !FORMAT_REPEAT_BUFSIZE */
 	__SSIZE_TYPE__ __result, __temp;
 #ifdef __hybrid_alloca
 	char *__buffer;
-	if __likely(__num_repetitions <= __FORMAT_REPEAT_BUFSIZE) {
+	if __likely(__num_repetitions <= 64) {
 		__buffer = (char *)__hybrid_alloca(__num_repetitions);
 		__libc_memsetc(__buffer, __ch, __num_repetitions, __SIZEOF_CHAR__);
 		return (*__printer)(__arg, __buffer, __num_repetitions);
 	}
-	__buffer = (char *)__hybrid_alloca(__FORMAT_REPEAT_BUFSIZE);
-	__localdep_memset(__buffer, __ch, __FORMAT_REPEAT_BUFSIZE);
+	__buffer = (char *)__hybrid_alloca(64);
+	__localdep_memset(__buffer, __ch, 64);
 #else /* __hybrid_alloca */
-	char __buffer[__FORMAT_REPEAT_BUFSIZE];
-	if __likely(__num_repetitions <= __FORMAT_REPEAT_BUFSIZE) {
+	char __buffer[64];
+	if __likely(__num_repetitions <= 64) {
 		__libc_memsetc(__buffer, __ch, __num_repetitions, __SIZEOF_CHAR__);
 		return (*__printer)(__arg, __buffer, __num_repetitions);
 	}
-	__localdep_memset(__buffer, __ch, __FORMAT_REPEAT_BUFSIZE);
+	__localdep_memset(__buffer, __ch, 64);
 #endif /* !__hybrid_alloca */
-	__result = (*__printer)(__arg, __buffer, __FORMAT_REPEAT_BUFSIZE);
+	__result = (*__printer)(__arg, __buffer, 64);
 	if __unlikely(__result < 0)
 		goto __done;
 	for (;;) {
-		__num_repetitions -= __FORMAT_REPEAT_BUFSIZE;
-		if (__num_repetitions < __FORMAT_REPEAT_BUFSIZE)
+		__num_repetitions -= 64;
+		if (__num_repetitions < 64)
 			break;
-		__temp = (*__printer)(__arg, __buffer, __FORMAT_REPEAT_BUFSIZE);
+		__temp = (*__printer)(__arg, __buffer, 64);
 		if __unlikely(__temp < 0)
 			goto __done;
 		__result += __temp;

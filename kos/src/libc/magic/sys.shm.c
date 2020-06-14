@@ -21,7 +21,7 @@
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(pid_t = __pid_t)]
 %[define_replacement(key_t = __key_t)]
-%[default_impl_section(".text.crt.utility.shm")]
+%[default:section(".text.crt.utility.shm")]
 
 %{
 #include <features.h>

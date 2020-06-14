@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8d07a9f */
+/* HASH CRC-32:0x1eee5bfe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,21 +30,15 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate32,(__fd_t __fd, int __mode, 
 #endif /* !__local___localdep_fallocate32_defined && __CRT_HAVE_fallocate */
 __LOCAL_LIBC(fallocate64) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fallocate64))(__fd_t __fd, int __mode, __off64_t __offset, __off64_t __length) {
-#ifdef __BUILDING_LIBC
-	(void)__fd;
-	(void)__mode;
-	(void)__offset;
-	(void)__length;
-	return 0;
-#elif defined(__CRT_HAVE_fallocate)
+#ifdef __CRT_HAVE_fallocate
 	return __localdep_fallocate32(__fd, __mode, (__off32_t)__offset, (__off32_t)__length);
-#else /* ... */
+#else /* __CRT_HAVE_fallocate */
 	(void)__fd;
 	(void)__mode;
 	(void)__offset;
 	(void)__length;
 	return 0;
-#endif /* !... */
+#endif /* !__CRT_HAVE_fallocate */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fallocate64_defined

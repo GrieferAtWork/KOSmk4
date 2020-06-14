@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd349935f */
+/* HASH CRC-32:0xc432cf90 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,26 +24,6 @@
 #if (defined(__CRT_HAVE_creat64) || (defined(__CRT_HAVE_creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)) || (defined(__CRT_HAVE__creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: creat64 from fcntl */
-#ifndef __local___localdep_creat64_defined
-#define __local___localdep_creat64_defined 1
-#ifdef __CRT_HAVE_creat64
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_creat64,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
-#elif defined(__CRT_HAVE_creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_creat64,(char const *__filename, __mode_t __mode),creat,(__filename,__mode))
-#elif defined(__CRT_HAVE_creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_creat64,(char const *__filename, __mode_t __mode),creat,(__filename,__mode))
-#elif defined(__CRT_HAVE__creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_creat64,(char const *__filename, __mode_t __mode),_creat,(__filename,__mode))
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
-__NAMESPACE_LOCAL_END
-#include <local/fcntl/creat64.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_creat64 __LIBC_LOCAL_NAME(creat64)
-#else /* ... */
-#undef __local___localdep_creat64_defined
-#endif /* !... */
-#endif /* !__local___localdep_creat64_defined */
 /* Dependency: open from fcntl */
 #ifndef __local___localdep_open_defined
 #define __local___localdep_open_defined 1
@@ -69,11 +49,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(creat) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(creat))(char const *__filename, __mode_t __mode) {
-#if defined(__CRT_HAVE_creat64) || (defined(__CRT_HAVE_creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)) || (defined(__CRT_HAVE__creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
-	return __localdep_creat64(__filename, __mode);
-#else /* __CRT_HAVE_creat64 || (__CRT_HAVE_creat && (!__O_LARGEFILE || (__O_LARGEFILE+0) == 0)) || (__CRT_HAVE__creat && (!__O_LARGEFILE || (__O_LARGEFILE+0) == 0)) || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open */
 	return __localdep_open(__filename, __O_CREAT | __O_WRONLY | __O_TRUNC, __mode);
-#endif /* !__CRT_HAVE_creat64 && (!__CRT_HAVE_creat || (__O_LARGEFILE && !(__O_LARGEFILE+0) == 0)) && (!__CRT_HAVE__creat || (__O_LARGEFILE && !(__O_LARGEFILE+0) == 0)) && !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_creat_defined

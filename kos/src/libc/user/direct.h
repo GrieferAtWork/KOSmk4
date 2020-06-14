@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a3cbe24 */
+/* HASH CRC-32:0x98057ead */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_DIRECT_H 1
 
 #include "../api.h"
+#include "../auto/direct.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
@@ -35,7 +36,6 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive);
 INTDEF int NOTHROW_RPC(LIBCCALL libc__getdrive)(void);
 INTDEF __ULONG32_TYPE__ NOTHROW_RPC(LIBCCALL libc__getdrives)(void);
 INTDEF unsigned int NOTHROW_RPC(LIBCCALL libc__getdiskfree)(unsigned int drive, struct _diskfree_t *diskfree);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc__mkdir)(char const *path);
 #endif /* !__KERNEL__ */
 
 DECL_END

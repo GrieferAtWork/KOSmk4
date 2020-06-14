@@ -43,7 +43,7 @@ struct _diskfree_t {
 %[insert:function(_chdir = chdir)]
 %[insert:function(_rmdir = rmdir)]
 
-%[default_impl_section(".text.crt.dos.fs.property")]
+%[default:section(".text.crt.dos.fs.property")]
 %#define _getdcwd_nolock _getdcwd
 [[cp]]
 char *_getdcwd(int drive, char *buf, size_t size);
@@ -64,7 +64,7 @@ unsigned int _getdiskfree(unsigned int drive, struct _diskfree_t *diskfree);
 %[insert:extern(rmdir)];
 
 [[section(".text.crt.dos.fs.modify")]]
-[[cp, userimpl, requires_function(mkdir)]]
+[[cp, requires_function(mkdir)]]
 int _mkdir([[nonnull]] char const *path) {
 	return mkdir(path, 0755);
 }

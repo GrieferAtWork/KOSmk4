@@ -27,7 +27,7 @@
 %[define_replacement(pos64_t = __pos64_t)]
 %[define_replacement(mode_t = __mode_t)]
 %[define_replacement(oflag_t = __oflag_t)]
-%[default_impl_section(".text.crt.system.mman")]
+%[default:section(".text.crt.system.mman")]
 
 %{
 

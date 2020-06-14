@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%[default_impl_section(".text.crt.net.interface")]
+%[default:section(".text.crt.net.interface")]
 
 %{
 #include <features.h>

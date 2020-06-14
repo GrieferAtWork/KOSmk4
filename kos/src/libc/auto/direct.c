@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xafe27f56 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,31 +18,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_LIBC_AUTO_DIRECT_C
+#define GUARD_LIBC_AUTO_DIRECT_C 1
 
-%[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
-%[default:section(".text.crt.system.auxv")]
+#include "../api.h"
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include "../user/direct.h"
+#include "../user/sys.stat.h"
 
-%{
-#include <elf.h>
-#include <bits/auxv.h>
-#include <bits/hwcap.h>
+DECL_BEGIN
 
-__SYSDECL_BEGIN
-
-#ifdef __CC__
-
+#ifndef __KERNEL__
+INTERN ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+NOTHROW_RPC(LIBCCALL libc__mkdir)(char const *path) {
+	return libc_mkdir(path, 0755);
 }
+#endif /* !__KERNEL__ */
 
-@@Return the value associated with an Elf*_auxv_t type from the auxv list
-@@passed to the program on startup.  If TYPE was not present in the auxv
-@@list, returns zero and sets errno to ENOENT
-[[export_alias("__getauxval")]]
-$ulongptr_t getauxval($ulongptr_t type);
+DECL_END
 
-%{
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(_mkdir, libc__mkdir);
+#endif /* !__KERNEL__ */
 
-#endif /* __CC__ */
-
-__SYSDECL_END
-
-}
+#endif /* !GUARD_LIBC_AUTO_DIRECT_C */

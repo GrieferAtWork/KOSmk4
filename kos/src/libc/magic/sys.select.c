@@ -27,7 +27,7 @@
 %[define_replacement(time32_t   = __time32_t)]
 %[define_replacement(time64_t   = __time64_t)]
 %[define_replacement(fd_set     = "struct __fd_set_struct")]
-%[default_impl_section(".text.crt.io.poll")]
+%[default:section(".text.crt.io.poll")]
 
 
 %(user){

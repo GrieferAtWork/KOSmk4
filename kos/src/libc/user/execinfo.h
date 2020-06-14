@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58c7e004 */
+/* HASH CRC-32:0xaa441925 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,13 +32,13 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* Store up to SIZE return address of the current program state
  * in ARRAY and return the exact number of values stored */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array, int size);
+INTDEF NONNULL((1)) __STDC_INT_AS_UINT_T NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array, __STDC_INT_AS_UINT_T size);
 /* Return names of functions from the backtrace list
  * in ARRAY in a newly malloc()ed memory block */
-INTDEF NONNULL((1)) char **NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array, int size);
+INTDEF NONNULL((1)) char **NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array, __STDC_INT_AS_UINT_T size);
 /* This function is similar to backtrace_symbols()
  * but it writes the result immediately to a file */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array, int size, fd_t fd);
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array, __STDC_INT_AS_UINT_T size, fd_t fd);
 #endif /* !__KERNEL__ */
 
 DECL_END

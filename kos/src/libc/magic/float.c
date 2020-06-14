@@ -20,7 +20,7 @@
 
 %[define_ccompat_header("cfloat")]
 %[define_replacement(errno_t = __errno_t)]
-%[default_impl_section(".text.crt.math.float")]
+%[default:section(".text.crt.math.float")]
 
 %(c, ccompat)#ifndef __NO_FPU
 %{

@@ -240,7 +240,7 @@ libc_get_kos_unwind_exception(void) {
  *       by the <kos/except.h> header working.
  *       Additionally, then libstdc++.so is loaded, we must remain compatible
  *       with its API, in that kos exceptions should show up as foreign exceptions
- *       when interfaced with the standard c++ API (which it does) */
+ *       when interfaced with the standard c++ API (which they do) */
 DEFINE_PUBLIC_WEAK_ALIAS(__gxx_personality_v0, libc_gxx_personality_v0);
 DEFINE_PUBLIC_WEAK_ALIAS(__cxa_begin_catch, libc_cxa_begin_catch);
 DEFINE_PUBLIC_WEAK_ALIAS(__cxa_end_catch, libc_cxa_end_catch);
@@ -283,7 +283,7 @@ libc_cxa_end_catch(void) {
 	 * its end without the associated exception having been re-thrown. */
 	struct exception_info *info = error_info();
 	if (!(info->ei_flags & EXCEPT_FRETHROW))
-	      info->ei_code = E_OK;
+		info->ei_code = E_OK;
 	info->ei_flags &= ~EXCEPT_FRETHROW;
 }
 
@@ -299,7 +299,7 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 	landingpad = (uintptr_t)context->uc_fde.f_pcstart;
 	pc         = (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
 
-	/* NOTE: `reader' points to a `struct gcc_lsda' */
+	/* HINT: `reader' points to a `struct gcc_lsda' */
 	temp = *reader++; /* gl_landing_enc */
 	if (temp != DW_EH_PE_omit) {
 		/* gl_landing_pad */
@@ -469,7 +469,7 @@ trigger_coredump(error_register_state_t *curr_state,
 	             unwind_error);
 	/* There really shouldn't be a reason to get here, but just in case... */
 
-	/* Shouldn't get here, but in something went wrong,
+	/* Shouldn't get here, but if something went wrong,
 	 * also try to trigger a legacy debug trap. */
 	error_register_state_to_ucpustate(curr_state, &curr_ust);
 	trigger_debugtrap(&curr_ust, exc);
@@ -479,7 +479,7 @@ trigger_coredump(error_register_state_t *curr_state,
 }
 
 
-PRIVATE SECTION_EXCEPT_TEXT void LIBCCALL
+PRIVATE SECTION_EXCEPT_TEXT ATTR_NOINLINE void LIBCCALL
 try_raise_signal_from_exception(error_register_state_t *__restrict state,
                                 struct exception_data *__restrict error) {
 	siginfo_t si;

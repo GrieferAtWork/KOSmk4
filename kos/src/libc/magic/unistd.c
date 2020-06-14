@@ -245,7 +245,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_environ)(void);
 };
 
-%[default_impl_section(".text.crt.fs.exec.exec")];
+%[default:section(".text.crt.fs.exec.exec")];
 
 @@>> execv(3)
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -276,7 +276,7 @@ int execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV);
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list
 [[cp, guard, ATTR_SENTINEL, export_alias("_execl"), impl_include("<parts/redirect-exec.h>")]]
-[[userimpl, requires_dependent_function(execv), allow_macros, crtbuiltin]]
+[[userimpl, requires_dependent_function(execv), crtbuiltin]]
 int execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_EXECL(char, execv, path, args)
 }
@@ -286,7 +286,7 @@ int execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (ch
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
 @@and setting `environ' to a `char **' passed after the NULL sentinel
 [[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execle"), crtbuiltin]]
-[[userimpl, requires_dependent_function(execve), ATTR_SENTINEL_O(1), allow_macros]]
+[[userimpl, requires_dependent_function(execve), ATTR_SENTINEL_O(1)]]
 int execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_EXECLE(char, execve, path, args)
 }
@@ -295,7 +295,7 @@ int execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (c
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list
 [[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execlp")]]
-[[userimpl, requires_dependent_function(execvp), ATTR_SENTINEL, allow_macros, crtbuiltin]]
+[[userimpl, requires_dependent_function(execvp), ATTR_SENTINEL, crtbuiltin]]
 int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_EXECL(char, execvp, file, args)
 }
@@ -313,13 +313,13 @@ int execvpe([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV, [[nonn
 @@Replace the calling process with the application image referred to by `PATH' / `FILE'
 @@and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel
 [[cp, guard, impl_include("<parts/redirect-exec.h>"), export_alias("_execlpe")]]
-[[userimpl, requires_dependent_function(execvpe), ATTR_SENTINEL_O(1), allow_macros]]
+[[userimpl, requires_dependent_function(execvpe), ATTR_SENTINEL_O(1)]]
 int execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_EXECLE(char, execvp, file, args)
 }
 %#endif /* __USE_KOS || __USE_DOS */
 
-%[default_impl_section(".text.crt.sched.process")]
+%[default:section(".text.crt.sched.process")]
 
 %
 @@>> getpid(2)
@@ -420,7 +420,7 @@ int setpgid($pid_t pid, $pid_t pgid);
 [[decl_include("<bits/types.h>")]]
 $pid_t setsid();
 
-%[default_impl_section(".text.crt.sched.user")]
+%[default:section(".text.crt.sched.user")]
 
 %
 @@>> getuid(2)
@@ -485,7 +485,7 @@ int setgid($gid_t gid);
 $pid_t fork();
 
 
-%[default_impl_section(".text.crt.system.utility")]
+%[default:section(".text.crt.system.utility")]
 
 %
 @@>> alarm(2)
@@ -511,7 +511,7 @@ int pause();
 [[cp, wunused, section(".text.crt.fs.property"), decl_include("<bits/types.h>")]]
 $longptr_t fpathconf($fd_t fd, int name);
 
-%[default_impl_section(".text.crt.io.tty")]
+%[default:section(".text.crt.io.tty")]
 
 %
 @@>> ttyname(3)
@@ -541,7 +541,7 @@ int tcsetpgrp($fd_t fd, $pid_t pgrp_id);
 [[wunused]]
 char *getlogin();
 
-%[default_impl_section(".text.crt.fs.modify")]
+%[default:section(".text.crt.fs.modify")]
 
 %
 @@>> chown(2)
@@ -572,9 +572,9 @@ int link([[nonnull]] char const *from, [[nonnull]] char const *to) {
 	return linkat(__CRT_AT_FDCWD, from, __CRT_AT_FDCWD, to, 0);
 }
 
-%[default_impl_section(".text.crt.sched.access")]
+%[default:section(".text.crt.sched.access")]
 %[insert:extern(exit)]
-%[default_impl_section(".text.crt.fs.modify")]
+%[default:section(".text.crt.fs.modify")]
 
 %
 @@>> read(2)
@@ -737,7 +737,7 @@ int chdir([[nonnull]] char const *path);
 [[cp, guard, export_alias("_getcwd"), section(".text.crt.fs.basic_property")]]
 char *getcwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 
-%[default_impl_section(".text.crt.fs.modify")]
+%[default:section(".text.crt.fs.modify")]
 
 %
 @@>> unlink(2)
@@ -757,7 +757,7 @@ int rmdir([[nonnull]] char const *path) {
 	return unlinkat(__CRT_AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
 }
 
-%[default_impl_section(".text.crt.fs.property")];
+%[default:section(".text.crt.fs.property")];
 
 %
 %#ifdef __USE_GNU
@@ -790,7 +790,7 @@ eaccess(*) = euidaccess;
 int faccessat($fd_t dfd, [[nonnull]] char const *file,
               __STDC_INT_AS_UINT_T type, $atflag_t flags);
 
-%[default_impl_section(".text.crt.fs.modify")];
+%[default:section(".text.crt.fs.modify")];
 
 %
 @@>> fchownat(2)
@@ -814,7 +814,7 @@ int linkat($fd_t fromfd, [[nonnull]] char const *from,
 int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
               [[nonnull]] char const *target_path);
 
-%[default_impl_section(".text.crt.fs.property")];
+%[default:section(".text.crt.fs.property")];
 
 %
 @@>> readlinkat(2)
@@ -839,7 +839,7 @@ ssize_t freadlinkat($fd_t dfd, [[nonnull]] char const *__restrict path,
                     [[outp(buflen)]] char *__restrict buf, size_t buflen, $atflag_t flags);
 %#endif /* __USE_KOS */
 
-%[default_impl_section(".text.crt.fs.modify")];
+%[default:section(".text.crt.fs.modify")];
 
 %
 @@>> unlinkat(2)
@@ -1176,7 +1176,7 @@ int syncfs($fd_t fd) {
 	return 0;
 }
 
-%[default_impl_section(".text.crt.sched.user")];
+%[default:section(".text.crt.sched.user")];
 
 [[decl_include("<bits/types.h>")]]
 int group_member($gid_t gid);

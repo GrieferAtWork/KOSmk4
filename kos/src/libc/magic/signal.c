@@ -29,7 +29,7 @@
 %[define_replacement(sig_atomic_t = __sig_atomic_t)]
 %[define_replacement(sig_t        = __sighandler_t)]
 %[define_replacement(timespec64   = __timespec64)]
-%[default_impl_section("{.text.crt.sched.signal|.text.crt.dos.sched.signal}")]
+%[default:section("{.text.crt.sched.signal|.text.crt.dos.sched.signal}")]
 
 %(user){
 DECL_END

@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %[define_replacement(size_t = __SIZE_TYPE__)]
-%[default_impl_section(".text.crt.dos.heap.debug_malloc")]
+%[default:section(".text.crt.dos.heap.debug_malloc")]
 
 %{
 #include <features.h>
