@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee9436a3 */
+/* HASH CRC-32:0xc5bdaa37 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,22 +23,6 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memset from string */
-#ifndef __local___localdep_memset_defined
-#define __local___localdep_memset_defined 1
-#ifdef __CRT_HAVE_memset
-/* Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
-#else /* __CRT_HAVE_memset */
-__NAMESPACE_LOCAL_END
-#include <local/string/memset.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
-#define __localdep_memset __LIBC_LOCAL_NAME(memset)
-#endif /* !__CRT_HAVE_memset */
-#endif /* !__local___localdep_memset_defined */
 /* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined 1
@@ -55,6 +39,22 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
+/* Dependency: memset from string */
+#ifndef __local___localdep_memset_defined
+#define __local___localdep_memset_defined 1
+#ifdef __CRT_HAVE_memset
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
+#else /* __CRT_HAVE_memset */
+__NAMESPACE_LOCAL_END
+#include <local/string/memset.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memset __LIBC_LOCAL_NAME(memset)
+#endif /* !__CRT_HAVE_memset */
+#endif /* !__local___localdep_memset_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/__overflow.h>
 __NAMESPACE_LOCAL_BEGIN

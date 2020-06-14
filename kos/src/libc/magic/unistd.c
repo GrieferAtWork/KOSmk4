@@ -46,6 +46,7 @@
 #include <bits/confname.h>
 #include <bits/posix_opt.h>
 #include <bits/types.h>
+#include <kos/anno.h>
 
 #if defined(__CRT_GLC) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #include <asm/unistd.h>

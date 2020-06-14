@@ -47,8 +47,6 @@ NOTHROW_NCX(LIBCCALL libc_setlocale)(int category,
 {
 	(void)category;
 	(void)locale;
-	CRT_UNIMPLEMENTED("setlocale"); /* TODO */
-	libc_seterrno(ENOSYS);
 	return current_locale;
 }
 /*[[[end:libc_setlocale]]]*/

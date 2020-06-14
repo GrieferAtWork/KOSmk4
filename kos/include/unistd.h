@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfec523d1 */
+/* HASH CRC-32:0x66328663 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,7 @@
 #include <bits/confname.h>
 #include <bits/posix_opt.h>
 #include <bits/types.h>
+#include <kos/anno.h>
 
 #if defined(__CRT_GLC) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #include <asm/unistd.h>

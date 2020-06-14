@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc96e70ae */
+/* HASH CRC-32:0x1e9198c7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,58 +22,6 @@
 #define __local_c32spncpy_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c32memcpy from parts.uchar.string */
-#ifndef __local___localdep_c32memcpy_defined
-#define __local___localdep_c32memcpy_defined 1
-#if defined(__CRT_HAVE_wmemcpy) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32memcpy,(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_DOS$wmemcpy)
-__CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32memcpy,(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_memcpyl) && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32memcpy,(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyl,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_DOS$memcpyl)
-__CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32memcpy,(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyl,(__dst,__src,__num_chars))
-#elif (__SIZEOF_WCHAR_T__ == 4)
-__NAMESPACE_LOCAL_END
-#include <local/wchar/wmemcpy.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32memcpy (*(__CHAR32_TYPE__ *(__LIBKCALL *)(__CHAR32_TYPE__ *__restrict, __CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wmemcpy))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/parts.uchar.string/c32memcpy.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32memcpy __LIBC_LOCAL_NAME(c32memcpy)
-#endif /* !... */
-#endif /* !__local___localdep_c32memcpy_defined */
-/* Dependency: c32mempset from parts.uchar.string */
-#ifndef __local___localdep_c32mempset_defined
-#define __local___localdep_c32mempset_defined 1
-#if defined(__CRT_HAVE_wmempset) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-/* Same as wmemset, but return a pointer after the last written character */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32mempset,(__CHAR32_TYPE__ *__dst, __CHAR32_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmempset,(__dst,__filler,__num_chars))
-#elif defined(__CRT_HAVE_DOS$wmempset)
-/* Same as wmemset, but return a pointer after the last written character */
-__CREDIRECT_KOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32mempset,(__CHAR32_TYPE__ *__dst, __CHAR32_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmempset,(__dst,__filler,__num_chars))
-#elif defined(__CRT_HAVE_mempsetl) && defined(__LIBCCALL_IS_LIBKCALL)
-/* Same as wmemset, but return a pointer after the last written character */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32mempset,(__CHAR32_TYPE__ *__dst, __CHAR32_TYPE__ __filler, __SIZE_TYPE__ __num_chars),mempsetl,(__dst,__filler,__num_chars))
-#elif defined(__CRT_HAVE_DOS$mempsetl)
-/* Same as wmemset, but return a pointer after the last written character */
-__CREDIRECT_KOS(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32mempset,(__CHAR32_TYPE__ *__dst, __CHAR32_TYPE__ __filler, __SIZE_TYPE__ __num_chars),mempsetl,(__dst,__filler,__num_chars))
-#elif (__SIZEOF_WCHAR_T__ == 4)
-__NAMESPACE_LOCAL_END
-#include <local/wchar/wmempset.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Same as wmemset, but return a pointer after the last written character */
-#define __localdep_c32mempset (*(__CHAR32_TYPE__ *(__LIBKCALL *)(__CHAR32_TYPE__ *, __CHAR32_TYPE__, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wmempset))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/parts.uchar.string/c32mempset.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Same as wmemset, but return a pointer after the last written character */
-#define __localdep_c32mempset __LIBC_LOCAL_NAME(c32mempset)
-#endif /* !... */
-#endif /* !__local___localdep_c32mempset_defined */
 /* Dependency: c32snlen from parts.uchar.string */
 #ifndef __local___localdep_c32snlen_defined
 #define __local___localdep_c32snlen_defined 1
@@ -97,12 +45,52 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32snlen __LIBC_LOCAL_NAME(c32snlen)
 #endif /* !... */
 #endif /* !__local___localdep_c32snlen_defined */
+/* Dependency: memcpyl from string */
+#ifndef __local___localdep_memcpyl_defined
+#define __local___localdep_memcpyl_defined 1
+#ifdef __CRT_HAVE_memcpyl
+/* Copy memory between non-overlapping memory blocks. */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),memcpyl,(__dst,__src,__n_dwords))
+#elif defined(__CRT_HAVE_wmemcpy) && (__SIZEOF_WCHAR_T__ == 4)
+/* Copy memory between non-overlapping memory blocks. */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),wmemcpy,(__dst,__src,__n_dwords))
+#elif defined(__CRT_HAVE_DOS$wmemcpy) && defined(__PE__)
+/* Copy memory between non-overlapping memory blocks. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),KOS$wmemcpy,(__dst,__src,__n_dwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpyl.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Copy memory between non-overlapping memory blocks. */
+#define __localdep_memcpyl __LIBC_LOCAL_NAME(memcpyl)
+#endif /* !... */
+#endif /* !__local___localdep_memcpyl_defined */
+/* Dependency: mempsetl from string */
+#ifndef __local___localdep_mempsetl_defined
+#define __local___localdep_mempsetl_defined 1
+#ifdef __CRT_HAVE_mempsetl
+/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),mempsetl,(__dst,__dword,__n_dwords))
+#elif defined(__CRT_HAVE_wmempset) && (__SIZEOF_WCHAR_T__ == 4)
+/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),wmempset,(__dst,__dword,__n_dwords))
+#elif defined(__CRT_HAVE_DOS$wmempset) && defined(__PE__)
+/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),KOS$wmempset,(__dst,__dword,__n_dwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/mempsetl.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `memsetl', but return `DST + N_DWORDS', rather than `DST' */
+#define __localdep_mempsetl __LIBC_LOCAL_NAME(mempsetl)
+#endif /* !... */
+#endif /* !__local___localdep_mempsetl_defined */
 /* Same as wcsncpy, but return a pointer after the last written character */
 __LOCAL_LIBC(c32spncpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32spncpy))(__CHAR32_TYPE__ *__restrict __buf, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __buflen) {
 	__SIZE_TYPE__ __srclen = __localdep_c32snlen(__src, __buflen);
-	__localdep_c32memcpy(__buf, __src, __srclen);
-	return __localdep_c32mempset(__buf+__srclen, '\0', __buflen - __srclen);
+	(__CHAR32_TYPE__ *)__localdep_memcpyl(__buf, __src, __srclen);
+	return (__CHAR32_TYPE__ *)__localdep_mempsetl(__buf+__srclen, '\0', __buflen - __srclen);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32spncpy_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee20068e */
+/* HASH CRC-32:0xba46fe87 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,12 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_timerfd_gettime) || defined(__CRT_HAVE_timerfd_gettime64)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: timerfd_gettime32 from sys.timerfd */
+#if !defined(__local___localdep_timerfd_gettime32_defined) && defined(__CRT_HAVE_timerfd_gettime)
+#define __local___localdep_timerfd_gettime32_defined 1
+/* Return the next expiration time of UFD */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(__fd_t __ufd, struct __itimerspec32 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
+#endif /* !__local___localdep_timerfd_gettime32_defined && __CRT_HAVE_timerfd_gettime */
 /* Dependency: timerfd_gettime64 from sys.timerfd */
 #ifndef __local___localdep_timerfd_gettime64_defined
 #define __local___localdep_timerfd_gettime64_defined 1
@@ -42,12 +48,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_timerfd_gettime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_timerfd_gettime64_defined */
-/* Dependency: timerfd_gettime32 from sys.timerfd */
-#if !defined(__local___localdep_timerfd_gettime32_defined) && defined(__CRT_HAVE_timerfd_gettime)
-#define __local___localdep_timerfd_gettime32_defined 1
-/* Return the next expiration time of UFD */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(__fd_t __ufd, struct __itimerspec32 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
-#endif /* !__local___localdep_timerfd_gettime32_defined && __CRT_HAVE_timerfd_gettime */
 /* Return the next expiration time of UFD */
 __LOCAL_LIBC(timerfd_gettime) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_gettime))(__fd_t __ufd, struct itimerspec *__restrict __otmr) {

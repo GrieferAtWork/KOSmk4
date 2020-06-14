@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x459eae70 */
+/* HASH CRC-32:0x8134a47c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,47 +23,6 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE_realloc
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strlen from string */
-#ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
-#ifdef __CRT_HAVE_strlen
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* __CRT_HAVE_strlen */
-__NAMESPACE_LOCAL_END
-#include <local/string/strlen.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
-#endif /* !__CRT_HAVE_strlen */
-#endif /* !__local___localdep_strlen_defined */
-/* Dependency: memcpyc from string */
-#ifndef __local___localdep_memcpyc_defined
-#define __local___localdep_memcpyc_defined 1
-#ifdef __CRT_HAVE_memcpyc
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
-#else /* __CRT_HAVE_memcpyc */
-__NAMESPACE_LOCAL_END
-#include <local/string/memcpyc.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
-#endif /* !__CRT_HAVE_memcpyc */
-#endif /* !__local___localdep_memcpyc_defined */
-/* Dependency: realloc from stdlib */
-#ifndef __local___localdep_realloc_defined
-#define __local___localdep_realloc_defined 1
-#if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
-__CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
-#elif defined(__CRT_HAVE_realloc)
-__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
-#else /* ... */
-#undef __local___localdep_realloc_defined
-#endif /* !... */
-#endif /* !__local___localdep_realloc_defined */
 /* Dependency: argz_add from argz */
 #ifndef __local___localdep_argz_add_defined
 #define __local___localdep_argz_add_defined 1
@@ -83,6 +42,22 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_argz_add_defined
 #endif /* !... */
 #endif /* !__local___localdep_argz_add_defined */
+/* Dependency: memcpyc from string */
+#ifndef __local___localdep_memcpyc_defined
+#define __local___localdep_memcpyc_defined 1
+#ifdef __CRT_HAVE_memcpyc
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* __CRT_HAVE_memcpyc */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
+#endif /* !__CRT_HAVE_memcpyc */
+#endif /* !__local___localdep_memcpyc_defined */
 /* Dependency: memmoveupc from string */
 #ifndef __local___localdep_memmoveupc_defined
 #define __local___localdep_memmoveupc_defined 1
@@ -99,6 +74,31 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memmoveupc __LIBC_LOCAL_NAME(memmoveupc)
 #endif /* !__CRT_HAVE_memmoveupc */
 #endif /* !__local___localdep_memmoveupc_defined */
+/* Dependency: realloc from stdlib */
+#ifndef __local___localdep_realloc_defined
+#define __local___localdep_realloc_defined 1
+#if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
+__CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
+#elif defined(__CRT_HAVE_realloc)
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
+#else /* ... */
+#undef __local___localdep_realloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_realloc_defined */
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
+#ifdef __CRT_HAVE_strlen
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
+#include <local/string/strlen.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN

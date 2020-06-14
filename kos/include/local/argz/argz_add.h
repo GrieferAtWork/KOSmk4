@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38fe94a6 */
+/* HASH CRC-32:0x63afd0ac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,20 +23,6 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strlen from string */
-#ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
-#ifdef __CRT_HAVE_strlen
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* __CRT_HAVE_strlen */
-__NAMESPACE_LOCAL_END
-#include <local/string/strlen.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
-#endif /* !__CRT_HAVE_strlen */
-#endif /* !__local___localdep_strlen_defined */
 /* Dependency: argz_append from argz */
 #ifndef __local___localdep_argz_append_defined
 #define __local___localdep_argz_append_defined 1
@@ -56,6 +42,20 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_argz_append_defined
 #endif /* !... */
 #endif /* !__local___localdep_argz_append_defined */
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
+#ifdef __CRT_HAVE_strlen
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
+#include <local/string/strlen.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
 /* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
 __LOCAL_LIBC(argz_add) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str) {

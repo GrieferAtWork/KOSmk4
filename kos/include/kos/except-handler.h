@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb748e91 */
+/* HASH CRC-32:0xe3a5ca72 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,9 +58,9 @@
  * For compatibility with POSIX, (most of) these types of exceptions can be
  * handled in 1 of 2 ways:
  *   - By raising a POSIX signal in the affected thread.
- *     This is the default behavior, both before and after the exception handler
- *     initialization that is performed by `libc.so' (which simply defines its
- *     handler to be used for system call exceptions)
+ *     This is the default behavior, both before (mode #1) and after (mode #4)
+ *     the exception handler initialization that is performed by `libc.so'
+ *     (which simply defines its handler to be used for system call exceptions)
  *     In this mode, so-long as no sys_X* system calls are used, KOS behaves
  *     identically to POSIX guidelines, and no exceptions will ever be thrown
  *     without the user explicitly making use of exception-enabled functions,
@@ -70,7 +70,7 @@
  *   - By propagating the underlying kernel exception into user-space.
  *     In this mode, user-space gains the greatest amount of knowledge
  *     about the exception in question, but will be required to implement
- *     handling for exceptions, as well as include eh_frame unwind information
+ *     handling for exceptions, as well as include .eh_frame unwind information
  *     within their application, and be using C++ if the intend is to actually
  *     catch such an exception (KOS kernel exceptions use the same mechanism
  *     as C++, meaning that RAII and the like get handled correctly, though to
@@ -121,12 +121,15 @@
  *        and even then: are only propagated as KOS exceptions when thrown
  *        by the kernel itself.
  *     Environment:
- *      - This mode is enabled by default if an .exe file (rather than an
- *        ELF) is executed, so-as to allow for simpler integration with SEH
+ *      - This mode is enabled by default if an .exe file (rather than
+ *        an ELF) is executed, so-as to allow for simpler integration
+ *        with SEH
  *      - Additionally, this mode is often set at the start of main()
  *        in applications that were specifically written to run on KOS
  *        and take full advantage of its feature set, but don't wish to
- *        make use of #4 to prevent any possibility of .
+ *        make use of #4 to prevent any possibility of ambiguity caused
+ *        by posix signals not being too specific when it comes to signal
+ *        causes.
  *
  *  #4 Use KOS exceptions only in modules that are `dlexceptaware(3)'
  *     Behavior:
@@ -166,9 +169,9 @@
  *         #7:    If no handler apart of a dlexceptaware-module was found in step #6, move on to step #SIG
  *         #8:    Make sure that both `EXCEPT_FINEXCEPT' and `EXCEPT_FMAYSIGNAL' are set.
  *         #9:    Unwind to the closest found exception handler and resume execution there.
- *                Note that this unwinding will invoke personality functions a second time, which
- *                differs from the usual single-pass unwinding used for handling all other types
- *                of KOS exceptions.
+ *                Note that this unwinding will invoke personality functions a second time,
+ *                which differs from the usual single-pass unwinding used for handling all
+ *                other types of KOS exceptions.
  *         #SIG:  Restore the KOS exception saved in step #1.
  *                Translate the exception into a signal which is then raised
  *                within the calling thread (s.a. `error_as_signal(3)')
@@ -176,7 +179,7 @@
  *                move on to step #CORE.
  *                NOTE: For this purpose, the `sys_raiseat()' system call exists.
  *         #CORE: Trigger a coredump to terminate the current application.
- *                NOTE: For this purpose, the `sys_codedump()' system call exists.
+ *                NOTE: For this purpose, the `sys_coredump()' system call exists.
  *     Environment:
  *      - This is the actual mode that you will encounter for most of your travels.
  *      - It is set up during libc initialization and usually remains active
@@ -189,9 +192,10 @@
  *     Unlike other components inherited by clone(2), this component does
  *     not feature a specific CLONE_* flag, meaning that this step is always
  *     performed
- *   - After a call to exec(2), the calling process is reset to mode #1,
- *     since a new memory image probably implies that user-space exception
- *     handlers are no longer present where they once where.
+ *   - After a call to exec(2), the calling process is reset to mode #1 (i.e.
+ *     exclusively make use of posix signals), since a new memory image probably
+ *     implies that user-space exception handlers are no longer present where
+ *     they once where.
  */
 
 __SYSDECL_BEGIN
@@ -199,23 +203,20 @@ __SYSDECL_BEGIN
 #define EXCEPT_HANDLER_MODE_UNCHANGED   0x0000 /* Don't change the current mode */
 #define EXCEPT_HANDLER_MODE_DISABLED    0x0001 /* MODE: Disable exception handlers (s.a. mode #1) */
 #define EXCEPT_HANDLER_MODE_ENABLED     0x0002 /* MODE: Enable exception handlers for sys_X* system calls (s.a. mode #2)
-                                                * When this flag is set, `set_exception_handler()' will set `__handler'
+                                                * When this flag is set, `set_exception_handler()' will set `HANDLER'
                                                 * as the new exception handler called by the kernel. */
 #define EXCEPT_HANDLER_MODE_SIGHAND     0x0003 /* MODE: Enable exceptions for non-syscall exceptions (s.a. mode #3) */
 #define EXCEPT_HANDLER_MODE_MASK        0x000f /* Mask for the mode */
 #define EXCEPT_HANDLER_FLAG_ONESHOT     0x2000 /* FLAG: Before execution of the handler is started, set the mode to `EXCEPT_HANDLER_MODE_DISABLED' */
-#define EXCEPT_HANDLER_FLAG_SETHANDLER  0x4000 /* FLAG: Set the given `__handler' as the new exception handler called by the kernel. */
-#define EXCEPT_HANDLER_FLAG_SETSTACK    0x8000 /* FLAG: Set the given `__handler_sp' as the stack used for handling exceptions. */
-/* TODO: Option to mask all posix signals before invoking an exception handler,
- *       which will also push a copy of the old signal mask onto the stack prior
- *       to passing control to the handler. */
+#define EXCEPT_HANDLER_FLAG_SETHANDLER  0x4000 /* FLAG: Set the given `HANDLER' as the new exception handler called by the kernel. */
+#define EXCEPT_HANDLER_FLAG_SETSTACK    0x8000 /* FLAG: Set the given `HANDLER_SP' as the stack used for handling exceptions. */
 
 
 /* Special value for `__handler_sp': Re-use the previous user-space stack for storing exceptions */
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
-#define EXCEPT_HANDLER_SP_CURRENT   (__CCAST(void *)0)
+#define EXCEPT_HANDLER_SP_CURRENT (__CCAST(void *)0)
 #else /* __ARCH_STACK_GROWS_DOWNWARDS */
-#define EXCEPT_HANDLER_SP_CURRENT   (__CCAST(void *)-1)
+#define EXCEPT_HANDLER_SP_CURRENT (__CCAST(void *)-1)
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 
 #ifdef __CC__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9879c5f8 */
+/* HASH CRC-32:0x83b639d9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,6 +55,21 @@ __NAMESPACE_STD_END
 #endif /* !__tm_defined */
 #endif
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: gmtime32 from time */
+#ifndef __local___localdep_gmtime32_defined
+#define __local___localdep_gmtime32_defined 1
+#ifdef __CRT_HAVE_gmtime
+/* Return the `struct tm' representation of *TIMER
+ * in Universal Coordinated Time (aka Greenwich Mean Time) */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_gmtime32,(__time32_t const *__timer),gmtime,(__timer))
+#elif defined(__CRT_HAVE__gmtime32)
+/* Return the `struct tm' representation of *TIMER
+ * in Universal Coordinated Time (aka Greenwich Mean Time) */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_gmtime32,(__time32_t const *__timer),_gmtime32,(__timer))
+#else /* ... */
+#undef __local___localdep_gmtime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_gmtime32_defined */
 /* Dependency: gmtime64 from time */
 #ifndef __local___localdep_gmtime64_defined
 #define __local___localdep_gmtime64_defined 1
@@ -96,21 +111,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_gmtime_r __LIBC_LOCAL_NAME(gmtime_r)
 #endif /* !... */
 #endif /* !__local___localdep_gmtime_r_defined */
-/* Dependency: gmtime32 from time */
-#ifndef __local___localdep_gmtime32_defined
-#define __local___localdep_gmtime32_defined 1
-#ifdef __CRT_HAVE_gmtime
-/* Return the `struct tm' representation of *TIMER
- * in Universal Coordinated Time (aka Greenwich Mean Time) */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_gmtime32,(__time32_t const *__timer),gmtime,(__timer))
-#elif defined(__CRT_HAVE__gmtime32)
-/* Return the `struct tm' representation of *TIMER
- * in Universal Coordinated Time (aka Greenwich Mean Time) */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_gmtime32,(__time32_t const *__timer),_gmtime32,(__timer))
-#else /* ... */
-#undef __local___localdep_gmtime32_defined
-#endif /* !... */
-#endif /* !__local___localdep_gmtime32_defined */
 __NAMESPACE_LOCAL_END
 #ifdef __BUILDING_LIBC
 #ifndef __LIBC_GMTIME_BUFFER_DEFINED

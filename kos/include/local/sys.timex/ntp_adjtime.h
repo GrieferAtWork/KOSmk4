@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfaa4eda */
+/* HASH CRC-32:0x2c135598 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,11 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_ntp_adjtime) || defined(__CRT_HAVE_ntp_adjtime64)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: ntp_adjtime32 from sys.timex */
+#if !defined(__local___localdep_ntp_adjtime32_defined) && defined(__CRT_HAVE_ntp_adjtime)
+#define __local___localdep_ntp_adjtime32_defined 1
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime32,(struct __timex32 *__restrict __tntx),ntp_adjtime,(__tntx))
+#endif /* !__local___localdep_ntp_adjtime32_defined && __CRT_HAVE_ntp_adjtime */
 /* Dependency: ntp_adjtime64 from sys.timex */
 #ifndef __local___localdep_ntp_adjtime64_defined
 #define __local___localdep_ntp_adjtime64_defined 1
@@ -39,11 +44,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_ntp_adjtime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_ntp_adjtime64_defined */
-/* Dependency: ntp_adjtime32 from sys.timex */
-#if !defined(__local___localdep_ntp_adjtime32_defined) && defined(__CRT_HAVE_ntp_adjtime)
-#define __local___localdep_ntp_adjtime32_defined 1
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime32,(struct __timex32 *__restrict __tntx),ntp_adjtime,(__tntx))
-#endif /* !__local___localdep_ntp_adjtime32_defined && __CRT_HAVE_ntp_adjtime */
 __LOCAL_LIBC(ntp_adjtime) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_adjtime))(struct timex *__restrict __tntx) {
 	int __result;

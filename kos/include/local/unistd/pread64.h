@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b0925aa */
+/* HASH CRC-32:0xf8033a58 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,59 +34,6 @@
 #endif
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: read from unistd */
-#ifndef __local___localdep_read_defined
-#define __local___localdep_read_defined 1
-#ifdef __CRT_HAVE_read
-/* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),read,(__fd,__buf,__bufsize))
-#elif defined(__CRT_HAVE__read)
-/* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),_read,(__fd,__buf,__bufsize))
-#elif defined(__CRT_HAVE___read)
-/* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),__read,(__fd,__buf,__bufsize))
-#else /* ... */
-#undef __local___localdep_read_defined
-#endif /* !... */
-#endif /* !__local___localdep_read_defined */
-/* Dependency: pread32 from unistd */
-#if !defined(__local___localdep_pread32_defined) && defined(__CRT_HAVE_pread)
-#define __local___localdep_pread32_defined 1
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pread32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),pread,(__fd,__buf,__bufsize,__offset))
-#endif /* !__local___localdep_pread32_defined && __CRT_HAVE_pread */
-/* Dependency: lseek64 from unistd */
-#ifndef __local___localdep_lseek64_defined
-#define __local___localdep_lseek64_defined 1
-#ifdef __CRT_HAVE_lseek64
-/* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
-__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-/* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
-__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE__lseeki64)
-/* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
-__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
-__NAMESPACE_LOCAL_END
-#include <local/unistd/lseek64.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
-#define __localdep_lseek64 __LIBC_LOCAL_NAME(lseek64)
-#else /* ... */
-#undef __local___localdep_lseek64_defined
-#endif /* !... */
-#endif /* !__local___localdep_lseek64_defined */
 /* Dependency: lseek32 from unistd */
 #ifndef __local___localdep_lseek32_defined
 #define __local___localdep_lseek32_defined 1
@@ -115,6 +62,59 @@ __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t 
 #undef __local___localdep_lseek32_defined
 #endif /* !... */
 #endif /* !__local___localdep_lseek32_defined */
+/* Dependency: lseek64 from unistd */
+#ifndef __local___localdep_lseek64_defined
+#define __local___localdep_lseek64_defined 1
+#ifdef __CRT_HAVE_lseek64
+/* >> lseek64(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE_lseek) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* >> lseek64(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE__lseeki64)
+/* >> lseek64(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
+__NAMESPACE_LOCAL_END
+#include <local/unistd/lseek64.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> lseek64(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+#define __localdep_lseek64 __LIBC_LOCAL_NAME(lseek64)
+#else /* ... */
+#undef __local___localdep_lseek64_defined
+#endif /* !... */
+#endif /* !__local___localdep_lseek64_defined */
+/* Dependency: pread32 from unistd */
+#if !defined(__local___localdep_pread32_defined) && defined(__CRT_HAVE_pread)
+#define __local___localdep_pread32_defined 1
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pread32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),pread,(__fd,__buf,__bufsize,__offset))
+#endif /* !__local___localdep_pread32_defined && __CRT_HAVE_pread */
+/* Dependency: read from unistd */
+#ifndef __local___localdep_read_defined
+#define __local___localdep_read_defined 1
+#ifdef __CRT_HAVE_read
+/* >> read(2)
+ * Read data from a given file descriptor `FD' and return the number of bytes read.
+ * A return value of ZERO(0) is indicative of EOF */
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),read,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE__read)
+/* >> read(2)
+ * Read data from a given file descriptor `FD' and return the number of bytes read.
+ * A return value of ZERO(0) is indicative of EOF */
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),_read,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE___read)
+/* >> read(2)
+ * Read data from a given file descriptor `FD' and return the number of bytes read.
+ * A return value of ZERO(0) is indicative of EOF */
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),__read,(__fd,__buf,__bufsize))
+#else /* ... */
+#undef __local___localdep_read_defined
+#endif /* !... */
+#endif /* !__local___localdep_read_defined */
 /* >> pread64(2)
  * Read data from a file at a specific offset */
 __LOCAL_LIBC(pread64) __ATTR_NONNULL((2)) __SSIZE_TYPE__

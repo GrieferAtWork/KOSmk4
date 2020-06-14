@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34ec2bf2 */
+/* HASH CRC-32:0xca347fce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,24 +22,11 @@
 #define __local_c32spawnl_defined 1
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wspawnv) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wspawnv)
-__NAMESPACE_LOCAL_BEGIN
-/* Dependency: c32spawnv from parts.uchar.process */
-#ifndef __local___localdep_c32spawnv_defined
-#define __local___localdep_c32spawnv_defined 1
-#if defined(__CRT_HAVE_wspawnv) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnv,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV),wspawnv,(__mode,__path,___argv))
-#elif defined(__CRT_HAVE_DOS$wspawnv)
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnv,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV),wspawnv,(__mode,__path,___argv))
-#else /* ... */
-#undef __local___localdep_c32spawnv_defined
-#endif /* !... */
-#endif /* !__local___localdep_c32spawnv_defined */
-__NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32spawnl) __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t
 __NOTHROW_RPC(__VLIBKCALL __LIBC_LOCAL_NAME(c32spawnl))(int __mode, __CHAR32_TYPE__ const *__restrict __path, __CHAR32_TYPE__ const *__args, ...) {
-	__REDIRECT_SPAWNL(__CHAR32_TYPE__, __localdep_c32spawnv, __mode, __path, __args)
+	__REDIRECT_SPAWNL(__CHAR32_TYPE__, __c32spawnv, __mode, __path, __args)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32spawnl_defined

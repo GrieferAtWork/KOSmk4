@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd30040d */
+/* HASH CRC-32:0xe795a751 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,11 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "parts.wchar.format-printer.h"
-#include "../user/format-printer.h"
+#include "format-printer.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
 #include "unicode.h"
-#include "../user/wchar.h"
 #include "wctype.h"
 
 DECL_BEGIN
@@ -1909,7 +1908,7 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_printer)(void *arg,
 	buf = libd_format_waprintf_alloc((struct format_c16aprintf_data *)arg, datalen);
 	if unlikely(!buf)
 		return -1;
-	libd_wmemcpy(buf, data, datalen);
+	(char16_t *)libc_memcpyw(buf, data, datalen);
 	return (ssize_t)datalen;
 }
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
@@ -1921,7 +1920,7 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_printer)(void *arg,
 	buf = libc_format_waprintf_alloc((struct format_c32aprintf_data *)arg, datalen);
 	if unlikely(!buf)
 		return -1;
-	libc_wmemcpy(buf, data, datalen);
+	(char32_t *)libc_memcpyl(buf, data, datalen);
 	return (ssize_t)datalen;
 }
 #endif /* !__KERNEL__ */

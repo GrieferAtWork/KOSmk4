@@ -402,6 +402,15 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: renameat2() is missing from <stdio.h> */
 
+	/* TODO: With the entire uvio pipeline implemented, the general assumption that
+	 *       accessing any (possibly faulty) user-space pointer can only ever trigger
+	 *       an E_SEGFAULT or E_WOULD_BLOCK no longer applies (due to the possibility
+	 *       or UVIO throwing some other, custom exception)
+	 *       Go through all uses of E_SEGFAULT in kernel-space that are the result of
+	 *       dealing with user-space memory-access fault handling, and update them to
+	 *       be able to deal with an arbitrary exception being the result of a faulty
+	 *       user-space memory access. */
+
 	return state;
 }
 

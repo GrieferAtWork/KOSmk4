@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1363bb5 */
+/* HASH CRC-32:0x2e422756 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,29 @@
 #include <__crt.h>
 #if (defined(__CRT_HAVE_fuzzy_wmemcasecmp) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp) || !defined(__NO_MALLOCA)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: c32slen from parts.uchar.string */
+#ifndef __local___localdep_c32slen_defined
+#define __local___localdep_c32slen_defined 1
+#if defined(__CRT_HAVE_wcslen) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
+#elif defined(__CRT_HAVE_DOS$wcslen)
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
+#elif (__SIZEOF_WCHAR_T__ == 4)
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wcslen.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_c32slen (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcslen))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/parts.uchar.string/c32slen.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_c32slen __LIBC_LOCAL_NAME(c32slen)
+#endif /* !... */
+#endif /* !__local___localdep_c32slen_defined */
 /* Dependency: fuzzy_c32memcasecmp from parts.uchar.string */
 #ifndef __local___localdep_fuzzy_c32memcasecmp_defined
 #define __local___localdep_fuzzy_c32memcasecmp_defined 1
@@ -54,29 +77,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* __NO_MALLOCA || !(__SIZEOF_WCHAR_T__ == 4) */
 #endif /* !... */
 #endif /* !__local___localdep_fuzzy_c32memcasecmp_defined */
-/* Dependency: c32slen from parts.uchar.string */
-#ifndef __local___localdep_c32slen_defined
-#define __local___localdep_c32slen_defined 1
-#if defined(__CRT_HAVE_wcslen) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
-#elif defined(__CRT_HAVE_DOS$wcslen)
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __string),wcslen,(__string))
-#elif (__SIZEOF_WCHAR_T__ == 4)
-__NAMESPACE_LOCAL_END
-#include <local/wchar/wcslen.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_c32slen (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcslen))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/parts.uchar.string/c32slen.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_c32slen __LIBC_LOCAL_NAME(c32slen)
-#endif /* !... */
-#endif /* !__local___localdep_c32slen_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN

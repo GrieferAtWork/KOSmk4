@@ -1436,14 +1436,14 @@ do_return_false:
 		assert(me->t_sched.s_running.sr_runprv == me);
 
 		/* Special case: blocking call made by the IDLE thread. */
-		if unlikely(me == &FORCPU(mycpu, thiscpu_idle)) {
+		idle = &FORCPU(mycpu, thiscpu_idle);
+		if unlikely(me == idle) {
 wait_a_bit:
 			/* Wait for the next interrupt. */
 			PREEMPTION_ENABLE_WAIT();
 			/* Indicate a sporadic wake-up. */
 			return false;
 		}
-		idle = &FORCPU(mycpu, thiscpu_idle);
 		/* End the current quantum prematurely. */
 		cpu_quantum_end_nopr(me, idle);
 		assert(me->t_sched.s_running.sr_runnxt == me);

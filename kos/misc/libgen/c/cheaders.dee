@@ -991,11 +991,11 @@ class FunctionPrototype {
 			exposedName: string, assemblyName: string) {
 		local hasEllipsis = this.hasEllipsis;
 		local isLcl = isLibcLinkage(decl, cc, assemblyName, hasEllipsis);
-		local isRedirect = exposedName != assemblyName;
+		local isSameAsname = exposedName == assemblyName && fp.externLinkage in ["", "C"];
 		fp << (isLcl
-		       ? isRedirect ? "__CEIREDIRECT" : "__CEIDECLARE"
-		       : isRedirect ? "__COMPILER_EIREDIRECT" : "__COMPILER_EIDECLARE");
-		if (isRedirect && isLcl) {
+		       ? isSameAsname ? "__CEIDECLARE" : "__CEIREDIRECT"
+		       : isSameAsname ? "__COMPILER_EIDECLARE" : "__COMPILER_EIREDIRECT");
+		if (isLcl) {
 			if (assemblyName.startswith("DOS$")) {
 				fp << "_DOS";
 				assemblyName = assemblyName[4:];
@@ -1023,7 +1023,7 @@ class FunctionPrototype {
 		fp << "," << exposedName << ",";
 		cprintArgumentListWithTypes(fp, escapeMode);
 		fp << ",";
-		if (isRedirect)
+		if (!isSameAsname)
 			fp << assemblyName << ",";
 	}
 
@@ -1129,7 +1129,8 @@ class FunctionImplementation {
 			fp.externLinkage = "";
 		/* Bind dependent functions. */
 		local deps: {string: Function} = dependencyFunctions;
-		for (local depName, depFun: deps) {
+		for (local depName: deps.keys.sorted()) {
+			local depFun = deps[depName];
 			fp << "/* Dependency: "
 				<< depFun.name << " from "
 				<< depFun.originalSystemHeaderName << " */\n";
@@ -1345,8 +1346,8 @@ class LocalFunction {
 			originalSystemHeaderName, name }));
 		/* Remember that we'll be needing the local implementation of this function */
 		neededLocalFunction.insert(this);
-		fp.namespace = oldNs;
 		fp.externLinkage = oldExternLinkage;
+		fp.namespace = oldNs;
 		local callToLocalName = LOCAL_NAMESPACE.keyCSymbolName(name);
 		if (oldNs !== LOCAL_NAMESPACE) {
 			if (LOCAL_NAMESPACE.prefix)
@@ -1484,7 +1485,8 @@ class InlineFunction {
 			local oldExternLinkage = fp.externLinkage;
 			if (oldExternLinkage !in ["", "C"])
 				fp.externLinkage = "";
-			for (local depName, depFun: deps) {
+			for (local depName: deps.keys.sorted()) {
+				local depFun = deps[depName];
 				depName = keyDependency(depName);
 				depFun.cprintHeaderDeclaration(fp, escapeMode, dependencyDecl,
 					exposedName:              depName,
@@ -3024,11 +3026,18 @@ class SystemHeader {
 				if (deps is none)
 					deps = dependentFunctionHeaders[binding.ppCond] = HashSet();
 				for (local none, func: bindingDeps) {
-					local intName = func.internalFunctionName;
-					if (intName is none)
-						continue; /* No internal name override! */
-					deps.insert(allLibraryFunctionsByName[intName]
-						.originalSystemHeaderName);
+					try {
+						local intName = func.internalFunctionName;
+						if (intName is none)
+							continue; /* No internal name override! */
+						deps.insert(allLibraryFunctionsByName[intName]
+							.originalSystemHeaderName);
+					} catch (...) {
+						print("... while scanning dependency ",
+							repr(func.name), " of function ",
+							repr(part.name));
+						throw;
+					}
 				}
 			}
 		}

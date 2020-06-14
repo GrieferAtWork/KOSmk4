@@ -259,10 +259,17 @@ errno_t umask_s($mode_t newmode, $mode_t *oldmode) {
 %[default_impl_section(".text.crt.dos.fs.utility")];
 
 [[cp, decl_include("<bits/types.h>")]]
-int __lock_fhandle($fd_t fd);
+int __lock_fhandle($fd_t fd) {
+	(void)fd;
+	/* No-op */
+	return 0;
+}
 
 [[decl_include("<bits/types.h>")]]
-void _unlock_fhandle($fd_t fd);
+void _unlock_fhandle($fd_t fd) {
+	(void)fd;
+	/* No-op */
+}
 
 
 [[decl_include("<bits/types.h>"), ATTR_PURE, wunused]]

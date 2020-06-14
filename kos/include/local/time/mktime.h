@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6af8edc9 */
+/* HASH CRC-32:0xbe312682 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,6 +56,22 @@ __NAMESPACE_STD_END
 #endif /* !__tm_defined */
 #endif
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: mktime32 from time */
+#ifndef __local___localdep_mktime32_defined
+#define __local___localdep_mktime32_defined 1
+#ifdef __CRT_HAVE_mktime
+/* Return the `time_t' representation of TP and normalize TP */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(__STRUCT_TM __KOS_FIXED_CONST *__tp),mktime,(__tp))
+#elif defined(__CRT_HAVE__mktime32)
+/* Return the `time_t' representation of TP and normalize TP */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(__STRUCT_TM __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
+#elif defined(__CRT_HAVE_timelocal)
+/* Return the `time_t' representation of TP and normalize TP */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(__STRUCT_TM __KOS_FIXED_CONST *__tp),timelocal,(__tp))
+#else /* ... */
+#undef __local___localdep_mktime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_mktime32_defined */
 /* Dependency: mktime64 from time */
 #ifndef __local___localdep_mktime64_defined
 #define __local___localdep_mktime64_defined 1
@@ -79,22 +95,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_mktime64 __LIBC_LOCAL_NAME(mktime64)
 #endif /* !... */
 #endif /* !__local___localdep_mktime64_defined */
-/* Dependency: mktime32 from time */
-#ifndef __local___localdep_mktime32_defined
-#define __local___localdep_mktime32_defined 1
-#ifdef __CRT_HAVE_mktime
-/* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(__STRUCT_TM __KOS_FIXED_CONST *__tp),mktime,(__tp))
-#elif defined(__CRT_HAVE__mktime32)
-/* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(__STRUCT_TM __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
-#elif defined(__CRT_HAVE_timelocal)
-/* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(__STRUCT_TM __KOS_FIXED_CONST *__tp),timelocal,(__tp))
-#else /* ... */
-#undef __local___localdep_mktime32_defined
-#endif /* !... */
-#endif /* !__local___localdep_mktime32_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __yearstodays
 #define __yearstodays(__n_years) (((146097*(__n_years))/400)/*-1*/) /* rounding error? */

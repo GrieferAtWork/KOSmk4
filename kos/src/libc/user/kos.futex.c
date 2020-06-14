@@ -36,7 +36,7 @@ DECL_BEGIN
 #ifdef __OPTIMIZE_SIZE__
 #define NO_FUTEX_SPIN 1
 #define SPIN_WHILE(should_wait_if_this_expression_is_true) \
-	do {       \
+	do {                                                   \
 	} __WHILE0
 #else /* __OPTIMIZE_SIZE__ */
 #undef NO_FUTEX_SPIN

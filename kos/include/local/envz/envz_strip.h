@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf3ffd72 */
+/* HASH CRC-32:0x523d34b7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,20 +22,6 @@
 #define __local_envz_strip_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strchrnul from string */
-#ifndef __local___localdep_strchrnul_defined
-#define __local___localdep_strchrnul_defined 1
-#ifdef __CRT_HAVE_strchrnul
-/* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
-#else /* __CRT_HAVE_strchrnul */
-__NAMESPACE_LOCAL_END
-#include <local/string/strchrnul.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_strchrnul __LIBC_LOCAL_NAME(strchrnul)
-#endif /* !__CRT_HAVE_strchrnul */
-#endif /* !__local___localdep_strchrnul_defined */
 /* Dependency: memmovedownc from string */
 #ifndef __local___localdep_memmovedownc_defined
 #define __local___localdep_memmovedownc_defined 1
@@ -63,6 +49,20 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #undef __local___localdep_realloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_realloc_defined */
+/* Dependency: strchrnul from string */
+#ifndef __local___localdep_strchrnul_defined
+#define __local___localdep_strchrnul_defined 1
+#ifdef __CRT_HAVE_strchrnul
+/* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
+#else /* __CRT_HAVE_strchrnul */
+__NAMESPACE_LOCAL_END
+#include <local/string/strchrnul.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
+#define __localdep_strchrnul __LIBC_LOCAL_NAME(strchrnul)
+#endif /* !__CRT_HAVE_strchrnul */
+#endif /* !__local___localdep_strchrnul_defined */
 /* Dependency: strend from string */
 #ifndef __local___localdep_strend_defined
 #define __local___localdep_strend_defined 1

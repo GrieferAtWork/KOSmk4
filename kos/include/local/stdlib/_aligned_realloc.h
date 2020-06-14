@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4423b0f8 */
+/* HASH CRC-32:0xa7a48747 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,34 +23,6 @@
 #include <__crt.h>
 #if (defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _aligned_msize from stdlib */
-#ifndef __local___localdep__aligned_msize_defined
-#define __local___localdep__aligned_msize_defined 1
-#ifdef __CRT_HAVE__aligned_msize
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__aligned_mallptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__aligned_mallptr,__min_alignment,__offset))
-#else /* __CRT_HAVE__aligned_msize */
-__NAMESPACE_LOCAL_END
-#include <local/stdlib/_aligned_msize.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep__aligned_msize __LIBC_LOCAL_NAME(_aligned_msize)
-#endif /* !__CRT_HAVE__aligned_msize */
-#endif /* !__local___localdep__aligned_msize_defined */
-/* Dependency: memcpy from string */
-#ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
-#ifdef __CRT_HAVE_memcpy
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
-#else /* __CRT_HAVE_memcpy */
-__NAMESPACE_LOCAL_END
-#include <local/string/memcpy.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-#define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
-#endif /* !__CRT_HAVE_memcpy */
-#endif /* !__local___localdep_memcpy_defined */
 /* Dependency: _aligned_free from stdlib */
 #ifndef __local___localdep__aligned_free_defined
 #define __local___localdep__aligned_free_defined 1
@@ -79,6 +51,34 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__aligned_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep__aligned_malloc_defined */
+/* Dependency: _aligned_msize from stdlib */
+#ifndef __local___localdep__aligned_msize_defined
+#define __local___localdep__aligned_msize_defined 1
+#ifdef __CRT_HAVE__aligned_msize
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__aligned_mallptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__aligned_mallptr,__min_alignment,__offset))
+#else /* __CRT_HAVE__aligned_msize */
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/_aligned_msize.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__aligned_msize __LIBC_LOCAL_NAME(_aligned_msize)
+#endif /* !__CRT_HAVE__aligned_msize */
+#endif /* !__local___localdep__aligned_msize_defined */
+/* Dependency: memcpy from string */
+#ifndef __local___localdep_memcpy_defined
+#define __local___localdep_memcpy_defined 1
+#ifdef __CRT_HAVE_memcpy
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
+#else /* __CRT_HAVE_memcpy */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpy.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
+#endif /* !__CRT_HAVE_memcpy */
+#endif /* !__local___localdep_memcpy_defined */
 __LOCAL_LIBC(_aligned_realloc) __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_realloc))(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment) {
 	void *__result;

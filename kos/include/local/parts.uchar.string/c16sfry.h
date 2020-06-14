@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5eb2a853 */
+/* HASH CRC-32:0x4069baf1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,20 +22,6 @@
 #define __local_c16sfry_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: rand from stdlib */
-#ifndef __local___localdep_rand_defined
-#define __local___localdep_rand_defined 1
-#ifdef __CRT_HAVE_rand
-__CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),rand,())
-#elif defined(__CRT_HAVE_random) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
-__CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),random,())
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/stdlib/rand.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_rand __LIBC_LOCAL_NAME(rand)
-#endif /* !... */
-#endif /* !__local___localdep_rand_defined */
 /* Dependency: c16slen from parts.uchar.string */
 #ifndef __local___localdep_c16slen_defined
 #define __local___localdep_c16slen_defined 1
@@ -59,6 +45,20 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16slen __LIBC_LOCAL_NAME(c16slen)
 #endif /* !... */
 #endif /* !__local___localdep_c16slen_defined */
+/* Dependency: rand from stdlib */
+#ifndef __local___localdep_rand_defined
+#define __local___localdep_rand_defined 1
+#ifdef __CRT_HAVE_rand
+__CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),rand,())
+#elif defined(__CRT_HAVE_random) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+__CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),random,())
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/rand.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_rand __LIBC_LOCAL_NAME(rand)
+#endif /* !... */
+#endif /* !__local___localdep_rand_defined */
 __LOCAL_LIBC(c16sfry) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sfry))(__CHAR16_TYPE__ *__restrict __string) {
 	__SIZE_TYPE__ __i, __count = __localdep_c16slen(__string);

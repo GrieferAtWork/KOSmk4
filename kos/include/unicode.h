@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bceab1f */
+/* HASH CRC-32:0xc5833cad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -887,7 +887,7 @@ __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL format_16to8)(void *__arg, 
 #include <local/unicode/format_16to8.h>
 /* Format printer (compatible with `__pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-8 output */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_16to8, __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_16to8)(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_16to8))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_16to8, __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL format_16to8)(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_16to8))(__arg, __data, __datalen); })
 #endif /* !... */
 
 struct format_32to8_data {
@@ -911,7 +911,7 @@ __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL format_32to8)(void *__arg, 
 #include <local/unicode/format_32to8.h>
 /* Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-8 output */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_32to8, __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_32to8)(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_32to8))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_32to8, __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL format_32to8)(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_32to8))(__arg, __data, __datalen); })
 #endif /* !... */
 
 struct format_16to32_data {
@@ -936,7 +936,7 @@ __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL format_16to32)(void *__arg,
 #include <local/unicode/format_16to32.h>
 /* Format printer (compatible with `__pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_16to32, __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_16to32)(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_16to32))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_16to32, __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL format_16to32)(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_16to32))(__arg, __data, __datalen); })
 #endif /* !... */
 
 struct format_32to16_data {
@@ -960,7 +960,7 @@ __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL format_32to16)(void *__arg,
 #include <local/unicode/format_32to16.h>
 /* Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16 output */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_32to16, __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_32to16)(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_32to16))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_32to16, __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL format_32to16)(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_32to16))(__arg, __data, __datalen); })
 #endif /* !... */
 
 

@@ -540,6 +540,9 @@
 #define __CRT_HAVE__CrtSetReportHookW2 1
 #define __CRT_HAVE__CrtSetReportMode 1
 #define __CRT_HAVE__Exit 1
+#define __CRT_HAVE__IO_2_1_stderr_ 1
+#define __CRT_HAVE__IO_2_1_stdin_ 1
+#define __CRT_HAVE__IO_2_1_stdout_ 1
 #define __CRT_HAVE__IO_fclose 1
 #define __CRT_HAVE__IO_fdopen 1
 #define __CRT_HAVE__IO_feof 1

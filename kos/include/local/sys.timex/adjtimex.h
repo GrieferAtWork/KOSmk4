@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbad4c19e */
+/* HASH CRC-32:0x64418209 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,17 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: adjtimex32 from sys.timex */
+#ifndef __local___localdep_adjtimex32_defined
+#define __local___localdep_adjtimex32_defined 1
+#ifdef __CRT_HAVE_adjtimex
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict __ntx),adjtimex,(__ntx))
+#elif defined(__CRT_HAVE___adjtimex)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict __ntx),__adjtimex,(__ntx))
+#else /* ... */
+#undef __local___localdep_adjtimex32_defined
+#endif /* !... */
+#endif /* !__local___localdep_adjtimex32_defined */
 /* Dependency: adjtimex64 from sys.timex */
 #ifndef __local___localdep_adjtimex64_defined
 #define __local___localdep_adjtimex64_defined 1
@@ -41,17 +52,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_adjtimex64_defined
 #endif /* !... */
 #endif /* !__local___localdep_adjtimex64_defined */
-/* Dependency: adjtimex32 from sys.timex */
-#ifndef __local___localdep_adjtimex32_defined
-#define __local___localdep_adjtimex32_defined 1
-#ifdef __CRT_HAVE_adjtimex
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict __ntx),adjtimex,(__ntx))
-#elif defined(__CRT_HAVE___adjtimex)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict __ntx),__adjtimex,(__ntx))
-#else /* ... */
-#undef __local___localdep_adjtimex32_defined
-#endif /* !... */
-#endif /* !__local___localdep_adjtimex32_defined */
 __LOCAL_LIBC(adjtimex) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtimex))(struct timex *__restrict __ntx) {
 	int __result;

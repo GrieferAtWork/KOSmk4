@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdaa87c81 */
+/* HASH CRC-32:0xd9c1f450 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,11 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: crt_calloc from stdlib */
+#if !defined(__local___localdep_crt_calloc_defined) && defined(__CRT_HAVE_calloc)
+#define __local___localdep_crt_calloc_defined 1
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_crt_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),calloc,(__count,__num_bytes))
+#endif /* !__local___localdep_crt_calloc_defined && __CRT_HAVE_calloc */
 /* Dependency: memalign from malloc */
 #ifndef __local___localdep_memalign_defined
 #define __local___localdep_memalign_defined 1
@@ -52,11 +57,6 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #undef __local___localdep_realloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_realloc_defined */
-/* Dependency: crt_calloc from stdlib */
-#if !defined(__local___localdep_crt_calloc_defined) && defined(__CRT_HAVE_calloc)
-#define __local___localdep_crt_calloc_defined 1
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_crt_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),calloc,(__count,__num_bytes))
-#endif /* !__local___localdep_crt_calloc_defined && __CRT_HAVE_calloc */
 __LOCAL_LIBC(malloc) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(malloc))(__SIZE_TYPE__ __num_bytes) {
 #ifdef __CRT_HAVE_calloc

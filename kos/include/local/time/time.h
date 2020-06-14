@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcda80e26 */
+/* HASH CRC-32:0x5e8b4b67 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,19 @@
 #if defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: time32 from time */
+#ifndef __local___localdep_time32_defined
+#define __local___localdep_time32_defined 1
+#ifdef __CRT_HAVE_time
+/* Return the current time and put it in *TIMER if TIMER is not NULL */
+__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),time,(__timer))
+#elif defined(__CRT_HAVE__time32)
+/* Return the current time and put it in *TIMER if TIMER is not NULL */
+__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),_time32,(__timer))
+#else /* ... */
+#undef __local___localdep_time32_defined
+#endif /* !... */
+#endif /* !__local___localdep_time32_defined */
 /* Dependency: time64 from time */
 #ifndef __local___localdep_time64_defined
 #define __local___localdep_time64_defined 1
@@ -46,19 +59,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_time64_defined
 #endif /* !... */
 #endif /* !__local___localdep_time64_defined */
-/* Dependency: time32 from time */
-#ifndef __local___localdep_time32_defined
-#define __local___localdep_time32_defined 1
-#ifdef __CRT_HAVE_time
-/* Return the current time and put it in *TIMER if TIMER is not NULL */
-__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),time,(__timer))
-#elif defined(__CRT_HAVE__time32)
-/* Return the current time and put it in *TIMER if TIMER is not NULL */
-__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),_time32,(__timer))
-#else /* ... */
-#undef __local___localdep_time32_defined
-#endif /* !... */
-#endif /* !__local___localdep_time32_defined */
 /* Return the current time and put it in *TIMER if TIMER is not NULL */
 __LOCAL_LIBC(time) __TM_TYPE(time)
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(time))(__TM_TYPE(time) *__timer) {

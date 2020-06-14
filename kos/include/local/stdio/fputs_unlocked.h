@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e4c2e04 */
+/* HASH CRC-32:0x7bccede9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,20 +24,6 @@
 #if defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strlen from string */
-#ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
-#ifdef __CRT_HAVE_strlen
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* __CRT_HAVE_strlen */
-__NAMESPACE_LOCAL_END
-#include <local/string/strlen.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
-#endif /* !__CRT_HAVE_strlen */
-#endif /* !__local___localdep_strlen_defined */
 /* Dependency: fwrite_unlocked from stdio */
 #ifndef __local___localdep_fwrite_unlocked_defined
 #define __local___localdep_fwrite_unlocked_defined 1
@@ -63,6 +49,20 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fwrite_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fwrite_unlocked_defined */
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
+#ifdef __CRT_HAVE_strlen
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
+#include <local/string/strlen.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
 /* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __LOCAL_LIBC(fputs_unlocked) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(fputs_unlocked))(char const *__restrict __string, __FILE *__restrict __stream) __THROWS(...) {

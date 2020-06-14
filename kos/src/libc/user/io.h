@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x244c005c */
+/* HASH CRC-32:0xbbdaa49e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,8 +41,6 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc__findnext32i64)(intptr_t findf
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc__findnext64)(intptr_t findfd, struct __finddata64_t *__restrict finddata);
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd, char const *filename, oflag_t oflags, int sflags, mode_t mode);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_, size_t size);
-INTDEF int NOTHROW_RPC(LIBCCALL libc___lock_fhandle)(fd_t fd);
-INTDEF void NOTHROW_NCX(LIBCCALL libc__unlock_fhandle)(fd_t fd);
 #endif /* !__KERNEL__ */
 
 DECL_END

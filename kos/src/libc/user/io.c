@@ -366,32 +366,9 @@ NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_,
 }
 /*[[[end:libc__mktemp_s]]]*/
 
-/*[[[head:libc___lock_fhandle,hash:CRC-32=0xb6f2c7f6]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") int
-NOTHROW_RPC(LIBCCALL libc___lock_fhandle)(fd_t fd)
-/*[[[body:libc___lock_fhandle]]]*/
-/*AUTO*/{
-	(void)fd;
-	CRT_UNIMPLEMENTED("__lock_fhandle"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc___lock_fhandle]]]*/
 
-/*[[[head:libc__unlock_fhandle,hash:CRC-32=0x2c2bb7d3]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") void
-NOTHROW_NCX(LIBCCALL libc__unlock_fhandle)(fd_t fd)
-/*[[[body:libc__unlock_fhandle]]]*/
-/*AUTO*/{
-	(void)fd;
-	CRT_UNIMPLEMENTED("_unlock_fhandle"); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc__unlock_fhandle]]]*/
 
 /*[[[end:implementation]]]*/
-
-
 
 
 #undef _findfirst
@@ -399,7 +376,7 @@ NOTHROW_NCX(LIBCCALL libc__unlock_fhandle)(fd_t fd)
 #undef _findnext
 #undef _findnexti64
 
-/*[[[start:exports,hash:CRC-32=0x3b274745]]]*/
+/*[[[start:exports,hash:CRC-32=0x7c0c20c7]]]*/
 DEFINE_PUBLIC_ALIAS(_access_s, libc__access_s);
 DEFINE_PUBLIC_ALIAS(_findclose, libc__findclose);
 DEFINE_PUBLIC_ALIAS(_findfirst, libc__findfirst32);
@@ -417,8 +394,6 @@ DEFINE_PUBLIC_ALIAS(_findnext64, libc__findnext64);
 DEFINE_PUBLIC_ALIAS(_sopen_s_nolock, libc__sopen_s);
 DEFINE_PUBLIC_ALIAS(_sopen_s, libc__sopen_s);
 DEFINE_PUBLIC_ALIAS(_mktemp_s, libc__mktemp_s);
-DEFINE_PUBLIC_ALIAS(__lock_fhandle, libc___lock_fhandle);
-DEFINE_PUBLIC_ALIAS(_unlock_fhandle, libc__unlock_fhandle);
 /*[[[end:exports]]]*/
 
 DECL_END

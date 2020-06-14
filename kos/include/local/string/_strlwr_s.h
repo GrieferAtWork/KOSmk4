@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf48c3bc */
+/* HASH CRC-32:0xab09c363 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,22 +22,6 @@
 #define __local__strlwr_s_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: tolower from ctype */
-#ifndef __local___localdep_tolower_defined
-#define __local___localdep_tolower_defined 1
-#if __has_builtin(__builtin_tolower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tolower)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,{ return __builtin_tolower(__ch); })
-#elif defined(__CRT_HAVE_tolower)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,(__ch))
-#elif defined(__CRT_HAVE__tolower)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),_tolower,(__ch))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/ctype/tolower.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_tolower __LIBC_LOCAL_NAME(tolower)
-#endif /* !... */
-#endif /* !__local___localdep_tolower_defined */
 /* Dependency: strnlen from string */
 #ifndef __local___localdep_strnlen_defined
 #define __local___localdep_strnlen_defined 1
@@ -55,6 +39,22 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strnlen __LIBC_LOCAL_NAME(strnlen)
 #endif /* !... */
 #endif /* !__local___localdep_strnlen_defined */
+/* Dependency: tolower from ctype */
+#ifndef __local___localdep_tolower_defined
+#define __local___localdep_tolower_defined 1
+#if __has_builtin(__builtin_tolower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tolower)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,{ return __builtin_tolower(__ch); })
+#elif defined(__CRT_HAVE_tolower)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,(__ch))
+#elif defined(__CRT_HAVE__tolower)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),_tolower,(__ch))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/ctype/tolower.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_tolower __LIBC_LOCAL_NAME(tolower)
+#endif /* !... */
+#endif /* !__local___localdep_tolower_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN

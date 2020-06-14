@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3367ce14 */
+/* HASH CRC-32:0xf3b00528 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,22 +22,6 @@
 #define __local__strupr_s_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: toupper from ctype */
-#ifndef __local___localdep_toupper_defined
-#define __local___localdep_toupper_defined 1
-#if __has_builtin(__builtin_toupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_toupper)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),toupper,{ return __builtin_toupper(__ch); })
-#elif defined(__CRT_HAVE_toupper)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),toupper,(__ch))
-#elif defined(__CRT_HAVE__toupper)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),_toupper,(__ch))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/ctype/toupper.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_toupper __LIBC_LOCAL_NAME(toupper)
-#endif /* !... */
-#endif /* !__local___localdep_toupper_defined */
 /* Dependency: strnlen from string */
 #ifndef __local___localdep_strnlen_defined
 #define __local___localdep_strnlen_defined 1
@@ -55,6 +39,22 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strnlen __LIBC_LOCAL_NAME(strnlen)
 #endif /* !... */
 #endif /* !__local___localdep_strnlen_defined */
+/* Dependency: toupper from ctype */
+#ifndef __local___localdep_toupper_defined
+#define __local___localdep_toupper_defined 1
+#if __has_builtin(__builtin_toupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_toupper)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),toupper,{ return __builtin_toupper(__ch); })
+#elif defined(__CRT_HAVE_toupper)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),toupper,(__ch))
+#elif defined(__CRT_HAVE__toupper)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),_toupper,(__ch))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/ctype/toupper.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_toupper __LIBC_LOCAL_NAME(toupper)
+#endif /* !... */
+#endif /* !__local___localdep_toupper_defined */
 __LOCAL_LIBC(_strupr_s) __ATTR_LEAF __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strupr_s))(char *__buf, __SIZE_TYPE__ __buflen) {
 	char *__iter, __ch;

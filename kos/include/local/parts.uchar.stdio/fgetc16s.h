@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a80268f */
+/* HASH CRC-32:0x66de6412 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,25 @@
 #if ((defined(__CRT_HAVE_fgetwc) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fgetwc) || (defined(__CRT_HAVE_getwc) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$getwc)) && ((defined(__CRT_HAVE_ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || (defined(__CRT_HAVE_ungetwc) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$ungetwc) || (defined(__CRT_HAVE_ungetwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: ferror from stdio */
+#ifndef __local___localdep_ferror_defined
+#define __local___localdep_ferror_defined 1
+#if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
+/* Check if an I/O error occurred in `STREAM' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
+#elif defined(__CRT_HAVE_ferror)
+/* Check if an I/O error occurred in `STREAM' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
+#elif defined(__CRT_HAVE__IO_ferror)
+/* Check if an I/O error occurred in `STREAM' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
+#elif defined(__CRT_HAVE_ferror_unlocked)
+/* Check if an I/O error occurred in `STREAM' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
+#else /* ... */
+#undef __local___localdep_ferror_defined
+#endif /* !... */
+#endif /* !__local___localdep_ferror_defined */
 /* Dependency: fgetc16 from parts.uchar.stdio */
 #ifndef __local___localdep_fgetc16_defined
 #define __local___localdep_fgetc16_defined 1
@@ -58,25 +77,6 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_unget
 #undef __local___localdep_ungetc16_defined
 #endif /* !... */
 #endif /* !__local___localdep_ungetc16_defined */
-/* Dependency: ferror from stdio */
-#ifndef __local___localdep_ferror_defined
-#define __local___localdep_ferror_defined 1
-#if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
-#elif defined(__CRT_HAVE_ferror)
-/* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
-#elif defined(__CRT_HAVE__IO_ferror)
-/* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
-#elif defined(__CRT_HAVE_ferror_unlocked)
-/* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
-#else /* ... */
-#undef __local___localdep_ferror_defined
-#endif /* !... */
-#endif /* !__local___localdep_ferror_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 #include <asm/stdio.h>

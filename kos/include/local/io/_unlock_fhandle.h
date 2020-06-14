@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d5645c6 */
+/* HASH CRC-32:0x1455cf96 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,19 +18,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_SEARCH_H
-#define GUARD_LIBC_USER_SEARCH_H 1
-
-#include "../api.h"
-#include "../auto/search.h"
-
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <search.h>
-
-DECL_BEGIN
-
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_SEARCH_H */
+#ifndef __local__unlock_fhandle_defined
+#define __local__unlock_fhandle_defined 1
+#include <__crt.h>
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(_unlock_fhandle) void
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_unlock_fhandle))(__fd_t __fd) {
+	(void)__fd;
+	/* No-op */
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep__unlock_fhandle_defined
+#define __local___localdep__unlock_fhandle_defined 1
+#define __localdep__unlock_fhandle __LIBC_LOCAL_NAME(_unlock_fhandle)
+#endif /* !__local___localdep__unlock_fhandle_defined */
+#endif /* !__local__unlock_fhandle_defined */

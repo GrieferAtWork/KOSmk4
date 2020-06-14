@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b8656fe */
+/* HASH CRC-32:0xb78c522a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,25 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: lseek32 from unistd */
+#ifndef __local___localdep_lseek32_defined
+#define __local___localdep_lseek32_defined 1
+#ifdef __CRT_HAVE_lseek
+/* >> lseek(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE__lseek)
+/* >> lseek(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE___lseek)
+/* >> lseek(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
+#else /* ... */
+#undef __local___localdep_lseek32_defined
+#endif /* !... */
+#endif /* !__local___localdep_lseek32_defined */
 /* Dependency: lseek64 from unistd */
 #ifndef __local___localdep_lseek64_defined
 #define __local___localdep_lseek64_defined 1
@@ -51,25 +70,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_lseek64_defined
 #endif /* !... */
 #endif /* !__local___localdep_lseek64_defined */
-/* Dependency: lseek32 from unistd */
-#ifndef __local___localdep_lseek32_defined
-#define __local___localdep_lseek32_defined 1
-#ifdef __CRT_HAVE_lseek
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE__lseek)
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE___lseek)
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `FD' */
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
-#else /* ... */
-#undef __local___localdep_lseek32_defined
-#endif /* !... */
-#endif /* !__local___localdep_lseek32_defined */
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __LOCAL_LIBC(lseek) __FS_TYPE(off)

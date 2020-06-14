@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa092086f */
+/* HASH CRC-32:0xa676f304 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,12 @@
 #include <__crt.h>
 struct __glob_struct;
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: globfree32 from glob */
+#if !defined(__local___localdep_globfree32_defined) && defined(__CRT_HAVE_globfree)
+#define __local___localdep_globfree32_defined 1
+/* Free storage allocated in PGLOB by a previous `glob' call */
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_globfree32,(void *__pglob),globfree,(__pglob))
+#endif /* !__local___localdep_globfree32_defined && __CRT_HAVE_globfree */
 /* Dependency: globfree64 from glob */
 #ifndef __local___localdep_globfree64_defined
 #define __local___localdep_globfree64_defined 1
@@ -40,12 +46,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_globfree64 __LIBC_LOCAL_NAME(globfree64)
 #endif /* !__CRT_HAVE_globfree64 */
 #endif /* !__local___localdep_globfree64_defined */
-/* Dependency: globfree32 from glob */
-#if !defined(__local___localdep_globfree32_defined) && defined(__CRT_HAVE_globfree)
-#define __local___localdep_globfree32_defined 1
-/* Free storage allocated in PGLOB by a previous `glob' call */
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_globfree32,(void *__pglob),globfree,(__pglob))
-#endif /* !__local___localdep_globfree32_defined && __CRT_HAVE_globfree */
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __LOCAL_LIBC(globfree) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(globfree))(struct __glob_struct *__pglob) {

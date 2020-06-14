@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cd9c622 */
+/* HASH CRC-32:0xf87c6b22 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,20 +22,6 @@
 #define __local_memcpyc_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memcpyq from string */
-#ifndef __local___localdep_memcpyq_defined
-#define __local___localdep_memcpyq_defined 1
-#ifdef __CRT_HAVE_memcpyq
-/* Copy memory between non-overlapping memory blocks. */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),memcpyq,(__dst,__src,__n_qwords))
-#else /* __CRT_HAVE_memcpyq */
-__NAMESPACE_LOCAL_END
-#include <local/string/memcpyq.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks. */
-#define __localdep_memcpyq __LIBC_LOCAL_NAME(memcpyq)
-#endif /* !__CRT_HAVE_memcpyq */
-#endif /* !__local___localdep_memcpyq_defined */
 /* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
@@ -72,6 +58,20 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyl __LIBC_LOCAL_NAME(memcpyl)
 #endif /* !... */
 #endif /* !__local___localdep_memcpyl_defined */
+/* Dependency: memcpyq from string */
+#ifndef __local___localdep_memcpyq_defined
+#define __local___localdep_memcpyq_defined 1
+#ifdef __CRT_HAVE_memcpyq
+/* Copy memory between non-overlapping memory blocks. */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),memcpyq,(__dst,__src,__n_qwords))
+#else /* __CRT_HAVE_memcpyq */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpyq.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Copy memory between non-overlapping memory blocks. */
+#define __localdep_memcpyq __LIBC_LOCAL_NAME(memcpyq)
+#endif /* !__CRT_HAVE_memcpyq */
+#endif /* !__local___localdep_memcpyq_defined */
 /* Dependency: memcpyw from string */
 #ifndef __local___localdep_memcpyw_defined
 #define __local___localdep_memcpyw_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d830a07 */
+/* HASH CRC-32:0xb92d4c59 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,11 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_sigtimedwait) || defined(__CRT_HAVE_sigtimedwait64)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: sigtimedwait32 from signal */
+#if !defined(__local___localdep_sigtimedwait32_defined) && defined(__CRT_HAVE_sigtimedwait)
+#define __local___localdep_sigtimedwait32_defined 1
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec32 const *__timeout),sigtimedwait,(__set,__info,__timeout))
+#endif /* !__local___localdep_sigtimedwait32_defined && __CRT_HAVE_sigtimedwait */
 /* Dependency: sigtimedwait64 from signal */
 #ifndef __local___localdep_sigtimedwait64_defined
 #define __local___localdep_sigtimedwait64_defined 1
@@ -39,11 +44,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_sigtimedwait64_defined
 #endif /* !... */
 #endif /* !__local___localdep_sigtimedwait64_defined */
-/* Dependency: sigtimedwait32 from signal */
-#if !defined(__local___localdep_sigtimedwait32_defined) && defined(__CRT_HAVE_sigtimedwait)
-#define __local___localdep_sigtimedwait32_defined 1
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec32 const *__timeout),sigtimedwait,(__set,__info,__timeout))
-#endif /* !__local___localdep_sigtimedwait32_defined && __CRT_HAVE_sigtimedwait */
 __LOCAL_LIBC(sigtimedwait) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait))(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct timespec const *__timeout) {
 #if defined(__CRT_HAVE_sigtimedwait64) || defined(__CRT_HAVE_sigtimedwait)

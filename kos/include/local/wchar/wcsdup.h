@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef790fa */
+/* HASH CRC-32:0x66383a79 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,22 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: malloc from stdlib */
+#ifndef __local___localdep_malloc_defined
+#define __local___localdep_malloc_defined 1
+#if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
+__CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,{ return __builtin_malloc(__num_bytes); })
+#elif defined(__CRT_HAVE_malloc)
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,(__num_bytes))
+#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/malloc.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_malloc __LIBC_LOCAL_NAME(malloc)
+#else /* ... */
+#undef __local___localdep_malloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_malloc_defined */
 /* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
@@ -59,22 +75,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcslen __LIBC_LOCAL_NAME(wcslen)
 #endif /* !... */
 #endif /* !__local___localdep_wcslen_defined */
-/* Dependency: malloc from stdlib */
-#ifndef __local___localdep_malloc_defined
-#define __local___localdep_malloc_defined 1
-#if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
-__CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,{ return __builtin_malloc(__num_bytes); })
-#elif defined(__CRT_HAVE_malloc)
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,(__num_bytes))
-#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
-__NAMESPACE_LOCAL_END
-#include <local/stdlib/malloc.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_malloc __LIBC_LOCAL_NAME(malloc)
-#else /* ... */
-#undef __local___localdep_malloc_defined
-#endif /* !... */
-#endif /* !__local___localdep_malloc_defined */
 __LOCAL_LIBC(wcsdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsdup))(__WCHAR_TYPE__ const *__restrict __string) {
 	__SIZE_TYPE__ __resultsize = (__localdep_wcslen(__string) + 1) * sizeof(__WCHAR_TYPE__);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc63acc96 */
+/* HASH CRC-32:0xd5eb2f64 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,6 +42,26 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcsnlen __LIBC_LOCAL_NAME(wcsnlen)
 #endif /* !... */
 #endif /* !__local___localdep_wcsnlen_defined */
+/* Dependency: wmemcpy from wchar */
+#ifndef __local___localdep_wmemcpy_defined
+#define __local___localdep_wmemcpy_defined 1
+#ifdef __CRT_HAVE_wmemcpy
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
+#elif defined(__CRT_HAVE_DOS$wmemcpy) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
+#elif defined(__CRT_HAVE_DOS$wmemcpy) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
+#elif defined(__CRT_HAVE_memcpyw) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyw,(__dst,__src,__num_chars))
+#elif defined(__CRT_HAVE_memcpyl) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyl,(__dst,__src,__num_chars))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wmemcpy.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wmemcpy __LIBC_LOCAL_NAME(wmemcpy)
+#endif /* !... */
+#endif /* !__local___localdep_wmemcpy_defined */
 /* Dependency: wmempset from wchar */
 #ifndef __local___localdep_wmempset_defined
 #define __local___localdep_wmempset_defined 1
@@ -68,26 +88,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wmempset __LIBC_LOCAL_NAME(wmempset)
 #endif /* !... */
 #endif /* !__local___localdep_wmempset_defined */
-/* Dependency: wmemcpy from wchar */
-#ifndef __local___localdep_wmemcpy_defined
-#define __local___localdep_wmemcpy_defined 1
-#ifdef __CRT_HAVE_wmemcpy
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_DOS$wmemcpy) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_DOS$wmemcpy) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_memcpyw) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyw,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_memcpyl) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyl,(__dst,__src,__num_chars))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/wchar/wmemcpy.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_wmemcpy __LIBC_LOCAL_NAME(wmemcpy)
-#endif /* !... */
-#endif /* !__local___localdep_wmemcpy_defined */
 /* Same as wcsncpy, but return a pointer after the last written character */
 __LOCAL_LIBC(wcspncpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcspncpy))(__WCHAR_TYPE__ *__restrict __buf, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __buflen) {

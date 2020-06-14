@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a62f46d */
+/* HASH CRC-32:0x68c00efe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,26 +22,6 @@
 #define __local_wcsncpy_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wmemset from wchar */
-#ifndef __local___localdep_wmemset_defined
-#define __local___localdep_wmemset_defined 1
-#ifdef __CRT_HAVE_wmemset
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmemset,(__dst,__filler,__num_chars))
-#elif defined(__CRT_HAVE_DOS$wmemset) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmemset,(__dst,__filler,__num_chars))
-#elif defined(__CRT_HAVE_DOS$wmemset) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmemset,(__dst,__filler,__num_chars))
-#elif defined(__CRT_HAVE_memsetw) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),memsetw,(__dst,__filler,__num_chars))
-#elif defined(__CRT_HAVE_memsetl) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),memsetl,(__dst,__filler,__num_chars))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/wchar/wmemset.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_wmemset __LIBC_LOCAL_NAME(wmemset)
-#endif /* !... */
-#endif /* !__local___localdep_wmemset_defined */
 /* Dependency: wcsnlen from wchar */
 #ifndef __local___localdep_wcsnlen_defined
 #define __local___localdep_wcsnlen_defined 1
@@ -82,6 +62,26 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wmemcpy __LIBC_LOCAL_NAME(wmemcpy)
 #endif /* !... */
 #endif /* !__local___localdep_wmemcpy_defined */
+/* Dependency: wmemset from wchar */
+#ifndef __local___localdep_wmemset_defined
+#define __local___localdep_wmemset_defined 1
+#ifdef __CRT_HAVE_wmemset
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmemset,(__dst,__filler,__num_chars))
+#elif defined(__CRT_HAVE_DOS$wmemset) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmemset,(__dst,__filler,__num_chars))
+#elif defined(__CRT_HAVE_DOS$wmemset) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmemset,(__dst,__filler,__num_chars))
+#elif defined(__CRT_HAVE_memsetw) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),memsetw,(__dst,__filler,__num_chars))
+#elif defined(__CRT_HAVE_memsetl) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),memsetl,(__dst,__filler,__num_chars))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wmemset.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wmemset __LIBC_LOCAL_NAME(wmemset)
+#endif /* !... */
+#endif /* !__local___localdep_wmemset_defined */
 __LOCAL_LIBC(wcsncpy) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncpy))(__WCHAR_TYPE__ *__restrict __buf, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __buflen) {
 	__SIZE_TYPE__ __srclen = __localdep_wcsnlen(__src, __buflen);

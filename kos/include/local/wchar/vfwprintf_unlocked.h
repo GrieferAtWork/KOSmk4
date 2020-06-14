@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf4094ec */
+/* HASH CRC-32:0x7f0d2289 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,37 @@
 #if defined(__CRT_HAVE_file_wprinter_unlocked) || (defined(__CRT_HAVE_DOS$file_wprinter_unlocked) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$file_wprinter_unlocked) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_file_wprinter) || (defined(__CRT_HAVE_DOS$file_wprinter) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$file_wprinter) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_fputwc_unlocked) || (defined(__CRT_HAVE_DOS$fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_fputwc_nolock) && __SIZEOF_WCHAR_T__ == 2)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: file_wprinter_unlocked from wchar */
+#ifndef __local___localdep_file_wprinter_unlocked_defined
+#define __local___localdep_file_wprinter_unlocked_defined 1
+#ifdef __CRT_HAVE_file_wprinter_unlocked
+/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_DOS$file_wprinter_unlocked) && __SIZEOF_WCHAR_T__ == 4
+/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_DOS$file_wprinter_unlocked) && __SIZEOF_WCHAR_T__ == 2
+/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_file_wprinter)
+/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_DOS$file_wprinter) && __SIZEOF_WCHAR_T__ == 4
+/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_DOS$file_wprinter) && __SIZEOF_WCHAR_T__ == 2
+/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_fputwc_unlocked) || (defined(__CRT_HAVE_DOS$fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_fputwc_nolock) && __SIZEOF_WCHAR_T__ == 2)
+__NAMESPACE_LOCAL_END
+#include <local/wchar/file_wprinter_unlocked.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
+#define __localdep_file_wprinter_unlocked __LIBC_LOCAL_NAME(file_wprinter_unlocked)
+#else /* ... */
+#undef __local___localdep_file_wprinter_unlocked_defined
+#endif /* !... */
+#endif /* !__local___localdep_file_wprinter_unlocked_defined */
 /* Dependency: format_vwprintf from parts.wchar.format-printer */
 #ifndef __local___localdep_format_vwprintf_defined
 #define __local___localdep_format_vwprintf_defined 1
@@ -400,37 +431,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_vwprintf __LIBC_LOCAL_NAME(format_vwprintf)
 #endif /* !... */
 #endif /* !__local___localdep_format_vwprintf_defined */
-/* Dependency: file_wprinter_unlocked from wchar */
-#ifndef __local___localdep_file_wprinter_unlocked_defined
-#define __local___localdep_file_wprinter_unlocked_defined 1
-#ifdef __CRT_HAVE_file_wprinter_unlocked
-/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_DOS$file_wprinter_unlocked) && __SIZEOF_WCHAR_T__ == 4
-/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_DOS$file_wprinter_unlocked) && __SIZEOF_WCHAR_T__ == 2
-/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_file_wprinter)
-/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_DOS$file_wprinter) && __SIZEOF_WCHAR_T__ == 4
-/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_DOS$file_wprinter) && __SIZEOF_WCHAR_T__ == 2
-/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_fputwc_unlocked) || (defined(__CRT_HAVE_DOS$fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_fputwc_nolock) && __SIZEOF_WCHAR_T__ == 2)
-__NAMESPACE_LOCAL_END
-#include <local/wchar/file_wprinter_unlocked.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-#define __localdep_file_wprinter_unlocked __LIBC_LOCAL_NAME(file_wprinter_unlocked)
-#else /* ... */
-#undef __local___localdep_file_wprinter_unlocked_defined
-#endif /* !... */
-#endif /* !__local___localdep_file_wprinter_unlocked_defined */
 __LOCAL_LIBC(vfwprintf_unlocked) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vfwprintf_unlocked))(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 	return (__STDC_INT_AS_SSIZE_T)__localdep_format_vwprintf(&__localdep_file_wprinter_unlocked,

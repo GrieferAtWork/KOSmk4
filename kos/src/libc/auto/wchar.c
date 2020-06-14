@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x629311cb */
+/* HASH CRC-32:0x18875149 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -374,122 +374,26 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_mbsinit)(mbstate_t const *mbs) {
 	return !mbs || __MBSTATE_ISINIT(mbs);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
-NOTHROW_NCX(LIBDCALL libd_wmemcmp)(char16_t const *s1,
-                                   char16_t const *s2,
-                                   size_t num_chars) {
-#if 2 == 2
-	return libc_memcmpw(s1, s2, num_chars);
-#elif 2 == 4
-	return libc_memcmpl(s1, s2, num_chars);
-#else /* ... */
-	return libc_memcmp(s1, s2, num_chars * sizeof(char16_t));
-#endif /* !... */
-}
-INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
-NOTHROW_NCX(LIBKCALL libc_wmemcmp)(char32_t const *s1,
-                                   char32_t const *s2,
-                                   size_t num_chars) {
-#if 4 == 2
-	return libc_memcmpw(s1, s2, num_chars);
-#elif 4 == 4
-	return libc_memcmpl(s1, s2, num_chars);
-#else /* ... */
-	return libc_memcmp(s1, s2, num_chars * sizeof(char32_t));
-#endif /* !... */
-}
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wmemcpy)(char16_t *__restrict dst,
-                                   char16_t const *__restrict src,
-                                   size_t num_chars) {
-#if 2 == 2
-	return (char16_t *)libc_memcpyw(dst, src, num_chars);
-#elif 2 == 4
-	return (char16_t *)libc_memcpyl(dst, src, num_chars);
-#else /* ... */
-	return (char16_t *)libc_memcpyc(dst, src, num_chars, sizeof(char16_t));
-#endif /* !... */
-}
-INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
-NOTHROW_NCX(LIBKCALL libc_wmemcpy)(char32_t *__restrict dst,
-                                   char32_t const *__restrict src,
-                                   size_t num_chars) {
-#if 4 == 2
-	return (char32_t *)libc_memcpyw(dst, src, num_chars);
-#elif 4 == 4
-	return (char32_t *)libc_memcpyl(dst, src, num_chars);
-#else /* ... */
-	return (char32_t *)libc_memcpyc(dst, src, num_chars, sizeof(char32_t));
-#endif /* !... */
-}
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wmemmove)(char16_t *dst,
-                                    char16_t const *src,
-                                    size_t num_chars) {
-#if 2 == 2
-	return (char16_t *)libc_memmovew(dst, src, num_chars);
-#elif 2 == 4
-	return (char16_t *)libc_memmovel(dst, src, num_chars);
-#else /* ... */
-	return (char16_t *)libc_memmove(dst, src, num_chars * sizeof(char16_t));
-#endif /* !... */
-}
-INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
-NOTHROW_NCX(LIBKCALL libc_wmemmove)(char32_t *dst,
-                                    char32_t const *src,
-                                    size_t num_chars) {
-#if 4 == 2
-	return (char32_t *)libc_memmovew(dst, src, num_chars);
-#elif 4 == 4
-	return (char32_t *)libc_memmovel(dst, src, num_chars);
-#else /* ... */
-	return (char32_t *)libc_memmove(dst, src, num_chars * sizeof(char32_t));
-#endif /* !... */
-}
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wmemset)(char16_t *dst,
-                                   char16_t filler,
-                                   size_t num_chars) {
-#if 2 == 2
-	return (char16_t *)libc_memsetw(dst, (u16)filler, num_chars);
-#elif 2 == 4
-	return (char16_t *)libc_memsetl(dst, (u32)filler, num_chars);
-#else /* ... */
-	return (char16_t *)libc_memset(dst, (int)filler, num_chars * sizeof(char16_t));
-#endif /* !... */
-}
-INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char32_t *
-NOTHROW_NCX(LIBKCALL libc_wmemset)(char32_t *dst,
-                                   char32_t filler,
-                                   size_t num_chars) {
-#if 4 == 2
-	return (char32_t *)libc_memsetw(dst, (u16)filler, num_chars);
-#elif 4 == 4
-	return (char32_t *)libc_memsetl(dst, (u32)filler, num_chars);
-#else /* ... */
-	return (char32_t *)libc_memset(dst, (int)filler, num_chars * sizeof(char32_t));
-#endif /* !... */
-}
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscpy)(char16_t *__restrict buf,
                                   char16_t const *__restrict src) {
-	return libd_wmemcpy(buf, src, libd_wcslen(src) + 1);
+	return (char16_t *)libc_memcpyw(buf, src, libd_wcslen(src) + 1);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcscpy)(char32_t *__restrict buf,
                                   char32_t const *__restrict src) {
-	return libc_wmemcpy(buf, src, libc_wcslen(src) + 1);
+	return (char32_t *)libc_memcpyl(buf, src, libc_wcslen(src) + 1);
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscat)(char16_t *__restrict buf,
                                   char16_t const *__restrict src) {
-	libd_wmemcpy(libd_wcsend(buf), src, libd_wcslen(src) + 1);
+	(char16_t *)libc_memcpyw(libd_wcsend(buf), src, libd_wcslen(src) + 1);
 	return buf;
 }
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcscat)(char32_t *__restrict buf,
                                   char32_t const *__restrict src) {
-	libc_wmemcpy(libc_wcsend(buf), src, libc_wcslen(src) + 1);
+	(char32_t *)libc_memcpyl(libc_wcsend(buf), src, libc_wcslen(src) + 1);
 	return buf;
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
@@ -498,7 +402,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncat)(char16_t *__restrict buf,
                                    size_t buflen) {
 	size_t srclen = libd_wcsnlen(src, buflen);
 	char16_t *dst = libd_wcsend(buf);
-	libd_wmemcpy(dst, src, srclen);
+	(char16_t *)libc_memcpyw(dst, src, srclen);
 	dst[srclen] = '\0';
 	return buf;
 }
@@ -508,7 +412,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncat)(char32_t *__restrict buf,
                                    size_t buflen) {
 	size_t srclen = libc_wcsnlen(src, buflen);
 	char32_t *dst = libc_wcsend(buf);
-	libc_wmemcpy(dst, src, srclen);
+	(char32_t *)libc_memcpyl(dst, src, srclen);
 	dst[srclen] = '\0';
 	return buf;
 }
@@ -517,8 +421,8 @@ NOTHROW_NCX(LIBDCALL libd_wcsncpy)(char16_t *__restrict buf,
                                    char16_t const *__restrict src,
                                    size_t buflen) {
 	size_t srclen = libd_wcsnlen(src, buflen);
-	libd_wmemcpy(buf, src, srclen);
-	libd_wmemset(buf+srclen, '\0', buflen - srclen);
+	(char16_t *)libc_memcpyw(buf, src, srclen);
+	(char16_t *)libc_memsetw(buf+srclen, '\0', buflen - srclen);
 	return buf;
 }
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
@@ -526,8 +430,8 @@ NOTHROW_NCX(LIBKCALL libc_wcsncpy)(char32_t *__restrict buf,
                                    char32_t const *__restrict src,
                                    size_t buflen) {
 	size_t srclen = libc_wcsnlen(src, buflen);
-	libc_wmemcpy(buf, src, srclen);
-	libc_wmemset(buf+srclen, '\0', buflen - srclen);
+	(char32_t *)libc_memcpyl(buf, src, srclen);
+	(char32_t *)libc_memsetl(buf+srclen, '\0', buflen - srclen);
 	return buf;
 }
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
@@ -1383,20 +1287,20 @@ NOTHROW_NCX(LIBKCALL libc_wcsxfrm_l)(char32_t *dst,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcpcpy)(char16_t *__restrict dst,
                                   char16_t const *__restrict src) {
-	return libd_wmempcpy(dst, src, libd_wcslen(src) + 1);
+	return (char16_t *)libc_mempcpyw(dst, src, libd_wcslen(src) + 1);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcpcpy)(char32_t *__restrict dst,
                                   char32_t const *__restrict src) {
-	return libc_wmempcpy(dst, src, libc_wcslen(src) + 1);
+	return (char32_t *)libc_mempcpyl(dst, src, libc_wcslen(src) + 1);
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcpncpy)(char16_t *__restrict buf,
                                    char16_t const *__restrict src,
                                    size_t buflen) {
 	size_t srclen = libd_wcsnlen(src, buflen);
-	libd_wmemcpy(buf, src, srclen);
-	libd_wmemset(buf + srclen, '\0', (size_t)(buflen - srclen));
+	(char16_t *)libc_memcpyw(buf, src, srclen);
+	(char16_t *)libc_memsetw(buf + srclen, '\0', (size_t)(buflen - srclen));
 	return buf + srclen;
 }
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
@@ -1404,8 +1308,8 @@ NOTHROW_NCX(LIBKCALL libc_wcpncpy)(char32_t *__restrict buf,
                                    char32_t const *__restrict src,
                                    size_t buflen) {
 	size_t srclen = libc_wcsnlen(src, buflen);
-	libc_wmemcpy(buf, src, srclen);
-	libc_wmemset(buf + srclen, '\0', (size_t)(buflen - srclen));
+	(char32_t *)libc_memcpyl(buf, src, srclen);
+	(char32_t *)libc_memsetl(buf + srclen, '\0', (size_t)(buflen - srclen));
 	return buf + srclen;
 }
 #ifndef LIBC_ARCH_HAVE_C16SNLEN
@@ -1517,54 +1421,6 @@ NOTHROW_NCX(LIBKCALL libc_wcschrnul)(char32_t const *haystack,
 			break;
 	}
 	return (char32_t *)haystack;
-}
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wmempcpy)(char16_t *__restrict dst,
-                                    char16_t const *__restrict src,
-                                    size_t num_chars) {
-#if 2 == 2
-	return (char16_t *)libc_mempcpyw(dst, src, num_chars);
-#elif 2 == 4
-	return (char16_t *)libc_mempcpyl(dst, src, num_chars);
-#else /* ... */
-	return (char16_t *)libc_mempcpy(dst, src, num_chars * sizeof(char16_t));
-#endif /* !... */
-}
-INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
-NOTHROW_NCX(LIBKCALL libc_wmempcpy)(char32_t *__restrict dst,
-                                    char32_t const *__restrict src,
-                                    size_t num_chars) {
-#if 4 == 2
-	return (char32_t *)libc_mempcpyw(dst, src, num_chars);
-#elif 4 == 4
-	return (char32_t *)libc_mempcpyl(dst, src, num_chars);
-#else /* ... */
-	return (char32_t *)libc_mempcpy(dst, src, num_chars * sizeof(char32_t));
-#endif /* !... */
-}
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wmempmove)(char16_t *dst,
-                                     char16_t const *src,
-                                     size_t num_chars) {
-#if 2 == 2
-	return (char16_t *)libc_mempmovew(dst, src, num_chars);
-#elif 2 == 4
-	return (char16_t *)libc_mempmovel(dst, src, num_chars);
-#else /* ... */
-	return (char16_t *)libc_mempmove(dst, src, num_chars * sizeof(char16_t));
-#endif /* !... */
-}
-INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
-NOTHROW_NCX(LIBKCALL libc_wmempmove)(char32_t *dst,
-                                     char32_t const *src,
-                                     size_t num_chars) {
-#if 4 == 2
-	return (char32_t *)libc_mempmovew(dst, src, num_chars);
-#elif 4 == 4
-	return (char32_t *)libc_mempmovel(dst, src, num_chars);
-#else /* ... */
-	return (char32_t *)libc_mempmove(dst, src, num_chars * sizeof(char32_t));
-#endif /* !... */
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_PURE WUNUSED NONNULL((1)) long
 NOTHROW_NCX(LIBDCALL libd__wcstol_l)(char16_t const *__restrict nptr,
@@ -2360,13 +2216,13 @@ NOTHROW_NCX(LIBKCALL libc_wcscasestr)(char32_t const *haystack,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcspcpy)(char16_t *__restrict buf,
                                    char16_t const *__restrict src) {
-	return libd_wmempcpy(buf, src, libd_wcslen(src) + 1);
+	return (char16_t *)libc_mempcpyw(buf, src, libd_wcslen(src) + 1);
 }
 /* Same as wcscpy, but return a pointer after the last written character */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcspcpy)(char32_t *__restrict buf,
                                    char32_t const *__restrict src) {
-	return libc_wmempcpy(buf, src, libc_wcslen(src) + 1);
+	return (char32_t *)libc_mempcpyl(buf, src, libc_wcslen(src) + 1);
 }
 /* Same as wcsncpy, but return a pointer after the last written character */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
@@ -2374,8 +2230,8 @@ NOTHROW_NCX(LIBDCALL libd_wcspncpy)(char16_t *__restrict buf,
                                     char16_t const *__restrict src,
                                     size_t buflen) {
 	size_t srclen = libd_wcsnlen(src, buflen);
-	libd_wmemcpy(buf, src, srclen);
-	return libd_wmempset(buf+srclen, '\0', buflen - srclen);
+	(char16_t *)libc_memcpyw(buf, src, srclen);
+	return (char16_t *)libc_mempsetw(buf+srclen, '\0', buflen - srclen);
 }
 /* Same as wcsncpy, but return a pointer after the last written character */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
@@ -2383,34 +2239,8 @@ NOTHROW_NCX(LIBKCALL libc_wcspncpy)(char32_t *__restrict buf,
                                     char32_t const *__restrict src,
                                     size_t buflen) {
 	size_t srclen = libc_wcsnlen(src, buflen);
-	libc_wmemcpy(buf, src, srclen);
-	return libc_wmempset(buf+srclen, '\0', buflen - srclen);
-}
-/* Same as wmemset, but return a pointer after the last written character */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wmempset)(char16_t *dst,
-                                    char16_t filler,
-                                    size_t num_chars) {
-#if 2 == 2
-	return (char16_t *)libc_mempsetw(dst, (u16)filler, num_chars);
-#elif 2 == 4
-	return (char16_t *)libc_mempsetl(dst, (u32)filler, num_chars);
-#else /* ... */
-	return (char16_t *)libc_mempset(dst, (int)filler, num_chars * sizeof(char16_t));
-#endif /* !... */
-}
-/* Same as wmemset, but return a pointer after the last written character */
-INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *
-NOTHROW_NCX(LIBKCALL libc_wmempset)(char32_t *dst,
-                                    char32_t filler,
-                                    size_t num_chars) {
-#if 4 == 2
-	return (char32_t *)libc_mempsetw(dst, (u16)filler, num_chars);
-#elif 4 == 4
-	return (char32_t *)libc_mempsetl(dst, (u32)filler, num_chars);
-#else /* ... */
-	return (char32_t *)libc_mempset(dst, (int)filler, num_chars * sizeof(char32_t));
-#endif /* !... */
+	(char32_t *)libc_memcpyl(buf, src, srclen);
+	return (char32_t *)libc_mempsetl(buf+srclen, '\0', buflen - srclen);
 }
 /* Same as `wcschr', but don't exceed `MAX_CHARS' characters. */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
@@ -2648,43 +2478,17 @@ NOTHROW_NCX(LIBKCALL libc_wcsnroff)(char32_t const *__restrict haystack,
                                     size_t maxlen) {
 	return (size_t)(libc_wcsnrchrnul(haystack, needle, maxlen) - haystack);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
-NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcmp)(char16_t const *s1,
-                                         size_t s1_chars,
-                                         char16_t const *s2,
-                                         size_t s2_chars) {
-#if 2 == 2
-	return libc_fuzzy_memcmpw(s1, s1_chars, s2, s2_chars);
-#elif 2 == 4
-	return libc_fuzzy_memcmpl(s1, s1_chars, s2, s2_chars);
-#else /* ... */
-	return libc_fuzzy_memcmp(s1, s1_chars * sizeof(char16_t), s2, s2_chars * sizeof(char16_t));
-#endif /* !... */
-}
-INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
-NOTHROW_NCX(LIBKCALL libc_fuzzy_wmemcmp)(char32_t const *s1,
-                                         size_t s1_chars,
-                                         char32_t const *s2,
-                                         size_t s2_chars) {
-#if 4 == 2
-	return libc_fuzzy_memcmpw(s1, s1_chars, s2, s2_chars);
-#elif 4 == 4
-	return libc_fuzzy_memcmpl(s1, s1_chars, s2, s2_chars);
-#else /* ... */
-	return libc_fuzzy_memcmp(s1, s1_chars * sizeof(char32_t), s2, s2_chars * sizeof(char32_t));
-#endif /* !... */
-}
 #include <parts/malloca.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wcscmp)(char16_t const *s1,
                                         char16_t const *s2) {
-	return libd_fuzzy_wmemcmp(s1, libd_wcslen(s1), s2, libd_wcslen(s2));
+	return libc_fuzzy_memcmpw(s1, libd_wcslen(s1), s2, libd_wcslen(s2));
 }
 #include <parts/malloca.h>
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBKCALL libc_fuzzy_wcscmp)(char32_t const *s1,
                                         char32_t const *s2) {
-	return libc_fuzzy_wmemcmp(s1, libc_wcslen(s1), s2, libc_wcslen(s2));
+	return libc_fuzzy_memcmpl(s1, libc_wcslen(s1), s2, libc_wcslen(s2));
 }
 #include <parts/malloca.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
@@ -2692,7 +2496,7 @@ NOTHROW_NCX(LIBDCALL libd_fuzzy_wcsncmp)(char16_t const *s1,
                                          size_t s1_maxlen,
                                          char16_t const *s2,
                                          size_t s2_maxlen) {
-	return libd_fuzzy_wmemcmp(s1, libd_wcsnlen(s1, s1_maxlen), s2, libd_wcsnlen(s2, s2_maxlen));
+	return libc_fuzzy_memcmpw(s1, libd_wcsnlen(s1, s1_maxlen), s2, libd_wcsnlen(s2, s2_maxlen));
 }
 #include <parts/malloca.h>
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
@@ -2700,7 +2504,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wcsncmp)(char32_t const *s1,
                                          size_t s1_maxlen,
                                          char32_t const *s2,
                                          size_t s2_maxlen) {
-	return libc_fuzzy_wmemcmp(s1, libc_wcsnlen(s1, s1_maxlen), s2, libc_wcsnlen(s2, s2_maxlen));
+	return libc_fuzzy_memcmpl(s1, libc_wcsnlen(s1, s1_maxlen), s2, libc_wcsnlen(s2, s2_maxlen));
 }
 #include <parts/malloca.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
@@ -5179,14 +4983,6 @@ DEFINE_PUBLIC_ALIAS(wcstol, libc_wcstol);
 DEFINE_PUBLIC_ALIAS(DOS$wcstoul, libd_wcstoul);
 DEFINE_PUBLIC_ALIAS(wcstoul, libc_wcstoul);
 DEFINE_PUBLIC_ALIAS(mbsinit, libc_mbsinit);
-DEFINE_PUBLIC_ALIAS(DOS$wmemcmp, libd_wmemcmp);
-DEFINE_PUBLIC_ALIAS(wmemcmp, libc_wmemcmp);
-DEFINE_PUBLIC_ALIAS(DOS$wmemcpy, libd_wmemcpy);
-DEFINE_PUBLIC_ALIAS(wmemcpy, libc_wmemcpy);
-DEFINE_PUBLIC_ALIAS(DOS$wmemmove, libd_wmemmove);
-DEFINE_PUBLIC_ALIAS(wmemmove, libc_wmemmove);
-DEFINE_PUBLIC_ALIAS(DOS$wmemset, libd_wmemset);
-DEFINE_PUBLIC_ALIAS(wmemset, libc_wmemset);
 DEFINE_PUBLIC_ALIAS(DOS$wcscpy, libd_wcscpy);
 DEFINE_PUBLIC_ALIAS(wcscpy, libc_wcscpy);
 DEFINE_PUBLIC_ALIAS(DOS$wcscat, libd_wcscat);
@@ -5309,10 +5105,6 @@ DEFINE_PUBLIC_ALIAS(DOS$wcswidth, libd_wcswidth);
 DEFINE_PUBLIC_ALIAS(wcswidth, libc_wcswidth);
 DEFINE_PUBLIC_ALIAS(DOS$wcschrnul, libd_wcschrnul);
 DEFINE_PUBLIC_ALIAS(wcschrnul, libc_wcschrnul);
-DEFINE_PUBLIC_ALIAS(DOS$wmempcpy, libd_wmempcpy);
-DEFINE_PUBLIC_ALIAS(wmempcpy, libc_wmempcpy);
-DEFINE_PUBLIC_ALIAS(DOS$wmempmove, libd_wmempmove);
-DEFINE_PUBLIC_ALIAS(wmempmove, libc_wmempmove);
 DEFINE_PUBLIC_ALIAS(DOS$_wcstol_l, libd__wcstol_l);
 DEFINE_PUBLIC_ALIAS(__wcstol_l, libc_wcstol_l);
 DEFINE_PUBLIC_ALIAS(wcstol_l, libc_wcstol_l);
@@ -5408,8 +5200,6 @@ DEFINE_PUBLIC_ALIAS(DOS$wcspcpy, libd_wcspcpy);
 DEFINE_PUBLIC_ALIAS(wcspcpy, libc_wcspcpy);
 DEFINE_PUBLIC_ALIAS(DOS$wcspncpy, libd_wcspncpy);
 DEFINE_PUBLIC_ALIAS(wcspncpy, libc_wcspncpy);
-DEFINE_PUBLIC_ALIAS(DOS$wmempset, libd_wmempset);
-DEFINE_PUBLIC_ALIAS(wmempset, libc_wmempset);
 DEFINE_PUBLIC_ALIAS(DOS$wcsnchr, libd_wcsnchr);
 DEFINE_PUBLIC_ALIAS(wcsnchr, libc_wcsnchr);
 DEFINE_PUBLIC_ALIAS(DOS$wcsnrchr, libd_wcsnrchr);
@@ -5434,8 +5224,6 @@ DEFINE_PUBLIC_ALIAS(DOS$wcsnoff, libd_wcsnoff);
 DEFINE_PUBLIC_ALIAS(wcsnoff, libc_wcsnoff);
 DEFINE_PUBLIC_ALIAS(DOS$wcsnroff, libd_wcsnroff);
 DEFINE_PUBLIC_ALIAS(wcsnroff, libc_wcsnroff);
-DEFINE_PUBLIC_ALIAS(DOS$fuzzy_wmemcmp, libd_fuzzy_wmemcmp);
-DEFINE_PUBLIC_ALIAS(fuzzy_wmemcmp, libc_fuzzy_wmemcmp);
 DEFINE_PUBLIC_ALIAS(DOS$fuzzy_wcscmp, libd_fuzzy_wcscmp);
 DEFINE_PUBLIC_ALIAS(fuzzy_wcscmp, libc_fuzzy_wcscmp);
 DEFINE_PUBLIC_ALIAS(DOS$fuzzy_wcsncmp, libd_fuzzy_wcsncmp);

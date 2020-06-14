@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc02e25d9 */
+/* HASH CRC-32:0x20d7f6f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,25 +22,6 @@
 #define __local_c16stok_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c16sspn from parts.uchar.string */
-#ifndef __local___localdep_c16sspn_defined
-#define __local___localdep_c16sspn_defined 1
-#if defined(__CRT_HAVE_wcsspn) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16sspn,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
-#elif defined(__CRT_HAVE_DOS$wcsspn)
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16sspn,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
-#elif (__SIZEOF_WCHAR_T__ == 2)
-__NAMESPACE_LOCAL_END
-#include <local/wchar/wcsspn.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16sspn (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *))&__LIBC_LOCAL_NAME(wcsspn))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/parts.uchar.string/c16sspn.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16sspn __LIBC_LOCAL_NAME(c16sspn)
-#endif /* !... */
-#endif /* !__local___localdep_c16sspn_defined */
 /* Dependency: c16scspn from parts.uchar.string */
 #ifndef __local___localdep_c16scspn_defined
 #define __local___localdep_c16scspn_defined 1
@@ -60,6 +41,25 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16scspn __LIBC_LOCAL_NAME(c16scspn)
 #endif /* !... */
 #endif /* !__local___localdep_c16scspn_defined */
+/* Dependency: c16sspn from parts.uchar.string */
+#ifndef __local___localdep_c16sspn_defined
+#define __local___localdep_c16sspn_defined 1
+#if defined(__CRT_HAVE_wcsspn) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16sspn,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
+#elif defined(__CRT_HAVE_DOS$wcsspn)
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16sspn,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
+#elif (__SIZEOF_WCHAR_T__ == 2)
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wcsspn.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_c16sspn (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *))&__LIBC_LOCAL_NAME(wcsspn))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/parts.uchar.string/c16sspn.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_c16sspn __LIBC_LOCAL_NAME(c16sspn)
+#endif /* !... */
+#endif /* !__local___localdep_c16sspn_defined */
 __LOCAL_LIBC(c16stok) __ATTR_NONNULL((2, 3)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stok))(__CHAR16_TYPE__ *__string, __CHAR16_TYPE__ const *__restrict __delim, __CHAR16_TYPE__ **__restrict __save_ptr) {
 	__CHAR16_TYPE__ *__end;

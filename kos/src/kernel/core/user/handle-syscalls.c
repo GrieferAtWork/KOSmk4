@@ -1790,7 +1790,7 @@ again:
 				new_ebits |= mask;
 		}
 		if (result) {
-			/* Update the fd-set words of  */
+			/* Update the fd-set words of all signaled FDs */
 			if (readfds)   ((fds_word_t *)readfds)[i] = new_rbits;
 			if (writefds)  ((fds_word_t *)writefds)[i] = new_wbits;
 			if (exceptfds) ((fds_word_t *)exceptfds)[i] = new_ebits;

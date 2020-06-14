@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd232fc98 */
+/* HASH CRC-32:0x6d4cc66c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,22 +25,6 @@
 #include <bits/types.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: OpenAt from kos.fcntl */
-#ifndef __local___localdep_OpenAt_defined
-#define __local___localdep_OpenAt_defined 1
-#if defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__THROWING,__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),Openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_OpenAt) && !defined(__USE_FILE_OFFSET64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__THROWING,__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64)
-__NAMESPACE_LOCAL_END
-#include <local/kos.fcntl/OpenAt.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_OpenAt __LIBC_LOCAL_NAME(OpenAt)
-#else /* ... */
-#undef __local___localdep_OpenAt_defined
-#endif /* !... */
-#endif /* !__local___localdep_OpenAt_defined */
 /* Dependency: Open64 from kos.fcntl */
 #ifndef __local___localdep_Open64_defined
 #define __local___localdep_Open64_defined 1
@@ -57,6 +41,22 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_Open64_defined
 #endif /* !... */
 #endif /* !__local___localdep_Open64_defined */
+/* Dependency: OpenAt from kos.fcntl */
+#ifndef __local___localdep_OpenAt_defined
+#define __local___localdep_OpenAt_defined 1
+#if defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__THROWING,__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),Openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE_OpenAt) && !defined(__USE_FILE_OFFSET64)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__THROWING,__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64)
+__NAMESPACE_LOCAL_END
+#include <local/kos.fcntl/OpenAt.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_OpenAt __LIBC_LOCAL_NAME(OpenAt)
+#else /* ... */
+#undef __local___localdep_OpenAt_defined
+#endif /* !... */
+#endif /* !__local___localdep_OpenAt_defined */
 __LOCAL_LIBC(Open) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 (__VLIBCCALL __LIBC_LOCAL_NAME(Open))(char const *__filename, __oflag_t __oflags, ...) __THROWS(...) {
 	__fd_t __result;

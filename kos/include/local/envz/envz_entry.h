@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc65195 */
+/* HASH CRC-32:0x9f14b761 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,34 +22,6 @@
 #define __local_envz_entry_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: stroff from string */
-#ifndef __local___localdep_stroff_defined
-#define __local___localdep_stroff_defined 1
-#ifdef __CRT_HAVE_stroff
-/* Same as `strchrnul', but return the offset from `STR', rather than the actual address */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_stroff,(char const *__restrict __haystack, int __needle),stroff,(__haystack,__needle))
-#else /* __CRT_HAVE_stroff */
-__NAMESPACE_LOCAL_END
-#include <local/string/stroff.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Same as `strchrnul', but return the offset from `STR', rather than the actual address */
-#define __localdep_stroff __LIBC_LOCAL_NAME(stroff)
-#endif /* !__CRT_HAVE_stroff */
-#endif /* !__local___localdep_stroff_defined */
-/* Dependency: strend from string */
-#ifndef __local___localdep_strend_defined
-#define __local___localdep_strend_defined 1
-#ifdef __CRT_HAVE_strend
-/* Same as `STR + strlen(STR)' */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
-#else /* __CRT_HAVE_strend */
-__NAMESPACE_LOCAL_END
-#include <local/string/strend.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Same as `STR + strlen(STR)' */
-#define __localdep_strend __LIBC_LOCAL_NAME(strend)
-#endif /* !__CRT_HAVE_strend */
-#endif /* !__local___localdep_strend_defined */
 /* Dependency: memcmp from string */
 #ifndef __local___localdep_memcmp_defined
 #define __local___localdep_memcmp_defined 1
@@ -76,6 +48,34 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
 #endif /* !... */
 #endif /* !__local___localdep_memcmp_defined */
+/* Dependency: strend from string */
+#ifndef __local___localdep_strend_defined
+#define __local___localdep_strend_defined 1
+#ifdef __CRT_HAVE_strend
+/* Same as `STR + strlen(STR)' */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
+#else /* __CRT_HAVE_strend */
+__NAMESPACE_LOCAL_END
+#include <local/string/strend.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `STR + strlen(STR)' */
+#define __localdep_strend __LIBC_LOCAL_NAME(strend)
+#endif /* !__CRT_HAVE_strend */
+#endif /* !__local___localdep_strend_defined */
+/* Dependency: stroff from string */
+#ifndef __local___localdep_stroff_defined
+#define __local___localdep_stroff_defined 1
+#ifdef __CRT_HAVE_stroff
+/* Same as `strchrnul', but return the offset from `STR', rather than the actual address */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_stroff,(char const *__restrict __haystack, int __needle),stroff,(__haystack,__needle))
+#else /* __CRT_HAVE_stroff */
+__NAMESPACE_LOCAL_END
+#include <local/string/stroff.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `strchrnul', but return the offset from `STR', rather than the actual address */
+#define __localdep_stroff __LIBC_LOCAL_NAME(stroff)
+#endif /* !__CRT_HAVE_stroff */
+#endif /* !__local___localdep_stroff_defined */
 /* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
  * Note that if `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */

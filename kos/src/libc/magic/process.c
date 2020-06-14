@@ -24,6 +24,7 @@
 %{
 #include <features.h>
 #include <bits/types.h>
+#include <kos/anno.h>
 
 __SYSDECL_BEGIN
 

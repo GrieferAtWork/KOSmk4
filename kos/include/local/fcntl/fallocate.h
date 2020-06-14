@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x774f7d6f */
+/* HASH CRC-32:0xa57d1207 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,11 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: fallocate32 from fcntl */
+#if !defined(__local___localdep_fallocate32_defined) && defined(__CRT_HAVE_fallocate)
+#define __local___localdep_fallocate32_defined 1
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate32,(__fd_t __fd, int __mode, __off64_t __offset, __off64_t __length),fallocate,(__fd,__mode,__offset,__length))
+#endif /* !__local___localdep_fallocate32_defined && __CRT_HAVE_fallocate */
 /* Dependency: fallocate64 from fcntl */
 #ifndef __local___localdep_fallocate64_defined
 #define __local___localdep_fallocate64_defined 1
@@ -38,11 +43,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_fallocate64 __LIBC_LOCAL_NAME(fallocate64)
 #endif /* !... */
 #endif /* !__local___localdep_fallocate64_defined */
-/* Dependency: fallocate32 from fcntl */
-#if !defined(__local___localdep_fallocate32_defined) && defined(__CRT_HAVE_fallocate)
-#define __local___localdep_fallocate32_defined 1
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate32,(__fd_t __fd, int __mode, __off64_t __offset, __off64_t __length),fallocate,(__fd,__mode,__offset,__length))
-#endif /* !__local___localdep_fallocate32_defined && __CRT_HAVE_fallocate */
 __LOCAL_LIBC(fallocate) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fallocate))(__fd_t __fd, int __mode, __FS_TYPE(off) __offset, __FS_TYPE(off) __length) {
 #ifdef __BUILDING_LIBC

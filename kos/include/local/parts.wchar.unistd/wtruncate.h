@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2c56772 */
+/* HASH CRC-32:0xc45221bd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,44 +33,25 @@
 #endif
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wtruncate64 from parts.wchar.unistd */
-#ifndef __local___localdep_wtruncate64_defined
-#define __local___localdep_wtruncate64_defined 1
-#ifdef __CRT_HAVE_wtruncate64
-/* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate64) && __SIZEOF_WCHAR_T__ == 4
-/* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate64) && __SIZEOF_WCHAR_T__ == 2
-/* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
-#elif defined(__CRT_HAVE_wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-/* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && __SIZEOF_WCHAR_T__ == 4
-/* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && __SIZEOF_WCHAR_T__ == 2
-/* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_wtruncate) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
-__NAMESPACE_LOCAL_END
-#include <local/parts.wchar.unistd/wtruncate64.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-#define __localdep_wtruncate64 __LIBC_LOCAL_NAME(wtruncate64)
+/* Dependency: close from unistd */
+#ifndef __local___localdep_close_defined
+#define __local___localdep_close_defined 1
+#ifdef __CRT_HAVE_close
+/* >> close(2)
+ * Close a file handle */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
+#elif defined(__CRT_HAVE__close)
+/* >> close(2)
+ * Close a file handle */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
+#elif defined(__CRT_HAVE___close)
+/* >> close(2)
+ * Close a file handle */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #else /* ... */
-#undef __local___localdep_wtruncate64_defined
+#undef __local___localdep_close_defined
 #endif /* !... */
-#endif /* !__local___localdep_wtruncate64_defined */
+#endif /* !__local___localdep_close_defined */
 /* Dependency: ftruncate from unistd */
 #ifndef __local___localdep_ftruncate_defined
 #define __local___localdep_ftruncate_defined 1
@@ -105,25 +86,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_ftruncate_defined
 #endif /* !... */
 #endif /* !__local___localdep_ftruncate_defined */
-/* Dependency: close from unistd */
-#ifndef __local___localdep_close_defined
-#define __local___localdep_close_defined 1
-#ifdef __CRT_HAVE_close
-/* >> close(2)
- * Close a file handle */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
-#elif defined(__CRT_HAVE__close)
-/* >> close(2)
- * Close a file handle */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
-#elif defined(__CRT_HAVE___close)
-/* >> close(2)
- * Close a file handle */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
-#else /* ... */
-#undef __local___localdep_close_defined
-#endif /* !... */
-#endif /* !__local___localdep_close_defined */
 /* Dependency: open from fcntl */
 #ifndef __local___localdep_open_defined
 #define __local___localdep_open_defined 1
@@ -163,6 +125,44 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate32,(__
 #undef __local___localdep_wtruncate32_defined
 #endif /* !... */
 #endif /* !__local___localdep_wtruncate32_defined */
+/* Dependency: wtruncate64 from parts.wchar.unistd */
+#ifndef __local___localdep_wtruncate64_defined
+#define __local___localdep_wtruncate64_defined 1
+#ifdef __CRT_HAVE_wtruncate64
+/* >> truncate64(2)
+ * Truncate the given file `FILE' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
+#elif defined(__CRT_HAVE_DOS$wtruncate64) && __SIZEOF_WCHAR_T__ == 4
+/* >> truncate64(2)
+ * Truncate the given file `FILE' to a length of `LENGTH' */
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
+#elif defined(__CRT_HAVE_DOS$wtruncate64) && __SIZEOF_WCHAR_T__ == 2
+/* >> truncate64(2)
+ * Truncate the given file `FILE' to a length of `LENGTH' */
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
+#elif defined(__CRT_HAVE_wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* >> truncate64(2)
+ * Truncate the given file `FILE' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
+#elif defined(__CRT_HAVE_DOS$wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && __SIZEOF_WCHAR_T__ == 4
+/* >> truncate64(2)
+ * Truncate the given file `FILE' to a length of `LENGTH' */
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
+#elif defined(__CRT_HAVE_DOS$wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && __SIZEOF_WCHAR_T__ == 2
+/* >> truncate64(2)
+ * Truncate the given file `FILE' to a length of `LENGTH' */
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate64,(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
+#elif defined(__CRT_HAVE_wtruncate) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
+__NAMESPACE_LOCAL_END
+#include <local/parts.wchar.unistd/wtruncate64.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> truncate64(2)
+ * Truncate the given file `FILE' to a length of `LENGTH' */
+#define __localdep_wtruncate64 __LIBC_LOCAL_NAME(wtruncate64)
+#else /* ... */
+#undef __local___localdep_wtruncate64_defined
+#endif /* !... */
+#endif /* !__local___localdep_wtruncate64_defined */
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __LOCAL_LIBC(wtruncate) __ATTR_NONNULL((1)) int

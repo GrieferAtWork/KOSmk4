@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33964494 */
+/* HASH CRC-32:0x469c339c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,32 +22,6 @@
 #define __local_strerror_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strncpy from string */
-#ifndef __local___localdep_strncpy_defined
-#define __local___localdep_strncpy_defined 1
-#if __has_builtin(__builtin_strncpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncpy)
-__CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncpy,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen),strncpy,{ return __builtin_strncpy(__buf, __src, __buflen); })
-#elif defined(__CRT_HAVE_strncpy)
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncpy,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen),strncpy,(__buf,__src,__buflen))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/string/strncpy.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_strncpy __LIBC_LOCAL_NAME(strncpy)
-#endif /* !... */
-#endif /* !__local___localdep_strncpy_defined */
-/* Dependency: strerror_s from string */
-#ifndef __local___localdep_strerror_s_defined
-#define __local___localdep_strerror_s_defined 1
-#ifdef __CRT_HAVE_strerror_s
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerror_s,(int __errnum),strerror_s,(__errnum))
-#else /* __CRT_HAVE_strerror_s */
-__NAMESPACE_LOCAL_END
-#include <local/string/strerror_s.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_strerror_s __LIBC_LOCAL_NAME(strerror_s)
-#endif /* !__CRT_HAVE_strerror_s */
-#endif /* !__local___localdep_strerror_s_defined */
 /* Dependency: sprintf from stdio */
 #ifndef __local___localdep_sprintf_defined
 #define __local___localdep_sprintf_defined 1
@@ -81,6 +55,32 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_sprintf __LIBC_LOCAL_NAME(sprintf)
 #endif /* !... */
 #endif /* !__local___localdep_sprintf_defined */
+/* Dependency: strerror_s from string */
+#ifndef __local___localdep_strerror_s_defined
+#define __local___localdep_strerror_s_defined 1
+#ifdef __CRT_HAVE_strerror_s
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerror_s,(int __errnum),strerror_s,(__errnum))
+#else /* __CRT_HAVE_strerror_s */
+__NAMESPACE_LOCAL_END
+#include <local/string/strerror_s.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strerror_s __LIBC_LOCAL_NAME(strerror_s)
+#endif /* !__CRT_HAVE_strerror_s */
+#endif /* !__local___localdep_strerror_s_defined */
+/* Dependency: strncpy from string */
+#ifndef __local___localdep_strncpy_defined
+#define __local___localdep_strncpy_defined 1
+#if __has_builtin(__builtin_strncpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncpy)
+__CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncpy,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen),strncpy,{ return __builtin_strncpy(__buf, __src, __buflen); })
+#elif defined(__CRT_HAVE_strncpy)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncpy,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen),strncpy,(__buf,__src,__buflen))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/strncpy.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strncpy __LIBC_LOCAL_NAME(strncpy)
+#endif /* !... */
+#endif /* !__local___localdep_strncpy_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __local_strerror_buf_defined
 #define __local_strerror_buf_defined 1

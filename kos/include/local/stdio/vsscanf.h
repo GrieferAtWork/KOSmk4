@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc63affb3 */
+/* HASH CRC-32:0x932234c8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,6 +85,20 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_vscanf __LIBC_LOCAL_NAME(format_vscanf)
 #endif /* !__CRT_HAVE_format_vscanf */
 #endif /* !__local___localdep_format_vscanf_defined */
+/* Dependency: unicode_readutf8 from unicode */
+#ifndef __local___localdep_unicode_readutf8_defined
+#define __local___localdep_unicode_readutf8_defined 1
+#ifdef __CRT_HAVE_unicode_readutf8
+/* Read a single Unicode character from a given UTF-8 string */
+__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
+#else /* __CRT_HAVE_unicode_readutf8 */
+__NAMESPACE_LOCAL_END
+#include <local/unicode/unicode_readutf8.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Read a single Unicode character from a given UTF-8 string */
+#define __localdep_unicode_readutf8 __LIBC_LOCAL_NAME(unicode_readutf8)
+#endif /* !__CRT_HAVE_unicode_readutf8 */
+#endif /* !__local___localdep_unicode_readutf8_defined */
 /* Dependency: unicode_readutf8_rev from unicode */
 #ifndef __local___localdep_unicode_readutf8_rev_defined
 #define __local___localdep_unicode_readutf8_rev_defined 1
@@ -103,20 +117,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_unicode_readutf8_rev __LIBC_LOCAL_NAME(unicode_readutf8_rev)
 #endif /* !__CRT_HAVE_unicode_readutf8_rev */
 #endif /* !__local___localdep_unicode_readutf8_rev_defined */
-/* Dependency: unicode_readutf8 from unicode */
-#ifndef __local___localdep_unicode_readutf8_defined
-#define __local___localdep_unicode_readutf8_defined 1
-#ifdef __CRT_HAVE_unicode_readutf8
-/* Read a single Unicode character from a given UTF-8 string */
-__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
-#else /* __CRT_HAVE_unicode_readutf8 */
-__NAMESPACE_LOCAL_END
-#include <local/unicode/unicode_readutf8.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Read a single Unicode character from a given UTF-8 string */
-#define __localdep_unicode_readutf8 __LIBC_LOCAL_NAME(unicode_readutf8)
-#endif /* !__CRT_HAVE_unicode_readutf8 */
-#endif /* !__local___localdep_unicode_readutf8_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/stdio.h>
 #include <hybrid/typecore.h>

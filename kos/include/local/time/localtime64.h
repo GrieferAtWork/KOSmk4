@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f5bf1ff */
+/* HASH CRC-32:0x6512e49e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,6 +55,19 @@ __NAMESPACE_STD_END
 #endif /* !__tm_defined */
 #endif
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: localtime32 from time */
+#ifndef __local___localdep_localtime32_defined
+#define __local___localdep_localtime32_defined 1
+#ifdef __CRT_HAVE_localtime
+/* Return the `struct tm' representation of *TIMER in the local timezone */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime32,(__time64_t const *__timer),localtime,(__timer))
+#elif defined(__CRT_HAVE__localtime32)
+/* Return the `struct tm' representation of *TIMER in the local timezone */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime32,(__time64_t const *__timer),_localtime32,(__timer))
+#else /* ... */
+#undef __local___localdep_localtime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_localtime32_defined */
 /* Dependency: localtime64_r from time */
 #ifndef __local___localdep_localtime64_r_defined
 #define __local___localdep_localtime64_r_defined 1
@@ -72,19 +85,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_localtime64_r __LIBC_LOCAL_NAME(localtime64_r)
 #endif /* !... */
 #endif /* !__local___localdep_localtime64_r_defined */
-/* Dependency: localtime32 from time */
-#ifndef __local___localdep_localtime32_defined
-#define __local___localdep_localtime32_defined 1
-#ifdef __CRT_HAVE_localtime
-/* Return the `struct tm' representation of *TIMER in the local timezone */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime32,(__time64_t const *__timer),localtime,(__timer))
-#elif defined(__CRT_HAVE__localtime32)
-/* Return the `struct tm' representation of *TIMER in the local timezone */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime32,(__time64_t const *__timer),_localtime32,(__timer))
-#else /* ... */
-#undef __local___localdep_localtime32_defined
-#endif /* !... */
-#endif /* !__local___localdep_localtime32_defined */
 __NAMESPACE_LOCAL_END
 #if defined(__BUILDING_LIBC) || (!defined(__CRT_HAVE_localtime) && !defined(__CRT_HAVE__localtime32))
 #ifndef __LIBC_GMTIME_BUFFER_DEFINED

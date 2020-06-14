@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0172dd8 */
+/* HASH CRC-32:0xbd48c797 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,31 +24,25 @@
 #if (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ungetc from stdio */
-#ifndef __local___localdep_ungetc_defined
-#define __local___localdep_ungetc_defined 1
-#if defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Unget a single character byte of data previously returned by `getc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
-#elif defined(__CRT_HAVE__ungetc_nolock) && defined(__USE_STDIO_UNLOCKED)
-/* Unget a single character byte of data previously returned by `getc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
-#elif defined(__CRT_HAVE_ungetc)
-/* Unget a single character byte of data previously returned by `getc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
-#elif defined(__CRT_HAVE__IO_ungetc)
-/* Unget a single character byte of data previously returned by `getc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
-#elif defined(__CRT_HAVE_ungetc_unlocked)
-/* Unget a single character byte of data previously returned by `getc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
-#elif defined(__CRT_HAVE__ungetc_nolock)
-/* Unget a single character byte of data previously returned by `getc()' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
+/* Dependency: ferror from stdio */
+#ifndef __local___localdep_ferror_defined
+#define __local___localdep_ferror_defined 1
+#if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
+/* Check if an I/O error occurred in `STREAM' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
+#elif defined(__CRT_HAVE_ferror)
+/* Check if an I/O error occurred in `STREAM' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
+#elif defined(__CRT_HAVE__IO_ferror)
+/* Check if an I/O error occurred in `STREAM' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
+#elif defined(__CRT_HAVE_ferror_unlocked)
+/* Check if an I/O error occurred in `STREAM' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #else /* ... */
-#undef __local___localdep_ungetc_defined
+#undef __local___localdep_ferror_defined
 #endif /* !... */
-#endif /* !__local___localdep_ungetc_defined */
+#endif /* !__local___localdep_ferror_defined */
 /* Dependency: fgetc from stdio */
 #ifndef __local___localdep_fgetc_defined
 #define __local___localdep_fgetc_defined 1
@@ -99,25 +93,31 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fgetc_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetc_defined */
-/* Dependency: ferror from stdio */
-#ifndef __local___localdep_ferror_defined
-#define __local___localdep_ferror_defined 1
-#if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
-#elif defined(__CRT_HAVE_ferror)
-/* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
-#elif defined(__CRT_HAVE__IO_ferror)
-/* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
-#elif defined(__CRT_HAVE_ferror_unlocked)
-/* Check if an I/O error occurred in `STREAM' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
+/* Dependency: ungetc from stdio */
+#ifndef __local___localdep_ungetc_defined
+#define __local___localdep_ungetc_defined 1
+#if defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetc_nolock) && defined(__USE_STDIO_UNLOCKED)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
+#elif defined(__CRT_HAVE_ungetc)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
+#elif defined(__CRT_HAVE__IO_ungetc)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
+#elif defined(__CRT_HAVE_ungetc_unlocked)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetc_nolock)
+/* Unget a single character byte of data previously returned by `getc()' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
 #else /* ... */
-#undef __local___localdep_ferror_defined
+#undef __local___localdep_ungetc_defined
 #endif /* !... */
-#endif /* !__local___localdep_ferror_defined */
+#endif /* !__local___localdep_ungetc_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN

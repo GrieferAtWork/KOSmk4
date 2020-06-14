@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf93f43e2 */
+/* HASH CRC-32:0x57fa3f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,24 +22,11 @@
 #define __local_c32execle_defined 1
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wexecve) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wexecve)
-__NAMESPACE_LOCAL_BEGIN
-/* Dependency: c32execve from parts.uchar.process */
-#ifndef __local___localdep_c32execve_defined
-#define __local___localdep_c32execve_defined 1
-#if defined(__CRT_HAVE_wexecve) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c32execve,(__CHAR32_TYPE__ const *__restrict __path, __T32ARGV, __T32ENVP),wexecve,(__path,___argv,___envp))
-#elif defined(__CRT_HAVE_DOS$wexecve)
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c32execve,(__CHAR32_TYPE__ const *__restrict __path, __T32ARGV, __T32ENVP),wexecve,(__path,___argv,___envp))
-#else /* ... */
-#undef __local___localdep_c32execve_defined
-#endif /* !... */
-#endif /* !__local___localdep_c32execve_defined */
-__NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32execle) __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__VLIBKCALL __LIBC_LOCAL_NAME(c32execle))(__CHAR32_TYPE__ const *__restrict __path, __CHAR32_TYPE__ const *__args, ...) {
-	__REDIRECT_EXECLE(__CHAR32_TYPE__, __localdep_c32execve, __path, __args)
+	__REDIRECT_EXECLE(__CHAR32_TYPE__, __c32execve, __path, __args)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32execle_defined

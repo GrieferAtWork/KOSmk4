@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6619b4 */
+/* HASH CRC-32:0x14e9fbbe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,110 +24,60 @@
 #include <kos/anno.h>
 #include <bits/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: format_repeat from format-printer */
-#ifndef __local___localdep_format_repeat_defined
-#define __local___localdep_format_repeat_defined 1
-#ifdef __CRT_HAVE_format_repeat
-/* Repeat `CH' a number of `NUM_REPETITIONS' times
- * The usual format-printer rules apply, and this function
- * is allowed to call `PRINTER' as often as it chooses */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_repeat,(__pformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_repeat,(__printer,__arg,__ch,__num_repetitions))
-#else /* __CRT_HAVE_format_repeat */
+/* Dependency: format_16to8 from unicode */
+#ifndef __local___localdep_format_16to8_defined
+#define __local___localdep_format_16to8_defined 1
+#if defined(__CRT_HAVE_format_wto8) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+/* Format printer (compatible with `__pc16formatprinter') for
+ * converting UTF-16 unicode input data into a UTF-8 output */
+__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_DOS$format_wto8)
+/* Format printer (compatible with `__pc16formatprinter') for
+ * converting UTF-16 unicode input data into a UTF-8 output */
+__CREDIRECT_DOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+#elif (__SIZEOF_WCHAR_T__ == 2)
 __NAMESPACE_LOCAL_END
-#include <local/format-printer/format_repeat.h>
+#include <local/unicode/format_wto8.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Repeat `CH' a number of `NUM_REPETITIONS' times
- * The usual format-printer rules apply, and this function
- * is allowed to call `PRINTER' as often as it chooses */
-#define __localdep_format_repeat __LIBC_LOCAL_NAME(format_repeat)
-#endif /* !__CRT_HAVE_format_repeat */
-#endif /* !__local___localdep_format_repeat_defined */
-/* Dependency: printf from stdio */
-#ifndef __local___localdep_printf_defined
-#define __local___localdep_printf_defined 1
-#if __has_builtin(__builtin_printf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_printf) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Print data to `stdout', following `FORMAT'
- * Return the number of successfully printed bytes */
-__CEIREDIRECT(__ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_printf,(char const *__restrict __format, ...),printf,{ return __builtin_printf(__format, __builtin_va_arg_pack()); })
-#elif defined(__CRT_HAVE_printf_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Print data to `stdout', following `FORMAT'
- * Return the number of successfully printed bytes */
-__LIBC __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_unlocked");
-#elif defined(__CRT_HAVE_printf)
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Print data to `stdout', following `FORMAT'
- * Return the number of successfully printed bytes */
-__LIBC __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf");
-#elif defined(__CRT_HAVE__IO_printf)
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Print data to `stdout', following `FORMAT'
- * Return the number of successfully printed bytes */
-__LIBC __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_printf");
-#elif defined(__CRT_HAVE_printf_s)
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Print data to `stdout', following `FORMAT'
- * Return the number of successfully printed bytes */
-__LIBC __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_s");
-#elif defined(__CRT_HAVE_printf_unlocked)
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Print data to `stdout', following `FORMAT'
- * Return the number of successfully printed bytes */
-__LIBC __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_unlocked");
-#elif defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s) || defined(__CRT_HAVE_vprintf_unlocked) || (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)))
-__NAMESPACE_LOCAL_END
-#include <local/stdio/printf.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Print data to `stdout', following `FORMAT'
- * Return the number of successfully printed bytes */
-#define __localdep_printf __LIBC_LOCAL_NAME(printf)
+/* Format printer (compatible with `__pc16formatprinter') for
+ * converting UTF-16 unicode input data into a UTF-8 output */
+#define __localdep_format_16to8 (*(__SSIZE_TYPE__(__LIBDCALL *)(void *, __CHAR16_TYPE__ const *, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_wto8))
 #else /* ... */
-#undef __local___localdep_printf_defined
-#endif /* !... */
-#endif /* !__local___localdep_printf_defined */
-/* Dependency: format_hexdump from format-printer */
-#ifndef __local___localdep_format_hexdump_defined
-#define __local___localdep_format_hexdump_defined 1
-#ifdef __CRT_HAVE_format_hexdump
-/* Print a hex dump of the given data using the provided format printer
- * @param: PRINTER:  A function called for all quoted portions of the text
- * @param: DATA:     A pointer to the data that should be dumped
- * @param: SIZE:     The amount of bytes read starting at DATA
- * @param: LINESIZE: The max amount of bytes to include per-line
- *                   HINT: Pass ZERO(0) to use a default size (16)
- * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
- * @return: 0: The given data was successfully hex-dumped
- * @return: *: The first non-ZERO(0) return value of PRINTER */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_hexdump,(__pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_hexdump,(__printer,__arg,__data,__size,__linesize,__flags))
-#else /* __CRT_HAVE_format_hexdump */
 __NAMESPACE_LOCAL_END
-#include <local/format-printer/format_hexdump.h>
+#include <local/unicode/format_16to8.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Print a hex dump of the given data using the provided format printer
- * @param: PRINTER:  A function called for all quoted portions of the text
- * @param: DATA:     A pointer to the data that should be dumped
- * @param: SIZE:     The amount of bytes read starting at DATA
- * @param: LINESIZE: The max amount of bytes to include per-line
- *                   HINT: Pass ZERO(0) to use a default size (16)
- * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
- * @return: 0: The given data was successfully hex-dumped
- * @return: *: The first non-ZERO(0) return value of PRINTER */
-#define __localdep_format_hexdump __LIBC_LOCAL_NAME(format_hexdump)
-#endif /* !__CRT_HAVE_format_hexdump */
-#endif /* !__local___localdep_format_hexdump_defined */
+/* Format printer (compatible with `__pc16formatprinter') for
+ * converting UTF-16 unicode input data into a UTF-8 output */
+#define __localdep_format_16to8 __LIBC_LOCAL_NAME(format_16to8)
+#endif /* !... */
+#endif /* !__local___localdep_format_16to8_defined */
+/* Dependency: format_32to8 from unicode */
+#ifndef __local___localdep_format_32to8_defined
+#define __local___localdep_format_32to8_defined 1
+#if defined(__CRT_HAVE_format_wto8) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+/* Format printer (compatible with `__pc32formatprinter') for
+ * converting UTF-32 unicode input data into a UTF-8 output */
+__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_DOS$format_wto8)
+/* Format printer (compatible with `__pc32formatprinter') for
+ * converting UTF-32 unicode input data into a UTF-8 output */
+__CREDIRECT_KOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+#elif (__SIZEOF_WCHAR_T__ == 4)
+__NAMESPACE_LOCAL_END
+#include <local/unicode/format_wto8.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Format printer (compatible with `__pc32formatprinter') for
+ * converting UTF-32 unicode input data into a UTF-8 output */
+#define __localdep_format_32to8 (*(__SSIZE_TYPE__(__LIBKCALL *)(void *, __CHAR32_TYPE__ const *, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_wto8))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/unicode/format_32to8.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Format printer (compatible with `__pc32formatprinter') for
+ * converting UTF-32 unicode input data into a UTF-8 output */
+#define __localdep_format_32to8 __LIBC_LOCAL_NAME(format_32to8)
+#endif /* !... */
+#endif /* !__local___localdep_format_32to8_defined */
 /* Dependency: format_c16escape from parts.uchar.format-printer */
 #ifndef __local___localdep_format_c16escape_defined
 #define __local___localdep_format_c16escape_defined 1
@@ -206,76 +156,29 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_c16escape __LIBC_LOCAL_NAME(format_c16escape)
 #endif /* !... */
 #endif /* !__local___localdep_format_c16escape_defined */
-/* Dependency: format_32to8 from unicode */
-#ifndef __local___localdep_format_32to8_defined
-#define __local___localdep_format_32to8_defined 1
-#if defined(__CRT_HAVE_format_wto8) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-/* Format printer (compatible with `__pc32formatprinter') for
- * converting UTF-32 unicode input data into a UTF-8 output */
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_DOS$format_wto8)
-/* Format printer (compatible with `__pc32formatprinter') for
- * converting UTF-32 unicode input data into a UTF-8 output */
-__CREDIRECT_KOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
-#elif (__SIZEOF_WCHAR_T__ == 4)
-__NAMESPACE_LOCAL_END
-#include <local/unicode/format_wto8.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `__pc32formatprinter') for
- * converting UTF-32 unicode input data into a UTF-8 output */
-#define __localdep_format_32to8 (*(__SSIZE_TYPE__(__LIBKCALL *)(void *, __CHAR32_TYPE__ const *, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_wto8))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/unicode/format_32to8.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `__pc32formatprinter') for
- * converting UTF-32 unicode input data into a UTF-8 output */
-#define __localdep_format_32to8 __LIBC_LOCAL_NAME(format_32to8)
-#endif /* !... */
-#endif /* !__local___localdep_format_32to8_defined */
-/* Dependency: format_16to8 from unicode */
-#ifndef __local___localdep_format_16to8_defined
-#define __local___localdep_format_16to8_defined 1
-#if defined(__CRT_HAVE_format_wto8) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-/* Format printer (compatible with `__pc16formatprinter') for
- * converting UTF-16 unicode input data into a UTF-8 output */
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_DOS$format_wto8)
-/* Format printer (compatible with `__pc16formatprinter') for
- * converting UTF-16 unicode input data into a UTF-8 output */
-__CREDIRECT_DOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+/* Dependency: format_c16width from parts.uchar.format-printer */
+#ifndef __local___localdep_format_c16width_defined
+#define __local___localdep_format_c16width_defined 1
+#if defined(__CRT_HAVE_format_wwidth) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c16width,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_DOS$format_wwidth)
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c16width,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 __NAMESPACE_LOCAL_END
-#include <local/unicode/format_wto8.h>
+#include <local/parts.wchar.format-printer/format_wwidth.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `__pc16formatprinter') for
- * converting UTF-16 unicode input data into a UTF-8 output */
-#define __localdep_format_16to8 (*(__SSIZE_TYPE__(__LIBDCALL *)(void *, __CHAR16_TYPE__ const *, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_wto8))
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+#define __localdep_format_c16width (*(__SSIZE_TYPE__(__LIBDCALL *)(void *, __CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_wwidth))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <local/unicode/format_16to8.h>
+#include <local/parts.uchar.format-printer/format_c16width.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `__pc16formatprinter') for
- * converting UTF-16 unicode input data into a UTF-8 output */
-#define __localdep_format_16to8 __LIBC_LOCAL_NAME(format_16to8)
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+#define __localdep_format_c16width __LIBC_LOCAL_NAME(format_c16width)
 #endif /* !... */
-#endif /* !__local___localdep_format_16to8_defined */
-/* Dependency: unicode_writeutf8 from unicode */
-#ifndef __local___localdep_unicode_writeutf8_defined
-#define __local___localdep_unicode_writeutf8_defined 1
-#ifdef __CRT_HAVE_unicode_writeutf8
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
-#else /* __CRT_HAVE_unicode_writeutf8 */
-__NAMESPACE_LOCAL_END
-#include <local/unicode/unicode_writeutf8.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
-#define __localdep_unicode_writeutf8 __LIBC_LOCAL_NAME(unicode_writeutf8)
-#endif /* !__CRT_HAVE_unicode_writeutf8 */
-#endif /* !__local___localdep_unicode_writeutf8_defined */
+#endif /* !__local___localdep_format_c16width_defined */
 /* Dependency: format_c32escape from parts.uchar.format-printer */
 #ifndef __local___localdep_format_c32escape_defined
 #define __local___localdep_format_c32escape_defined 1
@@ -383,43 +286,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_c32width __LIBC_LOCAL_NAME(format_c32width)
 #endif /* !... */
 #endif /* !__local___localdep_format_c32width_defined */
-/* Dependency: format_width from format-printer */
-#ifndef __local___localdep_format_width_defined
-#define __local___localdep_format_width_defined 1
-#ifdef __CRT_HAVE_format_width
-/* Returns the width (number of characters; not bytes) of the given unicode string */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_width,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
-#else /* __CRT_HAVE_format_width */
-__NAMESPACE_LOCAL_END
-#include <local/format-printer/format_width.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Returns the width (number of characters; not bytes) of the given unicode string */
-#define __localdep_format_width __LIBC_LOCAL_NAME(format_width)
-#endif /* !__CRT_HAVE_format_width */
-#endif /* !__local___localdep_format_width_defined */
-/* Dependency: format_c16width from parts.uchar.format-printer */
-#ifndef __local___localdep_format_c16width_defined
-#define __local___localdep_format_c16width_defined 1
-#if defined(__CRT_HAVE_format_wwidth) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-/* Returns the width (number of characters; not bytes) of the given unicode string */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c16width,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_DOS$format_wwidth)
-/* Returns the width (number of characters; not bytes) of the given unicode string */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c16width,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
-#elif (__SIZEOF_WCHAR_T__ == 2)
-__NAMESPACE_LOCAL_END
-#include <local/parts.wchar.format-printer/format_wwidth.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Returns the width (number of characters; not bytes) of the given unicode string */
-#define __localdep_format_c16width (*(__SSIZE_TYPE__(__LIBDCALL *)(void *, __CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_wwidth))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/parts.uchar.format-printer/format_c16width.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Returns the width (number of characters; not bytes) of the given unicode string */
-#define __localdep_format_c16width __LIBC_LOCAL_NAME(format_c16width)
-#endif /* !... */
-#endif /* !__local___localdep_format_c16width_defined */
 /* Dependency: format_escape from format-printer */
 #ifndef __local___localdep_format_escape_defined
 #define __local___localdep_format_escape_defined 1
@@ -473,6 +339,140 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_escape __LIBC_LOCAL_NAME(format_escape)
 #endif /* !... */
 #endif /* !__local___localdep_format_escape_defined */
+/* Dependency: format_hexdump from format-printer */
+#ifndef __local___localdep_format_hexdump_defined
+#define __local___localdep_format_hexdump_defined 1
+#ifdef __CRT_HAVE_format_hexdump
+/* Print a hex dump of the given data using the provided format printer
+ * @param: PRINTER:  A function called for all quoted portions of the text
+ * @param: DATA:     A pointer to the data that should be dumped
+ * @param: SIZE:     The amount of bytes read starting at DATA
+ * @param: LINESIZE: The max amount of bytes to include per-line
+ *                   HINT: Pass ZERO(0) to use a default size (16)
+ * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
+ * @return: 0: The given data was successfully hex-dumped
+ * @return: *: The first non-ZERO(0) return value of PRINTER */
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_hexdump,(__pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_hexdump,(__printer,__arg,__data,__size,__linesize,__flags))
+#else /* __CRT_HAVE_format_hexdump */
+__NAMESPACE_LOCAL_END
+#include <local/format-printer/format_hexdump.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Print a hex dump of the given data using the provided format printer
+ * @param: PRINTER:  A function called for all quoted portions of the text
+ * @param: DATA:     A pointer to the data that should be dumped
+ * @param: SIZE:     The amount of bytes read starting at DATA
+ * @param: LINESIZE: The max amount of bytes to include per-line
+ *                   HINT: Pass ZERO(0) to use a default size (16)
+ * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
+ * @return: 0: The given data was successfully hex-dumped
+ * @return: *: The first non-ZERO(0) return value of PRINTER */
+#define __localdep_format_hexdump __LIBC_LOCAL_NAME(format_hexdump)
+#endif /* !__CRT_HAVE_format_hexdump */
+#endif /* !__local___localdep_format_hexdump_defined */
+/* Dependency: format_repeat from format-printer */
+#ifndef __local___localdep_format_repeat_defined
+#define __local___localdep_format_repeat_defined 1
+#ifdef __CRT_HAVE_format_repeat
+/* Repeat `CH' a number of `NUM_REPETITIONS' times
+ * The usual format-printer rules apply, and this function
+ * is allowed to call `PRINTER' as often as it chooses */
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_repeat,(__pformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_repeat,(__printer,__arg,__ch,__num_repetitions))
+#else /* __CRT_HAVE_format_repeat */
+__NAMESPACE_LOCAL_END
+#include <local/format-printer/format_repeat.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Repeat `CH' a number of `NUM_REPETITIONS' times
+ * The usual format-printer rules apply, and this function
+ * is allowed to call `PRINTER' as often as it chooses */
+#define __localdep_format_repeat __LIBC_LOCAL_NAME(format_repeat)
+#endif /* !__CRT_HAVE_format_repeat */
+#endif /* !__local___localdep_format_repeat_defined */
+/* Dependency: format_width from format-printer */
+#ifndef __local___localdep_format_width_defined
+#define __local___localdep_format_width_defined 1
+#ifdef __CRT_HAVE_format_width
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_width,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
+#else /* __CRT_HAVE_format_width */
+__NAMESPACE_LOCAL_END
+#include <local/format-printer/format_width.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+#define __localdep_format_width __LIBC_LOCAL_NAME(format_width)
+#endif /* !__CRT_HAVE_format_width */
+#endif /* !__local___localdep_format_width_defined */
+/* Dependency: printf from stdio */
+#ifndef __local___localdep_printf_defined
+#define __local___localdep_printf_defined 1
+#if __has_builtin(__builtin_printf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_printf) && __has_builtin(__builtin_va_arg_pack)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Print data to `stdout', following `FORMAT'
+ * Return the number of successfully printed bytes */
+__CEIREDIRECT(__ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_printf,(char const *__restrict __format, ...),printf,{ return __builtin_printf(__format, __builtin_va_arg_pack()); })
+#elif defined(__CRT_HAVE_printf_unlocked) && defined(__USE_STDIO_UNLOCKED)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Print data to `stdout', following `FORMAT'
+ * Return the number of successfully printed bytes */
+__LIBC __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_unlocked");
+#elif defined(__CRT_HAVE_printf)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Print data to `stdout', following `FORMAT'
+ * Return the number of successfully printed bytes */
+__LIBC __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf");
+#elif defined(__CRT_HAVE__IO_printf)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Print data to `stdout', following `FORMAT'
+ * Return the number of successfully printed bytes */
+__LIBC __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_printf");
+#elif defined(__CRT_HAVE_printf_s)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Print data to `stdout', following `FORMAT'
+ * Return the number of successfully printed bytes */
+__LIBC __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_s");
+#elif defined(__CRT_HAVE_printf_unlocked)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Print data to `stdout', following `FORMAT'
+ * Return the number of successfully printed bytes */
+__LIBC __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_unlocked");
+#elif defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s) || defined(__CRT_HAVE_vprintf_unlocked) || (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)))
+__NAMESPACE_LOCAL_END
+#include <local/stdio/printf.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Print data to `stdout', following `FORMAT'
+ * Return the number of successfully printed bytes */
+#define __localdep_printf __LIBC_LOCAL_NAME(printf)
+#else /* ... */
+#undef __local___localdep_printf_defined
+#endif /* !... */
+#endif /* !__local___localdep_printf_defined */
+/* Dependency: unicode_writeutf8 from unicode */
+#ifndef __local___localdep_unicode_writeutf8_defined
+#define __local___localdep_unicode_writeutf8_defined 1
+#ifdef __CRT_HAVE_unicode_writeutf8
+/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
+ * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
+#else /* __CRT_HAVE_unicode_writeutf8 */
+__NAMESPACE_LOCAL_END
+#include <local/unicode/unicode_writeutf8.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
+ * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
+#define __localdep_unicode_writeutf8 __LIBC_LOCAL_NAME(unicode_writeutf8)
+#endif /* !__CRT_HAVE_unicode_writeutf8 */
+#endif /* !__local___localdep_unicode_writeutf8_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/printf-config.h>
 #include <libc/parts.uchar.string.h>

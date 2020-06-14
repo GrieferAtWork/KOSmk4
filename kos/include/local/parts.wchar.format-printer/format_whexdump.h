@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe43049aa */
+/* HASH CRC-32:0xf9097a7b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,20 +24,6 @@
 #include <kos/anno.h>
 #include <bits/wformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: iswprint from wctype */
-#ifndef __local___localdep_iswprint_defined
-#define __local___localdep_iswprint_defined 1
-#if __has_builtin(__builtin_iswprint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswprint)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswprint,(__WINT_TYPE__ __wc),iswprint,{ return __builtin_iswprint(__wc); })
-#elif defined(__CRT_HAVE_iswprint)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswprint,(__WINT_TYPE__ __wc),iswprint,(__wc))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/wctype/iswprint.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_iswprint __LIBC_LOCAL_NAME(iswprint)
-#endif /* !... */
-#endif /* !__local___localdep_iswprint_defined */
 /* Dependency: format_wrepeat from parts.wchar.format-printer */
 #ifndef __local___localdep_format_wrepeat_defined
 #define __local___localdep_format_wrepeat_defined 1
@@ -66,6 +52,20 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_wrepeat __LIBC_LOCAL_NAME(format_wrepeat)
 #endif /* !... */
 #endif /* !__local___localdep_format_wrepeat_defined */
+/* Dependency: iswprint from wctype */
+#ifndef __local___localdep_iswprint_defined
+#define __local___localdep_iswprint_defined 1
+#if __has_builtin(__builtin_iswprint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswprint)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswprint,(__WINT_TYPE__ __wc),iswprint,{ return __builtin_iswprint(__wc); })
+#elif defined(__CRT_HAVE_iswprint)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswprint,(__WINT_TYPE__ __wc),iswprint,(__wc))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wctype/iswprint.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_iswprint __LIBC_LOCAL_NAME(iswprint)
+#endif /* !... */
+#endif /* !__local___localdep_iswprint_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/__alloca.h>
 #include <hybrid/__unaligned.h>

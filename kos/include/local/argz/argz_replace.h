@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43d6cf79 */
+/* HASH CRC-32:0x395412d2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,31 +58,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memmem __LIBC_LOCAL_NAME(memmem)
 #endif /* !... */
 #endif /* !__local___localdep_memmem_defined */
-/* Dependency: strlen from string */
-#ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined 1
-#ifdef __CRT_HAVE_strlen
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
-#else /* __CRT_HAVE_strlen */
-__NAMESPACE_LOCAL_END
-#include <local/string/strlen.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
-#endif /* !__CRT_HAVE_strlen */
-#endif /* !__local___localdep_strlen_defined */
-/* Dependency: realloc from stdlib */
-#ifndef __local___localdep_realloc_defined
-#define __local___localdep_realloc_defined 1
-#if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
-__CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
-#elif defined(__CRT_HAVE_realloc)
-__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
-#else /* ... */
-#undef __local___localdep_realloc_defined
-#endif /* !... */
-#endif /* !__local___localdep_realloc_defined */
 /* Dependency: memmovedownc from string */
 #ifndef __local___localdep_memmovedownc_defined
 #define __local___localdep_memmovedownc_defined 1
@@ -99,20 +74,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memmovedownc __LIBC_LOCAL_NAME(memmovedownc)
 #endif /* !__CRT_HAVE_memmovedownc */
 #endif /* !__local___localdep_memmovedownc_defined */
-/* Dependency: mempcpyc from string */
-#ifndef __local___localdep_mempcpyc_defined
-#define __local___localdep_mempcpyc_defined 1
-#ifdef __CRT_HAVE_mempcpyc
-/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
-#else /* __CRT_HAVE_mempcpyc */
-__NAMESPACE_LOCAL_END
-#include <local/string/mempcpyc.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
-#define __localdep_mempcpyc __LIBC_LOCAL_NAME(mempcpyc)
-#endif /* !__CRT_HAVE_mempcpyc */
-#endif /* !__local___localdep_mempcpyc_defined */
 /* Dependency: memmoveupc from string */
 #ifndef __local___localdep_memmoveupc_defined
 #define __local___localdep_memmoveupc_defined 1
@@ -129,6 +90,45 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memmoveupc __LIBC_LOCAL_NAME(memmoveupc)
 #endif /* !__CRT_HAVE_memmoveupc */
 #endif /* !__local___localdep_memmoveupc_defined */
+/* Dependency: mempcpyc from string */
+#ifndef __local___localdep_mempcpyc_defined
+#define __local___localdep_mempcpyc_defined 1
+#ifdef __CRT_HAVE_mempcpyc
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* __CRT_HAVE_mempcpyc */
+__NAMESPACE_LOCAL_END
+#include <local/string/mempcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+#define __localdep_mempcpyc __LIBC_LOCAL_NAME(mempcpyc)
+#endif /* !__CRT_HAVE_mempcpyc */
+#endif /* !__local___localdep_mempcpyc_defined */
+/* Dependency: realloc from stdlib */
+#ifndef __local___localdep_realloc_defined
+#define __local___localdep_realloc_defined 1
+#if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
+__CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
+#elif defined(__CRT_HAVE_realloc)
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
+#else /* ... */
+#undef __local___localdep_realloc_defined
+#endif /* !... */
+#endif /* !__local___localdep_realloc_defined */
+/* Dependency: strlen from string */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined 1
+#ifdef __CRT_HAVE_strlen
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
+#include <local/string/strlen.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN

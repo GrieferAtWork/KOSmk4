@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfa1067f */
+/* HASH CRC-32:0x81b90573 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,6 @@
 #ifndef __local_fuzzy_wcscmp_defined
 #define __local_fuzzy_wcscmp_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_fuzzy_wmemcmp) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcmp) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcmp) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE_fuzzy_memcmpw) && (__SIZEOF_WCHAR_T__ == 2)) || (defined(__CRT_HAVE_fuzzy_memcmpl) && (__SIZEOF_WCHAR_T__ == 4)) || !defined(__NO_MALLOCA)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fuzzy_wmemcmp from wchar */
 #ifndef __local___localdep_fuzzy_wmemcmp_defined
@@ -38,16 +37,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NO
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcmp,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_chars, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_chars),fuzzy_memcmpl,(__s1,__s1_chars,__s2,__s2_chars))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <parts/malloca.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __NO_MALLOCA
-__NAMESPACE_LOCAL_END
 #include <local/wchar/fuzzy_wmemcmp.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_fuzzy_wmemcmp __LIBC_LOCAL_NAME(fuzzy_wmemcmp)
-#else /* !__NO_MALLOCA */
-#undef __local___localdep_fuzzy_wmemcmp_defined
-#endif /* __NO_MALLOCA */
 #endif /* !... */
 #endif /* !__local___localdep_fuzzy_wmemcmp_defined */
 /* Dependency: wcslen from wchar */
@@ -82,7 +74,4 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_fuzzy_wcscmp_defined 1
 #define __localdep_fuzzy_wcscmp __LIBC_LOCAL_NAME(fuzzy_wcscmp)
 #endif /* !__local___localdep_fuzzy_wcscmp_defined */
-#else /* __CRT_HAVE_fuzzy_wmemcmp || (__CRT_HAVE_DOS$fuzzy_wmemcmp && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$fuzzy_wmemcmp && __SIZEOF_WCHAR_T__ == 2) || (__CRT_HAVE_fuzzy_memcmpw && (__SIZEOF_WCHAR_T__ == 2)) || (__CRT_HAVE_fuzzy_memcmpl && (__SIZEOF_WCHAR_T__ == 4)) || !__NO_MALLOCA */
-#undef __local_fuzzy_wcscmp_defined
-#endif /* !__CRT_HAVE_fuzzy_wmemcmp && (!__CRT_HAVE_DOS$fuzzy_wmemcmp || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$fuzzy_wmemcmp || !__SIZEOF_WCHAR_T__ == 2) && (!__CRT_HAVE_fuzzy_memcmpw || !(__SIZEOF_WCHAR_T__ == 2)) && (!__CRT_HAVE_fuzzy_memcmpl || !(__SIZEOF_WCHAR_T__ == 4)) && __NO_MALLOCA */
 #endif /* !__local_fuzzy_wcscmp_defined */

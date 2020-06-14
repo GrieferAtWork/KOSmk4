@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a34b91f */
+/* HASH CRC-32:0x5bc874f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,15 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_sendfile) || defined(__CRT_HAVE_sendfile64)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: sendfile32 from sys.sendfile */
+#if !defined(__local___localdep_sendfile32_defined) && defined(__CRT_HAVE_sendfile)
+#define __local___localdep_sendfile32_defined 1
+/* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
+ * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
+ * read bytes. If OFFSET is a null pointer, use the normal file position instead.
+ * Return the number of written bytes, or -1 in case of error */
+__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile32,(__fd_t __out_fd, __fd_t __in_fd, __off32_t *__offset, __SIZE_TYPE__ __count),sendfile,(__out_fd,__in_fd,__offset,__count))
+#endif /* !__local___localdep_sendfile32_defined && __CRT_HAVE_sendfile */
 /* Dependency: sendfile64 from sys.sendfile */
 #ifndef __local___localdep_sendfile64_defined
 #define __local___localdep_sendfile64_defined 1
@@ -51,15 +60,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_sendfile64_defined
 #endif /* !... */
 #endif /* !__local___localdep_sendfile64_defined */
-/* Dependency: sendfile32 from sys.sendfile */
-#if !defined(__local___localdep_sendfile32_defined) && defined(__CRT_HAVE_sendfile)
-#define __local___localdep_sendfile32_defined 1
-/* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
- * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
- * read bytes. If OFFSET is a null pointer, use the normal file position instead.
- * Return the number of written bytes, or -1 in case of error */
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile32,(__fd_t __out_fd, __fd_t __in_fd, __off32_t *__offset, __SIZE_TYPE__ __count),sendfile,(__out_fd,__in_fd,__offset,__count))
-#endif /* !__local___localdep_sendfile32_defined && __CRT_HAVE_sendfile */
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.

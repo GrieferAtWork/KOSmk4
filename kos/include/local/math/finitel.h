@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc272789d */
+/* HASH CRC-32:0x5b2c37fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,28 +49,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_finite_defined
 #endif /* !... */
 #endif /* !__local___localdep_finite_defined */
-/* Dependency: isnanl from math */
-#ifndef __local___localdep_isnanl_defined
-#define __local___localdep_isnanl_defined 1
-#if __has_builtin(__builtin_isnanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanl)
-/* Return nonzero if VALUE is not a number */
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(__LONGDOUBLE __x),isnanl,{ return __builtin_isnanl(__x); })
-#elif defined(__CRT_HAVE_isnanl)
-/* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(__LONGDOUBLE __x),isnanl,(__x))
-#elif defined(__CRT_HAVE___isnanl)
-/* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(__LONGDOUBLE __x),__isnanl,(__x))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE___isnan) || defined(__CRT_HAVE__isnan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_LOCAL_END
-#include <local/math/isnanl.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Return nonzero if VALUE is not a number */
-#define __localdep_isnanl __LIBC_LOCAL_NAME(isnanl)
-#else /* ... */
-#undef __local___localdep_isnanl_defined
-#endif /* !... */
-#endif /* !__local___localdep_isnanl_defined */
 /* Dependency: isinfl from math */
 #ifndef __local___localdep_isinfl_defined
 #define __local___localdep_isinfl_defined 1
@@ -93,6 +71,28 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_isinfl_defined
 #endif /* !... */
 #endif /* !__local___localdep_isinfl_defined */
+/* Dependency: isnanl from math */
+#ifndef __local___localdep_isnanl_defined
+#define __local___localdep_isnanl_defined 1
+#if __has_builtin(__builtin_isnanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanl)
+/* Return nonzero if VALUE is not a number */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(__LONGDOUBLE __x),isnanl,{ return __builtin_isnanl(__x); })
+#elif defined(__CRT_HAVE_isnanl)
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(__LONGDOUBLE __x),isnanl,(__x))
+#elif defined(__CRT_HAVE___isnanl)
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(__LONGDOUBLE __x),__isnanl,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE___isnan) || defined(__CRT_HAVE__isnan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <local/math/isnanl.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return nonzero if VALUE is not a number */
+#define __localdep_isnanl __LIBC_LOCAL_NAME(isnanl)
+#else /* ... */
+#undef __local___localdep_isnanl_defined
+#endif /* !... */
+#endif /* !__local___localdep_isnanl_defined */
 __NAMESPACE_LOCAL_END
 #include <libm/finite.h>
 __NAMESPACE_LOCAL_BEGIN

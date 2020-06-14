@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e315d06 */
+/* HASH CRC-32:0xc99401ac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,19 @@
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 #endif /* !____compar_fn_t_defined */
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: free from stdlib */
+#ifndef __local___localdep_free_defined
+#define __local___localdep_free_defined 1
+#if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
+__CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
+#elif defined(__CRT_HAVE_free)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
+#elif defined(__CRT_HAVE_cfree)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
+#else /* ... */
+#undef __local___localdep_free_defined
+#endif /* !... */
+#endif /* !__local___localdep_free_defined */
 /* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined
 #define __local___localdep_memcpyc_defined 1
@@ -43,19 +56,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
-/* Dependency: free from stdlib */
-#ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
-#if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
-__CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
-#elif defined(__CRT_HAVE_free)
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
-#elif defined(__CRT_HAVE_cfree)
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
-#else /* ... */
-#undef __local___localdep_free_defined
-#endif /* !... */
-#endif /* !__local___localdep_free_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <parts/malloca.h>

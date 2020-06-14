@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x417e6b4d */
+/* HASH CRC-32:0x23b00834 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,26 +24,6 @@
 #if (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread)) && (defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock) || defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ungetc_unlocked from stdio */
-#ifndef __local___localdep_ungetc_unlocked_defined
-#define __local___localdep_ungetc_unlocked_defined 1
-#ifdef __CRT_HAVE_ungetc_unlocked
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
-#elif defined(__CRT_HAVE__ungetc_nolock)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
-#elif defined(__CRT_HAVE_ungetc)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
-#elif defined(__CRT_HAVE__IO_ungetc)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
-#elif defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)
-__NAMESPACE_LOCAL_END
-#include <local/stdio/ungetc_unlocked.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_ungetc_unlocked __LIBC_LOCAL_NAME(ungetc_unlocked)
-#else /* ... */
-#undef __local___localdep_ungetc_unlocked_defined
-#endif /* !... */
-#endif /* !__local___localdep_ungetc_unlocked_defined */
 /* Dependency: ferror_unlocked from stdio */
 #ifndef __local___localdep_ferror_unlocked_defined
 #define __local___localdep_ferror_unlocked_defined 1
@@ -91,6 +71,26 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fgetc_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetc_unlocked_defined */
+/* Dependency: ungetc_unlocked from stdio */
+#ifndef __local___localdep_ungetc_unlocked_defined
+#define __local___localdep_ungetc_unlocked_defined 1
+#ifdef __CRT_HAVE_ungetc_unlocked
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetc_nolock)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
+#elif defined(__CRT_HAVE_ungetc)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
+#elif defined(__CRT_HAVE__IO_ungetc)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
+#elif defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)
+__NAMESPACE_LOCAL_END
+#include <local/stdio/ungetc_unlocked.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_ungetc_unlocked __LIBC_LOCAL_NAME(ungetc_unlocked)
+#else /* ... */
+#undef __local___localdep_ungetc_unlocked_defined
+#endif /* !... */
+#endif /* !__local___localdep_ungetc_unlocked_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/stdio.h>
 #include <parts/errno.h>

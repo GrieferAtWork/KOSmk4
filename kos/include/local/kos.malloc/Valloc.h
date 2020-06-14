@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x766b9583 */
+/* HASH CRC-32:0xc1acdad2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,11 @@
 #ifdef __CRT_HAVE_Memalign
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: Memalign from kos.malloc */
+#if !defined(__local___localdep_Memalign_defined) && defined(__CRT_HAVE_Memalign)
+#define __local___localdep_Memalign_defined 1
+__CREDIRECT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__THROWING,__localdep_Memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),Memalign,(__alignment,__num_bytes))
+#endif /* !__local___localdep_Memalign_defined && __CRT_HAVE_Memalign */
 /* Dependency: getpagesize from unistd */
 #ifndef __local___localdep_getpagesize_defined
 #define __local___localdep_getpagesize_defined 1
@@ -57,11 +62,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__ARCH_PAGESIZE */
 #endif /* !... */
 #endif /* !__local___localdep_getpagesize_defined */
-/* Dependency: Memalign from kos.malloc */
-#if !defined(__local___localdep_Memalign_defined) && defined(__CRT_HAVE_Memalign)
-#define __local___localdep_Memalign_defined 1
-__CREDIRECT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__THROWING,__localdep_Memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),Memalign,(__alignment,__num_bytes))
-#endif /* !__local___localdep_Memalign_defined && __CRT_HAVE_Memalign */
 __LOCAL_LIBC(Valloc) __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(Valloc))(__SIZE_TYPE__ __num_bytes) __THROWS(__E_BADALLOC) {
 	return __localdep_Memalign(__localdep_getpagesize(), __num_bytes);

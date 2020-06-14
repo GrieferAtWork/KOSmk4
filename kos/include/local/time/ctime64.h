@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84390995 */
+/* HASH CRC-32:0xf72243cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,19 @@
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: ctime32 from time */
+#ifndef __local___localdep_ctime32_defined
+#define __local___localdep_ctime32_defined 1
+#ifdef __CRT_HAVE_ctime
+/* Equivalent to `asctime(localtime(timer))' */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime32,(__time32_t const *__timer),ctime,(__timer))
+#elif defined(__CRT_HAVE__ctime32)
+/* Equivalent to `asctime(localtime(timer))' */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime32,(__time32_t const *__timer),_ctime32,(__timer))
+#else /* ... */
+#undef __local___localdep_ctime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_ctime32_defined */
 /* Dependency: ctime64_r from time */
 #ifndef __local___localdep_ctime64_r_defined
 #define __local___localdep_ctime64_r_defined 1
@@ -108,19 +121,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_ctime64_r __LIBC_LOCAL_NAME(ctime64_r)
 #endif /* !... */
 #endif /* !__local___localdep_ctime64_r_defined */
-/* Dependency: ctime32 from time */
-#ifndef __local___localdep_ctime32_defined
-#define __local___localdep_ctime32_defined 1
-#ifdef __CRT_HAVE_ctime
-/* Equivalent to `asctime(localtime(timer))' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime32,(__time32_t const *__timer),ctime,(__timer))
-#elif defined(__CRT_HAVE__ctime32)
-/* Equivalent to `asctime(localtime(timer))' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime32,(__time32_t const *__timer),_ctime32,(__timer))
-#else /* ... */
-#undef __local___localdep_ctime32_defined
-#endif /* !... */
-#endif /* !__local___localdep_ctime32_defined */
 __NAMESPACE_LOCAL_END
 #if defined(__BUILDING_LIBC) || (!defined(__CRT_HAVE_ctime) && !defined(__CRT_HAVE__ctime32))
 #ifndef __LIBC_CTIME_BUFFER_DEFINED

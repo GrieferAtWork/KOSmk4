@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa45ad4f4 */
+/* HASH CRC-32:0xd72115b3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,21 +23,6 @@
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wutime) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wutime) || (defined(__CRT_HAVE__wutime32) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$_wutime32) || (defined(__CRT_HAVE_wutime64) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wutime64) || (defined(__CRT_HAVE__wutime64) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$_wutime64)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: crt_c32utime32 from parts.uchar.utime */
-#ifndef __local___localdep_crt_c32utime32_defined
-#define __local___localdep_crt_c32utime32_defined 1
-#if defined(__CRT_HAVE_wutime) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_c32utime32,(__CHAR32_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
-#elif defined(__CRT_HAVE_DOS$wutime)
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_c32utime32,(__CHAR32_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
-#elif defined(__CRT_HAVE__wutime32) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_c32utime32,(__CHAR32_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),_wutime32,(__filename,__file_times))
-#elif defined(__CRT_HAVE_DOS$_wutime32)
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_c32utime32,(__CHAR32_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),_wutime32,(__filename,__file_times))
-#else /* ... */
-#undef __local___localdep_crt_c32utime32_defined
-#endif /* !... */
-#endif /* !__local___localdep_crt_c32utime32_defined */
 /* Dependency: c32utime64 from parts.uchar.utime */
 #ifndef __local___localdep_c32utime64_defined
 #define __local___localdep_c32utime64_defined 1
@@ -63,6 +48,21 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_c32utime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_c32utime64_defined */
+/* Dependency: crt_c32utime32 from parts.uchar.utime */
+#ifndef __local___localdep_crt_c32utime32_defined
+#define __local___localdep_crt_c32utime32_defined 1
+#if defined(__CRT_HAVE_wutime) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_c32utime32,(__CHAR32_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
+#elif defined(__CRT_HAVE_DOS$wutime)
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_c32utime32,(__CHAR32_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
+#elif defined(__CRT_HAVE__wutime32) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_c32utime32,(__CHAR32_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),_wutime32,(__filename,__file_times))
+#elif defined(__CRT_HAVE_DOS$_wutime32)
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_c32utime32,(__CHAR32_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),_wutime32,(__filename,__file_times))
+#else /* ... */
+#undef __local___localdep_crt_c32utime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_crt_c32utime32_defined */
 __LOCAL_LIBC(c32utime) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32utime))(__CHAR32_TYPE__ const *__filename, struct utimbuf const *__file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO

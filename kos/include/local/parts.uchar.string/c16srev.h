@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fbbbf19 */
+/* HASH CRC-32:0x68badce1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,18 +22,6 @@
 #define __local_c16srev_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memrevl from string */
-#ifndef __local___localdep_memrevl_defined
-#define __local___localdep_memrevl_defined 1
-#ifdef __CRT_HAVE_memrevl
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrevl,(void *__restrict __base, __SIZE_TYPE__ __n_dwords),memrevl,(__base,__n_dwords))
-#else /* __CRT_HAVE_memrevl */
-__NAMESPACE_LOCAL_END
-#include <local/string/memrevl.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_memrevl __LIBC_LOCAL_NAME(memrevl)
-#endif /* !__CRT_HAVE_memrevl */
-#endif /* !__local___localdep_memrevl_defined */
 /* Dependency: c16slen from parts.uchar.string */
 #ifndef __local___localdep_c16slen_defined
 #define __local___localdep_c16slen_defined 1
@@ -69,6 +57,18 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memrev __LIBC_LOCAL_NAME(memrev)
 #endif /* !__CRT_HAVE_memrev */
 #endif /* !__local___localdep_memrev_defined */
+/* Dependency: memrevl from string */
+#ifndef __local___localdep_memrevl_defined
+#define __local___localdep_memrevl_defined 1
+#ifdef __CRT_HAVE_memrevl
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrevl,(void *__restrict __base, __SIZE_TYPE__ __n_dwords),memrevl,(__base,__n_dwords))
+#else /* __CRT_HAVE_memrevl */
+__NAMESPACE_LOCAL_END
+#include <local/string/memrevl.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_memrevl __LIBC_LOCAL_NAME(memrevl)
+#endif /* !__CRT_HAVE_memrevl */
+#endif /* !__local___localdep_memrevl_defined */
 /* Dependency: memrevw from string */
 #ifndef __local___localdep_memrevw_defined
 #define __local___localdep_memrevw_defined 1

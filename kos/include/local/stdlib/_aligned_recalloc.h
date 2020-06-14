@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1137c208 */
+/* HASH CRC-32:0x70dc472f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,34 @@
 #include <__crt.h>
 #if (defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: _aligned_free from stdlib */
+#ifndef __local___localdep__aligned_free_defined
+#define __local___localdep__aligned_free_defined 1
+#ifdef __CRT_HAVE__aligned_free
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__aligned_free,(void *__aligned_mallptr),_aligned_free,(__aligned_mallptr))
+#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/_aligned_free.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__aligned_free __LIBC_LOCAL_NAME(_aligned_free)
+#else /* ... */
+#undef __local___localdep__aligned_free_defined
+#endif /* !... */
+#endif /* !__local___localdep__aligned_free_defined */
+/* Dependency: _aligned_malloc from stdlib */
+#ifndef __local___localdep__aligned_malloc_defined
+#define __local___localdep__aligned_malloc_defined 1
+#ifdef __CRT_HAVE__aligned_malloc
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep__aligned_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),_aligned_malloc,(__num_bytes,__min_alignment))
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/_aligned_malloc.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep__aligned_malloc __LIBC_LOCAL_NAME(_aligned_malloc)
+#else /* ... */
+#undef __local___localdep__aligned_malloc_defined
+#endif /* !... */
+#endif /* !__local___localdep__aligned_malloc_defined */
 /* Dependency: _aligned_msize from stdlib */
 #ifndef __local___localdep__aligned_msize_defined
 #define __local___localdep__aligned_msize_defined 1
@@ -67,34 +95,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memset __LIBC_LOCAL_NAME(memset)
 #endif /* !__CRT_HAVE_memset */
 #endif /* !__local___localdep_memset_defined */
-/* Dependency: _aligned_free from stdlib */
-#ifndef __local___localdep__aligned_free_defined
-#define __local___localdep__aligned_free_defined 1
-#ifdef __CRT_HAVE__aligned_free
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__aligned_free,(void *__aligned_mallptr),_aligned_free,(__aligned_mallptr))
-#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-__NAMESPACE_LOCAL_END
-#include <local/stdlib/_aligned_free.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep__aligned_free __LIBC_LOCAL_NAME(_aligned_free)
-#else /* ... */
-#undef __local___localdep__aligned_free_defined
-#endif /* !... */
-#endif /* !__local___localdep__aligned_free_defined */
-/* Dependency: _aligned_malloc from stdlib */
-#ifndef __local___localdep__aligned_malloc_defined
-#define __local___localdep__aligned_malloc_defined 1
-#ifdef __CRT_HAVE__aligned_malloc
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep__aligned_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment),_aligned_malloc,(__num_bytes,__min_alignment))
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
-__NAMESPACE_LOCAL_END
-#include <local/stdlib/_aligned_malloc.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep__aligned_malloc __LIBC_LOCAL_NAME(_aligned_malloc)
-#else /* ... */
-#undef __local___localdep__aligned_malloc_defined
-#endif /* !... */
-#endif /* !__local___localdep__aligned_malloc_defined */
 __LOCAL_LIBC(_aligned_recalloc) __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_recalloc))(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment) {
 	void *__result;

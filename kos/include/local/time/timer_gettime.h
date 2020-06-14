@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac2df7ee */
+/* HASH CRC-32:0x94f16aa7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,12 @@
 #include <bits/itimerspec.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: timer_gettime32 from time */
+#if !defined(__local___localdep_timer_gettime32_defined) && defined(__CRT_HAVE_timer_gettime)
+#define __local___localdep_timer_gettime32_defined 1
+/* Get current value of timer TIMERID and store it in VALUE */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime32,(__timer_t __timerid, struct itimerspec *__value),timer_gettime,(__timerid,__value))
+#endif /* !__local___localdep_timer_gettime32_defined && __CRT_HAVE_timer_gettime */
 /* Dependency: timer_gettime64 from time */
 #ifndef __local___localdep_timer_gettime64_defined
 #define __local___localdep_timer_gettime64_defined 1
@@ -44,12 +50,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_timer_gettime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_timer_gettime64_defined */
-/* Dependency: timer_gettime32 from time */
-#if !defined(__local___localdep_timer_gettime32_defined) && defined(__CRT_HAVE_timer_gettime)
-#define __local___localdep_timer_gettime32_defined 1
-/* Get current value of timer TIMERID and store it in VALUE */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime32,(__timer_t __timerid, struct itimerspec *__value),timer_gettime,(__timerid,__value))
-#endif /* !__local___localdep_timer_gettime32_defined && __CRT_HAVE_timer_gettime */
 /* Get current value of timer TIMERID and store it in VALUE */
 __LOCAL_LIBC(timer_gettime) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_gettime))(__timer_t __timerid, struct itimerspec *__value) {

@@ -343,7 +343,19 @@ function str2wcs_replaceText(
 		if (tok in ["signed", "unsigned"]) {
 			/* Special case: Must not replace "char" after "signed" or "unsigned"
 			 * -> Handle this by simply treaking these keywords as escape prefixes
-			 *    for the following token. */
+			 *    for the following token.
+			 * TODO: This special handling breaks a couple of functions! e.g.:
+			 * >> INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
+			 * >> NOTHROW_NCX(LIBDCALL libd_wcsnchr)(char16_t const *__restrict haystack,
+			 * >>                                    char16_t needle,
+			 * >>                                    size_t maxlen) {
+			 * >> 	for (; maxlen-- && *haystack; ++haystack) {
+			 * >> 		if unlikely((unsigned char)*haystack == (unsigned char)needle)
+			 * >> 			return (char16_t *)haystack;
+			 * >> 	}
+			 * >> 	return NULL;
+			 * >> }
+			 */
 			self.next();
 			continue;
 		}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c87f4b5 */
+/* HASH CRC-32:0x94007f44 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,22 +22,6 @@
 #define __local_c16sxfrm_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memcpy from string */
-#ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
-#ifdef __CRT_HAVE_memcpy
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
-#else /* __CRT_HAVE_memcpy */
-__NAMESPACE_LOCAL_END
-#include <local/string/memcpy.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-#define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
-#endif /* !__CRT_HAVE_memcpy */
-#endif /* !__local___localdep_memcpy_defined */
 /* Dependency: c16snlen from parts.uchar.string */
 #ifndef __local___localdep_c16snlen_defined
 #define __local___localdep_c16snlen_defined 1
@@ -61,6 +45,22 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16snlen __LIBC_LOCAL_NAME(c16snlen)
 #endif /* !... */
 #endif /* !__local___localdep_c16snlen_defined */
+/* Dependency: memcpy from string */
+#ifndef __local___localdep_memcpy_defined
+#define __local___localdep_memcpy_defined 1
+#ifdef __CRT_HAVE_memcpy
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
+#else /* __CRT_HAVE_memcpy */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpy.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
+#endif /* !__CRT_HAVE_memcpy */
+#endif /* !__local___localdep_memcpy_defined */
 __LOCAL_LIBC(c16sxfrm) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sxfrm))(__CHAR16_TYPE__ *__dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __maxlen) {
 	/* XXX: Implement me */

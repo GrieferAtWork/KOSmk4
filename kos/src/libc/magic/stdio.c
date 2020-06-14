@@ -2324,8 +2324,13 @@ typedef __errno_t errno_t;
 
 #ifndef __rsize_t_defined
 #define __rsize_t_defined 1
-typedef __size_t rsize_t;
+typedef __SIZE_TYPE__ rsize_t;
 #endif /* !__rsize_t_defined */
+
+#ifndef __size_t_defined
+#define __size_t_defined 1
+typedef __SIZE_TYPE__ size_t;
+#endif /* !__size_t_defined */
 
 #ifndef __std_FILE_defined
 #define __std_FILE_defined 1

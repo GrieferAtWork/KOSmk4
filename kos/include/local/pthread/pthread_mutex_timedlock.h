@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef66b80b */
+/* HASH CRC-32:0x23f0e1fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,12 @@
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: pthread_mutex_timedlock32 from pthread */
+#if !defined(__local___localdep_pthread_mutex_timedlock32_defined) && defined(__CRT_HAVE_pthread_mutex_timedlock)
+#define __local___localdep_pthread_mutex_timedlock32_defined 1
+/* Wait until lock becomes available, or specified time passes */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock32,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
+#endif /* !__local___localdep_pthread_mutex_timedlock32_defined && __CRT_HAVE_pthread_mutex_timedlock */
 /* Dependency: pthread_mutex_timedlock64 from pthread */
 #ifndef __local___localdep_pthread_mutex_timedlock64_defined
 #define __local___localdep_pthread_mutex_timedlock64_defined 1
@@ -44,12 +50,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_pthread_mutex_timedlock64_defined
 #endif /* !... */
 #endif /* !__local___localdep_pthread_mutex_timedlock64_defined */
-/* Dependency: pthread_mutex_timedlock32 from pthread */
-#if !defined(__local___localdep_pthread_mutex_timedlock32_defined) && defined(__CRT_HAVE_pthread_mutex_timedlock)
-#define __local___localdep_pthread_mutex_timedlock32_defined 1
-/* Wait until lock becomes available, or specified time passes */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock32,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
-#endif /* !__local___localdep_pthread_mutex_timedlock32_defined && __CRT_HAVE_pthread_mutex_timedlock */
 /* Wait until lock becomes available, or specified time passes */
 __LOCAL_LIBC(pthread_mutex_timedlock) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_mutex_timedlock))(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) {

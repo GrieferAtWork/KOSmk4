@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x151048bc */
+/* HASH CRC-32:0x193824ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,28 +24,6 @@
 #if (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: read from unistd */
-#ifndef __local___localdep_read_defined
-#define __local___localdep_read_defined 1
-#ifdef __CRT_HAVE_read
-/* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),read,(__fd,__buf,__bufsize))
-#elif defined(__CRT_HAVE__read)
-/* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),_read,(__fd,__buf,__bufsize))
-#elif defined(__CRT_HAVE___read)
-/* >> read(2)
- * Read data from a given file descriptor `FD' and return the number of bytes read.
- * A return value of ZERO(0) is indicative of EOF */
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),__read,(__fd,__buf,__bufsize))
-#else /* ... */
-#undef __local___localdep_read_defined
-#endif /* !... */
-#endif /* !__local___localdep_read_defined */
 /* Dependency: lseek from unistd */
 #ifndef __local___localdep_lseek_defined
 #define __local___localdep_lseek_defined 1
@@ -95,6 +73,28 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_lseek_defined
 #endif /* !... */
 #endif /* !__local___localdep_lseek_defined */
+/* Dependency: read from unistd */
+#ifndef __local___localdep_read_defined
+#define __local___localdep_read_defined 1
+#ifdef __CRT_HAVE_read
+/* >> read(2)
+ * Read data from a given file descriptor `FD' and return the number of bytes read.
+ * A return value of ZERO(0) is indicative of EOF */
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),read,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE__read)
+/* >> read(2)
+ * Read data from a given file descriptor `FD' and return the number of bytes read.
+ * A return value of ZERO(0) is indicative of EOF */
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),_read,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE___read)
+/* >> read(2)
+ * Read data from a given file descriptor `FD' and return the number of bytes read.
+ * A return value of ZERO(0) is indicative of EOF */
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),__read,(__fd,__buf,__bufsize))
+#else /* ... */
+#undef __local___localdep_read_defined
+#endif /* !... */
+#endif /* !__local___localdep_read_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN

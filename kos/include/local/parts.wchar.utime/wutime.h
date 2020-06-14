@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38a32ce6 */
+/* HASH CRC-32:0x325e9203 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,25 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_wutime) || (defined(__CRT_HAVE_DOS$wutime) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wutime) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE__wutime32) || (defined(__CRT_HAVE_DOS$_wutime32) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wutime32) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_wutime64) || (defined(__CRT_HAVE_DOS$wutime64) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wutime64) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE__wutime64) || (defined(__CRT_HAVE_DOS$_wutime64) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wutime64) && __SIZEOF_WCHAR_T__ == 2)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: crt_wutime32 from parts.wchar.utime */
+#ifndef __local___localdep_crt_wutime32_defined
+#define __local___localdep_crt_wutime32_defined 1
+#ifdef __CRT_HAVE_wutime
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
+#elif defined(__CRT_HAVE_DOS$wutime) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
+#elif defined(__CRT_HAVE_DOS$wutime) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
+#elif defined(__CRT_HAVE__wutime32)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),_wutime32,(__filename,__file_times))
+#elif defined(__CRT_HAVE_DOS$_wutime32) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),_wutime32,(__filename,__file_times))
+#elif defined(__CRT_HAVE_DOS$_wutime32) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),_wutime32,(__filename,__file_times))
+#else /* ... */
+#undef __local___localdep_crt_wutime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_crt_wutime32_defined */
 /* Dependency: wutime64 from parts.wchar.utime */
 #ifndef __local___localdep_wutime64_defined
 #define __local___localdep_wutime64_defined 1
@@ -47,25 +66,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_wutime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_wutime64_defined */
-/* Dependency: crt_wutime32 from parts.wchar.utime */
-#ifndef __local___localdep_crt_wutime32_defined
-#define __local___localdep_crt_wutime32_defined 1
-#ifdef __CRT_HAVE_wutime
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
-#elif defined(__CRT_HAVE_DOS$wutime) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
-#elif defined(__CRT_HAVE_DOS$wutime) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
-#elif defined(__CRT_HAVE__wutime32)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),_wutime32,(__filename,__file_times))
-#elif defined(__CRT_HAVE_DOS$_wutime32) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),_wutime32,(__filename,__file_times))
-#elif defined(__CRT_HAVE_DOS$_wutime32) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),_wutime32,(__filename,__file_times))
-#else /* ... */
-#undef __local___localdep_crt_wutime32_defined
-#endif /* !... */
-#endif /* !__local___localdep_crt_wutime32_defined */
 __LOCAL_LIBC(wutime) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wutime))(__WCHAR_TYPE__ const *__filename, struct utimbuf const *__file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO

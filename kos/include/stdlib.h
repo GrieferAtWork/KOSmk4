@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd07dd6e5 */
+/* HASH CRC-32:0xcc40ec50 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -386,10 +386,6 @@ __NAMESPACE_STD_END
 #include <local/stdlib/bsearch.h>
 __NAMESPACE_STD_BEGIN
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
-extern "C++" {
-__NAMESPACE_STD_END
-} /* extern "C++" */
-__NAMESPACE_STD_BEGIN
 extern "C++" {
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch)(void const *__pkey, void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __cmp); }
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void const *(__LIBCCALL bsearch)(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __cmp); }

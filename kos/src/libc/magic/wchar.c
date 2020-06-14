@@ -50,6 +50,7 @@ typedef size_t rsize_t;
 
 #include <asm/stdio.h> /* __WEOF */
 #include <bits/mbstate.h>
+#include <kos/anno.h>
 
 #ifdef __USE_KOS
 #include <parts/malloca.h>
@@ -293,8 +294,8 @@ size_t wcrtomb(char *__restrict str, wchar_t wc,
 };
 
 [[std, wchar, wunused, export_alias("__mbrlen")]]
-size_t mbrlen([[inp_opt(maxlen)]] char const *__restrict str, size_t maxlen,
-              [[nullable]] mbstate_t *mbs) {
+$size_t mbrlen([[inp_opt(maxlen)]] char const *__restrict str, $size_t maxlen,
+               [[nullable]] $mbstate_t *mbs) {
 	wchar_t wc;
 	return mbrtowc(&wc, str, maxlen, mbs);
 };
@@ -373,8 +374,9 @@ int mbsinit([[nullable]] mbstate_t const *mbs) {
 	return !mbs || __MBSTATE_ISINIT(mbs);
 }
 
-[[std, wchar, wunused, ATTR_PURE]]
-[[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
+%[define_wchar_replacement(wmemcmp = memcmpw, memcmpl)]
+
+[[std, wchar, wunused, ATTR_PURE, no_crt_impl]]
 int wmemcmp([[inp(num_chars)]] wchar_t const *s1,
             [[inp(num_chars)]] wchar_t const *s2,
             size_t num_chars) {
@@ -385,12 +387,13 @@ int wmemcmp([[inp(num_chars)]] wchar_t const *s1,
 @@pp_else@@
 	return memcmp(s1, s2, num_chars * sizeof(wchar_t));
 @@pp_endif@@
-};
+}
 
-[[std, wchar, nonnull]]
+%[define_wchar_replacement(wmemcpy = "(char16_t *)memcpyw", "(char32_t *)memcpyl")]
+
+[[std, wchar, nonnull, no_crt_impl]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("memcpyw")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("memcpyl")]]
-[[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
 wchar_t *wmemcpy([[outp(num_chars)]] wchar_t *__restrict dst,
                  [[inp(num_chars)]] wchar_t const *__restrict src,
                  size_t num_chars) {
@@ -401,12 +404,13 @@ wchar_t *wmemcpy([[outp(num_chars)]] wchar_t *__restrict dst,
 @@pp_else@@
 	return (wchar_t *)memcpyc(dst, src, num_chars, sizeof(wchar_t));
 @@pp_endif@@
-};
+}
 
-[[std, wchar, nonnull]]
+%[define_wchar_replacement(wmemmove = "(char16_t *)memmovew", "(char32_t *)memmovel")]
+
+[[std, wchar, nonnull, no_crt_impl]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("memmovew")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("memmovel")]]
-[[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
 wchar_t *wmemmove([[outp(num_chars)]] wchar_t *dst,
                   [[inp(num_chars)]] wchar_t const *src,
                   size_t num_chars) {
@@ -417,12 +421,13 @@ wchar_t *wmemmove([[outp(num_chars)]] wchar_t *dst,
 @@pp_else@@
 	return (wchar_t *)memmove(dst, src, num_chars * sizeof(wchar_t));
 @@pp_endif@@
-};
+}
 
-[[std, wchar]]
+%[define_wchar_replacement(wmemset = "(char16_t *)memsetw", "(char32_t *)memsetl")]
+
+[[std, wchar, no_crt_impl]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("memsetw")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("memsetl")]]
-[[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
 [[nonnull]] wchar_t *wmemset([[outp(num_chars)]] wchar_t *dst, wchar_t filler, size_t num_chars) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	return (wchar_t *)memsetw(dst, (u16)filler, num_chars);
@@ -654,6 +659,8 @@ wchar_t *wcsstr([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *
 	[([[nonnull]] wchar_t *haystack, [[nonnull]] wchar_t *needle): wchar_t *]
 	[([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *needle): wchar_t const *]
 	%{generate(str2wcs)}
+
+%[define_wchar_replacement(wmemchr = "(char16_t *)memchrw", "(char32_t *)memchrl")]
 
 [[std, wchar, wunused, ATTR_PURE, no_crt_impl]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("memchrw")]]
@@ -1011,10 +1018,11 @@ wchar_t *wcschrnul([[nonnull]] wchar_t const *haystack, wchar_t needle)
 
 
 
-[[wchar, ATTR_RETNONNULL]]
+%[define_wchar_replacement(wmempcpy = "(char16_t *)mempcpyw", "(char32_t *)mempcpyl")]
+
+[[wchar, ATTR_RETNONNULL, no_crt_impl]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("mempcpyw")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("mempcpyl")]]
-[[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
 wchar_t *wmempcpy([[outp(num_chars)]] wchar_t *__restrict dst,
                   [[inp(num_chars)]] wchar_t const *__restrict src,
                   $size_t num_chars) {
@@ -1027,10 +1035,11 @@ wchar_t *wmempcpy([[outp(num_chars)]] wchar_t *__restrict dst,
 @@pp_endif@@
 }
 
-[[std, wchar, ATTR_RETNONNULL]]
+%[define_wchar_replacement(wmempmove = "(char16_t *)mempmovew", "(char32_t *)mempmovel")]
+
+[[std, wchar, ATTR_RETNONNULL, no_crt_impl]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("mempmovew")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("mempmovel")]]
-[[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
 wchar_t *wmempmove([[outp(num_chars)]] wchar_t *dst,
                    [[inp(num_chars)]] wchar_t const *src,
                    $size_t num_chars) {
@@ -1476,11 +1485,12 @@ wchar_t *wcspncpy([[outp(buflen)]] wchar_t *__restrict buf,
 	return wmempset(buf+srclen, '\0', buflen - srclen);
 }
 
+%[define_wchar_replacement(wmempset = "(char16_t *)mempsetw", "(char32_t *)mempsetl")]
+
 @@Same as wmemset, but return a pointer after the last written character
-[[wchar, ATTR_RETNONNULL, ATTR_LEAF]]
+[[wchar, ATTR_RETNONNULL, ATTR_LEAF, no_crt_impl]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("mempsetw")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("mempsetl")]]
-[[section("{.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory}")]]
 wchar_t *wmempset([[outp(num_chars)]] wchar_t *dst,
                   wchar_t filler, $size_t num_chars) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
@@ -1575,16 +1585,11 @@ $size_t wcsnroff([[inp(maxlen)]] wchar_t const *__restrict haystack, wchar_t nee
 	%{generate(str2wcs)}
 
 
-[[wchar, wunused, ATTR_PURE]]
+%[define_wchar_replacement(fuzzy_wmemcmp = fuzzy_memcmpw, fuzzy_memcmpl)]
+
+[[wchar, wunused, ATTR_PURE, no_crt_impl]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("fuzzy_memcmpw")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("fuzzy_memcmpl")]]
-/* TODO: [[if(defined(__LIBCCALL_IS_LIBKCALL)), crt_intern_kos_alias("libc_fuzzy_memcmpl")]]*/
-/* TODO: [[if(defined(__LIBCCALL_IS_LIBDCALL)), crt_intern_dos_alias("libc_fuzzy_memcmpw")]]*/
-/* TODO: The above current breaks because `libc_fuzzy_memcmpl' is defined in a different file
- *       that this function. The magic generator should be expanded to recognize this, causing
- *       it to place the DEFINE_INTERN_ALIAS() OF the above binding within "auto/string.c",
- *       rather than "auto/wchar.c" */
-[[requires_include("<parts/malloca.h>"), requires(!defined(__NO_MALLOCA))]]
 $size_t fuzzy_wmemcmp([[inp(s1_chars)]] wchar_t const *s1, $size_t s1_chars,
                       [[inp(s2_chars)]] wchar_t const *s2, $size_t s2_chars) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc20b177b */
+/* HASH CRC-32:0xd1f75599 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,23 +22,6 @@
 #define __local_c32rtombs_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mempcpy from string */
-#ifndef __local___localdep_mempcpy_defined
-#define __local___localdep_mempcpy_defined 1
-#ifdef __CRT_HAVE_mempcpy
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
-#elif defined(__CRT_HAVE___mempcpy)
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/string/mempcpy.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
-#define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
-#endif /* !... */
-#endif /* !__local___localdep_mempcpy_defined */
 /* Dependency: c32rtomb from uchar */
 #ifndef __local___localdep_c32rtomb_defined
 #define __local___localdep_c32rtomb_defined 1
@@ -58,6 +41,23 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32rtomb __LIBC_LOCAL_NAME(c32rtomb)
 #endif /* !... */
 #endif /* !__local___localdep_c32rtomb_defined */
+/* Dependency: mempcpy from string */
+#ifndef __local___localdep_mempcpy_defined
+#define __local___localdep_mempcpy_defined 1
+#ifdef __CRT_HAVE_mempcpy
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
+#elif defined(__CRT_HAVE___mempcpy)
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/mempcpy.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `memcpy', but return `DST + N_BYTES', rather than `DST' */
+#define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
+#endif /* !... */
+#endif /* !__local___localdep_mempcpy_defined */
 __LOCAL_LIBC(c32rtombs) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32rtombs))(char *__dst, __CHAR32_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs) {
 	__SIZE_TYPE__ __result = 0;

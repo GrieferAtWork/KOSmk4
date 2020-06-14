@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70afe798 */
+/* HASH CRC-32:0x1da7f4ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3298,7 +3298,8 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpl)(void const *s1,
 	}
 	__malloca_tryhard(v0, (s2_dwords+1) * sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
-	if unlikely(!v0) return (size_t)-1;
+	if unlikely(!v0)
+		return (size_t)-1;
 #endif /* __malloca_tryhard_mayfail */
 	__malloca_tryhard(v1, (s2_dwords+1) * sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
@@ -3355,7 +3356,8 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpq)(void const *s1,
 	}
 	__malloca_tryhard(v0, (s2_qwords+1) * sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
-	if unlikely(!v0) return (size_t)-1;
+	if unlikely(!v0)
+		return (size_t)-1;
 #endif /* __malloca_tryhard_mayfail */
 	__malloca_tryhard(v1, (s2_qwords+1) * sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
@@ -4258,6 +4260,9 @@ DEFINE_PUBLIC_ALIAS(DOS$wmemmove, libc_memmovew);
 DEFINE_PUBLIC_ALIAS(memmovew, libc_memmovew);
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEW */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVEW
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(DOS$wmempmove, libc_mempmovew);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(mempmovew, libc_mempmovew);
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVEW */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEL
@@ -4309,9 +4314,15 @@ DEFINE_PUBLIC_ALIAS(DOS$wmempset, libc_mempsetw);
 DEFINE_PUBLIC_ALIAS(mempsetw, libc_mempsetw);
 #endif /* !LIBC_ARCH_HAVE_MEMPSETW */
 #ifndef LIBC_ARCH_HAVE_MEMSETL
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(wmemset, libc_memsetl);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memsetl, libc_memsetl);
 #endif /* !LIBC_ARCH_HAVE_MEMSETL */
 #ifndef LIBC_ARCH_HAVE_MEMPSETL
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(wmempset, libc_mempsetl);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(mempsetl, libc_mempsetl);
 #endif /* !LIBC_ARCH_HAVE_MEMPSETL */
 #ifndef LIBC_ARCH_HAVE_MEMCMPW
@@ -4692,7 +4703,9 @@ DEFINE_PUBLIC_ALIAS(fuzzy_strcasecmp_l, libc_fuzzy_strcasecmp_l);
 DEFINE_PUBLIC_ALIAS(fuzzy_strncasecmp_l, libc_fuzzy_strncasecmp_l);
 DEFINE_PUBLIC_ALIAS(wildstrcasecmp_l, libc_wildstrcasecmp_l);
 DEFINE_PUBLIC_ALIAS(fuzzy_memcasecmp_l, libc_fuzzy_memcasecmp_l);
+DEFINE_PUBLIC_ALIAS(DOS$fuzzy_wmemcmp, libc_fuzzy_memcmpw);
 DEFINE_PUBLIC_ALIAS(fuzzy_memcmpw, libc_fuzzy_memcmpw);
+DEFINE_PUBLIC_ALIAS(fuzzy_wmemcmp, libc_fuzzy_memcmpl);
 DEFINE_PUBLIC_ALIAS(fuzzy_memcmpl, libc_fuzzy_memcmpl);
 DEFINE_PUBLIC_ALIAS(fuzzy_memcmpq, libc_fuzzy_memcmpq);
 DEFINE_PUBLIC_ALIAS(_strncoll, libc_strncoll);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9697c44b */
+/* HASH CRC-32:0x6bb4c698 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,20 @@
 #define __local_memcasemem_l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcasecmp_l from string */
+#ifndef __local___localdep_memcasecmp_l_defined
+#define __local___localdep_memcasecmp_l_defined 1
+#ifdef __CRT_HAVE_memcasecmp_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),memcasecmp_l,(__s1,__s2,__n_bytes,__locale))
+#elif defined(__CRT_HAVE__memicmp_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),_memicmp_l,(__s1,__s2,__n_bytes,__locale))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcasecmp_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_memcasecmp_l __LIBC_LOCAL_NAME(memcasecmp_l)
+#endif /* !... */
+#endif /* !__local___localdep_memcasecmp_l_defined */
 /* Dependency: tolower_l from ctype */
 #ifndef __local___localdep_tolower_l_defined
 #define __local___localdep_tolower_l_defined 1
@@ -38,20 +52,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_tolower_l __LIBC_LOCAL_NAME(tolower_l)
 #endif /* !... */
 #endif /* !__local___localdep_tolower_l_defined */
-/* Dependency: memcasecmp_l from string */
-#ifndef __local___localdep_memcasecmp_l_defined
-#define __local___localdep_memcasecmp_l_defined 1
-#ifdef __CRT_HAVE_memcasecmp_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),memcasecmp_l,(__s1,__s2,__n_bytes,__locale))
-#elif defined(__CRT_HAVE__memicmp_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),_memicmp_l,(__s1,__s2,__n_bytes,__locale))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/string/memcasecmp_l.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_memcasecmp_l __LIBC_LOCAL_NAME(memcasecmp_l)
-#endif /* !... */
-#endif /* !__local___localdep_memcasecmp_l_defined */
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN

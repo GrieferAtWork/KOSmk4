@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd18a64a */
+/* HASH CRC-32:0x724bd4df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,19 @@
 #if defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime) || defined(__CRT_HAVE_clock_settime64)
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: clock_settime32 from time */
+#ifndef __local___localdep_clock_settime32_defined
+#define __local___localdep_clock_settime32_defined 1
+#ifdef __CRT_HAVE_clock_settime
+/* Set clock CLOCK_ID to value TP */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime32,(__clockid_t __clock_id, struct __timespec32 const *__tp),clock_settime,(__clock_id,__tp))
+#elif defined(__CRT_HAVE___clock_settime)
+/* Set clock CLOCK_ID to value TP */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime32,(__clockid_t __clock_id, struct __timespec32 const *__tp),__clock_settime,(__clock_id,__tp))
+#else /* ... */
+#undef __local___localdep_clock_settime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_clock_settime32_defined */
 /* Dependency: clock_settime64 from time */
 #ifndef __local___localdep_clock_settime64_defined
 #define __local___localdep_clock_settime64_defined 1
@@ -49,19 +62,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_clock_settime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_clock_settime64_defined */
-/* Dependency: clock_settime32 from time */
-#ifndef __local___localdep_clock_settime32_defined
-#define __local___localdep_clock_settime32_defined 1
-#ifdef __CRT_HAVE_clock_settime
-/* Set clock CLOCK_ID to value TP */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime32,(__clockid_t __clock_id, struct __timespec32 const *__tp),clock_settime,(__clock_id,__tp))
-#elif defined(__CRT_HAVE___clock_settime)
-/* Set clock CLOCK_ID to value TP */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime32,(__clockid_t __clock_id, struct __timespec32 const *__tp),__clock_settime,(__clock_id,__tp))
-#else /* ... */
-#undef __local___localdep_clock_settime32_defined
-#endif /* !... */
-#endif /* !__local___localdep_clock_settime32_defined */
 /* Set clock CLOCK_ID to value TP */
 __LOCAL_LIBC(clock_settime) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_settime))(__clockid_t __clock_id, struct timespec const *__tp) {

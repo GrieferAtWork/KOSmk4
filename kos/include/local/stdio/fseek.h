@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce117d82 */
+/* HASH CRC-32:0x3f1798c9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,19 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: crt_fseeko from stdio */
+#ifndef __local___localdep_crt_fseeko_defined
+#define __local___localdep_crt_fseeko_defined 1
+#if defined(__CRT_HAVE_fseeko_unlocked) && defined(__USE_STDIO_UNLOCKED)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko_unlocked)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
+#else /* ... */
+#undef __local___localdep_crt_fseeko_defined
+#endif /* !... */
+#endif /* !__local___localdep_crt_fseeko_defined */
 /* Dependency: crt_fseeko64 from stdio */
 #ifndef __local___localdep_crt_fseeko64_defined
 #define __local___localdep_crt_fseeko64_defined 1
@@ -42,19 +55,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko64,(__FILE *
 #undef __local___localdep_crt_fseeko64_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fseeko64_defined */
-/* Dependency: crt_fseeko from stdio */
-#ifndef __local___localdep_crt_fseeko_defined
-#define __local___localdep_crt_fseeko_defined 1
-#if defined(__CRT_HAVE_fseeko_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko_unlocked)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
-#else /* ... */
-#undef __local___localdep_crt_fseeko_defined
-#endif /* !... */
-#endif /* !__local___localdep_crt_fseeko_defined */
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __LOCAL_LIBC(fseek) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fseek))(__FILE *__restrict __stream, long int __off, int __whence) __THROWS(...) {

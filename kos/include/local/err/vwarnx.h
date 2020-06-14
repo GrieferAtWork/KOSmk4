@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe35bf778 */
+/* HASH CRC-32:0x92f2f235 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,22 @@
 #include <local/program_invocation_name.h>
 #if !defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_fprintf) || defined(__CRT_HAVE__IO_fprintf) || defined(__CRT_HAVE_fprintf_s) || defined(__CRT_HAVE_fprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)) && (defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite))
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: flockfile from stdio */
+#ifndef __local___localdep_flockfile_defined
+#define __local___localdep_flockfile_defined 1
+#ifdef __CRT_HAVE_flockfile
+/* Acquire a lock to `STREAM' and block until doing so succeeds */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),flockfile,(__stream))
+#elif defined(__CRT_HAVE__lock_file)
+/* Acquire a lock to `STREAM' and block until doing so succeeds */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_lock_file,(__stream))
+#elif defined(__CRT_HAVE__IO_flockfile)
+/* Acquire a lock to `STREAM' and block until doing so succeeds */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_IO_flockfile,(__stream))
+#else /* ... */
+#undef __local___localdep_flockfile_defined
+#endif /* !... */
+#endif /* !__local___localdep_flockfile_defined */
 /* Dependency: fprintf from stdio */
 #ifndef __local___localdep_fprintf_defined
 #define __local___localdep_fprintf_defined 1
@@ -189,22 +205,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_vfprintf_defined
 #endif /* !... */
 #endif /* !__local___localdep_vfprintf_defined */
-/* Dependency: flockfile from stdio */
-#ifndef __local___localdep_flockfile_defined
-#define __local___localdep_flockfile_defined 1
-#ifdef __CRT_HAVE_flockfile
-/* Acquire a lock to `STREAM' and block until doing so succeeds */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),flockfile,(__stream))
-#elif defined(__CRT_HAVE__lock_file)
-/* Acquire a lock to `STREAM' and block until doing so succeeds */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_lock_file,(__stream))
-#elif defined(__CRT_HAVE__IO_flockfile)
-/* Acquire a lock to `STREAM' and block until doing so succeeds */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_IO_flockfile,(__stream))
-#else /* ... */
-#undef __local___localdep_flockfile_defined
-#endif /* !... */
-#endif /* !__local___localdep_flockfile_defined */
 __NAMESPACE_LOCAL_END
 #include <local/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN

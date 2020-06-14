@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdf0d719 */
+/* HASH CRC-32:0x1cb02c00 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,22 @@
 #define __local_strerror_r_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcpyc from string */
+#ifndef __local___localdep_memcpyc_defined
+#define __local___localdep_memcpyc_defined 1
+#ifdef __CRT_HAVE_memcpyc
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* __CRT_HAVE_memcpyc */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpyc.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
+#endif /* !__CRT_HAVE_memcpyc */
+#endif /* !__local___localdep_memcpyc_defined */
 /* Dependency: snprintf from stdio */
 #ifndef __local___localdep_snprintf_defined
 #define __local___localdep_snprintf_defined 1
@@ -48,6 +64,18 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_snprintf __LIBC_LOCAL_NAME(snprintf)
 #endif /* !... */
 #endif /* !__local___localdep_snprintf_defined */
+/* Dependency: strerror_s from string */
+#ifndef __local___localdep_strerror_s_defined
+#define __local___localdep_strerror_s_defined 1
+#ifdef __CRT_HAVE_strerror_s
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerror_s,(int __errnum),strerror_s,(__errnum))
+#else /* __CRT_HAVE_strerror_s */
+__NAMESPACE_LOCAL_END
+#include <local/string/strerror_s.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strerror_s __LIBC_LOCAL_NAME(strerror_s)
+#endif /* !__CRT_HAVE_strerror_s */
+#endif /* !__local___localdep_strerror_s_defined */
 /* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
@@ -62,34 +90,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* Dependency: memcpyc from string */
-#ifndef __local___localdep_memcpyc_defined
-#define __local___localdep_memcpyc_defined 1
-#ifdef __CRT_HAVE_memcpyc
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
-#else /* __CRT_HAVE_memcpyc */
-__NAMESPACE_LOCAL_END
-#include <local/string/memcpyc.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-#define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
-#endif /* !__CRT_HAVE_memcpyc */
-#endif /* !__local___localdep_memcpyc_defined */
-/* Dependency: strerror_s from string */
-#ifndef __local___localdep_strerror_s_defined
-#define __local___localdep_strerror_s_defined 1
-#ifdef __CRT_HAVE_strerror_s
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerror_s,(int __errnum),strerror_s,(__errnum))
-#else /* __CRT_HAVE_strerror_s */
-__NAMESPACE_LOCAL_END
-#include <local/string/strerror_s.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_strerror_s __LIBC_LOCAL_NAME(strerror_s)
-#endif /* !__CRT_HAVE_strerror_s */
-#endif /* !__local___localdep_strerror_s_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 #ifndef __local_strerror_buf_defined

@@ -20,55 +20,99 @@
 #ifndef GUARD_LIBC_HYBRID_ARCH_I386_CONFIG_H
 #define GUARD_LIBC_HYBRID_ARCH_I386_CONFIG_H 1
 
+#include <hybrid/host.h>
+
 /* Libc functions implemented by arch-specific, optimized functions.
  * Defining these macros causes libc's auto/user-system to not provide
  * the associated functions. */
-#define LIBC_ARCH_HAVE_MEMCPY        1
-#define LIBC_ARCH_HAVE_MEMMOVE       1
-#define LIBC_ARCH_HAVE_MEMSET        1
-#define LIBC_ARCH_HAVE_MEMCMP        1
-#define LIBC_ARCH_HAVE_STRLEN        1
-#define LIBC_ARCH_HAVE_STREND        1
-#define LIBC_ARCH_HAVE_STRNLEN       1
-#define LIBC_ARCH_HAVE_STRNEND       1
-#define LIBC_ARCH_HAVE_MEMPCPY       1
-#define LIBC_ARCH_HAVE_MEMCPYW       1
-#define LIBC_ARCH_HAVE_MEMPCPYW      1
-#define LIBC_ARCH_HAVE_MEMCPYL       1
-#define LIBC_ARCH_HAVE_MEMPCPYL      1
-#define LIBC_ARCH_HAVE_MEMMOVEW      1
-#define LIBC_ARCH_HAVE_MEMPMOVEW     1
-#define LIBC_ARCH_HAVE_MEMMOVEL      1
-#define LIBC_ARCH_HAVE_MEMPMOVEL     1
-#define LIBC_ARCH_HAVE_MEMMOVEUPW    1
-#define LIBC_ARCH_HAVE_MEMMOVEDOWNW  1
-#define LIBC_ARCH_HAVE_MEMPMOVEUPW   1
-#define LIBC_ARCH_HAVE_MEMPMOVEDOWNW 1
-#define LIBC_ARCH_HAVE_MEMMOVEUPL    1
-#define LIBC_ARCH_HAVE_MEMMOVEDOWNL  1
-#define LIBC_ARCH_HAVE_MEMPMOVEUPL   1
-#define LIBC_ARCH_HAVE_MEMPMOVEDOWNL 1
-#define LIBC_ARCH_HAVE_MEMSETW       1
-#define LIBC_ARCH_HAVE_MEMPSETW      1
-#define LIBC_ARCH_HAVE_MEMSETL       1
-#define LIBC_ARCH_HAVE_MEMPSETL      1
-#define LIBC_ARCH_HAVE_MEMCMPW       1
-#define LIBC_ARCH_HAVE_MEMCMPL       1
-#define LIBC_ARCH_HAVE_MEMMOVEUP     1
-#define LIBC_ARCH_HAVE_MEMMOVEDOWN   1
-#define LIBC_ARCH_HAVE_MEMPSET       1
+
+/* memcpy() */
+#define LIBC_ARCH_HAVE_MEMCPY   1
+#define LIBC_ARCH_HAVE_MEMCPYW  1
+#define LIBC_ARCH_HAVE_MEMCPYL  1
+#define LIBC_ARCH_HAVE_MEMPCPY  1
+#define LIBC_ARCH_HAVE_MEMPCPYW 1
+#define LIBC_ARCH_HAVE_MEMPCPYL 1
+#ifdef __x86_64__
+#define LIBC_ARCH_HAVE_MEMCPYQ  1
+#define LIBC_ARCH_HAVE_MEMPCPYQ 1
+#endif /* __x86_64__ */
+
+/* memmove() */
+#ifndef __x86_64__ /* TODO: Also provide on x86_64! */
+#define LIBC_ARCH_HAVE_MEMMOVE      1
+#define LIBC_ARCH_HAVE_MEMMOVEUP    1
+#define LIBC_ARCH_HAVE_MEMMOVEDOWN  1
+#define LIBC_ARCH_HAVE_MEMMOVEW     1
+#define LIBC_ARCH_HAVE_MEMMOVEUPW   1
+#define LIBC_ARCH_HAVE_MEMMOVEDOWNW 1
+#define LIBC_ARCH_HAVE_MEMMOVEL     1
+#define LIBC_ARCH_HAVE_MEMMOVEUPL   1
+#define LIBC_ARCH_HAVE_MEMMOVEDOWNL 1
 #define LIBC_ARCH_HAVE_MEMPMOVE      1
 #define LIBC_ARCH_HAVE_MEMPMOVEUP    1
 #define LIBC_ARCH_HAVE_MEMPMOVEDOWN  1
-#define LIBC_ARCH_HAVE_C16SLEN       1
-#define LIBC_ARCH_HAVE_C16SNLEN      1
-#define LIBC_ARCH_HAVE_C16SEND       1
-#define LIBC_ARCH_HAVE_C16SNEND      1
-#define LIBC_ARCH_HAVE_C32SLEN       1
-#define LIBC_ARCH_HAVE_C32SNLEN      1
-#define LIBC_ARCH_HAVE_C32SEND       1
-#define LIBC_ARCH_HAVE_C32SNEND      1
-#define LIBC_ARCH_HAVE_ABORT         1
-#define LIBC_ARCH_HAVE_SIG_RESTORE   1 /* void ASMCALL libc_sig_restore(void); */
+#define LIBC_ARCH_HAVE_MEMPMOVEW     1
+#define LIBC_ARCH_HAVE_MEMPMOVEUPW   1
+#define LIBC_ARCH_HAVE_MEMPMOVEDOWNW 1
+#define LIBC_ARCH_HAVE_MEMPMOVEL     1
+#define LIBC_ARCH_HAVE_MEMPMOVEUPL   1
+#define LIBC_ARCH_HAVE_MEMPMOVEDOWNL 1
+#ifdef __x86_64__
+#define LIBC_ARCH_HAVE_MEMMOVEQ      1
+#define LIBC_ARCH_HAVE_MEMMOVEUPQ    1
+#define LIBC_ARCH_HAVE_MEMMOVEDOWNQ  1
+#define LIBC_ARCH_HAVE_MEMPMOVEQ     1
+#define LIBC_ARCH_HAVE_MEMPMOVEUPQ   1
+#define LIBC_ARCH_HAVE_MEMPMOVEDOWNQ 1
+#endif /* __x86_64__ */
+#endif /* !__x86_64__ */
+
+/* memset() */
+#define LIBC_ARCH_HAVE_MEMSET   1
+#define LIBC_ARCH_HAVE_MEMSETW  1
+#define LIBC_ARCH_HAVE_MEMSETL  1
+#define LIBC_ARCH_HAVE_MEMPSET  1
+#define LIBC_ARCH_HAVE_MEMPSETW 1
+#define LIBC_ARCH_HAVE_MEMPSETL 1
+#ifdef __x86_64__
+#define LIBC_ARCH_HAVE_MEMSETQ  1
+#define LIBC_ARCH_HAVE_MEMPSETQ 1
+#endif /* __x86_64__ */
+
+/* memcmp() */
+#ifndef __x86_64__ /* TODO: Also provide on x86_64! */
+#define LIBC_ARCH_HAVE_MEMCMP  1
+#define LIBC_ARCH_HAVE_MEMCMPW 1
+#define LIBC_ARCH_HAVE_MEMCMPL 1
+#ifdef __x86_64__
+#define LIBC_ARCH_HAVE_MEMCMPQ 1
+#endif /* __x86_64__ */
+#endif /* !__x86_64__ */
+
+/* strlen() */
+#define LIBC_ARCH_HAVE_STRLEN  1
+#define LIBC_ARCH_HAVE_STREND  1
+#define LIBC_ARCH_HAVE_STRNLEN 1
+#define LIBC_ARCH_HAVE_STRNEND 1
+
+/* c16slen() */
+#define LIBC_ARCH_HAVE_C16SLEN  1
+#define LIBC_ARCH_HAVE_C16SEND  1
+#define LIBC_ARCH_HAVE_C16SNLEN 1
+#define LIBC_ARCH_HAVE_C16SNEND 1
+
+/* c32slen() */
+#define LIBC_ARCH_HAVE_C32SLEN  1
+#define LIBC_ARCH_HAVE_C32SEND  1
+#define LIBC_ARCH_HAVE_C32SNLEN 1
+#define LIBC_ARCH_HAVE_C32SNEND 1
+
+/* abort() */
+#define LIBC_ARCH_HAVE_ABORT 1
+
+/* void ASMCALL libc_sig_restore(void); */
+#define LIBC_ARCH_HAVE_SIG_RESTORE 1
+
 
 #endif /* !GUARD_LIBC_HYBRID_ARCH_I386_CONFIG_H */

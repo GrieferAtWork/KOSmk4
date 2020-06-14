@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38b42467 */
+/* HASH CRC-32:0xd550fe60 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,40 +33,6 @@
 #endif
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ftruncate from unistd */
-#ifndef __local___localdep_ftruncate_defined
-#define __local___localdep_ftruncate_defined 1
-#if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate64,(__fd,__length))
-#elif defined(__CRT_HAVE__chsize_s) && defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
-#elif defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate,(__fd,__length))
-#elif defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize,(__fd,__length))
-#elif defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)
-/* >> ftruncate(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),chsize,(__fd,__length))
-#elif defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)
-__NAMESPACE_LOCAL_END
-#include <local/unistd/ftruncate.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> ftruncate(2)
- * Truncate the given file `FD' to a length of `LENGTH' */
-#define __localdep_ftruncate __LIBC_LOCAL_NAME(ftruncate)
-#else /* ... */
-#undef __local___localdep_ftruncate_defined
-#endif /* !... */
-#endif /* !__local___localdep_ftruncate_defined */
 /* Dependency: c32truncate32 from parts.uchar.unistd */
 #ifndef __local___localdep_c32truncate32_defined
 #define __local___localdep_c32truncate32_defined 1
@@ -82,45 +48,6 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_c32truncate32,(
 #undef __local___localdep_c32truncate32_defined
 #endif /* !... */
 #endif /* !__local___localdep_c32truncate32_defined */
-/* Dependency: close from unistd */
-#ifndef __local___localdep_close_defined
-#define __local___localdep_close_defined 1
-#ifdef __CRT_HAVE_close
-/* >> close(2)
- * Close a file handle */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
-#elif defined(__CRT_HAVE__close)
-/* >> close(2)
- * Close a file handle */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
-#elif defined(__CRT_HAVE___close)
-/* >> close(2)
- * Close a file handle */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
-#else /* ... */
-#undef __local___localdep_close_defined
-#endif /* !... */
-#endif /* !__local___localdep_close_defined */
-/* Dependency: open from fcntl */
-#ifndef __local___localdep_open_defined
-#define __local___localdep_open_defined 1
-#if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE__open) && !defined(__USE_FILE_OFFSET64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE___open) && !defined(__USE_FILE_OFFSET64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
-__NAMESPACE_LOCAL_END
-#include <local/fcntl/open.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_open __LIBC_LOCAL_NAME(open)
-#else /* ... */
-#undef __local___localdep_open_defined
-#endif /* !... */
-#endif /* !__local___localdep_open_defined */
 /* Dependency: c32truncate64 from parts.uchar.unistd */
 #ifndef __local___localdep_c32truncate64_defined
 #define __local___localdep_c32truncate64_defined 1
@@ -158,6 +85,79 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_c32truncate64_defined
 #endif /* !... */
 #endif /* !__local___localdep_c32truncate64_defined */
+/* Dependency: close from unistd */
+#ifndef __local___localdep_close_defined
+#define __local___localdep_close_defined 1
+#ifdef __CRT_HAVE_close
+/* >> close(2)
+ * Close a file handle */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
+#elif defined(__CRT_HAVE__close)
+/* >> close(2)
+ * Close a file handle */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
+#elif defined(__CRT_HAVE___close)
+/* >> close(2)
+ * Close a file handle */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
+#else /* ... */
+#undef __local___localdep_close_defined
+#endif /* !... */
+#endif /* !__local___localdep_close_defined */
+/* Dependency: ftruncate from unistd */
+#ifndef __local___localdep_ftruncate_defined
+#define __local___localdep_ftruncate_defined 1
+#if defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)
+/* >> ftruncate(2)
+ * Truncate the given file `FD' to a length of `LENGTH' */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate64,(__fd,__length))
+#elif defined(__CRT_HAVE__chsize_s) && defined(__USE_FILE_OFFSET64)
+/* >> ftruncate(2)
+ * Truncate the given file `FD' to a length of `LENGTH' */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
+#elif defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)
+/* >> ftruncate(2)
+ * Truncate the given file `FD' to a length of `LENGTH' */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate,(__fd,__length))
+#elif defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)
+/* >> ftruncate(2)
+ * Truncate the given file `FD' to a length of `LENGTH' */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize,(__fd,__length))
+#elif defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)
+/* >> ftruncate(2)
+ * Truncate the given file `FD' to a length of `LENGTH' */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),chsize,(__fd,__length))
+#elif defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)
+__NAMESPACE_LOCAL_END
+#include <local/unistd/ftruncate.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> ftruncate(2)
+ * Truncate the given file `FD' to a length of `LENGTH' */
+#define __localdep_ftruncate __LIBC_LOCAL_NAME(ftruncate)
+#else /* ... */
+#undef __local___localdep_ftruncate_defined
+#endif /* !... */
+#endif /* !__local___localdep_ftruncate_defined */
+/* Dependency: open from fcntl */
+#ifndef __local___localdep_open_defined
+#define __local___localdep_open_defined 1
+#if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE__open) && !defined(__USE_FILE_OFFSET64)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE___open) && !defined(__USE_FILE_OFFSET64)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+__NAMESPACE_LOCAL_END
+#include <local/fcntl/open.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_open __LIBC_LOCAL_NAME(open)
+#else /* ... */
+#undef __local___localdep_open_defined
+#endif /* !... */
+#endif /* !__local___localdep_open_defined */
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __LOCAL_LIBC(c32truncate) __ATTR_NONNULL((1)) int

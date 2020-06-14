@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d05c4bf */
+/* HASH CRC-32:0xa2a83ff2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,11 +22,6 @@
 #define __local_isdigit_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _isctype from ctype */
-#if !defined(__local___localdep__isctype_defined) && defined(__CRT_HAVE__isctype)
-#define __local___localdep__isctype_defined 1
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep__isctype,(int __ch, int __mask),_isctype,(__ch,__mask))
-#endif /* !__local___localdep__isctype_defined && __CRT_HAVE__isctype */
 /* Dependency: __ctype_b_loc from ctype */
 #if !defined(__local___localdep___ctype_b_loc_defined) && defined(__CRT_HAVE___ctype_b_loc)
 #define __local___localdep___ctype_b_loc_defined 1
@@ -37,6 +32,11 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__UINT16_TYPE__ const **,__NOTHROW,__loca
 #define __local___localdep___locale_ctype_ptr_defined 1
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep___locale_ctype_ptr,(void),__locale_ctype_ptr,())
 #endif /* !__local___localdep___locale_ctype_ptr_defined && __CRT_HAVE___locale_ctype_ptr */
+/* Dependency: _isctype from ctype */
+#if !defined(__local___localdep__isctype_defined) && defined(__CRT_HAVE__isctype)
+#define __local___localdep__isctype_defined 1
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep__isctype,(int __ch, int __mask),_isctype,(__ch,__mask))
+#endif /* !__local___localdep__isctype_defined && __CRT_HAVE__isctype */
 __LOCAL_LIBC(isdigit) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isdigit))(int __ch) {
 #ifdef __BUILDING_LIBC

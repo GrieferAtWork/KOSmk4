@@ -67,9 +67,9 @@ struct ATTR_PACKED gcc_lsda_callsite {
 	/* Exception handling in GCC works as follows:
 	 *   - If a function doesn't have a .cfi_personality function,
 	 *     exceptions will simply be propagated through it.
-	 *   - If a function does have a `__gxx_personality_v0' as a personality
-	 *     function, its callsite table is searched for the associated unwind PC.
-	 *      - If the unwind PC wasn't found, then the program must terminate (in our case: panic())
+	 *   - If a function has `__gxx_personality_v0' as its personality function,
+	 *     its callsite table is searched for the associated unwind PC.
+	 *      - If the unwind PC wasn't found, then the program must std::terminate()
 	 *      - If the unwind PC was found as a valid call-site,
 	 *        then the associated action must be taken. */
 	uintptr_t gcs_start;       /* [ENCODING(:gl_callsite_enc)]

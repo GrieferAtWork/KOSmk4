@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b2716e5 */
+/* HASH CRC-32:0xa88d6985 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,20 @@
 #define __local__wcslwr_s_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: towlower from wctype */
+#ifndef __local___localdep_towlower_defined
+#define __local___localdep_towlower_defined 1
+#if __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,{ return __builtin_towlower(__wc); })
+#elif defined(__CRT_HAVE_towlower)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,(__wc))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wctype/towlower.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_towlower __LIBC_LOCAL_NAME(towlower)
+#endif /* !... */
+#endif /* !__local___localdep_towlower_defined */
 /* Dependency: wcsnlen from wchar */
 #ifndef __local___localdep_wcsnlen_defined
 #define __local___localdep_wcsnlen_defined 1
@@ -42,20 +56,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcsnlen __LIBC_LOCAL_NAME(wcsnlen)
 #endif /* !... */
 #endif /* !__local___localdep_wcsnlen_defined */
-/* Dependency: towlower from wctype */
-#ifndef __local___localdep_towlower_defined
-#define __local___localdep_towlower_defined 1
-#if __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,{ return __builtin_towlower(__wc); })
-#elif defined(__CRT_HAVE_towlower)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,(__wc))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/wctype/towlower.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_towlower __LIBC_LOCAL_NAME(towlower)
-#endif /* !... */
-#endif /* !__local___localdep_towlower_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN

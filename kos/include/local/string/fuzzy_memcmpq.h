@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe011ec */
+/* HASH CRC-32:0xa6ed0ba8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_memcmpq))(void const *__s1, __S
 	}
 	__malloca_tryhard(__v0, (__s2_qwords+1) * sizeof(__SIZE_TYPE__));
 #ifdef __malloca_tryhard_mayfail
-	if __unlikely(!__v0) return (__SIZE_TYPE__)-1;
+	if __unlikely(!__v0)
+		return (__SIZE_TYPE__)-1;
 #endif /* __malloca_tryhard_mayfail */
 	__malloca_tryhard(__v1, (__s2_qwords+1) * sizeof(__SIZE_TYPE__));
 #ifdef __malloca_tryhard_mayfail

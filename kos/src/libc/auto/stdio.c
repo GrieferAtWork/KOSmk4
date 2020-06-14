@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14e02117 */
+/* HASH CRC-32:0xebadff5b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/stdio.h"
-#include "../user/format-printer.h"
+#include "format-printer.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
 #include "unicode.h"

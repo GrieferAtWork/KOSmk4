@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e9f0d12 */
+/* HASH CRC-32:0x61c05e05 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,16 @@
 #define __local_isalpha_l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: __locale_ctype_ptr_l from ctype */
+#if !defined(__local___localdep___locale_ctype_ptr_l_defined) && defined(__CRT_HAVE___locale_ctype_ptr_l)
+#define __local___localdep___locale_ctype_ptr_l_defined 1
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___locale_ctype_ptr_l,(__locale_t __locale),__locale_ctype_ptr_l,(__locale))
+#endif /* !__local___localdep___locale_ctype_ptr_l_defined && __CRT_HAVE___locale_ctype_ptr_l */
+/* Dependency: _isctype_l from ctype */
+#if !defined(__local___localdep__isctype_l_defined) && defined(__CRT_HAVE__isctype_l)
+#define __local___localdep__isctype_l_defined 1
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__isctype_l,(int __ch, int __mask, __locale_t __locale),_isctype_l,(__ch,__mask,__locale))
+#endif /* !__local___localdep__isctype_l_defined && __CRT_HAVE__isctype_l */
 /* Dependency: isalpha from ctype */
 #ifndef __local___localdep_isalpha_defined
 #define __local___localdep_isalpha_defined 1
@@ -36,16 +46,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_isalpha __LIBC_LOCAL_NAME(isalpha)
 #endif /* !... */
 #endif /* !__local___localdep_isalpha_defined */
-/* Dependency: _isctype_l from ctype */
-#if !defined(__local___localdep__isctype_l_defined) && defined(__CRT_HAVE__isctype_l)
-#define __local___localdep__isctype_l_defined 1
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__isctype_l,(int __ch, int __mask, __locale_t __locale),_isctype_l,(__ch,__mask,__locale))
-#endif /* !__local___localdep__isctype_l_defined && __CRT_HAVE__isctype_l */
-/* Dependency: __locale_ctype_ptr_l from ctype */
-#if !defined(__local___localdep___locale_ctype_ptr_l_defined) && defined(__CRT_HAVE___locale_ctype_ptr_l)
-#define __local___localdep___locale_ctype_ptr_l_defined 1
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___locale_ctype_ptr_l,(__locale_t __locale),__locale_ctype_ptr_l,(__locale))
-#endif /* !__local___localdep___locale_ctype_ptr_l_defined && __CRT_HAVE___locale_ctype_ptr_l */
 __LOCAL_LIBC(isalpha_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isalpha_l))(int __ch, __locale_t __locale) {
 #ifdef __BUILDING_LIBC

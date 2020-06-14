@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1743ec00 */
+/* HASH CRC-32:0x94011a0c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,20 @@
 #define __local_unicode_8to16_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: unicode_readutf8_n from unicode */
+#ifndef __local___localdep_unicode_readutf8_n_defined
+#define __local___localdep_unicode_readutf8_n_defined 1
+#ifdef __CRT_HAVE_unicode_readutf8_n
+/* Same as `unicode_readutf8()', but don't read past `text_end' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
+#else /* __CRT_HAVE_unicode_readutf8_n */
+__NAMESPACE_LOCAL_END
+#include <local/unicode/unicode_readutf8_n.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `unicode_readutf8()', but don't read past `text_end' */
+#define __localdep_unicode_readutf8_n __LIBC_LOCAL_NAME(unicode_readutf8_n)
+#endif /* !__CRT_HAVE_unicode_readutf8_n */
+#endif /* !__local___localdep_unicode_readutf8_n_defined */
 /* Dependency: unicode_writeutf16 from unicode */
 #ifndef __local___localdep_unicode_writeutf16_defined
 #define __local___localdep_unicode_writeutf16_defined 1
@@ -38,20 +52,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_unicode_writeutf16 __LIBC_LOCAL_NAME(unicode_writeutf16)
 #endif /* !__CRT_HAVE_unicode_writeutf16 */
 #endif /* !__local___localdep_unicode_writeutf16_defined */
-/* Dependency: unicode_readutf8_n from unicode */
-#ifndef __local___localdep_unicode_readutf8_n_defined
-#define __local___localdep_unicode_readutf8_n_defined 1
-#ifdef __CRT_HAVE_unicode_readutf8_n
-/* Same as `unicode_readutf8()', but don't read past `text_end' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
-#else /* __CRT_HAVE_unicode_readutf8_n */
-__NAMESPACE_LOCAL_END
-#include <local/unicode/unicode_readutf8_n.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Same as `unicode_readutf8()', but don't read past `text_end' */
-#define __localdep_unicode_readutf8_n __LIBC_LOCAL_NAME(unicode_readutf8_n)
-#endif /* !__CRT_HAVE_unicode_readutf8_n */
-#endif /* !__local___localdep_unicode_readutf8_n_defined */
 /* Convert a given utf-8 string to utf-16.
  * @param: utf16_dst: A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_characters)' words, or `*2' bytes
  * @param: utf8_text: The input UTF-8 string to convert

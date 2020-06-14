@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84833eab */
+/* HASH CRC-32:0x3c3d6f33 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,26 +23,6 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_fuzzy_wmemcasecmp) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp) && __SIZEOF_WCHAR_T__ == 2) || !defined(__NO_MALLOCA)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcslen from wchar */
-#ifndef __local___localdep_wcslen_defined
-#define __local___localdep_wcslen_defined 1
-#ifdef __CRT_HAVE_wcslen
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
-#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 4
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
-#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 2
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/wchar/wcslen.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_wcslen __LIBC_LOCAL_NAME(wcslen)
-#endif /* !... */
-#endif /* !__local___localdep_wcslen_defined */
 /* Dependency: fuzzy_wmemcasecmp from wchar */
 #ifndef __local___localdep_fuzzy_wmemcasecmp_defined
 #define __local___localdep_fuzzy_wmemcasecmp_defined 1
@@ -66,6 +46,26 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* __NO_MALLOCA */
 #endif /* !... */
 #endif /* !__local___localdep_fuzzy_wmemcasecmp_defined */
+/* Dependency: wcslen from wchar */
+#ifndef __local___localdep_wcslen_defined
+#define __local___localdep_wcslen_defined 1
+#ifdef __CRT_HAVE_wcslen
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
+#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 4
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
+#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 2
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wchar/wcslen.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_wcslen __LIBC_LOCAL_NAME(wcslen)
+#endif /* !... */
+#endif /* !__local___localdep_wcslen_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN

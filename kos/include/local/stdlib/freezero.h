@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c09c242 */
+/* HASH CRC-32:0x7b43aff4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,19 +23,6 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: free from stdlib */
-#ifndef __local___localdep_free_defined
-#define __local___localdep_free_defined 1
-#if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
-__CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
-#elif defined(__CRT_HAVE_free)
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
-#elif defined(__CRT_HAVE_cfree)
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
-#else /* ... */
-#undef __local___localdep_free_defined
-#endif /* !... */
-#endif /* !__local___localdep_free_defined */
 /* Dependency: explicit_bzero from strings */
 #ifndef __local___localdep_explicit_bzero_defined
 #define __local___localdep_explicit_bzero_defined 1
@@ -68,6 +55,19 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_explicit_bzero __LIBC_LOCAL_NAME(explicit_bzero)
 #endif /* !... */
 #endif /* !__local___localdep_explicit_bzero_defined */
+/* Dependency: free from stdlib */
+#ifndef __local___localdep_free_defined
+#define __local___localdep_free_defined 1
+#if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
+__CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
+#elif defined(__CRT_HAVE_free)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
+#elif defined(__CRT_HAVE_cfree)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
+#else /* ... */
+#undef __local___localdep_free_defined
+#endif /* !... */
+#endif /* !__local___localdep_free_defined */
 /* Same as `free(mallptr)', but also ensure that the memory region
  * described by `mallptr...+=size' is explicitly freed to zero, or
  * immediately returned to the OS, rather than being left in cache

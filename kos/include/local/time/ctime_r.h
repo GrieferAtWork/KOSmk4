@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b843a70 */
+/* HASH CRC-32:0xf297331b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,20 +55,6 @@ __NAMESPACE_STD_END
 #endif /* !__tm_defined */
 #endif
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: localtime_r from time */
-#ifndef __local___localdep_localtime_r_defined
-#define __local___localdep_localtime_r_defined 1
-#ifdef __CRT_HAVE_localtime_r
-/* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime_r,(__TM_TYPE(time) const *__restrict __timer, __STRUCT_TM *__restrict __tp),localtime_r,(__timer,__tp))
-#else /* __CRT_HAVE_localtime_r */
-__NAMESPACE_LOCAL_END
-#include <local/time/localtime_r.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
-#define __localdep_localtime_r __LIBC_LOCAL_NAME(localtime_r)
-#endif /* !__CRT_HAVE_localtime_r */
-#endif /* !__local___localdep_localtime_r_defined */
 /* Dependency: asctime_r from time */
 #ifndef __local___localdep_asctime_r_defined
 #define __local___localdep_asctime_r_defined 1
@@ -104,6 +90,20 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_dos_ctime_s_defined
 #endif /* !... */
 #endif /* !__local___localdep_dos_ctime_s_defined */
+/* Dependency: localtime_r from time */
+#ifndef __local___localdep_localtime_r_defined
+#define __local___localdep_localtime_r_defined 1
+#ifdef __CRT_HAVE_localtime_r
+/* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime_r,(__TM_TYPE(time) const *__restrict __timer, __STRUCT_TM *__restrict __tp),localtime_r,(__timer,__tp))
+#else /* __CRT_HAVE_localtime_r */
+__NAMESPACE_LOCAL_END
+#include <local/time/localtime_r.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
+#define __localdep_localtime_r __LIBC_LOCAL_NAME(localtime_r)
+#endif /* !__CRT_HAVE_localtime_r */
+#endif /* !__local___localdep_localtime_r_defined */
 /* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __LOCAL_LIBC(ctime_r) __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime_r))(__TM_TYPE(time) const *__restrict __timer, char __buf[26]) {

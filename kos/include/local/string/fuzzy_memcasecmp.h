@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70e9c2f7 */
+/* HASH CRC-32:0x61240f6d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,22 +24,6 @@
 #include <parts/malloca.h>
 #ifndef __NO_MALLOCA
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: tolower from ctype */
-#ifndef __local___localdep_tolower_defined
-#define __local___localdep_tolower_defined 1
-#if __has_builtin(__builtin_tolower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tolower)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,{ return __builtin_tolower(__ch); })
-#elif defined(__CRT_HAVE_tolower)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,(__ch))
-#elif defined(__CRT_HAVE__tolower)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),_tolower,(__ch))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/ctype/tolower.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_tolower __LIBC_LOCAL_NAME(tolower)
-#endif /* !... */
-#endif /* !__local___localdep_tolower_defined */
 /* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined
 #define __local___localdep_memcpyc_defined 1
@@ -56,6 +40,22 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
+/* Dependency: tolower from ctype */
+#ifndef __local___localdep_tolower_defined
+#define __local___localdep_tolower_defined 1
+#if __has_builtin(__builtin_tolower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tolower)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,{ return __builtin_tolower(__ch); })
+#elif defined(__CRT_HAVE_tolower)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,(__ch))
+#elif defined(__CRT_HAVE__tolower)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),_tolower,(__ch))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/ctype/tolower.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_tolower __LIBC_LOCAL_NAME(tolower)
+#endif /* !... */
+#endif /* !__local___localdep_tolower_defined */
 __LOCAL_LIBC(fuzzy_memcasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_memcasecmp))(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes) {
 	__SIZE_TYPE__ *__v0, *__v1, __i, __j, __cost, __temp;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4aa5dd41 */
+/* HASH CRC-32:0x7ebafd48 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,32 @@
 #define __local_hasmntopt_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcmp from string */
+#ifndef __local___localdep_memcmp_defined
+#define __local___localdep_memcmp_defined 1
+#ifdef __CRT_HAVE_memcmp
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
+#elif defined(__CRT_HAVE_bcmp)
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcmp.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
+#define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
+#endif /* !... */
+#endif /* !__local___localdep_memcmp_defined */
 /* Dependency: strchrnul from string */
 #ifndef __local___localdep_strchrnul_defined
 #define __local___localdep_strchrnul_defined 1
@@ -50,32 +76,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* Dependency: memcmp from string */
-#ifndef __local___localdep_memcmp_defined
-#define __local___localdep_memcmp_defined 1
-#ifdef __CRT_HAVE_memcmp
-/* Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
-#elif defined(__CRT_HAVE_bcmp)
-/* Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/string/memcmp.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-#define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
-#endif /* !... */
-#endif /* !__local___localdep_memcmp_defined */
 /* Search MNT->mnt_opts for an option matching OPT.
  * Returns the address of the substring, or null if none found */
 __LOCAL_LIBC(hasmntopt) __ATTR_PURE __ATTR_WUNUSED char *

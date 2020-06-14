@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf19769e0 */
+/* HASH CRC-32:0x3c2161cc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,11 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: Open32 from kos.fcntl */
+#if !defined(__local___localdep_Open32_defined) && defined(__CRT_HAVE_Open)
+#define __local___localdep_Open32_defined 1
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open32,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
+#endif /* !__local___localdep_Open32_defined && __CRT_HAVE_Open */
 /* Dependency: OpenAt64 from kos.fcntl */
 #ifndef __local___localdep_OpenAt64_defined
 #define __local___localdep_OpenAt64_defined 1
@@ -41,11 +46,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_OpenAt64_defined
 #endif /* !... */
 #endif /* !__local___localdep_OpenAt64_defined */
-/* Dependency: Open32 from kos.fcntl */
-#if !defined(__local___localdep_Open32_defined) && defined(__CRT_HAVE_Open)
-#define __local___localdep_Open32_defined 1
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open32,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
-#endif /* !__local___localdep_Open32_defined && __CRT_HAVE_Open */
 __NAMESPACE_LOCAL_END
 #include <bits/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN

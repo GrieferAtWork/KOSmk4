@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25fda23f */
+/* HASH CRC-32:0xcf5eeb21 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,6 +85,20 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_vscanf __LIBC_LOCAL_NAME(format_vscanf)
 #endif /* !__CRT_HAVE_format_vscanf */
 #endif /* !__local___localdep_format_vscanf_defined */
+/* Dependency: unicode_readutf8_n from unicode */
+#ifndef __local___localdep_unicode_readutf8_n_defined
+#define __local___localdep_unicode_readutf8_n_defined 1
+#ifdef __CRT_HAVE_unicode_readutf8_n
+/* Same as `unicode_readutf8()', but don't read past `text_end' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
+#else /* __CRT_HAVE_unicode_readutf8_n */
+__NAMESPACE_LOCAL_END
+#include <local/unicode/unicode_readutf8_n.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `unicode_readutf8()', but don't read past `text_end' */
+#define __localdep_unicode_readutf8_n __LIBC_LOCAL_NAME(unicode_readutf8_n)
+#endif /* !__CRT_HAVE_unicode_readutf8_n */
+#endif /* !__local___localdep_unicode_readutf8_n_defined */
 /* Dependency: unicode_readutf8_rev from unicode */
 #ifndef __local___localdep_unicode_readutf8_rev_defined
 #define __local___localdep_unicode_readutf8_rev_defined 1
@@ -103,20 +117,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_unicode_readutf8_rev __LIBC_LOCAL_NAME(unicode_readutf8_rev)
 #endif /* !__CRT_HAVE_unicode_readutf8_rev */
 #endif /* !__local___localdep_unicode_readutf8_rev_defined */
-/* Dependency: unicode_readutf8_n from unicode */
-#ifndef __local___localdep_unicode_readutf8_n_defined
-#define __local___localdep_unicode_readutf8_n_defined 1
-#ifdef __CRT_HAVE_unicode_readutf8_n
-/* Same as `unicode_readutf8()', but don't read past `text_end' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
-#else /* __CRT_HAVE_unicode_readutf8_n */
-__NAMESPACE_LOCAL_END
-#include <local/unicode/unicode_readutf8_n.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Same as `unicode_readutf8()', but don't read past `text_end' */
-#define __localdep_unicode_readutf8_n __LIBC_LOCAL_NAME(unicode_readutf8_n)
-#endif /* !__CRT_HAVE_unicode_readutf8_n */
-#endif /* !__local___localdep_unicode_readutf8_n_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/stdio.h>
 #include <hybrid/typecore.h>

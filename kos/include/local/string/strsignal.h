@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb6972c8 */
+/* HASH CRC-32:0xb0efe657 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,18 +22,6 @@
 #define __local_strsignal_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strsignal_s from string */
-#ifndef __local___localdep_strsignal_s_defined
-#define __local___localdep_strsignal_s_defined 1
-#ifdef __CRT_HAVE_strsignal_s
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strsignal_s,(int __signum),strsignal_s,(__signum))
-#else /* __CRT_HAVE_strsignal_s */
-__NAMESPACE_LOCAL_END
-#include <local/string/strsignal_s.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_strsignal_s __LIBC_LOCAL_NAME(strsignal_s)
-#endif /* !__CRT_HAVE_strsignal_s */
-#endif /* !__local___localdep_strsignal_s_defined */
 /* Dependency: sprintf from stdio */
 #ifndef __local___localdep_sprintf_defined
 #define __local___localdep_sprintf_defined 1
@@ -81,6 +69,18 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strncpy __LIBC_LOCAL_NAME(strncpy)
 #endif /* !... */
 #endif /* !__local___localdep_strncpy_defined */
+/* Dependency: strsignal_s from string */
+#ifndef __local___localdep_strsignal_s_defined
+#define __local___localdep_strsignal_s_defined 1
+#ifdef __CRT_HAVE_strsignal_s
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strsignal_s,(int __signum),strsignal_s,(__signum))
+#else /* __CRT_HAVE_strsignal_s */
+__NAMESPACE_LOCAL_END
+#include <local/string/strsignal_s.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strsignal_s __LIBC_LOCAL_NAME(strsignal_s)
+#endif /* !__CRT_HAVE_strsignal_s */
+#endif /* !__local___localdep_strsignal_s_defined */
 __LOCAL_LIBC(strsignal) __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsignal))(int __signo) {
 	static char __strsignal_buf[64] = { 0 };

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ed25ec5 */
+/* HASH CRC-32:0xf354c9bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,11 @@
 #ifdef __CRT_HAVE_Malloc
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: Malloc from kos.malloc */
+#if !defined(__local___localdep_Malloc_defined) && defined(__CRT_HAVE_Malloc)
+#define __local___localdep_Malloc_defined 1
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,__localdep_Malloc,(__SIZE_TYPE__ __num_bytes),Malloc,(__num_bytes))
+#endif /* !__local___localdep_Malloc_defined && __CRT_HAVE_Malloc */
 /* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
@@ -40,11 +45,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-/* Dependency: Malloc from kos.malloc */
-#if !defined(__local___localdep_Malloc_defined) && defined(__CRT_HAVE_Malloc)
-#define __local___localdep_Malloc_defined 1
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,__localdep_Malloc,(__SIZE_TYPE__ __num_bytes),Malloc,(__num_bytes))
-#endif /* !__local___localdep_Malloc_defined && __CRT_HAVE_Malloc */
 __LOCAL_LIBC(Memdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(Memdup))(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes) __THROWS(__E_BADALLOC) {
 	void *__result;

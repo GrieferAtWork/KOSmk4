@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbba191e6 */
+/* HASH CRC-32:0x28f722e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,19 @@
 #if defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres) || defined(__CRT_HAVE_clock_getres64)
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: clock_getres32 from time */
+#ifndef __local___localdep_clock_getres32_defined
+#define __local___localdep_clock_getres32_defined 1
+#ifdef __CRT_HAVE_clock_getres
+/* Get resolution of clock CLOCK_ID */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres32,(__clockid_t __clock_id, struct __timespec32 *__res),clock_getres,(__clock_id,__res))
+#elif defined(__CRT_HAVE___clock_getres)
+/* Get resolution of clock CLOCK_ID */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres32,(__clockid_t __clock_id, struct __timespec32 *__res),__clock_getres,(__clock_id,__res))
+#else /* ... */
+#undef __local___localdep_clock_getres32_defined
+#endif /* !... */
+#endif /* !__local___localdep_clock_getres32_defined */
 /* Dependency: clock_getres64 from time */
 #ifndef __local___localdep_clock_getres64_defined
 #define __local___localdep_clock_getres64_defined 1
@@ -49,19 +62,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_clock_getres64_defined
 #endif /* !... */
 #endif /* !__local___localdep_clock_getres64_defined */
-/* Dependency: clock_getres32 from time */
-#ifndef __local___localdep_clock_getres32_defined
-#define __local___localdep_clock_getres32_defined 1
-#ifdef __CRT_HAVE_clock_getres
-/* Get resolution of clock CLOCK_ID */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres32,(__clockid_t __clock_id, struct __timespec32 *__res),clock_getres,(__clock_id,__res))
-#elif defined(__CRT_HAVE___clock_getres)
-/* Get resolution of clock CLOCK_ID */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres32,(__clockid_t __clock_id, struct __timespec32 *__res),__clock_getres,(__clock_id,__res))
-#else /* ... */
-#undef __local___localdep_clock_getres32_defined
-#endif /* !... */
-#endif /* !__local___localdep_clock_getres32_defined */
 /* Get resolution of clock CLOCK_ID */
 __LOCAL_LIBC(clock_getres) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_getres))(__clockid_t __clock_id, struct timespec *__res) {

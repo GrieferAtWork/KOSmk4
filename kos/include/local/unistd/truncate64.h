@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x514ae1c0 */
+/* HASH CRC-32:0x3df785c5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,25 @@
 #if defined(__CRT_HAVE_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: close from unistd */
+#ifndef __local___localdep_close_defined
+#define __local___localdep_close_defined 1
+#ifdef __CRT_HAVE_close
+/* >> close(2)
+ * Close a file handle */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
+#elif defined(__CRT_HAVE__close)
+/* >> close(2)
+ * Close a file handle */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
+#elif defined(__CRT_HAVE___close)
+/* >> close(2)
+ * Close a file handle */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
+#else /* ... */
+#undef __local___localdep_close_defined
+#endif /* !... */
+#endif /* !__local___localdep_close_defined */
 /* Dependency: ftruncate64 from unistd */
 #ifndef __local___localdep_ftruncate64_defined
 #define __local___localdep_ftruncate64_defined 1
@@ -83,13 +102,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_ftruncate64_defined
 #endif /* !... */
 #endif /* !__local___localdep_ftruncate64_defined */
-/* Dependency: truncate32 from unistd */
-#if !defined(__local___localdep_truncate32_defined) && defined(__CRT_HAVE_truncate)
-#define __local___localdep_truncate32_defined 1
-/* >> truncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_truncate32,(char const *__file, __pos32_t __length),truncate,(__file,__length))
-#endif /* !__local___localdep_truncate32_defined && __CRT_HAVE_truncate */
 /* Dependency: open64 from fcntl */
 #ifndef __local___localdep_open64_defined
 #define __local___localdep_open64_defined 1
@@ -112,25 +124,13 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_open64_defined
 #endif /* !... */
 #endif /* !__local___localdep_open64_defined */
-/* Dependency: close from unistd */
-#ifndef __local___localdep_close_defined
-#define __local___localdep_close_defined 1
-#ifdef __CRT_HAVE_close
-/* >> close(2)
- * Close a file handle */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
-#elif defined(__CRT_HAVE__close)
-/* >> close(2)
- * Close a file handle */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
-#elif defined(__CRT_HAVE___close)
-/* >> close(2)
- * Close a file handle */
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
-#else /* ... */
-#undef __local___localdep_close_defined
-#endif /* !... */
-#endif /* !__local___localdep_close_defined */
+/* Dependency: truncate32 from unistd */
+#if !defined(__local___localdep_truncate32_defined) && defined(__CRT_HAVE_truncate)
+#define __local___localdep_truncate32_defined 1
+/* >> truncate(2)
+ * Truncate the given file `FILE' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_truncate32,(char const *__file, __pos32_t __length),truncate,(__file,__length))
+#endif /* !__local___localdep_truncate32_defined && __CRT_HAVE_truncate */
 __NAMESPACE_LOCAL_END
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS

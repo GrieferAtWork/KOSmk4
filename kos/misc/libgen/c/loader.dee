@@ -3828,13 +3828,6 @@ got_chkExpr:
 						@@The Xchar-function implementation
 						local xc: XcharImplementation = wcharFunction
 							.getXCharImplementation(currentName, mode);
-						/* Figure out which prototypes should be used */
-						local usedPrototype: FunctionPrototype = currentPrototype;
-						local usedPrototypes: {(string, {FunctionPrototype...})...} = currentPrototypes;
-						if (usedPrototype is none)
-							usedPrototype = xc.prototype;
-						if (usedPrototypes is none)
-							usedPrototypes = xc.prototypes;
 						/* Enumerate bindings of the underlying [[wchar]] Function to construct
 						 * new, transformed bindings for our new the Xchar function. */
 						local basicBindings = [];
@@ -4063,6 +4056,20 @@ wc_bind_continue_scan_bindings:
 						if (xcImpl is none) {
 							yield basicBindings...;
 						} else {
+							/* Figure out which prototypes should be used */
+							local usedPrototypes: {(string, {FunctionPrototype...})...} = currentPrototypes;
+							if (usedPrototypes is none)
+								usedPrototypes = xc.prototypes;
+							else {
+								/* Check if usedPrototypes uses DEFAULT_CC, and if so: Change
+								 * that to instead make use of `WCHAR_REPLACEMENT_CC[mode]' */
+								for (local none, protos: usedPrototypes) {
+									for (local p: protos) {
+										if (p.cc === DEFAULT_CC)
+											p.cc = WCHAR_REPLACEMENT_CC[mode];
+									}
+								}
+							}
 							local implBinding = FunctionBinding(
 								ppCond:       xcImpl.ppCond,
 								ppCondPrefix: xcImpl.ppCondPrefix,
@@ -4102,6 +4109,12 @@ wc_bind_continue_scan_bindings:
 								implBinding.binding = InlineFunction(
 									mode: feat_inline, impl: xcImpl.impl);
 							} else if (!feat_noLocal) {
+								local usedPrototype: FunctionPrototype = currentPrototype;
+								if (usedPrototype is none)
+									usedPrototype = xc.prototype;
+								/* Replace default CC with the proper UCHAR-override */
+								if (usedPrototype.cc === DEFAULT_CC)
+									usedPrototype.cc = WCHAR_REPLACEMENT_CC[mode];
 								assert xcLocalFunction !is none;
 								xcLocalFunction.prototype     = usedPrototype;
 								xcLocalFunction.impl          = xcImpl.impl;

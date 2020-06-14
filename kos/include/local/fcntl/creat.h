@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4c67a4f */
+/* HASH CRC-32:0xd349935f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,26 +24,6 @@
 #if (defined(__CRT_HAVE_creat64) || (defined(__CRT_HAVE_creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)) || (defined(__CRT_HAVE__creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: open from fcntl */
-#ifndef __local___localdep_open_defined
-#define __local___localdep_open_defined 1
-#if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE__open) && !defined(__USE_FILE_OFFSET64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE___open) && !defined(__USE_FILE_OFFSET64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
-__NAMESPACE_LOCAL_END
-#include <local/fcntl/open.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_open __LIBC_LOCAL_NAME(open)
-#else /* ... */
-#undef __local___localdep_open_defined
-#endif /* !... */
-#endif /* !__local___localdep_open_defined */
 /* Dependency: creat64 from fcntl */
 #ifndef __local___localdep_creat64_defined
 #define __local___localdep_creat64_defined 1
@@ -64,6 +44,26 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_creat64_defined
 #endif /* !... */
 #endif /* !__local___localdep_creat64_defined */
+/* Dependency: open from fcntl */
+#ifndef __local___localdep_open_defined
+#define __local___localdep_open_defined 1
+#if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE__open) && !defined(__USE_FILE_OFFSET64)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE___open) && !defined(__USE_FILE_OFFSET64)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+__NAMESPACE_LOCAL_END
+#include <local/fcntl/open.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_open __LIBC_LOCAL_NAME(open)
+#else /* ... */
+#undef __local___localdep_open_defined
+#endif /* !... */
+#endif /* !__local___localdep_open_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN

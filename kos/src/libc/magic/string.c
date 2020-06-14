@@ -1252,6 +1252,9 @@ memmovew:([[nonnull]] /*aligned(2)*/ void *dst,
 
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST'
 [[fast, libc, kernel, ATTR_LEAF]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
+[[alias("DOS$wmempmove")]]
+[[if(!defined(__KERNEL__)), export_as("DOS$wmempmove")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEW))]]
 mempmovew:([[nonnull]] /*aligned(2)*/ void *dst,
            [[nonnull]] /*aligned(2)*/ void const *src,
@@ -1358,6 +1361,8 @@ memmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
 
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS')
 [[fast, libc, kernel, ATTR_LEAF, alias("mempmovew")]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
+[[alias("DOS$wmempmove")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEUPW))]]
 mempmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
              [[nonnull]] /*aligned(2)*/ void const *src,
@@ -1367,6 +1372,8 @@ mempmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
 
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS')
 [[fast, libc, kernel, ATTR_LEAF, alias("mempmovew")]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
+[[alias("DOS$wmempmove")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEDOWNW))]]
 mempmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
                [[nonnull]] /*aligned(2)*/ void const *src,
@@ -1412,6 +1419,8 @@ memmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
 
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS')
 [[fast, libc, kernel, ATTR_LEAF, alias("mempmovel")]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
+[[if(defined(__PE__)), alias("KOS$wmempmove")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEUPL))]]
 mempmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
              [[nonnull]] /*aligned(4)*/ void const *src,
@@ -1421,6 +1430,8 @@ mempmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
 
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS')
 [[fast, libc, kernel, ATTR_LEAF, alias("mempmovel")]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
+[[if(defined(__PE__)), alias("KOS$wmempmove")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEDOWNL))]]
 mempmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
                [[nonnull]] /*aligned(4)*/ void const *src,
@@ -1468,6 +1479,9 @@ mempsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 
 @@Fill memory with a given dword
 [[fast, libc, kernel, ATTR_LEAF]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemset")]]
+[[if(defined(__PE__)), alias("KOS$wmemset")]]
+[[if(!defined(__KERNEL__)), export_as("wmemset")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMSETL))]]
 memsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
          $uint32_t dword, $size_t n_dwords) -> [[== dst]] $uint32_t * {
@@ -1479,6 +1493,9 @@ memsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
 
 @@Same as `memsetl', but return `DST + N_DWORDS', rather than `DST'
 [[fast, libc, kernel, ATTR_LEAF]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempset")]]
+[[if(defined(__PE__)), alias("KOS$wmempset")]]
+[[if(!defined(__KERNEL__)), export_as("wmempset")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPSETL))]]
 mempsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
           $uint32_t dword, $size_t n_dwords) -> [== dst + n_dwords * 4] $uint32_t * {
@@ -5009,17 +5026,17 @@ $size_t fuzzy_memcasecmp_l([[nonnull]] void const *s1, $size_t s1_bytes,
 		}
 	}
 	__malloca_tryhard(v0, (s2_bytes + 1) * sizeof(size_t));
-#ifdef __malloca_tryhard_mayfail
+@@pp_ifdef __malloca_tryhard_mayfail@@
 	if unlikely(!v0)
 		return (size_t)-1;
-#endif /* __malloca_tryhard_mayfail */
+@@pp_endif@@
 	__malloca_tryhard(v1, (s2_bytes + 1) * sizeof(size_t));
-#ifdef __malloca_tryhard_mayfail
+@@pp_ifdef __malloca_tryhard_mayfail@@
 	if unlikely(!v1) {
 		__freea(v0);
 		return (size_t)-1;
 	}
-#endif /* __malloca_tryhard_mayfail */
+@@pp_endif@@
 	for (i = 0; i < s2_bytes; ++i)
 		v0[i] = i;
 	for (i = 0; i < s1_bytes; ++i) {
@@ -5057,7 +5074,7 @@ $size_t fuzzy_memcmpb([[nonnull]] void const *s1, $size_t s1_bytes,
 
 [[wunused, ATTR_PURE, requires_include("<parts/malloca.h>")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("fuzzy_wmemcmp")]]
-[[requires(!defined(__NO_MALLOCA))]]
+[[export_alias("DOS$fuzzy_wmemcmp"), requires(!defined(__NO_MALLOCA))]]
 $size_t fuzzy_memcmpw([[nonnull]] void const *s1, $size_t s1_words,
                       [[nonnull]] void const *s2, $size_t s2_words) {
 	size_t *v0, *v1, i, j, cost, temp;
@@ -5080,17 +5097,17 @@ $size_t fuzzy_memcmpw([[nonnull]] void const *s1, $size_t s1_words,
 		}
 	}
 	__malloca_tryhard(v0, (s2_words+1) * sizeof(size_t));
-#ifdef __malloca_tryhard_mayfail
+@@pp_ifdef __malloca_tryhard_mayfail@@
 	if unlikely(!v0)
 		return (size_t)-1;
-#endif /* __malloca_tryhard_mayfail */
+@@pp_endif@@
 	__malloca_tryhard(v1, (s2_words+1) * sizeof(size_t));
-#ifdef __malloca_tryhard_mayfail
+@@pp_ifdef __malloca_tryhard_mayfail@@
 	if unlikely(!v1) {
 		__freea(v0);
 		return (size_t)-1;
 	}
-#endif /* __malloca_tryhard_mayfail */
+@@pp_endif@@
 	for (i = 0; i < s2_words; ++i)
 		v0[i] = i;
 	for (i = 0; i < s1_words; ++i) {
@@ -5117,7 +5134,8 @@ $size_t fuzzy_memcmpw([[nonnull]] void const *s1, $size_t s1_words,
 
 [[wunused, ATTR_PURE, requires_include("<parts/malloca.h>")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("fuzzy_wmemcmp")]]
-[[alias("KOS$fuzzy_wmemcmp"), requires(!defined(__NO_MALLOCA))]]
+[[if(defined(__PE__)), alias("KOS$fuzzy_wmemcmp")]]
+[[export_as("fuzzy_wmemcmp"), requires(!defined(__NO_MALLOCA))]]
 $size_t fuzzy_memcmpl([[nonnull]] void const *s1, $size_t s1_dwords,
                       [[nonnull]] void const *s2, $size_t s2_dwords) {
 	size_t *v0, *v1, i, j, cost, temp;
@@ -5140,16 +5158,17 @@ $size_t fuzzy_memcmpl([[nonnull]] void const *s1, $size_t s1_dwords,
 		}
 	}
 	__malloca_tryhard(v0, (s2_dwords+1) * sizeof(size_t));
-#ifdef __malloca_tryhard_mayfail
-	if unlikely(!v0) return (size_t)-1;
-#endif /* __malloca_tryhard_mayfail */
+@@pp_ifdef __malloca_tryhard_mayfail@@
+	if unlikely(!v0)
+		return (size_t)-1;
+@@pp_endif@@
 	__malloca_tryhard(v1, (s2_dwords+1) * sizeof(size_t));
-#ifdef __malloca_tryhard_mayfail
+@@pp_ifdef __malloca_tryhard_mayfail@@
 	if unlikely(!v1) {
 		__freea(v0);
 		return (size_t)-1;
 	}
-#endif /* __malloca_tryhard_mayfail */
+@@pp_endif@@
 	for (i = 0; i < s2_dwords; ++i)
 		v0[i] = i;
 	for (i = 0; i < s1_dwords; ++i) {
@@ -5198,16 +5217,17 @@ $size_t fuzzy_memcmpq([[nonnull]] void const *s1, $size_t s1_qwords,
 		}
 	}
 	__malloca_tryhard(v0, (s2_qwords+1) * sizeof(size_t));
-#ifdef __malloca_tryhard_mayfail
-	if unlikely(!v0) return (size_t)-1;
-#endif /* __malloca_tryhard_mayfail */
+@@pp_ifdef __malloca_tryhard_mayfail@@
+	if unlikely(!v0)
+		return (size_t)-1;
+@@pp_endif@@
 	__malloca_tryhard(v1, (s2_qwords+1) * sizeof(size_t));
-#ifdef __malloca_tryhard_mayfail
+@@pp_ifdef __malloca_tryhard_mayfail@@
 	if unlikely(!v1) {
 		__freea(v0);
 		return (size_t)-1;
 	}
-#endif /* __malloca_tryhard_mayfail */
+@@pp_endif@@
 	for (i = 0; i < s2_qwords; ++i)
 		v0[i] = i;
 	for (i = 0; i < s1_qwords; ++i) {

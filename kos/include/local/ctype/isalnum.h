@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32b0bd26 */
+/* HASH CRC-32:0xcbcf9c12 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,44 +27,16 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep___ctype_b_loc_defined 1
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__UINT16_TYPE__ const **,__NOTHROW,__localdep___ctype_b_loc,(void),__ctype_b_loc,())
 #endif /* !__local___localdep___ctype_b_loc_defined && __CRT_HAVE___ctype_b_loc */
-/* Dependency: isupper from ctype */
-#ifndef __local___localdep_isupper_defined
-#define __local___localdep_isupper_defined 1
-#if __has_builtin(__builtin_isupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isupper)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isupper,(int __ch),isupper,{ return __builtin_isupper(__ch); })
-#elif defined(__CRT_HAVE_isupper)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isupper,(int __ch),isupper,(__ch))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/ctype/isupper.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_isupper __LIBC_LOCAL_NAME(isupper)
-#endif /* !... */
-#endif /* !__local___localdep_isupper_defined */
-/* Dependency: _isctype from ctype */
-#if !defined(__local___localdep__isctype_defined) && defined(__CRT_HAVE__isctype)
-#define __local___localdep__isctype_defined 1
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep__isctype,(int __ch, int __mask),_isctype,(__ch,__mask))
-#endif /* !__local___localdep__isctype_defined && __CRT_HAVE__isctype */
-/* Dependency: islower from ctype */
-#ifndef __local___localdep_islower_defined
-#define __local___localdep_islower_defined 1
-#if __has_builtin(__builtin_islower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_islower)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,{ return __builtin_islower(__ch); })
-#elif defined(__CRT_HAVE_islower)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,(__ch))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/ctype/islower.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_islower __LIBC_LOCAL_NAME(islower)
-#endif /* !... */
-#endif /* !__local___localdep_islower_defined */
 /* Dependency: __locale_ctype_ptr from ctype */
 #if !defined(__local___localdep___locale_ctype_ptr_defined) && defined(__CRT_HAVE___locale_ctype_ptr)
 #define __local___localdep___locale_ctype_ptr_defined 1
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep___locale_ctype_ptr,(void),__locale_ctype_ptr,())
 #endif /* !__local___localdep___locale_ctype_ptr_defined && __CRT_HAVE___locale_ctype_ptr */
+/* Dependency: _isctype from ctype */
+#if !defined(__local___localdep__isctype_defined) && defined(__CRT_HAVE__isctype)
+#define __local___localdep__isctype_defined 1
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep__isctype,(int __ch, int __mask),_isctype,(__ch,__mask))
+#endif /* !__local___localdep__isctype_defined && __CRT_HAVE__isctype */
 /* Dependency: isdigit from ctype */
 #ifndef __local___localdep_isdigit_defined
 #define __local___localdep_isdigit_defined 1
@@ -79,6 +51,34 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_isdigit __LIBC_LOCAL_NAME(isdigit)
 #endif /* !... */
 #endif /* !__local___localdep_isdigit_defined */
+/* Dependency: islower from ctype */
+#ifndef __local___localdep_islower_defined
+#define __local___localdep_islower_defined 1
+#if __has_builtin(__builtin_islower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_islower)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,{ return __builtin_islower(__ch); })
+#elif defined(__CRT_HAVE_islower)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,(__ch))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/ctype/islower.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_islower __LIBC_LOCAL_NAME(islower)
+#endif /* !... */
+#endif /* !__local___localdep_islower_defined */
+/* Dependency: isupper from ctype */
+#ifndef __local___localdep_isupper_defined
+#define __local___localdep_isupper_defined 1
+#if __has_builtin(__builtin_isupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isupper)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isupper,(int __ch),isupper,{ return __builtin_isupper(__ch); })
+#elif defined(__CRT_HAVE_isupper)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isupper,(int __ch),isupper,(__ch))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/ctype/isupper.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_isupper __LIBC_LOCAL_NAME(isupper)
+#endif /* !... */
+#endif /* !__local___localdep_isupper_defined */
 __LOCAL_LIBC(isalnum) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isalnum))(int __ch) {
 #ifdef __BUILDING_LIBC

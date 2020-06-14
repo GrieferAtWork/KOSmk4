@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f03322f */
+/* HASH CRC-32:0x3259e03d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,24 +22,11 @@
 #define __local_c32execlp_defined 1
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wexecvp) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wexecvp)
-__NAMESPACE_LOCAL_BEGIN
-/* Dependency: c32execvp from parts.uchar.process */
-#ifndef __local___localdep_c32execvp_defined
-#define __local___localdep_c32execvp_defined 1
-#if defined(__CRT_HAVE_wexecvp) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c32execvp,(__CHAR32_TYPE__ const *__restrict __file, __T32ARGV),wexecvp,(__path,___argv))
-#elif defined(__CRT_HAVE_DOS$wexecvp)
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c32execvp,(__CHAR32_TYPE__ const *__restrict __file, __T32ARGV),wexecvp,(__path,___argv))
-#else /* ... */
-#undef __local___localdep_c32execvp_defined
-#endif /* !... */
-#endif /* !__local___localdep_c32execvp_defined */
-__NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32execlp) __ATTR_SENTINEL __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__VLIBKCALL __LIBC_LOCAL_NAME(c32execlp))(__CHAR32_TYPE__ const *__restrict __file, __CHAR32_TYPE__ const *__args, ...) {
-	__REDIRECT_EXECL(__CHAR32_TYPE__, __localdep_c32execvp, __file, __args)
+	__REDIRECT_EXECL(__CHAR32_TYPE__, __c32execvp, __file, __args)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32execlp_defined

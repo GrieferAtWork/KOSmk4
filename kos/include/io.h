@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23c31534 */
+/* HASH CRC-32:0x4d6ba402 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -779,10 +779,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(umask_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LI
 #endif /* ... */
 #ifdef __CRT_HAVE___lock_fhandle
 __CDECLARE(,int,__NOTHROW_RPC,__lock_fhandle,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE___lock_fhandle */
+#else /* __CRT_HAVE___lock_fhandle */
+#include <local/io/__lock_fhandle.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__lock_fhandle, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL __lock_fhandle)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__lock_fhandle))(__fd); })
+#endif /* !__CRT_HAVE___lock_fhandle */
 #ifdef __CRT_HAVE__unlock_fhandle
 __CDECLARE_VOID(,__NOTHROW_NCX,_unlock_fhandle,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE__unlock_fhandle */
+#else /* __CRT_HAVE__unlock_fhandle */
+#include <local/io/_unlock_fhandle.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_unlock_fhandle, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL _unlock_fhandle)(__fd_t __fd) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_unlock_fhandle))(__fd); })
+#endif /* !__CRT_HAVE__unlock_fhandle */
 #ifdef __CRT_HAVE__get_osfhandle
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,intptr_t,__NOTHROW_NCX,_get_osfhandle,(__fd_t __fd),(__fd))
 #elif !defined(__CRT_DOS_PRIMARY)

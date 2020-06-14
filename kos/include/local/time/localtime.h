@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67b53ade */
+/* HASH CRC-32:0x23934d3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,20 +55,19 @@ __NAMESPACE_STD_END
 #endif /* !__tm_defined */
 #endif
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: localtime_r from time */
-#ifndef __local___localdep_localtime_r_defined
-#define __local___localdep_localtime_r_defined 1
-#ifdef __CRT_HAVE_localtime_r
-/* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime_r,(__TM_TYPE(time) const *__restrict __timer, __STRUCT_TM *__restrict __tp),localtime_r,(__timer,__tp))
-#else /* __CRT_HAVE_localtime_r */
-__NAMESPACE_LOCAL_END
-#include <local/time/localtime_r.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
-#define __localdep_localtime_r __LIBC_LOCAL_NAME(localtime_r)
-#endif /* !__CRT_HAVE_localtime_r */
-#endif /* !__local___localdep_localtime_r_defined */
+/* Dependency: localtime32 from time */
+#ifndef __local___localdep_localtime32_defined
+#define __local___localdep_localtime32_defined 1
+#ifdef __CRT_HAVE_localtime
+/* Return the `struct tm' representation of *TIMER in the local timezone */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime32,(__time64_t const *__timer),localtime,(__timer))
+#elif defined(__CRT_HAVE__localtime32)
+/* Return the `struct tm' representation of *TIMER in the local timezone */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime32,(__time64_t const *__timer),_localtime32,(__timer))
+#else /* ... */
+#undef __local___localdep_localtime32_defined
+#endif /* !... */
+#endif /* !__local___localdep_localtime32_defined */
 /* Dependency: localtime64 from time */
 #ifndef __local___localdep_localtime64_defined
 #define __local___localdep_localtime64_defined 1
@@ -89,19 +88,20 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_localtime64 __LIBC_LOCAL_NAME(localtime64)
 #endif /* !... */
 #endif /* !__local___localdep_localtime64_defined */
-/* Dependency: localtime32 from time */
-#ifndef __local___localdep_localtime32_defined
-#define __local___localdep_localtime32_defined 1
-#ifdef __CRT_HAVE_localtime
-/* Return the `struct tm' representation of *TIMER in the local timezone */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime32,(__time64_t const *__timer),localtime,(__timer))
-#elif defined(__CRT_HAVE__localtime32)
-/* Return the `struct tm' representation of *TIMER in the local timezone */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime32,(__time64_t const *__timer),_localtime32,(__timer))
-#else /* ... */
-#undef __local___localdep_localtime32_defined
-#endif /* !... */
-#endif /* !__local___localdep_localtime32_defined */
+/* Dependency: localtime_r from time */
+#ifndef __local___localdep_localtime_r_defined
+#define __local___localdep_localtime_r_defined 1
+#ifdef __CRT_HAVE_localtime_r
+/* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime_r,(__TM_TYPE(time) const *__restrict __timer, __STRUCT_TM *__restrict __tp),localtime_r,(__timer,__tp))
+#else /* __CRT_HAVE_localtime_r */
+__NAMESPACE_LOCAL_END
+#include <local/time/localtime_r.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
+#define __localdep_localtime_r __LIBC_LOCAL_NAME(localtime_r)
+#endif /* !__CRT_HAVE_localtime_r */
+#endif /* !__local___localdep_localtime_r_defined */
 __NAMESPACE_LOCAL_END
 #ifdef __BUILDING_LIBC
 #ifndef __LIBC_GMTIME_BUFFER_DEFINED

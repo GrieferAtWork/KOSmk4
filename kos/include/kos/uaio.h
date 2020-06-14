@@ -65,10 +65,10 @@ UAio_Create(__syscall_ulong_t __uaio_flags) {
  *       `ua_next' pointers of the given `ops'
  * NOTE: You can wait for the UAIO object to finish all of the given UAIO operations
  *       by polling it for `POLLIN', or by using `do read(self, &c, 1); while (c != 0);'
- *       Note that `read()' will always return 1 byte of data that is `0' if UAIO has
- *       been completed, and `1' if UAIO is currently in progress. The later will only
- *       ever be returned when the `IO_NONBLOCK' flag is set for `self'. If that flag
- *       is not set, then `read()' will block until all operations have completed.
+ *       Note that `read()' will always return 1 byte of data that is a 0-byte if UAIO
+ *       has been completed, and `1' if UAIO is currently in progress. The later will
+ *       only ever be returned when the `IO_NONBLOCK' flag is set for `self'. If that
+ *       flag is not set, then `read()' will block until all operations have completed.
  * @throws: E_BADALLOC:          [...]
  * @throws: E_INVALID_HANDLE:    [...]
  * @throws: E_ILLEGAL_OPERATION: The given UAIO object is bound to a different process's VM.

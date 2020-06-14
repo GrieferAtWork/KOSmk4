@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc7747f9 */
+/* HASH CRC-32:0x61d3e452 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,22 +22,6 @@
 #define __local_wildc16scasecmp_l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: towlower_l from wctype */
-#ifndef __local___localdep_towlower_l_defined
-#define __local___localdep_towlower_l_defined 1
-#ifdef __CRT_HAVE_towlower_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),towlower_l,(__wc,__locale))
-#elif defined(__CRT_HAVE__towlower_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),_towlower_l,(__wc,__locale))
-#elif defined(__CRT_HAVE___towlower_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),__towlower_l,(__wc,__locale))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <local/wctype/towlower_l.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_towlower_l __LIBC_LOCAL_NAME(towlower_l)
-#endif /* !... */
-#endif /* !__local___localdep_towlower_l_defined */
 /* Dependency: c16scasecmp_l from parts.uchar.string */
 #ifndef __local___localdep_c16scasecmp_l_defined
 #define __local___localdep_c16scasecmp_l_defined 1
@@ -61,6 +45,22 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16scasecmp_l __LIBC_LOCAL_NAME(c16scasecmp_l)
 #endif /* !... */
 #endif /* !__local___localdep_c16scasecmp_l_defined */
+/* Dependency: towlower_l from wctype */
+#ifndef __local___localdep_towlower_l_defined
+#define __local___localdep_towlower_l_defined 1
+#ifdef __CRT_HAVE_towlower_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),towlower_l,(__wc,__locale))
+#elif defined(__CRT_HAVE__towlower_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),_towlower_l,(__wc,__locale))
+#elif defined(__CRT_HAVE___towlower_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),__towlower_l,(__wc,__locale))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/wctype/towlower_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_towlower_l __LIBC_LOCAL_NAME(towlower_l)
+#endif /* !... */
+#endif /* !__local___localdep_towlower_l_defined */
 __LOCAL_LIBC(wildc16scasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(wildc16scasecmp_l))(__CHAR16_TYPE__ const *__pattern, __CHAR16_TYPE__ const *__string, __locale_t __locale) {
 	__CHAR16_TYPE__ __card_post, __pattern_ch, __wcsing_ch;

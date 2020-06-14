@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x813e5897 */
+/* HASH CRC-32:0x3e938450 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,11 @@
 #define __local_iscntrl_l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: __locale_ctype_ptr_l from ctype */
+#if !defined(__local___localdep___locale_ctype_ptr_l_defined) && defined(__CRT_HAVE___locale_ctype_ptr_l)
+#define __local___localdep___locale_ctype_ptr_l_defined 1
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___locale_ctype_ptr_l,(__locale_t __locale),__locale_ctype_ptr_l,(__locale))
+#endif /* !__local___localdep___locale_ctype_ptr_l_defined && __CRT_HAVE___locale_ctype_ptr_l */
 /* Dependency: _isctype_l from ctype */
 #if !defined(__local___localdep__isctype_l_defined) && defined(__CRT_HAVE__isctype_l)
 #define __local___localdep__isctype_l_defined 1
@@ -41,11 +46,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_iscntrl __LIBC_LOCAL_NAME(iscntrl)
 #endif /* !... */
 #endif /* !__local___localdep_iscntrl_defined */
-/* Dependency: __locale_ctype_ptr_l from ctype */
-#if !defined(__local___localdep___locale_ctype_ptr_l_defined) && defined(__CRT_HAVE___locale_ctype_ptr_l)
-#define __local___localdep___locale_ctype_ptr_l_defined 1
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___locale_ctype_ptr_l,(__locale_t __locale),__locale_ctype_ptr_l,(__locale))
-#endif /* !__local___localdep___locale_ctype_ptr_l_defined && __CRT_HAVE___locale_ctype_ptr_l */
 __LOCAL_LIBC(iscntrl_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iscntrl_l))(int __ch, __locale_t __locale) {
 #ifdef __BUILDING_LIBC

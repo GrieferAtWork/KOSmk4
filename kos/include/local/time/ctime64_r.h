@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66d15e8d */
+/* HASH CRC-32:0xe17aa710 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,6 +55,38 @@ __NAMESPACE_STD_END
 #endif /* !__tm_defined */
 #endif
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: asctime_r from time */
+#ifndef __local___localdep_asctime_r_defined
+#define __local___localdep_asctime_r_defined 1
+#ifdef __CRT_HAVE_asctime_r
+/* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
+ * that is the representation of TP in this format */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(__STRUCT_TM const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
+#else /* __CRT_HAVE_asctime_r */
+__NAMESPACE_LOCAL_END
+#include <local/time/asctime_r.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
+ * that is the representation of TP in this format */
+#define __localdep_asctime_r __LIBC_LOCAL_NAME(asctime_r)
+#endif /* !__CRT_HAVE_asctime_r */
+#endif /* !__local___localdep_asctime_r_defined */
+/* Dependency: dos_ctime64_s from time */
+#ifndef __local___localdep_dos_ctime64_s_defined
+#define __local___localdep_dos_ctime64_s_defined 1
+#ifdef __CRT_HAVE__ctime64_s
+/* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, *TMP*))' */
+__CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime64_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __time64_t const *__restrict __timer),_ctime64_s,(__buf,__bufsize,__timer))
+#elif defined(__CRT_HAVE__ctime32_s)
+__NAMESPACE_LOCAL_END
+#include <local/time/dos_ctime64_s.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, *TMP*))' */
+#define __localdep_dos_ctime64_s __LIBC_LOCAL_NAME(dos_ctime64_s)
+#else /* ... */
+#undef __local___localdep_dos_ctime64_s_defined
+#endif /* !... */
+#endif /* !__local___localdep_dos_ctime64_s_defined */
 /* Dependency: localtime64_r from time */
 #ifndef __local___localdep_localtime64_r_defined
 #define __local___localdep_localtime64_r_defined 1
@@ -72,38 +104,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_localtime64_r __LIBC_LOCAL_NAME(localtime64_r)
 #endif /* !... */
 #endif /* !__local___localdep_localtime64_r_defined */
-/* Dependency: dos_ctime64_s from time */
-#ifndef __local___localdep_dos_ctime64_s_defined
-#define __local___localdep_dos_ctime64_s_defined 1
-#ifdef __CRT_HAVE__ctime64_s
-/* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, *TMP*))' */
-__CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime64_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __time64_t const *__restrict __timer),_ctime64_s,(__buf,__bufsize,__timer))
-#elif defined(__CRT_HAVE__ctime32_s)
-__NAMESPACE_LOCAL_END
-#include <local/time/dos_ctime64_s.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, *TMP*))' */
-#define __localdep_dos_ctime64_s __LIBC_LOCAL_NAME(dos_ctime64_s)
-#else /* ... */
-#undef __local___localdep_dos_ctime64_s_defined
-#endif /* !... */
-#endif /* !__local___localdep_dos_ctime64_s_defined */
-/* Dependency: asctime_r from time */
-#ifndef __local___localdep_asctime_r_defined
-#define __local___localdep_asctime_r_defined 1
-#ifdef __CRT_HAVE_asctime_r
-/* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of TP in this format */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(__STRUCT_TM const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
-#else /* __CRT_HAVE_asctime_r */
-__NAMESPACE_LOCAL_END
-#include <local/time/asctime_r.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of TP in this format */
-#define __localdep_asctime_r __LIBC_LOCAL_NAME(asctime_r)
-#endif /* !__CRT_HAVE_asctime_r */
-#endif /* !__local___localdep_asctime_r_defined */
 /* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __LOCAL_LIBC(ctime64_r) __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime64_r))(__time64_t const *__restrict __timer, char __buf[26]) {

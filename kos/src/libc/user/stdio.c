@@ -57,35 +57,32 @@
 
 DECL_BEGIN
 
-#define libc__vscanf_s_l     libc__vscanf_l
-#define libc__vprintf_s_l    libc__vprintf_l
-#define libc__vfprintf_s_l   libc__vfprintf_l
-#define libc_format_printf   format_printf
-#define libc_format_vprintf  format_vprintf
+#undef libc_ferror_unlocked
+#undef libc_feof_unlocked
 #define libc_ferror_unlocked libc_ferror
 #define libc_feof_unlocked   libc_feof
 
-PRIVATE ATTR_SECTION(".data.crt.FILE.locked.utility.std_files_io") 
-struct iofile_data_novtab std_files_io[3] = {
-	/* [0] = */ IOFILE_DATA_NOVTAB_INIT(),
-	/* [1] = */ IOFILE_DATA_NOVTAB_INIT(),
-	/* [2] = */ IOFILE_DATA_NOVTAB_INIT()
-};
+#define DEFINE_DEFAULT_STD_FILE(name, io_flags, fd)                                                     \
+	PRIVATE ATTR_SECTION(".data.crt.FILE.locked.utility.std_files_io.default_" #name)                   \
+	struct iofile_data_novtab default_##name##_io = IOFILE_DATA_NOVTAB_INIT();                          \
+	INTERN ATTR_SECTION(".data.crt.FILE.locked.utility.std_files.default_" #name) FILE default_##name = \
+	__IO_FILE_INIT(NULL, 0, NULL, io_flags, fd, { 0 }, 0, (struct iofile_data *)&default_##name##_io)
+DEFINE_DEFAULT_STD_FILE(stdin, IO_LNBUF, STDIN_FILENO);
+DEFINE_DEFAULT_STD_FILE(stdout, IO_RW | IO_LNIFTYY, STDOUT_FILENO);
+DEFINE_DEFAULT_STD_FILE(stderr, IO_RW | IO_LNIFTYY, STDERR_FILENO);
+#undef DEFINE_DEFAULT_STD_FILE
 
-INTERN ATTR_SECTION(".data.crt.FILE.locked.utility.std_files") FILE std_files[3] = {
-	/* [0] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_LNBUF, STDIN_FILENO, { 0 }, 0, (struct iofile_data *)&std_files_io[0]),            /* !Relocation */
-	/* [1] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDOUT_FILENO, { 0 }, 0, (struct iofile_data *)&std_files_io[1]), /* !Relocation */
-	/* [2] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDERR_FILENO, { 0 }, 0, (struct iofile_data *)&std_files_io[2]), /* !Relocation */
-};
-
+DEFINE_PUBLIC_ALIAS(_IO_2_1_stdin_, default_stdin);
+DEFINE_PUBLIC_ALIAS(_IO_2_1_stdout_, default_stdout);
+DEFINE_PUBLIC_ALIAS(_IO_2_1_stderr_, default_stderr);
 
 /* These are the actual, exported std* stream symbols. */
 DATDEF FILE *g_stdin ASMNAME("stdin");
 DATDEF FILE *g_stdout ASMNAME("stdout");
 DATDEF FILE *g_stderr ASMNAME("stderr");
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.read.read.stdin")    FILE *g_stdin  = &std_files[0]; /* !Relocation */
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stdout") FILE *g_stdout = &std_files[1]; /* !Relocation */
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stderr") FILE *g_stderr = &std_files[2]; /* !Relocation */
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.read.read.stdin")    FILE *g_stdin  = &default_stdin;  /* !Relocation */
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stdout") FILE *g_stdout = &default_stdout; /* !Relocation */
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stderr") FILE *g_stderr = &default_stderr; /* !Relocation */
 
 
 
@@ -485,10 +482,12 @@ void LIBCCALL file_decref(FILE *__restrict self) {
 	assert(refcnt != 0);
 	if (refcnt == 1) {
 		/* Last reference -> This file has to go away! */
-		assert(!(self >= std_files &&
-		         self < COMPILER_ENDOF(std_files)));
-		assert(!(ex >= std_files_io &&
-		         ex < COMPILER_ENDOF(std_files_io)));
+		assert(self != &default_stdin &&
+		       self != &default_stdout &&
+		       self != &default_stderr);
+		assert(ex != &default_stdin_io &&
+		       ex != &default_stdout_io &&
+		       ex != &default_stderr_io);
 		assert(!atomic_owner_rwlock_reading(&ex->io_lock));
 		assert(!(self->if_flag & IO_READING));
 		if (ex->io_chsz != 0) {

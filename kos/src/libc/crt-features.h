@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b37c4a0 */
+/* HASH CRC-32:0x45c432b7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -233,7 +233,6 @@
 #define __CRT_HAVE_DOS$fuzzy_wcsncmp 1
 #define __CRT_HAVE_DOS$fuzzy_wmemcasecmp 1
 #define __CRT_HAVE_DOS$fuzzy_wmemcasecmp_l 1
-#define __CRT_HAVE_DOS$fuzzy_wmemcmp 1
 #define __CRT_HAVE_DOS$fwprintf 1
 #define __CRT_HAVE_DOS$fwprintf_unlocked 1
 #define __CRT_HAVE_DOS$fwscanf 1
@@ -357,15 +356,8 @@
 #define __CRT_HAVE_DOS$wlchown 1
 #define __CRT_HAVE_DOS$wlink 1
 #define __CRT_HAVE_DOS$wlinkat 1
-#define __CRT_HAVE_DOS$wmemcmp 1
-#define __CRT_HAVE_DOS$wmemcpy 1
 #define __CRT_HAVE_DOS$wmemcpy_s 1
-#define __CRT_HAVE_DOS$wmemmove 1
 #define __CRT_HAVE_DOS$wmemmove_s 1
-#define __CRT_HAVE_DOS$wmempcpy 1
-#define __CRT_HAVE_DOS$wmempmove 1
-#define __CRT_HAVE_DOS$wmempset 1
-#define __CRT_HAVE_DOS$wmemset 1
 #define __CRT_HAVE_DOS$wpathconf 1
 #define __CRT_HAVE_DOS$wprintf 1
 #define __CRT_HAVE_DOS$wprintf_unlocked 1
@@ -527,12 +519,10 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE___argc 1
 #define __CRT_HAVE___argv 1
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE___assert 1
 #define __CRT_HAVE___assert_fail 1
 #define __CRT_HAVE___assert_func 1
 #define __CRT_HAVE___assertfail 1
-#ifndef __KERNEL__
 #define __CRT_HAVE___control87_2 1
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE___crt_unreachable 1
@@ -683,9 +673,7 @@
 #define __CRT_HAVE__aligned_realloc_dbg 1
 #define __CRT_HAVE__aligned_recalloc 1
 #define __CRT_HAVE__aligned_recalloc_dbg 1
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE__assert 1
-#ifndef __KERNEL__
 #define __CRT_HAVE__atodbl 1
 #define __CRT_HAVE__atodbl_l 1
 #define __CRT_HAVE__atof_l 1
@@ -1582,7 +1570,6 @@
 #define __CRT_HAVE_fuzzy_wcsncmp 1
 #define __CRT_HAVE_fuzzy_wmemcasecmp 1
 #define __CRT_HAVE_fuzzy_wmemcasecmp_l 1
-#define __CRT_HAVE_fuzzy_wmemcmp 1
 #define __CRT_HAVE_fwide 1
 #define __CRT_HAVE_fwprintf 1
 #define __CRT_HAVE_fwprintf_unlocked 1
@@ -3312,15 +3299,8 @@
 #define __CRT_HAVE_wlchown 1
 #define __CRT_HAVE_wlink 1
 #define __CRT_HAVE_wlinkat 1
-#define __CRT_HAVE_wmemcmp 1
-#define __CRT_HAVE_wmemcpy 1
 #define __CRT_HAVE_wmemcpy_s 1
-#define __CRT_HAVE_wmemmove 1
 #define __CRT_HAVE_wmemmove_s 1
-#define __CRT_HAVE_wmempcpy 1
-#define __CRT_HAVE_wmempmove 1
-#define __CRT_HAVE_wmempset 1
-#define __CRT_HAVE_wmemset 1
 #define __CRT_HAVE_wpathconf 1
 #define __CRT_HAVE_wpopen 1
 #define __CRT_HAVE_wprintf 1

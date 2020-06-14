@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd73e62a9 */
+/* HASH CRC-32:0xf0f4988c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,29 +84,26 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_format_c32aprintf_alloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_format_c32aprintf_alloc_defined */
-/* Dependency: c32memcpy from parts.uchar.string */
-#ifndef __local___localdep_c32memcpy_defined
-#define __local___localdep_c32memcpy_defined 1
-#if defined(__CRT_HAVE_wmemcpy) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32memcpy,(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_DOS$wmemcpy)
-__CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32memcpy,(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_memcpyl) && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32memcpy,(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyl,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_DOS$memcpyl)
-__CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32memcpy,(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyl,(__dst,__src,__num_chars))
-#elif (__SIZEOF_WCHAR_T__ == 4)
-__NAMESPACE_LOCAL_END
-#include <local/wchar/wmemcpy.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32memcpy (*(__CHAR32_TYPE__ *(__LIBKCALL *)(__CHAR32_TYPE__ *__restrict, __CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wmemcpy))
+/* Dependency: memcpyl from string */
+#ifndef __local___localdep_memcpyl_defined
+#define __local___localdep_memcpyl_defined 1
+#ifdef __CRT_HAVE_memcpyl
+/* Copy memory between non-overlapping memory blocks. */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),memcpyl,(__dst,__src,__n_dwords))
+#elif defined(__CRT_HAVE_wmemcpy) && (__SIZEOF_WCHAR_T__ == 4)
+/* Copy memory between non-overlapping memory blocks. */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),wmemcpy,(__dst,__src,__n_dwords))
+#elif defined(__CRT_HAVE_DOS$wmemcpy) && defined(__PE__)
+/* Copy memory between non-overlapping memory blocks. */
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),KOS$wmemcpy,(__dst,__src,__n_dwords))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <local/parts.uchar.string/c32memcpy.h>
+#include <local/string/memcpyl.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32memcpy __LIBC_LOCAL_NAME(c32memcpy)
+/* Copy memory between non-overlapping memory blocks. */
+#define __localdep_memcpyl __LIBC_LOCAL_NAME(memcpyl)
 #endif /* !... */
-#endif /* !__local___localdep_c32memcpy_defined */
+#endif /* !__local___localdep_memcpyl_defined */
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 __LOCAL_LIBC(format_c32aprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_c32aprintf_printer))(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
@@ -114,7 +111,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_c32aprintf_printer))(void *__a
 	__buf = __localdep_format_c32aprintf_alloc((struct $format_c32aprintf_data *)__arg, __datalen);
 	if __unlikely(!__buf)
 		return -1;
-	__localdep_c32memcpy(__buf, __data, __datalen);
+	(__CHAR32_TYPE__ *)__localdep_memcpyl(__buf, __data, __datalen);
 	return (__SSIZE_TYPE__)__datalen;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca92418c */
+/* HASH CRC-32:0x18a83a5a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,28 @@
 #if defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: file_printer from stdio */
+#ifndef __local___localdep_file_printer_defined
+#define __local___localdep_file_printer_defined 1
+#if defined(__CRT_HAVE_file_printer_unlocked) && defined(__USE_STDIO_UNLOCKED)
+/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),file_printer_unlocked,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_file_printer)
+/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),file_printer,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_file_printer_unlocked)
+/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),file_printer_unlocked,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)
+__NAMESPACE_LOCAL_END
+#include <local/stdio/file_printer.h>
+__NAMESPACE_LOCAL_BEGIN
+/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+#define __localdep_file_printer __LIBC_LOCAL_NAME(file_printer)
+#else /* ... */
+#undef __local___localdep_file_printer_defined
+#endif /* !... */
+#endif /* !__local___localdep_file_printer_defined */
 /* Dependency: format_vprintf from format-printer */
 #ifndef __local___localdep_format_vprintf_defined
 #define __local___localdep_format_vprintf_defined 1
@@ -214,28 +236,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_vprintf __LIBC_LOCAL_NAME(format_vprintf)
 #endif /* !__CRT_HAVE_format_vprintf */
 #endif /* !__local___localdep_format_vprintf_defined */
-/* Dependency: file_printer from stdio */
-#ifndef __local___localdep_file_printer_defined
-#define __local___localdep_file_printer_defined 1
-#if defined(__CRT_HAVE_file_printer_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),file_printer_unlocked,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_file_printer)
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),file_printer,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_file_printer_unlocked)
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),file_printer_unlocked,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)
-__NAMESPACE_LOCAL_END
-#include <local/stdio/file_printer.h>
-__NAMESPACE_LOCAL_BEGIN
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
-#define __localdep_file_printer __LIBC_LOCAL_NAME(file_printer)
-#else /* ... */
-#undef __local___localdep_file_printer_defined
-#endif /* !... */
-#endif /* !__local___localdep_file_printer_defined */
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LOCAL_LIBC(vfprintf) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T

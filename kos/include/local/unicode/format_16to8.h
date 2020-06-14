@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1897f21a */
+/* HASH CRC-32:0x64bebe50 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Format printer (compatible with `__pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-8 output */
 __LOCAL_LIBC(format_16to8) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_16to8))(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_16to8))(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
 #if 2 == 2
 	struct __local_format_16to8_data {
 		__pformatprinter __fd_printer;   /* [1..1] Inner printer */

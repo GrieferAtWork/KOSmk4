@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f0e86ab */
+/* HASH CRC-32:0x34033507 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,23 +22,22 @@
 #define __local_memmoveupc_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memmoveupq from string */
-#ifndef __local___localdep_memmoveupq_defined
-#define __local___localdep_memmoveupq_defined 1
-#ifdef __CRT_HAVE_memmoveupq
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveupq,(__dst,__src,__n_qwords))
-#elif defined(__CRT_HAVE_memmoveq)
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
-#else /* ... */
+/* Dependency: memmoveup from string */
+#ifndef __local___localdep_memmoveup_defined
+#define __local___localdep_memmoveup_defined 1
+#ifdef __CRT_HAVE_memmoveup
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmoveup,(__dst,__src,__n_bytes))
+#else /* __CRT_HAVE_memmoveup */
 __NAMESPACE_LOCAL_END
-#include <local/string/memmoveupq.h>
+#include <local/string/memmoveup.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
-#define __localdep_memmoveupq __LIBC_LOCAL_NAME(memmoveupq)
-#endif /* !... */
-#endif /* !__local___localdep_memmoveupq_defined */
+/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memmoveup __LIBC_LOCAL_NAME(memmoveup)
+#endif /* !__CRT_HAVE_memmoveup */
+#endif /* !__local___localdep_memmoveup_defined */
 /* Dependency: memmoveupl from string */
 #ifndef __local___localdep_memmoveupl_defined
 #define __local___localdep_memmoveupl_defined 1
@@ -62,6 +61,23 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memmoveupl __LIBC_LOCAL_NAME(memmoveupl)
 #endif /* !... */
 #endif /* !__local___localdep_memmoveupl_defined */
+/* Dependency: memmoveupq from string */
+#ifndef __local___localdep_memmoveupq_defined
+#define __local___localdep_memmoveupq_defined 1
+#ifdef __CRT_HAVE_memmoveupq
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveupq,(__dst,__src,__n_qwords))
+#elif defined(__CRT_HAVE_memmoveq)
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveupq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <local/string/memmoveupq.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_QWORDS') */
+#define __localdep_memmoveupq __LIBC_LOCAL_NAME(memmoveupq)
+#endif /* !... */
+#endif /* !__local___localdep_memmoveupq_defined */
 /* Dependency: memmoveupw from string */
 #ifndef __local___localdep_memmoveupw_defined
 #define __local___localdep_memmoveupw_defined 1
@@ -85,22 +101,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memmoveupw __LIBC_LOCAL_NAME(memmoveupw)
 #endif /* !... */
 #endif /* !__local___localdep_memmoveupw_defined */
-/* Dependency: memmoveup from string */
-#ifndef __local___localdep_memmoveup_defined
-#define __local___localdep_memmoveup_defined 1
-#ifdef __CRT_HAVE_memmoveup
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
- * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmoveup,(__dst,__src,__n_bytes))
-#else /* __CRT_HAVE_memmoveup */
-__NAMESPACE_LOCAL_END
-#include <local/string/memmoveup.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks (assumes that `DST >= SRC || !N_BYTES')
- * @return: * : Always re-returns `dst' */
-#define __localdep_memmoveup __LIBC_LOCAL_NAME(memmoveup)
-#endif /* !__CRT_HAVE_memmoveup */
-#endif /* !__local___localdep_memmoveup_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>
 __NAMESPACE_LOCAL_BEGIN

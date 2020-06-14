@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb955e331 */
+/* HASH CRC-32:0x1d36fc2e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 __LOCAL_LIBC(format_c32sprintf_printer) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c32sprintf_printer))(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
+__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_c32sprintf_printer))(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	*(__CHAR32_TYPE__ **)__arg = (__CHAR32_TYPE__ *)__localdep_mempcpyc(*(__CHAR32_TYPE__ **)__arg, __data, __datalen, sizeof(__CHAR32_TYPE__));
 	return (__SSIZE_TYPE__)__datalen;
 }

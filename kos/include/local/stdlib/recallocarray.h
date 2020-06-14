@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb06aceb0 */
+/* HASH CRC-32:0x4e6c9bd1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,55 +39,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_calloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_calloc_defined */
-/* Dependency: memcpy from string */
-#ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined 1
-#ifdef __CRT_HAVE_memcpy
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
-#else /* __CRT_HAVE_memcpy */
-__NAMESPACE_LOCAL_END
-#include <local/string/memcpy.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
-#define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
-#endif /* !__CRT_HAVE_memcpy */
-#endif /* !__local___localdep_memcpy_defined */
-/* Dependency: malloc_usable_size from malloc */
-#ifndef __local___localdep_malloc_usable_size_defined
-#define __local___localdep_malloc_usable_size_defined 1
-#ifdef __CRT_HAVE_malloc_usable_size
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_malloc_usable_size,(void *__restrict __mallptr),malloc_usable_size,(__mallptr))
-#elif defined(__CRT_HAVE__msize)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_malloc_usable_size,(void *__restrict __mallptr),_msize,(__mallptr))
-#else /* ... */
-#undef __local___localdep_malloc_usable_size_defined
-#endif /* !... */
-#endif /* !__local___localdep_malloc_usable_size_defined */
-/* Dependency: freezero from stdlib */
-#ifndef __local___localdep_freezero_defined
-#define __local___localdep_freezero_defined 1
-#ifdef __CRT_HAVE_freezero
-/* Same as `free(mallptr)', but also ensure that the memory region
- * described by `mallptr...+=size' is explicitly freed to zero, or
- * immediately returned to the OS, rather than being left in cache
- * while still containing its previous contents. */
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_freezero,(void *__mallptr, __SIZE_TYPE__ __size),freezero,(__mallptr,__size))
-#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-__NAMESPACE_LOCAL_END
-#include <local/stdlib/freezero.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Same as `free(mallptr)', but also ensure that the memory region
- * described by `mallptr...+=size' is explicitly freed to zero, or
- * immediately returned to the OS, rather than being left in cache
- * while still containing its previous contents. */
-#define __localdep_freezero __LIBC_LOCAL_NAME(freezero)
-#else /* ... */
-#undef __local___localdep_freezero_defined
-#endif /* !... */
-#endif /* !__local___localdep_freezero_defined */
 /* Dependency: explicit_bzero from strings */
 #ifndef __local___localdep_explicit_bzero_defined
 #define __local___localdep_explicit_bzero_defined 1
@@ -120,6 +71,55 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_explicit_bzero __LIBC_LOCAL_NAME(explicit_bzero)
 #endif /* !... */
 #endif /* !__local___localdep_explicit_bzero_defined */
+/* Dependency: freezero from stdlib */
+#ifndef __local___localdep_freezero_defined
+#define __local___localdep_freezero_defined 1
+#ifdef __CRT_HAVE_freezero
+/* Same as `free(mallptr)', but also ensure that the memory region
+ * described by `mallptr...+=size' is explicitly freed to zero, or
+ * immediately returned to the OS, rather than being left in cache
+ * while still containing its previous contents. */
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_freezero,(void *__mallptr, __SIZE_TYPE__ __size),freezero,(__mallptr,__size))
+#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+__NAMESPACE_LOCAL_END
+#include <local/stdlib/freezero.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Same as `free(mallptr)', but also ensure that the memory region
+ * described by `mallptr...+=size' is explicitly freed to zero, or
+ * immediately returned to the OS, rather than being left in cache
+ * while still containing its previous contents. */
+#define __localdep_freezero __LIBC_LOCAL_NAME(freezero)
+#else /* ... */
+#undef __local___localdep_freezero_defined
+#endif /* !... */
+#endif /* !__local___localdep_freezero_defined */
+/* Dependency: malloc_usable_size from malloc */
+#ifndef __local___localdep_malloc_usable_size_defined
+#define __local___localdep_malloc_usable_size_defined 1
+#ifdef __CRT_HAVE_malloc_usable_size
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_malloc_usable_size,(void *__restrict __mallptr),malloc_usable_size,(__mallptr))
+#elif defined(__CRT_HAVE__msize)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_malloc_usable_size,(void *__restrict __mallptr),_msize,(__mallptr))
+#else /* ... */
+#undef __local___localdep_malloc_usable_size_defined
+#endif /* !... */
+#endif /* !__local___localdep_malloc_usable_size_defined */
+/* Dependency: memcpy from string */
+#ifndef __local___localdep_memcpy_defined
+#define __local___localdep_memcpy_defined 1
+#ifdef __CRT_HAVE_memcpy
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
+#else /* __CRT_HAVE_memcpy */
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpy.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
+#endif /* !__CRT_HAVE_memcpy */
+#endif /* !__local___localdep_memcpy_defined */
 /* Dependency: recallocv from malloc */
 #ifndef __local___localdep_recallocv_defined
 #define __local___localdep_recallocv_defined 1

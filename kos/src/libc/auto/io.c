@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x770eeae5 */
+/* HASH CRC-32:0x9b16f0d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,6 +69,17 @@ NOTHROW_NCX(LIBCCALL libc_umask_s)(mode_t newmode,
 	}
 	*oldmode = libc_umask(newmode);
 	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") int
+NOTHROW_RPC(LIBCCALL libc___lock_fhandle)(fd_t fd) {
+	(void)fd;
+	/* No-op */
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") void
+NOTHROW_NCX(LIBCCALL libc__unlock_fhandle)(fd_t fd) {
+	(void)fd;
+	/* No-op */
 }
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_PURE WUNUSED intptr_t
 NOTHROW_NCX(LIBCCALL libc__get_osfhandle)(fd_t fd) {
@@ -147,6 +158,8 @@ DEFINE_PUBLIC_ALIAS(_pipe, libc__pipe);
 DEFINE_PUBLIC_ALIAS(_filelengthi64, libc__filelengthi64);
 DEFINE_PUBLIC_ALIAS(_telli64, libc__telli64);
 DEFINE_PUBLIC_ALIAS(umask_s, libc_umask_s);
+DEFINE_PUBLIC_ALIAS(__lock_fhandle, libc___lock_fhandle);
+DEFINE_PUBLIC_ALIAS(_unlock_fhandle, libc__unlock_fhandle);
 DEFINE_PUBLIC_ALIAS(_get_osfhandle, libc__get_osfhandle);
 DEFINE_PUBLIC_ALIAS(_open_osfhandle, libc__open_osfhandle);
 DEFINE_PUBLIC_ALIAS(_setmode, libc_setmode);

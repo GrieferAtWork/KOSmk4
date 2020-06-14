@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24330c8d */
+/* HASH CRC-32:0xe9c6bf82 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,33 +45,30 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16slen __LIBC_LOCAL_NAME(c16slen)
 #endif /* !... */
 #endif /* !__local___localdep_c16slen_defined */
-/* Dependency: c16mempcpy from parts.uchar.string */
-#ifndef __local___localdep_c16mempcpy_defined
-#define __local___localdep_c16mempcpy_defined 1
-#if defined(__CRT_HAVE_wmempcpy) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16mempcpy,(__CHAR16_TYPE__ *__restrict __dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmempcpy,(__dst,__src,__num_chars))
+/* Dependency: mempcpyw from string */
+#ifndef __local___localdep_mempcpyw_defined
+#define __local___localdep_mempcpyw_defined 1
+#ifdef __CRT_HAVE_mempcpyw
+/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),mempcpyw,(__dst,__src,__n_words))
+#elif defined(__CRT_HAVE_wmempcpy) && (__SIZEOF_WCHAR_T__ == 2)
+/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),wmempcpy,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_DOS$wmempcpy)
-__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16mempcpy,(__CHAR16_TYPE__ *__restrict __dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmempcpy,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_mempcpyw) && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16mempcpy,(__CHAR16_TYPE__ *__restrict __dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),mempcpyw,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_DOS$mempcpyw)
-__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16mempcpy,(__CHAR16_TYPE__ *__restrict __dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),mempcpyw,(__dst,__src,__num_chars))
-#elif (__SIZEOF_WCHAR_T__ == 2)
-__NAMESPACE_LOCAL_END
-#include <local/wchar/wmempcpy.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16mempcpy (*(__CHAR16_TYPE__ *(__LIBDCALL *)(__CHAR16_TYPE__ *__restrict, __CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wmempcpy))
+/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),DOS$wmempcpy,(__dst,__src,__n_words))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <local/parts.uchar.string/c16mempcpy.h>
+#include <local/string/mempcpyw.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16mempcpy __LIBC_LOCAL_NAME(c16mempcpy)
+/* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
+#define __localdep_mempcpyw __LIBC_LOCAL_NAME(mempcpyw)
 #endif /* !... */
-#endif /* !__local___localdep_c16mempcpy_defined */
+#endif /* !__local___localdep_mempcpyw_defined */
 /* Same as wcscpy, but return a pointer after the last written character */
 __LOCAL_LIBC(c16spcpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16spcpy))(__CHAR16_TYPE__ *__restrict __buf, __CHAR16_TYPE__ const *__restrict __src) {
-	return __localdep_c16mempcpy(__buf, __src, __localdep_c16slen(__src) + 1);
+	return (__CHAR16_TYPE__ *)__localdep_mempcpyw(__buf, __src, __localdep_c16slen(__src) + 1);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16spcpy_defined
