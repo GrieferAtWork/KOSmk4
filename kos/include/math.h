@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0a71b1 */
+/* HASH CRC-32:0x2042d5c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3724,11 +3724,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acos,(float __x),acosf,(__x))
 /* Arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acos,(float __x),__acosf,(__x))
 #elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/acosf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Arc cosine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL acos)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acosf))(__x); }
 #endif /* ... */
@@ -3742,11 +3742,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asin,(float __x),asinf,(__x))
 /* Arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asin,(float __x),__asinf,(__x))
 #elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/asinf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Arc sine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL asin)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinf))(__x); }
 #endif /* ... */
@@ -3760,17 +3760,17 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan,(float __x),atanf,(__x))
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan,(float __x),__atanf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/atanf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Arc tangent of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atan)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanf))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_atan || __CRT_HAVE___atan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -3785,17 +3785,17 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan2,(float __y, float __x),atan2f,(
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan2,(float __y, float __x),__atan2f,(__y,__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/atan2f.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Arc tangent of Y/X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atan2)(float __y, float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2f))(__y, __x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_atan2 || __CRT_HAVE___atan2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -3810,11 +3810,11 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosf,float,__NOTHROW,cos,(float __x),cosf
 /* Cosine of X */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosf,float,__NOTHROW,cos,(float __x),__cosf,(__x))
 #elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/cosf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Cosine of X */
 __FORCELOCAL __ATTR_WUNUSED __DECL_SIMD_cosf float __NOTHROW(__LIBCCALL cos)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cosf))(__x); }
 #endif /* ... */
@@ -3828,11 +3828,11 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinf,float,__NOTHROW,sin,(float __x),sinf
 /* Sine of X */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinf,float,__NOTHROW,sin,(float __x),__sinf,(__x))
 #elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/sinf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Sine of X */
 __FORCELOCAL __ATTR_WUNUSED __DECL_SIMD_sinf float __NOTHROW(__LIBCCALL sin)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sinf))(__x); }
 #endif /* ... */
@@ -3846,11 +3846,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tan,(float __x),tanf,(__x))
 /* Tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tan,(float __x),__tanf,(__x))
 #elif defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/tanf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Tangent of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tan)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanf))(__x); }
 #endif /* ... */
@@ -3864,11 +3864,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cosh,(float __x),coshf,(__x))
 /* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cosh,(float __x),__coshf,(__x))
 #elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/coshf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Hyperbolic cosine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL cosh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshf))(__x); }
 #endif /* ... */
@@ -3882,11 +3882,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sinh,(float __x),sinhf,(__x))
 /* Hyperbolic sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sinh,(float __x),__sinhf,(__x))
 #elif defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/sinhf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Hyperbolic sine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL sinh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sinhf))(__x); }
 #endif /* ... */
@@ -3900,11 +3900,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),tanhf,(__x))
 /* Hyperbolic tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),__tanhf,(__x))
 #elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/tanhf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Hyperbolic tangent of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tanh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); }
 #endif /* ... */
@@ -3918,17 +3918,17 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expf,float,__NOTHROW,exp,(float __x),expf
 /* Exponential function of X */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expf,float,__NOTHROW,exp,(float __x),__expf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/expf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Exponential function of X */
 __FORCELOCAL __ATTR_WUNUSED __DECL_SIMD_expf float __NOTHROW(__LIBCCALL exp)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expf))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_exp || __CRT_HAVE___exp || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -3943,17 +3943,17 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,frexp,(float 
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,frexp,(float __x, int *__pexponent),__frexpf,(__x,__pexponent))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/frexpf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) float __NOTHROW_NCX(__LIBCCALL frexp)(float __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpf))(__x, __pexponent); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_frexp || __CRT_HAVE___frexp || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -3968,17 +3968,17 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,ldexp,(float __x, int __exponent),lde
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,ldexp,(float __x, int __exponent),__ldexpf,(__x,__exponent))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/ldexpf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* X times (two to the EXP power) */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL ldexp)(float __x, int __exponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldexpf))(__x, __exponent); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_ldexp || __CRT_HAVE___ldexp || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -3993,11 +3993,11 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logf,float,__NOTHROW,log,(float __x),logf
 /* Natural logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logf,float,__NOTHROW,log,(float __x),__logf,(__x))
 #elif defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/logf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Natural logarithm of X */
 __FORCELOCAL __ATTR_WUNUSED __DECL_SIMD_logf float __NOTHROW(__LIBCCALL log)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logf))(__x); }
 #endif /* ... */
@@ -4011,11 +4011,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log10,(float __x),log10f,(__x))
 /* Base-ten logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log10,(float __x),__log10f,(__x))
 #elif defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/log10f.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Base-ten logarithm of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL log10)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log10f))(__x); }
 #endif /* ... */
@@ -4029,17 +4029,17 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,modf,(float _
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),float,__NOTHROW_NCX,modf,(float __x, float *__iptr),__modff,(__x,__iptr))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/modff.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Break VALUE into integral and fractional parts */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) float __NOTHROW_NCX(__LIBCCALL modf)(float __x, float *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modff))(__x, __iptr); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_modf || __CRT_HAVE___modf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4054,17 +4054,17 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powf,float,__NOTHROW,pow,(float __x, floa
 /* Return X to the Y power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powf,float,__NOTHROW,pow,(float __x, float __y),__powf,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/powf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return X to the Y power */
 __FORCELOCAL __ATTR_WUNUSED __DECL_SIMD_powf float __NOTHROW(__LIBCCALL pow)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(powf))(__x, __y); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_pow || __CRT_HAVE___pow || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4079,17 +4079,17 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sqrt,(float __x),sqrtf,(__x))
 /* Return the square root of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sqrt,(float __x),__sqrtf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/sqrtf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the square root of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL sqrt)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sqrtf))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_sqrt || __CRT_HAVE___sqrt || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4104,11 +4104,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,ceil,(float __x),ceilf,(
 /* Smallest integral value not less than X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,ceil,(float __x),__ceilf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/ceilf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Smallest integral value not less than X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL ceil)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceilf))(__x); }
 #endif /* !... */
@@ -4122,11 +4122,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fabs,(float __x),fabsf,(
 /* Absolute value of X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fabs,(float __x),__fabsf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/fabsf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Absolute value of X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fabs)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsf))(__x); }
 #endif /* !... */
@@ -4140,11 +4140,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,floor,(float __x),floorf
 /* Largest integer not greater than X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,floor,(float __x),__floorf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/floorf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Largest integer not greater than X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL floor)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorf))(__x); }
 #endif /* !... */
@@ -4158,17 +4158,17 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,fmod,(float __x, float __y),fmodf,(__
 /* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,fmod,(float __x, float __y),__fmodf,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/fmodf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Floating-point modulo remainder of X/Y */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fmod)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmodf))(__x, __y); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_fmod || __CRT_HAVE___fmod || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4186,11 +4186,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acos,(__LONGDOUBLE __x),acosl,
 /* Arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acos,(__LONGDOUBLE __x),__acosl,(__x))
 #elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/acosl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Arc cosine of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL acos)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acosl))(__x); }
 #endif /* ... */
@@ -4204,11 +4204,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asin,(__LONGDOUBLE __x),asinl,
 /* Arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asin,(__LONGDOUBLE __x),__asinl,(__x))
 #elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/asinl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Arc sine of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL asin)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinl))(__x); }
 #endif /* ... */
@@ -4222,17 +4222,17 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan,(__LONGDOUBLE __x),atanl,
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan,(__LONGDOUBLE __x),__atanl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/atanl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Arc tangent of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atan)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanl))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_atan || __CRT_HAVE___atan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4247,17 +4247,17 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2,(__LONGDOUBLE __y, __LON
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2,(__LONGDOUBLE __y, __LONGDOUBLE __x),__atan2l,(__y,__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/atan2l.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Arc tangent of Y/X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atan2)(__LONGDOUBLE __y, __LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2l))(__y, __x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_atan2 || __CRT_HAVE___atan2 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4272,11 +4272,11 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cos,(__LONGDO
 /* Cosine of X */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cos,(__LONGDOUBLE __x),__cosl,(__x))
 #elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/cosl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Cosine of X */
 __FORCELOCAL __ATTR_WUNUSED __DECL_SIMD_cosl __LONGDOUBLE __NOTHROW(__LIBCCALL cos)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cosl))(__x); }
 #endif /* ... */
@@ -4290,11 +4290,11 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sin,(__LONGDO
 /* Sine of X */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sin,(__LONGDOUBLE __x),__sinl,(__x))
 #elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/sinl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Sine of X */
 __FORCELOCAL __ATTR_WUNUSED __DECL_SIMD_sinl __LONGDOUBLE __NOTHROW(__LIBCCALL sin)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sinl))(__x); }
 #endif /* ... */
@@ -4308,11 +4308,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tan,(__LONGDOUBLE __x),tanl,(_
 /* Tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tan,(__LONGDOUBLE __x),__tanl,(__x))
 #elif defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/tanl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Tangent of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL tan)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanl))(__x); }
 #endif /* ... */
@@ -4326,11 +4326,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cosh,(__LONGDOUBLE __x),coshl,
 /* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cosh,(__LONGDOUBLE __x),__coshl,(__x))
 #elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/coshl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Hyperbolic cosine of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL cosh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshl))(__x); }
 #endif /* ... */
@@ -4344,11 +4344,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sinh,(__LONGDOUBLE __x),sinhl,
 /* Hyperbolic sine of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sinh,(__LONGDOUBLE __x),__sinhl,(__x))
 #elif defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/sinhl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Hyperbolic sine of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL sinh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sinhl))(__x); }
 #endif /* ... */
@@ -4362,11 +4362,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),tanhl,
 /* Hyperbolic tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),__tanhl,(__x))
 #elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/tanhl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Hyperbolic tangent of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL tanh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhl))(__x); }
 #endif /* ... */
@@ -4380,17 +4380,17 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,exp,(__LONGDO
 /* Exponential function of X */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,exp,(__LONGDOUBLE __x),__expl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/expl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Exponential function of X */
 __FORCELOCAL __ATTR_WUNUSED __DECL_SIMD_expl __LONGDOUBLE __NOTHROW(__LIBCCALL exp)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expl))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_exp || __CRT_HAVE___exp || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4405,17 +4405,17 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,frexp,
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, int *__pexponent),__frexpl,(__x,__pexponent))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/frexpl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL frexp)(__LONGDOUBLE __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpl))(__x, __pexponent); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_frexp || __CRT_HAVE___frexp || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4430,17 +4430,17 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexp,(__LONGDOUBLE __x, int _
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexp,(__LONGDOUBLE __x, int __exponent),__ldexpl,(__x,__exponent))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/ldexpl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* X times (two to the EXP power) */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL ldexp)(__LONGDOUBLE __x, int __exponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldexpl))(__x, __exponent); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_ldexp || __CRT_HAVE___ldexp || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4455,11 +4455,11 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,log,(__LONGDO
 /* Natural logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,log,(__LONGDOUBLE __x),__logl,(__x))
 #elif defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/logl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Natural logarithm of X */
 __FORCELOCAL __ATTR_WUNUSED __DECL_SIMD_logl __LONGDOUBLE __NOTHROW(__LIBCCALL log)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logl))(__x); }
 #endif /* ... */
@@ -4473,11 +4473,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10,(__LONGDOUBLE __x),log10
 /* Base-ten logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10,(__LONGDOUBLE __x),__log10l,(__x))
 #elif defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/log10l.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Base-ten logarithm of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL log10)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log10l))(__x); }
 #endif /* ... */
@@ -4491,17 +4491,17 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modf,(
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modf,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),__modfl,(__x,__iptr))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/modfl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Break VALUE into integral and fractional parts */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL modf)(__LONGDOUBLE __x, __LONGDOUBLE *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modfl))(__x, __iptr); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_modf || __CRT_HAVE___modf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4516,17 +4516,17 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,pow,(__LONGDO
 /* Return X to the Y power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,pow,(__LONGDOUBLE __x, __LONGDOUBLE __y),__powl,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/powl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return X to the Y power */
 __FORCELOCAL __ATTR_WUNUSED __DECL_SIMD_powl __LONGDOUBLE __NOTHROW(__LIBCCALL pow)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(powl))(__x, __y); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_pow || __CRT_HAVE___pow || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4541,17 +4541,17 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrt,(__LONGDOUBLE __x),sqrtl,
 /* Return the square root of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrt,(__LONGDOUBLE __x),__sqrtl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/sqrtl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the square root of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL sqrt)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sqrtl))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_sqrt || __CRT_HAVE___sqrt || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4566,11 +4566,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ceil,(__LONGDOUBL
 /* Smallest integral value not less than X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ceil,(__LONGDOUBLE __x),__ceill,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/ceill.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Smallest integral value not less than X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL ceil)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceill))(__x); }
 #endif /* !... */
@@ -4584,11 +4584,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabs,(__LONGDOUBL
 /* Absolute value of X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabs,(__LONGDOUBLE __x),__fabsl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/fabsl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Absolute value of X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fabs)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); }
 #endif /* !... */
@@ -4602,11 +4602,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,floor,(__LONGDOUB
 /* Largest integer not greater than X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,floor,(__LONGDOUBLE __x),__floorl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/floorl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Largest integer not greater than X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL floor)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorl))(__x); }
 #endif /* !... */
@@ -4620,17 +4620,17 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmod,(__LONGDOUBLE __x, __LONG
 /* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmod,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmodl,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/fmodl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Floating-point modulo remainder of X/Y */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fmod)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmodl))(__x, __y); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_fmod || __CRT_HAVE___fmod || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4649,11 +4649,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acosh,(float __x),acoshf,(__x))
 /* Hyperbolic arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acosh,(float __x),__acoshf,(__x))
 #elif defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/acoshf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Hyperbolic arc cosine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL acosh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acoshf))(__x); }
 #endif /* ... */
@@ -4667,11 +4667,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asinh,(float __x),asinhf,(__x))
 /* Hyperbolic arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asinh,(float __x),__asinhf,(__x))
 #elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/asinhf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Hyperbolic arc sine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL asinh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhf))(__x); }
 #endif /* ... */
@@ -4685,11 +4685,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atanh,(float __x),atanhf,(__x))
 /* Hyperbolic arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atanh,(float __x),__atanhf,(__x))
 #elif defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/atanhf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Hyperbolic arc tangent of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atanh)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanhf))(__x); }
 #endif /* ... */
@@ -4703,17 +4703,17 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,expm1,(float __x),expm1f,(__x))
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,expm1,(float __x),__expm1f,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/expm1f.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return exp(X) - 1 */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL expm1)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expm1f))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_expm1 || __CRT_HAVE___expm1 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4728,11 +4728,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log1p,(float __x),log1pf,(__x))
 /* Return log(1 + X) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log1p,(float __x),__log1pf,(__x))
 #elif defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/log1pf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return log(1 + X) */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL log1p)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log1pf))(__x); }
 #endif /* ... */
@@ -4746,11 +4746,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,logb,(float __x),logbf,(__x))
 /* Return the base 2 signed integral exponent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,logb,(float __x),__logbf,(__x))
 #elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/logbf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the base 2 signed integral exponent of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL logb)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logbf))(__x); }
 #endif /* ... */
@@ -4764,17 +4764,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cbrt,(float __x),cbrtf,(
 /* Return the cube root of X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cbrt,(float __x),__cbrtf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/cbrtf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the cube root of X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL cbrt)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrtf))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_cbrt || __CRT_HAVE___cbrt || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4798,17 +4798,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,rint,(float __x),__rintf
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,rint,(float __x),__nearbyintf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___rint) || defined(__CRT_HAVE___nearbyint) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/rintf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL rint)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintf))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_rint || __CRT_HAVE_nearbyint || __CRT_HAVE___rint || __CRT_HAVE___nearbyint || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4832,17 +4832,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafter,(float __x, fl
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafter,(float __x, float __y),__nexttowardf,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/nextafterf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nextafter)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterf))(__x, __y); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_nextafter || __CRT_HAVE_nexttoward || __CRT_HAVE___nextafter || __CRT_HAVE__nextafter || __CRT_HAVE___nexttoward || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4866,17 +4866,17 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainder,(float __x, float __p),__re
 /* Return the remainder of integer division X/P with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainder,(float __x, float __p),__dremf,(__x,__p))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/remainderf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the remainder of integer division X/P with infinite precision */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL remainder)(float __x, float __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderf))(__x, __p); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_remainder || __CRT_HAVE_drem || __CRT_HAVE___remainder || __CRT_HAVE___drem || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4891,17 +4891,17 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(float __x),ilogbf,(__x))
 /* Return the binary exponent of X, which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(float __x),__ilogbf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/ilogbf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the binary exponent of X, which must be nonzero */
 __FORCELOCAL __ATTR_WUNUSED int __NOTHROW(__LIBCCALL ilogb)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ilogbf))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __CRT_HAVE_ilogb || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
@@ -4919,11 +4919,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosh,(__LONGDOUBLE __x),acosh
 /* Hyperbolic arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosh,(__LONGDOUBLE __x),__acoshl,(__x))
 #elif defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/acoshl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Hyperbolic arc cosine of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL acosh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acoshl))(__x); }
 #endif /* ... */
@@ -4937,11 +4937,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),asinh
 /* Hyperbolic arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),__asinhl,(__x))
 #elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/asinhl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Hyperbolic arc sine of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL asinh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhl))(__x); }
 #endif /* ... */
@@ -4955,11 +4955,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanh,(__LONGDOUBLE __x),atanh
 /* Hyperbolic arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanh,(__LONGDOUBLE __x),__atanhl,(__x))
 #elif defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/atanhl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Hyperbolic arc tangent of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atanh)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanhl))(__x); }
 #endif /* ... */
@@ -4973,17 +4973,17 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1,(__LONGDOUBLE __x),expm1
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1,(__LONGDOUBLE __x),__expm1l,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/expm1l.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return exp(X) - 1 */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL expm1)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expm1l))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_expm1 || __CRT_HAVE___expm1 || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -4998,11 +4998,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log1p,(__LONGDOUBLE __x),log1p
 /* Return log(1 + X) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log1p,(__LONGDOUBLE __x),__log1pl,(__x))
 #elif defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/log1pl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return log(1 + X) */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL log1p)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log1pl))(__x); }
 #endif /* ... */
@@ -5016,11 +5016,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logb,(__LONGDOUBLE __x),logbl,
 /* Return the base 2 signed integral exponent of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logb,(__LONGDOUBLE __x),__logbl,(__x))
 #elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/logbl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the base 2 signed integral exponent of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL logb)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logbl))(__x); }
 #endif /* ... */
@@ -5034,17 +5034,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrt,(__LONGDOUBL
 /* Return the cube root of X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrt,(__LONGDOUBLE __x),__cbrtl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/cbrtl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the cube root of X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL cbrt)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrtl))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_cbrt || __CRT_HAVE___cbrt || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -5068,17 +5068,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rint,(__LONGDOUBL
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rint,(__LONGDOUBLE __x),__nearbyintl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___rint) || defined(__CRT_HAVE___nearbyint) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/rintl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL rint)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintl))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_rint || __CRT_HAVE_nearbyint || __CRT_HAVE___rint || __CRT_HAVE___nearbyint || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -5102,17 +5102,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafter,(__LONG
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafter,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/nextafterl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL nextafter)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_nextafter || __CRT_HAVE_nexttoward || __CRT_HAVE___nextafter || __CRT_HAVE__nextafter || __CRT_HAVE___nexttoward || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -5136,17 +5136,17 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, _
 /* Return the remainder of integer division X/P with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __p),__dreml,(__x,__p))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/remainderl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the remainder of integer division X/P with infinite precision */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL remainder)(__LONGDOUBLE __x, __LONGDOUBLE __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderl))(__x, __p); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_remainder || __CRT_HAVE_drem || __CRT_HAVE___remainder || __CRT_HAVE___drem || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -5161,17 +5161,17 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(__LONGDOUBLE __x),ilogbl,(__x))
 /* Return the binary exponent of X, which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(__LONGDOUBLE __x),__ilogbl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/ilogbl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the binary exponent of X, which must be nonzero */
 __FORCELOCAL __ATTR_WUNUSED int __NOTHROW(__LIBCCALL ilogb)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ilogbl))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_ilogb || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
@@ -5191,11 +5191,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,exp2,(float __x),exp2f,(__x))
 /* Compute base-2 exponential of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,exp2,(float __x),__exp2f,(__x))
 #elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/exp2f.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Compute base-2 exponential of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL exp2)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp2f))(__x); }
 #endif /* ... */
@@ -5209,11 +5209,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log2,(float __x),log2f,(__x))
 /* Compute base-2 logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log2,(float __x),__log2f,(__x))
 #elif defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/log2f.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Compute base-2 logarithm of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL log2)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log2f))(__x); }
 #endif /* ... */
@@ -5227,11 +5227,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,copysign,(float __num, f
 /* Return X with its signed changed to Y's */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,copysign,(float __num, float __sign),__copysignf,(__num,__sign))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/copysignf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return X with its signed changed to Y's */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL copysign)(float __num, float __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignf))(__num, __sign); }
 #endif /* !... */
@@ -5245,11 +5245,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tgamma,(float __x),tgammaf,(__x))
 /* True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tgamma,(float __x),__tgammaf,(__x))
 #elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/tgammaf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* True gamma function */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tgamma)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tgammaf))(__x); }
 #endif /* ... */
@@ -5260,17 +5260,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nexttoward,(float __x, _
 #elif defined(__CRT_HAVE___nexttowardf)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nexttoward,(float __x, __LONGDOUBLE __y),__nexttowardf,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if ((defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)) && defined(__IEEE854_LONG_DOUBLE_TYPE__)) || defined(__CRT_HAVE_nextafterl) || defined(__CRT_HAVE_nexttowardl) || defined(__CRT_HAVE___nextafterl) || defined(__CRT_HAVE___nexttowardl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/nexttowardf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nexttoward)(float __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardf))(__x, __y); }
 #endif /* ((__IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__) && __IEEE854_LONG_DOUBLE_TYPE__) || __CRT_HAVE_nextafterl || __CRT_HAVE_nexttowardl || __CRT_HAVE___nextafterl || __CRT_HAVE___nexttowardl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_nextafter || __CRT_HAVE_nexttoward || __CRT_HAVE___nextafter || __CRT_HAVE__nextafter || __CRT_HAVE___nexttoward || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !... */
@@ -5290,17 +5290,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbn,(float __x, int _
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbn,(float __x, int __n),__scalblnf,(__x,__n))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn) || (defined(__CRT_HAVE_scalbln) && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || (defined(__CRT_HAVE___scalbln) && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/scalbnf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL scalbn)(float __x, int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbnf))(__x, __n); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_scalbn || __CRT_HAVE___scalbn || (__CRT_HAVE_scalbln && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || (__CRT_HAVE___scalbln && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -5321,17 +5321,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbln,(float __x, long
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbln,(float __x, long int __n),__scalbnf,(__x,__n))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || (defined(__CRT_HAVE___scalbn) && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/scalblnf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL scalbln)(float __x, long int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalblnf))(__x, __n); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_scalbln || __CRT_HAVE___scalbln || (__CRT_HAVE_scalbn && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || (__CRT_HAVE___scalbn && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -5355,17 +5355,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nearbyint,(float __x),__
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nearbyint,(float __x),__nearbyintf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___rint) || defined(__CRT_HAVE___nearbyint) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/rintf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nearbyint)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintf))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_rint || __CRT_HAVE_nearbyint || __CRT_HAVE___rint || __CRT_HAVE___nearbyint || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -5380,11 +5380,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,round,(float __x),roundf
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,round,(float __x),__roundf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/roundf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL round)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundf))(__x); }
 #endif /* !... */
@@ -5401,11 +5401,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,trunc,(float __x),truncf
  * format nearest but not larger in magnitude */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,trunc,(float __x),__truncf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/truncf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL trunc)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncf))(__x); }
@@ -5426,11 +5426,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remquo,(float __x, float __y, int *__
  * the integral quotient x/y, with n >= 3 */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remquo,(float __x, float __y, int *__pquo),__remquof,(__x,__y,__pquo))
 #elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/remquof.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
@@ -5452,11 +5452,11 @@ __CREDIRECT(,long int,__NOTHROW_NCX,lrint,(float __x),llrintf,(__x))
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(,long int,__NOTHROW_NCX,lrint,(float __x),__llrintf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/lrintf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Round X to nearest integral value according to current rounding direction */
 __FORCELOCAL long int __NOTHROW_NCX(__LIBCCALL lrint)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lrintf))(__x); }
 #endif /* !... */
@@ -5476,11 +5476,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(float __x),ll
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(float __x),__llroundf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/lroundf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lround)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundf))(__x); }
 #endif /* !... */
@@ -5494,11 +5494,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fdim,(float __x, float _
 /* Return positive difference between X and Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fdim,(float __x, float __y),__fdimf,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/fdimf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return positive difference between X and Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fdim)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdimf))(__x, __y); }
 #endif /* !... */
@@ -5512,11 +5512,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fmax,(float __x, float _
 /* Return maximum numeric value from X and Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fmax,(float __x, float __y),__fmaxf,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/fmaxf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return maximum numeric value from X and Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fmax)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxf))(__x, __y); }
 #endif /* !... */
@@ -5530,11 +5530,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fmin,(float __x, float _
 /* Return minimum numeric value from X and Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fmin,(float __x, float __y),__fminf,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/fminf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return minimum numeric value from X and Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fmin)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminf))(__x, __y); }
 #endif /* !... */
@@ -5548,11 +5548,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fma,(float __x, float __
 /* Multiply-add function computed as a ternary operation */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fma,(float __x, float __y, float __z),__fmaf,(__x,__y,__z))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/fmaf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Multiply-add function computed as a ternary operation */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fma)(float __x, float __y, float __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaf))(__x, __y, __z); }
 #endif /* !... */
@@ -5575,11 +5575,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(float __x),
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(float __x),__lrintf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/llrintf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Round X to nearest integral value according to current rounding direction */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL llrint)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llrintf))(__x); }
 #endif /* !... */
@@ -5599,11 +5599,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(float __x)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(float __x),__lroundf,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/llroundf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL llround)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llroundf))(__x); }
 #endif /* !... */
@@ -5621,11 +5621,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2,(__LONGDOUBLE __x),exp2l,
 /* Compute base-2 exponential of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2,(__LONGDOUBLE __x),__exp2l,(__x))
 #elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/exp2l.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Compute base-2 exponential of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL exp2)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp2l))(__x); }
 #endif /* ... */
@@ -5639,11 +5639,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log2,(__LONGDOUBLE __x),log2l,
 /* Compute base-2 logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log2,(__LONGDOUBLE __x),__log2l,(__x))
 #elif defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/log2l.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Compute base-2 logarithm of X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL log2)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log2l))(__x); }
 #endif /* ... */
@@ -5657,11 +5657,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,copysign,(__LONGD
 /* Return X with its signed changed to Y's */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,copysign,(__LONGDOUBLE __num, __LONGDOUBLE __sign),__copysignl,(__num,__sign))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/copysignl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return X with its signed changed to Y's */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL copysign)(__LONGDOUBLE __num, __LONGDOUBLE __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignl))(__num, __sign); }
 #endif /* !... */
@@ -5675,11 +5675,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgamma,(__LONGDOUBLE __x),tgam
 /* True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgamma,(__LONGDOUBLE __x),__tgammal,(__x))
 #elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/tgammal.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* True gamma function */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL tgamma)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tgammal))(__x); }
 #endif /* ... */
@@ -5702,17 +5702,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttoward,(__LON
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttoward,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/nextafterl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL nexttoward)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_nextafter || __CRT_HAVE_nexttoward || __CRT_HAVE___nextafter || __CRT_HAVE__nextafter || __CRT_HAVE___nexttoward || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -5733,17 +5733,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOU
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOUBLE __x, int __n),__scalblnl,(__x,__n))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn) || (defined(__CRT_HAVE_scalbln) && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || (defined(__CRT_HAVE___scalbln) && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/scalbnl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL scalbn)(__LONGDOUBLE __x, int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbnl))(__x, __n); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_scalbn || __CRT_HAVE___scalbn || (__CRT_HAVE_scalbln && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || (__CRT_HAVE___scalbln && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -5764,17 +5764,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDO
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDOUBLE __x, long int __n),__scalbnl,(__x,__n))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || (defined(__CRT_HAVE___scalbn) && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/scalblnl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL scalbln)(__LONGDOUBLE __x, long int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalblnl))(__x, __n); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_scalbln || __CRT_HAVE___scalbln || (__CRT_HAVE_scalbn && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || (__CRT_HAVE___scalbn && (__SIZEOF_INT__ == __SIZEOF_LONG__)) || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -5798,17 +5798,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nearbyint,(__LONG
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nearbyint,(__LONGDOUBLE __x),__nearbyintl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <ieee754.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___rint) || defined(__CRT_HAVE___nearbyint) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/rintl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL nearbyint)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintl))(__x); }
 #endif /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_rint || __CRT_HAVE_nearbyint || __CRT_HAVE___rint || __CRT_HAVE___nearbyint || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -5823,11 +5823,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,round,(__LONGDOUB
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,round,(__LONGDOUBLE __x),__roundl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/roundl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL round)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundl))(__x); }
 #endif /* !... */
@@ -5844,11 +5844,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,trunc,(__LONGDOUB
  * format nearest but not larger in magnitude */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,trunc,(__LONGDOUBLE __x),__truncl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/truncl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL trunc)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncl))(__x); }
@@ -5869,11 +5869,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remquo,(__LONGDOUBLE __x, __LO
  * the integral quotient x/y, with n >= 3 */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remquo,(__LONGDOUBLE __x, __LONGDOUBLE __y, int *__pquo),__remquol,(__x,__y,__pquo))
 #elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/remquol.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
@@ -5895,11 +5895,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(__LONGDOUBLE _
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(__LONGDOUBLE __x),__llrintl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/lrintl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Round X to nearest integral value according to current rounding direction */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lrint)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lrintl))(__x); }
 #endif /* !... */
@@ -5919,11 +5919,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(__LONGDOUBLE 
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(__LONGDOUBLE __x),__llroundl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/lroundl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lround)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundl))(__x); }
 #endif /* !... */
@@ -5937,11 +5937,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fdim,(__LONGDOUBL
 /* Return positive difference between X and Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fdim,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fdiml,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/fdiml.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return positive difference between X and Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fdim)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdiml))(__x, __y); }
 #endif /* !... */
@@ -5955,11 +5955,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmax,(__LONGDOUBL
 /* Return maximum numeric value from X and Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmax,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmaxl,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/fmaxl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return maximum numeric value from X and Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fmax)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxl))(__x, __y); }
 #endif /* !... */
@@ -5973,11 +5973,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmin,(__LONGDOUBL
 /* Return minimum numeric value from X and Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmin,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fminl,(__x,__y))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/fminl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return minimum numeric value from X and Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fmin)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminl))(__x, __y); }
 #endif /* !... */
@@ -5991,11 +5991,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fma,(__LONGDOUBLE
 /* Multiply-add function computed as a ternary operation */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fma,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),__fmal,(__x,__y,__z))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/fmal.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Multiply-add function computed as a ternary operation */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fma)(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmal))(__x, __y, __z); }
 #endif /* !... */
@@ -6018,11 +6018,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(__LONGDOUBL
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(__LONGDOUBLE __x),__lrintl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/llrintl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Round X to nearest integral value according to current rounding direction */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL llrint)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llrintl))(__x); }
 #endif /* !... */
@@ -6042,11 +6042,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(__LONGDOUB
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(__LONGDOUBLE __x),__lroundl,(__x))
 #else /* ... */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/llroundl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL llround)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llroundl))(__x); }
 #endif /* !... */
@@ -6066,11 +6066,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,hypot,(float __x, float __y),hypotf,(
 /* Return `sqrt(X*X + Y*Y)' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,hypot,(float __x, float __y),__hypotf,(__x,__y))
 #elif defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/hypotf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return `sqrt(X*X + Y*Y)' */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL hypot)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hypotf))(__x, __y); }
 #endif /* ... */
@@ -6081,11 +6081,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erf,(float __x),erff,(__x))
 #elif defined(__CRT_HAVE___erff)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erf,(float __x),__erff,(__x))
 #elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/erff.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL erf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erff))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_erfcf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfcf)
@@ -6095,11 +6095,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erfc,(float __x),erfcf,(__x))
 #elif defined(__CRT_HAVE___erfcf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erfc,(float __x),__erfcf,(__x))
 #elif defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/erfcf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL erfc)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erfcf))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_lgammaf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammaf)
@@ -6115,11 +6115,11 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgamma,(float __x),__lgammaf,(__x))
 #elif defined(__CRT_HAVE___gammaf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgamma,(float __x),__gammaf,(__x))
 #elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/lgammaf.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL lgamma)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); }
 #endif /* ... */
 } /* extern "C++" */
@@ -6135,11 +6135,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypot,(__LONGDOUBLE __x, __LON
 /* Return `sqrt(X*X + Y*Y)' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypot,(__LONGDOUBLE __x, __LONGDOUBLE __y),__hypotl,(__x,__y))
 #elif defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/hypotl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Return `sqrt(X*X + Y*Y)' */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL hypot)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hypotl))(__x, __y); }
 #endif /* ... */
@@ -6150,11 +6150,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erf,(__LONGDOUBLE __x),erfl,(_
 #elif defined(__CRT_HAVE___erfl)
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erf,(__LONGDOUBLE __x),__erfl,(__x))
 #elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/erfl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL erf)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erfl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_erfcl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfcl)
@@ -6164,11 +6164,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfc,(__LONGDOUBLE __x),erfcl,
 #elif defined(__CRT_HAVE___erfcl)
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfc,(__LONGDOUBLE __x),__erfcl,(__x))
 #elif defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/erfcl.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL erfc)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erfcl))(__x); }
 #endif /* ... */
 #if __has_builtin(__builtin_lgammal) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammal)
@@ -6184,11 +6184,11 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,lgamma,(__LONGDOUBLE __x),__lg
 #elif defined(__CRT_HAVE___gammal)
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,lgamma,(__LONGDOUBLE __x),__gammal,(__x))
 #elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/math/lgammal.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL lgamma)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); }
 #endif /* ... */
 } /* extern "C++" */

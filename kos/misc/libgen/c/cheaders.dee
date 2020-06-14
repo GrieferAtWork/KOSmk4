@@ -1336,18 +1336,18 @@ class LocalFunction {
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
 			prototypes: {FunctionPrototype...}, doc: string, preferBindingMacros: bool) {
 		local usedPrototype = functionPrototype;
-		local oldNs = fp.namespace;
-		fp.namespace = GLOBAL_NAMESPACE;
 		local oldExternLinkage = fp.externLinkage;
 		if (oldExternLinkage !in ["", "C"])
 			fp.externLinkage = "";
+		local oldNs = fp.namespace;
+		fp.namespace = GLOBAL_NAMESPACE;
 		/* Include the local-header for this function */
 		fp.ppInclude("<local/{}/{}.h>".format({
 			originalSystemHeaderName, name }));
 		/* Remember that we'll be needing the local implementation of this function */
 		neededLocalFunction.insert(this);
-		fp.externLinkage = oldExternLinkage;
 		fp.namespace = oldNs;
+		fp.externLinkage = oldExternLinkage;
 		local callToLocalName = LOCAL_NAMESPACE.keyCSymbolName(name);
 		if (oldNs !== LOCAL_NAMESPACE) {
 			if (LOCAL_NAMESPACE.prefix)
@@ -1480,11 +1480,11 @@ class InlineFunction {
 				}
 				return none;
 			};
-			local oldNs = fp.namespace;
-			fp.namespace = dependenciesNamespace;
 			local oldExternLinkage = fp.externLinkage;
 			if (oldExternLinkage !in ["", "C"])
 				fp.externLinkage = "";
+			local oldNs = fp.namespace;
+			fp.namespace = dependenciesNamespace;
 			for (local depName: deps.keys.sorted()) {
 				local depFun = deps[depName];
 				depName = keyDependency(depName);
@@ -1494,8 +1494,8 @@ class InlineFunction {
 					preferBindingMacros:      true,
 					printDeclarationPrefixes: true);
 			}
-			fp.externLinkage = oldExternLinkage;
 			fp.namespace = oldNs;
+			fp.externLinkage = oldExternLinkage;
 		} else {
 			depKey = [](keyword: string): string {
 				if (keyword == implName)
@@ -1504,11 +1504,11 @@ class InlineFunction {
 			};
 		}
 		if (impl.implPrefix) {
-			local oldNs = fp.namespace;
-			fp.namespace = GLOBAL_NAMESPACE;
 			local oldExternLinkage = fp.externLinkage;
 			if (oldExternLinkage !in ["", "C"])
 				fp.externLinkage = "";
+			local oldNs = fp.namespace;
+			fp.namespace = GLOBAL_NAMESPACE;
 			for (local x: impl.implPrefix) {
 				escapeNonRepeatingTextIntoFile(
 					fp, x, escapeMode,
@@ -1526,8 +1526,8 @@ class InlineFunction {
 					},
 					forceKeyEscape: true);
 			}
-			fp.externLinkage = oldExternLinkage;
 			fp.namespace = oldNs;
+			fp.externLinkage = oldExternLinkage;
 		}
 		for (local prototype: prototypes) {
 			if (doc)
@@ -1923,17 +1923,17 @@ class FunctionBinding {
 					continue;
 				if (usedBinding is LocalFunction) {
 					/* Include the local-implementation beforehard! */
-					local oldNs = fp.namespace;
 					local oldExternLinkage = fp.externLinkage;
-					fp.namespace = GLOBAL_NAMESPACE;
 					if (oldExternLinkage !in ["", "C"])
 						fp.externLinkage = "";
+					local oldNs = fp.namespace;
+					fp.namespace = GLOBAL_NAMESPACE;
 					/* Include the local-header for this function */
 					fp.ppInclude("<local/{}/{}.h>".format({
 						usedBinding.originalSystemHeaderName,
 						usedBinding.name }));
-					fp.externLinkage = oldExternLinkage;
 					fp.namespace = oldNs;
+					fp.externLinkage = oldExternLinkage;
 				}
 				if (printDeclarationPrefixes) {
 					/* TODO: Print declaration prefixes common to all of @usedPrototypes,
@@ -1966,18 +1966,18 @@ class FunctionBinding {
 					for (local proto: associatedPrototypes) {
 						for (local x: proto.declPrefix) {
 							if (oldNs is none) {
-								oldNs = fp.namespace;
 								oldExternLinkage = fp.externLinkage;
-								fp.namespace = GLOBAL_NAMESPACE;
 								if (oldExternLinkage !in ["", "C"])
 									fp.externLinkage = "";
+								oldNs = fp.namespace;
+								fp.namespace = GLOBAL_NAMESPACE;
 							}
 							escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
 						}
 					}
 					if (oldNs !is none) {
-						fp.externLinkage = oldExternLinkage;
 						fp.namespace = oldNs;
+						fp.externLinkage = oldExternLinkage;
 					}
 				}
 			}
@@ -2339,17 +2339,17 @@ normal_guardName_binding:
 							numNeededEndif.last = false;
 						}
 						/* Include the preprocessor-condition prefix texts. */
-						oldNs = fp.namespace;
-						fp.namespace = GLOBAL_NAMESPACE;
 						oldExternLinkage = fp.externLinkage;
 						if (oldExternLinkage !in ["", "C"])
 							fp.externLinkage = "";
+						oldNs = fp.namespace;
+						fp.namespace = GLOBAL_NAMESPACE;
 					}
 					fp.forceStartOfLine() << newText;
 				}
 				if (oldNs !is none) {
-					fp.externLinkage = oldExternLinkage;
 					fp.namespace = oldNs;
+					fp.externLinkage = oldExternLinkage;
 					fp.ppIf(usedPpCond);
 					numNeededEndif.pushback(true);
 				} else if (isFirst) {
@@ -2448,9 +2448,14 @@ class ExposedFunction {
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintHeaderDeclaration(fp: CWriter, escapeMode: int) {
 		local oldNs = fp.namespace;
-		if (namespaceOverride !is none)
-			fp.namespace = namespaceOverride;
 		local oldExternLinkage = fp.externLinkage;
+		if (namespaceOverride !is none) {
+			if (oldNs !== namespaceOverride) {
+				if (oldExternLinkage != "")
+					fp.externLinkage = "";
+			}
+			fp.namespace = namespaceOverride;
+		}
 		if (externLinkageOverride !is none)
 			fp.externLinkage = externLinkageOverride;
 		exposedFunc.cprintHeaderDeclaration(
@@ -2459,8 +2464,18 @@ class ExposedFunction {
 			printDeclarationPrefixes,
 			onlyPrintPrimaryPrototype,
 			ignoreNamespaceBindings);
-		fp.externLinkage = oldExternLinkage;
-		fp.namespace = oldNs;
+		if (fp.externLinkage != oldExternLinkage) {
+			if (fp.namespace !== oldNs) {
+				if (fp.externLinkage != "")
+					fp.externLinkage = "";
+				fp.namespace     = oldNs;
+				fp.externLinkage = oldExternLinkage;
+			} else {
+				fp.externLinkage = oldExternLinkage;
+			}
+		} else {
+			fp.namespace = oldNs;
+		}
 	}
 
 }

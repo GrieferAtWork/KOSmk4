@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd774dd6d */
+/* HASH CRC-32:0x7cc88e1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -605,11 +605,11 @@ extern "C++" {
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/string/memcpyc.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memcpy)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))(__dst, __src, __elem_count, __elem_size); }
@@ -619,11 +619,11 @@ __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHRO
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memmove,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovec,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmovec */
-__NAMESPACE_STD_END
 } /* extern "C++" */
+__NAMESPACE_STD_END
 #include <local/string/memmovec.h>
-extern "C++" {
 __NAMESPACE_STD_BEGIN
+extern "C++" {
 /* Move memory between potentially overlapping memory blocks
  * @return: * : Always re-returns `dst' */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmove)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovec))(__dst, __src, __elem_count, __elem_size); }
