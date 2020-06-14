@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3173d078 */
+/* HASH CRC-32:0x18b2f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -430,6 +430,10 @@ __CREDIRECT(,size_t,__NOTHROW_NCX,mbrtowc,(wchar_t *__pwc, char const *__restric
 __CREDIRECT_KOS(,size_t,__NOTHROW_NCX,mbrtowc,(wchar_t *__pwc, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_DOS$__mbrtowc) && __SIZEOF_WCHAR_T__ == 2
 __CREDIRECT_DOS(,size_t,__NOTHROW_NCX,mbrtowc,(wchar_t *__pwc, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
+#elif defined(__CRT_HAVE_mbrtoc16) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(,size_t,__NOTHROW_NCX,mbrtowc,(wchar_t *__pwc, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),mbrtoc16,(__pwc,__str,__maxlen,__mbs))
+#elif defined(__CRT_HAVE_mbrtoc32) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(,size_t,__NOTHROW_NCX,mbrtowc,(wchar_t *__pwc, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),mbrtoc32,(__pwc,__str,__maxlen,__mbs))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <local/wchar/mbrtowc.h>
@@ -442,6 +446,10 @@ __CDECLARE(,size_t,__NOTHROW_NCX,wcrtomb,(char *__restrict __str, wchar_t __wc, 
 __CREDIRECT_KOS(,size_t,__NOTHROW_NCX,wcrtomb,(char *__restrict __str, wchar_t __wc, mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_DOS$wcrtomb) && __SIZEOF_WCHAR_T__ == 2
 __CREDIRECT_DOS(,size_t,__NOTHROW_NCX,wcrtomb,(char *__restrict __str, wchar_t __wc, mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
+#elif defined(__CRT_HAVE_c16rtomb) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(,size_t,__NOTHROW_NCX,wcrtomb,(char *__restrict __str, wchar_t __wc, mbstate_t *__mbs),c16rtomb,(__str,__wc,__mbs))
+#elif defined(__CRT_HAVE_c32rtomb) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(,size_t,__NOTHROW_NCX,wcrtomb,(char *__restrict __str, wchar_t __wc, mbstate_t *__mbs),c32rtomb,(__str,__wc,__mbs))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <local/wchar/wcrtomb.h>
@@ -2692,8 +2700,8 @@ __FORCELOCAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL wcstouq)(w
 __CDECLARE(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, int __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstoll_l) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, int __base, __locale_t __locale),wcstoll_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE_DOS$wcstoll_l) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, int __base, __locale_t __locale),wcstoll_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE_DOS$_wcstoll_l) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, int __base, __locale_t __locale),_wcstoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstol_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, int __base, __locale_t __locale),wcstol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstol_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__) && __SIZEOF_WCHAR_T__ == 4
@@ -7154,8 +7162,8 @@ __FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NO
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, int __base, __locale_t __locale),wcstoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstoll_l) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, int __base, __locale_t __locale),wcstoll_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE_DOS$wcstoll_l) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, int __base, __locale_t __locale),wcstoll_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE_DOS$_wcstoll_l) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, int __base, __locale_t __locale),_wcstoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstol_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, int __base, __locale_t __locale),wcstol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstol_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__) && __SIZEOF_WCHAR_T__ == 4

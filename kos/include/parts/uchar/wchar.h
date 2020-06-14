@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x568074eb */
+/* HASH CRC-32:0xc926f7c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -692,8 +692,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32stoul_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNU
 #endif /* !... */
 #if defined(__CRT_HAVE_wcstoll_l) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,c16stoll_l,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base, __locale_t __locale),wcstoll_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE_DOS$wcstoll_l)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,c16stoll_l,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base, __locale_t __locale),wcstoll_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE_DOS$_wcstoll_l)
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,c16stoll_l,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base, __locale_t __locale),_wcstoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstol_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,c16stoll_l,(char16_t const *__restrict __nptr, char16_t **__endptr, int __base, __locale_t __locale),wcstol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_DOS$wcstol_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)

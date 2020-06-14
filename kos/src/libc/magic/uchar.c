@@ -86,10 +86,77 @@ typedef __CHAR32_TYPE__ char32_t;
 
 %[insert:std]
 
-[[std]] mbrtoc16(*) %{uchar("mbrtowc")}
-[[std]] mbrtoc32(*) %{uchar("mbrtowc")}
-[[std]] c16rtomb(*) %{uchar("wcrtomb")}
-[[std]] c32rtomb(*) %{uchar("wcrtomb")}
+[[std, no_crt_impl]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("mbrtowc", "__mbrtowc")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$mbrtowc")]]
+[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(mbrtowc)]]
+[[bind_local_function(uchar_mbrtoc16)]]
+size_t mbrtoc16([[nullable]] char16_t *pc16,
+                [[inp_opt(maxlen)]] char const *__restrict str,
+                size_t maxlen, [[nullable]] mbstate_t *mbs);
+
+[[std, no_crt_impl]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("mbrtowc", "__mbrtowc")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$mbrtowc")]]
+[[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(mbrtowc)]]
+[[bind_local_function(uchar_mbrtoc32)]]
+size_t mbrtoc32([[nullable]] char32_t *pc32,
+                [[inp_opt(maxlen)]] char const *__restrict str,
+                size_t maxlen, [[nullable]] mbstate_t *mbs);
+
+[[std, no_crt_impl]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("wcrtomb")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wcrtomb")]]
+[[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(wcrtomb)]]
+[[bind_local_function(uchar_c16rtomb)]]
+size_t c16rtomb(char *__restrict str, char16_t c16,
+                [[nullable]] mbstate_t *mbs);
+
+[[std, no_crt_impl]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("wcrtomb")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wcrtomb")]]
+[[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(wcrtomb)]]
+[[bind_local_function(uchar_c32rtomb)]]
+size_t c32rtomb(char *__restrict str, char32_t c32,
+                [[nullable]] mbstate_t *mbs);
+
+
+
+
+
+/* The actual uchar-variants of these functions
+ * These aren't exposed because they'd be using different calling
+ * conventions for individual bindings, where-as these functions
+ * are actually exported from libc, using both LIBKCALL and LIBDCALL
+ * calling conventions, meaning they don't impose the requirement
+ * of all of the other uchar-functions, in that they require the
+ * caller to deal with the possibility of the calling convention
+ * changing based on uchar character width.
+ * NOTE: The actual requirement of different calling conventions
+ *       is the result from the fact that since libc is already
+ *       implementing DOS compatibility, it may as well take
+ *       advantage of the fact that DOS uses 2-byte wchar_t,
+ *       while KOS uses 4-byte. So with that in mind, libc has
+ *       to contain 2 versions of every [[wchar]] function, at
+ *       which point it stands to reason to expose both.
+ * However, since the 2-byte variants mainly exist to allow for
+ * DOS compatibility, they obviously use the calling convention
+ * required by DOS, meaning that when linking against them from
+ * KOS-mode, their declarations have to reflect this (since it
+ * would be too expensive to have 4 variants of every wchar
+ * function, for both wchar-sizes, and both calling conventions)
+ *
+ * The only exception to this rule are these four functions,
+ * which due the fact of being mandated by the C standard, still
+ * have to be exported not only by name, but also by be bound to
+ * in headers by-name, _and_ be exposed with a consistent calling
+ * convention that matches `LIBCCALL'!
+ */
+[[ignore]] uchar_mbrtoc16(*) %{uchar16("mbrtowc")}
+[[ignore]] uchar_mbrtoc32(*) %{uchar32("mbrtowc")}
+[[ignore]] uchar_c16rtomb(*) %{uchar16("wcrtomb")}
+[[ignore]] uchar_c32rtomb(*) %{uchar32("wcrtomb")}
+
 
 %{
 

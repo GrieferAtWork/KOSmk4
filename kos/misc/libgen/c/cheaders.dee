@@ -1250,7 +1250,7 @@ class LocalFunction {
 		get(): FunctionPrototype {
 			local result = prototype;
 			if (result is Callable)
-				prototype = result = result();
+				result = prototype = result();
 			return result;
 		}
 	}
@@ -1270,7 +1270,7 @@ class LocalFunction {
 		get(): string | UserString {
 			local result = documentation;
 			if (result is Callable)
-				documentation = result = result();
+				result = documentation = result();
 			return result;
 		}
 	}
@@ -2060,7 +2060,7 @@ class Function {
 		get(): string | UserString {
 			local result = documentation;
 			if (result is Callable)
-				documentation = result = result();
+				result = documentation = result();
 			return result;
 		}
 	}
@@ -2586,7 +2586,7 @@ class LibraryFunction {
 		get(): string | UserString {
 			local result = documentation;
 			if (result is Callable)
-				documentation = result = result();
+				result = documentation = result();
 			return result;
 		}
 	}

@@ -216,8 +216,67 @@ int wctob(wint_t ch) {
 	return EOF;
 };
 
+
+%(auto_source){
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+/* Because STDC mandates the uchar16 and uchar32 variants:
+ *    mbrtowc:mbrtoc16:mbrtoc32
+ *    wcrtomb:c16rtomb:c32rtomb
+ * which are exposed in <uchar.h>, we need to be a little bit
+ * more careful when it comes to defining them on a platform
+ * where the standard DOS calling convention differs from the
+ * calling convention used by KOS (e.g. x86-64)
+ * 
+ * In this scenario, magic will have already given the symbols:
+ *   - LIBDCALL:DOS$mbrtowc:   size_t(wchar16_t *pwc, char const *str, size_t maxlen, mbstate_t *mbs);
+ *     LIBDCALL:DOS$mbrtoc16:  ...
+ *   - LIBKCALL:mbrtowc:       size_t(wchar32_t *pwc, char const *str, size_t maxlen, mbstate_t *mbs);
+ *     LIBKCALL:mbrtoc32:      ...
+ *     LIBDCALL:DOS$mbrtoc32:  ...  (msabi64-generator)
+ *   - LIBDCALL:DOS$wcrtomb:   size_t(char *str, wchar16_t wc, mbstate_t *mbs);
+ *     LIBDCALL:DOS$c16rtomb:  ...
+ *   - LIBKCALL:wcrtomb:       size_t(char *str, wchar32_t wc, mbstate_t *mbs);
+ *     LIBKCALL:c32rtomb:      ...
+ *     LIBDCALL:DOS$c32rtomb:  ...  (msabi64-generator)
+ *
+ * However, you can see that this system is still lacking the LIBKCALL
+ * variants of 2 functions that are only available as LIBDCALL (thus far):
+ *     LIBKCALL:mbrtoc16:  ...
+ *     LIBKCALL:c16rtomb:  ...
+ *
+ * Any because the msabi64 generator doesn't include special handling for this case,
+ * we simply have to manually implement these 2 functions as LIBKCALL wrappers for
+ * the associated LIBDCALL functions:
+ *
+ *     libc_mbrtoc16(...) { return libd_mbrtowc(...); }
+ *     libc_c16rtomb(...) { return libd_wcrtomb(...); }
+ */
+DEFINE_PUBLIC_ALIAS(mbrtoc16, libc_mbrtoc16);
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
+NOTHROW_NCX(LIBKCALL libc_mbrtoc16)(char16_t *pwc,
+                                    char const *__restrict str,
+                                    size_t maxlen,
+                                    mbstate_t *mbs) {
+	return libd_mbrtowc(pwc, str, maxlen, mbs);
+}
+
+DEFINE_PUBLIC_ALIAS(c16rtomb, libc_c16rtomb);
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
+NOTHROW_NCX(LIBKCALL libc_c16rtomb)(char *__restrict str,
+                                    char16_t wc,
+                                    mbstate_t *mbs) {
+	return libd_wcrtomb(str, wc, mbs);
+}
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+}
+
 [[std, wchar, export_alias("__mbrtowc")]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("mbrtoc16")]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("mbrtoc32")]]
 [[decl_include("<bits/mbstate.h>"), impl_include("<parts/errno.h>")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("mbrtoc16")]]
+[[if(!defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$mbrtoc16")]]
+[[kos_export_as("mbrtoc32")]]
 size_t mbrtowc([[nullable]] wchar_t *pwc,
                [[inp_opt(maxlen)]] char const *__restrict str, size_t maxlen,
                [[nullable]] mbstate_t *mbs) {
@@ -246,6 +305,11 @@ size_t mbrtowc([[nullable]] wchar_t *pwc,
 
 
 [[std, wchar, impl_include("<parts/errno.h>")]]
+[[if(__SIZEOF_WCHAR_T__ == 2), alias("c16rtomb")]]
+[[if(__SIZEOF_WCHAR_T__ == 4), alias("c32rtomb")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("c16rtomb")]]
+[[if(!defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$c16rtomb")]]
+[[kos_export_as("c32rtomb")]]
 size_t wcrtomb(char *__restrict str, wchar_t wc,
                [[nullable]] mbstate_t *mbs) {
 	char *endptr;
@@ -1067,7 +1131,7 @@ unsigned long wcstoul_l([[nonnull]] wchar_t const *__restrict nptr,
 %[insert:function(wcstoq = wcstoll)]
 %[insert:function(wcstouq = wcstoull)]
 
-[[wchar, export_as("_wcstoll_l", "__wcstoll_l")]]
+[[wchar, crt_dosname("_wcstoll_l"), export_as("__wcstoll_l")]]
 [[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("wcstol_l", "_wcstol_l", "__wcstol_l")]]
 [[if(__SIZEOF_LONG_LONG__ == 8), alias("_wcstoi64_l")]]
 [[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias("wcstoimax_l", "_wcstoimax_l", "__wcstoimax_l")]]

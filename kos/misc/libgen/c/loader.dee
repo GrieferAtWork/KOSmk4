@@ -2549,6 +2549,7 @@ again_parse_annotations:
 				}	break;
 
 				case "export_as":
+				case "kos_export_as":
 					self.next();
 					tok = self.skip("(");
 					while (tok !in ["", ")"]) {
@@ -2559,6 +2560,33 @@ again_parse_annotations:
 								.format({ tok }));
 						}
 						currentLibraryFunction.exportSymbolNames.append((
+							currentConditions !is none
+								? currentConditions
+								: "1",
+							tok));
+						tok = self.next();
+						if (tok != ",")
+							break;
+						tok = self.next();
+					}
+					self.skip(")");
+					break;
+
+				case "dos_export_as":
+					self.next();
+					tok = self.skip("(");
+					if (currentDosLibraryFunction is none) {
+						currentDosLibraryFunction = LibraryFunction(
+							ppCond: currentLibraryFunction.ppCond);
+					}
+					while (tok !in ["", ")"]) {
+						if (isCString(tok))
+							tok = tok.decode("c-escape");
+						else if (!tok.issymbol()) {
+							self.err("Expected string or keyword for [export_as(...)], but got {!r}"
+								.format({ tok }));
+						}
+						currentDosLibraryFunction.exportSymbolNames.append((
 							currentConditions !is none
 								? currentConditions
 								: "1",
@@ -2887,6 +2915,8 @@ do_handle_alt_variant_of:
 					 */
 					if (currentConditions !is none)
 						goto illegal_annotation_with_condition;
+					if (currentDosLibraryFunction.ppCond === currentLibraryFunction.ppCond)
+						currentDosLibraryFunction.ppCond = "1";
 					currentLibraryFunction.ppCond = "1";
 					self.next();
 					break;
@@ -2901,7 +2931,13 @@ do_handle_alt_variant_of:
 						goto illegal_annotation_with_condition;
 					self.next();
 					self.skip("(");
-					currentLibraryFunction.ppCond = parseCStringOrAllUntilRParen(self);
+					{
+						local newCond = parseCStringOrAllUntilRParen(self);
+						if (tok == "crt_impl_if" &&
+						    currentDosLibraryFunction.ppCond === currentLibraryFunction.ppCond)
+							currentDosLibraryFunction.ppCond = newCond;
+						currentLibraryFunction.ppCond = newCond;
+					}
 					self.skip(")");
 					break;
 
@@ -3765,15 +3801,6 @@ got_chkExpr:
 					local feat_noExternInline = currentFeatures.noExternInline;
 					local feat_noLocal        = currentFeatures.noExternInline;
 					local xcLocalFunction: LocalFunction = none;
-					if (feat_inline is none && !feat_noLocal) {
-						xcLocalFunction = LocalFunction(
-							name:                     currentName,
-							originalSystemHeaderName: headerName);
-						defineFunctionInMapping(allLocalFunctionsByName, xcLocalFunction);
-						if (!result.localFunctionsByName.setnew(xcLocalFunction.name, xcLocalFunction))
-							self.errAt(currentNameTokStart, "Duplicate local function: {!r}"
-								.format({ xcLocalFunction.name }));
-					}
 					@@The wchar function descriptor
 					local strWcsFunctionName: string = str(wcsFunctionName);
 					local wcharFunction: WcharFunction;
@@ -3791,6 +3818,31 @@ got_chkExpr:
 						self.errAt(currentNameTokStart,
 							"Duplicate declaration of %{{uchar{}}} variant of [[wchar]] function {!r}"
 							.format({ WCHAR_REPLACEMENT_WIDTH[mode], wcsFunctionName }));
+					}
+					if (feat_inline is none && !feat_noLocal) {
+						xcLocalFunction = LocalFunction(
+							name:                     currentName,
+							originalSystemHeaderName: headerName);
+						defineFunctionInMapping(allLocalFunctionsByName, xcLocalFunction);
+						if (!result.localFunctionsByName.setnew(xcLocalFunction.name, xcLocalFunction))
+							self.errAt(currentNameTokStart, "Duplicate local function: {!r}"
+								.format({ xcLocalFunction.name }));
+						xcLocalFunction.prototype = []{
+							local usedPrototype: FunctionPrototype = currentPrototype;
+							if (usedPrototype is none) {
+								usedPrototype = wcharFunction
+									.getXCharImplementation(currentName, mode)
+									.prototype;
+							}
+							/* Replace default CC with the proper UCHAR-override */
+							if (usedPrototype.cc === DEFAULT_CC)
+								usedPrototype.cc = WCHAR_REPLACEMENT_CC[mode];
+							return usedPrototype;
+						};
+						//xcLocalFunction.impl          = xcImpl.impl;
+						//xcLocalFunction.ppCond        = xcImpl.ppCond;
+						//xcLocalFunction.ppCondPrefix  = xcImpl.ppCondPrefix;
+						//xcLocalFunction.documentation = wc.documentation;
 					}
 					function getWcharFunction(): Function {
 						try {
@@ -4039,7 +4091,7 @@ wc_bind_continue_scan_bindings:
 						/* Last cast: Directly implement the Xchar function */
 						local xcImpl: none | Callable | LoaderFunctionImplementation = xc.loaderImpl;
 						if (xcImpl is Callable)
-							xcImpl = xcImpl();
+							xcImpl = xc.loaderImpl = xcImpl();
 						if (xcImpl is none) {
 							yield basicBindings...;
 						} else {

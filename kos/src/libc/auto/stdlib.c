@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a7456e2 */
+/* HASH CRC-32:0x4748655 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2608,7 +2608,7 @@ NOTHROW_NCX(LIBKCALL libc__wtoi64_l)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBDCALL libd__wtoll_l)(char16_t const *__restrict nptr,
                                     locale_t locale) {
-	return libd_wcstoll_l(nptr, NULL, 10, locale);
+	return libd__wcstoll_l(nptr, NULL, 10, locale);
 }
 #if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc__wtoll_l, libc__wtoi_l);

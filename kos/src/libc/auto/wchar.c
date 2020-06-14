@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18875149 */
+/* HASH CRC-32:0x24187f0a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,6 +66,58 @@ NOTHROW_NCX(LIBCCALL libc_wctob)(wint_t ch) {
 		return (int)ch;
 	return EOF;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+/* Because STDC mandates the uchar16 and uchar32 variants:
+ *    mbrtowc:mbrtoc16:mbrtoc32
+ *    wcrtomb:c16rtomb:c32rtomb
+ * which are exposed in <uchar.h>, we need to be a little bit
+ * more careful when it comes to defining them on a platform
+ * where the standard DOS calling convention differs from the
+ * calling convention used by KOS (e.g. x86-64)
+ * 
+ * In this scenario, magic will have already given the symbols:
+ *   - LIBDCALL:DOS$mbrtowc:   size_t(wchar16_t *pwc, char const *str, size_t maxlen, mbstate_t *mbs);
+ *     LIBDCALL:DOS$mbrtoc16:  ...
+ *   - LIBKCALL:mbrtowc:       size_t(wchar32_t *pwc, char const *str, size_t maxlen, mbstate_t *mbs);
+ *     LIBKCALL:mbrtoc32:      ...
+ *     LIBDCALL:DOS$mbrtoc32:  ...  (msabi64-generator)
+ *   - LIBDCALL:DOS$wcrtomb:   size_t(char *str, wchar16_t wc, mbstate_t *mbs);
+ *     LIBDCALL:DOS$c16rtomb:  ...
+ *   - LIBKCALL:wcrtomb:       size_t(char *str, wchar32_t wc, mbstate_t *mbs);
+ *     LIBKCALL:c32rtomb:      ...
+ *     LIBDCALL:DOS$c32rtomb:  ...  (msabi64-generator)
+ *
+ * However, you can see that this system is still lacking the LIBKCALL
+ * variants of 2 functions that are only available as LIBDCALL (thus far):
+ *     LIBKCALL:mbrtoc16:  ...
+ *     LIBKCALL:c16rtomb:  ...
+ *
+ * Any because the msabi64 generator doesn't include special handling for this case,
+ * we simply have to manually implement these 2 functions as LIBKCALL wrappers for
+ * the associated LIBDCALL functions:
+ *
+ *     libc_mbrtoc16(...) { return libd_mbrtowc(...); }
+ *     libc_c16rtomb(...) { return libd_wcrtomb(...); }
+ */
+DEFINE_PUBLIC_ALIAS(mbrtoc16, libc_mbrtoc16);
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
+NOTHROW_NCX(LIBKCALL libc_mbrtoc16)(char16_t *pwc,
+                                    char const *__restrict str,
+                                    size_t maxlen,
+                                    mbstate_t *mbs) {
+	return libd_mbrtowc(pwc, str, maxlen, mbs);
+}
+
+DEFINE_PUBLIC_ALIAS(c16rtomb, libc_c16rtomb);
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
+NOTHROW_NCX(LIBKCALL libc_c16rtomb)(char *__restrict str,
+                                    char16_t wc,
+                                    mbstate_t *mbs) {
+	return libd_wcrtomb(str, wc, mbs);
+}
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+#ifndef __KERNEL__
 #include <parts/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
 NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
@@ -1455,10 +1507,10 @@ NOTHROW_NCX(LIBKCALL libc_wcstoul_l)(char32_t const *__restrict nptr,
 	return libc_wcstoul(nptr, endptr, base);
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) __LONGLONG
-NOTHROW_NCX(LIBDCALL libd_wcstoll_l)(char16_t const *__restrict nptr,
-                                     char16_t **endptr,
-                                     int base,
-                                     locale_t locale) {
+NOTHROW_NCX(LIBDCALL libd__wcstoll_l)(char16_t const *__restrict nptr,
+                                      char16_t **endptr,
+                                      int base,
+                                      locale_t locale) {
 	(void)locale;
 	return libd_wcstoll(nptr, endptr, base);
 }
@@ -4966,10 +5018,24 @@ DECL_END
 DEFINE_PUBLIC_ALIAS(DOS$btowc, libd_btowc);
 DEFINE_PUBLIC_ALIAS(btowc, libc_btowc);
 DEFINE_PUBLIC_ALIAS(wctob, libc_wctob);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(mbrtoc16, libd_mbrtowc);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+#ifndef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(DOS$mbrtoc16, libd_mbrtowc);
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(DOS$mbrtowc, libd_mbrtowc);
 DEFINE_PUBLIC_ALIAS(__mbrtowc, libc_mbrtowc);
+DEFINE_PUBLIC_ALIAS(mbrtoc32, libc_mbrtowc);
 DEFINE_PUBLIC_ALIAS(mbrtowc, libc_mbrtowc);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(c16rtomb, libd_wcrtomb);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+#ifndef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(DOS$c16rtomb, libd_wcrtomb);
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(DOS$wcrtomb, libd_wcrtomb);
+DEFINE_PUBLIC_ALIAS(c32rtomb, libc_wcrtomb);
 DEFINE_PUBLIC_ALIAS(wcrtomb, libc_wcrtomb);
 DEFINE_PUBLIC_ALIAS(DOS$mbrlen, libd_mbrlen);
 DEFINE_PUBLIC_ALIAS(__mbrlen, libc_mbrlen);
@@ -5111,8 +5177,7 @@ DEFINE_PUBLIC_ALIAS(wcstol_l, libc_wcstol_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wcstoul_l, libd__wcstoul_l);
 DEFINE_PUBLIC_ALIAS(__wcstoul_l, libc_wcstoul_l);
 DEFINE_PUBLIC_ALIAS(wcstoul_l, libc_wcstoul_l);
-DEFINE_PUBLIC_ALIAS(DOS$wcstoll_l, libd_wcstoll_l);
-DEFINE_PUBLIC_ALIAS(_wcstoll_l, libc_wcstoll_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wcstoll_l, libd__wcstoll_l);
 DEFINE_PUBLIC_ALIAS(__wcstoll_l, libc_wcstoll_l);
 DEFINE_PUBLIC_ALIAS(wcstoll_l, libc_wcstoll_l);
 DEFINE_PUBLIC_ALIAS(DOS$wcstoull_l, libd_wcstoull_l);

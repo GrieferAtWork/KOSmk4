@@ -2698,7 +2698,7 @@ function generateLibcArchSyscallAssembly(
 			fp << "INTERN_FUNCTION(libc_sys_" << conditionalX << name << ")\n";
 			arch.platformLibcSyscallWrapper(fp, f, sysno, enableExcept);
 			fp << "END(libc_sys_" << conditionalX << name << ")\n";
-			fp << "DEFINE_PUBLIC_WEAK_ALIAS(sys_" << conditionalX << name << ", libc_sys_" << conditionalX << name << ")\n";
+			fp << "DEFINE_PUBLIC_ALIAS(sys_" << conditionalX << name << ", libc_sys_" << conditionalX << name << ")\n";
 			fp << "\n";
 		}
 	}

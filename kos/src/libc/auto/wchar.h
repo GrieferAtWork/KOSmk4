@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d2f1790 */
+/* HASH CRC-32:0xc817eb21 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -180,7 +180,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd__wcstol_l)(
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBKCALL libc_wcstol_l)(char32_t const *__restrict nptr, char32_t **endptr, int base, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) unsigned long NOTHROW_NCX(LIBDCALL libd__wcstoul_l)(char16_t const *__restrict nptr, char16_t **endptr, int base, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) unsigned long NOTHROW_NCX(LIBKCALL libc_wcstoul_l)(char32_t const *__restrict nptr, char32_t **endptr, int base, locale_t locale);
-INTDEF NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBDCALL libd_wcstoll_l)(char16_t const *__restrict nptr, char16_t **endptr, int base, locale_t locale);
+INTDEF NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBDCALL libd__wcstoll_l)(char16_t const *__restrict nptr, char16_t **endptr, int base, locale_t locale);
 INTDEF NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBKCALL libc_wcstoll_l)(char32_t const *__restrict nptr, char32_t **endptr, int base, locale_t locale);
 INTDEF NONNULL((1)) __ULONGLONG NOTHROW_NCX(LIBDCALL libd_wcstoull_l)(char16_t const *__restrict nptr, char16_t **endptr, int base, locale_t locale);
 INTDEF NONNULL((1)) __ULONGLONG NOTHROW_NCX(LIBKCALL libc_wcstoull_l)(char32_t const *__restrict nptr, char32_t **endptr, int base, locale_t locale);
