@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x529ec185 */
+/* HASH CRC-32:0x678971c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mbtoc16, __FORCELOCAL int __NOTHROW_NCX(__LIBDCA
 #endif /* !... */
 #if defined(__CRT_HAVE_mbtowc) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(,int,__NOTHROW_NCX,mbtoc32,(char32_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen),mbtowc,(__pwc,__str,__maxlen))
-#elif defined(__CRT_HAVE_DOS$mbtowc)
+#elif defined(__CRT_HAVE_KOS$mbtowc)
 __CREDIRECT_KOS(,int,__NOTHROW_NCX,mbtoc32,(char32_t *__restrict __pwc, char const *__restrict __str, size_t __maxlen),mbtowc,(__pwc,__str,__maxlen))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/stdlib/mbtowc.h>
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16tomb, __FORCELOCAL int __NOTHROW_NCX(__LIBDCA
 #endif /* !... */
 #if defined(__CRT_HAVE_wctomb) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(,int,__NOTHROW_NCX,c32tomb,(char *__str, char32_t __wc),wctomb,(__str,__wc))
-#elif defined(__CRT_HAVE_DOS$wctomb)
+#elif defined(__CRT_HAVE_KOS$wctomb)
 __CREDIRECT_KOS(,int,__NOTHROW_NCX,c32tomb,(char *__str, char32_t __wc),wctomb,(__str,__wc))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/stdlib/wctomb.h>
@@ -97,7 +97,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mbstoc16s, __FORCELOCAL __ATTR_NONNULL((1, 2)) s
 #endif /* !... */
 #if defined(__CRT_HAVE_mbstowcs) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,mbstoc32s,(char32_t *__restrict __dst, char const *__restrict __src, size_t __dstlen),mbstowcs,(__dst,__src,__dstlen))
-#elif defined(__CRT_HAVE_DOS$mbstowcs)
+#elif defined(__CRT_HAVE_KOS$mbstowcs)
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,mbstoc32s,(char32_t *__restrict __dst, char const *__restrict __src, size_t __dstlen),mbstowcs,(__dst,__src,__dstlen))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/stdlib/mbstowcs.h>
@@ -119,7 +119,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16stombs, __FORCELOCAL __ATTR_NONNULL((1, 2)) s
 #endif /* !... */
 #if defined(__CRT_HAVE_wcstombs) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c32stombs,(char *__restrict __dst, char32_t const *__restrict __src, size_t __dstlen),wcstombs,(__dst,__src,__dstlen))
-#elif defined(__CRT_HAVE_DOS$wcstombs)
+#elif defined(__CRT_HAVE_KOS$wcstombs)
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c32stombs,(char *__restrict __dst, char32_t const *__restrict __src, size_t __dstlen),wcstombs,(__dst,__src,__dstlen))
 #elif (__SIZEOF_WCHAR_T__ == 4)
 #include <local/stdlib/wcstombs.h>

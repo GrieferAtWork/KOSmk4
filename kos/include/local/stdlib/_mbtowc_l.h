@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e02312 */
+/* HASH CRC-32:0x7105f3a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,16 +27,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_mbtowc_defined 1
 #ifdef __CRT_HAVE_mbtowc
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_mbtowc,(__WCHAR_TYPE__ *__restrict __pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen),mbtowc,(__pwc,__str,__maxlen))
-#elif defined(__CRT_HAVE_DOS$mbtowc) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(,int,__NOTHROW_NCX,__localdep_mbtowc,(__WCHAR_TYPE__ *__restrict __pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen),mbtowc,(__pwc,__str,__maxlen))
-#elif defined(__CRT_HAVE_DOS$mbtowc) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(,int,__NOTHROW_NCX,__localdep_mbtowc,(__WCHAR_TYPE__ *__restrict __pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen),mbtowc,(__pwc,__str,__maxlen))
-#else /* ... */
+#else /* __CRT_HAVE_mbtowc */
 __NAMESPACE_LOCAL_END
 #include <local/stdlib/mbtowc.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_mbtowc __LIBC_LOCAL_NAME(mbtowc)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mbtowc */
 #endif /* !__local___localdep_mbtowc_defined */
 __LOCAL_LIBC(_mbtowc_l) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbtowc_l))(__WCHAR_TYPE__ *__dst, char const *__src, __SIZE_TYPE__ __srclen, __locale_t __locale) {

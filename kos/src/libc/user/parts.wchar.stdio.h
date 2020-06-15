@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x458ee4d2 */
+/* HASH CRC-32:0x42166dd2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,13 +30,13 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd__wremove)(char16_t const *filename);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wremove)(char16_t const *filename);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wremove)(char32_t const *filename);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd__wfopen)(char16_t const *filename, char16_t const *mode);
+INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd_wfopen)(char16_t const *filename, char16_t const *mode);
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBKCALL libc_wfopen)(char32_t const *filename, char32_t const *mode);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd__wfreopen)(char16_t const *filename, char16_t const *mode, FILE *stream);
+INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd_wfreopen)(char16_t const *filename, char16_t const *mode, FILE *stream);
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBKCALL libc_wfreopen)(char32_t const *filename, char32_t const *mode, FILE *stream);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd__wpopen)(char16_t const *command, char16_t const *mode);
+INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd_wpopen)(char16_t const *command, char16_t const *mode);
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBKCALL libc_wpopen)(char32_t const *command, char32_t const *mode);
 #endif /* !__KERNEL__ */
 

@@ -53,7 +53,7 @@ DEFINE_PUBLIC_ALIAS(DOS$wcstok, libd_wcstok_nosafe);
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory.wcstok") NONNULL((2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcstok_nosafe)(char16_t *string,
                                          char16_t const *__restrict delim) {
-	return libd_wcstok_s(string, delim, &wcstok_safe_ptr);
+	return libd_wcstok(string, delim, &wcstok_safe_ptr);
 }
 
 
@@ -71,16 +71,16 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.getc") NONNULL((1)) wint
 }
 /*[[[end:libc_fgetwc_unlocked]]]*/
 
-/*[[[head:libd__fgetwc_nolock,hash:CRC-32=0xa8e675a0]]]*/
+/*[[[head:libd_fgetwc_unlocked,hash:CRC-32=0xa084acc]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.getc") NONNULL((1)) wint_t
-(LIBDCALL libd__fgetwc_nolock)(FILE *__restrict stream) THROWS(...)
-/*[[[body:libd__fgetwc_nolock]]]*/
+(LIBDCALL libd_fgetwc_unlocked)(FILE *__restrict stream) THROWS(...)
+/*[[[body:libd_fgetwc_unlocked]]]*/
 {
 	wint_t result;
 	result = (wint_t)file_getc16(stream);
 	return result;
 }
-/*[[[end:libd__fgetwc_nolock]]]*/
+/*[[[end:libd_fgetwc_unlocked]]]*/
 
 /*[[[head:libc_fgetwc,hash:CRC-32=0xbe2e5d47]]]*/
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.getc") NONNULL((1)) wint_t
@@ -128,17 +128,17 @@ NOTHROW_NCX(LIBKCALL libc_ungetwc_unlocked)(wint_t ch,
 }
 /*[[[end:libc_ungetwc_unlocked]]]*/
 
-/*[[[head:libd__ungetwc_nolock,hash:CRC-32=0xef6a1e3f]]]*/
+/*[[[head:libd_ungetwc_unlocked,hash:CRC-32=0x7ea9b8df]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.putc") NONNULL((2)) wint_t
-NOTHROW_NCX(LIBDCALL libd__ungetwc_nolock)(wint_t ch,
-                                           FILE *__restrict stream)
-/*[[[body:libd__ungetwc_nolock]]]*/
+NOTHROW_NCX(LIBDCALL libd_ungetwc_unlocked)(wint_t ch,
+                                            FILE *__restrict stream)
+/*[[[body:libd_ungetwc_unlocked]]]*/
 {
 	wint_t result;
 	result = (wint_t)file_ungetc16(stream, (char16_t)ch);
 	return result;
 }
-/*[[[end:libd__ungetwc_nolock]]]*/
+/*[[[end:libd_ungetwc_unlocked]]]*/
 
 /*[[[head:libc_ungetwc,hash:CRC-32=0xad8ec30e]]]*/
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.putc") NONNULL((2)) wint_t
@@ -189,18 +189,18 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.putc") NONNULL((2)) win
 }
 /*[[[end:libc_fputwc_unlocked]]]*/
 
-/*[[[head:libd__fputwc_nolock,hash:CRC-32=0x950ae86f]]]*/
+/*[[[head:libd_fputwc_unlocked,hash:CRC-32=0xd773b947]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.putc") NONNULL((2)) wint_t
-(LIBDCALL libd__fputwc_nolock)(char16_t wc,
-                               FILE *__restrict stream) THROWS(...)
-/*[[[body:libd__fputwc_nolock]]]*/
+(LIBDCALL libd_fputwc_unlocked)(char16_t wc,
+                                FILE *__restrict stream) THROWS(...)
+/*[[[body:libd_fputwc_unlocked]]]*/
 {
 	wint_t result = (wint_t)wc;
 	if (file_print16(stream, &wc, 1) <= 0)
 		result = (wint_t)EOF16;
 	return result;
 }
-/*[[[end:libd__fputwc_nolock]]]*/
+/*[[[end:libd_fputwc_unlocked]]]*/
 
 /*[[[head:libc_fputwc,hash:CRC-32=0x599728ca]]]*/
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.putc") NONNULL((2)) wint_t
@@ -266,7 +266,7 @@ NOTHROW_NCX(LIBDCALL libd_open_wmemstream)(char16_t **bufloc,
 /*AUTO*/{
 	(void)bufloc;
 	(void)sizeloc;
-	CRT_UNIMPLEMENTED("open_wmemstream"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$open_wmemstream"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -308,7 +308,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR
 	(void)stream;
 	(void)format;
 	(void)args;
-	CRT_UNIMPLEMENTED("vfwscanf_unlocked"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$vfwscanf_unlocked"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -340,7 +340,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_L
 	(void)stream;
 	(void)format;
 	(void)args;
-	CRT_UNIMPLEMENTED("vfwscanf"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$vfwscanf"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -431,7 +431,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnrtombs)(char *dst,
 	(void)nwc;
 	(void)len;
 	(void)mbs;
-	CRT_UNIMPLEMENTED("wcsnrtombs"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$wcsnrtombs"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -491,7 +491,7 @@ NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *dst,
 	(void)nmc;
 	(void)len;
 	(void)mbs;
-	CRT_UNIMPLEMENTED("mbsnrtowcs"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$mbsnrtowcs"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -524,7 +524,7 @@ NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf,
 	(void)buf;
 	(void)bufsize;
 	(void)errno_value;
-	CRT_UNIMPLEMENTED("_wcserror_s"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$_wcserror_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -548,7 +548,7 @@ NOTHROW_NCX(LIBDCALL libd__wcserror)(int errno_value)
 /*[[[body:libd__wcserror]]]*/
 /*AUTO*/{
 	(void)errno_value;
-	CRT_UNIMPLEMENTED("_wcserror"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$_wcserror"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -572,7 +572,7 @@ NOTHROW_NCX(LIBDCALL libd___wcserror)(char16_t const *message)
 /*[[[body:libd___wcserror]]]*/
 /*AUTO*/{
 	(void)message;
-	CRT_UNIMPLEMENTED("__wcserror"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$__wcserror"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -604,7 +604,7 @@ NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf,
 	(void)buf;
 	(void)bufsize;
 	(void)message;
-	CRT_UNIMPLEMENTED("__wcserror_s"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$__wcserror_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -642,7 +642,7 @@ NOTHROW_NCX(LIBDCALL libd__wfsopen)(char16_t const *filename,
 	(void)filename;
 	(void)mode;
 	(void)sh_flag;
-	CRT_UNIMPLEMENTED("_wfsopen"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$_wfsopen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -670,7 +670,7 @@ NOTHROW_NCX(LIBDCALL libd__wfdopen)(fd_t fd,
 /*AUTO*/{
 	(void)fd;
 	(void)mode;
-	CRT_UNIMPLEMENTED("_wfdopen"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$_wfdopen"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -706,7 +706,7 @@ NOTHROW_NCX(LIBDCALL libd__wfopen_s)(FILE **pstream,
 	(void)pstream;
 	(void)filename;
 	(void)mode;
-	CRT_UNIMPLEMENTED("_wfopen_s"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$_wfopen_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -742,7 +742,7 @@ NOTHROW_NCX(LIBDCALL libd__wfreopen_s)(FILE **pstream,
 	(void)filename;
 	(void)mode;
 	(void)stream;
-	CRT_UNIMPLEMENTED("_wfreopen_s"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$_wfreopen_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -770,7 +770,7 @@ NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory,
 /*AUTO*/{
 	(void)directory;
 	(void)file_prefix;
-	CRT_UNIMPLEMENTED("_wtempnam"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$_wtempnam"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -802,7 +802,7 @@ NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst,
 /*AUTO*/{
 	(void)dst;
 	(void)wchar_count;
-	CRT_UNIMPLEMENTED("_wtmpnam_s"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$_wtmpnam_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -812,10 +812,12 @@ NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4a3f9231]]]*/
+/*[[[start:exports,hash:CRC-32=0x75e56266]]]*/
+DEFINE_PUBLIC_ALIAS(DOS$getwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(DOS$fgetwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(getwc, libc_fgetwc);
 DEFINE_PUBLIC_ALIAS(fgetwc, libc_fgetwc);
+DEFINE_PUBLIC_ALIAS(DOS$putwc, libd_fputwc);
 DEFINE_PUBLIC_ALIAS(DOS$fputwc, libd_fputwc);
 DEFINE_PUBLIC_ALIAS(putwc, libc_fputwc);
 DEFINE_PUBLIC_ALIAS(fputwc, libc_fputwc);
@@ -829,15 +831,18 @@ DEFINE_PUBLIC_ALIAS(DOS$wcsnrtombs, libd_wcsnrtombs);
 DEFINE_PUBLIC_ALIAS(wcsnrtombs, libc_wcsnrtombs);
 DEFINE_PUBLIC_ALIAS(DOS$open_wmemstream, libd_open_wmemstream);
 DEFINE_PUBLIC_ALIAS(open_wmemstream, libc_open_wmemstream);
-DEFINE_PUBLIC_ALIAS(DOS$_fgetwc_nolock, libd__fgetwc_nolock);
+DEFINE_PUBLIC_ALIAS(DOS$_fgetwc_nolock, libd_fgetwc_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$fgetwc_unlocked, libd_fgetwc_unlocked);
 DEFINE_PUBLIC_ALIAS(fgetwc_unlocked, libc_fgetwc_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$_fputwc_nolock, libd__fputwc_nolock);
+DEFINE_PUBLIC_ALIAS(DOS$_fputwc_nolock, libd_fputwc_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$fputwc_unlocked, libd_fputwc_unlocked);
 DEFINE_PUBLIC_ALIAS(fputwc_unlocked, libc_fputwc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$file_wprinter, libd_file_wprinter);
 DEFINE_PUBLIC_ALIAS(file_wprinter, libc_file_wprinter);
 DEFINE_PUBLIC_ALIAS(DOS$file_wprinter_unlocked, libd_file_wprinter_unlocked);
 DEFINE_PUBLIC_ALIAS(file_wprinter_unlocked, libc_file_wprinter_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$_ungetwc_nolock, libd__ungetwc_nolock);
+DEFINE_PUBLIC_ALIAS(DOS$_ungetwc_nolock, libd_ungetwc_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$ungetwc_unlocked, libd_ungetwc_unlocked);
 DEFINE_PUBLIC_ALIAS(ungetwc_unlocked, libc_ungetwc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$vfwscanf_unlocked, libd_vfwscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(vfwscanf_unlocked, libc_vfwscanf_unlocked);

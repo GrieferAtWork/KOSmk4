@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c5d595 */
+/* HASH CRC-32:0x8878b861 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_wcstombs_s_defined 1
 #ifdef __CRT_HAVE_wcstombs_s
 __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__errno_t,__NOTHROW_NCX,__localdep_wcstombs_s,(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __maxlen),wcstombs_s,(__presult,__buf,__buflen,__src,__maxlen))
-#elif defined(__CRT_HAVE_DOS$wcstombs_s) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2, 4)),__errno_t,__NOTHROW_NCX,__localdep_wcstombs_s,(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __maxlen),wcstombs_s,(__presult,__buf,__buflen,__src,__maxlen))
-#elif defined(__CRT_HAVE_DOS$wcstombs_s) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2, 4)),__errno_t,__NOTHROW_NCX,__localdep_wcstombs_s,(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __maxlen),wcstombs_s,(__presult,__buf,__buflen,__src,__maxlen))
-#else /* ... */
+#else /* __CRT_HAVE_wcstombs_s */
 __NAMESPACE_LOCAL_END
 #include <local/stdlib/wcstombs_s.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcstombs_s __LIBC_LOCAL_NAME(wcstombs_s)
-#endif /* !... */
+#endif /* !__CRT_HAVE_wcstombs_s */
 #endif /* !__local___localdep_wcstombs_s_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>

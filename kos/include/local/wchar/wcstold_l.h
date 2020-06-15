@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x471808c5 */
+/* HASH CRC-32:0xa852408 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,16 +27,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_wcstold_defined 1
 #ifdef __CRT_HAVE_wcstold
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_wcstold,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstold,(__nptr,__endptr))
-#elif defined(__CRT_HAVE_DOS$wcstold) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_wcstold,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstold,(__nptr,__endptr))
-#elif defined(__CRT_HAVE_DOS$wcstold) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_wcstold,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstold,(__nptr,__endptr))
-#else /* ... */
+#else /* __CRT_HAVE_wcstold */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcstold.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcstold __LIBC_LOCAL_NAME(wcstold)
-#endif /* !... */
+#endif /* !__CRT_HAVE_wcstold */
 #endif /* !__local___localdep_wcstold_defined */
 __LOCAL_LIBC(wcstold_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGDOUBLE
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstold_l))(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale) {

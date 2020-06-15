@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9b266ce */
+/* HASH CRC-32:0x9e35b66b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,20 +21,16 @@
 #ifndef __local_wspawnlpe_defined
 #define __local_wspawnlpe_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_wspawnvpe) || (defined(__CRT_HAVE_DOS$wspawnvpe) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wspawnvpe) && __SIZEOF_WCHAR_T__ == 2)
+#ifdef __CRT_HAVE_wspawnvpe
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wspawnvpe from parts.wchar.process */
 #ifndef __local___localdep_wspawnvpe_defined
 #define __local___localdep_wspawnvpe_defined 1
 #ifdef __CRT_HAVE_wspawnvpe
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvpe,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV, __TWENVP),wspawnvpe,(__mode,__file,___argv,___envp))
-#elif defined(__CRT_HAVE_DOS$wspawnvpe) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvpe,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV, __TWENVP),wspawnvpe,(__mode,__file,___argv,___envp))
-#elif defined(__CRT_HAVE_DOS$_wspawnvpe) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvpe,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV, __TWENVP),_wspawnvpe,(__mode,__file,___argv,___envp))
-#else /* ... */
+#else /* __CRT_HAVE_wspawnvpe */
 #undef __local___localdep_wspawnvpe_defined
-#endif /* !... */
+#endif /* !__CRT_HAVE_wspawnvpe */
 #endif /* !__local___localdep_wspawnvpe_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
@@ -48,7 +44,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wspawnlpe_defined 1
 #define __localdep_wspawnlpe __LIBC_LOCAL_NAME(wspawnlpe)
 #endif /* !__local___localdep_wspawnlpe_defined */
-#else /* __CRT_HAVE_wspawnvpe || (__CRT_HAVE_DOS$wspawnvpe && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$_wspawnvpe && __SIZEOF_WCHAR_T__ == 2) */
+#else /* __CRT_HAVE_wspawnvpe */
 #undef __local_wspawnlpe_defined
-#endif /* !__CRT_HAVE_wspawnvpe && (!__CRT_HAVE_DOS$wspawnvpe || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$_wspawnvpe || !__SIZEOF_WCHAR_T__ == 2) */
+#endif /* !__CRT_HAVE_wspawnvpe */
 #endif /* !__local_wspawnlpe_defined */

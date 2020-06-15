@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1967a0c5 */
+/* HASH CRC-32:0x5377d997 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,22 +30,12 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itow_s,(int __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_itow_s,(__val,__buf,__buflen,__radix))
-#elif defined(__CRT_HAVE_DOS$_itow_s) && __SIZEOF_WCHAR_T__ == 4
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itow_s,(int __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_itow_s,(__val,__buf,__buflen,__radix))
-#elif defined(__CRT_HAVE_DOS$_itow_s) && __SIZEOF_WCHAR_T__ == 2
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itow_s,(int __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_itow_s,(__val,__buf,__buflen,__radix))
-#else /* ... */
+#else /* __CRT_HAVE__itow_s */
 __NAMESPACE_LOCAL_END
 #include <local/stdlib/_itow_s.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep__itow_s __LIBC_LOCAL_NAME(_itow_s)
-#endif /* !... */
+#endif /* !__CRT_HAVE__itow_s */
 #endif /* !__local___localdep__itow_s_defined */
 __LOCAL_LIBC(_itow) __ATTR_NONNULL((2)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itow))(int __val, __WCHAR_TYPE__ *__buf, int __radix) {

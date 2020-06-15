@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79043527 */
+/* HASH CRC-32:0x37ae32d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,36 +21,18 @@
 #ifndef __local_wunlink_defined
 #define __local_wunlink_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wunlinkat) || (defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 2))
+#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wunlinkat from parts.wchar.unistd */
-#ifndef __local___localdep_wunlinkat_defined
+#if !defined(__local___localdep_wunlinkat_defined) && defined(__CRT_HAVE_wunlinkat)
 #define __local___localdep_wunlinkat_defined 1
-#ifdef __CRT_HAVE_wunlinkat
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
-#elif defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 4
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
-#elif defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 2
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
-#else /* ... */
-#undef __local___localdep_wunlinkat_defined
-#endif /* !... */
-#endif /* !__local___localdep_wunlinkat_defined */
+#endif /* !__local___localdep_wunlinkat_defined && __CRT_HAVE_wunlinkat */
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __LOCAL_LIBC(wunlink) __ATTR_NONNULL((1)) int
@@ -62,7 +44,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wunlink_defined 1
 #define __localdep_wunlink __LIBC_LOCAL_NAME(wunlink)
 #endif /* !__local___localdep_wunlink_defined */
-#else /* __CRT_AT_FDCWD && (__CRT_HAVE_wunlinkat || (__CRT_HAVE_DOS$wunlinkat && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$wunlinkat && __SIZEOF_WCHAR_T__ == 2)) */
+#else /* __CRT_AT_FDCWD && __CRT_HAVE_wunlinkat */
 #undef __local_wunlink_defined
-#endif /* !__CRT_AT_FDCWD || (!__CRT_HAVE_wunlinkat && (!__CRT_HAVE_DOS$wunlinkat || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$wunlinkat || !__SIZEOF_WCHAR_T__ == 2)) */
+#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_wunlinkat */
 #endif /* !__local_wunlink_defined */

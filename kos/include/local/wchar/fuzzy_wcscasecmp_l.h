@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9240aa5a */
+/* HASH CRC-32:0xf3a4a4b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,18 +21,14 @@
 #ifndef __local_fuzzy_wcscasecmp_l_defined
 #define __local_fuzzy_wcscasecmp_l_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_fuzzy_wmemcasecmp_l) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 2) || !defined(__NO_MALLOCA)
+#if defined(__CRT_HAVE_fuzzy_wmemcasecmp_l) || !defined(__NO_MALLOCA)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fuzzy_wmemcasecmp_l from wchar */
 #ifndef __local___localdep_fuzzy_wmemcasecmp_l_defined
 #define __local___localdep_fuzzy_wmemcasecmp_l_defined 1
 #ifdef __CRT_HAVE_fuzzy_wmemcasecmp_l
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcasecmp_l,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes, __locale_t __locale),fuzzy_wmemcasecmp_l,(__s1,__s1_bytes,__s2,__s2_bytes,__locale))
-#elif defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcasecmp_l,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes, __locale_t __locale),fuzzy_wmemcasecmp_l,(__s1,__s1_bytes,__s2,__s2_bytes,__locale))
-#elif defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcasecmp_l,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes, __locale_t __locale),fuzzy_wmemcasecmp_l,(__s1,__s1_bytes,__s2,__s2_bytes,__locale))
-#else /* ... */
+#else /* __CRT_HAVE_fuzzy_wmemcasecmp_l */
 __NAMESPACE_LOCAL_END
 #include <parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -44,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #else /* !__NO_MALLOCA */
 #undef __local___localdep_fuzzy_wmemcasecmp_l_defined
 #endif /* __NO_MALLOCA */
-#endif /* !... */
+#endif /* !__CRT_HAVE_fuzzy_wmemcasecmp_l */
 #endif /* !__local___localdep_fuzzy_wmemcasecmp_l_defined */
 /* Dependency: wcslen from wchar */
 #ifndef __local___localdep_wcslen_defined
@@ -52,19 +48,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcslen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
-#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 4
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
-#elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 2
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __string),wcslen,(__string))
-#else /* ... */
+#else /* __CRT_HAVE_wcslen */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 #define __localdep_wcslen __LIBC_LOCAL_NAME(wcslen)
-#endif /* !... */
+#endif /* !__CRT_HAVE_wcslen */
 #endif /* !__local___localdep_wcslen_defined */
 __LOCAL_LIBC(fuzzy_wcscasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wcscasecmp_l))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __locale_t __locale) {
@@ -75,7 +65,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_fuzzy_wcscasecmp_l_defined 1
 #define __localdep_fuzzy_wcscasecmp_l __LIBC_LOCAL_NAME(fuzzy_wcscasecmp_l)
 #endif /* !__local___localdep_fuzzy_wcscasecmp_l_defined */
-#else /* __CRT_HAVE_fuzzy_wmemcasecmp_l || (__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l && __SIZEOF_WCHAR_T__ == 2) || !__NO_MALLOCA */
+#else /* __CRT_HAVE_fuzzy_wmemcasecmp_l || !__NO_MALLOCA */
 #undef __local_fuzzy_wcscasecmp_l_defined
-#endif /* !__CRT_HAVE_fuzzy_wmemcasecmp_l && (!__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l || !__SIZEOF_WCHAR_T__ == 2) && __NO_MALLOCA */
+#endif /* !__CRT_HAVE_fuzzy_wmemcasecmp_l && __NO_MALLOCA */
 #endif /* !__local_fuzzy_wcscasecmp_l_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd07d5c7 */
+/* HASH CRC-32:0x11206e10 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -203,7 +203,7 @@ NOTHROW_NCX(LIBCCALL libc__wcsdup_dbg)(__WCHAR16_TYPE__ const *string,
 	(void)block_type;
 	(void)filename;
 	(void)line;
-	return (__WCHAR16_TYPE__ *)libd__wcsdup((char16_t const *)string);
+	return (__WCHAR16_TYPE__ *)libd_wcsdup((char16_t const *)string);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_MALLOC WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc__tempnam_dbg)(char const *dir_name,
@@ -280,7 +280,7 @@ NOTHROW_NCX(LIBCCALL libc__wgetcwd_dbg)(__WCHAR16_TYPE__ *buf,
 	(void)block_type;
 	(void)filename;
 	(void)line;
-	return (__WCHAR16_TYPE__ *)libd__wgetcwd((char16_t *)buf, buflen);
+	return (__WCHAR16_TYPE__ *)libd_wgetcwd((char16_t *)buf, buflen);
 }
 INTERN ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc__getdcwd_dbg)(int driveno,

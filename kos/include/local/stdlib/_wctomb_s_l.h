@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6384fa73 */
+/* HASH CRC-32:0xb137899f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_wctomb_s_defined 1
 #ifdef __CRT_HAVE_wctomb_s
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_wctomb_s,(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ __wc),wctomb_s,(__presult,__buf,__buflen,__wc))
-#elif defined(__CRT_HAVE_DOS$wctomb_s) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_wctomb_s,(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ __wc),wctomb_s,(__presult,__buf,__buflen,__wc))
-#elif defined(__CRT_HAVE_DOS$wctomb_s) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_wctomb_s,(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ __wc),wctomb_s,(__presult,__buf,__buflen,__wc))
-#else /* ... */
+#else /* __CRT_HAVE_wctomb_s */
 __NAMESPACE_LOCAL_END
 #include <local/stdlib/wctomb_s.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wctomb_s __LIBC_LOCAL_NAME(wctomb_s)
-#endif /* !... */
+#endif /* !__CRT_HAVE_wctomb_s */
 #endif /* !__local___localdep_wctomb_s_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>

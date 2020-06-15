@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf518d673 */
+/* HASH CRC-32:0x9d2728f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoimax)(char16_t const *__restrict nptr,
 #if __SIZEOF_INTMAX_T__ <= 4
 	return (intmax_t)libd_wcsto32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (intmax_t)libd__wcstoi64(nptr, endptr, base);
+	return (intmax_t)libd_wcsto64(nptr, endptr, base);
 #endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) intmax_t
@@ -90,7 +90,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoumax)(char16_t const *__restrict nptr,
 #if __SIZEOF_INTMAX_T__ <= 4
 	return (uintmax_t)libd_wcstou32(nptr, endptr, base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (uintmax_t)libd__wcstoui64(nptr, endptr, base);
+	return (uintmax_t)libd_wcstou64(nptr, endptr, base);
 #endif /* !(__SIZEOF_INTMAX_T__ <= 4) */
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
@@ -120,10 +120,10 @@ NOTHROW_NCX(LIBCCALL libc_strtoumax_l)(char const *__restrict nptr,
 	return libc_strtoumax(nptr, endptr, base);
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) intmax_t
-NOTHROW_NCX(LIBDCALL libd__wcstoimax_l)(char16_t const *__restrict nptr,
-                                        char16_t **endptr,
-                                        int base,
-                                        locale_t locale) {
+NOTHROW_NCX(LIBDCALL libd_wcstoimax_l)(char16_t const *__restrict nptr,
+                                       char16_t **endptr,
+                                       int base,
+                                       locale_t locale) {
 	(void)locale;
 	return libd_wcstoimax(nptr, endptr, base);
 }
@@ -136,10 +136,10 @@ NOTHROW_NCX(LIBKCALL libc_wcstoimax_l)(char32_t const *__restrict nptr,
 	return libc_wcstoimax(nptr, endptr, base);
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uintmax_t
-NOTHROW_NCX(LIBDCALL libd__wcstoumax_l)(char16_t const *__restrict nptr,
-                                        char16_t **endptr,
-                                        int base,
-                                        locale_t locale) {
+NOTHROW_NCX(LIBDCALL libd_wcstoumax_l)(char16_t const *__restrict nptr,
+                                       char16_t **endptr,
+                                       int base,
+                                       locale_t locale) {
 	(void)locale;
 	return libd_wcstoumax(nptr, endptr, base);
 }
@@ -168,9 +168,11 @@ DEFINE_PUBLIC_ALIAS(_strtoimax_l, libc_strtoimax_l);
 DEFINE_PUBLIC_ALIAS(strtoimax_l, libc_strtoimax_l);
 DEFINE_PUBLIC_ALIAS(_strtoumax_l, libc_strtoumax_l);
 DEFINE_PUBLIC_ALIAS(strtoumax_l, libc_strtoumax_l);
-DEFINE_PUBLIC_ALIAS(DOS$_wcstoimax_l, libd__wcstoimax_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wcstoimax_l, libd_wcstoimax_l);
+DEFINE_PUBLIC_ALIAS(DOS$wcstoimax_l, libd_wcstoimax_l);
 DEFINE_PUBLIC_ALIAS(wcstoimax_l, libc_wcstoimax_l);
-DEFINE_PUBLIC_ALIAS(DOS$_wcstoumax_l, libd__wcstoumax_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wcstoumax_l, libd_wcstoumax_l);
+DEFINE_PUBLIC_ALIAS(DOS$wcstoumax_l, libd_wcstoumax_l);
 DEFINE_PUBLIC_ALIAS(wcstoumax_l, libc_wcstoumax_l);
 #endif /* !__KERNEL__ */
 

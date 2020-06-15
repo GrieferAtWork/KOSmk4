@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e136d5e */
+/* HASH CRC-32:0x9e27e999 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,31 +21,17 @@
 #ifndef __local_waccess_defined
 #define __local_waccess_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wfaccessat) || (defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 2))
+#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wfaccessat)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wfaccessat from parts.wchar.unistd */
-#ifndef __local___localdep_wfaccessat_defined
+#if !defined(__local___localdep_wfaccessat_defined) && defined(__CRT_HAVE_wfaccessat)
 #define __local___localdep_wfaccessat_defined 1
-#ifdef __CRT_HAVE_wfaccessat
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfaccessat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
-#elif defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 4
-/* >> faccessat(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfaccessat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
-#elif defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 2
-/* >> faccessat(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfaccessat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
-#else /* ... */
-#undef __local___localdep_wfaccessat_defined
-#endif /* !... */
-#endif /* !__local___localdep_wfaccessat_defined */
+#endif /* !__local___localdep_wfaccessat_defined && __CRT_HAVE_wfaccessat */
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
@@ -58,7 +44,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_waccess_defined 1
 #define __localdep_waccess __LIBC_LOCAL_NAME(waccess)
 #endif /* !__local___localdep_waccess_defined */
-#else /* __CRT_AT_FDCWD && (__CRT_HAVE_wfaccessat || (__CRT_HAVE_DOS$wfaccessat && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$wfaccessat && __SIZEOF_WCHAR_T__ == 2)) */
+#else /* __CRT_AT_FDCWD && __CRT_HAVE_wfaccessat */
 #undef __local_waccess_defined
-#endif /* !__CRT_AT_FDCWD || (!__CRT_HAVE_wfaccessat && (!__CRT_HAVE_DOS$wfaccessat || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$wfaccessat || !__SIZEOF_WCHAR_T__ == 2)) */
+#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_wfaccessat */
 #endif /* !__local_waccess_defined */

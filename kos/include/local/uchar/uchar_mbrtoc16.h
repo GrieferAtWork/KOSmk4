@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b05c512 */
+/* HASH CRC-32:0x5a2f9f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_mbrtoc32_defined
-#define __local_mbrtoc32_defined 1
+#ifndef __local_uchar_mbrtoc16_defined
+#define __local_uchar_mbrtoc16_defined 1
 #include <__crt.h>
 #include <bits/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -64,8 +64,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(mbrtoc32) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(mbrtoc32))(__CHAR32_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs) {
+__LOCAL_LIBC(uchar_mbrtoc16) __SIZE_TYPE__
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(uchar_mbrtoc16))(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs) {
 	__SIZE_TYPE__ __error;
 	if (!__mbs) {
 		static __mbstate_t __mbrtowc_ps = __MBSTATE_INIT;
@@ -77,11 +77,11 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(mbrtoc32))(__CHAR32_TYPE__ *__pwc, ch
 	}
 	if (!__maxlen || !*__str)
 		return 0;
-#if 4 == 2
+#if 2 == 2
 	__error = __localdep_unicode_c8toc16((__CHAR16_TYPE__ *)__pwc, __str, __maxlen, __mbs);
-#else /* 4 == 2 */
+#else /* 2 == 2 */
 	__error = __localdep_unicode_c8toc32((__CHAR32_TYPE__ *)__pwc, __str, __maxlen, __mbs);
-#endif /* !(4 == 2) */
+#endif /* !(2 == 2) */
 #ifdef EILSEQ
 	if (__error == (__SIZE_TYPE__)-1)
 		__libc_seterrno(__EILSEQ);
@@ -89,8 +89,8 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(mbrtoc32))(__CHAR32_TYPE__ *__pwc, ch
 	return __error;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_mbrtoc32_defined
-#define __local___localdep_mbrtoc32_defined 1
-#define __localdep_mbrtoc32 __LIBC_LOCAL_NAME(mbrtoc32)
-#endif /* !__local___localdep_mbrtoc32_defined */
-#endif /* !__local_mbrtoc32_defined */
+#ifndef __local___localdep_uchar_mbrtoc16_defined
+#define __local___localdep_uchar_mbrtoc16_defined 1
+#define __localdep_uchar_mbrtoc16 __LIBC_LOCAL_NAME(uchar_mbrtoc16)
+#endif /* !__local___localdep_uchar_mbrtoc16_defined */
+#endif /* !__local_uchar_mbrtoc16_defined */

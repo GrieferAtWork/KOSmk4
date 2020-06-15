@@ -53,83 +53,6 @@ import Function from .cheaders;
  * >> } */
 
 
-/* How [[wchar]] and associated %{uchar} functions are handled:
- * >> [[wchar, wunused]]
- * >> size_t wcslen([[nonnull]] wchar_t const *__restrict str) {
- * >> 	size_t result = 0;
- * >> 	while (str[result])
- * >> 		++result;
- * >> 	return result;
- * >> }
- * >>
- * >> c16len(*) %{uchar}
- * >> c32len(*) %{uchar}
- * ============================================ EXPANDED ============================================
- * >> [[if(defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 2), raw_alias(DOS$wcslen)]]
- * >> [[if(defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 4), raw_alias(KOS$wcslen)]]
- * >> [[wunused]]
- * >> size_t wcslen([[nonnull]] wchar_t const *__restrict str) {
- * >> 	size_t result = 0;
- * >> 	while (str[result])
- * >> 		++result;
- * >> 	return result;
- * >> }
- * >>
- * >>
- * >> [[if(__SIZEOF_WCHAR_T__ == 2), alias(wcslen), alias(DOS$wcslen)]]
- * >> [[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(wcslen), nocrt, wunused]]
- * >> size_t c16len([[nonnull]] char16_t const *__restrict str) {
- * >> 	size_t result = 0;
- * >> 	while (str[result])
- * >> 		++result;
- * >> 	return result;
- * >> }
- * >>
- * >> [[if(__SIZEOF_WCHAR_T__ == 4), alias(wcslen), alias(KOS$wcslen)]]
- * >> [[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(wcslen), nocrt, wunused]]
- * >> size_t c32len([[nonnull]] char32_t const *__restrict str) {
- * >> 	size_t result = 0;
- * >> 	while (str[result])
- * >> 		++result;
- * >> 	return result;
- * >> }
- * ============================================ HEADER ============================================
- * >> #ifdef __CRT_HAVE_wcslen
- * >> __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,wcslen,(wchar_t const *__restrict __str),(__str))
- * >> #elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 2
- * >> __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,wcslen,(wchar_t const *__restrict __str),wcslen,(__str))
- * >> #elif defined(__CRT_HAVE_DOS$wcslen) && __SIZEOF_WCHAR_T__ == 4
- * >> __CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,wcslen,(wchar_t const *__restrict __str),wcslen,(__str))
- * >> #else // ...
- * >> #include <local/wchar/wcslen.h>
- * >> __NAMESPACE_LOCAL_USING_OR_IMPL(wcslen, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) size_t (__LIBCCALL wcslen)(wchar_t const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))(str); })
- * >> #endif // !...
- * >>
- * >> #if defined(__CRT_HAVE_wcslen) && (__SIZEOF_WCHAR_T__ == 2)
- * >> __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,c16len,(char16_t const *__restrict __str),wcslen,(__str))
- * >> #elif defined(__CRT_HAVE_DOS$wcslen)
- * >> __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,c16len,(char16_t const *__restrict __str),wcslen,(__str))
- * >> #elif __SIZEOF_WCHAR_T__ == 2
- * >> #include <local/wchar/wcslen.h>
- * >> __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) size_t (__LIBCCALL c16len)(char16_t const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((wchar_t const *__restrict)str); }
- * >> #else // ...
- * >> #include <local/wchar/c16len.h>
- * >> __NAMESPACE_LOCAL_USING_OR_IMPL(c16len, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) size_t (__LIBCCALL c16len)(char16_t const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16len))(str); })
- * >> #endif // !...
- * >>
- * >> #if defined(__CRT_HAVE_wcslen) && (__SIZEOF_WCHAR_T__ == 4)
- * >> __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,c32len,(char32_t const *__restrict __str),wcslen,(__str))
- * >> #elif defined(__CRT_HAVE_DOS$wcslen)
- * >> __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,,c32len,(char32_t const *__restrict __str),wcslen,(__str))
- * >> #elif __SIZEOF_WCHAR_T__ == 4
- * >> #include <local/wchar/wcslen.h>
- * >> __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) size_t (__LIBCCALL c32len)(char32_t const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((wchar_t const *__restrict)str); }
- * >> #else // ...
- * >> #include <local/wchar/c32len.h>
- * >> __NAMESPACE_LOCAL_USING_OR_IMPL(c32len, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) size_t (__LIBCCALL c32len)(char32_t const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32len))(str); })
- * >> #endif // !...
- */
-
 
 global final CXX_SYSTEM_HEADER_START = "#ifndef __CXX_SYSTEM_HEADER\n";
 global final CXX_SYSTEM_HEADER_END   = "#endif /* !__CXX_SYSTEM_HEADER */\n";
@@ -646,7 +569,7 @@ again_parse_annotations:
 						local nonNullArgs;
 						if (a.startswith("NONNULL((") && a.endswith("))")) {
 							nonNullArgs = a[9:-2];
-						} else if (a.startswith("__ATTR_NONNULL((") && a.endswith("))")) {
+						} else if (a.startswith("NONNULL((") && a.endswith("))")) {
 							nonNullArgs = a[16:-2];
 						} else {
 							continue;
@@ -869,8 +792,7 @@ class FunctionFeatures {
 	public member noAutoDependencyScanning: bool = false;            /* [[no_]auto_dependency_scanning] Automatically scan for dependencies */
 
 	/* WCHAR function features */
-	public member wchar: bool = false;         /* [[no_]wchar]       Expose and implement as a wchar-function */
-	public member wchar_noAlias: bool = false; /* [[no_]wchar_alias] Prevent duplication of function aliases */
+	public member wchar: bool = false; /* [[no_]wchar]       Expose and implement as a wchar-function */
 
 	/* CRT Features */
 	public member crt_name: UserString | string | none = none;       /* [[default_]crt_name(...)]    Symbol name override for the default CRT function binding */
@@ -880,7 +802,6 @@ class FunctionFeatures {
 	public member crt_userimpl: bool = false;                        /* [[no_]userimpl]              Prevent implementation in libc/auto and always use libc/user */
 	public member crt_kosSection: UserString | string | none = none; /* [kos_section(...)]           Section name for the KOS implementation */
 	public member crt_dosSection: UserString | string | none = none; /* [dos_section(...)]           Section name for the DOS implementation (if @wchar) */
-	public member crt_dosname: UserString | string | none = none;    /* [[default_]crt_dosname(...)] Same as @crt_name, but only for the DOS variant */
 	public member crt_kosImplRequires: UserString | string = "1";    /* [crt_kos_impl_requires(...)] Condition to meet for auto implementation (does not affect declaration; e.g. `!defined(LIBC_ARCH_HAVE_MEMCHR)') */
 	public member crt_dosImplRequires: UserString | string = "1";    /* [crt_dos_impl_requires(...)] Same as `crt_kosImplRequires', but for the DOS implementation (if @wchar) */
 
@@ -962,10 +883,7 @@ class FunctionFeatures {
 			"default_exposed_name"        : ("exposedName", none),
 			"wchar"                       : ("wchar", true),
 			"no_wchar"                    : ("wchar", false),
-			"wchar_alias"                 : ("wchar_noAlias", false),
-			"no_wchar_alias"              : ("wchar_noAlias", true),
 			"default_crt_name"            : ("crt_name", none),
-			"default_dosname"             : ("crt_dosname", none),
 			"crt_impl"                    : ("crt_noImpl", false),
 			"no_crt_impl"                 : ("crt_noImpl", true),
 			"crt_self_import"             : ("crt_noSelfImport", false),
@@ -1223,15 +1141,6 @@ class FunctionFeatures {
 			self.skip(")");
 			break;
 
-		case "crt_dosname":
-			if (ppCond !is none)
-				goto err_unexpected_if;
-			self.next();
-			self.skip("(");
-			crt_dosname = parseCStringOrKeyword(self);
-			self.skip(")");
-			break;
-
 		case "crt_impl_requires":
 		case "crt_kos_impl_requires":
 			if (ppCond !is none)
@@ -1381,8 +1290,6 @@ err_unexpected_if:
 			return "[no_]dos_section";
 		if (crt_kosSection !== defaultFeatures.crt_kosSection)
 			return "[no_]kos_section";
-		if (crt_dosname !== defaultFeatures.crt_dosname)
-			return "[default_]dosname";
 		if (crt_dosImplRequires !== defaultFeatures.crt_dosImplRequires)
 			return "[no_]crt_kos_impl_requires";
 		if (crt_kosImplRequires !== defaultFeatures.crt_kosImplRequires)
@@ -2313,9 +2220,7 @@ function loadSystemHeaderDefinitions(
 		local current = Function(originalSystemHeaderName: headerName);
 		local currentPrototype = FunctionPrototype(nothrow: DEFAULT_NOTHROW);
 		local currentPrototypes = [("1", { currentPrototype })];
-		local currentLibraryFunction = LibraryFunction(
-			originalSystemHeaderName: headerName,
-			ppCond: DEFAULT_LIBFUN_COND);
+		local currentKosLibraryFunction: LibraryFunction = none;
 		local currentDosLibraryFunction: LibraryFunction = none;
 		/* # of leading entires in @current.bindings that should appear before the self-binding */
 		local numPreferredBindings = 0;
@@ -2485,32 +2390,35 @@ again_parse_annotations:
 					self.skip(")");
 					break;
 
-				case "crt_intern_alias":
-				case "crt_intern_kos_alias": {
-					self.next();
-					self.skip("(");
-					currentLibraryFunction.bindings.append(
-						LibraryFunctionBinding(
-							ppCond:  currentConditions !is none ? currentConditions : "1",
-							binding: parseCStringOrKeyword(self)));
-					self.skip(")");
-				}	break;
-
-				case "crt_intern_dos_alias": {
-					self.next();
-					self.skip("(");
-					currentLibraryFunction.bindings.append(
-						LibraryFunctionBinding(
-							ppCond:  currentConditions !is none ? currentConditions : "1",
-							binding: parseCStringOrKeyword(self)));
-					self.skip(")");
-				}	break;
-
 				case "export_alias":
+				case "dos_export_alias":
+				case "kos_export_alias":
 				case "export_raw_alias":
+				case "dos_export_raw_alias":
+				case "kos_export_raw_alias":
 				case "preferred_export_alias":
-				case "preferred_export_raw_alias": {
+				case "preferred_dos_export_alias":
+				case "preferred_kos_export_alias":
+				case "preferred_export_raw_alias":
+				case "preferred_dos_export_raw_alias":
+				case "preferred_kos_export_raw_alias": {
 					local mode = tok;
+					local libFuncs: {LibraryFunction...};
+					if ("kos_" in mode) {
+						if (currentKosLibraryFunction is none)
+							currentKosLibraryFunction = LibraryFunction();
+						libFuncs = { currentKosLibraryFunction };
+					} else if ("dos_" in mode) {
+						if (currentDosLibraryFunction is none)
+							currentDosLibraryFunction = LibraryFunction();
+						libFuncs = { currentDosLibraryFunction };
+					} else {
+						if (currentDosLibraryFunction is none)
+							currentDosLibraryFunction = LibraryFunction();
+						if (currentKosLibraryFunction is none)
+							currentKosLibraryFunction = LibraryFunction();
+						libFuncs = { currentKosLibraryFunction, currentDosLibraryFunction };
+					}
 					self.next();
 					tok = self.skip("(");
 					while (tok !in ["", ")"]) {
@@ -2535,11 +2443,16 @@ again_parse_annotations:
 						} else {
 							current.bindings.append(binding);
 						}
-						currentLibraryFunction.exportSymbolNames.append((
-							currentConditions is none
-								? "1"
-								: currentConditions,
-							tok));
+						for (local lf: libFuncs) {
+							local usedAsmname = tok;
+							if (lf === currentDosLibraryFunction && #libFuncs > 1)
+								usedAsmname = "DOS$" + tok;
+							lf.exportSymbolNames.append((
+								currentConditions is none
+									? "1"
+									: currentConditions,
+								usedAsmname));
+						}
 						tok = self.next();
 						if (tok != ",")
 							break;
@@ -2550,6 +2463,8 @@ again_parse_annotations:
 
 				case "export_as":
 				case "kos_export_as":
+				case "dos_export_as": {
+					local mode = tok;
 					self.next();
 					tok = self.skip("(");
 					while (tok !in ["", ")"]) {
@@ -2559,45 +2474,33 @@ again_parse_annotations:
 							self.err("Expected string or keyword for [export_as(...)], but got {!r}"
 								.format({ tok }));
 						}
-						currentLibraryFunction.exportSymbolNames.append((
-							currentConditions !is none
-								? currentConditions
-								: "1",
-							tok));
-						tok = self.next();
-						if (tok != ",")
-							break;
-						tok = self.next();
-					}
-					self.skip(")");
-					break;
-
-				case "dos_export_as":
-					self.next();
-					tok = self.skip("(");
-					if (currentDosLibraryFunction is none) {
-						currentDosLibraryFunction = LibraryFunction(
-							ppCond: currentLibraryFunction.ppCond);
-					}
-					while (tok !in ["", ")"]) {
-						if (isCString(tok))
-							tok = tok.decode("c-escape");
-						else if (!tok.issymbol()) {
-							self.err("Expected string or keyword for [export_as(...)], but got {!r}"
-								.format({ tok }));
+						if (mode != "dos_export_as") {
+							if (currentKosLibraryFunction is none)
+								currentKosLibraryFunction = LibraryFunction();
+							currentKosLibraryFunction.exportSymbolNames.append((
+								currentConditions !is none
+									? currentConditions
+									: "1",
+								tok));
 						}
-						currentDosLibraryFunction.exportSymbolNames.append((
-							currentConditions !is none
-								? currentConditions
-								: "1",
-							tok));
+						if (mode != "kos_export_as") {
+							if (mode == "export_as")
+								tok = "DOS$" + tok;
+							if (currentDosLibraryFunction is none)
+								currentDosLibraryFunction = LibraryFunction();
+							currentDosLibraryFunction.exportSymbolNames.append((
+								currentConditions !is none
+									? currentConditions
+									: "1",
+								tok));
+						}
 						tok = self.next();
 						if (tok != ",")
 							break;
 						tok = self.next();
 					}
 					self.skip(")");
-					break;
+				}	break;
 
 				case "alias":
 				case "raw_alias":
@@ -2735,9 +2638,9 @@ again_parse_annotations:
 					 * >> ]] strlen(char const *__restrict str);
 					 * HEADER:
 					 * >> #if __has_builtin(__builtin_strlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strlen)
-					 * >> __CEIDECLARE(,size_t,__NOTHROW_NCX,strlen,(char const *__restrict __str),{ return __builtin_strlen(__str); })
+					 * >> __CEIDECLARE(,size_t,NOTHROW_NCX,strlen,(char const *__restrict __str),{ return __builtin_strlen(__str); })
 					 * >> #elif defined(__CRT_HAVE_strlen)
-					 * >> __CDECLARE(,size_t,__NOTHROW_NCX,strlen,(char const *__restrict __str),(__str))
+					 * >> __CDECLARE(,size_t,NOTHROW_NCX,strlen,(char const *__restrict __str),(__str))
 					 * >> #endif // ...
 					 */
 					local builtinStart: int = self.tokStart;
@@ -2826,6 +2729,26 @@ again_parse_annotations:
 					++numPreferredBindings;
 				}	break;
 
+				case "crt_intern_kos_alias":
+				case "crt_intern_dos_alias": {
+					self.next();
+					self.skip("(");
+					local lfun: LibraryFunction;
+					if (tok == "crt_intern_kos_alias") {
+						if (currentKosLibraryFunction is none)
+							currentKosLibraryFunction = LibraryFunction();
+						lfun = currentKosLibraryFunction;
+					} else {
+						if (currentDosLibraryFunction is none)
+							currentDosLibraryFunction = LibraryFunction();
+						lfun = currentDosLibraryFunction;
+					}
+					lfun.bindings.append(
+						LibraryFunctionBinding(
+							ppCond:  currentConditions !is none ? currentConditions : "1",
+							binding: parseCStringOrKeyword(self)));
+					self.skip(")");
+				}	break;
 
 				{
 					local wholeCond;
@@ -2889,7 +2812,9 @@ again_parse_annotations:
 						wholeCond    = currentConditions;
 					}
 do_handle_alt_variant_of:
-					currentLibraryFunction.bindings.append(
+					if (currentKosLibraryFunction is none)
+						currentKosLibraryFunction = LibraryFunction();
+					currentKosLibraryFunction.bindings.append(
 						LibraryFunctionBinding(
 							ppCond:  wholeCond,
 							binding: "libc_" + assemblyName));
@@ -2915,14 +2840,18 @@ do_handle_alt_variant_of:
 					 */
 					if (currentConditions !is none)
 						goto illegal_annotation_with_condition;
-					if (currentDosLibraryFunction.ppCond === currentLibraryFunction.ppCond)
-						currentDosLibraryFunction.ppCond = "1";
-					currentLibraryFunction.ppCond = "1";
+					if (currentDosLibraryFunction is none)
+						currentDosLibraryFunction = LibraryFunction();
+					if (currentKosLibraryFunction is none)
+						currentKosLibraryFunction = LibraryFunction();
+					currentDosLibraryFunction.ppCond = "1";
+					currentKosLibraryFunction.ppCond = "1";
 					self.next();
 					break;
 
 				case "crt_impl_if":
 				case "crt_kos_impl_if":
+				case "crt_dos_impl_if": {
 					/* >> [[crt_impl_if(!defined(LIBC_ARCH_HAVE_MEMCPY))]]
 					 * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
 					 * Specify a preprocessor condition that must be met for the function
@@ -2931,30 +2860,19 @@ do_handle_alt_variant_of:
 						goto illegal_annotation_with_condition;
 					self.next();
 					self.skip("(");
-					{
-						local newCond = parseCStringOrAllUntilRParen(self);
-						if (tok == "crt_impl_if" &&
-						    currentDosLibraryFunction.ppCond === currentLibraryFunction.ppCond)
-							currentDosLibraryFunction.ppCond = newCond;
-						currentLibraryFunction.ppCond = newCond;
+					local newCond = parseCStringOrAllUntilRParen(self);
+					if (tok != "crt_dos_impl_if") {
+						if (currentKosLibraryFunction is none)
+							currentKosLibraryFunction = LibraryFunction();
+						currentKosLibraryFunction.ppCond = newCond;
+					}
+					if (tok != "crt_kos_impl_if") {
+						if (currentDosLibraryFunction is none)
+							currentDosLibraryFunction = LibraryFunction();
+						currentDosLibraryFunction.ppCond = newCond;
 					}
 					self.skip(")");
-					break;
-
-				case "crt_dos_impl_if":
-					/* >> [[crt_dos_impl_if(!defined(LIBC_ARCH_HAVE_C16SLEN))]]
-					 * >> [[crt_kos_impl_if(!defined(LIBC_ARCH_HAVE_C32SLEN))]]
-					 * >> size_t wcslen(wchar_t const *str);
-					 * Same as crt_impl_if, but for the dos variant of a wchar-function. */
-					if (currentConditions !is none)
-						goto illegal_annotation_with_condition;
-					self.next();
-					self.skip("(");
-					if (currentDosLibraryFunction is none)
-						currentDosLibraryFunction = LibraryFunction();
-					currentDosLibraryFunction.ppCond = parseCStringOrAllUntilRParen(self);
-					self.skip(")");
-					break;
+				}	break;
 
 				default:
 					if (isCString(tok)) {
@@ -3092,120 +3010,22 @@ again_skip_annotation_rbracket:
 			if (currentFeatures.crt_kosSection != context.defaultFeatures.crt_kosSection ||
 			    currentFeatures.crt_dosSection != context.defaultFeatures.crt_dosSection) {
 				self.errAt(currentNameTokStart,
-					"[section({!r})] used with [nocrt] or [crt_noImpl]"
+					"[section({!r})] used with [nocrt] or [crt_no_impl]"
 					.format({ currentFeatures.crt_kosSection }));
 			}
-			if (currentLibraryFunction.exportSymbolNames) {
+			if (currentKosLibraryFunction.exportSymbolNames ||
+			    currentDosLibraryFunction.exportSymbolNames) {
 				self.errAt(currentNameTokStart,
-					"[export_as(...)] used with [nocrt] or [crt_noImpl]");
+					"[export_as(...)] used with [nocrt] or [crt_no_impl]");
 			}
 		}
 
-		if (currentFeatures.wchar) {
-			if (!currentFeatures.wchar_noAlias) {
-				/* For every assembly-binding, create 2 additional bindings:
-				 * >> [[if(COND), alias(NAME)]]
-				 * Extend by:
-				 * >> [[if(COND && __SIZEOF_WCHAR_T__ == 2), alias(DOS$NAME)]]
-				 * >> [[if(COND && __SIZEOF_WCHAR_T__ == 4), alias(KOS$NAME)]] */
-				for (local i = 0; i < #current.bindings;) {
-					local bind = current.bindings[i];
-					if (bind is Callable) {
-						++i;
-						continue;
-					}
-					local symbolName = bind.binding;
-					if (symbolName !is string && symbolName !is UserString) {
-						++i;
-						continue;
-					}
-					/* Don't alias certain objects based on their binding conditions
-					 * XXX: This is imprecise, but will work for now!
-					 *      In a perfect world, we would have to check if:
-					 * >> oldCond = optimize(bind.ppCond);
-					 * >> newCond16 = optimize("(" + bind.ppCond + ")&&(__SIZEOF_WCHAR_T__==2)");
-					 * >> newCond32 = optimize("(" + bind.ppCond + ")&&(__SIZEOF_WCHAR_T__==4)");
-					 * >> shouldEmit16 = newCond16 != "0" && newCond16 != oldCond;
-					 * >> shouldEmit32 = newCond32 != "0" && newCond32 != oldCond;
-					 * Such that we don't emit the alias if:
-					 *   - The resulting condition becomes impossible
-					 *     -> e.g.: "__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_WCHAR_T__ == 2"
-					 *              optimized to:
-					 *              "0"
-					 *   - The resulting condition doesn't differ from the old condition
-					 *     -> e.g.: "__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_WCHAR_T__ == 2"
-					 *              optimized to:
-					 *              "__SIZEOF_WCHAR_T__ == 2"
-					 *              With wouldn't differ from @oldCond
-					 *
-					 * However, since this would require _a_ _very_ _smart_ optimizer to do
-					 * the job for us, this isn't actually feasable, so we simply skip doing
-					 * the binding if the old condition already references "__SIZEOF_WCHAR_T__"
-					 */
-					if (bind.ppCond && "__SIZEOF_WCHAR_T__" in str(bind.ppCond)) {
-						++i;
-						continue;
-					}
-					symbolName = str symbolName;
-					local dosSymbolName = symbolName;
-					if (currentFeatures.crt_dosname !is none) {
-						local mySymbolName = currentFeatures.crt_name;
-						if (mySymbolName is none)
-							mySymbolName = currentName;
-						if (dosSymbolName == mySymbolName)
-							dosSymbolName = currentFeatures.crt_dosname;
-					}
-					dosSymbolName = "DOS$" + dosSymbolName;
-					local kosSymbolName = "KOS$" + symbolName;
-					local cDosPrototypes = Cell();
-					local cKosPrototypes = Cell();
-					local dosBinding = FunctionBinding(
-						ppCond: "({}) && __SIZEOF_WCHAR_T__ == 2".format({
-							replaceCrtHaveFromPreprocessorCondition(
-								bind.ppCond, symbolName, dosSymbolName)
-						}),
-						ppCondPrefix: bind.ppCondPrefix,
-						prototypes:   []{
-							if (!cDosPrototypes) {
-								local result = replaceWcharPrototypesShallow(
-									bind.prototypes, WCHAR_REPLACEMENT_CHAR16);
-								cDosPrototypes.value = result;
-								return result;
-							}
-							return cDosPrototypes.value;
-						},
-						binding:      dosSymbolName);
-					local kosBinding = FunctionBinding(
-						ppCond: "({}) && __SIZEOF_WCHAR_T__ == 4".format({
-							replaceCrtHaveFromPreprocessorCondition(
-								bind.ppCond, symbolName, kosSymbolName)
-						}),
-						ppCondPrefix: bind.ppCondPrefix,
-						prototypes:   []{
-							if (!cKosPrototypes) {
-								local result = replaceWcharPrototypesShallow(
-									bind.prototypes, WCHAR_REPLACEMENT_CHAR32);
-								cKosPrototypes.value = result;
-								return result;
-							}
-							return cKosPrototypes.value;
-						},
-						binding:      kosSymbolName);
-					current.bindings.insert(i + 1, kosBinding);
-					current.bindings.insert(i + 2, dosBinding);
-					i += 3;
-				}
-			}
-		} else { /* currentFeatures.wchar */
-			if (currentFeatures.crt_dosname !== context.defaultFeatures.crt_dosname) {
-				self.err("Function {!r} has a [dosname()] annotation, but no [[wchar]]"
-					.format({ currentName }));
-			}
+		if (!currentFeatures.wchar) {
 			if (currentFeatures.crt_dosImplRequires !== context.defaultFeatures.crt_dosImplRequires) {
 				self.err("Function {!r} has a [crt_dos_impl_requires()] annotation, but no [[wchar]]"
 					.format({ currentName }));
 			}
-		} /* !currentFeatures.wchar */
+		}
 
 		/* Check for special case: @"dstFunction(*) = srcFunction;"
 		 * This case is handled by:
@@ -3776,17 +3596,19 @@ got_chkExpr:
 						self, context.defaultFeatures, currentName);
 					currentFeatures.assertAllSymbolicAliasOnly(
 						self, context.defaultFeatures, currentName);
-					if (currentLibraryFunction.exportSymbolNames) {
+					if (currentKosLibraryFunction.exportSymbolNames ||
+					    currentDosLibraryFunction.exportSymbolNames) {
 						self.errAt(currentNameTokStart,
 							"[[export_as(...)]] used with %{{uchar}} function {!r}"
 								.format({ currentName }));
 					}
-					if (currentLibraryFunction.ppCond != DEFAULT_LIBFUN_COND) {
+					if ((currentKosLibraryFunction !is none && currentKosLibraryFunction.ppCond is bound) ||
+					    (currentDosLibraryFunction !is none && currentDosLibraryFunction.ppCond is bound)) {
 						self.errAt(currentNameTokStart,
 							"[[kernel]] used with %{{uchar}} function {!r}"
 								.format({ currentName }));
 					}
-					if (currentLibraryFunction.bindings) {
+					if (currentKosLibraryFunction.bindings || currentDosLibraryFunction.bindings) {
 						self.errAt(currentNameTokStart,
 							"[[crt_intern_alias(...)]] or [alt_variant_of(...)] "
 							"used with %{{uchar}} function {!r}"
@@ -3885,6 +3707,43 @@ got_chkExpr:
 						 * new, transformed bindings for our new the Xchar function. */
 						local basicBindings = [];
 						local mySize = WCHAR_REPLACEMENT_SIZE[mode];
+						/* Transform bindings to do something akin to the following:
+						 *
+						 * wchar-declaration:
+						 * >> #ifdef __CRT_HAVE_wcslen
+						 * >> __CDECLARE(ATTR_PURE WUNUSED NONNULL((1)),size_t,NOTHROW_NCX,wcslen,(wchar_t const *__restrict string),(string))
+						 * >> #else // ...
+						 * >> #include <local/wchar/wcslen.h>
+						 * >> __NAMESPACE_LOCAL_USING_OR_IMPL(wcslen, FORCELOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL wcslen)(wchar_t const *__restrict string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))(string); })
+						 * >> #endif // !...
+						 *
+						 * uchar16-declaration:
+						 * >> #if defined(__CRT_HAVE_wcslen) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+						 * >> __CREDIRECT(ATTR_PURE WUNUSED NONNULL((1)),size_t,NOTHROW_NCX,c16slen,(char16_t const *__restrict string),wcslen,(string))
+						 * >> #elif defined(__CRT_HAVE_DOS$wcslen)
+						 * >> __CREDIRECT_DOS(ATTR_PURE WUNUSED NONNULL((1)),size_t,NOTHROW_NCX,c16slen,(char16_t const *__restrict string),wcslen,(string))
+						 * >> #elif (__SIZEOF_WCHAR_T__ == 2)
+						 * >> #include <local/wchar/wcslen.h>
+						 * >> FORCELOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(__LIBDCALL c16slen)(char16_t const *__restrict string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((__WCHAR_TYPE__ const *)string); }
+						 * >> #else // ...
+						 * >> #include <local/parts.uchar.string/c16slen.h>
+						 * >> __NAMESPACE_LOCAL_USING_OR_IMPL(c16slen, FORCELOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(__LIBDCALL c16slen)(char16_t const *__restrict string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16slen))(string); })
+						 * >> #endif // !...
+						 *
+						 * uchar32-declaration:
+						 * >> #if defined(__CRT_HAVE_wcslen) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+						 * >> __CREDIRECT(ATTR_PURE WUNUSED NONNULL((1)),size_t,NOTHROW_NCX,c32slen,(char32_t const *__restrict string),wcslen,(string))
+						 * >> #elif defined(__CRT_HAVE_KOS$wcslen)
+						 * >> __CREDIRECT_KOS(ATTR_PURE WUNUSED NONNULL((1)),size_t,NOTHROW_NCX,c32slen,(char32_t const *__restrict string),wcslen,(string))
+						 * >> #elif (__SIZEOF_WCHAR_T__ == 4)
+						 * >> #include <local/wchar/wcslen.h>
+						 * >> FORCELOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(__LIBKCALL c32slen)(char32_t const *__restrict string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((__WCHAR_TYPE__ const *)string); }
+						 * >> #else // ...
+						 * >> #include <local/parts.uchar.string/c32slen.h>
+						 * >> __NAMESPACE_LOCAL_USING_OR_IMPL(c32slen, FORCELOCAL ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(__LIBKCALL c32slen)(char32_t const *__restrict string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32slen))(string); })
+						 * >> #endif // !...
+						 *
+						 */
 						for (local wc_bind/*:FunctionBinding*/ : wc.functionBindings) {
 							local wc_bind_binding = wc_bind.functionBinding;
 							/* Ignore namespace bindings (though we could theoretically bind these as well...) */
@@ -3912,12 +3771,12 @@ got_chkExpr:
 							 */
 							local wc_bindCond = str(wc_bind.ppCond);
 							local myCond: string;
-							local myCondRequiresMySize: bool;
+							local wc_bindCondSimplified;
 							if ("__SIZEOF_WCHAR_T__" !in wc_bindCond) {
 								/* Binding makes no mention of WCHAR-size -> Append our requirement */
+								wc_bindCondSimplified = wc_bindCond;
 								myCond = "{} && (__SIZEOF_WCHAR_T__ == {})"
 									.format({ wc_bindCond, mySize });
-								myCondRequiresMySize = true;
 							} else {
 								/* Scan the different usage cases of __SIZEOF_WCHAR_T__
 								 * XXX: This is imperfect! (See the above comment for
@@ -3994,7 +3853,7 @@ got_chkExpr:
 									i = e;
 								}
 								myCond = (myCond << wc_bindCond[flushStart:]).string;
-								myCondRequiresMySize = false;
+								wc_bindCondSimplified = myCond;
 							}
 							myCond = myCond.replace("&&1", "").replace("1&&", "");
 							local wcBinding = wc_bind.functionBinding;
@@ -4022,7 +3881,7 @@ got_chkExpr:
 									/* assert cc1 > cc2; */
 									{
 										local replacedPrototypes2 = replacedPrototypes;
-										if (origCC in ["LIBCCALL", "__LIBCCALL"]) {
+										if (origCC in ["LIBCCALL", "LIBCCALL"]) {
 											/* Optimize `replacedPrototypes2' to use `origCC', thus allowing
 											 * their eventual declaration to make use of __CDECLARE, rather
 											 * than having to use __COMPILER_REDIRECT... */
@@ -4044,36 +3903,10 @@ got_chkExpr:
 											prototypes:   replacedPrototypes2,
 											binding:      wcBinding));
 									}
-									/* Note a couple of special cases where we can still bind:
-									 * >> ...
-									 * >> #elif defined(__CRT_HAVE_memcpyw) && defined(__LIBCCALL_IS_LIBDCALL)
-									 * >> __COMPILER_REDIRECT(__LIBC,...,LIBDCALL,c16memcpy,...,memcpyw,...)
-									 * >> #elif defined(__CRT_HAVE_DOS$memcpyw)
-									 * >> __COMPILER_REDIRECT(__LIBC,...,LIBDCALL,c16memcpy,...,DOS$memcpyw,...)
-									 * >> ...
-									 * Note the second variant that can be used when:
-									 *   - replCC == "LIBDCALL"
-									 *     >> #if keyCrtHave("DOS$" + name)
-									 *     >> BIND_AGAINST("DOS$" + name)
-									 *     >> #endif
-									 *   - replCC == "LIBKCALL"
-									 *     >> #if keyCrtHave("KOS$" + name)
-									 *     >> BIND_AGAINST("KOS$" + name)
-									 *     >> #endif
-									 * Also note that we only do this when the basic @myCond doesn't impose
-									 * any requirements on @mySize, since if it does, then the wchar-size
-									 * attribute of the assembly symbol is dependent on DOS-vs-KOS linkage,
-									 * in which case we'd end up with a redundant binding:
-									 * >> ...
-									 * >> #elif defined(__CRT_HAVE_DOS$wmemcpy) && (__SIZEOF_WCHAR_T__ == 2)
-									 * >> __CREDIRECT_DOS(...,c16memcpy,...,wmemcpy,...)
-									 * >> #elif defined(__CRT_HAVE_DOS$wmemcpy)
-									 * >> __CREDIRECT_DOS(...,c16memcpy,...,wmemcpy,...)
-									 * >> ...
-									 */
-									if (!myCondRequiresMySize) {
+									/* Try to append a namespace-specific CRT binding */
+									if (!wcBindingStr.startswith("DOS$") && !wcBindingStr.startswith("KOS$")) {
 										local wcBindingCrtHaveKey = keyCrtHave(wcBindingStr);
-										if (wcBindingCrtHaveKey in myCond) {
+										if (wcBindingCrtHaveKey in wc_bindCondSimplified) {
 											local ccSpecificPrefix = {
 												"LIBKCALL"   : "KOS$",
 												"LIBDCALL"   : "DOS$",
@@ -4084,7 +3917,7 @@ got_chkExpr:
 												goto wc_bind_continue_scan_bindings;
 											wcBindingStr = ccSpecificPrefix + wcBindingStr;
 											basicBindings.append(FunctionBinding(
-												ppCond:       myCond.replace(wcBindingCrtHaveKey, keyCrtHave(wcBindingStr)),
+												ppCond:       wc_bindCondSimplified.replace(wcBindingCrtHaveKey, keyCrtHave(wcBindingStr)),
 												ppCondPrefix: replaceWcharTextArray(wc_bind.ppCondPrefix, mode),
 												prototypes:   replacedPrototypes,
 												binding:      wcBindingStr));
@@ -4396,49 +4229,56 @@ again_lookup_wcsCurrent:
 				local crtName = currentFeatures.crt_name;
 				if (crtName is none)
 					crtName = currentName;
-				if (currentLibraryFunction.documentation is string && !currentLibraryFunction.documentation)
-					currentLibraryFunction.documentation = current.documentation;
+				if (currentKosLibraryFunction is none)
+					currentKosLibraryFunction = LibraryFunction();
+				currentKosLibraryFunction.originalSystemHeaderName = headerName;
+				if (currentKosLibraryFunction.ppCond !is bound)
+					currentKosLibraryFunction.ppCond = DEFAULT_LIBFUN_COND;
+				if (currentKosLibraryFunction.documentation is string && !currentKosLibraryFunction.documentation)
+					currentKosLibraryFunction.documentation = current.documentation;
+				local libc_kosName: string; /* e.g. libc_strlen() */
+				if (currentKosLibraryFunction.name is bound) {
+					libc_kosName = currentKosLibraryFunction.name;
+				} else {
+					libc_kosName = "libc_" + crtName;
+					currentKosLibraryFunction.name = libc_kosName;
+				}
+				current.internalName = libc_kosName;
+				if (!currentFeatures.crt_noSelfExport)
+					currentKosLibraryFunction.exportSymbolNames.append(("1", crtName));
+				if (!allLibraryFunctionsByName.setnew(libc_kosName, currentKosLibraryFunction))
+					self.errAt(currentNameTokStart, "Duplicate library function: {!r}"
+						.format({ libc_kosName }));
 				if (currentFeatures.wchar) {
 					/* Create 2 new functions that are then exported from libc. */
-					local dosCrtName = currentFeatures.crt_dosname;
-					if (dosCrtName is none)
-						dosCrtName = crtName;
-					local kosVariant: LibraryFunction = currentLibraryFunction;
-					local dosVariant: LibraryFunction = currentDosLibraryFunction;
-					if (dosVariant is none)
-						dosVariant = LibraryFunction(ppCond: currentLibraryFunction.ppCond);
-					if (dosVariant.originalSystemHeaderName !is bound)
-						dosVariant.originalSystemHeaderName = kosVariant.originalSystemHeaderName;
-					local kosVariantName = "libc_" + crtName;
-					local dosVariantName = "libd_" + dosCrtName;
-					if (!currentFeatures.crt_noSelfExport) {
-						kosVariant.exportSymbolNames.append(("1", crtName));
-						/* XXX: the DOS$ prefix isn't required if no symbol of the same
-						 *      name is being exported from the default namespace!
-						 * However, it may prove a good idea to keep all char16_t-variants
-						 * of functions constrained to the DOS$ namespace:
-						 *   #1: Forward-compatibility may one day define a KOS-mode
-						 *       function using a name already in use under DOS-mode
-						 *   #2: The __C(DECLARE|REDIRECT)-system isn't designed to
-						 *       be able to deal with this kind of linkage. */
-						dosVariant.exportSymbolNames.append(("1", "DOS$" + dosCrtName));
+					if (currentDosLibraryFunction is none)
+						currentDosLibraryFunction = LibraryFunction();
+					currentDosLibraryFunction.originalSystemHeaderName = headerName;
+					if (currentDosLibraryFunction.ppCond !is bound)
+						currentDosLibraryFunction.ppCond = currentKosLibraryFunction.ppCond;
+					if (currentDosLibraryFunction.documentation is string && !currentDosLibraryFunction.documentation)
+						currentDosLibraryFunction.documentation = currentKosLibraryFunction.documentation;
+					local libc_dosName: string;
+					if (currentDosLibraryFunction.name is bound) {
+						libc_dosName = currentDosLibraryFunction.name;
+					} else {
+						libc_dosName = "libd_" + crtName;
+						currentDosLibraryFunction.name = libc_dosName;
 					}
-					current.internalName = kosVariantName;
-					kosVariant.name = kosVariantName;
-					dosVariant.name = dosVariantName;
-					if (!allLibraryFunctionsByName.setnew(kosVariantName, kosVariant))
+					if (!currentFeatures.crt_noSelfExport)
+						currentDosLibraryFunction.exportSymbolNames.append(("1", "DOS$" + crtName));
+					if (!allLibraryFunctionsByName.setnew(libc_dosName, currentDosLibraryFunction))
 						self.errAt(currentNameTokStart, "Duplicate library function: {!r}"
-							.format({ kosVariantName }));
-					if (!allLibraryFunctionsByName.setnew(dosVariantName, dosVariant))
-						self.errAt(currentNameTokStart, "Duplicate library function: {!r}"
-							.format({ dosVariantName }));
-					wcsCurrent.wc_internal_uchar = { dosVariant, kosVariant };
-					dosVariant.prototype = [] -> wcsCurrent.getXCharImplementation(
-						kosVariantName, WCHAR_REPLACEMENT_CHAR16).prototype;
-					kosVariant.prototype = [] -> wcsCurrent.getXCharImplementation(
-						dosVariantName, WCHAR_REPLACEMENT_CHAR32).prototype;
-					if (dosVariant.documentation is string && !dosVariant.documentation)
-						dosVariant.documentation = kosVariant.documentation;
+							.format({ libc_dosName }));
+					wcsCurrent.wc_internal_uchar = { currentDosLibraryFunction, currentKosLibraryFunction };
+					if (currentDosLibraryFunction.prototype !is bound) {
+						currentDosLibraryFunction.prototype = [] -> wcsCurrent.getXCharImplementation(
+							libc_dosName, WCHAR_REPLACEMENT_CHAR16).prototype;
+					}
+					if (currentKosLibraryFunction.prototype !is bound) {
+						currentKosLibraryFunction.prototype = [] -> wcsCurrent.getXCharImplementation(
+							libc_kosName, WCHAR_REPLACEMENT_CHAR32).prototype;
+					}
 					function createXCharBinding(
 							functionName: string | UserString,
 							ppCond: string | UserString,
@@ -4462,21 +4302,21 @@ again_lookup_wcsCurrent:
 					/* Link the Xchar-implementations.
 					 * NOTE: This has to happen delayed, so that everything will be
 					 *       available once the implementation gets generated. */
-					dosVariant.bindings.append(createXCharBinding(
-						dosVariantName, currentFeatures.crt_dosImplRequires,
-						dosCrtName, WCHAR_REPLACEMENT_CHAR16,
+					currentDosLibraryFunction.bindings.append(createXCharBinding(
+						libc_dosName, currentFeatures.crt_dosImplRequires,
+						"DOS$" + crtName, WCHAR_REPLACEMENT_CHAR16,
 						currentFeatures.crt_dosSection));
-					kosVariant.bindings.append(createXCharBinding(
-						kosVariantName, currentFeatures.crt_kosImplRequires,
+					currentKosLibraryFunction.bindings.append(createXCharBinding(
+						libc_kosName, currentFeatures.crt_kosImplRequires,
 						crtName, WCHAR_REPLACEMENT_CHAR32,
 						currentFeatures.crt_kosSection));
 					/* Insert the library implementations into the system header order */
 					if (currentFeatures.crt_userimpl || loaderImpl is none) {
-						result.order_libcUserHeader.extend({ dosVariant, kosVariant });
-						result.order_libcUserSource.extend({ dosVariant, kosVariant });
+						result.order_libcUserHeader.extend({ currentDosLibraryFunction, currentKosLibraryFunction });
+						result.order_libcUserSource.extend({ currentDosLibraryFunction, currentKosLibraryFunction });
 					} else {
-						result.order_libcAutoHeader.extend({ dosVariant, kosVariant });
-						result.order_libcAutoSource.extend({ dosVariant, kosVariant });
+						result.order_libcAutoHeader.extend({ currentDosLibraryFunction, currentKosLibraryFunction });
+						result.order_libcAutoSource.extend({ currentDosLibraryFunction, currentKosLibraryFunction });
 					}
 				} else {
 					/* Create a default implementation for user-sources */
@@ -4502,28 +4342,19 @@ again_lookup_wcsCurrent:
 								: loaderImpl.impl,
 							implSection: currentFeatures.crt_kosSection);
 					}
-					currentLibraryFunction.bindings.append(libImpl);
-					if (currentLibraryFunction.prototype !is bound)
-						currentLibraryFunction.prototype = currentPrototype;
-					if (!currentFeatures.crt_noSelfExport) {
-						currentLibraryFunction.exportSymbolNames
-							.append(("1", crtName));
-					}
-					local internal_crtName = "libc_" + crtName;
-					currentLibraryFunction.name = internal_crtName;
-					current.internalName = internal_crtName;
-					if (!allLibraryFunctionsByName.setnew(internal_crtName, currentLibraryFunction))
-						self.errAt(currentNameTokStart, "Duplicate library function: {!r}"
-							.format({ internal_crtName }));
+					currentKosLibraryFunction.bindings.append(libImpl);
+					if (currentKosLibraryFunction.prototype !is bound)
+						currentKosLibraryFunction.prototype = currentPrototype;
 					if (currentFeatures.crt_userimpl || loaderImpl is none) {
-						result.order_libcUserHeader.append(currentLibraryFunction);
-						result.order_libcUserSource.append(currentLibraryFunction);
+						result.order_libcUserHeader.append(currentKosLibraryFunction);
+						result.order_libcUserSource.append(currentKosLibraryFunction);
 					} else {
-						result.order_libcAutoHeader.append(currentLibraryFunction);
-						result.order_libcAutoSource.append(currentLibraryFunction);
+						result.order_libcAutoHeader.append(currentKosLibraryFunction);
+						result.order_libcAutoSource.append(currentKosLibraryFunction);
 					}
 				}
-				currentLibraryFunction = none;
+				currentKosLibraryFunction = none;
+				currentDosLibraryFunction = none;
 			}
 		}	break;
 
@@ -4538,17 +4369,19 @@ handle_eq_after_prototype:
 			if (#current.bindings > (currentFeatures.crt_noSelfImport ? 0 : 1))
 				self.errAt(currentNameTokStart, "Aliasing function {!r} has custom bindings {!r}"
 					.format({ currentName, current.bindings }));
-			if (currentLibraryFunction.exportSymbolNames) {
+			if (currentKosLibraryFunction.exportSymbolNames ||
+			    currentDosLibraryFunction.exportSymbolNames) {
 				self.errAt(currentNameTokStart,
 					"[[export_as(...)]] used with aliasing function {!r}"
 						.format({ current. name }));
 			}
-			if (currentLibraryFunction.ppCond != DEFAULT_LIBFUN_COND) {
+			if ((currentKosLibraryFunction !is none && currentKosLibraryFunction.ppCond is bound) ||
+			    (currentDosLibraryFunction !is none && currentDosLibraryFunction.ppCond is bound)) {
 				self.errAt(currentNameTokStart,
 					"[[kernel]] used with aliasing function {!r}"
 					.format({ currentName }));
 			}
-			if (currentLibraryFunction.bindings) {
+			if (currentKosLibraryFunction.bindings || currentDosLibraryFunction.bindings) {
 				self.errAt(currentNameTokStart,
 					"[[crt_intern_alias(...)]] or [[alt_variant_of(...)]] "
 					"used with aliasing function {!r}"
@@ -4655,14 +4488,14 @@ handle_eq_after_prototype:
 				.format({ tok }));
 		}
 done_function:
-		if (currentLibraryFunction !is none) {
+		if (currentKosLibraryFunction !is none || currentDosLibraryFunction !is none) {
 			/* Assert that no annotations added any special features to the library
 			 * function in situations where the library function isn't actually being
 			 * used */
-			if (currentLibraryFunction.exportSymbolNames)
+			if (currentKosLibraryFunction.exportSymbolNames || currentDosLibraryFunction.exportSymbolNames)
 				self.errAt(currentNameTokStart, "[export_as(...)] used, but function's isn't actually being exported");
 			/* Don't assert this: `alt_variant_of()' would still be allowed here! */
-//			if (currentLibraryFunction.bindings)
+//			if (currentKosLibraryFunction.bindings || currentDosLibraryFunction.bindings)
 //				self.errAt(currentNameTokStart, "[crt_intern_alias(...)] or [alt_variant_of(...)] used, but function's isn't actually being exported");
 		}
 

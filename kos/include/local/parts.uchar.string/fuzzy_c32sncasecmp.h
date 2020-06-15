@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80de7e12 */
+/* HASH CRC-32:0x3e63bb7f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_fuzzy_c32sncasecmp_defined
 #define __local_fuzzy_c32sncasecmp_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_fuzzy_wmemcasecmp) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp) || !defined(__NO_MALLOCA)
+#if (defined(__CRT_HAVE_fuzzy_wmemcasecmp) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fuzzy_wmemcasecmp) || !defined(__NO_MALLOCA)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32snlen from parts.uchar.string */
 #ifndef __local___localdep_c32snlen_defined
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_wcsnlen) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32snlen,(__CHAR32_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
-#elif defined(__CRT_HAVE_DOS$wcsnlen)
+#elif defined(__CRT_HAVE_KOS$wcsnlen)
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32snlen,(__CHAR32_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #elif (__SIZEOF_WCHAR_T__ == 4)
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_fuzzy_c32memcasecmp_defined 1
 #if defined(__CRT_HAVE_fuzzy_wmemcasecmp) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_c32memcasecmp,(__CHAR32_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_wmemcasecmp,(__s1,__s1_bytes,__s2,__s2_bytes))
-#elif defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp)
+#elif defined(__CRT_HAVE_KOS$fuzzy_wmemcasecmp)
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_c32memcasecmp,(__CHAR32_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_wmemcasecmp,(__s1,__s1_bytes,__s2,__s2_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
@@ -89,7 +89,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_fuzzy_c32sncasecmp_defined 1
 #define __localdep_fuzzy_c32sncasecmp __LIBC_LOCAL_NAME(fuzzy_c32sncasecmp)
 #endif /* !__local___localdep_fuzzy_c32sncasecmp_defined */
-#else /* (__CRT_HAVE_fuzzy_wmemcasecmp && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$fuzzy_wmemcasecmp || !__NO_MALLOCA */
+#else /* (__CRT_HAVE_fuzzy_wmemcasecmp && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$fuzzy_wmemcasecmp || !__NO_MALLOCA */
 #undef __local_fuzzy_c32sncasecmp_defined
-#endif /* (!__CRT_HAVE_fuzzy_wmemcasecmp || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$fuzzy_wmemcasecmp && __NO_MALLOCA */
+#endif /* (!__CRT_HAVE_fuzzy_wmemcasecmp || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$fuzzy_wmemcasecmp && __NO_MALLOCA */
 #endif /* !__local_fuzzy_c32sncasecmp_defined */

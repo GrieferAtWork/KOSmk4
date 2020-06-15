@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b93960d */
+/* HASH CRC-32:0x46d6fc8c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,19 +21,32 @@
 #ifndef __local_c16execl_defined
 #define __local_c16execl_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_wexecv) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wexecv)
+#if (defined(__CRT_HAVE_wexecv) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wexecv)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: c16execv from parts.uchar.process */
+#ifndef __local___localdep_c16execv_defined
+#define __local___localdep_c16execv_defined 1
+#if defined(__CRT_HAVE_wexecv) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),wexecv,(__path,___argv))
+#elif defined(__CRT_HAVE_DOS$wexecv)
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_c16execv,(__CHAR16_TYPE__ const *__restrict __path, __T16ARGV),wexecv,(__path,___argv))
+#else /* ... */
+#undef __local___localdep_c16execv_defined
+#endif /* !... */
+#endif /* !__local___localdep_c16execv_defined */
+__NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16execl) __ATTR_SENTINEL __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__VLIBDCALL __LIBC_LOCAL_NAME(c16execl))(__CHAR16_TYPE__ const *__restrict __path, __CHAR16_TYPE__ const *__args, ...) {
-	__REDIRECT_EXECL(__CHAR16_TYPE__, __c16execv, __path, __args)
+	__REDIRECT_EXECL(__CHAR16_TYPE__, __localdep_c16execv, __path, __args)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16execl_defined
 #define __local___localdep_c16execl_defined 1
 #define __localdep_c16execl __LIBC_LOCAL_NAME(c16execl)
 #endif /* !__local___localdep_c16execl_defined */
-#else /* (__CRT_HAVE_wexecv && (__SIZEOF_WCHAR_T__ == 2) && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wexecv */
+#else /* (__CRT_HAVE_wexecv && (__SIZEOF_WCHAR_T__ == 2) && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wexecv */
 #undef __local_c16execl_defined
-#endif /* (!__CRT_HAVE_wexecv || !(__SIZEOF_WCHAR_T__ == 2) || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$_wexecv */
+#endif /* (!__CRT_HAVE_wexecv || !(__SIZEOF_WCHAR_T__ == 2) || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wexecv */
 #endif /* !__local_c16execl_defined */

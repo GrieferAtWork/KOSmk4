@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1db60557 */
+/* HASH CRC-32:0x1d5a3974 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,16 +27,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_wcwidth_defined 1
 #ifdef __CRT_HAVE_wcwidth
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wcwidth,(__WCHAR_TYPE__ __ch),wcwidth,(__ch))
-#elif defined(__CRT_HAVE_DOS$wcwidth) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wcwidth,(__WCHAR_TYPE__ __ch),wcwidth,(__ch))
-#elif defined(__CRT_HAVE_DOS$wcwidth) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wcwidth,(__WCHAR_TYPE__ __ch),wcwidth,(__ch))
-#else /* ... */
+#else /* __CRT_HAVE_wcwidth */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcwidth.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcwidth __LIBC_LOCAL_NAME(wcwidth)
-#endif /* !... */
+#endif /* !__CRT_HAVE_wcwidth */
 #endif /* !__local___localdep_wcwidth_defined */
 __LOCAL_LIBC(wcswidth) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcswidth))(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __num_chars) {

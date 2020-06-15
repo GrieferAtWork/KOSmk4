@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac3a6805 */
+/* HASH CRC-32:0xdd956b45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,11 +30,11 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd__wtoi)(char16_t const *nptr);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wtoi)(char16_t const *nptr);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wtoi)(char32_t const *nptr);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd__wtol)(char16_t const *nptr);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_wtol)(char16_t const *nptr);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBKCALL libc_wtol)(char32_t const *nptr);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBDCALL libd__wtoll)(char16_t const *nptr);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBDCALL libd_wtoll)(char16_t const *nptr);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBKCALL libc_wtoll)(char32_t const *nptr);
 #endif /* !__KERNEL__ */
 

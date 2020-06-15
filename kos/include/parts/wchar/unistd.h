@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fd93dd8 */
+/* HASH CRC-32:0xd2953028 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,48 +47,20 @@ __SYSDECL_BEGIN
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __CDECLARE(__ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wttyname,(__fd_t __fd),(__fd))
-#elif defined(__CRT_HAVE_DOS$wttyname) && __SIZEOF_WCHAR_T__ == 4
-/* >> ttyname(3)
- * Return the name of a TTY given its file descriptor */
-__CREDIRECT_KOS(__ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wttyname,(__fd_t __fd),wttyname,(__fd))
-#elif defined(__CRT_HAVE_DOS$wttyname) && __SIZEOF_WCHAR_T__ == 2
-/* >> ttyname(3)
- * Return the name of a TTY given its file descriptor */
-__CREDIRECT_DOS(__ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wttyname,(__fd_t __fd),wttyname,(__fd))
-#endif /* ... */
+#endif /* __CRT_HAVE_wttyname */
 #ifdef __CRT_HAVE_wttyname_r
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wttyname_r,(__fd_t __fd, wchar_t *__buf, size_t __buflen),(__fd,__buf,__buflen))
-#elif defined(__CRT_HAVE_DOS$wttyname_r) && __SIZEOF_WCHAR_T__ == 4
-/* >> ttyname_r(3)
- * Return the name of a TTY given its file descriptor */
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wttyname_r,(__fd_t __fd, wchar_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
-#elif defined(__CRT_HAVE_DOS$wttyname_r) && __SIZEOF_WCHAR_T__ == 2
-/* >> ttyname_r(3)
- * Return the name of a TTY given its file descriptor */
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wttyname_r,(__fd_t __fd, wchar_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
-#endif /* ... */
+#endif /* __CRT_HAVE_wttyname_r */
 #ifdef __CRT_HAVE_wgetlogin
 __CDECLARE(__ATTR_WUNUSED,wchar_t *,__NOTHROW_NCX,wgetlogin,(void),())
-#elif defined(__CRT_HAVE_DOS$wgetlogin) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_WUNUSED,wchar_t *,__NOTHROW_NCX,wgetlogin,(void),wgetlogin,())
-#elif defined(__CRT_HAVE_DOS$wgetlogin) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_WUNUSED,wchar_t *,__NOTHROW_NCX,wgetlogin,(void),wgetlogin,())
-#endif /* ... */
+#endif /* __CRT_HAVE_wgetlogin */
 #ifdef __CRT_HAVE_wchown
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchown,(wchar_t const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
-#elif defined(__CRT_HAVE_DOS$wchown) && __SIZEOF_WCHAR_T__ == 4
-/* >> chown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchown,(wchar_t const *__file, __uid_t __owner, __gid_t __group),wchown,(__file,__owner,__group))
-#elif defined(__CRT_HAVE_DOS$wchown) && __SIZEOF_WCHAR_T__ == 2
-/* >> chown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchown,(wchar_t const *__file, __uid_t __owner, __gid_t __group),wchown,(__file,__owner,__group))
-#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wfchownat) || (defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wfchownat)
 #include <local/parts.wchar.unistd/wchown.h>
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
@@ -102,36 +74,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wchown, __FORCELOCAL __ATTR_NONNULL((1)) int __N
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 __CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,wpathconf,(wchar_t const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
-#elif defined(__CRT_HAVE_DOS$wpathconf) && __SIZEOF_WCHAR_T__ == 4
-/* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,wpathconf,(wchar_t const *__path, __STDC_INT_AS_UINT_T __name),wpathconf,(__path,__name))
-#elif defined(__CRT_HAVE_DOS$wpathconf) && __SIZEOF_WCHAR_T__ == 2
-/* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,wpathconf,(wchar_t const *__path, __STDC_INT_AS_UINT_T __name),wpathconf,(__path,__name))
-#endif /* ... */
+#endif /* __CRT_HAVE_wpathconf */
 #ifdef __CRT_HAVE_wlink
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wlink,(wchar_t const *__from, wchar_t const *__to),(__from,__to))
-#elif defined(__CRT_HAVE_DOS$wlink) && __SIZEOF_WCHAR_T__ == 4
-/* >> link(2)
- * Create a hard link from `FROM', leading to `TO' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wlink,(wchar_t const *__from, wchar_t const *__to),wlink,(__from,__to))
-#elif defined(__CRT_HAVE_DOS$wlink) && __SIZEOF_WCHAR_T__ == 2
-/* >> link(2)
- * Create a hard link from `FROM', leading to `TO' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wlink,(wchar_t const *__from, wchar_t const *__to),wlink,(__from,__to))
-#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wlinkat) || (defined(__CRT_HAVE_DOS$wlinkat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wlinkat) && __SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wlinkat)
 #include <local/parts.wchar.unistd/wlink.h>
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
@@ -142,17 +90,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) int _
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,waccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
-#elif defined(__CRT_HAVE_DOS$waccess) && __SIZEOF_WCHAR_T__ == 4
-/* >> access(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE' */
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,waccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
-#elif defined(__CRT_HAVE_DOS$waccess) && __SIZEOF_WCHAR_T__ == 2
-/* >> access(2)
- * @param: TYPE: Set of `X_OK|W_OK|R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE' */
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,waccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
-#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wfaccessat) || (defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wfaccessat)
 #include <local/parts.wchar.unistd/waccess.h>
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
@@ -163,41 +101,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(waccess, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONN
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchdir,(wchar_t const *__path),(__path))
-#elif defined(__CRT_HAVE_DOS$wchdir) && __SIZEOF_WCHAR_T__ == 4
-/* >> chdir(2)
- * Change the current working directory to `PATH' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchdir,(wchar_t const *__path),wchdir,(__path))
-#elif defined(__CRT_HAVE_DOS$_wchdir) && __SIZEOF_WCHAR_T__ == 2
-/* >> chdir(2)
- * Change the current working directory to `PATH' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchdir,(wchar_t const *__path),_wchdir,(__path))
-#endif /* ... */
+#endif /* __CRT_HAVE_wchdir */
 #ifdef __CRT_HAVE_wgetcwd
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CDECLARE(,wchar_t *,__NOTHROW_RPC,wgetcwd,(wchar_t *__buf, size_t __bufsize),(__buf,__bufsize))
-#elif defined(__CRT_HAVE_DOS$wgetcwd) && __SIZEOF_WCHAR_T__ == 4
-/* >> getcwd(2)
- * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-__CREDIRECT_KOS(,wchar_t *,__NOTHROW_RPC,wgetcwd,(wchar_t *__buf, size_t __bufsize),wgetcwd,(__buf,__bufsize))
-#elif defined(__CRT_HAVE_DOS$_wgetcwd) && __SIZEOF_WCHAR_T__ == 2
-/* >> getcwd(2)
- * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-__CREDIRECT_DOS(,wchar_t *,__NOTHROW_RPC,wgetcwd,(wchar_t *__buf, size_t __bufsize),_wgetcwd,(__buf,__bufsize))
-#endif /* ... */
+#endif /* __CRT_HAVE_wgetcwd */
 #ifdef __CRT_HAVE_wunlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wunlink,(wchar_t const *__file),(__file))
-#elif defined(__CRT_HAVE_DOS$wunlink) && __SIZEOF_WCHAR_T__ == 4
-/* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wunlink,(wchar_t const *__file),wunlink,(__file))
-#elif defined(__CRT_HAVE_DOS$_wunlink) && __SIZEOF_WCHAR_T__ == 2
-/* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wunlink,(wchar_t const *__file),_wunlink,(__file))
-#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wunlinkat) || (defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 #include <local/parts.wchar.unistd/wunlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
@@ -207,15 +121,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wunlink, __FORCELOCAL __ATTR_NONNULL((1)) int __
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wrmdir,(wchar_t const *__path),(__path))
-#elif defined(__CRT_HAVE_DOS$wrmdir) && __SIZEOF_WCHAR_T__ == 4
-/* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wrmdir,(wchar_t const *__path),wrmdir,(__path))
-#elif defined(__CRT_HAVE_DOS$_wrmdir) && __SIZEOF_WCHAR_T__ == 2
-/* >> rmdir(2)
- * Remove a directory referred to by `PATH' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wrmdir,(wchar_t const *__path),_wrmdir,(__path))
-#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wunlinkat) || (defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 #include <local/parts.wchar.unistd/wrmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
@@ -227,58 +133,34 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wrmdir, __FORCELOCAL __ATTR_NONNULL((1)) int __N
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,weuidaccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
-#elif defined(__CRT_HAVE_DOS$weuidaccess) && __SIZEOF_WCHAR_T__ == 4
-/* >> euidaccess(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,weuidaccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
-#elif defined(__CRT_HAVE_DOS$weuidaccess) && __SIZEOF_WCHAR_T__ == 2
-/* >> euidaccess(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,weuidaccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
-#else /* ... */
+#else /* __CRT_HAVE_weuidaccess */
 #include <asm/fcntl.h>
-#if defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && (defined(__CRT_HAVE_wfaccessat) || (defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 2))
+#if defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && defined(__CRT_HAVE_wfaccessat)
 #include <local/parts.wchar.unistd/weuidaccess.h>
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
 __NAMESPACE_LOCAL_USING_OR_IMPL(weuidaccess, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL weuidaccess)(wchar_t const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(weuidaccess))(__file, __type); })
-#endif /* __CRT_AT_FDCWD && __AT_EACCESS && (__CRT_HAVE_wfaccessat || (__CRT_HAVE_DOS$wfaccessat && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$wfaccessat && __SIZEOF_WCHAR_T__ == 2)) */
-#endif /* !... */
+#endif /* __CRT_AT_FDCWD && __AT_EACCESS && __CRT_HAVE_wfaccessat */
+#endif /* !__CRT_HAVE_weuidaccess */
 #ifdef __CRT_HAVE_weuidaccess
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,weaccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
-#elif defined(__CRT_HAVE_DOS$weuidaccess) && __SIZEOF_WCHAR_T__ == 4
-/* >> euidaccess(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,weaccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
-#elif defined(__CRT_HAVE_DOS$weuidaccess) && __SIZEOF_WCHAR_T__ == 2
-/* >> euidaccess(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,weaccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),weuidaccess,(__file,__type))
-#else /* ... */
+#else /* __CRT_HAVE_weuidaccess */
 #include <asm/fcntl.h>
-#if defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && (defined(__CRT_HAVE_wfaccessat) || (defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 2))
+#if defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && defined(__CRT_HAVE_wfaccessat)
 #include <local/parts.wchar.unistd/weuidaccess.h>
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL weaccess)(wchar_t const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(weuidaccess))(__file, __type); }
-#endif /* __CRT_AT_FDCWD && __AT_EACCESS && (__CRT_HAVE_wfaccessat || (__CRT_HAVE_DOS$wfaccessat && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$wfaccessat && __SIZEOF_WCHAR_T__ == 2)) */
-#endif /* !... */
+#endif /* __CRT_AT_FDCWD && __AT_EACCESS && __CRT_HAVE_wfaccessat */
+#endif /* !__CRT_HAVE_weuidaccess */
 #ifdef __CRT_HAVE_wget_current_dir_name
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wget_current_dir_name,(void),())
-#elif defined(__CRT_HAVE_DOS$wget_current_dir_name) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wget_current_dir_name,(void),wget_current_dir_name,())
-#elif defined(__CRT_HAVE_DOS$wget_current_dir_name) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wget_current_dir_name,(void),wget_current_dir_name,())
-#elif defined(__CRT_HAVE_wgetcwd) || (defined(__CRT_HAVE_DOS$wgetcwd) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wgetcwd) && __SIZEOF_WCHAR_T__ == 2)
+#elif defined(__CRT_HAVE_wgetcwd)
 #include <local/parts.wchar.unistd/wget_current_dir_name.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(wget_current_dir_name, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED wchar_t *__NOTHROW_RPC(__LIBCCALL wget_current_dir_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wget_current_dir_name))(); })
 #endif /* ... */
@@ -289,59 +171,23 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wget_current_dir_name, __FORCELOCAL __ATTR_MALLO
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfaccessat,(__fd_t __dfd, wchar_t const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),(__dfd,__file,__type,__flags))
-#elif defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 4
-/* >> faccessat(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfaccessat,(__fd_t __dfd, wchar_t const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
-#elif defined(__CRT_HAVE_DOS$wfaccessat) && __SIZEOF_WCHAR_T__ == 2
-/* >> faccessat(2)
- * @param: TYPE: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfaccessat,(__fd_t __dfd, wchar_t const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
-#endif /* ... */
+#endif /* __CRT_HAVE_wfaccessat */
 #ifdef __CRT_HAVE_wfchownat
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfchownat,(__fd_t __dfd, wchar_t const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
-#elif defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 4
-/* >> fchownat(2)
- * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfchownat,(__fd_t __dfd, wchar_t const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
-#elif defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 2
-/* >> fchownat(2)
- * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfchownat,(__fd_t __dfd, wchar_t const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
-#endif /* ... */
+#endif /* __CRT_HAVE_wfchownat */
 #ifdef __CRT_HAVE_wlinkat
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 __CDECLARE(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,wlinkat,(__fd_t __fromfd, wchar_t const *__from, __fd_t __tofd, wchar_t const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
-#elif defined(__CRT_HAVE_DOS$wlinkat) && __SIZEOF_WCHAR_T__ == 4
-/* >> linkat(2)
- * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,wlinkat,(__fd_t __fromfd, wchar_t const *__from, __fd_t __tofd, wchar_t const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
-#elif defined(__CRT_HAVE_DOS$wlinkat) && __SIZEOF_WCHAR_T__ == 2
-/* >> linkat(2)
- * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,wlinkat,(__fd_t __fromfd, wchar_t const *__from, __fd_t __tofd, wchar_t const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
-#endif /* ... */
+#endif /* __CRT_HAVE_wlinkat */
 #ifdef __CRT_HAVE_wsymlinkat
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
 __CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,wsymlinkat,(wchar_t const *__link_text, __fd_t __tofd, wchar_t const *__target_path),(__link_text,__tofd,__target_path))
-#elif defined(__CRT_HAVE_DOS$wsymlinkat) && __SIZEOF_WCHAR_T__ == 4
-/* >> symlinkat(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,wsymlinkat,(wchar_t const *__link_text, __fd_t __tofd, wchar_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
-#elif defined(__CRT_HAVE_DOS$wsymlinkat) && __SIZEOF_WCHAR_T__ == 2
-/* >> symlinkat(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,wsymlinkat,(wchar_t const *__link_text, __fd_t __tofd, wchar_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
-#endif /* ... */
+#endif /* __CRT_HAVE_wsymlinkat */
 #ifdef __CRT_HAVE_wreadlinkat
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
@@ -352,75 +198,27 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,wsymlinkat,(wchar_t con
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 __CDECLARE(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wreadlinkat,(__fd_t __dfd, wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
-#elif defined(__CRT_HAVE_DOS$wreadlinkat) && __SIZEOF_WCHAR_T__ == 4
-/* >> readlinkat(2)
- * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
- *          NUL-character to the buffer, nor will it return the required buffer
- *          size. Instead, it will return the written size, and the caller must
- *          keep on over allocating until the function indicates that it didn't
- *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wreadlinkat,(__fd_t __dfd, wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
-#elif defined(__CRT_HAVE_DOS$wreadlinkat) && __SIZEOF_WCHAR_T__ == 2
-/* >> readlinkat(2)
- * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
- *          NUL-character to the buffer, nor will it return the required buffer
- *          size. Instead, it will return the written size, and the caller must
- *          keep on over allocating until the function indicates that it didn't
- *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wreadlinkat,(__fd_t __dfd, wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
-#endif /* ... */
+#endif /* __CRT_HAVE_wreadlinkat */
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_wfreadlinkat
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
 __CDECLARE(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wfreadlinkat,(__fd_t __dfd, wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
-#elif defined(__CRT_HAVE_DOS$wfreadlinkat) && __SIZEOF_WCHAR_T__ == 4
-/* >> freadlinkat(2)
- * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
- * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wfreadlinkat,(__fd_t __dfd, wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen, __atflag_t __flags),wfreadlinkat,(__dfd,__path,__buf,__buflen,__flags))
-#elif defined(__CRT_HAVE_DOS$wfreadlinkat) && __SIZEOF_WCHAR_T__ == 2
-/* >> freadlinkat(2)
- * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
- * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
-__CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wfreadlinkat,(__fd_t __dfd, wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen, __atflag_t __flags),wfreadlinkat,(__dfd,__path,__buf,__buflen,__flags))
-#endif /* ... */
+#endif /* __CRT_HAVE_wfreadlinkat */
 #endif /* __USE_KOS */
 #ifdef __CRT_HAVE_wunlinkat
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wunlinkat,(__fd_t __dfd, wchar_t const *__name, __atflag_t __flags),(__dfd,__name,__flags))
-#elif defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 4
-/* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wunlinkat,(__fd_t __dfd, wchar_t const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
-#elif defined(__CRT_HAVE_DOS$wunlinkat) && __SIZEOF_WCHAR_T__ == 2
-/* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wunlinkat,(__fd_t __dfd, wchar_t const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
-#endif /* ... */
+#endif /* __CRT_HAVE_wunlinkat */
 #endif /* __USE_ATFILE */
 #ifdef __CRT_HAVE_wlchown
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wlchown,(wchar_t const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
-#elif defined(__CRT_HAVE_DOS$wlchown) && __SIZEOF_WCHAR_T__ == 4
-/* >> lchown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER',
- * but don't reference it if that file is a symbolic link */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wlchown,(wchar_t const *__file, __uid_t __owner, __gid_t __group),wlchown,(__file,__owner,__group))
-#elif defined(__CRT_HAVE_DOS$wlchown) && __SIZEOF_WCHAR_T__ == 2
-/* >> lchown(2)
- * Change the ownership of a given `FILE' to `GROUP:OWNER',
- * but don't reference it if that file is a symbolic link */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wlchown,(wchar_t const *__file, __uid_t __owner, __gid_t __group),wlchown,(__file,__owner,__group))
-#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wfchownat) || (defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wfchownat)
 #include <local/parts.wchar.unistd/wlchown.h>
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
@@ -441,27 +239,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wlchown, __FORCELOCAL __ATTR_NONNULL((1)) int __
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate,(wchar_t const *__file, __PIO_OFFSET __length),wtruncate64,(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate64) && defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 4
-/* >> truncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate,(wchar_t const *__file, __PIO_OFFSET __length),wtruncate64,(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate64) && defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 2
-/* >> truncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate,(wchar_t const *__file, __PIO_OFFSET __length),wtruncate64,(__file,__length))
 #elif defined(__CRT_HAVE_wtruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate,(wchar_t const *__file, __PIO_OFFSET __length),(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate) && !defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 4
-/* >> truncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate,(wchar_t const *__file, __PIO_OFFSET __length),wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate) && !defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 2
-/* >> truncate(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate,(wchar_t const *__file, __PIO_OFFSET __length),wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_wtruncate64) || (defined(__CRT_HAVE_DOS$wtruncate64) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wtruncate64) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE_DOS$wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_wtruncate) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)))
+#elif defined(__CRT_HAVE_wtruncate64) || defined(__CRT_HAVE_wtruncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate))) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && ((defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)))
 #include <local/parts.wchar.unistd/wtruncate.h>
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -472,27 +254,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wtruncate, __FORCELOCAL __ATTR_NONNULL((1)) int 
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate64,(wchar_t const *__file, __PIO_OFFSET64 __length),(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate64) && __SIZEOF_WCHAR_T__ == 4
-/* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate64,(wchar_t const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate64) && __SIZEOF_WCHAR_T__ == 2
-/* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate64,(wchar_t const *__file, __PIO_OFFSET64 __length),wtruncate64,(__file,__length))
 #elif defined(__CRT_HAVE_wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate64,(wchar_t const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && __SIZEOF_WCHAR_T__ == 4
-/* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate64,(wchar_t const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && __SIZEOF_WCHAR_T__ == 2
-/* >> truncate64(2)
- * Truncate the given file `FILE' to a length of `LENGTH' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate64,(wchar_t const *__file, __PIO_OFFSET64 __length),wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_wtruncate) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wtruncate) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
+#elif defined(__CRT_HAVE_wtruncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
 #include <local/parts.wchar.unistd/wtruncate64.h>
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -508,19 +274,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wtruncate64, __FORCELOCAL __ATTR_NONNULL((1)) in
  * text, at the filesystem location referred to by `TARGET_PATH'.
  * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wsymlink,(wchar_t const *__link_text, wchar_t const *__target_path),(__link_text,__target_path))
-#elif defined(__CRT_HAVE_DOS$wsymlink) && __SIZEOF_WCHAR_T__ == 4
-/* >> symlink(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TARGET_PATH'.
- * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wsymlink,(wchar_t const *__link_text, wchar_t const *__target_path),wsymlink,(__link_text,__target_path))
-#elif defined(__CRT_HAVE_DOS$wsymlink) && __SIZEOF_WCHAR_T__ == 2
-/* >> symlink(3)
- * Create a new symbolic link loaded with `LINK_TEXT' as link
- * text, at the filesystem location referred to by `TARGET_PATH'.
- * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wsymlink,(wchar_t const *__link_text, wchar_t const *__target_path),wsymlink,(__link_text,__target_path))
-#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wsymlinkat) || (defined(__CRT_HAVE_DOS$wsymlinkat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wsymlinkat) && __SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat)
 #include <local/parts.wchar.unistd/wsymlink.h>
 /* >> symlink(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
@@ -539,29 +293,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wsymlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) in
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,wreadlink,(wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen),(__path,__buf,__buflen))
-#elif defined(__CRT_HAVE_DOS$wreadlink) && __SIZEOF_WCHAR_T__ == 4
-/* >> readlink(3)
- * Read the text of a symbolic link under `PATH' into the provided buffer.
- * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
- * WARNING: This function is badly designed and will neither append a trailing
- *          NUL-character to the buffer, nor will it return the required buffer
- *          size. Instead, it will return the written size, and the caller must
- *          keep on over allocating until the function indicates that it didn't
- *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,wreadlink,(wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen),wreadlink,(__path,__buf,__buflen))
-#elif defined(__CRT_HAVE_DOS$wreadlink) && __SIZEOF_WCHAR_T__ == 2
-/* >> readlink(3)
- * Read the text of a symbolic link under `PATH' into the provided buffer.
- * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
- * WARNING: This function is badly designed and will neither append a trailing
- *          NUL-character to the buffer, nor will it return the required buffer
- *          size. Instead, it will return the written size, and the caller must
- *          keep on over allocating until the function indicates that it didn't
- *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,wreadlink,(wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen),wreadlink,(__path,__buf,__buflen))
-#elif defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wreadlinkat) || (defined(__CRT_HAVE_DOS$wreadlinkat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wreadlinkat) && __SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wreadlinkat)
 #include <local/parts.wchar.unistd/wreadlink.h>
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
@@ -579,11 +311,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wreadlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) s
 #if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
 #ifdef __CRT_HAVE_wgetlogin_r
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wgetlogin_r,(wchar_t *__name, size_t __name_len),(__name,__name_len))
-#elif defined(__CRT_HAVE_DOS$wgetlogin_r) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wgetlogin_r,(wchar_t *__name, size_t __name_len),wgetlogin_r,(__name,__name_len))
-#elif defined(__CRT_HAVE_DOS$wgetlogin_r) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wgetlogin_r,(wchar_t *__name, size_t __name_len),wgetlogin_r,(__name,__name_len))
-#endif /* ... */
+#endif /* __CRT_HAVE_wgetlogin_r */
 #endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
@@ -591,64 +319,28 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wgetlogin_r,(wchar_t *__na
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wgethostname,(wchar_t *__name, size_t __buflen),(__name,__buflen))
-#elif defined(__CRT_HAVE_DOS$wgethostname) && __SIZEOF_WCHAR_T__ == 4
-/* >> gethostname(3)
- * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wgethostname,(wchar_t *__name, size_t __buflen),wgethostname,(__name,__buflen))
-#elif defined(__CRT_HAVE_DOS$wgethostname) && __SIZEOF_WCHAR_T__ == 2
-/* >> gethostname(3)
- * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wgethostname,(wchar_t *__name, size_t __buflen),wgethostname,(__name,__buflen))
-#endif /* ... */
+#endif /* __CRT_HAVE_wgethostname */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_wsetlogin
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetlogin,(wchar_t const *__name),(__name))
-#elif defined(__CRT_HAVE_DOS$wsetlogin) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetlogin,(wchar_t const *__name),wsetlogin,(__name))
-#elif defined(__CRT_HAVE_DOS$wsetlogin) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetlogin,(wchar_t const *__name),wsetlogin,(__name))
-#endif /* ... */
+#endif /* __CRT_HAVE_wsetlogin */
 #ifdef __CRT_HAVE_wsethostname
 /* >> sethostname(2)
  * Set the name of the hosting machine */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsethostname,(wchar_t const *__name, size_t __len),(__name,__len))
-#elif defined(__CRT_HAVE_DOS$wsethostname) && __SIZEOF_WCHAR_T__ == 4
-/* >> sethostname(2)
- * Set the name of the hosting machine */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsethostname,(wchar_t const *__name, size_t __len),wsethostname,(__name,__len))
-#elif defined(__CRT_HAVE_DOS$wsethostname) && __SIZEOF_WCHAR_T__ == 2
-/* >> sethostname(2)
- * Set the name of the hosting machine */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsethostname,(wchar_t const *__name, size_t __len),wsethostname,(__name,__len))
-#endif /* ... */
+#endif /* __CRT_HAVE_wsethostname */
 #ifdef __CRT_HAVE_wgetdomainname
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wgetdomainname,(wchar_t *__name, size_t __buflen),(__name,__buflen))
-#elif defined(__CRT_HAVE_DOS$wgetdomainname) && __SIZEOF_WCHAR_T__ == 4
-/* >> getdomainname(3)
- * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wgetdomainname,(wchar_t *__name, size_t __buflen),wgetdomainname,(__name,__buflen))
-#elif defined(__CRT_HAVE_DOS$wgetdomainname) && __SIZEOF_WCHAR_T__ == 2
-/* >> getdomainname(3)
- * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wgetdomainname,(wchar_t *__name, size_t __buflen),wgetdomainname,(__name,__buflen))
-#endif /* ... */
+#endif /* __CRT_HAVE_wgetdomainname */
 #ifdef __CRT_HAVE_wsetdomainname
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetdomainname,(wchar_t const *__name, size_t __len),(__name,__len))
-#elif defined(__CRT_HAVE_DOS$wsetdomainname) && __SIZEOF_WCHAR_T__ == 4
-/* >> setdomainname(2)
- * Set the name of the hosting machine's domain */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetdomainname,(wchar_t const *__name, size_t __len),wsetdomainname,(__name,__len))
-#elif defined(__CRT_HAVE_DOS$wsetdomainname) && __SIZEOF_WCHAR_T__ == 2
-/* >> setdomainname(2)
- * Set the name of the hosting machine's domain */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetdomainname,(wchar_t const *__name, size_t __len),wsetdomainname,(__name,__len))
-#endif /* ... */
+#endif /* __CRT_HAVE_wsetdomainname */
 #endif /* __USE_MISC */
 
 #if (defined(__USE_MISC) || \
@@ -658,28 +350,14 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetdomainname,(wchar_t co
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchroot,(wchar_t const *__restrict __path),(__path))
-#elif defined(__CRT_HAVE_DOS$wchroot) && __SIZEOF_WCHAR_T__ == 4
-/* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
- * (usually the process) to a path that was previously address by `PATH' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchroot,(wchar_t const *__restrict __path),wchroot,(__path))
-#elif defined(__CRT_HAVE_DOS$wchroot) && __SIZEOF_WCHAR_T__ == 2
-/* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
- * (usually the process) to a path that was previously address by `PATH' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchroot,(wchar_t const *__restrict __path),wchroot,(__path))
-#endif /* ... */
+#endif /* __CRT_HAVE_wchroot */
 #endif /* ... */
 
 #if (defined(_EVERY_SOURCE) || \
      (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 #ifdef __CRT_HAVE_wctermid
 __CDECLARE(,wchar_t *,__NOTHROW_NCX,wctermid,(wchar_t *__s),(__s))
-#elif defined(__CRT_HAVE_DOS$wctermid) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(,wchar_t *,__NOTHROW_NCX,wctermid,(wchar_t *__s),wctermid,(__s))
-#elif defined(__CRT_HAVE_DOS$wctermid) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(,wchar_t *,__NOTHROW_NCX,wctermid,(wchar_t *__s),wctermid,(__s))
-#endif /* ... */
+#endif /* __CRT_HAVE_wctermid */
 #endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 #endif /* __CC__ */

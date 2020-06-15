@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0db0065 */
+/* HASH CRC-32:0x8af4b4d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,28 +21,16 @@
 #ifndef __local_wlchown_defined
 #define __local_wlchown_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_wfchownat) || (defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 2))
+#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wfchownat)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wfchownat from parts.wchar.unistd */
-#ifndef __local___localdep_wfchownat_defined
+#if !defined(__local___localdep_wfchownat_defined) && defined(__CRT_HAVE_wfchownat)
 #define __local___localdep_wfchownat_defined 1
-#ifdef __CRT_HAVE_wfchownat
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfchownat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
-#elif defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 4
-/* >> fchownat(2)
- * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfchownat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
-#elif defined(__CRT_HAVE_DOS$wfchownat) && __SIZEOF_WCHAR_T__ == 2
-/* >> fchownat(2)
- * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfchownat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
-#else /* ... */
-#undef __local___localdep_wfchownat_defined
-#endif /* !... */
-#endif /* !__local___localdep_wfchownat_defined */
+#endif /* !__local___localdep_wfchownat_defined && __CRT_HAVE_wfchownat */
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */
@@ -55,7 +43,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wlchown_defined 1
 #define __localdep_wlchown __LIBC_LOCAL_NAME(wlchown)
 #endif /* !__local___localdep_wlchown_defined */
-#else /* __CRT_AT_FDCWD && (__CRT_HAVE_wfchownat || (__CRT_HAVE_DOS$wfchownat && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$wfchownat && __SIZEOF_WCHAR_T__ == 2)) */
+#else /* __CRT_AT_FDCWD && __CRT_HAVE_wfchownat */
 #undef __local_wlchown_defined
-#endif /* !__CRT_AT_FDCWD || (!__CRT_HAVE_wfchownat && (!__CRT_HAVE_DOS$wfchownat || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$wfchownat || !__SIZEOF_WCHAR_T__ == 2)) */
+#endif /* !__CRT_AT_FDCWD || !__CRT_HAVE_wfchownat */
 #endif /* !__local_wlchown_defined */

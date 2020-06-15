@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc57afe57 */
+/* HASH CRC-32:0xe6c8a827 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcsend
 /* Same as `STR+wcslen(STR)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsend,(__WCHAR_TYPE__ const *__restrict __string),wcsend,(__string))
-#elif defined(__CRT_HAVE_DOS$wcsend) && __SIZEOF_WCHAR_T__ == 4
-/* Same as `STR+wcslen(STR)' */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsend,(__WCHAR_TYPE__ const *__restrict __string),wcsend,(__string))
-#elif defined(__CRT_HAVE_DOS$wcsend) && __SIZEOF_WCHAR_T__ == 2
-/* Same as `STR+wcslen(STR)' */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsend,(__WCHAR_TYPE__ const *__restrict __string),wcsend,(__string))
-#else /* ... */
+#else /* __CRT_HAVE_wcsend */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcsend.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `STR+wcslen(STR)' */
 #define __localdep_wcsend __LIBC_LOCAL_NAME(wcsend)
-#endif /* !... */
+#endif /* !__CRT_HAVE_wcsend */
 #endif /* !__local___localdep_wcsend_defined */
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __LOCAL_LIBC(wcslen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__

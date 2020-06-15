@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x970f07fd */
+/* HASH CRC-32:0xc94e7566 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcsrchrnul
 /* Same as `wcsrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsrchrnul,(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle),wcsrchrnul,(__haystack,__needle))
-#elif defined(__CRT_HAVE_DOS$wcsrchrnul) && __SIZEOF_WCHAR_T__ == 4
-/* Same as `wcsrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsrchrnul,(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle),wcsrchrnul,(__haystack,__needle))
-#elif defined(__CRT_HAVE_DOS$wcsrchrnul) && __SIZEOF_WCHAR_T__ == 2
-/* Same as `wcsrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsrchrnul,(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle),wcsrchrnul,(__haystack,__needle))
-#else /* ... */
+#else /* __CRT_HAVE_wcsrchrnul */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcsrchrnul.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `wcsrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_wcsrchrnul __LIBC_LOCAL_NAME(wcsrchrnul)
-#endif /* !... */
+#endif /* !__CRT_HAVE_wcsrchrnul */
 #endif /* !__local___localdep_wcsrchrnul_defined */
 /* Same as `wcsrchrnul', but return the offset from `STR', rather than the actual address */
 __LOCAL_LIBC(wcsroff) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b0e4cfe */
+/* HASH CRC-32:0x355810e4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcsnend
 /* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsnend,(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnend,(__string,__maxlen))
-#elif defined(__CRT_HAVE_DOS$wcsnend) && __SIZEOF_WCHAR_T__ == 4
-/* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsnend,(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnend,(__string,__maxlen))
-#elif defined(__CRT_HAVE_DOS$wcsnend) && __SIZEOF_WCHAR_T__ == 2
-/* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsnend,(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnend,(__string,__maxlen))
-#else /* ... */
+#else /* __CRT_HAVE_wcsnend */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcsnend.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
 #define __localdep_wcsnend __LIBC_LOCAL_NAME(wcsnend)
-#endif /* !... */
+#endif /* !__CRT_HAVE_wcsnend */
 #endif /* !__local___localdep_wcsnend_defined */
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __LOCAL_LIBC(wcsnlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__

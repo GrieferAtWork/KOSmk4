@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9097a7b */
+/* HASH CRC-32:0x53127dde */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,17 +32,7 @@ __NAMESPACE_LOCAL_BEGIN
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
-#elif defined(__CRT_HAVE_DOS$format_wrepeat) && __SIZEOF_WCHAR_T__ == 4
-/* Repeat `CH' a number of `NUM_REPETITIONS' times
- * The usual format-printer rules apply, and this function
- * is allowed to call `PRINTER' as often as it chooses */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
-#elif defined(__CRT_HAVE_DOS$format_wrepeat) && __SIZEOF_WCHAR_T__ == 2
-/* Repeat `CH' a number of `NUM_REPETITIONS' times
- * The usual format-printer rules apply, and this function
- * is allowed to call `PRINTER' as often as it chooses */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_wrepeat,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
-#else /* ... */
+#else /* __CRT_HAVE_format_wrepeat */
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_wrepeat.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -50,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 #define __localdep_format_wrepeat __LIBC_LOCAL_NAME(format_wrepeat)
-#endif /* !... */
+#endif /* !__CRT_HAVE_format_wrepeat */
 #endif /* !__local___localdep_format_wrepeat_defined */
 /* Dependency: iswprint from wctype */
 #ifndef __local___localdep_iswprint_defined

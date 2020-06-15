@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1b9863f */
+/* HASH CRC-32:0x6d131e91 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__wscanf_l_defined
 #define __local__wscanf_l_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE__vwscanf_l) || (defined(__CRT_HAVE_DOS$_vwscanf_l) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_vwscanf_l) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_vwscanf) || (defined(__CRT_HAVE_DOS$vwscanf) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$vwscanf) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_vfwscanf) || (defined(__CRT_HAVE_DOS$vfwscanf) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$vfwscanf) && __SIZEOF_WCHAR_T__ == 2)) && !defined(__NO_STDSTREAMS))
+#if defined(__CRT_HAVE__vwscanf_l) || defined(__CRT_HAVE_vwscanf) || (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _vwscanf_l from wchar */
@@ -29,11 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep__vwscanf_l_defined 1
 #ifdef __CRT_HAVE__vwscanf_l
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwscanf_l,(__WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwscanf_l,(__format,__locale,__args))
-#elif defined(__CRT_HAVE_DOS$_vwscanf_l) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwscanf_l,(__WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwscanf_l,(__format,__locale,__args))
-#elif defined(__CRT_HAVE_DOS$_vwscanf_l) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vwscanf_l,(__WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwscanf_l,(__format,__locale,__args))
-#elif defined(__CRT_HAVE_vwscanf) || (defined(__CRT_HAVE_DOS$vwscanf) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$vwscanf) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_vfwscanf) || (defined(__CRT_HAVE_DOS$vfwscanf) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$vfwscanf) && __SIZEOF_WCHAR_T__ == 2)) && !defined(__NO_STDSTREAMS))
+#elif defined(__CRT_HAVE_vwscanf) || (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS))
 __NAMESPACE_LOCAL_END
 #include <local/wchar/_vwscanf_l.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -56,7 +52,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__wscanf_l_defined 1
 #define __localdep__wscanf_l __LIBC_LOCAL_NAME(_wscanf_l)
 #endif /* !__local___localdep__wscanf_l_defined */
-#else /* __CRT_HAVE__vwscanf_l || (__CRT_HAVE_DOS$_vwscanf_l && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$_vwscanf_l && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE_vwscanf || (__CRT_HAVE_DOS$vwscanf && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$vwscanf && __SIZEOF_WCHAR_T__ == 2) || ((__CRT_HAVE_vfwscanf || (__CRT_HAVE_DOS$vfwscanf && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$vfwscanf && __SIZEOF_WCHAR_T__ == 2)) && !__NO_STDSTREAMS) */
+#else /* __CRT_HAVE__vwscanf_l || __CRT_HAVE_vwscanf || (__CRT_HAVE_vfwscanf && !__NO_STDSTREAMS) */
 #undef __local__wscanf_l_defined
-#endif /* !__CRT_HAVE__vwscanf_l && (!__CRT_HAVE_DOS$_vwscanf_l || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$_vwscanf_l || !__SIZEOF_WCHAR_T__ == 2) && !__CRT_HAVE_vwscanf && (!__CRT_HAVE_DOS$vwscanf || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$vwscanf || !__SIZEOF_WCHAR_T__ == 2) && ((!__CRT_HAVE_vfwscanf && (!__CRT_HAVE_DOS$vfwscanf || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$vfwscanf || !__SIZEOF_WCHAR_T__ == 2)) || __NO_STDSTREAMS) */
+#endif /* !__CRT_HAVE__vwscanf_l && !__CRT_HAVE_vwscanf && (!__CRT_HAVE_vfwscanf || __NO_STDSTREAMS) */
 #endif /* !__local__wscanf_l_defined */

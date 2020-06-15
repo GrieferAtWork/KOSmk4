@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30daa88a */
+/* HASH CRC-32:0xe34cd392 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep__vfwprintf_p_defined 1
 #ifdef __CRT_HAVE__vfwprintf_p
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vfwprintf_p,(__FILE *__stream, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vfwprintf_p,(__stream,__format,__args))
-#elif defined(__CRT_HAVE_DOS$_vfwprintf_p) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vfwprintf_p,(__FILE *__stream, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vfwprintf_p,(__stream,__format,__args))
-#elif defined(__CRT_HAVE_DOS$_vfwprintf_p) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep__vfwprintf_p,(__FILE *__stream, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vfwprintf_p,(__stream,__format,__args))
-#else /* ... */
+#else /* __CRT_HAVE__vfwprintf_p */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/_vfwprintf_p.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep__vfwprintf_p __LIBC_LOCAL_NAME(_vfwprintf_p)
-#endif /* !... */
+#endif /* !__CRT_HAVE__vfwprintf_p */
 #endif /* !__local___localdep__vfwprintf_p_defined */
 __LOCAL_LIBC(_fwprintf_p) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 (__VLIBCCALL __LIBC_LOCAL_NAME(_fwprintf_p))(__FILE *__stream, __WCHAR_TYPE__ const *__format, ...) __THROWS(...) {

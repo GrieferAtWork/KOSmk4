@@ -90,7 +90,8 @@ typedef __CHAR32_TYPE__ char32_t;
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("mbrtowc", "__mbrtowc")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$mbrtowc")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(mbrtowc)]]
-[[exposed_name("mbrtoc16"), bind_local_function(mbrtoc16)]]
+[[exposed_name("mbrtoc16"), bind_local_function(uchar_mbrtoc16)]]
+[[decl_include("<bits/mbstate.h>")]]
 size_t stdc_mbrtoc16([[nullable]] char16_t *pc16,
                      [[inp_opt(maxlen)]] char const *__restrict str,
                      size_t maxlen, [[nullable]] mbstate_t *mbs);
@@ -99,7 +100,8 @@ size_t stdc_mbrtoc16([[nullable]] char16_t *pc16,
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("mbrtowc", "__mbrtowc")]]
 [[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$mbrtowc")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(mbrtowc)]]
-[[exposed_name("mbrtoc32"), bind_local_function(mbrtoc32)]]
+[[exposed_name("mbrtoc32"), bind_local_function(uchar_mbrtoc32)]]
+[[decl_include("<bits/mbstate.h>")]]
 size_t stdc_mbrtoc32([[nullable]] char32_t *pc32,
                      [[inp_opt(maxlen)]] char const *__restrict str,
                      size_t maxlen, [[nullable]] mbstate_t *mbs);
@@ -108,7 +110,8 @@ size_t stdc_mbrtoc32([[nullable]] char32_t *pc32,
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wcrtomb")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wcrtomb")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(wcrtomb)]]
-[[exposed_name("c16rtomb"), bind_local_function(c16rtomb)]]
+[[exposed_name("c16rtomb"), bind_local_function(uchar_c16rtomb)]]
+[[decl_include("<bits/mbstate.h>")]]
 size_t stdc_c16rtomb(char *__restrict str, char16_t c16,
                      [[nullable]] mbstate_t *mbs);
 
@@ -116,7 +119,8 @@ size_t stdc_c16rtomb(char *__restrict str, char16_t c16,
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wcrtomb")]]
 [[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wcrtomb")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(wcrtomb)]]
-[[exposed_name("c32rtomb"), bind_local_function(c32rtomb)]]
+[[exposed_name("c32rtomb"), bind_local_function(uchar_c32rtomb)]]
+[[decl_include("<bits/mbstate.h>")]]
 size_t stdc_c32rtomb(char *__restrict str, char32_t c32,
                      [[nullable]] mbstate_t *mbs);
 
@@ -152,10 +156,10 @@ size_t stdc_c32rtomb(char *__restrict str, char32_t c32,
  * in headers by-name, _and_ be exposed with a consistent calling
  * convention that matches `LIBCCALL'!
  */
-[[ignore]] mbrtoc16(*) %{uchar16("mbrtowc")}
-[[ignore]] mbrtoc32(*) %{uchar32("mbrtowc")}
-[[ignore]] c16rtomb(*) %{uchar16("wcrtomb")}
-[[ignore]] c32rtomb(*) %{uchar32("wcrtomb")}
+[[ignore]] uchar_mbrtoc16(*) %{uchar16("mbrtowc")}
+[[ignore]] uchar_mbrtoc32(*) %{uchar32("mbrtowc")}
+[[ignore]] uchar_c16rtomb(*) %{uchar16("wcrtomb")}
+[[ignore]] uchar_c32rtomb(*) %{uchar32("wcrtomb")}
 
 
 %{

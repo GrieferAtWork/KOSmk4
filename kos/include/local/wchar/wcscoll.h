@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c83956d */
+/* HASH CRC-32:0xde40ff5f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcscmp
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscmp,(__s1,__s2))
-#elif defined(__CRT_HAVE_DOS$wcscmp) && __SIZEOF_WCHAR_T__ == 4
-/* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscmp,(__s1,__s2))
-#elif defined(__CRT_HAVE_DOS$wcscmp) && __SIZEOF_WCHAR_T__ == 2
-/* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscmp,(__s1,__s2))
-#else /* ... */
+#else /* __CRT_HAVE_wcscmp */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcscmp.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __localdep_wcscmp __LIBC_LOCAL_NAME(wcscmp)
-#endif /* !... */
+#endif /* !__CRT_HAVE_wcscmp */
 #endif /* !__local___localdep_wcscmp_defined */
 __LOCAL_LIBC(wcscoll) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscoll))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2) {

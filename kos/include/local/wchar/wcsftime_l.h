@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6566d24b */
+/* HASH CRC-32:0xd0060d6c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,16 +59,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_wcsftime_defined 1
 #ifdef __CRT_HAVE_wcsftime
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsftime,(__WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
-#elif defined(__CRT_HAVE_DOS$wcsftime) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsftime,(__WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
-#elif defined(__CRT_HAVE_DOS$wcsftime) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsftime,(__WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
-#else /* ... */
+#else /* __CRT_HAVE_wcsftime */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcsftime.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcsftime __LIBC_LOCAL_NAME(wcsftime)
-#endif /* !... */
+#endif /* !__CRT_HAVE_wcsftime */
 #endif /* !__local___localdep_wcsftime_defined */
 __LOCAL_LIBC(wcsftime_l) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsftime_l))(__WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __maxsize, __WCHAR_TYPE__ const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale) {

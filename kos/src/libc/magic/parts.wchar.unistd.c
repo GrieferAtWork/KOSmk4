@@ -47,10 +47,10 @@ __SYSDECL_BEGIN
 [[wchar, userimpl]] wlink(*) %{generate(str2wcs("link"))}
 [[wchar, userimpl]] waccess(*) %{generate(str2wcs("access"))}
 
-[[wchar, userimpl, crt_dosname("_wchdir")]]  wchdir(*) %{generate(str2wcs("chdir"))}
-[[wchar, userimpl, crt_dosname("_wgetcwd")]] wgetcwd(*) %{generate(str2wcs("getcwd"))}
-[[wchar, userimpl, crt_dosname("_wunlink")]] wunlink(*) %{generate(str2wcs("unlink"))}
-[[wchar, userimpl, crt_dosname("_wrmdir")]]  wrmdir(*) %{generate(str2wcs("rmdir"))}
+[[wchar, userimpl, dos_export_as("DOS$_wchdir")]]  wchdir(*) %{generate(str2wcs("chdir"))}
+[[wchar, userimpl, dos_export_as("DOS$_wgetcwd")]] wgetcwd(*) %{generate(str2wcs("getcwd"))}
+[[wchar, userimpl, dos_export_as("DOS$_wunlink")]] wunlink(*) %{generate(str2wcs("unlink"))}
+[[wchar, userimpl, dos_export_as("DOS$_wrmdir")]]  wrmdir(*) %{generate(str2wcs("rmdir"))}
 
 
 

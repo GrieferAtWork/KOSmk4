@@ -1728,7 +1728,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST ATTR_RE
 NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
 /*[[[body:libd___p__wenviron]]]*/
 /*AUTO*/{
-	CRT_UNIMPLEMENTED("__p__wenviron"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$__p__wenviron"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -1751,7 +1751,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST ATTR_RE
 NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
 /*[[[body:libd___p___winitenv]]]*/
 /*AUTO*/{
-	CRT_UNIMPLEMENTED("__p___winitenv"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$__p___winitenv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -1774,7 +1774,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST ATTR_RE
 NOTHROW_NCX(LIBDCALL libd___p___wargv)(void)
 /*[[[body:libd___p___wargv]]]*/
 /*AUTO*/{
-	CRT_UNIMPLEMENTED("__p___wargv"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$__p___wargv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -1796,7 +1796,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST ATTR_RE
 NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void)
 /*[[[body:libd___p__wpgmptr]]]*/
 /*AUTO*/{
-	CRT_UNIMPLEMENTED("__p__wpgmptr"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$__p__wpgmptr"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -1980,7 +1980,7 @@ NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname)
 /*[[[body:libd__wgetenv]]]*/
 /*AUTO*/{
 	(void)varname;
-	CRT_UNIMPLEMENTED("_wgetenv"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$_wgetenv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -2016,7 +2016,7 @@ NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *return_size,
 	(void)buf;
 	(void)buflen;
 	(void)varname;
-	CRT_UNIMPLEMENTED("_wgetenv_s"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$_wgetenv_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -2048,7 +2048,7 @@ NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf,
 	(void)pbuf;
 	(void)pbuflen;
 	(void)varname;
-	CRT_UNIMPLEMENTED("_wdupenv_s"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$_wdupenv_s"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }

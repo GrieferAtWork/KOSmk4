@@ -2531,7 +2531,7 @@ class LibraryFunction {
 
 	@@Preprocessor condition that must be evaluate to true at compile-time
 	@@in order for this library function to actually be implemented.
-	public member ppCond: string | UserString = "1";
+	public member ppCond: string | UserString;
 
 	@@Name of the original defining system header (may differ from the containing
 	@@header in case @"%[insert:extern(...)]" was used to inject a foreign function)

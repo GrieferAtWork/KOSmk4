@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf84612fb */
+/* HASH CRC-32:0xb7ad134f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_c32truncate64_defined
 #define __local_c32truncate64_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_wtruncate) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wtruncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
+#if (defined(__CRT_HAVE_wtruncate) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wtruncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32truncate32 from parts.uchar.unistd */
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_c32truncate32,(__CHAR32_TYPE__ const *__file, __pos32_t __length),wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate)
+#elif defined(__CRT_HAVE_KOS$wtruncate)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_c32truncate32,(__CHAR32_TYPE__ const *__file, __pos32_t __length),wtruncate,(__file,__length))
@@ -154,9 +154,9 @@ __NAMESPACE_LOCAL_BEGIN
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __LOCAL_LIBC(c32truncate64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32truncate64))(__CHAR32_TYPE__ const *__file, __PIO_OFFSET64 __length) {
-#if (defined(__CRT_HAVE_wtruncate) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wtruncate)
+#if (defined(__CRT_HAVE_wtruncate) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wtruncate)
 	return __localdep_c32truncate32(__file, (__PIO_OFFSET)__length);
-#else /* (__CRT_HAVE_wtruncate && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$wtruncate */
+#else /* (__CRT_HAVE_wtruncate && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wtruncate */
 	int __result;
 	__fd_t __fd;
 	__fd = __localdep_open64(__file, 1); /* O_WRONLY */
@@ -167,14 +167,14 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32truncate64))(__CHAR32_TYPE__ const
 	__localdep_close(__fd);
 #endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
 	return __result;
-#endif /* (!__CRT_HAVE_wtruncate || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$wtruncate */
+#endif /* (!__CRT_HAVE_wtruncate || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wtruncate */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32truncate64_defined
 #define __local___localdep_c32truncate64_defined 1
 #define __localdep_c32truncate64 __LIBC_LOCAL_NAME(c32truncate64)
 #endif /* !__local___localdep_c32truncate64_defined */
-#else /* (__CRT_HAVE_wtruncate && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$wtruncate || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open) && (__CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate)) */
+#else /* (__CRT_HAVE_wtruncate && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wtruncate || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open) && (__CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate)) */
 #undef __local_c32truncate64_defined
-#endif /* (!__CRT_HAVE_wtruncate || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$wtruncate && ((!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open) || (!__CRT_HAVE_ftruncate64 && !__CRT_HAVE__chsize_s && !__CRT_HAVE_ftruncate)) */
+#endif /* (!__CRT_HAVE_wtruncate || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wtruncate && ((!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open) || (!__CRT_HAVE_ftruncate64 && !__CRT_HAVE__chsize_s && !__CRT_HAVE_ftruncate)) */
 #endif /* !__local_c32truncate64_defined */

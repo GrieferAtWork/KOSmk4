@@ -351,10 +351,7 @@ function replaceWcharPrototypesShallow(
 
 function replaceWcharFunctionImplementation(
 		self: FunctionImplementation, mode: int,
-		functionName: string | UserString, prototype: FunctionPrototype,
-		forcedDependencies: {string...} = none,
-		unforcedDependencies: {string...} = none,
-		noAutoDependencyScanning: bool = false): FunctionImplementation {
+		functionName: string | UserString, prototype: FunctionPrototype): FunctionImplementation {
 	local oldFunctionName: string = str(self.name);
 	local keyOverride = [](keyword: string): string | none {
 		/* Special handling: References to the function's own name
@@ -368,9 +365,66 @@ function replaceWcharFunctionImplementation(
 		body:         replaceWcharText(self.body, mode, keyOverride: keyOverride),
 		name:         functionName,
 		implPrefix:   replaceWcharTextArray(self.implPrefix, mode, keyOverride: keyOverride));
+#if 1 /* This must be used so-as to catch explicit dependencies in uchar-functions.
+       * an example of this would be c16execl(), where the dependency on c16execv()
+       * has to be declared explicitly, as it would not be detected automatically */
+	local deps: {string: Function} = self.dependencyFunctions;
+	if (deps) {
+		local newDeps = Dict();
+		for (local name, func: deps) {
+			/* Try to see what happends if we were to replace `name' according
+			 * to %[define_wchar_replacement(...)] rules. This must be done to
+			 * deal with automatic dependencies who's keywords got transformed
+			 * into the name of some other function. (s.a. `wmemcpy', which is
+			 * replaced with `memcpyw' for uchar16, and `memcpyl' for uchar32) */
+			local replacedName = str(replaceWcharText(
+				name, mode, keyOverride: keyOverride));
+			if (!replacedName.issymbol()) {
+				/* Deal with the replacement containing multiple keywords.
+				 * Handle this case by checking if the replacement text
+				 * ends with a keyword.
+				 * This behavior goes hand-in-hand with stuff like:
+				 * >> %[define_wchar_replacement(wmemcpy = "(char16_t *)memcpyw", "(char32_t *)memcpyl")]
+				 * where the actual, new dependency is the last keyword of the
+				 * provided such, i.e. "memcpyw" for "(char16_t *)memcpyw"
+				 */
+				local kwdStart = #replacedName;
+				while (kwdStart && replacedName.issymcont(kwdStart - 1))
+					--kwdStart;
+				replacedName = replacedName[kwdStart:];
+			}
+			if (!replacedName)
+				continue;
+#if 1 /* Safety check to ensure that wchar-dependencies are replaced consistently */
+			local wcs = allWcharFunctionsByName.get(replacedName);
+			if (wcs !is none) {
+				func = wcs.wc_header_uchar[mode];
+				if (func is none) {
+					throw Error("Missing %{{uchar{}}}-variant of [[wchar]] Function {!r}"
+						.format({ WCHAR_REPLACEMENT_WIDTH[mode], func.name }));
+				}
+				newDeps[replacedName] = func;
+				continue;
+			}
+#endif
+			if (replacedName != name) {
+				/* Dependency was converted to some other function.
+				 * This can happen due to use of define_wchar_replacement.
+				 * Simply handle this case by loading the new, overwritten
+				 * dependency for our specific uchar-variant. */
+				func = allFunctionsByName.get(replacedName);
+				if (func is none)
+					continue;
+			}
+			newDeps[replacedName] = func;
+		}
+		result.dependencies = newDeps;
+	}
+#else
 	result.dependencies = scanForNamesOfDependentFunctions(
 		result.body, functionName, prototype, forcedDependencies,
 		unforcedDependencies, noAutoDependencyScanning);
+#endif
 	return result;
 }
 

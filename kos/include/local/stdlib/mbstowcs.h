@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x136c4216 */
+/* HASH CRC-32:0xf3804e98 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,16 +27,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_mbsrtowcs_defined 1
 #ifdef __CRT_HAVE_mbsrtowcs
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtowcs,(__WCHAR_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
-#elif defined(__CRT_HAVE_DOS$mbsrtowcs) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtowcs,(__WCHAR_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
-#elif defined(__CRT_HAVE_DOS$mbsrtowcs) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtowcs,(__WCHAR_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
-#else /* ... */
+#else /* __CRT_HAVE_mbsrtowcs */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/mbsrtowcs.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_mbsrtowcs __LIBC_LOCAL_NAME(mbsrtowcs)
-#endif /* !... */
+#endif /* !__CRT_HAVE_mbsrtowcs */
 #endif /* !__local___localdep_mbsrtowcs_defined */
 __LOCAL_LIBC(mbstowcs) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbstowcs))(__WCHAR_TYPE__ *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dstlen) {

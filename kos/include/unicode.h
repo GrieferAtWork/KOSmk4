@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46ed284d */
+/* HASH CRC-32:0xb898bf6c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -898,7 +898,7 @@ struct format_32to8_data {
 /* Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-8 output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_DOS$format_wto8)
+#elif defined(__CRT_HAVE_KOS$format_wto8)
 /* Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-8 output */
 __CREDIRECT_KOS(,__SSIZE_TYPE__,__NOTHROW_NCX,format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
@@ -947,7 +947,7 @@ struct format_32to16_data {
 /* Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16 output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_DOS$format_wto16)
+#elif defined(__CRT_HAVE_KOS$format_wto16)
 /* Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16 output */
 __CREDIRECT_KOS(,__SSIZE_TYPE__,__NOTHROW_NCX,format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))

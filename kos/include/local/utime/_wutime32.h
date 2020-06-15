@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ecec012 */
+/* HASH CRC-32:0x2a4ff575 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__wutime32_defined
 #define __local__wutime32_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_wutime64) || (defined(__CRT_HAVE_DOS$wutime64) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$wutime64) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE__wutime64) || (defined(__CRT_HAVE_DOS$_wutime64) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wutime64) && __SIZEOF_WCHAR_T__ == 2)
+#if defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64)
 #include <features.h>
 #include <bits/utimbuf.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -30,16 +30,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_crt_wutime64_defined 1
 #ifdef __CRT_HAVE_wutime64
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_DOS$wutime64) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_DOS$wutime64) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_DOS$_wutime64) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_DOS$_wutime64) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
 #else /* ... */
 #undef __local___localdep_crt_wutime64_defined
 #endif /* !... */
@@ -68,7 +60,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__wutime32_defined 1
 #define __localdep__wutime32 __LIBC_LOCAL_NAME(_wutime32)
 #endif /* !__local___localdep__wutime32_defined */
-#else /* __CRT_HAVE_wutime64 || (__CRT_HAVE_DOS$wutime64 && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$wutime64 && __SIZEOF_WCHAR_T__ == 2) || __CRT_HAVE__wutime64 || (__CRT_HAVE_DOS$_wutime64 && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$_wutime64 && __SIZEOF_WCHAR_T__ == 2) */
+#else /* __CRT_HAVE_wutime64 || __CRT_HAVE__wutime64 */
 #undef __local__wutime32_defined
-#endif /* !__CRT_HAVE_wutime64 && (!__CRT_HAVE_DOS$wutime64 || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$wutime64 || !__SIZEOF_WCHAR_T__ == 2) && !__CRT_HAVE__wutime64 && (!__CRT_HAVE_DOS$_wutime64 || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$_wutime64 || !__SIZEOF_WCHAR_T__ == 2) */
+#endif /* !__CRT_HAVE_wutime64 && !__CRT_HAVE__wutime64 */
 #endif /* !__local__wutime32_defined */

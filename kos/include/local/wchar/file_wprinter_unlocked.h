@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ce05c5a */
+/* HASH CRC-32:0x66de6dc5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,21 +21,13 @@
 #ifndef __local_file_wprinter_unlocked_defined
 #define __local_file_wprinter_unlocked_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_fputwc_unlocked) || (defined(__CRT_HAVE_DOS$fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_fputwc_nolock) && __SIZEOF_WCHAR_T__ == 2)
+#ifdef __CRT_HAVE_fputwc_unlocked
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fputwc_unlocked from wchar */
-#ifndef __local___localdep_fputwc_unlocked_defined
+#if !defined(__local___localdep_fputwc_unlocked_defined) && defined(__CRT_HAVE_fputwc_unlocked)
 #define __local___localdep_fputwc_unlocked_defined 1
-#ifdef __CRT_HAVE_fputwc_unlocked
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
-#elif defined(__CRT_HAVE_DOS$fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
-#elif defined(__CRT_HAVE_DOS$_fputwc_nolock) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
-#else /* ... */
-#undef __local___localdep_fputwc_unlocked_defined
-#endif /* !... */
-#endif /* !__local___localdep_fputwc_unlocked_defined */
+#endif /* !__local___localdep_fputwc_unlocked_defined && __CRT_HAVE_fputwc_unlocked */
 __NAMESPACE_LOCAL_END
 #include <asm/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -54,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_file_wprinter_unlocked_defined 1
 #define __localdep_file_wprinter_unlocked __LIBC_LOCAL_NAME(file_wprinter_unlocked)
 #endif /* !__local___localdep_file_wprinter_unlocked_defined */
-#else /* __CRT_HAVE_fputwc_unlocked || (__CRT_HAVE_DOS$fputwc_unlocked && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$_fputwc_nolock && __SIZEOF_WCHAR_T__ == 2) */
+#else /* __CRT_HAVE_fputwc_unlocked */
 #undef __local_file_wprinter_unlocked_defined
-#endif /* !__CRT_HAVE_fputwc_unlocked && (!__CRT_HAVE_DOS$fputwc_unlocked || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$_fputwc_nolock || !__SIZEOF_WCHAR_T__ == 2) */
+#endif /* !__CRT_HAVE_fputwc_unlocked */
 #endif /* !__local_file_wprinter_unlocked_defined */

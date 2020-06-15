@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6f4430 */
+/* HASH CRC-32:0x67d2ab60 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_c32rtomb_defined
-#define __local_c32rtomb_defined 1
+#ifndef __local_uchar_c16rtomb_defined
+#define __local_uchar_c16rtomb_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: unicode_writeutf8 from unicode */
@@ -41,11 +41,11 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c32rtomb) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32rtomb))(char *__restrict __str, __CHAR32_TYPE__ __wc, __mbstate_t *__mbs) {
+__LOCAL_LIBC(uchar_c16rtomb) __SIZE_TYPE__
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(uchar_c16rtomb))(char *__restrict __str, __CHAR16_TYPE__ __wc, __mbstate_t *__mbs) {
 	char *__endptr;
 	__SIZE_TYPE__ __result;
-#if 4 == 2
+#if 2 == 2
 	/* unicode_c16toc8() */
 	if (!__mbs) {
 		static __mbstate_t __wcrtomb_ps = __MBSTATE_INIT;
@@ -77,19 +77,19 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32rtomb))(char *__restrict __str, __
 	} else {
 		__endptr = __localdep_unicode_writeutf8(__str, (__CHAR32_TYPE__)(__UINT32_TYPE__)(__UINT16_TYPE__)__wc);
 	}
-#else /* 4 == 2 */
+#else /* 2 == 2 */
 	/* unicode_c32toc8() */
 	(void)__mbs;
 	if (!__str)
 		return 1;
 	__endptr = __localdep_unicode_writeutf8(__str, (__CHAR32_TYPE__)__wc);
-#endif /* !(4 == 2) */
+#endif /* !(2 == 2) */
 	__result = (__SIZE_TYPE__)(__endptr - __str);
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_c32rtomb_defined
-#define __local___localdep_c32rtomb_defined 1
-#define __localdep_c32rtomb __LIBC_LOCAL_NAME(c32rtomb)
-#endif /* !__local___localdep_c32rtomb_defined */
-#endif /* !__local_c32rtomb_defined */
+#ifndef __local___localdep_uchar_c16rtomb_defined
+#define __local___localdep_uchar_c16rtomb_defined 1
+#define __localdep_uchar_c16rtomb __LIBC_LOCAL_NAME(uchar_c16rtomb)
+#endif /* !__local___localdep_uchar_c16rtomb_defined */
+#endif /* !__local_uchar_c16rtomb_defined */

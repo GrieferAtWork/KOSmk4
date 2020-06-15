@@ -635,7 +635,7 @@ $uintmax_t strtoumax_l([[nonnull]] char const *__restrict nptr,
 	return strtoumax(nptr, endptr, base);
 }
 
-[[wchar, ATTR_LEAF, crt_dosname("_wcstoimax_l")]]
+[[wchar, ATTR_LEAF, dos_export_as("DOS$_wcstoimax_l")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("wcstol_l", "_wcstol_l", "__wcstol_l")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("wcstoll_l", "_wcstoll_l", "__wcstoll_l")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("wcsto64_l", "_wcstoi64_l")]]
@@ -646,7 +646,7 @@ $intmax_t wcstoimax_l([[nonnull]] $wchar_t const *__restrict nptr,
                       $locale_t locale)
 	%{generate(str2wcs)}
 
-[[wchar, ATTR_LEAF, crt_dosname("_wcstoumax_l")]]
+[[wchar, ATTR_LEAF, dos_export_as("DOS$_wcstoumax_l")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("wcstoul_l", "_wcstoul_l", "__wcstoul_l")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("wcstoull_l", "_wcstoull_l", "__wcstoull_l")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("wcstou64_l", "_wcstoui64_l")]]

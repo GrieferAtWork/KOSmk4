@@ -82,10 +82,7 @@ BEGIN
 							continue;
 						if (symbolBind != "GLOBAL" && symbolBind != "WEAK")
 							continue;
-						if (symbolName.startswith("kernel_") && (symbolName.endswith("_start") ||
-							symbolName.endswith("_end") || symbolName.endswith("_size")))
-							print "WARNING: Potentially unwanted kernel export:",repr symbolName;
-						final local libdlSymbols = {
+						final local LIBDL_SYMBOLS = {
 							"dlopen", "dlfopen", "dlclose", "dlsym", "dlerror", "dlgethandle",
 							"dlgetmodule", "dladdr", "dlmodulefd", "dlmodulename", "dlexceptaware",
 							"dlmodulebase", "dllocksection", "dlunlocksection", "dlsectionname",
@@ -94,7 +91,7 @@ BEGIN
 							"dltlsfree", "dltlsaddr", "dlauxctrl",
 						};
 						if (symbolSect == "UND") {
-							if (symbolName in libdlSymbols)
+							if (symbolName in LIBDL_SYMBOLS)
 								continue;
 							if (symbolName !in CRT_DLSUBST_GLOBALS)
 								print "WARNING: Unresolved symbol in libc:", repr symbolName;
@@ -106,14 +103,40 @@ BEGIN
 					symbols_set.update(CRT_DLSUBST_GLOBALS);
 					updateFileContents(self.group.fixFilename(LIBC_FEATURES_HEADER), [](fp: File){
 						fp << COPYRIGHT << "\n\n\n";
+						local dosSymbols = HashSet();
 						for (local x: symbols_set.sorted()) {
 							if (x.startswith("?")) {
 								fp << "#define __CRT_HAVE_"
 									<< x.replace("?", "$Q").replace("@", "$A")
 									<< " 1\n";
+							} else if (x.startswith("DOS$")) {
+								dosSymbols.insert(x[4:]);
 							} else {
 								fp << "#define __CRT_HAVE_" << x << " 1\n";
 							}
+						}
+						if (dosSymbols) {
+							local kosSymbols = HashSet();
+							for (local x: dosSymbols) {
+								if (x in symbols_set) {
+									/* Symbol exists twice (once for DOS, and once for KOS) */
+									kosSymbols.insert("KOS$" + x);
+								} else {
+									/* Symbol exists only in DOS-mode */
+									kosSymbols.insert(x);
+								}
+							}
+							if (kosSymbols) {
+								fp << "#ifdef __PE__\n";
+								for (local x: kosSymbols.sorted())
+									fp << "#define __CRT_HAVE_" << x << " 1\n";
+								fp << "#else /* __PE__ */\n";
+							} else {
+								fp << "#ifndef __PE__\n";
+							}
+							for (local x: dosSymbols.sorted())
+								fp << "#define __CRT_HAVE_DOS$" << x << " 1\n";
+							fp << "#endif /* !__PE__ */\n";
 						}
 					});
 				}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x278fe2bf */
+/* HASH CRC-32:0x7e805317 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__wgetcwd_dbg_defined
 #define __local__wgetcwd_dbg_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_wgetcwd) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wgetcwd)
+#if (defined(__CRT_HAVE_wgetcwd) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wgetcwd)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16getcwd from parts.uchar.unistd */
@@ -31,10 +31,10 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT(,__CHAR16_TYPE__ *,__NOTHROW_RPC,__localdep_c16getcwd,(__CHAR16_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),wgetcwd,(__buf,__bufsize))
-#elif defined(__CRT_HAVE_DOS$_wgetcwd)
+#elif defined(__CRT_HAVE_DOS$wgetcwd)
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-__CREDIRECT_DOS(,__CHAR16_TYPE__ *,__NOTHROW_RPC,__localdep_c16getcwd,(__CHAR16_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),_wgetcwd,(__buf,__bufsize))
+__CREDIRECT_DOS(,__CHAR16_TYPE__ *,__NOTHROW_RPC,__localdep_c16getcwd,(__CHAR16_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),wgetcwd,(__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_c16getcwd_defined
 #endif /* !... */
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__wgetcwd_dbg_defined 1
 #define __localdep__wgetcwd_dbg __LIBC_LOCAL_NAME(_wgetcwd_dbg)
 #endif /* !__local___localdep__wgetcwd_dbg_defined */
-#else /* (__CRT_HAVE_wgetcwd && (__SIZEOF_WCHAR_T__ == 2) && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wgetcwd */
+#else /* (__CRT_HAVE_wgetcwd && (__SIZEOF_WCHAR_T__ == 2) && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wgetcwd */
 #undef __local__wgetcwd_dbg_defined
-#endif /* (!__CRT_HAVE_wgetcwd || !(__SIZEOF_WCHAR_T__ == 2) || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$_wgetcwd */
+#endif /* (!__CRT_HAVE_wgetcwd || !(__SIZEOF_WCHAR_T__ == 2) || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wgetcwd */
 #endif /* !__local__wgetcwd_dbg_defined */

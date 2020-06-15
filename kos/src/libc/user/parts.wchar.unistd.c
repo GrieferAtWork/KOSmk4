@@ -66,7 +66,7 @@ NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd)
 /*[[[body:libd_wttyname]]]*/
 /*AUTO*/{
 	(void)fd;
-	CRT_UNIMPLEMENTED("wttyname"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$wttyname"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -102,7 +102,7 @@ NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
 	(void)fd;
 	(void)buf;
 	(void)buflen;
-	CRT_UNIMPLEMENTED("wttyname_r"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$wttyname_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -124,7 +124,7 @@ INTERN WUNUSED char16_t *
 NOTHROW_NCX(LIBDCALL libd_wgetlogin)(void)
 /*[[[body:libd_wgetlogin]]]*/
 /*AUTO*/{
-	CRT_UNIMPLEMENTED("wgetlogin"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$wgetlogin"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -258,12 +258,12 @@ NOTHROW_RPC(LIBKCALL libc_wchdir)(char32_t const *path)
 }
 /*[[[end:libc_wchdir]]]*/
 
-/*[[[head:libd__wchdir,hash:CRC-32=0x30fbea7b]]]*/
+/*[[[head:libd_wchdir,hash:CRC-32=0x1ac2ecff]]]*/
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 INTERN NONNULL((1)) int
-NOTHROW_RPC(LIBDCALL libd__wchdir)(char16_t const *path)
-/*[[[body:libd__wchdir]]]*/
+NOTHROW_RPC(LIBDCALL libd_wchdir)(char16_t const *path)
+/*[[[body:libd_wchdir]]]*/
 {
 	int result = -1;
 	char *used_path;
@@ -274,7 +274,7 @@ NOTHROW_RPC(LIBDCALL libd__wchdir)(char16_t const *path)
 	}
 	return result;
 }
-/*[[[end:libd__wchdir]]]*/
+/*[[[end:libd_wchdir]]]*/
 
 /*[[[head:libc_wgetcwd,hash:CRC-32=0xd4bdbee6]]]*/
 /* >> getcwd(2)
@@ -318,13 +318,13 @@ NOTHROW_RPC(LIBKCALL libc_wgetcwd)(char32_t *buf,
 }
 /*[[[end:libc_wgetcwd]]]*/
 
-/*[[[head:libd__wgetcwd,hash:CRC-32=0x7674a916]]]*/
+/*[[[head:libd_wgetcwd,hash:CRC-32=0x8e3861a5]]]*/
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 INTERN char16_t *
-NOTHROW_RPC(LIBDCALL libd__wgetcwd)(char16_t *buf,
-                                    size_t bufsize)
-/*[[[body:libd__wgetcwd]]]*/
+NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf,
+                                   size_t bufsize)
+/*[[[body:libd_wgetcwd]]]*/
 {
 	char16_t *result;
 	size_t result_len;
@@ -358,7 +358,7 @@ NOTHROW_RPC(LIBDCALL libd__wgetcwd)(char16_t *buf,
 	free(result);
 	return buf;
 }
-/*[[[end:libd__wgetcwd]]]*/
+/*[[[end:libd_wgetcwd]]]*/
 
 /*[[[head:libc_wfaccessat,hash:CRC-32=0xf8ec0018]]]*/
 /* >> faccessat(2)
@@ -582,7 +582,7 @@ NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd,
 	(void)buf;
 	(void)buflen;
 	(void)flags;
-	CRT_UNIMPLEMENTED("wfreadlinkat"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$wfreadlinkat"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -650,7 +650,7 @@ NOTHROW_RPC(LIBDCALL libd_wgetlogin_r)(char16_t *name,
 /*AUTO*/{
 	(void)name;
 	(void)name_len;
-	CRT_UNIMPLEMENTED("wgetlogin_r"); /* TODO */
+	CRT_UNIMPLEMENTED("DOS$wgetlogin_r"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
@@ -1085,16 +1085,16 @@ NOTHROW_RPC(LIBKCALL libc_wunlink)(char32_t const *file)
 }
 /*[[[end:libc_wunlink]]]*/
 
-/*[[[head:libd__wunlink,hash:CRC-32=0xac76829e]]]*/
+/*[[[head:libd_wunlink,hash:CRC-32=0x353c56c2]]]*/
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 INTERN NONNULL((1)) int
-NOTHROW_RPC(LIBDCALL libd__wunlink)(char16_t const *file)
-/*[[[body:libd__wunlink]]]*/
+NOTHROW_RPC(LIBDCALL libd_wunlink)(char16_t const *file)
+/*[[[body:libd_wunlink]]]*/
 {
 	return libd_wunlinkat(AT_FDCWD, file, 0);
 }
-/*[[[end:libd__wunlink]]]*/
+/*[[[end:libd_wunlink]]]*/
 
 /*[[[head:libc_wrmdir,hash:CRC-32=0xff738ed7]]]*/
 /* >> rmdir(2)
@@ -1107,16 +1107,16 @@ NOTHROW_RPC(LIBKCALL libc_wrmdir)(char32_t const *path)
 }
 /*[[[end:libc_wrmdir]]]*/
 
-/*[[[head:libd__wrmdir,hash:CRC-32=0xb8f74fc5]]]*/
+/*[[[head:libd_wrmdir,hash:CRC-32=0xe9b7b5a6]]]*/
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 INTERN NONNULL((1)) int
-NOTHROW_RPC(LIBDCALL libd__wrmdir)(char16_t const *path)
-/*[[[body:libd__wrmdir]]]*/
+NOTHROW_RPC(LIBDCALL libd_wrmdir)(char16_t const *path)
+/*[[[body:libd_wrmdir]]]*/
 {
 	return libd_wunlinkat(AT_FDCWD, path, AT_REMOVEDIR);
 }
-/*[[[end:libd__wrmdir]]]*/
+/*[[[end:libd_wrmdir]]]*/
 
 /*[[[head:libc_weuidaccess,hash:CRC-32=0xef5335d5]]]*/
 /* >> euidaccess(2)
@@ -1356,7 +1356,7 @@ NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *__restrict path,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xdcadb7cf]]]*/
+/*[[[start:exports,hash:CRC-32=0x33edbb3b]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$wttyname, libd_wttyname);
 DEFINE_PUBLIC_ALIAS(wttyname, libc_wttyname);
 DEFINE_PUBLIC_ALIAS(DOS$wttyname_r, libd_wttyname_r);
@@ -1371,13 +1371,17 @@ DEFINE_PUBLIC_ALIAS(DOS$wlink, libd_wlink);
 DEFINE_PUBLIC_ALIAS(wlink, libc_wlink);
 DEFINE_PUBLIC_ALIAS(DOS$waccess, libd_waccess);
 DEFINE_PUBLIC_ALIAS(waccess, libc_waccess);
-DEFINE_PUBLIC_ALIAS(DOS$_wchdir, libd__wchdir);
+DEFINE_PUBLIC_ALIAS(DOS$_wchdir, libd_wchdir);
+DEFINE_PUBLIC_ALIAS(DOS$wchdir, libd_wchdir);
 DEFINE_PUBLIC_ALIAS(wchdir, libc_wchdir);
-DEFINE_PUBLIC_ALIAS(DOS$_wgetcwd, libd__wgetcwd);
+DEFINE_PUBLIC_ALIAS(DOS$_wgetcwd, libd_wgetcwd);
+DEFINE_PUBLIC_ALIAS(DOS$wgetcwd, libd_wgetcwd);
 DEFINE_PUBLIC_ALIAS(wgetcwd, libc_wgetcwd);
-DEFINE_PUBLIC_ALIAS(DOS$_wunlink, libd__wunlink);
+DEFINE_PUBLIC_ALIAS(DOS$_wunlink, libd_wunlink);
+DEFINE_PUBLIC_ALIAS(DOS$wunlink, libd_wunlink);
 DEFINE_PUBLIC_ALIAS(wunlink, libc_wunlink);
-DEFINE_PUBLIC_ALIAS(DOS$_wrmdir, libd__wrmdir);
+DEFINE_PUBLIC_ALIAS(DOS$_wrmdir, libd_wrmdir);
+DEFINE_PUBLIC_ALIAS(DOS$wrmdir, libd_wrmdir);
 DEFINE_PUBLIC_ALIAS(wrmdir, libc_wrmdir);
 DEFINE_PUBLIC_ALIAS(DOS$weuidaccess, libd_weuidaccess);
 DEFINE_PUBLIC_ALIAS(weuidaccess, libc_weuidaccess);

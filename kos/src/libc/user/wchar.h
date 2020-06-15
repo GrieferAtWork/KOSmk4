@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3154b0c5 */
+/* HASH CRC-32:0xbdec251f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,9 +45,9 @@ INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_wcsnrtombs)(char *dst, char
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBKCALL libc_wcsnrtombs)(char *dst, char32_t const **__restrict psrc, size_t nwc, size_t len, mbstate_t *mbs);
 INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_open_wmemstream)(char16_t **bufloc, size_t *sizeloc);
 INTDEF FILE *NOTHROW_NCX(LIBKCALL libc_open_wmemstream)(char32_t **bufloc, size_t *sizeloc);
-INTDEF NONNULL((1)) wint_t (LIBDCALL libd__fgetwc_nolock)(FILE *__restrict stream) THROWS(...);
+INTDEF NONNULL((1)) wint_t (LIBDCALL libd_fgetwc_unlocked)(FILE *__restrict stream) THROWS(...);
 INTDEF NONNULL((1)) wint_t (LIBKCALL libc_fgetwc_unlocked)(FILE *__restrict stream) THROWS(...);
-INTDEF NONNULL((2)) wint_t (LIBDCALL libd__fputwc_nolock)(char16_t wc, FILE *__restrict stream) THROWS(...);
+INTDEF NONNULL((2)) wint_t (LIBDCALL libd_fputwc_unlocked)(char16_t wc, FILE *__restrict stream) THROWS(...);
 INTDEF NONNULL((2)) wint_t (LIBKCALL libc_fputwc_unlocked)(char32_t wc, FILE *__restrict stream) THROWS(...);
 /* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 INTDEF NONNULL((1, 2)) ssize_t (LIBDCALL libd_file_wprinter)(void *arg, char16_t const *__restrict data, size_t datalen) THROWS(...);
@@ -57,7 +57,7 @@ INTDEF NONNULL((1, 2)) ssize_t (LIBKCALL libc_file_wprinter)(void *arg, char32_t
 INTDEF NONNULL((1, 2)) ssize_t (LIBDCALL libd_file_wprinter_unlocked)(void *arg, char16_t const *__restrict data, size_t datalen) THROWS(...);
 /* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 INTDEF NONNULL((1, 2)) ssize_t (LIBKCALL libc_file_wprinter_unlocked)(void *arg, char32_t const *__restrict data, size_t datalen) THROWS(...);
-INTDEF NONNULL((2)) wint_t NOTHROW_NCX(LIBDCALL libd__ungetwc_nolock)(wint_t ch, FILE *__restrict stream);
+INTDEF NONNULL((2)) wint_t NOTHROW_NCX(LIBDCALL libd_ungetwc_unlocked)(wint_t ch, FILE *__restrict stream);
 INTDEF NONNULL((2)) wint_t NOTHROW_NCX(LIBKCALL libc_ungetwc_unlocked)(wint_t ch, FILE *__restrict stream);
 INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwscanf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) THROWS(...);
 INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBKCALL libc_vfwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) THROWS(...);

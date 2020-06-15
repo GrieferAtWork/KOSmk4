@@ -73,39 +73,39 @@ __SYSDECL_BEGIN
 
 %[default:section("{.text.crt.wchar.fs.exec.exec|.text.crt.dos.wchar.fs.exec.exec}")]
 
-[[cp, guard, wchar, argument_names(path, ___argv), crt_dosname("_wexecv")]]
+[[cp, guard, wchar, argument_names(path, ___argv), dos_export_as("DOS$_wexecv")]]
 int wexecv([[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV);
 
-[[cp, guard, wchar, argument_names(path, ___argv, ___envp), crt_dosname("_wexecve")]]
+[[cp, guard, wchar, argument_names(path, ___argv, ___envp), dos_export_as("DOS$_wexecve")]]
 int wexecve([[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
 
-[[cp, guard, wchar, argument_names(path, ___argv), crt_dosname("_wexecvp")]]
+[[cp, guard, wchar, argument_names(path, ___argv), dos_export_as("DOS$_wexecvp")]]
 int wexecvp([[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV);
 
-[[cp, guard, wchar, argument_names(path, ___argv, ___envp), crt_dosname("_wexecvpe")]]
+[[cp, guard, wchar, argument_names(path, ___argv, ___envp), dos_export_as("DOS$_wexecvpe")]]
 int wexecvpe([[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
 
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function(wexecv), ATTR_SENTINEL, crt_dosname("_wexecl")]]
+[[requires_dependent_function(wexecv), ATTR_SENTINEL, dos_export_as("DOS$_wexecl")]]
 int wexecl([[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
 	__REDIRECT_EXECL(wchar_t, wexecv, path, args)
 }
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function(wexecvp), ATTR_SENTINEL, crt_dosname("_wexeclp")]]
+[[requires_dependent_function(wexecvp), ATTR_SENTINEL, dos_export_as("DOS$_wexeclp")]]
 int wexeclp([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
 	__REDIRECT_EXECL(wchar_t, wexecvp, file, args)
 }
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function(wexecve), ATTR_SENTINEL_O(1), crt_dosname("_wexecle")]]
+[[requires_dependent_function(wexecve), ATTR_SENTINEL_O(1), dos_export_as("DOS$_wexecle")]]
 int wexecle([[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
 	__REDIRECT_EXECLE(wchar_t, wexecve, path, args)
 }
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function(wexecvpe), ATTR_SENTINEL_O(1), crt_dosname("_wexeclpe")]]
+[[requires_dependent_function(wexecvpe), ATTR_SENTINEL_O(1), dos_export_as("DOS$_wexeclpe")]]
 int wexeclpe([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
 	__REDIRECT_EXECLE(wchar_t, wexecvpe, file, args)
 }
@@ -113,43 +113,43 @@ int wexeclpe([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ..
 
 %[default:section("{.text.crt.wchar.fs.exec.spawn|.text.crt.dos.wchar.fs.exec.spawn}")]
 
-[[cp, guard, wchar, argument_names(mode, path, ___argv), crt_dosname("_wspawnv")]]
+[[cp, guard, wchar, argument_names(mode, path, ___argv), dos_export_as("DOS$_wspawnv")]]
 $pid_t wspawnv(int mode, [[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV);
 
-[[cp, guard, wchar, argument_names(mode, path, ___argv, ___envp), crt_dosname("_wspawnve")]]
+[[cp, guard, wchar, argument_names(mode, path, ___argv, ___envp), dos_export_as("DOS$_wspawnve")]]
 $pid_t wspawnve(int mode, [[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
 
-[[cp, guard, wchar, argument_names(mode, file, ___argv), crt_dosname("_wspawnvp")]]
+[[cp, guard, wchar, argument_names(mode, file, ___argv), dos_export_as("DOS$_wspawnvp")]]
 $pid_t wspawnvp(int mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV);
 
-[[cp, guard, wchar, argument_names(mode, file, ___argv, ___envp), crt_dosname("_wspawnvpe")]]
+[[cp, guard, wchar, argument_names(mode, file, ___argv, ___envp), dos_export_as("DOS$_wspawnvpe")]]
 $pid_t wspawnvpe(int mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP);
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function(wspawnv), ATTR_SENTINEL, crt_dosname("_wspawnl")]]
+[[requires_dependent_function(wspawnv), ATTR_SENTINEL, dos_export_as("DOS$_wspawnl")]]
 $pid_t wspawnl(int mode, [[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
 	__REDIRECT_SPAWNL(wchar_t, wspawnv, mode, path, args)
 }
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function(wspawnvp), ATTR_SENTINEL, crt_dosname("_wspawnlp")]]
+[[requires_dependent_function(wspawnvp), ATTR_SENTINEL, dos_export_as("DOS$_wspawnlp")]]
 $pid_t wspawnlp(int mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
 	__REDIRECT_SPAWNL(wchar_t, wspawnvp, mode, file, args)
 }
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function(wspawnve), ATTR_SENTINEL_O(1), crt_dosname("_wspawnle")]]
+[[requires_dependent_function(wspawnve), ATTR_SENTINEL_O(1), dos_export_as("DOS$_wspawnle")]]
 $pid_t wspawnle(int mode, [[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
 	__REDIRECT_SPAWNLE(wchar_t, wspawnve, mode, path, args)
 }
 
 [[cp, guard, wchar, userimpl, impl_include("<parts/redirect-exec.h>")]]
-[[requires_dependent_function(wspawnvpe), ATTR_SENTINEL_O(1), crt_dosname("_wspawnlpe")]]
+[[requires_dependent_function(wspawnvpe), ATTR_SENTINEL_O(1), dos_export_as("DOS$_wspawnlpe")]]
 $pid_t wspawnlpe(int mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
 	__REDIRECT_SPAWNLE(wchar_t, wspawnvpe, mode, file, args)
 }
 
-[[cp, guard, wchar, crt_dosname("_wsystem")]]
+[[cp, guard, wchar, dos_export_as("DOS$_wsystem")]]
 [[section("{.text.crt.wchar.fs.exec.system|.text.crt.dos.wchar.fs.exec.system}")]]
 int wsystem([[nullable]] wchar_t const *cmd);
 

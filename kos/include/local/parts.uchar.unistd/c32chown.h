@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd4f030f */
+/* HASH CRC-32:0x2420dd88 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_c32chown_defined
 #define __local_c32chown_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wfchownat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$wfchownat))
+#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wfchownat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wfchownat))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32fchownat from parts.uchar.unistd */
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c32fchownat,(__fd_t __dfd, __CHAR32_TYPE__ const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
-#elif defined(__CRT_HAVE_DOS$wfchownat)
+#elif defined(__CRT_HAVE_KOS$wfchownat)
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 __CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c32fchownat,(__fd_t __dfd, __CHAR32_TYPE__ const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c32chown_defined 1
 #define __localdep_c32chown __LIBC_LOCAL_NAME(c32chown)
 #endif /* !__local___localdep_c32chown_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wfchownat && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$wfchownat) */
+#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wfchownat && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wfchownat) */
 #undef __local_c32chown_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wfchownat || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$wfchownat) */
+#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wfchownat || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wfchownat) */
 #endif /* !__local_c32chown_defined */

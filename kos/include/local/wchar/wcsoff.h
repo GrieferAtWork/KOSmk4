@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79e45e97 */
+/* HASH CRC-32:0xaefda0d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_wcschrnul
 /* Same as `wcschr', but return `wcsend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcschrnul,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ __needle),wcschrnul,(__haystack,__needle))
-#elif defined(__CRT_HAVE_DOS$wcschrnul) && __SIZEOF_WCHAR_T__ == 4
-/* Same as `wcschr', but return `wcsend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcschrnul,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ __needle),wcschrnul,(__haystack,__needle))
-#elif defined(__CRT_HAVE_DOS$wcschrnul) && __SIZEOF_WCHAR_T__ == 2
-/* Same as `wcschr', but return `wcsend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcschrnul,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ __needle),wcschrnul,(__haystack,__needle))
-#else /* ... */
+#else /* __CRT_HAVE_wcschrnul */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcschrnul.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `wcschr', but return `wcsend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_wcschrnul __LIBC_LOCAL_NAME(wcschrnul)
-#endif /* !... */
+#endif /* !__CRT_HAVE_wcschrnul */
 #endif /* !__local___localdep_wcschrnul_defined */
 /* Same as `wcschrnul', but return the offset from `STR', rather than the actual address */
 __LOCAL_LIBC(wcsoff) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__

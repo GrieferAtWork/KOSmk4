@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf55a3a1 */
+/* HASH CRC-32:0xc5ea64a3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,19 +21,32 @@
 #ifndef __local_c16execlpe_defined
 #define __local_c16execlpe_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_wexecvpe) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wexecvpe)
+#if (defined(__CRT_HAVE_wexecvpe) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wexecvpe)
+__NAMESPACE_LOCAL_BEGIN
+/* Dependency: c16execvpe from parts.uchar.process */
+#ifndef __local___localdep_c16execvpe_defined
+#define __local___localdep_c16execvpe_defined 1
+#if defined(__CRT_HAVE_wexecvpe) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c16execvpe,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV, __T16ENVP),wexecvpe,(__path,___argv,___envp))
+#elif defined(__CRT_HAVE_DOS$wexecvpe)
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_c16execvpe,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV, __T16ENVP),wexecvpe,(__path,___argv,___envp))
+#else /* ... */
+#undef __local___localdep_c16execvpe_defined
+#endif /* !... */
+#endif /* !__local___localdep_c16execvpe_defined */
+__NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16execlpe) __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__VLIBDCALL __LIBC_LOCAL_NAME(c16execlpe))(__CHAR16_TYPE__ const *__restrict __file, __CHAR16_TYPE__ const *__args, ...) {
-	__REDIRECT_EXECLE(__CHAR16_TYPE__, __c16execvpe, __file, __args)
+	__REDIRECT_EXECLE(__CHAR16_TYPE__, __localdep_c16execvpe, __file, __args)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16execlpe_defined
 #define __local___localdep_c16execlpe_defined 1
 #define __localdep_c16execlpe __LIBC_LOCAL_NAME(c16execlpe)
 #endif /* !__local___localdep_c16execlpe_defined */
-#else /* (__CRT_HAVE_wexecvpe && (__SIZEOF_WCHAR_T__ == 2) && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wexecvpe */
+#else /* (__CRT_HAVE_wexecvpe && (__SIZEOF_WCHAR_T__ == 2) && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wexecvpe */
 #undef __local_c16execlpe_defined
-#endif /* (!__CRT_HAVE_wexecvpe || !(__SIZEOF_WCHAR_T__ == 2) || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$_wexecvpe */
+#endif /* (!__CRT_HAVE_wexecvpe || !(__SIZEOF_WCHAR_T__ == 2) || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wexecvpe */
 #endif /* !__local_c16execlpe_defined */

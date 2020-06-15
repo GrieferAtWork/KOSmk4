@@ -38,13 +38,13 @@ __SYSDECL_BEGIN
 
 %#ifdef __USE_KOS
 %[default:section("{.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert}")]
-[[wchar, wunused, ATTR_PURE, crt_dosname("_wtoi")]]
+[[wchar, wunused, ATTR_PURE, dos_export_as("DOS$_wtoi")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("wtol", "_wtol")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("wtoll", "_wtoll")]]
 [[if(__SIZEOF_INT__ == 8), alias("_wtoi64")]]
 int wtoi([[nonnull]] wchar_t const *nptr) %{generate(str2wcs("atoi"))}
 
-[[wchar, wunused, ATTR_PURE, crt_dosname("_wtol")]]
+[[wchar, wunused, ATTR_PURE, dos_export_as("DOS$_wtol")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, wtoi)]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_wtoi")]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("wtoll", "_wtoll")]]
@@ -52,7 +52,7 @@ int wtoi([[nonnull]] wchar_t const *nptr) %{generate(str2wcs("atoi"))}
 long wtol([[nonnull]] wchar_t const *nptr) %{generate(str2wcs("atol"))}
 
 %#ifdef __LONGLONG
-[[wchar, wunused, ATTR_PURE, crt_dosname("_wtoll")]]
+[[wchar, wunused, ATTR_PURE, dos_export_as("DOS$_wtoll")]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, "wtoi")]]
 [[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias("_wtoi")]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, "wtol")]]

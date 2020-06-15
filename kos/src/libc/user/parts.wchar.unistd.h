@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x408a641d */
+/* HASH CRC-32:0xb9939af1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,25 +80,25 @@ INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_waccess)(char16_t cons
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_waccess)(char32_t const *file, __STDC_INT_AS_UINT_T type);
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd__wchdir)(char16_t const *path);
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wchdir)(char16_t const *path);
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wchdir)(char32_t const *path);
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-INTDEF char16_t *NOTHROW_RPC(LIBDCALL libd__wgetcwd)(char16_t *buf, size_t bufsize);
+INTDEF char16_t *NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf, size_t bufsize);
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 INTDEF char32_t *NOTHROW_RPC(LIBKCALL libc_wgetcwd)(char32_t *buf, size_t bufsize);
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd__wunlink)(char16_t const *file);
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wunlink)(char16_t const *file);
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wunlink)(char32_t const *file);
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd__wrmdir)(char16_t const *path);
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wrmdir)(char16_t const *path);
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wrmdir)(char32_t const *path);

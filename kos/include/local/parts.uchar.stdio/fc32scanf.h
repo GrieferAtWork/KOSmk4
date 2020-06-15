@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f316261 */
+/* HASH CRC-32:0x98bbce66 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_fc32scanf_defined
 #define __local_fc32scanf_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_vfwscanf) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$vfwscanf)
+#if (defined(__CRT_HAVE_vfwscanf) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$vfwscanf)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: vfc32scanf from parts.uchar.stdio */
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_vfc32scanf_defined 1
 #if defined(__CRT_HAVE_vfwscanf) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
-#elif defined(__CRT_HAVE_DOS$vfwscanf)
+#elif defined(__CRT_HAVE_KOS$vfwscanf)
 __CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
 #else /* ... */
 #undef __local___localdep_vfc32scanf_defined
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_fc32scanf_defined 1
 #define __localdep_fc32scanf __LIBC_LOCAL_NAME(fc32scanf)
 #endif /* !__local___localdep_fc32scanf_defined */
-#else /* (__CRT_HAVE_vfwscanf && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$vfwscanf */
+#else /* (__CRT_HAVE_vfwscanf && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$vfwscanf */
 #undef __local_fc32scanf_defined
-#endif /* (!__CRT_HAVE_vfwscanf || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$vfwscanf */
+#endif /* (!__CRT_HAVE_vfwscanf || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$vfwscanf */
 #endif /* !__local_fc32scanf_defined */

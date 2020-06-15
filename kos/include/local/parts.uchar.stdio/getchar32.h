@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50017319 */
+/* HASH CRC-32:0x6641e7a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,18 +21,18 @@
 #ifndef __local_getchar32_defined
 #define __local_getchar32_defined 1
 #include <__crt.h>
-#if !defined(__NO_STDSTREAMS) && ((defined(__CRT_HAVE_fgetwc) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$fgetwc) || (defined(__CRT_HAVE_getwc) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_DOS$getwc))
+#if !defined(__NO_STDSTREAMS) && ((defined(__CRT_HAVE_fgetwc) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fgetwc) || (defined(__CRT_HAVE_getwc) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$getwc))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fgetc32 from parts.uchar.stdio */
 #ifndef __local___localdep_fgetc32_defined
 #define __local___localdep_fgetc32_defined 1
 #if defined(__CRT_HAVE_fgetwc) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc32,(__FILE *__restrict __stream),fgetwc,(__stream))
-#elif defined(__CRT_HAVE_DOS$fgetwc)
+#elif defined(__CRT_HAVE_KOS$fgetwc)
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc32,(__FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc32,(__FILE *__restrict __stream),getwc,(__stream))
-#elif defined(__CRT_HAVE_DOS$getwc)
+#elif defined(__CRT_HAVE_KOS$getwc)
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc32,(__FILE *__restrict __stream),getwc,(__stream))
 #else /* ... */
 #undef __local___localdep_fgetc32_defined
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_getchar32_defined 1
 #define __localdep_getchar32 __LIBC_LOCAL_NAME(getchar32)
 #endif /* !__local___localdep_getchar32_defined */
-#else /* !__NO_STDSTREAMS && ((__CRT_HAVE_fgetwc && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$fgetwc || (__CRT_HAVE_getwc && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_DOS$getwc) */
+#else /* !__NO_STDSTREAMS && ((__CRT_HAVE_fgetwc && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$fgetwc || (__CRT_HAVE_getwc && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$getwc) */
 #undef __local_getchar32_defined
-#endif /* __NO_STDSTREAMS || ((!__CRT_HAVE_fgetwc || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$fgetwc && (!__CRT_HAVE_getwc || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_DOS$getwc) */
+#endif /* __NO_STDSTREAMS || ((!__CRT_HAVE_fgetwc || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$fgetwc && (!__CRT_HAVE_getwc || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$getwc) */
 #endif /* !__local_getchar32_defined */

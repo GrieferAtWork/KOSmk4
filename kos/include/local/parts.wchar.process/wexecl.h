@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cdea0c2 */
+/* HASH CRC-32:0xea5a3ecb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,20 +21,16 @@
 #ifndef __local_wexecl_defined
 #define __local_wexecl_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_wexecv) || (defined(__CRT_HAVE_DOS$wexecv) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_DOS$_wexecv) && __SIZEOF_WCHAR_T__ == 2)
+#ifdef __CRT_HAVE_wexecv
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wexecv from parts.wchar.process */
 #ifndef __local___localdep_wexecv_defined
 #define __local___localdep_wexecv_defined 1
 #ifdef __CRT_HAVE_wexecv
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_wexecv,(__WCHAR_TYPE__ const *__restrict __path, __TWARGV),wexecv,(__path,___argv))
-#elif defined(__CRT_HAVE_DOS$wexecv) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_wexecv,(__WCHAR_TYPE__ const *__restrict __path, __TWARGV),wexecv,(__path,___argv))
-#elif defined(__CRT_HAVE_DOS$_wexecv) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_wexecv,(__WCHAR_TYPE__ const *__restrict __path, __TWARGV),_wexecv,(__path,___argv))
-#else /* ... */
+#else /* __CRT_HAVE_wexecv */
 #undef __local___localdep_wexecv_defined
-#endif /* !... */
+#endif /* !__CRT_HAVE_wexecv */
 #endif /* !__local___localdep_wexecv_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
@@ -48,7 +44,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wexecl_defined 1
 #define __localdep_wexecl __LIBC_LOCAL_NAME(wexecl)
 #endif /* !__local___localdep_wexecl_defined */
-#else /* __CRT_HAVE_wexecv || (__CRT_HAVE_DOS$wexecv && __SIZEOF_WCHAR_T__ == 4) || (__CRT_HAVE_DOS$_wexecv && __SIZEOF_WCHAR_T__ == 2) */
+#else /* __CRT_HAVE_wexecv */
 #undef __local_wexecl_defined
-#endif /* !__CRT_HAVE_wexecv && (!__CRT_HAVE_DOS$wexecv || !__SIZEOF_WCHAR_T__ == 4) && (!__CRT_HAVE_DOS$_wexecv || !__SIZEOF_WCHAR_T__ == 2) */
+#endif /* !__CRT_HAVE_wexecv */
 #endif /* !__local_wexecl_defined */
