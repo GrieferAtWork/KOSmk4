@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e667c6f */
+/* HASH CRC-32:0x61fddb35 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_fputwc_unlocked)
 #include <features.h>
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: file_wprinter_unlocked from wchar */
 #ifndef __local___localdep_file_wprinter_unlocked_defined
@@ -48,7 +49,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_format_vwprintf_defined 1
 #ifdef __CRT_HAVE_format_vwprintf
 __NAMESPACE_LOCAL_END
-#include <kos/anno.h>
 #include <bits/wformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation

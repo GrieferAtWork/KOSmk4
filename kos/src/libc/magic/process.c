@@ -214,7 +214,7 @@ typedef __intptr_t intptr_t;
 %
 %#ifndef _WPROCESS_DEFINED
 %#define _WPROCESS_DEFINED 1
-%[default:section("{.text.crt.wchar.fs.exec.exec|.text.crt.dos.wchar.fs.exec.exec}")]
+%[default:section(".text.crt{|.dos}.wchar.fs.exec.exec")]
 %[insert:function(_wexecv = wexecv)]
 %[insert:function(_wexecvp = wexecvp)]
 %[insert:function(_wexecve = wexecve)]
@@ -224,7 +224,7 @@ typedef __intptr_t intptr_t;
 %[insert:function(_wexecle = wexecle)]
 %[insert:function(_wexeclpe = wexeclpe)]
 
-%[default:section("{.text.crt.wchar.fs.exec.spawn|.text.crt.dos.wchar.fs.exec.spawn}")]
+%[default:section(".text.crt{|.dos}.wchar.fs.exec.spawn")]
 [[argument_names(mode, path, ___argv)]]
 intptr_t _wspawnv(int mode, [[nonnull]] wchar_t const *__restrict path,
                   __TWARGV) = wspawnv;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf00f622 */
+/* HASH CRC-32:0x662e692b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,6 +45,16 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyw,(__dst,__src,__num_chars))
 #elif defined(__CRT_HAVE_memcpyl) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyl,(__dst,__src,__num_chars))
+#elif __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpyw.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wmemcpy (*(__WCHAR_TYPE__ *(__LIBCCALL *)(__WCHAR_TYPE__ *__restrict, __WCHAR_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(memcpyw))
+#elif __SIZEOF_WCHAR_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <local/string/memcpyl.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wmemcpy (*(__WCHAR_TYPE__ *(__LIBCCALL *)(__WCHAR_TYPE__ *__restrict, __WCHAR_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(memcpyl))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wmemcpy.h>
@@ -61,6 +71,16 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),memsetw,(__dst,__filler,__num_chars))
 #elif defined(__CRT_HAVE_memsetl) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemset,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars),memsetl,(__dst,__filler,__num_chars))
+#elif __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <local/string/memsetw.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wmemset (*(__WCHAR_TYPE__ *(__LIBCCALL *)(__WCHAR_TYPE__ *, __WCHAR_TYPE__, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(memsetw))
+#elif __SIZEOF_WCHAR_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <local/string/memsetl.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wmemset (*(__WCHAR_TYPE__ *(__LIBCCALL *)(__WCHAR_TYPE__ *, __WCHAR_TYPE__, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(memsetl))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wmemset.h>

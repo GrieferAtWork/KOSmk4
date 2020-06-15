@@ -32,11 +32,11 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_setxattr,hash:CRC-32=0xd192d3de]]]*/
+/*[[[head:libc_setxattr,hash:CRC-32=0xcba1481c]]]*/
 /* Set the attribute NAME of the file pointed to by PATH to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
-INTERN NONNULL((1, 2, 3)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_setxattr)(char const *path,
                                     char const *name,
                                     void const *buf,
@@ -50,12 +50,12 @@ NOTHROW_RPC(LIBCCALL libc_setxattr)(char const *path,
 }
 /*[[[end:libc_setxattr]]]*/
 
-/*[[[head:libc_lsetxattr,hash:CRC-32=0x67f820aa]]]*/
+/*[[[head:libc_lsetxattr,hash:CRC-32=0xdc9b7e89]]]*/
 /* Set the attribute NAME of the file pointed to by PATH to VALUE (which is
  * SIZE bytes long), not following symlinks for the last pathname component.
  * Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
-INTERN NONNULL((1, 2, 3)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_lsetxattr)(char const *path,
                                      char const *name,
                                      void const *buf,
@@ -69,11 +69,11 @@ NOTHROW_RPC(LIBCCALL libc_lsetxattr)(char const *path,
 }
 /*[[[end:libc_lsetxattr]]]*/
 
-/*[[[head:libc_fsetxattr,hash:CRC-32=0x11efd3d5]]]*/
+/*[[[head:libc_fsetxattr,hash:CRC-32=0x2f349f52]]]*/
 /* Set the attribute NAME of the file descriptor FD to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
-INTERN NONNULL((2, 3)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_fsetxattr)(fd_t fd,
                                      char const *name,
                                      void const *buf,
@@ -87,10 +87,10 @@ NOTHROW_RPC(LIBCCALL libc_fsetxattr)(fd_t fd,
 }
 /*[[[end:libc_fsetxattr]]]*/
 
-/*[[[head:libc_getxattr,hash:CRC-32=0xf911aa89]]]*/
+/*[[[head:libc_getxattr,hash:CRC-32=0x24320064]]]*/
 /* Get the attribute NAME of the file pointed to by PATH to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors */
-INTERN NONNULL((1, 2, 3)) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 2, 3)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_getxattr)(char const *path,
                                     char const *name,
                                     void *buf,
@@ -103,11 +103,11 @@ NOTHROW_RPC(LIBCCALL libc_getxattr)(char const *path,
 }
 /*[[[end:libc_getxattr]]]*/
 
-/*[[[head:libc_lgetxattr,hash:CRC-32=0xa0c4d5da]]]*/
+/*[[[head:libc_lgetxattr,hash:CRC-32=0x45f64b5d]]]*/
 /* Get the attribute NAME of the file pointed to by PATH to VALUE (which is
  * SIZE bytes long), not following symlinks for the last pathname component.
  * Return 0 on success, -1 for errors */
-INTERN NONNULL((1, 2, 3)) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 2, 3)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_lgetxattr)(char const *path,
                                      char const *name,
                                      void *buf,
@@ -120,10 +120,10 @@ NOTHROW_RPC(LIBCCALL libc_lgetxattr)(char const *path,
 }
 /*[[[end:libc_lgetxattr]]]*/
 
-/*[[[head:libc_fgetxattr,hash:CRC-32=0x65f14770]]]*/
+/*[[[head:libc_fgetxattr,hash:CRC-32=0x489888]]]*/
 /* Get the attribute NAME of the file descriptor FD to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors */
-INTERN NONNULL((2, 3)) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2, 3)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_fgetxattr)(fd_t fd,
                                      char const *name,
                                      void *buf,
@@ -136,11 +136,11 @@ NOTHROW_RPC(LIBCCALL libc_fgetxattr)(fd_t fd,
 }
 /*[[[end:libc_fgetxattr]]]*/
 
-/*[[[head:libc_listxattr,hash:CRC-32=0x78fe2cdf]]]*/
+/*[[[head:libc_listxattr,hash:CRC-32=0x283340a]]]*/
 /* List attributes of the file pointed to by PATH into the
  * user-supplied buffer LIST (which is SIZE bytes big).
  * Return 0 on success, -1 for errors */
-INTERN NONNULL((1, 2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_listxattr)(char const *path,
                                      char *listbuf,
                                      size_t listbufsize)
@@ -152,11 +152,11 @@ NOTHROW_RPC(LIBCCALL libc_listxattr)(char const *path,
 }
 /*[[[end:libc_listxattr]]]*/
 
-/*[[[head:libc_llistxattr,hash:CRC-32=0xaf5ff751]]]*/
+/*[[[head:libc_llistxattr,hash:CRC-32=0x84bb72a5]]]*/
 /* List attributes of the file pointed to by PATH into the user-supplied
  * buffer LIST (which is SIZE bytes big), not following symlinks for the
  * last pathname component. Return 0 on success, -1 for errors */
-INTERN NONNULL((1, 2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_llistxattr)(char const *path,
                                       char *listbuf,
                                       size_t listbufsize)
@@ -168,10 +168,10 @@ NOTHROW_RPC(LIBCCALL libc_llistxattr)(char const *path,
 }
 /*[[[end:libc_llistxattr]]]*/
 
-/*[[[head:libc_flistxattr,hash:CRC-32=0x6cbefcae]]]*/
+/*[[[head:libc_flistxattr,hash:CRC-32=0x90a1f8a5]]]*/
 /* List attributes of the file descriptor FD into the user-supplied buffer
  * LIST (which is SIZE bytes big). Return 0 on success, -1 for errors */
-INTERN NONNULL((2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_flistxattr)(fd_t fd,
                                       char *listbuf,
                                       size_t listbufsize)
@@ -183,10 +183,10 @@ NOTHROW_RPC(LIBCCALL libc_flistxattr)(fd_t fd,
 }
 /*[[[end:libc_flistxattr]]]*/
 
-/*[[[head:libc_removexattr,hash:CRC-32=0x7d851dda]]]*/
+/*[[[head:libc_removexattr,hash:CRC-32=0x3f6e00ae]]]*/
 /* Remove the attribute NAME from the file pointed to by PATH.
  * Return 0 on success, -1 for errors */
-INTERN NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_removexattr)(char const *path,
                                        char const *name)
 /*[[[body:libc_removexattr]]]*/
@@ -197,11 +197,11 @@ NOTHROW_RPC(LIBCCALL libc_removexattr)(char const *path,
 }
 /*[[[end:libc_removexattr]]]*/
 
-/*[[[head:libc_lremovexattr,hash:CRC-32=0x339442a6]]]*/
+/*[[[head:libc_lremovexattr,hash:CRC-32=0x6d6c6378]]]*/
 /* Remove the attribute NAME from the file pointed to by PATH, not
  * following symlinks for the last pathname component.
  * Return 0 on success, -1 for errors */
-INTERN NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_lremovexattr)(char const *path,
                                         char const *name)
 /*[[[body:libc_lremovexattr]]]*/
@@ -212,10 +212,10 @@ NOTHROW_RPC(LIBCCALL libc_lremovexattr)(char const *path,
 }
 /*[[[end:libc_lremovexattr]]]*/
 
-/*[[[head:libc_fremovexattr,hash:CRC-32=0x552c4a0e]]]*/
+/*[[[head:libc_fremovexattr,hash:CRC-32=0x2a91bf8f]]]*/
 /* Remove the attribute NAME from the file descriptor FD.
  * Return 0 on success, -1 for errors */
-INTERN NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_fremovexattr)(fd_t fd,
                                         char const *name)
 /*[[[body:libc_fremovexattr]]]*/

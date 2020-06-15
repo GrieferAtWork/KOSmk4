@@ -37,9 +37,9 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc__ftime32,hash:CRC-32=0xf6c488a]]]*/
+/*[[[head:libc__ftime32,hash:CRC-32=0xc2fbf96b]]]*/
 /* Fill in TIMEBUF with information about the current time */
-INTERN NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc__ftime32)(struct timeb32 *timebuf)
 /*[[[body:libc__ftime32]]]*/
 {
@@ -48,12 +48,12 @@ NOTHROW_NCX(LIBCCALL libc__ftime32)(struct timeb32 *timebuf)
 }
 /*[[[end:libc__ftime32]]]*/
 
-/*[[[head:libc__ftime64,hash:CRC-32=0xf186e18a]]]*/
+/*[[[head:libc__ftime64,hash:CRC-32=0x34130afa]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc__ftime64, libc__ftime32);
 #else /* MAGIC:alias */
 /* Fill in TIMEBUF with information about the current time */
-INTERN NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc__ftime64)(struct timeb64 *timebuf)
 /*[[[body:libc__ftime64]]]*/
 {
@@ -63,9 +63,9 @@ NOTHROW_NCX(LIBCCALL libc__ftime64)(struct timeb64 *timebuf)
 #endif /* MAGIC:alias */
 /*[[[end:libc__ftime64]]]*/
 
-/*[[[head:libc__ftime32_s,hash:CRC-32=0xdf4366ad]]]*/
+/*[[[head:libc__ftime32_s,hash:CRC-32=0xe931a64b]]]*/
 /* Fill in TIMEBUF with information about the current time */
-INTERN NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc__ftime32_s)(struct timeb32 *timebuf)
 /*[[[body:libc__ftime32_s]]]*/
 {
@@ -75,12 +75,12 @@ NOTHROW_NCX(LIBCCALL libc__ftime32_s)(struct timeb32 *timebuf)
 }
 /*[[[end:libc__ftime32_s]]]*/
 
-/*[[[head:libc__ftime64_s,hash:CRC-32=0xadd69f5f]]]*/
+/*[[[head:libc__ftime64_s,hash:CRC-32=0x50447a85]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc__ftime64_s, libc__ftime32_s);
 #else /* MAGIC:alias */
 /* Fill in TIMEBUF with information about the current time */
-INTERN NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc__ftime64_s)(struct timeb64 *timebuf)
 /*[[[body:libc__ftime64_s]]]*/
 {
@@ -91,9 +91,9 @@ NOTHROW_NCX(LIBCCALL libc__ftime64_s)(struct timeb64 *timebuf)
 #endif /* MAGIC:alias */
 /*[[[end:libc__ftime64_s]]]*/
 
-/*[[[head:libc_ftime,hash:CRC-32=0xb528dc0c]]]*/
+/*[[[head:libc_ftime,hash:CRC-32=0x859f07cf]]]*/
 /* Fill in TIMEBUF with information about the current time */
-INTERN NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_ftime)(struct timeb *timebuf)
 /*[[[body:libc_ftime]]]*/
 {
@@ -117,12 +117,12 @@ NOTHROW_NCX(LIBCCALL libc_ftime)(struct timeb *timebuf)
 }
 /*[[[end:libc_ftime]]]*/
 
-/*[[[head:libc_ftime64,hash:CRC-32=0xe20f7879]]]*/
+/*[[[head:libc_ftime64,hash:CRC-32=0xef2c751a]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ftime64, libc_ftime);
 #else /* MAGIC:alias */
 /* Fill in TIMEBUF with information about the current time */
-INTERN NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_ftime64)(struct timeb64 *timebuf)
 /*[[[body:libc_ftime64]]]*/
 {

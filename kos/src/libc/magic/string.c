@@ -914,7 +914,7 @@ memfrob:([[nonnull]] void *buf, $size_t num_bytes) -> [[== buf]] void * {
 	return buf;
 }
 
-[[guard, ATTR_PURE, wunused]]
+[[guard, wunused, ATTR_PURE]]
 [[export_alias("_stricmp_l", "__strcasecmp_l")]]
 [[section(".text.crt.unicode.locale.memory")]]
 strcasecmp_l:([[nonnull]] char const *s1, [[nonnull]] char const *s2, $locale_t locale) -> int {
@@ -5448,7 +5448,7 @@ strnset:([[nonnull]] char *__restrict str, int ch, $size_t maxlen) -> [[== str]]
 	return str;
 }
 
-[[alias("_strrev"), ATTR_LEAF]]
+[[export_alias("_strrev"), ATTR_LEAF]]
 strrev:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 	return (char *)memrev(str, strlen(str));
 }
@@ -5695,7 +5695,7 @@ $errno_t _strerror_s([[nonnull]] char *__restrict buf,
 	return 0;
 }
 
-[[ATTR_LEAF, impl_include("<parts/errno.h>")]]
+[[impl_include("<parts/errno.h>")]]
 [[section(".text.crt.dos.unicode.static.memory")]]
 $errno_t _strlwr_s(char *buf, $size_t buflen) {
 	char *iter, ch;
@@ -5708,7 +5708,7 @@ $errno_t _strlwr_s(char *buf, $size_t buflen) {
 	return 0;
 }
 
-[[ATTR_LEAF, section(".text.crt.dos.unicode.static.memory")]]
+[[section(".text.crt.dos.unicode.static.memory")]]
 $errno_t _strupr_s(char *buf, $size_t buflen) {
 	char *iter, ch;
 	if (buf == NULL)
@@ -5720,7 +5720,7 @@ $errno_t _strupr_s(char *buf, $size_t buflen) {
 	return 0;
 }
 
-[[ATTR_LEAF, section(".text.crt.dos.unicode.locale.memory")]]
+[[section(".text.crt.dos.unicode.locale.memory")]]
 $errno_t _strlwr_s_l(char *buf, $size_t buflen, $locale_t locale) {
 	char *iter, ch;
 	if (buf == NULL)
@@ -5732,7 +5732,7 @@ $errno_t _strlwr_s_l(char *buf, $size_t buflen, $locale_t locale) {
 	return 0;
 }
 
-[[ATTR_LEAF, section(".text.crt.dos.unicode.locale.memory")]]
+[[section(".text.crt.dos.unicode.locale.memory")]]
 $errno_t _strupr_s_l(char *buf, $size_t buflen, $locale_t locale) {
 	char *iter, ch;
 	if (buf == NULL)
@@ -5748,7 +5748,7 @@ $errno_t _strupr_s_l(char *buf, $size_t buflen, $locale_t locale) {
 %[insert:function(_strnicmp_l = strncasecmp_l)]
 
 [[section(".text.crt.dos.string.memory")]]
-[[ATTR_LEAF, impl_include("<parts/errno.h>", "<libc/string.h>")]]
+[[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 $errno_t _strnset_s(char *__restrict buf, $size_t buflen, int ch, $size_t maxlen) {
 	char *iter;
 	size_t remaining;

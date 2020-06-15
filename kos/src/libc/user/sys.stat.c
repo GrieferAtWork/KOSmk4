@@ -767,8 +767,8 @@ NOTHROW_NCX(LIBKCALL libc__wstat64)(char32_t const *filename,
 }
 /*[[[end:libc__wstat64]]]*/
 
-/*[[[head:libd__wstat64,hash:CRC-32=0xc9955cda]]]*/
-INTERN NONNULL((1, 2)) int
+/*[[[head:libd__wstat64,hash:CRC-32=0xbff437e6]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.stat") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd__wstat64)(char16_t const *filename,
                                     struct __dos_stat64 *buf)
 /*[[[body:libd__wstat64]]]*/
@@ -801,8 +801,8 @@ NOTHROW_NCX(LIBKCALL libc__wstat32i64)(char32_t const *filename,
 }
 /*[[[end:libc__wstat32i64]]]*/
 
-/*[[[head:libd__wstat32i64,hash:CRC-32=0x9d2aacbf]]]*/
-INTERN NONNULL((1, 2)) int
+/*[[[head:libd__wstat32i64,hash:CRC-32=0x28148a19]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.stat") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd__wstat32i64)(char16_t const *filename,
                                        struct __dos_stat32i64 *buf)
 /*[[[body:libd__wstat32i64]]]*/
@@ -835,8 +835,8 @@ NOTHROW_NCX(LIBKCALL libc__wstat32)(char32_t const *filename,
 }
 /*[[[end:libc__wstat32]]]*/
 
-/*[[[head:libd__wstat32,hash:CRC-32=0xf95bcc78]]]*/
-INTERN NONNULL((1, 2)) int
+/*[[[head:libd__wstat32,hash:CRC-32=0x8f3aa744]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.stat") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
                                     struct __dos_stat32 *buf)
 /*[[[body:libd__wstat32]]]*/

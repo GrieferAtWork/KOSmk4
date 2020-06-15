@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x355810e4 */
+/* HASH CRC-32:0xf309c5f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_wcsnend_defined 1
 #ifdef __CRT_HAVE_wcsnend
 /* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsnend,(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnend,(__string,__maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsnend,(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnend,(__string,__maxlen))
 #else /* __CRT_HAVE_wcsnend */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcsnend.h>

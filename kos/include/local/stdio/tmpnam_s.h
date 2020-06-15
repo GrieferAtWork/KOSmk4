@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x965bfa42 */
+/* HASH CRC-32:0xb75e4d5b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,18 +34,18 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tmpnam_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tmpnam_s))(char *__restrict __buf, __SIZE_TYPE__ __bufsize) {
 	if __unlikely(!__buf) {
-#ifdef EINVAL
+#ifdef __EINVAL
 		return __EINVAL;
-#else /* EINVAL */
+#else /* __EINVAL */
 		return 1;
-#endif /* !EINVAL */
+#endif /* !__EINVAL */
 	}
 	if __unlikely(__bufsize < __L_tmpnam) {
-#ifdef ERANGE
+#ifdef __ERANGE
 		return __ERANGE; /* XXX: Is this what dos does? */
-#else /* ERANGE */
+#else /* __ERANGE */
 		return 1;
-#endif /* !ERANGE */
+#endif /* !__ERANGE */
 	}
 	if __unlikely(!__localdep_tmpnam(__buf)) {
 #ifdef __libc_geterrno

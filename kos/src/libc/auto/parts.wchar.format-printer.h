@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49d95b1c */
+/* HASH CRC-32:0x3d37c964 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -512,13 +512,13 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *NOTH
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED WUNUSED NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *__restrict self, size_t num_wchars);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *__restrict self, size_t num_wchars);
 /* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED WUNUSED NONNULL((1)) char32_t *NOTHROW_NCX(LIBKCALL libc_format_waprintf_alloc)(struct format_c32aprintf_data *__restrict self, size_t num_wchars);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *NOTHROW_NCX(LIBKCALL libc_format_waprintf_alloc)(struct format_c32aprintf_data *__restrict self, size_t num_wchars);
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_waprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */

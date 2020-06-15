@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63b0a6db */
+/* HASH CRC-32:0x14333c6c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(btowc))(int __ch) {
 	return (__CCAST(__WINT_TYPE__)0xffffffffu);
 #else /* __SIZEOF_WCHAR_T__ == 4 */
 	return (__CCAST(__WINT_TYPE__)0xffff);
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
+#endif /* !(__SIZEOF_WCHAR_T__ == 4) */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_btowc_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85e5b0e4 */
+/* HASH CRC-32:0xb44e4da0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,18 +41,18 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wctomb_s) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctomb_s))(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ __wc) {
 	if (!__presult || !__buf) {
-#ifdef EINVAL
+#ifdef __EINVAL
 		return __EINVAL;
-#else /* EINVAL */
+#else /* __EINVAL */
 		return 1;
-#endif /* !EINVAL */
+#endif /* !__EINVAL */
 	}
 	if (__buflen < MB_CUR_MAX) {
-#ifdef ERANGE
+#ifdef __ERANGE
 		return __ERANGE;
-#else /* ERANGE */
+#else /* __ERANGE */
 		return 1;
-#endif /* !ERANGE */
+#endif /* !__ERANGE */
 	}
 	*__presult = __localdep_wctomb(__buf, __wc);
 	return 0;

@@ -29,7 +29,7 @@
 %[define_replacement(sig_atomic_t = __sig_atomic_t)]
 %[define_replacement(sig_t        = __sighandler_t)]
 %[define_replacement(timespec64   = __timespec64)]
-%[default:section("{.text.crt.sched.signal|.text.crt.dos.sched.signal}")]
+%[default:section(".text.crt{|.dos}.sched.signal")]
 
 %(user){
 DECL_END
@@ -187,9 +187,10 @@ $sighandler_t ssignal(int signo, $sighandler_t handler);
 @@@param signo: One of `SIG*'
 int gsignal(int signo);
 
-/*[ATTR_DEPRECATED("Using `sigprocmask()' instead")]*/ int sigblock(int mask);
-/*[ATTR_DEPRECATED("Using `sigprocmask()' instead")]*/ int sigsetmask(int mask);
-/*[ATTR_DEPRECATED("Using `sigprocmask()' instead")]*/ int siggetmask(void);
+/*[[deprecated("Using `sigprocmask()' instead")]]*/ int sigblock(int mask);
+/*[[deprecated("Using `sigprocmask()' instead")]]*/ int sigsetmask(int mask);
+/*[[deprecated("Using `sigprocmask()' instead")]]*/ int siggetmask(void);
+
 
 %{
 #undef sys_siglist
@@ -269,7 +270,7 @@ int sigaddset([[nonnull]] sigset_t *set, int signo) {
 
 @@@param signo: One of `SIG*'
 [[decl_include("<bits/sigset.h>"), export_alias("__sigdelset")]]
-sigdelset:([[nonnull]] sigset_t *set, int signo) -> int {
+int sigdelset([[nonnull]] sigset_t *set, int signo) {
 	ulongptr_t mask = @__sigmask@(signo);
 	ulongptr_t word = @__sigword@(signo);
 	set->@__val@[word] &= ~mask;
@@ -279,7 +280,7 @@ sigdelset:([[nonnull]] sigset_t *set, int signo) -> int {
 @@@param signo: One of `SIG*'
 [[wunused, ATTR_PURE]]
 [[decl_include("<bits/sigset.h>"), export_alias("__sigismember")]]
-sigismember:([[nonnull]] sigset_t const *set, int signo) -> int {
+int sigismember([[nonnull]] sigset_t const *set, int signo) {
 	ulongptr_t mask = @__sigmask@(signo);
 	ulongptr_t word = @__sigword@(signo);
 	return (set->@__val@[word] & mask) != 0;

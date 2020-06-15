@@ -61,28 +61,28 @@ __strcat_chk([[nonnull]] char *__restrict dst,
              [[nonnull]] char const *__restrict src,
              $size_t dst_objsize)
 		-> [[== dst]] char *
-	%{chk(%auto, "(void)dst_objsize; /* TODO */")}
+	%{chk("strcat", "(void)dst_objsize; /* TODO */")}
 
 [[libc, fast, ATTR_LEAF]]
 __strcpy_chk([[nonnull]] char *__restrict dst,
              [[nonnull]] char const *__restrict src,
              $size_t dst_objsize)
 		-> [[== dst]] char *
-	%{chk(%auto, "(void)dst_objsize; /* TODO */")}
+	%{chk("strcpy", "(void)dst_objsize; /* TODO */")}
 
 [[libc, fast, ATTR_LEAF]]
 __strncat_chk([[nonnull]] char *__restrict dst,
               [[nonnull]] char const *__restrict src,
               $size_t buflen, $size_t dst_objsize)
 		-> [[== dst]] char *
-	%{chk(%auto, "(void)dst_objsize; /* TODO */")}
+	%{chk("strncat", "(void)dst_objsize; /* TODO */")}
 
 [[libc, fast, ATTR_LEAF]]
 __strncpy_chk([[nonnull]] char *__restrict dst,
               [[nonnull]] char const *__restrict src,
               $size_t buflen, $size_t dst_objsize)
 		-> [[== dst]] char *
-	%{chk(%auto, "(void)dst_objsize; /* TODO */")}
+	%{chk("strncpy", "(void)dst_objsize; /* TODO */")}
 
 %
 %#ifdef __USE_GNU
@@ -101,14 +101,14 @@ __stpcpy_chk:([[nonnull]] char *__restrict dst,
               [[nonnull]] char const *__restrict src,
               $size_t dst_objsize)
 		-> [== dst + strlen(src)] char *
-	%{chk(%auto, "(void)dst_objsize; /* TODO */")}
+	%{chk("stpcpy", "(void)dst_objsize; /* TODO */")}
 
 [[libc, fast, ATTR_LEAF]]
 __stpncpy_chk:([[nonnull]] char *__restrict dst,
                [[nonnull]] char const *__restrict src,
                $size_t buflen, $size_t dst_objsize)
 		-> [== dst + strlen(src)] char *
-	%{chk(%auto, "(void)dst_objsize; /* TODO */")}
+	%{chk("stpncpy", "(void)dst_objsize; /* TODO */")}
 %#endif /* __USE_XOPEN2K8 */
 
 %

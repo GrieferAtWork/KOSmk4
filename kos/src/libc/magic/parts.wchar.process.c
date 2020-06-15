@@ -71,7 +71,7 @@ __SYSDECL_BEGIN
 #endif /* !__TWARGV */
 }
 
-%[default:section("{.text.crt.wchar.fs.exec.exec|.text.crt.dos.wchar.fs.exec.exec}")]
+%[default:section(".text.crt{|.dos}.wchar.fs.exec.exec")]
 
 [[cp, guard, wchar, argument_names(path, ___argv), dos_export_as("DOS$_wexecv")]]
 int wexecv([[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV);
@@ -111,7 +111,7 @@ int wexeclpe([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ..
 }
 
 
-%[default:section("{.text.crt.wchar.fs.exec.spawn|.text.crt.dos.wchar.fs.exec.spawn}")]
+%[default:section(".text.crt{|.dos}.wchar.fs.exec.spawn")]
 
 [[cp, guard, wchar, argument_names(mode, path, ___argv), dos_export_as("DOS$_wspawnv")]]
 $pid_t wspawnv(int mode, [[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV);
@@ -150,7 +150,7 @@ $pid_t wspawnlpe(int mode, [[nonnull]] wchar_t const *__restrict file, wchar_t c
 }
 
 [[cp, guard, wchar, dos_export_as("DOS$_wsystem")]]
-[[section("{.text.crt.wchar.fs.exec.system|.text.crt.dos.wchar.fs.exec.system}")]]
+[[section(".text.crt{|.dos}.wchar.fs.exec.system")]]
 int wsystem([[nullable]] wchar_t const *cmd);
 
 

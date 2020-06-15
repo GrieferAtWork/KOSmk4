@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46c024e6 */
+/* HASH CRC-32:0x59857df8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_getwchar_defined 1
 #include <__crt.h>
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc))
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fgetwc from wchar */
 #ifndef __local___localdep_fgetwc_defined

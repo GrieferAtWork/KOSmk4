@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3c4efa2 */
+/* HASH CRC-32:0x69965775 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -504,7 +504,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_attr_setscope,(pthread_
 
 #ifdef __CRT_HAVE_pthread_attr_getstackaddr
 /* Return the previously set address for the stack */
-__CDECLARE(__ATTR_DEPRECATED_ __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,pthread_attr_getstackaddr,(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr),(__attr,__stackaddr))
+__CDECLARE(__ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,pthread_attr_getstackaddr,(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr),(__attr,__stackaddr))
 #endif /* __CRT_HAVE_pthread_attr_getstackaddr */
 
 #ifdef __CRT_HAVE_pthread_attr_setstackaddr
@@ -512,7 +512,7 @@ __CDECLARE(__ATTR_DEPRECATED_ __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,pthread_a
  * Depending on whether the stack grows up or down the value must either
  * be higher or lower than all the address in the memory block. The
  * minimal size of the block must be PTHREAD_STACK_MIN */
-__CDECLARE(__ATTR_DEPRECATED_ __ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_attr_setstackaddr,(pthread_attr_t *__attr, void *__stackaddr),(__attr,__stackaddr))
+__CDECLARE(__ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_attr_setstackaddr,(pthread_attr_t *__attr, void *__stackaddr),(__attr,__stackaddr))
 #endif /* __CRT_HAVE_pthread_attr_setstackaddr */
 
 #ifdef __CRT_HAVE_pthread_attr_getstacksize

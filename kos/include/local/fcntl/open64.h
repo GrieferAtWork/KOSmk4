@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x774d3c3c */
+/* HASH CRC-32:0x778b610f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,11 +47,11 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(open64))(char const *__filename, __o
 	__mode_t __mode;
 	__builtin_va_start(__args, __oflags);
 	__mode = __builtin_va_arg(__args, __mode_t);
-#ifdef O_LARGEFILE
+#ifdef __O_LARGEFILE
 	__result = __localdep_open32(__filename, __oflags | __O_LARGEFILE, __mode);
-#else /* O_LARGEFILE */
+#else /* __O_LARGEFILE */
 	__result = __localdep_open32(__filename, __oflags, __mode);
-#endif /* !O_LARGEFILE */
+#endif /* !__O_LARGEFILE */
 	__builtin_va_end(__args);
 	return __result;
 }

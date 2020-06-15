@@ -56,7 +56,7 @@ __SYSDECL_BEGIN
 @@Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
 @@Note that if `name' contains a `=' character, only characters leading up to this
 @@position are actually compared!
-[[ATTR_PURE, wunused]]
+[[wunused, ATTR_PURE]]
 char *envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
 	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
 	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]
@@ -75,7 +75,7 @@ char *envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_le
 
 @@Returns a pointer to the value portion of the entry
 @@in `ENVZ' for `NAME', or `NULL' if there is none.
-[[ATTR_PURE, wunused]]
+[[wunused, ATTR_PURE]]
 char *envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
 	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
 	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]
@@ -113,11 +113,11 @@ error_t envz_add([[nonnull]] char **__restrict penvz,
 	morelen  = namelen + 1 + valuelen + 1;
 	new_envz = (char *)realloc(*penvz, (*penvz_len + morelen) * sizeof(char));
 	if unlikely(!new_envz) {
-#ifdef ENOMEM
+@@pp_ifdef ENOMEM@@
 		return ENOMEM;
-#else /* ENOMEM */
+@@pp_else@@
 		return 1;
-#endif /* !ENOMEM */
+@@pp_endif@@
 	}
 	*penvz = new_envz;
 	new_envz += *penvz_len;

@@ -30,7 +30,7 @@
 %[define_wchar_replacement(__pwformatprinter = __pc16formatprinter, __pc32formatprinter)]
 %[define_wchar_replacement(format_wsnprintf_data = format_c16snprintf_data, format_c32snprintf_data)]
 %[define_wchar_replacement(__format_waprintf_data_defined = __format_c16aprintf_data_defined, __format_c32aprintf_data_defined)]
-%[default:section("{.text.crt.wchar.string.format|.text.crt.dos.wchar.string.format}")]
+%[default:section(".text.crt{|.dos}.wchar.string.format")]
 
 
 %(auto_header){

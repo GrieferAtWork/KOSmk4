@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fce2733 */
+/* HASH CRC-32:0x48224972 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,9 +77,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* __NO_MALLOCA || !(__SIZEOF_WCHAR_T__ == 2) */
 #endif /* !... */
 #endif /* !__local___localdep_fuzzy_c16memcasecmp_defined */
-__NAMESPACE_LOCAL_END
-#include <parts/malloca.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fuzzy_c16sncasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(fuzzy_c16sncasecmp))(__CHAR16_TYPE__ const *__s1, __SIZE_TYPE__ __s1_maxlen, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __s2_maxlen) {
 	return __localdep_fuzzy_c16memcasecmp(__s1, __localdep_c16snlen(__s1, __s1_maxlen), __s2, __localdep_c16snlen(__s2, __s2_maxlen));

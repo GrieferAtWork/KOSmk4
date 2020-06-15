@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x803a24d2 */
+/* HASH CRC-32:0xd39f6a98 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_c32stou32_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c32stou32) __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__
+__LOCAL_LIBC(c32stou32) __ATTR_LEAF __ATTR_NONNULL((1)) __UINT32_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32stou32))(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base) {
 	__UINT32_TYPE__ __result, __temp;
 	if (!__base) {

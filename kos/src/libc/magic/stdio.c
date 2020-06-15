@@ -701,7 +701,7 @@ int feof([[nonnull]] FILE __KOS_FIXED_CONST *__restrict stream);
 
 @@Check if an I/O error occurred in `STREAM'
 [[decl_include("<features.h>")]]
-[[std, ATTR_PURE, wunused, export_alias("_IO_ferror"), alias("ferror_unlocked")]]
+[[std, wunused, ATTR_PURE, export_alias("_IO_ferror"), alias("ferror_unlocked")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("ferror_unlocked")]]
 int ferror([[nonnull]] FILE __KOS_FIXED_CONST *__restrict stream);
 
@@ -950,7 +950,7 @@ __STDC_INT_AS_SIZE_T scanf([[nonnull]] char const *__restrict format, ...)
 %(std)
 %(std)#if !defined(__USE_ISOC11) || (defined(__cplusplus) && __cplusplus <= 201103L)
 [[std, cp_stdio, guard, wunused]]
-[[ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)")]]
+[[deprecated("No buffer size checks (use `fgets' instead)")]]
 [[export_alias("_IO_gets"), requires_include("<__crt.h>")]]
 [[impl_include("<local/stdstreams.h>", "<hybrid/typecore.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && $has_function(fgets))]]

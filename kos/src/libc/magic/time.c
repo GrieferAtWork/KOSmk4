@@ -380,7 +380,7 @@ double difftime32($time32_t time1, $time32_t time0);
 
 [[decl_include("<features.h>")]]
 [[decl_prefix(DEFINE_STRUCT_TM)]]
-[[ATTR_PURE, wunused, doc_alias(mktime)]]
+[[wunused, ATTR_PURE, doc_alias(mktime)]]
 [[ignore, nocrt, alias("mktime", "_mktime32", "timelocal")]]
 $time32_t mktime32([[nonnull]] __STRUCT_TM __KOS_FIXED_CONST *tp);
 

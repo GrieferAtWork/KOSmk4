@@ -382,9 +382,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write") NONNULL((1, 2))
 }
 /*[[[end:libc_file_wprinter_unlocked]]]*/
 
-/*[[[head:libd_file_wprinter,hash:CRC-32=0xa265f1bd]]]*/
+/*[[[head:libd_file_wprinter,hash:CRC-32=0xe22e1bab]]]*/
 /* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.scanf") NONNULL((1, 2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") NONNULL((1, 2)) ssize_t
 (LIBDCALL libd_file_wprinter)(void *arg,
                               char16_t const *__restrict data,
                               size_t datalen) THROWS(...)
@@ -403,9 +403,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.scanf") NONNULL((
 }
 /*[[[end:libd_file_wprinter]]]*/
 
-/*[[[head:libd_file_wprinter_unlocked,hash:CRC-32=0xe4fecd06]]]*/
+/*[[[head:libd_file_wprinter_unlocked,hash:CRC-32=0x7e2a63d0]]]*/
 /* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.scanf") NONNULL((1, 2)) ssize_t
+INTERN ATTR_SECTION(".text.crt..doswchar.FILE.unlocked.write.write") NONNULL((1, 2)) ssize_t
 (LIBDCALL libd_file_wprinter_unlocked)(void *arg,
                                        char16_t const *__restrict data,
                                        size_t datalen) THROWS(...)
@@ -514,8 +514,8 @@ NOTHROW_NCX(LIBKCALL libc__wcserror_s)(char32_t *buf,
 }
 /*[[[end:libc__wcserror_s]]]*/
 
-/*[[[head:libd__wcserror_s,hash:CRC-32=0xc567990f]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") errno_t
+/*[[[head:libd__wcserror_s,hash:CRC-32=0x53717418]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") errno_t
 NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf,
                                        size_t bufsize,
                                        int errno_value)
@@ -542,8 +542,8 @@ NOTHROW_NCX(LIBKCALL libc__wcserror)(int errno_value)
 }
 /*[[[end:libc__wcserror]]]*/
 
-/*[[[head:libd__wcserror,hash:CRC-32=0x2bc0d318]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") char16_t *
+/*[[[head:libd__wcserror,hash:CRC-32=0x8f600bcb]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") char16_t *
 NOTHROW_NCX(LIBDCALL libd__wcserror)(int errno_value)
 /*[[[body:libd__wcserror]]]*/
 /*AUTO*/{
@@ -566,8 +566,8 @@ NOTHROW_NCX(LIBKCALL libc___wcserror)(char32_t const *message)
 }
 /*[[[end:libc___wcserror]]]*/
 
-/*[[[head:libd___wcserror,hash:CRC-32=0xa916f59b]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") char16_t *
+/*[[[head:libd___wcserror,hash:CRC-32=0x94426558]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") char16_t *
 NOTHROW_NCX(LIBDCALL libd___wcserror)(char16_t const *message)
 /*[[[body:libd___wcserror]]]*/
 /*AUTO*/{
@@ -594,8 +594,8 @@ NOTHROW_NCX(LIBKCALL libc___wcserror_s)(char32_t *buf,
 }
 /*[[[end:libc___wcserror_s]]]*/
 
-/*[[[head:libd___wcserror_s,hash:CRC-32=0x6ffc48ac]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") errno_t
+/*[[[head:libd___wcserror_s,hash:CRC-32=0x1c1899a8]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") errno_t
 NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf,
                                         size_t bufsize,
                                         char16_t const *message)
@@ -632,8 +632,8 @@ NOTHROW_NCX(LIBKCALL libc__wfsopen)(char32_t const *filename,
 }
 /*[[[end:libc__wfsopen]]]*/
 
-/*[[[head:libd__wfsopen,hash:CRC-32=0xf6f66cf1]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") WUNUSED NONNULL((1, 2)) FILE *
+/*[[[head:libd__wfsopen,hash:CRC-32=0xd879952b]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
 NOTHROW_NCX(LIBDCALL libd__wfsopen)(char16_t const *filename,
                                     char16_t const *mode,
                                     __STDC_INT_AS_UINT_T sh_flag)
@@ -662,8 +662,8 @@ NOTHROW_NCX(LIBKCALL libc__wfdopen)(fd_t fd,
 }
 /*[[[end:libc__wfdopen]]]*/
 
-/*[[[head:libd__wfdopen,hash:CRC-32=0xcf4418f9]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") WUNUSED NONNULL((2)) FILE *
+/*[[[head:libd__wfdopen,hash:CRC-32=0xbd1e6774]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((2)) FILE *
 NOTHROW_NCX(LIBDCALL libd__wfdopen)(fd_t fd,
                                     char16_t const *mode)
 /*[[[body:libd__wfdopen]]]*/
@@ -696,8 +696,8 @@ NOTHROW_NCX(LIBKCALL libc__wfopen_s)(FILE **pstream,
 }
 /*[[[end:libc__wfopen_s]]]*/
 
-/*[[[head:libd__wfopen_s,hash:CRC-32=0x5728bb4f]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") NONNULL((1, 2, 3)) errno_t
+/*[[[head:libd__wfopen_s,hash:CRC-32=0xe928135b]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wfopen_s)(FILE **pstream,
                                      char16_t const *filename,
                                      char16_t const *mode)
@@ -730,8 +730,8 @@ NOTHROW_NCX(LIBKCALL libc__wfreopen_s)(FILE **pstream,
 }
 /*[[[end:libc__wfreopen_s]]]*/
 
-/*[[[head:libd__wfreopen_s,hash:CRC-32=0x8e313150]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") NONNULL((1, 2, 3)) errno_t
+/*[[[head:libd__wfreopen_s,hash:CRC-32=0xbde1c414]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") NONNULL((1, 2, 3)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wfreopen_s)(FILE **pstream,
                                        char16_t const *filename,
                                        char16_t const *mode,
@@ -762,8 +762,8 @@ NOTHROW_NCX(LIBKCALL libc__wtempnam)(char32_t const *directory,
 }
 /*[[[end:libc__wtempnam]]]*/
 
-/*[[[head:libd__wtempnam,hash:CRC-32=0x85e88346]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") WUNUSED char16_t *
+/*[[[head:libd__wtempnam,hash:CRC-32=0xc2e4bfc6]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") WUNUSED char16_t *
 NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory,
                                      char16_t const *file_prefix)
 /*[[[body:libd__wtempnam]]]*/
@@ -794,8 +794,8 @@ NOTHROW_NCX(LIBKCALL libc__wtmpnam_s)(char32_t *dst,
 }
 /*[[[end:libc__wtmpnam_s]]]*/
 
-/*[[[head:libd__wtmpnam_s,hash:CRC-32=0x2115e172]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") NONNULL((1)) errno_t
+/*[[[head:libd__wtmpnam_s,hash:CRC-32=0x3cf6b66]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst,
                                       size_t wchar_count)
 /*[[[body:libd__wtmpnam_s]]]*/

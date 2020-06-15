@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefa17559 */
+/* HASH CRC-32:0x18d8b6a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -253,7 +253,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <local/stdstreams.h>
 #ifndef __LOCAL_error_print_progname
-#ifdef error_print_progname
+#ifdef __error_print_progname
 #define __LOCAL_error_print_progname __error_print_progname
 #elif defined(__CRT_HAVE_error_print_progname)
 #ifdef __NO_ASMNAME
@@ -266,7 +266,7 @@ __LIBC void (__LIBCCALL *__error_print_progname)(void);
 #endif /* ... */
 #endif /* !__LOCAL_error_print_progname */
 #ifndef __LOCAL_error_one_per_line
-#ifdef error_one_per_line
+#ifdef __error_one_per_line
 #define __LOCAL_error_one_per_line __error_one_per_line
 #elif defined(__CRT_HAVE_error_one_per_line)
 #ifdef __NO_ASMNAME
@@ -279,7 +279,7 @@ __LIBC int __error_one_per_line;
 #endif /* ... */
 #endif /* !__LOCAL_error_one_per_line */
 #ifndef __LOCAL_error_message_count
-#ifdef error_message_count
+#ifdef __error_message_count
 #define __LOCAL_error_message_count __error_message_count
 #elif defined(__CRT_HAVE_error_message_count)
 #ifdef __NO_ASMNAME

@@ -31,9 +31,9 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_ftok,hash:CRC-32=0xba0db3b3]]]*/
+/*[[[head:libc_ftok,hash:CRC-32=0x5b8aff48]]]*/
 /* Generates key for System V style IPC */
-INTERN NONNULL((1)) key_t
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) key_t
 NOTHROW_RPC(LIBCCALL libc_ftok)(char const *pathname,
                                 __STDC_INT_AS_UINT_T proj_id)
 /*[[[body:libc_ftok]]]*/

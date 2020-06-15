@@ -30,7 +30,7 @@ import * from ..optiexpr;
 #define SystemHeader      Object /* SystemHeader from .cheaders */
 #define FunctionPrototype Object /* FunctionPrototype from .cheaders */
 
-global expandPreprocessorConditionString;
+global escapeText;
 
 @@Replace:
 @@   - @"$size_t" -> "$size_t"
@@ -650,7 +650,7 @@ again_handle_tok:
 				}
 				self.next();
 				self.skip("(");
-				local nsName = parseCStringOrKeyword(self);
+				local nsName = self.parseCStringOrKeyword();
 				namespaceStack.append(fp.namespace);
 				try {
 					fp.namespace = NAMESPACES[nsName];
@@ -769,7 +769,7 @@ parse_if_or_elif_condition:
 				} else if (tok.endswith("def")) {
 					cond = "defined({})".format({ cond });
 				}
-				cond = expandPreprocessorConditionString(cond);
+				cond = escapeText(cond, mode);
 				if (tok.startswith("pp_if")) {
 					if (oldKeepNewLinesFromDeadCode is none) {
 						if (fp !is CWriter) {
@@ -1032,19 +1032,6 @@ function escapeNonRepeatingTextIntoFile(
 		escapeTextIntoFile(
 			fp, text, mode, keyEscape, evalEnviron, forceKeyEscape);
 	}
-}
-
-
-function printPreprocessorConditionString(
-		fp: File | CWriter, text: string | CParser | UserString) {
-	escapeTextIntoFile(fp, text, ESCAPE_MODE_FULL, identity from functools);
-}
-
-function expandPreprocessorConditionString(
-		text: string | CParser | UserString): string {
-	local resultFp = File.Writer();
-	escapeTextIntoFile(resultFp, text, ESCAPE_MODE_FULL, identity from functools);
-	return resultFp.string;
 }
 
 

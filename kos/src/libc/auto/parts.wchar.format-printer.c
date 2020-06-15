@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa558776b */
+/* HASH CRC-32:0xe928d1b4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1831,7 +1831,7 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *_
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *__restrict self,
                                                  size_t num_wchars) {
 	char16_t *result;
@@ -1865,7 +1865,7 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
-INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED WUNUSED NONNULL((1)) char32_t *
+INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_format_waprintf_alloc)(struct format_c32aprintf_data *__restrict self,
                                                  size_t num_wchars) {
 	char32_t *result;

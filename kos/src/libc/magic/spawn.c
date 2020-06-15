@@ -124,12 +124,24 @@ typedef struct {
 
 }
 
+%[define(DEFINE_TARGV =
+@@pp_ifndef __TARGV@@
+@@pp_ifdef __USE_DOS@@
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+@@pp_else@@
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+@@pp_endif@@
+@@pp_endif@@
+)]
+
 
 %
 @@Spawn a new process executing PATH with the attributes describes in *ATTRP.
 @@Before running the process perform the actions described in FILE-ACTIONS.
 @@This function is a possible cancellation point and therefore not marked with __THROW
-[[cp]]
+[[cp, decl_prefix(DEFINE_TARGV)]]
 int posix_spawn([[nonnull]] pid_t *__restrict pid,
                 [[nonnull]] char const *__restrict path,
                 [[nullable]] posix_spawn_file_actions_t const *file_actions,
@@ -139,7 +151,7 @@ int posix_spawn([[nonnull]] pid_t *__restrict pid,
 %
 @@Similar to `posix_spawn' but search for FILE in the PATH.
 @@This function is a possible cancellation point and therefore not marked with __THROW
-[[cp]]
+[[cp, decl_prefix(DEFINE_TARGV)]]
 int posix_spawnp([[nonnull]] pid_t *__restrict pid,
                  [[nonnull]] const char *__restrict file,
                  [[nullable]] posix_spawn_file_actions_t const *file_actions,

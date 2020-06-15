@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6518d930 */
+/* HASH CRC-32:0x59229c59 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_vfscanf_defined 1
 #include <__crt.h>
 #if (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))
+#include <kos/anno.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fgetc from stdio */
@@ -79,7 +80,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_format_vscanf_defined 1
 #ifdef __CRT_HAVE_format_vscanf
 __NAMESPACE_LOCAL_END
-#include <kos/anno.h>
 #include <bits/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic scanf implementation

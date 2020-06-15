@@ -367,22 +367,22 @@ struct ip6_mtuinfo {
 
 %[default:section(".text.crt.net.inet.6.RFC_2292")]
 @@Obsolete hop-by-hop and Destination Options Processing (RFC 2292)
-[[cp_kos, ATTR_DEPRECATED_]]
+[[cp_kos, deprecated]]
 int inet6_option_space(int nbytes);
 
-[[cp_kos, ATTR_DEPRECATED_, doc_alias("inet6_option_space")]]
+[[cp_kos, deprecated, doc_alias("inet6_option_space")]]
 int inet6_option_init(void *bp, struct cmsghdr **cmsgp, int type);
 
-[[cp_kos, ATTR_DEPRECATED_, doc_alias("inet6_option_space")]]
+[[cp_kos, deprecated, doc_alias("inet6_option_space")]]
 int inet6_option_append(struct cmsghdr *cmsg, $uint8_t const *typep, int multx, int plusy);
 
-[[cp_kos, ATTR_DEPRECATED_, doc_alias("inet6_option_space")]]
+[[cp_kos, deprecated, doc_alias("inet6_option_space")]]
 $uint8_t *inet6_option_alloc(struct cmsghdr *cmsg, int datalen, int multx, int plusy);
 
-[[cp_kos, ATTR_DEPRECATED_, doc_alias("inet6_option_space")]]
+[[cp_kos, deprecated, doc_alias("inet6_option_space")]]
 int inet6_option_next(struct cmsghdr const *cmsg, $uint8_t **tptrp);
 
-[[cp_kos, ATTR_DEPRECATED_, doc_alias("inet6_option_space")]]
+[[cp_kos, deprecated, doc_alias("inet6_option_space")]]
 int inet6_option_find(struct cmsghdr const *cmsg, $uint8_t **tptrp, int type);
 
 

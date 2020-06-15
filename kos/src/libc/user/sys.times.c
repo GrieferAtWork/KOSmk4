@@ -33,12 +33,12 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_times,hash:CRC-32=0x17fc0682]]]*/
+/*[[[head:libc_times,hash:CRC-32=0x8c1e9e6b]]]*/
 /* Store the CPU time used by this process and all its
  * dead children (and their dead children) in BUFFER.
  * Return the elapsed real time, or (clock_t) -1 for errors.
  * All times are in CLK_TCKths of a second */
-INTERN clock_t
+INTERN ATTR_SECTION(".text.crt.unsorted") clock_t
 NOTHROW_NCX(LIBCCALL libc_times)(struct tms *buffer)
 /*[[[body:libc_times]]]*/
 {

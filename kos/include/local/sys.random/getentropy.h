@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba792cc3 */
+/* HASH CRC-32:0xa71d56ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,10 +61,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getentropy))(void *__buf, __SIZE_TYPE
 		                 __num_bytes - __result,
 		                 __GRND_RANDOM);
 		if (__temp < 0) {
-#if defined(__libc_geterrno) && defined(EINTR)
+#if defined(__libc_geterrno) && defined(__EINTR)
 			if (__libc_geterrno() == __EINTR)
 				continue;
-#endif /* __libc_geterrno && EINTR */
+#endif /* __libc_geterrno && __EINTR */
 			goto __err;
 		}
 		__result += (__SIZE_TYPE__)__temp;

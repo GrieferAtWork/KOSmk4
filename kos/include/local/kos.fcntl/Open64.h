@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c2161cc */
+/* HASH CRC-32:0x24f33951 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,11 +57,11 @@ __LOCAL_LIBC(Open64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 #if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))
 	__result = __localdep_OpenAt64(__CRT_AT_FDCWD, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
 #else /* __CRT_AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt) */
-#ifdef O_LARGEFILE
+#ifdef __O_LARGEFILE
 	__result = __localdep_Open32(__filename, __oflags | __O_LARGEFILE, __builtin_va_arg(__args, __mode_t));
-#else /* O_LARGEFILE */
+#else /* __O_LARGEFILE */
 	__result = __localdep_Open32(__filename, __oflags, __builtin_va_arg(__args, __mode_t));
-#endif /* !O_LARGEFILE */
+#endif /* !__O_LARGEFILE */
 #endif /* !__CRT_AT_FDCWD || (!__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt) */
 	__builtin_va_end(__args);
 	return __result;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8579ad7 */
+/* HASH CRC-32:0x378a68b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,12 +86,12 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_pthread_attr_getscope)(pthr
 /* Set scheduling contention scope in *ATTR according to SCOPE */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_attr_setscope)(pthread_attr_t *attr, int scope);
 /* Return the previously set address for the stack */
-INTDEF ATTR_DEPRECATED_ NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstackaddr)(pthread_attr_t const *__restrict attr, void **__restrict stackaddr);
+INTDEF ATTR_DEPRECATED("Use pthread_attr_getstack()") NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstackaddr)(pthread_attr_t const *__restrict attr, void **__restrict stackaddr);
 /* Set the starting address of the stack of the thread to be created.
  * Depending on whether the stack grows up or down the value must either
  * be higher or lower than all the address in the memory block. The
  * minimal size of the block must be PTHREAD_STACK_MIN */
-INTDEF ATTR_DEPRECATED_ NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstackaddr)(pthread_attr_t *attr, void *stackaddr);
+INTDEF ATTR_DEPRECATED("Use pthread_attr_setstack()") NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstackaddr)(pthread_attr_t *attr, void *stackaddr);
 /* Return the currently used minimal stack size */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstacksize)(pthread_attr_t const *__restrict attr, size_t *__restrict stacksize);
 /* Add information about the minimum stack size needed for the thread

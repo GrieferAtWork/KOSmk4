@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf47de60f */
+/* HASH CRC-32:0x4f7ef6b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_flushall_unlocked_defined
 #define __local_flushall_unlocked_defined 1
 #include <__crt.h>
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fflush_unlocked from stdio */
 #ifndef __local___localdep_fflush_unlocked_defined

@@ -1125,6 +1125,7 @@
 #define __CRT_HAVE__strnicoll_l 1
 #define __CRT_HAVE__strnset 1
 #define __CRT_HAVE__strnset_s 1
+#define __CRT_HAVE__strrev 1
 #define __CRT_HAVE__strset 1
 #define __CRT_HAVE__strset_s 1
 #define __CRT_HAVE__strtod_l 1
@@ -4646,6 +4647,7 @@
 #define __CRT_HAVE_KOS$wcsndup 1
 #define __CRT_HAVE_KOS$wcsnend 1
 #define __CRT_HAVE_KOS$wcsnlen 1
+#define __CRT_HAVE_KOS$wcsnlwr 1
 #define __CRT_HAVE_KOS$wcsnlwr_l 1
 #define __CRT_HAVE_KOS$wcsnoff 1
 #define __CRT_HAVE_KOS$wcsnrchr 1
@@ -5182,6 +5184,7 @@
 #define __CRT_HAVE_DOS$wcsndup 1
 #define __CRT_HAVE_DOS$wcsnend 1
 #define __CRT_HAVE_DOS$wcsnlen 1
+#define __CRT_HAVE_DOS$wcsnlwr 1
 #define __CRT_HAVE_DOS$wcsnlwr_l 1
 #define __CRT_HAVE_DOS$wcsnoff 1
 #define __CRT_HAVE_DOS$wcsnrchr 1

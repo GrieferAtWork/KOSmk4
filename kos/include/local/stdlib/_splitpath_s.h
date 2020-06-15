@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x904f3618 */
+/* HASH CRC-32:0xe4b7e1ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,18 +114,18 @@ __got_drive:
 	}
 	return 0;
 __err_inval:
-#ifdef EINVAL
+#ifdef __EINVAL
 	return __EINVAL;
-#else /* EINVAL */
+#else /* __EINVAL */
 	return 1;
-#endif /* !EINVAL */
+#endif /* !__EINVAL */
 __err_range:
-#ifdef ERANGE
+#ifdef __ERANGE
 	__libc_seterrno(__ERANGE);
 	return __ERANGE;
-#else /* ERANGE */
+#else /* __ERANGE */
 	return 1;
-#endif /* !ERANGE */
+#endif /* !__ERANGE */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__splitpath_s_defined

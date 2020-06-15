@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3b00528 */
+/* HASH CRC-32:0xd1fdb25a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_toupper __LIBC_LOCAL_NAME(toupper)
 #endif /* !... */
 #endif /* !__local___localdep_toupper_defined */
-__LOCAL_LIBC(_strupr_s) __ATTR_LEAF __errno_t
+__LOCAL_LIBC(_strupr_s) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strupr_s))(char *__buf, __SIZE_TYPE__ __buflen) {
 	char *__iter, __ch;
 	if (__buf == __NULLPTR)

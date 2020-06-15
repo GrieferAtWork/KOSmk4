@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58dd05e7 */
+/* HASH CRC-32:0x4f277001 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1033,7 +1033,7 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__res
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
-INTERN ATTR_SECTION(".text.crt.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__restrict self,
                                                 size_t num_chars) {
 	char *result;

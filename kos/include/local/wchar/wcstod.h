@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e864a11 */
+/* HASH CRC-32:0x9e99e111 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_wcstod_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wcstod) __ATTR_NONNULL((1)) double
+__LOCAL_LIBC(wcstod) __ATTR_LEAF __ATTR_NONNULL((1)) double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstod))(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr) {
 	/* TODO */
 	__COMPILER_IMPURE();

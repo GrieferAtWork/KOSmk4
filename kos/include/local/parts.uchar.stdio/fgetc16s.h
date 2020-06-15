@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66de6412 */
+/* HASH CRC-32:0x18bab6c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_fgetc16s_defined 1
 #include <__crt.h>
 #if ((defined(__CRT_HAVE_fgetwc) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fgetwc) || (defined(__CRT_HAVE_getwc) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$getwc)) && ((defined(__CRT_HAVE_ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || (defined(__CRT_HAVE_ungetwc) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$ungetwc) || (defined(__CRT_HAVE_ungetwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
+#include <kos/anno.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: ferror from stdio */
@@ -86,9 +87,9 @@ __LOCAL_LIBC(fgetc16s) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __CHAR16_TYPE__ *
 	__SIZE_TYPE__ __n;
 	if __unlikely(!__buf || !__bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef ERANGE
+#ifdef __ERANGE
 		__libc_seterrno(__ERANGE);
-#endif /* ERANGE */
+#endif /* __ERANGE */
 		return __NULLPTR;
 	}
 	for (__n = 0; __n < __bufsize - 1; ++__n) {

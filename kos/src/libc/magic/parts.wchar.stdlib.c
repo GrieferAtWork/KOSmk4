@@ -37,7 +37,7 @@ __SYSDECL_BEGIN
 }
 
 %#ifdef __USE_KOS
-%[default:section("{.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert}")]
+%[default:section(".text.crt{|.dos}.wchar.unicode.static.convert")]
 [[wchar, wunused, ATTR_PURE, dos_export_as("DOS$_wtoi")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("wtol", "_wtol")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("wtoll", "_wtoll")]]

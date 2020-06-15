@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38120b67 */
+/* HASH CRC-32:0x98753264 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsxfrm_defined
 #define __local___localdep_wcsxfrm_defined 1
 #ifdef __CRT_HAVE_wcsxfrm
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsxfrm,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __maxlen),wcsxfrm,(__dst,__src,__maxlen))
+__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsxfrm,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __maxlen),wcsxfrm,(__dst,__src,__maxlen))
 #else /* __CRT_HAVE_wcsxfrm */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcsxfrm.h>

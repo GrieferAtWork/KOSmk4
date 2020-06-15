@@ -310,9 +310,9 @@ function customDirectivesParser(context: LoaderContext): bool {
 		local check_crt      = "crt" in tok;
 		self.next();
 		self.skip("(");
-		local a = str parseCStringOrFunctionLikeExpression(self);
+		local a = str self.parseCStringOrFunctionLikeExpression();
 		self.skip("=");
-		local b = str parseCStringOrFunctionLikeExpression(self);
+		local b = str self.parseCStringOrFunctionLikeExpression();
 		self.skip(")");
 		local aName = a.partition("(")[0].strip();
 		local baseFunctionName = b.lstrip("_").partition("_chk")[0];
@@ -366,7 +366,7 @@ function customDirectivesParser(context: LoaderContext): bool {
 		self.next();
 		tok = self.skip("(");
 		while (tok !in ["", ")"]) {
-			local name = parseCStringOrFunctionLikeExpression(self);
+			local name = self.parseCStringOrFunctionLikeExpression();
 			s.insert(name);
 			if (self.tok != ",")
 				break;

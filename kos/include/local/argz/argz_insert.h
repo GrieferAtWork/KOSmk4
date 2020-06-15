@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8134a47c */
+/* HASH CRC-32:0xf8a5b4dc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,11 +119,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_insert))(char **__restrict __par
 	__argz     = *__pargz;
 	__argz_len = *__pargz_len;
 	if (__before < __argz || __before >= __argz + __argz_len) {
-#ifdef EINVAL
+#ifdef __EINVAL
 		return __EINVAL;
-#else /* EINVAL */
+#else /* __EINVAL */
 		return 1;
-#endif /* !EINVAL */
+#endif /* !__EINVAL */
 	}
 	/* Adjust `before' to point to the start of an entry
 	 * Note that GLibc has a bug here that causes it to accessed
@@ -144,11 +144,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_insert))(char **__restrict __par
 	__insert_offset = (__SIZE_TYPE__)(__before - __argz);
 	__argz = (char *)__localdep_realloc(__argz, __argz_len * sizeof(char));
 	if __unlikely(!__argz) {
-#ifdef ENOMEM
+#ifdef __ENOMEM
 		return __ENOMEM;
-#else /* ENOMEM */
+#else /* __ENOMEM */
 		return 1;
-#endif /* !ENOMEM */
+#endif /* !__ENOMEM */
 	}
 	/* Update ARGZ pointers. */
 	*__pargz     = __argz;

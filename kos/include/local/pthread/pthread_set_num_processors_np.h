@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6768f578 */
+/* HASH CRC-32:0x3d962324 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,11 +37,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(int _
 	int __i, __result;
 	__cpu_set_t __cset;
 	if (__n < 1) {
-#ifdef EINVAL
+#ifdef __EINVAL
 		return __EINVAL;
-#else /* EINVAL */
+#else /* __EINVAL */
 		return 1;
-#endif /* !EINVAL */
+#endif /* !__EINVAL */
 	}
 	__CPU_ZERO_S(sizeof(__cset), &__cset);
 	for (__i = 0; __i < __n; ++__i) {

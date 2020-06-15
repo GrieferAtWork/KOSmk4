@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27809d92 */
+/* HASH CRC-32:0x52335f3c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -250,6 +250,7 @@
 #define __CRT_HAVE_DOS$wcsndup 1
 #define __CRT_HAVE_DOS$wcsnend 1
 #define __CRT_HAVE_DOS$wcsnlen 1
+#define __CRT_HAVE_DOS$wcsnlwr 1
 #define __CRT_HAVE_DOS$wcsnlwr_l 1
 #define __CRT_HAVE_DOS$wcsnoff 1
 #define __CRT_HAVE_DOS$wcsnrchr 1

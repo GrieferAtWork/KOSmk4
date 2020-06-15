@@ -272,7 +272,7 @@ void _unlock_fhandle($fd_t fd) {
 }
 
 
-[[decl_include("<bits/types.h>"), ATTR_PURE, wunused]]
+[[decl_include("<bits/types.h>"), wunused, ATTR_PURE]]
 [[requires(!defined(__CRT_DOS_PRIMARY))]]
 intptr_t _get_osfhandle($fd_t fd) {
 	COMPILER_IMPURE();

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde760035 */
+/* HASH CRC-32:0xd0834f38 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ INTDEF WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBC
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf)(char const *__restrict format, ...) THROWS(...);
-INTDEF WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)") NONNULL((1)) char *(LIBCCALL libc_gets)(char *__restrict buf) THROWS(...);
+INTDEF WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") NONNULL((1)) char *(LIBCCALL libc_gets)(char *__restrict buf) THROWS(...);
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input, char const *__restrict format, va_list args);

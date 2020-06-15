@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76bec2ad */
+/* HASH CRC-32:0xbd13fe09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,6 +45,16 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),mempcpyw,(__dst,__src,__num_chars))
 #elif defined(__CRT_HAVE_mempcpyl) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),mempcpyl,(__dst,__src,__num_chars))
+#elif __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <local/string/mempcpyw.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wmempcpy (*(__WCHAR_TYPE__ *(__LIBCCALL *)(__WCHAR_TYPE__ *__restrict, __WCHAR_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(mempcpyw))
+#elif __SIZEOF_WCHAR_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <local/string/mempcpyl.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wmempcpy (*(__WCHAR_TYPE__ *(__LIBCCALL *)(__WCHAR_TYPE__ *__restrict, __WCHAR_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(mempcpyl))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wmempcpy.h>

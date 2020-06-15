@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6202e33d */
+/* HASH CRC-32:0xe7536a50 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,9 +83,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate_r))(__SIZE_TYPE__ __nel, stru
 		struct entry        __entry;
 	} __entry_type;
 	if (__htab == __NULLPTR) {
-#ifdef EINVAL
+#ifdef __EINVAL
 		__libc_seterrno(__EINVAL);
-#endif /* EINVAL */
+#endif /* __EINVAL */
 		return 0;
 	}
 	if (__htab->table != __NULLPTR)
@@ -94,9 +94,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate_r))(__SIZE_TYPE__ __nel, stru
 		__nel = 3;
 	for (__nel |= 1; ; __nel += 2) {
 		if (__UINT_MAX__ - 2 < __nel) {
-#ifdef ENOMEM
+#ifdef __ENOMEM
 			__libc_seterrno(__ENOMEM);
-#endif /* ENOMEM */
+#endif /* __ENOMEM */
 			return 0;
 		}
 		if (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__isprime)(__nel))

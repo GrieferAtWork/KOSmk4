@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27a5ac0a */
+/* HASH CRC-32:0x7c772c5a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qgcvt) __ATTR_NONNULL((3)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qgcvt))(__LONGDOUBLE __val, int __ndigit, char *__buf) {
-#ifndef LDBG_NDIGIT_MAX
+#ifndef __LDBG_NDIGIT_MAX
 #if __LDBL_MANT_DIG__ == 53
 #define __LDBG_NDIGIT_MAX 17
 #elif __LDBL_MANT_DIG__ == 24
@@ -71,7 +71,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qgcvt))(__LONGDOUBLE __val, int __ndi
 	/* ceil (M_LN2 / M_LN10 * DBL_MANT_DIG + 1.0) */
 #define __LDBG_NDIGIT_MAX (__LDBL_MANT_DIG__ / 4)
 #endif /* !... */
-#endif /* !LDBG_NDIGIT_MAX */
+#endif /* !__LDBG_NDIGIT_MAX */
 	if (__ndigit > __LDBG_NDIGIT_MAX)
 		__ndigit = __LDBG_NDIGIT_MAX;
 	__localdep_sprintf(__buf, "%.*Lg", __ndigit, __val);

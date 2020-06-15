@@ -157,7 +157,7 @@ int malloc_trim(size_t pad) {
 }
 
 %
-[[ATTR_PURE, wunused, export_alias(_msize)]]
+[[wunused, ATTR_PURE, export_alias(_msize)]]
 [[section(".text.crt.heap.helpers")]]
 size_t malloc_usable_size(void *__restrict mallptr);
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92ed47ef */
+/* HASH CRC-32:0xfb3d18a2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_putchar16_unlocked_defined 1
 #include <__crt.h>
 #if ((defined(__CRT_HAVE_fputwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fputwc_unlocked)) && !defined(__NO_STDSTREAMS)
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fputc16_unlocked from parts.uchar.stdio */
 #ifndef __local___localdep_fputc16_unlocked_defined

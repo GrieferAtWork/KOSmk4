@@ -1723,8 +1723,8 @@ NOTHROW_NCX(LIBCCALL libc___p___initenv)(void)
 }
 /*[[[end:libc___p___initenv]]]*/
 
-/*[[[head:libd___p__wenviron,hash:CRC-32=0xe56931f1]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
+/*[[[head:libd___p__wenviron,hash:CRC-32=0x876527b4]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
 /*[[[body:libd___p__wenviron]]]*/
 /*AUTO*/{
@@ -1745,9 +1745,9 @@ NOTHROW_NCX(LIBKCALL libc___p__wenviron)(void)
 }
 /*[[[end:libc___p__wenviron]]]*/
 
-/*[[[head:libd___p___winitenv,hash:CRC-32=0x6a4ac2c7]]]*/
+/*[[[head:libd___p___winitenv,hash:CRC-32=0x90b2aec9]]]*/
 /* Access to the initial environment block */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
 /*[[[body:libd___p___winitenv]]]*/
 /*AUTO*/{
@@ -1769,8 +1769,8 @@ NOTHROW_NCX(LIBKCALL libc___p___winitenv)(void)
 }
 /*[[[end:libc___p___winitenv]]]*/
 
-/*[[[head:libd___p___wargv,hash:CRC-32=0xa6ec59e4]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
+/*[[[head:libd___p___wargv,hash:CRC-32=0x1611f440]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p___wargv)(void)
 /*[[[body:libd___p___wargv]]]*/
 /*AUTO*/{
@@ -1791,8 +1791,8 @@ NOTHROW_NCX(LIBKCALL libc___p___wargv)(void)
 }
 /*[[[end:libc___p___wargv]]]*/
 
-/*[[[head:libd___p__wpgmptr,hash:CRC-32=0x187393f3]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t **
+/*[[[head:libd___p__wpgmptr,hash:CRC-32=0xa88e3e57]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t **
 NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void)
 /*[[[body:libd___p__wpgmptr]]]*/
 /*AUTO*/{
@@ -1974,8 +1974,8 @@ NOTHROW_NCX(LIBKCALL libc__wgetenv)(char32_t const *varname)
 }
 /*[[[end:libc__wgetenv]]]*/
 
-/*[[[head:libd__wgetenv,hash:CRC-32=0x11cde7c3]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") WUNUSED NONNULL((1)) char16_t *
+/*[[[head:libd__wgetenv,hash:CRC-32=0xa7845fca]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname)
 /*[[[body:libd__wgetenv]]]*/
 /*AUTO*/{
@@ -2004,8 +2004,8 @@ NOTHROW_NCX(LIBKCALL libc__wgetenv_s)(size_t *return_size,
 }
 /*[[[end:libc__wgetenv_s]]]*/
 
-/*[[[head:libd__wgetenv_s,hash:CRC-32=0x14e6f897]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 4)) errno_t
+/*[[[head:libd__wgetenv_s,hash:CRC-32=0x22cb9a76]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 4)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *return_size,
                                       char16_t *buf,
                                       size_t buflen,
@@ -2038,8 +2038,8 @@ NOTHROW_NCX(LIBKCALL libc__wdupenv_s)(char32_t **pbuf,
 }
 /*[[[end:libc__wdupenv_s]]]*/
 
-/*[[[head:libd__wdupenv_s,hash:CRC-32=0x77bdc1a2]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2, 3)) errno_t
+/*[[[head:libd__wdupenv_s,hash:CRC-32=0xdb82c616]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf,
                                       size_t *pbuflen,
                                       char16_t const *varname)

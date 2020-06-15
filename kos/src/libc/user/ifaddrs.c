@@ -31,13 +31,13 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_getifaddrs,hash:CRC-32=0xe4fd59b1]]]*/
+/*[[[head:libc_getifaddrs,hash:CRC-32=0x11c63ed8]]]*/
 /* Create a linked list of `struct ifaddrs' structures, one for each
  * network interface on the host machine. If successful, store the
  * list in *IFAP and return 0. On errors, return -1 and set `errno'.
  * The storage returned in *IFAP is allocated dynamically and can
  * only be properly freed by passing it to `freeifaddrs' */
-INTERN int
+INTERN ATTR_SECTION(".text.crt.unsorted") int
 NOTHROW_NCX(LIBCCALL libc_getifaddrs)(struct ifaddrs **ifap)
 /*[[[body:libc_getifaddrs]]]*/
 /*AUTO*/{
@@ -48,9 +48,9 @@ NOTHROW_NCX(LIBCCALL libc_getifaddrs)(struct ifaddrs **ifap)
 }
 /*[[[end:libc_getifaddrs]]]*/
 
-/*[[[head:libc_freeifaddrs,hash:CRC-32=0x11e9f9ac]]]*/
+/*[[[head:libc_freeifaddrs,hash:CRC-32=0xb0f7fe82]]]*/
 /* Reclaim the storage allocated by a previous `getifaddrs' call */
-INTERN void
+INTERN ATTR_SECTION(".text.crt.unsorted") void
 NOTHROW_NCX(LIBCCALL libc_freeifaddrs)(struct ifaddrs *ifa)
 /*[[[body:libc_freeifaddrs]]]*/
 /*AUTO*/{

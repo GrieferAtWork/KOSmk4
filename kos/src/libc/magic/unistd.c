@@ -1211,7 +1211,7 @@ int usleep($useconds_t useconds) {
 	return 0;
 }
 
-[[cp, ATTR_DEPRECATED("Use getcwd()")]]
+[[cp, deprecated("Use getcwd()")]]
 [[section(".text.crt.fs.basic_property")]]
 [[userimpl, requires_function(getcwd)]]
 char *getwd([[nonnull]] char *buf) {

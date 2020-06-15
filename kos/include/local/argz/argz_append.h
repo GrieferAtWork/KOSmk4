@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b7075ea */
+/* HASH CRC-32:0x4d076a1b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,11 +60,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_append))(char **__restrict __par
 	__SIZE_TYPE__ __newlen = __oldlen + __buf_len;
 	char *__newargz = (char *)__localdep_realloc(*__pargz, __newlen * sizeof(char));
 	if __unlikely(!__newargz) {
-#ifdef ENOMEM
+#ifdef __ENOMEM
 		return __ENOMEM;
-#else /* ENOMEM */
+#else /* __ENOMEM */
 		return 1;
-#endif /* !ENOMEM */
+#endif /* !__ENOMEM */
 	}
 	__localdep_memcpyc(__newargz + __oldlen, __buf, __buf_len, sizeof(char));
 	*__pargz     = __newargz;

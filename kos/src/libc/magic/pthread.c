@@ -474,7 +474,8 @@ int pthread_attr_destroy([[nonnull]] pthread_attr_t *attr);
 
 %
 @@Get detach state attribute
-int pthread_attr_getdetachstate([[nonnull]] pthread_attr_t const *attr, [[nonnull]] int *detachstate);
+int pthread_attr_getdetachstate([[nonnull]] pthread_attr_t const *attr,
+                                [[nonnull]] int *detachstate);
 
 %
 @@Set detach state attribute
@@ -482,7 +483,8 @@ int pthread_attr_setdetachstate([[nonnull]] pthread_attr_t *attr, int detachstat
 
 %
 @@Get the size of the guard area created for stack overflow protection
-int pthread_attr_getguardsize([[nonnull]] pthread_attr_t const *attr, [[nonnull]] size_t *guardsize);
+int pthread_attr_getguardsize([[nonnull]] pthread_attr_t const *attr,
+                              [[nonnull]] size_t *guardsize);
 
 %
 @@Set the size of the guard area created for stack overflow protection
@@ -527,7 +529,7 @@ int pthread_attr_setscope([[nonnull]] pthread_attr_t *attr, int scope);
 
 %
 @@Return the previously set address for the stack
-[[ATTR_DEPRECATED_]]
+[[deprecated("Use pthread_attr_getstack()")]]
 int pthread_attr_getstackaddr([[nonnull]] pthread_attr_t const *__restrict attr,
                               [[nonnull]] void **__restrict stackaddr);
 
@@ -537,7 +539,7 @@ int pthread_attr_getstackaddr([[nonnull]] pthread_attr_t const *__restrict attr,
 @@Depending on whether the stack grows up or down the value must either
 @@be higher or lower than all the address in the memory block. The
 @@minimal size of the block must be PTHREAD_STACK_MIN
-[[ATTR_DEPRECATED_]]
+[[deprecated("Use pthread_attr_setstack()")]]
 int pthread_attr_setstackaddr([[nonnull]] pthread_attr_t *attr, void *stackaddr);
 
 %
@@ -610,11 +612,14 @@ int pthread_setschedprio(pthread_t target_thread, int prio);
 
 %#ifdef __USE_GNU
 @@Get thread name visible in the kernel and its interfaces
-int pthread_getname_np(pthread_t target_thread, [[outp(buflen)]] char *buf, size_t buflen);
+int pthread_getname_np(pthread_t target_thread,
+                       [[outp(buflen)]] char *buf,
+                       size_t buflen);
 
 %
 @@Set thread name visible in the kernel and its interfaces
-int pthread_setname_np(pthread_t target_thread, [[nonnull]] const char *name);
+int pthread_setname_np(pthread_t target_thread,
+                       [[nonnull]] const char *name);
 %#endif /* __USE_GNU */
 
 

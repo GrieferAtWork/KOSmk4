@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe58693e */
+/* HASH CRC-32:0xd2d5caec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,10 +54,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr, __thrd
 	                       __arg);
 	if __likely(!__error)
 		return __thrd_success;
-#ifdef ENOMEM
+#ifdef __ENOMEM
 	if (__error == __ENOMEM)
 		return __thrd_nomem;
-#endif /* ENOMEM */
+#endif /* __ENOMEM */
 	return __thrd_error;
 }
 __NAMESPACE_LOCAL_END

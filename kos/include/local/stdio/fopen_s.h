@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x181a2735 */
+/* HASH CRC-32:0x4df53dd6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,19 +52,19 @@ __LOCAL_LIBC(fopen_s) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fopen_s))(__FILE **__pstream, char const *__filename, char const *__modes) {
 	__FILE *__result;
 	if __unlikely(!__pstream || !__filename || !__modes) {
-#ifdef EINVAL
+#ifdef __EINVAL
 		return __EINVAL;
-#else /* EINVAL */
+#else /* __EINVAL */
 		return 1;
-#endif /* !EINVAL */
+#endif /* !__EINVAL */
 	}
 	__result = __localdep_fopen64(__filename, __modes);
 	if __unlikely(!__result) {
-#ifdef ENOMEM
+#ifdef __ENOMEM
 		return __libc_geterrno_or(__ENOMEM);
-#else /* ENOMEM */
+#else /* __ENOMEM */
 		return 1;
-#endif /* !ENOMEM */
+#endif /* !__ENOMEM */
 	}
 	*__pstream = __result;
 	return 0;

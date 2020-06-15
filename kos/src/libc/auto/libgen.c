@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59e3d964 */
+/* HASH CRC-32:0x1ea59bc8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* Return directory part of PATH or "." if none is available */
-INTERN ATTR_RETNONNULL char *
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_RETNONNULL char *
 NOTHROW_NCX(LIBCCALL libc_dirname)(char *path) {
 	/* NOTE: This implementation is taken from GLibc */
 	/* dirname - return directory part of PATH.
@@ -89,7 +89,7 @@ NOTHROW_NCX(LIBCCALL libc_dirname)(char *path) {
  * modify its argument. Therefore we normally use the GNU version (in
  * <string.h>) and only if this header is included make the XPG
  * version available under the real name */
-INTERN ATTR_RETNONNULL char *
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_RETNONNULL char *
 NOTHROW_NCX(LIBCCALL libc___xpg_basename)(char *filename) {
 	/* NOTE: This implementation is taken from GLibc */
 	/* Return basename of given pathname according to the weird XPG specification.

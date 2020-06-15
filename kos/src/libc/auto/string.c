@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1da7f4ee */
+/* HASH CRC-32:0x97b2673e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3790,7 +3790,7 @@ NOTHROW_RPC(LIBCCALL libc__strerror_s)(char *__restrict buf,
 	return 0;
 }
 #include <parts/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.memory") ATTR_LEAF errno_t
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.memory") errno_t
 NOTHROW_NCX(LIBCCALL libc__strlwr_s)(char *buf,
                                      size_t buflen) {
 	char *iter, ch;
@@ -3802,7 +3802,7 @@ NOTHROW_NCX(LIBCCALL libc__strlwr_s)(char *buf,
 		*iter = libc_tolower(ch);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.memory") ATTR_LEAF errno_t
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.memory") errno_t
 NOTHROW_NCX(LIBCCALL libc__strupr_s)(char *buf,
                                      size_t buflen) {
 	char *iter, ch;
@@ -3814,7 +3814,7 @@ NOTHROW_NCX(LIBCCALL libc__strupr_s)(char *buf,
 		*iter = libc_toupper(ch);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.memory") ATTR_LEAF errno_t
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.memory") errno_t
 NOTHROW_NCX(LIBCCALL libc__strlwr_s_l)(char *buf,
                                        size_t buflen,
                                        locale_t locale) {
@@ -3827,7 +3827,7 @@ NOTHROW_NCX(LIBCCALL libc__strlwr_s_l)(char *buf,
 		*iter = libc_tolower_l(ch, locale);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.memory") ATTR_LEAF errno_t
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.memory") errno_t
 NOTHROW_NCX(LIBCCALL libc__strupr_s_l)(char *buf,
                                        size_t buflen,
                                        locale_t locale) {
@@ -3842,7 +3842,7 @@ NOTHROW_NCX(LIBCCALL libc__strupr_s_l)(char *buf,
 }
 #include <parts/errno.h>
 #include <libc/string.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_LEAF errno_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") errno_t
 NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf,
                                       size_t buflen,
                                       int ch,
@@ -4741,6 +4741,7 @@ DEFINE_PUBLIC_ALIAS(_strset, libc_strset);
 DEFINE_PUBLIC_ALIAS(strset, libc_strset);
 DEFINE_PUBLIC_ALIAS(_strnset, libc_strnset);
 DEFINE_PUBLIC_ALIAS(strnset, libc_strnset);
+DEFINE_PUBLIC_ALIAS(_strrev, libc_strrev);
 DEFINE_PUBLIC_ALIAS(strrev, libc_strrev);
 DEFINE_PUBLIC_ALIAS(_strset_s, libc__strset_s);
 DEFINE_PUBLIC_ALIAS(memcpy_s, libc_memcpy_s);

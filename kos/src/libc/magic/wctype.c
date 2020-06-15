@@ -143,7 +143,7 @@ __NAMESPACE_STD_USING(wctrans_t)
 }
 
 %[insert:std]
-%[default:section("{.text.crt.wchar.unicode.static.ctype|.text.crt.dos.wchar.unicode.static.ctype}")];
+%[default:section(".text.crt{|.dos}.wchar.unicode.static.ctype")];
 
 [[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswalnum(wint_t wc) {
@@ -201,7 +201,7 @@ int iswxdigit(wint_t wc) {
 }
 
 %(std)#ifdef __USE_ISOC99
-%[default:section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")];
+%[default:section(".text.crt{|.dos}.wchar.unicode.static.mbs")];
 
 [[std, guard, wunused, ATTR_PURE]]
 wctrans_t wctrans([[nonnull]] char const *prop) {
@@ -236,7 +236,7 @@ int iswctype(wint_t wc, wctype_t desc) {
 	return 0;
 }
 
-%[default:section("{.text.crt.wchar.unicode.static.ctype|.text.crt.dos.wchar.unicode.static.ctype}")]
+%[default:section(".text.crt{|.dos}.wchar.unicode.static.ctype")]
 %(std)#ifdef __USE_ISOC99
 [[std, guard, wunused, nothrow, ATTR_CONST, crtbuiltin]]
 int iswblank(wint_t wc) {
@@ -266,7 +266,7 @@ int iswascii($wint_t wc) {
 %
 %#ifdef __USE_XOPEN2K8
 
-%[default:section("{.text.crt.wchar.unicode.locale.ctype|.text.crt.dos.wchar.unicode.locale.ctype}")];
+%[default:section(".text.crt{|.dos}.wchar.unicode.locale.ctype")];
 [[wunused, ATTR_PURE, export_alias("_iswalnum_l", "__iswalnum_l")]]
 int iswalnum_l($wint_t wc, $locale_t locale) {
 	(void)locale;
@@ -372,7 +372,7 @@ $wint_t towlower_l($wint_t wc, $locale_t locale) {
 	return towlower(wc);
 }
 
-%[default:section("{.text.crt.wchar.unicode.locale.mbs|.text.crt.dos.wchar.unicode.locale.mbs}")];
+%[default:section(".text.crt{|.dos}.wchar.unicode.locale.mbs")];
 
 [[wunused, export_alias("__wctype_l")]]
 $wctype_t wctype_l([[nonnull]] char const *prop, $locale_t locale) {
@@ -425,20 +425,20 @@ $wint_t towctrans_l($wint_t wc, $wctrans_t desc, $locale_t locale) {
 
 %
 [[wunused, ATTR_CONST]]
-[[section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]]
+[[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 int isleadbyte(int wc) {
 	return wc >= 192 && wc <= 255;
 }
 
 [[wunused, ATTR_PURE]]
-[[section("{.text.crt.wchar.unicode.locale.mbs|.text.crt.dos.wchar.unicode.locale.mbs}")]]
+[[section(".text.crt{|.dos}.wchar.unicode.locale.mbs")]]
 int _isleadbyte_l(int wc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return isleadbyte(wc);
 }
 
-%[default:section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")];
+%[default:section(".text.crt{|.dos}.wchar.unicode.static.mbs")];
 [[wunused, ATTR_CONST]]
 int __iswcsymf($wint_t wc) {
 	return iswalpha(wc) || wc == '_' || wc == '$';
@@ -450,7 +450,7 @@ int __iswcsym($wint_t wc) {
 }
 
 %
-%[default:section("{.text.crt.wchar.unicode.locale.mbs|.text.crt.dos.wchar.unicode.locale.mbs}")];
+%[default:section(".text.crt{|.dos}.wchar.unicode.locale.mbs")];
 [[wunused, ATTR_PURE]]
 int _iswcsymf_l($wint_t wc, $locale_t locale) {
 	return iswalpha_l(wc, locale) || wc == '_' || wc == '$';

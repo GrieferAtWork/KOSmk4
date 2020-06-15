@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3683810 */
+/* HASH CRC-32:0x809933e5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_c16scanf_defined 1
 #include <__crt.h>
 #if (defined(__CRT_HAVE_vwscanf) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$vwscanf) || (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS) && (__SIZEOF_WCHAR_T__ == 2)) || (((defined(__CRT_HAVE_vfwscanf) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$vfwscanf)) && !defined(__NO_STDSTREAMS))
+#include <kos/anno.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: vc16scanf from parts.uchar.stdio */

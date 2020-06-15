@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd67982c4 */
+/* HASH CRC-32:0x8f44da50 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,11 +47,11 @@ __LOCAL_LIBC(_sopen_s) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_sopen_s))(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode) {
 	__fd_t __result;
 	if (!__fd) {
-#ifdef EINVAL
+#ifdef __EINVAL
 		return __EINVAL;
-#else /* EINVAL */
+#else /* __EINVAL */
 		return 1;
-#endif /* !EINVAL */
+#endif /* !__EINVAL */
 	}
 	__result = __localdep_sopen(__filename, __oflags, __sflags, __mode);
 	if (__result < 0) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x276c0e8a */
+/* HASH CRC-32:0x17bf9e0f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #if (defined(__CRT_HAVE_file_wprinter_unlocked) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$file_wprinter_unlocked) || (defined(__CRT_HAVE_file_wprinter) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$file_wprinter) || (defined(__CRT_HAVE_fputwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2)) || (defined(__CRT_HAVE_fputwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fputwc_unlocked)
 #include <features.h>
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: file_c16printer_unlocked from parts.uchar.stdio */
 #ifndef __local___localdep_file_c16printer_unlocked_defined
@@ -60,7 +61,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_format_vc16printf_defined 1
 #if defined(__CRT_HAVE_format_vwprintf) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
-#include <kos/anno.h>
 #include <bits/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
@@ -153,7 +153,6 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vc16printf,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
 #elif defined(__CRT_HAVE_DOS$format_vwprintf)
 __NAMESPACE_LOCAL_END
-#include <kos/anno.h>
 #include <bits/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
@@ -246,7 +245,6 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_DOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vc16printf,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
 #elif (__SIZEOF_WCHAR_T__ == 2)
 __NAMESPACE_LOCAL_END
-#include <kos/anno.h>
 #include <bits/uformat-printer.h>
 #include <local/parts.wchar.format-printer/format_vwprintf.h>
 __NAMESPACE_LOCAL_BEGIN

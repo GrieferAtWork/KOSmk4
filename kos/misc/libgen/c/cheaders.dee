@@ -278,7 +278,7 @@ class FunctionPrototype {
 	this = default;
 
 	@@List of attributes that should be applied to this function (e.g. @{ "ATTR_NORETURN" })
-	public member attributes: {(string | UserString)...} = ();
+	public member attributes: {(string | UserString | Callable)...} = ();
 
 	@@The nothrow behavior of this function. Should be one of:
 	@@  - @"":                   Unspecified (assume THROWING, but don't warn if used from NOTHROW)
@@ -318,14 +318,31 @@ class FunctionPrototype {
 			if (!m_attributesSorted) {
 				local wip = []; /* WIthParen */
 				local wop = []; /* WithOutParen */
-				for (local a: result) {
-					a = str(a);
-					if ("(" in a) {
-						wip.append(a);
-					} else {
-						wop.append(a);
-					}
+#define APPEND_ATTRIBUTE(a)            \
+				a = str(a);            \
+				if ("(" in a) {        \
+					if (a !in wip)     \
+						wip.append(a); \
+				} else {               \
+					if (a !in wop)     \
+						wop.append(a); \
 				}
+				for (local a: result) {
+					if (a is Callable) {
+						a = a();
+						if (a is Sequence) {
+							for (local e: a) {
+								APPEND_ATTRIBUTE(e)
+							}
+							continue;
+						}
+						if (a is none)
+							continue;
+					}
+					APPEND_ATTRIBUTE(a)
+					continue;
+				}
+#undef APPEND_ATTRIBUTE
 				wip.sort();
 				wop.sort();
 				wop.extend(wip);
@@ -1301,7 +1318,7 @@ class LocalFunction {
 			/* Include the preprocessor-condition prefix texts. */
 			for (local x: ppCondPrefix)
 				escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
-			fp.ppIf(expandPreprocessorConditionString(ppCond));
+			fp.ppIf(escapeText(ppCond, escapeMode));
 			/* Print out the declaration prefix. */
 			for (local x: usedPrototype.declPrefix)
 				escapeNonRepeatingTextIntoFile(fp, x, escapeMode);
@@ -1851,13 +1868,13 @@ class FunctionBinding {
 		}
 		if (hasUniversalPrototype) {
 			fp << "(";
-			printPreprocessorConditionString(fp, ppCond);
+			escapeTextIntoFile(fp, ppCond, ESCAPE_MODE_FULL);
 			fp << ")";
 			return;
 		}
 		if (ppCond != "1") {
 			fp << "((";
-			printPreprocessorConditionString(fp, ppCond);
+			escapeTextIntoFile(fp, ppCond, ESCAPE_MODE_FULL);
 			fp << ")&&";
 		}
 		local hasMultiplePrototypes = 0;
@@ -1874,7 +1891,7 @@ class FunctionBinding {
 			if (!isFirst)
 				fp << "||";
 			fp << "(";
-			printPreprocessorConditionString(fp, protoCond);
+			escapeTextIntoFile(fp, protoCond, ESCAPE_MODE_FULL);
 			fp << ")";
 			isFirst = false;
 		}
@@ -1947,7 +1964,7 @@ class FunctionBinding {
 		}
 		local isFirst = true;
 		for (local ppCond, associatedPrototypes: usedPrototypes) {
-			ppCond = expandPreprocessorConditionString(ppCond);
+			ppCond = escapeText(ppCond, escapeMode);
 			if (isFirst)
 				fp.ppIf(ppCond);
 			else {
@@ -2300,7 +2317,7 @@ no_usable_bindings:
 					}
 					fp.ppIf("!defined({}) && ({})".format({
 						guardName,
-						expandPreprocessorConditionString(bind.ppCond)
+						escapeText(bind.ppCond, escapeMode)
 					}));
 					fp.ppDefine(guardName, "1");
 					bind.cprintBindFunction(
@@ -2328,7 +2345,7 @@ normal_guardName_binding:
 					if (bindBinding.importName != exposedName)
 						continue;
 				}
-				local usedPpCond = expandPreprocessorConditionString(bind.ppCond);
+				local usedPpCond = escapeText(bind.ppCond, escapeMode);
 				local oldNs: Namespace | none = none;
 				local oldExternLinkage;
 				for (local x: bind.ppCondPrefix) {

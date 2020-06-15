@@ -28,7 +28,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_set_exception_handler,hash:CRC-32=0x7ca64b8b]]]*/
+/*[[[head:libc_set_exception_handler,hash:CRC-32=0x8cd5874e]]]*/
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *     Set mode #1: set_exception_handler(EXCEPT_HANDLER_MODE_DISABLED, NULL, NULL)
@@ -44,7 +44,7 @@ DECL_BEGIN
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-INTERN int
+INTERN ATTR_SECTION(".text.crt.unsorted") int
 NOTHROW(LIBCCALL libc_set_exception_handler)(unsigned int mode,
                                              except_handler_t handler,
                                              void *handler_sp)
@@ -58,7 +58,7 @@ NOTHROW(LIBCCALL libc_set_exception_handler)(unsigned int mode,
 }
 /*[[[end:libc_set_exception_handler]]]*/
 
-/*[[[head:libc_get_exception_handler,hash:CRC-32=0x36c47e2f]]]*/
+/*[[[head:libc_get_exception_handler,hash:CRC-32=0x64f7a560]]]*/
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
@@ -72,7 +72,7 @@ NOTHROW(LIBCCALL libc_set_exception_handler)(unsigned int mode,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
  * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
-INTERN int
+INTERN ATTR_SECTION(".text.crt.unsorted") int
 NOTHROW_NCX(LIBCCALL libc_get_exception_handler)(unsigned int *pmode,
                                                  except_handler_t *phandler,
                                                  void **phandler_sp)

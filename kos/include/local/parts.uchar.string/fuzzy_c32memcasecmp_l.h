@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b087a0d */
+/* HASH CRC-32:0xf582ca45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_towlower_l __LIBC_LOCAL_NAME(towlower_l)
 #endif /* !... */
 #endif /* !__local___localdep_towlower_l_defined */
-__LOCAL_LIBC(fuzzy_c32memcasecmp_l) __SIZE_TYPE__
+__LOCAL_LIBC(fuzzy_c32memcasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(fuzzy_c32memcasecmp_l))(__CHAR32_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes, __locale_t __locale) {
 	__SIZE_TYPE__ *__v0, *__v1, __i, __j, __cost, __temp;
 	if __unlikely(!__s1_bytes)

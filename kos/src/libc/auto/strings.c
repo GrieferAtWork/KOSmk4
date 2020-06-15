@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3995a432 */
+/* HASH CRC-32:0xff663985 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,18 +30,18 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN NONNULL((1, 2)) void
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 2)) void
 NOTHROW_NCX(LIBCCALL libc_bcopy)(void const *src,
                                  void *dst,
                                  size_t num_bytes) {
 	libc_memmove(dst, src, num_bytes);
 }
-INTERN NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_bzero)(void *__restrict dst,
                                  size_t num_bytes) {
 	libc_memset(dst, 0, num_bytes);
 }
-INTERN ATTR_PURE WUNUSED NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_PURE WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,
                                  int needle) {
 	for (; *haystack; ++haystack) {
@@ -52,7 +52,7 @@ NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,
 		return (char *)haystack;
 	return NULL;
 }
-INTERN ATTR_PURE WUNUSED NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_PURE WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack,
                                   int needle) {
 	char const *result = NULL;

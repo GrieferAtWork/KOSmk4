@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb06b47e4 */
+/* HASH CRC-32:0x8e7909e6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,11 @@ __LOCAL_LIBC(pthread_spin_trylock) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_trylock))(__pthread_spinlock_t *__lock) {
 	if (__hybrid_atomic_xch(*__lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
-#ifdef EBUSY
+#ifdef __EBUSY
 	return __EBUSY;
-#elif defined(EWOULDBLOCK)
+#elif defined(__EWOULDBLOCK)
 	return __EWOULDBLOCK;
-#elif defined(EAGAIN)
+#elif defined(__EAGAIN)
 	return __EAGAIN;
 #else /* ... */
 	return 1;

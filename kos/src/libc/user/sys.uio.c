@@ -35,8 +35,8 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_process_vm_readv,hash:CRC-32=0xc26f2aac]]]*/
-INTERN WUNUSED ssize_t
+/*[[[head:libc_process_vm_readv,hash:CRC-32=0xbf88f348]]]*/
+INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED ssize_t
 NOTHROW_RPC(LIBCCALL libc_process_vm_readv)(pid_t pid,
                                             struct iovec const *local_iov,
                                             ulongptr_t liovcnt,
@@ -54,8 +54,8 @@ NOTHROW_RPC(LIBCCALL libc_process_vm_readv)(pid_t pid,
 }
 /*[[[end:libc_process_vm_readv]]]*/
 
-/*[[[head:libc_process_vm_writev,hash:CRC-32=0x3c46a5ca]]]*/
-INTERN ssize_t
+/*[[[head:libc_process_vm_writev,hash:CRC-32=0xaefa34c0]]]*/
+INTERN ATTR_SECTION(".text.crt.unsorted") ssize_t
 NOTHROW_RPC(LIBCCALL libc_process_vm_writev)(pid_t pid,
                                              struct iovec const *local_iov,
                                              ulongptr_t liovcnt,
@@ -73,8 +73,8 @@ NOTHROW_RPC(LIBCCALL libc_process_vm_writev)(pid_t pid,
 }
 /*[[[end:libc_process_vm_writev]]]*/
 
-/*[[[head:libc_readv,hash:CRC-32=0x4908ae4]]]*/
-INTERN WUNUSED NONNULL((2)) ssize_t
+/*[[[head:libc_readv,hash:CRC-32=0x9bdb8e8e]]]*/
+INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd,
                                  struct iovec const *iov,
                                  __STDC_INT_AS_SIZE_T count)
@@ -86,8 +86,8 @@ NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd,
 }
 /*[[[end:libc_readv]]]*/
 
-/*[[[head:libc_writev,hash:CRC-32=0x77ed705a]]]*/
-INTERN NONNULL((2)) ssize_t
+/*[[[head:libc_writev,hash:CRC-32=0x7b5ef56c]]]*/
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd,
                                   struct iovec const *iov,
                                   __STDC_INT_AS_SIZE_T count)
@@ -99,8 +99,8 @@ NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd,
 }
 /*[[[end:libc_writev]]]*/
 
-/*[[[head:libc_preadv,hash:CRC-32=0xa405a0aa]]]*/
-INTERN WUNUSED NONNULL((2)) ssize_t
+/*[[[head:libc_preadv,hash:CRC-32=0xdb25eb35]]]*/
+INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_preadv)(fd_t fd,
                                   struct iovec const *iov,
                                   __STDC_INT_AS_SIZE_T count,
@@ -113,8 +113,8 @@ NOTHROW_RPC(LIBCCALL libc_preadv)(fd_t fd,
 }
 /*[[[end:libc_preadv]]]*/
 
-/*[[[head:libc_pwritev,hash:CRC-32=0x1549d233]]]*/
-INTERN NONNULL((2)) ssize_t
+/*[[[head:libc_pwritev,hash:CRC-32=0x41cd37eb]]]*/
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwritev)(fd_t fd,
                                    struct iovec const *iov,
                                    __STDC_INT_AS_SIZE_T count,
@@ -127,11 +127,11 @@ NOTHROW_RPC(LIBCCALL libc_pwritev)(fd_t fd,
 }
 /*[[[end:libc_pwritev]]]*/
 
-/*[[[head:libc_preadv64,hash:CRC-32=0x69e14d66]]]*/
+/*[[[head:libc_preadv64,hash:CRC-32=0xfb99017]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_preadv64, libc_preadv);
 #else /* MAGIC:alias */
-INTERN WUNUSED NONNULL((2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_preadv64)(fd_t fd,
                                     struct iovec const *iov,
                                     __STDC_INT_AS_SIZE_T count,
@@ -145,11 +145,11 @@ NOTHROW_RPC(LIBCCALL libc_preadv64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_preadv64]]]*/
 
-/*[[[head:libc_pwritev64,hash:CRC-32=0x5b3cc165]]]*/
+/*[[[head:libc_pwritev64,hash:CRC-32=0xaa900840]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_pwritev64, libc_pwritev);
 #else /* MAGIC:alias */
-INTERN NONNULL((2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwritev64)(fd_t fd,
                                      struct iovec const *iov,
                                      __STDC_INT_AS_SIZE_T count,

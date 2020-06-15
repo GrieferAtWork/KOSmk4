@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d4a97de */
+/* HASH CRC-32:0x365b3bfd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,7 +109,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16aprintf_pack))(struct forma
 	__result[__self->ap_used] = '\0'; /* NUL-terminate */
 	if (__pstrlen)
 		*__pstrlen = __self->ap_used;
-#ifndef NDEBUG
+#ifndef __NDEBUG
 #if __SIZEOF_POINTER__ == 4
 	__self->ap_base  = (__CHAR16_TYPE__ *)__UINT32_C(0xcccccccc);
 	__self->ap_avail = __UINT32_C(0xcccccccc);
@@ -119,7 +119,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16aprintf_pack))(struct forma
 	__self->ap_avail = __UINT64_C(0xcccccccccccccccc);
 	__self->ap_used  = __UINT64_C(0xcccccccccccccccc);
 #endif /* ... */
-#endif /* !NDEBUG */
+#endif /* !__NDEBUG */
 	return __result;
 }
 __NAMESPACE_LOCAL_END

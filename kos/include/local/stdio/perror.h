@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x505bcdb8 */
+/* HASH CRC-32:0xb5619f40 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 #if __has_builtin(__builtin_fprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fprintf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <features.h>
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -37,6 +38,7 @@ __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZ
 #elif defined(__CRT_HAVE_fprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <features.h>
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -44,6 +46,7 @@ __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__
 #elif defined(__CRT_HAVE_fprintf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -51,6 +54,7 @@ __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__
 #elif defined(__CRT_HAVE__IO_fprintf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -58,6 +62,7 @@ __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__
 #elif defined(__CRT_HAVE_fprintf_s)
 __NAMESPACE_LOCAL_END
 #include <features.h>
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -65,6 +70,7 @@ __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__
 #elif defined(__CRT_HAVE_fprintf_unlocked)
 __NAMESPACE_LOCAL_END
 #include <features.h>
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */

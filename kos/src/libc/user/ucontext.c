@@ -31,9 +31,9 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_getcontext,hash:CRC-32=0xaf852f36]]]*/
+/*[[[head:libc_getcontext,hash:CRC-32=0x88314362]]]*/
 /* Get user context and store it in variable pointed to by UCP */
-INTERN NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_getcontext)(ucontext_t *__restrict ucp)
 /*[[[body:libc_getcontext]]]*/
 /*AUTO*/{
@@ -44,9 +44,9 @@ NOTHROW_NCX(LIBCCALL libc_getcontext)(ucontext_t *__restrict ucp)
 }
 /*[[[end:libc_getcontext]]]*/
 
-/*[[[head:libc_setcontext,hash:CRC-32=0x28c48a45]]]*/
+/*[[[head:libc_setcontext,hash:CRC-32=0x75ce72b]]]*/
 /* Set user context from information of variable pointed to by UCP */
-INTERN NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_setcontext)(ucontext_t const *__restrict ucp)
 /*[[[body:libc_setcontext]]]*/
 /*AUTO*/{
@@ -57,10 +57,10 @@ NOTHROW_NCX(LIBCCALL libc_setcontext)(ucontext_t const *__restrict ucp)
 }
 /*[[[end:libc_setcontext]]]*/
 
-/*[[[head:libc_swapcontext,hash:CRC-32=0x8db2bd35]]]*/
+/*[[[head:libc_swapcontext,hash:CRC-32=0x51df0938]]]*/
 /* Save current context in context variable pointed to by OUCP and set
  * context from variable pointed to by UCP */
-INTERN NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__restrict oucp,
                                        ucontext_t const *__restrict ucp)
 /*[[[body:libc_swapcontext]]]*/
@@ -73,13 +73,13 @@ NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__restrict oucp,
 }
 /*[[[end:libc_swapcontext]]]*/
 
-/*[[[head:libc_makecontext,hash:CRC-32=0xfdf73e47]]]*/
+/*[[[head:libc_makecontext,hash:CRC-32=0x6fc70086]]]*/
 /* Manipulate user context UCP to continue with calling functions FUNC
  * and the ARGC-1 parameters following ARGC when the context is used
  * the next time in `setcontext' or `swapcontext'.
  * We cannot say anything about the parameters FUNC takes; `void'
  * is as good as any other choice */
-INTERN NONNULL((1, 2)) void
+INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 2)) void
 NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
                                         __makecontext_func_t func,
                                         int argc,

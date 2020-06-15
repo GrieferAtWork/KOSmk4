@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ec0b228 */
+/* HASH CRC-32:0x464ebb60 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcstod_defined
 #define __local___localdep_wcstod_defined 1
 #ifdef __CRT_HAVE_wcstod
-__CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstod,(__nptr,__endptr))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstod,(__nptr,__endptr))
 #else /* __CRT_HAVE_wcstod */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcstod.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcstod __LIBC_LOCAL_NAME(wcstod)
 #endif /* !__CRT_HAVE_wcstod */
 #endif /* !__local___localdep_wcstod_defined */
-__LOCAL_LIBC(wcstod_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) double
+__LOCAL_LIBC(wcstod_l) __ATTR_NONNULL((1)) double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstod_l))(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale) {
 	(void)__locale;
 	return __localdep_wcstod(__nptr, __endptr);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe69ce6ab */
+/* HASH CRC-32:0x801d31b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -975,7 +975,7 @@ NOTHROW_NCX(LIBCCALL libc__get_pgmptr)(char **pvalue) {
 	*pvalue = __LOCAL_program_invocation_name;
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.application.init") errno_t
 NOTHROW_NCX(LIBDCALL libd__get_wpgmptr)(char16_t **pvalue) {
 	*pvalue = *libd___p__wpgmptr();
 	return EOK;
@@ -2101,7 +2101,7 @@ NOTHROW_NCX(LIBCCALL libc_ultoa)(unsigned long val,
 	libc__ultoa_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) double
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) double
 NOTHROW_NCX(LIBDCALL libd__wtof)(char16_t const *nptr) {
 	return libd_wcstod(nptr, NULL);
 }
@@ -2109,7 +2109,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNU
 NOTHROW_NCX(LIBKCALL libc__wtof)(char32_t const *nptr) {
 	return libc_wcstod(nptr, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) double
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) double
 NOTHROW_NCX(LIBDCALL libd__wtof_l)(char16_t const *nptr,
                                    locale_t locale) {
 	return libd_wcstod_l(nptr, NULL, locale);
@@ -2119,7 +2119,7 @@ NOTHROW_NCX(LIBKCALL libc__wtof_l)(char32_t const *nptr,
                                    locale_t locale) {
 	return libc_wcstod_l(nptr, NULL, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) char16_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd__itow)(int val,
                                  char16_t *buf,
                                  int radix) {
@@ -2133,7 +2133,7 @@ NOTHROW_NCX(LIBKCALL libc__itow)(int val,
 	libc__itow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) char16_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd__ltow)(long val,
                                  char16_t *buf,
                                  int radix) {
@@ -2147,7 +2147,7 @@ NOTHROW_NCX(LIBKCALL libc__ltow)(long val,
 	libc__ltow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) char16_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd__ultow)(unsigned long val,
                                   char16_t *buf,
                                   int radix) {
@@ -2161,7 +2161,7 @@ NOTHROW_NCX(LIBKCALL libc__ultow)(unsigned long val,
 	libc__ultow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) char16_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd__i64tow)(s64 val,
                                    char16_t *buf,
                                    int radix) {
@@ -2175,7 +2175,7 @@ NOTHROW_NCX(LIBKCALL libc__i64tow)(s64 val,
 	libc__i64tow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) char16_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd__ui64tow)(u64 val,
                                     char16_t *buf,
                                     int radix) {
@@ -2190,7 +2190,7 @@ NOTHROW_NCX(LIBKCALL libc__ui64tow)(u64 val,
 	return buf;
 }
 #include <parts/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__itow_s)(int val,
                                    char16_t *buf,
                                    size_t buflen,
@@ -2272,7 +2272,7 @@ NOTHROW_NCX(LIBKCALL libc__itow_s)(int val,
 	return 0;
 }
 #include <parts/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__ltow_s)(long val,
                                    char16_t *buf,
                                    size_t buflen,
@@ -2354,7 +2354,7 @@ NOTHROW_NCX(LIBKCALL libc__ltow_s)(long val,
 	return 0;
 }
 #include <parts/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__ultow_s)(unsigned long val,
                                     char16_t *buf,
                                     size_t buflen,
@@ -2414,7 +2414,7 @@ NOTHROW_NCX(LIBKCALL libc__ultow_s)(unsigned long val,
 	return 0;
 }
 #include <parts/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__i64tow_s)(s64 val,
                                      char16_t *buf,
                                      size_t buflen,
@@ -2496,7 +2496,7 @@ NOTHROW_NCX(LIBKCALL libc__i64tow_s)(s64 val,
 	return 0;
 }
 #include <parts/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBDCALL libd__ui64tow_s)(u64 val,
                                       char16_t *buf,
                                       size_t buflen,
@@ -2555,7 +2555,7 @@ NOTHROW_NCX(LIBKCALL libc__ui64tow_s)(u64 val,
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) s64
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) s64
 NOTHROW_NCX(LIBDCALL libd__wtoi64)(char16_t const *__restrict nptr) {
 	return libd_wcsto64(nptr, NULL, 10);
 }
@@ -2563,7 +2563,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNU
 NOTHROW_NCX(LIBKCALL libc__wtoi64)(char32_t const *__restrict nptr) {
 	return libc_wcsto64(nptr, NULL, 10);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd__wtoi_l)(char16_t const *__restrict nptr,
                                    locale_t locale) {
 	return (int)libd_wcstol_l(nptr, NULL, 10, locale);
@@ -2573,7 +2573,7 @@ NOTHROW_NCX(LIBKCALL libc__wtoi_l)(char32_t const *__restrict nptr,
                                    locale_t locale) {
 	return (int)libc_wcstol_l(nptr, NULL, 10, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) long int
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_PURE WUNUSED NONNULL((1)) long int
 NOTHROW_NCX(LIBDCALL libd__wtol_l)(char16_t const *__restrict nptr,
                                    locale_t locale) {
 	return libd_wcstol_l(nptr, NULL, 10, locale);
@@ -2587,7 +2587,7 @@ NOTHROW_NCX(LIBKCALL libc__wtol_l)(char32_t const *__restrict nptr,
 	return libc_wcstol_l(nptr, NULL, 10, locale);
 }
 #endif /* !(__SIZEOF_LONG__ == __SIZEOF_INT__) */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) s64
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_PURE WUNUSED NONNULL((1)) s64
 NOTHROW_NCX(LIBDCALL libd__wtoi64_l)(char16_t const *__restrict nptr,
                                      locale_t locale) {
 	return libd_wcsto64_l(nptr, NULL, 10, locale);
@@ -2605,7 +2605,7 @@ NOTHROW_NCX(LIBKCALL libc__wtoi64_l)(char32_t const *__restrict nptr,
 	return libc_wcsto64_l(nptr, NULL, 10, locale);
 }
 #endif /* !... */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBDCALL libd__wtoll_l)(char16_t const *__restrict nptr,
                                     locale_t locale) {
 	return libd_wcstoll_l(nptr, NULL, 10, locale);

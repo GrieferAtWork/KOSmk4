@@ -60,6 +60,8 @@ global final DEFAULT_CC              = "LIBCCALL";
 global final DEFAULT_VCC             = "VLIBCCALL";
 global final DEFAULT_NOTHROW         = "NOTHROW_NCX";
 global final DEFAULT_LIBFUN_COND     = "!defined(__KERNEL__)";
+global final DEFAULT_KOS_SECTION     = ".text.crt.unsorted";
+global final DEFAULT_DOS_SECTION     = ".text.crt.dos.unsorted";
 global final INCLUDE_KOS_ANNO        = "#include <kos/anno.h>";
 
 @@Simple return type annotations which (when used) will be converted into attributes
@@ -273,6 +275,148 @@ continue_typename_expression:
 
 
 
+@@Try to parse a prototype annotation
+function parsePrototypeAnnotation(
+		self: CParser, prototype: FunctionPrototype,
+		attributeList: List with (string | UserString)): bool {
+	local tok = self.tok;
+	switch (tok) {
+
+	case "cc":
+		self.next();
+		self.skip("(");
+		prototype.cc = self.parseCStringOrAllUntilRParen();
+		tok = self.skip(")");
+		break;
+
+	case "throws":
+		tok = self.next();
+		if (tok == "(") {
+			self.next();
+			prototype.nothrow = "THROWS({})"
+				.format({ self.parseCStringOrAllUntilRParen() });
+			self.skip(")");
+		} else {
+			prototype.nothrow = "THROWS(...)";
+		}
+		if (prototype.declPrefix !is List)
+			prototype.declPrefix = List(prototype.declPrefix);
+		if (INCLUDE_KOS_ANNO !in prototype.declPrefix)
+			prototype.declPrefix.append(INCLUDE_KOS_ANNO);
+		break;
+
+	case "nothrow":
+		tok = self.next();
+		if (tok == "(") {
+			self.next();
+			prototype.nothrow = self.parseCStringOrAllUntilRParen();
+			self.skip(")");
+		} else {
+			prototype.nothrow = "NOTHROW";
+		}
+		break;
+
+	case "vartypes":
+		self.next();
+		tok = self.skip("(");
+		prototype.ellipsisArgumentTypes = [];
+		while (tok !in ["", ")"]) {
+			local typ, none = parseCTypeAndName(self)...;
+			prototype.ellipsisArgumentTypes.append(typ);
+			if (self.tok == ")")
+				break;
+			tok = self.skip(",");
+		}
+		tok = self.next();
+		break;
+
+	case "decl_prefix":
+		self.next();
+		self.skip("(");
+		if (prototype.declPrefix !is List)
+			prototype.declPrefix = List(prototype.declPrefix);
+		prototype.declPrefix.append(self.parseCStringOrAllUntilRParen());
+		self.skip(")");
+		break;
+
+	case "decl_include":
+		self.next();
+		tok = self.skip("(");
+		if (prototype.declPrefix !is List)
+			prototype.declPrefix = List(prototype.declPrefix);
+		while (tok !in ["", ")"]) {
+			prototype.declPrefix.append(
+				"#include " + self.parseCStringOrAllUntilRParen());
+			if (self.tok != ",")
+				break;
+			tok = self.next();
+		}
+		self.skip(")");
+		break;
+
+	case "attribute":
+	case "attributes":
+		self.next();
+		tok = self.skip("(");
+		while (tok !in ["", ")"]) {
+			attributeList.append(self.parseCStringOrAllUntilRParen());
+			if (self.tok != ",")
+				break;
+			tok = self.next();
+		}
+		self.skip(")");
+		break;
+
+	case "deprecated":
+		tok = self.next();
+		if (tok == "(") {
+			self.next();
+			attributeList.append("ATTR_DEPRECATED({!r})"
+				.format({ self.parseCString() }));
+			self.skip(")");
+		} else {
+			attributeList.append("ATTR_DEPRECATED_");
+		}
+		break;
+
+	default: {
+		if (isCString(tok)) {
+			attributeList.append(tok.decode("c-escape"));
+			self.next();
+			break;
+		}
+		local anno = SIMPLE_RETURN_TYPE_ATTRIBUTE_ANNOTATIONS.get(tok);
+		if (anno is none)
+			anno = SIMPLE_ATTRIBUTE_ANNOTATIONS.get(tok);
+		if (anno !is none) {
+			if (anno)
+				attributeList.append(anno);
+			self.next();
+			break;
+		}
+		anno = SIMPLE_NOTHROW_ANNOTATIONS.get(tok);
+		if (anno !is none) {
+			if (anno.startswith("THROWS")) {
+				if (prototype.declPrefix !is List)
+					prototype.declPrefix = List(prototype.declPrefix);
+				if (INCLUDE_KOS_ANNO !in prototype.declPrefix)
+					prototype.declPrefix.append(INCLUDE_KOS_ANNO);
+			}
+			prototype.nothrow = anno;
+			self.next();
+			break;
+		}
+		if (tok.startswith("ATTR_")) {
+			/* Attribute annotation. */
+			attributeList.append(self.parseCStringOrAllUntilRParen());
+			break;
+		}
+		return false;
+	}	break;
+
+	}
+	return true;
+}
 
 
 @@Parse the contents of an argument list, starting after the leading @"(",
@@ -307,113 +451,11 @@ again_parse_annotations:
 					tok = self.next();
 					break;
 
-				case "argument_names":
-					self.next();
-					self.skip("(");
-					functionArgumentNamesOverride = List(
-						parseCStringOrFunctionLikeExpressionList(self));
-					tok = self.skip(")");
-					break;
-
-				case "cc":
-					self.next();
-					self.skip("(");
-					result.cc = parseCStringOrAllUntilRParen(self);
-					tok = self.skip(")");
-					break;
-
-				case "throws":
-					self.next();
-					if (self.tok == "(") {
-						self.next();
-						result.nothrow = "THROWS({})"
-							.format({ parseCStringOrAllUntilRParen(self) });
-						self.skip(")");
-					} else {
-						result.nothrow = "THROWS(...)";
-					}
-					if (result.declPrefix !is List)
-						result.declPrefix = List(result.declPrefix);
-					if (INCLUDE_KOS_ANNO !in result.declPrefix)
-						result.declPrefix.append(INCLUDE_KOS_ANNO);
-					break;
-
-				case "nothrow":
-					self.next();
-					if (self.tok == "(") {
-						self.next();
-						result.nothrow = parseCStringOrAllUntilRParen(self);
-						self.skip(")");
-					} else {
-						result.nothrow = "NOTHROW";
-					}
-					break;
-
-				case "vartypes":
-					self.next();
-					self.skip("(");
-					result.ellipsisArgumentTypes = [];
-					while (self.tok != ")") {
-						local typ, none = parseCTypeAndName(self)...;
-						result.ellipsisArgumentTypes.append(typ);
-						if (self.tok == ")")
-							break;
-						self.skip(",");
-					}
-					tok = self.next();
-					break;
-
-				case "decl_prefix":
-					self.next();
-					self.skip("(");
-					if (result.declPrefix !is List)
-						result.declPrefix = List(result.declPrefix);
-					result.declPrefix.append(parseCStringOrAllUntilRParen(self));
-					self.skip(")");
-					break;
-
-				case "decl_include":
-					self.next();
-					self.skip("(");
-					if (result.declPrefix !is List)
-						result.declPrefix = List(result.declPrefix);
-					result.declPrefix.append(
-						"#include " + parseCStringOrAllUntilRParen(self));
-					self.skip(")");
-					break;
-
 				default:
-					if (isCString(tok)) {
-						result.attributes.append(tok.decode("c-escape"));
-						self.next();
-					} else {
-						local anno = SIMPLE_RETURN_TYPE_ATTRIBUTE_ANNOTATIONS.get(tok);
-						if (anno is none)
-							anno = SIMPLE_ATTRIBUTE_ANNOTATIONS.get(tok);
-						if (anno !is none) {
-							if (anno)
-								result.attributes.append(anno);
-							self.next();
-						} else {
-							anno = SIMPLE_NOTHROW_ANNOTATIONS.get(tok);
-							if (anno !is none) {
-								if (anno.startswith("THROWS")) {
-									if (result.declPrefix !is List)
-										result.declPrefix = List(result.declPrefix);
-									if (INCLUDE_KOS_ANNO !in result.declPrefix)
-										result.declPrefix.append(INCLUDE_KOS_ANNO);
-								}
-								result.nothrow = anno;
-								self.next();
-							} else if (tok.startswith("ATTR_")) {
-								/* Attribute annotation. */
-								result.attributes.append(parseCStringOrAllUntilRParen(self));
-							} else {
-								self.err("Unknown prototype annotation {!r}"
-									.format({ tok }));
-							}
-						}
-					}
+					if (parsePrototypeAnnotation(self, result, result.attributes))
+						break;
+					self.err("Unknown prototype annotation {!r}"
+						.format({ tok }));
 					break;
 				}
 				if (tok != ",")
@@ -562,7 +604,7 @@ again_parse_annotations:
 					tok = self.next();
 					if (tok == "+") {
 						self.next();
-						parseAllUntilRParenAsString(self);
+						self.parseAllUntilRParenAsString();
 					}
 					for (local a: result.attributes) {
 						a = str a;
@@ -595,7 +637,7 @@ again_parse_annotations:
 						local argumentIndices = [];
 						while (self.tok !in ["", ")"]) {
 							local argumentNameStart = self.tokStart;
-							local argumentName = parseCStringOrKeyword(self);
+							local argumentName = self.parseCStringOrKeyword();
 							try {
 								argumentIndices.append(
 									result.argv.index(result.argsByName[argumentName]) + 1);
@@ -616,12 +658,12 @@ again_parse_annotations:
 				case "realloc_unaligned": {
 					self.next();
 					self.skip("(");
-					parseCStringOrKeyword(self);
+					self.parseCStringOrKeyword();
 					self.skip(",");
 					local argumentIndices = [];
 					while (self.tok !in ["", ")"]) {
 						local argumentNameStart = self.tokStart;
-						local argumentName = parseCStringOrKeyword(self);
+						local argumentName = self.parseCStringOrKeyword();
 						try {
 							argumentIndices.append(
 								result.argv.index(result.argsByName[argumentName]) + 1);
@@ -647,7 +689,7 @@ again_parse_annotations:
 					self.next();
 					self.skip("(");
 					if (tok == "realign") {
-						parseCStringOrKeyword(self); /* mallptr */
+						self.parseCStringOrKeyword(); /* mallptr */
 						self.skip(",");
 					}
 					local minAlignmentAttrib;
@@ -658,7 +700,7 @@ again_parse_annotations:
 						minAlignmentAttrib = "__ATTR_MALL_PAGEALIGNED";
 					} else {
 						local minAlignmentArgumentNameStart = self.tokStart;
-						local minAlignmentArgumentName = parseCStringOrKeyword(self);
+						local minAlignmentArgumentName = self.parseCStringOrKeyword();
 						try {
 							minAlignmentAttrib = "ATTR_ALLOC_ALIGN({})"
 							.format({ result.argv.index(result.argsByName[minAlignmentArgumentName]) + 1 });
@@ -670,7 +712,7 @@ again_parse_annotations:
 					local argumentIndices = [];
 					while (self.tok !in ["", ")"]) {
 						local argumentNameStart = self.tokStart;
-						local argumentName = parseCStringOrKeyword(self);
+						local argumentName = self.parseCStringOrKeyword();
 						try {
 							argumentIndices.append(
 								result.argv.index(result.argsByName[argumentName]) + 1);
@@ -767,6 +809,31 @@ function constructAliasConditions(
 		return hasAssemblyName;
 	return "{} && ({})".format({ hasAssemblyName, ppCond });
 }
+
+@@Split a given section-string and return it as (dosSection, kosSection)
+function splitSectionsString(s: string): (string, string) {
+	if ("{" !in s)
+		return (s, s);
+	local dfp = File.Writer();
+	local kfp = File.Writer();
+	local i = 0;
+	for (;;) {
+		local cs = s.find("{", i);
+		if (cs < 0)
+			break;
+		local e = s[i:cs];
+		dfp << e;
+		kfp << e;
+		local ce = s.index("}", cs);
+		local cc = s.index("|", cs, ce);
+		kfp << s[cs + 1:cc]; /* First part: KOS section name */
+		dfp << s[cc + 1:ce]; /* Second part: DOS section name */
+		i = ce + 1;
+	}
+	local e = s[i:];
+	return ((dfp << e).string, (kfp << e).string);
+}
+
 
 class FunctionFeatures {
 	this = default;
@@ -959,7 +1026,7 @@ class FunctionFeatures {
 				goto err_unexpected_if;
 			self.next();
 			self.skip("(");
-			local addend = parseCStringOrAllUntilRParen(self);
+			local addend = self.parseCStringOrAllUntilRParen();
 			self.skip(")");
 			if (requires is UserString || requires != "1")
 				addend = "({}) && ({})".format({ requires, addend });
@@ -972,7 +1039,7 @@ class FunctionFeatures {
 			self.next();
 			self.skip("(");
 			while (self.tok !in ["", ")"]) {
-				local addend = "$has_function({})".format({ parseCStringOrKeyword(self) });
+				local addend = "$has_function({})".format({ self.parseCStringOrKeyword() });
 				if (requires is UserString || requires != "1")
 					addend = "({}) && ({})".format({ requires, addend });
 				requires = addend;
@@ -990,7 +1057,7 @@ class FunctionFeatures {
 			self.skip("(");
 			forcedDependencies = HashSet(forcedDependencies);
 			while (self.tok !in ["", ")"]) {
-				local functionName = parseCStringOrKeyword(self);
+				local functionName = self.parseCStringOrKeyword();
 				forcedDependencies.insert(functionName);
 				local addend = "$has_function({})".format({ functionName });
 				if (requires is UserString || requires != "1")
@@ -1012,7 +1079,7 @@ class FunctionFeatures {
 				requiresPrefix = List(requiresPrefix);
 			while (tok !in ["", ")"]) {
 				requiresPrefix.append(
-					"#include " + parseCStringOrAllUntilRParen(self));
+					"#include " + self.parseCStringOrAllUntilRParen());
 				tok = self.tok;
 				if (tok != ",")
 					break;
@@ -1028,7 +1095,7 @@ class FunctionFeatures {
 			self.skip("(");
 			if (requiresPrefix !is List)
 				requiresPrefix = List(requiresPrefix);
-			requiresPrefix.append(parseCStringOrAllUntilRParen(self));
+			requiresPrefix.append(self.parseCStringOrAllUntilRParen());
 			self.skip(")");
 		}	break;
 
@@ -1041,7 +1108,7 @@ class FunctionFeatures {
 				implPrefix = List(implPrefix);
 			while (tok !in ["", ")"]) {
 				implPrefix.append(
-					"#include " + parseCStringOrAllUntilRParen(self));
+					"#include " + self.parseCStringOrAllUntilRParen());
 				tok = self.tok;
 				if (tok != ",")
 					break;
@@ -1057,7 +1124,7 @@ class FunctionFeatures {
 			self.skip("(");
 			if (implPrefix !is List)
 				implPrefix = List(implPrefix);
-			implPrefix.append(parseCStringOrAllUntilRParen(self));
+			implPrefix.append(self.parseCStringOrAllUntilRParen());
 			self.skip(")");
 		}	break;
 
@@ -1067,19 +1134,13 @@ class FunctionFeatures {
 			self.next();
 			self.skip("(");
 			local sectionNameStart = self.tokStart;
-			local sectionName = parseCStringOrAllUntilRParen(self);
+			local sectionName = self.parseCStringOrAllUntilRParen();
 			self.skip(")");
-			local strSectionName = str sectionName;
-			if (strSectionName.startswith("{") && strSectionName.endswith("}") &&
-			    strSectionName.findmatch("{", "}", 1) == #strSectionName - 1) {
-				if ("|" !in strSectionName)
-					self.errAt(sectionNameStart, "Missing '|' in [section({!r})]"
-						.format({ strSectionName }));
-				local a, none, b = strSectionName[1:-1].partition("|")...;
-				crt_kosSection = a.strip();
-				crt_dosSection = b.strip();
-			} else {
-				crt_kosSection = sectionName;
+			try {
+				crt_dosSection, crt_kosSection =
+					splitSectionsString(str(sectionName))...;
+			} catch (Error as e) {
+				self.errAt(sectionNameStart, e.message);
 			}
 		}	break;
 
@@ -1089,7 +1150,7 @@ class FunctionFeatures {
 				goto err_unexpected_if;
 			self.next();
 			self.skip("(");
-			local name = parseCStringOrAllUntilRParen(self);
+			local name = self.parseCStringOrAllUntilRParen();
 			if (tok == "kos_section")
 				crt_kosSection = name;
 			else {
@@ -1103,7 +1164,7 @@ class FunctionFeatures {
 				goto err_unexpected_if;
 			self.next();
 			self.skip("(");
-			decl = parseCStringOrKeyword(self);
+			decl = self.parseCStringOrKeyword();
 			self.skip(")");
 		}	break;
 
@@ -1118,7 +1179,7 @@ class FunctionFeatures {
 				guardNames = Dict(guardNames);
 				setNamespaceGuardName(
 					"" /* GLOBAL_NAMESPACE.name */,
-					parseCStringOrKeyword(self));
+					self.parseCStringOrKeyword());
 				self.skip(")");
 			}
 			break;
@@ -1128,7 +1189,7 @@ class FunctionFeatures {
 				goto err_unexpected_if;
 			self.next();
 			self.skip("(");
-			exposedName = parseCStringOrKeyword(self);
+			exposedName = self.parseCStringOrKeyword();
 			self.skip(")");
 			break;
 
@@ -1137,7 +1198,7 @@ class FunctionFeatures {
 				goto err_unexpected_if;
 			self.next();
 			self.skip("(");
-			crt_name = parseCStringOrKeyword(self);
+			crt_name = self.parseCStringOrKeyword();
 			self.skip(")");
 			break;
 
@@ -1147,7 +1208,7 @@ class FunctionFeatures {
 				goto err_unexpected_if;
 			self.next();
 			self.skip("(");
-			crt_kosImplRequires = parseCStringOrAllUntilRParen(self);
+			crt_kosImplRequires = self.parseCStringOrAllUntilRParen();
 			self.skip(")");
 			break;
 
@@ -1156,7 +1217,7 @@ class FunctionFeatures {
 				goto err_unexpected_if;
 			self.next();
 			self.skip("(");
-			crt_dosImplRequires = parseCStringOrAllUntilRParen(self);
+			crt_dosImplRequires = self.parseCStringOrAllUntilRParen();
 			self.skip(")");
 			break;
 
@@ -1496,7 +1557,7 @@ class LoaderContext {
 			locationList = [];
 			tok = self.next();
 			while (tok !in ["", ")"]) {
-				locationList.append(parseCStringOrKeyword(self));
+				locationList.append(self.parseCStringOrKeyword());
 				tok = self.tok;
 				if (tok == ",") {
 					tok = self.next();
@@ -1551,7 +1612,7 @@ class LoaderContext {
 				tok = self.next();
 			if (!tok || tok == closeToken)
 				break;
-			macroList.append(parseCStringOrKeyword(self));
+			macroList.append(self.parseCStringOrKeyword());
 			tok = self.tok;
 		}
 		self.skip(closeToken);
@@ -1593,7 +1654,7 @@ do_push_macroList:
 	public function parseDirective_define_header_guard() {
 		self.next();
 		self.skip("(");
-		result_headerGuardName = parseCStringOrFunctionLikeExpression(self);
+		result_headerGuardName = self.parseCStringOrFunctionLikeExpression();
 		self.skip(")");
 	}
 
@@ -1604,7 +1665,7 @@ do_push_macroList:
 			self.err("Directive '%[define_ccompat_header(...)]' must come before '%[insert:std]'");
 		self.next();
 		self.skip("(");
-		result_ccompatHeaderName = parseCStringOrFunctionLikeExpression(self);
+		result_ccompatHeaderName = self.parseCStringOrFunctionLikeExpression();
 		result_order_headerCCompat = [];
 		self.skip(")");
 	}
@@ -1699,14 +1760,14 @@ again_parse_default_annotation:
 		self.skip("(");
 		local exposedFunction = ExposedFunction();
 		local insertedFunctionNameStart = self.tokStart;
-		local insertedFunctionName = parseCStringOrKeyword(self);
+		local insertedFunctionName = self.parseCStringOrKeyword();
 		if (guarded)
 			exposedFunction.guardName = true;
 		if (self.tok == "=") {
 			exposedFunction.exposedName = insertedFunctionName;
 			self.next();
 			insertedFunctionNameStart = self.tokStart;
-			insertedFunctionName = parseCStringOrKeyword(self);
+			insertedFunctionName = self.parseCStringOrKeyword();
 		}
 		exposedFunction.func = []{
 			try {
@@ -1719,10 +1780,10 @@ again_parse_default_annotation:
 			self.next();
 			while (self.tok !in ["", ")"]) {
 				local propStart = self.tokStart;
-				local prop = parseCStringOrKeyword(self);
+				local prop = self.parseCStringOrKeyword();
 				self.skip(":");
 				local valExprStart = self.tokStart;
-				local valExpr = parseAllUntilRParenAsString(self);
+				local valExpr = self.parseAllUntilRParenAsString();
 				try {
 					valExpr = exec(valExpr);
 				} catch (Error as e) {
@@ -1804,7 +1865,7 @@ again_parse_default_annotation:
 		self.next();
 		self.skip("(");
 		local functionNameStart = self.tokStart;
-		local functionName = parseCStringOrKeyword(self);
+		local functionName = self.parseCStringOrKeyword();
 		/* Only insert into "c" namespace! */
 		if (result_order_header_in_CXX_SYSTEM_HEADER) {
 			result.order_header.append(CXX_SYSTEM_HEADER_END);
@@ -1860,11 +1921,11 @@ again_parse_default_annotation:
 			: wcharReplacementEscapes;
 		self.next();
 		self.skip("(");
-		local orig = parseCStringOrKeyword(self);
+		local orig = self.parseCStringOrKeyword();
 		self.skip("=");
-		local c16 = parseCStringOrKeyword(self);
+		local c16 = self.parseCStringOrKeyword();
 		self.skip(",");
-		local c32 = parseCStringOrKeyword(self);
+		local c32 = self.parseCStringOrKeyword();
 		local newRepl = (c16, c32);
 		local ok, oldRepl = map.setnew_ex(orig, newRepl)...;
 		if (!ok && oldRepl != newRepl) {
@@ -1880,7 +1941,7 @@ again_parse_default_annotation:
 		self.next();
 		self.skip("(");
 		while (self.tok !in ["", ")"]) {
-			local kwd = str parseCStringOrKeyword(self);
+			local kwd = str self.parseCStringOrKeyword();
 			cLanguageKeywords.insert(kwd);
 			if (self.tok != ",")
 				break;
@@ -1896,9 +1957,9 @@ again_parse_default_annotation:
 		local mode = self.tok;
 		self.next();
 		self.skip("(");
-		local a = parseCStringOrKeyword(self);
+		local a = self.parseCStringOrKeyword();
 		self.skip("=");
-		local b = parseCStringOrAllUntilRParenAsString(self);
+		local b = self.parseCStringOrAllUntilRParenAsString();
 		local ok, oldRepl = map.setnew_ex(a, b)...;
 		if (!ok && ((oldRepl !is string && oldRepl !is UserString) || oldRepl != b)) {
 			if (oldRepl !is string && oldRepl !is UserString) {
@@ -1928,11 +1989,11 @@ again_parse_default_annotation:
 		local tok = self.tok;
 		self.next();
 		self.skip("(");
-		local orig = parseCStringOrKeyword(self);
+		local orig = self.parseCStringOrKeyword();
 		self.skip("=");
-		local flt = parseCStringOrKeyword(self);
+		local flt = self.parseCStringOrKeyword();
 		self.skip(",");
-		local ldbl = parseCStringOrKeyword(self);
+		local ldbl = self.parseCStringOrKeyword();
 		local newRepl = (flt, ldbl);
 		local ok, oldRepl = mathReplacementEscapes.setnew_ex(orig, newRepl)...;
 		if (!ok && oldRepl != newRepl) {
@@ -1951,9 +2012,9 @@ again_parse_default_annotation:
 		self.next();
 		self.skip("(");
 		local origStart = self.tokStart;
-		local orig = parseCStringOrKeyword(self);
+		local orig = self.parseCStringOrKeyword();
 		self.skip("=");
-		local repl = parseCStringOrKeyword(self);
+		local repl = self.parseCStringOrKeyword();
 		try {
 			math_defineReplacement(orig, repl,
 				mode is none ? MATH_REPLACEMENT_MODE_FLOAT : mode);
@@ -2241,7 +2302,7 @@ again_parse_annotations:
 					/* Conditional annotations */
 					self.next();
 					self.skip("(");
-					local ppAddend = parseCStringOrAllUntilRParen(self);
+					local ppAddend = self.parseCStringOrAllUntilRParen();
 					self.skip(")");
 					if (currentConditions is none)
 						currentConditions = ppAddend;
@@ -2256,7 +2317,7 @@ again_parse_annotations:
 						self.err("[doc(...)] used alongside [doc_alias(...)]");
 					self.next();
 					self.skip("(");
-					local line = parseCStringOrAllUntilRParen(self);
+					local line = self.parseCStringOrAllUntilRParen();
 					self.skip(")");
 					if (current.documentation)
 						current.documentation += "\n";
@@ -2271,7 +2332,7 @@ again_parse_annotations:
 					self.next();
 					self.skip("(");
 					local funcNameStart: int = self.tokStart;
-					local funcName: string = parseCStringOrKeyword(self);
+					local funcName: string = self.parseCStringOrKeyword();
 					self.skip(")");
 					current.documentation = [](): string {
 						local func: Function;
@@ -2294,99 +2355,7 @@ again_parse_annotations:
 					self.next();
 					self.skip("(");
 					functionArgumentNamesOverride = List(
-						parseCStringOrFunctionLikeExpressionList(self));
-					self.skip(")");
-					break;
-
-				case "cc":
-					if (currentConditions !is none)
-						goto illegal_annotation_with_condition;
-					self.next();
-					self.skip("(");
-					currentPrototype.cc = parseCStringOrAllUntilRParen(self);
-					self.skip(")");
-					break;
-
-				case "throws":
-					if (currentConditions !is none)
-						goto illegal_annotation_with_condition;
-					self.next();
-					if (self.tok == "(") {
-						self.next();
-						currentPrototype.nothrow = "THROWS({})"
-							.format({ parseCStringOrAllUntilRParen(self) });
-						self.skip(")");
-					} else {
-						currentPrototype.nothrow = "THROWS(...)";
-					}
-					if (currentPrototype.declPrefix !is List)
-						currentPrototype.declPrefix = List(currentPrototype.declPrefix);
-					currentPrototype.declPrefix.append(INCLUDE_KOS_ANNO);
-					break;
-
-				case "nothrow":
-					if (currentConditions !is none)
-						goto illegal_annotation_with_condition;
-					self.next();
-					if (self.tok == "(") {
-						self.next();
-						currentPrototype.nothrow = parseCStringOrAllUntilRParen(self);
-						self.skip(")");
-					} else {
-						currentPrototype.nothrow = "NOTHROW";
-					}
-					break;
-
-				case "vartypes":
-					if (currentConditions !is none)
-						goto illegal_annotation_with_condition;
-					self.next();
-					self.skip("(");
-					currentPrototype.ellipsisArgumentTypes = [];
-					while (self.tok !in ["", ")"]) {
-						local typ, none = parseCTypeAndName(self)...;
-						currentPrototype.ellipsisArgumentTypes.append(typ);
-						if (self.tok != ",")
-							break;
-						self.next();
-					}
-					self.skip(")");
-					break;
-
-				case "decl_prefix":
-					self.next();
-					self.skip("(");
-					if (currentPrototype.declPrefix !is List)
-						currentPrototype.declPrefix = List(currentPrototype.declPrefix);
-					currentPrototype.declPrefix.append(parseCStringOrAllUntilRParen(self));
-					self.skip(")");
-					break;
-
-				case "decl_include":
-					self.next();
-					self.skip("(");
-					if (currentPrototype.declPrefix !is List)
-						currentPrototype.declPrefix = List(currentPrototype.declPrefix);
-					while (self.tok !in ["", ")"]) {
-						currentPrototype.declPrefix.append(
-							"#include " + parseCStringOrAllUntilRParen(self));
-						if (self.tok != ",")
-							break;
-						self.next();
-					}
-					self.skip(")");
-					break;
-
-				case "attribute":
-				case "attributes":
-					if (currentConditions !is none)
-						goto illegal_annotation_with_condition;
-					if (defaultAttributes is none)
-						defaultAttributes = [];
-					self.next();
-					self.skip("(");
-					defaultAttributes.append(
-						parseCStringOrAllUntilRParen(self));
+						self.parseCStringOrFunctionLikeExpressionList());
 					self.skip(")");
 					break;
 
@@ -2509,7 +2478,7 @@ again_parse_annotations:
 					self.next();
 					self.skip("(");
 					while (self.tok !in ["", ")"]) {
-						local assemblyName = parseCStringOrFunctionLikeExpression(self);
+						local assemblyName = self.parseCStringOrFunctionLikeExpression();
 						local ppCond = currentConditions;
 						if (!tok.endswith("raw_alias"))
 							ppCond = constructAliasConditions(ppCond, assemblyName);
@@ -2535,7 +2504,7 @@ again_parse_annotations:
 					self.next();
 					self.skip("(");
 					while (self.tok !in ["", ")"]) {
-						local functionName = parseCStringOrFunctionLikeExpression(self);
+						local functionName = self.parseCStringOrFunctionLikeExpression();
 						local binding = FunctionBinding(
 							ppCond:     currentConditions is none ? "1" : currentConditions,
 							prototypes: currentPrototypes,
@@ -2556,7 +2525,7 @@ again_parse_annotations:
 				case "inline_as":
 					self.next();
 					self.skip("(");
-					self.inline = parseCStringOrKeyword(self);
+					self.inline = self.parseCStringOrKeyword();
 					self.skip(")");
 					break;
 
@@ -2580,10 +2549,10 @@ again_parse_annotations:
 						local externSymbolName;
 						self.next();
 						if (tok.endswith("extern_inline")) {
-							externSymbolName = parseCStringOrKeyword(self);
+							externSymbolName = self.parseCStringOrKeyword();
 							self.skip(",");
 						}
-						local body = parseCStringOrAllUntilRParen(self);
+						local body = self.parseCStringOrAllUntilRParen();
 						if (!currentFeatures.noInlineTruncate)
 							body = truncateInlineFunctionImplementation(str(body));
 						self.skip(")");
@@ -2646,7 +2615,7 @@ again_parse_annotations:
 					local builtinStart: int = self.tokStart;
 					local asmnameOverride: string | none = none;
 					if (self.next() == "(") {
-						asmnameOverride = parseCStringOrKeyword(self);
+						asmnameOverride = self.parseCStringOrKeyword();
 						self.skip(")");
 					}
 					function crtbuiltinBindingGenerator(): FunctionBinding {
@@ -2746,7 +2715,7 @@ again_parse_annotations:
 					lfun.bindings.append(
 						LibraryFunctionBinding(
 							ppCond:  currentConditions !is none ? currentConditions : "1",
-							binding: parseCStringOrKeyword(self)));
+							binding: self.parseCStringOrKeyword()));
 					self.skip(")");
 				}	break;
 
@@ -2780,7 +2749,7 @@ again_parse_annotations:
 					}[tok.lsstrip("preferred_")];
 					self.next();
 					self.skip("(");
-					assemblyName = parseCStringOrAllUntilRParen(self);
+					assemblyName = self.parseCStringOrAllUntilRParen();
 					goto do_handle_alt_variant_of;
 				case "alt_variant_of":
 				case "preferred_alt_variant_of":
@@ -2795,10 +2764,10 @@ again_parse_annotations:
 					 *                 implementation. */
 					self.next();
 					self.skip("(");
-					wholeCond = parseCStringOrAllUntilRParen(self);
+					wholeCond = self.parseCStringOrAllUntilRParen();
 					if (self.tok == ",") {
 						self.next();
-						assemblyName = parseCStringOrAllUntilRParen(self);
+						assemblyName = self.parseCStringOrAllUntilRParen();
 						if (currentConditions !is none && currentConditions != "1") {
 							if (wholeCond == "1")
 								wholeCond = currentConditions;
@@ -2860,7 +2829,7 @@ do_handle_alt_variant_of:
 						goto illegal_annotation_with_condition;
 					self.next();
 					self.skip("(");
-					local newCond = parseCStringOrAllUntilRParen(self);
+					local newCond = self.parseCStringOrAllUntilRParen();
 					if (tok != "crt_dos_impl_if") {
 						if (currentKosLibraryFunction is none)
 							currentKosLibraryFunction = LibraryFunction();
@@ -2875,44 +2844,16 @@ do_handle_alt_variant_of:
 				}	break;
 
 				default:
-					if (isCString(tok)) {
-						if (currentConditions !is none)
-							goto illegal_annotation_with_condition;
+					if (currentConditions is none) {
 						if (defaultAttributes is none)
 							defaultAttributes = [];
-						defaultAttributes.append(tok.decode("c-escape"));
-						self.next();
-					} else if (!currentFeatures.tryParseAttribute(self, currentConditions)) {
-						local anno = SIMPLE_RETURN_TYPE_ATTRIBUTE_ANNOTATIONS.get(tok);
-						if (anno is none)
-							anno = SIMPLE_ATTRIBUTE_ANNOTATIONS.get(tok);
-						if (anno !is none) {
-							if (currentConditions !is none)
-								goto illegal_annotation_with_condition;
-							if (anno) {
-								if (defaultAttributes is none)
-									defaultAttributes = List();
-								defaultAttributes.append(anno);
-							}
-							self.next();
-						} else {
-							anno = SIMPLE_NOTHROW_ANNOTATIONS.get(tok);
-							if (anno !is none) {
-								currentPrototype.nothrow = anno;
-								self.next();
-							} else if (tok.startswith("ATTR_")) {
-								/* Attribute annotation. */
-								if (currentConditions !is none)
-									goto illegal_annotation_with_condition;
-								if (defaultAttributes is none)
-									defaultAttributes = [];
-								defaultAttributes.append(parseCStringOrAllUntilRParen(self));
-							} else {
-								self.err("Unknown function annotation {!r}"
-									.format({ tok }));
-							}
-						}
+						if (parsePrototypeAnnotation(self, currentPrototype, defaultAttributes))
+							break;
 					}
+					if (currentFeatures.tryParseAttribute(self, currentConditions))
+						break;
+					self.err("Unknown function annotation {!r}"
+						.format({ tok }));
 					break;
 illegal_annotation_with_condition:
 					self.err("Annotation [{}] cannot be used [if(...)]"
@@ -3172,7 +3113,7 @@ handle_percent_after_prototype:
 							self.next();
 							self.skip("auto");
 						} else {
-							chkBaseFunctionName = parseCStringOrKeyword(self);
+							chkBaseFunctionName = self.parseCStringOrKeyword();
 						}
 						if (self.tok == ",") {
 							tok = self.next();
@@ -3182,7 +3123,7 @@ handle_percent_after_prototype:
 								self.next();
 								self.skip("auto");
 							} else {
-								chkExpr = parseCStringOrAllUntilRParen(self);
+								chkExpr = self.parseCStringOrAllUntilRParen();
 							}
 						}
 						self.skip(")");
@@ -3260,7 +3201,7 @@ got_chkExpr:
 							self.next();
 							self.skip("auto");
 						} else {
-							vprintfFunctionName = parseCStringOrKeyword(self);
+							vprintfFunctionName = self.parseCStringOrKeyword();
 						}
 						self.skip(")");
 					}
@@ -3401,7 +3342,7 @@ got_chkExpr:
 							self.next();
 							self.skip("auto");
 						} else {
-							baseFunctionName = parseCStringOrKeyword(self);
+							baseFunctionName = self.parseCStringOrKeyword();
 						}
 						tok = self.skip(")");
 					}
@@ -4305,11 +4246,15 @@ again_lookup_wcsCurrent:
 					currentDosLibraryFunction.bindings.append(createXCharBinding(
 						libc_dosName, currentFeatures.crt_dosImplRequires,
 						"DOS$" + crtName, WCHAR_REPLACEMENT_CHAR16,
-						currentFeatures.crt_dosSection));
+						currentFeatures.crt_dosSection !is none
+							? currentFeatures.crt_dosSection
+							: DEFAULT_DOS_SECTION));
 					currentKosLibraryFunction.bindings.append(createXCharBinding(
 						libc_kosName, currentFeatures.crt_kosImplRequires,
 						crtName, WCHAR_REPLACEMENT_CHAR32,
-						currentFeatures.crt_kosSection));
+						currentFeatures.crt_kosSection !is none
+							? currentFeatures.crt_kosSection
+							: DEFAULT_KOS_SECTION));
 					/* Insert the library implementations into the system header order */
 					if (currentFeatures.crt_userimpl || loaderImpl is none) {
 						result.order_libcUserHeader.extend({ currentDosLibraryFunction, currentKosLibraryFunction });
@@ -4320,29 +4265,24 @@ again_lookup_wcsCurrent:
 					}
 				} else {
 					/* Create a default implementation for user-sources */
-					local libImpl;
-					if (loaderImpl is none) {
-						local defaultImpl: FunctionImplementation | Callable;
-						if (currentPrototype is Callable) {
-							defaultImpl = [] -> getDefaultLibraryImplementationForPrototype(
-								currentPrototype(), crtName);
-						} else {
-							defaultImpl = getDefaultLibraryImplementationForPrototype(
-								currentPrototype, crtName);
-						}
-						libImpl = LibraryFunctionBinding(
-							ppCond:      currentFeatures.crt_kosImplRequires,
-							binding:     defaultImpl,
-							implSection: currentFeatures.crt_kosSection);
+					local libImpl: FunctionImplementation | Callable;
+					if (loaderImpl !is none) {
+						libImpl = loaderImpl is Callable
+							? [] -> loaderImpl().impl
+							: loaderImpl.impl;
+					} else if (currentPrototype is Callable) {
+						libImpl = [] -> getDefaultLibraryImplementationForPrototype(
+							currentPrototype(), crtName);
 					} else {
-						libImpl = LibraryFunctionBinding(
-							ppCond:      currentFeatures.crt_kosImplRequires,
-							binding:     loaderImpl is Callable
-								? [] -> loaderImpl().impl
-								: loaderImpl.impl,
-							implSection: currentFeatures.crt_kosSection);
+						libImpl = getDefaultLibraryImplementationForPrototype(
+							currentPrototype, crtName);
 					}
-					currentKosLibraryFunction.bindings.append(libImpl);
+					currentKosLibraryFunction.bindings.append(LibraryFunctionBinding(
+						ppCond:      currentFeatures.crt_kosImplRequires,
+						binding:     libImpl,
+						implSection: currentFeatures.crt_kosSection !is none
+							? currentFeatures.crt_kosSection
+							: DEFAULT_KOS_SECTION));
 					if (currentKosLibraryFunction.prototype !is bound)
 						currentKosLibraryFunction.prototype = currentPrototype;
 					if (currentFeatures.crt_userimpl || loaderImpl is none) {

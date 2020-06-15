@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x476c90a9 */
+/* HASH CRC-32:0x2f9f50fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,10 +107,10 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep))(struct timespec const *_
 	__error = __localdep_nanosleep(__time_point, __remaining);
 	if __likely(__error == 0)
 		return 0;
-#if defined(__libc_geterrno) && defined(EINTR)
+#if defined(__libc_geterrno) && defined(__EINTR)
 	if (__libc_geterrno() == __EINTR)
 		return -1;
-#endif /* __libc_geterrno && EINTR */
+#endif /* __libc_geterrno && __EINTR */
 	return -2;
 #endif /* !... */
 }

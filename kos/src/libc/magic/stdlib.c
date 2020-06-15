@@ -713,7 +713,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __float128 __NOTHROW(__LIBCCALL abs)(__
 [[std, wunused, section(".text.crt.fs.environ")]]
 char *getenv([[nonnull]] char const *varname);
 
-%[default:section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]
+%[default:section(".text.crt{|.dos}.wchar.unicode.static.mbs")]
 [[std]]
 int mblen([[inp_opt(maxlen)]] char const *str, size_t maxlen) {
 	return mbrlen(str, maxlen, NULL);
@@ -851,7 +851,7 @@ int rand() {
 
 %[default:section(".text.crt.unicode.static.convert")]
 /* Convert a string to an integer.  */
-[[std, ATTR_PURE, wunused]]
+[[std, wunused, ATTR_PURE]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("atol")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("atoll")]]
 int atoi([[nonnull]] char const *__restrict nptr) {
@@ -862,7 +862,7 @@ int atoi([[nonnull]] char const *__restrict nptr) {
 @@pp_endif@@
 }
 
-[[std, ATTR_PURE, wunused]]
+[[std, wunused, ATTR_PURE]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, "atoi")]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("atoll")]]
 long atol([[nonnull]] char const *__restrict nptr) {
@@ -874,7 +874,7 @@ long atol([[nonnull]] char const *__restrict nptr) {
 }
 
 %#if defined(__LONGLONG) && defined(__USE_ISOC99)
-[[std, ATTR_PURE, wunused]]
+[[std, wunused, ATTR_PURE]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, atoi)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, atol)]]
 __LONGLONG atoll([[nonnull]] char const *__restrict nptr) {
@@ -2773,7 +2773,7 @@ errno_t _ui64toa_s($u64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 %[insert:function(_strtoui64_l = strtou64_l)]
 
 
-[[ATTR_PURE, wunused]]
+[[wunused, ATTR_PURE]]
 [[alt_variant_of(__SIZEOF_INT__ == 8, "atoi")]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, "atol")]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, "atoll")]]
@@ -2781,7 +2781,7 @@ $s64 _atoi64([[nonnull]] char const *__restrict nptr) {
 	return strto64(nptr, NULL, 10);
 }
 
-[[ATTR_PURE, wunused]]
+[[wunused, ATTR_PURE]]
 [[alt_variant_of(__SIZEOF_INT__ == 8, _atoi_l)]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, _atol_l)]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, _atoll_l)]]
@@ -2790,9 +2790,9 @@ $s64 _atoi64_l([[nonnull]] char const *__restrict nptr, $locale_t locale) {
 }
 %#endif /* __UINT64_TYPE__ */
 
-%[default:section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]
+%[default:section(".text.crt{|.dos}.wchar.unicode.static.mbs")]
 
-[[ATTR_PURE, wunused]]
+[[wunused, ATTR_PURE]]
 $size_t _mbstrlen([[nonnull]] char const *str) {
 	size_t result = 0;
 	while (unicode_readutf8((char const **)&str))
@@ -2800,7 +2800,7 @@ $size_t _mbstrlen([[nonnull]] char const *str) {
 	return result;
 }
 
-[[ATTR_PURE, wunused]]
+[[wunused, ATTR_PURE]]
 $size_t _mbstrnlen([[nonnull]] char const *str, $size_t maxlen) {
 	size_t result = 0;
 	char const *endptr = str + maxlen;
@@ -2809,19 +2809,19 @@ $size_t _mbstrnlen([[nonnull]] char const *str, $size_t maxlen) {
 	return result;
 }
 
-[[ATTR_PURE, wunused]]
+[[wunused, ATTR_PURE]]
 $size_t _mbstrlen_l([[nonnull]] char const *str, $locale_t locale) {
 	(void)locale;
 	return _mbstrlen(str);
 }
 
-[[ATTR_PURE, wunused]]
+[[wunused, ATTR_PURE]]
 $size_t _mbstrnlen_l([[nonnull]] char const *str, $size_t maxlen, $locale_t locale) {
 	(void)locale;
 	return _mbstrnlen(str, maxlen);
 }
 
-[[ATTR_PURE, wunused]]
+[[wunused, ATTR_PURE]]
 int _mblen_l([[nonnull]] char const *str, $size_t maxlen, $locale_t locale) {
 	(void)locale;
 	return mblen(str, maxlen);
@@ -2919,7 +2919,7 @@ errno_t rand_s([[nonnull]] unsigned int *__restrict randval) {
 %#define _CRT_SYSTEM_DEFINED 1
 %#endif /* !_CRT_SYSTEM_DEFINED */
 
-%[default:section("{.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs}")]
+%[default:section(".text.crt{|.dos}.wchar.unicode.static.mbs")]
 
 %
 [[wchar]]

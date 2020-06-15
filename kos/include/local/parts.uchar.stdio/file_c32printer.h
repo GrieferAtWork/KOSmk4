@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73c78fa0 */
+/* HASH CRC-32:0x1c54fd6f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_file_c32printer_defined 1
 #include <__crt.h>
 #if (defined(__CRT_HAVE_fputwc) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fputwc) || (defined(__CRT_HAVE_putwc) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$putwc)
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fputc32 from parts.uchar.stdio */
 #ifndef __local___localdep_fputc32_defined

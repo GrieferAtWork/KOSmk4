@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23a20928 */
+/* HASH CRC-32:0x74b47855 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_fgetc_defined 1
 #include <__crt.h>
 #if (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread)
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _filbuf from stdio */
 #if !defined(__local___localdep__filbuf_defined) && defined(__CRT_HAVE__filbuf)

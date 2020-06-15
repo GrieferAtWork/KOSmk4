@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8360c68b */
+/* HASH CRC-32:0x3a37fac4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(btoc32))(int __ch) {
 		return (__WINT_TYPE__)__ch;
 #if 4 == 4
 	return (__CCAST(__WINT_TYPE__)0xffffffffu);
-#else /* __SIZEOF_WCHAR_T__ == 4 */
+#else /* 4 == 4 */
 	return (__CCAST(__WINT_TYPE__)0xffff);
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
+#endif /* !(4 == 4) */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_btoc32_defined

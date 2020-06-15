@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65030fd0 */
+/* HASH CRC-32:0x4eb79075 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_fgets_defined 1
 #if defined(__CRT_HAVE_fgets_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
+#include <kos/anno.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
@@ -36,6 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,__THROWING,__localdep_fgets,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgets_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgets)
 __NAMESPACE_LOCAL_END
+#include <kos/anno.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
@@ -44,6 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,__THROWING,__localdep_fgets,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgets,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgets_unlocked)
 __NAMESPACE_LOCAL_END
+#include <kos/anno.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
@@ -69,9 +72,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gets_s) __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(gets_s))(char *__restrict __buf, __SIZE_TYPE__ __bufsize) {
 	if __unlikely(!__buf) {
-#ifdef EINVAL
+#ifdef __EINVAL
 		__libc_seterrno(__EINVAL);
-#endif /* EINVAL */
+#endif /* __EINVAL */
 		return __NULLPTR;
 	}
 	return __localdep_fgets(__buf, (__STDC_INT_AS_SIZE_T)(unsigned int)__bufsize, __LOCAL_stdin);

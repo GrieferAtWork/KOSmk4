@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67e58ec9 */
+/* HASH CRC-32:0xe7b40481 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
-__LOCAL_LIBC(wcsnend) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
+__LOCAL_LIBC(wcsnend) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnend))(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen) {
 	for (; __maxlen && *__string; ++__string, --__maxlen)
 		;

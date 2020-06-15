@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31a68c3 */
+/* HASH CRC-32:0x21d41a30 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,11 +88,11 @@ __empty_argz:
 	*__pargz = __result_string;
 	if __unlikely(!__result_string) {
 		*__pargz_len = 0;
-#ifdef ENOMEM
+#ifdef __ENOMEM
 		return __ENOMEM;
-#else /* ENOMEM */
+#else /* __ENOMEM */
 		return 1;
-#endif /* !ENOMEM */
+#endif /* !__ENOMEM */
 	}
 	__dst = __result_string;
 	for (;;) {

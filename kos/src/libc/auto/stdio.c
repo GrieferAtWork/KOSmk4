@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebadff5b */
+/* HASH CRC-32:0xf8c823e7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -254,7 +254,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
 }
 #include <local/stdstreams.h>
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)") NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") NONNULL((1)) char *
 (LIBCCALL libc_gets)(char *__restrict buf) THROWS(...) {
 	return libc_fgets(buf, INT_MAX, stdin);
 }
@@ -1461,7 +1461,7 @@ NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf,
 }
 #include <local/stdstreams.h>
 #include <parts/errno.h>
-INTERN ATTR_COLD void
+INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
 (LIBDCALL libd__wperror)(char16_t const *__restrict message) THROWS(...) {
 	char const *enodesc;
 	enodesc = libc_strerror(__libc_geterrno());
