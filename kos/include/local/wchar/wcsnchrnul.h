@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9edb43ea */
+/* HASH CRC-32:0x2d6c3fa0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Same as `wcsnchr', but return `wcsnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
 __LOCAL_LIBC(wcsnchrnul) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnchrnul))(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle, __SIZE_TYPE__ __maxlen) {
-	for (; __maxlen-- && *__haystack && (unsigned char)*__haystack != (unsigned char)__needle; ++__haystack)
+	for (; __maxlen-- && *__haystack && (__WCHAR_TYPE__)*__haystack != (__WCHAR_TYPE__)__needle; ++__haystack)
 		;
 	return (__WCHAR_TYPE__ *)__haystack;
 }

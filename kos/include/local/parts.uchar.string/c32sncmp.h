@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe637c050 */
+/* HASH CRC-32:0x3b24ba99 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32sncmp))(__CHAR32_TYPE__ const *__s
 		if (!__maxlen--)
 			break;
 		if ((__c1 = *__s1++) != (__c2 = *__s2++))
-			return (int)((unsigned char)__c1 - (unsigned char)__c2);
+			return (int)((__CHAR32_TYPE__)__c1 - (__CHAR32_TYPE__)__c2);
 	} while (__c1);
 	return 0;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23f1ae74 */
+/* HASH CRC-32:0xa596c0d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscmp))(__WCHAR_TYPE__ const *__s1, 
 	__WCHAR_TYPE__ __c1, __c2;
 	do {
 		if __unlikely((__c1 = *__s1++) != (__c2 = *__s2++))
-			return (int)((unsigned char)__c1 - (unsigned char)__c2);
+			return (int)((__WCHAR_TYPE__)__c1 - (__WCHAR_TYPE__)__c2);
 	} while (__c1);
 	return 0;
 }

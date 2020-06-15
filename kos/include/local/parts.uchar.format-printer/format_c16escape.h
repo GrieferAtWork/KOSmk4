@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0610443 */
+/* HASH CRC-32:0x493f2003 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __LOCAL_LIBC(format_c16escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(format_c16escape))(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) {
-#define __escape_tooct(__c) ('0' + (__CHAR16_TYPE__)(unsigned char)(__c))
+#define __escape_tooct(__c) ('0' + (__CHAR16_TYPE__)(__CHAR16_TYPE__)(__c))
 #ifndef __DECIMALS_SELECTOR
 #define __LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define __DECIMALS_SELECTOR  __decimals

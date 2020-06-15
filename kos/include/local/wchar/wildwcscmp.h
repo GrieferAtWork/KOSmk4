@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36438fd6 */
+/* HASH CRC-32:0xef9a466c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscmp))(__WCHAR_TYPE__ const *__
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
 			while (*__pattern == '*')
 				++__pattern;
-			return -(int)(unsigned char)*__pattern;
+			return -(int)(__WCHAR_TYPE__)*__pattern;
 		}
 		if (!*__pattern)
-			return (int)(unsigned char)*__string; /* Pattern end doesn't match */
+			return (int)(__WCHAR_TYPE__)*__string; /* Pattern end doesn't match */
 		if (*__pattern == '*') {
 			/* Skip stars */
 			do {
@@ -50,7 +50,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscmp))(__WCHAR_TYPE__ const *__
 					if (!__LIBC_LOCAL_NAME(wildwcscmp)(__string, __pattern))
 						return 0;
 				} else if (!__ch) {
-					return -(int)(unsigned char)__card_post; /* Wildcard suffix not found */
+					return -(int)(__WCHAR_TYPE__)__card_post; /* Wildcard suffix not found */
 				}
 			}
 		}
@@ -62,7 +62,7 @@ __next:
 		}
 		break; /* mismatch */
 	}
-	return (int)((unsigned char)*__string - (unsigned char)*__pattern);
+	return (int)((__WCHAR_TYPE__)*__string - (__WCHAR_TYPE__)*__pattern);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wildwcscmp_defined

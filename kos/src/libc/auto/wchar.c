@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e8e1898 */
+/* HASH CRC-32:0x2844df02 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -498,7 +498,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscmp)(char16_t const *s1,
 	char16_t c1, c2;
 	do {
 		if unlikely((c1 = *s1++) != (c2 = *s2++))
-			return (int)((unsigned char)c1 - (unsigned char)c2);
+			return (int)((char16_t)c1 - (char16_t)c2);
 	} while (c1);
 	return 0;
 }
@@ -509,7 +509,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscmp)(char32_t const *s1,
 	char32_t c1, c2;
 	do {
 		if unlikely((c1 = *s1++) != (c2 = *s2++))
-			return (int)((unsigned char)c1 - (unsigned char)c2);
+			return (int)((char32_t)c1 - (char32_t)c2);
 	} while (c1);
 	return 0;
 }
@@ -523,7 +523,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncmp)(char16_t const *s1,
 		if (!maxlen--)
 			break;
 		if ((c1 = *s1++) != (c2 = *s2++))
-			return (int)((unsigned char)c1 - (unsigned char)c2);
+			return (int)((char16_t)c1 - (char16_t)c2);
 	} while (c1);
 	return 0;
 }
@@ -537,7 +537,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncmp)(char32_t const *s1,
 		if (!maxlen--)
 			break;
 		if ((c1 = *s1++) != (c2 = *s2++))
-			return (int)((unsigned char)c1 - (unsigned char)c2);
+			return (int)((char32_t)c1 - (char32_t)c2);
 	} while (c1);
 	return 0;
 }
@@ -1241,7 +1241,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscasecmp)(char16_t const *s1,
 	char16_t c1, c2;
 	do {
 		if ((c1 = *s1++) != (c2 = *s2++) && ((c1 = (char16_t)libc_towlower(c1)) != (c2 = (char16_t)libc_towlower(c2))))
-			return (int)((unsigned char)c1 - (unsigned char)c2);
+			return (int)((char16_t)c1 - (char16_t)c2);
 	} while (c1);
 	return 0;
 }
@@ -1251,7 +1251,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscasecmp)(char32_t const *s1,
 	char32_t c1, c2;
 	do {
 		if ((c1 = *s1++) != (c2 = *s2++) && ((c1 = (char32_t)libc_towlower(c1)) != (c2 = (char32_t)libc_towlower(c2))))
-			return (int)((unsigned char)c1 - (unsigned char)c2);
+			return (int)((char32_t)c1 - (char32_t)c2);
 	} while (c1);
 	return 0;
 }
@@ -1264,7 +1264,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncasecmp)(char16_t const *s1,
 		if (!maxlen--)
 			break;
 		if ((c1 = *s1++) != (c2 = *s2++) && ((c1 = (char16_t)libc_towlower(c1)) != (c2 = (char16_t)libc_towlower(c2))))
-			return (int)((unsigned char)c1 - (unsigned char)c2);
+			return (int)((char16_t)c1 - (char16_t)c2);
 	} while (c1);
 	return 0;
 }
@@ -1277,7 +1277,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncasecmp)(char32_t const *s1,
 		if (!maxlen--)
 			break;
 		if ((c1 = *s1++) != (c2 = *s2++) && ((c1 = (char32_t)libc_towlower(c1)) != (c2 = (char32_t)libc_towlower(c2))))
-			return (int)((unsigned char)c1 - (unsigned char)c2);
+			return (int)((char32_t)c1 - (char32_t)c2);
 	} while (c1);
 	return 0;
 }
@@ -2313,7 +2313,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnchr)(char16_t const *__restrict haystack,
                                    char16_t needle,
                                    size_t maxlen) {
 	for (; maxlen-- && *haystack; ++haystack) {
-		if unlikely((unsigned char)*haystack == (unsigned char)needle)
+		if unlikely((char16_t)*haystack == (char16_t)needle)
 			return (char16_t *)haystack;
 	}
 	return NULL;
@@ -2324,7 +2324,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnchr)(char32_t const *__restrict haystack,
                                    char32_t needle,
                                    size_t maxlen) {
 	for (; maxlen-- && *haystack; ++haystack) {
-		if unlikely((unsigned char)*haystack == (unsigned char)needle)
+		if unlikely((char32_t)*haystack == (char32_t)needle)
 			return (char32_t *)haystack;
 	}
 	return NULL;
@@ -2336,7 +2336,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnrchr)(char16_t const *__restrict haystack,
                                     size_t maxlen) {
 	char16_t const *result = NULL;
 	for (; maxlen-- && *haystack; ++haystack) {
-		if unlikely((unsigned char)*haystack == (unsigned char)needle)
+		if unlikely((char16_t)*haystack == (char16_t)needle)
 			result = haystack;
 	}
 	return (char16_t *)result;
@@ -2348,7 +2348,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnrchr)(char32_t const *__restrict haystack,
                                     size_t maxlen) {
 	char32_t const *result = NULL;
 	for (; maxlen-- && *haystack; ++haystack) {
-		if unlikely((unsigned char)*haystack == (unsigned char)needle)
+		if unlikely((char32_t)*haystack == (char32_t)needle)
 			result = haystack;
 	}
 	return (char32_t *)result;
@@ -2433,7 +2433,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsrchrnul)(char16_t const *__restrict haystack,
                                       char16_t needle) {
 	char16_t const *result = haystack - 1;
 	do {
-		if unlikely((unsigned char)*haystack == (unsigned char)needle)
+		if unlikely((char16_t)*haystack == (char16_t)needle)
 			result = haystack;
 	} while (*haystack++);
 	return (char16_t *)result;
@@ -2444,7 +2444,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsrchrnul)(char32_t const *__restrict haystack,
                                       char32_t needle) {
 	char32_t const *result = haystack - 1;
 	do {
-		if unlikely((unsigned char)*haystack == (unsigned char)needle)
+		if unlikely((char32_t)*haystack == (char32_t)needle)
 			result = haystack;
 	} while (*haystack++);
 	return (char32_t *)result;
@@ -2454,7 +2454,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNU
 NOTHROW_NCX(LIBDCALL libd_wcsnchrnul)(char16_t const *__restrict haystack,
                                       char16_t needle,
                                       size_t maxlen) {
-	for (; maxlen-- && *haystack && (unsigned char)*haystack != (unsigned char)needle; ++haystack)
+	for (; maxlen-- && *haystack && (char16_t)*haystack != (char16_t)needle; ++haystack)
 		;
 	return (char16_t *)haystack;
 }
@@ -2463,7 +2463,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL W
 NOTHROW_NCX(LIBKCALL libc_wcsnchrnul)(char32_t const *__restrict haystack,
                                       char32_t needle,
                                       size_t maxlen) {
-	for (; maxlen-- && *haystack && (unsigned char)*haystack != (unsigned char)needle; ++haystack)
+	for (; maxlen-- && *haystack && (char32_t)*haystack != (char32_t)needle; ++haystack)
 		;
 	return (char32_t *)haystack;
 }
@@ -2474,7 +2474,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnrchrnul)(char16_t const *__restrict haystack,
                                        size_t maxlen) {
 	char16_t const *result = haystack - 1;
 	for (; maxlen-- && *haystack; ++haystack) {
-		if unlikely((unsigned char)*haystack == (unsigned char)needle)
+		if unlikely((char16_t)*haystack == (char16_t)needle)
 			result = haystack;
 	}
 	return (char16_t *)result;
@@ -2486,7 +2486,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnrchrnul)(char32_t const *__restrict haystack,
                                        size_t maxlen) {
 	char32_t const *result = haystack - 1;
 	for (; maxlen-- && *haystack; ++haystack) {
-		if unlikely((unsigned char)*haystack == (unsigned char)needle)
+		if unlikely((char32_t)*haystack == (char32_t)needle)
 			result = haystack;
 	}
 	return (char32_t *)result;
@@ -2722,10 +2722,10 @@ NOTHROW_NCX(LIBDCALL libd_wildwcscmp)(char16_t const *pattern,
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
 			while (*pattern == '*')
 				++pattern;
-			return -(int)(unsigned char)*pattern;
+			return -(int)(char16_t)*pattern;
 		}
 		if (!*pattern)
-			return (int)(unsigned char)*string; /* Pattern end doesn't match */
+			return (int)(char16_t)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
 			/* Skip stars */
 			do {
@@ -2742,7 +2742,7 @@ NOTHROW_NCX(LIBDCALL libd_wildwcscmp)(char16_t const *pattern,
 					if (!libd_wildwcscmp(string, pattern))
 						return 0;
 				} else if (!ch) {
-					return -(int)(unsigned char)card_post; /* Wildcard suffix not found */
+					return -(int)(char16_t)card_post; /* Wildcard suffix not found */
 				}
 			}
 		}
@@ -2754,7 +2754,7 @@ next:
 		}
 		break; /* mismatch */
 	}
-	return (int)((unsigned char)*string - (unsigned char)*pattern);
+	return (int)((char16_t)*string - (char16_t)*pattern);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wildwcscmp)(char32_t const *pattern,
@@ -2765,10 +2765,10 @@ NOTHROW_NCX(LIBKCALL libc_wildwcscmp)(char32_t const *pattern,
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
 			while (*pattern == '*')
 				++pattern;
-			return -(int)(unsigned char)*pattern;
+			return -(int)(char32_t)*pattern;
 		}
 		if (!*pattern)
-			return (int)(unsigned char)*string; /* Pattern end doesn't match */
+			return (int)(char32_t)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
 			/* Skip stars */
 			do {
@@ -2785,7 +2785,7 @@ NOTHROW_NCX(LIBKCALL libc_wildwcscmp)(char32_t const *pattern,
 					if (!libc_wildwcscmp(string, pattern))
 						return 0;
 				} else if (!ch) {
-					return -(int)(unsigned char)card_post; /* Wildcard suffix not found */
+					return -(int)(char32_t)card_post; /* Wildcard suffix not found */
 				}
 			}
 		}
@@ -2797,7 +2797,7 @@ next:
 		}
 		break; /* mismatch */
 	}
-	return (int)((unsigned char)*string - (unsigned char)*pattern);
+	return (int)((char32_t)*string - (char32_t)*pattern);
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp)(char16_t const *pattern,
@@ -2828,7 +2828,7 @@ NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp)(char16_t const *pattern,
 					if (!libd_wildwcscasecmp(string, pattern))
 						return 0;
 				} else if (!ch) {
-					return -(int)(unsigned char)card_post; /* Wildcard suffix not found */
+					return -(int)(char16_t)card_post; /* Wildcard suffix not found */
 				}
 			}
 		}
@@ -2845,7 +2845,7 @@ next:
 		}
 		break; /* mismatch */
 	}
-	return (int)((unsigned char)wcsing_ch - (unsigned char)pattern_ch);
+	return (int)((char16_t)wcsing_ch - (char16_t)pattern_ch);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp)(char32_t const *pattern,
@@ -2876,7 +2876,7 @@ NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp)(char32_t const *pattern,
 					if (!libc_wildwcscasecmp(string, pattern))
 						return 0;
 				} else if (!ch) {
-					return -(int)(unsigned char)card_post; /* Wildcard suffix not found */
+					return -(int)(char32_t)card_post; /* Wildcard suffix not found */
 				}
 			}
 		}
@@ -2893,7 +2893,7 @@ next:
 		}
 		break; /* mismatch */
 	}
-	return (int)((unsigned char)wcsing_ch - (unsigned char)pattern_ch);
+	return (int)((char32_t)wcsing_ch - (char32_t)pattern_ch);
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsverscmp)(char16_t const *s1,
@@ -2912,7 +2912,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsverscmp)(char16_t const *s1,
 			/* Check if both strings have digit sequences in the same places. */
 			if ((c1 < '0' || c1 > '9') &&
 			    (c2 < '0' || c2 > '9'))
-				return (int)((unsigned char)c1 - (unsigned char)c2);
+				return (int)((char16_t)c1 - (char16_t)c2);
 			/* Deal with leading zeros. */
 			if (c1 == '0')
 				return -1;
@@ -2958,7 +2958,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsverscmp)(char32_t const *s1,
 			/* Check if both strings have digit sequences in the same places. */
 			if ((c1 < '0' || c1 > '9') &&
 			    (c2 < '0' || c2 > '9'))
-				return (int)((unsigned char)c1 - (unsigned char)c2);
+				return (int)((char32_t)c1 - (char32_t)c2);
 			/* Deal with leading zeros. */
 			if (c1 == '0')
 				return -1;
@@ -3299,7 +3299,7 @@ NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp_l)(char16_t const *pattern,
 					if (!libd_wcscasecmp_l(string, pattern, locale))
 						return 0;
 				} else if (!ch) {
-					return -(int)(unsigned char)card_post; /* Wildcard suffix not found */
+					return -(int)(char16_t)card_post; /* Wildcard suffix not found */
 				}
 			}
 		}
@@ -3316,7 +3316,7 @@ next:
 		}
 		break; /* mismatch */
 	}
-	return (int)((unsigned char)wcsing_ch - (unsigned char)pattern_ch);
+	return (int)((char16_t)wcsing_ch - (char16_t)pattern_ch);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp_l)(char32_t const *pattern,
@@ -3348,7 +3348,7 @@ NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp_l)(char32_t const *pattern,
 					if (!libc_wcscasecmp_l(string, pattern, locale))
 						return 0;
 				} else if (!ch) {
-					return -(int)(unsigned char)card_post; /* Wildcard suffix not found */
+					return -(int)(char32_t)card_post; /* Wildcard suffix not found */
 				}
 			}
 		}
@@ -3365,7 +3365,7 @@ next:
 		}
 		break; /* mismatch */
 	}
-	return (int)((unsigned char)wcsing_ch - (unsigned char)pattern_ch);
+	return (int)((char32_t)wcsing_ch - (char32_t)pattern_ch);
 }
 #include <parts/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t

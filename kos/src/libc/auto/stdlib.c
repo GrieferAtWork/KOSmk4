@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x801d31b1 */
+/* HASH CRC-32:0xb7ac95cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2224,7 +2224,7 @@ NOTHROW_NCX(LIBDCALL libd__itow_s)(int val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
+		char16_t digit;
 		digit = temp % (unsigned int)radix;
 		*--p = digit < 10 ? (char16_t)('0' + digit) : (char16_t)('A' + (digit - 10));
 	} while ((temp /= (unsigned int)radix) != 0);
@@ -2265,7 +2265,7 @@ NOTHROW_NCX(LIBKCALL libc__itow_s)(int val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
+		char32_t digit;
 		digit = temp % (unsigned int)radix;
 		*--p = digit < 10 ? (char32_t)('0' + digit) : (char32_t)('A' + (digit - 10));
 	} while ((temp /= (unsigned int)radix) != 0);
@@ -2306,7 +2306,7 @@ NOTHROW_NCX(LIBDCALL libd__ltow_s)(long val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
+		char16_t digit;
 		digit = temp % (unsigned int)radix;
 		*--p = digit < 10 ? (char16_t)('0' + digit) : (char16_t)('A' + (digit - 10));
 	} while ((temp /= (unsigned int)radix) != 0);
@@ -2347,7 +2347,7 @@ NOTHROW_NCX(LIBKCALL libc__ltow_s)(long val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
+		char32_t digit;
 		digit = temp % (unsigned int)radix;
 		*--p = digit < 10 ? (char32_t)('0' + digit) : (char32_t)('A' + (digit - 10));
 	} while ((temp /= (unsigned int)radix) != 0);
@@ -2377,7 +2377,7 @@ NOTHROW_NCX(LIBDCALL libd__ultow_s)(unsigned long val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
+		char16_t digit;
 		digit = temp % (unsigned int)radix;
 		*--p = digit < 10 ? (char16_t)('0' + digit) : (char16_t)('A' + (digit - 10));
 	} while ((temp /= (unsigned int)radix) != 0);
@@ -2407,7 +2407,7 @@ NOTHROW_NCX(LIBKCALL libc__ultow_s)(unsigned long val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
+		char32_t digit;
 		digit = temp % (unsigned int)radix;
 		*--p = digit < 10 ? (char32_t)('0' + digit) : (char32_t)('A' + (digit - 10));
 	} while ((temp /= (unsigned int)radix) != 0);
@@ -2448,7 +2448,7 @@ NOTHROW_NCX(LIBDCALL libd__i64tow_s)(s64 val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
+		char16_t digit;
 		digit = temp % (unsigned int)radix;
 		*--p = digit < 10 ? (char16_t)('0' + digit) : (char16_t)('A' + (digit - 10));
 	} while ((temp /= (unsigned int)radix) != 0);
@@ -2489,7 +2489,7 @@ NOTHROW_NCX(LIBKCALL libc__i64tow_s)(s64 val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
+		char32_t digit;
 		digit = temp % (unsigned int)radix;
 		*--p = digit < 10 ? (char32_t)('0' + digit) : (char32_t)('A' + (digit - 10));
 	} while ((temp /= (unsigned int)radix) != 0);
@@ -2519,7 +2519,7 @@ NOTHROW_NCX(LIBDCALL libd__ui64tow_s)(u64 val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
+		char16_t digit;
 		digit = temp % (unsigned int)radix;
 		*--p = digit < 10 ? (char16_t)('0' + digit) : (char16_t)('A' + (digit - 10));
 	} while ((temp /= (unsigned int)radix) != 0);
@@ -2549,7 +2549,7 @@ NOTHROW_NCX(LIBKCALL libc__ui64tow_s)(u64 val,
 	temp = val;
 	*p = '\0';
 	do {
-		unsigned char digit;
+		char32_t digit;
 		digit = temp % (unsigned int)radix;
 		*--p = digit < 10 ? (char32_t)('0' + digit) : (char32_t)('A' + (digit - 10));
 	} while ((temp /= (unsigned int)radix) != 0);

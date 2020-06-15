@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe928d1b4 */
+/* HASH CRC-32:0xc07a87af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -166,7 +166,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
                                char16_t const *__restrict text,
                                size_t textlen,
                                unsigned int flags) THROWS(...) {
-#define escape_tooct(c) ('0' + (char16_t)(unsigned char)(c))
+#define escape_tooct(c) ('0' + (char16_t)(char16_t)(c))
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals
@@ -451,7 +451,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
                                char32_t const *__restrict text,
                                size_t textlen,
                                unsigned int flags) THROWS(...) {
-#define escape_tooct(c) ('0' + (char32_t)(unsigned char)(c))
+#define escape_tooct(c) ('0' + (char32_t)(char32_t)(c))
 #ifndef DECIMALS_SELECTOR
 #define LOCAL_DECIMALS_SELECTOR_DEFINED 1
 #define DECIMALS_SELECTOR  decimals

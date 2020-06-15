@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa972bf3 */
+/* HASH CRC-32:0xb9962889 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sverscmp))(__CHAR16_TYPE__ const *
 			/* Check if both strings have digit sequences in the same places. */
 			if ((__c1 < '0' || __c1 > '9') &&
 			    (__c2 < '0' || __c2 > '9'))
-				return (int)((unsigned char)__c1 - (unsigned char)__c2);
+				return (int)((__CHAR16_TYPE__)__c1 - (__CHAR16_TYPE__)__c2);
 			/* Deal with leading zeros. */
 			if (__c1 == '0')
 				return -1;

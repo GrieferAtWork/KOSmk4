@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8e650c9 */
+/* HASH CRC-32:0x4495f7f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(wildc16scasecmp))(__CHAR16_TYPE__ con
 					if (!__LIBC_LOCAL_NAME(wildc16scasecmp)(__string, __pattern))
 						return 0;
 				} else if (!__ch) {
-					return -(int)(unsigned char)__card_post; /* Wildcard suffix not found */
+					return -(int)(__CHAR16_TYPE__)__card_post; /* Wildcard suffix not found */
 				}
 			}
 		}
@@ -81,7 +81,7 @@ __next:
 		}
 		break; /* mismatch */
 	}
-	return (int)((unsigned char)__wcsing_ch - (unsigned char)__pattern_ch);
+	return (int)((__CHAR16_TYPE__)__wcsing_ch - (__CHAR16_TYPE__)__pattern_ch);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wildc16scasecmp_defined
