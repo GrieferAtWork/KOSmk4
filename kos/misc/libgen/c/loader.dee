@@ -3819,6 +3819,15 @@ got_chkExpr:
 							"Duplicate declaration of %{{uchar{}}} variant of [[wchar]] function {!r}"
 							.format({ WCHAR_REPLACEMENT_WIDTH[mode], wcsFunctionName }));
 					}
+					function getWcharFunction(): Function {
+						try {
+							return wcharFunction.wc_func;
+						} catch (UnboundAttribute) {
+							self.errAt(currentNameTokStart,
+								"%{{uchar{}}}-function {!r} uses missing [[wchar]] function {!r}"
+								.format({ WCHAR_REPLACEMENT_WIDTH[mode], currentName, wcsFunctionName }));
+						}
+					}
 					if (feat_inline is none && !feat_noLocal) {
 						xcLocalFunction = LocalFunction(
 							name:                     currentName,
@@ -3829,29 +3838,34 @@ got_chkExpr:
 								.format({ xcLocalFunction.name }));
 						xcLocalFunction.prototype = []{
 							local usedPrototype: FunctionPrototype = currentPrototype;
-							if (usedPrototype is none) {
-								usedPrototype = wcharFunction
-									.getXCharImplementation(currentName, mode)
-									.prototype;
-							}
+							local xc: XcharImplementation = wcharFunction
+								.getXCharImplementation(currentName, mode);
+							if (usedPrototype is none)
+								usedPrototype = xc.prototype;
+							local xcImpl: none | Callable | LoaderFunctionImplementation = xc.loaderImpl;
+							if (xcImpl is Callable)
+								xcImpl = xc.loaderImpl = xcImpl();
+							xcLocalFunction.impl          = xcImpl.impl;
+							xcLocalFunction.ppCond        = xcImpl.ppCond;
+							xcLocalFunction.ppCondPrefix  = xcImpl.ppCondPrefix;
 							/* Replace default CC with the proper UCHAR-override */
 							if (usedPrototype.cc === DEFAULT_CC)
 								usedPrototype.cc = WCHAR_REPLACEMENT_CC[mode];
 							return usedPrototype;
 						};
-						//xcLocalFunction.impl          = xcImpl.impl;
-						//xcLocalFunction.ppCond        = xcImpl.ppCond;
-						//xcLocalFunction.ppCondPrefix  = xcImpl.ppCondPrefix;
-						//xcLocalFunction.documentation = wc.documentation;
-					}
-					function getWcharFunction(): Function {
-						try {
-							return wcharFunction.wc_func;
-						} catch (UnboundAttribute) {
-							self.errAt(currentNameTokStart,
-								"%{{uchar{}}}-function {!r} uses missing [[wchar]] function {!r}"
-								.format({ WCHAR_REPLACEMENT_WIDTH[mode], currentName, wcsFunctionName }));
-						}
+						xcLocalFunction.impl = []{
+							local xc: XcharImplementation = wcharFunction
+								.getXCharImplementation(currentName, mode);
+							local xcImpl: none | Callable | LoaderFunctionImplementation = xc.loaderImpl;
+							if (xcImpl is Callable)
+								xcImpl = xc.loaderImpl = xcImpl();
+							xcLocalFunction.ppCond       = xcImpl.ppCond;
+							xcLocalFunction.ppCondPrefix = xcImpl.ppCondPrefix;
+							return xcImpl.impl;
+						};
+						xcLocalFunction.documentation = []{
+							return getWcharFunction().documentation;
+						};
 					}
 					if (current.documentation is string && !current.documentation) {
 						/* Automatically inherit the documentation from @wcharFunction */

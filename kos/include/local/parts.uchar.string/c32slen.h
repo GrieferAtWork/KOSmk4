@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb079e370 */
+/* HASH CRC-32:0x55a27183 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_END
 #include <local/parts.uchar.string/c32send.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `STR+wcslen(STR)' */
-#define __localdep_c32send (*(__CHAR32_TYPE__ *(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(c32send))
+#define __localdep_c32send __LIBC_LOCAL_NAME(c32send)
 #endif /* !... */
 #endif /* !__local___localdep_c32send_defined */
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */

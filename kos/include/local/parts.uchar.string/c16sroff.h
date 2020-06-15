@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf862e7aa */
+/* HASH CRC-32:0x70aefc74 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_END
 #include <local/parts.uchar.string/c16srchrnul.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `wcsrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_c16srchrnul (*(__CHAR16_TYPE__ *(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __CHAR16_TYPE__))&__LIBC_LOCAL_NAME(c16srchrnul))
+#define __localdep_c16srchrnul __LIBC_LOCAL_NAME(c16srchrnul)
 #endif /* !... */
 #endif /* !__local___localdep_c16srchrnul_defined */
 /* Same as `wcsrchrnul', but return the offset from `STR', rather than the actual address */

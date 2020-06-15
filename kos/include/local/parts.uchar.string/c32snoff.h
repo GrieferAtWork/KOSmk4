@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f8a23bb */
+/* HASH CRC-32:0x51d82f8b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_END
 #include <local/parts.uchar.string/c32snchrnul.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `wcsnchr', but return `wcsnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_c32snchrnul (*(__CHAR32_TYPE__ *(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(c32snchrnul))
+#define __localdep_c32snchrnul __LIBC_LOCAL_NAME(c32snchrnul)
 #endif /* !... */
 #endif /* !__local___localdep_c32snchrnul_defined */
 /* Same as `wcsnchrnul', but return the offset from `STR', rather than the actual address */

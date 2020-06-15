@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfff70e35 */
+/* HASH CRC-32:0x465fb9f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_END
 #include <local/parts.uchar.string/c16send.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `STR+wcslen(STR)' */
-#define __localdep_c16send (*(__CHAR16_TYPE__ *(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(c16send))
+#define __localdep_c16send __LIBC_LOCAL_NAME(c16send)
 #endif /* !... */
 #endif /* !__local___localdep_c16send_defined */
 /* Dependency: c16slen from parts.uchar.string */

@@ -135,9 +135,7 @@
  * Basically, anything that is designed to interact with user-provided
  * memory buffers applies for this, as the user may have defined a
  * signal handler to throw an exception upon `SIGSEGV', or the like.
- * Or alternatively, has KOS kernel exceptions enabled (s.a. <kos/except-handler.h>)
- * Additionally, on KOS the kernel may have thrown the exception, and
- * is in the process of propagating it into user-space. */
+ * Or alternatively, has KOS kernel exceptions enabled (s.a. <kos/except-handler.h>) */
 #if !defined(__NO_NON_CALL_EXCEPTIONS) || \
     (defined(__NON_CALL_EXCEPTIONS) && (__NON_CALL_EXCEPTIONS+0) != 0)
 #undef __NO_NON_CALL_EXCEPTIONS

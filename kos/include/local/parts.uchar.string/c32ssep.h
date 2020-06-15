@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2adb0675 */
+/* HASH CRC-32:0x8f7b3346 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_END
 #include <local/parts.uchar.string/c32schr.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_c32schr (*(__CHAR32_TYPE__ *(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__))&__LIBC_LOCAL_NAME(c32schr))
+#define __localdep_c32schr __LIBC_LOCAL_NAME(c32schr)
 #endif /* !... */
 #endif /* !__local___localdep_c32schr_defined */
 __LOCAL_LIBC(c32ssep) __ATTR_LEAF __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__ *

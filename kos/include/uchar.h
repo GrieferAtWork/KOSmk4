@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x316e4e43 */
+/* HASH CRC-32:0xe9d46ceb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,9 +111,9 @@ __NAMESPACE_STD_BEGIN
 __FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc16)(char16_t *__pc16, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtowc))((__WCHAR_TYPE__ *)__pc16, __str, __maxlen, __mbs); }
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/uchar/uchar_mbrtoc16.h>
+#include <local/uchar/mbrtoc16.h>
 __NAMESPACE_STD_BEGIN
-__FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc16)(char16_t *__pc16, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(uchar_mbrtoc16))(__pc16, __str, __maxlen, __mbs); }
+__FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc16)(char16_t *__pc16, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtoc16))(__pc16, __str, __maxlen, __mbs); }
 #endif /* !... */
 #ifdef __CRT_HAVE_mbrtoc32
 __CDECLARE(,size_t,__NOTHROW_NCX,mbrtoc32,(char32_t *__pc32, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),(__pc32,__str,__maxlen,__mbs))
@@ -130,9 +130,9 @@ __NAMESPACE_STD_BEGIN
 __FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc32)(char32_t *__pc32, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtowc))((__WCHAR_TYPE__ *)__pc32, __str, __maxlen, __mbs); }
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/uchar/uchar_mbrtoc32.h>
+#include <local/uchar/mbrtoc32.h>
 __NAMESPACE_STD_BEGIN
-__FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc32)(char32_t *__pc32, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(uchar_mbrtoc32))(__pc32, __str, __maxlen, __mbs); }
+__FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc32)(char32_t *__pc32, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtoc32))(__pc32, __str, __maxlen, __mbs); }
 #endif /* !... */
 #ifdef __CRT_HAVE_c16rtomb
 __CDECLARE(,size_t,__NOTHROW_NCX,c16rtomb,(char *__restrict __str, char16_t __c16, mbstate_t *__mbs),(__str,__c16,__mbs))
@@ -147,9 +147,9 @@ __NAMESPACE_STD_BEGIN
 __FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL c16rtomb)(char *__restrict __str, char16_t __c16, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcrtomb))(__str, (__WCHAR_TYPE__)__c16, __mbs); }
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/uchar/uchar_c16rtomb.h>
+#include <local/uchar/c16rtomb.h>
 __NAMESPACE_STD_BEGIN
-__FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL c16rtomb)(char *__restrict __str, char16_t __c16, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(uchar_c16rtomb))(__str, __c16, __mbs); }
+__FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL c16rtomb)(char *__restrict __str, char16_t __c16, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16rtomb))(__str, __c16, __mbs); }
 #endif /* !... */
 #ifdef __CRT_HAVE_c32rtomb
 __CDECLARE(,size_t,__NOTHROW_NCX,c32rtomb,(char *__restrict __str, char32_t __c32, mbstate_t *__mbs),(__str,__c32,__mbs))
@@ -164,9 +164,9 @@ __NAMESPACE_STD_BEGIN
 __FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL c32rtomb)(char *__restrict __str, char32_t __c32, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcrtomb))(__str, (__WCHAR_TYPE__)__c32, __mbs); }
 #else /* ... */
 __NAMESPACE_STD_END
-#include <local/uchar/uchar_c32rtomb.h>
+#include <local/uchar/c32rtomb.h>
 __NAMESPACE_STD_BEGIN
-__FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL c32rtomb)(char *__restrict __str, char32_t __c32, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(uchar_c32rtomb))(__str, __c32, __mbs); }
+__FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL c32rtomb)(char *__restrict __str, char32_t __c32, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32rtomb))(__str, __c32, __mbs); }
 #endif /* !... */
 __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER

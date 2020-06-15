@@ -109,7 +109,7 @@ class CType {
 			return false;
 		if (afterName != str(other.afterName))
 			return false;
-		return false;
+		return true;
 	}
 
 	@@Returns @true if @this @CType is implicitly convertible to @other

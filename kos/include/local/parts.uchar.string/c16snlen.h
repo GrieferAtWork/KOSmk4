@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c0656e9 */
+/* HASH CRC-32:0xfa5affc7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_END
 #include <local/parts.uchar.string/c16snend.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
-#define __localdep_c16snend (*(__CHAR16_TYPE__ *(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(c16snend))
+#define __localdep_c16snend __LIBC_LOCAL_NAME(c16snend)
 #endif /* !... */
 #endif /* !__local___localdep_c16snend_defined */
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */

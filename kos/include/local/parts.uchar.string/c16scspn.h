@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb129e405 */
+/* HASH CRC-32:0x403e617a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_END
 #include <local/parts.uchar.string/c16schr.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_c16schr (*(__CHAR16_TYPE__ *(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __CHAR16_TYPE__))&__LIBC_LOCAL_NAME(c16schr))
+#define __localdep_c16schr __LIBC_LOCAL_NAME(c16schr)
 #endif /* !... */
 #endif /* !__local___localdep_c16schr_defined */
 __LOCAL_LIBC(c16scspn) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__

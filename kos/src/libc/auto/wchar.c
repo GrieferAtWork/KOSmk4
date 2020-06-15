@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24187f0a */
+/* HASH CRC-32:0xefb5e33c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,11 @@ NOTHROW_NCX(LIBCCALL libc_wctob)(wint_t ch) {
 	return EOF;
 }
 #endif /* !__KERNEL__ */
-#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+#ifndef __KERNEL__
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_INTERN_ALIAS(libc_mbrtoc16, libd_mbrtowc);
+DEFINE_INTERN_ALIAS(libc_c16rtomb, libd_wcrtomb);
+#else /* __LIBCCALL_IS_LIBDCALL */
 /* Because STDC mandates the uchar16 and uchar32 variants:
  *    mbrtowc:mbrtoc16:mbrtoc32
  *    wcrtomb:c16rtomb:c32rtomb
@@ -93,7 +97,7 @@ NOTHROW_NCX(LIBCCALL libc_wctob)(wint_t ch) {
  *     LIBKCALL:mbrtoc16:  ...
  *     LIBKCALL:c16rtomb:  ...
  *
- * Any because the msabi64 generator doesn't include special handling for this case,
+ * And because the msabi64 generator doesn't include special handling for this case,
  * we simply have to manually implement these 2 functions as LIBKCALL wrappers for
  * the associated LIBDCALL functions:
  *
@@ -116,7 +120,8 @@ NOTHROW_NCX(LIBKCALL libc_c16rtomb)(char *__restrict str,
                                     mbstate_t *mbs) {
 	return libd_wcrtomb(str, wc, mbs);
 }
-#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+#endif /* !__LIBCCALL_IS_LIBDCALL */
+#endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #include <parts/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t

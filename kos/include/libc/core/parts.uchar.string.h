@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f80e5e8 */
+/* HASH CRC-32:0x6966bf05 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1))
 #else /* ... */
 #include <local/parts.uchar.string/c16send.h>
 /* Same as `STR+wcslen(STR)' */
-#define __libc_core_c16send (*(__CHAR16_TYPE__ *(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16send)))
+#define __libc_core_c16send (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16send))
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsend) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* Same as `STR+wcslen(STR)' */
@@ -57,7 +57,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1))
 #else /* ... */
 #include <local/parts.uchar.string/c32send.h>
 /* Same as `STR+wcslen(STR)' */
-#define __libc_core_c32send (*(__CHAR32_TYPE__ *(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32send)))
+#define __libc_core_c32send (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32send))
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsnend) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
@@ -72,7 +72,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *
 #else /* ... */
 #include <local/parts.uchar.string/c16snend.h>
 /* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
-#define __libc_core_c16snend (*(__CHAR16_TYPE__ *(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16snend)))
+#define __libc_core_c16snend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16snend))
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsnend) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
 /* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
@@ -87,7 +87,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *
 #else /* ... */
 #include <local/parts.uchar.string/c32snend.h>
 /* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
-#define __libc_core_c32snend (*(__CHAR32_TYPE__ *(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32snend)))
+#define __libc_core_c32snend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32snend))
 #endif /* !... */
 #if defined(__CRT_HAVE_wcslen) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
