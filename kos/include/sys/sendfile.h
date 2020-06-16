@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14d4078e */
+/* HASH CRC-32:0xe5c93482 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __CREDIRECT(,ssize_t,__NOTHROW_NCX,sendfile,(__fd_t __out_fd, __fd_t __in_fd, of
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
  * Return the number of written bytes, or -1 in case of error */
 __CDECLARE(,ssize_t,__NOTHROW_NCX,sendfile,(__fd_t __out_fd, __fd_t __in_fd, off_t *__offset, size_t __count),(__out_fd,__in_fd,__offset,__count))
-#elif defined(__CRT_HAVE_sendfile) || defined(__CRT_HAVE_sendfile64)
+#elif defined(__CRT_HAVE_sendfile64) || defined(__CRT_HAVE_sendfile)
 #include <local/sys.sendfile/sendfile.h>
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
@@ -81,7 +81,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sendfile, __FORCELOCAL ssize_t __NOTHROW_NCX(__L
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
  * Return the number of written bytes, or -1 in case of error */
 __CDECLARE(,ssize_t,__NOTHROW_NCX,sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __off64_t *__offset, size_t __count),(__out_fd,__in_fd,__offset,__count))
-#elif defined(__CRT_HAVE_sendfile) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_sendfile) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba46fe87 */
+/* HASH CRC-32:0xfa87f9af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_timerfd_gettime_defined
 #define __local_timerfd_gettime_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_timerfd_gettime) || defined(__CRT_HAVE_timerfd_gettime64)
+#if defined(__CRT_HAVE_timerfd_gettime64) || defined(__CRT_HAVE_timerfd_gettime)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: timerfd_gettime32 from sys.timerfd */
 #if !defined(__local___localdep_timerfd_gettime32_defined) && defined(__CRT_HAVE_timerfd_gettime)
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(
 #ifdef __CRT_HAVE_timerfd_gettime64
 /* Return the next expiration time of UFD */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr),timerfd_gettime64,(__ufd,__otmr))
-#elif defined(__CRT_HAVE_timerfd_gettime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_timerfd_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Return the next expiration time of UFD */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime)
@@ -80,7 +80,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_timerfd_gettime_defined 1
 #define __localdep_timerfd_gettime __LIBC_LOCAL_NAME(timerfd_gettime)
 #endif /* !__local___localdep_timerfd_gettime_defined */
-#else /* __CRT_HAVE_timerfd_gettime || __CRT_HAVE_timerfd_gettime64 */
+#else /* __CRT_HAVE_timerfd_gettime64 || __CRT_HAVE_timerfd_gettime */
 #undef __local_timerfd_gettime_defined
-#endif /* !__CRT_HAVE_timerfd_gettime && !__CRT_HAVE_timerfd_gettime64 */
+#endif /* !__CRT_HAVE_timerfd_gettime64 && !__CRT_HAVE_timerfd_gettime */
 #endif /* !__local_timerfd_gettime_defined */

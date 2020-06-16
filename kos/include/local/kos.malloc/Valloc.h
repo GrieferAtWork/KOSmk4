@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1acdad2 */
+/* HASH CRC-32:0x4674952e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,10 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: Memalign from kos.malloc */
-#if !defined(__local___localdep_Memalign_defined) && defined(__CRT_HAVE_Memalign)
+#ifndef __local___localdep_Memalign_defined
 #define __local___localdep_Memalign_defined 1
 __CREDIRECT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__THROWING,__localdep_Memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),Memalign,(__alignment,__num_bytes))
-#endif /* !__local___localdep_Memalign_defined && __CRT_HAVE_Memalign */
+#endif /* !__local___localdep_Memalign_defined */
 /* Dependency: getpagesize from unistd */
 #ifndef __local___localdep_getpagesize_defined
 #define __local___localdep_getpagesize_defined 1

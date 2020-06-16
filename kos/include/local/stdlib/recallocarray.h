@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e6c9bd1 */
+/* HASH CRC-32:0x2d362405 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_recallocarray_defined
 #define __local_recallocarray_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || (defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)))) && (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
+#if (defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: calloc from stdlib */
 #ifndef __local___localdep_calloc_defined
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),calloc,{ return __builtin_calloc(__count, __num_bytes); })
 #elif defined(__CRT_HAVE_calloc)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),calloc,(__count,__num_bytes))
-#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 __NAMESPACE_LOCAL_END
 #include <local/stdlib/calloc.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -172,7 +172,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_recallocarray_defined 1
 #define __localdep_recallocarray __LIBC_LOCAL_NAME(recallocarray)
 #endif /* !__local___localdep_recallocarray_defined */
-#else /* (__CRT_HAVE_recallocv || __CRT_HAVE__recalloc || (__CRT_HAVE_realloc && (__CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize))) && (__CRT_HAVE_calloc || __CRT_HAVE_malloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize) */
+#else /* (__CRT_HAVE_recallocv || __CRT_HAVE__recalloc || __CRT_HAVE_realloc) && (__CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize) */
 #undef __local_recallocarray_defined
-#endif /* (!__CRT_HAVE_recallocv && !__CRT_HAVE__recalloc && (!__CRT_HAVE_realloc || (!__CRT_HAVE_malloc_usable_size && !__CRT_HAVE__msize))) || (!__CRT_HAVE_calloc && !__CRT_HAVE_malloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign) || (!__CRT_HAVE_malloc_usable_size && !__CRT_HAVE__msize) */
+#endif /* (!__CRT_HAVE_recallocv && !__CRT_HAVE__recalloc && !__CRT_HAVE_realloc) || (!__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign) || (!__CRT_HAVE_malloc_usable_size && !__CRT_HAVE__msize) */
 #endif /* !__local_recallocarray_defined */

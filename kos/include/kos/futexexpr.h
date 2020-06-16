@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22b11f05 */
+/* HASH CRC-32:0x25a92c84 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,7 +227,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr,(void *__base, __SI
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),(__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexexpr) || defined(__CRT_HAVE_lfutexexpr64)
+#elif defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
 #include <local/kos.futexexpr/lfutexexpr.h>
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
@@ -316,7 +316,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr,(lfutex_t *_
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexlockexpr) || defined(__CRT_HAVE_lfutexlockexpr64)
+#elif defined(__CRT_HAVE_lfutexlockexpr64) || defined(__CRT_HAVE_lfutexlockexpr)
 #include <local/kos.futexexpr/lfutexlockexpr.h>
 /* >> lfutexlockexpr(2)
  * A function that is similar to `lfutexexpr()', but allows for the use of one central
@@ -378,7 +378,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfutexlockexpr, __FORCELOCAL __ATTR_NONNULL((1, 
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr64,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexexpr) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_lfutexexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
@@ -467,7 +467,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr64, __FORCELOCAL __ATTR_NONNULL((3)) i
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr64,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexlockexpr) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_lfutexlockexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> lfutexlockexpr(2)
  * A function that is similar to `lfutexexpr()', but allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex

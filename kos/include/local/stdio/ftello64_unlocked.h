@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdac17579 */
+/* HASH CRC-32:0x258c0781 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,13 +45,13 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__THROWING,__localdep_f
 #elif defined(__CRT_HAVE__ftelli64)
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_ftelli64,(__stream))
-#elif defined(__CRT_HAVE_ftello) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_ftello) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftello,(__stream))
-#elif defined(__CRT_HAVE_ftell) && (__SIZEOF_OFF64_T__ == __SIZEOF_LONG__)
+#elif defined(__CRT_HAVE_ftell) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftell,(__stream))
-#elif defined(__CRT_HAVE__IO_ftell) && (__SIZEOF_OFF64_T__ == __SIZEOF_LONG__)
+#elif defined(__CRT_HAVE__IO_ftell) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
 /* 64-bit variant of `ftello' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_IO_ftell,(__stream))
 #elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock) || defined(__CRT_HAVE__IO_ftell)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa576643f */
+/* HASH CRC-32:0x11b6a7af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_preadv_defined
 #define __local_preadv_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_preadv) || defined(__CRT_HAVE_preadv64)
+#if defined(__CRT_HAVE_preadv64) || defined(__CRT_HAVE_preadv)
 #include <features.h>
 #include <bits/uio.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv32
 #define __local___localdep_preadv64_defined 1
 #ifdef __CRT_HAVE_preadv64
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv64,(__fd,__iov,__count,__offset))
-#elif defined(__CRT_HAVE_preadv) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_preadv) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_preadv)
 __NAMESPACE_LOCAL_END
@@ -59,7 +59,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_preadv_defined 1
 #define __localdep_preadv __LIBC_LOCAL_NAME(preadv)
 #endif /* !__local___localdep_preadv_defined */
-#else /* __CRT_HAVE_preadv || __CRT_HAVE_preadv64 */
+#else /* __CRT_HAVE_preadv64 || __CRT_HAVE_preadv */
 #undef __local_preadv_defined
-#endif /* !__CRT_HAVE_preadv && !__CRT_HAVE_preadv64 */
+#endif /* !__CRT_HAVE_preadv64 && !__CRT_HAVE_preadv */
 #endif /* !__local_preadv_defined */

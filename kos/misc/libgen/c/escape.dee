@@ -23,7 +23,6 @@ import * from .parser;
 import * from .globals;
 import * from .writer;
 import * from .namespace;
-import * from ..optiexpr;
 
 #define Function          Object /* Function from .cheaders */
 #define LocalFunction     Object /* LocalFunction from .cheaders */

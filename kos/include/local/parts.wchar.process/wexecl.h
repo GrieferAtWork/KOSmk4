@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea5a3ecb */
+/* HASH CRC-32:0xb5d197be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,11 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wexecv from parts.wchar.process */
 #ifndef __local___localdep_wexecv_defined
 #define __local___localdep_wexecv_defined 1
-#ifdef __CRT_HAVE_wexecv
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_wexecv,(__WCHAR_TYPE__ const *__restrict __path, __TWARGV),wexecv,(__path,___argv))
-#else /* __CRT_HAVE_wexecv */
-#undef __local___localdep_wexecv_defined
-#endif /* !__CRT_HAVE_wexecv */
 #endif /* !__local___localdep_wexecv_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>

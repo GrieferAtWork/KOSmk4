@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe17aa710 */
+/* HASH CRC-32:0xda623bf8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,7 +93,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_localtime64_r
 /* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime64_r,(__time64_t const *__restrict __timer, __STRUCT_TM *__restrict __tp),localtime64_r,(__timer,__tp))
-#elif defined(__CRT_HAVE_localtime_r) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_localtime_r) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime64_r,(__time64_t const *__restrict __timer, __STRUCT_TM *__restrict __tp),localtime_r,(__timer,__tp))
 #else /* ... */

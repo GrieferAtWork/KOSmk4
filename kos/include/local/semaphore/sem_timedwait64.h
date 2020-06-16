@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d1abb04 */
+/* HASH CRC-32:0xb97df8b0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,11 +24,11 @@
 #ifdef __CRT_HAVE_sem_timedwait
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sem_timedwait32 from semaphore */
-#if !defined(__local___localdep_sem_timedwait32_defined) && defined(__CRT_HAVE_sem_timedwait)
+#ifndef __local___localdep_sem_timedwait32_defined
 #define __local___localdep_sem_timedwait32_defined 1
 /* Similar to `sem_wait' but wait only until ABSTIME */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,(sem_t *__restrict __sem, struct __timespec32 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
-#endif /* !__local___localdep_sem_timedwait32_defined && __CRT_HAVE_sem_timedwait */
+#endif /* !__local___localdep_sem_timedwait32_defined */
 __LOCAL_LIBC(sem_timedwait64) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait64))(sem_t *__restrict __sem, struct __timespec64 const *__restrict __abstime) {
 	struct __timespec32 __ts32;

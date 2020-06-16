@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9b4bb78 */
+/* HASH CRC-32:0x77b55944 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32rtombs from parts.uchar.wchar */
 #ifndef __local___localdep_c32rtombs_defined
 #define __local___localdep_c32rtombs_defined 1
-#if defined(__CRT_HAVE_wcsrtombs) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_wcsrtombs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32rtombs,(char *__dst, __CHAR32_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
 #elif defined(__CRT_HAVE_KOS$wcsrtombs)
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32rtombs,(char *__dst, __CHAR32_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
-#elif (__SIZEOF_WCHAR_T__ == 4)
+#elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcsrtombs.h>
 __NAMESPACE_LOCAL_BEGIN

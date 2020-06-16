@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9cc0207 */
+/* HASH CRC-32:0x1be7ab9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32stold from parts.uchar.wchar */
 #ifndef __local___localdep_c32stold_defined
 #define __local___localdep_c32stold_defined 1
-#if defined(__CRT_HAVE_wcstold) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_wcstold) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_c32stold,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr),wcstold,(__nptr,__endptr))
 #elif defined(__CRT_HAVE_KOS$wcstold)
 __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_c32stold,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr),wcstold,(__nptr,__endptr))
-#elif (__SIZEOF_WCHAR_T__ == 4)
+#elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcstold.h>
 __NAMESPACE_LOCAL_BEGIN

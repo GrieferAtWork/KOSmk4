@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d4d4359 */
+/* HASH CRC-32:0x30eb1c5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,12 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: UnlinkAt from kos.unistd */
-#if !defined(__local___localdep_UnlinkAt_defined) && defined(__CRT_HAVE_UnlinkAt)
+#ifndef __local___localdep_UnlinkAt_defined
 #define __local___localdep_UnlinkAt_defined 1
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),UnlinkAt,(__dfd,__name,__flags))
-#endif /* !__local___localdep_UnlinkAt_defined && __CRT_HAVE_UnlinkAt */
+#endif /* !__local___localdep_UnlinkAt_defined */
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __LOCAL_LIBC(Unlink) __ATTR_NONNULL((1)) void

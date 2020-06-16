@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7acdc01 */
+/* HASH CRC-32:0xf4acab77 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__realloc_dbg_defined
 #define __local__realloc_dbg_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__realloc_dbg_defined 1
 #define __localdep__realloc_dbg __LIBC_LOCAL_NAME(_realloc_dbg)
 #endif /* !__local___localdep__realloc_dbg_defined */
-#else /* __CRT_HAVE_calloc || __CRT_HAVE_malloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
+#else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
 #undef __local__realloc_dbg_defined
-#endif /* !__CRT_HAVE_calloc && !__CRT_HAVE_malloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
+#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
 #endif /* !__local__realloc_dbg_defined */

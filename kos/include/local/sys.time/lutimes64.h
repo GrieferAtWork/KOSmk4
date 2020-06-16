@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1609f3f */
+/* HASH CRC-32:0x4e4b60b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,11 +24,11 @@
 #ifdef __CRT_HAVE_lutimes
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: lutimes32 from sys.time */
-#if !defined(__local___localdep_lutimes32_defined) && defined(__CRT_HAVE_lutimes)
+#ifndef __local___localdep_lutimes32_defined
 #define __local___localdep_lutimes32_defined 1
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes32,(char const *__file, struct __timeval32 const __tvp[2]),lutimes,(__file,__tvp))
-#endif /* !__local___localdep_lutimes32_defined && __CRT_HAVE_lutimes */
+#endif /* !__local___localdep_lutimes32_defined */
 /* Same as `utimes', but does not follow symbolic links */
 __LOCAL_LIBC(lutimes64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lutimes64))(char const *__file, struct __timeval64 const __tvp[2]) {

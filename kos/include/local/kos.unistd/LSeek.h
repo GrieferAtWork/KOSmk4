@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65691880 */
+/* HASH CRC-32:0xa0bcd543 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_LSeek_defined
 #define __local_LSeek_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_LSeek) || defined(__CRT_HAVE_LSeek64)
+#if defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: LSeek32 from kos.unistd */
@@ -38,7 +38,7 @@ __CREDIRECT(,__pos32_t,__THROWING,__localdep_LSeek32,(__fd_t __fd, __off32_t __o
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__pos64_t,__THROWING,__localdep_LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),LSeek64,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_LSeek) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_LSeek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__pos64_t,__THROWING,__localdep_LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
@@ -68,7 +68,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_LSeek_defined 1
 #define __localdep_LSeek __LIBC_LOCAL_NAME(LSeek)
 #endif /* !__local___localdep_LSeek_defined */
-#else /* __CRT_HAVE_LSeek || __CRT_HAVE_LSeek64 */
+#else /* __CRT_HAVE_LSeek64 || __CRT_HAVE_LSeek */
 #undef __local_LSeek_defined
-#endif /* !__CRT_HAVE_LSeek && !__CRT_HAVE_LSeek64 */
+#endif /* !__CRT_HAVE_LSeek64 && !__CRT_HAVE_LSeek */
 #endif /* !__local_LSeek_defined */

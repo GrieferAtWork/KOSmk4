@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabfe988 */
+/* HASH CRC-32:0x1eb0a4bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,13 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_strtou32_defined 1
 #ifdef __CRT_HAVE_strtou32
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, int __base),strtou32,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoul) && (__SIZEOF_LONG__ == 4)
+#elif defined(__CRT_HAVE_strtoul) && __SIZEOF_LONG__ == 4
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, int __base),strtoul,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoull) && (__SIZEOF_LONG_LONG__ == 4)
+#elif defined(__CRT_HAVE_strtoull) && __SIZEOF_LONG_LONG__ == 4
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, int __base),strtoull,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtouq) && (__SIZEOF_LONG_LONG__ == 4)
+#elif defined(__CRT_HAVE_strtouq) && __SIZEOF_LONG_LONG__ == 4
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, int __base),strtouq,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoumax) && (__SIZEOF_INTMAX_T__ == 4)
+#elif defined(__CRT_HAVE_strtoumax) && __SIZEOF_INTMAX_T__ == 4
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32,(char const *__restrict __nptr, char **__endptr, int __base),strtoumax,(__nptr,__endptr,__base))
 #else /* ... */
 __NAMESPACE_LOCAL_END
@@ -49,13 +49,13 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64,(char const *__restrict __nptr, char **__endptr, int __base),strtou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__strtoui64)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64,(char const *__restrict __nptr, char **__endptr, int __base),_strtoui64,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoul) && (__SIZEOF_LONG__ == 8)
+#elif defined(__CRT_HAVE_strtoul) && __SIZEOF_LONG__ == 8
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64,(char const *__restrict __nptr, char **__endptr, int __base),strtoul,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoull) && (__SIZEOF_LONG_LONG__ == 8)
+#elif defined(__CRT_HAVE_strtoull) && __SIZEOF_LONG_LONG__ == 8
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64,(char const *__restrict __nptr, char **__endptr, int __base),strtoull,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtouq) && (__SIZEOF_LONG_LONG__ == 8)
+#elif defined(__CRT_HAVE_strtouq) && __SIZEOF_LONG_LONG__ == 8
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64,(char const *__restrict __nptr, char **__endptr, int __base),strtouq,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoumax) && (__SIZEOF_INTMAX_T__ == 8)
+#elif defined(__CRT_HAVE_strtoumax) && __SIZEOF_INTMAX_T__ == 8
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64,(char const *__restrict __nptr, char **__endptr, int __base),strtoumax,(__nptr,__endptr,__base))
 #else /* ... */
 __NAMESPACE_LOCAL_END
@@ -70,7 +70,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoul))(char const *__restrict __np
 	return (unsigned long)__localdep_strtou32(__nptr, __endptr, __base);
 #else /* __SIZEOF_LONG__ <= 4 */
 	return (unsigned long)__localdep_strtou64(__nptr, __endptr, __base);
-#endif /* !(__SIZEOF_LONG__ <= 4) */
+#endif /* __SIZEOF_LONG__ > 4 */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtoul_defined

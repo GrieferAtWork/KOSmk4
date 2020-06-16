@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8398afa9 */
+/* HASH CRC-32:0xf3b188d8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,11 +24,11 @@
 #ifdef __CRT_HAVE_utimensat
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: utimensat32 from sys.stat */
-#if !defined(__local___localdep_utimensat32_defined) && defined(__CRT_HAVE_utimensat)
+#ifndef __local___localdep_utimensat32_defined
 #define __local___localdep_utimensat32_defined 1
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_utimensat32,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
-#endif /* !__local___localdep_utimensat32_defined && __CRT_HAVE_utimensat */
+#endif /* !__local___localdep_utimensat32_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN

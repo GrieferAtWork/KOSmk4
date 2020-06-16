@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1718b6a1 */
+/* HASH CRC-32:0x4f58dc0a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_adjtimex_defined
 #define __local_adjtimex_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64)
+#if defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64) || defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: adjtimex32 from sys.timex */
 #ifndef __local___localdep_adjtimex32_defined
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct 
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),adjtimex64,(__ntx))
 #elif defined(__CRT_HAVE___adjtimex64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),__adjtimex64,(__ntx))
-#elif defined(__CRT_HAVE_adjtimex) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),adjtimex,(__ntx))
 #elif defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 __NAMESPACE_LOCAL_END
@@ -157,7 +157,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_adjtimex_defined 1
 #define __localdep_adjtimex __LIBC_LOCAL_NAME(adjtimex)
 #endif /* !__local___localdep_adjtimex_defined */
-#else /* __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex || __CRT_HAVE_adjtimex64 || __CRT_HAVE___adjtimex64 */
+#else /* __CRT_HAVE_adjtimex64 || __CRT_HAVE___adjtimex64 || __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex */
 #undef __local_adjtimex_defined
-#endif /* !__CRT_HAVE_adjtimex && !__CRT_HAVE___adjtimex && !__CRT_HAVE_adjtimex64 && !__CRT_HAVE___adjtimex64 */
+#endif /* !__CRT_HAVE_adjtimex64 && !__CRT_HAVE___adjtimex64 && !__CRT_HAVE_adjtimex && !__CRT_HAVE___adjtimex */
 #endif /* !__local_adjtimex_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8c823e7 */
+/* HASH CRC-32:0x9396e5e1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -217,7 +217,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc,
 	                     (void *)stream,
 	                     format, args);
-#endif /* !(__SIZEOF_SIZE_T__ == __SIZEOF_INT__) */
+#endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 }
 #include <local/stdstreams.h>
 /* Scan data from `stdin', following `FORMAT'
@@ -383,7 +383,7 @@ NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd,
 	return libc_format_vprintf((pformatprinter)(void *)&libc_write,
 	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
 	                      format, args);
-#endif /* !__SIZEOF_INT__ != __SIZEOF_POINTER__ || __x86_64__ */
+#endif /* __SIZEOF_INT__ == __SIZEOF_POINTER__ || __x86_64__ */
 }
 INTERN ATTR_SECTION(".text.crt.io.write") ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd,
@@ -752,7 +752,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCAN
 	                     &__NAMESPACE_LOCAL_SYM vfscanf_ungetc_unlocked,
 	                     (void *)stream,
 	                     format, args);
-#endif /* !(__SIZEOF_SIZE_T__ == __SIZEOF_INT__) */
+#endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 }
 #include <local/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
@@ -1466,11 +1466,11 @@ INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
 	char const *enodesc;
 	enodesc = libc_strerror(__libc_geterrno());
 	if (message) {
-#if 2 == 2
+
 		libc_fprintf(stderr, "%I16s: %s\n", message, enodesc);
-#else /* 2 == 2 */
-		libc_fprintf(stderr, "%I32s: %s\n", message, enodesc);
-#endif /* !(2 == 2) */
+
+
+
 	} else {
 		libc_fprintf(stderr, "%s\n",
 		        enodesc);
@@ -1483,11 +1483,11 @@ INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
 	char const *enodesc;
 	enodesc = libc_strerror(__libc_geterrno());
 	if (message) {
-#if 4 == 2
-		libc_fprintf(stderr, "%I16s: %s\n", message, enodesc);
-#else /* 4 == 2 */
+
+
+
 		libc_fprintf(stderr, "%I32s: %s\n", message, enodesc);
-#endif /* !(4 == 2) */
+
 	} else {
 		libc_fprintf(stderr, "%s\n",
 		        enodesc);

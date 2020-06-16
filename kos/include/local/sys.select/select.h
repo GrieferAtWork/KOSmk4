@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67a73de7 */
+/* HASH CRC-32:0x7356210a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_select_defined
 #define __local_select_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select) || defined(__CRT_HAVE_select64)
+#if defined(__CRT_HAVE_select64) || defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: select32 from sys.select */
@@ -40,7 +40,7 @@ __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select32,(__STDC_INT
 #define __local___localdep_select64_defined 1
 #ifdef __CRT_HAVE_select64
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select64,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),select64,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
-#elif defined(__CRT_HAVE_select) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_select) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select64,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
 __NAMESPACE_LOCAL_END
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_select_defined 1
 #define __localdep_select __LIBC_LOCAL_NAME(select)
 #endif /* !__local___localdep_select_defined */
-#else /* __CRT_HAVE_select || __CRT_HAVE___select || __CRT_HAVE_select64 */
+#else /* __CRT_HAVE_select64 || __CRT_HAVE_select || __CRT_HAVE___select */
 #undef __local_select_defined
-#endif /* !__CRT_HAVE_select && !__CRT_HAVE___select && !__CRT_HAVE_select64 */
+#endif /* !__CRT_HAVE_select64 && !__CRT_HAVE_select && !__CRT_HAVE___select */
 #endif /* !__local_select_defined */

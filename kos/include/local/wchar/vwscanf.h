@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84ee13d */
+/* HASH CRC-32:0x88608c15 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: vfwscanf from wchar */
 #ifndef __local___localdep_vfwscanf_defined
 #define __local___localdep_vfwscanf_defined 1
-#ifdef __CRT_HAVE_vfwscanf
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfwscanf,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
-#else /* __CRT_HAVE_vfwscanf */
-#undef __local___localdep_vfwscanf_defined
-#endif /* !__CRT_HAVE_vfwscanf */
 #endif /* !__local___localdep_vfwscanf_defined */
 __NAMESPACE_LOCAL_END
 #include <local/stdstreams.h>

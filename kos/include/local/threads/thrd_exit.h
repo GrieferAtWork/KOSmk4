@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71e9e0d0 */
+/* HASH CRC-32:0x283b6132 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,12 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_exit from pthread */
-#if !defined(__local___localdep_pthread_exit_defined) && defined(__CRT_HAVE_pthread_exit)
+#ifndef __local___localdep_pthread_exit_defined
 #define __local___localdep_pthread_exit_defined 1
 /* Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
 __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_pthread_exit,(void *__retval),pthread_exit,(__retval))
-#endif /* !__local___localdep_pthread_exit_defined && __CRT_HAVE_pthread_exit */
+#endif /* !__local___localdep_pthread_exit_defined */
 /* Terminate current thread execution, cleaning up any thread local
  * storage and freeing resources. Returns the value specified in RES
  * s.a. `pthread_exit()' */

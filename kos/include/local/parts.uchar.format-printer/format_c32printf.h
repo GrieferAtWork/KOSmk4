@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d464e5d */
+/* HASH CRC-32:0x5f651420 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_vc32printf from parts.uchar.format-printer */
 #ifndef __local___localdep_format_vc32printf_defined
 #define __local___localdep_format_vc32printf_defined 1
-#if defined(__CRT_HAVE_format_vwprintf) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_format_vwprintf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -205,7 +205,7 @@ __CREDIRECT(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__TH
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 __CREDIRECT_KOS(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vc32printf,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
-#elif (__SIZEOF_WCHAR_T__ == 4)
+#elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_vwprintf.h>
 __NAMESPACE_LOCAL_BEGIN

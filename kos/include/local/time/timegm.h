@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d56a799 */
+/* HASH CRC-32:0xfafdbffa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,7 +108,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_timegm64
 /* Like `mktime', but TP represents Universal Time (UTC), not local time */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_timegm64,(__STRUCT_TM *__tp),timegm64,(__tp))
-#elif defined(__CRT_HAVE_timegm) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_timegm) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Like `mktime', but TP represents Universal Time (UTC), not local time */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_timegm64,(__STRUCT_TM *__tp),timegm,(__tp))
 #else /* ... */

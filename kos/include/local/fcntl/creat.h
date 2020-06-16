@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc432cf90 */
+/* HASH CRC-32:0xf101bdd8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_creat_defined
 #define __local_creat_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_creat64) || (defined(__CRT_HAVE_creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)) || (defined(__CRT_HAVE__creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
+#if (defined(__CRT_HAVE_creat64) || (defined(__CRT_HAVE_creat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || (defined(__CRT_HAVE__creat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: open from fcntl */
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_creat_defined 1
 #define __localdep_creat __LIBC_LOCAL_NAME(creat)
 #endif /* !__local___localdep_creat_defined */
-#else /* (__CRT_HAVE_creat64 || (__CRT_HAVE_creat && (!__O_LARGEFILE || (__O_LARGEFILE+0) == 0)) || (__CRT_HAVE__creat && (!__O_LARGEFILE || (__O_LARGEFILE+0) == 0)) || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open) && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__CRT_AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) */
+#else /* (__CRT_HAVE_creat64 || (__CRT_HAVE_creat && (!__O_LARGEFILE || !__O_LARGEFILE)) || (__CRT_HAVE__creat && (!__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open) && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__CRT_AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) */
 #undef __local_creat_defined
-#endif /* (!__CRT_HAVE_creat64 && (!__CRT_HAVE_creat || (__O_LARGEFILE && !(__O_LARGEFILE+0) == 0)) && (!__CRT_HAVE__creat || (__O_LARGEFILE && !(__O_LARGEFILE+0) == 0)) && !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open) || (!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__CRT_AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) */
+#endif /* (!__CRT_HAVE_creat64 && (!__CRT_HAVE_creat || (__O_LARGEFILE && __O_LARGEFILE)) && (!__CRT_HAVE__creat || (__O_LARGEFILE && __O_LARGEFILE)) && !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open) || (!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__CRT_AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) */
 #endif /* !__local_creat_defined */

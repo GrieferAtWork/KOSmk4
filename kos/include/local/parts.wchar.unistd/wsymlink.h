@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab7ab105 */
+/* HASH CRC-32:0x231cce5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wsymlinkat from parts.wchar.unistd */
-#if !defined(__local___localdep_wsymlinkat_defined) && defined(__CRT_HAVE_wsymlinkat)
+#ifndef __local___localdep_wsymlinkat_defined
 #define __local___localdep_wsymlinkat_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_BEGIN
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_wsymlinkat,(__WCHAR_TYPE__ const *__link_text, __fd_t __tofd, __WCHAR_TYPE__ const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
-#endif /* !__local___localdep_wsymlinkat_defined && __CRT_HAVE_wsymlinkat */
+#endif /* !__local___localdep_wsymlinkat_defined */
 /* >> symlink(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TARGET_PATH'.

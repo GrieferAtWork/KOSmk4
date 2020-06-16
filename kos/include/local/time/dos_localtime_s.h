@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d61be4f */
+/* HASH CRC-32:0x5400a5fd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_dos_localtime_s_defined
 #define __local_dos_localtime_s_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE__localtime32_s) || defined(__CRT_HAVE__localtime64_s)
+#if defined(__CRT_HAVE__localtime64_s) || defined(__CRT_HAVE__localtime32_s)
 #include <bits/types.h>
 #ifndef __STRUCT_TM
 #ifdef __tm_defined
@@ -92,7 +92,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_dos_localtime_s_defined 1
 #define __localdep_dos_localtime_s __LIBC_LOCAL_NAME(dos_localtime_s)
 #endif /* !__local___localdep_dos_localtime_s_defined */
-#else /* __CRT_HAVE__localtime32_s || __CRT_HAVE__localtime64_s */
+#else /* __CRT_HAVE__localtime64_s || __CRT_HAVE__localtime32_s */
 #undef __local_dos_localtime_s_defined
-#endif /* !__CRT_HAVE__localtime32_s && !__CRT_HAVE__localtime64_s */
+#endif /* !__CRT_HAVE__localtime64_s && !__CRT_HAVE__localtime32_s */
 #endif /* !__local_dos_localtime_s_defined */

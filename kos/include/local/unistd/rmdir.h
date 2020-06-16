@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5dc22dc */
+/* HASH CRC-32:0xe03e7c24 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: unlinkat from unistd */
-#if !defined(__local___localdep_unlinkat_defined) && defined(__CRT_HAVE_unlinkat)
+#ifndef __local___localdep_unlinkat_defined
 #define __local___localdep_unlinkat_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_unlinkat,(__fd_t __dfd, char const *__name, __atflag_t __flags),unlinkat,(__dfd,__name,__flags))
-#endif /* !__local___localdep_unlinkat_defined && __CRT_HAVE_unlinkat */
+#endif /* !__local___localdep_unlinkat_defined */
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __LOCAL_LIBC(rmdir) __ATTR_NONNULL((1)) int

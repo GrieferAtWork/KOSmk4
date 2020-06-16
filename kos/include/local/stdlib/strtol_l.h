@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56d7dd6c */
+/* HASH CRC-32:0x362e54f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,17 +27,17 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_strtol_defined 1
 #ifdef __CRT_HAVE_strtol
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_strtol,(char const *__restrict __nptr, char **__endptr, int __base),strtol,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strto32) && (__SIZEOF_LONG__ == 4)
+#elif defined(__CRT_HAVE_strto32) && __SIZEOF_LONG__ == 4
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_strtol,(char const *__restrict __nptr, char **__endptr, int __base),strto32,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strto64) && (__SIZEOF_LONG__ == 8)
+#elif defined(__CRT_HAVE_strto64) && __SIZEOF_LONG__ == 8
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_strtol,(char const *__restrict __nptr, char **__endptr, int __base),strto64,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoll) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+#elif defined(__CRT_HAVE_strtoll) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_strtol,(char const *__restrict __nptr, char **__endptr, int __base),strtoll,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoq) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+#elif defined(__CRT_HAVE_strtoq) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_strtol,(char const *__restrict __nptr, char **__endptr, int __base),strtoq,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE__strtoi64) && (__SIZEOF_LONG__ == 8)
+#elif defined(__CRT_HAVE__strtoi64) && __SIZEOF_LONG__ == 8
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_strtol,(char const *__restrict __nptr, char **__endptr, int __base),_strtoi64,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoimax) && (__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__)
+#elif defined(__CRT_HAVE_strtoimax) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_strtol,(char const *__restrict __nptr, char **__endptr, int __base),strtoimax,(__nptr,__endptr,__base))
 #else /* ... */
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x150be89b */
+/* HASH CRC-32:0x4be7bcbd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,10 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fputwc_unlocked from wchar */
-#if !defined(__local___localdep_fputwc_unlocked_defined) && defined(__CRT_HAVE_fputwc_unlocked)
+#ifndef __local___localdep_fputwc_unlocked_defined
 #define __local___localdep_fputwc_unlocked_defined 1
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
-#endif /* !__local___localdep_fputwc_unlocked_defined && __CRT_HAVE_fputwc_unlocked */
+#endif /* !__local___localdep_fputwc_unlocked_defined */
 __NAMESPACE_LOCAL_END
 #include <local/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN

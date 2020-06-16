@@ -1095,8 +1095,8 @@ NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response)
 }
 /*[[[end:libc_rpmatch]]]*/
 
-/*[[[head:libc_mkstemps64,hash:CRC-32=0x5d24fb80]]]*/
-#if !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0
+/*[[[head:libc_mkstemps64,hash:CRC-32=0xdfb71f3]]]*/
+#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_mkstemps64, libc_mkstemps);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
@@ -1487,8 +1487,8 @@ NOTHROW_NCX(LIBCCALL libc_mkstemp)(char *template_)
 }
 /*[[[end:libc_mkstemp]]]*/
 
-/*[[[head:libc_mkstemp64,hash:CRC-32=0x7c2879f6]]]*/
-#if !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0
+/*[[[head:libc_mkstemp64,hash:CRC-32=0xe2385956]]]*/
+#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_mkstemp64, libc_mkstemp);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
@@ -1629,8 +1629,8 @@ NOTHROW_RPC(LIBCCALL libc_mkostemps)(char *template_,
 }
 /*[[[end:libc_mkostemps]]]*/
 
-/*[[[head:libc_mkostemp64,hash:CRC-32=0x9a868612]]]*/
-#if !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0
+/*[[[head:libc_mkostemp64,hash:CRC-32=0xf1a2db9f]]]*/
+#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_mkostemp64, libc_mkostemp);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
@@ -1647,8 +1647,8 @@ NOTHROW_RPC(LIBCCALL libc_mkostemp64)(char *template_,
 #endif /* MAGIC:alias */
 /*[[[end:libc_mkostemp64]]]*/
 
-/*[[[head:libc_mkostemps64,hash:CRC-32=0x181bc576]]]*/
-#if !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0
+/*[[[head:libc_mkostemps64,hash:CRC-32=0x4e38af15]]]*/
+#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_mkostemps64, libc_mkostemps);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int

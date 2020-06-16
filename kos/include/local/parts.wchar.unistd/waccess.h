@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e27e999 */
+/* HASH CRC-32:0xb171c7bf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,13 @@
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wfaccessat from parts.wchar.unistd */
-#if !defined(__local___localdep_wfaccessat_defined) && defined(__CRT_HAVE_wfaccessat)
+#ifndef __local___localdep_wfaccessat_defined
 #define __local___localdep_wfaccessat_defined 1
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfaccessat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
-#endif /* !__local___localdep_wfaccessat_defined && __CRT_HAVE_wfaccessat */
+#endif /* !__local___localdep_wfaccessat_defined */
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */

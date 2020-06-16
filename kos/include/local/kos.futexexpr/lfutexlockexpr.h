@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6906d1e */
+/* HASH CRC-32:0xd89cf354 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_lfutexlockexpr_defined
 #define __local_lfutexlockexpr_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_lfutexlockexpr) || defined(__CRT_HAVE_lfutexlockexpr64)
+#if defined(__CRT_HAVE_lfutexlockexpr64) || defined(__CRT_HAVE_lfutexlockexpr)
 #include <bits/types.h>
 #include <bits/timespec.h>
 #include <kos/bits/futex-expr.h>
@@ -90,7 +90,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,__localdep_lfutexlockexpr32
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,__localdep_lfutexlockexpr64,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexlockexpr64,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexlockexpr) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_lfutexlockexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> lfutexlockexpr(2)
  * A function that is similar to `lfutexexpr()', but allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex
@@ -205,7 +205,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_lfutexlockexpr_defined 1
 #define __localdep_lfutexlockexpr __LIBC_LOCAL_NAME(lfutexlockexpr)
 #endif /* !__local___localdep_lfutexlockexpr_defined */
-#else /* __CRT_HAVE_lfutexlockexpr || __CRT_HAVE_lfutexlockexpr64 */
+#else /* __CRT_HAVE_lfutexlockexpr64 || __CRT_HAVE_lfutexlockexpr */
 #undef __local_lfutexlockexpr_defined
-#endif /* !__CRT_HAVE_lfutexlockexpr && !__CRT_HAVE_lfutexlockexpr64 */
+#endif /* !__CRT_HAVE_lfutexlockexpr64 && !__CRT_HAVE_lfutexlockexpr */
 #endif /* !__local_lfutexlockexpr_defined */

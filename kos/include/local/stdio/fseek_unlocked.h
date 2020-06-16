@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2040118f */
+/* HASH CRC-32:0x21f0f263 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,13 +51,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restr
 #elif defined(__CRT_HAVE__fseek_nolock)
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko) && (__SIZEOF_LONG__ == __SIZEOF_OFF32_T__)
+#elif defined(__CRT_HAVE_fseeko) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_fseeko64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE__fseeki64) && (__SIZEOF_LONG__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE__fseeki64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 /* Change the current in-file position of `STREAM' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64)

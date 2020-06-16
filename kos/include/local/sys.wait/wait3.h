@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ca1093 */
+/* HASH CRC-32:0xa5f5dd8f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_wait3_defined
 #define __local_wait3_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_wait3) || defined(__CRT_HAVE_wait3_64)
+#if defined(__CRT_HAVE_wait3_64) || defined(__CRT_HAVE_wait3)
 #include <features.h>
 #include <bits/rusage-struct.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait3_64,(__stat_loc,__options,__usage))
-#elif defined(__CRT_HAVE_wait3) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_wait3) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 struct __rusage64;
 __NAMESPACE_LOCAL_BEGIN
@@ -86,7 +86,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wait3_defined 1
 #define __localdep_wait3 __LIBC_LOCAL_NAME(wait3)
 #endif /* !__local___localdep_wait3_defined */
-#else /* __CRT_HAVE_wait3 || __CRT_HAVE_wait3_64 */
+#else /* __CRT_HAVE_wait3_64 || __CRT_HAVE_wait3 */
 #undef __local_wait3_defined
-#endif /* !__CRT_HAVE_wait3 && !__CRT_HAVE_wait3_64 */
+#endif /* !__CRT_HAVE_wait3_64 && !__CRT_HAVE_wait3 */
 #endif /* !__local_wait3_defined */

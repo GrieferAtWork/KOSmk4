@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0b99a06 */
+/* HASH CRC-32:0x276754cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,7 +85,7 @@ __err:
 	struct __local_format_32to32_data *__closure;
 	__closure = (struct __local_format_32to32_data *)__arg;
 	return (*__closure->__fd_printer)(__closure->__fd_arg, (__CHAR32_TYPE__ const *)__data, __datalen);
-#endif /* !(__SIZEOF_WCHAR_T__ == 2) */
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_wto32_defined

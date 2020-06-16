@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4df53dd6 */
+/* HASH CRC-32:0xc08db889 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_fopen_s_defined
 #define __local_fopen_s_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_fopen64) || defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen)
+#if defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fopen64 from stdio */
 #ifndef __local___localdep_fopen64_defined
@@ -32,10 +32,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__local
 #elif defined(__CRT_HAVE_fopen)
 /* 64-bit variant of `fopen' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen64,(char const *__restrict __filename, char const *__restrict __modes),fopen,(__filename,__modes))
-#elif defined(__CRT_HAVE_fopen) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
-/* 64-bit variant of `fopen' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen64,(char const *__restrict __filename, char const *__restrict __modes),fopen,(__filename,__modes))
-#elif defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64)
+#elif defined(__CRT_HAVE__IO_fopen)
 __NAMESPACE_LOCAL_END
 #include <local/stdio/fopen64.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -74,7 +71,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_fopen_s_defined 1
 #define __localdep_fopen_s __LIBC_LOCAL_NAME(fopen_s)
 #endif /* !__local___localdep_fopen_s_defined */
-#else /* __CRT_HAVE_fopen64 || __CRT_HAVE_fopen || __CRT_HAVE__IO_fopen */
+#else /* __CRT_HAVE_fopen || __CRT_HAVE__IO_fopen || __CRT_HAVE_fopen64 */
 #undef __local_fopen_s_defined
-#endif /* !__CRT_HAVE_fopen64 && !__CRT_HAVE_fopen && !__CRT_HAVE__IO_fopen */
+#endif /* !__CRT_HAVE_fopen && !__CRT_HAVE__IO_fopen && !__CRT_HAVE_fopen64 */
 #endif /* !__local_fopen_s_defined */

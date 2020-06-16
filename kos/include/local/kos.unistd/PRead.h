@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ebdd6b4 */
+/* HASH CRC-32:0x17ef25c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_PRead_defined
 #define __local_PRead_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_PRead) || defined(__CRT_HAVE_PRead64)
+#if defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: PRead32 from kos.unistd */
@@ -36,7 +36,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PRead32,(__f
 /* >> pread64(2)
  * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead64,(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PRead) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_PRead) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> pread64(2)
  * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_PRead_defined 1
 #define __localdep_PRead __LIBC_LOCAL_NAME(PRead)
 #endif /* !__local___localdep_PRead_defined */
-#else /* __CRT_HAVE_PRead || __CRT_HAVE_PRead64 */
+#else /* __CRT_HAVE_PRead64 || __CRT_HAVE_PRead */
 #undef __local_PRead_defined
-#endif /* !__CRT_HAVE_PRead && !__CRT_HAVE_PRead64 */
+#endif /* !__CRT_HAVE_PRead64 && !__CRT_HAVE_PRead */
 #endif /* !__local_PRead_defined */

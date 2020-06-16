@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe526382 */
+/* HASH CRC-32:0xc97df5f2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,13 @@
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: timerfd_settime32 from sys.timerfd */
-#if !defined(__local___localdep_timerfd_settime32_defined) && defined(__CRT_HAVE_timerfd_settime)
+#ifndef __local___localdep_timerfd_settime32_defined
 #define __local___localdep_timerfd_settime32_defined 1
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timerfd_settime32,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec32 const *__utmr, struct __itimerspec32 *__otmr),timerfd_settime,(__ufd,__flags,__utmr,__otmr))
-#endif /* !__local___localdep_timerfd_settime32_defined && __CRT_HAVE_timerfd_settime */
+#endif /* !__local___localdep_timerfd_settime32_defined */
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */

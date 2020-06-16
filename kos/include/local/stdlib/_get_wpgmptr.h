@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeeb95ac6 */
+/* HASH CRC-32:0x8ecfffde */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,11 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: __p__wpgmptr from stdlib */
 #ifndef __local___localdep___p__wpgmptr_defined
 #define __local___localdep___p__wpgmptr_defined 1
-#ifdef __CRT_HAVE___p__wpgmptr
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__WCHAR_TYPE__ **,__NOTHROW_NCX,__localdep___p__wpgmptr,(void),__p__wpgmptr,())
-#else /* __CRT_HAVE___p__wpgmptr */
-#undef __local___localdep___p__wpgmptr_defined
-#endif /* !__CRT_HAVE___p__wpgmptr */
 #endif /* !__local___localdep___p__wpgmptr_defined */
 __LOCAL_LIBC(_get_wpgmptr) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_wpgmptr))(__WCHAR_TYPE__ **__pvalue) {

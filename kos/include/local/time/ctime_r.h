@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf297331b */
+/* HASH CRC-32:0x8b827814 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime_
 #elif defined(__CRT_HAVE__ctime64_s) && !defined(__USE_TIME_BITS64)
 /* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __TM_TYPE(time) const *__restrict __timer),_ctime64_s,(__buf,__bufsize,__timer))
-#elif defined(__CRT_HAVE__ctime32_s) || defined(__CRT_HAVE__ctime64_s)
+#elif defined(__CRT_HAVE__ctime64_s) || defined(__CRT_HAVE__ctime32_s)
 __NAMESPACE_LOCAL_END
 #include <local/time/dos_ctime_s.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -110,7 +110,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime_r))(__TM_TYPE(time) const *__re
 #ifdef __BUILDING_LIBC
 	struct __NAMESPACE_STD_SYM tm __ltm;
 	return __localdep_asctime_r(__localdep_localtime_r(__timer, &__ltm), __buf);
-#elif defined(__CRT_HAVE__ctime32_s) || defined(__CRT_HAVE__ctime64_s)
+#elif defined(__CRT_HAVE__ctime64_s) || defined(__CRT_HAVE__ctime32_s)
 	return __localdep_dos_ctime_s(__buf, 26, __timer) ? __NULLPTR : __buf;
 #else /* ... */
 	struct __NAMESPACE_STD_SYM tm __ltm;

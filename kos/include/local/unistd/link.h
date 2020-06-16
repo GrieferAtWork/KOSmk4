@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49b55538 */
+/* HASH CRC-32:0xe3ad6fae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_linkat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: linkat from unistd */
-#if !defined(__local___localdep_linkat_defined) && defined(__CRT_HAVE_linkat)
+#ifndef __local___localdep_linkat_defined
 #define __local___localdep_linkat_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_linkat,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),linkat,(__fromfd,__from,__tofd,__to,__flags))
-#endif /* !__local___localdep_linkat_defined && __CRT_HAVE_linkat */
+#endif /* !__local___localdep_linkat_defined */
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __LOCAL_LIBC(link) __ATTR_NONNULL((1, 2)) int

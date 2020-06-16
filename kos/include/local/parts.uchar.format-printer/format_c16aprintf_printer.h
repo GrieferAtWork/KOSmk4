@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa957a34e */
+/* HASH CRC-32:0x96538792 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,12 @@
 #ifndef __local_format_c16aprintf_printer_defined
 #define __local_format_c16aprintf_printer_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_format_waprintf_alloc) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$format_waprintf_alloc) || defined(__CRT_HAVE_realloc)
+#if (defined(__CRT_HAVE_format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$format_waprintf_alloc) || defined(__CRT_HAVE_realloc)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_c16aprintf_alloc from parts.uchar.format-printer */
 #ifndef __local___localdep_format_c16aprintf_alloc_defined
 #define __local___localdep_format_c16aprintf_alloc_defined 1
-#if defined(__CRT_HAVE_format_waprintf_alloc) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
 #ifndef __format_waprintf_data_defined
 #define __format_waprintf_data_defined 1
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_BEGIN
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
 __CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_format_c16aprintf_alloc,(struct format_c16aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
-#elif defined(__CRT_HAVE_realloc) && (__SIZEOF_WCHAR_T__ == 2)
+#elif defined(__CRT_HAVE_realloc) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_waprintf_alloc.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -90,7 +90,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_memcpyw
 /* Copy memory between non-overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),memcpyw,(__dst,__src,__n_words))
-#elif defined(__CRT_HAVE_wmemcpy) && (__SIZEOF_WCHAR_T__ == 2)
+#elif defined(__CRT_HAVE_wmemcpy) && __SIZEOF_WCHAR_T__ == 2
 /* Copy memory between non-overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),wmemcpy,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_DOS$wmemcpy)
@@ -119,7 +119,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_format_c16aprintf_printer_defined 1
 #define __localdep_format_c16aprintf_printer __LIBC_LOCAL_NAME(format_c16aprintf_printer)
 #endif /* !__local___localdep_format_c16aprintf_printer_defined */
-#else /* (__CRT_HAVE_format_waprintf_alloc && (__SIZEOF_WCHAR_T__ == 2) && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$format_waprintf_alloc || __CRT_HAVE_realloc */
+#else /* (__CRT_HAVE_format_waprintf_alloc && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$format_waprintf_alloc || __CRT_HAVE_realloc */
 #undef __local_format_c16aprintf_printer_defined
-#endif /* (!__CRT_HAVE_format_waprintf_alloc || !(__SIZEOF_WCHAR_T__ == 2) || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$format_waprintf_alloc && !__CRT_HAVE_realloc */
+#endif /* (!__CRT_HAVE_format_waprintf_alloc || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$format_waprintf_alloc && !__CRT_HAVE_realloc */
 #endif /* !__local_format_c16aprintf_printer_defined */

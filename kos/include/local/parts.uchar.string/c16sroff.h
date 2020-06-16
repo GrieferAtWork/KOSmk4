@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70aefc74 */
+/* HASH CRC-32:0xa6d931d2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,13 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16srchrnul from parts.uchar.string */
 #ifndef __local___localdep_c16srchrnul_defined
 #define __local___localdep_c16srchrnul_defined 1
-#if defined(__CRT_HAVE_wcsrchrnul) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_wcsrchrnul) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* Same as `wcsrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16srchrnul,(__CHAR16_TYPE__ const *__restrict __haystack, __CHAR16_TYPE__ __needle),wcsrchrnul,(__haystack,__needle))
 #elif defined(__CRT_HAVE_DOS$wcsrchrnul)
 /* Same as `wcsrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16srchrnul,(__CHAR16_TYPE__ const *__restrict __haystack, __CHAR16_TYPE__ __needle),wcsrchrnul,(__haystack,__needle))
-#elif (__SIZEOF_WCHAR_T__ == 2)
+#elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcsrchrnul.h>
 __NAMESPACE_LOCAL_BEGIN

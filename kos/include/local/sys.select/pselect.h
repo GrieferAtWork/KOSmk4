@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53fec1fc */
+/* HASH CRC-32:0xc1b0c4f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_pselect_defined
 #define __local_pselect_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_pselect) || defined(__CRT_HAVE_pselect64)
+#if defined(__CRT_HAVE_pselect64) || defined(__CRT_HAVE_pselect)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pselect32 from sys.select */
@@ -34,7 +34,7 @@ __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect32,(__STDC_IN
 #define __local___localdep_pselect64_defined 1
 #ifdef __CRT_HAVE_pselect64
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect64,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect64,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
-#elif defined(__CRT_HAVE_pselect) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_pselect) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect64,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect)
 __NAMESPACE_LOCAL_END
@@ -68,7 +68,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_pselect_defined 1
 #define __localdep_pselect __LIBC_LOCAL_NAME(pselect)
 #endif /* !__local___localdep_pselect_defined */
-#else /* __CRT_HAVE_pselect || __CRT_HAVE_pselect64 */
+#else /* __CRT_HAVE_pselect64 || __CRT_HAVE_pselect */
 #undef __local_pselect_defined
-#endif /* !__CRT_HAVE_pselect && !__CRT_HAVE_pselect64 */
+#endif /* !__CRT_HAVE_pselect64 && !__CRT_HAVE_pselect */
 #endif /* !__local_pselect_defined */

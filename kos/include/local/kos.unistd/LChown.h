@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f154a28 */
+/* HASH CRC-32:0xe9915afb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,12 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: FChownAt from kos.unistd */
-#if !defined(__local___localdep_FChownAt_defined) && defined(__CRT_HAVE_FChownAt)
+#ifndef __local___localdep_FChownAt_defined
 #define __local___localdep_FChownAt_defined 1
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_FChownAt,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),FChownAt,(__dfd,__file,__owner,__group,__flags))
-#endif /* !__local___localdep_FChownAt_defined && __CRT_HAVE_FChownAt */
+#endif /* !__local___localdep_FChownAt_defined */
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadf8879c */
+/* HASH CRC-32:0x3558ddfe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,11 +57,11 @@ __NAMESPACE_STD_END
 #endif
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: dos_localtime32_s from time */
-#if !defined(__local___localdep_dos_localtime32_s_defined) && defined(__CRT_HAVE__localtime32_s)
+#ifndef __local___localdep_dos_localtime32_s_defined
 #define __local___localdep_dos_localtime32_s_defined 1
 /* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_localtime32_s,(__STRUCT_TM *__restrict __tp, __time32_t const *__restrict __timer),_localtime32_s,(__tp,__timer))
-#endif /* !__local___localdep_dos_localtime32_s_defined && __CRT_HAVE__localtime32_s */
+#endif /* !__local___localdep_dos_localtime32_s_defined */
 __LOCAL_LIBC(dos_localtime64_s) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_localtime64_s))(__STRUCT_TM *__restrict __tp, __time64_t const *__restrict __timer) {
 	__time32_t __tm32 = *__timer;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd65c91b */
+/* HASH CRC-32:0x14b12232 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: ReadlinkAt from kos.unistd */
-#if !defined(__local___localdep_ReadlinkAt_defined) && defined(__CRT_HAVE_ReadlinkAt)
+#ifndef __local___localdep_ReadlinkAt_defined
 #define __local___localdep_ReadlinkAt_defined 1
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__SIZE_TYPE__,__THROWING,__localdep_ReadlinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, __SIZE_TYPE__ __buflen),ReadlinkAt,(__dfd,__path,__buf,__buflen))
-#endif /* !__local___localdep_ReadlinkAt_defined && __CRT_HAVE_ReadlinkAt */
+#endif /* !__local___localdep_ReadlinkAt_defined */
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73460f2e */
+/* HASH CRC-32:0xd3c4418f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ui64toa_s,(__val,__buf,__buflen,__radix))
-#elif defined(__CRT_HAVE__ultoa_s) && (__SIZEOF_LONG__ == 8)
+#elif defined(__CRT_HAVE__ultoa_s) && __SIZEOF_LONG__ == 8
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN

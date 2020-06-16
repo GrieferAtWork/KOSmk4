@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd4947dd */
+/* HASH CRC-32:0x3792729c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,11 +26,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: vsc16scanf from parts.uchar.stdio */
 #ifndef __local___localdep_vsc16scanf_defined
 #define __local___localdep_vsc16scanf_defined 1
-#if defined(__CRT_HAVE_vswscanf) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_vswscanf) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc16scanf,(__CHAR16_TYPE__ const *__restrict __src, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))
 #elif defined(__CRT_HAVE_DOS$vswscanf)
 __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc16scanf,(__CHAR16_TYPE__ const *__restrict __src, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))
-#elif (__SIZEOF_WCHAR_T__ == 2)
+#elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <local/wchar/vswscanf.h>
 __NAMESPACE_LOCAL_BEGIN

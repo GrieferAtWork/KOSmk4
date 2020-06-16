@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c9a2b25 */
+/* HASH CRC-32:0xd6c7bdaf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __LOCAL_LIBC(format_c16width) __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16width))(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
-#if 2 == 2
+
 	__SIZE_TYPE__ __result = 0;
 	__CHAR16_TYPE__ const *__iter, *__end;
 	(void)__arg;
@@ -41,16 +41,16 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16width))(void *__arg, __CHAR
 		++__result;
 	}
 	return (__SSIZE_TYPE__)__result;
-#else /* 2 == 2 */
-	(void)__arg;
-	(void)__data;
-	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
-	 *      However, magic headers don't support conditional attributes, so we can't just do
-	 *      [if(__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
-	 *      [if(__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
-	__COMPILER_IMPURE();
-	return (__SSIZE_TYPE__)__datalen;
-#endif /* !(2 == 2) */
+
+
+
+
+
+
+
+
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_c16width_defined

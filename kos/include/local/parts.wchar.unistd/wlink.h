@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f472fd0 */
+/* HASH CRC-32:0x44a8efe1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wlinkat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wlinkat from parts.wchar.unistd */
-#if !defined(__local___localdep_wlinkat_defined) && defined(__CRT_HAVE_wlinkat)
+#ifndef __local___localdep_wlinkat_defined
 #define __local___localdep_wlinkat_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_wlinkat,(__fd_t __fromfd, __WCHAR_TYPE__ const *__from, __fd_t __tofd, __WCHAR_TYPE__ const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
-#endif /* !__local___localdep_wlinkat_defined && __CRT_HAVE_wlinkat */
+#endif /* !__local___localdep_wlinkat_defined */
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __LOCAL_LIBC(wlink) __ATTR_NONNULL((1, 2)) int

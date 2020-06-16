@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92b7d865 */
+/* HASH CRC-32:0xb0b0daf1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_clock_nanosleep_defined
 #define __local_clock_nanosleep_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep) || defined(__CRT_HAVE_clock_nanosleep64)
+#if defined(__CRT_HAVE_clock_nanosleep64) || defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
 #include <features.h>
 #include <bits/timespec.h>
 #include <bits/types.h>
@@ -45,7 +45,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep32,(
 #ifdef __CRT_HAVE_clock_nanosleep64
 /* High-resolution sleep with the specified clock */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep64,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec64 const *__requested_time, struct __timespec64 *__remaining),clock_nanosleep64,(__clock_id,__flags,__requested_time,__remaining))
-#elif defined(__CRT_HAVE_clock_nanosleep) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_clock_nanosleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* High-resolution sleep with the specified clock */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep64,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec64 const *__requested_time, struct __timespec64 *__remaining),clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
@@ -90,7 +90,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_clock_nanosleep_defined 1
 #define __localdep_clock_nanosleep __LIBC_LOCAL_NAME(clock_nanosleep)
 #endif /* !__local___localdep_clock_nanosleep_defined */
-#else /* __CRT_HAVE_clock_nanosleep || __CRT_HAVE___clock_nanosleep || __CRT_HAVE_clock_nanosleep64 */
+#else /* __CRT_HAVE_clock_nanosleep64 || __CRT_HAVE_clock_nanosleep || __CRT_HAVE___clock_nanosleep */
 #undef __local_clock_nanosleep_defined
-#endif /* !__CRT_HAVE_clock_nanosleep && !__CRT_HAVE___clock_nanosleep && !__CRT_HAVE_clock_nanosleep64 */
+#endif /* !__CRT_HAVE_clock_nanosleep64 && !__CRT_HAVE_clock_nanosleep && !__CRT_HAVE___clock_nanosleep */
 #endif /* !__local_clock_nanosleep_defined */

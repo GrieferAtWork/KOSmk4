@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b470f0f */
+/* HASH CRC-32:0x629fca83 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_16to32 from unicode */
 #ifndef __local___localdep_format_16to32_defined
 #define __local___localdep_format_16to32_defined 1
-#if defined(__CRT_HAVE_format_wto32) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_format_wto32) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
@@ -35,7 +35,7 @@ __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to32,(void *__arg,
 /* Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __CREDIRECT_DOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
-#elif (__SIZEOF_WCHAR_T__ == 2)
+#elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <local/unicode/format_wto32.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_32to16 from unicode */
 #ifndef __local___localdep_format_32to16_defined
 #define __local___localdep_format_32to16_defined 1
-#if defined(__CRT_HAVE_format_wto16) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_format_wto16) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16 output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
@@ -62,7 +62,7 @@ __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to16,(void *__arg,
 /* Format printer (compatible with `__pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-16 output */
 __CREDIRECT_KOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
-#elif (__SIZEOF_WCHAR_T__ == 4)
+#elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <local/unicode/format_wto16.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -113,7 +113,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_c16escape from parts.uchar.format-printer */
 #ifndef __local___localdep_format_c16escape_defined
 #define __local___localdep_format_c16escape_defined 1
-#if defined(__CRT_HAVE_format_wescape) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_format_wescape) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -143,7 +143,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16e
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif (__SIZEOF_WCHAR_T__ == 2)
+#elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_wescape.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -184,7 +184,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_c16hexdump from parts.uchar.format-printer */
 #ifndef __local___localdep_format_c16hexdump_defined
 #define __local___localdep_format_c16hexdump_defined 1
-#if defined(__CRT_HAVE_format_whexdump) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_format_whexdump) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* Print a hex dump of the given data using the provided format printer
  * @param: PRINTER:  A function called for all quoted portions of the text
  * @param: DATA:     A pointer to the data that should be dumped
@@ -206,7 +206,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16h
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16hexdump,(__pc16formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
-#elif (__SIZEOF_WCHAR_T__ == 2)
+#elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_whexdump.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -239,7 +239,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_c16repeat from parts.uchar.format-printer */
 #ifndef __local___localdep_format_c16repeat_defined
 #define __local___localdep_format_c16repeat_defined 1
-#if defined(__CRT_HAVE_format_wrepeat) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_format_wrepeat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
@@ -249,7 +249,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16r
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16repeat,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
-#elif (__SIZEOF_WCHAR_T__ == 2)
+#elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_wrepeat.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -270,13 +270,13 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_c16width from parts.uchar.format-printer */
 #ifndef __local___localdep_format_c16width_defined
 #define __local___localdep_format_c16width_defined 1
-#if defined(__CRT_HAVE_format_wwidth) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_format_wwidth) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c16width,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wwidth)
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c16width,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
-#elif (__SIZEOF_WCHAR_T__ == 2)
+#elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_wwidth.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -293,7 +293,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_c32escape from parts.uchar.format-printer */
 #ifndef __local___localdep_format_c32escape_defined
 #define __local___localdep_format_c32escape_defined 1
-#if defined(__CRT_HAVE_format_wescape) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_format_wescape) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -323,7 +323,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32e
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
-#elif (__SIZEOF_WCHAR_T__ == 4)
+#elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_wescape.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -370,13 +370,13 @@ __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__local
 #elif defined(__CRT_HAVE_KOS$format_length)
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c32width,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_format_wwidth) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE_format_wwidth) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c32width,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$format_wwidth)
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c32width,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
-#elif (__SIZEOF_WCHAR_T__ == 4)
+#elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_wwidth.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -508,7 +508,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_unlocked");
-#elif defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s) || defined(__CRT_HAVE_vprintf_unlocked) || (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)))
+#elif defined(__CRT_HAVE_vprintf) || defined(__CRT_HAVE_vprintf_s) || defined(__CRT_HAVE_vprintf_unlocked) || (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)))
 __NAMESPACE_LOCAL_END
 #include <local/stdio/printf.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -657,19 +657,19 @@ __LOCAL_LIBC(format_vc16printf) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3))
 #define __FORMAT_ESCAPE             __localdep_format_c16escape
 #define __FORMAT_WIDTH8             __localdep_format_width
 #define __FORMAT_ESCAPE8            __localdep_format_escape
-#if 2 == 2
+
 #define __FORMAT_WIDTH32            __localdep_format_c32width
 #define __FORMAT_ESCAPE32           __localdep_format_c32escape
 #define __FORMAT_UNICODE_WRITECHAR  __localdep_unicode_writeutf16
 #define __FORMAT_UNICODE_FORMAT8    __localdep_format_8to16
 #define __FORMAT_UNICODE_FORMAT32   __localdep_format_32to16
-#else /* 2 == 2 */
-#define __FORMAT_WIDTH16            __localdep_format_c16width
-#define __FORMAT_ESCAPE16           __localdep_format_c16escape
-#define __FORMAT_UNICODE_WRITECHAR(__dst, __ch) ((__dst)[0] = (__ch), (__dst) + 1)
-#define __FORMAT_UNICODE_FORMAT8    __localdep_format_8to32
-#define __FORMAT_UNICODE_FORMAT16   __localdep_format_16to32
-#endif /* !(2 == 2) */
+
+
+
+
+
+
+
 #include <local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }

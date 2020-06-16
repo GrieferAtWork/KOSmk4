@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f277001 */
+/* HASH CRC-32:0x143564d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -519,7 +519,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 					a = __hybrid_unaligned_get32((u32 *)(line_data + i));
 					b = __hybrid_unaligned_get32((u32 *)(line_data + i + 4));
-#endif /* !(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					dst = buffer + 16;
 					while (dst > buffer + 8) {
 						*--dst = dec[b & 0xf];
@@ -529,7 +529,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
 						*--dst = dec[a & 0xf];
 						a >>= 4;
 					}
-#endif /* !(__SIZEOF_POINTER__ >= 8) */
+#endif /* __SIZEOF_POINTER__ < 8 */
 					temp = (*printer)(arg, buffer, 17);
 					if unlikely(temp < 0)
 						goto err;
@@ -1001,13 +1001,13 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__res
 			self->ap_base = (char *)libc_malloc(1 * sizeof(char));
 			if unlikely(!self->ap_base)
 				return NULL;
-#elif defined(__CRT_HAVE_realloc)
-			self->ap_base = (char *)libc_realloc(NULL, 1 * sizeof(char));
-			if unlikely(!self->ap_base)
-				return NULL;
-#else /* ... */
+
+
+
+
+#else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
 			return NULL;
-#endif /* !... */
+#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
 		}
 	}
 	result = self->ap_base;

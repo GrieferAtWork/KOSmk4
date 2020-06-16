@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70af943c */
+/* HASH CRC-32:0x23537fde */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,12 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: Truncate32 from kos.unistd */
-#if !defined(__local___localdep_Truncate32_defined) && defined(__CRT_HAVE_Truncate)
+#ifndef __local___localdep_Truncate32_defined
 #define __local___localdep_Truncate32_defined 1
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),__vodi,__THROWING,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length))
-#endif /* !__local___localdep_Truncate32_defined && __CRT_HAVE_Truncate */
+#endif /* !__local___localdep_Truncate32_defined */
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __LOCAL_LIBC(Truncate64) __ATTR_NONNULL((1)) void

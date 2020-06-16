@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4411c988 */
+/* HASH CRC-32:0xba3e752e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_c32repeat from parts.uchar.format-printer */
 #ifndef __local___localdep_format_c32repeat_defined
 #define __local___localdep_format_c32repeat_defined 1
-#if defined(__CRT_HAVE_format_wrepeat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_format_wrepeat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32r
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32repeat,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions),format_wrepeat,(__printer,__arg,__ch,__num_repetitions))
-#elif (__SIZEOF_WCHAR_T__ == 4)
+#elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.format-printer/format_wrepeat.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -206,7 +206,7 @@ __LOCAL_LIBC(format_c32hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 					__a = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
 					__b = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i + 4));
-#endif /* !(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					__dst = __buffer + 16;
 					while (__dst > __buffer + 8) {
 						*--__dst = __dec[__b & 0xf];
@@ -216,7 +216,7 @@ __LOCAL_LIBC(format_c32hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 						*--__dst = __dec[__a & 0xf];
 						__a >>= 4;
 					}
-#endif /* !(__SIZEOF_POINTER__ >= 8) */
+#endif /* __SIZEOF_POINTER__ < 8 */
 					__temp = (*__printer)(__arg, __buffer, 17);
 					if __unlikely(__temp < 0)
 						goto __err;

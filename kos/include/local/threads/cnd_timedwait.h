@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b0b8d63 */
+/* HASH CRC-32:0xbb834a5c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_cnd_timedwait_defined
 #define __local_cnd_timedwait_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64)
+#if defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <bits/threads.h>
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_pthread_cond_timedwait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
-#elif defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64)
+#elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 __NAMESPACE_LOCAL_END
 #include <local/pthread/pthread_cond_timedwait.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -83,7 +83,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_cnd_timedwait_defined 1
 #define __localdep_cnd_timedwait __LIBC_LOCAL_NAME(cnd_timedwait)
 #endif /* !__local___localdep_cnd_timedwait_defined */
-#else /* __CRT_HAVE_pthread_cond_timedwait || __CRT_HAVE_pthread_cond_timedwait64 */
+#else /* __CRT_HAVE_pthread_cond_timedwait64 || __CRT_HAVE_pthread_cond_timedwait */
 #undef __local_cnd_timedwait_defined
-#endif /* !__CRT_HAVE_pthread_cond_timedwait && !__CRT_HAVE_pthread_cond_timedwait64 */
+#endif /* !__CRT_HAVE_pthread_cond_timedwait64 && !__CRT_HAVE_pthread_cond_timedwait */
 #endif /* !__local_cnd_timedwait_defined */

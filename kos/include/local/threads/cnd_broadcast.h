@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63ebbdc1 */
+/* HASH CRC-32:0x60c8a837 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,11 @@
 #include <bits/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_cond_broadcast from pthread */
-#if !defined(__local___localdep_pthread_cond_broadcast_defined) && defined(__CRT_HAVE_pthread_cond_broadcast)
+#ifndef __local___localdep_pthread_cond_broadcast_defined
 #define __local___localdep_pthread_cond_broadcast_defined 1
 /* Wake up all threads waiting for condition variables COND */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_cond_broadcast,(__pthread_cond_t *__cond),pthread_cond_broadcast,(__cond))
-#endif /* !__local___localdep_pthread_cond_broadcast_defined && __CRT_HAVE_pthread_cond_broadcast */
+#endif /* !__local___localdep_pthread_cond_broadcast_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/threads.h>
 #include <bits/pthreadtypes.h>

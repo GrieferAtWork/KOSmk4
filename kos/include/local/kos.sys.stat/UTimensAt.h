@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bec8fd9 */
+/* HASH CRC-32:0xa45381d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_UTimensAt_defined
 #define __local_UTimensAt_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_UTimensAt) || defined(__CRT_HAVE_UTimensAt64)
+#if defined(__CRT_HAVE_UTimensAt64) || defined(__CRT_HAVE_UTimensAt)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: UTimensAt32 from kos.sys.stat */
@@ -36,7 +36,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UTimensAt32,(__fd_t _
 #ifdef __CRT_HAVE_UTimensAt64
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UTimensAt64,(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt64,(__dirfd,__filename,__times,__flags))
-#elif defined(__CRT_HAVE_UTimensAt) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_UTimensAt) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UTimensAt64,(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_UTimensAt)
@@ -118,7 +118,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_UTimensAt_defined 1
 #define __localdep_UTimensAt __LIBC_LOCAL_NAME(UTimensAt)
 #endif /* !__local___localdep_UTimensAt_defined */
-#else /* __CRT_HAVE_UTimensAt || __CRT_HAVE_UTimensAt64 */
+#else /* __CRT_HAVE_UTimensAt64 || __CRT_HAVE_UTimensAt */
 #undef __local_UTimensAt_defined
-#endif /* !__CRT_HAVE_UTimensAt && !__CRT_HAVE_UTimensAt64 */
+#endif /* !__CRT_HAVE_UTimensAt64 && !__CRT_HAVE_UTimensAt */
 #endif /* !__local_UTimensAt_defined */

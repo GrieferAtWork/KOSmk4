@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa9a16ea */
+/* HASH CRC-32:0xd5816e51 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,11 +26,11 @@
 #include <bits/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_mutex_init from pthread */
-#if !defined(__local___localdep_pthread_mutex_init_defined) && defined(__CRT_HAVE_pthread_mutex_init)
+#ifndef __local___localdep_pthread_mutex_init_defined
 #define __local___localdep_pthread_mutex_init_defined 1
 /* Initialize a mutex */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutex_init,(__pthread_mutex_t *__mutex, __pthread_mutexattr_t const *__mutexattr),pthread_mutex_init,(__mutex,__mutexattr))
-#endif /* !__local___localdep_pthread_mutex_init_defined && __CRT_HAVE_pthread_mutex_init */
+#endif /* !__local___localdep_pthread_mutex_init_defined */
 /* Dependency: pthread_mutexattr_destroy from pthread */
 #if !defined(__local___localdep_pthread_mutexattr_destroy_defined) && defined(__CRT_HAVE_pthread_mutexattr_destroy)
 #define __local___localdep_pthread_mutexattr_destroy_defined 1

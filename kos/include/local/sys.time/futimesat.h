@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c9799ab */
+/* HASH CRC-32:0x549aa20c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_futimesat_defined
 #define __local_futimesat_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_futimesat) || defined(__CRT_HAVE_futimesat64)
+#if defined(__CRT_HAVE_futimesat64) || defined(__CRT_HAVE_futimesat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: futimesat32 from sys.time */
 #if !defined(__local___localdep_futimesat32_defined) && defined(__CRT_HAVE_futimesat)
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,__localdep_futimesat32,(__f
 #ifdef __CRT_HAVE_futimesat64
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_futimesat64,(__fd_t __fd, char const *__file, struct __timeval64 const __tvp[2]),futimesat64,(__fd,__file,__tvp))
-#elif defined(__CRT_HAVE_futimesat) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_futimesat) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_futimesat64,(__fd_t __fd, char const *__file, struct __timeval64 const __tvp[2]),futimesat,(__fd,__file,__tvp))
 #elif defined(__CRT_HAVE_futimesat)
@@ -76,7 +76,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_futimesat_defined 1
 #define __localdep_futimesat __LIBC_LOCAL_NAME(futimesat)
 #endif /* !__local___localdep_futimesat_defined */
-#else /* __CRT_HAVE_futimesat || __CRT_HAVE_futimesat64 */
+#else /* __CRT_HAVE_futimesat64 || __CRT_HAVE_futimesat */
 #undef __local_futimesat_defined
-#endif /* !__CRT_HAVE_futimesat && !__CRT_HAVE_futimesat64 */
+#endif /* !__CRT_HAVE_futimesat64 && !__CRT_HAVE_futimesat */
 #endif /* !__local_futimesat_defined */

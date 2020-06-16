@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16747776 */
+/* HASH CRC-32:0x6e9e9ab3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_pthread_timedjoin_np_defined
 #define __local_pthread_timedjoin_np_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_pthread_timedjoin_np) || defined(__CRT_HAVE_pthread_timedjoin64_np)
+#if defined(__CRT_HAVE_pthread_timedjoin64_np) || defined(__CRT_HAVE_pthread_timedjoin_np)
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -38,7 +38,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_pthread_timedjoin32_np,(__pthread_t __
 #define __local___localdep_pthread_timedjoin64_np_defined 1
 #ifdef __CRT_HAVE_pthread_timedjoin64_np
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_pthread_timedjoin64_np,(__pthread_t __pthread, void **__thread_return, struct __timespec64 const *__abstime),pthread_timedjoin64_np,(__pthread,__thread_return,__abstime))
-#elif defined(__CRT_HAVE_pthread_timedjoin_np) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_pthread_timedjoin_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_pthread_timedjoin64_np,(__pthread_t __pthread, void **__thread_return, struct __timespec64 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin_np)
 __NAMESPACE_LOCAL_END
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_pthread_timedjoin_np_defined 1
 #define __localdep_pthread_timedjoin_np __LIBC_LOCAL_NAME(pthread_timedjoin_np)
 #endif /* !__local___localdep_pthread_timedjoin_np_defined */
-#else /* __CRT_HAVE_pthread_timedjoin_np || __CRT_HAVE_pthread_timedjoin64_np */
+#else /* __CRT_HAVE_pthread_timedjoin64_np || __CRT_HAVE_pthread_timedjoin_np */
 #undef __local_pthread_timedjoin_np_defined
-#endif /* !__CRT_HAVE_pthread_timedjoin_np && !__CRT_HAVE_pthread_timedjoin64_np */
+#endif /* !__CRT_HAVE_pthread_timedjoin64_np && !__CRT_HAVE_pthread_timedjoin_np */
 #endif /* !__local_pthread_timedjoin_np_defined */

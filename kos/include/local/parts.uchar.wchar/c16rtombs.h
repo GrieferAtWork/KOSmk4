@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba0c6f08 */
+/* HASH CRC-32:0xff107b7c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: uchar_c16rtomb from uchar */
 #ifndef __local___localdep_uchar_c16rtomb_defined
 #define __local___localdep_uchar_c16rtomb_defined 1
-#if defined(__CRT_HAVE_wcrtomb) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_wcrtomb) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_DOS$wcrtomb)
 __CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
@@ -50,7 +50,7 @@ __CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, __mbstate_t *__mbs),c16rtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_DOS$c16rtomb)
 __CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, __mbstate_t *__mbs),c16rtomb,(__str,__wc,__mbs))
-#elif (__SIZEOF_WCHAR_T__ == 2)
+#elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcrtomb.h>
 __NAMESPACE_LOCAL_BEGIN

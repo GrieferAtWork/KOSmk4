@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64762f3d */
+/* HASH CRC-32:0x1f981694 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset),preadv64,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_preadv) && !defined(__USE_FILE_OFFSET64)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset),(__fd,__iov,__count,__offset))
-#elif defined(__CRT_HAVE_preadv) || defined(__CRT_HAVE_preadv64)
+#elif defined(__CRT_HAVE_preadv64) || defined(__CRT_HAVE_preadv)
 #include <local/sys.uio/preadv.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(preadv, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL preadv)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadv))(__fd, __iov, __count, __offset); })
 #endif /* ... */
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(preadv, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNU
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwritev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset),pwritev64,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_pwritev) && !defined(__USE_FILE_OFFSET64)
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwritev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset),(__fd,__iov,__count,__offset))
-#elif defined(__CRT_HAVE_pwritev) || defined(__CRT_HAVE_pwritev64)
+#elif defined(__CRT_HAVE_pwritev64) || defined(__CRT_HAVE_pwritev)
 #include <local/sys.uio/pwritev.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(pwritev, __FORCELOCAL __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL pwritev)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwritev))(__fd, __iov, __count, __offset); })
 #endif /* ... */
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pwritev, __FORCELOCAL __ATTR_NONNULL((2)) ssize_
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_preadv64
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),(__fd,__iov,__count,__offset))
-#elif defined(__CRT_HAVE_preadv) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_preadv) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_preadv)
 #include <local/sys.uio/preadv64.h>
@@ -83,7 +83,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(preadv64, __FORCELOCAL __ATTR_WUNUSED __ATTR_NON
 #endif /* ... */
 #ifdef __CRT_HAVE_pwritev64
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwritev64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),(__fd,__iov,__count,__offset))
-#elif defined(__CRT_HAVE_pwritev) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_pwritev) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwritev64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),pwritev,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_pwritev)
 #include <local/sys.uio/pwritev64.h>

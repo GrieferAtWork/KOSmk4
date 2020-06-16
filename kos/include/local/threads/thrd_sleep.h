@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f9f50fc */
+/* HASH CRC-32:0x49c7973a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_thrd_sleep_defined
 #define __local_thrd_sleep_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE_nanosleep64)
+#if defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: crt_thrd_sleep64 from threads */
@@ -47,7 +47,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep,(struct t
 #elif defined(__CRT_HAVE___nanosleep)
 /* Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep,(struct timespec const *__requested_time, struct timespec *__remaining),__nanosleep,(__requested_time,__remaining))
-#elif defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE_nanosleep64)
+#elif defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep)
 __NAMESPACE_LOCAL_END
 #include <local/time/nanosleep.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -119,7 +119,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_thrd_sleep_defined 1
 #define __localdep_thrd_sleep __LIBC_LOCAL_NAME(thrd_sleep)
 #endif /* !__local___localdep_thrd_sleep_defined */
-#else /* __CRT_HAVE_thrd_sleep || __CRT_HAVE_thrd_sleep64 || __CRT_HAVE___nanosleep || __CRT_HAVE_nanosleep || __CRT_HAVE_nanosleep64 */
+#else /* __CRT_HAVE_thrd_sleep || __CRT_HAVE_thrd_sleep64 || __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep */
 #undef __local_thrd_sleep_defined
-#endif /* !__CRT_HAVE_thrd_sleep && !__CRT_HAVE_thrd_sleep64 && !__CRT_HAVE___nanosleep && !__CRT_HAVE_nanosleep && !__CRT_HAVE_nanosleep64 */
+#endif /* !__CRT_HAVE_thrd_sleep && !__CRT_HAVE_thrd_sleep64 && !__CRT_HAVE_nanosleep64 && !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep */
 #endif /* !__local_thrd_sleep_defined */

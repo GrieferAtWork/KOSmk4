@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9540f83c */
+/* HASH CRC-32:0x4466f032 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,12 @@
 #ifndef __local_c32symlink_defined
 #define __local_c32symlink_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wsymlinkat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wsymlinkat))
+#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wsymlinkat))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32symlinkat from parts.uchar.unistd */
 #ifndef __local___localdep_c32symlinkat_defined
 #define __local___localdep_c32symlinkat_defined 1
-#if defined(__CRT_HAVE_wsymlinkat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c32symlink_defined 1
 #define __localdep_c32symlink __LIBC_LOCAL_NAME(c32symlink)
 #endif /* !__local___localdep_c32symlink_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wsymlinkat && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wsymlinkat) */
+#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wsymlinkat && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wsymlinkat) */
 #undef __local_c32symlink_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wsymlinkat || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wsymlinkat) */
+#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wsymlinkat || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wsymlinkat) */
 #endif /* !__local_c32symlink_defined */

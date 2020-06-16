@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2f3f9e1 */
+/* HASH CRC-32:0xe7b67bc7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_ppoll_defined
 #define __local_ppoll_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_ppoll) || defined(__CRT_HAVE_ppoll64)
+#if defined(__CRT_HAVE_ppoll64) || defined(__CRT_HAVE_ppoll)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: ppoll32 from sys.poll */
 #if !defined(__local___localdep_ppoll32_defined) && defined(__CRT_HAVE_ppoll)
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll32,(struct pol
 #define __local___localdep_ppoll64_defined 1
 #ifdef __CRT_HAVE_ppoll64
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll64,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss),ppoll64,(__fds,__nfds,__timeout,__ss))
-#elif defined(__CRT_HAVE_ppoll) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_ppoll) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll64,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
 #elif defined(__CRT_HAVE_ppoll)
 __NAMESPACE_LOCAL_END
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_ppoll_defined 1
 #define __localdep_ppoll __LIBC_LOCAL_NAME(ppoll)
 #endif /* !__local___localdep_ppoll_defined */
-#else /* __CRT_HAVE_ppoll || __CRT_HAVE_ppoll64 */
+#else /* __CRT_HAVE_ppoll64 || __CRT_HAVE_ppoll */
 #undef __local_ppoll_defined
-#endif /* !__CRT_HAVE_ppoll && !__CRT_HAVE_ppoll64 */
+#endif /* !__CRT_HAVE_ppoll64 && !__CRT_HAVE_ppoll */
 #endif /* !__local_ppoll_defined */

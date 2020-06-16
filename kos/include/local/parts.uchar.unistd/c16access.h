@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65e81c61 */
+/* HASH CRC-32:0x6729e9e0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,13 @@
 #ifndef __local_c16access_defined
 #define __local_c16access_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wfaccessat) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wfaccessat))
+#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wfaccessat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wfaccessat))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16faccessat from parts.uchar.unistd */
 #ifndef __local___localdep_c16faccessat_defined
 #define __local___localdep_c16faccessat_defined 1
-#if defined(__CRT_HAVE_wfaccessat) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_wfaccessat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c16access_defined 1
 #define __localdep_c16access __LIBC_LOCAL_NAME(c16access)
 #endif /* !__local___localdep_c16access_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wfaccessat && (__SIZEOF_WCHAR_T__ == 2) && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wfaccessat) */
+#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wfaccessat && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wfaccessat) */
 #undef __local_c16access_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wfaccessat || !(__SIZEOF_WCHAR_T__ == 2) || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wfaccessat) */
+#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wfaccessat || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wfaccessat) */
 #endif /* !__local_c16access_defined */

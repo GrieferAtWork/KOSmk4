@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34b41496 */
+/* HASH CRC-32:0xb9d71b34 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,13 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16snlen from parts.uchar.string */
 #ifndef __local___localdep_c16snlen_defined
 #define __local___localdep_c16snlen_defined 1
-#if defined(__CRT_HAVE_wcsnlen) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_wcsnlen) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16snlen,(__CHAR16_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #elif defined(__CRT_HAVE_DOS$wcsnlen)
 /* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16snlen,(__CHAR16_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
-#elif (__SIZEOF_WCHAR_T__ == 2)
+#elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcsnlen.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -83,13 +83,13 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_memrevw_defined */
 __LOCAL_LIBC(c16snrev) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16snrev))(__CHAR16_TYPE__ *__restrict __str, __SIZE_TYPE__ __maxlen) {
-#if 2 == 2
+
 	return (__CHAR16_TYPE__ *)__localdep_memrevw(__str, __localdep_c16snlen(__str, __maxlen));
-#elif 2 == 4
-	return (__CHAR16_TYPE__ *)__localdep_memrevl(__str, __localdep_c16snlen(__str, __maxlen));
-#else /* ... */
-	return (__CHAR16_TYPE__ *)__localdep_memrev(__str, __localdep_c16snlen(__str, __maxlen) * sizeof(__CHAR16_TYPE__));
-#endif /* !... */
+
+
+
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16snrev_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54a905bb */
+/* HASH CRC-32:0xab05779c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_lfutexexpr_defined
 #define __local_lfutexexpr_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_lfutexexpr) || defined(__CRT_HAVE_lfutexexpr64)
+#if defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
 #include <bits/types.h>
 #include <bits/timespec.h>
 #include <kos/bits/futex-expr.h>
@@ -90,7 +90,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_lfutexexpr32,(void 
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_lfutexexpr64,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr64,(__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexexpr) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_lfutexexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
@@ -205,7 +205,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_lfutexexpr_defined 1
 #define __localdep_lfutexexpr __LIBC_LOCAL_NAME(lfutexexpr)
 #endif /* !__local___localdep_lfutexexpr_defined */
-#else /* __CRT_HAVE_lfutexexpr || __CRT_HAVE_lfutexexpr64 */
+#else /* __CRT_HAVE_lfutexexpr64 || __CRT_HAVE_lfutexexpr */
 #undef __local_lfutexexpr_defined
-#endif /* !__CRT_HAVE_lfutexexpr && !__CRT_HAVE_lfutexexpr64 */
+#endif /* !__CRT_HAVE_lfutexexpr64 && !__CRT_HAVE_lfutexexpr */
 #endif /* !__local_lfutexexpr_defined */

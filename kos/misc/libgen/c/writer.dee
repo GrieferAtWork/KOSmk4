@@ -20,8 +20,8 @@
 
 import * from deemon;
 import * from .namespace;
-import * from ..optiexpr;
 import * from collections;
+import * from .ppexpr;
 import functools;
 
 #define UserString Object  /* UserString from .parser */
@@ -190,8 +190,8 @@ done:
 				 * >> #if !FOO && BAR
 				 * >> ... */
 				pendingParts.popback();
-				cond = optimizePreprocessorExpression("!({}) && ({})"
-					.format({ lastPart[1], cond }));
+				cond = ppParse("!({}) && ({})".format({ lastPart[1], cond }))
+					.optimize().tostr();
 				pendingParts.append((lastPart[0], cond));
 				return this;
 			}
@@ -214,8 +214,8 @@ done:
 				 * >> #if !FOO
 				 * >> ... */
 				pendingParts.popback();
-				local cond = optimizePreprocessorExpression("!({})"
-					.format({ lastPart[1] }));
+				local cond = ppParse("!({})".format({ lastPart[1] }))
+					.optimize().tostr();
 				pendingParts.append((lastPart[0], cond));
 				return this;
 			}
@@ -449,13 +449,15 @@ nope:
 
 class IfDefStackEntry {
 	this = default;
-	public member cond: string | none = none;    /* Condition to print for #else or #endif (or none if not set) */
+	public member cond: PPBranch | none = none;  /* Condition to print for #else or #endif (or none if not set) */
 	public member didWriteIf: bool = false;      /* #if, #ifdef or #ifndef was printed */
 	public member didWriteElse: bool = false;    /* #else was printed */
 	public member encounteredElse: bool = false; /* ppElse() was called */
 	public member encounteredIf0: bool = false;  /* m_IfdefDead was incremented because of ppElif("0") or ppIf("0") */
 	public member encounteredIf1: bool = false;  /* didWriteElse is true because of ppElif("1") or ppIf("1") */
-	public member printedPrefixes: {string...} = HashSet(); /* Set of prefix strings that have already been printed. */
+	public member printedPrefixes: {string...};  /* Set of prefix strings that have already been printed. */
+	public member ppAssumeWithCond: PPAssume;    /* Preprocessor assumptions when `cond != 0' */
+	public member ppAssumeWithNotCond: PPAssume; /* Preprocessor assumptions when `cond == 0' */
 }
 
 
@@ -464,9 +466,10 @@ class IfDefStackEntry {
 class CWriter {
 
 	@@@param: fp: The underlying file to which to output generated text
-	this(fp: File, keepNewLinesFromDeadCode: bool = false) {
+	this(fp: File, keepNewLinesFromDeadCode: bool = false, ppAssume: PPAssume = none) {
 		this.keepNewLinesFromDeadCode = keepNewLinesFromDeadCode;
 		this.generator = CGenerator(fp: fp);
+		this.m_ppAssume = ppAssume !is none ? ppAssume : PPAssume(assumptions: Dict());
 	}
 
 	@@The underlying generator used to produce output
@@ -494,8 +497,20 @@ class CWriter {
 		get(): bool -> m_IfdefDead != 0;
 	}
 
+	@@Return the preprocessor assumptions for the current scope
+	public property ppAssume: PPAssume = {
+		get(): PPAssume {
+			if (m_IfdefStack)
+				return m_IfdefStack.last.ppAssumeWithCond;
+			return m_ppAssume;
+		}
+	}
+
 	@@Stack of active #if-directives
 	private member m_IfdefStack: {IfDefStackEntry...} = [];
+
+	@@Default, global-scope pre-processor assumptions
+	private member m_ppAssume: PPAssume;
 
 	@@Non-zero if no text should current be emit
 	private member m_IfdefDead: int = 0;
@@ -512,23 +527,42 @@ class CWriter {
 	@@Insert a preprocessor directive `#if cond`
 	@@@return: * : The # of printed new-line characters
 	public function ppIf(cond: string): int {
-		local result = 0;
-		if (m_IfdefDead)
-			cond = "0"; /* Speed up some code... (and won't make a difference...) */
-		if (cond !is string)
-			cond = str cond;
-		cond = optimizePreprocessorExpression(cond);
-		local ent = IfDefStackEntry(cond: cond);
-		if (cond == "1") {
-			ent.encounteredIf1 = true;
-		} else if (cond == "0") {
-			ent.encounteredIf0 = true;
+		local condBranch: PPBranch;
+		local ent: IfDefStackEntry;
+		if (m_IfdefDead) {
+			/* Speed up some code... (and won't make a difference...) */
+			condBranch = PPBranch(BRT_CONST, 0);
+			ent = IfDefStackEntry(cond: condBranch);
+			ent.encounteredIf0      = true;
+			ent.ppAssumeWithCond    = none;
+			ent.ppAssumeWithNotCond = none;
+			ent.printedPrefixes     = none;
 			++m_IfdefDead;
+			m_IfdefStack.pushback(ent);
+			return 0;
+		}
+		/* Parse and optimize the given @cond within our current context. */
+		local result = 0;
+		local usedAssume: PPAssume = ppAssume;
+		condBranch = ppParse(str cond)
+			.optimize(asBool: true, assume: usedAssume);
+		ent = IfDefStackEntry(cond: condBranch);
+		if (condBranch.typ == BRT_CONST) {
+			if (condBranch.data) {
+				ent.encounteredIf1 = true;
+			} else {
+				ent.encounteredIf0 = true;
+				++m_IfdefDead;
+			}
+			ent.ppAssumeWithCond    = usedAssume;
+			ent.ppAssumeWithNotCond = usedAssume;
+			ent.printedPrefixes     = m_IfdefStack ? m_IfdefStack.last.printedPrefixes : m_GlobalPrintedPrefixes;
 		} else {
 			ent.didWriteIf = true;
-			ent.cond = cond;
-			if (!m_IfdefDead)
-				result = doPrintIf(cond);
+			result = doPrintIf(condBranch.tostr());
+			ent.ppAssumeWithCond    = usedAssume.withAssumption(condBranch, true);
+			ent.ppAssumeWithNotCond = usedAssume.withAssumption(condBranch, false);
+			ent.printedPrefixes     = HashSet();
 		}
 		m_IfdefStack.pushback(ent);
 		return result;
@@ -551,12 +585,14 @@ dont_emit_branch:
 				++m_IfdefDead;
 				ent.encounteredIf0 = true;
 			}
+			ent.printedPrefixes = none;
 			goto done;
 		}
-		if (cond !is string)
-			cond = str cond;
-		cond = optimizePreprocessorExpression(cond);
-		if (cond == "0") {
+		local usedAssume: PPAssume = ent.ppAssumeWithNotCond;
+		ent.ppAssumeWithCond = usedAssume;
+		local condBranch: PPBranch = ppParse(str cond)
+			.optimize(asBool: true, assume: usedAssume);
+		if (condBranch.typ == BRT_CONST && !condBranch.data) {
 			/* Special case: Don't do anything and ignore
 			 * everything until the next #elif or #else */
 			goto dont_emit_branch;
@@ -566,7 +602,7 @@ dont_emit_branch:
 			ent.encounteredIf0 = false;
 			--m_IfdefDead;
 		}
-		if (cond == "1") {
+		if (condBranch.typ == BRT_CONST && condBranch.data) {
 			/* Special case: Universal true-branch
 			 * (must be printed the same as #else) */
 			ent.encounteredIf1 = true;
@@ -580,12 +616,15 @@ dont_emit_branch:
 				if (generator.addForceNl())
 					result = 2;
 				local condText = "...";
-				if (ent.cond !is none) {
-					condText = optimizePreprocessorExpressionAndRemoveDefined(ent.cond);
-					ent.cond = "!({})".format({ ent.cond });
+				local eCond: PPBranch | none = ent.cond;
+				if (eCond !is none) {
+					condText = eCond.tostr(removeDefined: true);
+					ent.cond = PPBranch(BRT_NOT, eCond).optimize(asBool: true);
 				}
 				generator.addPpElse(condText);
-				ent.printedPrefixes.clear();
+				ent.printedPrefixes = HashSet();
+			} else {
+				ent.printedPrefixes = none;
 			}
 			goto done;
 		}
@@ -593,8 +632,14 @@ dont_emit_branch:
 		/* If we havn't yet written a #if branch, do so now */
 		if (!ent.didWriteIf) {
 			ent.didWriteIf = true;
-			if (!m_IfdefDead)
-				result = doPrintIf(cond);
+			if (!m_IfdefDead) {
+				result = doPrintIf(condBranch.tostr());
+				ent.printedPrefixes = HashSet();
+			} else {
+				ent.printedPrefixes = none;
+			}
+			ent.ppAssumeWithCond    = usedAssume.withAssumption(condBranch, true);
+			ent.ppAssumeWithNotCond = usedAssume.withAssumption(condBranch, false);
 			goto done;
 		}
 		/* Regular case: Print the #elif as an actual #elif */
@@ -602,11 +647,15 @@ dont_emit_branch:
 			result = 1;
 			if (generator.addForceNl())
 				result = 2;
-			generator.addPpElif(cond);
-			ent.printedPrefixes.clear();
+			generator.addPpElif(condBranch.tostr());
+			ent.printedPrefixes = HashSet();
+			ent.ppAssumeWithCond    = usedAssume.withAssumption(condBranch, true);
+			ent.ppAssumeWithNotCond = usedAssume.withAssumption(condBranch, false);
 			/* Delete the saved condition so that "..."
 			 * will appear as comment in generated code. */
 			ent.cond = none;
+		} else {
+			ent.printedPrefixes = none;
 		}
 done:
 		return result;
@@ -639,7 +688,7 @@ done:
 					result = 2;
 				local condText = "...";
 				if (ent.cond !is none) {
-					condText = optimizePreprocessorExpressionAndRemoveDefined(ent.cond);
+					condText = ent.cond.tostr(removeDefined: true);
 				} else if (ent.didWriteElse) {
 					condText = "!...";
 				}
@@ -750,17 +799,10 @@ done:
 
 	@@Remember the inclusion of a given @header
 	private function rememberPrefixAlreadyPrinted(prefix: string) {
-		local ppStackIndex = #m_IfdefStack - 1;
-		while (ppStackIndex >= 0) {
-			local ent: IfDefStackEntry = m_IfdefStack[ppStackIndex];
-			if (ent.didWriteIf || ent.didWriteElse)
-				break;
-			--ppStackIndex;
-		}
-		local set = ppStackIndex >= 0
-			? m_IfdefStack[ppStackIndex].printedPrefixes
-			: m_GlobalPrintedPrefixes;
-		set.insert(prefix);
+		(m_IfdefStack
+			? m_IfdefStack.last.printedPrefixes
+			: m_GlobalPrintedPrefixes)
+			.insert(prefix);
 	}
 
 	@@Print @text as a C or C++ comment, preferring C comments.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8a908e9 */
+/* HASH CRC-32:0x29cd29aa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
  * converting wide-character unicode input data into a UTF-16 output */
 __LOCAL_LIBC(format_32to16) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_32to16))(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
-#if 4 == 4
+
 	struct __local_format_32to16_data {
 		__pc16formatprinter __fd_printer; /* [1..1] Inner printer */
 		void               *__fd_arg;     /* Argument for `fd_printer' */
@@ -69,15 +69,15 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_32to16))(void *__arg, __CHAR32
 	return __result;
 __err:
 	return __temp;
-#else /* 4 == 4 */
-	struct __local_format_16to16_data {
-		__pc16formatprinter __fd_printer;   /* [1..1] Inner printer */
-		void               *__fd_arg;       /* Argument for `fd_printer' */
-	};
-	struct __local_format_16to16_data *__closure;
-	__closure = (struct __local_format_16to16_data *)__arg;
-	return (*__closure->__fd_printer)(__closure->__fd_arg, (__CHAR16_TYPE__ const *)__data, __datalen);
-#endif /* !(4 == 4) */
+
+
+
+
+
+
+
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_32to16_defined

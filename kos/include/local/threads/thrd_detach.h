@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x870ebdc7 */
+/* HASH CRC-32:0xb80d66ac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,13 @@
 #include <bits/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_detach from pthread */
-#if !defined(__local___localdep_pthread_detach_defined) && defined(__CRT_HAVE_pthread_detach)
+#ifndef __local___localdep_pthread_detach_defined
 #define __local___localdep_pthread_detach_defined 1
 /* Indicate that the thread THREAD is never to be joined with PTHREAD_JOIN.
  * The resources of THREAD will therefore be freed immediately when it
  * terminates, instead of waiting for another thread to perform PTHREAD_JOIN on it */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_pthread_detach,(__pthread_t __pthread),pthread_detach,(__pthread))
-#endif /* !__local___localdep_pthread_detach_defined && __CRT_HAVE_pthread_detach */
+#endif /* !__local___localdep_pthread_detach_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/threads.h>
 __NAMESPACE_LOCAL_BEGIN

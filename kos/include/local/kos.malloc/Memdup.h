@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf354c9bb */
+/* HASH CRC-32:0xb09a4b46 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,10 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: Malloc from kos.malloc */
-#if !defined(__local___localdep_Malloc_defined) && defined(__CRT_HAVE_Malloc)
+#ifndef __local___localdep_Malloc_defined
 #define __local___localdep_Malloc_defined 1
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,__localdep_Malloc,(__SIZE_TYPE__ __num_bytes),Malloc,(__num_bytes))
-#endif /* !__local___localdep_Malloc_defined && __CRT_HAVE_Malloc */
+#endif /* !__local___localdep_Malloc_defined */
 /* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1

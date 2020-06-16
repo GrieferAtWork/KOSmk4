@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x724bd4df */
+/* HASH CRC-32:0x18036fa3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_clock_settime_defined
 #define __local_clock_settime_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime) || defined(__CRT_HAVE_clock_settime64)
+#if defined(__CRT_HAVE_clock_settime64) || defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime)
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: clock_settime32 from time */
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* Set clock CLOCK_ID to value TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime64,(__clockid_t __clock_id, struct __timespec64 const *__tp),clock_settime64,(__clock_id,__tp))
-#elif defined(__CRT_HAVE_clock_settime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_clock_settime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -82,7 +82,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_clock_settime_defined 1
 #define __localdep_clock_settime __LIBC_LOCAL_NAME(clock_settime)
 #endif /* !__local___localdep_clock_settime_defined */
-#else /* __CRT_HAVE_clock_settime || __CRT_HAVE___clock_settime || __CRT_HAVE_clock_settime64 */
+#else /* __CRT_HAVE_clock_settime64 || __CRT_HAVE_clock_settime || __CRT_HAVE___clock_settime */
 #undef __local_clock_settime_defined
-#endif /* !__CRT_HAVE_clock_settime && !__CRT_HAVE___clock_settime && !__CRT_HAVE_clock_settime64 */
+#endif /* !__CRT_HAVE_clock_settime64 && !__CRT_HAVE_clock_settime && !__CRT_HAVE___clock_settime */
 #endif /* !__local_clock_settime_defined */

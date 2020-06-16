@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a8c368 */
+/* HASH CRC-32:0x3e774736 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_PWrite_defined
 #define __local_PWrite_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_PWrite) || defined(__CRT_HAVE_PWrite64)
+#if defined(__CRT_HAVE_PWrite64) || defined(__CRT_HAVE_PWrite)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: PWrite32 from kos.unistd */
@@ -36,7 +36,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PWrite32,(__
 /* >> pwrite64(2)
  * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PWrite64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PWrite64,(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PWrite) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_PWrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> pwrite64(2)
  * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PWrite64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_PWrite_defined 1
 #define __localdep_PWrite __LIBC_LOCAL_NAME(PWrite)
 #endif /* !__local___localdep_PWrite_defined */
-#else /* __CRT_HAVE_PWrite || __CRT_HAVE_PWrite64 */
+#else /* __CRT_HAVE_PWrite64 || __CRT_HAVE_PWrite */
 #undef __local_PWrite_defined
-#endif /* !__CRT_HAVE_PWrite && !__CRT_HAVE_PWrite64 */
+#endif /* !__CRT_HAVE_PWrite64 && !__CRT_HAVE_PWrite */
 #endif /* !__local_PWrite_defined */

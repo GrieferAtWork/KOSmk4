@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d392d3c */
+/* HASH CRC-32:0xc136f2fa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_pthread_rwlock_timedrdlock_defined
 #define __local_pthread_rwlock_timedrdlock_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_pthread_rwlock_timedrdlock) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock64)
+#if defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_rwlock_t
 #ifdef __CRT_HAVE_pthread_rwlock_timedrdlock64
 /* Try to acquire read lock for RWLOCK or return after specfied time */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_rwlock_timedrdlock64,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __abstime),pthread_rwlock_timedrdlock64,(__rwlock,__abstime))
-#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Try to acquire read lock for RWLOCK or return after specfied time */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_rwlock_timedrdlock64,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __abstime),pthread_rwlock_timedrdlock,(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_pthread_rwlock_timedrdlock_defined 1
 #define __localdep_pthread_rwlock_timedrdlock __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock)
 #endif /* !__local___localdep_pthread_rwlock_timedrdlock_defined */
-#else /* __CRT_HAVE_pthread_rwlock_timedrdlock || __CRT_HAVE_pthread_rwlock_timedrdlock64 */
+#else /* __CRT_HAVE_pthread_rwlock_timedrdlock64 || __CRT_HAVE_pthread_rwlock_timedrdlock */
 #undef __local_pthread_rwlock_timedrdlock_defined
-#endif /* !__CRT_HAVE_pthread_rwlock_timedrdlock && !__CRT_HAVE_pthread_rwlock_timedrdlock64 */
+#endif /* !__CRT_HAVE_pthread_rwlock_timedrdlock64 && !__CRT_HAVE_pthread_rwlock_timedrdlock */
 #endif /* !__local_pthread_rwlock_timedrdlock_defined */

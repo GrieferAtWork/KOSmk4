@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36797dc */
+/* HASH CRC-32:0xa87b2a74 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_settimeofday_defined
 #define __local_settimeofday_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_settimeofday) || defined(__CRT_HAVE_settimeofday64)
+#if defined(__CRT_HAVE_settimeofday64) || defined(__CRT_HAVE_settimeofday)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: settimeofday32 from sys.time */
 #if !defined(__local___localdep_settimeofday32_defined) && defined(__CRT_HAVE_settimeofday)
@@ -37,7 +37,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 con
 /* Set the current time of day and timezone information.
  * This call is restricted to the super-user */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),settimeofday64,(__tv,__tz))
-#elif defined(__CRT_HAVE_settimeofday) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_settimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Set the current time of day and timezone information.
  * This call is restricted to the super-user */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
@@ -77,7 +77,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_settimeofday_defined 1
 #define __localdep_settimeofday __LIBC_LOCAL_NAME(settimeofday)
 #endif /* !__local___localdep_settimeofday_defined */
-#else /* __CRT_HAVE_settimeofday || __CRT_HAVE_settimeofday64 */
+#else /* __CRT_HAVE_settimeofday64 || __CRT_HAVE_settimeofday */
 #undef __local_settimeofday_defined
-#endif /* !__CRT_HAVE_settimeofday && !__CRT_HAVE_settimeofday64 */
+#endif /* !__CRT_HAVE_settimeofday64 && !__CRT_HAVE_settimeofday */
 #endif /* !__local_settimeofday_defined */

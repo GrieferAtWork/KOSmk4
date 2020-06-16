@@ -23,8 +23,8 @@ import * from errors;
 import * from .cheaders;
 import * from .writer;
 import * from .escape;
+import .ppexpr;
 import hash from hashlib;
-import * from ..optiexpr;
 import fs;
 
 /* Helpers for generating and maintaining user-level source implementation files */
@@ -386,7 +386,7 @@ discard_function_during_scan:
 			for (local b: bindings[:-1]) {
 				assert b.functionBinding !is FunctionImplementation;
 				headFp << "#" << (isFirst ? "" : "el") << "if "
-					<< optimizePreprocessorExpression(b.ppCond) << "\n"
+					<< ppexpr.optimize(b.ppCond) << "\n"
 					   "DEFINE_INTERN_ALIAS(" << func.name << ", "
 					<< str(b.functionBinding) << ");\n";
 				isFirst = false;

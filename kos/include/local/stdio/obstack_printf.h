@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a7ef364 */
+/* HASH CRC-32:0xcf3feda9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,10 @@
 #ifdef __CRT_HAVE_obstack_vprintf
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: obstack_vprintf from stdio */
-#if !defined(__local___localdep_obstack_vprintf_defined) && defined(__CRT_HAVE_obstack_vprintf)
+#ifndef __local___localdep_obstack_vprintf_defined
 #define __local___localdep_obstack_vprintf_defined 1
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_obstack_vprintf,(struct obstack *__restrict __obstack_, char const *__restrict __format, __builtin_va_list __args),obstack_vprintf,(__obstack_,__format,__args))
-#endif /* !__local___localdep_obstack_vprintf_defined && __CRT_HAVE_obstack_vprintf */
+#endif /* !__local___localdep_obstack_vprintf_defined */
 __LOCAL_LIBC(obstack_printf) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(obstack_printf))(struct obstack *__restrict __obstack_, char const *__restrict __format, ...) {
 	int __result;

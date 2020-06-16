@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x302612ae */
+/* HASH CRC-32:0x242d8ff3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_utimensat_defined
 #define __local_utimensat_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_utimensat) || defined(__CRT_HAVE_utimensat64)
+#if defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE_utimensat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: utimensat32 from sys.stat */
 #if !defined(__local___localdep_utimensat32_defined) && defined(__CRT_HAVE_utimensat)
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_utimensat32,(__fd_t
 #define __local___localdep_utimensat64_defined 1
 #ifdef __CRT_HAVE_utimensat64
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_utimensat64,(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),utimensat64,(__dirfd,__filename,__times,__flags))
-#elif defined(__CRT_HAVE_utimensat) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_utimensat) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_utimensat64,(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_utimensat)
 __NAMESPACE_LOCAL_END
@@ -106,7 +106,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_utimensat_defined 1
 #define __localdep_utimensat __LIBC_LOCAL_NAME(utimensat)
 #endif /* !__local___localdep_utimensat_defined */
-#else /* __CRT_HAVE_utimensat || __CRT_HAVE_utimensat64 */
+#else /* __CRT_HAVE_utimensat64 || __CRT_HAVE_utimensat */
 #undef __local_utimensat_defined
-#endif /* !__CRT_HAVE_utimensat && !__CRT_HAVE_utimensat64 */
+#endif /* !__CRT_HAVE_utimensat64 && !__CRT_HAVE_utimensat */
 #endif /* !__local_utimensat_defined */

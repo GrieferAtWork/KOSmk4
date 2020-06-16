@@ -1,0 +1,1488 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+/* Preprocessor expression parser & optimizer */
+import * from deemon;
+import * from .parser;
+import util;
+
+#if 0
+#define ASSERT(expr)              assert expr
+#define ASSERT_AFTER_TOK(toks...) assert self.tok in toks
+#else
+#define ASSERT(expr)              none
+#define ASSERT_AFTER_TOK(toks...) none
+#endif
+
+
+/* Branch types */
+global final BRT_UNDEF   = 0;  /* @"foo(bar)"                          data: string   (Unrecognized expression; cannot be optimized) */
+global final BRT_CONST   = 1;  /* @"1234"                              data: int      (data is the integer constant) */
+global final BRT_NOT     = 2;  /* @"!{data}"                           data: PPBranch */
+global final BRT_INV     = 3;  /* @"~{data}"                           data: PPBranch */
+global final BRT_NEG     = 4;  /* @"-{data}"                           data: PPBranch */
+global final BRT_DEFINED = 5;  /* @"defined({data})"                   data: string   (data is the name of the macro) */
+global final BRT_IFELSE  = 6;  /* @"{data[0]} ? {data[1]} : {data[2]}" data: (PPBranch, PPBranch, PPBranch) */
+global final BRT_PROD    = 7;  /* @"{data[0]} * {data[1]} * ..."       data: {PPBranch...} */
+global final BRT_DIV     = 8;  /* @"{data[0]} / {data[1]}"             data: (PPBranch, PPBranch) */
+global final BRT_MOD     = 9;  /* @"{data[0]} % {data[1]}"             data: (PPBranch, PPBranch) */
+global final BRT_SUM     = 10; /* @"{data[0]} + {data[1]} + ..."       data: {PPBranch...} */
+global final BRT_SHL     = 11; /* @"{data[0]} << {data[1]}"            data: (PPBranch, PPBranch) */
+global final BRT_SHR     = 12; /* @"{data[0]} >> {data[1]}"            data: (PPBranch, PPBranch) */
+global final BRT_LO      = 13; /* @"{data[0]} < {data[1]}"             data: (PPBranch, PPBranch) */
+global final BRT_LE      = 14; /* @"{data[0]} <= {data[1]}"            data: (PPBranch, PPBranch) */
+global final BRT_EQ      = 15; /* @"{data[0]} == {data[1]}"            data: (PPBranch, PPBranch) */
+global final BRT_BITAND  = 16; /* @"{data[0]} & {data[1]} & ..."       data: {PPBranch...} */
+global final BRT_BITOR   = 17; /* @"{data[0]} | {data[1]} | ..."       data: {PPBranch...} */
+global final BRT_BITXOR  = 18; /* @"{data[0]} ^ {data[1]} ^ ..."       data: {PPBranch...} */
+global final BRT_ALL     = 19; /* @"{data[0]} && {data[1]} && ..."     data: {PPBranch...} */
+global final BRT_ANY     = 20; /* @"{data[0]} || {data[1]} || ..."     data: {PPBranch...} */
+
+
+#define OPERATOR_PRIORITY_BRT_UNDEF   0
+#define OPERATOR_PRIORITY_BRT_CONST   0
+#define OPERATOR_PRIORITY_BRT_NOT     0
+#define OPERATOR_PRIORITY_BRT_INV     0
+#define OPERATOR_PRIORITY_BRT_NEG     0
+#define OPERATOR_PRIORITY_BRT_DEFINED 0
+#define OPERATOR_PRIORITY_BRT_IFELSE  11
+#define OPERATOR_PRIORITY_BRT_PROD    1
+#define OPERATOR_PRIORITY_BRT_DIV     1
+#define OPERATOR_PRIORITY_BRT_MOD     1
+#define OPERATOR_PRIORITY_BRT_SUM     2
+#define OPERATOR_PRIORITY_BRT_SHL     3
+#define OPERATOR_PRIORITY_BRT_SHR     3
+#define OPERATOR_PRIORITY_BRT_LO      4
+#define OPERATOR_PRIORITY_BRT_LE      4
+#define OPERATOR_PRIORITY_BRT_EQ      5
+#define OPERATOR_PRIORITY_BRT_BITAND  6
+#define OPERATOR_PRIORITY_BRT_BITOR   7
+#define OPERATOR_PRIORITY_BRT_BITXOR  8
+#define OPERATOR_PRIORITY_BRT_ALL     9
+#define OPERATOR_PRIORITY_BRT_ANY     10
+
+
+@@Mapping between `BRT_*` and their operator priority, where
+@@operators with a greater priority must be wrapped in parenthesis,
+@@when wrapped by operators of lower priority.
+global final OPERATOR_PRIORITY: {int: int} = {
+	BRT_UNDEF   : OPERATOR_PRIORITY_BRT_UNDEF,
+	BRT_CONST   : OPERATOR_PRIORITY_BRT_CONST,
+	BRT_NOT     : OPERATOR_PRIORITY_BRT_NOT,
+	BRT_INV     : OPERATOR_PRIORITY_BRT_INV,
+	BRT_NEG     : OPERATOR_PRIORITY_BRT_NEG,
+	BRT_DEFINED : OPERATOR_PRIORITY_BRT_DEFINED,
+	BRT_IFELSE  : OPERATOR_PRIORITY_BRT_IFELSE,
+	BRT_PROD    : OPERATOR_PRIORITY_BRT_PROD,
+	BRT_DIV     : OPERATOR_PRIORITY_BRT_DIV,
+	BRT_MOD     : OPERATOR_PRIORITY_BRT_MOD,
+	BRT_SUM     : OPERATOR_PRIORITY_BRT_SUM,
+	BRT_SHL     : OPERATOR_PRIORITY_BRT_SHL,
+	BRT_SHR     : OPERATOR_PRIORITY_BRT_SHR,
+	BRT_LO      : OPERATOR_PRIORITY_BRT_LO,
+	BRT_LE      : OPERATOR_PRIORITY_BRT_LE,
+	BRT_EQ      : OPERATOR_PRIORITY_BRT_EQ,
+	BRT_BITAND  : OPERATOR_PRIORITY_BRT_BITAND,
+	BRT_BITOR   : OPERATOR_PRIORITY_BRT_BITOR,
+	BRT_BITXOR  : OPERATOR_PRIORITY_BRT_BITXOR,
+	BRT_ALL     : OPERATOR_PRIORITY_BRT_ALL,
+	BRT_ANY     : OPERATOR_PRIORITY_BRT_ANY,
+};
+global final OPERATOR_ALWAYS_PAREN_PRIORITY: {int...} = { BRT_ANY, BRT_ALL };
+
+
+global PPBranch;
+class PPAssume {
+	this = default;
+
+	public operator copy(): PPAssume {
+		return PPAssume(macros: macros, assumptions: copy assumptions);
+	}
+
+	@@Mapping between <macro-name> and <int-constant> or is-defined-boolean
+	public member macros: {string: (int | bool)} = none;
+
+	@@Branch value assumptions that may be made
+	public member assumptions: {PPBranch: int | bool};
+
+	@@Return a copy of @this @PPAssume with the given assumption
+	public function withAssumption(branch: PPBranch, value: int | bool = true): PPAssume {
+		local result = PPAssume(macros: macros);
+		result.assumptions = copy this.assumptions;
+		result.addAssumption(branch, value);
+		return result;
+	}
+
+	@@Register the assumption that @branch evaluates to @value
+	public function addAssumption(branch: PPBranch, value: int | bool = true) {
+		local typ  = branch.typ;
+		local data = branch.data;
+		/* Unwind assumptions (e.g. assume((foo == 42) == 1)  ->  assume(foo == 42)) */
+		switch (typ) {
+
+		case BRT_NOT:
+			/* assume(!foo == <value>) */
+			/* assume(foo == !<value>) */
+			ASSERT(data is PPBranch);
+			return addAssumption(data, !value);
+
+		case BRT_INV:
+			/* assume(~foo == <value>) */
+			/* assume(foo == ~<value>) */
+			ASSERT(data is PPBranch);
+			return addAssumption(data, ~value);
+
+		case BRT_NEG:
+			/* assume(-foo == <value>) */
+			/* assume(foo == -<value>) */
+			ASSERT(data is PPBranch);
+			return addAssumption(data, -value);
+
+		case BRT_PROD:
+		case BRT_BITAND:
+			if (value is bool)
+				return addAssumption(PPBranch(BRT_ALL, data), value);
+			goto default_assume;
+
+		case BRT_SUM:
+		case BRT_BITOR:
+			if (value is bool)
+				return addAssumption(PPBranch(BRT_ANY, data), value);
+			goto default_assume;
+
+		case BRT_LO:
+		case BRT_LE:
+			value = !!value;
+			goto default_assume;
+
+		case BRT_EQ: {
+			local a, b = data...;
+			ASSERT(a is PPBranch);
+			ASSERT(b is PPBranch);
+			if (a.typ == BRT_CONST) {
+				local temp = a;
+				a = b;
+				b = temp;
+			}
+			if (b.typ == BRT_CONST) {
+				if (value) {
+					/* assume((a == 42) == true)
+					 * assume(a == 42) */
+					return addAssumption(a, b.data);
+				}
+			}
+			value = !!value;
+			goto default_assume;
+		}	break;
+
+		case BRT_ALL:
+			if (value) {
+				/* >> assume((a && b && c) == true)
+				 * Same as:
+				 * >> assume(a == true)
+				 * >> assume(b == true)
+				 * >> assume(c == true) */
+				for (local a: data) {
+					ASSERT(a is PPBranch);
+					addAssumption(a, true);
+				}
+				return;
+			}
+			value = !!value;
+			goto default_assume;
+
+		case BRT_ANY:
+			if (!value) {
+				/* >> assume((a || b || c) == false)
+				 * >> assume(!(a || b || c) == true)
+				 * >> assume((!a && !b && !c) == true)
+				 * Same as:
+				 * >> assume(!a == true)
+				 * >> assume(!b == true)
+				 * >> assume(!c == true) */
+				for (local a: data) {
+					ASSERT(a is PPBranch);
+					addAssumption(PPBranch(BRT_NOT, a), true);
+				}
+				return;
+			}
+			value = !!value;
+			goto default_assume;
+
+		default:
+default_assume:
+			assumptions[branch] = value;
+			break;
+		}
+	}
+
+}
+
+
+class PPBranch {
+	this = default;
+
+	@@Branch type (one of `BRT_*`)
+	public member typ: int;
+
+	@@Branch data (depends on @typ)
+	public member data: Object;
+
+	public operator hash(): int {
+		/* TODO: Ignore order in data, when data is {PPBranch...} */
+		return typ.operator hash() ^ data.operator hash();
+	}
+
+	public operator == (other: PPBranch): bool {
+		/* TODO: Ignore order in data, when data is {PPBranch...} */
+		return typ == other.typ && data == other.data;
+	}
+
+	public operator != (other: PPBranch): bool {
+		return !(this == other);
+	}
+
+	@@Helper wrapper for @cprint
+	public operator str(): string {
+		File.Writer fp;
+		cprint(fp);
+		return fp.string;
+	}
+
+	public function tostr(removeDefined: bool = false): string {
+		File.Writer fp;
+		cprint(fp, removeDefined);
+		return fp.string;
+	}
+
+	public function cprintWithOptionalParen(fp: File, removeDefined: bool = false): File {
+		if (typ in OPERATOR_ALWAYS_PAREN_PRIORITY)
+			return cprint(fp << "(", removeDefined) << ")";
+		return cprint(fp, removeDefined);
+	}
+
+	@@Print the C-representation of @this @PPBranch
+	public function cprint(fp: File, removeDefined: bool = false): File {
+		local typ    = this.typ;
+		local data   = this.data;
+		local myPrio = OPERATOR_PRIORITY[typ];
+		switch (typ) {
+#define NEEDPAREN(myPrio, otherTyp)          \
+	(myPrio < OPERATOR_PRIORITY[otherTyp] || \
+	 otherTyp in OPERATOR_ALWAYS_PAREN_PRIORITY)
+
+		case BRT_UNDEF:
+		case BRT_CONST:
+			fp << data;
+			break;
+
+		case BRT_NOT: {
+			local dataTyp = data.typ;
+			switch (dataTyp) {
+
+			case BRT_LO:
+			case BRT_LE:
+			case BRT_EQ: {
+				local a, b = data.data...;
+				local myPrio = OPERATOR_PRIORITY[dataTyp];
+				if (NEEDPAREN(myPrio, a.typ)) {
+					a.cprint(fp << "(", removeDefined) << ")";
+				} else {
+					a.cprint(fp, removeDefined);
+				}
+				fp << {
+					BRT_LO: " >= ",
+					BRT_LE: " > ",
+					BRT_EQ: " != ",
+				}[dataTyp];
+				if (NEEDPAREN(myPrio, b.typ)) {
+					b.cprint(fp << "(", removeDefined) << ")";
+				} else {
+					b.cprint(fp, removeDefined);
+				}
+			}	goto done;
+
+			default:
+				break;
+			}
+		}	/* FALLTHRU */
+		case BRT_INV:
+		case BRT_NEG:
+			fp << {
+				BRT_NOT : "!",
+				BRT_INV : "~",
+				BRT_NEG : "-",
+			}[typ];
+			if (NEEDPAREN(OPERATOR_PRIORITY_BRT_NOT, data.typ)) {
+				data.cprint(fp << "(", removeDefined) << ")";
+			} else {
+				data.cprint(fp, removeDefined);
+			}
+			break;
+
+		case BRT_DEFINED:
+			if (removeDefined) {
+				fp << data;
+			} else {
+				fp << "defined(" << data << ")";
+			}
+			break;
+
+		case BRT_IFELSE:
+			data[0].cprintWithOptionalParen(fp, removeDefined) << " ? ";
+			data[1].cprintWithOptionalParen(fp, removeDefined) << " : ";
+			data[2].cprintWithOptionalParen(fp, removeDefined);
+			break;
+
+		case BRT_PROD:
+		case BRT_SUM:
+		case BRT_BITAND:
+		case BRT_BITOR:
+		case BRT_BITXOR:
+		case BRT_ALL:
+		case BRT_ANY: {
+			local op = {
+				BRT_PROD:   " * ",
+				BRT_SUM:    " + ",
+				BRT_BITAND: " & ",
+				BRT_BITOR:  " | ",
+				BRT_BITXOR: " ^ ",
+				BRT_ALL:    " && ",
+				BRT_ANY:    " || ",
+			}[typ];
+			local myPrio = OPERATOR_PRIORITY[typ];
+			local isFirst = true;
+			for (local e: data) {
+				if (!isFirst) {
+					if (e.typ == BRT_NEG && typ == BRT_SUM) {
+						/* Special case: Allow `foo + bar - bar`, rather than `foo + bar + -bar` */
+						fp << " - ";
+						e = e.data;
+					} else {
+						fp << op;
+					}
+				}
+				isFirst = false;
+				if (NEEDPAREN(myPrio, e.typ)) {
+					e.cprint(fp << "(", removeDefined) << ")";
+				} else {
+					e.cprint(fp, removeDefined);
+				}
+			}
+		}	break;
+
+		case BRT_DIV:
+		case BRT_MOD:
+		case BRT_SHL:
+		case BRT_SHR:
+		case BRT_LO:
+		case BRT_LE:
+		case BRT_EQ: {
+			local a, b = data...;
+			local myPrio = OPERATOR_PRIORITY[typ];
+			if (NEEDPAREN(myPrio, a.typ)) {
+				a.cprint(fp << "(", removeDefined) << ")";
+			} else {
+				a.cprint(fp, removeDefined);
+			}
+			fp << {
+				BRT_DIV: " / ",
+				BRT_MOD: " % ",
+				BRT_SHL: " << ",
+				BRT_SHR: " >> ",
+				BRT_LO:  " < ",
+				BRT_LE:  " <= ",
+				BRT_EQ:  " == ",
+			}[typ];
+			if (NEEDPAREN(myPrio, b.typ)) {
+				b.cprint(fp << "(", removeDefined) << ")";
+			} else {
+				b.cprint(fp, removeDefined);
+			}
+		}	break;
+
+		default:
+			fp << "?";
+			break;
+		}
+done:
+		return fp;
+	}
+
+	@@Check if @this @PPBranch can only ever evaluate to @0 or @1
+	public property isBoolean: bool = {
+		get(): bool {
+			switch (typ) {
+
+			case BRT_CONST:
+				return data in [0, 1];
+
+			case BRT_NOT:
+			case BRT_DEFINED:
+			case BRT_ALL:
+			case BRT_ANY:
+			case BRT_LO:
+			case BRT_LE:
+			case BRT_EQ:
+				return true;
+
+			case BRT_IFELSE:
+				return data[1].isBoolean && data[2].isBoolean;
+
+			case BRT_BITXOR:
+				for (local e: data) {
+					if (!e.isBoolean)
+						return false;
+				}
+				return true;
+
+			default:
+				break;
+			}
+			return false;
+		}
+	}
+
+
+	@@Optimize @this @PPBranch, and return it in its optimized form
+	@@Note that this function may also modify the original branch,
+	@@though mustn't necessarily re-return @this PPBranch!
+	@@@param: asBool: When true, the caller will use the resulting branch after
+	@@                casting its value to a boolean. - e.g. within a `a && b && c',
+	@@                `a || b || c', or a `a ? ... : ...' expression
+	public function optimize(asBool: bool = true, assume: PPAssume = none): PPBranch {
+		if (assume is none)
+			assume = PPAssume(assumptions: Dict());
+		local typ  = this.typ;
+		local data = this.data;
+		local repl = assume.assumptions.get(this);
+		if (repl !is none) {
+			if (asBool) {
+				typ  = BRT_CONST;
+				data = repl ? 1 : 0;
+			} else if (repl is int) {
+				typ  = BRT_CONST;
+				data = repl;
+			}
+		}
+again_switch_typ:
+		switch (typ) {
+
+		case BRT_UNDEF: {
+			/* Check if there's a known-macro-expression for this value */
+			ASSERT(data is string);
+			repl = assume.macros.get(data);
+			if (repl is int) {
+				typ  = BRT_CONST;
+				data = repl;
+			}
+		}	break;
+
+		case BRT_NOT: {
+			ASSERT(data is PPBranch);
+			data = data.optimize(true, assume);
+			local innerData = data.data;
+			switch (data.typ) {
+
+			case BRT_CONST:
+				ASSERT(innerData is int);
+				data.data = innerData ? 0 : 1;
+				return data;
+				break;
+
+			case BRT_NOT:
+			case BRT_INV:
+				ASSERT(innerData is PPBranch);
+				if (asBool || innerData.isBoolean)
+					return innerData; /* !!boolExpr  ->  boolExpr */
+				break;
+
+			case BRT_IFELSE:
+				ASSERT(innerData is Sequence);
+				ASSERT(#innerData == 3);
+				ASSERT(innerData[0] is PPBranch);
+				ASSERT(innerData[1] is PPBranch);
+				ASSERT(innerData[2] is PPBranch);
+				return PPBranch(BRT_IFELSE, {
+					innerData[0],
+					PPBranch(BRT_NOT, innerData[1]),
+					PPBranch(BRT_NOT, innerData[2]),
+				}).optimize(true, assume);
+				break;
+
+			case BRT_PROD:
+			case BRT_BITAND:
+			case BRT_ALL:
+				/* !(a * b)  ->  (a * b) == 0  ->  a == 0 || b == 0  ->  !a || !b */
+				ASSERT(innerData is Sequence);
+				return PPBranch(BRT_ANY, Tuple(
+					for (local b: innerData)
+						PPBranch(BRT_NOT, b)
+				)).optimize(true, assume);
+
+			case BRT_DIV:
+				/* !(a / b)  ->  (a / b) == 0  ->  a < b   (assuming that `b != 0`) */
+				ASSERT(innerData is Sequence);
+				ASSERT(#innerData == 2);
+				ASSERT(innerData[0] is PPBranch);
+				ASSERT(innerData[1] is PPBranch);
+				return PPBranch(BRT_LO, innerData).optimize(true, assume);
+
+			case BRT_SUM:
+			case BRT_BITOR:
+			case BRT_ANY:
+				/* !(a + b)  ->  (a + b) == 0  ->  a == 0 && b == 0  ->  !a && !b */
+				ASSERT(innerData is Sequence);
+				return PPBranch(BRT_ALL, Tuple(
+					for (local b: innerData)
+						PPBranch(BRT_NOT, b)
+				)).optimize(true, assume);
+
+			case BRT_SHL:
+				/* !(a << b)  ->  !a   (assuming that b >= 0) */
+				ASSERT(innerData is Sequence);
+				ASSERT(#innerData == 2);
+				ASSERT(innerData[0] is PPBranch);
+				ASSERT(innerData[1] is PPBranch);
+				return PPBranch(BRT_NOT, innerData[0]).optimize(true, assume);
+
+			default:
+				break;
+			}
+		}	break;
+
+		case BRT_INV:
+			if (asBool) {
+				typ = BRT_NOT;
+				goto again_switch_typ;
+			}
+			ASSERT(data is PPBranch);
+			data = data.optimize(false, assume);
+			if (data.typ == BRT_CONST) {
+				data.data = ~data.data;
+				return data;
+			}
+			if (data.isBoolean) {
+				/* return PPBranch(BRT_NOT, data).optimize(assume); */
+				typ = BRT_NOT;
+				goto again_switch_typ;
+			}
+			/* TODO: ~(x - 1)  ->  -x */
+			break;
+
+		case BRT_NEG:
+			ASSERT(data is PPBranch);
+			if (asBool) {
+				typ  = data.typ;
+				data = data.data;
+				goto again_switch_typ;
+			}
+			data = data.optimize(false, assume);
+			if (data.typ == BRT_CONST) {
+				data.data = -data.data;
+				return data;
+			}
+			break;
+
+		case BRT_DEFINED:
+			ASSERT(data is string);
+			repl = assume.macros.get(data);
+			if (repl !is none) {
+				typ  = BRT_CONST;
+				data = repl === false ? 0 : 1;
+			}
+			break;
+
+		case BRT_IFELSE: {
+			local cond, tt, ff = data...;
+			ASSERT(cond is PPBranch);
+			ASSERT(tt   is PPBranch);
+			ASSERT(ff   is PPBranch);
+			cond = cond.optimize(true, assume);
+			if (cond.typ == BRT_CONST)
+				return (cond.data ? tt : ff).optimize(asBool, assume);
+			/* Optimize both branches with respect to assumptions made on `cond' */
+			tt = tt.optimize(asBool, assume.withAssumption(cond, true));
+			ff = ff.optimize(asBool, assume.withAssumption(cond, false));
+			/* Check for special case: Both tt and ff branches identical */
+			if (data[1] == data[2])
+				return data[1];
+			data = { cond, tt, ff };
+		}	break;
+
+		case BRT_PROD:
+		case BRT_BITAND:
+		case BRT_ALL: {
+			if (asBool)
+				typ = BRT_ALL;
+			/* Flatten inner branches */
+again_flatten_all:
+			for (local e: data) {
+				ASSERT(e is PPBranch);
+				if (e.typ == typ) {
+					local newData = [];
+					for (local e: data) {
+						ASSERT(e is PPBranch);
+						if (e.typ == typ) {
+							newData.extend(e.data);
+						} else {
+							newData.append(e);
+						}
+					}
+					data = newData;
+					break;
+				}
+			}
+			if (typ != BRT_ALL) {
+				/* Optimize: bool * bool  -> bool && bool
+				 * Optimize: bool & bool  -> bool && bool */
+				for (local e: data) {
+					if (!e.isBoolean)
+						goto have_non_boolean_in_brt_all;
+				}
+				typ = BRT_ALL;
+			}
+have_non_boolean_in_brt_all:
+			if (data !is List)
+				data = List(data);
+			/* Remove duplicate branches with the use of assumptions
+			 * >> foo && foo && (foo || bar)
+			 * Same as
+			 * >> foo */
+			local hasInner = false;
+			local nm1 = #data - 1;
+			for (local i, e: util.enumerate(data)) {
+				local usedAssume: PPAssume = assume;
+				local isFirst: bool = true;
+				/* Gather assumptions from all of the other branches */
+				for (local j, e: util.enumerate(data)) {
+					if (i == j)
+						continue;
+					if (isFirst) {
+						usedAssume = usedAssume.withAssumption(e);
+						isFirst = false;
+					} else {
+						usedAssume.addAssumption(e);
+					}
+				}
+				data[i] = e = e.optimize(typ == BRT_ALL, usedAssume);
+				if (e.typ == typ)
+					hasInner = true;
+			}
+			if (hasInner)
+				goto again_flatten_all;
+			for (local e: data) {
+				ASSERT(e is PPBranch);
+				if (e.typ == BRT_CONST) {
+					/* Merge constant addends */
+					local opfun = typ == BRT_PROD
+						? operator *
+						: typ == BRT_BITAND
+						? operator &
+						: [](a, b) -> a && b;
+					local nonConstants: {PPBranch...} = [];
+					local constantsProd: int = 1;
+					for (local e: data) {
+						if (e.typ == BRT_CONST) {
+							constantsProd = opfun(constantsProd, e.data);
+						} else {
+							nonConstants.append(e);
+						}
+					}
+					if (!nonConstants)
+						return PPBranch(BRT_CONST, constantsProd);
+					if (constantsProd == 0)
+						return PPBranch(BRT_CONST, 0); /* x * y * z * 0 == 0 */
+					if (constantsProd == 1) {
+						if (#nonConstants == 1)
+							return nonConstants.first;
+						return PPBranch(typ, nonConstants); /* x * y * z * 1 == x * y * z */
+					}
+					if (constantsProd == -1 && typ == BRT_PROD)
+						return PPBranch(BRT_NEG, PPBranch(typ, nonConstants)).optimize(typ == BRT_ALL, assume);
+					if (typ != BRT_ALL) {
+						nonConstants.append(PPBranch(BRT_CONST, constantsProd));
+						return PPBranch(typ, nonConstants);
+					}
+					if (#nonConstants == 1)
+						return nonConstants.first;
+					return PPBranch(typ, nonConstants).optimize(typ == BRT_ALL, assume);
+				}
+			}
+			local n = #data;
+			if (!n)
+				return PPBranch(BRT_CONST, 1);
+			if (n == 1)
+				return data.first;
+		}	break;
+
+		case BRT_SUM:
+		case BRT_BITOR:
+		case BRT_ANY: {
+			if (asBool)
+				typ = BRT_ANY;
+			/* Flatten inner branches */
+again_flatten_any:
+			for (local e: data) {
+				ASSERT(e is PPBranch);
+				if (e.typ == typ) {
+					local newData = [];
+					for (local e: data) {
+						ASSERT(e is PPBranch);
+						if (e.typ == typ) {
+							newData.extend(e.data);
+						} else {
+							newData.append(e);
+						}
+					}
+					data = newData;
+					break;
+				}
+			}
+			if (typ == BRT_BITOR) {
+				/* Optimize: bool | bool -> bool || bool */
+				for (local e: data) {
+					if (!e.isBoolean)
+						goto have_non_boolean_in_brt_any;
+				}
+				typ = BRT_ANY;
+			}
+have_non_boolean_in_brt_any:
+			if (data !is List)
+				data = List(data);
+			/* Remove duplicate branches with the use of assumptions
+			 * >> foo || foo || (foo && bar)
+			 * Same as
+			 * >> foo */
+			local isFirst = true;
+			local hasInner = false;
+			local nm1 = #data - 1;
+			for (local i, e: util.enumerate(data)) {
+				local usedAssume: PPAssume = assume;
+				local isFirst: bool = true;
+				if (typ != BRT_SUM) {
+					/* Gather assumptions from all of the other branches */
+					for (local j, e: util.enumerate(data)) {
+						if (i == j)
+							continue;
+						if (isFirst) {
+							usedAssume = usedAssume.withAssumption(e, false);
+							isFirst = false;
+						} else {
+							usedAssume.addAssumption(e, false);
+						}
+					}
+				}
+				data[i] = e = e.optimize(typ == BRT_ANY, usedAssume);
+				if (e.typ == typ)
+					hasInner = true;
+			}
+			if (hasInner)
+				goto again_flatten_any;
+			for (local e: data) {
+				if (e.typ == BRT_CONST) {
+					/* Merge constant addends */
+					local opfun = typ == BRT_SUM
+						? operator +
+						: typ == BRT_BITOR
+						? operator |
+						: [](a, b) -> a || b;
+					local nonConstants: {PPBranch...} = [];
+					local constantsSum: int = 0;
+					for (local e: data) {
+						if (e.typ == BRT_CONST) {
+							constantsSum = opfun(constantsSum, e.data);
+						} else {
+							nonConstants.append(e);
+						}
+					}
+					if (!nonConstants)
+						return PPBranch(BRT_CONST, constantsSum);
+					if (constantsSum == 0) {
+						if (#nonConstants == 1)
+							return nonConstants.first;
+						return PPBranch(typ, nonConstants); /* x * y * z * 1 == x * y * z */
+					} else if (typ == BRT_ANY) {
+						return PPBranch(BRT_CONST, 1); /* x || y || z || 1 == 1 */
+					}
+					if (constantsSum == -1 && typ == BRT_BITOR)
+						return PPBranch(BRT_CONST, -1); /* x | y | z | -1 == -1 */
+					if (typ != BRT_ANY) {
+						nonConstants.append(PPBranch(BRT_CONST, constantsSum));
+						return PPBranch(typ, nonConstants);
+					}
+					if (#nonConstants == 1)
+						return nonConstants.first;
+					return PPBranch(typ, nonConstants).optimize(typ == BRT_ANY, assume);
+				}
+			}
+			local n = #data;
+			if (!n)
+				return PPBranch(BRT_CONST, 0);
+			if (n == 1)
+				return data.first;
+		}	break;
+
+		case BRT_DIV: {
+			local a, b = data...;
+			ASSERT(a is PPBranch);
+			ASSERT(b is PPBranch);
+			a = a.optimize(false, assume);
+			b = b.optimize(false, assume);
+			if (b.typ == BRT_CONST) {
+				if (b.data == 1)
+					return a;
+				if (a.typ == BRT_CONST) {
+					a.data = a.data / b.data;
+					return a;
+				}
+			}
+			if (a == b)
+				return PPBranch(BRT_CONST, 1);
+			if (a.isBoolean) {
+				/* a   b
+				 * 0 / x  -> 0
+				 * 1 / x  -> x == 1   (assuming that x != 0)
+				 *
+				 * -> a && (b == 1) */
+				return PPBranch(BRT_ALL, {
+					a,
+					PPBranch(BRT_EQ, {
+						b,
+						PPBranch(BRT_CONST, 1),
+					}),
+				}).optimize(asBool, assume);
+			}
+			if (b.isBoolean)
+				return a; /* Assuming that b cannot be 0 */
+			data = { a, b };
+		}	break;
+
+		case BRT_MOD: {
+			local a, b = data...;
+			ASSERT(a is PPBranch);
+			ASSERT(b is PPBranch);
+			a = a.optimize(false, assume);
+			b = b.optimize(false, assume);
+			if (b.typ == BRT_CONST) {
+				if (b.data == 1) {
+					b.data = 0;
+					return b;
+				}
+				if (a.typ == BRT_CONST) {
+					a.data = a.data % b.data;
+					return a;
+				}
+			}
+			if (a == b)
+				return PPBranch(BRT_CONST, 0);
+			if (a.isBoolean) {
+				/* a   b
+				 * 0 % x  ->  0
+				 * 1 % x  ->  0 */
+				return PPBranch(BRT_CONST, 0);
+			}
+			if (b.isBoolean)
+				return PPBranch(BRT_CONST, 0); /* Assuming that b cannot be 0 */
+			data = { a, b };
+		}	break;
+
+		case BRT_SHL: {
+			local a, b = data...;
+			ASSERT(a is PPBranch);
+			ASSERT(b is PPBranch);
+			a = a.optimize(false, assume);
+			b = b.optimize(false, assume);
+			if (b.typ == BRT_CONST) {
+				if (b.data == 0)
+					return a;
+				if (a.typ == BRT_CONST) {
+					a.data = a.data << b.data;
+					return a;
+				}
+			}
+			data = { a, b };
+		}	break;
+
+		case BRT_SHR: {
+			local a, b = data...;
+			ASSERT(a is PPBranch);
+			ASSERT(b is PPBranch);
+			a = a.optimize(false, assume);
+			b = b.optimize(false, assume);
+			if (b.typ == BRT_CONST) {
+				if (b.data == 0)
+					return a;
+				if (a.typ == BRT_CONST) {
+					a.data = a.data >> b.data;
+					return a;
+				}
+			}
+			if (a.isBoolean) {
+				/* a    b
+				 * 0 >> x  ->  0
+				 * 1 >> x  ->  x == 0
+				 *
+				 * --> a && !b */
+				return PPBranch(BRT_ALL, {
+					a,
+					PPBranch(BRT_NOT, b),
+				}).optimize(asBool, assume);
+			}
+			data = { a, b };
+		}	break;
+
+		case BRT_LO: {
+			local a, b = data...;
+			ASSERT(a is PPBranch);
+			ASSERT(b is PPBranch);
+			a = a.optimize(false, assume);
+			b = b.optimize(false, assume);
+			if (a.typ == BRT_CONST) {
+				if (b.typ == BRT_CONST) {
+					a.data = a.data < b.data ? 1 : 0;
+					return a;
+				} else {
+					/* Swap operands such that the constant always comes
+					 * second. Doing this simplifies further optimizations.
+					 * 10 < x  ->  x > 10  ->  !(x <= 10) */
+					return PPBranch(BRT_NOT, PPBranch(BRT_LE, { b, a })).optimize(true, assume);
+				}
+			}
+			if (a == b)
+				return PPBranch(BRT_CONST, 0);
+			if (b.typ == BRT_CONST) {
+				if (a.isBoolean) {
+					local bd = b.data;
+					if (bd >= 2)
+						return PPBranch(BRT_CONST, 1); /* 0 < 2 && 1 < 2  ->  true */
+					if (bd <= 0)
+						return PPBranch(BRT_CONST, 0); /* 0 < 0 && 1 < 0  ->  false */
+					if (bd == 1) {
+						/* a   b
+						 * 0 < 1  ->  true
+						 * 1 < 1  ->  false
+						 * -> !a */
+						return PPBranch(BRT_NOT, a).optimize(true, assume);
+					}
+				}
+			}
+			data = { a, b };
+		}	break;
+
+		case BRT_LE: {
+			local a, b = data...;
+			ASSERT(a is PPBranch);
+			ASSERT(b is PPBranch);
+			a = a.optimize(false, assume);
+			b = b.optimize(false, assume);
+			if (a.typ == BRT_CONST) {
+				if (b.typ == BRT_CONST) {
+					a.data = a.data <= b.data ? 1 : 0;
+					return a;
+				} else {
+					/* Swap operands such that the constant always comes
+					 * second. Doing this simplifies further optimizations.
+					 * 10 <= x  ->  x >= 10  ->  !(x < 10) */
+					return PPBranch(BRT_NOT, PPBranch(BRT_LO, { b, a })).optimize(true, assume);
+				}
+			}
+			if (a == b)
+				return PPBranch(BRT_CONST, 1);
+			if (b.typ == BRT_CONST) {
+				if (a.isBoolean) {
+					local bd = b.data;
+					if (bd >= 1)
+						return PPBranch(BRT_CONST, 1); /* 0 <=  1 && 1 <=  1  ->  true */
+					if (bd <= -1)
+						return PPBranch(BRT_CONST, 0); /* 0 <= -1 && 1 <= -1  ->  false */
+					if (bd == 0) {
+						/* a    b
+						 * 0 <= 0  ->  true
+						 * 1 <= 0  ->  false
+						 * -> !a */
+						return PPBranch(BRT_NOT, a).optimize(true, assume);
+					}
+				}
+			}
+			data = { a, b };
+		}	break;
+
+		case BRT_EQ: {
+			local a, b = data...;
+			ASSERT(a is PPBranch);
+			ASSERT(b is PPBranch);
+			a = a.optimize(false, assume);
+			b = b.optimize(false, assume);
+			if (a.typ == BRT_CONST) {
+				if (b.typ == BRT_CONST) {
+					a.data = a.data == b.data ? 1 : 0;
+					return a;
+				}
+				if (a.data == 0)
+					return PPBranch(BRT_NOT, b).optimize(true, assume);
+				/* Swap operands such that the constant always comes
+				 * second. Doing this simplifies further optimizations. */
+				local temp = a;
+				a = b;
+				b = a;
+			}
+			if (a == b)
+				return PPBranch(BRT_CONST, 1);
+			if (b.typ == BRT_CONST) {
+				if (b.data == 0)
+					return PPBranch(BRT_NOT, a).optimize(true, assume);
+			}
+			data = { a, b };
+		}	break;
+
+		case BRT_BITXOR: {
+			local a, b = data...;
+			ASSERT(a is PPBranch);
+			ASSERT(b is PPBranch);
+			a = a.optimize(false, assume);
+			b = b.optimize(false, assume);
+			if (a.typ == BRT_CONST) {
+				if (b.typ == BRT_CONST) {
+					a.data = a.data ^ b.data;
+					return a;
+				}
+			}
+			if (a == b)
+				return PPBranch(BRT_CONST, 0);
+			data = { a, b };
+		}	break;
+
+
+		default:
+			break;
+		}
+		this.typ  = typ;
+		this.data = data;
+		return this;
+	}
+
+}
+
+
+
+global ppParse;
+global _ppParseAfter_prod;
+global _ppParseAfter_sum;
+global _ppParseAfter_shift;
+global _ppParseAfter_cmp;
+global _ppParseAfter_cmpeq;
+global _ppParseAfter_bitand;
+global _ppParseAfter_bitxor;
+global _ppParseAfter_bitor;
+global _ppParseAfter_land;
+global _ppParseAfter_lor;
+global _ppParseAfter_cond;
+
+
+function _ppParse_unary(self: CParser): PPBranch {
+again:
+	local tok = self.tok;
+	local result;
+	switch (tok) {
+
+	case "":
+		break;
+
+	case "(":
+		self.next();
+		result = ppParse(self);
+		self.skip(")");
+		return result;
+
+	case "!":
+		self.next();
+		return PPBranch(BRT_NOT, _ppParse_unary(self));
+
+	case "~":
+		self.next();
+		return PPBranch(BRT_INV, _ppParse_unary(self));
+
+	case "+":
+		self.next();
+		goto again;
+
+	case "-":
+		self.next();
+		return PPBranch(BRT_NEG, _ppParse_unary(self));
+
+	case "defined": {
+		tok = self.next();
+		local hasParen: bool = tok == "(";
+		if (hasParen)
+			tok = self.next();
+		if (!tok.issymbol()) {
+			self.err("Expected keyword for 'defined(...)', but got {!r}"
+				.format({ tok }));
+		}
+		self.next();
+		if (hasParen)
+			self.skip(")");
+		return PPBranch(BRT_DEFINED, tok);
+	}	break;
+
+	default:
+		if (tok.isnumeric(0)) {
+			/* Integer constant */
+			tok = tok.rstrip("uUlL");
+			try {
+				result = int(tok);
+			} catch (Error as e) {
+				self.err(e.message);
+			}
+			self.next();
+do_return_const:
+			return PPBranch(BRT_CONST, result);
+		} else if (tok[0] == "'") {
+			/* Character literal */
+			try {
+				tok = tok.decode("c-escape");
+			} catch (Error as e) {
+				self.err(e.message);
+			}
+			if (!tok)
+				self.err("Empty character literal");
+			result = 0;
+			for (local o: tok.ordinals)
+				result = (result << 8) | o;
+			self.next();
+			goto do_return_const;
+		}
+		break;
+	}
+	if (!tok.issymbol()) {
+		self.err("Unexpected token in preprocessor expression: {!r}"
+			.format({ tok }));
+	}
+	/* Fallback: Return a BRT_UNDEF branch. */
+	{
+		local escapeStart = self.tokStart;
+		local escapeEnd = self.tokEnd;
+		tok = self.next();
+		while (tok in "([{<") {
+			self.skipPair();
+			escapeEnd = self.tokEnd;
+			tok = self.next();
+		}
+		return PPBranch(BRT_UNDEF, self.text[escapeStart:escapeEnd]);
+	}
+}
+
+#define DEFINE_PARSER_FUNCTION(name, before, is_suffix_token...) \
+	function _ppParse_##name(self: CParser): PPBranch {          \
+		local result = _ppParse_##before(self);                  \
+		if (self.tok is_suffix_token)                            \
+			return _ppParseAfter_##name(self, result);           \
+		return result;                                           \
+	}
+DEFINE_PARSER_FUNCTION(prod, unary, in ["*", "/", "%"])
+DEFINE_PARSER_FUNCTION(sum, prod, in ["+", "-"])
+DEFINE_PARSER_FUNCTION(shift, sum, in ["<<", ">>"])
+DEFINE_PARSER_FUNCTION(cmp, shift, in ["<", "<=", ">", ">="])
+DEFINE_PARSER_FUNCTION(cmpeq, cmp, in ["==", "!="])
+DEFINE_PARSER_FUNCTION(bitand, cmpeq, == "&")
+DEFINE_PARSER_FUNCTION(bitxor, cmpeq, == "^")
+DEFINE_PARSER_FUNCTION(bitor, bitxor, == "|")
+DEFINE_PARSER_FUNCTION(land, bitor, == "&&")
+DEFINE_PARSER_FUNCTION(lor, land, == "||")
+DEFINE_PARSER_FUNCTION(cond, lor, == "?")
+#undef DEFINE_PARSER_FUNCTION
+
+
+function _ppParseAfter_prod(self: CParser, base: PPBranch): PPBranch {
+	ASSERT_AFTER_TOK(["*", "/", "%"]);
+	do {
+		local what = {
+			"*" : BRT_PROD,
+			"/" : BRT_DIV,
+			"%" : BRT_MOD,
+		}[self.tok];
+		self.next();
+		base = PPBranch(what, { base, _ppParse_unary(self) });
+	} while (self.tok in ["*", "/", "%"]);
+	return base;
+}
+
+function _ppParseAfter_sum(self: CParser, base: PPBranch): PPBranch {
+	ASSERT_AFTER_TOK(["+", "-"]);
+	do {
+		local isNeg = self.tok == "-";
+		self.next();
+		local other = _ppParse_prod(self);
+		if (isNeg)
+			other = PPBranch(BRT_NEG, other);
+		base = PPBranch(BRT_SUM, { base, other });
+	} while (self.tok in ["+", "-"]);
+	return base;
+}
+
+function _ppParseAfter_shift(self: CParser, base: PPBranch): PPBranch {
+	ASSERT_AFTER_TOK(["<<", ">>"]);
+	do {
+		local what = {
+			"<<" : BRT_SHL,
+			">>" : BRT_SHR,
+		}[self.tok];
+		self.next();
+		base = PPBranch(what, { base, _ppParse_sum(self) });
+	} while (self.tok in ["+", "-"]);
+	return base;
+}
+
+function _ppParseAfter_cmp(self: CParser, base: PPBranch): PPBranch {
+	ASSERT_AFTER_TOK(["<", "<=", ">", ">="]);
+	do {
+		local what, isNot = {
+			"<"  : (BRT_LO, false),
+			"<=" : (BRT_LE, false),
+			">"  : (BRT_LE, true),
+			">=" : (BRT_LO, true),
+		}[self.tok]...;
+		self.next();
+		base = PPBranch(what, { base, _ppParse_shift(self) });
+		if (isNot)
+			base = PPBranch(BRT_NOT, base);
+	} while (self.tok in ["<", "<=", ">", ">="]);
+	return base;
+}
+
+function _ppParseAfter_cmpeq(self: CParser, base: PPBranch): PPBranch {
+	ASSERT_AFTER_TOK(["==", "!="]);
+	do {
+		local isNot = self.tok == "!=";
+		self.next();
+		base = PPBranch(BRT_EQ, { base, _ppParse_cmp(self) });
+		if (isNot)
+			base = PPBranch(BRT_NOT, base);
+	} while (self.tok in ["==", "!="]);
+	return base;
+}
+
+function _ppParseAfter_bitand(self: CParser, base: PPBranch): PPBranch {
+	ASSERT_AFTER_TOK(["&"]);
+	do {
+		self.next();
+		base = PPBranch(BRT_BITAND, { base, _ppParse_cmpeq(self) });
+	} while (self.tok in ["&"]);
+	return base;
+}
+
+function _ppParseAfter_bitxor(self: CParser, base: PPBranch): PPBranch {
+	ASSERT_AFTER_TOK(["^"]);
+	do {
+		self.next();
+		base = PPBranch(BRT_BITXOR, { base, _ppParse_bitand(self) });
+	} while (self.tok in ["^"]);
+	return base;
+}
+
+function _ppParseAfter_bitor(self: CParser, base: PPBranch): PPBranch {
+	ASSERT_AFTER_TOK(["|"]);
+	do {
+		self.next();
+		base = PPBranch(BRT_BITOR, { base, _ppParse_bitxor(self) });
+	} while (self.tok in ["|"]);
+	return base;
+}
+
+function _ppParseAfter_land(self: CParser, base: PPBranch): PPBranch {
+	ASSERT_AFTER_TOK(["&&"]);
+	do {
+		self.next();
+		base = PPBranch(BRT_ALL, { base, _ppParse_bitor(self) });
+	} while (self.tok in ["&&"]);
+	return base;
+}
+
+function _ppParseAfter_lor(self: CParser, base: PPBranch): PPBranch {
+	ASSERT_AFTER_TOK(["||"]);
+	do {
+		self.next();
+		base = PPBranch(BRT_ANY, { base, _ppParse_land(self) });
+	} while (self.tok in ["||"]);
+	return base;
+}
+
+function _ppParseAfter_cond(self: CParser, base: PPBranch): PPBranch {
+	ASSERT_AFTER_TOK(["?"]);
+	self.next();
+	local tt = _ppParse_lor(self);
+	self.skip(":");
+	local ff = ppParse(self);
+	return PPBranch(BRT_IFELSE, { base, tt, ff });
+}
+
+
+@@Parse and return a preprocessor expression
+function ppParse(self: string | UserString | CParser | File): PPBranch {
+	if (self !is CParser) {
+		self = CParser(self);
+		self.next();
+	}
+	try {
+		local result = _ppParse_unary(self);
+		switch (self.tok) {
+
+		case '*': case '/': case '%':
+			result = _ppParseAfter_prod(self, result);
+			if (self.tok in ["+", "-"]) {
+		case "+": case "-":
+				result = _ppParseAfter_sum(self, result);
+			}
+			if (self.tok in ["<<", ">>"]) {
+		case "<<": case ">>":
+				result = _ppParseAfter_shift(self, result);
+			}
+			if (self.tok in ["<", "<=", ">", ">="]) {
+		case "<": case "<=": case ">": case ">=":
+				result = _ppParseAfter_cmp(self, result);
+			}
+			if (self.tok in ["==", "!="]) {
+		case "==": case "!=":
+				result = _ppParseAfter_cmpeq(self, result);
+			}
+			if (self.tok in ["&"]) {
+		case "&":
+				result = _ppParseAfter_bitand(self, result);
+			}
+			if (self.tok in ["^"]) {
+		case "^":
+				result = _ppParseAfter_bitxor(self, result);
+			}
+			if (self.tok in ["|"]) {
+		case "|":
+				result = _ppParseAfter_bitor(self, result);
+			}
+			if (self.tok in ["&&"]) {
+		case "&&":
+				result = _ppParseAfter_land(self, result);
+			}
+			if (self.tok in ["||"]) {
+		case "||":
+				result = _ppParseAfter_lor(self, result);
+			}
+			if (self.tok in ["?"]) {
+		case "?":
+				result = _ppParseAfter_cond(self, result);
+			}
+			break;
+
+		default:
+			break;
+		}
+		return result;
+	} catch (Error as e) {
+		if (type(e) === Error)
+			throw;
+		if (self.tokStart !is bound)
+			throw;
+		print repr Traceback.current;
+		self.err(e.message);
+	}
+}
+
+
+@@A simple wrapper function that may be used
+@@for optimization of preprocessor expressions
+function optimize(expr: string): string {
+	return ppParse(expr).optimize().tostr();
+}
+
+
+
+
+#ifdef __MAIN__
+
+assert optimize("2 == 2") == "1";
+assert optimize("2 == 1") == "0";
+assert optimize("!a && (a || a)") == "0";
+assert optimize("!a && (a || b)") == "!a && b";
+assert optimize("!a && (a || b || c)") == "!a && (b || c)";
+assert optimize("a && (!a || b)") == "a && b";
+assert optimize("a && (!a || b || c)") == "a && (b || c)";
+assert optimize("!a || (a && b)") == "!a || b";
+assert optimize("!a || (a && b && c)") == "!a || (b && c)";
+assert optimize("a || (!a && b)") == "a || b";
+assert optimize("a || (!a && b && c)") == "a || (b && c)";
+assert optimize("a && !a") == "0";
+assert optimize("!a && a") == "0";
+assert optimize("a || !a") == "1";
+assert optimize("!a || a") == "1";
+assert optimize("!(!b && a)") == "b || !a";
+assert optimize("!(a && !b)") == "!a || b";
+assert optimize("!(!defined(b) && defined(a))") == "defined(b) || !defined(a)";
+assert optimize("!(defined(a) && !defined(b))") == "!defined(a) || defined(b)";
+assert optimize("(a)") == "a";
+assert optimize("(defined(a) || defined(b))") == "defined(a) || defined(b)";
+assert optimize("a || b") == "a || b";
+assert optimize("a || b && 1") == "a || b";
+assert optimize("a || b && 0") == "a";
+assert optimize("a || (b && 1)") == "a || b";
+assert optimize("a || (b && 0)") == "a";
+assert optimize("a || !(b && c)") == "a || !b || !c";
+assert optimize("a && !(b || c)") == "a && !b && !c";
+assert optimize("a && (a || b)") == "a";
+assert optimize(
+"defined(__CRT_HAVE_tmpfile64) || defined(__CRT_HAVE_tmpfile) || "
+"(defined(__CRT_HAVE_tmpfile) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0))"
+) == "defined(__CRT_HAVE_tmpfile64) || defined(__CRT_HAVE_tmpfile)";
+assert optimize(
+"!defined(_KERNEL) && !defined(_SYS_FCNTL_H_) && !defined(_SYS_QUEUE_H_) && "
+"!defined(_SYS_STAT_H_) && !defined(_SYS_TIMEVAR_H_) && !defined(_SYS_TIME_H_) && "
+"((_POSIX_C_SOURCE - 0) >= 200809L || (_XOPEN_SOURCE - 0) >= 700 || defined(_NETBSD_SOURCE)) && "
+"defined(QUEUEDEBUG) && defined(_KERNEL) && defined(_XOPEN_SOURCE)"
+) == "0";
+
+assert optimize(
+"(defined(__CRT_HAVE_lfutexlock64) && defined(__USE_TIME_BITS64)) || "
+"defined(__CRT_HAVE_lfutexlock)||defined(__CRT_HAVE_lfutexlock64)"
+) == "defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64)";
+assert optimize(
+"("
+	"(defined(__CRT_HAVE_lfutexlock64) && defined(__USE_TIME_BITS64)) || "
+	"(defined(__CRT_HAVE_lfutexlock) && !defined(__USE_TIME_BITS64)) || "
+	"("
+		"defined(__CRT_HAVE_lfutexlock) || ("
+			"defined(__CRT_HAVE_lfutexlock64) || "
+			"(defined(__CRT_HAVE_lfutexlock) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) ||"
+			"defined(__CRT_HAVE_lfutexlock)"
+		")"
+	")"
+")"
+) == "defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock)";
+
+#endif /* __MAIN__ */
+
+
+
+
+
+
+
+
+
+
+
+

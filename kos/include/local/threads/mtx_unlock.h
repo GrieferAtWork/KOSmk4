@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x482e055a */
+/* HASH CRC-32:0xe48e2f7e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,11 @@
 #include <bits/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_mutex_unlock from pthread */
-#if !defined(__local___localdep_pthread_mutex_unlock_defined) && defined(__CRT_HAVE_pthread_mutex_unlock)
+#ifndef __local___localdep_pthread_mutex_unlock_defined
 #define __local___localdep_pthread_mutex_unlock_defined 1
 /* Unlock a mutex */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutex_unlock,(__pthread_mutex_t *__mutex),pthread_mutex_unlock,(__mutex))
-#endif /* !__local___localdep_pthread_mutex_unlock_defined && __CRT_HAVE_pthread_mutex_unlock */
+#endif /* !__local___localdep_pthread_mutex_unlock_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/threads.h>
 #include <bits/pthreadtypes.h>

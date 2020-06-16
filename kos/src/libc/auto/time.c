@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4415bb3 */
+/* HASH CRC-32:0x8fc35890 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -209,7 +209,7 @@ NOTHROW_NCX(LIBCCALL libc_difftime64)(time64_t time1,
 	return time1 > time0 ? time1 - time0 : time0 - time1;
 #endif /* !... */
 }
-#endif /* !(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) */
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_mktime64, libc_mktime);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
@@ -241,7 +241,7 @@ NOTHROW_NCX(LIBCCALL libc_mktime64)(__STRUCT_TM __KOS_FIXED_CONST *tp) {
 	return result;
 #endif /* !... */
 }
-#endif /* !(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) */
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ctime64, libc_ctime);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
@@ -265,7 +265,7 @@ NOTHROW_NCX(LIBCCALL libc_ctime64)(time64_t const *timer) {
 	return libc_ctime64_r(timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
 #endif /* !... */
 }
-#endif /* !(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) */
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_gmtime64, libc_gmtime);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
@@ -290,7 +290,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime64)(time64_t const *timer) {
 	return libc_gmtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
 #endif /* !... */
 }
-#endif /* !(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) */
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_localtime64, libc_localtime);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
@@ -314,7 +314,7 @@ NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer) {
 	return libc_localtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
 #endif /* !... */
 }
-#endif /* !(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) */
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /* Like `mktime', but TP represents Universal Time (UTC), not local time */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time_t
 NOTHROW_NCX(LIBCCALL libc_timegm)(__STRUCT_TM *tp) {
@@ -352,7 +352,7 @@ NOTHROW_NCX(LIBCCALL libc_timegm64)(__STRUCT_TM *tp) {
 	return libc_mktime64(tp);
 #endif /* !... */
 }
-#endif /* !(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) */
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /* Similar to `strftime' but take the information from
  * the provided locale and not the global locale */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 3, 4)) size_t
@@ -479,7 +479,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer,
 	}
 	tp->tm_year -= 1900;
 	return tp;
-#elif defined(__CRT_HAVE__gmtime32_s) || defined(__CRT_HAVE__gmtime64_s)
+#elif defined(__CRT_HAVE__gmtime64_s) || defined(__CRT_HAVE__gmtime32_s)
 	return dos_gmtime_s(tp, timer) ? NULL : tp;
 #elif defined(__USE_TIME_BITS64)
 	return libc_gmtime64_r(timer, tp);
@@ -495,7 +495,7 @@ NOTHROW_NCX(LIBCCALL libc_localtime_r)(time_t const *__restrict timer,
 #ifdef __BUILDING_LIBC
 	/* XXX: Timezone support? */
 	return libc_gmtime_r(timer, tp);
-#elif defined(__CRT_HAVE__localtime32_s) || defined(__CRT_HAVE__localtime64_s)
+#elif defined(__CRT_HAVE__localtime64_s) || defined(__CRT_HAVE__localtime32_s)
 	return dos_localtime_s(tp, timer) ? NULL : tp;
 #elif defined(__USE_TIME_BITS64)
 	return libc_localtime64_r(timer, tp);
@@ -511,7 +511,7 @@ NOTHROW_NCX(LIBCCALL libc_ctime_r)(time_t const *__restrict timer,
 #ifdef __BUILDING_LIBC
 	struct tm ltm;
 	return libc_asctime_r(libc_localtime_r(timer, &ltm), buf);
-#elif defined(__CRT_HAVE__ctime32_s) || defined(__CRT_HAVE__ctime64_s)
+#elif defined(__CRT_HAVE__ctime64_s) || defined(__CRT_HAVE__ctime32_s)
 	return dos_ctime_s(buf, 26, timer) ? NULL : __buf;
 #else /* ... */
 	struct tm ltm;
@@ -633,7 +633,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer,
 	return tp;
 #endif /* !... */
 }
-#endif /* !(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) */
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_localtime64_r, libc_localtime_r);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
@@ -651,7 +651,7 @@ NOTHROW_NCX(LIBCCALL libc_localtime64_r)(time64_t const *__restrict timer,
 	return libc_gmtime64_r(timer, tp);
 #endif /* !... */
 }
-#endif /* !(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) */
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ctime64_r, libc_ctime_r);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
@@ -669,7 +669,7 @@ NOTHROW_NCX(LIBCCALL libc_ctime64_r)(time64_t const *__restrict timer,
 	return libc_asctime_r(libc_localtime64_r(timer, &ltm), buf);
 #endif /* !... */
 }
-#endif /* !(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) */
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if defined(__BUILDING_LIBC) || !defined(__CRT_HAVE_asctime_s)
 #ifndef __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED
 #define __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79d29266 */
+/* HASH CRC-32:0xd5556e21 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_stime_defined
 #define __local_stime_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_stime) || defined(__CRT_HAVE_stime64)
+#if defined(__CRT_HAVE_stime64) || defined(__CRT_HAVE_stime)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: stime32 from time */
@@ -36,7 +36,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime32,(__time32_t
 #ifdef __CRT_HAVE_stime64
 /* Set the system time to *WHEN. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime64,(__time64_t const *__when),stime64,(__when))
-#elif defined(__CRT_HAVE_stime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_stime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Set the system time to *WHEN. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime64,(__time64_t const *__when),stime,(__when))
 #elif defined(__CRT_HAVE_stime)
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_stime_defined 1
 #define __localdep_stime __LIBC_LOCAL_NAME(stime)
 #endif /* !__local___localdep_stime_defined */
-#else /* __CRT_HAVE_stime || __CRT_HAVE_stime64 */
+#else /* __CRT_HAVE_stime64 || __CRT_HAVE_stime */
 #undef __local_stime_defined
-#endif /* !__CRT_HAVE_stime && !__CRT_HAVE_stime64 */
+#endif /* !__CRT_HAVE_stime64 && !__CRT_HAVE_stime */
 #endif /* !__local_stime_defined */

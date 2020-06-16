@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2bf6a13 */
+/* HASH CRC-32:0x69b5ecab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,7 +152,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_NONNULL((1)) int __NO
 #endif /* !__rmdir_defined */
 #ifdef __CRT_HAVE__mkdir
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_mkdir,(char const *__path),(__path))
-#elif defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
+#elif defined(__CRT_HAVE_mkdir)
 #include <local/direct/_mkdir.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_mkdir, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _mkdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mkdir))(__path); })
 #endif /* ... */
@@ -160,7 +160,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_mkdir, __FORCELOCAL __ATTR_NONNULL((1)) int __N
 #define __mkdir_defined 1
 #ifdef __CRT_HAVE__mkdir
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__path),_mkdir,(__path))
-#elif defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
+#elif defined(__CRT_HAVE_mkdir)
 #include <local/direct/_mkdir.h>
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mkdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mkdir))(__path); }
 #else /* ... */

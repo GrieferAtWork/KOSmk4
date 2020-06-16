@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53127dde */
+/* HASH CRC-32:0xb66cf94c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -193,7 +193,7 @@ __LOCAL_LIBC(format_whexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 					__a = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i));
 					__b = __hybrid_unaligned_get32((__UINT32_TYPE__ *)(__line_data + __i + 4));
-#endif /* !(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					__dst = __buffer + 16;
 					while (__dst > __buffer + 8) {
 						*--__dst = __dec[__b & 0xf];
@@ -203,7 +203,7 @@ __LOCAL_LIBC(format_whexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 						*--__dst = __dec[__a & 0xf];
 						__a >>= 4;
 					}
-#endif /* !(__SIZEOF_POINTER__ >= 8) */
+#endif /* __SIZEOF_POINTER__ < 8 */
 					__temp = (*__printer)(__arg, __buffer, 17);
 					if __unlikely(__temp < 0)
 						goto __err;

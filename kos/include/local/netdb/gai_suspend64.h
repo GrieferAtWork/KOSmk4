@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0d55276 */
+/* HASH CRC-32:0xccbe740c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifdef __CRT_HAVE_gai_suspend
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: gai_suspend32 from netdb */
-#if !defined(__local___localdep_gai_suspend32_defined) && defined(__CRT_HAVE_gai_suspend)
+#ifndef __local___localdep_gai_suspend32_defined
 #define __local___localdep_gai_suspend32_defined 1
 /* Suspend execution of the thread until at least one of the ENT requests
  * in LIST is handled. If TIMEOUT is not a null pointer it specifies the
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_BEGIN
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_gai_suspend32,(struct gaicb const *const __list[], int __ent, struct __timespec32 const *__timeout),gai_suspend,(__list,__ent,__timeout))
-#endif /* !__local___localdep_gai_suspend32_defined && __CRT_HAVE_gai_suspend */
+#endif /* !__local___localdep_gai_suspend32_defined */
 /* Suspend execution of the thread until at least one of the ENT requests
  * in LIST is handled. If TIMEOUT is not a null pointer it specifies the
  * longest time the function keeps waiting before returning with an error.

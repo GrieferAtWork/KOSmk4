@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6137d240 */
+/* HASH CRC-32:0xcd3f7c8e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_lfutex_defined
 #define __local_lfutex_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64)
+#if defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: lfutex32 from kos.futex */
@@ -78,7 +78,7 @@ __CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex3
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutex64,(__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
-#elif defined(__CRT_HAVE_lfutex) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_lfutex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
@@ -195,7 +195,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_lfutex_defined 1
 #define __localdep_lfutex __LIBC_LOCAL_NAME(lfutex)
 #endif /* !__local___localdep_lfutex_defined */
-#else /* __CRT_HAVE_lfutex || __CRT_HAVE_lfutex64 */
+#else /* __CRT_HAVE_lfutex64 || __CRT_HAVE_lfutex */
 #undef __local_lfutex_defined
-#endif /* !__CRT_HAVE_lfutex && !__CRT_HAVE_lfutex64 */
+#endif /* !__CRT_HAVE_lfutex64 && !__CRT_HAVE_lfutex */
 #endif /* !__local_lfutex_defined */

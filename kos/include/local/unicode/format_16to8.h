@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64bebe50 */
+/* HASH CRC-32:0x3ac98e43 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
  * converting wide-character unicode input data into a UTF-8 output */
 __LOCAL_LIBC(format_16to8) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_16to8))(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
-#if 2 == 2
+
 	struct __local_format_16to8_data {
 		__pformatprinter __fd_printer;   /* [1..1] Inner printer */
 		void            *__fd_arg;       /* Argument for `fd_printer' */
@@ -95,30 +95,30 @@ __after_dst_write:
 	return __result;
 __err:
 	return __temp;
-#else /* 2 == 2 */
-	struct __local_format_32to8_data {
-		__pformatprinter __fd_printer; /* [1..1] Inner printer */
-		void            *__fd_arg;     /* Argument for `fd_printer' */
-	};
-	char __buf[64];
-	struct __local_format_32to8_data *__closure;
-	__SSIZE_TYPE__ __temp, __result = 0;
-	__SIZE_TYPE__ __i = 0;
-	__closure = (struct __local_format_32to8_data *)__arg;
-	while (__i < __datalen) {
-		char *__dst = __buf;
-		do {
-			__dst = __localdep_unicode_writeutf8(__dst, ((__CHAR32_TYPE__ const *)__data)[__i++]);
-		} while ((__dst + 7) < __COMPILER_ENDOF(__buf) && __i < __datalen);
-		__temp = (*__closure->__fd_printer)(__closure->__fd_arg, __buf, (__SIZE_TYPE__)(__dst - __buf));
-		if __unlikely(__temp < 0)
-			goto __err;
-		__result += __temp;
-	}
-	return __result;
-__err:
-	return __temp;
-#endif /* !(2 == 2) */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_16to8_defined

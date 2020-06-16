@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb92d4c59 */
+/* HASH CRC-32:0xd1e0c2f2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_sigtimedwait_defined
 #define __local_sigtimedwait_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_sigtimedwait) || defined(__CRT_HAVE_sigtimedwait64)
+#if defined(__CRT_HAVE_sigtimedwait64) || defined(__CRT_HAVE_sigtimedwait)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sigtimedwait32 from signal */
 #if !defined(__local___localdep_sigtimedwait32_defined) && defined(__CRT_HAVE_sigtimedwait)
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(str
 #define __local___localdep_sigtimedwait64_defined 1
 #ifdef __CRT_HAVE_sigtimedwait64
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait64,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__timeout),sigtimedwait64,(__set,__info,__timeout))
-#elif defined(__CRT_HAVE_sigtimedwait) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_sigtimedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait64,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__timeout),sigtimedwait,(__set,__info,__timeout))
 #elif defined(__CRT_HAVE_sigtimedwait)
 __NAMESPACE_LOCAL_END
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_sigtimedwait_defined 1
 #define __localdep_sigtimedwait __LIBC_LOCAL_NAME(sigtimedwait)
 #endif /* !__local___localdep_sigtimedwait_defined */
-#else /* __CRT_HAVE_sigtimedwait || __CRT_HAVE_sigtimedwait64 */
+#else /* __CRT_HAVE_sigtimedwait64 || __CRT_HAVE_sigtimedwait */
 #undef __local_sigtimedwait_defined
-#endif /* !__CRT_HAVE_sigtimedwait && !__CRT_HAVE_sigtimedwait64 */
+#endif /* !__CRT_HAVE_sigtimedwait64 && !__CRT_HAVE_sigtimedwait */
 #endif /* !__local_sigtimedwait_defined */

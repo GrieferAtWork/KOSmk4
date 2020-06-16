@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ebe92 */
+/* HASH CRC-32:0x5434666a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: lfutex32 from kos.futex */
-#if !defined(__local___localdep_lfutex32_defined) && defined(__CRT_HAVE_lfutex)
+#ifndef __local___localdep_lfutex32_defined
 #define __local___localdep_lfutex32_defined 1
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex32,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutex,(__uaddr,__futex_op,__val),__val,2,(__UINTPTR_TYPE__,__UINTPTR_TYPE__))
-#endif /* !__local___localdep_lfutex32_defined && __CRT_HAVE_lfutex */
+#endif /* !__local___localdep_lfutex32_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN

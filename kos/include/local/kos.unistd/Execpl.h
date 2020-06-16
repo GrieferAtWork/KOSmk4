@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d60acab */
+/* HASH CRC-32:0x99ffa95d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,13 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: Execvp from kos.unistd */
-#if !defined(__local___localdep_Execvp_defined) && defined(__CRT_HAVE_Execvp)
+#ifndef __local___localdep_Execvp_defined
 #define __local___localdep_Execvp_defined 1
 /* >> execvp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CREDIRECT_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),__THROWING,__localdep_Execvp,(char const *__restrict __file, __TARGV),Execvp,(__file,___argv))
-#endif /* !__local___localdep_Execvp_defined && __CRT_HAVE_Execvp */
+#endif /* !__local___localdep_Execvp_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN

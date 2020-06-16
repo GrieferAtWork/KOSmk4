@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb50cd414 */
+/* HASH CRC-32:0xd1aaeb22 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,13 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: SymlinkAt from kos.unistd */
-#if !defined(__local___localdep_SymlinkAt_defined) && defined(__CRT_HAVE_SymlinkAt)
+#ifndef __local___localdep_SymlinkAt_defined
 #define __local___localdep_SymlinkAt_defined 1
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),__THROWING,__localdep_SymlinkAt,(char const *__link_text, __fd_t __tofd, char const *__target_path),SymlinkAt,(__link_text,__tofd,__target_path))
-#endif /* !__local___localdep_SymlinkAt_defined && __CRT_HAVE_SymlinkAt */
+#endif /* !__local___localdep_SymlinkAt_defined */
 /* >> symlink(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TARGET_PATH'.

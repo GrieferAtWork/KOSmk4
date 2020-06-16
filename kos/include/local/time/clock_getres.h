@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28f722e8 */
+/* HASH CRC-32:0x4a427ed2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_clock_getres_defined
 #define __local_clock_getres_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres) || defined(__CRT_HAVE_clock_getres64)
+#if defined(__CRT_HAVE_clock_getres64) || defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres)
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: clock_getres32 from time */
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* Get resolution of clock CLOCK_ID */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres64,(__clockid_t __clock_id, struct __timespec64 *__res),clock_getres64,(__clock_id,__res))
-#elif defined(__CRT_HAVE_clock_getres) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_clock_getres) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -90,7 +90,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_clock_getres_defined 1
 #define __localdep_clock_getres __LIBC_LOCAL_NAME(clock_getres)
 #endif /* !__local___localdep_clock_getres_defined */
-#else /* __CRT_HAVE_clock_getres || __CRT_HAVE___clock_getres || __CRT_HAVE_clock_getres64 */
+#else /* __CRT_HAVE_clock_getres64 || __CRT_HAVE_clock_getres || __CRT_HAVE___clock_getres */
 #undef __local_clock_getres_defined
-#endif /* !__CRT_HAVE_clock_getres && !__CRT_HAVE___clock_getres && !__CRT_HAVE_clock_getres64 */
+#endif /* !__CRT_HAVE_clock_getres64 && !__CRT_HAVE_clock_getres && !__CRT_HAVE___clock_getres */
 #endif /* !__local_clock_getres_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62278d15 */
+/* HASH CRC-32:0x2a245016 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ftime32, __FORCELOCAL __ATTR_NONNULL((1)) void 
 #ifdef __CRT_HAVE__ftime64
 /* Fill in TIMEBUF with information about the current time */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_ftime64,(struct __timeb64 *__timebuf),(__timebuf))
-#elif defined(__CRT_HAVE__ftime32) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE__ftime32) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Fill in TIMEBUF with information about the current time */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_ftime64,(struct __timeb64 *__timebuf),_ftime32,(__timebuf))
 #elif defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime)
@@ -77,7 +77,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ftime32_s, __FORCELOCAL __ATTR_NONNULL((1)) err
 #ifdef __CRT_HAVE__ftime64_s
 /* Fill in TIMEBUF with information about the current time */
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_ftime64_s,(struct __timeb64 *__timebuf),(__timebuf))
-#elif defined(__CRT_HAVE__ftime32_s) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE__ftime32_s) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Fill in TIMEBUF with information about the current time */
 __CREDIRECT(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_ftime64_s,(struct __timeb64 *__timebuf),_ftime32_s,(__timebuf))
 #elif defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE__ftime32)
@@ -105,7 +105,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ftime, __FORCELOCAL __ATTR_NONNULL((1)) int __NO
 #ifdef __CRT_HAVE_ftime64
 /* Fill in TIMEBUF with information about the current time */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftime64,(struct timeb64 *__timebuf),(__timebuf))
-#elif defined(__CRT_HAVE_ftime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_ftime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Fill in TIMEBUF with information about the current time */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftime64,(struct timeb64 *__timebuf),ftime,(__timebuf))
 #elif defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime32)

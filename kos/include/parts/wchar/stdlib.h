@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c964d27 */
+/* HASH CRC-32:0xa70b5cc6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,15 +43,15 @@ __SYSDECL_BEGIN
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_wtoi
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),(__nptr))
-#elif defined(__CRT_HAVE_wtol) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+#elif defined(__CRT_HAVE_wtol) && __SIZEOF_INT__ == __SIZEOF_LONG__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),wtol,(__nptr))
-#elif defined(__CRT_HAVE__wtol) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+#elif defined(__CRT_HAVE__wtol) && __SIZEOF_INT__ == __SIZEOF_LONG__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),_wtol,(__nptr))
-#elif defined(__CRT_HAVE_wtoll) && (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__)
+#elif defined(__CRT_HAVE_wtoll) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),wtoll,(__nptr))
-#elif defined(__CRT_HAVE__wtoll) && (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__)
+#elif defined(__CRT_HAVE__wtoll) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),_wtoll,(__nptr))
-#elif defined(__CRT_HAVE__wtoi64) && (__SIZEOF_INT__ == 8)
+#elif defined(__CRT_HAVE__wtoi64) && __SIZEOF_INT__ == 8
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),_wtoi64,(__nptr))
 #else /* ... */
 #include <local/parts.wchar.stdlib/wtoi.h>
@@ -59,15 +59,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wtoi, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __
 #endif /* !... */
 #ifdef __CRT_HAVE_wtol
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),(__nptr))
-#elif defined(__CRT_HAVE_wtoi) && (__SIZEOF_LONG__ == __SIZEOF_INT__)
+#elif defined(__CRT_HAVE_wtoi) && __SIZEOF_LONG__ == __SIZEOF_INT__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),wtoi,(__nptr))
-#elif defined(__CRT_HAVE__wtoi) && (__SIZEOF_LONG__ == __SIZEOF_INT__)
+#elif defined(__CRT_HAVE__wtoi) && __SIZEOF_LONG__ == __SIZEOF_INT__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),_wtoi,(__nptr))
-#elif defined(__CRT_HAVE_wtoll) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+#elif defined(__CRT_HAVE_wtoll) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),wtoll,(__nptr))
-#elif defined(__CRT_HAVE__wtoll) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+#elif defined(__CRT_HAVE__wtoll) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),_wtoll,(__nptr))
-#elif defined(__CRT_HAVE__wtoi64) && (__SIZEOF_LONG__ == 8)
+#elif defined(__CRT_HAVE__wtoi64) && __SIZEOF_LONG__ == 8
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),_wtoi64,(__nptr))
 #else /* ... */
 #include <local/parts.wchar.stdlib/wtol.h>
@@ -76,15 +76,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wtol, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __
 #ifdef __LONGLONG
 #ifdef __CRT_HAVE_wtoll
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),(__nptr))
-#elif defined(__CRT_HAVE_wtoi) && (__SIZEOF_LONG_LONG__ == __SIZEOF_INT__)
+#elif defined(__CRT_HAVE_wtoi) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),wtoi,(__nptr))
-#elif defined(__CRT_HAVE__wtoi) && (__SIZEOF_LONG_LONG__ == __SIZEOF_INT__)
+#elif defined(__CRT_HAVE__wtoi) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),_wtoi,(__nptr))
-#elif defined(__CRT_HAVE_wtol) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
+#elif defined(__CRT_HAVE_wtol) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),wtol,(__nptr))
-#elif defined(__CRT_HAVE__wtol) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
+#elif defined(__CRT_HAVE__wtol) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),_wtol,(__nptr))
-#elif defined(__CRT_HAVE__wtoi64) && (__SIZEOF_LONG_LONG__ == 8)
+#elif defined(__CRT_HAVE__wtoi64) && __SIZEOF_LONG_LONG__ == 8
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),_wtoi64,(__nptr))
 #else /* ... */
 #include <local/parts.wchar.stdlib/wtoll.h>

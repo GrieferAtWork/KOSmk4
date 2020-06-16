@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x741151e9 */
+/* HASH CRC-32:0x37643d14 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wreadlinkat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wreadlinkat from parts.wchar.unistd */
-#if !defined(__local___localdep_wreadlinkat_defined) && defined(__CRT_HAVE_wreadlinkat)
+#ifndef __local___localdep_wreadlinkat_defined
 #define __local___localdep_wreadlinkat_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_wreadlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__restrict __path, __WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen),wreadlinkat,(__dfd,__path,__buf,__buflen))
-#endif /* !__local___localdep_wreadlinkat_defined && __CRT_HAVE_wreadlinkat */
+#endif /* !__local___localdep_wreadlinkat_defined */
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x940c710a */
+/* HASH CRC-32:0xca4faaef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise32,(__fd_t __fd, __off32_
 #define __local___localdep_posix_fadvise64_defined 1
 #ifdef __CRT_HAVE_posix_fadvise64
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise64,(__fd_t __fd, __off64_t __offset, __off64_t __length, int __advise),posix_fadvise64,(__fd,__offset,__length,__advise))
-#elif defined(__CRT_HAVE_posix_fadvise) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_posix_fadvise) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise64,(__fd_t __fd, __off64_t __offset, __off64_t __length, int __advise),posix_fadvise,(__fd,__offset,__length,__advise))
 #else /* ... */
 __NAMESPACE_LOCAL_END

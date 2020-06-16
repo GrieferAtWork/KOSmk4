@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7d682f7 */
+/* HASH CRC-32:0x6b096bb0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,11 @@
 #include <bits/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_setspecific from pthread */
-#if !defined(__local___localdep_pthread_setspecific_defined) && defined(__CRT_HAVE_pthread_setspecific)
+#ifndef __local___localdep_pthread_setspecific_defined
 #define __local___localdep_pthread_setspecific_defined 1
 /* Store POINTER in the thread-specific data slot identified by KEY */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),pthread_setspecific,(__key,__pointer))
-#endif /* !__local___localdep_pthread_setspecific_defined && __CRT_HAVE_pthread_setspecific */
+#endif /* !__local___localdep_pthread_setspecific_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/threads.h>
 #include <bits/pthreadtypes.h>

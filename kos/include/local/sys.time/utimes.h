@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bac8cb9 */
+/* HASH CRC-32:0x1721c25 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_utimes_defined
 #define __local_utimes_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_utimes) || defined(__CRT_HAVE_utimes64)
+#if defined(__CRT_HAVE_utimes64) || defined(__CRT_HAVE_utimes)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: utimes32 from sys.time */
 #if !defined(__local___localdep_utimes32_defined) && defined(__CRT_HAVE_utimes)
@@ -39,7 +39,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_utimes32,(char c
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
  * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_utimes64,(char const *__file, struct __timeval64 const __tvp[2]),utimes64,(__file,__tvp))
-#elif defined(__CRT_HAVE_utimes) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_utimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Change the access time of FILE to TVP[0] and the modification time of
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
  * Returns 0 on success, -1 on errors */
@@ -86,7 +86,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_utimes_defined 1
 #define __localdep_utimes __LIBC_LOCAL_NAME(utimes)
 #endif /* !__local___localdep_utimes_defined */
-#else /* __CRT_HAVE_utimes || __CRT_HAVE_utimes64 */
+#else /* __CRT_HAVE_utimes64 || __CRT_HAVE_utimes */
 #undef __local_utimes_defined
-#endif /* !__CRT_HAVE_utimes && !__CRT_HAVE_utimes64 */
+#endif /* !__CRT_HAVE_utimes64 && !__CRT_HAVE_utimes */
 #endif /* !__local_utimes_defined */

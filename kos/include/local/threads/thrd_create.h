@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2d5caec */
+/* HASH CRC-32:0xa88c126 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <bits/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_create from pthread */
-#if !defined(__local___localdep_pthread_create_defined) && defined(__CRT_HAVE_pthread_create)
+#ifndef __local___localdep_pthread_create_defined
 #define __local___localdep_pthread_create_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/pthreadtypes.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
  * getting passed ARG. Creation attributed come from ATTR. The new
  * handle is stored in *NEWTHREAD */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,__localdep_pthread_create,(__pthread_t *__restrict __newthread, __pthread_attr_t const *__restrict __attr, __pthread_start_routine_t __start_routine, void *__restrict __arg),pthread_create,(__newthread,__attr,__start_routine,__arg))
-#endif /* !__local___localdep_pthread_create_defined && __CRT_HAVE_pthread_create */
+#endif /* !__local___localdep_pthread_create_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/threads.h>
 #include <parts/errno.h>

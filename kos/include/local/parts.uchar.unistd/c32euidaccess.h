@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8391da0 */
+/* HASH CRC-32:0xcf2dccef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,13 @@
 #define __local_c32euidaccess_defined 1
 #include <__crt.h>
 #include <asm/fcntl.h>
-#if defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && ((defined(__CRT_HAVE_wfaccessat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wfaccessat))
+#if defined(__CRT_AT_FDCWD) && defined(__AT_EACCESS) && ((defined(__CRT_HAVE_wfaccessat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wfaccessat))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32faccessat from parts.uchar.unistd */
 #ifndef __local___localdep_c32faccessat_defined
 #define __local___localdep_c32faccessat_defined 1
-#if defined(__CRT_HAVE_wfaccessat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_wfaccessat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c32euidaccess_defined 1
 #define __localdep_c32euidaccess __LIBC_LOCAL_NAME(c32euidaccess)
 #endif /* !__local___localdep_c32euidaccess_defined */
-#else /* __CRT_AT_FDCWD && __AT_EACCESS && ((__CRT_HAVE_wfaccessat && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wfaccessat) */
+#else /* __CRT_AT_FDCWD && __AT_EACCESS && ((__CRT_HAVE_wfaccessat && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wfaccessat) */
 #undef __local_c32euidaccess_defined
-#endif /* !__CRT_AT_FDCWD || !__AT_EACCESS || ((!__CRT_HAVE_wfaccessat || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wfaccessat) */
+#endif /* !__CRT_AT_FDCWD || !__AT_EACCESS || ((!__CRT_HAVE_wfaccessat || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wfaccessat) */
 #endif /* !__local_c32euidaccess_defined */

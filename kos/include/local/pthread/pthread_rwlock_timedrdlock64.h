@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d1b492b */
+/* HASH CRC-32:0xf5569305 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,11 +26,11 @@
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_rwlock_timedrdlock32 from pthread */
-#if !defined(__local___localdep_pthread_rwlock_timedrdlock32_defined) && defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
+#ifndef __local___localdep_pthread_rwlock_timedrdlock32_defined
 #define __local___localdep_pthread_rwlock_timedrdlock32_defined 1
 /* Try to acquire read lock for RWLOCK or return after specfied time */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_rwlock_timedrdlock32,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec32 const *__restrict __abstime),pthread_rwlock_timedrdlock,(__rwlock,__abstime))
-#endif /* !__local___localdep_pthread_rwlock_timedrdlock32_defined && __CRT_HAVE_pthread_rwlock_timedrdlock */
+#endif /* !__local___localdep_pthread_rwlock_timedrdlock32_defined */
 /* Try to acquire read lock for RWLOCK or return after specfied time */
 __LOCAL_LIBC(pthread_rwlock_timedrdlock64) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64))(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __abstime) {

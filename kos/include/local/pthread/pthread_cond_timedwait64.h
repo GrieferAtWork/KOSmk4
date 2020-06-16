@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6718c7db */
+/* HASH CRC-32:0x91fe0553 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,10 @@
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_cond_timedwait32 from pthread */
-#if !defined(__local___localdep_pthread_cond_timedwait32_defined) && defined(__CRT_HAVE_pthread_cond_timedwait)
+#ifndef __local___localdep_pthread_cond_timedwait32_defined
 #define __local___localdep_pthread_cond_timedwait32_defined 1
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_pthread_cond_timedwait32,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
-#endif /* !__local___localdep_pthread_cond_timedwait32_defined && __CRT_HAVE_pthread_cond_timedwait */
+#endif /* !__local___localdep_pthread_cond_timedwait32_defined */
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch

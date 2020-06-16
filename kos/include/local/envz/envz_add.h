@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70a6c8a3 */
+/* HASH CRC-32:0x48678d7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,14 +32,12 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_ad
 #elif defined(__CRT_HAVE___argz_add)
 /* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),__argz_add,(__pargz,__pargz_len,__str))
-#elif defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_realloc)
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/argz/argz_add.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Append `STR' to the argz vector in `PARGZ & PARGZ_LEN' */
 #define __localdep_argz_add __LIBC_LOCAL_NAME(argz_add)
-#else /* ... */
-#undef __local___localdep_argz_add_defined
 #endif /* !... */
 #endif /* !__local___localdep_argz_add_defined */
 /* Dependency: envz_remove from envz */
@@ -73,13 +71,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined 1
-#if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
+#if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
 __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,{ return __builtin_realloc(__mallptr, __num_bytes); })
-#elif defined(__CRT_HAVE_realloc)
+#else /* __has_builtin(__builtin_realloc) && __LIBC_BIND_CRTBUILTINS */
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
-#else /* ... */
-#undef __local___localdep_realloc_defined
-#endif /* !... */
+#endif /* !__has_builtin(__builtin_realloc) || !__LIBC_BIND_CRTBUILTINS */
 #endif /* !__local___localdep_realloc_defined */
 /* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined

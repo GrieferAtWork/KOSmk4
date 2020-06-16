@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79876f37 */
+/* HASH CRC-32:0xdd00f157 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_gmtime
 #elif defined(__CRT_HAVE__gmtime64_s) && !defined(__USE_TIME_BITS64)
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_gmtime_s,(__STRUCT_TM *__restrict __tp, __TM_TYPE(time) const *__restrict __timer),_gmtime64_s,(__tp,__timer))
-#elif defined(__CRT_HAVE__gmtime32_s) || defined(__CRT_HAVE__gmtime64_s)
+#elif defined(__CRT_HAVE__gmtime64_s) || defined(__CRT_HAVE__gmtime32_s)
 __NAMESPACE_LOCAL_END
 #include <local/time/dos_gmtime_s.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -80,7 +80,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_gmtime64_r
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_gmtime64_r,(__time64_t const *__restrict __timer, __STRUCT_TM *__restrict __tp),gmtime64_r,(__timer,__tp))
-#elif defined(__CRT_HAVE_gmtime_r) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_gmtime_r) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_gmtime64_r,(__time64_t const *__restrict __timer, __STRUCT_TM *__restrict __tp),gmtime_r,(__timer,__tp))
 #else /* ... */
@@ -159,7 +159,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime_r))(__TM_TYPE(time) const *__r
 	}
 	__tp->tm_year -= 1900;
 	return __tp;
-#elif defined(__CRT_HAVE__gmtime32_s) || defined(__CRT_HAVE__gmtime64_s)
+#elif defined(__CRT_HAVE__gmtime64_s) || defined(__CRT_HAVE__gmtime32_s)
 	return __localdep_dos_gmtime_s(__tp, __timer) ? __NULLPTR : __tp;
 #elif defined(__USE_TIME_BITS64)
 	return __localdep_gmtime64_r(__timer, __tp);

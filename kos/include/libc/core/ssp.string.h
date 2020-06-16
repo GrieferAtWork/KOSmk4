@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68be2d30 */
+/* HASH CRC-32:0x628f8f8a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -249,7 +249,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #define ____libc_core___memcpyw_chk_defined 1
 #ifdef __CRT_HAVE___memcpyw_chk
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_core___memcpyw_chk,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__memcpyw_chk,(__dst,__src,__n_words,__dst_objsize))
-#elif defined(__CRT_HAVE___wmemcpy_chk) && (__SIZEOF_WCHAR_T__ == 2)
+#elif defined(__CRT_HAVE___wmemcpy_chk) && __SIZEOF_WCHAR_T__ == 2
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_core___memcpyw_chk,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__wmemcpy_chk,(__dst,__src,__n_words,__dst_objsize))
 #else /* ... */
 #include <local/ssp.string/__memcpyw_chk.h>
@@ -260,7 +260,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 #define ____libc_core___mempcpyw_chk_defined 1
 #ifdef __CRT_HAVE___mempcpyw_chk
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_core___mempcpyw_chk,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__mempcpyw_chk,(__dst,__src,__n_words,__dst_objsize))
-#elif defined(__CRT_HAVE___wmempcpy_chk) && (__SIZEOF_WCHAR_T__ == 2)
+#elif defined(__CRT_HAVE___wmempcpy_chk) && __SIZEOF_WCHAR_T__ == 2
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_core___mempcpyw_chk,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__wmempcpy_chk,(__dst,__src,__n_words,__dst_objsize))
 #else /* ... */
 #include <local/ssp.string/__mempcpyw_chk.h>
@@ -271,7 +271,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 #define ____libc_core___memmovew_chk_defined 1
 #ifdef __CRT_HAVE___memmovew_chk
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_core___memmovew_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__memmovew_chk,(__dst,__src,__n_words,__dst_objsize))
-#elif defined(__CRT_HAVE___wmemmove_chk) && (__SIZEOF_WCHAR_T__ == 2)
+#elif defined(__CRT_HAVE___wmemmove_chk) && __SIZEOF_WCHAR_T__ == 2
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_core___memmovew_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__wmemmove_chk,(__dst,__src,__n_words,__dst_objsize))
 #else /* ... */
 #include <local/ssp.string/__memmovew_chk.h>
@@ -282,7 +282,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 #define ____libc_core___memcpyl_chk_defined 1
 #ifdef __CRT_HAVE___memcpyl_chk
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_core___memcpyl_chk,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__memcpyl_chk,(__dst,__src,__n_dwords,__dst_objsize))
-#elif defined(__CRT_HAVE___wmemcpy_chk) && (__SIZEOF_WCHAR_T__ == 4)
+#elif defined(__CRT_HAVE___wmemcpy_chk) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_core___memcpyl_chk,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__wmemcpy_chk,(__dst,__src,__n_dwords,__dst_objsize))
 #else /* ... */
 #include <local/ssp.string/__memcpyl_chk.h>
@@ -293,7 +293,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 #define ____libc_core___mempcpyl_chk_defined 1
 #ifdef __CRT_HAVE___mempcpyl_chk
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_core___mempcpyl_chk,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__mempcpyl_chk,(__dst,__src,__n_dwords,__dst_objsize))
-#elif defined(__CRT_HAVE___wmempcpy_chk) && (__SIZEOF_WCHAR_T__ == 4)
+#elif defined(__CRT_HAVE___wmempcpy_chk) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_core___mempcpyl_chk,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__wmempcpy_chk,(__dst,__src,__n_dwords,__dst_objsize))
 #else /* ... */
 #include <local/ssp.string/__mempcpyl_chk.h>
@@ -304,7 +304,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 #define ____libc_core___memmovel_chk_defined 1
 #ifdef __CRT_HAVE___memmovel_chk
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_core___memmovel_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__memmovel_chk,(__dst,__src,__n_dwords,__dst_objsize))
-#elif defined(__CRT_HAVE___wmemmove_chk) && (__SIZEOF_WCHAR_T__ == 4)
+#elif defined(__CRT_HAVE___wmemmove_chk) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_core___memmovel_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__wmemmove_chk,(__dst,__src,__n_dwords,__dst_objsize))
 #else /* ... */
 #include <local/ssp.string/__memmovel_chk.h>
@@ -371,7 +371,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_core___memmoveupw_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__memmoveupw_chk,(__dst,__src,__n_words,__dst_objsize))
 #elif defined(__CRT_HAVE___memmovew_chk)
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_core___memmoveupw_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__memmovew_chk,(__dst,__src,__n_words,__dst_objsize))
-#elif defined(__CRT_HAVE___wmemmove_chk) && (__SIZEOF_WCHAR_T__ == 2)
+#elif defined(__CRT_HAVE___wmemmove_chk) && __SIZEOF_WCHAR_T__ == 2
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_core___memmoveupw_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__wmemmove_chk,(__dst,__src,__n_words,__dst_objsize))
 #else /* ... */
 #include <local/ssp.string/__memmoveupw_chk.h>
@@ -384,7 +384,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_core___memmovedownw_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__memmovedownw_chk,(__dst,__src,__n_words,__dst_objsize))
 #elif defined(__CRT_HAVE___memmovew_chk)
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_core___memmovedownw_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__memmovew_chk,(__dst,__src,__n_words,__dst_objsize))
-#elif defined(__CRT_HAVE___wmemmove_chk) && (__SIZEOF_WCHAR_T__ == 2)
+#elif defined(__CRT_HAVE___wmemmove_chk) && __SIZEOF_WCHAR_T__ == 2
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__libc_core___memmovedownw_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__wmemmove_chk,(__dst,__src,__n_words,__dst_objsize))
 #else /* ... */
 #include <local/ssp.string/__memmovedownw_chk.h>
@@ -397,7 +397,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_core___memmoveupl_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__memmoveupl_chk,(__dst,__src,__n_dwords,__dst_objsize))
 #elif defined(__CRT_HAVE___memmovel_chk)
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_core___memmoveupl_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__memmovel_chk,(__dst,__src,__n_dwords,__dst_objsize))
-#elif defined(__CRT_HAVE___wmemmove_chk) && (__SIZEOF_WCHAR_T__ == 4)
+#elif defined(__CRT_HAVE___wmemmove_chk) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_core___memmoveupl_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__wmemmove_chk,(__dst,__src,__n_dwords,__dst_objsize))
 #else /* ... */
 #include <local/ssp.string/__memmoveupl_chk.h>
@@ -410,7 +410,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_core___memmovedownl_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__memmovedownl_chk,(__dst,__src,__n_dwords,__dst_objsize))
 #elif defined(__CRT_HAVE___memmovel_chk)
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_core___memmovedownl_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__memmovel_chk,(__dst,__src,__n_dwords,__dst_objsize))
-#elif defined(__CRT_HAVE___wmemmove_chk) && (__SIZEOF_WCHAR_T__ == 4)
+#elif defined(__CRT_HAVE___wmemmove_chk) && __SIZEOF_WCHAR_T__ == 4
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__libc_core___memmovedownl_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__wmemmove_chk,(__dst,__src,__n_dwords,__dst_objsize))
 #else /* ... */
 #include <local/ssp.string/__memmovedownl_chk.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9cf9dcd */
+/* HASH CRC-32:0x18bc8b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_wait4_defined
 #define __local_wait4_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_wait4) || defined(__CRT_HAVE_wait4_64)
+#if defined(__CRT_HAVE_wait4_64) || defined(__CRT_HAVE_wait4)
 struct rusage;
 #include <features.h>
 #include <bits/rusage-struct.h>
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait4_64,(__pid,__stat_loc,__options,__usage))
-#elif defined(__CRT_HAVE_wait4) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_wait4) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 struct __rusage64;
 __NAMESPACE_LOCAL_BEGIN
@@ -87,7 +87,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wait4_defined 1
 #define __localdep_wait4 __LIBC_LOCAL_NAME(wait4)
 #endif /* !__local___localdep_wait4_defined */
-#else /* __CRT_HAVE_wait4 || __CRT_HAVE_wait4_64 */
+#else /* __CRT_HAVE_wait4_64 || __CRT_HAVE_wait4 */
 #undef __local_wait4_defined
-#endif /* !__CRT_HAVE_wait4 && !__CRT_HAVE_wait4_64 */
+#endif /* !__CRT_HAVE_wait4_64 && !__CRT_HAVE_wait4 */
 #endif /* !__local_wait4_defined */

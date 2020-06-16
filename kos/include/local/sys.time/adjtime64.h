@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb48f1e91 */
+/* HASH CRC-32:0xb9ee8edf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,14 +24,14 @@
 #ifdef __CRT_HAVE_adjtime
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: adjtime32 from sys.time */
-#if !defined(__local___localdep_adjtime32_defined) && defined(__CRT_HAVE_adjtime)
+#ifndef __local___localdep_adjtime32_defined
 #define __local___localdep_adjtime32_defined 1
 /* Adjust the current time of day by the amount in DELTA.
  * If OLDDELTA is not NULL, it is filled in with the amount of time
  * adjustment remaining to be done from the last `adjtime' call.
  * This call is restricted to the super-user */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime32,(struct __timeval32 const *__delta, struct __timeval32 *__olddelta),adjtime,(__delta,__olddelta))
-#endif /* !__local___localdep_adjtime32_defined && __CRT_HAVE_adjtime */
+#endif /* !__local___localdep_adjtime32_defined */
 /* Adjust the current time of day by the amount in DELTA.
  * If OLDDELTA is not NULL, it is filled in with the amount of time
  * adjustment remaining to be done from the last `adjtime' call.

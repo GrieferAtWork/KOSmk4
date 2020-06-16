@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6cfae0b */
+/* HASH CRC-32:0x7c8ea727 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,11 +24,11 @@
 #ifdef __CRT_HAVE_futimesat
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: futimesat32 from sys.time */
-#if !defined(__local___localdep_futimesat32_defined) && defined(__CRT_HAVE_futimesat)
+#ifndef __local___localdep_futimesat32_defined
 #define __local___localdep_futimesat32_defined 1
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,__localdep_futimesat32,(__fd_t __fd, char const *__file, struct __timeval32 const __tvp[2]),futimesat,(__fd,__file,__tvp))
-#endif /* !__local___localdep_futimesat32_defined && __CRT_HAVE_futimesat */
+#endif /* !__local___localdep_futimesat32_defined */
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __LOCAL_LIBC(futimesat64) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimesat64))(__fd_t __fd, char const *__file, struct __timeval64 const __tvp[2]) {

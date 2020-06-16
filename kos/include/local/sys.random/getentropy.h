@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa71d56ad */
+/* HASH CRC-32:0x7171fe66 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #if defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: getrandom from sys.random */
-#if !defined(__local___localdep_getrandom_defined) && defined(__CRT_HAVE_getrandom)
+#ifndef __local___localdep_getrandom_defined
 #define __local___localdep_getrandom_defined 1
 /* Ask the kernel for up to `NUM_BYTES' bytes of random data, which
  * should then be written to `BUFFER'.
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
  *                if no random data had already been retrieved from
  *                the kernel's random data sink. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_getrandom,(void *__buf, __SIZE_TYPE__ __num_bytes, unsigned int __flags),getrandom,(__buf,__num_bytes,__flags))
-#endif /* !__local___localdep_getrandom_defined && __CRT_HAVE_getrandom */
+#endif /* !__local___localdep_getrandom_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN

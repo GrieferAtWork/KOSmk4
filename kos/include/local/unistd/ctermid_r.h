@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73362f36 */
+/* HASH CRC-32:0xbf0df341 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,11 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: ctermid from unistd */
 #ifndef __local___localdep_ctermid_defined
 #define __local___localdep_ctermid_defined 1
-#ifdef __CRT_HAVE_ctermid
 __CREDIRECT(,char *,__NOTHROW_NCX,__localdep_ctermid,(char *__s),ctermid,(__s))
-#else /* __CRT_HAVE_ctermid */
-#undef __local___localdep_ctermid_defined
-#endif /* !__CRT_HAVE_ctermid */
 #endif /* !__local___localdep_ctermid_defined */
 /* Same as `ctermid', but return `NULL' when `S' is `NULL' */
 __LOCAL_LIBC(ctermid_r) char *

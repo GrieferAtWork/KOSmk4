@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f0268d4 */
+/* HASH CRC-32:0xd510ba33 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_memsetl
 /* Fill memory with a given dword */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memsetl,(__dst,__dword,__n_dwords))
-#elif defined(__CRT_HAVE_wmemset) && (__SIZEOF_WCHAR_T__ == 4)
+#elif defined(__CRT_HAVE_wmemset) && __SIZEOF_WCHAR_T__ == 4
 /* Fill memory with a given dword */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),wmemset,(__dst,__dword,__n_dwords))
 #elif defined(__CRT_HAVE_KOS$wmemset) && defined(__PE__)
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_memsetw
 /* Fill memory with a given word */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),memsetw,(__dst,__word,__n_words))
-#elif defined(__CRT_HAVE_wmemset) && (__SIZEOF_WCHAR_T__ == 2)
+#elif defined(__CRT_HAVE_wmemset) && __SIZEOF_WCHAR_T__ == 2
 /* Fill memory with a given word */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memsetw,(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),wmemset,(__dst,__word,__n_words))
 #elif defined(__CRT_HAVE_DOS$wmemset)
@@ -80,13 +80,13 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_memsetw_defined */
 __LOCAL_LIBC(c32memset) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32memset))(__CHAR32_TYPE__ *__dst, __CHAR32_TYPE__ __filler, __SIZE_TYPE__ __num_chars) {
-#if 4 == 2
-	return (__CHAR32_TYPE__ *)__localdep_memsetw(__dst, (__UINT16_TYPE__)__filler, __num_chars);
-#elif 4 == 4
+
+
+
 	return (__CHAR32_TYPE__ *)__localdep_memsetl(__dst, (__UINT32_TYPE__)__filler, __num_chars);
-#else /* ... */
-	return (__CHAR32_TYPE__ *)__localdep_memset(__dst, (int)__filler, __num_chars * sizeof(__CHAR32_TYPE__));
-#endif /* !... */
+
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32memset_defined

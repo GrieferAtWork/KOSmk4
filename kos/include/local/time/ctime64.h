@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf72243cd */
+/* HASH CRC-32:0xfe00de81 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_LOCAL_BEGIN
 /* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_ctime64_r,(__time64_t const *__restrict __timer, char __buf[26]),ctime64_r,(__timer,__buf))
-#elif defined(__CRT_HAVE_ctime_r) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_ctime_r) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 #ifndef __STRUCT_TM
 #ifdef __tm_defined

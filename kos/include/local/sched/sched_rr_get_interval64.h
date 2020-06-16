@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa1620d5 */
+/* HASH CRC-32:0x5bf3672c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,10 @@
 #ifdef __CRT_HAVE_sched_rr_get_interval
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sched_rr_get_interval32 from sched */
-#if !defined(__local___localdep_sched_rr_get_interval32_defined) && defined(__CRT_HAVE_sched_rr_get_interval)
+#ifndef __local___localdep_sched_rr_get_interval32_defined
 #define __local___localdep_sched_rr_get_interval32_defined 1
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),sched_rr_get_interval,(__pid,__tms))
-#endif /* !__local___localdep_sched_rr_get_interval32_defined && __CRT_HAVE_sched_rr_get_interval */
+#endif /* !__local___localdep_sched_rr_get_interval32_defined */
 __LOCAL_LIBC(sched_rr_get_interval64) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sched_rr_get_interval64))(__pid_t __pid, struct __timespec64 *__tms) {
 	struct __timespec32 __tms32;

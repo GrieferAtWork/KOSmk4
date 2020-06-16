@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x671c43f4 */
+/* HASH CRC-32:0x6c4dbb30 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -205,7 +205,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(hsearch, __FORCELOCAL ENTRY *__NOTHROW_NCX(__LIB
 #ifdef __CRT_HAVE_hcreate
 /* Create a new hashing table which will at most contain NEL elements */
 __CDECLARE(,int,__NOTHROW_NCX,hcreate,(size_t __nel),(__nel))
-#elif defined(__CRT_HAVE_hcreate_r) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_hcreate_r) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/search/hcreate.h>
 /* Create a new hashing table which will at most contain NEL elements */
 __NAMESPACE_LOCAL_USING_OR_IMPL(hcreate, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL hcreate)(size_t __nel) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hcreate))(__nel); })
@@ -239,7 +239,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(hsearch_r, __FORCELOCAL __ATTR_NONNULL((3, 4)) i
 #ifdef __CRT_HAVE_hcreate_r
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __CDECLARE(,int,__NOTHROW_NCX,hcreate_r,(size_t __nel, struct hsearch_data *__htab),(__nel,__htab))
-#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/search/hcreate_r.h>
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __NAMESPACE_LOCAL_USING_OR_IMPL(hcreate_r, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL hcreate_r)(size_t __nel, struct hsearch_data *__htab) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hcreate_r))(__nel, __htab); })

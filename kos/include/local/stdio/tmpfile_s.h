@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3739ef1 */
+/* HASH CRC-32:0x2f3c4a2a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,6 @@ __NAMESPACE_LOCAL_BEGIN
 /* 64-bit variant of `tmpfile' */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,__localdep_tmpfile64,(void),tmpfile64,())
 #elif defined(__CRT_HAVE_tmpfile)
-/* 64-bit variant of `tmpfile' */
-__CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,__localdep_tmpfile64,(void),tmpfile,())
-#elif defined(__CRT_HAVE_tmpfile) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 /* 64-bit variant of `tmpfile' */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,__localdep_tmpfile64,(void),tmpfile,())
 #else /* ... */

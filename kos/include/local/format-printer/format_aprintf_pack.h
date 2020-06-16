@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9aa6ab25 */
+/* HASH CRC-32:0x8800dedd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,13 +101,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_a
 			__self->ap_base = (char *)__localdep_malloc(1 * sizeof(char));
 			if __unlikely(!__self->ap_base)
 				return __NULLPTR;
-#elif defined(__CRT_HAVE_realloc)
-			__self->ap_base = (char *)__localdep_realloc(__NULLPTR, 1 * sizeof(char));
-			if __unlikely(!__self->ap_base)
-				return __NULLPTR;
-#else /* ... */
+
+
+
+
+#else /* __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign */
 			return __NULLPTR;
-#endif /* !... */
+#endif /* !__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign */
 		}
 	}
 	__result = __self->ap_base;

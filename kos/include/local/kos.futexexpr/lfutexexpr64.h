@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40460e15 */
+/* HASH CRC-32:0x2e9d04c5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: lfutexexpr32 from kos.futexexpr */
-#if !defined(__local___localdep_lfutexexpr32_defined) && defined(__CRT_HAVE_lfutexexpr)
+#ifndef __local___localdep_lfutexexpr32_defined
 #define __local___localdep_lfutexexpr32_defined 1
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_lfutexexpr32,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__base,__exprc,__exprv,__timeout,__timeout_flags))
-#endif /* !__local___localdep_lfutexexpr32_defined && __CRT_HAVE_lfutexexpr */
+#endif /* !__local___localdep_lfutexexpr32_defined */
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)

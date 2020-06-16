@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ea88666 */
+/* HASH CRC-32:0xdb370d56 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -262,7 +262,7 @@ __CDECLARE(,int,__NOTHROW_NCX,prlimit,(__pid_t __pid, __rlimit_resource_t __reso
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_prlimit64
 __CDECLARE(,int,__NOTHROW_NCX,prlimit64,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
-#elif defined(__CRT_HAVE_prlimit) && (__SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)
+#elif defined(__CRT_HAVE_prlimit) && __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,prlimit64,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),prlimit,(__pid,__resource,__new_limit,__old_limit))
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bc3b930 */
+/* HASH CRC-32:0x58aed8db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_getitimer_defined
 #define __local_getitimer_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE_getitimer64)
+#if defined(__CRT_HAVE_getitimer64) || defined(__CRT_HAVE_getitimer)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: getitimer32 from sys.time */
 #if !defined(__local___localdep_getitimer32_defined) && defined(__CRT_HAVE_getitimer)
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer32,(__itim
 /* Set *VALUE to the current setting of timer WHICH.
  * Return 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(__itimer_which_t __which, struct __itimerval64 *__curr_value),getitimer64,(__which,__curr_value))
-#elif defined(__CRT_HAVE_getitimer) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_getitimer) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Set *VALUE to the current setting of timer WHICH.
  * Return 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(__itimer_which_t __which, struct __itimerval64 *__curr_value),getitimer,(__which,__curr_value))
@@ -85,7 +85,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_getitimer_defined 1
 #define __localdep_getitimer __LIBC_LOCAL_NAME(getitimer)
 #endif /* !__local___localdep_getitimer_defined */
-#else /* __CRT_HAVE_getitimer || __CRT_HAVE_getitimer64 */
+#else /* __CRT_HAVE_getitimer64 || __CRT_HAVE_getitimer */
 #undef __local_getitimer_defined
-#endif /* !__CRT_HAVE_getitimer && !__CRT_HAVE_getitimer64 */
+#endif /* !__CRT_HAVE_getitimer64 && !__CRT_HAVE_getitimer */
 #endif /* !__local_getitimer_defined */

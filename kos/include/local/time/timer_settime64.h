@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1336cb07 */
+/* HASH CRC-32:0xad66a9d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,11 +27,11 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: timer_settime32 from time */
-#if !defined(__local___localdep_timer_settime32_defined) && defined(__CRT_HAVE_timer_settime)
+#ifndef __local___localdep_timer_settime32_defined
 #define __local___localdep_timer_settime32_defined 1
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime32,(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct __itimerspec32 const *__restrict __value, struct __itimerspec32 *__ovalue),timer_settime,(__timerid,__flags,__value,__ovalue))
-#endif /* !__local___localdep_timer_settime32_defined && __CRT_HAVE_timer_settime */
+#endif /* !__local___localdep_timer_settime32_defined */
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
 __LOCAL_LIBC(timer_settime64) __ATTR_NONNULL((3)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_settime64))(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__restrict __value, struct __itimerspec64 *__restrict __ovalue) {

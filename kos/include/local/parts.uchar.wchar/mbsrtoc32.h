@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2290911b */
+/* HASH CRC-32:0xe919c5d8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: uchar_mbrtoc32 from uchar */
 #ifndef __local___localdep_uchar_mbrtoc32_defined
 #define __local___localdep_uchar_mbrtoc32_defined 1
-#if defined(__CRT_HAVE_mbrtowc) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_mbrtowc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <bits/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc32,(__CHAR32_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtowc,(__pwc,__str,__maxlen,__mbs))
-#elif defined(__CRT_HAVE___mbrtowc) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#elif defined(__CRT_HAVE___mbrtowc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <bits/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc32,(__CHAR32_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtoc32,(__pwc,__str,__maxlen,__mbs))
-#elif (__SIZEOF_WCHAR_T__ == 4)
+#elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <local/wchar/mbrtowc.h>
 __NAMESPACE_LOCAL_BEGIN

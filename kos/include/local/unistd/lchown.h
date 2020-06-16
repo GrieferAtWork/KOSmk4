@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8f6f3ce */
+/* HASH CRC-32:0xe38a905c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,12 @@
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fchownat from unistd */
-#if !defined(__local___localdep_fchownat_defined) && defined(__CRT_HAVE_fchownat)
+#ifndef __local___localdep_fchownat_defined
 #define __local___localdep_fchownat_defined 1
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_fchownat,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),fchownat,(__dfd,__file,__owner,__group,__flags))
-#endif /* !__local___localdep_fchownat_defined && __CRT_HAVE_fchownat */
+#endif /* !__local___localdep_fchownat_defined */
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */

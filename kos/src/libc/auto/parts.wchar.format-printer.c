@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc07a87af */
+/* HASH CRC-32:0xb4360d6d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -191,14 +191,14 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 	while (text < textend) {
 		char16_t const *old_text = text;
 		uint32_t ch;
-#if 2 == 1
-		ch = libc_unicode_readutf8_n((char16_t const **)&text, textend);
-#elif 2 == 2
+
+
+
 		ch = libc_unicode_readutf16_n((char16_t const **)&text,
 		                         (char16_t const *)textend);
-#else /* ... */
-		ch = (uint32_t)*text++;
-#endif /* !... */
+
+
+
 		if unlikely(ch < 32 || ch >= 127  || ch == '\'' ||
 		              ch == '\"' || ch == '\\' ||
 		             (flags & 0x0010)) {
@@ -220,14 +220,14 @@ encode_oct:
 					if (text < textend) {
 						char16_t const *new_text = text;
 						uint32_t next_ch;
-#if 2 == 1
-						next_ch = libc_unicode_readutf8_n((char16_t const **)&new_text, textend);
-#elif 2 == 2
+
+
+
 						next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text,
 						                              (char16_t const *)textend);
-#else /* ... */
-						next_ch = (uint32_t)*new_text++;
-#endif /* !... */
+
+
+
 						if (next_ch >= '0' && next_ch <= '7')
 							goto encode_hex;
 					}
@@ -357,14 +357,14 @@ encode_hex:
 				if (text < textend) {
 					char16_t const *new_text = text;
 					uint32_t next_ch;
-#if 2 == 1
-					next_ch = libc_unicode_readutf8_n((char16_t const **)&new_text, textend);
-#elif 2 == 2
+
+
+
 					next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text,
 					                              (char16_t const *)textend);
-#else /* ... */
-					next_ch = (uint32_t)*new_text++;
-#endif /* !... */
+
+
+
 					if ((next_ch >= 'a' && next_ch <= 'f') ||
 					    (next_ch >= 'A' && next_ch <= 'F') ||
 					    (next_ch >= '0' && next_ch <= '9'))
@@ -476,14 +476,14 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 	while (text < textend) {
 		char32_t const *old_text = text;
 		uint32_t ch;
-#if 4 == 1
-		ch = libc_unicode_readutf8_n((char32_t const **)&text, textend);
-#elif 4 == 2
-		ch = libc_unicode_readutf16_n((char16_t const **)&text,
-		                         (char16_t const *)textend);
-#else /* ... */
+
+
+
+
+
+
 		ch = (uint32_t)*text++;
-#endif /* !... */
+
 		if unlikely(ch < 32 || ch >= 127  || ch == '\'' ||
 		              ch == '\"' || ch == '\\' ||
 		             (flags & 0x0010)) {
@@ -505,14 +505,14 @@ encode_oct:
 					if (text < textend) {
 						char32_t const *new_text = text;
 						uint32_t next_ch;
-#if 4 == 1
-						next_ch = libc_unicode_readutf8_n((char32_t const **)&new_text, textend);
-#elif 4 == 2
-						next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text,
-						                              (char16_t const *)textend);
-#else /* ... */
+
+
+
+
+
+
 						next_ch = (uint32_t)*new_text++;
-#endif /* !... */
+
 						if (next_ch >= '0' && next_ch <= '7')
 							goto encode_hex;
 					}
@@ -642,14 +642,14 @@ encode_hex:
 				if (text < textend) {
 					char32_t const *new_text = text;
 					uint32_t next_ch;
-#if 4 == 1
-					next_ch = libc_unicode_readutf8_n((char32_t const **)&new_text, textend);
-#elif 4 == 2
-					next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text,
-					                              (char16_t const *)textend);
-#else /* ... */
+
+
+
+
+
+
 					next_ch = (uint32_t)*new_text++;
-#endif /* !... */
+
 					if ((next_ch >= 'a' && next_ch <= 'f') ||
 					    (next_ch >= 'A' && next_ch <= 'F') ||
 					    (next_ch >= '0' && next_ch <= '9'))
@@ -857,7 +857,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 					a = __hybrid_unaligned_get32((u32 *)(line_data + i));
 					b = __hybrid_unaligned_get32((u32 *)(line_data + i + 4));
-#endif /* !(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					dst = buffer + 16;
 					while (dst > buffer + 8) {
 						*--dst = dec[b & 0xf];
@@ -867,7 +867,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 						*--dst = dec[a & 0xf];
 						a >>= 4;
 					}
-#endif /* !(__SIZEOF_POINTER__ >= 8) */
+#endif /* __SIZEOF_POINTER__ < 8 */
 					temp = (*printer)(arg, buffer, 17);
 					if unlikely(temp < 0)
 						goto err;
@@ -1063,7 +1063,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 					a = __hybrid_unaligned_get32((u32 *)(line_data + i));
 					b = __hybrid_unaligned_get32((u32 *)(line_data + i + 4));
-#endif /* !(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 					dst = buffer + 16;
 					while (dst > buffer + 8) {
 						*--dst = dec[b & 0xf];
@@ -1073,7 +1073,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 						*--dst = dec[a & 0xf];
 						a >>= 4;
 					}
-#endif /* !(__SIZEOF_POINTER__ >= 8) */
+#endif /* __SIZEOF_POINTER__ < 8 */
 					temp = (*printer)(arg, buffer, 17);
 					if unlikely(temp < 0)
 						goto err;
@@ -1252,19 +1252,19 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
 #define __FORMAT_ESCAPE             libd_format_wescape
 #define __FORMAT_WIDTH8             libc_format_width
 #define __FORMAT_ESCAPE8            libc_format_escape
-#if 2 == 2
+
 #define __FORMAT_WIDTH32            libc_format_wwidth
 #define __FORMAT_ESCAPE32           libc_format_wescape
 #define __FORMAT_UNICODE_WRITECHAR  libc_unicode_writeutf16
 #define __FORMAT_UNICODE_FORMAT8    libc_format_8to16
 #define __FORMAT_UNICODE_FORMAT32   libc_format_wto16
-#else /* 2 == 2 */
-#define __FORMAT_WIDTH16            libd_format_wwidth
-#define __FORMAT_ESCAPE16           libd_format_wescape
-#define __FORMAT_UNICODE_WRITECHAR(dst, ch) ((dst)[0] = (ch), (dst) + 1)
-#define __FORMAT_UNICODE_FORMAT8    libc_format_8to32
-#define __FORMAT_UNICODE_FORMAT16   libd_format_wto32
-#endif /* !(2 == 2) */
+
+
+
+
+
+
+
 #include <local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }
@@ -1391,19 +1391,19 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NON
 #define __FORMAT_ESCAPE             libc_format_wescape
 #define __FORMAT_WIDTH8             libc_format_width
 #define __FORMAT_ESCAPE8            libc_format_escape
-#if 4 == 2
-#define __FORMAT_WIDTH32            libc_format_wwidth
-#define __FORMAT_ESCAPE32           libc_format_wescape
-#define __FORMAT_UNICODE_WRITECHAR  libc_unicode_writeutf16
-#define __FORMAT_UNICODE_FORMAT8    libc_format_8to16
-#define __FORMAT_UNICODE_FORMAT32   libc_format_wto16
-#else /* 4 == 2 */
+
+
+
+
+
+
+
 #define __FORMAT_WIDTH16            libd_format_wwidth
 #define __FORMAT_ESCAPE16           libd_format_wescape
 #define __FORMAT_UNICODE_WRITECHAR(dst, ch) ((dst)[0] = (ch), (dst) + 1)
 #define __FORMAT_UNICODE_FORMAT8    libc_format_8to32
 #define __FORMAT_UNICODE_FORMAT16   libd_format_wto32
-#endif /* !(4 == 2) */
+
 #include <local/format-printf.h>
 #endif /* !__INTELLISENSE__ */
 }
@@ -1672,7 +1672,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_PURE NONNULL((2)) 
 NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
                                          char16_t const *__restrict data,
                                          size_t datalen) {
-#if 2 == 2
+
 	size_t result = 0;
 	char16_t const *iter, *end;
 	(void)arg;
@@ -1688,16 +1688,16 @@ NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
 		++result;
 	}
 	return (ssize_t)result;
-#else /* 2 == 2 */
-	(void)arg;
-	(void)data;
-	/* XXX: Not necessarily correct, as the 32-bit variant is actually ATTR_CONST.
-	 *      However, magic headers don't support conditional attributes, so we can't just do
-	 *      [if(__SIZEOF_WCHAR_T__ == 2), ATTR_PURE]
-	 *      [if(__SIZEOF_WCHAR_T__ != 2), ATTR_CONST] */
-	COMPILER_IMPURE();
-	return (ssize_t)datalen;
-#endif /* !(2 == 2) */
+
+
+
+
+
+
+
+
+
+
 }
 #include <hybrid/__assert.h>
 /* Pack and finalize a given aprintf format printer

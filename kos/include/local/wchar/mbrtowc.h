@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe4d76df */
+/* HASH CRC-32:0xdb080376 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbrtowc))(__WCHAR_TYPE__ *__pwc, char
 	__error = __localdep_unicode_c8toc16((__CHAR16_TYPE__ *)__pwc, __str, __maxlen, __mbs);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 	__error = __localdep_unicode_c8toc32((__CHAR32_TYPE__ *)__pwc, __str, __maxlen, __mbs);
-#endif /* !(__SIZEOF_WCHAR_T__ == 2) */
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 #ifdef __EILSEQ
 	if (__error == (__SIZE_TYPE__)-1)
 		__libc_seterrno(__EILSEQ);

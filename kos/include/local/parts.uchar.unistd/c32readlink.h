@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeee83e5f */
+/* HASH CRC-32:0x338ea588 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,12 @@
 #ifndef __local_c32readlink_defined
 #define __local_c32readlink_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wreadlinkat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wreadlinkat))
+#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wreadlinkat))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32readlinkat from parts.uchar.unistd */
 #ifndef __local___localdep_c32readlinkat_defined
 #define __local___localdep_c32readlinkat_defined 1
-#if defined(__CRT_HAVE_wreadlinkat) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c32readlink_defined 1
 #define __localdep_c32readlink __LIBC_LOCAL_NAME(c32readlink)
 #endif /* !__local___localdep_c32readlink_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wreadlinkat && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wreadlinkat) */
+#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wreadlinkat && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wreadlinkat) */
 #undef __local_c32readlink_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wreadlinkat || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wreadlinkat) */
+#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wreadlinkat || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wreadlinkat) */
 #endif /* !__local_c32readlink_defined */

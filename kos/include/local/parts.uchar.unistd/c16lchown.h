@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdeb0cf6d */
+/* HASH CRC-32:0xdac38e17 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,13 @@
 #ifndef __local_c16lchown_defined
 #define __local_c16lchown_defined 1
 #include <__crt.h>
-#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wfchownat) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wfchownat))
+#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_wfchownat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wfchownat))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16fchownat from parts.uchar.unistd */
 #ifndef __local___localdep_c16fchownat_defined
 #define __local___localdep_c16fchownat_defined 1
-#if defined(__CRT_HAVE_wfchownat) && (__SIZEOF_WCHAR_T__ == 2) && defined(__LIBCCALL_IS_LIBDCALL)
+#if defined(__CRT_HAVE_wfchownat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c16fchownat,(__fd_t __dfd, __CHAR16_TYPE__ const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c16lchown_defined 1
 #define __localdep_c16lchown __LIBC_LOCAL_NAME(c16lchown)
 #endif /* !__local___localdep_c16lchown_defined */
-#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wfchownat && (__SIZEOF_WCHAR_T__ == 2) && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wfchownat) */
+#else /* __CRT_AT_FDCWD && ((__CRT_HAVE_wfchownat && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wfchownat) */
 #undef __local_c16lchown_defined
-#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wfchownat || !(__SIZEOF_WCHAR_T__ == 2) || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wfchownat) */
+#endif /* !__CRT_AT_FDCWD || ((!__CRT_HAVE_wfchownat || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wfchownat) */
 #endif /* !__local_c16lchown_defined */

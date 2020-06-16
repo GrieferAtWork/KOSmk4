@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23e685bf */
+/* HASH CRC-32:0x3852682a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <bits/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_key_create from pthread */
-#if !defined(__local___localdep_pthread_key_create_defined) && defined(__CRT_HAVE_pthread_key_create)
+#ifndef __local___localdep_pthread_key_create_defined
 #define __local___localdep_pthread_key_create_defined 1
 __NAMESPACE_LOCAL_END
 #ifndef ____pthread_destr_function_t_defined
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
  * DESTR_FUNCTION is not called if the value associated is NULL when
  * the key is destroyed */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, __pthread_destr_function_t __destr_function),pthread_key_create,(__key,__destr_function))
-#endif /* !__local___localdep_pthread_key_create_defined && __CRT_HAVE_pthread_key_create */
+#endif /* !__local___localdep_pthread_key_create_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/threads.h>
 #include <bits/pthreadtypes.h>

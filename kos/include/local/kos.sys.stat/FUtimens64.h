@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85af325d */
+/* HASH CRC-32:0xbdf67932 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,10 @@
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: FUtimens32 from kos.sys.stat */
-#if !defined(__local___localdep_FUtimens32_defined) && defined(__CRT_HAVE_FUtimens)
+#ifndef __local___localdep_FUtimens32_defined
 #define __local___localdep_FUtimens32_defined 1
 __CREDIRECT_VOID(,__THROWING,__localdep_FUtimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUtimens,(__fd,__times))
-#endif /* !__local___localdep_FUtimens32_defined && __CRT_HAVE_FUtimens */
+#endif /* !__local___localdep_FUtimens32_defined */
 __LOCAL_LIBC(FUtimens64) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FUtimens64))(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]) __THROWS(...) {
 	struct __timespec32 __tms[2];

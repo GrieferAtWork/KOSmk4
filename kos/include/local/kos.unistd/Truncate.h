@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23be36d8 */
+/* HASH CRC-32:0xa3514d2c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_Truncate_defined
 #define __local_Truncate_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_Truncate) || defined(__CRT_HAVE_Truncate64)
+#if defined(__CRT_HAVE_Truncate64) || defined(__CRT_HAVE_Truncate)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: Truncate32 from kos.unistd */
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__vodi,__THROWING,__localdep_Truncate32,(char co
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate64,(char const *__file, __pos64_t __length),Truncate64,(__file,__length))
-#elif defined(__CRT_HAVE_Truncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_Truncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate64,(char const *__file, __pos64_t __length),Truncate,(__file,__length))
@@ -68,7 +68,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_Truncate_defined 1
 #define __localdep_Truncate __LIBC_LOCAL_NAME(Truncate)
 #endif /* !__local___localdep_Truncate_defined */
-#else /* __CRT_HAVE_Truncate || __CRT_HAVE_Truncate64 */
+#else /* __CRT_HAVE_Truncate64 || __CRT_HAVE_Truncate */
 #undef __local_Truncate_defined
-#endif /* !__CRT_HAVE_Truncate && !__CRT_HAVE_Truncate64 */
+#endif /* !__CRT_HAVE_Truncate64 && !__CRT_HAVE_Truncate */
 #endif /* !__local_Truncate_defined */

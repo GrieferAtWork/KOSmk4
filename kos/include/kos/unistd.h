@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed6ad756 */
+/* HASH CRC-32:0x62670243 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -274,7 +274,7 @@ __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,Write,(__fd_t __fd, void const 
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,ReadAll,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
-#elif defined(__CRT_HAVE_Read) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64))
+#elif defined(__CRT_HAVE_Read) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))
 #include <local/kos.unistd/ReadAll.h>
 /* >> readall(3)
  * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
@@ -295,7 +295,7 @@ __CREDIRECT(,__FS_TYPE(pos),__THROWING,LSeek,(__fd_t __fd, __FS_TYPE(off) __offs
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CDECLARE(,__FS_TYPE(pos),__THROWING,LSeek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_LSeek) || defined(__CRT_HAVE_LSeek64)
+#elif defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek)
 #include <local/kos.unistd/LSeek.h>
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
@@ -405,7 +405,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,UnlinkAt,(__fd_t __dfd, char cons
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CDECLARE(,__pos64_t,__THROWING,LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_LSeek) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_LSeek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__pos64_t,__THROWING,LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
@@ -428,7 +428,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PRead,(__fd_t __fd, void *__bu
 /* >> pread(2)
  * Read data from a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PRead,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PRead) || defined(__CRT_HAVE_PRead64)
+#elif defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 #include <local/kos.unistd/PRead.h>
 /* >> pread(2)
  * Read data from a file at a specific offset */
@@ -442,7 +442,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PWrite,(__fd_t __fd, void cons
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PWrite,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PWrite) || defined(__CRT_HAVE_PWrite64)
+#elif defined(__CRT_HAVE_PWrite64) || defined(__CRT_HAVE_PWrite)
 #include <local/kos.unistd/PWrite.h>
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
@@ -471,7 +471,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(PReadAll, __FORCELOCAL __ATTR_NONNULL((2)) size_
 /* >> pread64(2)
  * Read data from a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PRead64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PRead) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_PRead) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> pread64(2)
  * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PRead64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
@@ -485,7 +485,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(PRead64, __FORCELOCAL __ATTR_NONNULL((2)) size_t
 /* >> pwrite64(2)
  * Write data to a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PWrite64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PWrite) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_PWrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> pwrite64(2)
  * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PWrite64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
@@ -501,7 +501,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(PWrite64, __FORCELOCAL __ATTR_NONNULL((2)) size_
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PReadAll64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PReadAll) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_PReadAll) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PReadAll64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),PReadAll,(__fd,__buf,__bufsize,__offset))
@@ -609,7 +609,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate,(char const *__file, po
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate,(char const *__file, pos_t __length),(__file,__length))
-#elif defined(__CRT_HAVE_Truncate) || defined(__CRT_HAVE_Truncate64)
+#elif defined(__CRT_HAVE_Truncate64) || defined(__CRT_HAVE_Truncate)
 #include <local/kos.unistd/Truncate.h>
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -621,7 +621,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Truncate, __FORCELOCAL __ATTR_NONNULL((1)) void 
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate64,(char const *__file, pos64_t __length),(__file,__length))
-#elif defined(__CRT_HAVE_Truncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_Truncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate64,(char const *__file, pos64_t __length),Truncate,(__file,__length))
@@ -800,7 +800,7 @@ __CREDIRECT_VOID(,__THROWING,FTruncate,(__fd_t __fd, pos_t __length),FTruncate64
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE_VOID(,__THROWING,FTruncate,(__fd_t __fd, pos_t __length),(__fd,__length))
-#elif defined(__CRT_HAVE_FTruncate) || defined(__CRT_HAVE_FTruncate64)
+#elif defined(__CRT_HAVE_FTruncate64) || defined(__CRT_HAVE_FTruncate)
 #include <local/kos.unistd/FTruncate.h>
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
@@ -812,7 +812,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate, __FORCELOCAL void (__LIBCCALL FTrunca
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE_VOID(,__THROWING,FTruncate64,(__fd_t __fd, pos64_t __length),(__fd,__length))
-#elif defined(__CRT_HAVE_FTruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_FTruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT_VOID(,__THROWING,FTruncate64,(__fd_t __fd, pos64_t __length),FTruncate,(__fd,__length))

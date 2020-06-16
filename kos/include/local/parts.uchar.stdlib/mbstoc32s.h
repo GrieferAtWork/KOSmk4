@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4820f2aa */
+/* HASH CRC-32:0xc6572028 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mbsrtoc32 from parts.uchar.wchar */
 #ifndef __local___localdep_mbsrtoc32_defined
 #define __local___localdep_mbsrtoc32_defined 1
-#if defined(__CRT_HAVE_mbsrtowcs) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_mbsrtowcs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtoc32,(__CHAR32_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
 #elif defined(__CRT_HAVE_KOS$mbsrtowcs)
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtoc32,(__CHAR32_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
-#elif (__SIZEOF_WCHAR_T__ == 4)
+#elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <local/wchar/mbsrtowcs.h>
 __NAMESPACE_LOCAL_BEGIN

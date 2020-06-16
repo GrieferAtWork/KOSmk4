@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50dda73 */
+/* HASH CRC-32:0xf642fe1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
  * converting wide-character unicode input data into a UTF-32 output */
 __LOCAL_LIBC(format_16to32) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_16to32))(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
-#if 2 == 2
+
 	struct __local_format_16to32_data {
 		__pc32formatprinter __fd_printer;   /* [1..1] Inner printer */
 		void               *__fd_arg;       /* Argument for `fd_printer' */
@@ -77,15 +77,15 @@ __after_dst_write:
 	return __result;
 __err:
 	return __temp;
-#else /* 2 == 2 */
-	struct __local_format_32to32_data {
-		__pc32formatprinter __fd_printer;   /* [1..1] Inner printer */
-		void               *__fd_arg;       /* Argument for `fd_printer' */
-	};
-	struct __local_format_32to32_data *__closure;
-	__closure = (struct __local_format_32to32_data *)__arg;
-	return (*__closure->__fd_printer)(__closure->__fd_arg, (__CHAR32_TYPE__ const *)__data, __datalen);
-#endif /* !(2 == 2) */
+
+
+
+
+
+
+
+
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_16to32_defined

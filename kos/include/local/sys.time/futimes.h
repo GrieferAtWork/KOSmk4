@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e93fbce */
+/* HASH CRC-32:0xe5f8f4b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_futimes_defined
 #define __local_futimes_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_futimes) || defined(__CRT_HAVE_futimes64) || (defined(__CRT_HAVE_lutimes) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__))
+#if defined(__CRT_HAVE_futimes64) || (defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_futimes)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: futimes32 from sys.time */
 #if !defined(__local___localdep_futimes32_defined) && defined(__CRT_HAVE_futimes)
@@ -35,7 +35,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes32,(__fd_t __fd, struct __timev
 #ifdef __CRT_HAVE_futimes64
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),futimes64,(__fd,__tvp))
-#elif defined(__CRT_HAVE_lutimes) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),lutimes,(__fd,__tvp))
 #elif defined(__CRT_HAVE_futimes)
@@ -76,7 +76,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_futimes_defined 1
 #define __localdep_futimes __LIBC_LOCAL_NAME(futimes)
 #endif /* !__local___localdep_futimes_defined */
-#else /* __CRT_HAVE_futimes || __CRT_HAVE_futimes64 || (__CRT_HAVE_lutimes && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) */
+#else /* __CRT_HAVE_futimes64 || (__CRT_HAVE_lutimes && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || __CRT_HAVE_futimes */
 #undef __local_futimes_defined
-#endif /* !__CRT_HAVE_futimes && !__CRT_HAVE_futimes64 && (!__CRT_HAVE_lutimes || !(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) */
+#endif /* !__CRT_HAVE_futimes64 && (!__CRT_HAVE_lutimes || __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__) && !__CRT_HAVE_futimes */
 #endif /* !__local_futimes_defined */

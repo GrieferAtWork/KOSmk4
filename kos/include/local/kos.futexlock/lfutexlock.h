@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d68ca6e */
+/* HASH CRC-32:0x12f9dc5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_lfutexlock_defined
 #define __local_lfutexlock_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64)
+#if defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: lfutexlock32 from kos.futexlock */
@@ -86,7 +86,7 @@ __CVREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfut
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CVREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock64,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutexlock64,(__ulockaddr,__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
-#elif defined(__CRT_HAVE_lfutexlock) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_lfutexlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> lfutexlock(3)
  * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
  * This function behaves identical to the lfutex() system call, except that it takes
@@ -215,7 +215,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_lfutexlock_defined 1
 #define __localdep_lfutexlock __LIBC_LOCAL_NAME(lfutexlock)
 #endif /* !__local___localdep_lfutexlock_defined */
-#else /* __CRT_HAVE_lfutexlock || __CRT_HAVE_lfutexlock64 */
+#else /* __CRT_HAVE_lfutexlock64 || __CRT_HAVE_lfutexlock */
 #undef __local_lfutexlock_defined
-#endif /* !__CRT_HAVE_lfutexlock && !__CRT_HAVE_lfutexlock64 */
+#endif /* !__CRT_HAVE_lfutexlock64 && !__CRT_HAVE_lfutexlock */
 #endif /* !__local_lfutexlock_defined */

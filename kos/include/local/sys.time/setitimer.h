@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x666f8075 */
+/* HASH CRC-32:0x2f8365d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_setitimer_defined
 #define __local_setitimer_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE_setitimer64)
+#if defined(__CRT_HAVE_setitimer64) || defined(__CRT_HAVE_setitimer)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: setitimer32 from sys.time */
 #if !defined(__local___localdep_setitimer32_defined) && defined(__CRT_HAVE_setitimer)
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(__itim
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer64,(__itimer_which_t __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),setitimer64,(__which,__newval,__oldval))
-#elif defined(__CRT_HAVE_setitimer) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_setitimer) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer64,(__itimer_which_t __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),setitimer,(__which,__newval,__oldval))
@@ -93,7 +93,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_setitimer_defined 1
 #define __localdep_setitimer __LIBC_LOCAL_NAME(setitimer)
 #endif /* !__local___localdep_setitimer_defined */
-#else /* __CRT_HAVE_setitimer || __CRT_HAVE_setitimer64 */
+#else /* __CRT_HAVE_setitimer64 || __CRT_HAVE_setitimer */
 #undef __local_setitimer_defined
-#endif /* !__CRT_HAVE_setitimer && !__CRT_HAVE_setitimer64 */
+#endif /* !__CRT_HAVE_setitimer64 && !__CRT_HAVE_setitimer */
 #endif /* !__local_setitimer_defined */

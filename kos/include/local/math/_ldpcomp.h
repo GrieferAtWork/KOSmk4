@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc74e779a */
+/* HASH CRC-32:0x6d5fb955 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,10 @@
 #ifdef __CRT_HAVE__dpcomp
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _dpcomp from math */
-#if !defined(__local___localdep__dpcomp_defined) && defined(__CRT_HAVE__dpcomp)
+#ifndef __local___localdep__dpcomp_defined
 #define __local___localdep__dpcomp_defined 1
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__dpcomp,(double __x, double __y),_dpcomp,(__x,__y))
-#endif /* !__local___localdep__dpcomp_defined && __CRT_HAVE__dpcomp */
+#endif /* !__local___localdep__dpcomp_defined */
 __LOCAL_LIBC(_ldpcomp) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ldpcomp))(__LONGDOUBLE __x, __LONGDOUBLE __y) {
 	return __localdep__dpcomp((double)__x, (double)__y);

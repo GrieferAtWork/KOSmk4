@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xced2ccc6 */
+/* HASH CRC-32:0xe01afbc7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,12 +24,12 @@
 #ifdef __CRT_HAVE_wgetcwd
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wgetcwd from parts.wchar.unistd */
-#if !defined(__local___localdep_wgetcwd_defined) && defined(__CRT_HAVE_wgetcwd)
+#ifndef __local___localdep_wgetcwd_defined
 #define __local___localdep_wgetcwd_defined 1
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT(,__WCHAR_TYPE__ *,__NOTHROW_RPC,__localdep_wgetcwd,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),wgetcwd,(__buf,__bufsize))
-#endif /* !__local___localdep_wgetcwd_defined && __CRT_HAVE_wgetcwd */
+#endif /* !__local___localdep_wgetcwd_defined */
 __LOCAL_LIBC(wget_current_dir_name) __ATTR_MALLOC __ATTR_WUNUSED __WCHAR_TYPE__ *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wget_current_dir_name))(void) {
 	return __localdep_wgetcwd(__NULLPTR, 0);

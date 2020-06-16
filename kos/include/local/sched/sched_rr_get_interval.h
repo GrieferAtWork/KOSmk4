@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5514ccf4 */
+/* HASH CRC-32:0xff948aa2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_sched_rr_get_interval_defined
 #define __local_sched_rr_get_interval_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_sched_rr_get_interval) || defined(__CRT_HAVE_sched_rr_get_interval64)
+#if defined(__CRT_HAVE_sched_rr_get_interval64) || defined(__CRT_HAVE_sched_rr_get_interval)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sched_rr_get_interval32 from sched */
 #if !defined(__local___localdep_sched_rr_get_interval32_defined) && defined(__CRT_HAVE_sched_rr_get_interval)
@@ -33,7 +33,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid
 #define __local___localdep_sched_rr_get_interval64_defined 1
 #ifdef __CRT_HAVE_sched_rr_get_interval64
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid, struct __timespec64 *__tms),sched_rr_get_interval64,(__pid,__tms))
-#elif defined(__CRT_HAVE_sched_rr_get_interval) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_sched_rr_get_interval) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid, struct __timespec64 *__tms),sched_rr_get_interval,(__pid,__tms))
 #elif defined(__CRT_HAVE_sched_rr_get_interval)
 __NAMESPACE_LOCAL_END
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_sched_rr_get_interval_defined 1
 #define __localdep_sched_rr_get_interval __LIBC_LOCAL_NAME(sched_rr_get_interval)
 #endif /* !__local___localdep_sched_rr_get_interval_defined */
-#else /* __CRT_HAVE_sched_rr_get_interval || __CRT_HAVE_sched_rr_get_interval64 */
+#else /* __CRT_HAVE_sched_rr_get_interval64 || __CRT_HAVE_sched_rr_get_interval */
 #undef __local_sched_rr_get_interval_defined
-#endif /* !__CRT_HAVE_sched_rr_get_interval && !__CRT_HAVE_sched_rr_get_interval64 */
+#endif /* !__CRT_HAVE_sched_rr_get_interval64 && !__CRT_HAVE_sched_rr_get_interval */
 #endif /* !__local_sched_rr_get_interval_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81dec1a4 */
+/* HASH CRC-32:0xfe9f80f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_mtx_timedlock_defined
 #define __local_mtx_timedlock_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64)
+#if defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <bits/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_mutex_timedlock from pthread */
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* Wait until lock becomes available, or specified time passes */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
-#elif defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64)
+#elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 __NAMESPACE_LOCAL_END
 #include <local/pthread/pthread_mutex_timedlock.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_mtx_timedlock_defined 1
 #define __localdep_mtx_timedlock __LIBC_LOCAL_NAME(mtx_timedlock)
 #endif /* !__local___localdep_mtx_timedlock_defined */
-#else /* __CRT_HAVE_pthread_mutex_timedlock || __CRT_HAVE_pthread_mutex_timedlock64 */
+#else /* __CRT_HAVE_pthread_mutex_timedlock64 || __CRT_HAVE_pthread_mutex_timedlock */
 #undef __local_mtx_timedlock_defined
-#endif /* !__CRT_HAVE_pthread_mutex_timedlock && !__CRT_HAVE_pthread_mutex_timedlock64 */
+#endif /* !__CRT_HAVE_pthread_mutex_timedlock64 && !__CRT_HAVE_pthread_mutex_timedlock */
 #endif /* !__local_mtx_timedlock_defined */

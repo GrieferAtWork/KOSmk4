@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfa2da2c */
+/* HASH CRC-32:0x5c7b9132 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_gettimeofday_defined
 #define __local_gettimeofday_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) || defined(__CRT_HAVE_gettimeofday64)
+#if defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: gettimeofday32 from sys.time */
 #ifndef __local___localdep_gettimeofday32_defined
@@ -54,7 +54,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(str
  * NOTE: This form of timezone information is obsolete.
  * Use the functions and variables declared in <time.h> instead */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday64,(struct __timeval64 *__restrict __tv, void * __tz),gettimeofday64,(__tv,__tz))
-#elif defined(__CRT_HAVE_gettimeofday) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_gettimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Get the current time of day and timezone information,
  * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
  * Returns 0 on success, -1 on errors.
@@ -111,7 +111,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_gettimeofday_defined 1
 #define __localdep_gettimeofday __LIBC_LOCAL_NAME(gettimeofday)
 #endif /* !__local___localdep_gettimeofday_defined */
-#else /* __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday || __CRT_HAVE_gettimeofday64 */
+#else /* __CRT_HAVE_gettimeofday64 || __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday */
 #undef __local_gettimeofday_defined
-#endif /* !__CRT_HAVE_gettimeofday && !__CRT_HAVE___gettimeofday && !__CRT_HAVE_gettimeofday64 */
+#endif /* !__CRT_HAVE_gettimeofday64 && !__CRT_HAVE_gettimeofday && !__CRT_HAVE___gettimeofday */
 #endif /* !__local_gettimeofday_defined */

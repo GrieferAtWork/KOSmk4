@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94f16aa7 */
+/* HASH CRC-32:0xad61c21c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_timer_gettime_defined
 #define __local_timer_gettime_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_timer_gettime) || defined(__CRT_HAVE_timer_gettime64)
+#if defined(__CRT_HAVE_timer_gettime64) || defined(__CRT_HAVE_timer_gettime)
 #include <bits/itimerspec.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime32,(__
 #ifdef __CRT_HAVE_timer_gettime64
 /* Get current value of timer TIMERID and store it in VALUE */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime64,(__timer_t __timerid, struct __itimerspec64 *__value),timer_gettime64,(__timerid,__value))
-#elif defined(__CRT_HAVE_timer_gettime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_timer_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Get current value of timer TIMERID and store it in VALUE */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime64,(__timer_t __timerid, struct __itimerspec64 *__value),timer_gettime,(__timerid,__value))
 #elif defined(__CRT_HAVE_timer_gettime)
@@ -82,7 +82,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_timer_gettime_defined 1
 #define __localdep_timer_gettime __LIBC_LOCAL_NAME(timer_gettime)
 #endif /* !__local___localdep_timer_gettime_defined */
-#else /* __CRT_HAVE_timer_gettime || __CRT_HAVE_timer_gettime64 */
+#else /* __CRT_HAVE_timer_gettime64 || __CRT_HAVE_timer_gettime */
 #undef __local_timer_gettime_defined
-#endif /* !__CRT_HAVE_timer_gettime && !__CRT_HAVE_timer_gettime64 */
+#endif /* !__CRT_HAVE_timer_gettime64 && !__CRT_HAVE_timer_gettime */
 #endif /* !__local_timer_gettime_defined */

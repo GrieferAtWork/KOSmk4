@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x502ae61c */
+/* HASH CRC-32:0xfaaf4a1e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,10 @@
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _getdcwd from direct */
-#if !defined(__local___localdep__getdcwd_defined) && defined(__CRT_HAVE__getdcwd)
+#ifndef __local___localdep__getdcwd_defined
 #define __local___localdep__getdcwd_defined 1
 __CREDIRECT(,char *,__NOTHROW_RPC,__localdep__getdcwd,(int __drive, char *__buf, __SIZE_TYPE__ __size),_getdcwd,(__drive,__buf,__size))
-#endif /* !__local___localdep__getdcwd_defined && __CRT_HAVE__getdcwd */
+#endif /* !__local___localdep__getdcwd_defined */
 __LOCAL_LIBC(_getdcwd_dbg) __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_getdcwd_dbg))(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;

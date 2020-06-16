@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd50f7630 */
+/* HASH CRC-32:0xd3dbfa19 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,7 +117,7 @@ __CDECLARE(,int,__NOTHROW_NCX,setpriority,(__priority_which_t __which, id_t __wh
 /* Put the soft and hard limits for RESOURCE in *RLIMITS.
  * Returns 0 if successful, -1 if not (and sets errno) */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit64,(__rlimit_resource_t __resource, struct rlimit64 *__rlimits),(__resource,__rlimits))
-#elif defined(__CRT_HAVE_getrlimit) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_getrlimit) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* Put the soft and hard limits for RESOURCE in *RLIMITS.
  * Returns 0 if successful, -1 if not (and sets errno) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit64,(__rlimit_resource_t __resource, struct rlimit64 *__rlimits),getrlimit,(__resource,__rlimits))
@@ -127,7 +127,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit64,(__rlimit_resource
  * Only the super-user can increase hard limits.
  * Return 0 if successful, -1 if not (and sets errno) */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setrlimit64,(__rlimit_resource_t __resource, struct rlimit64 const *__rlimits),(__resource,__rlimits))
-#elif defined(__CRT_HAVE_setrlimit) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_setrlimit) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* Set the soft and hard limits for RESOURCE to *RLIMITS.
  * Only the super-user can increase hard limits.
  * Return 0 if successful, -1 if not (and sets errno) */

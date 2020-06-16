@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7405aeef */
+/* HASH CRC-32:0xe78796e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_adjtime_defined
 #define __local_adjtime_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_adjtime) || defined(__CRT_HAVE_adjtime64)
+#if defined(__CRT_HAVE_adjtime64) || defined(__CRT_HAVE_adjtime)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: adjtime32 from sys.time */
 #if !defined(__local___localdep_adjtime32_defined) && defined(__CRT_HAVE_adjtime)
@@ -41,7 +41,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime32,(struct __timeval32 const *_
  * adjustment remaining to be done from the last `adjtime' call.
  * This call is restricted to the super-user */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime64,(struct __timeval64 const *__delta, struct __timeval64 *__olddelta),adjtime64,(__delta,__olddelta))
-#elif defined(__CRT_HAVE_adjtime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_adjtime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Adjust the current time of day by the amount in DELTA.
  * If OLDDELTA is not NULL, it is filled in with the amount of time
  * adjustment remaining to be done from the last `adjtime' call.
@@ -99,7 +99,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_adjtime_defined 1
 #define __localdep_adjtime __LIBC_LOCAL_NAME(adjtime)
 #endif /* !__local___localdep_adjtime_defined */
-#else /* __CRT_HAVE_adjtime || __CRT_HAVE_adjtime64 */
+#else /* __CRT_HAVE_adjtime64 || __CRT_HAVE_adjtime */
 #undef __local_adjtime_defined
-#endif /* !__CRT_HAVE_adjtime && !__CRT_HAVE_adjtime64 */
+#endif /* !__CRT_HAVE_adjtime64 && !__CRT_HAVE_adjtime */
 #endif /* !__local_adjtime_defined */

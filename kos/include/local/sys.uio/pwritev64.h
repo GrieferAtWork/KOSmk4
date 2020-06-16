@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27e71c5a */
+/* HASH CRC-32:0x7393bb75 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,10 @@
 #include <bits/uio.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pwritev32 from sys.uio */
-#if !defined(__local___localdep_pwritev32_defined) && defined(__CRT_HAVE_pwritev)
+#ifndef __local___localdep_pwritev32_defined
 #define __local___localdep_pwritev32_defined 1
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),pwritev,(__fd,__iov,__count,__offset))
-#endif /* !__local___localdep_pwritev32_defined && __CRT_HAVE_pwritev */
+#endif /* !__local___localdep_pwritev32_defined */
 __LOCAL_LIBC(pwritev64) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwritev64))(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset) {
 	return __localdep_pwritev32(__fd, __iov, __count, (__off32_t)__offset);

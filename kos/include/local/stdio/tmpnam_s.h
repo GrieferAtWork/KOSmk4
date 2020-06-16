@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb75e4d5b */
+/* HASH CRC-32:0xc11502a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,10 @@
 #ifdef __CRT_HAVE_tmpnam
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: tmpnam from stdio */
-#if !defined(__local___localdep_tmpnam_defined) && defined(__CRT_HAVE_tmpnam)
+#ifndef __local___localdep_tmpnam_defined
 #define __local___localdep_tmpnam_defined 1
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_tmpnam,(char *__buf),tmpnam,(__buf))
-#endif /* !__local___localdep_tmpnam_defined && __CRT_HAVE_tmpnam */
+#endif /* !__local___localdep_tmpnam_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN

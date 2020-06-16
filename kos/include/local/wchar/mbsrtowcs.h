@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10b8ea6e */
+/* HASH CRC-32:0xe8fe1d9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,12 +35,12 @@ __NAMESPACE_LOCAL_END
 #include <bits/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
-#elif defined(__CRT_HAVE_mbrtoc16) && (__SIZEOF_WCHAR_T__ == 2)
+#elif defined(__CRT_HAVE_mbrtoc16) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <bits/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrtowc,(__WCHAR_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrtoc16,(__pwc,__str,__maxlen,__mbs))
-#elif defined(__CRT_HAVE_mbrtoc32) && (__SIZEOF_WCHAR_T__ == 4)
+#elif defined(__CRT_HAVE_mbrtoc32) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <bits/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN

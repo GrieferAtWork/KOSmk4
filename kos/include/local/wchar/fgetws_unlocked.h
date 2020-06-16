@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a742812 */
+/* HASH CRC-32:0x11accb0d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,10 +45,10 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferr
 #endif /* !... */
 #endif /* !__local___localdep_ferror_unlocked_defined */
 /* Dependency: fgetwc_unlocked from wchar */
-#if !defined(__local___localdep_fgetwc_unlocked_defined) && defined(__CRT_HAVE_fgetwc_unlocked)
+#ifndef __local___localdep_fgetwc_unlocked_defined
 #define __local___localdep_fgetwc_unlocked_defined 1
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
-#endif /* !__local___localdep_fgetwc_unlocked_defined && __CRT_HAVE_fgetwc_unlocked */
+#endif /* !__local___localdep_fgetwc_unlocked_defined */
 /* Dependency: ungetwc_unlocked from wchar */
 #ifndef __local___localdep_ungetwc_unlocked_defined
 #define __local___localdep_ungetwc_unlocked_defined 1

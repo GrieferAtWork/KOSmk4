@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a1725df */
+/* HASH CRC-32:0x94864af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_sem_timedwait_defined
 #define __local_sem_timedwait_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_sem_timedwait) || defined(__CRT_HAVE_sem_timedwait64)
+#if defined(__CRT_HAVE_sem_timedwait64) || defined(__CRT_HAVE_sem_timedwait)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sem_timedwait32 from semaphore */
 #if !defined(__local___localdep_sem_timedwait32_defined) && defined(__CRT_HAVE_sem_timedwait)
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,
 #define __local___localdep_sem_timedwait64_defined 1
 #ifdef __CRT_HAVE_sem_timedwait64
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait64,(sem_t *__restrict __sem, struct __timespec64 const *__restrict __abstime),sem_timedwait64,(__sem,__abstime))
-#elif defined(__CRT_HAVE_sem_timedwait) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_sem_timedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait64,(sem_t *__restrict __sem, struct __timespec64 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait)
 __NAMESPACE_LOCAL_END
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_sem_timedwait_defined 1
 #define __localdep_sem_timedwait __LIBC_LOCAL_NAME(sem_timedwait)
 #endif /* !__local___localdep_sem_timedwait_defined */
-#else /* __CRT_HAVE_sem_timedwait || __CRT_HAVE_sem_timedwait64 */
+#else /* __CRT_HAVE_sem_timedwait64 || __CRT_HAVE_sem_timedwait */
 #undef __local_sem_timedwait_defined
-#endif /* !__CRT_HAVE_sem_timedwait && !__CRT_HAVE_sem_timedwait64 */
+#endif /* !__CRT_HAVE_sem_timedwait64 && !__CRT_HAVE_sem_timedwait */
 #endif /* !__local_sem_timedwait_defined */

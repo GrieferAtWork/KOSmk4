@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3d3eef */
+/* HASH CRC-32:0xdcfc8501 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1059,7 +1059,7 @@ INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wto8)(void *arg,
                                        char16_t const *data,
                                        size_t datalen) {
-#if 2 == 2
+
 	struct __local_format_16to8_data {
 		__pformatprinter fd_printer;   /* [1..1] Inner printer */
 		void            *fd_arg;       /* Argument for `fd_printer' */
@@ -1109,30 +1109,30 @@ after_dst_write:
 	return result;
 err:
 	return temp;
-#else /* 2 == 2 */
-	struct __local_format_32to8_data {
-		__pformatprinter fd_printer; /* [1..1] Inner printer */
-		void            *fd_arg;     /* Argument for `fd_printer' */
-	};
-	char buf[64];
-	struct __local_format_32to8_data *closure;
-	ssize_t temp, result = 0;
-	size_t i = 0;
-	closure = (struct __local_format_32to8_data *)arg;
-	while (i < datalen) {
-		char *dst = buf;
-		do {
-			dst = libc_unicode_writeutf8(dst, ((char32_t const *)data)[i++]);
-		} while ((dst + 7) < COMPILER_ENDOF(buf) && i < datalen);
-		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
-	}
-	return result;
-err:
-	return temp;
-#endif /* !(2 == 2) */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #include <bits/format-printer.h>
 /* Format printer (compatible with `__pc16formatprinter') for
@@ -1141,57 +1141,57 @@ INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBKCALL libc_format_wto8)(void *arg,
                                        char32_t const *data,
                                        size_t datalen) {
-#if 4 == 2
-	struct __local_format_16to8_data {
-		__pformatprinter fd_printer;   /* [1..1] Inner printer */
-		void            *fd_arg;       /* Argument for `fd_printer' */
-		__CHAR16_TYPE__  fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
-	};
-	char buf[64], *dst = buf;
-	struct __local_format_16to8_data *closure;
-	ssize_t temp, result = 0;
-	size_t i = 0;
-	char32_t ch;
-	closure = (struct __local_format_16to8_data *)arg;
-	if (closure->fd_surrogate && datalen) {
-		ch  = closure->fd_surrogate - 0xd800;
-		closure->fd_surrogate = 0;
-		ch += 0x10000;
-		ch += ((char16_t const *)data)[0] - 0xdc00;
-		dst = libc_unicode_writeutf8(dst, ch);
-		i = 1;
-		goto after_dst_write;
-	}
-	while (i < datalen) {
-		do {
-			char16_t ch16;
-			ch16 = ((char16_t const *)data)[i++];
-			if (ch16 >= 0xd800 &&
-			    ch16 <= 0xdbff) {
-				if (i >= datalen) {
-					closure->fd_surrogate = ch16;
-					break;
-				}
-				ch  = ch16 - 0xd800;
-				ch += 0x10000;
-				ch += data[i++] - 0xdc00;
-			} else {
-				ch = ch16;
-			}
-			dst = libc_unicode_writeutf8(dst, ch);
-after_dst_write:
-			;
-		} while ((dst + 4) < COMPILER_ENDOF(buf) && i < datalen);
-		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
-		dst = buf;
-	}
-	return result;
-err:
-	return temp;
-#else /* 4 == 2 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	struct __local_format_32to8_data {
 		__pformatprinter fd_printer; /* [1..1] Inner printer */
 		void            *fd_arg;     /* Argument for `fd_printer' */
@@ -1214,7 +1214,7 @@ err:
 	return result;
 err:
 	return temp;
-#endif /* !(4 == 2) */
+
 }
 #include <bits/uformat-printer.h>
 /* Format printer (compatible with `__pc16formatprinter') for
@@ -1223,7 +1223,7 @@ INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wto32)(void *arg,
                                         char16_t const *data,
                                         size_t datalen) {
-#if 2 == 2
+
 	struct __local_format_16to32_data {
 		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
 		void               *fd_arg;       /* Argument for `fd_printer' */
@@ -1273,15 +1273,15 @@ after_dst_write:
 	return result;
 err:
 	return temp;
-#else /* 2 == 2 */
-	struct __local_format_32to32_data {
-		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
-		void               *fd_arg;       /* Argument for `fd_printer' */
-	};
-	struct __local_format_32to32_data *closure;
-	closure = (struct __local_format_32to32_data *)arg;
-	return (*closure->fd_printer)(closure->fd_arg, (char32_t const *)data, datalen);
-#endif /* !(2 == 2) */
+
+
+
+
+
+
+
+
+
 }
 #include <bits/uformat-printer.h>
 /* Format printer (compatible with `__pc16formatprinter') for
@@ -1290,57 +1290,57 @@ INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBKCALL libc_format_wto32)(void *arg,
                                         char32_t const *data,
                                         size_t datalen) {
-#if 4 == 2
-	struct __local_format_16to32_data {
-		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
-		void               *fd_arg;       /* Argument for `fd_printer' */
-		__CHAR16_TYPE__     fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
-	};
-	char32_t buf[64], *dst = buf;
-	struct __local_format_16to32_data *closure;
-	ssize_t temp, result = 0;
-	size_t i = 0;
-	char32_t ch;
-	closure = (struct __local_format_16to32_data *)arg;
-	if (closure->fd_surrogate && datalen) {
-		ch  = closure->fd_surrogate - 0xd800;
-		closure->fd_surrogate = 0;
-		ch += 0x10000;
-		ch += data[0] - 0xdc00;
-		*dst++ = ch;
-		i = 1;
-		goto after_dst_write;
-	}
-	while (i < datalen) {
-		do {
-			char16_t ch16;
-			ch16 = data[i++];
-			if (ch16 >= 0xd800 &&
-			    ch16 <= 0xdbff) {
-				if (i >= datalen) {
-					closure->fd_surrogate = ch16;
-					break;
-				}
-				ch  = ch16 - 0xd800;
-				ch += 0x10000;
-				ch += data[i++] - 0xdc00;
-			} else {
-				ch = ch16;
-			}
-			*dst++ = ch;
-after_dst_write:
-			;
-		} while (dst < COMPILER_ENDOF(buf) && i < datalen);
-		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
-		dst = buf;
-	}
-	return result;
-err:
-	return temp;
-#else /* 4 == 2 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	struct __local_format_32to32_data {
 		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
 		void               *fd_arg;       /* Argument for `fd_printer' */
@@ -1348,7 +1348,7 @@ err:
 	struct __local_format_32to32_data *closure;
 	closure = (struct __local_format_32to32_data *)arg;
 	return (*closure->fd_printer)(closure->fd_arg, (char32_t const *)data, datalen);
-#endif /* !(4 == 2) */
+
 }
 #include <bits/format-printer.h>
 #include <bits/uformat-printer.h>
@@ -1358,30 +1358,30 @@ INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wto16)(void *arg,
                                         char16_t const *data,
                                         size_t datalen) {
-#if 2 == 4
-	struct __local_format_32to16_data {
-		__pc16formatprinter fd_printer; /* [1..1] Inner printer */
-		void               *fd_arg;     /* Argument for `fd_printer' */
-	};
-	char16_t buf[64];
-	struct __local_format_32to16_data *closure;
-	ssize_t temp, result = 0;
-	size_t i = 0;
-	closure = (struct __local_format_32to16_data *)arg;
-	while (i < datalen) {
-		char16_t *dst = buf;
-		do {
-			dst = libc_unicode_writeutf16(dst, data[i++]);
-		} while ((dst + 2) < COMPILER_ENDOF(buf) && i < datalen);
-		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
-	}
-	return result;
-err:
-	return temp;
-#else /* 2 == 4 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	struct __local_format_16to16_data {
 		__pc16formatprinter fd_printer;   /* [1..1] Inner printer */
 		void               *fd_arg;       /* Argument for `fd_printer' */
@@ -1389,7 +1389,7 @@ err:
 	struct __local_format_16to16_data *closure;
 	closure = (struct __local_format_16to16_data *)arg;
 	return (*closure->fd_printer)(closure->fd_arg, (char16_t const *)data, datalen);
-#endif /* !(2 == 4) */
+
 }
 #include <bits/format-printer.h>
 #include <bits/uformat-printer.h>
@@ -1399,7 +1399,7 @@ INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBKCALL libc_format_wto16)(void *arg,
                                         char32_t const *data,
                                         size_t datalen) {
-#if 4 == 4
+
 	struct __local_format_32to16_data {
 		__pc16formatprinter fd_printer; /* [1..1] Inner printer */
 		void               *fd_arg;     /* Argument for `fd_printer' */
@@ -1422,15 +1422,15 @@ NOTHROW_NCX(LIBKCALL libc_format_wto16)(void *arg,
 	return result;
 err:
 	return temp;
-#else /* 4 == 4 */
-	struct __local_format_16to16_data {
-		__pc16formatprinter fd_printer;   /* [1..1] Inner printer */
-		void               *fd_arg;       /* Argument for `fd_printer' */
-	};
-	struct __local_format_16to16_data *closure;
-	closure = (struct __local_format_16to16_data *)arg;
-	return (*closure->fd_printer)(closure->fd_arg, (char16_t const *)data, datalen);
-#endif /* !(4 == 4) */
+
+
+
+
+
+
+
+
+
 }
 #endif /* !__KERNEL__ */
 

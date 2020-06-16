@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c51b857 */
+/* HASH CRC-32:0xfe8709 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_srand_defined 1
 #ifdef __CRT_HAVE_srand
 __CREDIRECT_VOID(,__NOTHROW,__localdep_srand,(long __seed),srand,(__seed))
-#elif defined(__CRT_HAVE_srandom) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+#elif defined(__CRT_HAVE_srandom) && __SIZEOF_INT__ == __SIZEOF_LONG__
 __CREDIRECT_VOID(,__NOTHROW,__localdep_srand,(long __seed),srandom,(__seed))
 #else /* ... */
 __NAMESPACE_LOCAL_END

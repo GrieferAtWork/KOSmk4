@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4595f1a4 */
+/* HASH CRC-32:0x481fb1f1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_timer_settime_defined
 #define __local_timer_settime_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_timer_settime) || defined(__CRT_HAVE_timer_settime64)
+#if defined(__CRT_HAVE_timer_settime64) || defined(__CRT_HAVE_timer_settime)
 #include <features.h>
 #include <bits/itimerspec.h>
 #include <bits/types.h>
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime32,(__
 #ifdef __CRT_HAVE_timer_settime64
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime64,(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__restrict __value, struct __itimerspec64 *__restrict __ovalue),timer_settime64,(__timerid,__flags,__value,__ovalue))
-#elif defined(__CRT_HAVE_timer_settime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_timer_settime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime64,(__timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__restrict __value, struct __itimerspec64 *__restrict __ovalue),timer_settime,(__timerid,__flags,__value,__ovalue))
 #elif defined(__CRT_HAVE_timer_settime)
@@ -91,7 +91,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_timer_settime_defined 1
 #define __localdep_timer_settime __LIBC_LOCAL_NAME(timer_settime)
 #endif /* !__local___localdep_timer_settime_defined */
-#else /* __CRT_HAVE_timer_settime || __CRT_HAVE_timer_settime64 */
+#else /* __CRT_HAVE_timer_settime64 || __CRT_HAVE_timer_settime */
 #undef __local_timer_settime_defined
-#endif /* !__CRT_HAVE_timer_settime && !__CRT_HAVE_timer_settime64 */
+#endif /* !__CRT_HAVE_timer_settime64 && !__CRT_HAVE_timer_settime */
 #endif /* !__local_timer_settime_defined */

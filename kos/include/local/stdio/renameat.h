@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7e8389f */
+/* HASH CRC-32:0xa793d999 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,11 +24,11 @@
 #ifdef __CRT_HAVE_frenameat
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: frenameat from stdio */
-#if !defined(__local___localdep_frenameat_defined) && defined(__CRT_HAVE_frenameat)
+#ifndef __local___localdep_frenameat_defined
 #define __local___localdep_frenameat_defined 1
 /* @param flags: Set of `0 | AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_frenameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),frenameat,(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
-#endif /* !__local___localdep_frenameat_defined && __CRT_HAVE_frenameat */
+#endif /* !__local___localdep_frenameat_defined */
 __LOCAL_LIBC(renameat) __ATTR_NONNULL((2, 4)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(renameat))(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path) {
 	return __localdep_frenameat(__oldfd, __oldname, __newfd, __newname_or_path, 0);

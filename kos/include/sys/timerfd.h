@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25abc3e8 */
+/* HASH CRC-32:0x775101e5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,timerfd_settime,(__fd_t __ufd,
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */
 __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,timerfd_settime,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr),(__ufd,__flags,__utmr,__otmr))
-#elif defined(__CRT_HAVE_timerfd_settime) || defined(__CRT_HAVE_timerfd_settime64)
+#elif defined(__CRT_HAVE_timerfd_settime64) || defined(__CRT_HAVE_timerfd_settime)
 #include <local/sys.timerfd/timerfd_settime.h>
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
@@ -93,7 +93,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,timerfd_gettime,(__fd_t __ufd,
 #elif defined(__CRT_HAVE_timerfd_gettime) && !defined(__USE_TIME_BITS64)
 /* Return the next expiration time of UFD */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,timerfd_gettime,(__fd_t __ufd, struct itimerspec *__restrict __otmr),(__ufd,__otmr))
-#elif defined(__CRT_HAVE_timerfd_gettime) || defined(__CRT_HAVE_timerfd_gettime64)
+#elif defined(__CRT_HAVE_timerfd_gettime64) || defined(__CRT_HAVE_timerfd_gettime)
 #include <local/sys.timerfd/timerfd_gettime.h>
 /* Return the next expiration time of UFD */
 __NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_gettime, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL timerfd_gettime)(__fd_t __ufd, struct itimerspec *__restrict __otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_gettime))(__ufd, __otmr); })
@@ -104,7 +104,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_gettime, __FORCELOCAL __ATTR_NONNULL((2)
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */
 __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec64 const *__utmr, struct itimerspec64 *__otmr),(__ufd,__flags,__utmr,__otmr))
-#elif defined(__CRT_HAVE_timerfd_settime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_timerfd_settime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */
@@ -119,7 +119,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_settime64, __FORCELOCAL __ATTR_NONNULL((
 #ifdef __CRT_HAVE_timerfd_gettime64
 /* Return the next expiration time of UFD */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,timerfd_gettime64,(__fd_t __ufd, struct itimerspec64 *__restrict __otmr),(__ufd,__otmr))
-#elif defined(__CRT_HAVE_timerfd_gettime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_timerfd_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Return the next expiration time of UFD */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,timerfd_gettime64,(__fd_t __ufd, struct itimerspec64 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime)

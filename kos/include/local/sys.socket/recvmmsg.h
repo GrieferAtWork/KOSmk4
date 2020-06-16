@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc63226e */
+/* HASH CRC-32:0xa601f3fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_recvmmsg_defined
 #define __local_recvmmsg_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_recvmmsg) || defined(__CRT_HAVE_recvmmsg64)
+#if defined(__CRT_HAVE_recvmmsg64) || defined(__CRT_HAVE_recvmmsg)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: recvmmsg32 from sys.socket */
@@ -44,7 +44,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_recvmmsg32,(__fd_t 
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
-#elif defined(__CRT_HAVE_recvmmsg) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+#elif defined(__CRT_HAVE_recvmmsg) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -93,7 +93,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_recvmmsg_defined 1
 #define __localdep_recvmmsg __LIBC_LOCAL_NAME(recvmmsg)
 #endif /* !__local___localdep_recvmmsg_defined */
-#else /* __CRT_HAVE_recvmmsg || __CRT_HAVE_recvmmsg64 */
+#else /* __CRT_HAVE_recvmmsg64 || __CRT_HAVE_recvmmsg */
 #undef __local_recvmmsg_defined
-#endif /* !__CRT_HAVE_recvmmsg && !__CRT_HAVE_recvmmsg64 */
+#endif /* !__CRT_HAVE_recvmmsg64 && !__CRT_HAVE_recvmmsg */
 #endif /* !__local_recvmmsg_defined */

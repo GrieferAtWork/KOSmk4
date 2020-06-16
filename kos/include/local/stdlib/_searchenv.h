@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9097621 */
+/* HASH CRC-32:0x9d202f29 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,13 +24,13 @@
 #ifdef __CRT_HAVE__searchenv_s
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _searchenv_s from stdlib */
-#if !defined(__local___localdep__searchenv_s_defined) && defined(__CRT_HAVE__searchenv_s)
+#ifndef __local___localdep__searchenv_s_defined
 #define __local___localdep__searchenv_s_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep__searchenv_s,(char const *__file, char const *__envvar, char *__restrict __resultpath, __SIZE_TYPE__ __buflen),_searchenv_s,(__file,__envvar,__resultpath,__buflen))
-#endif /* !__local___localdep__searchenv_s_defined && __CRT_HAVE__searchenv_s */
+#endif /* !__local___localdep__searchenv_s_defined */
 __LOCAL_LIBC(_searchenv) __ATTR_NONNULL((1, 2, 3)) void
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_searchenv))(char const *__file, char const *__envvar, char *__restrict __resultpath) {
 	__localdep__searchenv_s(__file, __envvar, __resultpath, (__SIZE_TYPE__)-1);

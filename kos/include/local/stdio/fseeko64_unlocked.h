@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaeef00a8 */
+/* HASH CRC-32:0x67c4ab98 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__re
 #elif defined(__CRT_HAVE__fseeki64_nolock)
 /* 64-bit variant of `fseeko' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_fseeko) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* 64-bit variant of `fseeko' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseeko64,(__FILE *__restrict __stream, __off64_t __off, int __whence),fseeko,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)

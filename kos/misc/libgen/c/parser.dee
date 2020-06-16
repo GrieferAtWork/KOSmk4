@@ -369,6 +369,16 @@ twochar:
 						goto twochar;
 					break;
 
+				case "|":
+					if (nextCh in "|=")
+						goto twochar;
+					break;
+
+				case "&":
+					if (nextCh in "&=")
+						goto twochar;
+					break;
+
 				case "=":
 				case "!":
 					if (nextCh in "=")

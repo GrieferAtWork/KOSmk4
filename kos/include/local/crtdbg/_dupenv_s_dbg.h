@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12d21ed2 */
+/* HASH CRC-32:0x98578891 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,13 +24,13 @@
 #ifdef __CRT_HAVE__dupenv_s
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: _dupenv_s from stdlib */
-#if !defined(__local___localdep__dupenv_s_defined) && defined(__CRT_HAVE__dupenv_s)
+#ifndef __local___localdep__dupenv_s_defined
 #define __local___localdep__dupenv_s_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep__dupenv_s,(char **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, char const *__varname),_dupenv_s,(__pbuf,__pbuflen,__varname))
-#endif /* !__local___localdep__dupenv_s_defined && __CRT_HAVE__dupenv_s */
+#endif /* !__local___localdep__dupenv_s_defined */
 __LOCAL_LIBC(_dupenv_s_dbg) _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_dupenv_s_dbg))(char **__pbuf, __SIZE_TYPE__ *__pbufsize, char const *__varname, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;

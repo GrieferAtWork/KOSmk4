@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec3e84bd */
+/* HASH CRC-32:0x925166c9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,12 +27,12 @@ struct __rusage64;
 #include <bits/rusage-struct.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wait4_32 from sys.wait */
-#if !defined(__local___localdep_wait4_32_defined) && defined(__CRT_HAVE_wait4)
+#ifndef __local___localdep_wait4_32_defined
 #define __local___localdep_wait4_32_defined 1
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait4_32,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),wait4,(__pid,__stat_loc,__options,__usage))
-#endif /* !__local___localdep_wait4_32_defined && __CRT_HAVE_wait4 */
+#endif /* !__local___localdep_wait4_32_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/rusage-convert.h>
 __NAMESPACE_LOCAL_BEGIN

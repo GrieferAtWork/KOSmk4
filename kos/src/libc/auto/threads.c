@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x380aa36c */
+/* HASH CRC-32:0x8c9de83f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,7 +91,7 @@ NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr,
 	error = libc_pthread_join((pthread_t)thr, (void **)res);
 	if likely(!error)
 		return thrd_success;
-#endif /* !(__SIZEOF_POINTER__ != __SIZEOF_INT__) */
+#endif /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
 	return thrd_error;
 }
 #include <asm/threads.h>
@@ -168,7 +168,7 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock64)(mtx_t *__restrict mutex,
 		return thrd_success;
 	return thrd_error;
 }
-#endif /* !(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) */
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <asm/threads.h>
 #include <bits/pthreadtypes.h>
 /* Try to lock the mutex pointed by MUTEX without blocking.
@@ -287,7 +287,7 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait64)(cnd_t *__restrict cond,
 		return thrd_timedout;
 	return thrd_error;
 }
-#endif /* !(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) */
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <asm/threads.h>
 #include <bits/pthreadtypes.h>
 /* Create new thread-specific storage key and stores it in the object pointed by TSS_ID.

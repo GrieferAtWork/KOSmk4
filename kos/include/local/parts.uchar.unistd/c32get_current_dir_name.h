@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb07fc441 */
+/* HASH CRC-32:0xed4a75ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,12 @@
 #ifndef __local_c32get_current_dir_name_defined
 #define __local_c32get_current_dir_name_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_wgetcwd) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wgetcwd)
+#if (defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wgetcwd)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32getcwd from parts.uchar.unistd */
 #ifndef __local___localdep_c32getcwd_defined
 #define __local___localdep_c32getcwd_defined 1
-#if defined(__CRT_HAVE_wgetcwd) && (__SIZEOF_WCHAR_T__ == 4) && defined(__LIBCCALL_IS_LIBKCALL)
+#if defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT(,__CHAR32_TYPE__ *,__NOTHROW_RPC,__localdep_c32getcwd,(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),wgetcwd,(__buf,__bufsize))
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c32get_current_dir_name_defined 1
 #define __localdep_c32get_current_dir_name __LIBC_LOCAL_NAME(c32get_current_dir_name)
 #endif /* !__local___localdep_c32get_current_dir_name_defined */
-#else /* (__CRT_HAVE_wgetcwd && (__SIZEOF_WCHAR_T__ == 4) && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wgetcwd */
+#else /* (__CRT_HAVE_wgetcwd && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wgetcwd */
 #undef __local_c32get_current_dir_name_defined
-#endif /* (!__CRT_HAVE_wgetcwd || !(__SIZEOF_WCHAR_T__ == 4) || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wgetcwd */
+#endif /* (!__CRT_HAVE_wgetcwd || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wgetcwd */
 #endif /* !__local_c32get_current_dir_name_defined */

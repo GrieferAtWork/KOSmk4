@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2746eae */
+/* HASH CRC-32:0x7124bc77 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,15 +24,15 @@
 #if defined(__CRT_HAVE_getenv) && defined(__CRT_HAVE__putenv_s)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: dos_putenv_s from stdlib */
-#if !defined(__local___localdep_dos_putenv_s_defined) && defined(__CRT_HAVE__putenv_s)
+#ifndef __local___localdep_dos_putenv_s_defined
 #define __local___localdep_dos_putenv_s_defined 1
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_dos_putenv_s,(char const *__varname, char const *__val),_putenv_s,(__varname,__val))
-#endif /* !__local___localdep_dos_putenv_s_defined && __CRT_HAVE__putenv_s */
+#endif /* !__local___localdep_dos_putenv_s_defined */
 /* Dependency: getenv from stdlib */
-#if !defined(__local___localdep_getenv_defined) && defined(__CRT_HAVE_getenv)
+#ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined 1
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
-#endif /* !__local___localdep_getenv_defined && __CRT_HAVE_getenv */
+#endif /* !__local___localdep_getenv_defined */
 __LOCAL_LIBC(setenv) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setenv))(char const *__varname, char const *__val, int __replace) {
 	if (!__replace && __localdep_getenv(__varname))

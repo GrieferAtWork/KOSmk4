@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9958d7b */
+/* HASH CRC-32:0x63b1d3bd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,13 +24,13 @@
 #ifdef __CRT_HAVE_utimes
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: utimes32 from sys.time */
-#if !defined(__local___localdep_utimes32_defined) && defined(__CRT_HAVE_utimes)
+#ifndef __local___localdep_utimes32_defined
 #define __local___localdep_utimes32_defined 1
 /* Change the access time of FILE to TVP[0] and the modification time of
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
  * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_utimes32,(char const *__file, struct __timeval32 const __tvp[2]),utimes,(__file,__tvp))
-#endif /* !__local___localdep_utimes32_defined && __CRT_HAVE_utimes */
+#endif /* !__local___localdep_utimes32_defined */
 /* Change the access time of FILE to TVP[0] and the modification time of
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
  * Returns 0 on success, -1 on errors */
