@@ -1354,6 +1354,17 @@ function _ppParseAfter_cond(self: CParser, base: PPBranch): PPBranch {
 @@Parse and return a preprocessor expression
 function ppParse(self: string | UserString | CParser | File): PPBranch {
 	if (self !is CParser) {
+#if 1
+		/* Optimizations for a (very) small hand full of expressions
+		 * These appear explicitly since they're often used as placeholder
+		 * conditional strings, such as `CWriter.ppElse()' actually calling
+		 * forward to `CWriter.ppElif("1")'. */
+		switch(str(self)) {
+		case "0": return PPBranch(BRT_CONST, 0);
+		case "1": return PPBranch(BRT_CONST, 1);
+		default: break;
+		}
+#endif
 		self = CParser(self);
 		self.next();
 	}

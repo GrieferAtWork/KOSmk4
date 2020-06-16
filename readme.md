@@ -380,32 +380,33 @@ All ported applications can be installed onto your KOS disk image by using `bash
 - `/kos/include/hybrid/*` must not have any cross-dependencies to files other `/kos/include/__std(cxx|inc).h` and `/kos/include/compiler/*`
 	- The hybrid API should not be bound to only work under KOS and/or GCC
 - The provided `/kos/.clang-format` file is not perfect:
-	- Labels should always have an indentation of 0
-	- The `likely` and `unlikely` keywords cannot be programmed to work correctly with clang-format and need manual adjustment after formatting
-	- Incorrect instances of formatting resulting from this can be detected with the regular expressions found in `/kos/.clang-format`
+	- See the comments on where it fails within the file itself
 - Try not to make direct use of GCC builtin functions. - Use the much more portable functions available through `/kos/include/hybrid/*`. Otherwise, always check if the builtin exists with `__has_builtin()` beforehand (don't worry about GCC not providing `__has_builtin()`; the kos headers are able to emulate that macro for GCC)
 	- As an exception to this rule, the following GCC builtins can always be used without first being checked (since they can easily be emulated, or stubbed out on unsupported compilers):
 		- `__builtin_va_list`, `__builtin_va(start|end|copy|arg)(...)`
 		- `__builtin_prefetch(addr)`
 		- `__builtin_choose_expr(cond, tt, ff)`
-			- But don't assume that the false-branch doesn't get compiled. - Only assume that it doesn't get evaluated at runtime (this one may be emulated as `cond ? tt : ff`)
-		- `__builtin_offsetof(...)`
+			- But don't assume that the false-branch doesn't get compiled. - Only assume that it doesn't get evaluated at runtime (this one may be emulated as `cond ? tt : ff` when `__NO_builtin_choose_expr` is defined)
+		- `__builtin_offsetof(struct, field)`
 		- `__builtin_expect(expr, expected)`
 		- `__builtin_unreachable()`
 		- `__builtin_assume(expr)`
-			- Not actually a GCC builtin, but may be used to instruct the compiler to assume that `expr` is always true (mainly useful as a replacement for `assert()` for when you *really* want to get fast code, and don't care about instabilities; use with caution and remember that it may just be a no-op)
+			- Not actually a GCC builtin, but may be used to instruct the compiler to assume that `expr` is always true (mainly useful as a replacement for `assert()` for when you *really* want to get fast code, and don't care about instabilities; use with caution and remember that it may just be a no-op. Also make sure that `expr` doesn't carry any side-effects, no matter how often it would be evaluated at runtime)
+			- Also comes with a macro `__NO_builtin_assume` if it's just a no-op
 		- `__builtin_constant_p(expr)` (may be emulated to always evaluate to `false`)
-			- Also comes with a macro `__NO_builtin_types_compatible_p` if not supported
+			- Also comes with a macro `__NO_builtin_constant_p` if not supported
 		- `__restrict`
 			- Even though stdc now defines a standard keyword `restrict`, many compilers don't yet support it to the point where more compilers natively understand `__restrict` than ones that understand `restrict`
+			- So with all of this in mind, just write `__restrict` everywhere and let the headers worry about how to provide that keyword
 		- `__builtin_types_compatible_p(T1, T2)` (Stubbed out to always return `0`)
 			- Also comes with a macro `__NO_builtin_types_compatible_p` if not supported
-- Always try to maintain compatibility with any arbitrary post-STDC C/C++ compiler in headers
+- Always try to maintain compatibility with any arbitrary post-STDC C/C++ compiler in headers (though native library sources don't have to conform to this)
 	- Any header must always ensure that it includes `<__stdinc.h>` at some point, or includes another header that unconditionally includes it (this header is used to do all of the work of creating a common, cross-compiler basis of available features)
 	- Anything that only a C compiler could understand must be wrapped inside a `#ifdef __CC__` block (`CC` standing C/C++-Compiler)
 		- Always allow an assembler or linker script to include any arbirary header found in `/kos/include/`
 		- Related to the later, also consider if an assembly source file could reasonably need to make use of structures defined in your header, and if so: add `[__]OFFSET_MYSTRUCT_MYFIELD` and `[__]SIZEOF_MYSTRUCT` macros describing the absolute offsets of certain fields
 			- To assert that these offsets are valid, you may add the header to the list of checked headers in `$PROJPATH/kos/src/_verify/[arch/(i386|...)/]assert_types.c`
+	- This rule only exists to allow 3rd party programs to be built using a compiler other than the gcc from the KOS toolchain. Only example of where this makes a difference is using `tcc` from inside of KOS after also having installed KOS system headers.
 - Libc:
 	- Try to maintain header (API) compatibility with GLIBc, MSVC and CYGWIN
 	- Try to maintain binary (ABI) compatibility with GLIBc and MSVC (CYGWIN only as far as that is possible)

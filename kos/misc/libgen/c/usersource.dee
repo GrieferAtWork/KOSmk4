@@ -63,13 +63,13 @@ function updateUserImplementationSourceFile(
 		ppAssume: PPAssume = none) {
 	@@The layout of the user-source-file:
 	@@  - UserSourceFunction: A function in the form of:
-	@@    >> /*[[[head:foo,hash:...]]]*/
+	@@    >> /*[[[head:libc_foo,hash:...]]]*/
 	@@    >> INTERN void LIBCCALL libc_foo(void)
-	@@    >> /*[[[body:foo]]]*/
+	@@    >> /*[[[body:libc_foo]]]*/
 	@@    >> {
 	@@    >> 	...
 	@@    >> }
-	@@    >> /*[[[end:foo]]]*/
+	@@    >> /*[[[end:libc_foo]]]*/
 	@@  - _UserSourceExportTable: A placeholder for the exports table
 	@@  - string: Some other string that is inserted between locations
 	local userSourceLayout: {(UserSourceFunction | _UserSourceExportTable | string)...} = [];

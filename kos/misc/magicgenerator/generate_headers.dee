@@ -157,7 +157,7 @@ function servicePendingTasks() {
 				try {
 					task = pendingTasks.popfront();
 				} catch (IndexError) {
-					break;
+					continue;
 				}
 				/* Execute the task */
 				task[0](task[1]...);
