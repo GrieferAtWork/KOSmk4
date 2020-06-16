@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fc35890 */
+/* HASH CRC-32:0x2812cf58 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,15 +34,15 @@ DECL_BEGIN
 INTERN ATTR_SECTION(".text.crt.time") ATTR_CONST WUNUSED double
 NOTHROW_NCX(LIBCCALL libc_difftime)(time_t time1,
                                     time_t time0) {
-#ifdef __BUILDING_LIBC
+
 	return time1 > time0 ? time1 - time0 : time0 - time1;
-#elif defined(__CRT_HAVE_difftime) || defined(__CRT_HAVE__difftime32)
-	return difftime32((time32_t)time1, (time32_t)time0);
-#else /* ... */
-	return libc_difftime64((time32_t)time1, (time32_t)time0);
 
 
-#endif /* !... */
+
+
+
+
+
 }
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
@@ -50,7 +50,7 @@ NOTHROW_NCX(LIBCCALL libc_difftime)(time_t time1,
 /* Return the `time_t' representation of TP and normalize TP */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time_t
 NOTHROW_NCX(LIBCCALL libc_mktime)(__STRUCT_TM __KOS_FIXED_CONST *tp) {
-#ifdef __BUILDING_LIBC
+
 	__TM_TYPE(time) result;
 	result = __yearstodays(tp->tm_year) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
 	result += tp->tm_yday;
@@ -59,8 +59,6 @@ NOTHROW_NCX(LIBCCALL libc_mktime)(__STRUCT_TM __KOS_FIXED_CONST *tp) {
 	result += tp->tm_min*60;
 	result += tp->tm_sec;
 	return result;
-#else /* __BUILDING_LIBC */
-	return (time_t)libc_mktime64(tp);
 
 
 
@@ -72,7 +70,9 @@ NOTHROW_NCX(LIBCCALL libc_mktime)(__STRUCT_TM __KOS_FIXED_CONST *tp) {
 
 
 
-#endif /* !__BUILDING_LIBC */
+
+
+
 }
 #if defined(__BUILDING_LIBC) || (!defined(__CRT_HAVE_ctime) && !defined(__CRT_HAVE__ctime32))
 #ifndef __LIBC_CTIME_BUFFER_DEFINED
@@ -85,17 +85,17 @@ __NAMESPACE_LOCAL_END
 /* Equivalent to `asctime(localtime(timer))' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_ctime)(time_t const *timer) {
-#ifdef __BUILDING_LIBC
+
 	return libc_ctime_r(timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
-#else /* __BUILDING_LIBC */
-	time64_t tm64 = (time64_t)*timer;
-	return libc_ctime64(&tm64);
 
 
 
 
 
-#endif /* !__BUILDING_LIBC */
+
+
+
+
 }
 #ifdef __BUILDING_LIBC
 #ifndef __LIBC_GMTIME_BUFFER_DEFINED
@@ -109,17 +109,17 @@ __NAMESPACE_LOCAL_END
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_gmtime)(time_t const *timer) {
-#ifdef __BUILDING_LIBC
+
 	return libc_gmtime_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
-#else /* __BUILDING_LIBC */
-	time64_t tm64 = (time64_t)*timer;
-	return libc_gmtime64(&tm64);
 
 
 
 
 
-#endif /* !__BUILDING_LIBC */
+
+
+
+
 }
 #ifdef __BUILDING_LIBC
 #ifndef __LIBC_GMTIME_BUFFER_DEFINED
@@ -132,17 +132,17 @@ __NAMESPACE_LOCAL_END
 /* Return the `struct tm' representation of *TIMER in the local timezone */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_localtime)(time_t const *timer) {
-#ifdef __BUILDING_LIBC
+
 	return libc_localtime_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
-#else /* __BUILDING_LIBC */
-	time64_t tm64 = (time64_t)*timer;
-	return libc_localtime64(&tm64);
 
 
 
 
 
-#endif /* !__BUILDING_LIBC */
+
+
+
+
 }
 /* Format TP into S according to FORMAT.
  * Write no more than MAXSIZE characters and return the number
@@ -152,7 +152,7 @@ NOTHROW_NCX(LIBCCALL libc_strftime)(char *__restrict buf,
                                     size_t bufsize,
                                     char const *__restrict format,
                                     __STRUCT_TM const *__restrict tp) {
-#ifdef __BUILDING_LIBC
+
 	/* TODO */
 	(void)buf;
 	(void)bufsize;
@@ -160,17 +160,17 @@ NOTHROW_NCX(LIBCCALL libc_strftime)(char *__restrict buf,
 	(void)tp;
 	COMPILER_IMPURE();
 	return 0;
-#elif defined(__CRT_HAVE_strftime_l) || defined(__CRT_HAVE__strftime_l) || defined(__CRT_HAVE___strftime_l)
-	return crt_strftime_l(buf, bufsize, format, tp, NULL);
-#else /* ... */
-	/* TODO */
-	(void)buf;
-	(void)bufsize;
-	(void)format;
-	(void)tp;
-	COMPILER_IMPURE();
-	return 0;
-#endif /* !... */
+
+
+
+
+
+
+
+
+
+
+
 }
 #ifndef __LIBC_CTIME_BUFFER_DEFINED
 #define __LIBC_CTIME_BUFFER_DEFINED 1
@@ -201,13 +201,13 @@ DEFINE_INTERN_ALIAS(libc_difftime64, libc_difftime);
 INTERN ATTR_SECTION(".text.crt.time") ATTR_CONST WUNUSED double
 NOTHROW_NCX(LIBCCALL libc_difftime64)(time64_t time1,
                                       time64_t time0) {
-#ifdef __BUILDING_LIBC
+
 	return time1 > time0 ? time1 - time0 : time0 - time1;
-#elif defined(__CRT_HAVE_difftime) || defined(__CRT_HAVE__difftime32)
-	return difftime32((time32_t)time1, (time32_t)time0);
-#else /* ... */
-	return time1 > time0 ? time1 - time0 : time0 - time1;
-#endif /* !... */
+
+
+
+
+
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -219,7 +219,7 @@ DEFINE_INTERN_ALIAS(libc_mktime64, libc_mktime);
 /* Return the `time_t' representation of TP and normalize TP */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time64_t
 NOTHROW_NCX(LIBCCALL libc_mktime64)(__STRUCT_TM __KOS_FIXED_CONST *tp) {
-#ifdef __BUILDING_LIBC
+
 	time64_t result;
 	result = __yearstodays(tp->tm_year) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
 	result += tp->tm_yday;
@@ -228,18 +228,18 @@ NOTHROW_NCX(LIBCCALL libc_mktime64)(__STRUCT_TM __KOS_FIXED_CONST *tp) {
 	result += tp->tm_min*60;
 	result += tp->tm_sec;
 	return result;
-#elif defined(__CRT_HAVE_mktime) || defined(__CRT_HAVE__mktime32) || defined(__CRT_HAVE_timelocal)
-	return (time64_t)mktime32(tp);
-#else /* ... */
-	time64_t result;
-	result = __yearstodays(tp->tm_year) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
-	result += tp->tm_yday;
-	result *= 86400; /* SECONDS_PER_DAY */
-	result += tp->tm_hour*60*60;
-	result += tp->tm_min*60;
-	result += tp->tm_sec;
-	return result;
-#endif /* !... */
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -256,14 +256,14 @@ __NAMESPACE_LOCAL_END
 /* Equivalent to `asctime(localtime(timer))' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_ctime64)(time64_t const *timer) {
-#ifdef __BUILDING_LIBC
+
 	return libc_ctime64_r(timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
-#elif defined(__CRT_HAVE_ctime) || defined(__CRT_HAVE__ctime32)
-	time32_t tm32 = (time32_t)*timer;
-	return ctime32(&tm32);
-#else /* ... */
-	return libc_ctime64_r(timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
-#endif /* !... */
+
+
+
+
+
+
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -281,14 +281,14 @@ __NAMESPACE_LOCAL_END
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_gmtime64)(time64_t const *timer) {
-#ifdef __BUILDING_LIBC
+
 	return libc_gmtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
-#elif defined(__CRT_HAVE_gmtime) || defined(__CRT_HAVE__gmtime32)
-	time32_t tm32 = (time32_t)*timer;
-	return gmtime32(&tm32);
-#else /* ... */
-	return libc_gmtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
-#endif /* !... */
+
+
+
+
+
+
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -305,28 +305,28 @@ __NAMESPACE_LOCAL_END
 /* Return the `struct tm' representation of *TIMER in the local timezone */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer) {
-#ifdef __BUILDING_LIBC
+
 	return libc_localtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
-#elif defined(__CRT_HAVE_localtime) || defined(__CRT_HAVE__localtime32)
-	time32_t tm32 = (time32_t)*timer;
-	return localtime32(&tm32);
-#else /* ... */
-	return libc_localtime64_r(timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
-#endif /* !... */
+
+
+
+
+
+
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /* Like `mktime', but TP represents Universal Time (UTC), not local time */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time_t
 NOTHROW_NCX(LIBCCALL libc_timegm)(__STRUCT_TM *tp) {
-#ifdef __BUILDING_LIBC
+
 	/* TODO: Timezones */
 	return libc_mktime(tp);
-#else /* __BUILDING_LIBC */
-	return (time_t)libc_timegm64(tp);
 
 
 
-#endif /* !__BUILDING_LIBC */
+
+
+
 }
 #ifndef __isleap
 #define __isleap(year) ((year)%4 == 0 && ((year)%100 != 0 || (year)%400 == 0))
@@ -342,15 +342,15 @@ DEFINE_INTERN_ALIAS(libc_timegm64, libc_timegm);
 /* Like `mktime', but TP represents Universal Time (UTC), not local time */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time64_t
 NOTHROW_NCX(LIBCCALL libc_timegm64)(__STRUCT_TM *tp) {
-#ifdef __BUILDING_LIBC
+
 	/* TODO: Timezones */
 	return libc_mktime64(tp);
-#elif defined(__CRT_HAVE_timegm)
-	return (time64_t)timegm32(tp);
-#else /* ... */
-	/* TODO: Timezones */
-	return libc_mktime64(tp);
-#endif /* !... */
+
+
+
+
+
+
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /* Similar to `strftime' but take the information from
@@ -370,23 +370,23 @@ INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2, 3)) char *
 NOTHROW_NCX(LIBCCALL libc_strptime)(char const *__restrict s,
                                     char const *__restrict format,
                                     __STRUCT_TM *__restrict tp) {
-#ifdef __BUILDING_LIBC
+
 	/* TODO */
 	(void)s;
 	(void)format;
 	(void)tp;
 	COMPILER_IMPURE();
 	return NULL;
-#elif defined(__CRT_HAVE_strptime_l)
-	return crt_strptime_l(s, format, tp, NULL);
-#else /* ... */
-	/* TODO */
-	(void)s;
-	(void)format;
-	(void)tp;
-	COMPILER_IMPURE();
-	return NULL;
-#endif /* !... */
+
+
+
+
+
+
+
+
+
+
 }
 /* Similar to `strptime' but take the information from
  * the provided locale and not the global locale */
@@ -438,7 +438,7 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer,
                                     __STRUCT_TM *__restrict tp) {
-#ifdef __BUILDING_LIBC
+
 	time_t t; int i;
 	u16 const *monthvec;
 	t = *timer;
@@ -479,44 +479,44 @@ NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer,
 	}
 	tp->tm_year -= 1900;
 	return tp;
-#elif defined(__CRT_HAVE__gmtime64_s) || defined(__CRT_HAVE__gmtime32_s)
-	return dos_gmtime_s(tp, timer) ? NULL : tp;
-#elif defined(__USE_TIME_BITS64)
-	return libc_gmtime64_r(timer, tp);
-#else /* ... */
-	time64_t tm64 = (time64_t)*timer;
-	return libc_gmtime64_r(&tm64, tp);
-#endif /* !... */
+
+
+
+
+
+
+
+
 }
 /* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_localtime_r)(time_t const *__restrict timer,
                                        __STRUCT_TM *__restrict tp) {
-#ifdef __BUILDING_LIBC
+
 	/* XXX: Timezone support? */
 	return libc_gmtime_r(timer, tp);
-#elif defined(__CRT_HAVE__localtime64_s) || defined(__CRT_HAVE__localtime32_s)
-	return dos_localtime_s(tp, timer) ? NULL : tp;
-#elif defined(__USE_TIME_BITS64)
-	return libc_localtime64_r(timer, tp);
-#else /* ... */
-	time64_t tm64 = (time64_t)*timer;
-	return libc_localtime64_r(&tm64, tp);
-#endif /* !... */
+
+
+
+
+
+
+
+
 }
 /* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_ctime_r)(time_t const *__restrict timer,
                                    char buf[26]) {
-#ifdef __BUILDING_LIBC
+
 	struct tm ltm;
 	return libc_asctime_r(libc_localtime_r(timer, &ltm), buf);
-#elif defined(__CRT_HAVE__ctime64_s) || defined(__CRT_HAVE__ctime32_s)
-	return dos_ctime_s(buf, 26, timer) ? NULL : __buf;
-#else /* ... */
-	struct tm ltm;
-	return libc_asctime_r(libc_localtime_r(timer, &ltm), buf);
-#endif /* !... */
+
+
+
+
+
+
 }
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_gmtime64_r, libc_gmtime_r);
@@ -547,7 +547,7 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer,
                                       __STRUCT_TM *__restrict tp) {
-#ifdef __BUILDING_LIBC
+
 	time_t t; int i;
 	u16 const *monthvec;
 	t = *timer;
@@ -588,50 +588,50 @@ NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer,
 	}
 	tp->tm_year -= 1900;
 	return tp;
-#elif defined(__CRT_HAVE__gmtime64_s) || defined(__CRT_HAVE__gmtime32_s)
-	return dos_gmtime64_s(tp, timer) ? NULL : tp;
-#else /* ... */
-	time64_t t; int i;
-	u16 const *monthvec;
-	t = *timer;
-	tp->tm_sec  = (int)(t % 60);
-	tp->tm_min  = (int)((t/60) % 60);
-	tp->tm_hour = (int)((t/(60*60)) % 24);
-	t /= 86400; /* SECONDS_PER_DAY */
-	t += __yearstodays(1970); /* LINUX_TIME_START_YEAR */
-	tp->tm_wday = (int)(t % 7); /* DAYS_PER_WEEK */
-	tp->tm_year = (int)__daystoyears(t);
-	t -= __yearstodays(tp->tm_year);
-	tp->tm_yday = (int)t;
-	monthvec = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(tp->tm_year)];
-	for (i = 1; i < 12; ++i)
-		if (monthvec[i] >= t)
-			break;
-	tp->tm_mon = i - 1;
-	t -= monthvec[i - 1];
-	tp->tm_mday = t + 1;
-	/* found here: "http://stackoverflow.com/questions/5590429/calculating-daylight-savings-time-from-only-date" */
-	if (tp->tm_mon < 2 || tp->tm_mon > 10) {
-		//January, February, and December are out.
-		tp->tm_isdst = 0;
-	} else if (tp->tm_mon > 2 && tp->tm_mon < 10) {
-		//April to October are in
-		tp->tm_isdst = 1;
-	} else {
-		int previousSunday;
-		previousSunday = tp->tm_mday - tp->tm_wday;
-		if (tp->tm_mon == 2) {
-			//In march, we are DST if our previous Sunday was on or after the 8th.
-			tp->tm_isdst = previousSunday >= 8;
-		} else {
-			//In November we must be before the first Sunday to be dst.
-			//That means the previous Sunday must be before the 1st.
-			tp->tm_isdst = previousSunday <= 0;
-		}
-	}
-	tp->tm_year -= 1900;
-	return tp;
-#endif /* !... */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -641,15 +641,15 @@ DEFINE_INTERN_ALIAS(libc_localtime64_r, libc_localtime_r);
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_localtime64_r)(time64_t const *__restrict timer,
                                          __STRUCT_TM *__restrict tp) {
-#ifdef __BUILDING_LIBC
+
 	/* XXX: Timezone support? */
 	return libc_gmtime64_r(timer, tp);
-#elif defined(__CRT_HAVE__localtime64_s) || defined(__CRT_HAVE__localtime32_s)
-	return dos_localtime64_s(tp, timer) ? NULL : tp;
-#else /* ... */
-	/* XXX: Timezone support? */
-	return libc_gmtime64_r(timer, tp);
-#endif /* !... */
+
+
+
+
+
+
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -659,15 +659,15 @@ DEFINE_INTERN_ALIAS(libc_ctime64_r, libc_ctime_r);
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_ctime64_r)(time64_t const *__restrict timer,
                                      char buf[26]) {
-#ifdef __BUILDING_LIBC
+
 	struct tm ltm;
 	return libc_asctime_r(libc_localtime64_r(timer, &ltm), buf);
-#elif defined(__CRT_HAVE__ctime64_s) || defined(__CRT_HAVE__ctime32_s)
-	return dos_ctime64_s(buf, 26, timer) ? NULL : __buf;
-#else /* ... */
-	struct tm ltm;
-	return libc_asctime_r(libc_localtime64_r(timer, &ltm), buf);
-#endif /* !... */
+
+
+
+
+
+
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #if defined(__BUILDING_LIBC) || !defined(__CRT_HAVE_asctime_s)
@@ -691,7 +691,7 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_asctime_r)(__STRUCT_TM const *__restrict tp,
                                      char buf[26]) {
-#ifdef __BUILDING_LIBC
+
 	libc_sprintf(buf,
 	        "%.3s %.3s%3u %.2u:%.2u:%.2u %u\n",
 	        (unsigned int)tp->tm_wday >= 7 ? "??" "?" :
@@ -704,22 +704,22 @@ NOTHROW_NCX(LIBCCALL libc_asctime_r)(__STRUCT_TM const *__restrict tp,
 	        (unsigned int)tp->tm_sec,
 	        (unsigned int)tp->tm_year + 1900);
 	return buf;
-#elif defined(__CRT_HAVE_asctime_s)
-	return crt_asctime_s(buf, 26, tp) ? NULL : buf;
-#else /* ... */
-	libc_sprintf(buf,
-	        "%.3s %.3s%3u %.2u:%.2u:%.2u %u\n",
-	        (unsigned int)tp->tm_wday >= 7 ? "??" "?" :
-	        __NAMESPACE_LOCAL_SYM __abbr_wday_names[tp->tm_wday],
-	        (unsigned int)tp->tm_mon >= 12 ? "??" "?" :
-	        __NAMESPACE_LOCAL_SYM __abbr_month_names[tp->tm_mon],
-	        (unsigned int)tp->tm_mday,
-	        (unsigned int)tp->tm_hour,
-	        (unsigned int)tp->tm_min,
-	        (unsigned int)tp->tm_sec,
-	        (unsigned int)tp->tm_year + 1900);
-	return buf;
-#endif /* !... */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 #endif /* !__KERNEL__ */
 

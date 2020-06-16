@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x904f8f21 */
+/* HASH CRC-32:0x485580b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,15 +99,15 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_
 /* Like `mktime', but TP represents Universal Time (UTC), not local time */
 __LOCAL_LIBC(timegm64) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __time64_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timegm64))(__STRUCT_TM *__tp) {
-#ifdef __BUILDING_LIBC
-	/* TODO: Timezones */
-	return __localdep_mktime64(__tp);
-#elif defined(__CRT_HAVE_timegm)
+
+
+
+#ifdef __CRT_HAVE_timegm
 	return (__time64_t)__localdep_timegm32(__tp);
-#else /* ... */
+#else /* 0 */
 	/* TODO: Timezones */
 	return __localdep_mktime64(__tp);
-#endif /* !... */
+#endif /* 1 */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_timegm64_defined

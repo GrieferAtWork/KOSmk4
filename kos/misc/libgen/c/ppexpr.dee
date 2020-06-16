@@ -109,15 +109,18 @@ global final OPERATOR_ALWAYS_PAREN_PRIORITY: {int...} = { BRT_ANY, BRT_ALL };
 
 
 global PPBranch;
+global PPAssume;
+
+@@Create a new PPAssume object
+function createPPAssume(macros: {string: (int | bool)} = none): PPAssume {
+	return PPAssume(macros: macros, assumptions: Dict());
+}
+
 class PPAssume {
 	this = default;
 
-	public operator copy(): PPAssume {
-		return PPAssume(macros: macros, assumptions: copy assumptions);
-	}
-
 	@@Mapping between <macro-name> and <int-constant> or is-defined-boolean
-	public member macros: {string: (int | bool)} = none;
+	public member macros: {string: (int | bool)};
 
 	@@Branch value assumptions that may be made
 	public member assumptions: {PPBranch: int | bool};
@@ -289,8 +292,22 @@ class PPBranch {
 	 otherTyp in OPERATOR_ALWAYS_PAREN_PRIORITY)
 
 		case BRT_UNDEF:
-		case BRT_CONST:
 			fp << data;
+			break;
+
+		case BRT_CONST:
+			if (data < 0) {
+				fp << "-";
+				data = -data;
+			}
+			fp << (data > 256 ? data.hex() : data);
+			if (data > 0x7fffffffffffffff)
+				fp << "ULL";
+			else if (data > 0xffffffff)
+				fp << "LL";
+			else if (data > 0x7fffffff) {
+				fp << "U";
+			}
 			break;
 
 		case BRT_NOT: {
@@ -469,7 +486,7 @@ done:
 	@@                `a || b || c', or a `a ? ... : ...' expression
 	public function optimize(asBool: bool = true, assume: PPAssume = none): PPBranch {
 		if (assume is none)
-			assume = PPAssume(assumptions: Dict());
+			assume = createPPAssume();
 		local typ  = this.typ;
 		local data = this.data;
 		local repl = assume.assumptions.get(this);
@@ -1042,7 +1059,7 @@ have_non_boolean_in_brt_any:
 				 * second. Doing this simplifies further optimizations. */
 				local temp = a;
 				a = b;
-				b = a;
+				b = temp;
 			}
 			if (a == b)
 				return PPBranch(BRT_CONST, 1);
@@ -1146,9 +1163,8 @@ again:
 	default:
 		if (tok.isnumeric(0)) {
 			/* Integer constant */
-			tok = tok.rstrip("uUlL");
 			try {
-				result = int(tok);
+				result = int(tok.rstrip("uUlL"));
 			} catch (Error as e) {
 				self.err(e.message);
 			}
@@ -1472,6 +1488,9 @@ assert optimize(
 	")"
 ")"
 ) == "defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock)";
+
+assert optimize("!(4 == __SIZEOF_POINTER__) && !defined(__x86_64__)") ==
+"__SIZEOF_POINTER__ != 4 && !defined(__x86_64__)";
 
 #endif /* __MAIN__ */
 

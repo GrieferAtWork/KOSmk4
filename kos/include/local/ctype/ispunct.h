@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf631a164 */
+/* HASH CRC-32:0xee8f2ff7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,12 +39,12 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep__isctype,(int _
 #endif /* !__local___localdep__isctype_defined && __CRT_HAVE__isctype */
 __LOCAL_LIBC(ispunct) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ispunct))(int __ch) {
-#ifdef __BUILDING_LIBC
-	return ((__UINT8_TYPE__)__ch >= 0x21 && (__UINT8_TYPE__)__ch <= 0x2f) ||
-	       ((__UINT8_TYPE__)__ch >= 0x3a && (__UINT8_TYPE__)__ch <= 0x40) ||
-	       ((__UINT8_TYPE__)__ch >= 0x5b && (__UINT8_TYPE__)__ch <= 0x60) ||
-	       ((__UINT8_TYPE__)__ch >= 0x7b && (__UINT8_TYPE__)__ch <= 0x7e);
-#else /* __BUILDING_LIBC */
+
+
+
+
+
+
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -62,7 +62,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ispunct))(int __ch) {
 	       ((__UINT8_TYPE__)__ch >= 0x5b && (__UINT8_TYPE__)__ch <= 0x60) ||
 	       ((__UINT8_TYPE__)__ch >= 0x7b && (__UINT8_TYPE__)__ch <= 0x7e);
 #endif
-#endif /* !__BUILDING_LIBC */
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ispunct_defined

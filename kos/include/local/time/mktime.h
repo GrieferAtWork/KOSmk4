@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb53d9c85 */
+/* HASH CRC-32:0xf1ae4099 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,16 +103,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the `time_t' representation of TP and normalize TP */
 __LOCAL_LIBC(mktime) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __TM_TYPE(time)
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime))(__STRUCT_TM __KOS_FIXED_CONST *__tp) {
-#ifdef __BUILDING_LIBC
-	__TM_TYPE(time) __result;
-	__result = __yearstodays(__tp->tm_year) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
-	__result += __tp->tm_yday;
-	__result *= 86400; /* SECONDS_PER_DAY */
-	__result += __tp->tm_hour*60*60;
-	__result += __tp->tm_min*60;
-	__result += __tp->tm_sec;
-	return __result;
-#else /* __BUILDING_LIBC */
+
+
+
+
+
+
+
+
+
+
 	return (__TM_TYPE(time))__localdep_mktime64(__tp);
 
 
@@ -125,7 +125,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime))(__STRUCT_TM __KOS_FIXED_CONS
 
 
 
-#endif /* !__BUILDING_LIBC */
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mktime_defined

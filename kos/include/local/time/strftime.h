@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ca0c19c */
+/* HASH CRC-32:0x44ad3bd2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,17 +78,17 @@ __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt
  * of characters written, or 0 if it would exceed MAXSIZE */
 __LOCAL_LIBC(strftime) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp) {
-#ifdef __BUILDING_LIBC
-	/* TODO */
-	(void)__buf;
-	(void)__bufsize;
-	(void)__format;
-	(void)__tp;
-	__COMPILER_IMPURE();
-	return 0;
-#elif defined(__CRT_HAVE_strftime_l) || defined(__CRT_HAVE__strftime_l) || defined(__CRT_HAVE___strftime_l)
+
+
+
+
+
+
+
+
+#if defined(__CRT_HAVE_strftime_l) || defined(__CRT_HAVE__strftime_l) || defined(__CRT_HAVE___strftime_l)
 	return __localdep_crt_strftime_l(__buf, __bufsize, __format, __tp, __NULLPTR);
-#else /* ... */
+#else /* 0 */
 	/* TODO */
 	(void)__buf;
 	(void)__bufsize;
@@ -96,7 +96,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf, __
 	(void)__tp;
 	__COMPILER_IMPURE();
 	return 0;
-#endif /* !... */
+#endif /* 1 */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strftime_defined

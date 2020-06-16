@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b86da65 */
+/* HASH CRC-32:0xaa220226 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,23 +65,23 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),char *,__NOTHROW_NCX,__localdep_crt_strpti
  * The return value is a pointer to the first unparsed character in S */
 __LOCAL_LIBC(strptime) __ATTR_NONNULL((1, 2, 3)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strptime))(char const *__restrict __s, char const *__restrict __format, __STRUCT_TM *__restrict __tp) {
-#ifdef __BUILDING_LIBC
-	/* TODO */
-	(void)__s;
-	(void)__format;
-	(void)__tp;
-	__COMPILER_IMPURE();
-	return __NULLPTR;
-#elif defined(__CRT_HAVE_strptime_l)
+
+
+
+
+
+
+
+#ifdef __CRT_HAVE_strptime_l
 	return __localdep_crt_strptime_l(__s, __format, __tp, __NULLPTR);
-#else /* ... */
+#else /* 0 */
 	/* TODO */
 	(void)__s;
 	(void)__format;
 	(void)__tp;
 	__COMPILER_IMPURE();
 	return __NULLPTR;
-#endif /* !... */
+#endif /* 1 */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strptime_defined

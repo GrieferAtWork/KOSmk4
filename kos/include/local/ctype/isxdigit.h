@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8356784a */
+/* HASH CRC-32:0xe3d089ac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,11 +53,11 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_isdigit_defined */
 __LOCAL_LIBC(isxdigit) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isxdigit))(int __ch) {
-#ifdef __BUILDING_LIBC
-	return __localdep_isdigit(__ch) ||
-	       ((__UINT8_TYPE__)__ch >= 0x41 && (__UINT8_TYPE__)__ch <= 0x46) ||
-	       ((__UINT8_TYPE__)__ch >= 0x61 && (__UINT8_TYPE__)__ch <= 0x66);
-#else /* __BUILDING_LIBC */
+
+
+
+
+
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -74,7 +74,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isxdigit))(int __ch) {
 	       ((__UINT8_TYPE__)__ch >= 0x41 && (__UINT8_TYPE__)__ch <= 0x46) ||
 	       ((__UINT8_TYPE__)__ch >= 0x61 && (__UINT8_TYPE__)__ch <= 0x66);
 #endif
-#endif /* !__BUILDING_LIBC */
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isxdigit_defined

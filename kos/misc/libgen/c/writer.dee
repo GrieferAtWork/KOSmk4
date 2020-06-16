@@ -469,7 +469,7 @@ class CWriter {
 	this(fp: File, keepNewLinesFromDeadCode: bool = false, ppAssume: PPAssume = none) {
 		this.keepNewLinesFromDeadCode = keepNewLinesFromDeadCode;
 		this.generator = CGenerator(fp: fp);
-		this.m_ppAssume = ppAssume !is none ? ppAssume : PPAssume(assumptions: Dict());
+		this.m_ppAssume = ppAssume !is none ? ppAssume : createPPAssume();
 	}
 
 	@@The underlying generator used to produce output

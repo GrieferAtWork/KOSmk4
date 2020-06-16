@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda623bf8 */
+/* HASH CRC-32:0x10ad1a7c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,15 +107,15 @@ __NAMESPACE_LOCAL_BEGIN
 /* Equivalent to `asctime_r(localtime_r(timer, *TMP*), buf)' */
 __LOCAL_LIBC(ctime64_r) __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime64_r))(__time64_t const *__restrict __timer, char __buf[26]) {
-#ifdef __BUILDING_LIBC
-	struct __NAMESPACE_STD_SYM tm __ltm;
-	return __localdep_asctime_r(__localdep_localtime64_r(__timer, &__ltm), __buf);
-#elif defined(__CRT_HAVE__ctime64_s) || defined(__CRT_HAVE__ctime32_s)
+
+
+
+#if defined(__CRT_HAVE__ctime64_s) || defined(__CRT_HAVE__ctime32_s)
 	return __localdep_dos_ctime64_s(__buf, 26, __timer) ? __NULLPTR : __buf;
-#else /* ... */
+#else /* 0 */
 	struct __NAMESPACE_STD_SYM tm __ltm;
 	return __localdep_asctime_r(__localdep_localtime64_r(__timer, &__ltm), __buf);
-#endif /* !... */
+#endif /* 1 */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ctime64_r_defined

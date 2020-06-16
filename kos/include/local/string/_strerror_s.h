@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88095a8a */
+/* HASH CRC-32:0x1f3fcc6c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <parts/errno.h>
 #ifdef __libc_geterrno
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: snprintf from stdio */
 #ifndef __local___localdep_snprintf_defined
@@ -62,9 +63,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strerror_s __LIBC_LOCAL_NAME(strerror_s)
 #endif /* !__CRT_HAVE_strerror_s */
 #endif /* !__local___localdep_strerror_s_defined */
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_strerror_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_strerror_s))(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__message) {
 	char const *__string;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb6d0f79 */
+/* HASH CRC-32:0xd1dcb5df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,50 +96,50 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 __LOCAL_LIBC(gmtime64_r) __ATTR_NONNULL((1, 2)) __STRUCT_TM *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__restrict __timer, __STRUCT_TM *__restrict __tp) {
-#ifdef __BUILDING_LIBC
-	__TM_TYPE(time) __t; int __i;
-	__UINT16_TYPE__ const *__monthvec;
-	__t = *__timer;
-	__tp->tm_sec  = (int)(__t % 60);
-	__tp->tm_min  = (int)((__t/60) % 60);
-	__tp->tm_hour = (int)((__t/(60*60)) % 24);
-	__t /= 86400; /* SECONDS_PER_DAY */
-	__t += __yearstodays(1970); /* LINUX_TIME_START_YEAR */
-	__tp->tm_wday = (int)(__t % 7); /* DAYS_PER_WEEK */
-	__tp->tm_year = (int)__daystoyears(__t);
-	__t -= __yearstodays(__tp->tm_year);
-	__tp->tm_yday = (int)__t;
-	__monthvec = __NAMESPACE_LOCAL_SYM __time_monthstart_yday[__isleap(__tp->tm_year)];
-	for (__i = 1; __i < 12; ++__i)
-		if (__monthvec[__i] >= __t)
-			break;
-	__tp->tm_mon = __i - 1;
-	__t -= __monthvec[__i - 1];
-	__tp->tm_mday = __t + 1;
-	/* found here: "http://stackoverflow.com/questions/5590429/calculating-daylight-savings-time-from-only-date" */
-	if (__tp->tm_mon < 2 || __tp->tm_mon > 10) {
-		//January, February, and December are out.
-		__tp->tm_isdst = 0;
-	} else if (__tp->tm_mon > 2 && __tp->tm_mon < 10) {
-		//April to October are in
-		__tp->tm_isdst = 1;
-	} else {
-		int __previousSunday;
-		__previousSunday = __tp->tm_mday - __tp->tm_wday;
-		if (__tp->tm_mon == 2) {
-			//In march, we are DST if our previous Sunday was on or after the 8th.
-			__tp->tm_isdst = __previousSunday >= 8;
-		} else {
-			//In November we must be before the first Sunday to be dst.
-			//That means the previous Sunday must be before the 1st.
-			__tp->tm_isdst = __previousSunday <= 0;
-		}
-	}
-	__tp->tm_year -= 1900;
-	return __tp;
-#elif defined(__CRT_HAVE__gmtime64_s) || defined(__CRT_HAVE__gmtime32_s)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#if defined(__CRT_HAVE__gmtime64_s) || defined(__CRT_HAVE__gmtime32_s)
 	return __localdep_dos_gmtime64_s(__tp, __timer) ? __NULLPTR : __tp;
-#else /* ... */
+#else /* 0 */
 	__time64_t __t; int __i;
 	__UINT16_TYPE__ const *__monthvec;
 	__t = *__timer;
@@ -180,7 +180,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__rest
 	}
 	__tp->tm_year -= 1900;
 	return __tp;
-#endif /* !... */
+#endif /* 1 */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_gmtime64_r_defined

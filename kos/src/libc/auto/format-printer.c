@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x143564d1 */
+/* HASH CRC-32:0x4e21290a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -139,14 +139,14 @@ INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
 	while (text < textend) {
 		char const *old_text = text;
 		uint32_t ch;
-#if __SIZEOF_CHAR__ == 1
+
 		ch = libc_unicode_readutf8_n((char const **)&text, textend);
-#elif __SIZEOF_CHAR__ == 2
-		ch = libc_unicode_readutf16_n((char16_t const **)&text,
-		                         (char16_t const *)textend);
-#else /* ... */
-		ch = (uint32_t)*text++;
-#endif /* !... */
+
+
+
+
+
+
 		if unlikely(ch < 32 || ch >= 127  || ch == '\'' ||
 		              ch == '\"' || ch == '\\' ||
 		             (flags & 0x0010)) {
@@ -168,14 +168,14 @@ encode_oct:
 					if (text < textend) {
 						char const *new_text = text;
 						uint32_t next_ch;
-#if __SIZEOF_CHAR__ == 1
+
 						next_ch = libc_unicode_readutf8_n((char const **)&new_text, textend);
-#elif __SIZEOF_CHAR__ == 2
-						next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text,
-						                              (char16_t const *)textend);
-#else /* ... */
-						next_ch = (uint32_t)*new_text++;
-#endif /* !... */
+
+
+
+
+
+
 						if (next_ch >= '0' && next_ch <= '7')
 							goto encode_hex;
 					}
@@ -305,14 +305,14 @@ encode_hex:
 				if (text < textend) {
 					char const *new_text = text;
 					uint32_t next_ch;
-#if __SIZEOF_CHAR__ == 1
+
 					next_ch = libc_unicode_readutf8_n((char const **)&new_text, textend);
-#elif __SIZEOF_CHAR__ == 2
-					next_ch = libc_unicode_readutf16_n((char16_t const **)&new_text,
-					                              (char16_t const *)textend);
-#else /* ... */
-					next_ch = (uint32_t)*new_text++;
-#endif /* !... */
+
+
+
+
+
+
 					if ((next_ch >= 'a' && next_ch <= 'f') ||
 					    (next_ch >= 'A' && next_ch <= 'F') ||
 					    (next_ch >= '0' && next_ch <= '9'))

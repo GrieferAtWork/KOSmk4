@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd694da42 */
+/* HASH CRC-32:0xb3724c89 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,20 +29,20 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep__heapmin,(void),_heapmin,())
 #endif /* !__local___localdep__heapmin_defined && __CRT_HAVE__heapmin */
 __LOCAL_LIBC(malloc_trim) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(malloc_trim))(__SIZE_TYPE__ __pad) {
-#ifdef __BUILDING_LIBC
-	/* NO-OP (indicate failure to release memory) */
-	__COMPILER_IMPURE();
-	(void)__pad;
-	return 0;
-#elif defined(__CRT_HAVE__heapmin)
+
+
+
+
+
+#ifdef __CRT_HAVE__heapmin
 	(void)__pad;
 	return __localdep__heapmin() ? 1 : 0;
-#else /* ... */
+#else /* 0 */
 	/* NO-OP (indicate failure to release memory) */
 	__COMPILER_IMPURE();
 	(void)__pad;
 	return 0;
-#endif /* !... */
+#endif /* 1 */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_malloc_trim_defined

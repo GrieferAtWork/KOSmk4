@@ -1674,10 +1674,17 @@ wcsncpy_s(*) %{generate(str2wcs("strncpy_s"))}
 %#endif  /* __USE_DOS_SLIB */
 
 %[default:section(".text.crt.dos.wchar.errno")];
-[[guard, wchar]] wchar_t *_wcserror(int errno_value);
-[[guard, wchar]] $errno_t _wcserror_s(wchar_t *buf, $size_t bufsize, int errno_value);
-[[guard, wchar]] wchar_t *__wcserror(wchar_t const *message);
-[[guard, wchar]] $errno_t __wcserror_s(wchar_t *buf, $size_t bufsize, wchar_t const *message);
+[[guard, wchar]]
+wchar_t *_wcserror(int errno_value);
+
+[[guard, wchar, decl_include("<bits/types.h>")]]
+$errno_t _wcserror_s(wchar_t *buf, $size_t bufsize, int errno_value);
+
+[[guard, wchar]]
+wchar_t *__wcserror(wchar_t const *message);
+
+[[guard, wchar, decl_include("<bits/types.h>")]]
+$errno_t __wcserror_s(wchar_t *buf, $size_t bufsize, wchar_t const *message);
 
 %[insert:guarded_function(_wcsicmp = wcscasecmp)]
 %[insert:guarded_function(_wcsnicmp = wcsncasecmp)]
@@ -1685,10 +1692,12 @@ wcsncpy_s(*) %{generate(str2wcs("strncpy_s"))}
 %[insert:guarded_function(_wcsnicmp_l = wcsncasecmp_l)]
 
 [[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t _wcsnset_s(wchar_t *__restrict buf, $size_t buflen, wchar_t ch, $size_t maxlen)
 	%{generate(str2wcs("_strnset_s"))}
 
 [[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t _wcsset_s([[nonnull]] wchar_t *dst, $size_t dstsize, wchar_t ch)
 	%{generate(str2wcs("_strset_s"))}
 
@@ -1705,11 +1714,13 @@ _wcslwr_s_l(*) %{generate(str2wcs("_strlwr_s_l"))}
 _wcsupr_s_l(*) %{generate(str2wcs("_strupr_s_l"))}
 
 [[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t wmemcpy_s([[nonnull]] wchar_t *dst, rsize_t dstlength,
                    [[nonnull]] wchar_t const *src, rsize_t srclength)
 	%{generate(str2wcs("memcpy_s"))}
 
 [[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t wmemmove_s([[nonnull]] wchar_t *dst, rsize_t dstlength,
                     [[nonnull]] wchar_t const *src, rsize_t srclength)
 	%{generate(str2wcs("memmove_s"))}
@@ -2186,21 +2197,20 @@ __STDC_INT_AS_SSIZE_T _wscanf_l([[nonnull]] wchar_t const *format,
 
 %[default:section(".text.crt.dos.wchar.FILE.locked.access")]
 
-[[decl_include("<features.h>")]]
-[[guard, wchar, wunused]]
+[[guard, wchar, wunused, decl_include("<features.h>")]]
 $FILE *_wfsopen([[nonnull]] wchar_t const *filename,
                 [[nonnull]] wchar_t const *mode,
                 __STDC_INT_AS_UINT_T sh_flag);
 
-[[guard, wchar, wunused]]
+[[guard, wchar, wunused, decl_include("<bits/types.h>")]]
 $FILE *_wfdopen($fd_t fd, [[nonnull]] wchar_t const *mode);
 
-[[guard, wchar]]
+[[guard, wchar, decl_include("<bits/types.h>")]]
 $errno_t _wfopen_s([[nonnull]] $FILE **pstream,
                    [[nonnull]] wchar_t const *filename,
                    [[nonnull]] wchar_t const *mode);
 
-[[guard, wchar]]
+[[guard, wchar, decl_include("<bits/types.h>")]]
 $errno_t _wfreopen_s([[nonnull]] $FILE **pstream,
                      [[nonnull]] wchar_t const *filename,
                      [[nonnull]] wchar_t const *mode, $FILE *stream);

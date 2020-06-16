@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e1d5672 */
+/* HASH CRC-32:0xf7b184f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,15 +62,15 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the difference between TIME1 and TIME0 */
 __LOCAL_LIBC(difftime) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(difftime))(__TM_TYPE(time) __time1, __TM_TYPE(time) __time0) {
-#ifdef __BUILDING_LIBC
-	return __time1 > __time0 ? __time1 - __time0 : __time0 - __time1;
-#elif defined(__CRT_HAVE_difftime) || defined(__CRT_HAVE__difftime32)
+
+
+#if defined(__CRT_HAVE_difftime) || defined(__CRT_HAVE__difftime32)
 	return __localdep_difftime32((__time32_t)__time1, (__time32_t)__time0);
-#else /* ... */
+#else /* 0 */
 	return __localdep_difftime64((__time32_t)__time1, (__time32_t)__time0);
 
 
-#endif /* !... */
+#endif /* 1 */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_difftime_defined

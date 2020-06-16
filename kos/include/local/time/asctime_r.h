@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x492fd5cb */
+/* HASH CRC-32:0xcbb81914 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,22 +116,22 @@ __NAMESPACE_LOCAL_BEGIN
  * that is the representation of TP in this format */
 __LOCAL_LIBC(asctime_r) __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_r))(__STRUCT_TM const *__restrict __tp, char __buf[26]) {
-#ifdef __BUILDING_LIBC
-	__localdep_sprintf(__buf,
-	        "%.3s %.3s%3u %.2u:%.2u:%.2u %u\n",
-	        (unsigned int)__tp->tm_wday >= 7 ? "??" "?" :
-	        __NAMESPACE_LOCAL_SYM __abbr_wday_names[__tp->tm_wday],
-	        (unsigned int)__tp->tm_mon >= 12 ? "??" "?" :
-	        __NAMESPACE_LOCAL_SYM __abbr_month_names[__tp->tm_mon],
-	        (unsigned int)__tp->tm_mday,
-	        (unsigned int)__tp->tm_hour,
-	        (unsigned int)__tp->tm_min,
-	        (unsigned int)__tp->tm_sec,
-	        (unsigned int)__tp->tm_year + 1900);
-	return __buf;
-#elif defined(__CRT_HAVE_asctime_s)
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifdef __CRT_HAVE_asctime_s
 	return __localdep_crt_asctime_s(__buf, 26, __tp) ? __NULLPTR : __buf;
-#else /* ... */
+#else /* 0 */
 	__localdep_sprintf(__buf,
 	        "%.3s %.3s%3u %.2u:%.2u:%.2u %u\n",
 	        (unsigned int)__tp->tm_wday >= 7 ? "??" "?" :
@@ -144,7 +144,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_r))(__STRUCT_TM const *__rest
 	        (unsigned int)__tp->tm_sec,
 	        (unsigned int)__tp->tm_year + 1900);
 	return __buf;
-#endif /* !... */
+#endif /* 1 */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_asctime_r_defined

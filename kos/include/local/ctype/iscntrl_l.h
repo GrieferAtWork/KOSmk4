@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e938450 */
+/* HASH CRC-32:0x312d4852 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,11 +48,11 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_iscntrl_defined */
 __LOCAL_LIBC(iscntrl_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iscntrl_l))(int __ch, __locale_t __locale) {
-#ifdef __BUILDING_LIBC
-	(void)__locale;
-	__COMPILER_IMPURE();
-	return __localdep_iscntrl(__ch);
-#else /* __BUILDING_LIBC */
+
+
+
+
+
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -69,7 +69,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iscntrl_l))(int __ch, __locale_t __lo
 	__COMPILER_IMPURE();
 	return __localdep_iscntrl(__ch);
 #endif
-#endif /* !__BUILDING_LIBC */
+
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_iscntrl_l_defined

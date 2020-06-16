@@ -23,6 +23,7 @@ import * from errors;
 import * from .cheaders;
 import * from .writer;
 import * from .escape;
+import * from .ppexpr;
 import .ppexpr;
 import hash from hashlib;
 import fs;
@@ -58,7 +59,8 @@ function updateUserImplementationSourceFile(
 		filename: string, header: SystemHeader,
 		printUpdateMessage: Callable with string = none,
 		criticalSection: Object = none,
-		HASH_FUNCTION: string = "CRC-32") {
+		HASH_FUNCTION: string = "CRC-32",
+		ppAssume: PPAssume = none) {
 	@@The layout of the user-source-file:
 	@@  - UserSourceFunction: A function in the form of:
 	@@    >> /*[[[head:foo,hash:...]]]*/
@@ -361,7 +363,7 @@ discard_function_during_scan:
 	for (local part: userSourceLayout) {
 		if (part === UserSourceExportTable) {
 			local expTab = File.Writer();
-			local expTabCWriter = CWriter(expTab);
+			local expTabCWriter = CWriter(expTab, ppAssume: ppAssume);
 			header.cprintLibraryUserSourceExports(
 				expTabCWriter, skippedFunctionNames);
 			expTabCWriter.flush();
@@ -394,7 +396,7 @@ discard_function_during_scan:
 			if (!isFirst)
 				headFp << "#else /* MAGIC:alias */\n";
 			{
-				local headWriter = CWriter(headFp);
+				local headWriter = CWriter(headFp, ppAssume: ppAssume);
 				local doc = func.documentationString;
 				if (doc)
 					headWriter.printComment(doc);

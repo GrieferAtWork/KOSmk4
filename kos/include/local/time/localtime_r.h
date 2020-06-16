@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x632ce8ae */
+/* HASH CRC-32:0xa669d7c7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,10 +111,10 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
 __LOCAL_LIBC(localtime_r) __ATTR_NONNULL((1, 2)) __STRUCT_TM *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(localtime_r))(__TM_TYPE(time) const *__restrict __timer, __STRUCT_TM *__restrict __tp) {
-#ifdef __BUILDING_LIBC
-	/* XXX: Timezone support? */
-	return __localdep_gmtime_r(__timer, __tp);
-#elif defined(__CRT_HAVE__localtime64_s) || defined(__CRT_HAVE__localtime32_s)
+
+
+
+#if defined(__CRT_HAVE__localtime64_s) || defined(__CRT_HAVE__localtime32_s)
 	return __localdep_dos_localtime_s(__tp, __timer) ? __NULLPTR : __tp;
 #elif defined(__USE_TIME_BITS64)
 	return __localdep_localtime64_r(__timer, __tp);

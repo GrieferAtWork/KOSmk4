@@ -21,6 +21,7 @@
 import * from deemon;
 import * from util;
 
+/* TODO: Get rid of this file. - Use the much better ".c.ppexpr" module instead! */
 
 class PPBranch {
 	optimize() {}

@@ -5466,6 +5466,7 @@ strrev:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 
 [[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t _strset_s([[nonnull]] char *dst, $size_t dstsize, int ch) {
 	char *p;
 	size_t remaining;
@@ -5487,6 +5488,7 @@ $errno_t _strset_s([[nonnull]] char *dst, $size_t dstsize, int ch) {
 %#ifdef __USE_DOS_SLIB
 [[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t memcpy_s([[nonnull]] void *dst, rsize_t dstlength,
                   [[nonnull]] void const *src, rsize_t srclength) {
 	if (!srclength)
@@ -5507,6 +5509,7 @@ $errno_t memcpy_s([[nonnull]] void *dst, rsize_t dstlength,
 
 [[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t memmove_s([[nonnull]] void *dst, rsize_t dstlength,
                    [[nonnull]] void const *src, rsize_t srclength) {
 	if (!srclength)
@@ -5522,6 +5525,7 @@ $errno_t memmove_s([[nonnull]] void *dst, rsize_t dstlength,
 
 [[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t strcpy_s(char *dst, $size_t dstsize, char const *src) {
 	char *iter;
 	size_t remaining;
@@ -5541,6 +5545,7 @@ $errno_t strcpy_s(char *dst, $size_t dstsize, char const *src) {
 
 [[impl_include("<parts/errno.h>")]]
 [[section(".text.crt.dos.string.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t strcat_s(char *dst, $size_t dstsize, char const *src) {
 	if (!dst || !src)
 		return __EINVAL;
@@ -5564,6 +5569,7 @@ $size_t strnlen_s([[nullable]] char const *str, $size_t maxlen) {
 
 [[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t strncat_s(char *dst, rsize_t dstsize, const char *src, rsize_t maxlen) {
 	char *iter;
 	size_t remaining;
@@ -5602,6 +5608,7 @@ $errno_t strncat_s(char *dst, rsize_t dstsize, const char *src, rsize_t maxlen) 
 
 [[impl_include("<parts/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t strncpy_s(char *dst, $size_t dstsize, char const *src, $size_t maxlen) {
 	char *iter;
 	size_t remaining;
@@ -5668,6 +5675,7 @@ char *_strerror(char const *message) {
 [[requires(defined(__libc_geterrno))]]
 [[impl_include("<bits/types.h>")]]
 [[impl_include("<parts/errno.h>")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t _strerror_s([[nonnull]] char *__restrict buf,
                      $size_t buflen, char const *message) {
 	char const *string;
@@ -5697,6 +5705,7 @@ $errno_t _strerror_s([[nonnull]] char *__restrict buf,
 
 [[impl_include("<parts/errno.h>")]]
 [[section(".text.crt.dos.unicode.static.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t _strlwr_s(char *buf, $size_t buflen) {
 	char *iter, ch;
 	if (buf == NULL)
@@ -5709,6 +5718,7 @@ $errno_t _strlwr_s(char *buf, $size_t buflen) {
 }
 
 [[section(".text.crt.dos.unicode.static.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t _strupr_s(char *buf, $size_t buflen) {
 	char *iter, ch;
 	if (buf == NULL)
@@ -5721,6 +5731,7 @@ $errno_t _strupr_s(char *buf, $size_t buflen) {
 }
 
 [[section(".text.crt.dos.unicode.locale.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t _strlwr_s_l(char *buf, $size_t buflen, $locale_t locale) {
 	char *iter, ch;
 	if (buf == NULL)
@@ -5733,6 +5744,7 @@ $errno_t _strlwr_s_l(char *buf, $size_t buflen, $locale_t locale) {
 }
 
 [[section(".text.crt.dos.unicode.locale.memory")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t _strupr_s_l(char *buf, $size_t buflen, $locale_t locale) {
 	char *iter, ch;
 	if (buf == NULL)
@@ -5749,6 +5761,7 @@ $errno_t _strupr_s_l(char *buf, $size_t buflen, $locale_t locale) {
 
 [[section(".text.crt.dos.string.memory")]]
 [[impl_include("<parts/errno.h>", "<libc/string.h>")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t _strnset_s(char *__restrict buf, $size_t buflen, int ch, $size_t maxlen) {
 	char *iter;
 	size_t remaining;

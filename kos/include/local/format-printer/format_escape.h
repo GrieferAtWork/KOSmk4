@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc4effcb */
+/* HASH CRC-32:0x8f20d986 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,14 +92,14 @@ __LOCAL_LIBC(format_escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 	while (__text < __textend) {
 		char const *__old_text = __text;
 		__UINT32_TYPE__ __ch;
-#if __SIZEOF_CHAR__ == 1
+
 		__ch = __localdep_unicode_readutf8_n((char const **)&__text, __textend);
-#elif __SIZEOF_CHAR__ == 2
-		__ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__text,
-		                         (__CHAR16_TYPE__ const *)__textend);
-#else /* ... */
-		__ch = (__UINT32_TYPE__)*__text++;
-#endif /* !... */
+
+
+
+
+
+
 		if __unlikely(__ch < 32 || __ch >= 127  || __ch == '\'' ||
 		              __ch == '\"' || __ch == '\\' ||
 		             (__flags & 0x0010)) {
@@ -121,14 +121,14 @@ __encode_oct:
 					if (__text < __textend) {
 						char const *__new_text = __text;
 						__UINT32_TYPE__ __next_ch;
-#if __SIZEOF_CHAR__ == 1
+
 						__next_ch = __localdep_unicode_readutf8_n((char const **)&__new_text, __textend);
-#elif __SIZEOF_CHAR__ == 2
-						__next_ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text,
-						                              (__CHAR16_TYPE__ const *)__textend);
-#else /* ... */
-						__next_ch = (__UINT32_TYPE__)*__new_text++;
-#endif /* !... */
+
+
+
+
+
+
 						if (__next_ch >= '0' && __next_ch <= '7')
 							goto __encode_hex;
 					}
@@ -258,14 +258,14 @@ __encode_hex:
 				if (__text < __textend) {
 					char const *__new_text = __text;
 					__UINT32_TYPE__ __next_ch;
-#if __SIZEOF_CHAR__ == 1
+
 					__next_ch = __localdep_unicode_readutf8_n((char const **)&__new_text, __textend);
-#elif __SIZEOF_CHAR__ == 2
-					__next_ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text,
-					                              (__CHAR16_TYPE__ const *)__textend);
-#else /* ... */
-					__next_ch = (__UINT32_TYPE__)*__new_text++;
-#endif /* !... */
+
+
+
+
+
+
 					if ((__next_ch >= 'a' && __next_ch <= 'f') ||
 					    (__next_ch >= 'A' && __next_ch <= 'F') ||
 					    (__next_ch >= '0' && __next_ch <= '9'))

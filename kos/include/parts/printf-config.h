@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_PRINTF_CONFIG_H
-#define _ASM_PRINTF_CONFIG_H 1
+#ifndef _PARTS_PRINTF_CONFIG_H
+#define _PARTS_PRINTF_CONFIG_H 1
 
 #include <__stdinc.h>
 #include <__crt.h>
@@ -51,4 +51,4 @@
 #endif /* !__CRT_KOS || !__KOS__ */
 
 
-#endif /* !_ASM_PRINTF_CONFIG_H */
+#endif /* !_PARTS_PRINTF_CONFIG_H */

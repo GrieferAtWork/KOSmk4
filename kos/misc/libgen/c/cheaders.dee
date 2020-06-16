@@ -35,13 +35,6 @@ import * from .namespace;
 import util;
 
 
-/* TODO: The effective escapeMode for 'ppCond' of LocalFunction bindings
- *       must be changed to ESCAPE_MODE_FULL when the surrounding declaration
- *       is printed in ESCAPE_MODE_PART.
- *       Reason being that the condition in local function implementation
- *       headers is always printed in ESCAPE_MODE_FULL, so in bindings, the
- *       condition must also be encoded that same way! */
-
 global Function;
 global SystemHeader;
 
@@ -623,7 +616,7 @@ class FunctionPrototype {
 			local indentWidth;
 			{
 				local tempfp = File.Writer();
-				local tempWriter = CWriter(tempfp);
+				local tempWriter = CWriter(tempfp, ppAssume: fp.ppAssume);
 				if (!breakAfterReturnType) {
 					escapeTextIntoFile(tempWriter, decl, escapeMode);
 					if (decl)
@@ -2741,10 +2734,7 @@ class LibraryFunction {
 	}
 
 	@@Print the in-library export table of this function
-	public function cprintInLibraryExports(
-			fp: CWriter, escapeMode: int,
-			/* TODO: Get rid of @assumeNdefKernel and implement a proper assumptions system! */
-			assumeNdefKernel: bool = false) {
+	public function cprintInLibraryExports(fp: CWriter, escapeMode: int) {
 		local hasUsableExport = false;
 		for (local ppCond, none: exportSymbolNames) {
 			if (ppCond != "0") {
@@ -2755,7 +2745,7 @@ class LibraryFunction {
 		if (!hasUsableExport)
 			return;
 		local usedBindings = functionBindings;
-		fp.ppIf(assumeNdefKernel && ppCond == "!defined(__KERNEL__)" ? "1" : ppCond);
+		fp.ppIf(ppCond);
 		local hasUniversalBinding = false;
 		for (local bind: usedBindings) {
 			if (bind.ppCond == "1") {
@@ -2843,7 +2833,6 @@ class SystemHeader {
 	@@Print the contents of the exposed header (such as `<string.h>`),
 	@@excluding the leading COPYRIGHT
 	public function cprintHeader(fp: CWriter, escapeMode: int) {
-		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "0" */
 		for (local part: order_header) {
 			if (part is Function || part is ExposedFunction) {
 				part.cprintHeaderDeclaration(fp, escapeMode);
@@ -2986,10 +2975,6 @@ class SystemHeader {
 	}
 
 	private function cprintInternalLibraryHeader(fp: CWriter, isAuto: bool) {
-		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
-		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
-		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
-		 *       replaced by the export-condition */
 		local guardName = "GUARD_LIBC_{}_{}_H".format({
 			isAuto ? "AUTO" : "USER",
 			name.replace("-", "_").replace(".", "_").upper()
@@ -3027,10 +3012,6 @@ class SystemHeader {
 
 	@@Print the implementations from /kos/src/libc/auto/string.c
 	public function cprintLibraryAutoSource(fp: CWriter) {
-		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
-		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
-		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
-		 *       replaced by the export-condition */
 		local guardName = "GUARD_LIBC_AUTO_{}_C".format({
 			name.replace("-", "_").replace(".", "_").upper()
 		});
@@ -3128,10 +3109,6 @@ class SystemHeader {
 
 	@@Print the export table from /kos/src/libc/auto/string.c
 	public function cprintLibraryAutoSourceExports(fp: CWriter) {
-		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
-		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
-		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
-		 *       replaced by the export-condition */
 		for (local part: order_libcAutoSource) {
 			if (part is LibraryFunction) {
 				part.cprintInLibraryExports(fp, ESCAPE_MODE_NONE);
@@ -3149,15 +3126,10 @@ class SystemHeader {
 	@@Print the export table from /kos/src/libc/user/string.c
 	public function cprintLibraryUserSourceExports(
 			fp: CWriter, skippedFunctionNames: {string...} = none) {
-		/* TODO: Assume that "defined(__BUILDING_LIBC)" == "1" */
-		/* TODO: Assume that "defined(__KERNEL__)" == "0" */
-		/* TODO: Assume that "defined(__CRT_HAVE_*)" == "1" for all symbols exported from libc
-		 *       In cases of conditional exports, "defined(__CRT_HAVE_*)" should instead be
-		 *       replaced by the export-condition */
 		for (local part /*: LibraryFunction*/ : order_libcUserSource) {
 			if (part.name in skippedFunctionNames)
 				continue;
-			part.cprintInLibraryExports(fp, ESCAPE_MODE_NONE, assumeNdefKernel: true);
+			part.cprintInLibraryExports(fp, ESCAPE_MODE_NONE);
 		}
 	}
 }
