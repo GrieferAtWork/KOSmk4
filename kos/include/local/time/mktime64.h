@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f214bf9 */
+/* HASH CRC-32:0xfe43a6b0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,7 +91,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime64))(__STRUCT_TM __KOS_FIXED_CO
 
 #if defined(__CRT_HAVE_mktime) || defined(__CRT_HAVE__mktime32) || defined(__CRT_HAVE_timelocal)
 	return (__time64_t)__localdep_mktime32(__tp);
-#else /* 0 */
+#else /* __CRT_HAVE_mktime || __CRT_HAVE__mktime32 || __CRT_HAVE_timelocal */
 	__time64_t __result;
 	__result = __yearstodays(__tp->tm_year) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
 	__result += __tp->tm_yday;
@@ -100,7 +100,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime64))(__STRUCT_TM __KOS_FIXED_CO
 	__result += __tp->tm_min*60;
 	__result += __tp->tm_sec;
 	return __result;
-#endif /* 1 */
+#endif /* !__CRT_HAVE_mktime && !__CRT_HAVE__mktime32 && !__CRT_HAVE_timelocal */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mktime64_defined

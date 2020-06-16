@@ -527,24 +527,22 @@ class CWriter {
 	@@Insert a preprocessor directive `#if cond`
 	@@@return: * : The # of printed new-line characters
 	public function ppIf(cond: string): int {
-		local condBranch: PPBranch;
 		local ent: IfDefStackEntry;
 		if (m_IfdefDead) {
-			/* Speed up some code... (and won't make a difference...) */
-			condBranch = PPBranch(BRT_CONST, 0);
-			ent = IfDefStackEntry(cond: condBranch);
-			ent.encounteredIf0      = true;
-			ent.ppAssumeWithCond    = none;
-			ent.ppAssumeWithNotCond = none;
-			ent.printedPrefixes     = none;
+			/* Simplified handling for when we're already in dead code. */
+			m_IfdefStack.pushback(IfDefStackEntry(
+				cond:                none,
+				encounteredIf0:      true,
+				ppAssumeWithCond:    none,
+				ppAssumeWithNotCond: none,
+				printedPrefixes:     none));
 			++m_IfdefDead;
-			m_IfdefStack.pushback(ent);
 			return 0;
 		}
 		/* Parse and optimize the given @cond within our current context. */
 		local result = 0;
 		local usedAssume: PPAssume = ppAssume;
-		condBranch = ppParse(str cond)
+		local condBranch: PPBranch = ppParse(str cond)
 			.optimize(asBool: true, assume: usedAssume);
 		ent = IfDefStackEntry(cond: condBranch);
 		if (condBranch.typ == BRT_CONST) {
@@ -635,8 +633,10 @@ dont_emit_branch:
 			if (!m_IfdefDead) {
 				result = doPrintIf(condBranch.tostr());
 				ent.printedPrefixes = HashSet();
+				ent.cond = condBranch;
 			} else {
 				ent.printedPrefixes = none;
+				ent.cond = none;
 			}
 			ent.ppAssumeWithCond    = usedAssume.withAssumption(condBranch, true);
 			ent.ppAssumeWithNotCond = usedAssume.withAssumption(condBranch, false);

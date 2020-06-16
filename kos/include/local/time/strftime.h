@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44ad3bd2 */
+/* HASH CRC-32:0xaa814d78 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,7 +88,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf, __
 
 #if defined(__CRT_HAVE_strftime_l) || defined(__CRT_HAVE__strftime_l) || defined(__CRT_HAVE___strftime_l)
 	return __localdep_crt_strftime_l(__buf, __bufsize, __format, __tp, __NULLPTR);
-#else /* 0 */
+#else /* __CRT_HAVE_strftime_l || __CRT_HAVE__strftime_l || __CRT_HAVE___strftime_l */
 	/* TODO */
 	(void)__buf;
 	(void)__bufsize;
@@ -96,7 +96,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf, __
 	(void)__tp;
 	__COMPILER_IMPURE();
 	return 0;
-#endif /* 1 */
+#endif /* !__CRT_HAVE_strftime_l && !__CRT_HAVE__strftime_l && !__CRT_HAVE___strftime_l */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strftime_defined

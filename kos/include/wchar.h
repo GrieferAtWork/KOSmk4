@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb883a73e */
+/* HASH CRC-32:0x8c643bc5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1473,12 +1473,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_wcstok_defined 1
 #ifdef __CRT_HAVE_wcstok_s
 __CREDIRECT(__ATTR_NONNULL((2, 3)),wchar_t *,__NOTHROW_NCX,__localdep_wcstok,(wchar_t *__string, wchar_t const *__restrict __delim, wchar_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
-#else /* false */
+#else /* __CRT_HAVE_wcstok_s */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcstok.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcstok __LIBC_LOCAL_NAME(wcstok)
-#endif /* 1 */
+#endif /* !__CRT_HAVE_wcstok_s */
 #endif /* !__local___localdep_wcstok_defined */
 __NAMESPACE_LOCAL_END
 __NAMESPACE_STD_BEGIN

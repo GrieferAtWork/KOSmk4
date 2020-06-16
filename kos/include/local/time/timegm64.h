@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x485580b */
+/* HASH CRC-32:0x9df89ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,10 +104,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timegm64))(__STRUCT_TM *__tp) {
 
 #ifdef __CRT_HAVE_timegm
 	return (__time64_t)__localdep_timegm32(__tp);
-#else /* 0 */
+#else /* __CRT_HAVE_timegm */
 	/* TODO: Timezones */
 	return __localdep_mktime64(__tp);
-#endif /* 1 */
+#endif /* !__CRT_HAVE_timegm */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_timegm64_defined
