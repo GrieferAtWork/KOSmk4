@@ -1346,6 +1346,7 @@
 #define __CRT_HAVE_backtrace_symbols 1
 #define __CRT_HAVE_backtrace_symbols_fd 1
 #define __CRT_HAVE_basename 1
+#define __CRT_HAVE_bcmp 1
 #define __CRT_HAVE_bcopy 1
 #define __CRT_HAVE_bind 1
 #define __CRT_HAVE_bindresvport 1

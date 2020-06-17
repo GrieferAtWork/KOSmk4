@@ -17,22 +17,67 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#include <hybrid/compiler.h>
+#ifdef __INTELLISENSE__
+#define N           1
+#define RETURN_PCPY 0
+#define __ASSEMBLER__ 1
+#endif /* __INTELLISENSE__ */
 
+#include <hybrid/compiler.h>
 #include <asm/cfi.h>
 #include <asm/instr/movzxq.h>
 
+#ifndef __DEEMON__
 #ifndef N
 #error "Must #define N before #including this file"
 #endif /* !N */
 #ifndef RETURN_PCPY
 #error "Must #define RETURN_PCPY before #including this file"
 #endif /* !RETURN_PCPY */
+#endif /* !__DEEMON__ */
 
+/* Being/end a code-block during which EFLAGS.DF=0 is required */
 #ifdef __KERNEL__
-#define ENTER_CLD  cld
+#define BEGIN_CLD cld
+#define END_CLD   /* nothing */
 #else /* __KERNEL__ */
-#define ENTER_CLD  /* nothing */
+#define BEGIN_CLD /* nothing */
+#define END_CLD   /* nothing */
+#endif /* !__KERNEL__ */
+
+
+/* Being/end a code-block during which EFLAGS.DF=1 is required */
+#if !defined(__KERNEL__) || 1
+
+/*[[[deemon
+import * from deemon;
+import compileExpression from ......misc.libgen.cfi.compiler;
+local fp = File.Writer();
+local oldOut = File.stdout;
+File.stdout = fp;
+compileExpression('x86_64', '%rflags', r'
+	push %rflags     # %rflags
+	push $EFLAGS_DF  # %rflags, EFLAGS_DF
+	not              # %rflags, ~EFLAGS_DF
+	and              # (%rflags & ~EFLAGS_DF)
+', deref_after: false);
+File.stdout = oldOut;
+print("#define CFI_RESTORE_EFLAGS_CLEARDF \\");
+print("\t", " \\\n\t".join(fp.string.strip().splitlines(false)));
+]]]*/
+#define CFI_RESTORE_EFLAGS_CLEARDF \
+	__ASM_L(	.cfi_escape 0x16,0x31,0x07,0x90,0x31,0x0a,0x00,0x04) \
+	__ASM_L(	.cfi_escape 0x20,0x1a)
+//[[[end]]]
+/* Setup a custom CFI restore function to clear EFLAGS.DF during unwinding */
+#define BEGIN_STD std; CFI_RESTORE_EFLAGS_CLEARDF
+#else /* !__KERNEL__ */
+#define BEGIN_STD std
+#endif /* __KERNEL__ */
+#ifdef __KERNEL__
+#define END_STD   /* nothing */
+#else /* __KERNEL__ */
+#define END_STD   cld; .cfi_restore %eflags
 #endif /* !__KERNEL__ */
 
 
@@ -51,6 +96,7 @@
 #endif
 
 
+
 #undef TEST_DX_MASK
 #if 1
 #define TEST_DX_MASK(mask) testb $(mask), %dl
@@ -58,18 +104,38 @@
 #define TEST_DX_MASK(mask) testq $(mask), %rdx
 #endif
 
-
-.section .text.crt.string.memory
 #if RETURN_PCPY
-INTERN_FUNCTION(F(libc_mempcpy))
+#define IFELSE_PCPY(if_pcpy, nif_pcpy)  if_pcpy
+#define IF_PCPY(...)                    __VA_ARGS__
+#define NIF_PCPY(...)                   /* nothing */
 #else /* RETURN_PCPY */
-INTERN_FUNCTION(F(libc_memcpy))
+#define IFELSE_PCPY(if_pcpy, nif_pcpy)  nif_pcpy
+#define IF_PCPY(...)                    /* nothing */
+#define NIF_PCPY(...)                   __VA_ARGS__
 #endif /* !RETURN_PCPY */
+
+
+#if RETURN_PCPY
+#define USED_LIBC_MEMMOVEDOWN_START F(libc_x86_mempmovedown_start)
+#define USED_LIBC_MEMMOVEUP_START   F(libc_x86_mempmoveup_start)
+#else /* RETURN_PCPY */
+#define USED_LIBC_MEMMOVEDOWN_START F(libc_x86_memmovedown_start)
+#define USED_LIBC_MEMMOVEUP_START   F(libc_x86_memmoveup_start)
+#endif /* !RETURN_PCPY */
+
+
+
+
+/******************************************************************************************/
+/* void *SYSVABI memcpy(void *restrict dst, void const *restrict src, size_t num_bytes);  */
+/* void *SYSVABI mempcpy(void *restrict dst, void const *restrict src, size_t num_bytes); */
+/******************************************************************************************/
+.section .text.crt.string.memory
+INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempcpy),
+                            F(libc_memcpy)))
 	.cfi_startproc
-	ENTER_CLD
-#if !RETURN_PCPY
-	movq   %rdi, %rax
-#endif /* !RETURN_PCPY */
+	BEGIN_CLD
+	NIF_PCPY(movq %rdi, %rax)
 #if N == 1
 	movq   %rdx, %rcx
 	shrq   $(3), %rcx
@@ -104,61 +170,271 @@ INTERN_FUNCTION(F(libc_memcpy))
 	movq   %rdx, %rcx
 	rep    movsq
 #endif /* !N... */
-#if RETURN_PCPY
-	movq   %rdi, %rax
-#endif /* RETURN_PCPY */
+	IF_PCPY(movq %rdi, %rax)
+	END_CLD
 	ret
 	.cfi_endproc
-#if RETURN_PCPY
-END(F(libc_mempcpy))
-DEFINE_PUBLIC_ALIAS(F(mempcpy),F(libc_mempcpy))
-#else /* RETURN_PCPY */
-END(F(libc_memcpy))
-DEFINE_PUBLIC_ALIAS(F(memcpy),F(libc_memcpy))
-#endif /* !RETURN_PCPY */
+END(IFELSE_PCPY(F(libc_mempcpy),
+                F(libc_memcpy)))
+DEFINE_PUBLIC_ALIAS(IFELSE_PCPY(F(mempcpy),
+                                F(memcpy)),
+                    IFELSE_PCPY(F(libc_mempcpy),
+                                F(libc_memcpy)))
 
 
 
 
-
+/**************************************************************************/
+/* void *LIBCCALL memmove(void *dst, void const *src, size_t num_bytes);  */
+/* void *LIBCCALL mempmove(void *dst, void const *src, size_t num_bytes); */
+/**************************************************************************/
 .section .text.crt.string.memory
-#if RETURN_PCPY
-INTERN_FUNCTION(F(libc_mempset))
-#else /* RETURN_PCPY */
-INTERN_FUNCTION(F(libc_memset))
-#endif /* !RETURN_PCPY */
+INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempmove),
+                            F(libc_memmove)))
 	.cfi_startproc
-	ENTER_CLD
+	movq   %rdx, %rcx /* num_WORDS */
+	cmpq   %rsi, %rdi
+#ifdef __OPTIMIZE_SIZE__
+	jb     USED_LIBC_MEMMOVEDOWN_START /* if (dst < src) memmovedown() */
+	jmp    USED_LIBC_MEMMOVEUP_START   /* if (dst >= src) memmoveup() */
+#else /* __OPTIMIZE_SIZE__ */
+	jb     USED_LIBC_MEMMOVEDOWN_START /* if (dst < src) memmovedown() */
+	ja     USED_LIBC_MEMMOVEUP_START   /* if (dst > src) memmoveup() */
+	ret    /* dst == src */
+#endif /* !__OPTIMIZE_SIZE__ */
+	.cfi_endproc
+END(IFELSE_PCPY(F(libc_mempmove),
+                F(libc_memmove)))
+DEFINE_PUBLIC_ALIAS(IFELSE_PCPY(F(mempmove),
+                                F(memmove)),
+                    IFELSE_PCPY(F(libc_mempmove),
+                                F(libc_memmove)))
+
+
+
+
+
+#ifndef NDEBUG
+#ifndef MEMMOVEDOWN_INVALID_ORDER_STRINGS_DEFINED
+#define MEMMOVEDOWN_INVALID_ORDER_STRINGS_DEFINED 1
+.pushsection .rodata.crt.string.memory
+	.Linvalid_order_str_format: .asciz "This isn't a memmovedown() operation, but is memmoveup(): dst(%p) > src(%p) (count:%Iu)"
+	.Linvalid_order_str_file:   .asciz __FILE__
+	.Linvalid_order_str_expr:   .asciz "dst <= src"
+.popsection
+#endif /* !MEMMOVEDOWN_INVALID_ORDER_STRINGS_DEFINED */
+
+#if RETURN_PCPY
+#ifndef MEMMOVEDOWN_INVALID_ORDER_FUNC_DEFINED
+#define MEMMOVEDOWN_INVALID_ORDER_FUNC_DEFINED 1
+.pushsection .rodata.crt.string.memory
+	.Linvalid_order_str_pfunc: .asciz "mempmovedown"
+.popsection
+#endif /* !MEMMOVEDOWN_INVALID_ORDER_FUNC_DEFINED */
+#else /* RETURN_PCPY */
+#ifndef MEMMOVEDOWN_INVALID_ORDER_PFUNC_DEFINED
+#define MEMMOVEDOWN_INVALID_ORDER_PFUNC_DEFINED 1
+.pushsection .rodata.crt.string.memory
+	.Linvalid_order_str_func: .asciz "memmovedown"
+.popsection
+#endif /* !MEMMOVEDOWN_INVALID_ORDER_PFUNC_DEFINED */
+#endif /* !RETURN_PCPY */
+#endif /* !NDEBUG */
+
+
+/******************************************************************************/
+/* void *LIBCCALL memmovedown(void *dst, void const *src, size_t num_bytes);  */
+/* void *LIBCCALL mempmovedown(void *dst, void const *src, size_t num_bytes); */
+/******************************************************************************/
+.section .text.crt.string.memory
+INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempmovedown),
+                            F(libc_memmovedown)))
+	.cfi_startproc
+	BEGIN_CLD
+	movq   %rdx, %rcx /* num_WORDS */
+
+	/* assert(dst <= src || !n_bytes); */
+#ifndef NDEBUG
+	.cfi_remember_state
+	cmpq   %rsi, %rdi
+	jbe    1f         /* if (dst <= src) goto 1f; */
+	testq  %rcx, %rcx
+	jz     1f         /* if (!n_bytes) goto 1f; */
+	/* Invalid use of `memmovedown' */
+#ifdef __CRT_HAVE___acheckf
+	pushq_cfi %rdi
+#endif /* __CRT_HAVE___acheckf */
+	pushq_cfi %rcx                          /* format:`...count:%Iu' */
+	pushq_cfi %rsi                          /* format:`...src(%p)...' */
+	movq   %rdi, %r9                        /* format:`...dst(%p)...' */
+	leaq   .Linvalid_order_str_format(%rip), %r8 /* format */
+	leaq   IFELSE_PCPY(.Linvalid_order_str_pfunc,
+	                   .Linvalid_order_str_func)(%rip), %rcx /* func */
+	movq   $(__LINE__), %rdx                    /* line */
+	leaq   .Linvalid_order_str_file(%rip), %rsi /* file */
+	leaq   .Linvalid_order_str_expr(%rip), %rdi /* expr */
+#undef PUSH_RELSTR
+#ifdef __CRT_HAVE___acheckf
+	INTERN(libc___acheckf)
+	call   libc___acheckf
+	popq_cfi %rsi
+	popq_cfi %rcx
+	popq_cfi %rdi
+	INTERN(IFELSE_PCPY(F(libc_mempmoveup), F(libc_memmoveup)))
+	jmp    IFELSE_PCPY(F(libc_mempmoveup), F(libc_memmoveup))
+#else /* __CRT_HAVE___acheckf */
+	INTERN(libc___afailf)
+	call   libc___afailf
+#endif /* !__CRT_HAVE___acheckf */
+1:	.cfi_restore_state
+#endif /* !NDEBUG */
+
+PRIVATE_LABEL(IFELSE_PCPY(F(libc_x86_mempmovedown_start),
+                          F(libc_x86_memmovedown_start))):
+	NIF_PCPY(movq %rdi, %rax)
+	rep    I(movs)   /* Actually copy memory */
+	IF_PCPY(movq %rdi, %rax)
+	END_CLD
+	ret
+	.cfi_endproc
+END(IFELSE_PCPY(F(libc_mempmovedown),
+                F(libc_memmovedown)))
+DEFINE_PUBLIC_ALIAS(IFELSE_PCPY(F(mempmovedown),
+                                F(memmovedown)),
+                    IFELSE_PCPY(F(libc_mempmovedown),
+                                F(libc_memmovedown)))
+
+
+
+
+
+
+#ifndef NDEBUG
+#ifndef MEMMOVEUP_INVALID_ORDER_STRINGS_DEFINED
+#define MEMMOVEUP_INVALID_ORDER_STRINGS_DEFINED 1
+	.pushsection .rodata.crt.string.memory
+.Linvalid_orderup_str_format: .asciz "This isn't a memmoveup() operation, but is memmovedown(): dst(%p) < src(%p) (count:%Iu)"
+.Linvalid_orderup_str_expr:   .asciz "dst >= src"
+	.popsection
+#endif /* !MEMMOVEUP_INVALID_ORDER_STRINGS_DEFINED */
+
+#if RETURN_PCPY
+#ifndef MEMMOVEUP_INVALID_ORDER_FUNC_DEFINED
+#define MEMMOVEUP_INVALID_ORDER_FUNC_DEFINED 1
+	.pushsection .rodata.crt.string.memory
+.Linvalid_orderup_str_pfunc:  .asciz "mempmoveup"
+	.popsection
+#endif /* !MEMMOVEUP_INVALID_ORDER_FUNC_DEFINED */
+#else /* RETURN_PCPY */
+#ifndef MEMMOVEUP_INVALID_ORDER_PFUNC_DEFINED
+#define MEMMOVEUP_INVALID_ORDER_PFUNC_DEFINED 1
+	.pushsection .rodata.crt.string.memory
+.Linvalid_orderup_str_func:   .asciz "memmoveup"
+	.popsection
+#endif /* !MEMMOVEUP_INVALID_ORDER_PFUNC_DEFINED */
+#endif /* !RETURN_PCPY */
+#endif /* !NDEBUG */
+
+
+/****************************************************************************/
+/* void *LIBCCALL memmoveup(void *dst, void const *src, size_t num_bytes);  */
+/* void *LIBCCALL mempmoveup(void *dst, void const *src, size_t num_bytes); */
+/****************************************************************************/
+.section .text.crt.string.memory
+INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempmoveup),
+                            F(libc_memmoveup)))
+	.cfi_startproc
+	movq   %rdx, %rcx /* n_bytes */
+
+	/* assert(dst >= src || !n_bytes); */
+#ifndef NDEBUG
+	.cfi_remember_state
+	cmpq   %rsi, %rdi
+	jae    1f         /* if (dst >= src) goto 1f; */
+	testq  %rcx, %rcx
+	jz     1f         /* if (!n_bytes) goto 1f; */
+	/* Invalid use of `memmoveup' */
+#ifdef __CRT_HAVE___acheckf
+	pushq_cfi %rdi
+#endif /* __CRT_HAVE___acheckf */
+	pushq_cfi %rcx                          /* format:`...count:%Iu' */
+	pushq_cfi %rsi                          /* format:`...src(%p)...' */
+	movq   %rdi, %r9                        /* format:`...dst(%p)...' */
+	leaq   .Linvalid_orderup_str_format(%rip), %r8 /* format */
+	leaq   IFELSE_PCPY(.Linvalid_orderup_str_pfunc,
+	                   .Linvalid_orderup_str_func)(%rip), %rcx /* func */
+	movq   $(__LINE__), %rdx                    /* line */
+	leaq   .Linvalid_order_str_file(%rip), %rsi /* file */
+	leaq   .Linvalid_orderup_str_expr(%rip), %rdi /* expr */
+#undef PUSH_RELSTR
+#ifdef __CRT_HAVE___acheckf
+	INTERN(libc___acheckf)
+	call   libc___acheckf
+	popq_cfi %rsi
+	popq_cfi %rcx
+	popq_cfi %rdi
+	INTERN(IFELSE_PCPY(F(libc_mempmovedown), F(libc_memmovedown)))
+	jmp    IFELSE_PCPY(F(libc_mempmovedown), F(libc_memmovedown))
+#else /* __CRT_HAVE___acheckf */
+	INTERN(libc___afailf)
+	call   libc___afailf
+#endif /* !__CRT_HAVE___acheckf */
+1:	.cfi_restore_state
+#endif /* !NDEBUG */
+
+PRIVATE_LABEL(IFELSE_PCPY(F(libc_x86_mempmoveup_start),
+                          F(libc_x86_memmoveup_start))):
+	/* Make sure that the direction bit is set,
+	 * thus causing `movs' to do a top->down copy */
+	BEGIN_STD
+	NIF_PCPY(movq %rdi, %rax)
+	/* Jump ahead to the last address */
+	leaq   -N(%rdi, %rcx, N), %rdi
+	leaq   -N(%rsi, %rcx, N), %rsi
+	IF_PCPY(leaq N(%rdi), %rax)
+	rep    I(movs) /* Actually perform the memory copy */
+	END_STD        /* Restore the direction flag */
+	ret
+	.cfi_endproc
+END(IFELSE_PCPY(F(libc_mempmoveup),
+                F(libc_memmoveup)))
+DEFINE_PUBLIC_ALIAS(IFELSE_PCPY(F(mempmoveup),
+                                F(memmoveup)),
+                    IFELSE_PCPY(F(libc_mempmoveup),
+                                F(libc_memmoveup)))
+#undef USED_LIBC_MEMMOVEDOWN_START
+#undef USED_LIBC_MEMMOVEUP_START
+
+
+
+
+
+/*************************************************************************/
+/* void *SYSVABI memset(void *restrict dst, T Tword, size_t num_Tword);  */
+/* void *SYSVABI mempset(void *restrict dst, T Tword, size_t num_Tword); */
+/*************************************************************************/
+.section .text.crt.string.memory
+INTERN_FUNCTION(IFELSE_PCPY(F(libc_mempset),
+                            F(libc_memset)))
+	.cfi_startproc
+	BEGIN_CLD
 #if N == 8
 	movq   %rsi, %rax
 	movq   %rdx, %rcx
-#if !RETURN_PCPY
-	movq   %rdi, %rdx
-#endif /* !RETURN_PCPY */
+	NIF_PCPY(movq %rdi, %rdx)
 	rep    stosq
-#if RETURN_PCPY
-	movq   %rdi, %rax
-#else /* RETURN_PCPY */
-	movq   %rdx, %rax
-#endif /* !RETURN_PCPY */
+	movq   IFELSE_PCPY(%rdi, %rdx), %rax
 #elif N == 4
 	movzlq %esi, %rax /* RAX = ESI & 0xffffffff */
 	shlq   $(32),  %rsi
 	orq    %rsi, %rax /* RAX = ESI | ESI << 32 */
 	movq   %rdx, %rcx
-#if !RETURN_PCPY
-	movq   %rdi, %rdx
-#endif /* !RETURN_PCPY */
+	NIF_PCPY(movq %rdi, %rdx)
 	shrq   $(1), %rcx
 	rep    stosq
 	jnc    1f /* if (!(n_dwords & 1)) goto 1f; */
 	stosl
-1:
-#if RETURN_PCPY
-	movq   %rdi, %rax
-#else /* RETURN_PCPY */
-	movq   %rdx, %rax
-#endif /* !RETURN_PCPY */
+1:	movq   IFELSE_PCPY(%rdi, %rdx), %rax
 #elif N == 2
 	movw   %si, %ax
 	shll   $(16), %eax
@@ -166,9 +442,7 @@ INTERN_FUNCTION(F(libc_memset))
 	movzlq %eax, %rsi
 	shlq   $(32), %rax
 	orq    %rsi, %rax /* EAX = WORD << 48 | WORD << 32 | WORD << 16 | WORD */
-#if !RETURN_PCPY
-	movq   %rdi, %r8
-#endif /* !RETURN_PCPY */
+	NIF_PCPY(movq %rdi, %r8)
 	movq   %rdx, %rcx
 	shrq   $(2), %rcx
 	rep    stosq
@@ -177,13 +451,8 @@ INTERN_FUNCTION(F(libc_memset))
 1:	TEST_DX_MASK(1)
 	jz     1f /* if (!(n_words & 1)) goto 1f; */
 	stosw
-1:
-#if RETURN_PCPY
-	movq   %rdi, %rax
-#else /* RETURN_PCPY */
-	movq   %r8, %rax
-#endif /* !RETURN_PCPY */
-#elif N == 1
+1:	movq   IFELSE_PCPY(%rdi, %r8), %rax
+#else /* N == 1 */
 	movb   %sil, %al
 	movb   %al, %ah
 	movw   %ax, %si
@@ -192,9 +461,7 @@ INTERN_FUNCTION(F(libc_memset))
 	movzlq %eax, %rsi
 	shlq   $(32), %rax
 	orq    %rsi, %rax
-#if !RETURN_PCPY
-	movq   %rdi, %r8
-#endif /* !RETURN_PCPY */
+	NIF_PCPY(movq %rdi, %r8)
 	movq   %rdx, %rcx
 	shrq   $(3), %rcx
 	rep    stosq
@@ -206,30 +473,51 @@ INTERN_FUNCTION(F(libc_memset))
 1:	TEST_DX_MASK(1)
 	jz     1f /* if (!(n_bytes & 1)) goto 1f; */
 	stosb
-1:
-#if RETURN_PCPY
-	movq   %rdi, %rax
-#else /* RETURN_PCPY */
-	movq   %r8, %rax
-#endif /* !RETURN_PCPY */
-#else /* N... */
-#error "INVALID N"
-#endif /* !N... */
+1:	movq   IFELSE_PCPY(%rdi, %r8), %rax
+#endif /* N == ... */
+	END_CLD
 	ret
 	.cfi_endproc
-#if RETURN_PCPY
-END(F(libc_mempset))
-DEFINE_PUBLIC_ALIAS(F(mempset),F(libc_mempset))
-#else /* RETURN_PCPY */
-END(F(libc_memset))
-DEFINE_PUBLIC_ALIAS(F(memset),F(libc_memset))
-#endif /* !RETURN_PCPY */
+END(IFELSE_PCPY(F(libc_mempset),
+                F(libc_memset)))
+DEFINE_PUBLIC_ALIAS(IFELSE_PCPY(F(mempset),
+                                F(memset)),
+                    IFELSE_PCPY(F(libc_mempset),
+                                F(libc_memset)))
+
+
 
 
 
 #if !RETURN_PCPY
 
-/* TODO: memcmp[b|w|l]()      (cmps) */
+/********************************************************************************/
+/* Tsigned LIBCCALL memcmp(void const *lhs, void const *rhs, size_t num_Tword); */
+/********************************************************************************/
+.section .text.crt.string.memory
+INTERN_FUNCTION(F(libc_memcmp))
+	.cfi_startproc
+	BEGIN_CLD
+	/* lhs:       %rdi
+	 * rhs:       %rsi
+	 * num_Tword: %rdx */
+	movq   %rdx, %rcx /* count */
+	/* Compare DS:ESI (lhs) with ES:EDI (rhs) */
+	xorq   %rax, %rax /* result = 0; // HINT: This also forces %eflags to an equal-state to
+	                   *             //       handle %ecx==0 (where cmps won't update %eflags) */
+	repe   I(cmps)    /* Do the actual compare */
+	/* jb -> return -1; */
+	/* ja -> return 1; */
+	/* je -> return 0; */
+	seta   %al         /* result = (result & 0xffffffffffffff00) | ((lhs > rhs) ? 1 : 0); */
+	movq   $(-1), %rcx
+	cmovb  %rcx, %rax  /* if (lhs < rhs) result = -1; */
+	END_CLD
+	ret
+	.cfi_endproc
+END(F(libc_memcmp))
+DEFINE_PUBLIC_ALIAS(F(memcmp), F(libc_memcmp))
+
 
 /* TODO: memchr[b|w|l]()      (scas) */
 /* TODO: memrchr[b|w|l]()     (scas) */
@@ -268,8 +556,8 @@ DEFINE_PUBLIC_ALIAS(F(memset),F(libc_memset))
 #define STRING_SECTION         .text.crt.wchar.unicode.static.memory
 #define F_STRING(name)         libc_wcs##name
 #define F_STRING_EXPORT(name)       wcs##name
-#endif
-#endif
+#endif /* N... */
+#endif /* N... */
 
 
 #ifdef F_STRING
@@ -277,33 +565,34 @@ DEFINE_PUBLIC_ALIAS(F(memset),F(libc_memset))
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(end))
 	.cfi_startproc
-	ENTER_CLD
+	BEGIN_CLD
 #if N == 2
-	/* char const *string = %rcx; */
+	/* MSABI: char const *string = %rcx; */
 	pushq_cfi_r %rdi
 	movq   %rcx, %rdi
-#endif
+#endif /* N == 2 */
 	movq   $-1, %rcx
 	xorl   %eax, %eax
 	repne; I(scas)
 	leaq   -N(%rdi), %rax
 #if N == 2
 	popq_cfi_r %rdi
-#endif
+#endif /* N == 2 */
+	END_CLD
 	ret
 	.cfi_endproc
 END(F_STRING(end))
-DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(end),F_STRING(end))
+DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(end), F_STRING(end))
 
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(len))
 	.cfi_startproc
-	ENTER_CLD
+	BEGIN_CLD
 #if N == 2
-	/* char const *string = %rcx; */
+	/* MSABI: char const *string = %rcx; */
 	pushq_cfi_r %rdi
 	movq   %rcx, %rdi
-#endif
+#endif /* N == 2 */
 	movq   $-1, %rcx
 	xorl   %eax, %eax
 	repne; I(scas)
@@ -311,19 +600,20 @@ INTERN_FUNCTION(F_STRING(len))
 	subq   $(2), %rax   /* result = (0 - RCX) - 2; */
 #if N == 2
 	popq_cfi_r %rdi
-#endif
+#endif /* N == 2 */
+	END_CLD
 	ret
 	.cfi_endproc
 END(F_STRING(len))
-DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(len),F_STRING(len))
+DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(len), F_STRING(len))
 
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(nlen))
 	.cfi_startproc
-	ENTER_CLD
+	BEGIN_CLD
 #if N == 2
-	/* char const *string = %rcx; */
-	/* size_t      maxlen = %rdx; */
+	/* MSABI: char const *string = %rcx;
+	 *        size_t      maxlen = %rdx; */
 	pushq_cfi_r %rdi
 	movq   %rcx, %rdi
 	xorq   %rax, %rax
@@ -345,19 +635,20 @@ INTERN_FUNCTION(F_STRING(nlen))
 	incq   %rcx
 1:	subq   %rcx, %rsi
 	movq   %rsi, %rax /* result = max_chars - RCX; */
-#endif
-2:	ret
+#endif /* N != 2 */
+2:	END_CLD
+	ret
 	.cfi_endproc
 END(F_STRING(nlen))
-DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nlen),F_STRING(nlen))
+DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nlen), F_STRING(nlen))
 
 .section STRING_SECTION
 INTERN_FUNCTION(F_STRING(nend))
 	.cfi_startproc
-	ENTER_CLD
+	BEGIN_CLD
 #if N == 2
-	/* char const *string = %rcx; */
-	/* size_t      maxlen = %rdx; */
+	/* MSABI: char const *string = %rcx;
+	 *        size_t      maxlen = %rdx; */
 	pushq_cfi_r %rdi
 	xorq   %rax, %rax
 	testq  %rdx, %rdx
@@ -369,8 +660,9 @@ INTERN_FUNCTION(F_STRING(nend))
 	subq   $(2), %rdi
 1:	movq   %rdi, %rax
 	popq_cfi_r %rdi
+	END_CLD
 	ret
-#else
+#else /* N == 2 */
 	xorq   %rax, %rax
 	testq  %rsi, %rsi
 	jz     1f
@@ -383,11 +675,12 @@ INTERN_FUNCTION(F_STRING(nend))
 	subq   $(N), %rdi
 #endif /* N != 1 */
 1:	movq   %rdi, %rax
+	END_CLD
 	ret
-#endif
+#endif /* N != 2 */
 	.cfi_endproc
 END(F_STRING(nend))
-DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nend),F_STRING(nend))
+DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nend), F_STRING(nend))
 
 #endif /* F_STRING */
 
@@ -398,11 +691,15 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nend),F_STRING(nend))
 
 #endif /* !RETURN_PCPY */
 
-
-
+#undef IF_PCPY
+#undef NIF_PCPY
+#undef IFELSE_PCPY
 #undef RETURN_PCPY
 #undef N
 #undef I
 #undef F
-#undef ENTER_CLD
+#undef BEGIN_CLD
+#undef END_CLD
+#undef BEGIN_STD
+#undef END_STD
 

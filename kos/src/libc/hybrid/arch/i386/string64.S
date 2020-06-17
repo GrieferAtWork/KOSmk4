@@ -48,10 +48,12 @@
 #include "string64-template.S"
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(bcmp, libc_memcmp)
+
 /* Implement a couple of wchar functions */
-//TODO:DEFINE_PUBLIC_ALIAS(wmemcmp, libc_memcmpl)
-//TODO:DEFINE_PUBLIC_ALIAS(wmemmove, libc_memmovel)
-//TODO:DEFINE_PUBLIC_ALIAS(wmempmove, libc_mempmovel)
+DEFINE_PUBLIC_ALIAS(wmemcmp, libc_memcmpl)
+DEFINE_PUBLIC_ALIAS(wmemmove, libc_memmovel)
+DEFINE_PUBLIC_ALIAS(wmempmove, libc_mempmovel)
 DEFINE_PUBLIC_ALIAS(wmemcpy, libc_memcpyl)
 DEFINE_PUBLIC_ALIAS(wmemset, libc_memsetl)
 DEFINE_PUBLIC_ALIAS(wmempcpy, libc_mempcpyl)

@@ -39,7 +39,6 @@
 #endif /* __x86_64__ */
 
 /* memmove() */
-#ifndef __x86_64__ /* TODO: Also provide on x86_64! */
 #define LIBC_ARCH_HAVE_MEMMOVE      1
 #define LIBC_ARCH_HAVE_MEMMOVEUP    1
 #define LIBC_ARCH_HAVE_MEMMOVEDOWN  1
@@ -66,7 +65,6 @@
 #define LIBC_ARCH_HAVE_MEMPMOVEUPQ   1
 #define LIBC_ARCH_HAVE_MEMPMOVEDOWNQ 1
 #endif /* __x86_64__ */
-#endif /* !__x86_64__ */
 
 /* memset() */
 #define LIBC_ARCH_HAVE_MEMSET   1
@@ -81,14 +79,12 @@
 #endif /* __x86_64__ */
 
 /* memcmp() */
-#ifndef __x86_64__ /* TODO: Also provide on x86_64! */
 #define LIBC_ARCH_HAVE_MEMCMP  1
 #define LIBC_ARCH_HAVE_MEMCMPW 1
 #define LIBC_ARCH_HAVE_MEMCMPL 1
 #ifdef __x86_64__
 #define LIBC_ARCH_HAVE_MEMCMPQ 1
 #endif /* __x86_64__ */
-#endif /* !__x86_64__ */
 
 /* strlen() */
 #define LIBC_ARCH_HAVE_STRLEN  1
