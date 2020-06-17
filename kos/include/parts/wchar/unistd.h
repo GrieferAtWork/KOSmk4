@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e3c470 */
+/* HASH CRC-32:0x15d54bac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,16 +101,28 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(waccess, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONN
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchdir,(wchar_t const *__path),(__path))
-#endif /* __CRT_HAVE_wchdir */
+#elif defined(__CRT_HAVE__wchdir)
+/* >> chdir(2)
+ * Change the current working directory to `PATH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchdir,(wchar_t const *__path),_wchdir,(__path))
+#endif /* ... */
 #ifdef __CRT_HAVE_wgetcwd
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CDECLARE(,wchar_t *,__NOTHROW_RPC,wgetcwd,(wchar_t *__buf, size_t __bufsize),(__buf,__bufsize))
-#endif /* __CRT_HAVE_wgetcwd */
+#elif defined(__CRT_HAVE__wgetcwd)
+/* >> getcwd(2)
+ * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
+__CREDIRECT(,wchar_t *,__NOTHROW_RPC,wgetcwd,(wchar_t *__buf, size_t __bufsize),_wgetcwd,(__buf,__bufsize))
+#endif /* ... */
 #ifdef __CRT_HAVE_wunlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wunlink,(wchar_t const *__file),(__file))
+#elif defined(__CRT_HAVE__wunlink)
+/* >> unlink(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wunlink,(wchar_t const *__file),_wunlink,(__file))
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 #include <local/parts.wchar.unistd/wunlink.h>
 /* >> unlink(2)
@@ -121,6 +133,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wunlink, __FORCELOCAL __ATTR_NONNULL((1)) int __
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wrmdir,(wchar_t const *__path),(__path))
+#elif defined(__CRT_HAVE__wrmdir)
+/* >> rmdir(2)
+ * Remove a directory referred to by `PATH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wrmdir,(wchar_t const *__path),_wrmdir,(__path))
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 #include <local/parts.wchar.unistd/wrmdir.h>
 /* >> rmdir(2)
@@ -160,7 +176,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL wea
 #endif /* !__CRT_HAVE_weuidaccess */
 #ifdef __CRT_HAVE_wget_current_dir_name
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wget_current_dir_name,(void),())
-#elif defined(__CRT_HAVE_wgetcwd)
+#elif defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd)
 #include <local/parts.wchar.unistd/wget_current_dir_name.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(wget_current_dir_name, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED wchar_t *__NOTHROW_RPC(__LIBCCALL wget_current_dir_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wget_current_dir_name))(); })
 #endif /* ... */

@@ -4217,7 +4217,6 @@
 #define __CRT_HAVE_wcsfry 1
 #define __CRT_HAVE_wcsftime 1
 #define __CRT_HAVE_wcsftime_l 1
-#define __CRT_HAVE_wcsicoll 1
 #define __CRT_HAVE_wcslen 1
 #define __CRT_HAVE_wcslwr 1
 #define __CRT_HAVE_wcslwr_l 1
@@ -4627,7 +4626,6 @@
 #define __CRT_HAVE_KOS$wcsfry 1
 #define __CRT_HAVE_KOS$wcsftime 1
 #define __CRT_HAVE_KOS$wcsftime_l 1
-#define __CRT_HAVE_KOS$wcsicoll 1
 #define __CRT_HAVE_KOS$wcslen 1
 #define __CRT_HAVE_KOS$wcslwr 1
 #define __CRT_HAVE_KOS$wcslwr_l 1
@@ -5164,7 +5162,6 @@
 #define __CRT_HAVE_DOS$wcsfry 1
 #define __CRT_HAVE_DOS$wcsftime 1
 #define __CRT_HAVE_DOS$wcsftime_l 1
-#define __CRT_HAVE_DOS$wcsicoll 1
 #define __CRT_HAVE_DOS$wcslen 1
 #define __CRT_HAVE_DOS$wcslwr 1
 #define __CRT_HAVE_DOS$wcslwr_l 1

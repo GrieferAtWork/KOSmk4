@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc6ef588 */
+/* HASH CRC-32:0x593134ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4927,10 +4927,12 @@ __FORCELOCAL __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T 
 #define __swprintf_s_defined 1
 #ifdef __CRT_HAVE_swprintf
 __LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL swprintf_s)(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, ...) __CASMNAME("swprintf");
-#else /* __CRT_HAVE_swprintf */
+#elif defined(__CRT_HAVE__swprintf)
+__LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL swprintf_s)(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, ...) __CASMNAME("_swprintf");
+#else /* ... */
 #include <local/wchar/swprintf.h>
 #define swprintf_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swprintf))
-#endif /* !__CRT_HAVE_swprintf */
+#endif /* !... */
 #endif /* !__swprintf_s_defined */
 #ifndef __vfwprintf_s_defined
 #define __vfwprintf_s_defined 1
@@ -5143,10 +5145,12 @@ __FORCELOCAL __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T 
 #define ___swprintf_c_defined 1
 #ifdef __CRT_HAVE_swprintf
 __LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL _swprintf_c)(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, ...) __CASMNAME("swprintf");
-#else /* __CRT_HAVE_swprintf */
+#elif defined(__CRT_HAVE__swprintf)
+__LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL _swprintf_c)(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, ...) __CASMNAME("_swprintf");
+#else /* ... */
 #include <local/wchar/swprintf.h>
 #define _swprintf_c (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swprintf))
-#endif /* !__CRT_HAVE_swprintf */
+#endif /* !... */
 #endif /* !___swprintf_c_defined */
 #ifndef ___vsnwprintf_s_defined
 #define ___vsnwprintf_s_defined 1
@@ -5656,14 +5660,26 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,_wfreopen_s,(__FILE
 #undef ___wfreopen_s_defined
 #endif /* !__CRT_HAVE__wfreopen_s */
 #endif /* !___wfreopen_s_defined */
-#if !defined(___wfopen_defined) && defined(__CRT_HAVE_wfopen)
+#ifndef ___wfopen_defined
 #define ___wfopen_defined 1
+#ifdef __CRT_HAVE_wfopen
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfopen,(wchar_t const *__filename, wchar_t const *__mode),wfopen,(__filename,__mode))
-#endif /* !___wfopen_defined && __CRT_HAVE_wfopen */
-#if !defined(___wfreopen_defined) && defined(__CRT_HAVE_wfreopen)
+#elif defined(__CRT_HAVE__wfopen)
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfopen,(wchar_t const *__filename, wchar_t const *__mode),(__filename,__mode))
+#else /* ... */
+#undef ___wfopen_defined
+#endif /* !... */
+#endif /* !___wfopen_defined */
+#ifndef ___wfreopen_defined
 #define ___wfreopen_defined 1
+#ifdef __CRT_HAVE_wfreopen
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfreopen,(wchar_t const *__filename, wchar_t const *__mode, __FILE *__stream),wfreopen,(__filename,__mode,__stream))
-#endif /* !___wfreopen_defined && __CRT_HAVE_wfreopen */
+#elif defined(__CRT_HAVE__wfreopen)
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfreopen,(wchar_t const *__filename, wchar_t const *__mode, __FILE *__stream),(__filename,__mode,__stream))
+#else /* ... */
+#undef ___wfreopen_defined
+#endif /* !... */
+#endif /* !___wfreopen_defined */
 #ifndef ___fgetwchar_defined
 #define ___fgetwchar_defined 1
 #ifdef __CRT_HAVE_getwchar
@@ -5764,17 +5780,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wperror, __FORCELOCAL __ATTR_COLD void (__LIBCC
 #define ___wpopen_defined 1
 #ifdef __CRT_HAVE_wpopen
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wpopen,(wchar_t const *__command, wchar_t const *__mode),wpopen,(__command,__mode))
-#else /* __CRT_HAVE_wpopen */
+#elif defined(__CRT_HAVE__wpopen)
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wpopen,(wchar_t const *__command, wchar_t const *__mode),(__command,__mode))
+#else /* ... */
 #undef ___wpopen_defined
-#endif /* !__CRT_HAVE_wpopen */
+#endif /* !... */
 #endif /* !___wpopen_defined */
 #ifndef ___wremove_defined
 #define ___wremove_defined 1
 #ifdef __CRT_HAVE_wremove
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wremove,(wchar_t const *__filename),wremove,(__filename))
-#else /* __CRT_HAVE_wremove */
+#elif defined(__CRT_HAVE__wremove)
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wremove,(wchar_t const *__filename),(__filename))
+#else /* ... */
 #undef ___wremove_defined
-#endif /* !__CRT_HAVE_wremove */
+#endif /* !... */
 #endif /* !___wremove_defined */
 #ifndef ___wtmpnam_s_defined
 #define ___wtmpnam_s_defined 1
@@ -5784,32 +5804,58 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,_wtmpnam_s,(wchar_t *__ds
 #undef ___wtmpnam_s_defined
 #endif /* !__CRT_HAVE__wtmpnam_s */
 #endif /* !___wtmpnam_s_defined */
-#if !defined(___fgetwc_nolock_defined) && defined(__CRT_HAVE_fgetwc_unlocked)
+#ifndef ___fgetwc_nolock_defined
 #define ___fgetwc_nolock_defined 1
+#ifdef __CRT_HAVE_fgetwc_unlocked
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,_fgetwc_nolock,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
-#endif /* !___fgetwc_nolock_defined && __CRT_HAVE_fgetwc_unlocked */
-#if !defined(___fputwc_nolock_defined) && defined(__CRT_HAVE_fputwc_unlocked)
+#elif defined(__CRT_HAVE__fgetwc_nolock)
+__CDECLARE(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,_fgetwc_nolock,(__FILE *__restrict __stream),(__stream))
+#else /* ... */
+#undef ___fgetwc_nolock_defined
+#endif /* !... */
+#endif /* !___fgetwc_nolock_defined */
+#ifndef ___fputwc_nolock_defined
 #define ___fputwc_nolock_defined 1
+#ifdef __CRT_HAVE_fputwc_unlocked
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,_fputwc_nolock,(wchar_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
-#endif /* !___fputwc_nolock_defined && __CRT_HAVE_fputwc_unlocked */
+#elif defined(__CRT_HAVE__fputwc_nolock)
+__CDECLARE(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,_fputwc_nolock,(wchar_t __wc, __FILE *__restrict __stream),(__wc,__stream))
+#else /* ... */
+#undef ___fputwc_nolock_defined
+#endif /* !... */
+#endif /* !___fputwc_nolock_defined */
 #ifndef ___ungetwc_nolock_defined
 #define ___ungetwc_nolock_defined 1
 #ifdef __CRT_HAVE_ungetwc_unlocked
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,_ungetwc_nolock,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetwc_nolock)
+__CDECLARE(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,_ungetwc_nolock,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetwc)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,_ungetwc_nolock,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
 #else /* ... */
 #undef ___ungetwc_nolock_defined
 #endif /* !... */
 #endif /* !___ungetwc_nolock_defined */
-#if !defined(___getwc_nolock_defined) && defined(__CRT_HAVE_fgetwc_unlocked)
+#ifndef ___getwc_nolock_defined
 #define ___getwc_nolock_defined 1
+#ifdef __CRT_HAVE_fgetwc_unlocked
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,_getwc_nolock,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
-#endif /* !___getwc_nolock_defined && __CRT_HAVE_fgetwc_unlocked */
-#if !defined(___putwc_nolock_defined) && defined(__CRT_HAVE_fputwc_unlocked)
+#elif defined(__CRT_HAVE__fgetwc_nolock)
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,_getwc_nolock,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+#else /* ... */
+#undef ___getwc_nolock_defined
+#endif /* !... */
+#endif /* !___getwc_nolock_defined */
+#ifndef ___putwc_nolock_defined
 #define ___putwc_nolock_defined 1
+#ifdef __CRT_HAVE_fputwc_unlocked
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,_putwc_nolock,(wchar_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
-#endif /* !___putwc_nolock_defined && __CRT_HAVE_fputwc_unlocked */
+#elif defined(__CRT_HAVE__fputwc_nolock)
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,_putwc_nolock,(wchar_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+#else /* ... */
+#undef ___putwc_nolock_defined
+#endif /* !... */
+#endif /* !___putwc_nolock_defined */
 #endif /* !_WSTDIO_DEFINED */
 #endif /* __CC__ */
 #endif /* __USE_DOS */

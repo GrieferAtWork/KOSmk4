@@ -37,21 +37,24 @@ __SYSDECL_BEGIN
 
 }
 
-[[guard, wchar, dos_export_as("DOS$_wremove")]]
+[[guard, wchar, dos_export_alias("_wremove")]]
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
 int wremove([[nonnull]] wchar_t const *filename);
 
-[[wchar, wunused, dos_export_as("DOS$_wfopen")]]
+[[wchar, wunused, dos_export_alias("_wfopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
-$FILE *wfopen([[nonnull]] wchar_t const *filename, [[nonnull]] wchar_t const *mode);
+$FILE *wfopen([[nonnull]] wchar_t const *filename,
+              [[nonnull]] wchar_t const *mode);
 
-[[wchar, wunused, dos_export_as("DOS$_wfreopen")]]
+[[wchar, wunused, dos_export_alias("_wfreopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
-$FILE *wfreopen([[nonnull]] wchar_t const *filename, [[nonnull]] wchar_t const *mode, $FILE *stream);
+$FILE *wfreopen([[nonnull]] wchar_t const *filename,
+                [[nonnull]] wchar_t const *mode, $FILE *stream);
 
-[[guard, wchar, wunused, dos_export_as("DOS$_wpopen")]]
+[[guard, wchar, wunused, dos_export_alias("_wpopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
-$FILE *wpopen([[nonnull]] wchar_t const *command, [[nonnull]] wchar_t const *mode);
+$FILE *wpopen([[nonnull]] wchar_t const *command,
+              [[nonnull]] wchar_t const *mode);
 
 
 %{

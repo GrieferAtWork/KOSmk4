@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfee7bfa5 */
+/* HASH CRC-32:0xd08c7cf2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5294,9 +5294,7 @@ DEFINE_PUBLIC_ALIAS(DOS$_wcsncoll, libd_wcsncoll);
 DEFINE_PUBLIC_ALIAS(DOS$wcsncoll, libd_wcsncoll);
 DEFINE_PUBLIC_ALIAS(wcsncoll, libc_wcsncoll);
 DEFINE_PUBLIC_ALIAS(DOS$_wcsicoll, libd_wcscasecoll);
-DEFINE_PUBLIC_ALIAS(DOS$wcsicoll, libd_wcscasecoll);
 DEFINE_PUBLIC_ALIAS(DOS$wcscasecoll, libd_wcscasecoll);
-DEFINE_PUBLIC_ALIAS(wcsicoll, libc_wcscasecoll);
 DEFINE_PUBLIC_ALIAS(wcscasecoll, libc_wcscasecoll);
 DEFINE_PUBLIC_ALIAS(DOS$_wcsnicoll, libd_wcsncasecoll);
 DEFINE_PUBLIC_ALIAS(DOS$wcsncasecoll, libd_wcsncasecoll);

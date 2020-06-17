@@ -84,7 +84,7 @@ int wutime([[nonnull]] wchar_t const *filename,
 %
 %#ifdef __USE_TIME64
 [[time64_variant_of(wutime)]]
-[[cp, wchar, dos_export_as("DOS$_wutime64"), doc_alias("wutime")]]
+[[cp, wchar, dos_export_alias("_wutime64"), doc_alias("wutime")]]
 [[userimpl, requires_function(crt_wutime32)]]
 int wutime64([[nonnull]] $wchar_t const *filename,
              [[nullable]] struct utimbuf64 const *file_times) {

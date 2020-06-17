@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c399df8 */
+/* HASH CRC-32:0x87f5dfd1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_wcstod_l_defined 1
 #ifdef __CRT_HAVE_wcstod_l
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),wcstod_l,(__nptr,__endptr,__locale))
+#elif defined(__CRT_HAVE__wcstod_l)
+__CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),_wcstod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE___wcstod_l)
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod_l,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __locale_t __locale),__wcstod_l,(__nptr,__endptr,__locale))
 #else /* ... */

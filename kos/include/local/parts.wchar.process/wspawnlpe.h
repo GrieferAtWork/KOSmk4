@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e1d8162 */
+/* HASH CRC-32:0xfd69d709 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,18 @@
 #ifndef __local_wspawnlpe_defined
 #define __local_wspawnlpe_defined 1
 #include <__crt.h>
-#ifdef __CRT_HAVE_wspawnvpe
+#if defined(__CRT_HAVE_wspawnvpe) || defined(__CRT_HAVE__wspawnvpe)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wspawnvpe from parts.wchar.process */
 #ifndef __local___localdep_wspawnvpe_defined
 #define __local___localdep_wspawnvpe_defined 1
+#ifdef __CRT_HAVE_wspawnvpe
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvpe,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV, __TWENVP),wspawnvpe,(__mode,__file,___argv,___envp))
+#elif defined(__CRT_HAVE__wspawnvpe)
+__CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvpe,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV, __TWENVP),_wspawnvpe,(__mode,__file,___argv,___envp))
+#else /* ... */
+#undef __local___localdep_wspawnvpe_defined
+#endif /* !... */
 #endif /* !__local___localdep_wspawnvpe_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
@@ -40,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wspawnlpe_defined 1
 #define __localdep_wspawnlpe __LIBC_LOCAL_NAME(wspawnlpe)
 #endif /* !__local___localdep_wspawnlpe_defined */
-#else /* __CRT_HAVE_wspawnvpe */
+#else /* __CRT_HAVE_wspawnvpe || __CRT_HAVE__wspawnvpe */
 #undef __local_wspawnlpe_defined
-#endif /* !__CRT_HAVE_wspawnvpe */
+#endif /* !__CRT_HAVE_wspawnvpe && !__CRT_HAVE__wspawnvpe */
 #endif /* !__local_wspawnlpe_defined */

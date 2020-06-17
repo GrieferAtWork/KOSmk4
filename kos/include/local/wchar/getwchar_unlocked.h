@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b0eeeb7 */
+/* HASH CRC-32:0xf987b938 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,19 @@
 #ifndef __local_getwchar_unlocked_defined
 #define __local_getwchar_unlocked_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_fgetwc_unlocked) && !defined(__NO_STDSTREAMS)
+#if (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && !defined(__NO_STDSTREAMS)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fgetwc_unlocked from wchar */
 #ifndef __local___localdep_fgetwc_unlocked_defined
 #define __local___localdep_fgetwc_unlocked_defined 1
+#ifdef __CRT_HAVE_fgetwc_unlocked
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+#elif defined(__CRT_HAVE__fgetwc_nolock)
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+#else /* ... */
+#undef __local___localdep_fgetwc_unlocked_defined
+#endif /* !... */
 #endif /* !__local___localdep_fgetwc_unlocked_defined */
 __NAMESPACE_LOCAL_END
 #include <local/stdstreams.h>
@@ -41,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_getwchar_unlocked_defined 1
 #define __localdep_getwchar_unlocked __LIBC_LOCAL_NAME(getwchar_unlocked)
 #endif /* !__local___localdep_getwchar_unlocked_defined */
-#else /* __CRT_HAVE_fgetwc_unlocked && !__NO_STDSTREAMS */
+#else /* (__CRT_HAVE_fgetwc_unlocked || __CRT_HAVE__fgetwc_nolock) && !__NO_STDSTREAMS */
 #undef __local_getwchar_unlocked_defined
-#endif /* !__CRT_HAVE_fgetwc_unlocked || __NO_STDSTREAMS */
+#endif /* (!__CRT_HAVE_fgetwc_unlocked && !__CRT_HAVE__fgetwc_nolock) || __NO_STDSTREAMS */
 #endif /* !__local_getwchar_unlocked_defined */

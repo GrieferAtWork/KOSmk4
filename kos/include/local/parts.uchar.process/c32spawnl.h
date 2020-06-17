@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x766c31bb */
+/* HASH CRC-32:0x916a0bca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_c32spawnl_defined
 #define __local_c32spawnl_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_wspawnv) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wspawnv)
+#if (defined(__CRT_HAVE_wspawnv) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wspawnv) || (defined(__CRT_HAVE__wspawnv) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_wspawnv)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32spawnv from parts.uchar.process */
 #ifndef __local___localdep_c32spawnv_defined
@@ -30,6 +30,10 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnv,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV),wspawnv,(__mode,__path,___argv))
 #elif defined(__CRT_HAVE_KOS$wspawnv)
 __CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnv,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV),wspawnv,(__mode,__path,___argv))
+#elif defined(__CRT_HAVE__wspawnv) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnv,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV),_wspawnv,(__mode,__path,___argv))
+#elif defined(__CRT_HAVE_KOS$_wspawnv)
+__CREDIRECT_KOS(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_c32spawnv,(int __mode, __CHAR32_TYPE__ const *__restrict __path, __T32ARGV),_wspawnv,(__mode,__path,___argv))
 #else /* ... */
 #undef __local___localdep_c32spawnv_defined
 #endif /* !... */
@@ -46,7 +50,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c32spawnl_defined 1
 #define __localdep_c32spawnl __LIBC_LOCAL_NAME(c32spawnl)
 #endif /* !__local___localdep_c32spawnl_defined */
-#else /* (__CRT_HAVE_wspawnv && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wspawnv */
+#else /* (__CRT_HAVE_wspawnv && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wspawnv || (__CRT_HAVE__wspawnv && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$_wspawnv */
 #undef __local_c32spawnl_defined
-#endif /* (!__CRT_HAVE_wspawnv || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wspawnv */
+#endif /* (!__CRT_HAVE_wspawnv || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wspawnv && (!__CRT_HAVE__wspawnv || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$_wspawnv */
 #endif /* !__local_c32spawnl_defined */

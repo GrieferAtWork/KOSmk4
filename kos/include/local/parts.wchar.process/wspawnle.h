@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7facec32 */
+/* HASH CRC-32:0x3731885f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,18 @@
 #ifndef __local_wspawnle_defined
 #define __local_wspawnle_defined 1
 #include <__crt.h>
-#ifdef __CRT_HAVE_wspawnve
+#if defined(__CRT_HAVE_wspawnve) || defined(__CRT_HAVE__wspawnve)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wspawnve from parts.wchar.process */
 #ifndef __local___localdep_wspawnve_defined
 #define __local___localdep_wspawnve_defined 1
+#ifdef __CRT_HAVE_wspawnve
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_wspawnve,(int __mode, __WCHAR_TYPE__ const *__restrict __path, __TWARGV, __TWENVP),wspawnve,(__mode,__path,___argv,___envp))
+#elif defined(__CRT_HAVE__wspawnve)
+__CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_wspawnve,(int __mode, __WCHAR_TYPE__ const *__restrict __path, __TWARGV, __TWENVP),_wspawnve,(__mode,__path,___argv,___envp))
+#else /* ... */
+#undef __local___localdep_wspawnve_defined
+#endif /* !... */
 #endif /* !__local___localdep_wspawnve_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
@@ -40,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wspawnle_defined 1
 #define __localdep_wspawnle __LIBC_LOCAL_NAME(wspawnle)
 #endif /* !__local___localdep_wspawnle_defined */
-#else /* __CRT_HAVE_wspawnve */
+#else /* __CRT_HAVE_wspawnve || __CRT_HAVE__wspawnve */
 #undef __local_wspawnle_defined
-#endif /* !__CRT_HAVE_wspawnve */
+#endif /* !__CRT_HAVE_wspawnve && !__CRT_HAVE__wspawnve */
 #endif /* !__local_wspawnle_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca0f7db3 */
+/* HASH CRC-32:0x9883ea75 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -439,73 +439,105 @@ typedef __intptr_t intptr_t;
 #define _WPROCESS_DEFINED 1
 #ifdef __CRT_HAVE_wexecv
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,_wexecv,(wchar_t const *__restrict __path, __TWARGV),wexecv,(__path,___argv))
-#endif /* __CRT_HAVE_wexecv */
+#elif defined(__CRT_HAVE__wexecv)
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,_wexecv,(wchar_t const *__restrict __path, __TWARGV),(__path,___argv))
+#endif /* ... */
 #ifdef __CRT_HAVE_wexecvp
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,_wexecvp,(wchar_t const *__restrict __file, __TWARGV),wexecvp,(__path,___argv))
-#endif /* __CRT_HAVE_wexecvp */
+#elif defined(__CRT_HAVE__wexecvp)
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,_wexecvp,(wchar_t const *__restrict __file, __TWARGV),(__path,___argv))
+#endif /* ... */
 #ifdef __CRT_HAVE_wexecve
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,_wexecve,(wchar_t const *__restrict __path, __TWARGV, __TWENVP),wexecve,(__path,___argv,___envp))
-#endif /* __CRT_HAVE_wexecve */
+#elif defined(__CRT_HAVE__wexecve)
+__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,_wexecve,(wchar_t const *__restrict __path, __TWARGV, __TWENVP),(__path,___argv,___envp))
+#endif /* ... */
 #ifdef __CRT_HAVE_wexecvpe
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,_wexecvpe,(wchar_t const *__restrict __file, __TWARGV, __TWENVP),wexecvpe,(__path,___argv,___envp))
-#endif /* __CRT_HAVE_wexecvpe */
+#elif defined(__CRT_HAVE__wexecvpe)
+__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,_wexecvpe,(wchar_t const *__restrict __file, __TWARGV, __TWENVP),(__path,___argv,___envp))
+#endif /* ... */
 #ifdef __CRT_HAVE_wexecl
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexecl)(wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME("wexecl");
-#elif defined(__CRT_HAVE_wexecv)
+#elif defined(__CRT_HAVE__wexecl)
+__LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexecl)(wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_SAME("_wexecl");
+#elif defined(__CRT_HAVE_wexecv) || defined(__CRT_HAVE__wexecv)
 #include <local/parts.wchar.process/wexecl.h>
 #define _wexecl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecl))
 #endif /* ... */
 #ifdef __CRT_HAVE_wexeclp
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexeclp)(wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME("wexeclp");
-#elif defined(__CRT_HAVE_wexecvp)
+#elif defined(__CRT_HAVE__wexeclp)
+__LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexeclp)(wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME_SAME("_wexeclp");
+#elif defined(__CRT_HAVE_wexecvp) || defined(__CRT_HAVE__wexecvp)
 #include <local/parts.wchar.process/wexeclp.h>
 #define _wexeclp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclp))
 #endif /* ... */
 #ifdef __CRT_HAVE_wexecle
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME("wexecle");
-#elif defined(__CRT_HAVE_wexecve)
+#elif defined(__CRT_HAVE__wexecle)
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_SAME("_wexecle");
+#elif defined(__CRT_HAVE_wexecve) || defined(__CRT_HAVE__wexecve)
 #include <local/parts.wchar.process/wexecle.h>
 #define _wexecle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecle))
 #endif /* ... */
 #ifdef __CRT_HAVE_wexeclpe
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME("wexeclpe");
-#elif defined(__CRT_HAVE_wexecvpe)
+#elif defined(__CRT_HAVE__wexeclpe)
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME_SAME("_wexeclpe");
+#elif defined(__CRT_HAVE_wexecvpe) || defined(__CRT_HAVE__wexecvpe)
 #include <local/parts.wchar.process/wexeclpe.h>
 #define _wexeclpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclpe))
 #endif /* ... */
 #ifdef __CRT_HAVE_wspawnv
 __CREDIRECT(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnv,(int __mode, wchar_t const *__restrict __path, __TWARGV),wspawnv,(__mode,__path,___argv))
-#endif /* __CRT_HAVE_wspawnv */
+#elif defined(__CRT_HAVE__wspawnv)
+__CDECLARE(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnv,(int __mode, wchar_t const *__restrict __path, __TWARGV),(__mode,__path,___argv))
+#endif /* ... */
 #ifdef __CRT_HAVE_wspawnvp
 __CREDIRECT(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnvp,(int __mode, wchar_t const *__restrict __path, __TWARGV),wspawnvp,(__mode,__path,___argv))
-#endif /* __CRT_HAVE_wspawnvp */
+#elif defined(__CRT_HAVE__wspawnvp)
+__CDECLARE(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnvp,(int __mode, wchar_t const *__restrict __path, __TWARGV),(__mode,__path,___argv))
+#endif /* ... */
 #ifdef __CRT_HAVE_wspawnve
 __CREDIRECT(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnve,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),wspawnve,(__mode,__path,___argv,___envp))
-#endif /* __CRT_HAVE_wspawnve */
+#elif defined(__CRT_HAVE__wspawnve)
+__CDECLARE(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnve,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),(__mode,__path,___argv,___envp))
+#endif /* ... */
 #ifdef __CRT_HAVE_wspawnvpe
 __CREDIRECT(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnvpe,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),wspawnvpe,(__mode,__path,___argv,___envp))
-#endif /* __CRT_HAVE_wspawnvpe */
+#elif defined(__CRT_HAVE__wspawnvpe)
+__CDECLARE(__ATTR_NONNULL((2)),intptr_t,__NOTHROW_NCX,_wspawnvpe,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),(__mode,__path,___argv,___envp))
+#endif /* ... */
 #ifdef __CRT_HAVE_wspawnl
 __LIBC __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnl)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME("wspawnl");
-#elif defined(__CRT_HAVE_wspawnv)
+#elif defined(__CRT_HAVE__wspawnl)
+__LIBC __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnl)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_SAME("_wspawnl");
+#elif defined(__CRT_HAVE_wspawnv) || defined(__CRT_HAVE__wspawnv)
 #include <local/parts.wchar.process/wspawnl.h>
 #define _wspawnl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnl))
 #endif /* ... */
 #ifdef __CRT_HAVE_wspawnlp
 __LIBC __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnlp)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME("wspawnlp");
-#elif defined(__CRT_HAVE_wspawnvp)
+#elif defined(__CRT_HAVE__wspawnlp)
+__LIBC __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnlp)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_SAME("_wspawnlp");
+#elif defined(__CRT_HAVE_wspawnvp) || defined(__CRT_HAVE__wspawnvp)
 #include <local/parts.wchar.process/wspawnlp.h>
 #define _wspawnlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlp))
 #endif /* ... */
 #ifdef __CRT_HAVE_wspawnle
 __LIBC __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnle)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME("wspawnle");
-#elif defined(__CRT_HAVE_wspawnve)
+#elif defined(__CRT_HAVE__wspawnle)
+__LIBC __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnle)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_SAME("_wspawnle");
+#elif defined(__CRT_HAVE_wspawnve) || defined(__CRT_HAVE__wspawnve)
 #include <local/parts.wchar.process/wspawnle.h>
 #define _wspawnle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnle))
 #endif /* ... */
 #ifdef __CRT_HAVE_wspawnlpe
 __LIBC __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnlpe)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME("wspawnlpe");
-#elif defined(__CRT_HAVE_wspawnvpe)
+#elif defined(__CRT_HAVE__wspawnlpe)
+__LIBC __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnlpe)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_SAME("_wspawnlpe");
+#elif defined(__CRT_HAVE_wspawnvpe) || defined(__CRT_HAVE__wspawnvpe)
 #include <local/parts.wchar.process/wspawnlpe.h>
 #define _wspawnlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlpe))
 #endif /* ... */
@@ -515,9 +547,11 @@ __LIBC __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnlpe)(int __
 #define _CRT_WSYSTEM_DEFINED 1
 #ifdef __CRT_HAVE_wsystem
 __CREDIRECT(,int,__NOTHROW_RPC,_wsystem,(wchar_t const *__cmd),wsystem,(__cmd))
-#else /* __CRT_HAVE_wsystem */
+#elif defined(__CRT_HAVE__wsystem)
+__CDECLARE(,int,__NOTHROW_RPC,_wsystem,(wchar_t const *__cmd),(__cmd))
+#else /* ... */
 #undef _CRT_WSYSTEM_DEFINED
-#endif /* !__CRT_HAVE_wsystem */
+#endif /* !... */
 #endif /* !_CRT_WSYSTEM_DEFINED */
 
 #endif /* __CC__ */

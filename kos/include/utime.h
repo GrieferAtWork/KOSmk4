@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54ff000d */
+/* HASH CRC-32:0x3b8de04 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -203,6 +203,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wutime32, __FORCELOCAL __ATTR_NONNULL((1)) int 
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wutime64,(__WCHAR_TYPE__ const *__filename, struct utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_wutime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wutime64,(__WCHAR_TYPE__ const *__filename, struct utimbuf64 const *__file_times),wutime,(__filename,__file_times))
+#elif defined(__CRT_HAVE__wutime64)
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wutime64,(__WCHAR_TYPE__ const *__filename, struct utimbuf64 const *__file_times),(__filename,__file_times))
 #elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32)
 #include <local/parts.wchar.utime/wutime64.h>
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _wutime64)(__WCHAR_TYPE__ const *__filename, struct utimbuf64 const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wutime64))(__filename, __file_times); }

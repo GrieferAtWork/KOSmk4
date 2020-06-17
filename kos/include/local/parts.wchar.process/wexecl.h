@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5d197be */
+/* HASH CRC-32:0x83dc86a5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,18 @@
 #ifndef __local_wexecl_defined
 #define __local_wexecl_defined 1
 #include <__crt.h>
-#ifdef __CRT_HAVE_wexecv
+#if defined(__CRT_HAVE_wexecv) || defined(__CRT_HAVE__wexecv)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wexecv from parts.wchar.process */
 #ifndef __local___localdep_wexecv_defined
 #define __local___localdep_wexecv_defined 1
+#ifdef __CRT_HAVE_wexecv
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_wexecv,(__WCHAR_TYPE__ const *__restrict __path, __TWARGV),wexecv,(__path,___argv))
+#elif defined(__CRT_HAVE__wexecv)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_wexecv,(__WCHAR_TYPE__ const *__restrict __path, __TWARGV),_wexecv,(__path,___argv))
+#else /* ... */
+#undef __local___localdep_wexecv_defined
+#endif /* !... */
 #endif /* !__local___localdep_wexecv_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
@@ -40,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wexecl_defined 1
 #define __localdep_wexecl __LIBC_LOCAL_NAME(wexecl)
 #endif /* !__local___localdep_wexecl_defined */
-#else /* __CRT_HAVE_wexecv */
+#else /* __CRT_HAVE_wexecv || __CRT_HAVE__wexecv */
 #undef __local_wexecl_defined
-#endif /* !__CRT_HAVE_wexecv */
+#endif /* !__CRT_HAVE_wexecv && !__CRT_HAVE__wexecv */
 #endif /* !__local_wexecl_defined */

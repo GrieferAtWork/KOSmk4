@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0ee3306 */
+/* HASH CRC-32:0x23044d20 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -253,6 +253,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16chdir,(char16_t const *__pa
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16chdir,(char16_t const *__path),wchdir,(__path))
+#elif defined(__CRT_HAVE__wchdir) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> chdir(2)
+ * Change the current working directory to `PATH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16chdir,(char16_t const *__path),_wchdir,(__path))
+#elif defined(__CRT_HAVE_DOS$_wchdir)
+/* >> chdir(2)
+ * Change the current working directory to `PATH' */
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16chdir,(char16_t const *__path),_wchdir,(__path))
 #endif /* ... */
 #if defined(__CRT_HAVE_wchdir) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> chdir(2)
@@ -262,6 +270,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chdir,(char32_t const *__pa
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chdir,(char32_t const *__path),wchdir,(__path))
+#elif defined(__CRT_HAVE__wchdir) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> chdir(2)
+ * Change the current working directory to `PATH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chdir,(char32_t const *__path),_wchdir,(__path))
+#elif defined(__CRT_HAVE_KOS$_wchdir)
+/* >> chdir(2)
+ * Change the current working directory to `PATH' */
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chdir,(char32_t const *__path),_wchdir,(__path))
 #endif /* ... */
 #if defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> getcwd(2)
@@ -271,6 +287,14 @@ __CREDIRECT(,char16_t *,__NOTHROW_RPC,c16getcwd,(char16_t *__buf, size_t __bufsi
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT_DOS(,char16_t *,__NOTHROW_RPC,c16getcwd,(char16_t *__buf, size_t __bufsize),wgetcwd,(__buf,__bufsize))
+#elif defined(__CRT_HAVE__wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> getcwd(2)
+ * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
+__CREDIRECT(,char16_t *,__NOTHROW_RPC,c16getcwd,(char16_t *__buf, size_t __bufsize),_wgetcwd,(__buf,__bufsize))
+#elif defined(__CRT_HAVE_DOS$_wgetcwd)
+/* >> getcwd(2)
+ * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
+__CREDIRECT_DOS(,char16_t *,__NOTHROW_RPC,c16getcwd,(char16_t *__buf, size_t __bufsize),_wgetcwd,(__buf,__bufsize))
 #endif /* ... */
 #if defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> getcwd(2)
@@ -280,6 +304,14 @@ __CREDIRECT(,char32_t *,__NOTHROW_RPC,c32getcwd,(char32_t *__buf, size_t __bufsi
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT_KOS(,char32_t *,__NOTHROW_RPC,c32getcwd,(char32_t *__buf, size_t __bufsize),wgetcwd,(__buf,__bufsize))
+#elif defined(__CRT_HAVE__wgetcwd) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> getcwd(2)
+ * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
+__CREDIRECT(,char32_t *,__NOTHROW_RPC,c32getcwd,(char32_t *__buf, size_t __bufsize),_wgetcwd,(__buf,__bufsize))
+#elif defined(__CRT_HAVE_KOS$_wgetcwd)
+/* >> getcwd(2)
+ * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
+__CREDIRECT_KOS(,char32_t *,__NOTHROW_RPC,c32getcwd,(char32_t *__buf, size_t __bufsize),_wgetcwd,(__buf,__bufsize))
 #endif /* ... */
 #if defined(__CRT_HAVE_wunlink) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> unlink(2)
@@ -289,6 +321,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16unlink,(char16_t const *__f
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16unlink,(char16_t const *__file),wunlink,(__file))
+#elif defined(__CRT_HAVE__wunlink) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> unlink(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16unlink,(char16_t const *__file),_wunlink,(__file))
+#elif defined(__CRT_HAVE_DOS$_wunlink)
+/* >> unlink(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16unlink,(char16_t const *__file),_wunlink,(__file))
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.unistd/wunlink.h>
 /* >> unlink(2)
@@ -308,6 +348,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32unlink,(char32_t const *__f
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32unlink,(char32_t const *__file),wunlink,(__file))
+#elif defined(__CRT_HAVE__wunlink) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> unlink(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32unlink,(char32_t const *__file),_wunlink,(__file))
+#elif defined(__CRT_HAVE_KOS$_wunlink)
+/* >> unlink(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32unlink,(char32_t const *__file),_wunlink,(__file))
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 4
 #include <local/parts.wchar.unistd/wunlink.h>
 /* >> unlink(2)
@@ -327,6 +375,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16rmdir,(char16_t const *__pa
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16rmdir,(char16_t const *__path),wrmdir,(__path))
+#elif defined(__CRT_HAVE__wrmdir) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> rmdir(2)
+ * Remove a directory referred to by `PATH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16rmdir,(char16_t const *__path),_wrmdir,(__path))
+#elif defined(__CRT_HAVE_DOS$_wrmdir)
+/* >> rmdir(2)
+ * Remove a directory referred to by `PATH' */
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16rmdir,(char16_t const *__path),_wrmdir,(__path))
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.unistd/wrmdir.h>
 /* >> rmdir(2)
@@ -346,6 +402,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32rmdir,(char32_t const *__pa
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32rmdir,(char32_t const *__path),wrmdir,(__path))
+#elif defined(__CRT_HAVE__wrmdir) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> rmdir(2)
+ * Remove a directory referred to by `PATH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32rmdir,(char32_t const *__path),_wrmdir,(__path))
+#elif defined(__CRT_HAVE_KOS$_wrmdir)
+/* >> rmdir(2)
+ * Remove a directory referred to by `PATH' */
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32rmdir,(char32_t const *__path),_wrmdir,(__path))
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 4
 #include <local/parts.wchar.unistd/wrmdir.h>
 /* >> rmdir(2)
@@ -478,10 +542,10 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBKCALL c32
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,c16get_current_dir_name,(void),wget_current_dir_name,())
 #elif defined(__CRT_HAVE_DOS$wget_current_dir_name)
 __CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,c16get_current_dir_name,(void),wget_current_dir_name,())
-#elif defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 2
+#elif (defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd)) && __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.unistd/wget_current_dir_name.h>
 __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char16_t *__NOTHROW_RPC(__LIBDCALL c16get_current_dir_name)(void) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wget_current_dir_name))(); }
-#elif (defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wgetcwd)
+#elif (defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wgetcwd) || (defined(__CRT_HAVE__wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wgetcwd)
 #include <local/parts.uchar.unistd/c16get_current_dir_name.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16get_current_dir_name, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char16_t *__NOTHROW_RPC(__LIBDCALL c16get_current_dir_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16get_current_dir_name))(); })
 #endif /* ... */
@@ -489,10 +553,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16get_current_dir_name, __FORCELOCAL __ATTR_MAL
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char32_t *,__NOTHROW_RPC,c32get_current_dir_name,(void),wget_current_dir_name,())
 #elif defined(__CRT_HAVE_KOS$wget_current_dir_name)
 __CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,char32_t *,__NOTHROW_RPC,c32get_current_dir_name,(void),wget_current_dir_name,())
-#elif defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 4
+#elif (defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd)) && __SIZEOF_WCHAR_T__ == 4
 #include <local/parts.wchar.unistd/wget_current_dir_name.h>
 __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char32_t *__NOTHROW_RPC(__LIBKCALL c32get_current_dir_name)(void) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wget_current_dir_name))(); }
-#elif (defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wgetcwd)
+#elif (defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wgetcwd) || (defined(__CRT_HAVE__wgetcwd) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_wgetcwd)
 #include <local/parts.uchar.unistd/c32get_current_dir_name.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32get_current_dir_name, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char32_t *__NOTHROW_RPC(__LIBKCALL c32get_current_dir_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32get_current_dir_name))(); })
 #endif /* ... */

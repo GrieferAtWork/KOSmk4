@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32a5bf66 */
+/* HASH CRC-32:0x3bad417f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,6 +41,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCH
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_wutime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime,(__filename,__file_times))
+#elif defined(__CRT_HAVE__wutime64)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32)
 __NAMESPACE_LOCAL_END
 #include <local/parts.wchar.utime/wutime64.h>

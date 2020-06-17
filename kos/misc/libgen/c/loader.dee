@@ -2414,7 +2414,7 @@ again_parse_annotations:
 						}
 						for (local lf: libFuncs) {
 							local usedAsmname = tok;
-							if (lf === currentDosLibraryFunction && #libFuncs > 1)
+							if (lf === currentDosLibraryFunction)
 								usedAsmname = "DOS$" + tok;
 							lf.exportSymbolNames.append((
 								currentConditions is none

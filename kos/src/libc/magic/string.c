@@ -1157,11 +1157,23 @@ mempcpyb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
           [[nonnull]] /*aligned(1)*/ void const *__restrict src,
           $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t * = mempcpy;
 
+%(auto_source){
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+DEFINE_PUBLIC_ALIAS(DOS$wmemcpy, libd_wmemcpy);
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+NOTHROW_NCX(LIBDCALL libd_wmemcpy)(char16_t *__restrict dst,
+                                   char16_t const *__restrict src,
+                                   size_t num_chars) {
+	return (char16_t *)libc_memcpyw(dst, src, num_chars);
+}
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+}
+
 @@Copy memory between non-overlapping memory blocks.
 [[fast, libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemcpy")]]
-[[alias("DOS$wmemcpy")]]
-[[if(!defined(__KERNEL__)), export_as("DOS$wmemcpy")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemcpy")]]
+[[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), export_as("DOS$wmemcpy")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCPYW))]]
 memcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
          [[nonnull]] /*aligned(2)*/ void const *__restrict src,
@@ -1173,11 +1185,23 @@ memcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 	return (u16 *)dst;
 }
 
+%(auto_source){
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+DEFINE_PUBLIC_ALIAS(DOS$wmempcpy, libd_wmempcpy);
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+NOTHROW_NCX(LIBDCALL libd_wmempcpy)(char16_t *__restrict dst,
+                                    char16_t const *__restrict src,
+                                    size_t num_chars) {
+	return (char16_t *)libc_mempcpyw(dst, src, num_chars);
+}
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+}
+
 @@Same as `memcpyw', but return `DST + N_WORDS', rather than `DST'
 [[fast, libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempcpy")]]
-[[alias("DOS$wmempcpy")]]
-[[if(!defined(__KERNEL__)), export_as("DOS$wmempcpy")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempcpy")]]
+[[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), export_as("DOS$wmempcpy")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPCPYW))]]
 mempcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
           [[nonnull]] /*aligned(2)*/ void const *__restrict src,
@@ -1188,7 +1212,7 @@ mempcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 @@Copy memory between non-overlapping memory blocks.
 [[fast, libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemcpy")]]
-[[if(defined(__PE__)), alias("KOS$wmemcpy")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemcpy")]]
 [[if(!defined(__KERNEL__)), export_as("wmemcpy")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCPYL))]]
 memcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
@@ -1204,7 +1228,7 @@ memcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
 @@Same as `memcpyl', but return `DST + N_DWORDS', rather than `DST'
 [[fast, libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempcpy")]]
-[[if(defined(__PE__)), alias("KOS$wmempcpy")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempcpy")]]
 [[if(!defined(__KERNEL__)), export_as("wmempcpy")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPCPYL))]]
 mempcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
@@ -1226,11 +1250,23 @@ mempmoveb:([[nonnull]] /*aligned(1)*/ void *dst,
            [[nonnull]] /*aligned(1)*/ void const *src,
            $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t * = mempmove;
 
+%(auto_source){
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+DEFINE_PUBLIC_ALIAS(DOS$wmemmove, libd_wmemmove);
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+NOTHROW_NCX(LIBDCALL libd_wmemmove)(char16_t *dst,
+                                    char16_t const *src,
+                                    size_t num_chars) {
+	return (char16_t *)libc_memmovew(dst, src, num_chars);
+}
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+}
+
 @@Move memory between potentially overlapping memory blocks.
 [[fast, libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
-[[alias("DOS$wmemmove")]]
-[[if(!defined(__KERNEL__)), export_as("DOS$wmemmove")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemmove")]]
+[[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), export_as("DOS$wmemmove")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEW))]]
 memmovew:([[nonnull]] /*aligned(2)*/ void *dst,
           [[nonnull]] /*aligned(2)*/ void const *src,
@@ -1250,11 +1286,23 @@ memmovew:([[nonnull]] /*aligned(2)*/ void *dst,
 	return (u16 *)dst;
 }
 
+%(auto_source){
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+DEFINE_PUBLIC_ALIAS(DOS$wmempmove, libd_wmempmove);
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
+NOTHROW_NCX(LIBDCALL libd_wmempmove)(char16_t *dst,
+                                     char16_t const *src,
+                                     size_t num_chars) {
+	return (char16_t *)libc_mempmovew(dst, src, num_chars);
+}
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+}
+
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST'
 [[fast, libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
-[[alias("DOS$wmempmove")]]
-[[if(!defined(__KERNEL__)), export_as("DOS$wmempmove")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempmove")]]
+[[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), export_as("DOS$wmempmove")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEW))]]
 mempmovew:([[nonnull]] /*aligned(2)*/ void *dst,
            [[nonnull]] /*aligned(2)*/ void const *src,
@@ -1265,7 +1313,7 @@ mempmovew:([[nonnull]] /*aligned(2)*/ void *dst,
 @@Move memory between potentially overlapping memory blocks.
 [[fast, libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
-[[if(defined(__PE__)), alias("KOS$wmemmove")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemmove")]]
 [[if(!defined(__KERNEL__)), export_as("wmemmove")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEL))]]
 memmovel:([[nonnull]] /*aligned(4)*/ void *dst,
@@ -1289,7 +1337,7 @@ memmovel:([[nonnull]] /*aligned(4)*/ void *dst,
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST'
 [[fast, libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
-[[if(defined(__PE__)), alias("KOS$wmempmove")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempmove")]]
 [[if(!defined(__KERNEL__)), export_as("wmempmove")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEL))]]
 mempmovel:([[nonnull]] /*aligned(4)*/ void *dst,
@@ -1326,7 +1374,7 @@ mempmovedownb:([[nonnull]] /*aligned(1)*/ void *dst,
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_WORDS')
 [[fast, libc, kernel, ATTR_LEAF, alias("memmovew")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
-[[alias("DOS$wmemmove")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemmove")]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEUPW))]]
 memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
@@ -1344,7 +1392,7 @@ memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS')
 [[fast, libc, kernel, ATTR_LEAF, alias("memmovew")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemmove")]]
-[[alias("DOS$wmemmove")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemmove")]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEDOWNW))]]
 memmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
@@ -1362,7 +1410,7 @@ memmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST >= SRC || !N_WORDS')
 [[fast, libc, kernel, ATTR_LEAF, alias("mempmovew")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
-[[alias("DOS$wmempmove")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempmove")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEUPW))]]
 mempmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
              [[nonnull]] /*aligned(2)*/ void const *src,
@@ -1373,7 +1421,7 @@ mempmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
 @@Same as `memmovew', but return `DST + N_WORDS', rather than `DST' (assumes that `DST <= SRC || !N_WORDS')
 [[fast, libc, kernel, ATTR_LEAF, alias("mempmovew")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempmove")]]
-[[alias("DOS$wmempmove")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempmove")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEDOWNW))]]
 mempmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
                [[nonnull]] /*aligned(2)*/ void const *src,
@@ -1384,7 +1432,7 @@ mempmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST >= SRC || !N_DWORDS')
 [[fast, libc, kernel, alias("memmovel"), ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
-[[if(defined(__PE__)), alias("KOS$wmemmove")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemmove")]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEUPL))]]
 memmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
@@ -1402,7 +1450,7 @@ memmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
 @@Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_DWORDS')
 [[fast, libc, kernel, ATTR_LEAF, alias("memmovel")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemmove")]]
-[[if(defined(__PE__)), alias("KOS$wmemmove")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemmove")]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMOVEDOWNL))]]
 memmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
@@ -1420,7 +1468,7 @@ memmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST >= SRC || !N_DWORDS')
 [[fast, libc, kernel, ATTR_LEAF, alias("mempmovel")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
-[[if(defined(__PE__)), alias("KOS$wmempmove")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempmove")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEUPL))]]
 mempmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
              [[nonnull]] /*aligned(4)*/ void const *src,
@@ -1431,7 +1479,7 @@ mempmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
 @@Same as `memmovew', but return `DST + N_DWORDS', rather than `DST' (assumes that `DST <= SRC || !N_DWORDS')
 [[fast, libc, kernel, ATTR_LEAF, alias("mempmovel")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempmove")]]
-[[if(defined(__PE__)), alias("KOS$wmempmove")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempmove")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPMOVEDOWNL))]]
 mempmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
                [[nonnull]] /*aligned(4)*/ void const *src,
@@ -1452,11 +1500,23 @@ memsetb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
 mempsetb:([[nonnull]] /*aligned(1)*/ void *__restrict dst,
           int byte, $size_t n_bytes) -> [[== dst + n_bytes]] $uint8_t * = mempset;
 
+%(auto_source){
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+DEFINE_PUBLIC_ALIAS(DOS$wmemset, libd_wmemset);
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
+NOTHROW_NCX(LIBDCALL libd_wmemset)(char16_t *dst,
+                                   char16_t filler,
+                                   size_t num_chars) {
+	return (char16_t *)libc_memsetw(dst, (u16)filler, num_chars);
+}
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+}
+
 @@Fill memory with a given word
 [[fast, libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemset")]]
-[[alias("DOS$wmemset")]]
-[[if(!defined(__KERNEL__)), export_as("DOS$wmemset")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemset")]]
+[[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), export_as("DOS$wmemset")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMSETW))]]
 memsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
          $uint16_t word, $size_t n_words) -> [[== dst]] $uint16_t * {
@@ -1466,11 +1526,23 @@ memsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 	return (u16 *)dst;
 }
 
+%(auto_source){
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+DEFINE_PUBLIC_ALIAS(DOS$wmempset, libd_wmempset);
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
+NOTHROW_NCX(LIBDCALL libd_wmempset)(char16_t *dst,
+                                    char16_t filler,
+                                    size_t num_chars) {
+	return (char16_t *)libc_mempsetw(dst, (u16)filler, num_chars);
+}
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+}
+
 @@Same as `memsetw', but return `DST + N_WORDS', rather than `DST'
 [[fast, libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmempset")]]
-[[alias("DOS$wmempset")]]
-[[if(!defined(__KERNEL__)), export_as("DOS$wmempset")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmempset")]]
+[[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), export_as("DOS$wmempset")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPSETW))]]
 mempsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
           $uint16_t word, $size_t n_words) -> [== dst + n_words * 2] $uint16_t * {
@@ -1480,7 +1552,7 @@ mempsetw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
 @@Fill memory with a given dword
 [[fast, libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemset")]]
-[[if(defined(__PE__)), alias("KOS$wmemset")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemset")]]
 [[if(!defined(__KERNEL__)), export_as("wmemset")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMSETL))]]
 memsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
@@ -1494,7 +1566,7 @@ memsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
 @@Same as `memsetl', but return `DST + N_DWORDS', rather than `DST'
 [[fast, libc, kernel, ATTR_LEAF]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmempset")]]
-[[if(defined(__PE__)), alias("KOS$wmempset")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmempset")]]
 [[if(!defined(__KERNEL__)), export_as("wmempset")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMPSETL))]]
 mempsetl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
@@ -1509,11 +1581,23 @@ int memcmpb([[nonnull]] /*aligned(1)*/ void const *s1,
             [[nonnull]] /*aligned(1)*/ void const *s2,
             $size_t n_bytes) = memcmp;
 
+%(auto_source){
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+DEFINE_PUBLIC_ALIAS(DOS$wmemcmp, libd_wmemcmp);
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+NOTHROW_NCX(LIBDCALL libd_wmemcmp)(char16_t const *s1,
+                                   char16_t const *s2,
+                                   size_t num_chars) {
+	return libc_memcmpw(s1, s2, num_chars);
+}
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+}
+
 @@Compare memory buffers and return the difference of the first non-matching word
 [[fast, libc, kernel, wunused, ATTR_PURE]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemcmp")]]
-[[alias("DOS$wmemcmp")]]
-[[if(!defined(__KERNEL__)), export_as("DOS$wmemcmp")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemcmp")]]
+[[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), export_as("DOS$wmemcmp")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPW))]]
 $int16_t memcmpw([[nonnull]] /*aligned(2)*/ void const *s1,
                  [[nonnull]] /*aligned(2)*/ void const *s2, $size_t n_words) {
@@ -1528,7 +1612,7 @@ $int16_t memcmpw([[nonnull]] /*aligned(2)*/ void const *s1,
 @@Compare memory buffers and return the difference of the first non-matching dword
 [[fast, libc, kernel, wunused, ATTR_PURE]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemcmp")]]
-[[if(defined(__PE__)), alias("KOS$wmemcmp")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemcmp")]]
 [[if(!defined(__KERNEL__)), export_as("wmemcmp")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPL))]]
 $int32_t memcmpl([[nonnull]] /*aligned(4)*/ void const *s1,
@@ -1549,11 +1633,23 @@ $uint8_t *memchrb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, in
 	[([[nonnull]] /*aligned(1)*/ void const *__restrict haystack, int byte, $size_t n_bytes): $uint8_t const *]
 	= memchr;
 
+%(auto_source){
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+DEFINE_PUBLIC_ALIAS(DOS$wmemchr, libd_wmemchr);
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
+NOTHROW_NCX(LIBDCALL libd_wmemchr)(char16_t const *haystack,
+                                   char16_t needle,
+                                   size_t num_chars) {
+	return (char16_t *)libc_memchrw(haystack, (u16)needle, num_chars);
+}
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+}
+
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
 [[fast, libc, kernel, wunused, ATTR_PURE]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("wmemchr")]]
-[[alias("DOS$wmemchr")]]
-[[if(!defined(__KERNEL__)), export_as("DOS$wmemchr")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemchr")]]
+[[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), export_as("DOS$wmemchr")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCHRW))]]
 $uint16_t *memchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $uint16_t word, $size_t n_words)
 	[([[nonnull]] /*aligned(2)*/ void *__restrict haystack, $uint16_t word, $size_t n_words): $uint16_t *]
@@ -1570,7 +1666,7 @@ $uint16_t *memchrw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack, $
 @@Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
 [[fast, libc, kernel, wunused, ATTR_PURE]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("wmemchr")]]
-[[if(defined(__PE__)), alias("KOS$wmemchr")]]
+[[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemchr")]]
 [[if(!defined(__KERNEL__)), export_as("wmemchr")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCHRL))]]
 $uint32_t *memchrl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack, $uint32_t dword, $size_t n_dwords)

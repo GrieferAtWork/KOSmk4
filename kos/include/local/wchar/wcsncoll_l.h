@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa0b5de2 */
+/* HASH CRC-32:0xe8b869c2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,12 +27,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_wcsncoll_defined 1
 #ifdef __CRT_HAVE_wcsncoll
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncoll,(__s1,__s2,__maxlen))
-#else /* __CRT_HAVE_wcsncoll */
+#elif defined(__CRT_HAVE__wcsncoll)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),_wcsncoll,(__s1,__s2,__maxlen))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <local/wchar/wcsncoll.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcsncoll __LIBC_LOCAL_NAME(wcsncoll)
-#endif /* !__CRT_HAVE_wcsncoll */
+#endif /* !... */
 #endif /* !__local___localdep_wcsncoll_defined */
 __LOCAL_LIBC(wcsncoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncoll_l))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale) {
