@@ -32,6 +32,12 @@ DECL_BEGIN
 /*[[[skip:libc_OpenAt]]]*/
 /*[[[skip:libc_OpenAt64]]]*/
 
+
+
+
+
+
+
 /*[[[start:exports,hash:CRC-32=0x0]]]*/
 /*[[[end:exports]]]*/
 

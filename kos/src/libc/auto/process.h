@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa9f3110 */
+/* HASH CRC-32:0xfcdfbc23 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,12 +29,49 @@
 
 DECL_BEGIN
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF uintptr_t NOTHROW_NCX(LIBDCALL libd__beginthread)(__dos_beginthread_entry_t entry, u32 stacksz, void *arg);
+INTDEF uintptr_t NOTHROW_NCX(LIBDCALL libd__beginthreadex)(void *sec, u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, u32 flags, u32 *threadaddr);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF void NOTHROW_NCX(LIBCCALL libc__endthread)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF void NOTHROW_NCX(LIBDCALL libd__endthreadex)(u32 exitcode);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF void (LIBCCALL libc__c_exit)(void) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF intptr_t (LIBDCALL libd__loaddll)(char __KOS_FIXED_CONST *file) THROWS(...);
+INTDEF int (LIBDCALL libd__unloaddll)(intptr_t hnd) THROWS(...);
+INTDEF __procfun (LIBDCALL libd__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) THROWS(...);
+INTDEF pid_t NOTHROW_RPC(LIBDCALL libd_cwait)(int *tstat, pid_t pid, int action);
+INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnv)(int mode, char const *__restrict path, __TARGV);
+INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnvp)(int mode, char const *__restrict file, __TARGV);
+INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnve)(int mode, char const *__restrict path, __TARGV, __TENVP);
+INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnvpe)(int mode, char const *__restrict file, __TARGV, __TENVP);
+INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnl)(int mode, char const *__restrict path, char const *args, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnl)(int mode, char const *__restrict path, char const *args, ...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnlp)(int mode, char const *__restrict file, char const *args, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlp)(int mode, char const *__restrict file, char const *args, ...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnle)(int mode, char const *__restrict path, char const *args, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode, char const *__restrict path, char const *args, ...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnlpe)(int mode, char const *__restrict file, char const *args, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(int mode, char const *__restrict file, char const *args, ...);
 #endif /* !__KERNEL__ */
 

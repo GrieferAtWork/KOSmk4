@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee6b82fa */
+/* HASH CRC-32:0xaa163c98 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_ULIMIT_H 1
 
 #include "../api.h"
+#include "../auto/ulimit.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

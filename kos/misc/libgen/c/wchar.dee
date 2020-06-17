@@ -56,6 +56,7 @@ global final WCHAR_REPLACEMENT_WIDTH: (int, int) = { 16, 32 };
 global final WCHAR_REPLACEMENT_SIZE:  (int, int) = { 2, 4 };
 global final WCHAR_REPLACEMENT_STR:   (string, string) = { "u", "U" };
 global final WCHAR_REPLACEMENT_CC:    (string, string) = { "LIBDCALL", "LIBKCALL" };
+global final WCHAR_REPLACEMENT_VCC:   (string, string) = { "VLIBDCALL", "VLIBKCALL" };
 
 @@Mapping of all local functions ever defined (by name)
 @@Duplicate entires aren't allowed

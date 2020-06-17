@@ -33,6 +33,29 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
+/*[[[head:libd_ptrace,hash:CRC-32=0x3521f19a]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+/* Perform process tracing functions. REQUEST is one of
+ * the values above, and determines the action to be taken.
+ * For all requests except PTRACE_TRACEME, PID specifies the process to be traced.
+ *
+ * PID and the other arguments described above for the various requests should
+ * appear (those that are used for the particular request) as:
+ *     pid_t PID, void *ADDR, int DATA, void *ADDR2
+ * after REQUEST */
+INTERN ATTR_SECTION(".text.crt.dos.system.ptrace") longptr_t
+NOTHROW_NCX(VLIBDCALL libd_ptrace)(__ptrace_request_t request,
+                                   ...)
+/*[[[body:libd_ptrace]]]*/
+/*AUTO*/{
+	(void)request;
+	CRT_UNIMPLEMENTED("ptrace"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+#endif /* MAGIC:impl_if */
+/*[[[end:libd_ptrace]]]*/
+
 /*[[[head:libc_ptrace,hash:CRC-32=0x21d6ab4a]]]*/
 /* Perform process tracing functions. REQUEST is one of
  * the values above, and determines the action to be taken.
@@ -65,7 +88,10 @@ NOTHROW_NCX(VLIBCCALL libc_ptrace)(__ptrace_request_t request,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xeeda6583]]]*/
+/*[[[start:exports,hash:CRC-32=0x65019c92]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(DOS$ptrace, libd_ptrace);
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(ptrace, libc_ptrace);
 /*[[[end:exports]]]*/
 

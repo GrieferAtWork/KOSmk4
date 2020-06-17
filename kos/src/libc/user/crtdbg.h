@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf78cc1d1 */
+/* HASH CRC-32:0xb9b05961 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,24 +31,24 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF __LONG32_TYPE__ *NOTHROW_NCX(LIBCCALL libc___p__crtAssertBusy)(void);
-INTDEF __LONG32_TYPE__ *NOTHROW_NCX(LIBCCALL libc___p__crtBreakAlloc)(void);
-INTDEF int *NOTHROW_NCX(LIBCCALL libc___p__crtDbgFlag)(void);
-INTDEF _CRT_REPORT_HOOK NOTHROW_NCX(LIBCCALL libc__CrtGetReportHook)(void);
-INTDEF _CRT_REPORT_HOOK NOTHROW_NCX(LIBCCALL libc__CrtSetReportHook)(_CRT_REPORT_HOOK pfn_new_hook);
-INTDEF int NOTHROW_NCX(LIBCCALL libc__CrtSetReportHook2)(int mode, _CRT_REPORT_HOOK pfn_new_hook);
-INTDEF int NOTHROW_NCX(LIBCCALL libc__CrtSetReportHookW2)(int mode, _CRT_REPORT_HOOKW pfn_new_hook);
-INTDEF _CRT_ALLOC_HOOK NOTHROW_NCX(LIBCCALL libc__CrtGetAllocHook)(void);
-INTDEF _CRT_ALLOC_HOOK NOTHROW_NCX(LIBCCALL libc__CrtSetAllocHook)(_CRT_ALLOC_HOOK pfn_new_hook);
-INTDEF _CRT_DUMP_CLIENT NOTHROW_NCX(LIBCCALL libc__CrtGetDumpClient)(void);
-INTDEF _CRT_DUMP_CLIENT NOTHROW_NCX(LIBCCALL libc__CrtSetDumpClient)(_CRT_DUMP_CLIENT pfn_new_dump);
-INTDEF int NOTHROW_NCX(LIBCCALL libc__CrtSetReportMode)(int report_type, int report_mode);
-INTDEF _HFILE NOTHROW_NCX(LIBCCALL libc__CrtSetReportFile)(int report_type, _HFILE report_file);
-INTDEF size_t NOTHROW_NCX(LIBCCALL libc__CrtSetDebugFillThreshold)(size_t new_debug_fill_threshold);
-INTDEF int NOTHROW_NCX(VLIBCCALL libc__CrtDbgReport)(int report_type, char const *filename, int line, char const *module_name, char const *format, ...);
-INTDEF int NOTHROW_NCX(VLIBCCALL libc__CrtDbgReportW)(int report_type, __WCHAR16_TYPE__ const *filename, int line, __WCHAR16_TYPE__ const *module_name, __WCHAR16_TYPE__ const *format, ...);
-INTDEF void NOTHROW_NCX(LIBCCALL libc__CrtDbgBreak)(void);
-INTDEF __LONG32_TYPE__ NOTHROW_NCX(LIBCCALL libc__CrtSetBreakAlloc)(__LONG32_TYPE__ break_alloc);
+INTDEF __LONG32_TYPE__ *NOTHROW_NCX(LIBDCALL libc___p__crtAssertBusy)(void);
+INTDEF __LONG32_TYPE__ *NOTHROW_NCX(LIBDCALL libc___p__crtBreakAlloc)(void);
+INTDEF int *NOTHROW_NCX(LIBDCALL libc___p__crtDbgFlag)(void);
+INTDEF _CRT_REPORT_HOOK NOTHROW_NCX(LIBDCALL libc__CrtGetReportHook)(void);
+INTDEF _CRT_REPORT_HOOK NOTHROW_NCX(LIBDCALL libc__CrtSetReportHook)(_CRT_REPORT_HOOK pfn_new_hook);
+INTDEF int NOTHROW_NCX(LIBDCALL libc__CrtSetReportHook2)(int mode, _CRT_REPORT_HOOK pfn_new_hook);
+INTDEF int NOTHROW_NCX(LIBDCALL libc__CrtSetReportHookW2)(int mode, _CRT_REPORT_HOOKW pfn_new_hook);
+INTDEF _CRT_ALLOC_HOOK NOTHROW_NCX(LIBDCALL libc__CrtGetAllocHook)(void);
+INTDEF _CRT_ALLOC_HOOK NOTHROW_NCX(LIBDCALL libc__CrtSetAllocHook)(_CRT_ALLOC_HOOK pfn_new_hook);
+INTDEF _CRT_DUMP_CLIENT NOTHROW_NCX(LIBDCALL libc__CrtGetDumpClient)(void);
+INTDEF _CRT_DUMP_CLIENT NOTHROW_NCX(LIBDCALL libc__CrtSetDumpClient)(_CRT_DUMP_CLIENT pfn_new_dump);
+INTDEF int NOTHROW_NCX(LIBDCALL libc__CrtSetReportMode)(int report_type, int report_mode);
+INTDEF _HFILE NOTHROW_NCX(LIBDCALL libc__CrtSetReportFile)(int report_type, _HFILE report_file);
+INTDEF size_t NOTHROW_NCX(LIBDCALL libc__CrtSetDebugFillThreshold)(size_t new_debug_fill_threshold);
+INTDEF int NOTHROW_NCX(VLIBDCALL libc__CrtDbgReport)(int report_type, char const *filename, int line, char const *module_name, char const *format, ...);
+INTDEF int NOTHROW_NCX(VLIBDCALL libc__CrtDbgReportW)(int report_type, __WCHAR16_TYPE__ const *filename, int line, __WCHAR16_TYPE__ const *module_name, __WCHAR16_TYPE__ const *format, ...);
+INTDEF void NOTHROW_NCX(LIBDCALL libc__CrtDbgBreak)(void);
+INTDEF __LONG32_TYPE__ NOTHROW_NCX(LIBDCALL libc__CrtSetBreakAlloc)(__LONG32_TYPE__ break_alloc);
 #endif /* !__KERNEL__ */
 
 DECL_END

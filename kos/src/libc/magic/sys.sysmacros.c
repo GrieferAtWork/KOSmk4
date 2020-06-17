@@ -21,7 +21,7 @@
 %[define_replacement(major_t = __major_t)]
 %[define_replacement(minor_t = __minor_t)]
 %[define_replacement(dev_t = __dev_t)]
-%[default:section(".text.crt.system.utility")]
+%[default:section(".text.crt{|.dos}.system.utility")]
 
 %{
 #include <features.h>

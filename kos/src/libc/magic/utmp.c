@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default:section(".text.crt.database.utmp")]
+%[default:section(".text.crt{|.dos}.database.utmp")]
 
 %{
 #include <features.h>
@@ -58,7 +58,7 @@ __SYSDECL_BEGIN
 
 @@Make FD be the controlling terminal, stdin, stdout, and stderr;
 @@then close FD. Returns 0 on success, nonzero on error
-[[cp_kos, section(".text.crt.io.tty")]]
+[[cp_kos, section(".text.crt{|.dos}.io.tty")]]
 int login_tty($fd_t fd);
 
 @@Write the given entry into utmp and wtmp

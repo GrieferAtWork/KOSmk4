@@ -147,6 +147,25 @@ NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
 /*[[[skip:libc_strerror_s]]]*/
 /*[[[skip:libc_strerrorname_s]]]*/
 
+/*[[[head:libd_strerror_s,hash:CRC-32=0xef00806b]]]*/
+INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
+NOTHROW(LIBDCALL libd_strerror_s)(errno_t errnum)
+/*[[[body:libd_strerror_s]]]*/
+{
+	return libc_strerror_s(libd_errno_dos2kos(errnum));
+}
+/*[[[end:libd_strerror_s]]]*/
+
+/*[[[head:libd_strerrorname_s,hash:CRC-32=0x26a4b765]]]*/
+INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
+NOTHROW(LIBDCALL libd_strerrorname_s)(int errnum)
+/*[[[body:libd_strerrorname_s]]]*/
+{
+	return libc_strerrorname_s(libd_errno_dos2kos(errnum));
+}
+/*[[[end:libd_strerrorname_s]]]*/
+
+
 
 #ifndef sys_siglist
 #undef _sys_siglist
@@ -173,7 +192,9 @@ NOTHROW(LIBCCALL libc_strsignal_s)(int signum)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x9710ba89]]]*/
+/*[[[start:exports,hash:CRC-32=0x700644fe]]]*/
+DEFINE_PUBLIC_ALIAS(DOS$strerror_s, libd_strerror_s);
+DEFINE_PUBLIC_ALIAS(DOS$strerrorname_s, libd_strerrorname_s);
 DEFINE_PUBLIC_ALIAS(strsignal_s, libc_strsignal_s);
 /*[[[end:exports]]]*/
 

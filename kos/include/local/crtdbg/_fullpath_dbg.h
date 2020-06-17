@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6da26f88 */
+/* HASH CRC-32:0x78fe25fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,char *,__NOTHROW_RPC,__localdep__fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),_fullpath,(__buf,__path,__buflen))
 #endif /* !__local___localdep__fullpath_defined */
 __LOCAL_LIBC(_fullpath_dbg) __ATTR_WUNUSED __ATTR_NONNULL((2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fullpath_dbg))(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) {
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_fullpath_dbg))(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;

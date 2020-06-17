@@ -24,9 +24,9 @@
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 %[define_replacement(mbstate_t = __mbstate_t)]
-%[default:section(".text.crt.unicode.mbr")]
+%[default:section(".text.crt{|.dos}.unicode.mbr")]
 
-%[declare_known_section(".text.crt.wchar.unicode.convert")]
+%[declare_known_section(".text.crt{|.dos}.wchar.unicode.convert")]
 %[declare_known_section(".text.crt.dos.wchar.unicode.convert")]
 
 

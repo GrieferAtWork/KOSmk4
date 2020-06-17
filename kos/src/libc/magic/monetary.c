@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default:section(".text.crt.utility.monetary")]
+%[default:section(".text.crt{|.dos}.utility.monetary")]
 
 
 %{

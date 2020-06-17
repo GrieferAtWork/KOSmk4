@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4acab77 */
+/* HASH CRC-32:0x2fd0e392 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #endif /* !... */
 #endif /* !__local___localdep_realloc_defined */
 __LOCAL_LIBC(_realloc_dbg) __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_realloc_dbg))(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) {
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_realloc_dbg))(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;

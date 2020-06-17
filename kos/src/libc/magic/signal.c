@@ -31,7 +31,7 @@
 %[define_replacement(timespec64   = __timespec64)]
 %[default:section(".text.crt{|.dos}.sched.signal")]
 
-%(user){
+%(auto_header,user){
 DECL_END
 #include <bits/sigaction.h>
 DECL_BEGIN

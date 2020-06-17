@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%[default:section(".text.crt.net.db")]
+%[default:section(".text.crt{|.dos}.net.db")]
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(sa_family_t = __UINT16_TYPE__)]

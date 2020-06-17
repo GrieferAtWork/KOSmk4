@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default:section(".text.crt.string.argz")]
+%[default:section(".text.crt{|.dos}.string.argz")]
 %[define_partial_replacement(argc = ___argc)]
 %[define_partial_replacement(argv = ___argv)]
 

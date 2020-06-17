@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(errno_t = __errno_t)]
-%[default:section(".text.crt.error")]
+%[default:section(".text.crt{|.dos}.error")]
 
 %(auto_source){
 /* Use the KOS-special `libc_strerror_s()' functions, rather than strerror()

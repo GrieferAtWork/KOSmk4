@@ -22,7 +22,7 @@
 %[define_replacement(syscall_ulong_t = __syscall_ulong_t)]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
-%[default:section(".text.crt.sched.futexexpr")]
+%[default:section(".text.crt{|.dos}.sched.futexexpr")]
 
 %{
 #include <features.h>
@@ -266,7 +266,7 @@ int lfutexexpr(void *base, $size_t exprc, [[nonnull]] struct lfutexexpr const *e
 [[cp, decl_include("<bits/types.h>", "<bits/timespec.h>", "<kos/bits/futex-expr.h>")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("lfutexlockexpr64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("lfutexlockexpr")]]
-[[section(".text.crt.sched.futexlockexpr"), no_crt_self_import]]
+[[section(".text.crt{|.dos}.sched.futexlockexpr"), no_crt_self_import]]
 [[userimpl, requires($has_function(lfutexlockexpr32) || $has_function(lfutexlockexpr64))]]
 int lfutexlockexpr([[nonnull]] lfutex_t *ulockaddr, void *base,
                    $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
@@ -305,7 +305,7 @@ int lfutexexpr64(void *base, $size_t exprc, [[nonnull]] struct lfutexexpr const 
 
 [[cp, time64_variant_of(lfutexlockexpr), doc_alias("lfutexlockexpr")]]
 [[decl_include("<bits/types.h>", "<bits/timespec.h>", "<kos/bits/futex-expr.h>")]]
-[[userimpl, requires_function(lfutexlockexpr32), section(".text.crt.sched.futexlockexpr")]]
+[[userimpl, requires_function(lfutexlockexpr32), section(".text.crt{|.dos}.sched.futexlockexpr")]]
 int lfutexlockexpr64([[nonnull]] lfutex_t *ulockaddr, void *base,
                      $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
                      struct timespec64 const *timeout, unsigned int timeout_flags) {

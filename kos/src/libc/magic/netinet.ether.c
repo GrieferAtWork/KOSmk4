@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%[default:section(".text.crt.net.ether")]
+%[default:section(".text.crt{|.dos}.net.ether")]
 
 %{
 #include <features.h>

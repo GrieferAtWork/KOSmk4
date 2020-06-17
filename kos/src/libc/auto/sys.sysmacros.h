@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf03341 */
+/* HASH CRC-32:0xdbc7285b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,22 @@
 
 DECL_BEGIN
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_CONST WUNUSED major_t NOTHROW(LIBDCALL libd_gnu_dev_major)(dev_t dev);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_CONST WUNUSED major_t NOTHROW(LIBCCALL libc_gnu_dev_major)(dev_t dev);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_CONST WUNUSED minor_t NOTHROW(LIBDCALL libd_gnu_dev_minor)(dev_t dev);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF ATTR_CONST WUNUSED minor_t NOTHROW(LIBCCALL libc_gnu_dev_minor)(dev_t dev);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_CONST WUNUSED dev_t NOTHROW(LIBDCALL libd_gnu_dev_makedev)(major_t major, minor_t minor);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF ATTR_CONST WUNUSED dev_t NOTHROW(LIBCCALL libc_gnu_dev_makedev)(major_t major, minor_t minor);
 #endif /* !__KERNEL__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcf8be23 */
+/* HASH CRC-32:0x3bfc2424 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wtempnam_dbg) __ATTR_WUNUSED __WCHAR16_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wtempnam_dbg))(__WCHAR16_TYPE__ const *__dir_name, __WCHAR16_TYPE__ const *__file_prefix, int __block_type, char const *__filename, int __line) {
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_wtempnam_dbg))(__WCHAR16_TYPE__ const *__dir_name, __WCHAR16_TYPE__ const *__file_prefix, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;

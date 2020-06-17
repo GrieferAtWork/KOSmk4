@@ -56,6 +56,9 @@ BEGIN
 			"auto/*.c",
 			"user/*.c",
 		})
+		if (!TARGET.LIBC_LIBDCALL_IS_LIBKCALL) {
+			SOURCE({ "auto/dosabi/*.c" })
+		}
 	END
 	BEGIN GROUP("libs.libc") { COMPILE };
 		SET_LANGUAGE("assembler-with-cpp")
@@ -103,40 +106,40 @@ BEGIN
 					symbols_set.update(CRT_DLSUBST_GLOBALS);
 					updateFileContents(self.group.fixFilename(LIBC_FEATURES_HEADER), [](fp: File){
 						fp << COPYRIGHT << "\n\n\n";
-						local dosSymbols = HashSet();
-						for (local x: symbols_set.sorted()) {
-							if (x.startswith("?")) {
-								fp << "#define __CRT_HAVE_"
-									<< x.replace("?", "$Q").replace("@", "$A")
-									<< " 1\n";
-							} else if (x.startswith("DOS$")) {
-								dosSymbols.insert(x[4:]);
-							} else {
+						if (!TARGET.DL_HAVE_PE_COMPAT) {
+							for (local x: symbols_set.sorted())
 								fp << "#define __CRT_HAVE_" << x << " 1\n";
-							}
-						}
-						if (dosSymbols) {
-							local kosSymbols = HashSet();
-							for (local x: dosSymbols) {
-								if (x in symbols_set) {
-									/* Symbol exists twice (once for DOS, and once for KOS) */
-									kosSymbols.insert("KOS$" + x);
+						} else {
+							local dosSymbols     = HashSet(); /* Symbols exposed with a DOS$ prefix */
+							for (local x: symbols_set.sorted()) {
+								if (x.startswith("?")) {
+									fp << "#define __CRT_HAVE_"
+										<< x.replace("?", "$Q").replace("@", "$A")
+										<< " 1\n";
+								} else if (x.startswith("DOS$")) {
+									dosSymbols.insert(x[4:]);
 								} else {
-									/* Symbol exists only in DOS-mode */
-									kosSymbols.insert(x);
+									fp << "#define __CRT_HAVE_" << x << " 1\n";
 								}
 							}
-							if (kosSymbols) {
+							if (dosSymbols) {
+								dosSymbols = dosSymbols.sorted();
 								fp << "#ifdef __PE__\n";
-								for (local x: kosSymbols.sorted())
-									fp << "#define __CRT_HAVE_" << x << " 1\n";
+								for (local x: dosSymbols) {
+									/* Functions that only exist in DOS */
+									if (x in symbols_set) {
+										/* Hybrid symbol */
+										fp << "#define __CRT_HAVE_KOS$" << x << " 1\n";
+									} else {
+										/* DOS-only symbol symbol */
+										fp << "#define __CRT_HAVE_" << x << " 1\n";
+									}
+								}
 								fp << "#else /* __PE__ */\n";
-							} else {
-								fp << "#ifndef __PE__\n";
+								for (local x: dosSymbols)
+									fp << "#define __CRT_HAVE_DOS$" << x << " 1\n";
+								fp << "#endif /* !__PE__ */\n";
 							}
-							for (local x: dosSymbols.sorted())
-								fp << "#define __CRT_HAVE_DOS$" << x << " 1\n";
-							fp << "#endif /* !__PE__ */\n";
 						}
 					});
 				}
@@ -184,6 +187,9 @@ BEGIN
 			"user/*.c",
 			"auto/*.c",
 		})
+		if (!TARGET.LIBC_LIBDCALL_IS_LIBKCALL) {
+			SOURCE({ "auto/dosabi/*.c" })
+		}
 	END
 
 	/* TODO: After linking, edit libc.so to turn all weak symbol declarations into full symbols.

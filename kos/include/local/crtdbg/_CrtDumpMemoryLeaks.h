@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fa4125e */
+/* HASH CRC-32:0x333af1c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtDumpMemoryLeaks) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtDumpMemoryLeaks))(void) {
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtDumpMemoryLeaks))(void) {
 	__COMPILER_IMPURE();
 	return 0;
 }

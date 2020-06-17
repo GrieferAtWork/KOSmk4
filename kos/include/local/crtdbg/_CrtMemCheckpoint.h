@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xacb41e91 */
+/* HASH CRC-32:0x4eee8881 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memset */
 #endif /* !__local___localdep_memset_defined */
 __LOCAL_LIBC(_CrtMemCheckpoint) __ATTR_NONNULL((1)) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtMemCheckpoint))(_CrtMemState *__state) {
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtMemCheckpoint))(_CrtMemState *__state) {
 	__localdep_memset(__state, 0, sizeof(*__state));
 }
 __NAMESPACE_LOCAL_END

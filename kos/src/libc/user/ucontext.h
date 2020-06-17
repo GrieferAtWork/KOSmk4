@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29b0cbea */
+/* HASH CRC-32:0x5dc2c311 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_UCONTEXT_H 1
 
 #include "../api.h"
+#include "../auto/ucontext.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
@@ -37,6 +38,16 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_setcontext)(ucontext_t const *
 /* Save current context in context variable pointed to by OUCP and set
  * context from variable pointed to by UCP */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__restrict oucp, ucontext_t const *__restrict ucp);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Manipulate user context UCP to continue with calling functions FUNC
+ * and the ARGC-1 parameters following ARGC when the context is used
+ * the next time in `setcontext' or `swapcontext'.
+ * We cannot say anything about the parameters FUNC takes; `void'
+ * is as good as any other choice */
+INTDEF NONNULL((1, 2)) void NOTHROW_NCX(VLIBDCALL libd_makecontext)(ucontext_t *ucp, __makecontext_func_t func, int argc, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Manipulate user context UCP to continue with calling functions FUNC
  * and the ARGC-1 parameters following ARGC when the context is used
  * the next time in `setcontext' or `swapcontext'.

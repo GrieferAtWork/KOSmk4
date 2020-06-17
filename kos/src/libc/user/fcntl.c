@@ -30,8 +30,8 @@
 DECL_BEGIN
 
 
-PRIVATE ATTR_SECTION(".text.crt.dos.io.access.oflag_dos2kos")
-oflag_t NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
+PRIVATE ATTR_SECTION(".text.crt.dos.io.access") oflag_t
+NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 	oflag_t result;
 	result = dos_oflags & (O_ACCMODE | O_TRUNC);
 	if (dos_oflags & __DOS_O_APPEND)
@@ -58,11 +58,15 @@ oflag_t NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 }
 
 
-DEFINE_PUBLIC_ALIAS(DOS$open, libd_open);
-DEFINE_PUBLIC_ALIAS(DOS$_open, libd_open);
-INTERN WUNUSED NONNULL((1))
-ATTR_SECTION(".text.crt.dos.io.access.open") fd_t
-NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename, oflag_t oflags, ...) {
+
+
+/*[[[head:libd_open,hash:CRC-32=0x2928b750]]]*/
+INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((1)) fd_t
+NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
+                                 oflag_t oflags,
+                                 ...)
+/*[[[body:libd_open]]]*/
+{
 	fd_t result;
 	oflag_t kos_oflags;
 	va_list args;
@@ -94,22 +98,7 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename, oflag_t oflags, ...) {
 	}
 	return result;
 }
-
-
-DEFINE_PUBLIC_ALIAS(DOS$creat, libd_creat);
-DEFINE_PUBLIC_ALIAS(DOS$_creat, libd_creat);
-INTERN WUNUSED NONNULL((1))
-ATTR_SECTION(".text.crt.dos.io.access.creat") fd_t
-NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename, mode_t mode){
-	return libd_open(filename,
-	                 __DOS_O_CREAT | O_WRONLY | __DOS_O_TRUNC,
-	                 mode);
-}
-
-
-
-
-/*[[[start:implementation]]]*/
+/*[[[end:libd_open]]]*/
 
 /*[[[head:libc_open,hash:CRC-32=0xba1315d6]]]*/
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((1)) fd_t
@@ -136,6 +125,16 @@ NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename,
 }
 /*[[[end:libc_open]]]*/
 
+/*[[[head:libd_creat,hash:CRC-32=0x515ffa3c]]]*/
+INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((1)) fd_t
+NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename,
+                                 mode_t mode)
+/*[[[body:libd_creat]]]*/
+{
+	return libd_open(filename, __DOS_O_CREAT | O_WRONLY | __DOS_O_TRUNC, mode);
+}
+/*[[[end:libd_creat]]]*/
+
 /*[[[head:libc_creat,hash:CRC-32=0xaaefe2d]]]*/
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
@@ -153,6 +152,23 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_creat]]]*/
+
+/*[[[head:libd_openat,hash:CRC-32=0xb8b718ce]]]*/
+INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((2)) fd_t
+NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
+                                   char const *filename,
+                                   oflag_t oflags,
+                                   ...)
+/*[[[body:libd_openat]]]*/
+{
+	(void)dirfd;
+	(void)filename;
+	(void)oflags;
+	CRT_UNIMPLEMENTED("DOS$openat"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:libd_openat]]]*/
 
 /*[[[head:libc_openat,hash:CRC-32=0x3cf66674]]]*/
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((2)) fd_t
@@ -176,11 +192,18 @@ NOTHROW_RPC(VLIBCCALL libc_openat)(fd_t dirfd,
 
 
 DEFINE_INTERN_ALIAS(libc_open64, libc_open);
+DEFINE_INTERN_ALIAS(libd_open64, libd_open);
 DEFINE_INTERN_ALIAS(libc_creat64, libc_creat);
+DEFINE_INTERN_ALIAS(libd_creat64, libd_creat);
 DEFINE_INTERN_ALIAS(libc_openat64, libc_openat);
+DEFINE_INTERN_ALIAS(libd_openat64, libd_openat);
+/*[[[impl:libd_open64]]]*/
 /*[[[impl:libc_open64]]]*/
+/*[[[impl:libd_creat64]]]*/
 /*[[[impl:libc_creat64]]]*/
+/*[[[impl:libd_openat64]]]*/
 /*[[[impl:libc_openat64]]]*/
+
 
 
 
@@ -338,6 +361,7 @@ NOTHROW_NCX(LIBCCALL libc_fallocate64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_fallocate64]]]*/
 
+
 /*[[[head:libc_fcntl,hash:CRC-32=0x9ee9436b]]]*/
 INTERN ATTR_SECTION(".text.crt.io.utility") __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd,
@@ -461,7 +485,7 @@ NOTHROW_RPC(LIBCCALL libc_lockf64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc774c9c4]]]*/
+/*[[[start:exports,hash:CRC-32=0x8e2cb0a3]]]*/
 DEFINE_PUBLIC_ALIAS(readahead, libc_readahead);
 DEFINE_PUBLIC_ALIAS(sync_file_range, libc_sync_file_range);
 DEFINE_PUBLIC_ALIAS(vmsplice, libc_vmsplice);
@@ -473,13 +497,23 @@ DEFINE_PUBLIC_ALIAS(fallocate, libc_fallocate);
 DEFINE_PUBLIC_ALIAS(fallocate64, libc_fallocate64);
 DEFINE_PUBLIC_ALIAS(__fcntl, libc_fcntl);
 DEFINE_PUBLIC_ALIAS(fcntl, libc_fcntl);
+DEFINE_PUBLIC_ALIAS(DOS$__open, libd_open);
+DEFINE_PUBLIC_ALIAS(DOS$_open, libd_open);
+DEFINE_PUBLIC_ALIAS(DOS$open, libd_open);
 DEFINE_PUBLIC_ALIAS(__open, libc_open);
 DEFINE_PUBLIC_ALIAS(open, libc_open);
+DEFINE_PUBLIC_ALIAS(DOS$_creat, libd_creat);
+DEFINE_PUBLIC_ALIAS(DOS$creat, libd_creat);
 DEFINE_PUBLIC_ALIAS(creat, libc_creat);
+DEFINE_PUBLIC_ALIAS(DOS$__open64, libd_open64);
+DEFINE_PUBLIC_ALIAS(DOS$open64, libd_open64);
 DEFINE_PUBLIC_ALIAS(__open64, libc_open64);
 DEFINE_PUBLIC_ALIAS(open64, libc_open64);
+DEFINE_PUBLIC_ALIAS(DOS$creat64, libd_creat64);
 DEFINE_PUBLIC_ALIAS(creat64, libc_creat64);
+DEFINE_PUBLIC_ALIAS(DOS$openat, libd_openat);
 DEFINE_PUBLIC_ALIAS(openat, libc_openat);
+DEFINE_PUBLIC_ALIAS(DOS$openat64, libd_openat64);
 DEFINE_PUBLIC_ALIAS(openat64, libc_openat64);
 DEFINE_PUBLIC_ALIAS(posix_fadvise, libc_posix_fadvise);
 DEFINE_PUBLIC_ALIAS(posix_fallocate, libc_posix_fallocate);

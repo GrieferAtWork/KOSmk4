@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b19af6e */
+/* HASH CRC-32:0xc662e63c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_BITS_RESOURCE_H 1
 
 #include "../api.h"
+#include "../auto/bits.resource.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

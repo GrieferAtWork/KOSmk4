@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f4db8e9 */
+/* HASH CRC-32:0x13a8a11d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SYS_TIMEX_H 1
 
 #include "../api.h"
+#include "../auto/sys.timex.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

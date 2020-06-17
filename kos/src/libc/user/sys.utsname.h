@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e102ec0 */
+/* HASH CRC-32:0x877db9a6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SYS_UTSNAME_H 1
 
 #include "../api.h"
+#include "../auto/sys.utsname.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

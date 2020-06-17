@@ -146,19 +146,6 @@ NOBLOCK char const *NOTHROW(LIBCCALL libc_strerrorname_s)(int errnum) {
 	return result;
 }
 
-DEFINE_PUBLIC_ALIAS(DOS$strerror_s, libd_strerror_s);
-INTERN WUNUSED ATTR_CONST ATTR_SECTION(".text.crt.dos.errno.strerror_s")
-NOBLOCK char const *NOTHROW(LIBDCALL libd_strerror_s)(int errnum) {
-	return libc_strerror_s(libd_errno_dos2kos(errnum));
-}
-
-DEFINE_PUBLIC_ALIAS(DOS$strerrorname_s, libd_strerrorname_s);
-INTERN WUNUSED ATTR_CONST ATTR_SECTION(".text.crt.dos.errno.strerrorname_s")
-NOBLOCK char const *NOTHROW(LIBDCALL libd_strerrorname_s)(int errnum) {
-	return libc_strerrorname_s(libd_errno_dos2kos(errnum));
-}
-
-
 
 
 INTERN ATTR_CONST WUNUSED ATTR_RETNONNULL
@@ -347,44 +334,6 @@ NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_setnterrno)(/*nt*/ errno_t value) 
 	d->ed_kind  = LIBC_ERRNO_KIND_NT;
 	return -1;
 }
-
-
-DEFINE_PUBLIC_ALIAS(_get_errno, libd__get_errno);
-DEFINE_INTERN_ALIAS(libc__get_errno, libd__get_errno);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access._get_errno")
-NOBLOCK errno_t NOTHROW(LIBDCALL libd__get_errno)(errno_t *value) {
-	if (!value)
-		return __DOS_EINVAL;
-	*value = libd_geterrno();
-	return 0;
-}
-
-DEFINE_PUBLIC_ALIAS(_set_errno, libd__set_errno);
-DEFINE_INTERN_ALIAS(libc__set_errno, libd__set_errno);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access._set_errno")
-NOBLOCK errno_t NOTHROW(LIBDCALL libd__set_errno)(errno_t value) {
-	libd_seterrno(value);
-	return 0;
-}
-
-DEFINE_PUBLIC_ALIAS(_get_doserrno, libd__get_doserrno);
-DEFINE_INTERN_ALIAS(libc__get_doserrno, libd__get_doserrno);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access._get_doserrno")
-NOBLOCK errno_t NOTHROW(LIBDCALL libd__get_doserrno)(errno_t *value) {
-	if (!value)
-		return __DOS_EINVAL;
-	*value = libd_getnterrno();
-	return 0;
-}
-
-DEFINE_PUBLIC_ALIAS(_set_doserrno, libd__set_doserrno);
-DEFINE_INTERN_ALIAS(libc__set_doserrno, libd__set_doserrno);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access._set_doserrno")
-NOBLOCK errno_t NOTHROW(LIBDCALL libd__set_doserrno)(errno_t value) {
-	libd_setnterrno(value);
-	return 0;
-}
-
 
 
 

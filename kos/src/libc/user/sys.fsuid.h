@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x119ad5f7 */
+/* HASH CRC-32:0x3a77a07e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SYS_FSUID_H 1
 
 #include "../api.h"
+#include "../auto/sys.fsuid.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

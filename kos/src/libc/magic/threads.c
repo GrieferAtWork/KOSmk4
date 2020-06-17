@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default:section(".text.crt.sched.threads")]
+%[default:section(".text.crt{|.dos}.sched.threads")]
 
 %[define_replacement(tss_t = __tss_t)]
 %[define_replacement(thrd_t = __thrd_t)]

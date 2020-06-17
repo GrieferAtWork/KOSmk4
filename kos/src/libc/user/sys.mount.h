@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf861bbc2 */
+/* HASH CRC-32:0x5e3f6ca4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SYS_MOUNT_H 1
 
 #include "../api.h"
+#include "../auto/sys.mount.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

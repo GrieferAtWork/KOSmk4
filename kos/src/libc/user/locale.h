@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa7a1ee8 */
+/* HASH CRC-32:0xebabf12d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_LOCALE_H 1
 
 #include "../api.h"
+#include "../auto/locale.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

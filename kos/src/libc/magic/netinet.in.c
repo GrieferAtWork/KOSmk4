@@ -234,7 +234,7 @@ struct group_filter {
 
 }
 
-%[default:section(".text.crt.net.convert")]
+%[default:section(".text.crt{|.dos}.net.convert")]
 [[ATTR_CONST, impl_include("<hybrid/__byteswap.h>")]]
 [[if(defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohs")]]
 $uint16_t htons($uint16_t hostword) {
@@ -324,7 +324,7 @@ $uint64_t ntohq($uint64_t netquad) {
 #endif /* __NO_XBLOCK */
 #define IN6_IS_ADDR_MULTICAST(a)    (((__uint8_t const *)(a))[0] == __UINT8_C(0xff))
 }
-%[default:section(".text.crt.net.inet.6.bind_reserved")]
+%[default:section(".text.crt{|.dos}.net.inet.6.bind_reserved")]
 
 %
 %#ifdef __USE_MISC
@@ -365,7 +365,7 @@ struct ip6_mtuinfo {
 
 }
 
-%[default:section(".text.crt.net.inet.6.RFC_2292")]
+%[default:section(".text.crt{|.dos}.net.inet.6.RFC_2292")]
 @@Obsolete hop-by-hop and Destination Options Processing (RFC 2292)
 [[cp_kos, deprecated]]
 int inet6_option_space(int nbytes);
@@ -386,7 +386,7 @@ int inet6_option_next(struct cmsghdr const *cmsg, $uint8_t **tptrp);
 int inet6_option_find(struct cmsghdr const *cmsg, $uint8_t **tptrp, int type);
 
 
-%[default:section(".text.crt.net.inet.6.RFC_3542")]
+%[default:section(".text.crt{|.dos}.net.inet.6.RFC_3542")]
 @@Hop-by-Hop and Destination Options Processing (RFC 3542)
 [[cp_kos]]
 int inet6_opt_init(void *extbuf, socklen_t extlen);
@@ -413,7 +413,7 @@ int inet6_opt_find(void *extbuf, socklen_t extlen, int offset,
 int inet6_opt_get_val(void *databuf, int offset, void *val, socklen_t vallen);
 
 
-%[default:section(".text.crt.net.inet.6.RFC_3542")]
+%[default:section(".text.crt{|.dos}.net.inet.6.RFC_3542")]
 
 @@Routing Header Option (RFC 3542)
 [[cp_kos]]
@@ -434,7 +434,7 @@ int inet6_rth_segments(void const *bp);
 [[cp_kos, doc_alias("inet6_rth_space")]]
 struct in6_addr *inet6_rth_getaddr(void const *bp, int index);
 
-%[default:section(".text.crt.net.inet.6.ipv4_source_filter")]
+%[default:section(".text.crt{|.dos}.net.inet.6.ipv4_source_filter")]
 
 @@Get IPv4 source filter
 [[cp_kos]]
@@ -448,7 +448,7 @@ int setipv4sourcefilter($fd_t sockfd, struct in_addr interface_addr,
                         struct in_addr group, $uint32_t fmode,
                         $uint32_t numsrc, struct in_addr const *slist);
 
-%[default:section(".text.crt.net.inet.6.source_filter")]
+%[default:section(".text.crt{|.dos}.net.inet.6.source_filter")]
 
 @@Get source filter
 [[cp_kos]]

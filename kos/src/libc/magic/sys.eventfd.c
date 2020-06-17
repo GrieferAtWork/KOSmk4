@@ -20,7 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(eventfd_t = __UINT64_TYPE__)]
-%[default:section(".text.crt.sched.eventfd")]
+%[default:section(".text.crt{|.dos}.sched.eventfd")]
 
 %{
 #include <features.h>

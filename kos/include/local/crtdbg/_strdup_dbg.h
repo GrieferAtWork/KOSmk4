@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26a47c12 */
+/* HASH CRC-32:0xacc69777 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_strdup_defined */
 __LOCAL_LIBC(_strdup_dbg) __ATTR_MALLOC __ATTR_WUNUSED char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strdup_dbg))(char const *__string, int __block_type, char const *__filename, int __line) {
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_strdup_dbg))(char const *__string, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;

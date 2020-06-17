@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0d03fff */
+/* HASH CRC-32:0x50285146 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wdupenv_s_dbg) _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wdupenv_s_dbg))(__WCHAR16_TYPE__ **__pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR16_TYPE__ const *__varname, int __block_type, char const *__filename, int __line) {
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_wdupenv_s_dbg))(__WCHAR16_TYPE__ **__pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR16_TYPE__ const *__varname, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;

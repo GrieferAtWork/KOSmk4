@@ -19,7 +19,7 @@
  */
 
 
-%[default:section(".text.crt.system.reboot")]
+%[default:section(".text.crt{|.dos}.system.reboot")]
 
 %{
 #include <features.h>

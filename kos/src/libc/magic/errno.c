@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(errno_t = __errno_t)]
-%[default:section(".text.crt.errno.utility")]
+%[default:section(".text.crt{|.dos}.errno.utility")]
 
 %[define_replacement(EPERM           = __EPERM)]           /* Operation not permitted */
 %[define_replacement(ENOENT          = __ENOENT)]          /* No such file or directory */
@@ -854,7 +854,7 @@ typedef __errno_t errno_t;
 }
 
 [[guard, alias("_errno", "__errno"), wunused]]
-[[ATTR_CONST, section(".text.crt.errno_access")]]
+[[ATTR_CONST, section(".text.crt{|.dos}.errno_access")]]
 [[nonnull]] $errno_t *__errno_location();
 
 

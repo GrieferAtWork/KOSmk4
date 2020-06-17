@@ -82,6 +82,7 @@ function updateUserImplementationSourceFile(
 		missingSourceFunctionsByName[f.name] = f;
 	local origText: string;
 	local hasExportTable: bool = false;
+	local final MAGIC_IMPL_IF_ENDIF = "#endif /* MAGIC:impl_if */\n";
 	local final MAGIC_ALIAS_ENDIF = "#endif /* MAGIC:alias */\n";
 	try {
 		with (local fp = File.open(filename, "rb"))
@@ -152,6 +153,8 @@ function updateUserImplementationSourceFile(
 				local bodyText: string = origText[bodyStart:bodyEnd];
 				if (bodyText.endswith(MAGIC_ALIAS_ENDIF))
 					bodyText = bodyText[:-#MAGIC_ALIAS_ENDIF];
+				if (bodyText.endswith(MAGIC_IMPL_IF_ENDIF))
+					bodyText = bodyText[:-#MAGIC_IMPL_IF_ENDIF];
 				if (func is none) {
 					/* Discard the function if its body is auto-generated */
 					if (isFunctionBodyGenerated(none, bodyText)) {
@@ -295,13 +298,20 @@ discard_function_during_scan:
 		local it = header.order_libcUserSource.operator iter();
 		foreach (local f: it) {
 			if (f.name !in missingSourceFunctionsByName) {
-				prevPresentFunction = f;
+				for (local e: userSourceLayout) {
+					if (e is UserSourceFunction && e.func === f) {
+						prevPresentFunction = f;
+						break;
+					}
+				}
 				continue;
 			}
 			if (prevPresentFunction is none) {
 				/* Insert before the next function */
+				local it2 = copy(it);
+again_find_nextPresentFunction:
 				local nextPresentFunction: LibraryFunction | none = none;
-				foreach (local f2: copy(it)) {
+				foreach (local f2: it2) {
 					if (f2.name in missingSourceFunctionsByName)
 						continue;
 					nextPresentFunction = f2;
@@ -322,12 +332,12 @@ discard_function_during_scan:
 				/* Find where the next present function is at */
 				local i = 0;
 				for (;; ++i) {
+					if (i >= #userSourceLayout)
+						goto again_find_nextPresentFunction;
 					local e = userSourceLayout[i];
-					if (e !is UserSourceFunction)
-						continue;
-					if (e.func !== nextPresentFunction)
-						continue;
-					break;
+					if (e is UserSourceFunction &&
+					    e.func === nextPresentFunction)
+						break;
 				}
 				/* Insert at userSourceLayout[i] */
 				userSourceLayout.insert(i, "\n");
@@ -378,17 +388,34 @@ discard_function_during_scan:
 		}
 		if (part is UserSourceFunction) {
 			local func: LibraryFunction = part.func;
+			local funcCond = ppexpr.ppParse(func.ppCond)
+				.optimize(asBool: true, assume: ppAssume)
+				.tostr();
 			local bindings: {LibraryFunctionBinding...} = func.functionBindings;
 			assert bindings, func.name;
 			local implBinding: LibraryFunctionBinding = bindings.last;
 			assert implBinding.functionBinding is FunctionImplementation, func.name;
 			local headFp = File.Writer();
+			if (funcCond != "1") {
+				if (funcCond.startswith("defined(") && funcCond.endswith(")") &&
+				    funcCond.findmatch("(", ")", 8) == #funcCond - 1)
+					headFp << "#ifdef " << funcCond[8:-1];
+				else if (funcCond.startswith("!defined(") && funcCond.endswith(")") &&
+				         funcCond.findmatch("(", ")", 9) == #funcCond - 1)
+					headFp << "#ifndef " << funcCond[9:-1];
+				else {
+					headFp << "#if " << funcCond;
+				}
+				headFp << "\n";
+			}
 			local isFirst = true;
 			/* Deal with intern-alias bindings (*ugh* UGLY!!) */
 			for (local b: bindings[:-1]) {
 				assert b.functionBinding !is FunctionImplementation;
 				headFp << "#" << (isFirst ? "" : "el") << "if "
-					<< ppexpr.optimize(b.ppCond) << "\n"
+					<< ppexpr.ppParse(b.ppCond)
+						.optimize(asBool: true, assume: ppAssume)
+						.tostr() << "\n"
 					   "DEFINE_INTERN_ALIAS(" << func.name << ", "
 					<< str(b.functionBinding) << ");\n";
 				isFirst = false;
@@ -431,6 +458,8 @@ discard_function_during_scan:
 				fp << "\n";
 			if (!isFirst)
 				fp << MAGIC_ALIAS_ENDIF;
+			if (funcCond != "1")
+				fp << MAGIC_IMPL_IF_ENDIF;
 			fp << "/*[[[end:" << func.name << "]]]*/\n";
 			continue;
 		}

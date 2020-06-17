@@ -26,7 +26,7 @@
 %[define_replacement(time64_t   = __time64_t)]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
-%[default:section(".text.crt.io.poll")]
+%[default:section(".text.crt{|.dos}.io.poll")]
 
 
 %{
@@ -60,7 +60,7 @@ struct pollfd {
 
 }
 
-%(user){
+%(auto_header,user){
 DECL_END
 #include <bits/sigset.h>
 DECL_BEGIN

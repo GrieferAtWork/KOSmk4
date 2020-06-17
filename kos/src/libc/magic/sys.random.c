@@ -20,7 +20,7 @@
 
 %[define_replacement(GRND_RANDOM = __GRND_RANDOM)]
 %[define_replacement(GRND_NONBLOCK = __GRND_NONBLOCK)]
-%[default:section(".text.crt.system.random")]
+%[default:section(".text.crt{|.dos}.system.random")]
 
 %{
 #include <features.h>

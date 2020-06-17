@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e5bfaa5 */
+/* HASH CRC-32:0xa2ba16ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,10 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: __p__crtDbgFlag from crtdbg */
 #ifndef __local___localdep___p__crtDbgFlag_defined
 #define __local___localdep___p__crtDbgFlag_defined 1
-__CREDIRECT(,int *,__NOTHROW_NCX,__localdep___p__crtDbgFlag,(void),__p__crtDbgFlag,())
+__COMPILER_REDIRECT(__LIBC,,int *,__NOTHROW_NCX,__LIBDCALL,__localdep___p__crtDbgFlag,(void),__p__crtDbgFlag,())
 #endif /* !__local___localdep___p__crtDbgFlag_defined */
 __LOCAL_LIBC(_CrtSetDbgFlag) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtSetDbgFlag))(int __new_flag) {
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtSetDbgFlag))(int __new_flag) {
 	int __result, *__ptr;
 	__ptr = __localdep___p__crtDbgFlag();
 	__result = *__ptr;

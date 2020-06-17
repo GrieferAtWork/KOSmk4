@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%[default:section(".text.crt.except.io.utility")]
+%[default:section(".text.crt{|.dos}.except.io.utility")]
 
 %{
 #include <features.h>
@@ -34,7 +34,7 @@ __SYSDECL_BEGIN
 [[throws, guard, vartypes(void *)]]
 __STDC_INT_AS_SSIZE_T Fcntl($fd_t fd, int cmd, ...);
 
-%[default:section(".text.crt.except.io.access")]
+%[default:section(".text.crt{|.dos}.except.io.access")]
 
 [[ignore, nocrt, alias(Open)]]
 [[cp, wunused, vartypes($mode_t), throws, decl_include("<bits/types.h>")]]

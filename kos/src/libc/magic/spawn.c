@@ -22,7 +22,7 @@
 %[define_replacement(oflag_t = __oflag_t)]
 %[define_replacement(posix_spawnattr_t = posix_spawnattr_t)]
 %[define_replacement(posix_spawn_file_actions_t = posix_spawn_file_actions_t)]
-%[default:section(".text.crt.fs.exec.posix_spawn")]
+%[default:section(".text.crt{|.dos}.fs.exec.posix_spawn")]
 
 
 %{
@@ -142,6 +142,7 @@ typedef struct {
 @@Before running the process perform the actions described in FILE-ACTIONS.
 @@This function is a possible cancellation point and therefore not marked with __THROW
 [[cp, decl_prefix(DEFINE_TARGV)]]
+[[argument_names(pid, path, file_actions, attrp, ___argv, ___envp)]]
 int posix_spawn([[nonnull]] pid_t *__restrict pid,
                 [[nonnull]] char const *__restrict path,
                 [[nullable]] posix_spawn_file_actions_t const *file_actions,
@@ -152,6 +153,7 @@ int posix_spawn([[nonnull]] pid_t *__restrict pid,
 @@Similar to `posix_spawn' but search for FILE in the PATH.
 @@This function is a possible cancellation point and therefore not marked with __THROW
 [[cp, decl_prefix(DEFINE_TARGV)]]
+[[argument_names(pid, file, file_actions, attrp, ___argv, ___envp)]]
 int posix_spawnp([[nonnull]] pid_t *__restrict pid,
                  [[nonnull]] const char *__restrict file,
                  [[nullable]] posix_spawn_file_actions_t const *file_actions,

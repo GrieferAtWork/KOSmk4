@@ -93,7 +93,7 @@ void delay(unsigned int mill) {
 [[cp, guard, nocrt, alias("_sleep", "sleep"), exposed_name("sleep")]]
 void dos_sleep(unsigned int duration);
 
-%[default:section(".text.crt.fs.modify")]
+%[default:section(".text.crt{|.dos}.fs.modify")]
 %[insert:extern(unlink)]
 
 %{

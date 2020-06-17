@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default:section(".text.crt.system.syslog")]
+%[default:section(".text.crt{|.dos}.system.syslog")]
 
 %{
 #include <features.h>

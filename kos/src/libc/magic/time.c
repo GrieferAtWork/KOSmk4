@@ -19,7 +19,7 @@
  */
 
 %[define_ccompat_header("ctime")]
-%[default:section(".text.crt.time")]
+%[default:section(".text.crt{|.dos}.time")]
 
 %[define_replacement(time_t    = "__TM_TYPE(time)")]
 %[define_replacement(time32_t  = __time32_t)]
@@ -1123,14 +1123,14 @@ int clock_settime(clockid_t clock_id, [[nonnull]] struct timespec const *tp) {
 
 @@Create new per-process timer using CLOCK_ID
 [[decl_include("<bits/sigevent.h>", "<bits/types.h>")]]
-[[section(".text.crt.timer")]]
+[[section(".text.crt{|.dos}.timer")]]
 int timer_create(clockid_t clock_id,
                  [[nullable]] struct sigevent *__restrict evp,
                  [[nonnull]] timer_t *__restrict timerid);
 
 @@Delete timer TIMERID
 [[decl_include("<bits/types.h>")]]
-[[section(".text.crt.timer")]]
+[[section(".text.crt{|.dos}.timer")]]
 int timer_delete(timer_t timerid);
 
 @@Set timer TIMERID to VALUE, returning old value in OVALUE
@@ -1146,7 +1146,7 @@ int timer_settime32(timer_t timerid, __STDC_INT_AS_UINT_T flags,
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("timer_settime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("timer_settime")]]
 [[userimpl, requires($has_function(timer_settime32) || $has_function(timer_settime64))]]
-[[section(".text.crt.timer")]]
+[[section(".text.crt{|.dos}.timer")]]
 int timer_settime(timer_t timerid, __STDC_INT_AS_UINT_T flags,
                   [[nonnull]] struct itimerspec const *__restrict value,
                   [[nullable]] struct itimerspec *__restrict ovalue) {
@@ -1192,7 +1192,7 @@ int timer_gettime32(timer_t timerid, [[nonnull]] struct itimerspec *value);
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("timer_gettime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("timer_gettime")]]
 [[userimpl, requires($has_function(timer_gettime32) || $has_function(timer_gettime64))]]
-[[section(".text.crt.timer"), decl_include("<bits/itimerspec.h>", "<bits/types.h>")]]
+[[section(".text.crt{|.dos}.timer"), decl_include("<bits/itimerspec.h>", "<bits/types.h>")]]
 int timer_gettime(timer_t timerid, [[nonnull]] struct itimerspec *value) {
 @@pp_if $has_function(timer_gettime32)@@
 	int result;
@@ -1220,7 +1220,7 @@ int timer_gettime(timer_t timerid, [[nonnull]] struct itimerspec *value) {
 }
 
 @@Get expiration overrun for timer TIMERID
-[[section(".text.crt.timer"), decl_include("<bits/types.h>")]]
+[[section(".text.crt{|.dos}.timer"), decl_include("<bits/types.h>")]]
 int timer_getoverrun(timer_t timerid);
 
 %
@@ -1329,7 +1329,7 @@ int clock_settime64(clockid_t clock_id, [[nonnull]] struct timespec64 const *tp)
 }
 
 [[decl_include("<features.h>", "<bits/itimerspec.h>", "<bits/types.h>")]]
-[[doc_alias("timer_settime"), time64_variant_of(timer_settime), section(".text.crt.timer")]]
+[[doc_alias("timer_settime"), time64_variant_of(timer_settime), section(".text.crt{|.dos}.timer")]]
 [[userimpl, requires_function(timer_settime32)]]
 int timer_settime64(timer_t timerid, __STDC_INT_AS_UINT_T flags,
                     [[nonnull]] struct itimerspec64 const *__restrict value,
@@ -1351,7 +1351,7 @@ int timer_settime64(timer_t timerid, __STDC_INT_AS_UINT_T flags,
 }
 
 [[decl_include("<bits/itimerspec.h>", "<bits/types.h>")]]
-[[doc_alias("timer_gettime"), time64_variant_of(timer_gettime), section(".text.crt.timer")]]
+[[doc_alias("timer_gettime"), time64_variant_of(timer_gettime), section(".text.crt{|.dos}.timer")]]
 [[userimpl, requires_function(timer_gettime32)]]
 int timer_gettime64(timer_t timerid, [[nonnull]] struct itimerspec64 *value) {
 	int result;
@@ -1443,9 +1443,11 @@ __STRUCT_TM *getdate([[nonnull]] const char *string);
 
 
 
-%(user)INTDEF char *libc_tzname[2];
-%(user)INTDEF int libc_daylight;
-%(user)INTDEF longptr_t libc_timezone;
+%(user){
+INTDEF char *libc_tzname[2];
+INTDEF int libc_daylight;
+INTDEF longptr_t libc_timezone;
+}
 
 
 %

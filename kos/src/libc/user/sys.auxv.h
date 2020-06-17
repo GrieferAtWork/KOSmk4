@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbeeea094 */
+/* HASH CRC-32:0xd5e7414b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SYS_AUXV_H 1
 
 #include "../api.h"
+#include "../auto/sys.auxv.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

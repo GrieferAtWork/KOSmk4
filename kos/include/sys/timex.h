@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96dba9db */
+/* HASH CRC-32:0x7b632fb7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -159,7 +159,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(adjtimex, __FORCELOCAL __ATTR_NONNULL((1)) int _
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_gettime,(struct ntptimeval *__restrict __ntv),ntp_gettimex64,(__ntv))
 #elif defined(__CRT_HAVE_ntp_gettimex) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_gettime,(struct ntptimeval *__restrict __ntv),ntp_gettimex,(__ntv))
-#elif defined(__CRT_HAVE_ntp_gettimex64) || (defined(__CRT_HAVE_ntp_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_ntp_gettimex)
+#elif defined(__CRT_HAVE_ntp_gettimex64) || defined(__CRT_HAVE_ntp_gettimex)
 #include <local/sys.timex/ntp_gettime.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(ntp_gettime, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL ntp_gettime)(struct ntptimeval *__restrict __ntv) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntp_gettime))(__ntv); })
 #endif /* ... */
@@ -193,8 +193,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ntp_adjtime64, __FORCELOCAL __ATTR_NONNULL((1)) 
 #endif /* ... */
 #ifdef __CRT_HAVE_ntp_gettimex64
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_gettime64,(struct ntptimeval64 *__restrict __ntv),ntp_gettimex64,(__ntv))
-#elif defined(__CRT_HAVE_ntp_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_gettime64,(struct ntptimeval64 *__restrict __ntv),ntp_gettime,(__ntv))
+#elif defined(__CRT_HAVE_ntp_gettimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_gettime64,(struct ntptimeval64 *__restrict __ntv),ntp_gettimex,(__ntv))
 #elif defined(__CRT_HAVE_ntp_gettimex)
 #include <local/sys.timex/ntp_gettime64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(ntp_gettime64, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL ntp_gettime64)(struct ntptimeval64 *__restrict __ntv) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntp_gettime64))(__ntv); })

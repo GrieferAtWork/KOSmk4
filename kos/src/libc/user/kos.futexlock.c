@@ -94,6 +94,7 @@ NOTHROW_RPC(LIBCCALL libc_lfutexlock_impl)(lfutex_t *ulockaddr,
 
 /*[[[start:implementation]]]*/
 
+
 /*[[[head:libc_lfutexlock,hash:CRC-32=0x50667198]]]*/
 /* >> lfutexlock(3)
  * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
@@ -165,6 +166,7 @@ NOTHROW_RPC(VLIBCCALL libc_lfutexlock)(lfutex_t *ulockaddr,
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 }
 /*[[[end:libc_lfutexlock]]]*/
+
 
 /*[[[head:libc_lfutexlock64,hash:CRC-32=0x6a959e2b]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__

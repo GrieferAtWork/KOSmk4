@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa613412e */
+/* HASH CRC-32:0x11eb72ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_PTY_H 1
 
 #include "../api.h"
+#include "../auto/pty.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1649fea8 */
+/* HASH CRC-32:0xb1dbb0bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_ntp_gettime_defined
 #define __local_ntp_gettime_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_ntp_gettimex64) || (defined(__CRT_HAVE_ntp_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_ntp_gettimex)
+#if defined(__CRT_HAVE_ntp_gettimex64) || defined(__CRT_HAVE_ntp_gettimex)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: ntp_gettime32 from sys.timex */
 #if !defined(__local___localdep_ntp_gettime32_defined) && defined(__CRT_HAVE_ntp_gettimex)
@@ -33,8 +33,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime32,(stru
 #define __local___localdep_ntp_gettime64_defined 1
 #ifdef __CRT_HAVE_ntp_gettimex64
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime64,(struct __ntptimeval64 *__restrict __ntv),ntp_gettimex64,(__ntv))
-#elif defined(__CRT_HAVE_ntp_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime64,(struct __ntptimeval64 *__restrict __ntv),ntp_gettime,(__ntv))
+#elif defined(__CRT_HAVE_ntp_gettimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime64,(struct __ntptimeval64 *__restrict __ntv),ntp_gettimex,(__ntv))
 #elif defined(__CRT_HAVE_ntp_gettimex)
 __NAMESPACE_LOCAL_END
 #include <local/sys.timex/ntp_gettime64.h>
@@ -83,7 +83,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_ntp_gettime_defined 1
 #define __localdep_ntp_gettime __LIBC_LOCAL_NAME(ntp_gettime)
 #endif /* !__local___localdep_ntp_gettime_defined */
-#else /* __CRT_HAVE_ntp_gettimex64 || (__CRT_HAVE_ntp_gettime && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || __CRT_HAVE_ntp_gettimex */
+#else /* __CRT_HAVE_ntp_gettimex64 || __CRT_HAVE_ntp_gettimex */
 #undef __local_ntp_gettime_defined
-#endif /* !__CRT_HAVE_ntp_gettimex64 && (!__CRT_HAVE_ntp_gettime || __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__) && !__CRT_HAVE_ntp_gettimex */
+#endif /* !__CRT_HAVE_ntp_gettimex64 && !__CRT_HAVE_ntp_gettimex */
 #endif /* !__local_ntp_gettime_defined */

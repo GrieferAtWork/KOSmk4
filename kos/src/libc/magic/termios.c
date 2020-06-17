@@ -24,7 +24,7 @@
 %[define_replacement(speed_t  = __UINT32_TYPE__)]
 %[define_replacement(tcflag_t = __UINT32_TYPE__)]
 
-%[default:section(".text.crt.io.tty")]
+%[default:section(".text.crt{|.dos}.io.tty")]
 
 %{
 #include <features.h>

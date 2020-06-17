@@ -493,7 +493,7 @@ int ntp_adjtime64([[nonnull]] struct timex64 *__restrict tntx) {
 }
 
 
-[[crt_name("ntp_gettimex64"), time64_variant_of(ntp_gettime)]]
+[[crt_name("ntp_gettimex64"), time64_variant_of(ntp_gettimex)]]
 [[userimpl, requires_function(ntp_gettime32)]]
 int ntp_gettime64([[nonnull]] struct ntptimeval64 *__restrict ntv) {
 	struct $ntptimeval32 ntv32;

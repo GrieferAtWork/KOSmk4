@@ -31,6 +31,25 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
+/*[[[head:libd_strfmon,hash:CRC-32=0x7435bd4d]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+INTERN ATTR_SECTION(".text.crt.dos.utility.monetary") ATTR_LIBC_STRFMON(3, 4) NONNULL((1, 3)) ssize_t
+NOTHROW_NCX(VLIBDCALL libd_strfmon)(char *__restrict s,
+                                    size_t maxsize,
+                                    char const *__restrict format,
+                                    ...)
+/*[[[body:libd_strfmon]]]*/
+/*AUTO*/{
+	(void)s;
+	(void)maxsize;
+	(void)format;
+	CRT_UNIMPLEMENTED("strfmon"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+#endif /* MAGIC:impl_if */
+/*[[[end:libd_strfmon]]]*/
+
 /*[[[head:libc_strfmon,hash:CRC-32=0x52cfa8a8]]]*/
 INTERN ATTR_SECTION(".text.crt.utility.monetary") ATTR_LIBC_STRFMON(3, 4) NONNULL((1, 3)) ssize_t
 NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s,
@@ -47,6 +66,27 @@ NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s,
 	return 0;
 }
 /*[[[end:libc_strfmon]]]*/
+
+/*[[[head:libd_strfmon_l,hash:CRC-32=0xe458adb]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+INTERN ATTR_SECTION(".text.crt.dos.utility.monetary") ATTR_LIBC_STRFMON(4, 5) NONNULL((1, 4)) ssize_t
+NOTHROW_NCX(VLIBDCALL libd_strfmon_l)(char *__restrict s,
+                                      size_t maxsize,
+                                      locale_t loc,
+                                      const char *__restrict format,
+                                      ...)
+/*[[[body:libd_strfmon_l]]]*/
+/*AUTO*/{
+	(void)s;
+	(void)maxsize;
+	(void)loc;
+	(void)format;
+	CRT_UNIMPLEMENTED("strfmon_l"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+#endif /* MAGIC:impl_if */
+/*[[[end:libd_strfmon_l]]]*/
 
 /*[[[head:libc_strfmon_l,hash:CRC-32=0x22732bdf]]]*/
 INTERN ATTR_SECTION(".text.crt.utility.monetary") ATTR_LIBC_STRFMON(4, 5) NONNULL((1, 4)) ssize_t
@@ -71,8 +111,15 @@ NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe4855736]]]*/
+/*[[[start:exports,hash:CRC-32=0xda3de07]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(DOS$strfmon, libd_strfmon);
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(strfmon, libc_strfmon);
+#ifndef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(DOS$__strfmon_l, libd_strfmon_l);
+DEFINE_PUBLIC_ALIAS(DOS$strfmon_l, libd_strfmon_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strfmon_l, libc_strfmon_l);
 DEFINE_PUBLIC_ALIAS(strfmon_l, libc_strfmon_l);
 /*[[[end:exports]]]*/

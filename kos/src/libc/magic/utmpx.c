@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default:section(".text.crt.database.utmpx")]
+%[default:section(".text.crt{|.dos}.database.utmpx")]
 
 %{
 #include <features.h>

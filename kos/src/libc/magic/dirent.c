@@ -29,7 +29,7 @@
 %[define_replacement(oflag_t    = __oflag_t)]
 %[define_replacement(longptr_t  = __LONGPTR_TYPE__)]
 %[define_replacement(DIR        = "struct __dirstream")]
-%[default:section(".text.crt.fs.dir")]
+%[default:section(".text.crt{|.dos}.fs.dir")]
 
 
 %{

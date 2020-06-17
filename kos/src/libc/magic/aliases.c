@@ -52,7 +52,7 @@
 
 
 %[define_replacement(sigset_t = "struct __sigset_struct")]
-%[default:section(".text.crt.database.aliases")]
+%[default:section(".text.crt{|.dos}.database.aliases")]
 
 %{
 #include <features.h>

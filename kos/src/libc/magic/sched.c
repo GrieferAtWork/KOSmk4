@@ -82,7 +82,7 @@ typedef __cpu_set_t cpu_set_t;
 %#ifdef __CC__
 
 
-%[default:section(".text.crt.sched.param")];
+%[default:section(".text.crt{|.dos}.sched.param")];
 
 int sched_setparam($pid_t pid, struct sched_param const *param);
 
@@ -96,7 +96,7 @@ int sched_setscheduler($pid_t pid, int policy, struct sched_param const *param);
 int sched_getscheduler($pid_t pid);
 
 %
-%[default:section(".text.crt.sched.thread")];
+%[default:section(".text.crt{|.dos}.sched.thread")];
 
 @@@return: 1: Another thread was executed prior to the function returning
 @@            The thread may not necessarily be apart of the calling process
@@ -104,7 +104,7 @@ int sched_getscheduler($pid_t pid);
 [[export_alias("thrd_yield", "pthread_yield", "__sched_yield")]]
 int sched_yield();
 
-%[default:section(".text.crt.sched.param")];
+%[default:section(".text.crt{|.dos}.sched.param")];
 
 [[export_alias("__sched_get_priority_max")]]
 int sched_get_priority_max(int algorithm);

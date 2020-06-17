@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x293f1852 */
+/* HASH CRC-32:0x8608c662 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_FCNTL_H 1
 
 #include "../api.h"
+#include "../auto/fcntl.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
@@ -40,11 +41,17 @@ INTDEF fd_t NOTHROW_RPC(LIBCCALL libc_open_by_handle_at)(fd_t mountdirfd, struct
 INTDEF int NOTHROW_NCX(LIBCCALL libc_fallocate)(fd_t fd, int mode, off_t offset, off_t length);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_fallocate64)(fd_t fd, int mode, off64_t offset, off64_t length);
 INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd, int cmd, ...);
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename, oflag_t oflags, ...);
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename, mode_t mode);
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename, mode_t mode);
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(VLIBDCALL libd_open64)(char const *filename, oflag_t oflags, ...);
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(VLIBCCALL libc_open64)(char const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_creat64)(char const *filename, mode_t mode);
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBCCALL libc_creat64)(char const *filename, mode_t mode);
+INTDEF WUNUSED NONNULL((2)) fd_t NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd, char const *filename, oflag_t oflags, ...);
 INTDEF WUNUSED NONNULL((2)) fd_t NOTHROW_RPC(VLIBCCALL libc_openat)(fd_t dirfd, char const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED NONNULL((2)) fd_t NOTHROW_RPC(VLIBDCALL libd_openat64)(fd_t dirfd, char const *filename, oflag_t oflags, ...);
 INTDEF WUNUSED NONNULL((2)) fd_t NOTHROW_RPC(VLIBCCALL libc_openat64)(fd_t dirfd, char const *filename, oflag_t oflags, ...);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_posix_fadvise)(fd_t fd, off_t offset, off_t length, int advise);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_posix_fallocate)(fd_t fd, off_t offset, off_t length);

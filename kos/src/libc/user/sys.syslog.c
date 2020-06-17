@@ -71,6 +71,22 @@ NOTHROW_NCX(LIBCCALL libc_setlogmask)(__STDC_INT_AS_UINT_T mask)
 }
 /*[[[end:libc_setlogmask]]]*/
 
+/*[[[head:libd_syslog,hash:CRC-32=0x9740b81b]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+INTERN ATTR_SECTION(".text.crt.dos.system.syslog") ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) void
+NOTHROW_RPC(VLIBDCALL libd_syslog)(__STDC_INT_AS_UINT_T level,
+                                   char const *format,
+                                   ...)
+/*[[[body:libd_syslog]]]*/
+/*AUTO*/{
+	va_list args;
+	va_start(args,format);
+	vsyslog(level,format,args);
+	va_end(args);
+}
+#endif /* MAGIC:impl_if */
+/*[[[end:libd_syslog]]]*/
+
 /*[[[head:libc_syslog,hash:CRC-32=0xdae646ad]]]*/
 INTERN ATTR_SECTION(".text.crt.system.syslog") ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) void
 NOTHROW_RPC(VLIBCCALL libc_syslog)(__STDC_INT_AS_UINT_T level,
@@ -122,10 +138,13 @@ NOTHROW_RPC(LIBCCALL libc_syslog_printer)(void *arg,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x5297673b]]]*/
+/*[[[start:exports,hash:CRC-32=0x92b5e77]]]*/
 DEFINE_PUBLIC_ALIAS(closelog, libc_closelog);
 DEFINE_PUBLIC_ALIAS(openlog, libc_openlog);
 DEFINE_PUBLIC_ALIAS(setlogmask, libc_setlogmask);
+#ifndef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(DOS$syslog, libd_syslog);
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(syslog, libc_syslog);
 DEFINE_PUBLIC_ALIAS(vsyslog, libc_vsyslog);
 DEFINE_PUBLIC_ALIAS(syslog_printer, libc_syslog_printer);

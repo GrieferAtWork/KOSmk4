@@ -20,7 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(longptr_t = __LONGPTR_TYPE__)]
-%[default:section(".text.crt.sched.msg")]
+%[default:section(".text.crt{|.dos}.sched.msg")]
 
 %{
 

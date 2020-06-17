@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d127249 */
+/* HASH CRC-32:0xfacd1231 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,8 +29,16 @@
 
 DECL_BEGIN
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LIBC_STRFMON(3, 4) NONNULL((1, 3)) ssize_t NOTHROW_NCX(VLIBDCALL libd_strfmon)(char *__restrict s, size_t maxsize, char const *__restrict format, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_LIBC_STRFMON(3, 4) NONNULL((1, 3)) ssize_t NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s, size_t maxsize, char const *__restrict format, ...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LIBC_STRFMON(4, 5) NONNULL((1, 4)) ssize_t NOTHROW_NCX(VLIBDCALL libd_strfmon_l)(char *__restrict s, size_t maxsize, locale_t loc, const char *__restrict format, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF ATTR_LIBC_STRFMON(4, 5) NONNULL((1, 4)) ssize_t NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s, size_t maxsize, locale_t loc, const char *__restrict format, ...);
 #endif /* !__KERNEL__ */
 

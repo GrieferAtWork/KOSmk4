@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default:section(".text.crt.ssp.string.memory")]
+%[default:section(".text.crt{|.dos}.ssp.string.memory")]
 
 %{
 #include <features.h>

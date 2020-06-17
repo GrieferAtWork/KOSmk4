@@ -27,7 +27,7 @@
 %[define_replacement(pos64_t = __pos64_t)]
 %[define_replacement(mode_t = __mode_t)]
 %[define_replacement(oflag_t = __oflag_t)]
-%[default:section(".text.crt.system.mman")]
+%[default:section(".text.crt{|.dos}.system.mman")]
 
 %{
 
@@ -551,7 +551,7 @@ void *mmap32(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 @@              MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
 @@              MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_DONT_OVERRIDE'
 [[decl_include("<features.h>")]]
-[[wunused, section(".text.crt.heap.mman"), no_crt_self_import]]
+[[wunused, section(".text.crt{|.dos}.heap.mman"), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mmap64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("mmap")]]
 [[userimpl, requires($has_function(mmap32) || $has_function(mmap64))]]
@@ -565,13 +565,13 @@ void *mmap(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 }
 
 @@Unmap memory from `addr...+=len'
-[[section(".text.crt.heap.mman")]]
+[[section(".text.crt{|.dos}.heap.mman")]]
 int munmap([[nonnull]] void *addr, size_t len);
 
 @@@param prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE |
 @@             PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED |
 @@             PROT_GROWSUP | PROT_GROWSDOWN'
-[[decl_include("<features.h>"), section(".text.crt.system.mman")]]
+[[decl_include("<features.h>"), section(".text.crt{|.dos}.system.mman")]]
 int mprotect([[nonnull]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot);
 
 @@@param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC'
@@ -616,7 +616,7 @@ int mincore([[nonnull]] void *start, size_t len, unsigned char *vec);
 %
 %#ifdef __USE_LARGEFILE64
 [[decl_include("<features.h>")]]
-[[wunused, section(".text.crt.heap.mman")]]
+[[wunused, section(".text.crt{|.dos}.heap.mman")]]
 [[doc_alias("mmap"), off64_variant_of(mmap)]]
 [[userimpl, requires_function(mmap32)]]
 void *mmap64(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
@@ -645,7 +645,7 @@ int posix_madvise([[nonnull]] void *addr, size_t len,
 %#ifdef __USE_GNU
 
 @@@param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED'
-[[section(".text.crt.heap.mman"), vartypes(void *)]]
+[[section(".text.crt{|.dos}.heap.mman"), vartypes(void *)]]
 [[decl_include("<features.h>")]]
 void *mremap(void *addr, size_t old_len, size_t new_len,
              __STDC_INT_AS_UINT_T flags, ... /* void *new_address */);

@@ -61,6 +61,7 @@ INTERN ATTR_READMOSTLY unsigned int futex_spin_counter = 4;
 
 /*[[[start:implementation]]]*/
 
+
 /*[[[head:libc_lfutex,hash:CRC-32=0xab151a58]]]*/
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
@@ -120,6 +121,7 @@ NOTHROW_RPC(VLIBCCALL libc_lfutex)(lfutex_t *uaddr,
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 }
 /*[[[end:libc_lfutex]]]*/
+
 
 /*[[[head:libc_lfutex64,hash:CRC-32=0x49288cd6]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__

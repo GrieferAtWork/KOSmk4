@@ -99,9 +99,9 @@ NOTHROW_NCX(LIBCCALL libc_ntp_adjtime64)(struct timex64 *__restrict tntx)
 #endif /* MAGIC:alias */
 /*[[[end:libc_ntp_adjtime64]]]*/
 
-/*[[[head:libc_ntp_gettimex64,hash:CRC-32=0xd09ab209]]]*/
+/*[[[head:libc_ntp_gettimex64,hash:CRC-32=0xcf37f2b4]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-DEFINE_INTERN_ALIAS(libc_ntp_gettimex64, libc_ntp_gettime);
+DEFINE_INTERN_ALIAS(libc_ntp_gettimex64, libc_ntp_gettimex);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_ntp_gettimex64)(struct ntptimeval64 *__restrict ntv)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde8d251a */
+/* HASH CRC-32:0xa90260cc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2640,7 +2640,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/fuzzy_wcscmp.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL fuzzy_c16scmp)(char16_t const *__s1, char16_t const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wcscmp))((__WCHAR_TYPE__ const *)__s1, (__WCHAR_TYPE__ const *)__s2); }
-#elif defined(__CRT_HAVE_fuzzy_memcmpw) || defined(__CRT_HAVE_DOS$fuzzy_wmemcmp) || !defined(__NO_MALLOCA)
+#elif defined(__CRT_HAVE_fuzzy_memcmpw) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcmp) && defined(__LIBCCALL_IS_LIBDCALL)) || !defined(__NO_MALLOCA)
 #include <local/parts.uchar.string/fuzzy_c16scmp.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_c16scmp, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL fuzzy_c16scmp)(char16_t const *__s1, char16_t const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_c16scmp))(__s1, __s2); })
 #endif /* ... */
@@ -2651,7 +2651,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/fuzzy_wcscmp.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL fuzzy_c32scmp)(char32_t const *__s1, char32_t const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wcscmp))((__WCHAR_TYPE__ const *)__s1, (__WCHAR_TYPE__ const *)__s2); }
-#elif defined(__CRT_HAVE_fuzzy_memcmpl) || (defined(__CRT_HAVE_KOS$fuzzy_wmemcmp) && defined(__PE__)) || !defined(__NO_MALLOCA)
+#elif defined(__CRT_HAVE_fuzzy_memcmpl) || (defined(__CRT_HAVE_KOS$fuzzy_wmemcmp) && defined(__LIBCCALL_IS_LIBKCALL)) || !defined(__NO_MALLOCA)
 #include <local/parts.uchar.string/fuzzy_c32scmp.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_c32scmp, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL fuzzy_c32scmp)(char32_t const *__s1, char32_t const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_c32scmp))(__s1, __s2); })
 #endif /* ... */
@@ -2662,7 +2662,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/fuzzy_wcsncmp.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL fuzzy_c16sncmp)(char16_t const *__s1, __SIZE_TYPE__ __s1_maxlen, char16_t const *__s2, __SIZE_TYPE__ __s2_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wcsncmp))((__WCHAR_TYPE__ const *)__s1, __s1_maxlen, (__WCHAR_TYPE__ const *)__s2, __s2_maxlen); }
-#elif defined(__CRT_HAVE_fuzzy_memcmpw) || defined(__CRT_HAVE_DOS$fuzzy_wmemcmp) || !defined(__NO_MALLOCA)
+#elif defined(__CRT_HAVE_fuzzy_memcmpw) || (defined(__CRT_HAVE_DOS$fuzzy_wmemcmp) && defined(__LIBCCALL_IS_LIBDCALL)) || !defined(__NO_MALLOCA)
 #include <local/parts.uchar.string/fuzzy_c16sncmp.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_c16sncmp, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL fuzzy_c16sncmp)(char16_t const *__s1, __SIZE_TYPE__ __s1_maxlen, char16_t const *__s2, __SIZE_TYPE__ __s2_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_c16sncmp))(__s1, __s1_maxlen, __s2, __s2_maxlen); })
 #endif /* ... */
@@ -2673,7 +2673,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/fuzzy_wcsncmp.h>
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL fuzzy_c32sncmp)(char32_t const *__s1, __SIZE_TYPE__ __s1_maxlen, char32_t const *__s2, __SIZE_TYPE__ __s2_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wcsncmp))((__WCHAR_TYPE__ const *)__s1, __s1_maxlen, (__WCHAR_TYPE__ const *)__s2, __s2_maxlen); }
-#elif defined(__CRT_HAVE_fuzzy_memcmpl) || (defined(__CRT_HAVE_KOS$fuzzy_wmemcmp) && defined(__PE__)) || !defined(__NO_MALLOCA)
+#elif defined(__CRT_HAVE_fuzzy_memcmpl) || (defined(__CRT_HAVE_KOS$fuzzy_wmemcmp) && defined(__LIBCCALL_IS_LIBKCALL)) || !defined(__NO_MALLOCA)
 #include <local/parts.uchar.string/fuzzy_c32sncmp.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fuzzy_c32sncmp, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL fuzzy_c32sncmp)(char32_t const *__s1, __SIZE_TYPE__ __s1_maxlen, char32_t const *__s2, __SIZE_TYPE__ __s2_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_c32sncmp))(__s1, __s1_maxlen, __s2, __s2_maxlen); })
 #endif /* ... */

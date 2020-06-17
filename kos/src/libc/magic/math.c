@@ -19,7 +19,7 @@
  */
 
 %[define_ccompat_header("cmath")]
-%[default:section(".text.crt.math.math")]
+%[default:section(".text.crt{|.dos}.math.math")]
 
 %[define_double_replacement(__LIBM_MATHFUN = __LIBM_MATHFUNF, __LIBM_MATHFUNL)]
 %[define_double_replacement(__LIBM_MATHFUNI = __LIBM_MATHFUNIF, __LIBM_MATHFUNIL)]

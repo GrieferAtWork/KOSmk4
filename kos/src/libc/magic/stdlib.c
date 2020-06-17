@@ -19,8 +19,8 @@
  */
 
 %[define_ccompat_header("cstdlib")]
-%[declare_known_section(".text.crt.application.init")]
-%[declare_known_section(".text.crt.glibc")]
+%[declare_known_section(".text.crt{|.dos}.application.init")]
+%[declare_known_section(".text.crt{|.dos}.glibc")]
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]
@@ -230,7 +230,7 @@ typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 @@pp_endif@@
 )]
 
-[[section(".text.crt.utility.stdlib")]]
+[[section(".text.crt{|.dos}.utility.stdlib")]]
 [[impl_include("<hybrid/__minmax.h>")]]
 [[decl_prefix(DEFINE_COMPAR_D_FN_T), throws]]
 void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
@@ -379,7 +379,7 @@ typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 #endif /* !__compar_d_fn_t_defined */
 }
 
-[[section(".text.crt.utility.stdlib")]]
+[[section(".text.crt{|.dos}.utility.stdlib")]]
 [[decl_prefix(DEFINE_COMPAR_D_FN_T), throws, wunused]]
 void *bsearch_r([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg)
 	[([[nonnull]] void const *pkey, [[nonnull]] void *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg): void *]
@@ -451,7 +451,7 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 %(auto_source)__NAMESPACE_LOCAL_USING(__invoke_compare_helper)
 %(auto_source)#endif /* ____invoke_compare_helper_defined */
 
-[[section(".text.crt.utility.stdlib")]]
+[[section(".text.crt{|.dos}.utility.stdlib")]]
 [[decl_prefix(DEFINE_COMPAR_FN_T)]]
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), throws, std]]
 void qsort([[nonnull]] void *pbase, size_t item_count,
@@ -461,7 +461,7 @@ void qsort([[nonnull]] void *pbase, size_t item_count,
 	        (void *)cmp);
 }
 
-[[section(".text.crt.utility.stdlib")]]
+[[section(".text.crt{|.dos}.utility.stdlib")]]
 [[decl_prefix(DEFINE_COMPAR_FN_T)]]
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), wunused, std, throws]]
 void *bsearch([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp)
@@ -474,7 +474,7 @@ void *bsearch([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_
 }
 
 
-%[default:section(".text.crt.math.utility")]
+%[default:section(".text.crt{|.dos}.math.utility")]
 
 [[ATTR_CONST, wunused, nothrow, std, crtbuiltin]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, abs)]]
@@ -710,7 +710,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __float128 __NOTHROW(__LIBCCALL abs)(__
 }
 %(std)#endif /* __cplusplus && __CORRECT_ISO_CPP_MATH_H_PROTO && !__NO_FPU */
 
-[[std, wunused, section(".text.crt.fs.environ")]]
+[[std, wunused, section(".text.crt{|.dos}.fs.environ")]]
 char *getenv([[nonnull]] char const *varname);
 
 %[default:section(".text.crt{|.dos}.wchar.unicode.static.mbs")]
@@ -745,11 +745,11 @@ size_t wcstombs([[nonnull]] char *__restrict dst,
 	return wcsrtombs(dst, (wchar_t const **)&src, dstlen, NULL);
 }
 
-[[cp, std, guard, section(".text.crt.fs.exec.system")]]
+[[cp, std, guard, section(".text.crt{|.dos}.fs.exec.system")]]
 int system([[nullable]] char const *command);
 
 
-%[default:section(".text.crt.application.exit")]
+%[default:section(".text.crt{|.dos}.application.exit")]
 [[std, guard, crtbuiltin, ATTR_NORETURN, throws]]
 [[export_alias("_ZSt9terminatev", "?terminate@@YAXXZ")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_ABORT))]]
@@ -769,7 +769,7 @@ typedef void (*__LIBCCALL __atexit_func_t)(void);
 #endif /* !____atexit_func_t_defined */
 )]
 
-%[default:section(".text.crt.sched.process")]
+%[default:section(".text.crt{|.dos}.sched.process")]
 [[std, alias("at_quick_exit"), decl_prefix(DEFINE_ATEXIT_FUNC_T)]]
 int atexit([[nonnull]] __atexit_func_t func);
 
@@ -787,11 +787,11 @@ int at_quick_exit([[nonnull]] __atexit_func_t func);
   preferred_extern_inline(_exit, { __builtin__exit(status); })]]
 [[export_alias("_exit")]]
 [[alias("quick_exit", "exit")]]
-[[ATTR_NORETURN, throws, section(".text.crt.application.exit")]]
+[[ATTR_NORETURN, throws, section(".text.crt{|.dos}.application.exit")]]
 void _Exit(int status);
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
 
-%[default:section(".text.crt.heap.malloc")];
+%[default:section(".text.crt{|.dos}.heap.malloc")];
 [[ignore, nocrt, alias("calloc")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
 void *crt_calloc(size_t count, size_t num_bytes);
@@ -831,7 +831,7 @@ void *realloc(void *mallptr, size_t num_bytes);
 void free(void *mallptr);
 
 
-%[default:section(".text.crt.random")];
+%[default:section(".text.crt{|.dos}.random")];
 [[std, nothrow, userimpl]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("srandom")]]
 void srand(long seed) {
@@ -849,7 +849,7 @@ int rand() {
 }
 
 
-%[default:section(".text.crt.unicode.static.convert")]
+%[default:section(".text.crt{|.dos}.unicode.static.convert")]
 /* Convert a string to an integer.  */
 [[std, wunused, ATTR_PURE]]
 [[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("atol")]]
@@ -1362,7 +1362,7 @@ char *qfcvt(__LONGDOUBLE val, int ndigit,
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 
-%[default:section(".text.crt.random")]
+%[default:section(".text.crt{|.dos}.random")]
 %{
 struct drand48_data {
 	unsigned short __x[3];
@@ -1403,14 +1403,14 @@ int srandom_r(unsigned int seed, [[nonnull]] struct random_data *buf);
 int initstate_r(unsigned int seed, [[nonnull]] char *__restrict statebuf, $size_t statelen, [[nonnull]] struct random_data *__restrict buf);
 int setstate_r([[nonnull]] char *__restrict statebuf, [[nonnull]] struct random_data *__restrict buf);
 
-%[default:section(".text.crt.sched.process")]
+%[default:section(".text.crt{|.dos}.sched.process")]
 %typedef void (__LIBCCALL *__on_exit_func_t)(int __status, void *__arg);
 int on_exit([[nonnull]] __on_exit_func_t func, void *arg);
 
-%[default:section(".text.crt.fs.environ")]
+%[default:section(".text.crt{|.dos}.fs.environ")]
 int clearenv();
 
-%[default:section(".text.crt.fs.utility")]
+%[default:section(".text.crt{|.dos}.fs.utility")]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemps64")]]
 [[wunused]] int mkstemps([[nonnull]] char *template_, int suffixlen);
 [[wunused]] int rpmatch([[nonnull]] char const *response);
@@ -1421,7 +1421,7 @@ int mkstemps64([[nonnull]] char *template_, int suffixlen);
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_MISC */
 
-%[default:section(".text.crt.random")]
+%[default:section(".text.crt{|.dos}.random")]
 %
 %
 %#ifdef __USE_POSIX
@@ -1436,7 +1436,7 @@ int rand_r([[nonnull]] unsigned int *__restrict pseed) {
 
 %
 %
-%[default:section(".text.crt.system.utility")]
+%[default:section(".text.crt{|.dos}.system.utility")]
 
 %#ifdef __USE_MISC
 %[insert:extern(cfree)]
@@ -1450,7 +1450,7 @@ int getloadavg(double loadavg[], int nelem);
 %
 %
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K))
-%[default:section(".text.crt.heap")]
+%[default:section(".text.crt{|.dos}.heap")]
 %[insert:extern(valloc)]
 %#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K) */
 
@@ -1489,7 +1489,7 @@ __CDECLARE(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW,__ctype_get_mb_cur_max,(void),
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN)
-%[default:section(".text.crt.random")]
+%[default:section(".text.crt{|.dos}.random")]
 %#ifndef __NO_FPU
 double drand48();
 %#endif /* !__NO_FPU */
@@ -1506,13 +1506,13 @@ void lcong48([[nonnull]] unsigned short param[7]);
 %#endif /* __USE_MISC || __USE_XOPEN */
 
 %#if defined(__USE_MISC) || defined(__USE_XOPEN) || defined(__USE_DOS)
-%[default:section(".text.crt.fs.environ")]
+%[default:section(".text.crt{|.dos}.fs.environ")]
 [[export_alias("_putenv")]]
 int putenv([[nonnull]] char *string);
 %#endif /* __USE_MISC || __USE_XOPEN || __USE_DOS */
 
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-%[default:section(".text.crt.random")];
+%[default:section(".text.crt{|.dos}.random")];
 
 [[userimpl]]
 [[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias("rand")]]
@@ -1530,7 +1530,7 @@ void srandom(unsigned int seed) {
 char *initstate(unsigned int seed, [[outp(statelen)]] char *statebuf, $size_t statelen);
 char *setstate([[nonnull]] char *statebuf);
 
-%[default:section(".text.crt.string.encrypt")]
+%[default:section(".text.crt{|.dos}.string.encrypt")]
 
 [[wunused]]
 char *l64a(long n); /* TODO: Implement here */
@@ -1544,7 +1544,7 @@ long a64l([[nonnull]] char const *s); /* TODO: Implement here */
 @@@param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
 @@                  path, or NULL to automatically `malloc()'ate and return a
 @@                  buffer of sufficient size.
-[[cp, wunused, section(".text.crt.fs.property")]]
+[[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
 char *realpath([[nonnull]] char const *__restrict filename, char *resolved);
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
@@ -1559,7 +1559,7 @@ char *realpath([[nonnull]] char const *__restrict filename, char *resolved);
 @@NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
 @@      bytes automatically allocated in the heap, ontop of which you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
-[[cp, wunused, section(".text.crt.fs.property")]]
+[[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
 char *frealpath($fd_t fd, char *resolved, $size_t buflen);
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED || __USE_KOS */
 
@@ -1571,7 +1571,7 @@ char *frealpath($fd_t fd, char *resolved, $size_t buflen);
 @@NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
 @@      bytes automatically allocated in the heap, ontop of which you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
-[[cp, wunused, section(".text.crt.fs.property")]]
+[[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
 char *frealpath4($fd_t fd, char *resolved, $size_t buflen, $atflag_t flags);
 
 @@Returns the absolute filesystem path for the specified file
@@ -1582,7 +1582,7 @@ char *frealpath4($fd_t fd, char *resolved, $size_t buflen, $atflag_t flags);
 @@      bytes automatically allocated in the heap, ontop of which you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
 @@@param flags: Set of `0|AT_ALTPATH|AT_SYMLINK_FOLLOW|AT_DOSPATH'
-[[cp, wunused, section(".text.crt.fs.property")]]
+[[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
 char *frealpathat($fd_t dirfd, [[nonnull]] char const *filename,
                   char *resolved, $size_t buflen, $atflag_t flags);
 %#endif /* __USE_KOS */
@@ -1591,7 +1591,7 @@ char *frealpathat($fd_t dirfd, [[nonnull]] char const *filename,
 %
 %
 %#ifdef __USE_XOPEN2K
-%[default:section(".text.crt.fs.environ")]
+%[default:section(".text.crt{|.dos}.fs.environ")]
 [[ignore, nocrt, alias("_putenv_s")]]
 int dos_putenv_s([[nonnull]] char const *varname,
                  [[nonnull]] char const *val);
@@ -1629,7 +1629,7 @@ int unsetenv([[nonnull]] char const *varname) {
 %
 %#if defined(__USE_MISC) || \
 %   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
-%[default:section(".text.crt.fs.utility")]
+%[default:section(".text.crt{|.dos}.fs.utility")]
 [[guard, alias("_mktemp"), export_alias("__mktemp")]]
 char *mktemp([[nonnull]] char *template_);
 %#endif
@@ -1639,7 +1639,7 @@ char *mktemp([[nonnull]] char *template_);
 %
 %#if defined(__USE_MISC) || defined(__USE_DOS) || \
 %   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
-%[default:section(".text.crt.unicode.static.convert")]
+%[default:section(".text.crt{|.dos}.unicode.static.convert")]
 
 %#ifndef __NO_FPU
 [[impl_prefix(DEFINE_QCVT_BUFFER)]]
@@ -1671,7 +1671,7 @@ char *fcvt(double val, int ndigit,
 
 
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
-%[default:section(".text.crt.application.options")]
+%[default:section(".text.crt{|.dos}.application.options")]
 [[wunused]]
 int getsubopt([[nonnull]] char **__restrict optionp,
               [[nonnull]] char *const *__restrict tokens,
@@ -1711,7 +1711,7 @@ int getsubopt([[nonnull]] char **__restrict optionp,
 	return -1;
 }
 
-%[default:section(".text.crt.fs.utility")]
+%[default:section(".text.crt{|.dos}.fs.utility")]
 [[wunused, alias("mkstemp64")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemp64")]]
 [[userimpl, requires_function(mktemp)]]
@@ -1737,7 +1737,7 @@ char *mkdtemp([[nonnull]] char *template_);
 
 %
 %#ifdef __USE_XOPEN
-%[default:section(".text.crt.io.tty")]
+%[default:section(".text.crt{|.dos}.io.tty")]
 %[insert:extern(setkey)]
 int grantpt($fd_t fd);
 int unlockpt($fd_t fd);
@@ -1754,7 +1754,7 @@ int posix_openpt($oflag_t oflags);
 
 
 %#ifdef __USE_GNU
-%[default:section(".text.crt.unicode.static.convert")]
+%[default:section(".text.crt{|.dos}.unicode.static.convert")]
 [[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("strtoll_l", "_strtoll_l", "__strtoll_l")]]
 [[alt_variant_of(__SIZEOF_LONG__ == 4, "strto32_l")]]
 [[alt_variant_of(__SIZEOF_LONG__ == 8, "strto64_l")]]
@@ -1827,11 +1827,11 @@ __LONGDOUBLE strtold_l([[nonnull]] char const *__restrict nptr,
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 
-[[section(".text.crt.fs.environ")]]
+[[section(".text.crt{|.dos}.fs.environ")]]
 [[wunused, export_alias("__secure_getenv"), alias("getenv")]]
 char *secure_getenv([[nonnull]] char const *varname);
 
-[[section(".text.crt.io.tty")]]
+[[section(".text.crt{|.dos}.io.tty")]]
 int ptsname_r($fd_t fd, [[nonnull]] char *buf, $size_t buflen);
 
 [[cp]]
@@ -1839,10 +1839,10 @@ int getpt();
 
 @@Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
 @@Upon error, `NULL' is returned instead
-[[cp, ATTR_MALLOC, wunused, section(".text.crt.fs.property")]]
+[[cp, ATTR_MALLOC, wunused, section(".text.crt{|.dos}.fs.property")]]
 char *canonicalize_file_name([[nonnull]] char const *filename);
 
-%[default:section(".text.crt.fs.utility")]
+%[default:section(".text.crt{|.dos}.fs.utility")]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemp64")]]
 [[cp, wunused, alias("mkostemp64")]]
 int mkostemp([[nonnull]] char *template_, int flags);
@@ -1938,7 +1938,7 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(__SIZE_TYPE__ __num_bytes) { return (call
 
 %
 %#ifdef __USE_BSD
-[[section(".text.crt.heap.rare_helpers")]]
+[[section(".text.crt{|.dos}.heap.rare_helpers")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 [[userimpl, requires_function(realloc, free)]]
 void *reallocf(void *mallptr, $size_t num_bytes) {
@@ -1952,7 +1952,7 @@ void *reallocf(void *mallptr, $size_t num_bytes) {
 @@Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
 @@when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
 @@is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block
-[[section(".text.crt.heap.rare_helpers")]]
+[[section(".text.crt{|.dos}.heap.rare_helpers")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((3, 4))]]
 [[userimpl, requires_function(recallocv, calloc, malloc_usable_size)]]
 void *recallocarray(void *mallptr, $size_t old_elem_count,
@@ -1988,7 +1988,7 @@ void *recallocarray(void *mallptr, $size_t old_elem_count,
 @@described by `mallptr...+=size' is explicitly freed to zero, or
 @@immediately returned to the OS, rather than being left in cache
 @@while still containing its previous contents.
-[[section(".text.crt.heap.rare_helpers")]]
+[[section(".text.crt{|.dos}.heap.rare_helpers")]]
 [[userimpl, requires_function(free)]]
 void freezero(void *mallptr, $size_t size) {
 	if likely(mallptr) {
@@ -2070,12 +2070,12 @@ typedef int (__LIBCCALL *_onexit_t)(void);
 %#define errno     (*__errno_location())
 %#endif /* ____errno_location_defined */
 %#endif /* !errno */
-%[default:section(".text.crt.errno_access")]
+%[default:section(".text.crt.dos.errno_access")]
 
-[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
 errno_t _get_errno(errno_t *perr);
 
-[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
 errno_t _set_errno(errno_t err);
 %#endif /* !_CRT_ERRNO_DEFINED */
 
@@ -2086,7 +2086,7 @@ errno_t _set_errno(errno_t err);
 [[guard, ATTR_CONST]]
 $u32 *__doserrno();
 
-[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
 errno_t _get_doserrno($u32 *perr);
 
 [[decl_include("<bits/types.h>")]]
@@ -2901,7 +2901,7 @@ errno_t rand_s([[nonnull]] unsigned int *__restrict randval) {
 }
 
 
-%[default:section(".text.crt.unicode.static.convert")];
+%[default:section(".text.crt{|.dos}.unicode.static.convert")];
 %[insert:function(_strtol_l = strtol_l)]
 %[insert:function(_strtoul_l = strtoul_l)]
 %[insert:function(_strtoll_l = strtoll_l)]
@@ -3127,7 +3127,7 @@ void _aligned_free(void *aligned_mallptr) {
 [[cp]]
 char *_fullpath(char *buf, char const *path, $size_t buflen);
 
-%[default:section(".text.crt.unicode.static.convert")]
+%[default:section(".text.crt{|.dos}.unicode.static.convert")]
 
 %#ifndef __NO_FPU
 [[decl_include("<bits/types.h>")]]
@@ -3520,7 +3520,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 %
 %[default:section(".text.crt.dos.string.utility")];
 %[insert:extern(swab)]
-%[default:section(".text.crt.unicode.static.convert")];
+%[default:section(".text.crt{|.dos}.unicode.static.convert")];
 
 
 %

@@ -215,6 +215,7 @@ function build(reconfigure: Callable = none, binTargetName: string = none) {
 	reconfigure(me);
 
 	{
+		final local TARGET = __nth(2) TARGET;
 		final local XARCH  = TARGET.XARCH;
 		final local SUFFIX = TARGET.SUFFIX;
 		final local ASMFILES = TARGET.ASMFILES;

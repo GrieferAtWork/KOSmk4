@@ -531,7 +531,7 @@ __NAMESPACE_STD_USING(imaxdiv_t)
 %[insert:std]
 
 
-[[std, section(".text.crt.math.utility")]]
+[[std, section(".text.crt{|.dos}.math.utility")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_INT__), alias("abs")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("labs")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("llabs")]]
@@ -541,7 +541,7 @@ $intmax_t imaxabs($intmax_t x) {
 }
 
 [[std, nothrow, ATTR_CONST]]
-[[section(".text.crt.math.utility")]]
+[[section(".text.crt{|.dos}.math.utility")]]
 imaxdiv_t imaxdiv($intmax_t numer, $intmax_t denom) {
 	imaxdiv_t result;
 	result.@quot@ = numer / denom;
@@ -550,7 +550,7 @@ imaxdiv_t imaxdiv($intmax_t numer, $intmax_t denom) {
 }
 
 
-[[std, ATTR_LEAF, section(".text.crt.unicode.static.convert")]]
+[[std, ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("strtol")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("strtoll", "strtoq")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("strto64", "_strtoi64")]]
@@ -565,7 +565,7 @@ $intmax_t strtoimax([[nonnull]] char const *__restrict nptr,
 }
 
 
-[[std, ATTR_LEAF, section(".text.crt.unicode.static.convert")]]
+[[std, ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("strtoul")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("strtoull", "strtouq")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("strtou64", "_strtoui64")]]

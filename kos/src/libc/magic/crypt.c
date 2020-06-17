@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default:section(".text.crt.string.encrypt")]
+%[default:section(".text.crt{|.dos}.string.encrypt")]
 
 %{
 #include <features.h>

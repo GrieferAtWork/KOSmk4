@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed63080 */
+/* HASH CRC-32:0x2f7c57c8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,21 @@
 
 DECL_BEGIN
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF uint32_t NOTHROW_NCX(LIBDCALL libd__controlfp)(uint32_t newval, uint32_t mask);
+INTDEF void NOTHROW_NCX(LIBDCALL libd__set_controlfp)(uint32_t newval, uint32_t mask);
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__controlfp_s)(uint32_t *pcurrent, uint32_t newval, uint32_t mask);
+INTDEF void NOTHROW_NCX(LIBDCALL libd__statusfp2)(uint32_t *x86_stat, uint32_t *sse2_stat);
+INTDEF uint32_t NOTHROW_NCX(LIBDCALL libd__control87)(uint32_t newval, uint32_t mask);
+INTDEF int NOTHROW_NCX(LIBDCALL libd___control87_2)(uint32_t newval, uint32_t mask, uint32_t *x86_control_word, uint32_t *sse2_control_word);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd__chgsign)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc__chgsign)(double x);
 #endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__fpclass)(double x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END
 

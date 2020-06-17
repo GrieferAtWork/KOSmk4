@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45e2b10a */
+/* HASH CRC-32:0x9e3b62fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SYS_STATFS_H 1
 
 #include "../api.h"
+#include "../auto/sys.statfs.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

@@ -38,7 +38,7 @@ __SYSDECL_BEGIN
 
 }
 
-%(user){
+%(auto_header,user){
 #ifndef __T16ARGV
 #ifdef __USE_DOS
 #define __T16ARGV char16_t const *const *__restrict ___argv

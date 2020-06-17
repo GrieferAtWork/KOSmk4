@@ -20,7 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
-%[default:section(".text.crt.system.ioperm")]
+%[default:section(".text.crt{|.dos}.system.ioperm")]
 
 %{
 #include <features.h>

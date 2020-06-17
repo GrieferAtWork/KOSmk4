@@ -45,8 +45,9 @@
 #include <unistd.h>
 
 #include "../libc/dl.h"
-#include "../libc/init.h"
+#include "../libc/errno.h"
 #include "../libc/globals.h"
+#include "../libc/init.h"
 #include "malloc.h"
 #include "stdlib.h"
 
@@ -1825,11 +1826,87 @@ NOTHROW_RPC(LIBCCALL libc__fullpath)(char *buf,
 /*[[[end:libc__fullpath]]]*/
 
 /* All of these are implemented in libc/libc/errno.c */
-/*[[[skip:libc__get_errno]]]*/
-/*[[[skip:libc__set_errno]]]*/
 /*[[[skip:libc___doserrno]]]*/
-/*[[[skip:libc__get_doserrno]]]*/
-/*[[[skip:libc__set_doserrno]]]*/
+
+/*[[[head:libd__get_errno,hash:CRC-32=0x89478bd0]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno_access") errno_t
+NOTHROW_NCX(LIBDCALL libd__get_errno)(errno_t *perr)
+/*[[[body:libd__get_errno]]]*/
+{
+	if (!perr)
+		return __DOS_EINVAL;
+	*perr = libd_geterrno();
+	return EOK;
+}
+/*[[[end:libd__get_errno]]]*/
+
+/*[[[head:libc__get_errno,hash:CRC-32=0x6d797f41]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno_access") errno_t
+NOTHROW_NCX(LIBCCALL libc__get_errno)(errno_t *perr)
+/*[[[body:libc__get_errno]]]*/
+{
+	if (!perr)
+		return EINVAL;
+	*perr = libd_geterrno();
+	return EOK;
+}
+/*[[[end:libc__get_errno]]]*/
+
+/*[[[head:libd__set_errno,hash:CRC-32=0xd9d75bda]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno_access") errno_t
+NOTHROW_NCX(LIBDCALL libd__set_errno)(errno_t err)
+/*[[[body:libd__set_errno]]]*/
+{
+	libd_seterrno(err);
+	return EOK;
+}
+/*[[[end:libd__set_errno]]]*/
+
+/*[[[head:libc__set_errno,hash:CRC-32=0x57b23e35]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno_access") errno_t
+NOTHROW_NCX(LIBCCALL libc__set_errno)(errno_t err)
+/*[[[body:libc__set_errno]]]*/
+{
+	libc_seterrno(err);
+	return EOK;
+}
+/*[[[end:libc__set_errno]]]*/
+
+/*[[[head:libd__get_doserrno,hash:CRC-32=0xbb969dc6]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") errno_t
+NOTHROW_NCX(LIBDCALL libd__get_doserrno)(u32 *perr)
+/*[[[body:libd__get_doserrno]]]*/
+{
+	if (!perr)
+		return __DOS_EINVAL;
+	*perr = libd_getnterrno();
+	return 0;
+}
+/*[[[end:libd__get_doserrno]]]*/
+
+/*[[[head:libc__get_doserrno,hash:CRC-32=0x8bad074a]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") errno_t
+NOTHROW_NCX(LIBCCALL libc__get_doserrno)(u32 *perr)
+/*[[[body:libc__get_doserrno]]]*/
+{
+	if (!perr)
+		return EINVAL;
+	*perr = libd_getnterrno();
+	return 0;
+}
+/*[[[end:libc__get_doserrno]]]*/
+
+
+/*[[[head:libc__set_doserrno,hash:CRC-32=0xd9a78cf6]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") errno_t
+NOTHROW_NCX(LIBCCALL libc__set_doserrno)(u32 err)
+/*[[[body:libc__set_doserrno]]]*/
+{
+	libd_setnterrno(err);
+	return EOK;
+}
+/*[[[end:libc__set_doserrno]]]*/
+
 
 /*[[[head:libc__seterrormode,hash:CRC-32=0xb76bea9f]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.errno") void
@@ -2128,7 +2205,7 @@ NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xca5f7548]]]*/
+/*[[[start:exports,hash:CRC-32=0xe3cbd8c0]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(system, libc_system);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
@@ -2203,6 +2280,13 @@ DEFINE_PUBLIC_ALIAS(mkostemps64, libc_mkostemps64);
 DEFINE_PUBLIC_ALIAS(reallocf, libc_reallocf);
 DEFINE_PUBLIC_ALIAS(recallocarray, libc_recallocarray);
 DEFINE_PUBLIC_ALIAS(freezero, libc_freezero);
+DEFINE_PUBLIC_ALIAS(DOS$_get_errno, libd__get_errno);
+DEFINE_PUBLIC_ALIAS(_get_errno, libc__get_errno);
+DEFINE_PUBLIC_ALIAS(DOS$_set_errno, libd__set_errno);
+DEFINE_PUBLIC_ALIAS(_set_errno, libc__set_errno);
+DEFINE_PUBLIC_ALIAS(DOS$_get_doserrno, libd__get_doserrno);
+DEFINE_PUBLIC_ALIAS(_get_doserrno, libc__get_doserrno);
+DEFINE_PUBLIC_ALIAS(_set_doserrno, libc__set_doserrno);
 DEFINE_PUBLIC_ALIAS(__p___argc, libc___p___argc);
 DEFINE_PUBLIC_ALIAS(__p___argv, libc___p___argv);
 DEFINE_PUBLIC_ALIAS(DOS$__p___wargv, libd___p___wargv);

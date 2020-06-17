@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cded6dd */
+/* HASH CRC-32:0x22262f87 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,20 +29,60 @@
 
 DECL_BEGIN
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Convert 48 bit Ethernet ADDRess to ASCII */
+INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_ether_ntoa)(struct ether_addr const *__restrict addr);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Convert 48 bit Ethernet ADDRess to ASCII */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_ether_ntoa)(struct ether_addr const *__restrict addr);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Convert 48 bit Ethernet ADDRess to ASCII */
+INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_ether_ntoa_r)(struct ether_addr const *__restrict addr, char *__restrict buf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Convert 48 bit Ethernet ADDRess to ASCII */
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr, char *__restrict buf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Convert ASCII string S to 48 bit Ethernet address */
+INTDEF ATTR_RETNONNULL NONNULL((1)) struct ether_addr *NOTHROW_NCX(LIBDCALL libd_ether_aton)(char const *__restrict asc);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Convert ASCII string S to 48 bit Ethernet address */
 INTDEF ATTR_RETNONNULL NONNULL((1)) struct ether_addr *NOTHROW_NCX(LIBCCALL libc_ether_aton)(char const *__restrict asc);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Convert ASCII string S to 48 bit Ethernet address */
+INTDEF WUNUSED NONNULL((1, 2)) struct ether_addr *NOTHROW_NCX(LIBDCALL libd_ether_aton_r)(char const *__restrict asc, struct ether_addr *__restrict addr);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Convert ASCII string S to 48 bit Ethernet address */
 INTDEF WUNUSED NONNULL((1, 2)) struct ether_addr *NOTHROW_NCX(LIBCCALL libc_ether_aton_r)(char const *__restrict asc, struct ether_addr *__restrict addr);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Convert ASCII string S to 48 bit Ethernet address */
+INTDEF WUNUSED NONNULL((1, 2)) struct ether_addr *NOTHROW_NCX(LIBDCALL libd_ether_paton_r)(char const **__restrict pasc, struct ether_addr *__restrict addr);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Convert ASCII string S to 48 bit Ethernet address */
 INTDEF WUNUSED NONNULL((1, 2)) struct ether_addr *NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc, struct ether_addr *__restrict addr);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Scan LINE and set ADDR and HOSTNAME */
+INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBDCALL libd_ether_line)(char const *line, struct ether_addr *addr, char *hostname);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Scan LINE and set ADDR and HOSTNAME */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_ether_line)(char const *line, struct ether_addr *addr, char *hostname);
 #endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Map 48 bit Ethernet number ADDR to HOSTNAME */
+INTDEF int NOTHROW_RPC_KOS(LIBDCALL libd_ether_ntohost)(char *hostname, struct ether_addr const *addr);
+/* Map HOSTNAME to 48 bit Ethernet address */
+INTDEF int NOTHROW_RPC_KOS(LIBDCALL libd_ether_hostton)(char const *hostname, struct ether_addr *addr);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END
 

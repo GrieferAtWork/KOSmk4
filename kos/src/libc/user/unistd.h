@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e6151ae */
+/* HASH CRC-32:0xdf2bebd5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,15 +44,40 @@ INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_execve)(char const *__re
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_execvp)(char const *__restrict file, __TARGV);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> execl(3)
+ * Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBDCALL libd_execl)(char const *__restrict path, char const *args, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path, char const *args, ...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> execle(3)
+ * Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * and setting `environ' to a `char **' passed after the NULL sentinel */
+INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBDCALL libd_execle)(char const *__restrict path, char const *args, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path, char const *args, ...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> execlp(3)
+ * Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBDCALL libd_execlp)(char const *__restrict file, char const *args, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
@@ -61,6 +86,14 @@ INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execlp)(char co
  * Replace the calling process with the application image referred to by `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file, __TARGV, __TENVP);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> execlpe(3)
+ * Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
+INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBDCALL libd_execlpe)(char const *__restrict file, char const *args, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
@@ -418,7 +451,17 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_endusershell)(void);
 INTDEF void NOTHROW_RPC(LIBCCALL libc_setusershell)(void);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_daemon)(__STDC_INT_AS_UINT_T nochdir, __STDC_INT_AS_UINT_T noclose);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF longptr_t NOTHROW_RPC(VLIBDCALL libd_syscall)(longptr_t sysno, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF longptr_t NOTHROW_RPC(VLIBCCALL libc_syscall)(longptr_t sysno, ...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF __LONG64_TYPE__ NOTHROW_RPC(VLIBDCALL libd_syscall64)(syscall_ulong_t sysno, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF __LONG64_TYPE__ NOTHROW_RPC(VLIBCCALL libc_syscall64)(syscall_ulong_t sysno, ...);
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads

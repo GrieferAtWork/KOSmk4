@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf4c4305 */
+/* HASH CRC-32:0x4889af71 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,9 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerror_s)(int errnum);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strerror_s)(errno_t errnum);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerror_s)(errno_t errnum);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strerrorname_s)(int errnum);
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerrorname_s)(int errnum);
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strsignal_s)(int signum);
 #endif /* !__KERNEL__ */

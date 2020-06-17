@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9200f189 */
+/* HASH CRC-32:0xa62060d3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,10 @@
 
 DECL_BEGIN
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Sleep for `mill' milliseconds (1/1.000 seconds) */
+INTDEF void NOTHROW_RPC(LIBDCALL libd_delay)(unsigned int mill);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_delay)(unsigned int mill);

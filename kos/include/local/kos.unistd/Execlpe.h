@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3dca5b7 */
+/* HASH CRC-32:0x5487f29a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> execvpe(3)
  * Replace the calling process with the application image referred to by `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,__localdep_Execvpe,(char const *__restrict __file, __TARGV, __TENVP),Execvpe,(__fd,___argv,___envp))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,__localdep_Execvpe,(char const *__restrict __file, __TARGV, __TENVP),Execvpe,(__file,___argv,___envp))
 #endif /* !__local___localdep_Execvpe_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>

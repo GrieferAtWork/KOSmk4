@@ -1421,6 +1421,7 @@ function ppParse(self: string | UserString | CParser | File): PPBranch {
 		}
 		return result;
 	} catch (Error as e) {
+		print "... while parsing expression string", repr(str(self));
 		if (type(e) === Error)
 			throw;
 		if (self.tokStart !is bound)

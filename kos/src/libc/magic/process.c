@@ -104,7 +104,7 @@ void _endthread() {
 
 void _endthreadex($u32 exitcode);
 
-%[default:section(".text.crt.sched.process")]
+%[default:section(".text.crt{|.dos}.sched.process")]
 
 %
 %#ifndef _CRT_TERMINATE_DEFINED
@@ -162,7 +162,7 @@ intptr_t _spawnle(int mode, [[nonnull]] char const *__restrict path,
 intptr_t _spawnlpe(int mode, [[nonnull]] char const *__restrict file,
                    char const *args, ... /*, (char *)NULL, (char **)environ*/) = spawnlpe;
 
-%[default:section(".text.crt.fs.exec.system")]
+%[default:section(".text.crt{|.dos}.fs.exec.system")]
 %[insert:extern(system)]
 
 %
@@ -281,7 +281,7 @@ intptr_t _wspawnlpe(int mode, [[nonnull]] wchar_t const *__restrict path,
 [[cp, export_alias("_cwait")]]
 $pid_t cwait(int *tstat, $pid_t pid, int action);
 
-%[default:section(".text.crt.fs.exec.spawn")]
+%[default:section(".text.crt{|.dos}.fs.exec.spawn")]
 
 [[cp, guard, argument_names(mode, path, ___argv), export_alias("_spawnv")]]
 $pid_t spawnv(int mode, [[nonnull]] char const *__restrict path, [[nonnull]] __TARGV);

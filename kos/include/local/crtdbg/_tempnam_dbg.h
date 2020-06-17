@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac2743d3 */
+/* HASH CRC-32:0x1c847481 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_tempnam
 #endif /* !... */
 #endif /* !__local___localdep_tempnam_defined */
 __LOCAL_LIBC(_tempnam_dbg) __ATTR_MALLOC __ATTR_WUNUSED char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_tempnam_dbg))(char const *__dir_name, char const *__file_prefix, int __block_type, char const *__filename, int __line) {
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_tempnam_dbg))(char const *__dir_name, char const *__file_prefix, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;

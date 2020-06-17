@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(errno_t = __errno_t)]
-%[default:section(".text.crt.error")]
+%[default:section(".text.crt{|.dos}.error")]
 
 %(auto_source){
 #include "../libc/globals.h"

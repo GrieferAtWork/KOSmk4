@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default:section(".text.crt.net.inet")]
+%[default:section(".text.crt{|.dos}.net.inet")]
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(pid_t = __pid_t)]
 %[define_replacement(in_addr_t = __u_net32_t)]

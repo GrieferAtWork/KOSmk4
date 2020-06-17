@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61e26f77 */
+/* HASH CRC-32:0xea200b6f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -819,15 +819,6 @@ NOTHROW_NCX(LIBCCALL libc_memccpy)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCCPY */
 #endif /* !__KERNEL__ */
-#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
-DEFINE_PUBLIC_ALIAS(DOS$wmemcpy, libd_wmemcpy);
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wmemcpy)(char16_t *__restrict dst,
-                                   char16_t const *__restrict src,
-                                   size_t num_chars) {
-	return (char16_t *)libc_memcpyw(dst, src, num_chars);
-}
-#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
 #ifndef LIBC_ARCH_HAVE_MEMCPYW
 /* Copy memory between non-overlapping memory blocks. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
@@ -841,15 +832,6 @@ NOTHROW_NCX(LIBCCALL libc_memcpyw)(void *__restrict dst,
 	return (u16 *)dst;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCPYW */
-#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
-DEFINE_PUBLIC_ALIAS(DOS$wmempcpy, libd_wmempcpy);
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wmempcpy)(char16_t *__restrict dst,
-                                    char16_t const *__restrict src,
-                                    size_t num_chars) {
-	return (char16_t *)libc_mempcpyw(dst, src, num_chars);
-}
-#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
 #ifndef LIBC_ARCH_HAVE_MEMPCPYW
 /* Same as `memcpyw', but return `DST + N_WORDS', rather than `DST' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
@@ -881,15 +863,6 @@ NOTHROW_NCX(LIBCCALL libc_mempcpyl)(void *__restrict dst,
 	return (u32 *)libc_memcpyl(dst, src, n_dwords) + n_dwords;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPCPYL */
-#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
-DEFINE_PUBLIC_ALIAS(DOS$wmemmove, libd_wmemmove);
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wmemmove)(char16_t *dst,
-                                    char16_t const *src,
-                                    size_t num_chars) {
-	return (char16_t *)libc_memmovew(dst, src, num_chars);
-}
-#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEW
 /* Move memory between potentially overlapping memory blocks. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
@@ -911,15 +884,6 @@ NOTHROW_NCX(LIBCCALL libc_memmovew)(void *dst,
 	return (u16 *)dst;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEW */
-#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
-DEFINE_PUBLIC_ALIAS(DOS$wmempmove, libd_wmempmove);
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wmempmove)(char16_t *dst,
-                                     char16_t const *src,
-                                     size_t num_chars) {
-	return (char16_t *)libc_mempmovew(dst, src, num_chars);
-}
-#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
 #ifndef LIBC_ARCH_HAVE_MEMPMOVEW
 /* Same as `memmovew', but return `DST + N_WORDS', rather than `DST' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) uint16_t *
@@ -1059,15 +1023,6 @@ NOTHROW_NCX(LIBCCALL libc_mempmovedownl)(void *dst,
 	return (u32 *)libc_memmovedownl(dst, src, n_dwords) + n_dwords;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVEDOWNL */
-#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
-DEFINE_PUBLIC_ALIAS(DOS$wmemset, libd_wmemset);
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wmemset)(char16_t *dst,
-                                   char16_t filler,
-                                   size_t num_chars) {
-	return (char16_t *)libc_memsetw(dst, (u16)filler, num_chars);
-}
-#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
 #ifndef LIBC_ARCH_HAVE_MEMSETW
 /* Fill memory with a given word */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint16_t *
@@ -1080,15 +1035,6 @@ NOTHROW_NCX(LIBCCALL libc_memsetw)(void *__restrict dst,
 	return (u16 *)dst;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMSETW */
-#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
-DEFINE_PUBLIC_ALIAS(DOS$wmempset, libd_wmempset);
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wmempset)(char16_t *dst,
-                                    char16_t filler,
-                                    size_t num_chars) {
-	return (char16_t *)libc_mempsetw(dst, (u16)filler, num_chars);
-}
-#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
 #ifndef LIBC_ARCH_HAVE_MEMPSETW
 /* Same as `memsetw', but return `DST + N_WORDS', rather than `DST' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint16_t *
@@ -1119,15 +1065,6 @@ NOTHROW_NCX(LIBCCALL libc_mempsetl)(void *__restrict dst,
 	return (u32 *)libc_memsetl(dst, dword, n_dwords) + n_dwords;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPSETL */
-#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
-DEFINE_PUBLIC_ALIAS(DOS$wmemcmp, libd_wmemcmp);
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
-NOTHROW_NCX(LIBDCALL libd_wmemcmp)(char16_t const *s1,
-                                   char16_t const *s2,
-                                   size_t num_chars) {
-	return libc_memcmpw(s1, s2, num_chars);
-}
-#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
 #ifndef LIBC_ARCH_HAVE_MEMCMPW
 /* Compare memory buffers and return the difference of the first non-matching word */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int16_t
@@ -1156,15 +1093,6 @@ NOTHROW_NCX(LIBCCALL libc_memcmpl)(void const *s1,
 	return v1 - v2;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCMPL */
-#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
-DEFINE_PUBLIC_ALIAS(DOS$wmemchr, libd_wmemchr);
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
-NOTHROW_NCX(LIBDCALL libd_wmemchr)(char16_t const *haystack,
-                                   char16_t needle,
-                                   size_t num_chars) {
-	return (char16_t *)libc_memchrw(haystack, (u16)needle, num_chars);
-}
-#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
 #ifndef LIBC_ARCH_HAVE_MEMCHRW
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) uint16_t *
@@ -4775,7 +4703,9 @@ DEFINE_PUBLIC_ALIAS(fuzzy_strcasecmp_l, libc_fuzzy_strcasecmp_l);
 DEFINE_PUBLIC_ALIAS(fuzzy_strncasecmp_l, libc_fuzzy_strncasecmp_l);
 DEFINE_PUBLIC_ALIAS(wildstrcasecmp_l, libc_wildstrcasecmp_l);
 DEFINE_PUBLIC_ALIAS(fuzzy_memcasecmp_l, libc_fuzzy_memcasecmp_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$fuzzy_wmemcmp, libc_fuzzy_memcmpw);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(fuzzy_memcmpw, libc_fuzzy_memcmpw);
 DEFINE_PUBLIC_ALIAS(fuzzy_wmemcmp, libc_fuzzy_memcmpl);
 DEFINE_PUBLIC_ALIAS(fuzzy_memcmpl, libc_fuzzy_memcmpl);

@@ -39,7 +39,7 @@ __SYSDECL_BEGIN
 
 }
 
-%[default:section(".text.crt.except.fs.stat")]
+%[default:section(".text.crt{|.dos}.except.fs.stat")]
 
 [[throws, nocrt, doc_alias(stat), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("KStat")]]
@@ -98,7 +98,7 @@ void FStatAt64($fd_t dirfd, [[nonnull]] char const *__restrict filename,
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_ATFILE */
 
-%[default:section(".text.crt.except.fs.modify")]
+%[default:section(".text.crt{|.dos}.except.fs.modify")]
 
 %
 [[cp, throws, doc_alias("mkdir")]]
@@ -115,7 +115,7 @@ void Chmod([[nonnull]] char const *filename, $mode_t mode);
 void LChmod([[nonnull]] char const *filename, $mode_t mode);
 %#endif /* __USE_MISC */
 
-%[default:section(".text.crt.except.fs.modify")]
+%[default:section(".text.crt{|.dos}.except.fs.modify")]
 
 %
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
@@ -157,7 +157,7 @@ void MknodAt($fd_t dirfd, [[nonnull]] char const *nodename, $mode_t mode, $dev_t
 %#endif /* __USE_ATFILE */
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
-%[default:section(".text.crt.except.fs.modify_time")];
+%[default:section(".text.crt{|.dos}.except.fs.modify_time")];
 
 [[cp, throws, doc_alias("utimensat32"), ignore, nocrt, alias("UTimensAt")]]
 void UTimensAt32($fd_t dirfd, [[nonnull]] char const *filename,

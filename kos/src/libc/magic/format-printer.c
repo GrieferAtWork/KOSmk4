@@ -22,7 +22,7 @@
 %[define_replacement(pformatgetc    = __pformatgetc)]
 %[define_replacement(pformatungetc  = __pformatungetc)]
 
-%[default:section(".text.crt.string.format")]
+%[default:section(".text.crt{|.dos}.string.format")]
 
 %[define_str2wcs_replacement(pformatprinter = pwformatprinter)]
 %[define_str2wcs_replacement(__pformatprinter = __pwformatprinter)]
@@ -979,7 +979,7 @@ $ssize_t format_width(void *arg, [[nonnull]] /*utf-8*/ char const *__restrict da
 }
 
 @@Always re-return `datalen' and ignore all other arguments
-[[ATTR_CONST, export_alias("format_wwidth")]]
+[[ATTR_CONST, kos_export_alias("format_wwidth")]]
 $ssize_t format_length(void *arg, /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	(void)arg;
 	(void)data;

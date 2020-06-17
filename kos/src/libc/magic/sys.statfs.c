@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
-%[default:section(".text.crt.fs.statfs.statfs")]
+%[default:section(".text.crt{|.dos}.fs.statfs.statfs")]
 
 %{
 #include <features.h>

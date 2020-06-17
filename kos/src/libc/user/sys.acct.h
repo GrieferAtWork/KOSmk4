@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf12a48ad */
+/* HASH CRC-32:0x19e2f081 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SYS_ACCT_H 1
 
 #include "../api.h"
+#include "../auto/sys.acct.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

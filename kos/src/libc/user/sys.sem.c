@@ -31,6 +31,26 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
+/*[[[head:libd_semctl,hash:CRC-32=0xc28f7352]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+/* Semaphore control operation. */
+INTERN ATTR_SECTION(".text.crt.dos.io.poll") int
+NOTHROW_NCX(VLIBDCALL libd_semctl)(int semid,
+                                   __STDC_INT_AS_UINT_T semnum,
+                                   __STDC_INT_AS_UINT_T cmd,
+                                   ...)
+/*[[[body:libd_semctl]]]*/
+/*AUTO*/{
+	(void)semid;
+	(void)semnum;
+	(void)cmd;
+	CRT_UNIMPLEMENTED("semctl"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+#endif /* MAGIC:impl_if */
+/*[[[end:libd_semctl]]]*/
+
 /*[[[head:libc_semctl,hash:CRC-32=0xfd05428e]]]*/
 /* Semaphore control operation. */
 INTERN ATTR_SECTION(".text.crt.io.poll") int
@@ -106,7 +126,10 @@ NOTHROW_NCX(LIBCCALL libc_semtimedop)(int semid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x69dcda71]]]*/
+/*[[[start:exports,hash:CRC-32=0x879137b2]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(DOS$semctl, libd_semctl);
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(semctl, libc_semctl);
 DEFINE_PUBLIC_ALIAS(semget, libc_semget);
 DEFINE_PUBLIC_ALIAS(semop, libc_semop);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c53c679 */
+/* HASH CRC-32:0x974a7e96 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SYS_MMAN_H 1
 
 #include "../api.h"
+#include "../auto/sys.mman.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

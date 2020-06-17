@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee4734b */
+/* HASH CRC-32:0x5cb87ae9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,23 @@
 
 DECL_BEGIN
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Return directory part of PATH or "." if none is available */
+INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBDCALL libd_dirname)(char *path);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Return directory part of PATH or "." if none is available */
 INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBCCALL libc_dirname)(char *path);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Return final component of PATH.
+ * This is the weird XPG version of this function. It sometimes will
+ * modify its argument. Therefore we normally use the GNU version (in
+ * <string.h>) and only if this header is included make the XPG
+ * version available under the real name */
+INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBDCALL libd___xpg_basename)(char *filename);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Return final component of PATH.
  * This is the weird XPG version of this function. It sometimes will
  * modify its argument. Therefore we normally use the GNU version (in

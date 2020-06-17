@@ -105,6 +105,12 @@
 #include <features.h>
 #include <hybrid/compiler.h>
 
+#undef ATTR_DEPRECATED
+#undef ATTR_DEPRECATED_
+#define ATTR_DEPRECATED(msg) /* nothing */
+#define ATTR_DEPRECATED_     /* nothing */
+
+
 #include <hybrid/host.h>
 
 #include <kos/anno.h>

@@ -48,13 +48,13 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 }
 
-%[default:section(".text.crt.unicode.static.ctype")];
+%[default:section(".text.crt{|.dos}.unicode.static.ctype")];
 
 [[ignore, ATTR_CONST, wunused, nothrow]]
 char const *__locale_ctype_ptr();
 
 [[ignore, wunused, ATTR_PURE]]
-[[section(".text.crt.unicode.locale.ctype")]]
+[[section(".text.crt{|.dos}.unicode.locale.ctype")]]
 char const *__locale_ctype_ptr_l($locale_t locale);
 
 [[ignore, wunused, ATTR_PURE, nothrow]]
@@ -70,7 +70,7 @@ $int32_t const **__ctype_toupper_loc();
 int _isctype(int ch, int mask);
 
 [[ignore, wunused, ATTR_PURE]]
-[[section(".text.crt.unicode.locale.ctype")]]
+[[section(".text.crt{|.dos}.unicode.locale.ctype")]]
 int _isctype_l(int ch, int mask, $locale_t locale);
 
 
@@ -400,7 +400,7 @@ int isblank(int ch) {
 #ifdef __USE_XOPEN2K8
 }
 
-%[default:section(".text.crt.unicode.locale.ctype")]
+%[default:section(".text.crt{|.dos}.unicode.locale.ctype")]
 
 [[wunused, ATTR_PURE, export_alias("__iscntrl_l")]]
 int iscntrl_l(int ch, __locale_t locale) {
@@ -1089,7 +1089,7 @@ __NAMESPACE_INT_END
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 }
-%[default:section(".text.crt.unicode.static.ctype")];
+%[default:section(".text.crt{|.dos}.unicode.static.ctype")];
 
 @@Returns non-zero if `(C & ~0x7f) == 0'
 [[nothrow, ATTR_CONST]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cb94036 */
+/* HASH CRC-32:0x9ea40fda */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,11 @@
 
 DECL_BEGIN
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Match NAME against the filename pattern PATTERN,
+ * returning zero if it matches, FNM_NOMATCH if not */
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_fnmatch)(char const *pattern, char const *name, int match_flags);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Match NAME against the filename pattern PATTERN,
  * returning zero if it matches, FNM_NOMATCH if not */

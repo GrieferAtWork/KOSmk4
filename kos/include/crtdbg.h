@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2baa4d3a */
+/* HASH CRC-32:0xecc3bdaf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -230,7 +230,7 @@ __LIBC __LONG32_TYPE__ _crtAssertBusy;
 #ifndef ____p__crtAssertBusy_defined
 #define ____p__crtAssertBusy_defined 1
 #ifdef __CRT_HAVE___p__crtAssertBusy
-__CDECLARE(,__LONG32_TYPE__ *,__NOTHROW_NCX,__p__crtAssertBusy,(void),())
+__LIBC __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __p__crtAssertBusy)(void) __CASMNAME_SAME("__p__crtAssertBusy");
 #else /* __CRT_HAVE___p__crtAssertBusy */
 #undef ____p__crtAssertBusy_defined
 #endif /* !__CRT_HAVE___p__crtAssertBusy */
@@ -245,7 +245,7 @@ __LIBC __LONG32_TYPE__ _crtBreakAlloc;
 #ifndef ____p__crtBreakAlloc_defined
 #define ____p__crtBreakAlloc_defined 1
 #ifdef __CRT_HAVE___p__crtBreakAlloc
-__CDECLARE(,__LONG32_TYPE__ *,__NOTHROW_NCX,__p__crtBreakAlloc,(void),())
+__LIBC __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __p__crtBreakAlloc)(void) __CASMNAME_SAME("__p__crtBreakAlloc");
 #else /* __CRT_HAVE___p__crtBreakAlloc */
 #undef ____p__crtBreakAlloc_defined
 #endif /* !__CRT_HAVE___p__crtBreakAlloc */
@@ -260,7 +260,7 @@ __LIBC int _crtDbgFlag;
 #ifndef ____p__crtDbgFlag_defined
 #define ____p__crtDbgFlag_defined 1
 #ifdef __CRT_HAVE___p__crtDbgFlag
-__CDECLARE(,int *,__NOTHROW_NCX,__p__crtDbgFlag,(void),())
+__LIBC int *__NOTHROW_NCX(__LIBDCALL __p__crtDbgFlag)(void) __CASMNAME_SAME("__p__crtDbgFlag");
 #else /* __CRT_HAVE___p__crtDbgFlag */
 #undef ____p__crtDbgFlag_defined
 #endif /* !__CRT_HAVE___p__crtDbgFlag */
@@ -270,49 +270,49 @@ __CDECLARE(,int *,__NOTHROW_NCX,__p__crtDbgFlag,(void),())
 #endif /* ____p__crtDbgFlag_defined */
 #endif /* !__CRT_HAVE__crtDbgFlag */
 #ifdef __CRT_HAVE__CrtGetReportHook
-__CDECLARE(,_CRT_REPORT_HOOK,__NOTHROW_NCX,_CrtGetReportHook,(void),())
+__LIBC _CRT_REPORT_HOOK __NOTHROW_NCX(__LIBDCALL _CrtGetReportHook)(void) __CASMNAME_SAME("_CrtGetReportHook");
 #endif /* __CRT_HAVE__CrtGetReportHook */
 #ifdef __CRT_HAVE__CrtSetReportHook
-__CDECLARE(,_CRT_REPORT_HOOK,__NOTHROW_NCX,_CrtSetReportHook,(_CRT_REPORT_HOOK __pfn_new_hook),(__pfn_new_hook))
+__LIBC _CRT_REPORT_HOOK __NOTHROW_NCX(__LIBDCALL _CrtSetReportHook)(_CRT_REPORT_HOOK __pfn_new_hook) __CASMNAME_SAME("_CrtSetReportHook");
 #endif /* __CRT_HAVE__CrtSetReportHook */
 #ifdef __CRT_HAVE__CrtSetReportHook2
-__CDECLARE(,int,__NOTHROW_NCX,_CrtSetReportHook2,(int __mode, _CRT_REPORT_HOOK __pfn_new_hook),(__mode,__pfn_new_hook))
+__LIBC int __NOTHROW_NCX(__LIBDCALL _CrtSetReportHook2)(int __mode, _CRT_REPORT_HOOK __pfn_new_hook) __CASMNAME_SAME("_CrtSetReportHook2");
 #endif /* __CRT_HAVE__CrtSetReportHook2 */
 #ifdef __CRT_HAVE__CrtSetReportHookW2
-__CDECLARE(,int,__NOTHROW_NCX,_CrtSetReportHookW2,(int __mode, _CRT_REPORT_HOOKW __pfn_new_hook),(__mode,__pfn_new_hook))
+__LIBC int __NOTHROW_NCX(__LIBDCALL _CrtSetReportHookW2)(int __mode, _CRT_REPORT_HOOKW __pfn_new_hook) __CASMNAME_SAME("_CrtSetReportHookW2");
 #endif /* __CRT_HAVE__CrtSetReportHookW2 */
 #ifdef __CRT_HAVE__CrtGetAllocHook
-__CDECLARE(,_CRT_ALLOC_HOOK,__NOTHROW_NCX,_CrtGetAllocHook,(void),())
+__LIBC _CRT_ALLOC_HOOK __NOTHROW_NCX(__LIBDCALL _CrtGetAllocHook)(void) __CASMNAME_SAME("_CrtGetAllocHook");
 #endif /* __CRT_HAVE__CrtGetAllocHook */
 #ifdef __CRT_HAVE__CrtSetAllocHook
-__CDECLARE(,_CRT_ALLOC_HOOK,__NOTHROW_NCX,_CrtSetAllocHook,(_CRT_ALLOC_HOOK __pfn_new_hook),(__pfn_new_hook))
+__LIBC _CRT_ALLOC_HOOK __NOTHROW_NCX(__LIBDCALL _CrtSetAllocHook)(_CRT_ALLOC_HOOK __pfn_new_hook) __CASMNAME_SAME("_CrtSetAllocHook");
 #endif /* __CRT_HAVE__CrtSetAllocHook */
 #ifdef __CRT_HAVE__CrtGetDumpClient
-__CDECLARE(,_CRT_DUMP_CLIENT,__NOTHROW_NCX,_CrtGetDumpClient,(void),())
+__LIBC _CRT_DUMP_CLIENT __NOTHROW_NCX(__LIBDCALL _CrtGetDumpClient)(void) __CASMNAME_SAME("_CrtGetDumpClient");
 #endif /* __CRT_HAVE__CrtGetDumpClient */
 #ifdef __CRT_HAVE__CrtSetDumpClient
-__CDECLARE(,_CRT_DUMP_CLIENT,__NOTHROW_NCX,_CrtSetDumpClient,(_CRT_DUMP_CLIENT __pfn_new_dump),(__pfn_new_dump))
+__LIBC _CRT_DUMP_CLIENT __NOTHROW_NCX(__LIBDCALL _CrtSetDumpClient)(_CRT_DUMP_CLIENT __pfn_new_dump) __CASMNAME_SAME("_CrtSetDumpClient");
 #endif /* __CRT_HAVE__CrtSetDumpClient */
 #endif /* !_M_CEE_PURE */
 #ifdef __CRT_HAVE__CrtSetDbgFlag
-__CDECLARE(,int,__NOTHROW_NCX,_CrtSetDbgFlag,(int __new_flag),(__new_flag))
+__LIBC int __NOTHROW_NCX(__LIBDCALL _CrtSetDbgFlag)(int __new_flag) __CASMNAME_SAME("_CrtSetDbgFlag");
 #elif defined(__CRT_HAVE___p__crtDbgFlag)
 #include <local/crtdbg/_CrtSetDbgFlag.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtSetDbgFlag, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _CrtSetDbgFlag)(int __new_flag) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtSetDbgFlag))(__new_flag); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtSetDbgFlag, __FORCELOCAL int __NOTHROW_NCX(__LIBDCALL _CrtSetDbgFlag)(int __new_flag) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtSetDbgFlag))(__new_flag); })
 #endif /* ... */
 #ifdef __CRT_HAVE__CrtSetReportMode
-__CDECLARE(,int,__NOTHROW_NCX,_CrtSetReportMode,(int __report_type, int __report_mode),(__report_type,__report_mode))
+__LIBC int __NOTHROW_NCX(__LIBDCALL _CrtSetReportMode)(int __report_type, int __report_mode) __CASMNAME_SAME("_CrtSetReportMode");
 #endif /* __CRT_HAVE__CrtSetReportMode */
 #ifdef __CRT_HAVE__CrtSetReportFile
-__CDECLARE(,_HFILE,__NOTHROW_NCX,_CrtSetReportFile,(int __report_type, _HFILE __report_file),(__report_type,__report_file))
+__LIBC _HFILE __NOTHROW_NCX(__LIBDCALL _CrtSetReportFile)(int __report_type, _HFILE __report_file) __CASMNAME_SAME("_CrtSetReportFile");
 #endif /* __CRT_HAVE__CrtSetReportFile */
 #ifdef __CRT_HAVE__CrtSetDebugFillThreshold
-__CDECLARE(,__SIZE_TYPE__,__NOTHROW_NCX,_CrtSetDebugFillThreshold,(__SIZE_TYPE__ __new_debug_fill_threshold),(__new_debug_fill_threshold))
+__LIBC __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _CrtSetDebugFillThreshold)(__SIZE_TYPE__ __new_debug_fill_threshold) __CASMNAME_SAME("_CrtSetDebugFillThreshold");
 #endif /* __CRT_HAVE__CrtSetDebugFillThreshold */
 #ifndef ___CrtDbgReport_defined
 #define ___CrtDbgReport_defined 1
 #ifdef __CRT_HAVE__CrtDbgReport
-__LIBC int __NOTHROW_NCX(__VLIBCCALL _CrtDbgReport)(int __report_type, char const *__filename, int __line, char const *__module_name, char const *__format, ...) __CASMNAME_SAME("_CrtDbgReport");
+__LIBC int __NOTHROW_NCX(__VLIBDCALL _CrtDbgReport)(int __report_type, char const *__filename, int __line, char const *__module_name, char const *__format, ...) __CASMNAME_SAME("_CrtDbgReport");
 #else /* __CRT_HAVE__CrtDbgReport */
 #undef ___CrtDbgReport_defined
 #endif /* !__CRT_HAVE__CrtDbgReport */
@@ -320,9 +320,9 @@ __LIBC int __NOTHROW_NCX(__VLIBCCALL _CrtDbgReport)(int __report_type, char cons
 #ifndef ___CrtDbgReportW_defined
 #define ___CrtDbgReportW_defined 1
 #ifdef __CRT_HAVE__CrtDbgReportW
-__LIBC int __NOTHROW_NCX(__VLIBCCALL _CrtDbgReportW)(int __report_type, __WCHAR16_TYPE__ const *__filename, int __line, __WCHAR16_TYPE__ const *__module_name, __WCHAR16_TYPE__ const *__format, ...) __CASMNAME_SAME("_CrtDbgReportW");
+__LIBC int __NOTHROW_NCX(__VLIBDCALL _CrtDbgReportW)(int __report_type, __WCHAR16_TYPE__ const *__filename, int __line, __WCHAR16_TYPE__ const *__module_name, __WCHAR16_TYPE__ const *__format, ...) __CASMNAME_SAME("_CrtDbgReportW");
 #elif defined(__CRT_HAVE_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ)
-__LIBC int __NOTHROW_NCX(__VLIBCCALL _CrtDbgReportW)(int __report_type, __WCHAR16_TYPE__ const *__filename, int __line, __WCHAR16_TYPE__ const *__module_name, __WCHAR16_TYPE__ const *__format, ...) __CASMNAME("?_CrtDbgReportW@@YAHHPBGH00ZZ");
+__LIBC int __NOTHROW_NCX(__VLIBDCALL _CrtDbgReportW)(int __report_type, __WCHAR16_TYPE__ const *__filename, int __line, __WCHAR16_TYPE__ const *__module_name, __WCHAR16_TYPE__ const *__format, ...) __CASMNAME("?_CrtDbgReportW@@YAHHPBGH00ZZ");
 #else /* ... */
 #undef ___CrtDbgReportW_defined
 #endif /* !... */
@@ -330,21 +330,21 @@ __LIBC int __NOTHROW_NCX(__VLIBCCALL _CrtDbgReportW)(int __report_type, __WCHAR1
 #ifndef ___CrtDbgBreak_defined
 #define ___CrtDbgBreak_defined 1
 #ifdef __CRT_HAVE__CrtDbgBreak
-__CDECLARE_VOID(,__NOTHROW_NCX,_CrtDbgBreak,(void),())
+__LIBC void __NOTHROW_NCX(__LIBDCALL _CrtDbgBreak)(void) __CASMNAME_SAME("_CrtDbgBreak");
 #else /* __CRT_HAVE__CrtDbgBreak */
 #undef ___CrtDbgBreak_defined
 #endif /* !__CRT_HAVE__CrtDbgBreak */
 #endif /* !___CrtDbgBreak_defined */
 #ifdef __CRT_HAVE__CrtSetBreakAlloc
-__CDECLARE(,__LONG32_TYPE__,__NOTHROW_NCX,_CrtSetBreakAlloc,(__LONG32_TYPE__ __break_alloc),(__break_alloc))
+__LIBC __LONG32_TYPE__ __NOTHROW_NCX(__LIBDCALL _CrtSetBreakAlloc)(__LONG32_TYPE__ __break_alloc) __CASMNAME_SAME("_CrtSetBreakAlloc");
 #endif /* __CRT_HAVE__CrtSetBreakAlloc */
 #ifndef ___malloc_dbg_defined
 #define ___malloc_dbg_defined 1
 #ifdef __CRT_HAVE__malloc_dbg
-__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,_malloc_dbg,(__SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line),(__num_bytes,__block_type,__filename,__line))
+__LIBC __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _malloc_dbg)(__SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_malloc_dbg");
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/crtdbg/_malloc_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_malloc_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL _malloc_dbg)(__SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_malloc_dbg))(__num_bytes, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_malloc_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _malloc_dbg)(__SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_malloc_dbg))(__num_bytes, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___malloc_dbg_defined
 #endif /* !... */
@@ -352,10 +352,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_malloc_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_W
 #ifndef ___calloc_dbg_defined
 #define ___calloc_dbg_defined 1
 #ifdef __CRT_HAVE__calloc_dbg
-__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,_calloc_dbg,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line),(__count,__num_bytes,__block_type,__filename,__line))
+__LIBC __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)) void *__NOTHROW_NCX(__LIBDCALL _calloc_dbg)(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_calloc_dbg");
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/crtdbg/_calloc_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_calloc_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)) void *__NOTHROW_NCX(__LIBCCALL _calloc_dbg)(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_calloc_dbg))(__count, __num_bytes, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_calloc_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)) void *__NOTHROW_NCX(__LIBDCALL _calloc_dbg)(__SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_calloc_dbg))(__count, __num_bytes, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___calloc_dbg_defined
 #endif /* !... */
@@ -363,10 +363,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_calloc_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_W
 #ifndef ___realloc_dbg_defined
 #define ___realloc_dbg_defined 1
 #ifdef __CRT_HAVE__realloc_dbg
-__CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,_realloc_dbg,(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line),(__ptr,__num_bytes,__block_type,__filename,__line))
+__LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_realloc_dbg");
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/crtdbg/_realloc_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_realloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL _realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_realloc_dbg))(__ptr, __num_bytes, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_realloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_realloc_dbg))(__ptr, __num_bytes, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___realloc_dbg_defined
 #endif /* !... */
@@ -374,10 +374,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_realloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR
 #ifndef ___recalloc_dbg_defined
 #define ___recalloc_dbg_defined 1
 #ifdef __CRT_HAVE__recalloc_dbg
-__CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,_recalloc_dbg,(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line),(__ptr,__count,__num_bytes,__block_type,__filename,__line))
+__LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_recalloc_dbg");
 #elif defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || (defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)))
 #include <local/crtdbg/_recalloc_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_recalloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL _recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_recalloc_dbg))(__ptr, __count, __num_bytes, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_recalloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_recalloc_dbg))(__ptr, __count, __num_bytes, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___recalloc_dbg_defined
 #endif /* !... */
@@ -385,10 +385,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_recalloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATT
 #ifndef ___expand_dbg_defined
 #define ___expand_dbg_defined 1
 #ifdef __CRT_HAVE__expand_dbg
-__CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,_expand_dbg,(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line),(__ptr,__num_bytes,__block_type,__filename,__line))
+__LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBDCALL _expand_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_expand_dbg");
 #elif defined(__CRT_HAVE_realloc_in_place) || defined(__CRT_HAVE__expand)
 #include <local/crtdbg/_expand_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_expand_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL _expand_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_expand_dbg))(__ptr, __num_bytes, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_expand_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBDCALL _expand_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_expand_dbg))(__ptr, __num_bytes, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___expand_dbg_defined
 #endif /* !... */
@@ -396,10 +396,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_expand_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_
 #ifndef ___free_dbg_defined
 #define ___free_dbg_defined 1
 #ifdef __CRT_HAVE__free_dbg
-__CDECLARE_VOID(,__NOTHROW_NCX,_free_dbg,(void *__ptr, int __block_type),(__ptr,__block_type))
+__LIBC void __NOTHROW_NCX(__LIBDCALL _free_dbg)(void *__ptr, int __block_type) __CASMNAME_SAME("_free_dbg");
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #include <local/crtdbg/_free_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_free_dbg, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL _free_dbg)(void *__ptr, int __block_type) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_free_dbg))(__ptr, __block_type); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_free_dbg, __FORCELOCAL void __NOTHROW_NCX(__LIBDCALL _free_dbg)(void *__ptr, int __block_type) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_free_dbg))(__ptr, __block_type); })
 #else /* ... */
 #undef ___free_dbg_defined
 #endif /* !... */
@@ -407,10 +407,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_free_dbg, __FORCELOCAL void __NOTHROW_NCX(__LIB
 #ifndef ___msize_dbg_defined
 #define ___msize_dbg_defined 1
 #ifdef __CRT_HAVE__msize_dbg
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,_msize_dbg,(void *__ptr, int __block_type),(__ptr,__block_type))
+__LIBC __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _msize_dbg)(void *__ptr, int __block_type) __CASMNAME_SAME("_msize_dbg");
 #elif defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
 #include <local/crtdbg/_msize_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_msize_dbg, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _msize_dbg)(void *__ptr, int __block_type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_msize_dbg))(__ptr, __block_type); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_msize_dbg, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _msize_dbg)(void *__ptr, int __block_type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_msize_dbg))(__ptr, __block_type); })
 #else /* ... */
 #undef ___msize_dbg_defined
 #endif /* !... */
@@ -418,19 +418,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_msize_dbg, __FORCELOCAL __ATTR_PURE __ATTR_WUNU
 #ifndef ___aligned_msize_dbg_defined
 #define ___aligned_msize_dbg_defined 1
 #ifdef __CRT_HAVE__aligned_msize_dbg
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,_aligned_msize_dbg,(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),(__ptr,__min_alignment,__offset))
+__LIBC __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _aligned_msize_dbg)(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) __CASMNAME_SAME("_aligned_msize_dbg");
 #else /* __CRT_HAVE__aligned_msize_dbg */
 #include <local/crtdbg/_aligned_msize_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_msize_dbg, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _aligned_msize_dbg)(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_msize_dbg))(__ptr, __min_alignment, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_msize_dbg, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _aligned_msize_dbg)(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_msize_dbg))(__ptr, __min_alignment, __offset); })
 #endif /* !__CRT_HAVE__aligned_msize_dbg */
 #endif /* !___aligned_msize_dbg_defined */
 #ifndef ___aligned_malloc_dbg_defined
 #define ___aligned_malloc_dbg_defined 1
 #ifdef __CRT_HAVE__aligned_malloc_dbg
-__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,_aligned_malloc_dbg,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line),(__num_bytes,__min_alignment,__filename,__line))
+__LIBC __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _aligned_malloc_dbg)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) __CASMNAME_SAME("_aligned_malloc_dbg");
 #elif defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/crtdbg/_aligned_malloc_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_malloc_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL _aligned_malloc_dbg)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_malloc_dbg))(__num_bytes, __min_alignment, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_malloc_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _aligned_malloc_dbg)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_malloc_dbg))(__num_bytes, __min_alignment, __filename, __line); })
 #else /* ... */
 #undef ___aligned_malloc_dbg_defined
 #endif /* !... */
@@ -438,10 +438,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_malloc_dbg, __FORCELOCAL __ATTR_MALLOC 
 #ifndef ___aligned_realloc_dbg_defined
 #define ___aligned_realloc_dbg_defined 1
 #ifdef __CRT_HAVE__aligned_realloc_dbg
-__CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,_aligned_realloc_dbg,(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line),(__ptr,__num_bytes,__min_alignment,__filename,__line))
+__LIBC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _aligned_realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) __CASMNAME_SAME("_aligned_realloc_dbg");
 #elif defined(__CRT_HAVE__aligned_realloc) || ((defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
 #include <local/crtdbg/_aligned_realloc_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_realloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL _aligned_realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_realloc_dbg))(__ptr, __num_bytes, __min_alignment, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_realloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _aligned_realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_realloc_dbg))(__ptr, __num_bytes, __min_alignment, __filename, __line); })
 #else /* ... */
 #undef ___aligned_realloc_dbg_defined
 #endif /* !... */
@@ -449,10 +449,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_realloc_dbg, __FORCELOCAL __ATTR_WUNUSE
 #ifndef ___aligned_recalloc_dbg_defined
 #define ___aligned_recalloc_dbg_defined 1
 #ifdef __CRT_HAVE__aligned_recalloc_dbg
-__CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,_aligned_recalloc_dbg,(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line),(__ptr,__count,__num_bytes,__min_alignment,__filename,__line))
+__LIBC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _aligned_recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) __CASMNAME_SAME("_aligned_recalloc_dbg");
 #elif defined(__CRT_HAVE__aligned_recalloc) || ((defined(__CRT_HAVE__aligned_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
 #include <local/crtdbg/_aligned_recalloc_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_recalloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL _aligned_recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_recalloc_dbg))(__ptr, __count, __num_bytes, __min_alignment, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_recalloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _aligned_recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_recalloc_dbg))(__ptr, __count, __num_bytes, __min_alignment, __filename, __line); })
 #else /* ... */
 #undef ___aligned_recalloc_dbg_defined
 #endif /* !... */
@@ -460,10 +460,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_recalloc_dbg, __FORCELOCAL __ATTR_WUNUS
 #ifndef ___aligned_offset_malloc_dbg_defined
 #define ___aligned_offset_malloc_dbg_defined 1
 #ifdef __CRT_HAVE__aligned_offset_malloc_dbg
-__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,_aligned_offset_malloc_dbg,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line),(__num_bytes,__min_alignment,__offset,__filename,__line))
+__LIBC __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_malloc_dbg)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) __CASMNAME_SAME("_aligned_offset_malloc_dbg");
 #elif defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/crtdbg/_aligned_offset_malloc_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_malloc_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL _aligned_offset_malloc_dbg)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_malloc_dbg))(__num_bytes, __min_alignment, __offset, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_malloc_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_malloc_dbg)(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_malloc_dbg))(__num_bytes, __min_alignment, __offset, __filename, __line); })
 #else /* ... */
 #undef ___aligned_offset_malloc_dbg_defined
 #endif /* !... */
@@ -471,10 +471,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_malloc_dbg, __FORCELOCAL __ATTR_
 #ifndef ___aligned_offset_realloc_dbg_defined
 #define ___aligned_offset_realloc_dbg_defined 1
 #ifdef __CRT_HAVE__aligned_offset_realloc_dbg
-__CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,_aligned_offset_realloc_dbg,(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line),(__ptr,__num_bytes,__min_alignment,__offset,__filename,__line))
+__LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) __CASMNAME_SAME("_aligned_offset_realloc_dbg");
 #elif defined(__CRT_HAVE__aligned_offset_realloc) || ((defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
 #include <local/crtdbg/_aligned_offset_realloc_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_realloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL _aligned_offset_realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_realloc_dbg))(__ptr, __num_bytes, __min_alignment, __offset, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_realloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_realloc_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_realloc_dbg))(__ptr, __num_bytes, __min_alignment, __offset, __filename, __line); })
 #else /* ... */
 #undef ___aligned_offset_realloc_dbg_defined
 #endif /* !... */
@@ -482,10 +482,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_realloc_dbg, __FORCELOCAL __ATTR
 #ifndef ___aligned_offset_recalloc_dbg_defined
 #define ___aligned_offset_recalloc_dbg_defined 1
 #ifdef __CRT_HAVE__aligned_offset_recalloc_dbg
-__CDECLARE(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,_aligned_offset_recalloc_dbg,(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line),(__ptr,__count,__num_bytes,__min_alignment,__offset,__filename,__line))
+__LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) __CASMNAME_SAME("_aligned_offset_recalloc_dbg");
 #elif defined(__CRT_HAVE__aligned_offset_recalloc) || ((defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
 #include <local/crtdbg/_aligned_offset_recalloc_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_recalloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL _aligned_offset_recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_recalloc_dbg))(__ptr, __count, __num_bytes, __min_alignment, __offset, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_recalloc_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBDCALL _aligned_offset_recalloc_dbg)(void *__ptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_recalloc_dbg))(__ptr, __count, __num_bytes, __min_alignment, __offset, __filename, __line); })
 #else /* ... */
 #undef ___aligned_offset_recalloc_dbg_defined
 #endif /* !... */
@@ -493,10 +493,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_offset_recalloc_dbg, __FORCELOCAL __ATT
 #ifndef ___aligned_free_dbg_defined
 #define ___aligned_free_dbg_defined 1
 #ifdef __CRT_HAVE__aligned_free_dbg
-__CDECLARE_VOID(,__NOTHROW_NCX,_aligned_free_dbg,(void *__ptr),(__ptr))
+__LIBC void __NOTHROW_NCX(__LIBDCALL _aligned_free_dbg)(void *__ptr) __CASMNAME_SAME("_aligned_free_dbg");
 #elif defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #include <local/crtdbg/_aligned_free_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_free_dbg, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL _aligned_free_dbg)(void *__ptr) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_free_dbg))(__ptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_free_dbg, __FORCELOCAL void __NOTHROW_NCX(__LIBDCALL _aligned_free_dbg)(void *__ptr) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_free_dbg))(__ptr); })
 #else /* ... */
 #undef ___aligned_free_dbg_defined
 #endif /* !... */
@@ -504,10 +504,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_free_dbg, __FORCELOCAL void __NOTHROW_N
 #ifndef ___strdup_dbg_defined
 #define ___strdup_dbg_defined 1
 #ifdef __CRT_HAVE__strdup_dbg
-__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,_strdup_dbg,(char const *__string, int __block_type, char const *__filename, int __line),(__string,__block_type,__filename,__line))
+__LIBC __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _strdup_dbg)(char const *__string, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_strdup_dbg");
 #elif defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/crtdbg/_strdup_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_strdup_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL _strdup_dbg)(char const *__string, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strdup_dbg))(__string, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_strdup_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _strdup_dbg)(char const *__string, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strdup_dbg))(__string, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___strdup_dbg_defined
 #endif /* !... */
@@ -515,10 +515,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_strdup_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_W
 #ifndef ___wcsdup_dbg_defined
 #define ___wcsdup_dbg_defined 1
 #ifdef __CRT_HAVE__wcsdup_dbg
-__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,__WCHAR16_TYPE__ *,__NOTHROW_NCX,_wcsdup_dbg,(__WCHAR16_TYPE__ const *__string, int __block_type, char const *__filename, int __line),(__string,__block_type,__filename,__line))
+__LIBC __ATTR_MALLOC __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wcsdup_dbg)(__WCHAR16_TYPE__ const *__string, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wcsdup_dbg");
 #elif (defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wcsdup) || (defined(__CRT_HAVE__wcsdup) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <local/crtdbg/_wcsdup_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wcsdup_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBCCALL _wcsdup_dbg)(__WCHAR16_TYPE__ const *__string, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wcsdup_dbg))(__string, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wcsdup_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wcsdup_dbg)(__WCHAR16_TYPE__ const *__string, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wcsdup_dbg))(__string, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___wcsdup_dbg_defined
 #endif /* !... */
@@ -526,10 +526,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wcsdup_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_W
 #ifndef ___tempnam_dbg_defined
 #define ___tempnam_dbg_defined 1
 #ifdef __CRT_HAVE__tempnam_dbg
-__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,_tempnam_dbg,(char const *__dir_name, char const *__file_prefix, int __block_type, char const *__filename, int __line),(__dir_name,__file_prefix,__block_type,__filename,__line))
+__LIBC __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _tempnam_dbg)(char const *__dir_name, char const *__file_prefix, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_tempnam_dbg");
 #elif defined(__CRT_HAVE_tempnam) || defined(__CRT_HAVE__tempnam)
 #include <local/crtdbg/_tempnam_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_tempnam_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL _tempnam_dbg)(char const *__dir_name, char const *__file_prefix, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_tempnam_dbg))(__dir_name, __file_prefix, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_tempnam_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _tempnam_dbg)(char const *__dir_name, char const *__file_prefix, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_tempnam_dbg))(__dir_name, __file_prefix, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___tempnam_dbg_defined
 #endif /* !... */
@@ -537,19 +537,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_tempnam_dbg, __FORCELOCAL __ATTR_MALLOC __ATTR_
 #ifndef ___wtempnam_dbg_defined
 #define ___wtempnam_dbg_defined 1
 #ifdef __CRT_HAVE__wtempnam_dbg
-__CDECLARE(__ATTR_WUNUSED,__WCHAR16_TYPE__ *,__NOTHROW_NCX,_wtempnam_dbg,(__WCHAR16_TYPE__ const *__dir_name, __WCHAR16_TYPE__ const *__file_prefix, int __block_type, char const *__filename, int __line),(__dir_name,__file_prefix,__block_type,__filename,__line))
+__LIBC __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wtempnam_dbg)(__WCHAR16_TYPE__ const *__dir_name, __WCHAR16_TYPE__ const *__file_prefix, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wtempnam_dbg");
 #else /* __CRT_HAVE__wtempnam_dbg */
 #include <local/crtdbg/_wtempnam_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wtempnam_dbg, __FORCELOCAL __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBCCALL _wtempnam_dbg)(__WCHAR16_TYPE__ const *__dir_name, __WCHAR16_TYPE__ const *__file_prefix, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtempnam_dbg))(__dir_name, __file_prefix, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wtempnam_dbg, __FORCELOCAL __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wtempnam_dbg)(__WCHAR16_TYPE__ const *__dir_name, __WCHAR16_TYPE__ const *__file_prefix, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtempnam_dbg))(__dir_name, __file_prefix, __block_type, __filename, __line); })
 #endif /* !__CRT_HAVE__wtempnam_dbg */
 #endif /* !___wtempnam_dbg_defined */
 #ifndef ___fullpath_dbg_defined
 #define ___fullpath_dbg_defined 1
 #ifdef __CRT_HAVE__fullpath_dbg
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,_fullpath_dbg,(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line),(__full_path,__path,__bufsize,__block_type,__filename,__line))
+__LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBDCALL _fullpath_dbg)(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_fullpath_dbg");
 #elif defined(__CRT_HAVE__fullpath)
 #include <local/crtdbg/_fullpath_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_fullpath_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL _fullpath_dbg)(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fullpath_dbg))(__full_path, __path, __bufsize, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_fullpath_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBDCALL _fullpath_dbg)(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fullpath_dbg))(__full_path, __path, __bufsize, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___fullpath_dbg_defined
 #endif /* !... */
@@ -557,19 +557,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_fullpath_dbg, __FORCELOCAL __ATTR_WUNUSED __ATT
 #ifndef ___wfullpath_dbg_defined
 #define ___wfullpath_dbg_defined 1
 #ifdef __CRT_HAVE__wfullpath_dbg
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__WCHAR16_TYPE__ *,__NOTHROW_NCX,_wfullpath_dbg,(__WCHAR16_TYPE__ *__full_path, __WCHAR16_TYPE__ const *__path, __SIZE_TYPE__ __buflen, int __block_type, char const *__filename, int __line),(__full_path,__path,__buflen,__block_type,__filename,__line))
+__LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wfullpath_dbg)(__WCHAR16_TYPE__ *__full_path, __WCHAR16_TYPE__ const *__path, __SIZE_TYPE__ __buflen, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wfullpath_dbg");
 #else /* __CRT_HAVE__wfullpath_dbg */
 #include <local/crtdbg/_wfullpath_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wfullpath_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBCCALL _wfullpath_dbg)(__WCHAR16_TYPE__ *__full_path, __WCHAR16_TYPE__ const *__path, __SIZE_TYPE__ __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfullpath_dbg))(__full_path, __path, __buflen, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wfullpath_dbg, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wfullpath_dbg)(__WCHAR16_TYPE__ *__full_path, __WCHAR16_TYPE__ const *__path, __SIZE_TYPE__ __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfullpath_dbg))(__full_path, __path, __buflen, __block_type, __filename, __line); })
 #endif /* !__CRT_HAVE__wfullpath_dbg */
 #endif /* !___wfullpath_dbg_defined */
 #ifndef ___getcwd_dbg_defined
 #define ___getcwd_dbg_defined 1
 #ifdef __CRT_HAVE__getcwd_dbg
-__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,_getcwd_dbg,(char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line),(__buf,__bufsize,__block_type,__filename,__line))
+__LIBC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _getcwd_dbg)(char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_getcwd_dbg");
 #elif defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
 #include <local/crtdbg/_getcwd_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_getcwd_dbg, __FORCELOCAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL _getcwd_dbg)(char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getcwd_dbg))(__buf, __bufsize, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_getcwd_dbg, __FORCELOCAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _getcwd_dbg)(char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getcwd_dbg))(__buf, __bufsize, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___getcwd_dbg_defined
 #endif /* !... */
@@ -577,10 +577,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_getcwd_dbg, __FORCELOCAL __ATTR_WUNUSED char *_
 #ifndef ___wgetcwd_dbg_defined
 #define ___wgetcwd_dbg_defined 1
 #ifdef __CRT_HAVE__wgetcwd_dbg
-__CDECLARE(__ATTR_WUNUSED,__WCHAR16_TYPE__ *,__NOTHROW_NCX,_wgetcwd_dbg,(__WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line),(__buf,__buflen,__block_type,__filename,__line))
+__LIBC __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetcwd_dbg)(__WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wgetcwd_dbg");
 #elif (defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wgetcwd) || (defined(__CRT_HAVE__wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wgetcwd)
 #include <local/crtdbg/_wgetcwd_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wgetcwd_dbg, __FORCELOCAL __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBCCALL _wgetcwd_dbg)(__WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetcwd_dbg))(__buf, __buflen, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wgetcwd_dbg, __FORCELOCAL __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetcwd_dbg)(__WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetcwd_dbg))(__buf, __buflen, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___wgetcwd_dbg_defined
 #endif /* !... */
@@ -588,10 +588,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wgetcwd_dbg, __FORCELOCAL __ATTR_WUNUSED __WCHA
 #ifndef ___getdcwd_dbg_defined
 #define ___getdcwd_dbg_defined 1
 #ifdef __CRT_HAVE__getdcwd_dbg
-__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,_getdcwd_dbg,(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line),(__driveno,__buf,__bufsize,__block_type,__filename,__line))
+__LIBC __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _getdcwd_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_getdcwd_dbg");
 #elif defined(__CRT_HAVE__getdcwd)
 #include <local/crtdbg/_getdcwd_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_getdcwd_dbg, __FORCELOCAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL _getdcwd_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdcwd_dbg))(__driveno, __buf, __bufsize, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_getdcwd_dbg, __FORCELOCAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _getdcwd_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdcwd_dbg))(__driveno, __buf, __bufsize, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___getdcwd_dbg_defined
 #endif /* !... */
@@ -599,19 +599,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_getdcwd_dbg, __FORCELOCAL __ATTR_WUNUSED char *
 #ifndef ___wgetdcwd_dbg_defined
 #define ___wgetdcwd_dbg_defined 1
 #ifdef __CRT_HAVE__wgetdcwd_dbg
-__CDECLARE(__ATTR_WUNUSED,__WCHAR16_TYPE__ *,__NOTHROW_NCX,_wgetdcwd_dbg,(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line),(__driveno,__buf,__buflen,__block_type,__filename,__line))
+__LIBC __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetdcwd_dbg)(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wgetdcwd_dbg");
 #else /* __CRT_HAVE__wgetdcwd_dbg */
 #include <local/crtdbg/_wgetdcwd_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wgetdcwd_dbg, __FORCELOCAL __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBCCALL _wgetdcwd_dbg)(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetdcwd_dbg))(__driveno, __buf, __buflen, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wgetdcwd_dbg, __FORCELOCAL __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetdcwd_dbg)(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetdcwd_dbg))(__driveno, __buf, __buflen, __block_type, __filename, __line); })
 #endif /* !__CRT_HAVE__wgetdcwd_dbg */
 #endif /* !___wgetdcwd_dbg_defined */
 #ifndef ___getdcwd_lk_dbg_defined
 #define ___getdcwd_lk_dbg_defined 1
 #ifdef __CRT_HAVE__getdcwd_dbg
-__CREDIRECT(__ATTR_WUNUSED,char *,__NOTHROW_NCX,_getdcwd_lk_dbg,(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line),_getdcwd_dbg,(__driveno,__buf,__bufsize,__block_type,__filename,__line))
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED,char *,__NOTHROW_NCX,__LIBDCALL,_getdcwd_lk_dbg,(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line),_getdcwd_dbg,(__driveno,__buf,__bufsize,__block_type,__filename,__line))
 #elif defined(__CRT_HAVE__getdcwd)
 #include <local/crtdbg/_getdcwd_dbg.h>
-__FORCELOCAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL _getdcwd_lk_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdcwd_dbg))(__driveno, __buf, __bufsize, __block_type, __filename, __line); }
+__FORCELOCAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBDCALL _getdcwd_lk_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdcwd_dbg))(__driveno, __buf, __bufsize, __block_type, __filename, __line); }
 #else /* ... */
 #undef ___getdcwd_lk_dbg_defined
 #endif /* !... */
@@ -619,19 +619,19 @@ __FORCELOCAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL _getdcwd_lk_dbg)(int 
 #ifndef ___wgetdcwd_lk_dbg_defined
 #define ___wgetdcwd_lk_dbg_defined 1
 #ifdef __CRT_HAVE__wgetdcwd_dbg
-__CREDIRECT(__ATTR_WUNUSED,__WCHAR16_TYPE__ *,__NOTHROW_NCX,_wgetdcwd_lk_dbg,(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line),_wgetdcwd_dbg,(__driveno,__buf,__buflen,__block_type,__filename,__line))
+__COMPILER_REDIRECT(__LIBC,__ATTR_WUNUSED,__WCHAR16_TYPE__ *,__NOTHROW_NCX,__LIBDCALL,_wgetdcwd_lk_dbg,(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line),_wgetdcwd_dbg,(__driveno,__buf,__buflen,__block_type,__filename,__line))
 #else /* __CRT_HAVE__wgetdcwd_dbg */
 #include <local/crtdbg/_wgetdcwd_dbg.h>
-__FORCELOCAL __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBCCALL _wgetdcwd_lk_dbg)(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetdcwd_dbg))(__driveno, __buf, __buflen, __block_type, __filename, __line); }
+__FORCELOCAL __ATTR_WUNUSED __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetdcwd_lk_dbg)(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetdcwd_dbg))(__driveno, __buf, __buflen, __block_type, __filename, __line); }
 #endif /* !__CRT_HAVE__wgetdcwd_dbg */
 #endif /* !___wgetdcwd_lk_dbg_defined */
 #ifndef ___dupenv_s_dbg_defined
 #define ___dupenv_s_dbg_defined 1
 #ifdef __CRT_HAVE__dupenv_s_dbg
-__CDECLARE(_Check_return_wat_ __ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,_dupenv_s_dbg,(char **__pbuf, __SIZE_TYPE__ *__pbufsize, char const *__varname, int __block_type, char const *__filename, int __line),(__pbuf,__pbufsize,__varname,__block_type,__filename,__line))
+__LIBC _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t __NOTHROW_NCX(__LIBDCALL _dupenv_s_dbg)(char **__pbuf, __SIZE_TYPE__ *__pbufsize, char const *__varname, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_dupenv_s_dbg");
 #elif defined(__CRT_HAVE__dupenv_s)
 #include <local/crtdbg/_dupenv_s_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_dupenv_s_dbg, __FORCELOCAL _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t __NOTHROW_NCX(__LIBCCALL _dupenv_s_dbg)(char **__pbuf, __SIZE_TYPE__ *__pbufsize, char const *__varname, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_dupenv_s_dbg))(__pbuf, __pbufsize, __varname, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_dupenv_s_dbg, __FORCELOCAL _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t __NOTHROW_NCX(__LIBDCALL _dupenv_s_dbg)(char **__pbuf, __SIZE_TYPE__ *__pbufsize, char const *__varname, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_dupenv_s_dbg))(__pbuf, __pbufsize, __varname, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___dupenv_s_dbg_defined
 #endif /* !... */
@@ -639,89 +639,89 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_dupenv_s_dbg, __FORCELOCAL _Check_return_wat_ _
 #ifndef ___wdupenv_s_dbg_defined
 #define ___wdupenv_s_dbg_defined 1
 #ifdef __CRT_HAVE__wdupenv_s_dbg
-__CDECLARE(_Check_return_wat_ __ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,_wdupenv_s_dbg,(__WCHAR16_TYPE__ **__pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR16_TYPE__ const *__varname, int __block_type, char const *__filename, int __line),(__pbuf,__pbuflen,__varname,__block_type,__filename,__line))
+__LIBC _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t __NOTHROW_NCX(__LIBDCALL _wdupenv_s_dbg)(__WCHAR16_TYPE__ **__pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR16_TYPE__ const *__varname, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wdupenv_s_dbg");
 #else /* __CRT_HAVE__wdupenv_s_dbg */
 #include <local/crtdbg/_wdupenv_s_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wdupenv_s_dbg, __FORCELOCAL _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t __NOTHROW_NCX(__LIBCCALL _wdupenv_s_dbg)(__WCHAR16_TYPE__ **__pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR16_TYPE__ const *__varname, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wdupenv_s_dbg))(__pbuf, __pbuflen, __varname, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wdupenv_s_dbg, __FORCELOCAL _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t __NOTHROW_NCX(__LIBDCALL _wdupenv_s_dbg)(__WCHAR16_TYPE__ **__pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR16_TYPE__ const *__varname, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wdupenv_s_dbg))(__pbuf, __pbuflen, __varname, __block_type, __filename, __line); })
 #endif /* !__CRT_HAVE__wdupenv_s_dbg */
 #endif /* !___wdupenv_s_dbg_defined */
 #ifdef __CRT_HAVE__CrtCheckMemory
-__CDECLARE(,int,__NOTHROW_NCX,_CrtCheckMemory,(void),())
+__LIBC int __NOTHROW_NCX(__LIBDCALL _CrtCheckMemory)(void) __CASMNAME_SAME("_CrtCheckMemory");
 #else /* __CRT_HAVE__CrtCheckMemory */
 #include <local/crtdbg/_CrtCheckMemory.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtCheckMemory, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _CrtCheckMemory)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtCheckMemory))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtCheckMemory, __FORCELOCAL int __NOTHROW_NCX(__LIBDCALL _CrtCheckMemory)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtCheckMemory))(); })
 #endif /* !__CRT_HAVE__CrtCheckMemory */
 #ifdef __CRT_HAVE__CrtDoForAllClientObjects
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_CrtDoForAllClientObjects,(_PFNCRTDOFORALLCLIENTOBJECTS __pfn, void *__context),(__pfn,__context))
+__LIBC __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBDCALL _CrtDoForAllClientObjects)(_PFNCRTDOFORALLCLIENTOBJECTS __pfn, void *__context) __CASMNAME_SAME("_CrtDoForAllClientObjects");
 #else /* __CRT_HAVE__CrtDoForAllClientObjects */
 #include <local/crtdbg/_CrtDoForAllClientObjects.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtDoForAllClientObjects, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _CrtDoForAllClientObjects)(_PFNCRTDOFORALLCLIENTOBJECTS __pfn, void *__context) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtDoForAllClientObjects))(__pfn, __context); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtDoForAllClientObjects, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBDCALL _CrtDoForAllClientObjects)(_PFNCRTDOFORALLCLIENTOBJECTS __pfn, void *__context) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtDoForAllClientObjects))(__pfn, __context); })
 #endif /* !__CRT_HAVE__CrtDoForAllClientObjects */
 #ifdef __CRT_HAVE__CrtIsValidPointer
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_CrtIsValidPointer,(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, int __writable),(__ptr,__num_bytes,__writable))
+__LIBC __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL _CrtIsValidPointer)(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, int __writable) __CASMNAME_SAME("_CrtIsValidPointer");
 #else /* __CRT_HAVE__CrtIsValidPointer */
 #include <local/crtdbg/_CrtIsValidPointer.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtIsValidPointer, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _CrtIsValidPointer)(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, int __writable) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtIsValidPointer))(__ptr, __num_bytes, __writable); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtIsValidPointer, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL _CrtIsValidPointer)(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, int __writable) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtIsValidPointer))(__ptr, __num_bytes, __writable); })
 #endif /* !__CRT_HAVE__CrtIsValidPointer */
 #ifdef __CRT_HAVE__CrtIsValidHeapPointer
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_CrtIsValidHeapPointer,(void const *__heap_ptr),(__heap_ptr))
+__LIBC __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL _CrtIsValidHeapPointer)(void const *__heap_ptr) __CASMNAME_SAME("_CrtIsValidHeapPointer");
 #else /* __CRT_HAVE__CrtIsValidHeapPointer */
 #include <local/crtdbg/_CrtIsValidHeapPointer.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtIsValidHeapPointer, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _CrtIsValidHeapPointer)(void const *__heap_ptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtIsValidHeapPointer))(__heap_ptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtIsValidHeapPointer, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL _CrtIsValidHeapPointer)(void const *__heap_ptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtIsValidHeapPointer))(__heap_ptr); })
 #endif /* !__CRT_HAVE__CrtIsValidHeapPointer */
 #ifdef __CRT_HAVE__CrtIsMemoryBlock
-__CDECLARE(,int,__NOTHROW_NCX,_CrtIsMemoryBlock,(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, __LONG32_TYPE__ *__prequest_number, char **__filename, int *__line),(__ptr,__num_bytes,__prequest_number,__filename,__line))
+__LIBC int __NOTHROW_NCX(__LIBDCALL _CrtIsMemoryBlock)(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, __LONG32_TYPE__ *__prequest_number, char **__filename, int *__line) __CASMNAME_SAME("_CrtIsMemoryBlock");
 #else /* __CRT_HAVE__CrtIsMemoryBlock */
 #include <local/crtdbg/_CrtIsMemoryBlock.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtIsMemoryBlock, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _CrtIsMemoryBlock)(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, __LONG32_TYPE__ *__prequest_number, char **__filename, int *__line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtIsMemoryBlock))(__ptr, __num_bytes, __prequest_number, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtIsMemoryBlock, __FORCELOCAL int __NOTHROW_NCX(__LIBDCALL _CrtIsMemoryBlock)(void const *__ptr, __STDC_UINT_AS_SIZE_T __num_bytes, __LONG32_TYPE__ *__prequest_number, char **__filename, int *__line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtIsMemoryBlock))(__ptr, __num_bytes, __prequest_number, __filename, __line); })
 #endif /* !__CRT_HAVE__CrtIsMemoryBlock */
 #ifdef __CRT_HAVE__CrtReportBlockType
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_CrtReportBlockType,(void const *__ptr),(__ptr))
+__LIBC __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL _CrtReportBlockType)(void const *__ptr) __CASMNAME_SAME("_CrtReportBlockType");
 #else /* __CRT_HAVE__CrtReportBlockType */
 #include <local/crtdbg/_CrtReportBlockType.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtReportBlockType, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _CrtReportBlockType)(void const *__ptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtReportBlockType))(__ptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtReportBlockType, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL _CrtReportBlockType)(void const *__ptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtReportBlockType))(__ptr); })
 #endif /* !__CRT_HAVE__CrtReportBlockType */
 #ifdef __CRT_HAVE__CrtMemCheckpoint
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_CrtMemCheckpoint,(_CrtMemState *__state),(__state))
+__LIBC __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBDCALL _CrtMemCheckpoint)(_CrtMemState *__state) __CASMNAME_SAME("_CrtMemCheckpoint");
 #else /* __CRT_HAVE__CrtMemCheckpoint */
 #include <local/crtdbg/_CrtMemCheckpoint.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemCheckpoint, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _CrtMemCheckpoint)(_CrtMemState *__state) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemCheckpoint))(__state); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemCheckpoint, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBDCALL _CrtMemCheckpoint)(_CrtMemState *__state) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemCheckpoint))(__state); })
 #endif /* !__CRT_HAVE__CrtMemCheckpoint */
 #ifdef __CRT_HAVE__CrtMemDifference
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,_CrtMemDifference,(_CrtMemState *__state, _CrtMemState const *__old_state, _CrtMemState const *__new_state),(__state,__old_state,__new_state))
+__LIBC __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBDCALL _CrtMemDifference)(_CrtMemState *__state, _CrtMemState const *__old_state, _CrtMemState const *__new_state) __CASMNAME_SAME("_CrtMemDifference");
 #else /* __CRT_HAVE__CrtMemDifference */
 #include <local/crtdbg/_CrtMemDifference.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemDifference, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL _CrtMemDifference)(_CrtMemState *__state, _CrtMemState const *__old_state, _CrtMemState const *__new_state) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemDifference))(__state, __old_state, __new_state); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemDifference, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBDCALL _CrtMemDifference)(_CrtMemState *__state, _CrtMemState const *__old_state, _CrtMemState const *__new_state) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemDifference))(__state, __old_state, __new_state); })
 #endif /* !__CRT_HAVE__CrtMemDifference */
 #ifdef __CRT_HAVE__CrtMemDumpAllObjectsSince
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_CrtMemDumpAllObjectsSince,(_CrtMemState const *__state),(__state))
+__LIBC __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBDCALL _CrtMemDumpAllObjectsSince)(_CrtMemState const *__state) __CASMNAME_SAME("_CrtMemDumpAllObjectsSince");
 #else /* __CRT_HAVE__CrtMemDumpAllObjectsSince */
 #include <local/crtdbg/_CrtMemDumpAllObjectsSince.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemDumpAllObjectsSince, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _CrtMemDumpAllObjectsSince)(_CrtMemState const *__state) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemDumpAllObjectsSince))(__state); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemDumpAllObjectsSince, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBDCALL _CrtMemDumpAllObjectsSince)(_CrtMemState const *__state) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemDumpAllObjectsSince))(__state); })
 #endif /* !__CRT_HAVE__CrtMemDumpAllObjectsSince */
 #ifdef __CRT_HAVE__CrtMemDumpStatistics
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_CrtMemDumpStatistics,(_CrtMemState const *__state),(__state))
+__LIBC __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBDCALL _CrtMemDumpStatistics)(_CrtMemState const *__state) __CASMNAME_SAME("_CrtMemDumpStatistics");
 #else /* __CRT_HAVE__CrtMemDumpStatistics */
 #include <local/crtdbg/_CrtMemDumpStatistics.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemDumpStatistics, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _CrtMemDumpStatistics)(_CrtMemState const *__state) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemDumpStatistics))(__state); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemDumpStatistics, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBDCALL _CrtMemDumpStatistics)(_CrtMemState const *__state) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemDumpStatistics))(__state); })
 #endif /* !__CRT_HAVE__CrtMemDumpStatistics */
 #ifdef __CRT_HAVE__CrtDumpMemoryLeaks
-__CDECLARE(,int,__NOTHROW_NCX,_CrtDumpMemoryLeaks,(void),())
+__LIBC int __NOTHROW_NCX(__LIBDCALL _CrtDumpMemoryLeaks)(void) __CASMNAME_SAME("_CrtDumpMemoryLeaks");
 #else /* __CRT_HAVE__CrtDumpMemoryLeaks */
 #include <local/crtdbg/_CrtDumpMemoryLeaks.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtDumpMemoryLeaks, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _CrtDumpMemoryLeaks)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtDumpMemoryLeaks))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtDumpMemoryLeaks, __FORCELOCAL int __NOTHROW_NCX(__LIBDCALL _CrtDumpMemoryLeaks)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtDumpMemoryLeaks))(); })
 #endif /* !__CRT_HAVE__CrtDumpMemoryLeaks */
 #ifdef __CRT_HAVE__CrtSetCheckCount
-__CDECLARE(,int,__NOTHROW_NCX,_CrtSetCheckCount,(int __check_count),(__check_count))
+__LIBC int __NOTHROW_NCX(__LIBDCALL _CrtSetCheckCount)(int __check_count) __CASMNAME_SAME("_CrtSetCheckCount");
 #else /* __CRT_HAVE__CrtSetCheckCount */
 #include <local/crtdbg/_CrtSetCheckCount.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtSetCheckCount, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _CrtSetCheckCount)(int __check_count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtSetCheckCount))(__check_count); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtSetCheckCount, __FORCELOCAL int __NOTHROW_NCX(__LIBDCALL _CrtSetCheckCount)(int __check_count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtSetCheckCount))(__check_count); })
 #endif /* !__CRT_HAVE__CrtSetCheckCount */
 #ifdef __CRT_HAVE__CrtGetCheckCount
-__CDECLARE(__ATTR_PURE,int,__NOTHROW_NCX,_CrtGetCheckCount,(void),())
+__LIBC __ATTR_PURE int __NOTHROW_NCX(__LIBDCALL _CrtGetCheckCount)(void) __CASMNAME_SAME("_CrtGetCheckCount");
 #else /* __CRT_HAVE__CrtGetCheckCount */
 #include <local/crtdbg/_CrtGetCheckCount.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtGetCheckCount, __FORCELOCAL __ATTR_PURE int __NOTHROW_NCX(__LIBCCALL _CrtGetCheckCount)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtGetCheckCount))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtGetCheckCount, __FORCELOCAL __ATTR_PURE int __NOTHROW_NCX(__LIBDCALL _CrtGetCheckCount)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtGetCheckCount))(); })
 #endif /* !__CRT_HAVE__CrtGetCheckCount */
 
 #ifndef ___CrtDbgBreak_defined

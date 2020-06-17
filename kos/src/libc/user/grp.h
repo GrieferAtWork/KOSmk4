@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca5d6cff */
+/* HASH CRC-32:0x1ab20c41 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_GRP_H 1
 
 #include "../api.h"
+#include "../auto/grp.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

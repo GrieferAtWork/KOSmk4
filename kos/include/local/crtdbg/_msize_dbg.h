@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5628b6f5 */
+/* HASH CRC-32:0xa83f794e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__m
 #endif /* !... */
 #endif /* !__local___localdep__msize_defined */
 __LOCAL_LIBC(_msize_dbg) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_msize_dbg))(void *__ptr, int __block_type) {
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_msize_dbg))(void *__ptr, int __block_type) {
 	(void)__block_type;
 	return __localdep__msize(__ptr);
 }

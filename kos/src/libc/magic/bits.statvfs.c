@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(sigset_t = "struct __sigset_struct")]
-%[default:section(".text.crt.sched.pthread")]
+%[default:section(".text.crt{|.dos}.sched.pthread")]
 
 
 %{

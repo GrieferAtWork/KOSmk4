@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5018340 */
+/* HASH CRC-32:0x9d48b0c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,21 +29,67 @@
 
 DECL_BEGIN
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
+INTDEF ATTR_LIBC_PRINTF(1, 2) void (VLIBDCALL libd_warn)(char const *format, ...) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 INTDEF ATTR_LIBC_PRINTF(1, 2) void (VLIBCCALL libc_warn)(char const *format, ...) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
+INTDEF ATTR_LIBC_PRINTF(1, 0) void (LIBDCALL libd_vwarn)(char const *format, va_list args) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 INTDEF ATTR_LIBC_PRINTF(1, 0) void (LIBCCALL libc_vwarn)(char const *format, va_list args) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
+INTDEF ATTR_LIBC_PRINTF(1, 2) void (VLIBDCALL libd_warnx)(char const *format, ...) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 INTDEF ATTR_LIBC_PRINTF(1, 2) void (VLIBCCALL libc_warnx)(char const *format, ...) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
+INTDEF ATTR_LIBC_PRINTF(1, 0) void (LIBDCALL libd_vwarnx)(char const *format, va_list args) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 INTDEF ATTR_LIBC_PRINTF(1, 0) void (LIBCCALL libc_vwarnx)(char const *format, va_list args) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Same as `warn()', but follow up by calling `exit(status)' */
+INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void (VLIBDCALL libd_err)(int status, char const *format, ...) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Same as `warn()', but follow up by calling `exit(status)' */
 INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void (VLIBCCALL libc_err)(int status, char const *format, ...) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Same as `warn()', but follow up by calling `exit(status)' */
+INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void (LIBDCALL libd_verr)(int status, char const *format, va_list args) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Same as `warn()', but follow up by calling `exit(status)' */
 INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void (LIBCCALL libc_verr)(int status, char const *format, va_list args) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Same as `warnx()', but follow up by calling `exit(status)' */
+INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void (VLIBDCALL libd_errx)(int status, char const *format, ...) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Same as `warnx()', but follow up by calling `exit(status)' */
 INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void (VLIBCCALL libc_errx)(int status, char const *format, ...) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Same as `warn()', but follow up by calling `exit(status)' */
+INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void (LIBDCALL libd_verrx)(int status, char const *format, va_list args) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Same as `warn()', but follow up by calling `exit(status)' */
 INTDEF ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void (LIBCCALL libc_verrx)(int status, char const *format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */

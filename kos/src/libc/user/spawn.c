@@ -48,6 +48,8 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid,
 	(void)path;
 	(void)file_actions;
 	(void)attrp;
+	(void)___argv;
+	(void)___envp;
 	CRT_UNIMPLEMENTED("posix_spawn"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
@@ -70,6 +72,8 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid,
 	(void)file;
 	(void)file_actions;
 	(void)attrp;
+	(void)___argv;
+	(void)___envp;
 	CRT_UNIMPLEMENTED("posix_spawnp"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c375b0f */
+/* HASH CRC-32:0xb6c9f827 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,20 @@
 
 DECL_BEGIN
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Append a given `NAME' to `SL'. `NAME' is considered
+ * inherited if the StringList is destroyed with `1' */
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_sl_add)(struct _stringlist *sl, char *name);
+/* Free a given string list. When `ALL' is non-zero, all contained
+ * string pointers (as previously added with `sl_add()') will also
+ * be `free(3)'ed. */
+INTDEF void NOTHROW_NCX(LIBDCALL libd_sl_free)(struct _stringlist *sl, int all);
+/* Search for `NAME' within the given StringList. Upon success,
+ * return a pointer to the equivalent string within `SL' (i.e. the
+ * pointer originally passed to `sl_add()' to insert that string).
+ * If `SL' doesn't contain an equivalent string, return `NULL' instead. */
+INTDEF ATTR_PURE NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl, char const *name);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Search for `NAME' within the given StringList. Upon success,
  * return a pointer to the equivalent string within `SL' (i.e. the

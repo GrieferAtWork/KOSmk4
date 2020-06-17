@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f44d7a0 */
+/* HASH CRC-32:0x28b99c08 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SYS_TIME_H 1
 
 #include "../api.h"
+#include "../auto/sys.time.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

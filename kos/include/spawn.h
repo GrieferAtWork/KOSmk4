@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16f2ff2e */
+/* HASH CRC-32:0xf5509d40 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,13 +129,13 @@ typedef struct {
 /* Spawn a new process executing PATH with the attributes describes in *ATTRP.
  * Before running the process perform the actions described in FILE-ACTIONS.
  * This function is a possible cancellation point and therefore not marked with __THROW */
-__CDECLARE(__ATTR_NONNULL((1, 2, 5, 6)),int,__NOTHROW_RPC,posix_spawn,(pid_t *__restrict __pid, char const *__restrict __path, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__path,__file_actions,__attrp,,))
+__CDECLARE(__ATTR_NONNULL((1, 2, 5, 6)),int,__NOTHROW_RPC,posix_spawn,(pid_t *__restrict __pid, char const *__restrict __path, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__path,__file_actions,__attrp,___argv,___envp))
 #endif /* __CRT_HAVE_posix_spawn */
 
 #ifdef __CRT_HAVE_posix_spawnp
 /* Similar to `posix_spawn' but search for FILE in the PATH.
  * This function is a possible cancellation point and therefore not marked with __THROW */
-__CDECLARE(__ATTR_NONNULL((1, 2, 5, 6)),int,__NOTHROW_RPC,posix_spawnp,(pid_t *__restrict __pid, const char *__restrict __file, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__file,__file_actions,__attrp,,))
+__CDECLARE(__ATTR_NONNULL((1, 2, 5, 6)),int,__NOTHROW_RPC,posix_spawnp,(pid_t *__restrict __pid, const char *__restrict __file, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__file,__file_actions,__attrp,___argv,___envp))
 #endif /* __CRT_HAVE_posix_spawnp */
 
 #ifdef __CRT_HAVE_posix_spawnattr_init

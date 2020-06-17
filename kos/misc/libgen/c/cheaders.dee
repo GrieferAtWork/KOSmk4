@@ -189,7 +189,7 @@ again_compare_typenames:
 	}
 
 	@@Same @cprintCCastPrefix, but meant to be used by generators
-	public function cprintCCastPrefixForGenerator(fp: CWriter | File) {
+	public function cprintCCastPrefixForGenerator(fp: CWriter) {
 		fp << "(";
 		local typename = str(beforeName).strip();
 		if (typename.endswith("__restrict"))
@@ -203,8 +203,14 @@ again_compare_typenames:
 
 	@@Print a stub-value for @this type (e.g. @"(char const *)0")
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
-	public function cprintStubValue(fp: CWriter, escapeMode: int) {
+	public function cprintStubValue(fp: CWriter | File, escapeMode: int) {
 		cprintCCastPrefix(fp, escapeMode);
+		fp << "0";
+	}
+
+	@@Same @cprintStubValue, but meant to be used by generators
+	public function cprintStubValueForGenerator(fp: CWriter | File) {
+		cprintCCastPrefixForGenerator(fp);
 		fp << "0";
 	}
 
@@ -225,6 +231,30 @@ again_compare_typenames:
 			if (afterNameStr.first !in ")[")
 				fp << " ";
 			escapeTextIntoFile(fp, afterName, escapeMode);
+		}
+		if (afterNameStr)
+			return true;
+		if (name)
+			return true;
+		if (beforeNameStr)
+			return !beforeNameStr.endswith("*");
+		return false;
+	}
+
+	@@Same @cprint, but meant to be used by generators
+	public function cprintForGenerator(fp: CWriter, name: string = ""): bool {
+		local beforeNameStr = str beforeName;
+		local afterNameStr = str afterName;
+		fp << beforeNameStr;
+		if (name) {
+			if (!beforeNameStr.endswith("*"))
+				fp << " ";
+			fp << name;
+		}
+		if (afterNameStr) {
+			if (afterNameStr.first !in ")[")
+				fp << " ";
+			fp << afterName;
 		}
 		if (afterNameStr)
 			return true;
@@ -2583,6 +2613,8 @@ class LibraryFunction {
 				bindingConditions.append("({})".format({ b.ppCond }));
 			}
 			bindingConditions = "||".join(bindingConditions);
+			if (!bindingConditions)
+				return "0";
 			if (ppCond != "1") {
 				bindingConditions = "({})&&({})"
 					.format({ ppCond, bindingConditions });
@@ -2812,22 +2844,25 @@ class SystemHeader {
 	@@  - @Callable:            Invoke @Callable(fp, escapeMode)
 	public member order_header: {(Function | ExposedFunction | string | UserString | Callable)...} = [];
 
-	@@Output order of <libc/string.h> (when empty, don't generate that header)
+	@@Output order of <libc/string.h> (when empty, don't generate that file)
 	public member order_libcHeader: {(Function | string | UserString)...} = [];
 
-	@@Output order of <libc/core/string.h> (when empty, don't generate that header)
+	@@Output order of <libc/core/string.h> (when empty, don't generate that file)
 	public member order_libcCoreHeader: {(Function | string | UserString)...} = [];
 
-	@@Output order of /src/libc/auto/string.h (when empty, don't generate that header)
+	@@Output order of /src/libc/auto/string.h (when empty, don't generate that file)
 	public member order_libcAutoHeader: {(LibraryFunction | string | UserString)...} = [];
 
-	@@Output order of /src/libc/auto/string.c (when empty, don't generate that header)
+	@@Output order of /src/libc/auto/string.c (when empty, don't generate that file)
 	public member order_libcAutoSource: {(LibraryFunction | string | UserString)...} = [];
 
-	@@Output order of /src/libc/user/string.h (when empty, don't generate that header)
+	@@Output order of /src/libc/auto/dosabi/string.c (when empty, don't generate that file)
+	public member order_libcDosabiSource: {(LibraryFunction | string | UserString)...} = [];
+
+	@@Output order of /src/libc/user/string.h (when empty, don't generate that file)
 	public member order_libcUserHeader: {(LibraryFunction | string | UserString)...} = [];
 
-	@@Output order of /src/libc/user/string.c (when empty, don't generate that header)
+	@@Output order of /src/libc/user/string.c (when empty, don't generate that file)
 	public member order_libcUserSource: {LibraryFunction...} = [];
 
 	@@Print the contents of the exposed header (such as `<string.h>`),
@@ -3011,23 +3046,27 @@ class SystemHeader {
 	}
 
 	@@Print the implementations from /kos/src/libc/auto/string.c
-	public function cprintLibraryAutoSource(fp: CWriter) {
-		local guardName = "GUARD_LIBC_AUTO_{}_C".format({
-			name.replace("-", "_").replace(".", "_").upper()
+	public function cprintLibraryAutoSource(fp: CWriter, dosAbi: bool = false) {
+		local guardName = "GUARD_LIBC_AUTO_{}{}_C".format({
+			dosAbi ? "DOSABI_" : "",
+			name.replace("-", "_").replace(".", "_").upper(),
 		});
 		fp << "#ifndef " << guardName << "\n"
 			"#define " << guardName << " 1\n"
 			"\n"
-			"#include \"../api.h\"\n"
+			"#include \"../" << (dosAbi ? "../" : "") << "api.h\"\n"
 			"#include <hybrid/typecore.h>\n"
 			"#include <kos/types.h>\n"
 			"#include \"";
+		if (dosAbi)
+			fp << "../";
 		if (order_libcUserHeader)
 			fp << "../user/";
 		fp << name << ".h\"\n";
 		local dependentFunctionHeaders: {string: {string...}} = Dict();
 		/* Gather declaring headers of all dependent functions */
-		for (local part: order_libcAutoSource) {
+		local partOrder = dosAbi ? order_libcDosabiSource : order_libcAutoSource;
+		for (local part: partOrder) {
 			if (part !is LibraryFunction)
 				continue;
 			for (local binding /*: LibraryFunctionBinding*/: part.functionBindings) {
@@ -3068,6 +3107,8 @@ class SystemHeader {
 				} else {
 					hdr = "\"{}.h\"".format({ hdr });
 				}
+				if (dosAbi)
+					hdr = "\"../" + hdr[1:];
 				fp.ppInclude(hdr);
 			}
 			fp.ppEndif();
@@ -3076,7 +3117,7 @@ class SystemHeader {
 		fp << "\n"
 			"DECL_BEGIN\n"
 			"\n";
-		for (local part: order_libcAutoSource) {
+		for (local part: partOrder) {
 			if (part is LibraryFunction) {
 				part.cprintInLibraryAutoImplementation(fp, ESCAPE_MODE_NONE, "INTERN");
 			} else {
@@ -3087,7 +3128,7 @@ class SystemHeader {
 			"DECL_END\n"
 			"\n";
 		/* Print out the symbol export table. */
-		for (local part: order_libcAutoSource) {
+		for (local part: partOrder) {
 			if (part !is LibraryFunction)
 				continue;
 			if (!part.exportSymbolNames)

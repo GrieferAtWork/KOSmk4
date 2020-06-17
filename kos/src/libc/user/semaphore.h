@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae69c884 */
+/* HASH CRC-32:0xcd02116d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SEMAPHORE_H 1
 
 #include "../api.h"
+#include "../auto/semaphore.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

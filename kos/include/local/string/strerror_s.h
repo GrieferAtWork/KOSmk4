@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bf77a1e */
+/* HASH CRC-32:0xe8280075 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strerror_s_defined
 #define __local_strerror_s_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #ifndef ___local_sys_errlist_defined
 #define ___local_sys_errlist_defined 1
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
@@ -35,7 +36,7 @@ __LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL __sys_nerr)(void);
 #endif
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerror_s) __ATTR_CONST __ATTR_WUNUSED char const *
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerror_s))(int __errnum) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerror_s))(__errno_t __errnum) {
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
 	return (unsigned int)__errnum < (unsigned int)_sys_nerr ? _sys_errlist[__errnum] : __NULLPTR;
 #elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)

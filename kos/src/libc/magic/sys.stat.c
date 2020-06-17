@@ -55,8 +55,8 @@
 %[define_replacement(UTIME_NOW   = __UTIME_NOW)]
 %[define_replacement(UTIME_OMIT  = __UTIME_OMIT)]
 
-%[declare_known_section(".text.crt.fs.stat")]
-%[declare_known_section(".text.crt.fs.stat_glc")]
+%[declare_known_section(".text.crt{|.dos}.fs.stat")]
+%[declare_known_section(".text.crt{|.dos}.fs.stat_glc")]
 
 /* KOS's stat function family */
 %[declare_user_export("kstat", "kstat64")]
@@ -387,7 +387,7 @@ typedef __blksize_t blksize_t;
  * Otherwise, `struct stat' uses a totally generic layout.
  */
 
-%[default:section(".text.crt.fs.stat")];
+%[default:section(".text.crt{|.dos}.fs.stat")];
 
 /* Name format: `<N_TIME_BITS>i<N_FILE_BITS>' */
 [[ignore, nocrt, alias("_stat", "_stat32")]]
@@ -554,7 +554,7 @@ int fstatat64($fd_t dirfd, [[nonnull]] char const *__restrict filename,
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_ATFILE */
 
-%[default:section(".text.crt.fs.modify")];
+%[default:section(".text.crt{|.dos}.fs.modify")];
 
 [[cp, ignore, nocrt, alias("_mkdir")]]
 int dos_mkdir([[nonnull]] char const *pathname);
@@ -585,7 +585,7 @@ int chmod([[nonnull]] char const *filename, $mode_t mode);
 int lchmod([[nonnull]] char const *filename, $mode_t mode);
 %#endif /* __USE_MISC */
 
-%[default:section(".text.crt.fs.basic_property")];
+%[default:section(".text.crt{|.dos}.fs.basic_property")];
 
 %
 ;
@@ -607,7 +607,7 @@ $mode_t getumask() {
 }
 %#endif /* __USE_GNU */
 
-%[default:section(".text.crt.fs.modify")];
+%[default:section(".text.crt{|.dos}.fs.modify")];
 
 %
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
@@ -651,7 +651,7 @@ int mkfifo([[nonnull]] char const *fifoname, $mode_t mode);
 %#endif /* __USE_ATFILE */
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
-%[default:section(".text.crt.fs.modify_time")];
+%[default:section(".text.crt{|.dos}.fs.modify_time")];
 
 [[cp, ignore, doc_alias("utimensat"), nocrt, alias("utimensat")]]
 int utimensat32($fd_t dirfd, [[nonnull]] char const *filename,

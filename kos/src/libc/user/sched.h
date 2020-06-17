@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x673c908d */
+/* HASH CRC-32:0x1f2c247b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SCHED_H 1
 
 #include "../api.h"
+#include "../auto/sched.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

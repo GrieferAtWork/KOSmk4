@@ -20,7 +20,7 @@
 
 %[define_replacement(pformatreader = __pformatreader)]
 
-%[default:section(".text.crt.string.format")]
+%[default:section(".text.crt{|.dos}.string.format")]
 
 %{
 #include <features.h>

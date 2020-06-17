@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91b70f39 */
+/* HASH CRC-32:0x8ce245cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_CrtSetCheckCount) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_CrtSetCheckCount))(int __check_count) {
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtSetCheckCount))(int __check_count) {
 	(void)__check_count;
 	__COMPILER_IMPURE();
 	return 0;

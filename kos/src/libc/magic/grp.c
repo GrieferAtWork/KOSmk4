@@ -20,7 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(gid_t = __gid_t)]
-%[default:section(".text.crt.database.group")]
+%[default:section(".text.crt{|.dos}.database.group")]
 
 %{
 #include <features.h>

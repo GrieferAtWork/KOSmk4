@@ -20,7 +20,7 @@
 
 %[define_replacement(cpu_set_t = __cpu_set_t)]
 
-%(user){
+%(auto_header,user){
 
 #ifndef __cpu_set_t_defined
 #define __cpu_set_t_defined 1
@@ -514,12 +514,12 @@ struct sched_param {
 
 }
 
-%[default:section(".text.crt.sched.utility")];
+%[default:section(".text.crt{|.dos}.sched.utility")];
 
 %#if defined(__USE_GNU) || defined(__USE_KOS)
 %typedef int (__LIBCCALL *__clone_func_t)(void *__arg);
 
-[[section(".text.crt.sched.access")]]
+[[section(".text.crt{|.dos}.sched.access")]]
 [[vartypes($pid_t, void *, $pid_t), export_alias("__clone")]]
 $pid_t clone([[nonnull]] __clone_func_t fn, void *child_stack, int flags,
              void *arg, ... /* pid_t *ptid, void *newtls, pid_t *ctid */);
@@ -574,7 +574,7 @@ int setns($fd_t fd, int nstype);
 @@Assuming that the calling thread was constructed by `clone()',
 @@calling this function has the same effect as returning `EXIT_CODE'
 @@from `clone()'s `FN' callback
-[[ATTR_NORETURN, section(".text.crt.sched.access")]]
+[[ATTR_NORETURN, section(".text.crt{|.dos}.sched.access")]]
 void exit_thread(int exit_code);
 %#endif /* __USE_KOS */
 %#endif /* __USE_GNU || __USE_KOS */

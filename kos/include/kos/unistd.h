@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62670243 */
+/* HASH CRC-32:0xaa4d2298 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -653,7 +653,7 @@ __CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((2, 3)),__THROWING,FExecve,(__fd_
 /* >> execvpe(3)
  * Replace the calling process with the application image referred to by `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,Execvpe,(char const *__restrict __file, __TARGV, __TENVP),(__fd,___argv,___envp))
+__CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,Execvpe,(char const *__restrict __file, __TARGV, __TENVP),(__file,___argv,___envp))
 #endif /* __CRT_HAVE_Execvpe */
 #endif /* __USE_GNU */
 

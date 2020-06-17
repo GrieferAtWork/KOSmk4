@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab6ac847 */
+/* HASH CRC-32:0x25c7cb73 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_KOS_SYS_IOCTL_H 1
 
 #include "../api.h"
+#include "../auto/kos.sys.ioctl.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

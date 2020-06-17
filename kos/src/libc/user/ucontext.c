@@ -73,6 +73,29 @@ NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__restrict oucp,
 }
 /*[[[end:libc_swapcontext]]]*/
 
+/*[[[head:libd_makecontext,hash:CRC-32=0x478976d]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+/* Manipulate user context UCP to continue with calling functions FUNC
+ * and the ARGC-1 parameters following ARGC when the context is used
+ * the next time in `setcontext' or `swapcontext'.
+ * We cannot say anything about the parameters FUNC takes; `void'
+ * is as good as any other choice */
+INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((1, 2)) void
+NOTHROW_NCX(VLIBDCALL libd_makecontext)(ucontext_t *ucp,
+                                        __makecontext_func_t func,
+                                        int argc,
+                                        ...)
+/*[[[body:libd_makecontext]]]*/
+/*AUTO*/{
+	(void)ucp;
+	(void)func;
+	(void)argc;
+	CRT_UNIMPLEMENTED("makecontext"); /* TODO */
+	libc_seterrno(ENOSYS);
+}
+#endif /* MAGIC:impl_if */
+/*[[[end:libd_makecontext]]]*/
+
 /*[[[head:libc_makecontext,hash:CRC-32=0x6fc70086]]]*/
 /* Manipulate user context UCP to continue with calling functions FUNC
  * and the ARGC-1 parameters following ARGC when the context is used
@@ -98,10 +121,13 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6800f348]]]*/
+/*[[[start:exports,hash:CRC-32=0xb7d444c8]]]*/
 DEFINE_PUBLIC_ALIAS(getcontext, libc_getcontext);
 DEFINE_PUBLIC_ALIAS(setcontext, libc_setcontext);
 DEFINE_PUBLIC_ALIAS(swapcontext, libc_swapcontext);
+#ifndef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(DOS$makecontext, libd_makecontext);
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(makecontext, libc_makecontext);
 /*[[[end:exports]]]*/
 

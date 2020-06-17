@@ -57,7 +57,22 @@ final global ppAssumeSourceFiles: PPAssume = createPPAssume({
 
 @@Macro definition assumptions that may be made inside of libc
 final global ppAssumeUserSourceFiles: PPAssume = createPPAssume({
-	"__KERNEL__" : false, /* not defined */
+	"__KERNEL__"      : false, /* not defined */
+	"__BUILDING_LIBC" : 1,
+	"__SIZEOF_CHAR__" : 1,
+	"__KOS__"         : 1,
+	"__KOS_VERSION__" : 400,
+});
+
+@@Macro definition assumptions that may be made in DOSABI source files
+final global ppAssumeDosAbiSourceFiles: PPAssume = createPPAssume({
+	"__LIBCCALL_IS_LIBDCALL" : false, /* not defined */
+	"__LIBDCALL_IS_LIBKCALL" : false, /* not defined */
+	"__KERNEL__"             : false, /* not defined */
+	"__BUILDING_LIBC"        : 1,
+	"__SIZEOF_CHAR__"        : 1,
+	"__KOS__"                : 1,
+	"__KOS_VERSION__"        : 400,
 });
 
 
@@ -644,6 +659,16 @@ try {
 					fp << COPYRIGHT << "\n";
 					local cWriter = CWriter(fp, ppAssume: ppAssumeSourceFiles);
 					header.cprintLibraryAutoSource(cWriter);
+					cWriter.flush();
+				}));
+		}
+		if (header.order_libcDosabiSource) {
+			startTask(updateHashedFile, (
+				"src/libc/auto/dosabi/{}.c".format({ name }),
+				[](fp: File) {
+					fp << COPYRIGHT << "\n";
+					local cWriter = CWriter(fp, ppAssume: ppAssumeDosAbiSourceFiles);
+					header.cprintLibraryAutoSource(cWriter, dosAbi: true);
 					cWriter.flush();
 				}));
 		}

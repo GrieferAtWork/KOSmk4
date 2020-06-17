@@ -1212,7 +1212,7 @@ $ssize_t file_wprinter([[nonnull]] void *arg,
 @@Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG'
 [[cp_stdio, wchar, impl_include("<asm/stdio.h>"), alias("file_wprinter")]]
 [[userimpl, requires_function(fputwc_unlocked)]]
-[[section(".text.crt.{|.dos}wchar.FILE.unlocked.write.write")]]
+[[section(".text.crt{|.dos}.wchar.FILE.unlocked.write.write")]]
 $ssize_t file_wprinter_unlocked([[nonnull]] void *arg,
                                 [[inp(datalen)]] wchar_t const *__restrict data,
                                 $size_t datalen) {

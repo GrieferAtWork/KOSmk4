@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb45b0f85 */
+/* HASH CRC-32:0x472d4a1c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_MALLOC_H 1
 
 #include "../api.h"
+#include "../auto/malloc.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

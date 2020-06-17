@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4615acb */
+/* HASH CRC-32:0xa8d691dc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SYS_XATTR_H 1
 
 #include "../api.h"
+#include "../auto/sys.xattr.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

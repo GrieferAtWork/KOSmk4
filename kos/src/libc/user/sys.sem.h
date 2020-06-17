@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc82b97f9 */
+/* HASH CRC-32:0x68681140 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SYS_SEM_H 1
 
 #include "../api.h"
+#include "../auto/sys.sem.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
@@ -29,6 +30,10 @@
 
 DECL_BEGIN
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Semaphore control operation. */
+INTDEF int NOTHROW_NCX(VLIBDCALL libd_semctl)(int semid, __STDC_INT_AS_UINT_T semnum, __STDC_INT_AS_UINT_T cmd, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Semaphore control operation. */
 INTDEF int NOTHROW_NCX(VLIBCCALL libc_semctl)(int semid, __STDC_INT_AS_UINT_T semnum, __STDC_INT_AS_UINT_T cmd, ...);

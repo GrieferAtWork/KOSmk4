@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98578891 */
+/* HASH CRC-32:0x8d0bc2e7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep__dupenv_s,(char **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, char const *__varname),_dupenv_s,(__pbuf,__pbuflen,__varname))
 #endif /* !__local___localdep__dupenv_s_defined */
 __LOCAL_LIBC(_dupenv_s_dbg) _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_dupenv_s_dbg))(char **__pbuf, __SIZE_TYPE__ *__pbufsize, char const *__varname, int __block_type, char const *__filename, int __line) {
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_dupenv_s_dbg))(char **__pbuf, __SIZE_TYPE__ *__pbufsize, char const *__varname, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;

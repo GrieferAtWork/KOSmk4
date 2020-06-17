@@ -275,6 +275,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr,
 }
 /*[[[end:libc_posix_madvise]]]*/
 
+
 /*[[[head:libc_mremap,hash:CRC-32=0x31cbe7cb]]]*/
 /* @param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 INTERN ATTR_SECTION(".text.crt.heap.mman") void *

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ab1d808 */
+/* HASH CRC-32:0x2891ea5e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SGTTY_H 1
 
 #include "../api.h"
+#include "../auto/sgtty.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

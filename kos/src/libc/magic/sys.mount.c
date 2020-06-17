@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%[default:section(".text.crt.fs.mount")]
+%[default:section(".text.crt{|.dos}.fs.mount")]
 %[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
 
 %{

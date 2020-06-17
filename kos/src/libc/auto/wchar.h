@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x961e267e */
+/* HASH CRC-32:0x87630218 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,6 +41,11 @@ typedef size_t rsize_t;
 #ifndef __KERNEL__
 INTDEF ATTR_CONST WUNUSED wint_t NOTHROW_NCX(LIBDCALL libd_btowc)(int ch);
 INTDEF ATTR_CONST WUNUSED wint_t NOTHROW_NCX(LIBKCALL libc_btowc)(int ch);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_wctob)(wint_t ch);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_wctob)(wint_t ch);
 INTDEF size_t NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc, char const *__restrict str, size_t maxlen, mbstate_t *mbs);
 INTDEF size_t NOTHROW_NCX(LIBKCALL libc_mbrtowc)(char32_t *pwc, char const *__restrict str, size_t maxlen, mbstate_t *mbs);
@@ -56,6 +61,11 @@ INTDEF ATTR_LEAF NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_wcstol)(char16_t co
 INTDEF ATTR_LEAF NONNULL((1)) long NOTHROW_NCX(LIBKCALL libc_wcstol)(char32_t const *__restrict nptr, char32_t **endptr, int base);
 INTDEF ATTR_LEAF NONNULL((1)) unsigned long NOTHROW_NCX(LIBDCALL libd_wcstoul)(char16_t const *__restrict nptr, char16_t **endptr, int base);
 INTDEF ATTR_LEAF NONNULL((1)) unsigned long NOTHROW_NCX(LIBKCALL libc_wcstoul)(char32_t const *__restrict nptr, char32_t **endptr, int base);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_mbsinit)(mbstate_t const *mbs);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_mbsinit)(mbstate_t const *mbs);
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBDCALL libd_wcscpy)(char16_t *__restrict buf, char16_t const *__restrict src);
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char32_t *NOTHROW_NCX(LIBKCALL libc_wcscpy)(char32_t *__restrict buf, char32_t const *__restrict src);
@@ -113,6 +123,11 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBDCALL libd_wcs
 /* Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
  * If no such needle exists, return `NULL' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char32_t *NOTHROW_NCX(LIBKCALL libc_wcsstr)(char32_t const *haystack, char32_t const *needle);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_fwide)(FILE *fp, int mode);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fwide)(FILE *fp, int mode);
 INTDEF ATTR_LIBC_WPRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fwprintf)(FILE *__restrict stream, char16_t const *__restrict format, ...) THROWS(...);
 INTDEF ATTR_LIBC_WPRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBKCALL libc_fwprintf)(FILE *__restrict stream, char32_t const *__restrict format, ...) THROWS(...);

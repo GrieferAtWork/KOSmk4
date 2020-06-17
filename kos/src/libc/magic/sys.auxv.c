@@ -19,7 +19,7 @@
  */
 
 %[define_replacement(ulongptr_t = __ULONGPTR_TYPE__)]
-%[default:section(".text.crt.system.auxv")]
+%[default:section(".text.crt{|.dos}.system.auxv")]
 
 %{
 #include <elf.h>

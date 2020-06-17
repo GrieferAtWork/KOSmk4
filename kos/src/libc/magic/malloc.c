@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[default:section(".text.crt.heap.malloc")]
+%[default:section(".text.crt{|.dos}.heap.malloc")]
 
 %(libc_fast){
 #include "stdlib.h"
@@ -70,7 +70,7 @@ typedef __SIZE_TYPE__ size_t;
 @@          memory (for internal control structures) is available to complete
 @@          the operation
 [[alias(_expand), ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
-[[section(".text.crt.heap.helpers")]]
+[[section(".text.crt{|.dos}.heap.helpers")]]
 realloc_in_place:(void *__restrict mallptr, size_t n_bytes) -> void *;
 
 [[ignore, nocrt, alias(posix_memalign)]]
@@ -93,17 +93,17 @@ void *memalign(size_t alignment, size_t n_bytes) {
 
 %
 [[wunused, ATTR_MALL_PAGEALIGNED, ATTR_ALLOC_SIZE((1)), ATTR_MALLOC]]
-[[section(".text.crt.heap.rare_helpers")]]
+[[section(".text.crt{|.dos}.heap.rare_helpers")]]
 void *pvalloc(size_t n_bytes);
 
 [[guard, wunused, ATTR_MALL_PAGEALIGNED, ATTR_ALLOC_SIZE((1))]]
-[[section(".text.crt.heap.rare_helpers"), userimpl, requires($has_function(memalign))]]
+[[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl, requires($has_function(memalign))]]
 void *valloc($size_t n_bytes) {
 	return memalign(getpagesize(), n_bytes);
 }
 
 [[guard, crtbuiltin]]
-[[section(".text.crt.heap.rare_helpers"), impl_include("<parts/errno.h>")]]
+[[section(".text.crt{|.dos}.heap.rare_helpers"), impl_include("<parts/errno.h>")]]
 [[userimpl, requires_function(memalign)]]
 int posix_memalign([[nonnull]] void **__restrict pp,
                    $size_t alignment, $size_t n_bytes) {
@@ -138,7 +138,7 @@ cfree(*) = free;
 int _heapmin();
 
 
-[[userimpl, section(".text.crt.heap.utility")]]
+[[userimpl, section(".text.crt{|.dos}.heap.utility")]]
 int malloc_trim(size_t pad) {
 @@pp_ifdef __BUILDING_LIBC@@
 	/* NO-OP (indicate failure to release memory) */
@@ -158,10 +158,10 @@ int malloc_trim(size_t pad) {
 
 %
 [[wunused, ATTR_PURE, export_alias(_msize)]]
-[[section(".text.crt.heap.helpers")]]
+[[section(".text.crt{|.dos}.heap.helpers")]]
 size_t malloc_usable_size(void *__restrict mallptr);
 
-[[userimpl, section(".text.crt.heap.utility")]]
+[[userimpl, section(".text.crt{|.dos}.heap.utility")]]
 int mallopt(int parameter_number, int parameter_value) {
 	/* NO-OP */
 	COMPILER_IMPURE();
@@ -177,7 +177,7 @@ int mallopt(int parameter_number, int parameter_value) {
 %#ifdef __USE_KOS
 [[export_alias(__memdup)]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
-[[section(".text.crt.heap.rare_helpers"), userimpl, requires_function(malloc)]]
+[[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl, requires_function(malloc)]]
 void *memdup([[nonnull]] void const *__restrict ptr, size_t n_bytes) {
 	void *result;
 	result = malloc(n_bytes);
@@ -188,7 +188,7 @@ void *memdup([[nonnull]] void const *__restrict ptr, size_t n_bytes) {
 
 [[export_alias(__memcdup)]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
-[[section(".text.crt.heap.rare_helpers"), userimpl, requires_function(memdup)]]
+[[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl, requires_function(memdup)]]
 void *memcdup([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes) {
 	if likely(n_bytes) {
 		void const *endaddr;
@@ -200,7 +200,7 @@ void *memcdup([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes
 }
 
 [[guard, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
-[[section(".text.crt.heap.rare_helpers"), userimpl]]
+[[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl]]
 [[impl_include("<hybrid/__overflow.h>"), requires_function(realloc)]]
 reallocarray:(void *ptr, $size_t elem_count, $size_t elem_size)
 		-> [realloc(mallptr, elem_count * elem_size)] void * {
@@ -212,7 +212,7 @@ reallocarray:(void *ptr, $size_t elem_count, $size_t elem_size)
 
 [[guard]] reallocv(*) = reallocarray;
 
-[[guard, section(".text.crt.heap.rare_helpers")]]
+[[guard, section(".text.crt{|.dos}.heap.rare_helpers")]]
 [[userimpl, requires($has_function(realloc) && $has_function(malloc_usable_size))]]
 recalloc:(void *mallptr, $size_t num_bytes)
 		-> [realloc(mallptr, num_bytes)] void * {
@@ -230,7 +230,7 @@ recalloc:(void *mallptr, $size_t num_bytes)
 
 [[guard, export_alias(_recalloc)]]
 [[userimpl, requires($has_function(realloc) && $has_function(malloc_usable_size))]]
-[[section(".text.crt.heap.rare_helpers"), impl_include("<hybrid/__overflow.h>")]]
+[[section(".text.crt{|.dos}.heap.rare_helpers"), impl_include("<hybrid/__overflow.h>")]]
 recallocv:(void *mallptr, $size_t elem_count, $size_t elem_size)
 		-> [realloc(mallptr, elem_count * elem_size)] void * {
 	void *result;

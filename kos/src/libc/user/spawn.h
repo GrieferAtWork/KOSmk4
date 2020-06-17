@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdabb970 */
+/* HASH CRC-32:0x3c4b6398 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_SPAWN_H 1
 
 #include "../api.h"
+#include "../auto/spawn.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

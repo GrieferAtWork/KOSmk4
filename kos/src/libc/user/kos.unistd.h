@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22ffab51 */
+/* HASH CRC-32:0x93fd38d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define GUARD_LIBC_USER_KOS_UNISTD_H 1
 
 #include "../api.h"
+#include "../auto/kos.unistd.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
@@ -42,19 +43,53 @@ INTDEF ATTR_NORETURN NONNULL((1, 2, 3)) void (LIBCCALL libc_Execve)(char const *
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 INTDEF ATTR_NORETURN NONNULL((1, 2)) void (LIBCCALL libc_Execvp)(char const *__restrict file, __TARGV) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> execl(3)
+ * Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+INTDEF ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void (VLIBDCALL libd_Execl)(char const *__restrict path, char const *args, ...) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 INTDEF ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void (VLIBCCALL libc_Execl)(char const *__restrict path, char const *args, ...) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> execle(3)
+ * Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * and setting `environ' to a `char **' passed after the NULL sentinel */
+INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBDCALL libd_Execle)(char const *__restrict path, char const *args, ...) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execle)(char const *__restrict path, char const *args, ...) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> execlp(3)
+ * Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
+INTDEF ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void (VLIBDCALL libd_Execpl)(char const *__restrict file, char const *args, ...) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 INTDEF ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void (VLIBCCALL libc_Execpl)(char const *__restrict file, char const *args, ...) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> execle(3)
+ * Replace the calling process with the application image referred to by `PATH' / `FILE'
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
+ * and setting `environ' to a `char **' passed after the NULL sentinel */
+INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBDCALL libd_Execlpe)(char const *__restrict file, char const *args, ...) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list,
@@ -300,7 +335,17 @@ INTDEF NONNULL((1)) void (LIBCCALL libc_GetDomainName)(char *name, size_t buflen
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
 INTDEF NONNULL((1)) void (LIBCCALL libc_SetDomainName)(char const *name, size_t len) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF __syscall_slong_t (VLIBDCALL libd_Syscall)(__syscall_ulong_t sysno, ...) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF __syscall_slong_t (VLIBCCALL libc_Syscall)(__syscall_ulong_t sysno, ...) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF __LONG64_TYPE__ (VLIBDCALL libd_Syscall64)(__syscall_ulong_t sysno, ...) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF __LONG64_TYPE__ (VLIBCCALL libc_Syscall64)(__syscall_ulong_t sysno, ...) THROWS(...);
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
