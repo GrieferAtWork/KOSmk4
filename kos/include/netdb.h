@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bc798e */
+/* HASH CRC-32:0xda64dd69 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -262,103 +262,68 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__h
 #endif /* __USE_MISC || !__USE_XOPEN2K8 */
 
 #ifdef __USE_MISC
-#ifdef __CRT_HAVE_herror
 /* Print error indicated by `h_errno' variable on standard error.
  * STR, if non-null, is printed before the error string */
-__CDECLARE_VOID(,__NOTHROW_RPC,herror,(char const *__str),(__str))
-#endif /* __CRT_HAVE_herror */
-#ifdef __CRT_HAVE_hstrerror
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC,herror,(char const *__str),(__str))
 /* Return string associated with error ERR_NUM */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,hstrerror,(int __err_num),(__err_num))
-#endif /* __CRT_HAVE_hstrerror */
+__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,hstrerror,(int __err_num),(__err_num))
 #endif /* __USE_MISC */
-#ifdef __CRT_HAVE_sethostent
 /* Open host data base files and mark them as staying
  * open even after a later search if STAY_OPEN is non-zero */
-__CDECLARE_VOID(,__NOTHROW_RPC,sethostent,(int __stay_open),(__stay_open))
-#endif /* __CRT_HAVE_sethostent */
-#ifdef __CRT_HAVE_endhostent
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC,sethostent,(int __stay_open),(__stay_open))
 /* Close host data base files and clear `stay open' flag */
-__CDECLARE_VOID(,__NOTHROW_RPC_NOKOS,endhostent,(void),())
-#endif /* __CRT_HAVE_endhostent */
-#ifdef __CRT_HAVE_gethostent
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endhostent,(void),())
 /* Get next entry from host data base file. Open data base if necessary */
-__CDECLARE(,struct hostent *,__NOTHROW_RPC,gethostent,(void),())
-#endif /* __CRT_HAVE_gethostent */
-#ifdef __CRT_HAVE_gethostbyaddr
+__CDECLARE_OPT(,struct hostent *,__NOTHROW_RPC,gethostent,(void),())
 /* Return entry from host data base which address match ADDR with length LEN and type TYPE */
-__CDECLARE(,struct hostent *,__NOTHROW_RPC,gethostbyaddr,(void const *__addr, socklen_t __len, int __type),(__addr,__len,__type))
-#endif /* __CRT_HAVE_gethostbyaddr */
-#ifdef __CRT_HAVE_gethostbyname
+__CDECLARE_OPT(,struct hostent *,__NOTHROW_RPC,gethostbyaddr,(void const *__addr, socklen_t __len, int __type),(__addr,__len,__type))
 /* Return entry from host data base for host with NAME */
-__CDECLARE(,struct hostent *,__NOTHROW_RPC,gethostbyname,(char const *__name),(__name))
-#endif /* __CRT_HAVE_gethostbyname */
+__CDECLARE_OPT(,struct hostent *,__NOTHROW_RPC,gethostbyname,(char const *__name),(__name))
 #ifdef __USE_MISC
-#ifdef __CRT_HAVE_gethostbyname2
 /* Return entry from host data base for host with NAME. AF must be
  * set to the address type which is `AF_INET' for IPv4 or `AF_INET6'
  * for IPv6.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,struct hostent *,__NOTHROW_RPC,gethostbyname2,(char const *__name, int __af),(__name,__af))
-#endif /* __CRT_HAVE_gethostbyname2 */
-#ifdef __CRT_HAVE_gethostent_r
+__CDECLARE_OPT(,struct hostent *,__NOTHROW_RPC,gethostbyname2,(char const *__name, int __af),(__name,__af))
 /* Reentrant versions of the functions above. The additional arguments
  * specify a buffer of BUFLEN starting at BUF. The last argument is a
  * pointer to a variable which gets the value which would be stored in
  * the global variable `herrno' by the non-reentrant functions.
  * These functions are not part of POSIX and therefore no official cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,gethostent_r,(struct hostent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct hostent **__restrict __result, int *__restrict __h_errnop),(__result_buf,__buf,__buflen,__result,__h_errnop))
-#endif /* __CRT_HAVE_gethostent_r */
-#ifdef __CRT_HAVE_gethostbyaddr_r
+__CDECLARE_OPT(,int,__NOTHROW_RPC,gethostent_r,(struct hostent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct hostent **__restrict __result, int *__restrict __h_errnop),(__result_buf,__buf,__buflen,__result,__h_errnop))
 /* Reentrant versions of the functions above. The additional arguments
  * specify a buffer of BUFLEN starting at BUF. The last argument is a
  * pointer to a variable which gets the value which would be stored in
  * the global variable `herrno' by the non-reentrant functions.
  * These functions are not part of POSIX and therefore no official cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,gethostbyaddr_r,(void const *__restrict __addr, socklen_t __len, int __type, struct hostent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct hostent **__restrict __result, int *__restrict __h_errnop),(__addr,__len,__type,__result_buf,__buf,__buflen,__result,__h_errnop))
-#endif /* __CRT_HAVE_gethostbyaddr_r */
-#ifdef __CRT_HAVE_gethostbyname_r
+__CDECLARE_OPT(,int,__NOTHROW_RPC,gethostbyaddr_r,(void const *__restrict __addr, socklen_t __len, int __type, struct hostent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct hostent **__restrict __result, int *__restrict __h_errnop),(__addr,__len,__type,__result_buf,__buf,__buflen,__result,__h_errnop))
 /* Reentrant versions of the functions above. The additional arguments
  * specify a buffer of BUFLEN starting at BUF. The last argument is a
  * pointer to a variable which gets the value which would be stored in
  * the global variable `herrno' by the non-reentrant functions.
  * These functions are not part of POSIX and therefore no official cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,gethostbyname_r,(char const *__restrict __name, struct hostent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct hostent **__restrict __result, int *__restrict __h_errnop),(__name,__result_buf,__buf,__buflen,__result,__h_errnop))
-#endif /* __CRT_HAVE_gethostbyname_r */
-#ifdef __CRT_HAVE_gethostbyname2_r
+__CDECLARE_OPT(,int,__NOTHROW_RPC,gethostbyname_r,(char const *__restrict __name, struct hostent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct hostent **__restrict __result, int *__restrict __h_errnop),(__name,__result_buf,__buf,__buflen,__result,__h_errnop))
 /* Reentrant versions of the functions above. The additional arguments
  * specify a buffer of BUFLEN starting at BUF. The last argument is a
  * pointer to a variable which gets the value which would be stored in
  * the global variable `herrno' by the non-reentrant functions.
  * These functions are not part of POSIX and therefore no official cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,gethostbyname2_r,(char const *__restrict __name, int __af, struct hostent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct hostent **__restrict __result, int *__restrict __h_errnop),(__name,__af,__result_buf,__buf,__buflen,__result,__h_errnop))
-#endif /* __CRT_HAVE_gethostbyname2_r */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,gethostbyname2_r,(char const *__restrict __name, int __af, struct hostent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct hostent **__restrict __result, int *__restrict __h_errnop),(__name,__af,__result_buf,__buf,__buflen,__result,__h_errnop))
 #endif /* __USE_MISC */
-#ifdef __CRT_HAVE_setnetent
 /* Open network data base files and mark them as staying
  * open even after a later search if STAY_OPEN is non-zero */
-__CDECLARE_VOID(,__NOTHROW_RPC,setnetent,(int __stay_open),(__stay_open))
-#endif /* __CRT_HAVE_setnetent */
-#ifdef __CRT_HAVE_endnetent
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC,setnetent,(int __stay_open),(__stay_open))
 /* Close network data base files and clear `stay open' flag */
-__CDECLARE_VOID(,__NOTHROW_RPC_NOKOS,endnetent,(void),())
-#endif /* __CRT_HAVE_endnetent */
-#ifdef __CRT_HAVE_getnetent
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endnetent,(void),())
 /* Get next entry from network data base file. Open data base if necessary */
-__CDECLARE(,struct netent *,__NOTHROW_RPC,getnetent,(void),())
-#endif /* __CRT_HAVE_getnetent */
-#ifdef __CRT_HAVE_getnetbyaddr
+__CDECLARE_OPT(,struct netent *,__NOTHROW_RPC,getnetent,(void),())
 /* Return entry from network data base which address match NET and type TYPE */
-__CDECLARE(,struct netent *,__NOTHROW_RPC,getnetbyaddr,(uint32_t __net, int __type),(__net,__type))
-#endif /* __CRT_HAVE_getnetbyaddr */
-#ifdef __CRT_HAVE_getnetbyname
+__CDECLARE_OPT(,struct netent *,__NOTHROW_RPC,getnetbyaddr,(uint32_t __net, int __type),(__net,__type))
 /* Return entry from network data base for network with NAME */
-__CDECLARE(,struct netent *,__NOTHROW_RPC,getnetbyname,(char const *__name),(__name))
-#endif /* __CRT_HAVE_getnetbyname */
+__CDECLARE_OPT(,struct netent *,__NOTHROW_RPC,getnetbyname,(char const *__name),(__name))
 
 #ifdef __USE_MISC
-#ifdef __CRT_HAVE_getnetent_r
 /* Reentrant versions of the functions above. The additional
  * arguments specify a buffer of BUFLEN starting at BUF. The last
  * argument is a pointer to a variable which gets the value which
@@ -366,9 +331,7 @@ __CDECLARE(,struct netent *,__NOTHROW_RPC,getnetbyname,(char const *__name),(__n
  * non-reentrant functions.
  * These functions are not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,getnetent_r,(struct netent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct netent **__restrict __result, int *__restrict __h_errnop),(__result_buf,__buf,__buflen,__result,__h_errnop))
-#endif /* __CRT_HAVE_getnetent_r */
-#ifdef __CRT_HAVE_getnetbyaddr_r
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getnetent_r,(struct netent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct netent **__restrict __result, int *__restrict __h_errnop),(__result_buf,__buf,__buflen,__result,__h_errnop))
 /* Reentrant versions of the functions above. The additional
  * arguments specify a buffer of BUFLEN starting at BUF. The last
  * argument is a pointer to a variable which gets the value which
@@ -376,9 +339,7 @@ __CDECLARE(,int,__NOTHROW_RPC,getnetent_r,(struct netent *__restrict __result_bu
  * non-reentrant functions.
  * These functions are not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,getnetbyaddr_r,(uint32_t __net, int __type, struct netent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct netent **__restrict __result, int *__restrict __h_errnop),(__net,__type,__result_buf,__buf,__buflen,__result,__h_errnop))
-#endif /* __CRT_HAVE_getnetbyaddr_r */
-#ifdef __CRT_HAVE_getnetbyname_r
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getnetbyaddr_r,(uint32_t __net, int __type, struct netent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct netent **__restrict __result, int *__restrict __h_errnop),(__net,__type,__result_buf,__buf,__buflen,__result,__h_errnop))
 /* Reentrant versions of the functions above. The additional
  * arguments specify a buffer of BUFLEN starting at BUF. The last
  * argument is a pointer to a variable which gets the value which
@@ -386,133 +347,89 @@ __CDECLARE(,int,__NOTHROW_RPC,getnetbyaddr_r,(uint32_t __net, int __type, struct
  * non-reentrant functions.
  * These functions are not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,getnetbyname_r,(char const *__restrict __name, struct netent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct netent **__restrict __result, int *__restrict __h_errnop),(__name,__result_buf,__buf,__buflen,__result,__h_errnop))
-#endif /* __CRT_HAVE_getnetbyname_r */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getnetbyname_r,(char const *__restrict __name, struct netent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct netent **__restrict __result, int *__restrict __h_errnop),(__name,__result_buf,__buf,__buflen,__result,__h_errnop))
 #endif /* __USE_MISC */
-#ifdef __CRT_HAVE_setservent
 /* Open service data base files and mark them as staying open even
  * after a later search if STAY_OPEN is non-zero */
-__CDECLARE_VOID(,__NOTHROW_RPC,setservent,(int __stay_open),(__stay_open))
-#endif /* __CRT_HAVE_setservent */
-#ifdef __CRT_HAVE_endservent
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC,setservent,(int __stay_open),(__stay_open))
 /* Close service data base files and clear `stay open' flag */
-__CDECLARE_VOID(,__NOTHROW_RPC_NOKOS,endservent,(void),())
-#endif /* __CRT_HAVE_endservent */
-#ifdef __CRT_HAVE_getservent
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endservent,(void),())
 /* Get next entry from service data base file. Open data base if necessary */
-__CDECLARE(,struct servent *,__NOTHROW_RPC,getservent,(void),())
-#endif /* __CRT_HAVE_getservent */
-#ifdef __CRT_HAVE_getservbyname
+__CDECLARE_OPT(,struct servent *,__NOTHROW_RPC,getservent,(void),())
 /* Return entry from network data base for network with NAME and protocol PROTO */
-__CDECLARE(,struct servent *,__NOTHROW_RPC,getservbyname,(char const *__name, char const *__proto),(__name,__proto))
-#endif /* __CRT_HAVE_getservbyname */
-#ifdef __CRT_HAVE_getservbyport
+__CDECLARE_OPT(,struct servent *,__NOTHROW_RPC,getservbyname,(char const *__name, char const *__proto),(__name,__proto))
 /* Return entry from service data base which matches port PORT and protocol PROTO */
-__CDECLARE(,struct servent *,__NOTHROW_RPC,getservbyport,(int __port, char const *__proto),(__port,__proto))
-#endif /* __CRT_HAVE_getservbyport */
+__CDECLARE_OPT(,struct servent *,__NOTHROW_RPC,getservbyport,(int __port, char const *__proto),(__port,__proto))
 
 #ifdef __USE_MISC
-#ifdef __CRT_HAVE_getservent_r
 /* Reentrant versions of the functions above. The additional
  * arguments specify a buffer of BUFLEN starting at BUF.
  * These functions are not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,getservent_r,(struct servent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct servent **__restrict __result),(__result_buf,__buf,__buflen,__result))
-#endif /* __CRT_HAVE_getservent_r */
-#ifdef __CRT_HAVE_getservbyname_r
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getservent_r,(struct servent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct servent **__restrict __result),(__result_buf,__buf,__buflen,__result))
 /* Reentrant versions of the functions above. The additional
  * arguments specify a buffer of BUFLEN starting at BUF.
  * These functions are not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,getservbyname_r,(char const *__restrict __name, char const *__restrict __proto, struct servent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct servent **__restrict __result),(__name,__proto,__result_buf,__buf,__buflen,__result))
-#endif /* __CRT_HAVE_getservbyname_r */
-#ifdef __CRT_HAVE_getservbyport_r
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getservbyname_r,(char const *__restrict __name, char const *__restrict __proto, struct servent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct servent **__restrict __result),(__name,__proto,__result_buf,__buf,__buflen,__result))
 /* Reentrant versions of the functions above. The additional
  * arguments specify a buffer of BUFLEN starting at BUF.
  * These functions are not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,getservbyport_r,(int __port, char const *__restrict __proto, struct servent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct servent **__restrict __result),(__port,__proto,__result_buf,__buf,__buflen,__result))
-#endif /* __CRT_HAVE_getservbyport_r */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getservbyport_r,(int __port, char const *__restrict __proto, struct servent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct servent **__restrict __result),(__port,__proto,__result_buf,__buf,__buflen,__result))
 #endif /* __USE_MISC */
-#ifdef __CRT_HAVE_setprotoent
 /* Open protocol data base files and mark them as staying open even
  * after a later search if STAY_OPEN is non-zero */
-__CDECLARE_VOID(,__NOTHROW_RPC,setprotoent,(int __stay_open),(__stay_open))
-#endif /* __CRT_HAVE_setprotoent */
-#ifdef __CRT_HAVE_endprotoent
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC,setprotoent,(int __stay_open),(__stay_open))
 /* Close protocol data base files and clear `stay open' flag */
-__CDECLARE_VOID(,__NOTHROW_RPC_NOKOS,endprotoent,(void),())
-#endif /* __CRT_HAVE_endprotoent */
-#ifdef __CRT_HAVE_getprotoent
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endprotoent,(void),())
 /* Get next entry from protocol data base file. Open data base if necessary */
-__CDECLARE(,struct protoent *,__NOTHROW_RPC,getprotoent,(void),())
-#endif /* __CRT_HAVE_getprotoent */
-#ifdef __CRT_HAVE_getprotobyname
+__CDECLARE_OPT(,struct protoent *,__NOTHROW_RPC,getprotoent,(void),())
 /* Return entry from protocol data base for network with NAME */
-__CDECLARE(,struct protoent *,__NOTHROW_RPC,getprotobyname,(char const *__name),(__name))
-#endif /* __CRT_HAVE_getprotobyname */
-#ifdef __CRT_HAVE_getprotobynumber
+__CDECLARE_OPT(,struct protoent *,__NOTHROW_RPC,getprotobyname,(char const *__name),(__name))
 /* Return entry from protocol data base which number is PROTO */
-__CDECLARE(,struct protoent *,__NOTHROW_RPC,getprotobynumber,(int __proto),(__proto))
-#endif /* __CRT_HAVE_getprotobynumber */
+__CDECLARE_OPT(,struct protoent *,__NOTHROW_RPC,getprotobynumber,(int __proto),(__proto))
 
 #ifdef __USE_MISC
-#ifdef __CRT_HAVE_getprotoent_r
 /* Reentrant versions of the functions above. The additional
  * arguments specify a buffer of BUFLEN starting at BUF.
  * These functions are not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,getprotoent_r,(struct protoent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct protoent **__restrict __result),(__result_buf,__buf,__buflen,__result))
-#endif /* __CRT_HAVE_getprotoent_r */
-#ifdef __CRT_HAVE_getprotobyname_r
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getprotoent_r,(struct protoent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct protoent **__restrict __result),(__result_buf,__buf,__buflen,__result))
 /* Reentrant versions of the functions above. The additional
  * arguments specify a buffer of BUFLEN starting at BUF.
  * These functions are not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,getprotobyname_r,(char const *__restrict __name, struct protoent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct protoent **__restrict __result),(__name,__result_buf,__buf,__buflen,__result))
-#endif /* __CRT_HAVE_getprotobyname_r */
-#ifdef __CRT_HAVE_getprotobynumber_r
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getprotobyname_r,(char const *__restrict __name, struct protoent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct protoent **__restrict __result),(__name,__result_buf,__buf,__buflen,__result))
 /* Reentrant versions of the functions above. The additional
  * arguments specify a buffer of BUFLEN starting at BUF.
  * These functions are not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,getprotobynumber_r,(int __proto, struct protoent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct protoent **__restrict __result),(__proto,__result_buf,__buf,__buflen,__result))
-#endif /* __CRT_HAVE_getprotobynumber_r */
-#ifdef __CRT_HAVE_setnetgrent
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getprotobynumber_r,(int __proto, struct protoent *__restrict __result_buf, char *__restrict __buf, size_t __buflen, struct protoent **__restrict __result),(__proto,__result_buf,__buf,__buflen,__result))
 /* Establish network group NETGROUP for enumeration.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,setnetgrent,(char const *__netgroup),(__netgroup))
-#endif /* __CRT_HAVE_setnetgrent */
-#ifdef __CRT_HAVE_endnetgrent
+__CDECLARE_OPT(,int,__NOTHROW_RPC,setnetgrent,(char const *__netgroup),(__netgroup))
 /* Free all space allocated by previous `setnetgrent' call.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE_VOID(,__NOTHROW_RPC_NOKOS,endnetgrent,(void),())
-#endif /* __CRT_HAVE_endnetgrent */
-#ifdef __CRT_HAVE_getnetgrent
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endnetgrent,(void),())
 /* Get next member of netgroup established by last `setnetgrent' call
  * and return pointers to elements in HOSTP, USERP, and DOMAINP.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,getnetgrent,(char **__restrict __hostp, char **__restrict __userp, char **__restrict __domainp),(__hostp,__userp,__domainp))
-#endif /* __CRT_HAVE_getnetgrent */
-#ifdef __CRT_HAVE_innetgr
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getnetgrent,(char **__restrict __hostp, char **__restrict __userp, char **__restrict __domainp),(__hostp,__userp,__domainp))
 /* Test whether NETGROUP contains the triple (HOST, USER, DOMAIN).
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,innetgr,(char const *__netgroup, char const *__host, char const *__user, char const *__domain),(__netgroup,__host,__user,__domain))
-#endif /* __CRT_HAVE_innetgr */
-#ifdef __CRT_HAVE_getnetgrent_r
+__CDECLARE_OPT(,int,__NOTHROW_RPC,innetgr,(char const *__netgroup, char const *__host, char const *__user, char const *__domain),(__netgroup,__host,__user,__domain))
 /* Reentrant version of `getnetgrent' where result is placed in BUFFER.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,getnetgrent_r,(char **__restrict __hostp, char **__restrict __userp, char **__restrict __domainp, char *__restrict __buf, size_t __buflen),(__hostp,__userp,__domainp,__buf,__buflen))
-#endif /* __CRT_HAVE_getnetgrent_r */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getnetgrent_r,(char **__restrict __hostp, char **__restrict __userp, char **__restrict __domainp, char *__restrict __buf, size_t __buflen),(__hostp,__userp,__domainp,__buf,__buflen))
 #endif /* __USE_MISC */
 
 #ifdef __USE_MISC
-#ifdef __CRT_HAVE_rcmd
 /* Call `rshd' at port RPORT on remote machine *AHOST to execute CMD.
  * The local user is LOCUSER, on the remote machine the command is
  * executed as REMUSER. In *FD2P the descriptor to the socket for the
@@ -521,16 +438,12 @@ __CDECLARE(,int,__NOTHROW_RPC,getnetgrent_r,(char **__restrict __hostp, char **_
  * official host name.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,rcmd,(char **__restrict __ahost, __UINT16_TYPE__ __rport, char const *__restrict __locuser, char const *__restrict __remuser, char const *__restrict __cmd, int *__restrict __fd2p),(__ahost,__rport,__locuser,__remuser,__cmd,__fd2p))
-#endif /* __CRT_HAVE_rcmd */
-#ifdef __CRT_HAVE_rcmd_af
+__CDECLARE_OPT(,int,__NOTHROW_RPC,rcmd,(char **__restrict __ahost, __UINT16_TYPE__ __rport, char const *__restrict __locuser, char const *__restrict __remuser, char const *__restrict __cmd, int *__restrict __fd2p),(__ahost,__rport,__locuser,__remuser,__cmd,__fd2p))
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_TYPE__ __rport, char const *__restrict __locuser, char const *__restrict __remuser, char const *__restrict __cmd, int *__restrict __fd2p, sa_family_t __af),(__ahost,__rport,__locuser,__remuser,__cmd,__fd2p,__af))
-#endif /* __CRT_HAVE_rcmd_af */
-#ifdef __CRT_HAVE_rexec
+__CDECLARE_OPT(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_TYPE__ __rport, char const *__restrict __locuser, char const *__restrict __remuser, char const *__restrict __cmd, int *__restrict __fd2p, sa_family_t __af),(__ahost,__rport,__locuser,__remuser,__cmd,__fd2p,__af))
 /* Call `rexecd' at port RPORT on remote machine *AHOST to execute
  * CMD. The process runs at the remote machine using the ID of user
  * NAME whose cleartext password is PASSWD. In *FD2P the descriptor
@@ -538,93 +451,68 @@ __CDECLARE(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_TYPE_
  * returns *AHOST contains the official host name.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,rexec,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p),(__ahost,__rport,__name,__pass,__cmd,__fd2p))
-#endif /* __CRT_HAVE_rexec */
-#ifdef __CRT_HAVE_rexec_af
+__CDECLARE_OPT(,int,__NOTHROW_RPC,rexec,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p),(__ahost,__rport,__name,__pass,__cmd,__fd2p))
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,rexec_af,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p, sa_family_t __af),(__ahost,__rport,__name,__pass,__cmd,__fd2p,__af))
-#endif /* __CRT_HAVE_rexec_af */
-#ifdef __CRT_HAVE_ruserok
+__CDECLARE_OPT(,int,__NOTHROW_RPC,rexec_af,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p, sa_family_t __af),(__ahost,__rport,__name,__pass,__cmd,__fd2p,__af))
 /* Check whether user REMUSER on system RHOST is allowed to login as LOCUSER.
  * If SUSER is not zero the user tries to become superuser. Return 0 if
  * it is possible.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,ruserok,(char const *__rhost, int __suser, char const *__remuser, char const *__locuser),(__rhost,__suser,__remuser,__locuser))
-#endif /* __CRT_HAVE_ruserok */
-#ifdef __CRT_HAVE_ruserok_af
+__CDECLARE_OPT(,int,__NOTHROW_RPC,ruserok,(char const *__rhost, int __suser, char const *__remuser, char const *__locuser),(__rhost,__suser,__remuser,__locuser))
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,ruserok_af,(char const *__rhost, int __suser, char const *__remuser, char const *__locuser, sa_family_t __af),(__rhost,__suser,__remuser,__locuser,__af))
-#endif /* __CRT_HAVE_ruserok_af */
-#ifdef __CRT_HAVE_iruserok
+__CDECLARE_OPT(,int,__NOTHROW_RPC,ruserok_af,(char const *__rhost, int __suser, char const *__remuser, char const *__locuser, sa_family_t __af),(__rhost,__suser,__remuser,__locuser,__af))
 /* Check whether user REMUSER on system indicated by IPv4 address
  * RADDR is allowed to login as LOCUSER. Non-IPv4 (e.g., IPv6) are
  * not supported. If SUSER is not zero the user tries to become
  * superuser. Return 0 if it is possible.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,iruserok,(uint32_t __raddr, int __suser, char const *__remuser, char const *__locuser),(__raddr,__suser,__remuser,__locuser))
-#endif /* __CRT_HAVE_iruserok */
-#ifdef __CRT_HAVE_iruserok_af
+__CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok,(uint32_t __raddr, int __suser, char const *__remuser, char const *__locuser),(__raddr,__suser,__remuser,__locuser))
 /* This is the equivalent function where the pfamiliy if the address
  * pointed to by RADDR is determined by the value of AF. It therefore
  * can be used for IPv6
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,iruserok_af,(void const *__raddr, int __suser, char const *__remuser, char const *__locuser, sa_family_t __af),(__raddr,__suser,__remuser,__locuser,__af))
-#endif /* __CRT_HAVE_iruserok_af */
-#ifdef __CRT_HAVE_rresvport
+__CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok_af,(void const *__raddr, int __suser, char const *__remuser, char const *__locuser, sa_family_t __af),(__raddr,__suser,__remuser,__locuser,__af))
 /* Try to allocate reserved port, returning a descriptor for a socket opened
  * at this port or -1 if unsuccessful. The search for an available port
  * will start at ALPORT and continues with lower numbers.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,rresvport,(int *__alport),(__alport))
-#endif /* __CRT_HAVE_rresvport */
-#ifdef __CRT_HAVE_rresvport_af
+__CDECLARE_OPT(,int,__NOTHROW_RPC,rresvport,(int *__alport),(__alport))
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,rresvport_af,(int *__alport, sa_family_t __af),(__alport,__af))
-#endif /* __CRT_HAVE_rresvport_af */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,rresvport_af,(int *__alport, sa_family_t __af),(__alport,__af))
 #endif /* __USE_MISC */
 
 /* Extension from POSIX.1:2001. */
 #ifdef __USE_XOPEN2K
-#ifdef __CRT_HAVE_getaddrinfo
 /* Translate name of a service location and/or a service name to set of socket addresses */
-__CDECLARE(,int,__NOTHROW_RPC,getaddrinfo,(char const *__restrict __name, char const *__restrict __service, struct addrinfo const *__restrict __req, struct addrinfo **__restrict __pai),(__name,__service,__req,__pai))
-#endif /* __CRT_HAVE_getaddrinfo */
-#ifdef __CRT_HAVE_freeaddrinfo
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getaddrinfo,(char const *__restrict __name, char const *__restrict __service, struct addrinfo const *__restrict __req, struct addrinfo **__restrict __pai),(__name,__service,__req,__pai))
 /* Free `addrinfo' structure AI including associated storage */
-__CDECLARE_VOID(,__NOTHROW_NCX,freeaddrinfo,(struct addrinfo *__ai),(__ai))
-#endif /* __CRT_HAVE_freeaddrinfo */
-#ifdef __CRT_HAVE_gai_strerror
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,freeaddrinfo,(struct addrinfo *__ai),(__ai))
 /* Convert error return from getaddrinfo() to a string */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,gai_strerror,(int __ecode),(__ecode))
-#endif /* __CRT_HAVE_gai_strerror */
-#ifdef __CRT_HAVE_getnameinfo
+__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,gai_strerror,(int __ecode),(__ecode))
 /* Translate a socket address to a location and service name */
-__CDECLARE(,int,__NOTHROW_RPC,getnameinfo,(struct sockaddr const *__restrict __sa, socklen_t __salen, char *__restrict __host, socklen_t __hostlen, char *__restrict __serv, socklen_t __servlen, int __flags),(__sa,__salen,__host,__hostlen,__serv,__servlen,__flags))
-#endif /* __CRT_HAVE_getnameinfo */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getnameinfo,(struct sockaddr const *__restrict __sa, socklen_t __salen, char *__restrict __host, socklen_t __hostlen, char *__restrict __serv, socklen_t __servlen, int __flags),(__sa,__salen,__host,__hostlen,__serv,__servlen,__flags))
 #endif /* __USE_XOPEN2K */
 
 #ifdef __USE_GNU
-#ifdef __CRT_HAVE_getaddrinfo_a
 /* Enqueue ENT requests from the LIST. If MODE is GAI_WAIT wait until all
  * requests are handled. If WAIT is GAI_NOWAIT return immediately after
  * queueing the requests and signal completion according to SIG.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
-__CDECLARE(,int,__NOTHROW_RPC,getaddrinfo_a,(int __mode, struct gaicb *__list[__restrict_arr], int __ent, struct sigevent *__restrict __sig),(__mode,__list,__ent,__sig))
-#endif /* __CRT_HAVE_getaddrinfo_a */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getaddrinfo_a,(int __mode, struct gaicb *__list[__restrict_arr], int __ent, struct sigevent *__restrict __sig),(__mode,__list,__ent,__sig))
 #if defined(__CRT_HAVE_gai_suspend64) && defined(__USE_TIME_BITS64)
 /* Suspend execution of the thread until at least one of the ENT requests
  * in LIST is handled. If TIMEOUT is not a null pointer it specifies the
@@ -674,14 +562,10 @@ __CREDIRECT(,int,__NOTHROW_RPC,gai_suspend64,(struct gaicb const *const __list[]
 __NAMESPACE_LOCAL_USING_OR_IMPL(gai_suspend64, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL gai_suspend64)(struct gaicb const *const __list[], int __ent, struct timespec64 const *__timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gai_suspend64))(__list, __ent, __timeout); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
-#ifdef __CRT_HAVE_gai_error
 /* Get the error status of the request REQ */
-__CDECLARE(,int,__NOTHROW_NCX,gai_error,(struct gaicb *__req),(__req))
-#endif /* __CRT_HAVE_gai_error */
-#ifdef __CRT_HAVE_gai_cancel
+__CDECLARE_OPT(,int,__NOTHROW_NCX,gai_error,(struct gaicb *__req),(__req))
 /* Cancel the requests associated with GAICBP */
-__CDECLARE(,int,__NOTHROW_NCX,gai_cancel,(struct gaicb *__gaicbp),(__gaicbp))
-#endif /* __CRT_HAVE_gai_cancel */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,gai_cancel,(struct gaicb *__gaicbp),(__gaicbp))
 #endif /* __USE_GNU */
 #endif /* __CC__ */
 

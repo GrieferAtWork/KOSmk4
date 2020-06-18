@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb03765b4 */
+/* HASH CRC-32:0x89c16fa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,9 +77,7 @@ typedef __cpu_set_t cpu_set_t;
 #define CPU_FREE(cpuset)                               __CPU_FREE(cpuset)
 
 #ifdef __CC__
-#ifdef __CRT_HAVE_sched_setparam
-__CDECLARE(,int,__NOTHROW_NCX,sched_setparam,(__pid_t __pid, struct sched_param const *__param),(__pid,__param))
-#endif /* __CRT_HAVE_sched_setparam */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sched_setparam,(__pid_t __pid, struct sched_param const *__param),(__pid,__param))
 #ifdef __CRT_HAVE_sched_getparam
 __CDECLARE(,int,__NOTHROW_NCX,sched_getparam,(__pid_t __pid, struct sched_param *__param),(__pid,__param))
 #elif defined(__CRT_HAVE___sched_getparam)
@@ -127,12 +125,8 @@ __CDECLARE(,int,__NOTHROW_NCX,sched_get_priority_min,(int __algorithm),(__algori
 #elif defined(__CRT_HAVE___sched_get_priority_min)
 __CREDIRECT(,int,__NOTHROW_NCX,sched_get_priority_min,(int __algorithm),__sched_get_priority_min,(__algorithm))
 #endif /* ... */
-#ifdef __CRT_HAVE_sched_setaffinity
-__CDECLARE(,int,__NOTHROW_NCX,sched_setaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, cpu_set_t const *__cpuset),(__pid,__cpusetsize,__cpuset))
-#endif /* __CRT_HAVE_sched_setaffinity */
-#ifdef __CRT_HAVE_sched_getaffinity
-__CDECLARE(,int,__NOTHROW_NCX,sched_getaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, cpu_set_t *__cpuset),(__pid,__cpusetsize,__cpuset))
-#endif /* __CRT_HAVE_sched_getaffinity */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sched_setaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, cpu_set_t const *__cpuset),(__pid,__cpusetsize,__cpuset))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sched_getaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, cpu_set_t *__cpuset),(__pid,__cpusetsize,__cpuset))
 #if defined(__CRT_HAVE_sched_rr_get_interval64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_NCX,sched_rr_get_interval,(__pid_t __pid, struct timespec *__tms),sched_rr_get_interval64,(__pid,__tms))
 #elif defined(__CRT_HAVE_sched_rr_get_interval) && !defined(__USE_TIME_BITS64)

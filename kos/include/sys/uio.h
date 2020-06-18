@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f981694 */
+/* HASH CRC-32:0x505b7d3d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,20 +39,12 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 
 #ifdef __USE_GNU
-#ifdef __CRT_HAVE_process_vm_readv
-__CDECLARE(__ATTR_WUNUSED,ssize_t,__NOTHROW_RPC,process_vm_readv,(__pid_t __pid, struct iovec const *__local_iov, __ULONGPTR_TYPE__ __liovcnt, struct iovec const *__remote_iov, __ULONGPTR_TYPE__ __riovcnt, __ULONGPTR_TYPE__ __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
-#endif /* __CRT_HAVE_process_vm_readv */
-#ifdef __CRT_HAVE_process_vm_writev
-__CDECLARE(,ssize_t,__NOTHROW_RPC,process_vm_writev,(__pid_t __pid, struct iovec const *__local_iov, __ULONGPTR_TYPE__ __liovcnt, struct iovec const *__remote_iov, __ULONGPTR_TYPE__ __riovcnt, __ULONGPTR_TYPE__ __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
-#endif /* __CRT_HAVE_process_vm_writev */
+__CDECLARE_OPT(__ATTR_WUNUSED,ssize_t,__NOTHROW_RPC,process_vm_readv,(__pid_t __pid, struct iovec const *__local_iov, __ULONGPTR_TYPE__ __liovcnt, struct iovec const *__remote_iov, __ULONGPTR_TYPE__ __riovcnt, __ULONGPTR_TYPE__ __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
+__CDECLARE_OPT(,ssize_t,__NOTHROW_RPC,process_vm_writev,(__pid_t __pid, struct iovec const *__local_iov, __ULONGPTR_TYPE__ __liovcnt, struct iovec const *__remote_iov, __ULONGPTR_TYPE__ __riovcnt, __ULONGPTR_TYPE__ __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __USE_GNU */
 
-#ifdef __CRT_HAVE_readv
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,readv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),(__fd,__iov,__count))
-#endif /* __CRT_HAVE_readv */
-#ifdef __CRT_HAVE_writev
-__CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),(__fd,__iov,__count))
-#endif /* __CRT_HAVE_writev */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,readv,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),(__fd,__iov,__count))
+__CDECLARE_OPT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count),(__fd,__iov,__count))
 
 #ifdef __USE_MISC
 #if defined(__CRT_HAVE_preadv64) && defined(__USE_FILE_OFFSET64)

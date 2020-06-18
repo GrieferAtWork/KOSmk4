@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4619a13d */
+/* HASH CRC-32:0x92b175bd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,15 +57,11 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#ifdef __CRT_HAVE_setfsuid
 /* Change uid used for file access control to UID, without affecting
  * other privileges (such as who can send signals at the process) */
-__CDECLARE(,int,__NOTHROW_NCX,setfsuid,(__uid_t __uid),(__uid))
-#endif /* __CRT_HAVE_setfsuid */
-#ifdef __CRT_HAVE_setfsgid
+__CDECLARE_OPT(,int,__NOTHROW_NCX,setfsuid,(__uid_t __uid),(__uid))
 /* Ditto for group id */
-__CDECLARE(,int,__NOTHROW_NCX,setfsgid,(__gid_t __gid),(__gid))
-#endif /* __CRT_HAVE_setfsgid */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,setfsgid,(__gid_t __gid),(__gid))
 
 #endif /* __CC__ */
 

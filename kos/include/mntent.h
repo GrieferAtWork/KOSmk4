@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb509da3 */
+/* HASH CRC-32:0x4c9157ab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,11 +99,9 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *
  * entries from the beginning of FILE.  MODE is as for `fopen' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *__file, char const *__mode),__setmntent,(__file,__mode))
 #endif /* ... */
-#ifdef __CRT_HAVE_getmntent
 /* Read one mount table entry from STREAM.  Returns a pointer to storage
  * reused on the next call, or null for EOF or error (use feof/ferror to check) */
-__CDECLARE(__ATTR_NONNULL((1)),struct mntent *,__NOTHROW_RPC,getmntent,(__FILE *__stream),(__stream))
-#endif /* __CRT_HAVE_getmntent */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),struct mntent *,__NOTHROW_RPC,getmntent,(__FILE *__stream),(__stream))
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_getmntent_r
@@ -115,11 +113,9 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),struct mntent *,__NOTHROW_RPC,getmntent_r,
 #endif /* ... */
 #endif /* __USE_MISC */
 
-#ifdef __CRT_HAVE_addmntent
 /* Write the mount table entry described by MNT to STREAM.
  * Return zero on success, nonzero on failure */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,addmntent,(__FILE *__restrict __stream, struct mntent const *__restrict __mnt),(__stream,__mnt))
-#endif /* __CRT_HAVE_addmntent */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,addmntent,(__FILE *__restrict __stream, struct mntent const *__restrict __mnt),(__stream,__mnt))
 #ifdef __CRT_HAVE_endmntent
 /* Close a stream opened with `setmntent' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),(__stream))

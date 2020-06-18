@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8199b57 */
+/* HASH CRC-32:0xa124e4e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -526,21 +526,17 @@ __CREDIRECT(,int,__NOTHROW_RPC,fsync,(__fd_t __fd),fdatasync,(__fd))
 __NAMESPACE_LOCAL_USING_OR_IMPL(fsync, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL fsync)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fsync))(__fd); })
 #endif /* !... */
 
-#ifdef __CRT_HAVE_getppid
 /* >> getppid(2)
  * Return the PID of the calling process's parent.
  * (That is the TID of the leader of the parent of the calling thread's leader)
  * THIS_THREAD->LEADER->PARENT->LEADER->PID */
-__CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getppid,(void),())
-#endif /* __CRT_HAVE_getppid */
+__CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getppid,(void),())
 
-#ifdef __CRT_HAVE_getpgrp
 /* >> getpgrp(2)
  * Return the ID of the calling process's process group.
  * (That is the TID of the leader of the process group of the calling thread's leader)
  * THIS_THREAD->LEADER->GROUP_LEADER->PID */
-__CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgrp,(void),())
-#endif /* __CRT_HAVE_getpgrp */
+__CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgrp,(void),())
 
 #ifdef __CRT_HAVE_getpgid
 /* >> getpgid(2)
@@ -576,7 +572,6 @@ __CDECLARE(,int,__NOTHROW_NCX,setpgid,(__pid_t __pid, __pid_t __pgid),(__pid,__p
 __CREDIRECT(,int,__NOTHROW_NCX,setpgid,(__pid_t __pid, __pid_t __pgid),__setpgid,(__pid,__pgid))
 #endif /* ... */
 
-#ifdef __CRT_HAVE_setsid
 /* >> setsid(2)
  * Make the calling thread's process the leader of its associated
  * process group, before also making it its own session leader.
@@ -584,55 +579,40 @@ __CREDIRECT(,int,__NOTHROW_NCX,setpgid,(__pid_t __pid, __pid_t __pgid),__setpgid
  *  - THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
  *  - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
  *  - return THIS_THREAD->LEADER->PID; */
-__CDECLARE(,__pid_t,__NOTHROW_NCX,setsid,(void),())
-#endif /* __CRT_HAVE_setsid */
+__CDECLARE_OPT(,__pid_t,__NOTHROW_NCX,setsid,(void),())
 
-#ifdef __CRT_HAVE_getuid
 /* >> getuid(2)
  * Return the real user ID of the calling process */
-__CDECLARE(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,getuid,(void),())
-#endif /* __CRT_HAVE_getuid */
+__CDECLARE_OPT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,getuid,(void),())
 
-#ifdef __CRT_HAVE_geteuid
 /* >> geteuid(2)
  * Return the effective user ID of the calling process */
-__CDECLARE(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,geteuid,(void),())
-#endif /* __CRT_HAVE_geteuid */
+__CDECLARE_OPT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,geteuid,(void),())
 
-#ifdef __CRT_HAVE_getgid
 /* >> getgid(2)
  * Return the real group ID of the calling process */
-__CDECLARE(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,getgid,(void),())
-#endif /* __CRT_HAVE_getgid */
+__CDECLARE_OPT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,getgid,(void),())
 
-#ifdef __CRT_HAVE_getegid
 /* >> getegid(2)
  * Return the effective group ID of the calling process */
-__CDECLARE(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,getegid,(void),())
-#endif /* __CRT_HAVE_getegid */
+__CDECLARE_OPT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,getegid,(void),())
 
 /* ... */
-#ifdef __CRT_HAVE_getgroups
-__CDECLARE(,int,__NOTHROW_NCX,getgroups,(int __size, __gid_t __list[]),(__size,__list))
-#endif /* __CRT_HAVE_getgroups */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,getgroups,(int __size, __gid_t __list[]),(__size,__list))
 
-#ifdef __CRT_HAVE_setuid
 /* >> setuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `UID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
-__CDECLARE(,int,__NOTHROW_NCX,setuid,(__uid_t __uid),(__uid))
-#endif /* __CRT_HAVE_setuid */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,setuid,(__uid_t __uid),(__uid))
 
-#ifdef __CRT_HAVE_setgid
 /* >> setgid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `GID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
-__CDECLARE(,int,__NOTHROW_NCX,setgid,(__gid_t __gid),(__gid))
-#endif /* __CRT_HAVE_setgid */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,setgid,(__gid_t __gid),(__gid))
 
 #if __has_builtin(__builtin_fork) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fork)
 /* >> fork(2)
@@ -666,58 +646,42 @@ __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,fork,(void),())
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,fork,(void),__fork,())
 #endif /* ... */
 
-#ifdef __CRT_HAVE_alarm
 /* >> alarm(2)
  * @return: 0 : No alarm was scheduled before.
  * @return: * : The number of seconds yet to pass before a previous alarm would have elapsed.
  * Schedule an to deliver a `SIGALRM' after letting `seconds' elapse.
  * You may pass ZERO(0) for SECONDS to disable a previously scheduled alarm */
-__CDECLARE(,unsigned int,__NOTHROW_NCX,alarm,(unsigned int __seconds),(__seconds))
-#endif /* __CRT_HAVE_alarm */
+__CDECLARE_OPT(,unsigned int,__NOTHROW_NCX,alarm,(unsigned int __seconds),(__seconds))
 
-#ifdef __CRT_HAVE_pause
 /* >> pause(2)
  * Suspend execution until the delivery of a POSIX_SIGNAL */
-__CDECLARE(,int,__NOTHROW_RPC,pause,(void),())
-#endif /* __CRT_HAVE_pause */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,pause,(void),())
 
-#ifdef __CRT_HAVE_fpathconf
 /* >> fpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__CDECLARE(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,fpathconf,(__fd_t __fd, int __name),(__fd,__name))
-#endif /* __CRT_HAVE_fpathconf */
+__CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,fpathconf,(__fd_t __fd, int __name),(__fd,__name))
 
-#ifdef __CRT_HAVE_ttyname
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE_ttyname */
-#ifdef __CRT_HAVE_ttyname_r
+__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),(__fd))
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,ttyname_r,(__fd_t __fd, char *__buf, size_t __buflen),(__fd,__buf,__buflen))
-#endif /* __CRT_HAVE_ttyname_r */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,ttyname_r,(__fd_t __fd, char *__buf, size_t __buflen),(__fd,__buf,__buflen))
 
-#ifdef __CRT_HAVE_tcgetpgrp
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
-__CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,tcgetpgrp,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE_tcgetpgrp */
+__CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,tcgetpgrp,(__fd_t __fd),(__fd))
 
-#ifdef __CRT_HAVE_tcsetpgrp
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
-__CDECLARE(,int,__NOTHROW_NCX,tcsetpgrp,(__fd_t __fd, __pid_t __pgrp_id),(__fd,__pgrp_id))
-#endif /* __CRT_HAVE_tcsetpgrp */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,tcsetpgrp,(__fd_t __fd, __pid_t __pgrp_id),(__fd,__pgrp_id))
 
 /* ... */
-#ifdef __CRT_HAVE_getlogin
-__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,getlogin,(void),())
-#endif /* __CRT_HAVE_getlogin */
+__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_NCX,getlogin,(void),())
 
 #ifdef __CRT_HAVE_chown
 /* >> chown(2)
@@ -730,15 +694,13 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chown,(char const *__file, __ui
 __NAMESPACE_LOCAL_USING_OR_IMPL(chown, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL chown)(char const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(chown))(__file, __owner, __group); })
 #endif /* ... */
 
-#ifdef __CRT_HAVE_pathconf
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
-#endif /* __CRT_HAVE_pathconf */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
 
 #ifdef __CRT_HAVE_link
 /* >> link(2)
@@ -1114,33 +1076,24 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL eac
 #endif /* __USE_GNU */
 
 #ifdef __USE_ATFILE
-#ifdef __CRT_HAVE_faccessat
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,faccessat,(__fd_t __dfd, char const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),(__dfd,__file,__type,__flags))
-#endif /* __CRT_HAVE_faccessat */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,faccessat,(__fd_t __dfd, char const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),(__dfd,__file,__type,__flags))
 
-#ifdef __CRT_HAVE_fchownat
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fchownat,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
-#endif /* __CRT_HAVE_fchownat */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fchownat,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
 
-#ifdef __CRT_HAVE_linkat
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
-__CDECLARE(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,linkat,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
-#endif /* __CRT_HAVE_linkat */
+__CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,linkat,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
 
-#ifdef __CRT_HAVE_symlinkat
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
-__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,symlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path))
-#endif /* __CRT_HAVE_symlinkat */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,symlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path))
 
-#ifdef __CRT_HAVE_readlinkat
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -1149,23 +1102,18 @@ __CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,symlinkat,(char const *__lin
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__CDECLARE(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,readlinkat,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
-#endif /* __CRT_HAVE_readlinkat */
+__CDECLARE_OPT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,readlinkat,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
 
 #ifdef __USE_KOS
-#ifdef __CRT_HAVE_freadlinkat
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
-__CDECLARE(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,freadlinkat,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
-#endif /* __CRT_HAVE_freadlinkat */
+__CDECLARE_OPT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,freadlinkat,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
 #endif /* __USE_KOS */
 
-#ifdef __CRT_HAVE_unlinkat
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,unlinkat,(__fd_t __dfd, char const *__name, __atflag_t __flags),(__dfd,__name,__flags))
-#endif /* __CRT_HAVE_unlinkat */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,unlinkat,(__fd_t __dfd, char const *__name, __atflag_t __flags),(__dfd,__name,__flags))
 #endif /* __USE_ATFILE */
 
 
@@ -1397,21 +1345,11 @@ __CDECLARE(,int,__NOTHROW_RPC,syncfs,(__fd_t __fd),(__fd))
 #include <local/unistd/syncfs.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(syncfs, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL syncfs)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(syncfs))(__fd); })
 #endif /* !__CRT_HAVE_syncfs */
-#ifdef __CRT_HAVE_group_member
-__CDECLARE(,int,__NOTHROW_NCX,group_member,(__gid_t __gid),(__gid))
-#endif /* __CRT_HAVE_group_member */
-#ifdef __CRT_HAVE_getresuid
-__CDECLARE(,int,__NOTHROW_NCX,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
-#endif /* __CRT_HAVE_getresuid */
-#ifdef __CRT_HAVE_getresgid
-__CDECLARE(,int,__NOTHROW_NCX,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
-#endif /* __CRT_HAVE_getresgid */
-#ifdef __CRT_HAVE_setresuid
-__CDECLARE(,int,__NOTHROW_NCX,setresuid,(__uid_t __ruid, __uid_t __euid, __uid_t __suid),(__ruid,__euid,__suid))
-#endif /* __CRT_HAVE_setresuid */
-#ifdef __CRT_HAVE_setresgid
-__CDECLARE(,int,__NOTHROW_NCX,setresgid,(__gid_t __rgid, __gid_t __egid, __gid_t __sgid),(__rgid,__egid,__sgid))
-#endif /* __CRT_HAVE_setresgid */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,group_member,(__gid_t __gid),(__gid))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,setresuid,(__uid_t __ruid, __uid_t __euid, __uid_t __suid),(__ruid,__euid,__suid))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,setresgid,(__gid_t __rgid, __gid_t __egid, __gid_t __sgid),(__rgid,__egid,__sgid))
 #endif /* __USE_GNU */
 #if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || \
      defined(__USE_MISC)
@@ -1429,9 +1367,7 @@ __CDECLARE(__ATTR_DEPRECATED("Use getcwd()") __ATTR_NONNULL((1)),char *,__NOTHRO
 #include <local/unistd/getwd.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(getwd, __FORCELOCAL __ATTR_DEPRECATED("Use getcwd()") __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL getwd)(char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwd))(__buf); })
 #endif /* ... */
-#ifdef __CRT_HAVE_ualarm
-__CDECLARE(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t __value, __useconds_t __interval),(__value,__interval))
-#endif /* __CRT_HAVE_ualarm */
+__CDECLARE_OPT(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t __value, __useconds_t __interval),(__value,__interval))
 
 #ifndef __vfork_defined
 #define __vfork_defined 1
@@ -1451,17 +1387,13 @@ __CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(voi
 #endif /* !__vfork_defined */
 #endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) || __USE_MISC */
 
-#ifdef __CRT_HAVE_fchown
 /* >> fchown(2)
  * Change the ownership of a given `FD' to `GROUP:OWNER' */
-__CDECLARE(,int,__NOTHROW_RPC,fchown,(__fd_t __fd, __uid_t __owner, __gid_t __group),(__fd,__owner,__group))
-#endif /* __CRT_HAVE_fchown */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,fchown,(__fd_t __fd, __uid_t __owner, __gid_t __group),(__fd,__owner,__group))
 
-#ifdef __CRT_HAVE_fchdir
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
-__CDECLARE(,int,__NOTHROW_RPC,fchdir,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE_fchdir */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,fchdir,(__fd_t __fd),(__fd))
 
 #ifdef __CRT_HAVE_getpgid
 /* >> getpgid(2)
@@ -1479,12 +1411,10 @@ __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgid,(__pid_t __pid),(__pid))
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgid,(__pid_t __pid),__getpgid,(__pid))
 #endif /* ... */
 
-#ifdef __CRT_HAVE_getsid
 /* >> getsid(2)
  * Return the ID of the session which a process `PID' is apart of.
  * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
-__CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getsid,(__pid_t __pid),(__pid))
-#endif /* __CRT_HAVE_getsid */
+__CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getsid,(__pid_t __pid),(__pid))
 
 #ifdef __CRT_HAVE_lchown
 /* >> lchown(2)
@@ -1606,7 +1536,6 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,_exit,(int __status),exit,(__status)
 #endif /* !___exit_defined */
 
 #ifdef __USE_POSIX2
-#ifdef __CRT_HAVE_confstr
 /* Retrieve a system configuration string specified by `name'
  * @param: name:   One of `_CS_*' from <bits/confname.h>
  * @param: buf:    Target buffer
@@ -1614,8 +1543,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,_exit,(int __status),exit,(__status)
  * @return: * :    Required buffer size (including a trailing \0-character)
  * @return: 1 :    Empty configuration string.
  * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
-__CDECLARE(,size_t,__NOTHROW_NCX,confstr,(__STDC_INT_AS_UINT_T __name, char *__buf, size_t __buflen),(__name,__buf,__buflen))
-#endif /* __CRT_HAVE_confstr */
+__CDECLARE_OPT(,size_t,__NOTHROW_NCX,confstr,(__STDC_INT_AS_UINT_T __name, char *__buf, size_t __buflen),(__name,__buf,__buflen))
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("optarg")
@@ -1675,27 +1603,19 @@ __CDECLARE_VOID(,__NOTHROW_RPC,sync,(void),())
 __NAMESPACE_LOCAL_USING_OR_IMPL(sync, __FORCELOCAL void __NOTHROW_RPC(__LIBCCALL sync)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sync))(); })
 #endif /* !__CRT_HAVE_sync */
 
-#ifdef __CRT_HAVE_setpgrp
 /* >> setpgrp(3)
  * Move the calling process into its own process group.
  * Equivalent to `setpgid(0, 0)' */
-__CDECLARE(,int,__NOTHROW_NCX,setpgrp,(void),())
-#endif /* __CRT_HAVE_setpgrp */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,setpgrp,(void),())
 
 /* ... */
-#ifdef __CRT_HAVE_setreuid
-__CDECLARE(,int,__NOTHROW_NCX,setreuid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
-#endif /* __CRT_HAVE_setreuid */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,setreuid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
 
 /* ... */
-#ifdef __CRT_HAVE_setregid
-__CDECLARE(,int,__NOTHROW_NCX,setregid,(__gid_t __rgid, __gid_t __egid),(__rgid,__egid))
-#endif /* __CRT_HAVE_setregid */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,setregid,(__gid_t __rgid, __gid_t __egid),(__rgid,__egid))
 
 /* ... */
-#ifdef __CRT_HAVE_gethostid
-__CDECLARE(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_NCX,gethostid,(void),())
-#endif /* __CRT_HAVE_gethostid */
+__CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_NCX,gethostid,(void),())
 #if defined(__USE_MISC) || !defined(__USE_XOPEN2K)
 #ifdef __CRT_HAVE_getpagesize
 /* >> getpagesize(3)
@@ -1726,31 +1646,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getdtablesize, __FORCELOCAL __ATTR_CONST __ATTR_
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_XOPEN2K
-#ifdef __CRT_HAVE_seteuid
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `EUID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
-__CDECLARE(,int,__NOTHROW_NCX,seteuid,(__uid_t __euid),(__euid))
-#endif /* __CRT_HAVE_seteuid */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,seteuid,(__uid_t __euid),(__euid))
 
-#ifdef __CRT_HAVE_setegid
 /* >> setegid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `EGID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
-__CDECLARE(,int,__NOTHROW_NCX,setegid,(__gid_t __egid),(__egid))
-#endif /* __CRT_HAVE_setegid */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,setegid,(__gid_t __egid),(__egid))
 #endif /* __USE_XOPEN2K */
 
 #if defined(__USE_MISC) || \
    (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_UNIX98))
 /* ... */
-#ifdef __CRT_HAVE_ttyslot
-__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,ttyslot,(void),())
-#endif /* __CRT_HAVE_ttyslot */
+__CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,ttyslot,(void),())
 #endif
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
@@ -1796,82 +1710,54 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(readlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) ss
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 #if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
-#ifdef __CRT_HAVE_getlogin_r
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,getlogin_r,(char *__name, size_t __name_len),(__name,__name_len))
-#endif /* __CRT_HAVE_getlogin_r */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,getlogin_r,(char *__name, size_t __name_len),(__name,__name_len))
 #endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
-#ifdef __CRT_HAVE_gethostname
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gethostname,(char *__name, size_t __buflen),(__name,__buflen))
-#endif /* __CRT_HAVE_gethostname */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gethostname,(char *__name, size_t __buflen),(__name,__buflen))
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 #ifdef __USE_MISC
 /* ... */
-#ifdef __CRT_HAVE_setlogin
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setlogin,(char const *__name),(__name))
-#endif /* __CRT_HAVE_setlogin */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setlogin,(char const *__name),(__name))
 
-#ifdef __CRT_HAVE_sethostname
 /* >> sethostname(2)
  * Set the name of the hosting machine */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sethostname,(char const *__name, size_t __len),(__name,__len))
-#endif /* __CRT_HAVE_sethostname */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sethostname,(char const *__name, size_t __len),(__name,__len))
 
 /* ... */
-#ifdef __CRT_HAVE_sethostid
-__CDECLARE(,int,__NOTHROW_NCX,sethostid,(__LONGPTR_TYPE__ __id),(__id))
-#endif /* __CRT_HAVE_sethostid */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sethostid,(__LONGPTR_TYPE__ __id),(__id))
 
-#ifdef __CRT_HAVE_getdomainname
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getdomainname,(char *__name, size_t __buflen),(__name,__buflen))
-#endif /* __CRT_HAVE_getdomainname */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getdomainname,(char *__name, size_t __buflen),(__name,__buflen))
 
-#ifdef __CRT_HAVE_setdomainname
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setdomainname,(char const *__name, size_t __len),(__name,__len))
-#endif /* __CRT_HAVE_setdomainname */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setdomainname,(char const *__name, size_t __len),(__name,__len))
 
 /* ... */
-#ifdef __CRT_HAVE_vhangup
-__CDECLARE(,int,__NOTHROW_NCX,vhangup,(void),())
-#endif /* __CRT_HAVE_vhangup */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,vhangup,(void),())
 
 /* ... */
-#ifdef __CRT_HAVE_profil
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,profil,(__UINT16_TYPE__ *__sample_buffer, size_t __size, size_t __offset, unsigned int __scale),(__sample_buffer,__size,__offset,__scale))
-#endif /* __CRT_HAVE_profil */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,profil,(__UINT16_TYPE__ *__sample_buffer, size_t __size, size_t __offset, unsigned int __scale),(__sample_buffer,__size,__offset,__scale))
 
 /* ... */
-#ifdef __CRT_HAVE_getusershell
-__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getusershell,(void),())
-#endif /* __CRT_HAVE_getusershell */
+__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getusershell,(void),())
 
 /* ... */
-#ifdef __CRT_HAVE_endusershell
-__CDECLARE_VOID(,__NOTHROW_NCX,endusershell,(void),())
-#endif /* __CRT_HAVE_endusershell */
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,endusershell,(void),())
 
 /* ... */
-#ifdef __CRT_HAVE_setusershell
-__CDECLARE_VOID(,__NOTHROW_RPC,setusershell,(void),())
-#endif /* __CRT_HAVE_setusershell */
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC,setusershell,(void),())
 
 /* ... */
-#ifdef __CRT_HAVE_daemon
-__CDECLARE(,int,__NOTHROW_RPC,daemon,(__STDC_INT_AS_UINT_T __nochdir, __STDC_INT_AS_UINT_T __noclose),(__nochdir,__noclose))
-#endif /* __CRT_HAVE_daemon */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,daemon,(__STDC_INT_AS_UINT_T __nochdir, __STDC_INT_AS_UINT_T __noclose),(__nochdir,__noclose))
 
 /* ... */
-#ifdef __CRT_HAVE_revoke
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,revoke,(char const *__file),(__file))
-#endif /* __CRT_HAVE_revoke */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,revoke,(char const *__file),(__file))
 
 #if !defined(__acct_defined) && defined(__CRT_HAVE_acct)
 #define __acct_defined 1
@@ -1928,17 +1814,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_WUNUSED __ATTR_N
 
 #if defined(__USE_MISC) || \
    (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
-#ifdef __CRT_HAVE_chroot
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chroot,(char const *__restrict __path),(__path))
-#endif /* __CRT_HAVE_chroot */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chroot,(char const *__restrict __path),(__path))
 
 /* ... */
-#ifdef __CRT_HAVE_getpass
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
-#endif /* __CRT_HAVE_getpass */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
 #endif /* ... */
 
 #if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
@@ -1993,12 +1875,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ftruncate64, __FORCELOCAL int __NOTHROW_NCX(__LI
 
 #if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K)) || \
      defined(__USE_MISC)
-#ifdef __CRT_HAVE_brk
 /* >> brk(2), sbrk(2)
  * Change the program break, allowing for a rudimentary implementation of a heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
-__CDECLARE(,int,__NOTHROW_NCX,brk,(void *__addr),(__addr))
-#endif /* __CRT_HAVE_brk */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,brk,(void *__addr),(__addr))
 #ifdef __CRT_HAVE_sbrk
 __CDECLARE(,void *,__NOTHROW_NCX,sbrk,(intptr_t __delta),(__delta))
 #elif defined(__CRT_HAVE___sbrk)

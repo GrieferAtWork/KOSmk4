@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1555df5e */
+/* HASH CRC-32:0x29954567 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,71 +59,41 @@ __SYSDECL_BEGIN
 #define WTMP_FILENAME  _PATH_WTMP
 
 #ifdef __CC__
-#ifdef __CRT_HAVE_login_tty
 /* Make FD be the controlling terminal, stdin, stdout, and stderr;
  * then close FD. Returns 0 on success, nonzero on error */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,login_tty,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE_login_tty */
-#ifdef __CRT_HAVE_login
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,login_tty,(__fd_t __fd),(__fd))
 /* Write the given entry into utmp and wtmp */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC_KOS,login,(struct utmp const *__entry),(__entry))
-#endif /* __CRT_HAVE_login */
-#ifdef __CRT_HAVE_logout
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_RPC_KOS,login,(struct utmp const *__entry),(__entry))
 /* Write the utmp entry to say the user on UT_LINE has logged out */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,logout,(char const *__ut_line),(__ut_line))
-#endif /* __CRT_HAVE_logout */
-#ifdef __CRT_HAVE_logwtmp
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,logout,(char const *__ut_line),(__ut_line))
 /* Append to wtmp an entry for the current time and the given info */
-__CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC_KOS,logwtmp,(char const *__ut_line, char const *__ut_name, char const *__ut_host),(__ut_line,__ut_name,__ut_host))
-#endif /* __CRT_HAVE_logwtmp */
-#ifdef __CRT_HAVE_updwtmp
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC_KOS,logwtmp,(char const *__ut_line, char const *__ut_name, char const *__ut_host),(__ut_line,__ut_name,__ut_host))
 /* Append entry UTMP to the wtmp-like file WTMP_FILE */
-__CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_RPC_KOS,updwtmp,(char const *__wtmp_file, struct utmp const *__utmp),(__wtmp_file,__utmp))
-#endif /* __CRT_HAVE_updwtmp */
-#ifdef __CRT_HAVE_utmpname
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1, 2)),__NOTHROW_RPC_KOS,updwtmp,(char const *__wtmp_file, struct utmp const *__utmp),(__wtmp_file,__utmp))
 /* Change name of the utmp file to be examined */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,utmpname,(char const *__file),(__file))
-#endif /* __CRT_HAVE_utmpname */
-#ifdef __CRT_HAVE_getutent
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,utmpname,(char const *__file),(__file))
 /* Read next entry from a utmp-like file */
-__CDECLARE(,struct utmp *,__NOTHROW_RPC_KOS,getutent,(void),())
-#endif /* __CRT_HAVE_getutent */
-#ifdef __CRT_HAVE_setutent
+__CDECLARE_OPT(,struct utmp *,__NOTHROW_RPC_KOS,getutent,(void),())
 /* Reset the input stream to the beginning of the file */
-__CDECLARE_VOID(,__NOTHROW_RPC_KOS,setutent,(void),())
-#endif /* __CRT_HAVE_setutent */
-#ifdef __CRT_HAVE_endutent
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC_KOS,setutent,(void),())
 /* Close the current open file */
-__CDECLARE_VOID(,__NOTHROW_NCX,endutent,(void),())
-#endif /* __CRT_HAVE_endutent */
-#ifdef __CRT_HAVE_getutid
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,endutent,(void),())
 /* Search forward from the current point in the utmp file
  * until the next entry with a ut_type matching ID->ut_type */
-__CDECLARE(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,getutid,(struct utmp const *__id),(__id))
-#endif /* __CRT_HAVE_getutid */
-#ifdef __CRT_HAVE_getutline
+__CDECLARE_OPT(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,getutid,(struct utmp const *__id),(__id))
 /* Search forward from the current point in the utmp file
  * until the next entry with a ut_line matching LINE->ut_line */
-__CDECLARE(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,getutline,(struct utmp const *__line),(__line))
-#endif /* __CRT_HAVE_getutline */
-#ifdef __CRT_HAVE_pututline
+__CDECLARE_OPT(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,getutline,(struct utmp const *__line),(__line))
 /* Write out entry pointed to by UTMP_PTR into the utmp file */
-__CDECLARE(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,pututline,(struct utmp const *__utmp_ptr),(__utmp_ptr))
-#endif /* __CRT_HAVE_pututline */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,pututline,(struct utmp const *__utmp_ptr),(__utmp_ptr))
 
 #ifdef __USE_MISC
-#ifdef __CRT_HAVE_getutent_r
 /* Reentrant versions of the file for handling utmp files */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC_KOS,getutent_r,(struct utmp *__buffer, struct utmp **__result),(__buffer,__result))
-#endif /* __CRT_HAVE_getutent_r */
-#ifdef __CRT_HAVE_getutid_r
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC_KOS,getutent_r,(struct utmp *__buffer, struct utmp **__result),(__buffer,__result))
 /* Reentrant versions of the file for handling utmp files */
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC_KOS,getutid_r,(struct utmp const *__id, struct utmp *__buffer, struct utmp **__result),(__id,__buffer,__result))
-#endif /* __CRT_HAVE_getutid_r */
-#ifdef __CRT_HAVE_getutline_r
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC_KOS,getutid_r,(struct utmp const *__id, struct utmp *__buffer, struct utmp **__result),(__id,__buffer,__result))
 /* Reentrant versions of the file for handling utmp files */
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC_KOS,getutline_r,(struct utmp const *__line, struct utmp *__buffer, struct utmp **__result),(__line,__buffer,__result))
-#endif /* __CRT_HAVE_getutline_r */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC_KOS,getutline_r,(struct utmp const *__line, struct utmp *__buffer, struct utmp **__result),(__line,__buffer,__result))
 #endif /* __USE_MISC */
 #endif /* __CC__ */
 

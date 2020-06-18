@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1867762 */
+/* HASH CRC-32:0xd8a7378c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,21 +36,11 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#ifdef __CRT_HAVE_Malloc
-__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,Malloc,(size_t __num_bytes),(__num_bytes))
-#endif /* __CRT_HAVE_Malloc */
-#ifdef __CRT_HAVE_Calloc
-__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__THROWING,Calloc,(size_t __count, size_t __num_bytes),(__count,__num_bytes))
-#endif /* __CRT_HAVE_Calloc */
-#ifdef __CRT_HAVE_Realloc
-__CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__THROWING,Realloc,(void *__mallptr, size_t __num_bytes),(__mallptr,__num_bytes))
-#endif /* __CRT_HAVE_Realloc */
-#ifdef __CRT_HAVE_Memalign
-__CDECLARE(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__THROWING,Memalign,(size_t __alignment, size_t __num_bytes),(__alignment,__num_bytes))
-#endif /* __CRT_HAVE_Memalign */
-#ifdef __CRT_HAVE_PValloc
-__CDECLARE(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,PValloc,(size_t __num_bytes),(__num_bytes))
-#endif /* __CRT_HAVE_PValloc */
+__CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,Malloc,(size_t __num_bytes),(__num_bytes))
+__CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__THROWING,Calloc,(size_t __count, size_t __num_bytes),(__count,__num_bytes))
+__CDECLARE_OPT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__THROWING,Realloc,(void *__mallptr, size_t __num_bytes),(__mallptr,__num_bytes))
+__CDECLARE_OPT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__THROWING,Memalign,(size_t __alignment, size_t __num_bytes),(__alignment,__num_bytes))
+__CDECLARE_OPT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,PValloc,(size_t __num_bytes),(__num_bytes))
 #ifdef __CRT_HAVE_Valloc
 __CDECLARE(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,Valloc,(size_t __num_bytes),(__num_bytes))
 #elif defined(__CRT_HAVE_Memalign)

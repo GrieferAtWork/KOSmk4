@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65de9679 */
+/* HASH CRC-32:0xb931db4c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -174,7 +174,6 @@ __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt,(int ___argc, char *const ___
 #undef __getopt_defined
 #endif /* !__CRT_HAVE_getopt */
 #endif /* !__getopt_defined */
-#ifdef __CRT_HAVE_getopt_long
 /* Return the option character from OPTS just read.  Return -1 when
  * there are no more options.  For unrecognized options, or options
  * missing arguments, `optopt' is set to the option letter, and '?' is
@@ -190,9 +189,7 @@ __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt,(int ___argc, char *const ___
  * - If OPTS begins with `--', then non-option arguments are treated as
  *   arguments to the option '\0'.  This behavior is specific to the GNU
  *   `getopt' */
-__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt_long,(int ___argc, char *const ___argv[], char const *__shortopts, struct option const *__longopts, int *__longind),(___argc,___argv,__shortopts,__longopts,__longind))
-#endif /* __CRT_HAVE_getopt_long */
-#ifdef __CRT_HAVE_getopt_long_only
+__CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt_long,(int ___argc, char *const ___argv[], char const *__shortopts, struct option const *__longopts, int *__longind),(___argc,___argv,__shortopts,__longopts,__longind))
 /* Return the option character from OPTS just read.  Return -1 when
  * there are no more options.  For unrecognized options, or options
  * missing arguments, `optopt' is set to the option letter, and '?' is
@@ -208,8 +205,7 @@ __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt_long,(int ___argc, char *cons
  * - If OPTS begins with `--', then non-option arguments are treated as
  *   arguments to the option '\0'.  This behavior is specific to the GNU
  *   `getopt' */
-__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt_long_only,(int ___argc, char *const ___argv[], char const *__shortopts, struct option const *__longopts, int *__longind),(___argc,___argv,__shortopts,__longopts,__longind))
-#endif /* __CRT_HAVE_getopt_long_only */
+__CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt_long_only,(int ___argc, char *const ___argv[], char const *__shortopts, struct option const *__longopts, int *__longind),(___argc,___argv,__shortopts,__longopts,__longind))
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("val")

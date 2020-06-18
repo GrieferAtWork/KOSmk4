@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17554cc9 */
+/* HASH CRC-32:0xef749f30 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -339,14 +339,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ntohq, __FORCELOCAL __ATTR_CONST __UINT64_TYPE__
 #define IN6_IS_ADDR_MULTICAST(a)    (((__uint8_t const *)(a))[0] == __UINT8_C(0xff))
 
 #ifdef __USE_MISC
-#ifdef __CRT_HAVE_bindresvport
 /* Bind socket to a privileged IP port */
-__CDECLARE(,int,__NOTHROW_RPC,bindresvport,(__fd_t __sockfd, struct sockaddr_in *__sock_in),(__sockfd,__sock_in))
-#endif /* __CRT_HAVE_bindresvport */
-#ifdef __CRT_HAVE_bindresvport6
+__CDECLARE_OPT(,int,__NOTHROW_RPC,bindresvport,(__fd_t __sockfd, struct sockaddr_in *__sock_in),(__sockfd,__sock_in))
 /* The IPv6 version of this function */
-__CDECLARE(,int,__NOTHROW_RPC,bindresvport6,(__fd_t __sockfd, struct sockaddr_in6 *__sock_in),(__sockfd,__sock_in))
-#endif /* __CRT_HAVE_bindresvport6 */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,bindresvport6,(__fd_t __sockfd, struct sockaddr_in6 *__sock_in),(__sockfd,__sock_in))
 #endif /* __USE_MISC */
 
 #define IN6_IS_ADDR_MC_NODELOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x1)))
@@ -370,98 +366,52 @@ struct ip6_mtuinfo {
 	__uint32_t          ip6m_mtu;  /* path MTU in host byte order */
 };
 
-#ifdef __CRT_HAVE_inet6_option_space
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
-__CDECLARE(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_space,(int __nbytes),(__nbytes))
-#endif /* __CRT_HAVE_inet6_option_space */
-#ifdef __CRT_HAVE_inet6_option_init
+__CDECLARE_OPT(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_space,(int __nbytes),(__nbytes))
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
-__CDECLARE(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_init,(void *__bp, struct cmsghdr **__cmsgp, int __type),(__bp,__cmsgp,__type))
-#endif /* __CRT_HAVE_inet6_option_init */
-#ifdef __CRT_HAVE_inet6_option_append
+__CDECLARE_OPT(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_init,(void *__bp, struct cmsghdr **__cmsgp, int __type),(__bp,__cmsgp,__type))
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
-__CDECLARE(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_append,(struct cmsghdr *__cmsg, __UINT8_TYPE__ const *__typep, int __multx, int __plusy),(__cmsg,__typep,__multx,__plusy))
-#endif /* __CRT_HAVE_inet6_option_append */
-#ifdef __CRT_HAVE_inet6_option_alloc
+__CDECLARE_OPT(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_append,(struct cmsghdr *__cmsg, __UINT8_TYPE__ const *__typep, int __multx, int __plusy),(__cmsg,__typep,__multx,__plusy))
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
-__CDECLARE(__ATTR_DEPRECATED_,__UINT8_TYPE__ *,__NOTHROW_RPC_KOS,inet6_option_alloc,(struct cmsghdr *__cmsg, int __datalen, int __multx, int __plusy),(__cmsg,__datalen,__multx,__plusy))
-#endif /* __CRT_HAVE_inet6_option_alloc */
-#ifdef __CRT_HAVE_inet6_option_next
+__CDECLARE_OPT(__ATTR_DEPRECATED_,__UINT8_TYPE__ *,__NOTHROW_RPC_KOS,inet6_option_alloc,(struct cmsghdr *__cmsg, int __datalen, int __multx, int __plusy),(__cmsg,__datalen,__multx,__plusy))
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
-__CDECLARE(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_next,(struct cmsghdr const *__cmsg, __UINT8_TYPE__ **__tptrp),(__cmsg,__tptrp))
-#endif /* __CRT_HAVE_inet6_option_next */
-#ifdef __CRT_HAVE_inet6_option_find
+__CDECLARE_OPT(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_next,(struct cmsghdr const *__cmsg, __UINT8_TYPE__ **__tptrp),(__cmsg,__tptrp))
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
-__CDECLARE(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_find,(struct cmsghdr const *__cmsg, __UINT8_TYPE__ **__tptrp, int __type),(__cmsg,__tptrp,__type))
-#endif /* __CRT_HAVE_inet6_option_find */
-#ifdef __CRT_HAVE_inet6_opt_init
+__CDECLARE_OPT(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_find,(struct cmsghdr const *__cmsg, __UINT8_TYPE__ **__tptrp, int __type),(__cmsg,__tptrp,__type))
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_init,(void *__extbuf, socklen_t __extlen),(__extbuf,__extlen))
-#endif /* __CRT_HAVE_inet6_opt_init */
-#ifdef __CRT_HAVE_inet6_opt_append
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_init,(void *__extbuf, socklen_t __extlen),(__extbuf,__extlen))
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_append,(void *__extbuf, socklen_t __extlen, int __offset, __UINT8_TYPE__ __type, socklen_t __len, __UINT8_TYPE__ __align, void **__databufp),(__extbuf,__extlen,__offset,__type,__len,__align,__databufp))
-#endif /* __CRT_HAVE_inet6_opt_append */
-#ifdef __CRT_HAVE_inet6_opt_finish
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_append,(void *__extbuf, socklen_t __extlen, int __offset, __UINT8_TYPE__ __type, socklen_t __len, __UINT8_TYPE__ __align, void **__databufp),(__extbuf,__extlen,__offset,__type,__len,__align,__databufp))
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_finish,(void *__extbuf, socklen_t __extlen, int __offset),(__extbuf,__extlen,__offset))
-#endif /* __CRT_HAVE_inet6_opt_finish */
-#ifdef __CRT_HAVE_inet6_opt_set_val
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_finish,(void *__extbuf, socklen_t __extlen, int __offset),(__extbuf,__extlen,__offset))
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_set_val,(void *__databuf, int __offset, void *__val, socklen_t __vallen),(__databuf,__offset,__val,__vallen))
-#endif /* __CRT_HAVE_inet6_opt_set_val */
-#ifdef __CRT_HAVE_inet6_opt_next
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_set_val,(void *__databuf, int __offset, void *__val, socklen_t __vallen),(__databuf,__offset,__val,__vallen))
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_next,(void *__extbuf, socklen_t __extlen, int __offset, __UINT8_TYPE__ *__typep, socklen_t *__lenp, void **__databufp),(__extbuf,__extlen,__offset,__typep,__lenp,__databufp))
-#endif /* __CRT_HAVE_inet6_opt_next */
-#ifdef __CRT_HAVE_inet6_opt_find
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_next,(void *__extbuf, socklen_t __extlen, int __offset, __UINT8_TYPE__ *__typep, socklen_t *__lenp, void **__databufp),(__extbuf,__extlen,__offset,__typep,__lenp,__databufp))
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_find,(void *__extbuf, socklen_t __extlen, int __offset, __UINT8_TYPE__ __type, socklen_t *__lenp, void **__databufp),(__extbuf,__extlen,__offset,__type,__lenp,__databufp))
-#endif /* __CRT_HAVE_inet6_opt_find */
-#ifdef __CRT_HAVE_inet6_opt_get_val
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_find,(void *__extbuf, socklen_t __extlen, int __offset, __UINT8_TYPE__ __type, socklen_t *__lenp, void **__databufp),(__extbuf,__extlen,__offset,__type,__lenp,__databufp))
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_opt_get_val,(void *__databuf, int __offset, void *__val, socklen_t __vallen),(__databuf,__offset,__val,__vallen))
-#endif /* __CRT_HAVE_inet6_opt_get_val */
-#ifdef __CRT_HAVE_inet6_rth_space
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_get_val,(void *__databuf, int __offset, void *__val, socklen_t __vallen),(__databuf,__offset,__val,__vallen))
 /* Routing Header Option (RFC 3542) */
-__CDECLARE(,socklen_t,__NOTHROW_RPC_KOS,inet6_rth_space,(int __type, int __segments),(__type,__segments))
-#endif /* __CRT_HAVE_inet6_rth_space */
-#ifdef __CRT_HAVE_inet6_rth_init
+__CDECLARE_OPT(,socklen_t,__NOTHROW_RPC_KOS,inet6_rth_space,(int __type, int __segments),(__type,__segments))
 /* Routing Header Option (RFC 3542) */
-__CDECLARE(,void *,__NOTHROW_RPC_KOS,inet6_rth_init,(void *__bp, socklen_t __bp_len, int __type, int __segments),(__bp,__bp_len,__type,__segments))
-#endif /* __CRT_HAVE_inet6_rth_init */
-#ifdef __CRT_HAVE_inet6_rth_add
+__CDECLARE_OPT(,void *,__NOTHROW_RPC_KOS,inet6_rth_init,(void *__bp, socklen_t __bp_len, int __type, int __segments),(__bp,__bp_len,__type,__segments))
 /* Routing Header Option (RFC 3542) */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_rth_add,(void *__bp, struct in6_addr const *__addr),(__bp,__addr))
-#endif /* __CRT_HAVE_inet6_rth_add */
-#ifdef __CRT_HAVE_inet6_rth_reverse
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_rth_add,(void *__bp, struct in6_addr const *__addr),(__bp,__addr))
 /* Routing Header Option (RFC 3542) */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_rth_reverse,(void const *__in, void *__out),(__in,__out))
-#endif /* __CRT_HAVE_inet6_rth_reverse */
-#ifdef __CRT_HAVE_inet6_rth_segments
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_rth_reverse,(void const *__in, void *__out),(__in,__out))
 /* Routing Header Option (RFC 3542) */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,inet6_rth_segments,(void const *__bp),(__bp))
-#endif /* __CRT_HAVE_inet6_rth_segments */
-#ifdef __CRT_HAVE_inet6_rth_getaddr
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_rth_segments,(void const *__bp),(__bp))
 /* Routing Header Option (RFC 3542) */
-__CDECLARE(,struct in6_addr *,__NOTHROW_RPC_KOS,inet6_rth_getaddr,(void const *__bp, int __index),(__bp,__index))
-#endif /* __CRT_HAVE_inet6_rth_getaddr */
-#ifdef __CRT_HAVE_getipv4sourcefilter
+__CDECLARE_OPT(,struct in6_addr *,__NOTHROW_RPC_KOS,inet6_rth_getaddr,(void const *__bp, int __index),(__bp,__index))
 /* Get IPv4 source filter */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,getipv4sourcefilter,(__fd_t __sockfd, struct in_addr __interface_addr, struct in_addr __group, __UINT32_TYPE__ *__fmode, __UINT32_TYPE__ *__numsrc, struct in_addr *__slist),(__sockfd,__interface_addr,__group,__fmode,__numsrc,__slist))
-#endif /* __CRT_HAVE_getipv4sourcefilter */
-#ifdef __CRT_HAVE_setipv4sourcefilter
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,getipv4sourcefilter,(__fd_t __sockfd, struct in_addr __interface_addr, struct in_addr __group, __UINT32_TYPE__ *__fmode, __UINT32_TYPE__ *__numsrc, struct in_addr *__slist),(__sockfd,__interface_addr,__group,__fmode,__numsrc,__slist))
 /* Set IPv4 source filter */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,setipv4sourcefilter,(__fd_t __sockfd, struct in_addr __interface_addr, struct in_addr __group, __UINT32_TYPE__ __fmode, __UINT32_TYPE__ __numsrc, struct in_addr const *__slist),(__sockfd,__interface_addr,__group,__fmode,__numsrc,__slist))
-#endif /* __CRT_HAVE_setipv4sourcefilter */
-#ifdef __CRT_HAVE_getsourcefilter
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,setipv4sourcefilter,(__fd_t __sockfd, struct in_addr __interface_addr, struct in_addr __group, __UINT32_TYPE__ __fmode, __UINT32_TYPE__ __numsrc, struct in_addr const *__slist),(__sockfd,__interface_addr,__group,__fmode,__numsrc,__slist))
 /* Get source filter */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,getsourcefilter,(__fd_t __sockfd, __UINT32_TYPE__ __interface_addr, struct sockaddr const *__group, socklen_t __grouplen, __UINT32_TYPE__ *__fmode, __UINT32_TYPE__ *__numsrc, struct sockaddr_storage *__slist),(__sockfd,__interface_addr,__group,__grouplen,__fmode,__numsrc,__slist))
-#endif /* __CRT_HAVE_getsourcefilter */
-#ifdef __CRT_HAVE_setsourcefilter
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,getsourcefilter,(__fd_t __sockfd, __UINT32_TYPE__ __interface_addr, struct sockaddr const *__group, socklen_t __grouplen, __UINT32_TYPE__ *__fmode, __UINT32_TYPE__ *__numsrc, struct sockaddr_storage *__slist),(__sockfd,__interface_addr,__group,__grouplen,__fmode,__numsrc,__slist))
 /* Set source filter */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,setsourcefilter,(__fd_t __sockfd, __UINT32_TYPE__ __interface_addr, struct sockaddr const *__group, socklen_t __grouplen, __UINT32_TYPE__ __fmode, __UINT32_TYPE__ __numsrc, struct sockaddr_storage const *__slist),(__sockfd,__interface_addr,__group,__grouplen,__fmode,__numsrc,__slist))
-#endif /* __CRT_HAVE_setsourcefilter */
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,setsourcefilter,(__fd_t __sockfd, __UINT32_TYPE__ __interface_addr, struct sockaddr const *__group, socklen_t __grouplen, __UINT32_TYPE__ __fmode, __UINT32_TYPE__ __numsrc, struct sockaddr_storage const *__slist),(__sockfd,__interface_addr,__group,__grouplen,__fmode,__numsrc,__slist))
 #endif /* __USE_GNU */
 
 #endif /* __CC__ */

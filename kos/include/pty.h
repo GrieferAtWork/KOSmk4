@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabd7be3 */
+/* HASH CRC-32:0x3ae9b757 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,17 +59,13 @@ __SYSDECL_BEGIN
 struct termios;
 struct winsize;
 
-#ifdef __CRT_HAVE_openpty
 /* Create pseudo tty master slave pair with NAME and set terminal
  * attributes according to TERMP and WINP and return handles for
  * both ends in AMASTER and ASLAVE */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__aslave,__name,__termp,__winp))
-#endif /* __CRT_HAVE_openpty */
-#ifdef __CRT_HAVE_forkpty
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__aslave,__name,__termp,__winp))
 /* Create child process and establish the slave pseudo
  * terminal as the child's controlling terminal */
-__CDECLARE(__ATTR_NONNULL((1, 2)),__pid_t,__NOTHROW_NCX,forkpty,(__fd_t *__amaster, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__name,__termp,__winp))
-#endif /* __CRT_HAVE_forkpty */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__pid_t,__NOTHROW_NCX,forkpty,(__fd_t *__amaster, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__name,__termp,__winp))
 
 #endif /* __CC__ */
 

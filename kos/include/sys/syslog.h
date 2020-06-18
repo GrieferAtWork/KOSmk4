@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bd37ca4 */
+/* HASH CRC-32:0x1a7aa86b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -137,15 +137,9 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
-#ifdef __CRT_HAVE_closelog
-__CDECLARE_VOID(,__NOTHROW_NCX,closelog,(void),())
-#endif /* __CRT_HAVE_closelog */
-#ifdef __CRT_HAVE_openlog
-__CDECLARE_VOID(,__NOTHROW_RPC,openlog,(char const *__ident, __STDC_INT_AS_UINT_T __option, __STDC_INT_AS_UINT_T __facility),(__ident,__option,__facility))
-#endif /* __CRT_HAVE_openlog */
-#ifdef __CRT_HAVE_setlogmask
-__CDECLARE(,int,__NOTHROW_NCX,setlogmask,(__STDC_INT_AS_UINT_T __mask),(__mask))
-#endif /* __CRT_HAVE_setlogmask */
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,closelog,(void),())
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC,openlog,(char const *__ident, __STDC_INT_AS_UINT_T __option, __STDC_INT_AS_UINT_T __facility),(__ident,__option,__facility))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,setlogmask,(__STDC_INT_AS_UINT_T __mask),(__mask))
 #ifdef __CRT_HAVE_syslog
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__VLIBCCALL syslog)(__STDC_INT_AS_UINT_T __level, char const *__format, ...) __CASMNAME_SAME("syslog");
 #elif defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer)
@@ -167,10 +161,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vsyslog, __FORCELOCAL __ATTR_LIBC_PRINTF(2, 0) _
 #endif /* __USE_MISC */
 
 #ifdef __USE_KOS
-#ifdef __CRT_HAVE_syslog_printer
 /* Helper functions for printing to the system log */
-__CDECLARE(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,syslog_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
-#endif /* __CRT_HAVE_syslog_printer */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,syslog_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #define SYSLOG_PRINTER_CLOSURE(level) ((void *)(__uintptr_t)(__STDC_INT_AS_UINT_T)(level))
 #endif /* __USE_KOS */
 

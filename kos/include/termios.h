@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x765aef3c */
+/* HASH CRC-32:0x440966ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,40 +75,24 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cfsetispeed,(struct termios *__
 #include <local/termios/cfsetispeed.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfsetispeed, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cfsetispeed)(struct termios *__restrict __termios_p, speed_t __speed) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfsetispeed))(__termios_p, __speed); })
 #endif /* !__CRT_HAVE_cfsetispeed */
-#ifdef __CRT_HAVE_tcgetattr
 /* Get terminal attributes */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,tcgetattr,(__fd_t __fd, struct termios *__restrict __termios_p),(__fd,__termios_p))
-#endif /* __CRT_HAVE_tcgetattr */
-#ifdef __CRT_HAVE_tcsetattr
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,tcgetattr,(__fd_t __fd, struct termios *__restrict __termios_p),(__fd,__termios_p))
 /* Set terminal attributes
  * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
-__CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,tcsetattr,(__fd_t __fd, __STDC_INT_AS_UINT_T __optional_actions, struct termios const *__restrict __termios_p),(__fd,__optional_actions,__termios_p))
-#endif /* __CRT_HAVE_tcsetattr */
-#ifdef __CRT_HAVE_tcsendbreak
-__CDECLARE(,int,__NOTHROW_NCX,tcsendbreak,(__fd_t __fd, int __duration),(__fd,__duration))
-#endif /* __CRT_HAVE_tcsendbreak */
-#ifdef __CRT_HAVE_tcdrain
-__CDECLARE(,int,__NOTHROW_RPC,tcdrain,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE_tcdrain */
-#ifdef __CRT_HAVE_tcflush
+__CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,tcsetattr,(__fd_t __fd, __STDC_INT_AS_UINT_T __optional_actions, struct termios const *__restrict __termios_p),(__fd,__optional_actions,__termios_p))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,tcsendbreak,(__fd_t __fd, int __duration),(__fd,__duration))
+__CDECLARE_OPT(,int,__NOTHROW_RPC,tcdrain,(__fd_t __fd),(__fd))
 /* @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
-__CDECLARE(,int,__NOTHROW_NCX,tcflush,(__fd_t __fd, __STDC_INT_AS_UINT_T __queue_selector),(__fd,__queue_selector))
-#endif /* __CRT_HAVE_tcflush */
-#ifdef __CRT_HAVE_tcflow
+__CDECLARE_OPT(,int,__NOTHROW_NCX,tcflush,(__fd_t __fd, __STDC_INT_AS_UINT_T __queue_selector),(__fd,__queue_selector))
 /* @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
-__CDECLARE(,int,__NOTHROW_NCX,tcflow,(__fd_t __fd, __STDC_INT_AS_UINT_T __action),(__fd,__action))
-#endif /* __CRT_HAVE_tcflow */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,tcflow,(__fd_t __fd, __STDC_INT_AS_UINT_T __action),(__fd,__action))
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
-#ifdef __CRT_HAVE_tcgetsid
-__CDECLARE(,__pid_t,__NOTHROW_NCX,tcgetsid,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE_tcgetsid */
+__CDECLARE_OPT(,__pid_t,__NOTHROW_NCX,tcgetsid,(__fd_t __fd),(__fd))
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
 #if defined(__USE_BSD)
-#ifdef __CRT_HAVE_tcsetsid
-__CDECLARE(,int,__NOTHROW_NCX,tcsetsid,(__fd_t __fd, __pid_t __pid),(__fd,__pid))
-#endif /* __CRT_HAVE_tcsetsid */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,tcsetsid,(__fd_t __fd, __pid_t __pid),(__fd,__pid))
 #endif /* __USE_BSD */
 
 #ifdef __USE_MISC

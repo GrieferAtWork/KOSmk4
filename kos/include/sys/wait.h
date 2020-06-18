@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5b79ee0 */
+/* HASH CRC-32:0xa237c1be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -135,11 +135,9 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,waitpid,(__pid_t __pid, __WAIT_STATUS __stat_
 #define __id_t_defined 1
 typedef __id_t id_t;
 #endif /* !__id_t_defined */
-#ifdef __CRT_HAVE_waitid
 /* @param options: At least one of `WEXITED | WSTOPPED | WCONTINUED',
  *                 optionally or'd with `WNOHANG | WNOWAIT' */
-__CDECLARE(,int,__NOTHROW_RPC,waitid,(idtype_t __idtype, id_t __id, siginfo_t *__infop, __STDC_INT_AS_UINT_T __options),(__idtype,__id,__infop,__options))
-#endif /* __CRT_HAVE_waitid */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,waitid,(idtype_t __idtype, id_t __id, siginfo_t *__infop, __STDC_INT_AS_UINT_T __options),(__idtype,__id,__infop,__options))
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
@@ -216,7 +214,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wait4_64, __FORCELOCAL __pid_t __NOTHROW_NCX(__L
 #endif /* __USE_MISC */
 
 #ifdef __USE_KOS
-#ifdef __CRT_HAVE_detach
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -305,8 +302,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wait4_64, __FORCELOCAL __pid_t __NOTHROW_NCX(__L
  *                              This could mean that it had already been detached
  *                              and exited, or that the `PID' is just invalid (which
  *                              would also be the case if it was valid at some point) */
-__CDECLARE(,int,__NOTHROW_NCX,detach,(__pid_t __pid),(__pid))
-#endif /* __CRT_HAVE_detach */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,detach,(__pid_t __pid),(__pid))
 #endif /* __USE_KOS */
 
 #endif /* __CC__ */

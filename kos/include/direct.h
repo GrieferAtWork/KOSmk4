@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69b5ecab */
+/* HASH CRC-32:0x5058b32a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,18 +93,10 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_rmdir,(char const *__path),(__
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); }
 #endif /* ... */
 #define _getdcwd_nolock _getdcwd
-#ifdef __CRT_HAVE__getdcwd
-__CDECLARE(,char *,__NOTHROW_RPC,_getdcwd,(int __drive, char *__buf, size_t __size),(__drive,__buf,__size))
-#endif /* __CRT_HAVE__getdcwd */
-#ifdef __CRT_HAVE__chdrive
-__CDECLARE(,int,__NOTHROW_RPC,_chdrive,(int __drive),(__drive))
-#endif /* __CRT_HAVE__chdrive */
-#ifdef __CRT_HAVE__getdrive
-__CDECLARE(,int,__NOTHROW_RPC,_getdrive,(void),())
-#endif /* __CRT_HAVE__getdrive */
-#ifdef __CRT_HAVE__getdrives
-__CDECLARE(,__ULONG32_TYPE__,__NOTHROW_RPC,_getdrives,(void),())
-#endif /* __CRT_HAVE__getdrives */
+__CDECLARE_OPT(,char *,__NOTHROW_RPC,_getdcwd,(int __drive, char *__buf, size_t __size),(__drive,__buf,__size))
+__CDECLARE_OPT(,int,__NOTHROW_RPC,_chdrive,(int __drive),(__drive))
+__CDECLARE_OPT(,int,__NOTHROW_RPC,_getdrive,(void),())
+__CDECLARE_OPT(,__ULONG32_TYPE__,__NOTHROW_RPC,_getdrives,(void),())
 
 #ifndef _GETDISKFREE_DEFINED
 #define _GETDISKFREE_DEFINED 1

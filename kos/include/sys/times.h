@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7f7d871 */
+/* HASH CRC-32:0x4ff46a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,13 +66,11 @@ struct tms {
 	clock_t tms_cstime; /* System CPU time of dead children. */
 };
 
-#ifdef __CRT_HAVE_times
 /* Store the CPU time used by this process and all its
  * dead children (and their dead children) in BUFFER.
  * Return the elapsed real time, or (clock_t) -1 for errors.
  * All times are in CLK_TCKths of a second */
-__CDECLARE(,clock_t,__NOTHROW_NCX,times,(struct tms *__buffer),(__buffer))
-#endif /* __CRT_HAVE_times */
+__CDECLARE_OPT(,clock_t,__NOTHROW_NCX,times,(struct tms *__buffer),(__buffer))
 #endif /* __CC__ */
 
 __SYSDECL_END

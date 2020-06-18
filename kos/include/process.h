@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9883ea75 */
+/* HASH CRC-32:0x14da20b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,21 +87,15 @@ typedef __WCHAR_TYPE__ wchar_t;
 typedef void (__LIBCCALL *__dos_beginthread_entry_t)(void *__arg);
 typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__arg);
 
-#ifdef __CRT_HAVE__beginthread
-__CDECLARE(,uintptr_t,__NOTHROW_NCX,_beginthread,(__dos_beginthread_entry_t __entry, __UINT32_TYPE__ __stacksz, void *__arg),(__entry,__stacksz,__arg))
-#endif /* __CRT_HAVE__beginthread */
-#ifdef __CRT_HAVE__beginthreadex
-__CDECLARE(,uintptr_t,__NOTHROW_NCX,_beginthreadex,(void *__sec, __UINT32_TYPE__ __stacksz, __dos_beginthreadex_entry_t __entry, void *__arg, __UINT32_TYPE__ __flags, __UINT32_TYPE__ *__threadaddr),(__sec,__stacksz,__entry,__arg,__flags,__threadaddr))
-#endif /* __CRT_HAVE__beginthreadex */
+__CDECLARE_OPT(,uintptr_t,__NOTHROW_NCX,_beginthread,(__dos_beginthread_entry_t __entry, __UINT32_TYPE__ __stacksz, void *__arg),(__entry,__stacksz,__arg))
+__CDECLARE_OPT(,uintptr_t,__NOTHROW_NCX,_beginthreadex,(void *__sec, __UINT32_TYPE__ __stacksz, __dos_beginthreadex_entry_t __entry, void *__arg, __UINT32_TYPE__ __flags, __UINT32_TYPE__ *__threadaddr),(__sec,__stacksz,__entry,__arg,__flags,__threadaddr))
 #ifdef __CRT_HAVE__endthread
 __CDECLARE_VOID(,__NOTHROW_NCX,_endthread,(void),())
 #elif defined(__CRT_HAVE__endthreadex)
 #include <local/process/_endthread.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_endthread, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL _endthread)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_endthread))(); })
 #endif /* ... */
-#ifdef __CRT_HAVE__endthreadex
-__CDECLARE_VOID(,__NOTHROW_NCX,_endthreadex,(__UINT32_TYPE__ __exitcode),(__exitcode))
-#endif /* __CRT_HAVE__endthreadex */
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,_endthreadex,(__UINT32_TYPE__ __exitcode),(__exitcode))
 
 #ifndef _CRT_TERMINATE_DEFINED
 #define _CRT_TERMINATE_DEFINED 1
@@ -161,9 +155,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,_exit,(int __status),exit,(__status)
 #endif /* !... */
 #endif /* !___exit_defined */
 #endif /* !_CRT_TERMINATE_DEFINED */
-#ifdef __CRT_HAVE__cexit
-__CDECLARE_VOID(,__THROWING,_cexit,(void),())
-#endif /* __CRT_HAVE__cexit */
+__CDECLARE_VOID_OPT(,__THROWING,_cexit,(void),())
 #ifdef __CRT_HAVE__c_exit
 __CDECLARE_VOID(,__THROWING,_c_exit,(void),())
 #else /* __CRT_HAVE__c_exit */
@@ -402,17 +394,11 @@ __CDECLARE(,int,__NOTHROW_RPC,system,(char const *__command),(__command))
 
 
 
-#ifdef __CRT_HAVE__loaddll
-__CDECLARE(,intptr_t,__THROWING,_loaddll,(char __KOS_FIXED_CONST *__file),(__file))
-#endif /* __CRT_HAVE__loaddll */
-#ifdef __CRT_HAVE__unloaddll
-__CDECLARE(,int,__THROWING,_unloaddll,(intptr_t __hnd),(__hnd))
-#endif /* __CRT_HAVE__unloaddll */
+__CDECLARE_OPT(,intptr_t,__THROWING,_loaddll,(char __KOS_FIXED_CONST *__file),(__file))
+__CDECLARE_OPT(,int,__THROWING,_unloaddll,(intptr_t __hnd),(__hnd))
 
 typedef int (__LIBCCALL *__procfun)(void);
-#ifdef __CRT_HAVE__getdllprocaddr
-__CDECLARE(,__procfun,__THROWING,_getdllprocaddr,(intptr_t __hnd, char __KOS_FIXED_CONST *__symname, intptr_t __ord),(__hnd,__symname,__ord))
-#endif /* __CRT_HAVE__getdllprocaddr */
+__CDECLARE_OPT(,__procfun,__THROWING,_getdllprocaddr,(intptr_t __hnd, char __KOS_FIXED_CONST *__symname, intptr_t __ord),(__hnd,__symname,__ord))
 
 #ifndef __wchar_t_defined
 #define __wchar_t_defined 1

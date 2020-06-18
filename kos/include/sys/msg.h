@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd729aff */
+/* HASH CRC-32:0xd7bbdff4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,22 +100,14 @@ struct msgbuf {
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __USE_GNU */
 
-#ifdef __CRT_HAVE_msgctl
 /* Message queue control operation */
-__CDECLARE(,int,__NOTHROW_NCX,msgctl,(int __msqid, __STDC_INT_AS_UINT_T __cmd, struct msqid_ds *__buf),(__msqid,__cmd,__buf))
-#endif /* __CRT_HAVE_msgctl */
-#ifdef __CRT_HAVE_msgget
+__CDECLARE_OPT(,int,__NOTHROW_NCX,msgctl,(int __msqid, __STDC_INT_AS_UINT_T __cmd, struct msqid_ds *__buf),(__msqid,__cmd,__buf))
 /* Get messages queue */
-__CDECLARE(,int,__NOTHROW_NCX,msgget,(key_t __key, __STDC_INT_AS_UINT_T __msgflg),(__key,__msgflg))
-#endif /* __CRT_HAVE_msgget */
-#ifdef __CRT_HAVE_msgrcv
+__CDECLARE_OPT(,int,__NOTHROW_NCX,msgget,(key_t __key, __STDC_INT_AS_UINT_T __msgflg),(__key,__msgflg))
 /* Receive message from message queue */
-__CDECLARE(,ssize_t,__NOTHROW_RPC,msgrcv,(int __msqid, void *__msgp, size_t __msgsz, __LONGPTR_TYPE__ __msgtyp, __STDC_INT_AS_UINT_T __msgflg),(__msqid,__msgp,__msgsz,__msgtyp,__msgflg))
-#endif /* __CRT_HAVE_msgrcv */
-#ifdef __CRT_HAVE_msgsnd
+__CDECLARE_OPT(,ssize_t,__NOTHROW_RPC,msgrcv,(int __msqid, void *__msgp, size_t __msgsz, __LONGPTR_TYPE__ __msgtyp, __STDC_INT_AS_UINT_T __msgflg),(__msqid,__msgp,__msgsz,__msgtyp,__msgflg))
 /* Send message to message queue */
-__CDECLARE(,int,__NOTHROW_RPC,msgsnd,(int __msqid, const void *__msgp, size_t __msgsz, __STDC_INT_AS_UINT_T __msgflg),(__msqid,__msgp,__msgsz,__msgflg))
-#endif /* __CRT_HAVE_msgsnd */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,msgsnd,(int __msqid, const void *__msgp, size_t __msgsz, __STDC_INT_AS_UINT_T __msgflg),(__msqid,__msgp,__msgsz,__msgflg))
 
 #endif /* __CC__ */
 

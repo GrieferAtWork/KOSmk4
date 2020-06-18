@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95bdd9bb */
+/* HASH CRC-32:0x32db5490 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,32 +65,16 @@ struct rpcent {
 	__STDC_INT32_AS_SSIZE_T r_number;  /* RPC program number. */
 };
 
-#ifdef __CRT_HAVE_setrpcent
-__CDECLARE_VOID(,__NOTHROW_RPC_KOS,setrpcent,(int __stayopen),(__stayopen))
-#endif /* __CRT_HAVE_setrpcent */
-#ifdef __CRT_HAVE_endrpcent
-__CDECLARE_VOID(,__NOTHROW_NCX,endrpcent,(void),())
-#endif /* __CRT_HAVE_endrpcent */
-#ifdef __CRT_HAVE_getrpcbyname
-__CDECLARE(,struct rpcent *,__NOTHROW_RPC_KOS,getrpcbyname,(char const *__name),(__name))
-#endif /* __CRT_HAVE_getrpcbyname */
-#ifdef __CRT_HAVE_getrpcbynumber
-__CDECLARE(,struct rpcent *,__NOTHROW_RPC_KOS,getrpcbynumber,(int __number),(__number))
-#endif /* __CRT_HAVE_getrpcbynumber */
-#ifdef __CRT_HAVE_getrpcent
-__CDECLARE(,struct rpcent *,__NOTHROW_RPC_KOS,getrpcent,(void),())
-#endif /* __CRT_HAVE_getrpcent */
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC_KOS,setrpcent,(int __stayopen),(__stayopen))
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,endrpcent,(void),())
+__CDECLARE_OPT(,struct rpcent *,__NOTHROW_RPC_KOS,getrpcbyname,(char const *__name),(__name))
+__CDECLARE_OPT(,struct rpcent *,__NOTHROW_RPC_KOS,getrpcbynumber,(int __number),(__number))
+__CDECLARE_OPT(,struct rpcent *,__NOTHROW_RPC_KOS,getrpcent,(void),())
 
 #ifdef __USE_MISC
-#ifdef __CRT_HAVE_getrpcbyname_r
-__CDECLARE(,int,__NOTHROW_RPC_KOS,getrpcbyname_r,(char const *__name, struct rpcent *__result_buf, char *__buffer, size_t __buflen, struct rpcent **__result),(__name,__result_buf,__buffer,__buflen,__result))
-#endif /* __CRT_HAVE_getrpcbyname_r */
-#ifdef __CRT_HAVE_getrpcbynumber_r
-__CDECLARE(,int,__NOTHROW_RPC_KOS,getrpcbynumber_r,(int __number, struct rpcent *__result_buf, char *__buffer, size_t __buflen, struct rpcent **__result),(__number,__result_buf,__buffer,__buflen,__result))
-#endif /* __CRT_HAVE_getrpcbynumber_r */
-#ifdef __CRT_HAVE_getrpcent_r
-__CDECLARE(,int,__NOTHROW_RPC_KOS,getrpcent_r,(struct rpcent *__result_buf, char *__buffer, size_t __buflen, struct rpcent **__result),(__result_buf,__buffer,__buflen,__result))
-#endif /* __CRT_HAVE_getrpcent_r */
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,getrpcbyname_r,(char const *__name, struct rpcent *__result_buf, char *__buffer, size_t __buflen, struct rpcent **__result),(__name,__result_buf,__buffer,__buflen,__result))
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,getrpcbynumber_r,(int __number, struct rpcent *__result_buf, char *__buffer, size_t __buflen, struct rpcent **__result),(__number,__result_buf,__buffer,__buflen,__result))
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,getrpcent_r,(struct rpcent *__result_buf, char *__buffer, size_t __buflen, struct rpcent **__result),(__result_buf,__buffer,__buflen,__result))
 #endif /* __USE_MISC */
 
 #endif /* __CC__ */

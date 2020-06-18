@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43d5fc92 */
+/* HASH CRC-32:0xb3b1c1bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -559,39 +559,21 @@ __CDECLARE(__ATTR_WUNUSED,void *,__NOTHROW_NCX,mmap,(void *__addr, size_t __len,
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_DONT_OVERRIDE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mmap, __FORCELOCAL __ATTR_WUNUSED void *__NOTHROW_NCX(__LIBCCALL mmap)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __FS_TYPE(off) __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mmap))(__addr, __len, __prot, __flags, __fd, __offset); })
 #endif /* ... */
-#ifdef __CRT_HAVE_munmap
 /* Unmap memory from `addr...+=len' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munmap,(void *__addr, size_t __len),(__addr,__len))
-#endif /* __CRT_HAVE_munmap */
-#ifdef __CRT_HAVE_mprotect
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munmap,(void *__addr, size_t __len),(__addr,__len))
 /* @param prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE |
  *              PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED |
  *              PROT_GROWSUP | PROT_GROWSDOWN' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mprotect,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot),(__addr,__len,__prot))
-#endif /* __CRT_HAVE_mprotect */
-#ifdef __CRT_HAVE_msync
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mprotect,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot),(__addr,__len,__prot))
 /* @param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,msync,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __flags),(__addr,__len,__flags))
-#endif /* __CRT_HAVE_msync */
-#ifdef __CRT_HAVE_mlock
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mlock,(void const *__addr, size_t __len),(__addr,__len))
-#endif /* __CRT_HAVE_mlock */
-#ifdef __CRT_HAVE_munlock
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munlock,(void const *__addr, size_t __len),(__addr,__len))
-#endif /* __CRT_HAVE_munlock */
-#ifdef __CRT_HAVE_mlockall
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,msync,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __flags),(__addr,__len,__flags))
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mlock,(void const *__addr, size_t __len),(__addr,__len))
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munlock,(void const *__addr, size_t __len),(__addr,__len))
 /* @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
-__CDECLARE(,int,__NOTHROW_NCX,mlockall,(__STDC_INT_AS_UINT_T __flags),(__flags))
-#endif /* __CRT_HAVE_mlockall */
-#ifdef __CRT_HAVE_munlockall
-__CDECLARE(,int,__NOTHROW_NCX,munlockall,(void),())
-#endif /* __CRT_HAVE_munlockall */
-#ifdef __CRT_HAVE_shm_open
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_open,(char const *__name, __oflag_t __oflags, mode_t __mode),(__name,__oflags,__mode))
-#endif /* __CRT_HAVE_shm_open */
-#ifdef __CRT_HAVE_shm_unlink
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_unlink,(char const *__name),(__name))
-#endif /* __CRT_HAVE_shm_unlink */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,mlockall,(__STDC_INT_AS_UINT_T __flags),(__flags))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,munlockall,(void),())
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_open,(char const *__name, __oflag_t __oflags, mode_t __mode),(__name,__oflags,__mode))
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_unlink,(char const *__name),(__name))
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_madvise
@@ -602,9 +584,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,madvise,(void *__addr, size_t 
 #include <local/sys.mman/madvise.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(madvise, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL madvise)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(madvise))(__addr, __len, __advice); })
 #endif /* !... */
-#ifdef __CRT_HAVE_mincore
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mincore,(void *__start, size_t __len, unsigned char *__vec),(__start,__len,__vec))
-#endif /* __CRT_HAVE_mincore */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mincore,(void *__start, size_t __len, unsigned char *__vec),(__start,__len,__vec))
 #endif /* __USE_MISC */
 
 #ifdef __USE_LARGEFILE64
@@ -647,30 +627,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_madvise, __FORCELOCAL __ATTR_NONNULL((1)) 
 /* @param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 __LIBC void *__NOTHROW_NCX(__VLIBCCALL mremap)(void *__addr, size_t __old_len, size_t __new_len, __STDC_INT_AS_UINT_T __flags, ...) __CASMNAME_SAME("mremap");
 #endif /* __CRT_HAVE_mremap */
-#ifdef __CRT_HAVE_remap_file_pages
-__CDECLARE(,int,__NOTHROW_NCX,remap_file_pages,(void *__start, size_t __size, __STDC_INT_AS_UINT_T __prot, size_t __pgoff, __STDC_INT_AS_UINT_T __flags),(__start,__size,__prot,__pgoff,__flags))
-#endif /* __CRT_HAVE_remap_file_pages */
-#ifdef __CRT_HAVE_memfd_create
-__CDECLARE(,__fd_t,__NOTHROW_NCX,memfd_create,(char const *__name, unsigned int __flags),(__name,__flags))
-#endif /* __CRT_HAVE_memfd_create */
-#ifdef __CRT_HAVE_mlock2
-__CDECLARE(,int,__NOTHROW_NCX,mlock2,(void const *__addr, size_t __length, unsigned int __flags),(__addr,__length,__flags))
-#endif /* __CRT_HAVE_mlock2 */
-#ifdef __CRT_HAVE_pkey_alloc
-__CDECLARE(,int,__NOTHROW_NCX,pkey_alloc,(unsigned int __flags, unsigned int __access_rights),(__flags,__access_rights))
-#endif /* __CRT_HAVE_pkey_alloc */
-#ifdef __CRT_HAVE_pkey_set
-__CDECLARE(,int,__NOTHROW_NCX,pkey_set,(int __key, unsigned int __access_rights),(__key,__access_rights))
-#endif /* __CRT_HAVE_pkey_set */
-#ifdef __CRT_HAVE_pkey_get
-__CDECLARE(,int,__NOTHROW_NCX,pkey_get,(int __key),(__key))
-#endif /* __CRT_HAVE_pkey_get */
-#ifdef __CRT_HAVE_pkey_free
-__CDECLARE(,int,__NOTHROW_NCX,pkey_free,(int __key),(__key))
-#endif /* __CRT_HAVE_pkey_free */
-#ifdef __CRT_HAVE_pkey_mprotect
-__CDECLARE(,int,__NOTHROW_NCX,pkey_mprotect,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, int __pkey),(__addr,__len,__prot,__pkey))
-#endif /* __CRT_HAVE_pkey_mprotect */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,remap_file_pages,(void *__start, size_t __size, __STDC_INT_AS_UINT_T __prot, size_t __pgoff, __STDC_INT_AS_UINT_T __flags),(__start,__size,__prot,__pgoff,__flags))
+__CDECLARE_OPT(,__fd_t,__NOTHROW_NCX,memfd_create,(char const *__name, unsigned int __flags),(__name,__flags))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,mlock2,(void const *__addr, size_t __length, unsigned int __flags),(__addr,__length,__flags))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_alloc,(unsigned int __flags, unsigned int __access_rights),(__flags,__access_rights))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_set,(int __key, unsigned int __access_rights),(__key,__access_rights))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_get,(int __key),(__key))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_free,(int __key),(__key))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_mprotect,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, int __pkey),(__addr,__len,__prot,__pkey))
 #endif /* __USE_GNU */
 
 #endif /* __CC__ */

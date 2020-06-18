@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x775101e5 */
+/* HASH CRC-32:0x3407d554 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,10 +66,8 @@ enum {
 
 #ifdef __CC__
 
-#ifdef __CRT_HAVE_timerfd_create
 /* Return file descriptor for new interval timer source */
-__CDECLARE(,__fd_t,__NOTHROW,timerfd_create,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags),(__clock_id,__flags))
-#endif /* __CRT_HAVE_timerfd_create */
+__CDECLARE_OPT(,__fd_t,__NOTHROW,timerfd_create,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags),(__clock_id,__flags))
 #if defined(__CRT_HAVE_timerfd_settime64) && defined(__USE_TIME_BITS64)
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr

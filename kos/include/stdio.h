@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x593134ca */
+/* HASH CRC-32:0x1f8ef14 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -401,9 +401,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_NONNULL((1, 2)) int 
 #undef __std_rename_defined
 #endif /* !... */
 #endif /* !__std_rename_defined */
-#ifdef __CRT_HAVE_tmpnam
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,tmpnam,(char *__buf),(__buf))
-#endif /* __CRT_HAVE_tmpnam */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,tmpnam,(char *__buf),(__buf))
 #ifdef __CRT_HAVE_fclose
 /* Close and destroy a given file `STREAM' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__THROWING,fclose,(FILE *__restrict __stream),(__stream))
@@ -1732,14 +1730,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(renameat, __FORCELOCAL __ATTR_NONNULL((2, 4)) in
 #endif /* ... */
 
 #ifdef __USE_KOS
-#ifdef __CRT_HAVE_removeat
 /* Remove a file or directory `FILENAME' relative to a given base directory `DIRFD' */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,removeat,(__fd_t __dirfd, char const *__filename),(__dirfd,__filename))
-#endif /* __CRT_HAVE_removeat */
-#ifdef __CRT_HAVE_frenameat
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,removeat,(__fd_t __dirfd, char const *__filename),(__dirfd,__filename))
 /* @param flags: Set of `0 | AT_DOSPATH' */
-__CDECLARE(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,frenameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
-#endif /* __CRT_HAVE_frenameat */
+__CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,frenameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
 #endif /* __USE_KOS */
 #endif /* __USE_ATFILE */
 
@@ -1958,12 +1952,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,fileno,(__FI
 #endif /* __USE_POSIX || __USE_DOS */
 
 #ifdef __USE_XOPEN2K8
-#ifdef __CRT_HAVE_fmemopen
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__FILE *,__NOTHROW_NCX,fmemopen,(void *__mem, __SIZE_TYPE__ __len, char const *__modes),(__mem,__len,__modes))
-#endif /* __CRT_HAVE_fmemopen */
-#ifdef __CRT_HAVE_open_memstream
-__CDECLARE(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,open_memstream,(char **__bufloc, __SIZE_TYPE__ *__sizeloc),(__bufloc,__sizeloc))
-#endif /* __CRT_HAVE_open_memstream */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__FILE *,__NOTHROW_NCX,fmemopen,(void *__mem, __SIZE_TYPE__ __len, char const *__modes),(__mem,__len,__modes))
+__CDECLARE_OPT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,open_memstream,(char **__bufloc, __SIZE_TYPE__ *__sizeloc),(__bufloc,__sizeloc))
 #if defined(__CRT_HAVE_getdelim_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__getdelim,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream),getdelim_unlocked,(__lineptr,__pcount,__delimiter,__stream))
 #elif defined(__CRT_HAVE_getdelim)
@@ -2196,9 +2186,7 @@ __CREDIRECT(,int,__THROWING,fcloseall,(void),_fcloseall,())
 #endif /* __USE_GNU || __USE_DOS */
 
 #ifdef __USE_GNU
-#ifdef __CRT_HAVE_fopencookie
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__FILE *,__NOTHROW_NCX,fopencookie,(void *__restrict __magic_cookie, char const *__restrict __modes, _IO_cookie_io_functions_t __io_funcs),(__magic_cookie,__modes,__io_funcs))
-#endif /* __CRT_HAVE_fopencookie */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__FILE *,__NOTHROW_NCX,fopencookie,(void *__restrict __magic_cookie, char const *__restrict __modes, _IO_cookie_io_functions_t __io_funcs),(__magic_cookie,__modes,__io_funcs))
 #ifdef __CRT_HAVE_fgets_unlocked
 /* Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,__THROWING,fgets_unlocked,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),(__buf,__bufsize,__stream))
@@ -2226,9 +2214,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fputs_unlocked, __FORCELOCAL __ATTR_NONNULL((1, 
 #endif /* ... */
 
 struct obstack;
-#ifdef __CRT_HAVE_obstack_vprintf
-__CDECLARE(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,obstack_vprintf,(struct obstack *__restrict __obstack_, char const *__restrict __format, __builtin_va_list __args),(__obstack_,__format,__args))
-#endif /* __CRT_HAVE_obstack_vprintf */
+__CDECLARE_OPT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,obstack_vprintf,(struct obstack *__restrict __obstack_, char const *__restrict __format, __builtin_va_list __args),(__obstack_,__format,__args))
 #ifdef __CRT_HAVE_obstack_printf
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__VLIBCCALL obstack_printf)(struct obstack *__restrict __obstack_, char const *__restrict __format, ...) __CASMNAME_SAME("obstack_printf");
 #elif defined(__CRT_HAVE_obstack_vprintf)
@@ -3374,35 +3360,17 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__off64_t,__THROWING,_ftelli64,(_
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __off64_t (__LIBCCALL _ftelli64)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftello64))(__stream); }
 #endif /* ... */
 
-#ifdef __CRT_HAVE__rmtmp
-__CDECLARE(,int,__NOTHROW_RPC,_rmtmp,(void),())
-#endif /* __CRT_HAVE__rmtmp */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,_rmtmp,(void),())
 
-#ifdef __CRT_HAVE__filbuf
-__CDECLARE(__ATTR_NONNULL((1)),int,__THROWING,_filbuf,(__FILE *__restrict __stream),(__stream))
-#endif /* __CRT_HAVE__filbuf */
-#ifdef __CRT_HAVE__flsbuf
-__CDECLARE(__ATTR_NONNULL((2)),int,__THROWING,_flsbuf,(int __ch, __FILE *__restrict __stream),(__ch,__stream))
-#endif /* __CRT_HAVE__flsbuf */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__THROWING,_filbuf,(__FILE *__restrict __stream),(__stream))
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__THROWING,_flsbuf,(int __ch, __FILE *__restrict __stream),(__ch,__stream))
 
-#ifdef __CRT_HAVE__getmaxstdio
-__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,_getmaxstdio,(void),())
-#endif /* __CRT_HAVE__getmaxstdio */
-#ifdef __CRT_HAVE__setmaxstdio
-__CDECLARE(,int,__NOTHROW_NCX,_setmaxstdio,(int __val),(__val))
-#endif /* __CRT_HAVE__setmaxstdio */
-#ifdef __CRT_HAVE__get_printf_count_output
-__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,_get_printf_count_output,(void),())
-#endif /* __CRT_HAVE__get_printf_count_output */
-#ifdef __CRT_HAVE__set_printf_count_output
-__CDECLARE(,int,__NOTHROW_NCX,_set_printf_count_output,(int __val),(__val))
-#endif /* __CRT_HAVE__set_printf_count_output */
-#ifdef __CRT_HAVE__get_output_format
-__CDECLARE(__ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,_get_output_format,(void),())
-#endif /* __CRT_HAVE__get_output_format */
-#ifdef __CRT_HAVE__set_output_format
-__CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_set_output_format,(__UINT32_TYPE__ __format),(__format))
-#endif /* __CRT_HAVE__set_output_format */
+__CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_getmaxstdio,(void),())
+__CDECLARE_OPT(,int,__NOTHROW_NCX,_setmaxstdio,(int __val),(__val))
+__CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_get_printf_count_output,(void),())
+__CDECLARE_OPT(,int,__NOTHROW_NCX,_set_printf_count_output,(int __val),(__val))
+__CDECLARE_OPT(__ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,_get_output_format,(void),())
+__CDECLARE_OPT(,__UINT32_TYPE__,__NOTHROW_NCX,_set_output_format,(__UINT32_TYPE__ __format),(__format))
 #if __has_builtin(__builtin_vscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vscanf)
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */

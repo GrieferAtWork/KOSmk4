@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16fc9668 */
+/* HASH CRC-32:0x3f6524e7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,10 +83,8 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CRT_HAVE_flock
 /* Apply or remove an advisory lock, according to OPERATION, on the file FD refers to */
-__CDECLARE(,int,__NOTHROW_RPC,flock,(__fd_t __fd, __STDC_INT_AS_UINT_T __operation),(__fd,__operation))
-#endif /* __CRT_HAVE_flock */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,flock,(__fd_t __fd, __STDC_INT_AS_UINT_T __operation),(__fd,__operation))
 
 __SYSDECL_END
 #endif /* __CC__ */

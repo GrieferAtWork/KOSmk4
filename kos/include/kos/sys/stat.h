@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d68df55 */
+/* HASH CRC-32:0x142b9ed */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,62 +89,38 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2, 3)),__THROWING,FStatAt64,(__fd_t __dirfd, ch
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_ATFILE */
 
-#ifdef __CRT_HAVE_Mkdir
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))
-#endif /* __CRT_HAVE_Mkdir */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))
 
-#ifdef __CRT_HAVE_Chmod
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Chmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
-#endif /* __CRT_HAVE_Chmod */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Chmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
 
 #ifdef __USE_MISC
-#ifdef __CRT_HAVE_LChmod
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,LChmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
-#endif /* __CRT_HAVE_LChmod */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,LChmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #endif /* __USE_MISC */
 
 #if defined(__USE_KOS) && defined(__USE_ATFILE)
-#ifdef __CRT_HAVE_FMkdirAt
 /* @param flags: Set of `0 | AT_DOSPATH' */
-__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,FMkdirAt,(__fd_t __dirfd, char const *__pathname, __mode_t __mode, __atflag_t __flags),(__dirfd,__pathname,__mode,__flags))
-#endif /* __CRT_HAVE_FMkdirAt */
-#ifdef __CRT_HAVE_FMknodAt
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,FMkdirAt,(__fd_t __dirfd, char const *__pathname, __mode_t __mode, __atflag_t __flags),(__dirfd,__pathname,__mode,__flags))
 /* @param flags: Set of `0 | AT_DOSPATH' */
-__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,FMknodAt,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),(__dirfd,__nodename,__mode,__dev,__flags))
-#endif /* __CRT_HAVE_FMknodAt */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,FMknodAt,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),(__dirfd,__nodename,__mode,__dev,__flags))
 #endif /* __USE_KOS && __USE_ATFILE */
 
-#ifdef __CRT_HAVE_Mkfifo
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Mkfifo,(char const *__fifoname, __mode_t __mode),(__fifoname,__mode))
-#endif /* __CRT_HAVE_Mkfifo */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Mkfifo,(char const *__fifoname, __mode_t __mode),(__fifoname,__mode))
 
 #ifdef __USE_ATFILE
-#ifdef __CRT_HAVE_FChmodAt
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
-__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,FChmodAt,(__fd_t __dirfd, char const *__filename, __mode_t __mode, __atflag_t __flags),(__dirfd,__filename,__mode,__flags))
-#endif /* __CRT_HAVE_FChmodAt */
-#ifdef __CRT_HAVE_MkdirAt
-__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,MkdirAt,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),(__dirfd,__pathname,__mode))
-#endif /* __CRT_HAVE_MkdirAt */
-#ifdef __CRT_HAVE_MkfifoAt
-__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,MkfifoAt,(__fd_t __dirfd, char const *__fifoname, __mode_t __mode),(__dirfd,__fifoname,__mode))
-#endif /* __CRT_HAVE_MkfifoAt */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,FChmodAt,(__fd_t __dirfd, char const *__filename, __mode_t __mode, __atflag_t __flags),(__dirfd,__filename,__mode,__flags))
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,MkdirAt,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),(__dirfd,__pathname,__mode))
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,MkfifoAt,(__fd_t __dirfd, char const *__fifoname, __mode_t __mode),(__dirfd,__fifoname,__mode))
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_POSIX
-#ifdef __CRT_HAVE_FChmod
-__CDECLARE_VOID(,__THROWING,FChmod,(__fd_t __fd, __mode_t __mode),(__fd,__mode))
-#endif /* __CRT_HAVE_FChmod */
+__CDECLARE_VOID_OPT(,__THROWING,FChmod,(__fd_t __fd, __mode_t __mode),(__fd,__mode))
 #endif /* __USE_POSIX */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-#ifdef __CRT_HAVE_Mknod
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Mknod,(char const *__nodename, __mode_t __mode, __dev_t __dev),(__nodename,__mode,__dev))
-#endif /* __CRT_HAVE_Mknod */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Mknod,(char const *__nodename, __mode_t __mode, __dev_t __dev),(__nodename,__mode,__dev))
 #ifdef __USE_ATFILE
-#ifdef __CRT_HAVE_MknodAt
-__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,MknodAt,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev),(__dirfd,__nodename,__mode,__dev))
-#endif /* __CRT_HAVE_MknodAt */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,MknodAt,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev),(__dirfd,__nodename,__mode,__dev))
 #endif /* __USE_ATFILE */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 

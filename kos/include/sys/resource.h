@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3dbfa19 */
+/* HASH CRC-32:0x938fdb7e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,24 +93,18 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setrlimit,(__rlimit_resource_t
  * Return 0 if successful, -1 if not (and sets errno) */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setrlimit,(__rlimit_resource_t __resource, struct rlimit const *__rlimits),(__resource,__rlimits))
 #endif /* ... */
-#ifdef __CRT_HAVE_getrusage
 /* Return resource usage information on process indicated by WHO
  * and put it in *USAGE. Returns 0 for success, -1 for failure */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrusage,(__rusage_who_t __who, struct rusage *__usage),(__who,__usage))
-#endif /* __CRT_HAVE_getrusage */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrusage,(__rusage_who_t __who, struct rusage *__usage),(__who,__usage))
 /* TODO: getrusage64() (__USE_TIME64 & __USE_TIME_BITS64 integration) */
-#ifdef __CRT_HAVE_getpriority
 /* Return the highest priority of any process specified by WHICH and
  * WHO (see above); if WHO is zero, the current process, process group,
  * or user (as specified by WHO) is used.  A lower priority number means
  * higher priority. Priorities range from PRIO_MIN to PRIO_MAX (above) */
-__CDECLARE(,int,__NOTHROW_NCX,getpriority,(__priority_which_t __which, id_t __who),(__which,__who))
-#endif /* __CRT_HAVE_getpriority */
-#ifdef __CRT_HAVE_setpriority
+__CDECLARE_OPT(,int,__NOTHROW_NCX,getpriority,(__priority_which_t __which, id_t __who),(__which,__who))
 /* Set the priority of all processes specified by WHICH and WHO (see above) to PRIO.
  * Returns 0 on success, -1 on errors */
-__CDECLARE(,int,__NOTHROW_NCX,setpriority,(__priority_which_t __which, id_t __who, int __prio),(__which,__who,__prio))
-#endif /* __CRT_HAVE_setpriority */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,setpriority,(__priority_which_t __which, id_t __who, int __prio),(__which,__who,__prio))
 
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_getrlimit64

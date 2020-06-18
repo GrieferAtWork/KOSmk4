@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1dd03128 */
+/* HASH CRC-32:0xbd981833 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -331,22 +331,14 @@ struct ifconf {
 
 #ifdef __CC__
 
-#ifdef __CRT_HAVE_if_nametoindex
 /* Convert an interface name to an index, and vice versa */
-__CDECLARE(,unsigned int,__NOTHROW_RPC_KOS,if_nametoindex,(char const *__ifname),(__ifname))
-#endif /* __CRT_HAVE_if_nametoindex */
-#ifdef __CRT_HAVE_if_indextoname
+__CDECLARE_OPT(,unsigned int,__NOTHROW_RPC_KOS,if_nametoindex,(char const *__ifname),(__ifname))
 /* Convert an interface name to an index, and vice versa */
-__CDECLARE(,char *,__NOTHROW_RPC_KOS,if_indextoname,(unsigned int __ifindex, char *__ifname),(__ifindex,__ifname))
-#endif /* __CRT_HAVE_if_indextoname */
-#ifdef __CRT_HAVE_if_nameindex
+__CDECLARE_OPT(,char *,__NOTHROW_RPC_KOS,if_indextoname,(unsigned int __ifindex, char *__ifname),(__ifindex,__ifname))
 /* Return a list of all interfaces and their indices */
-__CDECLARE(,struct if_nameindex *,__NOTHROW_RPC_KOS,if_nameindex,(void),())
-#endif /* __CRT_HAVE_if_nameindex */
-#ifdef __CRT_HAVE_if_freenameindex
+__CDECLARE_OPT(,struct if_nameindex *,__NOTHROW_RPC_KOS,if_nameindex,(void),())
 /* Free the data returned from if_nameindex */
-__CDECLARE_VOID(,__NOTHROW_NCX,if_freenameindex,(struct if_nameindex *__ptr),(__ptr))
-#endif /* __CRT_HAVE_if_freenameindex */
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,if_freenameindex,(struct if_nameindex *__ptr),(__ptr))
 
 #endif /* __CC__ */
 

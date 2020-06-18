@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4bd886c */
+/* HASH CRC-32:0x5a70e0ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,6 @@ typedef __SIZE_TYPE__ size_t;
 typedef __SSIZE_TYPE__ ssize_t;
 #endif /* !__ssize_t_defined */
 
-#ifdef __CRT_HAVE_getrandom
 /* Ask the kernel for up to `NUM_BYTES' bytes of random data, which
  * should then be written to `BUFFER'.
  * @param: FLAGS: Set of `GRND_NONBLOCK | GRND_RANDOM'
@@ -69,8 +68,7 @@ typedef __SSIZE_TYPE__ ssize_t;
  *                calling thread being interrupted, EINTR is only set
  *                if no random data had already been retrieved from
  *                the kernel's random data sink. */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),ssize_t,__NOTHROW_NCX,getrandom,(void *__buf, size_t __num_bytes, unsigned int __flags),(__buf,__num_bytes,__flags))
-#endif /* __CRT_HAVE_getrandom */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),ssize_t,__NOTHROW_NCX,getrandom,(void *__buf, size_t __num_bytes, unsigned int __flags),(__buf,__num_bytes,__flags))
 #ifndef __getentropy_defined
 #define __getentropy_defined 1
 #ifdef __CRT_HAVE_getentropy

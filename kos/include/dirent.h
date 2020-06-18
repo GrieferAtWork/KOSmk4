@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfe727e1 */
+/* HASH CRC-32:0x6e659208 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -156,16 +156,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(opendirat, __FORCELOCAL __ATTR_WUNUSED __ATTR_NO
 #endif /* ... */
 #endif /* __USE_KOS && __USE_ATFILE */
 
-#ifdef __CRT_HAVE_closedir
 /* Close a directory stream previously returned by `opendir(3)' and friends */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,closedir,(DIR *__dirp),(__dirp))
-#endif /* __CRT_HAVE_closedir */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,closedir,(DIR *__dirp),(__dirp))
 
 #ifdef __USE_BSD
-#ifdef __CRT_HAVE_fdclosedir
 /* Same as `closedir()', but instead of closing the underlying file descriptor, return it */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,fdclosedir,(DIR *__dirp),(__dirp))
-#endif /* __CRT_HAVE_fdclosedir */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,fdclosedir,(DIR *__dirp),(__dirp))
 #endif /* __USE_BSD */
 
 #if defined(__CRT_HAVE_readdir) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
@@ -178,17 +174,13 @@ __CDECLARE(__ATTR_NONNULL((1)),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__res
 __CREDIRECT(__ATTR_NONNULL((1)),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),readdir64,(__dirp))
 #endif /* ... */
 
-#ifdef __CRT_HAVE_rewinddir
 /* Rewind the given directory stream in such a way that the next call
  * to `readdir(3)' will once again return the first directory entry */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,rewinddir,(DIR *__restrict __dirp),(__dirp))
-#endif /* __CRT_HAVE_rewinddir */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,rewinddir,(DIR *__restrict __dirp),(__dirp))
 
 #ifdef __USE_XOPEN2K8
-#ifdef __CRT_HAVE_fdopendir
 /* Create a new directory stream by inheriting the given `FD' as stream handle */
-__CDECLARE(__ATTR_WUNUSED,DIR *,__NOTHROW_NCX,fdopendir,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE_fdopendir */
+__CDECLARE_OPT(__ATTR_WUNUSED,DIR *,__NOTHROW_NCX,fdopendir,(__fd_t __fd),(__fd))
 #endif /* __USE_XOPEN2K8 */
 
 #ifdef __USE_LARGEFILE64
@@ -229,21 +221,15 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir64_r,(DIR *__rest
 #endif /* __USE_POSIX */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
-#ifdef __CRT_HAVE_seekdir
 /* Get the directory stream position */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,seekdir,(DIR *__restrict __dirp, __LONGPTR_TYPE__ __pos),(__dirp,__pos))
-#endif /* __CRT_HAVE_seekdir */
-#ifdef __CRT_HAVE_telldir
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,seekdir,(DIR *__restrict __dirp, __LONGPTR_TYPE__ __pos),(__dirp,__pos))
 /* Get the directory stream position */
-__CDECLARE(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,telldir,(DIR *__restrict __dirp),(__dirp))
-#endif /* __CRT_HAVE_telldir */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),long int,__NOTHROW_NCX,telldir,(DIR *__restrict __dirp),(__dirp))
 #endif /* __USE_MISC || __USE_XOPEN */
 
 #ifdef __USE_XOPEN2K8
-#ifdef __CRT_HAVE_dirfd
 /* Return the underlying file descriptor of the given directory stream */
-__CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,dirfd,(DIR __KOS_FIXED_CONST *__restrict __dirp),(__dirp))
-#endif /* __CRT_HAVE_dirfd */
+__CDECLARE_OPT(__ATTR_PURE __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,dirfd,(DIR __KOS_FIXED_CONST *__restrict __dirp),(__dirp))
 #ifndef ____scandir_selector_t_defined
 #define ____scandir_selector_t_defined 1
 typedef int (*__scandir_selector_t)(struct dirent const *);

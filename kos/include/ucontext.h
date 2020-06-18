@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4991b54e */
+/* HASH CRC-32:0xbf14bf74 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,21 +54,15 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#ifdef __CRT_HAVE_getcontext
 /* Get user context and store it in variable pointed to by UCP */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getcontext,(ucontext_t *__restrict __ucp),(__ucp))
-#endif /* __CRT_HAVE_getcontext */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getcontext,(ucontext_t *__restrict __ucp),(__ucp))
 
-#ifdef __CRT_HAVE_setcontext
 /* Set user context from information of variable pointed to by UCP */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setcontext,(ucontext_t const *__restrict __ucp),(__ucp))
-#endif /* __CRT_HAVE_setcontext */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setcontext,(ucontext_t const *__restrict __ucp),(__ucp))
 
-#ifdef __CRT_HAVE_swapcontext
 /* Save current context in context variable pointed to by OUCP and set
  * context from variable pointed to by UCP */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,swapcontext,(ucontext_t *__restrict __oucp, ucontext_t const *__restrict __ucp),(__oucp,__ucp))
-#endif /* __CRT_HAVE_swapcontext */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,swapcontext,(ucontext_t *__restrict __oucp, ucontext_t const *__restrict __ucp),(__oucp,__ucp))
 
 typedef void (*__makecontext_func_t)(void);
 

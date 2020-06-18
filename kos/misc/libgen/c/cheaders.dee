@@ -677,12 +677,15 @@ class FunctionPrototype {
 	@@> __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,wcslen,(__WCHAR_TYPE__ const *__restrict __str),(__str))
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintCDECLARE(
-			fp: CWriter, escapeMode: int, decl: string, exposedName: string) {
+			fp: CWriter, escapeMode: int, decl: string,
+			exposedName: string, optSuffix: bool = false) {
 		/* Special case: Make use of __CDECLARE */
 		local isVoidReturn = this.returnType.isVoid;
 		fp << "__CDECLARE";
 		if (isVoidReturn)
 			fp << "_VOID";
+		if (optSuffix)
+			fp << "_OPT";
 		fp << "(";
 		/* Attributes */
 		cprintAttributeList(fp, escapeMode);
@@ -1081,6 +1084,20 @@ class FunctionPrototype {
 			isFirst = false;
 		}
 		fp << "))\n";
+	}
+
+	@@Check if __CDECLARE will be used by @cprintRedirectionBinding,
+	@@when called with the given arguments.
+	public function cprintRedirectionBindingUsesCDECLARE(
+			fp: CWriter, decl: string, exposedName: string,
+			assemblyName: string): bool {
+		if (exposedName != assemblyName)
+			return false;
+		if (fp.externLinkage !in ["", "C"])
+			return false;
+		if (this.hasEllipsis)
+			return false;
+		return isLibcLinkage(decl, cc, assemblyName, false);
 	}
 
 	@@Print a redirection- or declaration-binding, based on
@@ -2395,6 +2412,7 @@ no_usable_bindings:
 			local usedBindings = functionBindings;
 			if (!usedBindings)
 				return; /* No bindings -> Noop */
+			local doc = documentationString;
 			if (exposedName is none)
 				exposedName = this.name;
 			if (guardName is bool) {
@@ -2444,7 +2462,7 @@ no_usable_bindings:
 					fp.ppDefine(guardName, "1");
 					bind.cprintBindFunction(
 						fp, escapeMode, decl, exposedName, guardName,
-						documentationString, preferBindingMacros,
+						doc, preferBindingMacros,
 						printDeclarationPrefixes,
 						onlyPrintPrimaryPrototype);
 					fp.ppEndif();
@@ -2453,7 +2471,38 @@ no_usable_bindings:
 normal_guardName_binding:
 				fp.ppIfndef(guardName);
 				fp.ppDefine(guardName, "1");
-			}
+			} else /* if (guardName is none) */ {
+				/* Check if we can use `__CDECLARE_OPT()' */
+				if (#usedBindings == 1) {
+					local bind: FunctionBinding = usedBindings.first;
+					local bindBinding = bind.functionBinding;
+					if (bindBinding is string || bindBinding is UserString) {
+						bindBinding = str bindBinding;
+						if (bind.ppCond == "defined(__CRT_HAVE_{})".format({ bindBinding })) {
+							local bindingPrototypes: {(string | UserString, {FunctionPrototype...})...}
+								= bind.functionPrototypes;
+							if (#bindingPrototypes == 1) {
+								local protoCond: string | UserString;
+								local protos: {FunctionPrototype...};
+								protoCond, protos = bindingPrototypes.first...;
+								if (protoCond == "1" && #protos == 1) {
+									local ptype: FunctionPrototype = protos.first;
+									if (ptype.cprintRedirectionBindingUsesCDECLARE(
+											fp, decl, exposedName, bindBinding)) {
+										/* Use __CDECLARE_OPT() for the declaration! */
+										if (doc)
+											fp.printComment(doc);
+										ptype.cprintCDECLARE(
+											fp, escapeMode, decl, exposedName,
+											optSuffix: true);
+										return;
+									}
+								}
+							}
+						}
+					}
+				} /* if (#usedBindings == 1) */
+			} /* if (guardName is none) */
 			local isFirst = true;
 			local numNeededEndif = [];
 			for (local bind: usedBindings) {
@@ -2501,7 +2550,7 @@ normal_guardName_binding:
 				}
 				bind.cprintBindFunction(
 					fp, escapeMode, decl, exposedName, guardName,
-					documentationString, preferBindingMacros,
+					doc, preferBindingMacros,
 					printDeclarationPrefixes,
 					onlyPrintPrimaryPrototype);
 				isFirst = false;

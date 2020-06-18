@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde2bbccc */
+/* HASH CRC-32:0xeb2445b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,10 +57,8 @@
 __SYSDECL_BEGIN
 
 #ifdef __CC__
-#ifdef __CRT_HAVE_setkey
 /* Setup DES tables according KEY */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setkey,(char const *__key),(__key))
-#endif /* __CRT_HAVE_setkey */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,setkey,(char const *__key),(__key))
 #ifndef __crypt_defined
 #define __crypt_defined 1
 #ifdef __CRT_HAVE_crypt
@@ -131,18 +129,12 @@ struct crypt_data {
 #pragma pop_macro("keysched")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
-#ifdef __CRT_HAVE_crypt_r
 /* Encrypt at most 8 characters from KEY using salt to perturb DES */
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),char *,__NOTHROW_NCX,crypt_r,(char const *__key, char const *__salt, struct crypt_data *__restrict __data),(__key,__salt,__data))
-#endif /* __CRT_HAVE_crypt_r */
-#ifdef __CRT_HAVE_setkey_r
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),char *,__NOTHROW_NCX,crypt_r,(char const *__key, char const *__salt, struct crypt_data *__restrict __data),(__key,__salt,__data))
 /* Setup DES tables according KEY */
-__CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,setkey_r,(char const *__key, struct crypt_data *__restrict __data),(__key,__data))
-#endif /* __CRT_HAVE_setkey_r */
-#ifdef __CRT_HAVE_encrypt_r
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,setkey_r,(char const *__key, struct crypt_data *__restrict __data),(__key,__data))
 /* Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place */
-__CDECLARE_VOID(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,encrypt_r,(char *__glibc_block, int __edflag, struct crypt_data *__restrict __data),(__glibc_block,__edflag,__data))
-#endif /* __CRT_HAVE_encrypt_r */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1, 3)),__NOTHROW_NCX,encrypt_r,(char *__glibc_block, int __edflag, struct crypt_data *__restrict __data),(__glibc_block,__edflag,__data))
 #endif /* __USE_GNU */
 
 #endif /* __CC__ */

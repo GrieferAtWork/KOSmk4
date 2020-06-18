@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f0c396b */
+/* HASH CRC-32:0xe68f4b0c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,18 +93,14 @@ struct ifaddrs {
 	void *ifa_data; /* Address-specific data (may be unused). */
 };
 
-#ifdef __CRT_HAVE_getifaddrs
 /* Create a linked list of `struct ifaddrs' structures, one for each
  * network interface on the host machine. If successful, store the
  * list in *IFAP and return 0. On errors, return -1 and set `errno'.
  * The storage returned in *IFAP is allocated dynamically and can
  * only be properly freed by passing it to `freeifaddrs' */
-__CDECLARE(,int,__NOTHROW_NCX,getifaddrs,(struct ifaddrs **__ifap),(__ifap))
-#endif /* __CRT_HAVE_getifaddrs */
-#ifdef __CRT_HAVE_freeifaddrs
+__CDECLARE_OPT(,int,__NOTHROW_NCX,getifaddrs,(struct ifaddrs **__ifap),(__ifap))
 /* Reclaim the storage allocated by a previous `getifaddrs' call */
-__CDECLARE_VOID(,__NOTHROW_NCX,freeifaddrs,(struct ifaddrs *__ifa),(__ifa))
-#endif /* __CRT_HAVE_freeifaddrs */
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,freeifaddrs,(struct ifaddrs *__ifa),(__ifa))
 
 #endif /* __CC__ */
 

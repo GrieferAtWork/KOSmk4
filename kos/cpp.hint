@@ -369,7 +369,9 @@
 #define __CASMNAME_SAME_KOS(x)
 #define __CASMNAME_SAME_DOS(x)
 #define __CDECLARE(attr,Treturn,nothrow,name,param,args)                                                    Treturn name param;
+#define __CDECLARE_OPT(attr,Treturn,nothrow,name,param,args)                                                Treturn name param;
 #define __CDECLARE_VOID(attr,nothrow,name,param,args)                                                       void name param;
+#define __CDECLARE_VOID_OPT(attr,nothrow,name,param,args)                                                   void name param;
 #define __CREDIRECT(attr,Treturn,nothrow,name,param,asmname,args)                                           Treturn name param;
 #define __CREDIRECT_VOID(attr,nothrow,name,param,asmname,args)                                              void name param;
 #define __CVREDIRECT(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)        Treturn name param;

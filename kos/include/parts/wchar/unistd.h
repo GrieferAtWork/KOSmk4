@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15d54bac */
+/* HASH CRC-32:0xf445893 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,19 +43,13 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#ifdef __CRT_HAVE_wttyname
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-__CDECLARE(__ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wttyname,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE_wttyname */
-#ifdef __CRT_HAVE_wttyname_r
+__CDECLARE_OPT(__ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wttyname,(__fd_t __fd),(__fd))
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wttyname_r,(__fd_t __fd, wchar_t *__buf, size_t __buflen),(__fd,__buf,__buflen))
-#endif /* __CRT_HAVE_wttyname_r */
-#ifdef __CRT_HAVE_wgetlogin
-__CDECLARE(__ATTR_WUNUSED,wchar_t *,__NOTHROW_NCX,wgetlogin,(void),())
-#endif /* __CRT_HAVE_wgetlogin */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wttyname_r,(__fd_t __fd, wchar_t *__buf, size_t __buflen),(__fd,__buf,__buflen))
+__CDECLARE_OPT(__ATTR_WUNUSED,wchar_t *,__NOTHROW_NCX,wgetlogin,(void),())
 #ifdef __CRT_HAVE_wchown
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
@@ -66,15 +60,13 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchown,(wchar_t const *__file, 
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wchown, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL wchown)(wchar_t const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wchown))(__file, __owner, __group); })
 #endif /* ... */
-#ifdef __CRT_HAVE_wpathconf
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,wpathconf,(wchar_t const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
-#endif /* __CRT_HAVE_wpathconf */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,wpathconf,(wchar_t const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
 #ifdef __CRT_HAVE_wlink
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
@@ -182,29 +174,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wget_current_dir_name, __FORCELOCAL __ATTR_MALLO
 #endif /* ... */
 #endif /* __USE_GNU */
 #ifdef __USE_ATFILE
-#ifdef __CRT_HAVE_wfaccessat
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfaccessat,(__fd_t __dfd, wchar_t const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),(__dfd,__file,__type,__flags))
-#endif /* __CRT_HAVE_wfaccessat */
-#ifdef __CRT_HAVE_wfchownat
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfaccessat,(__fd_t __dfd, wchar_t const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),(__dfd,__file,__type,__flags))
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfchownat,(__fd_t __dfd, wchar_t const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
-#endif /* __CRT_HAVE_wfchownat */
-#ifdef __CRT_HAVE_wlinkat
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfchownat,(__fd_t __dfd, wchar_t const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
-__CDECLARE(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,wlinkat,(__fd_t __fromfd, wchar_t const *__from, __fd_t __tofd, wchar_t const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
-#endif /* __CRT_HAVE_wlinkat */
-#ifdef __CRT_HAVE_wsymlinkat
+__CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,wlinkat,(__fd_t __fromfd, wchar_t const *__from, __fd_t __tofd, wchar_t const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
-__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,wsymlinkat,(wchar_t const *__link_text, __fd_t __tofd, wchar_t const *__target_path),(__link_text,__tofd,__target_path))
-#endif /* __CRT_HAVE_wsymlinkat */
-#ifdef __CRT_HAVE_wreadlinkat
+__CDECLARE_OPT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,wsymlinkat,(wchar_t const *__link_text, __fd_t __tofd, wchar_t const *__target_path),(__link_text,__tofd,__target_path))
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -213,21 +196,16 @@ __CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,wsymlinkat,(wchar_t const *_
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__CDECLARE(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wreadlinkat,(__fd_t __dfd, wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
-#endif /* __CRT_HAVE_wreadlinkat */
+__CDECLARE_OPT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wreadlinkat,(__fd_t __dfd, wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
 #ifdef __USE_KOS
-#ifdef __CRT_HAVE_wfreadlinkat
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
-__CDECLARE(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wfreadlinkat,(__fd_t __dfd, wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
-#endif /* __CRT_HAVE_wfreadlinkat */
+__CDECLARE_OPT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wfreadlinkat,(__fd_t __dfd, wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
 #endif /* __USE_KOS */
-#ifdef __CRT_HAVE_wunlinkat
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wunlinkat,(__fd_t __dfd, wchar_t const *__name, __atflag_t __flags),(__dfd,__name,__flags))
-#endif /* __CRT_HAVE_wunlinkat */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wunlinkat,(__fd_t __dfd, wchar_t const *__name, __atflag_t __flags),(__dfd,__name,__flags))
 #endif /* __USE_ATFILE */
 #ifdef __CRT_HAVE_wlchown
 /* >> lchown(2)
@@ -325,55 +303,39 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wreadlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) s
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 #if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
-#ifdef __CRT_HAVE_wgetlogin_r
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wgetlogin_r,(wchar_t *__name, size_t __name_len),(__name,__name_len))
-#endif /* __CRT_HAVE_wgetlogin_r */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wgetlogin_r,(wchar_t *__name, size_t __name_len),(__name,__name_len))
 #endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
-#ifdef __CRT_HAVE_wgethostname
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wgethostname,(wchar_t *__name, size_t __buflen),(__name,__buflen))
-#endif /* __CRT_HAVE_wgethostname */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wgethostname,(wchar_t *__name, size_t __buflen),(__name,__buflen))
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 #ifdef __USE_MISC
-#ifdef __CRT_HAVE_wsetlogin
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetlogin,(wchar_t const *__name),(__name))
-#endif /* __CRT_HAVE_wsetlogin */
-#ifdef __CRT_HAVE_wsethostname
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetlogin,(wchar_t const *__name),(__name))
 /* >> sethostname(2)
  * Set the name of the hosting machine */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsethostname,(wchar_t const *__name, size_t __len),(__name,__len))
-#endif /* __CRT_HAVE_wsethostname */
-#ifdef __CRT_HAVE_wgetdomainname
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsethostname,(wchar_t const *__name, size_t __len),(__name,__len))
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wgetdomainname,(wchar_t *__name, size_t __buflen),(__name,__buflen))
-#endif /* __CRT_HAVE_wgetdomainname */
-#ifdef __CRT_HAVE_wsetdomainname
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wgetdomainname,(wchar_t *__name, size_t __buflen),(__name,__buflen))
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetdomainname,(wchar_t const *__name, size_t __len),(__name,__len))
-#endif /* __CRT_HAVE_wsetdomainname */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetdomainname,(wchar_t const *__name, size_t __len),(__name,__len))
 #endif /* __USE_MISC */
 
 #if (defined(__USE_MISC) || \
      (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
-#ifdef __CRT_HAVE_wchroot
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchroot,(wchar_t const *__restrict __path),(__path))
-#endif /* __CRT_HAVE_wchroot */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchroot,(wchar_t const *__restrict __path),(__path))
 #endif /* ... */
 
 #if (defined(_EVERY_SOURCE) || \
      (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
-#ifdef __CRT_HAVE_wctermid
-__CDECLARE(,wchar_t *,__NOTHROW_NCX,wctermid,(wchar_t *__s),(__s))
-#endif /* __CRT_HAVE_wctermid */
+__CDECLARE_OPT(,wchar_t *,__NOTHROW_NCX,wctermid,(wchar_t *__s),(__s))
 #endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 #endif /* __CC__ */

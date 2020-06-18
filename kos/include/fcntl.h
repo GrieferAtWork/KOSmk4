@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70e22cca */
+/* HASH CRC-32:0x1b963e03 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,21 +124,11 @@ __CDECLARE(,int,__NOTHROW_NCX,sync_file_range,(__fd_t __fd, __off64_t __offset, 
 __NAMESPACE_LOCAL_USING_OR_IMPL(sync_file_range, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL sync_file_range)(__fd_t __fd, __off64_t __offset, __off64_t __count, unsigned int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sync_file_range))(__fd, __offset, __count, __flags); })
 #endif /* !__CRT_HAVE_sync_file_range */
 struct iovec;
-#ifdef __CRT_HAVE_vmsplice
-__CDECLARE(,__SSIZE_TYPE__,__NOTHROW_RPC,vmsplice,(__fd_t __fdout, struct iovec const *__iov, __SIZE_TYPE__ __count, unsigned int __flags),(__fdout,__iov,__count,__flags))
-#endif /* __CRT_HAVE_vmsplice */
-#ifdef __CRT_HAVE_splice
-__CDECLARE(,__SSIZE_TYPE__,__NOTHROW_RPC,splice,(__fd_t __fdin, __off64_t *__offin, __fd_t __fdout, __off64_t *__offout, __SIZE_TYPE__ __length, unsigned int __flags),(__fdin,__offin,__fdout,__offout,__length,__flags))
-#endif /* __CRT_HAVE_splice */
-#ifdef __CRT_HAVE_tee
-__CDECLARE(,__SSIZE_TYPE__,__NOTHROW_RPC,tee,(__fd_t __fdin, __fd_t __fdout, __SIZE_TYPE__ __length, unsigned int __flags),(__fdin,__fdout,__length,__flags))
-#endif /* __CRT_HAVE_tee */
-#ifdef __CRT_HAVE_name_to_handle_at
-__CDECLARE(,int,__NOTHROW_RPC,name_to_handle_at,(__fd_t __dirfd, char const *__name, struct file_handle *__handle, int *__mnt_id, int __flags),(__dirfd,__name,__handle,__mnt_id,__flags))
-#endif /* __CRT_HAVE_name_to_handle_at */
-#ifdef __CRT_HAVE_open_by_handle_at
-__CDECLARE(,__fd_t,__NOTHROW_RPC,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle *__handle, int __flags),(__mountdirfd,__handle,__flags))
-#endif /* __CRT_HAVE_open_by_handle_at */
+__CDECLARE_OPT(,__SSIZE_TYPE__,__NOTHROW_RPC,vmsplice,(__fd_t __fdout, struct iovec const *__iov, __SIZE_TYPE__ __count, unsigned int __flags),(__fdout,__iov,__count,__flags))
+__CDECLARE_OPT(,__SSIZE_TYPE__,__NOTHROW_RPC,splice,(__fd_t __fdin, __off64_t *__offin, __fd_t __fdout, __off64_t *__offout, __SIZE_TYPE__ __length, unsigned int __flags),(__fdin,__offin,__fdout,__offout,__length,__flags))
+__CDECLARE_OPT(,__SSIZE_TYPE__,__NOTHROW_RPC,tee,(__fd_t __fdin, __fd_t __fdout, __SIZE_TYPE__ __length, unsigned int __flags),(__fdin,__fdout,__length,__flags))
+__CDECLARE_OPT(,int,__NOTHROW_RPC,name_to_handle_at,(__fd_t __dirfd, char const *__name, struct file_handle *__handle, int *__mnt_id, int __flags),(__dirfd,__name,__handle,__mnt_id,__flags))
+__CDECLARE_OPT(,__fd_t,__NOTHROW_RPC,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle *__handle, int __flags),(__mountdirfd,__handle,__flags))
 #if defined(__CRT_HAVE_fallocate64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(,int,__NOTHROW_NCX,fallocate,(__fd_t __fd, int __mode, __FS_TYPE(off) __offset, __FS_TYPE(off) __length),fallocate64,(__fd,__mode,__offset,__length))
 #elif defined(__CRT_HAVE_fallocate) && !defined(__USE_FILE_OFFSET64)

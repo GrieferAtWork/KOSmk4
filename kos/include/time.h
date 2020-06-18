@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb921a0a */
+/* HASH CRC-32:0x55f6f2a7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -263,11 +263,9 @@ struct sigevent;
 #endif /* __USE_POSIX199309 */
 
 __NAMESPACE_STD_BEGIN
-#ifdef __CRT_HAVE_clock
 /* Time used by the program so far (user time + system time)
  * The result / CLOCKS_PER_SECOND is program time in seconds */
-__CDECLARE(__ATTR_WUNUSED,clock_t,__NOTHROW_NCX,clock,(void),())
-#endif /* __CRT_HAVE_clock */
+__CDECLARE_OPT(__ATTR_WUNUSED,clock_t,__NOTHROW_NCX,clock,(void),())
 #if defined(__CRT_HAVE_time64) && defined(__USE_TIME_BITS64)
 /* Return the current time and put it in *TIMER if TIMER is not NULL */
 __CREDIRECT(,time_t,__NOTHROW_NCX,time,(time_t *__timer),time64,(__timer))
@@ -660,11 +658,9 @@ __LIBC char *(tzname)[2] __ASMNAME("__tzname");
 #undef __tzname_defined
 #endif
 #endif /* !__tzname_defined */
-#ifdef __CRT_HAVE_tzset
 /* Set time conversion information from the TZ environment variable.
  * If TZ is not defined, a locale-dependent default is used */
-__CDECLARE_VOID(,__NOTHROW_NCX,tzset,(void),())
-#endif /* __CRT_HAVE_tzset */
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,tzset,(void),())
 #endif /* __USE_POSIX */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
@@ -863,14 +859,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime,(clockid_t __clo
 /* Set clock CLOCK_ID to value TP */
 __NAMESPACE_LOCAL_USING_OR_IMPL(clock_settime, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL clock_settime)(clockid_t __clock_id, struct timespec const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_settime))(__clock_id, __tp); })
 #endif /* ... */
-#ifdef __CRT_HAVE_timer_create
 /* Create new per-process timer using CLOCK_ID */
-__CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,timer_create,(clockid_t __clock_id, struct sigevent *__restrict __evp, timer_t *__restrict __timerid),(__clock_id,__evp,__timerid))
-#endif /* __CRT_HAVE_timer_create */
-#ifdef __CRT_HAVE_timer_delete
+__CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,timer_create,(clockid_t __clock_id, struct sigevent *__restrict __evp, timer_t *__restrict __timerid),(__clock_id,__evp,__timerid))
 /* Delete timer TIMERID */
-__CDECLARE(,int,__NOTHROW_NCX,timer_delete,(timer_t __timerid),(__timerid))
-#endif /* __CRT_HAVE_timer_delete */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,timer_delete,(timer_t __timerid),(__timerid))
 #if defined(__CRT_HAVE_timer_settime64) && defined(__USE_TIME_BITS64)
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,timer_settime,(timer_t __timerid, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__restrict __value, struct itimerspec *__restrict __ovalue),timer_settime64,(__timerid,__flags,__value,__ovalue))
@@ -893,10 +885,8 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,timer_gettime,(timer_t __timeri
 /* Get current value of timer TIMERID and store it in VALUE */
 __NAMESPACE_LOCAL_USING_OR_IMPL(timer_gettime, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL timer_gettime)(timer_t __timerid, struct itimerspec *__value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timer_gettime))(__timerid, __value); })
 #endif /* ... */
-#ifdef __CRT_HAVE_timer_getoverrun
 /* Get expiration overrun for timer TIMERID */
-__CDECLARE(,int,__NOTHROW_NCX,timer_getoverrun,(timer_t __timerid),(__timerid))
-#endif /* __CRT_HAVE_timer_getoverrun */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,timer_getoverrun,(timer_t __timerid),(__timerid))
 
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_clock_nanosleep64) && defined(__USE_TIME_BITS64)
@@ -1047,13 +1037,11 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get,(struct timespec *
 __LIBC int getdate_err;
 #endif /* __CRT_HAVE_getdate_err */
 
-#ifdef __CRT_HAVE_getdate
 /* Parse the given string as a date specification and return a value
  * representing the value.  The templates from the file identified by
  * the environment variable DATEMSK are used.  In case of an error
  * `getdate_err' is set */
-__CDECLARE(__ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,getdate,(const char *__string),(__string))
-#endif /* __CRT_HAVE_getdate */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,getdate,(const char *__string),(__string))
 #endif /* __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_GNU

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94181f72 */
+/* HASH CRC-32:0x8cb02625 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,12 +52,10 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#ifdef __CRT_HAVE_klogctl
 /* Control the kernel's logging facility.  This corresponds exactly to the
  * kernel's syslog system call, but that name is easily confused with the
  * user-level syslog facility, which is something completely different */
-__CDECLARE(,int,__NOTHROW_NCX,klogctl,(__STDC_INT_AS_UINT_T __type, char *__bufp, __STDC_INT_AS_SIZE_T __len),(__type,__bufp,__len))
-#endif /* __CRT_HAVE_klogctl */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,klogctl,(__STDC_INT_AS_UINT_T __type, char *__bufp, __STDC_INT_AS_SIZE_T __len),(__type,__bufp,__len))
 
 #endif /* __CC__ */
 

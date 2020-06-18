@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4da891c7 */
+/* HASH CRC-32:0xe38d1171 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,14 +55,10 @@ __SYSDECL_BEGIN
 
 struct sgttyb;
 
-#ifdef __CRT_HAVE_gtty
 /* Fill in *PARAMS with terminal parameters associated with FD */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,gtty,(__fd_t __fd, struct sgttyb *__params),(__fd,__params))
-#endif /* __CRT_HAVE_gtty */
-#ifdef __CRT_HAVE_stty
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,gtty,(__fd_t __fd, struct sgttyb *__params),(__fd,__params))
 /* Set the terminal parameters associated with FD to *PARAMS */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,stty,(__fd_t __fd, struct sgttyb const *__params),(__fd,__params))
-#endif /* __CRT_HAVE_stty */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,stty,(__fd_t __fd, struct sgttyb const *__params),(__fd,__params))
 #endif /* __CC__ */
 
 __SYSDECL_END

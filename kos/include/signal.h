@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f1f9109 */
+/* HASH CRC-32:0xababb547 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -158,10 +158,8 @@ __NAMESPACE_STD_USING(size_t)
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 __NAMESPACE_STD_BEGIN
-#ifdef __CRT_HAVE_raise
 /* @param signo: One of `SIG*' */
-__CDECLARE(,int,__NOTHROW_NCX,raise,(int __signo),(__signo))
-#endif /* __CRT_HAVE_raise */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,raise,(int __signo),(__signo))
 #ifdef __CRT_HAVE_sysv_signal
 /* @param signo: One of `SIG*' */
 __CREDIRECT(,__sighandler_t,__NOTHROW_NCX,signal,(int __signo, __sighandler_t __handler),sysv_signal,(__signo,__handler))
@@ -201,23 +199,13 @@ __NAMESPACE_STD_USING(signal)
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __USE_MISC
 #define sigmask(signo) __sigmask(signo)
-#ifdef __CRT_HAVE_ssignal
 /* @param signo: One of `SIG*' */
-__CDECLARE(,__sighandler_t,__NOTHROW_NCX,ssignal,(int __signo, __sighandler_t __handler),(__signo,__handler))
-#endif /* __CRT_HAVE_ssignal */
-#ifdef __CRT_HAVE_gsignal
+__CDECLARE_OPT(,__sighandler_t,__NOTHROW_NCX,ssignal,(int __signo, __sighandler_t __handler),(__signo,__handler))
 /* @param signo: One of `SIG*' */
-__CDECLARE(,int,__NOTHROW_NCX,gsignal,(int __signo),(__signo))
-#endif /* __CRT_HAVE_gsignal */
-#ifdef __CRT_HAVE_sigblock
-__CDECLARE(,int,__NOTHROW_NCX,sigblock,(int __mask),(__mask))
-#endif /* __CRT_HAVE_sigblock */
-#ifdef __CRT_HAVE_sigsetmask
-__CDECLARE(,int,__NOTHROW_NCX,sigsetmask,(int __mask),(__mask))
-#endif /* __CRT_HAVE_sigsetmask */
-#ifdef __CRT_HAVE_siggetmask
-__CDECLARE(,int,__NOTHROW_NCX,siggetmask,(void),())
-#endif /* __CRT_HAVE_siggetmask */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,gsignal,(int __signo),(__signo))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sigblock,(int __mask),(__mask))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sigsetmask,(int __mask),(__mask))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,siggetmask,(void),())
 #undef sys_siglist
 #undef _sys_siglist
 #if defined(__CRT_HAVE___p_sys_siglist)
@@ -243,16 +231,12 @@ __LIBC char const *const sys_siglist[_NSIG] __ASMNAME("_sys_siglist");
 __LIBC char const *const _sys_siglist[_NSIG];
 #endif /* sys_siglist... */
 struct sigcontext;
-#ifdef __CRT_HAVE_sigreturn
-__CDECLARE_VOID(__ATTR_NORETURN,__NOTHROW_NCX,sigreturn,(struct sigcontext const *__scp),(__scp))
-#endif /* __CRT_HAVE_sigreturn */
+__CDECLARE_VOID_OPT(__ATTR_NORETURN,__NOTHROW_NCX,sigreturn,(struct sigcontext const *__scp),(__scp))
 #endif /* __USE_MISC */
 
 #ifdef __USE_XOPEN
-#ifdef __CRT_HAVE_bsd_signal
 /* @param signo: One of `SIG*' */
-__CDECLARE(,__sighandler_t,__NOTHROW_NCX,bsd_signal,(int __signo, __sighandler_t __handler),(__signo,__handler))
-#endif /* __CRT_HAVE_bsd_signal */
+__CDECLARE_OPT(,__sighandler_t,__NOTHROW_NCX,bsd_signal,(int __signo, __sighandler_t __handler),(__signo,__handler))
 #ifdef __CRT_HAVE___xpg_sigpause
 /* @param signo: One of `SIG*' */
 __CREDIRECT(,int,__NOTHROW_NCX,sigpause,(int __signo),__xpg_sigpause,(__signo))
@@ -260,10 +244,8 @@ __CREDIRECT(,int,__NOTHROW_NCX,sigpause,(int __signo),__xpg_sigpause,(__signo))
 #endif /* __USE_XOPEN */
 
 #ifdef __USE_POSIX
-#ifdef __CRT_HAVE_kill
 /* @param signo: One of `SIG*' */
-__CDECLARE(,int,__NOTHROW_NCX,kill,(__pid_t __pid, int __signo),(__pid,__signo))
-#endif /* __CRT_HAVE_kill */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,kill,(__pid_t __pid, int __signo),(__pid,__signo))
 #ifdef __CRT_HAVE_sigemptyset
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigemptyset,(sigset_t *__set),(__set))
 #else /* __CRT_HAVE_sigemptyset */
@@ -309,10 +291,8 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sig
 /* @param signo: One of `SIG*' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigismember, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigismember)(sigset_t const *__set, int __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigismember))(__set, __signo); })
 #endif /* !... */
-#ifdef __CRT_HAVE_sigprocmask
 /* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
-__CDECLARE(,int,__NOTHROW_NCX,sigprocmask,(int __how, sigset_t const *__set, sigset_t *__oset),(__how,__set,__oset))
-#endif /* __CRT_HAVE_sigprocmask */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sigprocmask,(int __how, sigset_t const *__set, sigset_t *__oset),(__how,__set,__oset))
 #ifdef __CRT_HAVE_sigsuspend
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigsuspend,(sigset_t const *__set),(__set))
 #elif defined(__CRT_HAVE___sigsuspend)
@@ -325,13 +305,9 @@ __CDECLARE(,int,__NOTHROW_NCX,sigaction,(int __signo, struct sigaction const *__
 /* @param signo: One of `SIG*' */
 __CREDIRECT(,int,__NOTHROW_NCX,sigaction,(int __signo, struct sigaction const *__act, struct sigaction *__oact),__sigaction,(__signo,__act,__oact))
 #endif /* ... */
-#ifdef __CRT_HAVE_sigpending
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigpending,(sigset_t *__restrict __set),(__set))
-#endif /* __CRT_HAVE_sigpending */
-#ifdef __CRT_HAVE_sigwait
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigpending,(sigset_t *__restrict __set),(__set))
 /* @param signo: One of `SIG*' */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sigwait,(sigset_t const *__restrict __set, int *__restrict __signo),(__set,__signo))
-#endif /* __CRT_HAVE_sigwait */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sigwait,(sigset_t const *__restrict __set, int *__restrict __signo),(__set,__signo))
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_sigisemptyset
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigisemptyset,(sigset_t const *__restrict __set),(__set))
@@ -353,9 +329,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sigorset, __FORCELOCAL __ATTR_NONNULL((1, 2, 3))
 #endif /* !__CRT_HAVE_sigorset */
 #endif /* __USE_GNU */
 #ifdef __USE_POSIX199309
-#ifdef __CRT_HAVE_sigwaitinfo
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigwaitinfo,(sigset_t const *__restrict __set, siginfo_t *__restrict __info),(__set,__info))
-#endif /* __CRT_HAVE_sigwaitinfo */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigwaitinfo,(sigset_t const *__restrict __set, siginfo_t *__restrict __info),(__set,__info))
 #if defined(__CRT_HAVE_sigtimedwait64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait,(sigset_t const *__restrict __set, siginfo_t *__restrict __info, struct timespec const *__timeout),sigtimedwait64,(__set,__info,__timeout))
 #elif defined(__CRT_HAVE_sigtimedwait) && !defined(__USE_TIME_BITS64)
@@ -364,10 +338,8 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait,(sigset_t const *_
 #include <local/signal/sigtimedwait.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigtimedwait, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL sigtimedwait)(sigset_t const *__restrict __set, siginfo_t *__restrict __info, struct timespec const *__timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigtimedwait))(__set, __info, __timeout); })
 #endif /* ... */
-#ifdef __CRT_HAVE_sigqueue
 /* @param signo: One of `SIG*' */
-__CDECLARE(,int,__NOTHROW_NCX,sigqueue,(__pid_t __pid, int __signo, union sigval const __val),(__pid,__signo,__val))
-#endif /* __CRT_HAVE_sigqueue */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sigqueue,(__pid_t __pid, int __signo, union sigval const __val),(__pid,__signo,__val))
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_sigtimedwait64
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait64,(sigset_t const *__restrict __set, siginfo_t *__restrict __info, struct __timespec64 const *__timeout),(__set,__info,__timeout))
@@ -382,63 +354,39 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sigtimedwait64, __FORCELOCAL __ATTR_NONNULL((1))
 #endif /* __USE_POSIX */
 
 #ifdef __USE_KOS
-#ifdef __CRT_HAVE_sigqueueinfo
 /* @param signo: One of `SIG*' */
-__CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,sigqueueinfo,(__pid_t __tgid, int __signo, siginfo_t const *__uinfo),(__tgid,__signo,__uinfo))
-#endif /* __CRT_HAVE_sigqueueinfo */
-#ifdef __CRT_HAVE_tgsigqueueinfo
+__CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,sigqueueinfo,(__pid_t __tgid, int __signo, siginfo_t const *__uinfo),(__tgid,__signo,__uinfo))
 /* @param signo: One of `SIG*' */
-__CDECLARE(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, int __signo, siginfo_t const *__uinfo),(__tgid,__tid,__signo,__uinfo))
-#endif /* __CRT_HAVE_tgsigqueueinfo */
+__CDECLARE_OPT(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, int __signo, siginfo_t const *__uinfo),(__tgid,__tid,__signo,__uinfo))
 #endif /* __USE_KOS */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-#ifdef __CRT_HAVE_killpg
 /* @param signo: One of `SIG*' */
-__CDECLARE(,int,__NOTHROW_NCX,killpg,(__pid_t __pgrp, int __signo),(__pgrp,__signo))
-#endif /* __CRT_HAVE_killpg */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,killpg,(__pid_t __pgrp, int __signo),(__pgrp,__signo))
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_XOPEN2K8
-#ifdef __CRT_HAVE_psignal
 /* @param signo: One of `SIG*' */
-__CDECLARE_VOID(,__NOTHROW_NCX,psignal,(int __signo, char const *__s),(__signo,__s))
-#endif /* __CRT_HAVE_psignal */
-#ifdef __CRT_HAVE_psiginfo
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,psiginfo,(siginfo_t const *__pinfo, char const *__s),(__pinfo,__s))
-#endif /* __CRT_HAVE_psiginfo */
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,psignal,(int __signo, char const *__s),(__signo,__s))
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,psiginfo,(siginfo_t const *__pinfo, char const *__s),(__pinfo,__s))
 #endif /* __USE_XOPEN2K8 */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
-#ifdef __CRT_HAVE_siginterrupt
 /* @param signo: One of `SIG*' */
-__CDECLARE(,int,__NOTHROW_NCX,siginterrupt,(int __signo, int __interrupt),(__signo,__interrupt))
-#endif /* __CRT_HAVE_siginterrupt */
-#ifdef __CRT_HAVE_sigstack
-__CDECLARE(,int,__NOTHROW_NCX,sigstack,(struct sigstack *__ss, struct sigstack *__oss),(__ss,__oss))
-#endif /* __CRT_HAVE_sigstack */
-#ifdef __CRT_HAVE_sigaltstack
-__CDECLARE(,int,__NOTHROW_NCX,sigaltstack,(struct sigaltstack const *__ss, struct sigaltstack *__oss),(__ss,__oss))
-#endif /* __CRT_HAVE_sigaltstack */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,siginterrupt,(int __signo, int __interrupt),(__signo,__interrupt))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sigstack,(struct sigstack *__ss, struct sigstack *__oss),(__ss,__oss))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sigaltstack,(struct sigaltstack const *__ss, struct sigaltstack *__oss),(__ss,__oss))
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 #ifdef __USE_XOPEN_EXTENDED
-#ifdef __CRT_HAVE_sighold
 /* @param signo: One of `SIG*' */
-__CDECLARE(,int,__NOTHROW_NCX,sighold,(int __signo),(__signo))
-#endif /* __CRT_HAVE_sighold */
-#ifdef __CRT_HAVE_sigrelse
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sighold,(int __signo),(__signo))
 /* @param signo: One of `SIG*' */
-__CDECLARE(,int,__NOTHROW_NCX,sigrelse,(int __signo),(__signo))
-#endif /* __CRT_HAVE_sigrelse */
-#ifdef __CRT_HAVE_sigignore
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sigrelse,(int __signo),(__signo))
 /* @param signo: One of `SIG*' */
-__CDECLARE(,int,__NOTHROW_NCX,sigignore,(int __signo),(__signo))
-#endif /* __CRT_HAVE_sigignore */
-#ifdef __CRT_HAVE_sigset
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sigignore,(int __signo),(__signo))
 /* @param signo: One of `SIG*' */
-__CDECLARE(,__sighandler_t,__NOTHROW_NCX,sigset,(int __signo, __sighandler_t __disp),(__signo,__disp))
-#endif /* __CRT_HAVE_sigset */
+__CDECLARE_OPT(,__sighandler_t,__NOTHROW_NCX,sigset,(int __signo, __sighandler_t __disp),(__signo,__disp))
 #endif /* __USE_XOPEN_EXTENDED */
 
 #ifdef __CRT_HAVE___libc_current_sigrtmin

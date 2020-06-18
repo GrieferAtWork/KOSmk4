@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5444ab0 */
+/* HASH CRC-32:0xcb3ca432 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -224,39 +224,27 @@ __CDECLARE(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,inet_neta,(__UINT32_TYPE__ _
  * result in buffer starting at BUF with length of LEN bytes */
 __NAMESPACE_LOCAL_USING_OR_IMPL(inet_neta, __FORCELOCAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL inet_neta)(__UINT32_TYPE__ __net, char *__buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_neta))(__net, __buf, __len); })
 #endif /* !__CRT_HAVE_inet_neta */
-#ifdef __CRT_HAVE_inet_net_ntop
 /* Convert network number for interface type AF in buffer starting at CP
  * to presentation format. The result will specify BITS bits of the number */
-__CDECLARE(,char *,__NOTHROW_RPC_KOS,inet_net_ntop,(int __af, void const *__cp, int __bits, char *__buf, __SIZE_TYPE__ __len),(__af,__cp,__bits,__buf,__len))
-#endif /* __CRT_HAVE_inet_net_ntop */
-#ifdef __CRT_HAVE_inet_net_pton
+__CDECLARE_OPT(,char *,__NOTHROW_RPC_KOS,inet_net_ntop,(int __af, void const *__cp, int __bits, char *__buf, __SIZE_TYPE__ __len),(__af,__cp,__bits,__buf,__len))
 /* Convert network number for interface type AF from presentation in buffer starting
  * at CP to network format and store result int buffer starting at BUF of size LEN */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,inet_net_pton,(int __af, char const *__cp, void *__buf, __SIZE_TYPE__ __len),(__af,__cp,__buf,__len))
-#endif /* __CRT_HAVE_inet_net_pton */
-#ifdef __CRT_HAVE_inet_nsap_addr
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet_net_pton,(int __af, char const *__cp, void *__buf, __SIZE_TYPE__ __len),(__af,__cp,__buf,__len))
 /* Convert ASCII representation in hexadecimal form of the Internet address
  * to binary form and place result in buffer of length LEN starting at BUF */
-__CDECLARE(,unsigned int,__NOTHROW_RPC_KOS,inet_nsap_addr,(char const *__cp, unsigned char *__buf, int __len),(__cp,__buf,__len))
-#endif /* __CRT_HAVE_inet_nsap_addr */
-#ifdef __CRT_HAVE_inet_nsap_ntoa
+__CDECLARE_OPT(,unsigned int,__NOTHROW_RPC_KOS,inet_nsap_addr,(char const *__cp, unsigned char *__buf, int __len),(__cp,__buf,__len))
 /* Convert internet address in binary form in LEN bytes
  * starting at CP a presentation form and place result in BUF */
-__CDECLARE(,char *,__NOTHROW_RPC_KOS,inet_nsap_ntoa,(int __len, unsigned char const *__cp, char *__buf),(__len,__cp,__buf))
-#endif /* __CRT_HAVE_inet_nsap_ntoa */
+__CDECLARE_OPT(,char *,__NOTHROW_RPC_KOS,inet_nsap_ntoa,(int __len, unsigned char const *__cp, char *__buf),(__len,__cp,__buf))
 #endif /* __USE_MISC */
-#ifdef __CRT_HAVE_inet_pton
 /* Convert from presentation format of an Internet number in buffer
  * starting at CP to the binary network format and store result for
  * interface type AF in buffer starting at BUF */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,inet_pton,(int __af, char const *__restrict __cp, void *__restrict __buf),(__af,__cp,__buf))
-#endif /* __CRT_HAVE_inet_pton */
-#ifdef __CRT_HAVE_inet_ntop
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet_pton,(int __af, char const *__restrict __cp, void *__restrict __buf),(__af,__cp,__buf))
 /* Convert a Internet address in binary network format for interface
  * type AF in buffer starting at CP to presentation form and place
  * result in buffer of length LEN starting at BUF */
-__CDECLARE(,char const *,__NOTHROW_RPC_KOS,inet_ntop,(int __af, void const *__restrict __cp, char *__restrict __buf, socklen_t __len),(__af,__cp,__buf,__len))
-#endif /* __CRT_HAVE_inet_ntop */
+__CDECLARE_OPT(,char const *,__NOTHROW_RPC_KOS,inet_ntop,(int __af, void const *__restrict __cp, char *__restrict __buf, socklen_t __len),(__af,__cp,__buf,__len))
 
 #endif /* __CC__ */
 

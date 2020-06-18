@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2832e79 */
+/* HASH CRC-32:0xeaf6cfe0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -468,47 +468,29 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getumask, __FORCELOCAL __mode_t __NOTHROW_NCX(__
 #endif /* __USE_GNU */
 
 #if defined(__USE_KOS) && defined(__USE_ATFILE)
-#ifdef __CRT_HAVE_fmkdirat
 /* @param flags: Set of `0 | AT_DOSPATH' */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fmkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode, __atflag_t __flags),(__dirfd,__pathname,__mode,__flags))
-#endif /* __CRT_HAVE_fmkdirat */
-#ifdef __CRT_HAVE_fmknodat
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fmkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode, __atflag_t __flags),(__dirfd,__pathname,__mode,__flags))
 /* @param flags: Set of `0 | AT_DOSPATH' */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fmknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),(__dirfd,__nodename,__mode,__dev,__flags))
-#endif /* __CRT_HAVE_fmknodat */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fmknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),(__dirfd,__nodename,__mode,__dev,__flags))
 #endif
 
-#ifdef __CRT_HAVE_mkfifo
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkfifo,(char const *__fifoname, __mode_t __mode),(__fifoname,__mode))
-#endif /* __CRT_HAVE_mkfifo */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkfifo,(char const *__fifoname, __mode_t __mode),(__fifoname,__mode))
 
 #ifdef __USE_ATFILE
-#ifdef __CRT_HAVE_fchmodat
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fchmodat,(__fd_t __dirfd, char const *__filename, __mode_t __mode, __atflag_t __flags),(__dirfd,__filename,__mode,__flags))
-#endif /* __CRT_HAVE_fchmodat */
-#ifdef __CRT_HAVE_mkdirat
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),(__dirfd,__pathname,__mode))
-#endif /* __CRT_HAVE_mkdirat */
-#ifdef __CRT_HAVE_mkfifoat
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mkfifoat,(__fd_t __dirfd, char const *__fifoname, __mode_t __mode),(__dirfd,__fifoname,__mode))
-#endif /* __CRT_HAVE_mkfifoat */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fchmodat,(__fd_t __dirfd, char const *__filename, __mode_t __mode, __atflag_t __flags),(__dirfd,__filename,__mode,__flags))
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),(__dirfd,__pathname,__mode))
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mkfifoat,(__fd_t __dirfd, char const *__fifoname, __mode_t __mode),(__dirfd,__fifoname,__mode))
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_POSIX
-#ifdef __CRT_HAVE_fchmod
-__CDECLARE(,int,__NOTHROW_RPC,fchmod,(__fd_t __fd, __mode_t __mode),(__fd,__mode))
-#endif /* __CRT_HAVE_fchmod */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,fchmod,(__fd_t __fd, __mode_t __mode),(__fd,__mode))
 #endif /* __USE_POSIX */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-#ifdef __CRT_HAVE_mknod
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mknod,(char const *__nodename, __mode_t __mode, __dev_t __dev),(__nodename,__mode,__dev))
-#endif /* __CRT_HAVE_mknod */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mknod,(char const *__nodename, __mode_t __mode, __dev_t __dev),(__nodename,__mode,__dev))
 #ifdef __USE_ATFILE
-#ifdef __CRT_HAVE_mknodat
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev),(__dirfd,__nodename,__mode,__dev))
-#endif /* __CRT_HAVE_mknodat */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev),(__dirfd,__nodename,__mode,__dev))
 #endif /* __USE_ATFILE */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
@@ -600,18 +582,10 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_fstat64,(__fd_t __fd, struct _
 #elif defined(__CRT_HAVE__fstat64i32)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,_fstat64,(__fd_t __fd, struct __dos_stat64 *__restrict __buf),_fstat64i32,(__fd,__buf))
 #endif /* ... */
-#ifdef __CRT_HAVE__wstat32
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat32,(__WCHAR_TYPE__ const *__filename, struct __dos_stat32 *__buf),(__filename,__buf))
-#endif /* __CRT_HAVE__wstat32 */
-#ifdef __CRT_HAVE__wstat64
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat64,(__WCHAR_TYPE__ const *__filename, struct __dos_stat64 *__buf),(__filename,__buf))
-#endif /* __CRT_HAVE__wstat64 */
-#ifdef __CRT_HAVE__wstat32i64
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat32i64,(__WCHAR_TYPE__ const *__filename, struct __dos_stat32i64 *__buf),(__filename,__buf))
-#endif /* __CRT_HAVE__wstat32i64 */
-#ifdef __CRT_HAVE__wstat64i32
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat64i32,(__WCHAR_TYPE__ const *__filename, struct __dos_stat64i32 *__buf),(__filename,__buf))
-#endif /* __CRT_HAVE__wstat64i32 */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat32,(__WCHAR_TYPE__ const *__filename, struct __dos_stat32 *__buf),(__filename,__buf))
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat64,(__WCHAR_TYPE__ const *__filename, struct __dos_stat64 *__buf),(__filename,__buf))
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat32i64,(__WCHAR_TYPE__ const *__filename, struct __dos_stat32i64 *__buf),(__filename,__buf))
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat64i32,(__WCHAR_TYPE__ const *__filename, struct __dos_stat64i32 *__buf),(__filename,__buf))
 #endif /* __USE_DOS */
 
 #endif /* __CC__ */

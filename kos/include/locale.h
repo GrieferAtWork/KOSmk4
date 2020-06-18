@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b453502 */
+/* HASH CRC-32:0x926e75bf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -283,14 +283,10 @@ __NAMESPACE_STD_USING(lconv)
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 __NAMESPACE_STD_BEGIN
-#ifdef __CRT_HAVE_setlocale
 /* Set and/or return the current locale */
-__CDECLARE(,char *,__NOTHROW_NCX,setlocale,(int __category, char const *__locale),(__category,__locale))
-#endif /* __CRT_HAVE_setlocale */
-#ifdef __CRT_HAVE_localeconv
+__CDECLARE_OPT(,char *,__NOTHROW_NCX,setlocale,(int __category, char const *__locale),(__category,__locale))
 /* Return the numeric/monetary information for the current locale */
-__CDECLARE(,struct lconv *,__NOTHROW_NCX,localeconv,(void),())
-#endif /* __CRT_HAVE_localeconv */
+__CDECLARE_OPT(,struct lconv *,__NOTHROW_NCX,localeconv,(void),())
 __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #ifdef __CRT_HAVE_setlocale

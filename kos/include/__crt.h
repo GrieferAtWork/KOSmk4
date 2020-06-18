@@ -622,6 +622,31 @@ typedef void *__locale_t;
 #endif /* !__NO_EXTERNINLINE */
 #endif /* !__BUILDING_LIBC... */
 
+#define __PRIVATE_CDECLARE_OPT_ARG_PLACEHOLDER_ ,
+#define __PRIVATE_CDECLARE_OPT_ARG_PLACEHOLDER_1 ,
+#define __PRIVATE_CDECLARE_OPT_TAKE_SECOND_ARG_IMPL(x, val, ...) val
+#define __PRIVATE_CDECLARE_OPT_TAKE_SECOND_ARG(x) __PRIVATE_CDECLARE_OPT_TAKE_SECOND_ARG_IMPL x
+#define __PRIVATE_CDECLARE_OPT_IS_DEFINED3(...) __PRIVATE_CDECLARE_OPT_TAKE_SECOND_ARG((__VA_ARGS__ 1,0))
+#define __PRIVATE_CDECLARE_OPT_IS_DEFINED2(x) __PRIVATE_CDECLARE_OPT_IS_DEFINED3(__PRIVATE_CDECLARE_OPT_ARG_PLACEHOLDER_##x)
+#define __PRIVATE_CDECLARE_OPT_IS_DEFINED(x) __PRIVATE_CDECLARE_OPT_IS_DEFINED2(x)
+
+#define __PRIVATE_CDECLARE_OPT_0(attr,Treturn,nothrow,name,param,args)
+#define __PRIVATE_CDECLARE_VOID_OPT_0(attr,nothrow,name,param,args)
+#define __PRIVATE_CDECLARE_OPT_1         __CDECLARE
+#define __PRIVATE_CDECLARE_VOID_OPT_1    __CDECLARE_VOID
+#define __PRIVATE_CDECLARE_OPT2(is)      __PRIVATE_CDECLARE_OPT_##is
+#define __PRIVATE_CDECLARE_VOID_OPT2(is) __PRIVATE_CDECLARE_VOID_OPT_##is
+#define __PRIVATE_CDECLARE_OPT(is)       __PRIVATE_CDECLARE_OPT2(is)
+#define __PRIVATE_CDECLARE_VOID_OPT(is)  __PRIVATE_CDECLARE_VOID_OPT2(is)
+
+/* Same as the _OPT-less counterpart, only these macros
+ * integrate the test for `defined(__CRT_HAVE_<name>)',
+ * meaning that the caller won't have to do that check. */
+#define __CDECLARE_OPT(attr,Treturn,nothrow,name,param,args) \
+	__PRIVATE_CDECLARE_OPT(__PRIVATE_CDECLARE_OPT_IS_DEFINED(__CRT_HAVE_##name))(attr,Treturn,nothrow,name,param,args)
+#define __CDECLARE_VOID_OPT(attr,nothrow,name,param,args) \
+	__PRIVATE_CDECLARE_VOID_OPT(__PRIVATE_CDECLARE_OPT_IS_DEFINED(__CRT_HAVE_##name))(attr,nothrow,name,param,args)
+
 
 /* Special value used to indicate the *at functions should use the current working directory. */
 #ifndef __CRT_AT_FDCWD

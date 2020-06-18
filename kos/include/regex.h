@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc72c9c3 */
+/* HASH CRC-32:0x8b16db47 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -319,48 +319,33 @@ typedef struct {
 #ifdef __CC__
 
 #ifdef __USE_GNU
-#ifdef __CRT_HAVE_re_set_syntax
 /* Sets the current default syntax to SYNTAX, and return the old syntax.
  * You can also simply assign to the `re_syntax_options' variable */
-__CDECLARE(,reg_syntax_t,__NOTHROW_NCX,re_set_syntax,(reg_syntax_t __syntax),(__syntax))
-#endif /* __CRT_HAVE_re_set_syntax */
-#ifdef __CRT_HAVE_re_compile_pattern
+__CDECLARE_OPT(,reg_syntax_t,__NOTHROW_NCX,re_set_syntax,(reg_syntax_t __syntax),(__syntax))
 /* Compile the regular expression PATTERN, with length LENGTH
  * and syntax given by the global `re_syntax_options', into the buffer
  * BUFFER. Return NULL if successful, and an error string if not.
  * To free the allocated storage, you must call `regfree' on BUFFER.
  * Note that the translate table must either have been initialized by
  * `regcomp', with a malloc'd value, or set to NULL before calling `regfree' */
-__CDECLARE(,char const *,__NOTHROW_NCX,re_compile_pattern,(char const *__pattern, size_t __length, struct re_pattern_buffer *__buffer),(__pattern,__length,__buffer))
-#endif /* __CRT_HAVE_re_compile_pattern */
-#ifdef __CRT_HAVE_re_compile_fastmap
+__CDECLARE_OPT(,char const *,__NOTHROW_NCX,re_compile_pattern,(char const *__pattern, size_t __length, struct re_pattern_buffer *__buffer),(__pattern,__length,__buffer))
 /* Compile a fastmap for the compiled pattern in BUFFER; used to
  * accelerate searches. Return 0 if successful and -2 if was an internal error */
-__CDECLARE(,int,__NOTHROW_NCX,re_compile_fastmap,(struct re_pattern_buffer *__buffer),(__buffer))
-#endif /* __CRT_HAVE_re_compile_fastmap */
-#ifdef __CRT_HAVE_re_search
+__CDECLARE_OPT(,int,__NOTHROW_NCX,re_compile_fastmap,(struct re_pattern_buffer *__buffer),(__buffer))
 /* Search in the string STRING (with length LENGTH) for the pattern
  * compiled into BUFFER. Start searching at position START, for RANGE
  * characters. Return the starting position of the match, -1 for no
  * match, or -2 for an internal error. Also return register
  * information in REGS (if REGS and BUFFER->no_sub are nonzero) */
-__CDECLARE(,int,__NOTHROW_NCX,re_search,(struct re_pattern_buffer *__buffer, char const *__string, int __length, int __start, int __range, struct re_registers *__regs),(__buffer,__string,__length,__start,__range,__regs))
-#endif /* __CRT_HAVE_re_search */
-#ifdef __CRT_HAVE_re_search_2
+__CDECLARE_OPT(,int,__NOTHROW_NCX,re_search,(struct re_pattern_buffer *__buffer, char const *__string, int __length, int __start, int __range, struct re_registers *__regs),(__buffer,__string,__length,__start,__range,__regs))
 /* Like `re_search', but search in the concatenation of STRING1
  * and STRING2. Also, stop searching at index START + STOP */
-__CDECLARE(,int,__NOTHROW_NCX,re_search_2,(struct re_pattern_buffer *__buffer, char const *__string1, int __length1, char const *__string2, int __length2, int __start, int __range, struct re_registers *__regs, int __stop),(__buffer,__string1,__length1,__string2,__length2,__start,__range,__regs,__stop))
-#endif /* __CRT_HAVE_re_search_2 */
-#ifdef __CRT_HAVE_re_match
+__CDECLARE_OPT(,int,__NOTHROW_NCX,re_search_2,(struct re_pattern_buffer *__buffer, char const *__string1, int __length1, char const *__string2, int __length2, int __start, int __range, struct re_registers *__regs, int __stop),(__buffer,__string1,__length1,__string2,__length2,__start,__range,__regs,__stop))
 /* Like `re_search', but return how many characters in STRING
  * the regexp in BUFFER matched, starting at position START */
-__CDECLARE(,int,__NOTHROW_NCX,re_match,(struct re_pattern_buffer *__buffer, char const *__string, int __length, int __start, struct re_registers *__regs),(__buffer,__string,__length,__start,__regs))
-#endif /* __CRT_HAVE_re_match */
-#ifdef __CRT_HAVE_re_match_2
+__CDECLARE_OPT(,int,__NOTHROW_NCX,re_match,(struct re_pattern_buffer *__buffer, char const *__string, int __length, int __start, struct re_registers *__regs),(__buffer,__string,__length,__start,__regs))
 /* Relates to `re_match' as `re_search_2' relates to `re_search' */
-__CDECLARE(,int,__NOTHROW_NCX,re_match_2,(struct re_pattern_buffer *__buffer, char const *__string1, int __length1, char const *__string2, int __length2, int __start, struct re_registers *__regs, int __stop),(__buffer,__string1,__length1,__string2,__length2,__start,__regs,__stop))
-#endif /* __CRT_HAVE_re_match_2 */
-#ifdef __CRT_HAVE_re_set_registers
+__CDECLARE_OPT(,int,__NOTHROW_NCX,re_match_2,(struct re_pattern_buffer *__buffer, char const *__string1, int __length1, char const *__string2, int __length2, int __start, struct re_registers *__regs, int __stop),(__buffer,__string1,__length1,__string2,__length2,__start,__regs,__stop))
 /* Set REGS to hold NUM_REGS registers, storing them in STARTS and
  * ENDS. Subsequent matches using BUFFER and REGS will use this memory
  * for recording register information. STARTS and ENDS must be allocated
@@ -368,24 +353,15 @@ __CDECLARE(,int,__NOTHROW_NCX,re_match_2,(struct re_pattern_buffer *__buffer, ch
  * If NUM_REGS == 0, then subsequent matches should allocate their own register data.
  * Unless this function is called, the first search or match using
  * PATTERN_BUFFER will allocate its own register data, without freeing the old data */
-__CDECLARE_VOID(,__NOTHROW_NCX,re_set_registers,(struct re_pattern_buffer *__buffer, struct re_registers *__regs, unsigned int __num_regs, regoff_t *__starts, regoff_t *__ends),(__buffer,__regs,__num_regs,__starts,__ends))
-#endif /* __CRT_HAVE_re_set_registers */
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,re_set_registers,(struct re_pattern_buffer *__buffer, struct re_registers *__regs, unsigned int __num_regs, regoff_t *__starts, regoff_t *__ends),(__buffer,__regs,__num_regs,__starts,__ends))
 #endif /* __USE_GNU */
 
 
 /* POSIX compatibility.  */
-#ifdef __CRT_HAVE_regcomp
-__CDECLARE(,int,__NOTHROW_NCX,regcomp,(regex_t *__restrict __preg, char const *__restrict __pattern, int __cflags),(__preg,__pattern,__cflags))
-#endif /* __CRT_HAVE_regcomp */
-#ifdef __CRT_HAVE_regexec
-__CDECLARE(,int,__NOTHROW_NCX,regexec,(regex_t const *__restrict __preg, char const *__restrict __string, size_t __nmatch, regmatch_t __pmatch[__restrict_arr], int __eflags),(__preg,__string,__nmatch,__pmatch,__eflags))
-#endif /* __CRT_HAVE_regexec */
-#ifdef __CRT_HAVE_regerror
-__CDECLARE(,size_t,__NOTHROW_NCX,regerror,(int __errcode, regex_t const *__restrict __preg, char *__restrict __errbuf, size_t __errbuf_size),(__errcode,__preg,__errbuf,__errbuf_size))
-#endif /* __CRT_HAVE_regerror */
-#ifdef __CRT_HAVE_regfree
-__CDECLARE_VOID(,__NOTHROW_NCX,regfree,(regex_t *__preg),(__preg))
-#endif /* __CRT_HAVE_regfree */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,regcomp,(regex_t *__restrict __preg, char const *__restrict __pattern, int __cflags),(__preg,__pattern,__cflags))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,regexec,(regex_t const *__restrict __preg, char const *__restrict __string, size_t __nmatch, regmatch_t __pmatch[__restrict_arr], int __eflags),(__preg,__string,__nmatch,__pmatch,__eflags))
+__CDECLARE_OPT(,size_t,__NOTHROW_NCX,regerror,(int __errcode, regex_t const *__restrict __preg, char *__restrict __errbuf, size_t __errbuf_size),(__errcode,__preg,__errbuf,__errbuf_size))
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,regfree,(regex_t *__preg),(__preg))
 
 #endif /* __CC__ */
 

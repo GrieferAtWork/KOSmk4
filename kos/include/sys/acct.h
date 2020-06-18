@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b9133da */
+/* HASH CRC-32:0xe48c465c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,10 +145,8 @@ struct acct_v3 {
 	char            ac_comm[ACCT_COMM]; /* Command Name */
 };
 
-#ifdef __CRT_HAVE_acct
 /* Switch process accounting on and off */
-__CDECLARE(,int,__NOTHROW_RPC,acct,(const char *__filename),(__filename))
-#endif /* __CRT_HAVE_acct */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,acct,(const char *__filename),(__filename))
 
 #endif /* __CC__ */
 

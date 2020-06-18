@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99f626c5 */
+/* HASH CRC-32:0x93360ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -219,18 +219,14 @@ __SYSDECL_BEGIN
 #endif /* !UMOUNT_NOFOLLOW */
 
 #ifdef __CC__
-#ifdef __CRT_HAVE_mount
-__CDECLARE(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
-#endif /* __CRT_HAVE_mount */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
 #ifdef __CRT_HAVE_umount
 __CDECLARE(,int,__NOTHROW_RPC,umount,(char const *__special_file),(__special_file))
 #elif defined(__CRT_HAVE_umount2)
 #include <local/sys.mount/umount.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(umount, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL umount)(char const *__special_file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(umount))(__special_file); })
 #endif /* ... */
-#ifdef __CRT_HAVE_umount2
-__CDECLARE(,int,__NOTHROW_RPC,umount2,(char const *__special_file, __STDC_INT_AS_UINT_T __flags),(__special_file,__flags))
-#endif /* __CRT_HAVE_umount2 */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,umount2,(char const *__special_file, __STDC_INT_AS_UINT_T __flags),(__special_file,__flags))
 #endif /* __CC__ */
 
 __SYSDECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f3fb665 */
+/* HASH CRC-32:0xfa172c03 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -517,7 +517,6 @@ __LIBC __ATTR_NONNULL((1)) __pid_t __NOTHROW_NCX(__VLIBCCALL clone)(__clone_func
 #elif defined(__CRT_HAVE___clone)
 __CVREDIRECT(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,clone,(__clone_func_t __fn, void *__child_stack, int __flags, void *__arg),__clone,(__fn,__child_stack,__flags,__arg),__arg,3,(__pid_t,void *,__pid_t))
 #endif /* ... */
-#ifdef __CRT_HAVE_unshare
 /* >> unshare(2)
  * Unshare certain components of the calling thread that may be shared with other
  * threads or processes, such as the filesystem, or opened file descriptors.
@@ -542,18 +541,14 @@ __CVREDIRECT(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,clone,(__clone_func_t __f
  *                 - CLONE_SYSVSEM:   ...
  *                 - CLONE_VM:        Unshare the current VM (KOS extension)
  *                 - CLONE_SIGHAND:   Unshare signal handlers (KOS extension) */
-__CDECLARE(,int,__NOTHROW_NCX,unshare,(int __flags),(__flags))
-#endif /* __CRT_HAVE_unshare */
-#ifdef __CRT_HAVE_sched_getcpu
+__CDECLARE_OPT(,int,__NOTHROW_NCX,unshare,(int __flags),(__flags))
 /* >> sched_getcpu(3)
  * Returns the number of the CPU for the calling thread.
  * Note that due to unforeseeable scheduling conditions, this may change at any
  * moment, even before this function returns, or before the caller was able to
  * act on its return value. For that reason, this function must only be taken
  * as a hint */
-__CDECLARE(,int,__NOTHROW_NCX,sched_getcpu,(void),())
-#endif /* __CRT_HAVE_sched_getcpu */
-#ifdef __CRT_HAVE_setns
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sched_getcpu,(void),())
 /* >> setns(2)
  * With `FD' referring to a namespace, reassociate the calling thread with that namespace.
  * For this purpose, `FD' was opened for one of the files in `/proc/[pid]/ns/'
@@ -561,18 +556,15 @@ __CDECLARE(,int,__NOTHROW_NCX,sched_getcpu,(void),())
  *                 type of namespace, or one of `CLONE_NEWCGROUP', `CLONE_NEWIPC',
  *                `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',
  *                `CLONE_NEWUTS') */
-__CDECLARE(,int,__NOTHROW_NCX,setns,(__fd_t __fd, int __nstype),(__fd,__nstype))
-#endif /* __CRT_HAVE_setns */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,setns,(__fd_t __fd, int __nstype),(__fd,__nstype))
 
 #ifdef __USE_KOS
-#ifdef __CRT_HAVE_exit_thread
 /* Exits the current thread by invoking the SYS_exit system call,
  * after performing some additional cleanup not done by the kernel.
  * Assuming that the calling thread was constructed by `clone()',
  * calling this function has the same effect as returning `EXIT_CODE'
  * from `clone()'s `FN' callback */
-__CDECLARE_VOID(__ATTR_NORETURN,__NOTHROW_NCX,exit_thread,(int __exit_code),(__exit_code))
-#endif /* __CRT_HAVE_exit_thread */
+__CDECLARE_VOID_OPT(__ATTR_NORETURN,__NOTHROW_NCX,exit_thread,(int __exit_code),(__exit_code))
 #endif /* __USE_KOS */
 #endif /* __USE_GNU || __USE_KOS */
 #endif /* __CC__ */

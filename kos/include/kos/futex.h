@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf5f2e7a */
+/* HASH CRC-32:0x9a3cf9f2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1426,7 +1426,6 @@ __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_allbits)(lfutex_t *__uaddr, lfutex_t
 
 
 
-#ifdef __CRT_HAVE_futex_getspin
 /* Get/Set the number of times to spin the following futex operations without
  * entering kernel-space, setting waiter-bits, and entering sleep mode:
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
@@ -1447,9 +1446,7 @@ __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_allbits)(lfutex_t *__uaddr, lfutex_t
  * >> return lfutex(uaddr, LFUTEX_WAIT_WHILE, val, (struct timespec const *)NULL);
  * Upon startup, `futex_getspin()' is pre-initialized to `4'.
  * @return: * : The current (get) / old (set) spin value */
-__CDECLARE(__ATTR_WUNUSED,unsigned int,__NOTHROW,futex_getspin,(void),())
-#endif /* __CRT_HAVE_futex_getspin */
-#ifdef __CRT_HAVE_futex_setspin
+__CDECLARE_OPT(__ATTR_WUNUSED,unsigned int,__NOTHROW,futex_getspin,(void),())
 /* Get/Set the number of times to spin the following futex operations without
  * entering kernel-space, setting waiter-bits, and entering sleep mode:
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
@@ -1470,8 +1467,7 @@ __CDECLARE(__ATTR_WUNUSED,unsigned int,__NOTHROW,futex_getspin,(void),())
  * >> return lfutex(uaddr, LFUTEX_WAIT_WHILE, val, (struct timespec const *)NULL);
  * Upon startup, `futex_getspin()' is pre-initialized to `4'.
  * @return: * : The current (get) / old (set) spin value */
-__CDECLARE(,unsigned int,__NOTHROW,futex_setspin,(unsigned int __new_spin),(__new_spin))
-#endif /* __CRT_HAVE_futex_setspin */
+__CDECLARE_OPT(,unsigned int,__NOTHROW,futex_setspin,(unsigned int __new_spin),(__new_spin))
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd6a245b */
+/* HASH CRC-32:0xfc5b226d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,30 +77,18 @@ struct aliasent {
 #pragma pop_macro("alias_name")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
-#ifdef __CRT_HAVE_setaliasent
 /* Open alias data base files */
-__CDECLARE_VOID(,__NOTHROW_RPC_KOS,setaliasent,(void),())
-#endif /* __CRT_HAVE_setaliasent */
-#ifdef __CRT_HAVE_endaliasent
+__CDECLARE_VOID_OPT(,__NOTHROW_RPC_KOS,setaliasent,(void),())
 /* Close alias data base files */
-__CDECLARE_VOID(,__NOTHROW_NCX,endaliasent,(void),())
-#endif /* __CRT_HAVE_endaliasent */
-#ifdef __CRT_HAVE_getaliasent
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,endaliasent,(void),())
 /* Get the next entry from the alias data base */
-__CDECLARE(,struct aliasent *,__NOTHROW_RPC_KOS,getaliasent,(void),())
-#endif /* __CRT_HAVE_getaliasent */
-#ifdef __CRT_HAVE_getaliasent_r
+__CDECLARE_OPT(,struct aliasent *,__NOTHROW_RPC_KOS,getaliasent,(void),())
 /* Get the next entry from the alias data base and put it in RESULT_BUF */
-__CDECLARE(__ATTR_NONNULL((1, 2, 4)),int,__NOTHROW_RPC_KOS,getaliasent_r,(struct aliasent *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct aliasent **__restrict __result),(__result_buf,__buffer,__buflen,__result))
-#endif /* __CRT_HAVE_getaliasent_r */
-#ifdef __CRT_HAVE_getaliasbyname
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 4)),int,__NOTHROW_RPC_KOS,getaliasent_r,(struct aliasent *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct aliasent **__restrict __result),(__result_buf,__buffer,__buflen,__result))
 /* Get alias entry corresponding to NAME */
-__CDECLARE(__ATTR_NONNULL((1)),struct aliasent *,__NOTHROW_RPC_KOS,getaliasbyname,(char const *__name),(__name))
-#endif /* __CRT_HAVE_getaliasbyname */
-#ifdef __CRT_HAVE_getaliasbyname_r
+__CDECLARE_OPT(__ATTR_NONNULL((1)),struct aliasent *,__NOTHROW_RPC_KOS,getaliasbyname,(char const *__name),(__name))
 /* Get alias entry corresponding to NAME and put it in RESULT_BUF */
-__CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC_KOS,getaliasbyname_r,(char const *__restrict __name, struct aliasent *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct aliasent **__restrict __result),(__name,__result_buf,__buffer,__buflen,__result))
-#endif /* __CRT_HAVE_getaliasbyname_r */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC_KOS,getaliasbyname_r,(char const *__restrict __name, struct aliasent *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct aliasent **__restrict __result),(__name,__result_buf,__buffer,__buflen,__result))
 #endif /* __CC__ */
 
 __SYSDECL_END

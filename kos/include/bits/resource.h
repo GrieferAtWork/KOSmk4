@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb370d56 */
+/* HASH CRC-32:0xf0923d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -256,9 +256,7 @@ typedef enum __rlimit_resource __rlimit_resource_t;
 typedef int __rlimit_resource_t;
 #endif /* !__COMPILER_PREFERR_ENUMS */
 
-#ifdef __CRT_HAVE_prlimit
-__CDECLARE(,int,__NOTHROW_NCX,prlimit,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit const *__new_limit, struct rlimit *__old_limit),(__pid,__resource,__new_limit,__old_limit))
-#endif /* __CRT_HAVE_prlimit */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,prlimit,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit const *__new_limit, struct rlimit *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_prlimit64
 __CDECLARE(,int,__NOTHROW_NCX,prlimit64,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))

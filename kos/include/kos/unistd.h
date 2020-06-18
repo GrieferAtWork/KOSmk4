@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa4d2298 */
+/* HASH CRC-32:0x3cc50494 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,24 +47,18 @@ typedef __pos64_t pos64_t; /* File/device position */
 #endif /* !__pos64_t_defined */
 #endif /* __USE_LARGEFILE64 */
 
-#ifdef __CRT_HAVE_Execv
 /* >> execv(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),__THROWING,Execv,(char const *__restrict __path, __TARGV),(__path,___argv))
-#endif /* __CRT_HAVE_Execv */
-#ifdef __CRT_HAVE_Execve
+__CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),__THROWING,Execv,(char const *__restrict __path, __TARGV),(__path,___argv))
 /* >> execve(2)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,Execve,(char const *__restrict __path, __TARGV, __TENVP),(__path,___argv,___envp))
-#endif /* __CRT_HAVE_Execve */
-#ifdef __CRT_HAVE_Execvp
+__CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,Execve,(char const *__restrict __path, __TARGV, __TENVP),(__path,___argv,___envp))
 /* >> execvp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),__THROWING,Execvp,(char const *__restrict __file, __TARGV),(__file,___argv))
-#endif /* __CRT_HAVE_Execvp */
+__CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),__THROWING,Execvp,(char const *__restrict __file, __TARGV),(__file,___argv))
 #ifdef __CRT_HAVE_Execl
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -134,11 +128,9 @@ __NAMESPACE_LOCAL_USING(Execlpe)
 #endif /* !__cplusplus */
 #endif /* ... */
 
-#ifdef __CRT_HAVE_Pipe
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Pipe,(__fd_t __pipedes[2]),(__pipedes))
-#endif /* __CRT_HAVE_Pipe */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Pipe,(__fd_t __pipedes[2]),(__pipedes))
 
 #ifdef __CRT_HAVE_FSync
 /* >> fsync(2)
@@ -158,17 +150,14 @@ __CREDIRECT_VOID(,__THROWING,FSync,(__fd_t __fd),FDataSync,(__fd))
 __NAMESPACE_LOCAL_USING_OR_IMPL(FSync, __FORCELOCAL void (__LIBCCALL FSync)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FSync))(__fd); })
 #endif /* !... */
 
-#ifdef __CRT_HAVE_SetPGid
 /* >> setpgid(2)
  * Change the ID of the process group associated with `PID's process.
  * (That is the TID of the leader of the process group of `PID's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
  * When `PID' is ZERO(0), use `gettid()' for it instead.
  * When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead */
-__CDECLARE_VOID(,__THROWING,SetPGid,(__pid_t __pid, __pid_t __pgid),(__pid,__pgid))
-#endif /* __CRT_HAVE_SetPGid */
+__CDECLARE_VOID_OPT(,__THROWING,SetPGid,(__pid_t __pid, __pid_t __pgid),(__pid,__pgid))
 
-#ifdef __CRT_HAVE_SetSid
 /* >> setsid(2)
  * Make the calling thread's process the leader of its associated
  * process group, before also making it its own session leader.
@@ -176,28 +165,22 @@ __CDECLARE_VOID(,__THROWING,SetPGid,(__pid_t __pid, __pid_t __pgid),(__pid,__pgi
  *  - THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
  *  - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
  *  - return THIS_THREAD->LEADER->PID; */
-__CDECLARE(,__pid_t,__THROWING,SetSid,(void),())
-#endif /* __CRT_HAVE_SetSid */
+__CDECLARE_OPT(,__pid_t,__THROWING,SetSid,(void),())
 
-#ifdef __CRT_HAVE_SetUid
 /* >> setuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `UID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
-__CDECLARE_VOID(,__THROWING,SetUid,(__uid_t __uid),(__uid))
-#endif /* __CRT_HAVE_SetUid */
+__CDECLARE_VOID_OPT(,__THROWING,SetUid,(__uid_t __uid),(__uid))
 
-#ifdef __CRT_HAVE_SetGid
 /* >> setgid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `GID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
-__CDECLARE_VOID(,__THROWING,SetGid,(__gid_t __gid),(__gid))
-#endif /* __CRT_HAVE_SetGid */
+__CDECLARE_VOID_OPT(,__THROWING,SetGid,(__gid_t __gid),(__gid))
 
-#ifdef __CRT_HAVE_Fork
 /* >> fork(2)
  * Clone the calling thread into a second process and return twice, once
  * in the parent process where this function returns the (non-zero) PID
@@ -206,18 +189,15 @@ __CDECLARE_VOID(,__THROWING,SetGid,(__gid_t __gid),(__gid))
  * The child then usually proceeds by calling `exec(2)' to replace its
  * application image with that of another program that the original
  * parent can then `wait(2)' for */
-__CDECLARE(__ATTR_WUNUSED,__pid_t,__THROWING,Fork,(void),())
-#endif /* __CRT_HAVE_Fork */
+__CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,Fork,(void),())
 
-#ifdef __CRT_HAVE_FPathConf
 /* >> fpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__CDECLARE(__ATTR_WUNUSED,long int,__THROWING,FPathConf,(__fd_t __fd, int __name),(__fd,__name))
-#endif /* __CRT_HAVE_FPathConf */
+__CDECLARE_OPT(__ATTR_WUNUSED,long int,__THROWING,FPathConf,(__fd_t __fd, int __name),(__fd,__name))
 
 #ifdef __CRT_HAVE_Chown
 /* >> chown(2)
@@ -230,15 +210,13 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Chown,(char const *__file, __uid_
 __NAMESPACE_LOCAL_USING_OR_IMPL(Chown, __FORCELOCAL __ATTR_NONNULL((1)) void (__LIBCCALL Chown)(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Chown))(__file, __owner, __group); })
 #endif /* ... */
 
-#ifdef __CRT_HAVE_PathConf
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__CDECLARE(__ATTR_NONNULL((1)),long int,__THROWING,PathConf,(char const *__path, int __name),(__path,__name))
-#endif /* __CRT_HAVE_PathConf */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),long int,__THROWING,PathConf,(char const *__path, int __name),(__path,__name))
 
 #ifdef __CRT_HAVE_Link
 /* >> link(2)
@@ -251,18 +229,14 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Link,(char const *__from, char
 __NAMESPACE_LOCAL_USING_OR_IMPL(Link, __FORCELOCAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL Link)(char const *__from, char const *__to) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Link))(__from, __to); })
 #endif /* ... */
 
-#ifdef __CRT_HAVE_Read
 /* >> read(2)
  * Read data from a given file descriptor `FD' and return the number of bytes read.
  * A return value of ZERO(0) is indicative of EOF */
-__CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,Read,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
-#endif /* __CRT_HAVE_Read */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Read,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 
-#ifdef __CRT_HAVE_Write
 /* >> write(2)
  * Write data to a given file descriptor `FD' and return the number of bytes written */
-__CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,Write,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
-#endif /* __CRT_HAVE_Write */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Write,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_ReadAll
@@ -302,31 +276,23 @@ __CDECLARE(,__FS_TYPE(pos),__THROWING,LSeek,(__fd_t __fd, __FS_TYPE(off) __offse
 __NAMESPACE_LOCAL_USING_OR_IMPL(LSeek, __FORCELOCAL __FS_TYPE(pos) (__LIBCCALL LSeek)(__fd_t __fd, __FS_TYPE(off) __offset, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LSeek))(__fd, __offset, __whence); })
 #endif /* ... */
 
-#ifdef __CRT_HAVE_Dup2
 /* >> dup2(2)
  * @return: NEWFD: Returns the new handle upon success.
  * Duplicate a file referred to by `OLDFD' into `NEWFD' */
-__CDECLARE(,__fd_t,__THROWING,Dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,__newfd))
-#endif /* __CRT_HAVE_Dup2 */
+__CDECLARE_OPT(,__fd_t,__THROWING,Dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,__newfd))
 
-#ifdef __CRT_HAVE_Dup
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `FD' and return its duplicated handle number */
-__CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,Dup,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE_Dup */
+__CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,Dup,(__fd_t __fd),(__fd))
 
-#ifdef __CRT_HAVE_Chdir
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Chdir,(char const *__path),(__path))
-#endif /* __CRT_HAVE_Chdir */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Chdir,(char const *__path),(__path))
 
-#ifdef __CRT_HAVE_GetCwd
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-__CDECLARE(,char *,__THROWING,GetCwd,(char *__buf, size_t __bufsize),(__buf,__bufsize))
-#endif /* __CRT_HAVE_GetCwd */
+__CDECLARE_OPT(,char *,__THROWING,GetCwd,(char *__buf, size_t __bufsize),(__buf,__bufsize))
 
 #ifdef __CRT_HAVE_Unlink
 /* >> unlink(2)
@@ -352,26 +318,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Rmdir, __FORCELOCAL __ATTR_NONNULL((1)) void (__
 
 #ifdef __USE_ATFILE
 
-#ifdef __CRT_HAVE_FChownAt
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
-__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,FChownAt,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
-#endif /* __CRT_HAVE_FChownAt */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,FChownAt,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
 
-#ifdef __CRT_HAVE_LinkAt
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
-__CDECLARE_VOID(__ATTR_NONNULL((2, 4)),__THROWING,LinkAt,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
-#endif /* __CRT_HAVE_LinkAt */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((2, 4)),__THROWING,LinkAt,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
 
-#ifdef __CRT_HAVE_SymlinkAt
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
-__CDECLARE_VOID(__ATTR_NONNULL((1, 3)),__THROWING,SymlinkAt,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path))
-#endif /* __CRT_HAVE_SymlinkAt */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1, 3)),__THROWING,SymlinkAt,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path))
 
-#ifdef __CRT_HAVE_ReadlinkAt
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -380,23 +339,18 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 3)),__THROWING,SymlinkAt,(char const *__link_
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__CDECLARE(__ATTR_NONNULL((2, 3)),size_t,__THROWING,ReadlinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
-#endif /* __CRT_HAVE_ReadlinkAt */
+__CDECLARE_OPT(__ATTR_NONNULL((2, 3)),size_t,__THROWING,ReadlinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
 
 #ifdef __USE_KOS
-#ifdef __CRT_HAVE_FReadlinkAt
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
-__CDECLARE(__ATTR_NONNULL((2, 3)),size_t,__THROWING,FReadlinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
-#endif /* __CRT_HAVE_FReadlinkAt */
+__CDECLARE_OPT(__ATTR_NONNULL((2, 3)),size_t,__THROWING,FReadlinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
 #endif /* __USE_KOS */
 
-#ifdef __CRT_HAVE_UnlinkAt
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),(__dfd,__name,__flags))
-#endif /* __CRT_HAVE_UnlinkAt */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),(__dfd,__name,__flags))
 #endif /* __USE_ATFILE */
 
 
@@ -517,12 +471,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(PReadAll64, __FORCELOCAL __ATTR_NONNULL((2)) siz
 
 
 #ifdef __USE_GNU
-#ifdef __CRT_HAVE_Pipe2
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Pipe2,(__fd_t __pipedes[2], __oflag_t __flags),(__pipedes,__flags))
-#endif /* __CRT_HAVE_Pipe2 */
-#ifdef __CRT_HAVE_Dup3
-__CDECLARE(,__fd_t,__THROWING,Dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags))
-#endif /* __CRT_HAVE_Dup3 */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Pipe2,(__fd_t __pipedes[2], __oflag_t __flags),(__pipedes,__flags))
+__CDECLARE_OPT(,__fd_t,__THROWING,Dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags))
 #ifdef __CRT_HAVE_GetCurrentDirName
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__THROWING,GetCurrentDirName,(void),())
 #elif defined(__CRT_HAVE_GetCwd)
@@ -535,56 +485,38 @@ __CDECLARE_VOID(,__THROWING,SyncFs,(__fd_t __fd),(__fd))
 #include <local/kos.unistd/SyncFs.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(SyncFs, __FORCELOCAL void (__LIBCCALL SyncFs)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(SyncFs))(__fd); })
 #endif /* !__CRT_HAVE_SyncFs */
-#ifdef __CRT_HAVE_GetResUid
-__CDECLARE_VOID(,__NOTHROW_NCX,GetResUid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
-#endif /* __CRT_HAVE_GetResUid */
-#ifdef __CRT_HAVE_GetResGid
-__CDECLARE_VOID(,__NOTHROW_NCX,GetResGid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
-#endif /* __CRT_HAVE_GetResGid */
-#ifdef __CRT_HAVE_SetResUid
-__CDECLARE_VOID(,__NOTHROW_NCX,SetResUid,(__uid_t __ruid, __uid_t __euid, __uid_t __suid),(__ruid,__euid,__suid))
-#endif /* __CRT_HAVE_SetResUid */
-#ifdef __CRT_HAVE_SetResGid
-__CDECLARE_VOID(,__NOTHROW_NCX,SetResGid,(__gid_t __rgid, __gid_t __egid, __gid_t __sgid),(__rgid,__egid,__sgid))
-#endif /* __CRT_HAVE_SetResGid */
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,GetResUid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,GetResGid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,SetResUid,(__uid_t __ruid, __uid_t __euid, __uid_t __suid),(__ruid,__euid,__suid))
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,SetResGid,(__gid_t __rgid, __gid_t __egid, __gid_t __sgid),(__rgid,__egid,__sgid))
 #endif /* __USE_GNU */
 #if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)) || \
      defined(__USE_MISC)
-#ifdef __CRT_HAVE_VFork
 /* >> vfork(2)
  * Same as `fork(2)', but possibly suspend the calling process until the
  * child process either calls `exit(2)' or one of the many `exec(2)' functions */
-__CDECLARE(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__THROWING,VFork,(void),())
-#endif /* __CRT_HAVE_VFork */
+__CDECLARE_OPT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__THROWING,VFork,(void),())
 #endif
 
-#ifdef __CRT_HAVE_FChown
 /* >> fchown(2)
  * Change the ownership of a given `FD' to `GROUP:OWNER' */
-__CDECLARE_VOID(,__THROWING,FChown,(__fd_t __fd, __uid_t __owner, __gid_t __group),(__fd,__owner,__group))
-#endif /* __CRT_HAVE_FChown */
+__CDECLARE_VOID_OPT(,__THROWING,FChown,(__fd_t __fd, __uid_t __owner, __gid_t __group),(__fd,__owner,__group))
 
-#ifdef __CRT_HAVE_FChdir
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
-__CDECLARE_VOID(,__THROWING,FChdir,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE_FChdir */
+__CDECLARE_VOID_OPT(,__THROWING,FChdir,(__fd_t __fd),(__fd))
 
-#ifdef __CRT_HAVE_GetPGid
 /* >> getpgid(2)
  * Return the ID of the process group associated with `PID's process.
  * (That is the TID of the leader of the process group of `PID's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `PID' is ZERO(0), use `gettid()' for it instead */
-__CDECLARE(__ATTR_WUNUSED,__pid_t,__THROWING,GetPGid,(__pid_t __pid),(__pid))
-#endif /* __CRT_HAVE_GetPGid */
+__CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,GetPGid,(__pid_t __pid),(__pid))
 
-#ifdef __CRT_HAVE_GetSid
 /* >> getsid(2)
  * Return the ID of the session which a process `PID' is apart of.
  * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
-__CDECLARE(__ATTR_WUNUSED,__pid_t,__THROWING,GetSid,(__pid_t __pid),(__pid))
-#endif /* __CRT_HAVE_GetSid */
+__CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,GetSid,(__pid_t __pid),(__pid))
 
 #ifdef __CRT_HAVE_LChown
 /* >> lchown(2)
@@ -649,12 +581,10 @@ __CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((2, 3)),__THROWING,FExecve,(__fd_
 #endif /* !__FExecve_defined */
 #endif /* __USE_XOPEN2K8 */
 #ifdef __USE_GNU
-#ifdef __CRT_HAVE_Execvpe
 /* >> execvpe(3)
  * Replace the calling process with the application image referred to by `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,Execvpe,(char const *__restrict __file, __TARGV, __TENVP),(__file,___argv,___envp))
-#endif /* __CRT_HAVE_Execvpe */
+__CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,Execvpe,(char const *__restrict __file, __TARGV, __TENVP),(__file,___argv,___envp))
 #endif /* __USE_GNU */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
@@ -667,37 +597,27 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Nice, __FORCELOCAL int (__LIBCCALL Nice)(int __i
 #endif /* __USE_MISC || __USE_XOPEN */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-#ifdef __CRT_HAVE_SetPGrp
 /* >> setpgrp(3)
  * Move the calling process into its own process group.
  * Equivalent to `setpgid(0, 0)' */
-__CDECLARE_VOID(,__THROWING,SetPGrp,(void),())
-#endif /* __CRT_HAVE_SetPGrp */
-#ifdef __CRT_HAVE_SetReUid
-__CDECLARE_VOID(,__THROWING,SetReUid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
-#endif /* __CRT_HAVE_SetReUid */
-#ifdef __CRT_HAVE_SetReGid
-__CDECLARE_VOID(,__THROWING,SetReGid,(__gid_t __rgid, __gid_t __egid),(__rgid,__egid))
-#endif /* __CRT_HAVE_SetReGid */
+__CDECLARE_VOID_OPT(,__THROWING,SetPGrp,(void),())
+__CDECLARE_VOID_OPT(,__THROWING,SetReUid,(__uid_t __ruid, __uid_t __euid),(__ruid,__euid))
+__CDECLARE_VOID_OPT(,__THROWING,SetReGid,(__gid_t __rgid, __gid_t __egid),(__rgid,__egid))
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_XOPEN2K
-#ifdef __CRT_HAVE_SetEUid
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `EUID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
-__CDECLARE_VOID(,__THROWING,SetEUid,(__uid_t __euid),(__euid))
-#endif /* __CRT_HAVE_SetEUid */
-#ifdef __CRT_HAVE_SetEGid
+__CDECLARE_VOID_OPT(,__THROWING,SetEUid,(__uid_t __euid),(__euid))
 /* >> setegid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `EGID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
-__CDECLARE_VOID(,__THROWING,SetEGid,(__gid_t __egid),(__egid))
-#endif /* __CRT_HAVE_SetEGid */
+__CDECLARE_VOID_OPT(,__THROWING,SetEGid,(__gid_t __egid),(__egid))
 #endif /* __USE_XOPEN2K */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
@@ -743,32 +663,24 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Readlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) si
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
-#ifdef __CRT_HAVE_GetHostName
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,GetHostName,(char *__name, size_t __buflen),(__name,__buflen))
-#endif /* __CRT_HAVE_GetHostName */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,GetHostName,(char *__name, size_t __buflen),(__name,__buflen))
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 #ifdef __USE_MISC
 
-#ifdef __CRT_HAVE_SetHostName
 /* >> sethostname(2)
  * Set the name of the hosting machine */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,SetHostName,(char const *__name, size_t __len),(__name,__len))
-#endif /* __CRT_HAVE_SetHostName */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,SetHostName,(char const *__name, size_t __len),(__name,__len))
 
-#ifdef __CRT_HAVE_GetDomainName
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,GetDomainName,(char *__name, size_t __buflen),(__name,__buflen))
-#endif /* __CRT_HAVE_GetDomainName */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,GetDomainName,(char *__name, size_t __buflen),(__name,__buflen))
 
-#ifdef __CRT_HAVE_SetDomainName
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,SetDomainName,(char const *__name, size_t __len),(__name,__len))
-#endif /* __CRT_HAVE_SetDomainName */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,SetDomainName,(char const *__name, size_t __len),(__name,__len))
 #ifdef __CRT_HAVE_Syscall
 __LIBC __syscall_slong_t (__VLIBCCALL Syscall)(__syscall_ulong_t __sysno, ...) __THROWS(...) __CASMNAME_SAME("Syscall");
 #endif /* __CRT_HAVE_Syscall */
@@ -783,12 +695,10 @@ __LIBC __LONG64_TYPE__ (__VLIBCCALL Syscall64)(__syscall_ulong_t __sysno, ...) _
 
 #if defined(__USE_MISC) || \
    (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
-#ifdef __CRT_HAVE_ChRoot
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,ChRoot,(char const *__restrict __path),(__path))
-#endif /* __CRT_HAVE_ChRoot */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,ChRoot,(char const *__restrict __path),(__path))
 #endif /* ... */
 
 #if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)

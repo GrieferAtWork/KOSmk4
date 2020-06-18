@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25e7933a */
+/* HASH CRC-32:0xb1a534d4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,18 +84,10 @@ struct ttyent {
 	char           *ty_comment; /* comment field */
 };
 
-#ifdef __CRT_HAVE_getttyent
-__CDECLARE(,struct ttyent *,__NOTHROW_RPC_KOS,getttyent,(void),())
-#endif /* __CRT_HAVE_getttyent */
-#ifdef __CRT_HAVE_getttynam
-__CDECLARE(__ATTR_NONNULL((1)),struct ttyent *,__NOTHROW_RPC_KOS,getttynam,(char const *__tty),(__tty))
-#endif /* __CRT_HAVE_getttynam */
-#ifdef __CRT_HAVE_setttyent
-__CDECLARE(,int,__NOTHROW_RPC_KOS,setttyent,(void),())
-#endif /* __CRT_HAVE_setttyent */
-#ifdef __CRT_HAVE_endttyent
-__CDECLARE(,int,__NOTHROW_NCX,endttyent,(void),())
-#endif /* __CRT_HAVE_endttyent */
+__CDECLARE_OPT(,struct ttyent *,__NOTHROW_RPC_KOS,getttyent,(void),())
+__CDECLARE_OPT(__ATTR_NONNULL((1)),struct ttyent *,__NOTHROW_RPC_KOS,getttynam,(char const *__tty),(__tty))
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,setttyent,(void),())
+__CDECLARE_OPT(,int,__NOTHROW_NCX,endttyent,(void),())
 #endif /* __CC__ */
 
 __SYSDECL_END

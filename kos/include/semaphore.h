@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9db8d63e */
+/* HASH CRC-32:0xd826b79a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,31 +58,21 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
-#ifdef __CRT_HAVE_sem_init
 /* Initialize semaphore object SEM to VALUE.
  * If PSHARED then share it with other processes */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_init,(sem_t *__sem, int __pshared, unsigned int __value),(__sem,__pshared,__value))
-#endif /* __CRT_HAVE_sem_init */
-#ifdef __CRT_HAVE_sem_destroy
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_init,(sem_t *__sem, int __pshared, unsigned int __value),(__sem,__pshared,__value))
 /* Free resources associated with semaphore object SEM */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_destroy,(sem_t *__sem),(__sem))
-#endif /* __CRT_HAVE_sem_destroy */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_destroy,(sem_t *__sem),(__sem))
 #ifdef __CRT_HAVE_sem_open
 /* Open a named semaphore NAME with open flags OFLAGS */
 __LIBC __ATTR_NONNULL((1)) sem_t *__NOTHROW_RPC_KOS(__VLIBCCALL sem_open)(char const *__name, __oflag_t __oflags, ...) __CASMNAME_SAME("sem_open");
 #endif /* __CRT_HAVE_sem_open */
-#ifdef __CRT_HAVE_sem_close
 /* Close descriptor for named semaphore SEM */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_close,(sem_t *__sem),(__sem))
-#endif /* __CRT_HAVE_sem_close */
-#ifdef __CRT_HAVE_sem_unlink
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_close,(sem_t *__sem),(__sem))
 /* Remove named semaphore NAME */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,sem_unlink,(const char *__name),(__name))
-#endif /* __CRT_HAVE_sem_unlink */
-#ifdef __CRT_HAVE_sem_wait
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,sem_unlink,(const char *__name),(__name))
 /* Wait for SEM being posted */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sem_wait,(sem_t *__sem),(__sem))
-#endif /* __CRT_HAVE_sem_wait */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sem_wait,(sem_t *__sem),(__sem))
 
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_sem_timedwait) && !defined(__USE_TIME_BITS64)
@@ -108,18 +98,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sem_timedwait64, __FORCELOCAL __ATTR_NONNULL((1,
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
-#ifdef __CRT_HAVE_sem_trywait
 /* Test whether SEM is posted */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_trywait,(sem_t *__sem),(__sem))
-#endif /* __CRT_HAVE_sem_trywait */
-#ifdef __CRT_HAVE_sem_post
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_trywait,(sem_t *__sem),(__sem))
 /* Post SEM */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_post,(sem_t *__sem),(__sem))
-#endif /* __CRT_HAVE_sem_post */
-#ifdef __CRT_HAVE_sem_getvalue
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_post,(sem_t *__sem),(__sem))
 /* Get current value of SEM and store it in *SVAL */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sem_getvalue,(sem_t *__restrict __sem, int *__restrict __sval),(__sem,__sval))
-#endif /* __CRT_HAVE_sem_getvalue */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sem_getvalue,(sem_t *__restrict __sem, int *__restrict __sval),(__sem,__sval))
 #endif /* __CC__ */
 
 __SYSDECL_END

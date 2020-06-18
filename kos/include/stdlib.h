@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73212ea */
+/* HASH CRC-32:0xe3d3995e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -600,9 +600,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __float128 __NOTHROW(__LIBCCALL abs)(__
 #endif /* __COMPILER_HAVE_FLOAT128 */
 } /* extern "C++" */
 #endif /* __cplusplus && __CORRECT_ISO_CPP_MATH_H_PROTO && !__NO_FPU */
-#ifdef __CRT_HAVE_getenv
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,getenv,(char const *__varname),(__varname))
-#endif /* __CRT_HAVE_getenv */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,getenv,(char const *__varname),(__varname))
 #ifdef __CRT_HAVE_mblen
 __CDECLARE(,int,__NOTHROW_NCX,mblen,(char const *__str, size_t __maxlen),(__str,__maxlen))
 #else /* __CRT_HAVE_mblen */
@@ -1415,34 +1413,16 @@ struct drand48_data {
 	__ULONGLONG    __a;
 };
 #ifndef __NO_FPU
-#ifdef __CRT_HAVE_drand48_r
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,drand48_r,(struct drand48_data *__restrict __buffer, double *__restrict __result),(__buffer,__result))
-#endif /* __CRT_HAVE_drand48_r */
-#ifdef __CRT_HAVE_erand48_r
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,erand48_r,(unsigned short __xsubi[3], struct drand48_data *__restrict __buffer, double *__restrict __result),(__xsubi,__buffer,__result))
-#endif /* __CRT_HAVE_erand48_r */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,drand48_r,(struct drand48_data *__restrict __buffer, double *__restrict __result),(__buffer,__result))
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,erand48_r,(unsigned short __xsubi[3], struct drand48_data *__restrict __buffer, double *__restrict __result),(__xsubi,__buffer,__result))
 #endif /* !__NO_FPU */
-#ifdef __CRT_HAVE_lrand48_r
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lrand48_r,(struct drand48_data *__restrict __buffer, long *__restrict __result),(__buffer,__result))
-#endif /* __CRT_HAVE_lrand48_r */
-#ifdef __CRT_HAVE_nrand48_r
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,nrand48_r,(unsigned short __xsubi[3], struct drand48_data *__restrict __buffer, long *__restrict __result),(__xsubi,__buffer,__result))
-#endif /* __CRT_HAVE_nrand48_r */
-#ifdef __CRT_HAVE_mrand48_r
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,mrand48_r,(struct drand48_data *__restrict __buffer, long *__restrict __result),(__buffer,__result))
-#endif /* __CRT_HAVE_mrand48_r */
-#ifdef __CRT_HAVE_jrand48_r
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,jrand48_r,(unsigned short __xsubi[3], struct drand48_data *__restrict __buffer, long *__restrict __result),(__xsubi,__buffer,__result))
-#endif /* __CRT_HAVE_jrand48_r */
-#ifdef __CRT_HAVE_srand48_r
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,srand48_r,(long __seedval, struct drand48_data *__buffer),(__seedval,__buffer))
-#endif /* __CRT_HAVE_srand48_r */
-#ifdef __CRT_HAVE_seed48_r
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,seed48_r,(unsigned short __seed16v[3], struct drand48_data *__buffer),(__seed16v,__buffer))
-#endif /* __CRT_HAVE_seed48_r */
-#ifdef __CRT_HAVE_lcong48_r
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lcong48_r,(unsigned short __param[7], struct drand48_data *__buffer),(__param,__buffer))
-#endif /* __CRT_HAVE_lcong48_r */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lrand48_r,(struct drand48_data *__restrict __buffer, long *__restrict __result),(__buffer,__result))
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,nrand48_r,(unsigned short __xsubi[3], struct drand48_data *__restrict __buffer, long *__restrict __result),(__xsubi,__buffer,__result))
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,mrand48_r,(struct drand48_data *__restrict __buffer, long *__restrict __result),(__buffer,__result))
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,jrand48_r,(unsigned short __xsubi[3], struct drand48_data *__restrict __buffer, long *__restrict __result),(__xsubi,__buffer,__result))
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,srand48_r,(long __seedval, struct drand48_data *__buffer),(__seedval,__buffer))
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,seed48_r,(unsigned short __seed16v[3], struct drand48_data *__buffer),(__seed16v,__buffer))
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lcong48_r,(unsigned short __param[7], struct drand48_data *__buffer),(__param,__buffer))
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("fptr")
 #pragma push_macro("rptr")
@@ -1477,33 +1457,19 @@ struct random_data {
 #pragma pop_macro("rptr")
 #pragma pop_macro("fptr")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#ifdef __CRT_HAVE_random_r
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,random_r,(struct random_data *__restrict __buf, __INT32_TYPE__ *__restrict __result),(__buf,__result))
-#endif /* __CRT_HAVE_random_r */
-#ifdef __CRT_HAVE_srandom_r
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,srandom_r,(unsigned int __seed, struct random_data *__buf),(__seed,__buf))
-#endif /* __CRT_HAVE_srandom_r */
-#ifdef __CRT_HAVE_initstate_r
-__CDECLARE(__ATTR_NONNULL((2, 4)),int,__NOTHROW_NCX,initstate_r,(unsigned int __seed, char *__restrict __statebuf, __SIZE_TYPE__ __statelen, struct random_data *__restrict __buf),(__seed,__statebuf,__statelen,__buf))
-#endif /* __CRT_HAVE_initstate_r */
-#ifdef __CRT_HAVE_setstate_r
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,setstate_r,(char *__restrict __statebuf, struct random_data *__restrict __buf),(__statebuf,__buf))
-#endif /* __CRT_HAVE_setstate_r */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,random_r,(struct random_data *__restrict __buf, __INT32_TYPE__ *__restrict __result),(__buf,__result))
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,srandom_r,(unsigned int __seed, struct random_data *__buf),(__seed,__buf))
+__CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_NCX,initstate_r,(unsigned int __seed, char *__restrict __statebuf, __SIZE_TYPE__ __statelen, struct random_data *__restrict __buf),(__seed,__statebuf,__statelen,__buf))
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,setstate_r,(char *__restrict __statebuf, struct random_data *__restrict __buf),(__statebuf,__buf))
 typedef void (__LIBCCALL *__on_exit_func_t)(int __status, void *__arg);
-#ifdef __CRT_HAVE_on_exit
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,on_exit,(__on_exit_func_t __func, void *__arg),(__func,__arg))
-#endif /* __CRT_HAVE_on_exit */
-#ifdef __CRT_HAVE_clearenv
-__CDECLARE(,int,__NOTHROW_NCX,clearenv,(void),())
-#endif /* __CRT_HAVE_clearenv */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,on_exit,(__on_exit_func_t __func, void *__arg),(__func,__arg))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,clearenv,(void),())
 #if defined(__CRT_HAVE_mkstemps64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemps,(char *__template_, int __suffixlen),mkstemps64,(__template_,__suffixlen))
 #elif defined(__CRT_HAVE_mkstemps)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemps,(char *__template_, int __suffixlen),(__template_,__suffixlen))
 #endif /* ... */
-#ifdef __CRT_HAVE_rpmatch
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,rpmatch,(char const *__response),(__response))
-#endif /* __CRT_HAVE_rpmatch */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,rpmatch,(char const *__response),(__response))
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_mkstemps64
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemps64,(char *__template_, int __suffixlen),(__template_,__suffixlen))
@@ -1538,9 +1504,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,cfree,(void *__mallptr),(__mallptr))
 #endif /* !... */
 #endif /* !__cfree_defined */
 #ifndef __NO_FPU
-#ifdef __CRT_HAVE_getloadavg
-__CDECLARE(,int,__NOTHROW_RPC,getloadavg,(double __loadavg[], int __nelem),(__loadavg,__nelem))
-#endif /* __CRT_HAVE_getloadavg */
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getloadavg,(double __loadavg[], int __nelem),(__loadavg,__nelem))
 #endif /* !__NO_FPU */
 #endif /* __USE_MISC */
 
@@ -1618,36 +1582,18 @@ __CDECLARE(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW,__ctype_get_mb_cur_max,(void),
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifndef __NO_FPU
-#ifdef __CRT_HAVE_drand48
-__CDECLARE(,double,__NOTHROW_NCX,drand48,(void),())
-#endif /* __CRT_HAVE_drand48 */
+__CDECLARE_OPT(,double,__NOTHROW_NCX,drand48,(void),())
 #endif /* !__NO_FPU */
-#ifdef __CRT_HAVE_lrand48
-__CDECLARE(,long,__NOTHROW_NCX,lrand48,(void),())
-#endif /* __CRT_HAVE_lrand48 */
-#ifdef __CRT_HAVE_mrand48
-__CDECLARE(,long,__NOTHROW_NCX,mrand48,(void),())
-#endif /* __CRT_HAVE_mrand48 */
+__CDECLARE_OPT(,long,__NOTHROW_NCX,lrand48,(void),())
+__CDECLARE_OPT(,long,__NOTHROW_NCX,mrand48,(void),())
 #ifndef __NO_FPU
-#ifdef __CRT_HAVE_erand48
-__CDECLARE(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,erand48,(unsigned short __xsubi[3]),(__xsubi))
-#endif /* __CRT_HAVE_erand48 */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,erand48,(unsigned short __xsubi[3]),(__xsubi))
 #endif /* !__NO_FPU */
-#ifdef __CRT_HAVE_nrand48
-__CDECLARE(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,nrand48,(unsigned short __xsubi[3]),(__xsubi))
-#endif /* __CRT_HAVE_nrand48 */
-#ifdef __CRT_HAVE_jrand48
-__CDECLARE(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,jrand48,(unsigned short __xsubi[3]),(__xsubi))
-#endif /* __CRT_HAVE_jrand48 */
-#ifdef __CRT_HAVE_srand48
-__CDECLARE_VOID(,__NOTHROW_NCX,srand48,(long __seedval),(__seedval))
-#endif /* __CRT_HAVE_srand48 */
-#ifdef __CRT_HAVE_seed48
-__CDECLARE(__ATTR_NONNULL((1)),unsigned short *,__NOTHROW_NCX,seed48,(unsigned short __seed16v[3]),(__seed16v))
-#endif /* __CRT_HAVE_seed48 */
-#ifdef __CRT_HAVE_lcong48
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,lcong48,(unsigned short __param[7]),(__param))
-#endif /* __CRT_HAVE_lcong48 */
+__CDECLARE_OPT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,nrand48,(unsigned short __xsubi[3]),(__xsubi))
+__CDECLARE_OPT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,jrand48,(unsigned short __xsubi[3]),(__xsubi))
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,srand48,(long __seedval),(__seedval))
+__CDECLARE_OPT(__ATTR_NONNULL((1)),unsigned short *,__NOTHROW_NCX,seed48,(unsigned short __seed16v[3]),(__seed16v))
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,lcong48,(unsigned short __param[7]),(__param))
 #endif /* __USE_MISC || __USE_XOPEN */
 #if defined(__USE_MISC) || defined(__USE_XOPEN) || defined(__USE_DOS)
 #ifdef __CRT_HAVE_putenv
@@ -1673,27 +1619,17 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,srandom,(unsigned int __seed),srand,(__seed))
 #include <local/stdlib/srandom.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(srandom, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL srandom)(unsigned int __seed) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(srandom))(__seed); })
 #endif /* !... */
-#ifdef __CRT_HAVE_initstate
-__CDECLARE(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,initstate,(unsigned int __seed, char *__statebuf, __SIZE_TYPE__ __statelen),(__seed,__statebuf,__statelen))
-#endif /* __CRT_HAVE_initstate */
-#ifdef __CRT_HAVE_setstate
-__CDECLARE(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,setstate,(char *__statebuf),(__statebuf))
-#endif /* __CRT_HAVE_setstate */
-#ifdef __CRT_HAVE_l64a
-__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,l64a,(long __n),(__n))
-#endif /* __CRT_HAVE_l64a */
-#ifdef __CRT_HAVE_a64l
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,a64l,(char const *__s),(__s))
-#endif /* __CRT_HAVE_a64l */
-#ifdef __CRT_HAVE_realpath
+__CDECLARE_OPT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,initstate,(unsigned int __seed, char *__statebuf, __SIZE_TYPE__ __statelen),(__seed,__statebuf,__statelen))
+__CDECLARE_OPT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,setstate,(char *__statebuf),(__statebuf))
+__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_NCX,l64a,(long __n),(__n))
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,a64l,(char const *__s),(__s))
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink()', but will also function for
  * non-symlink paths, as well as always return an absolute (unambiguous) path
  * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
  *                   path, or NULL to automatically `malloc()'ate and return a
  *                   buffer of sufficient size. */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,realpath,(char const *__restrict __filename, char *__resolved),(__filename,__resolved))
-#endif /* __CRT_HAVE_realpath */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,realpath,(char const *__restrict __filename, char *__resolved),(__filename,__resolved))
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS)
@@ -1701,27 +1637,22 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,realpath,(cha
  *       but it seems to be something that GLibc isn't implementing for some reason...
  *       Because of that, I didn't really know where to put this, so I put it in the
  *       same _SOURCE-block as its `realpath()' companion. */
-#ifdef __CRT_HAVE_frealpath
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
  *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen),(__fd,__resolved,__buflen))
-#endif /* __CRT_HAVE_frealpath */
+__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen),(__fd,__resolved,__buflen))
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 #ifdef __USE_KOS
-#ifdef __CRT_HAVE_frealpath4
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * @param flags: Set of `0|AT_ALTPATH|AT_DOSPATH'
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
  *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath4,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),(__fd,__resolved,__buflen,__flags))
-#endif /* __CRT_HAVE_frealpath4 */
-#ifdef __CRT_HAVE_frealpathat
+__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath4,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),(__fd,__resolved,__buflen,__flags))
 /* Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_FOLLOW' is given, a final symlink is dereferenced,
  * causing the pointed-to file location to be retrieved. - Otherwise, the
@@ -1730,8 +1661,7 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath4,(__fd_t __fd, char *__
  *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size.
  * @param flags: Set of `0|AT_ALTPATH|AT_SYMLINK_FOLLOW|AT_DOSPATH' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,frealpathat,(__fd_t __dirfd, char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),(__dirfd,__filename,__resolved,__buflen,__flags))
-#endif /* __CRT_HAVE_frealpathat */
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,frealpathat,(__fd_t __dirfd, char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),(__dirfd,__filename,__resolved,__buflen,__flags))
 #endif /* __USE_KOS */
 
 
@@ -1837,21 +1767,13 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mkdtemp,(cha
 /* Setup DES tables according KEY */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setkey,(char const *__key),(__key))
 #endif /* !__setkey_defined && __CRT_HAVE_setkey */
-#ifdef __CRT_HAVE_grantpt
-__CDECLARE(,int,__NOTHROW_NCX,grantpt,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE_grantpt */
-#ifdef __CRT_HAVE_unlockpt
-__CDECLARE(,int,__NOTHROW_NCX,unlockpt,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE_unlockpt */
-#ifdef __CRT_HAVE_ptsname
-__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,ptsname,(__fd_t __fd),(__fd))
-#endif /* __CRT_HAVE_ptsname */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,grantpt,(__fd_t __fd),(__fd))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,unlockpt,(__fd_t __fd),(__fd))
+__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_NCX,ptsname,(__fd_t __fd),(__fd))
 #endif /* __USE_XOPEN */
 
 #ifdef __USE_XOPEN2KXSI
-#ifdef __CRT_HAVE_posix_openpt
-__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_RPC,posix_openpt,(__oflag_t __oflags),(__oflags))
-#endif /* __CRT_HAVE_posix_openpt */
+__CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_RPC,posix_openpt,(__oflag_t __oflags),(__oflags))
 #endif /* __USE_XOPEN2KXSI */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_strtol_l
@@ -1987,17 +1909,11 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,secure_geten
 #elif defined(__CRT_HAVE_getenv)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,secure_getenv,(char const *__varname),getenv,(__varname))
 #endif /* ... */
-#ifdef __CRT_HAVE_ptsname_r
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ptsname_r,(__fd_t __fd, char *__buf, __SIZE_TYPE__ __buflen),(__fd,__buf,__buflen))
-#endif /* __CRT_HAVE_ptsname_r */
-#ifdef __CRT_HAVE_getpt
-__CDECLARE(,int,__NOTHROW_RPC,getpt,(void),())
-#endif /* __CRT_HAVE_getpt */
-#ifdef __CRT_HAVE_canonicalize_file_name
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ptsname_r,(__fd_t __fd, char *__buf, __SIZE_TYPE__ __buflen),(__fd,__buf,__buflen))
+__CDECLARE_OPT(,int,__NOTHROW_RPC,getpt,(void),())
 /* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
  * Upon error, `NULL' is returned instead */
-__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,canonicalize_file_name,(char const *__filename),(__filename))
-#endif /* __CRT_HAVE_canonicalize_file_name */
+__CDECLARE_OPT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,canonicalize_file_name,(char const *__filename),(__filename))
 #if defined(__CRT_HAVE_mkostemp64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkostemp,(char *__template_, int __flags),mkostemp64,(__template_,__flags))
 #elif defined(__CRT_HAVE_mkostemp)
@@ -2260,12 +2176,8 @@ __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_
 #define errno     (*__errno_location())
 #endif /* ____errno_location_defined */
 #endif /* !errno */
-#ifdef __CRT_HAVE__get_errno
-__CDECLARE(,errno_t,__NOTHROW_NCX,_get_errno,(errno_t *__perr),(__perr))
-#endif /* __CRT_HAVE__get_errno */
-#ifdef __CRT_HAVE__set_errno
-__CDECLARE(,errno_t,__NOTHROW_NCX,_set_errno,(errno_t __err),(__err))
-#endif /* __CRT_HAVE__set_errno */
+__CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_get_errno,(errno_t *__perr),(__perr))
+__CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_errno,(errno_t __err),(__err))
 #endif /* !_CRT_ERRNO_DEFINED */
 
 #ifndef ____doserrno_defined
@@ -2276,12 +2188,8 @@ __CDECLARE(__ATTR_CONST,__UINT32_TYPE__ *,__NOTHROW_NCX,__doserrno,(void),())
 #undef ____doserrno_defined
 #endif /* !__CRT_HAVE___doserrno */
 #endif /* !____doserrno_defined */
-#ifdef __CRT_HAVE__get_doserrno
-__CDECLARE(,errno_t,__NOTHROW_NCX,_get_doserrno,(__UINT32_TYPE__ *__perr),(__perr))
-#endif /* __CRT_HAVE__get_doserrno */
-#ifdef __CRT_HAVE__set_doserrno
-__CDECLARE(,errno_t,__NOTHROW_NCX,_set_doserrno,(__UINT32_TYPE__ __err),(__err))
-#endif /* __CRT_HAVE__set_doserrno */
+__CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_get_doserrno,(__UINT32_TYPE__ *__perr),(__perr))
+__CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_doserrno,(__UINT32_TYPE__ __err),(__err))
 #ifdef ____doserrno_defined
 #define _doserrno (*__doserrno())
 #endif /* ____doserrno_defined */
@@ -2525,23 +2433,15 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_N
 #define ___purecall_handler_defined 1
 typedef void (__LIBCCALL *_purecall_handler)(void);
 #endif /* !___purecall_handler_defined */
-#ifdef __CRT_HAVE__set_purecall_handler
-__CDECLARE(,_purecall_handler,__NOTHROW_NCX,_set_purecall_handler,(_purecall_handler __handler),(__handler))
-#endif /* __CRT_HAVE__set_purecall_handler */
-#ifdef __CRT_HAVE__get_purecall_handler
-__CDECLARE(,_purecall_handler,__NOTHROW_NCX,_get_purecall_handler,(void),())
-#endif /* __CRT_HAVE__get_purecall_handler */
+__CDECLARE_OPT(,_purecall_handler,__NOTHROW_NCX,_set_purecall_handler,(_purecall_handler __handler),(__handler))
+__CDECLARE_OPT(,_purecall_handler,__NOTHROW_NCX,_get_purecall_handler,(void),())
 
 #ifndef ___invalid_parameter_handler_defined
 #define ___invalid_parameter_handler_defined 1
 typedef void (__LIBCCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
 #endif /* !___invalid_parameter_handler_defined */
-#ifdef __CRT_HAVE__set_invalid_parameter_handler
-__CDECLARE(,_invalid_parameter_handler,__NOTHROW_NCX,_set_invalid_parameter_handler,(_invalid_parameter_handler __handler),(__handler))
-#endif /* __CRT_HAVE__set_invalid_parameter_handler */
-#ifdef __CRT_HAVE__get_invalid_parameter_handler
-__CDECLARE(,_invalid_parameter_handler,__NOTHROW_NCX,_get_invalid_parameter_handler,(void),())
-#endif /* __CRT_HAVE__get_invalid_parameter_handler */
+__CDECLARE_OPT(,_invalid_parameter_handler,__NOTHROW_NCX,_set_invalid_parameter_handler,(_invalid_parameter_handler __handler),(__handler))
+__CDECLARE_OPT(,_invalid_parameter_handler,__NOTHROW_NCX,_get_invalid_parameter_handler,(void),())
 
 #ifdef __CRT_HAVE__get_pgmptr
 __CDECLARE(,errno_t,__NOTHROW_NCX,_get_pgmptr,(char **__pvalue),(__pvalue))
@@ -2574,16 +2474,10 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__p
 #define _fmode (*__p__fmode())
 #endif /* ____p__fmode_defined */
 #endif /* !... */
-#ifdef __CRT_HAVE__set_fmode
-__CDECLARE(,errno_t,__NOTHROW_NCX,_set_fmode,(int __mode),(__mode))
-#endif /* __CRT_HAVE__set_fmode */
-#ifdef __CRT_HAVE__get_fmode
-__CDECLARE(,errno_t,__NOTHROW_NCX,_get_fmode,(int *__pmode),(__pmode))
-#endif /* __CRT_HAVE__get_fmode */
+__CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_fmode,(int __mode),(__mode))
+__CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_get_fmode,(int *__pmode),(__pmode))
 
-#ifdef __CRT_HAVE__set_abort_behavior
-__CDECLARE(,unsigned int,__NOTHROW_NCX,_set_abort_behavior,(unsigned int __flags, unsigned int __mask),(__flags,__mask))
-#endif /* __CRT_HAVE__set_abort_behavior */
+__CDECLARE_OPT(,unsigned int,__NOTHROW_NCX,_set_abort_behavior,(unsigned int __flags, unsigned int __mask),(__flags,__mask))
 
 #ifdef __INT64_TYPE__
 #ifdef _MSC_VER
@@ -2700,12 +2594,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(qsort_s, __FORCELOCAL __ATTR_NONNULL((1, 4)) voi
 #endif /* !__CRT_HAVE_qsort_s */
 #endif  /* _CRT_ALGO_DEFINED */
 
-#ifdef __CRT_HAVE_getenv_s
-__CDECLARE(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,getenv_s,(__SIZE_TYPE__ *__psize, char *__buf, rsize_t __buflen, char const *__varname),(__psize,__buf,__buflen,__varname))
-#endif /* __CRT_HAVE_getenv_s */
-#ifdef __CRT_HAVE__dupenv_s
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_NCX,_dupenv_s,(char **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, char const *__varname),(__pbuf,__pbuflen,__varname))
-#endif /* __CRT_HAVE__dupenv_s */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,getenv_s,(__SIZE_TYPE__ *__psize, char *__buf, rsize_t __buflen, char const *__varname),(__psize,__buf,__buflen,__varname))
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_NCX,_dupenv_s,(char **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, char const *__varname),(__pbuf,__pbuflen,__varname))
 #endif /* __USE_DOS_SLIB */
 
 #ifdef __CRT_HAVE_itoa
@@ -3221,9 +3111,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_free, __FORCELOCAL void __NOTHROW_NCX(_
 #endif /* ... */
 
 #define _CVTBUFSIZE   349
-#ifdef __CRT_HAVE__fullpath
-__CDECLARE(,char *,__NOTHROW_RPC,_fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),(__buf,__path,__buflen))
-#endif /* __CRT_HAVE__fullpath */
+__CDECLARE_OPT(,char *,__NOTHROW_RPC,_fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),(__buf,__path,__buflen))
 #ifndef __NO_FPU
 #ifdef __CRT_HAVE__ecvt_s
 __CDECLARE(__ATTR_NONNULL((1, 5, 6)),errno_t,__NOTHROW_NCX,_ecvt_s,(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),(__buf,__buflen,__val,__ndigit,__decptr,__sign))
@@ -3450,9 +3338,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC,_searchenv,(char const *
 #include <local/stdlib/_searchenv.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_searchenv, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) void __NOTHROW_RPC(__LIBCCALL _searchenv)(char const *__file, char const *__envvar, char *__restrict __resultpath) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_searchenv))(__file, __envvar, __resultpath); })
 #endif /* ... */
-#ifdef __CRT_HAVE__searchenv_s
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_RPC,_searchenv_s,(char const *__file, char const *__envvar, char *__restrict __resultpath, __SIZE_TYPE__ __buflen),(__file,__envvar,__resultpath,__buflen))
-#endif /* __CRT_HAVE__searchenv_s */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_RPC,_searchenv_s,(char const *__file, char const *__envvar, char *__restrict __resultpath, __SIZE_TYPE__ __buflen),(__file,__envvar,__resultpath,__buflen))
 #ifdef __CRT_HAVE__makepath
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_makepath,(char *__restrict __buf, char const *__drive, char const *__dir, char const *__file, char const *__ext),(__buf,__drive,__dir,__file,__ext))
 #else /* __CRT_HAVE__makepath */
@@ -3478,16 +3364,10 @@ __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_splitpath_s,(char const *_
 __NAMESPACE_LOCAL_USING_OR_IMPL(_splitpath_s, __FORCELOCAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _splitpath_s)(char const *__restrict __abspath, char *__drive, __SIZE_TYPE__ __drivelen, char *__dir, __SIZE_TYPE__ __dirlen, char *__file, __SIZE_TYPE__ __filelen, char *__ext, __SIZE_TYPE__ __extlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_splitpath_s))(__abspath, __drive, __drivelen, __dir, __dirlen, __file, __filelen, __ext, __extlen); })
 #endif /* !__CRT_HAVE__splitpath_s */
 
-#ifdef __CRT_HAVE__seterrormode
-__CDECLARE_VOID(,__NOTHROW_NCX,_seterrormode,(int __mode),(__mode))
-#endif /* __CRT_HAVE__seterrormode */
-#ifdef __CRT_HAVE__set_error_mode
-__CDECLARE(,int,__NOTHROW_NCX,_set_error_mode,(int __mode),(__mode))
-#endif /* __CRT_HAVE__set_error_mode */
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,_seterrormode,(int __mode),(__mode))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,_set_error_mode,(int __mode),(__mode))
 
-#ifdef __CRT_HAVE__beep
-__CDECLARE_VOID(,__NOTHROW_NCX,_beep,(unsigned int __freq, unsigned int __duration),(__freq,__duration))
-#endif /* __CRT_HAVE__beep */
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,_beep,(unsigned int __freq, unsigned int __duration),(__freq,__duration))
 #ifdef __CRT_HAVE_sleep
 /* >> sleep(3)
  * Sleep for up to `SECONDS' seconds */

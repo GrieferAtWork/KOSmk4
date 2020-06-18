@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfed7f44 */
+/* HASH CRC-32:0x665c1025 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,14 +104,10 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,ether_line,(char const *_
 /* Scan LINE and set ADDR and HOSTNAME */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ether_line, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL ether_line)(char const *__line, struct ether_addr *__addr, char *__hostname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_line))(__line, __addr, __hostname); })
 #endif /* !__CRT_HAVE_ether_line */
-#ifdef __CRT_HAVE_ether_ntohost
 /* Map 48 bit Ethernet number ADDR to HOSTNAME */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,ether_ntohost,(char *__hostname, struct ether_addr const *__addr),(__hostname,__addr))
-#endif /* __CRT_HAVE_ether_ntohost */
-#ifdef __CRT_HAVE_ether_hostton
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,ether_ntohost,(char *__hostname, struct ether_addr const *__addr),(__hostname,__addr))
 /* Map HOSTNAME to 48 bit Ethernet address */
-__CDECLARE(,int,__NOTHROW_RPC_KOS,ether_hostton,(char const *__hostname, struct ether_addr *__addr),(__hostname,__addr))
-#endif /* __CRT_HAVE_ether_hostton */
+__CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,ether_hostton,(char const *__hostname, struct ether_addr *__addr),(__hostname,__addr))
 
 #endif /* __CC__ */
 
