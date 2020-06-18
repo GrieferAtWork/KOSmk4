@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4b7e1ce */
+/* HASH CRC-32:0x27ed1677 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,7 +92,7 @@ __got_drive:
 		if (__dir)
 			*__dir = 0;
 	}
-	if (__last_dot != (__SIZE_TYPE__)-1) {
+	if (__last_dot != (__SIZE_TYPE__)-1 && __last_dot > __last_slash) {
 		if (__ext) {
 			__SIZE_TYPE__ __path_extlen = __len - __last_dot;
 			if __unlikely(__extlen <= __path_extlen)

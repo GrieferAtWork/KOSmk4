@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50816c13 */
+/* HASH CRC-32:0x9b049b58 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1967,7 +1967,7 @@ NOTHROW_NCX(LIBCCALL libc__makepath_s)(char *buf,
 	}
 	if (ext && *ext) {
 		size_t len = libc_strlen(ext);
-		if (*ext != ':')
+		if (*ext != '.')
 			path_putc('.');
 		path_putn(ext, len);
 	}
@@ -2041,7 +2041,7 @@ got_drive:
 		if (dir)
 			*dir = 0;
 	}
-	if (last_dot != (size_t)-1) {
+	if (last_dot != (size_t)-1 && last_dot > last_slash) {
 		if (ext) {
 			size_t path_extlen = len - last_dot;
 			if unlikely(extlen <= path_extlen)

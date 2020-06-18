@@ -3370,7 +3370,7 @@ errno_t _makepath_s([[nonnull]] char *buf, $size_t buflen,
 	}
 	if (ext && *ext) {
 		size_t len = strlen(ext);
-		if (*ext != ':')
+		if (*ext != '.')
 			path_putc('.');
 		path_putn(ext, len);
 	}
@@ -3441,7 +3441,7 @@ got_drive:
 		if (dir)
 			*dir = 0;
 	}
-	if (last_dot != (size_t)-1) {
+	if (last_dot != (size_t)-1 && last_dot > last_slash) {
 		if (ext) {
 			size_t path_extlen = len - last_dot;
 			if unlikely(extlen <= path_extlen)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64795a6 */
+/* HASH CRC-32:0x98081b64 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,7 +84,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath_s))(char *__buf, __SIZE_TYP
 	}
 	if (__ext && *__ext) {
 		__SIZE_TYPE__ __len = __localdep_strlen(__ext);
-		if (*__ext != ':')
+		if (*__ext != '.')
 			__path_putc('.');
 		__path_putn(__ext, __len);
 	}

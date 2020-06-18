@@ -108,9 +108,13 @@
  *
  */
 
-#define MSABI64_LOAD_RETURN_ADDRESS()     \
-	popq   %r10;      /* offset-addent */ \
-	addq   %r10, %rax /* calculate absolute address */
+
+/* 32 unnecessary bytes of pure bloat, as mandated by the specs (ugh...) */
+#define MSABI_SHADOWSPACE_SIZE 32
+
+#define MSABI_LOAD_RETURN_ADDRESS()       \
+	popq   %r11;      /* offset-addent */ \
+	addq   %r11, %rax /* calculate absolute address */
 
 
 /* NOTE: There is a requirement that `(MSABI_SAVEZONE_SIZE % 16) == 0',
@@ -174,7 +178,7 @@ DEFINE_INTERN_ALIAS(libd_msabi64_RR, libd_msabi64_RRRR)
 DEFINE_INTERN_ALIAS(libd_msabi64_RRR, libd_msabi64_RRRR)
 INTERN_FUNCTION(libd_msabi64_RRRR)
 	.cfi_startproc
-	MSABI64_LOAD_RETURN_ADDRESS()
+	MSABI_LOAD_RETURN_ADDRESS()
 	MSABI_SAVEZONE_PUSH()
 	/* The simple cases: All arguments reside in registers. */
 
@@ -199,20 +203,20 @@ END(libd_msabi64_RRRR)
 .section ".text.crt.dos.msabi64.msabi64_RRRRR"
 INTERN_FUNCTION(libd_msabi64_RRRRR)
 	.cfi_startproc
-	MSABI64_LOAD_RETURN_ADDRESS()
+	MSABI_LOAD_RETURN_ADDRESS()
 	MSABI_SAVEZONE_PUSH()
 
 	/* Transform the argument list:
-	 *   %rcx                          -->  %rdi
-	 *   %rdx                          -->  %rsi
-	 *   %r8                           -->  %rdx
-	 *   %r9                           -->  %rcx
-	 *   MSABI_SAVEZONE_SIZE + 8(%rsp) -->  %r8 */
+	 *   %rcx                                                   --> %rdi
+	 *   %rdx                                                   --> %rsi
+	 *   %r8                                                    --> %rdx
+	 *   %r9                                                    --> %rcx
+	 *   MSABI_SAVEZONE_SIZE + MSABI_SHADOWSPACE_SIZE + 8(%rsp) --> %r8 */
 	movq   %rcx,     %rdi
 	movq   %rdx,     %rsi
 	movq   %r8,      %rdx
 	movq   %r9,      %rcx
-	movq   (MSABI_SAVEZONE_SIZE + 8)(%rsp), %r8
+	movq   (MSABI_SAVEZONE_SIZE + MSABI_SHADOWSPACE_SIZE + 8)(%rsp), %r8
 
 	callq  *%rax /* Call the libc_* variant */
 
@@ -254,7 +258,7 @@ INTERN_FUNCTION(libd_msabi64_RRRRRRn)
 	/* Special argument:
 	 * >> size_t num_sysv_stack_arguments = %r10;
 	 */
-	MSABI64_LOAD_RETURN_ADDRESS()
+	MSABI_LOAD_RETURN_ADDRESS()
 	MSABI_SAVEZONE_PUSH()
 	pushq_cfi_r %rbp
 	movq   %rsp, %rbp
@@ -262,14 +266,14 @@ INTERN_FUNCTION(libd_msabi64_RRRRRRn)
 	.cfi_def_cfa_register %rbp
 
 	/* Transform the argument list:
-	 *   %rcx     -->  %rdi
-	 *   %rdx     -->  %rsi
-	 *   %r8      -->  %rdx
-	 *   %r9      -->  %rcx
-	 *   (MSABI_SAVEZONE_SIZE + 16)(%rsp) -->  %r8
-	 *   (MSABI_SAVEZONE_SIZE + 24)(%rsp) -->  %r9
+	 *   %rcx                                                      --> %rdi
+	 *   %rdx                                                      --> %rsi
+	 *   %r8                                                       --> %rdx
+	 *   %r9                                                       --> %rcx
+	 *   (MSABI_SAVEZONE_SIZE + MSABI_SHADOWSPACE_SIZE + 16)(%rbp) --> %r8
+	 *   (MSABI_SAVEZONE_SIZE + MSABI_SHADOWSPACE_SIZE + 24)(%rbp) --> %r9
 	 * for (i: [:%r10].reversed()) {
-	 *   pushq (MSABI_SAVEZONE_SIZE + 32 + i * 8)(%rsp)
+	 *   pushq (MSABI_SAVEZONE_SIZE + MSABI_SHADOWSPACE_SIZE + 32 + i * 8)(%rbp)
 	 * }
 	 */
 	movq   %rcx, %rdi /* arg1 */
@@ -286,15 +290,15 @@ INTERN_FUNCTION(libd_msabi64_RRRRRRn)
 	movq   %r10, %rcx /* arg7-argN */
 	testq  %rcx, %rcx
 	jz     2f
-1:	pushq  (MSABI_SAVEZONE_SIZE + 32 - 8)(%rsp, %rcx, 8)
+1:	pushq  (MSABI_SAVEZONE_SIZE + MSABI_SHADOWSPACE_SIZE + 32 - 8)(%rbp, %rcx, 8)
 	loop   1b
 2:
 
-	movq   %rdx, %rsi                            /* arg2 */
-	movq   %r8,  %rdx                            /* arg3 */
-	movq   %r9,  %rcx                            /* arg4 */
-	movq   (MSABI_SAVEZONE_SIZE + 16)(%rsp), %r8 /* arg5 */
-	movq   (MSABI_SAVEZONE_SIZE + 24)(%rsp), %r9 /* arg6 */
+	movq   %rdx, %rsi                                                     /* arg2 */
+	movq   %r8,  %rdx                                                     /* arg3 */
+	movq   %r9,  %rcx                                                     /* arg4 */
+	movq   (MSABI_SAVEZONE_SIZE + MSABI_SHADOWSPACE_SIZE + 16)(%rbp), %r8 /* arg5 */
+	movq   (MSABI_SAVEZONE_SIZE + MSABI_SHADOWSPACE_SIZE + 24)(%rbp), %r9 /* arg6 */
 
 	callq  *%rax /* Call the libc_* variant */
 
