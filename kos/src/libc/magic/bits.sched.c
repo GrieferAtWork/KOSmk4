@@ -518,6 +518,7 @@ struct sched_param {
 
 %#if defined(__USE_GNU) || defined(__USE_KOS)
 %typedef int (__LIBCCALL *__clone_func_t)(void *__arg);
+%[define_type_class(__clone_func_t = "TP")]
 
 [[section(".text.crt{|.dos}.sched.access")]]
 [[vartypes($pid_t, void *, $pid_t), export_alias("__clone")]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa88c126 */
+/* HASH CRC-32:0xfe634b87 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_END
 #ifndef ____pthread_start_routine_t_defined
 #define ____pthread_start_routine_t_defined 1
 typedef void *(*__pthread_start_routine_t)(void *);
-#endif
+#endif /* !____pthread_start_routine_t_defined */
 __NAMESPACE_LOCAL_BEGIN
 /* Create a new thread, starting with execution of START-ROUTINE
  * getting passed ARG. Creation attributed come from ATTR. The new

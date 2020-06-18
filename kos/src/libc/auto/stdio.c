@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9396e5e1 */
+/* HASH CRC-32:0x1c847c33 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,6 +155,23 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 0)
                          va_list args) THROWS(...) {
 	return (__STDC_INT_AS_SSIZE_T)libc_format_vprintf(&libc_file_printer, stream, format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Print data to `STREAM', following `FORMAT'
+ * Return the number of successfully printed bytes */
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd_fprintf)(FILE *__restrict stream,
+                         char const *__restrict format,
+                         ...) THROWS(...) {
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vfprintf(stream, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
@@ -176,6 +193,22 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(1, 0)
                         va_list args) THROWS(...) {
 	return libc_vfprintf(stdout, format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Print data to `stdout', following `FORMAT'
+ * Return the number of successfully printed bytes */
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.write.printf") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd_printf)(char const *__restrict format,
+                        ...) THROWS(...) {
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vprintf(format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
@@ -227,6 +260,23 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
                        va_list args) THROWS(...) {
 	return libc_vfscanf(stdin, format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Scan data from `STREAM', following `FORMAT'
+ * Return the number of successfully scanned data items */
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd_fscanf)(FILE *__restrict stream,
+                        char const *__restrict format,
+                        ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vfscanf(stream, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
@@ -240,6 +290,22 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Scan data from `stdin', following `FORMAT'
+ * Return the number of successfully scanned data items */
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd_scanf)(char const *__restrict format,
+                       ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vscanf(format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
@@ -281,6 +347,23 @@ NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input,
 	                     &__NAMESPACE_LOCAL_SYM __vsscanf_ungetc,
 	                     (void *)&input_pointer, format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Scan data from a given `INPUT' string, following `FORMAT'
+ * Return the number of successfully scanned data items */
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.scanf") ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd_sscanf)(char const *__restrict input,
+                                   char const *__restrict format,
+                                   ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vsscanf(input, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 INTERN ATTR_SECTION(".text.crt.unicode.static.format.scanf") ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
@@ -310,6 +393,21 @@ NOTHROW_NCX(LIBCCALL libc_vsprintf)(char *__restrict dest,
 		*dest_pointer = '\0';
 	return result;
 }
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Print a formatted string to a given in-member string buffer `BUF'
+ * Return the number of written characters, excluding a trailing NUL-character */
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd_sprintf)(char *__restrict buf,
+                                    char const *__restrict format,
+                                    ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vsprintf(buf, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 INTERN ATTR_SECTION(".text.crt.unicode.static.format.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
@@ -347,6 +445,22 @@ NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf,
 		*data.__sd_buffer = '\0';
 	return result;
 }
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Print a formatted string to a given in-member string buffer `BUF'
+ * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd_snprintf)(char *__restrict buf,
+                                     size_t buflen,
+                                     char const *__restrict format,
+                                     ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vsnprintf(buf, buflen, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
 INTERN ATTR_SECTION(".text.crt.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
@@ -385,6 +499,21 @@ NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd,
 	                      format, args);
 #endif /* __SIZEOF_INT__ == __SIZEOF_POINTER__ || __x86_64__ */
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.io.write") ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T
+NOTHROW_RPC(VLIBDCALL libd_dprintf)(fd_t fd,
+                                    char const *__restrict format,
+                                    ...) {
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vdprintf(fd, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.io.write") ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd,
                                     char const *__restrict format,
@@ -551,6 +680,21 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") NONNULL((1, 2)) __STD
 	                         stream);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.obstack") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) int
+NOTHROW_NCX(VLIBDCALL libd_obstack_printf)(struct obstack *__restrict obstack_,
+                                           char const *__restrict format,
+                                           ...) {
+	int result;
+	va_list args;
+	va_start(args, format);
+	result = libc_obstack_vprintf(obstack_, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.obstack") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict obstack_,
                                            char const *__restrict format,
@@ -594,6 +738,22 @@ NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr,
 	*pstr = result;
 	return (__STDC_INT_AS_SSIZE_T)error;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
+INTERN ATTR_SECTION(".text.crt.dos.heap.strdup") WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd_asprintf)(char **__restrict pstr,
+                                     char const *__restrict format,
+                                     ...) {
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vasprintf(pstr, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 INTERN ATTR_SECTION(".text.crt.heap.strdup") WUNUSED ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr,
@@ -696,6 +856,21 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(2, 
                                   va_list args) THROWS(...) {
 	return (__STDC_INT_AS_SSIZE_T)libc_format_vprintf(&libc_file_printer_unlocked, stream, format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd_fprintf_unlocked)(FILE *__restrict stream,
+                                  char const *__restrict format,
+                                  ...) THROWS(...) {
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vfprintf_unlocked(stream, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 (VLIBCCALL libc_fprintf_unlocked)(FILE *__restrict stream,
                                   char const *__restrict format,
@@ -713,6 +888,20 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(1, 
                                  va_list args) THROWS(...) {
 	return libc_vfprintf_unlocked(stdout, format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd_printf_unlocked)(char const *__restrict format,
+                                 ...) THROWS(...) {
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vprintf_unlocked(format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (VLIBCCALL libc_printf_unlocked)(char const *__restrict format,
                                  ...) THROWS(...) {
@@ -760,6 +949,21 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCAN
                                 va_list args) THROWS(...) {
 	return libc_vfscanf_unlocked(stdin, format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd_fscanf_unlocked)(FILE *__restrict stream,
+                                 char const *__restrict format,
+                                 ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vfscanf_unlocked(stream, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc_fscanf_unlocked)(FILE *__restrict stream,
                                  char const *__restrict format,
@@ -771,6 +975,20 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCAN
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd_scanf_unlocked)(char const *__restrict format,
+                                ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vscanf_unlocked(format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc_scanf_unlocked)(char const *__restrict format,
                                 ...) THROWS(...) {
@@ -853,6 +1071,21 @@ NOTHROW_NCX(LIBCCALL libc__vsnscanf_l)(char const *__restrict input,
 	(void)locale;
 	return libc__vsnscanf(input, inputlen, format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd__scanf_l)(char const *__restrict format,
+                          locale_t locale,
+                          ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vscanf_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__scanf_l)(char const *__restrict format,
                           locale_t locale,
@@ -864,6 +1097,22 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") ATTR_LIBC_SCANF(1, 3
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd__fscanf_l)(FILE *__restrict stream,
+                           char const *__restrict format,
+                           locale_t locale,
+                           ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vfscanf_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__fscanf_l)(FILE *__restrict stream,
                            char const *__restrict format,
@@ -876,6 +1125,22 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") ATTR_LIBC_SCANF(2, 4
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.scanf") ATTR_LIBC_SCANF(3, 4) NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snscanf)(char const *__restrict input,
+                                     size_t inputlen,
+                                     char const *__restrict format,
+                                     ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vsnscanf(input, inputlen, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.scanf") ATTR_LIBC_SCANF(3, 4) NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snscanf)(char const *__restrict input,
                                      size_t inputlen,
@@ -888,6 +1153,23 @@ NOTHROW_NCX(VLIBCCALL libc__snscanf)(char const *__restrict input,
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf") ATTR_LIBC_SCANF(3, 5) NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snscanf_l)(char const *__restrict input,
+                                       size_t inputlen,
+                                       char const *__restrict format,
+                                       locale_t locale,
+                                       ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vsnscanf_l(input, inputlen, format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf") ATTR_LIBC_SCANF(3, 5) NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snscanf_l)(char const *__restrict input,
                                        size_t inputlen,
@@ -931,6 +1213,22 @@ NOTHROW_NCX(LIBCCALL libc__vsprintf_p_l)(char *__restrict buf,
 	(void)locale;
 	return libc__vsprintf_p(buf, bufsize, format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__sprintf_l)(char *__restrict buf,
+                                       char const *__restrict format,
+                                       locale_t locale,
+                                       ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vsprintf_l(buf, format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__sprintf_l)(char *__restrict buf,
                                        char const *__restrict format,
@@ -943,6 +1241,23 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_l)(char *__restrict buf,
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__sprintf_s_l)(char *__restrict buf,
+                                         size_t bufsize,
+                                         char const *__restrict format,
+                                         locale_t locale,
+                                         ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vsnprintf_l(buf, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__sprintf_s_l)(char *__restrict buf,
                                          size_t bufsize,
@@ -956,6 +1271,22 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_s_l)(char *__restrict buf,
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__sprintf_p)(char *__restrict buf,
+                                       size_t bufsize,
+                                       char const *__restrict format,
+                                       ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vsprintf_p(buf, bufsize, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__sprintf_p)(char *__restrict buf,
                                        size_t bufsize,
@@ -968,6 +1299,23 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_p)(char *__restrict buf,
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(3, 5) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__sprintf_p_l)(char *__restrict buf,
+                                         size_t bufsize,
+                                         char const *__restrict format,
+                                         locale_t locale,
+                                         ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vsprintf_p_l(buf, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(3, 5) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__sprintf_p_l)(char *__restrict buf,
                                          size_t bufsize,
@@ -986,6 +1334,20 @@ NOTHROW_NCX(LIBCCALL libc__vscprintf)(char const *__restrict format,
                                       va_list args) {
 	return libc_vsnprintf(NULL, 0, format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__scprintf)(char const *__restrict format,
+                                      ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vscprintf(format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__scprintf)(char const *__restrict format,
                                       ...) {
@@ -1019,6 +1381,21 @@ NOTHROW_NCX(LIBCCALL libc__vscprintf_p_l)(char const *__restrict format,
 	(void)locale;
 	return libc__vscprintf_p(format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") WUNUSED ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__scprintf_l)(char const *__restrict format,
+                                        locale_t locale,
+                                        ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vscprintf_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") WUNUSED ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__scprintf_l)(char const *__restrict format,
                                         locale_t locale,
@@ -1030,6 +1407,20 @@ NOTHROW_NCX(VLIBCCALL libc__scprintf_l)(char const *__restrict format,
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") WUNUSED ATTR_LIBC_PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__scprintf_p)(char const *__restrict format,
+                                        ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vscprintf_p(format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") WUNUSED ATTR_LIBC_PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__scprintf_p)(char const *__restrict format,
                                         ...) {
@@ -1040,6 +1431,21 @@ NOTHROW_NCX(VLIBCCALL libc__scprintf_p)(char const *__restrict format,
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") WUNUSED ATTR_LIBC_PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__scprintf_p_l)(char const *__restrict format,
+                                          locale_t locale,
+                                          ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vscprintf_p_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") WUNUSED ATTR_LIBC_PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__scprintf_p_l)(char const *__restrict format,
                                           locale_t locale,
@@ -1092,6 +1498,22 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf_s_l)(char *__restrict buf,
 	(void)locale;
 	return libc__vsnprintf(buf, bufsize, format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snprintf)(char *__restrict buf,
+                                      size_t bufsize,
+                                      char const *__restrict format,
+                                      ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vsnprintf(buf, bufsize, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snprintf)(char *__restrict buf,
                                       size_t bufsize,
@@ -1104,6 +1526,23 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf)(char *__restrict buf,
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snprintf_l)(char *__restrict buf,
+                                        size_t bufsize,
+                                        char const *__restrict format,
+                                        locale_t locale,
+                                        ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vsnprintf_l(buf, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snprintf_l)(char *__restrict buf,
                                         size_t bufsize,
@@ -1117,6 +1556,22 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_l)(char *__restrict buf,
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snprintf_c)(char *__restrict buf,
+                                        size_t bufsize,
+                                        char const *__restrict format,
+                                        ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vsnprintf(buf, bufsize, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snprintf_c)(char *__restrict buf,
                                         size_t bufsize,
@@ -1129,6 +1584,23 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_c)(char *__restrict buf,
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snprintf_c_l)(char *__restrict buf,
+                                          size_t bufsize,
+                                          char const *__restrict format,
+                                          locale_t locale,
+                                          ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vsnprintf_l(buf, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snprintf_c_l)(char *__restrict buf,
                                           size_t bufsize,
@@ -1142,6 +1614,23 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_c_l)(char *__restrict buf,
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(4, 5) NONNULL((4)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snprintf_s)(char *__restrict buf,
+                                        size_t bufsize,
+                                        size_t buflen,
+                                        char const *__restrict format,
+                                        ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vsnprintf_s(buf, bufsize, buflen, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(4, 5) NONNULL((4)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snprintf_s)(char *__restrict buf,
                                         size_t bufsize,
@@ -1155,6 +1644,24 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_s)(char *__restrict buf,
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(4, 6) NONNULL((4)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snprintf_s_l)(char *__restrict buf,
+                                          size_t bufsize,
+                                          size_t buflen,
+                                          char const *__restrict format,
+                                          locale_t locale,
+                                          ...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vsnprintf_s_l(buf, bufsize, buflen, format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(4, 6) NONNULL((4)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snprintf_s_l)(char *__restrict buf,
                                           size_t bufsize,
@@ -1189,6 +1696,21 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 	(void)locale;
 	return libc__vprintf_p(format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd__printf_l)(char const *__restrict format,
+                           locale_t locale,
+                           ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vprintf_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__printf_l)(char const *__restrict format,
                            locale_t locale,
@@ -1200,6 +1722,21 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd__printf_s_l)(char const *__restrict format,
+                             locale_t locale,
+                             ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vprintf_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__printf_s_l)(char const *__restrict format,
                              locale_t locale,
@@ -1211,6 +1748,20 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd__printf_p)(char const *__restrict format,
+                           ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vprintf_p(format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__printf_p)(char const *__restrict format,
                            ...) THROWS(...) {
@@ -1221,6 +1772,21 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRIN
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd__printf_p_l)(char const *__restrict format,
+                             locale_t locale,
+                             ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vprintf_p_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__printf_p_l)(char const *__restrict format,
                              locale_t locale,
@@ -1259,6 +1825,22 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 	(void)locale;
 	return libc__vfprintf_p(stream, format, args);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd__fprintf_l)(FILE *__restrict stream,
+                            char const *__restrict format,
+                            locale_t locale,
+                            ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vfprintf_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__fprintf_l)(FILE *__restrict stream,
                             char const *__restrict format,
@@ -1271,6 +1853,22 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd__fprintf_s_l)(FILE *__restrict stream,
+                              char const *__restrict format,
+                              locale_t locale,
+                              ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vfprintf_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__fprintf_s_l)(FILE *__restrict stream,
                               char const *__restrict format,
@@ -1283,6 +1881,21 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRIN
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF_P(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd__fprintf_p)(FILE *__restrict stream,
+                            char const *__restrict format,
+                            ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vfprintf_p(stream, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF_P(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__fprintf_p)(FILE *__restrict stream,
                             char const *__restrict format,
@@ -1294,6 +1907,22 @@ INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRIN
 	va_end(args);
 	return result;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+(VLIBDCALL libd__fprintf_p_l)(FILE *__restrict stream,
+                              char const *__restrict format,
+                              locale_t locale,
+                              ...) THROWS(...) {
+	__STDC_INT_AS_SIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vfprintf_p_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF_P(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__fprintf_p_l)(FILE *__restrict stream,
                               char const *__restrict format,
@@ -1524,9 +2153,22 @@ DEFINE_PUBLIC_ALIAS(puts, libc_puts);
 DEFINE_PUBLIC_ALIAS(perror, libc_perror);
 DEFINE_PUBLIC_ALIAS(_IO_vfprintf, libc_vfprintf);
 DEFINE_PUBLIC_ALIAS(vfprintf, libc_vfprintf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_IO_fprintf, libd_fprintf);
+DEFINE_PUBLIC_ALIAS(DOS$fprintf, libd_fprintf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_IO_fprintf, libc_fprintf);
 DEFINE_PUBLIC_ALIAS(fprintf, libc_fprintf);
 DEFINE_PUBLIC_ALIAS(vprintf, libc_vprintf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_IO_printf, libd_printf);
+DEFINE_PUBLIC_ALIAS(DOS$printf_s, libd_printf);
+DEFINE_PUBLIC_ALIAS(DOS$printf, libd_printf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_IO_printf, libc_printf);
 DEFINE_PUBLIC_ALIAS(printf_s, libc_printf);
 DEFINE_PUBLIC_ALIAS(printf, libc_printf);
@@ -1534,17 +2176,37 @@ DEFINE_PUBLIC_ALIAS(_IO_vfscanf, libc_vfscanf);
 DEFINE_PUBLIC_ALIAS(__vfscanf, libc_vfscanf);
 DEFINE_PUBLIC_ALIAS(vfscanf, libc_vfscanf);
 DEFINE_PUBLIC_ALIAS(vscanf, libc_vscanf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$fscanf, libd_fscanf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(fscanf, libc_fscanf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$scanf, libd_scanf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(scanf, libc_scanf);
 DEFINE_PUBLIC_ALIAS(_IO_gets, libc_gets);
 DEFINE_PUBLIC_ALIAS(gets, libc_gets);
 DEFINE_PUBLIC_ALIAS(__vsscanf, libc_vsscanf);
 DEFINE_PUBLIC_ALIAS(vsscanf, libc_vsscanf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_IO_sscanf, libd_sscanf);
+DEFINE_PUBLIC_ALIAS(DOS$sscanf, libd_sscanf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_IO_sscanf, libc_sscanf);
 DEFINE_PUBLIC_ALIAS(sscanf, libc_sscanf);
 DEFINE_PUBLIC_ALIAS(_IO_vsprintf, libc_vsprintf);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(vsprintf, libc_vsprintf);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_IO_sprintf, libd_sprintf);
+DEFINE_PUBLIC_ALIAS(DOS$sprintf, libd_sprintf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_IO_sprintf, libc_sprintf);
 #endif /* !__KERNEL__ */
@@ -1553,9 +2215,17 @@ DEFINE_PUBLIC_ALIAS(sprintf, libc_sprintf);
 DEFINE_PUBLIC_ALIAS(__vsnprintf, libc_vsnprintf);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(vsnprintf, libc_vsnprintf);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$snprintf, libd_snprintf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(snprintf, libc_snprintf);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(vdprintf, libc_vdprintf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$dprintf, libd_dprintf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(dprintf, libc_dprintf);
 DEFINE_PUBLIC_ALIAS(_IO_setbuffer, libc_setbuffer);
 DEFINE_PUBLIC_ALIAS(setbuffer, libc_setbuffer);
@@ -1571,8 +2241,19 @@ DEFINE_PUBLIC_ALIAS(_putw, libc_putw);
 DEFINE_PUBLIC_ALIAS(putw, libc_putw);
 DEFINE_PUBLIC_ALIAS(fgets_unlocked, libc_fgets_unlocked);
 DEFINE_PUBLIC_ALIAS(fputs_unlocked, libc_fputs_unlocked);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$obstack_printf, libd_obstack_printf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(obstack_printf, libc_obstack_printf);
 DEFINE_PUBLIC_ALIAS(vasprintf, libc_vasprintf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$__asprintf, libd_asprintf);
+DEFINE_PUBLIC_ALIAS(DOS$asprintf, libd_asprintf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__asprintf, libc_asprintf);
 DEFINE_PUBLIC_ALIAS(asprintf, libc_asprintf);
 DEFINE_PUBLIC_ALIAS(getw_unlocked, libc_getw_unlocked);
@@ -1581,15 +2262,37 @@ DEFINE_PUBLIC_ALIAS(getdelim_unlocked, libc_getdelim_unlocked);
 DEFINE_PUBLIC_ALIAS(getline_unlocked, libc_getline_unlocked);
 DEFINE_PUBLIC_ALIAS(puts_unlocked, libc_puts_unlocked);
 DEFINE_PUBLIC_ALIAS(vfprintf_unlocked, libc_vfprintf_unlocked);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$fprintf_s, libd_fprintf_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$fprintf_unlocked, libd_fprintf_unlocked);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(fprintf_s, libc_fprintf_unlocked);
 DEFINE_PUBLIC_ALIAS(fprintf_unlocked, libc_fprintf_unlocked);
 DEFINE_PUBLIC_ALIAS(vprintf_s, libc_vprintf_unlocked);
 DEFINE_PUBLIC_ALIAS(vprintf_unlocked, libc_vprintf_unlocked);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$printf_s, libd_printf_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$printf_unlocked, libd_printf_unlocked);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(printf_s, libc_printf_unlocked);
 DEFINE_PUBLIC_ALIAS(printf_unlocked, libc_printf_unlocked);
 DEFINE_PUBLIC_ALIAS(vfscanf_unlocked, libc_vfscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(vscanf_unlocked, libc_vscanf_unlocked);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$fscanf_unlocked, libd_fscanf_unlocked);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(fscanf_unlocked, libc_fscanf_unlocked);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$scanf_unlocked, libd_scanf_unlocked);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(scanf_unlocked, libc_scanf_unlocked);
 DEFINE_PUBLIC_ALIAS(_fsopen, libc__fsopen);
 DEFINE_PUBLIC_ALIAS(_vscanf_s_l, libc__vscanf_l);
@@ -1602,55 +2305,189 @@ DEFINE_PUBLIC_ALIAS(_vsnscanf_s, libc__vsnscanf);
 DEFINE_PUBLIC_ALIAS(_vsnscanf, libc__vsnscanf);
 DEFINE_PUBLIC_ALIAS(_vsnscanf_s_l, libc__vsnscanf_l);
 DEFINE_PUBLIC_ALIAS(_vsnscanf_l, libc__vsnscanf_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_scanf_s_l, libd__scanf_l);
+DEFINE_PUBLIC_ALIAS(DOS$_scanf_l, libd__scanf_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_scanf_s_l, libc__scanf_l);
 DEFINE_PUBLIC_ALIAS(_scanf_l, libc__scanf_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_fscanf_s_l, libd__fscanf_l);
+DEFINE_PUBLIC_ALIAS(DOS$_fscanf_l, libd__fscanf_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_fscanf_s_l, libc__fscanf_l);
 DEFINE_PUBLIC_ALIAS(_fscanf_l, libc__fscanf_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_snscanf_s, libd__snscanf);
+DEFINE_PUBLIC_ALIAS(DOS$_snscanf, libd__snscanf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_snscanf_s, libc__snscanf);
 DEFINE_PUBLIC_ALIAS(_snscanf, libc__snscanf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_snscanf_s_l, libd__snscanf_l);
+DEFINE_PUBLIC_ALIAS(DOS$_snscanf_l, libd__snscanf_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_snscanf_s_l, libc__snscanf_l);
 DEFINE_PUBLIC_ALIAS(_snscanf_l, libc__snscanf_l);
 DEFINE_PUBLIC_ALIAS(_vsprintf_l, libc__vsprintf_l);
 DEFINE_PUBLIC_ALIAS(_vsprintf_p, libc__vsprintf_p);
 DEFINE_PUBLIC_ALIAS(_vsprintf_p_l, libc__vsprintf_p_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_sprintf_l, libd__sprintf_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_sprintf_l, libc__sprintf_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_sprintf_s_l, libd__sprintf_s_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_sprintf_s_l, libc__sprintf_s_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_sprintf_p, libd__sprintf_p);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_sprintf_p, libc__sprintf_p);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_sprintf_p_l, libd__sprintf_p_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_sprintf_p_l, libc__sprintf_p_l);
 DEFINE_PUBLIC_ALIAS(_vscprintf, libc__vscprintf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_scprintf, libd__scprintf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_scprintf, libc__scprintf);
 DEFINE_PUBLIC_ALIAS(_vscprintf_l, libc__vscprintf_l);
 DEFINE_PUBLIC_ALIAS(_vscprintf_p, libc__vscprintf_p);
 DEFINE_PUBLIC_ALIAS(_vscprintf_p_l, libc__vscprintf_p_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_scprintf_l, libd__scprintf_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_scprintf_l, libc__scprintf_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_scprintf_p, libd__scprintf_p);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_scprintf_p, libc__scprintf_p);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_scprintf_p_l, libd__scprintf_p_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_scprintf_p_l, libc__scprintf_p_l);
 DEFINE_PUBLIC_ALIAS(_vsnprintf, libc__vsnprintf);
 DEFINE_PUBLIC_ALIAS(_vsprintf_s_l, libc__vsnprintf_l);
 DEFINE_PUBLIC_ALIAS(_vsnprintf_l, libc__vsnprintf_l);
 DEFINE_PUBLIC_ALIAS(_vsnprintf_s, libc__vsnprintf_s);
 DEFINE_PUBLIC_ALIAS(_vsnprintf_s_l, libc__vsnprintf_s_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_snprintf, libd__snprintf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_snprintf, libc__snprintf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_snprintf_l, libd__snprintf_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_snprintf_l, libc__snprintf_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_snprintf_c, libd__snprintf_c);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_snprintf_c, libc__snprintf_c);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_snprintf_c_l, libd__snprintf_c_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_snprintf_c_l, libc__snprintf_c_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_snprintf_s, libd__snprintf_s);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_snprintf_s, libc__snprintf_s);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_snprintf_s_l, libd__snprintf_s_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_snprintf_s_l, libc__snprintf_s_l);
 DEFINE_PUBLIC_ALIAS(_vprintf_s_l, libc__vprintf_l);
 DEFINE_PUBLIC_ALIAS(_vprintf_l, libc__vprintf_l);
 DEFINE_PUBLIC_ALIAS(_vprintf_p, libc__vprintf_p);
 DEFINE_PUBLIC_ALIAS(_vprintf_p_l, libc__vprintf_p_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_printf_l, libd__printf_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_printf_l, libc__printf_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_printf_s_l, libd__printf_s_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_printf_s_l, libc__printf_s_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_printf_p, libd__printf_p);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_printf_p, libc__printf_p);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_printf_p_l, libd__printf_p_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_printf_p_l, libc__printf_p_l);
 DEFINE_PUBLIC_ALIAS(_vfprintf_s_l, libc__vfprintf_l);
 DEFINE_PUBLIC_ALIAS(_vfprintf_l, libc__vfprintf_l);
 DEFINE_PUBLIC_ALIAS(_vfprintf_p, libc__vfprintf_p);
 DEFINE_PUBLIC_ALIAS(_vfprintf_p_l, libc__vfprintf_p_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_fprintf_l, libd__fprintf_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_fprintf_l, libc__fprintf_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_fprintf_s_l, libd__fprintf_s_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_fprintf_s_l, libc__fprintf_s_l);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_fprintf_p, libd__fprintf_p);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_fprintf_p, libc__fprintf_p);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_fprintf_p_l, libd__fprintf_p_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_fprintf_p_l, libc__fprintf_p_l);
 DEFINE_PUBLIC_ALIAS(fopen_s, libc_fopen_s);
 DEFINE_PUBLIC_ALIAS(freopen_s, libc_freopen_s);

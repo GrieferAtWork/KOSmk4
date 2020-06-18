@@ -32,6 +32,7 @@ import * from .escape;
 import * from .globals;
 import * from .namespace;
 import * from .namespace;
+import * from .typeclass;
 import util;
 
 
@@ -104,6 +105,104 @@ class CType {
 			return false;
 		return true;
 	}
+
+	@@Same as @typeClass, but throw an @Error if the class cannot be deduced
+	public property requireTypeClass: string = {
+		get(): string {
+			local result = typeClass;
+			if (result !is none)
+				return result;
+			throw Error("Unable to deduce typeclass of {!r}".format({ this }));
+		}
+	}
+
+	@@Returns the type classification for @this @CType
+	@@Note that this class only applies when @this type is used in an argument list
+	@@For more information, see @(import .typeclass)
+	@@If the type class cannot be deduced, this property returns @none instead
+	public property typeClass: string | none = {
+		get(): string {
+			if (afterName) {
+				/* An after-string only exists for the following cases, all
+				 * of which are pointers when they appear in argument lists:
+				 * >> int x[];         // Flexible array (C convention passes this as a pointer)
+				 * >> int x[42];       // Fixed-length array (Passed like its flexible counterpart)
+				 * >> int (*x)(int a); // Function pointer */
+				return "TP";
+			}
+			local typename = str(beforeName).strip();
+			if (typename.endswith("__restrict"))
+				return "TP"; /* Only pointer can be marked as __restrict */
+			if (typename.endswith("*") || typename.endswith("&"))
+				return "TP"; /* Pointer type */
+again:
+			typename = typename.replace("$", "");
+			for (;;) {
+				if (typename.startswith("unsigned ")) {
+					typename = typename[9:].lstrip();
+					continue;
+				}
+				if (typename.startswith("signed ")) {
+					typename = typename[7:].lstrip();
+					continue;
+				}
+				if (typename.startswith("int ")) {
+					typename = typename[4:].lstrip();
+					continue;
+				}
+				if (typename.endswith(" unsigned")) {
+					typename = typename[:-9].rstrip();
+					continue;
+				}
+				if (typename.endswith(" signed")) {
+					typename = typename[:-7].rstrip();
+					continue;
+				}
+				if (typename.endswith(" int")) {
+					typename = typename[:-4].rstrip();
+					continue;
+				}
+				break;
+			}
+			if (typename.startswith("struct ")) {
+				typename = typename[7:];
+do_handle_struct_type:
+				return "TS(__SIZEOF_{})".format({ typename.lstrip().lstrip("_").upper() });
+			}
+			if (typename.startswith("union ")) {
+				typename = typename[6:];
+				goto do_handle_struct_type;
+			}
+			if (typename.startswith("enum "))
+				return "TD"; /* Enums always get passed like `int` */
+			local result = knownTypeClasses.get(typename);
+			if (result !is none)
+				return result;
+			/* Also check if the escaped variant may be known */
+			for (local map: { keywordEscapes, partialKeywordEscapes }) {
+				local escaped = map.get(typename);
+				if (escaped is none)
+					continue;
+				result = knownTypeClasses.get(escaped);
+				if (result !is none)
+					return result;
+				if (escaped.endswith("__restrict"))
+					return "TP";
+				if (escaped.endswith("*") || escaped.endswith("&"))
+					return "TP"; /* Pointer type */
+				if (escaped.startswith("struct ") || escaped.startswith("union ") ||
+				    escaped.startswith("enum ") || escaped.startswith("unsigned ") ||
+				    escaped.startswith("signed ") || escaped.startswith("int ") ||
+				    escaped.endswith(" unsigned") || escaped.endswith(" signed") ||
+				    escaped.endswith(" int")) {
+					typename = escaped;
+					goto again;
+				}
+			}
+			return none;
+		}
+	}
+
 
 	@@Returns @true if @this @CType is implicitly convertible to @other
 	public function implicitlyConvertibleTo(other: CType): bool {
@@ -2856,8 +2955,8 @@ class SystemHeader {
 	@@Output order of /src/libc/auto/string.c (when empty, don't generate that file)
 	public member order_libcAutoSource: {(LibraryFunction | string | UserString)...} = [];
 
-	@@Output order of /src/libc/auto/dosabi/string.c (when empty, don't generate that file)
-	public member order_libcDosabiSource: {(LibraryFunction | string | UserString)...} = [];
+	@@Output order of /src/libc/libc/dosabi-*.h (when empty, don't generate that file)
+	public member order_libcDosabiSource: {LibraryFunction...} = [];
 
 	@@Output order of /src/libc/user/string.h (when empty, don't generate that file)
 	public member order_libcUserHeader: {(LibraryFunction | string | UserString)...} = [];
@@ -3046,27 +3145,23 @@ class SystemHeader {
 	}
 
 	@@Print the implementations from /kos/src/libc/auto/string.c
-	public function cprintLibraryAutoSource(fp: CWriter, dosAbi: bool = false) {
-		local guardName = "GUARD_LIBC_AUTO_{}{}_C".format({
-			dosAbi ? "DOSABI_" : "",
+	public function cprintLibraryAutoSource(fp: CWriter) {
+		local guardName = "GUARD_LIBC_AUTO_{}_C".format({
 			name.replace("-", "_").replace(".", "_").upper(),
 		});
 		fp << "#ifndef " << guardName << "\n"
 			"#define " << guardName << " 1\n"
 			"\n"
-			"#include \"../" << (dosAbi ? "../" : "") << "api.h\"\n"
+			"#include \"../api.h\"\n"
 			"#include <hybrid/typecore.h>\n"
 			"#include <kos/types.h>\n"
 			"#include \"";
-		if (dosAbi)
-			fp << "../";
 		if (order_libcUserHeader)
 			fp << "../user/";
 		fp << name << ".h\"\n";
 		local dependentFunctionHeaders: {string: {string...}} = Dict();
 		/* Gather declaring headers of all dependent functions */
-		local partOrder = dosAbi ? order_libcDosabiSource : order_libcAutoSource;
-		for (local part: partOrder) {
+		for (local part: order_libcAutoSource) {
 			if (part !is LibraryFunction)
 				continue;
 			for (local binding /*: LibraryFunctionBinding*/: part.functionBindings) {
@@ -3107,8 +3202,6 @@ class SystemHeader {
 				} else {
 					hdr = "\"{}.h\"".format({ hdr });
 				}
-				if (dosAbi)
-					hdr = "\"../" + hdr[1:];
 				fp.ppInclude(hdr);
 			}
 			fp.ppEndif();
@@ -3117,7 +3210,7 @@ class SystemHeader {
 		fp << "\n"
 			"DECL_BEGIN\n"
 			"\n";
-		for (local part: partOrder) {
+		for (local part: order_libcAutoSource) {
 			if (part is LibraryFunction) {
 				part.cprintInLibraryAutoImplementation(fp, ESCAPE_MODE_NONE, "INTERN");
 			} else {
@@ -3128,7 +3221,7 @@ class SystemHeader {
 			"DECL_END\n"
 			"\n";
 		/* Print out the symbol export table. */
-		for (local part: partOrder) {
+		for (local part: order_libcAutoSource) {
 			if (part !is LibraryFunction)
 				continue;
 			if (!part.exportSymbolNames)

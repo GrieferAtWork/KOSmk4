@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b3e3d2d */
+/* HASH CRC-32:0xb34e4079 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,7 @@
 
 #include <features.h>
 #include <bits/types.h>
+#include <asm/stdio.h>
 
 /* Partially derived from GNU C /usr/include/libio.h */
 
@@ -60,9 +61,9 @@
    This exception applies to code released by its copyright holders
    in files containing the exception.  */
 
-#ifndef EOF
-#define EOF (-1)
-#endif /* !EOF */
+#if !defined(EOF) && defined(__EOF)
+#define EOF __EOF
+#endif /* !EOF && __EOF */
 
 #ifndef NULL
 #define NULL __NULLPTR

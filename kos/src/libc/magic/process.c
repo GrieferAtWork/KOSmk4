@@ -21,6 +21,9 @@
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(pid_t = __pid_t)]
 
+%[define_type_class(__TARGV = "TP")]
+%[define_type_class(__TENVP = "TP")]
+
 %{
 #include <features.h>
 #include <bits/types.h>
@@ -89,6 +92,9 @@ typedef __WCHAR_TYPE__ wchar_t;
 %typedef void (__LIBCCALL *__dos_beginthread_entry_t)(void *__arg);
 %typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__arg);
 %
+
+%[define_type_class(__dos_beginthread_entry_t = "TP")]
+%[define_type_class(__dos_beginthreadex_entry_t = "TP")]
 
 %[define_replacement(__dos_beginthread_entry_t = __dos_beginthread_entry_t)]
 %[define_replacement(__dos_beginthreadex_entry_t = __dos_beginthreadex_entry_t)]
@@ -180,6 +186,7 @@ int _unloaddll(intptr_t hnd);
 %
 %typedef int (__LIBCCALL *__procfun)(void);
 %[define_replacement(__procfun = __procfun)]
+%[define_type_class(__procfun = "TP")]
 
 [[throws, decl_include("<features.h>")]]
 __procfun _getdllprocaddr(intptr_t hnd,
@@ -210,6 +217,9 @@ typedef __intptr_t intptr_t;
 #endif /* !__TWARGV */
 
 }
+
+%[define_type_class(__TWARGV = "TP")]
+%[define_type_class(__TWENVP = "TP")]
 
 %
 %#ifndef _WPROCESS_DEFINED

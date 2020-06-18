@@ -36,6 +36,12 @@ __SYSDECL_BEGIN
 
 %[define_wchar_replacement(__TWARGV = __T16ARGV, __T32ARGV)]
 %[define_wchar_replacement(__TWENVP = __T16ENVP, __T32ENVP)]
+
+%[define_type_class(__T16ARGV = "TP")]
+%[define_type_class(__T16ENVP = "TP")]
+%[define_type_class(__T32ARGV = "TP")]
+%[define_type_class(__T32ENVP = "TP")]
+
 %{
 #ifndef __T16ARGV
 #ifdef __USE_DOS

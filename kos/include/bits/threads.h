@@ -31,7 +31,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 
 typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_KEY_T) __tss_t;
-typedef __UINTPTR_TYPE__ __thrd_t;
+typedef __TYPEFOR_UINTIB(__SIZEOF_PTHREAD_T) __thrd_t;
 typedef void (__LIBCCALL *__tss_dtor_t)(void *__arg);
 typedef int (__LIBCCALL *__thrd_start_t)(void *__obj);
 typedef void (__LIBCCALL *__once_func_t)(void);

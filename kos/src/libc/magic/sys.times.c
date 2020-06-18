@@ -19,6 +19,7 @@
  */
 
 %[define_replacement(fd_t = __fd_t)]
+%[define_replacement(clock_t = __typedef_clock_t)]
 
 %{
 #include <bits/types.h>
@@ -65,6 +66,8 @@ struct tms {
 @@dead children (and their dead children) in BUFFER.
 @@Return the elapsed real time, or (clock_t) -1 for errors.
 @@All times are in CLK_TCKths of a second
+[[decl_include("<bits/types.h>")]]
+[[decl_prefix(struct tms;)]]
 clock_t times(struct tms *buffer);
 
 %{

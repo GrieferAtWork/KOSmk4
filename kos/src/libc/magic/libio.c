@@ -23,6 +23,7 @@
 %{
 #include <features.h>
 #include <bits/types.h>
+#include <asm/stdio.h>
 
 /* Partially derived from GNU C /usr/include/libio.h */
 
@@ -53,9 +54,9 @@
    This exception applies to code released by its copyright holders
    in files containing the exception.  */
 
-#ifndef EOF
-#define EOF (-1)
-#endif /* !EOF */
+#if !defined(EOF) && defined(__EOF)
+#define EOF __EOF
+#endif /* !EOF && __EOF */
 
 #ifndef NULL
 #define NULL __NULLPTR
@@ -126,6 +127,10 @@ typedef _IO_cookie_io_functions_t cookie_io_functions_t;
 #endif /* __USE_GNU */
 
 }
+
+%[define_type_class(_IO_cookie_io_functions_t = "TS(__SIZEOF_COOKIE_IO_FUNCTIONS_T)")]
+%[define_type_class(cookie_io_functions_t     = "TS(__SIZEOF_COOKIE_IO_FUNCTIONS_T)")]
+
 
 /* ... */
 

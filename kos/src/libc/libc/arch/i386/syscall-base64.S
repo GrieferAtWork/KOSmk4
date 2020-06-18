@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_LIBC_ARCH_I386_SYSCALL_BASE64_S
 #define GUARD_LIBC_LIBC_ARCH_I386_SYSCALL_BASE64_S 1
+#define __ASSEMBLER__ 1
 
 #include <hybrid/compiler.h>
 

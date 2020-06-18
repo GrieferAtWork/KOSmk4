@@ -30,6 +30,11 @@
 %[define_replacement(cnd_t = __cnd_t)]
 %[define_replacement(STATIC_ASSERT = __STATIC_ASSERT)]
 
+%[define_type_class(tss_t = "TIn(__SIZEOF_PTHREAD_KEY_T)")]
+%[define_type_class(thrd_t = "TIn(__SIZEOF_PTHREAD_T)")]
+%[define_type_class(thrd_start_t = "TP")]
+%[define_type_class(tss_dtor_t = "TP")]
+
 %[define_replacement(thrd_success  = __thrd_success)]
 %[define_replacement(thrd_busy     = __thrd_busy)]
 %[define_replacement(thrd_error    = __thrd_error)]

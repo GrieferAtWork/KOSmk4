@@ -65,6 +65,11 @@ typedef int __priority_which_t;
 
 }
 
+%[define_type_class(__rlimit_resource_t = "TD")]
+%[define_type_class(__rusage_who_t = "TD")]
+%[define_type_class(__priority_which_t = "TD")]
+
+
 
 @@Put the soft and hard limits for RESOURCE in *RLIMITS.
 @@Returns 0 if successful, -1 if not (and sets errno)

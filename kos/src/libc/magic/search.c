@@ -241,7 +241,6 @@ typedef struct entry {
 @@pp_endif@@
 )]
 
-
 @@Search for entry matching ITEM.key in internal hash table.
 @@If ACTION is `FIND' return found entry or signal error by returning NULL.
 @@If ACTION is `ENTER' replace existing data (if any) with ITEM.data
@@ -772,6 +771,7 @@ done:
 typedef void (__LIBCCALL *__action_fn_t)(void const *nodep, VISIT value, int level);
 #endif /* !__ACTION_FN_T */
 }
+%[define_type_class(__action_fn_t = "TP")]
 
 @@Walk through the whole tree and call the ACTION callback for every node or leaf
 [[export_alias("__twalk"), impl_prefix(
@@ -810,6 +810,7 @@ void twalk([[nullable]] void const *root,
  * If the keys are atomic data this function should do nothing.  */
 typedef void (*__free_fn_t) (void *__nodep);
 }
+%[define_type_class(__free_fn_t = "TP")]
 
 @@Destroy the whole tree, call FREEFCT for each node or leaf
 [[requires_function(free)]]
@@ -840,7 +841,7 @@ again:
 
 @@Perform linear search for KEY by comparing by COMPAR in an array [BASE, BASE+NMEMB*SIZE)
 [[decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<features.h>")]]
-void *lfind:(void const *key, [[nonnull]] void const *base, [[nonnull]] size_t __KOS_FIXED_CONST *nmemb, size_t size, [[nonnull]] __compar_fn_t compar)
+void *lfind(void const *key, [[nonnull]] void const *base, [[nonnull]] size_t __KOS_FIXED_CONST *nmemb, size_t size, [[nonnull]] __compar_fn_t compar)
 	[(void const *key, [[nonnull]] void *base, [[nonnull]] size_t __KOS_FIXED_CONST *nmemb, size_t size, [[nonnull]] __compar_fn_t compar): void *]
 	[(void const *key, [[nonnull]] void const *base, [[nonnull]] size_t __KOS_FIXED_CONST *nmemb, size_t size, [[nonnull]] __compar_fn_t compar): void const *]
 {

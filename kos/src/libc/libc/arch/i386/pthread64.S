@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_LIBC_ARCH_I386_PTHREAD64_S
 #define GUARD_LIBC_LIBC_ARCH_I386_PTHREAD64_S 1
+#define __ASSEMBLER__ 1
 #define _KOS_KERNEL_SOURCE 1
 
 #include "../../pthread.h"

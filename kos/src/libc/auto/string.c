@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea200b6f */
+/* HASH CRC-32:0x673b286c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2844,6 +2844,21 @@ NOTHROW_NCX(LIBCCALL libc_vstrdupf)(char const *__restrict format,
 	char *result;
 	return libc_vasprintf(&result, format, args) >= 0 ? result : 0;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Print the given `FORMAT' into a newly allocated, heap-allocated string */
+INTERN ATTR_SECTION(".text.crt.dos.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) char *
+NOTHROW_NCX(VLIBDCALL libd_strdupf)(char const *__restrict format,
+                                    ...) {
+	char * result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vstrdupf(format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string */
 INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0) char *
 NOTHROW_NCX(VLIBCCALL libc_strdupf)(char const *__restrict format,
@@ -4690,6 +4705,11 @@ DEFINE_PUBLIC_ALIAS(memcasecmp_l, libc_memcasecmp_l);
 DEFINE_PUBLIC_ALIAS(memcasemem_l, libc_memcasemem_l);
 DEFINE_PUBLIC_ALIAS(strcasestr_l, libc_strcasestr_l);
 DEFINE_PUBLIC_ALIAS(vstrdupf, libc_vstrdupf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$strdupf, libd_strdupf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(strdupf, libc_strdupf);
 DEFINE_PUBLIC_ALIAS(wildstrcmp, libc_wildstrcmp);
 DEFINE_PUBLIC_ALIAS(wildstrcasecmp, libc_wildstrcasecmp);

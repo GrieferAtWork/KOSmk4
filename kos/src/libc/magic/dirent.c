@@ -269,6 +269,8 @@ typedef int (*__scandir_selector_t)(struct dirent const *);
 typedef int (*__scandir_cmp_t)(struct dirent const **, struct dirent const **);
 #endif /* !____scandir_selector_t_defined */
 }
+%[define_type_class(__scandir_selector_t = "TP")]
+%[define_type_class(__scandir_cmp_t = "TP")]
 
 %[define(DEFINE_SCANDIR_SELECTOR_T =
 @@pp_ifndef ____scandir_selector_t_defined@@
@@ -330,6 +332,8 @@ typedef int (*__scandir64_selector_t)(struct dirent64 const *);
 typedef int (*__scandir64_cmp_t)(struct dirent64 const **, struct dirent64 const **);
 #endif /* !____scandir64_selector_t_defined */
 }
+%[define_type_class(__scandir64_selector_t = "TP")]
+%[define_type_class(__scandir64_cmp_t = "TP")]
 
 %[define(DEFINE_SCANDIR64_SELECTOR_T =
 @@pp_ifndef ____scandir64_selector_t_defined@@

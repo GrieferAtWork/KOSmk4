@@ -35,6 +35,10 @@
 %[define_replacement(pthread_barrierattr_t = __pthread_barrierattr_t)]
 %[define_replacement(cpu_set_t = __cpu_set_t)]
 
+%[define_type_class(__pthread_t = "TIn(__SIZEOF_PTHREAD_T)")]
+%[define_type_class(__pthread_key_t = "TIn(__SIZEOF_PTHREAD_KEY_T)")]
+%[define_type_class(__pthread_once_t = "TIn(__SIZEOF_PTHREAD_ONCE_T)")]
+
 
 %{
 #include <features.h>
@@ -357,19 +361,20 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
 
 }
 
-
+%[define_type_class(__pthread_start_routine_t = "TP")]
+%[define(DEFINE_PTHREAD_START_ROUTINE_T =
+@@pp_ifndef ____pthread_start_routine_t_defined@@
+#define ____pthread_start_routine_t_defined 1
+typedef void *(*__pthread_start_routine_t)(void *);
+@@pp_endif@@
+)]
 
 %
 @@Create a new thread, starting with execution of START-ROUTINE
 @@getting passed ARG. Creation attributed come from ATTR. The new
 @@handle is stored in *NEWTHREAD
 [[decl_include("<bits/pthreadtypes.h>")]]
-[[decl_prefix(
-#ifndef ____pthread_start_routine_t_defined
-#define ____pthread_start_routine_t_defined 1
-typedef void *(*__pthread_start_routine_t)(void *);
-#endif /* !____pthread_start_routine_t_defined */
-)]]
+[[decl_prefix(DEFINE_PTHREAD_START_ROUTINE_T)]]
 int pthread_create([[nonnull]] pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr,
                    [[nonnull]] __pthread_start_routine_t start_routine, void *__restrict arg);
 
@@ -662,6 +667,7 @@ int pthread_getaffinity_np(pthread_t pthread, size_t cpusetsize,
 
 %
 %typedef void (__LIBCCALL *__pthread_once_routine_t)(void);
+%[define_type_class(__pthread_once_routine_t = "TP")]
 
 %
 %/* Functions for handling initialization. */
@@ -1503,6 +1509,7 @@ int pthread_barrierattr_setpshared([[nonnull]] pthread_barrierattr_t *attr, int 
 typedef void (__LIBCCALL *__pthread_destr_function_t)(void *);
 #endif /* !____pthread_destr_function_t_defined */
 }
+%[define_type_class(__pthread_destr_function_t = "TP")]
 
 
 %
@@ -1546,6 +1553,7 @@ int pthread_getcpuclockid(pthread_t pthread_id, [[nonnull]] $clockid_t *clock_id
 %#define ____pthread_atfork_func_t_defined 1
 %typedef void (__LIBCCALL *__pthread_atfork_func_t)(void);
 %#endif /* !____pthread_atfork_func_t_defined */
+%[define_type_class(__pthread_atfork_func_t = "TP")]
 
 %
 @@Install handlers to be called when a new process is created with FORK.

@@ -29,6 +29,7 @@
 %[define_replacement(sig_atomic_t = __sig_atomic_t)]
 %[define_replacement(sig_t        = __sighandler_t)]
 %[define_replacement(timespec64   = __timespec64)]
+%[define_type_class(__sighandler_t = "TP")]
 %[default:section(".text.crt{|.dos}.sched.signal")]
 
 %(auto_header,user){

@@ -116,6 +116,7 @@ typedef void *__restrict __timezone_ptr_t;
 }
 
 %[define_replacement(__timezone_ptr_t = "void *")]
+%[define_replacement(__itimer_which_t = int)]
 
 
 [[doc_alias("gettimeofday"), ignore, nocrt, alias("gettimeofday", "__gettimeofday")]]

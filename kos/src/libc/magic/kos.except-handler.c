@@ -20,6 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(except_handler_t = __except_handler_t)]
+%[define_type_class(__except_handler_t = "TP")]
 
 %{
 #include <kos/anno.h>

@@ -18,32 +18,39 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+%[default:section(".text.crt{|.dos}.string.format")]
+
 %[define_replacement(pformatprinter = __pformatprinter)]
 %[define_replacement(pformatgetc    = __pformatgetc)]
 %[define_replacement(pformatungetc  = __pformatungetc)]
 
-%[default:section(".text.crt{|.dos}.string.format")]
+%[define_type_class(__pformatprinter    = "TP")]
+%[define_type_class(__pformatgetc       = "TP")]
+%[define_type_class(__pformatungetc     = "TP")]
+%[define_type_class(__pwformatprinter   = "TP")]
+%[define_type_class(__pc16formatprinter = "TP")]
+%[define_type_class(__pc32formatprinter = "TP")]
 
-%[define_str2wcs_replacement(pformatprinter = pwformatprinter)]
-%[define_str2wcs_replacement(__pformatprinter = __pwformatprinter)]
-%[define_str2wcs_replacement(format_repeat = format_wrepeat)]
-%[define_str2wcs_replacement(format_escape = format_wescape)]
-%[define_str2wcs_replacement(format_hexdump = format_whexdump)]
-%[define_str2wcs_replacement(format_printf = format_wprintf)]
-%[define_str2wcs_replacement(format_vprintf = format_vwprintf)]
-%[define_str2wcs_replacement(format_sprintf_printer = format_wsprintf_printer)]
-%[define_str2wcs_replacement(format_snprintf_data = format_wsnprintf_data)]
+%[define_str2wcs_replacement(pformatprinter          = pwformatprinter)]
+%[define_str2wcs_replacement(__pformatprinter        = __pwformatprinter)]
+%[define_str2wcs_replacement(format_repeat           = format_wrepeat)]
+%[define_str2wcs_replacement(format_escape           = format_wescape)]
+%[define_str2wcs_replacement(format_hexdump          = format_whexdump)]
+%[define_str2wcs_replacement(format_printf           = format_wprintf)]
+%[define_str2wcs_replacement(format_vprintf          = format_vwprintf)]
+%[define_str2wcs_replacement(format_sprintf_printer  = format_wsprintf_printer)]
+%[define_str2wcs_replacement(format_snprintf_data    = format_wsnprintf_data)]
 %[define_str2wcs_replacement(format_snprintf_printer = format_wsnprintf_printer)]
 
-%[define_str2wcs_replacement(ATTR_LIBC_PRINTF = ATTR_LIBC_WPRINTF)]
+%[define_str2wcs_replacement(ATTR_LIBC_PRINTF   = ATTR_LIBC_WPRINTF)]
 %[define_str2wcs_replacement(ATTR_LIBC_PRINTF_P = ATTR_LIBC_WPRINTF_P)]
-%[define_str2wcs_replacement(ATTR_LIBC_SCANF = ATTR_LIBC_WSCANF)]
+%[define_str2wcs_replacement(ATTR_LIBC_SCANF    = ATTR_LIBC_WSCANF)]
 
-%[define_str2wcs_replacement(__ATTR_LIBC_PRINTF = __ATTR_LIBC_WPRINTF)]
+%[define_str2wcs_replacement(__ATTR_LIBC_PRINTF   = __ATTR_LIBC_WPRINTF)]
 %[define_str2wcs_replacement(__ATTR_LIBC_PRINTF_P = __ATTR_LIBC_WPRINTF_P)]
-%[define_str2wcs_replacement(__ATTR_LIBC_SCANF = __ATTR_LIBC_WSCANF)]
+%[define_str2wcs_replacement(__ATTR_LIBC_SCANF    = __ATTR_LIBC_WSCANF)]
 
-%[define_str2wcs_header_replacement("<format-printer.h>" = "<parts/wchar/format-printer.h>")]
+%[define_str2wcs_header_replacement("<format-printer.h>"      = "<parts/wchar/format-printer.h>")]
 %[define_str2wcs_header_replacement("<bits/format-printer.h>" = "<bits/wformat-printer.h>")]
 
 %(auto_source){

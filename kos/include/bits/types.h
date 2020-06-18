@@ -141,9 +141,9 @@ __DECL_BEGIN
 #ifndef __SIZEOF_CLOCK_T__
 #define __SIZEOF_CLOCK_T__          __SIZEOF_SYSCALL_LONG_T__
 #endif /* !__SIZEOF_CLOCK_T__ */
-#ifndef __SIZEOF_USECOND_T__
-#define __SIZEOF_USECOND_T__        4
-#endif /* !__SIZEOF_USECOND_T__ */
+#ifndef __SIZEOF_USECONDS_T__
+#define __SIZEOF_USECONDS_T__       4
+#endif /* !__SIZEOF_USECONDS_T__ */
 #ifndef __SIZEOF_SUSECONDS_T__
 #define __SIZEOF_SUSECONDS_T__      __SIZEOF_SYSCALL_LONG_T__
 #endif /* !__SIZEOF_SUSECONDS_T__ */
@@ -509,7 +509,7 @@ typedef __CRT_PRIVATE_UINT(__SIZEOF_GID_T__) __gid_t;
 typedef __CRT_PRIVATE_UINT(__SIZEOF_UID_T__) __uid_t;
 #define __uid_t           __uid_t
 #undef  __useconds_t
-typedef __CRT_PRIVATE_UINT(__SIZEOF_USECOND_T__) __useconds_t;
+typedef __CRT_PRIVATE_UINT(__SIZEOF_USECONDS_T__) __useconds_t;
 #define __useconds_t      __useconds_t
 #undef  __jtime_t
 typedef __CRT_PRIVATE_UINT(__SIZEOF_JTIME_T__) __jtime_t;

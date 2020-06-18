@@ -253,6 +253,8 @@ struct rlimit64 {
 %#endif /* !__COMPILER_PREFERR_ENUMS */
 %
 
+%[define_type_class(__rlimit_resource_t = "TD")]
+
 int prlimit($pid_t pid, __rlimit_resource_t resource,
             [[nullable]] struct rlimit const *new_limit,
             [[nullable]] struct rlimit *old_limit);

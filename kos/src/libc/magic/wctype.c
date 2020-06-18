@@ -23,6 +23,7 @@
 %[define_replacement(wint_t = __WINT_TYPE__)]
 %[define_replacement(wctype_t = __WCTYPE_TYPE__)]
 %[define_replacement(wctrans_t = __wctrans_t)]
+%[define_type_class(__wctrans_t = "TP")]
 
 %[define_str2wcs_replacement(iscntrl = iswcntrl)]
 %[define_str2wcs_replacement(isspace = iswspace)]

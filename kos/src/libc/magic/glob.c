@@ -161,6 +161,10 @@ typedef int (__LIBCCALL *__glob_errfunc_t)(char const *__path, int __flags);
 
 }
 
+%[define_type_class(__glob_errfunc_t = "TP")]
+%[define_replacement(__glob_errfunc_t = __glob_errfunc_t)]
+
+
 %[define(DEFINE_GLOB_ERRFUNC_T =
 @@pp_ifndef ____glob_errfunc_t_defined@@
 #define ____glob_errfunc_t_defined 1

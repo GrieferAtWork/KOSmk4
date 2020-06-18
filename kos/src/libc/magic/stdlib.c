@@ -34,6 +34,14 @@
 %[define_replacement(s32 = __INT32_TYPE__)]
 %[define_replacement(s64 = __INT64_TYPE__)]
 
+%[define_type_class(__WAIT_STATUS      = "TP")]
+%[define_type_class(__WAIT_STATUS_DEFN = "TP")]
+%[define_type_class(__atexit_func_t    = "TP")]
+%[define_type_class(__on_exit_func_t   = "TP")]
+%[define_type_class(comparison_fn_t    = "TP")]
+%[define_type_class(__compar_fn_t      = "TP")]
+%[define_type_class(__compar_d_fn_t    = "TP")]
+
 %(auto_source){
 #include "../libc/globals.h"
 }
@@ -160,6 +168,9 @@ struct __lldiv_struct {
 %[define_replacement(div_t = "struct __div_struct")]
 %[define_replacement(ldiv_t = "struct __ldiv_struct")]
 %[define_replacement(lldiv_t = "struct __lldiv_struct")]
+%[define_type_class(div_t = "TS(__SIZEOF_DIV_STRUCT)")]
+%[define_type_class(ldiv_t = "TS(__SIZEOF_LDIV_STRUCT)")]
+%[define_type_class(lldiv_t = "TS(__SIZEOF_LLDIV_STRUCT)")]
 %{
 
 __NAMESPACE_STD_BEGIN
@@ -215,6 +226,7 @@ typedef void (*__LIBCCALL __atexit_func_t)(void);
 #endif /* !____atexit_func_t_defined */
 
 }
+
 %#ifdef __USE_GNU
 %{
 #ifndef __compar_d_fn_t_defined
@@ -222,6 +234,7 @@ typedef void (*__LIBCCALL __atexit_func_t)(void);
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 }
+
 
 %[define(DEFINE_COMPAR_D_FN_T =
 @@pp_ifndef __compar_d_fn_t_defined@@
@@ -434,6 +447,8 @@ void *bsearch_r([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $si
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 @@pp_endif@@
 )]
+
+
 
 %[define(DEFINE_INVOKE_COMPARE_HELPER =
 @@pp_ifndef ____invoke_compare_helper_defined@@
@@ -2326,6 +2341,7 @@ typedef void (__LIBCCALL *_purecall_handler)(void);
 #endif /* !___purecall_handler_defined */
 )]
 %[define_replacement(_purecall_handler = _purecall_handler)]
+%[define_type_class(_purecall_handler = "TP")]
 
 
 [[decl_prefix(DEFINE_PURECALL_HANDLER)]]
@@ -2350,6 +2366,7 @@ typedef void (__LIBCCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t c
 #endif /* !___invalid_parameter_handler_defined */
 )]
 %[define_replacement(_invalid_parameter_handler = _invalid_parameter_handler)]
+%[define_type_class(_invalid_parameter_handler = "TP")]
 
 [[decl_prefix(DEFINE_INVALID_PARAMETER_HANDLER)]]
 _invalid_parameter_handler _set_invalid_parameter_handler(_invalid_parameter_handler __handler);
@@ -2501,6 +2518,8 @@ typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void
 typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
 @@pp_endif@@
 )]
+%[define_replacement(__dos_compar_d_fn_t = __dos_compar_d_fn_t)]
+%[define_type_class(__dos_compar_d_fn_t = "TP")]
 
 %[define(DEFINE_INVOKE_COMPARE_HELPER_S =
 @@pp_ifndef ____invoke_compare_helper_s_defined@@
@@ -3562,6 +3581,8 @@ char *ultoa(unsigned long val, [[nonnull]] char *buf, int radix) {
 typedef int (__LIBCCALL *_onexit_t)(void);
 #endif  /* _ONEXIT_T_DEFINED */
 )]
+%[define_type_class(onexit_t  = "TP")]
+%[define_type_class(_onexit_t = "TP")]
 
 [[export_alias("_onexit"), decl_prefix(DEFINE_ONEXIT_T)]]
 onexit_t onexit(onexit_t func);

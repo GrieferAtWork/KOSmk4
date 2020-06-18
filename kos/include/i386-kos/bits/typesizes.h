@@ -33,7 +33,7 @@
 #define __SIZEOF_INO32_T__          __SIZEOF_SYSCALL_LONG_T__
 #define __SIZEOF_RLIM32_T__         __SIZEOF_SYSCALL_LONG_T__
 #define __SIZEOF_TIME32_T__         __SIZEOF_SYSCALL_LONG_T__
-#define __SIZEOF_USECOND_T__        4
+#define __SIZEOF_USECONDS_T__       4
 #define __SIZEOF_SUSECONDS_T__      __SIZEOF_SYSCALL_LONG_T__
 #define __SIZEOF_CLOCKID_T__        4
 #define __SIZEOF_CLOCK_T__          __SIZEOF_SYSCALL_LONG_T__

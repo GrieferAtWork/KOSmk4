@@ -28,18 +28,8 @@ import * from .globals;
 import * from .namespace;
 import * from .wchar;
 import * from .generator;
+import * from .typeclass;
 import Function from .cheaders;
-
-/* TODO: Add checks & errors for duplicate Function.bindings
- *       - Duplicate [[alias(...)]] Annotations
- *       - An [[alias(...)]] annotation that overlaps with [[crt_name()]] without [[no_crt_self_import]]
- *       - A [[wchar]] function that binds against assembly names already designated by other bindings
- *       - ...
- * TODO: Assert that `FunctionPrototype.nothrow === DEFAULT_NOTHROW' whenever
- *       re-assigning a different nothrow, thus ensuring that any function has
- *       at most a single nothrow-related annotation!
- */
-
 
 /* How auto vs. user implementation is selected:
  * >> if (HAS_MAGIC_IMPLEMENTION_BODY) {
@@ -556,6 +546,11 @@ again_skip_arg_annotation_rbracket:
 		if (tok != ",")
 			break;
 		tok = self.next();
+	}
+	if (#result.argv == 1) {
+		local arg0 = result.argv.first;
+		if (!arg0.name && arg0.ctype.beforeName == "void" && !arg0.ctype.afterName)
+			result.argv = []; /* Argument list is actually empty! */
 	}
 	self.skip(")");
 	if (nonNullArguments) {
@@ -2092,6 +2087,10 @@ again_parse_default_annotation:
 			}
 		}
 		self.skip(")");
+	}
+
+	public function parseDirective_define_type_class() {
+		parseDirective_define_replacement(knownTypeClasses);
 	}
 
 	public function parseDirective_define_partial_replacement() {
@@ -4524,39 +4523,49 @@ again_lookup_wcsCurrent:
 						local crt_dosSection = currentFeatures.crt_dosSection !is none
 							? currentFeatures.crt_dosSection
 							: DEFAULT_DOS_SECTION;
-						local dosLibImpl: FunctionImplementation | Callable;
-						/* Generate the wrapper/ */
 						local dosProto: FunctionPrototype | Callable = currentDosLibraryFunction.prototype;
-						if (dosProto is Callable ||
-						    (kosProto is Callable && dosProto.hasEllipsis &&
-						     dosProto.ellipsisArgumentTypes is none)) {
-							dosLibImpl = []{
-								local usedDosProto: FunctionPrototype;
-								usedDosProto = dosProto is Callable ? dosProto() : dosProto;
-								if (!usedDosProto.hasEllipsis || usedDosProto.ellipsisArgumentTypes !is none) {
-									return generateDosWrapperFunctionImplementationForPrototype(
-										usedDosProto, kosProto is Callable ? kosProto() : kosProto,
-										libc_dosName, libc_kosName, current);
-								}
-								return libImpl;
-							};
-						} else if (!dosProto.hasEllipsis || dosProto.ellipsisArgumentTypes !is none) {
-							dosLibImpl = generateDosWrapperFunctionImplementationForPrototype(
-								dosProto, kosProto, libc_dosName, libc_kosName, current);
-						} else {
-							dosLibImpl = libImpl;
-						}
-						currentDosLibraryFunction.bindings.append(LibraryFunctionBinding(
-							ppCond:      currentFeatures.crt_dosImplRequires,
-							binding:     dosLibImpl,
-							implSection: crt_dosSection));
-						if ((currentFeatures.crt_userimpl || loaderImpl is none) &&
-						    (dosProto !is Callable && dosProto.hasEllipsis && dosProto.ellipsisArgumentTypes is none)) {
-							result.order_libcUserHeader.append(currentDosLibraryFunction);
-							result.order_libcUserSource.append(currentDosLibraryFunction);
-						} else {
+						if (dosProto is Callable || !dosProto.hasEllipsis || dosProto.ellipsisArgumentTypes !is none) {
+							currentDosLibraryFunction.bindings.append(LibraryFunctionBinding(
+								ppCond:      currentFeatures.crt_dosImplRequires,
+								/* Special trigger to cause a DFUN() wrapper to be generated. */
+								binding:     FunctionImplementation(name: libc_kosName),
+								implSection: crt_dosSection));
 							result.order_libcAutoHeader.append(currentDosLibraryFunction);
 							result.order_libcDosabiSource.append(currentDosLibraryFunction);
+						} else {
+							local dosLibImpl: FunctionImplementation | Callable;
+							/* Generate the wrapper/ */
+							if (dosProto is Callable ||
+							    (kosProto is Callable && dosProto.hasEllipsis &&
+							     dosProto.ellipsisArgumentTypes is none)) {
+								dosLibImpl = []{
+									local usedDosProto: FunctionPrototype;
+									usedDosProto = dosProto is Callable ? dosProto() : dosProto;
+									if (!usedDosProto.hasEllipsis || usedDosProto.ellipsisArgumentTypes !is none) {
+										return generateDosWrapperFunctionImplementationForPrototype(
+											usedDosProto, kosProto is Callable ? kosProto() : kosProto,
+											libc_dosName, libc_kosName, current);
+									}
+									return libImpl;
+								};
+							} else if (!dosProto.hasEllipsis || dosProto.ellipsisArgumentTypes !is none) {
+								dosLibImpl = generateDosWrapperFunctionImplementationForPrototype(
+									dosProto, kosProto, libc_dosName, libc_kosName, current);
+							} else {
+								dosLibImpl = libImpl;
+							}
+							currentDosLibraryFunction.bindings.append(LibraryFunctionBinding(
+								ppCond:      currentFeatures.crt_dosImplRequires,
+								binding:     dosLibImpl,
+								implSection: crt_dosSection));
+							if ((currentFeatures.crt_userimpl || loaderImpl is none) &&
+							    (dosProto !is Callable && dosProto.hasEllipsis && dosProto.ellipsisArgumentTypes is none)) {
+								result.order_libcUserHeader.append(currentDosLibraryFunction);
+								result.order_libcUserSource.append(currentDosLibraryFunction);
+							} else {
+								result.order_libcAutoHeader.append(currentDosLibraryFunction);
+								result.order_libcAutoSource.append(currentDosLibraryFunction);
+							}
 						}
 					}
 continue_without_dosabi_wrapper:

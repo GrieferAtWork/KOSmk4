@@ -56,9 +56,6 @@ BEGIN
 			"auto/*.c",
 			"user/*.c",
 		})
-		if (!TARGET.LIBC_LIBDCALL_IS_LIBKCALL) {
-			SOURCE({ "auto/dosabi/*.c" })
-		}
 	END
 	BEGIN GROUP("libs.libc") { COMPILE };
 		SET_LANGUAGE("assembler-with-cpp")
@@ -187,9 +184,6 @@ BEGIN
 			"user/*.c",
 			"auto/*.c",
 		})
-		if (!TARGET.LIBC_LIBDCALL_IS_LIBKCALL) {
-			SOURCE({ "auto/dosabi/*.c" })
-		}
 	END
 
 	/* TODO: After linking, edit libc.so to turn all weak symbol declarations into full symbols.

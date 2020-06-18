@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ef9e4a3 */
+/* HASH CRC-32:0x7d1cef10 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2229,7 +2229,6 @@
 #define __CRT_HAVE_DOS$sigdelset 1
 #define __CRT_HAVE_DOS$sigemptyset 1
 #define __CRT_HAVE_DOS$sigfillset 1
-#define __CRT_HAVE_DOS$siggetmask 1
 #define __CRT_HAVE_DOS$sighold 1
 #define __CRT_HAVE_DOS$sigignore 1
 #define __CRT_HAVE_DOS$siginterrupt 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f1f23bd */
+/* HASH CRC-32:0xa6f60065 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -349,7 +349,7 @@ too_small:
 	__libc_seterrno(ERANGE);
 #elif defined(EINVAL)
 	__libc_seterrno(EINVAL);
-#endif
+#endif /* ... */
 	return NULL;
 }
 #endif /* !__KERNEL__ */

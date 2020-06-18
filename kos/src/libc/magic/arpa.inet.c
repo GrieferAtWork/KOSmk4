@@ -22,6 +22,7 @@
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(pid_t = __pid_t)]
 %[define_replacement(in_addr_t = __u_net32_t)]
+%[define_replacement(socklen_t = __socklen_t)]
 
 %{
 #include <features.h>
@@ -373,13 +374,13 @@ char *inet_neta($uint32_t net, [[outp(len)]] char *buf, $size_t len) {
 		goto too_small;
 	return buf;
 too_small:
-#ifdef EMSGSIZE
+@@pp_ifdef EMSGSIZE@@
 	__libc_seterrno(EMSGSIZE);
-#elif defined(ERANGE)
+@@pp_elif defined(ERANGE)@@
 	__libc_seterrno(ERANGE);
-#elif defined(EINVAL)
+@@pp_elif defined(EINVAL)@@
 	__libc_seterrno(EINVAL);
-#endif
+@@pp_endif@@
 	return NULL;
 }
 

@@ -71,6 +71,9 @@ __SYSDECL_BEGIN
 #endif /* !__TWARGV */
 }
 
+%[define_type_class(__TWARGV = "TP")]
+%[define_type_class(__TWENVP = "TP")]
+
 %[default:section(".text.crt{|.dos}.wchar.fs.exec.exec")]
 
 [[cp, guard, wchar, argument_names(path, ___argv), dos_export_alias("_wexecv")]]

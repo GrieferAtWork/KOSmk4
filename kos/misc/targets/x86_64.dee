@@ -59,10 +59,6 @@ global final AS_PTR = ".quad";
 @@GNU AS pseudo-directive for emitting a 32-bit integer
 global final AS_I32 = ".int";
 
-@@Dos functions exported from libc follow the same ABI as KOS functions
-@@NOTE: Same as `defined(__LIBDCALL_IS_LIBKCALL)` from `<__crt.h>`
-global final LIBC_LIBDCALL_IS_LIBKCALL = false;
-
 @@Libdl implements the PE-compatibility mode system
 global final DL_HAVE_PE_COMPAT = true;
 

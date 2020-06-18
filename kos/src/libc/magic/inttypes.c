@@ -528,6 +528,8 @@ __NAMESPACE_STD_USING(imaxdiv_t)
 
 }
 
+%[define_type_class(imaxdiv_t = "TS(__SIZEOF_IMAXDIV_STRUCT)")]
+
 %[insert:std]
 
 

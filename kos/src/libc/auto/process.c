@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9d837be */
+/* HASH CRC-32:0xc74376f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,18 @@ NOTHROW_NCX(LIBCCALL libc__endthread)(void) {
 INTERN ATTR_SECTION(".text.crt.dos.sched.process") void
 (LIBCCALL libc__c_exit)(void) THROWS(...) {
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#include <parts/redirect-exec.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") ATTR_SENTINEL NONNULL((2)) pid_t
+NOTHROW_RPC(VLIBDCALL libd_spawnl)(int mode,
+                                   char const *__restrict path,
+                                   char const *args,
+                                   ...) {
+	__REDIRECT_SPAWNL(char, libc_spawnv, mode, path, args)
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #include <parts/redirect-exec.h>
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") ATTR_SENTINEL NONNULL((2)) pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnl)(int mode,
@@ -44,6 +56,18 @@ NOTHROW_RPC(VLIBCCALL libc_spawnl)(int mode,
                                    ...) {
 	__REDIRECT_SPAWNL(char, libc_spawnv, mode, path, args)
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#include <parts/redirect-exec.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") ATTR_SENTINEL NONNULL((2)) pid_t
+NOTHROW_RPC(VLIBDCALL libd_spawnlp)(int mode,
+                                    char const *__restrict file,
+                                    char const *args,
+                                    ...) {
+	__REDIRECT_SPAWNL(char, libc_spawnvp, mode, file, args)
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #include <parts/redirect-exec.h>
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") ATTR_SENTINEL NONNULL((2)) pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnlp)(int mode,
@@ -52,6 +76,18 @@ NOTHROW_RPC(VLIBCCALL libc_spawnlp)(int mode,
                                     ...) {
 	__REDIRECT_SPAWNL(char, libc_spawnvp, mode, file, args)
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#include <parts/redirect-exec.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
+NOTHROW_RPC(VLIBDCALL libd_spawnle)(int mode,
+                                    char const *__restrict path,
+                                    char const *args,
+                                    ...) {
+	__REDIRECT_SPAWNLE(char, libc_spawnve, mode, path, args)
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #include <parts/redirect-exec.h>
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode,
@@ -60,6 +96,18 @@ NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode,
                                     ...) {
 	__REDIRECT_SPAWNLE(char, libc_spawnve, mode, path, args)
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#include <parts/redirect-exec.h>
+INTERN ATTR_SECTION(".text.crt.dos.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
+NOTHROW_RPC(VLIBDCALL libd_spawnlpe)(int mode,
+                                     char const *__restrict file,
+                                     char const *args,
+                                     ...) {
+	__REDIRECT_SPAWNLE(char, libc_spawnvpe, mode, file, args)
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #include <parts/redirect-exec.h>
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") ATTR_SENTINEL_O(1) NONNULL((2)) pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(int mode,
@@ -75,12 +123,36 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_endthread, libc__endthread);
 DEFINE_PUBLIC_ALIAS(_c_exit, libc__c_exit);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_spawnl, libd_spawnl);
+DEFINE_PUBLIC_ALIAS(DOS$spawnl, libd_spawnl);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_spawnl, libc_spawnl);
 DEFINE_PUBLIC_ALIAS(spawnl, libc_spawnl);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_spawnlp, libd_spawnlp);
+DEFINE_PUBLIC_ALIAS(DOS$spawnlp, libd_spawnlp);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_spawnlp, libc_spawnlp);
 DEFINE_PUBLIC_ALIAS(spawnlp, libc_spawnlp);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_spawnle, libd_spawnle);
+DEFINE_PUBLIC_ALIAS(DOS$spawnle, libd_spawnle);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_spawnle, libc_spawnle);
 DEFINE_PUBLIC_ALIAS(spawnle, libc_spawnle);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_spawnlpe, libd_spawnlpe);
+DEFINE_PUBLIC_ALIAS(DOS$spawnlpe, libd_spawnlpe);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_spawnlpe, libc_spawnlpe);
 DEFINE_PUBLIC_ALIAS(spawnlpe, libc_spawnlpe);
 #endif /* !__KERNEL__ */

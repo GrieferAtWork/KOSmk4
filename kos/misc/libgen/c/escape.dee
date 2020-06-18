@@ -195,11 +195,11 @@ global keywordEscapes: {string: string} = Dict({
 	"u16" : "__UINT16_TYPE__",
 	"u32" : "__UINT32_TYPE__",
 	"u64" : "__UINT64_TYPE__",
+	"va_list" : "__builtin_va_list",
 });
 
 @@Special replacements for keywords in @ESCAPE_MODE_PART contexts
 global partialKeywordEscapes: {string: string} = Dict({
-	"va_list" : "__builtin_va_list",
 	"va_start" : "__builtin_va_start",
 	"va_copy" : "__builtin_va_copy",
 	"va_end" : "__builtin_va_end",

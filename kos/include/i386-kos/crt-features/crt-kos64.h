@@ -7137,7 +7137,6 @@
 #define __CRT_HAVE_KOS$sigdelset 1
 #define __CRT_HAVE_KOS$sigemptyset 1
 #define __CRT_HAVE_KOS$sigfillset 1
-#define __CRT_HAVE_KOS$siggetmask 1
 #define __CRT_HAVE_KOS$sighold 1
 #define __CRT_HAVE_KOS$sigignore 1
 #define __CRT_HAVE_KOS$siginterrupt 1
@@ -10472,7 +10471,6 @@
 #define __CRT_HAVE_DOS$sigdelset 1
 #define __CRT_HAVE_DOS$sigemptyset 1
 #define __CRT_HAVE_DOS$sigfillset 1
-#define __CRT_HAVE_DOS$siggetmask 1
 #define __CRT_HAVE_DOS$sighold 1
 #define __CRT_HAVE_DOS$sigignore 1
 #define __CRT_HAVE_DOS$siginterrupt 1

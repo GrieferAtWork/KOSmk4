@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2fd2a52 */
+/* HASH CRC-32:0xa52fd61d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,12 +28,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_setitimer32_defined 1
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(__itimer_which_t __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),setitimer,(__which,__newval,__oldval))
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(int __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),setitimer,(__which,__newval,__oldval))
 #endif /* !__local___localdep_setitimer32_defined */
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
 __LOCAL_LIBC(setitimer64) __ATTR_NONNULL((2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setitimer64))(__itimer_which_t __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setitimer64))(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval) {
 	int __result;
 	struct __itimerval32 __new32, __old32;
 	__new32.it_interval.tv_sec  = (__time32_t)__newval->it_interval.tv_sec;

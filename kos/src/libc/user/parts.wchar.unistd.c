@@ -312,7 +312,7 @@ NOTHROW_RPC(LIBKCALL libc_wgetcwd)(char32_t *buf,
 		free(result);
 		return NULL;
 	}
-	c32memcpy(buf, result, result_len + 1);
+	memcpyl(buf, result, result_len + 1);
 	free(result);
 	return buf;
 }
@@ -354,7 +354,7 @@ NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf,
 		free(result);
 		return NULL;
 	}
-	c16memcpy(buf, result, result_len + 1);
+	memcpyw(buf, result, result_len + 1);
 	free(result);
 	return buf;
 }

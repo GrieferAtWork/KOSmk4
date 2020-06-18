@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23a15f1e */
+/* HASH CRC-32:0xce69fc9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,17 @@
 DECL_BEGIN
 
 #include "../libc/globals.h"
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
+INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(1, 2) void
+(VLIBDCALL libd_warn)(char const *format,
+                      ...) THROWS(...) {
+	va_list args;
+	va_start(args, format);
+	libc_vwarn(format, args);
+	va_end(args);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
@@ -64,6 +75,19 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 	libc_funlockfile(stderr);
 #endif /* (__CRT_HAVE_flockfile || __CRT_HAVE__lock_file || __CRT_HAVE__IO_flockfile) && (__CRT_HAVE_funlockfile || __CRT_HAVE__unlock_file || __CRT_HAVE__IO_funlockfile) */
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
+INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(1, 2) void
+(VLIBDCALL libd_warnx)(char const *format,
+                       ...) THROWS(...) {
+	va_list args;
+	va_start(args, format);
+	libc_vwarnx(format, args);
+	va_end(args);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
 (VLIBCCALL libc_warnx)(char const *format,
@@ -90,6 +114,19 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 	libc_funlockfile(stderr);
 #endif /* (__CRT_HAVE_flockfile || __CRT_HAVE__lock_file || __CRT_HAVE__IO_flockfile) && (__CRT_HAVE_funlockfile || __CRT_HAVE__unlock_file || __CRT_HAVE__IO_funlockfile) */
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Same as `warn()', but follow up by calling `exit(status)' */
+INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
+(VLIBDCALL libd_err)(int status,
+                     char const *format,
+                     ...) THROWS(...) {
+	va_list args;
+	va_start(args, format);
+	libc_verr(status, format, args);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Same as `warn()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 (VLIBCCALL libc_err)(int status,
@@ -107,6 +144,19 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void
 	libc_vwarn(format, args);
 	libc_exit(status);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Same as `warnx()', but follow up by calling `exit(status)' */
+INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
+(VLIBDCALL libd_errx)(int status,
+                      char const *format,
+                      ...) THROWS(...) {
+	va_list args;
+	va_start(args, format);
+	libc_verrx(status, format, args);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 /* Same as `warnx()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 (VLIBCCALL libc_errx)(int status,
@@ -128,13 +178,31 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void
 
 DECL_END
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$warn, libd_warn);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(warn, libc_warn);
 DEFINE_PUBLIC_ALIAS(vwarn, libc_vwarn);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$warnx, libd_warnx);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(warnx, libc_warnx);
 DEFINE_PUBLIC_ALIAS(vwarnx, libc_vwarnx);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$err, libd_err);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(err, libc_err);
 DEFINE_PUBLIC_ALIAS(verr, libc_verr);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$errx, libd_errx);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(errx, libc_errx);
 DEFINE_PUBLIC_ALIAS(verrx, libc_verrx);
 #endif /* !__KERNEL__ */

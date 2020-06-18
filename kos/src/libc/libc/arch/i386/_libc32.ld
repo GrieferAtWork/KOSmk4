@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_LIBC_ARCH_I386__LIBC_LD
-#define GUARD_LIBC_LIBC_ARCH_I386__LIBC_LD 1
+#ifndef GUARD_LIBC_LIBC_ARCH_I386__LIBC32_LD
+#define GUARD_LIBC_LIBC_ARCH_I386__LIBC32_LD 1
 
 #include <hybrid/compiler.h>
 
@@ -178,4 +178,4 @@ SECTIONS {
 
 }
 
-#endif /* !GUARD_LIBC_LIBC_ARCH_I386__LIBC_LD */
+#endif /* !GUARD_LIBC_LIBC_ARCH_I386__LIBC32_LD */
