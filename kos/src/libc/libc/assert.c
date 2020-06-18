@@ -30,12 +30,14 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/syscalls.h>
+#include <sys/ioctl.h>
 #include <sys/syslog.h>
 
 #include <format-printer.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#include <termio.h>
 #include <unistd.h>
 
 #include <libunwind/api.h> /* UNWIND_USER_ABORT */
@@ -46,6 +48,29 @@
 DECL_BEGIN
 
 PUBLIC uintptr_t __stack_chk_guard = 0x123baf37;
+
+/* 0: Unknown, 1: Yes, 2: No */
+PRIVATE ATTR_SECTION(".bss.crt.assert.stderr_isatty") int stderr_isatty = 0;
+
+INTERN ATTR_NOINLINE ATTR_COLD ATTR_SECTION(".text.crt.assert.determine_stderr_isatty") void
+NOTHROW(LIBCCALL determine_stderr_isatty)(void) {
+	struct termios ios;
+	stderr_isatty = sys_ioctl(STDERR_FILENO, TCGETA, &ios) < 0 ? 2 : 1;
+}
+
+INTERN ATTR_COLD ATTR_SECTION(".text.crt.assert.printer") ssize_t LIBCCALL
+assert_printer(void *UNUSED(ignored), char const *__restrict data, size_t datalen) {
+	/* Also write assertion error text to stderr, but only if it's a TTY. */
+	if (stderr_isatty != 2) {
+		if (stderr_isatty == 0)
+			determine_stderr_isatty();
+		if (stderr_isatty == 1)
+			sys_write(STDERR_FILENO, data, datalen);
+	}
+	return syslog_printer(SYSLOG_PRINTER_CLOSURE(LOG_ERR),
+	                      data, datalen);
+}
+
 
 PRIVATE ATTR_NORETURN ATTR_COLD void LIBCCALL
 trap_application(struct kcpustate *__restrict state,
@@ -69,14 +94,17 @@ trap_application(struct kcpustate *__restrict state,
 
 INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert.__stack_chk_fail") void __FCALL
 libc_stack_failure_core(struct kcpustate *__restrict state) {
-	syslog(LOG_ERR, "User-space stack check failure [pc=%p]\n",
-	       kcpustate_getpc(state));
+	format_printf(&assert_printer, NULL,
+	              "User-space stack check failure [pc=%p]\n",
+	              kcpustate_getpc(state));
 	trap_application(state, SIGABRT, UNWIND_USER_SSP);
 }
 
 INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert.abort") void __FCALL
 libc_abort_failure_core(struct kcpustate *__restrict state) {
-	syslog(LOG_ERR, "abort() called [pc=%p]\n", kcpustate_getpc(state));
+	format_printf(&assert_printer, NULL,
+	              "abort() called [pc=%p]\n",
+	              kcpustate_getpc(state));
 	trap_application(state, SIGABRT, UNWIND_USER_ABORT);
 }
 
@@ -84,21 +112,22 @@ libc_abort_failure_core(struct kcpustate *__restrict state) {
 INTERN ATTR_SECTION(".text.crt.assert.assert")
 ATTR_NOINLINE ATTR_NORETURN ATTR_COLD void LIBCCALL
 libc_assertion_failure_core(struct assert_args *__restrict args) {
-	syslog(LOG_ERR, "Assertion Failure [pc=%p]\n",
-	       kcpustate_getpc(&args->aa_state));
-	syslog(LOG_ERR, "%s(%d) : %s%s%s\n",
-	       args->aa_file, args->aa_line,
-	       args->aa_func ? args->aa_func : "",
-	       args->aa_func ? " : " : "",
-	       args->aa_expr);
+	format_printf(&assert_printer, NULL,
+	              "Assertion Failure [pc=%p]\n",
+	              kcpustate_getpc(&args->aa_state));
+	format_printf(&assert_printer, NULL,
+	              "%s(%d) : %s%s%s\n",
+	              args->aa_file, args->aa_line,
+	              args->aa_func ? args->aa_func : "",
+	              args->aa_func ? " : " : "",
+	              args->aa_expr);
 	if (args->aa_format) {
 		va_list vargs;
 		va_copy(vargs, args->aa_args);
-		format_vprintf(&syslog_printer,
-		               SYSLOG_PRINTER_CLOSURE(LOG_ERR),
+		format_vprintf(&assert_printer, NULL,
 		               args->aa_format, vargs);
 		va_end(vargs);
-		syslog(LOG_ERR, "\n");
+		assert_printer(NULL, "\n", 1);
 	}
 	trap_application(&args->aa_state, SIGABRT, UNWIND_USER_ASSERT);
 }
