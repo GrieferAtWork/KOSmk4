@@ -65,16 +65,46 @@
 #define MSABI64_CONVERTER_FOR(argc, ...)   MSABI64_CONVERTER_FOR2(argc, (__VA_ARGS__))
 
 
+/* Floating point argument passing is identical between msabi and sysvabi,
+ * with the exception that msabi requires a buch of fpu registers to stay
+ * preserved upon return. */
+#define libd_msabi64_F      libd_msabi64_R
+#define libd_msabi64_FF     libd_msabi64_R
+#define libd_msabi64_FFF    libd_msabi64_R
+#define libd_msabi64_FFR    libd_msabi64_R
+#define libd_msabi64_FR     libd_msabi64_R
+#define libd_msabi64_FRR    libd_msabi64_RR
+#define libd_msabi64_FRRR   libd_msabi64_RRR
+#define libd_msabi64_FRRRRR libd_msabi64_RRRRR
+#define libd_msabi64_RF     libd_msabi64_R
+#define libd_msabi64_RRFR   libd_msabi64_RRR
+#define libd_msabi64_RRFRRR libd_msabi64_RRRRR
+
+/* The 1-4 general-purpose wrappers can all use the same implementation */
+#define libd_msabi64_R   libd_msabi64_RRRR
+#define libd_msabi64_RR  libd_msabi64_RRRR
+#define libd_msabi64_RRR libd_msabi64_RRRR
+
+
+/* Calculate the address of the libc_* variant from data set-up by the libd_* wrapper.
+ * Upon return, the absolute address of the libc_* function is stored in %rax
+ * s.a. The `#define DFUN()' macro below, which fills in the data used by this macro! */
+#define MSABI_LOAD_RETURN_ADDRESS()       \
+	popq   %r11;      /* offset-addent */ \
+	addq   %r11, %rax /* calculate absolute address */
+
+
 .section ".text.crt.dos.msabi64"
-#define DFUN(sectionName, libd_name, libc_name, returnType, argc, ...) \
-	INTERN_FUNCTION(libd_name);                                        \
-		INTERN(libc_name);                                             \
-		/* movl $((libc_name - .) - 10), %eax */                       \
-		.byte  0xb8;                                                   \
-		.reloc ., R_X86_64_PC32, libc_name - 9;                        \
-		.int   0;                                                      \
-		INTERN(MSABI64_CONVERTER_FOR(argc, __VA_ARGS__));              \
-		call   MSABI64_CONVERTER_FOR(argc, __VA_ARGS__);               \
+#define DFUN(sectionName, libd_name, libc_name, returnType, argc, ...)              \
+	INTERN_FUNCTION(libd_name);                                                     \
+		INTERN(libc_name);                                                          \
+		/* movzlq $((libc_name - .) - 10), %rax */                                  \
+		/* HINT: 10 == . - END(libd_name) */                                        \
+		.byte  0xb8;                                                                \
+		.reloc ., R_X86_64_PC32, libc_name - 9; /* 10-1=9, where 1=sizeof(.byte) */ \
+		.int   0;                                                                   \
+		INTERN(MSABI64_CONVERTER_FOR(argc, __VA_ARGS__));                           \
+		call   MSABI64_CONVERTER_FOR(argc, __VA_ARGS__);                            \
 	END(libd_name);
 
 /* Since wrappers don't really need any CFI instrumentation,
@@ -111,11 +141,6 @@
 
 /* 32 unnecessary bytes of pure bloat, as mandated by the specs (ugh...) */
 #define MSABI_SHADOWSPACE_SIZE 32
-
-#define MSABI_LOAD_RETURN_ADDRESS()       \
-	popq   %r11;      /* offset-addent */ \
-	addq   %r11, %rax /* calculate absolute address */
-
 
 /* NOTE: There is a requirement that `(MSABI_SAVEZONE_SIZE % 16) == 0',
  *       in order to ensure a 16-bit aligned stack upon entry to libc_* */
@@ -173,9 +198,6 @@
 	popq_cfi_r %rdi
 
 .section ".text.crt.dos.msabi64.msabi64_RRRR"
-DEFINE_INTERN_ALIAS(libd_msabi64_R, libd_msabi64_RRRR)
-DEFINE_INTERN_ALIAS(libd_msabi64_RR, libd_msabi64_RRRR)
-DEFINE_INTERN_ALIAS(libd_msabi64_RRR, libd_msabi64_RRRR)
 INTERN_FUNCTION(libd_msabi64_RRRR)
 	.cfi_startproc
 	MSABI_LOAD_RETURN_ADDRESS()
@@ -311,21 +333,6 @@ INTERN_FUNCTION(libd_msabi64_RRRRRRn)
 END(libd_msabi64_RRRRRRn)
 .cfi_endproc
 
-
-/* Floating point argument passing is identical between msabi and sysvabi,
- * with the exception that msabi requires a buch of fpu registers to stay
- * preserved upon return. */
-DEFINE_INTERN_ALIAS(libd_msabi64_F, libd_msabi64_R)
-DEFINE_INTERN_ALIAS(libd_msabi64_FF, libd_msabi64_R)
-DEFINE_INTERN_ALIAS(libd_msabi64_FFF, libd_msabi64_R)
-DEFINE_INTERN_ALIAS(libd_msabi64_FFR, libd_msabi64_R)
-DEFINE_INTERN_ALIAS(libd_msabi64_FR, libd_msabi64_R)
-DEFINE_INTERN_ALIAS(libd_msabi64_FRR, libd_msabi64_RR)
-DEFINE_INTERN_ALIAS(libd_msabi64_FRRR, libd_msabi64_RRR)
-DEFINE_INTERN_ALIAS(libd_msabi64_FRRRRR, libd_msabi64_RRRRR)
-DEFINE_INTERN_ALIAS(libd_msabi64_RF, libd_msabi64_R)
-DEFINE_INTERN_ALIAS(libd_msabi64_RRFR, libd_msabi64_RRR)
-DEFINE_INTERN_ALIAS(libd_msabi64_RRFRRR, libd_msabi64_RRRRR)
 
 
 
