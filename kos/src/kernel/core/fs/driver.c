@@ -1451,18 +1451,23 @@ driver_invoke_destructors(struct driver *__restrict self) {
 
 	for (i = 0; i < self->d_dyncnt; ++i) {
 		switch (self->d_dynhdr[i].d_tag) {
+
 		case DT_NULL:
 			goto done_dyntag;
+
 		case DT_FINI:
 			fini_func = (uintptr_t)self->d_dynhdr[i].d_un.d_ptr;
 			break;
+
 		case DT_FINI_ARRAY:
 			fini_array_base = (uintptr_t *)(self->d_loadaddr +
 			                                self->d_dynhdr[i].d_un.d_ptr);
 			break;
+
 		case DT_FINI_ARRAYSZ:
 			fini_array_size = (size_t)self->d_dynhdr[i].d_un.d_val / sizeof(void(*)(void));
 			break;
+
 		default: break;
 		}
 	}
@@ -1496,8 +1501,10 @@ driver_enable_textrel(struct driver *__restrict self)
 		if (self->d_phdr[i].p_flags & PF_W)
 			continue; /* Already writable */
 		/* Must make this header writable! */
-		if (!did_lock_kernel)
+		if (!did_lock_kernel) {
 			vm_kernel_treelock_write();
+			did_lock_kernel = true;
+		}
 		node = vm_getnodeofaddress(&vm_kernel,
 		                    (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
 		assertf(node, "Missing node for driver %q's program segment #%I16u mapped at %p",
@@ -1523,10 +1530,12 @@ driver_disable_textrel(struct driver *__restrict self)
 		if (self->d_phdr[i].p_flags & PF_W)
 			continue; /* Already writable */
 		/* Must make this header writable! */
-		if (!did_lock_kernel)
+		if (!did_lock_kernel) {
 			vm_kernel_treelock_write();
+			did_lock_kernel = true;
+		}
 		node = vm_getnodeofaddress(&vm_kernel,
-		                     (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
+		                           (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
 		assertf(node, "Missing node for driver %q's program segment #%I16u mapped at %p",
 		        self->d_name, (uint16_t)i,
 		        (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
