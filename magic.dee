@@ -178,7 +178,7 @@ function buildToolchainsAndGroups() {
 function setBinTargetLink(target_arch: string, target_name: string) {
 	/* Make sure that the correct bin-config is selected. */
 	local selConfigFile = "bin/{}-kos".format({ target_arch });
-	local selConfig = cygwinReadLink(selConfigFile);
+	local selConfig = readlink(selConfigFile);
 	if (selConfig !is string || selConfig != target_name) {
 		if (selConfig !is none)
 			fs.unlink(selConfigFile);

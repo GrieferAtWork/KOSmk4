@@ -145,59 +145,64 @@ function getLatestFilenameOf(filename: string): string {
 }
 
 
-
-#ifdef __WINDOWS__
-local final _cygwinReadlinkCache: {string: string | bool | none} = Dict();
-function cygwinReadLink(path: string): string | bool | none {
-	local result = _cygwinReadlinkCache.get(path, true);
+local final _readlinkCache: {string: string | bool | none} = Dict();
+function readlink(path: string): string | bool | none {
+	local result = _readlinkCache.get(path, true);
 	if (result !== true)
 		return result;
-	local fp;
-	fp = try File.open(path, "r") catch (...) none;
-	if (fp is none)
-		result = none;
-	else try {
-		with(fp) {
-			local data = fp.read(#"!<symlink>");
-			if (!data.startswith("!<symlink>"))
-				result = none;
-			else {
-				result = fp.readall()[2:-2].decode("utf-16");
-			}
-		}
+	try {
+		result = fs.readlink(path);
 	} catch (...) {
-		result = false;
+#ifdef __WINDOWS__
+		local fp;
+		fp = try File.open(path, "r") catch (...) none;
+		if (fp is none)
+			result = none;
+		else try {
+			with(fp) {
+				local data = fp.read(#"!<symlink>");
+				if (!data.startswith("!<symlink>"))
+					result = none;
+				else {
+					result = fp.readall()[2:-2].decode("utf-16");
+				}
+			}
+		} catch (...)
+#endif /* __WINDOWS__ */
+		{
+			result = false;
+		}
 	}
-	_cygwinReadlinkCache[path] = result;
+	_readlinkCache[path] = result;
 	return result;
 }
 
-local final _cygwinRalpathCache: {string: string} = Dict();
-function cygwinRealpath(path: string): string {
+
+local final _realpathCache: {string: string} = Dict();
+function realpath(path: string): string {
 	local orig_path = path;
 again:
-	local result = _cygwinRalpathCache.get(path);
+	local result = _realpathCache.get(path);
 	if (result !is none)
 		return result;
 	if ("/" !in path)
 		result = path;
 	else {
-		local link = cygwinReadLink(path);
+		local link = readlink(path);
 		if (link is string) {
 			path = joinpath(fs.headof(path), link);
 			goto again;
 		}
 		if (link !== false) {
 			local head, none, tail = path.rpartition("/")...;
-			result = joinpath(cygwinRealpath(head), tail);
+			result = joinpath(realpath(head), tail);
 		} else {
 			result = path;
 		}
 	}
-	_cygwinRalpathCache[orig_path] = result;
+	_realpathCache[orig_path] = result;
 	return result;
 }
-#endif /* __WINDOWS__ */
 
 
 @@Normalize a given file path
@@ -209,17 +214,15 @@ function normalizePath(path: string, expand_symlinks: bool = true): string {
 		path = path.partition("/");
 		path = "{}:/{}".format({ path[0], path[2] });
 	}
+#endif /* __WINDOWS__ */
 	if (!fs.isabs(path))
 		path = fs.abspath(path, ROOTDIR);
 	path = fs.expand(path, "p").replace("\\", "/");
 	if (expand_symlinks)
-		path = cygwinRealpath(path);
+		path = realpath(path);
 	if (path.lower().startswith(ROOTDIR))
 		path = path[#ROOTDIR:];
 	return path;
-#else /* __WINDOWS__ */
-	return fs.expand(fs.abspath(path, ROOTDIR), "p").lsstrip(ROOTDIR);
-#endif /* !__WINDOWS__ */
 }
 
 @@Cache of already created directories.
