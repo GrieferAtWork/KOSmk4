@@ -3547,6 +3547,8 @@ done_tags_for_soname:
 			/* Figure out which PT_LOAD-phdr contains `dynstr_vla' */
 			for (i = 0; i < phdrc; ++i) {
 				char *dynstr_base;
+				size_t dynstr_offset;
+				size_t dynstr_size;
 				char *so_name_start;
 				char *so_name_end;
 				if (phdrv[i].p_type != PT_LOAD)
@@ -3557,15 +3559,17 @@ done_tags_for_soname:
 				 * always be an empty string, which isn't allowed! */
 				if (phdrv[i].p_vaddr + phdrv[i].p_filesz <= dynstr_vla)
 					continue;
-				/* Found the section. */
-				dynstr_base = (char *)(base + phdrv[i].p_offset);
+				/* Found the segment. */
+				dynstr_offset = dynstr_vla - phdrv[i].p_vaddr; /* Offset of `.dynstr' in segment */
+				dynstr_base   = (char *)(base + phdrv[i].p_offset + dynstr_offset);
+				dynstr_size   = phdrv[i].p_filesz - dynstr_offset;
 				/* Make sure that .dynstr is in-bounds of the driver image. */
-				if unlikely((void *)dynstr_base < (void *)base || soname_offset >= phdrv[i].p_filesz ||
-				            (void *)(dynstr_base + phdrv[i].p_filesz) >= (void *)(base + num_bytes))
+				if unlikely((void *)dynstr_base < (void *)base || soname_offset > dynstr_size ||
+				            (void *)(dynstr_base + dynstr_size) > (void *)(base + num_bytes))
 					THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME);
 				so_name_start = dynstr_base + soname_offset;
 				so_name_end = (char *)memend(so_name_start, '\0',
-				                             phdrv[i].p_filesz - soname_offset);
+				                             dynstr_size - soname_offset);
 				/* All right! we've got the DT_SONAME string!
 				 * -> Search for an existing driver with this name. */
 				result = driver_with_namel(so_name_start,
