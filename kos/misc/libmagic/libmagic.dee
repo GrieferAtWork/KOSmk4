@@ -150,29 +150,7 @@ function readlink(path: string): string | bool | none {
 	local result = _readlinkCache.get(path, true);
 	if (result !== true)
 		return result;
-	try {
-		result = fs.readlink(path);
-	} catch (...) {
-#ifdef __WINDOWS__
-		local fp;
-		fp = try File.open(path, "r") catch (...) none;
-		if (fp is none)
-			result = none;
-		else try {
-			with(fp) {
-				local data = fp.read(#"!<symlink>");
-				if (!data.startswith("!<symlink>"))
-					result = none;
-				else {
-					result = fp.readall()[2:-2].decode("utf-16");
-				}
-			}
-		} catch (...)
-#endif /* __WINDOWS__ */
-		{
-			result = false;
-		}
-	}
+	result = try fs.readlink(path) catch (...) false;
 	_readlinkCache[path] = result;
 	return result;
 }
@@ -208,11 +186,13 @@ again:
 @@Normalize a given file path
 function normalizePath(path: string, expand_symlinks: bool = true): string {
 #ifdef __WINDOWS__
-	final local CYG_PREFIX = "/cygdrive/";
-	if (path.startswith(CYG_PREFIX)) {
-		path = path[#CYG_PREFIX:];
-		path = path.partition("/");
-		path = "{}:/{}".format({ path[0], path[2] });
+	for (local pfx: { "/cygdrive/", "/mnt/" }) {
+		if (path.startswith(pfx)) {
+			path = path[#pfx:];
+			path = path.partition("/");
+			path = "{}:/{}".format({ path[0], path[2] });
+			break;
+		}
 	}
 #endif /* __WINDOWS__ */
 	if (!fs.isabs(path))
