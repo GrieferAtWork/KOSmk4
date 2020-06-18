@@ -65,6 +65,8 @@ PHDRS {
 
 SECTIONS {
 
+	. = SIZEOF_HEADERS;
+
 	.plt : {
 		*(.plt)
 	} PHDR(text)

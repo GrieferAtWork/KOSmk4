@@ -185,10 +185,6 @@ BEGIN
 			"auto/*.c",
 		})
 	END
-
-	/* TODO: After linking, edit libc.so to turn all weak symbol declarations into full symbols.
-	 *       Their weakness only stems from the fact that they were used to define auto implementations. */
-
 END
 
 
