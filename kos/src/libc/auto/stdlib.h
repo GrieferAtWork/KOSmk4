@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe42edc30 */
+/* HASH CRC-32:0x834f4cb6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -594,6 +594,8 @@ INTDEF size_t NOTHROW_NCX(LIBDCALL libd__mbstowcs_l)(char16_t *dst, char const *
 INTDEF size_t NOTHROW_NCX(LIBKCALL libc__mbstowcs_l)(char32_t *dst, char const *src, size_t dstlen, locale_t locale);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__mbstowcs_s)(size_t *presult, char16_t *dst, size_t dstsize, char const *src, size_t dstlen);
 INTDEF errno_t NOTHROW_NCX(LIBKCALL libc__mbstowcs_s)(size_t *presult, char32_t *dst, size_t dstsize, char const *src, size_t dstlen);
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_mbstowcs_s)(size_t *presult, char16_t *dst, size_t dstsize, char const *src, size_t dstlen);
+INTDEF errno_t NOTHROW_NCX(LIBKCALL libc_mbstowcs_s)(size_t *presult, char32_t *dst, size_t dstsize, char const *src, size_t dstlen);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__mbstowcs_s_l)(size_t *presult, char16_t *dst, size_t dstsize, char const *src, size_t dstlen, locale_t locale);
 INTDEF errno_t NOTHROW_NCX(LIBKCALL libc__mbstowcs_s_l)(size_t *presult, char32_t *dst, size_t dstsize, char const *src, size_t dstlen, locale_t locale);
 #endif /* !__KERNEL__ */
@@ -850,6 +852,16 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) s64 NOTHROW_NCX(LIBDCALL libd__wtoi64_l)(c
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) s64 NOTHROW_NCX(LIBKCALL libc__wtoi64_l)(char32_t const *__restrict nptr, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBDCALL libd__wtoll_l)(char16_t const *__restrict nptr, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBKCALL libc__wtoll_l)(char32_t const *__restrict nptr, locale_t locale);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__wmakepath_s)(char16_t *buf, size_t buflen, char16_t const *drive, char16_t const *dir, char16_t const *file, char16_t const *ext);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc__wmakepath_s)(char32_t *buf, size_t buflen, char32_t const *drive, char32_t const *dir, char32_t const *file, char32_t const *ext);
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd__wmakepath)(char16_t *__restrict buf, char16_t const *drive, char16_t const *dir, char16_t const *file, char16_t const *ext);
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBKCALL libc__wmakepath)(char32_t *__restrict buf, char32_t const *drive, char32_t const *dir, char32_t const *file, char32_t const *ext);
+INTDEF NONNULL((1, 2, 3)) void NOTHROW_RPC(LIBDCALL libd__wsearchenv)(char16_t const *file, char16_t const *envvar, char16_t *__restrict resultpath);
+INTDEF NONNULL((1, 2, 3)) void NOTHROW_RPC(LIBKCALL libc__wsearchenv)(char32_t const *file, char32_t const *envvar, char32_t *__restrict resultpath);
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd__wsplitpath)(char16_t const *__restrict abspath, char16_t *drive, char16_t *dir, char16_t *file, char16_t *ext);
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBKCALL libc__wsplitpath)(char32_t const *__restrict abspath, char32_t *drive, char32_t *dir, char32_t *file, char32_t *ext);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__wsplitpath_s)(char16_t const *__restrict abspath, char16_t *drive, size_t drivelen, char16_t *dir, size_t dirlen, char16_t *file, size_t filelen, char16_t *ext, size_t extlen);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc__wsplitpath_s)(char32_t const *__restrict abspath, char32_t *drive, size_t drivelen, char32_t *dir, size_t dirlen, char32_t *file, size_t filelen, char32_t *ext, size_t extlen);
 #endif /* !__KERNEL__ */
 
 DECL_END

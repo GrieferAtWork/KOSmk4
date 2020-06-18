@@ -2115,6 +2115,126 @@ NOTHROW_NCX(LIBKCALL libc__wdupenv_s)(char32_t **pbuf,
 }
 /*[[[end:libc__wdupenv_s]]]*/
 
+/*[[[head:libd__wfullpath,hash:CRC-32=0x8506fc61]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") char16_t *
+NOTHROW_NCX(LIBDCALL libd__wfullpath)(char16_t *buf,
+                                      char16_t const *path,
+                                      size_t buflen)
+/*[[[body:libd__wfullpath]]]*/
+/*AUTO*/{
+	(void)buf;
+	(void)path;
+	(void)buflen;
+	CRT_UNIMPLEMENTED("DOS$_wfullpath"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libd__wfullpath]]]*/
+
+/*[[[head:libc__wfullpath,hash:CRC-32=0xe620b50]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") char32_t *
+NOTHROW_NCX(LIBKCALL libc__wfullpath)(char32_t *buf,
+                                      char32_t const *path,
+                                      size_t buflen)
+/*[[[body:libc__wfullpath]]]*/
+/*AUTO*/{
+	(void)buf;
+	(void)path;
+	(void)buflen;
+	CRT_UNIMPLEMENTED("_wfullpath"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:libc__wfullpath]]]*/
+
+/*[[[head:libd__wputenv,hash:CRC-32=0x2ede1d24]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) int
+NOTHROW_NCX(LIBDCALL libd__wputenv)(char16_t *string)
+/*[[[body:libd__wputenv]]]*/
+/*AUTO*/{
+	(void)string;
+	CRT_UNIMPLEMENTED("DOS$_wputenv"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libd__wputenv]]]*/
+
+/*[[[head:libc__wputenv,hash:CRC-32=0x913e79b2]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) int
+NOTHROW_NCX(LIBKCALL libc__wputenv)(char32_t *string)
+/*[[[body:libc__wputenv]]]*/
+/*AUTO*/{
+	(void)string;
+	CRT_UNIMPLEMENTED("_wputenv"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc__wputenv]]]*/
+
+/*[[[head:libd__wputenv_s,hash:CRC-32=0x985727da]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") errno_t
+NOTHROW_NCX(LIBDCALL libd__wputenv_s)(char16_t const *varname,
+                                      char16_t const *val)
+/*[[[body:libd__wputenv_s]]]*/
+/*AUTO*/{
+	(void)varname;
+	(void)val;
+	CRT_UNIMPLEMENTED("DOS$_wputenv_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libd__wputenv_s]]]*/
+
+/*[[[head:libc__wputenv_s,hash:CRC-32=0xcfcd97a5]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") errno_t
+NOTHROW_NCX(LIBKCALL libc__wputenv_s)(char32_t const *varname,
+                                      char32_t const *val)
+/*[[[body:libc__wputenv_s]]]*/
+/*AUTO*/{
+	(void)varname;
+	(void)val;
+	CRT_UNIMPLEMENTED("_wputenv_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc__wputenv_s]]]*/
+
+/*[[[head:libd__wsearchenv_s,hash:CRC-32=0x39e33fd3]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
+NOTHROW_RPC(LIBDCALL libd__wsearchenv_s)(char16_t const *file,
+                                         char16_t const *envvar,
+                                         char16_t *__restrict resultpath,
+                                         size_t buflen)
+/*[[[body:libd__wsearchenv_s]]]*/
+/*AUTO*/{
+	(void)file;
+	(void)envvar;
+	(void)resultpath;
+	(void)buflen;
+	CRT_UNIMPLEMENTED("DOS$_wsearchenv_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libd__wsearchenv_s]]]*/
+
+/*[[[head:libc__wsearchenv_s,hash:CRC-32=0x3e9d5b1]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
+NOTHROW_RPC(LIBKCALL libc__wsearchenv_s)(char32_t const *file,
+                                         char32_t const *envvar,
+                                         char32_t *__restrict resultpath,
+                                         size_t buflen)
+/*[[[body:libc__wsearchenv_s]]]*/
+/*AUTO*/{
+	(void)file;
+	(void)envvar;
+	(void)resultpath;
+	(void)buflen;
+	CRT_UNIMPLEMENTED("_wsearchenv_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc__wsearchenv_s]]]*/
+
 /*[[[head:libd__wdupenv_s,hash:CRC-32=0xdb82c616]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf,
@@ -2205,7 +2325,7 @@ NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe3cbd8c0]]]*/
+/*[[[start:exports,hash:CRC-32=0xad665e64]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(system, libc_system);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
@@ -2321,6 +2441,14 @@ DEFINE_PUBLIC_ALIAS(DOS$_wgetenv_s, libd__wgetenv_s);
 DEFINE_PUBLIC_ALIAS(_wgetenv_s, libc__wgetenv_s);
 DEFINE_PUBLIC_ALIAS(DOS$_wdupenv_s, libd__wdupenv_s);
 DEFINE_PUBLIC_ALIAS(_wdupenv_s, libc__wdupenv_s);
+DEFINE_PUBLIC_ALIAS(DOS$_wfullpath, libd__wfullpath);
+DEFINE_PUBLIC_ALIAS(_wfullpath, libc__wfullpath);
+DEFINE_PUBLIC_ALIAS(DOS$_wputenv, libd__wputenv);
+DEFINE_PUBLIC_ALIAS(_wputenv, libc__wputenv);
+DEFINE_PUBLIC_ALIAS(DOS$_wputenv_s, libd__wputenv_s);
+DEFINE_PUBLIC_ALIAS(_wputenv_s, libc__wputenv_s);
+DEFINE_PUBLIC_ALIAS(DOS$_wsearchenv_s, libd__wsearchenv_s);
+DEFINE_PUBLIC_ALIAS(_wsearchenv_s, libc__wsearchenv_s);
 /*[[[end:exports]]]*/
 
 DECL_END

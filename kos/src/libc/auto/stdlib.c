@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b049b58 */
+/* HASH CRC-32:0x22985b09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1453,6 +1453,50 @@ NOTHROW_NCX(LIBKCALL libc__mbstowcs_s)(size_t *presult,
 #endif /* EILSEQ */
 	return 0;
 }
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
+NOTHROW_NCX(LIBDCALL libd_mbstowcs_s)(size_t *presult,
+                                      char16_t *dst,
+                                      size_t dstsize,
+                                      char const *src,
+                                      size_t dstlen) {
+	size_t error;
+	if (dstlen >= dstsize) {
+		if (!dstsize)
+			return 0;
+		dstlen = dstsize - 1;
+	}
+	error = libd_mbstowcs(dst, src, dstlen);
+	if (presult)
+		*presult = error;
+#ifdef EILSEQ
+	if (error == (size_t)-1)
+		return EILSEQ;
+#endif /* EILSEQ */
+	return 0;
+}
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") errno_t
+NOTHROW_NCX(LIBKCALL libc_mbstowcs_s)(size_t *presult,
+                                      char32_t *dst,
+                                      size_t dstsize,
+                                      char const *src,
+                                      size_t dstlen) {
+	size_t error;
+	if (dstlen >= dstsize) {
+		if (!dstsize)
+			return 0;
+		dstlen = dstsize - 1;
+	}
+	error = libc_mbstowcs(dst, src, dstlen);
+	if (presult)
+		*presult = error;
+#ifdef EILSEQ
+	if (error == (size_t)-1)
+		return EILSEQ;
+#endif /* EILSEQ */
+	return 0;
+}
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
 NOTHROW_NCX(LIBDCALL libd__mbstowcs_s_l)(size_t *presult,
                                          char16_t *dst,
@@ -2621,6 +2665,348 @@ NOTHROW_NCX(LIBKCALL libc__wtoll_l)(char32_t const *__restrict nptr,
 	return libc_wcstoll_l(nptr, NULL, 10, locale);
 }
 #endif /* !... */
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBDCALL libd__wmakepath_s)(char16_t *buf,
+                                        size_t buflen,
+                                        char16_t const *drive,
+                                        char16_t const *dir,
+                                        char16_t const *file,
+                                        char16_t const *ext) {
+#define path_putn(p, n)                                  \
+	do {                                                 \
+		if unlikely(buflen < n)                          \
+			goto err_buflen;                             \
+		buf = (char16_t *)libc_mempcpyc(buf, p, n, sizeof(char16_t)); \
+	} __WHILE0
+#define path_putc(ch)          \
+	do {                       \
+		if unlikely(!buflen--) \
+			goto err_buflen;   \
+		*buf++ = (ch);         \
+	} __WHILE0
+	if (drive && *drive) {
+		path_putc(*drive);
+		path_putc(':');
+	}
+	if (dir && *dir) {
+		size_t len = libd_wcslen(dir);
+		path_putn(dir, len);
+		if (dir[len - 1] != '/' && dir[len - 1] != '\\')
+			path_putc('\\');
+	}
+	if (file && *file) {
+		size_t len = libd_wcslen(file);
+		path_putn(file, len);
+	}
+	if (ext && *ext) {
+		size_t len = libd_wcslen(ext);
+		if (*ext != '.')
+			path_putc('.');
+		path_putn(ext, len);
+	}
+	path_putc('\0');
+	return 0;
+err_buflen:
+#ifdef EINVAL
+	return EINVAL;
+#else /* EINVAL */
+	return 1;
+#endif /* !EINVAL */
+#undef path_putn
+#undef path_putc
+}
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBKCALL libc__wmakepath_s)(char32_t *buf,
+                                        size_t buflen,
+                                        char32_t const *drive,
+                                        char32_t const *dir,
+                                        char32_t const *file,
+                                        char32_t const *ext) {
+#define path_putn(p, n)                                  \
+	do {                                                 \
+		if unlikely(buflen < n)                          \
+			goto err_buflen;                             \
+		buf = (char32_t *)libc_mempcpyc(buf, p, n, sizeof(char32_t)); \
+	} __WHILE0
+#define path_putc(ch)          \
+	do {                       \
+		if unlikely(!buflen--) \
+			goto err_buflen;   \
+		*buf++ = (ch);         \
+	} __WHILE0
+	if (drive && *drive) {
+		path_putc(*drive);
+		path_putc(':');
+	}
+	if (dir && *dir) {
+		size_t len = libc_wcslen(dir);
+		path_putn(dir, len);
+		if (dir[len - 1] != '/' && dir[len - 1] != '\\')
+			path_putc('\\');
+	}
+	if (file && *file) {
+		size_t len = libc_wcslen(file);
+		path_putn(file, len);
+	}
+	if (ext && *ext) {
+		size_t len = libc_wcslen(ext);
+		if (*ext != '.')
+			path_putc('.');
+		path_putn(ext, len);
+	}
+	path_putc('\0');
+	return 0;
+err_buflen:
+#ifdef EINVAL
+	return EINVAL;
+#else /* EINVAL */
+	return 1;
+#endif /* !EINVAL */
+#undef path_putn
+#undef path_putc
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) void
+NOTHROW_NCX(LIBDCALL libd__wmakepath)(char16_t *__restrict buf,
+                                      char16_t const *drive,
+                                      char16_t const *dir,
+                                      char16_t const *file,
+                                      char16_t const *ext) {
+	libd__wmakepath_s(buf, (size_t)-1, drive, dir, file, ext);
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) void
+NOTHROW_NCX(LIBKCALL libc__wmakepath)(char32_t *__restrict buf,
+                                      char32_t const *drive,
+                                      char32_t const *dir,
+                                      char32_t const *file,
+                                      char32_t const *ext) {
+	libc__wmakepath_s(buf, (size_t)-1, drive, dir, file, ext);
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) void
+NOTHROW_RPC(LIBDCALL libd__wsearchenv)(char16_t const *file,
+                                       char16_t const *envvar,
+                                       char16_t *__restrict resultpath) {
+	libd__wsearchenv_s(file, envvar, resultpath, (size_t)-1);
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) void
+NOTHROW_RPC(LIBKCALL libc__wsearchenv)(char32_t const *file,
+                                       char32_t const *envvar,
+                                       char32_t *__restrict resultpath) {
+	libc__wsearchenv_s(file, envvar, resultpath, (size_t)-1);
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) void
+NOTHROW_NCX(LIBDCALL libd__wsplitpath)(char16_t const *__restrict abspath,
+                                       char16_t *drive,
+                                       char16_t *dir,
+                                       char16_t *file,
+                                       char16_t *ext) {
+	libd__wsplitpath_s(abspath,
+	             drive, drive ? 3 : 0,
+	             dir, dir ? 256 : 0,
+	             file, file ? 256 : 0,
+	             ext, ext ? 256 : 0);
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) void
+NOTHROW_NCX(LIBKCALL libc__wsplitpath)(char32_t const *__restrict abspath,
+                                       char32_t *drive,
+                                       char32_t *dir,
+                                       char32_t *file,
+                                       char32_t *ext) {
+	libc__wsplitpath_s(abspath,
+	             drive, drive ? 3 : 0,
+	             dir, dir ? 256 : 0,
+	             file, file ? 256 : 0,
+	             ext, ext ? 256 : 0);
+}
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBDCALL libd__wsplitpath_s)(char16_t const *__restrict abspath,
+                                         char16_t *drive,
+                                         size_t drivelen,
+                                         char16_t *dir,
+                                         size_t dirlen,
+                                         char16_t *file,
+                                         size_t filelen,
+                                         char16_t *ext,
+                                         size_t extlen) {
+	size_t len, last_slash, last_dot;
+	if unlikely(!abspath)
+		goto err_inval;
+	if unlikely((drive != NULL) != (drivelen != 0))
+		goto err_inval;
+	if unlikely((dir != NULL) != (dirlen != 0))
+		goto err_inval;
+	if unlikely((file != NULL) != (filelen != 0))
+		goto err_inval;
+	if unlikely((ext != NULL) != (extlen != 0))
+		goto err_inval;
+	for (len = 0; len < 3; ++len) {
+		if (abspath[len] == ':') {
+			if (drive) {
+				if unlikely(drivelen <= len)
+					goto err_range;
+				libc_memcpyc(drive, abspath, len, sizeof(char16_t));
+				drive[len] = 0;
+			}
+			abspath += len + 1;
+			goto got_drive;
+		}
+	}
+	if (drive)
+		*drive = 0;
+got_drive:
+	last_slash = 0;
+	last_dot = (size_t)-1;
+	for (len = 0;; ++len) {
+		char16_t ch = abspath[len];
+		if (!ch)
+			break;
+		if (ch == '/' || ch == '\\')
+			last_slash = len + 1;
+		if (ch == '.')
+			last_dot = len;
+	}
+	if (last_slash) {
+		if (dir) {
+			if unlikely(dirlen <= last_slash)
+				goto err_range;
+			libc_memcpyc(dir, abspath, last_slash, sizeof(char16_t));
+			dir[last_slash] = 0;
+		}
+	} else {
+		if (dir)
+			*dir = 0;
+	}
+	if (last_dot != (size_t)-1 && last_dot > last_slash) {
+		if (ext) {
+			size_t path_extlen = len - last_dot;
+			if unlikely(extlen <= path_extlen)
+				goto err_range;
+			libc_memcpyc(ext, abspath + last_dot, path_extlen, sizeof(char16_t));
+			ext[path_extlen] = 0;
+		}
+	} else {
+		if (ext)
+			*ext = 0;
+		last_dot = len;
+	}
+	if (file) {
+		len = last_dot - last_slash;
+		if unlikely(filelen <= len)
+			goto err_range;
+		libc_memcpyc(file, abspath + last_slash, len, sizeof(char16_t));
+		file[len] = 0;
+	}
+	return 0;
+err_inval:
+#ifdef EINVAL
+	return EINVAL;
+#else /* EINVAL */
+	return 1;
+#endif /* !EINVAL */
+err_range:
+#ifdef ERANGE
+	__libc_seterrno(ERANGE);
+	return ERANGE;
+#else /* ERANGE */
+	return 1;
+#endif /* !ERANGE */
+}
+#include <parts/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBKCALL libc__wsplitpath_s)(char32_t const *__restrict abspath,
+                                         char32_t *drive,
+                                         size_t drivelen,
+                                         char32_t *dir,
+                                         size_t dirlen,
+                                         char32_t *file,
+                                         size_t filelen,
+                                         char32_t *ext,
+                                         size_t extlen) {
+	size_t len, last_slash, last_dot;
+	if unlikely(!abspath)
+		goto err_inval;
+	if unlikely((drive != NULL) != (drivelen != 0))
+		goto err_inval;
+	if unlikely((dir != NULL) != (dirlen != 0))
+		goto err_inval;
+	if unlikely((file != NULL) != (filelen != 0))
+		goto err_inval;
+	if unlikely((ext != NULL) != (extlen != 0))
+		goto err_inval;
+	for (len = 0; len < 3; ++len) {
+		if (abspath[len] == ':') {
+			if (drive) {
+				if unlikely(drivelen <= len)
+					goto err_range;
+				libc_memcpyc(drive, abspath, len, sizeof(char32_t));
+				drive[len] = 0;
+			}
+			abspath += len + 1;
+			goto got_drive;
+		}
+	}
+	if (drive)
+		*drive = 0;
+got_drive:
+	last_slash = 0;
+	last_dot = (size_t)-1;
+	for (len = 0;; ++len) {
+		char32_t ch = abspath[len];
+		if (!ch)
+			break;
+		if (ch == '/' || ch == '\\')
+			last_slash = len + 1;
+		if (ch == '.')
+			last_dot = len;
+	}
+	if (last_slash) {
+		if (dir) {
+			if unlikely(dirlen <= last_slash)
+				goto err_range;
+			libc_memcpyc(dir, abspath, last_slash, sizeof(char32_t));
+			dir[last_slash] = 0;
+		}
+	} else {
+		if (dir)
+			*dir = 0;
+	}
+	if (last_dot != (size_t)-1 && last_dot > last_slash) {
+		if (ext) {
+			size_t path_extlen = len - last_dot;
+			if unlikely(extlen <= path_extlen)
+				goto err_range;
+			libc_memcpyc(ext, abspath + last_dot, path_extlen, sizeof(char32_t));
+			ext[path_extlen] = 0;
+		}
+	} else {
+		if (ext)
+			*ext = 0;
+		last_dot = len;
+	}
+	if (file) {
+		len = last_dot - last_slash;
+		if unlikely(filelen <= len)
+			goto err_range;
+		libc_memcpyc(file, abspath + last_slash, len, sizeof(char32_t));
+		file[len] = 0;
+	}
+	return 0;
+err_inval:
+#ifdef EINVAL
+	return EINVAL;
+#else /* EINVAL */
+	return 1;
+#endif /* !EINVAL */
+err_range:
+#ifdef ERANGE
+	__libc_seterrno(ERANGE);
+	return ERANGE;
+#else /* ERANGE */
+	return 1;
+#endif /* !ERANGE */
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -2755,6 +3141,8 @@ DEFINE_PUBLIC_ALIAS(DOS$_mbstowcs_l, libd__mbstowcs_l);
 DEFINE_PUBLIC_ALIAS(_mbstowcs_l, libc__mbstowcs_l);
 DEFINE_PUBLIC_ALIAS(DOS$_mbstowcs_s, libd__mbstowcs_s);
 DEFINE_PUBLIC_ALIAS(_mbstowcs_s, libc__mbstowcs_s);
+DEFINE_PUBLIC_ALIAS(DOS$mbstowcs_s, libd_mbstowcs_s);
+DEFINE_PUBLIC_ALIAS(mbstowcs_s, libc_mbstowcs_s);
 DEFINE_PUBLIC_ALIAS(DOS$_mbstowcs_s_l, libd__mbstowcs_s_l);
 DEFINE_PUBLIC_ALIAS(_mbstowcs_s_l, libc__mbstowcs_s_l);
 DEFINE_PUBLIC_ALIAS(rand_s, libc_rand_s);
@@ -2839,6 +3227,16 @@ DEFINE_PUBLIC_ALIAS(DOS$_wtoi64_l, libd__wtoi64_l);
 DEFINE_PUBLIC_ALIAS(_wtoi64_l, libc__wtoi64_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wtoll_l, libd__wtoll_l);
 DEFINE_PUBLIC_ALIAS(_wtoll_l, libc__wtoll_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wmakepath_s, libd__wmakepath_s);
+DEFINE_PUBLIC_ALIAS(_wmakepath_s, libc__wmakepath_s);
+DEFINE_PUBLIC_ALIAS(DOS$_wmakepath, libd__wmakepath);
+DEFINE_PUBLIC_ALIAS(_wmakepath, libc__wmakepath);
+DEFINE_PUBLIC_ALIAS(DOS$_wsearchenv, libd__wsearchenv);
+DEFINE_PUBLIC_ALIAS(_wsearchenv, libc__wsearchenv);
+DEFINE_PUBLIC_ALIAS(DOS$_wsplitpath, libd__wsplitpath);
+DEFINE_PUBLIC_ALIAS(_wsplitpath, libc__wsplitpath);
+DEFINE_PUBLIC_ALIAS(DOS$_wsplitpath_s, libd__wsplitpath_s);
+DEFINE_PUBLIC_ALIAS(_wsplitpath_s, libc__wsplitpath_s);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_STDLIB_C */

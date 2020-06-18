@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe73ad663 */
+/* HASH CRC-32:0x73212ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2975,6 +2975,12 @@ __CDECLARE(,errno_t,__NOTHROW_NCX,_mbstowcs_s,(__SIZE_TYPE__ *__presult, wchar_t
 #include <local/stdlib/_mbstowcs_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_mbstowcs_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _mbstowcs_s)(__SIZE_TYPE__ *__presult, wchar_t *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstowcs_s))(__presult, __dst, __dstsize, __src, __dstlen); })
 #endif /* !__CRT_HAVE__mbstowcs_s */
+#ifdef __CRT_HAVE_mbstowcs_s
+__CDECLARE(,errno_t,__NOTHROW_NCX,mbstowcs_s,(__SIZE_TYPE__ *__presult, wchar_t *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen),(__presult,__dst,__dstsize,__src,__dstlen))
+#else /* __CRT_HAVE_mbstowcs_s */
+#include <local/stdlib/mbstowcs_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(mbstowcs_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL mbstowcs_s)(__SIZE_TYPE__ *__presult, wchar_t *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbstowcs_s))(__presult, __dst, __dstsize, __src, __dstlen); })
+#endif /* !__CRT_HAVE_mbstowcs_s */
 #ifdef __CRT_HAVE__mbstowcs_s_l
 __CDECLARE(,errno_t,__NOTHROW_NCX,_mbstowcs_s_l,(__SIZE_TYPE__ *__presult, wchar_t *__dst, __SIZE_TYPE__ __dstsize, char const *__src, __SIZE_TYPE__ __dstlen, __locale_t __locale),(__presult,__dst,__dstsize,__src,__dstlen,__locale))
 #else /* __CRT_HAVE__mbstowcs_s_l */
@@ -3482,22 +3488,6 @@ __CDECLARE(,int,__NOTHROW_NCX,_set_error_mode,(int __mode),(__mode))
 #ifdef __CRT_HAVE__beep
 __CDECLARE_VOID(,__NOTHROW_NCX,_beep,(unsigned int __freq, unsigned int __duration),(__freq,__duration))
 #endif /* __CRT_HAVE__beep */
-
-#ifndef _CRT_WPERROR_DEFINED
-#define _CRT_WPERROR_DEFINED 1
-#ifdef __CRT_HAVE__wperror
-__CDECLARE_VOID(__ATTR_COLD,__THROWING,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message))
-#else /* __CRT_HAVE__wperror */
-#include <__crt.h>
-#include <parts/errno.h>
-#if !defined(__NO_STDSTREAMS) && defined(__libc_geterrno) && (defined(__CRT_HAVE_fprintf) || defined(__CRT_HAVE__IO_fprintf) || defined(__CRT_HAVE_fprintf_s) || defined(__CRT_HAVE_fprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite))
-#include <local/stdio/_wperror.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wperror, __FORCELOCAL __ATTR_COLD void (__LIBCCALL _wperror)(__WCHAR_TYPE__ const *__restrict __message) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wperror))(__message); })
-#else /* !__NO_STDSTREAMS && __libc_geterrno && (__CRT_HAVE_fprintf || __CRT_HAVE__IO_fprintf || __CRT_HAVE_fprintf_s || __CRT_HAVE_fprintf_unlocked || __CRT_HAVE_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock || __CRT_HAVE__IO_fwrite) */
-#undef _CRT_WPERROR_DEFINED
-#endif /* __NO_STDSTREAMS || !__libc_geterrno || (!__CRT_HAVE_fprintf && !__CRT_HAVE__IO_fprintf && !__CRT_HAVE_fprintf_s && !__CRT_HAVE_fprintf_unlocked && !__CRT_HAVE_vfprintf && !__CRT_HAVE_vfprintf_s && !__CRT_HAVE__IO_vfprintf && !__CRT_HAVE_vfprintf_unlocked && !__CRT_HAVE_file_printer && !__CRT_HAVE_file_printer_unlocked && !__CRT_HAVE_fputc && !__CRT_HAVE_putc && !__CRT_HAVE__IO_putc && !__CRT_HAVE_fputc_unlocked && !__CRT_HAVE_putc_unlocked && (!__CRT_DOS || !__CRT_HAVE__flsbuf) && !__CRT_HAVE_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock && !__CRT_HAVE__IO_fwrite) */
-#endif /* !__CRT_HAVE__wperror */
-#endif /* !_CRT_WPERROR_DEFINED */
 #ifdef __CRT_HAVE_sleep
 /* >> sleep(3)
  * Sleep for up to `SECONDS' seconds */
@@ -4242,6 +4232,103 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtoll_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSE
 #endif /* !___wtoll_l_defined */
 #endif /* __LONGLONG */
 #endif /* !_WSTDLIB_DEFINED */
+#ifndef _WSTDLIBP_DEFINED
+#define _WSTDLIBP_DEFINED 1
+#ifndef ___wfullpath_defined
+#define ___wfullpath_defined 1
+#ifdef __CRT_HAVE__wfullpath
+__CDECLARE(,wchar_t *,__NOTHROW_NCX,_wfullpath,(wchar_t *__buf, wchar_t const *__path, __SIZE_TYPE__ __buflen),(__buf,__path,__buflen))
+#else /* __CRT_HAVE__wfullpath */
+#undef ___wfullpath_defined
+#endif /* !__CRT_HAVE__wfullpath */
+#endif /* !___wfullpath_defined */
+#ifndef ___wmakepath_s_defined
+#define ___wmakepath_s_defined 1
+#ifdef __CRT_HAVE__wmakepath_s
+__CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_wmakepath_s,(wchar_t *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__drive, wchar_t const *__dir, wchar_t const *__file, wchar_t const *__ext),(__buf,__buflen,__drive,__dir,__file,__ext))
+#else /* __CRT_HAVE__wmakepath_s */
+#include <local/stdlib/_wmakepath_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wmakepath_s, __FORCELOCAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _wmakepath_s)(wchar_t *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__drive, wchar_t const *__dir, wchar_t const *__file, wchar_t const *__ext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wmakepath_s))(__buf, __buflen, __drive, __dir, __file, __ext); })
+#endif /* !__CRT_HAVE__wmakepath_s */
+#endif /* !___wmakepath_s_defined */
+#ifndef ___wmakepath_defined
+#define ___wmakepath_defined 1
+#ifdef __CRT_HAVE__wmakepath
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_wmakepath,(wchar_t *__restrict __buf, wchar_t const *__drive, wchar_t const *__dir, wchar_t const *__file, wchar_t const *__ext),(__buf,__drive,__dir,__file,__ext))
+#else /* __CRT_HAVE__wmakepath */
+#include <local/stdlib/_wmakepath.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wmakepath, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _wmakepath)(wchar_t *__restrict __buf, wchar_t const *__drive, wchar_t const *__dir, wchar_t const *__file, wchar_t const *__ext) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wmakepath))(__buf, __drive, __dir, __file, __ext); })
+#endif /* !__CRT_HAVE__wmakepath */
+#endif /* !___wmakepath_defined */
+#ifndef _CRT_WPERROR_DEFINED
+#define _CRT_WPERROR_DEFINED 1
+#ifdef __CRT_HAVE__wperror
+__CDECLARE_VOID(__ATTR_COLD,__THROWING,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message))
+#else /* __CRT_HAVE__wperror */
+#include <__crt.h>
+#include <parts/errno.h>
+#if !defined(__NO_STDSTREAMS) && defined(__libc_geterrno) && (defined(__CRT_HAVE_fprintf) || defined(__CRT_HAVE__IO_fprintf) || defined(__CRT_HAVE_fprintf_s) || defined(__CRT_HAVE_fprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite))
+#include <local/stdio/_wperror.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wperror, __FORCELOCAL __ATTR_COLD void (__LIBCCALL _wperror)(__WCHAR_TYPE__ const *__restrict __message) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wperror))(__message); })
+#else /* !__NO_STDSTREAMS && __libc_geterrno && (__CRT_HAVE_fprintf || __CRT_HAVE__IO_fprintf || __CRT_HAVE_fprintf_s || __CRT_HAVE_fprintf_unlocked || __CRT_HAVE_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock || __CRT_HAVE__IO_fwrite) */
+#undef _CRT_WPERROR_DEFINED
+#endif /* __NO_STDSTREAMS || !__libc_geterrno || (!__CRT_HAVE_fprintf && !__CRT_HAVE__IO_fprintf && !__CRT_HAVE_fprintf_s && !__CRT_HAVE_fprintf_unlocked && !__CRT_HAVE_vfprintf && !__CRT_HAVE_vfprintf_s && !__CRT_HAVE__IO_vfprintf && !__CRT_HAVE_vfprintf_unlocked && !__CRT_HAVE_file_printer && !__CRT_HAVE_file_printer_unlocked && !__CRT_HAVE_fputc && !__CRT_HAVE_putc && !__CRT_HAVE__IO_putc && !__CRT_HAVE_fputc_unlocked && !__CRT_HAVE_putc_unlocked && (!__CRT_DOS || !__CRT_HAVE__flsbuf) && !__CRT_HAVE_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock && !__CRT_HAVE__IO_fwrite) */
+#endif /* !__CRT_HAVE__wperror */
+#endif /* !_CRT_WPERROR_DEFINED */
+#ifndef ___wputenv_defined
+#define ___wputenv_defined 1
+#ifdef __CRT_HAVE__wputenv
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wputenv,(wchar_t *__string),(__string))
+#else /* __CRT_HAVE__wputenv */
+#undef ___wputenv_defined
+#endif /* !__CRT_HAVE__wputenv */
+#endif /* !___wputenv_defined */
+#ifndef ___wputenv_s_defined
+#define ___wputenv_s_defined 1
+#ifdef __CRT_HAVE__wputenv_s
+__CDECLARE(,errno_t,__NOTHROW_NCX,_wputenv_s,(wchar_t const *__varname, wchar_t const *__val),(__varname,__val))
+#else /* __CRT_HAVE__wputenv_s */
+#undef ___wputenv_s_defined
+#endif /* !__CRT_HAVE__wputenv_s */
+#endif /* !___wputenv_s_defined */
+#ifndef ___wsearchenv_s_defined
+#define ___wsearchenv_s_defined 1
+#ifdef __CRT_HAVE__wsearchenv_s
+__CDECLARE(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_RPC,_wsearchenv_s,(wchar_t const *__file, wchar_t const *__envvar, wchar_t *__restrict __resultpath, __SIZE_TYPE__ __buflen),(__file,__envvar,__resultpath,__buflen))
+#else /* __CRT_HAVE__wsearchenv_s */
+#undef ___wsearchenv_s_defined
+#endif /* !__CRT_HAVE__wsearchenv_s */
+#endif /* !___wsearchenv_s_defined */
+#ifndef ___wsearchenv_defined
+#define ___wsearchenv_defined 1
+#ifdef __CRT_HAVE__wsearchenv
+__CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC,_wsearchenv,(wchar_t const *__file, wchar_t const *__envvar, wchar_t *__restrict __resultpath),(__file,__envvar,__resultpath))
+#elif defined(__CRT_HAVE__wsearchenv_s)
+#include <local/stdlib/_wsearchenv.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wsearchenv, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) void __NOTHROW_RPC(__LIBCCALL _wsearchenv)(wchar_t const *__file, wchar_t const *__envvar, wchar_t *__restrict __resultpath) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsearchenv))(__file, __envvar, __resultpath); })
+#else /* ... */
+#undef ___wsearchenv_defined
+#endif /* !... */
+#endif /* !___wsearchenv_defined */
+#ifndef ___wsplitpath_defined
+#define ___wsplitpath_defined 1
+#ifdef __CRT_HAVE__wsplitpath
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_wsplitpath,(wchar_t const *__restrict __abspath, wchar_t *__drive, wchar_t *__dir, wchar_t *__file, wchar_t *__ext),(__abspath,__drive,__dir,__file,__ext))
+#else /* __CRT_HAVE__wsplitpath */
+#include <local/stdlib/_wsplitpath.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wsplitpath, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _wsplitpath)(wchar_t const *__restrict __abspath, wchar_t *__drive, wchar_t *__dir, wchar_t *__file, wchar_t *__ext) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsplitpath))(__abspath, __drive, __dir, __file, __ext); })
+#endif /* !__CRT_HAVE__wsplitpath */
+#endif /* !___wsplitpath_defined */
+#ifndef ___wsplitpath_s_defined
+#define ___wsplitpath_s_defined 1
+#ifdef __CRT_HAVE__wsplitpath_s
+__CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_wsplitpath_s,(wchar_t const *__restrict __abspath, wchar_t *__drive, __SIZE_TYPE__ __drivelen, wchar_t *__dir, __SIZE_TYPE__ __dirlen, wchar_t *__file, __SIZE_TYPE__ __filelen, wchar_t *__ext, __SIZE_TYPE__ __extlen),(__abspath,__drive,__drivelen,__dir,__dirlen,__file,__filelen,__ext,__extlen))
+#else /* __CRT_HAVE__wsplitpath_s */
+#include <local/stdlib/_wsplitpath_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wsplitpath_s, __FORCELOCAL __ATTR_NONNULL((1)) errno_t __NOTHROW_NCX(__LIBCCALL _wsplitpath_s)(wchar_t const *__restrict __abspath, wchar_t *__drive, __SIZE_TYPE__ __drivelen, wchar_t *__dir, __SIZE_TYPE__ __dirlen, wchar_t *__file, __SIZE_TYPE__ __filelen, wchar_t *__ext, __SIZE_TYPE__ __extlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsplitpath_s))(__abspath, __drive, __drivelen, __dir, __dirlen, __file, __filelen, __ext, __extlen); })
+#endif /* !__CRT_HAVE__wsplitpath_s */
+#endif /* !___wsplitpath_s_defined */
+#endif /* !_WSTDLIBP_DEFINED */
 
 #endif /* __CC__ */
 #endif /* __USE_DOS */

@@ -2291,6 +2291,19 @@ $errno_t _wtmpnam_s([[outp(wchar_count)]] wchar_t *dst, $size_t wchar_count);
 %#endif /* __LONGLONG */
 %#endif /* !_WSTDLIB_DEFINED */
 
+%#ifndef _WSTDLIBP_DEFINED
+%#define _WSTDLIBP_DEFINED 1
+%[insert:extern(_wfullpath)]
+%[insert:extern(_wmakepath_s)]
+%[insert:extern(_wmakepath)]
+%[insert:function(_wperror = _wperror, guardName: "_CRT_WPERROR_DEFINED")]
+%[insert:extern(_wputenv)]
+%[insert:extern(_wputenv_s)]
+%[insert:extern(_wsearchenv_s)]
+%[insert:extern(_wsearchenv)]
+%[insert:extern(_wsplitpath)]
+%[insert:extern(_wsplitpath_s)]
+%#endif /* !_WSTDLIBP_DEFINED */
 
 %#endif /* __USE_DOS */
 

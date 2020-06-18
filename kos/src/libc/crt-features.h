@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d1cef10 */
+/* HASH CRC-32:0x48fc614f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -566,14 +566,23 @@
 #define __CRT_HAVE_DOS$_wfopen_s 1
 #define __CRT_HAVE_DOS$_wfreopen_s 1
 #define __CRT_HAVE_DOS$_wfsopen 1
+#define __CRT_HAVE_DOS$_wfullpath 1
 #define __CRT_HAVE_DOS$_wgetenv 1
 #define __CRT_HAVE_DOS$_wgetenv_s 1
+#define __CRT_HAVE_DOS$_wmakepath 1
+#define __CRT_HAVE_DOS$_wmakepath_s 1
 #define __CRT_HAVE_DOS$_wperror 1
 #define __CRT_HAVE_DOS$_wprintf_l 1
 #define __CRT_HAVE_DOS$_wprintf_p 1
 #define __CRT_HAVE_DOS$_wprintf_p_l 1
 #define __CRT_HAVE_DOS$_wprintf_s_l 1
+#define __CRT_HAVE_DOS$_wputenv 1
+#define __CRT_HAVE_DOS$_wputenv_s 1
 #define __CRT_HAVE_DOS$_wscanf_l 1
+#define __CRT_HAVE_DOS$_wsearchenv 1
+#define __CRT_HAVE_DOS$_wsearchenv_s 1
+#define __CRT_HAVE_DOS$_wsplitpath 1
+#define __CRT_HAVE_DOS$_wsplitpath_s 1
 #define __CRT_HAVE_DOS$_wstat32 1
 #define __CRT_HAVE_DOS$_wstat32i64 1
 #define __CRT_HAVE_DOS$_wstat64 1
@@ -1563,6 +1572,7 @@
 #define __CRT_HAVE_DOS$mbsnrtowcs 1
 #define __CRT_HAVE_DOS$mbsrtowcs 1
 #define __CRT_HAVE_DOS$mbstowcs 1
+#define __CRT_HAVE_DOS$mbstowcs_s 1
 #define __CRT_HAVE_DOS$mbtowc 1
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -3433,17 +3443,26 @@
 #define __CRT_HAVE__wfopen_s 1
 #define __CRT_HAVE__wfreopen_s 1
 #define __CRT_HAVE__wfsopen 1
+#define __CRT_HAVE__wfullpath 1
 #define __CRT_HAVE__wfullpath_dbg 1
 #define __CRT_HAVE__wgetcwd_dbg 1
 #define __CRT_HAVE__wgetdcwd_dbg 1
 #define __CRT_HAVE__wgetenv 1
 #define __CRT_HAVE__wgetenv_s 1
+#define __CRT_HAVE__wmakepath 1
+#define __CRT_HAVE__wmakepath_s 1
 #define __CRT_HAVE__wperror 1
 #define __CRT_HAVE__wprintf_l 1
 #define __CRT_HAVE__wprintf_p 1
 #define __CRT_HAVE__wprintf_p_l 1
 #define __CRT_HAVE__wprintf_s_l 1
+#define __CRT_HAVE__wputenv 1
+#define __CRT_HAVE__wputenv_s 1
 #define __CRT_HAVE__wscanf_l 1
+#define __CRT_HAVE__wsearchenv 1
+#define __CRT_HAVE__wsearchenv_s 1
+#define __CRT_HAVE__wsplitpath 1
+#define __CRT_HAVE__wsplitpath_s 1
 #define __CRT_HAVE__wstat32 1
 #define __CRT_HAVE__wstat32i64 1
 #define __CRT_HAVE__wstat64 1
@@ -4501,6 +4520,7 @@
 #define __CRT_HAVE_mbsnrtowcs 1
 #define __CRT_HAVE_mbsrtowcs 1
 #define __CRT_HAVE_mbstowcs 1
+#define __CRT_HAVE_mbstowcs_s 1
 #define __CRT_HAVE_mbtowc 1
 #define __CRT_HAVE_memalign 1
 #define __CRT_HAVE_memcasecmp 1

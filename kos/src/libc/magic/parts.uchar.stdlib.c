@@ -118,7 +118,24 @@ c32stombs(*) %{uchar32("wcstombs")}
 [[ignore]] _c16toll_l(*) %{uchar16("_wtoll_l")}
 [[ignore]] _c32toll_l(*) %{uchar32("_wtoll_l")}
 
-
+[[ignore]] _c16fullpath(*) %{uchar16("_wfullpath")}
+[[ignore]] _c32fullpath(*) %{uchar32("_wfullpath")}
+[[ignore]] _c16makepath_s(*) %{uchar16("_wmakepath_s")}
+[[ignore]] _c32makepath_s(*) %{uchar32("_wmakepath_s")}
+[[ignore]] _c16makepath(*) %{uchar16("_wmakepath")}
+[[ignore]] _c32makepath(*) %{uchar32("_wmakepath")}
+[[ignore]] _c16putenv(*) %{uchar16("_wputenv")}
+[[ignore]] _c32putenv(*) %{uchar32("_wputenv")}
+[[ignore]] _c16putenv_s(*) %{uchar16("_wputenv_s")}
+[[ignore]] _c32putenv_s(*) %{uchar32("_wputenv_s")}
+[[ignore]] _c16searchenv_s(*) %{uchar16("_wsearchenv_s")}
+[[ignore]] _c32searchenv_s(*) %{uchar32("_wsearchenv_s")}
+[[ignore]] _c16searchenv(*) %{uchar16("_wsearchenv")}
+[[ignore]] _c32searchenv(*) %{uchar32("_wsearchenv")}
+[[ignore]] _c16splitpath(*) %{uchar16("_wsplitpath")}
+[[ignore]] _c32splitpath(*) %{uchar32("_wsplitpath")}
+[[ignore]] _c16splitpath_s(*) %{uchar16("_wsplitpath_s")}
+[[ignore]] _c32splitpath_s(*) %{uchar32("_wsplitpath_s")}
 
 %{
 

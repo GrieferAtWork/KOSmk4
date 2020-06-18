@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x226beafe */
+/* HASH CRC-32:0xd1b733a9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -183,6 +183,14 @@ INTDEF NONNULL((1, 4)) errno_t NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *ret
 INTDEF NONNULL((1, 4)) errno_t NOTHROW_NCX(LIBKCALL libc__wgetenv_s)(size_t *return_size, char32_t *buf, size_t buflen, char32_t const *varname);
 INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf, size_t *pbuflen, char16_t const *varname);
 INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBKCALL libc__wdupenv_s)(char32_t **pbuf, size_t *pbuflen, char32_t const *varname);
+INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd__wfullpath)(char16_t *buf, char16_t const *path, size_t buflen);
+INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc__wfullpath)(char32_t *buf, char32_t const *path, size_t buflen);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd__wputenv)(char16_t *string);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc__wputenv)(char32_t *string);
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__wputenv_s)(char16_t const *varname, char16_t const *val);
+INTDEF errno_t NOTHROW_NCX(LIBKCALL libc__wputenv_s)(char32_t const *varname, char32_t const *val);
+INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_RPC(LIBDCALL libd__wsearchenv_s)(char16_t const *file, char16_t const *envvar, char16_t *__restrict resultpath, size_t buflen);
+INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_RPC(LIBKCALL libc__wsearchenv_s)(char32_t const *file, char32_t const *envvar, char32_t *__restrict resultpath, size_t buflen);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -2882,6 +2882,27 @@ errno_t _mbstowcs_s($size_t *presult,
 	return 0;
 }
 
+[[decl_include("<bits/types.h>")]]
+[[wchar, impl_include("<parts/errno.h>")]]
+errno_t mbstowcs_s($size_t *presult,
+                   wchar_t *dst, $size_t dstsize,
+                   char const *src, $size_t dstlen) {
+	size_t error;
+	if (dstlen >= dstsize) {
+		if (!dstsize)
+			return 0;
+		dstlen = dstsize - 1;
+	}
+	error = mbstowcs(dst, src, dstlen);
+	if (presult)
+		*presult = error;
+@@pp_ifdef EILSEQ@@
+	if (error == (size_t)-1)
+		return EILSEQ;
+@@pp_endif@@
+	return 0;
+}
+
 [[wchar, decl_include("<bits/types.h>")]]
 errno_t _mbstowcs_s_l($size_t *presult,
                       wchar_t *dst, $size_t dstsize,
@@ -3486,9 +3507,6 @@ int _set_error_mode(int mode);
 %[default:section(".text.crt.dos.system")]
 void _beep(unsigned int freq, unsigned int duration);
 
-%
-%[insert:function(_wperror = _wperror, guardName: "_CRT_WPERROR_DEFINED")]
-
 %[default:section(".text.crt.dos.system")];
 [[cp]] void _sleep($u32 duration) = sleep;
 
@@ -3701,6 +3719,48 @@ _wtoll_l(*) %{generate(str2wcs("_atoll_l"))}
 %#endif /* __LONGLONG */
 
 %#endif /* !_WSTDLIB_DEFINED */
+
+
+%#ifndef _WSTDLIBP_DEFINED
+%#define _WSTDLIBP_DEFINED 1
+
+%[default:section(".text.crt.dos.wchar.fs.utility")]
+[[guard, wchar]]
+wchar_t *_wfullpath(wchar_t *buf, wchar_t const *path, $size_t buflen);
+
+[[guard, wchar]] _wmakepath_s(*) %{generate(str2wcs("_makepath_s"))}
+[[guard, wchar]] _wmakepath(*) %{generate(str2wcs("_makepath"))}
+
+%[insert:function(_wperror = _wperror, guardName: "_CRT_WPERROR_DEFINED")]
+
+%[default:section(".text.crt.dos.wchar.fs.environ")]
+%[define_str2wcs_replacement(_putenv = _wputenv)]
+[[guard, wchar]]
+int _wputenv([[nonnull]] wchar_t *string);
+
+%[define_str2wcs_replacement(_putenv_s = _wputenv_s)]
+[[guard, wchar, decl_include("<bits/types.h>")]]
+errno_t _wputenv_s(wchar_t const *varname, wchar_t const *val);
+
+%[define_str2wcs_replacement(_searchenv_s = _wsearchenv_s)]
+[[cp, guard, wchar, decl_include("<bits/types.h>")]]
+errno_t _wsearchenv_s([[nonnull]] wchar_t const *file,
+                      [[nonnull]] wchar_t const *envvar,
+                      [[nonnull]] wchar_t *__restrict resultpath,
+                      $size_t buflen);
+
+[[guard, wchar]]
+_wsearchenv(*) %{generate(str2wcs("_searchenv"))}
+
+[[guard, wchar]]
+_wsplitpath(*) %{generate(str2wcs("_splitpath"))}
+
+[[guard, wchar]]
+_wsplitpath_s(*) %{generate(str2wcs("_splitpath_s"))}
+
+%#endif /* !_WSTDLIBP_DEFINED */
+
+
 
 %{
 
