@@ -1793,7 +1793,7 @@ char *ctermid_r([[nullable]] char *s) {
 @@@param: NAME: One of `_SC_*' from <bits/confname.h>
 @@Return a system configuration value `NAME'
 @@return: * : The configuration limit associated with `NAME' for `PATH'
-@@return: -1: [errno=<unchanged>] `NAME' referrs to a maximum or minimum
+@@return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
 @@                                limit, and that limit is indeterminate
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
 [[cp, wunused, section(".text.crt{|.dos}.system.configuration")]]

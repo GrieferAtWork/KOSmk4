@@ -219,6 +219,7 @@ struct pending_ipi {
 };
 
 /* Vector of pending IPI. */
+/* XXX: This right here makes up 98% of .percpu! You know that, right? */
 PRIVATE ATTR_PERCPU struct pending_ipi
 thiscpu_x86_ipi_pending[CPU_IPI_BUFFER_SIZE];
 

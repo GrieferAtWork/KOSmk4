@@ -2504,395 +2504,927 @@ NOTHROW_NCX(LIBCCALL libc_confstr)(__STDC_INT_AS_UINT_T name,
 }
 /*[[[end:libc_confstr]]]*/
 
-/*[[[head:libc_sysconf,hash:CRC-32=0xa1c47dad]]]*/
+
+
+#define SYSCONF_ENTRY_UNDEFINED INT32_MIN
+#define SYSCONF_ENTRY_UNLIMITED (-1)
+
+/* List of sysconf values that may have values > INT32_MAX */
+#define SYSCONF_VALUES_HI_INT32             \
+	{ "CHAR_MAX", "INT_MAX", "SSIZE_MAX",   \
+	  "SCHAR_MAX", "SHRT_MAX", "UCHAR_MAX", \
+	  "UINT_MAX", "ULONG_MAX", "USHRT_MAX" }
+
+/* List of sysconf values that may have values <= INT32_MIN */
+#define SYSCONF_VALUES_LO_INT32 \
+	{ "CHAR_MIN", "INT_MIN", "SCHAR_MIN", "SHRT_MIN" }
+
+
+PRIVATE ATTR_SECTION(".rodata.crt.system.configuration")
+s32 const sysconf_table[] = {
+/*[[[deemon
+import * from deemon;
+@@Mapping from @(SC_ID: (name, values))
+local sc_values: {int: (string, string)} = Dict();
+for (local l: File.open("../../../include/bits/confname.h")) {
+	l = l.strip();
+	local name, idval, values;
+	try {
+		name, idval, values = l.scanf("#define _SC_%[^ ] %[^/]/" "* [== %[^\\]]")...;
+	} catch (...) {
+		continue;
+	}
+	if (name == "COUNT")
+		continue;
+	name = "_SC_" + name;
+	try {
+		idval = idval.strip();
+		if (!idval.isnumeric()) {
+			for (local i, nameAndValue: sc_values) {
+				local name2, none = nameAndValue...;
+				if (name2 in idval)
+					idval = idval.replace(name2, str(i));
+			}
+			idval = exec(idval);
+		} else {
+			idval = int(idval);
+		}
+	} catch (...) {
+		continue;
+	}
+	if (idval !in sc_values)
+		sc_values[idval] = (name, values.strip());
+}
+local idCount = (sc_values.keys > ...) + 1;
+local maxIdLen = #str(idCount - 1);
+for (local id: [:idCount]) {
+	local name, values = sc_values.get(id)...;
+	if (name is none)
+		name = str(id);
+	if (values is none)
+		values = "SYSCONF_ENTRY_UNDEFINED";
+	local prefix = "\t/" "* [{}] = *" "/ ".format({ str(id).rjust(maxIdLen) });
+	local suffix = ", /" "* {} *" "/".format({ name });
+	local endifComment = Cell();
+	function ppBeginIfDef(macroName) {
+		if (!endifComment) {
+			print("#ifdef ", macroName);
+			endifComment.value = macroName;
+		} else {
+			print("#elif defined(", macroName, ")");
+			endifComment.value = "...";
+		}
+	}
+	function ppBeginIf(expr) {
+		if (!endifComment) {
+			print("#if ", expr);
+			endifComment.value = expr;
+		} else {
+			print("#elif ", expr);
+			endifComment.value = "...";
+		}
+	}
+	function ppElse() {
+		local com = endifComment.value;
+		print("#else /" "* ", com, " *" "/");
+		if ("<" in com) {
+			com = com.replace("<", ">=").replace(">==", ">");
+		} else if (">" in com) {
+			com = com.replace(">", "<=").replace("<==", "<");
+		} else {
+			com = "!" + com;
+		}
+		endifComment.value = com;
+	}
+	function ppEndif() {
+		print("#endif /" "* ", endifComment.value, " *" "/");
+		del endifComment.value;
+	}
+	values = List(values.split(","));
+	local nvalues = #values;
+	for (local i: [:nvalues]) {
+		local v = values[i].strip();
+		if (v.startswith("defined(") && v.endswith(")")) {
+			v = v[8:-1].strip();
+			ppBeginIfDef(v);
+			print(prefix, "1", suffix);
+			ppElse();
+			print(prefix, "SYSCONF_ENTRY_UNLIMITED", suffix);
+			ppEndif();
+			break;
+		} else if (v in ["custom", "SYSCONF_ENTRY_UNDEFINED"]) {
+			if (endifComment)
+				ppElse();
+			print(prefix, "SYSCONF_ENTRY_UNDEFINED", suffix);
+			break;
+		} else if (v == "unlimited") {
+			if (endifComment)
+				ppElse();
+			print(prefix, "SYSCONF_ENTRY_UNLIMITED", suffix);
+			break;
+		} else {
+			local need_undefined = false;
+			if (v in SYSCONF_VALUES_HI_INT32) {
+				need_undefined = true;
+				ppBeginIf("{} <= INT32_MAX".format({ v }));
+			} else if (v in SYSCONF_VALUES_LO_INT32) {
+				need_undefined = true;
+				ppBeginIf("{} > INT32_MIN".format({ v }));
+			} else if (i != nvalues - 1) {
+				ppBeginIfDef(v);
+			} else if (endifComment) {
+				ppElse();
+			}
+			print(prefix, v, suffix);
+			if (need_undefined) {
+				ppElse();
+				print(prefix, "SYSCONF_ENTRY_UNDEFINED", suffix);
+				ppEndif();
+				break;
+			}
+		}
+	}
+	if (endifComment)
+		ppEndif();
+}
+]]]*/
+	/* [  0] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_ARG_MAX */
+	/* [  1] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_CHILD_MAX */
+	/* [  2] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_CLK_TCK */
+	/* [  3] = */ NGROUPS_MAX, /* _SC_NGROUPS_MAX */
+	/* [  4] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_OPEN_MAX */
+#ifdef STREAM_MAX
+	/* [  5] = */ STREAM_MAX, /* _SC_STREAM_MAX */
+#elif defined(FOPEN_MAX)
+	/* [  5] = */ FOPEN_MAX, /* _SC_STREAM_MAX */
+#else /* ... */
+	/* [  5] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_STREAM_MAX */
+#endif /* !... */
+	/* [  6] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_TZNAME_MAX */
+	/* [  7] = */ _POSIX_JOB_CONTROL, /* _SC_JOB_CONTROL */
+	/* [  8] = */ _POSIX_SAVED_IDS, /* _SC_SAVED_IDS */
+	/* [  9] = */ _POSIX_REALTIME_SIGNALS, /* _SC_REALTIME_SIGNALS */
+	/* [ 10] = */ _POSIX_PRIORITY_SCHEDULING, /* _SC_PRIORITY_SCHEDULING */
+	/* [ 11] = */ _POSIX_TIMERS, /* _SC_TIMERS */
+	/* [ 12] = */ _POSIX_ASYNCHRONOUS_IO, /* _SC_ASYNCHRONOUS_IO */
+	/* [ 13] = */ _POSIX_PRIORITIZED_IO, /* _SC_PRIORITIZED_IO */
+	/* [ 14] = */ _POSIX_SYNCHRONIZED_IO, /* _SC_SYNCHRONIZED_IO */
+	/* [ 15] = */ _POSIX_FSYNC, /* _SC_FSYNC */
+	/* [ 16] = */ _POSIX_MAPPED_FILES, /* _SC_MAPPED_FILES */
+	/* [ 17] = */ _POSIX_MEMLOCK, /* _SC_MEMLOCK */
+	/* [ 18] = */ _POSIX_MEMLOCK_RANGE, /* _SC_MEMLOCK_RANGE */
+	/* [ 19] = */ _POSIX_MEMORY_PROTECTION, /* _SC_MEMORY_PROTECTION */
+	/* [ 20] = */ _POSIX_MESSAGE_PASSING, /* _SC_MESSAGE_PASSING */
+	/* [ 21] = */ _POSIX_SEMAPHORES, /* _SC_SEMAPHORES */
+	/* [ 22] = */ _POSIX_SHARED_MEMORY_OBJECTS, /* _SC_SHARED_MEMORY_OBJECTS */
+	/* [ 23] = */ _POSIX_AIO_LISTIO_MAX, /* _SC_AIO_LISTIO_MAX */
+	/* [ 24] = */ _POSIX_AIO_MAX, /* _SC_AIO_MAX */
+	/* [ 25] = */ AIO_PRIO_DELTA_MAX, /* _SC_AIO_PRIO_DELTA_MAX */
+#ifdef DELAYTIMER_MAX
+	/* [ 26] = */ DELAYTIMER_MAX, /* _SC_DELAYTIMER_MAX */
+#else /* DELAYTIMER_MAX */
+	/* [ 26] = */ _POSIX_DELAYTIMER_MAX, /* _SC_DELAYTIMER_MAX */
+#endif /* !DELAYTIMER_MAX */
+	/* [ 27] = */ _POSIX_MQ_OPEN_MAX, /* _SC_MQ_OPEN_MAX */
+#ifdef MQ_PRIO_MAX
+	/* [ 28] = */ MQ_PRIO_MAX, /* _SC_MQ_PRIO_MAX */
+#else /* MQ_PRIO_MAX */
+	/* [ 28] = */ _POSIX_MQ_PRIO_MAX, /* _SC_MQ_PRIO_MAX */
+#endif /* !MQ_PRIO_MAX */
+	/* [ 29] = */ _POSIX_VERSION, /* _SC_VERSION */
+	/* [ 30] = */ __ARCH_PAGESIZE, /* _SC_PAGESIZE */
+#ifdef RTSIG_MAX
+	/* [ 31] = */ RTSIG_MAX, /* _SC_RTSIG_MAX */
+#else /* RTSIG_MAX */
+	/* [ 31] = */ _POSIX_RTSIG_MAX, /* _SC_RTSIG_MAX */
+#endif /* !RTSIG_MAX */
+	/* [ 32] = */ _POSIX_SEM_NSEMS_MAX, /* _SC_SEM_NSEMS_MAX */
+#ifdef SEM_VALUE_MAX
+	/* [ 33] = */ SEM_VALUE_MAX, /* _SC_SEM_VALUE_MAX */
+#else /* SEM_VALUE_MAX */
+	/* [ 33] = */ _POSIX_SEM_VALUE_MAX, /* _SC_SEM_VALUE_MAX */
+#endif /* !SEM_VALUE_MAX */
+	/* [ 34] = */ _POSIX_SIGQUEUE_MAX, /* _SC_SIGQUEUE_MAX */
+	/* [ 35] = */ _POSIX_TIMER_MAX, /* _SC_TIMER_MAX */
+#ifdef BC_BASE_MAX
+	/* [ 36] = */ BC_BASE_MAX, /* _SC_BC_BASE_MAX */
+#else /* BC_BASE_MAX */
+	/* [ 36] = */ _POSIX2_BC_BASE_MAX, /* _SC_BC_BASE_MAX */
+#endif /* !BC_BASE_MAX */
+#ifdef BC_DIM_MAX
+	/* [ 37] = */ BC_DIM_MAX, /* _SC_BC_DIM_MAX */
+#else /* BC_DIM_MAX */
+	/* [ 37] = */ _POSIX2_BC_DIM_MAX, /* _SC_BC_DIM_MAX */
+#endif /* !BC_DIM_MAX */
+#ifdef BC_SCALE_MAX
+	/* [ 38] = */ BC_SCALE_MAX, /* _SC_BC_SCALE_MAX */
+#else /* BC_SCALE_MAX */
+	/* [ 38] = */ _POSIX2_BC_SCALE_MAX, /* _SC_BC_SCALE_MAX */
+#endif /* !BC_SCALE_MAX */
+#ifdef BC_STRING_MAX
+	/* [ 39] = */ BC_STRING_MAX, /* _SC_BC_STRING_MAX */
+#else /* BC_STRING_MAX */
+	/* [ 39] = */ _POSIX2_BC_STRING_MAX, /* _SC_BC_STRING_MAX */
+#endif /* !BC_STRING_MAX */
+#ifdef COLL_WEIGHTS_MAX
+	/* [ 40] = */ COLL_WEIGHTS_MAX, /* _SC_COLL_WEIGHTS_MAX */
+#else /* COLL_WEIGHTS_MAX */
+	/* [ 40] = */ _POSIX2_COLL_WEIGHTS_MAX, /* _SC_COLL_WEIGHTS_MAX */
+#endif /* !COLL_WEIGHTS_MAX */
+	/* [ 41] = */ SYSCONF_ENTRY_UNDEFINED, /* 41 */
+#ifdef EXPR_NEST_MAX
+	/* [ 42] = */ EXPR_NEST_MAX, /* _SC_EXPR_NEST_MAX */
+#else /* EXPR_NEST_MAX */
+	/* [ 42] = */ _POSIX2_EXPR_NEST_MAX, /* _SC_EXPR_NEST_MAX */
+#endif /* !EXPR_NEST_MAX */
+#ifdef LINE_MAX
+	/* [ 43] = */ LINE_MAX, /* _SC_LINE_MAX */
+#else /* LINE_MAX */
+	/* [ 43] = */ _POSIX2_LINE_MAX, /* _SC_LINE_MAX */
+#endif /* !LINE_MAX */
+#ifdef RE_DUP_MAX
+	/* [ 44] = */ RE_DUP_MAX, /* _SC_RE_DUP_MAX */
+#else /* RE_DUP_MAX */
+	/* [ 44] = */ _POSIX_RE_DUP_MAX, /* _SC_RE_DUP_MAX */
+#endif /* !RE_DUP_MAX */
+#ifdef CHARCLASS_NAME_MAX
+	/* [ 45] = */ CHARCLASS_NAME_MAX, /* _SC_CHARCLASS_NAME_MAX */
+#else /* CHARCLASS_NAME_MAX */
+	/* [ 45] = */ _POSIX2_CHARCLASS_NAME_MAX, /* _SC_CHARCLASS_NAME_MAX */
+#endif /* !CHARCLASS_NAME_MAX */
+	/* [ 46] = */ _POSIX2_VERSION, /* _SC_2_VERSION */
+#ifdef _POSIX2_C_BIND
+	/* [ 47] = */ _POSIX2_C_BIND, /* _SC_2_C_BIND */
+#else /* _POSIX2_C_BIND */
+	/* [ 47] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_2_C_BIND */
+#endif /* !_POSIX2_C_BIND */
+#ifdef _SC_2_C_DEV
+	/* [ 48] = */ _SC_2_C_DEV, /* _SC_2_C_DEV */
+#else /* _SC_2_C_DEV */
+	/* [ 48] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_2_C_DEV */
+#endif /* !_SC_2_C_DEV */
+#ifdef _POSIX2_FORT_DEV
+	/* [ 49] = */ _POSIX2_FORT_DEV, /* _SC_2_FORT_DEV */
+#else /* _POSIX2_FORT_DEV */
+	/* [ 49] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_2_FORT_DEV */
+#endif /* !_POSIX2_FORT_DEV */
+#ifdef _POSIX2_FORT_RUN
+	/* [ 50] = */ _POSIX2_FORT_RUN, /* _SC_2_FORT_RUN */
+#else /* _POSIX2_FORT_RUN */
+	/* [ 50] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_2_FORT_RUN */
+#endif /* !_POSIX2_FORT_RUN */
+#ifdef _POSIX2_SW_DEV
+	/* [ 51] = */ _POSIX2_SW_DEV, /* _SC_2_SW_DEV */
+#else /* _POSIX2_SW_DEV */
+	/* [ 51] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_2_SW_DEV */
+#endif /* !_POSIX2_SW_DEV */
+#ifdef _POSIX2_LOCALEDEF
+	/* [ 52] = */ _POSIX2_LOCALEDEF, /* _SC_2_LOCALEDEF */
+#else /* _POSIX2_LOCALEDEF */
+	/* [ 52] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_2_LOCALEDEF */
+#endif /* !_POSIX2_LOCALEDEF */
+#ifdef _POSIX_PII
+	/* [ 53] = */ 1, /* _SC_PII */
+#else /* _POSIX_PII */
+	/* [ 53] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_PII */
+#endif /* !_POSIX_PII */
+#ifdef _POSIX_PII_XTI
+	/* [ 54] = */ 1, /* _SC_PII_XTI */
+#else /* _POSIX_PII_XTI */
+	/* [ 54] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_PII_XTI */
+#endif /* !_POSIX_PII_XTI */
+#ifdef _POSIX_PII_SOCKET
+	/* [ 55] = */ 1, /* _SC_PII_SOCKET */
+#else /* _POSIX_PII_SOCKET */
+	/* [ 55] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_PII_SOCKET */
+#endif /* !_POSIX_PII_SOCKET */
+#ifdef _POSIX_PII_INTERNET
+	/* [ 56] = */ 1, /* _SC_PII_INTERNET */
+#else /* _POSIX_PII_INTERNET */
+	/* [ 56] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_PII_INTERNET */
+#endif /* !_POSIX_PII_INTERNET */
+#ifdef _POSIX_PII_OSI
+	/* [ 57] = */ 1, /* _SC_PII_OSI */
+#else /* _POSIX_PII_OSI */
+	/* [ 57] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_PII_OSI */
+#endif /* !_POSIX_PII_OSI */
+#ifdef _POSIX_POLL
+	/* [ 58] = */ 1, /* _SC_POLL */
+#else /* _POSIX_POLL */
+	/* [ 58] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_POLL */
+#endif /* !_POSIX_POLL */
+#ifdef _POSIX_SELECT
+	/* [ 59] = */ 1, /* _SC_SELECT */
+#else /* _POSIX_SELECT */
+	/* [ 59] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_SELECT */
+#endif /* !_POSIX_SELECT */
+	/* [ 60] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_UIO_MAXIOV */
+#ifdef _POSIX_PII_INTERNET_STREAM
+	/* [ 61] = */ 1, /* _SC_PII_INTERNET_STREAM */
+#else /* _POSIX_PII_INTERNET_STREAM */
+	/* [ 61] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_PII_INTERNET_STREAM */
+#endif /* !_POSIX_PII_INTERNET_STREAM */
+#ifdef _POSIX_PII_INTERNET_DGRAM
+	/* [ 62] = */ 1, /* _SC_PII_INTERNET_DGRAM */
+#else /* _POSIX_PII_INTERNET_DGRAM */
+	/* [ 62] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_PII_INTERNET_DGRAM */
+#endif /* !_POSIX_PII_INTERNET_DGRAM */
+#ifdef _POSIX_PII_OSI_COTS
+	/* [ 63] = */ 1, /* _SC_PII_OSI_COTS */
+#else /* _POSIX_PII_OSI_COTS */
+	/* [ 63] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_PII_OSI_COTS */
+#endif /* !_POSIX_PII_OSI_COTS */
+#ifdef _POSIX_PII_OSI_CLTS
+	/* [ 64] = */ 1, /* _SC_PII_OSI_CLTS */
+#else /* _POSIX_PII_OSI_CLTS */
+	/* [ 64] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_PII_OSI_CLTS */
+#endif /* !_POSIX_PII_OSI_CLTS */
+#ifdef _POSIX_PII_OSI_M
+	/* [ 65] = */ 1, /* _SC_PII_OSI_M */
+#else /* _POSIX_PII_OSI_M */
+	/* [ 65] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_PII_OSI_M */
+#endif /* !_POSIX_PII_OSI_M */
+	/* [ 66] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_T_IOV_MAX */
+	/* [ 67] = */ _POSIX_THREADS, /* _SC_THREADS */
+	/* [ 68] = */ _POSIX_THREAD_SAFE_FUNCTIONS, /* _SC_THREAD_SAFE_FUNCTIONS */
+	/* [ 69] = */ NSS_BUFLEN_GROUP, /* _SC_GETGR_R_SIZE_MAX */
+	/* [ 70] = */ NSS_BUFLEN_PASSWD, /* _SC_GETPW_R_SIZE_MAX */
+	/* [ 71] = */ LOGIN_NAME_MAX, /* _SC_LOGIN_NAME_MAX */
+	/* [ 72] = */ TTY_NAME_MAX, /* _SC_TTY_NAME_MAX */
+	/* [ 73] = */ _POSIX_THREAD_DESTRUCTOR_ITERATIONS, /* _SC_THREAD_DESTRUCTOR_ITERATIONS */
+	/* [ 74] = */ _POSIX_THREAD_KEYS_MAX, /* _SC_THREAD_KEYS_MAX */
+	/* [ 75] = */ PTHREAD_STACK_MIN, /* _SC_THREAD_STACK_MIN */
+	/* [ 76] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_THREAD_THREADS_MAX */
+	/* [ 77] = */ _POSIX_THREAD_ATTR_STACKADDR, /* _SC_THREAD_ATTR_STACKADDR */
+	/* [ 78] = */ _POSIX_THREAD_ATTR_STACKSIZE, /* _SC_THREAD_ATTR_STACKSIZE */
+	/* [ 79] = */ _POSIX_THREAD_PRIORITY_SCHEDULING, /* _SC_THREAD_PRIORITY_SCHEDULING */
+	/* [ 80] = */ _POSIX_THREAD_PRIO_INHERIT, /* _SC_THREAD_PRIO_INHERIT */
+	/* [ 81] = */ _POSIX_THREAD_PRIO_PROTECT, /* _SC_THREAD_PRIO_PROTECT */
+	/* [ 82] = */ _POSIX_THREAD_PROCESS_SHARED, /* _SC_THREAD_PROCESS_SHARED */
+	/* [ 83] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_NPROCESSORS_CONF */
+	/* [ 84] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_NPROCESSORS_ONLN */
+	/* [ 85] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_PHYS_PAGES */
+	/* [ 86] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_AVPHYS_PAGES */
+	/* [ 87] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_ATEXIT_MAX */
+	/* [ 88] = */ BUFSIZ, /* _SC_PASS_MAX */
+	/* [ 89] = */ _XOPEN_VERSION, /* _SC_XOPEN_VERSION */
+	/* [ 90] = */ _XOPEN_XCU_VERSION, /* _SC_XOPEN_XCU_VERSION */
+	/* [ 91] = */ _XOPEN_UNIX, /* _SC_XOPEN_UNIX */
+	/* [ 92] = */ _XOPEN_CRYPT, /* _SC_XOPEN_CRYPT */
+	/* [ 93] = */ _XOPEN_ENH_I18N, /* _SC_XOPEN_ENH_I18N */
+	/* [ 94] = */ _XOPEN_SHM, /* _SC_XOPEN_SHM */
+	/* [ 95] = */ _POSIX2_CHAR_TERM, /* _SC_2_CHAR_TERM */
+	/* [ 96] = */ _POSIX2_C_VERSION, /* _SC_2_C_VERSION */
+#ifdef _POSIX2_UPE
+	/* [ 97] = */ _POSIX2_UPE, /* _SC_2_UPE */
+#else /* _POSIX2_UPE */
+	/* [ 97] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_2_UPE */
+#endif /* !_POSIX2_UPE */
+	/* [ 98] = */ _XOPEN_XPG2, /* _SC_XOPEN_XPG2 */
+	/* [ 99] = */ _XOPEN_XPG3, /* _SC_XOPEN_XPG3 */
+	/* [100] = */ _XOPEN_XPG4, /* _SC_XOPEN_XPG4 */
+	/* [101] = */ CHAR_BIT, /* _SC_CHAR_BIT */
+#if CHAR_MAX <= INT32_MAX
+	/* [102] = */ CHAR_MAX, /* _SC_CHAR_MAX */
+#else /* CHAR_MAX <= INT32_MAX */
+	/* [102] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_CHAR_MAX */
+#endif /* CHAR_MAX > INT32_MAX */
+#if CHAR_MIN > INT32_MIN
+	/* [103] = */ CHAR_MIN, /* _SC_CHAR_MIN */
+#else /* CHAR_MIN > INT32_MIN */
+	/* [103] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_CHAR_MIN */
+#endif /* CHAR_MIN <= INT32_MIN */
+#if INT_MAX <= INT32_MAX
+	/* [104] = */ INT_MAX, /* _SC_INT_MAX */
+#else /* INT_MAX <= INT32_MAX */
+	/* [104] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_INT_MAX */
+#endif /* INT_MAX > INT32_MAX */
+#if INT_MIN > INT32_MIN
+	/* [105] = */ INT_MIN, /* _SC_INT_MIN */
+#else /* INT_MIN > INT32_MIN */
+	/* [105] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_INT_MIN */
+#endif /* INT_MIN <= INT32_MIN */
+	/* [106] = */ LONG_BIT, /* _SC_LONG_BIT */
+	/* [107] = */ WORD_BIT, /* _SC_WORD_BIT */
+	/* [108] = */ MB_LEN_MAX, /* _SC_MB_LEN_MAX */
+	/* [109] = */ NZERO, /* _SC_NZERO */
+#if SSIZE_MAX <= INT32_MAX
+	/* [110] = */ SSIZE_MAX, /* _SC_SSIZE_MAX */
+#else /* SSIZE_MAX <= INT32_MAX */
+	/* [110] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_SSIZE_MAX */
+#endif /* SSIZE_MAX > INT32_MAX */
+#if SCHAR_MAX <= INT32_MAX
+	/* [111] = */ SCHAR_MAX, /* _SC_SCHAR_MAX */
+#else /* SCHAR_MAX <= INT32_MAX */
+	/* [111] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_SCHAR_MAX */
+#endif /* SCHAR_MAX > INT32_MAX */
+#if SCHAR_MIN > INT32_MIN
+	/* [112] = */ SCHAR_MIN, /* _SC_SCHAR_MIN */
+#else /* SCHAR_MIN > INT32_MIN */
+	/* [112] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_SCHAR_MIN */
+#endif /* SCHAR_MIN <= INT32_MIN */
+#if SHRT_MAX <= INT32_MAX
+	/* [113] = */ SHRT_MAX, /* _SC_SHRT_MAX */
+#else /* SHRT_MAX <= INT32_MAX */
+	/* [113] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_SHRT_MAX */
+#endif /* SHRT_MAX > INT32_MAX */
+#if SHRT_MIN > INT32_MIN
+	/* [114] = */ SHRT_MIN, /* _SC_SHRT_MIN */
+#else /* SHRT_MIN > INT32_MIN */
+	/* [114] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_SHRT_MIN */
+#endif /* SHRT_MIN <= INT32_MIN */
+#if UCHAR_MAX <= INT32_MAX
+	/* [115] = */ UCHAR_MAX, /* _SC_UCHAR_MAX */
+#else /* UCHAR_MAX <= INT32_MAX */
+	/* [115] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_UCHAR_MAX */
+#endif /* UCHAR_MAX > INT32_MAX */
+#if UINT_MAX <= INT32_MAX
+	/* [116] = */ UINT_MAX, /* _SC_UINT_MAX */
+#else /* UINT_MAX <= INT32_MAX */
+	/* [116] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_UINT_MAX */
+#endif /* UINT_MAX > INT32_MAX */
+#if ULONG_MAX <= INT32_MAX
+	/* [117] = */ ULONG_MAX, /* _SC_ULONG_MAX */
+#else /* ULONG_MAX <= INT32_MAX */
+	/* [117] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_ULONG_MAX */
+#endif /* ULONG_MAX > INT32_MAX */
+#if USHRT_MAX <= INT32_MAX
+	/* [118] = */ USHRT_MAX, /* _SC_USHRT_MAX */
+#else /* USHRT_MAX <= INT32_MAX */
+	/* [118] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_USHRT_MAX */
+#endif /* USHRT_MAX > INT32_MAX */
+	/* [119] = */ NL_ARGMAX, /* _SC_NL_ARGMAX */
+	/* [120] = */ NL_LANGMAX, /* _SC_NL_LANGMAX */
+	/* [121] = */ NL_MSGMAX, /* _SC_NL_MSGMAX */
+	/* [122] = */ NL_NMAX, /* _SC_NL_NMAX */
+	/* [123] = */ NL_SETMAX, /* _SC_NL_SETMAX */
+	/* [124] = */ NL_TEXTMAX, /* _SC_NL_TEXTMAX */
+	/* [125] = */ SYSCONF_ENTRY_UNDEFINED, /* 125 */
+	/* [126] = */ SYSCONF_ENTRY_UNDEFINED, /* 126 */
+	/* [127] = */ SYSCONF_ENTRY_UNDEFINED, /* 127 */
+	/* [128] = */ SYSCONF_ENTRY_UNDEFINED, /* 128 */
+	/* [129] = */ _XOPEN_LEGACY, /* _SC_XOPEN_LEGACY */
+#ifdef _XOPEN_REALTIME
+	/* [130] = */ _XOPEN_REALTIME, /* _SC_XOPEN_REALTIME */
+#else /* _XOPEN_REALTIME */
+	/* [130] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_XOPEN_REALTIME */
+#endif /* !_XOPEN_REALTIME */
+#ifdef _XOPEN_REALTIME_THREADS
+	/* [131] = */ _XOPEN_REALTIME_THREADS, /* _SC_XOPEN_REALTIME_THREADS */
+#else /* _XOPEN_REALTIME_THREADS */
+	/* [131] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_XOPEN_REALTIME_THREADS */
+#endif /* !_XOPEN_REALTIME_THREADS */
+	/* [132] = */ _POSIX_ADVISORY_INFO, /* _SC_ADVISORY_INFO */
+	/* [133] = */ _POSIX_BARRIERS, /* _SC_BARRIERS */
+#ifdef _POSIX_BASE
+	/* [134] = */ _POSIX_BASE, /* _SC_BASE */
+#else /* _POSIX_BASE */
+	/* [134] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_BASE */
+#endif /* !_POSIX_BASE */
+#ifdef _POSIX_C_LANG_SUPPORT
+	/* [135] = */ _POSIX_C_LANG_SUPPORT, /* _SC_C_LANG_SUPPORT */
+#else /* _POSIX_C_LANG_SUPPORT */
+	/* [135] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_C_LANG_SUPPORT */
+#endif /* !_POSIX_C_LANG_SUPPORT */
+#ifdef _POSIX_C_LANG_SUPPORT_R
+	/* [136] = */ _POSIX_C_LANG_SUPPORT_R, /* _SC_C_LANG_SUPPORT_R */
+#else /* _POSIX_C_LANG_SUPPORT_R */
+	/* [136] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_C_LANG_SUPPORT_R */
+#endif /* !_POSIX_C_LANG_SUPPORT_R */
+#ifdef _POSIX_CLOCK_SELECTION
+	/* [137] = */ _POSIX_CLOCK_SELECTION, /* _SC_CLOCK_SELECTION */
+#else /* _POSIX_CLOCK_SELECTION */
+	/* [137] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_CLOCK_SELECTION */
+#endif /* !_POSIX_CLOCK_SELECTION */
+#ifdef _POSIX_CPUTIME
+	/* [138] = */ _POSIX_CPUTIME, /* _SC_CPUTIME */
+#else /* _POSIX_CPUTIME */
+	/* [138] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_CPUTIME */
+#endif /* !_POSIX_CPUTIME */
+#ifdef _POSIX_THREAD_CPUTIME
+	/* [139] = */ _POSIX_THREAD_CPUTIME, /* _SC_THREAD_CPUTIME */
+#else /* _POSIX_THREAD_CPUTIME */
+	/* [139] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_THREAD_CPUTIME */
+#endif /* !_POSIX_THREAD_CPUTIME */
+#ifdef _POSIX_DEVICE_IO
+	/* [140] = */ _POSIX_DEVICE_IO, /* _SC_DEVICE_IO */
+#else /* _POSIX_DEVICE_IO */
+	/* [140] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_DEVICE_IO */
+#endif /* !_POSIX_DEVICE_IO */
+#ifdef _POSIX_DEVICE_SPECIFIC
+	/* [141] = */ _POSIX_DEVICE_SPECIFIC, /* _SC_DEVICE_SPECIFIC */
+#else /* _POSIX_DEVICE_SPECIFIC */
+	/* [141] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_DEVICE_SPECIFIC */
+#endif /* !_POSIX_DEVICE_SPECIFIC */
+#ifdef _POSIX_DEVICE_SPECIFIC_R
+	/* [142] = */ _POSIX_DEVICE_SPECIFIC_R, /* _SC_DEVICE_SPECIFIC_R */
+#else /* _POSIX_DEVICE_SPECIFIC_R */
+	/* [142] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_DEVICE_SPECIFIC_R */
+#endif /* !_POSIX_DEVICE_SPECIFIC_R */
+#ifdef _POSIX_FD_MGMT
+	/* [143] = */ _POSIX_FD_MGMT, /* _SC_FD_MGMT */
+#else /* _POSIX_FD_MGMT */
+	/* [143] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_FD_MGMT */
+#endif /* !_POSIX_FD_MGMT */
+#ifdef _POSIX_FIFO
+	/* [144] = */ _POSIX_FIFO, /* _SC_FIFO */
+#else /* _POSIX_FIFO */
+	/* [144] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_FIFO */
+#endif /* !_POSIX_FIFO */
+#ifdef _POSIX_PIPE
+	/* [145] = */ _POSIX_PIPE, /* _SC_PIPE */
+#else /* _POSIX_PIPE */
+	/* [145] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_PIPE */
+#endif /* !_POSIX_PIPE */
+#ifdef _POSIX_FILE_ATTRIBUTES
+	/* [146] = */ _POSIX_FILE_ATTRIBUTES, /* _SC_FILE_ATTRIBUTES */
+#else /* _POSIX_FILE_ATTRIBUTES */
+	/* [146] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_FILE_ATTRIBUTES */
+#endif /* !_POSIX_FILE_ATTRIBUTES */
+#ifdef _POSIX_FILE_LOCKING
+	/* [147] = */ _POSIX_FILE_LOCKING, /* _SC_FILE_LOCKING */
+#else /* _POSIX_FILE_LOCKING */
+	/* [147] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_FILE_LOCKING */
+#endif /* !_POSIX_FILE_LOCKING */
+#ifdef _POSIX_FILE_SYSTEM
+	/* [148] = */ _POSIX_FILE_SYSTEM, /* _SC_FILE_SYSTEM */
+#else /* _POSIX_FILE_SYSTEM */
+	/* [148] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_FILE_SYSTEM */
+#endif /* !_POSIX_FILE_SYSTEM */
+#ifdef _POSIX_MONOTONIC_CLOCK
+	/* [149] = */ _POSIX_MONOTONIC_CLOCK, /* _SC_MONOTONIC_CLOCK */
+#else /* _POSIX_MONOTONIC_CLOCK */
+	/* [149] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_MONOTONIC_CLOCK */
+#endif /* !_POSIX_MONOTONIC_CLOCK */
+#ifdef _POSIX_MULTI_PROCESS
+	/* [150] = */ _POSIX_MULTI_PROCESS, /* _SC_MULTI_PROCESS */
+#else /* _POSIX_MULTI_PROCESS */
+	/* [150] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_MULTI_PROCESS */
+#endif /* !_POSIX_MULTI_PROCESS */
+#ifdef _POSIX_SINGLE_PROCESS
+	/* [151] = */ _POSIX_SINGLE_PROCESS, /* _SC_SINGLE_PROCESS */
+#else /* _POSIX_SINGLE_PROCESS */
+	/* [151] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_SINGLE_PROCESS */
+#endif /* !_POSIX_SINGLE_PROCESS */
+#ifdef _POSIX_NETWORKING
+	/* [152] = */ _POSIX_NETWORKING, /* _SC_NETWORKING */
+#else /* _POSIX_NETWORKING */
+	/* [152] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_NETWORKING */
+#endif /* !_POSIX_NETWORKING */
+#ifdef _POSIX_READER_WRITER_LOCKS
+	/* [153] = */ _POSIX_READER_WRITER_LOCKS, /* _SC_READER_WRITER_LOCKS */
+#else /* _POSIX_READER_WRITER_LOCKS */
+	/* [153] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_READER_WRITER_LOCKS */
+#endif /* !_POSIX_READER_WRITER_LOCKS */
+#ifdef _POSIX_SPIN_LOCKS
+	/* [154] = */ _POSIX_SPIN_LOCKS, /* _SC_SPIN_LOCKS */
+#else /* _POSIX_SPIN_LOCKS */
+	/* [154] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_SPIN_LOCKS */
+#endif /* !_POSIX_SPIN_LOCKS */
+#ifdef _POSIX_REGEXP
+	/* [155] = */ _POSIX_REGEXP, /* _SC_REGEXP */
+#else /* _POSIX_REGEXP */
+	/* [155] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_REGEXP */
+#endif /* !_POSIX_REGEXP */
+	/* [156] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_REGEX_VERSION */
+#ifdef _POSIX_SHELL
+	/* [157] = */ _POSIX_SHELL, /* _SC_SHELL */
+#else /* _POSIX_SHELL */
+	/* [157] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_SHELL */
+#endif /* !_POSIX_SHELL */
+#ifdef _POSIX_SIGNALS
+	/* [158] = */ _POSIX_SIGNALS, /* _SC_SIGNALS */
+#else /* _POSIX_SIGNALS */
+	/* [158] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_SIGNALS */
+#endif /* !_POSIX_SIGNALS */
+#ifdef _POSIX_SPAWN
+	/* [159] = */ _POSIX_SPAWN, /* _SC_SPAWN */
+#else /* _POSIX_SPAWN */
+	/* [159] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_SPAWN */
+#endif /* !_POSIX_SPAWN */
+#ifdef _POSIX_SPORADIC_SERVER
+	/* [160] = */ _POSIX_SPORADIC_SERVER, /* _SC_SPORADIC_SERVER */
+#else /* _POSIX_SPORADIC_SERVER */
+	/* [160] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_SPORADIC_SERVER */
+#endif /* !_POSIX_SPORADIC_SERVER */
+#ifdef _POSIX_THREAD_SPORADIC_SERVER
+	/* [161] = */ _POSIX_THREAD_SPORADIC_SERVER, /* _SC_THREAD_SPORADIC_SERVER */
+#else /* _POSIX_THREAD_SPORADIC_SERVER */
+	/* [161] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_THREAD_SPORADIC_SERVER */
+#endif /* !_POSIX_THREAD_SPORADIC_SERVER */
+#ifdef _POSIX_SYSTEM_DATABASE
+	/* [162] = */ _POSIX_SYSTEM_DATABASE, /* _SC_SYSTEM_DATABASE */
+#else /* _POSIX_SYSTEM_DATABASE */
+	/* [162] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_SYSTEM_DATABASE */
+#endif /* !_POSIX_SYSTEM_DATABASE */
+#ifdef _POSIX_SYSTEM_DATABASE_R
+	/* [163] = */ _POSIX_SYSTEM_DATABASE_R, /* _SC_SYSTEM_DATABASE_R */
+#else /* _POSIX_SYSTEM_DATABASE_R */
+	/* [163] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_SYSTEM_DATABASE_R */
+#endif /* !_POSIX_SYSTEM_DATABASE_R */
+#ifdef _POSIX_TIMEOUTS
+	/* [164] = */ _POSIX_TIMEOUTS, /* _SC_TIMEOUTS */
+#else /* _POSIX_TIMEOUTS */
+	/* [164] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_TIMEOUTS */
+#endif /* !_POSIX_TIMEOUTS */
+#ifdef _POSIX_TYPED_MEMORY_OBJECTS
+	/* [165] = */ _POSIX_TYPED_MEMORY_OBJECTS, /* _SC_TYPED_MEMORY_OBJECTS */
+#else /* _POSIX_TYPED_MEMORY_OBJECTS */
+	/* [165] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_TYPED_MEMORY_OBJECTS */
+#endif /* !_POSIX_TYPED_MEMORY_OBJECTS */
+#ifdef _POSIX_USER_GROUPS
+	/* [166] = */ _POSIX_USER_GROUPS, /* _SC_USER_GROUPS */
+#else /* _POSIX_USER_GROUPS */
+	/* [166] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_USER_GROUPS */
+#endif /* !_POSIX_USER_GROUPS */
+#ifdef _POSIX_USER_GROUPS_R
+	/* [167] = */ _POSIX_USER_GROUPS_R, /* _SC_USER_GROUPS_R */
+#else /* _POSIX_USER_GROUPS_R */
+	/* [167] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_USER_GROUPS_R */
+#endif /* !_POSIX_USER_GROUPS_R */
+#ifdef _POSIX2_PBS
+	/* [168] = */ _POSIX2_PBS, /* _SC_2_PBS */
+#else /* _POSIX2_PBS */
+	/* [168] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_2_PBS */
+#endif /* !_POSIX2_PBS */
+#ifdef _POSIX2_PBS_ACCOUNTING
+	/* [169] = */ _POSIX2_PBS_ACCOUNTING, /* _SC_2_PBS_ACCOUNTING */
+#else /* _POSIX2_PBS_ACCOUNTING */
+	/* [169] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_2_PBS_ACCOUNTING */
+#endif /* !_POSIX2_PBS_ACCOUNTING */
+#ifdef _POSIX2_PBS_LOCATE
+	/* [170] = */ _POSIX2_PBS_LOCATE, /* _SC_2_PBS_LOCATE */
+#else /* _POSIX2_PBS_LOCATE */
+	/* [170] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_2_PBS_LOCATE */
+#endif /* !_POSIX2_PBS_LOCATE */
+#ifdef _POSIX2_PBS_MESSAGE
+	/* [171] = */ _POSIX2_PBS_MESSAGE, /* _SC_2_PBS_MESSAGE */
+#else /* _POSIX2_PBS_MESSAGE */
+	/* [171] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_2_PBS_MESSAGE */
+#endif /* !_POSIX2_PBS_MESSAGE */
+#ifdef _POSIX2_PBS_TRACK
+	/* [172] = */ _POSIX2_PBS_TRACK, /* _SC_2_PBS_TRACK */
+#else /* _POSIX2_PBS_TRACK */
+	/* [172] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_2_PBS_TRACK */
+#endif /* !_POSIX2_PBS_TRACK */
+	/* [173] = */ SYSCONF_ENTRY_UNDEFINED, /* _SC_SYMLOOP_MAX */
+	/* [174] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_STREAMS */
+#ifdef _POSIX2_PBS_CHECKPOINT
+	/* [175] = */ _POSIX2_PBS_CHECKPOINT, /* _SC_2_PBS_CHECKPOINT */
+#else /* _POSIX2_PBS_CHECKPOINT */
+	/* [175] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_2_PBS_CHECKPOINT */
+#endif /* !_POSIX2_PBS_CHECKPOINT */
+	/* [176] = */ SYSCONF_ENTRY_UNDEFINED, /* 176 */
+	/* [177] = */ SYSCONF_ENTRY_UNDEFINED, /* 177 */
+	/* [178] = */ SYSCONF_ENTRY_UNDEFINED, /* 178 */
+	/* [179] = */ SYSCONF_ENTRY_UNDEFINED, /* 179 */
+#ifdef HOST_NAME_MAX
+	/* [180] = */ HOST_NAME_MAX, /* _SC_HOST_NAME_MAX */
+#else /* HOST_NAME_MAX */
+	/* [180] = */ _POSIX_HOST_NAME_MAX, /* _SC_HOST_NAME_MAX */
+#endif /* !HOST_NAME_MAX */
+#ifdef _POSIX_TRACE
+	/* [181] = */ _POSIX_TRACE, /* _SC_TRACE */
+#else /* _POSIX_TRACE */
+	/* [181] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_TRACE */
+#endif /* !_POSIX_TRACE */
+	/* [182] = */ _POSIX_TRACE_EVENT_FILTER, /* _SC_TRACE_EVENT_FILTER */
+	/* [183] = */ _POSIX_TRACE_INHERIT, /* _SC_TRACE_INHERIT */
+	/* [184] = */ _POSIX_TRACE_LOG, /* _SC_TRACE_LOG */
+	/* [185] = */ 0, /* _SC_LEVEL1_ICACHE_SIZE */
+	/* [186] = */ 0, /* _SC_LEVEL1_ICACHE_ASSOC */
+	/* [187] = */ 0, /* _SC_LEVEL1_ICACHE_LINESIZE */
+	/* [188] = */ 0, /* _SC_LEVEL1_DCACHE_SIZE */
+	/* [189] = */ 0, /* _SC_LEVEL1_DCACHE_ASSOC */
+	/* [190] = */ 0, /* _SC_LEVEL1_DCACHE_LINESIZE */
+	/* [191] = */ 0, /* _SC_LEVEL2_CACHE_SIZE */
+	/* [192] = */ 0, /* _SC_LEVEL2_CACHE_ASSOC */
+	/* [193] = */ 0, /* _SC_LEVEL2_CACHE_LINESIZE */
+	/* [194] = */ 0, /* _SC_LEVEL3_CACHE_SIZE */
+	/* [195] = */ 0, /* _SC_LEVEL3_CACHE_ASSOC */
+	/* [196] = */ 0, /* _SC_LEVEL3_CACHE_LINESIZE */
+	/* [197] = */ 0, /* _SC_LEVEL4_CACHE_SIZE */
+	/* [198] = */ 0, /* _SC_LEVEL4_CACHE_ASSOC */
+	/* [199] = */ 0, /* _SC_LEVEL4_CACHE_LINESIZE */
+	/* [200] = */ SYSCONF_ENTRY_UNDEFINED, /* 200 */
+	/* [201] = */ SYSCONF_ENTRY_UNDEFINED, /* 201 */
+	/* [202] = */ SYSCONF_ENTRY_UNDEFINED, /* 202 */
+	/* [203] = */ SYSCONF_ENTRY_UNDEFINED, /* 203 */
+	/* [204] = */ SYSCONF_ENTRY_UNDEFINED, /* 204 */
+	/* [205] = */ SYSCONF_ENTRY_UNDEFINED, /* 205 */
+	/* [206] = */ SYSCONF_ENTRY_UNDEFINED, /* 206 */
+	/* [207] = */ SYSCONF_ENTRY_UNDEFINED, /* 207 */
+	/* [208] = */ SYSCONF_ENTRY_UNDEFINED, /* 208 */
+	/* [209] = */ SYSCONF_ENTRY_UNDEFINED, /* 209 */
+	/* [210] = */ SYSCONF_ENTRY_UNDEFINED, /* 210 */
+	/* [211] = */ SYSCONF_ENTRY_UNDEFINED, /* 211 */
+	/* [212] = */ SYSCONF_ENTRY_UNDEFINED, /* 212 */
+	/* [213] = */ SYSCONF_ENTRY_UNDEFINED, /* 213 */
+	/* [214] = */ SYSCONF_ENTRY_UNDEFINED, /* 214 */
+	/* [215] = */ SYSCONF_ENTRY_UNDEFINED, /* 215 */
+	/* [216] = */ SYSCONF_ENTRY_UNDEFINED, /* 216 */
+	/* [217] = */ SYSCONF_ENTRY_UNDEFINED, /* 217 */
+	/* [218] = */ SYSCONF_ENTRY_UNDEFINED, /* 218 */
+	/* [219] = */ SYSCONF_ENTRY_UNDEFINED, /* 219 */
+	/* [220] = */ SYSCONF_ENTRY_UNDEFINED, /* 220 */
+	/* [221] = */ SYSCONF_ENTRY_UNDEFINED, /* 221 */
+	/* [222] = */ SYSCONF_ENTRY_UNDEFINED, /* 222 */
+	/* [223] = */ SYSCONF_ENTRY_UNDEFINED, /* 223 */
+	/* [224] = */ SYSCONF_ENTRY_UNDEFINED, /* 224 */
+	/* [225] = */ SYSCONF_ENTRY_UNDEFINED, /* 225 */
+	/* [226] = */ SYSCONF_ENTRY_UNDEFINED, /* 226 */
+	/* [227] = */ SYSCONF_ENTRY_UNDEFINED, /* 227 */
+	/* [228] = */ SYSCONF_ENTRY_UNDEFINED, /* 228 */
+	/* [229] = */ SYSCONF_ENTRY_UNDEFINED, /* 229 */
+	/* [230] = */ SYSCONF_ENTRY_UNDEFINED, /* 230 */
+	/* [231] = */ SYSCONF_ENTRY_UNDEFINED, /* 231 */
+	/* [232] = */ SYSCONF_ENTRY_UNDEFINED, /* 232 */
+	/* [233] = */ SYSCONF_ENTRY_UNDEFINED, /* 233 */
+	/* [234] = */ SYSCONF_ENTRY_UNDEFINED, /* 234 */
+#ifdef _POSIX_IPV6
+	/* [235] = */ _POSIX_IPV6, /* _SC_IPV6 */
+#else /* _POSIX_IPV6 */
+	/* [235] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_IPV6 */
+#endif /* !_POSIX_IPV6 */
+#ifdef _POSIX_RAW_SOCKETS
+	/* [236] = */ _POSIX_RAW_SOCKETS, /* _SC_RAW_SOCKETS */
+#else /* _POSIX_RAW_SOCKETS */
+	/* [236] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_RAW_SOCKETS */
+#endif /* !_POSIX_RAW_SOCKETS */
+	/* [237] = */ SYSCONF_ENTRY_UNDEFINED, /* 237 */
+	/* [238] = */ SYSCONF_ENTRY_UNDEFINED, /* 238 */
+	/* [239] = */ SYSCONF_ENTRY_UNDEFINED, /* 239 */
+	/* [240] = */ SYSCONF_ENTRY_UNDEFINED, /* 240 */
+#ifdef _POSIX_SS_REPL_MAX
+	/* [241] = */ _POSIX_SS_REPL_MAX, /* _SC_SS_REPL_MAX */
+#else /* _POSIX_SS_REPL_MAX */
+	/* [241] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_SS_REPL_MAX */
+#endif /* !_POSIX_SS_REPL_MAX */
+	/* [242] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_TRACE_EVENT_NAME_MAX */
+	/* [243] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_TRACE_NAME_MAX */
+	/* [244] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_TRACE_SYS_MAX */
+	/* [245] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_TRACE_USER_EVENT_MAX */
+	/* [246] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_XOPEN_STREAMS */
+#ifdef _POSIX_THREAD_ROBUST_PRIO_INHERIT
+	/* [247] = */ _POSIX_THREAD_ROBUST_PRIO_INHERIT, /* _SC_THREAD_ROBUST_PRIO_INHERIT */
+#else /* _POSIX_THREAD_ROBUST_PRIO_INHERIT */
+	/* [247] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_THREAD_ROBUST_PRIO_INHERIT */
+#endif /* !_POSIX_THREAD_ROBUST_PRIO_INHERIT */
+#ifdef _POSIX_THREAD_ROBUST_PRIO_PROTECT
+	/* [248] = */ _POSIX_THREAD_ROBUST_PRIO_PROTECT, /* _SC_THREAD_ROBUST_PRIO_PROTECT */
+#else /* _POSIX_THREAD_ROBUST_PRIO_PROTECT */
+	/* [248] = */ SYSCONF_ENTRY_UNLIMITED, /* _SC_THREAD_ROBUST_PRIO_PROTECT */
+#endif /* !_POSIX_THREAD_ROBUST_PRIO_PROTECT */
+/*[[[end]]]*/
+};
+STATIC_ASSERT(COMPILER_LENOF(sysconf_table) <= _SC_COUNT);
+
+
+
+/*[[[head:libc_sysconf,hash:CRC-32=0x2bfea1fe]]]*/
 /* >> sysconf(2)
  * @param: NAME: One of `_SC_*' from <bits/confname.h>
  * Return a system configuration value `NAME'
  * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] `NAME' referrs to a maximum or minimum
+ * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTERN ATTR_SECTION(".text.crt.system.configuration") WUNUSED longptr_t
 NOTHROW_RPC(LIBCCALL libc_sysconf)(__STDC_INT_AS_UINT_T name)
 /*[[[body:libc_sysconf]]]*/
 {
-	long int result;
+	longptr_t result;
+	if (name < COMPILER_LENOF(sysconf_table)) {
+		result = sysconf_table[name];
+		if (result != SYSCONF_ENTRY_UNDEFINED)
+			return result;
+	}
 	switch (name) {
+
+	/* Special handling to deal with names where the actual config value
+	 * overlaps with the `SYSCONF_ENTRY_UNDEFINED' marker. Note that for
+	 * this purpose, `SYSCONF_ENTRY_UNDEFINED' has a value of `INT32_MIN' */
+
+/*[[[deemon
+for (local name: SYSCONF_VALUES_LO_INT32) {
+	print("#if ", name, " == INT32_MIN");
+	print("#define NEED_SYSCONF_INT32_MIN_CONFVAL_OVERLAP");
+	print("	case _SC_", name, ":");
+	print("#endif /" "* ", name, " == INT32_MIN *" "/");
+}
+]]]*/
+#if CHAR_MIN == INT32_MIN
+#define NEED_SYSCONF_INT32_MIN_CONFVAL_OVERLAP
+	case _SC_CHAR_MIN:
+#endif /* CHAR_MIN == INT32_MIN */
+#if INT_MIN == INT32_MIN
+#define NEED_SYSCONF_INT32_MIN_CONFVAL_OVERLAP
+	case _SC_INT_MIN:
+#endif /* INT_MIN == INT32_MIN */
+#if SCHAR_MIN == INT32_MIN
+#define NEED_SYSCONF_INT32_MIN_CONFVAL_OVERLAP
+	case _SC_SCHAR_MIN:
+#endif /* SCHAR_MIN == INT32_MIN */
+#if SHRT_MIN == INT32_MIN
+#define NEED_SYSCONF_INT32_MIN_CONFVAL_OVERLAP
+	case _SC_SHRT_MIN:
+#endif /* SHRT_MIN == INT32_MIN */
+/*[[[end]]]*/
+#ifdef NEED_SYSCONF_INT32_MIN_CONFVAL_OVERLAP
+#undef NEED_SYSCONF_INT32_MIN_CONFVAL_OVERLAP
+		result = INT32_MIN;
+		break;
+#endif /* NEED_SYSCONF_INT32_MIN_CONFVAL_OVERLAP */
+
+
+	/* Special handling for conf values outside of the
+	 * 32-bit range required by the config table above. */
+/*[[[deemon
+for (local name: SYSCONF_VALUES_HI_INT32) {
+	print("#if ", name, " > INT32_MAX");
+	print("	case _SC_", name, ":");
+	print("		result = (longptr_t)", name, ";");
+	print("		break;");
+	print("#endif /" "* ", name, " > INT32_MAX *" "/");
+}
+
+for (local name: SYSCONF_VALUES_LO_INT32) {
+	print("#if ", name, " < INT32_MIN");
+	print("	case _SC_", name, ":");
+	print("		result = (longptr_t)", name, ";");
+	print("		break;");
+	print("#endif /" "* ", name, " < INT32_MIN *" "/");
+}
+]]]*/
+#if CHAR_MAX > INT32_MAX
+	case _SC_CHAR_MAX:
+		result = (longptr_t)CHAR_MAX;
+		break;
+#endif /* CHAR_MAX > INT32_MAX */
+#if INT_MAX > INT32_MAX
+	case _SC_INT_MAX:
+		result = (longptr_t)INT_MAX;
+		break;
+#endif /* INT_MAX > INT32_MAX */
+#if SSIZE_MAX > INT32_MAX
+	case _SC_SSIZE_MAX:
+		result = (longptr_t)SSIZE_MAX;
+		break;
+#endif /* SSIZE_MAX > INT32_MAX */
+#if SCHAR_MAX > INT32_MAX
+	case _SC_SCHAR_MAX:
+		result = (longptr_t)SCHAR_MAX;
+		break;
+#endif /* SCHAR_MAX > INT32_MAX */
+#if SHRT_MAX > INT32_MAX
+	case _SC_SHRT_MAX:
+		result = (longptr_t)SHRT_MAX;
+		break;
+#endif /* SHRT_MAX > INT32_MAX */
+#if UCHAR_MAX > INT32_MAX
+	case _SC_UCHAR_MAX:
+		result = (longptr_t)UCHAR_MAX;
+		break;
+#endif /* UCHAR_MAX > INT32_MAX */
+#if UINT_MAX > INT32_MAX
+	case _SC_UINT_MAX:
+		result = (longptr_t)UINT_MAX;
+		break;
+#endif /* UINT_MAX > INT32_MAX */
+#if ULONG_MAX > INT32_MAX
+	case _SC_ULONG_MAX:
+		result = (longptr_t)ULONG_MAX;
+		break;
+#endif /* ULONG_MAX > INT32_MAX */
+#if USHRT_MAX > INT32_MAX
+	case _SC_USHRT_MAX:
+		result = (longptr_t)USHRT_MAX;
+		break;
+#endif /* USHRT_MAX > INT32_MAX */
+#if CHAR_MIN < INT32_MIN
+	case _SC_CHAR_MIN:
+		result = (longptr_t)CHAR_MIN;
+		break;
+#endif /* CHAR_MIN < INT32_MIN */
+#if INT_MIN < INT32_MIN
+	case _SC_INT_MIN:
+		result = (longptr_t)INT_MIN;
+		break;
+#endif /* INT_MIN < INT32_MIN */
+#if SCHAR_MIN < INT32_MIN
+	case _SC_SCHAR_MIN:
+		result = (longptr_t)SCHAR_MIN;
+		break;
+#endif /* SCHAR_MIN < INT32_MIN */
+#if SHRT_MIN < INT32_MIN
+	case _SC_SHRT_MIN:
+		result = (longptr_t)SHRT_MIN;
+		break;
+#endif /* SHRT_MIN < INT32_MIN */
+/*[[[end]]]*/
 
 	case _SC_CLK_TCK:
 		result = CLK_TCK; /* TODO */
-		break;
-
-	case _SC_NGROUPS_MAX:
-		result = NGROUPS_MAX;
-		break;
-
-	case _SC_STREAM_MAX:
-		/* Unlimited, but needs a fixed value for historical reasons... */
-#ifdef STREAM_MAX
-		result = STREAM_MAX;
-#else /* STREAM_MAX */
-		result = FOPEN_MAX;
-#endif /* !STREAM_MAX */
-		break;
-
-	case _SC_JOB_CONTROL:
-		result = _POSIX_JOB_CONTROL;
-		break;
-
-	case _SC_SAVED_IDS:
-		result = _POSIX_SAVED_IDS;
-		break;
-
-	case _SC_REALTIME_SIGNALS:
-		result = _POSIX_REALTIME_SIGNALS;
-		break;
-
-	case _SC_PRIORITY_SCHEDULING:
-		result = _POSIX_PRIORITY_SCHEDULING;
-		break;
-
-	case _SC_TIMERS:
-		result = _POSIX_TIMERS;
-		break;
-
-	case _SC_ASYNCHRONOUS_IO:
-		result = _POSIX_ASYNCHRONOUS_IO;
-		break;
-
-	case _SC_PRIORITIZED_IO:
-		result = _POSIX_PRIORITIZED_IO;
-		break;
-
-	case _SC_SYNCHRONIZED_IO:
-		result = _POSIX_SYNCHRONIZED_IO;
-		break;
-
-	case _SC_FSYNC:
-		result = _POSIX_FSYNC;
-		break;
-
-	case _SC_MAPPED_FILES:
-		result = _POSIX_MAPPED_FILES;
-		break;
-
-	case _SC_MEMLOCK:
-		result = _POSIX_MEMLOCK;
-		break;
-
-	case _SC_MEMLOCK_RANGE:
-		result = _POSIX_MEMLOCK_RANGE;
-		break;
-
-	case _SC_MEMORY_PROTECTION:
-		result = _POSIX_MEMORY_PROTECTION;
-		break;
-
-	case _SC_MESSAGE_PASSING:
-		result = _POSIX_MESSAGE_PASSING;
-		break;
-
-	case _SC_SEMAPHORES:
-		result = _POSIX_SEMAPHORES;
-		break;
-
-	case _SC_SHARED_MEMORY_OBJECTS:
-		result = _POSIX_SHARED_MEMORY_OBJECTS;
-		break;
-
-	case _SC_AIO_LISTIO_MAX:
-		result = _POSIX_AIO_LISTIO_MAX;
-		break;
-
-	case _SC_AIO_MAX:
-		result = _POSIX_AIO_MAX;
-		break;
-
-	case _SC_AIO_PRIO_DELTA_MAX:
-		result = AIO_PRIO_DELTA_MAX;
-		break;
-
-	case _SC_DELAYTIMER_MAX:
-		result = DELAYTIMER_MAX;
-		break;
-
-	case _SC_MQ_OPEN_MAX:
-		result = _POSIX_MQ_OPEN_MAX;
-		break;
-
-	case _SC_MQ_PRIO_MAX:
-		result = MQ_PRIO_MAX;
-		break;
-
-	case _SC_VERSION:
-		result = _POSIX_VERSION;
-		break;
-
-	case _SC_PAGESIZE:
-		result = OS_PAGESIZE;
-		break;
-
-	case _SC_RTSIG_MAX:
-		result = RTSIG_MAX;
-		break;
-
-	case _SC_SEM_NSEMS_MAX:
-		result = _POSIX_SEM_NSEMS_MAX;
-		break;
-
-	case _SC_SEM_VALUE_MAX:
-		result = SEM_VALUE_MAX;
-		break;
-
-	case _SC_SIGQUEUE_MAX:
-		result = _POSIX_SIGQUEUE_MAX;
-		break;
-
-	case _SC_TIMER_MAX:
-		result = _POSIX_TIMER_MAX;
-		break;
-
-	case _SC_BC_BASE_MAX:
-		result = BC_BASE_MAX;
-		break;
-
-	case _SC_BC_DIM_MAX:
-		result = BC_DIM_MAX;
-		break;
-
-	case _SC_BC_SCALE_MAX:
-		result = BC_SCALE_MAX;
-		break;
-
-	case _SC_BC_STRING_MAX:
-		result = BC_STRING_MAX;
-		break;
-
-	case _SC_COLL_WEIGHTS_MAX:
-		result = COLL_WEIGHTS_MAX;
-		break;
-
-	case _SC_EXPR_NEST_MAX:
-		result = EXPR_NEST_MAX;
-		break;
-
-	case _SC_LINE_MAX:
-		result = LINE_MAX; /* NOTE: Can be increased. */
-		break;
-
-	case _SC_RE_DUP_MAX:
-		result = RE_DUP_MAX;
-		break;
-
-	case _SC_CHARCLASS_NAME_MAX:
-		result = CHARCLASS_NAME_MAX;
-		break;
-
-	case _SC_2_VERSION:
-		result = _POSIX2_VERSION;
-		break;
-
-	case _SC_2_C_BIND:
-#ifdef _POSIX2_C_BIND
-		result = _POSIX2_C_BIND;
-		break;
-#else /* _POSIX2_C_BIND */
-		goto unlimited;
-#endif /* !_POSIX2_C_BIND */
-
-	case _SC_2_C_DEV:
-#ifdef _POSIX2_C_DEV
-		result = _POSIX2_C_DEV;
-		break;
-#else /* _POSIX2_C_DEV */
-		goto unlimited;
-#endif /* !_POSIX2_C_DEV */
-
-	case _SC_2_FORT_DEV:
-#ifdef _POSIX2_FORT_DEV
-		result = _POSIX2_FORT_DEV;
-		break;
-#else /* _POSIX2_FORT_DEV */
-		goto unlimited;
-#endif /* !_POSIX2_FORT_DEV */
-
-	case _SC_2_FORT_RUN:
-#ifdef _POSIX2_FORT_RUN
-		result = _POSIX2_FORT_RUN;
-		break;
-#else /* _POSIX2_FORT_RUN */
-		goto unlimited;
-#endif /* !_POSIX2_FORT_RUN */
-
-	case _SC_2_SW_DEV:
-#ifdef _POSIX2_SW_DEV
-		result = _POSIX2_SW_DEV;
-		break;
-#else /* _POSIX2_SW_DEV */
-		goto unlimited;
-#endif /* !_POSIX2_SW_DEV */
-
-	case _SC_2_LOCALEDEF:
-#ifdef _POSIX2_LOCALEDEF
-		result = _POSIX2_LOCALEDEF;
-		break;
-#else /* _POSIX2_LOCALEDEF */
-		goto unlimited;
-#endif /* !_POSIX2_LOCALEDEF */
-
-	case _SC_PII:
-#ifdef _POSIX_PII
-		result = 1;
-		break;
-#else /* _POSIX_PII */
-		goto unlimited;
-#endif /* !_POSIX_PII */
-
-	case _SC_PII_XTI:
-#ifdef _POSIX_PII_XTI
-		result = 1;
-		break;
-#else /* _POSIX_PII_XTI */
-		goto unlimited;
-#endif /* !_POSIX_PII_XTI */
-
-	case _SC_PII_SOCKET:
-#ifdef _POSIX_PII_SOCKET
-		result = 1;
-		break;
-#else /* _POSIX_PII_SOCKET */
-		goto unlimited;
-#endif /* !_POSIX_PII_SOCKET */
-
-	case _SC_PII_INTERNET:
-#ifdef _POSIX_PII_INTERNET
-		result = 1;
-		break;
-#else /* _POSIX_PII_INTERNET */
-		goto unlimited;
-#endif /* !_POSIX_PII_INTERNET */
-
-	case _SC_PII_OSI:
-#ifdef _POSIX_PII_OSI
-		result = 1;
-		break;
-#else /* _POSIX_PII_OSI */
-		goto unlimited;
-#endif /* !_POSIX_PII_OSI */
-
-	case _SC_POLL:
-#ifdef _POSIX_POLL
-		result = 1;
-		break;
-#else /* _POSIX_POLL */
-		goto unlimited;
-#endif /* !_POSIX_POLL */
-
-	case _SC_SELECT:
-#ifdef _POSIX_SELECT
-		result = 1;
-		break;
-#else /* _POSIX_SELECT */
-		goto unlimited;
-#endif /* !_POSIX_SELECT */
-
-	case _SC_PII_INTERNET_STREAM:
-#ifdef _POSIX_PII_INTERNET_STREAM
-		result = 1;
-		break;
-#else /* _POSIX_PII_INTERNET_STREAM */
-		goto unlimited;
-#endif /* !_POSIX_PII_INTERNET_STREAM */
-
-	case _SC_PII_INTERNET_DGRAM:
-#ifdef _POSIX_PII_INTERNET_DGRAM
-		result = 1;
-		break;
-#else /* _POSIX_PII_INTERNET_DGRAM */
-		goto unlimited;
-#endif /* !_POSIX_PII_INTERNET_DGRAM */
-
-	case _SC_PII_OSI_COTS:
-#ifdef _POSIX_PII_OSI_COTS
-		result = 1;
-		break;
-#else /* _POSIX_PII_OSI_COTS */
-		goto unlimited;
-#endif /* !_POSIX_PII_OSI_COTS */
-
-	case _SC_PII_OSI_CLTS:
-#ifdef _POSIX_PII_OSI_CLTS
-		result = 1;
-		break;
-#else /* _POSIX_PII_OSI_CLTS */
-		goto unlimited;
-#endif /* !_POSIX_PII_OSI_CLTS */
-
-	case _SC_PII_OSI_M:
-#ifdef _POSIX_PII_OSI_M
-		result = 1;
-		break;
-#else /* _POSIX_PII_OSI_M */
-		goto unlimited;
-#endif /* !_POSIX_PII_OSI_M */
-
-	case _SC_THREADS:
-		result = _POSIX_THREADS;
-		break;
-
-	case _SC_THREAD_SAFE_FUNCTIONS:
-		result = _POSIX_THREAD_SAFE_FUNCTIONS;
-		break;
-
-	case _SC_GETGR_R_SIZE_MAX:
-		result = NSS_BUFLEN_GROUP;
-		break;
-	case _SC_GETPW_R_SIZE_MAX:
-		result = NSS_BUFLEN_PASSWD;
-		break;
-
-	case _SC_LOGIN_NAME_MAX:
-		result = LOGIN_NAME_MAX;
-		break;
-
-	case _SC_TTY_NAME_MAX:
-		result = TTY_NAME_MAX;
-		break;
-
-	case _SC_THREAD_DESTRUCTOR_ITERATIONS:
-		result = _POSIX_THREAD_DESTRUCTOR_ITERATIONS;
-		break;
-
-	case _SC_THREAD_KEYS_MAX:
-		result = _POSIX_THREAD_KEYS_MAX;
-		break;
-
-	case _SC_THREAD_STACK_MIN:
-		result = PTHREAD_STACK_MIN;
-		break;
-
-	case _SC_THREAD_ATTR_STACKADDR:
-		result = _POSIX_THREAD_ATTR_STACKADDR;
-		break;
-
-	case _SC_THREAD_ATTR_STACKSIZE:
-		result = _POSIX_THREAD_ATTR_STACKSIZE;
-		break;
-
-	case _SC_THREAD_PRIORITY_SCHEDULING:
-		result = _POSIX_THREAD_PRIORITY_SCHEDULING;
-		break;
-
-	case _SC_THREAD_PRIO_INHERIT:
-		result = _POSIX_THREAD_PRIO_INHERIT;
-		break;
-
-	case _SC_THREAD_PRIO_PROTECT:
-		result = _POSIX_THREAD_PRIO_PROTECT;
-		break;
-
-	case _SC_THREAD_PROCESS_SHARED:
-		result = _POSIX_THREAD_PROCESS_SHARED;
 		break;
 
 	case _SC_NPROCESSORS_CONF:
@@ -2911,630 +3443,12 @@ NOTHROW_RPC(LIBCCALL libc_sysconf)(__STDC_INT_AS_UINT_T name)
 		result = get_avphys_pages();
 		break;
 
-	case _SC_ATEXIT_MAX:
-	case _SC_PASS_MAX:
-		result = 1024;
-		break;
-
-	case _SC_XOPEN_VERSION:
-		result = _XOPEN_VERSION;
-		break;
-
-	case _SC_XOPEN_XCU_VERSION:
-		result = _XOPEN_XCU_VERSION;
-		break;
-
-	case _SC_XOPEN_UNIX:
-		result = _XOPEN_UNIX;
-		break;
-
-	case _SC_XOPEN_CRYPT:
-		result = _XOPEN_CRYPT;
-		break;
-
-	case _SC_XOPEN_ENH_I18N:
-		result = _XOPEN_ENH_I18N;
-		break;
-
-	case _SC_XOPEN_SHM:
-		result = _XOPEN_SHM;
-		break;
-
-	case _SC_2_CHAR_TERM:
-		result = _POSIX2_CHAR_TERM;
-		break;
-
-	case _SC_2_C_VERSION:
-		result = _POSIX2_C_VERSION;
-		break;
-
-	case _SC_2_UPE:
-#ifdef _POSIX2_UPE
-		result = _POSIX2_UPE;
-		break;
-#else
-		goto unlimited;
-#endif
-
-	case _SC_XOPEN_XPG2:
-		result = _XOPEN_XPG2;
-		break;
-
-	case _SC_XOPEN_XPG3:
-		result = _XOPEN_XPG3;
-		break;
-
-	case _SC_XOPEN_XPG4:
-		result = _XOPEN_XPG4;
-		break;
-
-	case _SC_CHAR_BIT:
-		result = CHAR_BIT;
-		break;
-
-	case _SC_CHAR_MAX:
-		result = CHAR_MAX;
-		break;
-
-	case _SC_CHAR_MIN:
-		result = CHAR_MIN;
-		break;
-
-	case _SC_INT_MAX:
-		result = INT_MAX;
-		break;
-
-	case _SC_INT_MIN:
-		result = INT_MIN;
-		break;
-
-	case _SC_LONG_BIT:
-		result = LONG_BIT;
-		break;
-
-	case _SC_WORD_BIT:
-		result = WORD_BIT;
-		break;
-
-	case _SC_MB_LEN_MAX:
-		result = MB_LEN_MAX;
-		break;
-
-	case _SC_NZERO:
-		result = NZERO;
-		break;
-
-	case _SC_SSIZE_MAX:
-		result = SSIZE_MAX;
-		break;
-
-	case _SC_SCHAR_MAX:
-		result = SCHAR_MAX;
-		break;
-
-	case _SC_SCHAR_MIN:
-		result = SCHAR_MIN;
-		break;
-
-	case _SC_SHRT_MAX:
-		result = SHRT_MAX;
-		break;
-
-	case _SC_SHRT_MIN:
-		result = SHRT_MIN;
-		break;
-
-	case _SC_UCHAR_MAX:
-		result = UCHAR_MAX;
-		break;
-
-	case _SC_UINT_MAX:
-		result = UINT_MAX;
-		break;
-
-	case _SC_ULONG_MAX:
-		result = ULONG_MAX;
-		break;
-
-	case _SC_USHRT_MAX:
-		result = USHRT_MAX;
-		break;
-
-	case _SC_NL_ARGMAX:
-		result = NL_ARGMAX;
-		break;
-
-	case _SC_NL_LANGMAX:
-		result = NL_LANGMAX;
-		break;
-
-	case _SC_NL_MSGMAX:
-		result = NL_MSGMAX;
-		break;
-
-	case _SC_NL_NMAX:
-		result = NL_NMAX;
-		break;
-
-	case _SC_NL_SETMAX:
-		result = NL_SETMAX;
-		break;
-
-	case _SC_NL_TEXTMAX:
-		result = NL_TEXTMAX;
-		break;
-
-	case _SC_XOPEN_LEGACY:
-		result = _XOPEN_LEGACY;
-		break;
-
-	case _SC_XOPEN_REALTIME:
-#ifdef _XOPEN_REALTIME
-		result = _XOPEN_REALTIME;
-		break;
-#else /* _XOPEN_REALTIME */
-		goto unlimited;
-#endif /* !_XOPEN_REALTIME */
-
-	case _SC_XOPEN_REALTIME_THREADS:
-#ifdef _XOPEN_REALTIME_THREADS
-		result = _XOPEN_REALTIME_THREADS;
-		break;
-#else /* _XOPEN_REALTIME_THREADS */
-		goto unlimited;
-#endif /* !_XOPEN_REALTIME_THREADS */
-
-	case _SC_ADVISORY_INFO:
-		result = _POSIX_ADVISORY_INFO;
-		break;
-
-	case _SC_BARRIERS:
-		result = _POSIX_BARRIERS;
-		break;
-
-	case _SC_BASE:
-#ifdef _POSIX_BASE
-		result = _POSIX_BASE;
-		break;
-#else /* _POSIX_BASE */
-		goto unlimited;
-#endif /* !_POSIX_BASE */
-
-	case _SC_C_LANG_SUPPORT:
-#ifdef _POSIX_C_LANG_SUPPORT
-		result = _POSIX_C_LANG_SUPPORT;
-		break;
-#else /* _POSIX_C_LANG_SUPPORT */
-		goto unlimited;
-#endif /* !_POSIX_C_LANG_SUPPORT */
-
-	case _SC_C_LANG_SUPPORT_R:
-#ifdef _POSIX_C_LANG_SUPPORT_R
-		result = _POSIX_C_LANG_SUPPORT_R;
-		break;
-#else /* _POSIX_C_LANG_SUPPORT_R */
-		goto unlimited;
-#endif /* !_POSIX_C_LANG_SUPPORT_R */
-
-	case _SC_CLOCK_SELECTION:
-#ifdef _POSIX_CLOCK_SELECTION
-		result = _POSIX_CLOCK_SELECTION;
-		break;
-#else /* _POSIX_CLOCK_SELECTION */
-		goto unlimited;
-#endif /* !_POSIX_CLOCK_SELECTION */
-
-	case _SC_CPUTIME:
-#ifdef _POSIX_CPUTIME
-		result = _POSIX_CPUTIME;
-		break;
-#else /* _POSIX_CPUTIME */
-		goto unlimited;
-#endif /* !_POSIX_CPUTIME */
-
-	case _SC_THREAD_CPUTIME:
-#ifdef _POSIX_THREAD_CPUTIME
-		result = _POSIX_THREAD_CPUTIME;
-		break;
-#else /* _POSIX_THREAD_CPUTIME */
-		goto unlimited;
-#endif /* !_POSIX_THREAD_CPUTIME */
-
-	case _SC_DEVICE_IO:
-#ifdef _POSIX_DEVICE_IO
-		result = _POSIX_DEVICE_IO;
-		break;
-#else /* _POSIX_DEVICE_IO */
-		goto unlimited;
-#endif /* !_POSIX_DEVICE_IO */
-
-	case _SC_DEVICE_SPECIFIC:
-#ifdef _POSIX_DEVICE_SPECIFIC
-		result = _POSIX_DEVICE_SPECIFIC;
-		break;
-#else /* _POSIX_DEVICE_SPECIFIC */
-		goto unlimited;
-#endif /* !_POSIX_DEVICE_SPECIFIC */
-
-	case _SC_DEVICE_SPECIFIC_R:
-#ifdef _POSIX_DEVICE_SPECIFIC_R
-		result = _POSIX_DEVICE_SPECIFIC_R;
-		break;
-#else /* _POSIX_DEVICE_SPECIFIC_R */
-		goto unlimited;
-#endif /* !_POSIX_DEVICE_SPECIFIC_R */
-
-	case _SC_FD_MGMT:
-#ifdef _POSIX_FD_MGMT
-		result = _POSIX_FD_MGMT;
-		break;
-#else /* _POSIX_FD_MGMT */
-		goto unlimited;
-#endif /* !_POSIX_FD_MGMT */
-
-	case _SC_FIFO:
-#ifdef _POSIX_FIFO
-		result = _POSIX_FIFO;
-		break;
-#else /* _POSIX_FIFO */
-		goto unlimited;
-#endif /* !_POSIX_FIFO */
-
-	case _SC_PIPE:
-#ifdef _POSIX_PIPE
-		result = _POSIX_PIPE;
-		break;
-#else /* _POSIX_PIPE */
-		goto unlimited;
-#endif /* !_POSIX_PIPE */
-
-	case _SC_FILE_ATTRIBUTES:
-#ifdef _POSIX_FILE_ATTRIBUTES
-		result = _POSIX_FILE_ATTRIBUTES;
-		break;
-#else /* _POSIX_FILE_ATTRIBUTES */
-		goto unlimited;
-#endif /* !_POSIX_FILE_ATTRIBUTES */
-
-	case _SC_FILE_LOCKING:
-#ifdef _POSIX_FILE_LOCKING
-		result = _POSIX_FILE_LOCKING;
-		break;
-#else /* _POSIX_FILE_LOCKING */
-		goto unlimited;
-#endif /* !_POSIX_FILE_LOCKING */
-
-	case _SC_FILE_SYSTEM:
-#ifdef _POSIX_FILE_SYSTEM
-		result = _POSIX_FILE_SYSTEM;
-		break;
-#else /* _POSIX_FILE_SYSTEM */
-		goto unlimited;
-#endif /* !_POSIX_FILE_SYSTEM */
-
-
-	case _SC_MONOTONIC_CLOCK:
-#ifdef _POSIX_MONOTONIC_CLOCK
-		result = _POSIX_MONOTONIC_CLOCK;
-		break;
-#else /* _POSIX_MONOTONIC_CLOCK */
-		goto unlimited;
-#endif /* !_POSIX_MONOTONIC_CLOCK */
-
-	case _SC_MULTI_PROCESS:
-#ifdef _POSIX_MULTI_PROCESS
-		result = _POSIX_MULTI_PROCESS;
-		break;
-#else /* _POSIX_MULTI_PROCESS */
-		goto unlimited;
-#endif /* !_POSIX_MULTI_PROCESS */
-
-	case _SC_SINGLE_PROCESS:
-#ifdef _POSIX_SINGLE_PROCESS
-		result = _POSIX_SINGLE_PROCESS;
-		break;
-#else /* _POSIX_SINGLE_PROCESS */
-		goto unlimited;
-#endif /* !_POSIX_SINGLE_PROCESS */
-
-	case _SC_NETWORKING:
-#ifdef _POSIX_NETWORKING
-		result = _POSIX_NETWORKING;
-		break;
-#else /* _POSIX_NETWORKING */
-		goto unlimited;
-#endif /* !_POSIX_NETWORKING */
-
-	case _SC_READER_WRITER_LOCKS:
-#ifdef _POSIX_READER_WRITER_LOCKS
-		result = _POSIX_READER_WRITER_LOCKS;
-		break;
-#else /* _POSIX_READER_WRITER_LOCKS */
-		goto unlimited;
-#endif /* !_POSIX_READER_WRITER_LOCKS */
-
-	case _SC_SPIN_LOCKS:
-#ifdef _POSIX_SPIN_LOCKS
-		result = _POSIX_SPIN_LOCKS;
-		break;
-#else /* _POSIX_SPIN_LOCKS */
-		goto unlimited;
-#endif /* !_POSIX_SPIN_LOCKS */
-
-	case _SC_REGEXP:
-#ifdef _POSIX_REGEXP
-		result = _POSIX_REGEXP;
-		break;
-#else /* _POSIX_REGEXP */
-		goto unlimited;
-#endif /* !_POSIX_REGEXP */
-
-	case _SC_SHELL:
-#ifdef _POSIX_SHELL
-		result = _POSIX_SHELL;
-		break;
-#else /* _POSIX_SHELL */
-		goto unlimited;
-#endif /* !_POSIX_SHELL */
-
-	case _SC_SIGNALS:
-#ifdef _POSIX_SIGNALS
-		result = _POSIX_SIGNALS;
-		break;
-#else /* _POSIX_SIGNALS */
-		goto unlimited;
-#endif /* !_POSIX_SIGNALS */
-
-	case _SC_SPAWN:
-#ifdef _POSIX_SPAWN
-		result = _POSIX_SPAWN;
-		break;
-#else /* _POSIX_SPAWN */
-		goto unlimited;
-#endif /* !_POSIX_SPAWN */
-
-	case _SC_SPORADIC_SERVER:
-#ifdef _POSIX_SPORADIC_SERVER
-		result = _POSIX_SPORADIC_SERVER;
-		break;
-#else /* _POSIX_SPORADIC_SERVER */
-		goto unlimited;
-#endif /* !_POSIX_SPORADIC_SERVER */
-
-	case _SC_THREAD_SPORADIC_SERVER:
-#ifdef _POSIX_THREAD_SPORADIC_SERVER
-		result = _POSIX_THREAD_SPORADIC_SERVER;
-		break;
-#else /* _POSIX_THREAD_SPORADIC_SERVER */
-		goto unlimited;
-#endif /* !_POSIX_THREAD_SPORADIC_SERVER */
-
-	case _SC_SYSTEM_DATABASE:
-#ifdef _POSIX_SYSTEM_DATABASE
-		result = _POSIX_SYSTEM_DATABASE;
-		break;
-#else /* _POSIX_SYSTEM_DATABASE */
-		goto unlimited;
-#endif /* !_POSIX_SYSTEM_DATABASE */
-
-	case _SC_SYSTEM_DATABASE_R:
-#ifdef _POSIX_SYSTEM_DATABASE_R
-		result = _POSIX_SYSTEM_DATABASE_R;
-		break;
-#else /* _POSIX_SYSTEM_DATABASE_R */
-		goto unlimited;
-#endif /* !_POSIX_SYSTEM_DATABASE_R */
-
-	case _SC_TIMEOUTS:
-#ifdef _POSIX_TIMEOUTS
-		result = _POSIX_TIMEOUTS;
-		break;
-#else /* _POSIX_TIMEOUTS */
-		goto unlimited;
-#endif /* !_POSIX_TIMEOUTS */
-
-	case _SC_TYPED_MEMORY_OBJECTS:
-#ifdef _POSIX_TYPED_MEMORY_OBJECTS
-		result = _POSIX_TYPED_MEMORY_OBJECTS;
-		break;
-#else /* _POSIX_TYPED_MEMORY_OBJECTS */
-		goto unlimited;
-#endif /* !_POSIX_TYPED_MEMORY_OBJECTS */
-
-	case _SC_USER_GROUPS:
-#ifdef _POSIX_USER_GROUPS
-		result = _POSIX_USER_GROUPS;
-		break;
-#else /* _POSIX_USER_GROUPS */
-		goto unlimited;
-#endif /* !_POSIX_USER_GROUPS */
-
-	case _SC_USER_GROUPS_R:
-#ifdef _POSIX_USER_GROUPS_R
-		result = _POSIX_USER_GROUPS_R;
-		break;
-#else /* _POSIX_USER_GROUPS_R */
-		goto unlimited;
-#endif /* !_POSIX_USER_GROUPS_R */
-
-	case _SC_2_PBS:
-#ifdef _POSIX2_PBS
-		result = _POSIX2_PBS;
-		break;
-#else /* _POSIX2_PBS */
-		goto unlimited;
-#endif /* !_POSIX2_PBS */
-
-	case _SC_2_PBS_ACCOUNTING:
-#ifdef _POSIX2_PBS_ACCOUNTING
-		result = _POSIX2_PBS_ACCOUNTING;
-		break;
-#else /* _POSIX2_PBS_ACCOUNTING */
-		goto unlimited;
-#endif /* !_POSIX2_PBS_ACCOUNTING */
-
-	case _SC_2_PBS_LOCATE:
-#ifdef _POSIX2_PBS_LOCATE
-		result = _POSIX2_PBS_LOCATE;
-		break;
-#else /* _POSIX2_PBS_LOCATE */
-		goto unlimited;
-#endif /* !_POSIX2_PBS_LOCATE */
-
-	case _SC_2_PBS_MESSAGE:
-#ifdef _POSIX2_PBS_MESSAGE
-		result = _POSIX2_PBS_MESSAGE;
-		break;
-#else /* _POSIX2_PBS_MESSAGE */
-		goto unlimited;
-#endif /* !_POSIX2_PBS_MESSAGE */
-
-	case _SC_2_PBS_TRACK:
-#ifdef _POSIX2_PBS_TRACK
-		result = _POSIX2_PBS_TRACK;
-		break;
-#else /* _POSIX2_PBS_TRACK */
-		goto unlimited;
-#endif /* !_POSIX2_PBS_TRACK */
-
 	case _SC_SYMLOOP_MAX:
 		result = MAXSYMLINKS; /* TODO: Kernel:`THIS_FS->f_lnkmax' */
 		break;
 
-	case _SC_2_PBS_CHECKPOINT:
-#ifdef _POSIX2_PBS_CHECKPOINT
-		result = _POSIX2_PBS_CHECKPOINT;
-		break;
-#else /* _POSIX2_PBS_CHECKPOINT */
-		goto unlimited;
-#endif /* !_POSIX2_PBS_CHECKPOINT */
-
-	case _SC_HOST_NAME_MAX:
-		result = HOST_NAME_MAX;
-		break;
-
-	case _SC_TRACE:
-#ifdef _POSIX_TRACE
-		result = _POSIX_TRACE;
-		break;
-#else /* _POSIX_TRACE */
-		goto unlimited;
-#endif /* !_POSIX_TRACE */
-
-	case _SC_TRACE_EVENT_FILTER:
-#ifdef _POSIX_TRACE_EVENT_FILTER
-		result = _POSIX_TRACE_EVENT_FILTER;
-		break;
-#else /* _POSIX_TRACE_EVENT_FILTER */
-		goto unlimited;
-#endif /* !_POSIX_TRACE_EVENT_FILTER */
-
-	case _SC_TRACE_INHERIT:
-#ifdef _POSIX_TRACE_INHERIT
-		result = _POSIX_TRACE_INHERIT;
-		break;
-#else /* _POSIX_TRACE_INHERIT */
-		goto unlimited;
-#endif /* !_POSIX_TRACE_INHERIT */
-
-	case _SC_TRACE_LOG:
-#ifdef _POSIX_TRACE_LOG
-		result = _POSIX_TRACE_LOG;
-		break;
-#else /* _POSIX_TRACE_LOG */
-		goto unlimited;
-#endif /* !_POSIX_TRACE_LOG */
-
-	case _SC_LEVEL1_ICACHE_SIZE:
-	case _SC_LEVEL1_ICACHE_ASSOC:
-	case _SC_LEVEL1_ICACHE_LINESIZE:
-	case _SC_LEVEL1_DCACHE_SIZE:
-	case _SC_LEVEL1_DCACHE_ASSOC:
-	case _SC_LEVEL1_DCACHE_LINESIZE:
-	case _SC_LEVEL2_CACHE_SIZE:
-	case _SC_LEVEL2_CACHE_ASSOC:
-	case _SC_LEVEL2_CACHE_LINESIZE:
-	case _SC_LEVEL3_CACHE_SIZE:
-	case _SC_LEVEL3_CACHE_ASSOC:
-	case _SC_LEVEL3_CACHE_LINESIZE:
-	case _SC_LEVEL4_CACHE_SIZE:
-	case _SC_LEVEL4_CACHE_ASSOC:
-	case _SC_LEVEL4_CACHE_LINESIZE:
-		result = 0;
-		break;
-
-	case _SC_IPV6:
-#ifdef _POSIX_IPV6
-		result = _POSIX_IPV6;
-		break;
-#else
-		goto unlimited;
-#endif
-
-	case _SC_RAW_SOCKETS:
-#ifdef _POSIX_RAW_SOCKETS
-		result = _POSIX_RAW_SOCKETS;
-		break;
-#else
-		goto unlimited;
-#endif
-
-	case _SC_SS_REPL_MAX:
-#ifdef _POSIX_SS_REPL_MAX
-		result = _POSIX_SS_REPL_MAX;
-		break;
-#else
-		goto unlimited;
-#endif
-
-	case _SC_THREAD_ROBUST_PRIO_INHERIT:
-#ifdef _POSIX_THREAD_ROBUST_PRIO_INHERIT
-		result = _POSIX_THREAD_ROBUST_PRIO_INHERIT;
-		break;
-#else
-		goto unlimited;
-#endif
-
-	case _SC_THREAD_ROBUST_PRIO_PROTECT:
-#ifdef _POSIX_THREAD_ROBUST_PRIO_PROTECT
-		result = _POSIX_THREAD_ROBUST_PRIO_PROTECT;
-		break;
-#else
-		goto unlimited;
-#endif
-
 	default:
-	case _SC_EQUIV_CLASS_MAX:
-	case _SC_V6_ILP32_OFF32:
-	case _SC_V6_ILP32_OFFBIG:
-	case _SC_V6_LP64_OFF64:
-	case _SC_V6_LPBIG_OFFBIG:
-	case _SC_XBS5_ILP32_OFF32:
-	case _SC_XBS5_ILP32_OFFBIG:
-	case _SC_XBS5_LP64_OFF64:
-	case _SC_XBS5_LPBIG_OFFBIG:
-	case _SC_V7_ILP32_OFF32:
-	case _SC_V7_ILP32_OFFBIG:
-	case _SC_V7_LP64_OFF64:
-	case _SC_V7_LPBIG_OFFBIG:
-		libc_seterrno(EINVAL);
-		ATTR_FALLTHROUGH
-	case _SC_TZNAME_MAX:           /* Unlimited */
-	case _SC_ARG_MAX:              /* Unlimited */
-	case _SC_CHILD_MAX:            /* Unlimited */
-	case _SC_OPEN_MAX:             /* Unlimited */
-	case _SC_THREAD_THREADS_MAX:   /* Unlimited */
-	case _SC_UIO_MAXIOV:           /* Unlimited */
-	case _SC_T_IOV_MAX:            /* Unlimited */
-	case _SC_REGEX_VERSION:        /* Deprecated */
-	case _SC_STREAMS:              /* Unsupported */
-	case _SC_TRACE_EVENT_NAME_MAX: /* Unsupported */
-	case _SC_TRACE_NAME_MAX:       /* Unsupported */
-	case _SC_TRACE_SYS_MAX:        /* Unsupported */
-	case _SC_TRACE_USER_EVENT_MAX: /* Unsupported */
-	case _SC_XOPEN_STREAMS:        /* Unsupported */
-unlimited: ATTR_UNUSED;
-		result = -1;
+		result = libc_seterrno(EINVAL);
 		break;
 	}
 	return result;

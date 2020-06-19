@@ -463,10 +463,16 @@ again_confstr:
 		                                  : sysconf(id);
 		/* Check for unlimited/undefined config name. */
 		if ((id >= _SC_CHAR_BIT && id <= _SC_USHRT_MAX) && type == CONFTYPE_SYSCONF) {
-			/* Special case: Print these as unsigned! */
+			/* Special case: Print (some of) these as unsigned! */
 			if (value == -1 && errno != EOK)
 				goto err;
-			result = dprintf(fd, "%lu\n", (unsigned long)value);
+			if (id == _SC_CHAR_MIN || id == _SC_INT_MIN ||
+			    id == _SC_SCHAR_MIN || id == _SC_SHRT_MIN) {
+				/* Still print these as signed! */
+				result = dprintf(fd, "%ld\n", value);
+			} else {
+				result = dprintf(fd, "%lu\n", (unsigned long)value);
+			}
 		} else if (value == -1) {
 			PRIVATE char const undefined[] = "undefined\n";
 			if (errno != EOK)

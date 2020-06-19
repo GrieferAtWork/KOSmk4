@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf2bebd5 */
+/* HASH CRC-32:0x1796edaf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -490,7 +490,7 @@ INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);
  * @param: NAME: One of `_SC_*' from <bits/confname.h>
  * Return a system configuration value `NAME'
  * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] `NAME' referrs to a maximum or minimum
+ * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBCCALL libc_sysconf)(__STDC_INT_AS_UINT_T name);
