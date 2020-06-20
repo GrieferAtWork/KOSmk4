@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a134849 */
+/* HASH CRC-32:0xe0972033 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1134,7 +1134,7 @@
 #define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT 1
 #define __NRRTR_restart_syscall          SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_exit                    SC_REPR_EXIT_STATUS                                                  /* status */ 
-#define __NRRTR_exit                     SC_REPR_INT                                                          /* return */
+#define __NRRTR_exit                     SC_REPR_SIGNO_T                                                      /* return */
 #define __NRRTR_fork                     SC_REPR_PID_T                                                        /* return */
 #define __NRATR0_read                    SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_read                    SC_REPR_POINTER                                                      /* buf */ 
@@ -1231,7 +1231,7 @@
 #define __NRRTR_ftime                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NRRTR_sync                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_kill                    SC_REPR_PID_T                                                        /* pid */ 
-#define __NRATR1_kill                    SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRATR1_kill                    SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NRRTR_kill                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_rename                  SC_REPR_FILENAME                                                     /* oldname */ 
 #define __NRATR1_rename                  SC_REPR_FILENAME                                                     /* newname_or_path */ 
@@ -1246,14 +1246,14 @@
 #define __NRATR0_pipe                    SC_REPR_POINTER                                                      /* pipedes */ 
 #define __NRRTR_pipe                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_times                   SC_REPR_POINTER                                                      /* buf */ 
-#define __NRRTR_times                    SC_REPR_INT                                                          /* return */
+#define __NRRTR_times                    SC_REPR_SIGNO_T                                                      /* return */
 #define __NRRTR_prof                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_brk                     SC_REPR_POINTER                                                      /* addr */ 
 #define __NRRTR_brk                      SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_setgid                  SC_REPR_GID_T                                                        /* gid */ 
 #define __NRRTR_setgid                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NRRTR_getgid                   SC_REPR_GID_T                                                        /* return */
-#define __NRATR0_signal                  SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRATR0_signal                  SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NRATR1_signal                  SC_REPR_SIGHANDLER_T                                                 /* handler */ 
 #define __NRRTR_signal                   SC_REPR_SIGHANDLER_T                                                 /* return */
 #define __NRRTR_geteuid                  SC_REPR_UID_T                                                        /* return */
@@ -1294,7 +1294,7 @@
 #define __NRRTR_getppid                  SC_REPR_PID_T                                                        /* return */
 #define __NRRTR_getpgrp                  SC_REPR_PID_T                                                        /* return */
 #define __NRRTR_setsid                   SC_REPR_PID_T                                                        /* return */
-#define __NRATR0_sigaction               SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRATR0_sigaction               SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NRATR1_sigaction               SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 
 #define __NRATR2_sigaction               SC_REPR_POINTER                                                      /* oact */ 
 #define __NRRTR_sigaction                SC_REPR_ERRNO_T                                                      /* return */
@@ -1464,7 +1464,7 @@
 #define __NRATR3_sigreturn               SC_REPR_STRUCT_SIGSET                                                /* restore_sigmask */ 
 #define __NRATR4_sigreturn               SC_REPR_STRUCT_RPC_SYSCALL_INFO32                                    /* sc_info */ 
 #define __NRATR5_sigreturn               SC_REPR_STRUCT_UCPUSTATE32                                           /* restore_cpu */ 
-#define __NRRTR_sigreturn                SC_REPR_INT                                                          /* return */
+#define __NRRTR_sigreturn                SC_REPR_SIGNO_T                                                      /* return */
 #define __NRATR0_clone                   SC_REPR_CLONE_FLAGS                                                  /* flags */ 
 #define __NRATR1_clone                   SC_REPR_POINTER                                                      /* child_stack */ 
 #define __NRATR2_clone                   SC_REPR_POINTER                                                      /* ptid */ 
@@ -1624,8 +1624,8 @@
 #define __NRATR3_rt_sigreturn            SC_REPR_STRUCT_SIGSET                                                /* restore_sigmask */ 
 #define __NRATR4_rt_sigreturn            SC_REPR_STRUCT_RPC_SYSCALL_INFO32                                    /* sc_info */ 
 #define __NRATR5_rt_sigreturn            SC_REPR_STRUCT_UCPUSTATE32                                           /* restore_cpu */ 
-#define __NRRTR_rt_sigreturn             SC_REPR_INT                                                          /* return */
-#define __NRATR0_rt_sigaction            SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRRTR_rt_sigreturn             SC_REPR_SIGNO_T                                                      /* return */
+#define __NRATR0_rt_sigaction            SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NRATR1_rt_sigaction            SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 
 #define __NRATL1_rt_sigaction            3                                                                    /* act -> sigsetsize */ 
 #define __NRATR2_rt_sigaction            SC_REPR_POINTER                                                      /* oact */ 
@@ -1647,7 +1647,7 @@
 #define __NRATR3_rt_sigtimedwait         SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NRRTR_rt_sigtimedwait          SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NRATR0_rt_sigqueueinfo         SC_REPR_PID_T                                                        /* tgid */ 
-#define __NRATR1_rt_sigqueueinfo         SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRATR1_rt_sigqueueinfo         SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NRATR2_rt_sigqueueinfo         SC_REPR_STRUCT_SIGINFOX32                                            /* uinfo */ 
 #define __NRRTR_rt_sigqueueinfo          SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_rt_sigsuspend           SC_REPR_STRUCT_SIGSET                                                /* set */ 
@@ -1848,7 +1848,7 @@
 #define __NRATR1_fremovexattr            SC_REPR_STRING                                                       /* name */ 
 #define __NRRTR_fremovexattr             SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_tkill                   SC_REPR_PID_T                                                        /* tid */ 
-#define __NRATR1_tkill                   SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRATR1_tkill                   SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NRRTR_tkill                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_sendfile64              SC_REPR_FD_T                                                         /* out_fd */ 
 #define __NRATR1_sendfile64              SC_REPR_FD_T                                                         /* in_fd */ 
@@ -1889,7 +1889,7 @@
 #define __NRATR0_fadvise64               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_fadvise64                SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_exit_group              SC_REPR_EXIT_STATUS                                                  /* exit_code */ 
-#define __NRRTR_exit_group               SC_REPR_INT                                                          /* return */
+#define __NRRTR_exit_group               SC_REPR_SIGNO_T                                                      /* return */
 #define __NRATR0_lookup_dcookie          SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_lookup_dcookie           SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_epoll_create            SC_REPR_SYSCALL_ULONG_T                                              /* size */ 
@@ -1950,7 +1950,7 @@
 #define __NRRTR_fstatfs64                SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_tgkill                  SC_REPR_PID_T                                                        /* tgid */ 
 #define __NRATR1_tgkill                  SC_REPR_PID_T                                                        /* tid */ 
-#define __NRATR2_tgkill                  SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRATR2_tgkill                  SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NRRTR_tgkill                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_utimes                  SC_REPR_FILENAME                                                     /* filename */ 
 #define __NRATR1_utimes                  SC_REPR_STRUCT_TIMEVALX32_VEC2                                       /* times */ 
@@ -2227,7 +2227,7 @@
 #define __NRRTR_pwritev                  SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_rt_tgsigqueueinfo       SC_REPR_PID_T                                                        /* tgid */ 
 #define __NRATR1_rt_tgsigqueueinfo       SC_REPR_PID_T                                                        /* tid */ 
-#define __NRATR2_rt_tgsigqueueinfo       SC_REPR_SIGNO                                                        /* signo */ 
+#define __NRATR2_rt_tgsigqueueinfo       SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NRATR3_rt_tgsigqueueinfo       SC_REPR_STRUCT_SIGINFOX32                                            /* uinfo */ 
 #define __NRRTR_rt_tgsigqueueinfo        SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_perf_event_open         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 

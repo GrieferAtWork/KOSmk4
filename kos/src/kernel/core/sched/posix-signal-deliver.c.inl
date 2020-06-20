@@ -75,7 +75,7 @@ task_raisesignalthread(struct task *__restrict target,
 		kfree(entry);
 		IFELSE(RETHROW(), return TASK_RAISESIGNALTHREAD_NX_SEGFAULT);
 	}
-	if unlikely(entry->sqe_info.si_signo == 0 || entry->sqe_info.si_signo >= NSIG) {
+	if unlikely(entry->sqe_info.si_signo <= 0 || entry->sqe_info.si_signo >= NSIG) {
 		kfree(entry);
 		IFELSE(THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		             E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
@@ -245,7 +245,7 @@ NOTHROW_NX(KCALL FUNC(deliver_signal_to_some_thread_in_process))(struct task *__
 	struct process_sigqueue *procqueue;
 	u32 kernel_signo;
 	assert(!(process_leader->t_flags & TASK_FKERNTHREAD));
-	assert(!(info->sqe_info.si_signo == 0 || info->sqe_info.si_signo >= NSIG));
+	assert(!(info->sqe_info.si_signo <= 0 || info->sqe_info.si_signo >= NSIG));
 	if unlikely(ATOMIC_READ(process_leader->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED)) {
 		kfree(info);
 		/* No possible receiver in a terminating process. */
@@ -412,7 +412,7 @@ NOTHROW_NX(KCALL FUNC(task_raisesignalprocess))(struct task *__restrict target,
 #endif /* DELIVER_NX */
 	TRY {
 		memcpy(&entry->sqe_info, info, sizeof(siginfo_t));
-		if unlikely(entry->sqe_info.si_signo == 0 || entry->sqe_info.si_signo >= NSIG) {
+		if unlikely(entry->sqe_info.si_signo <= 0 || entry->sqe_info.si_signo >= NSIG) {
 			IFELSE(THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			             E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
 			             entry->sqe_info.si_signo),

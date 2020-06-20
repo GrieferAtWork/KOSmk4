@@ -37,8 +37,8 @@
 
 DECL_BEGIN
 
-LOCAL int LIBCCALL
-libc_signo_dos2kos(int dos_signo) {
+LOCAL signo_t LIBCCALL
+libc_signo_dos2kos(signo_t dos_signo) {
 	if (dos_signo == __DOS_SIGABRT)
 		return __KOS_SIGABRT;
 	return dos_signo;
@@ -66,40 +66,18 @@ INTDEF void /*ASMCALL*/ libc_sig_restore(void);
 
 
 
-/*[[[start:implementation]]]*/
+/*[[[head:libd_raise,hash:CRC-32=0x8c6e30c8]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.sched.signal") int
+NOTHROW_NCX(LIBDCALL libd_raise)(signo_t signo)
+/*[[[body:libd_raise]]]*/
+{
+	return libc_raise(libc_signo_dos2kos(signo));
+}
+/*[[[end:libd_raise]]]*/
 
-///*[[[head:DOS$raise,hash:CRC-32=0x693a2f09]]]*/
-///* @param signo: One of `SIG*' */
-//INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.signal.raise") int
-//NOTHROW_NCX(LIBDCALL libd_raise)(int signo)
-///*[[[body:DOS$raise]]]*/
-//{
-//	return libc_raise(libc_signo_dos2kos(signo));
-//}
-///*[[[end:DOS$raise]]]*/
-//
-///*[[[head:DOS$signal,hash:CRC-32=0x195f877e]]]*/
-///* @param signo: One of `SIG*' */
-//INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.signal.signal") sighandler_t
-//NOTHROW_NCX(LIBDCALL libd_signal)(int signo,
-//                                  sighandler_t handler)
-///*[[[body:DOS$signal]]]*/
-//{
-//	if (handler == (sighandler_t)2) /* SIG_GET */
-//		handler = SIG_GET;
-//	else if (handler == (sighandler_t)3) /* SIG_SGE */
-//		handler = SIG_ERR;               /* ??? */
-//	else if (handler == (sighandler_t)4) /* SIG_ACK */
-//		handler = SIG_DFL;               /* ??? */
-//	return libc_signal(libc_signo_dos2kos(signo), handler);
-//}
-///*[[[end:DOS$signal]]]*/
-
-
-/*[[[head:libc_raise,hash:CRC-32=0x384fedc8]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_raise,hash:CRC-32=0xbfc984b3]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_raise)(int signo)
+NOTHROW_NCX(LIBCCALL libc_raise)(signo_t signo)
 /*[[[body:libc_raise]]]*/
 {
 	return kill(getpid(),
@@ -107,10 +85,19 @@ NOTHROW_NCX(LIBCCALL libc_raise)(int signo)
 }
 /*[[[end:libc_raise]]]*/
 
-/*[[[head:libc_sysv_signal,hash:CRC-32=0x21ead24a]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libd_sysv_signal,hash:CRC-32=0xe68d1b83]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.sched.signal") sighandler_t
+NOTHROW_NCX(LIBDCALL libd_sysv_signal)(signo_t signo,
+                                       sighandler_t handler)
+/*[[[body:libd_sysv_signal]]]*/
+{
+	return libc_sysv_signal(libc_signo_dos2kos(signo), handler);
+}
+/*[[[end:libd_sysv_signal]]]*/
+
+/*[[[head:libc_sysv_signal,hash:CRC-32=0x39dc26c6]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") sighandler_t
-NOTHROW_NCX(LIBCCALL libc_sysv_signal)(int signo,
+NOTHROW_NCX(LIBCCALL libc_sysv_signal)(signo_t signo,
                                        sighandler_t handler)
 /*[[[body:libc_sysv_signal]]]*/
 {
@@ -222,12 +209,12 @@ NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
 
 
 
+
 PRIVATE ATTR_SECTION(".bss.crt.sched.signal") sigset_t __sigintr;
 
-/*[[[head:libc_bsd_signal,hash:CRC-32=0xb61114a]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_bsd_signal,hash:CRC-32=0x8260093]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") sighandler_t
-NOTHROW_NCX(LIBCCALL libc_bsd_signal)(int signo,
+NOTHROW_NCX(LIBCCALL libc_bsd_signal)(signo_t signo,
                                       sighandler_t handler)
 /*[[[body:libc_bsd_signal]]]*/
 {
@@ -252,10 +239,20 @@ NOTHROW_NCX(LIBCCALL libc_bsd_signal)(int signo,
 }
 /*[[[end:libc_bsd_signal]]]*/
 
-/*[[[head:libc___xpg_sigpause,hash:CRC-32=0xc3c3c29]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libd_bsd_signal,hash:CRC-32=0xb42e433d]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.sched.signal") sighandler_t
+NOTHROW_NCX(LIBDCALL libd_bsd_signal)(signo_t signo,
+                                      sighandler_t handler)
+/*[[[body:libd_bsd_signal]]]*/
+{
+	return libc_bsd_signal(libc_signo_dos2kos(signo), handler);
+}
+/*[[[end:libd_bsd_signal]]]*/
+
+
+/*[[[head:libc___xpg_sigpause,hash:CRC-32=0xf7eccb73]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc___xpg_sigpause)(int signo)
+NOTHROW_NCX(LIBCCALL libc___xpg_sigpause)(signo_t signo)
 /*[[[body:libc___xpg_sigpause]]]*/
 /*AUTO*/{
 	(void)signo;
@@ -265,11 +262,10 @@ NOTHROW_NCX(LIBCCALL libc___xpg_sigpause)(int signo)
 }
 /*[[[end:libc___xpg_sigpause]]]*/
 
-/*[[[head:libc_kill,hash:CRC-32=0x51393aba]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_kill,hash:CRC-32=0x4135227d]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_kill)(pid_t pid,
-                                int signo)
+                                signo_t signo)
 /*[[[body:libc_kill]]]*/
 {
 	errno_t result;
@@ -278,10 +274,10 @@ NOTHROW_NCX(LIBCCALL libc_kill)(pid_t pid,
 }
 /*[[[end:libc_kill]]]*/
 
-/*[[[head:libc_sigprocmask,hash:CRC-32=0x8017498a]]]*/
+/*[[[head:libc_sigprocmask,hash:CRC-32=0xf8ce3e0d]]]*/
 /* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_sigprocmask)(int how,
+NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
                                        sigset_t const *set,
                                        sigset_t *oset)
 /*[[[body:libc_sigprocmask]]]*/
@@ -313,10 +309,9 @@ NOTHROW_RPC(LIBCCALL libc_sigsuspend)(sigset_t const *set)
 }
 /*[[[end:libc_sigsuspend]]]*/
 
-/*[[[head:libc_sigaction,hash:CRC-32=0xb629bc2f]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_sigaction,hash:CRC-32=0xe485d789]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_sigaction)(int signo,
+NOTHROW_NCX(LIBCCALL libc_sigaction)(signo_t signo,
                                      struct sigaction const *act,
                                      struct sigaction *oact)
 /*[[[body:libc_sigaction]]]*/
@@ -354,11 +349,10 @@ NOTHROW_NCX(LIBCCALL libc_sigpending)(sigset_t *__restrict set)
 }
 /*[[[end:libc_sigpending]]]*/
 
-/*[[[head:libc_sigwait,hash:CRC-32=0x35867b97]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_sigwait,hash:CRC-32=0xf3b20004]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_sigwait)(sigset_t const *__restrict set,
-                                   int *__restrict signo)
+                                   signo_t *__restrict signo)
 /*[[[body:libc_sigwait]]]*/
 {
 	errno_t result;
@@ -440,11 +434,10 @@ NOTHROW_RPC(LIBCCALL libc_sigtimedwait64)(sigset_t const *__restrict set,
 #endif /* MAGIC:alias */
 /*[[[end:libc_sigtimedwait64]]]*/
 
-/*[[[head:libc_sigqueue,hash:CRC-32=0x2bb9aec8]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_sigqueue,hash:CRC-32=0x24374bab]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_sigqueue)(pid_t pid,
-                                    int signo,
+                                    signo_t signo,
                                     union sigval const val)
 /*[[[body:libc_sigqueue]]]*/
 {
@@ -456,11 +449,10 @@ NOTHROW_NCX(LIBCCALL libc_sigqueue)(pid_t pid,
 }
 /*[[[end:libc_sigqueue]]]*/
 
-/*[[[head:libc_sigqueueinfo,hash:CRC-32=0x3351e9f5]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_sigqueueinfo,hash:CRC-32=0xc4bc11c]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_sigqueueinfo)(pid_t tgid,
-                                        int signo,
+                                        signo_t signo,
                                         siginfo_t const *uinfo)
 /*[[[body:libc_sigqueueinfo]]]*/
 {
@@ -472,12 +464,11 @@ NOTHROW_NCX(LIBCCALL libc_sigqueueinfo)(pid_t tgid,
 }
 /*[[[end:libc_sigqueueinfo]]]*/
 
-/*[[[head:libc_tgsigqueueinfo,hash:CRC-32=0xd4a3a02b]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_tgsigqueueinfo,hash:CRC-32=0xa3e87001]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((4)) int
 NOTHROW_NCX(LIBCCALL libc_tgsigqueueinfo)(pid_t tgid,
                                           pid_t tid,
-                                          int signo,
+                                          signo_t signo,
                                           siginfo_t const *uinfo)
 /*[[[body:libc_tgsigqueueinfo]]]*/
 {
@@ -490,21 +481,19 @@ NOTHROW_NCX(LIBCCALL libc_tgsigqueueinfo)(pid_t tgid,
 }
 /*[[[end:libc_tgsigqueueinfo]]]*/
 
-/*[[[head:libc_killpg,hash:CRC-32=0x36103c34]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_killpg,hash:CRC-32=0x632634b6]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_killpg)(pid_t pgrp,
-                                  int signo)
+                                  signo_t signo)
 /*[[[body:libc_killpg]]]*/
 {
 	return kill(-pgrp, signo);
 }
 /*[[[end:libc_killpg]]]*/
 
-/*[[[head:libc_psignal,hash:CRC-32=0xf61d74b4]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_psignal,hash:CRC-32=0x40b58e8a]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") void
-NOTHROW_NCX(LIBCCALL libc_psignal)(int signo,
+NOTHROW_NCX(LIBCCALL libc_psignal)(signo_t signo,
                                    char const *s)
 /*[[[body:libc_psignal]]]*/
 /*AUTO*/{
@@ -528,11 +517,10 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 }
 /*[[[end:libc_psiginfo]]]*/
 
-/*[[[head:libc_siginterrupt,hash:CRC-32=0x7eaf72c5]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_siginterrupt,hash:CRC-32=0x7be25065]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_siginterrupt)(int signo,
-                                        int interrupt)
+NOTHROW_NCX(LIBCCALL libc_siginterrupt)(signo_t signo,
+                                        __STDC_INT_AS_UINT_T interrupt)
 /*[[[body:libc_siginterrupt]]]*/
 {
 	struct sigaction action;
@@ -599,40 +587,36 @@ set_single_signal_action(int sig, int how) {
 	return libc_sigprocmask(how, &set, NULL);
 }
 
-/*[[[head:libc_sighold,hash:CRC-32=0xaa2b1c6d]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_sighold,hash:CRC-32=0xb5de5490]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_sighold)(int signo)
+NOTHROW_NCX(LIBCCALL libc_sighold)(signo_t signo)
 /*[[[body:libc_sighold]]]*/
 {
 	return set_single_signal_action(signo, SIG_BLOCK);
 }
 /*[[[end:libc_sighold]]]*/
 
-/*[[[head:libc_sigrelse,hash:CRC-32=0xa61d633d]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_sigrelse,hash:CRC-32=0xce23f035]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_sigrelse)(int signo)
+NOTHROW_NCX(LIBCCALL libc_sigrelse)(signo_t signo)
 /*[[[body:libc_sigrelse]]]*/
 {
 	return set_single_signal_action(signo, SIG_UNBLOCK);
 }
 /*[[[end:libc_sigrelse]]]*/
 
-/*[[[head:libc_sigignore,hash:CRC-32=0xea28f44c]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_sigignore,hash:CRC-32=0x197c5558]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_sigignore)(int signo)
+NOTHROW_NCX(LIBCCALL libc_sigignore)(signo_t signo)
 /*[[[body:libc_sigignore]]]*/
 {
 	return libc_bsd_signal(signo, SIG_IGN) == SIG_ERR ? -1 : 0;
 }
 /*[[[end:libc_sigignore]]]*/
 
-/*[[[head:libc_sigset,hash:CRC-32=0xce5c3b6e]]]*/
-/* @param signo: One of `SIG*' */
+/*[[[head:libc_sigset,hash:CRC-32=0x1270dec0]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") sighandler_t
-NOTHROW_NCX(LIBCCALL libc_sigset)(int signo,
+NOTHROW_NCX(LIBCCALL libc_sigset)(signo_t signo,
                                   sighandler_t disp)
 /*[[[body:libc_sigset]]]*/
 {
@@ -673,27 +657,39 @@ err:
 /*[[[impl:libc_signal]]]*/
 /*[[[impl:libc_ssignal]]]*/
 /*[[[impl:libc_gsignal]]]*/
+/*[[[impl:libd_signal]]]*/
+/*[[[impl:libd_ssignal]]]*/
+/*[[[impl:libd_gsignal]]]*/
 DEFINE_INTERN_ALIAS(libc_signal, libc_bsd_signal);
 DEFINE_INTERN_ALIAS(libc_ssignal, libc_bsd_signal);
 DEFINE_INTERN_ALIAS(libc_gsignal, libc_raise);
+DEFINE_INTERN_ALIAS(libd_signal, libd_bsd_signal);
+DEFINE_INTERN_ALIAS(libd_ssignal, libd_bsd_signal);
+DEFINE_INTERN_ALIAS(libd_gsignal, libd_raise);
 
-/*[[[end:implementation]]]*/
 
 
-
-/*[[[start:exports,hash:CRC-32=0x3174060f]]]*/
+/*[[[start:exports,hash:CRC-32=0x4ed700a6]]]*/
+DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
+DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
+DEFINE_PUBLIC_ALIAS(DOS$sysv_signal, libd_sysv_signal);
 DEFINE_PUBLIC_ALIAS(__sysv_signal, libc_sysv_signal);
 DEFINE_PUBLIC_ALIAS(sysv_signal, libc_sysv_signal);
+DEFINE_PUBLIC_ALIAS(DOS$_signal, libd_signal);
+DEFINE_PUBLIC_ALIAS(DOS$signal, libd_signal);
 DEFINE_PUBLIC_ALIAS(_signal, libc_signal);
 DEFINE_PUBLIC_ALIAS(signal, libc_signal);
+DEFINE_PUBLIC_ALIAS(DOS$ssignal, libd_ssignal);
 DEFINE_PUBLIC_ALIAS(ssignal, libc_ssignal);
+DEFINE_PUBLIC_ALIAS(DOS$gsignal, libd_gsignal);
 DEFINE_PUBLIC_ALIAS(gsignal, libc_gsignal);
 DEFINE_PUBLIC_ALIAS(sigblock, libc_sigblock);
 DEFINE_PUBLIC_ALIAS(sigsetmask, libc_sigsetmask);
 DEFINE_PUBLIC_ALIAS(siggetmask, libc_siggetmask);
 DEFINE_PUBLIC_ALIAS(__p_sys_siglist, libc___p_sys_siglist);
 DEFINE_PUBLIC_ALIAS(sigreturn, libc_sigreturn);
+DEFINE_PUBLIC_ALIAS(DOS$bsd_signal, libd_bsd_signal);
 DEFINE_PUBLIC_ALIAS(bsd_signal, libc_bsd_signal);
 DEFINE_PUBLIC_ALIAS(__xpg_sigpause, libc___xpg_sigpause);
 DEFINE_PUBLIC_ALIAS(kill, libc_kill);

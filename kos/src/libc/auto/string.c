@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc806d30d */
+/* HASH CRC-32:0x818070e0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -395,7 +395,7 @@ __LOCAL_LIBC_DATA(strsignal_buf) char strsignal_buf[64] = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__local_strsignal_buf_defined */
 INTERN ATTR_SECTION(".text.crt.dos.string.memory.strsignal") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
-NOTHROW_NCX(LIBDCALL libd_strsignal)(int signo) {
+NOTHROW_NCX(LIBDCALL libd_strsignal)(signo_t signo) {
 	char *result = __NAMESPACE_LOCAL_SYM strsignal_buf;
 	char const *string;
 	string = libc_strsignal_s(signo);
@@ -415,7 +415,7 @@ __LOCAL_LIBC_DATA(strsignal_buf) char strsignal_buf[64] = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__local_strsignal_buf_defined */
 INTERN ATTR_SECTION(".text.crt.string.memory.strsignal") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc_strsignal)(int signo) {
+NOTHROW_NCX(LIBCCALL libc_strsignal)(signo_t signo) {
 	char *result = __NAMESPACE_LOCAL_SYM strsignal_buf;
 	char const *string;
 	string = libc_strsignal_s(signo);

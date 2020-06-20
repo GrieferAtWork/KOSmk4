@@ -73,14 +73,14 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	USER CHECKED byte_t *usp, *orig_usp;
 	bool must_restore_sigmask;
 	sigset_t old_sigmask;
-	u32 signo = ATOMIC_READ(siginfo->si_signo);
+	signo_t signo = ATOMIC_READ(siginfo->si_signo);
 	USER CHECKED NAME2(siginfox, _t) *user_siginfo;
 	USER CHECKED NAME2(ucontext, _t) *user_ucontext;
 	USER CHECKED sigset_t *user_sigset;
 	USER CHECKED struct NAME(fpustate) *user_fpustate;
 	USER CHECKED struct NAME(rpc_syscall_info) *user_sc_info;
 	USER CHECKED NAME(u) user_rstor;
-	if unlikely(signo == 0 || signo >= NSIG)
+	if unlikely(signo <= 0 || signo >= NSIG)
 		return NULL;
 	/* Check if the handler should be reset before being invoked. */
 	if (action->sa_flags & SIGACTION_SA_RESETHAND) {
@@ -340,7 +340,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	usp -= 8;
 	validate_writable(usp, 8);
 	((u64 *)usp)[0] = (u64)user_rstor;                   /* Return address */
-	gpregs_setpdi(&state->ics_gpregs, (uintptr_t)signo); /* int signo */
+	gpregs_setpdi(&state->ics_gpregs, (uintptr_t)signo); /* signo_t signo */
 	if (action->sa_flags & SIGACTION_SA_SIGINFO) {
 		gpregs_setpsi(&state->ics_gpregs, (uintptr_t)user_siginfo);  /* siginfo64_t *info */
 		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)user_ucontext); /* struct ucontext64 *ctx */
@@ -350,14 +350,14 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		usp -= 4 * sizeof(u32);
 		validate_writable(usp, 4 * sizeof(u32));
 		((u32 *)usp)[0] = (u32)user_rstor;               /* Return address */
-		((u32 *)usp)[1] = (u32)signo;                    /* int signo */
+		((u32 *)usp)[1] = (u32)signo;                    /* signo_t signo */
 		((u32 *)usp)[2] = (u32)(uintptr_t)user_siginfo;  /* siginfo32_t *info */
 		((u32 *)usp)[3] = (u32)(uintptr_t)user_ucontext; /* struct ucontext32 *ctx */
 	} else {
 		usp -= 2 * sizeof(u32);
 		validate_writable(usp, 2 * sizeof(u32));
 		((u32 *)usp)[0] = (u32)user_rstor; /* Return address */
-		((u32 *)usp)[1] = (u32)signo;      /* int signo */
+		((u32 *)usp)[1] = (u32)signo;      /* signo_t signo */
 	}
 #endif /* !DEFINE_RAISE64 */
 

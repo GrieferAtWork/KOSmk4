@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x730e3e3b */
+/* HASH CRC-32:0x778a5763 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -666,7 +666,11 @@
 #define __CRT_HAVE_DOS$bindresvport 1
 #define __CRT_HAVE_DOS$bindresvport6 1
 #define __CRT_HAVE_DOS$brk 1
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$bsd_signal 1
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$bsearch 1
 #define __CRT_HAVE_DOS$bsearch_r 1
 #define __CRT_HAVE_DOS$bsearch_s 1
@@ -1319,7 +1323,11 @@
 #define __CRT_HAVE_DOS$gnu_dev_minor 1
 #define __CRT_HAVE_DOS$grantpt 1
 #define __CRT_HAVE_DOS$group_member 1
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$gsignal 1
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$gtty 1
 #define __CRT_HAVE_DOS$hasmntopt 1
 #define __CRT_HAVE_DOS$hcreate 1
@@ -2015,7 +2023,11 @@
 #define __CRT_HAVE_DOS$qsort_r 1
 #define __CRT_HAVE_DOS$qsort_s 1
 #define __CRT_HAVE_DOS$quick_exit 1
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$raise 1
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$rand_r 1
 #define __CRT_HAVE_DOS$rand_s 1
 #define __CRT_HAVE_DOS$random_r 1
@@ -2246,7 +2258,11 @@
 #define __CRT_HAVE_DOS$siginterrupt 1
 #define __CRT_HAVE_DOS$sigisemptyset 1
 #define __CRT_HAVE_DOS$sigismember 1
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$signal 1
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$signalfd 1
 #define __CRT_HAVE_DOS$significand 1
 #define __CRT_HAVE_DOS$significandf 1
@@ -2303,9 +2319,9 @@
 #define __CRT_HAVE_DOS$srandom 1
 #define __CRT_HAVE_DOS$srandom_r 1
 #define __CRT_HAVE_DOS$sscanf 1
-#define __CRT_HAVE_DOS$ssignal 1
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#define __CRT_HAVE_DOS$ssignal 1
 #define __CRT_HAVE_DOS$stat 1
 #define __CRT_HAVE_DOS$stat64 1
 #endif /* !__KERNEL__ */
@@ -2461,7 +2477,11 @@
 #define __CRT_HAVE_DOS$syslog 1
 #define __CRT_HAVE_DOS$syslog_printer 1
 #define __CRT_HAVE_DOS$system 1
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$sysv_signal 1
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$tan 1
 #define __CRT_HAVE_DOS$tanf 1
 #define __CRT_HAVE_DOS$tanh 1

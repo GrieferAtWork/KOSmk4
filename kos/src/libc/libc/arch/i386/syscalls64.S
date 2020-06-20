@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b274996 */
+/* HASH CRC-32:0xe664931c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -352,7 +352,7 @@ INTERN_FUNCTION(libc_sys_Xbrk)
 END(libc_sys_Xbrk)
 DEFINE_PUBLIC_ALIAS(sys_Xbrk, libc_sys_Xbrk)
 
-/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx64 const *act, struct sigactionx64 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(signo_t signo, struct sigactionx64 const *act, struct sigactionx64 *oact, size_t sigsetsize) */
 .section .text.crt.syscall.rt_sigaction
 INTERN_FUNCTION(libc_sys_rt_sigaction)
 	.cfi_startproc
@@ -365,7 +365,7 @@ INTERN_FUNCTION(libc_sys_rt_sigaction)
 END(libc_sys_rt_sigaction)
 DEFINE_PUBLIC_ALIAS(sys_rt_sigaction, libc_sys_rt_sigaction)
 
-/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx64 const *act, struct sigactionx64 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(signo_t signo, struct sigactionx64 const *act, struct sigactionx64 *oact, size_t sigsetsize) */
 .section .text.crt.syscall.Xrt_sigaction
 INTERN_FUNCTION(libc_sys_Xrt_sigaction)
 	.cfi_startproc
@@ -1632,8 +1632,7 @@ INTERN_FUNCTION(libc_sys_Xwait4)
 END(libc_sys_Xwait4)
 DEFINE_PUBLIC_ALIAS(sys_Xwait4, libc_sys_Xwait4)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t kill(pid_t pid, syscall_ulong_t signo) */
+/* errno_t kill(pid_t pid, signo_t signo) */
 .section .text.crt.syscall.kill
 INTERN_FUNCTION(libc_sys_kill)
 	.cfi_startproc
@@ -1645,8 +1644,7 @@ INTERN_FUNCTION(libc_sys_kill)
 END(libc_sys_kill)
 DEFINE_PUBLIC_ALIAS(sys_kill, libc_sys_kill)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t kill(pid_t pid, syscall_ulong_t signo) */
+/* errno_t kill(pid_t pid, signo_t signo) */
 .section .text.crt.syscall.Xkill
 INTERN_FUNCTION(libc_sys_Xkill)
 	.cfi_startproc
@@ -3250,8 +3248,7 @@ INTERN_FUNCTION(libc_sys_Xrt_sigtimedwait)
 END(libc_sys_Xrt_sigtimedwait)
 DEFINE_PUBLIC_ALIAS(sys_Xrt_sigtimedwait, libc_sys_Xrt_sigtimedwait)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfox64_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t signo, struct __siginfox64_struct const *uinfo) */
 .section .text.crt.syscall.rt_sigqueueinfo
 INTERN_FUNCTION(libc_sys_rt_sigqueueinfo)
 	.cfi_startproc
@@ -3263,8 +3260,7 @@ INTERN_FUNCTION(libc_sys_rt_sigqueueinfo)
 END(libc_sys_rt_sigqueueinfo)
 DEFINE_PUBLIC_ALIAS(sys_rt_sigqueueinfo, libc_sys_rt_sigqueueinfo)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfox64_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t signo, struct __siginfox64_struct const *uinfo) */
 .section .text.crt.syscall.Xrt_sigqueueinfo
 INTERN_FUNCTION(libc_sys_Xrt_sigqueueinfo)
 	.cfi_startproc
@@ -4992,8 +4988,7 @@ INTERN_FUNCTION(libc_sys_Xfremovexattr)
 END(libc_sys_Xfremovexattr)
 DEFINE_PUBLIC_ALIAS(sys_Xfremovexattr, libc_sys_Xfremovexattr)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
+/* errno_t tkill(pid_t tid, signo_t signo) */
 .section .text.crt.syscall.tkill
 INTERN_FUNCTION(libc_sys_tkill)
 	.cfi_startproc
@@ -5005,8 +5000,7 @@ INTERN_FUNCTION(libc_sys_tkill)
 END(libc_sys_tkill)
 DEFINE_PUBLIC_ALIAS(sys_tkill, libc_sys_tkill)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
+/* errno_t tkill(pid_t tid, signo_t signo) */
 .section .text.crt.syscall.Xtkill
 INTERN_FUNCTION(libc_sys_Xtkill)
 	.cfi_startproc
@@ -5834,8 +5828,7 @@ INTERN_FUNCTION(libc_sys_Xepoll_ctl)
 END(libc_sys_Xepoll_ctl)
 DEFINE_PUBLIC_ALIAS(sys_Xepoll_ctl, libc_sys_Xepoll_ctl)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
+/* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
 .section .text.crt.syscall.tgkill
 INTERN_FUNCTION(libc_sys_tgkill)
 	.cfi_startproc
@@ -5847,8 +5840,7 @@ INTERN_FUNCTION(libc_sys_tgkill)
 END(libc_sys_tgkill)
 DEFINE_PUBLIC_ALIAS(sys_tgkill, libc_sys_tgkill)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
+/* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
 .section .text.crt.syscall.Xtgkill
 INTERN_FUNCTION(libc_sys_Xtgkill)
 	.cfi_startproc
@@ -7462,8 +7454,7 @@ INTERN_FUNCTION(libc_sys_Xpwritev)
 END(libc_sys_Xpwritev)
 DEFINE_PUBLIC_ALIAS(sys_Xpwritev, libc_sys_Xpwritev)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfox64_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t signo, struct __siginfox64_struct const *uinfo) */
 .section .text.crt.syscall.rt_tgsigqueueinfo
 INTERN_FUNCTION(libc_sys_rt_tgsigqueueinfo)
 	.cfi_startproc
@@ -7476,8 +7467,7 @@ INTERN_FUNCTION(libc_sys_rt_tgsigqueueinfo)
 END(libc_sys_rt_tgsigqueueinfo)
 DEFINE_PUBLIC_ALIAS(sys_rt_tgsigqueueinfo, libc_sys_rt_tgsigqueueinfo)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfox64_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t signo, struct __siginfox64_struct const *uinfo) */
 .section .text.crt.syscall.Xrt_tgsigqueueinfo
 INTERN_FUNCTION(libc_sys_Xrt_tgsigqueueinfo)
 	.cfi_startproc

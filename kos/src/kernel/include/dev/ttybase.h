@@ -54,7 +54,7 @@ struct ttybase_device
 
 /* Kernel-level implementations for terminal system operators. */
 FUNDEF ssize_t LIBTERM_CC kernel_terminal_check_sigttou(struct terminal *__restrict self);
-FUNDEF ssize_t LIBTERM_CC kernel_terminal_raise(struct terminal *__restrict self, unsigned int signo);
+FUNDEF ssize_t LIBTERM_CC kernel_terminal_raise(struct terminal *__restrict self, signo_t signo);
 
 /* Check if the calling thread is allowed to read from `self'
  * This function must be called by read-operator overrides! */

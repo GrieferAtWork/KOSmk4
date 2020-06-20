@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa4ca7c1 */
+/* HASH CRC-32:0x1d08e8d5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,28 +45,25 @@ NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set) {
 		set->__val[cnt] = ~(ulongptr_t)0;
 	return 0;
 }
-/* @param signo: One of `SIG*' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set,
-                                     int signo) {
+                                     signo_t signo) {
 	ulongptr_t mask = __sigmask(signo);
 	ulongptr_t word = __sigword(signo);
 	set->__val[word] |= mask;
 	return 0;
 }
-/* @param signo: One of `SIG*' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set,
-                                     int signo) {
+                                     signo_t signo) {
 	ulongptr_t mask = __sigmask(signo);
 	ulongptr_t word = __sigword(signo);
 	set->__val[word] &= ~mask;
 	return 0;
 }
-/* @param signo: One of `SIG*' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
-                                       int signo) {
+                                       signo_t signo) {
 	ulongptr_t mask = __sigmask(signo);
 	ulongptr_t word = __sigword(signo);
 	return (set->__val[word] & mask) != 0;
@@ -97,11 +94,11 @@ NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set,
 		set->__val[i] = left->__val[i] | right->__val[i];
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED int
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
 NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void) {
 	return __SIGRTMIN;
 }
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED int
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
 NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void) {
 	return __SIGRTMAX;
 }

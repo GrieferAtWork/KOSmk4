@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3656e4f9 */
+/* HASH CRC-32:0xaa5fcc85 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,9 +39,9 @@ __NAMESPACE_STD_USING(size_t)
 #ifdef __CRT_HAVE_raise
 __NAMESPACE_STD_USING(raise)
 #endif /* __CRT_HAVE_raise */
-#if defined(__CRT_HAVE_sysv_signal) || defined(__CRT_HAVE_signal) || defined(__CRT_HAVE__signal)
+#if (defined(__CRT_HAVE_signal) && defined(__USE_MISC)) || (defined(__CRT_HAVE__signal) && defined(__USE_MISC)) || defined(__CRT_HAVE_sysv_signal)
 __NAMESPACE_STD_USING(signal)
-#endif /* __CRT_HAVE_sysv_signal || __CRT_HAVE_signal || __CRT_HAVE__signal */
+#endif /* (__CRT_HAVE_signal && __USE_MISC) || (__CRT_HAVE__signal && __USE_MISC) || __CRT_HAVE_sysv_signal */
 #undef _CXX_STDONLY_CSIGNAL
 #endif /* !__CXX_SYSTEM_HEADER */
 #else /* _CXX_STDONLY_CSIGNAL */
@@ -158,17 +158,13 @@ __NAMESPACE_STD_USING(size_t)
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 __NAMESPACE_STD_BEGIN
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,raise,(int __signo),(__signo))
-#ifdef __CRT_HAVE_sysv_signal
-/* @param signo: One of `SIG*' */
-__CREDIRECT(,__sighandler_t,__NOTHROW_NCX,signal,(int __signo, __sighandler_t __handler),sysv_signal,(__signo,__handler))
-#elif defined(__CRT_HAVE_signal)
-/* @param signo: One of `SIG*' */
-__CDECLARE(,__sighandler_t,__NOTHROW_NCX,signal,(int __signo, __sighandler_t __handler),(__signo,__handler))
-#elif defined(__CRT_HAVE__signal)
-/* @param signo: One of `SIG*' */
-__CREDIRECT(,__sighandler_t,__NOTHROW_NCX,signal,(int __signo, __sighandler_t __handler),_signal,(__signo,__handler))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,raise,(__signo_t __signo),(__signo))
+#if defined(__CRT_HAVE_signal) && defined(__USE_MISC)
+__CDECLARE(,__sighandler_t,__NOTHROW_NCX,signal,(__signo_t __signo, __sighandler_t __handler),(__signo,__handler))
+#elif defined(__CRT_HAVE__signal) && defined(__USE_MISC)
+__CREDIRECT(,__sighandler_t,__NOTHROW_NCX,signal,(__signo_t __signo, __sighandler_t __handler),_signal,(__signo,__handler))
+#elif defined(__CRT_HAVE_sysv_signal)
+__CREDIRECT(,__sighandler_t,__NOTHROW_NCX,signal,(__signo_t __signo, __sighandler_t __handler),sysv_signal,(__signo,__handler))
 #endif /* ... */
 __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
@@ -177,32 +173,26 @@ __NAMESPACE_STD_USING(raise)
 #endif /* __CRT_HAVE_raise */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __CRT_HAVE_sysv_signal
-/* @param signo: One of `SIG*' */
-__CREDIRECT(,__sighandler_t,__NOTHROW_NCX,__sysv_signal,(int __signo, __sighandler_t __handler),sysv_signal,(__signo,__handler))
+__CREDIRECT(,__sighandler_t,__NOTHROW_NCX,__sysv_signal,(__signo_t __signo, __sighandler_t __handler),sysv_signal,(__signo,__handler))
 #elif defined(__CRT_HAVE___sysv_signal)
-/* @param signo: One of `SIG*' */
-__CDECLARE(,__sighandler_t,__NOTHROW_NCX,__sysv_signal,(int __signo, __sighandler_t __handler),(__signo,__handler))
+__CDECLARE(,__sighandler_t,__NOTHROW_NCX,__sysv_signal,(__signo_t __signo, __sighandler_t __handler),(__signo,__handler))
 #endif /* ... */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_sysv_signal
-/* @param signo: One of `SIG*' */
-__CDECLARE(,__sighandler_t,__NOTHROW_NCX,sysv_signal,(int __signo, __sighandler_t __handler),(__signo,__handler))
+__CDECLARE(,__sighandler_t,__NOTHROW_NCX,sysv_signal,(__signo_t __signo, __sighandler_t __handler),(__signo,__handler))
 #elif defined(__CRT_HAVE___sysv_signal)
-/* @param signo: One of `SIG*' */
-__CREDIRECT(,__sighandler_t,__NOTHROW_NCX,sysv_signal,(int __signo, __sighandler_t __handler),__sysv_signal,(__signo,__handler))
+__CREDIRECT(,__sighandler_t,__NOTHROW_NCX,sysv_signal,(__signo_t __signo, __sighandler_t __handler),__sysv_signal,(__signo,__handler))
 #endif /* ... */
 #endif /* __USE_GNU */
 #ifndef __CXX_SYSTEM_HEADER
-#if defined(__CRT_HAVE_sysv_signal) || defined(__CRT_HAVE_signal) || defined(__CRT_HAVE__signal)
+#if (defined(__CRT_HAVE_signal) && defined(__USE_MISC)) || (defined(__CRT_HAVE__signal) && defined(__USE_MISC)) || defined(__CRT_HAVE_sysv_signal)
 __NAMESPACE_STD_USING(signal)
-#endif /* __CRT_HAVE_sysv_signal || __CRT_HAVE_signal || __CRT_HAVE__signal */
+#endif /* (__CRT_HAVE_signal && __USE_MISC) || (__CRT_HAVE__signal && __USE_MISC) || __CRT_HAVE_sysv_signal */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __USE_MISC
 #define sigmask(signo) __sigmask(signo)
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(,__sighandler_t,__NOTHROW_NCX,ssignal,(int __signo, __sighandler_t __handler),(__signo,__handler))
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,gsignal,(int __signo),(__signo))
+__CDECLARE_OPT(,__sighandler_t,__NOTHROW_NCX,ssignal,(__signo_t __signo, __sighandler_t __handler),(__signo,__handler))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,gsignal,(__signo_t __signo),(__signo))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,sigblock,(int __mask),(__mask))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,sigsetmask,(int __mask),(__mask))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,siggetmask,(void),())
@@ -245,17 +235,14 @@ __CDECLARE_VOID_OPT(__ATTR_NORETURN,__NOTHROW_NCX,sigreturn,(struct sigcontext c
 #endif /* __USE_MISC */
 
 #ifdef __USE_XOPEN
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(,__sighandler_t,__NOTHROW_NCX,bsd_signal,(int __signo, __sighandler_t __handler),(__signo,__handler))
+__CDECLARE_OPT(,__sighandler_t,__NOTHROW_NCX,bsd_signal,(__signo_t __signo, __sighandler_t __handler),(__signo,__handler))
 #ifdef __CRT_HAVE___xpg_sigpause
-/* @param signo: One of `SIG*' */
-__CREDIRECT(,int,__NOTHROW_NCX,sigpause,(int __signo),__xpg_sigpause,(__signo))
+__CREDIRECT(,int,__NOTHROW_NCX,sigpause,(__signo_t __signo),__xpg_sigpause,(__signo))
 #endif /* __CRT_HAVE___xpg_sigpause */
 #endif /* __USE_XOPEN */
 
 #ifdef __USE_POSIX
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,kill,(__pid_t __pid, int __signo),(__pid,__signo))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,kill,(__pid_t __pid, __signo_t __signo),(__pid,__signo))
 #ifdef __CRT_HAVE_sigemptyset
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigemptyset,(sigset_t *__set),(__set))
 #else /* __CRT_HAVE_sigemptyset */
@@ -269,55 +256,43 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigfillset,(sigset_t *__set),(_
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigfillset, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigfillset)(sigset_t *__set) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigfillset))(__set); })
 #endif /* !__CRT_HAVE_sigfillset */
 #ifdef __CRT_HAVE_sigaddset
-/* @param signo: One of `SIG*' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigaddset,(sigset_t *__set, int __signo),(__set,__signo))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigaddset,(sigset_t *__set, __signo_t __signo),(__set,__signo))
 #elif defined(__CRT_HAVE___sigaddset)
-/* @param signo: One of `SIG*' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigaddset,(sigset_t *__set, int __signo),__sigaddset,(__set,__signo))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigaddset,(sigset_t *__set, __signo_t __signo),__sigaddset,(__set,__signo))
 #else /* ... */
 #include <local/signal/sigaddset.h>
-/* @param signo: One of `SIG*' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigaddset, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigaddset)(sigset_t *__set, int __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigaddset))(__set, __signo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigaddset, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigaddset)(sigset_t *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigaddset))(__set, __signo); })
 #endif /* !... */
 #ifdef __CRT_HAVE_sigdelset
-/* @param signo: One of `SIG*' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigdelset,(sigset_t *__set, int __signo),(__set,__signo))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigdelset,(sigset_t *__set, __signo_t __signo),(__set,__signo))
 #elif defined(__CRT_HAVE___sigdelset)
-/* @param signo: One of `SIG*' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigdelset,(sigset_t *__set, int __signo),__sigdelset,(__set,__signo))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigdelset,(sigset_t *__set, __signo_t __signo),__sigdelset,(__set,__signo))
 #else /* ... */
 #include <local/signal/sigdelset.h>
-/* @param signo: One of `SIG*' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigdelset, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigdelset)(sigset_t *__set, int __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigdelset))(__set, __signo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigdelset, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigdelset)(sigset_t *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigdelset))(__set, __signo); })
 #endif /* !... */
 #ifdef __CRT_HAVE_sigismember
-/* @param signo: One of `SIG*' */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(sigset_t const *__set, int __signo),(__set,__signo))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(sigset_t const *__set, __signo_t __signo),(__set,__signo))
 #elif defined(__CRT_HAVE___sigismember)
-/* @param signo: One of `SIG*' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(sigset_t const *__set, int __signo),__sigismember,(__set,__signo))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(sigset_t const *__set, __signo_t __signo),__sigismember,(__set,__signo))
 #else /* ... */
 #include <local/signal/sigismember.h>
-/* @param signo: One of `SIG*' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigismember, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigismember)(sigset_t const *__set, int __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigismember))(__set, __signo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigismember, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigismember)(sigset_t const *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigismember))(__set, __signo); })
 #endif /* !... */
 /* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,sigprocmask,(int __how, sigset_t const *__set, sigset_t *__oset),(__how,__set,__oset))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sigprocmask,(__STDC_INT_AS_UINT_T __how, sigset_t const *__set, sigset_t *__oset),(__how,__set,__oset))
 #ifdef __CRT_HAVE_sigsuspend
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigsuspend,(sigset_t const *__set),(__set))
 #elif defined(__CRT_HAVE___sigsuspend)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigsuspend,(sigset_t const *__set),__sigsuspend,(__set))
 #endif /* ... */
 #ifdef __CRT_HAVE_sigaction
-/* @param signo: One of `SIG*' */
-__CDECLARE(,int,__NOTHROW_NCX,sigaction,(int __signo, struct sigaction const *__act, struct sigaction *__oact),(__signo,__act,__oact))
+__CDECLARE(,int,__NOTHROW_NCX,sigaction,(__signo_t __signo, struct sigaction const *__act, struct sigaction *__oact),(__signo,__act,__oact))
 #elif defined(__CRT_HAVE___sigaction)
-/* @param signo: One of `SIG*' */
-__CREDIRECT(,int,__NOTHROW_NCX,sigaction,(int __signo, struct sigaction const *__act, struct sigaction *__oact),__sigaction,(__signo,__act,__oact))
+__CREDIRECT(,int,__NOTHROW_NCX,sigaction,(__signo_t __signo, struct sigaction const *__act, struct sigaction *__oact),__sigaction,(__signo,__act,__oact))
 #endif /* ... */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigpending,(sigset_t *__restrict __set),(__set))
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sigwait,(sigset_t const *__restrict __set, int *__restrict __signo),(__set,__signo))
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sigwait,(sigset_t const *__restrict __set, __signo_t *__restrict __signo),(__set,__signo))
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_sigisemptyset
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigisemptyset,(sigset_t const *__restrict __set),(__set))
@@ -348,8 +323,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait,(sigset_t const *_
 #include <local/signal/sigtimedwait.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigtimedwait, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL sigtimedwait)(sigset_t const *__restrict __set, siginfo_t *__restrict __info, struct timespec const *__timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigtimedwait))(__set, __info, __timeout); })
 #endif /* ... */
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,sigqueue,(__pid_t __pid, int __signo, union sigval const __val),(__pid,__signo,__val))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sigqueue,(__pid_t __pid, __signo_t __signo, union sigval const __val),(__pid,__signo,__val))
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_sigtimedwait64
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigtimedwait64,(sigset_t const *__restrict __set, siginfo_t *__restrict __info, struct __timespec64 const *__timeout),(__set,__info,__timeout))
@@ -364,57 +338,48 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sigtimedwait64, __FORCELOCAL __ATTR_NONNULL((1))
 #endif /* __USE_POSIX */
 
 #ifdef __USE_KOS
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,sigqueueinfo,(__pid_t __tgid, int __signo, siginfo_t const *__uinfo),(__tgid,__signo,__uinfo))
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, int __signo, siginfo_t const *__uinfo),(__tgid,__tid,__signo,__uinfo))
+__CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,sigqueueinfo,(__pid_t __tgid, __signo_t __signo, siginfo_t const *__uinfo),(__tgid,__signo,__uinfo))
+__CDECLARE_OPT(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __signo_t __signo, siginfo_t const *__uinfo),(__tgid,__tid,__signo,__uinfo))
 #endif /* __USE_KOS */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,killpg,(__pid_t __pgrp, int __signo),(__pgrp,__signo))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,killpg,(__pid_t __pgrp, __signo_t __signo),(__pgrp,__signo))
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_XOPEN2K8
-/* @param signo: One of `SIG*' */
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,psignal,(int __signo, char const *__s),(__signo,__s))
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,psignal,(__signo_t __signo, char const *__s),(__signo,__s))
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,psiginfo,(siginfo_t const *__pinfo, char const *__s),(__pinfo,__s))
 #endif /* __USE_XOPEN2K8 */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,siginterrupt,(int __signo, int __interrupt),(__signo,__interrupt))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,siginterrupt,(__signo_t __signo, __STDC_INT_AS_UINT_T __interrupt),(__signo,__interrupt))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,sigstack,(struct sigstack *__ss, struct sigstack *__oss),(__ss,__oss))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,sigaltstack,(struct sigaltstack const *__ss, struct sigaltstack *__oss),(__ss,__oss))
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 #ifdef __USE_XOPEN_EXTENDED
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,sighold,(int __signo),(__signo))
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,sigrelse,(int __signo),(__signo))
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,sigignore,(int __signo),(__signo))
-/* @param signo: One of `SIG*' */
-__CDECLARE_OPT(,__sighandler_t,__NOTHROW_NCX,sigset,(int __signo, __sighandler_t __disp),(__signo,__disp))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sighold,(__signo_t __signo),(__signo))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sigrelse,(__signo_t __signo),(__signo))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,sigignore,(__signo_t __signo),(__signo))
+__CDECLARE_OPT(,__sighandler_t,__NOTHROW_NCX,sigset,(__signo_t __signo, __sighandler_t __disp),(__signo,__disp))
 #endif /* __USE_XOPEN_EXTENDED */
 
 #ifdef __CRT_HAVE___libc_current_sigrtmin
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__libc_current_sigrtmin,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmin,(void),())
 #else /* __CRT_HAVE___libc_current_sigrtmin */
 #include <bits/signum-values.h>
 #ifdef __SIGRTMIN
 #include <local/signal/__libc_current_sigrtmin.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmin, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmin))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmin, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmin))(); })
 #endif /* __SIGRTMIN */
 #endif /* !__CRT_HAVE___libc_current_sigrtmin */
 #ifdef __CRT_HAVE___libc_current_sigrtmax
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__libc_current_sigrtmax,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmax,(void),())
 #else /* __CRT_HAVE___libc_current_sigrtmax */
 #include <bits/signum-values.h>
 #ifdef __SIGRTMAX
 #include <local/signal/__libc_current_sigrtmax.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmax)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmax)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(); })
 #endif /* __SIGRTMAX */
 #endif /* !__CRT_HAVE___libc_current_sigrtmax */
 

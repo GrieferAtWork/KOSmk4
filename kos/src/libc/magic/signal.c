@@ -162,31 +162,32 @@ __NAMESPACE_STD_USING(size_t)
 
 %[insert:std]
 
-@@@param signo: One of `SIG*'
-[[std /*, dos_variant*/]]
-int raise(int signo);
+[[std, crt_dos_variant, decl_include("<bits/types.h>")]]
+int raise($signo_t signo);
 
 %[insert:function(__sysv_signal = sysv_signal)]
 
 %#ifdef __USE_GNU
-@@@param signo: One of `SIG*'
-[[export_alias("__sysv_signal")]]
-$sighandler_t sysv_signal(int signo, $sighandler_t handler);
+[[decl_include("<bits/types.h>", "<bits/sigaction.h>")]]
+[[export_alias("__sysv_signal"), crt_dos_variant]]
+$sighandler_t sysv_signal($signo_t signo, $sighandler_t handler);
 %#endif /* __USE_GNU */
 
 
-@@@param signo: One of `SIG*'
-[[std, preferred_alias(sysv_signal), export_alias(_signal) /*, dos_variant*/]]
-$sighandler_t signal(int signo, $sighandler_t handler);
+[[std, no_crt_self_import, crt_dos_variant]]
+[[if(defined(__USE_MISC)), preferred_alias("signal", "_signal")]]
+[[alias("sysv_signal"), export_as("_signal")]]
+[[decl_include("<bits/types.h>", "<bits/sigaction.h>")]]
+$sighandler_t signal($signo_t signo, $sighandler_t handler);
 
 %#ifdef __USE_MISC
 %#define sigmask(signo) __sigmask(signo)
 
-@@@param signo: One of `SIG*'
-$sighandler_t ssignal(int signo, $sighandler_t handler);
+[[decl_include("<bits/types.h>", "<bits/sigaction.h>"), crt_dos_variant]]
+$sighandler_t ssignal($signo_t signo, $sighandler_t handler);
 
-@@@param signo: One of `SIG*'
-int gsignal(int signo);
+[[decl_include("<bits/types.h>"), crt_dos_variant]]
+int gsignal($signo_t signo);
 
 /*[[deprecated("Using `sigprocmask()' instead")]]*/ int sigblock(int mask);
 /*[[deprecated("Using `sigprocmask()' instead")]]*/ int sigsetmask(int mask);
@@ -234,19 +235,19 @@ void sigreturn(struct sigcontext const *scp);
 %
 %#ifdef __USE_XOPEN
 
-@@@param signo: One of `SIG*'
-$sighandler_t bsd_signal(int signo, $sighandler_t handler);
+[[decl_include("<bits/types.h>", "<bits/sigaction.h>"), crt_dos_variant]]
+$sighandler_t bsd_signal($signo_t signo, $sighandler_t handler);
 
-@@@param signo: One of `SIG*'
 [[crt_name("__xpg_sigpause")]]
-int sigpause(int signo);
+[[decl_include("<bits/types.h>")]]
+int sigpause($signo_t signo);
 
 %#endif /* __USE_XOPEN */
 %
 %#ifdef __USE_POSIX
 
-@@@param signo: One of `SIG*'
-int kill($pid_t pid, int signo);
+[[decl_include("<bits/types.h>")]]
+int kill($pid_t pid, $signo_t signo);
 
 [[decl_include("<bits/sigset.h>")]]
 int sigemptyset([[nonnull]] sigset_t *set) {
@@ -266,49 +267,46 @@ int sigfillset([[nonnull]] sigset_t *set) {
 	return 0;
 }
 
-@@@param signo: One of `SIG*'
-[[decl_include("<bits/sigset.h>"), export_alias("__sigaddset")]]
-int sigaddset([[nonnull]] sigset_t *set, int signo) {
+[[decl_include("<bits/types.h>", "<bits/sigset.h>"), export_alias("__sigaddset")]]
+int sigaddset([[nonnull]] sigset_t *set, $signo_t signo) {
 	ulongptr_t mask = @__sigmask@(signo);
 	ulongptr_t word = @__sigword@(signo);
 	set->@__val@[word] |= mask;
 	return 0;
 }
 
-@@@param signo: One of `SIG*'
-[[decl_include("<bits/sigset.h>"), export_alias("__sigdelset")]]
-int sigdelset([[nonnull]] sigset_t *set, int signo) {
+[[decl_include("<bits/types.h>", "<bits/sigset.h>"), export_alias("__sigdelset")]]
+int sigdelset([[nonnull]] sigset_t *set, $signo_t signo) {
 	ulongptr_t mask = @__sigmask@(signo);
 	ulongptr_t word = @__sigword@(signo);
 	set->@__val@[word] &= ~mask;
 	return 0;
 }
 
-@@@param signo: One of `SIG*'
-[[wunused, ATTR_PURE]]
-[[decl_include("<bits/sigset.h>"), export_alias("__sigismember")]]
-int sigismember([[nonnull]] sigset_t const *set, int signo) {
+[[wunused, ATTR_PURE, export_alias("__sigismember")]]
+[[decl_include("<bits/types.h>", "<bits/sigset.h>")]]
+int sigismember([[nonnull]] sigset_t const *set, $signo_t signo) {
 	ulongptr_t mask = @__sigmask@(signo);
 	ulongptr_t word = @__sigword@(signo);
 	return (set->@__val@[word] & mask) != 0;
 }
 
 @@@param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
-int sigprocmask(int how, sigset_t const *set, sigset_t *oset);
+[[decl_include("<features.h>")]]
+int sigprocmask(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 
 [[cp, export_alias("__sigsuspend")]]
 int sigsuspend([[nonnull]] sigset_t const *set);
 
-@@@param signo: One of `SIG*'
+[[decl_include("<bits/types.h>")]]
 [[export_alias("__sigaction"), decl_prefix(struct sigaction;)]]
-int sigaction(int signo, struct sigaction const *act, struct sigaction *oact);
+int sigaction($signo_t signo, struct sigaction const *act, struct sigaction *oact);
 
 int sigpending([[nonnull]] sigset_t *__restrict set);
 
-@@@param signo: One of `SIG*'
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 int sigwait([[nonnull]] sigset_t const *__restrict set,
-            [[nonnull]] int *__restrict signo);
+            [[nonnull]] $signo_t *__restrict signo);
 
 %#ifdef __USE_GNU
 [[wunused, ATTR_PURE, decl_include("<bits/sigset.h>")]]
@@ -375,8 +373,8 @@ int sigtimedwait([[nonnull]] sigset_t const *__restrict set,
 @@pp_endif@@
 }
 
-@@@param signo: One of `SIG*'
-int sigqueue($pid_t pid, int signo, union sigval const val);
+[[decl_include("<bits/types.h>")]]
+int sigqueue($pid_t pid, $signo_t signo, union sigval const val);
 
 %#ifdef __USE_TIME64
 
@@ -399,25 +397,25 @@ int sigtimedwait64([[nonnull]] sigset_t const *__restrict set,
 
 %
 %#ifdef __USE_KOS
-@@@param signo: One of `SIG*'
-int sigqueueinfo($pid_t tgid, int signo,
+[[decl_include("<bits/types.h>")]]
+int sigqueueinfo($pid_t tgid, $signo_t signo,
                  [[nonnull]] siginfo_t const *uinfo);
 
-@@@param signo: One of `SIG*'
-int tgsigqueueinfo($pid_t tgid, $pid_t tid, int signo,
+[[decl_include("<bits/types.h>")]]
+int tgsigqueueinfo($pid_t tgid, $pid_t tid, $signo_t signo,
                    [[nonnull]] siginfo_t const *uinfo);
 %#endif /* __USE_KOS */
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-@@@param signo: One of `SIG*'
-int killpg($pid_t pgrp, int signo);
+[[decl_include("<bits/types.h>")]]
+int killpg($pid_t pgrp, $signo_t signo);
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 %
 %#ifdef __USE_XOPEN2K8
-@@@param signo: One of `SIG*'
-void psignal(int signo, [[nullable]] char const *s);
+[[decl_include("<bits/types.h>")]]
+void psignal($signo_t signo, [[nullable]] char const *s);
 
 void psiginfo([[nonnull]] siginfo_t const *pinfo,
               [[nullable]] char const *s);
@@ -425,8 +423,8 @@ void psiginfo([[nonnull]] siginfo_t const *pinfo,
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
-@@@param signo: One of `SIG*'
-int siginterrupt(int signo, int interrupt);
+[[decl_include("<features.h>", "<bits/types.h>")]]
+int siginterrupt($signo_t signo, __STDC_INT_AS_UINT_T interrupt);
 
 int sigstack([[nullable]] struct sigstack *ss,
              [[nullable]] struct sigstack *oss);
@@ -437,17 +435,17 @@ int sigaltstack([[nullable]] struct sigaltstack const *ss,
 
 %
 %#ifdef __USE_XOPEN_EXTENDED
-@@@param signo: One of `SIG*'
-int sighold(int signo);
+[[decl_include("<bits/types.h>")]]
+int sighold($signo_t signo);
 
-@@@param signo: One of `SIG*'
-int sigrelse(int signo);
+[[decl_include("<bits/types.h>")]]
+int sigrelse($signo_t signo);
 
-@@@param signo: One of `SIG*'
-int sigignore(int signo);
+[[decl_include("<bits/types.h>")]]
+int sigignore($signo_t signo);
 
-@@@param signo: One of `SIG*'
-$sighandler_t sigset(int signo, $sighandler_t disp);
+[[decl_include("<bits/types.h>")]]
+$sighandler_t sigset($signo_t signo, $sighandler_t disp);
 
 %#endif /* __USE_XOPEN_EXTENDED */
 %
@@ -456,14 +454,16 @@ $sighandler_t sigset(int signo, $sighandler_t disp);
 [[ATTR_CONST, wunused]]
 [[requires_include("<bits/signum-values.h>")]]
 [[requires(defined(__SIGRTMIN))]]
-int __libc_current_sigrtmin() {
+[[decl_include("<bits/types.h>")]]
+$signo_t __libc_current_sigrtmin() {
 	return __SIGRTMIN;
 }
 
 [[ATTR_CONST, wunused]]
 [[requires_include("<bits/signum-values.h>")]]
 [[requires(defined(__SIGRTMAX))]]
-int __libc_current_sigrtmax() {
+[[decl_include("<bits/types.h>")]]
+$signo_t __libc_current_sigrtmax() {
 	return __SIGRTMAX;
 }
 

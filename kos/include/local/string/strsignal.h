@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7384755 */
+/* HASH CRC-32:0x6a593277 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strsignal_defined
 #define __local_strsignal_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sprintf from stdio */
 #ifndef __local___localdep_sprintf_defined
@@ -90,7 +91,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__local_strsignal_buf_defined */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strsignal) __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsignal))(int __signo) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsignal))(__signo_t __signo) {
 	char *__result = __NAMESPACE_LOCAL_SYM __strsignal_buf;
 	char const *__string;
 	__string = __localdep_strsignal_s(__signo);

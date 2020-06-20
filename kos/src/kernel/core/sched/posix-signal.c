@@ -1237,14 +1237,15 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 
 #ifdef WANT_SIGACTION
 PRIVATE void KCALL
-do_sigaction(syscall_ulong_t signo,
+do_sigaction(signo_t signo,
              CHECKED USER struct sigaction const *act,
              CHECKED USER struct sigaction *oact) {
 	struct kernel_sigaction ohandler;
 	struct sighand *hand;
-	if unlikely(signo == 0 || signo >= NSIG)
+	if unlikely(signo <= 0 || signo >= NSIG)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      signo);
 	if (!act) {
 		if (oact) {
 			struct sighand_ptr *handptr;
@@ -1349,7 +1350,7 @@ no_old_handler:
 #endif /* WANT_SIGACTION */
 
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGACTION
-DEFINE_SYSCALL4(errno_t, rt_sigaction, syscall_ulong_t, signo,
+DEFINE_SYSCALL4(errno_t, rt_sigaction, signo_t, signo,
                 UNCHECKED USER struct sigaction const *, act,
                 UNCHECKED USER struct sigaction *, oact,
                 size_t, sigsetsize) {
@@ -1404,7 +1405,7 @@ sigaction_to_compat_sigaction(struct sigaction const *__restrict self,
 }
 
 PRIVATE errno_t KCALL
-do_compat_sigaction(syscall_ulong_t signo,
+do_compat_sigaction(compat_signo_t signo,
                     UNCHECKED USER struct compat_sigaction const *act,
                     UNCHECKED USER struct compat_sigaction *oact) {
 	struct sigaction real_act, real_oact;
@@ -1423,7 +1424,7 @@ do_compat_sigaction(syscall_ulong_t signo,
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGACTION */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGACTION
-DEFINE_COMPAT_SYSCALL4(errno_t, rt_sigaction, syscall_ulong_t, signo,
+DEFINE_COMPAT_SYSCALL4(compat_errno_t, rt_sigaction, compat_signo_t, signo,
                        UNCHECKED USER struct compat_sigaction const *, act,
                        UNCHECKED USER struct compat_sigaction *, oact,
                        size_t, sigsetsize) {
@@ -1437,7 +1438,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_sigaction, syscall_ulong_t, signo,
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGACTION */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGACTION
-DEFINE_COMPAT_SYSCALL3(errno_t, sigaction, syscall_ulong_t, signo,
+DEFINE_COMPAT_SYSCALL3(compat_errno_t, sigaction, compat_signo_t, signo,
                        UNCHECKED USER struct compat_sigaction const *, act,
                        UNCHECKED USER struct compat_sigaction *, oact) {
 	return do_compat_sigaction(signo, act, oact);
@@ -1446,7 +1447,7 @@ DEFINE_COMPAT_SYSCALL3(errno_t, sigaction, syscall_ulong_t, signo,
 
 #ifdef __ARCH_WANT_SYSCALL_SIGNAL
 DEFINE_SYSCALL2(sighandler_t, signal,
-                syscall_ulong_t, signo,
+                signo_t, signo,
                 UNCHECKED USER sighandler_t, handler) {
 	struct sigaction oact, act;
 	if (handler == KERNEL_SIG_GET) {
@@ -1462,7 +1463,7 @@ DEFINE_SYSCALL2(sighandler_t, signal,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGNAL
 DEFINE_COMPAT_SYSCALL2(sighandler_t, signal,
-                       syscall_ulong_t, signo,
+                       compat_signo_t, signo,
                        UNCHECKED USER sighandler_t, handler) {
 	struct sigaction oact, act;
 	if (handler == KERNEL_SIG_GET) {
@@ -1722,13 +1723,13 @@ taskpid_getpid_ind(struct taskpid *__restrict self, size_t ind) {
 /* kill(), tgkill(), tkill()                                            */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_KILL
-DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, syscall_ulong_t, signo) {
+DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
 	REF struct task *target;
 	struct taskpid *mypid;
 	siginfo_t info;
 	memset(&info, 0, sizeof(siginfo_t));
 	/* Make sure we've been given a valid signal number. */
-	if unlikely(signo == 0 || signo >= NSIG)
+	if unlikely(signo <= 0 || signo >= NSIG)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
 	info.si_signo = signo;
@@ -1766,17 +1767,20 @@ do_inherit_target_and_raise_processgroup:
 #ifdef __ARCH_WANT_SYSCALL_TGKILL
 DEFINE_SYSCALL3(errno_t, tgkill,
                 pid_t, tgid, pid_t, pid,
-                syscall_ulong_t, signo) {
+                signo_t, signo) {
 	REF struct task *target;
-	if unlikely(/*signo == 0 ||*/ signo >= NSIG)
+	if unlikely(signo < 0 || signo >= NSIG)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      signo);
 	if unlikely(pid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID,
+		      pid);
 	if unlikely(tgid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TGID, tgid);
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TGID,
+		      tgid);
 	target = pidns_lookup_task(THIS_PIDNS, (upid_t)pid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Check if the given TGID matches the group of this thread. */
@@ -1801,9 +1805,9 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 #endif /* __ARCH_WANT_SYSCALL_TGKILL */
 
 #ifdef __ARCH_WANT_SYSCALL_TKILL
-DEFINE_SYSCALL2(errno_t, tkill, pid_t, pid, syscall_ulong_t, signo) {
+DEFINE_SYSCALL2(errno_t, tkill, pid_t, pid, signo_t, signo) {
 	REF struct task *target;
-	if unlikely(/*signo == 0 ||*/ signo >= NSIG)
+	if unlikely(signo < 0 || signo >= NSIG)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
 	if unlikely(pid <= 0)
@@ -1836,14 +1840,14 @@ DEFINE_SYSCALL2(errno_t, tkill, pid_t, pid, syscall_ulong_t, signo) {
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGQUEUEINFO
 DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
-                pid_t, tgid, syscall_ulong_t, signo,
+                pid_t, tgid, signo_t, signo,
                 USER UNCHECKED siginfo_t const *, uinfo) {
 	REF struct task *target;
 	siginfo_t info;
 	if unlikely(tgid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tgid);
-	if unlikely(/*signo == 0 ||*/ signo >= NSIG)
+	if unlikely(signo < 0 || signo >= NSIG)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
 	validate_readable(uinfo, sizeof(siginfo_t));
@@ -1868,7 +1872,7 @@ DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
 
 #ifdef __ARCH_WANT_SYSCALL_RT_TGSIGQUEUEINFO
 DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
-                pid_t, tgid, pid_t, tid, syscall_ulong_t, signo,
+                pid_t, tgid, pid_t, tid, signo_t, signo,
                 USER UNCHECKED siginfo_t const *, uinfo) {
 	siginfo_t info;
 	REF struct task *target;
@@ -1879,7 +1883,7 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 	if unlikely(tid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tid);
-	if unlikely(/*signo == 0 ||*/ signo >= NSIG)
+	if unlikely(signo < 0 || signo >= NSIG)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
 	validate_readable(uinfo, sizeof(siginfo_t));
@@ -1907,14 +1911,14 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGQUEUEINFO
 DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
-                       pid_t, tgid, syscall_ulong_t, signo,
+                       pid_t, tgid, signo_t, signo,
                        USER UNCHECKED compat_siginfo_t const *, uinfo) {
 	REF struct task *target;
 	siginfo_t info;
 	if unlikely(tgid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tgid);
-	if unlikely(/*signo == 0 ||*/ signo >= NSIG)
+	if unlikely(signo < 0 || signo >= NSIG)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
 	validate_readable(uinfo, sizeof(compat_siginfo_t));
@@ -1939,7 +1943,7 @@ DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_TGSIGQUEUEINFO
 DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
-                       pid_t, tgid, pid_t, tid, syscall_ulong_t, signo,
+                       pid_t, tgid, pid_t, tid, signo_t, signo,
                        USER UNCHECKED compat_siginfo_t const *, uinfo) {
 	siginfo_t info;
 	REF struct task *target;
@@ -1950,7 +1954,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 	if unlikely(tid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tid);
-	if unlikely(/*signo == 0 ||*/ signo >= NSIG)
+	if unlikely(signo < 0 || signo >= NSIG)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
 	validate_readable(uinfo, sizeof(compat_siginfo_t));

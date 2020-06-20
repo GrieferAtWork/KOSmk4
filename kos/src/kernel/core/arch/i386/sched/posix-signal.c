@@ -546,7 +546,7 @@ raiseat32_impl(struct icpustate *__restrict state,
 		state = syscall_fill_icpustate_from_ucpustate32(state, ust);
 	}
 	/* Verify that the signal number is inside of its mandatory bounds. */
-	if unlikely(!si.si_signo || si.si_signo >= NSIG) {
+	if unlikely(si.si_signo <= 0 || si.si_signo >= NSIG) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
 		      si.si_signo);
@@ -598,7 +598,7 @@ raiseat64_impl(struct icpustate *__restrict state,
 		state = syscall_fill_icpustate_from_ucpustate64(state, ust);
 	}
 	/* Verify that the signal number is inside of its mandatory bounds. */
-	if unlikely(!si.si_signo || si.si_signo >= NSIG) {
+	if unlikely(si.si_signo <= 0 || si.si_signo >= NSIG) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
 		      si.si_signo);

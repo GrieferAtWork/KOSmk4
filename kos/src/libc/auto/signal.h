@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64599d26 */
+/* HASH CRC-32:0x935c452 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,25 +39,11 @@ typedef __sighandler_t sighandler_t;
 #endif /* !__sighandler_t_defined */
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* @param signo: One of `SIG*' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_raise)(int signo);
-/* @param signo: One of `SIG*' */
-INTDEF sighandler_t NOTHROW_NCX(LIBDCALL libd_sysv_signal)(int signo, sighandler_t handler);
-/* @param signo: One of `SIG*' */
-INTDEF sighandler_t NOTHROW_NCX(LIBDCALL libd_signal)(int signo, sighandler_t handler);
-/* @param signo: One of `SIG*' */
-INTDEF sighandler_t NOTHROW_NCX(LIBDCALL libd_ssignal)(int signo, sighandler_t handler);
-/* @param signo: One of `SIG*' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_gsignal)(int signo);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sigblock)(int mask);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sigsetmask)(int mask);
 INTDEF ATTR_NORETURN void NOTHROW_NCX(LIBDCALL libd_sigreturn)(struct sigcontext const *scp);
-/* @param signo: One of `SIG*' */
-INTDEF sighandler_t NOTHROW_NCX(LIBDCALL libd_bsd_signal)(int signo, sighandler_t handler);
-/* @param signo: One of `SIG*' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd___xpg_sigpause)(int signo);
-/* @param signo: One of `SIG*' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_kill)(pid_t pid, int signo);
+INTDEF int NOTHROW_NCX(LIBDCALL libd___xpg_sigpause)(signo_t signo);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_kill)(pid_t pid, signo_t signo);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigemptyset)(sigset_t *set);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -70,38 +56,30 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigfillset)(sigset_t *set);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* @param signo: One of `SIG*' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigaddset)(sigset_t *set, int signo);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigaddset)(sigset_t *set, signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* @param signo: One of `SIG*' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set, int signo);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set, signo_t signo);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* @param signo: One of `SIG*' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigdelset)(sigset_t *set, int signo);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigdelset)(sigset_t *set, signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* @param signo: One of `SIG*' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set, int signo);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set, signo_t signo);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* @param signo: One of `SIG*' */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigismember)(sigset_t const *set, int signo);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigismember)(sigset_t const *set, signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* @param signo: One of `SIG*' */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set, int signo);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set, signo_t signo);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_sigprocmask)(int how, sigset_t const *set, sigset_t *oset);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_sigprocmask)(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigsuspend)(sigset_t const *set);
-/* @param signo: One of `SIG*' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_sigaction)(int signo, struct sigaction const *act, struct sigaction *oact);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_sigaction)(signo_t signo, struct sigaction const *act, struct sigaction *oact);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigpending)(sigset_t *__restrict set);
-/* @param signo: One of `SIG*' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_sigwait)(sigset_t const *__restrict set, int *__restrict signo);
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_sigwait)(sigset_t const *__restrict set, signo_t *__restrict signo);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigisemptyset)(sigset_t const *__restrict set);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -122,34 +100,24 @@ INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set,
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigwaitinfo)(sigset_t const *__restrict set, siginfo_t *__restrict info);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigtimedwait)(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec const *timeout);
-/* @param signo: One of `SIG*' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_sigqueue)(pid_t pid, int signo, union sigval const val);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_sigqueue)(pid_t pid, signo_t signo, union sigval const val);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigtimedwait64)(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec64 const *timeout);
-/* @param signo: One of `SIG*' */
-INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_sigqueueinfo)(pid_t tgid, int signo, siginfo_t const *uinfo);
-/* @param signo: One of `SIG*' */
-INTDEF NONNULL((4)) int NOTHROW_NCX(LIBDCALL libd_tgsigqueueinfo)(pid_t tgid, pid_t tid, int signo, siginfo_t const *uinfo);
-/* @param signo: One of `SIG*' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_killpg)(pid_t pgrp, int signo);
-/* @param signo: One of `SIG*' */
-INTDEF void NOTHROW_NCX(LIBDCALL libd_psignal)(int signo, char const *s);
+INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_sigqueueinfo)(pid_t tgid, signo_t signo, siginfo_t const *uinfo);
+INTDEF NONNULL((4)) int NOTHROW_NCX(LIBDCALL libd_tgsigqueueinfo)(pid_t tgid, pid_t tid, signo_t signo, siginfo_t const *uinfo);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_killpg)(pid_t pgrp, signo_t signo);
+INTDEF void NOTHROW_NCX(LIBDCALL libd_psignal)(signo_t signo, char const *s);
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_psiginfo)(siginfo_t const *pinfo, char const *s);
-/* @param signo: One of `SIG*' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_siginterrupt)(int signo, int interrupt);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_siginterrupt)(signo_t signo, __STDC_INT_AS_UINT_T interrupt);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sigstack)(struct sigstack *ss, struct sigstack *oss);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sigaltstack)(struct sigaltstack const *ss, struct sigaltstack *oss);
-/* @param signo: One of `SIG*' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_sighold)(int signo);
-/* @param signo: One of `SIG*' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_sigrelse)(int signo);
-/* @param signo: One of `SIG*' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_sigignore)(int signo);
-/* @param signo: One of `SIG*' */
-INTDEF sighandler_t NOTHROW_NCX(LIBDCALL libd_sigset)(int signo, sighandler_t disp);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_sighold)(signo_t signo);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_sigrelse)(signo_t signo);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_sigignore)(signo_t signo);
+INTDEF sighandler_t NOTHROW_NCX(LIBDCALL libd_sigset)(signo_t signo, sighandler_t disp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void);
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void);
+INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void);
+INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END

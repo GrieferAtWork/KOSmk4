@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa54abe54 */
+/* HASH CRC-32:0xb268ba24 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@
 #define SYS_mprotect               __NR_mprotect               /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 #define SYS_munmap                 __NR_munmap                 /* errno_t munmap(void *addr, size_t len) */
 #define SYS_brk                    __NR_brk                    /* errno_t brk(void *addr) */
-#define SYS_rt_sigaction           __NR_rt_sigaction           /* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx64 const *act, struct sigactionx64 *oact, size_t sigsetsize) */
+#define SYS_rt_sigaction           __NR_rt_sigaction           /* errno_t rt_sigaction(signo_t signo, struct sigactionx64 const *act, struct sigactionx64 *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define SYS_rt_sigprocmask         __NR_rt_sigprocmask         /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
 /* Restore the given CPU/FPU context descriptors, as well as signal mask
@@ -146,8 +146,7 @@
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 #define SYS_wait4                  __NR_wait4                  /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex64 *usage) */
-/* @param: signo: One of `SIG*' */
-#define SYS_kill                   __NR_kill                   /* errno_t kill(pid_t pid, syscall_ulong_t signo) */
+#define SYS_kill                   __NR_kill                   /* errno_t kill(pid_t pid, signo_t signo) */
 #define SYS_uname                  __NR_uname                  /* errno_t uname(struct utsname *name) */
 #define SYS_semget                 __NR_semget                 /* errno_t semget(int TODO_PROTOTYPE) */
 #define SYS_semop                  __NR_semop                  /* errno_t semop(int TODO_PROTOTYPE) */
@@ -216,8 +215,7 @@
 #define SYS_capset                 __NR_capset                 /* errno_t capset(int TODO_PROTOTYPE) */
 #define SYS_rt_sigpending          __NR_rt_sigpending          /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */
 #define SYS_rt_sigtimedwait        __NR_rt_sigtimedwait        /* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox64_struct *info, struct timespecx64 const *timeout, size_t sigsetsize) */
-/* @param: signo: One of `SIG*' */
-#define SYS_rt_sigqueueinfo        __NR_rt_sigqueueinfo        /* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfox64_struct const *uinfo) */
+#define SYS_rt_sigqueueinfo        __NR_rt_sigqueueinfo        /* errno_t rt_sigqueueinfo(pid_t tgid, signo_t signo, struct __siginfox64_struct const *uinfo) */
 #define SYS_rt_sigsuspend          __NR_rt_sigsuspend          /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define SYS_sigaltstack            __NR_sigaltstack            /* errno_t sigaltstack(struct sigaltstackx64 const *ss, struct sigaltstackx64 *oss) */
 #define SYS_utime                  __NR_utime                  /* errno_t utime(char const *filename, struct utimbufx64 const *times) */
@@ -299,8 +297,7 @@
 #define SYS_removexattr            __NR_removexattr            /* errno_t removexattr(char const *path, char const *name) */
 #define SYS_lremovexattr           __NR_lremovexattr           /* errno_t lremovexattr(char const *path, char const *name) */
 #define SYS_fremovexattr           __NR_fremovexattr           /* errno_t fremovexattr(fd_t fd, char const *name) */
-/* @param: signo: One of `SIG*' */
-#define SYS_tkill                  __NR_tkill                  /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
+#define SYS_tkill                  __NR_tkill                  /* errno_t tkill(pid_t tid, signo_t signo) */
 #define SYS_time                   __NR_time                   /* time32_t time(time32_t *timer) */
 /* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 #define SYS_futex                  __NR_futex                  /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
@@ -338,8 +335,7 @@
 #define SYS_epoll_wait             __NR_epoll_wait             /* errno_t epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
 /* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
 #define SYS_epoll_ctl              __NR_epoll_ctl              /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
-/* @param: signo: One of `SIG*' */
-#define SYS_tgkill                 __NR_tgkill                 /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
+#define SYS_tgkill                 __NR_tgkill                 /* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
 #define SYS_utimes                 __NR_utimes                 /* errno_t utimes(char const *filename, struct timevalx64 const[2] times) */
 #define SYS_vserver                __NR_vserver                /* errno_t vserver(int TODO_PROTOTYPE) */
 #define SYS_mbind                  __NR_mbind                  /* errno_t mbind(int TODO_PROTOTYPE) */
@@ -433,8 +429,7 @@
 #define SYS_inotify_init1          __NR_inotify_init1          /* errno_t inotify_init1(int TODO_PROTOTYPE) */
 #define SYS_preadv                 __NR_preadv                 /* ssize_t preadv(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset) */
 #define SYS_pwritev                __NR_pwritev                /* ssize_t pwritev(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset) */
-/* @param: signo: One of `SIG*' */
-#define SYS_rt_tgsigqueueinfo      __NR_rt_tgsigqueueinfo      /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfox64_struct const *uinfo) */
+#define SYS_rt_tgsigqueueinfo      __NR_rt_tgsigqueueinfo      /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t signo, struct __siginfox64_struct const *uinfo) */
 #define SYS_perf_event_open        __NR_perf_event_open        /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |

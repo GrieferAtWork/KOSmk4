@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7773bda5 */
+/* HASH CRC-32:0x9e4e0504 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,9 +40,9 @@ typedef __sigset_t sigset_t;
 #endif /* !__sigset_t_defined */
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_sigmask)(int how, sigset_t const *newmask, sigset_t *oldmask);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_kill)(pthread_t threadid, int signo);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_sigqueue)(pthread_t threadid, int signo, union sigval const value);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_sigmask)(__STDC_INT_AS_UINT_T how, sigset_t const *newmask, sigset_t *oldmask);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_kill)(pthread_t threadid, signo_t signo);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_sigqueue)(pthread_t threadid, signo_t signo, union sigval const value);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

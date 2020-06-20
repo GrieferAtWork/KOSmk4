@@ -40,7 +40,7 @@
 %[typesize(*:[unsigned,signed,uint] = int)]
 %[typesize(*:[ulong] = long)]
 %[typesize(*:[ullong] = llong)]
-%[typesize(*:[errno_t,mode_t,oflag_t,fd_t] = int)]
+%[typesize(*:[errno_t,signo_t,mode_t,oflag_t,fd_t] = int)]
 %[typesize(*:[syscall_ulong_t] = ulong)]
 %[typesize(*:[syscall_slong_t] = syscall_ulong_t)]
 %[typesize(*:[socklen_t,size_t] = syscall_ulong_t)]
@@ -269,6 +269,7 @@
 %[define_tostr(uid_t                = UID_T)]
 %[define_tostr(fd_t                 = FD_T)]
 %[define_tostr(errno_t              = ERRNO_T)]
+%[define_tostr(signo_t              = SIGNO_T)]
 %[define_tostr(iomode_t             = IOMODE_T)]
 %[define_tostr(atflag_t             = ATFLAG_T)]
 %[define_tostr(oflag_t              = OFLAG_T)]
@@ -523,15 +524,9 @@ ftimex64:([tostr(out:STRUCT_TIMEBX64)] struct timebx64 *tp) -> errno_t;
 %[endgroup]
 
 [cp] sync:() -> errno_t;
-
-@@@param: signo: One of `SIG*'
-kill:(pid_t pid, [tostr(SIGNO)] syscall_ulong_t signo) -> errno_t;
-
-@@@param: signo: One of `SIG*'
-tkill:(pid_t tid, [tostr(SIGNO)] syscall_ulong_t signo) -> errno_t;
-
-@@@param: signo: One of `SIG*'
-tgkill:(pid_t tgid, pid_t tid, [tostr(SIGNO)] syscall_ulong_t signo) -> errno_t;
+kill:(pid_t pid, signo_t signo) -> errno_t;
+tkill:(pid_t tid, signo_t signo) -> errno_t;
+tgkill:(pid_t tgid, pid_t tid, signo_t signo) -> errno_t;
 
 
 [cp] rename:([tostr(FILENAME)] char const *oldname,
@@ -566,11 +561,7 @@ dup3:(fd_t oldfd, fd_t newfd, [tostr(OFLAG__CLOEXEC__CLOFORK)] oflag_t flags) ->
 times:([tostr(out:STRUCT_TMS)] struct tms *buf) -> clock_t;
 
 brk:(void *addr) -> errno_t;
-
-@@@param: signo: One of `SIG*'
-signal:([tostr(SIGNO)] syscall_ulong_t signo,
-        sighandler_t handler) -> sighandler_t;
-
+signal:(signo_t signo, sighandler_t handler) -> sighandler_t;
 acct:([tostr(FILENAME)] char const *filename) -> errno_t;
 
 [cp][restart(must)] umount2:(char const *special_file, syscall_ulong_t flags) -> errno_t;
@@ -593,17 +584,15 @@ olduname:([tostr(out:STRUCT_LINUX_OLDUNAME)] struct linux_olduname *name) -> err
 uname:([tostr(out:STRUCT_UTSNAME)] struct utsname *name) -> errno_t;
 
 %[startgroup]
-@@@param: signo: One of `SIG*'
-sigaction:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTION)] struct sigaction const *act, [tostr(out:STRUCT_SIGACTION)] struct sigaction *oact) -> errno_t;
-sigactionx32:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTIONX32)] struct sigactionx32 const *act, [tostr(out:STRUCT_SIGACTIONX32)] struct sigactionx32 *oact) -> errno_t;
-sigactionx64:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTIONX64)] struct sigactionx64 const *act, [tostr(out:STRUCT_SIGACTIONX64)] struct sigactionx64 *oact) -> errno_t;
+sigaction:(signo_t signo, [tostr(STRUCT_SIGACTION)] struct sigaction const *act, [tostr(out:STRUCT_SIGACTION)] struct sigaction *oact) -> errno_t;
+sigactionx32:(signo_t signo, [tostr(STRUCT_SIGACTIONX32)] struct sigactionx32 const *act, [tostr(out:STRUCT_SIGACTIONX32)] struct sigactionx32 *oact) -> errno_t;
+sigactionx64:(signo_t signo, [tostr(STRUCT_SIGACTIONX64)] struct sigactionx64 const *act, [tostr(out:STRUCT_SIGACTIONX64)] struct sigactionx64 *oact) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-@@@param: signo: One of `SIG*'
-rt_sigaction:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTION:sigsetsize)] struct sigaction const *act, [tostr(out:STRUCT_SIGACTION:sigsetsize)] struct sigaction *oact, size_t sigsetsize) -> errno_t;
-rt_sigactionx32:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTIONX32:sigsetsize)] struct sigactionx32 const *act, [tostr(out:STRUCT_SIGACTIONX32:sigsetsize)] struct sigactionx32 *oact, size_t sigsetsize) -> errno_t;
-rt_sigactionx64:([tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGACTIONX64:sigsetsize)] struct sigactionx64 const *act, [tostr(out:STRUCT_SIGACTIONX64:sigsetsize)] struct sigactionx64 *oact, size_t sigsetsize) -> errno_t;
+rt_sigaction:(signo_t signo, [tostr(STRUCT_SIGACTION:sigsetsize)] struct sigaction const *act, [tostr(out:STRUCT_SIGACTION:sigsetsize)] struct sigaction *oact, size_t sigsetsize) -> errno_t;
+rt_sigactionx32:(signo_t signo, [tostr(STRUCT_SIGACTIONX32:sigsetsize)] struct sigactionx32 const *act, [tostr(out:STRUCT_SIGACTIONX32:sigsetsize)] struct sigactionx32 *oact, size_t sigsetsize) -> errno_t;
+rt_sigactionx64:(signo_t signo, [tostr(STRUCT_SIGACTIONX64:sigsetsize)] struct sigactionx64 const *act, [tostr(out:STRUCT_SIGACTIONX64:sigsetsize)] struct sigactionx64 *oact, size_t sigsetsize) -> errno_t;
 %[endgroup]
 
 
@@ -988,10 +977,9 @@ rt_sigpending:([tostr(out:STRUCT_SIGSET:sigsetsize)] struct __sigset_struct *set
 %[endgroup]
 
 %[startgroup]
-@@@param: signo: One of `SIG*'
-rt_sigqueueinfo:(pid_t tgid, [tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGINFO)] struct __siginfo_struct const *uinfo) -> errno_t;
-[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox32:(pid_t tgid, [tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGINFOX32)] struct __siginfox32_struct const *uinfo) -> errno_t;
-[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox64:(pid_t tgid, [tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGINFOX64)] struct __siginfox64_struct const *uinfo) -> errno_t;
+rt_sigqueueinfo:(pid_t tgid, signo_t signo, [tostr(STRUCT_SIGINFO)] struct __siginfo_struct const *uinfo) -> errno_t;
+rt_sigqueueinfox32:(pid_t tgid, signo_t signo, [tostr(STRUCT_SIGINFOX32)] struct __siginfox32_struct const *uinfo) -> errno_t;
+rt_sigqueueinfox64:(pid_t tgid, signo_t signo, [tostr(STRUCT_SIGINFOX64)] struct __siginfox64_struct const *uinfo) -> errno_t;
 %[endgroup]
 
 rt_sigsuspend:([tostr(STRUCT_SIGSET:sigsetsize)] struct __sigset_struct const *set,
@@ -1476,10 +1464,9 @@ inotify_init1:(int TODO_PROTOTYPE) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-@@@param: signo: One of `SIG*'
-rt_tgsigqueueinfo:(pid_t tgid, pid_t tid, [tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGINFO)] struct __siginfo_struct const *uinfo) -> errno_t;
-[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfox32:(pid_t tgid, pid_t tid, [tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGINFOX32)] struct __siginfox32_struct const *uinfo) -> errno_t;
-[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfox64:(pid_t tgid, pid_t tid, [tostr(SIGNO)] syscall_ulong_t signo, [tostr(STRUCT_SIGINFOX64)] struct __siginfox64_struct const *uinfo) -> errno_t;
+rt_tgsigqueueinfo:(pid_t tgid, pid_t tid, signo_t signo, [tostr(STRUCT_SIGINFO)] struct __siginfo_struct const *uinfo) -> errno_t;
+rt_tgsigqueueinfox32:(pid_t tgid, pid_t tid, signo_t signo, [tostr(STRUCT_SIGINFOX32)] struct __siginfox32_struct const *uinfo) -> errno_t;
+rt_tgsigqueueinfox64:(pid_t tgid, pid_t tid, signo_t signo, [tostr(STRUCT_SIGINFOX64)] struct __siginfox64_struct const *uinfo) -> errno_t;
 %[endgroup]
 
 perf_event_open:(int TODO_PROTOTYPE) -> errno_t;

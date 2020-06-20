@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x487dc1d5 */
+/* HASH CRC-32:0x6d9f21a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1134,7 +1134,7 @@
 #define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT 1
 #define __NR32RTR_restart_syscall          SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_exit                    SC_REPR_EXIT_STATUS                                                  /* status */ 
-#define __NR32RTR_exit                     SC_REPR_INT                                                          /* return */
+#define __NR32RTR_exit                     SC_REPR_SIGNO_T                                                      /* return */
 #define __NR32RTR_fork                     SC_REPR_PID_T                                                        /* return */
 #define __NR32ATR0_read                    SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_read                    SC_REPR_POINTER                                                      /* buf */ 
@@ -1231,7 +1231,7 @@
 #define __NR32RTR_ftime                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32RTR_sync                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_kill                    SC_REPR_PID_T                                                        /* pid */ 
-#define __NR32ATR1_kill                    SC_REPR_SIGNO                                                        /* signo */ 
+#define __NR32ATR1_kill                    SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NR32RTR_kill                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_rename                  SC_REPR_FILENAME                                                     /* oldname */ 
 #define __NR32ATR1_rename                  SC_REPR_FILENAME                                                     /* newname_or_path */ 
@@ -1246,14 +1246,14 @@
 #define __NR32ATR0_pipe                    SC_REPR_POINTER                                                      /* pipedes */ 
 #define __NR32RTR_pipe                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_times                   SC_REPR_POINTER                                                      /* buf */ 
-#define __NR32RTR_times                    SC_REPR_INT                                                          /* return */
+#define __NR32RTR_times                    SC_REPR_SIGNO_T                                                      /* return */
 #define __NR32RTR_prof                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_brk                     SC_REPR_POINTER                                                      /* addr */ 
 #define __NR32RTR_brk                      SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_setgid                  SC_REPR_GID_T                                                        /* gid */ 
 #define __NR32RTR_setgid                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32RTR_getgid                   SC_REPR_GID_T                                                        /* return */
-#define __NR32ATR0_signal                  SC_REPR_SIGNO                                                        /* signo */ 
+#define __NR32ATR0_signal                  SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NR32ATR1_signal                  SC_REPR_SIGHANDLER_T                                                 /* handler */ 
 #define __NR32RTR_signal                   SC_REPR_SIGHANDLER_T                                                 /* return */
 #define __NR32RTR_geteuid                  SC_REPR_UID_T                                                        /* return */
@@ -1294,7 +1294,7 @@
 #define __NR32RTR_getppid                  SC_REPR_PID_T                                                        /* return */
 #define __NR32RTR_getpgrp                  SC_REPR_PID_T                                                        /* return */
 #define __NR32RTR_setsid                   SC_REPR_PID_T                                                        /* return */
-#define __NR32ATR0_sigaction               SC_REPR_SIGNO                                                        /* signo */ 
+#define __NR32ATR0_sigaction               SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NR32ATR1_sigaction               SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 
 #define __NR32ATR2_sigaction               SC_REPR_POINTER                                                      /* oact */ 
 #define __NR32RTR_sigaction                SC_REPR_ERRNO_T                                                      /* return */
@@ -1464,7 +1464,7 @@
 #define __NR32ATR3_sigreturn               SC_REPR_STRUCT_SIGSET                                                /* restore_sigmask */ 
 #define __NR32ATR4_sigreturn               SC_REPR_STRUCT_RPC_SYSCALL_INFO32                                    /* sc_info */ 
 #define __NR32ATR5_sigreturn               SC_REPR_STRUCT_UCPUSTATE32                                           /* restore_cpu */ 
-#define __NR32RTR_sigreturn                SC_REPR_INT                                                          /* return */
+#define __NR32RTR_sigreturn                SC_REPR_SIGNO_T                                                      /* return */
 #define __NR32ATR0_clone                   SC_REPR_CLONE_FLAGS                                                  /* flags */ 
 #define __NR32ATR1_clone                   SC_REPR_POINTER                                                      /* child_stack */ 
 #define __NR32ATR2_clone                   SC_REPR_POINTER                                                      /* ptid */ 
@@ -1624,8 +1624,8 @@
 #define __NR32ATR3_rt_sigreturn            SC_REPR_STRUCT_SIGSET                                                /* restore_sigmask */ 
 #define __NR32ATR4_rt_sigreturn            SC_REPR_STRUCT_RPC_SYSCALL_INFO32                                    /* sc_info */ 
 #define __NR32ATR5_rt_sigreturn            SC_REPR_STRUCT_UCPUSTATE32                                           /* restore_cpu */ 
-#define __NR32RTR_rt_sigreturn             SC_REPR_INT                                                          /* return */
-#define __NR32ATR0_rt_sigaction            SC_REPR_SIGNO                                                        /* signo */ 
+#define __NR32RTR_rt_sigreturn             SC_REPR_SIGNO_T                                                      /* return */
+#define __NR32ATR0_rt_sigaction            SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NR32ATR1_rt_sigaction            SC_REPR_STRUCT_SIGACTIONX32                                          /* act */ 
 #define __NR32ATL1_rt_sigaction            3                                                                    /* act -> sigsetsize */ 
 #define __NR32ATR2_rt_sigaction            SC_REPR_POINTER                                                      /* oact */ 
@@ -1647,7 +1647,7 @@
 #define __NR32ATR3_rt_sigtimedwait         SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NR32RTR_rt_sigtimedwait          SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_rt_sigqueueinfo         SC_REPR_PID_T                                                        /* tgid */ 
-#define __NR32ATR1_rt_sigqueueinfo         SC_REPR_SIGNO                                                        /* signo */ 
+#define __NR32ATR1_rt_sigqueueinfo         SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NR32ATR2_rt_sigqueueinfo         SC_REPR_STRUCT_SIGINFOX32                                            /* uinfo */ 
 #define __NR32RTR_rt_sigqueueinfo          SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_rt_sigsuspend           SC_REPR_STRUCT_SIGSET                                                /* set */ 
@@ -1848,7 +1848,7 @@
 #define __NR32ATR1_fremovexattr            SC_REPR_STRING                                                       /* name */ 
 #define __NR32RTR_fremovexattr             SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_tkill                   SC_REPR_PID_T                                                        /* tid */ 
-#define __NR32ATR1_tkill                   SC_REPR_SIGNO                                                        /* signo */ 
+#define __NR32ATR1_tkill                   SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NR32RTR_tkill                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_sendfile64              SC_REPR_FD_T                                                         /* out_fd */ 
 #define __NR32ATR1_sendfile64              SC_REPR_FD_T                                                         /* in_fd */ 
@@ -1889,7 +1889,7 @@
 #define __NR32ATR0_fadvise64               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_fadvise64                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_exit_group              SC_REPR_EXIT_STATUS                                                  /* exit_code */ 
-#define __NR32RTR_exit_group               SC_REPR_INT                                                          /* return */
+#define __NR32RTR_exit_group               SC_REPR_SIGNO_T                                                      /* return */
 #define __NR32ATR0_lookup_dcookie          SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_lookup_dcookie           SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_epoll_create            SC_REPR_SYSCALL_ULONG_T                                              /* size */ 
@@ -1950,7 +1950,7 @@
 #define __NR32RTR_fstatfs64                SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_tgkill                  SC_REPR_PID_T                                                        /* tgid */ 
 #define __NR32ATR1_tgkill                  SC_REPR_PID_T                                                        /* tid */ 
-#define __NR32ATR2_tgkill                  SC_REPR_SIGNO                                                        /* signo */ 
+#define __NR32ATR2_tgkill                  SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NR32RTR_tgkill                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_utimes                  SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATR1_utimes                  SC_REPR_STRUCT_TIMEVALX32_VEC2                                       /* times */ 
@@ -2227,7 +2227,7 @@
 #define __NR32RTR_pwritev                  SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_rt_tgsigqueueinfo       SC_REPR_PID_T                                                        /* tgid */ 
 #define __NR32ATR1_rt_tgsigqueueinfo       SC_REPR_PID_T                                                        /* tid */ 
-#define __NR32ATR2_rt_tgsigqueueinfo       SC_REPR_SIGNO                                                        /* signo */ 
+#define __NR32ATR2_rt_tgsigqueueinfo       SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NR32ATR3_rt_tgsigqueueinfo       SC_REPR_STRUCT_SIGINFOX32                                            /* uinfo */ 
 #define __NR32RTR_rt_tgsigqueueinfo        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_perf_event_open         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 

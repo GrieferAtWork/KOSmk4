@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x102c4d70 */
+/* HASH CRC-32:0xf1db4429 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -184,22 +184,17 @@
 #define __NR_sched_get_priority_min 0x7e  /* syscall_slong_t sched_get_priority_min(syscall_ulong_t algorithm) */
 #define __NR_sched_rr_get_interval  0x7f  /* errno_t sched_rr_get_interval(pid_t pid, struct timespec *tms) */
 #define __NR_restart_syscall        0x80  /* errno_t restart_syscall(void) */
-/* @param: signo: One of `SIG*' */
-#define __NR_kill                   0x81  /* errno_t kill(pid_t pid, syscall_ulong_t signo) */
-/* @param: signo: One of `SIG*' */
-#define __NR_tkill                  0x82  /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
-/* @param: signo: One of `SIG*' */
-#define __NR_tgkill                 0x83  /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
+#define __NR_kill                   0x81  /* errno_t kill(pid_t pid, signo_t signo) */
+#define __NR_tkill                  0x82  /* errno_t tkill(pid_t tid, signo_t signo) */
+#define __NR_tgkill                 0x83  /* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
 #define __NR_sigaltstack            0x84  /* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
 #define __NR_rt_sigsuspend          0x85  /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
-/* @param: signo: One of `SIG*' */
-#define __NR_rt_sigaction           0x86  /* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) */
+#define __NR_rt_sigaction           0x86  /* errno_t rt_sigaction(signo_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define __NR_rt_sigprocmask         0x87  /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
 #define __NR_rt_sigpending          0x88  /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */
 #define __NR_rt_sigtimedwait        0x89  /* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo_struct *info, struct timespec const *timeout, size_t sigsetsize) */
-/* @param: signo: One of `SIG*' */
-#define __NR_rt_sigqueueinfo        0x8a  /* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfo_struct const *uinfo) */
+#define __NR_rt_sigqueueinfo        0x8a  /* errno_t rt_sigqueueinfo(pid_t tgid, signo_t signo, struct __siginfo_struct const *uinfo) */
 #define __NR_rt_sigreturn           0x8b  /* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
 /* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 #define __NR_setpriority            0x8c  /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
@@ -339,8 +334,7 @@
 #define __NR_set_mempolicy          0xed  /* errno_t set_mempolicy(int TODO_PROTOTYPE) */
 #define __NR_migrate_pages          0xee  /* errno_t migrate_pages(int TODO_PROTOTYPE) */
 #define __NR_move_pages             0xef  /* errno_t move_pages(int TODO_PROTOTYPE) */
-/* @param: signo: One of `SIG*' */
-#define __NR_rt_tgsigqueueinfo      0xf0  /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo_struct const *uinfo) */
+#define __NR_rt_tgsigqueueinfo      0xf0  /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t signo, struct __siginfo_struct const *uinfo) */
 #define __NR_perf_event_open        0xf1  /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 /* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
 #define __NR_accept4                0xf2  /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */

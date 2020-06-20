@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb171324d */
+/* HASH CRC-32:0x84982411 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,8 +71,7 @@
 #define SYS_nice                    __NR_nice                    /* errno_t nice(syscall_slong_t inc) */
 #define SYS_ftime                   __NR_ftime                   /* errno_t ftime(struct timebx32 *tp) */
 #define SYS_sync                    __NR_sync                    /* errno_t sync(void) */
-/* @param: signo: One of `SIG*' */
-#define SYS_kill                    __NR_kill                    /* errno_t kill(pid_t pid, syscall_ulong_t signo) */
+#define SYS_kill                    __NR_kill                    /* errno_t kill(pid_t pid, signo_t signo) */
 #define SYS_rename                  __NR_rename                  /* errno_t rename(char const *oldname, char const *newname_or_path) */
 #define SYS_mkdir                   __NR_mkdir                   /* errno_t mkdir(char const *pathname, mode_t mode) */
 #define SYS_rmdir                   __NR_rmdir                   /* errno_t rmdir(char const *path) */
@@ -83,8 +82,7 @@
 #define SYS_brk                     __NR_brk                     /* errno_t brk(void *addr) */
 #define SYS_setgid                  __NR_setgid                  /* errno_t setgid(uint16_t gid) */
 #define SYS_getgid                  __NR_getgid                  /* uint16_t getgid(void) */
-/* @param: signo: One of `SIG*' */
-#define SYS_signal                  __NR_signal                  /* sighandler_t signal(syscall_ulong_t signo, sighandler_t handler) */
+#define SYS_signal                  __NR_signal                  /* sighandler_t signal(signo_t signo, sighandler_t handler) */
 #define SYS_geteuid                 __NR_geteuid                 /* uint16_t geteuid(void) */
 #define SYS_getegid                 __NR_getegid                 /* uint16_t getegid(void) */
 #define SYS_acct                    __NR_acct                    /* errno_t acct(char const *filename) */
@@ -103,7 +101,7 @@
 #define SYS_getppid                 __NR_getppid                 /* pid_t getppid(void) */
 #define SYS_getpgrp                 __NR_getpgrp                 /* pid_t getpgrp(void) */
 #define SYS_setsid                  __NR_setsid                  /* pid_t setsid(void) */
-#define SYS_sigaction               __NR_sigaction               /* errno_t sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
+#define SYS_sigaction               __NR_sigaction               /* errno_t sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
 #define SYS_sgetmask                __NR_sgetmask                /* syscall_ulong_t sgetmask(void) */
 #define SYS_ssetmask                __NR_ssetmask                /* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
 #define SYS_setreuid                __NR_setreuid                /* errno_t setreuid(uint16_t ruid, uint16_t euid) */
@@ -245,13 +243,12 @@
  * The order chosen is also important, as it is selected such that arguments
  * are only passed through registers that are preserved by CDECL */
 #define SYS_rt_sigreturn            __NR_rt_sigreturn            /* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
-#define SYS_rt_sigaction            __NR_rt_sigaction            /* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
+#define SYS_rt_sigaction            __NR_rt_sigaction            /* errno_t rt_sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define SYS_rt_sigprocmask          __NR_rt_sigprocmask          /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
 #define SYS_rt_sigpending           __NR_rt_sigpending           /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */
 #define SYS_rt_sigtimedwait         __NR_rt_sigtimedwait         /* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
-/* @param: signo: One of `SIG*' */
-#define SYS_rt_sigqueueinfo         __NR_rt_sigqueueinfo         /* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
+#define SYS_rt_sigqueueinfo         __NR_rt_sigqueueinfo         /* errno_t rt_sigqueueinfo(pid_t tgid, signo_t signo, struct __siginfox32_struct const *uinfo) */
 #define SYS_rt_sigsuspend           __NR_rt_sigsuspend           /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define SYS_pread64                 __NR_pread64                 /* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
 #define SYS_pwrite64                __NR_pwrite64                /* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */
@@ -312,8 +309,7 @@
 #define SYS_removexattr             __NR_removexattr             /* errno_t removexattr(char const *path, char const *name) */
 #define SYS_lremovexattr            __NR_lremovexattr            /* errno_t lremovexattr(char const *path, char const *name) */
 #define SYS_fremovexattr            __NR_fremovexattr            /* errno_t fremovexattr(fd_t fd, char const *name) */
-/* @param: signo: One of `SIG*' */
-#define SYS_tkill                   __NR_tkill                   /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
+#define SYS_tkill                   __NR_tkill                   /* errno_t tkill(pid_t tid, signo_t signo) */
 #define SYS_sendfile64              __NR_sendfile64              /* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 /* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 #define SYS_futex                   __NR_futex                   /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
@@ -347,8 +343,7 @@
 #define SYS_clock_nanosleep         __NR_clock_nanosleep         /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32 const *requested_time, struct timespecx32 *remaining) */
 #define SYS_statfs64                __NR_statfs64                /* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
 #define SYS_fstatfs64               __NR_fstatfs64               /* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
-/* @param: signo: One of `SIG*' */
-#define SYS_tgkill                  __NR_tgkill                  /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
+#define SYS_tgkill                  __NR_tgkill                  /* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
 #define SYS_utimes                  __NR_utimes                  /* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 #define SYS_fadvise64_64            __NR_fadvise64_64            /* errno_t fadvise64_64(int TODO_PROTOTYPE) */
 #define SYS_vserver                 __NR_vserver                 /* errno_t vserver(int TODO_PROTOTYPE) */
@@ -442,8 +437,7 @@
 #define SYS_inotify_init1           __NR_inotify_init1           /* errno_t inotify_init1(int TODO_PROTOTYPE) */
 #define SYS_preadv                  __NR_preadv                  /* ssize_t preadv(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 #define SYS_pwritev                 __NR_pwritev                 /* ssize_t pwritev(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
-/* @param: signo: One of `SIG*' */
-#define SYS_rt_tgsigqueueinfo       __NR_rt_tgsigqueueinfo       /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
+#define SYS_rt_tgsigqueueinfo       __NR_rt_tgsigqueueinfo       /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t signo, struct __siginfox32_struct const *uinfo) */
 #define SYS_perf_event_open         __NR_perf_event_open         /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |

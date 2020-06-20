@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8559986 */
+/* HASH CRC-32:0x5dba2651 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -834,7 +834,7 @@
 #define __NR64AT0_munmap                 (void *, void *)
 #define __NR64AT1_munmap                 (size_t, __size_t)
 #define __NR64AT0_brk                    (void *, void *)
-#define __NR64AT0_rt_sigaction           (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT0_rt_sigaction           (signo_t, __signo_t)
 #define __NR64AT1_rt_sigaction           (struct sigactionx64 const *, struct __sigactionx64 const *)
 #define __NR64AT2_rt_sigaction           (struct sigactionx64 *, struct __sigactionx64 *)
 #define __NR64AT3_rt_sigaction           (size_t, __size_t)
@@ -967,7 +967,7 @@
 #define __NR64AT2_wait4                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT3_wait4                  (struct rusagex64 *, struct __rusagex64 *)
 #define __NR64AT0_kill                   (pid_t, __pid_t)
-#define __NR64AT1_kill                   (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_kill                   (signo_t, __signo_t)
 #define __NR64AT0_uname                  (struct utsname *, struct utsname *)
 #define __NR64AT0_semget                 (int, int)
 #define __NR64AT0_semop                  (int, int)
@@ -1076,7 +1076,7 @@
 #define __NR64AT2_rt_sigtimedwait        (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT3_rt_sigtimedwait        (size_t, __size_t)
 #define __NR64AT0_rt_sigqueueinfo        (pid_t, __pid_t)
-#define __NR64AT1_rt_sigqueueinfo        (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_rt_sigqueueinfo        (signo_t, __signo_t)
 #define __NR64AT2_rt_sigqueueinfo        (struct __siginfox64_struct const *, struct __siginfox64_struct const *)
 #define __NR64AT0_rt_sigsuspend          (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NR64AT1_rt_sigsuspend          (size_t, __size_t)
@@ -1209,7 +1209,7 @@
 #define __NR64AT0_fremovexattr           (fd_t, __fd_t)
 #define __NR64AT1_fremovexattr           (char const *, char const *)
 #define __NR64AT0_tkill                  (pid_t, __pid_t)
-#define __NR64AT1_tkill                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_tkill                  (signo_t, __signo_t)
 #define __NR64AT0_time                   (time32_t *, __time32_t *)
 #define __NR64AT0_futex                  (uint32_t *, __uint32_t *)
 #define __NR64AT1_futex                  (syscall_ulong_t, __syscall_ulong_t)
@@ -1283,7 +1283,7 @@
 #define __NR64AT3_epoll_ctl              (struct epoll_event *, struct epoll_event *)
 #define __NR64AT0_tgkill                 (pid_t, __pid_t)
 #define __NR64AT1_tgkill                 (pid_t, __pid_t)
-#define __NR64AT2_tgkill                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT2_tgkill                 (signo_t, __signo_t)
 #define __NR64AT0_utimes                 (char const *, char const *)
 #define __NR64AT1_utimes                 (struct timevalx64 const *, struct __timevalx64 const *)
 #define __NR64AT0_vserver                (int, int)
@@ -1462,7 +1462,7 @@
 #define __NR64AT3_pwritev                (uint64_t, __uint64_t)
 #define __NR64AT0_rt_tgsigqueueinfo      (pid_t, __pid_t)
 #define __NR64AT1_rt_tgsigqueueinfo      (pid_t, __pid_t)
-#define __NR64AT2_rt_tgsigqueueinfo      (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT2_rt_tgsigqueueinfo      (signo_t, __signo_t)
 #define __NR64AT3_rt_tgsigqueueinfo      (struct __siginfox64_struct const *, struct __siginfox64_struct const *)
 #define __NR64AT0_perf_event_open        (int, int)
 #define __NR64AT0_recvmmsg               (fd_t, __fd_t)
@@ -1723,7 +1723,7 @@
 #define __NR64AM_mprotect(a, b, c, d, e, f)               (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NR64AM_munmap(a, b, c, d, e, f)                 (void *)a, (__size_t)b
 #define __NR64AM_brk(a, b, c, d, e, f)                    (void *)a
-#define __NR64AM_rt_sigaction(a, b, c, d, e, f)           (__syscall_ulong_t)a, (struct __sigactionx64 const *)b, (struct __sigactionx64 *)c, (__size_t)d
+#define __NR64AM_rt_sigaction(a, b, c, d, e, f)           (__signo_t)a, (struct __sigactionx64 const *)b, (struct __sigactionx64 *)c, (__size_t)d
 #define __NR64AM_rt_sigprocmask(a, b, c, d, e, f)         (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NR64AM_rt_sigreturn(a, b, c, d, e, f)           /* nothing */
 #define __NR64AM_ioctl(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (void *)c
@@ -1772,7 +1772,7 @@
 #define __NR64AM_execve(a, b, c, d, e, f)                 (char const *)a, (__HYBRID_PTR64(char const) const *)b, (__HYBRID_PTR64(char const) const *)c
 #define __NR64AM_exit(a, b, c, d, e, f)                   (__syscall_ulong_t)a
 #define __NR64AM_wait4(a, b, c, d, e, f)                  (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct __rusagex64 *)d
-#define __NR64AM_kill(a, b, c, d, e, f)                   (__pid_t)a, (__syscall_ulong_t)b
+#define __NR64AM_kill(a, b, c, d, e, f)                   (__pid_t)a, (__signo_t)b
 #define __NR64AM_uname(a, b, c, d, e, f)                  (struct utsname *)a
 #define __NR64AM_semget(a, b, c, d, e, f)                 (int)a
 #define __NR64AM_semop(a, b, c, d, e, f)                  (int)a
@@ -1839,7 +1839,7 @@
 #define __NR64AM_capset(a, b, c, d, e, f)                 (int)a
 #define __NR64AM_rt_sigpending(a, b, c, d, e, f)          (struct __sigset_struct *)a, (__size_t)b
 #define __NR64AM_rt_sigtimedwait(a, b, c, d, e, f)        (struct __sigset_struct const *)a, (struct __siginfox64_struct *)b, (struct __timespecx64 const *)c, (__size_t)d
-#define __NR64AM_rt_sigqueueinfo(a, b, c, d, e, f)        (__pid_t)a, (__syscall_ulong_t)b, (struct __siginfox64_struct const *)c
+#define __NR64AM_rt_sigqueueinfo(a, b, c, d, e, f)        (__pid_t)a, (__signo_t)b, (struct __siginfox64_struct const *)c
 #define __NR64AM_rt_sigsuspend(a, b, c, d, e, f)          (struct __sigset_struct const *)a, (__size_t)b
 #define __NR64AM_sigaltstack(a, b, c, d, e, f)            (struct __sigaltstackx64 const *)a, (struct __sigaltstackx64 *)b
 #define __NR64AM_utime(a, b, c, d, e, f)                  (char const *)a, (struct __utimbufx64 const *)b
@@ -1910,7 +1910,7 @@
 #define __NR64AM_removexattr(a, b, c, d, e, f)            (char const *)a, (char const *)b
 #define __NR64AM_lremovexattr(a, b, c, d, e, f)           (char const *)a, (char const *)b
 #define __NR64AM_fremovexattr(a, b, c, d, e, f)           (__fd_t)a, (char const *)b
-#define __NR64AM_tkill(a, b, c, d, e, f)                  (__pid_t)a, (__syscall_ulong_t)b
+#define __NR64AM_tkill(a, b, c, d, e, f)                  (__pid_t)a, (__signo_t)b
 #define __NR64AM_time(a, b, c, d, e, f)                   (__time32_t *)a
 #define __NR64AM_futex(a, b, c, d, e, f)                  (__uint32_t *)a, (__syscall_ulong_t)b, (__uint32_t)c, (struct __timespecx64 const *)d, (__uint32_t *)e, (__uint32_t)f
 #define __NR64AM_sched_setaffinity(a, b, c, d, e, f)      (__pid_t)a, (__size_t)b, (struct __cpu_set_struct const *)c
@@ -1944,7 +1944,7 @@
 #define __NR64AM_exit_group(a, b, c, d, e, f)             (__syscall_ulong_t)a
 #define __NR64AM_epoll_wait(a, b, c, d, e, f)             (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d
 #define __NR64AM_epoll_ctl(a, b, c, d, e, f)              (__fd_t)a, (__syscall_ulong_t)b, (__fd_t)c, (struct epoll_event *)d
-#define __NR64AM_tgkill(a, b, c, d, e, f)                 (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c
+#define __NR64AM_tgkill(a, b, c, d, e, f)                 (__pid_t)a, (__pid_t)b, (__signo_t)c
 #define __NR64AM_utimes(a, b, c, d, e, f)                 (char const *)a, (struct __timevalx64 const *)b
 #define __NR64AM_vserver(a, b, c, d, e, f)                (int)a
 #define __NR64AM_mbind(a, b, c, d, e, f)                  (int)a
@@ -2007,7 +2007,7 @@
 #define __NR64AM_inotify_init1(a, b, c, d, e, f)          (int)a
 #define __NR64AM_preadv(a, b, c, d, e, f)                 (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__uint64_t)d
 #define __NR64AM_pwritev(a, b, c, d, e, f)                (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__uint64_t)d
-#define __NR64AM_rt_tgsigqueueinfo(a, b, c, d, e, f)      (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c, (struct __siginfox64_struct const *)d
+#define __NR64AM_rt_tgsigqueueinfo(a, b, c, d, e, f)      (__pid_t)a, (__pid_t)b, (__signo_t)c, (struct __siginfox64_struct const *)d
 #define __NR64AM_perf_event_open(a, b, c, d, e, f)        (int)a
 #define __NR64AM_recvmmsg(a, b, c, d, e, f)               (__fd_t)a, (struct __mmsghdrx64 *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespecx64 const *)e
 #define __NR64AM_fanotify_init(a, b, c, d, e, f)          (int)a

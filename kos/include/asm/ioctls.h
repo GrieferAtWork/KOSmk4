@@ -83,7 +83,7 @@
 #define TCSETX              _IO('T', 0x33)
 #define TCSETXF             _IO('T', 0x34)
 #define TCSETXW             _IO('T', 0x35)
-#define TIOCSIG            _IOW('T', 0x36, int) /* pty: generate signal */
+#define TIOCSIG            _IOW('T', 0x36, __signo_t) /* pty: generate signal */
 #define TIOCVHANGUP         _IO('T', 0x37)
 #define TIOCGPKT           _IOR('T', 0x38, int) /* Get packet mode state */
 #define TIOCGPTLCK         _IOR('T', 0x39, int) /* Get Pty lock state */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7f31aca */
+/* HASH CRC-32:0xa93fbd4b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,8 +23,9 @@
 #include <__crt.h>
 #include <bits/signum-values.h>
 #ifdef __SIGRTMIN
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__libc_current_sigrtmin) __ATTR_CONST __ATTR_WUNUSED int
+__LOCAL_LIBC(__libc_current_sigrtmin) __ATTR_CONST __ATTR_WUNUSED __signo_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__libc_current_sigrtmin))(void) {
 	return __SIGRTMIN;
 }

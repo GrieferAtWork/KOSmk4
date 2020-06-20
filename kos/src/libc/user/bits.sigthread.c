@@ -41,9 +41,9 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_pthread_sigmask,hash:CRC-32=0xa43ff15a]]]*/
+/*[[[head:libc_pthread_sigmask,hash:CRC-32=0xc71e4057]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.pthread") int
-NOTHROW_NCX(LIBCCALL libc_pthread_sigmask)(int how,
+NOTHROW_NCX(LIBCCALL libc_pthread_sigmask)(__STDC_INT_AS_UINT_T how,
                                            sigset_t const *newmask,
                                            sigset_t *oldmask)
 /*[[[body:libc_pthread_sigmask]]]*/
@@ -60,10 +60,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_sigmask)(int how,
 }
 /*[[[end:libc_pthread_sigmask]]]*/
 
-/*[[[head:libc_pthread_kill,hash:CRC-32=0xc3a6d06f]]]*/
+/*[[[head:libc_pthread_kill,hash:CRC-32=0x39b95c95]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t threadid,
-                                        int signo)
+                                        signo_t signo)
 /*[[[body:libc_pthread_kill]]]*/
 {
 	struct pthread *pt = (struct pthread *)threadid;
@@ -79,10 +79,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t threadid,
 }
 /*[[[end:libc_pthread_kill]]]*/
 
-/*[[[head:libc_pthread_sigqueue,hash:CRC-32=0x4094fa66]]]*/
+/*[[[head:libc_pthread_sigqueue,hash:CRC-32=0x2015b83d]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.pthread") int
 NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t threadid,
-                                            int signo,
+                                            signo_t signo,
                                             union sigval const value)
 /*[[[body:libc_pthread_sigqueue]]]*/
 {

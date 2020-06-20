@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26cca40d */
+/* HASH CRC-32:0x511741f1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,8 +68,7 @@
 #define __NR32_nice                    0x22                   /* errno_t nice(syscall_slong_t inc) */
 #define __NR32_ftime                   0x23                   /* errno_t ftime(struct timebx32 *tp) */
 #define __NR32_sync                    0x24                   /* errno_t sync(void) */
-/* @param: signo: One of `SIG*' */
-#define __NR32_kill                    0x25                   /* errno_t kill(pid_t pid, syscall_ulong_t signo) */
+#define __NR32_kill                    0x25                   /* errno_t kill(pid_t pid, signo_t signo) */
 #define __NR32_rename                  0x26                   /* errno_t rename(char const *oldname, char const *newname_or_path) */
 #define __NR32_mkdir                   0x27                   /* errno_t mkdir(char const *pathname, mode_t mode) */
 #define __NR32_rmdir                   0x28                   /* errno_t rmdir(char const *path) */
@@ -80,8 +79,7 @@
 #define __NR32_brk                     0x2d                   /* errno_t brk(void *addr) */
 #define __NR32_setgid                  0x2e                   /* errno_t setgid(uint16_t gid) */
 #define __NR32_getgid                  0x2f                   /* uint16_t getgid(void) */
-/* @param: signo: One of `SIG*' */
-#define __NR32_signal                  0x30                   /* sighandler_t signal(syscall_ulong_t signo, sighandler_t handler) */
+#define __NR32_signal                  0x30                   /* sighandler_t signal(signo_t signo, sighandler_t handler) */
 #define __NR32_geteuid                 0x31                   /* uint16_t geteuid(void) */
 #define __NR32_getegid                 0x32                   /* uint16_t getegid(void) */
 #define __NR32_acct                    0x33                   /* errno_t acct(char const *filename) */
@@ -100,7 +98,7 @@
 #define __NR32_getppid                 0x40                   /* pid_t getppid(void) */
 #define __NR32_getpgrp                 0x41                   /* pid_t getpgrp(void) */
 #define __NR32_setsid                  0x42                   /* pid_t setsid(void) */
-#define __NR32_sigaction               0x43                   /* errno_t sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
+#define __NR32_sigaction               0x43                   /* errno_t sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
 #define __NR32_sgetmask                0x44                   /* syscall_ulong_t sgetmask(void) */
 #define __NR32_ssetmask                0x45                   /* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
 #define __NR32_setreuid                0x46                   /* errno_t setreuid(uint16_t ruid, uint16_t euid) */
@@ -242,13 +240,12 @@
  * The order chosen is also important, as it is selected such that arguments
  * are only passed through registers that are preserved by CDECL */
 #define __NR32_rt_sigreturn            0xad                   /* void rt_sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
-#define __NR32_rt_sigaction            0xae                   /* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
+#define __NR32_rt_sigaction            0xae                   /* errno_t rt_sigaction(signo_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define __NR32_rt_sigprocmask          0xaf                   /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
 #define __NR32_rt_sigpending           0xb0                   /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */
 #define __NR32_rt_sigtimedwait         0xb1                   /* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
-/* @param: signo: One of `SIG*' */
-#define __NR32_rt_sigqueueinfo         0xb2                   /* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
+#define __NR32_rt_sigqueueinfo         0xb2                   /* errno_t rt_sigqueueinfo(pid_t tgid, signo_t signo, struct __siginfox32_struct const *uinfo) */
 #define __NR32_rt_sigsuspend           0xb3                   /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define __NR32_pread64                 0xb4                   /* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
 #define __NR32_pwrite64                0xb5                   /* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */
@@ -309,8 +306,7 @@
 #define __NR32_removexattr             0xeb                   /* errno_t removexattr(char const *path, char const *name) */
 #define __NR32_lremovexattr            0xec                   /* errno_t lremovexattr(char const *path, char const *name) */
 #define __NR32_fremovexattr            0xed                   /* errno_t fremovexattr(fd_t fd, char const *name) */
-/* @param: signo: One of `SIG*' */
-#define __NR32_tkill                   0xee                   /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
+#define __NR32_tkill                   0xee                   /* errno_t tkill(pid_t tid, signo_t signo) */
 #define __NR32_sendfile64              0xef                   /* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 /* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 #define __NR32_futex                   0xf0                   /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
@@ -344,8 +340,7 @@
 #define __NR32_clock_nanosleep         0x10b                  /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32 const *requested_time, struct timespecx32 *remaining) */
 #define __NR32_statfs64                0x10c                  /* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
 #define __NR32_fstatfs64               0x10d                  /* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
-/* @param: signo: One of `SIG*' */
-#define __NR32_tgkill                  0x10e                  /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
+#define __NR32_tgkill                  0x10e                  /* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
 #define __NR32_utimes                  0x10f                  /* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 #define __NR32_fadvise64_64            0x110                  /* errno_t fadvise64_64(int TODO_PROTOTYPE) */
 #define __NR32_vserver                 0x111                  /* errno_t vserver(int TODO_PROTOTYPE) */
@@ -439,8 +434,7 @@
 #define __NR32_inotify_init1           0x14c                  /* errno_t inotify_init1(int TODO_PROTOTYPE) */
 #define __NR32_preadv                  0x14d                  /* ssize_t preadv(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 #define __NR32_pwritev                 0x14e                  /* ssize_t pwritev(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
-/* @param: signo: One of `SIG*' */
-#define __NR32_rt_tgsigqueueinfo       0x14f                  /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
+#define __NR32_rt_tgsigqueueinfo       0x14f                  /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t signo, struct __siginfox32_struct const *uinfo) */
 #define __NR32_perf_event_open         0x150                  /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |

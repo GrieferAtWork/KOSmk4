@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdb526f2 */
+/* HASH CRC-32:0xf49129ae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,8 +71,8 @@ DFUN(".text.crt.dos.sched.access", libd_exit_thread, libc_exit_thread, TV, 1, TD
 
 /* bits.sigthread */
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_sigmask, libc_pthread_sigmask, TD, 3, TD, TP, TP)
-DFUN(".text.crt.dos.sched.pthread", libd_pthread_kill, libc_pthread_kill, TD, 2, TIn(__SIZEOF_PTHREAD_T), TD)
-DFUN(".text.crt.dos.sched.pthread", libd_pthread_sigqueue, libc_pthread_sigqueue, TD, 3, TIn(__SIZEOF_PTHREAD_T), TD, TS(__SIZEOF_SIGVAL CONST))
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_kill, libc_pthread_kill, TD, 2, TIn(__SIZEOF_PTHREAD_T), TIn(__SIZEOF_SIGNO_T__))
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_sigqueue, libc_pthread_sigqueue, TD, 3, TIn(__SIZEOF_PTHREAD_T), TIn(__SIZEOF_SIGNO_T__), TS(__SIZEOF_SIGVAL CONST))
 
 /* crypt */
 DFUN(".text.crt.dos.string.encrypt", libd_setkey, libc_setkey, TV, 1, TP)
@@ -1099,25 +1099,19 @@ DFUN(".text.crt.dos.database.shadow", libd_sgetspent_r, libc_sgetspent_r, TD, 5,
 DFUN(".text.crt.dos.database.shadow", libd_fgetspent_r, libc_fgetspent_r, TD, 5, TP, TP, TP, TI, TP)
 
 /* signal */
-DFUN(".text.crt.dos.sched.signal", libd_raise, libc_raise, TD, 1, TD)
-DFUN(".text.crt.dos.sched.signal", libd_sysv_signal, libc_sysv_signal, TP, 2, TD, TP)
-DFUN(".text.crt.dos.sched.signal", libd_signal, libc_signal, TP, 2, TD, TP)
-DFUN(".text.crt.dos.sched.signal", libd_ssignal, libc_ssignal, TP, 2, TD, TP)
-DFUN(".text.crt.dos.sched.signal", libd_gsignal, libc_gsignal, TD, 1, TD)
 DFUN(".text.crt.dos.sched.signal", libd_sigblock, libc_sigblock, TD, 1, TD)
 DFUN(".text.crt.dos.sched.signal", libd_sigsetmask, libc_sigsetmask, TD, 1, TD)
 DFUN(".text.crt.dos.sched.signal", libd_sigreturn, libc_sigreturn, TV, 1, TP)
-DFUN(".text.crt.dos.sched.signal", libd_bsd_signal, libc_bsd_signal, TP, 2, TD, TP)
-DFUN(".text.crt.dos.sched.signal", libd___xpg_sigpause, libc___xpg_sigpause, TD, 1, TD)
-DFUN(".text.crt.dos.sched.signal", libd_kill, libc_kill, TD, 2, TIn(__SIZEOF_PID_T__), TD)
+DFUN(".text.crt.dos.sched.signal", libd___xpg_sigpause, libc___xpg_sigpause, TD, 1, TIn(__SIZEOF_SIGNO_T__))
+DFUN(".text.crt.dos.sched.signal", libd_kill, libc_kill, TD, 2, TIn(__SIZEOF_PID_T__), TIn(__SIZEOF_SIGNO_T__))
 DFUN(".text.crt.dos.sched.signal", libd_sigemptyset, libc_sigemptyset, TD, 1, TP)
 DFUN(".text.crt.dos.sched.signal", libd_sigfillset, libc_sigfillset, TD, 1, TP)
-DFUN(".text.crt.dos.sched.signal", libd_sigaddset, libc_sigaddset, TD, 2, TP, TD)
-DFUN(".text.crt.dos.sched.signal", libd_sigdelset, libc_sigdelset, TD, 2, TP, TD)
-DFUN(".text.crt.dos.sched.signal", libd_sigismember, libc_sigismember, TD, 2, TP, TD)
+DFUN(".text.crt.dos.sched.signal", libd_sigaddset, libc_sigaddset, TD, 2, TP, TIn(__SIZEOF_SIGNO_T__))
+DFUN(".text.crt.dos.sched.signal", libd_sigdelset, libc_sigdelset, TD, 2, TP, TIn(__SIZEOF_SIGNO_T__))
+DFUN(".text.crt.dos.sched.signal", libd_sigismember, libc_sigismember, TD, 2, TP, TIn(__SIZEOF_SIGNO_T__))
 DFUN(".text.crt.dos.sched.signal", libd_sigprocmask, libc_sigprocmask, TD, 3, TD, TP, TP)
 DFUN(".text.crt.dos.sched.signal", libd_sigsuspend, libc_sigsuspend, TD, 1, TP)
-DFUN(".text.crt.dos.sched.signal", libd_sigaction, libc_sigaction, TD, 3, TD, TP, TP)
+DFUN(".text.crt.dos.sched.signal", libd_sigaction, libc_sigaction, TD, 3, TIn(__SIZEOF_SIGNO_T__), TP, TP)
 DFUN(".text.crt.dos.sched.signal", libd_sigpending, libc_sigpending, TD, 1, TP)
 DFUN(".text.crt.dos.sched.signal", libd_sigwait, libc_sigwait, TD, 2, TP, TP)
 DFUN(".text.crt.dos.sched.signal", libd_sigisemptyset, libc_sigisemptyset, TD, 1, TP)
@@ -1125,20 +1119,20 @@ DFUN(".text.crt.dos.sched.signal", libd_sigandset, libc_sigandset, TD, 3, TP, TP
 DFUN(".text.crt.dos.sched.signal", libd_sigorset, libc_sigorset, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.sched.signal", libd_sigwaitinfo, libc_sigwaitinfo, TD, 2, TP, TP)
 DFUN(".text.crt.dos.sched.signal", libd_sigtimedwait, libc_sigtimedwait, TD, 3, TP, TP, TP)
-DFUN(".text.crt.dos.sched.signal", libd_sigqueue, libc_sigqueue, TD, 3, TIn(__SIZEOF_PID_T__), TD, TS(__SIZEOF_SIGVAL CONST))
+DFUN(".text.crt.dos.sched.signal", libd_sigqueue, libc_sigqueue, TD, 3, TIn(__SIZEOF_PID_T__), TIn(__SIZEOF_SIGNO_T__), TS(__SIZEOF_SIGVAL CONST))
 DFUN(".text.crt.dos.sched.signal", libd_sigtimedwait64, libc_sigtimedwait64, TD, 3, TP, TP, TP)
-DFUN(".text.crt.dos.sched.signal", libd_sigqueueinfo, libc_sigqueueinfo, TD, 3, TIn(__SIZEOF_PID_T__), TD, TP)
-DFUN(".text.crt.dos.sched.signal", libd_tgsigqueueinfo, libc_tgsigqueueinfo, TD, 4, TIn(__SIZEOF_PID_T__), TIn(__SIZEOF_PID_T__), TD, TP)
-DFUN(".text.crt.dos.sched.signal", libd_killpg, libc_killpg, TD, 2, TIn(__SIZEOF_PID_T__), TD)
-DFUN(".text.crt.dos.sched.signal", libd_psignal, libc_psignal, TV, 2, TD, TP)
+DFUN(".text.crt.dos.sched.signal", libd_sigqueueinfo, libc_sigqueueinfo, TD, 3, TIn(__SIZEOF_PID_T__), TIn(__SIZEOF_SIGNO_T__), TP)
+DFUN(".text.crt.dos.sched.signal", libd_tgsigqueueinfo, libc_tgsigqueueinfo, TD, 4, TIn(__SIZEOF_PID_T__), TIn(__SIZEOF_PID_T__), TIn(__SIZEOF_SIGNO_T__), TP)
+DFUN(".text.crt.dos.sched.signal", libd_killpg, libc_killpg, TD, 2, TIn(__SIZEOF_PID_T__), TIn(__SIZEOF_SIGNO_T__))
+DFUN(".text.crt.dos.sched.signal", libd_psignal, libc_psignal, TV, 2, TIn(__SIZEOF_SIGNO_T__), TP)
 DFUN(".text.crt.dos.sched.signal", libd_psiginfo, libc_psiginfo, TV, 2, TP, TP)
-DFUN(".text.crt.dos.sched.signal", libd_siginterrupt, libc_siginterrupt, TD, 2, TD, TD)
+DFUN(".text.crt.dos.sched.signal", libd_siginterrupt, libc_siginterrupt, TD, 2, TIn(__SIZEOF_SIGNO_T__), TD)
 DFUN(".text.crt.dos.sched.signal", libd_sigstack, libc_sigstack, TD, 2, TP, TP)
 DFUN(".text.crt.dos.sched.signal", libd_sigaltstack, libc_sigaltstack, TD, 2, TP, TP)
-DFUN(".text.crt.dos.sched.signal", libd_sighold, libc_sighold, TD, 1, TD)
-DFUN(".text.crt.dos.sched.signal", libd_sigrelse, libc_sigrelse, TD, 1, TD)
-DFUN(".text.crt.dos.sched.signal", libd_sigignore, libc_sigignore, TD, 1, TD)
-DFUN(".text.crt.dos.sched.signal", libd_sigset, libc_sigset, TP, 2, TD, TP)
+DFUN(".text.crt.dos.sched.signal", libd_sighold, libc_sighold, TD, 1, TIn(__SIZEOF_SIGNO_T__))
+DFUN(".text.crt.dos.sched.signal", libd_sigrelse, libc_sigrelse, TD, 1, TIn(__SIZEOF_SIGNO_T__))
+DFUN(".text.crt.dos.sched.signal", libd_sigignore, libc_sigignore, TD, 1, TIn(__SIZEOF_SIGNO_T__))
+DFUN(".text.crt.dos.sched.signal", libd_sigset, libc_sigset, TP, 2, TIn(__SIZEOF_SIGNO_T__), TP)
 
 /* spawn */
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn, libc_posix_spawn, TD, 6, TP, TP, TP, TP, TP, TP)

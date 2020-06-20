@@ -26,13 +26,14 @@
 
 #include <assert.h>
 #include <signal.h>
+#include <kos/types.h>
 #include <system-test/ctest.h>
 
 DECL_BEGIN
 
 PRIVATE sig_atomic_t hand_called = 0;
 
-PRIVATE void myhand(int signo) {
+PRIVATE void myhand(signo_t signo) {
 	assert(signo == SIGUSR1);
 	++hand_called;
 }

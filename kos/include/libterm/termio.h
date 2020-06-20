@@ -62,7 +62,7 @@ typedef __ATTR_NONNULL((1, 2)) __ssize_t
  * @return: < 0:  An error status that should be propagated immediately. */
 typedef __ATTR_NONNULL((1)) __ssize_t
 (LIBTERM_CC *pterminal_raise_t)(struct terminal *__restrict self,
-                                unsigned int signo);
+                                __signo_t signo);
 
 /* Check if the calling process's group leader is apart of the foreground process
  * group associated with the given terminal `self'. - If it is, return 0. Otherwise,

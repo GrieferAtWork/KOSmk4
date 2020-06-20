@@ -71,7 +71,7 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
                     syscall_ulong_t unwind_error) {
 	struct ucpustate curr_ustate, orig_ustate;
 	void **utb_vector;
-	unsigned int signo = SIGABRT;
+	signo_t signo = SIGABRT;
 	validate_readable_opt(exception,
 	                      unwind_error == UNWIND_SUCCESS ? sizeof(struct NAME(exception_data))
 	                                                     : sizeof(NAME2(siginfox, _t)));

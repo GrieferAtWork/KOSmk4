@@ -300,8 +300,13 @@ typedef __syscall_ulong_t syscall_ulong_t;
 
 #ifndef __errno_t_defined
 #define __errno_t_defined 1
-typedef __errno_t errno_t;
-#endif /* !errno_t_defined */
+typedef __errno_t errno_t; /* Errno code (one of `E*' from <errno.h>) */
+#endif /* !__errno_t_defined */
+
+#ifndef __signo_t_defined
+#define __signo_t_defined 1
+typedef __signo_t signo_t; /* Signal number (one of `SIG*' from <bits/signum-values.h>) */
+#endif /* !__signo_t_defined */
 
 #ifndef __atflag_t_defined
 #define __atflag_t_defined 1

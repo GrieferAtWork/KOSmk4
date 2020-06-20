@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4bb4fa6 */
+/* HASH CRC-32:0xcfea37be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,11 @@
 #ifndef __local_sigdelset_defined
 #define __local_sigdelset_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #include <bits/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
-/* @param signo: One of `SIG*' */
 __LOCAL_LIBC(sigdelset) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigdelset))(struct __sigset_struct *__set, int __signo) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigdelset))(struct __sigset_struct *__set, __signo_t __signo) {
 	__ULONGPTR_TYPE__ __mask = __sigmask(__signo);
 	__ULONGPTR_TYPE__ __word = __sigword(__signo);
 	__set->__val[__word] &= ~__mask;

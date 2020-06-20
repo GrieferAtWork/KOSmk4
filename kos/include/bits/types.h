@@ -35,6 +35,9 @@ __DECL_BEGIN
 #ifndef __SIZEOF_ERRNO_T__
 #define __SIZEOF_ERRNO_T__          __SIZEOF_INT__
 #endif /* !__SIZEOF_ERRNO_T__ */
+#ifndef __SIZEOF_SIGNO_T__
+#define __SIZEOF_SIGNO_T__          __SIZEOF_INT__
+#endif /* !__SIZEOF_SIGNO_T__ */
 #ifndef __SIZEOF_OFLAG_T__
 #define __SIZEOF_OFLAG_T__          __SIZEOF_INT__
 #endif /* !__SIZEOF_OFLAG_T__ */
@@ -307,6 +310,10 @@ typedef __CRT_PRIVATE_ULNG(__SIZEOF_SYSCALL_LONG_T__) __syscall_ulong_t;
 #undef  __errno_t
 typedef __CRT_PRIVATE_SINT(__SIZEOF_ERRNO_T__) __errno_t;
 #define __errno_t __errno_t
+
+#undef  __signo_t
+typedef __CRT_PRIVATE_SINT(__SIZEOF_SIGNO_T__) __signo_t;
+#define __signo_t __signo_t
 
 #undef  __oflag_t
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)

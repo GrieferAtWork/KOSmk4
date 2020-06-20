@@ -1421,7 +1421,7 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_SEEK_WHENCE 1
 	// TODO: #define HAVE_SC_REPR_SIGMASK 1
 	// TODO: #define HAVE_SC_REPR_SIGNALFD4_FLAGS 1
-	// TODO: #define HAVE_SC_REPR_SIGNO 1
+	// TODO: #define HAVE_SC_REPR_SIGNO_T 1
 	// TODO: #define HAVE_SC_REPR_SIGPROCMASK_HOW 1
 	// TODO: #define HAVE_SC_REPR_SOCKETCALL_ARGS 1
 	// TODO: #define HAVE_SC_REPR_SOCKETCALL_CALL 1

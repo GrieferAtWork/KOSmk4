@@ -40,6 +40,9 @@ __SYSDECL_BEGIN
 #ifndef __ARCH_COMPAT_SIZEOF_ERRNO_T
 #define __ARCH_COMPAT_SIZEOF_ERRNO_T          __ARCH_COMPAT_SIZEOF_INT
 #endif /* !__ARCH_COMPAT_SIZEOF_ERRNO_T */
+#ifndef __ARCH_COMPAT_SIZEOF_SIGNO_T
+#define __ARCH_COMPAT_SIZEOF_SIGNO_T          __ARCH_COMPAT_SIZEOF_INT
+#endif /* !__ARCH_COMPAT_SIZEOF_SIGNO_T */
 #ifndef __ARCH_COMPAT_SIZEOF_OFLAG_T
 #define __ARCH_COMPAT_SIZEOF_OFLAG_T          __ARCH_COMPAT_SIZEOF_INT
 #endif /* !__ARCH_COMPAT_SIZEOF_OFLAG_T */
@@ -233,6 +236,10 @@ typedef __CRT_PRIVATE_ULNG(__ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T) __compat_syscall
 #undef  __compat_errno_t
 typedef __CRT_PRIVATE_SINT(__ARCH_COMPAT_SIZEOF_ERRNO_T) __compat_errno_t;
 #define __compat_errno_t __compat_errno_t
+
+#undef  __compat_signo_t
+typedef __CRT_PRIVATE_SINT(__ARCH_COMPAT_SIZEOF_SIGNO_T) __compat_signo_t;
+#define __compat_signo_t __compat_signo_t
 
 #undef  __compat_oflag_t
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)

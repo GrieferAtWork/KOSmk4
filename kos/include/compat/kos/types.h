@@ -171,7 +171,12 @@ typedef __compat_syscall_ulong_t compat_syscall_ulong_t;
 #ifndef __compat_errno_t_defined
 #define __compat_errno_t_defined 1
 typedef __compat_errno_t compat_errno_t;
-#endif /* !ercompat_rno_t_defined */
+#endif /* !__compat_errno_t_defined */
+
+#ifndef __compat_signo_t_defined
+#define __compat_signo_t_defined 1
+typedef __compat_signo_t compat_signo_t;
+#endif /* !__compat_signo_t_defined */
 
 #ifndef __compat_atflag_t_defined
 #define __compat_atflag_t_defined 1

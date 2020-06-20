@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c72451f */
+/* HASH CRC-32:0x11da6508 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1435,17 +1435,9 @@ DEFINE_PUBLIC_ALIAS(DOS$sgetspent_r, libd_sgetspent_r);
 DEFINE_PUBLIC_ALIAS(DOS$fgetspent_r, libd_fgetspent_r);
 
 /* signal */
-DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
-DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
-DEFINE_PUBLIC_ALIAS(DOS$sysv_signal, libd_sysv_signal);
-DEFINE_PUBLIC_ALIAS(DOS$_signal, libd_signal);
-DEFINE_PUBLIC_ALIAS(DOS$signal, libd_signal);
-DEFINE_PUBLIC_ALIAS(DOS$ssignal, libd_ssignal);
-DEFINE_PUBLIC_ALIAS(DOS$gsignal, libd_gsignal);
 DEFINE_PUBLIC_ALIAS(DOS$sigblock, libd_sigblock);
 DEFINE_PUBLIC_ALIAS(DOS$sigsetmask, libd_sigsetmask);
 DEFINE_PUBLIC_ALIAS(DOS$sigreturn, libd_sigreturn);
-DEFINE_PUBLIC_ALIAS(DOS$bsd_signal, libd_bsd_signal);
 DEFINE_PUBLIC_ALIAS(DOS$__xpg_sigpause, libd___xpg_sigpause);
 DEFINE_PUBLIC_ALIAS(DOS$kill, libd_kill);
 DEFINE_PUBLIC_ALIAS(DOS$sigemptyset, libd_sigemptyset);

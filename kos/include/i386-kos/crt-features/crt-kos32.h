@@ -4587,6 +4587,7 @@
 #define __CRT_HAVE_KOS$__strerror_r 1
 #define __CRT_HAVE_KOS$__sys_errlist 1
 #define __CRT_HAVE_KOS$__sys_nerr 1
+#define __CRT_HAVE_KOS$__sysv_signal 1
 #define __CRT_HAVE_KOS$__timezone 1
 #define __CRT_HAVE_KOS$__tzname 1
 #define __CRT_HAVE_KOS$__wcscasecmp_l 1
@@ -4637,6 +4638,7 @@
 #define __CRT_HAVE_KOS$_scwprintf_p 1
 #define __CRT_HAVE_KOS$_scwprintf_p_l 1
 #define __CRT_HAVE_KOS$_set_errno 1
+#define __CRT_HAVE_KOS$_signal 1
 #define __CRT_HAVE_KOS$_snwprintf_l 1
 #define __CRT_HAVE_KOS$_snwprintf_s 1
 #define __CRT_HAVE_KOS$_snwprintf_s_l 1
@@ -4791,6 +4793,7 @@
 #define __CRT_HAVE__wunlink 1
 #define __CRT_HAVE__wutime32 1
 #define __CRT_HAVE__wutime64 1
+#define __CRT_HAVE_KOS$bsd_signal 1
 #define __CRT_HAVE_KOS$btowc 1
 #define __CRT_HAVE_KOS$creat 1
 #define __CRT_HAVE_KOS$creat64 1
@@ -4838,6 +4841,7 @@
 #define __CRT_HAVE_KOS$getwc 1
 #define __CRT_HAVE_KOS$getwchar 1
 #define __CRT_HAVE_KOS$getwchar_unlocked 1
+#define __CRT_HAVE_KOS$gsignal 1
 #define __CRT_HAVE_KOS$lstat 1
 #define __CRT_HAVE_KOS$lstat64 1
 #define __CRT_HAVE_KOS$mbrlen 1
@@ -4855,6 +4859,9 @@
 #define __CRT_HAVE_KOS$putwc 1
 #define __CRT_HAVE_KOS$putwchar 1
 #define __CRT_HAVE_KOS$putwchar_unlocked 1
+#define __CRT_HAVE_KOS$raise 1
+#define __CRT_HAVE_KOS$signal 1
+#define __CRT_HAVE_KOS$ssignal 1
 #define __CRT_HAVE_KOS$stat 1
 #define __CRT_HAVE_KOS$stat64 1
 #define __CRT_HAVE_KOS$strerror 1
@@ -4867,6 +4874,7 @@
 #define __CRT_HAVE_KOS$swscanf 1
 #define __CRT_HAVE_KOS$sys_errlist 1
 #define __CRT_HAVE_KOS$sys_nerr 1
+#define __CRT_HAVE_KOS$sysv_signal 1
 #define __CRT_HAVE_KOS$ungetwc 1
 #define __CRT_HAVE_KOS$ungetwc_unlocked 1
 #define __CRT_HAVE_KOS$vfwprintf 1
@@ -5078,6 +5086,7 @@
 #define __CRT_HAVE_DOS$__strerror_r 1
 #define __CRT_HAVE_DOS$__sys_errlist 1
 #define __CRT_HAVE_DOS$__sys_nerr 1
+#define __CRT_HAVE_DOS$__sysv_signal 1
 #define __CRT_HAVE_DOS$__timezone 1
 #define __CRT_HAVE_DOS$__tzname 1
 #define __CRT_HAVE_DOS$__wcscasecmp_l 1
@@ -5128,6 +5137,7 @@
 #define __CRT_HAVE_DOS$_scwprintf_p 1
 #define __CRT_HAVE_DOS$_scwprintf_p_l 1
 #define __CRT_HAVE_DOS$_set_errno 1
+#define __CRT_HAVE_DOS$_signal 1
 #define __CRT_HAVE_DOS$_snwprintf_l 1
 #define __CRT_HAVE_DOS$_snwprintf_s 1
 #define __CRT_HAVE_DOS$_snwprintf_s_l 1
@@ -5282,6 +5292,7 @@
 #define __CRT_HAVE_DOS$_wunlink 1
 #define __CRT_HAVE_DOS$_wutime32 1
 #define __CRT_HAVE_DOS$_wutime64 1
+#define __CRT_HAVE_DOS$bsd_signal 1
 #define __CRT_HAVE_DOS$btowc 1
 #define __CRT_HAVE_DOS$creat 1
 #define __CRT_HAVE_DOS$creat64 1
@@ -5329,6 +5340,7 @@
 #define __CRT_HAVE_DOS$getwc 1
 #define __CRT_HAVE_DOS$getwchar 1
 #define __CRT_HAVE_DOS$getwchar_unlocked 1
+#define __CRT_HAVE_DOS$gsignal 1
 #define __CRT_HAVE_DOS$lstat 1
 #define __CRT_HAVE_DOS$lstat64 1
 #define __CRT_HAVE_DOS$mbrlen 1
@@ -5346,6 +5358,9 @@
 #define __CRT_HAVE_DOS$putwc 1
 #define __CRT_HAVE_DOS$putwchar 1
 #define __CRT_HAVE_DOS$putwchar_unlocked 1
+#define __CRT_HAVE_DOS$raise 1
+#define __CRT_HAVE_DOS$signal 1
+#define __CRT_HAVE_DOS$ssignal 1
 #define __CRT_HAVE_DOS$stat 1
 #define __CRT_HAVE_DOS$stat64 1
 #define __CRT_HAVE_DOS$strerror 1
@@ -5358,6 +5373,7 @@
 #define __CRT_HAVE_DOS$swscanf 1
 #define __CRT_HAVE_DOS$sys_errlist 1
 #define __CRT_HAVE_DOS$sys_nerr 1
+#define __CRT_HAVE_DOS$sysv_signal 1
 #define __CRT_HAVE_DOS$ungetwc 1
 #define __CRT_HAVE_DOS$ungetwc_unlocked 1
 #define __CRT_HAVE_DOS$vfwprintf 1

@@ -27,15 +27,16 @@
 #if 0 /* Available type size overrides */
 #define __SIZEOF_FD_T__             __SIZEOF_INT__
 #define __SIZEOF_ERRNO_T__          __SIZEOF_INT__
+#define __SIZEOF_SIGNO_T__          __SIZEOF_INT__
 #define __SIZEOF_OFLAG_T__          __SIZEOF_INT__
 #define __SIZEOF_SYSCALL_LONG_T__   __SIZEOF_REGISTER__
 #define __SIZEOF_MODE_T__           4
 #define __SIZEOF_ATFLAG_T__         __SIZEOF_INT__
 #if __SIZEOF_POINTER__ >= 8
 #define __SIZEOF_IOMODE_T__         4
-#else
+#else /* __SIZEOF_POINTER__ >= 8 */
 #define __SIZEOF_IOMODE_T__         2
-#endif
+#endif /* __SIZEOF_POINTER__ < 8 */
 #define __SIZEOF_MAJOR_T__          4
 #define __SIZEOF_MINOR_T__          4
 #define __SIZEOF_DEV_T__            8

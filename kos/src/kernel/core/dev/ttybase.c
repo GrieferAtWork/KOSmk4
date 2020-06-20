@@ -214,7 +214,7 @@ kernel_terminal_check_sigttou(struct terminal *__restrict self) {
 
 PUBLIC ssize_t LIBTERM_CC
 kernel_terminal_raise(struct terminal *__restrict self,
-                      unsigned int signo) {
+                      signo_t signo) {
 	REF struct taskpid *fg_pid;
 	struct ttybase_device *term;
 	term = container_of(self, struct ttybase_device, t_term);
@@ -743,17 +743,17 @@ do_TCSETX: {
 	}	break;
 
 	case TIOCSIG: {
-		int signo;
-		validate_readable(arg, sizeof(int));
+		signo_t signo;
+		validate_readable(arg, sizeof(signo_t));
 		COMPILER_READ_BARRIER();
-		signo = *(USER CHECKED int *)arg;
+		signo = *(USER CHECKED signo_t *)arg;
 		COMPILER_READ_BARRIER();
-		if unlikely(signo == 0 || signo >= NSIG) {
+		if unlikely(signo <= 0 || signo >= NSIG) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
 			      signo);
 		}
-		kernel_terminal_raise(&me->t_term, (unsigned int)signo);
+		kernel_terminal_raise(&me->t_term, signo);
 	}	break;
 
 	/* XXX: TIOCVHANGUP? */

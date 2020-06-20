@@ -19,6 +19,7 @@
  */
 
 %[define_replacement(sigset_t = "struct __sigset_struct")]
+%[define_replacement(signo_t = __signo_t)]
 %[default:section(".text.crt{|.dos}.sched.pthread")]
 
 
@@ -48,18 +49,18 @@ struct __sigset_struct;
 
 }
 
-[[guard]]
-int pthread_sigmask(int how,
+[[guard, decl_include("<features.h>", "<bits/sigset.h>")]]
+int pthread_sigmask(__STDC_INT_AS_UINT_T how,
                     [[nullable]] $sigset_t const *newmask,
                     [[nullable]] $sigset_t *oldmask);
 
-[[guard]]
-int pthread_kill($pthread_t threadid, int signo);
+[[guard, decl_include("<bits/types.h>", "<bits/pthreadtypes.h>")]]
+int pthread_kill($pthread_t threadid, $signo_t signo);
 
 %#ifdef __USE_GNU
-[[guard]]
+[[guard, decl_include("<bits/types.h>", "<bits/pthreadtypes.h>", "<bits/sigval.h>")]]
 int pthread_sigqueue($pthread_t threadid,
-                     int signo,
+                     $signo_t signo,
                      union sigval const value);
 %#endif /* __USE_GNU */
 

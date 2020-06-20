@@ -83,8 +83,8 @@ typedef __sigset_t sigset_t;
 
 
 struct ucontext;
-typedef void (*user_sighandler_func_t)(int signo);
-typedef void (*user_sigaction_func_t)(int signo, siginfo_t *info, struct ucontext *ctx);
+typedef void (*user_sighandler_func_t)(signo_t signo);
+typedef void (*user_sigaction_func_t)(signo_t signo, siginfo_t *info, struct ucontext *ctx);
 typedef void (*user_sigrestore_func_t)(void);
 
 struct kernel_sigmask {

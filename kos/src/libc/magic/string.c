@@ -607,8 +607,8 @@ __LOCAL_LIBC_DATA(strsignal_buf) char strsignal_buf[64] = { 0 };
 
 [[std, wunused, ATTR_COLD, crt_dos_variant]]
 [[nonnull, section(".text.crt{|.dos}.string.memory.strsignal")]]
-[[impl_prefix(DEFINE_STRSIGNAL_BUF)]]
-char *strsignal(int signo) {
+[[impl_prefix(DEFINE_STRSIGNAL_BUF), decl_include("<bits/types.h>")]]
+char *strsignal($signo_t signo) {
 	char *result = __NAMESPACE_LOCAL_SYM strsignal_buf;
 	char const *string;
 	string = strsignal_s(signo);

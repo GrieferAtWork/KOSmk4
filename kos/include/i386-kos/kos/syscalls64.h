@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcff61cb */
+/* HASH CRC-32:0xe35615a9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -733,8 +733,7 @@ __CDECLARE_SC(,__errno_t,kfstat,(__fd_t __fd, struct __kos_statx64 *__statbuf),(
 __CDECLARE_SC(,__errno_t,kfstatat,(__fd_t __dirfd, char const *__filename, struct __kos_statx64 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
 #endif /* __CRT_HAVE_SC(kfstatat) */
 #if __CRT_HAVE_SC(kill)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_SC(,__errno_t,kill,(__pid_t __pid, __syscall_ulong_t __signo),(__pid,__signo))
+__CDECLARE_SC(,__errno_t,kill,(__pid_t __pid, __signo_t __signo),(__pid,__signo))
 #endif /* __CRT_HAVE_SC(kill) */
 #if __CRT_HAVE_SC(klstat)
 __CDECLARE_SC(,__errno_t,klstat,(char const *__filename, struct __kos_statx64 *__statbuf),(__filename,__statbuf))
@@ -1214,7 +1213,7 @@ __CDECLARE_SC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulong
 __CDECLARE_SC(,__syscall_slong_t,rpc_service,(void),())
 #endif /* __CRT_HAVE_SC(rpc_service) */
 #if __CRT_HAVE_SC(rt_sigaction)
-__CDECLARE_SC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct __sigactionx64 const *__act, struct __sigactionx64 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
+__CDECLARE_SC(,__errno_t,rt_sigaction,(__signo_t __signo, struct __sigactionx64 const *__act, struct __sigactionx64 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigaction) */
 #if __CRT_HAVE_SC(rt_sigpending)
 __CDECLARE_SC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t __sigsetsize),(__set,__sigsetsize))
@@ -1224,8 +1223,7 @@ __CDECLARE_SC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t 
 __CDECLARE_SC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset, __size_t __sigsetsize),(__how,__set,__oset,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigprocmask) */
 #if __CRT_HAVE_SC(rt_sigqueueinfo)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __syscall_ulong_t __signo, struct __siginfox64_struct const *__uinfo),(__tgid,__signo,__uinfo))
+__CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __signo_t __signo, struct __siginfox64_struct const *__uinfo),(__tgid,__signo,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_sigqueueinfo) */
 #if __CRT_HAVE_SC(rt_sigreturn)
 /* Restore the given CPU/FPU context descriptors, as well as signal mask
@@ -1251,8 +1249,7 @@ __CDECLARE_SC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __s
 __CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *__set, struct __siginfox64_struct *__info, struct __timespecx64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigtimedwait) */
 #if __CRT_HAVE_SC(rt_tgsigqueueinfo)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_SC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __syscall_ulong_t __signo, struct __siginfox64_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
+__CDECLARE_SC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __signo_t __signo, struct __siginfox64_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_tgsigqueueinfo) */
 #if __CRT_HAVE_SC(sched_get_priority_max)
 __CDECLARE_SC(,__syscall_slong_t,sched_get_priority_max,(__syscall_ulong_t __algorithm),(__algorithm))
@@ -1517,8 +1514,7 @@ __CDECLARE_SC(,__ssize_t,syslog,(__syscall_ulong_t __level, char const *__str, _
 __CDECLARE_SC(,__ssize_t,tee,(__fd_t __fdin, __fd_t __fdout, __size_t __length, __syscall_ulong_t __flags),(__fdin,__fdout,__length,__flags))
 #endif /* __CRT_HAVE_SC(tee) */
 #if __CRT_HAVE_SC(tgkill)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_SC(,__errno_t,tgkill,(__pid_t __tgid, __pid_t __tid, __syscall_ulong_t __signo),(__tgid,__tid,__signo))
+__CDECLARE_SC(,__errno_t,tgkill,(__pid_t __tgid, __pid_t __tid, __signo_t __signo),(__tgid,__tid,__signo))
 #endif /* __CRT_HAVE_SC(tgkill) */
 #if __CRT_HAVE_SC(time)
 __CDECLARE_SC(,__time32_t,time,(__time32_t *__timer),(__timer))
@@ -1559,8 +1555,7 @@ __CDECLARE_SC(,__errno_t,timerfd_settime,(__fd_t __timerfd, __syscall_ulong_t __
 __CDECLARE_SC(,__clock_t,times,(struct tms *__buf),(__buf))
 #endif /* __CRT_HAVE_SC(times) */
 #if __CRT_HAVE_SC(tkill)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_SC(,__errno_t,tkill,(__pid_t __tid, __syscall_ulong_t __signo),(__tid,__signo))
+__CDECLARE_SC(,__errno_t,tkill,(__pid_t __tid, __signo_t __signo),(__tid,__signo))
 #endif /* __CRT_HAVE_SC(tkill) */
 #if __CRT_HAVE_SC(truncate)
 __CDECLARE_SC(,__errno_t,truncate,(char const *__filename, __syscall_ulong_t __length),(__filename,__length))
@@ -2260,8 +2255,7 @@ __CDECLARE_XSC(,__errno_t,kfstat,(__fd_t __fd, struct __kos_statx64 *__statbuf),
 __CDECLARE_XSC(,__errno_t,kfstatat,(__fd_t __dirfd, char const *__filename, struct __kos_statx64 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
 #endif /* __CRT_HAVE_XSC(kfstatat) */
 #if __CRT_HAVE_XSC(kill)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_XSC(,__errno_t,kill,(__pid_t __pid, __syscall_ulong_t __signo),(__pid,__signo))
+__CDECLARE_XSC(,__errno_t,kill,(__pid_t __pid, __signo_t __signo),(__pid,__signo))
 #endif /* __CRT_HAVE_XSC(kill) */
 #if __CRT_HAVE_XSC(klstat)
 __CDECLARE_XSC(,__errno_t,klstat,(char const *__filename, struct __kos_statx64 *__statbuf),(__filename,__statbuf))
@@ -2741,7 +2735,7 @@ __CDECLARE_XSC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulon
 __CDECLARE_XSC(,__syscall_slong_t,rpc_service,(void),())
 #endif /* __CRT_HAVE_XSC(rpc_service) */
 #if __CRT_HAVE_XSC(rt_sigaction)
-__CDECLARE_XSC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct __sigactionx64 const *__act, struct __sigactionx64 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
+__CDECLARE_XSC(,__errno_t,rt_sigaction,(__signo_t __signo, struct __sigactionx64 const *__act, struct __sigactionx64 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigaction) */
 #if __CRT_HAVE_XSC(rt_sigpending)
 __CDECLARE_XSC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t __sigsetsize),(__set,__sigsetsize))
@@ -2751,8 +2745,7 @@ __CDECLARE_XSC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t
 __CDECLARE_XSC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset, __size_t __sigsetsize),(__how,__set,__oset,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigprocmask) */
 #if __CRT_HAVE_XSC(rt_sigqueueinfo)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_XSC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __syscall_ulong_t __signo, struct __siginfox64_struct const *__uinfo),(__tgid,__signo,__uinfo))
+__CDECLARE_XSC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __signo_t __signo, struct __siginfox64_struct const *__uinfo),(__tgid,__signo,__uinfo))
 #endif /* __CRT_HAVE_XSC(rt_sigqueueinfo) */
 #if __CRT_HAVE_XSC(rt_sigsuspend)
 __CDECLARE_XSC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __size_t __sigsetsize),(__set,__sigsetsize))
@@ -2761,8 +2754,7 @@ __CDECLARE_XSC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __
 __CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *__set, struct __siginfox64_struct *__info, struct __timespecx64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigtimedwait) */
 #if __CRT_HAVE_XSC(rt_tgsigqueueinfo)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_XSC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __syscall_ulong_t __signo, struct __siginfox64_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
+__CDECLARE_XSC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __signo_t __signo, struct __siginfox64_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
 #endif /* __CRT_HAVE_XSC(rt_tgsigqueueinfo) */
 #if __CRT_HAVE_XSC(sched_get_priority_max)
 __CDECLARE_XSC(,__syscall_slong_t,sched_get_priority_max,(__syscall_ulong_t __algorithm),(__algorithm))
@@ -3027,8 +3019,7 @@ __CDECLARE_XSC(,__ssize_t,syslog,(__syscall_ulong_t __level, char const *__str, 
 __CDECLARE_XSC(,__ssize_t,tee,(__fd_t __fdin, __fd_t __fdout, __size_t __length, __syscall_ulong_t __flags),(__fdin,__fdout,__length,__flags))
 #endif /* __CRT_HAVE_XSC(tee) */
 #if __CRT_HAVE_XSC(tgkill)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_XSC(,__errno_t,tgkill,(__pid_t __tgid, __pid_t __tid, __syscall_ulong_t __signo),(__tgid,__tid,__signo))
+__CDECLARE_XSC(,__errno_t,tgkill,(__pid_t __tgid, __pid_t __tid, __signo_t __signo),(__tgid,__tid,__signo))
 #endif /* __CRT_HAVE_XSC(tgkill) */
 #if __CRT_HAVE_XSC(time)
 __CDECLARE_XSC(,__time32_t,time,(__time32_t *__timer),(__timer))
@@ -3069,8 +3060,7 @@ __CDECLARE_XSC(,__errno_t,timerfd_settime,(__fd_t __timerfd, __syscall_ulong_t _
 __CDECLARE_XSC(,__clock_t,times,(struct tms *__buf),(__buf))
 #endif /* __CRT_HAVE_XSC(times) */
 #if __CRT_HAVE_XSC(tkill)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_XSC(,__errno_t,tkill,(__pid_t __tid, __syscall_ulong_t __signo),(__tid,__signo))
+__CDECLARE_XSC(,__errno_t,tkill,(__pid_t __tid, __signo_t __signo),(__tid,__signo))
 #endif /* __CRT_HAVE_XSC(tkill) */
 #if __CRT_HAVE_XSC(truncate)
 __CDECLARE_XSC(,__errno_t,truncate,(char const *__filename, __syscall_ulong_t __length),(__filename,__length))
