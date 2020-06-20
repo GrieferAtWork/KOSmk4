@@ -17,37 +17,70 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_LIBC_SYSCALLS_C
-#define GUARD_LIBC_LIBC_SYSCALLS_C 1
+#ifndef GUARD_LIBC_USER_KOS_HOP_API_C
+#define GUARD_LIBC_USER_KOS_HOP_API_C 1
 
-/* Keep this one the first */
 #include "../api.h"
 /**/
 
+#include "kos.hop.api.h"
 #include <kos/syscalls.h>
-
-#include <errno.h>
-#include <stdarg.h>
-
-/* TODO: Replace this file with /kos/src/libc/user/kos.ksysctl.c
- *       -> Consequently, also generate other related files! */
 
 DECL_BEGIN
 
-INTERN ATTR_SECTION(".text.crt.syscall.ksysctl") syscall_slong_t
-NOTHROW_NCX(VLIBCCALL libc_ksysctl)(syscall_ulong_t cmd, ... /*, void *arg*/) {
+/*[[[head:libc_hop,hash:CRC-32=0x71d6a478]]]*/
+/* Perform a handle operation specified by `cmd'
+ * @param: cmd: One of `HOP_<type>_<command>' */
+INTERN ATTR_SECTION(".text.crt.syscall.hop") syscall_slong_t
+NOTHROW_NCX(VLIBCCALL libc_hop)(fd_t fd,
+                                syscall_ulong_t cmd,
+                                ...)
+/*[[[body:libc_hop]]]*/
+{
 	syscall_slong_t result;
 	va_list args;
 	va_start(args, cmd);
-	result = sys_ksysctl(cmd, va_arg(args, void *));
+	result = sys_hop(fd, cmd, va_arg(args, void *));
 	va_end(args);
 	if (E_ISERR(result))
 		result = libc_seterrno((errno_t)-result);
 	return result;
 }
+/*[[[end:libc_hop]]]*/
 
-DEFINE_PUBLIC_ALIAS(ksysctl, libc_ksysctl);
+/*[[[head:libc_hopf,hash:CRC-32=0xf29f2f3c]]]*/
+/* Perform a handle operation specified by `cmd'
+ * @param: cmd: One of `HOP_<type>_<command>' */
+INTERN ATTR_SECTION(".text.crt.syscall.hop") syscall_slong_t
+NOTHROW_NCX(VLIBCCALL libc_hopf)(fd_t fd,
+                                 syscall_ulong_t cmd,
+                                 iomode_t mode,
+                                 ...)
+/*[[[body:libc_hopf]]]*/
+{
+	syscall_slong_t result;
+	va_list args;
+	va_start(args, mode);
+	result = sys_hopf(fd, cmd, mode, va_arg(args, void *));
+	va_end(args);
+	if (E_ISERR(result))
+		result = libc_seterrno((errno_t)-result);
+	return result;
+}
+/*[[[end:libc_hopf]]]*/
+
+
+/* These are provided as syscall amendments */
+/*[[[skip:libc_Hop]]]*/
+/*[[[skip:libc_Hopf]]]*/
+
+
+
+/*[[[start:exports,hash:CRC-32=0xc71fbf47]]]*/
+DEFINE_PUBLIC_ALIAS(hop, libc_hop);
+DEFINE_PUBLIC_ALIAS(hopf, libc_hopf);
+/*[[[end:exports]]]*/
 
 DECL_END
 
-#endif /* !GUARD_LIBC_LIBC_SYSCALLS_C */
+#endif /* !GUARD_LIBC_USER_KOS_HOP_API_C */

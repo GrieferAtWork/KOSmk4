@@ -4454,6 +4454,8 @@
 #define __CRT_HAVE_KOS$GetResGid 1
 #define __CRT_HAVE_KOS$GetResUid 1
 #define __CRT_HAVE_KOS$GetSid 1
+#define __CRT_HAVE_KOS$Hop 1
+#define __CRT_HAVE_KOS$Hopf 1
 #define __CRT_HAVE_KOS$Ioctl 1
 #define __CRT_HAVE_KOS$LChmod 1
 #define __CRT_HAVE_KOS$LChown 1
@@ -6262,6 +6264,8 @@
 #define __CRT_HAVE_KOS$hcreate_r 1
 #define __CRT_HAVE_KOS$hdestroy_r 1
 #define __CRT_HAVE_KOS$herror 1
+#define __CRT_HAVE_KOS$hop 1
+#define __CRT_HAVE_KOS$hopf 1
 #define __CRT_HAVE_KOS$hsearch 1
 #define __CRT_HAVE_KOS$hsearch_r 1
 #define __CRT_HAVE_KOS$hstrerror 1
@@ -7804,6 +7808,8 @@
 #define __CRT_HAVE_DOS$GetResGid 1
 #define __CRT_HAVE_DOS$GetResUid 1
 #define __CRT_HAVE_DOS$GetSid 1
+#define __CRT_HAVE_DOS$Hop 1
+#define __CRT_HAVE_DOS$Hopf 1
 #define __CRT_HAVE_DOS$Ioctl 1
 #define __CRT_HAVE_DOS$LChmod 1
 #define __CRT_HAVE_DOS$LChown 1
@@ -9612,6 +9618,8 @@
 #define __CRT_HAVE_DOS$hcreate_r 1
 #define __CRT_HAVE_DOS$hdestroy_r 1
 #define __CRT_HAVE_DOS$herror 1
+#define __CRT_HAVE_DOS$hop 1
+#define __CRT_HAVE_DOS$hopf 1
 #define __CRT_HAVE_DOS$hsearch 1
 #define __CRT_HAVE_DOS$hsearch_r 1
 #define __CRT_HAVE_DOS$hstrerror 1

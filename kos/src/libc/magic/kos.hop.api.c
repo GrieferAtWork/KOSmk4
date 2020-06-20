@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x54d60812 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_HOP_API_H
-#define _KOS_HOP_API_H 1
+%[default:section(".text.crt{|.dos}.syscall.hop")]
 
-#include <__stdinc.h>
-#include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
+%{
 #include <bits/types.h>
 #include <hybrid/typecore.h>
 
@@ -55,34 +47,36 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#ifdef __CRT_HAVE_hop
-/* Perform a handle operation specified by `cmd'
- * @param: cmd: One of `HOP_<type>_<command>' */
-__LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hop)(__fd_t __fd, __syscall_ulong_t __cmd, ...) __CASMNAME_SAME("hop");
-#endif /* __CRT_HAVE_hop */
-#ifdef __CRT_HAVE_hopf
-/* Perform a handle operation specified by `cmd'
- * @param: cmd: One of `HOP_<type>_<command>' */
-__LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hopf)(__fd_t __fd, __syscall_ulong_t __cmd, __iomode_t __mode, ...) __CASMNAME_SAME("hopf");
-#endif /* __CRT_HAVE_hopf */
+}
 
 
+@@Perform a handle operation specified by `cmd'
+@@@param: cmd: One of `HOP_<type>_<command>'
+[[vartypes(void *)]]
+$syscall_slong_t hop($fd_t fd, $syscall_ulong_t cmd, ... /*, void *arg*/);
 
-/* Exception-enabled variants */
+[[vartypes(void *), doc_alias("hop")]]
+$syscall_slong_t hopf($fd_t fd, $syscall_ulong_t cmd, $iomode_t mode, ... /*, void *arg*/);
 
-#ifdef __CRT_HAVE_Hop
-/* Perform a handle operation specified by `cmd'
- * @param: cmd: One of `HOP_<type>_<command>' */
-__LIBC __syscall_slong_t (__VLIBCCALL Hop)(__fd_t __fd, __syscall_ulong_t __cmd, ...) __THROWS(...) __CASMNAME_SAME("Hop");
-#endif /* __CRT_HAVE_Hop */
-#ifdef __CRT_HAVE_Hopf
-/* Perform a handle operation specified by `cmd'
- * @param: cmd: One of `HOP_<type>_<command>' */
-__LIBC __syscall_slong_t (__VLIBCCALL Hopf)(__fd_t __fd, __syscall_ulong_t __cmd, __iomode_t __mode, ...) __THROWS(...) __CASMNAME_SAME("Hopf");
-#endif /* __CRT_HAVE_Hopf */
+
+%
+%
+%
+%/* Exception-enabled variants */
+%
+
+
+[[vartypes(void *), throws, doc_alias("hop")]]
+$syscall_slong_t Hop($fd_t fd, $syscall_ulong_t cmd, ... /*, void *arg*/);
+
+[[vartypes(void *), throws, doc_alias("Hop")]]
+$syscall_slong_t Hopf($fd_t fd, $syscall_ulong_t cmd, $iomode_t mode, ... /*, void *arg*/);
+
+
+%{
 
 #endif /* __CC__ */
 
 __SYSDECL_END
 
-#endif /* !_KOS_HOP_API_H */
+}

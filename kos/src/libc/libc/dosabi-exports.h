@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11da6508 */
+/* HASH CRC-32:0xf764f491 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -456,6 +456,12 @@ DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_exactbits64, libd_futexlock_tim
 DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaituntil_exactbits64, libd_futexlock_timedwaituntil_exactbits64);
 DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_anybit64, libd_futexlock_timedwaitwhile_anybit64);
 DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_allbits64, libd_futexlock_timedwaitwhile_allbits64);
+
+/* kos.hop.api */
+DEFINE_PUBLIC_ALIAS(DOS$hop, libd_hop);
+DEFINE_PUBLIC_ALIAS(DOS$hopf, libd_hopf);
+DEFINE_PUBLIC_ALIAS(DOS$Hop, libd_Hop);
+DEFINE_PUBLIC_ALIAS(DOS$Hopf, libd_Hopf);
 
 /* kos.malloc */
 DEFINE_PUBLIC_ALIAS(DOS$Malloc, libd_Malloc);

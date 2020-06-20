@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x5fb3c0fa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,37 +18,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_LIBC_SYSCALLS_C
-#define GUARD_LIBC_LIBC_SYSCALLS_C 1
+#ifndef GUARD_LIBC_AUTO_KOS_HOP_API_H
+#define GUARD_LIBC_AUTO_KOS_HOP_API_H 1
 
-/* Keep this one the first */
 #include "../api.h"
-/**/
 
-#include <kos/syscalls.h>
-
-#include <errno.h>
-#include <stdarg.h>
-
-/* TODO: Replace this file with /kos/src/libc/user/kos.ksysctl.c
- *       -> Consequently, also generate other related files! */
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include <kos/hop/api.h>
 
 DECL_BEGIN
 
-INTERN ATTR_SECTION(".text.crt.syscall.ksysctl") syscall_slong_t
-NOTHROW_NCX(VLIBCCALL libc_ksysctl)(syscall_ulong_t cmd, ... /*, void *arg*/) {
-	syscall_slong_t result;
-	va_list args;
-	va_start(args, cmd);
-	result = sys_ksysctl(cmd, va_arg(args, void *));
-	va_end(args);
-	if (E_ISERR(result))
-		result = libc_seterrno((errno_t)-result);
-	return result;
-}
-
-DEFINE_PUBLIC_ALIAS(ksysctl, libc_ksysctl);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Perform a handle operation specified by `cmd'
+ * @param: cmd: One of `HOP_<type>_<command>' */
+INTDEF syscall_slong_t NOTHROW_NCX(VLIBDCALL libd_hop)(fd_t fd, syscall_ulong_t cmd, ...);
+/* Perform a handle operation specified by `cmd'
+ * @param: cmd: One of `HOP_<type>_<command>' */
+INTDEF syscall_slong_t NOTHROW_NCX(VLIBDCALL libd_hopf)(fd_t fd, syscall_ulong_t cmd, iomode_t mode, ...);
+/* Perform a handle operation specified by `cmd'
+ * @param: cmd: One of `HOP_<type>_<command>' */
+INTDEF syscall_slong_t (VLIBDCALL libd_Hop)(fd_t fd, syscall_ulong_t cmd, ...) THROWS(...);
+/* Perform a handle operation specified by `cmd'
+ * @param: cmd: One of `HOP_<type>_<command>' */
+INTDEF syscall_slong_t (VLIBDCALL libd_Hopf)(fd_t fd, syscall_ulong_t cmd, iomode_t mode, ...) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_LIBC_SYSCALLS_C */
+#endif /* !GUARD_LIBC_AUTO_KOS_HOP_API_H */

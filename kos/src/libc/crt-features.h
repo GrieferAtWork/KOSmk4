@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x778a5763 */
+/* HASH CRC-32:0x83698e98 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,6 +71,8 @@
 #define __CRT_HAVE_DOS$GetResGid 1
 #define __CRT_HAVE_DOS$GetResUid 1
 #define __CRT_HAVE_DOS$GetSid 1
+#define __CRT_HAVE_DOS$Hop 1
+#define __CRT_HAVE_DOS$Hopf 1
 #define __CRT_HAVE_DOS$Ioctl 1
 #define __CRT_HAVE_DOS$LChmod 1
 #define __CRT_HAVE_DOS$LChown 1
@@ -1334,6 +1336,8 @@
 #define __CRT_HAVE_DOS$hcreate_r 1
 #define __CRT_HAVE_DOS$hdestroy_r 1
 #define __CRT_HAVE_DOS$herror 1
+#define __CRT_HAVE_DOS$hop 1
+#define __CRT_HAVE_DOS$hopf 1
 #define __CRT_HAVE_DOS$hsearch 1
 #define __CRT_HAVE_DOS$hsearch_r 1
 #define __CRT_HAVE_DOS$hstrerror 1
@@ -2923,6 +2927,8 @@
 #define __CRT_HAVE_GetResGid 1
 #define __CRT_HAVE_GetResUid 1
 #define __CRT_HAVE_GetSid 1
+#define __CRT_HAVE_Hop 1
+#define __CRT_HAVE_Hopf 1
 #define __CRT_HAVE_Ioctl 1
 #define __CRT_HAVE_LChmod 1
 #define __CRT_HAVE_LChown 1
@@ -4278,6 +4284,8 @@
 #define __CRT_HAVE_hdestroy 1
 #define __CRT_HAVE_hdestroy_r 1
 #define __CRT_HAVE_herror 1
+#define __CRT_HAVE_hop 1
+#define __CRT_HAVE_hopf 1
 #define __CRT_HAVE_hsearch 1
 #define __CRT_HAVE_hsearch_r 1
 #define __CRT_HAVE_hstrerror 1

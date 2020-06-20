@@ -250,7 +250,7 @@ discard_function_during_scan:
 			"#define " << guardName << " 1\n"
 			"\n"
 			"#include \"../api.h\"\n"
-			"#include \"aliases.h\"\n"
+			"#include \"" << header.name << ".h\"\n"
 			"\n"
 			"DECL_BEGIN\n"
 			"\n";
