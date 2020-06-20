@@ -99,6 +99,7 @@
 #include <libio.h>
 
 #ifdef __USE_DOS
+#include <bits/sys_errlist.h>
 #include <xlocale.h>
 #endif /* __USE_DOS */
 

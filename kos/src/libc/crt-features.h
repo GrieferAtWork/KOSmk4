@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48fc614f */
+/* HASH CRC-32:0x730e3e3b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,6 +227,8 @@
 #define __CRT_HAVE_DOS$__strncpy_chk 1
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#define __CRT_HAVE_DOS$__sys_errlist 1
+#define __CRT_HAVE_DOS$__sys_nerr 1
 #define __CRT_HAVE_DOS$__wcserror 1
 #define __CRT_HAVE_DOS$__wcserror_s 1
 #endif /* !__KERNEL__ */
@@ -2335,11 +2337,15 @@
 #define __CRT_HAVE_DOS$strdup 1
 #define __CRT_HAVE_DOS$strdupf 1
 #define __CRT_HAVE_DOS$strend 1
-#define __CRT_HAVE_DOS$strerror 1
-#define __CRT_HAVE_DOS$strerror_l 1
-#define __CRT_HAVE_DOS$strerror_r 1
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#define __CRT_HAVE_DOS$strerror 1
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$strerror_l 1
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$strerror_r 1
 #define __CRT_HAVE_DOS$strerror_s 1
 #define __CRT_HAVE_DOS$strerrorname_s 1
 #endif /* !__KERNEL__ */
@@ -2392,8 +2398,12 @@
 #define __CRT_HAVE_DOS$strroff 1
 #define __CRT_HAVE_DOS$strsep 1
 #define __CRT_HAVE_DOS$strset 1
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$strsignal 1
 #define __CRT_HAVE_DOS$strsignal_s 1
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$strspn 1
 #define __CRT_HAVE_DOS$strstr 1
 #define __CRT_HAVE_DOS$strto32 1
@@ -3107,6 +3117,7 @@
 #define __CRT_HAVE___p__wenviron 1
 #define __CRT_HAVE___p__wpgmptr 1
 #define __CRT_HAVE___p_program_invocation_short_name 1
+#define __CRT_HAVE___p_sys_siglist 1
 #define __CRT_HAVE___peb 1
 #define __CRT_HAVE___progname 1
 #define __CRT_HAVE___progname_full 1
@@ -3129,6 +3140,8 @@
 #define __CRT_HAVE___strcpy_chk 1
 #define __CRT_HAVE___strncat_chk 1
 #define __CRT_HAVE___strncpy_chk 1
+#define __CRT_HAVE___sys_errlist 1
+#define __CRT_HAVE___sys_nerr 1
 #define __CRT_HAVE___unicode_asciiflags 1
 #define __CRT_HAVE___unicode_descriptor 1
 #define __CRT_HAVE___wcserror 1

@@ -45,6 +45,7 @@
 #include <asm/stdio.h>
 #include <bits/confname.h>
 #include <bits/posix_opt.h>
+#include <bits/sys_errlist.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 
@@ -105,19 +106,40 @@ __SYSDECL_BEGIN
 #define _XOPEN_ENH_I18N    1
 #define _XOPEN_LEGACY      1
 
-#define STDIN_FILENO  __STDIN_FILENO  /* Standard input. */
-#define STDOUT_FILENO __STDOUT_FILENO /* Standard output. */
-#define STDERR_FILENO __STDERR_FILENO /* Standard error output. */
 
+#ifdef __STDIN_FILENO
+#define STDIN_FILENO  __STDIN_FILENO  /* Standard input. */
+#endif /* __STDIN_FILENO */
+#ifdef __STDOUT_FILENO
+#define STDOUT_FILENO __STDOUT_FILENO /* Standard output. */
+#endif /* __STDOUT_FILENO */
+#ifdef __STDERR_FILENO
+#define STDERR_FILENO __STDERR_FILENO /* Standard error output. */
+#endif /* __STDERR_FILENO */
+
+#ifdef __F_OK
 #define F_OK __F_OK /* Test for existence. */
+#endif /* __F_OK */
+#ifdef __X_OK
 #define X_OK __X_OK /* Test for execute permission. */
+#endif /* __X_OK */
+#ifdef __W_OK
 #define W_OK __W_OK /* Test for write permission. */
+#endif /* __W_OK */
+#ifdef __R_OK
 #define R_OK __R_OK /* Test for read permission. */
+#endif /* __R_OK */
 
 #ifndef SEEK_SET
+#ifdef __SEEK_SET
 #define SEEK_SET __SEEK_SET /* Seek from beginning of file. */
+#endif /* __SEEK_SET */
+#ifdef __SEEK_CUR
 #define SEEK_CUR __SEEK_CUR /* Seek from current position. */
+#endif /* __SEEK_CUR */
+#ifdef __SEEK_END
 #define SEEK_END __SEEK_END /* Seek from end of file. */
+#endif /* __SEEK_END */
 #ifdef __USE_GNU
 #ifdef __SEEK_DATA
 #define SEEK_DATA __SEEK_DATA /* Seek to next data. */
@@ -560,7 +582,20 @@ int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
 [[cp, section(".text.crt{|.dos}.fs.property"), decl_include("<features.h>")]]
-$longptr_t pathconf([[nonnull]] char const *path, __STDC_INT_AS_UINT_T name);
+[[requires_include("<asm/fcntl.h>")]]
+[[requires($has_function(fpathconf) && $has_function(open) && defined(__O_RDONLY))]]
+$longptr_t pathconf([[nonnull]] char const *path, __STDC_INT_AS_UINT_T name) {
+	fd_t fd;
+	longptr_t result;
+	fd = open(path, O_RDONLY);
+	if unlikely(fd < 0)
+		return -1;
+	result = fpathconf(fd, name);
+@@pp_if $has_function(close)@@
+	close(fd);
+@@pp_endif@@
+	return result;
+}
 
 %
 @@>> link(2)

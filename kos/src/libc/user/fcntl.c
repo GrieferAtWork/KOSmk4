@@ -60,8 +60,8 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 
 
 
-/*[[[head:libd_open,hash:CRC-32=0x2928b750]]]*/
-INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((1)) fd_t
+/*[[[head:libd_open,hash:CRC-32=0xaf141f0a]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.io.access") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
                                  oflag_t oflags,
                                  ...)
@@ -125,8 +125,8 @@ NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename,
 }
 /*[[[end:libc_open]]]*/
 
-/*[[[head:libd_creat,hash:CRC-32=0x515ffa3c]]]*/
-INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((1)) fd_t
+/*[[[head:libd_creat,hash:CRC-32=0x7d7ebee8]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.io.access") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename,
                                  mode_t mode)
 /*[[[body:libd_creat]]]*/
@@ -153,8 +153,8 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
 }
 /*[[[end:libc_creat]]]*/
 
-/*[[[head:libd_openat,hash:CRC-32=0xb8b718ce]]]*/
-INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((2)) fd_t
+/*[[[head:libd_openat,hash:CRC-32=0x8e01b37b]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.io.access") WUNUSED NONNULL((2)) fd_t
 NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
                                    char const *filename,
                                    oflag_t oflags,

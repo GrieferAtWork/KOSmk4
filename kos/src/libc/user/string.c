@@ -23,14 +23,16 @@
 #include "../api.h"
 /**/
 
+#include <bits/signum-values-dos.h>
+#include <bits/signum-values-kos.h>
 #include <parts/dos/errno.h>
 
 #include <assert.h>
+#include <ctype.h>
 #include <errno.h>
 #include <malloc.h>
 #include <signal.h>
 #include <string.h>
-#include <ctype.h>
 
 #include "../libc/errno.h"
 #include "malloc.h"
@@ -141,60 +143,158 @@ NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
 }
 
 
-/*[[[start:implementation]]]*/
+PRIVATE ATTR_SECTION(".rodata.crt.errno")
+struct ATTR_PACKED strerror_names_db_struct {
+#define E(id, message)                          \
+	char name_##id[sizeof(#id) / sizeof(char)]; \
+	char mesg_##id[sizeof(message) / sizeof(char)];
+#include "../libc/sys_errlist.def"
+#undef E
+} const strerror_names_db = {
+#define E(id, message)      \
+	/* .name_##id = */ #id, \
+	/* .mesg_##id = */ message,
+#include "../libc/sys_errlist.def"
+#undef E
+};
 
-/* These 2 functions are implemented in libc/errno.c */
-/*[[[skip:libc_strerror_s]]]*/
-/*[[[skip:libc_strerrorname_s]]]*/
+typedef u16 strerror_offset_t;
+STATIC_ASSERT(sizeof(strerror_names_db) <= 0x10000);
 
-/*[[[head:libd_strerror_s,hash:CRC-32=0xef00806b]]]*/
+PRIVATE ATTR_SECTION(".rodata.crt.errno") strerror_offset_t const strerror_offsets_db[__ECOUNT] = {
+#define E(id, message) offsetof(struct strerror_names_db_struct, name_##id),
+#include "../libc/sys_errlist.def"
+#undef E
+};
+
+
+
+/*[[[head:libc_strerrorname_s,hash:CRC-32=0xa1482a43]]]*/
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBDCALL libd_strerror_s)(errno_t errnum)
-/*[[[body:libd_strerror_s]]]*/
+NOTHROW(LIBCCALL libc_strerrorname_s)(int errnum)
+/*[[[body:libc_strerrorname_s]]]*/
 {
-	return libc_strerror_s(libd_errno_dos2kos(errnum));
+	char const *result;
+	if ((unsigned int)errnum >= COMPILER_LENOF(strerror_offsets_db))
+		return NULL;
+	result = (char const *)((byte_t const *)&strerror_names_db +
+	                        strerror_offsets_db[(unsigned int)errnum]);
+	return result;
 }
-/*[[[end:libd_strerror_s]]]*/
+/*[[[end:libc_strerrorname_s]]]*/
 
-/*[[[head:libd_strerrorname_s,hash:CRC-32=0x26a4b765]]]*/
-INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
+/*[[[head:libd_strerrorname_s,hash:CRC-32=0x687b914f]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBDCALL libd_strerrorname_s)(int errnum)
 /*[[[body:libd_strerrorname_s]]]*/
 {
-	return libc_strerrorname_s(libd_errno_dos2kos(errnum));
+	/* Special handling for a hand full of errno
+	 * values that don't have KOS equivalents. */
+	switch (errnum) {
+	case __DOS_STRUNCATE:
+		return "STRUNCATE\0" "Truncated";
+	case __DOS_EOTHER:
+		return "EOTHER\0" "Other";
+	default:
+		break;
+	}
+	errnum = libd_errno_dos2kos(errnum);
+	return libc_strerrorname_s(errnum);
 }
 /*[[[end:libd_strerrorname_s]]]*/
 
+/*[[[head:libc_strerror_s,hash:CRC-32=0x68ec1d4d]]]*/
+INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
+NOTHROW(LIBCCALL libc_strerror_s)(errno_t errnum)
+/*[[[body:libc_strerror_s]]]*/
+{
+	char const *result;
+	result = libc_strerrorname_s(errnum);
+	if (result)
+		result = strend(result) + 1;
+	return result;
+}
+/*[[[end:libc_strerror_s]]]*/
+
+/*[[[head:libd_strerror_s,hash:CRC-32=0xa1dfa641]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
+NOTHROW(LIBDCALL libd_strerror_s)(errno_t errnum)
+/*[[[body:libd_strerror_s]]]*/
+{
+	char const *result;
+	result = libd_strerrorname_s(errnum);
+	if (result)
+		result = strend(result) + 1;
+	return result;
+}
+/*[[[end:libd_strerror_s]]]*/
 
 
-#ifndef sys_siglist
-#undef _sys_siglist
-#ifndef ____p_sys_siglist_defined
-#define ____p_sys_siglist_defined 1
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__NOTHROW_NCX,__p_sys_siglist,(void),())
-#endif /* !____p_sys_siglist_defined */
-#define _sys_siglist  __p_sys_siglist()
-#define sys_siglist   __p_sys_siglist()
-#endif /* !sys_siglist */
+PRIVATE ATTR_SECTION(".rodata.crt.errno")
+struct ATTR_PACKED strsignal_names_db_struct {
+#define E(id) char name_##id[sizeof(#id) / sizeof(char)];
+#include "../libc/sys_siglist.def"
+#undef E
+} const strsignal_names_db = {
+#define E(id) /* .name_##id = */ #id,
+#include "../libc/sys_siglist.def"
+#undef E
+};
+
+typedef u8 strsignal_offset_t;
+STATIC_ASSERT(sizeof(strsignal_names_db) <= 0x100);
+
+PRIVATE ATTR_SECTION(".rodata.crt.errno") strsignal_offset_t const strsignal_offsets_db[__ECOUNT] = {
+#define E(id) offsetof(struct strsignal_names_db_struct, name_##id),
+#include "../libc/sys_siglist.def"
+#undef E
+};
+
 
 /*[[[head:libc_strsignal_s,hash:CRC-32=0x4ff1fbbd]]]*/
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBCCALL libc_strsignal_s)(int signum)
 /*[[[body:libc_strsignal_s]]]*/
 {
-	if unlikely(signum >= NSIG)
+	char const *result;
+	if ((unsigned int)signum >= COMPILER_LENOF(strsignal_offsets_db))
 		return NULL;
-	return sys_siglist[signum];
+	result = (char const *)((byte_t const *)&strsignal_names_db +
+	                        strsignal_offsets_db[(unsigned int)signum]);
+	return result;
 }
 /*[[[end:libc_strsignal_s]]]*/
 
-/*[[[end:implementation]]]*/
+
+
+/* TODO: Unify this function with "user/signal.c" */
+LOCAL int LIBCCALL
+libc_signo_dos2kos(int dos_signo) {
+	if (dos_signo == __DOS_SIGABRT)
+		return __KOS_SIGABRT;
+	return dos_signo;
+}
+
+
+/*[[[head:libd_strsignal_s,hash:CRC-32=0x7752dcc0]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
+NOTHROW(LIBDCALL libd_strsignal_s)(int signum)
+/*[[[body:libd_strsignal_s]]]*/
+{
+	signum = libc_signo_dos2kos(signum);
+	return libc_strsignal_s(signum);
+}
+/*[[[end:libd_strsignal_s]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x700644fe]]]*/
+
+/*[[[start:exports,hash:CRC-32=0xd90888cf]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$strerror_s, libd_strerror_s);
+DEFINE_PUBLIC_ALIAS(strerror_s, libc_strerror_s);
 DEFINE_PUBLIC_ALIAS(DOS$strerrorname_s, libd_strerrorname_s);
+DEFINE_PUBLIC_ALIAS(strerrorname_s, libc_strerrorname_s);
+DEFINE_PUBLIC_ALIAS(DOS$strsignal_s, libd_strsignal_s);
 DEFINE_PUBLIC_ALIAS(strsignal_s, libc_strsignal_s);
 /*[[[end:exports]]]*/
 

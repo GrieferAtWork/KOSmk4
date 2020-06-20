@@ -1908,6 +1908,8 @@ NOTHROW_NCX(LIBCCALL libc__set_doserrno)(u32 err)
 /*[[[end:libc__set_doserrno]]]*/
 
 
+
+
 /*[[[head:libc__seterrormode,hash:CRC-32=0xb76bea9f]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.errno") void
 NOTHROW_NCX(LIBCCALL libc__seterrormode)(int mode)

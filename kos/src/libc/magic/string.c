@@ -500,7 +500,7 @@ __LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
 @@pp_endif@@
 )]
 
-[[std, wunused, ATTR_COLD]]
+[[std, wunused, ATTR_COLD, crt_dos_variant]]
 [[nonnull, section(".text.crt{|.dos}.errno")]]
 [[impl_prefix(DEFINE_STRERROR_BUF)]]
 char *strerror(int errnum) {
@@ -596,17 +596,26 @@ char *strerror_l(int errnum, $locale_t locale) {
 	return strerror(errnum);
 }
 
-[[std, wunused, ATTR_COLD]]
+%[define(DEFINE_STRSIGNAL_BUF =
+@@pp_ifndef __local_strsignal_buf_defined@@
+#define __local_strsignal_buf_defined 1
+@@push_namespace(local)@@
+__LOCAL_LIBC_DATA(strsignal_buf) char strsignal_buf[64] = { 0 };
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+[[std, wunused, ATTR_COLD, crt_dos_variant]]
 [[nonnull, section(".text.crt{|.dos}.string.memory.strsignal")]]
+[[impl_prefix(DEFINE_STRSIGNAL_BUF)]]
 char *strsignal(int signo) {
-	static char strsignal_buf[64] = { 0 };
-	char *result = strsignal_buf;
+	char *result = __NAMESPACE_LOCAL_SYM strsignal_buf;
 	char const *string;
 	string = strsignal_s(signo);
 	if (string) {
 		/* Copy the descriptor text. */
-		result[COMPILER_LENOF(strsignal_buf) - 1] = '\0';
-		strncpy(result, string, COMPILER_LENOF(strsignal_buf) - 1);
+		result[COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strsignal_buf) - 1] = '\0';
+		strncpy(result, string, COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strsignal_buf) - 1);
 	} else {
 		sprintf(result, "Unknown signal %d", signo);
 	}
@@ -938,7 +947,7 @@ int strncasecmp_l([[nonnull]] char const *s1,
 %#ifdef __USE_GNU
 [[ATTR_COLD, export_alias("__strerror_r")]]
 [[nonnull, section(".text.crt{|.dos}.errno")]]
-[[impl_include("<hybrid/__assert.h>")]]
+[[impl_include("<hybrid/__assert.h>"), crt_dos_variant]]
 [[impl_prefix(DEFINE_STRERROR_BUF)]]
 char *strerror_r(int errnum, [[nonnull]] char *buf, $size_t buflen) {
 	char const *string;
@@ -4445,38 +4454,38 @@ char const *strerrorname_s(int errnum) {
 }
 
 [[wunused, nothrow, ATTR_CONST, section(".text.crt{|.dos}.errno")]]
-[[userimpl, impl_include("<bits/signum.h>"), impl_prefix(
+[[userimpl, crt_dos_variant, impl_include("<bits/signum.h>"), impl_prefix(
 #ifndef ___local_sys_siglist_defined
 #define ___local_sys_siglist_defined 1
-#undef sys_siglist
-#undef _sys_siglist
+#undef @sys_siglist@
+#undef @_sys_siglist@
 #if defined(__CRT_HAVE___p_sys_siglist)
 #ifndef ____p_sys_siglist_defined
 #define ____p_sys_siglist_defined 1
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__NOTHROW_NCX,__p_sys_siglist,(void),())
 #endif /* !____p_sys_siglist_defined */
-#define _sys_siglist  __p_sys_siglist()
-#define sys_siglist   __p_sys_siglist()
+#define @_sys_siglist@  __p_sys_siglist()
+#define @sys_siglist@   __p_sys_siglist()
 #elif defined(__CRT_HAVE_sys_siglist)
 #if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_ASMNAME)
-__LIBC char const *const _sys_siglist[_NSIG] __ASMNAME("sys_siglist");
+__LIBC char const *const @_sys_siglist@[@_NSIG@] __ASMNAME("sys_siglist");
 #else /* __CRT_HAVE__sys_siglist || !__NO_ASMNAME */
-#define _sys_siglist  sys_siglist
+#define @_sys_siglist@  @sys_siglist@
 #endif /* !__CRT_HAVE__sys_siglist && __NO_ASMNAME */
-__LIBC char const *const sys_siglist[_NSIG];
+__LIBC char const *const @sys_siglist@[@_NSIG@];
 #elif defined(__CRT_HAVE__sys_siglist)
 #ifndef __NO_ASMNAME
-__LIBC char const *const sys_siglist[_NSIG] __ASMNAME("_sys_siglist");
+__LIBC char const *const @sys_siglist@[@_NSIG@] __ASMNAME("_sys_siglist");
 #else /* !__NO_ASMNAME */
-#define sys_siglist     _sys_siglist
+#define @sys_siglist@     @_sys_siglist@
 #endif /* __NO_ASMNAME */
-__LIBC char const *const _sys_siglist[_NSIG];
+__LIBC char const *const @_sys_siglist@[@_NSIG@];
 #endif /* sys_siglist... */
 #endif /* !___local_sys_siglist_defined */
 ), impl_include("<bits/signum-values.h>")]]
 char const *strsignal_s(int signum) {
 #if defined(__CRT_HAVE___p_sys_siglist) || defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist)
-	return (unsigned int)errnum < _NSIG ? @_sys_siglist@[signum] : NULL;
+	return (unsigned int)errnum < @_NSIG@ ? @_sys_siglist@[signum] : NULL;
 #else /* __CRT_HAVE___p_sys_siglist || __CRT_HAVE_sys_siglist || __CRT_HAVE__sys_siglist */
 	char const *result;
 	switch (signum) {

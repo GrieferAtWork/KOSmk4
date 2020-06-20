@@ -583,6 +583,7 @@
 #define __CRT_HAVE___p__wpgmptr 1
 #define __CRT_HAVE___p_program_invocation_name 1
 #define __CRT_HAVE___p_program_invocation_short_name 1
+#define __CRT_HAVE___p_sys_siglist 1
 #define __CRT_HAVE___peb 1
 #define __CRT_HAVE___pipe 1
 #define __CRT_HAVE___poll 1
@@ -1152,6 +1153,7 @@
 #define __CRT_HAVE__swprintf_p_l 1
 #define __CRT_HAVE__swprintf_s_l 1
 #define __CRT_HAVE__swscanf_l 1
+#define __CRT_HAVE__sys_nerr 1
 #define __CRT_HAVE__sysconf 1
 #define __CRT_HAVE__tell 1
 #define __CRT_HAVE__telli64 1
@@ -3831,6 +3833,7 @@
 #define __CRT_HAVE_sys_munmap 1
 #define __CRT_HAVE_sys_name_to_handle_at 1
 #define __CRT_HAVE_sys_nanosleep 1
+#define __CRT_HAVE_sys_nerr 1
 #define __CRT_HAVE_sys_nfsservctl 1
 #define __CRT_HAVE_sys_open 1
 #define __CRT_HAVE_sys_open_by_handle_at 1
@@ -4956,6 +4959,8 @@
 #define __CRT_HAVE_KOS$__strtoull_l 1
 #define __CRT_HAVE_KOS$__strverscmp 1
 #define __CRT_HAVE_KOS$__strxfrm_l 1
+#define __CRT_HAVE_KOS$__sys_errlist 1
+#define __CRT_HAVE_KOS$__sys_nerr 1
 #define __CRT_HAVE_KOS$__sysconf 1
 #define __CRT_HAVE_KOS$__sysv_signal 1
 #define __CRT_HAVE_KOS$__tan 1
@@ -5353,6 +5358,7 @@
 #define __CRT_HAVE_KOS$_swprintf_p_l 1
 #define __CRT_HAVE_KOS$_swprintf_s_l 1
 #define __CRT_HAVE_KOS$_swscanf_l 1
+#define __CRT_HAVE_KOS$_sys_nerr 1
 #define __CRT_HAVE_KOS$_sysconf 1
 #define __CRT_HAVE_KOS$_tell 1
 #define __CRT_HAVE_KOS$_telli64 1
@@ -7357,6 +7363,7 @@
 #define __CRT_HAVE_KOS$symlinkat 1
 #define __CRT_HAVE_KOS$sync_file_range 1
 #define __CRT_HAVE_KOS$syncfs 1
+#define __CRT_HAVE_KOS$sys_nerr 1
 #define __CRT_HAVE_KOS$syscall 1
 #define __CRT_HAVE_KOS$syscall64 1
 #define __CRT_HAVE_KOS$sysconf 1
@@ -8300,6 +8307,8 @@
 #define __CRT_HAVE_DOS$__strtoull_l 1
 #define __CRT_HAVE_DOS$__strverscmp 1
 #define __CRT_HAVE_DOS$__strxfrm_l 1
+#define __CRT_HAVE_DOS$__sys_errlist 1
+#define __CRT_HAVE_DOS$__sys_nerr 1
 #define __CRT_HAVE_DOS$__sysconf 1
 #define __CRT_HAVE_DOS$__sysv_signal 1
 #define __CRT_HAVE_DOS$__tan 1
@@ -8697,6 +8706,7 @@
 #define __CRT_HAVE_DOS$_swprintf_p_l 1
 #define __CRT_HAVE_DOS$_swprintf_s_l 1
 #define __CRT_HAVE_DOS$_swscanf_l 1
+#define __CRT_HAVE_DOS$_sys_nerr 1
 #define __CRT_HAVE_DOS$_sysconf 1
 #define __CRT_HAVE_DOS$_tell 1
 #define __CRT_HAVE_DOS$_telli64 1
@@ -10701,6 +10711,7 @@
 #define __CRT_HAVE_DOS$symlinkat 1
 #define __CRT_HAVE_DOS$sync_file_range 1
 #define __CRT_HAVE_DOS$syncfs 1
+#define __CRT_HAVE_DOS$sys_nerr 1
 #define __CRT_HAVE_DOS$syscall 1
 #define __CRT_HAVE_DOS$syscall64 1
 #define __CRT_HAVE_DOS$sysconf 1

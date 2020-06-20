@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29a54523 */
+/* HASH CRC-32:0x3e5524c8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,27 +18,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_STRING_H
-#define GUARD_LIBC_USER_STRING_H 1
+#ifndef GUARD_LIBC_USER_BITS_SYS_ERRLIST_H
+#define GUARD_LIBC_USER_BITS_SYS_ERRLIST_H 1
 
 #include "../api.h"
-#include "../auto/string.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include <string.h>
+#include <bits/sys_errlist.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strerror_s)(errno_t errnum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerror_s)(errno_t errnum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strerrorname_s)(int errnum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerrorname_s)(int errnum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strsignal_s)(int signum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strsignal_s)(int signum);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *NOTHROW(LIBDCALL libd___sys_errlist)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *NOTHROW(LIBCCALL libc___sys_errlist)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW(LIBDCALL libd___sys_nerr)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW(LIBCCALL libc___sys_nerr)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_USER_STRING_H */
+#endif /* !GUARD_LIBC_USER_BITS_SYS_ERRLIST_H */

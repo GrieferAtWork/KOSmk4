@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x29a54523 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,27 +17,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_STRING_H
-#define GUARD_LIBC_USER_STRING_H 1
-
-#include "../api.h"
-#include "../auto/string.h"
-
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <string.h>
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strerror_s)(errno_t errnum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerror_s)(errno_t errnum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strerrorname_s)(int errnum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerrorname_s)(int errnum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strsignal_s)(int signum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strsignal_s)(int signum);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_STRING_H */
+E(SIGHUP)    /* Hangup (POSIX). */
+E(SIGINT)    /* Interrupt (ANSI). */
+E(SIGQUIT)   /* Quit (POSIX). */
+E(SIGILL)    /* Illegal instruction (ANSI). */
+E(SIGTRAP)   /* Trace trap (POSIX). */
+E(SIGABRT)   /* Abort (ANSI). */
+E(SIGBUS)    /* BUS error (4.2 BSD). */
+E(SIGFPE)    /* Floating-point exception (ANSI). */
+E(SIGKILL)   /* Kill, unblockable (POSIX). */
+E(SIGUSR1)   /* User-defined signal 1 (POSIX). */
+E(SIGSEGV)   /* Segmentation violation (ANSI). */
+E(SIGUSR2)   /* User-defined signal 2 (POSIX). */
+E(SIGPIPE)   /* Broken pipe (POSIX). */
+E(SIGALRM)   /* Alarm clock (POSIX). */
+E(SIGTERM)   /* Termination (ANSI). */
+E(SIGSTKFLT) /* Stack fault. */
+E(SIGCHLD)   /* Child status has changed (POSIX). */
+E(SIGCONT)   /* Continue (POSIX). */
+E(SIGSTOP)   /* Stop, unblockable (POSIX). */
+E(SIGTSTP)   /* Keyboard stop (POSIX). */
+E(SIGTTIN)   /* Background read from tty (POSIX). */
+E(SIGTTOU)   /* Background write to tty (POSIX). */
+E(SIGURG)    /* Urgent condition on socket (4.2 BSD). */
+E(SIGXCPU)   /* CPU limit exceeded (4.2 BSD). */
+E(SIGXFSZ)   /* File size limit exceeded (4.2 BSD). */
+E(SIGVTALRM) /* Virtual alarm clock (4.2 BSD). */
+E(SIGPROF)   /* Profiling alarm clock (4.2 BSD). */
+E(SIGWINCH)  /* Window size change (4.3 BSD, Sun). */
+E(SIGIO)     /* I/O now possible (4.2 BSD). */
+E(SIGPWR)    /* Power failure restart (System V). */
+E(SIGSYS)    /* Bad system call. */

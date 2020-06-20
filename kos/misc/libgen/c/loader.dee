@@ -4448,9 +4448,9 @@ again_lookup_wcsCurrent:
 								: getDefaultLibraryImplementationForPrototype(kosProto, crtName);
 						}
 						currentDosLibraryFunction.bindings.append(LibraryFunctionBinding(
-							ppCond:      currentFeatures.crt_kosImplRequires,
+							ppCond:      currentFeatures.crt_dosImplRequires,
 							binding:     dosLibImpl,
-							implSection: crt_kosSection));
+							implSection: crt_dosSection));
 						currentKosLibraryFunction.bindings.append(LibraryFunctionBinding(
 							ppCond:      currentFeatures.crt_kosImplRequires,
 							binding:     kosLibImpl,

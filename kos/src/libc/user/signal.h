@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4dffb56 */
+/* HASH CRC-32:0x6795c151 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,6 +53,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_gsignal)(int signo);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sigblock)(int mask);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_siggetmask)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *NOTHROW(LIBCCALL libc___p_sys_siglist)(void);
 INTDEF ATTR_NORETURN void NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp);
 /* @param signo: One of `SIG*' */
 INTDEF sighandler_t NOTHROW_NCX(LIBCCALL libc_bsd_signal)(int signo, sighandler_t handler);

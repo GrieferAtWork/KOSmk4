@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x673b286c */
+/* HASH CRC-32:0xc806d30d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -304,6 +304,26 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__local_strerror_buf_defined */
+INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
+NOTHROW_NCX(LIBDCALL libd_strerror)(int errnum) {
+	char *result = __NAMESPACE_LOCAL_SYM strerror_buf;
+	char const *string;
+	string = libc_strerror_s(errnum);
+	if (string) {
+		/* Copy the descriptor text. */
+		result[COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf) - 1] = '\0';
+		libc_strncpy(result, string, COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf) - 1);
+	} else {
+		libc_sprintf(result, "Unknown error %d", errnum);
+	}
+	return result;
+}
+#ifndef __local_strerror_buf_defined
+#define __local_strerror_buf_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
+__NAMESPACE_LOCAL_END
+#endif /* !__local_strerror_buf_defined */
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_strerror)(int errnum) {
 	char *result = __NAMESPACE_LOCAL_SYM strerror_buf;
@@ -368,16 +388,41 @@ NOTHROW_NCX(LIBCCALL libc_strerror_l)(int errnum,
 	(void)locale;
 	return libc_strerror(errnum);
 }
-INTERN ATTR_SECTION(".text.crt.string.memory.strsignal") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc_strsignal)(int signo) {
-	static char strsignal_buf[64] = { 0 };
-	char *result = strsignal_buf;
+#ifndef __local_strsignal_buf_defined
+#define __local_strsignal_buf_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC_DATA(strsignal_buf) char strsignal_buf[64] = { 0 };
+__NAMESPACE_LOCAL_END
+#endif /* !__local_strsignal_buf_defined */
+INTERN ATTR_SECTION(".text.crt.dos.string.memory.strsignal") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
+NOTHROW_NCX(LIBDCALL libd_strsignal)(int signo) {
+	char *result = __NAMESPACE_LOCAL_SYM strsignal_buf;
 	char const *string;
 	string = libc_strsignal_s(signo);
 	if (string) {
 		/* Copy the descriptor text. */
-		result[COMPILER_LENOF(strsignal_buf) - 1] = '\0';
-		libc_strncpy(result, string, COMPILER_LENOF(strsignal_buf) - 1);
+		result[COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strsignal_buf) - 1] = '\0';
+		libc_strncpy(result, string, COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strsignal_buf) - 1);
+	} else {
+		libc_sprintf(result, "Unknown signal %d", signo);
+	}
+	return result;
+}
+#ifndef __local_strsignal_buf_defined
+#define __local_strsignal_buf_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC_DATA(strsignal_buf) char strsignal_buf[64] = { 0 };
+__NAMESPACE_LOCAL_END
+#endif /* !__local_strsignal_buf_defined */
+INTERN ATTR_SECTION(".text.crt.string.memory.strsignal") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
+NOTHROW_NCX(LIBCCALL libc_strsignal)(int signo) {
+	char *result = __NAMESPACE_LOCAL_SYM strsignal_buf;
+	char const *string;
+	string = libc_strsignal_s(signo);
+	if (string) {
+		/* Copy the descriptor text. */
+		result[COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strsignal_buf) - 1] = '\0';
+		libc_strncpy(result, string, COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strsignal_buf) - 1);
 	} else {
 		libc_sprintf(result, "Unknown signal %d", signo);
 	}
@@ -649,6 +694,46 @@ NOTHROW_NCX(LIBCCALL libc_strncasecmp_l)(char const *s1,
                                          locale_t locale) {
 	(void)locale;
 	return libc_strncasecmp(s1, s2, maxlen);
+}
+#include <hybrid/__assert.h>
+#ifndef __local_strerror_buf_defined
+#define __local_strerror_buf_defined 1
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC_DATA(strerror_buf) char strerror_buf[64] = { 0 };
+__NAMESPACE_LOCAL_END
+#endif /* !__local_strerror_buf_defined */
+INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *
+NOTHROW_NCX(LIBDCALL libd_strerror_r)(int errnum,
+                                      char *buf,
+                                      size_t buflen) {
+	char const *string;
+	string = libc_strerror_s(errnum);
+	if (!buf || !buflen) {
+		buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
+		buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
+	}
+	if (string) {
+		/* Copy the descriptor text. */
+		size_t msg_len = libc_strlen(string) + 1;
+		if (msg_len > buflen) {
+			buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
+			buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
+			if unlikely(msg_len > buflen) {
+				msg_len      = buflen - 1;
+				buf[msg_len] = '\0';
+			}
+		}
+		libc_memcpyc(buf, string, msg_len, sizeof(char));
+	} else {
+again_unknown:
+		if (libc_snprintf(buf, buflen, "Unknown error %d", errnum) >= buflen) {
+			__hybrid_assert(buf != __NAMESPACE_LOCAL_SYM strerror_buf);
+			buf    = __NAMESPACE_LOCAL_SYM strerror_buf;
+			buflen = COMPILER_LENOF(__NAMESPACE_LOCAL_SYM strerror_buf);
+			goto again_unknown;
+		}
+	}
+	return buf;
 }
 #include <hybrid/__assert.h>
 #ifndef __local_strerror_buf_defined
@@ -4137,6 +4222,7 @@ DEFINE_PUBLIC_ALIAS(strcoll, libc_strcoll);
 DEFINE_PUBLIC_ALIAS(strxfrm, libc_strxfrm);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRXFRM */
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(DOS$strerror, libd_strerror);
 DEFINE_PUBLIC_ALIAS(strerror, libc_strerror);
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_STRNLEN
@@ -4158,6 +4244,7 @@ DEFINE_PUBLIC_ALIAS(_strxfrm_l, libc_strxfrm_l);
 DEFINE_PUBLIC_ALIAS(__strxfrm_l, libc_strxfrm_l);
 DEFINE_PUBLIC_ALIAS(strxfrm_l, libc_strxfrm_l);
 DEFINE_PUBLIC_ALIAS(strerror_l, libc_strerror_l);
+DEFINE_PUBLIC_ALIAS(DOS$strsignal, libd_strsignal);
 DEFINE_PUBLIC_ALIAS(strsignal, libc_strsignal);
 DEFINE_PUBLIC_ALIAS(__strndup, libc_strndup);
 DEFINE_PUBLIC_ALIAS(strndup, libc_strndup);
@@ -4208,6 +4295,8 @@ DEFINE_PUBLIC_ALIAS(_strnicmp_l, libc_strncasecmp_l);
 DEFINE_PUBLIC_ALIAS(_strncmpi_l, libc_strncasecmp_l);
 DEFINE_PUBLIC_ALIAS(__strncasecmp_l, libc_strncasecmp_l);
 DEFINE_PUBLIC_ALIAS(strncasecmp_l, libc_strncasecmp_l);
+DEFINE_PUBLIC_ALIAS(DOS$__strerror_r, libd_strerror_r);
+DEFINE_PUBLIC_ALIAS(DOS$strerror_r, libd_strerror_r);
 DEFINE_PUBLIC_ALIAS(__strerror_r, libc_strerror_r);
 DEFINE_PUBLIC_ALIAS(strerror_r, libc_strerror_r);
 DEFINE_PUBLIC_ALIAS(__xpg_strerror_r, libc___xpg_strerror_r);

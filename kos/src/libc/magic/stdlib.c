@@ -58,6 +58,7 @@
 #ifdef __USE_DOS
 #include <xlocale.h>
 #include <bits/byteswap.h>
+#include <bits/sys_errlist.h>
 #endif /* __USE_DOS */
 #ifdef __USE_GNU
 #include <xlocale.h>
@@ -2116,23 +2117,6 @@ errno_t _set_doserrno($u32 err);
 
 %
 %{
-#ifndef ___sys_errlist_defined
-#define ___sys_errlist_defined 1
-#if defined(__CRT_HAVE__sys_errlist)
-__LIBC char const *const _sys_errlist[];
-#elif defined(__CRT_HAVE___sys_errlist)
-__CDECLARE(, char const *const *,__NOTHROW, __sys_errlist, (void), ())
-#define _sys_errlist (__sys_errlist())
-#endif /* ... */
-
-#if defined(__CRT_HAVE__sys_nerr)
-__LIBC int _sys_nerr;
-#elif defined(__CRT_HAVE___sys_nerr)
-__CDECLARE(, int *,__NOTHROW, __sys_nerr, (void), ())
-#define _sys_nerr    (*__sys_nerr())
-#endif /* ... */
-#endif /* !___sys_errlist_defined */
-
 #ifndef ___environ_defined
 #define ___environ_defined 1
 #undef _environ
@@ -3518,11 +3502,6 @@ void _beep(unsigned int freq, unsigned int duration);
 #endif /* !__cplusplus */
 }
 
-%
-%{
-#define sys_errlist _sys_errlist
-#define sys_nerr    _sys_nerr
-}
 
 %
 %{

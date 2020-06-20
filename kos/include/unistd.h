@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf71f54 */
+/* HASH CRC-32:0xaba7eab2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,7 @@
 #include <asm/stdio.h>
 #include <bits/confname.h>
 #include <bits/posix_opt.h>
+#include <bits/sys_errlist.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 
@@ -95,19 +96,40 @@ __SYSDECL_BEGIN
 #define _XOPEN_ENH_I18N    1
 #define _XOPEN_LEGACY      1
 
-#define STDIN_FILENO  __STDIN_FILENO  /* Standard input. */
-#define STDOUT_FILENO __STDOUT_FILENO /* Standard output. */
-#define STDERR_FILENO __STDERR_FILENO /* Standard error output. */
 
+#ifdef __STDIN_FILENO
+#define STDIN_FILENO  __STDIN_FILENO  /* Standard input. */
+#endif /* __STDIN_FILENO */
+#ifdef __STDOUT_FILENO
+#define STDOUT_FILENO __STDOUT_FILENO /* Standard output. */
+#endif /* __STDOUT_FILENO */
+#ifdef __STDERR_FILENO
+#define STDERR_FILENO __STDERR_FILENO /* Standard error output. */
+#endif /* __STDERR_FILENO */
+
+#ifdef __F_OK
 #define F_OK __F_OK /* Test for existence. */
+#endif /* __F_OK */
+#ifdef __X_OK
 #define X_OK __X_OK /* Test for execute permission. */
+#endif /* __X_OK */
+#ifdef __W_OK
 #define W_OK __W_OK /* Test for write permission. */
+#endif /* __W_OK */
+#ifdef __R_OK
 #define R_OK __R_OK /* Test for read permission. */
+#endif /* __R_OK */
 
 #ifndef SEEK_SET
+#ifdef __SEEK_SET
 #define SEEK_SET __SEEK_SET /* Seek from beginning of file. */
+#endif /* __SEEK_SET */
+#ifdef __SEEK_CUR
 #define SEEK_CUR __SEEK_CUR /* Seek from current position. */
+#endif /* __SEEK_CUR */
+#ifdef __SEEK_END
 #define SEEK_END __SEEK_END /* Seek from end of file. */
+#endif /* __SEEK_END */
 #ifdef __USE_GNU
 #ifdef __SEEK_DATA
 #define SEEK_DATA __SEEK_DATA /* Seek to next data. */
@@ -694,13 +716,27 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chown,(char const *__file, __ui
 __NAMESPACE_LOCAL_USING_OR_IMPL(chown, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL chown)(char const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(chown))(__file, __owner, __group); })
 #endif /* ... */
 
+#ifdef __CRT_HAVE_pathconf
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
+__CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
+#else /* __CRT_HAVE_pathconf */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_fpathconf) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY)
+#include <local/unistd/pathconf.h>
+/* >> pathconf(2)
+ * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pathconf, __FORCELOCAL __ATTR_NONNULL((1)) __LONGPTR_TYPE__ __NOTHROW_RPC(__LIBCCALL pathconf)(char const *__path, __STDC_INT_AS_UINT_T __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pathconf))(__path, __name); })
+#endif /* __CRT_HAVE_fpathconf && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__CRT_AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && __O_RDONLY */
+#endif /* !__CRT_HAVE_pathconf */
 
 #ifdef __CRT_HAVE_link
 /* >> link(2)

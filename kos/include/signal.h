@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xababb547 */
+/* HASH CRC-32:0x3656e4f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -206,30 +206,40 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,gsignal,(int __signo),(__signo))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,sigblock,(int __mask),(__mask))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,sigsetmask,(int __mask),(__mask))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,siggetmask,(void),())
-#undef sys_siglist
-#undef _sys_siglist
-#if defined(__CRT_HAVE___p_sys_siglist)
+
+#ifndef sys_siglist
+#ifdef _sys_siglist
+#define sys_siglist _sys_siglist
+#else /* _sys_siglist */
 #ifndef ____p_sys_siglist_defined
 #define ____p_sys_siglist_defined 1
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__NOTHROW_NCX,__p_sys_siglist,(void),())
+#ifdef __CRT_HAVE___p_sys_siglist
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *const *,__NOTHROW,__p_sys_siglist,(void),())
+#else /* __CRT_HAVE___p_sys_siglist */
+#undef ____p_sys_siglist_defined
+#endif /* !__CRT_HAVE___p_sys_siglist */
 #endif /* !____p_sys_siglist_defined */
-#define _sys_siglist  __p_sys_siglist()
-#define sys_siglist   __p_sys_siglist()
-#elif defined(__CRT_HAVE_sys_siglist)
-#if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_ASMNAME)
-__LIBC char const *const _sys_siglist[_NSIG] __ASMNAME("sys_siglist");
-#else /* __CRT_HAVE__sys_siglist || !__NO_ASMNAME */
-#define _sys_siglist  sys_siglist
-#endif /* !__CRT_HAVE__sys_siglist && __NO_ASMNAME */
+#ifdef ____p_sys_siglist_defined
+#define sys_siglist  __p_sys_siglist()
+#define _sys_siglist __p_sys_siglist()
+#endif /* ____p_sys_siglist_defined */
+#ifndef _sys_siglist
+#ifdef __CRT_HAVE_sys_siglist
 __LIBC char const *const sys_siglist[_NSIG];
+#define sys_siglist  sys_siglist
+#define _sys_siglist sys_siglist
 #elif defined(__CRT_HAVE__sys_siglist)
-#ifndef __NO_ASMNAME
-__LIBC char const *const sys_siglist[_NSIG] __ASMNAME("_sys_siglist");
-#else /* !__NO_ASMNAME */
-#define sys_siglist     _sys_siglist
-#endif /* __NO_ASMNAME */
 __LIBC char const *const _sys_siglist[_NSIG];
+#define sys_siglist  _sys_siglist
+#define _sys_siglist _sys_siglist
 #endif /* sys_siglist... */
+#endif /* !_sys_siglist */
+#endif /* !_sys_siglist */
+#endif /* !sys_siglist */
+
+#if !defined(_sys_siglist) && defined(sys_siglist)
+#define _sys_siglist sys_siglist
+#endif /* !_sys_siglist && sys_siglist */
 struct sigcontext;
 __CDECLARE_VOID_OPT(__ATTR_NORETURN,__NOTHROW_NCX,sigreturn,(struct sigcontext const *__scp),(__scp))
 #endif /* __USE_MISC */

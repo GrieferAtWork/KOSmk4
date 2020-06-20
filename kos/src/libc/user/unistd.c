@@ -2361,25 +2361,6 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 /*[[[end:libc_fpathconf]]]*/
 
 
-/*[[[head:libc_pathconf,hash:CRC-32=0xa51c8ad0]]]*/
-/* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((1)) longptr_t
-NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
-                                    __STDC_INT_AS_UINT_T name)
-/*[[[body:libc_pathconf]]]*/
-/*AUTO*/{
-	(void)path;
-	(void)name;
-	CRT_UNIMPLEMENTED("pathconf"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_pathconf]]]*/
 
 /*[[[head:libc_confstr,hash:CRC-32=0x3fd15238]]]*/
 /* Retrieve a system configuration string specified by `name'
@@ -3809,7 +3790,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8eac1e83]]]*/
+/*[[[start:exports,hash:CRC-32=0x69a56699]]]*/
 DEFINE_PUBLIC_ALIAS(_execv, libc_execv);
 DEFINE_PUBLIC_ALIAS(execv, libc_execv);
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
@@ -3874,7 +3855,6 @@ DEFINE_PUBLIC_ALIAS(tcgetpgrp, libc_tcgetpgrp);
 DEFINE_PUBLIC_ALIAS(tcsetpgrp, libc_tcsetpgrp);
 DEFINE_PUBLIC_ALIAS(getlogin, libc_getlogin);
 DEFINE_PUBLIC_ALIAS(chown, libc_chown);
-DEFINE_PUBLIC_ALIAS(pathconf, libc_pathconf);
 DEFINE_PUBLIC_ALIAS(link, libc_link);
 DEFINE_PUBLIC_ALIAS(_read, libc_read);
 DEFINE_PUBLIC_ALIAS(__read, libc_read);

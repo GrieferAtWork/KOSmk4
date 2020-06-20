@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3d3995e */
+/* HASH CRC-32:0xf2e5b555 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -159,6 +159,7 @@ __NAMESPACE_STD_USING(aligned_alloc)
 #ifdef __USE_DOS
 #include <xlocale.h>
 #include <bits/byteswap.h>
+#include <bits/sys_errlist.h>
 #endif /* __USE_DOS */
 #ifdef __USE_GNU
 #include <xlocale.h>
@@ -2194,23 +2195,6 @@ __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_doserrno,(__UINT32_TYPE__ __err),(__e
 #define _doserrno (*__doserrno())
 #endif /* ____doserrno_defined */
 
-#ifndef ___sys_errlist_defined
-#define ___sys_errlist_defined 1
-#if defined(__CRT_HAVE__sys_errlist)
-__LIBC char const *const _sys_errlist[];
-#elif defined(__CRT_HAVE___sys_errlist)
-__CDECLARE(, char const *const *,__NOTHROW, __sys_errlist, (void), ())
-#define _sys_errlist (__sys_errlist())
-#endif /* ... */
-
-#if defined(__CRT_HAVE__sys_nerr)
-__LIBC int _sys_nerr;
-#elif defined(__CRT_HAVE___sys_nerr)
-__CDECLARE(, int *,__NOTHROW, __sys_nerr, (void), ())
-#define _sys_nerr    (*__sys_nerr())
-#endif /* ... */
-#endif /* !___sys_errlist_defined */
-
 #ifndef ___environ_defined
 #define ___environ_defined 1
 #undef _environ
@@ -3383,9 +3367,6 @@ __FORCELOCAL void __NOTHROW_RPC(__LIBCCALL _sleep)(__UINT32_TYPE__ __duration) {
 #define min(a, b)   __min(a, b)
 #define max(a, b)   __max(a, b)
 #endif /* !__cplusplus */
-
-#define sys_errlist _sys_errlist
-#define sys_nerr    _sys_nerr
 
 #ifndef __environ_defined
 #define __environ_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f8ef14 */
+/* HASH CRC-32:0x3a18841f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -194,6 +194,7 @@ __NAMESPACE_STD_USING(snprintf)
 #include <libio.h>
 
 #ifdef __USE_DOS
+#include <bits/sys_errlist.h>
 #include <xlocale.h>
 #endif /* __USE_DOS */
 

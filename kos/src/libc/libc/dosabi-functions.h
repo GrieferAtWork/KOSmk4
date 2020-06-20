@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f8181bf */
+/* HASH CRC-32:0xfdb526f2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1589,14 +1589,12 @@ DFUN(".text.crt.dos.string.memory", libd_strpbrk, libc_strpbrk, TP, 2, TP, TP)
 DFUN(".text.crt.dos.string.memory", libd_strtok, libc_strtok, TP, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.memory", libd_strcoll, libc_strcoll, TD, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.memory", libd_strxfrm, libc_strxfrm, TI, 3, TP, TP, TI)
-DFUN(".text.crt.dos.errno", libd_strerror, libc_strerror, TP, 1, TD)
 DFUN(".text.crt.dos.string.memory", libd_strnlen, libc_strnlen, TI, 2, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_stpcpy, libc_stpcpy, TP, 2, TP, TP)
 DFUN(".text.crt.dos.string.memory", libd_stpncpy, libc_stpncpy, TP, 3, TP, TP, TI)
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strcoll_l, libc_strcoll_l, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strxfrm_l, libc_strxfrm_l, TI, 4, TP, TP, TI, TP)
 DFUN(".text.crt.dos.errno", libd_strerror_l, libc_strerror_l, TP, 2, TD, TP)
-DFUN(".text.crt.dos.string.memory.strsignal", libd_strsignal, libc_strsignal, TP, 1, TD)
 DFUN(".text.crt.dos.heap.strdup", libd_strndup, libc_strndup, TP, 2, TP, TI)
 DFUN(".text.crt.dos.heap.strdup", libd_strdup, libc_strdup, TP, 1, TP)
 DFUN(".text.crt.dos.string.memory", libd_strtok_r, libc_strtok_r, TP, 3, TP, TP, TP)
@@ -1612,7 +1610,6 @@ DFUN(".text.crt.dos.string.memory", libd_strfry, libc_strfry, TP, 1, TP)
 DFUN(".text.crt.dos.string.memory", libd_memfrob, libc_memfrob, TP, 2, TP, TI)
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strcasecmp_l, libc_strcasecmp_l, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strncasecmp_l, libc_strncasecmp_l, TD, 4, TP, TP, TI, TP)
-DFUN(".text.crt.dos.errno", libd_strerror_r, libc_strerror_r, TP, 3, TD, TP, TI)
 DFUN(".text.crt.dos.errno", libd___xpg_strerror_r, libc___xpg_strerror_r, TIn(__SIZEOF_ERRNO_T__), 3, TD, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_strsep, libc_strsep, TP, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.memory", libd_strcasecmp, libc_strcasecmp, TD, 2, TP, TP)
@@ -1767,7 +1764,6 @@ DFUN(".text.crt.dos.unicode.static.memory", libd_memcasemem, libc_memcasemem, TP
 DFUN(".text.crt.dos.unicode.locale.memory", libd_memcasecmp_l, libc_memcasecmp_l, TD, 4, TP, TP, TI, TP)
 DFUN(".text.crt.dos.unicode.locale.memory", libd_memcasemem_l, libc_memcasemem_l, TP, 5, TP, TI, TP, TI, TP)
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strcasestr_l, libc_strcasestr_l, TP, 3, TP, TP, TP)
-DFUN(".text.crt.dos.errno", libd_strsignal_s, libc_strsignal_s, TP, 1, TD)
 DFUN(".text.crt.dos.heap.strdup", libd_vstrdupf, libc_vstrdupf, TP, 2, TP, TP)
 DFUN(".text.crt.dos.string.memory", libd_wildstrcmp, libc_wildstrcmp, TD, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.memory", libd_wildstrcasecmp, libc_wildstrcasecmp, TD, 2, TP, TP)

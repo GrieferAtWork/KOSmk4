@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb758a28f */
+/* HASH CRC-32:0x9c72451f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2034,7 +2034,6 @@ DEFINE_PUBLIC_ALIAS(DOS$strpbrk, libd_strpbrk);
 DEFINE_PUBLIC_ALIAS(DOS$strtok, libd_strtok);
 DEFINE_PUBLIC_ALIAS(DOS$strcoll, libd_strcoll);
 DEFINE_PUBLIC_ALIAS(DOS$strxfrm, libd_strxfrm);
-DEFINE_PUBLIC_ALIAS(DOS$strerror, libd_strerror);
 DEFINE_PUBLIC_ALIAS(DOS$strnlen, libd_strnlen);
 DEFINE_PUBLIC_ALIAS(DOS$__stpcpy, libd_stpcpy);
 DEFINE_PUBLIC_ALIAS(DOS$stpcpy, libd_stpcpy);
@@ -2047,7 +2046,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_strxfrm_l, libd_strxfrm_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strxfrm_l, libd_strxfrm_l);
 DEFINE_PUBLIC_ALIAS(DOS$strxfrm_l, libd_strxfrm_l);
 DEFINE_PUBLIC_ALIAS(DOS$strerror_l, libd_strerror_l);
-DEFINE_PUBLIC_ALIAS(DOS$strsignal, libd_strsignal);
 DEFINE_PUBLIC_ALIAS(DOS$__strndup, libd_strndup);
 DEFINE_PUBLIC_ALIAS(DOS$strndup, libd_strndup);
 DEFINE_PUBLIC_ALIAS(DOS$_strdup, libd_strdup);
@@ -2075,8 +2073,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_strnicmp_l, libd_strncasecmp_l);
 DEFINE_PUBLIC_ALIAS(DOS$_strncmpi_l, libd_strncasecmp_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strncasecmp_l, libd_strncasecmp_l);
 DEFINE_PUBLIC_ALIAS(DOS$strncasecmp_l, libd_strncasecmp_l);
-DEFINE_PUBLIC_ALIAS(DOS$__strerror_r, libd_strerror_r);
-DEFINE_PUBLIC_ALIAS(DOS$strerror_r, libd_strerror_r);
 DEFINE_PUBLIC_ALIAS(DOS$__xpg_strerror_r, libd___xpg_strerror_r);
 DEFINE_PUBLIC_ALIAS(DOS$strsep, libd_strsep);
 DEFINE_PUBLIC_ALIAS(DOS$_stricmp, libd_strcasecmp);
@@ -2253,7 +2249,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_memicmp_l, libd_memcasecmp_l);
 DEFINE_PUBLIC_ALIAS(DOS$memcasecmp_l, libd_memcasecmp_l);
 DEFINE_PUBLIC_ALIAS(DOS$memcasemem_l, libd_memcasemem_l);
 DEFINE_PUBLIC_ALIAS(DOS$strcasestr_l, libd_strcasestr_l);
-DEFINE_PUBLIC_ALIAS(DOS$strsignal_s, libd_strsignal_s);
 DEFINE_PUBLIC_ALIAS(DOS$vstrdupf, libd_vstrdupf);
 DEFINE_PUBLIC_ALIAS(DOS$wildstrcmp, libd_wildstrcmp);
 DEFINE_PUBLIC_ALIAS(DOS$wildstrcasecmp, libd_wildstrcasecmp);

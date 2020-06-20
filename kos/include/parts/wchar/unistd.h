@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf445893 */
+/* HASH CRC-32:0xb7df0fdd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,13 +60,27 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchown,(wchar_t const *__file, 
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wchown, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL wchown)(wchar_t const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wchown))(__file, __owner, __group); })
 #endif /* ... */
+#ifdef __CRT_HAVE_wpathconf
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,wpathconf,(wchar_t const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
+__CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,wpathconf,(wchar_t const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
+#else /* __CRT_HAVE_wpathconf */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_fpathconf) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY)
+#include <local/parts.wchar.unistd/wpathconf.h>
+/* >> pathconf(2)
+ * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wpathconf, __FORCELOCAL __ATTR_NONNULL((1)) __LONGPTR_TYPE__ __NOTHROW_RPC(__LIBCCALL wpathconf)(wchar_t const *__path, __STDC_INT_AS_UINT_T __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wpathconf))(__path, __name); })
+#endif /* __CRT_HAVE_fpathconf && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__CRT_AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && __O_RDONLY */
+#endif /* !__CRT_HAVE_wpathconf */
 #ifdef __CRT_HAVE_wlink
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */

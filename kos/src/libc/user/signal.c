@@ -21,27 +21,33 @@
 #define GUARD_LIBC_USER_SIGNAL_C 1
 
 #include "../api.h"
-#include "signal.h"
+/**/
 
+#include <bits/signum-values-dos.h>
+#include <bits/signum-values-kos.h>
 #include <kos/syscalls.h>
+
+#include <stddef.h>
 #include <string.h>
 #include <unistd.h>
-#include <stddef.h>
+
+#include "signal.h"
+#include "string.h"
 
 DECL_BEGIN
 
 LOCAL int LIBCCALL
 libc_signo_dos2kos(int dos_signo) {
-	if (dos_signo == 22)
-		return SIGABRT;
+	if (dos_signo == __DOS_SIGABRT)
+		return __KOS_SIGABRT;
 	return dos_signo;
 }
 
 LOCAL int LIBCCALL
 libc_sigms_dos2kos(int dos_sigms) {
-	if ((unsigned int)dos_sigms & (1 << (22 - 1))) {
-		dos_sigms &= ~(1 << (22 - 1));
-		dos_sigms |= ~(1 << (SIGABRT - 1));
+	if ((unsigned int)dos_sigms & (1 << (__DOS_SIGABRT - 1))) {
+		dos_sigms &= ~(1 << (__DOS_SIGABRT - 1));
+		dos_sigms |= ~(1 << (__KOS_SIGABRT - 1));
 	}
 	return dos_sigms;
 }
@@ -170,6 +176,31 @@ NOTHROW_NCX(LIBCCALL libc_siggetmask)(void)
 }
 /*[[[end:libc_siggetmask]]]*/
 
+
+PRIVATE ATTR_SECTION(".bss.crt.errno.sys_siglist") char const *
+libc_sys_siglist[NSIG] = { NULL };
+
+/*[[[head:libc___p_sys_siglist,hash:CRC-32=0xa33e9b16]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *
+NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
+/*[[[body:libc___p_sys_siglist]]]*/
+{
+	char const **result = libc_sys_siglist;
+	if (!result[0]) {
+		unsigned int i = _NSIG;
+		/* Lazily initialize */
+		for (;;) {
+			result[i] = libc_strsignal_s(i);
+			COMPILER_WRITE_BARRIER();
+			if (!i)
+				break;
+			--i;
+		}
+	}
+	return result;
+}
+/*[[[end:libc___p_sys_siglist]]]*/
+
 /*[[[head:libc_sigreturn,hash:CRC-32=0x5c20a42e]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_NORETURN void
 NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
@@ -185,7 +216,7 @@ NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
 
 
 
-PRIVATE sigset_t __sigintr;
+PRIVATE ATTR_SECTION(".bss.crt.sched.signal") sigset_t __sigintr;
 
 /*[[[head:libc_bsd_signal,hash:CRC-32=0xb61114a]]]*/
 /* @param signo: One of `SIG*' */
@@ -644,7 +675,7 @@ DEFINE_INTERN_ALIAS(libc_gsignal, libc_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x9d99980e]]]*/
+/*[[[start:exports,hash:CRC-32=0x3174060f]]]*/
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(__sysv_signal, libc_sysv_signal);
 DEFINE_PUBLIC_ALIAS(sysv_signal, libc_sysv_signal);
@@ -655,6 +686,7 @@ DEFINE_PUBLIC_ALIAS(gsignal, libc_gsignal);
 DEFINE_PUBLIC_ALIAS(sigblock, libc_sigblock);
 DEFINE_PUBLIC_ALIAS(sigsetmask, libc_sigsetmask);
 DEFINE_PUBLIC_ALIAS(siggetmask, libc_siggetmask);
+DEFINE_PUBLIC_ALIAS(__p_sys_siglist, libc___p_sys_siglist);
 DEFINE_PUBLIC_ALIAS(sigreturn, libc_sigreturn);
 DEFINE_PUBLIC_ALIAS(bsd_signal, libc_bsd_signal);
 DEFINE_PUBLIC_ALIAS(__xpg_sigpause, libc___xpg_sigpause);
