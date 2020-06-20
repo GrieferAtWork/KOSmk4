@@ -394,7 +394,8 @@ dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
 				} else {
 					if (symbol.ds_sym->st_shndx != SHN_ABS)
 						result += symbol.ds_mod->dm_loadaddr;
-					if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC)
+					if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
+					    ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_KOS_IDATA)
 						result = (*(ElfW(Addr)(*)(void))(void *)result)();
 				}
 				*presult = result;
@@ -487,7 +488,8 @@ again_search_globals_module:
 						} else {
 							if (symbol.ds_sym->st_shndx != SHN_ABS)
 								result += symbol.ds_mod->dm_loadaddr;
-							if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC) {
+							if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
+							    ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_KOS_IDATA) {
 								TRY {
 									result = (*(ElfW(Addr)(*)(void))(void *)result)();
 								} EXCEPT {
@@ -527,7 +529,8 @@ again_search_globals_module:
 				} else {
 					if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
 						result += weak_symbol.ds_mod->dm_loadaddr;
-					if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC) {
+					if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
+					    ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_KOS_IDATA) {
 						TRY {
 							result = (*(ElfW(Addr)(*)(void))(void *)result)();
 						} EXCEPT {
@@ -601,7 +604,8 @@ again_search_globals_module:
 						} else {
 							if (symbol.ds_sym->st_shndx != SHN_ABS)
 								result += self->dm_loadaddr;
-							if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC)
+							if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
+							    ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_KOS_IDATA)
 								result = (*(ElfW(Addr)(*)(void))(void *)result)();
 						}
 done:
@@ -645,7 +649,8 @@ done:
 					} else {
 						if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
 							result += weak_symbol.ds_mod->dm_loadaddr;
-						if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC)
+						if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC ||
+						    ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_KOS_IDATA)
 							result = (*(ElfW(Addr)(*)(void))(void *)result)();
 					}
 				}

@@ -112,9 +112,6 @@ int main(int argc, char *argv[], char *envp[]) {
 	(void)argv;
 	(void)envp;
 
-	/* TODO: Add a system test for `STT_GNU_IFUNC'
-	 * KOS should support this feature, but it's never actually been tested... */
-
 	run_all_tests();
 	printf("All tests OK" EL "\n");
 	return 0;

@@ -131,10 +131,10 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			DlModule *src_module;
 			dst_sym = self->dm_elf.de_dynsym_tab + ELFW(R_SYM)(rel.r_info);
 			if unlikely(!DlModule_ElfFindSymbol(self,
-			                                 ELFW(R_SYM)(rel.r_info),
-			                                 &value,
-			                                 &src_size,
-			                                 &src_module))
+			                                    ELFW(R_SYM)(rel.r_info),
+			                                    &value,
+			                                    &src_size,
+			                                    &src_module))
 				goto err;
 			if unlikely(dst_sym->st_size != src_size) {
 				/* Special handling for symbols exported by the RTLD module itself.

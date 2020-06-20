@@ -19,6 +19,18 @@ diff -Naur binutils-2.32-orig/bfd/config.bfd binutils-2.32/bfd/config.bfd
      targ_defvec=x86_64_elf64_vec
      targ_selvecs="i386_elf32_vec iamcu_elf32_vec x86_64_elf32_vec l1om_elf64_vec k1om_elf64_vec"
      case "${targ}" in
+diff -Naur binutils-2.32-orig/bfd/elf.c binutils-2.32/bfd/elf.c
+--- binutils-2.32-orig/bfd/elf.c	2019-01-19 17:01:32.000000000 +0100
++++ binutils-2.32/bfd/elf.c	2020-06-20 13:31:09.159461000 +0200
+@@ -8086,7 +8086,7 @@
+       if ((flags & BSF_THREAD_LOCAL) != 0)
+ 	type = STT_TLS;
+       else if ((flags & BSF_GNU_INDIRECT_FUNCTION) != 0)
+-	type = STT_GNU_IFUNC;
++	type = (flags & BSF_OBJECT) ? 11 : STT_GNU_IFUNC;
+       else if ((flags & BSF_FUNCTION) != 0)
+ 	type = STT_FUNC;
+       else if ((flags & BSF_OBJECT) != 0)
 diff -Naur binutils-2.32-orig/bfd/elf64-x86-64.c binutils-2.32/bfd/elf64-x86-64.c
 --- binutils-2.32-orig/bfd/elf64-x86-64.c	2019-01-19 17:01:33.000000000 +0100
 +++ binutils-2.32/bfd/elf64-x86-64.c	2019-08-08 12:53:44.236980500 +0200
@@ -36,9 +48,22 @@ diff -Naur binutils-2.32-orig/bfd/elf64-x86-64.c binutils-2.32/bfd/elf64-x86-64.
  	      && ((bfd_link_executable (info)
  		   && ((h->root.type == bfd_link_hash_undefweak
  			&& !resolved_to_zero)
+diff -Naur binutils-2.32-orig/bfd/elfcode.h binutils-2.32/bfd/elfcode.h
+--- binutils-2.32-orig/bfd/elfcode.h	2019-01-19 17:01:33.000000000 +0100
++++ binutils-2.32/bfd/elfcode.h	2020-06-20 13:37:16.418211300 +0200
+@@ -1343,6 +1343,9 @@
+ 	    case STT_GNU_IFUNC:
+ 	      sym->symbol.flags |= BSF_GNU_INDIRECT_FUNCTION;
+ 	      break;
++	    case 11:
++	      sym->symbol.flags |= BSF_OBJECT | BSF_GNU_INDIRECT_FUNCTION;
++	      break;
+ 	    }
+ 
+ 	  if (dynamic)
 diff -Naur binutils-2.32-orig/bfd/elflink.c binutils-2.32/bfd/elflink.c
 --- binutils-2.32-orig/bfd/elflink.c	2019-01-19 17:01:33.000000000 +0100
-+++ binutils-2.32/bfd/elflink.c	2019-11-28 18:44:14.984322400 +0100
++++ binutils-2.32/bfd/elflink.c	2020-06-20 13:59:26.486070400 +0200
 @@ -543,13 +543,18 @@
  	 table.  */
        name = h->root.root.string;
@@ -119,7 +144,17 @@ diff -Naur binutils-2.32-orig/bfd/elflink.c binutils-2.32/bfd/elflink.c
    if (p != NULL && h->verinfo.vertree == NULL)
      {
        struct bfd_elf_version_tree *t;
-@@ -4980,7 +4993,7 @@
+@@ -4944,6 +4957,9 @@
+ 	      if (type == STT_GNU_IFUNC
+ 		  && (abfd->flags & DYNAMIC) != 0)
+ 		type = STT_FUNC;
++	      if (type == 11
++		  && (abfd->flags & DYNAMIC) != 0)
++		type = STT_OBJECT;
+ 
+ 	      if (h->type != type)
+ 		{
+@@ -4980,7 +4996,7 @@
  	  if (definition && !dynamic)
  	    {
  	      char *p = strchr (name, ELF_VER_CHR);
@@ -128,7 +163,7 @@ diff -Naur binutils-2.32-orig/bfd/elflink.c binutils-2.32/bfd/elflink.c
  		{
  		  /* Queue non-default versions so that .symver x, x@FOO
  		     aliases can be checked.  */
-@@ -5248,6 +5261,8 @@
+@@ -5248,6 +5264,8 @@
  	      || (h->root.type != bfd_link_hash_defined
  		  && h->root.type != bfd_link_hash_defweak))
  	    continue;
@@ -137,7 +172,7 @@ diff -Naur binutils-2.32-orig/bfd/elflink.c binutils-2.32/bfd/elflink.c
  
  	  amt = p - h->root.root.string;
  	  shortname = (char *) bfd_malloc (amt + 1);
-@@ -5539,6 +5554,8 @@
+@@ -5539,6 +5557,8 @@
    p = strchr (name, ELF_VER_CHR);
    if (p == NULL || p[1] != ELF_VER_CHR)
      return h;
@@ -146,7 +181,7 @@ diff -Naur binutils-2.32-orig/bfd/elflink.c binutils-2.32/bfd/elflink.c
  
    /* First check with only one `@'.  */
    len = strlen (name);
-@@ -5771,7 +5788,7 @@
+@@ -5771,7 +5791,7 @@
    if (h->versioned >= versioned)
      {
        char *p = strchr (name, ELF_VER_CHR);
@@ -155,7 +190,7 @@ diff -Naur binutils-2.32-orig/bfd/elflink.c binutils-2.32/bfd/elflink.c
  	{
  	  alc = (char *) bfd_malloc (p - name + 1);
  	  if (alc == NULL)
-@@ -5845,7 +5862,7 @@
+@@ -5845,7 +5865,7 @@
    if (h->versioned >= versioned)
      {
        char *p = strchr (name, ELF_VER_CHR);
@@ -164,7 +199,7 @@ diff -Naur binutils-2.32-orig/bfd/elflink.c binutils-2.32/bfd/elflink.c
  	{
  	  alc = (char *) bfd_malloc (p - name + 1);
  	  if (alc == NULL)
-@@ -10059,7 +10076,7 @@
+@@ -10059,7 +10079,7 @@
  	{
  	  char *p = strrchr (h->root.root.string, ELF_VER_CHR);
  
@@ -185,6 +220,22 @@ diff -Naur binutils-2.32-orig/config.sub binutils-2.32/config.sub
  	# Remember, each alternative MUST END IN *, to match a version number.
  		;;
  	qnx*)
+diff -Naur binutils-2.32-orig/gas/config/obj-elf.c binutils-2.32/gas/config/obj-elf.c
+--- binutils-2.32-orig/gas/config/obj-elf.c	2019-01-19 17:01:33.000000000 +0100
++++ binutils-2.32/gas/config/obj-elf.c	2020-06-20 13:29:30.464670500 +0200
+@@ -2043,6 +2043,12 @@
+ 		type_name);
+       type = BSF_FUNCTION | BSF_GNU_INDIRECT_FUNCTION;
+     }
++  else if (strcmp (type_name, "kos_indirect_data") == 0
++	   || strcmp (type_name, "11") == 0
++	   || strcmp (type_name, "STT_KOS_IDATA") == 0)
++    {
++      type = BSF_OBJECT | BSF_GNU_INDIRECT_FUNCTION;
++    }
+   else if (strcmp (type_name, "gnu_unique_object") == 0)
+     {
+       struct elf_backend_data *bed;
 diff -Naur binutils-2.32-orig/gas/configure.tgt binutils-2.32/gas/configure.tgt
 --- binutils-2.32-orig/gas/configure.tgt	2019-01-19 17:01:33.000000000 +0100
 +++ binutils-2.32/gas/configure.tgt	2019-03-17 10:51:36.829505700 +0100

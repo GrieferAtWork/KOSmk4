@@ -2145,7 +2145,8 @@ driver_symbol_ex(struct driver *__restrict self,
 			uintptr_t addr = elf_sym->st_value;
 			if (elf_sym->st_shndx != SHN_ABS)
 				addr += self->d_loadaddr;
-			if (ELFW(ST_TYPE)(elf_sym->st_info) == STT_GNU_IFUNC)
+			if (ELFW(ST_TYPE)(elf_sym->st_info) == STT_GNU_IFUNC ||
+			    ELFW(ST_TYPE)(elf_sym->st_info) == STT_KOS_IDATA)
 				addr = (*(uintptr_t(*)(void))addr)();
 			*psymbol_addr = (void *)addr;
 		}
@@ -2875,7 +2876,8 @@ found_symbol:
 		symbol_addr = (void *)sym->st_value;
 		if (sym->st_shndx != SHN_ABS)
 			symbol_addr = (byte_t *)symbol_addr + dep->d_loadaddr;
-		if (ELFW(ST_TYPE)(sym->st_info) == STT_GNU_IFUNC)
+		if (ELFW(ST_TYPE)(sym->st_info) == STT_GNU_IFUNC ||
+		    ELFW(ST_TYPE)(sym->st_info) == STT_KOS_IDATA)
 			symbol_addr = (*(void *(*)(void))symbol_addr)();
 		if (psymbol_size)
 			*psymbol_size = sym->st_size;

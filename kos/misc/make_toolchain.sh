@@ -451,7 +451,8 @@ if ! [ -f "$PREFIX/gcc/Makefile" ]; then
 		--enable-multiarch \
 		--enable-initfini-array \
 		--enable-__cxa_atexit \
-		--enable-multilib
+		--enable-multilib \
+		--enable-gnu-indirect-function
 	cmd cd "$KOS_BINUTILS"
 else
 	echo "    Already configured"

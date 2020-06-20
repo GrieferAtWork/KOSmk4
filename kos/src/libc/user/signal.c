@@ -25,6 +25,7 @@
 
 #include <bits/signum-values-dos.h>
 #include <bits/signum-values-kos.h>
+#include <kos/exec/idata.h>
 #include <kos/syscalls.h>
 
 #include <stddef.h>
@@ -177,8 +178,13 @@ NOTHROW_NCX(LIBCCALL libc_siggetmask)(void)
 /*[[[end:libc_siggetmask]]]*/
 
 
+#undef sys_siglist
+#undef _sys_siglist
 PRIVATE ATTR_SECTION(".bss.crt.errno.sys_siglist") char const *
 libc_sys_siglist[NSIG] = { NULL };
+
+DEFINE_PUBLIC_IDATA_G(sys_siglist, libc___p_sys_siglist, NSIG * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA_G(_sys_siglist, libc___p_sys_siglist, NSIG * __SIZEOF_POINTER__);
 
 /*[[[head:libc___p_sys_siglist,hash:CRC-32=0xa33e9b16]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *
@@ -187,7 +193,7 @@ NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
 {
 	char const **result = libc_sys_siglist;
 	if (!result[0]) {
-		unsigned int i = _NSIG;
+		unsigned int i = NSIG;
 		/* Lazily initialize */
 		for (;;) {
 			result[i] = libc_strsignal_s(i);

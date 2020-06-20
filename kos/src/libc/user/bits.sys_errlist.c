@@ -21,14 +21,20 @@
 #define GUARD_LIBC_USER_BITS_SYS_ERRLIST_C 1
 
 #include "../api.h"
-#include "aliases.h"
 /**/
 
+#include <kos/exec/idata.h>
+
+#include "bits.sys_errlist.h"
 #include "string.h"
 
 DECL_BEGIN
 
 
+#undef sys_nerr
+#undef _sys_nerr
+#undef sys_errlist
+#undef _sys_errlist
 INTERN ATTR_SECTION(".data.crt.errno") /*    */ int libc_sys_nerr = __GEN_ECOUNT;
 INTERN ATTR_SECTION(".data.crt.dos.errno") /**/ int libd_sys_nerr = __DOS_ECOUNT;
 INTERN ATTR_SECTION(".bss.crt.errno") /*     */ char const *libc_sys_errlist[__GEN_ECOUNT];
@@ -38,6 +44,11 @@ DEFINE_PUBLIC_ALIAS(sys_nerr, libc_sys_nerr);
 DEFINE_PUBLIC_ALIAS(_sys_nerr, libc_sys_nerr);
 DEFINE_PUBLIC_ALIAS(DOS$sys_nerr, libd_sys_nerr);
 DEFINE_PUBLIC_ALIAS(DOS$_sys_nerr, libd_sys_nerr);
+
+DEFINE_PUBLIC_IDATA_G(sys_errlist, libc___sys_errlist, __GEN_ECOUNT * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA_G(_sys_errlist, libc___sys_errlist, __GEN_ECOUNT * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA_G(DOS$sys_errlist, libd___sys_errlist, __DOS_ECOUNT * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA_G(DOS$_sys_errlist, libd___sys_errlist, __DOS_ECOUNT * __SIZEOF_POINTER__);
 
 
 /*[[[head:libd___sys_errlist,hash:CRC-32=0x64e50929]]]*/
