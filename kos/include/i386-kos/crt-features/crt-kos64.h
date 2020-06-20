@@ -1153,7 +1153,9 @@
 #define __CRT_HAVE__swprintf_p_l 1
 #define __CRT_HAVE__swprintf_s_l 1
 #define __CRT_HAVE__swscanf_l 1
+#define __CRT_HAVE__sys_errlist 1
 #define __CRT_HAVE__sys_nerr 1
+#define __CRT_HAVE__sys_siglist 1
 #define __CRT_HAVE__sysconf 1
 #define __CRT_HAVE__tell 1
 #define __CRT_HAVE__telli64 1
@@ -3675,6 +3677,7 @@
 #define __CRT_HAVE_sys_epoll_pwait 1
 #define __CRT_HAVE_sys_epoll_wait 1
 #define __CRT_HAVE_sys_epoll_wait_old 1
+#define __CRT_HAVE_sys_errlist 1
 #define __CRT_HAVE_sys_eventfd 1
 #define __CRT_HAVE_sys_eventfd2 1
 #define __CRT_HAVE_sys_execve 1
@@ -3950,6 +3953,7 @@
 #define __CRT_HAVE_sys_shmget 1
 #define __CRT_HAVE_sys_shutdown 1
 #define __CRT_HAVE_sys_sigaltstack 1
+#define __CRT_HAVE_sys_siglist 1
 #define __CRT_HAVE_sys_signalfd 1
 #define __CRT_HAVE_sys_signalfd4 1
 #define __CRT_HAVE_sys_socket 1
@@ -5358,6 +5362,7 @@
 #define __CRT_HAVE_KOS$_swprintf_p_l 1
 #define __CRT_HAVE_KOS$_swprintf_s_l 1
 #define __CRT_HAVE_KOS$_swscanf_l 1
+#define __CRT_HAVE_KOS$_sys_errlist 1
 #define __CRT_HAVE_KOS$_sys_nerr 1
 #define __CRT_HAVE_KOS$_sysconf 1
 #define __CRT_HAVE_KOS$_tell 1
@@ -7363,6 +7368,7 @@
 #define __CRT_HAVE_KOS$symlinkat 1
 #define __CRT_HAVE_KOS$sync_file_range 1
 #define __CRT_HAVE_KOS$syncfs 1
+#define __CRT_HAVE_KOS$sys_errlist 1
 #define __CRT_HAVE_KOS$sys_nerr 1
 #define __CRT_HAVE_KOS$syscall 1
 #define __CRT_HAVE_KOS$syscall64 1
@@ -8706,6 +8712,7 @@
 #define __CRT_HAVE_DOS$_swprintf_p_l 1
 #define __CRT_HAVE_DOS$_swprintf_s_l 1
 #define __CRT_HAVE_DOS$_swscanf_l 1
+#define __CRT_HAVE_DOS$_sys_errlist 1
 #define __CRT_HAVE_DOS$_sys_nerr 1
 #define __CRT_HAVE_DOS$_sysconf 1
 #define __CRT_HAVE_DOS$_tell 1
@@ -10711,6 +10718,7 @@
 #define __CRT_HAVE_DOS$symlinkat 1
 #define __CRT_HAVE_DOS$sync_file_range 1
 #define __CRT_HAVE_DOS$syncfs 1
+#define __CRT_HAVE_DOS$sys_errlist 1
 #define __CRT_HAVE_DOS$sys_nerr 1
 #define __CRT_HAVE_DOS$syscall 1
 #define __CRT_HAVE_DOS$syscall64 1

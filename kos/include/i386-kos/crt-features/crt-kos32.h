@@ -1156,7 +1156,9 @@
 #define __CRT_HAVE__swprintf_p_l 1
 #define __CRT_HAVE__swprintf_s_l 1
 #define __CRT_HAVE__swscanf_l 1
+#define __CRT_HAVE__sys_errlist 1
 #define __CRT_HAVE__sys_nerr 1
+#define __CRT_HAVE__sys_siglist 1
 #define __CRT_HAVE__sysconf 1
 #define __CRT_HAVE__tell 1
 #define __CRT_HAVE__telli64 1
@@ -3762,6 +3764,7 @@
 #define __CRT_HAVE_sys_epoll_ctl 1
 #define __CRT_HAVE_sys_epoll_pwait 1
 #define __CRT_HAVE_sys_epoll_wait 1
+#define __CRT_HAVE_sys_errlist 1
 #define __CRT_HAVE_sys_eventfd 1
 #define __CRT_HAVE_sys_eventfd2 1
 #define __CRT_HAVE_sys_execve 1
@@ -4085,6 +4088,7 @@
 #define __CRT_HAVE_sys_shutdown 1
 #define __CRT_HAVE_sys_sigaction 1
 #define __CRT_HAVE_sys_sigaltstack 1
+#define __CRT_HAVE_sys_siglist 1
 #define __CRT_HAVE_sys_signal 1
 #define __CRT_HAVE_sys_signalfd 1
 #define __CRT_HAVE_sys_signalfd4 1
@@ -4645,6 +4649,7 @@
 #define __CRT_HAVE_KOS$_swprintf_p_l 1
 #define __CRT_HAVE_KOS$_swprintf_s_l 1
 #define __CRT_HAVE_KOS$_swscanf_l 1
+#define __CRT_HAVE_KOS$_sys_errlist 1
 #define __CRT_HAVE_KOS$_sys_nerr 1
 #define __CRT_HAVE_KOS$_ui64tow 1
 #define __CRT_HAVE_KOS$_ui64tow_s 1
@@ -4860,6 +4865,7 @@
 #define __CRT_HAVE_KOS$strsignal_s 1
 #define __CRT_HAVE_KOS$swprintf 1
 #define __CRT_HAVE_KOS$swscanf 1
+#define __CRT_HAVE_KOS$sys_errlist 1
 #define __CRT_HAVE_KOS$sys_nerr 1
 #define __CRT_HAVE_KOS$ungetwc 1
 #define __CRT_HAVE_KOS$ungetwc_unlocked 1
@@ -5134,6 +5140,7 @@
 #define __CRT_HAVE_DOS$_swprintf_p_l 1
 #define __CRT_HAVE_DOS$_swprintf_s_l 1
 #define __CRT_HAVE_DOS$_swscanf_l 1
+#define __CRT_HAVE_DOS$_sys_errlist 1
 #define __CRT_HAVE_DOS$_sys_nerr 1
 #define __CRT_HAVE_DOS$_ui64tow 1
 #define __CRT_HAVE_DOS$_ui64tow_s 1
@@ -5349,6 +5356,7 @@
 #define __CRT_HAVE_DOS$strsignal_s 1
 #define __CRT_HAVE_DOS$swprintf 1
 #define __CRT_HAVE_DOS$swscanf 1
+#define __CRT_HAVE_DOS$sys_errlist 1
 #define __CRT_HAVE_DOS$sys_nerr 1
 #define __CRT_HAVE_DOS$ungetwc 1
 #define __CRT_HAVE_DOS$ungetwc_unlocked 1

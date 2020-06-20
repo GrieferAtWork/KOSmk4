@@ -293,6 +293,16 @@ function enumerateSymbolsStep(elfBinary: string, callback: Callable): Step {
 					} catch (...) {
 						continue;
 					}
+					if (symbolType == "<OS" && symbolBind == "specific>:") {
+						/* 491: 0002478d   528 <OS specific>: 11 GLOBAL DEFAULT    2 sys_errlist */
+						symbolType = symbolVisi;
+						symbolBind = symbolSect;
+						try {
+							symbolVisi, symbolSect, symbolName = symbolName.scanf("%[^ ] %[^ ] %[^]")...;
+						} catch (...) {
+							continue;
+						}
+					}
 					yield (
 						symbolName.rstrip(),
 						symbolType,
