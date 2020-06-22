@@ -19,7 +19,6 @@
  */
 #ifndef GUARD_KERNEL_CORE_FS_VFS_OPEN_C
 #define GUARD_KERNEL_CORE_FS_VFS_OPEN_C 1
-
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 

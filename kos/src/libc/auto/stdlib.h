@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x999a9bd3 */
+/* HASH CRC-32:0xedb2fa36 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -321,19 +321,27 @@ INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_realpath)(char const
 INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_frealpath)(fd_t fd, char *resolved, size_t buflen);
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
- * @param flags: Set of `0|AT_ALTPATH|AT_DOSPATH'
+ * @param flags: Set of `0 | AT_ALTPATH | AT_DOSPATH'
+ * NOTE: You may use `AT_ALTPATH' to cause the path to be printed in alternate
+ *       representation mode. This means that if the path would have normally
+ *       been printed as a unix path, it would instead be printed as a DOS path.
+ *       Similarly, the reverse also applies.
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
  *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
 INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd, char *resolved, size_t buflen, atflag_t flags);
 /* Returns the absolute filesystem path for the specified file
- * When `AT_SYMLINK_FOLLOW' is given, a final symlink is dereferenced,
- * causing the pointed-to file location to be retrieved. - Otherwise, the
- * location of the link is printed instead.
+ * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
+ * causing the path to the symlink itself to be printed. - Otherwise, the
+ * filed pointed to by the symblic link is printed.
+ * NOTE: You may use `AT_ALTPATH' to cause the path to be printed in alternate
+ *       representation mode. This means that if the path would have normally
+ *       been printed as a unix path, it would instead be printed as a DOS path.
+ *       Similarly, the reverse also applies.
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
  *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size.
- * @param flags: Set of `0|AT_ALTPATH|AT_SYMLINK_FOLLOW|AT_DOSPATH' */
+ * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 INTDEF WUNUSED NONNULL((2)) char *NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd, char const *filename, char *resolved, size_t buflen, atflag_t flags);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname, char const *val, int replace);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname);

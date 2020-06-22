@@ -284,7 +284,6 @@ INTERN struct inode_type ProcFS_PerProc_Fd_Entry_Type = {
 	},
 	/* .it_file = */ {
 	},
-	/* TODO: Need some kind of operator that can be used to overwrite open(2) */
 	{
 		 .it_symlink = {
 			/* .sl_readlink = */ NULL,

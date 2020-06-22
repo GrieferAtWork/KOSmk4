@@ -20,6 +20,7 @@
 #ifndef GUARD_APPS_SYSTEM_TEST_TEST_OPEN_ANON_INODE_C
 #define GUARD_APPS_SYSTEM_TEST_TEST_OPEN_ANON_INODE_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <hybrid/compiler.h>
 
@@ -27,11 +28,13 @@
 #include <system-test/ctest.h>
 
 #include <assert.h>
+#include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <kos/hop/handle.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
 
@@ -135,6 +138,47 @@ DEFINE_TEST(open_anon_inode) {
 	ASSERT_ERROR_OK(error == 0);
 	error = close(rw[0]);
 	ASSERT_ERROR_OK(error == 0);
+
+	{
+		fd_t dfd;
+		char *with_follow;
+		char const *expected_with_follow;
+		char *without_follow;
+
+		/* Test what had already been mentioned above:
+		 * Use files from `/proc/self/fd/[...]/' to implement the
+		 * equivalent of an `openat()' system call, whilst still
+		 * using the regular `open()'. */
+		dfd = open("/proc/self", O_RDONLY | O_DIRECTORY);
+		ASSERT_ERROR_OK(dfd >= 0);
+
+		sprintf(pathbuf, "/proc/self/fd/%d/exe", dfd);
+		with_follow = frealpathat(AT_FDCWD, pathbuf, NULL, 0, 0);
+		ASSERT_ERROR_OK(with_follow != NULL);
+		without_follow = frealpathat(AT_FDCWD, pathbuf, NULL, 0, AT_SYMLINK_NOFOLLOW);
+		ASSERT_ERROR_OK(without_follow != NULL);
+		error = close(dfd);
+		ASSERT_ERROR_OK(error == 0);
+
+		/* `with_follow' should be the equivalent of `readlink("/proc/self/exe")'
+		 * we can check this by comparing it against `expected_with_follow', which
+		 * should be an identical string. */
+		expected_with_follow = dlmodulename(dlopen(NULL, 0));
+		assertf(expected_with_follow != NULL, "%s", dlerror());
+		assertf(strcmp(with_follow, expected_with_follow) == 0,
+		        "%q != %q", with_follow, expected_with_follow);
+
+		/* `without_follow' should simply be a string `/proc/[getpid()]/exe', since
+		 * in this case the final symbolic link `exe' wasn't dereferenced. */
+		sprintf(pathbuf, "/proc/%d/exe", getpid());
+		assertf(strcmp(without_follow, pathbuf) == 0,
+		        "%q != %q", without_follow, pathbuf);
+
+
+		free(without_follow);
+		free(with_follow);
+	}
+
 }
 
 
