@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c847c33 */
+/* HASH CRC-32:0x1cc2bfcb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2141,9 +2141,7 @@ DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(setbuf, libc_setbuf);
-DEFINE_PUBLIC_ALIAS(_fgetchar, libc_getchar);
 DEFINE_PUBLIC_ALIAS(getchar, libc_getchar);
-DEFINE_PUBLIC_ALIAS(_fputchar, libc_putchar);
 DEFINE_PUBLIC_ALIAS(putchar, libc_putchar);
 DEFINE_PUBLIC_ALIAS(fgets, libc_fgets);
 DEFINE_PUBLIC_ALIAS(_IO_fputs, libc_fputs);
@@ -2235,9 +2233,7 @@ DEFINE_PUBLIC_ALIAS(getdelim, libc_getdelim);
 DEFINE_PUBLIC_ALIAS(getline, libc_getline);
 DEFINE_PUBLIC_ALIAS(getchar_unlocked, libc_getchar_unlocked);
 DEFINE_PUBLIC_ALIAS(putchar_unlocked, libc_putchar_unlocked);
-DEFINE_PUBLIC_ALIAS(_getw, libc_getw);
 DEFINE_PUBLIC_ALIAS(getw, libc_getw);
-DEFINE_PUBLIC_ALIAS(_putw, libc_putw);
 DEFINE_PUBLIC_ALIAS(putw, libc_putw);
 DEFINE_PUBLIC_ALIAS(fgets_unlocked, libc_fgets_unlocked);
 DEFINE_PUBLIC_ALIAS(fputs_unlocked, libc_fputs_unlocked);
@@ -2268,9 +2264,7 @@ DEFINE_PUBLIC_ALIAS(DOS$fprintf_s, libd_fprintf_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$fprintf_unlocked, libd_fprintf_unlocked);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(fprintf_s, libc_fprintf_unlocked);
 DEFINE_PUBLIC_ALIAS(fprintf_unlocked, libc_fprintf_unlocked);
-DEFINE_PUBLIC_ALIAS(vprintf_s, libc_vprintf_unlocked);
 DEFINE_PUBLIC_ALIAS(vprintf_unlocked, libc_vprintf_unlocked);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -2278,7 +2272,6 @@ DEFINE_PUBLIC_ALIAS(DOS$printf_s, libd_printf_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$printf_unlocked, libd_printf_unlocked);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(printf_s, libc_printf_unlocked);
 DEFINE_PUBLIC_ALIAS(printf_unlocked, libc_printf_unlocked);
 DEFINE_PUBLIC_ALIAS(vfscanf_unlocked, libc_vfscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(vscanf_unlocked, libc_vscanf_unlocked);
