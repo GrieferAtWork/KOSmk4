@@ -1742,10 +1742,21 @@ diff -Naur gcc-9.1.0-orig/libstdc++-v3/include/ext/ropeimpl.h gcc-9.1.0/libstdc+
    using std::__throw_length_error;
 diff -Naur gcc-9.1.0-orig/libstdc++-v3/include/ext/string_conversions.h gcc-9.1.0/libstdc++-v3/include/ext/string_conversions.h
 --- gcc-9.1.0-orig/libstdc++-v3/include/ext/string_conversions.h	2019-01-01 13:31:55.000000000 +0100
-+++ gcc-9.1.0/libstdc++-v3/include/ext/string_conversions.h	2019-11-10 15:14:14.151192600 +0100
-@@ -94,9 +94,9 @@
++++ gcc-9.1.0/libstdc++-v3/include/ext/string_conversions.h	2020-06-22 15:04:08.670099300 +0200
+@@ -93,10 +93,20 @@
+       return __ret;
      }
  
++  // Support wrapper for KOS's `unsigned int base` extension
++  template<typename _TRet, typename _Ret = _TRet, typename _CharT>
++    _Ret
++    __stoa(_TRet (*__convf) (const _CharT*, _CharT**, unsigned int),
++	   const char* __name, const _CharT* __str, std::size_t* __idx,
++	   int __base)
++    {
++		return __stoa<_TRet, _Ret, _CharT, unsigned int>(__convf, __name, __str, __idx, __base);
++    }
++
    // Helper for the to_string / to_wstring functions.
 -  template<typename _String, typename _CharT = typename _String::value_type>
 +  template<typename _String, typename _ReturnType, typename _CharT = typename _String::value_type>
@@ -1755,7 +1766,7 @@ diff -Naur gcc-9.1.0-orig/libstdc++-v3/include/ext/string_conversions.h gcc-9.1.
  				 __builtin_va_list), std::size_t __n,
  		 const _CharT* __fmt, ...)
      {
-@@ -108,13 +108,14 @@
+@@ -108,13 +118,14 @@
        __builtin_va_list __args;
        __builtin_va_start(__args, __fmt);
  

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d362405 */
+/* HASH CRC-32:0x3a9295ec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,16 +76,16 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_freezero_defined 1
 #ifdef __CRT_HAVE_freezero
 /* Same as `free(mallptr)', but also ensure that the memory region
- * described by `mallptr...+=size' is explicitly freed to zero, or
+ * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_freezero,(void *__mallptr, __SIZE_TYPE__ __size),freezero,(__mallptr,__size))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_freezero,(void *__mallptr, __SIZE_TYPE__ __num_bytes),freezero,(__mallptr,__num_bytes))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 __NAMESPACE_LOCAL_END
 #include <local/stdlib/freezero.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `free(mallptr)', but also ensure that the memory region
- * described by `mallptr...+=size' is explicitly freed to zero, or
+ * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */
 #define __localdep_freezero __LIBC_LOCAL_NAME(freezero)

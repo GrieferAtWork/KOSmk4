@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1b733a9 */
+/* HASH CRC-32:0x8a32c5ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -135,10 +135,10 @@ INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(
  * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *NOTHROW_NCX(LIBCCALL libc_recallocarray)(void *mallptr, size_t old_elem_count, size_t new_elem_count, size_t elem_size);
 /* Same as `free(mallptr)', but also ensure that the memory region
- * described by `mallptr...+=size' is explicitly freed to zero, or
+ * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr, size_t size);
+INTDEF void NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr, size_t num_bytes);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_errno)(errno_t *perr);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_errno)(errno_t *perr);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__set_errno)(errno_t err);

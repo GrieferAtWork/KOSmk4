@@ -400,6 +400,73 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       simple C-level interrupt handlers and/or system calls, by not needing
 	 *       to save registers that would be used in any case! */
 
+	/* TODO: Create a separate driver for transactional memory emulation. */
+	/* TODO: Create another separate driver (that makes use of the transactional
+	 *       instruction emulator) to emulate instruction execution for the child-
+	 *       process branch after a call to fork().
+	 *       By doing this (and doing it in a transactional environment), we could
+	 *       be on the lookout for calls to exec(), allowing us to detect the usual
+	 *       fork()+exec() pattern without having to actually clone anything (but
+	 *       instead we'd be able to spawn() a new process!) */
+	/* Reminder on how transactional memory works:
+	 * >> extern int bar, baz;
+	 * >> void foo() {
+	 * >>     if (!transaction({
+	 * >>         if (bar == 7)
+	 * >>             baz = 3;
+	 * >>     })) {
+	 * >>         printf("Failed");
+	 * >>     }
+	 * >> }
+	 * Behavior:
+	 * >> extern int bar, baz;
+	 * >> void foo() {
+	 * >>     for (;;) {
+	 * >>         uintptr_t tx_oldver;
+	 * >>         int baz_newval;
+	 * >>         bool baz_should_set = false;
+	 * >>         tx_oldver = THIS_VM->tx_version;
+	 * >>         COMPILER_BARRIER();
+	 * >>         if (bar == 7) {
+	 * >>             baz_should_set = true;
+	 * >>             baz_newval = 3;
+	 * >>         }
+	 * >>         // NOTE: Anything done in here that would be ~too~ complex, such as (trying
+	 * >>         //       to) do a system call would instead trigger `goto tx_failed'
+	 * >>         COMPILER_BARRIER();
+	 * >>         if (!baz_should_set) {
+	 * >>             // Nothing modified. -> No need to change the version of do any write-back
+	 * >>             // Must still verify version integrity, though!
+	 * >>             if (THIS_VM->tx_version != tx_oldver)
+	 * >>                 continue;
+	 * >>             break;
+	 * >>         }
+	 * >>         while (!sync_trywrite(&THIS_VM->tx_lock)) {
+	 * >>             if (THIS_VM->tx_version != tx_oldver)
+	 * >>                 continue;
+	 * >>             task_yield();
+	 * >>         }
+	 * >>         COMPILER_BARRIER();
+	 * >>         FINALLY_ENDWRITE(&THIS_VM->tx_lock);
+	 * >>         if (THIS_VM->tx_version != tx_oldver)
+	 * >>             continue;
+	 * >>         if (baz_should_set) {
+	 * >>             if (IS_VIO(baz))
+	 * >>                 goto tx_failed;
+	 * >>             baz = baz_newval;
+	 * >>         }
+	 * >>         ++THIS_VM->tx_version;
+	 * >>         break;
+	 * >>     }
+	 * >>     if (0) {
+	 * >> tx_failed:
+	 * >>         printf("Failed");
+	 * >>     }
+	 * >> }
+	 * During the 
+	 * 
+	 */
+
 	/* TODO: renameat2() is missing from <stdio.h> */
 
 	return state;

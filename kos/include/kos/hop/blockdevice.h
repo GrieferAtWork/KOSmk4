@@ -57,9 +57,9 @@ struct hop_blockdevice_stat /*[PREFIX(bs_)]*/ {
 	__uint64_t   bs_total_bytes;   /* Total number of bytes available. */
 	__uint64_t   bs_sector_count;  /* Total number of sectors available. */
 	__uint64_t   bs_sector_size;   /* Size of a single sector (in bytes). */
-	__uint32_t   bs_device_flag;   /* Active device flags (Set of `BD_F*').
+	__uint32_t   bs_device_flag;   /* Active device flags (Set of `BLOCK_DEVICE_FLAG_*').
 	                                * NOTE: If this device is a partition, the `BLOCK_DEVICE_FLAG_PARTITION' bit is set */
-	__uint32_t   bs_partcount;     /* Number of child partitions of thsi block device. */
+	__uint32_t   bs_partcount;     /* Number of child partitions of this block device. */
 	__uint64_t   bs_devno;         /* Device number (`dev_t') */
 	char         bs_name[80];      /* Name of the device (as used for the auto-node that may appear in `/dev') */
 };
@@ -96,7 +96,7 @@ struct hop_blockdevice_openpart /*[PREFIX(bop_)]*/ {
                                                   * >> hop(fd, HOP_BLOCKDEVICE_OPENDRIVEROOT, &root);
                                                   * >> hop(root.of_hint, HOP_BLOCKDEVICE_WRREADONLY, 0);
                                                   * >> close(root.of_hint); */
-#define HOP_BLOCKDEVICE_OPENDRIVEROOT 0x00020005 /* [struct hop_openfd *arg] Open the drive root of a partition, or re-open a partition.
+#define HOP_BLOCKDEVICE_OPENDRIVEROOT 0x00020005 /* [struct hop_openfd *arg] Open the drive root of a partition, or re-open a drive root.
                                                   * @return: == arg->of_hint
                                                   * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a block-device. */
 #define HOP_BLOCKDEVICE_OPENDRIVEPART 0x00020006 /* [struct hop_blockdevice_openpart *arg] Open a given partition.

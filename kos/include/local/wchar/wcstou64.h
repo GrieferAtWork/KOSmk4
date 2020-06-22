@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bc0df9f */
+/* HASH CRC-32:0x133b5f57 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,10 @@
 #ifndef __local_wcstou64_defined
 #define __local_wcstou64_defined 1
 #include <__crt.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcstou64) __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstou64))(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, int __base) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstou64))(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base) {
 	__UINT64_TYPE__ __result, __temp;
 	if (!__base) {
 		if (*__nptr == '0') {
@@ -56,7 +57,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstou64))(__WCHAR_TYPE__ const *__re
 		if (__temp >= (unsigned int)__base)
 			break;
 		++__nptr;
-		__result *= __base;
+		__result *= (unsigned int)__base;
 		__result += __temp;
 	}
 	if (__endptr)

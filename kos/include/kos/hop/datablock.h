@@ -130,7 +130,7 @@ struct hop_datablock_syncbytes /*[PREFIX(dsb_)]*/ {
 	 *        and `bsr_maxbyte'. */
 	__uint64_t        dsb_minbyte;     /* [IN] Offset of the lowest byte that should be synced. */
 	__uint64_t        dsb_maxbyte;     /* [IN] Offset of the greatest byte that should be synced. */
-	__uint64_t        dsb_count;       /* [OUT] Number of synced data pages (pages that had been modified). */
+	__uint64_t        dsb_count;       /* [OUT] Number of synced data bytes. */
 };
 #endif /* __CC__ */
 
@@ -252,8 +252,8 @@ struct hop_directory_opennode /*[PREFIX(don_)]*/ {
 	                                        * structure version. */
 	__uint32_t          __don_pad1;        /* ... */
 	/* Open the INode/Directory entry of a given child of some directory.
-	 * WARNING: This function does not follow symbolic links, understands
-	 *          the special paths `.' and `..', or will even traverse more
+	 * WARNING: This function does not follow symbolic links, doesn't understand
+	 *          the special paths `.' and `..', and will not even traverse more
 	 *          than a single directory component (aka. no slashes)
 	 *          These are the low-level functions used to lookup a child
 	 *          entry within some given directory. */
@@ -290,8 +290,8 @@ struct hop_directory_creatfile /*[PREFIX(dcf_)]*/ {
 	                                          * structure version. */
 	__uint32_t          __dcf_pad1;          /* ... */
 	/* Create/open a child within a given directory.
-	 * WARNING: This function does not follow symbolic links, understands
-	 *          the special paths `.' and `..', or will even traverse more
+	 * WARNING: This function does not follow symbolic links, doesn't understand
+	 *          the special paths `.' and `..', and will not even traverse more
 	 *          than a single directory component (aka. no slashes)
 	 *          These are the low-level functions used to lookup a child
 	 *          entry within some given directory.
@@ -345,8 +345,8 @@ struct hop_directory_remove /*[PREFIX(drm_)]*/ {
 	                                         * structure version. */
 	__uint32_t          __drm_pad1;         /* ... */
 	/* Remove a child from a given directory.
-	 * WARNING: This function does not follow symbolic links, understands
-	 *          the special paths `.' and `..', or will even traverse more
+	 * WARNING: This function does not follow symbolic links, doesn't understand
+	 *          the special paths `.' and `..', and will not even traverse more
 	 *          than a single directory component (aka. no slashes)
 	 *          These are the low-level functions used to lookup a child
 	 *          entry within some given directory. */
@@ -386,8 +386,8 @@ struct hop_directory_rename /*[PREFIX(drn_)]*/ {
 	                                         * structure version. */
 	__uint32_t          __drn_pad1;         /* ... */
 	/* Rename a child in a given directory, potentially also moving it into another directory.
-	 * WARNING: This function does not follow symbolic links, understands
-	 *          the special paths `.' and `..', or will even traverse more
+	 * WARNING: This function does not follow symbolic links, doesn't understand
+	 *          the special paths `.' and `..', and will not even traverse more
 	 *          than a single directory component (aka. no slashes)
 	 *          These are the low-level functions used to lookup a child
 	 *          entry within some given directory. */
@@ -429,8 +429,8 @@ struct hop_directory_link /*[PREFIX(dli_)]*/ {
 	                                          * structure version. */
 	__uint32_t          __dli_pad1;          /* ... */
 	/* Create hard links within a given directory.
-	 * WARNING: This function does not follow symbolic links, understands
-	 *          the special paths `.' and `..', or will even traverse more
+	 * WARNING: This function does not follow symbolic links, doesn't understand
+	 *          the special paths `.' and `..', and will not even traverse more
 	 *          than a single directory component (aka. no slashes)
 	 *          These are the low-level functions used to lookup a child
 	 *          entry within some given directory. */
@@ -467,8 +467,8 @@ struct hop_directory_symlink /*[PREFIX(dsl_)]*/ {
 	                                          * structure version. */
 	__uint32_t          __dsl_pad1;          /* ... */
 	/* Create a new symbolic link within a given directory.
-	 * WARNING: This function does not follow symbolic links, understands
-	 *          the special paths `.' and `..', or will even traverse more
+	 * WARNING: This function does not follow symbolic links, doesn't understand
+	 *          the special paths `.' and `..', and will not even traverse more
 	 *          than a single directory component (aka. no slashes)
 	 *          These are the low-level functions used to lookup a child
 	 *          entry within some given directory. */
@@ -513,8 +513,8 @@ struct hop_directory_mknod /*[PREFIX(dmn_)]*/ {
 	                                          * structure version. */
 	__uint32_t          __dmn_pad1;          /* ... */
 	/* Create a new symbolic link within a given directory.
-	 * WARNING: This function does not follow symbolic links, understands
-	 *          the special paths `.' and `..', or will even traverse more
+	 * WARNING: This function does not follow symbolic links, doesn't understand
+	 *          the special paths `.' and `..', and will not even traverse more
 	 *          than a single directory component (aka. no slashes)
 	 *          These are the low-level functions used to lookup a child
 	 *          entry within some given directory. */
@@ -558,8 +558,8 @@ struct hop_directory_mkdir /*[PREFIX(dmd_)]*/ {
 	                                          * structure version. */
 	__uint32_t          __dmd_pad1;          /* ... */
 	/* Create a new symbolic link within a given directory.
-	 * WARNING: This function does not follow symbolic links, understands
-	 *          the special paths `.' and `..', or will even traverse more
+	 * WARNING: This function does not follow symbolic links, doesn't understand
+	 *          the special paths `.' and `..', and will not even traverse more
 	 *          than a single directory component (aka. no slashes)
 	 *          These are the low-level functions used to lookup a child
 	 *          entry within some given directory. */

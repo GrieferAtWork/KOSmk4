@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1172d9e1 */
+/* HASH CRC-32:0x9fe017fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,10 @@
 #ifndef __local_strtou32_defined
 #define __local_strtou32_defined 1
 #include <__crt.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtou32) __ATTR_LEAF __ATTR_NONNULL((1)) __UINT32_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32))(char const *__restrict __nptr, char **__endptr, int __base) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) {
 	__UINT32_TYPE__ __result, __temp;
 	if (!__base) {
 		if (*__nptr == '0') {
@@ -56,7 +57,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32))(char const *__restrict __n
 		if (__temp >= (unsigned int)__base)
 			break;
 		++__nptr;
-		__result *= __base;
+		__result *= (unsigned int)__base;
 		__result += __temp;
 	}
 	if (__endptr)

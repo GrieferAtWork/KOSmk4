@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7afd687c */
+/* HASH CRC-32:0xc22912de */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ __LOCAL_LIBC(qsort_r) __ATTR_NONNULL((1, 4)) void
 		while (__STACK_NOT_EMPTY) {
 			__BYTE_TYPE__ *__left_ptr;
 			__BYTE_TYPE__ *__right_ptr;
-			__BYTE_TYPE__ *__mid = __lo+__item_size * ((__hi-__lo) / __item_size >> 1);
+			__BYTE_TYPE__ *__mid = __lo + __item_size * ((__hi - __lo) / __item_size >> 1);
 			if ((*__cmp)((void *)__mid, (void *)__lo, __arg) < 0)
 				__SWAP(__mid, __lo, __item_size);
 			if ((*__cmp)((void *)__hi, (void *)__mid, __arg) < 0)

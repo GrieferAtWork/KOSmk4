@@ -2306,18 +2306,18 @@ NOTHROW_NCX(LIBCCALL libc_recallocarray)(void *mallptr,
 }
 /*[[[end:libc_recallocarray]]]*/
 
-/*[[[head:libc_freezero,hash:CRC-32=0xe08eaf1c]]]*/
+/*[[[head:libc_freezero,hash:CRC-32=0x86cde3d3]]]*/
 /* Same as `free(mallptr)', but also ensure that the memory region
- * described by `mallptr...+=size' is explicitly freed to zero, or
+ * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */
 INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") void
 NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
-                                    size_t size)
+                                    size_t num_bytes)
 /*[[[body:libc_freezero]]]*/
 /*AUTO*/{
 	if likely(mallptr) {
-		explicit_bzero(mallptr, size);
+		explicit_bzero(mallptr, num_bytes);
 		free(mallptr);
 	}
 }

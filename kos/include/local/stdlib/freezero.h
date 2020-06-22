@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b43aff4 */
+/* HASH CRC-32:0x302ef5f5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,13 +69,13 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
 /* Same as `free(mallptr)', but also ensure that the memory region
- * described by `mallptr...+=size' is explicitly freed to zero, or
+ * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
  * immediately returned to the OS, rather than being left in cache
  * while still containing its previous contents. */
 __LOCAL_LIBC(freezero) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(freezero))(void *__mallptr, __SIZE_TYPE__ __size) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(freezero))(void *__mallptr, __SIZE_TYPE__ __num_bytes) {
 	if __likely(__mallptr) {
-		__localdep_explicit_bzero(__mallptr, __size);
+		__localdep_explicit_bzero(__mallptr, __num_bytes);
 		__localdep_free(__mallptr);
 	}
 }

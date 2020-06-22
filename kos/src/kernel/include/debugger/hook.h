@@ -62,8 +62,8 @@ DECL_BEGIN
 
 /* Optional, per-module section containing debugger hooks.
  * This section contains an arbitrary number of hooks, each
- * of which followed the layout mandated by `struct dbg_hookhdr'
- * The hooks array is be terminated in a couple of ways:
+ * of which follows the layout mandated by `struct dbg_hookhdr'
+ * The hooks array can be terminated in a couple of ways:
  *   - By simply reaching the end of the .dbg.hooks section (intended method)
  *   - By encountering a hook with a `dh_size' field `< sizeof(struct dbg_hookhdr)'
  *   - By encountering a hook with a `dh_size' field `> REMAINING_SPACE_IN_SECTION' */
@@ -177,8 +177,8 @@ struct dbg_morehook {
                                                  * because argv[0] is the name of the function))
                                                  * When this flag is set, the commandline changes its color (to red)
                                                  * whenever the word currently being written can no longer be auto-
-                                                 * completed (the same way it changes color when the name of the current
-                                                 * command is unknown) */
+                                                 * completed (the same way it changes color when the typed command
+                                                 * name doesn't match any known command) */
 
 /* Debugger command provider hook */
 #ifdef __CC__
@@ -193,7 +193,7 @@ typedef void (DBG_CALL *dbg_autocomplete_cb_t)(void *arg, char const *name, size
 /* Enumerate a list of possible words that may follow after
  * argc+argv by invoking `(*cb)(arg, ...)' for each possibility.
  * @param: starts_with: (optional) When non-NULL (and non-empty), the function
- *                       is allowed to skip enumeration auto-completion options
+ *                       is allowed to skip enumerating auto-completion options
  *                       that start with the C-string `starts_with' */
 typedef void (DBG_CALL *dbg_autocomplete_t)(size_t argc, char *argv[],
                                             dbg_autocomplete_cb_t cb, void *arg,
@@ -216,7 +216,7 @@ typedef void (DBG_CALL *dbg_autocomplete_t)(size_t argc, char *argv[],
  * >> DBG_AUTOCOMPLETE(Symbol name, Symbol argc, Symbol argv, Symbol cb, Symbol arg) { ... }
  * >> DBG_AUTOCOMPLETE(Symbol name, Symbol argc, Symbol argv, Symbol cb, Symbol arg, Symbol starts_with) { ... }
  * >> DBG_AUTOCOMPLETE(Symbol name, Symbol argc, Symbol argv, Symbol cb, Symbol arg, Symbol starts_with, Symbol starts_with_len) { ... }
- * NOTE: All arguments are the names of the parameters passed to the function. */
+ * NOTE: All arguments (except for `name') are the names of the parameters passed to the function. */
 #define DBG_AUTOCOMPLETE(...) __HYBRID_PP_VA_OVERLOAD(_DBG_PRIVATE_AUTOCOMPLETE_, (__VA_ARGS__))(__VA_ARGS__)
 
 struct dbg_commandhook {

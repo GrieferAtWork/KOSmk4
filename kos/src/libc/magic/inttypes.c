@@ -533,16 +533,23 @@ __NAMESPACE_STD_USING(imaxdiv_t)
 %[insert:std]
 
 
-[[std, section(".text.crt{|.dos}.math.utility")]]
+[[std, nothrow, ATTR_CONST, crtbuiltin]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_INT__), alias("abs")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("labs")]]
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("llabs")]]
-[[nothrow, ATTR_CONST, crtbuiltin]]
+[[if(__SIZEOF_INTMAX_T__ == 8), alias("_abs64")]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_INT__), bind_local_function(abs)]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), bind_local_function(labs)]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), bind_local_function(llabs)]]
+[[section(".text.crt{|.dos}.math.utility")]]
 $intmax_t imaxabs($intmax_t x) {
 	return x < 0 ? -x : x;
 }
 
 [[std, nothrow, ATTR_CONST]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_INT__), alias("div")]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), alias("ldiv")]]
+[[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("lldiv")]]
 [[section(".text.crt{|.dos}.math.utility")]]
 imaxdiv_t imaxdiv($intmax_t numer, $intmax_t denom) {
 	imaxdiv_t result;
@@ -557,8 +564,11 @@ imaxdiv_t imaxdiv($intmax_t numer, $intmax_t denom) {
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("strtoll", "strtoq")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("strto64", "_strtoi64")]]
 [[if(__SIZEOF_INTMAX_T__ == 4), alias("strto32")]]
+[[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(strto64)]]
+[[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(strto32)]]
+[[decl_include("<features.h>")]]
 $intmax_t strtoimax([[nonnull]] char const *__restrict nptr,
-                    [[nullable]] char **endptr, int base) {
+                    [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base) {
 @@pp_if __SIZEOF_INTMAX_T__ <= 4@@
 	return (intmax_t)strto32(nptr, endptr, base);
 @@pp_else@@
@@ -572,8 +582,11 @@ $intmax_t strtoimax([[nonnull]] char const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("strtoull", "strtouq")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("strtou64", "_strtoui64")]]
 [[if(__SIZEOF_INTMAX_T__ == 4), alias("strtou32")]]
+[[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(strtou64)]]
+[[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(strtou32)]]
+[[decl_include("<features.h>")]]
 $uintmax_t strtoumax([[nonnull]] char const *__restrict nptr,
-                     [[nullable]] char ** endptr, int base) {
+                     [[nullable]] char ** endptr, __STDC_INT_AS_UINT_T base) {
 @@pp_if __SIZEOF_INTMAX_T__ <= 4@@
 	return (uintmax_t)strtou32(nptr, endptr, base);
 @@pp_else@@
@@ -588,8 +601,11 @@ $uintmax_t strtoumax([[nonnull]] char const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("wcstoll", "wcstoq")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("wcsto64", "_wcstoi64")]]
 [[if(__SIZEOF_INTMAX_T__ == 4), alias("wcsto32")]]
+[[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcsto64)]]
+[[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(wcsto32)]]
+[[decl_include("<features.h>")]]
 $intmax_t wcstoimax([[nonnull]] $wchar_t const *__restrict nptr,
-                    [[nullable]] $wchar_t **endptr, int base)
+                    [[nullable]] $wchar_t **endptr, __STDC_INT_AS_UINT_T base)
 	%{generate(str2wcs("strtoimax"))}
 
 [[std, wchar, ATTR_LEAF]]
@@ -598,8 +614,11 @@ $intmax_t wcstoimax([[nonnull]] $wchar_t const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("wcstoull", "wcstouq")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("wcstou64", "_wcstoui64")]]
 [[if(__SIZEOF_INTMAX_T__ == 4), alias("wcstou32")]]
+[[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcstou64)]]
+[[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(wcstou32)]]
+[[decl_include("<features.h>")]]
 $uintmax_t wcstoumax([[nonnull]] $wchar_t const *__restrict nptr,
-                     [[nullable]] $wchar_t **endptr, int base)
+                     [[nullable]] $wchar_t **endptr, __STDC_INT_AS_UINT_T base)
 	%{generate(str2wcs("strtoumax"))}
 
 %
@@ -615,9 +634,12 @@ $uintmax_t wcstoumax([[nonnull]] $wchar_t const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("strtoll_l", "_strtoll_l", "__strtoll_l")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("strto64_l", "_strtoi64_l")]]
 [[if(__SIZEOF_INTMAX_T__ == 4), alias("strto32_l")]]
+[[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(strto64_l)]]
+[[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(strto32_l)]]
 [[section(".text.crt{|.dos}.unicode.locale.convert")]]
+[[decl_include("<features.h>")]]
 $intmax_t strtoimax_l([[nonnull]] char const *__restrict nptr,
-                      [[nullable]] char **endptr, int base,
+                      [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
                       $locale_t locale) {
 	(void)locale;
 	return strtoimax(nptr, endptr, base);
@@ -629,9 +651,12 @@ $intmax_t strtoimax_l([[nonnull]] char const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("strtoull_l", "_strtoull_l", "__strtoull_l")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("strtou64_l", "_strtoui64_l")]]
 [[if(__SIZEOF_INTMAX_T__ == 4), alias("strtou32_l")]]
+[[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(strtou64_l)]]
+[[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(strtou32_l)]]
 [[section(".text.crt{|.dos}.unicode.locale.convert")]]
+[[decl_include("<features.h>")]]
 $uintmax_t strtoumax_l([[nonnull]] char const *__restrict nptr,
-                       [[nullable]] char **endptr, int base,
+                       [[nullable]] char **endptr, __STDC_INT_AS_UINT_T base,
                        $locale_t locale) {
 	(void)locale;
 	return strtoumax(nptr, endptr, base);
@@ -642,9 +667,12 @@ $uintmax_t strtoumax_l([[nonnull]] char const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("wcstoll_l", "_wcstoll_l", "__wcstoll_l")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("wcsto64_l", "_wcstoi64_l")]]
 [[if(__SIZEOF_INTMAX_T__ == 4), alias("wcsto32_l")]]
+[[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcsto64_l)]]
+[[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(wcsto32_l)]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
+[[decl_include("<features.h>")]]
 $intmax_t wcstoimax_l([[nonnull]] $wchar_t const *__restrict nptr,
-                      [[nullable]] $wchar_t **endptr, int base,
+                      [[nullable]] $wchar_t **endptr, __STDC_INT_AS_UINT_T base,
                       $locale_t locale)
 	%{generate(str2wcs("strtoimax_l"))}
 
@@ -653,9 +681,12 @@ $intmax_t wcstoimax_l([[nonnull]] $wchar_t const *__restrict nptr,
 [[if(__SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), alias("wcstoull_l", "_wcstoull_l", "__wcstoull_l")]]
 [[if(__SIZEOF_INTMAX_T__ == 8), alias("wcstou64_l", "_wcstoui64_l")]]
 [[if(__SIZEOF_INTMAX_T__ == 4), alias("wcstou32_l")]]
+[[if(__SIZEOF_INTMAX_T__ == 8), bind_local_function(wcstou64_l)]]
+[[if(__SIZEOF_INTMAX_T__ == 4), bind_local_function(wcstou32_l)]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
+[[decl_include("<features.h>")]]
 $uintmax_t wcstoumax_l([[nonnull]] $wchar_t const *__restrict nptr,
-                       [[nullable]] $wchar_t **endptr, int base,
+                       [[nullable]] $wchar_t **endptr, __STDC_INT_AS_UINT_T base,
                        $locale_t locale)
 	%{generate(str2wcs("strtoumax_l"))}
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd08c7cf2 */
+/* HASH CRC-32:0x7643c65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -390,7 +390,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsrtombs)(char *dst,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) long
 NOTHROW_NCX(LIBDCALL libd_wcstol)(char16_t const *__restrict nptr,
                                   char16_t **endptr,
-                                  int base) {
+                                  __STDC_INT_AS_UINT_T base) {
 #if __SIZEOF_LONG__ <= 4
 	return (long)libd_wcsto32(nptr, endptr, base);
 #else /* __SIZEOF_LONG__ <= 4 */
@@ -400,7 +400,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstol)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) long
 NOTHROW_NCX(LIBKCALL libc_wcstol)(char32_t const *__restrict nptr,
                                   char32_t **endptr,
-                                  int base) {
+                                  __STDC_INT_AS_UINT_T base) {
 #if __SIZEOF_LONG__ <= 4
 	return (long)libc_wcsto32(nptr, endptr, base);
 #else /* __SIZEOF_LONG__ <= 4 */
@@ -410,7 +410,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstol)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBDCALL libd_wcstoul)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
-                                   int base) {
+                                   __STDC_INT_AS_UINT_T base) {
 #if __SIZEOF_LONG__ <= 4
 	return (unsigned long)libd_wcstou32(nptr, endptr, base);
 #else /* __SIZEOF_LONG__ <= 4 */
@@ -420,7 +420,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoul)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBKCALL libc_wcstoul)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
-                                   int base) {
+                                   __STDC_INT_AS_UINT_T base) {
 #if __SIZEOF_LONG__ <= 4
 	return (unsigned long)libc_wcstou32(nptr, endptr, base);
 #else /* __SIZEOF_LONG__ <= 4 */
@@ -1164,7 +1164,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstold)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBDCALL libd_wcstoll)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
-                                   int base) {
+                                   __STDC_INT_AS_UINT_T base) {
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__LONGLONG)libd_wcsto32(nptr, endptr, base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
@@ -1174,7 +1174,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoll)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBKCALL libc_wcstoll)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
-                                   int base) {
+                                   __STDC_INT_AS_UINT_T base) {
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__LONGLONG)libc_wcsto32(nptr, endptr, base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
@@ -1184,7 +1184,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoll)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __ULONGLONG
 NOTHROW_NCX(LIBDCALL libd_wcstoull)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
-                                    int base) {
+                                    __STDC_INT_AS_UINT_T base) {
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__ULONGLONG)libd_wcstou32(nptr, endptr, base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
@@ -1194,7 +1194,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoull)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __ULONGLONG
 NOTHROW_NCX(LIBKCALL libc_wcstoull)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
-                                    int base) {
+                                    __STDC_INT_AS_UINT_T base) {
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__ULONGLONG)libc_wcstou32(nptr, endptr, base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
@@ -1482,7 +1482,7 @@ NOTHROW_NCX(LIBKCALL libc_wcschrnul)(char32_t const *haystack,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) long
 NOTHROW_NCX(LIBDCALL libd_wcstol_l)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
-                                    int base,
+                                    __STDC_INT_AS_UINT_T base,
                                     locale_t locale) {
 	(void)locale;
 	return libd_wcstol(nptr, endptr, base);
@@ -1490,7 +1490,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstol_l)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") NONNULL((1)) long
 NOTHROW_NCX(LIBKCALL libc_wcstol_l)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
-                                    int base,
+                                    __STDC_INT_AS_UINT_T base,
                                     locale_t locale) {
 	(void)locale;
 	return libc_wcstol(nptr, endptr, base);
@@ -1498,7 +1498,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstol_l)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBDCALL libd_wcstoul_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
-                                     int base,
+                                     __STDC_INT_AS_UINT_T base,
                                      locale_t locale) {
 	(void)locale;
 	return libd_wcstoul(nptr, endptr, base);
@@ -1506,7 +1506,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoul_l)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBKCALL libc_wcstoul_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
-                                     int base,
+                                     __STDC_INT_AS_UINT_T base,
                                      locale_t locale) {
 	(void)locale;
 	return libc_wcstoul(nptr, endptr, base);
@@ -1514,7 +1514,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoul_l)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBDCALL libd_wcstoll_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
-                                     int base,
+                                     __STDC_INT_AS_UINT_T base,
                                      locale_t locale) {
 	(void)locale;
 	return libd_wcstoll(nptr, endptr, base);
@@ -1522,7 +1522,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoll_l)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBKCALL libc_wcstoll_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
-                                     int base,
+                                     __STDC_INT_AS_UINT_T base,
                                      locale_t locale) {
 	(void)locale;
 	return libc_wcstoll(nptr, endptr, base);
@@ -1530,7 +1530,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoll_l)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) __ULONGLONG
 NOTHROW_NCX(LIBDCALL libd_wcstoull_l)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
-                                      int base,
+                                      __STDC_INT_AS_UINT_T base,
                                       locale_t locale) {
 	(void)locale;
 	return libd_wcstoull(nptr, endptr, base);
@@ -1538,7 +1538,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoull_l)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") NONNULL((1)) __ULONGLONG
 NOTHROW_NCX(LIBKCALL libc_wcstoull_l)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
-                                      int base,
+                                      __STDC_INT_AS_UINT_T base,
                                       locale_t locale) {
 	(void)locale;
 	return libc_wcstoull(nptr, endptr, base);
@@ -1884,7 +1884,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnend)(char32_t const *__restrict string,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
-                                   int base) {
+                                   __STDC_INT_AS_UINT_T base) {
 	u32 result;
 	bool neg = false;
 	while (*nptr == '-') {
@@ -1897,7 +1897,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBKCALL libc_wcsto32)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
-                                   int base) {
+                                   __STDC_INT_AS_UINT_T base) {
 	u32 result;
 	bool neg = false;
 	while (*nptr == '-') {
@@ -1910,7 +1910,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
-                                    int base) {
+                                    __STDC_INT_AS_UINT_T base) {
 	u32 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
@@ -1943,7 +1943,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
-		result *= base;
+		result *= (unsigned int)base;
 		result += temp;
 	}
 	if (endptr)
@@ -1953,7 +1953,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
-                                    int base) {
+                                    __STDC_INT_AS_UINT_T base) {
 	u32 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
@@ -1986,7 +1986,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
-		result *= base;
+		result *= (unsigned int)base;
 		result += temp;
 	}
 	if (endptr)
@@ -1996,7 +1996,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
-                                    int base) {
+                                    __STDC_INT_AS_UINT_T base) {
 	u64 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
@@ -2029,7 +2029,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
-		result *= base;
+		result *= (unsigned int)base;
 		result += temp;
 	}
 	if (endptr)
@@ -2039,7 +2039,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
-                                    int base) {
+                                    __STDC_INT_AS_UINT_T base) {
 	u64 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
@@ -2072,7 +2072,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
-		result *= base;
+		result *= (unsigned int)base;
 		result += temp;
 	}
 	if (endptr)
@@ -2082,7 +2082,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
-                                   int base) {
+                                   __STDC_INT_AS_UINT_T base) {
 	u64 result;
 	bool neg = false;
 	while (*nptr == '-') {
@@ -2095,7 +2095,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBKCALL libc_wcsto64)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
-                                   int base) {
+                                   __STDC_INT_AS_UINT_T base) {
 	u64 result;
 	bool neg = false;
 	while (*nptr == '-') {
@@ -2108,7 +2108,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBDCALL libd_wcsto32_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
-                                     int base,
+                                     __STDC_INT_AS_UINT_T base,
                                      locale_t locale) {
 	(void)locale;
 	return libd_wcsto32(nptr, endptr, base);
@@ -2116,7 +2116,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32_l)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBKCALL libc_wcsto32_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
-                                     int base,
+                                     __STDC_INT_AS_UINT_T base,
                                      locale_t locale) {
 	(void)locale;
 	return libc_wcsto32(nptr, endptr, base);
@@ -2124,7 +2124,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32_l)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBDCALL libd_wcstou32_l)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
-                                      int base,
+                                      __STDC_INT_AS_UINT_T base,
                                       locale_t locale) {
 	(void)locale;
 	return libd_wcstou32(nptr, endptr, base);
@@ -2132,7 +2132,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_l)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBKCALL libc_wcstou32_l)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
-                                      int base,
+                                      __STDC_INT_AS_UINT_T base,
                                       locale_t locale) {
 	(void)locale;
 	return libc_wcstou32(nptr, endptr, base);
@@ -2140,7 +2140,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_l)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBDCALL libd_wcsto64_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
-                                     int base,
+                                     __STDC_INT_AS_UINT_T base,
                                      locale_t locale) {
 	(void)locale;
 	return libd_wcsto64(nptr, endptr, base);
@@ -2148,7 +2148,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64_l)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBKCALL libc_wcsto64_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
-                                     int base,
+                                     __STDC_INT_AS_UINT_T base,
                                      locale_t locale) {
 	(void)locale;
 	return libc_wcsto64(nptr, endptr, base);
@@ -2156,7 +2156,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64_l)(char32_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBDCALL libd_wcstou64_l)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
-                                      int base,
+                                      __STDC_INT_AS_UINT_T base,
                                       locale_t locale) {
 	(void)locale;
 	return libd_wcstou64(nptr, endptr, base);
@@ -2164,7 +2164,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_l)(char16_t const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBKCALL libc_wcstou64_l)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
-                                      int base,
+                                      __STDC_INT_AS_UINT_T base,
                                       locale_t locale) {
 	(void)locale;
 	return libc_wcstou64(nptr, endptr, base);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22985b09 */
+/* HASH CRC-32:0xcb80411d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,7 +91,7 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 		while (STACK_NOT_EMPTY) {
 			byte_t *left_ptr;
 			byte_t *right_ptr;
-			byte_t *mid = lo+item_size * ((hi-lo) / item_size >> 1);
+			byte_t *mid = lo + item_size * ((hi - lo) / item_size >> 1);
 			if ((*cmp)((void *)mid, (void *)lo, arg) < 0)
 				SWAP(mid, lo, item_size);
 			if ((*cmp)((void *)hi, (void *)mid, arg) < 0)
@@ -411,7 +411,7 @@ DEFINE_INTERN_ALIAS(libc_strtoul, libc_strtou64);
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBCCALL libc_strtoul)(char const *__restrict nptr,
                                    char **endptr,
-                                   int base) {
+                                   __STDC_INT_AS_UINT_T base) {
 #if __SIZEOF_LONG__ <= 4
 	return (unsigned long)libc_strtou32(nptr, endptr, base);
 #else /* __SIZEOF_LONG__ <= 4 */
@@ -427,7 +427,7 @@ DEFINE_INTERN_ALIAS(libc_strtol, libc_strto64);
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) long
 NOTHROW_NCX(LIBCCALL libc_strtol)(char const *__restrict nptr,
                                   char **endptr,
-                                  int base) {
+                                  __STDC_INT_AS_UINT_T base) {
 #if __SIZEOF_LONG__ <= 4
 	return (long)libc_strto32(nptr, endptr, base);
 #else /* __SIZEOF_LONG__ <= 4 */
@@ -443,7 +443,7 @@ DEFINE_INTERN_ALIAS(libc_strtoull, libc_strtou32);
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) __ULONGLONG
 NOTHROW_NCX(LIBCCALL libc_strtoull)(char const *__restrict nptr,
                                     char **endptr,
-                                    int base) {
+                                    __STDC_INT_AS_UINT_T base) {
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__ULONGLONG)libc_strtou32(nptr, endptr, base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
@@ -459,7 +459,7 @@ DEFINE_INTERN_ALIAS(libc_strtoll, libc_strto32);
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBCCALL libc_strtoll)(char const *__restrict nptr,
                                    char **endptr,
-                                   int base) {
+                                   __STDC_INT_AS_UINT_T base) {
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__LONGLONG)libc_strto32(nptr, endptr, base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
@@ -506,7 +506,7 @@ NOTHROW_NCX(LIBCCALL libc_strtold)(char const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr,
                                     char **endptr,
-                                    int base) {
+                                    __STDC_INT_AS_UINT_T base) {
 	u32 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
@@ -539,7 +539,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr,
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
-		result *= base;
+		result *= (unsigned int)base;
 		result += temp;
 	}
 	if (endptr)
@@ -549,7 +549,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBCCALL libc_strto32)(char const *__restrict nptr,
                                    char **endptr,
-                                   int base) {
+                                   __STDC_INT_AS_UINT_T base) {
 	u32 result;
 	bool neg = false;
 	while (*nptr == '-') {
@@ -562,7 +562,7 @@ NOTHROW_NCX(LIBCCALL libc_strto32)(char const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr,
                                     char **endptr,
-                                    int base) {
+                                    __STDC_INT_AS_UINT_T base) {
 	u64 result, temp;
 	if (!base) {
 		if (*nptr == '0') {
@@ -595,7 +595,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr,
 		if (temp >= (unsigned int)base)
 			break;
 		++nptr;
-		result *= base;
+		result *= (unsigned int)base;
 		result += temp;
 	}
 	if (endptr)
@@ -605,7 +605,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBCCALL libc_strto64)(char const *__restrict nptr,
                                    char **endptr,
-                                   int base) {
+                                   __STDC_INT_AS_UINT_T base) {
 	u64 result;
 	bool neg = false;
 	while (*nptr == '-') {
@@ -619,7 +619,7 @@ NOTHROW_NCX(LIBCCALL libc_strto64)(char const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBCCALL libc_strtou32_l)(char const *__restrict nptr,
                                       char **endptr,
-                                      int base,
+                                      __STDC_INT_AS_UINT_T base,
                                       locale_t locale) {
 	(void)locale;
 	return libc_strtou32(nptr, endptr, base);
@@ -627,7 +627,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_l)(char const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBCCALL libc_strto32_l)(char const *__restrict nptr,
                                      char **endptr,
-                                     int base,
+                                     __STDC_INT_AS_UINT_T base,
                                      locale_t locale) {
 	(void)locale;
 	return libc_strto32(nptr, endptr, base);
@@ -635,7 +635,7 @@ NOTHROW_NCX(LIBCCALL libc_strto32_l)(char const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBCCALL libc_strtou64_l)(char const *__restrict nptr,
                                       char **endptr,
-                                      int base,
+                                      __STDC_INT_AS_UINT_T base,
                                       locale_t locale) {
 	(void)locale;
 	return libc_strtou64(nptr, endptr, base);
@@ -643,7 +643,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_l)(char const *__restrict nptr,
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBCCALL libc_strto64_l)(char const *__restrict nptr,
                                      char **endptr,
-                                     int base,
+                                     __STDC_INT_AS_UINT_T base,
                                      locale_t locale) {
 	(void)locale;
 	return libc_strto64(nptr, endptr, base);
@@ -890,7 +890,7 @@ DEFINE_INTERN_ALIAS(libc_strtol_l, libc_strto64_l);
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1)) long
 NOTHROW_NCX(LIBCCALL libc_strtol_l)(char const *__restrict nptr,
                                     char **endptr,
-                                    int base,
+                                    __STDC_INT_AS_UINT_T base,
                                     locale_t locale) {
 	(void)locale;
 	return libc_strtol(nptr, endptr, base);
@@ -904,7 +904,7 @@ DEFINE_INTERN_ALIAS(libc_strtoul_l, libc_strtou64_l);
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBCCALL libc_strtoul_l)(char const *__restrict nptr,
                                      char **endptr,
-                                     int base,
+                                     __STDC_INT_AS_UINT_T base,
                                      locale_t locale) {
 	(void)locale;
 	return libc_strtoul(nptr, endptr, base);
@@ -918,7 +918,7 @@ DEFINE_INTERN_ALIAS(libc_strtoll_l, libc_strto32_l);
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBCCALL libc_strtoll_l)(char const *__restrict nptr,
                                      char **endptr,
-                                     int base,
+                                     __STDC_INT_AS_UINT_T base,
                                      locale_t locale) {
 	(void)locale;
 	return libc_strtoll(nptr, endptr, base);
@@ -932,7 +932,7 @@ DEFINE_INTERN_ALIAS(libc_strtoull_l, libc_strtou32_l);
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1)) __ULONGLONG
 NOTHROW_NCX(LIBCCALL libc_strtoull_l)(char const *__restrict nptr,
                                       char **endptr,
-                                      int base,
+                                      __STDC_INT_AS_UINT_T base,
                                       locale_t locale) {
 	(void)locale;
 	return libc_strtoull(nptr, endptr, base);
@@ -1057,14 +1057,14 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.dos.utility") WUNUSED NONNULL((1, 2, 5)) void *
 (LIBCCALL libc_bsearch_s)(void const *key,
                           void const *base,
-                          size_t nmemb,
-                          size_t size,
+                          size_t elem_count,
+                          size_t elem_size,
                           __dos_compar_d_fn_t compar,
                           void *arg) THROWS(...) {
 	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data data;
 	data.__fun = compar;
 	data.__arg = arg;
-	return (void *)libc_bsearch_r(key, base, nmemb, size,
+	return (void *)libc_bsearch_r(key, base, elem_count, elem_size,
 	                         &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
 	                         &data);
 }
@@ -1084,14 +1084,14 @@ __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_s_defined */
 INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 4)) void
 (LIBCCALL libc_qsort_s)(void *base,
-                        size_t nmemb,
-                        size_t size,
+                        size_t elem_count,
+                        size_t elem_size,
                         __dos_compar_d_fn_t compar,
                         void *arg) THROWS(...) {
 	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data data;
 	data.__fun = compar;
 	data.__arg = arg;
-	return libc_qsort_r(base, nmemb, size,
+	return libc_qsort_r(base, elem_count, elem_size,
 	               &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
 	               &data);
 }
