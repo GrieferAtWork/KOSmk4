@@ -54,7 +54,7 @@ ProcFS_PerProc_Fd_Lookup(struct directory_node *__restrict self,
                          u16 namelen, uintptr_t UNUSED(hash), fsmode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	/* Evaluate running process PIDs */
+	/* Evaluate file descriptor number */
 	if likely(namelen != 0) {
 		char ch = ATOMIC_READ(name[0]);
 		if ((ch >= '1' && ch <= '9') || (ch == '0' && namelen == 1)) {
@@ -246,14 +246,45 @@ err:
 	return snprintf(buf, bufsize, "anon_inode:[?]");
 }
 
+PRIVATE NONNULL((1, 3, 4, 5)) REF struct handle KCALL
+ProcFS_PerProc_Fd_Entry_Open(struct inode *__restrict self,
+                             oflag_t UNUSED(oflags),
+                             struct path *UNUSED(containing_path),
+                             struct directory_node *UNUSED(containing_directory),
+                             struct directory_entry *UNUSED(containing_dirent)) {
+	upid_t pid;
+	unsigned int fdno;
+	REF struct handle result;
+	REF struct handle_manager *hman;
+	REF struct task *thread;
+	pid  = (upid_t)(self->i_fileino & PROCFS_INOTYPE_FD_PIDMASK);
+	fdno = (unsigned int)((self->i_fileino & PROCFS_INOTYPE_FD_FDMASK) >> PROCFS_INOTYPE_FD_FDSHIFT);
+	thread = pidns_trylookup_task(THIS_PIDNS, pid);
+	if unlikely(!thread)
+		THROW(E_NO_SUCH_PROCESS, pid);
+	FINALLY_DECREF_UNLIKELY(thread);
+	hman = task_gethandlemanager(thread);
+	FINALLY_DECREF_UNLIKELY(hman);
+	result = handle_lookupin(fdno, hman);
+	return result;
+}
+
+
+
 INTERN struct inode_type ProcFS_PerProc_Fd_Entry_Type = {
 	/* .it_fini = */ NULL,
 	/* .it_attr = */ {
-		/* .a_loadattr = */ NULL,
-		/* .a_saveattr = */ NULL,
+		/* .a_loadattr   = */ NULL,
+		/* .a_saveattr   = */ NULL,
+		/* .a_maskattr   = */ NULL,
+		/* .a_pathconf   = */ NULL,
+		/* .a_ioctl      = */ NULL,
+		/* .a_clearcache = */ NULL,
+		/* .a_open       = */ &ProcFS_PerProc_Fd_Entry_Open
 	},
 	/* .it_file = */ {
 	},
+	/* TODO: Need some kind of operator that can be used to overwrite open(2) */
 	{
 		 .it_symlink = {
 			/* .sl_readlink = */ NULL,

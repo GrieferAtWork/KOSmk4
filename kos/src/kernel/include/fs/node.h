@@ -55,6 +55,7 @@ struct driver;
 struct wall_clock;
 struct aio_buffer;
 struct aio_pbuffer;
+struct handle;
 
 typedef uintptr_t fsmode_t; /* Set of `FS_MODE_F*' */
 
@@ -132,6 +133,37 @@ struct inode_type {
 		 * An optional callback that is invoked when kernel caches are being cleared. */
 		NOBLOCK NONNULL((1))
 		size_t /*NOTHROW*/ (KCALL *a_clearcache)(struct inode *__restrict self);
+
+		/* [0..1] Open the given INode by returning a new handle that should be
+		 * returned to the user-space program. Note that the `h_mode' field of
+		 * the returned handle is ignored and it is up to the caller to fill it
+		 * in as `return.h_mode = IO_FROM_OPENFLAG(oflags)'.
+		 *
+		 * When this operator is set to `NULL', the inode will be opened as:
+		 * >> if (S_ISBLK(self->i_filemode)) {
+		 * >>     return { HANDLE_TYPE_BLOCKDEVICE, block_device_lookup(devno) };
+		 * >> } else if (S_ISCHR(self->i_filemode)) {
+		 * >>     result = { HANDLE_TYPE_CHARACTERDEVICE, character_device_lookup(devno) };
+		 * >>     if (cdev->cd_type.ct_open)
+		 * >>         (*cdev->cd_type.ct_open)(cdev, &result);
+		 * >>     return result;
+		 * >> } else {
+		 * >>     if (s_ISDIR(self->i_filemode) && result_inode->i_type->it_directory.d_readdir)
+		 * >>         return { HANDLE_TYPE_ONESHOT_DIRECTORY_FILE, ... };
+		 * >>     return { HANDLE_TYPE_FILE, ... };
+		 * >> }
+		 * @param: self:                 The INode that is being accessed.
+		 * @param: oflags:               Open flags used during the INode access.
+		 * @param: containing_path:      The path from with `self' was accessed.
+		 * @param: containing_directory: The directory node mounted on `containing_path' when the access was made.
+		 * @param: containing_dirent:    The directory entry that pointed to `self' when the access was made. */
+		NONNULL((1, 3, 4, 5))
+		REF struct handle (KCALL *a_open)(struct inode *__restrict self,
+		                                  oflag_t oflags,
+		                                  struct path *containing_path,
+		                                  struct directory_node *containing_directory,
+		                                  struct directory_entry *containing_dirent)
+				THROWS(...);
 
 	} it_attr;
 
@@ -750,6 +782,13 @@ inode_file_pwritev_with_pwrite(struct inode *__restrict self,
 #define INODE_FATTRLOADED  0x0008 /* [lock(WRITE_ONCE)] The node's attributes have been loaded. */
 #define INODE_FDIRLOADED   0x0010 /* [lock(WRITE_ONCE)] The entires of a directory INode has been fully loaded. */
 #define INODE_FLNKLOADED   0x0010 /* [lock(WRITE_ONCE)] A symbolic link node's text has been loaded. */
+#define INODE_FLNK_DONT_FOLLOW_FINAL_LINK 0x2000 /* - Don't follow the symlink of this INode if it's the final link of some given path.
+                                                  * - Skip the `if (!(oflags & O_SYMLINK)) THROW(E_FSERROR_IS_A_SYMBOLIC_LINK);' check during open.
+                                                  * This flag is used to implement open() for procfs's `/proc/[pid]/fd/[no]' files. */
+#define INODE_FSUPERDEL    0x4000 /* Set alongside `INODE_FDELETED' when the INode was closed because of the
+                                   * superblock being unmounted, when `superblock_set_unmounted()' was called.
+                                   * If `superblock_set_unmounted()' then fails to synchronize outstanding changes,
+                                   * nodes with this bit set will have their `INODE_FDELETED' flags cleared again. */
 #define INODE_FDELETED     0x8000 /* FLAG: The INode has been deleted.
                                    * When this flag is set, it is illegal to set any of the following flags:
                                    *  - INODE_FCHANGED
@@ -765,10 +804,6 @@ inode_file_pwritev_with_pwrite(struct inode *__restrict self,
                                    * NOTE: This flag is set atomically, and is checked before any kind of operation
                                    *       is performed on the node, thus allowing it to prevent any such operation
                                    *       from occurring in the future. */
-#define INODE_FSUPERDEL    0x4000 /* Set alongside `INODE_FDELETED' when the INode was closed because of the
-                                   * superblock being unmounted, when `superblock_set_unmounted()' was called.
-                                   * If `superblock_set_unmounted()' then fails to synchronize outstanding changes,
-                                   * nodes with this bit set will have their `INODE_FDELETED' flags cleared again. */
 
 
 

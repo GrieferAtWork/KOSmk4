@@ -26,11 +26,16 @@
 #include <kernel/cache.h>
 #include <kernel/types.h>
 
+#ifndef __INTELLISENSE__
+#include <kernel/handle.h>
+#endif /* !__INTELLISENSE__ */
+
 #include <hybrid/__atomic.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/format-printer.h>
+#include <kos/kernel/handle.h>
 
 #include <stdbool.h>
 
@@ -730,14 +735,15 @@ path_traversen_at_recent(struct fs *__restrict filesystem, unsigned int dirfd,
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
-#else
+#else /* __INTELLISENSE__ */
 #define path_traverse_ex_recent(...)  path_recent(path_traverse_ex(__VA_ARGS__))
 #define path_traverse_recent(...)     path_recent(path_traverse(__VA_ARGS__))
 #define path_traversen_ex_recent(...) path_recent(path_traversen_ex(__VA_ARGS__))
 #define path_traversen_recent(...)    path_recent(path_traversen(__VA_ARGS__))
 #define path_traverse_at_recent(...)  path_recent(path_traverse_at(__VA_ARGS__))
 #define path_traversen_at_recent(...) path_recent(path_traversen_at(__VA_ARGS__))
-#endif
+#endif /* !__INTELLISENSE__ */
+
 
 
 
@@ -837,10 +843,72 @@ REF struct fs *KCALL fs_alloc(void) THROWS(E_BADALLOC);
 FUNDEF ATTR_RETNONNULL WUNUSED ATTR_MALLOC REF struct fs *KCALL
 fs_clone(struct fs *__restrict self, bool clone_vfs) THROWS(E_BADALLOC);
 
-
 /* The kernel's own filesystem / the filesystem used when running `/bin/init'. */
 DATDEF struct fs fs_kernel;
 DATDEF struct vfs vfs_kernel;
+
+
+struct handle;
+
+/* Back-end implementation of `sys_open()' and friends.
+ * WARNING: This function does _NOT_ validate `oflags', `mode' or `fsmode'!
+ *          Invalid flags are silently ignored.
+ * WARNING: This function does _NOT_ fill in `return.h_mode'
+ * @param: oflags: Set of `O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK |
+ *                         O_DIRECTORY | O_CREAT | O_EXCL | O_NOATIME |
+ *                         O_PATH | O_TMPFILE | O_SYMLINK | O_*'
+ * @param: fsmode: Set of `0 | FS_MODE_FDOSPATH | FS_MODE_FEMPTY_PATH |
+ *                         FS_MODE_FSYMLINK_NOFOLLOW' */
+FUNDEF WUNUSED NONNULL((1, 2, 3)) REF struct handle KCALL
+fs_open_ex(struct fs *__restrict filesystem,
+           struct path *cwd, struct path *root,
+           USER CHECKED /*utf-8*/ char const *upath,
+           oflag_t oflags, mode_t mode DFL(644),
+           fsmode_t fsmode DFL(FS_MODE_FNORMAL));
+
+/* A somplified wrapper for `fs_open_ex()'
+ * WARNING: This function does _NOT_ validate `oflags' or `fsmode'!
+ *          Invalid flags are silently ignored.
+ * WARNING: This function does _NOT_ fill in `return.h_mode'
+ * @param: oflags: Set of `O_NOCTTY | O_TRUNC | O_APPEND | O_NONBLOCK |
+ *                         O_DIRECTORY | O_CREAT | O_EXCL | O_NOATIME |
+ *                         O_PATH | O_TMPFILE | O_SYMLINK | O_DOSPATH |
+ *                         O_NOFOLLOW | O_*' */
+FUNDEF WUNUSED NONNULL((1)) REF struct handle KCALL
+fs_open(struct fs *__restrict filesystem, unsigned int dirfd,
+        USER CHECKED /*utf-8*/ char const *upath,
+        oflag_t oflags, mode_t mode DFL(644));
+
+#ifdef __cplusplus
+extern "C++" {
+#ifdef __INTELLISENSE__
+LOCAL WUNUSED NONNULL((1)) REF struct handle KCALL
+fs_open(struct fs *__restrict filesystem,
+        USER CHECKED /*utf-8*/ char const *upath,
+        oflag_t oflags, mode_t mode DFL(644));
+LOCAL WUNUSED REF struct handle KCALL
+fs_open(USER CHECKED /*utf-8*/ char const *upath,
+        oflag_t oflags, mode_t mode DFL(644));
+#else /* __INTELLISENSE__ */
+LOCAL WUNUSED NONNULL((1)) REF struct handle KCALL
+fs_open(struct fs *__restrict filesystem,
+        USER CHECKED /*utf-8*/ char const *upath,
+        oflag_t oflags, mode_t mode DFL(644)) {
+	return fs_open(filesystem, HANDLE_SYMBOLIC_FDCWD,
+	               upath, oflags, mode);
+}
+
+LOCAL WUNUSED REF struct handle KCALL
+fs_open(USER CHECKED /*utf-8*/ char const *upath,
+        oflag_t oflags, mode_t mode DFL(644)) {
+	return fs_open(&fs_kernel, HANDLE_SYMBOLIC_FDCWD,
+	               upath, oflags, mode);
+}
+#endif /* !__INTELLISENSE__ */
+}
+#endif /* __cplusplus */
+
+
 
 /* [1..1] Per-thread filesystem information.
  * NOTE: Initialized to NULL. - Must be initialized before the task is started. */

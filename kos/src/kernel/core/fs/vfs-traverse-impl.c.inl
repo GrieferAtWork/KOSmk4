@@ -684,7 +684,8 @@ got_result_path:
 				         : directory_getnode(containing_directory, last_seg, last_seglen, hash, pcontaining_dirent);
 				if unlikely(!result)
 					THROW(E_FSERROR_FILE_NOT_FOUND);
-				if (follow_final_link && INODE_ISLNK(result)) {
+				if (follow_final_link && INODE_ISLNK(result) &&
+				    !(result->i_flags & INODE_FLNK_DONT_FOLLOW_FINAL_LINK)) {
 					TRY {
 						REF struct inode *new_result;
 						struct symlink_node *sl_node;
@@ -760,7 +761,7 @@ again_follow_symlink:
 						}
 						decref(result);
 						result = new_result;
-						if (INODE_ISLNK(result))
+						if (INODE_ISLNK(result) && !(result->i_flags & INODE_FLNK_DONT_FOLLOW_FINAL_LINK))
 							goto again_follow_symlink;
 					} EXCEPT {
 						if (pcontaining_dirent)
