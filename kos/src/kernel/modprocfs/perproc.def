@@ -75,20 +75,14 @@ MKDIR(attr, 0555,
 
 MKREG_RO(attr_current, 0666, ProcFS_PerProc_Attr_Current_Printer)
 
-PERPROC_DIRECTORY_ENTRY("exe", DT_LNK, exe)
-DYNAMIC_SYMLINK(exe, 0777, ProcFS_PerProc_Exe_Printer)
+PERPROC_DIRECTORY_ENTRY("cmdline", DT_REG, cmdline)
+MKREG_RO(cmdline, 0222, ProcFS_PerProc_Cmdline_Printer)
 
 PERPROC_DIRECTORY_ENTRY("cwd", DT_LNK, cwd)
 DYNAMIC_SYMLINK(cwd, 0777, ProcFS_PerProc_Cwd_Printer)
 
-PERPROC_DIRECTORY_ENTRY("root", DT_LNK, root)
-DYNAMIC_SYMLINK(root, 0777, ProcFS_PerProc_Root_Printer)
-
-PERPROC_DIRECTORY_ENTRY("cmdline", DT_REG, cmdline)
-MKREG_RO(cmdline, 0222, ProcFS_PerProc_Cmdline_Printer)
-
-PERPROC_DIRECTORY_ENTRY("stat", DT_REG, stat)
-MKREG_RO(stat, 0222, ProcFS_PerProc_Stat_Printer)
+PERPROC_DIRECTORY_ENTRY("exe", DT_LNK, exe)
+DYNAMIC_SYMLINK(exe, 0777, ProcFS_PerProc_Exe_Printer)
 
 PERPROC_DIRECTORY_ENTRY("fd", DT_DIR, fd)
 CUSTOM(fd, S_IFDIR | 0300, ProcFS_PerProc_Fd_Type)
@@ -102,7 +96,15 @@ MKDIR(kos, 0555,
 CUSTOM(kos_drives, S_IFDIR | 0300, ProcFS_PerProc_Kos_Drives_Type)
 CUSTOM(kos_dcwd, S_IFDIR | 0300, ProcFS_PerProc_Kos_DrivesCwd_Type)
 
-//#define PROCFS_PERPROC_NO_CUSTOM 1 /* Delete if we ever get CUSTOM() entries */
+PERPROC_DIRECTORY_ENTRY("map_files", DT_DIR, map_files)
+CUSTOM(map_files, S_IFDIR | 0300, ProcFS_PerProc_MapFiles_Type)
+
+PERPROC_DIRECTORY_ENTRY("root", DT_LNK, root)
+DYNAMIC_SYMLINK(root, 0777, ProcFS_PerProc_Root_Printer)
+
+PERPROC_DIRECTORY_ENTRY("stat", DT_REG, stat)
+MKREG_RO(stat, 0222, ProcFS_PerProc_Stat_Printer)
+
 
 #undef PERPROC_DIRECTORY_ENTRY
 #undef CUSTOM

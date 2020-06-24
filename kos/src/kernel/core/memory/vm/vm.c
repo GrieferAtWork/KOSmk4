@@ -2963,7 +2963,7 @@ DECL_END
 #include "vm-datablock-read-write-base.c.inl"
 
 DECL_BEGIN
-#endif
+#endif /* !__INTELLISENSE__ */
 
 
 

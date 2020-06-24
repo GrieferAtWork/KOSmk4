@@ -2748,6 +2748,67 @@ vm_exec_assert_regular(struct inode *__restrict self)
 		       E_NOT_EXECUTABLE_NOT_REGULAR);
 
 
+
+struct vm_mapinfo {
+	/* VM Memory mapping information (as passed to `vm_enum_callback_t') */
+	UNCHECKED void             *vmi_min;    /* Address of the lowest mapped byte */
+	UNCHECKED void             *vmi_max;    /* [> vmi_min] Address of the greatest mapped byte */
+	uintptr_half_t              vmi_prot;   /* VM Node protection (Set of `VM_PROT_*'). */
+	REF struct vm_datablock    *vmi_block;  /* [0..1] Mapped data block (or NULL of reserved memory mappings) */
+	pos_t                       vmi_offset; /* Byte-offset into `vmi_block', where the mapping at `vmi_min' starts. */
+	REF struct path            *vmi_fspath; /* [0..1] Mapped object filesystem path (or NULL if unknown or N/A) */
+	REF struct directory_entry *vmi_fsname; /* [0..1] Mapped object filesystem name (or NULL if unknown or N/A) */
+	size_t                      vmi_index;  /* ID of the first `struct vm_node' that this area is apart of.
+	                                         * For this purpose, node-ids are counted such that the first node
+	                                         * that either overlaps, or comes after `enum_minaddr' has `vmi_index=0'.
+	                                         * This counter is used to generate INode numbers for `/proc/[pid]/map_files/...' */
+};
+#define vm_mapinfo_size(self) ((size_t)((byte_t *)(self)->vmi_max - (byte_t *)(self)->vmi_min) + 1)
+
+
+/* Callback for `vm_enum()'
+ * @param: arg:   The argument (cookie) originally passed to `vm_enum()'
+ * @param: info:  Information about the mapping range being enumerated.
+ * @return: >= 0: Continue enumeration and add the result to the sum eventually returned by `vm_enum()'
+ * @return: < 0:  Halt enumeration immediatly by having `vm_enum()' re-return this same value. */
+typedef ssize_t (FCALL *vm_enum_callback_t)(void *arg, struct vm_mapinfo *__restrict info);
+
+/* Enumerate all mappings contained within the given `enum_minaddr...enum_maxaddr'
+ * address range within the given VM `self'. This function will automatically re-
+ * assemble memory mappings that had previously been split into multiple nodes,
+ * such that adjacent `struct vm_node's that describe a contiguous memory mapping
+ * do not appear as individual, separate nodes.
+ * @param: cb:           A callback that should be invoked for every mapped memory region
+ *                       contained with the given address range `enum_minaddr' ... `enum_maxaddr'
+ *                       The sum of return values returned by this callback will eventually be
+ *                       returned by this function, unless `cb()' returns a negative value, which
+ *                       will cause enumeration to halt immediately, and that same value to be
+ *                       propagated to the caller.
+ *                       Note that mappings are enumerated in strictly ascending order, and that
+ *                       this function guaranties that even in the modifications being made to the
+ *                       given `self' while enumeration takes place, the `vmi_min' of all future
+ *                       mappings will always be `> vmi_max' of every already/currently enumerated
+ *                       mapping.
+ * @param: arg:          An argument (cookie) to-be passed to `cb()'
+ * @param: enum_minaddr: The starting address of mappings to-be enumerated, such that any mapping
+ *                       that overlap with `enum_minaddr ... enum_maxaddr' will be enumerated.
+ * @param: enum_maxaddr: Same as `enum_minaddr', but specifies the max address of any enumerated
+ *                       mapping. */
+FUNDEF ssize_t KCALL
+vm_enum(struct vm *__restrict self, vm_enum_callback_t cb, void *arg,
+#ifdef USERSPACE_END
+        UNCHECKED void *enum_minaddr DFL((UNCHECKED void *)0),
+        UNCHECKED void *enum_maxaddr DFL((UNCHECKED void *)USERSPACE_END)
+#else /* USERSPACE_END */
+        UNCHECKED void *enum_minaddr DFL((UNCHECKED void *)USERSPACE_START),
+        UNCHECKED void *enum_maxaddr DFL((UNCHECKED void *)-1)
+#endif /* !USERSPACE_END */
+        );
+
+
+
+
+
 /* List of callbacks that should be invoked after vm_exec()
  * These are called alongside stuff like `handle_manager_cloexec()'
  * NOTE: The passed vm is always `THIS_VM', and is never `&vm_kernel' */

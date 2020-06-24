@@ -69,6 +69,15 @@ DECL_BEGIN
 	(((ino_t)PROCFS_INOTYPE_DCWD << PROCFS_INO_TYPESHFT) | \
 	 ((ino_t)(drive_id) << PROCFS_INOTYPE_DCWD_DRVSHIFT) | (ino_t)(pid))
 
+/* File memory mappings. `readlink /proc/[pid]/map_files/[from-to]' */
+#define PROCFS_INOTYPE_MAPFILES          0x04                         /* Per-process drives */
+#define PROCFS_INOTYPE_MAPFILES_PIDMASK  UINT64_C(0x000000007fffffff) /* PID mask */
+#define PROCFS_INOTYPE_MAPFILES_NUMMASK  UINT64_C(0x00ffffff80000000) /* Mapping number shift */
+#define PROCFS_INOTYPE_MAPFILES_NUMSHIFT 31
+#define PROCFS_INOMAKE_MAPFILES(pid, num)                 \
+	(((ino_t)PROCFS_INOTYPE_MAPFILES << PROCFS_INO_TYPESHFT) | \
+	 ((ino_t)(num) << PROCFS_INOTYPE_MAPFILES_NUMSHIFT) | (ino_t)(pid))
+
 /* File handle bindings. `readlink /proc/[pid]/fd/[id]' */
 #define PROCFS_INOTYPE_FD_LO      0x80                         /* Per-process file handles */
 #define PROCFS_INOTYPE_FD_HI      0xff                         /* Per-process file handles */
@@ -245,8 +254,9 @@ INTDEF struct procfs_singleton_dir_data ProcFS_RootDirectory_FsData;
 INTDEF struct inode_type ProcFS_RootDirectory_Type;
 INTDEF struct inode_type ProcFS_PerProcRootDirectory_Type;
 INTDEF struct inode_type ProcFS_PerProc_Kos_Drives_Entry_Type; /* For `PROCFS_INOTYPE_DRIVE' */
-INTDEF struct inode_type ProcFS_PerProc_Kos_Dcwd_Entry_Type; /* For `PROCFS_INOTYPE_DCWD' */
-INTDEF struct inode_type ProcFS_PerProc_Fd_Entry_Type; /* For `PROCFS_INOTYPE_FD_(LO|HI)' */
+INTDEF struct inode_type ProcFS_PerProc_Kos_Dcwd_Entry_Type;   /* For `PROCFS_INOTYPE_DCWD' */
+INTDEF struct inode_type ProcFS_PerProc_MapFiles_Entry_Type;   /* For `PROCFS_INOTYPE_MAPFILES' */
+INTDEF struct inode_type ProcFS_PerProc_Fd_Entry_Type;         /* For `PROCFS_INOTYPE_FD_(LO|HI)' */
 
 INTDEF struct superblock_type ProcFS_Type;
 INTDEF struct superblock ProcFS;
