@@ -482,6 +482,8 @@ again:
 			/* Simply unmap the entire node. */
 			decref_unlikely(part->dp_block);
 			decref_unlikely(node->vn_block);
+			assert(node->vn_fspath == NULL);
+			assert(node->vn_fsname == NULL);
 			vm_do_pdir_unmap(addr, effective_pages * PAGESIZE);
 			part->dp_srefs = NULL;
 #ifdef NDEBUG
@@ -796,6 +798,8 @@ page_properties_updated:
 			}
 
 			assert(node->vn_prot & VM_PROT_SHARED);
+			assert(node->vn_fspath == NULL);
+			assert(node->vn_fsname == NULL);
 			corepair.cp_node->vn_node.a_vmin = unmap_max + 1;
 			corepair.cp_node->vn_node.a_vmax = node->vn_node.a_vmax;
 			corepair.cp_node->vn_flags |= node->vn_flags & ~(VM_NODE_FLAG_COREPRT);
@@ -804,6 +808,8 @@ page_properties_updated:
 			corepair.cp_part->dp_block         = incref(part->dp_block);
 			corepair.cp_node->vn_part          = corepair.cp_part;
 			corepair.cp_node->vn_block         = incref(node->vn_block);
+			corepair.cp_node->vn_fspath        = NULL;
+			corepair.cp_node->vn_fsname        = NULL;
 			corepair.cp_node->vn_link.ln_pself = &corepair.cp_part->dp_srefs;
 			corepair.cp_part->dp_refcnt        = 1; /* +1: corepair.cp_node->vn_part */
 			assertf(corepair.cp_part->dp_tree.a_vmin == (datapage_t)0, "GFP_CALLOC should have done this");

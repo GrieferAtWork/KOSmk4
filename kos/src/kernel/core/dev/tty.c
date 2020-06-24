@@ -301,10 +301,13 @@ predict_output_device_command:
 }
 
 
-INTERN NONNULL((1)) REF struct vm_datablock *KCALL
+INTERN NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
 tty_device_mmap(struct character_device *__restrict self,
                 pos_t *__restrict pminoffset,
-                pos_t *__restrict pnumbytes) THROWS(...) {
+                pos_t *__restrict pnumbytes,
+                REF struct path **__restrict pdatablock_fspath,
+                REF struct directory_entry **__restrict pdatablock_fsname)
+		THROWS(...) {
 	struct tty_device *me;
 	REF struct vm_datablock *result;
 	me = (struct tty_device *)self;
@@ -312,7 +315,9 @@ tty_device_mmap(struct character_device *__restrict self,
 	 * so forward any request for mapping data into memory to it, and it alone. */
 	result = (*handle_type_db.h_mmap[me->t_ohandle_typ])(me->t_ohandle_ptr,
 	                                                     pminoffset,
-	                                                     pnumbytes);
+	                                                     pnumbytes,
+	                                                     pdatablock_fspath,
+	                                                     pdatablock_fsname);
 	return result;
 }
 

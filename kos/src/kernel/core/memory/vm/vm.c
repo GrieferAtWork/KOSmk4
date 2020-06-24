@@ -24,6 +24,8 @@
 #include <kernel/compiler.h>
 
 #include <debugger/hook.h>
+#include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
@@ -2967,7 +2969,7 @@ DECL_BEGIN
 
 /* Free a given VM node (the method used depending on
  * `self->vn_flags & VM_NODE_FLAG_COREPRT') */
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_node_free)(struct vm_node *__restrict self) {
 	DEFINE_PUBLIC_SYMBOL(vm_datablock_anonymous_zero,
 	                     &vm_datablock_anonymous_zero_vec[0],
@@ -2980,11 +2982,15 @@ NOTHROW(KCALL vm_node_free)(struct vm_node *__restrict self) {
 }
 
 /* Destroy a given node. - This will finalize the following fields:
+ *  - vn_fspath
+ *  - vn_fsname
  *  - vn_block
  *  - vn_part
  *  - vn_link */
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self) {
+	xdecref(self->vn_fspath);
+	xdecref(self->vn_fsname);
 	if (self->vn_block) {
 		struct vm_datapart *part = self->vn_part;
 		assert(self->vn_vm != NULL);

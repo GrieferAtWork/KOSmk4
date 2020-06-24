@@ -161,7 +161,8 @@ ProcFS_Singleton_CustomTypes[PROCFS_SINGLETON_COUNT - PROCFS_SINGLETON_START_CUS
 
 
 INTERN NONNULL((1)) void KCALL
-ProcFS_Singleton_LoadAttr(struct inode *__restrict self) {
+ProcFS_Singleton_LoadAttr(struct inode *__restrict self)
+		THROWS(E_IOERROR, ...) {
 	struct procfs_singleton_data *data;
 	data = (struct procfs_singleton_data *)self->i_fsdata;
 	self->i_fileatime = data->psd_atime;
@@ -178,7 +179,9 @@ ProcFS_Singleton_LoadAttr(struct inode *__restrict self) {
 }
 
 INTERN NONNULL((1)) void KCALL
-ProcFS_Singleton_SaveAttr(struct inode *__restrict self) {
+ProcFS_Singleton_SaveAttr(struct inode *__restrict self)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
+		       E_FSERROR_READONLY, E_IOERROR, ...) {
 	struct procfs_singleton_data *data;
 	data = (struct procfs_singleton_data *)self->i_fsdata;
 	data->psd_atime = self->i_fileatime;

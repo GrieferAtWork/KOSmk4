@@ -261,6 +261,7 @@ PUBLIC void (KCALL devfs_lock_read)(void)
 		sync_downgrade(&devfs_lock);
 	}
 }
+
 PUBLIC void (KCALL devfs_lock_write)(void)
 		THROWS(E_INTERRUPT, ...) {
 	sync_write(&devfs_lock);
@@ -268,6 +269,7 @@ PUBLIC void (KCALL devfs_lock_write)(void)
 	if unlikely(devfs_must_service_pending_delete())
 		devfs_service_pending_delete();
 }
+
 PUBLIC bool (KCALL devfs_lock_upgrade)(void)
 		THROWS(E_WOULDBLOCK,E_INTERRUPT,...) {
 	bool result;
@@ -277,6 +279,7 @@ PUBLIC bool (KCALL devfs_lock_upgrade)(void)
 		devfs_service_pending_delete();
 	return result;
 }
+
 PUBLIC bool NOTHROW(KCALL devfs_lock_read_nx)(void) {
 	bool result;
 	result = sync_read_nx(&devfs_lock);
@@ -288,6 +291,7 @@ PUBLIC bool NOTHROW(KCALL devfs_lock_read_nx)(void) {
 	}
 	return result;
 }
+
 PUBLIC bool NOTHROW(KCALL devfs_lock_write_nx)(void) {
 	bool result;
 	result = sync_write_nx(&devfs_lock);
@@ -295,6 +299,7 @@ PUBLIC bool NOTHROW(KCALL devfs_lock_write_nx)(void) {
 		devfs_service_pending_delete();
 	return result;
 }
+
 PUBLIC unsigned int NOTHROW(KCALL devfs_lock_upgrade_nx)(void) {
 	unsigned int result;
 	result = sync_upgrade_nx(&devfs_lock);
@@ -302,6 +307,7 @@ PUBLIC unsigned int NOTHROW(KCALL devfs_lock_upgrade_nx)(void) {
 		devfs_service_pending_delete();
 	return result;
 }
+
 PUBLIC NOBLOCK bool NOTHROW(KCALL devfs_lock_tryread)(void) {
 	bool result;
 	result = sync_tryread(&devfs_lock);
@@ -313,6 +319,7 @@ PUBLIC NOBLOCK bool NOTHROW(KCALL devfs_lock_tryread)(void) {
 	}
 	return result;
 }
+
 PUBLIC NOBLOCK bool NOTHROW(KCALL devfs_lock_trywrite)(void) {
 	bool result;
 	result = sync_trywrite(&devfs_lock);
@@ -320,6 +327,7 @@ PUBLIC NOBLOCK bool NOTHROW(KCALL devfs_lock_trywrite)(void) {
 		devfs_service_pending_delete();
 	return result;
 }
+
 PUBLIC NOBLOCK bool NOTHROW(KCALL devfs_lock_tryupgrade)(void) {
 	bool result;
 	result = sync_tryupgrade(&devfs_lock);
@@ -327,6 +335,7 @@ PUBLIC NOBLOCK bool NOTHROW(KCALL devfs_lock_tryupgrade)(void) {
 		devfs_service_pending_delete();
 	return result;
 }
+
 PUBLIC NOBLOCK void NOTHROW(KCALL devfs_lock_endwrite)(void) {
 	if unlikely(devfs_must_service_pending_delete())
 		goto do_service;
@@ -340,6 +349,7 @@ do_service:
 		}
 	}
 }
+
 PUBLIC NOBLOCK bool NOTHROW(KCALL devfs_lock_endread)(void) {
 	bool result;
 	result = rwlock_endread(&devfs_lock);
@@ -353,6 +363,7 @@ again:
 	}
 	return result;
 }
+
 PUBLIC NOBLOCK bool NOTHROW(KCALL devfs_lock_end)(void) {
 	bool result;
 	result = rwlock_end(&devfs_lock);
@@ -366,6 +377,7 @@ again:
 	}
 	return result;
 }
+
 PUBLIC NOBLOCK bool NOTHROW(KCALL devfs_lock_downgrade)(void) {
 	bool result;
 	if unlikely(devfs_must_service_pending_delete())

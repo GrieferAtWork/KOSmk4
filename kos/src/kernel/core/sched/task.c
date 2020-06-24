@@ -139,6 +139,8 @@ this_kernel_stacknode_ ASMNAME("this_kernel_stacknode") = {
 	/* .vn_vm        = */ &vm_kernel,
 	/* .vn_part      = */ &this_kernel_stackpart_,
 	/* .vn_block     = */ &vm_datablock_anonymous,
+	/* .vn_fspath    = */ NULL,
+	/* .vn_fsname    = */ NULL,
 	/* .vn_link      = */ { NULL, &LLIST_HEAD(this_kernel_stackpart_.dp_srefs) },
 	/* .vn_guard     = */ 0
 };

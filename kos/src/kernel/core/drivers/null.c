@@ -80,17 +80,23 @@ null_poll(struct character_device *__restrict UNUSED(self),
 	return what;
 }
 
-PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
 phys_mmap(struct character_device *__restrict UNUSED(self),
           pos_t *__restrict UNUSED(pminoffset),
-          pos_t *__restrict UNUSED(pnumbytes)) THROWS(...) {
+          pos_t *__restrict UNUSED(pnumbytes),
+          REF struct path **__restrict UNUSED(pdatablock_fspath),
+          REF struct directory_entry **__restrict UNUSED(pdatablock_fsname))
+		THROWS(...) {
 	return incref(&vm_datablock_physical);
 }
 
-PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
 zero_mmap(struct character_device *__restrict UNUSED(self),
           pos_t *__restrict UNUSED(pminoffset),
-          pos_t *__restrict UNUSED(pnumbytes)) THROWS(...) {
+          pos_t *__restrict UNUSED(pnumbytes),
+          REF struct path **__restrict UNUSED(pdatablock_fspath),
+          REF struct directory_entry **__restrict UNUSED(pdatablock_fsname))
+		THROWS(...) {
 	return incref(&vm_datablock_anonymous_zero);
 }
 
@@ -297,32 +303,38 @@ kmsg_poll(struct character_device *__restrict UNUSED(self),
 
 #ifdef LIBVIO_CONFIG_ENABLED
 PRIVATE u8 KCALL
-port_rdb(struct vio_args *__restrict UNUSED(args), vio_addr_t addr) {
+port_rdb(struct vio_args *__restrict UNUSED(args),
+         vio_addr_t addr) {
 	return inb((port_t)addr);
 }
 
 PRIVATE u16 KCALL
-port_rdw(struct vio_args *__restrict UNUSED(args), vio_addr_t addr) {
+port_rdw(struct vio_args *__restrict UNUSED(args),
+         vio_addr_t addr) {
 	return inw((port_t)addr);
 }
 
 PRIVATE u32 KCALL
-port_rdl(struct vio_args *__restrict UNUSED(args), vio_addr_t addr) {
+port_rdl(struct vio_args *__restrict UNUSED(args),
+         vio_addr_t addr) {
 	return inl((port_t)addr);
 }
 
 PRIVATE void KCALL
-port_wrb(struct vio_args *__restrict UNUSED(args), vio_addr_t addr, u8 value) {
+port_wrb(struct vio_args *__restrict UNUSED(args),
+         vio_addr_t addr, u8 value) {
 	outb((port_t)addr, value);
 }
 
 PRIVATE void KCALL
-port_wrw(struct vio_args *__restrict UNUSED(args), vio_addr_t addr, u16 value) {
+port_wrw(struct vio_args *__restrict UNUSED(args),
+         vio_addr_t addr, u16 value) {
 	outw((port_t)addr, value);
 }
 
 PRIVATE void KCALL
-port_wrl(struct vio_args *__restrict UNUSED(args), vio_addr_t addr, u32 value) {
+port_wrl(struct vio_args *__restrict UNUSED(args),
+         vio_addr_t addr, u32 value) {
 	outl((port_t)addr, value);
 }
 
@@ -332,10 +344,13 @@ VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&port_rdb, &port_rdw, &port_rdl, NULL)
 PRIVATE struct vm_datablock port_datablock = VM_DATABLOCK_INIT_VIO(&port_vio);
 
 #define PORT_MMAP_POINTER (&port_mmap)
-PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
 port_mmap(struct character_device *__restrict UNUSED(self),
           pos_t *__restrict UNUSED(pminoffset),
-          pos_t *__restrict pnumbytes) THROWS(...) {
+          pos_t *__restrict pnumbytes,
+          REF struct path **__restrict UNUSED(pdatablock_fspath),
+          REF struct directory_entry **__restrict UNUSED(pdatablock_fsname))
+		THROWS(...) {
 	*pnumbytes = (pos_t)((port_t)-1) + 1;
 	return incref(&port_datablock);
 }
@@ -370,10 +385,13 @@ VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&random_rdb, &random_rdw, &random_rdl,
 PRIVATE struct vm_datablock random_datablock = VM_DATABLOCK_INIT_VIO(&random_vio);
 
 #define RANDOM_MMAP_POINTER (&random_mmap)
-PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
 random_mmap(struct character_device *__restrict UNUSED(self),
             pos_t *__restrict UNUSED(pminoffset),
-            pos_t *__restrict UNUSED(pnumbytes)) THROWS(...) {
+            pos_t *__restrict UNUSED(pnumbytes),
+            REF struct path **__restrict UNUSED(pdatablock_fspath),
+            REF struct directory_entry **__restrict UNUSED(pdatablock_fsname))
+		THROWS(...) {
 	return incref(&random_datablock);
 }
 
@@ -405,10 +423,13 @@ VIO_OPERATORS_INIT(VIO_CALLBACK_INIT_READ(&urandom_rdb, &urandom_rdw, &urandom_r
 PRIVATE struct vm_datablock urandom_datablock = VM_DATABLOCK_INIT_VIO(&urandom_vio);
 
 #define URANDOM_MMAP_POINTER (&urandom_mmap)
-PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
 urandom_mmap(struct character_device *__restrict UNUSED(self),
              pos_t *__restrict UNUSED(pminoffset),
-             pos_t *__restrict UNUSED(pnumbytes)) THROWS(...) {
+             pos_t *__restrict UNUSED(pnumbytes),
+             REF struct path **__restrict UNUSED(pdatablock_fspath),
+             REF struct directory_entry **__restrict UNUSED(pdatablock_fsname))
+		THROWS(...) {
 	return incref(&urandom_datablock);
 }
 

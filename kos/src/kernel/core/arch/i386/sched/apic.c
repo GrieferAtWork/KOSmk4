@@ -307,15 +307,17 @@ vm_node_alloc_locked_ram(size_t num_pages) {
 		decref_likely(part);
 		RETHROW();
 	}
-	result->vn_prot = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED;
-	part->dp_srefs  = result;
+	result->vn_prot          = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED;
+	part->dp_srefs           = result;
 	result->vn_link.ln_pself = &part->dp_srefs;
 	result->vn_link.ln_next  = NULL;
-	result->vn_flags = VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_NOMERGE;
-	result->vn_vm    = &vm_kernel;
-	result->vn_part  = part;
-	result->vn_block = incref(&vm_datablock_anonymous_zero);
-	result->vn_guard = 0;
+	result->vn_flags         = VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_NOMERGE;
+	result->vn_vm            = &vm_kernel;
+	result->vn_part          = part;
+	result->vn_block         = incref(&vm_datablock_anonymous_zero);
+	result->vn_fspath        = NULL;
+	result->vn_fsname        = NULL;
+	result->vn_guard         = 0;
 	return result;
 }
 
@@ -323,6 +325,8 @@ PRIVATE NOBLOCK ATTR_FREETEXT void
 NOTHROW(KCALL vm_node_destroy_locked_ram)(struct vm_node *__restrict self) {
 	assert(self->vn_block);
 	assert(self->vn_part);
+	assert(self->vn_fspath == NULL);
+	assert(self->vn_fsname == NULL);
 	assert(self->vn_link.ln_pself == &self->vn_part->dp_srefs);
 	assert(self->vn_link.ln_next == NULL);
 	assert(self->vn_part->dp_srefs == self);
@@ -439,12 +443,14 @@ PRIVATE ATTR_FREETEXT struct cpu *KCALL cpu_alloc(void) {
 	cpu_node2 = &FORCPU(result, thiscpu_x86_iobnode);
 	cpu_node2->vn_node.a_vmin = PAGEID_ENCODE((byte_t *)cpu_baseaddr + (size_t)__x86_cpu_part1_pages * PAGESIZE);
 	cpu_node2->vn_node.a_vmax = cpu_node2->vn_node.a_vmin + 1;
-	cpu_node2->vn_prot  = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_PRIVATE;
-	cpu_node2->vn_flags = VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED;
-	cpu_node2->vn_vm    = &vm_kernel;
-	cpu_node2->vn_part  = NULL; /* Reservation */
-	cpu_node2->vn_block = NULL; /* Reservation */
-	cpu_node2->vn_guard = 0;
+	cpu_node2->vn_prot   = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_PRIVATE;
+	cpu_node2->vn_flags  = VM_NODE_FLAG_KERNPRT | VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED;
+	cpu_node2->vn_vm     = &vm_kernel;
+	cpu_node2->vn_part   = NULL; /* Reservation */
+	cpu_node2->vn_block  = NULL; /* Reservation */
+	cpu_node2->vn_fspath = NULL;
+	cpu_node2->vn_fsname = NULL;
+	cpu_node2->vn_guard  = 0;
 #ifndef NDEBUG
 	memset(&cpu_node2->vn_link, 0xcc, sizeof(cpu_node2->vn_link));
 #endif /* !NDEBUG */

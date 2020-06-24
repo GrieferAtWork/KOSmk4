@@ -304,6 +304,8 @@ handle_remove_write_error:
 			resnode->vn_vm          = result;
 			resnode->vn_part        = xincref(node->vn_part);
 			resnode->vn_block       = xincref(node->vn_block);
+			resnode->vn_fspath      = xincref(node->vn_fspath);
+			resnode->vn_fsname      = xincref(node->vn_fsname);
 			assert(!node->vn_part || getrefcnt(node->vn_part) >= 2);
 			assert(!node->vn_block || getrefcnt(node->vn_block) >= 2);
 			if (resnode->vn_part) {

@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_MODPROCFS_FILES_PERPROC_STAT_C
 #define GUARD_MODPROCFS_FILES_PERPROC_STAT_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -36,6 +37,7 @@
 #include <sys/wait.h>
 
 #include <format-printer.h>
+#include <inttypes.h>
 #include <signal.h>
 
 #include "../procfs.h"
@@ -116,7 +118,8 @@ ProcFS_PerProc_Stat_Printer(struct regular_node *__restrict self,
 	if (thread)
 		v = task_getvm(thread);
 	FINALLY_XDECREF_UNLIKELY(v);
-	if (format_printf(printer, arg, "%I32d (", pid) < 0)
+	if (format_printf(printer, arg,
+	                  "%" PRIuN(__SIZEOF_PID_T__) " (", pid) < 0)
 		goto done;
 	if (v) {
 		REF struct directory_entry *exec_dent;
@@ -169,7 +172,7 @@ no_exec:
 		if unlikely(!parent)
 			goto noparent;
 		FINALLY_DECREF_UNLIKELY(parent);
-		if (format_printf(printer, arg, " %I32d ",
+		if (format_printf(printer, arg, " %" PRIuN(__SIZEOF_PID_T__) " ",
 		                  task_gettid_of_s(parent)) < 0)
 			goto done;
 	} else {
@@ -183,7 +186,7 @@ noparent:
 		if unlikely(!group)
 			goto nogroup;
 		FINALLY_DECREF_UNLIKELY(group);
-		if (format_printf(printer, arg, "%I32d ",
+		if (format_printf(printer, arg, "%" PRIuN(__SIZEOF_PID_T__) " ",
 		                  task_gettid_of_s(group)) < 0)
 			goto done;
 	} else {
@@ -201,7 +204,7 @@ nogroup:
 		if unlikely(!session)
 			goto nosession;
 		FINALLY_DECREF_UNLIKELY(session);
-		if (format_printf(printer, arg, "%I32d ",
+		if (format_printf(printer, arg, "%" PRIuN(__SIZEOF_PID_T__) " ",
 		                  task_gettid_of_s(session)) < 0)
 			goto done;
 		ctty = __TASK_CTTY_FIELD(session).get();
@@ -212,14 +215,14 @@ nogroup:
 		tty_devno_encoded = ((MAJOR(tty_devno) & 0xff) << 8) |
 		                    ((MINOR(tty_devno) & 0xff) |
 		                     (MINOR(tty_devno) & 0xffff00) << 8);
-		if (format_printf(printer, arg, "%I32d ",
+		if (format_printf(printer, arg, "%" PRIu32 " ",
 		                  tty_devno_encoded) < 0)
 			goto done;
 		fproc = ctty->t_fproc.get();
 		if (!fproc)
 			goto nofproc;
 		FINALLY_DECREF_UNLIKELY(fproc);
-		if (format_printf(printer, arg, "%I32d ",
+		if (format_printf(printer, arg, "%" PRIuN(__SIZEOF_PID_T__) " ",
 		                  taskpid_getpid_s(fproc)) < 0)
 			goto done;
 	} else {
@@ -263,7 +266,7 @@ nofproc:
 		for (iter = v->v_tasks; iter; iter = iter->t_vm_tasks.ln_next)
 			++thread_count;
 		sync_endread(&v->v_tasklock);
-		if (format_printf(printer, arg, "%Id ",
+		if (format_printf(printer, arg, "%" PRIuSIZ " ",
 		                  thread_count) < 0)
 			goto done;
 	} else {
@@ -285,7 +288,7 @@ nofproc:
 			vsize += vm_node_getsize(iter);
 		}
 		sync_endread(v);
-		if (format_printf(printer, arg, "%Iu ", vsize) < 0)
+		if (format_printf(printer, arg, "%" PRIuSIZ " ", vsize) < 0)
 			goto done;
 	} else {
 		if ((*printer)(arg, "0 ", 2) < 0)
@@ -298,37 +301,37 @@ nofproc:
 #ifdef KERNELSPACE_HIGHMEM
 	if ((*printer)(arg, "0 ", 2) < 0)
 		goto done; /* TODO: startcode */
-	if (format_printf(printer, arg, "%Iu ", KERNELSPACE_BASE) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", KERNELSPACE_BASE) < 0)
 		goto done; /* TODO: endcode */
 #else /* KERNELSPACE_HIGHMEM */
-	if (format_printf(printer, arg, "%Iu ", KERNEL_CEILING) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", KERNEL_CEILING) < 0)
 		goto done; /* TODO: startcode */
-	if (format_printf(printer, arg, "%Iu ", (void *)-1) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", (void *)-1) < 0)
 		goto done; /* TODO: endcode */
 #endif /* !KERNELSPACE_HIGHMEM */
-	if (format_printf(printer, arg, "%Iu ", (void *)1234) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", (void *)1234) < 0)
 		goto done; /* TODO: startstack */
-	if (format_printf(printer, arg, "%Iu ", (void *)1234) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", (void *)1234) < 0)
 		goto done; /* TODO: kstkesp */
-	if (format_printf(printer, arg, "%Iu ", (void *)1234) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", (void *)1234) < 0)
 		goto done; /* TODO: kstkeip */
-	if (format_printf(printer, arg, "%Iu ", 0) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", 0) < 0)
 		goto done; /* TODO: signal */
-	if (format_printf(printer, arg, "%Iu ", 0) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", 0) < 0)
 		goto done; /* TODO: blocked */
-	if (format_printf(printer, arg, "%Iu ", 0) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", 0) < 0)
 		goto done; /* TODO: sigignore */
-	if (format_printf(printer, arg, "%Iu ", 0) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", 0) < 0)
 		goto done; /* TODO: sigcatch */
-	if (format_printf(printer, arg, "%Iu ", 0) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", 0) < 0)
 		goto done; /* TODO: wchan */
-	if (format_printf(printer, arg, "%Iu ", 0) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", 0) < 0)
 		goto done; /* TODO: nswap */
-	if (format_printf(printer, arg, "%Iu ", 0) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", 0) < 0)
 		goto done; /* TODO: cnswap */
-	if (format_printf(printer, arg, "%d ", SIGCLD) < 0)
+	if (format_printf(printer, arg, "%" PRIuN(__SIZEOF_SIGNO_T__) " ", SIGCLD) < 0)
 		goto done; /* exit_signal */
-	if (format_printf(printer, arg, "%d ",
+	if (format_printf(printer, arg, "%u ",
 	                  thread ? (unsigned int)thread->t_cpu->c_id
 	                         : (unsigned int)_bootcpu.c_id) < 0)
 		goto done; /* processor */
@@ -336,7 +339,7 @@ nofproc:
 		goto done; /* TODO: rt_priority */
 	if (format_printf(printer, arg, "%u ", 0) < 0)
 		goto done; /* TODO: policy */
-	if (format_printf(printer, arg, "%I64u ", 0) < 0)
+	if (format_printf(printer, arg, "%I64u ", (u64)0) < 0)
 		goto done; /* TODO: delayacct_blkio_ticks */
 	if (format_printf(printer, arg, "%Iu ", 0) < 0)
 		goto done; /* TODO: guest_time */
@@ -345,25 +348,25 @@ nofproc:
 #ifdef KERNELSPACE_HIGHMEM
 	if ((*printer)(arg, "0 ", 2) < 0)
 		goto done; /* TODO: start_data */
-	if (format_printf(printer, arg, "%Iu ", KERNELSPACE_BASE) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", KERNELSPACE_BASE) < 0)
 		goto done; /* TODO: end_data */
 #else /* KERNELSPACE_HIGHMEM */
-	if (format_printf(printer, arg, "%Iu ", KERNEL_CEILING) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", KERNEL_CEILING) < 0)
 		goto done; /* TODO: start_data */
-	if (format_printf(printer, arg, "%Iu ", (void *)-1) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", (void *)-1) < 0)
 		goto done; /* TODO: end_data */
 #endif /* !KERNELSPACE_HIGHMEM */
-	if (format_printf(printer, arg, "%Iu ", 0) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", 0) < 0)
 		goto done; /* start_brk... (NOTE: This is maintained by libc, so we can't actually know this one...) */
-	if (format_printf(printer, arg, "%Iu ", 0) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", 0) < 0)
 		goto done; /* TODO: arg_start */
-	if (format_printf(printer, arg, "%Iu ", 0) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", 0) < 0)
 		goto done; /* TODO: arg_end */
-	if (format_printf(printer, arg, "%Iu ", 0) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", 0) < 0)
 		goto done; /* TODO: env_start */
-	if (format_printf(printer, arg, "%Iu ", 0) < 0)
+	if (format_printf(printer, arg, "%" PRIuPTR " ", 0) < 0)
 		goto done; /* TODO: env_end */
-	if (format_printf(printer, arg, "%d ",
+	if (format_printf(printer, arg, "%u ",
 	                  tpid ? tpid->tp_status.w_status
 	                       : W_EXITCODE(0, 0)) < 0)
 		goto done; /* exit_code */

@@ -23,6 +23,8 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/syscall.h>
@@ -61,11 +63,17 @@ STATIC_ASSERT(PROT_SHARED == VM_PROT_SHARED);
 LOCAL REF struct vm_datablock *KCALL
 getdatablock_from_handle(unsigned int fd,
                          pos_t *__restrict pminoffset,
-                         pos_t *__restrict pnumbytes) {
+                         pos_t *__restrict pnumbytes,
+                         REF struct path **__restrict pdatablock_fspath,
+                         REF struct directory_entry **__restrict pdatablock_fsname) {
 	REF struct vm_datablock *result;
 	struct handle hnd = handle_lookup(fd);
 	TRY {
-		result = handle_mmap(hnd, pminoffset, pnumbytes);
+		result = handle_mmap(hnd,
+		                     pminoffset,
+		                     pnumbytes,
+		                     pdatablock_fspath,
+		                     pdatablock_fsname);
 	} EXCEPT {
 		decref(hnd);
 		RETHROW();
@@ -137,14 +145,17 @@ DEFINE_SYSCALL3(errno_t, mprotect,
      defined(__ARCH_WANT_SYSCALL_MMAP2) || \
      defined(__ARCH_WANT_COMPAT_SYSCALL_MMAP2))
 #define WANT_MMAP 1
-#endif
+#endif /* __ARCH_WANT_... */
+
 #ifdef WANT_MMAP
 PRIVATE void *KCALL
 sys_mmap_impl(void *addr, size_t length, syscall_ulong_t prot,
               syscall_ulong_t flags, fd_t fd, pos_t file_offset) {
 	byte_t *result;
 	uintptr_t result_offset;
-	REF struct vm_datablock *datablock;
+	REF struct vm_datablock *datablock;           /* [1..1] */
+	REF struct path *datablock_fspath;            /* [0..1] */
+	REF struct directory_entry *datablock_fsname; /* [0..1] */
 	pos_t file_minoffset;
 	pos_t file_maxnumbytes;
 	/* Check for unknown flags. */
@@ -204,11 +215,15 @@ sys_mmap_impl(void *addr, size_t length, syscall_ulong_t prot,
 	file_minoffset   = 0;
 	file_maxnumbytes = (pos_t)-1;
 	/* Figure out which datablock should be mapped. */
+	datablock_fspath = NULL;
+	datablock_fsname = NULL;
 	if (!(flags & MAP_ANONYMOUS)) {
 		/* File mapping */
 		datablock = getdatablock_from_handle(fd,
 		                                     &file_minoffset,
-		                                     &file_maxnumbytes);
+		                                     &file_maxnumbytes,
+		                                     &datablock_fspath,
+		                                     &datablock_fsname);
 	} else if (!(flags & MAP_UNINITIALIZED)) {
 		/* Zero-initialized, anonymous memory */
 		datablock = incref(&vm_datablock_anonymous_zero);
@@ -275,6 +290,8 @@ again_mapat:
 				                            result,
 				                            num_bytes,
 				                            datablock,
+				                            datablock_fspath,
+				                            datablock_fsname,
 				                            file_offset & ~PAGEMASK,
 				                            file_minoffset,
 				                            file_maxnumbytes,
@@ -342,6 +359,8 @@ again_mapat:
 				                                   PAGESIZE,
 				                                   getfree_mode,
 				                                   datablock,
+				                                   datablock_fspath,
+				                                   datablock_fsname,
 				                                   file_offset & ~PAGEMASK,
 				                                   file_minoffset,
 				                                   file_maxnumbytes,
@@ -352,10 +371,14 @@ again_mapat:
 			}
 		}
 	} EXCEPT {
+		xdecref(datablock_fspath);
+		xdecref(datablock_fsname);
 		decref(datablock);
 		RETHROW();
 	}
-	decref(datablock);
+	xdecref_unlikely(datablock_fspath);
+	xdecref_unlikely(datablock_fsname);
+	decref_unlikely(datablock);
 	assert(!task_isconnected());
 	return result + result_offset;
 }

@@ -46,6 +46,8 @@ PUBLIC ATTR_PERTASK struct vm_node this_trampoline_node = {
 	/* .vn_vm     = */ &vm_kernel,
 	/* .vn_part   = */ NULL,
 	/* .vn_block  = */ NULL,
+	/* .vn_fspath = */ NULL,
+	/* .vn_fsname = */ NULL,
 	/* .vn_link   = */ { NULL, NULL },
 	/* .vn_guard  = */ 0
 };

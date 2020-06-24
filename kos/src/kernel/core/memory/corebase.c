@@ -327,6 +327,8 @@ again_tryhard_mapping_target:
 		result.cp_node->vn_node.a_vmax = result.cp_node->vn_node.a_vmin;
 		result.cp_part->dp_block       = incref(&vm_datablock_anonymous);
 		result.cp_node->vn_block       = incref(&vm_datablock_anonymous);
+		result.cp_node->vn_fspath      = NULL;
+		result.cp_node->vn_fsname      = NULL;
 		result.cp_node->vn_prot        = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED;
 		result.cp_node->vn_vm          = &vm_kernel;
 		result.cp_node->vn_flags |= VM_NODE_FLAG_PREPARED;

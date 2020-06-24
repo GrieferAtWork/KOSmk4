@@ -511,6 +511,8 @@ again_lookup_node_already_locked:
 								node->vn_node.a_vmin = PAGEID_ENCODE(COMPAT_KERNELSPACE_BASE);
 								node->vn_part  = &userkern_segment_part_compat;
 								node->vn_block = &userkern_segment_block_compat;
+								assert(node->vn_fspath == NULL);
+								assert(node->vn_fsname == NULL);
 								/* Re-insert the node and continue operating as if we'd found
 								 * everything as it has been changed into from the get-go. */
 								vm_node_insert(node);

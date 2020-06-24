@@ -57,6 +57,8 @@ PUBLIC ATTR_PERCPU struct vm_node thiscpu_x86_iobnode = {
 	/* .vn_vm     = */ &vm_kernel,
 	/* .vn_part   = */ NULL,
 	/* .vn_block  = */ NULL,
+	/* .vn_fspath = */ NULL,
+	/* .vn_fsname = */ NULL,
 	/* .vn_link   = */ { NULL, NULL },
 	/* .vn_guard  = */ 0
 };
@@ -121,6 +123,8 @@ PUBLIC ATTR_PERCPU struct vm_node _thiscpu_x86_dfstacknode ASMNAME("thiscpu_x86_
 	.vn_vm     = &vm_kernel,
 	.vn_part   = &__bootcpu_x86_dfstack_part,
 	.vn_block  = &vm_datablock_anonymous,
+	.vn_fspath = NULL,
+	.vn_fsname = NULL,
 	.vn_link   = { NULL, &LLIST_HEAD(__bootcpu_x86_dfstack_part.dp_srefs) },
 	.vn_guard  = 0
 };

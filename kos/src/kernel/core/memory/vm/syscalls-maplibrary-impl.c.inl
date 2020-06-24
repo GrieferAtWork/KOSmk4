@@ -180,15 +180,23 @@ DEFINE_SYSCALL5(void *, maplibrary,
 {
 	byte_t *result;
 	struct vm *v = THIS_VM;
-	size_t i;
-	uintptr_t addr_page_offset     = 0; /* Sub-page offset for the load address (usually 0) */
-	uintptr_t min_page             = 0;
-	REF struct vm_datablock *file  = NULL;
-	pos_t file_minoffset           = 0;
-	pos_t file_maxnumbytes         = (pos_t)-1;
+	size_t i, min_alignment, total_bytes;
+	uintptr_t addr_page_offset, min_page;
+	REF struct vm_datablock *file;
+	REF struct path *file_fspath;
+	REF struct directory_entry *file_fsname;
+	pos_t file_minoffset, file_maxnumbytes;
 	bool is_first;
-	size_t min_alignment = PAGESIZE;
-	size_t total_bytes   = 0;
+	v                = THIS_VM;
+	addr_page_offset = 0; /* Sub-page offset for the load address (usually 0) */
+	min_page         = 0;
+	file             = NULL;
+	file_fspath      = NULL;
+	file_fsname      = NULL;
+	file_minoffset   = 0;
+	file_maxnumbytes = (pos_t)-1;
+	min_alignment    = PAGESIZE;
+	total_bytes      = 0;
 	validate_readablem(hdrv, hdrc, sizeof(MY_ElfW(Phdr)));
 	VALIDATE_FLAGSET(flags,
 	                 MAP_FIXED | MAP_LOCKED | MAP_NONBLOCK |
@@ -391,6 +399,8 @@ again_map_segments:
 				              result + addr + filesize,
 				              size - filesize,
 				              &vm_datablock_anonymous_zero,
+				              NULL,
+				              NULL,
 				              0,
 				              prot,
 				              VM_NODE_FLAG_NORMAL,
@@ -425,7 +435,9 @@ unmap_check_overlap_and_find_new_candidate:
 				if (!file) {
 					file = getdatablock_from_handle((unsigned int)fd,
 					                                &file_minoffset,
-					                                &file_maxnumbytes);
+					                                &file_maxnumbytes,
+					                                &file_fspath,
+					                                &file_fsname);
 					/* Make sure that the offset and byte counts are aligned by the pagesize. */
 					file_maxnumbytes += file_minoffset & PAGEMASK;
 					file_minoffset &= ~PAGEMASK;
@@ -437,6 +449,8 @@ unmap_check_overlap_and_find_new_candidate:
 				                       result + addr,
 				                       filesize,
 				                       file,
+				                       file_fspath,
+				                       file_fsname,
 				                       (pos_t)offset,
 				                       file_minoffset,
 				                       file_maxnumbytes,
@@ -497,9 +511,13 @@ unmap_check_overlap_and_find_new_candidate:
 	} EXCEPT {
 		FUNC(unmap_range)(v, result, hdrv, i);
 		xdecref(file);
+		xdecref(file_fspath);
+		xdecref(file_fsname);
 		RETHROW();
 	}
-	xdecref(file);
+	xdecref_unlikely(file_fspath);
+	xdecref_unlikely(file_fsname);
+	xdecref_unlikely(file);
 done:
 	return result + addr_page_offset;
 }

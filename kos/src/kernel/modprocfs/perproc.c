@@ -107,7 +107,7 @@ ProcFS_PerProc_FsData[PROCFS_PERPROC_COUNT] = {
 
 INTERN_CONST mode_t const
 ProcFS_PerProc_FileMode[PROCFS_PERPROC_COUNT] = {
-	[PROCFS_PERPROC_ROOT] = S_IFDIR | 0333,
+	[PROCFS_PERPROC_ROOT] = S_IFDIR | 0555,
 #define MKDIR(id, mode, files) \
 	[PROCFS_PERPROC_ID_##id] = S_IFDIR | mode,
 #include "perproc.def"
@@ -138,14 +138,17 @@ ProcFS_PerProc_CustomTypes[PROCFS_PERPROC_COUNT - PROCFS_PERPROC_START_CUSTOM] =
 #endif /* !PROCFS_PERPROC_NO_CUSTOM */
 
 INTERN NONNULL((1)) void KCALL
-ProcFS_PerProc_LoadAttr(struct inode *__restrict self) {
+ProcFS_PerProc_LoadAttr(struct inode *__restrict self)
+		THROWS(E_IOERROR, ...) {
 	/* XXX: Load attributes from dynamically allocated thread-local storage?
 	 *      NOTE: PID can be accessed by `self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK' */
 	(void)self;
 }
 
 INTERN NONNULL((1)) void KCALL
-ProcFS_PerProc_SaveAttr(struct inode *__restrict self) {
+ProcFS_PerProc_SaveAttr(struct inode *__restrict self)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
+		       E_FSERROR_READONLY, E_IOERROR, ...) {
 	/* XXX: Save attributes in dynamically allocated thread-local storage?
 	 *      NOTE: PID can be accessed by `self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK' */
 	(void)self;

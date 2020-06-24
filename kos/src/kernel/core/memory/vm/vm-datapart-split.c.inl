@@ -1066,10 +1066,12 @@ done_futex:
 				 * specifically the part about having to re-prepare a sub-region before unmap()
 				 * following a map() operation, when only a part of that original region must
 				 * be unmapped, as opposed to it in its entirety) */
-				high->vn_flags = iter->vn_flags & ~(VM_NODE_FLAG_COREPRT);
-				high->vn_vm    = iter->vn_vm;
-				high->vn_part  = incref(result);
-				high->vn_block = incref(iter->vn_block);
+				high->vn_flags  = iter->vn_flags & ~(VM_NODE_FLAG_COREPRT);
+				high->vn_vm     = iter->vn_vm;
+				high->vn_part   = incref(result);
+				high->vn_block  = incref(iter->vn_block);
+				high->vn_fspath = xincref(iter->vn_fspath);
+				high->vn_fsname = xincref(iter->vn_fsname);
 				/* Set the partitioned flag for both node parts, so-as to prevent race conditions
 				 * when one of them gets unmapped (and its region becomes unprepared) at a later
 				 * point in time (required so each node can safely be unprepared, without interfering

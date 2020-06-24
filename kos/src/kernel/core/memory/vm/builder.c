@@ -50,11 +50,13 @@
 
 DECL_BEGIN
 
-FORCELOCAL NOBLOCK void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vmb_delete_node)(struct vm_node *__restrict node) {
+	xdecref(node->vn_fsname);
+	xdecref(node->vn_fspath);
+	decref(node->vn_block);
 	/* Drop references held by the node. */
 	vm_datapart_decref_and_merge(node->vn_part);
-	decref(node->vn_block);
 	/* Delete the VM Node */
 	vm_node_free(node);
 }
@@ -77,7 +79,7 @@ NOTHROW(KCALL vmb_delete_node)(struct vm_node *__restrict node) {
  * >> }
  * >> // Don't finalize `v' after `vmb_apply()' has succeeded
  */
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vmb_fini)(struct vmb *__restrict self) {
 	struct vm_node *iter, *next;
 	iter = self->v_byaddr;
@@ -116,10 +118,12 @@ NOTHROW(KCALL vmb_do_delete_whole_nodes)(struct vmb *__restrict self,
 	}
 }
 
-PRIVATE void KCALL
+PRIVATE NONNULL((1, 4)) void KCALL
 vmb_do_mapat(struct vmb *__restrict self,
              pageid_t page_index, size_t num_pages,
              struct vm_datablock *__restrict data,
+             struct path *fspath,
+             struct directory_entry *fsname,
              vm_vpage64_t data_start_vpage,
              uintptr_half_t prot,
              uintptr_half_t flag,
@@ -189,6 +193,8 @@ again:
 	/* Initialize the new VM Node */
 	node->vn_part        = part;
 	node->vn_block       = incref(data);
+	node->vn_fspath      = xincref(fspath);
+	node->vn_fsname      = xincref(fsname);
 	node->vn_node.a_vmin = page_index;
 	node->vn_node.a_vmax = page_index + num_vpages - 1;
 	node->vn_prot        = prot;
@@ -230,14 +236,16 @@ again:
  *                 Set to 0 if the mapping should include a guard.
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
-PUBLIC bool KCALL
+FUNDEF WUNUSED NONNULL((1, 4)) bool KCALL
 vmb_paged_mapat(struct vmb *__restrict self,
-          pageid_t page_index, size_t num_pages,
-          struct vm_datablock *__restrict data,
-          vm_vpage64_t data_start_vpage,
-          uintptr_half_t prot,
-          uintptr_half_t flag,
-          uintptr_t guard)
+                pageid_t page_index, size_t num_pages,
+                struct vm_datablock *__restrict data,
+                struct path *fspath,
+                struct directory_entry *fsname,
+                vm_vpage64_t data_start_vpage,
+                uintptr_half_t prot,
+                uintptr_half_t flag,
+                uintptr_t guard)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	pageid_t endpage;
 	/* Use an overflow-addition, so we can indicate failure if the
@@ -255,6 +263,8 @@ vmb_paged_mapat(struct vmb *__restrict self,
 	             page_index,
 	             num_pages,
 	             data,
+	             fspath,
+	             fsname,
 	             data_start_vpage,
 	             prot,
 	             flag,
@@ -309,13 +319,15 @@ DECL_BEGIN
 
 /* A combination of `vmb_paged_getfree' + `vmb_paged_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-PUBLIC NONNULL((1, 6)) pageid_t KCALL
+PUBLIC WUNUSED NONNULL((1, 6)) pageid_t KCALL
 vmb_paged_map(struct vmb *__restrict self,
               pageid_t hint,
               size_t num_pages,
               size_t min_alignment_in_pages,
               unsigned int getfree_mode,
               struct vm_datablock *__restrict data,
+              struct path *fspath,
+              struct directory_entry *fsname,
               vm_vpage64_t data_start_vpage,
               uintptr_half_t prot,
               uintptr_half_t flag,
@@ -333,6 +345,8 @@ vmb_paged_map(struct vmb *__restrict self,
 	             result,
 	             num_pages,
 	             data,
+	             fspath,
+	             fsname,
 	             data_start_vpage,
 	             prot,
 	             flag,
@@ -624,6 +638,8 @@ again_lock_parts:
 						             node->vn_node.a_vmax + 1,
 						             num_missing_vpages,
 						             part_block,
+						             node->vn_fspath,
+						             node->vn_fsname,
 						             off_missing_vpages,
 						             node->vn_prot,
 						             node_guard,

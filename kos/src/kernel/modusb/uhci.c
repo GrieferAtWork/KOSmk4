@@ -3216,7 +3216,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 		addr = vm_map(&vm_kernel,
 		               HINT_GETADDR(KERNEL_VMHINT_DEVICE), 1, 1,
 		               HINT_GETMODE(KERNEL_VMHINT_DEVICE),
-		               &vm_datablock_physical,
+		               &vm_datablock_physical, NULL, NULL,
 		               (pos_t)(dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_start & ~PAGEMASK),
 		               VM_PROT_READ | VM_PROT_WRITE,
 		               VM_NODE_FLAG_NORMAL, 0);

@@ -3944,6 +3944,10 @@ NOTHROW(KCALL superblock_mountlock_upgrade_nx)(struct superblock *__restrict sel
 }
 
 
+/* Open the INode associated with a given directory entry.
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: The superblock has been unmounted.
+ * @throws: E_IOERROR:   [...]
+ * @throws: E_BADALLOC:  [...] */
 PUBLIC ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct inode *KCALL
 superblock_opennode(struct superblock *__restrict self,
                     struct directory_node *__restrict parent_directory,
@@ -4091,6 +4095,30 @@ check_result_for_deletion:
 		RETHROW();
 	}
 	superblock_nodeslock_endwrite(self);
+	return result;
+}
+
+
+/* Find some mounting point that is apart of the given `ns'
+ * If multiple such paths exist, arbitrarily return one of them.
+ * If no such paths exist, return NULL instead. */
+PUBLIC WUNUSED NONNULL((1, 2)) REF struct path *KCALL
+superblock_find_mount_from_vfs(struct superblock *__restrict self,
+                               struct vfs const *__restrict ns) {
+	REF struct path *result;
+	superblock_mountlock_read(self);
+	for (result = self->s_mount; result;
+	     result = result->p_mount->mp_fsmount.ln_next) {
+		assert(result->p_mount);
+		/* Check if this mounting point exists within the given `ns' */
+		if (result->p_vfs == ns) {
+			/* Try to acquire a reference to the mounting point.
+			 * This may fail if the mounting point is currently being unmounted. */
+			if (tryincref(result))
+				break;
+		}
+	}
+	superblock_mountlock_endread(self);
 	return result;
 }
 

@@ -144,10 +144,13 @@ handle_datapart_truncate(struct vm_datapart *__restrict self, pos_t new_size) {
 	xdecref(vm_datapart_split(self, (size_t)(new_size / PAGESIZE)));
 }
 
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct vm_datablock *KCALL
+INTERN WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
 handle_datapart_mmap(struct vm_datapart *__restrict self,
                      pos_t *__restrict pminoffset,
-                     pos_t *__restrict pnumbytes) {
+                     pos_t *__restrict pnumbytes,
+                     REF struct path **__restrict UNUSED(pdatablock_fspath),
+                     REF struct directory_entry **__restrict UNUSED(pdatablock_fsname))
+		THROWS(...) {
 	REF struct vm_datablock *result;
 	sync_read(self);
 	result      = incref(self->dp_block);

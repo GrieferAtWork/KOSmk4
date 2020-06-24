@@ -29,6 +29,7 @@
 #include <kernel/paging.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
+#include <sched/userkern.h>
 #include <sched/x86/tss.h>
 
 #include <asm/cpu-cpuid.h>
@@ -95,18 +96,29 @@ struct vm vm_kernel_head = {
 	/* .v_tasklock   = */ ATOMIC_RWLOCK_INIT,
 	/* .v_deltasks   = */ NULL,
 	/* .v_kernreserve = */ {
-		/* .vn_node   = */ { (struct vm_node *)0xcccccccc,
-		                     (struct vm_node *)0xcccccccc,
-		                     0xcccccccc,
-		                     0xcccccccc },
-		/* .vn_byaddr = */ { (struct vm_node *)0xcccccccc, (struct vm_node **)0xcccccccc },
-		/* .vn_prot   = */ 0xcccc,
-		/* .vn_flags  = */ 0xcccc,
+		/* .vn_node   = */ { NULL,
+		                     NULL,
+		                     KERNELSPACE_MINPAGEID,
+		                     KERNELSPACE_MAXPAGEID },
+		/* .vn_byaddr = */ { NULL, (struct vm_node **)0xcccccccc },
+#ifndef CONFIG_NO_USERKERN_SEGMENT
+		/* .vn_prot   = */ VM_PROT_PRIVATE | VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
+#else /* !CONFIG_NO_USERKERN_SEGMENT */
+		/* .vn_prot   = */ VM_PROT_PRIVATE,
+#endif /* CONFIG_NO_USERKERN_SEGMENT */
+		/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_KERNPRT,
 		/* .vn_vm     = */ (struct vm *)0xcccccccc,
-		/* .vn_part   = */ (struct vm_datapart *)0xcccccccc,
-		/* .vn_block  = */ (struct vm_datablock *)0xcccccccc,
+#ifndef CONFIG_NO_USERKERN_SEGMENT
+		/* .vn_part   = */ &userkern_segment_part,
+		/* .vn_block  = */ &userkern_segment_block,
+#else /* !CONFIG_NO_USERKERN_SEGMENT */
+		/* .vn_part   = */ NULL,
+		/* .vn_block  = */ NULL,
+#endif /* CONFIG_NO_USERKERN_SEGMENT */
+		/* .vn_fspath = */ NULL,
+		/* .vn_fsname = */ NULL,
 		/* .vn_link   = */ { (struct vm_node *)0xcccccccc, (struct vm_node **)0xcccccccc },
-		/* .vn_guard  = */ 0xcccccccc
+		/* .vn_guard  = */ 0
 	}
 };
 

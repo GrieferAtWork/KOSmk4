@@ -49,7 +49,7 @@ struct kernel_debugtraps {
 
 #define KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION 0x0001 /* Trap on E_ILLEGAL_INSTRUCTION */
 #define KERNEL_DEBUGTRAP_ON_SEGFAULT            0x0002 /* Trap on E_SEGFAULT */
-#define KERNEL_DEBUGTRAP_ON_UNHANDLED_EXCEPT    0x0004 /* Trap on unhandled exceptions */
+#define KERNEL_DEBUGTRAP_ON_UNHANDLED_EXCEPT    0x0004 /* Trap on unhandled kernel exceptions */
 #define KERNEL_DEBUGTRAP_ON_COREDUMP            0x0008 /* Trap on creation of coredumps */
 #define KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT 0x0010 /* Trap on unhandled interrupts */
 #define KERNEL_DEBUGTRAP_ON_DRIVER_INIT_FAILURE 0x0020 /* Trap on driver initialization failure */

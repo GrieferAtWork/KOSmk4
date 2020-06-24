@@ -34,6 +34,7 @@
 #include <dev/ttybase.h>
 #include <fs/node.h>
 #include <fs/ramfs.h>
+#include <fs/vfs.h>
 #include <kernel/aio.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
@@ -714,12 +715,30 @@ handle_characterdevice_ioctl(struct character_device *__restrict self, syscall_u
 	      cmd);
 }
 
-INTERN NONNULL((1)) REF struct vm_datablock *KCALL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
 handle_characterdevice_mmap(struct character_device *__restrict self,
                             pos_t *__restrict pminoffset,
-                            pos_t *__restrict pnumbytes) THROWS(...) {
-	if likely(self->cd_type.ct_mmap)
-		return (*self->cd_type.ct_mmap)(self, pminoffset, pnumbytes);
+                            pos_t *__restrict pnumbytes,
+                            REF struct path **__restrict pdatablock_fspath,
+                            REF struct directory_entry **__restrict pdatablock_fsname)
+		THROWS(...) {
+	if likely(self->cd_type.ct_mmap) {
+		REF struct vm_datablock *result;
+		result = (*self->cd_type.ct_mmap)(self, pminoffset, pnumbytes,
+		                                  pdatablock_fspath,
+		                                  pdatablock_fsname);
+		if (!*pdatablock_fsname && ATOMIC_READ(self->cd_devfs_inode) != NULL) {
+			/* Fill in filesystem location information from devfs! */
+			*pdatablock_fsname = xincref(self->cd_devfs_entry);
+			if (!*pdatablock_fspath) {
+				/* Try to lookup (one of) the mounting point(s) of devfs within the current namespace.
+				 * If such a mounting point exists, `superblock_find_mount_from_vfs()' will return
+				 * `NULL', which is allowed to happen, and will be dealt with by our caller. */
+				*pdatablock_fspath = superblock_find_mount_from_vfs(&devfs, THIS_VFS);
+			}
+		}
+		return result;
+	}
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 	      E_FILESYSTEM_OPERATION_MMAP);
 }

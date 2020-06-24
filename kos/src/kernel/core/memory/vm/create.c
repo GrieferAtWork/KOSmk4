@@ -87,19 +87,19 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 	/*atomic_rwlock_init(&result->v_tasklock);*/
 	assert(result->v_deltasks == NULL);
 	/*shared_rwlock_init(&result->v_dma_lock);*/
-	result->v_kernreserve.vn_node.a_min      = NULL;
-	result->v_kernreserve.vn_node.a_max      = NULL;
-	result->v_kernreserve.vn_node.a_vmin     = KERNELSPACE_MINPAGEID;
-	result->v_kernreserve.vn_node.a_vmax     = KERNELSPACE_MAXPAGEID;
+	assert(result->v_kernreserve.vn_node.a_min == NULL);
+	assert(result->v_kernreserve.vn_node.a_max == NULL);
+	assert(result->v_kernreserve.vn_node.a_vmin == KERNELSPACE_MINPAGEID);
+	assert(result->v_kernreserve.vn_node.a_vmax == KERNELSPACE_MAXPAGEID);
 	result->v_kernreserve.vn_byaddr.ln_pself = &result->v_byaddr;
-	result->v_kernreserve.vn_byaddr.ln_next  = NULL;
-	result->v_kernreserve.vn_prot = (VM_PROT_NONE | VM_PROT_PRIVATE
+	assert(result->v_kernreserve.vn_byaddr.ln_next == NULL);
 #ifndef CONFIG_NO_USERKERN_SEGMENT
-	                                 | VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC
-#endif /* !CONFIG_NO_USERKERN_SEGMENT */
-	                                 );
-	result->v_kernreserve.vn_flags = (VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_KERNPRT);
-	result->v_kernreserve.vn_vm    = result;
+	assert(result->v_kernreserve.vn_prot == (VM_PROT_PRIVATE | VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC));
+#else /* !CONFIG_NO_USERKERN_SEGMENT */
+	assert(result->v_kernreserve.vn_prot == (VM_PROT_PRIVATE));
+#endif /* CONFIG_NO_USERKERN_SEGMENT */
+	assert(result->v_kernreserve.vn_flags == (VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_KERNPRT));
+	result->v_kernreserve.vn_vm = result;
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 	/* NOTE: Don't chain the `v_kernreserve' node, or incref() the part/block,
 	 *       since doing so is unnecessary.
@@ -108,13 +108,15 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 	 *       none of the functions that would normally rely on proper integration
 	 *       should ever get to the point they could be bothered by the missing
 	 *       integrity. */
-	result->v_kernreserve.vn_part  = &userkern_segment_part;
-	result->v_kernreserve.vn_block = &userkern_segment_block;
+	assert(result->v_kernreserve.vn_part  == &userkern_segment_part);
+	assert(result->v_kernreserve.vn_block == &userkern_segment_block);
 #else /* !CONFIG_NO_USERKERN_SEGMENT */
-	result->v_kernreserve.vn_part  = NULL;
-	result->v_kernreserve.vn_block = NULL;
+	assert(result->v_kernreserve.vn_part  == NULL);
+	assert(result->v_kernreserve.vn_block == NULL);
 #endif /* CONFIG_NO_USERKERN_SEGMENT */
-	result->v_kernreserve.vn_guard = 0;
+	assert(result->v_kernreserve.vn_guard == 0);
+	assert(result->v_kernreserve.vn_fspath == NULL);
+	assert(result->v_kernreserve.vn_fsname == NULL);
 
 #ifdef ARCH_PAGEDIR_INIT_IS_NOEXCEPT
 	/* Initialize the page directory. */
@@ -193,6 +195,8 @@ NOTHROW(KCALL vm_destroy)(struct vm *__restrict self) {
 #endif /* !__ARCH_HAVE_COMPAT */
 #endif /* !NDEBUG */
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
+	assert(self->v_kernreserve.vn_fspath == NULL);
+	assert(self->v_kernreserve.vn_fsname == NULL);
 	/* Finalize the underlying page directory. */
 	pagedir_fini2(&self->v_pagedir, self->v_pdir_phys);
 	/* Drop a weak reference, which is likely going to free the VM */

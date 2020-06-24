@@ -66,6 +66,8 @@ struct vm_node;
 struct vm_datapart;
 struct vm_datablock;
 struct vm_futex_controller;
+struct path;
+struct directory_entry;
 
 #ifndef __gfp_t_defined
 #define __gfp_t_defined 1
@@ -1458,45 +1460,48 @@ DATDEF struct vm_datablock_type vm_ramfile_type;
 
 struct vm_node {
 	ATREE_NODE(struct vm_node, pageid_t)
-	                         vn_node;   /* [lock(vn_vm->v_treelock,OWNER)] VM Node controller. */
-	LLIST_NODE(struct vm_node)
-	                         vn_byaddr; /* [lock(vn_vm->v_treelock,OWNER)][const_if(VM_NODE_FLAG_KERNPRT)] Order chain of nodes mapped within #vn_vm. */
-	uintptr_half_t           vn_prot;   /* [lock(vn_vm->v_treelock,OWNER)][const_if(VM_NODE_FLAG_KERNPRT)] VM Node protection (Set of `VM_PROT_*'). */
-	uintptr_half_t           vn_flags;  /* [lock(vn_vm->v_treelock,OWNER)][const_if(VM_NODE_FLAG_KERNPRT)] VM Node flags (Set of `VM_FLAG_F*'). */
-	struct vm               *vn_vm;     /* [1..1][const] The associated VM */
-	REF struct vm_datapart  *vn_part;   /* [0..1][lock(vn_vm->v_treelock)][const_if(VM_NODE_FLAG_HINTED || VM_NODE_FLAG_KERNPRT)]
-	                                     * NOTE: When `vn_block' is `NULL', then this field is _required_ to be `NULL'
-	                                     * The mapped part (or `NULL' if this VM Node describes a reserved memory region) */
-	REF struct vm_datablock *vn_block;  /* [0..1][const] The mapped part (or `NULL' if this VM Node describes a reserved memory region) */
-	LLIST_NODE(struct vm_node) vn_link; /* [lock(vn_vm->v_treelock && vn_part)] Chain of nodes in either
-	                                     * `vn_part->dp_crefs' or `vn_part->dp_srefs'.
-	                                     * Which chain is used depends on the `VM_PROT_SHARED' bit. */
-	uintptr_t                vn_guard;  /* [const] An associated guard descriptor, used to implement lazy stack growth.
-	                                     * When `0', the node acts normally and guard behavior is disabled.
-	                                     * When `1', any access made to the node results in an `E_STACK_OVERFLOW' exception being generated.
-	                                     * Otherwise, accessing any page apart of this node will cause a new 1-page large node to be
-	                                     * created either below or above this one (depending on `VM_NODE_FLAG_GROWSUP'), with that
-	                                     * node being created with `vn_guard' decremented by one.
-	                                     * If the `vn_guard' value of the new node is `1', `vn_part' of that node is set to `NULL'.
-	                                     * Otherwise, the node is initialized to map to the proper data part above of below the
-	                                     * one that this node is mapped to.
-	                                     * When a node is split due to a call to `vm_datapart_split()', only the upper (w/ VM_NODE_FLAG_GROWSUP)
-	                                     * or lower (w/o VM_NODE_FLAG_GROWSUP) node will retain its `vn_guard' setting, while the other
-	                                     * will have this field set to 0. */
+	                            vn_node;   /* [lock(vn_vm->v_treelock,OWNER)] VM Node controller. */
+	LLIST_NODE(struct vm_node)  vn_byaddr; /* [lock(vn_vm->v_treelock,OWNER)][const_if(VM_NODE_FLAG_KERNPRT)] Order chain of nodes mapped within #vn_vm. */
+	uintptr_half_t              vn_prot;   /* [lock(vn_vm->v_treelock,OWNER)][const_if(VM_NODE_FLAG_KERNPRT)] VM Node protection (Set of `VM_PROT_*'). */
+	uintptr_half_t              vn_flags;  /* [lock(vn_vm->v_treelock,OWNER)][const_if(VM_NODE_FLAG_KERNPRT)] VM Node flags (Set of `VM_FLAG_F*'). */
+	struct vm                  *vn_vm;     /* [1..1][const] The associated VM */
+	REF struct vm_datapart     *vn_part;   /* [0..1][lock(vn_vm->v_treelock)][const_if(VM_NODE_FLAG_HINTED || VM_NODE_FLAG_KERNPRT)]
+	                                        * NOTE: When `vn_block' is `NULL', then this field is _required_ to be `NULL'
+	                                        * The mapped part (or `NULL' if this VM Node describes a reserved memory region) */
+	REF struct vm_datablock    *vn_block;  /* [0..1][const] The mapped part (or `NULL' if this VM Node describes a reserved memory region) */
+	REF struct path            *vn_fspath; /* [0..1][const] Optional mapping path (only used for memory->disk mapping listings) */
+	REF struct directory_entry *vn_fsname; /* [0..1][const] Optional mapping name (only used for memory->disk mapping listings) */
+	LLIST_NODE(struct vm_node)  vn_link;   /* [lock(vn_vm->v_treelock && vn_part)] Chain of nodes in either
+	                                        * `vn_part->dp_crefs' or `vn_part->dp_srefs'.
+	                                        * Which chain is used depends on the `VM_PROT_SHARED' bit. */
+	uintptr_t                   vn_guard;  /* [const] An associated guard descriptor, used to implement lazy stack growth.
+	                                        * When `0', the node acts normally and guard behavior is disabled.
+	                                        * When `1', any access made to the node results in an `E_STACK_OVERFLOW' exception being generated.
+	                                        * Otherwise, accessing any page apart of this node will cause a new 1-page large node to be
+	                                        * created either below or above this one (depending on `VM_NODE_FLAG_GROWSUP'), with that
+	                                        * node being created with `vn_guard' decremented by one.
+	                                        * If the `vn_guard' value of the new node is `1', `vn_part' of that node is set to `NULL'.
+	                                        * Otherwise, the node is initialized to map to the proper data part above of below the
+	                                        * one that this node is mapped to.
+	                                        * When a node is split due to a call to `vm_datapart_split()', only the upper (w/ VM_NODE_FLAG_GROWSUP)
+	                                        * or lower (w/o VM_NODE_FLAG_GROWSUP) node will retain its `vn_guard' setting, while the other
+	                                        * will have this field set to 0. */
 	/* TODO: Memory breakpoint support (any memory access is emulated using VIO) */
 };
 
 
 /* Free a given VM node (the method used depending on
  * `self->vn_flags & VM_NODE_FLAG_COREPRT') */
-FUNDEF NOBLOCK void
+FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_node_free)(struct vm_node *__restrict self);
 
 /* Destroy a given node. - This will finalize the following fields:
+ *  - vn_fspath
+ *  - vn_fsname
  *  - vn_block
  *  - vn_part
  *  - vn_link */
-FUNDEF NOBLOCK void
+FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self);
 
 
@@ -1747,24 +1752,30 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm
  * @param: prot:   Set of `VM_PROT_*'.
  * @param: flag:   Set of `VM_NODE_FLAG_*'.
  * @param: data_start_vpage: The memory page index where mapping of `data' starts.
+ * @param: fspath: Optional mapping path (only used for memory->disk mapping listings)
+ * @param: fsname: Optional mapping name (only used for memory->disk mapping listings)
  * @param: guard:  If non-zero, repetition limit for a guard mapping.
- *                 Set to 0 if the mapping should include a guard.
+ *                 Set to 0 if the mapping shouldn't include a guard.
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
-FUNDEF bool KCALL
+FUNDEF WUNUSED NONNULL((1, 4)) bool KCALL
 vm_mapat(struct vm *__restrict self,
          PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
          PAGEDIR_PAGEALIGNED size_t num_bytes,
          struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+         struct path *fspath DFL(__NULLPTR),
+         struct directory_entry *fsname DFL(__NULLPTR),
          PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
          uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
          uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
          uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-LOCAL bool KCALL
+LOCAL WUNUSED NONNULL((1, 4)) bool KCALL
 vm_paged_mapat(struct vm *__restrict self,
                pageid_t page_index, size_t num_pages,
                struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+               struct path *fspath DFL(__NULLPTR),
+               struct directory_entry *fsname DFL(__NULLPTR),
                vm_vpage64_t data_start_vpage DFL(0),
                uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
                uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
@@ -1772,7 +1783,7 @@ vm_paged_mapat(struct vm *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	return vm_mapat(self, PAGEID_DECODE(page_index),
 	                num_pages * PAGESIZE,
-	                data,
+	                data, fspath, fsname,
 	                (pos_t)data_start_vpage * PAGESIZE,
 	                prot, flag, guard);
 }
@@ -1780,11 +1791,15 @@ vm_paged_mapat(struct vm *__restrict self,
 /* Same as `vm_paged_mapat()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
  * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
- * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage' */
-FUNDEF bool KCALL
+ * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage'
+ * @param: fspath: Optional mapping path (only used for memory->disk mapping listings)
+ * @param: fsname: Optional mapping name (only used for memory->disk mapping listings) */
+FUNDEF WUNUSED NONNULL((1, 4)) bool KCALL
 vm_paged_mapat_subrange(struct vm *__restrict self,
                         pageid_t page_index, size_t num_pages,
                         struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+                        struct path *fspath DFL(__NULLPTR),
+                        struct directory_entry *fsname DFL(__NULLPTR),
                         vm_vpage64_t data_start_vpage DFL(0),
                         vm_vpage64_t data_subrange_minvpage DFL(0),
                         vm_vpage64_t data_subrange_maxvpage DFL((vm_vpage64_t)-1),
@@ -1793,11 +1808,13 @@ vm_paged_mapat_subrange(struct vm *__restrict self,
                         uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
-LOCAL bool KCALL
+LOCAL WUNUSED NONNULL((1, 4)) bool KCALL
 vm_mapat_subrange(struct vm *__restrict self,
                   PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
                   PAGEDIR_PAGEALIGNED size_t num_bytes,
                   struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+                  struct path *fspath DFL(__NULLPTR),
+                  struct directory_entry *fsname DFL(__NULLPTR),
                   PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
                   PAGEDIR_PAGEALIGNED pos_t data_subrange_minoffset DFL(0),
                   PAGEDIR_PAGEALIGNED pos_t data_subrange_numbytes DFL((pos_t)-1),
@@ -1813,7 +1830,7 @@ vm_mapat_subrange(struct vm *__restrict self,
 	return vm_paged_mapat_subrange(self,
 	                               PAGEID_ENCODE(addr),
 	                               num_bytes / PAGESIZE,
-	                               data,
+	                               data, fspath, fsname,
 	                               (vm_vpage64_t)(data_start_offset / PAGESIZE),
 	                               (vm_vpage64_t)(data_subrange_minoffset / PAGESIZE),
 	                               (vm_vpage64_t)((data_subrange_minoffset + data_subrange_numbytes - 1) / PAGESIZE),
@@ -1824,7 +1841,7 @@ vm_mapat_subrange(struct vm *__restrict self,
  * @param: flag: Set of `VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE'
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
-FUNDEF bool KCALL
+FUNDEF WUNUSED NONNULL((1)) bool KCALL
 vm_mapresat(struct vm *__restrict self,
             PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
             PAGEDIR_PAGEALIGNED size_t num_bytes,
@@ -1925,19 +1942,24 @@ NOTHROW(KCALL vm_find_last_node_lower_equal)(struct vm *__restrict effective_vm,
 
 
 /* A combination of `vm_paged_getfree' + `vm_paged_mapat'
- * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-FUNDEF PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+ * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target.
+ * @param: fspath: Optional mapping path (only used for memory->disk mapping listings)
+ * @param: fsname: Optional mapping name (only used for memory->disk mapping listings) */
+FUNDEF WUNUSED NONNULL((1, 6)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 vm_map(struct vm *__restrict self,
        PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
        PAGEDIR_PAGEALIGNED size_t num_bytes,
        PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE),
        unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
        struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+       struct path *fspath DFL(__NULLPTR),
+       struct directory_entry *fsname DFL(__NULLPTR),
        PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
        uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
        uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
        uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
 LOCAL pageid_t KCALL
 vm_paged_map(struct vm *__restrict self,
              pageid_t hint,
@@ -1945,6 +1967,8 @@ vm_paged_map(struct vm *__restrict self,
              size_t min_alignment_in_pages DFL(1),
              unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
              struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+             struct path *fspath DFL(__NULLPTR),
+             struct directory_entry *fsname DFL(__NULLPTR),
              vm_vpage64_t data_start_vpage DFL(0),
              uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
              uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
@@ -1955,7 +1979,7 @@ vm_paged_map(struct vm *__restrict self,
 	                PAGEID_DECODE(hint),
 	                num_pages * PAGESIZE,
 	                min_alignment_in_pages * PAGESIZE,
-	                getfree_mode, data,
+	                getfree_mode, data, fspath, fsname,
 	                (pos_t)data_start_vpage * PAGESIZE,
 	                prot, flag, guard);
 	return PAGEID_ENCODE(result);
@@ -1964,7 +1988,9 @@ vm_paged_map(struct vm *__restrict self,
 /* Same as `vm_paged_map()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
  * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
- * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage' */
+ * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage'
+ * @param: fspath: Optional mapping path (only used for memory->disk mapping listings)
+ * @param: fsname: Optional mapping name (only used for memory->disk mapping listings) */
 FUNDEF pageid_t KCALL
 vm_paged_map_subrange(struct vm *__restrict self,
                       pageid_t hint,
@@ -1972,6 +1998,8 @@ vm_paged_map_subrange(struct vm *__restrict self,
                       size_t min_alignment_in_pages DFL(1),
                       unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
                       struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+                      struct path *fspath DFL(__NULLPTR),
+                      struct directory_entry *fsname DFL(__NULLPTR),
                       vm_vpage64_t data_start_vpage DFL(0),
                       vm_vpage64_t data_subrange_minvpage DFL(0),
                       vm_vpage64_t data_subrange_maxvpage DFL((vm_vpage64_t)-1),
@@ -1986,6 +2014,8 @@ vm_map_subrange(struct vm *__restrict self,
                 PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE),
                 unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
                 struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+                struct path *fspath DFL(__NULLPTR),
+                struct directory_entry *fsname DFL(__NULLPTR),
                 PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
                 PAGEDIR_PAGEALIGNED pos_t data_subrange_minoffset DFL(0),
                 PAGEDIR_PAGEALIGNED pos_t data_subrange_numbytes DFL((pos_t)-1),
@@ -2005,7 +2035,7 @@ vm_map_subrange(struct vm *__restrict self,
 	                               num_bytes / PAGESIZE,
 	                               min_alignment / PAGESIZE,
 	                               getfree_mode,
-	                               data,
+	                               data, fspath, fsname,
 	                               (vm_vpage64_t)(data_start_offset / PAGESIZE),
 	                               (vm_vpage64_t)(data_subrange_minoffset / PAGESIZE),
 	                               (vm_vpage64_t)((data_subrange_minoffset + data_subrange_numbytes - 1) / PAGESIZE),

@@ -266,10 +266,15 @@ handle_file_ioctl(struct file *__restrict self,
 	return inode_ioctl(self->f_node, cmd, arg, mode);
 }
 
-INTERN REF struct vm_datablock *KCALL
+INTERN WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
 handle_file_mmap(struct file *__restrict self,
                  pos_t *__restrict UNUSED(pminoffset),
-                 pos_t *__restrict UNUSED(pnumbytes)) {
+                 pos_t *__restrict UNUSED(pnumbytes),
+                 REF struct path **__restrict pdatablock_fspath,
+                 REF struct directory_entry **__restrict pdatablock_fsname)
+		THROWS(...) {
+	*pdatablock_fspath = xincref(self->f_path);
+	*pdatablock_fsname = xincref(self->f_dirent);
 	return incref(self->f_node);
 }
 

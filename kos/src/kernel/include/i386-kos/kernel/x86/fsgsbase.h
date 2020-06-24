@@ -37,7 +37,7 @@
  * certain calls to (rd|wr)msr, which we emulate on x86_64 at runtime by saving the
  * address of every use of these instructions in a big list that gets relocated at
  * runtime if this CPU feature isn't present.
- * This can be done fairly simple, since the opcode sequence for any of the aforementioned
+ * This can be done fairly easily, since the opcode sequence for any of the aforementioned
  * instructions is always 5 bytes (when the operand is 64-bit, which is should always be
  * within the kernel, as a 32-bit operand would mean a truncated result)
  * These 5 bits can then easily be replaced with a call-instruction to a function that

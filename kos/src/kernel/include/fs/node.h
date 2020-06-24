@@ -56,6 +56,7 @@ struct wall_clock;
 struct aio_buffer;
 struct aio_pbuffer;
 struct handle;
+struct vfs;
 
 typedef uintptr_t fsmode_t; /* Set of `FS_MODE_F*' */
 
@@ -2126,6 +2127,13 @@ superblock_opennode(struct superblock *__restrict self,
                     struct directory_node *__restrict parent_directory,
                     struct directory_entry *__restrict parent_directory_entry)
 		THROWS(E_FSERROR_DELETED, E_IOERROR, E_BADALLOC, ...);
+
+/* Find some mounting point that is apart of the given `ns'
+ * If multiple such paths exist, arbitrarily return one of them.
+ * If no such paths exist, return NULL instead. */
+FUNDEF WUNUSED NONNULL((1, 2)) REF struct path *KCALL
+superblock_find_mount_from_vfs(struct superblock *__restrict self,
+                               struct vfs const *__restrict ns);
 
 
 /* Gather information about the filesystem and store that information in `*result' */

@@ -268,6 +268,8 @@ again:
 		                             ;
 		incref(corepair.cp_part->dp_block);
 		corepair.cp_node->vn_block  = incref(corepair.cp_part->dp_block);
+		corepair.cp_node->vn_fspath = NULL;
+		corepair.cp_node->vn_fsname = NULL;
 		corepair.cp_node->vn_prot   = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED;
 		corepair.cp_node->vn_flags |= VM_NODE_FLAG_PREPARED;
 		corepair.cp_node->vn_part   = corepair.cp_part;

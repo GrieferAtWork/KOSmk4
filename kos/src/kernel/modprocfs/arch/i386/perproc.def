@@ -20,7 +20,7 @@
 
 
 PERPROC_DIRECTORY_ENTRY("x86", DT_DIR, x86)
-MKDIR(x86, 0333,
+MKDIR(x86, 0555,
       F(x86, "iopl", DT_REG, x86_iopl)
       F_END)
 

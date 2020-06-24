@@ -175,7 +175,7 @@ __FORCELOCAL void (__cpuid2)(__UINT32_TYPE__ __leaf_eax, __UINT32_TYPE__ __leaf_
 /* NOTE: There may be cases where cpuid returns different values between
  *       multiple invocations, however in the most common case this doesn't
  *       happen, which is the case of using it as a feature test helper.
- *       So to optimize for this case, annotate these functions are ATTR_CONST. */
+ *       So to optimize for this case, annotate these functions are `ATTR_CONST'. */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid_eax)(__UINT32_TYPE__ __leaf_eax) { __UINT32_TYPE__ __res; __asm__("cpuid" : "=a" (__res) : "a" (__leaf_eax) : "ecx", "edx", "ebx"); return __res; }
 __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid_ecx)(__UINT32_TYPE__ __leaf_eax) { __UINT32_TYPE__ __res, __eax; __asm__("cpuid" : "=c" (__res), "=a" (__eax) : "a" (__leaf_eax) : "edx", "ebx"); return __res; }
 __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __UINT32_TYPE__ (__cpuid_edx)(__UINT32_TYPE__ __leaf_eax) { __UINT32_TYPE__ __res, __eax; __asm__("cpuid" : "=d" (__res), "=a" (__eax) : "a" (__leaf_eax) : "ecx", "ebx"); return __res; }
@@ -437,7 +437,9 @@ __FORCELOCAL void (__outsl)(__UINT16_TYPE__ __port, void const *__restrict __src
 /* Read/write the FS/GS-base registers. */
 #ifdef __x86_64__
 #ifdef __KERNEL__
+__DECL_END
 #include <kernel/x86/fsgsbase.h>
+__DECL_BEGIN
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rdfsbasel)(void) { __register __UINT64_TYPE__ __result; __asm__("safe_rdfsbase %0" : "=r" (__result)); return (__UINT32_TYPE__)__result; }
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rdgsbasel)(void) { __register __UINT64_TYPE__ __result; __asm__("safe_rdgsbase %0" : "=r" (__result)); return (__UINT32_TYPE__)__result; }
 __FORCELOCAL void (__wrfsbasel)(__UINT32_TYPE__ __val) { __asm__ __volatile__("safe_wrfsbase %0" : : "r" ((__UINT64_TYPE__)__val)); }
@@ -486,7 +488,7 @@ void (__wrgsbase)(void *__val);
 	".endif\n\t.endif\n\t.endif\n\t.endif\n\t.endif\n\t.endif\n\t.endif\n\t.endif\n\t"
 
 /* The KOS kernel emulates the `(wr|rd)(fs|gs)base' instructions in 32-bit mode!
- * As a matter of fact, this is the preferred way for user-space to change them!
+ * As a matter of fact, this is the preferred way for user-space to change them.
  * NOTE: The byte sequences below are what the `(wr|rd)(fs|gs)base' instructions
  *       would assembly to if they were valid for 32-bit code. However since Intel
  *       states that these instructions are not available in protected mode (32-bit
@@ -609,8 +611,8 @@ __FORCELOCAL void (__wrgs_keepbase)(__UINT16_TYPE__ __val) {
 }
 #else /* __x86_64__ */
 /* Set the %fs or %gs register index, but also preserve the segment base address values.
- * In 32-bit mode, this is the same as regular reads/writes to/from the %fs or %gs register,
- * since due to fs/gs.base emulation, the actual segment base address is stored within the
+ * In 32-bit mode, this is the same as regular writes to the %fs or %gs register, since
+ * due to fs/gs.base emulation, the actual segment base address is stored within the
  * GDT, meaning that segment reloads will not clobber the base register so-long as the
  * segment being re-loaded doesn't have a different base address. */
 #ifdef __INTELLISENSE__

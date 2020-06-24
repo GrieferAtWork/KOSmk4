@@ -35,13 +35,14 @@ DECL_BEGIN
 #define PROCFS_INO_TYPEMASK UINT64_C(0xff00000000000000)
 #define PROCFS_INO_TYPESHFT 56
 
-#define PROCFS_INOTYPE_SINGLETON 0x00 /* Singleton INode (anything that appears only once in /proc) */
+#define PROCFS_INOTYPE_SINGLETON        0x00   /* Singleton INode (anything that appears only once in /proc) */
 #define PROCFS_INOTYPE_SINGLETON_IDMASK 0xffff /* Mask for the ID of a singleton */
 /* @param: id: One of PROCFS_SINGLETON_* */
-#define PROCFS_INOMAKE_SINGLETON(id) (((ino_t)PROCFS_INOTYPE_SINGLETON << PROCFS_INO_TYPESHFT) | (id))
+#define PROCFS_INOMAKE_SINGLETON(id) \
+	(((ino_t)PROCFS_INOTYPE_SINGLETON << PROCFS_INO_TYPESHFT) | (id))
 
 /* Per-process data */
-#define PROCFS_INOTYPE_PERPROC         0x01 /* Per-process INode */
+#define PROCFS_INOTYPE_PERPROC         0x01                         /* Per-process INode */
 #define PROCFS_INOTYPE_PERPROC_PIDMASK UINT64_C(0x000000007fffffff) /* PID mask */
 #define PROCFS_INOTYPE_PERPROC_IDMASK  UINT64_C(0x0000ffff00000000) /* ID mask */
 #define PROCFS_INOTYPE_PERPROC_IDSHIFT 32
@@ -51,30 +52,30 @@ DECL_BEGIN
 	 ((ino_t)(id) << PROCFS_INOTYPE_PERPROC_IDSHIFT) | (ino_t)(pid))
 
 /* DOS Drive bindings. `readlink /proc/[pid]/kos/drives/[a-z]' */
-#define PROCFS_INOTYPE_DRIVE          0x02 /* Per-process drives */
+#define PROCFS_INOTYPE_DRIVE          0x02                         /* Per-process drives */
 #define PROCFS_INOTYPE_DRIVE_PIDMASK  UINT64_C(0x000000007fffffff) /* PID mask */
 #define PROCFS_INOTYPE_DRIVE_DRVMASK  UINT64_C(0x0000001f00000000) /* DOS Drive id ('a' + .) */
 #define PROCFS_INOTYPE_DRIVE_DRVSHIFT 32
-#define PROCFS_INOMAKE_DRIVE(pid, drive_id) \
+#define PROCFS_INOMAKE_DRIVE(pid, drive_id)                 \
 	(((ino_t)PROCFS_INOTYPE_DRIVE << PROCFS_INO_TYPESHFT) | \
 	 ((ino_t)(drive_id) << PROCFS_INOTYPE_DRIVE_DRVSHIFT) | (ino_t)(pid))
 
 /* DOS Drive cwd bindings. `readlink /proc/[pid]/kos/dcwd/[a-z]' */
-#define PROCFS_INOTYPE_DCWD          0x03 /* Per-process drives */
+#define PROCFS_INOTYPE_DCWD          0x03                         /* Per-process drives */
 #define PROCFS_INOTYPE_DCWD_PIDMASK  UINT64_C(0x000000007fffffff) /* PID mask */
 #define PROCFS_INOTYPE_DCWD_DRVMASK  UINT64_C(0x0000001f00000000) /* DOS Drive id ('a' + .) */
 #define PROCFS_INOTYPE_DCWD_DRVSHIFT 32
-#define PROCFS_INOMAKE_DCWD(pid, drive_id) \
+#define PROCFS_INOMAKE_DCWD(pid, drive_id)                 \
 	(((ino_t)PROCFS_INOTYPE_DCWD << PROCFS_INO_TYPESHFT) | \
 	 ((ino_t)(drive_id) << PROCFS_INOTYPE_DCWD_DRVSHIFT) | (ino_t)(pid))
 
 /* File handle bindings. `readlink /proc/[pid]/fd/[id]' */
-#define PROCFS_INOTYPE_FD_LO       0x80 /* Per-process file handles */
-#define PROCFS_INOTYPE_FD_HI       0xff /* Per-process file handles */
-#define PROCFS_INOTYPE_FD_PIDMASK  UINT64_C(0x000000007fffffff) /* PID mask */
-#define PROCFS_INOTYPE_FD_FDMASK   UINT64_C(0x7fffffff80000000) /* File handle number */
-#define PROCFS_INOTYPE_FD_FDSHIFT  31
-#define PROCFS_INOMAKE_FD(pid, fd) \
+#define PROCFS_INOTYPE_FD_LO      0x80                         /* Per-process file handles */
+#define PROCFS_INOTYPE_FD_HI      0xff                         /* Per-process file handles */
+#define PROCFS_INOTYPE_FD_PIDMASK UINT64_C(0x000000007fffffff) /* PID mask */
+#define PROCFS_INOTYPE_FD_FDMASK  UINT64_C(0x7fffffff80000000) /* File handle number */
+#define PROCFS_INOTYPE_FD_FDSHIFT 31
+#define PROCFS_INOMAKE_FD(pid, fd)                          \
 	(((ino_t)PROCFS_INOTYPE_FD_LO << PROCFS_INO_TYPESHFT) | \
 	 ((ino_t)(fd) << PROCFS_INOTYPE_FD_FDSHIFT) | (ino_t)(pid))
 
@@ -220,8 +221,8 @@ INTDEF struct inode_type ProcFS_PerProc_RegularRo_Type;      /* Type for general
 INTDEF struct inode_type ProcFS_PerProc_RegularRw_Type;      /* Type for general-purpose singleton read/write files */
 INTDEF struct inode_type ProcFS_PerProc_DynamicSymlink_Type; /* Type for general-purpose singleton dynamic symlink files */
 
-INTDEF NONNULL((1)) void KCALL ProcFS_Singleton_LoadAttr(struct inode *__restrict self);
-INTDEF NONNULL((1)) void KCALL ProcFS_Singleton_SaveAttr(struct inode *__restrict self);
+INTDEF NONNULL((1)) void KCALL ProcFS_Singleton_LoadAttr(struct inode *__restrict self) THROWS(E_IOERROR, ...);
+INTDEF NONNULL((1)) void KCALL ProcFS_Singleton_SaveAttr(struct inode *__restrict self) THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_READONLY, E_IOERROR, ...);
 
 /* ProcFS_Singleton_Directory_Type.it_directory.d_oneshot.o_lookup */
 INTDEF NONNULL((1, 2)) REF struct directory_entry *KCALL

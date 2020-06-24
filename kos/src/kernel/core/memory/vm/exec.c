@@ -247,8 +247,10 @@ create_bss_overlap_node(struct regular_node *__restrict exec_node,
 	/* result_node->vn_prot        = ...; // Initialized by the caller */
 	result_node->vn_flags = VM_NODE_FLAG_NORMAL;
 	/* result_node->vn_vm          = ...; // Unused by vmb */
-	result_node->vn_part  = result_part; /* Inherit reference */
-	result_node->vn_block = incref(&vm_datablock_anonymous_zero);
+	result_node->vn_part   = result_part; /* Inherit reference */
+	result_node->vn_block  = incref(&vm_datablock_anonymous_zero);
+	result_node->vn_fspath = NULL;
+	result_node->vn_fsname = NULL;
 	/* result_node->vn_link        = ...; // Unused by vmb */
 	result_node->vn_guard = 0;
 	return result_node;

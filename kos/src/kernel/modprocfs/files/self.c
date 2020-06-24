@@ -26,6 +26,7 @@
 #include <kernel/driver.h>
 #include <sched/pid.h>
 
+#include <inttypes.h>
 #include <stdio.h>
 
 #include "../procfs.h"
@@ -37,7 +38,9 @@ ProcFS_Self_Printer(struct symlink_node *__restrict UNUSED(self),
                     USER CHECKED /*utf-8*/ char *buf,
                     size_t bufsize) {
 	upid_t mypid = task_getpid_s();
-	return snprintf(buf, bufsize, "%u", (unsigned int)mypid);
+	return snprintf(buf, bufsize,
+	                "%" PRIuN(__SIZEOF_PID_T__),
+	                mypid);
 }
 
 

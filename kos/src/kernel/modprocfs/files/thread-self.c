@@ -25,6 +25,7 @@
 
 #include <sched/pid.h>
 
+#include <inttypes.h>
 #include <stdio.h>
 
 #include "../procfs.h"
@@ -37,9 +38,10 @@ ProcFS_ThreadSelf_Printer(struct symlink_node *__restrict UNUSED(self),
                           size_t bufsize) {
 	upid_t mypid = task_getpid_s();
 	upid_t mytid = task_gettid_s();
-	return snprintf(buf, bufsize, "%u/task/%u",
-	                (unsigned int)mypid,
-	                (unsigned int)mytid);
+	return snprintf(buf, bufsize,
+	                "%" PRIuN(__SIZEOF_PID_T__) "/task/"
+	                "%" PRIuN(__SIZEOF_PID_T__),
+	                mypid, mytid);
 }
 
 

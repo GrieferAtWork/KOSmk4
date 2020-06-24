@@ -68,7 +68,7 @@
 
 
 PERPROC_DIRECTORY_ENTRY("attr", DT_DIR, attr)
-MKDIR(attr, 0333,
+MKDIR(attr, 0555,
       F(attr, "current", DT_REG, attr_current)
       ARCH_ENUMERATE_PERPROC_ATTR
       F_END)
@@ -94,7 +94,7 @@ PERPROC_DIRECTORY_ENTRY("fd", DT_DIR, fd)
 CUSTOM(fd, S_IFDIR | 0300, ProcFS_PerProc_Fd_Type)
 
 PERPROC_DIRECTORY_ENTRY("kos", DT_DIR, kos)
-MKDIR(kos, 0333,
+MKDIR(kos, 0555,
       F(attr, "drives", DT_DIR, kos_drives)
       F(attr, "dcwd", DT_DIR, kos_dcwd)
       ARCH_ENUMERATE_PERPROC_KOS

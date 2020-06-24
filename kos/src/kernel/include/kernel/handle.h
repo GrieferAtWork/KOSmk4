@@ -47,6 +47,8 @@ DECL_BEGIN
 struct dirent;
 struct stat;
 struct aio_multihandle;
+struct path;
+struct directory_entry;
 
 #ifdef __INTELLISENSE__
 DATDEF
@@ -125,11 +127,20 @@ struct handle_types {
 	 * @param: pnumbytes:  Set to the max number of bytes which may be mapped, starting at `*pminoffset'.
 	 *                     Handle operators are not required to set this value.
 	 *                     It is default initialized to `(pos_t)-1'
+	 * @param: pdatablock_fspath: [0..1][1..1] Optional:
+	 *                     May be filled in the filesystem path to the mapped object.
+	 *                     It is default initialized to `NULL'
+	 * @param: pdatablock_fsname: [0..1][1..1] Optional:
+	 *                     May be filled in the filesystem name of the mapped object.
+	 *                     It is default initialized to `NULL'
 	 * @return: * :        The datablock to-be used for mapping this handle into memory (never NULL). */
 	REF struct vm_datablock *
-	(WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) KCALL *h_mmap[HANDLE_TYPE_COUNT])(void *__restrict ptr,
-	                                                                              pos_t *__restrict pminoffset,
-	                                                                              pos_t *__restrict pnumbytes)
+	(WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5)) KCALL *
+	 h_mmap[HANDLE_TYPE_COUNT])(void *__restrict ptr,
+	                            pos_t *__restrict pminoffset,
+	                            pos_t *__restrict pnumbytes,
+	                            REF struct path **__restrict pdatablock_fspath,
+	                            REF struct directory_entry **__restrict pdatablock_fsname)
 			/*THROWS(...)*/;
 
 	/* @return: * : The amount of newly allocated bytes. */
@@ -220,7 +231,7 @@ handle_datasize(struct handle const *__restrict self,
 #define handle_ioctl(self, cmd, arg)                             HANDLE_FUNC(self, h_ioctl)((self).h_data, cmd, arg, (self).h_mode)
 #define handle_ioctlf(self, cmd, arg, flags)                     HANDLE_FUNC(self, h_ioctl)((self).h_data, cmd, arg, flags)
 #define handle_truncate(self, new_size)                          HANDLE_FUNC(self, h_truncate)((self).h_data, new_size)
-#define handle_mmap(self, pminoffset, pnumbytes)                 HANDLE_FUNC(self, h_mmap)((self).h_data, pminoffset, pnumbytes)
+#define handle_mmap(self, pminoffset, pnumbytes, pdatablock_fspath, pdatablock_fsname) HANDLE_FUNC(self, h_mmap)((self).h_data, pminoffset, pnumbytes, pdatablock_fspath, pdatablock_fsname)
 #define handle_allocate(self, mode, start, length)               HANDLE_FUNC(self, h_allocate)((self).h_data, mode, start, length)
 #define handle_sync(self)                                        HANDLE_FUNC(self, h_sync)((self).h_data)
 #define handle_datasync(self)                                    HANDLE_FUNC(self, h_datasync)((self).h_data)

@@ -118,7 +118,7 @@ NOTHROW(FCALL getpcrel)(s32 *__restrict offset) {
 }
 
 
-/* Simply check if the `kernel_debugtrap()' would immediately return. */
+/* Simply check if the `kernel_debugtrap()' does more than return immediately. */
 #define TRAPS_ENABLED() (ATOMIC_READ(kernel_debugtrap_data[0]) != 0xc3)
 
 /* Check if debug traps are enabled. */

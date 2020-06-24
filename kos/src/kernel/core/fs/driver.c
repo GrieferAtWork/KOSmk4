@@ -3438,10 +3438,15 @@ find_new_candidate_tryhard:
 			/* TODO: Prefault this mapping! (although technically, this would only be a performance
 			 *       improvement, since we're faulting all of the memory below anyways...) */
 			if (!vm_mapat(&vm_kernel,
-			               (void *)(addr & ~PAGEMASK),
-			               CEIL_ALIGN(size + (addr & PAGEMASK), PAGESIZE),
-			               &vm_datablock_anonymous, 0,
-			               prot, VM_NODE_FLAG_PREPARED, 0)) {
+			              (void *)(addr & ~PAGEMASK),
+			              CEIL_ALIGN(size + (addr & PAGEMASK), PAGESIZE),
+			              &vm_datablock_anonymous,
+			              NULL,
+			              NULL,
+			              0,
+			              prot,
+			              VM_NODE_FLAG_PREPARED,
+			              0)) {
 				/* Check for illegal overlap */
 				if (contains_illegal_overlap(self->d_phdr, self->d_phnum))
 					THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP);
@@ -4005,6 +4010,8 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
 	                      PAGESIZE,
 	                      HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
 	                      driver_inode,
+	                      driver_path,
+	                      driver_dentry,
 	                      0,
 	                      VM_PROT_READ | VM_PROT_SHARED,
 	                      VM_NODE_FLAG_NOMERGE,

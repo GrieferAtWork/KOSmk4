@@ -309,6 +309,8 @@ PUBLIC struct vm_node x86_phys2virt64_node = {
 	/* .vn_vm     = */ &vm_kernel,
 	/* .vn_part   = */ NULL,                   /* Reserved mapping */
 	/* .vn_block  = */ &vm_datablock_physical, /* Physical memory mapping */
+	/* .vn_fspath = */ NULL,
+	/* .vn_fsname = */ NULL,
 	/* .vn_link   = */ LLIST_INITNODE,
 	/* .vn_guard  = */ 0
 };

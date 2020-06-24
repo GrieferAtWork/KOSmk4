@@ -33,7 +33,7 @@
 	.pushsection sect; \
 		.reloc ., R_X86_64_RELATIVE, func; .quad 0; \
 	.popsection
-#else
+#else /* __x86_64__ */
 #define DEFINE_ABS_CALLBACK(sect, func) \
 	.pushsection sect; \
 		.long func; \
@@ -42,8 +42,8 @@
 	.pushsection sect; \
 		.reloc ., R_386_RELATIVE, func; .long 0; \
 	.popsection
-#endif
-#else
+#endif /* !__x86_64__ */
+#else /* __ASSEMBLER__ */
 #ifdef __x86_64__
 #define LOAD_FAR_POINTER(x) \
 	__XBLOCK({                                        \
@@ -63,7 +63,7 @@
 	        "\t.reloc .,R_X86_64_RELATIVE," PP_PRIVATE_STR(func) "\n\t" \
 	        "\t.quad 0\n\t"                                             \
 	        ".popsection")
-#else
+#else /* __x86_64__ */
 #define DEFINE_ABS_CALLBACK(sect, func) \
     __asm__(".pushsection " sect "\n\t"            \
 	        "\t.long " PP_PRIVATE_STR(func) "\n\t" \
@@ -73,8 +73,8 @@
 	        "\t.reloc .,R_386_RELATIVE," PP_PRIVATE_STR(func) "\n\t" \
 	        "\t.long 0\n\t"                                          \
 	        ".popsection")
-#endif
-#endif
+#endif /* !__x86_64__ */
+#endif /* !__ASSEMBLER__ */
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #define DEFINE_CALLBACK(sect, func) DEFINE_ABS_CALLBACK(sect, func)

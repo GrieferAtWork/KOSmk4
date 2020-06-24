@@ -39,6 +39,7 @@
 #include <kernel/vm/phys.h>
 #include <kernel/x86/cpuid.h>
 #include <sched/cpu.h>
+#include <sched/userkern.h>
 #include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
@@ -188,20 +189,30 @@ struct vm vm_kernel_head = {
 	/* .v_tasklock   = */ ATOMIC_RWLOCK_INIT,
 	/* .v_deltasks   = */ NULL,
 	/* .v_kernreserve = */ {
-		/* .vn_node   = */ { (struct vm_node *)UINT64_C(0xcccccccccccccccc),
-		                     (struct vm_node *)UINT64_C(0xcccccccccccccccc),
-		                     UINT64_C(0xcccccccccccccccc),
-		                     UINT64_C(0xcccccccccccccccc) },
-		/* .vn_byaddr = */ { (struct vm_node *)UINT64_C(0xcccccccccccccccc),
-		                     (struct vm_node **)UINT64_C(0xcccccccccccccccc) },
-		/* .vn_prot   = */ UINT32_C(0xcccccccc),
-		/* .vn_flags  = */ UINT32_C(0xcccccccc),
+		/* .vn_node   = */ { NULL,
+		                     NULL,
+		                     KERNELSPACE_MINPAGEID,
+		                     KERNELSPACE_MAXPAGEID },
+		/* .vn_byaddr = */ { NULL, (struct vm_node **)UINT64_C(0xcccccccccccccccc) },
+#ifndef CONFIG_NO_USERKERN_SEGMENT
+		/* .vn_prot   = */ VM_PROT_PRIVATE | VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
+#else /* !CONFIG_NO_USERKERN_SEGMENT */
+		/* .vn_prot   = */ VM_PROT_PRIVATE,
+#endif /* CONFIG_NO_USERKERN_SEGMENT */
+		/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_KERNPRT,
 		/* .vn_vm     = */ (struct vm *)UINT64_C(0xcccccccccccccccc),
-		/* .vn_part   = */ (struct vm_datapart *)UINT64_C(0xcccccccccccccccc),
-		/* .vn_block  = */ (struct vm_datablock *)UINT64_C(0xcccccccccccccccc),
+#ifndef CONFIG_NO_USERKERN_SEGMENT
+		/* .vn_part   = */ &userkern_segment_part,
+		/* .vn_block  = */ &userkern_segment_block,
+#else /* !CONFIG_NO_USERKERN_SEGMENT */
+		/* .vn_part   = */ NULL,
+		/* .vn_block  = */ NULL,
+#endif /* CONFIG_NO_USERKERN_SEGMENT */
+		/* .vn_fspath = */ NULL,
+		/* .vn_fsname = */ NULL,
 		/* .vn_link   = */ { (struct vm_node *)UINT64_C(0xcccccccccccccccc),
 		                     (struct vm_node **)UINT64_C(0xcccccccccccccccc) },
-		/* .vn_guard  = */ UINT64_C(0xcccccccccccccccc)
+		/* .vn_guard  = */ 0
 	}
 };
 

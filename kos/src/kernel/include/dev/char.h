@@ -39,18 +39,59 @@ struct handle;
 struct character_device_type {
 	REF struct driver *ct_driver; /* [1..1] The associated, implementing driver. */
 	/* [0..1] Finalizer callback. */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *ct_fini)(struct character_device *__restrict self);
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (KCALL *ct_fini)(struct character_device *__restrict self);
+
 	/* All of these are [0..1] */
-	NONNULL((1)) size_t (KCALL *ct_read)(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-	NONNULL((1)) size_t (KCALL *ct_write)(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-	NONNULL((1)) size_t (KCALL *ct_pread)(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-	NONNULL((1)) size_t (KCALL *ct_pwrite)(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-	NONNULL((1)) syscall_slong_t (KCALL *ct_ioctl)(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
-	NONNULL((1)) REF struct vm_datablock *(KCALL *ct_mmap)(struct character_device *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes) THROWS(...);
-	NONNULL((1)) void (KCALL *ct_sync)(struct character_device *__restrict self) THROWS(...);
-	NONNULL((1)) void (KCALL *ct_stat)(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+	NONNULL((1)) size_t
+	(KCALL *ct_read)(struct character_device *__restrict self,
+	                 USER CHECKED void *dst, size_t num_bytes,
+	                 iomode_t mode)
+			THROWS(...);
+	NONNULL((1)) size_t
+	(KCALL *ct_write)(struct character_device *__restrict self,
+	                  USER CHECKED void const *src, size_t num_bytes,
+	                  iomode_t mode)
+			THROWS(...);
+	NONNULL((1)) size_t
+	(KCALL *ct_pread)(struct character_device *__restrict self,
+	                  USER CHECKED void *dst, size_t num_bytes,
+	                  pos_t addr, iomode_t mode)
+			THROWS(...);
+	NONNULL((1)) size_t
+	(KCALL *ct_pwrite)(struct character_device *__restrict self,
+	                   USER CHECKED void const *src, size_t num_bytes,
+	                   pos_t addr, iomode_t mode)
+			THROWS(...);
+
+	NONNULL((1)) syscall_slong_t
+	(KCALL *ct_ioctl)(struct character_device *__restrict self,
+	                  syscall_ulong_t cmd,
+	                  USER UNCHECKED void *arg, iomode_t mode)
+			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
+
+	ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *
+	(KCALL *ct_mmap)(struct character_device *__restrict self,
+	                 pos_t *__restrict pminoffset,
+	                 pos_t *__restrict pnumbytes,
+	                 REF struct path **__restrict pdatablock_fspath,
+	                 REF struct directory_entry **__restrict pdatablock_fsname)
+			THROWS(...);
+
+	NONNULL((1)) void
+	(KCALL *ct_sync)(struct character_device *__restrict self)
+			THROWS(...);
+
+	NONNULL((1)) void
+	(KCALL *ct_stat)(struct character_device *__restrict self,
+	                 USER CHECKED struct stat *result)
+			THROWS(...);
+
 	/* @return: * : Set of available signals. */
-	NONNULL((1)) poll_mode_t (KCALL *ct_poll)(struct character_device *__restrict self, poll_mode_t what);
+	NONNULL((1)) poll_mode_t
+	(KCALL *ct_poll)(struct character_device *__restrict self,
+	                 poll_mode_t what);
+
 	/* [0..1] Optional callback that is invoked when the device is opened by user-space.
 	 * @param: hand: [in|out] Upon input, this handle describes the already-initialized
 	 *                        handle that will be made available to user-space. This callback
@@ -175,15 +216,58 @@ character_device_register_auto(struct character_device *__restrict self)
 
 
 /* Character device I/O functions. */
-FUNDEF NONNULL((1)) size_t KCALL character_device_read(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) size_t KCALL character_device_write(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) size_t KCALL character_device_pread(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) size_t KCALL character_device_pwrite(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) syscall_slong_t KCALL character_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) REF struct vm_datablock *KCALL character_device_mmap(struct character_device *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL character_device_sync(struct character_device *__restrict self) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL character_device_stat(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-FUNDEF NONNULL((1)) poll_mode_t KCALL character_device_poll(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) size_t KCALL
+character_device_read(struct character_device *__restrict self, USER CHECKED void *dst,
+                      size_t num_bytes, iomode_t mode)
+		THROWS(...);
+
+FUNDEF NONNULL((1)) size_t KCALL
+character_device_write(struct character_device *__restrict self, USER CHECKED void const *src,
+                       size_t num_bytes, iomode_t mode)
+		THROWS(...);
+
+FUNDEF NONNULL((1)) size_t KCALL
+character_device_pread(struct character_device *__restrict self, USER CHECKED void *dst,
+                       size_t num_bytes, pos_t addr, iomode_t mode)
+		THROWS(...);
+
+FUNDEF NONNULL((1)) size_t KCALL
+character_device_pwrite(struct character_device *__restrict self, USER CHECKED void const *src,
+                        size_t num_bytes, pos_t addr, iomode_t mode)
+		THROWS(...);
+
+
+FUNDEF NONNULL((1)) syscall_slong_t KCALL
+character_device_ioctl(struct character_device *__restrict self,
+                       syscall_ulong_t cmd, USER UNCHECKED void *arg,
+                       iomode_t mode)
+		THROWS(...);
+
+/* Invoke the `ct_mmap' operator fails to fill in `*pdatablock_fspath'
+ * and/or `*pdatablock_fsname', then this function will automatically
+ * make fill in these pointers through use of `self->cd_devfs_entry',
+ * as well as `superblock_find_mount_from_vfs(&devfs, THIS_VFS)' */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
+character_device_mmap(struct character_device *__restrict self,
+                      pos_t *__restrict pminoffset,
+                      pos_t *__restrict pnumbytes,
+                      REF struct path **__restrict pdatablock_fspath,
+                      REF struct directory_entry **__restrict pdatablock_fsname)
+		THROWS(...);
+
+FUNDEF NONNULL((1)) void KCALL
+character_device_sync(struct character_device *__restrict self)
+		THROWS(...);
+
+FUNDEF NONNULL((1)) void KCALL
+character_device_stat(struct character_device *__restrict self,
+                      USER CHECKED struct stat *result)
+		THROWS(...);
+
+FUNDEF NONNULL((1)) poll_mode_t KCALL
+character_device_poll(struct character_device *__restrict self,
+                      poll_mode_t what)
+		THROWS(...);
 
 
 #endif /* __CC__ */

@@ -23,6 +23,8 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
@@ -398,15 +400,19 @@ handle_remove_write_error:
  * @param: prot:   Set of `VM_PROT_*'.
  * @param: flag:   Set of `VM_NODE_FLAG_*'.
  * @param: data_start_vpage: The memory page index where mapping of `data' starts.
+ * @param: fspath: Optional mapping path (only used for memory->disk mapping listings)
+ * @param: fsname: Optional mapping name (only used for memory->disk mapping listings)
  * @param: guard:  If non-zero, repetition limit for a guard mapping.
- *                 Set to 0 if the mapping should include a guard.
+ *                 Set to 0 if the mapping shouldn't include a guard.
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
-PUBLIC bool KCALL
+PUBLIC WUNUSED NONNULL((1, 4)) bool KCALL
 vm_mapat(struct vm *__restrict self,
          PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
          PAGEDIR_PAGEALIGNED size_t num_bytes,
          struct vm_datablock *__restrict data,
+         struct path *fspath,
+         struct directory_entry *fsname,
          PAGEDIR_PAGEALIGNED pos_t data_start_offset,
          uintptr_half_t prot, uintptr_half_t flag, uintptr_t guard) {
 	size_t i, num_pages;
@@ -472,6 +478,8 @@ vm_mapat(struct vm *__restrict self,
 		node->vn_vm          = self;
 		node->vn_part        = part; /* Inherit reference */
 		node->vn_block       = incref(data);
+		node->vn_fspath      = xincref(fspath);
+		node->vn_fsname      = xincref(fsname);
 		node->vn_guard       = 0;
 		if (prot & VM_PROT_SHARED) {
 			LLIST_INSERT(part->dp_srefs, node, vn_link);
@@ -504,7 +512,7 @@ vm_mapat(struct vm *__restrict self,
  * @param: flag: Set of `VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE'
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
-PUBLIC bool KCALL
+PUBLIC WUNUSED NONNULL((1)) bool KCALL
 vm_mapresat(struct vm *__restrict self,
             PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
             PAGEDIR_PAGEALIGNED size_t num_bytes,
@@ -529,6 +537,8 @@ vm_mapresat(struct vm *__restrict self,
 	node->vn_vm          = self;
 	node->vn_part        = NULL;
 	node->vn_block       = NULL;
+	node->vn_fspath      = NULL;
+	node->vn_fsname      = NULL;
 #ifndef NDEBUG
 	memset(&node->vn_link, 0xcc, sizeof(node->vn_link));
 #endif /* !NDEBUG */
@@ -565,13 +575,15 @@ vm_mapresat(struct vm *__restrict self,
 
 /* A combination of `vm_paged_getfree' + `vm_paged_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-FUNDEF PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+FUNDEF WUNUSED NONNULL((1, 6)) PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
 vm_map(struct vm *__restrict self,
        PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
        PAGEDIR_PAGEALIGNED size_t num_bytes,
        PAGEDIR_PAGEALIGNED size_t min_alignment,
        unsigned int getfree_mode,
        struct vm_datablock *__restrict data,
+       struct path *fspath,
+       struct directory_entry *fsname,
        PAGEDIR_PAGEALIGNED pos_t data_start_offset,
        uintptr_half_t prot,
        uintptr_half_t flag,
@@ -661,6 +673,8 @@ again:
 		node->vn_vm          = self;
 		node->vn_part        = part; /* Inherit reference */
 		node->vn_block       = incref(data);
+		node->vn_fspath      = xincref(fspath);
+		node->vn_fsname      = xincref(fsname);
 		node->vn_guard       = 0;
 		if (prot & VM_PROT_SHARED) {
 			LLIST_INSERT(part->dp_srefs, node, vn_link);
@@ -721,11 +735,13 @@ vm_mapres(struct vm *__restrict self,
 
 	node = (struct vm_node *)kmalloc(sizeof(struct vm_node),
 	                                 GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
-	node->vn_prot  = VM_PROT_NONE;
-	node->vn_flags = flag;
-	node->vn_vm    = self;
-	node->vn_part  = NULL;
-	node->vn_block = NULL;
+	node->vn_prot   = VM_PROT_NONE;
+	node->vn_flags  = flag;
+	node->vn_vm     = self;
+	node->vn_part   = NULL;
+	node->vn_block  = NULL;
+	node->vn_fspath = NULL;
+	node->vn_fsname = NULL;
 #ifndef NDEBUG
 	memset(&node->vn_link, 0xcc, sizeof(node->vn_link));
 #endif /* !NDEBUG */
@@ -785,6 +801,8 @@ NOTHROW(KCALL vm_map_subrange_descriptors_fini_and_unlock_parts)(struct vm_map_s
 	/* Destroy the zero-mapping. */
 	assert(self->sd_zeronode->vn_block == &vm_datablock_anonymous_zero);
 	assert(self->sd_zeronode->vn_part == self->sd_zeropart);
+	assert(self->sd_zeronode->vn_fspath == NULL);
+	assert(self->sd_zeronode->vn_fsname == NULL);
 	decref_nokill(&vm_datablock_anonymous_zero); /* self->sd_zeronode->vn_block */
 	decref_likely(self->sd_zeropart);            /* self->sd_zeropart */
 	kfree(self->sd_zeronode);
@@ -820,7 +838,7 @@ vm_map_subrange_descriptors_init_and_lock_parts_and_vm(struct vm_map_subrange_de
 	                                     GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
 	TRY {
 		zeropart = vm_paged_datablock_createpart(&vm_datablock_anonymous_zero,
-		                                   0, num_zerovpages);
+		                                         0, num_zerovpages);
 		assert(!isshared(zeropart));
 		TRY {
 			/* Load data parts & acquire locks. */
@@ -847,10 +865,12 @@ vm_map_subrange_descriptors_init_and_lock_parts_and_vm(struct vm_map_subrange_de
  * During this operation, write-locks held on each data-part, and have `effective_vm'
  * inherit all data parts, and nodes such that `self' must be finalized by a call to
  * `vm_map_subrange_descriptors_fini_caller_inherited_parts()' */
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(KCALL vm_map_subrange_descriptors_insert_into_vm)(struct vm_map_subrange_descriptors *__restrict self,
                                                           struct vm *__restrict effective_vm,
                                                           struct vm_datablock *__restrict data,
+                                                          struct path *fspath,
+                                                          struct directory_entry *fsname,
                                                           size_t num_datavpages,
                                                           size_t num_zerovpages,
                                                           pageid_t base_offset,
@@ -892,6 +912,8 @@ NOTHROW(KCALL vm_map_subrange_descriptors_insert_into_vm)(struct vm_map_subrange
 		node->vn_vm          = effective_vm;
 		node->vn_part        = part; /* Inherit reference */
 		node->vn_block       = incref(data);
+		node->vn_fspath      = xincref(fspath);
+		node->vn_fsname      = xincref(fsname);
 		node->vn_guard       = 0;
 		if (prot & VM_PROT_SHARED) {
 			LLIST_INSERT(part->dp_srefs, node, vn_link);
@@ -925,6 +947,8 @@ NOTHROW(KCALL vm_map_subrange_descriptors_insert_into_vm)(struct vm_map_subrange
 		node->vn_vm          = effective_vm;
 		node->vn_part        = part; /* Inherit reference */
 		node->vn_block       = incref(&vm_datablock_anonymous_zero);
+		node->vn_fspath      = NULL;
+		node->vn_fsname      = NULL;
 		node->vn_guard       = 0;
 		if (prot & VM_PROT_SHARED) {
 			LLIST_INSERT(part->dp_srefs, node, vn_link);
@@ -950,20 +974,24 @@ NOTHROW(KCALL vm_map_subrange_descriptors_insert_into_vm)(struct vm_map_subrange
 /* Same as `vm_paged_map()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
  * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
- * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage' */
+ * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage'
+ * @param: fspath: Optional mapping path (only used for memory->disk mapping listings)
+ * @param: fsname: Optional mapping name (only used for memory->disk mapping listings) */
 PUBLIC pageid_t KCALL
 vm_paged_map_subrange(struct vm *__restrict effective_vm,
-                pageid_t hint,
-                size_t num_pages,
-                size_t min_alignment_in_pages,
-                unsigned int getfree_mode,
-                struct vm_datablock *__restrict data,
-                vm_vpage64_t data_start_vpage,
-                vm_vpage64_t data_subrange_minvpage,
-                vm_vpage64_t data_subrange_maxvpage,
-                uintptr_half_t prot,
-                uintptr_half_t flag,
-                uintptr_t guard)
+                      pageid_t hint,
+                      size_t num_pages,
+                      size_t min_alignment_in_pages,
+                      unsigned int getfree_mode,
+                      struct vm_datablock *__restrict data,
+                      struct path *fspath,
+                      struct directory_entry *fsname,
+                      vm_vpage64_t data_start_vpage,
+                      vm_vpage64_t data_subrange_minvpage,
+                      vm_vpage64_t data_subrange_maxvpage,
+                      uintptr_half_t prot,
+                      uintptr_half_t flag,
+                      uintptr_t guard)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	pageid_t result;
 	vm_vpage64_t data_minmappage, data_maxmappage;
@@ -974,15 +1002,17 @@ vm_paged_map_subrange(struct vm *__restrict effective_vm,
 		/* The entire range is out-of-bounds.
 		 * Map everything as ANON+ZERO */
 		result = vm_paged_map(effective_vm,
-		                hint,
-		                num_pages,
-		                min_alignment_in_pages,
-		                getfree_mode,
-		                &vm_datablock_anonymous_zero,
-		                0,
-		                prot,
-		                flag,
-		                guard);
+		                      hint,
+		                      num_pages,
+		                      min_alignment_in_pages,
+		                      getfree_mode,
+		                      &vm_datablock_anonymous_zero,
+		                      NULL,
+		                      NULL,
+		                      0,
+		                      prot,
+		                      flag,
+		                      guard);
 		goto done;
 	}
 	if (OVERFLOW_UADD(data_minmappage, num_pages - 1, &data_maxmappage) ||
@@ -1026,6 +1056,8 @@ again_create_sr:
 		vm_map_subrange_descriptors_insert_into_vm(&sr,
 		                                           effective_vm,
 		                                           data,
+		                                           fspath,
+		                                           fsname,
 		                                           num_datavpages,
 		                                           num_zerovpages,
 		                                           result,
@@ -1040,15 +1072,17 @@ again_create_sr:
 	/* The entire mapping fits into the allowed mapping-range of the given data-block.
 	 * -> We can just map the memory normally. */
 	result = vm_paged_map(effective_vm,
-	                hint,
-	                num_pages,
-	                min_alignment_in_pages,
-	                getfree_mode,
-	                data,
-	                data_minmappage,
-	                prot,
-	                flag,
-	                guard);
+	                      hint,
+	                      num_pages,
+	                      min_alignment_in_pages,
+	                      getfree_mode,
+	                      data,
+	                      fspath,
+	                      fsname,
+	                      data_minmappage,
+	                      prot,
+	                      flag,
+	                      guard);
 done:
 	return result;
 }
@@ -1059,11 +1093,15 @@ done:
 /* Same as `vm_mapat()', but only allowed pages between `data_subrange_minvpage ... data_subrange_maxvpage'
  * to be mapped from `data'. - Any attempted to map data from outside that range will instead cause
  * memory from `vm_datablock_anonymous_zero' to be mapped.
- * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage' */
-PUBLIC bool KCALL
-vm_paged_mapat_subrange(struct vm *__restrict effective_vm,
+ * Additionally, `data_start_vpage' is an offset from `data_subrange_minvpage'
+ * @param: fspath: Optional mapping path (only used for memory->disk mapping listings)
+ * @param: fsname: Optional mapping name (only used for memory->disk mapping listings) */
+PUBLIC WUNUSED NONNULL((1, 4)) bool KCALL
+vm_paged_mapat_subrange(struct vm *__restrict self,
                         pageid_t page_index, size_t num_pages,
                         struct vm_datablock *__restrict data,
+                        struct path *fspath,
+                        struct directory_entry *fsname,
                         vm_vpage64_t data_start_vpage,
                         vm_vpage64_t data_subrange_minvpage,
                         vm_vpage64_t data_subrange_maxvpage,
@@ -1083,14 +1121,16 @@ vm_paged_mapat_subrange(struct vm *__restrict effective_vm,
 		data_minmappage > data_subrange_maxvpage) {
 		/* The entire range is out-of-bounds.
 		 * Map everything as ANON+ZERO */
-		return vm_paged_mapat(effective_vm,
-		                page_index,
-		                num_pages,
-		                &vm_datablock_anonymous_zero,
-		                0,
-		                prot,
-		                flag,
-		                guard);
+		return vm_paged_mapat(self,
+		                      page_index,
+		                      num_pages,
+		                      &vm_datablock_anonymous_zero,
+		                      NULL,
+		                      NULL,
+		                      0,
+		                      prot,
+		                      flag,
+		                      guard);
 	}
 	if (OVERFLOW_UADD(data_minmappage, num_pages - 1, &data_maxmappage) ||
 	    data_maxmappage > data_subrange_maxvpage) {
@@ -1107,43 +1147,47 @@ vm_paged_mapat_subrange(struct vm *__restrict effective_vm,
 		 * a total of `num_zerovpages' from `&vm_datablock_anonymous_zero'.
 		 * To prevent race conditions, we must map both of these at the same time! */
 		vm_map_subrange_descriptors_init_and_lock_parts_and_vm(&sr,
-		                                                       effective_vm,
+		                                                       self,
 		                                                       data,
 		                                                       data_minmappage,
 		                                                       num_datavpages,
 		                                                       num_zerovpages,
 		                                                       prot);
 		/* Figure out where the mapping should go. */
-		if unlikely(vm_paged_isused(effective_vm, page_index, maxvpage)) {
-			sync_endwrite(effective_vm);
+		if unlikely(vm_paged_isused(self, page_index, maxvpage)) {
+			sync_endwrite(self);
 			vm_map_subrange_descriptors_fini_and_unlock_parts(&sr);
 			return false;
 		}
 		/* Insert created mappings into the VM. */
 		vm_map_subrange_descriptors_insert_into_vm(&sr,
-		                                           effective_vm,
+		                                           self,
 		                                           data,
+		                                           fspath,
+		                                           fsname,
 		                                           num_datavpages,
 		                                           num_zerovpages,
 		                                           page_index,
 		                                           prot,
 		                                           flag,
 		                                           guard);
-		sync_endwrite(effective_vm);
+		sync_endwrite(self);
 		vm_map_subrange_descriptors_fini_caller_inherited_parts(&sr);
 		return true;
 	}
 
 	/* The entire mapping fits into the allowed mapping-range of the given data-block.
 	 * -> We can just map the memory normally. */
-	return vm_paged_mapat(effective_vm,
-	                page_index,
-	                num_pages,
-	                data,
-	                data_minmappage,
-	                prot,
-	                flag,
-	                guard);
+	return vm_paged_mapat(self,
+	                      page_index,
+	                      num_pages,
+	                      data,
+	                      fspath,
+	                      fsname,
+	                      data_minmappage,
+	                      prot,
+	                      flag,
+	                      guard);
 }
 
 DECL_END

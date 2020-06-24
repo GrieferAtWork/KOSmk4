@@ -619,17 +619,10 @@ halt_unhandled_exception(unsigned int unwind_error,
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() &&
 		(kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_UNHANDLED_EXCEPT)) {
-		uintptr_t trapno = SIGBUS;
-		if (info->ei_class == E_SEGFAULT) {
-			trapno = SIGSEGV;
-		} else if (info->ei_class == E_ILLEGAL_INSTRUCTION) {
-			trapno = SIGILL;
-		} else if (info->ei_class == E_DIVIDE_BY_ZERO) {
-			trapno = SIGFPE;
-		} else if (info->ei_class == E_BREAKPOINT) {
-			trapno = SIGTRAP;
-		}
-		kernel_debugtrap(&info->ei_state, trapno);
+		siginfo_t si;
+		if (!error_as_signal(&info->ei_data, &si))
+			si.si_signo = SIGABRT;
+		kernel_debugtrap(&info->ei_state, si.si_signo);
 	}
 	{
 		STRUCT_DBG_ENTRY_INFO(3) einfo;
@@ -671,6 +664,7 @@ search_fde:
 		perso_code = (*(dwarf_perso_t)fde.f_persofun)(&fde, state,
 		                                              (void *)fde.f_lsdaaddr);
 		switch (perso_code) {
+
 		case DWARF_PERSO_EXECUTE_HANDLER:
 			/* When unwinding a landing pad, we must check if there is an active
 			 * `DW_CFA_GNU_args_size' instruction.
@@ -688,9 +682,11 @@ search_fde:
 			ATTR_FALLTHROUGH
 		case DWARF_PERSO_EXECUTE_HANDLER_NOW:
 			return state; /* Execute a new handler. */
+
 		case DWARF_PERSO_ABORT_SEARCH:
 			halt_unhandled_exception(UNWIND_SUCCESS, state);
 			return state;
+
 		default: break;
 		}
 	}
@@ -755,14 +751,14 @@ search_fde:
 			            ustate.ucs_sgregs.sg_fs != expected_fs ||
 			            ustate.ucs_sgregs.sg_es != expected_es ||
 			            ustate.ucs_sgregs.sg_ds != expected_ds) {
-#define LOG_SEGNENT_INCONSISTENCY(name, isval, wantval)                                            \
+#define LOG_SEGMENT_INCONSISTENCY(name, isval, wantval)                                            \
 				do {                                                                               \
 					if (isval != wantval) {                                                        \
 						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: %#I16x != %#I16x\n", \
 						       name, isval, wantval);                                              \
 					}                                                                              \
 				} __WHILE0
-#define LOG_SEGNENT_INCONSISTENCY_CHK(name, isval, isok)                                 \
+#define LOG_SEGMENT_INCONSISTENCY_CHK(name, isval, isok)                                 \
 				do {                                                                     \
 					if (!isok(isval)) {                                                  \
 						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: %#I16x\n", \
@@ -778,9 +774,9 @@ search_fde:
 				 * >> *(u16 *)ESP = DS;
 				 * In other words, it leaves the upper 2 bytes of the pushed DWORD
 				 * undefined (or rather: have them keep their previous values)
-				 * -> To fix this, we libunwind (and also some other components
+				 * -> To fix this, libunwind (and also some other components
 				 *    that use segment registers) have been adjusted, in order
-				 *    to either ignore the upper 2 bytes during reads, and fill
+				 *    to both ignore the upper 2 bytes during reads, and fill
 				 *    them as all zeroes during writes.
 				 * Intel manuals:
 				 * ... if the operand size is 32-bits, either a zero-extended value is
@@ -793,13 +789,13 @@ search_fde:
 				 *    one less Problem for me to figure out the hard way once testing
 				 *    on real Hardware is going to start...
 				 */
-				LOG_SEGNENT_INCONSISTENCY_CHK('c', ustate.ucs_cs, SEGMENT_IS_VALID_KERNCODE);
-				LOG_SEGNENT_INCONSISTENCY_CHK('s', ustate.ucs_ss, SEGMENT_IS_VALID_KERNDATA);
-				LOG_SEGNENT_INCONSISTENCY('g', ustate.ucs_sgregs.sg_gs, expected_gs);
-				LOG_SEGNENT_INCONSISTENCY('f', ustate.ucs_sgregs.sg_fs, expected_fs);
-				LOG_SEGNENT_INCONSISTENCY('e', ustate.ucs_sgregs.sg_es, expected_es);
-				LOG_SEGNENT_INCONSISTENCY('d', ustate.ucs_sgregs.sg_ds, expected_ds);
-#undef LOG_SEGNENT_INCONSISTENCY
+				LOG_SEGMENT_INCONSISTENCY_CHK('c', ustate.ucs_cs, SEGMENT_IS_VALID_KERNCODE);
+				LOG_SEGMENT_INCONSISTENCY_CHK('s', ustate.ucs_ss, SEGMENT_IS_VALID_KERNDATA);
+				LOG_SEGMENT_INCONSISTENCY('g', ustate.ucs_sgregs.sg_gs, expected_gs);
+				LOG_SEGMENT_INCONSISTENCY('f', ustate.ucs_sgregs.sg_fs, expected_fs);
+				LOG_SEGMENT_INCONSISTENCY('e', ustate.ucs_sgregs.sg_es, expected_es);
+				LOG_SEGMENT_INCONSISTENCY('d', ustate.ucs_sgregs.sg_ds, expected_ds);
+#undef LOG_SEGMENT_INCONSISTENCY
 				error = UNWIND_INVALID_REGISTER;
 				goto err_old_state;
 			}

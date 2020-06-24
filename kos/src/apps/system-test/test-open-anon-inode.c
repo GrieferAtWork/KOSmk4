@@ -150,7 +150,7 @@ DEFINE_TEST(open_anon_inode) {
 		 * equivalent of an `openat()' system call, whilst still
 		 * using the regular `open()'. */
 		dfd = open("/proc/self", O_RDONLY | O_DIRECTORY);
-		ASSERT_ERROR_OK(dfd >= 0);
+		ASSERT_ERROR_OK(dfd != -1);
 
 		sprintf(pathbuf, "/proc/self/fd/%d/exe", dfd);
 		with_follow = frealpathat(AT_FDCWD, pathbuf, NULL, 0, 0);

@@ -197,6 +197,8 @@ INTERN struct vm_datapart x86_kernel_vm_parts[6] = {
 		/* .vn_vm     = */ &vm_kernel,                                                          \
 		/* .vn_part   = */ NULL,                                                                \
 		/* .vn_block  = */ NULL,                                                                \
+		/* .vn_fspath = */ NULL,                                                                \
+		/* .vn_fsname = */ NULL,                                                                \
 		/* .vn_link   = */ LLIST_INITNODE,                                                      \
 		/* .vn_guard  = */ 0                                                                    \
 	}
@@ -209,6 +211,8 @@ INTERN struct vm_datapart x86_kernel_vm_parts[6] = {
 		/* .vn_vm     = */ &vm_kernel,                                                          \
 		/* .vn_part   = */ &(part),                                                             \
 		/* .vn_block  = */ &vm_datablock_anonymous,                                             \
+		/* .vn_fspath = */ NULL,                                                                \
+		/* .vn_fsname = */ NULL,                                                                \
 		/* .vn_link   = */ { NULL, &LLIST_HEAD((part).dp_srefs) },                              \
 		/* .vn_guard  = */ 0                                                                    \
 	}

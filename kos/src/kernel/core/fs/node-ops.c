@@ -81,13 +81,16 @@ inode_file_pwrite_with_write(struct inode *__restrict self, vm_phys_t src,
 		/* XXX: Instead of vm_paged_map(), maybe just call `f_write()' multiple times?
 		 *      Or at the very least, do so when vm_paged_map() fails! */
 		tempbase = vm_map(&vm_kernel,
-		                   HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
-		                   aligned_num_bytes, PAGESIZE,
-		                   HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
-		                   &vm_datablock_physical,
-		                   (pos_t)minpageaddr,
-		                   VM_PROT_READ | VM_PROT_SHARED,
-		                   VM_NODE_FLAG_NOMERGE);
+		                  HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
+		                  aligned_num_bytes,
+		                  PAGESIZE,
+		                  HINT_GETMODE(KERNEL_VMHINT_TEMPORARY),
+		                  &vm_datablock_physical,
+		                  NULL,
+		                  NULL,
+		                  (pos_t)minpageaddr,
+		                  VM_PROT_READ | VM_PROT_SHARED,
+		                  VM_NODE_FLAG_NOMERGE);
 		TRY {
 			(*self->i_type->it_file.f_write)(self,
 			                                 (byte_t *)tempbase + ((ptrdiff_t)src & PAGEMASK),

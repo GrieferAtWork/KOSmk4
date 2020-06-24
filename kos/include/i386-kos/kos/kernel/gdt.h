@@ -21,8 +21,8 @@
 #define _I386_KOS_KOS_KERNEL_GDT_H 1
 
 #include <__stdinc.h>
+
 #include <bits/types.h>
-#include <features.h>
 
 __SYSDECL_BEGIN
 
@@ -41,7 +41,7 @@ __SYSDECL_BEGIN
  *
  * Or simplified:
  * >> SEGMENT_KERNEL_CODE == BASE       (sysenter)
- * >> SEGMENT_KERNEL_DATA == BASE + 8   (sysenter)
+ * >> SEGMENT_KERNEL_DATA == BASE + 8   (sysenter, syscall)
  * >> SEGMENT_USER_CODE32 == BASE + 16  (sysexit)
  * >> SEGMENT_USER_DATA32 == BASE + 24  (sysexit)
  * >> SEGMENT_USER_CODE64 == BASE + 32  (sysret)
@@ -50,6 +50,12 @@ __SYSDECL_BEGIN
  * >> IA32_STAR[47:32] = SEGMENT_KERNEL_CODE
  * >> IA32_STAR[63:48] = SEGMENT_USER_CODE32 | 3 (aka. `SEGMENT_USER_CODE32_RPL')
  *
+ * Also: Since these segment indices are visible to user-space, make sure that any
+ *       segment that may be useful to user-space (such as all of the SEGMENT_USER_*
+ *       segments) has the same value between 32-bit and 64-bit mode, irregardless
+ *       of user-space being hosted by a 32-bit or 64-bit kernel.
+ *       User-space should be allowed to hard-code expected segment values when it
+ *       deems that doing so may be beneficial.
  */
 
 
@@ -203,8 +209,8 @@ __SYSDECL_BEGIN
  * always:  Guarantied to be the case (may assume this case)
  * usually: Is the case by default; can be changed by factors (don't assume, but may optimize for this case)
  *
- * NOTE: The fact that %gs goes unused in kernel-space is also the reason why
- *       some CPU state structures exist that simply omit it, as it doesn't
+ * NOTE: The fact that %gs goes unused in 32-bit kernel-space is also the reason
+ *       why some CPU state structures exist that simply omit it, as it doesn't
  *       need to be saved/written/restored for the purposes of syscalls or hardware
  *       interrupts. The only place where it does actually need to be saved is when
  *       it comes to scheduling, as different user-space tasks are allowed to have

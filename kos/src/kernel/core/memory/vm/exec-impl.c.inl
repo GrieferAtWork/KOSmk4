@@ -130,6 +130,8 @@ MY_FUNC(vm_exec_impl)(struct vm *__restrict effective_vm,
 					                         page_index,
 					                         num_pages,
 					                         exec_node,
+					                         exec_path,
+					                         exec_dentry,
 					                         (vm_vpage64_t)(phdr_vector[i].p_offset / PAGESIZE),
 					                         prot | VM_PROT_PRIVATE);
 					if unlikely(!map_ok) {
@@ -196,6 +198,8 @@ err_overlap:
 						                   page_index + num_pages,
 						                   num_total - num_pages,
 						                   &vm_datablock_anonymous_zero,
+						                   NULL,
+						                   NULL,
 						                   0,
 						                   prot | VM_PROT_PRIVATE);
 						if unlikely(!map_ok)
@@ -220,6 +224,8 @@ err_overlap:
 				                      HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
 #endif
 				                      &MY_FUNC(elfexec_system_rtld_file).rf_block,
+				                      NULL, /* TODO: fspath */
+				                      NULL, /* TODO: fsname */
 				                      0,
 				                      VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC | VM_PROT_PRIVATE,
 				                      VM_NODE_FLAG_NORMAL,
@@ -234,6 +240,8 @@ err_overlap:
 			                     PAGESIZE,
 			                     HINT_GETMODE(KERNEL_VMHINT_USER_STACK),
 			                     &vm_datablock_anonymous_zero, /* XXX: Use memory with a debug initializer? */
+			                     NULL,
+			                     NULL,
 			                     0,
 			                     VM_PROT_READ | VM_PROT_WRITE,
 			                     VM_NODE_FLAG_NORMAL,

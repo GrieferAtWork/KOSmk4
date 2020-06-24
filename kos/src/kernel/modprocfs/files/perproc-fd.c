@@ -251,7 +251,8 @@ ProcFS_PerProc_Fd_Entry_Open(struct inode *__restrict self,
                              oflag_t UNUSED(oflags),
                              struct path *UNUSED(containing_path),
                              struct directory_node *UNUSED(containing_directory),
-                             struct directory_entry *UNUSED(containing_dirent)) {
+                             struct directory_entry *UNUSED(containing_dirent))
+		THROWS(...) {
 	upid_t pid;
 	unsigned int fdno;
 	REF struct handle result;

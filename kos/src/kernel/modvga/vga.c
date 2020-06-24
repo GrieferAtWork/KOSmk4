@@ -1627,10 +1627,11 @@ VGA_Ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
 	return 0;
 }
 
-PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
 VGA_MMap(struct character_device *__restrict self,
-         pos_t *__restrict pminoffset,
-         pos_t *__restrict pnumbytes) THROWS(...) {
+         pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes,
+         REF struct path **__restrict UNUSED(pdatablock_fspath),
+         REF struct directory_entry **__restrict UNUSED(pdatablock_fsname)) THROWS(...) {
 	VGA *me = (VGA *)self;
 	*pminoffset = (pos_t)me->v_vram_addr;
 	*pnumbytes  = (pos_t)me->v_vram_size;
@@ -1895,7 +1896,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 		                   HINT_GETADDR(KERNEL_VMHINT_DEVICE),
 		                   CEIL_ALIGN(vga_device->v_vram_size, PAGESIZE),
 		                   PAGESIZE, HINT_GETMODE(KERNEL_VMHINT_DEVICE),
-		                   &vm_datablock_physical,
+		                   &vm_datablock_physical, NULL, NULL,
 		                   (pos_t)(vga_device->v_vram_addr & ~PAGEMASK),
 		                   VM_PROT_READ | VM_PROT_WRITE,
 		                   VM_NODE_FLAG_NORMAL, 0);

@@ -64,7 +64,8 @@ struct vmb {
 
 /* Initialize a given VM Builder. */
 #ifdef __INTELLISENSE__
-LOCAL NOBLOCK void NOTHROW(KCALL vmb_init)(struct vmb *__restrict self);
+LOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL vmb_init)(struct vmb *__restrict self);
 #else /* __INTELLISENSE__ */
 #define vmb_init(self) ((self)->v_tree = NULL, (self)->v_byaddr = NULL)
 #endif /* !__INTELLISENSE__ */
@@ -86,7 +87,8 @@ LOCAL NOBLOCK void NOTHROW(KCALL vmb_init)(struct vmb *__restrict self);
  * >> }
  * >> // Don't finalize `v' after `vmb_apply()' has succeeded
  */
-FUNDEF NOBLOCK void NOTHROW(KCALL vmb_fini)(struct vmb *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL vmb_fini)(struct vmb *__restrict self);
 
 
 
@@ -98,20 +100,24 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vmb_fini)(struct vmb *__restrict self);
  *                 Set to 0 if the mapping should include a guard.
  * @return: true:  Successfully created the mapping.
  * @return: false: Another mapping already exists. */
-FUNDEF bool KCALL
+FUNDEF WUNUSED NONNULL((1, 4)) bool KCALL
 vmb_paged_mapat(struct vmb *__restrict self,
                 pageid_t page_index, size_t num_pages,
                 struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+                struct path *fspath DFL(__NULLPTR),
+                struct directory_entry *fsname DFL(__NULLPTR),
                 vm_vpage64_t data_start_vpage DFL(0),
                 uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
                 uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
                 uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-LOCAL bool KCALL
+LOCAL WUNUSED NONNULL((1, 4)) bool KCALL
 vmb_mapat(struct vmb *__restrict self,
           PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
           PAGEDIR_PAGEALIGNED size_t num_bytes,
           struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+          struct path *fspath DFL(__NULLPTR),
+          struct directory_entry *fsname DFL(__NULLPTR),
           PAGEDIR_PAGEALIGNED pos_t data_start_offset DFL(0),
           uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
           uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
@@ -121,9 +127,9 @@ vmb_mapat(struct vmb *__restrict self,
 	__hybrid_assert((num_bytes & PAGEMASK) == 0);
 	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
 	return vmb_paged_mapat(self, PAGEID_ENCODE(addr),
-	                 num_bytes / PAGESIZE, data,
-	                 (vm_vpage64_t)(data_start_offset / PAGESIZE),
-	                 prot, flag, guard);
+	                       num_bytes / PAGESIZE, data, fspath, fsname,
+	                       (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                       prot, flag, guard);
 }
 
 
@@ -179,25 +185,29 @@ NOTHROW(KCALL vmb_getfree)(struct vmb *__restrict self,
 
 /* A combination of `vmb_paged_getfree' + `vmb_paged_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-FUNDEF NONNULL((1, 6)) pageid_t KCALL
+FUNDEF WUNUSED NONNULL((1, 6)) pageid_t KCALL
 vmb_paged_map(struct vmb *__restrict self,
               pageid_t hint,
               size_t num_pages,
               size_t min_alignment_in_pages DFL(1),
               unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
               struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+              struct path *fspath DFL(__NULLPTR),
+              struct directory_entry *fsname DFL(__NULLPTR),
               vm_vpage64_t data_start_vpage DFL(0),
               uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
               uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
               uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-LOCAL PAGEDIR_PAGEALIGNED UNCHECKED NONNULL((1, 6)) void *KCALL
+LOCAL WUNUSED PAGEDIR_PAGEALIGNED UNCHECKED NONNULL((1, 6)) void *KCALL
 vmb_map(struct vmb *__restrict self,
         PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
         PAGEDIR_PAGEALIGNED size_t num_bytes,
         PAGEDIR_PAGEALIGNED size_t min_alignment DFL(PAGESIZE),
         unsigned int getfree_mode DFL(VM_GETFREE_ABOVE | VM_GETFREE_ASLR),
         struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
+        struct path *fspath DFL(__NULLPTR),
+        struct directory_entry *fsname DFL(__NULLPTR),
         pos_t data_start_offset DFL(0),
         uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
         uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
@@ -209,10 +219,11 @@ vmb_map(struct vmb *__restrict self,
 	__hybrid_assert((min_alignment & PAGEMASK) == 0);
 	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
 	result = vmb_paged_map(self, PAGEID_ENCODE(hint),
-	                 num_bytes / PAGESIZE,
-	                 min_alignment / PAGESIZE, getfree_mode,
-	                 data, (vm_vpage64_t)(data_start_offset / PAGESIZE),
-	                 prot, flag, guard);
+	                       num_bytes / PAGESIZE,
+	                       min_alignment / PAGESIZE, getfree_mode,
+	                       data, fspath, fsname,
+	                       (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                       prot, flag, guard);
 	return __ARCH_PAGEID_DECODE(result);
 }
 

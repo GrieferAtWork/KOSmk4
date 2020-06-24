@@ -31,6 +31,8 @@
 
 #include <hybrid/atomic.h>
 
+#include <sys/utsname.h>
+
 #include <format-printer.h>
 #include <stdio.h>
 #include <stdlib.h>

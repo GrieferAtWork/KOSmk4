@@ -162,8 +162,8 @@ x86_task_clone(struct icpustate const *__restrict init_state,
 		memcpy(result, __kernel_pertask_start, (size_t)__kernel_pertask_size);
 		result->t_heapsz = resptr.hp_siz;
 		result->t_self   = result;
-		incref(&vm_datablock_anonymous); /* FORTASK(result,this_kernel_stacknode_).vn_block */
-		incref(&vm_datablock_anonymous); /* FORTASK(result,this_kernel_stackpart_).dp_block */
+		incref(&vm_datablock_anonymous); /* FORTASK(result, this_kernel_stacknode_).vn_block */
+		incref(&vm_datablock_anonymous); /* FORTASK(result, this_kernel_stackpart_).dp_block */
 #define REL(x) ((x) = (__typeof__(x))(uintptr_t)((byte_t *)(x) + (uintptr_t)result))
 		REL(FORTASK(result, this_kernel_stacknode_).vn_part);
 		REL(FORTASK(result, this_kernel_stacknode_).vn_link.ln_pself);

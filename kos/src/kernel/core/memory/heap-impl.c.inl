@@ -138,7 +138,9 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 #endif /* !CONFIG_DEBUG_HEAP */
 	                              ;
 	incref(corepair.cp_part->dp_block);
-	corepair.cp_node->vn_block = incref(corepair.cp_part->dp_block);
+	corepair.cp_node->vn_block  = incref(corepair.cp_part->dp_block);
+	corepair.cp_node->vn_fspath = NULL;
+	corepair.cp_node->vn_fsname = NULL;
 	corepair.cp_node->vn_flags |= VM_NODE_FLAG_PREPARED;
 	corepair.cp_node->vn_part          = corepair.cp_part;
 	corepair.cp_node->vn_link.ln_pself = &LLIST_HEAD(corepair.cp_part->dp_srefs);

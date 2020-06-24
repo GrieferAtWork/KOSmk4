@@ -22,7 +22,19 @@
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
 
-#define sys_errlist DONT_DEFINE
+/* System headers are smart enough to define `sys_errlist' not as an external
+ * data object, but rather as a direct invocation of its resolver function,
+ * which in turn would allow its initialization to be delayed until the point
+ * of first use.
+ * Now that is good an all, but we're not here to have the headers help us
+ * write the most optimal code possible. - No: we're here to test the idata
+ * system, meaning that we want these 2 symbols to be linked as actual external
+ * data objects.
+ * So by pre-defining macros with the these names, we can make the headers think
+ * that these symbols have already been defined, thus preventing headers from
+ * actually defining them! */
+#define sys_errlist DONT_DEFINE_sys_errlist
+#define sys_nerr    DONT_DEFINE_sys_nerr
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
@@ -34,6 +46,7 @@
 #include <dlfcn.h>
 #include <signal.h>
 #undef sys_errlist
+#undef sys_nerr
 
 DECL_BEGIN
 

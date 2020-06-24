@@ -245,6 +245,8 @@ do_throw_first_unmapped:
 					new_node->vn_vm               = self;
 					new_node->vn_part             = NULL;
 					new_node->vn_block            = xincref(minmax.mm_min->vn_block);
+					new_node->vn_fspath           = xincref(minmax.mm_min->vn_fspath);
+					new_node->vn_fsname           = xincref(minmax.mm_min->vn_fsname);
 					new_node->vn_guard            = 0;
 					minmax.mm_min->vn_node.a_vmax = minpageid - 1;
 					if (minmax.mm_min->vn_guard &&
