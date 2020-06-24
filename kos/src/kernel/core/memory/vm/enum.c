@@ -128,12 +128,20 @@ again_lock_tree_and_search_for_first_node:
 					goto node_is_not_an_extension;
 				if (prev->vmi_block != node->vn_block)
 					goto node_is_not_an_extension;
-				if (prev->vmi_offset + vm_mapinfo_size(prev) != vm_datapart_minbyte(node->vn_part))
-					goto node_is_not_an_extension;
 				if (prev->vmi_fspath != node->vn_fspath)
 					goto node_is_not_an_extension;
 				if (prev->vmi_fsname != node->vn_fsname)
 					goto node_is_not_an_extension;
+				if (prev->vmi_offset + vm_mapinfo_size(prev) != vm_datapart_minbyte(node->vn_part)) {
+					/* Unaligned offsets only matter if `prev->vmi_block' isn't
+					 * anonymous, or if offsets are non-zero. */
+					if (!vm_datablock_isanonymous(prev->vmi_block))
+						goto node_is_not_an_extension;
+					if (prev->vmi_offset != 0)
+						goto node_is_not_an_extension;
+					if (vm_datapart_minbyte(node->vn_part) != 0)
+						goto node_is_not_an_extension;
+				}
 				/* This _is_ an extension to the previous node! */
 				prev->vmi_max = vm_node_getmax(node);
 				goto continue_with_next_node;

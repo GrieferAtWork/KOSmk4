@@ -224,8 +224,8 @@ err_overlap:
 				                      HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
 #endif
 				                      &MY_FUNC(elfexec_system_rtld_file).rf_block,
-				                      NULL, /* TODO: fspath */
-				                      NULL, /* TODO: fsname */
+				                      NULL,
+				                      NULL,
 				                      0,
 				                      VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC | VM_PROT_PRIVATE,
 				                      VM_NODE_FLAG_NORMAL,

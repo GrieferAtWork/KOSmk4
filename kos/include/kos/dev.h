@@ -35,8 +35,8 @@
 #define MINORMASK    ((1 << MINORBITS)-1)
 #define MAJORMASK    ((1 << MAJORBITS)-1)
 
-#define MAJOR(dev)   (__CCAST(uintptr_t)(dev) >> MINORBITS)
-#define MINOR(dev)   (__CCAST(uintptr_t)(dev) &  MINORMASK)
+#define MAJOR(dev)   (__CCAST(__major_t)(__CCAST(__uintptr_t)(dev) >> MINORBITS))
+#define MINOR(dev)   (__CCAST(__minor_t)(__CCAST(__uintptr_t)(dev) &  MINORMASK))
 #define MKDEV(ma,mi) (__CCAST(dev_t)((ma) << MINORBITS | (mi)))
 
 #ifdef __CC__

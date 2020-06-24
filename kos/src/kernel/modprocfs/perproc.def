@@ -99,6 +99,9 @@ CUSTOM(kos_dcwd, S_IFDIR | 0300, ProcFS_PerProc_Kos_DrivesCwd_Type)
 PERPROC_DIRECTORY_ENTRY("map_files", DT_DIR, map_files)
 CUSTOM(map_files, S_IFDIR | 0300, ProcFS_PerProc_MapFiles_Type)
 
+PERPROC_DIRECTORY_ENTRY("maps", DT_REG, maps)
+MKREG_RO(maps, 0222, ProcFS_PerProc_Maps_Printer)
+
 PERPROC_DIRECTORY_ENTRY("root", DT_LNK, root)
 DYNAMIC_SYMLINK(root, 0777, ProcFS_PerProc_Root_Printer)
 

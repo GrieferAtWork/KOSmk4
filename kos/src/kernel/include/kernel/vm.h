@@ -1238,6 +1238,10 @@ NOTHROW(KCALL vm_datablock_deanonymize)(struct vm_datablock *__restrict self);
 	                       NULL, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #endif /* !__INTELLISENSE__ */
 
+/* Check if `self' is an anonymous datablock */
+#define vm_datablock_isanonymous(self) \
+	(__hybrid_atomic_load((self)->db_parts, __ATOMIC_ACQUIRE) == VM_DATABLOCK_ANONPARTS)
+
 
 /* Synchronize all modified data pages within the specified address range.
  * When called, this function will go through all data parts of `self', and

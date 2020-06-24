@@ -22,7 +22,6 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kernel/printk.h>
 
 #include <fs/vfs.h>
 #include <sched/pid.h>
