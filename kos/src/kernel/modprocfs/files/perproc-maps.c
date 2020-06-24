@@ -24,14 +24,15 @@
 #include <kernel/compiler.h>
 
 #include <fs/vfs.h>
-#include <kernel/vm.h>
 #include <kernel/exec.h> /* elfexec_system_rtld_file */
+#include <kernel/vm.h>
 #include <sched/pid.h>
 
 #include <kos/dev.h>
 
 #include <format-printer.h>
 #include <inttypes.h>
+#include <string.h>
 
 #include "../procfs.h"
 
@@ -44,24 +45,24 @@ NOTHROW(FCALL nameof_special_datablock)(struct vm_datablock *__restrict self) {
 	if (self == &elfexec_system_rtld_file.rf_block) {
 #ifdef __ARCH_HAVE_COMPAT
 #if __SIZEOF_POINTER__ == 8
-		return "kernel.libdl64";
+		return "[kernel.libdl64]";
 #else /* __SIZEOF_POINTER__ == 8 */
-		return "kernel.libdl32";
+		return "[kernel.libdl32]";
 #endif /* __SIZEOF_POINTER__ != 8 */
 #else /* __ARCH_HAVE_COMPAT */
-		return "kernel.libdl";
+		return "[kernel.libdl]";
 #endif /* !__ARCH_HAVE_COMPAT */
 	}
 #ifdef __ARCH_HAVE_COMPAT
 	if (self == &compat_elfexec_system_rtld_file.rf_block)
-		return "kernel.libdl";
+		return "[kernel.libdl]";
 #endif /* __ARCH_HAVE_COMPAT */
 	if (self == &vm_datablock_physical)
-		return "mem"; /* same as: /dev7mem */
+		return "[mem]"; /* same as: /dev7mem */
 	if (self == &vm_datablock_anonymous)
-		return "anon";
+		return "[anon]";
 	if (self == &vm_datablock_anonymous_zero)
-		return "zero"; /* same as: /dev/zero */
+		return "[zero]"; /* same as: /dev/zero */
 	return NULL;
 }
 
@@ -91,7 +92,7 @@ maps_printer_cb(void *arg, struct vm_mapinfo *__restrict info) {
 	result = format_printf(ctx->pd_printer,
 	                       ctx->pd_arg,
 	                       "%.8" PRIxPTR "-%.8" PRIxPTR " "     /* from-to */
-	                       "%c%c%c%c "                          /* [r-][w-][x-][ps] */
+	                       "%c%c%c%c "                          /* [r-][w-][x-][sp] */
 	                       "%.8" PRIxN(__SIZEOF_OFF64_T__) " "  /* offset */
 	                       "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"  /* dev:major */
 	                       "%.2" PRIxN(__SIZEOF_MINOR_T__) " "  /* dev:minor */
@@ -134,10 +135,9 @@ maps_printer_cb(void *arg, struct vm_mapinfo *__restrict info) {
 			char const *special_name;
 			special_name = nameof_special_datablock(info->vmi_block);
 			if (special_name) {
-				temp = format_printf(ctx->pd_printer,
-				                     ctx->pd_arg,
-				                     "[%s]",
-				                     special_name);
+				temp = (*ctx->pd_printer)(ctx->pd_arg,
+				                          special_name,
+				                          strlen(special_name));
 			}
 		}
 	}
