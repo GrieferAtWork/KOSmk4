@@ -177,7 +177,7 @@ $sighandler_t sysv_signal($signo_t signo, $sighandler_t handler);
 
 [[std, no_crt_self_import, crt_dos_variant]]
 [[if(defined(__USE_MISC)), preferred_alias("signal", "_signal")]]
-[[alias("sysv_signal"), export_as("_signal")]]
+[[alias("sysv_signal"), dos_export_as("DOS$_signal")]]
 [[decl_include("<bits/types.h>", "<bits/sigaction.h>")]]
 $sighandler_t signal($signo_t signo, $sighandler_t handler);
 

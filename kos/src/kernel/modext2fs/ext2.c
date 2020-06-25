@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_MODEXT2FS_EXT2_C
 #define GUARD_MODEXT2FS_EXT2_C 1
-#define _KOS_SOURCE 1
+#define _KOS_SOURCE            1
 
 #include "ext2.h"
 
@@ -35,6 +35,7 @@
 #include <hybrid/byteswap.h>
 
 #include <bits/crt/confname.h>
+#include <linux/magic.h>
 
 #include <assert.h>
 #include <string.h>
@@ -569,7 +570,6 @@ INTERN struct inode_type Ext2_DirOps = {
 		/*.a_loadattr   = */ &ExtINode_LoadAttr,
 		/*.a_saveattr   = */ &ExtINode_SaveAttr,
 		/*.a_maskattr   = */ NULL,
-		/*.a_pathconf   = */ NULL,
 		/*.a_clearcache = */ NULL,
 	},
 	/*.it_file = */ {
@@ -605,7 +605,6 @@ INTERN struct inode_type Ext2_RegOps = {
 		/*.a_loadattr   = */ &ExtINode_LoadAttr,
 		/*.a_saveattr   = */ &ExtINode_SaveAttr,
 		/*.a_maskattr   = */ NULL,
-		/*.a_pathconf   = */ NULL,
 		/*.a_clearcache = */ NULL,
 	},
 	/*.it_file = */ {
@@ -626,7 +625,6 @@ INTERN struct inode_type Ext2_DevOps = {
 		/*.a_loadattr   = */ &ExtINode_LoadAttr,
 		/*.a_saveattr   = */ &ExtINode_SaveAttr,
 		/*.a_maskattr   = */ NULL,
-		/*.a_pathconf   = */ NULL,
 		/*.a_clearcache = */ NULL,
 	}
 };
@@ -636,7 +634,6 @@ INTERN struct inode_type Ext2_LnkOps = {
 		/*.a_loadattr   = */ &ExtINode_LoadAttr,
 		/*.a_saveattr   = */ &ExtINode_SaveAttr,
 		/*.a_maskattr   = */ NULL,
-		/*.a_pathconf   = */ NULL,
 		/*.a_clearcache = */ NULL,
 	},
 	/*.it_file = */ {
@@ -668,6 +665,7 @@ Ext2_OpenSuperblock(Ext2Superblock *__restrict self, UNCHECKED USER char *args)
 	Ext2DiskSuperblock super;
 	u32 num_block_groups, temp;
 	bool must_mount_ro = false;
+	self->s_features.sf_magic = EXT2_SUPER_MAGIC;
 
 	/* XXX: Mount arguments? */
 	(void)args;

@@ -575,7 +575,7 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 	fi
 	echo "    Make sure to delete any existing installation of c++ headers"
 	rm -r "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER"
-	# Build our own libc.so and libm.so before buildin libstdc++ so GCC can link against our code!
+	# Build our own libc.so and libm.so before building libstdc++, so GCC can link against our code!
 	echo "    Making libc.so and libm.so for $GCC_VERSION:libstdc++"
 	cmd cd "$KOS_ROOT"
 	cmd deemon "magic.dee" \
@@ -776,11 +776,12 @@ if [[ `uname -s` == *CYGWIN* ]]; then
 		gcc $GDBRIDGE_FLAGS \
 			-DCMDLINE="$GDBRIDGE_CMDLINE" \
 			-o "$KOS_MISC/gdbridge/gdbridge.exe" \
-			"$KOS_MISC/gdbridge/gdbridge.c" || {
-		local error=$?
-		echo "ERROR: Command failed 'gcc $GDBRIDGE_FLAGS -DCMDLINE=\"$GDBRIDGE_CMDLINE\" -o \"$KOS_MISC/gdbridge/gdbridge.exe\" \"$KOS_MISC/gdbridge/gdbridge.c\"' -> '$error'"
-		exit $error
-	}
+			"$KOS_MISC/gdbridge/gdbridge.c" \
+		|| {
+			local error=$?
+			echo "ERROR: Command failed 'gcc $GDBRIDGE_FLAGS -DCMDLINE=\"$GDBRIDGE_CMDLINE\" -o \"$KOS_MISC/gdbridge/gdbridge.exe\" \"$KOS_MISC/gdbridge/gdbridge.c\"' -> '$error'"
+			exit $error
+		}
 	fi
 fi
 

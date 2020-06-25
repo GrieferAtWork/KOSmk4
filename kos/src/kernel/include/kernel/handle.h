@@ -187,7 +187,7 @@ struct handle {
 
 
 /* Returns the type-kind code for `self' (One of `HANDLE_TYPEKIND_*') */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED uintptr_half_t
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_half_t
 NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self);
 
 /* Print the text that should result from `readlink("/proc/[pid]/fd/[fdno]")' */
@@ -201,6 +201,15 @@ handle_print(struct handle const *__restrict self,
 FUNDEF NONNULL((1, 2)) __BOOL KCALL
 handle_datasize(struct handle const *__restrict self,
                 pos_t *__restrict presult);
+
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF NOBLOCK ATTR_PURE WUNUSED uintptr_half_t NOTHROW(KCALL handle_typekind)(struct handle const &__restrict self) ASMNAME("handle_typekind");
+FUNDEF NONNULL((2)) ssize_t KCALL handle_print(struct handle const &__restrict self, __pformatprinter printer, void *arg) ASMNAME("handle_print");
+FUNDEF NONNULL((2)) __BOOL KCALL handle_datasize(struct handle const &__restrict self, pos_t *__restrict presult) ASMNAME("handle_datasize");
+} /* extern "C++" */
+#endif /* __cplusplus */
+
 
 #define HANDLE_FUNC(self, name) (*handle_type_db.name[(self).h_type])
 
@@ -242,24 +251,44 @@ handle_datasize(struct handle const *__restrict self,
 extern "C++" {
 
 FORCELOCAL NOBLOCK struct handle const &
-NOTHROW(KCALL incref)(struct handle const &self) {
+NOTHROW(KCALL incref)(struct handle const &__restrict self) {
 	handle_incref(self);
 	return self;
 }
 
 FORCELOCAL NOBLOCK void
-NOTHROW(KCALL decref)(struct handle const &self) {
+NOTHROW(KCALL decref)(struct handle const &__restrict self) {
 	handle_decref(self);
 }
 
 FORCELOCAL NOBLOCK void
-NOTHROW(KCALL decref_likely)(struct handle const &self) {
+NOTHROW(KCALL decref_likely)(struct handle const &__restrict self) {
 	handle_decref(self);
 }
 
 FORCELOCAL NOBLOCK void
-NOTHROW(KCALL decref_unlikely)(struct handle const &self) {
+NOTHROW(KCALL decref_unlikely)(struct handle const &__restrict self) {
 	handle_decref(self);
+}
+
+FORCELOCAL NOBLOCK NONNULL((1)) struct handle const *
+NOTHROW(KCALL incref)(struct handle const *__restrict self) {
+	return &incref(*self);
+}
+
+FORCELOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL decref)(struct handle const *__restrict self) {
+	decref(*self);
+}
+
+FORCELOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL decref_likely)(struct handle const *__restrict self) {
+	decref_likely(*self);
+}
+
+FORCELOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL decref_unlikely)(struct handle const *__restrict self) {
+	decref_unlikely(*self);
 }
 
 }
@@ -402,9 +431,9 @@ handle_stflags(struct handle_manager *__restrict self,
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: Too many open handles
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-FUNDEF NONNULL((1)) unsigned int FCALL
+FUNDEF NONNULL((1, 2)) unsigned int FCALL
 handle_install(struct handle_manager *__restrict self,
-               struct handle hnd)
+               struct handle const *__restrict hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE);
@@ -415,9 +444,10 @@ handle_install(struct handle_manager *__restrict self,
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: `hint' is outside the allowed handle range.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-FUNDEF NONNULL((1)) unsigned int FCALL
+FUNDEF NONNULL((1, 3)) unsigned int FCALL
 handle_installat(struct handle_manager *__restrict self,
-                 unsigned int hint, struct handle hnd)
+                 unsigned int hint,
+                 struct handle const *__restrict hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE);
@@ -427,18 +457,20 @@ handle_installat(struct handle_manager *__restrict self,
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: `dst_fd' is outside the allowed handle range.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-FUNDEF NONNULL((1)) void FCALL
+FUNDEF NONNULL((1, 3)) void FCALL
 handle_installinto(struct handle_manager *__restrict self,
-                   unsigned int dst_fd, struct handle hnd)
+                   unsigned int dst_fd,
+                   struct handle const *__restrict hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE);
 
 /* Same as `handle_installinto()', but return the old handle
  * (or a HANDLE_TYPE_UNDEFINED) previously bound to that slot. */
-FUNDEF WUNUSED NONNULL((1)) REF struct handle FCALL
+FUNDEF WUNUSED NONNULL((1, 3)) REF struct handle FCALL
 handle_installxchg(struct handle_manager *__restrict self,
-                   unsigned int dst_fd, struct handle hnd)
+                   unsigned int dst_fd,
+                   struct handle const *__restrict hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE);
@@ -449,9 +481,9 @@ struct hop_openfd;
 /* Do everything required to install a handle via a open openfd
  * command data packet that has been passed via user-space.
  * Note that `data' is an UNCHECKED user pointer! */
-FUNDEF unsigned int FCALL
+FUNDEF NONNULL((2)) unsigned int FCALL
 handle_installhop(USER UNCHECKED struct hop_openfd *data,
-                  struct handle hnd)
+                  struct handle const *__restrict hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE,
@@ -463,11 +495,64 @@ handle_installhop(USER UNCHECKED struct hop_openfd *data,
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: `dst_fd' is outside the allowed handle range.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-FUNDEF void FCALL
-handle_installinto_sym(unsigned int dst_fd, struct handle hnd)
+FUNDEF NONNULL((2)) void FCALL
+handle_installinto_sym(unsigned int dst_fd,
+                       struct handle const *__restrict hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE);
+
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF NONNULL((1)) unsigned int FCALL
+handle_install(struct handle_manager *__restrict self,
+               struct handle const &__restrict hnd)
+		THROWS(E_WOULDBLOCK, E_BADALLOC,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE)
+		ASMNAME("handle_install");
+FUNDEF NONNULL((1)) unsigned int FCALL
+handle_installat(struct handle_manager *__restrict self,
+                 unsigned int hint,
+                 struct handle const &__restrict hnd)
+		THROWS(E_WOULDBLOCK, E_BADALLOC,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE)
+		ASMNAME("handle_installat");
+FUNDEF NONNULL((1)) void FCALL
+handle_installinto(struct handle_manager *__restrict self,
+                   unsigned int dst_fd,
+                   struct handle const &__restrict hnd)
+		THROWS(E_WOULDBLOCK, E_BADALLOC,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE)
+		ASMNAME("handle_installinto");
+FUNDEF WUNUSED NONNULL((1)) REF struct handle FCALL
+handle_installxchg(struct handle_manager *__restrict self,
+                   unsigned int dst_fd,
+                   struct handle const &__restrict hnd)
+		THROWS(E_WOULDBLOCK, E_BADALLOC,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE)
+		ASMNAME("handle_installxchg");
+FUNDEF unsigned int FCALL
+handle_installhop(USER UNCHECKED struct hop_openfd *data,
+                  struct handle const &__restrict hnd)
+		THROWS(E_WOULDBLOCK, E_BADALLOC,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE,
+		       E_SEGFAULT, E_INVALID_ARGUMENT)
+		ASMNAME("handle_installhop");
+FUNDEF void FCALL
+handle_installinto_sym(unsigned int dst_fd,
+                       struct handle const &__restrict hnd)
+		THROWS(E_WOULDBLOCK, E_BADALLOC,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
+		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE)
+		ASMNAME("handle_installinto_sym");
+} /* extern "C++" */
+#endif /* __cplusplus */
+
 
 /* The kernel-space equivalent of the user-space `fcntl()' function.
  * @param: cmd: One of `F_*' from <kos/io.h> */
@@ -509,12 +594,6 @@ FUNDEF WUNUSED REF struct handle FCALL
 handle_lookup_nosym(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 
-/* Same as `handle_lookup()', but throw an `E_INVALID_HANDLE_FILETYPE'
- * error when the found handle's type doesn't match `type' */
-FUNDEF WUNUSED REF struct handle FCALL
-handle_lookup_type(unsigned int fd, uintptr_half_t type)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
-
 
 struct inode;
 struct regular_node;
@@ -544,7 +623,7 @@ FUNDEF WUNUSED ATTR_RETNONNULL REF struct superblock *FCALL handle_get_superbloc
 FUNDEF WUNUSED ATTR_RETNONNULL REF struct path *FCALL handle_get_path(unsigned int fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
 FUNDEF WUNUSED ATTR_RETNONNULL REF struct taskpid *FCALL handle_get_taskpid(unsigned int fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
 /* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
-FUNDEF WUNUSED ATTR_RETNONNULL REF struct task *FCALL handle_get_task(unsigned int fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE,E_PROCESS_EXITED);
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct task *FCALL handle_get_task(unsigned int fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
 FUNDEF WUNUSED ATTR_RETNONNULL REF struct vm *FCALL handle_get_vm(unsigned int fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
 FUNDEF WUNUSED ATTR_RETNONNULL REF struct fs *FCALL handle_get_fs(unsigned int fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
 FUNDEF WUNUSED ATTR_RETNONNULL REF struct vfs *FCALL handle_get_vfs(unsigned int fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
@@ -552,6 +631,60 @@ FUNDEF WUNUSED ATTR_RETNONNULL REF struct pipe *FCALL handle_get_pipe(unsigned i
 FUNDEF WUNUSED ATTR_RETNONNULL REF struct driver *FCALL handle_get_driver(unsigned int fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
 FUNDEF WUNUSED ATTR_RETNONNULL REF struct pidns *FCALL handle_get_pidns(unsigned int fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
 FUNDEF WUNUSED ATTR_RETNONNULL REF struct socket *FCALL handle_get_socket(unsigned int fd) THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
+
+/* Try to case the given handle `self' into `wanted_type', and return a
+ * reference to a handle-compatible object with type `wanted_type'. If such
+ * a cast is impossible, an `E_INVALID_HANDLE_FILETYPE' error is thrown.
+ * NOTE: This function also inherits a reference to `self' (unless an exception is thrown) */
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF void *FCALL
+handle_as(REF struct handle const *__restrict self, uintptr_half_t wanted_type)
+		THROWS(E_INVALID_HANDLE_FILETYPE);
+
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct inode *FCALL handle_as_inode(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct regular_node *FCALL handle_as_regular_node(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct directory_node *FCALL handle_as_directory_node(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct directory_entry *FCALL handle_as_directory_entry(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_datablock *FCALL handle_as_datablock(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct superblock *FCALL handle_as_superblock(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct superblock *FCALL handle_as_superblock_relaxed(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct path *FCALL handle_as_path(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct taskpid *FCALL handle_as_taskpid(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+/* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct task *FCALL handle_as_task(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm *FCALL handle_as_vm(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct fs *FCALL handle_as_fs(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vfs *FCALL handle_as_vfs(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct pipe *FCALL handle_as_pipe(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct driver *FCALL handle_as_driver(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct pidns *FCALL handle_as_pidns(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct socket *FCALL handle_as_socket(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
+
+#if defined(__cplusplus) && !defined(NO_HANDLE_AS_CXX_OVERLOADS)
+extern "C++" {
+FUNDEF WUNUSED ATTR_RETNONNULL REF void *FCALL
+handle_as(REF struct handle const &__restrict self, uintptr_half_t wanted_type)
+		THROWS(E_INVALID_HANDLE_FILETYPE)
+		ASMNAME("handle_as");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct inode *FCALL handle_as_inode(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_inode");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct regular_node *FCALL handle_as_regular_node(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_regular_node");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct directory_node *FCALL handle_as_directory_node(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_directory_node");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct directory_entry *FCALL handle_as_directory_entry(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_directory_entry");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct vm_datablock *FCALL handle_as_datablock(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_datablock");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct superblock *FCALL handle_as_superblock(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_superblock");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct superblock *FCALL handle_as_superblock_relaxed(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_superblock_relaxed");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct path *FCALL handle_as_path(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_path");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct taskpid *FCALL handle_as_taskpid(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_taskpid");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct task *FCALL handle_as_task(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) ASMNAME("handle_as_task");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct vm *FCALL handle_as_vm(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_vm");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct fs *FCALL handle_as_fs(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_fs");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct vfs *FCALL handle_as_vfs(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_vfs");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct pipe *FCALL handle_as_pipe(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_pipe");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct driver *FCALL handle_as_driver(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_driver");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct pidns *FCALL handle_as_pidns(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_pidns");
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct socket *FCALL handle_as_socket(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_socket");
+} /* extern "C++" */
+#endif /* __cplusplus && !NO_HANDLE_AS_CXX_OVERLOADS */
+
 
 #endif /* __CC__ */
 

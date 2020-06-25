@@ -1441,9 +1441,10 @@ handle_manage_rehash(struct handle_manager *__restrict self)
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: `dst_fd' is outside the allowed handle range.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-PUBLIC NONNULL((1)) void FCALL
+PUBLIC NONNULL((1, 3)) void FCALL
 handle_installinto(struct handle_manager *__restrict self,
-                   unsigned int dst_fd, struct handle hnd)
+                   unsigned int dst_fd,
+                   struct handle const *__restrict hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE) {
@@ -1727,8 +1728,8 @@ handle_lookup_ptr(unsigned int fd, struct handle_manager *__restrict self)
 	return result;
 }
 
-PRIVATE ATTR_RETNONNULL WUNUSED REF struct path *KCALL
-handle_getpath(struct handle const *__restrict hnd) {
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *KCALL
+handle_as_path_noinherit(struct handle const *__restrict hnd) {
 	REF struct path *result;
 	switch (hnd->h_type) {
 
@@ -1844,8 +1845,8 @@ handle_close(unsigned int fd)
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: `dst_fd' is outside the allowed handle range.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-PUBLIC void FCALL
-handle_installinto_sym(unsigned int dst_fd, struct handle hnd)
+PUBLIC NONNULL((2)) void FCALL
+handle_installinto_sym(unsigned int dst_fd, struct handle const *__restrict hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE) {
@@ -1855,7 +1856,7 @@ handle_installinto_sym(unsigned int dst_fd, struct handle hnd)
 	case HANDLE_SYMBOLIC_FDCWD: {
 		REF struct path *p, *oldp;
 		struct fs *f;
-		p = handle_getpath(&hnd);
+		p = handle_as_path_noinherit(hnd);
 		f = THIS_FS;
 		TRY {
 			sync_write(&f->f_pathlock);
@@ -1872,7 +1873,7 @@ handle_installinto_sym(unsigned int dst_fd, struct handle hnd)
 	case HANDLE_SYMBOLIC_FDROOT: {
 		REF struct path *p, *oldp;
 		struct fs *f;
-		p = handle_getpath(&hnd);
+		p = handle_as_path_noinherit(hnd);
 		f = THIS_FS;
 		TRY {
 			sync_write(&f->f_pathlock);
@@ -1893,7 +1894,7 @@ handle_installinto_sym(unsigned int dst_fd, struct handle hnd)
 		struct fs *f;
 		/* Bind DOS per-drive current working directories */
 		id = (dst_fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN));
-		p = handle_getpath(&hnd);
+		p = handle_as_path_noinherit(hnd);
 		f = THIS_FS;
 		TRY {
 			sync_write(&f->f_pathlock);
@@ -1915,7 +1916,7 @@ handle_installinto_sym(unsigned int dst_fd, struct handle hnd)
 		cred_require_driveroot();
 		/* Bind DOS drives */
 		id = (dst_fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN));
-		p = handle_getpath(&hnd);
+		p = handle_as_path_noinherit(hnd);
 		v = THIS_FS->f_vfs;
 		TRY {
 			sync_read(&v->v_drives_lock);
@@ -2037,712 +2038,6 @@ handle_lookup(unsigned int fd)
 		break;
 	}
 	return result;
-}
-
-
-/* Same as `handle_lookup()', but throw an `E_INVALID_HANDLE_FILETYPE'
- * error when the found handle's type doesn't match `type' */
-PUBLIC WUNUSED REF struct handle FCALL
-handle_lookup_type(unsigned int fd, uintptr_half_t type)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	REF struct handle result;
-	result = handle_lookup(fd);
-	if (result.h_type != type) {
-		uintptr_half_t subkind;
-		subkind = handle_typekind(&result);
-		decref_unlikely(result);
-		THROW(E_INVALID_HANDLE_FILETYPE,
-		      fd, type, result.h_type,
-		      HANDLE_TYPEKIND_GENERIC, subkind);
-	}
-	return result;
-}
-
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct inode *FCALL handle_get_inode(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_DATABLOCK:
-		if (vm_datablock_isinode((struct vm_datablock *)result.h_data))
-			return (REF struct inode *)result.h_data;
-		break;
-
-	case HANDLE_TYPE_FILE: {
-		REF struct inode *resnode;
-		resnode = (REF struct inode *)incref(((struct file *)result.h_data)->f_node);
-		decref_unlikely((struct file *)result.h_data);
-		return resnode;
-	}	break;
-
-	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
-		REF struct directory_node *resnode;
-		resnode = (REF struct directory_node *)incref(((struct oneshot_directory_file *)result.h_data)->d_node);
-		decref_unlikely((struct oneshot_directory_file *)result.h_data);
-		return resnode;
-	}	break;
-
-	case HANDLE_TYPE_PATH: {
-		REF struct inode *resnode;
-		TRY {
-			sync_read((struct path *)result.h_data);
-		} EXCEPT {
-			decref_unlikely((struct path *)result.h_data);
-			RETHROW();
-		}
-		resnode = ((struct path *)result.h_data)->p_inode;
-		if unlikely(!resnode) {
-			sync_endread((struct path *)result.h_data);
-			decref_unlikely((struct path *)result.h_data);
-			THROW(E_FSERROR_DELETED,
-			      E_FILESYSTEM_DELETED_UNMOUNTED);
-		}
-		incref(resnode);
-		sync_endread((struct path *)result.h_data);
-		decref_unlikely(result);
-		return resnode;
-	}	break;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE,
-	      fd, HANDLE_TYPE_DATABLOCK, result.h_type,
-	      HANDLE_TYPEKIND_DATABLOCK_INODE, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct regular_node *FCALL
-handle_get_regular_node(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_DATABLOCK:
-		if (vm_datablock_isinode((struct vm_datablock *)result.h_data) &&
-		    INODE_ISREG((struct inode *)result.h_data))
-			return (REF struct regular_node *)result.h_data;
-		break;
-
-	case HANDLE_TYPE_FILE: {
-		REF struct inode *resnode;
-		resnode = ((struct file *)result.h_data)->f_node;
-		if (INODE_ISREG(resnode)) {
-			incref(resnode);
-			decref_unlikely((struct file *)result.h_data);
-			return (REF struct regular_node *)resnode;
-		}
-	}	break;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE,
-	      fd, HANDLE_TYPE_DATABLOCK, result.h_type,
-	      HANDLE_TYPEKIND_DATABLOCK_REGULARNODE, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct directory_node *FCALL
-handle_get_directory_node(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_DATABLOCK:
-		if (vm_datablock_isinode((struct vm_datablock *)result.h_data) &&
-		    INODE_ISDIR((struct inode *)result.h_data))
-			return (REF struct directory_node *)result.h_data;
-		break;
-
-	case HANDLE_TYPE_FILE: {
-		REF struct inode *resnode;
-		resnode = ((struct file *)result.h_data)->f_node;
-		if (INODE_ISDIR(resnode)) {
-			incref(resnode);
-			decref_unlikely((struct file *)result.h_data);
-			return (REF struct directory_node *)resnode;
-		}
-	}	break;
-
-	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
-		REF struct directory_node *resnode;
-		resnode = (REF struct directory_node *)incref(((struct oneshot_directory_file *)result.h_data)->d_node);
-		decref_unlikely((struct oneshot_directory_file *)result.h_data);
-		return resnode;
-	}	break;
-
-	case HANDLE_TYPE_PATH: {
-		REF struct directory_node *resnode;
-		TRY {
-			sync_read((struct path *)result.h_data);
-		} EXCEPT {
-			decref_unlikely((struct path *)result.h_data);
-			RETHROW();
-		}
-		resnode = ((struct path *)result.h_data)->p_inode;
-		if unlikely(!resnode) {
-			sync_endread((struct path *)result.h_data);
-			decref_unlikely((struct path *)result.h_data);
-			THROW(E_FSERROR_DELETED,
-			      E_FILESYSTEM_DELETED_UNMOUNTED);
-		}
-		incref(resnode);
-		sync_endread((struct path *)result.h_data);
-		decref_unlikely((struct path *)result.h_data);
-		return resnode;
-	}	break;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE,
-	      fd, HANDLE_TYPE_DATABLOCK, result.h_type,
-	      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct directory_entry *FCALL
-handle_get_directory_entry(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_DIRECTORYENTRY:
-		return (REF struct directory_entry *)result.h_data;
-
-	case HANDLE_TYPE_FILE:
-	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
-		REF struct directory_entry *resent;
-		STATIC_ASSERT(offsetof(struct file, f_dirent) ==
-		              offsetof(struct oneshot_directory_file, d_dirent));
-		resent = ((struct file *)result.h_data)->f_dirent;
-		if (resent) {
-			incref(resent);
-			decref_unlikely(result);
-			return resent;
-		}
-	}	break;
-
-	case HANDLE_TYPE_PATH: {
-		REF struct directory_entry *resent;
-		TRY {
-			sync_read((struct path *)result.h_data);
-		} EXCEPT {
-			decref_unlikely((REF struct path *)result.h_data);
-			RETHROW();
-		}
-		if unlikely(!((struct path *)result.h_data)->p_inode) {
-			sync_endread((struct path *)result.h_data);
-			decref_unlikely((REF struct path *)result.h_data);
-			THROW(E_FSERROR_DELETED,
-			      E_FILESYSTEM_DELETED_UNMOUNTED);
-		}
-		resent = incref(((struct path *)result.h_data)->p_dirent);
-		sync_endread((struct path *)result.h_data);
-		decref_unlikely((REF struct path *)result.h_data);
-		return resent;
-	}	break;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE,
-	      fd, HANDLE_TYPE_DATABLOCK, result.h_type,
-	      HANDLE_TYPEKIND_DATABLOCK_DIRECTORY, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct vm_datablock *FCALL
-handle_get_datablock(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_DATABLOCK:
-		return (REF struct vm_datablock *)result.h_data;
-
-	case HANDLE_TYPE_FILE: {
-		REF struct inode *resnode;
-		resnode = (REF struct inode *)incref(((struct file *)result.h_data)->f_node);
-		decref_unlikely((struct file *)result.h_data);
-		return resnode;
-	}	break;
-
-	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
-		REF struct directory_node *resnode;
-		resnode = (REF struct directory_node *)incref(((struct oneshot_directory_file *)result.h_data)->d_node);
-		decref_unlikely((struct oneshot_directory_file *)result.h_data);
-		return resnode;
-	}	break;
-
-	case HANDLE_TYPE_PATH: {
-		REF struct inode *resnode;
-		TRY {
-			sync_read((struct path *)result.h_data);
-		} EXCEPT {
-			decref_unlikely((struct path *)result.h_data);
-			RETHROW();
-		}
-		resnode = ((struct path *)result.h_data)->p_inode;
-		if unlikely(!resnode) {
-			sync_endread((struct path *)result.h_data);
-			decref_unlikely((struct path *)result.h_data);
-			THROW(E_FSERROR_DELETED,
-			      E_FILESYSTEM_DELETED_UNMOUNTED);
-		}
-		incref(resnode);
-		sync_endread((struct path *)result.h_data);
-		decref_unlikely((struct path *)result.h_data);
-		return resnode;
-	}	break;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE,
-	      fd, HANDLE_TYPE_DATABLOCK, result.h_type,
-	      HANDLE_TYPEKIND_DATABLOCK_GENERIC, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct superblock *FCALL
-handle_get_superblock(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_DATABLOCK:
-		if (vm_datablock_isinode((struct vm_datablock *)result.h_data) &&
-		    INODE_ISSUPER((struct inode *)result.h_data))
-			return (REF struct superblock *)result.h_data;
-		break;
-
-	case HANDLE_TYPE_FILE: {
-		REF struct inode *resnode;
-		resnode = ((struct file *)result.h_data)->f_node;
-		if (INODE_ISSUPER(resnode)) {
-			incref(resnode);
-			decref_unlikely((struct file *)result.h_data);
-			return (REF struct superblock *)resnode;
-		}
-	}	break;
-
-	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
-		REF struct directory_node *resnode;
-		resnode = ((struct oneshot_directory_file *)result.h_data)->d_node;
-		if (INODE_ISSUPER(resnode)) {
-			incref(resnode);
-			decref_unlikely((struct oneshot_directory_file *)result.h_data);
-			return (REF struct superblock *)resnode;
-		}
-	}	break;
-
-	case HANDLE_TYPE_PATH: {
-		REF struct inode *resnode;
-		TRY {
-			sync_read((struct path *)result.h_data);
-		} EXCEPT {
-			decref_unlikely((struct path *)result.h_data);
-			RETHROW();
-		}
-		resnode = ((struct path *)result.h_data)->p_inode;
-		if unlikely(!resnode) {
-			sync_endread((struct path *)result.h_data);
-			decref_unlikely((struct path *)result.h_data);
-			THROW(E_FSERROR_DELETED,
-			      E_FILESYSTEM_DELETED_UNMOUNTED);
-		}
-		if unlikely(!INODE_ISSUPER(resnode)) {
-			sync_endread((struct path *)result.h_data);
-			decref_unlikely((struct path *)result.h_data);
-			break;
-		}
-		incref(resnode);
-		sync_endread((struct path *)result.h_data);
-		decref_unlikely((struct path *)result.h_data);
-		return (REF struct superblock *)resnode;
-	}	break;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE, fd,
-	      HANDLE_TYPE_DATABLOCK, result.h_type,
-	      HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct superblock *FCALL
-handle_get_superblock_relaxed(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	REF struct superblock *resblock;
-	uintptr_half_t subkind;
-	struct handle result;
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_DATABLOCK:
-		if (vm_datablock_isinode((struct vm_datablock *)result.h_data)) {
-			resblock = ((struct inode *)result.h_data)->i_super;
-			incref(resblock);
-			decref_unlikely((struct inode *)result.h_data);
-			return resblock;
-		}
-		break;
-
-	case HANDLE_TYPE_FILE: {
-		REF struct superblock *resnode;
-		resnode = (REF struct superblock *)incref(((struct file *)result.h_data)->f_node->i_super);
-		decref_unlikely((struct file *)result.h_data);
-		return resnode;
-	}	break;
-
-	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
-		REF struct superblock *resnode;
-		resnode = (REF struct superblock *)incref(((struct oneshot_directory_file *)result.h_data)->d_node->i_super);
-		decref_unlikely((struct oneshot_directory_file *)result.h_data);
-		return resnode;
-	}	break;
-
-	case HANDLE_TYPE_PATH: {
-		REF struct inode *resnode;
-		TRY {
-			sync_read((struct path *)result.h_data);
-		} EXCEPT {
-			decref_unlikely((struct path *)result.h_data);
-			RETHROW();
-		}
-		resnode = ((struct path *)result.h_data)->p_inode;
-		if unlikely(!resnode) {
-			sync_endread((struct path *)result.h_data);
-			decref_unlikely((struct path *)result.h_data);
-			THROW(E_FSERROR_DELETED,
-			      E_FILESYSTEM_DELETED_UNMOUNTED);
-		}
-		resblock = resnode->i_super;
-		incref(resblock);
-		sync_endread((struct path *)result.h_data);
-		decref_unlikely((struct path *)result.h_data);
-		return (REF struct superblock *)resblock;
-	}	break;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE, fd,
-	      HANDLE_TYPE_DATABLOCK, result.h_type,
-	      HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct path *FCALL
-handle_get_path(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_FILE: {
-		REF struct path *respath;
-		respath = incref(((struct file *)result.h_data)->f_path);
-		decref_unlikely((struct file *)result.h_data);
-		return respath;
-	}	break;
-
-	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
-		REF struct path *respath;
-		respath = incref(((struct oneshot_directory_file *)result.h_data)->d_path);
-		decref_unlikely((struct oneshot_directory_file *)result.h_data);
-		return respath;
-	}	break;
-
-	case HANDLE_TYPE_PATH:
-		return (REF struct path *)result.h_data;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE, fd,
-	      HANDLE_TYPE_PATH, result.h_type,
-	      HANDLE_TYPEKIND_GENERIC, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct taskpid *FCALL
-handle_get_taskpid(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_TASK:
-		return (REF struct taskpid *)result.h_data;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE, fd,
-	      HANDLE_TYPE_VM, result.h_type,
-	      HANDLE_TYPEKIND_GENERIC, subkind);
-}
-
-/* @throw: E_PROCESS_EXITED: `fd' belongs to a task that is no longer allocated. */
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct task *FCALL
-handle_get_task(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE, E_PROCESS_EXITED) {
-	uintptr_half_t subkind;
-	struct handle result;
-	switch (fd) {
-
-	case HANDLE_SYMBOLIC_THISTASK:
-		return incref(THIS_TASK);
-
-	case HANDLE_SYMBOLIC_THISPROCESS:
-		return incref(task_getprocess());
-
-	case HANDLE_SYMBOLIC_GROUPLEADER:
-		return task_getprocessgroupleader_srch();
-
-	case HANDLE_SYMBOLIC_SESSIONLEADER:
-		return task_getsessionleader_srch();
-
-	case HANDLE_SYMBOLIC_PARENTPROCESS: {
-		REF struct task *temp;
-		temp = task_getprocessparent();
-		if likely(temp)
-			return temp;
-	}	break;
-
-	default: break;
-	}
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_TASK: {
-		REF struct task *restask;
-		TRY {
-			restask = taskpid_gettask((struct taskpid *)result.h_data);
-			if unlikely(!restask) {
-				THROW(E_PROCESS_EXITED,
-				      taskpid_getpid((struct taskpid *)result.h_data,
-				                     THIS_PIDNS));
-			}
-		} EXCEPT {
-			decref_unlikely((struct taskpid *)result.h_data);
-			RETHROW();
-		}
-		decref_unlikely((struct taskpid *)result.h_data);
-		return restask;
-	}	break;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE, fd,
-	      HANDLE_TYPE_VM, result.h_type,
-	      HANDLE_TYPEKIND_GENERIC, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct vm *FCALL
-handle_get_vm(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	if (fd == HANDLE_SYMBOLIC_THISTASK)
-		return incref(THIS_VM);
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_VM:
-		return (REF struct vm *)result.h_data;
-
-	case HANDLE_TYPE_TASK:
-		if (result.h_data == THIS_TASKPID) {
-			decref_unlikely((struct taskpid *)result.h_data);
-			return incref(THIS_VM);
-		}
-		break;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE, fd,
-	      HANDLE_TYPE_VM, result.h_type,
-	      HANDLE_TYPEKIND_GENERIC, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct fs *FCALL
-handle_get_fs(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	if (fd == HANDLE_SYMBOLIC_THISTASK)
-		return incref(THIS_FS);
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_FS:
-		return (REF struct fs *)result.h_data;
-
-	case HANDLE_TYPE_TASK:
-		if (result.h_data == THIS_TASKPID) {
-			decref_unlikely((struct taskpid *)result.h_data);
-			return incref(THIS_FS);
-		}
-		break;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE, fd,
-	      HANDLE_TYPE_FS, result.h_type,
-	      HANDLE_TYPEKIND_GENERIC, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct vfs *FCALL
-handle_get_vfs(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	if (fd == HANDLE_SYMBOLIC_THISTASK)
-		return (REF struct vfs *)incref(THIS_VFS);
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_PATH:
-		if (((struct path *)result.h_data)->p_vfs == (struct path *)result.h_data)
-			return (REF struct vfs *)result.h_data;
-		break;
-
-	case HANDLE_TYPE_TASK:
-		if (result.h_data == THIS_TASKPID) {
-			decref_unlikely((struct taskpid *)result.h_data);
-			return (REF struct vfs *)incref(THIS_VFS);
-		}
-		break;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE, fd,
-	      HANDLE_TYPE_PATH, result.h_type,
-	      HANDLE_TYPEKIND_PATH_VFSROOT, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct pipe *FCALL
-handle_get_pipe(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_PIPE:
-		return (REF struct pipe *)result.h_data;
-
-	case HANDLE_TYPE_PIPE_READER:
-	case HANDLE_TYPE_PIPE_WRITER: {
-		REF struct pipe *respipe;
-		respipe = incref(((struct pipe_reader *)result.h_data)->pr_pipe);
-		decref_unlikely(result);
-		return respipe;
-	}
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE, fd,
-	      HANDLE_TYPE_PIPE, result.h_type,
-	      HANDLE_TYPEKIND_GENERIC, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct driver *FCALL
-handle_get_driver(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_DRIVER:
-		return (REF struct driver *)result.h_data;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE, fd,
-	      HANDLE_TYPE_DRIVER, result.h_type,
-	      HANDLE_TYPEKIND_GENERIC, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct pidns *FCALL
-handle_get_pidns(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_PIDNS:
-		return (REF struct pidns *)result.h_data;
-
-	case HANDLE_TYPE_TASK:
-		if (result.h_data == THIS_TASKPID) {
-			decref_unlikely((struct taskpid *)result.h_data);
-			return incref(THIS_PIDNS);
-		}
-		break;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE, fd,
-	      HANDLE_TYPE_PIDNS, result.h_type,
-	      HANDLE_TYPEKIND_GENERIC, subkind);
-}
-
-PUBLIC WUNUSED ATTR_RETNONNULL REF struct socket *FCALL
-handle_get_socket(unsigned int fd)
-		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
-	uintptr_half_t subkind;
-	struct handle result;
-	result = handle_lookup(fd);
-	switch (result.h_type) {
-
-	case HANDLE_TYPE_SOCKET:
-		return (REF struct socket *)result.h_data;
-
-	default: break;
-	}
-	subkind = handle_typekind(&result);
-	decref_unlikely(result);
-	THROW(E_INVALID_HANDLE_FILETYPE, fd,
-	      HANDLE_TYPE_SOCKET, result.h_type,
-	      HANDLE_TYPEKIND_GENERIC, subkind);
 }
 
 
@@ -3056,9 +2351,9 @@ handle_fcntl(struct handle_manager *__restrict self,
 
 /* Do everything required to install a handle via a open openfd
  * command data packet that has been passed via user-space. */
-PUBLIC unsigned int FCALL
+PUBLIC NONNULL((2)) unsigned int FCALL
 handle_installhop(USER UNCHECKED struct hop_openfd *data,
-                  struct handle hnd)
+                  struct handle const *__restrict hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE,
@@ -3066,6 +2361,7 @@ handle_installhop(USER UNCHECKED struct hop_openfd *data,
 	u16 mode, flags;
 	unsigned int result_fd;
 	struct handle_manager *man;
+	struct handle used_hnd;
 	man = THIS_HANDLE_MANAGER;
 	validate_writable(data, 1);
 	COMPILER_READ_BARRIER();
@@ -3079,18 +2375,19 @@ handle_installhop(USER UNCHECKED struct hop_openfd *data,
 		      ~(IO_CLOEXEC | IO_CLOFORK),
 		      0);
 	}
-	hnd.h_mode |= flags;
+	used_hnd = *hnd;
+	used_hnd.h_mode |= flags;
 	switch (mode) {
 
 	case HOP_OPENFD_MODE_AUTO:
-		result_fd = handle_install(man, hnd);
+		result_fd = handle_install(man, used_hnd);
 		break;
 
 	case HOP_OPENFD_MODE_HINT:
 		COMPILER_READ_BARRIER();
 		result_fd = (unsigned int)data->of_hint;
 		COMPILER_READ_BARRIER();
-		result_fd = handle_installat(man, result_fd, hnd);
+		result_fd = handle_installat(man, result_fd, used_hnd);
 		break;
 
 	case HOP_OPENFD_MODE_INTO:
@@ -3098,7 +2395,7 @@ handle_installhop(USER UNCHECKED struct hop_openfd *data,
 		result_fd = (unsigned int)data->of_hint;
 		COMPILER_READ_BARRIER();
 		/* Allow for symbolic handle assignments. */
-		handle_installinto_sym(result_fd, hnd);
+		handle_installinto_sym(result_fd, used_hnd);
 		return result_fd;
 
 	case HOP_OPENFD_MODE_INTO_EXACT:
@@ -3106,7 +2403,7 @@ handle_installhop(USER UNCHECKED struct hop_openfd *data,
 		result_fd = (unsigned int)data->of_hint;
 		COMPILER_READ_BARRIER();
 		/* Don't allow for symbolic handle assignments. */
-		handle_installinto(man, result_fd, hnd);
+		handle_installinto(man, result_fd, used_hnd);
 		return result_fd;
 
 	default:

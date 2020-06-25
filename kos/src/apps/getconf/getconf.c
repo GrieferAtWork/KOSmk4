@@ -44,12 +44,12 @@ DECL_BEGIN
 #define CONFTYPE_SYSCONF  3 /* Use `sysconf()' to determine value */
 
 struct conf {
-	char const *c_name;       /* [1..1] Config name */
+	char const  *c_name;      /* [1..1] Config name */
 	unsigned int c_id : 30;   /* Configuration ID */
 	unsigned int c_type : 2;  /* Configuration type */
 #if __SIZEOF_POINTER__ > 4
-	uint32_t _c_pad; /* ... */
-#endif               /* __SIZEOF_POINTER__ > 4 */
+	uint32_t    _c_pad; /* ... */
+#endif /* __SIZEOF_POINTER__ > 4 */
 };
 
 #define LONGEST_CONF_NAME_NAMELENGTH_PLUS_1 34 /* "_POSIX_THREAD_ROBUST_PRIO_PROTECT" */
@@ -556,10 +556,10 @@ int main(int argc, char *argv[]) {
 	}
 	if (strcmp(argv[0], "-a") == 0) {
 		char const *path = "/";
-		if unlikely(argc > 1)
+		if unlikely(argc > 2)
 			goto bad_usage;
-		if (argc == 1)
-			path = argv[0];
+		if (argc == 2)
+			path = argv[1];
 		printall(path);
 	} else {
 		struct conf const *cfg;

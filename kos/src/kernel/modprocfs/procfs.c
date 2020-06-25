@@ -26,8 +26,10 @@
 #include <kernel/compiler.h>
 
 #include <fs/node.h>
-#include <kernel/printk.h>
 #include <kernel/driver.h>
+#include <kernel/printk.h>
+
+#include <linux/magic.h>
 
 #include <libvio/api.h>
 
@@ -104,7 +106,18 @@ INTERN struct superblock ProcFS = {
 	/* .s_mount        = */ LLIST_INIT,
 	/* .s_cblock_next  = */ NULL,
 	/* .s_umount_pend  = */ NULL,
-	/* .s_filesystems  = */ SLIST_INITNODE
+	/* .s_filesystems  = */ SLIST_INITNODE,
+	/* .s_features     = */ {
+		/* .sf_symlink_max        = */ (pos_t)-1,
+		/* .sf_link_max           = */ (nlink_t)-1,
+		/* .sf_magic              = */ PROC_SUPER_MAGIC,
+		/* .sf_rec_incr_xfer_size = */ PAGESIZE,
+		/* .sf_rec_max_xfer_size  = */ PAGESIZE,
+		/* .sf_rec_min_xfer_size  = */ PAGESIZE,
+		/* .sf_rec_xfer_align     = */ PAGESIZE,
+		/* .sf_name_max           = */ (u16)-1,
+		/* .sf_filesizebits       = */ 64,
+	},
 };
 
 

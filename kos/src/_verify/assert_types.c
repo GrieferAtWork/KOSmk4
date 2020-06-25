@@ -471,18 +471,18 @@ static_assert(sizeof(struct __flock32) == __SIZEOF_FLOCK32);
 #include <bits/itimerspec.h>
 
 /* struct itimerspec */
-static_assert(offsetof(struct itimerspec, it_value) == __OFFSET_ITIMERSPEC_VALUE);
 static_assert(offsetof(struct itimerspec, it_interval) == __OFFSET_ITIMERSPEC_INTERVAL);
+static_assert(offsetof(struct itimerspec, it_value) == __OFFSET_ITIMERSPEC_VALUE);
 static_assert(sizeof(struct itimerspec) == __SIZEOF_ITIMERSPEC);
 
 /* struct __itimerspec64 */
-static_assert(offsetof(struct __itimerspec64, it_value) == __OFFSET_ITIMERSPEC64_VALUE);
 static_assert(offsetof(struct __itimerspec64, it_interval) == __OFFSET_ITIMERSPEC64_INTERVAL);
+static_assert(offsetof(struct __itimerspec64, it_value) == __OFFSET_ITIMERSPEC64_VALUE);
 static_assert(sizeof(struct __itimerspec64) == __SIZEOF_ITIMERSPEC64);
 
 /* struct __itimerspec32 */
-static_assert(offsetof(struct __itimerspec32, it_value) == __OFFSET_ITIMERSPEC32_VALUE);
 static_assert(offsetof(struct __itimerspec32, it_interval) == __OFFSET_ITIMERSPEC32_INTERVAL);
+static_assert(offsetof(struct __itimerspec32, it_value) == __OFFSET_ITIMERSPEC32_VALUE);
 static_assert(sizeof(struct __itimerspec32) == __SIZEOF_ITIMERSPEC32);
 
 
@@ -492,18 +492,18 @@ static_assert(sizeof(struct __itimerspec32) == __SIZEOF_ITIMERSPEC32);
 #include <bits/itimerval.h>
 
 /* struct itimerval */
-static_assert(offsetof(struct itimerval, it_value) == __OFFSET_ITIMERVAL_VALUE);
 static_assert(offsetof(struct itimerval, it_interval) == __OFFSET_ITIMERVAL_INTERVAL);
+static_assert(offsetof(struct itimerval, it_value) == __OFFSET_ITIMERVAL_VALUE);
 static_assert(sizeof(struct itimerval) == __SIZEOF_ITIMERVAL);
 
 /* struct __itimerval64 */
-static_assert(offsetof(struct __itimerval64, it_value) == __OFFSET_ITIMERVAL64_VALUE);
 static_assert(offsetof(struct __itimerval64, it_interval) == __OFFSET_ITIMERVAL64_INTERVAL);
+static_assert(offsetof(struct __itimerval64, it_value) == __OFFSET_ITIMERVAL64_VALUE);
 static_assert(sizeof(struct __itimerval64) == __SIZEOF_ITIMERVAL64);
 
 /* struct __itimerval32 */
-static_assert(offsetof(struct __itimerval32, it_value) == __OFFSET_ITIMERVAL32_VALUE);
 static_assert(offsetof(struct __itimerval32, it_interval) == __OFFSET_ITIMERVAL32_INTERVAL);
+static_assert(offsetof(struct __itimerval32, it_value) == __OFFSET_ITIMERVAL32_VALUE);
 static_assert(sizeof(struct __itimerval32) == __SIZEOF_ITIMERVAL32);
 
 
@@ -513,8 +513,8 @@ static_assert(sizeof(struct __itimerval32) == __SIZEOF_ITIMERVAL32);
 #include <bits/mmsghdr-struct.h>
 
 /* struct mmsghdr */
-static_assert(offsetof(struct mmsghdr, msg_len) == __OFFSET_MMSGHDR_LEN);
 static_assert(offsetof(struct mmsghdr, msg_hdr) == __OFFSET_MMSGHDR_HDR);
+static_assert(offsetof(struct mmsghdr, msg_len) == __OFFSET_MMSGHDR_LEN);
 static_assert(sizeof(struct mmsghdr) == __SIZEOF_MMSGHDR);
 static_assert(alignof(struct mmsghdr) == __ALIGNOF_MMSGHDR);
 
@@ -850,18 +850,18 @@ static_assert(sizeof(struct __timeb32) == __SIZEOF_TIMEB32);
 #include <bits/timespec.h>
 
 /* struct timespec */
-static_assert(offsetof(struct timespec, tv_sec) == __OFFSET_TIMESPEC_SEC);
 static_assert(offsetof(struct timespec, tv_nsec) == __OFFSET_TIMESPEC_NSEC);
+static_assert(offsetof(struct timespec, tv_sec) == __OFFSET_TIMESPEC_SEC);
 static_assert(sizeof(struct timespec) == __SIZEOF_TIMESPEC);
 
 /* struct __timespec64 */
-static_assert(offsetof(struct __timespec64, tv_sec) == __OFFSET_TIMESPEC64_SEC);
 static_assert(offsetof(struct __timespec64, tv_nsec) == __OFFSET_TIMESPEC64_NSEC);
+static_assert(offsetof(struct __timespec64, tv_sec) == __OFFSET_TIMESPEC64_SEC);
 static_assert(sizeof(struct __timespec64) == __SIZEOF_TIMESPEC64);
 
 /* struct __timespec32 */
-static_assert(offsetof(struct __timespec32, tv_sec) == __OFFSET_TIMESPEC32_SEC);
 static_assert(offsetof(struct __timespec32, tv_nsec) == __OFFSET_TIMESPEC32_NSEC);
+static_assert(offsetof(struct __timespec32, tv_sec) == __OFFSET_TIMESPEC32_SEC);
 static_assert(sizeof(struct __timespec32) == __SIZEOF_TIMESPEC32);
 
 
@@ -871,18 +871,18 @@ static_assert(sizeof(struct __timespec32) == __SIZEOF_TIMESPEC32);
 #include <bits/timeval.h>
 
 /* struct timeval */
-static_assert(offsetof(struct timeval, tv_usec) == __OFFSET_TIMEVAL_USEC);
 static_assert(offsetof(struct timeval, tv_sec) == __OFFSET_TIMEVAL_SEC);
+static_assert(offsetof(struct timeval, tv_usec) == __OFFSET_TIMEVAL_USEC);
 static_assert(sizeof(struct timeval) == __SIZEOF_TIMEVAL);
 
 /* struct __timeval64 */
-static_assert(offsetof(struct __timeval64, tv_usec) == __OFFSET_TIMEVAL64_USEC);
 static_assert(offsetof(struct __timeval64, tv_sec) == __OFFSET_TIMEVAL64_SEC);
+static_assert(offsetof(struct __timeval64, tv_usec) == __OFFSET_TIMEVAL64_USEC);
 static_assert(sizeof(struct __timeval64) == __SIZEOF_TIMEVAL64);
 
 /* struct __timeval32 */
-static_assert(offsetof(struct __timeval32, tv_usec) == __OFFSET_TIMEVAL32_USEC);
 static_assert(offsetof(struct __timeval32, tv_sec) == __OFFSET_TIMEVAL32_SEC);
+static_assert(offsetof(struct __timeval32, tv_usec) == __OFFSET_TIMEVAL32_USEC);
 static_assert(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
 
 
@@ -892,18 +892,18 @@ static_assert(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
 #include <bits/utimbuf.h>
 
 /* struct utimbuf */
-static_assert(offsetof(struct utimbuf, modtime) == __OFFSET_UTIMBUF_MODTIME);
 static_assert(offsetof(struct utimbuf, actime) == __OFFSET_UTIMBUF_ACTIME);
+static_assert(offsetof(struct utimbuf, modtime) == __OFFSET_UTIMBUF_MODTIME);
 static_assert(sizeof(struct utimbuf) == __SIZEOF_UTIMBUF);
 
 /* struct __utimbuf64 */
-static_assert(offsetof(struct __utimbuf64, modtime) == __OFFSET_UTIMBUF64_MODTIME);
 static_assert(offsetof(struct __utimbuf64, actime) == __OFFSET_UTIMBUF64_ACTIME);
+static_assert(offsetof(struct __utimbuf64, modtime) == __OFFSET_UTIMBUF64_MODTIME);
 static_assert(sizeof(struct __utimbuf64) == __SIZEOF_UTIMBUF64);
 
 /* struct __utimbuf32 */
-static_assert(offsetof(struct __utimbuf32, modtime) == __OFFSET_UTIMBUF32_MODTIME);
 static_assert(offsetof(struct __utimbuf32, actime) == __OFFSET_UTIMBUF32_ACTIME);
+static_assert(offsetof(struct __utimbuf32, modtime) == __OFFSET_UTIMBUF32_MODTIME);
 static_assert(sizeof(struct __utimbuf32) == __SIZEOF_UTIMBUF32);
 
 
@@ -991,13 +991,13 @@ static_assert(offsetof(struct elf64_sym, st_value) == __OFFSET_ELF64_SYM_VALUE);
 static_assert(sizeof(struct elf64_sym) == __SIZEOF_ELF64_SYM);
 
 /* struct elf32_syminfo */
-static_assert(offsetof(struct elf32_syminfo, si_flags) == __OFFSET_ELF32_SYMINFO_FLAGS);
 static_assert(offsetof(struct elf32_syminfo, si_boundto) == __OFFSET_ELF32_SYMINFO_BOUNDTO);
+static_assert(offsetof(struct elf32_syminfo, si_flags) == __OFFSET_ELF32_SYMINFO_FLAGS);
 static_assert(sizeof(struct elf32_syminfo) == __SIZEOF_ELF32_SYMINFO);
 
 /* struct elf64_syminfo */
-static_assert(offsetof(struct elf64_syminfo, si_flags) == __OFFSET_ELF64_SYMINFO_FLAGS);
 static_assert(offsetof(struct elf64_syminfo, si_boundto) == __OFFSET_ELF64_SYMINFO_BOUNDTO);
+static_assert(offsetof(struct elf64_syminfo, si_flags) == __OFFSET_ELF64_SYMINFO_FLAGS);
 static_assert(sizeof(struct elf64_syminfo) == __SIZEOF_ELF64_SYMINFO);
 
 /* struct elf32_rel */
@@ -1083,14 +1083,14 @@ static_assert(sizeof(struct elf64_verdef) == __SIZEOF_ELF64_VERDEF);
 static_assert(alignof(struct elf64_verdef) == __ALIGNOF_ELF64_VERDEF);
 
 /* struct elf32_verdaux */
-static_assert(offsetof(struct elf32_verdaux, vda_next) == __OFFSET_ELF32_VERDAUX_NEXT);
 static_assert(offsetof(struct elf32_verdaux, vda_name) == __OFFSET_ELF32_VERDAUX_NAME);
+static_assert(offsetof(struct elf32_verdaux, vda_next) == __OFFSET_ELF32_VERDAUX_NEXT);
 static_assert(sizeof(struct elf32_verdaux) == __SIZEOF_ELF32_VERDAUX);
 static_assert(alignof(struct elf32_verdaux) == __ALIGNOF_ELF32_VERDAUX);
 
 /* struct elf64_verdaux */
-static_assert(offsetof(struct elf64_verdaux, vda_next) == __OFFSET_ELF64_VERDAUX_NEXT);
 static_assert(offsetof(struct elf64_verdaux, vda_name) == __OFFSET_ELF64_VERDAUX_NAME);
+static_assert(offsetof(struct elf64_verdaux, vda_next) == __OFFSET_ELF64_VERDAUX_NEXT);
 static_assert(sizeof(struct elf64_verdaux) == __SIZEOF_ELF64_VERDAUX);
 static_assert(alignof(struct elf64_verdaux) == __ALIGNOF_ELF64_VERDAUX);
 
@@ -1131,14 +1131,14 @@ static_assert(sizeof(struct elf64_vernaux) == __SIZEOF_ELF64_VERNAUX);
 static_assert(alignof(struct elf64_vernaux) == __ALIGNOF_ELF64_VERNAUX);
 
 /* struct elf32_auxv_t */
-static_assert(offsetof(struct elf32_auxv_t, a_un.a_val) == __OFFSET_ELF32_AUXV_VAL);
 static_assert(offsetof(struct elf32_auxv_t, a_type) == __OFFSET_ELF32_AUXV_TYPE);
+static_assert(offsetof(struct elf32_auxv_t, a_un.a_val) == __OFFSET_ELF32_AUXV_VAL);
 static_assert(sizeof(struct elf32_auxv_t) == __SIZEOF_ELF32_AUXV);
 static_assert(alignof(struct elf32_auxv_t) == __ALIGNOF_ELF32_AUXV);
 
 /* struct elf64_auxv_t */
-static_assert(offsetof(struct elf64_auxv_t, a_un.a_val) == __OFFSET_ELF64_AUXV_VAL);
 static_assert(offsetof(struct elf64_auxv_t, a_type) == __OFFSET_ELF64_AUXV_TYPE);
+static_assert(offsetof(struct elf64_auxv_t, a_un.a_val) == __OFFSET_ELF64_AUXV_VAL);
 static_assert(sizeof(struct elf64_auxv_t) == __SIZEOF_ELF64_AUXV);
 static_assert(alignof(struct elf64_auxv_t) == __ALIGNOF_ELF64_AUXV);
 
@@ -1195,8 +1195,8 @@ static_assert(sizeof(struct elf_options) == __SIZEOF_ELF_OPTIONS);
 static_assert(alignof(struct elf_options) == __ALIGNOF_ELF_OPTIONS);
 
 /* struct elf_options_hw */
-static_assert(offsetof(struct elf_options_hw, hwp_flags2) == __OFFSET_ELF_OPTIONS_HW_FLAGS2);
 static_assert(offsetof(struct elf_options_hw, hwp_flags1) == __OFFSET_ELF_OPTIONS_HW_FLAGS1);
+static_assert(offsetof(struct elf_options_hw, hwp_flags2) == __OFFSET_ELF_OPTIONS_HW_FLAGS2);
 static_assert(sizeof(struct elf_options_hw) == __SIZEOF_ELF_OPTIONS_HW);
 static_assert(alignof(struct elf_options_hw) == __ALIGNOF_ELF_OPTIONS_HW);
 
@@ -1544,6 +1544,21 @@ static_assert(offsetof(struct hop_directory_mkdir, dmd_node) == __OFFSET_HOP_DIR
 static_assert(offsetof(struct hop_directory_mkdir, dmd_owner) == __OFFSET_HOP_DIRECTORY_MKDIR_OWNER);
 static_assert(offsetof(struct hop_directory_mkdir, dmd_struct_size) == __OFFSET_HOP_DIRECTORY_MKDIR_STRUCT_SIZE);
 static_assert(sizeof(struct hop_directory_mkdir) == __SIZEOF_HOP_DIRECTORY_MKDIR);
+
+/* struct hop_superblock_features */
+static_assert(offsetof(struct hop_superblock_features, sbf_features) == __OFFSET_HOP_SUPERBLOCK_FEATURES_FEATURES);
+static_assert(offsetof(struct hop_superblock_features, sbf_filesizebits) == __OFFSET_HOP_SUPERBLOCK_FEATURES_FILESIZEBITS);
+static_assert(offsetof(struct hop_superblock_features, sbf_link_max) == __OFFSET_HOP_SUPERBLOCK_FEATURES_LINK_MAX);
+static_assert(offsetof(struct hop_superblock_features, sbf_magic) == __OFFSET_HOP_SUPERBLOCK_FEATURES_MAGIC);
+static_assert(offsetof(struct hop_superblock_features, sbf_name_max) == __OFFSET_HOP_SUPERBLOCK_FEATURES_NAME_MAX);
+static_assert(offsetof(struct hop_superblock_features, sbf_rec_incr_xfer_size) == __OFFSET_HOP_SUPERBLOCK_FEATURES_REC_INCR_XFER_SIZE);
+static_assert(offsetof(struct hop_superblock_features, sbf_rec_max_xfer_size) == __OFFSET_HOP_SUPERBLOCK_FEATURES_REC_MAX_XFER_SIZE);
+static_assert(offsetof(struct hop_superblock_features, sbf_rec_min_xfer_size) == __OFFSET_HOP_SUPERBLOCK_FEATURES_REC_MIN_XFER_SIZE);
+static_assert(offsetof(struct hop_superblock_features, sbf_rec_xfer_align) == __OFFSET_HOP_SUPERBLOCK_FEATURES_REC_XFER_ALIGN);
+static_assert(offsetof(struct hop_superblock_features, sbf_sector_size) == __OFFSET_HOP_SUPERBLOCK_FEATURES_SECTOR_SIZE);
+static_assert(offsetof(struct hop_superblock_features, sbf_struct_size) == __OFFSET_HOP_SUPERBLOCK_FEATURES_STRUCT_SIZE);
+static_assert(offsetof(struct hop_superblock_features, sbf_symlink_max) == __OFFSET_HOP_SUPERBLOCK_FEATURES_SYMLINK_MAX);
+static_assert(sizeof(struct hop_superblock_features) == __SIZEOF_HOP_SUPERBLOCK_FEATURES);
 
 
 

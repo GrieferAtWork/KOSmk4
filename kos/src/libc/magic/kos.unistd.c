@@ -118,14 +118,7 @@ void SetGid($gid_t gid);
 [[section(".text.crt{|.dos}.except.sched.access")]]
 $pid_t Fork();
 
-%
-[[throws, wunused, doc_alias("fpathconf")]]
-[[section(".text.crt{|.dos}.except.fs.property")]]
-long int FPathConf($fd_t fd, int name);
-
-
 %[default:section(".text.crt{|.dos}.except.fs.modify")]
-
 
 %
 [[cp, throws, doc_alias("chown")]]
@@ -133,11 +126,6 @@ long int FPathConf($fd_t fd, int name);
 void Chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	FChownAt(__CRT_AT_FDCWD, file, owner, group, 0);
 }
-
-%
-[[cp, throws, doc_alias("pathconf")]]
-[[section(".text.crt{|.dos}.except.fs.property")]]
-long int PathConf([[nonnull]] char const *path, int name);
 
 %
 [[cp, throws, doc_alias("link")]]

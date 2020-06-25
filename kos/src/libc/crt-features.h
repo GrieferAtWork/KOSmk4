@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31db18a1 */
+/* HASH CRC-32:0xca657caf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,6 @@
 #define __CRT_HAVE_DOS$FExecve 1
 #define __CRT_HAVE_DOS$FMkdirAt 1
 #define __CRT_HAVE_DOS$FMknodAt 1
-#define __CRT_HAVE_DOS$FPathConf 1
 #define __CRT_HAVE_DOS$FReadlinkAt 1
 #define __CRT_HAVE_DOS$FSync 1
 #define __CRT_HAVE_DOS$FTruncate 1
@@ -102,7 +101,6 @@
 #define __CRT_HAVE_DOS$PValloc 1
 #define __CRT_HAVE_DOS$PWrite 1
 #define __CRT_HAVE_DOS$PWrite64 1
-#define __CRT_HAVE_DOS$PathConf 1
 #define __CRT_HAVE_DOS$Pipe 1
 #define __CRT_HAVE_DOS$Pipe2 1
 #define __CRT_HAVE_DOS$Read 1
@@ -2913,7 +2911,6 @@
 #define __CRT_HAVE_FExecve 1
 #define __CRT_HAVE_FMkdirAt 1
 #define __CRT_HAVE_FMknodAt 1
-#define __CRT_HAVE_FPathConf 1
 #define __CRT_HAVE_FReadlinkAt 1
 #define __CRT_HAVE_FSync 1
 #define __CRT_HAVE_FTruncate 1
@@ -2961,7 +2958,6 @@
 #define __CRT_HAVE_PValloc 1
 #define __CRT_HAVE_PWrite 1
 #define __CRT_HAVE_PWrite64 1
-#define __CRT_HAVE_PathConf 1
 #define __CRT_HAVE_Pipe 1
 #define __CRT_HAVE_Pipe2 1
 #define __CRT_HAVE_Read 1

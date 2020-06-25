@@ -48,7 +48,6 @@
 #define __CRT_HAVE_FExecve 1
 #define __CRT_HAVE_FMkdirAt 1
 #define __CRT_HAVE_FMknodAt 1
-#define __CRT_HAVE_FPathConf 1
 #define __CRT_HAVE_FReadlinkAt 1
 #define __CRT_HAVE_FSync 1
 #define __CRT_HAVE_FTruncate 1
@@ -105,7 +104,6 @@
 #define __CRT_HAVE_PValloc 1
 #define __CRT_HAVE_PWrite 1
 #define __CRT_HAVE_PWrite64 1
-#define __CRT_HAVE_PathConf 1
 #define __CRT_HAVE_Pipe 1
 #define __CRT_HAVE_Pipe2 1
 #define __CRT_HAVE_Read 1
@@ -1041,7 +1039,6 @@
 #define __CRT_HAVE__setjmpex 1
 #define __CRT_HAVE__setmaxstdio 1
 #define __CRT_HAVE__setmode 1
-#define __CRT_HAVE__signal 1
 #define __CRT_HAVE__snprintf 1
 #define __CRT_HAVE__snprintf_c 1
 #define __CRT_HAVE__snprintf_c_l 1
@@ -4421,7 +4418,6 @@
 #define __CRT_HAVE_KOS$FExecve 1
 #define __CRT_HAVE_KOS$FMkdirAt 1
 #define __CRT_HAVE_KOS$FMknodAt 1
-#define __CRT_HAVE_KOS$FPathConf 1
 #define __CRT_HAVE_KOS$FReadlinkAt 1
 #define __CRT_HAVE_KOS$FSync 1
 #define __CRT_HAVE_KOS$FTruncate 1
@@ -4467,7 +4463,6 @@
 #define __CRT_HAVE_KOS$PValloc 1
 #define __CRT_HAVE_KOS$PWrite 1
 #define __CRT_HAVE_KOS$PWrite64 1
-#define __CRT_HAVE_KOS$PathConf 1
 #define __CRT_HAVE_KOS$Pipe 1
 #define __CRT_HAVE_KOS$Pipe2 1
 #define __CRT_HAVE_KOS$Read 1
@@ -5262,7 +5257,7 @@
 #define __CRT_HAVE_KOS$_seterrormode 1
 #define __CRT_HAVE_KOS$_setmaxstdio 1
 #define __CRT_HAVE_KOS$_setmode 1
-#define __CRT_HAVE_KOS$_signal 1
+#define __CRT_HAVE__signal 1
 #define __CRT_HAVE_KOS$_snprintf 1
 #define __CRT_HAVE_KOS$_snprintf_c 1
 #define __CRT_HAVE_KOS$_snprintf_c_l 1
@@ -7783,7 +7778,6 @@
 #define __CRT_HAVE_DOS$FExecve 1
 #define __CRT_HAVE_DOS$FMkdirAt 1
 #define __CRT_HAVE_DOS$FMknodAt 1
-#define __CRT_HAVE_DOS$FPathConf 1
 #define __CRT_HAVE_DOS$FReadlinkAt 1
 #define __CRT_HAVE_DOS$FSync 1
 #define __CRT_HAVE_DOS$FTruncate 1
@@ -7829,7 +7823,6 @@
 #define __CRT_HAVE_DOS$PValloc 1
 #define __CRT_HAVE_DOS$PWrite 1
 #define __CRT_HAVE_DOS$PWrite64 1
-#define __CRT_HAVE_DOS$PathConf 1
 #define __CRT_HAVE_DOS$Pipe 1
 #define __CRT_HAVE_DOS$Pipe2 1
 #define __CRT_HAVE_DOS$Read 1

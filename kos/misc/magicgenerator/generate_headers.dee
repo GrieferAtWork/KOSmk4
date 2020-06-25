@@ -880,7 +880,6 @@ try {
 	messagePrefix = "3/3";
 
 	startTask(updateHashedFile, ("include/gnu/stubs.h", doPrint_include_gnu_stubs));
-	waitTasks();
 
 	/* Generate all of the needed <local/...> headers */
 	local printedLocalFunctions: HashSet with LocalFunction = HashSet();

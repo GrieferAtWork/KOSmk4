@@ -114,16 +114,6 @@ struct inode_type {
 		void (KCALL *a_maskattr)(struct inode *__restrict self)
 				/*THROWS(E_FSERROR_UNSUPPORTED_OPERATION, ...)*/;
 
-		/* [0..1]
-		 * Query information about hard limits on various filesystem objects.
-		 * @param: name: One of `_PC_*' from `<bits/confname.h>'
-		 * @return: INODE_PATHCONF_UNDEDEFINED: The given `name' is not implemented by the underlying filesystem.
-		 * For more details on how this operator is invoked, see the documentation of `inode_pathconf()' */
-		NONNULL((1))
-		intptr_t (KCALL *a_pathconf)(struct inode *__restrict self, unsigned int name)
-				THROWS(...);
-#define INODE_PATHCONF_UNDEDEFINED  (-22) /* -EINVAL */
-
 		/* [0..1] General-purpose handler for ioctl() requests */
 		NONNULL((1))
 		syscall_slong_t (KCALL *a_ioctl)(struct inode *__restrict self, syscall_ulong_t cmd,
@@ -1234,39 +1224,6 @@ inode_ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
             USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...);
 
-/* Return information on hard limits for the given INode.
- * @param: name: One of `_PC_*' from `<bits/confname.h>'
- * @return: INODE_PATHCONF_UNDEDEFINED: The given `name' is not implemented by the underlying filesystem.
- * NOTE: This function invokes the `io_pathconf' operator of given INode `self'.
- *       If that operator isn't implemented or returns `INODE_PATHCONF_UNDEDEFINED',
- *       the same operator is re-invoked on `self->i_super->s_rootdir'.
- *       If that operator isn't implemented, or returns `INODE_PATHCONF_UNDEDEFINED'
- *       too, the following values are returned for specific `name's,
- *       or `INODE_PATHCONF_UNDEDEFINED' for any other name:
- * - _PC_LINK_MAX:           LINK_MAX     (From <linux/limits.h>)  (or `1' when the link operator isn't implemented for the INode itself, or the filesystem root)
- * - _PC_MAX_CANON:          MAX_CANON    (From <linux/limits.h>)
- * - _PC_MAX_INPUT:          MAX_INPUT    (From <linux/limits.h>)
- * - _PC_NAME_MAX:           65535
- * - _PC_PATH_MAX:           LONG_MAX
- * - _PC_PIPE_BUF:           PIPE_BUF     (From <linux/limits.h>)
- * - _PC_CHOWN_RESTRICTED:   0
- * - _PC_NO_TRUNC:           1
- * - _PC_VDISABLE:           '\0'
- * - _PC_FILESIZEBITS:       64
- * - _PC_REC_INCR_XFER_SIZE: VM_DATABLOCK_PAGESIZE(self)
- * - _PC_REC_MAX_XFER_SIZE:  VM_DATABLOCK_PAGESIZE(self) * (BITS_PER_POINTER / VM_DATAPART_PPP_BITS)
- * - _PC_REC_MIN_XFER_SIZE:  VM_DATABLOCK_PAGESIZE(self)
- * - _PC_REC_XFER_ALIGN:     VM_DATABLOCK_PAGESIZE(self)
- * - _PC_ALLOC_SIZE_MIN:     VM_DATABLOCK_PAGESIZE(self)
- * - _PC_SYMLINK_MAX:        self->i_type->it_directory.d_symlink != NULL ? LONG_MAX : 0
- * - _PC_2_SYMLINKS:         self->i_type->it_directory.d_symlink != NULL ? 1 : 0
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
- * @throw: E_IOERROR:  Failed to read/write data to/from disk. */
-FUNDEF WUNUSED NONNULL((1)) intptr_t KCALL
-inode_pathconf(struct inode *__restrict self, unsigned int name)
-		THROWS(E_FSERROR_DELETED, E_IOERROR, ...);
-
 /* Change all non-NULL the timestamp that are given.
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
  * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
@@ -1887,10 +1844,25 @@ struct superblock_type {
 		 *       discarded when multiple tasks attempt to open a
 		 *       given device as a superblock at the same time.
 		 * This function must initialize the following members of `self':
+		 *   - s_features.sf_magic
 		 *   - i_fileino
 		 *   - i_type
 		 *   - i_fsdata      (Optionally; pre-initialized to `NULL')
 		 *   - db_pageshift
+		 * Prior to being invoked, the following fields are already initialized:
+		 *   - s_features.sf_symlink_max        = (pos_t)-1
+		 *   - s_features.sf_link_max           = (nlink_t)-1
+		 *   - s_features.sf_rec_incr_xfer_size = 0
+		 *   - s_features.sf_rec_max_xfer_size  = 0
+		 *   - s_features.sf_rec_min_xfer_size  = 0
+		 *   - s_features.sf_rec_xfer_align     = 0
+		 *   - s_features.sf_name_max           = (u16)-1
+		 *   - s_features.sf_filesizebits       = 64
+		 * Following the invocation, the following fields may be initialized:
+		 *   - s_features.sf_rec_incr_xfer_size = VM_DATABLOCK_PAGESIZE(self)   (if `st_open' returned with this field left at `0')
+		 *   - s_features.sf_rec_max_xfer_size  = VM_DATABLOCK_PAGESIZE(self)   (if `st_open' returned with this field left at `0')
+		 *   - s_features.sf_rec_min_xfer_size  = VM_DATABLOCK_PAGESIZE(self)   (if `st_open' returned with this field left at `0')
+		 *   - s_features.sf_rec_xfer_align     = VM_DATABLOCK_PAGESIZE(self)   (if `st_open' returned with this field left at `0')
 		 * After this, the caller will add the superblock to the global chain
 		 * of existing superblocks through use of the `s_filesystems' field.
 		 * @param: args: Type-specific user-space data passed to the constructor.
@@ -1972,6 +1944,20 @@ struct superblock_type {
 #define __private_superblock_type_destroy(self) driver_destroy((self)->st_driver)
 DEFINE_REFCOUNT_FUNCTIONS(struct superblock_type, st_driver->d_refcnt, __private_superblock_type_destroy);
 
+struct superblock_features {
+	pos_t   sf_symlink_max;        /* Max length of text contained within symbolic links */
+	nlink_t sf_link_max;           /* Max # links a file may have */
+	u32     sf_magic;              /* Filesystem ~magic~ (one of the constants from `<linux/magic.h>') */
+	u32     sf_rec_incr_xfer_size; /* Buffer size increments for efficient disk transfer operations */
+	u32     sf_rec_max_xfer_size;  /* Max buffer size for efficient disk transfer operations */
+	u32     sf_rec_min_xfer_size;  /* Min buffer size for efficient disk transfer operations */
+	u32     sf_rec_xfer_align;     /* Required in-memory buffer alignment for efficient disk transfer operations */
+	u16     sf_name_max;           /* Max # chars in a file name */
+	u8      sf_filesizebits;       /* Max # of bits in a file's size field (usually 64 or 32) */
+};
+#define superblock_features_has_symlink(self) ((self)->sf_symlink_max != 0)
+#define superblock_features_has_hrdlink(self) ((self)->sf_link_max > 1)
+
 
 #ifndef SUPERBLOCK_FNORMAL
 #define SUPERBLOCK_FNORMAL      0x0000 /* Normal superblock flags. */
@@ -2020,6 +2006,7 @@ struct superblock
 	WEAK REF struct path         *s_umount_pend;  /* [0..1] Chain of paths which are pending to be removed from `s_mount'
 	                                               * [CHAIN(->p_mount->mp_pending)] Chain of paths that are pending to be removed from `s_mount'. */
 	SLIST_NODE(struct superblock) s_filesystems;  /* [lock(fs_filesystems.f_superlock)] Chain of known filesystems. */
+	struct superblock_features    s_features;     /* [const] Superblock features. */
 	/* Filesystem-specific superblock data goes here! */
 };
 
@@ -2141,6 +2128,7 @@ FUNDEF NONNULL((1, 2)) void KCALL
 superblock_statfs(struct superblock *__restrict self,
                   USER CHECKED struct statfs *result)
 		THROWS(E_IOERROR, E_SEGFAULT, ...);
+
 
 struct path;
 struct vfs;

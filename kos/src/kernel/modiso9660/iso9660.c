@@ -33,6 +33,8 @@
 
 #include <hybrid/byteorder.h>
 
+#include <linux/magic.h>
+
 #include <stddef.h>
 #include <string.h>
 
@@ -213,7 +215,6 @@ INTERN struct inode_type Iso9660_RegType = {
 		/*.a_loadattr   = */ &Iso9660INode_LoadAttr,
 		/*.a_saveattr   = */ NULL,
 		/*.a_maskattr   = */ NULL,
-		/*.a_pathconf   = */ NULL, /* TODO */
 		/*.a_clearcache = */ NULL,
 	},
 	/*.it_file = */ {
@@ -234,7 +235,6 @@ INTERN struct inode_type Iso9660_DirType = {
 		/*.a_loadattr   = */ &Iso9660INode_LoadAttr,
 		/*.a_saveattr   = */ NULL,
 		/*.a_maskattr   = */ NULL,
-		/*.a_pathconf   = */ NULL, /* TODO */
 		/*.a_clearcache = */ NULL,
 	},
 	/*.it_file = */ {
@@ -273,6 +273,7 @@ Iso9660_OpenSuperblock(Iso9660Superblock *__restrict self, UNCHECKED USER char *
 	VolumeDescriptor volume;
 	pos_t offset               = (pos_t)0x8000;
 	pos_t second_volume_offset = (pos_t)-1;
+	self->s_features.sf_magic = ISOFS_SUPER_MAGIC;
 	/* XXX: Mount arguments for iso9660? */
 	(void)args;
 

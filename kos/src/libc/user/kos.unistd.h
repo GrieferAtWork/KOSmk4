@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb55101a0 */
+/* HASH CRC-32:0xfe01e6bf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -138,23 +138,9 @@ INTDEF void (LIBCCALL libc_SetGid)(gid_t gid) THROWS(...);
  * application image with that of another program that the original
  * parent can then `wait(2)' for */
 INTDEF WUNUSED pid_t (LIBCCALL libc_Fork)(void) THROWS(...);
-/* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
- * Return a path configuration value associated with `NAME' for `FD'
- * return: * : The configuration limit associated with `NAME' for `FD'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTDEF WUNUSED long int (LIBCCALL libc_FPathConf)(fd_t fd, int name) THROWS(...);
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 INTDEF NONNULL((1)) void (LIBCCALL libc_Chown)(char const *file, uid_t owner, gid_t group) THROWS(...);
-/* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTDEF NONNULL((1)) long int (LIBCCALL libc_PathConf)(char const *path, int name) THROWS(...);
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 INTDEF NONNULL((1, 2)) void (LIBCCALL libc_Link)(char const *from, char const *to) THROWS(...);

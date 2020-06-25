@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71a30637 */
+/* HASH CRC-32:0x4a0828d5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -685,7 +685,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,pause,(void),())
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,fpathconf,(__fd_t __fd, int __name),(__fd,__name))
+__CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,fpathconf,(__fd_t __fd, __STDC_INT_AS_UINT_T __name),(__fd,__name))
 
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */

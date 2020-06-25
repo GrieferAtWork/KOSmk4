@@ -530,8 +530,9 @@ int pause();
 @@return: * : The configuration limit associated with `NAME' for `FD'
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
-[[cp, wunused, section(".text.crt{|.dos}.fs.property"), decl_include("<bits/types.h>")]]
-$longptr_t fpathconf($fd_t fd, int name);
+[[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
+$longptr_t fpathconf($fd_t fd, __STDC_INT_AS_UINT_T name);
 
 %[default:section(".text.crt{|.dos}.io.tty")]
 

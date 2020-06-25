@@ -1173,6 +1173,46 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		                (unsigned int)(uintptr_t)arg != 0);
 		break;
 
+	case HOP_SUPERBLOCK_FEATURES: {
+		struct superblock *super;
+		struct hop_superblock_features *data;
+		size_t struct_size;
+		u32 feat_flags;
+		if (!vm_datablock_isinode(self)) {
+			THROW(E_INVALID_HANDLE_FILETYPE,
+			      0, /* Filled in by the caller */
+			      HANDLE_TYPE_DATABLOCK,
+			      0,
+			      HANDLE_TYPEKIND_DATABLOCK_INODE,
+			      0);
+		}
+		validate_writable(arg, sizeof(struct hop_superblock_features));
+		data        = (struct hop_superblock_features *)arg;
+		struct_size = ATOMIC_READ(data->sbf_struct_size);
+		if (struct_size != sizeof(struct hop_superblock_features))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_superblock_features), struct_size);
+		super = ((struct inode *)self)->i_super;
+		feat_flags = 0;
+		if (superblock_features_has_symlink(&super->s_features))
+			feat_flags |= HOP_SUPERBLOCK_FEAT_SYMLINKS;
+		if (superblock_features_has_hrdlink(&super->s_features))
+			feat_flags |= HOP_SUPERBLOCK_FEAT_HRDLINKS;
+		COMPILER_READ_BARRIER();
+		/* Copy features info to user-space. */
+		data->sbf_features           = feat_flags;
+		data->sbf_sector_size        = VM_DATABLOCK_PAGESIZE(self);
+		data->sbf_link_max           = (u64)super->s_features.sf_link_max;
+		data->sbf_name_max           = (u64)super->s_features.sf_name_max;
+		data->sbf_symlink_max        = (u64)super->s_features.sf_symlink_max;
+		data->sbf_rec_incr_xfer_size = (u32)super->s_features.sf_rec_incr_xfer_size;
+		data->sbf_rec_max_xfer_size  = (u32)super->s_features.sf_rec_max_xfer_size;
+		data->sbf_rec_min_xfer_size  = (u32)super->s_features.sf_rec_min_xfer_size;
+		data->sbf_rec_xfer_align     = (u32)super->s_features.sf_rec_xfer_align;
+		data->sbf_filesizebits       = super->s_features.sf_filesizebits;
+		data->sbf_magic              = super->s_features.sf_magic;
+		COMPILER_READ_BARRIER();
+	}	break;
+
 		/* TODO: HOP for using `inode_read_blocking()' */
 		/* TODO: HOP for using `inode_readv_blocking()' */
 

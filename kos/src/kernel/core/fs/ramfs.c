@@ -24,8 +24,8 @@
 
 #include <fs/node.h>
 #include <fs/ramfs.h>
-#include <kernel/iovec.h>
 #include <kernel/driver.h>
+#include <kernel/iovec.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
@@ -33,6 +33,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except/fs.h>
+#include <linux/magic.h>
 
 #include <assert.h>
 #include <string.h>
@@ -287,7 +288,6 @@ PUBLIC struct inode_type ramfs_dev_type = {
 		/* .a_loadattr   = */ NULL, /* All nodes are created with attributes already loaded */
 		/* .a_saveattr   = */ &ramfs_saveattr,
 		/* .a_maskattr   = */ NULL,
-		/* .a_pathconf   = */ NULL,
 		/* .a_clearcache = */ NULL
 	},
 };
@@ -297,7 +297,6 @@ PUBLIC struct inode_type ramfs_regular_type = {
 		/* .a_loadattr   = */ NULL, /* All nodes are created with attributes already loaded */
 		/* .a_saveattr   = */ &ramfs_saveattr,
 		/* .a_maskattr   = */ NULL,
-		/* .a_pathconf   = */ NULL,
 		/* .a_clearcache = */ NULL
 	},
 	/* .it_file = */ {
@@ -319,7 +318,6 @@ PUBLIC struct inode_type ramfs_directory_type = {
 		/* .a_loadattr   = */ NULL, /* All nodes are created with attributes already loaded */
 		/* .a_saveattr   = */ &ramfs_saveattr,
 		/* .a_maskattr   = */ NULL,
-		/* .a_pathconf   = */ NULL,
 		/* .a_clearcache = */ NULL
 	},
 	/* .it_file = */ { /* NULL... */ },
@@ -345,7 +343,6 @@ PUBLIC struct inode_type ramfs_symlink_type = {
 		/* .a_loadattr   = */ NULL, /* All nodes are created with attributes already loaded */
 		/* .a_saveattr   = */ &ramfs_saveattr,
 		/* .a_maskattr   = */ NULL,
-		/* .a_pathconf   = */ NULL,
 		/* .a_clearcache = */ NULL
 	},
 	/* .it_file = */ { /* NULL... */ },
@@ -362,6 +359,7 @@ ramfs_open(struct superblock *__restrict self,
 		THROWS(E_FSERROR_WRONG_FILE_SYSTEM, E_FSERROR_CORRUPTED_FILE_SYSTEM,
 		       E_IOERROR_BADBOUNDS, E_DIVIDE_BY_ZERO, E_OVERFLOW, E_INDEX_ERROR,
 		       E_IOERROR, E_SEGFAULT, ...) {
+	self->s_features.sf_magic = RAMFS_MAGIC;
 	self->i_type       = &ramfs_directory_type;
 	self->db_pageshift = 0;
 #ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO

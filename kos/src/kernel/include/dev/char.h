@@ -90,7 +90,8 @@ struct character_device_type {
 	/* @return: * : Set of available signals. */
 	NONNULL((1)) poll_mode_t
 	(KCALL *ct_poll)(struct character_device *__restrict self,
-	                 poll_mode_t what);
+	                 poll_mode_t what)
+			THROWS(...);
 
 	/* [0..1] Optional callback that is invoked when the device is opened by user-space.
 	 * @param: hand: [in|out] Upon input, this handle describes the already-initialized

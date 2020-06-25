@@ -367,45 +367,7 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 }
 /*[[[end:libc_Execlpe]]]*/
 
-/*[[[head:libc_FPathConf,hash:CRC-32=0x9c937efa]]]*/
-/* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
- * Return a path configuration value associated with `NAME' for `FD'
- * return: * : The configuration limit associated with `NAME' for `FD'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTERN ATTR_SECTION(".text.crt.except.fs.property") WUNUSED long int
-(LIBCCALL libc_FPathConf)(fd_t fd,
-                          int name) THROWS(...)
-/*[[[body:libc_FPathConf]]]*/
-/*AUTO*/{
-	(void)fd;
-	(void)name;
-	CRT_UNIMPLEMENTED("FPathConf"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_FPathConf]]]*/
 
-/*[[[head:libc_PathConf,hash:CRC-32=0x67e161b3]]]*/
-/* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTERN ATTR_SECTION(".text.crt.except.fs.property") NONNULL((1)) long int
-(LIBCCALL libc_PathConf)(char const *path,
-                         int name) THROWS(...)
-/*[[[body:libc_PathConf]]]*/
-/*AUTO*/{
-	(void)path;
-	(void)name;
-	CRT_UNIMPLEMENTED("PathConf"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_PathConf]]]*/
 
 
 /*[[[head:libc_ReadAll,hash:CRC-32=0x65a5d0e4]]]*/
@@ -785,7 +747,7 @@ INTERN ATTR_SECTION(".text.crt.except.system.configuration") NONNULL((1)) void
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1cb4be7d]]]*/
+/*[[[start:exports,hash:CRC-32=0xf6a78f81]]]*/
 DEFINE_PUBLIC_ALIAS(Execv, libc_Execv);
 DEFINE_PUBLIC_ALIAS(Execvp, libc_Execvp);
 #ifndef __LIBCCALL_IS_LIBDCALL
@@ -804,8 +766,6 @@ DEFINE_PUBLIC_ALIAS(Execpl, libc_Execpl);
 DEFINE_PUBLIC_ALIAS(DOS$Execlpe, libd_Execlpe);
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(Execlpe, libc_Execlpe);
-DEFINE_PUBLIC_ALIAS(FPathConf, libc_FPathConf);
-DEFINE_PUBLIC_ALIAS(PathConf, libc_PathConf);
 DEFINE_PUBLIC_ALIAS(ReadAll, libc_ReadAll);
 DEFINE_PUBLIC_ALIAS(GetCwd, libc_GetCwd);
 DEFINE_PUBLIC_ALIAS(PRead, libc_PRead);

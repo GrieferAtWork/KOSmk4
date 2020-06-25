@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e05a19e */
+/* HASH CRC-32:0x38daee85 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -487,9 +487,7 @@ DEFINE_PUBLIC_ALIAS(DOS$FSync, libd_FSync);
 DEFINE_PUBLIC_ALIAS(DOS$SetPGid, libd_SetPGid);
 DEFINE_PUBLIC_ALIAS(DOS$SetUid, libd_SetUid);
 DEFINE_PUBLIC_ALIAS(DOS$SetGid, libd_SetGid);
-DEFINE_PUBLIC_ALIAS(DOS$FPathConf, libd_FPathConf);
 DEFINE_PUBLIC_ALIAS(DOS$Chown, libd_Chown);
-DEFINE_PUBLIC_ALIAS(DOS$PathConf, libd_PathConf);
 DEFINE_PUBLIC_ALIAS(DOS$Link, libd_Link);
 DEFINE_PUBLIC_ALIAS(DOS$Read, libd_Read);
 DEFINE_PUBLIC_ALIAS(DOS$Write, libd_Write);

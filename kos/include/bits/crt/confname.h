@@ -26,74 +26,74 @@
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	_PC_LINK_MAX,
-	_PC_MAX_CANON,
-	_PC_MAX_INPUT,
-	_PC_NAME_MAX,
-	_PC_PATH_MAX,
-	_PC_PIPE_BUF,
-	_PC_CHOWN_RESTRICTED,
-	_PC_NO_TRUNC,
-	_PC_VDISABLE,
-	_PC_SYNC_IO,
-	_PC_ASYNC_IO,
-	_PC_PRIO_IO,
-	_PC_SOCK_MAXBUF,
-	_PC_FILESIZEBITS,
-	_PC_REC_INCR_XFER_SIZE,
-	_PC_REC_MAX_XFER_SIZE,
-	_PC_REC_MIN_XFER_SIZE,
-	_PC_REC_XFER_ALIGN,
-	_PC_ALLOC_SIZE_MIN,
-	_PC_SYMLINK_MAX,
-	_PC_2_SYMLINKS
+	_PC_LINK_MAX,           /* [perfs] Max # links a file may have */
+	_PC_MAX_CANON,          /* [const] size of the canonical input queue */
+	_PC_MAX_INPUT,          /* [const] size of the type-ahead buffer */
+	_PC_NAME_MAX,           /* [perfs] Max # chars in a file name */
+	_PC_PATH_MAX,           /* [const] Max # chars in a path name including nul (Unlimited in KOS) */
+	_PC_PIPE_BUF,           /* [const] Max # bytes in atomic write to a pipe */
+	_PC_CHOWN_RESTRICTED,   /* [const] Is file access restricted by file ownership. */
+	_PC_NO_TRUNC,           /* [const] Filenames are not silently truncated. */
+	_PC_VDISABLE,           /* [const] `c_cc' member of `struct termios' structure can be disabled by using the value _POSIX_VDISABLE. */
+	_PC_SYNC_IO,            /* [const][== _POSIX_SYNC_IO | -1] */
+	_PC_ASYNC_IO,           /* [const][== _POSIX_ASYNC_IO | -1] */
+	_PC_PRIO_IO,            /* [const][== _POSIX_PRIO_IO | -1] */
+	_PC_SOCK_MAXBUF,        /* [const][== SOCK_MAXBUF | -1] */
+	_PC_FILESIZEBITS,       /* [perfs] Max # of bits in a file's size field */
+	_PC_REC_INCR_XFER_SIZE, /* [perfs] Buffer size increments for efficient disk transfer operations */
+	_PC_REC_MAX_XFER_SIZE,  /* [perfs] Max buffer size for efficient disk transfer operations */
+	_PC_REC_MIN_XFER_SIZE,  /* [perfs] Min buffer size for efficient disk transfer operations */
+	_PC_REC_XFER_ALIGN,     /* [perfs] Required in-member buffer alignment for efficient disk transfer operations */
+	_PC_ALLOC_SIZE_MIN,     /* Same as `_PC_REC_XFER_ALIGN' */
+	_PC_SYMLINK_MAX,        /* [perfs] Max length of text contained within symbolic links */
+	_PC_2_SYMLINKS          /* [perfs] Are symbolic links supported by the filesystem */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#define _PC_LINK_MAX           _PC_LINK_MAX
-#define _PC_MAX_CANON          _PC_MAX_CANON
-#define _PC_MAX_INPUT          _PC_MAX_INPUT
-#define _PC_NAME_MAX           _PC_NAME_MAX
-#define _PC_PATH_MAX           _PC_PATH_MAX
-#define _PC_PIPE_BUF           _PC_PIPE_BUF
-#define _PC_CHOWN_RESTRICTED   _PC_CHOWN_RESTRICTED
-#define _PC_NO_TRUNC           _PC_NO_TRUNC
-#define _PC_VDISABLE           _PC_VDISABLE
-#define _PC_SYNC_IO            _PC_SYNC_IO
-#define _PC_ASYNC_IO           _PC_ASYNC_IO
-#define _PC_PRIO_IO            _PC_PRIO_IO
-#define _PC_SOCK_MAXBUF        _PC_SOCK_MAXBUF
-#define _PC_FILESIZEBITS       _PC_FILESIZEBITS
-#define _PC_REC_INCR_XFER_SIZE _PC_REC_INCR_XFER_SIZE
-#define _PC_REC_MAX_XFER_SIZE  _PC_REC_MAX_XFER_SIZE
-#define _PC_REC_MIN_XFER_SIZE  _PC_REC_MIN_XFER_SIZE
-#define _PC_REC_XFER_ALIGN     _PC_REC_XFER_ALIGN
-#define _PC_ALLOC_SIZE_MIN     _PC_ALLOC_SIZE_MIN
-#define _PC_SYMLINK_MAX        _PC_SYMLINK_MAX
-#define _PC_2_SYMLINKS         _PC_2_SYMLINKS
+#define _PC_LINK_MAX           _PC_LINK_MAX           /* [perfs] Max # links a file may have */
+#define _PC_MAX_CANON          _PC_MAX_CANON          /* [const] size of the canonical input queue */
+#define _PC_MAX_INPUT          _PC_MAX_INPUT          /* [const] size of the type-ahead buffer */
+#define _PC_NAME_MAX           _PC_NAME_MAX           /* [perfs] Max # chars in a file name */
+#define _PC_PATH_MAX           _PC_PATH_MAX           /* [const] Max # chars in a path name including nul (Unlimited in KOS) */
+#define _PC_PIPE_BUF           _PC_PIPE_BUF           /* [const] Max # bytes in atomic write to a pipe */
+#define _PC_CHOWN_RESTRICTED   _PC_CHOWN_RESTRICTED   /* [const] Is file access restricted by file ownership. */
+#define _PC_NO_TRUNC           _PC_NO_TRUNC           /* [const] Filenames are not silently truncated. */
+#define _PC_VDISABLE           _PC_VDISABLE           /* [const] `c_cc' member of `struct termios' structure can be disabled by using the value _POSIX_VDISABLE. */
+#define _PC_SYNC_IO            _PC_SYNC_IO            /* [const][== _POSIX_SYNC_IO | -1] */
+#define _PC_ASYNC_IO           _PC_ASYNC_IO           /* [const][== _POSIX_ASYNC_IO | -1] */
+#define _PC_PRIO_IO            _PC_PRIO_IO            /* [const][== _POSIX_PRIO_IO | -1] */
+#define _PC_SOCK_MAXBUF        _PC_SOCK_MAXBUF        /* [const][== SOCK_MAXBUF | -1] */
+#define _PC_FILESIZEBITS       _PC_FILESIZEBITS       /* [perfs] Max # of bits in a file's size field */
+#define _PC_REC_INCR_XFER_SIZE _PC_REC_INCR_XFER_SIZE /* [perfs] Buffer size increments for efficient disk transfer operations */
+#define _PC_REC_MAX_XFER_SIZE  _PC_REC_MAX_XFER_SIZE  /* [perfs] Max buffer size for efficient disk transfer operations */
+#define _PC_REC_MIN_XFER_SIZE  _PC_REC_MIN_XFER_SIZE  /* [perfs] Min buffer size for efficient disk transfer operations */
+#define _PC_REC_XFER_ALIGN     _PC_REC_XFER_ALIGN     /* [perfs] Required in-member buffer alignment for efficient disk transfer operations */
+#define _PC_ALLOC_SIZE_MIN     _PC_ALLOC_SIZE_MIN     /* Same as `_PC_REC_XFER_ALIGN' */
+#define _PC_SYMLINK_MAX        _PC_SYMLINK_MAX        /* [perfs] Max length of text contained within symbolic links */
+#define _PC_2_SYMLINKS         _PC_2_SYMLINKS         /* [perfs] Are symbolic links supported by the filesystem */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define _PC_LINK_MAX           0
-#define _PC_MAX_CANON          1
-#define _PC_MAX_INPUT          2
-#define _PC_NAME_MAX           3
-#define _PC_PATH_MAX           4
-#define _PC_PIPE_BUF           5
-#define _PC_CHOWN_RESTRICTED   6
-#define _PC_NO_TRUNC           7
-#define _PC_VDISABLE           8
-#define _PC_SYNC_IO            9
-#define _PC_ASYNC_IO           10
-#define _PC_PRIO_IO            11
-#define _PC_SOCK_MAXBUF        12
-#define _PC_FILESIZEBITS       13
-#define _PC_REC_INCR_XFER_SIZE 14
-#define _PC_REC_MAX_XFER_SIZE  15
-#define _PC_REC_MIN_XFER_SIZE  16
-#define _PC_REC_XFER_ALIGN     17
-#define _PC_ALLOC_SIZE_MIN     18
-#define _PC_SYMLINK_MAX        19
-#define _PC_2_SYMLINKS         20
+#define _PC_LINK_MAX           0  /* [perfs] Max # links a file may have */
+#define _PC_MAX_CANON          1  /* [const] size of the canonical input queue */
+#define _PC_MAX_INPUT          2  /* [const] size of the type-ahead buffer */
+#define _PC_NAME_MAX           3  /* [perfs] Max # chars in a file name */
+#define _PC_PATH_MAX           4  /* [const] Max # chars in a path name including nul (Unlimited in KOS) */
+#define _PC_PIPE_BUF           5  /* [const] Max # bytes in atomic write to a pipe */
+#define _PC_CHOWN_RESTRICTED   6  /* [const] Is file access restricted by file ownership. */
+#define _PC_NO_TRUNC           7  /* [const] Filenames are not silently truncated. */
+#define _PC_VDISABLE           8  /* [const] `c_cc' member of `struct termios' structure can be disabled by using the value _POSIX_VDISABLE. */
+#define _PC_SYNC_IO            9  /* [const][== _POSIX_SYNC_IO | -1] */
+#define _PC_ASYNC_IO           10 /* [const][== _POSIX_ASYNC_IO | -1] */
+#define _PC_PRIO_IO            11 /* [const][== _POSIX_PRIO_IO | -1] */
+#define _PC_SOCK_MAXBUF        12 /* [const][== SOCK_MAXBUF | -1] */
+#define _PC_FILESIZEBITS       13 /* [perfs] Max # of bits in a file's size field */
+#define _PC_REC_INCR_XFER_SIZE 14 /* [perfs] Buffer size increments for efficient disk transfer operations */
+#define _PC_REC_MAX_XFER_SIZE  15 /* [perfs] Max buffer size for efficient disk transfer operations */
+#define _PC_REC_MIN_XFER_SIZE  16 /* [perfs] Min buffer size for efficient disk transfer operations */
+#define _PC_REC_XFER_ALIGN     17 /* [perfs] Required in-member buffer alignment for efficient disk transfer operations */
+#define _PC_ALLOC_SIZE_MIN     18 /* Same as `_PC_REC_XFER_ALIGN' */
+#define _PC_SYMLINK_MAX        19 /* [perfs] Max length of text contained within symbolic links */
+#define _PC_2_SYMLINKS         20 /* [perfs] Are symbolic links supported by the filesystem */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

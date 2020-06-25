@@ -41,7 +41,6 @@
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
-#include <bits/confname.h>
 #include <kos/dev.h>
 #include <kos/except/inval.h>
 #include <linux/magic.h>
@@ -1285,26 +1284,6 @@ Fat16_SaveRootDirectoryEntryINodeAttributes(struct inode *__restrict self)
 	                   (pos_t)self->i_fileino + offsetof(FatFile, f_attr));
 }
 
-PRIVATE NONNULL((1)) intptr_t KCALL
-Fat_PathConf(struct inode *__restrict self, unsigned int name)
-		THROWS(...) {
-	intptr_t result;
-	/*FatSuperblock *super;
-	super = (FatSuperblock *)self->i_super;*/
-	(void)self;
-	switch (name) {
-
-	case _PC_NAME_MAX:
-		result = LFN_SEQNUM_MAXCOUNT * LFN_NAME;
-		break;
-
-	default:
-		result = INODE_PATHCONF_UNDEDEFINED;
-		break;
-	}
-	return result;
-}
-
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
           USER UNCHECKED void *arg, iomode_t mode)
@@ -2094,7 +2073,6 @@ INTERN struct inode_type Fat_FileNodeOperators = {
 		.a_loadattr   = &Fat32_LoadINodeAttributes,
 		.a_saveattr   = &Fat32_SaveINodeAttributes,
 		.a_maskattr   = &Fat_MaskINodeAttributes,
-		.a_pathconf   = &Fat_PathConf,
 		.a_ioctl      = &Fat_Ioctl,
 		.a_clearcache = NULL,
 	},
@@ -2117,7 +2095,6 @@ INTERN struct inode_type Fat_DirectoryNodeOperators = {
 		.a_loadattr   = &Fat32_LoadINodeAttributes,
 		.a_saveattr   = &Fat32_SaveINodeAttributes,
 		.a_maskattr   = &Fat_MaskINodeAttributes,
-		.a_pathconf   = &Fat_PathConf,
 		.a_ioctl      = &Fat_Ioctl,
 		.a_clearcache = NULL,
 	},
@@ -2154,7 +2131,6 @@ INTERN struct inode_type Fat16_RootDirectoryFileEntryNodeOperators = {
 		.a_loadattr   = &Fat16_LoadRootDirectoryEntryINodeAttributes,
 		.a_saveattr   = &Fat16_SaveRootDirectoryEntryINodeAttributes,
 		.a_maskattr   = &Fat_MaskINodeAttributes,
-		.a_pathconf   = &Fat_PathConf,
 		.a_ioctl      = &Fat_Ioctl,
 		.a_clearcache = NULL,
 	},
@@ -2177,7 +2153,6 @@ INTERN struct inode_type Fat16_RootDirectoryDirectoryEntryNodeOperators = {
 		.a_loadattr   = &Fat16_LoadRootDirectoryEntryINodeAttributes,
 		.a_saveattr   = &Fat16_SaveRootDirectoryEntryINodeAttributes,
 		.a_maskattr   = &Fat_MaskINodeAttributes,
-		.a_pathconf   = &Fat_PathConf,
 		.a_ioctl      = &Fat_Ioctl,
 		.a_clearcache = NULL,
 	},
@@ -2214,7 +2189,6 @@ INTERN struct inode_type Fat16_RootDirectoryNodeOperators = {
 		.a_loadattr   = NULL,
 		.a_saveattr   = NULL,
 		.a_maskattr   = NULL,
-		.a_pathconf   = &Fat_PathConf,
 		.a_ioctl      = &Fat_Ioctl,
 		.a_clearcache = NULL,
 	},
@@ -2251,7 +2225,6 @@ INTERN struct inode_type Fat32_RootDirectoryNodeOperators = {
 		.a_loadattr   = NULL,
 		.a_saveattr   = NULL,
 		.a_maskattr   = NULL,
-		.a_pathconf   = &Fat_PathConf,
 		.a_ioctl      = &Fat_Ioctl,
 		.a_clearcache = NULL,
 	},
@@ -2488,6 +2461,11 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		       E_IOERROR, E_SEGFAULT, ...) {
 	FatDiskHeader disk_header;
 	(void)args; /* TODO: User-arguments. */
+	self->s_features.sf_symlink_max  = 0;
+	self->s_features.sf_link_max     = 1;
+	self->s_features.sf_magic        = MSDOS_SUPER_MAGIC;
+	self->s_features.sf_name_max     = LFN_SEQNUM_MAXCOUNT * LFN_NAME;
+	self->s_features.sf_filesizebits = 32;
 
 	/* Read the FAT disk header. */
 	block_device_read(self->s_device,

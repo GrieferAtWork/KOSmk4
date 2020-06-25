@@ -48,7 +48,6 @@
 #define __CRT_HAVE_FExecve 1
 #define __CRT_HAVE_FMkdirAt 1
 #define __CRT_HAVE_FMknodAt 1
-#define __CRT_HAVE_FPathConf 1
 #define __CRT_HAVE_FReadlinkAt 1
 #define __CRT_HAVE_FSync 1
 #define __CRT_HAVE_FTruncate 1
@@ -105,7 +104,6 @@
 #define __CRT_HAVE_PValloc 1
 #define __CRT_HAVE_PWrite 1
 #define __CRT_HAVE_PWrite64 1
-#define __CRT_HAVE_PathConf 1
 #define __CRT_HAVE_Pipe 1
 #define __CRT_HAVE_Pipe2 1
 #define __CRT_HAVE_Read 1
@@ -1044,7 +1042,6 @@
 #define __CRT_HAVE__setjmpex 1
 #define __CRT_HAVE__setmaxstdio 1
 #define __CRT_HAVE__setmode 1
-#define __CRT_HAVE__signal 1
 #define __CRT_HAVE__snprintf 1
 #define __CRT_HAVE__snprintf_c 1
 #define __CRT_HAVE__snprintf_c_l 1
@@ -4620,7 +4617,7 @@
 #define __CRT_HAVE_KOS$_scwprintf_p 1
 #define __CRT_HAVE_KOS$_scwprintf_p_l 1
 #define __CRT_HAVE_KOS$_set_errno 1
-#define __CRT_HAVE_KOS$_signal 1
+#define __CRT_HAVE__signal 1
 #define __CRT_HAVE_KOS$_snwprintf_l 1
 #define __CRT_HAVE_KOS$_snwprintf_s 1
 #define __CRT_HAVE_KOS$_snwprintf_s_l 1

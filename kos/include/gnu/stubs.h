@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94f02fd */
+/* HASH CRC-32:0x728ff362 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define __stub_FPathConf 1
-#define __stub_PathConf 1
 #define __stub__CrtDbgBreak 1
 #define __stub__CrtDbgReport 1
 #define __stub_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ 1
@@ -175,7 +173,6 @@
 #define __stub_fgetpwent_r 1
 #define __stub_fgetspent 1
 #define __stub_fgetspent_r 1
-#define __stub_fpathconf 1
 #define __stub__fpreset 1
 #define __stub_fpreset 1
 #define __stub_freeaddrinfo 1

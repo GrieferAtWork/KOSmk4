@@ -29,9 +29,10 @@ DECL_BEGIN
 #ifdef INSTALL_IN
 /* Same as `handle_installinto()', but return the old handle
  * (or a HANDLE_TYPE_UNDEFINED) previously bound to that slot. */
-PUBLIC WUNUSED NONNULL((1)) REF struct handle FCALL
+PUBLIC WUNUSED NONNULL((1, 3)) REF struct handle FCALL
 handle_installxchg(struct handle_manager *__restrict self,
-                   unsigned int dst_fd, struct handle hnd)
+                   unsigned int dst_fd,
+                   struct handle const *__restrict hnd)
 #elif defined(INSTALL_AT)
 /* Similar to `handle_put()', but place the handle in a
  * descriptor slot that is greater than, or equal to `hint'.
@@ -39,9 +40,10 @@ handle_installxchg(struct handle_manager *__restrict self,
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: `hint' is outside the allowed handle range.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-FUNDEF NONNULL((1)) unsigned int FCALL
+FUNDEF NONNULL((1, 3)) unsigned int FCALL
 handle_installat(struct handle_manager *__restrict self,
-                 unsigned int hint, struct handle hnd)
+                 unsigned int hint,
+                 struct handle const *__restrict hnd)
 #else /* INSTALL_AT */
 /* Add the given handle to the handle manager and
  * return the handle number of where it was placed.
@@ -49,9 +51,9 @@ handle_installat(struct handle_manager *__restrict self,
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: Too many open handles
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-PUBLIC NONNULL((1)) unsigned int FCALL
+PUBLIC NONNULL((1, 2)) unsigned int FCALL
 handle_install(struct handle_manager *__restrict self,
-               struct handle hnd)
+               struct handle const *__restrict hnd)
 #endif /* !INSTALL_AT */
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
@@ -59,7 +61,7 @@ handle_install(struct handle_manager *__restrict self,
 #ifndef INSTALL_IN
 	unsigned int dst_fd;
 #endif /* !INSTALL_IN */
-	assert(hnd.h_type != HANDLE_TYPE_UNDEFINED);
+	assert(hnd->h_type != HANDLE_TYPE_UNDEFINED);
 	sync_write(&self->hm_lock);
 again_locked:
 	handle_manager_assert_integrity(self);
@@ -78,7 +80,7 @@ again_locked:
 		if (self->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
 			if (dst_fd < self->hm_linear.hm_alloc) {
 				old_handle                        = self->hm_linear.hm_vector[dst_fd];
-				self->hm_linear.hm_vector[dst_fd] = incref(hnd);
+				self->hm_linear.hm_vector[dst_fd] = *incref(hnd);
 update_old_handle:
 				/* Update counters according to the change in handle binding. */
 				if (old_handle.h_type == HANDLE_TYPE_UNDEFINED) {
@@ -96,9 +98,9 @@ update_old_handle:
 						--self->hm_clofork_count;
 					}
 				}
-				if (hnd.h_mode & IO_CLOEXEC)
+				if (hnd->h_mode & IO_CLOEXEC)
 					++self->hm_cloexec_count;
-				if (hnd.h_mode & IO_CLOFORK)
+				if (hnd->h_mode & IO_CLOFORK)
 					++self->hm_clofork_count;
 				handle_manager_assert_integrity(self);
 				sync_endwrite(&self->hm_lock);
@@ -122,7 +124,7 @@ update_old_handle:
 				} else {
 					old_handle = self->hm_linear.hm_vector[vecid];
 				}
-				self->hm_linear.hm_vector[vecid] = incref(hnd);
+				self->hm_linear.hm_vector[vecid] = *incref(hnd);
 				goto update_old_handle;
 			}
 		}
@@ -308,7 +310,7 @@ got_result_slot:
 			handle_manager_assert_integrity(self);
 		}
 		/* Store the given handle within its designated slot. */
-		self->hm_linear.hm_vector[dst_fd] = incref(hnd);
+		self->hm_linear.hm_vector[dst_fd] = *incref(hnd);
 		assert(self->hm_count <= self->hm_linear.hm_alloc);
 	} else {
 		unsigned int how;
@@ -446,16 +448,16 @@ install_hash_handle:
 		ent->hh_vector_index = vector_index;
 		/* Insert the given handle into the vector. */
 		assert(self->hm_hashvector.hm_vector[vector_index].h_type == HANDLE_TYPE_UNDEFINED);
-		self->hm_hashvector.hm_vector[vector_index] = incref(hnd);
+		self->hm_hashvector.hm_vector[vector_index] = *incref(hnd);
 		assert(self->hm_count <= self->hm_hashvector.hm_alloc);
 		assert(self->hm_count + 1 <= self->hm_hashvector.hm_hashuse);
 	}
 
 	/* Keep track of the number of used handles. */
 	++self->hm_count;
-	if (hnd.h_mode & IO_CLOEXEC)
+	if (hnd->h_mode & IO_CLOEXEC)
 		++self->hm_cloexec_count;
-	if (hnd.h_mode & IO_CLOFORK)
+	if (hnd->h_mode & IO_CLOFORK)
 		++self->hm_clofork_count;
 #if !defined(INSTALL_AT) && !defined(INSTALL_IN)
 	self->hm_minfree = dst_fd + 1;

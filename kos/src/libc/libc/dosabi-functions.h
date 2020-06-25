@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf7903d9 */
+/* HASH CRC-32:0xeacfdec7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -473,9 +473,7 @@ DFUN(".text.crt.dos.except.io.sync", libd_FSync, libc_FSync, TV, 1, TIn(__SIZEOF
 DFUN(".text.crt.dos.except.sched.process", libd_SetPGid, libc_SetPGid, TV, 2, TIn(__SIZEOF_PID_T__), TIn(__SIZEOF_PID_T__))
 DFUN(".text.crt.dos.except.sched.process", libd_SetUid, libc_SetUid, TV, 1, TIn(__SIZEOF_UID_T__))
 DFUN(".text.crt.dos.except.sched.process", libd_SetGid, libc_SetGid, TV, 1, TIn(__SIZEOF_GID_T__))
-DFUN(".text.crt.dos.except.fs.property", libd_FPathConf, libc_FPathConf, TL, 2, TIn(__SIZEOF_FD_T__), TD)
 DFUN(".text.crt.dos.except.fs.modify", libd_Chown, libc_Chown, TV, 3, TP, TIn(__SIZEOF_UID_T__), TIn(__SIZEOF_GID_T__))
-DFUN(".text.crt.dos.except.fs.property", libd_PathConf, libc_PathConf, TL, 2, TP, TD)
 DFUN(".text.crt.dos.except.fs.modify", libd_Link, libc_Link, TV, 2, TP, TP)
 DFUN(".text.crt.dos.except.io.read", libd_Read, libc_Read, TI, 3, TIn(__SIZEOF_FD_T__), TP, TI)
 DFUN(".text.crt.dos.except.io.write", libd_Write, libc_Write, TI, 3, TIn(__SIZEOF_FD_T__), TP, TI)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98d437d9 */
+/* HASH CRC-32:0x928e2495 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -191,14 +191,6 @@ __CDECLARE_VOID_OPT(,__THROWING,SetGid,(__gid_t __gid),(__gid))
  * parent can then `wait(2)' for */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,Fork,(void),())
 
-/* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
- * Return a path configuration value associated with `NAME' for `FD'
- * return: * : The configuration limit associated with `NAME' for `FD'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__CDECLARE_OPT(__ATTR_WUNUSED,long int,__THROWING,FPathConf,(__fd_t __fd, int __name),(__fd,__name))
-
 #ifdef __CRT_HAVE_Chown
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
@@ -209,14 +201,6 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Chown,(char const *__file, __uid_
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Chown, __FORCELOCAL __ATTR_NONNULL((1)) void (__LIBCCALL Chown)(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Chown))(__file, __owner, __group); })
 #endif /* ... */
-
-/* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),long int,__THROWING,PathConf,(char const *__path, int __name),(__path,__name))
 
 #ifdef __CRT_HAVE_Link
 /* >> link(2)

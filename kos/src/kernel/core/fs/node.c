@@ -52,12 +52,12 @@
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 
-#include <bits/confname.h>
 #include <bits/dirent.h>
 #include <kos/except/fs.h>
 #include <kos/except/inval.h>
 #include <kos/except/io.h>
 #include <linux/limits.h>
+#include <linux/magic.h>
 #include <sys/stat.h>
 #include <sys/statfs.h>
 #include <sys/statvfs.h>
@@ -873,109 +873,6 @@ inode_ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
 	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
 	      cmd);
-}
-
-
-/* Return information on hard limits for the given INode.
- * @param: name: One of `_PC_*' from `<bits/confname.h>'
- * @return: INODE_PATHCONF_UNDEDEFINED: The given `name' is not implemented by the underlying filesystem.
- * NOTE: This function invokes the `io_pathconf' operator of given INode `self'.
- *       If that operator isn't implemented or returns `INODE_PATHCONF_UNDEDEFINED',
- *       the same operator is re-invoked on `self->i_super->s_root'.
- *       If that operator isn't implemented, or returns `INODE_PATHCONF_UNDEDEFINED'
- *       too, the following values are returned for specific `name's,
- *       or `INODE_PATHCONF_UNDEDEFINED' for any other name:
- * - _PC_LINK_MAX:           LINK_MAX     (From <linux/limits.h>)  (or `1' when the link operator isn't implemented for the INode itself, or the filesystem root)
- * - _PC_MAX_CANON:          MAX_CANON    (From <linux/limits.h>)
- * - _PC_MAX_INPUT:          MAX_INPUT    (From <linux/limits.h>)
- * - _PC_NAME_MAX:           65535
- * - _PC_PATH_MAX:           LONG_MAX
- * - _PC_PIPE_BUF:           PIPE_BUF     (From <linux/limits.h>)
- * - _PC_CHOWN_RESTRICTED:   0
- * - _PC_NO_TRUNC:           1
- * - _PC_VDISABLE:           '\0'
- * - _PC_FILESIZEBITS:       64
- * - _PC_REC_INCR_XFER_SIZE: VM_DATABLOCK_PAGESIZE(self)
- * - _PC_REC_MAX_XFER_SIZE:  VM_DATABLOCK_PAGESIZE(self) * (BITS_PER_POINTER / VM_DATAPART_PPP_BITS)
- * - _PC_REC_MIN_XFER_SIZE:  VM_DATABLOCK_PAGESIZE(self)
- * - _PC_REC_XFER_ALIGN:     VM_DATABLOCK_PAGESIZE(self)
- * - _PC_ALLOC_SIZE_MIN:     VM_DATABLOCK_PAGESIZE(self)
- * - _PC_SYMLINK_MAX:        self->i_type->it_directory.d_symlink != NULL ? LONG_MAX : 0
- * - _PC_2_SYMLINKS:         self->i_type->it_directory.d_symlink != NULL ? 1 : 0
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
- * @throw: E_IOERROR:  Failed to read/write data to/from disk. */
-PUBLIC WUNUSED NONNULL((1)) intptr_t KCALL
-inode_pathconf(struct inode *__restrict self, unsigned int name)
-		THROWS(E_FSERROR_DELETED, E_IOERROR, ...) {
-	intptr_t result;
-	struct inode *super_root;
-	if (self->i_type->it_attr.a_pathconf) {
-		result = (*self->i_type->it_attr.a_pathconf)(self, name);
-		if (result != INODE_PATHCONF_UNDEDEFINED)
-			goto done;
-	}
-	super_root = self->i_super;
-	if (super_root->i_type->it_attr.a_pathconf) {
-		result = (*super_root->i_type->it_attr.a_pathconf)(super_root, name);
-		if (result != INODE_PATHCONF_UNDEDEFINED)
-			goto done;
-	}
-	switch (name) {
-	case _PC_LINK_MAX:
-		result = 1;
-		if ((INODE_ISDIR(self) && self->i_type->it_directory.d_link) ||
-		    (super_root->i_type->it_directory.d_link))
-			result = LINK_MAX;
-		break;
-	case _PC_MAX_CANON:
-		result = MAX_CANON;
-		break;
-	case _PC_MAX_INPUT:
-		result = MAX_INPUT;
-		break;
-	case _PC_NAME_MAX:
-		result = 65535;
-		break;
-	case _PC_PATH_MAX:
-		result = LONG_MAX;
-		break;
-	case _PC_PIPE_BUF:
-		result = PIPE_BUF;
-		break;
-	case _PC_CHOWN_RESTRICTED:
-		result = 0;
-		break;
-	case _PC_NO_TRUNC:
-		result = 1;
-		break;
-	case _PC_VDISABLE:
-		result = '\0';
-		break;
-	case _PC_FILESIZEBITS:
-		result = 64;
-		break;
-	case _PC_REC_INCR_XFER_SIZE:
-	case _PC_REC_MIN_XFER_SIZE:
-	case _PC_REC_XFER_ALIGN:
-	case _PC_ALLOC_SIZE_MIN:
-		result = VM_DATABLOCK_PAGESIZE(self);
-		break;
-	case _PC_REC_MAX_XFER_SIZE:
-		result = VM_DATABLOCK_PAGESIZE(self) * (BITS_PER_POINTER / VM_DATAPART_PPP_BITS);
-		break;
-	case _PC_SYMLINK_MAX:
-		result = self->i_type->it_directory.d_symlink != NULL ? LONG_MAX : 0;
-		break;
-	case _PC_2_SYMLINKS:
-		result = self->i_type->it_directory.d_symlink != NULL ? 1 : 0;
-		break;
-	default:
-		result = INODE_PATHCONF_UNDEDEFINED;
-		break;
-	}
-done:
-	return result;
 }
 
 
@@ -4387,6 +4284,22 @@ superblock_open(struct superblock_type *__restrict type,
 			atomic_rwlock_cinit(&result->s_changed_lock);
 			rwlock_cinit(&result->s_nodes_lock);
 			atomic_rwlock_cinit(&result->s_mount_lock);
+			/* Fill in filesystem features with documented default values. */
+			result->s_features.sf_symlink_max = (pos_t)-1;
+			result->s_features.sf_link_max    = (nlink_t)-1;
+			assert(result->s_features.sf_rec_incr_xfer_size == 0);
+			assert(result->s_features.sf_rec_max_xfer_size == 0);
+			assert(result->s_features.sf_rec_min_xfer_size == 0);
+			assert(result->s_features.sf_rec_xfer_align == 0);
+			result->s_features.sf_name_max     = (u16)-1;
+			result->s_features.sf_filesizebits = 64;
+#ifndef NDEBUG
+			/* The devfs is initialized statically, so `st_open' should never
+			 * try to fill in the magic-field with its magic number. As such,
+			 * we can check for an `st_open' callback that forgot to fill in
+			 * this field by later checking if it's still set to this constant. */
+			result->s_features.sf_magic = DEVFS_SUPER_MAGIC;
+#endif /* !NDEBUG */
 			/* Open the new superblock. */
 			TRY {
 				(*type->st_open)(result, args);
@@ -4401,6 +4314,20 @@ superblock_open(struct superblock_type *__restrict type,
 					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_FSERROR_READONLY));
 				RETHROW();
 			}
+#ifndef NDEBUG
+			assertf(result->s_features.sf_magic != DEVFS_SUPER_MAGIC,
+			        "Superblock initializer for %q forgot to fill in `s_features.sf_magic'",
+			        type->st_name);
+#endif /* !NDEBUG */
+			/* Substitute default feature values. */
+			if (result->s_features.sf_rec_incr_xfer_size == 0)
+				result->s_features.sf_rec_incr_xfer_size = VM_DATABLOCK_PAGESIZE(result);
+			if (result->s_features.sf_rec_max_xfer_size == 0)
+				result->s_features.sf_rec_max_xfer_size = VM_DATABLOCK_PAGESIZE(result);
+			if (result->s_features.sf_rec_min_xfer_size == 0)
+				result->s_features.sf_rec_min_xfer_size = VM_DATABLOCK_PAGESIZE(result);
+			if (result->s_features.sf_rec_xfer_align == 0)
+				result->s_features.sf_rec_xfer_align = VM_DATABLOCK_PAGESIZE(result);
 		} EXCEPT {
 			heap_free(FS_HEAP, resptr.hp_ptr, resptr.hp_siz, FS_GFP);
 			RETHROW();
@@ -4414,7 +4341,7 @@ superblock_open(struct superblock_type *__restrict type,
 		result->db_pagealign = (size_t)1 << result->db_pageshift;
 		result->db_pagemask  = result->db_pagealign - 1;
 		result->db_pagesize  = (size_t)PAGESIZE >> result->db_pageshift;
-#endif
+#endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
 		/* Add the new superblock to the chain of known file-systems. */
 		SLIST_INSERT(fs_filesystems.f_superblocks, result, s_filesystems);
 	} EXCEPT {

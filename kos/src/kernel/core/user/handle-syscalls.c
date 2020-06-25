@@ -1362,7 +1362,13 @@ DEFINE_SYSCALL3(syscall_slong_t, hop,
 			 *       e.g.: A DATABLOCK command on a FILE object
 			 *             should be allowed, but would require
 			 *             an implicit cast */
-			result = (*handle_type_db.h_hop[hand.h_type])(hand.h_data,
+			uintptr_half_t wanted_type;
+			wanted_type = (u16)(cmd >> 16);
+			if (wanted_type != hand.h_type) {
+				hand.h_data = handle_as(hand, wanted_type);
+				hand.h_type = wanted_type;
+			}
+			result = (*handle_type_db.h_hop[wanted_type])(hand.h_data,
 			                                              cmd,
 			                                              arg,
 			                                              hand.h_mode);

@@ -52,7 +52,7 @@
 DECL_BEGIN
 
 /* Returns the type-kind code for `self' (One of `HANDLE_TYPEKIND_*') */
-PUBLIC NOBLOCK ATTR_PURE WUNUSED uintptr_half_t
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_half_t
 NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self) {
 	switch (self->h_type) {
 

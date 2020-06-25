@@ -30,6 +30,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/pagesize.h>
+#include <kos/hop/datablock.h> /* Needed for fpathconf() */
 #include <kos/syscalls.h>
 #include <sys/mman.h>
 #include <sys/param.h>
@@ -2310,7 +2311,83 @@ NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s)
 }
 /*[[[end:libc_ctermid]]]*/
 
-/*[[[head:libc_fpathconf,hash:CRC-32=0xde44f570]]]*/
+
+#define PATHCONF_VARYING_LIMIT INTPTR_MIN
+PRIVATE ATTR_SECTION(".rodata.crt.fs.property") longptr_t const pc_constants[] = {
+	[_PC_LINK_MAX]           = PATHCONF_VARYING_LIMIT,
+	[_PC_MAX_CANON]          = MAX_CANON,
+	[_PC_MAX_INPUT]          = MAX_INPUT,
+	[_PC_NAME_MAX]           = PATHCONF_VARYING_LIMIT,
+	[_PC_PATH_MAX]           = PATH_MAX,
+	[_PC_PIPE_BUF]           = PIPE_BUF,
+	[_PC_CHOWN_RESTRICTED]   = _POSIX_CHOWN_RESTRICTED,
+	[_PC_NO_TRUNC]           = _POSIX_NO_TRUNC,
+	[_PC_VDISABLE]           = _POSIX_VDISABLE,
+#ifdef _POSIX_SYNC_IO
+	[_PC_SYNC_IO]            = _POSIX_SYNC_IO,
+#else /* _POSIX_SYNC_IO */
+	[_PC_SYNC_IO]            = -1,
+#endif /* !_POSIX_SYNC_IO */
+#ifdef _POSIX_ASYNC_IO
+	[_PC_ASYNC_IO]           = _POSIX_ASYNC_IO,
+#else /* _POSIX_ASYNC_IO */
+	[_PC_ASYNC_IO]           = -1,
+#endif /* !_POSIX_ASYNC_IO */
+#ifdef _POSIX_PRIO_IO
+	[_PC_PRIO_IO]            = _POSIX_PRIO_IO,
+#else /* _POSIX_PRIO_IO */
+	[_PC_PRIO_IO]            = -1,
+#endif /* !_POSIX_PRIO_IO */
+	[_PC_SOCK_MAXBUF]        = -1,
+	[_PC_FILESIZEBITS]       = PATHCONF_VARYING_LIMIT,
+	[_PC_REC_INCR_XFER_SIZE] = PATHCONF_VARYING_LIMIT,
+	[_PC_REC_MAX_XFER_SIZE]  = PATHCONF_VARYING_LIMIT,
+	[_PC_REC_MIN_XFER_SIZE]  = PATHCONF_VARYING_LIMIT,
+	[_PC_REC_XFER_ALIGN]     = PATHCONF_VARYING_LIMIT,
+	[_PC_ALLOC_SIZE_MIN]     = PATHCONF_VARYING_LIMIT,
+	[_PC_SYMLINK_MAX]        = PATHCONF_VARYING_LIMIT,
+	[_PC_2_SYMLINKS]         = PATHCONF_VARYING_LIMIT,
+};
+
+
+#if __SIZEOF_POINTER__ <= 4
+#define FIELD32_OFFSET(offset) (u8)(offset)
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define FIELD64_OFFSET(offset) (u8)(offset)
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+#define FIELD64_OFFSET(offset) (u8)(offset) + 4
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+#else /* __SIZEOF_POINTER__ <= 4 */
+#define FIELD32_OFFSET(offset) 0x80 | (u8)(offset)
+#define FIELD64_OFFSET(offset) (u8)(offset)
+#endif /* __SIZEOF_POINTER__ > 4 */
+#define FIELD_UNDEFINED UINT8_MAX
+
+PRIVATE ATTR_SECTION(".rodata.crt.fs.property") u8 const pc_superblock_features_offset[] = {
+	[_PC_LINK_MAX]           = FIELD64_OFFSET(offsetof(struct hop_superblock_features, sbf_link_max)),
+	[_PC_MAX_CANON]          = FIELD_UNDEFINED,
+	[_PC_MAX_INPUT]          = FIELD_UNDEFINED,
+	[_PC_NAME_MAX]           = FIELD64_OFFSET(offsetof(struct hop_superblock_features, sbf_name_max)),
+	[_PC_PATH_MAX]           = FIELD_UNDEFINED,
+	[_PC_PIPE_BUF]           = FIELD_UNDEFINED,
+	[_PC_CHOWN_RESTRICTED]   = FIELD_UNDEFINED,
+	[_PC_NO_TRUNC]           = FIELD_UNDEFINED,
+	[_PC_VDISABLE]           = FIELD_UNDEFINED,
+	[_PC_SYNC_IO]            = FIELD_UNDEFINED,
+	[_PC_ASYNC_IO]           = FIELD_UNDEFINED,
+	[_PC_PRIO_IO]            = FIELD_UNDEFINED,
+	[_PC_SOCK_MAXBUF]        = FIELD_UNDEFINED,
+	[_PC_FILESIZEBITS]       = FIELD_UNDEFINED, /* Custom! */
+	[_PC_REC_INCR_XFER_SIZE] = FIELD32_OFFSET(offsetof(struct hop_superblock_features, sbf_rec_incr_xfer_size)),
+	[_PC_REC_MAX_XFER_SIZE]  = FIELD32_OFFSET(offsetof(struct hop_superblock_features, sbf_rec_max_xfer_size)),
+	[_PC_REC_MIN_XFER_SIZE]  = FIELD32_OFFSET(offsetof(struct hop_superblock_features, sbf_rec_min_xfer_size)),
+	[_PC_REC_XFER_ALIGN]     = FIELD32_OFFSET(offsetof(struct hop_superblock_features, sbf_rec_xfer_align)),
+	[_PC_ALLOC_SIZE_MIN]     = FIELD32_OFFSET(offsetof(struct hop_superblock_features, sbf_rec_xfer_align)),
+	[_PC_SYMLINK_MAX]        = FIELD64_OFFSET(offsetof(struct hop_superblock_features, sbf_symlink_max)),
+	[_PC_2_SYMLINKS]         = FIELD_UNDEFINED, /* Custom! */
+};
+
+/*[[[head:libc_fpathconf,hash:CRC-32=0x2a2fb4af]]]*/
 /* >> fpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
@@ -2319,14 +2396,53 @@ NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s)
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED longptr_t
 NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
-                                     int name)
+                                     __STDC_INT_AS_UINT_T name)
 /*[[[body:libc_fpathconf]]]*/
-/*AUTO*/{
-	(void)fd;
-	(void)name;
-	CRT_UNIMPLEMENTED("fpathconf"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	longptr_t result;
+	STATIC_ASSERT(COMPILER_LENOF(pc_superblock_features_offset) >=
+	              COMPILER_LENOF(pc_constants));
+	if unlikely(name >= COMPILER_LENOF(pc_constants)) {
+		result = libc_seterrno(EINVAL);
+	} else {
+		result = pc_constants[name];
+		if (result == PATHCONF_VARYING_LIMIT) {
+			/* Determine the value based on `fd' */
+			struct hop_superblock_features feat;
+			feat.sbf_struct_size = sizeof(feat);
+			result = hop(fd, HOP_SUPERBLOCK_FEATURES, &feat);
+			if (result >= 0) {
+				u8 offset;
+				offset = pc_superblock_features_offset[name];
+				if (offset != FIELD_UNDEFINED) {
+#if __SIZEOF_POINTER__ <= 4
+					result = (longptr_t)*(u32 *)((byte_t *)&feat + offset);
+#else /* __SIZEOF_POINTER__ <= 4 */
+					void *field_addr;
+					field_addr = (byte_t *)&feat + (offset & 0x7f);
+					if (offset & 0x80) {
+						/* 32-bit field. */
+						result = (longptr_t)*(u32 *)field_addr;
+					} else {
+						/* 64-bit field. */
+						result = (longptr_t)*(u64 *)field_addr;
+					}
+#endif /* __SIZEOF_POINTER__ > 4 */
+				} else {
+					/* Custom field. */
+					if (name == _PC_FILESIZEBITS) {
+						result = feat.sbf_filesizebits; /* 8-bit field */
+					} else if (name == _PC_2_SYMLINKS) {
+						result = feat.sbf_features & HOP_SUPERBLOCK_FEAT_SYMLINKS ? 1 : 0; /* 1-bit field */
+					} else {
+						/* Shouldn't get here... */
+						result = PATHCONF_VARYING_LIMIT;
+					}
+				}
+			}
+		}
+	}
+	return result;
 }
 /*[[[end:libc_fpathconf]]]*/
 

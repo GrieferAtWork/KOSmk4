@@ -734,7 +734,7 @@ DEFINE_INTERN_ALIAS(libd_gsignal, libd_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x17d0cb01]]]*/
+/*[[[start:exports,hash:CRC-32=0x35c2142d]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
@@ -743,7 +743,6 @@ DEFINE_PUBLIC_ALIAS(__sysv_signal, libc_sysv_signal);
 DEFINE_PUBLIC_ALIAS(sysv_signal, libc_sysv_signal);
 DEFINE_PUBLIC_ALIAS(DOS$_signal, libd_signal);
 DEFINE_PUBLIC_ALIAS(DOS$signal, libd_signal);
-DEFINE_PUBLIC_ALIAS(_signal, libc_signal);
 DEFINE_PUBLIC_ALIAS(signal, libc_signal);
 DEFINE_PUBLIC_ALIAS(DOS$ssignal, libd_ssignal);
 DEFINE_PUBLIC_ALIAS(ssignal, libc_ssignal);

@@ -50,7 +50,7 @@
  * on linux, g++ will _always_ pre-define `_GNU_SOURCE' straight
  * from within the compiler itself, in order to get access to some
  * of the symbols that are required to implement the inline functions
- * form headers. Don't believe me? - Compile the following on a linux
+ * from headers. Don't believe me? - Compile the following on a linux
  * machine:
  * foo.cc:
  * >> #ifdef _GNU_SOURCE
