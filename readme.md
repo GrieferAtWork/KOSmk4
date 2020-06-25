@@ -621,9 +621,9 @@ To help you understand how this script works to do what it does, here is a docum
 
 I personally use Visual Studio 2017 Community Edition for this, as it actually has a fairly unknown feature `Open Folder` which allows for a hacky way to get full support for GDB debugging without having to pay an insane sum of up to $340 for [VisualGDB](https://visualgdb.com/buy/) (I'm doing this as a hobby; I don't have that kind of money; Jeez: I could barely scrape together $10 if that was the asking price)
 
-I mean seriously: Even when you scoure the osdev wiki you'll come across references to [VisualGDB and VisualKernel](https://wiki.osdev.org/Kernel_Debugging), so I really don't understand who wrote that recommendataion. - I don't think any of us bare-metal, kernel-development enthusiats (especially newcomers who could use a real, and simple to use integrated debugging experience the most) would be willing to pay that much...
+I mean seriously: Even when you scoure the osdev wiki you'll come across references to [VisualGDB and VisualKernel](https://wiki.osdev.org/Kernel_Debugging), so I really don't understand who wrote that recommendation. - I don't think any of us bare-metal, kernel-development enthusiats (especially newcomers who could use a real, and simple to use integrated debugging experience the most) would be willing to pay that much...
 
-Anyways. - Even though practically no documentation on this feature of Visual Studio (of which you can get the Community Edition for free by the way) exists, I managed to get it working through trial an error.
+Anyways. - Even though practically no documentation on this feature of Visual Studio (of which you can get the Community Edition for free by the way) exists, I managed to get it working through trial and error.
 
 And if you don't like Visual Studio (or aren't using Windows) I do know for a fact that Visual Studio Code also includes functionality for connecting to a GDB server/stub when you start diving into extensions
 
@@ -704,7 +704,7 @@ This system is tightly interwoven with the CRT feature files described in the se
 
 This is done via a custom function definition protocol implemented by a deemon program found in `$PROJPATH/kos/misc/magicgenerator/generate_headers.dee`, which when run, will parse and link the definition files from `$PROJPATH/kos/src/libc/magic/*.c` to gain knowledge of what goes where, how everything looks like, what annotations may be applied to functions, how functions are implemented, and so on...
 
-As the end result, KOS is able to provide definitions for many header functions while simultaniously exporting them from both libc (and sometimes the kernel) in such a way that the possibility of mistakes happening due to redundancy falls away (e.g. all function prototypes of memcpy() are annotated with `ATTR_NONNULL((1, 2))`, and despite this specific annotation exists in possibly more than 20 places, any changes to it would only require a single modification of the tags in `/kos/src/libc/magic/string.c`)
+As the end result, KOS is able to provide definitions for many header functions while simultaniously exporting them from both libc (and sometimes the kernel) in such a way that the possibility of mistakes happening due to redundancy falls away (e.g. all function prototypes of memcpy() are annotated with `ATTR_NONNULL((1, 2))`, and despite this specific annotation existing in possibly more than 20 places, any changes to it would only require a single modification of the tags in `/kos/src/libc/magic/string.c`)
 
 Additionally, when using KOS headers with a CRT other than KOS, this makes it possible to substitute KOS-specific extensions such as `strend()` by automatically providing a local implementation of the function though `/kos/include/local/string/strend.h`, where this variant of the function is implemented identically to the variant exported by KOS's libc, meaning that in the event of changes having to be made to its implementation, all that's required is another single alteration in `/kos/src/libc/magic/string.c`
 
