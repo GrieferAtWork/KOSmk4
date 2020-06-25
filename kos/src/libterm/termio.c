@@ -1351,7 +1351,8 @@ libterminal_flush_ibuf(struct terminal *__restrict self,
  *                   only the return value of the intended printer (in this case `t_iprint') is added to
  *                   the eventually returned sum. - Additionally, in this case, the lower of the return
  *                   value of the original call to `t_iprint' and num_bytes passed to it is used as the number
- *                   of bytes that would be echoed on-screen.
+ *                   of bytes that would be echoed on-screen. (meaning that no characters will get echoed
+ *                   that can't be added to the input queue)
  * @return: < 0:   A format-printer returned a negative value
  * @return: -1:   [USERSPACE] Printing to one of the linebuffers failed (s.a. `linebuffer_write()'; `errno') */
 INTERN NONNULL((1)) ssize_t CC

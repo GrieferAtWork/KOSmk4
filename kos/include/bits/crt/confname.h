@@ -27,8 +27,8 @@
 #ifdef __CC__
 enum {
 	_PC_LINK_MAX,           /* [perfs] Max # links a file may have */
-	_PC_MAX_CANON,          /* [const] size of the canonical input queue */
-	_PC_MAX_INPUT,          /* [const] size of the type-ahead buffer */
+	_PC_MAX_CANON,          /* [pertty] size of the canonical input queue (s.a. `struct tty::t_term.t_canon.lb_limt') */
+	_PC_MAX_INPUT,          /* [pertty] size of the type-ahead buffer (s.a. `struct tty::t_term.t_ibuf.rb_limit') */
 	_PC_NAME_MAX,           /* [perfs] Max # chars in a file name */
 	_PC_PATH_MAX,           /* [const] Max # chars in a path name including nul (Unlimited in KOS) */
 	_PC_PIPE_BUF,           /* [const] Max # bytes in atomic write to a pipe */
@@ -52,8 +52,8 @@ enum {
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define _PC_LINK_MAX           _PC_LINK_MAX           /* [perfs] Max # links a file may have */
-#define _PC_MAX_CANON          _PC_MAX_CANON          /* [const] size of the canonical input queue */
-#define _PC_MAX_INPUT          _PC_MAX_INPUT          /* [const] size of the type-ahead buffer */
+#define _PC_MAX_CANON          _PC_MAX_CANON          /* [pertty] size of the canonical input queue (s.a. `struct tty::t_term.t_canon.lb_limt') */
+#define _PC_MAX_INPUT          _PC_MAX_INPUT          /* [pertty] size of the type-ahead buffer (s.a. `struct tty::t_term.t_ibuf.rb_limit') */
 #define _PC_NAME_MAX           _PC_NAME_MAX           /* [perfs] Max # chars in a file name */
 #define _PC_PATH_MAX           _PC_PATH_MAX           /* [const] Max # chars in a path name including nul (Unlimited in KOS) */
 #define _PC_PIPE_BUF           _PC_PIPE_BUF           /* [const] Max # bytes in atomic write to a pipe */
@@ -74,8 +74,8 @@ enum {
 #define _PC_2_SYMLINKS         _PC_2_SYMLINKS         /* [perfs] Are symbolic links supported by the filesystem */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define _PC_LINK_MAX           0  /* [perfs] Max # links a file may have */
-#define _PC_MAX_CANON          1  /* [const] size of the canonical input queue */
-#define _PC_MAX_INPUT          2  /* [const] size of the type-ahead buffer */
+#define _PC_MAX_CANON          1  /* [pertty] size of the canonical input queue (s.a. `struct tty::t_term.t_canon.lb_limt') */
+#define _PC_MAX_INPUT          2  /* [pertty] size of the type-ahead buffer (s.a. `struct tty::t_term.t_ibuf.rb_limit') */
 #define _PC_NAME_MAX           3  /* [perfs] Max # chars in a file name */
 #define _PC_PATH_MAX           4  /* [const] Max # chars in a path name including nul (Unlimited in KOS) */
 #define _PC_PIPE_BUF           5  /* [const] Max # bytes in atomic write to a pipe */

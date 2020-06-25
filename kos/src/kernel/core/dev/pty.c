@@ -76,8 +76,11 @@ NOTHROW(KCALL pty_slave_fini)(struct character_device *__restrict self) {
 }
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
-pty_slave_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
-                USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+pty_slave_ioctl(struct character_device *__restrict self,
+                syscall_ulong_t cmd,
+                USER UNCHECKED void *arg,
+                iomode_t mode)
+		THROWS(...) {
 	struct pty_slave *me;
 	me = (struct pty_slave *)self;
 	switch (cmd) {
@@ -114,7 +117,8 @@ NOTHROW(KCALL pty_master_fini)(struct character_device *__restrict self) {
 
 PRIVATE NONNULL((1)) size_t KCALL
 pty_master_read(struct character_device *__restrict self,
-                USER CHECKED void *dst, size_t num_bytes, iomode_t mode)
+                USER CHECKED void *dst,
+                size_t num_bytes, iomode_t mode)
 		THROWS(...) {
 	size_t result;
 	struct pty_master *me;
@@ -161,7 +165,8 @@ again_read:
 
 PRIVATE NONNULL((1)) size_t KCALL
 pty_master_write(struct character_device *__restrict self,
-                 USER CHECKED void const *src, size_t num_bytes, iomode_t mode)
+                 USER CHECKED void const *src,
+                 size_t num_bytes, iomode_t mode)
 		THROWS(...) {
 	ssize_t result;
 	struct pty_master *me;
@@ -224,7 +229,9 @@ again_write:
 
 PRIVATE NONNULL((1)) syscall_slong_t KCALL
 pty_master_ioctl(struct character_device *__restrict self,
-                 syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode)
+                 syscall_ulong_t cmd,
+                 USER UNCHECKED void *arg,
+                 iomode_t mode)
 		THROWS(...) {
 	struct pty_master *me;
 	REF struct pty_slave *slave;
@@ -245,7 +252,8 @@ pty_master_ioctl(struct character_device *__restrict self,
 
 PRIVATE NONNULL((1)) void KCALL
 pty_master_stat(struct character_device *__restrict self,
-                USER CHECKED struct stat *result) THROWS(...) {
+                USER CHECKED struct stat *result)
+		THROWS(...) {
 	struct pty_master *me;
 	REF struct pty_slave *slave;
 	me    = (struct pty_master *)self;
@@ -260,7 +268,8 @@ pty_master_stat(struct character_device *__restrict self,
 
 PRIVATE NONNULL((1)) poll_mode_t KCALL
 pty_master_poll(struct character_device *__restrict self,
-                poll_mode_t what) {
+                poll_mode_t what)
+		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct pty_master *me;
 	REF struct pty_slave *slave;
 	poll_mode_t result = 0;

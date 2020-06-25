@@ -40,9 +40,9 @@ __DECL_BEGIN
 
 #ifdef __KERNEL__
 #define __KERNEL_SELECT(if_kernel, if_not_kernel) if_kernel
-#else
+#else /* __KERNEL__ */
 #define __KERNEL_SELECT(if_kernel, if_not_kernel) if_not_kernel
-#endif
+#endif /* !__KERNEL__ */
 
 
 struct terminal;
@@ -66,13 +66,15 @@ typedef __ATTR_NONNULL((1)) __ssize_t
 
 /* Check if the calling process's group leader is apart of the foreground process
  * group associated with the given terminal `self'. - If it is, return 0. Otherwise,
- * the POSIX behavior is to raise a signal `SIGTTOU' within every process in caller's
+ * the POSIX behavior is to raise a signal `SIGTTOU' within every process in the caller's
  * process group, however the implementation of this function may also choose to do
  * something completely different. (or just be a no-op; >I'm just a sign, not a cop...<)
  * For a POSIX-compliant terminal, a kernel-side implementation of this would look like:
  * >> PRIVATE ssize_t LIBTERM_CC my_terminal_check_sigttou(struct terminal *__restrict self) {
  * >>	MY_TERMINAL *term = container_of(self, MY_TERMINAL, t_term);
  * >>	REF struct task *my_leader = task_getprocessgroupleader();
+ * >>	if (!my_leader)
+ * >>		...;
  * >>	FINALLY_DECREF_UNLIKELY(my_leader);
  * >>	if unlikely(FORTASK(my_leader, this_taskpid) != ATOMIC_READ(term->t_fproc)) {
  * >>		task_raisesignalprocessgroup(my_leader, SIGTTOU);
@@ -129,7 +131,16 @@ __NOTHROW_NCX(LIBTERM_CC terminal_init)(struct terminal *__restrict self,
 
 /* Print output (display) or input (keyboard) to a given terminal
  * @param: mode:   I/O mode (set of `IO_*'; the terminal sub-system recognizes `IO_NONBLOCK')
- * @return: >= 0 : The number of written bytes.
+ * @return: >= 0 : The sum of return values from calls to the associated printer
+ *                 - The usual rules apply where negative return values are propagated immediately.
+ *                 - Data printed when an I/O buffer is flushed is not added to this sum, however
+ *                   negative values resulting from this case are propagated none-the-less.
+ *                 - In cases where data is written to multiple printers (e.g. terminal_iwrite() w/ ECHO),
+ *                   only the return value of the intended printer (in this case `t_iprint') is added to
+ *                   the eventually returned sum. - Additionally, in this case, the lower of the return
+ *                   value of the original call to `t_iprint' and num_bytes passed to it is used as the number
+ *                   of bytes that would be echoed on-screen. (meaning that no characters will get echoed
+ *                   that can't be added to the input queue)
  * @return: < 0:   A format-printer returned a negative value
  * @return: -1:   [USERSPACE] Printing to one of the linebuffers failed (s.a. `linebuffer_write()'; `errno') */
 typedef __ATTR_NONNULL((1)) __ssize_t

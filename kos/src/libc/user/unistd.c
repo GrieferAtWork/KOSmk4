@@ -2315,14 +2315,15 @@ NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s)
 #define PATHCONF_VARYING_LIMIT INTPTR_MIN
 PRIVATE ATTR_SECTION(".rodata.crt.fs.property") longptr_t const pc_constants[] = {
 	[_PC_LINK_MAX]           = PATHCONF_VARYING_LIMIT,
-	[_PC_MAX_CANON]          = MAX_CANON,
-	[_PC_MAX_INPUT]          = MAX_INPUT,
+	[_PC_MAX_CANON]          = MAX_CANON, /* TODO: ((struct tty *)handle_as_tty(fd))->t_term.t_canon.lb_limt */
+	[_PC_MAX_INPUT]          = MAX_INPUT, /* TODO: ((struct tty *)handle_as_tty(fd))->t_term.t_ibuf.rb_limit */
 	[_PC_NAME_MAX]           = PATHCONF_VARYING_LIMIT,
 	[_PC_PATH_MAX]           = PATH_MAX,
 	[_PC_PIPE_BUF]           = PIPE_BUF,
 	[_PC_CHOWN_RESTRICTED]   = _POSIX_CHOWN_RESTRICTED,
 	[_PC_NO_TRUNC]           = _POSIX_NO_TRUNC,
-	[_PC_VDISABLE]           = _POSIX_VDISABLE,
+	[_PC_VDISABLE]           = 1, /* All KOS terminals support disabling control characters. All
+	                               * related functionality is implemented in `/kos/src/libterm/termio.c' */
 #ifdef _POSIX_SYNC_IO
 	[_PC_SYNC_IO]            = _POSIX_SYNC_IO,
 #else /* _POSIX_SYNC_IO */
