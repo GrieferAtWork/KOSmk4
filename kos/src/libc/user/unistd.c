@@ -2315,8 +2315,8 @@ NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s)
 #define PATHCONF_VARYING_LIMIT INTPTR_MIN
 PRIVATE ATTR_SECTION(".rodata.crt.fs.property") longptr_t const pc_constants[] = {
 	[_PC_LINK_MAX]           = PATHCONF_VARYING_LIMIT,
-	[_PC_MAX_CANON]          = MAX_CANON, /* TODO: ((struct tty *)handle_as_tty(fd))->t_term.t_canon.lb_limt */
-	[_PC_MAX_INPUT]          = MAX_INPUT, /* TODO: ((struct tty *)handle_as_tty(fd))->t_term.t_ibuf.rb_limit */
+	[_PC_MAX_CANON]          = MAX_CANON, /* TODO: ((struct tty_device *)handle_as_tty(fd))->t_term.t_canon.lb_limt */
+	[_PC_MAX_INPUT]          = MAX_INPUT, /* TODO: ((struct tty_device *)handle_as_tty(fd))->t_term.t_ibuf.rb_limit */
 	[_PC_NAME_MAX]           = PATHCONF_VARYING_LIMIT,
 	[_PC_PATH_MAX]           = PATH_MAX,
 	[_PC_PIPE_BUF]           = PIPE_BUF,
