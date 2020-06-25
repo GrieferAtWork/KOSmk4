@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe3b859c */
+/* HASH CRC-32:0xdf7903d9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,40 @@
 #ifndef DFUN
 #define DFUN(section, libd_name, libc_name, returnType, argc, /*argvTypes*/...)
 #endif /* !DFUN */
+
+#ifndef TP
+#define TP << TIn(__SIZEOF_POINTER__)
+#endif /* !TP */
+#ifndef THH
+#define THH << TIn(__SIZEOF_CHAR__)
+#endif /* !THH */
+#ifndef TH
+#define TH << TIn(__SIZEOF_SHORT__)
+#endif /* !TH */
+#ifndef TD
+#define TD << TIn(__SIZEOF_INT__)
+#endif /* !TD */
+#ifndef TL
+#define TL << TIn(__SIZEOF_LONG__)
+#endif /* !TL */
+#ifndef TLL
+#define TLL << TIn(__SIZEOF_LONG_LONG__)
+#endif /* !TLL */
+#ifndef TI
+#define TI << TIn(__SIZEOF_SIZE_T__)
+#endif /* !TI */
+#ifndef TI8
+#define TI8 << TIn(1)
+#endif /* !TI8 */
+#ifndef TI16
+#define TI16 << TIn(2)
+#endif /* !TI16 */
+#ifndef TI32
+#define TI32 << TIn(4)
+#endif /* !TI32 */
+#ifndef TI64
+#define TI64 << TIn(8)
+#endif /* !TI64 */
 
 /* aliases */
 DFUN(".text.crt.dos.database.aliases", libd_getaliasent_r, libc_getaliasent_r, TD, 4, TP, TP, TI, TP)

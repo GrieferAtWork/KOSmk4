@@ -44,6 +44,14 @@ class UserSourceFunction {
 class _UserSourceExportTable {}
 global UserSourceExportTable = _UserSourceExportTable();
 
+@@Set of all user-level library functions that have stub implementations
+global stubUserFunctions: {LibraryFunction...} = HashSet();
+
+@@Check if the given @body is that of a stub function
+function isStubFunctionImplementation(body: string): bool {
+	return "CRT_UNIMPLEMENTED" in body;
+}
+
 
 @@Check if the given function body is merely auto-generated
 @@NOTE: Passing @none for @func means that the actual function is
@@ -446,6 +454,8 @@ again_find_nextPresentFunction:
 				escapeTextIntoFile(bodyFp, implBinding.functionBinding.body, ESCAPE_MODE_NONE);
 				usedBody = bodyFp.string;
 			}
+			if (isStubFunctionImplementation(usedBody))
+				stubUserFunctions.insert(func);
 			/* Print the actual function */
 			headFp = headFp.string.lstrip("\n").rstrip() + "\n";
 			fp << "/*[[[head:" << func.name << ",hash:"

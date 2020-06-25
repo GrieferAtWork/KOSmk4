@@ -28,7 +28,7 @@ import * from ..libgen.c.writer;
 import * from ..libgen.c.loader;
 import * from ..libgen.c.globals;
 import * from ..libgen.c.ppexpr;
-import updateUserImplementationSourceFile from ..libgen.c.usersource;
+import * from ..libgen.c.usersource;
 import Function from ..libgen.c.cheaders;
 import hash from hashlib;
 import fs;
@@ -630,7 +630,25 @@ function doPrint_src_libc_libc_dosabiFunctions(fp: File) {
 	fp << COPYRIGHT << "\n"
 		"#ifndef DFUN\n"
 		"#define DFUN(section, libd_name, libc_name, returnType, argc, /*argvTypes*/...)\n"
-		"#endif /* !DFUN */\n";
+		"#endif /* !DFUN */\n\n";
+	final local DEFAULT_TIn_TYPES: {(string, string)...} = {
+		("TP", "__SIZEOF_POINTER__"),
+		("THH", "__SIZEOF_CHAR__"),
+		("TH", "__SIZEOF_SHORT__"),
+		("TD", "__SIZEOF_INT__"),
+		("TL", "__SIZEOF_LONG__"),
+		("TLL", "__SIZEOF_LONG_LONG__"),
+		("TI", "__SIZEOF_SIZE_T__"),
+		("TI8", "1"),
+		("TI16", "2"),
+		("TI32", "4"),
+		("TI64", "8"),
+	};
+	for (local name, siz: DEFAULT_TIn_TYPES) {
+		fp << "#ifndef " << name << "\n"
+			"#define " << name << " << TIn(" << siz << ")\n"
+			"#endif /* !" << name << " */\n";
+	}
 	local cWriter = CWriter(fp, ppAssume: ppAssumeDosAbiSourceFiles);
 	for (local name: allSystemHeaders.keys.sorted()) {
 		local header: SystemHeader = allSystemHeaders[name];
@@ -717,6 +735,29 @@ function doPrint_src_libc_libc_dosabiExports(fp: File) {
 			}
 			cWriter.ppEndif();
 		}
+	}
+	cWriter.flush();
+}
+
+
+@@Print the file "/kos/include/gnu/stubs.h"
+function doPrint_include_gnu_stubs(fp: File) {
+	fp << COPYRIGHT << "\n";
+	local cWriter = CWriter(fp, ppAssume: ppAssumeUserSourceFiles);
+	local stubsByName: {string: LibraryFunction} = Dict();
+	for (local f: stubUserFunctions)
+		stubsByName[f.name] = f;
+	for (local name: stubsByName.keys.sorted()) {
+		local f = stubsByName[name];
+		cWriter.ppIf(f.implementationPpCond);
+		for (local ppCond, symbolName: f.exportSymbolNames) {
+			cWriter.ppIf(ppCond);
+			if (symbolName.startswith("?"))
+				symbolName = symbolName.replace("?", "$Q").replace("@", "$A");
+			cWriter << "#define __stub_" << symbolName << " 1\n";
+			cWriter.ppEndif();
+		}
+		cWriter.ppEndif();
 	}
 	cWriter.flush();
 }
@@ -837,6 +878,9 @@ try {
 
 	waitTasks();
 	messagePrefix = "3/3";
+
+	startTask(updateHashedFile, ("include/gnu/stubs.h", doPrint_include_gnu_stubs));
+	waitTasks();
 
 	/* Generate all of the needed <local/...> headers */
 	local printedLocalFunctions: HashSet with LocalFunction = HashSet();
