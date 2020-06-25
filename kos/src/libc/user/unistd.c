@@ -2146,36 +2146,6 @@ NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 }
 /*[[[end:libc_revoke]]]*/
 
-/*[[[head:libd_syscall,hash:CRC-32=0xe92a633b]]]*/
-#ifndef __LIBCCALL_IS_LIBDCALL
-INTERN ATTR_SECTION(".text.crt.dos.system.utility") longptr_t
-NOTHROW_RPC(VLIBDCALL libd_syscall)(longptr_t sysno,
-                                    ...)
-/*[[[body:libd_syscall]]]*/
-/*AUTO*/{
-	(void)sysno;
-	CRT_UNIMPLEMENTED("syscall"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-#endif /* MAGIC:impl_if */
-/*[[[end:libd_syscall]]]*/
-
-/*[[[head:libd_syscall64,hash:CRC-32=0x42d78139]]]*/
-#ifndef __LIBCCALL_IS_LIBDCALL
-INTERN ATTR_SECTION(".text.crt.dos.system.utility") __LONG64_TYPE__
-NOTHROW_RPC(VLIBDCALL libd_syscall64)(syscall_ulong_t sysno,
-                                      ...)
-/*[[[body:libd_syscall64]]]*/
-/*AUTO*/{
-	(void)sysno;
-	CRT_UNIMPLEMENTED("syscall64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-#endif /* MAGIC:impl_if */
-/*[[[end:libd_syscall64]]]*/
-
 /* `syscall' needs to be implemented in assembly! */
 /*[[[skip:libc_syscall]]]*/
 /*[[[skip:libc_syscall64]]]*/
@@ -3790,7 +3760,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x69a56699]]]*/
+/*[[[start:exports,hash:CRC-32=0xbee770b8]]]*/
 DEFINE_PUBLIC_ALIAS(_execv, libc_execv);
 DEFINE_PUBLIC_ALIAS(execv, libc_execv);
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
@@ -3957,10 +3927,6 @@ DEFINE_PUBLIC_ALIAS(endusershell, libc_endusershell);
 DEFINE_PUBLIC_ALIAS(setusershell, libc_setusershell);
 DEFINE_PUBLIC_ALIAS(daemon, libc_daemon);
 DEFINE_PUBLIC_ALIAS(revoke, libc_revoke);
-#ifndef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(DOS$syscall, libd_syscall);
-DEFINE_PUBLIC_ALIAS(DOS$syscall64, libd_syscall64);
-#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(chroot, libc_chroot);
 DEFINE_PUBLIC_ALIAS(getpass, libc_getpass);
 DEFINE_PUBLIC_ALIAS(_chsize, libc_ftruncate);

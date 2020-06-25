@@ -726,37 +726,6 @@ INTERN ATTR_SECTION(".text.crt.except.system.configuration") NONNULL((1)) void
 }
 /*[[[end:libc_GetDomainName]]]*/
 
-/*[[[head:libd_Syscall,hash:CRC-32=0x95c630d2]]]*/
-#ifndef __LIBCCALL_IS_LIBDCALL
-INTERN ATTR_SECTION(".text.crt.dos.except.system.utility") __syscall_slong_t
-(VLIBDCALL libd_Syscall)(__syscall_ulong_t sysno,
-                         ...) THROWS(...)
-/*[[[body:libd_Syscall]]]*/
-/*AUTO*/{
-	(void)sysno;
-	CRT_UNIMPLEMENTED("Syscall"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-#endif /* MAGIC:impl_if */
-/*[[[end:libd_Syscall]]]*/
-
-/*[[[head:libd_Syscall64,hash:CRC-32=0x1bd799d5]]]*/
-#ifndef __LIBCCALL_IS_LIBDCALL
-INTERN ATTR_SECTION(".text.crt.dos.except.system.utility") __LONG64_TYPE__
-(VLIBDCALL libd_Syscall64)(__syscall_ulong_t sysno,
-                           ...) THROWS(...)
-/*[[[body:libd_Syscall64]]]*/
-/*AUTO*/{
-	(void)sysno;
-	CRT_UNIMPLEMENTED("Syscall64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-#endif /* MAGIC:impl_if */
-/*[[[end:libd_Syscall64]]]*/
-
-
 /*[[[skip:libc_Execve]]]*/
 /*[[[skip:libc_Pipe]]]*/
 /*[[[skip:libc_SetPGid]]]*/
@@ -816,7 +785,7 @@ INTERN ATTR_SECTION(".text.crt.dos.except.system.utility") __LONG64_TYPE__
 
 
 
-/*[[[start:exports,hash:CRC-32=0x2f157847]]]*/
+/*[[[start:exports,hash:CRC-32=0x1cb4be7d]]]*/
 DEFINE_PUBLIC_ALIAS(Execv, libc_Execv);
 DEFINE_PUBLIC_ALIAS(Execvp, libc_Execvp);
 #ifndef __LIBCCALL_IS_LIBDCALL
@@ -852,10 +821,6 @@ DEFINE_PUBLIC_ALIAS(SetEUid, libc_SetEUid);
 DEFINE_PUBLIC_ALIAS(SetEGid, libc_SetEGid);
 DEFINE_PUBLIC_ALIAS(GetHostName, libc_GetHostName);
 DEFINE_PUBLIC_ALIAS(GetDomainName, libc_GetDomainName);
-#ifndef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(DOS$Syscall, libd_Syscall);
-DEFINE_PUBLIC_ALIAS(DOS$Syscall64, libd_Syscall64);
-#endif /* !__LIBCCALL_IS_LIBDCALL */
 /*[[[end:exports]]]*/
 
 DECL_END

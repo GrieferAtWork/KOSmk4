@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6aea474 */
+/* HASH CRC-32:0xb55101a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -335,18 +335,8 @@ INTDEF NONNULL((1)) void (LIBCCALL libc_GetDomainName)(char *name, size_t buflen
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
 INTDEF NONNULL((1)) void (LIBCCALL libc_SetDomainName)(char const *name, size_t len) THROWS(...);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF __syscall_slong_t (VLIBDCALL libd_Syscall)(__syscall_ulong_t sysno, ...) THROWS(...);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF __syscall_slong_t (VLIBCCALL libc_Syscall)(__syscall_ulong_t sysno, ...) THROWS(...);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF __LONG64_TYPE__ (VLIBDCALL libd_Syscall64)(__syscall_ulong_t sysno, ...) THROWS(...);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF __LONG64_TYPE__ (VLIBCCALL libc_Syscall64)(__syscall_ulong_t sysno, ...) THROWS(...);
+INTDEF __syscall_slong_t (VLIBCCALL libc_Syscall)(syscall_ulong_t sysno, ...) THROWS(...);
+INTDEF __LONG64_TYPE__ (VLIBCCALL libc_Syscall64)(syscall_ulong_t sysno, ...) THROWS(...);
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */

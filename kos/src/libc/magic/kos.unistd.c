@@ -584,11 +584,15 @@ void GetDomainName([[outp(buflen)]] char *name, size_t buflen);
 void SetDomainName([[inp(len)]] char const *name, size_t len);
 
 [[cp, throws, section(".text.crt{|.dos}.except.system.utility")]]
-__syscall_slong_t Syscall(__syscall_ulong_t sysno, ...);
+[[vartypes($syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t,
+           $syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t)]]
+__syscall_slong_t Syscall($syscall_ulong_t sysno, ...);
 
 %#ifdef __USE_KOS
 [[cp, throws, section(".text.crt{|.dos}.except.system.utility"), preferred_alias("Syscall")]]
-__LONG64_TYPE__ Syscall64(__syscall_ulong_t sysno, ...);
+[[vartypes($syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t,
+           $syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t)]]
+__LONG64_TYPE__ Syscall64($syscall_ulong_t sysno, ...);
 %#endif /* __USE_KOS */
 
 %#endif /* __USE_MISC */

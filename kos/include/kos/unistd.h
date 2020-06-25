@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31127166 */
+/* HASH CRC-32:0x98d437d9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -686,7 +686,7 @@ __LIBC __syscall_slong_t (__VLIBCCALL Syscall)(__syscall_ulong_t __sysno, ...) _
 #endif /* __CRT_HAVE_Syscall */
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_Syscall
-__LIBC __LONG64_TYPE__ (__VLIBCCALL Syscall64)(__syscall_ulong_t __sysno, ...) __THROWS(...) __CASMNAME("Syscall");
+__CVREDIRECT(,__LONG64_TYPE__,__THROWING,Syscall64,(__syscall_ulong_t __sysno),Syscall,(__sysno),__sysno,6,(__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t,__syscall_ulong_t))
 #elif defined(__CRT_HAVE_Syscall64)
 __LIBC __LONG64_TYPE__ (__VLIBCCALL Syscall64)(__syscall_ulong_t __sysno, ...) __THROWS(...) __CASMNAME_SAME("Syscall64");
 #endif /* ... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec635298 */
+/* HASH CRC-32:0x8e05a19e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -541,6 +541,8 @@ DEFINE_PUBLIC_ALIAS(DOS$GetHostName, libd_GetHostName);
 DEFINE_PUBLIC_ALIAS(DOS$SetHostName, libd_SetHostName);
 DEFINE_PUBLIC_ALIAS(DOS$GetDomainName, libd_GetDomainName);
 DEFINE_PUBLIC_ALIAS(DOS$SetDomainName, libd_SetDomainName);
+DEFINE_PUBLIC_ALIAS(DOS$Syscall, libd_Syscall);
+DEFINE_PUBLIC_ALIAS(DOS$Syscall64, libd_Syscall64);
 DEFINE_PUBLIC_ALIAS(DOS$ChRoot, libd_ChRoot);
 DEFINE_PUBLIC_ALIAS(DOS$FTruncate, libd_FTruncate);
 DEFINE_PUBLIC_ALIAS(DOS$FTruncate64, libd_FTruncate64);
@@ -2906,6 +2908,8 @@ DEFINE_PUBLIC_ALIAS(DOS$setdomainname, libd_setdomainname);
 DEFINE_PUBLIC_ALIAS(DOS$profil, libd_profil);
 DEFINE_PUBLIC_ALIAS(DOS$daemon, libd_daemon);
 DEFINE_PUBLIC_ALIAS(DOS$revoke, libd_revoke);
+DEFINE_PUBLIC_ALIAS(DOS$syscall, libd_syscall);
+DEFINE_PUBLIC_ALIAS(DOS$syscall64, libd_syscall64);
 DEFINE_PUBLIC_ALIAS(DOS$chroot, libd_chroot);
 DEFINE_PUBLIC_ALIAS(DOS$getpass, libd_getpass);
 DEFINE_PUBLIC_ALIAS(DOS$_chsize, libd_ftruncate);

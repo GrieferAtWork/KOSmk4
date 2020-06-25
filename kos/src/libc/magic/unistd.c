@@ -1671,11 +1671,15 @@ int revoke([[nonnull]] char const *file);
 %[insert:extern(acct)]
 
 [[cp, section(".text.crt{|.dos}.system.utility")]]
+[[vartypes($syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t,
+           $syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t)]]
 $longptr_t syscall($longptr_t sysno, ...);
 
 %
 %#ifdef __USE_KOS
 [[cp, section(".text.crt{|.dos}.system.utility"), preferred_alias("syscall")]]
+[[vartypes($syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t,
+           $syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t)]]
 __LONG64_TYPE__ syscall64($syscall_ulong_t sysno, ...);
 %#endif /* __USE_KOS */
 %

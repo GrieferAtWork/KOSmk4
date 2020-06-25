@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ea4f7cb */
+/* HASH CRC-32:0xbe3b859c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -493,6 +493,8 @@ DFUN(".text.crt.dos.except.system.configuration", libd_GetHostName, libc_GetHost
 DFUN(".text.crt.dos.except.system.configuration", libd_SetHostName, libc_SetHostName, TV, 2, TP, TI)
 DFUN(".text.crt.dos.except.system.configuration", libd_GetDomainName, libc_GetDomainName, TV, 2, TP, TI)
 DFUN(".text.crt.dos.except.system.configuration", libd_SetDomainName, libc_SetDomainName, TV, 2, TP, TI)
+DFUN(".text.crt.dos.except.system.utility", libd_Syscall, libc_Syscall, TIn(__SIZEOF_SYSCALL_LONG_T__), 7, TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__))
+DFUN(".text.crt.dos.except.system.utility", libd_Syscall64, libc_Syscall64, TI64, 7, TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__))
 DFUN(".text.crt.dos.except.fs.utility", libd_ChRoot, libc_ChRoot, TV, 1, TP)
 DFUN(".text.crt.dos.except.io.write", libd_FTruncate, libc_FTruncate, TV, 2, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF32_T__))
 DFUN(".text.crt.dos.except.io.large.write", libd_FTruncate64, libc_FTruncate64, TV, 2, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF64_T__))
@@ -2337,6 +2339,8 @@ DFUN(".text.crt.dos.system.configuration", libd_setdomainname, libc_setdomainnam
 DFUN(".text.crt.dos.system.utility", libd_profil, libc_profil, TD, 4, TP, TI, TI, TD)
 DFUN(".text.crt.dos.system.utility", libd_daemon, libc_daemon, TD, 2, TD, TD)
 DFUN(".text.crt.dos.fs.modify", libd_revoke, libc_revoke, TD, 1, TP)
+DFUN(".text.crt.dos.system.utility", libd_syscall, libc_syscall, TP, 7, TP, TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__))
+DFUN(".text.crt.dos.system.utility", libd_syscall64, libc_syscall64, TI64, 7, TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_SYSCALL_LONG_T__))
 DFUN(".text.crt.dos.fs.utility", libd_chroot, libc_chroot, TD, 1, TP)
 DFUN(".text.crt.dos.io.tty", libd_getpass, libc_getpass, TP, 1, TP)
 DFUN(".text.crt.dos.io.write", libd_ftruncate, libc_ftruncate, TD, 2, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF32_T__))
