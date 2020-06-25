@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9939af1 */
+/* HASH CRC-32:0xc68a9d26 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,14 +51,14 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wchown)(char16_t const *file, 
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wchown)(char32_t const *file, uid_t owner, gid_t group);
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path, __STDC_INT_AS_UINT_T name);
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'

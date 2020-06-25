@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x331f76b3 */
+/* HASH CRC-32:0x917e7814 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ INTDEF void (LIBDCALL libd_SetUid)(uid_t uid) THROWS(...);
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTDEF void (LIBDCALL libd_SetGid)(gid_t gid) THROWS(...);
 /* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
@@ -79,7 +79,7 @@ INTDEF WUNUSED long int (LIBDCALL libd_FPathConf)(fd_t fd, int name) THROWS(...)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 INTDEF NONNULL((1)) void (LIBDCALL libd_Chown)(char const *file, uid_t owner, gid_t group) THROWS(...);
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'

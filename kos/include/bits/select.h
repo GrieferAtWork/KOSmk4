@@ -21,28 +21,23 @@
 #define _BITS_SELECT_H 1
 
 #include <__stdinc.h>
-
-#ifndef __FD_SETSIZE
-#define __FD_SETSIZE 1024
-#endif /* !__FD_SETSIZE */
+#include <asm/select.h> /* __FD_SETSIZE */
 
 #ifndef __FD_ZERO
-#define __FD_ZERO(set)                                                 \
-	do {                                                               \
-		__size_t __i;                                                  \
-		fd_set *const __arr = (set);                                   \
-		for (__i = 0; __i < sizeof(fd_set) / sizeof(__fd_mask); ++__i) \
-			__FDS_BITS(__arr)                                          \
-			[__i] = 0;                                                 \
-	} __WHILE0
+#include <hybrid/typecore.h>
+#include <libc/string.h>
+#define __FD_ZERO(set) \
+	__libc_memset(__FDS_BITS(__arr), 0, __FD_SETSIZE / __CHAR_BIT__)
 #endif /* !__FD_ZERO */
 
 #ifndef __FD_SET
 #define __FD_SET(d, set) ((void)(__FDS_BITS(set)[__FD_ELT(d)] |= __FD_MASK(d)))
 #endif /* !__FD_SET */
+
 #ifndef __FD_CLR
 #define __FD_CLR(d, set) ((void)(__FDS_BITS(set)[__FD_ELT(d)] &= ~__FD_MASK(d)))
 #endif /* !__FD_CLR */
+
 #ifndef __FD_ISSET
 #define __FD_ISSET(d, set) ((__FDS_BITS(set)[__FD_ELT(d)] & __FD_MASK(d)) != 0)
 #endif /* !__FD_ISSET */

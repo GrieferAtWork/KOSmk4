@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2f5fcf3 */
+/* HASH CRC-32:0x781184de */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -185,6 +185,7 @@ __NAMESPACE_STD_USING(snprintf)
 
 #include <features.h>
 
+#include <asm/crt/stdio.h>
 #include <asm/oflags.h>
 #include <asm/stdio.h>
 #include <bits/stdio_lim.h>
@@ -194,7 +195,7 @@ __NAMESPACE_STD_USING(snprintf)
 #include <libio.h>
 
 #ifdef __USE_DOS
-#include <bits/sys_errlist.h>
+#include <bits/crt/sys_errlist.h>
 #include <xlocale.h>
 #endif /* __USE_DOS */
 
@@ -203,7 +204,7 @@ __NAMESPACE_STD_USING(snprintf)
 #endif /* __CRT_CYG_PRIMARY */
 
 #ifdef __CRT_DOS_PRIMARY
-#include <bits/io-file.h>
+#include <bits/crt/io-file.h>
 #endif /* __CRT_DOS_PRIMARY */
 
 __SYSDECL_BEGIN
@@ -443,7 +444,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fflush, __FORCELOCAL int (__LIBCCALL fflush)(FIL
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setbuf,(FILE *__restrict __stream, char *__buf),(__stream,__buf))
 #else /* __CRT_HAVE_setbuf */
 __NAMESPACE_STD_END
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 __NAMESPACE_STD_BEGIN
 #if defined(___IOFBF) && defined(___IONBF) && defined(__BUFSIZ) && (defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked))
 __NAMESPACE_STD_END
@@ -1752,7 +1753,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setbuffer,(__FILE *__restrict 
 /* Specify the location and size for the buffer to-be used by `STREAM' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setbuffer,(__FILE *__restrict __stream, char *__buf, __SIZE_TYPE__ __bufsize),_IO_setbuffer,(__stream,__buf,__bufsize))
 #else /* ... */
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 #if defined(___IOFBF) && defined(___IONBF) && (defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked))
 #include <local/stdio/setbuffer.h>
 /* Specify the location and size for the buffer to-be used by `STREAM' */

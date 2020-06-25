@@ -22,121 +22,24 @@
 
 %{
 #include <features.h>
-#include <endian.h>
+
 #include <hybrid/typecore.h>
+
+#include <bits/acct.h>
 #include <bits/types.h>
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
+#include <endian.h>
+#endif /* __USE_GLIBC */
 
+#ifdef __CC__
 __SYSDECL_BEGIN
-
-/* Documentation taken from Glibc /usr/include/i386-linux-gnu/sys/acct.h */
-/* Copyright (C) 1996-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-
-#define ACCT_COMM 16
-#define AHZ       100
-
-#if __BYTE_ORDER == __BIG_ENDIAN
-#define ACCT_BYTEORDER 0x80  /* Accounting file is big endian. */
-#else
-#define ACCT_BYTEORDER 0x00  /* Accounting file is little endian. */
-#endif
-
-
-/*[[[enum]]]*/
-#ifdef __CC__
-enum {
-	AFORK = 0x01, /* Has executed fork, but no exec. */
-	ASU   = 0x02, /* Used super-user privileges. */
-	ACORE = 0x08, /* Dumped core. */
-	AXSIG = 0x10  /* Killed by a signal. */
-};
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#define AFORK AFORK /* Has executed fork, but no exec. */
-#define ASU   ASU   /* Used super-user privileges. */
-#define ACORE ACORE /* Dumped core. */
-#define AXSIG AXSIG /* Killed by a signal. */
-#else /* __COMPILER_PREFERR_ENUMS */
-#define AFORK 0x01 /* Has executed fork, but no exec. */
-#define ASU   0x02 /* Used super-user privileges. */
-#define ACORE 0x08 /* Dumped core. */
-#define AXSIG 0x10 /* Killed by a signal. */
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
-
-#ifdef __CC__
 
 #ifndef __time_t_defined
 #define __time_t_defined 1
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
-
-/*
-  comp_t is a 16-bit "floating" point number with a 3-bit base 8
-  exponent and a 13-bit fraction. See linux/kernel/acct.c for the
-  specific encoding system used.
-*/
-
-typedef __UINT16_TYPE__ comp_t;
-
-struct acct {
-	char            ac_flag;              /* Flags.  */
-	__UINT16_TYPE__ ac_uid;               /* Real user ID.  */
-	__UINT16_TYPE__ ac_gid;               /* Real group ID.  */
-	__UINT16_TYPE__ ac_tty;               /* Controlling terminal.  */
-	__UINT32_TYPE__ ac_btime;             /* Beginning time.  */
-	comp_t          ac_utime;             /* User time.  */
-	comp_t          ac_stime;             /* System time.  */
-	comp_t          ac_etime;             /* Elapsed time.  */
-	comp_t          ac_mem;               /* Average memory usage.  */
-	comp_t          ac_io;                /* Chars transferred.  */
-	comp_t          ac_rw;                /* Blocks read or written.  */
-	comp_t          ac_minflt;            /* Minor pagefaults.  */
-	comp_t          ac_majflt;            /* Major pagefaults.  */
-	comp_t          ac_swaps;             /* Number of swaps.  */
-	__UINT32_TYPE__ ac_exitcode;          /* Process exitcode.  */
-	char            ac_comm[ACCT_COMM+1]; /* Command name.  */
-	char            ac_pad[10];           /* Padding bytes.  */
-};
-
-struct acct_v3 {
-	char            ac_flag;            /* Flags */
-	char            ac_version;         /* Always set to ACCT_VERSION */
-	__UINT16_TYPE__ ac_tty;             /* Control Terminal */
-	__UINT32_TYPE__ ac_exitcode;        /* Exitcode */
-	__UINT32_TYPE__ ac_uid;             /* Real User ID */
-	__UINT32_TYPE__ ac_gid;             /* Real Group ID */
-	__UINT32_TYPE__ ac_pid;             /* Process ID */
-	__UINT32_TYPE__ ac_ppid;            /* Parent Process ID */
-	__UINT32_TYPE__ ac_btime;           /* Process Creation Time */
-	float           ac_etime;           /* Elapsed Time */
-	comp_t          ac_utime;           /* User Time */
-	comp_t          ac_stime;           /* System Time */
-	comp_t          ac_mem;             /* Average Memory Usage */
-	comp_t          ac_io;              /* Chars Transferred */
-	comp_t          ac_rw;              /* Blocks Read or Written */
-	comp_t          ac_minflt;          /* Minor Pagefaults */
-	comp_t          ac_majflt;          /* Major Pagefaults */
-	comp_t          ac_swaps;           /* Number of Swaps */
-	char            ac_comm[ACCT_COMM]; /* Command Name */
-};
 
 }
 
@@ -146,8 +49,7 @@ int acct(const char *filename);
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

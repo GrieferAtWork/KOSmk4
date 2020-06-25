@@ -31,7 +31,7 @@
 #include <hybrid/sync/atomic-owner-rwlock.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <bits/io-file.h>
+#include <bits/crt/io-file.h>
 #include <kos/syscalls.h>
 #include <parts/errno.h>
 

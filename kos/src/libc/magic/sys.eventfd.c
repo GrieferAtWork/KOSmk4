@@ -24,10 +24,13 @@
 
 %{
 #include <features.h>
-#include <stdint.h>
+
 #include <bits/types.h>
 #include <bits/eventfd.h>
 
+#ifdef __USE_GLIBC
+#include <stdint.h>
+#endif /* __USE_GLIBC */
 
 /* Documentation taken from Glibc /usr/include/i386-linux-gnu/sys/eventfd.h */
 /* Copyright (C) 2007-2016 Free Software Foundation, Inc.
@@ -54,7 +57,7 @@ __SYSDECL_BEGIN
 /* Type for event counter. */
 #ifndef __eventfd_t_defined
 #define __eventfd_t_defined 1
-typedef uint64_t eventfd_t;
+typedef __uint64_t eventfd_t;
 #endif /* !__eventfd_t_defined */
 
 }

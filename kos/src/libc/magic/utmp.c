@@ -23,8 +23,14 @@
 
 %{
 #include <features.h>
+#include <bits/crt/db/utmp.h>
+#include <bits/types.h>
+#include <paths.h>
+
+#ifdef __USE_GLIBC
+#include <sys/time.h>
 #include <sys/types.h>
-#include <bits/utmp.h>
+#endif /* __USE_GLIBC */
 
 /* Documentation taken from Glibc /usr/include/utmp.h */
 /* Copyright (C) 1993-2016 Free Software Foundation, Inc.
@@ -47,10 +53,10 @@
 __SYSDECL_BEGIN
 
 /* Compatibility names for the strings of the canonical file names. */
-#define UTMP_FILE      _PATH_UTMP
-#define UTMP_FILENAME  _PATH_UTMP
-#define WTMP_FILE      _PATH_WTMP
-#define WTMP_FILENAME  _PATH_WTMP
+#define UTMP_FILE     _PATH_UTMP
+#define UTMP_FILENAME _PATH_UTMP
+#define WTMP_FILE     _PATH_WTMP
+#define WTMP_FILENAME _PATH_WTMP
 
 #ifdef __CC__
 }
@@ -62,7 +68,7 @@ __SYSDECL_BEGIN
 int login_tty($fd_t fd);
 
 @@Write the given entry into utmp and wtmp
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
 void login([[nonnull]] struct utmp const *entry);
 
 @@Write the utmp entry to say the user on UT_LINE has logged out
@@ -76,7 +82,7 @@ void logwtmp([[nonnull]] char const *ut_line,
              [[nonnull]] char const *ut_host);
 
 @@Append entry UTMP to the wtmp-like file WTMP_FILE
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
 void updwtmp([[nonnull]] char const *wtmp_file,
              [[nonnull]] struct utmp const *utmp);
 
@@ -85,7 +91,7 @@ void updwtmp([[nonnull]] char const *wtmp_file,
 int utmpname([[nonnull]] char const *file);
 
 @@Read next entry from a utmp-like file
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
 struct utmp *getutent();
 
 @@Reset the input stream to the beginning of the file
@@ -97,31 +103,31 @@ void endutent();
 
 @@Search forward from the current point in the utmp file
 @@until the next entry with a ut_type matching ID->ut_type
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
 struct utmp *getutid([[nonnull]] struct utmp const *id);
 
 @@Search forward from the current point in the utmp file
 @@until the next entry with a ut_line matching LINE->ut_line
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
 struct utmp *getutline([[nonnull]] struct utmp const *line);
 
 @@Write out entry pointed to by UTMP_PTR into the utmp file
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
 struct utmp *pututline([[nonnull]] struct utmp const *utmp_ptr);
 
 %
 %#ifdef __USE_MISC
 @@Reentrant versions of the file for handling utmp files
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
 int getutent_r([[nonnull]] struct utmp *buffer,
                [[nonnull]] struct utmp **result);
 
-[[cp_kos, doc_alias(getutent_r)]]
+[[cp_kos, doc_alias(getutent_r), decl_include("<bits/crt/db/utmp.h>")]]
 int getutid_r([[nonnull]] struct utmp const *id,
               [[nonnull]] struct utmp *buffer,
               [[nonnull]] struct utmp **result);
 
-[[cp_kos, doc_alias(getutent_r)]]
+[[cp_kos, doc_alias(getutent_r), decl_include("<bits/crt/db/utmp.h>")]]
 int getutline_r([[nonnull]] struct utmp const *line,
                 [[nonnull]] struct utmp *buffer,
                 [[nonnull]] struct utmp **result);

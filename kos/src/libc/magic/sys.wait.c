@@ -27,6 +27,7 @@
 %{
 #include <features.h>
 #include <bits/types.h>
+#include <bits/waitmacros.h>
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #include <bits/siginfo.h> /* We'd only need `siginfo_t' */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
@@ -48,11 +49,6 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-#ifndef __WAIT_MACROS_DEFINED
-#include <bits/waitflags.h>
-#include <bits/waitstatus.h>
-#endif /* !__WAIT_MACROS_DEFINED */
-
 __SYSDECL_BEGIN
 
 #ifdef __USE_MISC
@@ -68,44 +64,11 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#ifndef __WAIT_MACROS_DEFINED
-#define __WAIT_MACROS_DEFINED 1
-#ifdef __USE_MISC
-#if defined(__GNUC__) && !defined(__cplusplus)
-#   define __WAIT_INT(status) (__extension__(((union{ __typeof__(status) __inval; int __ival; }) { .__inval = (status) }).__ival))
-#else /* __GNUC__ && !__cplusplus */
-#   define __WAIT_INT(status) (*(int *)&(status))
-#endif /* !__GNUC__ || __cplusplus */
-#ifdef __NO_ATTR_TRANSPARENT_UNION
-#   define __WAIT_STATUS      void *
-#   define __WAIT_STATUS_DEFN void *
-#else /* __NO_ATTR_TRANSPARENT_UNION */
-typedef union {
-	union wait *__uptr_;
-	int        *__iptr_;
-} __WAIT_STATUS __ATTR_TRANSPARENT_UNION;
-#   define __WAIT_STATUS_DEFN int *
-#endif /* !__NO_ATTR_TRANSPARENT_UNION */
-#else /* __USE_MISC */
-#   define __WAIT_INT(status)  (status)
-#   define __WAIT_STATUS        int *
-#   define __WAIT_STATUS_DEFN   int *
-#endif /* !__USE_MISC */
-#   define WEXITSTATUS(status)  __WEXITSTATUS(__WAIT_INT(status))
-#   define WTERMSIG(status)     __WTERMSIG(__WAIT_INT(status))
-#   define WSTOPSIG(status)     __WSTOPSIG(__WAIT_INT(status))
-#   define WIFEXITED(status)    __WIFEXITED(__WAIT_INT(status))
-#   define WIFSIGNALED(status)  __WIFSIGNALED(__WAIT_INT(status))
-#   define WIFSTOPPED(status)   __WIFSTOPPED(__WAIT_INT(status))
-#ifdef __WIFCONTINUED
-#   define WIFCONTINUED(status) __WIFCONTINUED(__WAIT_INT(status))
-#endif /* __WIFCONTINUED */
-#endif /* !__WAIT_MACROS_DEFINED */
-
 }
 
+
 @@Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);')
-[[cp, export_alias("__wait")]]
+[[cp, export_alias("__wait"), decl_include("<bits/types.h>", "<bits/waitmacros.h>")]]
 $pid_t wait([[nullable]] __WAIT_STATUS stat_loc);
 
 @@Wait for a child process:
@@ -113,8 +76,8 @@ $pid_t wait([[nullable]] __WAIT_STATUS stat_loc);
 @@ - `pid == -1': Wait for any child process
 @@ - `pid == 0':  Wait for any child process whose process group ID is that of the caller
 @@ - `pid > 0':   Wait for the child whose process ID is equal to `PID'
-@@@param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
-[[decl_include("<features.h>")]]
+@@@param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
+[[decl_include("<bits/types.h>", "<features.h>", "<bits/waitmacros.h>")]]
 [[cp, export_alias("__waitpid")]]
 $pid_t waitpid($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
                __STDC_INT_AS_UINT_T options);
@@ -137,19 +100,21 @@ int waitid(idtype_t idtype, id_t id,
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 %struct rusage;
 
-[[decl_include("<features.h>", "<bits/rusage-struct.h>")]]
+[[decl_include("<bits/types.h>", "<features.h>")]]
+[[decl_include("<bits/rusage-struct.h>", "<bits/waitmacros.h>")]]
 [[cp, doc_alias("wait3"), ignore, nocrt, alias("wait3")]]
 $pid_t wait3_32([[nullable]] __WAIT_STATUS stat_loc,
                 __STDC_INT_AS_UINT_T options,
                 [[nullable]] struct $rusage32 *usage);
 
-@@Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+@@Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [[cp, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("wait3_64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("wait3")]]
 [[userimpl, requires($has_function(wait3_32) || $has_function(wait3_64))]]
-[[decl_include("<features.h>", "<bits/rusage-struct.h>")]]
+[[decl_include("<bits/types.h>", "<features.h>")]]
+[[decl_include("<bits/rusage-struct.h>", "<bits/waitmacros.h>")]]
 [[impl_include("<bits/rusage-convert.h>")]]
 $pid_t wait3([[nullable]] __WAIT_STATUS stat_loc,
              __STDC_INT_AS_UINT_T options,
@@ -171,8 +136,9 @@ $pid_t wait3([[nullable]] __WAIT_STATUS stat_loc,
 
 %#ifdef __USE_TIME64
 %struct rusage64;
-[[decl_include("<features.h>"), decl_prefix(struct rusage64;)]]
-[[impl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>")]]
+[[decl_include("<bits/types.h>", "<features.h>")]]
+[[decl_include("<bits/rusage-struct.h>", "<bits/waitmacros.h>")]]
+[[impl_include("<bits/rusage-struct.h>", "<bits/rusage-convert.h>", "<bits/waitmacros.h>")]]
 [[doc_alias("wait3"), time64_variant_of(wait3)]]
 [[userimpl, requires_function(wait3_32)]]
 $pid_t wait3_64([[nullable]] __WAIT_STATUS stat_loc,
@@ -191,18 +157,20 @@ $pid_t wait3_64([[nullable]] __WAIT_STATUS stat_loc,
 %
 %#ifdef __USE_MISC
 
-[[decl_include("<features.h>", "<bits/rusage-struct.h>")]]
+[[decl_include("<bits/types.h>", "<features.h>")]]
+[[decl_include("<bits/rusage-struct.h>", "<bits/waitmacros.h>")]]
 [[cp, doc_alias("wait4"), ignore, nocrt, alias("wait4")]]
 $pid_t wait4_32($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
                 __STDC_INT_AS_UINT_T options,
                 [[nullable]] struct $rusage32 *usage);
 
-@@Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
-@@@param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
+@@Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
+@@@param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [[cp, decl_prefix(struct rusage;)]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("wait4_64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("wait4")]]
-[[decl_include("<features.h>", "<bits/rusage-struct.h>")]]
+[[decl_include("<bits/types.h>", "<features.h>")]]
+[[decl_include("<bits/rusage-struct.h>", "<bits/waitmacros.h>")]]
 [[impl_include("<bits/rusage-convert.h>")]]
 [[userimpl, requires($has_function(wait4_32) || $has_function(wait4_64))]]
 $pid_t wait4($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
@@ -226,7 +194,8 @@ $pid_t wait4($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
 %#ifdef __USE_TIME64
 %struct rusage64;
 [[doc_alias("wait4"), time64_variant_of(wait4), decl_prefix(struct rusage64;)]]
-[[decl_include("<features.h>", "<bits/rusage-struct.h>")]]
+[[decl_include("<bits/types.h>", "<features.h>")]]
+[[decl_include("<bits/rusage-struct.h>", "<bits/waitmacros.h>")]]
 [[impl_include("<bits/rusage-convert.h>")]]
 [[userimpl, requires_function(wait4_32)]]
 $pid_t wait4_64($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
@@ -332,6 +301,7 @@ $pid_t wait4_64($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
 @@                             This could mean that it had already been detached
 @@                             and exited, or that the `PID' is just invalid (which
 @@                             would also be the case if it was valid at some point)
+[[decl_include("<bits/types.h>")]]
 int detach($pid_t pid);
 %#endif /* __USE_KOS */
 

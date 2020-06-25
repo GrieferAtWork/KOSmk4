@@ -46,10 +46,10 @@
 #endif /* !SEEK_SET */
 
 #ifndef L_SET
-#define L_SET  SEEK_SET /* Seek from beginning of file. */
-#define L_CURR SEEK_CUR /* Seek from current position. */
-#define L_INCR SEEK_CUR /* Seek from current position. */
-#define L_XTND SEEK_END /* Seek from end of file. */
+#define L_SET  __SEEK_SET /* Seek from beginning of file. */
+#define L_CURR __SEEK_CUR /* Seek from current position. */
+#define L_INCR __SEEK_CUR /* Seek from current position. */
+#define L_XTND __SEEK_END /* Seek from end of file. */
 #endif /* !L_SET */
 
 /* Shared lock. */
@@ -79,7 +79,7 @@ __SYSDECL_BEGIN
 }
 
 @@Apply or remove an advisory lock, according to OPERATION, on the file FD refers to
-[[cp, decl_include("<features.h>")]]
+[[cp, decl_include("<features.h>", "<bits/types.h>")]]
 int flock($fd_t fd, __STDC_INT_AS_UINT_T operation);
 
 %{

@@ -347,10 +347,10 @@ void _free_dbg([[nullable]] void *ptr, int block_type) {
 }
 
 [[guard, wunused, ATTR_PURE]]
-[[crt_dos_only, requires_function(_msize)]]
+[[crt_dos_only, requires_function(malloc_usable_size)]]
 $size_t _msize_dbg([[nonnull]] void *ptr, int block_type) {
 	(void)block_type;
-	return _msize(ptr);
+	return malloc_usable_size(ptr);
 }
 
 [[guard, wunused, ATTR_PURE]]

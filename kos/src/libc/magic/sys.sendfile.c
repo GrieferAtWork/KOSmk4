@@ -53,6 +53,7 @@ __SYSDECL_BEGIN
 
 };
 
+[[decl_include("<bits/types.h>")]]
 [[doc_alias("sendfile"), ignore, nocrt, alias("sendfile")]]
 ssize_t sendfile32($fd_t out_fd, $fd_t in_fd,
                    [[nullable]] $off32_t *offset,
@@ -63,7 +64,7 @@ ssize_t sendfile32($fd_t out_fd, $fd_t in_fd,
 @@to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
 @@read bytes. If OFFSET is a null pointer, use the normal file position instead.
 @@Return the number of written bytes, or -1 in case of error
-[[no_crt_self_import]]
+[[no_crt_self_import, decl_include("<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile")]]
 [[userimpl, requires($has_function(sendfile32) || $has_function(sendfile64))]]
@@ -93,6 +94,7 @@ ssize_t sendfile($fd_t out_fd, $fd_t in_fd,
 }
 
 %#ifdef __USE_LARGEFILE64
+[[decl_include("<bits/types.h>")]]
 [[doc_alias("sendfile"), off64_variant_of(sendfile)]]
 [[userimpl, requires_function(sendfile32)]]
 ssize_t sendfile64($fd_t out_fd, $fd_t in_fd,

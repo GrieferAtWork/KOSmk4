@@ -51,6 +51,13 @@
 #define __CLONE_NEWNET         0x40000000 /* New network namespace. */
 #define __CLONE_IO             0x80000000 /* Clone I/O context. */
 
+#define __SCHED_OTHER         0x00000000 /* ... */
+#define __SCHED_FIFO          0x00000001 /* ... */
+#define __SCHED_RR            0x00000002 /* ... */
+#define __SCHED_BATCH         0x00000003 /* ... */
+#define __SCHED_IDLE          0x00000005 /* ... */
+#define __SCHED_RESET_ON_FORK 0x40000000 /* ... */
+
 #endif /* ... */
 
 #endif /* !_ASM_SCHED_H */

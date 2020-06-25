@@ -52,9 +52,11 @@ struct sgttyb;
 }
 
 @@Fill in *PARAMS with terminal parameters associated with FD
+[[decl_prefix(struct sgttyb;), decl_include("<bits/types.h>")]]
 int gtty($fd_t fd, [[nonnull]] struct sgttyb *params);
 
 @@Set the terminal parameters associated with FD to *PARAMS
+[[decl_prefix(struct sgttyb;), decl_include("<bits/types.h>")]]
 int stty($fd_t fd, [[nonnull]] struct sgttyb const *params);
 
 %{

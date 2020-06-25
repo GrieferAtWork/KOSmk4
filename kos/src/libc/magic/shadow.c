@@ -26,6 +26,8 @@
 #include <features.h>
 #include <paths.h>
 
+#include <bits/crt/db/spwd.h>
+
 /* Documentation taken from Glibc /usr/include/shadow.h */
 /* Copyright (C) 1996-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -47,7 +49,9 @@
 __SYSDECL_BEGIN
 
 /* Paths to the user database files.  */
+#ifdef _PATH_SHADOW
 #define SHADOW _PATH_SHADOW
+#endif /* _PATH_SHADOW */
 
 #ifdef __CC__
 
@@ -70,20 +74,6 @@ __NAMESPACE_STD_USING(FILE)
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
-
-/* Structure of the password file.  */
-struct spwd {
-	char             *sp_namp;    /* Login name. */
-	char             *sp_pwdp;    /* Encrypted password. */
-	__LONGPTR_TYPE__  sp_lstchg;  /* Date of last change. */
-	__LONGPTR_TYPE__  sp_min;     /* Minimum number of days between changes. */
-	__LONGPTR_TYPE__  sp_max;     /* Maximum number of days between changes. */
-	__LONGPTR_TYPE__  sp_warn;    /* Number of days to warn user to change the password. */
-	__LONGPTR_TYPE__  sp_inact;   /* Number of days the account may be inactive. */
-	__LONGPTR_TYPE__  sp_expire;  /* Number of days since 1970-01-01 until account expires. */
-	__ULONGPTR_TYPE__ sp_flag;    /* Reserved. */
-};
-
 }
 
 
@@ -98,27 +88,27 @@ void endspent();
 
 @@Get next entry from database, perhaps after opening the file.
 @@This function is not part of POSIX and therefore no official cancellation point
-[[cp]]
+[[cp, decl_include("<bits/crt/db/spwd.h>")]]
 struct spwd *getspent();
 
 @@Get shadow entry matching NAME.
 @@This function is not part of POSIX and therefore no official cancellation point
-[[cp]]
+[[cp, decl_include("<bits/crt/db/spwd.h>")]]
 struct spwd *getspnam([[nonnull]] char const *__restrict name);
 
 @@Read shadow entry from STRING.
 @@This function is not part of POSIX and therefore no official cancellation point
-[[cp]]
+[[cp, decl_include("<bits/crt/db/spwd.h>")]]
 struct spwd *sgetspent([[nonnull]] char const *__restrict string);
 
 @@Read next shadow entry from STREAM.
 @@This function is not part of POSIX and therefore no official cancellation point
-[[cp]]
+[[cp, decl_include("<bits/crt/db/spwd.h>")]]
 struct spwd *fgetspent([[nonnull]] $FILE *__restrict stream);
 
 @@Write line containing shadow password entry to stream.
 @@This function is not part of POSIX and therefore no official cancellation point
-[[cp]]
+[[cp, decl_include("<bits/crt/db/spwd.h>")]]
 int putspent([[nonnull]] struct spwd const *__restrict p,
              [[nonnull]] $FILE *__restrict stream);
 
@@ -126,24 +116,24 @@ int putspent([[nonnull]] struct spwd const *__restrict p,
 %#ifdef __USE_MISC
 @@Reentrant versions of some of the functions above.
 @@These functions are not part of POSIX and therefore no official cancellation point
-[[cp]]
+[[cp, decl_include("<bits/crt/db/spwd.h>")]]
 int getspent_r([[nonnull]] struct spwd *__restrict result_buf,
                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                [[nonnull]] struct spwd **__restrict result);
 
-[[cp, doc_alias("getspent_r")]]
+[[cp, doc_alias(getspent_r), decl_include("<bits/crt/db/spwd.h>")]]
 int getspnam_r([[nonnull]] char const *__restrict name,
                [[nonnull]] struct spwd *__restrict result_buf,
                [[nonnull]] char *__restrict buffer, size_t buflen,
                [[nonnull]] struct spwd **__restrict result);
 
-[[cp, doc_alias("getspent_r")]]
+[[cp, doc_alias(getspent_r), decl_include("<bits/crt/db/spwd.h>")]]
 int sgetspent_r([[nonnull]] char const *__restrict string,
                 [[nonnull]] struct spwd *__restrict result_buf,
                 [[nonnull]] char *__restrict buffer, size_t buflen,
                 [[nonnull]] struct spwd **__restrict result);
 
-[[cp, doc_alias("getspent_r")]]
+[[cp, doc_alias(getspent_r), decl_include("<bits/crt/db/spwd.h>")]]
 int fgetspent_r([[nonnull]] $FILE *__restrict stream,
                 [[nonnull]] struct spwd *__restrict result_buf,
                 [[nonnull]] char *__restrict buffer, size_t buflen,

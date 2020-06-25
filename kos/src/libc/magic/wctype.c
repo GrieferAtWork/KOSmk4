@@ -63,7 +63,7 @@
 #include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
 
-#include <asm/stdio.h> /* __WEOF */
+#include <asm/crt/stdio.h> /* __WEOF */
 #include <bits/types.h>
 
 #if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
@@ -72,9 +72,9 @@
 
 __SYSDECL_BEGIN
 
-#ifndef WEOF
+#if !defined(WEOF) && defined(__WEOF)
 #define WEOF __WEOF
-#endif /* !WEOF */
+#endif /* !WEOF && __WEOF */
 
 #ifdef __CC__
 

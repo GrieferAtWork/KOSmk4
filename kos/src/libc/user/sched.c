@@ -26,11 +26,114 @@
 
 DECL_BEGIN
 
+/* Clone must be implemented in assembly! */
+/*[[[skip:libc_clone]]]*/
 
+/*[[[head:libc_unshare,hash:CRC-32=0xfce05d4c]]]*/
+/* >> unshare(2)
+ * Unshare certain components of the calling thread that may be shared with other
+ * threads or processes, such as the filesystem, or opened file descriptors.
+ * When being unshared, the calling thread's descriptor for a specific component
+ * is replaced with a copy of its previous contents at that moment in time, with
+ * the notable exception of certain KOS-specific extensions, where specifically
+ * marked data will be deleted (s.a. `O_CLOFORK' and `PROT_LOOSE')
+ * The behavior and meaning of individual bits in `flags' matches their meaning
+ * when passed to `clone()', except that for certain flags the meaning is reversed.
+ * For example: Passing `CLONE_FILES' to `clone(2)' will cause handles to be shared,
+ *              but passing it to `unshare(2)' will cause handles to be unshared.
+ * @param: flags: Set of `CLONE_*' flags:
+ *                 - CLONE_FILES:     Unshare handles (and close all marked as `O_CLOFORK')
+ *                 - CLONE_FS:        Unshare umask(), chroot(), chdir(), fsmode() and drive-cwds
+ *                 - CLONE_NEWCGROUP: ...
+ *                 - CLONE_NEWIPC:    ...
+ *                 - CLONE_NEWNET:    ...
+ *                 - CLONE_NEWNS:     Unshare the mount namespace
+ *                 - CLONE_NEWPID:    Unshare the PID namespace
+ *                 - CLONE_NEWUSER:   ...
+ *                 - CLONE_NEWUTS:    ...
+ *                 - CLONE_SYSVSEM:   ...
+ *                 - CLONE_VM:        Unshare the current VM (KOS extension)
+ *                 - CLONE_SIGHAND:   Unshare signal handlers (KOS extension) */
+INTERN ATTR_SECTION(".text.crt.sched.utility") int
+NOTHROW_NCX(LIBCCALL libc_unshare)(__STDC_INT_AS_UINT_T flags)
+/*[[[body:libc_unshare]]]*/
+{
+	errno_t result;
+	result = sys_unshare((syscall_ulong_t)(unsigned int)flags);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_unshare]]]*/
 
+/*[[[head:libc_sched_getcpu,hash:CRC-32=0x688a6a22]]]*/
+/* >> sched_getcpu(3)
+ * Returns the number of the CPU for the calling thread.
+ * Note that due to unforeseeable scheduling conditions, this may change at any
+ * moment, even before this function returns, or before the caller was able to
+ * act on its return value. For that reason, this function must only be taken
+ * as a hint */
+INTERN ATTR_SECTION(".text.crt.sched.utility") __STDC_INT_AS_UINT_T
+NOTHROW_NCX(LIBCCALL libc_sched_getcpu)(void)
+/*[[[body:libc_sched_getcpu]]]*/
+{
+	errno_t error;
+	uint32_t res;
+	/* XXX: Figure out how linux implements `struct getcpu_cache' */
+	error = sys_getcpu(&res, NULL, NULL);
+	if (E_ISERR(error)) {
+		libc_seterrno(-error);
+		return -1;
+	}
+	return (int)(unsigned int)res;
+}
+/*[[[end:libc_sched_getcpu]]]*/
 
+/*[[[head:libc_setns,hash:CRC-32=0x9fc156c5]]]*/
+/* >> setns(2)
+ * With `FD' referring to a namespace, reassociate the calling thread with that namespace.
+ * For this purpose, `FD' was opened for one of the files in `/proc/[pid]/ns/'
+ * @param: nstype: The type of namespace to re-associate (either 0 to allow any
+ *                 type of namespace, or one of `CLONE_NEWCGROUP', `CLONE_NEWIPC',
+ *                `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',
+ *                `CLONE_NEWUTS') */
+INTERN ATTR_SECTION(".text.crt.sched.utility") int
+NOTHROW_NCX(LIBCCALL libc_setns)(fd_t fd,
+                                 __STDC_INT_AS_UINT_T nstype)
+/*[[[body:libc_setns]]]*/
+{
+	errno_t result;
+	result = sys_setns(fd,
+	                   (syscall_ulong_t)(unsigned int)nstype);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_setns]]]*/
 
-/*[[[start:implementation]]]*/
+/*[[[head:libc_exit_thread,hash:CRC-32=0x75d45953]]]*/
+/* Exits the current thread by invoking the SYS_exit system call,
+ * after performing some additional cleanup not done by the kernel.
+ * Assuming that the calling thread was constructed by `clone()',
+ * calling this function has the same effect as returning `EXIT_CODE'
+ * from `clone()'s `FN' callback */
+INTERN ATTR_SECTION(".text.crt.sched.access") ATTR_NORETURN void
+NOTHROW_NCX(LIBCCALL libc_exit_thread)(int exit_code)
+/*[[[body:libc_exit_thread]]]*/
+{
+	/* NOTE: The TLS segment, and stack are explicitly defined when calling the clone() function.
+	 *       Seeing this, we'd be wrong to assume and free a DL-based TLS segment, or munmap()
+	 *       the current stack, seeing how we cannot know if our current thread actually owns
+	 *       them.
+	 *       Given these facts, it would seem that this function is fairly pointless, as we can
+	 *       only get here if our thread still has a stack, in which case it would seem improbable
+	 *       that anyone else owns that stack. And given the fact that in order to use libc properly,
+	 *       one has to make use of DL-based TLS segments, it would also seem improbable that the
+	 *       current thread isn't (or wasn't) using a DL-based TLS segment.
+	 *       Oh well...
+	 */
+	/* Don't let yourself be fooled:
+	 *   - sys_exit()       terminated the calling _thread_
+	 *   - sys_exit_group() terminated the calling _process_ */
+	sys_exit((syscall_ulong_t)(unsigned int)exit_code);
+}
+/*[[[end:libc_exit_thread]]]*/
 
 /*[[[head:libc_sched_setparam,hash:CRC-32=0xcfb2c3b7]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.param") int
@@ -96,9 +199,9 @@ NOTHROW_NCX(LIBCCALL libc_sched_yield)(void)
 }
 /*[[[end:libc_sched_yield]]]*/
 
-/*[[[head:libc_sched_get_priority_max,hash:CRC-32=0xdd40b0c3]]]*/
+/*[[[head:libc_sched_get_priority_max,hash:CRC-32=0xcfb90dd3]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.param") int
-NOTHROW_NCX(LIBCCALL libc_sched_get_priority_max)(int algorithm)
+NOTHROW_NCX(LIBCCALL libc_sched_get_priority_max)(__STDC_INT_AS_UINT_T algorithm)
 /*[[[body:libc_sched_get_priority_max]]]*/
 {
 	syscall_slong_t result;
@@ -107,9 +210,9 @@ NOTHROW_NCX(LIBCCALL libc_sched_get_priority_max)(int algorithm)
 }
 /*[[[end:libc_sched_get_priority_max]]]*/
 
-/*[[[head:libc_sched_get_priority_min,hash:CRC-32=0xf43e4ddb]]]*/
+/*[[[head:libc_sched_get_priority_min,hash:CRC-32=0x3c3482c5]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.param") int
-NOTHROW_NCX(LIBCCALL libc_sched_get_priority_min)(int algorithm)
+NOTHROW_NCX(LIBCCALL libc_sched_get_priority_min)(__STDC_INT_AS_UINT_T algorithm)
 /*[[[body:libc_sched_get_priority_min]]]*/
 {
 	syscall_slong_t result;
@@ -172,11 +275,13 @@ NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid,
 #endif /* MAGIC:alias */
 /*[[[end:libc_sched_rr_get_interval64]]]*/
 
-/*[[[end:implementation]]]*/
 
 
-
-/*[[[start:exports,hash:CRC-32=0x772b6425]]]*/
+/*[[[start:exports,hash:CRC-32=0x722b9c1]]]*/
+DEFINE_PUBLIC_ALIAS(unshare, libc_unshare);
+DEFINE_PUBLIC_ALIAS(sched_getcpu, libc_sched_getcpu);
+DEFINE_PUBLIC_ALIAS(setns, libc_setns);
+DEFINE_PUBLIC_ALIAS(exit_thread, libc_exit_thread);
 DEFINE_PUBLIC_ALIAS(sched_setparam, libc_sched_setparam);
 DEFINE_PUBLIC_ALIAS(__sched_getparam, libc_sched_getparam);
 DEFINE_PUBLIC_ALIAS(sched_getparam, libc_sched_getparam);

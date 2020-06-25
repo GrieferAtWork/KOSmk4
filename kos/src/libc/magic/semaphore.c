@@ -29,7 +29,7 @@
 #include <features.h>
 #include <sys/types.h>
 #include <bits/types.h>
-#include <bits/semaphore.h>
+#include <bits/crt/semaphore.h>
 #ifdef __USE_XOPEN2K
 #include <bits/timespec.h>
 #endif /* __USE_XOPEN2K */
@@ -60,16 +60,20 @@ __SYSDECL_BEGIN
 
 @@Initialize semaphore object SEM to VALUE.
 @@If PSHARED then share it with other processes
+[[decl_prefix("<bits/crt/semaphore.h>")]]
 int sem_init([[nonnull]] sem_t *sem, int pshared, unsigned int value);
 
 @@Free resources associated with semaphore object SEM
+[[decl_prefix("<bits/crt/semaphore.h>")]]
 int sem_destroy([[nonnull]] sem_t *sem);
 
 @@Open a named semaphore NAME with open flags OFLAGS
 [[cp_kos, vartypes($mode_t, unsigned int)]]
+[[decl_prefix("<bits/crt/semaphore.h>")]]
 sem_t *sem_open([[nonnull]] char const *name, $oflag_t oflags, ...);
 
 @@Close descriptor for named semaphore SEM
+[[decl_prefix("<bits/crt/semaphore.h>")]]
 int sem_close([[nonnull]] sem_t *sem);
 
 @@Remove named semaphore NAME
@@ -77,10 +81,11 @@ int sem_close([[nonnull]] sem_t *sem);
 int sem_unlink([[nonnull]] const char *name);
 
 @@Wait for SEM being posted
-[[cp]]
+[[cp, decl_prefix("<bits/crt/semaphore.h>")]]
 int sem_wait([[nonnull]] sem_t *sem);
 
-[[cp, doc_alias(sem_timedwait), ignore, nocrt, alias(sem_timedwait)]]
+[[cp, doc_alias(sem_timedwait), ignore, nocrt, alias("sem_timedwait")]]
+[[decl_prefix("<bits/crt/semaphore.h>")]]
 int sem_timedwait32([[nonnull]] sem_t *__restrict sem,
                     [[nonnull]] struct $timespec32 const *__restrict abstime);
 
@@ -88,9 +93,9 @@ int sem_timedwait32([[nonnull]] sem_t *__restrict sem,
 %
 %#ifdef __USE_XOPEN2K
 @@Similar to `sem_wait' but wait only until ABSTIME
-[[cp, no_crt_self_import]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias(sem_timedwait)]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias(sem_timedwait64)]]
+[[cp, no_crt_self_import, decl_prefix("<bits/crt/semaphore.h>")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("sem_timedwait")]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("sem_timedwait64")]]
 [[userimpl, requires($has_function(sem_timedwait32) || $has_function(sem_timedwait64))]]
 int sem_timedwait([[nonnull]] sem_t *__restrict sem,
                   [[nonnull]] struct timespec const *__restrict abstime) {
@@ -111,6 +116,7 @@ int sem_timedwait([[nonnull]] sem_t *__restrict sem,
 %#ifdef __USE_TIME64
 [[cp, time64_variant_of(sem_timedwait)]]
 [[userimpl, requires_function(sem_timedwait32)]]
+[[decl_prefix("<bits/crt/semaphore.h>")]]
 int sem_timedwait64([[nonnull]] sem_t *__restrict sem,
                     [[nonnull]] struct timespec64 const *__restrict abstime) {
 	struct timespec32 ts32;
@@ -122,12 +128,15 @@ int sem_timedwait64([[nonnull]] sem_t *__restrict sem,
 %#endif /* __USE_XOPEN2K */
 
 @@Test whether SEM is posted
+[[decl_prefix("<bits/crt/semaphore.h>")]]
 int sem_trywait([[nonnull]] sem_t *sem);
 
 @@Post SEM
+[[decl_prefix("<bits/crt/semaphore.h>")]]
 int sem_post([[nonnull]] sem_t *sem);
 
 @@Get current value of SEM and store it in *SVAL
+[[decl_prefix("<bits/crt/semaphore.h>")]]
 int sem_getvalue([[nonnull]] sem_t *__restrict sem,
                  [[nonnull]] int *__restrict sval);
 

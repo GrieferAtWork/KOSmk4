@@ -49,8 +49,8 @@ NOTHROW_NCX(LIBCCALL libc_setfsuid)(uid_t uid)
 }
 /*[[[end:libc_setfsuid]]]*/
 
-/*[[[head:libc_setfsgid,hash:CRC-32=0x9864f42d]]]*/
-/* Ditto for group id */
+/*[[[head:libc_setfsgid,hash:CRC-32=0xae141683]]]*/
+/* Same as `setfsuid()', but for group id */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_setfsgid)(gid_t gid)
 /*[[[body:libc_setfsgid]]]*/

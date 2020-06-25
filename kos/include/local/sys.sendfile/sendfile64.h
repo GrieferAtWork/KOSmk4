@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf38561eb */
+/* HASH CRC-32:0x414b4770 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_sendfile64_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_sendfile
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sendfile32 from sys.sendfile */
 #ifndef __local___localdep_sendfile32_defined

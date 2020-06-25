@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e659208 */
+/* HASH CRC-32:0xaf40ba6b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,18 +38,41 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_MISC
 #ifndef DT_UNKNOWN
+#if (defined(__DT_UNKNOWN) || defined(__DT_FIFO) || \
+     defined(__DT_CHR) || defined(__DT_DIR) ||      \
+     defined(__DT_BLK) || defined(__DT_REG) ||      \
+     defined(__DT_LNK) || defined(__DT_SOCK) ||     \
+     defined(__DT_WHT))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	DT_UNKNOWN = __DT_UNKNOWN,
-	DT_FIFO    = __DT_FIFO,
-	DT_CHR     = __DT_CHR,
-	DT_DIR     = __DT_DIR,
-	DT_BLK     = __DT_BLK,
-	DT_REG     = __DT_REG,
-	DT_LNK     = __DT_LNK,
-	DT_SOCK    = __DT_SOCK,
-	DT_WHT     = __DT_WHT
+#ifdef __DT_UNKNOWN
+	DT_UNKNOWN = __DT_UNKNOWN, /* ... */
+#endif /* __DT_UNKNOWN */
+#ifdef __DT_FIFO
+	DT_FIFO = __DT_FIFO, /* ... */
+#endif /* __DT_FIFO */
+#ifdef __DT_CHR
+	DT_CHR = __DT_CHR, /* ... */
+#endif /* __DT_CHR */
+#ifdef __DT_DIR
+	DT_DIR = __DT_DIR, /* ... */
+#endif /* __DT_DIR */
+#ifdef __DT_BLK
+	DT_BLK = __DT_BLK, /* ... */
+#endif /* __DT_BLK */
+#ifdef __DT_REG
+	DT_REG = __DT_REG, /* ... */
+#endif /* __DT_REG */
+#ifdef __DT_LNK
+	DT_LNK = __DT_LNK, /* ... */
+#endif /* __DT_LNK */
+#ifdef __DT_SOCK
+	DT_SOCK = __DT_SOCK, /* ... */
+#endif /* __DT_SOCK */
+#ifdef __DT_WHT
+	DT_WHT = __DT_WHT /* ... */
+#endif /* __DT_WHT */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -75,16 +98,21 @@ enum {
 #define DT_WHT     __DT_WHT
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
 #endif /* !DT_UNKNOWN */
 
 /* Convert between stat structure types and directory types. */
 #ifndef IFTODT
-#define IFTODT(mode)    __IFTODT(mode)
+#ifdef __IFTODT
+#define IFTODT(mode) __IFTODT(mode)
+#endif /* __IFTODT */
+#ifdef __DTTOIF
 #define DTTOIF(dirtype) __DTTOIF(dirtype)
+#endif /* __DTTOIF */
 #endif /* !IFTODT */
 
 #if defined(__USE_XOPEN2K8) && !defined(MAXNAMLEN)
-#define MAXNAMLEN    255 /* == 'NAME_MAX' from <linux/limits.h> */
+#define MAXNAMLEN 255 /* == 'NAME_MAX' from <linux/limits.h> */
 #endif /* __USE_XOPEN2K8 && !MAXNAMLEN */
 #endif /* __USE_MISC */
 

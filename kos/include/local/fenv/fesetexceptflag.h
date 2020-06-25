@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcab7188c */
+/* HASH CRC-32:0xb4cfb1b4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_fesetexceptflag_defined
 #define __local_fesetexceptflag_defined 1
 #include <__crt.h>
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Set complete status for exceptions indicated by EXCEPTS according
  * to the representation in the object pointed to by FLAGP */

@@ -22,7 +22,13 @@
 
 %{
 #include <features.h>
+
+#include <asm/xattr.h>
+#include <bits/types.h>
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
+#endif /* __USE_GLIBC */
 
 /* Documentation comments have been taken from GLibc: /usr/include/i386-linux-gnu/sys/xattr.h */
 /* Copyright (C) 2002-2016 Free Software Foundation, Inc.
@@ -46,25 +52,44 @@
 __SYSDECL_BEGIN
 
 #ifndef __USE_KERNEL_XATTR_DEFS
+#if (defined(__XATTR_CREATE) || defined(__XATTR_REPLACE))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	XATTR_CREATE  = 1, /* set value, fail if attr already exists. */
-	XATTR_REPLACE = 2  /* set value, fail if attr does not exist. */
+#ifdef __XATTR_CREATE
+	XATTR_CREATE  = __XATTR_CREATE, /* set value, fail if attr already exists. */
+#endif /* __XATTR_CREATE */
+#ifdef __XATTR_REPLACE
+	XATTR_REPLACE = __XATTR_REPLACE /* set value, fail if attr does not exist. */
+#endif /* __XATTR_REPLACE */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __XATTR_CREATE
 #define XATTR_CREATE  XATTR_CREATE  /* set value, fail if attr already exists. */
+#endif /* __XATTR_CREATE */
+#ifdef __XATTR_REPLACE
 #define XATTR_REPLACE XATTR_REPLACE /* set value, fail if attr does not exist. */
+#endif /* __XATTR_REPLACE */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define XATTR_CREATE  1 /* set value, fail if attr already exists. */
-#define XATTR_REPLACE 2 /* set value, fail if attr does not exist. */
+#ifdef __XATTR_CREATE
+#define XATTR_CREATE  __XATTR_CREATE  /* set value, fail if attr already exists. */
+#endif /* __XATTR_CREATE */
+#ifdef __XATTR_REPLACE
+#define XATTR_REPLACE __XATTR_REPLACE /* set value, fail if attr does not exist. */
+#endif /* __XATTR_REPLACE */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
 #endif /* !__USE_KERNEL_XATTR_DEFS */
 
 #ifdef __CC__
+
+#ifndef __size_t_defined
+#define __size_t_defined 1
+typedef __size_t size_t;
+#endif /* !__size_t_defined */
 
 }
 

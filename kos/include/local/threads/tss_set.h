@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b096bb0 */
+/* HASH CRC-32:0x8ad28a50 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_tss_set_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_setspecific
-#include <bits/threads.h>
+#include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_setspecific from pthread */
 #ifndef __local___localdep_pthread_setspecific_defined
@@ -31,8 +31,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),pthread_setspecific,(__key,__pointer))
 #endif /* !__local___localdep_pthread_setspecific_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Sets the value of the thread-specific storage
  * identified by TSS_ID for the current thread to VAL

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe9f80f9 */
+/* HASH CRC-32:0x4a49d24c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,21 +22,21 @@
 #define __local_mtx_timedlock_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
-#include <bits/threads.h>
+#include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_mutex_timedlock from pthread */
 #ifndef __local___localdep_pthread_mutex_timedlock_defined
 #define __local___localdep_pthread_mutex_timedlock_defined 1
 #if defined(__CRT_HAVE_pthread_mutex_timedlock64) && defined(__USE_TIME_BITS64)
 __NAMESPACE_LOCAL_END
-#include <bits/pthreadtypes.h>
+#include <bits/crt/pthreadtypes.h>
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait until lock becomes available, or specified time passes */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_mutex_timedlock64,(__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock) && !defined(__USE_TIME_BITS64)
 __NAMESPACE_LOCAL_END
-#include <bits/pthreadtypes.h>
+#include <bits/crt/pthreadtypes.h>
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait until lock becomes available, or specified time passes */
@@ -52,8 +52,8 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_pthread_mutex_timedlock_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Block the current thread until the mutex pointed by MUTEX
  * is unlocked or time pointed by TIME_POINT is reached.

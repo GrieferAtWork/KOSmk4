@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe48e2f7e */
+/* HASH CRC-32:0xb73d36e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_mtx_unlock_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_mutex_unlock
-#include <bits/threads.h>
+#include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_mutex_unlock from pthread */
 #ifndef __local___localdep_pthread_mutex_unlock_defined
@@ -31,8 +31,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutex_unlock,(__pthread_mutex_t *__mutex),pthread_mutex_unlock,(__mutex))
 #endif /* !__local___localdep_pthread_mutex_unlock_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Unlock the mutex pointed by MUTEX.
  * It may potentially awake other threads waiting on this mutex

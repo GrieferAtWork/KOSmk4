@@ -26,6 +26,7 @@
 #include <hybrid/host.h>
 
 #include <asm/pagesize.h>
+#include <bits/ipc.h>
 #include <bits/types.h>
 
 __SYSDECL_BEGIN
@@ -71,7 +72,7 @@ __SYSDECL_BEGIN
 __CREDIRECT(__ATTR_CONST,int,__NOTHROW,__libc_getpagesize,(void),getpagesize,())
 #endif /* !____libc_getpagesize_defined */
 #define SHMLBA __libc_getpagesize()
-#endif
+#endif /* ... */
 #endif /* !SHMLBA */
 
 #ifdef __CC__
@@ -83,17 +84,17 @@ struct shmid_ds {
 	struct ipc_perm     shm_perm;  /* operation permission struct. */
 	size_t              shm_segsz; /* size of segment in bytes. */
 	__time32_t          shm_atime; /* time of last shmat(). */
-#if __SIZEOF_POINTER__ <= 4
+#if __SIZEOF_POINTER__ > __SIZEOF_TIME32_T__
 	__UINT32_TYPE__   __glibc_reserved1;
-#endif /* __SIZEOF_POINTER__ <= 4 */
+#endif /* __SIZEOF_POINTER__ > __SIZEOF_TIME32_T__ */
 	__time32_t          shm_dtime; /* time of last shmdt(). */
-#if __SIZEOF_POINTER__ <= 4
+#if __SIZEOF_POINTER__ > __SIZEOF_TIME32_T__
 	__UINT32_TYPE__   __glibc_reserved2;
-#endif /* __SIZEOF_POINTER__ <= 4 */
+#endif /* __SIZEOF_POINTER__ > __SIZEOF_TIME32_T__ */
 	__time32_t          shm_ctime; /* time of last change by shmctl(). */
-#if __SIZEOF_POINTER__ <= 4
+#if __SIZEOF_POINTER__ > __SIZEOF_TIME32_T__
 	__UINT32_TYPE__   __glibc_reserved3;
-#endif /* __SIZEOF_POINTER__ <= 4 */
+#endif /* __SIZEOF_POINTER__ > __SIZEOF_TIME32_T__ */
 	__pid_t             shm_cpid;  /* pid of creator. */
 	__pid_t             shm_lpid;  /* pid of last shmop. */
 	shmatt_t            shm_nattch; /* number of current attaches. */
@@ -154,6 +155,9 @@ struct shminfo {
 
 struct shm_info {
 	int               used_ids;
+#if __SIZEOF_INT__ < __SIZEOF_SYSCALL_LONG_T__
+	__BYTE_TYPE__   __si_pad[__SIZEOF_SYSCALL_LONG_T__ - __SIZEOF_INT__]; /* ... */
+#endif /* __SIZEOF_INT__ < __SIZEOF_SYSCALL_LONG_T__ */
 	__syscall_ulong_t shm_tot; /* total allocated shm. */
 	__syscall_ulong_t shm_rss; /* total resident shm. */
 	__syscall_ulong_t shm_swp; /* total swapped shm. */

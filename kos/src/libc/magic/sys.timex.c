@@ -34,11 +34,12 @@
 
 %{
 #include <features.h>
-#include <sys/time.h>
+
 #include <bits/timex.h>
 #include <bits/types.h>
+#include <sys/time.h>
 
-/* Documentation taken from /usr/include/i386-linux-gnu/sys/timex.h */
+	/* Documentation taken from /usr/include/i386-linux-gnu/sys/timex.h */
 /* Copyright (C) 1995-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 

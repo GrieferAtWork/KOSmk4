@@ -35,6 +35,7 @@
 %(auto_header,user){
 DECL_END
 #include <bits/sigaction.h>
+#include <pthread.h>
 DECL_BEGIN
 
 #ifndef __sighandler_t_defined
@@ -74,8 +75,8 @@ typedef __sighandler_t sighandler_t;
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
-#include <bits/pthreadtypes.h>
-#include <bits/sigthread.h>
+#include <bits/crt/pthreadtypes.h>
+#include <bits/sigval.h> /* union sigval */
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 __SYSDECL_BEGIN
@@ -467,6 +468,24 @@ $signo_t __libc_current_sigrtmax() {
 	return __SIGRTMAX;
 }
 
+%
+%#if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
+[[guard, decl_include("<features.h>", "<bits/sigset.h>")]]
+int pthread_sigmask(__STDC_INT_AS_UINT_T how,
+                    [[nullable]] $sigset_t const *newmask,
+                    [[nullable]] $sigset_t *oldmask);
+
+[[guard, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+int pthread_kill($pthread_t threadid, $signo_t signo);
+
+%#ifdef __USE_GNU
+[[guard, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/sigval.h>")]]
+int pthread_sigqueue($pthread_t threadid,
+                     $signo_t signo,
+                     union sigval const value);
+%#endif /* __USE_GNU */
+
+%#endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 
 %{

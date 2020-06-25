@@ -2125,7 +2125,7 @@ static_assert(offsetof(struct x86_64_va_list_reg_save_area, rsa_xmm[15]) == OFFS
 static_assert(sizeof(__sigset_t) == __SIZEOF_SIGSET_T__);
 static_assert(COMPILER_LENOF(((__sigset_t *)0)->__val) == _SIGSET_NWORDS);
 
-#include <bits/semaphore.h>
+#include <bits/crt/semaphore.h>
 static_assert(sizeof(sem_t) == __SIZEOF_SEM_T);
 static_assert(alignof(sem_t) >= alignof(void *));
 

@@ -25,7 +25,6 @@
 #include <hybrid/__atomic.h>
 #include <hybrid/typecore.h>
 
-#include <bits/mbstate.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/refcnt.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa163c98 */
+/* HASH CRC-32:0x49559adc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,9 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Control process limits according to CMD */
-INTDEF longptr_t NOTHROW_NCX(VLIBCCALL libc_ulimit)(int cmd, ...);
+/* Control process limits according to CMD
+ * @param: cmd: One OF `UL_*' */
+INTDEF longptr_t NOTHROW_NCX(VLIBCCALL libc_ulimit)(__STDC_INT_AS_UINT_T cmd, ...);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a524ae9 */
+/* HASH CRC-32:0xec635298 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,22 +70,6 @@ DEFINE_PUBLIC_ALIAS(DOS$inet_nsap_addr, libd_inet_nsap_addr);
 DEFINE_PUBLIC_ALIAS(DOS$inet_nsap_ntoa, libd_inet_nsap_ntoa);
 DEFINE_PUBLIC_ALIAS(DOS$inet_pton, libd_inet_pton);
 DEFINE_PUBLIC_ALIAS(DOS$inet_ntop, libd_inet_ntop);
-
-/* bits.resource */
-DEFINE_PUBLIC_ALIAS(DOS$prlimit, libd_prlimit);
-DEFINE_PUBLIC_ALIAS(DOS$prlimit64, libd_prlimit64);
-
-/* bits.sched */
-DEFINE_PUBLIC_ALIAS(DOS$__clone, libd_clone);
-DEFINE_PUBLIC_ALIAS(DOS$clone, libd_clone);
-DEFINE_PUBLIC_ALIAS(DOS$unshare, libd_unshare);
-DEFINE_PUBLIC_ALIAS(DOS$setns, libd_setns);
-DEFINE_PUBLIC_ALIAS(DOS$exit_thread, libd_exit_thread);
-
-/* bits.sigthread */
-DEFINE_PUBLIC_ALIAS(DOS$pthread_sigmask, libd_pthread_sigmask);
-DEFINE_PUBLIC_ALIAS(DOS$pthread_kill, libd_pthread_kill);
-DEFINE_PUBLIC_ALIAS(DOS$pthread_sigqueue, libd_pthread_sigqueue);
 
 /* crypt */
 DEFINE_PUBLIC_ALIAS(DOS$setkey, libd_setkey);
@@ -578,6 +562,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__uselocale, libd_uselocale);
 DEFINE_PUBLIC_ALIAS(DOS$uselocale, libd_uselocale);
 
 /* malloc */
+DEFINE_PUBLIC_ALIAS(DOS$_expand, libd_realloc_in_place);
 DEFINE_PUBLIC_ALIAS(DOS$realloc_in_place, libd_realloc_in_place);
 DEFINE_PUBLIC_ALIAS(DOS$aligned_alloc, libd_memalign);
 DEFINE_PUBLIC_ALIAS(DOS$memalign, libd_memalign);
@@ -1377,6 +1362,11 @@ DEFINE_PUBLIC_ALIAS(DOS$getrpcbynumber_r, libd_getrpcbynumber_r);
 DEFINE_PUBLIC_ALIAS(DOS$getrpcent_r, libd_getrpcent_r);
 
 /* sched */
+DEFINE_PUBLIC_ALIAS(DOS$__clone, libd_clone);
+DEFINE_PUBLIC_ALIAS(DOS$clone, libd_clone);
+DEFINE_PUBLIC_ALIAS(DOS$unshare, libd_unshare);
+DEFINE_PUBLIC_ALIAS(DOS$setns, libd_setns);
+DEFINE_PUBLIC_ALIAS(DOS$exit_thread, libd_exit_thread);
 DEFINE_PUBLIC_ALIAS(DOS$sched_setparam, libd_sched_setparam);
 DEFINE_PUBLIC_ALIAS(DOS$__sched_getparam, libd_sched_getparam);
 DEFINE_PUBLIC_ALIAS(DOS$sched_getparam, libd_sched_getparam);
@@ -1480,6 +1470,9 @@ DEFINE_PUBLIC_ALIAS(DOS$sighold, libd_sighold);
 DEFINE_PUBLIC_ALIAS(DOS$sigrelse, libd_sigrelse);
 DEFINE_PUBLIC_ALIAS(DOS$sigignore, libd_sigignore);
 DEFINE_PUBLIC_ALIAS(DOS$sigset, libd_sigset);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_sigmask, libd_pthread_sigmask);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_kill, libd_pthread_kill);
+DEFINE_PUBLIC_ALIAS(DOS$pthread_sigqueue, libd_pthread_sigqueue);
 
 /* spawn */
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawn, libd_posix_spawn);
@@ -2424,6 +2417,9 @@ DEFINE_PUBLIC_ALIAS(DOS$poll, libd_poll);
 DEFINE_PUBLIC_ALIAS(DOS$ppoll, libd_ppoll);
 DEFINE_PUBLIC_ALIAS(DOS$ppoll64, libd_ppoll64);
 
+/* sys.ptrace */
+DEFINE_PUBLIC_ALIAS(DOS$ptrace, libd_ptrace);
+
 /* sys.random */
 DEFINE_PUBLIC_ALIAS(DOS$getrandom, libd_getrandom);
 DEFINE_PUBLIC_ALIAS(DOS$getentropy, libd_getentropy);
@@ -2432,10 +2428,13 @@ DEFINE_PUBLIC_ALIAS(DOS$getentropy, libd_getentropy);
 DEFINE_PUBLIC_ALIAS(DOS$reboot, libd_reboot);
 
 /* sys.resource */
+DEFINE_PUBLIC_ALIAS(DOS$prlimit, libd_prlimit);
+DEFINE_PUBLIC_ALIAS(DOS$prlimit64, libd_prlimit64);
 DEFINE_PUBLIC_ALIAS(DOS$__getrlimit, libd_getrlimit);
 DEFINE_PUBLIC_ALIAS(DOS$getrlimit, libd_getrlimit);
 DEFINE_PUBLIC_ALIAS(DOS$setrlimit, libd_setrlimit);
 DEFINE_PUBLIC_ALIAS(DOS$getrusage, libd_getrusage);
+DEFINE_PUBLIC_ALIAS(DOS$getrusage64, libd_getrusage64);
 DEFINE_PUBLIC_ALIAS(DOS$getpriority, libd_getpriority);
 DEFINE_PUBLIC_ALIAS(DOS$setpriority, libd_setpriority);
 DEFINE_PUBLIC_ALIAS(DOS$getrlimit64, libd_getrlimit64);
@@ -2739,6 +2738,8 @@ DEFINE_PUBLIC_ALIAS(DOS$strftime_l, libd_strftime_l);
 DEFINE_PUBLIC_ALIAS(DOS$strptime, libd_strptime);
 DEFINE_PUBLIC_ALIAS(DOS$strptime_l, libd_strptime_l);
 DEFINE_PUBLIC_ALIAS(DOS$getdate_r, libd_getdate_r);
+DEFINE_PUBLIC_ALIAS(DOS$clock_adjtime, libd_clock_adjtime);
+DEFINE_PUBLIC_ALIAS(DOS$clock_adjtime64, libd_clock_adjtime64);
 DEFINE_PUBLIC_ALIAS(DOS$__gmtime_r, libd_gmtime_r);
 DEFINE_PUBLIC_ALIAS(DOS$gmtime_r, libd_gmtime_r);
 DEFINE_PUBLIC_ALIAS(DOS$localtime_r, libd_localtime_r);

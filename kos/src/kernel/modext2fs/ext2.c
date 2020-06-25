@@ -34,7 +34,7 @@
 #include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
 
-#include <bits/confname.h>
+#include <bits/crt/confname.h>
 
 #include <assert.h>
 #include <string.h>

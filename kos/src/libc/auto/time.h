@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc16f81bd */
+/* HASH CRC-32:0x85e32ca7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -263,6 +263,8 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_getdate_r)(char const *__re
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_getdate_r)(char const *__restrict string, __STRUCT_TM *__restrict resbufp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF int NOTHROW_NCX(LIBDCALL libd_clock_adjtime)(clockid_t clock_id, struct timex *utx);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_clock_adjtime64)(clockid_t clock_id, struct timex64 *utx);
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 INTDEF NONNULL((1, 2)) __STRUCT_TM *NOTHROW_NCX(LIBDCALL libd_gmtime_r)(time_t const *__restrict timer, __STRUCT_TM *__restrict tp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

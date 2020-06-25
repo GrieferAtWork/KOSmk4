@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ff46a */
+/* HASH CRC-32:0x85a0b5a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <bits/types.h>
+#include <bits/tms.h>
 
 __SYSDECL_BEGIN
 
@@ -57,14 +58,6 @@ __SYSDECL_BEGIN
 #define __clock_t_defined 1
 typedef __typedef_clock_t clock_t;
 #endif /* !__clock_t_defined */
-
-/* Structure describing CPU time used by a process and its children.  */
-struct tms {
-	clock_t tms_utime;  /* User CPU time. */
-	clock_t tms_stime;  /* System CPU time. */
-	clock_t tms_cutime; /* User CPU time of dead children. */
-	clock_t tms_cstime; /* System CPU time of dead children. */
-};
 
 /* Store the CPU time used by this process and all its
  * dead children (and their dead children) in BUFFER.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f6524e7 */
+/* HASH CRC-32:0x17ba8a97 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,10 +53,10 @@
 #endif /* !SEEK_SET */
 
 #ifndef L_SET
-#define L_SET  SEEK_SET /* Seek from beginning of file. */
-#define L_CURR SEEK_CUR /* Seek from current position. */
-#define L_INCR SEEK_CUR /* Seek from current position. */
-#define L_XTND SEEK_END /* Seek from end of file. */
+#define L_SET  __SEEK_SET /* Seek from beginning of file. */
+#define L_CURR __SEEK_CUR /* Seek from current position. */
+#define L_INCR __SEEK_CUR /* Seek from current position. */
+#define L_XTND __SEEK_END /* Seek from end of file. */
 #endif /* !L_SET */
 
 /* Shared lock. */

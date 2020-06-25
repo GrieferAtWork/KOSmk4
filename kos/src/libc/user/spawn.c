@@ -181,11 +181,11 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getflags)(posix_spawnattr_t const *__r
 }
 /*[[[end:libc_posix_spawnattr_getflags]]]*/
 
-/*[[[head:libc_posix_spawnattr_setflags,hash:CRC-32=0xf6c54eab]]]*/
+/*[[[head:libc_posix_spawnattr_setflags,hash:CRC-32=0x43e51430]]]*/
 /* Store flags in the attribute structure */
 INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setflags)(posix_spawnattr_t *__restrict attr,
-                                                    short int flags)
+                                                    int16_t flags)
 /*[[[body:libc_posix_spawnattr_setflags]]]*/
 /*AUTO*/{
 	(void)attr;

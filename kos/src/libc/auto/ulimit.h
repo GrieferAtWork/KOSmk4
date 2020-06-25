@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x569e5cde */
+/* HASH CRC-32:0x14c045c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,8 +30,9 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Control process limits according to CMD */
-INTDEF longptr_t NOTHROW_NCX(VLIBDCALL libd_ulimit)(int cmd, ...);
+/* Control process limits according to CMD
+ * @param: cmd: One OF `UL_*' */
+INTDEF longptr_t NOTHROW_NCX(VLIBDCALL libd_ulimit)(__STDC_INT_AS_UINT_T cmd, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

@@ -24,7 +24,7 @@
 %{
 #include <features.h>
 #include <sys/time.h>
-#include <bits/utmpx.h>
+#include <bits/crt/db/utmpx.h>
 #include <bits/types.h>
 
 /* Documentation taken from Glibc /usr/include/utmp.h */
@@ -49,10 +49,10 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_GNU
 /* Compatibility names for the strings of the canonical file names.  */
-#define UTMPX_FILE      _PATH_UTMPX
-#define UTMPX_FILENAME  _PATH_UTMPX
-#define WTMPX_FILE      _PATH_WTMPX
-#define WTMPX_FILENAME  _PATH_WTMPX
+#define UTMPX_FILE     _PATH_UTMPX
+#define UTMPX_FILENAME _PATH_UTMPX
+#define WTMPX_FILE     _PATH_WTMPX
+#define WTMPX_FILENAME _PATH_WTMPX
 #endif /* __USE_GNU */
 
 #ifdef __CC__
@@ -77,19 +77,19 @@ void setutxent();
 void endutxent();
 
 @@Get the next entry from the user accounting database
-[[cp]]
+[[cp, decl_include("<bits/crt/db/utmpx.h>")]]
 struct utmpx *getutxent();
 
 @@Get the user accounting database entry corresponding to ID
-[[cp]]
+[[cp, decl_include("<bits/crt/db/utmpx.h>")]]
 struct utmpx *getutxid(struct utmpx const *id);
 
 @@Get the user accounting database entry corresponding to LINE
-[[cp]]
+[[cp, decl_include("<bits/crt/db/utmpx.h>")]]
 struct utmpx *getutxline(struct utmpx const *line);
 
 @@Write the entry UTMPX into the user accounting database
-[[cp]]
+[[cp, decl_include("<bits/crt/db/utmpx.h>")]]
 struct utmpx *pututxline(struct utmpx const *utmpx);
 
 %
@@ -101,17 +101,17 @@ int utmpxname(char const *file);
 
 @@Append entry UTMP to the wtmpx-like file WTMPX_FILE.
 @@This function is not part of POSIX and therefore no official cancellation point
-[[cp]]
+[[cp, decl_include("<bits/crt/db/utmpx.h>")]]
 void updwtmpx(char const *wtmpx_file, struct utmpx const *utmpx);
 
 @@Copy the information in UTMPX to UTMP.
 @@This function is not part of POSIX and therefore no official cancellation point
-[[cp]]
+[[cp, decl_include("<bits/crt/db/utmpx.h>", "<bits/crt/db/utmp.h>")]]
 void getutmp(struct utmpx const *utmpx, struct utmp *utmp);
 
 @@Copy the information in UTMP to UTMPX.
 @@This function is not part of POSIX and therefore no official cancellation point
-[[cp]]
+[[cp, decl_include("<bits/crt/db/utmpx.h>")]]
 void getutmpx(struct utmp const *utmp, struct utmpx *utmpx);
 %#endif /* __USE_GNU */
 

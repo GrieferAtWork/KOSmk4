@@ -61,7 +61,7 @@ NOTHROW_NCX(LIBCCALL libc_epoll_create1)(__STDC_INT_AS_UINT_T flags)
 }
 /*[[[end:libc_epoll_create1]]]*/
 
-/*[[[head:libc_epoll_ctl,hash:CRC-32=0x37089adf]]]*/
+/*[[[head:libc_epoll_ctl,hash:CRC-32=0x42d08fd0]]]*/
 /* Manipulate an epoll instance "epfd". Returns 0 in case of success,
  * -1 in case of error (the "errno" variable will contain the
  * specific error code) The "op" parameter is one of the EPOLL_CTL_*
@@ -70,7 +70,7 @@ NOTHROW_NCX(LIBCCALL libc_epoll_create1)(__STDC_INT_AS_UINT_T flags)
  * is interested in and any associated user data */
 INTERN ATTR_SECTION(".text.crt.io.poll") int
 NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd,
-                                     enum __epoll_ctl op,
+                                     __epoll_ctl_t op,
                                      fd_t fd,
                                      struct epoll_event *event)
 /*[[[body:libc_epoll_ctl]]]*/

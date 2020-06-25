@@ -33,7 +33,7 @@
 #endif /* __USE_MISC */
 
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
-#include <bits/pthreadtypes.h>
+#include <bits/crt/pthreadtypes.h>
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 __SYSDECL_BEGIN

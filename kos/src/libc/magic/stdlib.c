@@ -34,6 +34,8 @@
 %[define_replacement(s32 = __INT32_TYPE__)]
 %[define_replacement(s64 = __INT64_TYPE__)]
 
+%[define_replacement(__WAIT_STATUS = __WAIT_STATUS)]
+%[define_replacement(__WAIT_STATUS_DEFN = __WAIT_STATUS_DEFN)]
 %[define_type_class(__WAIT_STATUS      = "TP")]
 %[define_type_class(__WAIT_STATUS_DEFN = "TP")]
 %[define_type_class(__atexit_func_t    = "TP")]
@@ -49,40 +51,47 @@
 
 %{
 #include <features.h>
-#include <bits/types.h>
+
 #include <hybrid/typecore.h>
+
+#include <asm/crt/stdlib.h>
+#include <asm/stdlib.h>
+#include <bits/types.h>
 #include <kos/anno.h>
+
 #ifdef __USE_MISC
 #include <alloca.h>
 #endif /* __USE_MISC */
+
 #ifdef __USE_DOS
-#include <xlocale.h>
 #include <bits/byteswap.h>
-#include <bits/sys_errlist.h>
+#include <bits/crt/sys_errlist.h>
+#include <xlocale.h>
 #endif /* __USE_DOS */
+
 #ifdef __USE_GNU
 #include <xlocale.h>
 #endif /* __USE_GNU */
+
 #if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/__overflow.h>
 #endif /* __USE_KOS && __USE_STRING_OVERLOADS */
 
+#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
+#include <bits/waitmacros.h>
+#endif /* __USE_XOPEN || __USE_XOPEN2K8 */
+
 __SYSDECL_BEGIN
 
-#ifdef __CRT_DOS_PRIMARY
-#define RAND_MAX 0x7fff /* TODO: Check what this really is */
-#elif defined(__CRT_KOS_PRIMARY)
-#define RAND_MAX 0x7fffffff
-#elif defined(__CRT_GLC_PRIMARY)
-#define RAND_MAX 0x7fff /* TODO: Check what this really is */
-#elif defined(__CRT_CYG_PRIMARY)
-#define RAND_MAX 0x7fff /* TODO: Check what this really is */
-#else /* ... */
-#define RAND_MAX 0x7fff
-#endif /* !... */
-
-#define EXIT_SUCCESS 0
-#define EXIT_FAILURE 1
+#ifdef __RAND_MAX
+#define RAND_MAX __RAND_MAX
+#endif /* __RAND_MAX */
+#ifdef __EXIT_SUCCESS
+#define EXIT_SUCCESS __EXIT_SUCCESS
+#endif /* __EXIT_SUCCESS */
+#ifdef __EXIT_FAILURE
+#define EXIT_FAILURE __EXIT_FAILURE
+#endif /* __EXIT_FAILURE */
 
 #ifdef __CC__
 
@@ -110,45 +119,6 @@ typedef __WCHAR_TYPE__ wchar_t;
 #ifndef NULL
 #define NULL __NULLPTR
 #endif /* !NULL */
-
-#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
-#ifndef __WAIT_MACROS_DEFINED
-#define __WAIT_MACROS_DEFINED 1
-#include <bits/waitflags.h>
-#include <bits/waitstatus.h>
-
-#ifdef __USE_MISC
-#if defined(__GNUC__) && !defined(__cplusplus)
-#   define __WAIT_INT(status) (__extension__(((union{ __typeof__(status) __inval; int __ival; }) { .__inval = (status) }).__ival))
-#else /* __GNUC__ && !__cplusplus */
-#   define __WAIT_INT(status) (*(int *)&(status))
-#endif /* !__GNUC__ || __cplusplus */
-#ifdef __NO_ATTR_TRANSPARENT_UNION
-#   define __WAIT_STATUS      void *
-#   define __WAIT_STATUS_DEFN void *
-#else /* __NO_ATTR_TRANSPARENT_UNION */
-typedef union {
-	union wait *__uptr_;
-	int        *__iptr_;
-} __WAIT_STATUS __ATTR_TRANSPARENT_UNION;
-#   define __WAIT_STATUS_DEFN int *
-#endif /* !__NO_ATTR_TRANSPARENT_UNION */
-#else /* __USE_MISC */
-#   define __WAIT_INT(status)  (status)
-#   define __WAIT_STATUS        int *
-#   define __WAIT_STATUS_DEFN   int *
-#endif /* !__USE_MISC */
-#   define WEXITSTATUS(status)  __WEXITSTATUS(__WAIT_INT(status))
-#   define WTERMSIG(status)     __WTERMSIG(__WAIT_INT(status))
-#   define WSTOPSIG(status)     __WSTOPSIG(__WAIT_INT(status))
-#   define WIFEXITED(status)    __WIFEXITED(__WAIT_INT(status))
-#   define WIFSIGNALED(status)  __WIFSIGNALED(__WAIT_INT(status))
-#   define WIFSTOPPED(status)   __WIFSTOPPED(__WAIT_INT(status))
-#ifdef __WIFCONTINUED
-#   define WIFCONTINUED(status) __WIFCONTINUED(__WAIT_INT(status))
-#endif /* __WIFCONTINUED */
-#endif /* !__WAIT_MACROS_DEFINED */
-#endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 }%[push_macro @undef { quot rem }]%{
 struct __div_struct {

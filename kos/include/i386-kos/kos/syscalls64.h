@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe35615a9 */
+/* HASH CRC-32:0x9e2a6c05 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 #include <bits/itimerval64.h>
 #include <bits/mmsghdr-struct64.h>
 #include <bits/msghdr-struct64.h>
+#include <bits/pollfd.h>
 #include <bits/rusage-struct64.h>
 #include <bits/sigaction-struct64.h>
 #include <bits/siginfo-struct64.h>

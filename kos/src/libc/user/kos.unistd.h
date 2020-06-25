@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93fd38d1 */
+/* HASH CRC-32:0xf6aea474 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -139,7 +139,7 @@ INTDEF void (LIBCCALL libc_SetGid)(gid_t gid) THROWS(...);
  * parent can then `wait(2)' for */
 INTDEF WUNUSED pid_t (LIBCCALL libc_Fork)(void) THROWS(...);
 /* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
@@ -149,7 +149,7 @@ INTDEF WUNUSED long int (LIBCCALL libc_FPathConf)(fd_t fd, int name) THROWS(...)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 INTDEF NONNULL((1)) void (LIBCCALL libc_Chown)(char const *file, uid_t owner, gid_t group) THROWS(...);
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'

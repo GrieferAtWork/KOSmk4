@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95cdf49b */
+/* HASH CRC-32:0xb472cf50 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 
 #include <features.h>
 #include <sys/time.h>
-#include <bits/utmpx.h>
+#include <bits/crt/db/utmpx.h>
 #include <bits/types.h>
 
 /* Documentation taken from Glibc /usr/include/utmp.h */
@@ -55,10 +55,10 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_GNU
 /* Compatibility names for the strings of the canonical file names.  */
-#define UTMPX_FILE      _PATH_UTMPX
-#define UTMPX_FILENAME  _PATH_UTMPX
-#define WTMPX_FILE      _PATH_WTMPX
-#define WTMPX_FILENAME  _PATH_WTMPX
+#define UTMPX_FILE     _PATH_UTMPX
+#define UTMPX_FILENAME _PATH_UTMPX
+#define WTMPX_FILE     _PATH_WTMPX
+#define WTMPX_FILENAME _PATH_WTMPX
 #endif /* __USE_GNU */
 
 #ifdef __CC__

@@ -23,7 +23,6 @@
 #include <__stdinc.h>
 #include <__crt.h>
 
-
 #if defined(__CRT_HAVE_setpgid)
 #define _POSIX_JOB_CONTROL                   1 /* Job control is supported. */
 #endif

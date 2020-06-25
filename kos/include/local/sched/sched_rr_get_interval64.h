@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bf3672c */
+/* HASH CRC-32:0x429772e4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,8 @@
 #define __local_sched_rr_get_interval64_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_sched_rr_get_interval
+#include <bits/types.h>
+#include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sched_rr_get_interval32 from sched */
 #ifndef __local___localdep_sched_rr_get_interval32_defined

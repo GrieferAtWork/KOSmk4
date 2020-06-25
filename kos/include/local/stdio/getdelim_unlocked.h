@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28dfa2d8 */
+/* HASH CRC-32:0xb8e56ac3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,7 +77,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(in
 #endif /* !... */
 #endif /* !__local___localdep_ungetc_unlocked_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getdelim_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__

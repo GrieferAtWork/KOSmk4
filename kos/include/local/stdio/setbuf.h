@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30c5ee74 */
+/* HASH CRC-32:0xbc5144ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_setbuf_defined
 #define __local_setbuf_defined 1
 #include <__crt.h>
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 #if defined(___IOFBF) && defined(___IONBF) && defined(__BUFSIZ) && (defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: setvbuf from stdio */

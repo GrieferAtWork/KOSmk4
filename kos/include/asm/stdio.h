@@ -21,7 +21,6 @@
 #define _ASM_STDIO_H 1
 
 #include <__crt.h>
-#include <hybrid/typecore.h>
 
 #define __SEEK_SET  0 /* Seek from beginning of file. */
 #define __SEEK_CUR  1 /* Seek from current position. */
@@ -39,32 +38,5 @@
 #define __X_OK 1 /* Test for execute permission. */
 #define __W_OK 2 /* Test for write permission. */
 #define __R_OK 4 /* Test for read permission. */
-
-#ifdef __CRT_DOS_PRIMARY
-#define ___IOFBF 0x0000 /* Fully buffered. */
-#define ___IOLBF 0x0040 /* Line buffered. */
-#define ___IONBF 0x0004 /* No buffering. */
-#else /* __CRT_DOS_PRIMARY */
-#define ___IOFBF 0 /* Fully buffered. */
-#define ___IOLBF 1 /* Line buffered. */
-#define ___IONBF 2 /* No buffering. */
-#endif /* !__CRT_DOS_PRIMARY */
-
-#ifdef __CRT_DOS_PRIMARY
-#define __BUFSIZ 512
-#else /* __CRT_DOS_PRIMARY */
-#define __BUFSIZ 8192
-#endif /* !__CRT_DOS_PRIMARY */
-
-
-#define __EOF    (-1)
-#define __WEOF16 (__CCAST(__WINT_TYPE__)__UINT16_C(0xffff))
-#define __WEOF32 (__CCAST(__WINT_TYPE__)__UINT32_C(0xffffffff))
-#if __SIZEOF_WCHAR_T__ == 4
-#define __WEOF __WEOF32
-#else /* __SIZEOF_WCHAR_T__ == 4 */
-#define __WEOF __WEOF16
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
-
 
 #endif /* !_ASM_STDIO_H */

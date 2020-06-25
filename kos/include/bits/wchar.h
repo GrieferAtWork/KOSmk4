@@ -21,13 +21,14 @@
 #define _BITS_WCHAR_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/limitcore.h>
 
 #ifndef __WCHAR_MIN
-#define __WCHAR_MIN  __WCHAR_MIN__
+#define __WCHAR_MIN __WCHAR_MIN__
 #endif /* !__WCHAR_MIN */
 #ifndef __WCHAR_MAX
-#define __WCHAR_MAX  __WCHAR_MAX__
+#define __WCHAR_MAX __WCHAR_MAX__
 #endif /* !__WCHAR_MAX */
 
 #endif /* !_BITS_WCHAR_H */

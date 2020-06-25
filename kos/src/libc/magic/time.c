@@ -51,6 +51,10 @@
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
 
+#ifdef __USE_GNU
+#include <bits/timex.h>
+#endif /* __USE_GNU */
+
 
 /* Some documentation comments are taken from /usr/include/time.h on a linux machine.
  * The following copyright notice can be found at the top of that file: */
@@ -1528,6 +1532,18 @@ int getdate_r([[nonnull]] char const *__restrict string,
 	COMPILER_IMPURE();
 	return 0;
 }
+
+[[guard, no_crt_self_import]]
+[[if(defined(__USE_TIME_BITS64)), preferred_alias("clock_adjtime64")]]
+[[if(!defined(__USE_TIME_BITS64)), preferred_alias("clock_adjtime")]]
+int clock_adjtime($clockid_t clock_id, struct timex *utx);
+
+%
+%#ifdef __USE_TIME64
+[[guard, time64_variant_of(clock_adjtime)]]
+int clock_adjtime64($clockid_t clock_id, struct timex64 *utx);
+%#endif /* __USE_TIME64 */
+
 %#endif /* __USE_GNU */
 
 

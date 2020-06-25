@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa5fcc85 */
+/* HASH CRC-32:0x776badde */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,8 +81,8 @@ __NAMESPACE_STD_USING(signal)
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
-#include <bits/pthreadtypes.h>
-#include <bits/sigthread.h>
+#include <bits/crt/pthreadtypes.h>
+#include <bits/sigval.h> /* union sigval */
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 __SYSDECL_BEGIN
@@ -382,6 +382,35 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_si
 __NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmax)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(); })
 #endif /* __SIGRTMAX */
 #endif /* !__CRT_HAVE___libc_current_sigrtmax */
+
+#if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
+#ifndef __pthread_sigmask_defined
+#define __pthread_sigmask_defined 1
+#ifdef __CRT_HAVE_pthread_sigmask
+__CDECLARE(,int,__NOTHROW_NCX,pthread_sigmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__newmask, struct __sigset_struct *__oldmask),(__how,__newmask,__oldmask))
+#else /* __CRT_HAVE_pthread_sigmask */
+#undef __pthread_sigmask_defined
+#endif /* !__CRT_HAVE_pthread_sigmask */
+#endif /* !__pthread_sigmask_defined */
+#ifndef __pthread_kill_defined
+#define __pthread_kill_defined 1
+#ifdef __CRT_HAVE_pthread_kill
+__CDECLARE(,int,__NOTHROW_NCX,pthread_kill,(__pthread_t __threadid, __signo_t __signo),(__threadid,__signo))
+#else /* __CRT_HAVE_pthread_kill */
+#undef __pthread_kill_defined
+#endif /* !__CRT_HAVE_pthread_kill */
+#endif /* !__pthread_kill_defined */
+#ifdef __USE_GNU
+#ifndef __pthread_sigqueue_defined
+#define __pthread_sigqueue_defined 1
+#ifdef __CRT_HAVE_pthread_sigqueue
+__CDECLARE(,int,__NOTHROW_NCX,pthread_sigqueue,(__pthread_t __threadid, __signo_t __signo, union sigval const __value),(__threadid,__signo,__value))
+#else /* __CRT_HAVE_pthread_sigqueue */
+#undef __pthread_sigqueue_defined
+#endif /* !__CRT_HAVE_pthread_sigqueue */
+#endif /* !__pthread_sigqueue_defined */
+#endif /* __USE_GNU */
+#endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 #endif /* __CC__ */
 

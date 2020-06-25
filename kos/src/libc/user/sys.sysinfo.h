@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf1110a7 */
+/* HASH CRC-32:0x8e0734ed */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,8 +34,8 @@ DECL_BEGIN
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_sysinfo)(struct sysinfo *info);
 INTDEF WUNUSED int NOTHROW_RPC(LIBCCALL libc_get_nprocs_conf)(void);
 INTDEF WUNUSED int NOTHROW_RPC(LIBCCALL libc_get_nprocs)(void);
-INTDEF WUNUSED __INTPTR_TYPE__ NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void);
-INTDEF WUNUSED __INTPTR_TYPE__ NOTHROW_RPC(LIBCCALL libc_get_avphys_pages)(void);
+INTDEF WUNUSED intptr_t NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void);
+INTDEF WUNUSED intptr_t NOTHROW_RPC(LIBCCALL libc_get_avphys_pages)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END

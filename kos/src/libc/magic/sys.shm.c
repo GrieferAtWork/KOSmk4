@@ -25,8 +25,11 @@
 
 %{
 #include <features.h>
-#include <sys/ipc.h>
 #include <bits/shm.h>
+
+#ifdef __USE_GLIBC
+#include <sys/ipc.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 

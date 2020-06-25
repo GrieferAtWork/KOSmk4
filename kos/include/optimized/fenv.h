@@ -24,7 +24,7 @@
 
 #ifdef __CC__
 #include <__crt.h>
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 
 #ifndef __WANT_FENV_INLINE
 #if 0

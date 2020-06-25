@@ -24,7 +24,6 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <asm/dlfcn.h>     /* __CRT_HAVE_dl_iterate_phdr */
 #include <bits/elfclass.h> /* Defines __ELF_NATIVE_CLASS.  */
 #include <bits/types.h>
 #include <kos/exec/elf.h> /* ElfW() */
@@ -32,6 +31,8 @@
 
 #include <dlfcn.h>
 #include <elf.h>
+
+#include <libdl/asm/dlfcn.h> /* __CRT_HAVE_dl_iterate_phdr */
 
 /* #include <bits/link.h> */
 

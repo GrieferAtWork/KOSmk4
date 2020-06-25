@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a77a07e */
+/* HASH CRC-32:0x97c675b5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 /* Change uid used for file access control to UID, without affecting
  * other privileges (such as who can send signals at the process) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setfsuid)(uid_t uid);
-/* Ditto for group id */
+/* Same as `setfsuid()', but for group id */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setfsgid)(gid_t gid);
 #endif /* !__KERNEL__ */
 

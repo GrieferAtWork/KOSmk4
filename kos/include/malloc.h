@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5fa5983 */
+/* HASH CRC-32:0xd1b5f009 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#include <asm/crt/malloc.h>
 #if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/__overflow.h>
 #ifndef __cplusplus
@@ -38,15 +39,15 @@
 
 __SYSDECL_BEGIN
 
-#if (defined(__CRT_KOS) || defined(__CRT_GLC))
-/* malloc behavior attributes. */
-#define __MALLOC_ZERO_IS_NONNULL  1
-#define __REALLOC_ZERO_IS_NONNULL 1
-#endif /* ... */
-
-#define M_TRIM_THRESHOLD     (-1)
-#define M_GRANULARITY        (-2)
-#define M_MMAP_THRESHOLD     (-3)
+#ifdef __M_TRIM_THRESHOLD
+#define M_TRIM_THRESHOLD __M_TRIM_THRESHOLD
+#endif /* __M_TRIM_THRESHOLD */
+#ifdef __M_GRANULARITY
+#define M_GRANULARITY __M_GRANULARITY
+#endif /* __M_GRANULARITY */
+#ifdef __M_MMAP_THRESHOLD
+#define M_MMAP_THRESHOLD __M_MMAP_THRESHOLD
+#endif /* __M_MMAP_THRESHOLD */
 
 #ifdef __CC__
 

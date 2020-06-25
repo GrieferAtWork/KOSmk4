@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd826b79a */
+/* HASH CRC-32:0x994bc6ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 #include <features.h>
 #include <sys/types.h>
 #include <bits/types.h>
-#include <bits/semaphore.h>
+#include <bits/crt/semaphore.h>
 #ifdef __USE_XOPEN2K
 #include <bits/timespec.h>
 #endif /* __USE_XOPEN2K */

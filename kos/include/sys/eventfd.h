@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x778a3c16 */
+/* HASH CRC-32:0x9aa1a9b3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,10 +29,13 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <stdint.h>
+
 #include <bits/types.h>
 #include <bits/eventfd.h>
 
+#ifdef __USE_GLIBC
+#include <stdint.h>
+#endif /* __USE_GLIBC */
 
 /* Documentation taken from Glibc /usr/include/i386-linux-gnu/sys/eventfd.h */
 /* Copyright (C) 2007-2016 Free Software Foundation, Inc.
@@ -59,7 +62,7 @@ __SYSDECL_BEGIN
 /* Type for event counter. */
 #ifndef __eventfd_t_defined
 #define __eventfd_t_defined 1
-typedef uint64_t eventfd_t;
+typedef __uint64_t eventfd_t;
 #endif /* !__eventfd_t_defined */
 
 /* Return file descriptor for generic event channel. Set initial value to COUNT */

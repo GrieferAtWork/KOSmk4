@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb80d66ac */
+/* HASH CRC-32:0x77b68c01 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_thrd_detach_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_detach
-#include <bits/threads.h>
+#include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_detach from pthread */
 #ifndef __local___localdep_pthread_detach_defined
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_pthread_detach,(__pthread_t __pthread),pthread_detach,(__pthread))
 #endif /* !__local___localdep_pthread_detach_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/threads.h>
+#include <asm/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Detach the thread identified by THR from the current
  * environment (it does not allow join or wait for it)

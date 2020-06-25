@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3cc50494 */
+/* HASH CRC-32:0x31127166 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -192,7 +192,7 @@ __CDECLARE_VOID_OPT(,__THROWING,SetGid,(__gid_t __gid),(__gid))
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,Fork,(void),())
 
 /* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
@@ -211,7 +211,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Chown, __FORCELOCAL __ATTR_NONNULL((1)) void (__
 #endif /* ... */
 
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'

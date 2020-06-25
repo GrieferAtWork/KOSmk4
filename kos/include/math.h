@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44162f13 */
+/* HASH CRC-32:0xf73b278b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -562,7 +562,13 @@ __NAMESPACE_STD_USING(islessgreater)
 #include <bits/huge_vall.h>
 #include <bits/inf.h>
 #include <bits/nan.h>
+#include <asm/fp_type.h>
 #endif /* __USE_ISOC99 */
+
+#ifdef __USE_MISC
+#include <asm/crt/math-libc_version.h>
+#include <asm/crt/math-exception.h>
+#endif /* __USE_MISC */
 
 #include <bits/mathdef.h>
 
@@ -11456,33 +11462,67 @@ __LIBC int (signgam);
  *  DECIMAL_DIG    Number of decimal digits supported by conversion between
  *      decimal and all internal floating-point formats. */
 
+#if (defined(__FP_NAN) || defined(__FP_INFINITE) ||   \
+     defined(__FP_ZERO) || defined(__FP_SUBNORMAL) || \
+     defined(__FP_NORMAL))
 /* All floating-point numbers can be put in one of these categories. */
 /* NOTE: These values must match the declarations from <libm/fdlibm.h>! */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	FP_NAN       = 0,
-	FP_INFINITE  = 1,
-	FP_ZERO      = 2,
-	FP_SUBNORMAL = 3,
-	FP_NORMAL    = 4
+#ifdef __FP_NAN
+	FP_NAN = __FP_NAN, /* ... */
+#endif /* __FP_NAN */
+#ifdef __FP_INFINITE
+	FP_INFINITE = __FP_INFINITE, /* ... */
+#endif /* __FP_INFINITE */
+#ifdef __FP_ZERO
+	FP_ZERO = __FP_ZERO, /* ... */
+#endif /* __FP_ZERO */
+#ifdef __FP_SUBNORMAL
+	FP_SUBNORMAL = __FP_SUBNORMAL, /* ... */
+#endif /* __FP_SUBNORMAL */
+#ifdef __FP_NORMAL
+	FP_NORMAL = __FP_NORMAL /* ... */
+#endif /* __FP_NORMAL */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#define FP_NAN       FP_NAN
-#define FP_INFINITE  FP_INFINITE
-#define FP_ZERO      FP_ZERO
-#define FP_SUBNORMAL FP_SUBNORMAL
-#define FP_NORMAL    FP_NORMAL
+#ifdef __FP_NAN
+#define FP_NAN       FP_NAN       /* ... */
+#endif /* __FP_NAN */
+#ifdef __FP_INFINITE
+#define FP_INFINITE  FP_INFINITE  /* ... */
+#endif /* __FP_INFINITE */
+#ifdef __FP_ZERO
+#define FP_ZERO      FP_ZERO      /* ... */
+#endif /* __FP_ZERO */
+#ifdef __FP_SUBNORMAL
+#define FP_SUBNORMAL FP_SUBNORMAL /* ... */
+#endif /* __FP_SUBNORMAL */
+#ifdef __FP_NORMAL
+#define FP_NORMAL    FP_NORMAL    /* ... */
+#endif /* __FP_NORMAL */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define FP_NAN       0
-#define FP_INFINITE  1
-#define FP_ZERO      2
-#define FP_SUBNORMAL 3
-#define FP_NORMAL    4
+#ifdef __FP_NAN
+#define FP_NAN       __FP_NAN       /* ... */
+#endif /* __FP_NAN */
+#ifdef __FP_INFINITE
+#define FP_INFINITE  __FP_INFINITE  /* ... */
+#endif /* __FP_INFINITE */
+#ifdef __FP_ZERO
+#define FP_ZERO      __FP_ZERO      /* ... */
+#endif /* __FP_ZERO */
+#ifdef __FP_SUBNORMAL
+#define FP_SUBNORMAL __FP_SUBNORMAL /* ... */
+#endif /* __FP_SUBNORMAL */
+#ifdef __FP_NORMAL
+#define FP_NORMAL    __FP_NORMAL    /* ... */
+#endif /* __FP_NORMAL */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
 
 
 
@@ -11492,9 +11532,12 @@ enum {
 #define signbit(x) __FPFUNC(x, __builtin_signbitf, __builtin_signbit, __builtin_signbitl)
 #endif /* __builtin_signbitf && __builtin_signbit && __builtin_signbitl */
 #ifndef __SUPPORT_SNAN__
-#if __has_builtin(__builtin_fpclassify)
-#define fpclassify(x) __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x)
-#endif /* __builtin_fpclassify */
+#if (__has_builtin(__builtin_fpclassify) &&             \
+     defined(__FP_NAN) && defined(__FP_INFINITE) &&     \
+     defined(__FP_NORMAL) && defined(__FP_SUBNORMAL) && \
+     defined(__FP_ZERO))
+#define fpclassify(x) __builtin_fpclassify(__FP_NAN, __FP_INFINITE, __FP_NORMAL, __FP_SUBNORMAL, __FP_ZERO, x)
+#endif /* __builtin_fpclassify && defined(__FP_...) */
 #if __has_builtin(__builtin_isfinite)
 #define isfinite(x) __builtin_isfinite(x)
 #endif /* __builtin_isfinite */
@@ -11520,7 +11563,9 @@ enum {
 
 #ifndef isnormal
 #ifdef fpclassify
-#define isnormal(x) (fpclassify(x) == FP_NORMAL)
+#ifdef __FP_NORMAL
+#define isnormal(x) (fpclassify(x) == __FP_NORMAL)
+#endif /* __FP_NORMAL */
 #endif /* fpclassify */
 #endif /* !isnormal */
 
@@ -11559,11 +11604,11 @@ enum {
 
 /* Generic... */
 #ifndef isunordered
-#ifdef fpclassify
-#define isunordered(u, v) (fpclassify(u) == FP_NAN || fpclassify(v) == FP_NAN)
-#else /* fpclassify */
+#if defined(fpclassify) && defined(__FP_NAN)
+#define isunordered(u, v) (fpclassify(u) == __FP_NAN || fpclassify(v) == __FP_NAN)
+#else /* fpclassify && __FP_NAN */
 #define isunordered(u, v) 0
-#endif /* !fpclassify */
+#endif /* !fpclassify || !__FP_NAN */
 #endif /* !isunordered */
 
 #ifndef isgreater
@@ -11811,14 +11856,46 @@ __NAMESPACE_STD_USING(islessgreater)
 
 
 #ifdef __USE_MISC
+#if (defined(___IEEE_) || defined(___SVID_) ||   \
+     defined(___XOPEN_) || defined(___POSIX_) || \
+     defined(___ISOC_))
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("_IEEE_")
+#pragma push_macro("_SVID_")
+#pragma push_macro("_XOPEN_")
+#pragma push_macro("_POSIX_")
+#pragma push_macro("_ISOC_")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef _IEEE_
+#undef _SVID_
+#undef _XOPEN_
+#undef _POSIX_
+#undef _ISOC_
 /* Support for various different standard error handling behaviors. */
 typedef enum {
-	_IEEE_  = -1, /* According to IEEE 754/IEEE 854. */
-	_SVID_  = 0,  /* According to System V, release 4. */
-	_XOPEN_ = 1,  /* Nowadays also Unix98. */
-	_POSIX_ = 2,
-	_ISOC_  = 3   /* Actually this is ISO C99. */
+#ifdef ___IEEE_
+	_IEEE_ = ___IEEE_,   /* According to IEEE 754/IEEE 854. */
+#endif /* ___IEEE_ */
+#ifdef ___SVID_
+	_SVID_ = ___SVID_,   /* According to System V, release 4. */
+#endif /* ___SVID_ */
+#ifdef ___XOPEN_
+	_XOPEN_ = ___XOPEN_, /* Nowadays also Unix98. */
+#endif /* ___XOPEN_ */
+#ifdef ___POSIX_
+	_POSIX_ = ___POSIX_, /* ... */
+#endif /* ___POSIX_ */
+#ifdef ___ISOC_
+	_ISOC_ = ___ISOC_    /* Actually this is ISO C99. */
+#endif /* ___ISOC_ */
 } _LIB_VERSION_TYPE;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("_ISOC_")
+#pragma pop_macro("_POSIX_")
+#pragma pop_macro("_XOPEN_")
+#pragma pop_macro("_SVID_")
+#pragma pop_macro("_IEEE_")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 /* This variable can be changed at run-time to any of the values above to
  * affect floating point error handling behavior (it may also be necessary
@@ -11833,10 +11910,8 @@ __LIBC _LIB_VERSION_TYPE _LIB_VERSION;
 #pragma pop_macro("_LIB_VERSION")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __CRT_HAVE__LIB_VERSION */
-#endif /* __USE_MISC */
+#endif /* ... */
 
-
-#ifdef __USE_MISC
 
 /* In SVID error handling, `matherr' is called with this description of the exceptional condition.
  * We have a problem when using C++ since `exception' is a reserved name in C++. */
@@ -11894,23 +11969,35 @@ __CDECLARE(,int,__NOTHROW,matherr,(struct exception *__exc),(__exc))
 #endif /* !__cplusplus */
 #endif /* __CRT_HAVE_matherr */
 
-#define X_TLOSS    1.41484755040568800000e+16
+#define X_TLOSS 1.41484755040568800000e+16
 
 /* Types of exceptions in the `type' field. */
-#define DOMAIN     1
-#define SING       2
-#define OVERFLOW   3
-#define UNDERFLOW  4
-#define TLOSS      5
-#define PLOSS      6
+#ifdef __MATH_EXCEPT_DOMAIN
+#define DOMAIN __MATH_EXCEPT_DOMAIN /* ... */
+#endif /* __MATH_EXCEPT_DOMAIN */
+#ifdef __MATH_EXCEPT_SING
+#define SING __MATH_EXCEPT_SING /* ... */
+#endif /* __MATH_EXCEPT_SING */
+#ifdef __MATH_EXCEPT_OVERFLOW
+#define OVERFLOW __MATH_EXCEPT_OVERFLOW /* ... */
+#endif /* __MATH_EXCEPT_OVERFLOW */
+#ifdef __MATH_EXCEPT_UNDERFLOW
+#define UNDERFLOW __MATH_EXCEPT_UNDERFLOW /* ... */
+#endif /* __MATH_EXCEPT_UNDERFLOW */
+#ifdef __MATH_EXCEPT_TLOSS
+#define TLOSS __MATH_EXCEPT_TLOSS /* ... */
+#endif /* __MATH_EXCEPT_TLOSS */
+#ifdef __MATH_EXCEPT_PLOSS
+#define PLOSS __MATH_EXCEPT_PLOSS /* ... */
+#endif /* __MATH_EXCEPT_PLOSS */
 
 /* SVID mode specifies returning this large value instead of infinity. */
-#define HUGE       3.40282347e+38F
+#define HUGE 3.40282347e+38F
 
 #else /* __USE_MISC */
 #ifdef __USE_XOPEN
 /* X/Open wants another strange constant. */
-#define MAXFLOAT   3.40282347e+38F
+#define MAXFLOAT 3.40282347e+38F
 #endif /* __USE_XOPEN */
 #endif /* !__USE_MISC */
 

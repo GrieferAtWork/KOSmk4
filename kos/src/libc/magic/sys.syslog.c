@@ -145,20 +145,14 @@ int setlogmask(__STDC_INT_AS_UINT_T mask);
 
 [[decl_include("<features.h>")]]
 [[cp, ATTR_LIBC_PRINTF(2, 3)]]
-[[userimpl, requires_function(vsyslog)]]
 void syslog(__STDC_INT_AS_UINT_T level,
-            [[nonnull]] char const *format, ...) {
-	va_list args;
-	va_start(args,format);
-	vsyslog(level,format,args);
-	va_end(args);
-}
+            [[nonnull]] char const *format, ...)
+	%{printf("vsyslog")}
 
 %
 %#ifdef __USE_MISC
-[[decl_include("<features.h>")]]
-[[cp, ATTR_LIBC_PRINTF(2, 0)]]
-[[userimpl, requires_dependent_function(syslog_printer)]]
+[[cp, ATTR_LIBC_PRINTF(2, 0), decl_include("<features.h>")]]
+[[requires_dependent_function(syslog_printer)]]
 void vsyslog(__STDC_INT_AS_UINT_T level,
              [[nonnull]] char const *format,
              $va_list args) {

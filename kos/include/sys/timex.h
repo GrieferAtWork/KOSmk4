@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b632fb7 */
+/* HASH CRC-32:0xf10203c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,12 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <sys/time.h>
+
 #include <bits/timex.h>
 #include <bits/types.h>
+#include <sys/time.h>
 
-/* Documentation taken from /usr/include/i386-linux-gnu/sys/timex.h */
+	/* Documentation taken from /usr/include/i386-linux-gnu/sys/timex.h */
 /* Copyright (C) 1995-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 

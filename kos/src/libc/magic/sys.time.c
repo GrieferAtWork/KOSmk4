@@ -32,6 +32,8 @@
 
 %{
 #include <features.h>
+
+#include <asm/time.h>
 #include <bits/types.h>
 #include <bits/itimerval.h>
 #include <sys/select.h>
@@ -57,25 +59,46 @@
 
 __SYSDECL_BEGIN
 
+#if (defined(__ITIMER_REAL) || defined(__ITIMER_VIRTUAL) || \
+     defined(__ITIMER_PROF))
 /*[[[enum]]]*/
 #ifdef __CC__
 typedef enum __itimer_which {
-	ITIMER_REAL    = 0,
-	ITIMER_VIRTUAL = 1,
-	ITIMER_PROF    = 2
+#ifdef __ITIMER_REAL
+	ITIMER_REAL    = __ITIMER_REAL,
+#endif /* __ITIMER_REAL */
+#ifdef __ITIMER_VIRTUAL
+	ITIMER_VIRTUAL = __ITIMER_VIRTUAL,
+#endif /* __ITIMER_VIRTUAL */
+#ifdef __ITIMER_PROF
+	ITIMER_PROF    = __ITIMER_PROF
+#endif /* __ITIMER_PROF */
 } __itimer_which_t;
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __ITIMER_REAL
 #define ITIMER_REAL    ITIMER_REAL
+#endif /* __ITIMER_REAL */
+#ifdef __ITIMER_VIRTUAL
 #define ITIMER_VIRTUAL ITIMER_VIRTUAL
+#endif /* __ITIMER_VIRTUAL */
+#ifdef __ITIMER_PROF
 #define ITIMER_PROF    ITIMER_PROF
+#endif /* __ITIMER_PROF */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define ITIMER_REAL    0
-#define ITIMER_VIRTUAL 1
-#define ITIMER_PROF    2
+#ifdef __ITIMER_REAL
+#define ITIMER_REAL    __ITIMER_REAL
+#endif /* __ITIMER_REAL */
+#ifdef __ITIMER_VIRTUAL
+#define ITIMER_VIRTUAL __ITIMER_VIRTUAL
+#endif /* __ITIMER_VIRTUAL */
+#ifdef __ITIMER_PROF
+#define ITIMER_PROF    __ITIMER_PROF
+#endif /* __ITIMER_PROF */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
 
 #ifdef __CC__
 

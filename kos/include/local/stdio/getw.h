@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x983e75c0 */
+/* HASH CRC-32:0x7ddce58b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fread_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Similar to `getc()', but read 2 bytes */
 __LOCAL_LIBC(getw) __ATTR_NONNULL((1)) int

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7643c65 */
+/* HASH CRC-32:0x670d8e66 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ NOTHROW_NCX(LIBKCALL libc_btowc)(int ch) {
 #endif /* !__KERNEL__ */
 #include <stdio.h>
 #ifndef __KERNEL__
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_wctob)(wint_t ch) {
 	if (ch >= 0 && ch <= 0x7f)
@@ -590,7 +590,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.putc") wint_t
 	return libc_fputwc(wc, stdout);
 }
 #include <parts/errno.h>
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) char16_t *
 (LIBDCALL libd_fgetws)(char16_t *__restrict buf,
                        __STDC_INT_AS_SIZE_T bufsize,
@@ -632,7 +632,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") WUNUSED NONNULL
 	return buf;
 }
 #include <parts/errno.h>
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) char32_t *
 (LIBKCALL libc_fgetws)(char32_t *__restrict buf,
                        __STDC_INT_AS_SIZE_T bufsize,
@@ -1605,7 +1605,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.putc") wint_t
 (LIBKCALL libc_putwchar_unlocked)(char32_t wc) THROWS(...) {
 	return libc_fputwc_unlocked(wc, stdin);
 }
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 #include <parts/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) char16_t *
 (LIBDCALL libd_fgetws_unlocked)(char16_t *__restrict buf,
@@ -1647,7 +1647,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.read") NONNULL((1, 3
 	buf[n] = '\0';
 	return buf;
 }
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 #include <parts/errno.h>
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) char32_t *
 (LIBKCALL libc_fgetws_unlocked)(char32_t *__restrict buf,

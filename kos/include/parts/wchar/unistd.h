@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7df0fdd */
+/* HASH CRC-32:0x14b982f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wchown, __FORCELOCAL __ATTR_NONNULL((1)) int __N
 #endif /* ... */
 #ifdef __CRT_HAVE_wpathconf
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
@@ -73,7 +73,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,wpathconf,(wchar_t
 #if defined(__CRT_HAVE_fpathconf) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY)
 #include <local/parts.wchar.unistd/wpathconf.h>
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'

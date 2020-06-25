@@ -48,7 +48,10 @@ typedef size_t rsize_t;
 %{
 #include <features.h>
 
-#include <asm/stdio.h> /* __WEOF */
+#include <hybrid/limitcore.h> /* __WCHAR_MIN__, __WCHAR_MAX__ */
+#include <hybrid/typecore.h>
+
+#include <asm/crt/stdio.h> /* __WEOF */
 #include <bits/mbstate.h>
 #include <kos/anno.h>
 
@@ -59,7 +62,6 @@ typedef size_t rsize_t;
 #ifdef __USE_DOS
 #include <bits/types.h>
 #include <parts/errno.h>
-
 #include <crtdefs.h>
 #endif /* __USE_DOS */
 
@@ -209,7 +211,7 @@ wint_t btowc(int ch) {
 ;
 
 [[std, wunused, ATTR_CONST]]
-[[impl_include("<asm/stdio.h>")]]
+[[impl_include("<asm/crt/stdio.h>")]]
 int wctob(wint_t ch) {
 	if (ch >= 0 && ch <= 0x7f)
 		return (int)ch;
@@ -591,7 +593,7 @@ wint_t fputwc(wchar_t wc, [[nonnull]] FILE *stream);
 [[cp_stdio, std, guard, wchar, wunused, alias("fgetws_unlocked", "_fgetws_nolock")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgetws_unlocked", "_fgetws_nolock")]]
 [[requires($has_function(fgetwc) && $has_function(ungetwc) && $has_function(ferror))]]
-[[impl_include("<parts/errno.h>", "<asm/stdio.h>")]]
+[[impl_include("<parts/errno.h>", "<asm/crt/stdio.h>")]]
 [[decl_include("<features.h>")]]
 wchar_t *fgetws([[outp(bufsize)]] wchar_t *__restrict buf,
                 __STDC_INT_AS_SIZE_T bufsize,
@@ -1118,7 +1120,7 @@ $wint_t fputwc_unlocked(wchar_t wc, [[nonnull]] $FILE *__restrict stream);
 [[cp_stdio, wchar, dos_export_alias("_fgetws_nolock"), alias("fgetws")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.read.read")]]
 [[requires_function(fgetwc_unlocked, ungetwc_unlocked, ferror_unlocked)]]
-[[impl_include("<asm/stdio.h>", "<parts/errno.h>")]]
+[[impl_include("<asm/crt/stdio.h>", "<parts/errno.h>")]]
 wchar_t *fgetws_unlocked([[outp(bufsize)]] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize,
                          [[nonnull]] $FILE *__restrict stream) {
 	$size_t n;
@@ -1193,7 +1195,7 @@ $size_t wcsftime_l([[outp(maxsize)]] wchar_t *__restrict buf, $size_t maxsize,
 %
 
 @@For use with `format_printf()' and friends: Prints to a `FILE *' closure argument
-[[cp_stdio, wchar, impl_include("<asm/stdio.h>")]]
+[[cp_stdio, wchar, impl_include("<asm/crt/stdio.h>")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("file_wprinter_unlocked")]]
 [[alias("file_wprinter_unlocked")]]
 [[userimpl, requires($has_function(fputwc))]]
@@ -1210,7 +1212,7 @@ $ssize_t file_wprinter([[nonnull]] void *arg,
 }
 
 @@Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG'
-[[cp_stdio, wchar, impl_include("<asm/stdio.h>"), alias("file_wprinter")]]
+[[cp_stdio, wchar, impl_include("<asm/crt/stdio.h>"), alias("file_wprinter")]]
 [[userimpl, requires_function(fputwc_unlocked)]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.write.write")]]
 $ssize_t file_wprinter_unlocked([[nonnull]] void *arg,

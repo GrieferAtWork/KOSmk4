@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55f6f2a7 */
+/* HASH CRC-32:0xc2c318c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,6 +90,10 @@ __NAMESPACE_STD_USING(timespec_get)
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
+
+#ifdef __USE_GNU
+#include <bits/timex.h>
+#endif /* __USE_GNU */
 
 
 /* Some documentation comments are taken from /usr/include/time.h on a linux machine.
@@ -1130,6 +1134,29 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,getdate_r,(char const *__res
 __NAMESPACE_LOCAL_USING_OR_IMPL(getdate_r, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL getdate_r)(char const *__restrict __string, __STRUCT_TM *__restrict __resbufp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdate_r))(__string, __resbufp); })
 #endif /* !__CRT_HAVE_getdate_r */
 #endif /* !__getdate_r_defined */
+#ifndef __clock_adjtime_defined
+#define __clock_adjtime_defined 1
+#if defined(__CRT_HAVE_clock_adjtime64) && defined(__USE_TIME_BITS64)
+__CREDIRECT(,int,__NOTHROW_NCX,clock_adjtime,(__clockid_t __clock_id, struct timex *__utx),clock_adjtime64,(__clock_id,__utx))
+#elif defined(__CRT_HAVE_clock_adjtime) && !defined(__USE_TIME_BITS64)
+__CDECLARE(,int,__NOTHROW_NCX,clock_adjtime,(__clockid_t __clock_id, struct timex *__utx),(__clock_id,__utx))
+#else /* ... */
+#undef __clock_adjtime_defined
+#endif /* !... */
+#endif /* !__clock_adjtime_defined */
+
+#ifdef __USE_TIME64
+#ifndef __clock_adjtime64_defined
+#define __clock_adjtime64_defined 1
+#ifdef __CRT_HAVE_clock_adjtime64
+__CDECLARE(,int,__NOTHROW_NCX,clock_adjtime64,(__clockid_t __clock_id, struct timex64 *__utx),(__clock_id,__utx))
+#elif defined(__CRT_HAVE_clock_adjtime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(,int,__NOTHROW_NCX,clock_adjtime64,(__clockid_t __clock_id, struct timex64 *__utx),clock_adjtime,(__clock_id,__utx))
+#else /* ... */
+#undef __clock_adjtime64_defined
+#endif /* !... */
+#endif /* !__clock_adjtime64_defined */
+#endif /* __USE_TIME64 */
 #endif /* __USE_GNU */
 
 #ifdef __USE_POSIX

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa414dbc */
+/* HASH CRC-32:0xa9be8ab6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -185,7 +185,7 @@ INTDEF unsigned int NOTHROW_NCX(LIBCCALL libc_alarm)(unsigned int seconds);
  * Suspend execution until the delivery of a POSIX_SIGNAL */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_pause)(void);
 /* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
@@ -375,7 +375,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file, 
 INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t fd, __TARGV, __TENVP);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_nice)(int inc);
 /* Retrieve a system configuration string specified by `name'
- * @param: name:   One of `_CS_*' from <bits/confname.h>
+ * @param: name:   One of `_CS_*' from <bits/crt/confname.h>
  * @param: buf:    Target buffer
  * @param: buflen: Available buffer size (including a trailing \0-character)
  * @return: * :    Required buffer size (including a trailing \0-character)
@@ -480,7 +480,7 @@ INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s);
 /* Same as `ctermid', but return `NULL' when `S' is `NULL' */
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);
 /* >> sysconf(2)
- * @param: NAME: One of `_SC_*' from <bits/confname.h>
+ * @param: NAME: One of `_SC_*' from <bits/crt/confname.h>
  * Return a system configuration value `NAME'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum

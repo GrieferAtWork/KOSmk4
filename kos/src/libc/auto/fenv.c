@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe80b7249 */
+/* HASH CRC-32:0x73dd0bc8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,21 +29,21 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Clear the supported exceptions represented by EXCEPTS */
 INTERN ATTR_SECTION(".text.crt.math.fenv") int
 NOTHROW(LIBCCALL libc_feclearexcept)(int excepts) {
 	__inline_feclearexcept(excepts);
 	return 0;
 }
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Raise the supported exceptions represented by EXCEPTS */
 INTERN ATTR_SECTION(".text.crt.math.fenv") int
 (LIBCCALL libc_feraiseexcept)(int excepts) THROWS(...) {
 	__inline_feraiseexcept(excepts);
 	return 0;
 }
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Store implementation-defined representation of the exception
  * flags indicated by EXCEPTS in the object pointed to by FLAGP */
 INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
@@ -57,7 +57,7 @@ NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp,
 #endif /* !__inline_fegetexceptflag */
 	return 0;
 }
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Set complete status for exceptions indicated by EXCEPTS according
  * to the representation in the object pointed to by FLAGP */
 INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
@@ -72,14 +72,14 @@ NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t const *flagp,
 #endif /* !__inline_fesetexceptflag */
 	return 0;
 }
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Determine which of subset of the exceptions
  * specified by EXCEPTS are currently set */
 INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_PURE WUNUSED int
 NOTHROW(LIBCCALL libc_fetestexcept)(int excepts) {
 	return __inline_fetestexcept(excepts);
 }
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Get current rounding direction
  * @return: One of...
  *             ... `FE_TONEAREST':  round()
@@ -90,7 +90,7 @@ INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_PURE WUNUSED int
 NOTHROW(LIBCCALL libc_fegetround)(void) {
 	return __inline_fegetround();
 }
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Establish the rounding direction represented by `rounding_direction'
  * @param: rounding_direction: One of...
  *             ... `FE_TONEAREST':  round()
@@ -101,14 +101,14 @@ INTERN ATTR_SECTION(".text.crt.math.fenv") int
 NOTHROW(LIBCCALL libc_fesetround)(int rounding_direction) {
 	return __inline_fesetround(rounding_direction);
 }
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Store the current floating-point environment in the object pointed to by ENVP */
 INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_fegetenv)(fenv_t *envp) {
 	__inline_fegetenv(envp);
 	return 0;
 }
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Save the current environment in the object pointed to by ENVP, clear
  * exception flags and install a non-stop mode (if available) for all exceptions */
 INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
@@ -116,14 +116,14 @@ NOTHROW_NCX(LIBCCALL libc_feholdexcept)(fenv_t *envp) {
 	__inline_feholdexcept(envp);
 	return 0;
 }
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Establish the floating-point environment represented by the object pointed to by ENVP */
 INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_fesetenv)(fenv_t const *envp) {
 	__inline_fesetenv(envp);
 	return 0;
 }
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Save current exceptions in temporary storage, install environment
  * represented by object pointed to by ENVP and raise exceptions
  * according to saved exceptions */
@@ -132,7 +132,7 @@ NOTHROW_NCX(LIBCCALL libc_feupdateenv)(fenv_t const *envp) {
 	__inline_feupdateenv(envp);
 	return 0;
 }
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Enable individual exceptions.  Will not enable more exceptions than
  * EXCEPTS specifies.  Returns the previous enabled exceptions if all
  * exceptions are successfully set, otherwise returns -1 */
@@ -140,7 +140,7 @@ INTERN ATTR_SECTION(".text.crt.math.fenv") int
 NOTHROW(LIBCCALL libc_feenableexcept)(int excepts) {
 	return __inline_feenableexcept(excepts);
 }
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Disable individual exceptions.  Will not disable more exceptions than
  * EXCEPTS specifies.  Returns the previous enabled exceptions if all
  * exceptions are successfully disabled, otherwise returns -1 */
@@ -148,7 +148,7 @@ INTERN ATTR_SECTION(".text.crt.math.fenv") int
 NOTHROW(LIBCCALL libc_fedisableexcept)(int excepts) {
 	return __inline_fedisableexcept(excepts);
 }
-#include <bits/fenv-inline.h>
+#include <bits/crt/fenv-inline.h>
 /* Return enabled exceptions */
 INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_PURE WUNUSED int
 NOTHROW(LIBCCALL libc_fegetexcept)(void) {

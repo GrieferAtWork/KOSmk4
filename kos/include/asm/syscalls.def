@@ -142,6 +142,7 @@
 %[typeorg(<bits/mmsghdr-struct64.h>: mmsghdrx64, __mmsghdrx64)]
 %[typeorg(<bits/sigstack32.h>: sigstackx32, __sigstackx32, sigaltstackx32, __sigaltstackx32)]
 %[typeorg(<bits/sigstack64.h>: sigstackx64, __sigstackx64, sigaltstackx64, __sigaltstackx64)]
+%[typeorg(<bits/pollfd.h>: pollfd)]
 
 /* Define how specific struct names should be escaped in headers */
 %[struct_escape(sigstackx32 = __sigstackx32, sigstackx64 = __sigstackx64)]

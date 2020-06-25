@@ -25,6 +25,7 @@
 #include <features.h>
 #include <paths.h>
 
+#include <bits/crt/db/mntent.h>
 
 /* Disclaimer: Documentation is taken from Glibc /usr/include/mntent.h */
 /* Utilities for reading/writing fstab, mtab, etc.
@@ -49,23 +50,23 @@
 __SYSDECL_BEGIN
 
 /* File listing canonical interesting mount points.  */
-#define MNTTAB          _PATH_MNTTAB   /* Deprecated alias.  */
+#define MNTTAB _PATH_MNTTAB /* Deprecated alias.  */
 
 /* File listing currently active mount points.  */
-#define MOUNTED         _PATH_MOUNTED  /* Deprecated alias.  */
+#define MOUNTED _PATH_MOUNTED /* Deprecated alias.  */
 
 /* General filesystem types.  */
-#define MNTTYPE_IGNORE  "ignore"       /* Ignore this entry.  */
-#define MNTTYPE_NFS     "nfs"          /* Network file system.  */
-#define MNTTYPE_SWAP    "swap"         /* Swap device.  */
+#define MNTTYPE_IGNORE "ignore" /* Ignore this entry.  */
+#define MNTTYPE_NFS    "nfs"    /* Network file system.  */
+#define MNTTYPE_SWAP   "swap"   /* Swap device.  */
 
 /* Generic mount options.  */
-#define MNTOPT_DEFAULTS "defaults"    /* Use all default options.  */
-#define MNTOPT_RO       "ro"          /* Read only.  */
-#define MNTOPT_RW       "rw"          /* Read/write.  */
-#define MNTOPT_SUID     "suid"        /* Set uid allowed.  */
-#define MNTOPT_NOSUID   "nosuid"      /* No set uid allowed.  */
-#define MNTOPT_NOAUTO   "noauto"      /* Do not auto mount. */
+#define MNTOPT_DEFAULTS "defaults" /* Use all default options.  */
+#define MNTOPT_RO       "ro"       /* Read only.  */
+#define MNTOPT_RW       "rw"       /* Read/write.  */
+#define MNTOPT_SUID     "suid"     /* Set uid allowed.  */
+#define MNTOPT_NOSUID   "nosuid"   /* No set uid allowed.  */
+#define MNTOPT_NOAUTO   "noauto"   /* Do not auto mount. */
 
 #ifdef __CC__
 
@@ -73,16 +74,6 @@ __SYSDECL_BEGIN
 #define __FILE_defined 1
 typedef __FILE FILE;
 #endif /* !__FILE_defined */
-
-/* Structure describing a mount table entry.  */
-struct mntent {
-	char          *mnt_fsname; /* Device or server for filesystem. */
-	char          *mnt_dir;    /* Directory mounted on. */
-	char          *mnt_type;   /* Type of filesystem: ufs, nfs, etc. */
-	char          *mnt_opts;   /* Comma-separated options for fs. */
-	__INT32_TYPE__ mnt_freq;   /* Dump frequency (in days). */
-	__INT32_TYPE__ mnt_passno; /* Pass number for `fsck'. */
-};
 
 }
 
@@ -95,13 +86,13 @@ $FILE *setmntent([[nonnull]] char const *file,
 
 @@Read one mount table entry from STREAM.  Returns a pointer to storage
 @@reused on the next call, or null for EOF or error (use feof/ferror to check)
-[[cp]]
+[[cp, decl_include("<bits/crt/db/mntent.h>")]]
 struct mntent *getmntent([[nonnull]] $FILE *stream);
 
 %
 %#ifdef __USE_MISC
 @@Reentrant version of the above function
-[[decl_include("<features.h>"), decl_prefix(struct mntent;)]]
+[[decl_include("<features.h>", "<bits/crt/db/mntent.h>")]]
 [[cp, export_alias("__getmntent_r")]]
 struct mntent *getmntent_r([[nonnull]] $FILE *__restrict stream,
                            [[nonnull]] struct mntent *__restrict result,
@@ -112,7 +103,7 @@ struct mntent *getmntent_r([[nonnull]] $FILE *__restrict stream,
 %
 @@Write the mount table entry described by MNT to STREAM.
 @@Return zero on success, nonzero on failure
-[[cp]]
+[[cp, decl_include("<bits/crt/db/mntent.h>")]]
 int addmntent([[nonnull]] $FILE *__restrict stream,
               [[nonnull]] struct mntent const *__restrict mnt);
 
@@ -122,7 +113,7 @@ int endmntent([[nonnull]] $FILE *stream);
 
 @@Search MNT->mnt_opts for an option matching OPT.
 @@Returns the address of the substring, or null if none found
-[[wunused, ATTR_PURE]]
+[[wunused, ATTR_PURE, decl_include("<bits/crt/db/mntent.h>")]]
 char *hasmntopt([[nullable]] struct mntent const *mnt,
                 [[nullable]] char const *opt) {
 	char *str;

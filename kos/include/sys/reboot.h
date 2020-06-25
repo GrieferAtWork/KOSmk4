@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x424f4e2e */
+/* HASH CRC-32:0xd4427118 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,17 +29,32 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#include <asm/reboot.h>
 
 __SYSDECL_BEGIN
 
 /* Linux compatibility header */
-#define RB_AUTOBOOT    0x01234567 /* Do a hard reset immediately. */
-#define RB_HALT_SYSTEM 0xcdef0123 /* Halt the system. */
-#define RB_ENABLE_CAD  0x89abcdef /* Enable reboot with Ctrl-Alt-Delete. */
-#define RB_DISABLE_CAD 0          /* Disable reboot with Ctrl-Alt-Delete. */
-#define RB_POWER_OFF   0x4321fedc /* halt and switch off power (if possible). */
-#define RB_SW_SUSPEND  0xd000fce2 /* Suspend the system using a software suspend. */
-#define RB_KEXEC       0x45584543 /* Reboot into new kernel (not supported currently). */
+#ifdef __RB_AUTOBOOT
+#define RB_AUTOBOOT __RB_AUTOBOOT /* Do a hard reset immediately. */
+#endif /* __RB_AUTOBOOT */
+#ifdef __RB_HALT_SYSTEM
+#define RB_HALT_SYSTEM __RB_HALT_SYSTEM /* Halt the system. */
+#endif /* __RB_HALT_SYSTEM */
+#ifdef __RB_ENABLE_CAD
+#define RB_ENABLE_CAD __RB_ENABLE_CAD /* Enable reboot with Ctrl-Alt-Delete. */
+#endif /* __RB_ENABLE_CAD */
+#ifdef __RB_DISABLE_CAD
+#define RB_DISABLE_CAD __RB_DISABLE_CAD /* Disable reboot with Ctrl-Alt-Delete. */
+#endif /* __RB_DISABLE_CAD */
+#ifdef __RB_POWER_OFF
+#define RB_POWER_OFF __RB_POWER_OFF /* halt and switch off power (if possible). */
+#endif /* __RB_POWER_OFF */
+#ifdef __RB_SW_SUSPEND
+#define RB_SW_SUSPEND __RB_SW_SUSPEND /* Suspend the system using a software suspend. */
+#endif /* __RB_SW_SUSPEND */
+#ifdef __RB_KEXEC
+#define RB_KEXEC __RB_KEXEC /* Reboot into new kernel (not supported currently). */
+#endif /* __RB_KEXEC */
 
 #ifdef __CC__
 

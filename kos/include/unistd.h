@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaba7eab2 */
+/* HASH CRC-32:0x1faa3264 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,9 +33,9 @@
 #include <hybrid/typecore.h>
 
 #include <asm/stdio.h>
-#include <bits/confname.h>
+#include <bits/crt/confname.h>
 #include <bits/posix_opt.h>
-#include <bits/sys_errlist.h>
+#include <bits/crt/sys_errlist.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 
@@ -44,7 +44,7 @@
 #endif /* __CRT_GLC || __CRT_KOS || __CRT_KOS_KERNEL */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
-#include <bits/environments.h>
+#include <bits/crt/environments.h>
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 __SYSDECL_BEGIN
@@ -680,7 +680,7 @@ __CDECLARE_OPT(,unsigned int,__NOTHROW_NCX,alarm,(unsigned int __seconds),(__sec
 __CDECLARE_OPT(,int,__NOTHROW_RPC,pause,(void),())
 
 /* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
@@ -718,7 +718,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(chown, __FORCELOCAL __ATTR_NONNULL((1)) int __NO
 
 #ifdef __CRT_HAVE_pathconf
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
@@ -729,7 +729,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char con
 #if defined(__CRT_HAVE_fpathconf) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY)
 #include <local/unistd/pathconf.h>
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
@@ -1573,7 +1573,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,_exit,(int __status),exit,(__status)
 
 #ifdef __USE_POSIX2
 /* Retrieve a system configuration string specified by `name'
- * @param: name:   One of `_CS_*' from <bits/confname.h>
+ * @param: name:   One of `_CS_*' from <bits/crt/confname.h>
  * @param: buf:    Target buffer
  * @param: buflen: Available buffer size (including a trailing \0-character)
  * @return: * :    Required buffer size (including a trailing \0-character)
@@ -2061,7 +2061,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL char *__NOTHROW_NCX(__LI
 
 #ifdef __CRT_HAVE_sysconf
 /* >> sysconf(2)
- * @param: NAME: One of `_SC_*' from <bits/confname.h>
+ * @param: NAME: One of `_SC_*' from <bits/crt/confname.h>
  * Return a system configuration value `NAME'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
@@ -2070,7 +2070,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL char *__NOTHROW_NCX(__LI
 __CDECLARE(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,sysconf,(__STDC_INT_AS_UINT_T __name),(__name))
 #elif defined(__CRT_HAVE__sysconf)
 /* >> sysconf(2)
- * @param: NAME: One of `_SC_*' from <bits/confname.h>
+ * @param: NAME: One of `_SC_*' from <bits/crt/confname.h>
  * Return a system configuration value `NAME'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
@@ -2079,7 +2079,7 @@ __CDECLARE(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,sysconf,(__STDC_INT_AS_
 __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,sysconf,(__STDC_INT_AS_UINT_T __name),_sysconf,(__name))
 #elif defined(__CRT_HAVE___sysconf)
 /* >> sysconf(2)
- * @param: NAME: One of `_SC_*' from <bits/confname.h>
+ * @param: NAME: One of `_SC_*' from <bits/crt/confname.h>
  * Return a system configuration value `NAME'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum

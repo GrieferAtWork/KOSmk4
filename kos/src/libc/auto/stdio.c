@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cc2bfcb */
+/* HASH CRC-32:0x2f027f41 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
 
 #include "../libc/globals.h"
 #ifndef __KERNEL__
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 /* Alias for `setvbuf(STREAM, buf, _IOFBF, BUFSIZ)' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_setbuf)(FILE *__restrict stream,
@@ -324,7 +324,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_DEPRECATED("
 (LIBCCALL libc_gets)(char *__restrict buf) THROWS(...) {
 	return libc_fgets(buf, INT_MAX, stdin);
 }
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_getc)(void *__arg) {
@@ -525,7 +525,7 @@ NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd,
 	va_end(args);
 	return result;
 }
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 /* Specify the location and size for the buffer to-be used by `STREAM' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_setbuffer)(FILE *__restrict stream,
@@ -541,7 +541,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_setlinebuf)(FILE *__restrict stream) {
 	libc_setvbuf(stream, NULL, _IOLBF, 0);
 }
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 #include <hybrid/__assert.h>
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 2, 4)) ssize_t
 (LIBCCALL libc_getdelim)(char **__restrict lineptr,
@@ -607,7 +607,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") int
 (LIBCCALL libc_putchar_unlocked)(int ch) THROWS(...) {
 	return libc_fputc_unlocked(ch, stdout);
 }
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 /* Similar to `getc()', but read 2 bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") NONNULL((1)) int
 (LIBCCALL libc_getw)(FILE *__restrict stream) THROWS(...) {
@@ -616,7 +616,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") NONNULL((1)) int
 	       ? (int)result
 	       : (int)EOF;
 }
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 /* Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") NONNULL((2)) int
 (LIBCCALL libc_putw)(int w,
@@ -626,7 +626,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") NONNULL((2)) int
 	       ? w
 	       : EOF;
 }
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 #include <parts/errno.h>
 /* Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 3)) char *
@@ -766,7 +766,7 @@ NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr,
 	va_end(args);
 	return result;
 }
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") NONNULL((1)) int
 (LIBCCALL libc_getw_unlocked)(FILE *__restrict stream) THROWS(...) {
 	u16 result;
@@ -782,7 +782,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") NONNULL((2)) int
 	       ? w
 	       : EOF;
 }
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 #include <hybrid/__assert.h>
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED NONNULL((1, 2, 4)) ssize_t
 (LIBCCALL libc_getdelim_unlocked)(char **__restrict lineptr,
@@ -1029,7 +1029,7 @@ NOTHROW_NCX(LIBCCALL libc__vsscanf_l)(char const *__restrict input,
 	(void)locale;
 	return libc_vsscanf(input, format, args);
 }
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 struct __vsnscanf_data {

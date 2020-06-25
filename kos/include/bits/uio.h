@@ -22,23 +22,10 @@
 
 #include <__stdinc.h>
 
-#include <hybrid/typecore.h>
-
 #include <bits/iovec-struct.h>
 
-__SYSDECL_BEGIN
-
 #ifndef UIO_MAXIOV
-#define UIO_MAXIOV  1024
+#define UIO_MAXIOV 1024
 #endif /* !UIO_MAXIOV */
-
-#ifdef __CC__
-#ifndef __size_t_defined
-#define __size_t_defined 1
-typedef __SIZE_TYPE__ size_t;
-#endif /* !__size_t_defined */
-#endif /* __CC__ */
-
-__SYSDECL_END
 
 #endif /* !_BITS_UIO_H */

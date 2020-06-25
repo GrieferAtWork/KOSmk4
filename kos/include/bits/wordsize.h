@@ -21,20 +21,21 @@
 #define _BITS_WORDSIZE_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/typecore.h>
 
 #if __SIZEOF_POINTER__ == 1
-#   define __WORDSIZE 8
+#define __WORDSIZE 8
 #elif __SIZEOF_POINTER__ == 2
-#   define __WORDSIZE 16
+#define __WORDSIZE 16
 #elif __SIZEOF_POINTER__ == 4
-#   define __WORDSIZE 32
+#define __WORDSIZE 32
 #elif __SIZEOF_POINTER__ == 8
-#   define __WORDSIZE 64
-#else
-#   define __WORDSIZE (__SIZEOF_POINTER__*8)
-#endif
+#define __WORDSIZE 64
+#else /* __SIZEOF_POINTER__ == ... */
+#define __WORDSIZE (__SIZEOF_POINTER__ * 8)
+#endif /* __SIZEOF_POINTER__ != ... */
 
-#define __SYSCALL_WORDSIZE   __WORDSIZE
+#define __SYSCALL_WORDSIZE __WORDSIZE
 
 #endif /* !_BITS_WORDSIZE_H */

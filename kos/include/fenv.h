@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1dbffba2 */
+/* HASH CRC-32:0x239ef57d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __NAMESPACE_STD_USING(feupdateenv)
 #ifndef __NO_FPU
 #include <features.h>
 
-#include <bits/fenv.h>
+#include <bits/crt/fenv.h>
 #include <kos/anno.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/fenv.h>

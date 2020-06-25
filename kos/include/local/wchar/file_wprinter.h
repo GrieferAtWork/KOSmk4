@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd11d9bc2 */
+/* HASH CRC-32:0xece3bbea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WC
 #endif /* !... */
 #endif /* !__local___localdep_fputwc_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 /* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __LOCAL_LIBC(file_wprinter) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__

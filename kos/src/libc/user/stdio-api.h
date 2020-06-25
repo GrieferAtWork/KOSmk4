@@ -27,8 +27,9 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-owner-rwlock.h>
 
+#include <asm/crt/stdio.h>
 #include <asm/stdio.h>
-#include <bits/io-file.h>
+#include <bits/crt/io-file.h>
 #include <bits/mbstate.h>
 #include <kos/types.h>
 

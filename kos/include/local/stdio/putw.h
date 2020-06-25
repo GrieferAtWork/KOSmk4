@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e29a72d */
+/* HASH CRC-32:0xc3d08ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fwrite_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
 __LOCAL_LIBC(putw) __ATTR_NONNULL((2)) int

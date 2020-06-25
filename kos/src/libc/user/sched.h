@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f2c247b */
+/* HASH CRC-32:0x553dd94f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,53 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+INTDEF NONNULL((1)) pid_t NOTHROW_NCX(VLIBCCALL libc_clone)(__clone_func_t fn, void *child_stack, int flags, void *arg, ...);
+/* >> unshare(2)
+ * Unshare certain components of the calling thread that may be shared with other
+ * threads or processes, such as the filesystem, or opened file descriptors.
+ * When being unshared, the calling thread's descriptor for a specific component
+ * is replaced with a copy of its previous contents at that moment in time, with
+ * the notable exception of certain KOS-specific extensions, where specifically
+ * marked data will be deleted (s.a. `O_CLOFORK' and `PROT_LOOSE')
+ * The behavior and meaning of individual bits in `flags' matches their meaning
+ * when passed to `clone()', except that for certain flags the meaning is reversed.
+ * For example: Passing `CLONE_FILES' to `clone(2)' will cause handles to be shared,
+ *              but passing it to `unshare(2)' will cause handles to be unshared.
+ * @param: flags: Set of `CLONE_*' flags:
+ *                 - CLONE_FILES:     Unshare handles (and close all marked as `O_CLOFORK')
+ *                 - CLONE_FS:        Unshare umask(), chroot(), chdir(), fsmode() and drive-cwds
+ *                 - CLONE_NEWCGROUP: ...
+ *                 - CLONE_NEWIPC:    ...
+ *                 - CLONE_NEWNET:    ...
+ *                 - CLONE_NEWNS:     Unshare the mount namespace
+ *                 - CLONE_NEWPID:    Unshare the PID namespace
+ *                 - CLONE_NEWUSER:   ...
+ *                 - CLONE_NEWUTS:    ...
+ *                 - CLONE_SYSVSEM:   ...
+ *                 - CLONE_VM:        Unshare the current VM (KOS extension)
+ *                 - CLONE_SIGHAND:   Unshare signal handlers (KOS extension) */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_unshare)(__STDC_INT_AS_UINT_T flags);
+/* >> sched_getcpu(3)
+ * Returns the number of the CPU for the calling thread.
+ * Note that due to unforeseeable scheduling conditions, this may change at any
+ * moment, even before this function returns, or before the caller was able to
+ * act on its return value. For that reason, this function must only be taken
+ * as a hint */
+INTDEF __STDC_INT_AS_UINT_T NOTHROW_NCX(LIBCCALL libc_sched_getcpu)(void);
+/* >> setns(2)
+ * With `FD' referring to a namespace, reassociate the calling thread with that namespace.
+ * For this purpose, `FD' was opened for one of the files in `/proc/[pid]/ns/'
+ * @param: nstype: The type of namespace to re-associate (either 0 to allow any
+ *                 type of namespace, or one of `CLONE_NEWCGROUP', `CLONE_NEWIPC',
+ *                `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',
+ *                `CLONE_NEWUTS') */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_setns)(fd_t fd, __STDC_INT_AS_UINT_T nstype);
+/* Exits the current thread by invoking the SYS_exit system call,
+ * after performing some additional cleanup not done by the kernel.
+ * Assuming that the calling thread was constructed by `clone()',
+ * calling this function has the same effect as returning `EXIT_CODE'
+ * from `clone()'s `FN' callback */
+INTDEF ATTR_NORETURN void NOTHROW_NCX(LIBCCALL libc_exit_thread)(int exit_code);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_setparam)(pid_t pid, struct sched_param const *param);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_getparam)(pid_t pid, struct sched_param *param);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_setscheduler)(pid_t pid, int policy, struct sched_param const *param);
@@ -39,8 +86,8 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_getscheduler)(pid_t pid);
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_yield)(void);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_get_priority_max)(int algorithm);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_get_priority_min)(int algorithm);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_get_priority_max)(__STDC_INT_AS_UINT_T algorithm);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_get_priority_min)(__STDC_INT_AS_UINT_T algorithm);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_setaffinity)(pid_t pid, size_t cpusetsize, cpu_set_t const *cpuset);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_getaffinity)(pid_t pid, size_t cpusetsize, cpu_set_t *cpuset);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval)(pid_t pid, struct timespec *tms);

@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x519481a2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +21,8 @@
 #define _BITS_STATVFS_H 1
 
 #include <__stdinc.h>
-#include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
-
-#include <__stdinc.h>
 #include <features.h>
+
 #include <bits/types.h>
 
 /* Documentation (partially) derived from Glibc /usr/include/i386-linux-gnu/bits/statvfs.h */

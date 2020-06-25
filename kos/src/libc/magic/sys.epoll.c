@@ -24,12 +24,15 @@
 %{
 #include <features.h>
 
+#include <asm/epoll.h>
 #include <bits/epoll.h>
 #include <bits/sigset.h>
 #include <bits/types.h>
-#include <sys/types.h>
 
+#ifdef __USE_GLIBC
+#include <sys/types.h>
 #include <stdint.h>
+#endif /* __USE_GLIBC */
 
 
 /* Documentation taken from Glibc /usr/include/i386-linux-gnu/sys/epoll.h */
@@ -52,79 +55,194 @@
 
 __SYSDECL_BEGIN
 
+#if (defined(__EPOLLIN) || defined(__EPOLLPRI) ||        \
+     defined(__EPOLLOUT) || defined(__EPOLLERR) ||       \
+     defined(__EPOLLHUP) || defined(__EPOLLRDNORM) ||    \
+     defined(__EPOLLRDBAND) || defined(__EPOLLWRNORM) || \
+     defined(__EPOLLWRBAND) || defined(__EPOLLMSG) ||    \
+     defined(__EPOLLRDHUP) || defined(__EPOLLWAKEUP) ||  \
+     defined(__EPOLLONESHOT) || defined(__EPOLLET))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum EPOLL_EVENTS {
-	EPOLLIN       = 0x00000001,
-	EPOLLPRI      = 0x00000002,
-	EPOLLOUT      = 0x00000004,
-	EPOLLERR      = 0x00000008,
-	EPOLLHUP      = 0x00000010,
-	EPOLLRDNORM   = 0x00000040,
-	EPOLLRDBAND   = 0x00000080,
-	EPOLLWRNORM   = 0x00000100,
-	EPOLLWRBAND   = 0x00000200,
-	EPOLLMSG      = 0x00000400,
-	EPOLLRDHUP    = 0x00002000,
-	EPOLLWAKEUP   = 0x20000000,
-	EPOLLONESHOT  = 0x40000000,
-	EPOLLET       = 0x80000000
+#ifdef __EPOLLIN
+	EPOLLIN = __EPOLLIN, /* ... */
+#endif /* __EPOLLIN */
+#ifdef __EPOLLPRI
+	EPOLLPRI = __EPOLLPRI, /* ... */
+#endif /* __EPOLLPRI */
+#ifdef __EPOLLOUT
+	EPOLLOUT = __EPOLLOUT, /* ... */
+#endif /* __EPOLLOUT */
+#ifdef __EPOLLERR
+	EPOLLERR = __EPOLLERR, /* ... */
+#endif /* __EPOLLERR */
+#ifdef __EPOLLHUP
+	EPOLLHUP = __EPOLLHUP, /* ... */
+#endif /* __EPOLLHUP */
+#ifdef __EPOLLRDNORM
+	EPOLLRDNORM = __EPOLLRDNORM, /* ... */
+#endif /* __EPOLLRDNORM */
+#ifdef __EPOLLRDBAND
+	EPOLLRDBAND = __EPOLLRDBAND, /* ... */
+#endif /* __EPOLLRDBAND */
+#ifdef __EPOLLWRNORM
+	EPOLLWRNORM = __EPOLLWRNORM, /* ... */
+#endif /* __EPOLLWRNORM */
+#ifdef __EPOLLWRBAND
+	EPOLLWRBAND = __EPOLLWRBAND, /* ... */
+#endif /* __EPOLLWRBAND */
+#ifdef __EPOLLMSG
+	EPOLLMSG = __EPOLLMSG, /* ... */
+#endif /* __EPOLLMSG */
+#ifdef __EPOLLRDHUP
+	EPOLLRDHUP = __EPOLLRDHUP, /* ... */
+#endif /* __EPOLLRDHUP */
+#ifdef __EPOLLWAKEUP
+	EPOLLWAKEUP = __EPOLLWAKEUP, /* ... */
+#endif /* __EPOLLWAKEUP */
+#ifdef __EPOLLONESHOT
+	EPOLLONESHOT = __EPOLLONESHOT, /* ... */
+#endif /* __EPOLLONESHOT */
+#ifdef __EPOLLET
+	EPOLLET = __EPOLLET /* ... */
+#endif /* __EPOLLET */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#define EPOLLIN      EPOLLIN
-#define EPOLLPRI     EPOLLPRI
-#define EPOLLOUT     EPOLLOUT
-#define EPOLLERR     EPOLLERR
-#define EPOLLHUP     EPOLLHUP
-#define EPOLLRDNORM  EPOLLRDNORM
-#define EPOLLRDBAND  EPOLLRDBAND
-#define EPOLLWRNORM  EPOLLWRNORM
-#define EPOLLWRBAND  EPOLLWRBAND
-#define EPOLLMSG     EPOLLMSG
-#define EPOLLRDHUP   EPOLLRDHUP
-#define EPOLLWAKEUP  EPOLLWAKEUP
-#define EPOLLONESHOT EPOLLONESHOT
-#define EPOLLET      EPOLLET
+#ifdef __EPOLLIN
+#define EPOLLIN      EPOLLIN      /* ... */
+#endif /* __EPOLLIN */
+#ifdef __EPOLLPRI
+#define EPOLLPRI     EPOLLPRI     /* ... */
+#endif /* __EPOLLPRI */
+#ifdef __EPOLLOUT
+#define EPOLLOUT     EPOLLOUT     /* ... */
+#endif /* __EPOLLOUT */
+#ifdef __EPOLLERR
+#define EPOLLERR     EPOLLERR     /* ... */
+#endif /* __EPOLLERR */
+#ifdef __EPOLLHUP
+#define EPOLLHUP     EPOLLHUP     /* ... */
+#endif /* __EPOLLHUP */
+#ifdef __EPOLLRDNORM
+#define EPOLLRDNORM  EPOLLRDNORM  /* ... */
+#endif /* __EPOLLRDNORM */
+#ifdef __EPOLLRDBAND
+#define EPOLLRDBAND  EPOLLRDBAND  /* ... */
+#endif /* __EPOLLRDBAND */
+#ifdef __EPOLLWRNORM
+#define EPOLLWRNORM  EPOLLWRNORM  /* ... */
+#endif /* __EPOLLWRNORM */
+#ifdef __EPOLLWRBAND
+#define EPOLLWRBAND  EPOLLWRBAND  /* ... */
+#endif /* __EPOLLWRBAND */
+#ifdef __EPOLLMSG
+#define EPOLLMSG     EPOLLMSG     /* ... */
+#endif /* __EPOLLMSG */
+#ifdef __EPOLLRDHUP
+#define EPOLLRDHUP   EPOLLRDHUP   /* ... */
+#endif /* __EPOLLRDHUP */
+#ifdef __EPOLLWAKEUP
+#define EPOLLWAKEUP  EPOLLWAKEUP  /* ... */
+#endif /* __EPOLLWAKEUP */
+#ifdef __EPOLLONESHOT
+#define EPOLLONESHOT EPOLLONESHOT /* ... */
+#endif /* __EPOLLONESHOT */
+#ifdef __EPOLLET
+#define EPOLLET      EPOLLET      /* ... */
+#endif /* __EPOLLET */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define EPOLLIN      0x00000001
-#define EPOLLPRI     0x00000002
-#define EPOLLOUT     0x00000004
-#define EPOLLERR     0x00000008
-#define EPOLLHUP     0x00000010
-#define EPOLLRDNORM  0x00000040
-#define EPOLLRDBAND  0x00000080
-#define EPOLLWRNORM  0x00000100
-#define EPOLLWRBAND  0x00000200
-#define EPOLLMSG     0x00000400
-#define EPOLLRDHUP   0x00002000
-#define EPOLLWAKEUP  0x20000000
-#define EPOLLONESHOT 0x40000000
-#define EPOLLET      0x80000000
+#ifdef __EPOLLIN
+#define EPOLLIN      __EPOLLIN      /* ... */
+#endif /* __EPOLLIN */
+#ifdef __EPOLLPRI
+#define EPOLLPRI     __EPOLLPRI     /* ... */
+#endif /* __EPOLLPRI */
+#ifdef __EPOLLOUT
+#define EPOLLOUT     __EPOLLOUT     /* ... */
+#endif /* __EPOLLOUT */
+#ifdef __EPOLLERR
+#define EPOLLERR     __EPOLLERR     /* ... */
+#endif /* __EPOLLERR */
+#ifdef __EPOLLHUP
+#define EPOLLHUP     __EPOLLHUP     /* ... */
+#endif /* __EPOLLHUP */
+#ifdef __EPOLLRDNORM
+#define EPOLLRDNORM  __EPOLLRDNORM  /* ... */
+#endif /* __EPOLLRDNORM */
+#ifdef __EPOLLRDBAND
+#define EPOLLRDBAND  __EPOLLRDBAND  /* ... */
+#endif /* __EPOLLRDBAND */
+#ifdef __EPOLLWRNORM
+#define EPOLLWRNORM  __EPOLLWRNORM  /* ... */
+#endif /* __EPOLLWRNORM */
+#ifdef __EPOLLWRBAND
+#define EPOLLWRBAND  __EPOLLWRBAND  /* ... */
+#endif /* __EPOLLWRBAND */
+#ifdef __EPOLLMSG
+#define EPOLLMSG     __EPOLLMSG     /* ... */
+#endif /* __EPOLLMSG */
+#ifdef __EPOLLRDHUP
+#define EPOLLRDHUP   __EPOLLRDHUP   /* ... */
+#endif /* __EPOLLRDHUP */
+#ifdef __EPOLLWAKEUP
+#define EPOLLWAKEUP  __EPOLLWAKEUP  /* ... */
+#endif /* __EPOLLWAKEUP */
+#ifdef __EPOLLONESHOT
+#define EPOLLONESHOT __EPOLLONESHOT /* ... */
+#endif /* __EPOLLONESHOT */
+#ifdef __EPOLLET
+#define EPOLLET      __EPOLLET      /* ... */
+#endif /* __EPOLLET */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
 
+#if (defined(__EPOLL_CTL_ADD) || defined(__EPOLL_CTL_DEL) || \
+     defined(__EPOLL_CTL_MOD))
 /* Valid opcodes ( "op" parameter ) to issue to epoll_ctl().  */
 /*[[[enum]]]*/
 #ifdef __CC__
-enum __epoll_ctl {
-	EPOLL_CTL_ADD = 1, /* Add a file descriptor to the interface.  */
-	EPOLL_CTL_DEL = 2, /* Remove a file descriptor from the interface.  */
-	EPOLL_CTL_MOD = 3  /* Change file descriptor epoll_event structure.  */
-};
+typedef enum __epoll_ctl {
+#ifdef __EPOLL_CTL_ADD
+	EPOLL_CTL_ADD = __EPOLL_CTL_ADD, /* Add a file descriptor to the interface.  */
+#endif /* __EPOLL_CTL_ADD */
+#ifdef __EPOLL_CTL_DEL
+	EPOLL_CTL_DEL = __EPOLL_CTL_DEL, /* Remove a file descriptor from the interface.  */
+#endif /* __EPOLL_CTL_DEL */
+#ifdef __EPOLL_CTL_MOD
+	EPOLL_CTL_MOD = __EPOLL_CTL_MOD  /* Change file descriptor epoll_event structure.  */
+#endif /* __EPOLL_CTL_MOD */
+} __epoll_ctl_t;
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __EPOLL_CTL_ADD
 #define EPOLL_CTL_ADD EPOLL_CTL_ADD /* Add a file descriptor to the interface.  */
+#endif /* __EPOLL_CTL_ADD */
+#ifdef __EPOLL_CTL_DEL
 #define EPOLL_CTL_DEL EPOLL_CTL_DEL /* Remove a file descriptor from the interface.  */
+#endif /* __EPOLL_CTL_DEL */
+#ifdef __EPOLL_CTL_MOD
 #define EPOLL_CTL_MOD EPOLL_CTL_MOD /* Change file descriptor epoll_event structure.  */
+#endif /* __EPOLL_CTL_MOD */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define EPOLL_CTL_ADD 1 /* Add a file descriptor to the interface.  */
-#define EPOLL_CTL_DEL 2 /* Remove a file descriptor from the interface.  */
-#define EPOLL_CTL_MOD 3 /* Change file descriptor epoll_event structure.  */
+#ifdef __EPOLL_CTL_ADD
+#define EPOLL_CTL_ADD __EPOLL_CTL_ADD /* Add a file descriptor to the interface.  */
+#endif /* __EPOLL_CTL_ADD */
+#ifdef __EPOLL_CTL_DEL
+#define EPOLL_CTL_DEL __EPOLL_CTL_DEL /* Remove a file descriptor from the interface.  */
+#endif /* __EPOLL_CTL_DEL */
+#ifdef __EPOLL_CTL_MOD
+#define EPOLL_CTL_MOD __EPOLL_CTL_MOD /* Change file descriptor epoll_event structure.  */
+#endif /* __EPOLL_CTL_MOD */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#elif defined(__CC__)
+typedef int __epoll_ctl_t;
+#endif /* ... */
 
 #ifdef __CC__
 
@@ -133,25 +251,8 @@ enum __epoll_ctl {
 typedef __sigset_t sigset_t;
 #endif /* !__sigset_t_defined */
 
-}%[push_macro @undef { ptr fd u32 u64 events data }]%{
-typedef union epoll_data {
-	void      *ptr;
-	int        fd;
-	__uint32_t u32;
-	__uint64_t u64;
-} epoll_data_t;
-
-#ifndef __EPOLL_PACKED
-#define __EPOLL_PACKED /* nothing */
-#endif /* !__EPOLL_PACKED */
-
-struct __EPOLL_PACKED epoll_event {
-	__uint32_t   events; /* Epoll events (Set of `EPOLL*'; s.a. `EPOLL_EVENTS') */
-	epoll_data_t data;   /* User data variable */
-};
-}%[pop_macro]%{
-
 }
+%[define_replacement(__epoll_ctl_t = int)]
 
 
 @@Creates an epoll instance.  Returns an fd for the new instance.
@@ -174,7 +275,8 @@ $fd_t epoll_create1(__STDC_INT_AS_UINT_T flags);
 @@constants defined above. The "fd" parameter is the target of the
 @@operation. The "event" parameter describes which events the caller
 @@is interested in and any associated user data
-int epoll_ctl($fd_t epfd, enum __epoll_ctl op,
+[[decl_include("<bits/epoll.h>")]]
+int epoll_ctl($fd_t epfd, __epoll_ctl_t op,
               $fd_t fd, struct epoll_event *event);
 
 
@@ -185,13 +287,13 @@ int epoll_ctl($fd_t epfd, enum __epoll_ctl op,
 @@events. The "maxevents" is the maximum number of events to be
 @@returned (usually size of "events"). The "timeout" parameter
 @@specifies the maximum wait time in milliseconds (-1 == infinite).
-[[cp, decl_include("<features.h>")]]
+[[cp, decl_include("<features.h>", "<bits/epoll.h>")]]
 int epoll_wait($fd_t epfd, struct epoll_event *events,
                __STDC_INT_AS_SIZE_T maxevents, int timeout);
 
 @@Same as epoll_wait, but the thread's signal mask is temporarily
 @@and atomically replaced with the one provided as parameter
-[[cp, decl_include("<features.h>")]]
+[[cp, decl_include("<features.h>", "<bits/epoll.h>")]]
 int epoll_pwait($fd_t epfd, struct epoll_event *events,
                 __STDC_INT_AS_SIZE_T maxevents, int timeout,
                 sigset_t const *ss);

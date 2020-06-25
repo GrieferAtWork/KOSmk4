@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x141e3165 */
+/* HASH CRC-32:0x11bda30e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,7 @@
 
 #include <features.h>
 #include <bits/types.h>
+#include <bits/crt/db/passwd.h>
 
 /* Documentation taken from Glibc /usr/include/pwd.h */
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
@@ -75,19 +76,6 @@ typedef __gid_t gid_t;
 typedef __uid_t uid_t;
 #endif /* !__uid_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
-
-#ifndef __passwd_defined
-#define __passwd_defined 1
-struct passwd {
-	char   *pw_name;   /* Username. */
-	char   *pw_passwd; /* Password. */
-	__uid_t pw_uid;    /* User ID. */
-	__gid_t pw_gid;    /* Group ID. */
-	char   *pw_gecos;  /* Real name. */
-	char   *pw_dir;    /* Home directory. */
-	char   *pw_shell;  /* Shell program. */
-};
-#endif /* !__passwd_defined */
 
 #ifndef __std_FILE_defined
 #define __std_FILE_defined 1

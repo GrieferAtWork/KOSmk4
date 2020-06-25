@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb34e4079 */
+/* HASH CRC-32:0xfb2f59ec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,7 @@
 #include <features.h>
 #include <bits/types.h>
 #include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 
 /* Partially derived from GNU C /usr/include/libio.h */
 

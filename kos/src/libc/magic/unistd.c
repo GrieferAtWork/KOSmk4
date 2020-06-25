@@ -43,9 +43,9 @@
 #include <hybrid/typecore.h>
 
 #include <asm/stdio.h>
-#include <bits/confname.h>
+#include <bits/crt/confname.h>
 #include <bits/posix_opt.h>
-#include <bits/sys_errlist.h>
+#include <bits/crt/sys_errlist.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 
@@ -54,7 +54,7 @@
 #endif /* __CRT_GLC || __CRT_KOS || __CRT_KOS_KERNEL */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
-#include <bits/environments.h>
+#include <bits/crt/environments.h>
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 __SYSDECL_BEGIN
@@ -525,7 +525,7 @@ int pause();
 
 %
 @@>> fpathconf(2)
-@@@param: NAME: One of `_PC_*' from <bits/confname.h>
+@@@param: NAME: One of `_PC_*' from <bits/crt/confname.h>
 @@Return a path configuration value associated with `NAME' for `FD'
 @@return: * : The configuration limit associated with `NAME' for `FD'
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
@@ -576,7 +576,7 @@ int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 
 %
 @@>> pathconf(2)
-@@@param: NAME: One of `_PC_*' from <bits/confname.h>
+@@@param: NAME: One of `_PC_*' from <bits/crt/confname.h>
 @@Return a path configuration value associated with `NAME' for `PATH'
 @@return: * : The configuration limit associated with `NAME' for `PATH'
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
@@ -1417,7 +1417,7 @@ int nice(int inc) {
 %#ifdef __USE_POSIX2
 
 @@Retrieve a system configuration string specified by `name'
-@@@param: name:   One of `_CS_*' from <bits/confname.h>
+@@@param: name:   One of `_CS_*' from <bits/crt/confname.h>
 @@@param: buf:    Target buffer
 @@@param: buflen: Available buffer size (including a trailing \0-character)
 @@@return: * :    Required buffer size (including a trailing \0-character)
@@ -1825,7 +1825,7 @@ char *ctermid_r([[nullable]] char *s) {
 %
 %
 @@>> sysconf(2)
-@@@param: NAME: One of `_SC_*' from <bits/confname.h>
+@@@param: NAME: One of `_SC_*' from <bits/crt/confname.h>
 @@Return a system configuration value `NAME'
 @@return: * : The configuration limit associated with `NAME' for `PATH'
 @@return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum

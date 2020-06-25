@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff9db57f */
+/* HASH CRC-32:0xa6f42e78 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,13 @@
 #define __local_thrd_join_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_join
-#include <bits/threads.h>
+#include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_join from pthread */
 #ifndef __local___localdep_pthread_join_defined
 #define __local___localdep_pthread_join_defined 1
 __NAMESPACE_LOCAL_END
-#include <bits/pthreadtypes.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Make calling thread wait for termination of the thread THREAD. The
  * exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_pthread_join,(__pthread_t __pthread, void **__thread_return),pthread_join,(__pthread,__thread_return))
 #endif /* !__local___localdep_pthread_join_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/threads.h>
+#include <asm/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Block current thread until execution of THR is complete.
  * In case that RES is not NULL, will store the return value of THR when exiting

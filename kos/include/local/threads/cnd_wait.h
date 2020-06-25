@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc06e9060 */
+/* HASH CRC-32:0x7e53ba38 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_cnd_wait_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_cond_wait
-#include <bits/threads.h>
+#include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_cond_wait from pthread */
 #ifndef __local___localdep_pthread_cond_wait_defined
@@ -32,8 +32,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_cond_wait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex),pthread_cond_wait,(__cond,__mutex))
 #endif /* !__local___localdep_pthread_cond_wait_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Block current thread on the condition variable pointed by COND
  * s.a. `pthread_cond_wait()' */

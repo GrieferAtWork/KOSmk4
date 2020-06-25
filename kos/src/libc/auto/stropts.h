@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a9bcd7c */
+/* HASH CRC-32:0x847c5a94 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,13 +33,13 @@ DECL_BEGIN
 /* Test whether FILDES is associated with a STREAM-based file */
 INTDEF int NOTHROW(LIBDCALL libd_isastream)(fd_t fildes);
 /* Receive next message from a STREAMS file */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_getmsg)(fd_t fildes, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, int *__restrict flagsp);
+INTDEF int NOTHROW_RPC(LIBDCALL libd_getmsg)(fd_t fildes, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, __STDC_INT_AS_UINT_T *__restrict flagsp);
 /* Receive next message from a STREAMS file, with *FLAGSP allowing to control which message. */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_getpmsg)(fd_t fildes, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, int *__restrict bandp, int *__restrict flagsp);
+INTDEF int NOTHROW_RPC(LIBDCALL libd_getpmsg)(fd_t fildes, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, int *__restrict bandp, __STDC_INT_AS_UINT_T *__restrict flagsp);
 /* Send a message on a STREAM */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_putmsg)(fd_t fildes, struct strbuf const *ctlptr, struct strbuf const *dataptr, int flags);
+INTDEF int NOTHROW_RPC(LIBDCALL libd_putmsg)(fd_t fildes, struct strbuf const *ctlptr, struct strbuf const *dataptr, __STDC_INT_AS_UINT_T flags);
 /* Send a message on a STREAM to the BAND */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_putpmsg)(fd_t fildes, struct strbuf const *ctlptr, struct strbuf const *dataptr, int band, int flags);
+INTDEF int NOTHROW_RPC(LIBDCALL libd_putpmsg)(fd_t fildes, struct strbuf const *ctlptr, struct strbuf const *dataptr, __STDC_INT_AS_UINT_T band, __STDC_INT_AS_UINT_T flags);
 /* Attach a STREAMS-based file descriptor FILDES to a file PATH in the file system name space */
 INTDEF NONNULL((2)) int NOTHROW_RPC_KOS(LIBDCALL libd_fattach)(fd_t fildes, char const *__restrict path);
 /* Detach a name PATH from a STREAMS-based file descriptor */

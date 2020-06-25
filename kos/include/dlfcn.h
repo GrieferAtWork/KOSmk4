@@ -29,8 +29,8 @@
 
 #include <features.h>
 
-#include <asm/dlfcn.h>
-#include <bits/dlfcn.h>
+#include <libdl/asm/dlfcn.h>
+#include <libdl/bits/dlfcn.h>
 #include <bits/types.h>
 
 /* NOTE: To use anything from this file, you must link with '-ldl',

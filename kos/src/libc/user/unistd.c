@@ -2340,9 +2340,9 @@ NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s)
 }
 /*[[[end:libc_ctermid]]]*/
 
-/*[[[head:libc_fpathconf,hash:CRC-32=0x68bc5593]]]*/
+/*[[[head:libc_fpathconf,hash:CRC-32=0xde44f570]]]*/
 /* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
@@ -2362,9 +2362,9 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 
 
 
-/*[[[head:libc_confstr,hash:CRC-32=0x3fd15238]]]*/
+/*[[[head:libc_confstr,hash:CRC-32=0xff0998f1]]]*/
 /* Retrieve a system configuration string specified by `name'
- * @param: name:   One of `_CS_*' from <bits/confname.h>
+ * @param: name:   One of `_CS_*' from <bits/crt/confname.h>
  * @param: buf:    Target buffer
  * @param: buflen: Available buffer size (including a trailing \0-character)
  * @return: * :    Required buffer size (including a trailing \0-character)
@@ -2507,7 +2507,7 @@ s32 const sysconf_table[] = {
 import * from deemon;
 @@Mapping from @(SC_ID: (name, values))
 local sc_values: {int: (string, string)} = Dict();
-for (local l: File.open("../../../include/bits/confname.h")) {
+for (local l: File.open("../../../include/bits/crt/confname.h")) {
 	l = l.strip();
 	local name, idval, values;
 	try {
@@ -3262,9 +3262,9 @@ STATIC_ASSERT(COMPILER_LENOF(sysconf_table) <= _SC_COUNT);
 
 
 
-/*[[[head:libc_sysconf,hash:CRC-32=0x2bfea1fe]]]*/
+/*[[[head:libc_sysconf,hash:CRC-32=0x13dbfb07]]]*/
 /* >> sysconf(2)
- * @param: NAME: One of `_SC_*' from <bits/confname.h>
+ * @param: NAME: One of `_SC_*' from <bits/crt/confname.h>
  * Return a system configuration value `NAME'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum

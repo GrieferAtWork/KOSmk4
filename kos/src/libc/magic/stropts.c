@@ -23,10 +23,10 @@
 
 %{
 #include <features.h>
+
 #include <bits/types.h>
 #include <bits/xtitypes.h>
 #include <bits/stropts.h>
-
 
 /* Documentation taken from Glibc /usr/include/stropts.h */
 /* Copyright (C) 1998-2016 Free Software Foundation, Inc.
@@ -67,27 +67,48 @@ typedef __t_uscalar_t t_uscalar_t;
 }
 
 @@Test whether FILDES is associated with a STREAM-based file
-[[nothrow]] isastream:($fd_t fildes) -> int;
+[[nothrow, decl_include("<bits/types.h>")]]
+int isastream($fd_t fildes);
 
 @@Receive next message from a STREAMS file
-[[cp]] getmsg:($fd_t fildes, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, int *__restrict flagsp) -> int;
+[[cp, decl_include("<bits/types.h>", "<bits/stropts.h>")]]
+int getmsg($fd_t fildes,
+           struct strbuf *__restrict ctlptr,
+           struct strbuf *__restrict dataptr,
+           __STDC_INT_AS_UINT_T *__restrict flagsp);
 
 @@Receive next message from a STREAMS file, with *FLAGSP allowing to control which message.
-[[cp]] getpmsg:($fd_t fildes, struct strbuf *__restrict ctlptr, struct strbuf *__restrict dataptr, int *__restrict bandp, int *__restrict flagsp) -> int;
+[[cp, decl_include("<bits/types.h>", "<bits/stropts.h>")]]
+int getpmsg($fd_t fildes,
+            struct strbuf *__restrict ctlptr,
+            struct strbuf *__restrict dataptr,
+            int *__restrict bandp,
+            __STDC_INT_AS_UINT_T *__restrict flagsp);
 
 %[insert:extern(ioctl)]
 
 @@Send a message on a STREAM
-[[cp]] putmsg:($fd_t fildes, struct strbuf const *ctlptr, struct strbuf const *dataptr, int flags) -> int;
+[[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/stropts.h>")]]
+int putmsg($fd_t fildes,
+           struct strbuf const *ctlptr,
+           struct strbuf const *dataptr,
+           __STDC_INT_AS_UINT_T flags);
 
 @@Send a message on a STREAM to the BAND
-[[cp]] putpmsg:($fd_t fildes, struct strbuf const *ctlptr, struct strbuf const *dataptr, int band, int flags) -> int;
+[[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/stropts.h>")]]
+int putpmsg($fd_t fildes,
+            struct strbuf const *ctlptr,
+            struct strbuf const *dataptr,
+            __STDC_INT_AS_UINT_T band,
+            __STDC_INT_AS_UINT_T flags);
 
 @@Attach a STREAMS-based file descriptor FILDES to a file PATH in the file system name space
-[[cp_kos]] fattach:($fd_t fildes, [[nonnull]] char const *__restrict path) -> int;
+[[cp_kos, decl_include("<bits/types.h>")]]
+int fattach($fd_t fildes, [[nonnull]] char const *__restrict path);
 
 @@Detach a name PATH from a STREAMS-based file descriptor
-[[cp_kos]] fdetach:([[nonnull]] char const *__restrict path) -> int;
+[[cp_kos]]
+int fdetach([[nonnull]] char const *__restrict path);
 
 
 %{

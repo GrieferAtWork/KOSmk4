@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9384063d */
+/* HASH CRC-32:0xdbb4a6a7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_cnd_timedwait64_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
-#include <bits/threads.h>
+#include <bits/crt/threads.h>
 #include <bits/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_cond_timedwait64 from pthread */
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_pthread_cond_timedwait64_defined 1
 #ifdef __CRT_HAVE_pthread_cond_timedwait64
 __NAMESPACE_LOCAL_END
-#include <bits/pthreadtypes.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_pthread_cond_timedwait64,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __abstime),pthread_cond_timedwait64,(__cond,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
-#include <bits/pthreadtypes.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
@@ -60,8 +60,8 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_pthread_cond_timedwait64_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Block current thread on the condition variable until condition variable
  * pointed by COND is signaled or time pointed by TIME_POINT is reached

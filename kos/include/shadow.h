@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x131fa1d5 */
+/* HASH CRC-32:0x97f173dd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,8 @@
 #include <features.h>
 #include <paths.h>
 
+#include <bits/crt/db/spwd.h>
+
 /* Documentation taken from Glibc /usr/include/shadow.h */
 /* Copyright (C) 1996-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -52,7 +54,9 @@
 __SYSDECL_BEGIN
 
 /* Paths to the user database files.  */
+#ifdef _PATH_SHADOW
 #define SHADOW _PATH_SHADOW
+#endif /* _PATH_SHADOW */
 
 #ifdef __CC__
 
@@ -74,20 +78,6 @@ __NAMESPACE_STD_USING(FILE)
 #define __size_t_defined 1
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
-
-
-/* Structure of the password file.  */
-struct spwd {
-	char             *sp_namp;    /* Login name. */
-	char             *sp_pwdp;    /* Encrypted password. */
-	__LONGPTR_TYPE__  sp_lstchg;  /* Date of last change. */
-	__LONGPTR_TYPE__  sp_min;     /* Minimum number of days between changes. */
-	__LONGPTR_TYPE__  sp_max;     /* Maximum number of days between changes. */
-	__LONGPTR_TYPE__  sp_warn;    /* Number of days to warn user to change the password. */
-	__LONGPTR_TYPE__  sp_inact;   /* Number of days the account may be inactive. */
-	__LONGPTR_TYPE__  sp_expire;  /* Number of days since 1970-01-01 until account expires. */
-	__ULONGPTR_TYPE__ sp_flag;    /* Reserved. */
-};
 
 /* Open database for reading.
  * This function is not part of POSIX and therefore no official cancellation point */

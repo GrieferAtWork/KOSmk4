@@ -68,8 +68,8 @@ NOTHROW_RPC(LIBCCALL libc_get_nprocs)(void)
 }
 /*[[[end:libc_get_nprocs]]]*/
 
-/*[[[head:libc_get_phys_pages,hash:CRC-32=0x13904100]]]*/
-INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED __INTPTR_TYPE__
+/*[[[head:libc_get_phys_pages,hash:CRC-32=0x168dd9bc]]]*/
+INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED intptr_t
 NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void)
 /*[[[body:libc_get_phys_pages]]]*/
 {
@@ -80,8 +80,8 @@ NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void)
 }
 /*[[[end:libc_get_phys_pages]]]*/
 
-/*[[[head:libc_get_avphys_pages,hash:CRC-32=0x7832c6d9]]]*/
-INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED __INTPTR_TYPE__
+/*[[[head:libc_get_avphys_pages,hash:CRC-32=0xce963906]]]*/
+INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED intptr_t
 NOTHROW_RPC(LIBCCALL libc_get_avphys_pages)(void)
 /*[[[body:libc_get_avphys_pages]]]*/
 {

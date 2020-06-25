@@ -98,6 +98,38 @@ NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string)
 }
 /*[[[end:libc_getdate]]]*/
 
+/*[[[head:libc_clock_adjtime,hash:CRC-32=0x30838bc7]]]*/
+INTERN ATTR_SECTION(".text.crt.time") int
+NOTHROW_NCX(LIBCCALL libc_clock_adjtime)(clockid_t clock_id,
+                                         struct timex *utx)
+/*[[[body:libc_clock_adjtime]]]*/
+/*AUTO*/{
+	(void)clock_id;
+	(void)utx;
+	CRT_UNIMPLEMENTED("clock_adjtime"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:libc_clock_adjtime]]]*/
+
+/*[[[head:libc_clock_adjtime64,hash:CRC-32=0x2a7ab234]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_clock_adjtime64, libc_clock_adjtime);
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.time") int
+NOTHROW_NCX(LIBCCALL libc_clock_adjtime64)(clockid_t clock_id,
+                                           struct timex64 *utx)
+/*[[[body:libc_clock_adjtime64]]]*/
+/*AUTO*/{
+	(void)clock_id;
+	(void)utx;
+	CRT_UNIMPLEMENTED("clock_adjtime64"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_clock_adjtime64]]]*/
+
 
 /*[[[head:libc_timespec_get,hash:CRC-32=0xa4d83ba3]]]*/
 /* Set TS to calendar time based in time base BASE */
@@ -494,7 +526,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x500dacb3]]]*/
+/*[[[start:exports,hash:CRC-32=0xf3af61ec]]]*/
 DEFINE_PUBLIC_ALIAS(clock, libc_clock);
 DEFINE_PUBLIC_ALIAS(time, libc_time);
 DEFINE_PUBLIC_ALIAS(_time64, libc_time64);
@@ -528,6 +560,8 @@ DEFINE_PUBLIC_ALIAS(timer_gettime64, libc_timer_gettime64);
 DEFINE_PUBLIC_ALIAS(clock_nanosleep64, libc_clock_nanosleep64);
 DEFINE_PUBLIC_ALIAS(timespec_get, libc_timespec_get);
 DEFINE_PUBLIC_ALIAS(getdate, libc_getdate);
+DEFINE_PUBLIC_ALIAS(clock_adjtime, libc_clock_adjtime);
+DEFINE_PUBLIC_ALIAS(clock_adjtime64, libc_clock_adjtime64);
 /*[[[end:exports]]]*/
 
 DECL_END

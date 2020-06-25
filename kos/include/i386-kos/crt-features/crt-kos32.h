@@ -1380,6 +1380,8 @@
 #define __CRT_HAVE_clearerr_s 1
 #define __CRT_HAVE_clearerr_unlocked 1
 #define __CRT_HAVE_clock 1
+#define __CRT_HAVE_clock_adjtime 1
+#define __CRT_HAVE_clock_adjtime64 1
 #define __CRT_HAVE_clock_getcpuclockid 1
 #define __CRT_HAVE_clock_getres 1
 #define __CRT_HAVE_clock_getres64 1
@@ -2011,6 +2013,7 @@
 #define __CRT_HAVE_getrpcent 1
 #define __CRT_HAVE_getrpcent_r 1
 #define __CRT_HAVE_getrusage 1
+#define __CRT_HAVE_getrusage64 1
 #define __CRT_HAVE_gets 1
 #define __CRT_HAVE_gets_s 1
 #define __CRT_HAVE_getservbyname 1

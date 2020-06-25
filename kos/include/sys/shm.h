@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfda11a0 */
+/* HASH CRC-32:0xe77dd24 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,8 +29,11 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <sys/ipc.h>
 #include <bits/shm.h>
+
+#ifdef __USE_GLIBC
+#include <sys/ipc.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 

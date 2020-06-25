@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x935c452 */
+/* HASH CRC-32:0xd5d42e6e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,7 @@ DECL_BEGIN
 
 DECL_END
 #include <bits/sigaction.h>
+#include <pthread.h>
 DECL_BEGIN
 
 #ifndef __sighandler_t_defined
@@ -119,6 +120,11 @@ INTDEF sighandler_t NOTHROW_NCX(LIBDCALL libd_sigset)(signo_t signo, sighandler_
 INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void);
 INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void);
 #endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_sigmask)(__STDC_INT_AS_UINT_T how, sigset_t const *newmask, sigset_t *oldmask);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_kill)(pthread_t threadid, signo_t signo);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_sigqueue)(pthread_t threadid, signo_t signo, union sigval const value);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END
 

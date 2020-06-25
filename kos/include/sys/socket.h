@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14f89671 */
+/* HASH CRC-32:0x88b9920e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@
 
 #include <hybrid/typecore.h>
 
+#include <asm/socket.h>
 #include <bits/socket.h>
 #include <bits/timespec.h>
 #include <bits/types.h>
@@ -65,25 +66,46 @@
 __SYSDECL_BEGIN
 
 #ifndef SHUT_RD
+#if (defined(__SHUT_RD) || defined(__SHUT_WR) || \
+     defined(__SHUT_RDWR))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	SHUT_RD   = 0, /* No more receptions. */
-	SHUT_WR   = 1, /* No more transmissions. */
-	SHUT_RDWR = 2  /* No more receptions or transmissions. */
+#ifdef __SHUT_RD
+	SHUT_RD   = __SHUT_RD, /* No more receptions. */
+#endif /* __SHUT_RD */
+#ifdef __SHUT_WR
+	SHUT_WR   = __SHUT_WR, /* No more transmissions. */
+#endif /* __SHUT_WR */
+#ifdef __SHUT_RDWR
+	SHUT_RDWR = __SHUT_RDWR  /* No more receptions or transmissions. */
+#endif /* __SHUT_RDWR */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __SHUT_RD
 #define SHUT_RD   SHUT_RD   /* No more receptions. */
+#endif /* __SHUT_RD */
+#ifdef __SHUT_WR
 #define SHUT_WR   SHUT_WR   /* No more transmissions. */
+#endif /* __SHUT_WR */
+#ifdef __SHUT_RDWR
 #define SHUT_RDWR SHUT_RDWR /* No more receptions or transmissions. */
+#endif /* __SHUT_RDWR */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define SHUT_RD   0 /* No more receptions. */
-#define SHUT_WR   1 /* No more transmissions. */
-#define SHUT_RDWR 2 /* No more receptions or transmissions. */
+#ifdef __SHUT_RD
+#define SHUT_RD   __SHUT_RD   /* No more receptions. */
+#endif /* __SHUT_RD */
+#ifdef __SHUT_WR
+#define SHUT_WR   __SHUT_WR   /* No more transmissions. */
+#endif /* __SHUT_WR */
+#ifdef __SHUT_RDWR
+#define SHUT_RDWR __SHUT_RDWR /* No more receptions or transmissions. */
+#endif /* __SHUT_RDWR */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
 #endif /* !SHUT_RD */
 
 

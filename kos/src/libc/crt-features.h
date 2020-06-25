@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83698e98 */
+/* HASH CRC-32:0x31db18a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -703,6 +703,8 @@
 #define __CRT_HAVE_DOS$chroot 1
 #define __CRT_HAVE_DOS$clearerr 1
 #define __CRT_HAVE_DOS$clearerr_s 1
+#define __CRT_HAVE_DOS$clock_adjtime 1
+#define __CRT_HAVE_DOS$clock_adjtime64 1
 #define __CRT_HAVE_DOS$clock_getcpuclockid 1
 #define __CRT_HAVE_DOS$clock_getres 1
 #define __CRT_HAVE_DOS$clock_getres64 1
@@ -1275,6 +1277,7 @@
 #define __CRT_HAVE_DOS$getrpcbynumber_r 1
 #define __CRT_HAVE_DOS$getrpcent_r 1
 #define __CRT_HAVE_DOS$getrusage 1
+#define __CRT_HAVE_DOS$getrusage64 1
 #define __CRT_HAVE_DOS$gets 1
 #define __CRT_HAVE_DOS$gets_s 1
 #define __CRT_HAVE_DOS$getservbyname 1
@@ -3617,6 +3620,8 @@
 #define __CRT_HAVE_clearerr 1
 #define __CRT_HAVE_clearerr_s 1
 #define __CRT_HAVE_clock 1
+#define __CRT_HAVE_clock_adjtime 1
+#define __CRT_HAVE_clock_adjtime64 1
 #define __CRT_HAVE_clock_getcpuclockid 1
 #define __CRT_HAVE_clock_getres 1
 #define __CRT_HAVE_clock_getres64 1
@@ -4221,6 +4226,7 @@
 #define __CRT_HAVE_getrpcent 1
 #define __CRT_HAVE_getrpcent_r 1
 #define __CRT_HAVE_getrusage 1
+#define __CRT_HAVE_getrusage64 1
 #define __CRT_HAVE_gets 1
 #define __CRT_HAVE_gets_s 1
 #define __CRT_HAVE_getservbyname 1

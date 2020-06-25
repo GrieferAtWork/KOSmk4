@@ -70,6 +70,7 @@ ProcFS_Sys_X86_KeepIopl_Fork_Print(struct regular_node *__restrict UNUSED(self),
                                    pformatprinter printer, void *arg) {
 	return ProcFS_PrintBool(printer, arg, x86_iopl_keep_after_fork);
 }
+
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_X86_KeepIopl_Fork_Write(struct regular_node *__restrict UNUSED(self),
                                    USER CHECKED void const *buf,
@@ -84,6 +85,7 @@ ProcFS_Sys_X86_KeepIopl_Clone_Print(struct regular_node *__restrict UNUSED(self)
                                     pformatprinter printer, void *arg) {
 	return ProcFS_PrintBool(printer, arg, x86_iopl_keep_after_clone);
 }
+
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_X86_KeepIopl_Clone_Write(struct regular_node *__restrict UNUSED(self),
                                     USER CHECKED void const *buf,
@@ -102,6 +104,7 @@ ProcFS_Sys_X86_KeepIopl_Exec_Print(struct regular_node *__restrict UNUSED(self),
 	keep = (mask.uem_mask & EFLAGS_IOPLMASK) == EFLAGS_IOPLMASK;
 	return ProcFS_PrintBool(printer, arg, keep);
 }
+
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_X86_KeepIopl_Exec_Write(struct regular_node *__restrict UNUSED(self),
                                    USER CHECKED void const *buf,

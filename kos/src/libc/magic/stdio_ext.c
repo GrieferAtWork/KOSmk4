@@ -24,6 +24,7 @@
 %{
 #include <stdio.h>
 #include <kos/anno.h>
+#include <asm/crt/stdio_ext.h>
 
 __SYSDECL_BEGIN
 
@@ -45,14 +46,22 @@ __SYSDECL_BEGIN
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
+#if (defined(__FSETLOCKING_QUERY) || defined(__FSETLOCKING_INTERNAL) || \
+     defined(__FSETLOCKING_BYCALLER))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	FSETLOCKING_QUERY    = 0, /* Query current state of the locking status. */
-	FSETLOCKING_INTERNAL = 1, /* The library protects all uses of the stream functions, except for
-	                           * uses of the *_unlocked functions, by calls equivalent to flockfile(). */
-	FSETLOCKING_BYCALLER = 2  /* The user will take care of locking.
-	                           * This is the equivalent of `__USE_STDIO_UNLOCKED' on a per-file basis. */
+#ifdef __FSETLOCKING_QUERY
+	FSETLOCKING_QUERY    = __FSETLOCKING_QUERY,    /* Query current state of the locking status. */
+#endif /* __FSETLOCKING_QUERY */
+#ifdef __FSETLOCKING_INTERNAL
+	FSETLOCKING_INTERNAL = __FSETLOCKING_INTERNAL, /* The library protects all uses of the stream functions, except for
+	                                                * uses of the *_unlocked functions, by calls equivalent to flockfile(). */
+#endif /* __FSETLOCKING_INTERNAL */
+#ifdef __FSETLOCKING_BYCALLER
+	FSETLOCKING_BYCALLER = __FSETLOCKING_BYCALLER  /* The user will take care of locking.
+	                                                * This is the equivalent of `__USE_STDIO_UNLOCKED' on a per-file basis. */
+#endif /* __FSETLOCKING_BYCALLER */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -70,6 +79,8 @@ enum {
                                 * This is the equivalent of `__USE_STDIO_UNLOCKED' on a per-file basis. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
+
 
 #ifdef __CC__
 

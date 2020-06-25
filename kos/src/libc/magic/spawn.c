@@ -20,17 +20,22 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]
-%[define_replacement(posix_spawnattr_t = posix_spawnattr_t)]
-%[define_replacement(posix_spawn_file_actions_t = posix_spawn_file_actions_t)]
+%[define_replacement(posix_spawnattr_t = "struct __posix_spawnattr")]
+%[define_replacement(posix_spawn_file_actions_t = "struct __posix_spawn_file_actions")]
 %[default:section(".text.crt{|.dos}.fs.exec.posix_spawn")]
 
 
 %{
 #include <features.h>
-#include <sched.h>
 #include <bits/sigset.h>
 #include <sys/types.h>
 #include <bits/types.h>
+#include <bits/posix_spawn.h>
+#include <bits/sched_param.h>
+
+#ifdef __USE_GLIBC
+#include <sched.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 
@@ -54,28 +59,6 @@ __SYSDECL_BEGIN
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-
-/* Flags to be set in the `posix_spawnattr_t'. */
-#ifdef __CRT_CYG_PRIMARY
-#define POSIX_SPAWN_RESETIDS        0x01
-#define POSIX_SPAWN_SETPGROUP       0x02
-#define POSIX_SPAWN_SETSCHEDPARAM   0x04
-#define POSIX_SPAWN_SETSCHEDULER    0x08
-#define POSIX_SPAWN_SETSIGDEF       0x10
-#define POSIX_SPAWN_SETSIGMASK      0x20
-#else /* __CRT_CYG_PRIMARY */
-#define POSIX_SPAWN_RESETIDS        0x01
-#define POSIX_SPAWN_SETPGROUP       0x02
-#define POSIX_SPAWN_SETSIGDEF       0x04
-#define POSIX_SPAWN_SETSIGMASK      0x08
-#define POSIX_SPAWN_SETSCHEDPARAM   0x10
-#define POSIX_SPAWN_SETSCHEDULER    0x20
-#ifdef __USE_GNU
-#define POSIX_SPAWN_USEVFORK        0x40
-#endif /* __USE_GNU */
-#endif /* !__CRT_CYG_PRIMARY */
-
-
 #ifdef __CC__
 
 #ifndef __sigset_t_defined
@@ -87,30 +70,6 @@ typedef __sigset_t sigset_t;
 #define __pid_t_defined 1
 typedef __pid_t pid_t;
 #endif /* !pid_t_defined */
-
-
-/* Data structure to contain attributes for thread creation. */
-typedef struct {
-	/* TODO: Cygwin structure layout! */
-	short int          __flags;
-	pid_t              __pgrp;
-	sigset_t           __sd;
-	sigset_t           __ss;
-	struct sched_param __sp;
-	int                __policy;
-	int                __pad[16];
-} posix_spawnattr_t;
-
-
-/* Data structure to contain information about the actions to be
- * performed in the new process with respect to file descriptors. */
-typedef struct {
-	/* TODO: Cygwin structure layout! */
-	int                    __allocated;
-	int                    __used;
-	struct __spawn_action *__actions;
-	int                    __pad[16];
-} posix_spawn_file_actions_t;
 
 #ifndef __TARGV
 #ifdef __USE_DOS
@@ -141,7 +100,7 @@ typedef struct {
 @@Spawn a new process executing PATH with the attributes describes in *ATTRP.
 @@Before running the process perform the actions described in FILE-ACTIONS.
 @@This function is a possible cancellation point and therefore not marked with __THROW
-[[cp, decl_prefix(DEFINE_TARGV)]]
+[[cp, decl_prefix(DEFINE_TARGV), decl_include("<bits/posix_spawn.h>")]]
 [[argument_names(pid, path, file_actions, attrp, ___argv, ___envp)]]
 int posix_spawn([[nonnull]] pid_t *__restrict pid,
                 [[nonnull]] char const *__restrict path,
@@ -152,7 +111,7 @@ int posix_spawn([[nonnull]] pid_t *__restrict pid,
 %
 @@Similar to `posix_spawn' but search for FILE in the PATH.
 @@This function is a possible cancellation point and therefore not marked with __THROW
-[[cp, decl_prefix(DEFINE_TARGV)]]
+[[cp, decl_prefix(DEFINE_TARGV), decl_include("<bits/posix_spawn.h>")]]
 [[argument_names(pid, file, file_actions, attrp, ___argv, ___envp)]]
 int posix_spawnp([[nonnull]] pid_t *__restrict pid,
                  [[nonnull]] const char *__restrict file,
@@ -162,83 +121,100 @@ int posix_spawnp([[nonnull]] pid_t *__restrict pid,
 
 %
 @@Initialize data structure with attributes for `spawn' to default values
+[[decl_include("<bits/posix_spawn.h>")]]
 int posix_spawnattr_init([[nonnull]] posix_spawnattr_t *__restrict attr);
 
 %
 @@Free resources associated with ATTR
+[[decl_include("<bits/posix_spawn.h>")]]
 int posix_spawnattr_destroy([[nonnull]] posix_spawnattr_t *__restrict attr);
 
 %
 @@Store signal mask for signals with default handling from ATTR in SIGDEFAULT
+[[decl_include("<bits/posix_spawn.h>", "<bits/sigset.h>")]]
 int posix_spawnattr_getsigdefault([[nonnull]] posix_spawnattr_t const *__restrict attr,
                                   [[nonnull]] sigset_t *__restrict sigdefault);
 
 %
 @@Set signal mask for signals with default handling in ATTR to SIGDEFAULT
+[[decl_include("<bits/posix_spawn.h>", "<bits/sigset.h>")]]
 int posix_spawnattr_setsigdefault([[nonnull]] posix_spawnattr_t *__restrict attr,
                                   [[nonnull]] sigset_t const *__restrict sigdefault);
 
 %
 @@Store signal mask for the new process from ATTR in SIGMASK
+[[decl_include("<bits/posix_spawn.h>", "<bits/sigset.h>")]]
 int posix_spawnattr_getsigmask([[nonnull]] posix_spawnattr_t const *__restrict attr,
                                [[nonnull]] sigset_t *__restrict sigmask);
 
 %
 @@Set signal mask for the new process in ATTR to SIGMASK
+[[decl_include("<bits/posix_spawn.h>", "<bits/sigset.h>")]]
 int posix_spawnattr_setsigmask([[nonnull]] posix_spawnattr_t *__restrict attr,
                                [[nonnull]] sigset_t const *__restrict sigmask);
 
 %
 @@Get flag word from the attribute structure
+[[decl_include("<bits/posix_spawn.h>")]]
 int posix_spawnattr_getflags([[nonnull]] posix_spawnattr_t const *__restrict attr,
                              [[nonnull]] $int16_t *__restrict flags);
 
 %
 @@Store flags in the attribute structure
+[[decl_include("<bits/posix_spawn.h>")]]
 int posix_spawnattr_setflags([[nonnull]] posix_spawnattr_t *__restrict attr,
-                             short int flags);
+                             $int16_t flags);
 
 %
 @@Get process group ID from the attribute structure
+[[decl_include("<bits/posix_spawn.h>", "<bits/types.h>")]]
 int posix_spawnattr_getpgroup([[nonnull]] posix_spawnattr_t const *__restrict attr,
                               [[nonnull]] pid_t *__restrict pgroup);
 
 %
 @@Store rocess group ID in the attribute structure
+[[decl_include("<bits/posix_spawn.h>", "<bits/types.h>")]]
 int posix_spawnattr_setpgroup([[nonnull]] posix_spawnattr_t *__restrict attr, pid_t pgroup);
 
 %
 @@Get scheduling policy from the attribute structure
+[[decl_include("<bits/posix_spawn.h>")]]
 int posix_spawnattr_getschedpolicy([[nonnull]] posix_spawnattr_t const *__restrict attr,
                                    [[nonnull]] int *__restrict schedpolicy);
 
 %
 @@Store scheduling policy in the attribute structure
+[[decl_include("<bits/posix_spawn.h>")]]
 int posix_spawnattr_setschedpolicy([[nonnull]] posix_spawnattr_t *__restrict attr,
                                    int schedpolicy);
 
 %
 @@Get scheduling parameters from the attribute structure
+[[decl_include("<bits/posix_spawn.h>", "<bits/sched_param.h>")]]
 int posix_spawnattr_getschedparam([[nonnull]] posix_spawnattr_t const *__restrict attr,
                                   [[nonnull]] struct sched_param *__restrict schedparam);
 
 %
 @@Store scheduling parameters in the attribute structure
+[[decl_include("<bits/posix_spawn.h>", "<bits/sched_param.h>")]]
 int posix_spawnattr_setschedparam([[nonnull]] posix_spawnattr_t *__restrict attr,
                                   [[nonnull]] struct sched_param const *__restrict schedparam);
 
 
 %
 @@Initialize data structure for file attribute for `spawn' call
+[[decl_include("<bits/posix_spawn.h>")]]
 int posix_spawn_file_actions_init([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions);
 
 %
 @@Free resources associated with FILE-ACTIONS
+[[decl_include("<bits/posix_spawn.h>")]]
 int posix_spawn_file_actions_destroy([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions);
 
 %
 @@Add an action to FILE-ACTIONS which tells the implementation
 @@to call `open' for the given file during the `spawn' call
+[[decl_include("<bits/posix_spawn.h>", "<bits/types.h>")]]
 int posix_spawn_file_actions_addopen([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
                                      $fd_t fd, [[nonnull]] char const *__restrict path,
                                      $oflag_t oflags, mode_t mode);
@@ -246,11 +222,13 @@ int posix_spawn_file_actions_addopen([[nonnull]] posix_spawn_file_actions_t *__r
 %
 @@Add an action to FILE-ACTIONS which tells the implementation to
 @@call `close' for the given file descriptor during the `spawn' call
+[[decl_include("<bits/posix_spawn.h>", "<bits/types.h>")]]
 int posix_spawn_file_actions_addclose([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions, $fd_t fd);
 
 %
 @@Add an action to FILE-ACTIONS which tells the implementation to
 @@call `dup2' for the given file descriptors during the `spawn' call
+[[decl_include("<bits/posix_spawn.h>", "<bits/types.h>")]]
 int posix_spawn_file_actions_adddup2([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
                                      $fd_t fd, $fd_t newfd);
 

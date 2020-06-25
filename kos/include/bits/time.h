@@ -25,8 +25,6 @@
 
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
-
 /* System-dependent timing definitions.  Linux version.
    Copyright (C) 1996-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -46,11 +44,11 @@ __SYSDECL_BEGIN
    <http://www.gnu.org/licenses/>.  */
 
 #ifndef __DOS_CLOCKS_PER_SEC
-#define __DOS_CLOCKS_PER_SEC  ((clock_t)1000)
+#define __DOS_CLOCKS_PER_SEC ((clock_t)1000)
 #endif /* !__DOS_CLOCKS_PER_SEC */
 
 #ifndef __KOS_CLOCKS_PER_SEC
-#define __KOS_CLOCKS_PER_SEC  ((clock_t)1000000)
+#define __KOS_CLOCKS_PER_SEC ((clock_t)1000000)
 #endif /* !__KOS_CLOCKS_PER_SEC */
 
 #ifndef CLOCKS_PER_SEC
@@ -63,16 +61,18 @@ __SYSDECL_BEGIN
 
 #if (!defined(__STRICT_ANSI__) || defined(__USE_POSIX)) && \
      !defined(__USE_XOPEN2K) && defined(__CC__) && !defined(__USE_ISOC_PURE)
+__SYSDECL_BEGIN
 #ifdef __CRT_HAVE___sysconf
 __CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,__sysconf,(int __confno),(__confno))
 #define CLK_TCK ((__typedef_clock_t)__sysconf(2))
 #elif defined(__CRT_HAVE_sysconf)
 __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,__sysconf,(int __confno),sysconf,(__confno))
 #define CLK_TCK ((__typedef_clock_t)__sysconf(2))
-#else
+#else /* ... */
 #define CLK_TCK   CLOCKS_PER_SEC
-#endif
-#endif
+#endif /* !... */
+__SYSDECL_END
+#endif /* ... */
 
 
 #ifdef __USE_POSIX199309
@@ -113,16 +113,5 @@ __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,__sysconf,(int __confno),sysconf,(
 #define TIMER_ABSTIME            1 /* Flag to indicate time is absolute. */
 #endif /* !TIMER_ABSTIME */
 #endif /* __USE_POSIX199309 */
-
-#ifdef __CC__
-#ifdef __USE_GNU
-#ifdef __CRT_HAVE_clock_adjtime
-struct timex;
-__CDECLARE(,int,__NOTHROW_NCX,clock_adjtime,(__clockid_t __clock_id, struct timex *__utx),(__clock_id,__utx))
-#endif /* __CRT_HAVE_clock_adjtime */
-#endif /* __USE_GNU */
-#endif /* __CC__ */
-
-__SYSDECL_END
 
 #endif /* !_BITS_TIME_H */

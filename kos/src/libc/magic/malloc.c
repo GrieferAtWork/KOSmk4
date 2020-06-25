@@ -20,15 +20,13 @@
 
 %[default:section(".text.crt{|.dos}.heap.malloc")]
 
-%(libc_fast){
-#include "stdlib.h"
-}
-%(libc_core){
+%(libc_fast,libc_core){
 #include "stdlib.h"
 }
 
 %{
 #include <features.h>
+#include <asm/crt/malloc.h>
 #if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/__overflow.h>
 #ifndef __cplusplus
@@ -38,15 +36,15 @@
 
 __SYSDECL_BEGIN
 
-#if (defined(__CRT_KOS) || defined(__CRT_GLC))
-/* malloc behavior attributes. */
-#define __MALLOC_ZERO_IS_NONNULL  1
-#define __REALLOC_ZERO_IS_NONNULL 1
-#endif /* ... */
-
-#define M_TRIM_THRESHOLD     (-1)
-#define M_GRANULARITY        (-2)
-#define M_MMAP_THRESHOLD     (-3)
+#ifdef __M_TRIM_THRESHOLD
+#define M_TRIM_THRESHOLD __M_TRIM_THRESHOLD
+#endif /* __M_TRIM_THRESHOLD */
+#ifdef __M_GRANULARITY
+#define M_GRANULARITY __M_GRANULARITY
+#endif /* __M_GRANULARITY */
+#ifdef __M_MMAP_THRESHOLD
+#define M_MMAP_THRESHOLD __M_MMAP_THRESHOLD
+#endif /* __M_MMAP_THRESHOLD */
 
 #ifdef __CC__
 
@@ -69,12 +67,13 @@ typedef __SIZE_TYPE__ size_t;
 @@          in use. However, an `E_BADALLOC' exception is thrown if insufficient
 @@          memory (for internal control structures) is available to complete
 @@          the operation
-[[alias(_expand), ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
+[[dos_export_alias("_expand"), ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt{|.dos}.heap.helpers")]]
-realloc_in_place:(void *__restrict mallptr, size_t n_bytes) -> void *;
+void *realloc_in_place(void *__restrict mallptr, size_t n_bytes);
 
-[[ignore, nocrt, alias(posix_memalign)]]
-int crt_posix_memalign([[nonnull]] void **__restrict pp, size_t alignment, size_t n_bytes);
+[[ignore, nocrt, alias("posix_memalign")]]
+int crt_posix_memalign([[nonnull]] void **__restrict pp,
+                       size_t alignment, size_t n_bytes);
 
 %
 
@@ -111,19 +110,19 @@ int posix_memalign([[nonnull]] void **__restrict pp,
 	size_t d = alignment / sizeof(void *);
 	size_t r = alignment % sizeof(void *);
 	if (r != 0 || !d || (d & (d - 1)) != 0) {
-#ifdef EINVAL
+@@pp_ifdef EINVAL@@
 		return EINVAL;
-#else /* EINVAL */
+@@pp_else@@
 		return 1;
-#endif /* !EINVAL */
+@@pp_endif@@
 	}
 	result = memalign(alignment, n_bytes);
 	if (!result) {
-#ifdef ENOMEM
+@@pp_ifdef ENOMEM@@
 		return ENOMEM;
-#else /* ENOMEM */
+@@pp_else@@
 		return 1;
-#endif /* !ENOMEM */
+@@pp_endif@@
 	}
 	*pp = result;
 	return 0;
@@ -157,7 +156,7 @@ int malloc_trim(size_t pad) {
 }
 
 %
-[[wunused, ATTR_PURE, export_alias(_msize)]]
+[[wunused, ATTR_PURE, dos_export_alias("_msize")]]
 [[section(".text.crt{|.dos}.heap.helpers")]]
 size_t malloc_usable_size(void *__restrict mallptr);
 
@@ -175,7 +174,7 @@ int mallopt(int parameter_number, int parameter_value) {
 
 %
 %#ifdef __USE_KOS
-[[export_alias(__memdup)]]
+[[export_alias("__memdup")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl, requires_function(malloc)]]
 void *memdup([[nonnull]] void const *__restrict ptr, size_t n_bytes) {
@@ -186,7 +185,7 @@ void *memdup([[nonnull]] void const *__restrict ptr, size_t n_bytes) {
 	return result;
 }
 
-[[export_alias(__memcdup)]]
+[[export_alias("__memcdup")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl, requires_function(memdup)]]
 void *memcdup([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes) {
@@ -202,8 +201,8 @@ void *memcdup([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes
 [[guard, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl]]
 [[impl_include("<hybrid/__overflow.h>"), requires_function(realloc)]]
-reallocarray:(void *ptr, $size_t elem_count, $size_t elem_size)
-		-> [realloc(mallptr, elem_count * elem_size)] void * {
+reallocarray(void *ptr, $size_t elem_count, $size_t elem_size)
+		-> [[realloc(mallptr, elem_count * elem_size)]] void * {
 	size_t total_bytes;
 	if (__hybrid_overflow_umul(elem_count, elem_size, &total_bytes))
 		total_bytes = (size_t)-1; /* Force down-stream failure */
@@ -214,8 +213,8 @@ reallocarray:(void *ptr, $size_t elem_count, $size_t elem_size)
 
 [[guard, section(".text.crt{|.dos}.heap.rare_helpers")]]
 [[userimpl, requires($has_function(realloc) && $has_function(malloc_usable_size))]]
-recalloc:(void *mallptr, $size_t num_bytes)
-		-> [realloc(mallptr, num_bytes)] void * {
+recalloc(void *mallptr, $size_t num_bytes)
+		-> [[realloc(mallptr, num_bytes)]] void * {
 	void *result;
 	size_t oldsize;
 	oldsize = malloc_usable_size(mallptr);
@@ -231,8 +230,8 @@ recalloc:(void *mallptr, $size_t num_bytes)
 [[guard, export_alias(_recalloc)]]
 [[userimpl, requires($has_function(realloc) && $has_function(malloc_usable_size))]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), impl_include("<hybrid/__overflow.h>")]]
-recallocv:(void *mallptr, $size_t elem_count, $size_t elem_size)
-		-> [realloc(mallptr, elem_count * elem_size)] void * {
+recallocv(void *mallptr, $size_t elem_count, $size_t elem_size)
+		-> [[realloc(mallptr, elem_count * elem_size)]] void * {
 	void *result;
 	size_t total_bytes, oldsize;
 	oldsize = malloc_usable_size(mallptr);
@@ -314,7 +313,7 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(size_t __num_bytes) { return (calloc)(1, 
 
 
 %#ifdef __USE_DOS
-_msize(*) = malloc_usable_size;
+%[insert:function(_msize = malloc_usable_size)]
 %#endif /* __USE_DOS */
 
 %{

@@ -25,7 +25,7 @@
 #ifndef __NO_FPU
 #include <hybrid/typecore.h>
 
-#include <bits/fenv.h>
+#include <bits/crt/fenv.h>
 #include <bits/types.h>
 
 #include <libc/fenv.h>

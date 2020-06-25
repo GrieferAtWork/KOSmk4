@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa002df60 */
+/* HASH CRC-32:0x927b676f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,10 +29,15 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <sched.h>
 #include <bits/sigset.h>
 #include <sys/types.h>
 #include <bits/types.h>
+#include <bits/posix_spawn.h>
+#include <bits/sched_param.h>
+
+#ifdef __USE_GLIBC
+#include <sched.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 
@@ -56,28 +61,6 @@ __SYSDECL_BEGIN
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-
-/* Flags to be set in the `posix_spawnattr_t'. */
-#ifdef __CRT_CYG_PRIMARY
-#define POSIX_SPAWN_RESETIDS        0x01
-#define POSIX_SPAWN_SETPGROUP       0x02
-#define POSIX_SPAWN_SETSCHEDPARAM   0x04
-#define POSIX_SPAWN_SETSCHEDULER    0x08
-#define POSIX_SPAWN_SETSIGDEF       0x10
-#define POSIX_SPAWN_SETSIGMASK      0x20
-#else /* __CRT_CYG_PRIMARY */
-#define POSIX_SPAWN_RESETIDS        0x01
-#define POSIX_SPAWN_SETPGROUP       0x02
-#define POSIX_SPAWN_SETSIGDEF       0x04
-#define POSIX_SPAWN_SETSIGMASK      0x08
-#define POSIX_SPAWN_SETSCHEDPARAM   0x10
-#define POSIX_SPAWN_SETSCHEDULER    0x20
-#ifdef __USE_GNU
-#define POSIX_SPAWN_USEVFORK        0x40
-#endif /* __USE_GNU */
-#endif /* !__CRT_CYG_PRIMARY */
-
-
 #ifdef __CC__
 
 #ifndef __sigset_t_defined
@@ -89,30 +72,6 @@ typedef __sigset_t sigset_t;
 #define __pid_t_defined 1
 typedef __pid_t pid_t;
 #endif /* !pid_t_defined */
-
-
-/* Data structure to contain attributes for thread creation. */
-typedef struct {
-	/* TODO: Cygwin structure layout! */
-	short int          __flags;
-	pid_t              __pgrp;
-	sigset_t           __sd;
-	sigset_t           __ss;
-	struct sched_param __sp;
-	int                __policy;
-	int                __pad[16];
-} posix_spawnattr_t;
-
-
-/* Data structure to contain information about the actions to be
- * performed in the new process with respect to file descriptors. */
-typedef struct {
-	/* TODO: Cygwin structure layout! */
-	int                    __allocated;
-	int                    __used;
-	struct __spawn_action *__actions;
-	int                    __pad[16];
-} posix_spawn_file_actions_t;
 
 #ifndef __TARGV
 #ifdef __USE_DOS
@@ -156,7 +115,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_setsigma
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getflags,(posix_spawnattr_t const *__restrict __attr, __INT16_TYPE__ *__restrict __flags),(__attr,__flags))
 
 /* Store flags in the attribute structure */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawnattr_setflags,(posix_spawnattr_t *__restrict __attr, short int __flags),(__attr,__flags))
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawnattr_setflags,(posix_spawnattr_t *__restrict __attr, __INT16_TYPE__ __flags),(__attr,__flags))
 
 /* Get process group ID from the attribute structure */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getpgroup,(posix_spawnattr_t const *__restrict __attr, pid_t *__restrict __pgroup),(__attr,__pgroup))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x926e75bf */
+/* HASH CRC-32:0xcee0147e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,6 @@
 #undef _LOCALE_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
 #else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "locale.h" after "clocale" */
-#ifndef __lconv_defined
-#define __lconv_defined 1
-__NAMESPACE_STD_USING(lconv)
-#endif /* !__lconv_defined */
 #ifdef __CRT_HAVE_setlocale
 __NAMESPACE_STD_USING(setlocale)
 #endif /* __CRT_HAVE_setlocale */
@@ -47,7 +43,8 @@ __NAMESPACE_STD_USING(localeconv)
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <bits/locale.h>
+#include <bits/crt/locale.h>
+#include <bits/crt/lconv.h>
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
@@ -84,203 +81,146 @@ __NAMESPACE_STD_USING(localeconv)
 
 /* These are the possibilities for the first argument to setlocale.
  * The code assumes that the lowest LC_* symbol has the value zero. */
-#define LC_CTYPE          __LC_CTYPE
-#define LC_NUMERIC        __LC_NUMERIC
-#define LC_TIME           __LC_TIME
-#define LC_COLLATE        __LC_COLLATE
-#define LC_MONETARY       __LC_MONETARY
-#define LC_MESSAGES       __LC_MESSAGES
-#define LC_ALL            __LC_ALL
-#define LC_PAPER          __LC_PAPER
-#define LC_NAME           __LC_NAME
-#define LC_ADDRESS        __LC_ADDRESS
-#define LC_TELEPHONE      __LC_TELEPHONE
-#define LC_MEASUREMENT    __LC_MEASUREMENT
+#ifdef __LC_CTYPE
+#define LC_CTYPE __LC_CTYPE
+#endif /* __LC_CTYPE */
+#ifdef __LC_NUMERIC
+#define LC_NUMERIC __LC_NUMERIC
+#endif /* __LC_NUMERIC */
+#ifdef __LC_TIME
+#define LC_TIME __LC_TIME
+#endif /* __LC_TIME */
+#ifdef __LC_COLLATE
+#define LC_COLLATE __LC_COLLATE
+#endif /* __LC_COLLATE */
+#ifdef __LC_MONETARY
+#define LC_MONETARY __LC_MONETARY
+#endif /* __LC_MONETARY */
+#ifdef __LC_MESSAGES
+#define LC_MESSAGES __LC_MESSAGES
+#endif /* __LC_MESSAGES */
+#ifdef __LC_ALL
+#define LC_ALL __LC_ALL
+#endif /* __LC_ALL */
+#ifdef __LC_PAPER
+#define LC_PAPER __LC_PAPER
+#endif /* __LC_PAPER */
+#ifdef __LC_NAME
+#define LC_NAME __LC_NAME
+#endif /* __LC_NAME */
+#ifdef __LC_ADDRESS
+#define LC_ADDRESS __LC_ADDRESS
+#endif /* __LC_ADDRESS */
+#ifdef __LC_TELEPHONE
+#define LC_TELEPHONE __LC_TELEPHONE
+#endif /* __LC_TELEPHONE */
+#ifdef __LC_MEASUREMENT
+#define LC_MEASUREMENT __LC_MEASUREMENT
+#endif /* __LC_MEASUREMENT */
+#ifdef __LC_IDENTIFICATION
 #define LC_IDENTIFICATION __LC_IDENTIFICATION
+#endif /* __LC_IDENTIFICATION */
 
 #ifdef __USE_XOPEN2K8
 /* These are the bits that can be set in the CATEGORY_MASK argument to
  * `newlocale'. In the GNU implementation, LC_FOO_MASK has the value
  * of (1 << LC_FOO), but this is not a part of the interface that
  * callers can assume will be true. */
-#define LC_CTYPE_MASK          (1 << __LC_CTYPE)
-#define LC_NUMERIC_MASK        (1 << __LC_NUMERIC)
-#define LC_TIME_MASK           (1 << __LC_TIME)
-#define LC_COLLATE_MASK        (1 << __LC_COLLATE)
-#define LC_MONETARY_MASK       (1 << __LC_MONETARY)
-#define LC_MESSAGES_MASK       (1 << __LC_MESSAGES)
-#define LC_PAPER_MASK          (1 << __LC_PAPER)
-#define LC_NAME_MASK           (1 << __LC_NAME)
-#define LC_ADDRESS_MASK        (1 << __LC_ADDRESS)
-#define LC_TELEPHONE_MASK      (1 << __LC_TELEPHONE)
-#define LC_MEASUREMENT_MASK    (1 << __LC_MEASUREMENT)
-#define LC_IDENTIFICATION_MASK (1 << __LC_IDENTIFICATION)
-#define LC_ALL_MASK            (LC_CTYPE_MASK | LC_NUMERIC_MASK | LC_TIME_MASK | \
-                                LC_COLLATE_MASK | LC_MONETARY_MASK | LC_MESSAGES_MASK | \
-                                LC_PAPER_MASK | LC_NAME_MASK | LC_ADDRESS_MASK | \
-                                LC_TELEPHONE_MASK | LC_MEASUREMENT_MASK | LC_IDENTIFICATION_MASK)
+#ifdef __LC_CTYPE
+#define LC_CTYPE_MASK               (1 << __LC_CTYPE)
+#define __PRIVATE_OPT_LC_CTYPE_MASK (1 << __LC_CTYPE)
+#else /* __LC_CTYPE */
+#define __PRIVATE_OPT_LC_CTYPE_MASK 0
+#endif /* !__LC_CTYPE */
+#ifdef __LC_NUMERIC
+#define LC_NUMERIC_MASK               (1 << __LC_NUMERIC)
+#define __PRIVATE_OPT_LC_NUMERIC_MASK (1 << __LC_NUMERIC)
+#else /* __LC_NUMERIC */
+#define __PRIVATE_OPT_LC_NUMERIC_MASK 0
+#endif /* !__LC_NUMERIC */
+#ifdef __LC_TIME
+#define LC_TIME_MASK               (1 << __LC_TIME)
+#define __PRIVATE_OPT_LC_TIME_MASK (1 << __LC_TIME)
+#else /* __LC_TIME */
+#define __PRIVATE_OPT_LC_TIME_MASK 0
+#endif /* !__LC_TIME */
+#ifdef __LC_COLLATE
+#define LC_COLLATE_MASK               (1 << __LC_COLLATE)
+#define __PRIVATE_OPT_LC_COLLATE_MASK (1 << __LC_COLLATE)
+#else /* __LC_COLLATE */
+#define __PRIVATE_OPT_LC_COLLATE_MASK 0
+#endif /* !__LC_COLLATE */
+#ifdef __LC_MONETARY
+#define LC_MONETARY_MASK               (1 << __LC_MONETARY)
+#define __PRIVATE_OPT_LC_MONETARY_MASK (1 << __LC_MONETARY)
+#else /* __LC_MONETARY */
+#define __PRIVATE_OPT_LC_MONETARY_MASK 0
+#endif /* !__LC_MONETARY */
+#ifdef __LC_MESSAGES
+#define LC_MESSAGES_MASK               (1 << __LC_MESSAGES)
+#define __PRIVATE_OPT_LC_MESSAGES_MASK (1 << __LC_MESSAGES)
+#else /* __LC_MESSAGES */
+#define __PRIVATE_OPT_LC_MESSAGES_MASK 0
+#endif /* !__LC_MESSAGES */
+#ifdef __LC_PAPER
+#define LC_PAPER_MASK               (1 << __LC_PAPER)
+#define __PRIVATE_OPT_LC_PAPER_MASK (1 << __LC_PAPER)
+#else /* __LC_PAPER */
+#define __PRIVATE_OPT_LC_PAPER_MASK 0
+#endif /* !__LC_PAPER */
+#ifdef __LC_NAME
+#define LC_NAME_MASK               (1 << __LC_NAME)
+#define __PRIVATE_OPT_LC_NAME_MASK (1 << __LC_NAME)
+#else /* __LC_NAME */
+#define __PRIVATE_OPT_LC_NAME_MASK 0
+#endif /* !__LC_NAME */
+#ifdef __LC_ADDRESS
+#define LC_ADDRESS_MASK               (1 << __LC_ADDRESS)
+#define __PRIVATE_OPT_LC_ADDRESS_MASK (1 << __LC_ADDRESS)
+#else /* __LC_ADDRESS */
+#define __PRIVATE_OPT_LC_ADDRESS_MASK 0
+#endif /* !__LC_ADDRESS */
+#ifdef __LC_TELEPHONE
+#define LC_TELEPHONE_MASK               (1 << __LC_TELEPHONE)
+#define __PRIVATE_OPT_LC_TELEPHONE_MASK (1 << __LC_TELEPHONE)
+#else /* __LC_TELEPHONE */
+#define __PRIVATE_OPT_LC_TELEPHONE_MASK 0
+#endif /* !__LC_TELEPHONE */
+#ifdef __LC_MEASUREMENT
+#define LC_MEASUREMENT_MASK               (1 << __LC_MEASUREMENT)
+#define __PRIVATE_OPT_LC_MEASUREMENT_MASK (1 << __LC_MEASUREMENT)
+#else /* __LC_MEASUREMENT */
+#define __PRIVATE_OPT_LC_MEASUREMENT_MASK 0
+#endif /* !__LC_MEASUREMENT */
+#ifdef __LC_IDENTIFICATION
+#define LC_IDENTIFICATION_MASK               (1 << __LC_IDENTIFICATION)
+#define __PRIVATE_OPT_LC_IDENTIFICATION_MASK (1 << __LC_IDENTIFICATION)
+#else /* __LC_IDENTIFICATION */
+#define __PRIVATE_OPT_LC_IDENTIFICATION_MASK 0
+#endif /* !__LC_IDENTIFICATION */
+
+#define LC_ALL_MASK                      \
+	(__PRIVATE_OPT_LC_CTYPE_MASK |       \
+	 __PRIVATE_OPT_LC_NUMERIC_MASK |     \
+	 __PRIVATE_OPT_LC_TIME_MASK |        \
+	 __PRIVATE_OPT_LC_COLLATE_MASK |     \
+	 __PRIVATE_OPT_LC_MONETARY_MASK |    \
+	 __PRIVATE_OPT_LC_MESSAGES_MASK |    \
+	 __PRIVATE_OPT_LC_PAPER_MASK |       \
+	 __PRIVATE_OPT_LC_NAME_MASK |        \
+	 __PRIVATE_OPT_LC_ADDRESS_MASK |     \
+	 __PRIVATE_OPT_LC_TELEPHONE_MASK |   \
+	 __PRIVATE_OPT_LC_MEASUREMENT_MASK | \
+	 __PRIVATE_OPT_LC_IDENTIFICATION_MASK)
 
 /* This value can be passed to `uselocale' and may be returned by it.
  * Passing this value to any other function has undefined behavior. */
-#define LC_GLOBAL_LOCALE   (__CCAST(__locale_t)(-1))
-
+#define LC_GLOBAL_LOCALE (__CCAST(__locale_t)(-1))
 #endif /* __USE_XOPEN2K8 */
-
-
 
 __SYSDECL_BEGIN
 
 #ifdef __CC__
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("decimal_point")
-#pragma push_macro("thousands_sep")
-#pragma push_macro("grouping")
-#pragma push_macro("int_curr_symbol")
-#pragma push_macro("currency_symbol")
-#pragma push_macro("mon_decimal_point")
-#pragma push_macro("mon_thousands_sep")
-#pragma push_macro("mon_grouping")
-#pragma push_macro("positive_sign")
-#pragma push_macro("negative_sign")
-#pragma push_macro("int_frac_digits")
-#pragma push_macro("frac_digits")
-#pragma push_macro("p_cs_precedes")
-#pragma push_macro("p_sep_by_space")
-#pragma push_macro("n_cs_precedes")
-#pragma push_macro("n_sep_by_space")
-#pragma push_macro("p_sign_posn")
-#pragma push_macro("n_sign_posn")
-#pragma push_macro("int_p_cs_precedes")
-#pragma push_macro("int_p_sep_by_space")
-#pragma push_macro("int_n_cs_precedes")
-#pragma push_macro("int_n_sep_by_space")
-#pragma push_macro("int_p_sign_posn")
-#pragma push_macro("int_n_sign_posn")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef decimal_point
-#undef thousands_sep
-#undef grouping
-#undef int_curr_symbol
-#undef currency_symbol
-#undef mon_decimal_point
-#undef mon_thousands_sep
-#undef mon_grouping
-#undef positive_sign
-#undef negative_sign
-#undef int_frac_digits
-#undef frac_digits
-#undef p_cs_precedes
-#undef p_sep_by_space
-#undef n_cs_precedes
-#undef n_sep_by_space
-#undef p_sign_posn
-#undef n_sign_posn
-#undef int_p_cs_precedes
-#undef int_p_sep_by_space
-#undef int_n_cs_precedes
-#undef int_n_sep_by_space
-#undef int_p_sign_posn
-#undef int_n_sign_posn
-
-/* Structure giving information about numeric and monetary notation. */
-__NAMESPACE_STD_BEGIN
-
-#ifndef __std_lconv_defined
-#define __std_lconv_defined 1
-#ifdef __lconv_defined
-__NAMESPACE_GLB_USING(lconv)
-#else /* __lconv_defined */
-struct lconv {
-	/* Numeric (non-monetary) information. */
-	char *decimal_point; /* Decimal point character. */
-	char *thousands_sep; /* Thousands separator. */
-	char *grouping;      /* Each element is the number of digits in each group;
-	                      * elements with higher indices are farther left.
-	                      * An element with value CHAR_MAX means that no further grouping is done.
-	                      * An element with value 0 means that the previous element is used for all groups farther left. */
-
-	/* Monetary information. */
-	char *int_curr_symbol;   /* First three chars are a currency symbol from ISO 4217.
-	                          * Fourth char is the separator. Fifth char is '\0'. */
-	char *currency_symbol;   /* Local currency symbol. */
-	char *mon_decimal_point; /* Decimal point character. */
-	char *mon_thousands_sep; /* Thousands separator. */
-	char *mon_grouping;      /* Like `grouping' element (above). */
-	char *positive_sign;     /* Sign for positive values. */
-	char *negative_sign;     /* Sign for negative values. */
-	char int_frac_digits;    /* Int'l fractional digits. */
-	char frac_digits;        /* Local fractional digits. */
-	char p_cs_precedes;      /* 1 if currency_symbol precedes a positive value, 0 if succeeds. */
-	char p_sep_by_space;     /* 1 iff a space separates currency_symbol from a positive value. */
-	char n_cs_precedes;      /* 1 if currency_symbol precedes a negative value, 0 if succeeds. */
-	char n_sep_by_space;     /* 1 iff a space separates currency_symbol from a negative value. */
-	char p_sign_posn; /* Positive and negative sign positions:
-	                   * 0 Parentheses surround the quantity and currency_symbol.
-	                   * 1 The sign string precedes the quantity and currency_symbol.
-	                   * 2 The sign string follows the quantity and currency_symbol.
-	                   * 3 The sign string immediately precedes the currency_symbol.
-	                   * 4 The sign string immediately follows the currency_symbol. */
-	char n_sign_posn; /* s.a. `p_sign_posn' */
-#ifdef __USE_ISOC99
-	char int_p_cs_precedes;  /* 1 if int_curr_symbol precedes a positive value, 0 if succeeds. */
-	char int_p_sep_by_space; /* 1 iff a space separates int_curr_symbol from a positive value. */
-	char int_n_cs_precedes;  /* 1 if int_curr_symbol precedes a negative value, 0 if succeeds. */
-	char int_n_sep_by_space; /* 1 iff a space separates int_curr_symbol from a negative value. */
-	char int_p_sign_posn;    /* Positive and negative sign positions:
-	                          * 0 Parentheses surround the quantity and int_curr_symbol.
-	                          * 1 The sign string precedes the quantity and int_curr_symbol.
-	                          * 2 The sign string follows the quantity and int_curr_symbol.
-	                          * 3 The sign string immediately precedes the int_curr_symbol.
-	                          * 4 The sign string immediately follows the int_curr_symbol. */
-	char int_n_sign_posn;    /* s.a. `int_p_sign_posn' */
-#else /* __USE_ISOC99 */
-	char __int_p_cs_precedes;
-	char __int_p_sep_by_space;
-	char __int_n_cs_precedes;
-	char __int_n_sep_by_space;
-	char __int_p_sign_posn;
-	char __int_n_sign_posn;
-#endif /* !__USE_ISOC99 */
-};
-#endif /* !__lconv_defined */
-#endif /* !__std_lconv_defined */
-__NAMESPACE_STD_END
-
-#ifndef __CXX_SYSTEM_HEADER
-#ifndef __lconv_defined
-#define __lconv_defined 1
-__NAMESPACE_STD_USING(lconv)
-#endif /* !__lconv_defined */
-#endif /* !__CXX_SYSTEM_HEADER */
-
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("int_n_sign_posn")
-#pragma pop_macro("int_p_sign_posn")
-#pragma pop_macro("int_n_sep_by_space")
-#pragma pop_macro("int_n_cs_precedes")
-#pragma pop_macro("int_p_sep_by_space")
-#pragma pop_macro("int_p_cs_precedes")
-#pragma pop_macro("n_sign_posn")
-#pragma pop_macro("p_sign_posn")
-#pragma pop_macro("n_sep_by_space")
-#pragma pop_macro("n_cs_precedes")
-#pragma pop_macro("p_sep_by_space")
-#pragma pop_macro("p_cs_precedes")
-#pragma pop_macro("frac_digits")
-#pragma pop_macro("int_frac_digits")
-#pragma pop_macro("negative_sign")
-#pragma pop_macro("positive_sign")
-#pragma pop_macro("mon_grouping")
-#pragma pop_macro("mon_thousands_sep")
-#pragma pop_macro("mon_decimal_point")
-#pragma pop_macro("currency_symbol")
-#pragma pop_macro("int_curr_symbol")
-#pragma pop_macro("grouping")
-#pragma pop_macro("thousands_sep")
-#pragma pop_macro("decimal_point")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 __NAMESPACE_STD_BEGIN
 /* Set and/or return the current locale */

@@ -90,6 +90,7 @@
 %{
 #include <features.h>
 
+#include <asm/crt/stdio.h>
 #include <asm/oflags.h>
 #include <asm/stdio.h>
 #include <bits/stdio_lim.h>
@@ -99,7 +100,7 @@
 #include <libio.h>
 
 #ifdef __USE_DOS
-#include <bits/sys_errlist.h>
+#include <bits/crt/sys_errlist.h>
 #include <xlocale.h>
 #endif /* __USE_DOS */
 
@@ -108,7 +109,7 @@
 #endif /* __CRT_CYG_PRIMARY */
 
 #ifdef __CRT_DOS_PRIMARY
-#include <bits/io-file.h>
+#include <bits/crt/io-file.h>
 #endif /* __CRT_DOS_PRIMARY */
 
 __SYSDECL_BEGIN
@@ -408,7 +409,7 @@ fflush:([[nullable]] FILE *stream) -> int {
 %[default:section(".text.crt{|.dos}.FILE.locked.read.utility")]
 
 @@Alias for `setvbuf(STREAM, buf, _IOFBF, BUFSIZ)'
-[[std, requires_include("<asm/stdio.h>"), impl_include("<asm/stdio.h>")]]
+[[std, requires_include("<asm/crt/stdio.h>"), impl_include("<asm/crt/stdio.h>")]]
 [[requires(defined(___IOFBF) && defined(___IONBF) && defined(__BUFSIZ) && $has_function(setvbuf))]]
 void setbuf([[nonnull]] FILE *__restrict stream, [[nullable]] char *buf) {
 	setvbuf(stream, buf,
@@ -967,7 +968,7 @@ char *gets([[nonnull]] char *__restrict buf) {
 @@Scan data from a given `INPUT' string, following `FORMAT'
 @@Return the number of successfully scanned data items
 [[decl_include("<features.h>")]]
-[[guard, std, guard, crtbuiltin, impl_include("<asm/stdio.h>")]]
+[[guard, std, guard, crtbuiltin, impl_include("<asm/crt/stdio.h>")]]
 [[dependency(unicode_readutf8, unicode_readutf8_rev)]]
 [[impl_include("<hybrid/typecore.h>"), impl_prefix(
 @@push_namespace(local)@@
@@ -1137,7 +1138,7 @@ char *tmpnam_r([[nonnull]] char *buf) {
 
 @@Specify the location and size for the buffer to-be used by `STREAM'
 [[export_alias("_IO_setbuffer")]]
-[[requires_include("<asm/stdio.h>"), impl_include("<asm/stdio.h>")]]
+[[requires_include("<asm/crt/stdio.h>"), impl_include("<asm/crt/stdio.h>")]]
 [[requires(defined(___IOFBF) && defined(___IONBF) && $has_function(setvbuf))]]
 [[section(".text.crt{|.dos}.FILE.locked.read.utility")]]
 void setbuffer([[nonnull]] $FILE *__restrict stream,
@@ -1299,7 +1300,7 @@ $FILE *open_memstream(char **bufloc, $size_t *sizeloc);
 [[cp_stdio, wunused, alias("getdelim_unlocked"), export_alias("__getdelim")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("getdelim_unlocked")]]
 [[requires($has_function(realloc) && $has_function(fgetc) && $has_function(ungetc))]]
-[[impl_include("<asm/stdio.h>", "<hybrid/__assert.h>")]]
+[[impl_include("<asm/crt/stdio.h>", "<hybrid/__assert.h>")]]
 $ssize_t getdelim([[nonnull]] char **__restrict lineptr,
                   [[nonnull]] $size_t *__restrict pcount, int delimiter,
                   [[nonnull]] $FILE *__restrict stream) {
@@ -1434,7 +1435,7 @@ int pclose([[nonnull]] $FILE *stream);
 [[cp_stdio, dos_export_alias("_getw")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("getw_unlocked")]]
 [[requires_function(fread)]]
-[[impl_include("<asm/stdio.h>")]]
+[[impl_include("<asm/crt/stdio.h>")]]
 int getw([[nonnull]] $FILE *__restrict stream) {
 	u16 result;
 	return fread(&result, sizeof(result), 1, stream)
@@ -1446,7 +1447,7 @@ int getw([[nonnull]] $FILE *__restrict stream) {
 @@Similar to `putc()', but write 2 bytes loaded from `W & 0xffff'
 [[cp_stdio, dos_export_alias("_putw"), requires_function(fwrite)]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("putw_unlocked")]]
-[[impl_include("<asm/stdio.h>")]]
+[[impl_include("<asm/crt/stdio.h>")]]
 int putw(int w, [[nonnull]] $FILE *__restrict stream) {
 	u16 c = (u16)w;
 	return fwrite(&c, sizeof(c), 1, stream)
@@ -1477,7 +1478,7 @@ $FILE *fopencookie(void *__restrict magic_cookie,
 %[default:section(".text.crt{|.dos}.FILE.unlocked.read.read")]
 
 @@Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG'
-[[decl_include("<features.h>"), impl_include("<asm/stdio.h>")]]
+[[decl_include("<features.h>"), impl_include("<asm/crt/stdio.h>")]]
 [[cp_stdio, alias("fgets"), wunused, impl_include("<parts/errno.h>")]]
 [[requires($has_function(fgetc_unlocked) && $has_function(ungetc_unlocked) && $has_function(ferror_unlocked))]]
 char *fgets_unlocked([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
@@ -1929,7 +1930,7 @@ int fsetpos_unlocked([[nonnull]] $FILE *__restrict stream,
 [[cp_stdio, alias("getw", "_getw")]]
 [[section(".text.crt{|.dos}.FILE.unlocked.read.getc")]]
 [[requires_function(fread_unlocked)]]
-[[impl_include("<asm/stdio.h>")]]
+[[impl_include("<asm/crt/stdio.h>")]]
 int getw_unlocked([[nonnull]] $FILE *__restrict stream) {
 	u16 result;
 	return fread_unlocked(&result, sizeof(result), 1, stream)
@@ -1966,7 +1967,7 @@ int ungetc_unlocked(int ch, [[nonnull]] $FILE *__restrict stream) {
 [[cp_stdio, wunused, alias("getdelim"), doc_alias("getdelim")]]
 [[section(".text.crt{|.dos}.FILE.unlocked.read.read")]]
 [[requires_function(realloc, fgetc_unlocked, ungetc_unlocked)]]
-[[impl_include("<asm/stdio.h>", "<hybrid/__assert.h>")]]
+[[impl_include("<asm/crt/stdio.h>", "<hybrid/__assert.h>")]]
 $ssize_t getdelim_unlocked([[nonnull]] char **__restrict lineptr,
                            [[nonnull]] $size_t *__restrict pcount, int delimiter,
                            [[nonnull]] $FILE *__restrict stream) {
@@ -2462,7 +2463,7 @@ __STDC_INT_AS_SIZE_T _vsscanf_l([[nonnull]] char const *__restrict input,
 [[ignore, export_alias("_vsnscanf_s")]]
 [[section(".text.crt.dos.unicode.static.format.scanf")]]
 [[dependency(unicode_readutf8_n, unicode_readutf8_rev)]]
-[[impl_include("<asm/stdio.h>")]]
+[[impl_include("<asm/crt/stdio.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(
 @@push_namespace(local)@@

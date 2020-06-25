@@ -21,16 +21,63 @@
 #define GUARD_LIBC_USER_SYS_RESOURCE_C 1
 
 #include "../api.h"
-#include "sys.resource.h"
+/**/
+
 #include <kos/syscalls.h>
+
+#include "sys.resource.h"
 
 DECL_BEGIN
 
 
+/*[[[head:libc_prlimit,hash:CRC-32=0xcc2a3cc6]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.resource") int
+NOTHROW_NCX(LIBCCALL libc_prlimit)(pid_t pid,
+                                   __rlimit_resource_t resource,
+                                   struct rlimit const *new_limit,
+                                   struct rlimit *old_limit)
+/*[[[body:libc_prlimit]]]*/
+{
+	errno_t error;
+#if __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__
+	error = sys_prlimit64(pid, (syscall_ulong_t)resource,
+	                      (struct rlimit64 const *)new_limit,
+	                      (struct rlimit64 *)old_limit);
+#else /* __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__ */
+	struct rlimit64 nl, ol;
+	if (new_limit) {
+		nl.rlim_cur = (rlim64_t)new_limit->rlim_cur;
+		nl.rlim_max = (rlim64_t)new_limit->rlim_max;
+	}
+	error = sys_prlimit64(pid, (syscall_ulong_t)resource,
+	                      new_limit ? &nl : NULL,
+	                      old_limit ? &ol : NULL);
+	if (old_limit && E_ISOK(error)) {
+		old_limit->rlim_cur = (rlim_t)ol.rlim_cur;
+		old_limit->rlim_max = (rlim_t)ol.rlim_max;
+	}
+#endif /* __SIZEOF_RLIM32_T__ != __SIZEOF_RLIM64_T__ */
+	return libc_seterrno_syserr(error);
+}
+/*[[[end:libc_prlimit]]]*/
 
-
-
-/*[[[start:implementation]]]*/
+/*[[[head:libc_prlimit64,hash:CRC-32=0x61d945b2]]]*/
+#if __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__
+DEFINE_INTERN_ALIAS(libc_prlimit64, libc_prlimit);
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.sched.resource") int
+NOTHROW_NCX(LIBCCALL libc_prlimit64)(pid_t pid,
+                                     __rlimit_resource_t resource,
+                                     struct rlimit64 const *new_limit,
+                                     struct rlimit64 *old_limit)
+/*[[[body:libc_prlimit64]]]*/
+{
+	errno_t error;
+	error = sys_prlimit64(pid, (syscall_ulong_t)resource, new_limit, old_limit);
+	return libc_seterrno_syserr(error);
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_prlimit64]]]*/
 
 /*[[[head:libc_getrlimit,hash:CRC-32=0x183c9dc8]]]*/
 /* Put the soft and hard limits for RESOURCE in *RLIMITS.
@@ -74,6 +121,26 @@ NOTHROW_NCX(LIBCCALL libc_getrusage)(__rusage_who_t who,
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:libc_getrusage]]]*/
+
+/*[[[head:libc_getrusage64,hash:CRC-32=0x1e7c6b14]]]*/
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_getrusage64, libc_getrusage);
+#else /* MAGIC:alias */
+/* Return resource usage information on process indicated by WHO
+ * and put it in *USAGE. Returns 0 for success, -1 for failure */
+INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
+NOTHROW_NCX(LIBCCALL libc_getrusage64)(__rusage_who_t who,
+                                       struct rusage64 *usage)
+/*[[[body:libc_getrusage64]]]*/
+/*AUTO*/{
+	(void)who;
+	(void)usage;
+	CRT_UNIMPLEMENTED("getrusage64"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_getrusage64]]]*/
 
 /*[[[head:libc_getpriority,hash:CRC-32=0xb9800c80]]]*/
 /* Return the highest priority of any process specified by WHICH and
@@ -155,11 +222,14 @@ NOTHROW_NCX(LIBCCALL libc_setrlimit64)(__rlimit_resource_t resource,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xec91bd85]]]*/
+/*[[[start:exports,hash:CRC-32=0x87c1c3e3]]]*/
+DEFINE_PUBLIC_ALIAS(prlimit, libc_prlimit);
+DEFINE_PUBLIC_ALIAS(prlimit64, libc_prlimit64);
 DEFINE_PUBLIC_ALIAS(__getrlimit, libc_getrlimit);
 DEFINE_PUBLIC_ALIAS(getrlimit, libc_getrlimit);
 DEFINE_PUBLIC_ALIAS(setrlimit, libc_setrlimit);
 DEFINE_PUBLIC_ALIAS(getrusage, libc_getrusage);
+DEFINE_PUBLIC_ALIAS(getrusage64, libc_getrusage64);
 DEFINE_PUBLIC_ALIAS(getpriority, libc_getpriority);
 DEFINE_PUBLIC_ALIAS(setpriority, libc_setpriority);
 DEFINE_PUBLIC_ALIAS(getrlimit64, libc_getrlimit64);

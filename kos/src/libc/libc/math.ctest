@@ -25,7 +25,6 @@
 
 #include <system-test/ctest.h>
 
-#include <bits/fenv-inline.h>
 #include <assert.h>
 #include <fenv.h>
 #include <stdio.h>

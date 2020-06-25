@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1dee8fac */
+/* HASH CRC-32:0xb57540ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,7 +88,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(in
 #endif /* !... */
 #endif /* !__local___localdep_ungetc_unlocked_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG' */

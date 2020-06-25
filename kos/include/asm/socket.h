@@ -83,14 +83,19 @@
 #if defined(__KOS__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #define SO_NOSIGPIPE 1024 /* int always_imply_MSG_NOSIGNAL = 0 or 1; */
 #define SO_DONTWAIT  1025 /* int always_imply_MSG_DONTWAIT = 0 or 1; */
-#endif /* __KOS__ || __CRT_KOS || __CRT_KOS_KERNEL */
+#endif                    /* __KOS__ || __CRT_KOS || __CRT_KOS_KERNEL */
 
 
-#define SO_GET_FILTER                    SO_ATTACH_FILTER
-#define SCM_TIMESTAMP                    SO_TIMESTAMP
-#define SCM_TIMESTAMPNS                  SO_TIMESTAMPNS
-#define SCM_TIMESTAMPING                 SO_TIMESTAMPING
-#define SCM_WIFI_STATUS                  SO_WIFI_STATUS
-#define SO_DETACH_BPF                    SO_DETACH_FILTER
+#define SO_GET_FILTER    SO_ATTACH_FILTER
+#define SCM_TIMESTAMP    SO_TIMESTAMP
+#define SCM_TIMESTAMPNS  SO_TIMESTAMPNS
+#define SCM_TIMESTAMPING SO_TIMESTAMPING
+#define SCM_WIFI_STATUS  SO_WIFI_STATUS
+#define SO_DETACH_BPF    SO_DETACH_FILTER
+
+
+#define __SHUT_RD   0 /* No more receptions. */
+#define __SHUT_WR   1 /* No more transmissions. */
+#define __SHUT_RDWR 2 /* No more receptions or transmissions. */
 
 #endif /* !_ASM_SOCKET_H */

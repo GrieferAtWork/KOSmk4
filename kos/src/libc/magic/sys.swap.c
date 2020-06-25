@@ -23,15 +23,24 @@
 
 %{
 #include <features.h>
+#include <asm/swap.h>
 
 __SYSDECL_BEGIN
 
 /* The swap priority is encoded as:
  *  - (prio << SWAP_FLAG_PRIO_SHIFT) & SWAP_FLAG_PRIO_MASK */
-#define SWAP_FLAG_PREFER     0x08000 /* Set if swap priority is specified. */
-#define SWAP_FLAG_PRIO_MASK  0x07fff
-#define SWAP_FLAG_PRIO_SHIFT       0
-#define SWAP_FLAG_DISCARD    0x10000 /* Discard swap cluster after use. */
+#ifdef __SWAP_FLAG_PREFER
+#define SWAP_FLAG_PREFER __SWAP_FLAG_PREFER /* Set if swap priority is specified. */
+#endif /* __SWAP_FLAG_PREFER */
+#ifdef __SWAP_FLAG_PRIO_MASK
+#define SWAP_FLAG_PRIO_MASK __SWAP_FLAG_PRIO_MASK
+#endif /* __SWAP_FLAG_PRIO_MASK */
+#ifdef __SWAP_FLAG_PRIO_SHIFT
+#define SWAP_FLAG_PRIO_SHIFT __SWAP_FLAG_PRIO_SHIFT
+#endif /* __SWAP_FLAG_PRIO_SHIFT */
+#ifdef __SWAP_FLAG_DISCARD
+#define SWAP_FLAG_DISCARD __SWAP_FLAG_DISCARD /* Discard swap cluster after use. */
+#endif /* __SWAP_FLAG_DISCARD */
 
 #ifdef __CC__
 

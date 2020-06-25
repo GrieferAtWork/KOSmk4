@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c9de83f */
+/* HASH CRC-32:0x570e3f4d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 
 STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 #ifndef __KERNEL__
-#include <asm/threads.h>
+#include <asm/crt/threads.h>
 #include <parts/errno.h>
 /* Create a new thread executing the function FUNC.  Arguments for FUNC
  * are passed through ARG. If successful, THR is set to new thread identifier */
@@ -59,7 +59,7 @@ INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_NORETURN void
 (LIBCCALL libc_thrd_exit)(int res) THROWS(...) {
 	libc_pthread_exit((void *)(uintptr_t)(unsigned int)res);
 }
-#include <asm/threads.h>
+#include <asm/crt/threads.h>
 /* Detach the thread identified by THR from the current
  * environment (it does not allow join or wait for it)
  * s.a. `pthread_detach()' */
@@ -71,7 +71,7 @@ NOTHROW_NCX(LIBCCALL libc_thrd_detach)(thrd_t thr) {
 		return thrd_success;
 	return thrd_error;
 }
-#include <asm/threads.h>
+#include <asm/crt/threads.h>
 /* Block current thread until execution of THR is complete.
  * In case that RES is not NULL, will store the return value of THR when exiting
  * s.a. `pthread_join()' */
@@ -94,9 +94,9 @@ NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr,
 #endif /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
 	return thrd_error;
 }
-#include <asm/threads.h>
-#include <bits/pthreadvalues.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadvalues.h>
+#include <bits/crt/pthreadtypes.h>
 /* Creates a new mutex object with type TYPE.
  * If successful the new object is pointed by MUTEX
  * s.a. `pthread_mutex_init()' */
@@ -122,8 +122,8 @@ NOTHROW_NCX(LIBCCALL libc_mtx_init)(mtx_t *__restrict mutex,
 		return thrd_success;
 	return thrd_error;
 }
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 /* Block the current thread until the mutex pointed to by MUTEX is
  * unlocked.  In that case current thread will not be blocked
  * s.a. `pthread_mutex_lock()' */
@@ -135,8 +135,8 @@ NOTHROW_RPC(LIBCCALL libc_mtx_lock)(mtx_t *__restrict mutex) {
 		return thrd_success;
 	return thrd_error;
 }
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 /* Block the current thread until the mutex pointed by MUTEX
  * is unlocked or time pointed by TIME_POINT is reached.
  * In case the mutex is unlock, the current thread will not be blocked
@@ -153,8 +153,8 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock)(mtx_t *__restrict mutex,
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_mtx_timedlock64, libc_mtx_timedlock);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 /* Block the current thread until the mutex pointed by MUTEX
  * is unlocked or time pointed by TIME_POINT is reached.
  * In case the mutex is unlock, the current thread will not be blocked
@@ -169,8 +169,8 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock64)(mtx_t *__restrict mutex,
 	return thrd_error;
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 /* Try to lock the mutex pointed by MUTEX without blocking.
  * If the mutex is free the current threads takes control of
  * it, otherwise it returns immediately
@@ -183,8 +183,8 @@ NOTHROW_NCX(LIBCCALL libc_mtx_trylock)(mtx_t *__restrict mutex) {
 		return thrd_success;
 	return thrd_error;
 }
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 /* Unlock the mutex pointed by MUTEX.
  * It may potentially awake other threads waiting on this mutex
  * s.a. `pthread_mutex_unlock()' */
@@ -196,8 +196,8 @@ NOTHROW_NCX(LIBCCALL libc_mtx_unlock)(mtx_t *__restrict mutex) {
 		return thrd_success;
 	return thrd_error;
 }
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 /* Initialize new condition variable pointed by COND
  * s.a. `pthread_cond_init()' */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
@@ -208,8 +208,8 @@ NOTHROW_NCX(LIBCCALL libc_cnd_init)(cnd_t *__restrict cond) {
 		return thrd_success;
 	return thrd_error;
 }
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 /* Unblock one thread that currently waits on condition variable pointed by COND
  * s.a. `pthread_cond_signal()' */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
@@ -220,8 +220,8 @@ NOTHROW_NCX(LIBCCALL libc_cnd_signal)(cnd_t *__restrict cond) {
 		return thrd_success;
 	return thrd_error;
 }
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 /* Unblock all threads currently waiting on condition variable pointed by COND
  * s.a. `pthread_cond_broadcast()' */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
@@ -232,8 +232,8 @@ NOTHROW_NCX(LIBCCALL libc_cnd_broadcast)(cnd_t *__restrict cond) {
 		return thrd_success;
 	return thrd_error;
 }
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 /* Block current thread on the condition variable pointed by COND
  * s.a. `pthread_cond_wait()' */
 INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2)) int
@@ -246,8 +246,8 @@ NOTHROW_RPC(LIBCCALL libc_cnd_wait)(cnd_t *__restrict cond,
 		return thrd_success;
 	return thrd_error;
 }
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 /* Block current thread on the condition variable until condition variable
  * pointed by COND is signaled or time pointed by TIME_POINT is reached
  * s.a. `pthread_cond_timedwait()' */
@@ -268,8 +268,8 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait)(cnd_t *__restrict cond,
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_cnd_timedwait64, libc_cnd_timedwait);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 /* Block current thread on the condition variable until condition variable
  * pointed by COND is signaled or time pointed by TIME_POINT is reached
  * s.a. `pthread_cond_timedwait()' */
@@ -288,8 +288,8 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait64)(cnd_t *__restrict cond,
 	return thrd_error;
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 /* Create new thread-specific storage key and stores it in the object pointed by TSS_ID.
  * If DESTRUCTOR is not NULL, the function will be called when the thread terminates
  * s.a. `pthread_key_create()' */
@@ -302,8 +302,8 @@ NOTHROW_NCX(LIBCCALL libc_tss_create)(tss_t *tss_id,
 		return thrd_success;
 	return thrd_error;
 }
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 /* Sets the value of the thread-specific storage
  * identified by TSS_ID for the current thread to VAL
  * s.a. `pthread_setspecific()' */

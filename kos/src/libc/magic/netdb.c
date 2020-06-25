@@ -30,7 +30,7 @@
 
 %{
 #include <features.h>
-#include <bits/netdb.h>
+#include <bits/crt/db/netdb.h>
 #include <bits/types.h>
 #include <netinet/in.h>
 #include <stdint.h>

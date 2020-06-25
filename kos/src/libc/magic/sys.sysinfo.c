@@ -24,13 +24,14 @@
 %{
 #include <features.h>
 #include <linux/kernel.h>
+#include <bits/types.h>
 
 __SYSDECL_BEGIN
 
 #ifdef __CC__
 }
 
-[[cp]]
+[[cp, decl_include("<linux/sysinfo.h>")]]
 int sysinfo([[nonnull]] struct sysinfo *info);
 
 [[cp, wunused]]
@@ -40,10 +41,10 @@ int get_nprocs_conf();
 int get_nprocs();
 
 [[cp, wunused]]
-__INTPTR_TYPE__ get_phys_pages();
+$intptr_t get_phys_pages();
 
 [[cp, wunused]]
-__INTPTR_TYPE__ get_avphys_pages();
+$intptr_t get_avphys_pages();
 
 
 %{

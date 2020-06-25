@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc066ca6 */
+/* HASH CRC-32:0xf3e988af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_cnd_signal_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_cond_signal
-#include <bits/threads.h>
+#include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_cond_signal from pthread */
 #ifndef __local___localdep_pthread_cond_signal_defined
@@ -31,8 +31,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_cond_signal,(__pthread_cond_t *__cond),pthread_cond_signal,(__cond))
 #endif /* !__local___localdep_pthread_cond_signal_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Unblock one thread that currently waits on condition variable pointed by COND
  * s.a. `pthread_cond_signal()' */

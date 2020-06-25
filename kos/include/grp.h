@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66354ea5 */
+/* HASH CRC-32:0x6f176304 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,7 @@
 
 #include <features.h>
 #include <bits/types.h>
+#include <bits/crt/db/group.h>
 
 
 /* Documentation taken from Glibc /usr/include/grp.h */
@@ -69,16 +70,6 @@ typedef __size_t size_t;
 typedef __gid_t gid_t;
 #endif /* !__gid_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
-
-#ifndef __group_defined
-#define __group_defined 1
-struct group {
-	char   *gr_name;   /* Group name. */
-	char   *gr_passwd; /* Password. */
-	__gid_t gr_gid;    /* Group ID. */
-	char  **gr_mem;    /* Member list. */
-};
-#endif /* !__group_defined */
 
 #ifndef __std_FILE_defined
 #define __std_FILE_defined 1

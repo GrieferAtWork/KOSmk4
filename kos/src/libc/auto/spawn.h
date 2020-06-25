@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a323889 */
+/* HASH CRC-32:0xc03cad35 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setsigmask)
 /* Get flag word from the attribute structure */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getflags)(posix_spawnattr_t const *__restrict attr, int16_t *__restrict flags);
 /* Store flags in the attribute structure */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setflags)(posix_spawnattr_t *__restrict attr, short int flags);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setflags)(posix_spawnattr_t *__restrict attr, int16_t flags);
 /* Get process group ID from the attribute structure */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getpgroup)(posix_spawnattr_t const *__restrict attr, pid_t *__restrict pgroup);
 /* Store rocess group ID in the attribute structure */

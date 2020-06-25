@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78546ee4 */
+/* HASH CRC-32:0xc76abdaa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc,(
 #endif /* !__local___localdep_ungetwc_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/errno.h>
-#include <asm/stdio.h>
+#include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetws) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __WCHAR_TYPE__ *
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetws))(__WCHAR_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream) __THROWS(...) {

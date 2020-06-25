@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29954567 */
+/* HASH CRC-32:0x31eb8bb4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,8 +29,14 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#include <bits/crt/db/utmp.h>
+#include <bits/types.h>
+#include <paths.h>
+
+#ifdef __USE_GLIBC
+#include <sys/time.h>
 #include <sys/types.h>
-#include <bits/utmp.h>
+#endif /* __USE_GLIBC */
 
 /* Documentation taken from Glibc /usr/include/utmp.h */
 /* Copyright (C) 1993-2016 Free Software Foundation, Inc.
@@ -53,10 +59,10 @@
 __SYSDECL_BEGIN
 
 /* Compatibility names for the strings of the canonical file names. */
-#define UTMP_FILE      _PATH_UTMP
-#define UTMP_FILENAME  _PATH_UTMP
-#define WTMP_FILE      _PATH_WTMP
-#define WTMP_FILENAME  _PATH_WTMP
+#define UTMP_FILE     _PATH_UTMP
+#define UTMP_FILENAME _PATH_UTMP
+#define WTMP_FILE     _PATH_WTMP
+#define WTMP_FILENAME _PATH_WTMP
 
 #ifdef __CC__
 /* Make FD be the controlling terminal, stdin, stdout, and stderr;

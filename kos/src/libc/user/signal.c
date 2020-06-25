@@ -23,6 +23,8 @@
 #include "../api.h"
 /**/
 
+#include <hybrid/atomic.h>
+
 #include <bits/signum-values-dos.h>
 #include <bits/signum-values-kos.h>
 #include <kos/exec/idata.h>
@@ -32,6 +34,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "../libc/pthread.h"
 #include "signal.h"
 #include "string.h"
 
@@ -653,6 +656,68 @@ err:
 }
 /*[[[end:libc_sigset]]]*/
 
+/*[[[head:libc_pthread_sigmask,hash:CRC-32=0xc2fbcd33]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.signal") int
+NOTHROW_NCX(LIBCCALL libc_pthread_sigmask)(__STDC_INT_AS_UINT_T how,
+                                           sigset_t const *newmask,
+                                           sigset_t *oldmask)
+/*[[[body:libc_pthread_sigmask]]]*/
+{
+	errno_t result;
+#ifdef __NR_sigprocmask
+	result = sys_sigprocmask((syscall_ulong_t)(unsigned int)how,
+	                         newmask, oldmask);
+#else /* __NR_sigprocmask */
+	result = sys_rt_sigprocmask((syscall_ulong_t)(unsigned int)how,
+	                            newmask, oldmask, sizeof(sigset_t));
+#endif /* !__NR_sigprocmask */
+	return -result;
+}
+/*[[[end:libc_pthread_sigmask]]]*/
+
+/*[[[head:libc_pthread_kill,hash:CRC-32=0x7438a00e]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.signal") int
+NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t threadid,
+                                        signo_t signo)
+/*[[[body:libc_pthread_kill]]]*/
+{
+	struct pthread *pt = (struct pthread *)threadid;
+	pid_t tid;
+	errno_t result;
+	tid = ATOMIC_READ(pt->pt_tid);
+	if unlikely(tid == 0)
+		return ESRCH;
+	/* No way to handle the case where `pt_tid' got set
+	 * to zero, and `tid' got re-used. - Sorry... */
+	result = sys_kill(tid, signo);
+	return -result;
+}
+/*[[[end:libc_pthread_kill]]]*/
+
+/*[[[head:libc_pthread_sigqueue,hash:CRC-32=0xef2ef369]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.signal") int
+NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t threadid,
+                                            signo_t signo,
+                                            union sigval const value)
+/*[[[body:libc_pthread_sigqueue]]]*/
+{
+	struct pthread *pt = (struct pthread *)threadid;
+	siginfo_t info;
+	errno_t result;
+	pid_t tid;
+	memset(&info, 0, sizeof(siginfo_t));
+	info.si_value = value;
+	info.si_code  = SI_QUEUE;
+	tid = ATOMIC_READ(pt->pt_tid);
+	if unlikely(tid == 0)
+		return ESRCH;
+	/* No way to handle the case where `pt_tid' got set
+	 * to zero, and `tid' got re-used. - Sorry... */
+	result = sys_rt_sigqueueinfo(tid, signo, &info);
+	return -result;
+}
+/*[[[end:libc_pthread_sigqueue]]]*/
+
 
 /*[[[impl:libc_signal]]]*/
 /*[[[impl:libc_ssignal]]]*/
@@ -669,7 +734,7 @@ DEFINE_INTERN_ALIAS(libd_gsignal, libd_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4ed700a6]]]*/
+/*[[[start:exports,hash:CRC-32=0x17d0cb01]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
@@ -716,6 +781,9 @@ DEFINE_PUBLIC_ALIAS(sighold, libc_sighold);
 DEFINE_PUBLIC_ALIAS(sigrelse, libc_sigrelse);
 DEFINE_PUBLIC_ALIAS(sigignore, libc_sigignore);
 DEFINE_PUBLIC_ALIAS(sigset, libc_sigset);
+DEFINE_PUBLIC_ALIAS(pthread_sigmask, libc_pthread_sigmask);
+DEFINE_PUBLIC_ALIAS(pthread_kill, libc_pthread_kill);
+DEFINE_PUBLIC_ALIAS(pthread_sigqueue, libc_pthread_sigqueue);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -44,13 +44,13 @@ NOTHROW(LIBCCALL libc_isastream)(fd_t fildes)
 }
 /*[[[end:libc_isastream]]]*/
 
-/*[[[head:libc_getmsg,hash:CRC-32=0xc1af7690]]]*/
+/*[[[head:libc_getmsg,hash:CRC-32=0xe7ca45fa]]]*/
 /* Receive next message from a STREAMS file */
 INTERN ATTR_SECTION(".text.crt.io.stropts") int
 NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fildes,
                                   struct strbuf *__restrict ctlptr,
                                   struct strbuf *__restrict dataptr,
-                                  int *__restrict flagsp)
+                                  __STDC_INT_AS_UINT_T *__restrict flagsp)
 /*[[[body:libc_getmsg]]]*/
 /*AUTO*/{
 	(void)fildes;
@@ -63,14 +63,14 @@ NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fildes,
 }
 /*[[[end:libc_getmsg]]]*/
 
-/*[[[head:libc_getpmsg,hash:CRC-32=0x62b6f1a7]]]*/
+/*[[[head:libc_getpmsg,hash:CRC-32=0x5fc8bd76]]]*/
 /* Receive next message from a STREAMS file, with *FLAGSP allowing to control which message. */
 INTERN ATTR_SECTION(".text.crt.io.stropts") int
 NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fildes,
                                    struct strbuf *__restrict ctlptr,
                                    struct strbuf *__restrict dataptr,
                                    int *__restrict bandp,
-                                   int *__restrict flagsp)
+                                   __STDC_INT_AS_UINT_T *__restrict flagsp)
 /*[[[body:libc_getpmsg]]]*/
 /*AUTO*/{
 	(void)fildes;
@@ -84,13 +84,13 @@ NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fildes,
 }
 /*[[[end:libc_getpmsg]]]*/
 
-/*[[[head:libc_putmsg,hash:CRC-32=0x561a26e3]]]*/
+/*[[[head:libc_putmsg,hash:CRC-32=0xae8e6f50]]]*/
 /* Send a message on a STREAM */
 INTERN ATTR_SECTION(".text.crt.io.stropts") int
 NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fildes,
                                   struct strbuf const *ctlptr,
                                   struct strbuf const *dataptr,
-                                  int flags)
+                                  __STDC_INT_AS_UINT_T flags)
 /*[[[body:libc_putmsg]]]*/
 /*AUTO*/{
 	(void)fildes;
@@ -103,14 +103,14 @@ NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fildes,
 }
 /*[[[end:libc_putmsg]]]*/
 
-/*[[[head:libc_putpmsg,hash:CRC-32=0x8d496aef]]]*/
+/*[[[head:libc_putpmsg,hash:CRC-32=0x5a834cff]]]*/
 /* Send a message on a STREAM to the BAND */
 INTERN ATTR_SECTION(".text.crt.io.stropts") int
 NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fildes,
                                    struct strbuf const *ctlptr,
                                    struct strbuf const *dataptr,
-                                   int band,
-                                   int flags)
+                                   __STDC_INT_AS_UINT_T band,
+                                   __STDC_INT_AS_UINT_T flags)
 /*[[[body:libc_putpmsg]]]*/
 /*AUTO*/{
 	(void)fildes;

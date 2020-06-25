@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88cc37ae */
+/* HASH CRC-32:0xf4055cb1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,10 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sched_getaffinity from sched */
 #ifndef __local___localdep_sched_getaffinity_defined
 #define __local___localdep_sched_getaffinity_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+#include <bits/sched.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, __cpu_set_t *__cpuset),sched_getaffinity,(__pid,__cpusetsize,__cpuset))
 #endif /* !__local___localdep_sched_getaffinity_defined */
 __NAMESPACE_LOCAL_END

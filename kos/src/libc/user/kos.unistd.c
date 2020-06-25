@@ -367,9 +367,9 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 }
 /*[[[end:libc_Execlpe]]]*/
 
-/*[[[head:libc_FPathConf,hash:CRC-32=0xa719e6c2]]]*/
+/*[[[head:libc_FPathConf,hash:CRC-32=0x9c937efa]]]*/
 /* >> fpathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `FD'
  * return: * : The configuration limit associated with `NAME' for `FD'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
@@ -387,9 +387,9 @@ INTERN ATTR_SECTION(".text.crt.except.fs.property") WUNUSED long int
 }
 /*[[[end:libc_FPathConf]]]*/
 
-/*[[[head:libc_PathConf,hash:CRC-32=0x3dead8f3]]]*/
+/*[[[head:libc_PathConf,hash:CRC-32=0x67e161b3]]]*/
 /* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/confname.h>
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH'
  * return: * : The configuration limit associated with `NAME' for `PATH'
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'

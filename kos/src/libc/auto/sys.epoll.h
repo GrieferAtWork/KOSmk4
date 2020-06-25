@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6487be1a */
+/* HASH CRC-32:0x6e88b5e0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ INTDEF WUNUSED fd_t NOTHROW_NCX(LIBDCALL libd_epoll_create1)(__STDC_INT_AS_UINT_
  * constants defined above. The "fd" parameter is the target of the
  * operation. The "event" parameter describes which events the caller
  * is interested in and any associated user data */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_epoll_ctl)(fd_t epfd, enum __epoll_ctl op, fd_t fd, struct epoll_event *event);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_epoll_ctl)(fd_t epfd, __epoll_ctl_t op, fd_t fd, struct epoll_event *event);
 /* Wait for events on an epoll instance "epfd". Returns the number of
  * triggered events returned in "events" buffer. Or -1 in case of
  * error with the "errno" variable set to the specific error code. The

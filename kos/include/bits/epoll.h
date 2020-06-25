@@ -21,6 +21,8 @@
 #define _BITS_EPOLL_H 1
 
 #include <__stdinc.h>
+#include <asm/epoll.h>
+#include <bits/types.h>
 
 __DECL_BEGIN
 
@@ -29,19 +31,67 @@ __DECL_BEGIN
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	EPOLL_CLOEXEC = 0x80000
+#ifdef __EPOLL_CLOEXEC
+	EPOLL_CLOEXEC = __EPOLL_CLOEXEC
+#endif /* __EPOLL_CLOEXEC */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __EPOLL_CLOEXEC
 #define EPOLL_CLOEXEC EPOLL_CLOEXEC
+#endif /* __EPOLL_CLOEXEC */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define EPOLL_CLOEXEC 0x80000
+#ifdef __EPOLL_CLOEXEC
+#define EPOLL_CLOEXEC __EPOLL_CLOEXEC
+#endif /* __EPOLL_CLOEXEC */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
-__DECL_END
 
-#define __EPOLL_PACKED  __ATTR_PACKED
+#ifdef __CC__
+#ifndef __EPOLL_PACKED
+#define __EPOLL_PACKED __ATTR_PACKED
+#endif /* !__EPOLL_PACKED */
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("ptr")
+#pragma push_macro("fd")
+#pragma push_macro("u32")
+#pragma push_macro("u64")
+#pragma push_macro("events")
+#pragma push_macro("data")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef ptr
+#undef fd
+#undef u32
+#undef u64
+#undef events
+#undef data
+
+typedef union epoll_data {
+	void      *ptr;
+	int        fd;
+	__uint32_t u32;
+	__uint64_t u64;
+} epoll_data_t;
+
+struct __EPOLL_PACKED epoll_event {
+	__uint32_t   events; /* Epoll events (Set of `EPOLL*'; s.a. `EPOLL_EVENTS') */
+	epoll_data_t data;   /* User data variable */
+};
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("data")
+#pragma pop_macro("events")
+#pragma pop_macro("u64")
+#pragma pop_macro("u32")
+#pragma pop_macro("fd")
+#pragma pop_macro("ptr")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+#endif /* __CC__ */
+
+__DECL_END
 
 #endif /* !_BITS_EPOLL_H */

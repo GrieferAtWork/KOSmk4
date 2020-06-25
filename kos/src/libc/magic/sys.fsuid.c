@@ -56,9 +56,11 @@ __SYSDECL_BEGIN
 
 @@Change uid used for file access control to UID, without affecting
 @@other privileges (such as who can send signals at the process)
+[[decl_include("<bits/types.h>")]]
 int setfsuid($uid_t uid);
 
-@@Ditto for group id
+@@Same as `setfsuid()', but for group id
+[[decl_include("<bits/types.h>")]]
 int setfsgid($gid_t gid);
 
 %{

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c547176 */
+/* HASH CRC-32:0x5ea4f7cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,21 +58,6 @@ DFUN(".text.crt.dos.net.inet", libd_inet_nsap_addr, libc_inet_nsap_addr, TD, 3, 
 DFUN(".text.crt.dos.net.inet", libd_inet_nsap_ntoa, libc_inet_nsap_ntoa, TP, 3, TD, TP, TP)
 DFUN(".text.crt.dos.net.inet", libd_inet_pton, libc_inet_pton, TD, 3, TD, TP, TP)
 DFUN(".text.crt.dos.net.inet", libd_inet_ntop, libc_inet_ntop, TP, 4, TD, TP, TP, TIn(__SIZEOF_SOCKLEN_T__))
-
-/* bits.resource */
-DFUN(".text.crt.dos.sched.resource", libd_prlimit, libc_prlimit, TD, 4, TIn(__SIZEOF_PID_T__), TD, TP, TP)
-DFUN(".text.crt.dos.sched.resource", libd_prlimit64, libc_prlimit64, TD, 4, TIn(__SIZEOF_PID_T__), TD, TP, TP)
-
-/* bits.sched */
-DFUN(".text.crt.dos.sched.access", libd_clone, libc_clone, TIn(__SIZEOF_PID_T__), 7, TP, TP, TD, TP, TIn(__SIZEOF_PID_T__), TP, TIn(__SIZEOF_PID_T__))
-DFUN(".text.crt.dos.sched.utility", libd_unshare, libc_unshare, TD, 1, TD)
-DFUN(".text.crt.dos.sched.utility", libd_setns, libc_setns, TD, 2, TIn(__SIZEOF_FD_T__), TD)
-DFUN(".text.crt.dos.sched.access", libd_exit_thread, libc_exit_thread, TV, 1, TD)
-
-/* bits.sigthread */
-DFUN(".text.crt.dos.sched.pthread", libd_pthread_sigmask, libc_pthread_sigmask, TD, 3, TD, TP, TP)
-DFUN(".text.crt.dos.sched.pthread", libd_pthread_kill, libc_pthread_kill, TD, 2, TIn(__SIZEOF_PTHREAD_T), TIn(__SIZEOF_SIGNO_T__))
-DFUN(".text.crt.dos.sched.pthread", libd_pthread_sigqueue, libc_pthread_sigqueue, TD, 3, TIn(__SIZEOF_PTHREAD_T), TIn(__SIZEOF_SIGNO_T__), TS(__SIZEOF_SIGVAL CONST))
 
 /* crypt */
 DFUN(".text.crt.dos.string.encrypt", libd_setkey, libc_setkey, TV, 1, TP)
@@ -1050,6 +1035,10 @@ DFUN(".text.crt.dos.net.rpc", libd_getrpcbynumber_r, libc_getrpcbynumber_r, TD, 
 DFUN(".text.crt.dos.net.rpc", libd_getrpcent_r, libc_getrpcent_r, TD, 4, TP, TP, TI, TP)
 
 /* sched */
+DFUN(".text.crt.dos.sched.access", libd_clone, libc_clone, TIn(__SIZEOF_PID_T__), 7, TP, TP, TD, TP, TIn(__SIZEOF_PID_T__), TP, TIn(__SIZEOF_PID_T__))
+DFUN(".text.crt.dos.sched.utility", libd_unshare, libc_unshare, TD, 1, TD)
+DFUN(".text.crt.dos.sched.utility", libd_setns, libc_setns, TD, 2, TIn(__SIZEOF_FD_T__), TD)
+DFUN(".text.crt.dos.sched.access", libd_exit_thread, libc_exit_thread, TV, 1, TD)
 DFUN(".text.crt.dos.sched.param", libd_sched_setparam, libc_sched_setparam, TD, 2, TIn(__SIZEOF_PID_T__), TP)
 DFUN(".text.crt.dos.sched.param", libd_sched_getparam, libc_sched_getparam, TD, 2, TIn(__SIZEOF_PID_T__), TP)
 DFUN(".text.crt.dos.sched.param", libd_sched_setscheduler, libc_sched_setscheduler, TD, 3, TIn(__SIZEOF_PID_T__), TD, TP)
@@ -1139,6 +1128,9 @@ DFUN(".text.crt.dos.sched.signal", libd_sighold, libc_sighold, TD, 1, TIn(__SIZE
 DFUN(".text.crt.dos.sched.signal", libd_sigrelse, libc_sigrelse, TD, 1, TIn(__SIZEOF_SIGNO_T__))
 DFUN(".text.crt.dos.sched.signal", libd_sigignore, libc_sigignore, TD, 1, TIn(__SIZEOF_SIGNO_T__))
 DFUN(".text.crt.dos.sched.signal", libd_sigset, libc_sigset, TP, 2, TIn(__SIZEOF_SIGNO_T__), TP)
+DFUN(".text.crt.dos.sched.signal", libd_pthread_sigmask, libc_pthread_sigmask, TD, 3, TD, TP, TP)
+DFUN(".text.crt.dos.sched.signal", libd_pthread_kill, libc_pthread_kill, TD, 2, TIn(__SIZEOF_PTHREAD_T), TIn(__SIZEOF_SIGNO_T__))
+DFUN(".text.crt.dos.sched.signal", libd_pthread_sigqueue, libc_pthread_sigqueue, TD, 3, TIn(__SIZEOF_PTHREAD_T), TIn(__SIZEOF_SIGNO_T__), TS(__SIZEOF_SIGVAL CONST))
 
 /* spawn */
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn, libc_posix_spawn, TD, 6, TP, TP, TP, TP, TP, TP)
@@ -1150,7 +1142,7 @@ DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setsigdefault, li
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getsigmask, libc_posix_spawnattr_getsigmask, TD, 2, TP, TP)
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setsigmask, libc_posix_spawnattr_setsigmask, TD, 2, TP, TP)
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getflags, libc_posix_spawnattr_getflags, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setflags, libc_posix_spawnattr_setflags, TD, 2, TP, TH)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setflags, libc_posix_spawnattr_setflags, TD, 2, TP, TI16)
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getpgroup, libc_posix_spawnattr_getpgroup, TD, 2, TP, TP)
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setpgroup, libc_posix_spawnattr_setpgroup, TD, 2, TP, TIn(__SIZEOF_PID_T__))
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getschedpolicy, libc_posix_spawnattr_getschedpolicy, TD, 2, TP, TP)
@@ -1917,6 +1909,9 @@ DFUN(".text.crt.dos.io.poll", libd_poll, libc_poll, TD, 3, TP, TP, TD)
 DFUN(".text.crt.dos.io.poll", libd_ppoll, libc_ppoll, TD, 4, TP, TP, TP, TP)
 DFUN(".text.crt.dos.io.poll", libd_ppoll64, libc_ppoll64, TD, 4, TP, TP, TP, TP)
 
+/* sys.ptrace */
+DFUN(".text.crt.dos.system.ptrace", libd_ptrace, libc_ptrace, TP, 4, TD, TIn(__SIZEOF_PID_T__), TP, TP)
+
 /* sys.random */
 DFUN(".text.crt.dos.system.random", libd_getrandom, libc_getrandom, TI, 3, TP, TI, TD)
 DFUN(".text.crt.dos.system.random", libd_getentropy, libc_getentropy, TD, 2, TP, TI)
@@ -1925,9 +1920,12 @@ DFUN(".text.crt.dos.system.random", libd_getentropy, libc_getentropy, TD, 2, TP,
 DFUN(".text.crt.dos.system.reboot", libd_reboot, libc_reboot, TD, 1, TD)
 
 /* sys.resource */
+DFUN(".text.crt.dos.sched.resource", libd_prlimit, libc_prlimit, TD, 4, TIn(__SIZEOF_PID_T__), TD, TP, TP)
+DFUN(".text.crt.dos.sched.resource", libd_prlimit64, libc_prlimit64, TD, 4, TIn(__SIZEOF_PID_T__), TD, TP, TP)
 DFUN(".text.crt.dos.sched.resource", libd_getrlimit, libc_getrlimit, TD, 2, TD, TP)
 DFUN(".text.crt.dos.sched.resource", libd_setrlimit, libc_setrlimit, TD, 2, TD, TP)
 DFUN(".text.crt.dos.sched.resource", libd_getrusage, libc_getrusage, TD, 2, TD, TP)
+DFUN(".text.crt.dos.sched.resource", libd_getrusage64, libc_getrusage64, TD, 2, TD, TP)
 DFUN(".text.crt.dos.sched.resource", libd_getpriority, libc_getpriority, TD, 2, TD, TIn(__SIZEOF_ID_T__))
 DFUN(".text.crt.dos.sched.resource", libd_setpriority, libc_setpriority, TD, 3, TD, TIn(__SIZEOF_ID_T__), TD)
 DFUN(".text.crt.dos.sched.resource", libd_getrlimit64, libc_getrlimit64, TD, 2, TD, TP)
@@ -2201,6 +2199,8 @@ DFUN(".text.crt.dos.time", libd_strftime_l, libc_strftime_l, TI, 5, TP, TI, TP, 
 DFUN(".text.crt.dos.time", libd_strptime, libc_strptime, TP, 3, TP, TP, TP)
 DFUN(".text.crt.dos.time", libd_strptime_l, libc_strptime_l, TP, 4, TP, TP, TP, TP)
 DFUN(".text.crt.dos.time", libd_getdate_r, libc_getdate_r, TD, 2, TP, TP)
+DFUN(".text.crt.dos.time", libd_clock_adjtime, libc_clock_adjtime, TD, 2, TIn(__SIZEOF_CLOCKID_T__), TP)
+DFUN(".text.crt.dos.time", libd_clock_adjtime64, libc_clock_adjtime64, TD, 2, TIn(__SIZEOF_CLOCKID_T__), TP)
 DFUN(".text.crt.dos.time", libd_gmtime_r, libc_gmtime_r, TP, 2, TP, TP)
 DFUN(".text.crt.dos.time", libd_localtime_r, libc_localtime_r, TP, 2, TP, TP)
 DFUN(".text.crt.dos.time", libd_ctime_r, libc_ctime_r, TP, 2, TP, TP)

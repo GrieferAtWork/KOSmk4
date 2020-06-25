@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda64dd69 */
+/* HASH CRC-32:0xb7b2b925 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <bits/netdb.h>
+#include <bits/crt/db/netdb.h>
 #include <bits/types.h>
 #include <netinet/in.h>
 #include <stdint.h>

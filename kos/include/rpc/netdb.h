@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32db5490 */
+/* HASH CRC-32:0xe78bed89 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <bits/types.h>
+#include <bits/crt/db/rpcent.h>
 
 __SYSDECL_BEGIN
 
@@ -56,14 +57,6 @@ __SYSDECL_BEGIN
 #define __size_t_defined 1
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
-
-struct rpcent {
-	/* XXX: It's unclear if r_name can be NULL! */
-	char                   *r_name;    /* Name of server for this rpc program. */
-	/* XXX: It's unclear if r_aliases can be NULL! (or is {NULL} when empty) */
-	char                  **r_aliases; /* [0..1][0..n] Alias list. (terminated by a NULL-entry) */
-	__STDC_INT32_AS_SSIZE_T r_number;  /* RPC program number. */
-};
 
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC_KOS,setrpcent,(int __stayopen),(__stayopen))
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,endrpcent,(void),())

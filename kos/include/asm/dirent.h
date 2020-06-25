@@ -22,17 +22,17 @@
 
 #include <__stdinc.h>
 
-#define __DT_UNKNOWN 0
-#define __DT_FIFO    1
-#define __DT_CHR     2
-#define __DT_DIR     4
-#define __DT_BLK     6
-#define __DT_REG     8
-#define __DT_LNK     10
-#define __DT_SOCK    12
-#define __DT_WHT     14
+#define __DT_UNKNOWN 0  /* ... */
+#define __DT_FIFO    1  /* ... */
+#define __DT_CHR     2  /* ... */
+#define __DT_DIR     4  /* ... */
+#define __DT_BLK     6  /* ... */
+#define __DT_REG     8  /* ... */
+#define __DT_LNK     10 /* ... */
+#define __DT_SOCK    12 /* ... */
+#define __DT_WHT     14 /* ... */
 
-#define __IFTODT(mode)    (((mode) & 0170000) >> 12)
+#define __IFTODT(mode)    (((mode)&0170000) >> 12)
 #define __DTTOIF(dirtype) ((dirtype) << 12)
 
 #endif /* !_ASM_DIRENT_H */

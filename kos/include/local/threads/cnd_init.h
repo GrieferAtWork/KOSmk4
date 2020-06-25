@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7692443 */
+/* HASH CRC-32:0x815dd339 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_cnd_init_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_cond_init
-#include <bits/threads.h>
+#include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_cond_init from pthread */
 #ifndef __local___localdep_pthread_cond_init_defined
@@ -32,8 +32,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_cond_init,(__pthread_cond_t *__restrict __cond, __pthread_condattr_t const *__restrict __cond_attr),pthread_cond_init,(__cond,__cond_attr))
 #endif /* !__local___localdep_pthread_cond_init_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/threads.h>
-#include <bits/pthreadtypes.h>
+#include <asm/crt/threads.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Initialize new condition variable pointed by COND
  * s.a. `pthread_cond_init()' */

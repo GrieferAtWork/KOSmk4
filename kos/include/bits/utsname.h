@@ -21,13 +21,86 @@
 #define _BITS_UTSNAME_H 1
 
 #include <__stdinc.h>
+#include <features.h>
+#include <asm/utsname.h>
 
-#ifndef _UTSNAME_LENGTH
-#define _UTSNAME_LENGTH        65
-#endif /* !_UTSNAME_LENGTH */
+#ifndef _UTSNAME_SYSNAME_LENGTH
+#define _UTSNAME_SYSNAME_LENGTH _UTSNAME_LENGTH
+#endif /* !_UTSNAME_SYSNAME_LENGTH */
+#ifndef _UTSNAME_NODENAME_LENGTH
+#define _UTSNAME_NODENAME_LENGTH _UTSNAME_LENGTH
+#endif /* !_UTSNAME_NODENAME_LENGTH */
+#ifndef _UTSNAME_RELEASE_LENGTH
+#define _UTSNAME_RELEASE_LENGTH _UTSNAME_LENGTH
+#endif /* !_UTSNAME_RELEASE_LENGTH */
+#ifndef _UTSNAME_VERSION_LENGTH
+#define _UTSNAME_VERSION_LENGTH _UTSNAME_LENGTH
+#endif /* !_UTSNAME_VERSION_LENGTH */
+#ifndef _UTSNAME_MACHINE_LENGTH
+#define _UTSNAME_MACHINE_LENGTH _UTSNAME_LENGTH
+#endif /* !_UTSNAME_MACHINE_LENGTH */
 
 #ifndef _UTSNAME_DOMAIN_LENGTH
-#define _UTSNAME_DOMAIN_LENGTH _UTSNAME_LENGTH
-#endif /* !_UTSNAME_DOMAIN_LENGTH */
+#define _UTSNAME_DOMAIN_LENGTH 0
+#elif (_UTSNAME_DOMAIN_LENGTH + 0) == 0
+#undef _UTSNAME_DOMAIN_LENGTH
+#define _UTSNAME_DOMAIN_LENGTH 0
+#endif /* _UTSNAME_DOMAIN_LENGTH... */
+
+#ifdef __CC__
+__DECL_BEGIN
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("sysname")
+#pragma push_macro("nodename")
+#pragma push_macro("release")
+#pragma push_macro("version")
+#pragma push_macro("machine")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef sysname
+#undef nodename
+#undef release
+#undef version
+#undef machine
+#if defined(__USE_GNU) && _UTSNAME_DOMAIN_LENGTH
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("domainname")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef domainname
+#endif /* __USE_GNU && _UTSNAME_DOMAIN_LENGTH */
+
+/* Structure describing the system and machine.  */
+struct utsname {
+	char sysname[_UTSNAME_SYSNAME_LENGTH];   /* Name of the implementation of the operating system. */
+	char nodename[_UTSNAME_NODENAME_LENGTH]; /* Name of this node on the network. */
+	char release[_UTSNAME_RELEASE_LENGTH];   /* Current release level of this implementation. */
+	char version[_UTSNAME_VERSION_LENGTH];   /* Current version level of this release. */
+	char machine[_UTSNAME_MACHINE_LENGTH];   /* Name of the hardware type the system is running on. */
+#if _UTSNAME_DOMAIN_LENGTH
+#ifdef __USE_GNU
+	char domainname[_UTSNAME_DOMAIN_LENGTH]; /* Name of the domain of this node on the network. */
+#else /* __USE_GNU */
+	char __domainname[_UTSNAME_DOMAIN_LENGTH]; /* Name of the domain of this node on the network. */
+#endif /* !__USE_GNU */
+#endif /* _UTSNAME_DOMAIN_LENGTH */
+};
+
+#if defined(__USE_GNU) && _UTSNAME_DOMAIN_LENGTH
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("domainname")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#endif /* __USE_GNU && _UTSNAME_DOMAIN_LENGTH */
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("machine")
+#pragma pop_macro("version")
+#pragma pop_macro("release")
+#pragma pop_macro("nodename")
+#pragma pop_macro("sysname")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+
+__DECL_END
+#endif /* __CC__ */
+
 
 #endif /* !_BITS_UTSNAME_H */

@@ -46,10 +46,10 @@
 #include <sched.h>
 #include <time.h>
 
-#include <bits/pthreadtypes.h>
-#include <bits/pthreadvalues.h>
-#include <bits/pthreadinit.h>
-#include <bits/setjmp.h>
+#include <bits/crt/pthreadtypes.h>
+#include <bits/crt/pthreadvalues.h>
+#include <bits/crt/pthreadinit.h>
+#include <bits/crt/setjmp.h>
 #include <bits/wordsize.h>
 #include <kos/anno.h>
 
@@ -74,255 +74,484 @@ __SYSDECL_BEGIN
    <http://www.gnu.org/licenses/>.  */
 
 
+#if defined(__PTHREAD_CREATE_JOINABLE) || defined(__PTHREAD_CREATE_DETACHED)
 /* Detach state. */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
+#ifdef __PTHREAD_CREATE_JOINABLE
 	PTHREAD_CREATE_JOINABLE = __PTHREAD_CREATE_JOINABLE,
+#endif /* __PTHREAD_CREATE_JOINABLE */
+#ifdef __PTHREAD_CREATE_DETACHED
 	PTHREAD_CREATE_DETACHED = __PTHREAD_CREATE_DETACHED
+#endif /* __PTHREAD_CREATE_DETACHED */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __PTHREAD_CREATE_JOINABLE
 #define PTHREAD_CREATE_JOINABLE PTHREAD_CREATE_JOINABLE
+#endif /* __PTHREAD_CREATE_JOINABLE */
+#ifdef __PTHREAD_CREATE_DETACHED
 #define PTHREAD_CREATE_DETACHED PTHREAD_CREATE_DETACHED
+#endif /* __PTHREAD_CREATE_DETACHED */
 #else /* __COMPILER_PREFERR_ENUMS */
+#ifdef __PTHREAD_CREATE_JOINABLE
 #define PTHREAD_CREATE_JOINABLE __PTHREAD_CREATE_JOINABLE
+#endif /* __PTHREAD_CREATE_JOINABLE */
+#ifdef __PTHREAD_CREATE_DETACHED
 #define PTHREAD_CREATE_DETACHED __PTHREAD_CREATE_DETACHED
+#endif /* __PTHREAD_CREATE_DETACHED */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
 
+
+#if (defined(__PTHREAD_MUTEX_TIMED) || defined(__PTHREAD_MUTEX_RECURSIVE) ||     \
+     defined(__PTHREAD_MUTEX_ERRORCHECK) || defined(__PTHREAD_MUTEX_ADAPTIVE) || \
+     (defined(__USE_XOPEN2K) && (defined(__PTHREAD_MUTEX_STALLED) ||             \
+                                 defined(__PTHREAD_MUTEX_ROBUST))))
 /* Mutex types. */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
+#ifdef __PTHREAD_MUTEX_TIMED
 	PTHREAD_MUTEX_TIMED_NP      = __PTHREAD_MUTEX_TIMED,
+#endif /* __PTHREAD_MUTEX_TIMED */
+#ifdef __PTHREAD_MUTEX_RECURSIVE
 	PTHREAD_MUTEX_RECURSIVE_NP  = __PTHREAD_MUTEX_RECURSIVE,
+#endif /* __PTHREAD_MUTEX_RECURSIVE */
+#ifdef __PTHREAD_MUTEX_ERRORCHECK
 	PTHREAD_MUTEX_ERRORCHECK_NP = __PTHREAD_MUTEX_ERRORCHECK,
+#endif /* __PTHREAD_MUTEX_ERRORCHECK */
+#ifdef __PTHREAD_MUTEX_ADAPTIVE
 	PTHREAD_MUTEX_ADAPTIVE_NP   = __PTHREAD_MUTEX_ADAPTIVE,
+#endif /* __PTHREAD_MUTEX_ADAPTIVE */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
+#ifdef __PTHREAD_MUTEX_TIMED
 	PTHREAD_MUTEX_NORMAL     = __PTHREAD_MUTEX_TIMED,
+#endif /* __PTHREAD_MUTEX_TIMED */
+#ifdef __PTHREAD_MUTEX_RECURSIVE
 	PTHREAD_MUTEX_RECURSIVE  = __PTHREAD_MUTEX_RECURSIVE,
+#endif /* __PTHREAD_MUTEX_RECURSIVE */
+#ifdef __PTHREAD_MUTEX_ERRORCHECK
 	PTHREAD_MUTEX_ERRORCHECK = __PTHREAD_MUTEX_ERRORCHECK,
-	PTHREAD_MUTEX_DEFAULT    = PTHREAD_MUTEX_NORMAL,
+#endif /* __PTHREAD_MUTEX_ERRORCHECK */
+#ifdef __PTHREAD_MUTEX_TIMED
+	PTHREAD_MUTEX_DEFAULT    = __PTHREAD_MUTEX_TIMED,
+#endif /* __PTHREAD_MUTEX_TIMED */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 #ifdef __USE_GNU
+#ifdef __PTHREAD_MUTEX_TIMED
 	PTHREAD_MUTEX_FAST_NP = __PTHREAD_MUTEX_TIMED, /* For compatibility. */
+#endif /* __PTHREAD_MUTEX_TIMED */
 #endif /* __USE_GNU */
 #ifdef __USE_XOPEN2K
+#ifdef __PTHREAD_MUTEX_STALLED
 	PTHREAD_MUTEX_STALLED    = __PTHREAD_MUTEX_STALLED, /* Robust mutex or not flags. */
+	PTHREAD_MUTEX_STALLED_NP = __PTHREAD_MUTEX_STALLED, /* Robust mutex or not flags. */
+#endif /* __PTHREAD_MUTEX_STALLED */
+#ifdef __PTHREAD_MUTEX_ROBUST
 	PTHREAD_MUTEX_ROBUST     = __PTHREAD_MUTEX_ROBUST,  /* ... */
-	PTHREAD_MUTEX_STALLED_NP = __PTHREAD_MUTEX_STALLED, /* ... */
 	PTHREAD_MUTEX_ROBUST_NP  = __PTHREAD_MUTEX_ROBUST,  /* ... */
+#endif /* __PTHREAD_MUTEX_ROBUST */
 #endif /* __USE_XOPEN2K */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __PTHREAD_MUTEX_TIMED
 #define PTHREAD_MUTEX_TIMED_NP      PTHREAD_MUTEX_TIMED_NP
+#endif /* __PTHREAD_MUTEX_TIMED */
+#ifdef __PTHREAD_MUTEX_RECURSIVE
 #define PTHREAD_MUTEX_RECURSIVE_NP  PTHREAD_MUTEX_RECURSIVE_NP
+#endif /* __PTHREAD_MUTEX_RECURSIVE */
+#ifdef __PTHREAD_MUTEX_ERRORCHECK
 #define PTHREAD_MUTEX_ERRORCHECK_NP PTHREAD_MUTEX_ERRORCHECK_NP
+#endif /* __PTHREAD_MUTEX_ERRORCHECK */
+#ifdef __PTHREAD_MUTEX_ADAPTIVE
 #define PTHREAD_MUTEX_ADAPTIVE_NP   PTHREAD_MUTEX_ADAPTIVE_NP
+#endif /* __PTHREAD_MUTEX_ADAPTIVE */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
+#ifdef __PTHREAD_MUTEX_TIMED
 #define PTHREAD_MUTEX_NORMAL        PTHREAD_MUTEX_NORMAL
+#endif /* __PTHREAD_MUTEX_TIMED */
+#ifdef __PTHREAD_MUTEX_RECURSIVE
 #define PTHREAD_MUTEX_RECURSIVE     PTHREAD_MUTEX_RECURSIVE
+#endif /* __PTHREAD_MUTEX_RECURSIVE */
+#ifdef __PTHREAD_MUTEX_ERRORCHECK
 #define PTHREAD_MUTEX_ERRORCHECK    PTHREAD_MUTEX_ERRORCHECK
+#endif /* __PTHREAD_MUTEX_ERRORCHECK */
+#ifdef __PTHREAD_MUTEX_TIMED
 #define PTHREAD_MUTEX_DEFAULT       PTHREAD_MUTEX_DEFAULT
+#endif /* __PTHREAD_MUTEX_TIMED */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 #ifdef __USE_GNU
+#ifdef __PTHREAD_MUTEX_TIMED
 #define PTHREAD_MUTEX_FAST_NP       PTHREAD_MUTEX_FAST_NP       /* For compatibility. */
+#endif /* __PTHREAD_MUTEX_TIMED */
 #endif /* __USE_GNU */
 #ifdef __USE_XOPEN2K
+#ifdef __PTHREAD_MUTEX_STALLED
 #define PTHREAD_MUTEX_STALLED       PTHREAD_MUTEX_STALLED       /* Robust mutex or not flags. */
+#define PTHREAD_MUTEX_STALLED_NP    PTHREAD_MUTEX_STALLED_NP    /* Robust mutex or not flags. */
+#endif /* __PTHREAD_MUTEX_STALLED */
+#ifdef __PTHREAD_MUTEX_ROBUST
 #define PTHREAD_MUTEX_ROBUST        PTHREAD_MUTEX_ROBUST        /* ... */
-#define PTHREAD_MUTEX_STALLED_NP    PTHREAD_MUTEX_STALLED_NP    /* ... */
 #define PTHREAD_MUTEX_ROBUST_NP     PTHREAD_MUTEX_ROBUST_NP     /* ... */
+#endif /* __PTHREAD_MUTEX_ROBUST */
 #endif /* __USE_XOPEN2K */
 #else /* __COMPILER_PREFERR_ENUMS */
+#ifdef __PTHREAD_MUTEX_TIMED
 #define PTHREAD_MUTEX_TIMED_NP      __PTHREAD_MUTEX_TIMED
+#endif /* __PTHREAD_MUTEX_TIMED */
+#ifdef __PTHREAD_MUTEX_RECURSIVE
 #define PTHREAD_MUTEX_RECURSIVE_NP  __PTHREAD_MUTEX_RECURSIVE
+#endif /* __PTHREAD_MUTEX_RECURSIVE */
+#ifdef __PTHREAD_MUTEX_ERRORCHECK
 #define PTHREAD_MUTEX_ERRORCHECK_NP __PTHREAD_MUTEX_ERRORCHECK
+#endif /* __PTHREAD_MUTEX_ERRORCHECK */
+#ifdef __PTHREAD_MUTEX_ADAPTIVE
 #define PTHREAD_MUTEX_ADAPTIVE_NP   __PTHREAD_MUTEX_ADAPTIVE
+#endif /* __PTHREAD_MUTEX_ADAPTIVE */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
+#ifdef __PTHREAD_MUTEX_TIMED
 #define PTHREAD_MUTEX_NORMAL        __PTHREAD_MUTEX_TIMED
+#endif /* __PTHREAD_MUTEX_TIMED */
+#ifdef __PTHREAD_MUTEX_RECURSIVE
 #define PTHREAD_MUTEX_RECURSIVE     __PTHREAD_MUTEX_RECURSIVE
+#endif /* __PTHREAD_MUTEX_RECURSIVE */
+#ifdef __PTHREAD_MUTEX_ERRORCHECK
 #define PTHREAD_MUTEX_ERRORCHECK    __PTHREAD_MUTEX_ERRORCHECK
+#endif /* __PTHREAD_MUTEX_ERRORCHECK */
+#ifdef __PTHREAD_MUTEX_TIMED
 #define PTHREAD_MUTEX_DEFAULT       __PTHREAD_MUTEX_TIMED
+#endif /* __PTHREAD_MUTEX_TIMED */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 #ifdef __USE_GNU
+#ifdef __PTHREAD_MUTEX_TIMED
 #define PTHREAD_MUTEX_FAST_NP       __PTHREAD_MUTEX_TIMED      /* For compatibility. */
+#endif /* __PTHREAD_MUTEX_TIMED */
 #endif /* __USE_GNU */
 #ifdef __USE_XOPEN2K
+#ifdef __PTHREAD_MUTEX_STALLED
 #define PTHREAD_MUTEX_STALLED       __PTHREAD_MUTEX_STALLED    /* Robust mutex or not flags. */
+#define PTHREAD_MUTEX_STALLED_NP    __PTHREAD_MUTEX_STALLED    /* Robust mutex or not flags. */
+#endif /* __PTHREAD_MUTEX_STALLED */
+#ifdef __PTHREAD_MUTEX_ROBUST
 #define PTHREAD_MUTEX_ROBUST        __PTHREAD_MUTEX_ROBUST     /* ... */
-#define PTHREAD_MUTEX_STALLED_NP    __PTHREAD_MUTEX_STALLED    /* ... */
 #define PTHREAD_MUTEX_ROBUST_NP     __PTHREAD_MUTEX_ROBUST     /* ... */
+#endif /* __PTHREAD_MUTEX_ROBUST */
 #endif /* __USE_XOPEN2K */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
 
 
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
+#if (defined(__PTHREAD_PRIO_NONE) || defined(__PTHREAD_PRIO_INHERIT) || \
+     defined(__PTHREAD_PRIO_PROTECT))
 /* Mutex protocols. */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
+#ifdef __PTHREAD_PRIO_NONE
 	PTHREAD_PRIO_NONE    = __PTHREAD_PRIO_NONE,
+#endif /* __PTHREAD_PRIO_NONE */
+#ifdef __PTHREAD_PRIO_INHERIT
 	PTHREAD_PRIO_INHERIT = __PTHREAD_PRIO_INHERIT,
+#endif /* __PTHREAD_PRIO_INHERIT */
+#ifdef __PTHREAD_PRIO_PROTECT
 	PTHREAD_PRIO_PROTECT = __PTHREAD_PRIO_PROTECT,
+#endif /* __PTHREAD_PRIO_PROTECT */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __PTHREAD_PRIO_NONE
 #define PTHREAD_PRIO_NONE    PTHREAD_PRIO_NONE
+#endif /* __PTHREAD_PRIO_NONE */
+#ifdef __PTHREAD_PRIO_INHERIT
 #define PTHREAD_PRIO_INHERIT PTHREAD_PRIO_INHERIT
+#endif /* __PTHREAD_PRIO_INHERIT */
+#ifdef __PTHREAD_PRIO_PROTECT
 #define PTHREAD_PRIO_PROTECT PTHREAD_PRIO_PROTECT
+#endif /* __PTHREAD_PRIO_PROTECT */
 #else /* __COMPILER_PREFERR_ENUMS */
+#ifdef __PTHREAD_PRIO_NONE
 #define PTHREAD_PRIO_NONE    __PTHREAD_PRIO_NONE
+#endif /* __PTHREAD_PRIO_NONE */
+#ifdef __PTHREAD_PRIO_INHERIT
 #define PTHREAD_PRIO_INHERIT __PTHREAD_PRIO_INHERIT
+#endif /* __PTHREAD_PRIO_INHERIT */
+#ifdef __PTHREAD_PRIO_PROTECT
 #define PTHREAD_PRIO_PROTECT __PTHREAD_PRIO_PROTECT
+#endif /* __PTHREAD_PRIO_PROTECT */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 /* Read-write lock types. */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
+#if (defined(__PTHREAD_RWLOCK_PREFER_READER) || defined(__PTHREAD_RWLOCK_PREFER_WRITER) || \
+     defined(__PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE) || defined(__PTHREAD_RWLOCK_PREFER_READER))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
+#ifdef __PTHREAD_RWLOCK_PREFER_READER
 	PTHREAD_RWLOCK_PREFER_READER_NP              = __PTHREAD_RWLOCK_PREFER_READER,
+#endif /* __PTHREAD_RWLOCK_PREFER_READER */
+#ifdef __PTHREAD_RWLOCK_PREFER_WRITER
 	PTHREAD_RWLOCK_PREFER_WRITER_NP              = __PTHREAD_RWLOCK_PREFER_WRITER,
+#endif /* __PTHREAD_RWLOCK_PREFER_WRITER */
+#ifdef __PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE
 	PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP = __PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE,
+#endif /* __PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE */
+#ifdef __PTHREAD_RWLOCK_PREFER_READER
 	PTHREAD_RWLOCK_DEFAULT_NP                    = __PTHREAD_RWLOCK_PREFER_READER,
+#endif /* __PTHREAD_RWLOCK_PREFER_READER */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __PTHREAD_RWLOCK_PREFER_READER
 #define PTHREAD_RWLOCK_PREFER_READER_NP              PTHREAD_RWLOCK_PREFER_READER_NP
+#endif /* __PTHREAD_RWLOCK_PREFER_READER */
+#ifdef __PTHREAD_RWLOCK_PREFER_WRITER
 #define PTHREAD_RWLOCK_PREFER_WRITER_NP              PTHREAD_RWLOCK_PREFER_WRITER_NP
+#endif /* __PTHREAD_RWLOCK_PREFER_WRITER */
+#ifdef __PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE
 #define PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP
+#endif /* __PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE */
+#ifdef __PTHREAD_RWLOCK_PREFER_READER
 #define PTHREAD_RWLOCK_DEFAULT_NP                    PTHREAD_RWLOCK_DEFAULT_NP
+#endif /* __PTHREAD_RWLOCK_PREFER_READER */
 #else /* __COMPILER_PREFERR_ENUMS */
+#ifdef __PTHREAD_RWLOCK_PREFER_READER
 #define PTHREAD_RWLOCK_PREFER_READER_NP              __PTHREAD_RWLOCK_PREFER_READER
+#endif /* __PTHREAD_RWLOCK_PREFER_READER */
+#ifdef __PTHREAD_RWLOCK_PREFER_WRITER
 #define PTHREAD_RWLOCK_PREFER_WRITER_NP              __PTHREAD_RWLOCK_PREFER_WRITER
+#endif /* __PTHREAD_RWLOCK_PREFER_WRITER */
+#ifdef __PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE
 #define PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP __PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE
+#endif /* __PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE */
+#ifdef __PTHREAD_RWLOCK_PREFER_READER
 #define PTHREAD_RWLOCK_DEFAULT_NP                    __PTHREAD_RWLOCK_PREFER_READER
+#endif /* __PTHREAD_RWLOCK_PREFER_READER */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
-#endif  /* __USE_UNIX98 || __USE_XOPEN2K */
+#endif /* ... */
+#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 /* Scheduler inheritance. */
+#if (defined(__PTHREAD_INHERIT_SCHED) || \
+     defined(__PTHREAD_EXPLICIT_SCHED))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
+#ifdef __PTHREAD_INHERIT_SCHED
 	PTHREAD_INHERIT_SCHED  = __PTHREAD_INHERIT_SCHED,
+#endif /* __PTHREAD_INHERIT_SCHED */
+#ifdef __PTHREAD_EXPLICIT_SCHED
 	PTHREAD_EXPLICIT_SCHED = __PTHREAD_EXPLICIT_SCHED
+#endif /* __PTHREAD_EXPLICIT_SCHED */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __PTHREAD_INHERIT_SCHED
 #define PTHREAD_INHERIT_SCHED  PTHREAD_INHERIT_SCHED
+#endif /* __PTHREAD_INHERIT_SCHED */
+#ifdef __PTHREAD_EXPLICIT_SCHED
 #define PTHREAD_EXPLICIT_SCHED PTHREAD_EXPLICIT_SCHED
+#endif /* __PTHREAD_EXPLICIT_SCHED */
 #else /* __COMPILER_PREFERR_ENUMS */
+#ifdef __PTHREAD_INHERIT_SCHED
 #define PTHREAD_INHERIT_SCHED  __PTHREAD_INHERIT_SCHED
+#endif /* __PTHREAD_INHERIT_SCHED */
+#ifdef __PTHREAD_EXPLICIT_SCHED
 #define PTHREAD_EXPLICIT_SCHED __PTHREAD_EXPLICIT_SCHED
+#endif /* __PTHREAD_EXPLICIT_SCHED */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
 
 /* Scope handling. */
+#if (defined(__PTHREAD_SCOPE_SYSTEM) || \
+     defined(__PTHREAD_SCOPE_PROCESS))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
+#ifdef __PTHREAD_SCOPE_SYSTEM
 	PTHREAD_SCOPE_SYSTEM  = __PTHREAD_SCOPE_SYSTEM,
+#endif /* __PTHREAD_SCOPE_SYSTEM */
+#ifdef __PTHREAD_SCOPE_PROCESS
 	PTHREAD_SCOPE_PROCESS = __PTHREAD_SCOPE_PROCESS
+#endif /* __PTHREAD_SCOPE_PROCESS */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __PTHREAD_SCOPE_SYSTEM
 #define PTHREAD_SCOPE_SYSTEM  PTHREAD_SCOPE_SYSTEM
+#endif /* __PTHREAD_SCOPE_SYSTEM */
+#ifdef __PTHREAD_SCOPE_PROCESS
 #define PTHREAD_SCOPE_PROCESS PTHREAD_SCOPE_PROCESS
+#endif /* __PTHREAD_SCOPE_PROCESS */
 #else /* __COMPILER_PREFERR_ENUMS */
+#ifdef __PTHREAD_SCOPE_SYSTEM
 #define PTHREAD_SCOPE_SYSTEM  __PTHREAD_SCOPE_SYSTEM
+#endif /* __PTHREAD_SCOPE_SYSTEM */
+#ifdef __PTHREAD_SCOPE_PROCESS
 #define PTHREAD_SCOPE_PROCESS __PTHREAD_SCOPE_PROCESS
+#endif /* __PTHREAD_SCOPE_PROCESS */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
 
 /* Process shared or private flag. */
+#if (defined(__PTHREAD_PROCESS_PRIVATE) || \
+     defined(__PTHREAD_PROCESS_SHARED))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
+#ifdef __PTHREAD_PROCESS_PRIVATE
 	PTHREAD_PROCESS_PRIVATE = __PTHREAD_PROCESS_PRIVATE,
+#endif /* __PTHREAD_PROCESS_PRIVATE */
+#ifdef __PTHREAD_PROCESS_SHARED
 	PTHREAD_PROCESS_SHARED  = __PTHREAD_PROCESS_SHARED
+#endif /* __PTHREAD_PROCESS_SHARED */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __PTHREAD_PROCESS_PRIVATE
 #define PTHREAD_PROCESS_PRIVATE PTHREAD_PROCESS_PRIVATE
+#endif /* __PTHREAD_PROCESS_PRIVATE */
+#ifdef __PTHREAD_PROCESS_SHARED
 #define PTHREAD_PROCESS_SHARED  PTHREAD_PROCESS_SHARED
+#endif /* __PTHREAD_PROCESS_SHARED */
 #else /* __COMPILER_PREFERR_ENUMS */
+#ifdef __PTHREAD_PROCESS_PRIVATE
 #define PTHREAD_PROCESS_PRIVATE __PTHREAD_PROCESS_PRIVATE
+#endif /* __PTHREAD_PROCESS_PRIVATE */
+#ifdef __PTHREAD_PROCESS_SHARED
 #define PTHREAD_PROCESS_SHARED  __PTHREAD_PROCESS_SHARED
+#endif /* __PTHREAD_PROCESS_SHARED */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
 
 /* Cancellation */
+#if (defined(__PTHREAD_CANCEL_ENABLE) || \
+     defined(__PTHREAD_CANCEL_DISABLE) || \
+     defined(__PTHREAD_CANCEL_DEFERRED) || \
+     defined(__PTHREAD_CANCEL_ASYNCHRONOUS))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
+#ifdef __PTHREAD_CANCEL_ENABLE
 	PTHREAD_CANCEL_ENABLE       = __PTHREAD_CANCEL_ENABLE,
+#endif /* __PTHREAD_CANCEL_ENABLE */
+#ifdef __PTHREAD_CANCEL_DISABLE
 	PTHREAD_CANCEL_DISABLE      = __PTHREAD_CANCEL_DISABLE,
+#endif /* __PTHREAD_CANCEL_DISABLE */
+#ifdef __PTHREAD_CANCEL_DEFERRED
 	PTHREAD_CANCEL_DEFERRED     = __PTHREAD_CANCEL_DEFERRED,
+#endif /* __PTHREAD_CANCEL_DEFERRED */
+#ifdef __PTHREAD_CANCEL_ASYNCHRONOUS
 	PTHREAD_CANCEL_ASYNCHRONOUS = __PTHREAD_CANCEL_ASYNCHRONOUS
+#endif /* __PTHREAD_CANCEL_ASYNCHRONOUS */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __PTHREAD_CANCEL_ENABLE
 #define PTHREAD_CANCEL_ENABLE       PTHREAD_CANCEL_ENABLE
+#endif /* __PTHREAD_CANCEL_ENABLE */
+#ifdef __PTHREAD_CANCEL_DISABLE
 #define PTHREAD_CANCEL_DISABLE      PTHREAD_CANCEL_DISABLE
+#endif /* __PTHREAD_CANCEL_DISABLE */
+#ifdef __PTHREAD_CANCEL_DEFERRED
 #define PTHREAD_CANCEL_DEFERRED     PTHREAD_CANCEL_DEFERRED
+#endif /* __PTHREAD_CANCEL_DEFERRED */
+#ifdef __PTHREAD_CANCEL_ASYNCHRONOUS
 #define PTHREAD_CANCEL_ASYNCHRONOUS PTHREAD_CANCEL_ASYNCHRONOUS
+#endif /* __PTHREAD_CANCEL_ASYNCHRONOUS */
 #else /* __COMPILER_PREFERR_ENUMS */
+#ifdef __PTHREAD_CANCEL_ENABLE
 #define PTHREAD_CANCEL_ENABLE       __PTHREAD_CANCEL_ENABLE
+#endif /* __PTHREAD_CANCEL_ENABLE */
+#ifdef __PTHREAD_CANCEL_DISABLE
 #define PTHREAD_CANCEL_DISABLE      __PTHREAD_CANCEL_DISABLE
+#endif /* __PTHREAD_CANCEL_DISABLE */
+#ifdef __PTHREAD_CANCEL_DEFERRED
 #define PTHREAD_CANCEL_DEFERRED     __PTHREAD_CANCEL_DEFERRED
+#endif /* __PTHREAD_CANCEL_DEFERRED */
+#ifdef __PTHREAD_CANCEL_ASYNCHRONOUS
 #define PTHREAD_CANCEL_ASYNCHRONOUS __PTHREAD_CANCEL_ASYNCHRONOUS
+#endif /* __PTHREAD_CANCEL_ASYNCHRONOUS */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
+#endif /* ... */
+
+#ifdef __PTHREAD_CANCELED
 #define PTHREAD_CANCELED __PTHREAD_CANCELED
+#endif /* __PTHREAD_CANCELED */
 
 /* Single execution handling. */
+#ifdef __PTHREAD_ONCE_INIT
 #define PTHREAD_ONCE_INIT __PTHREAD_ONCE_INIT
+#endif /* __PTHREAD_ONCE_INIT */
 
 #ifdef __USE_XOPEN2K
 /* Value returned by 'pthread_barrier_wait' for one of the threads
  * after the required number of threads have called this function.
  * -1 is distinct from 0 and all errno constants */
+#ifdef __PTHREAD_BARRIER_SERIAL_THREAD
 #define PTHREAD_BARRIER_SERIAL_THREAD __PTHREAD_BARRIER_SERIAL_THREAD
+#endif /* __PTHREAD_BARRIER_SERIAL_THREAD */
 #endif /* __USE_XOPEN2K */
 
 
 
 #ifdef __CC__
 
+#ifdef __PTHREAD_MUTEX_INITIALIZER
 #define PTHREAD_MUTEX_INITIALIZER               __PTHREAD_MUTEX_INITIALIZER
+#endif /* __PTHREAD_MUTEX_INITIALIZER */
 #ifdef __USE_GNU
+#ifdef __PTHREAD_RECURSIVE_MUTEX_INITIALIZER
 #define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP  __PTHREAD_RECURSIVE_MUTEX_INITIALIZER
+#endif /* __PTHREAD_RECURSIVE_MUTEX_INITIALIZER */
+#ifdef __PTHREAD_ERRORCHECK_MUTEX_INITIALIZER
 #define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP __PTHREAD_ERRORCHECK_MUTEX_INITIALIZER
+#endif /* __PTHREAD_ERRORCHECK_MUTEX_INITIALIZER */
+#ifdef __PTHREAD_ADAPTIVE_MUTEX_INITIALIZER
 #define PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP   __PTHREAD_ADAPTIVE_MUTEX_INITIALIZER
+#endif /* __PTHREAD_ADAPTIVE_MUTEX_INITIALIZER */
 #endif /* __USE_GNU */
 
 /* Read-write lock types. */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
 
 /* Read-write lock initializers. */
+#ifdef __PTHREAD_RWLOCK_INITIALIZER
 #define PTHREAD_RWLOCK_INITIALIZER __PTHREAD_RWLOCK_INITIALIZER
+#endif /* __PTHREAD_RWLOCK_INITIALIZER */
 #ifdef __USE_GNU
+#ifdef __PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER
 #define PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP __PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER
+#endif /* __PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER */
 #endif /* __USE_GNU */
 #endif  /* __USE_UNIX98 || __USE_XOPEN2K */
 
 /* Conditional variable handling. */
+#ifdef __PTHREAD_COND_INITIALIZER
 #define PTHREAD_COND_INITIALIZER __PTHREAD_COND_INITIALIZER
+#endif /* __PTHREAD_COND_INITIALIZER */
 
 /* Cleanup buffers */
 struct _pthread_cleanup_buffer {
@@ -373,7 +602,7 @@ typedef void *(*__pthread_start_routine_t)(void *);
 @@Create a new thread, starting with execution of START-ROUTINE
 @@getting passed ARG. Creation attributed come from ATTR. The new
 @@handle is stored in *NEWTHREAD
-[[decl_include("<bits/pthreadtypes.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>")]]
 [[decl_prefix(DEFINE_PTHREAD_START_ROUTINE_T)]]
 int pthread_create([[nonnull]] pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr,
                    [[nonnull]] __pthread_start_routine_t start_routine, void *__restrict arg);
@@ -388,13 +617,13 @@ void pthread_exit(void *retval);
 @@Make calling thread wait for termination of the thread THREAD. The
 @@exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
 @@is not NULL
-[[cp, decl_include("<bits/pthreadtypes.h>")]]
+[[cp, decl_include("<bits/crt/pthreadtypes.h>")]]
 int pthread_join(pthread_t pthread, void **thread_return);
 
 %#ifdef __USE_GNU
 @@Check whether thread THREAD has terminated. If yes return the status of
 @@the thread in *THREAD_RETURN, if THREAD_RETURN is not NULL
-[[decl_include("<bits/pthreadtypes.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>")]]
 int pthread_tryjoin_np(pthread_t pthread, void **thread_return);
 
 %
@@ -403,7 +632,7 @@ int pthread_tryjoin_np(pthread_t pthread, void **thread_return);
 @@Make calling thread wait for termination of the thread THREAD, but only
 @@until TIMEOUT. The exit status of the thread is stored in
 @@*THREAD_RETURN, if THREAD_RETURN is not NULL.
-[[cp, decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>"), no_crt_self_import]]
+[[cp, decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("pthread_timedjoin64_np")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("pthread_timedjoin_np")]]
 [[userimpl, requires($has_function(pthread_timedjoin32_np) || $has_function(pthread_timedjoin64_np))]]
@@ -428,13 +657,13 @@ int pthread_timedjoin_np(pthread_t pthread, void **thread_return,
 
 %#ifdef __USE_TIME64
 [[cp, ignore, doc_alias(pthread_timedjoin_np), nocrt, alias("pthread_timedjoin_np")]]
-[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>")]]
 int pthread_timedjoin32_np(pthread_t pthread, void **thread_return,
                            struct timespec32 const *abstime);
 
 
 [[cp, time64_variant_of(pthread_timedjoin_np)]]
-[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>")]]
 [[userimpl, requires_function(pthread_timedjoin32_np)]]
 int pthread_timedjoin64_np(pthread_t pthread, void **thread_return,
                            struct timespec64 const *abstime) {
@@ -978,7 +1207,7 @@ int pthread_mutex_lock([[nonnull]] pthread_mutex_t *mutex);
 %
 %#ifdef __USE_XOPEN2K
 @@Wait until lock becomes available, or specified time passes
-[[cp, decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>"), no_crt_self_import]]
+[[cp, decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_mutex_timedlock64)]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_mutex_timedlock)]]
 [[userimpl, requires($has_function(pthread_mutex_timedlock32) || $has_function(pthread_mutex_timedlock64))]]
@@ -1003,12 +1232,12 @@ int pthread_mutex_timedlock([[nonnull]] pthread_mutex_t *__restrict mutex,
 
 %#ifdef __USE_TIME64
 [[cp, doc_alias(pthread_mutex_timedlock), ignore, nocrt, alias(pthread_mutex_timedlock)]]
-[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>")]]
 int pthread_mutex_timedlock32([[nonnull]] pthread_mutex_t *__restrict mutex,
                               [[nonnull]] struct timespec const *__restrict abstime);
 
 [[cp, doc_alias(pthread_mutex_timedlock), time64_variant_of(pthread_mutex_timedlock)]]
-[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>")]]
 [[userimpl, requires($has_function(pthread_mutex_timedlock32))]]
 int pthread_mutex_timedlock64([[nonnull]] pthread_mutex_t *__restrict mutex,
                               [[nonnull]] struct timespec64 const *__restrict abstime) {
@@ -1150,7 +1379,7 @@ int pthread_rwlock_tryrdlock([[nonnull]] pthread_rwlock_t *rwlock);
 [[cp, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_timedrdlock64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_timedrdlock")]]
-[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>")]]
 [[userimpl, requires($has_function(pthread_rwlock_timedrdlock32) || $has_function(pthread_rwlock_timedrdlock64))]]
 pthread_rwlock_timedrdlock:([[nonnull]] pthread_rwlock_t *__restrict rwlock,
                             [[nonnull]] struct timespec const *__restrict abstime) -> int {
@@ -1174,12 +1403,12 @@ pthread_rwlock_timedrdlock:([[nonnull]] pthread_rwlock_t *__restrict rwlock,
 %#ifdef __USE_TIME64
 
 [[cp, doc_alias("pthread_rwlock_timedrdlock"), ignore, nocrt, alias("pthread_rwlock_timedrdlock")]]
-[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>")]]
 int pthread_rwlock_timedrdlock32([[nonnull]] pthread_rwlock_t *__restrict rwlock,
                                  [[nonnull]] struct timespec32 const *__restrict abstime);
 
 [[cp, doc_alias("pthread_rwlock_timedrdlock"), time64_variant_of(pthread_rwlock_timedrdlock)]]
-[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>")]]
 [[userimpl, requires_function(pthread_rwlock_timedrdlock32)]]
 int pthread_rwlock_timedrdlock64([[nonnull]] pthread_rwlock_t *__restrict rwlock,
                                  [[nonnull]] struct timespec64 const *__restrict abstime) {
@@ -1211,7 +1440,7 @@ int pthread_rwlock_trywrlock([[nonnull]] pthread_rwlock_t *rwlock);
 [[cp, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_timedwrlock64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_timedwrlock")]]
-[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>")]]
 [[userimpl, requires($has_function(pthread_rwlock_timedwrlock32) || $has_function(pthread_rwlock_timedwrlock64))]]
 int pthread_rwlock_timedwrlock([[nonnull]] pthread_rwlock_t *__restrict rwlock,
                                [[nonnull]] struct timespec const *__restrict abstime) {
@@ -1235,13 +1464,13 @@ int pthread_rwlock_timedwrlock([[nonnull]] pthread_rwlock_t *__restrict rwlock,
 %#ifdef __USE_TIME64
 
 [[cp, doc_alias(pthread_rwlock_timedwrlock), ignore, nocrt, alias("pthread_rwlock_timedwrlock")]]
-[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>")]]
 int pthread_rwlock_timedwrlock32([[nonnull]] pthread_rwlock_t *__restrict rwlock,
                                  [[nonnull]] struct timespec32 const *__restrict abstime);
 
 [[cp, doc_alias(pthread_rwlock_timedwrlock)]]
 [[time64_variant_of(pthread_rwlock_timedwrlock)]]
-[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>")]]
 [[userimpl, requires_function(pthread_rwlock_timedwrlock32)]]
 int pthread_rwlock_timedwrlock64([[nonnull]] pthread_rwlock_t *__restrict rwlock,
                                  [[nonnull]] struct timespec64 const *__restrict abstime) {
@@ -1326,7 +1555,7 @@ int pthread_cond_wait([[nonnull]] pthread_cond_t *__restrict cond,
 [[cp, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_cond_timedwait64)]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_cond_timedwait)]]
-[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>")]]
 [[userimpl, requires($has_function(pthread_cond_timedwait32) || $has_function(pthread_cond_timedwait64))]]
 int pthread_cond_timedwait([[nonnull]] pthread_cond_t *__restrict cond,
                            [[nonnull]] pthread_mutex_t *__restrict mutex,
@@ -1350,13 +1579,13 @@ int pthread_cond_timedwait([[nonnull]] pthread_cond_t *__restrict cond,
 
 %#ifdef __USE_TIME64
 [[cp, ignore, nocrt, alias("pthread_cond_timedwait")]]
-[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>")]]
 int pthread_cond_timedwait32([[nonnull]] pthread_cond_t *__restrict cond,
                              [[nonnull]] pthread_mutex_t *__restrict mutex,
                              [[nonnull]] struct timespec32 const *__restrict abstime);
 
 [[cp, doc_alias("pthread_cond_timedwait"), time64_variant_of(pthread_cond_timedwait)]]
-[[decl_include("<bits/pthreadtypes.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/pthreadtypes.h>", "<bits/timespec.h>")]]
 [[userimpl, requires_function(pthread_cond_timedwait32)]]
 int pthread_cond_timedwait64([[nonnull]] pthread_cond_t *__restrict cond,
                              [[nonnull]] pthread_mutex_t *__restrict mutex,

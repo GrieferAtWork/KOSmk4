@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3218c24 */
+/* HASH CRC-32:0x39c1d88f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,6 +92,10 @@ INTDEF NONNULL((1)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL libc_getdate)(const char *
 INTDEF char *libc_tzname[2];
 INTDEF int libc_daylight;
 INTDEF longptr_t libc_timezone;
+#ifndef __KERNEL__
+INTDEF int NOTHROW_NCX(LIBCCALL libc_clock_adjtime)(clockid_t clock_id, struct timex *utx);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_clock_adjtime64)(clockid_t clock_id, struct timex64 *utx);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

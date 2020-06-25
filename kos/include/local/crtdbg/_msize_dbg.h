@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa83f794e */
+/* HASH CRC-32:0xe9cb7d3a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,21 +23,21 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _msize from malloc */
-#ifndef __local___localdep__msize_defined
-#define __local___localdep__msize_defined 1
+/* Dependency: malloc_usable_size from malloc */
+#ifndef __local___localdep_malloc_usable_size_defined
+#define __local___localdep_malloc_usable_size_defined 1
 #ifdef __CRT_HAVE_malloc_usable_size
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__msize,(void *__restrict __mallptr),malloc_usable_size,(__mallptr))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_malloc_usable_size,(void *__restrict __mallptr),malloc_usable_size,(__mallptr))
 #elif defined(__CRT_HAVE__msize)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__msize,(void *__restrict __mallptr),_msize,(__mallptr))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_malloc_usable_size,(void *__restrict __mallptr),_msize,(__mallptr))
 #else /* ... */
-#undef __local___localdep__msize_defined
+#undef __local___localdep_malloc_usable_size_defined
 #endif /* !... */
-#endif /* !__local___localdep__msize_defined */
+#endif /* !__local___localdep_malloc_usable_size_defined */
 __LOCAL_LIBC(_msize_dbg) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_msize_dbg))(void *__ptr, int __block_type) {
 	(void)__block_type;
-	return __localdep__msize(__ptr);
+	return __localdep_malloc_usable_size(__ptr);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__msize_dbg_defined

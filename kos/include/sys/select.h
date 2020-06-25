@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7489e55 */
+/* HASH CRC-32:0xbe11bf55 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,10 +58,10 @@ typedef __suseconds_t suseconds_t;
 
 typedef __intptr_t __fd_mask;
 
-#undef  __NFDBITS
-#define __NFDBITS    (8 * (int)sizeof(__fd_mask))
+#undef __NFDBITS
+#define __NFDBITS    (8 * sizeof(__fd_mask))
 #define __FD_ELT(d)  ((d) / __NFDBITS)
-#define __FD_MASK(d) ((__fd_mask)(1UL << ((d) % __NFDBITS)))
+#define __FD_MASK(d) ((__fd_mask)1 << ((d) % __NFDBITS))
 
 typedef struct __fd_set_struct {
 #ifdef __USE_XOPEN

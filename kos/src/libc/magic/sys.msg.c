@@ -25,8 +25,15 @@
 %{
 
 #include <features.h>
-#include <sys/ipc.h>
 #include <bits/msq.h>
+
+#ifdef __USE_GNU
+#include <bits/msgbuf.h> /* struct msgbuf */
+#endif /* __USE_GNU */
+
+#ifdef __USE_GLIBC
+#include <sys/ipc.h>
+#endif /* __USE_GLIBC */
 
 /* Documentation taken from /usr/include/i386-linux-gnu/sys/msg.h */
 /* Copyright (C) 1995-2016 Free Software Foundation, Inc.
@@ -70,31 +77,22 @@ typedef __pid_t pid_t;
 typedef __ssize_t ssize_t;
 #endif /* !__ssize_t_defined */
 
+#ifndef __key_t_defined
+#define __key_t_defined 1
+typedef __key_t key_t;
+#endif /* !__key_t_defined */
+
 /* The following System V style IPC functions implement a message queue system.
  * The definition is found in XPG2. */
-
-#ifdef __USE_GNU
-/* Template for struct to be used as argument for `msgsnd' and `msgrcv'.  */
-}%[push_macro @undef { mtype mtext }]%{
-struct msgbuf {
-	__syscall_slong_t               mtype;  /* type of received/sent message */
-#ifdef __USE_KOS
-	__COMPILER_FLEXIBLE_ARRAY(char, mtext); /* text of the message */
-#else /* __USE_KOS */
-	char                            mtext[1]; /* text of the message */
-#endif /* !__USE_KOS */
-};
-}%[pop_macro]%{
-#endif /* __USE_GNU */
 
 }
 
 @@Message queue control operation
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<bits/msq.h>")]]
 int msgctl(int msqid, __STDC_INT_AS_UINT_T cmd, struct msqid_ds *buf);
 
 @@Get messages queue
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
 int msgget(key_t key, __STDC_INT_AS_UINT_T msgflg);
 
 @@Receive message from message queue

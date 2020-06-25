@@ -23,6 +23,7 @@
 
 %{
 #include <bits/types.h>
+#include <bits/crt/db/rpcent.h>
 
 __SYSDECL_BEGIN
 
@@ -51,14 +52,6 @@ __SYSDECL_BEGIN
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
-struct rpcent {
-	/* XXX: It's unclear if r_name can be NULL! */
-	char                   *r_name;    /* Name of server for this rpc program. */
-	/* XXX: It's unclear if r_aliases can be NULL! (or is {NULL} when empty) */
-	char                  **r_aliases; /* [0..1][0..n] Alias list. (terminated by a NULL-entry) */
-	__STDC_INT32_AS_SSIZE_T r_number;  /* RPC program number. */
-};
-
 }
 
 [[cp_kos]]
@@ -66,30 +59,30 @@ void setrpcent(int stayopen);
 
 void endrpcent();
 
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/rpcent.h>")]]
 struct rpcent *getrpcbyname(char const *name);
 
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/rpcent.h>")]]
 struct rpcent *getrpcbynumber(int number);
 
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/rpcent.h>")]]
 struct rpcent *getrpcent();
 
 
 %
 %#ifdef __USE_MISC
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/crt/db/rpcent.h>")]]
 int getrpcbyname_r(char const *name, struct rpcent *result_buf,
                    char *buffer, size_t buflen,
-                   struct rpcent **result);
-[[cp_kos]]
+                   struct rpcent **result); /* XXX: [[nonnull]] annotations? */
+[[cp_kos, decl_include("<bits/crt/db/rpcent.h>")]]
 int getrpcbynumber_r(int number, struct rpcent *result_buf,
                      char *buffer, size_t buflen,
-                     struct rpcent **result);
-[[cp_kos]]
+                     struct rpcent **result); /* XXX: [[nonnull]] annotations? */
+[[cp_kos, decl_include("<bits/crt/db/rpcent.h>")]]
 int getrpcent_r(struct rpcent *result_buf,
                 char *buffer, size_t buflen,
-                struct rpcent **result);
+                struct rpcent **result); /* XXX: [[nonnull]] annotations? */
 %#endif /* __USE_MISC */
 
 

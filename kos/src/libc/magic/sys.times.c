@@ -23,6 +23,7 @@
 
 %{
 #include <bits/types.h>
+#include <bits/tms.h>
 
 __SYSDECL_BEGIN
 
@@ -52,22 +53,13 @@ __SYSDECL_BEGIN
 typedef __typedef_clock_t clock_t;
 #endif /* !__clock_t_defined */
 
-/* Structure describing CPU time used by a process and its children.  */
-struct tms {
-	clock_t tms_utime;  /* User CPU time. */
-	clock_t tms_stime;  /* System CPU time. */
-	clock_t tms_cutime; /* User CPU time of dead children. */
-	clock_t tms_cstime; /* System CPU time of dead children. */
-};
-
 }
 
 @@Store the CPU time used by this process and all its
 @@dead children (and their dead children) in BUFFER.
 @@Return the elapsed real time, or (clock_t) -1 for errors.
 @@All times are in CLK_TCKths of a second
-[[decl_include("<bits/types.h>")]]
-[[decl_prefix(struct tms;)]]
+[[decl_include("<bits/types.h>", "<bits/tms.h>")]]
 clock_t times(struct tms *buffer);
 
 %{

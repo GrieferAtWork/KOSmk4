@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e2e8c7f */
+/* HASH CRC-32:0x2d9f5400 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,13 +34,6 @@ DECL_BEGIN
 INTDEF void NOTHROW_NCX(LIBCCALL libc_closelog)(void);
 INTDEF void NOTHROW_RPC(LIBCCALL libc_openlog)(char const *ident, __STDC_INT_AS_UINT_T option, __STDC_INT_AS_UINT_T facility);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setlogmask)(__STDC_INT_AS_UINT_T mask);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) void NOTHROW_RPC(VLIBDCALL libd_syslog)(__STDC_INT_AS_UINT_T level, char const *format, ...);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) void NOTHROW_RPC(VLIBCCALL libc_syslog)(__STDC_INT_AS_UINT_T level, char const *format, ...);
-INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) void NOTHROW_RPC(LIBCCALL libc_vsyslog)(__STDC_INT_AS_UINT_T level, char const *format, va_list args);
 /* Helper functions for printing to the system log */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_syslog_printer)(void *arg, char const *__restrict data, size_t datalen);
 #endif /* !__KERNEL__ */

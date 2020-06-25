@@ -1377,6 +1377,8 @@
 #define __CRT_HAVE_clearerr_s 1
 #define __CRT_HAVE_clearerr_unlocked 1
 #define __CRT_HAVE_clock 1
+#define __CRT_HAVE_clock_adjtime 1
+#define __CRT_HAVE_clock_adjtime64 1
 #define __CRT_HAVE_clock_getcpuclockid 1
 #define __CRT_HAVE_clock_getres 1
 #define __CRT_HAVE_clock_getres64 1
@@ -2008,6 +2010,7 @@
 #define __CRT_HAVE_getrpcent 1
 #define __CRT_HAVE_getrpcent_r 1
 #define __CRT_HAVE_getrusage 1
+#define __CRT_HAVE_getrusage64 1
 #define __CRT_HAVE_gets 1
 #define __CRT_HAVE_gets_s 1
 #define __CRT_HAVE_getservbyname 1
@@ -5071,6 +5074,7 @@
 #define __CRT_HAVE_KOS$_execvp 1
 #define __CRT_HAVE_KOS$_execvpe 1
 #define __CRT_HAVE_KOS$_exit 1
+#define __CRT_HAVE__expand 1
 #define __CRT_HAVE__fclose_nolock 1
 #define __CRT_HAVE_KOS$_fcvt 1
 #define __CRT_HAVE_KOS$_fcvt_s 1
@@ -5640,6 +5644,8 @@
 #define __CRT_HAVE_KOS$clearerr 1
 #define __CRT_HAVE_KOS$clearerr_s 1
 #define __CRT_HAVE_KOS$clearerr_unlocked 1
+#define __CRT_HAVE_KOS$clock_adjtime 1
+#define __CRT_HAVE_KOS$clock_adjtime64 1
 #define __CRT_HAVE_KOS$clock_getcpuclockid 1
 #define __CRT_HAVE_KOS$clock_getres 1
 #define __CRT_HAVE_KOS$clock_getres64 1
@@ -6193,6 +6199,7 @@
 #define __CRT_HAVE_KOS$getrpcbynumber_r 1
 #define __CRT_HAVE_KOS$getrpcent_r 1
 #define __CRT_HAVE_KOS$getrusage 1
+#define __CRT_HAVE_KOS$getrusage64 1
 #define __CRT_HAVE_KOS$gets 1
 #define __CRT_HAVE_KOS$gets_s 1
 #define __CRT_HAVE_KOS$getservbyname 1
@@ -8429,6 +8436,7 @@
 #define __CRT_HAVE_DOS$_execvp 1
 #define __CRT_HAVE_DOS$_execvpe 1
 #define __CRT_HAVE_DOS$_exit 1
+#define __CRT_HAVE_DOS$_expand 1
 #define __CRT_HAVE_DOS$_fclose_nolock 1
 #define __CRT_HAVE_DOS$_fcvt 1
 #define __CRT_HAVE_DOS$_fcvt_s 1
@@ -8998,6 +9006,8 @@
 #define __CRT_HAVE_DOS$clearerr 1
 #define __CRT_HAVE_DOS$clearerr_s 1
 #define __CRT_HAVE_DOS$clearerr_unlocked 1
+#define __CRT_HAVE_DOS$clock_adjtime 1
+#define __CRT_HAVE_DOS$clock_adjtime64 1
 #define __CRT_HAVE_DOS$clock_getcpuclockid 1
 #define __CRT_HAVE_DOS$clock_getres 1
 #define __CRT_HAVE_DOS$clock_getres64 1
@@ -9551,6 +9561,7 @@
 #define __CRT_HAVE_DOS$getrpcbynumber_r 1
 #define __CRT_HAVE_DOS$getrpcent_r 1
 #define __CRT_HAVE_DOS$getrusage 1
+#define __CRT_HAVE_DOS$getrusage64 1
 #define __CRT_HAVE_DOS$gets 1
 #define __CRT_HAVE_DOS$gets_s 1
 #define __CRT_HAVE_DOS$getservbyname 1
