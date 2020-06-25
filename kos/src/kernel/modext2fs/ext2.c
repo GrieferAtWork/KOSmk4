@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_MODEXT2FS_EXT2_C
 #define GUARD_MODEXT2FS_EXT2_C 1
-#define _KOS_SOURCE            1
+#define _KOS_SOURCE 1
 
 #include "ext2.h"
 

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BITS_MATH_VECTOR_H
-#define _I386_KOS_BITS_MATH_VECTOR_H 1
+#ifndef _I386_KOS_BITS_CRT_MATH_VECTOR_H
+#define _I386_KOS_BITS_CRT_MATH_VECTOR_H 1
 
 #include <__stdinc.h>
 #include <hybrid/host.h>
@@ -45,6 +45,6 @@
 #endif /* __DECL_SIMD_x86_64 */
 #endif /* __x86_64__ && __FAST_MATH__ */
 
-#include "../../bits/math-vector.h"
+#include "../../../bits/crt/math-vector.h"
 
-#endif /* !_I386_KOS_BITS_MATH_VECTOR_H */
+#endif /* !_I386_KOS_BITS_CRT_MATH_VECTOR_H */

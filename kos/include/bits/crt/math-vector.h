@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_MATH_VECTOR_H
-#define _BITS_MATH_VECTOR_H 1
+#ifndef _BITS_CRT_MATH_VECTOR_H
+#define _BITS_CRT_MATH_VECTOR_H 1
 
 #include <__stdinc.h>
 
@@ -77,4 +77,4 @@
 #define __DECL_SIMD_powl    /* nothing */
 #endif /* !__DECL_SIMD_powl */
 
-#endif /* !_BITS_MATH_VECTOR_H */
+#endif /* !_BITS_CRT_MATH_VECTOR_H */

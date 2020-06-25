@@ -1368,7 +1368,7 @@ DEFINE_SYSCALL4(errno_t, rt_sigaction, signo_t, signo,
 #endif /* __ARCH_WANT_SYSCALL_RT_SIGACTION */
 
 #ifdef __ARCH_WANT_SYSCALL_SIGACTION
-DEFINE_SYSCALL3(errno_t, sigaction, syscall_ulong_t, signo,
+DEFINE_SYSCALL3(errno_t, sigaction, signo_t, signo,
                 UNCHECKED USER struct sigaction const *, act,
                 UNCHECKED USER struct sigaction *, oact) {
 	return sys_rt_sigaction(signo, act, oact, sizeof(sigset_t));

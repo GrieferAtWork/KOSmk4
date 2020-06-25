@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62338412 */
+/* HASH CRC-32:0xdefe90e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_cosl_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
-#include <bits/math-vector.h>
+#include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: cos from math */
 #ifndef __local___localdep_cos_defined

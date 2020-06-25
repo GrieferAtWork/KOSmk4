@@ -182,13 +182,17 @@ incdir("", "../../include");
 #include <asm/byteswap.h>
 #include <asm/cacheline.h>
 #include <asm/crt/malloc.h>
+#include <asm/crt/math-exception.h>
+#include <asm/crt/math-libc_version.h>
 #include <asm/crt/stdio.h>
+#include <asm/crt/stdio_ext.h>
 #include <asm/crt/stdlib.h>
 #include <asm/crt/threads.h>
 #include <asm/crt/ttyent.h>
 #include <asm/dirent.h>
 #include <asm/epoll.h>
 #include <asm/fcntl.h>
+#include <asm/fp_type.h>
 #include <asm/int-l64.h>
 #include <asm/int-ll64.h>
 #include <asm/intrin-arith.h>
@@ -223,6 +227,7 @@ incdir("", "../../include");
 #include <asm/syscalls.h>
 #include <asm/termbits.h>
 #include <asm/termios.h>
+#include <asm/time.h>
 #include <asm/types.h>
 #include <asm/ulimit.h>
 #include <asm/unistd.h>
@@ -250,6 +255,7 @@ incdir("", "../../include");
 #include <bits/crt/io-file.h>
 #include <bits/crt/lconv.h>
 #include <bits/crt/locale.h>
+#include <bits/crt/math-vector.h>
 #include <bits/crt/pthreadinit.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/pthreadvalues.h>
@@ -278,7 +284,6 @@ incdir("", "../../include");
 #include <bits/itimerspec.h>
 #include <bits/itimerval.h>
 #include <bits/local_lim.h>
-#include <bits/math-vector.h>
 #include <bits/mathdef.h>
 #include <bits/mbstate.h>
 #include <bits/mman.h>

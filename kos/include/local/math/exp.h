@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa88a90b8 */
+/* HASH CRC-32:0x74f5fedc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#include <bits/math-vector.h>
+#include <bits/crt/math-vector.h>
 #include <libm/signbit.h>
 #include <libm/finite.h>
 #include <libm/matherr.h>

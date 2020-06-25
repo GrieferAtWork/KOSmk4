@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1e69369 */
+/* HASH CRC-32:0x4c559eee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,19 +50,19 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_powf_defined 1
 #if __has_builtin(__builtin_powf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_powf)
 __NAMESPACE_LOCAL_END
-#include <bits/math-vector.h>
+#include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X to the Y power */
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powf,float,__NOTHROW,__localdep_powf,(float __x, float __y),powf,{ return __builtin_powf(__x, __y); })
 #elif defined(__CRT_HAVE_powf)
 __NAMESPACE_LOCAL_END
-#include <bits/math-vector.h>
+#include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X to the Y power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powf,float,__NOTHROW,__localdep_powf,(float __x, float __y),powf,(__x,__y))
 #elif defined(__CRT_HAVE___powf)
 __NAMESPACE_LOCAL_END
-#include <bits/math-vector.h>
+#include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X to the Y power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powf,float,__NOTHROW,__localdep_powf,(float __x, float __y),__powf,(__x,__y))

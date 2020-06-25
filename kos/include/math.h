@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf73b278b */
+/* HASH CRC-32:0x6883e648 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -553,7 +553,7 @@ __NAMESPACE_STD_USING(islessgreater)
 #include <hybrid/typecore.h>
 
 #include <bits/huge_val.h>
-#include <bits/math-vector.h>
+#include <bits/crt/math-vector.h>
 
 #include <ieee754.h>
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x195e2bf3 */
+/* HASH CRC-32:0xb7d18493 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,19 +50,19 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_powl_defined 1
 #if __has_builtin(__builtin_powl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_powl)
 __NAMESPACE_LOCAL_END
-#include <bits/math-vector.h>
+#include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X to the Y power */
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,__localdep_powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),powl,{ return __builtin_powl(__x, __y); })
 #elif defined(__CRT_HAVE_powl)
 __NAMESPACE_LOCAL_END
-#include <bits/math-vector.h>
+#include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X to the Y power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,__localdep_powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),powl,(__x,__y))
 #elif defined(__CRT_HAVE___powl)
 __NAMESPACE_LOCAL_END
-#include <bits/math-vector.h>
+#include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X to the Y power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,__localdep_powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__powl,(__x,__y))

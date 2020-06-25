@@ -48,7 +48,7 @@
 #include <hybrid/typecore.h>
 
 #include <bits/huge_val.h>
-#include <bits/math-vector.h>
+#include <bits/crt/math-vector.h>
 
 #include <ieee754.h>
 
@@ -172,12 +172,12 @@ double  atan2(double y, double x){
 }
 
 @@Cosine of X
-[[attribute("__DECL_SIMD_cos"), decl_include("<bits/math-vector.h>")]]
+[[attribute("__DECL_SIMD_cos"), decl_include("<bits/crt/math-vector.h>")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__cos")]]
 double cos(double x); /* TODO */
 
 @@Sine of X
-[[attribute("__DECL_SIMD_sin"), decl_include("<bits/math-vector.h>")]]
+[[attribute("__DECL_SIMD_sin"), decl_include("<bits/crt/math-vector.h>")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__sin")]]
 double sin(double x); /* TODO */
 
@@ -257,7 +257,7 @@ double atanh(double x); /* TODO */
 %(std, c)/* Exponential and logarithmic functions. */
 
 @@Exponential function of X
-[[attribute("__DECL_SIMD_exp"), decl_include("<bits/math-vector.h>")]]
+[[attribute("__DECL_SIMD_exp"), decl_include("<bits/crt/math-vector.h>")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__exp")]]
 [[impl_include("<libm/signbit.h>", "<libm/finite.h>")]]
 [[impl_include("<libm/matherr.h>", "<libm/exp.h>")]]
@@ -319,7 +319,7 @@ double ldexp(double x, int exponent) {
 }
 
 @@Natural logarithm of X
-[[attribute("__DECL_SIMD_log"), decl_include("<bits/math-vector.h>")]]
+[[attribute("__DECL_SIMD_log"), decl_include("<bits/crt/math-vector.h>")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__log")]]
 double log(double x); /* TODO */
 
@@ -425,7 +425,7 @@ double log2(double x); /* TODO */
 %(std, c)/* Power functions. */
 
 @@Return X to the Y power
-[[attribute("__DECL_SIMD_pow"), decl_include("<bits/math-vector.h>")]]
+[[attribute("__DECL_SIMD_pow"), decl_include("<bits/crt/math-vector.h>")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__pow")]]
 [[impl_include("<libm/finite.h>", "<libm/isnan.h>", "<libm/matherr.h>")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/pow.h>")]]
@@ -1227,7 +1227,7 @@ __LONGLONG llroundl(__LONGDOUBLE x) %{generate(double2ldouble("llround"))}
 %#ifdef __USE_GNU
 @@Cosine and sine of X
 [[nothrow, crtbuiltin, export_alias("__sincos")]]
-[[attribute("__DECL_SIMD_sincos"), decl_include("<bits/math-vector.h>")]]
+[[attribute("__DECL_SIMD_sincos"), decl_include("<bits/crt/math-vector.h>")]]
 void sincos(double x, [[nonnull]] double *psinx, [[nonnull]] double *pcosx); /* TODO */
 
 @@A function missing in all standards: compute exponent to base ten
@@ -1242,7 +1242,7 @@ double pow10(double x) {
 }
 
 [[crtbuiltin, export_alias("__sincosf"), nothrow, doc_alias(sincos)]]
-[[attribute("__DECL_SIMD_sincosf"), decl_include("<bits/math-vector.h>")]]
+[[attribute("__DECL_SIMD_sincosf"), decl_include("<bits/crt/math-vector.h>")]]
 [[requires_function(sincos)]]
 void sincosf(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx) {
 	double sinx, cosx;
@@ -1256,7 +1256,7 @@ void sincosf(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx) {
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[nothrow, crtbuiltin, export_alias("__sincosl"), doc_alias(sincos)]]
-[[attribute("__DECL_SIMD_sincosl"), decl_include("<bits/math-vector.h>")]]
+[[attribute("__DECL_SIMD_sincosl"), decl_include("<bits/crt/math-vector.h>")]]
 [[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("__sincos", "sincos")]]
 [[requires_function(sincos)]]
 void sincosl(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *psinx, [[nonnull]] __LONGDOUBLE *pcosx) {

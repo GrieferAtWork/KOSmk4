@@ -659,7 +659,7 @@ FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct driver *FCALL handle_as_d
 FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct pidns *FCALL handle_as_pidns(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
 FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct socket *FCALL handle_as_socket(REF struct handle const *__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE);
 
-#if defined(__cplusplus) && !defined(NO_HANDLE_AS_CXX_OVERLOADS)
+#if defined(__cplusplus) && !defined(NO_CXX_HANDLE_AS_OVERLOADS)
 extern "C++" {
 FUNDEF WUNUSED ATTR_RETNONNULL REF void *FCALL
 handle_as(REF struct handle const &__restrict self, uintptr_half_t wanted_type)
@@ -683,7 +683,7 @@ FUNDEF WUNUSED ATTR_RETNONNULL REF struct driver *FCALL handle_as_driver(REF str
 FUNDEF WUNUSED ATTR_RETNONNULL REF struct pidns *FCALL handle_as_pidns(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_pidns");
 FUNDEF WUNUSED ATTR_RETNONNULL REF struct socket *FCALL handle_as_socket(REF struct handle const &__restrict self) THROWS(E_INVALID_HANDLE_FILETYPE) ASMNAME("handle_as_socket");
 } /* extern "C++" */
-#endif /* __cplusplus && !NO_HANDLE_AS_CXX_OVERLOADS */
+#endif /* __cplusplus && !NO_CXX_HANDLE_AS_OVERLOADS */
 
 
 #endif /* __CC__ */

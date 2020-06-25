@@ -142,7 +142,7 @@ NOTHROW_RPC(LIBKCALL libc_wpathconf)(char32_t const *path,
                                      __STDC_INT_AS_UINT_T name)
 /*[[[body:libc_wpathconf]]]*/
 {
-	long int result;
+	longptr_t result;
 	char *used_path;
 	used_path = libc_uchar_c32tombs(path);
 	if unlikely(!used_path)
@@ -165,7 +165,7 @@ NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path,
                                      __STDC_INT_AS_UINT_T name)
 /*[[[body:libd_wpathconf]]]*/
 {
-	long int result;
+	longptr_t result;
 	char *used_path;
 	used_path = libc_uchar_c16tombs(path);
 	if unlikely(!used_path)
