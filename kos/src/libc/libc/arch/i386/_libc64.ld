@@ -57,7 +57,7 @@ PHDRS {
 #define ENUMERATE_SECTIONS(PREFIX)                                 \
 	*(PREFIX.hot PREFIX.likely PREFIX.hot.* PREFIX.likely.*)       \
 	*(PREFIX)                                                      \
-	ENUMERATE_CRT_SECTIONS(PREFIX)                                 \
+	ENUMERATE_CRT_SECTIONS(PREFIX.crt)                             \
 	*(PREFIX.cold PREFIX.unlikely PREFIX.cold.* PREFIX.unlikely.*) \
 	*(PREFIX.*)                                                    \
 /**/

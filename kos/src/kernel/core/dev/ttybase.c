@@ -766,19 +766,19 @@ do_TCSETX:
 	case TTYIO_CANON_GETLIMIT:
 	case TTYIO_OPEND_GETLIMIT:
 	case TTYIO_IPEND_GETLIMIT:
-#if __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
+#if defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
 	case _IO_WITHSIZE(TTYIO_IBUF_GETLIMIT, compat_size_t):
 	case _IO_WITHSIZE(TTYIO_CANON_GETLIMIT, compat_size_t):
 	case _IO_WITHSIZE(TTYIO_OPEND_GETLIMIT, compat_size_t):
 	case _IO_WITHSIZE(TTYIO_IPEND_GETLIMIT, compat_size_t):
-#endif /* __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
+#endif /* __ARCH_HAVE_COMPAT && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
 	{
 		size_t value;
-#if __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
+#if defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
 		validate_writable(arg, _IOC_SIZE(cmd));
-#else /* __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
+#else /* __ARCH_HAVE_COMPAT && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
 		validate_writable(arg, sizeof(size_t));
-#endif /* __SIZEOF_SIZE_T__ == __ARCH_COMPAT_SIZEOF_SIZE_T */
+#endif /* !__ARCH_HAVE_COMPAT || __SIZEOF_SIZE_T__ == __ARCH_COMPAT_SIZEOF_SIZE_T */
 		switch (_IOC_NR(cmd)) {
 
 		case _IOC_NR(TTYIO_IBUF_GETLIMIT):
@@ -800,11 +800,11 @@ do_TCSETX:
 		default: __builtin_unreachable();
 		}
 		COMPILER_WRITE_BARRIER();
-#if __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
+#if defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
 		if (_IOC_SIZE(cmd) == sizeof(compat_size_t)) {
 			*(USER CHECKED compat_size_t *)arg = (compat_size_t)value;
 		} else
-#endif /* __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
+#endif /* defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
 		{
 			*(USER CHECKED size_t *)arg = (size_t)value;
 		}
@@ -814,23 +814,23 @@ do_TCSETX:
 	case TTYIO_CANON_SETLIMIT:
 	case TTYIO_OPEND_SETLIMIT:
 	case TTYIO_IPEND_SETLIMIT:
-#if __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
+#if defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
 	case _IO_WITHSIZE(TTYIO_IBUF_SETLIMIT, compat_size_t):
 	case _IO_WITHSIZE(TTYIO_CANON_SETLIMIT, compat_size_t):
 	case _IO_WITHSIZE(TTYIO_OPEND_SETLIMIT, compat_size_t):
 	case _IO_WITHSIZE(TTYIO_IPEND_SETLIMIT, compat_size_t):
-#endif /* __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
+#endif /* __ARCH_HAVE_COMPAT && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
 	{
 		size_t value;
 		struct linebuffer *lnbuf;
 		cred_require_sysadmin();
 		COMPILER_READ_BARRIER();
-#if __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
+#if defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
 		if (_IOC_SIZE(cmd) == sizeof(compat_size_t)) {
 			validate_readable(arg, sizeof(compat_size_t));
 			value = *(USER CHECKED compat_size_t *)arg;
 		} else
-#endif /* __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
+#endif /* __ARCH_HAVE_COMPAT && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
 		{
 			validate_readable(arg, sizeof(size_t));
 			value = *(USER CHECKED size_t *)arg;

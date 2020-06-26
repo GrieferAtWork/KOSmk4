@@ -773,9 +773,8 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 do_normal_vio:
 					/* Make sure that the segment was mapped with the proper protection */
 					if unlikely((ecode & X86_PAGEFAULT_ECODE_WRITING)
-						         ? !(node_prot & VM_PROT_WRITE) /* Write to read-only VIO segment */
-						         : !(node_prot & VM_PROT_READ)  /* Read from non-readable VIO segment */
-						         ) {
+					            ? !(node_prot & VM_PROT_WRITE)   /* Write to read-only VIO segment */
+					            : !(node_prot & VM_PROT_READ)) { /* Read from non-readable VIO segment */
 						PERTASK_SET(this_exception_code, (ecode & X86_PAGEFAULT_ECODE_WRITING)
 						                                 ? ERROR_CODEOF(E_SEGFAULT_READONLY)
 						                                 : ERROR_CODEOF(E_SEGFAULT_NOTREADABLE));
@@ -879,23 +878,23 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 						goto decref_part_and_pop_connections_and_set_exception_pointers;
 					}
 					vm_datapart_lockread_setcore(part);
+					/* Check if the part still includes the accessed page.
+					 * This is required to ensure that `vm_datapart_loadpage()'
+					 * can be called safely (the part may have been split between
+					 * the time of us acquiring a read-lock to it, and the point
+					 * when we released our write-lock to the effected VM) */
+					if unlikely(node_vpage_offset >= vm_datapart_numvpages(part)) {
+						sync_endread(part);
+						decref_unlikely(part);
+						goto again_lookup_node;
+					}
 				}
 				assert(sync_reading(part));
-				COMPILER_READ_BARRIER();
-				/* Check if the part still includes the accessed page.
-				 * This is required to ensure that `vm_datapart_loadpage()'
-				 * can be called safely (the part may have been split between
-				 * the time of us acquiring a read-lock to it, and the point
-				 * when we released our write-lock to the effected VM) */
-				if unlikely(node_vpage_offset >= vm_datapart_numvpages(part)) {
-					sync_endread(part);
-					decref_unlikely(part);
-					goto again_lookup_node;
-				}
-				/* Load the affected page into the core. */
 				assert(part->dp_state != VM_DATAPART_STATE_ABSENT);
 				assert(node_vpage_offset < vm_datapart_numvpages(part));
+				COMPILER_BARRIER();
 
+				/* Load the affected page into the core. */
 				TRY {
 					ppage = vm_datapart_loadpage(part,
 					                             node_vpage_offset,
@@ -908,8 +907,9 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 				/* Re-acquire a lock to the VM, so we can map the affected page. */
 				if (!sync_trywrite(effective_vm)) {
 					sync_endread(part);
-					sync_write(effective_vm); /* Force a temporary lock to wait until it becomes available */
-					sync_endwrite(effective_vm);
+					/* Wait until it becomes possible to write to `effective_vm' */
+					while (!sync_canwrite(effective_vm))
+						task_yield();
 					decref_unlikely(part);
 					goto again_lookup_node;
 				}

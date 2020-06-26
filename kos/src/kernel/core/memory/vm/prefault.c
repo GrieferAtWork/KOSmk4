@@ -72,7 +72,8 @@ NOTHROW(KCALL free_partilly_initialized_datapart)(struct vm_datapart *__restrict
  * @param: pdid_unshare:      When non-NULL, set to `true' if the caller should try to merge `part' during decref(),
  *                            as the result of this function having actually performed an unshare.
  * @return: * : The number of consecutive pages loaded for write-access.
- *              In this case, a read-lock on `part' is passed to the caller. 
+ *              In this case, a read-lock on `part' is passed to the caller.
+ *              This is always at most `node_vpage_count'
  * @return: 0 : `node' is no longer valid (must re-attempt its lookup)
  *              In this case, no lock on `part' is passed to the caller. */
 PUBLIC size_t KCALL

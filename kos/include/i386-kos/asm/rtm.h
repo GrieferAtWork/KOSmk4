@@ -28,14 +28,14 @@
  * NOTE: A value of `0' is possible, and indicates that the transaction
  *       cannot be performed atomically (but that the fallback-path must
  *       be executed instead) */
-#define _XABORT_FAILED   __UINT32_C(0x00000000) /*  */
+#define _XABORT_FAILED   __UINT32_C(0x00000000) /* Transaction cannot be performed atomically */
 #define _XABORT_EXPLICIT __UINT32_C(0x00000001) /* Abort was caused by `xabort' */
 #define _XABORT_RETRY    __UINT32_C(0x00000002) /* The transaction may succeed if re-attempted */
 #define _XABORT_CONFLICT __UINT32_C(0x00000004) /* Transaction failed due to an address-conflict with another processor */
 #define _XABORT_CAPACITY __UINT32_C(0x00000008) /* The internal buffer to track transactions overflowed */
 #define _XABORT_DEBUG    __UINT32_C(0x00000010) /* A #DB (%drN) or #BP (int3) was triggered */
 #define _XABORT_NESTED   __UINT32_C(0x00000020) /* A nested transaction failed */
-#define _XABORT_CODE_M   __UINT32_C(0xff000000) /*  */
+#define _XABORT_CODE_M   __UINT32_C(0xff000000) /* [valid_if(_XABORT_EXPLICIT)] XABORT argument */
 #define _XABORT_CODE_S   24
 #define _XABORT_CODE(x)  (((x) & _XABORT_CODE_M) >> _XABORT_CODE_S)
 

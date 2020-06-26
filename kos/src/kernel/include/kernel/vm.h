@@ -1709,7 +1709,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vm_kernel_treelock_tryservice)(void);
 #define vm_treelock_reading(self)    atomic_rwlock_reading(&(self)->v_treelock)
 #define vm_treelock_writing(self)    atomic_rwlock_writing(&(self)->v_treelock)
 #define vm_treelock_canread(self)    atomic_rwlock_canread(&(self)->v_treelock)
-#define vm_treelock_canwrite(self)   atomic_rwlock_writing(&(self)->v_treelock)
+#define vm_treelock_canwrite(self)   atomic_rwlock_canwrite(&(self)->v_treelock)
 
 /* Define C++ sync API hooks. */
 __DEFINE_SYNC_RWLOCK(struct vm,
@@ -2289,7 +2289,8 @@ vm_forcefault(struct vm *__restrict self,
  * @param: pdid_unshare:      When non-NULL, set to `true' if the caller should try to merge `part' during decref(),
  *                            as the result of this function having actually performed an unshare.
  * @return: * : The number of consecutive pages loaded for write-access.
- *              In this case, a read-lock on `part' is passed to the caller. 
+ *              In this case, a read-lock on `part' is passed to the caller.
+ *              This is always at most `node_vpage_count'
  * @return: 0 : `node' is no longer valid (must re-attempt its lookup)
  *              In this case, no lock on `part' is passed to the caller. */
 FUNDEF size_t KCALL
