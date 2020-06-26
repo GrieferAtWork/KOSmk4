@@ -397,11 +397,12 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		effective_vm = THIS_VM;
 	{
 		struct task_connections con;
-		size_t vpage_offset; /* Offset (in vpages) of the accessed page from the start of `node' */
 		task_pushconnections(&con);
 		TRY {
 			struct vm_node *node;
-			struct vm_datapart *part;
+			REF struct vm_datapart *part;
+			uintptr_half_t node_prot;
+			size_t node_vpage_offset; /* Offset (in vpages) of the accessed page from the start of `node' */
 again_lookup_node:
 #ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
 			/* Access to the phys2virt section is allowed while preemption is disabled.
@@ -421,7 +422,6 @@ again_lookup_node:
 #else /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
 			sync_read(effective_vm);
 #endif /* !CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
-again_lookup_node_already_locked:
 			assert(sync_reading(effective_vm));
 			assert(!sync_writing(effective_vm));
 			/* Lookup the node associated with the given page. */
@@ -646,8 +646,9 @@ do_handle_iob_node_access:
 				/* TODO: Map a new guard above/below this node! */
 			}
 			assert(!wasdestroyed(node->vn_part));
-			part         = incref(node->vn_part);
-			vpage_offset = (size_t)(pageid - vm_node_getminpageid(node));
+			part              = incref(node->vn_part);
+			node_prot         = node->vn_prot;
+			node_vpage_offset = (size_t)(pageid - vm_node_getminpageid(node));
 			assert(vm_node_getpagecount(node) == vm_datapart_numvpages(part));
 			has_changed = ecode & X86_PAGEFAULT_ECODE_WRITING;
 			/* Acquire a lock to the affected data part. */
@@ -657,14 +658,12 @@ do_handle_iob_node_access:
 #ifdef LIBVIO_CONFIG_ENABLED
 				if (part->dp_state == VM_DATAPART_STATE_VIOPRT) {
 					struct vio_emulate_args args;
-					uintptr_half_t nodeprot;
-					nodeprot = node->vn_prot;
 					COMPILER_READ_BARRIER();
 					sync_endread(effective_vm);
 					/* VIO Emulation */
 					sync_read(part);
 					args.vea_args.va_block        = incref(part->dp_block);
-					args.vea_args.va_acmap_offset = ((pos_t)(vpage_offset + vm_datapart_mindpage(part))
+					args.vea_args.va_acmap_offset = ((pos_t)(node_vpage_offset + vm_datapart_mindpage(part))
 					                                 << VM_DATABLOCK_ADDRSHIFT(args.vea_args.va_block));
 					sync_endread(part);
 					args.vea_args.va_ops = args.vea_args.va_block->db_vio;
@@ -678,8 +677,17 @@ do_handle_iob_node_access:
 					/* Check for special case: call into VIO memory */
 					if (args.vea_args.va_ops->vo_call && (uintptr_t)addr == pc) {
 						/* Make sure that memory mapping has execute permissions! */
-						if unlikely(!(nodeprot & VM_PROT_EXEC))
-							goto vio_failure_throw_segfault;
+						if unlikely(!(node_prot & VM_PROT_EXEC)) {
+							PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+							PERTASK_SET(this_exception_pointers[1],
+							            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_EXEC |
+							                        E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS()));
+cleanup_vio_and_pop_connections_and_set_exception_pointers2:
+							decref_unlikely(args.vea_args.va_block);
+							assert(args.vea_args.va_part == part);
+							decref_unlikely(args.vea_args.va_part);
+							goto pop_connections_and_set_exception_pointers2;
+						}
 						/* Special case: call into VIO memory */
 						TRY {
 							vio_addr_t vio_addr;
@@ -765,21 +773,23 @@ do_handle_iob_node_access:
 do_normal_vio:
 					/* Make sure that the segment was mapped with the proper protection */
 					if unlikely((ecode & X86_PAGEFAULT_ECODE_WRITING)
-						         ? !(nodeprot & VM_PROT_WRITE) /* Write to read-only VIO segment */
-						         : !(nodeprot & VM_PROT_READ)  /* Read from non-readable VIO segment */
+						         ? !(node_prot & VM_PROT_WRITE) /* Write to read-only VIO segment */
+						         : !(node_prot & VM_PROT_READ)  /* Read from non-readable VIO segment */
 						         ) {
-vio_failure_throw_segfault:
-						decref_unlikely(args.vea_args.va_block);
-						assert(args.vea_args.va_part == part);
-						decref_unlikely(args.vea_args.va_part);
-						goto pop_connections_and_throw_segfault;
+						PERTASK_SET(this_exception_code, (ecode & X86_PAGEFAULT_ECODE_WRITING)
+						                                 ? ERROR_CODEOF(E_SEGFAULT_READONLY)
+						                                 : ERROR_CODEOF(E_SEGFAULT_NOTREADABLE));
+						PERTASK_SET(this_exception_pointers[1],
+						            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_EXEC |
+						                        E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS()));
+						goto cleanup_vio_and_pop_connections_and_set_exception_pointers2;
 					}
 					args.vea_args.va_state = state;
 					/* Determine the address range for which memory access should be virtualized
 					 * by looking at the lower/upper bound of the accessed VM node. - Any memory
 					 * access within this range will be dispatched via VIO. */
-					args.vea_ptrlo = vm_node_getmin(node);
-					args.vea_ptrhi = vm_node_getmax(node);
+					args.vea_ptrlo = (byte_t *)pageaddr - node_vpage_offset * PAGESIZE;
+					args.vea_ptrhi = (byte_t *)args.vea_ptrlo + vm_datapart_numvpages(part) * PAGESIZE - 1;
 					args.vea_addr  = vio_args_vioaddr(&args.vea_args, args.vea_ptrlo);
 					TRY {
 						/* Emulate the current instruction. */
@@ -824,324 +834,71 @@ vio_failure_throw_segfault:
 				}
 #endif /* LIBVIO_CONFIG_ENABLED */
 				sync_endread(effective_vm);
-
+				/* Make sure the desired user-space access is actually allowed! */
+				if unlikely(!(node_prot & VM_PROT_EXEC) &&
+				            ((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) || (uintptr_t)addr == pc)) {
+					/* Non-executable memory */
+					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+decref_part_and_pop_connections_and_set_exception_pointers:
+					decref_unlikely(part);
+					goto pop_connections_and_set_exception_pointers;
+				}
 				if (has_changed) {
-					if (node->vn_prot & VM_PROT_SHARED) {
-						/* Changes made by the caller should be shared.
-						 * -> Simply unshare copy-on-write mappings, and
-						 *    ensure that the part is loaded in-core, before
-						 *    proceeding to initialize the associated page. */
-						if (ATOMIC_READ(part->dp_crefs)) {
-							/* If there are copy-on-write mappings, first
-							 * minimize the data part to only contain a single
-							 * page of physical memory. - That way, we only need
-							 * to copy a single page, too, minimizing memory use. */
-do_unshare_cow:
-							if (vpage_offset != 0) {
-								xdecref(vm_datapart_split(part, vpage_offset));
-								decref_unlikely(part);
-								goto again_lookup_node;
-							}
-							if (vm_datapart_numvpages(part) != 1) {
-								xdecref(vm_datapart_split(part, 1));
-								decref_unlikely(part);
-								goto again_lookup_node;
-							}
-							vm_datapart_lockread_setcore_unsharecow(part);
-						} else {
-							/* No copy-on-write references (lock the part, load it into the core, and check again) */
-							vm_datapart_lockread_setcore(part);
-							if unlikely(ATOMIC_READ(part->dp_crefs)) {
-								sync_endread(part);
-								goto do_unshare_cow;
-							}
-						}
-					} else {
-						/* Changes made by the caller should be private.
-						 * -> Because of this, we must give them their own, private
-						 *    copy of the given data part, if that part can somehow
-						 *    be reached from the outside. */
-						vm_datapart_lockread_setcore(part);
-						if (/* The part is anonymous */
-						    ATOMIC_READ(part->dp_block->db_parts) == VM_DATABLOCK_ANONPARTS &&
-						    /* The part isn't mapped as shared by anyone */
-						    part->dp_srefs == NULL &&
-						    /* There aren't any other copy-on-write nodes. */
-						    part->dp_crefs == node && node->vn_link.ln_next == NULL) {
-							/* No need to copy the part. - we're already the only ones actually using it! */
-						} else {
-							struct vm_datapart *new_part;
-							pageptr_t old_ppage, new_ppage;
-							/* Verify that the access being made is valid. */
-							if unlikely(!(node->vn_prot & VM_PROT_WRITE))
-								goto endread_and_decref_part_and_set_readonly;
-							if (!(node->vn_prot & VM_PROT_EXEC)) {
-								if unlikely((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) || (uintptr_t)addr == pc)
-									goto endread_and_decref_part_and_set_noexec;
-							}
-
-							/* We have to split the part such that we can
-							 * manipulate the accessed page individually. */
-							if (vpage_offset != 0) {
-								sync_endread(part);
-								xdecref(vm_datapart_split(part, vpage_offset));
-								decref_unlikely(part);
-								goto again_lookup_node;
-							}
-							if (vm_datapart_numvpages(part) != 1) {
-								sync_endread(part);
-								xdecref(vm_datapart_split(part, 1));
-								decref_unlikely(part);
-								goto again_lookup_node;
-							}
-							assert(vpage_offset == 0);
-							assert(vm_datapart_numvpages(part) == 1);
-							assert(vm_node_getstartpageid(node) == pageid);
-							assert(vm_node_getpagecount(node) == 1);
-
-							/* Make sure that PAGE#0 of `part' has been initialized!
-							 * If it wasn't, we need to initialize it now, since
-							 * otherwise we'd be copying uninitialized data below!
-							 * Also: If this page isn't marked as initialized, the
-							 *       duplicated part won't be set as such, either! */
-							{
-								unsigned int i, count;
-								count = VM_DATABLOCK_PAGEALIGN(part->dp_block);
-								for (i = 0; i < count; ++i) {
-									unsigned int part_state;
-									part_state = vm_datapart_getstate(part, i);
-									if (VM_DATAPART_PPP_ISINITIALIZED(part_state))
-										continue;
-									/* Must initialize the part's first page! */
-									TRY {
-										has_changed = false;
-										vm_datapart_loadpage(part, 0, &has_changed);
-									} EXCEPT {
-										sync_endread(part);
-										RETHROW();
-									}
-									sync_endread(part);
-									decref_unlikely(part);
-									goto again_lookup_node;
-								}
-							}
-
-							/* At this point, we need to allocate a new vm_datapart, which we
-							 * then have to set up as a mirror copy of the affected part.
-							 * HINT: By this point, we can already assume that `part' is INCORE/LOCKED,
-							 *       since we used `vm_datapart_lockread_setcore()' to acquire a read
-							 *       lock to it above.
-							 * HINT: We don't need to allocate a new node, because we can simply re-use
-							 *       the old node, as it doesn't even need to change its memory location! */
-							new_part = (struct vm_datapart *)kmalloc_nx(sizeof(struct vm_datapart),
-							                                            GFP_LOCKED | GFP_ATOMIC | GFP_VCBASE);
-							if (!new_part) {
-								sync_endread(part);
-								new_part = (struct vm_datapart *)kmalloc(sizeof(struct vm_datapart),
-								                                         GFP_LOCKED | GFP_VCBASE);
-								goto upgrade_and_recheck_vm_for_node;
-							} else if (!sync_tryupgrade(part)) {
-								sync_endread(part);
-upgrade_and_recheck_vm_for_node:
-								sync_read(effective_vm);
-								if unlikely(vm_getnodeofpageid(effective_vm, pageid) != node ||
-								            node->vn_part != part ||
-								            (node->vn_prot & VM_PROT_SHARED)) {
-									decref_unlikely(part);
-									kfree(new_part);
-									printk(KERN_DEBUG "Race condition: Mapping target at %p (%p) has changed during unshare (#1)\n",
-									       pageaddr, addr);
-									goto again_lookup_node_already_locked;
-								}
-								sync_endread(effective_vm);
-								vm_datapart_lockwrite_setcore(part);
-							}
-
-							/* Allocate the physical memory used for backing the vm-local copy. */
-							new_ppage = page_mallocone();
-							/* Check if the allocation failed. */
-							if unlikely(new_ppage == PAGEPTR_INVALID) {
-								sync_endwrite(part);
-								kfree(new_part);
-								THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
-							}
-
-							/* Initialize the new part. */
-							new_part->dp_refcnt = 2; /* +1 (CREF: `node'), +1 (part; assignment below) */
-							shared_rwlock_init(&new_part->dp_lock);
-							new_part->dp_tree.a_vmin = part->dp_tree.a_vmin;
-							new_part->dp_tree.a_vmax = part->dp_tree.a_vmax;
-							new_part->dp_crefs = node;
-							new_part->dp_srefs = NULL;
-							new_part->dp_stale = NULL;
-							new_part->dp_state = part->dp_state;
-							new_part->dp_flags = part->dp_flags & (VM_DATAPART_FLAG_LOCKED | VM_DATAPART_FLAG_CHANGED);
-							new_part->dp_pprop = unlikely(part->dp_flags & VM_DATAPART_FLAG_HEAPPPP)
-							                     ? part->dp_pprop_p[0]
-							                     : part->dp_pprop;
-							new_part->dp_ramdata.rd_blockv          = &new_part->dp_ramdata.rd_block0;
-							new_part->dp_ramdata.rd_block0.rb_start = new_ppage;
-							new_part->dp_ramdata.rd_block0.rb_size  = 1;
-							new_part->dp_futex                      = NULL;
-							assert(new_part->dp_state == VM_DATAPART_STATE_INCORE ||
-							       new_part->dp_state == VM_DATAPART_STATE_LOCKED);
-
-							if (!sync_trywrite(effective_vm)) {
-								sync_endwrite(part);
-								page_free(new_ppage, 1);
-								kfree(new_part);
-								sync_write(effective_vm);
-								sync_downgrade(effective_vm);
-								decref_unlikely(part);
-								goto again_lookup_node_already_locked;
-							}
-							if unlikely(vm_getnodeofpageid(effective_vm, pageid) != node ||
-							            node->vn_part != part ||
-							            (node->vn_prot & VM_PROT_SHARED)) {
-								sync_downgrade(effective_vm);
-								sync_endwrite(part);
-								page_free(new_ppage, 1);
-								kfree(new_part);
-								decref_unlikely(part);
-								printk(KERN_DEBUG "Race condition: Mapping target at %p (%p) has changed during unshare (#2)\n",
-								       pageaddr, addr);
-								goto again_lookup_node_already_locked;
-							}
-							/* If the node isn't prepared, make sure that we can map memory. */
-							if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
-								if unlikely(!pagedir_prepare_mapone(pageaddr)) {
-									sync_endwrite(effective_vm);
-									sync_endwrite(part);
-									page_free(new_ppage, 1);
-									kfree(new_part);
-									decref_unlikely(part);
-									THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
-								}
-							}
-
-							/* Copy the contents of the page being unshared. */
-							old_ppage = part->dp_ramdata.rd_blockv[0].rb_start;
-							vm_copypageinphys(page2addr(new_ppage),
-							                  page2addr(old_ppage));
-
-							new_part->dp_block = incref(&vm_datablock_anonymous_zero_vec[VM_DATABLOCK_PAGESHIFT(part->dp_block)]);
-
-							/* Must update the page directory mapping _before_ calling `sync_endwrite(effective_vm)'
-							 * Otherwise, `part' may be destroyed while `effective_vm' still contains the mapping
-							 * of the already destroyed (and potentially re-purposed) part. */
-							prot = node->vn_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
-							if (effective_vm != &vm_kernel)
-								prot |= PAGEDIR_MAP_FUSER;
-
-							/* Since we're changing an existing mapping such that the
-							 * previous mapping may get deleted, we must sync this change.
-							 * Otherwise, some cached TLB entry may still reference the old
-							 * datapart once that part has been destroyed. */
-#ifndef CONFIG_NO_SMP
-							if unlikely(!vm_sync_begin_nx(effective_vm)) {
-								sync_endwrite(effective_vm);
-								sync_endwrite(part);
-								page_free(new_ppage, 1);
-								kfree(new_part);
-								/* Block until the task lock becomes available, then try again. */
-								vm_tasklock_read(effective_vm);
-								vm_tasklock_endread(effective_vm);
-								/* decref() is below `vm_tasklock_read(effective_vm)' because we're still
-								 * inside of the `TRY { ... } EXCEPT { decref_unlikely(part); }' block */
-								decref_unlikely(part);
-								goto again_lookup_node_already_locked;
-							}
-#endif /* !CONFIG_NO_SMP */
-
-							/* Actually map the accessed page! */
-							pagedir_mapone(pageaddr, page2addr(new_ppage), prot);
-							vm_sync_endone(effective_vm, pageaddr);
-
-							/* Unlink the given node from the old part's chain. */
-							LLIST_REMOVE(node, vn_link);
-							sync_endwrite(part);
-
-							/* Re-link the node to be apart of our part copy. */
-							assert(!sync_reading(new_part));
-							assert(!sync_writing(new_part));
-							node->vn_link.ln_pself = &new_part->dp_crefs;
-							node->vn_link.ln_next  = NULL;
-							assert(node->vn_part == part);
-							decref_nokill(part);      /* node->vn_part */
-							node->vn_part = new_part; /* Inherit reference */
-							assert(ATOMIC_READ(new_part->dp_block->db_parts) == VM_DATABLOCK_ANONPARTS);
-							assert(new_part->dp_srefs == NULL);
-							assert(new_part->dp_crefs == node);
-							assert(node->vn_link.ln_pself == &new_part->dp_crefs);
-							assert(node->vn_link.ln_next == NULL);
-							sync_endwrite(effective_vm);
-
-							decref_unlikely(part); /* The reference created by `part = incref(node->vn_part);' above */
-							/* Try to merge `part' during the decref() below! */
-							vm_datapart_decref_and_merge(new_part);
-
-#if 1
-							printk(KERN_TRACE "[vm] Unshared page at %p [tid=%u,pc=%p,sp=%p]\n",
-							       pageaddr, task_getroottid_s(),
-							       pc, icpustate_getsp(state));
-#else
-							printk(KERN_TRACE "[vm] Unshared page at %p [tid=%u,pc=%p,sp=%p,oldpage=" FORMAT_VM_PHYS_T ",newpage=" FORMAT_VM_PHYS_T "]\n",
-							       pageaddr, task_getroottid_s(),
-							       page2addr(old_ppage), page2addr(new_ppage),
-							       pc, icpustate_getsp(state));
-#endif
-							goto done_before_pop_connections;
-						}
+					bool did_unshare;
+					if unlikely(!(node_prot & VM_PROT_WRITE)) {
+						/* Read-only memory */
+						PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_READONLY));
+						goto decref_part_and_pop_connections_and_set_exception_pointers;
+					}
+					did_unshare = false;
+					/* Lock and unshare the datapart being written to. */
+					if (!vm_lock_and_unshare_datapart_for_writing(effective_vm,
+					                                              &part,
+					                                              addr,
+					                                              node,
+					                                              node_prot,
+					                                              node_vpage_offset,
+					                                              1,
+					                                              &did_unshare)) {
+						/* Race condition... (try again) */
+						decref_unlikely(part);
+						goto again_lookup_node;
+					}
+					/* In case an unshare did actually happen, `vm_lock_and_unshare_datapart_for_writing()'
+					 * will have already performed the necessary page directory re-mapping, so we're already
+					 * done. */
+					if (did_unshare) {
+						sync_endread(part);
+						vm_datapart_decref_and_merge(part);
+						goto done_before_pop_connections;
 					}
 				} else {
+					if unlikely(!(node_prot & VM_PROT_READ)) {
+						/* Write-only memory */
+						PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTREADABLE));
+						goto decref_part_and_pop_connections_and_set_exception_pointers;
+					}
 					vm_datapart_lockread_setcore(part);
 				}
+				assert(sync_reading(part));
 				COMPILER_READ_BARRIER();
 				/* Check if the part still includes the accessed page.
 				 * This is required to ensure that `vm_datapart_loadpage()'
 				 * can be called safely (the part may have been split between
 				 * the time of us acquiring a read-lock to it, and the point
 				 * when we released our write-lock to the effected VM) */
-				if unlikely(vpage_offset >= vm_datapart_numvpages(part)) {
+				if unlikely(node_vpage_offset >= vm_datapart_numvpages(part)) {
 					sync_endread(part);
 					decref_unlikely(part);
 					goto again_lookup_node;
 				}
 				/* Load the affected page into the core. */
 				assert(part->dp_state != VM_DATAPART_STATE_ABSENT);
-				assert(vpage_offset < vm_datapart_numvpages(part));
+				assert(node_vpage_offset < vm_datapart_numvpages(part));
 
-				/* Make sure the desired user-space access is actually allowed! */
-				if unlikely(!(node->vn_prot & VM_PROT_WRITE) &&
-				            (ecode & X86_PAGEFAULT_ECODE_WRITING)) {
-					/* Read-only memory */
-endread_and_decref_part_and_set_readonly:
-					sync_endread(part);
-					decref_unlikely(part);
-					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_READONLY));
-					goto pop_connections_and_set_exception_pointers;
-				}
-				if unlikely(!(node->vn_prot & VM_PROT_READ) &&
-				            !(ecode & X86_PAGEFAULT_ECODE_WRITING)) {
-					/* Write-only memory */
-					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTREADABLE));
-					sync_endread(part);
-					decref_unlikely(part);
-					goto pop_connections_and_set_exception_pointers;
-				}
-				if (!(node->vn_prot & VM_PROT_EXEC)) {
-					if unlikely((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) || (uintptr_t)addr == pc) {
-						/* Non-executable memory */
-endread_and_decref_part_and_set_noexec:
-						sync_endread(part);
-						decref_unlikely(part);
-						PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
-						goto pop_connections_and_set_exception_pointers;
-					}
-				}
 				TRY {
 					ppage = vm_datapart_loadpage(part,
-					                             vpage_offset,
+					                             node_vpage_offset,
 					                             &has_changed);
 				} EXCEPT {
 					sync_endread(part);
@@ -1151,48 +908,26 @@ endread_and_decref_part_and_set_noexec:
 				/* Re-acquire a lock to the VM, so we can map the affected page. */
 				if (!sync_trywrite(effective_vm)) {
 					sync_endread(part);
-					sync_write(effective_vm);
-					sync_downgrade(effective_vm);
+					sync_write(effective_vm); /* Force a temporary lock to wait until it becomes available */
+					sync_endwrite(effective_vm);
 					decref_unlikely(part);
-					goto again_lookup_node_already_locked;
+					goto again_lookup_node;
 				}
 
 				/* Check to ensure that the mapped target hasn't changed
 				 * while we were loading the affected page into the core. */
 				if unlikely(vm_getnodeofpageid(effective_vm, pageid) != node ||
-				            node->vn_part != part) {
+				            node->vn_part != part || node->vn_prot != node_prot) {
 					sync_endread(part);
+					sync_endwrite(effective_vm);
 					decref_unlikely(part);
-					sync_downgrade(effective_vm);
 					printk(KERN_DEBUG "Race condition: Mapping target at %p has changed\n",
 					       pageaddr);
-					goto again_lookup_node_already_locked;
-				}
-
-				/* Check one more time if we must unshare the node when writing.
-				 * This may still trigger after a fork() that happened in another
-				 * thread within the same VM, which copied the VM before we got here,
-				 * but did so after we checked this above (aka.: during the time
-				 * when we had to release our VM lock to initialize the associated
-				 * data part page) */
-				if ((ecode & X86_PAGEFAULT_ECODE_WRITING) &&
-				    !(node->vn_prot & VM_PROT_SHARED) &&
-				    !(/* The part is anonymous */
-				      ATOMIC_READ(part->dp_block->db_parts) == VM_DATABLOCK_ANONPARTS &&
-				      /* The part isn't mapped as shared by anyone */
-				      part->dp_srefs == NULL &&
-				      /* There aren't any other copy-on-write nodes. */
-				      part->dp_crefs == node && node->vn_link.ln_next == NULL)) {
-					sync_endread(part);
-					decref_unlikely(part);
-					sync_downgrade(effective_vm);
-					printk(KERN_DEBUG "Race condition: Must unshare node at %p because of write %u\n",
-					       pageaddr);
-					goto again_lookup_node_already_locked;
+					goto again_lookup_node;
 				}
 
 				/* Map the affected page, overriding the mapping hint that originally got us here. */
-				prot = node->vn_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+				prot = node_prot & (PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 
 				/* Unset so we're able to track changes.
 				 * NOTE: The actual tracking of changes isn't something that can be done atomically,
@@ -1205,7 +940,7 @@ endread_and_decref_part_and_set_noexec:
 					 * we're mapping it with write permissions, we must delete those in case of a PRIVATE
 					 * memory mapping when the part isn't anonymous, or mapped by other SHARED or PRIVATE
 					 * mappings. */
-					if (!(node->vn_prot & VM_PROT_SHARED) &&
+					if (!(node_prot & VM_PROT_SHARED) &&
 					    (ATOMIC_READ(part->dp_block->db_parts) != VM_DATABLOCK_ANONPARTS ||
 					     part->dp_srefs != NULL || part->dp_crefs != node ||
 					     node->vn_link.ln_next != NULL))
@@ -1272,6 +1007,9 @@ pop_connections_and_throw_segfault:
 pop_connections_and_set_exception_pointers:
 			task_popconnections(&con);
 			goto set_exception_pointers;
+pop_connections_and_set_exception_pointers2:
+			task_popconnections(&con);
+			goto set_exception_pointers2;
 		}
 	}
 done:
@@ -1374,7 +1112,6 @@ not_a_badcall:
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
 	}
 set_exception_pointers:
-	PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
 	PERTASK_SET(this_exception_pointers[1],
 	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT |
 	                        ((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) ||
@@ -1382,6 +1119,8 @@ set_exception_pointers:
 	                         ? E_SEGFAULT_CONTEXT_EXEC
 	                         : 0) |
 	                        GET_PF_CONTEXT_UW_BITS()));
+set_exception_pointers2:
+	PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
 	{
 		unsigned int i;
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)

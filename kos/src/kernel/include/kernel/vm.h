@@ -2222,14 +2222,20 @@ FUNDEF size_t FCALL vm_prefault(USER CHECKED void const *addr,
                                 size_t num_bytes, bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
+
+/* Flags for `vm_forcefault()' */
+#define VM_FORCEFAULT_FLAG_READ  0x0000 /* Prefault for the purpose of a future read operation. */
+#define VM_FORCEFAULT_FLAG_WRITE 0x0001 /* Prefault for the purpose of a future write operation. */
+#define VM_FORCEFAULT_FLAG_NOVIO 0x0002 /* Throw an `E_SEGFAULT' exception when a VIO mapping is encountered. */
+
 /* Force all bytes within the given address range to be faulted for either reading
  * or writing. If any page within the specified range isn't mapped, throw an E_SEGFAULT
- * exception. Otherwise, ensure that copy-on-write is invoked when `for_writing' is true,
- * and that irregardless of `for_writing', physical memory is allocated for any mapping
- * that can be made to be backed by RAM.
+ * exception. Otherwise, ensure that copy-on-write is invoked when `VM_FORCEFAULT_FLAG_WRITE'
+ * is set, and that irregardless of `VM_FORCEFAULT_FLAG_WRITE', physical memory is allocated
+ * for any mapping that can be made to be backed by RAM.
  * Any VIO mappings within the specified range are simply ignored (and will not count
- * towards the returned value)
- * @return: * : The total number of bytes that become faulted as the resule of this
+ * towards the returned value), unless `VM_FORCEFAULT_FLAG_NOVIO' is set
+ * @return: * : The total number of bytes that become faulted as the result of this
  *              function being called. Note that even if you may be expecting that some
  *              specified address within the range wasn't faulted before, you must still
  *              allow for this function to return `0', since there always exists a
@@ -2249,21 +2255,52 @@ FUNDEF size_t FCALL
 vm_paged_forcefault(struct vm *__restrict self,
                     pageid_t minpageid,
                     pageid_t maxpageid,
-                    bool for_writing)
+                    unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 LOCAL size_t FCALL
 vm_forcefault(struct vm *__restrict self,
               PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
               PAGEDIR_PAGEALIGNED size_t num_bytes,
-              bool for_writing)
+              unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
 	__hybrid_assert(((uintptr_t)addr & PAGEMASK) == 0);
 	__hybrid_assert((num_bytes & PAGEMASK) == 0);
 	return vm_paged_forcefault(self,
 	                           PAGEID_ENCODE((byte_t *)addr),
 	                           PAGEID_ENCODE((byte_t *)addr + num_bytes - 1),
-	                           for_writing);
+	                           flags);
 }
+
+
+/* Lock and (possibly) unshare some given datapart for the purpose of performing
+ * writes to its backing memory in the context of the given vm `self'.
+ * This funciton is used by the #PF handler, `vm_write()', `vm_prefault()' and `vm_forcefault()'
+ * whenever memory is accessed in a way that it is necessary to perform a write.
+ * @param: self:              The VM inside of which `node' is mapped.
+ * @param: ppart:             [in|out] A reference to the effective part being accessed (may be modified during unsharing)
+ * @param: addr:              The access that is being accessed.
+ * @param: node:              A pointer to the node that is being accessed. Note that since no lock is held to
+ *                            `self' when this function is called, this pointer may already no longer be valid!
+ * @param: node_prot:         The original value of `node->vn_prot'
+ * @param: node_vpage_offset: Page-offset into `node' to the first page to which write-access is actually required.
+ *                            This must be equal to `PAGEID_ENCODE(addr) - vm_node_getstartpageid(node)'
+ * @param: node_vpage_count:  The max number of consecutive pages for which write-access is required. For most
+ *                            kinds of memory accesses (including #PF-related ones), this argument is simply `1'
+ * @param: pdid_unshare:      When non-NULL, set to `true' if the caller should try to merge `part' during decref(),
+ *                            as the result of this function having actually performed an unshare.
+ * @return: * : The number of consecutive pages loaded for write-access.
+ *              In this case, a read-lock on `part' is passed to the caller. 
+ * @return: 0 : `node' is no longer valid (must re-attempt its lookup)
+ *              In this case, no lock on `part' is passed to the caller. */
+FUNDEF size_t KCALL
+vm_lock_and_unshare_datapart_for_writing(struct vm *__restrict self,
+                                         REF struct vm_datapart **__restrict ppart,
+                                         USER void *addr,
+                                         WEAK struct vm_node *node,
+                                         uintptr_half_t node_prot,
+                                         size_t node_vpage_offset,
+                                         size_t node_vpage_count,
+                                         bool *pdid_unshare);
 
 
 /* Sync changes made to file mappings within the given address
