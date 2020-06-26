@@ -23,6 +23,7 @@
 /* KOS-specific video-device system interface. */
 
 #include <__stdinc.h>
+
 #include <asm/ioctl.h>
 #include <bits/types.h>
 
@@ -31,10 +32,10 @@ __DECL_BEGIN
 #define VD_FORMAT_FLAG_NORMAL 0x0000 /* Normal flags */
 
 #define VIDEOIO_LISTFORMAT _IOR_KOS('V', 0x00, struct vd_lsfmt_struct) /* Enumerate available video formats. */
-#define VIDEOIO_GETFORMAT  _IOR_KOS('V', 0x01, struct vd_format) /* Get the current video format. */
-#define VIDEOIO_SETFORMAT  _IOW_KOS('V', 0x01, struct vd_format) /* Set the current video format. */
-#define VIDEOIO_GETPAL     _IOR_KOS('V', 0x02, struct vd_pal_struct) /* Get the current color palette. */
-#define VIDEOIO_SETPAL     _IOW_KOS('V', 0x02, struct vd_pal_struct) /* Set the current color palette. */
+#define VIDEOIO_GETFORMAT  _IOR_KOS('V', 0x01, struct vd_format)       /* Get the current video format. */
+#define VIDEOIO_SETFORMAT  _IOW_KOS('V', 0x01, struct vd_format)       /* Set the current video format. */
+#define VIDEOIO_GETPAL     _IOR_KOS('V', 0x02, struct vd_pal_struct)   /* Get the current color palette. */
+#define VIDEOIO_SETPAL     _IOW_KOS('V', 0x02, struct vd_pal_struct)   /* Set the current color palette. */
 
 
 #ifdef __CC__
@@ -47,13 +48,13 @@ struct vd_palette {
 };
 
 struct vd_format {
-	vd_codec_t vdf_codec;  /* Video display codec (One of `VIDEO_CODEC_*'). (When `VIDEO_CODEC_NONE', this is a TTY format) */
-	__uint16_t vdf_flags;  /* Video format flags (Set of `VD_FORMAT_FLAG_*') */
-	__uint32_t vdf_resx;   /* Screen resolution in X (or TTY cell count in X) */
-	__uint32_t vdf_resy;   /* Screen resolution in Y (or TTY cell count in Y) */
-	__uint32_t vdf_scan;   /* Scanline size (in bytes) */
-	__uint32_t vdf_dpix;   /* Dots (pixels) per inch in X (or 0 if unknown) (or TTY cell pixel-size in X) */
-	__uint32_t vdf_dpiy;   /* Dots (pixels) per inch in Y (or 0 if unknown) (or TTY cell pixel-size in Y) */
+	vd_codec_t vdf_codec; /* Video display codec (One of `VIDEO_CODEC_*'). (When `VIDEO_CODEC_NONE', this is a TTY format) */
+	__uint16_t vdf_flags; /* Video format flags (Set of `VD_FORMAT_FLAG_*') */
+	__uint32_t vdf_resx;  /* Screen resolution in X (or TTY cell count in X) */
+	__uint32_t vdf_resy;  /* Screen resolution in Y (or TTY cell count in Y) */
+	__uint32_t vdf_scan;  /* Scanline size (in bytes) */
+	__uint32_t vdf_dpix;  /* Dots (pixels) per inch in X (or 0 if unknown) (or TTY cell pixel-size in X) */
+	__uint32_t vdf_dpiy;  /* Dots (pixels) per inch in Y (or 0 if unknown) (or TTY cell pixel-size in Y) */
 };
 
 struct vd_lsfmt_struct {

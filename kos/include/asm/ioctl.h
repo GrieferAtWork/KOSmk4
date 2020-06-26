@@ -83,6 +83,7 @@
 #define _IOR_KOS(type, nr, T)  _IOC_KOS(_IOC_READ, (type), (nr), _IOC_TYPECHECK(T))
 #define _IOW_KOS(type, nr, T)  _IOC_KOS(_IOC_WRITE, (type), (nr), _IOC_TYPECHECK(T))
 #define _IOWR_KOS(type, nr, T) _IOC_KOS(_IOC_READ | _IOC_WRITE, (type), (nr), _IOC_TYPECHECK(T))
+#define _IO_WITHSIZE(base, T)  (((base) & ~(_IOC_TYPEMASK << _IOC_TYPESHIFT)) | (sizeof(T) << _IOC_TYPESHIFT))
 
 /* used to decode ioctl numbers.. */
 #define _IOC_NR(nr)    (((nr) >> _IOC_NRSHIFT) & _IOC_NRMASK)

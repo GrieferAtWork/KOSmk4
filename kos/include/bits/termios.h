@@ -112,10 +112,11 @@ struct termios2 {
 #define IUCLC    0x000200 /* Map uppercase characters to lowercase on input (requires `IEXTEN'). */
 #define IXON     0x000400 /* Enable support for `VSTOP' to disable TTY output transmission. */
 #define IXANY    0x000800 /* Any input character has the behavior of `VSTART' */
-#define IXOFF    0x001000 /* Status bit for `VSTOP' / `VSTART': Don't transmit pending TTY output until this bit is cleared. */
+#define IXOFF    0x001000 /* Status bit for `VSTOP' / `VSTART': Don't transmit pending TTY output until this bit is cleared.
+                           * When set, tty output is instead stored in a secondary buffer (s.a. `TTYIO_OPEND_GETLIMIT' and `TTYIO_OPEND_SETLIMIT') */
 #define IMAXBEL  0x002000 /* Ring bell when input queue is full (KOS-SPECIFIC: The bell also gets triggered when the queue is empty and a delete character is received) */
 #define IUTF8    0x004000 /* Input is UTF8 */
-#define __IIOFF  0x100000 /* Status bit for `TCIOFF' / `TCION': When set, disable enqueuing of new input. */
+#define __IIOFF  0x100000 /* Status bit for `TCIOFF' / `TCION': When set, redirect input to a secondary buffer. (s.a. `TTYIO_IPEND_GETLIMIT' and `TTYIO_IPEND_SETLIMIT') */
 
 /* c_oflag bits */
 #define OPOST       0x00001 /* Enable implementation-defined output processing */

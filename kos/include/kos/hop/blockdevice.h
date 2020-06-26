@@ -39,12 +39,12 @@ __DECL_BEGIN
 #endif /* !BLOCK_DEVICE_FLAG_NORMAL */
 
 #define __OFFSET_HOP_BLOCKDEVICE_STAT_STRUCT_SIZE  0
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_TOTAL_BYTES  8
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_COUNT 16
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_SIZE  24
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_DEVICE_FLAG  32
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_PARTCOUNT    36
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_DEVNO        40
+#define __OFFSET_HOP_BLOCKDEVICE_STAT_DEVNO        8
+#define __OFFSET_HOP_BLOCKDEVICE_STAT_TOTAL_BYTES  16
+#define __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_COUNT 24
+#define __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_SIZE  32
+#define __OFFSET_HOP_BLOCKDEVICE_STAT_DEVICE_FLAG  40
+#define __OFFSET_HOP_BLOCKDEVICE_STAT_PARTCOUNT    44
 #define __OFFSET_HOP_BLOCKDEVICE_STAT_NAME         48
 #define __SIZEOF_HOP_BLOCKDEVICE_STAT              128
 #ifdef __CC__
@@ -54,13 +54,13 @@ struct hop_blockdevice_stat /*[PREFIX(bs_)]*/ {
 	                                * this value is too small or doesn't match any recognized
 	                                * structure version. */
 	__uint32_t __bs_pad;           /* ... */
+	__uint64_t   bs_devno;         /* Device number (`dev_t') */
 	__uint64_t   bs_total_bytes;   /* Total number of bytes available. */
 	__uint64_t   bs_sector_count;  /* Total number of sectors available. */
 	__uint64_t   bs_sector_size;   /* Size of a single sector (in bytes). */
 	__uint32_t   bs_device_flag;   /* Active device flags (Set of `BLOCK_DEVICE_FLAG_*').
 	                                * NOTE: If this device is a partition, the `BLOCK_DEVICE_FLAG_PARTITION' bit is set */
 	__uint32_t   bs_partcount;     /* Number of child partitions of this block device. */
-	__uint64_t   bs_devno;         /* Device number (`dev_t') */
 	char         bs_name[80];      /* Name of the device (as used for the auto-node that may appear in `/dev') */
 };
 #endif /* __CC__ */
@@ -82,7 +82,7 @@ struct hop_blockdevice_openpart /*[PREFIX(bop_)]*/ {
 
 
 /* For `HANDLE_TYPE_BLOCKDEVICE' */
-#define HOP_BLOCKDEVICE_STAT          0x00020001 /* [struct hop_blockdevice_stat *result] Read information about the datablock */
+#define HOP_BLOCKDEVICE_STAT          0x00020001 /* [struct hop_blockdevice_stat *result] Read information about the device */
 #define HOP_BLOCKDEVICE_SYNC          0x00020002 /* Write any modified, but unsaved sectors to disk. */
 #define HOP_BLOCKDEVICE_RDREADONLY    0x00020003 /* @return: (0|1): Check if the given block-device is in read-only mode */
 #define HOP_BLOCKDEVICE_WRREADONLY    0x00020004 /* [uint32_t enabled] Set the read-only mode for the given block-device.

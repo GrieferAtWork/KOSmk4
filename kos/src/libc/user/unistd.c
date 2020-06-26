@@ -31,7 +31,9 @@
 
 #include <asm/pagesize.h>
 #include <kos/hop/datablock.h> /* Needed for fpathconf() */
+#include <kos/ioctl/tty.h>
 #include <kos/syscalls.h>
+#include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/param.h>
 #include <sys/resource.h>
@@ -2315,8 +2317,8 @@ NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s)
 #define PATHCONF_VARYING_LIMIT INTPTR_MIN
 PRIVATE ATTR_SECTION(".rodata.crt.fs.property") longptr_t const pc_constants[] = {
 	[_PC_LINK_MAX]           = PATHCONF_VARYING_LIMIT,
-	[_PC_MAX_CANON]          = MAX_CANON, /* TODO: ((struct tty_device *)handle_as_tty(fd))->t_term.t_canon.lb_limt */
-	[_PC_MAX_INPUT]          = MAX_INPUT, /* TODO: ((struct tty_device *)handle_as_tty(fd))->t_term.t_ibuf.rb_limit */
+	[_PC_MAX_CANON]          = PATHCONF_VARYING_LIMIT,
+	[_PC_MAX_INPUT]          = PATHCONF_VARYING_LIMIT,
 	[_PC_NAME_MAX]           = PATHCONF_VARYING_LIMIT,
 	[_PC_PATH_MAX]           = PATH_MAX,
 	[_PC_PIPE_BUF]           = PIPE_BUF,
@@ -2348,6 +2350,15 @@ PRIVATE ATTR_SECTION(".rodata.crt.fs.property") longptr_t const pc_constants[] =
 	[_PC_ALLOC_SIZE_MIN]     = PATHCONF_VARYING_LIMIT,
 	[_PC_SYMLINK_MAX]        = PATHCONF_VARYING_LIMIT,
 	[_PC_2_SYMLINKS]         = PATHCONF_VARYING_LIMIT,
+	/* What about `_PC_TIMESTAMP_RESOLUTION'? */
+	// XXX: _PC_ACL_ENABLED
+	// XXX: _PC_MIN_HOLE_SIZE
+	// XXX: _PC_REFLINK_ENABLED
+	// XXX: _PC_XATTR_ENABLED
+	// XXX: _PC_SATTR_ENABLED
+	// XXX: _PC_XATTR_EXISTS
+	// XXX: _PC_SATTR_EXISTS
+	// XXX: _PC_ACCESS_FILTERING
 };
 
 
@@ -2405,11 +2416,27 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 	              COMPILER_LENOF(pc_constants));
 	if unlikely(name >= COMPILER_LENOF(pc_constants)) {
 		result = libc_seterrno(EINVAL);
-	} else {
-		result = pc_constants[name];
-		if (result == PATHCONF_VARYING_LIMIT) {
-			/* Determine the value based on `fd' */
+	} else if ((result = pc_constants[name]) == PATHCONF_VARYING_LIMIT) {
+		/* Determine the value based on `fd' */
+		switch (name) {
+
+		case _PC_MAX_INPUT: {
+			size_t value;
+			result = ioctl(fd, TTYIO_IBUF_GETLIMIT, &value);
+			if (result >= 0)
+				result = (longptr_t)value;
+		}	break;
+
+		case _PC_MAX_CANON: {
+			size_t value;
+			result = ioctl(fd, TTYIO_CANON_GETLIMIT, &value);
+			if (result >= 0)
+				result = (longptr_t)value;
+		}	break;
+
+		default: {
 			struct hop_superblock_features feat;
+			/* Default case: Derive path information from superblock features. */
 			feat.sbf_struct_size = sizeof(feat);
 			result = hop(fd, HOP_SUPERBLOCK_FEATURES, &feat);
 			if (result >= 0) {
@@ -2441,11 +2468,43 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 					}
 				}
 			}
+		}	break;
 		}
 	}
 	return result;
 }
 /*[[[end:libc_fpathconf]]]*/
+
+/*[[[head:libc_pathconf,hash:CRC-32=0x14d6e30c]]]*/
+/* >> pathconf(2)
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((1)) longptr_t
+NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
+                                    __STDC_INT_AS_UINT_T name)
+/*[[[body:libc_pathconf]]]*/
+{
+	longptr_t result;
+#ifndef __OPTIMIZE_SIZE__
+	/* Try not to open `path' if `name' is invalid, or has a constant value */
+	if unlikely(name >= COMPILER_LENOF(pc_constants)) {
+		result = libc_seterrno(EINVAL);
+	} else if ((result = pc_constants[name]) == PATHCONF_VARYING_LIMIT)
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		fd_t fd;
+		fd = open(path, O_RDONLY);
+		if unlikely(fd < 0)
+			return -1;
+		result = libc_fpathconf(fd, name);
+		sys_close(fd);
+	}
+	return result;
+}
+/*[[[end:libc_pathconf]]]*/
 
 
 
@@ -3877,7 +3936,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbee770b8]]]*/
+/*[[[start:exports,hash:CRC-32=0xa59a053a]]]*/
 DEFINE_PUBLIC_ALIAS(_execv, libc_execv);
 DEFINE_PUBLIC_ALIAS(execv, libc_execv);
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
@@ -3942,6 +4001,7 @@ DEFINE_PUBLIC_ALIAS(tcgetpgrp, libc_tcgetpgrp);
 DEFINE_PUBLIC_ALIAS(tcsetpgrp, libc_tcsetpgrp);
 DEFINE_PUBLIC_ALIAS(getlogin, libc_getlogin);
 DEFINE_PUBLIC_ALIAS(chown, libc_chown);
+DEFINE_PUBLIC_ALIAS(pathconf, libc_pathconf);
 DEFINE_PUBLIC_ALIAS(link, libc_link);
 DEFINE_PUBLIC_ALIAS(_read, libc_read);
 DEFINE_PUBLIC_ALIAS(__read, libc_read);

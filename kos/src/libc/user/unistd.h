@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef43b530 */
+/* HASH CRC-32:0xc6e9cd7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -207,6 +207,13 @@ INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_getlogin)(void);
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_chown)(char const *file, uid_t owner, gid_t group);
+/* >> pathconf(2)
+ * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
+ * Return a path configuration value associated with `NAME' for `PATH'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path, __STDC_INT_AS_UINT_T name);
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_link)(char const *from, char const *to);

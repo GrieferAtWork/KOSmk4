@@ -37,8 +37,11 @@
 #include <hybrid/atomic.h>
 
 #include <asm/ioctls.h>
+#include <compat/config.h>
+#include <compat/kos/types.h>
 #include <kos/except/inval.h>
 #include <kos/except/io.h>
+#include <kos/ioctl/tty.h>
 #include <linux/termios.h> /* struct termiox */
 #include <sys/stat.h>
 #include <sys/types.h> /* loff_t */
@@ -729,9 +732,9 @@ do_TCSETA: {
 		goto do_TCSETX;
 	case TCSETX:
 	case TCSETXF:
-	case TCSETXW:
-do_TCSETX: {
+	case TCSETXW: {
 		struct termios new_io;
+do_TCSETX:
 		validate_readable(arg, sizeof(struct termiox));
 		COMPILER_READ_BARRIER();
 		termiox_to_termios(&new_io, (USER CHECKED struct termiox *)arg);
@@ -758,9 +761,116 @@ do_TCSETX: {
 
 	/* XXX: TIOCVHANGUP? */
 
+	/* KOS-specific tty ioctl commands */
+	case TTYIO_IBUF_GETLIMIT:
+	case TTYIO_CANON_GETLIMIT:
+	case TTYIO_OPEND_GETLIMIT:
+	case TTYIO_IPEND_GETLIMIT:
+#if __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
+	case _IO_WITHSIZE(TTYIO_IBUF_GETLIMIT, compat_size_t):
+	case _IO_WITHSIZE(TTYIO_CANON_GETLIMIT, compat_size_t):
+	case _IO_WITHSIZE(TTYIO_OPEND_GETLIMIT, compat_size_t):
+	case _IO_WITHSIZE(TTYIO_IPEND_GETLIMIT, compat_size_t):
+#endif /* __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
+	{
+		size_t value;
+#if __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
+		validate_writable(arg, _IOC_SIZE(cmd));
+#else /* __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
+		validate_writable(arg, sizeof(size_t));
+#endif /* __SIZEOF_SIZE_T__ == __ARCH_COMPAT_SIZEOF_SIZE_T */
+		switch (_IOC_NR(cmd)) {
+
+		case _IOC_NR(TTYIO_IBUF_GETLIMIT):
+			value = ATOMIC_READ(me->t_term.t_ibuf.rb_limit);
+			break;
+
+		case _IOC_NR(TTYIO_CANON_GETLIMIT):
+			value = ATOMIC_READ(me->t_term.t_canon.lb_limt);
+			break;
+
+		case _IOC_NR(TTYIO_OPEND_GETLIMIT):
+			value = ATOMIC_READ(me->t_term.t_opend.lb_limt);
+			break;
+
+		case _IOC_NR(TTYIO_IPEND_GETLIMIT):
+			value = ATOMIC_READ(me->t_term.t_ipend.lb_limt);
+			break;
+
+		default: __builtin_unreachable();
+		}
+		COMPILER_WRITE_BARRIER();
+#if __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
+		if (_IOC_SIZE(cmd) == sizeof(compat_size_t)) {
+			*(USER CHECKED compat_size_t *)arg = (compat_size_t)value;
+		} else
+#endif /* __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
+		{
+			*(USER CHECKED size_t *)arg = (size_t)value;
+		}
+	}	break;
+
+	case TTYIO_IBUF_SETLIMIT:
+	case TTYIO_CANON_SETLIMIT:
+	case TTYIO_OPEND_SETLIMIT:
+	case TTYIO_IPEND_SETLIMIT:
+#if __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
+	case _IO_WITHSIZE(TTYIO_IBUF_SETLIMIT, compat_size_t):
+	case _IO_WITHSIZE(TTYIO_CANON_SETLIMIT, compat_size_t):
+	case _IO_WITHSIZE(TTYIO_OPEND_SETLIMIT, compat_size_t):
+	case _IO_WITHSIZE(TTYIO_IPEND_SETLIMIT, compat_size_t):
+#endif /* __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
+	{
+		size_t value;
+		struct linebuffer *lnbuf;
+		cred_require_sysadmin();
+		COMPILER_READ_BARRIER();
+#if __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
+		if (_IOC_SIZE(cmd) == sizeof(compat_size_t)) {
+			validate_readable(arg, sizeof(compat_size_t));
+			value = *(USER CHECKED compat_size_t *)arg;
+		} else
+#endif /* __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
+		{
+			validate_readable(arg, sizeof(size_t));
+			value = *(USER CHECKED size_t *)arg;
+		}
+		COMPILER_READ_BARRIER();
+		switch (_IOC_NR(cmd)) {
+
+		case _IOC_NR(TTYIO_IBUF_SETLIMIT):
+			if (!value) {
+				ringbuffer_close(&me->t_term.t_ibuf);
+			} else {
+				ATOMIC_WRITE(me->t_term.t_ibuf.rb_limit, value);
+			}
+			goto done;
+
+		case _IOC_NR(TTYIO_CANON_SETLIMIT):
+			lnbuf = &me->t_term.t_canon;
+			break;
+
+		case _IOC_NR(TTYIO_OPEND_SETLIMIT):
+			lnbuf = &me->t_term.t_opend;
+			break;
+
+		case _IOC_NR(TTYIO_IPEND_SETLIMIT):
+			lnbuf = &me->t_term.t_ipend;
+			break;
+
+		default: __builtin_unreachable();
+		}
+		if (!value) {
+			linebuffer_close(lnbuf);
+		} else {
+			ATOMIC_WRITE(lnbuf->lb_limt, value);
+		}
+	}	break;
+
 	default:
 		return -EINVAL;
 	}
+done:
 	return 0;
 }
 

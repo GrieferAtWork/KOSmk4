@@ -280,13 +280,21 @@ ioctl_generic(syscall_ulong_t command,
 
 	default:
 		if (_IOC_TYPE(command) == 'T') {
+			/* All KOS-specific ioctl commands with type='T' are
+			 * tty-specific, so we must return `-ENOTTY' for all
+			 * of them! */
+			if (_IOC_ISKOS(command))
+				goto do_return_notty;
 			switch (_IOC_NR(command)) {
+
 			case _IOC_NR(TCGETS) ... _IOC_NR(TIOCPKT):
 			case _IOC_NR(TIOCNOTTY) ... _IOC_NR(TIOCGEXCL):
 			case _IOC_NR(TIOCSERCONFIG) ... _IOC_NR(TIOCGICOUNT):
 				/* TTY-specific ioctl()s (user-space uses one of these to implement `isatty()') */
+do_return_notty:
 				*result = -ENOTTY;
 				return true;
+
 			default:
 				break;
 			}

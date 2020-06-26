@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0ea79f0 */
+/* HASH CRC-32:0xc2c8464 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,17 +111,6 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_chown)(char const *file, uid_t
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBDCALL libd_pathconf)(char const *path, __STDC_INT_AS_UINT_T name);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-/* >> pathconf(2)
- * @param: NAME: One of `_PC_*' from <bits/crt/confname.h>
- * Return a path configuration value associated with `NAME' for `PATH'
- * return: * : The configuration limit associated with `NAME' for `PATH'
- * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
- * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
-INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path, __STDC_INT_AS_UINT_T name);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_link)(char const *from, char const *to);

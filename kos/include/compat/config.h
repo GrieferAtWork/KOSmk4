@@ -31,7 +31,7 @@
 
 #define __ARCH_HAVE_COMPAT 1
 #define __ARCH_COMPAT_FUNCPTR(return, cc, name, args) __HYBRID_FUNCPTRnn(return, cc, name, args)
-#define __ARCH_COMPAT(x)             x##nn
+#define __ARCH_COMPAT(x)                              x##nn
 
 #define __ARCH_COMPAT_SIZEOF_POINTER nn
 #define __ARCH_COMPAT_PTR(T)        __HYBRID_PTRnn(T)
@@ -50,8 +50,8 @@
 #define __ARCH_COMPAT_PTRDIFF_T __LONGnn_TYPE__
 
 #define __ARCH_COMPAT_SIZEOF_SHORT nn
-#define __ARCH_COMPAT_SHORT  __INT16_TYPE__
-#define __ARCH_COMPAT_USHORT __UINT16_TYPE__
+#define __ARCH_COMPAT_SHORT  __INTnn_TYPE__
+#define __ARCH_COMPAT_USHORT __UINTnn_TYPE__
 
 #define __ARCH_COMPAT_SIZEOF_INT nn
 #define __ARCH_COMPAT_INT  __INTnn_TYPE__

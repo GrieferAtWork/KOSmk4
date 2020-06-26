@@ -583,7 +583,7 @@ int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
 [[cp, section(".text.crt{|.dos}.fs.property"), decl_include("<features.h>")]]
-[[requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/fcntl.h>")]]
 [[requires($has_function(fpathconf) && $has_function(open) && defined(__O_RDONLY))]]
 $longptr_t pathconf([[nonnull]] char const *path, __STDC_INT_AS_UINT_T name) {
 	fd_t fd;
